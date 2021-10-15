@@ -1,0 +1,14 @@
+html, body {
+                overflow2: hidden;
+                width2: 100%;
+                height2: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            #renderCanvas {
+                width: 500px;
+                height: 500px;
+                touch-action: none;
+            }
+
