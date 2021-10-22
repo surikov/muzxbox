@@ -5,14 +5,70 @@
 	<meta name="viewport"
 		content="initial-scale=1.0, width=device-width, height=device-height, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
 	<link rel="stylesheet" type="text/css" href="resources/base.css">
+	<link rel="stylesheet" type="text/css" href="resources/menu.css">
 	<script type='text/javascript' src='./code/muzxbox.js'></script>
-	<title>Test Editor</title>
+	<title>MuzXBox</title>
 </head>
 
 <body>
+	<!--
 	<p>test 1</p>
-	
+	<p><button onclick='MuzXBox.openMenu();'>test</button></p>
 	<p>test 2</p>
+	-->
+	<svg id="contentSVG" class='contentSVG' viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
+		xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+		<g id='backgroundLayerGroup'></g>
+		<g id='foregroundLayerGroup'></g>
+	</svg>
+	<div id='menuDiv1' class='mainmenu' onclick='MuzXBox.closeMenu();'>
+		<div id="mydiv">
+			<div id="mydivheader"></div>
+		</div>
+		<div id='menuContentDiv' class='menucontent'>
+			<p>
+				<button onclick='MuzXBox.closeMenu();'>close</button>
+			</p>
+			<p class='menubuttonRow'>
+				Another long string to fill whole width
+			</p>
+			<p class='menubuttonRow'>
+				Second long string to fill whole width
+			</p>
+			<p class='menubuttonRow'>1</p>
+			<p class='menubuttonRow'>2</p>
+			<p class='menubuttonRow'>3</p>
+			<p class='menubuttonRow'>4</p>
+			<p class='menubuttonRow'>5</p>
+			<p class='menubuttonRow'>6</p>
+			<p class='menubuttonRow'>7</p>
+			<p class='menubuttonRow' id='dragstarter'>[[[[[dragtest]]]</p>
+			<p class='menubuttonRow'>8</p>
+			<p class='menubuttonRow'>9</p>
+			<p class='menubuttonRow'>10</p>
+			<p class='menubuttonRow'>11</p>
+			<p class='menubuttonRow'>12</p>
+			<p class='menubuttonRow'>13</p>
+			<p class='menubuttonRow'>14</p>
+			<p class='menubuttonRow'>15</p>
+			<p class='menubuttonRow'>16</p>
+			<p class='menubuttonRow'>17</p>
+			<p class='menubuttonRow'>18</p>
+			<p class='menubuttonRow'>19</p>
+			<p class='menubuttonRow'>20</p>
+			<p class='menubuttonRow'>21</p>
+			<p class='menubuttonRow'>22</p>
+			<p class='menubuttonRow'>23</p>
+			<p class='menubuttonRow'>24</p>
+			<p class='menubuttonRow'>25</p>
+			<p class='menubuttonRow'>26</p>
+			<p class='menubuttonRow'>27</p>
+			<p class='menubuttonRow'>28</p>
+			<p class='menubuttonRow'>29</p>
+			<p class='menubuttonRow'>30</p>
+
+		</div>
+	</div>
 	<script>
 		function waitMBx(){
 			console.log('waitMBx');

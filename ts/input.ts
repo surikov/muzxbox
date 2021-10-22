@@ -1,69 +1,90 @@
 console.log('MuzXBox v1.01');
-class ZInputDeviceHandler{
+class ZInputDeviceHandler {
 	constructor() {
-		//
+		let me = this;
+		window.addEventListener("keydown", function (keyboardEvent: KeyboardEvent) {
+			me.processKeyboardEvent(keyboardEvent);
+		});
 	}
-	processKeyboardEvent(keyboardEvent:KeyboardEvent){
+	processKeyboardEvent(keyboardEvent: KeyboardEvent) {
 		//console.log(keyboardEvent.code);
-		if(keyboardEvent.code=='KeyX'){
-			this.processKeyX();
-		}
-		if(keyboardEvent.code=='KeyY'){
-			this.processKeyY();
-		}
-		if(keyboardEvent.code=='KeyA'){
-			this.processKeyA();
-		}
-		if(keyboardEvent.code=='KeyB'){
-			this.processKeyB();
-		}
-		if(keyboardEvent.key=='+'){
-			this.processAnyPlus();
-		}
-		if(keyboardEvent.key=='-'){
-			this.processAnyMinus();
-		}
-		if(keyboardEvent.code=='ArrowLeft'){
-			this.processArrowLeft();
-		}
-		if(keyboardEvent.code=='ArrowRight'){
-			this.processArrowRight();
-		}
-		if(keyboardEvent.code=='ArrowUp'){
-			this.processArrowUp();
-		}
-		if(keyboardEvent.code=='ArrowDown'){
-			this.processArrowDown();
+		//e.preventDefault();
+		switch (keyboardEvent.code) {
+			case 'KeyX':
+				keyboardEvent.preventDefault();
+				this.processKeyX();
+				break;
+			case 'KeyY':
+				keyboardEvent.preventDefault();
+				this.processKeyY();
+				break;
+			case 'KeyA':
+				keyboardEvent.preventDefault();
+				this.processKeyA();
+				break;
+			case 'KeyB':
+				keyboardEvent.preventDefault();
+				this.processKeyB();
+				break;
+			case 'ArrowLeft':
+				keyboardEvent.preventDefault();
+				this.processArrowLeft();
+				break;
+			case 'ArrowRight':
+				keyboardEvent.preventDefault();
+				this.processArrowRight();
+				break;
+			case 'ArrowUp':
+				keyboardEvent.preventDefault();
+				this.processArrowUp();
+				break;
+			case 'ArrowDown':
+				keyboardEvent.preventDefault();
+				this.processArrowDown();
+				break;
+			default:
+				switch (keyboardEvent.key) {
+					case '+':
+						keyboardEvent.preventDefault();
+						this.processAnyPlus();
+						break;
+					case '-':
+						keyboardEvent.preventDefault();
+						this.processAnyMinus();
+						break;
+					default:
+					//
+				}
 		}
 	}
-	processKeyX(){
+	processKeyX() {
 		console.log('KeyX');
 	}
-	processKeyY(){
+	processKeyY() {
 		console.log('KeyY');
 	}
-	processKeyA(){
+	processKeyA() {
 		console.log('KeyA');
 	}
-	processKeyB(){
+	processKeyB() {
 		console.log('KeyB');
 	}
-	processAnyPlus(){
+	processAnyPlus() {
 		console.log('+');
 	}
-	processAnyMinus(){
+	processAnyMinus() {
 		console.log('-');
 	}
-	processArrowLeft(){
+	processArrowLeft() {
 		console.log('left');
 	}
-	processArrowRight(){
+	processArrowRight() {
 		console.log('right');
 	}
-	processArrowUp(){
+	processArrowUp() {
 		console.log('up');
 	}
-	processArrowDown(){
+	processArrowDown() {
 		console.log('down');
 	}
 }

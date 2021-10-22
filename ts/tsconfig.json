@@ -25,5 +25,7 @@
 	,"files": [
 		"main.ts"
 		,"input.ts"
+		,"tilelevel.ts"
+		,"tilelevelutil.ts"
 	]
 }
