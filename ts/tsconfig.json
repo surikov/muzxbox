@@ -27,5 +27,15 @@
 		,"input.ts"
 		,"tilelevel.ts"
 		,"tilelevelutil.ts"
+		,"zvoogtypes.ts"
+		,"zvoogplugin.ts"
+		,"zvoogutil.ts"
+		,"filters/ZvoogFxGain.ts"
+		,"filters/WAFEcho.ts"
+		,"filters/WAFEqualizer.ts"
+		,"sources/ZvoogSineSource.ts"
+		,"sources/WAFInsSource.ts"
+		,"sources/WAFPercSource.ts"
+		,"sources/AudioFileSource.ts"
 	]
 }
