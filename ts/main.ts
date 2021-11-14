@@ -8,6 +8,7 @@ let sizeRatio = 2;
 
 class MuzXBox {
 	zInputDeviceHandler: ZInputDeviceHandler;
+	muzLoader:MuzLoader;
 	constructor() {
 		console.log('start');
 	}
@@ -15,6 +16,7 @@ class MuzXBox {
 		console.log('initAll');
 		let me = this;
 		this.zInputDeviceHandler = new ZInputDeviceHandler();
+		this.muzLoader=new MuzLoader();
 		this.createUI();
 	}
 	createUI() {
@@ -22,7 +24,7 @@ class MuzXBox {
 		let backgroundLayerGroup: SVGElement = (document.getElementById('backgroundLayerGroup') as any) as SVGElement;
 		let minZoom: number = 1;
 		let maxZoom: number = 100;
-		testProject = this.createTestProject();
+		testProject = this.muzLoader.createTestProject();
 		console.log(testProject);
 		firstAnchor = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: minZoom, hideZoom: maxZoom + 1, content: [] };
 		menuAnchor = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: minZoom, hideZoom: maxZoom + 1, content: [] };
@@ -82,37 +84,7 @@ class MuzXBox {
 		menuAnchor.content.push({ x: 20, y: 16, w: 4, h: 4, rx: 1, ry: 1, css: 'debug', action: () => { this.testChooser(20, 16); } });
 		*/
 	}
-	createTestProject(): MuzXBoxProject {
-		let p: MuzXBoxProject = {
-			tracks: [
-				{
-					patterns: [//drums
-						{ pattern: 0, skip: { count: 0, division: 4 }, duration: { count: 1, division: 4 } }
-						, { pattern: 1, skip: { count: 6, division: 4 }, duration: { count: 1, division: 4 } }
-						, { pattern: 0, skip: { count: 0, division: 4 }, duration: { count: 1, division: 4 } }
-						, { pattern: 2, skip: { count: 6, division: 4 }, duration: { count: 1, division: 4 } }
-					]
-				}, {
-					patterns: [//bass
-						{ pattern: 3, skip: { count: 0, division: 4 }, duration: { count: 4, division: 4 } }
-					]
-				}, {
-					patterns: [//lead
-						{ pattern: 4, skip: { count: 1, division: 4 }, duration: { count: 1, division: 4 } }
-					]
-				}, {
-					patterns: [//pad
-						{ pattern: 15, skip: { count: 4, division: 4 }, duration: { count: 2, division: 4 } }
-						, { pattern: 10, skip: { count: 6, division: 4 }, duration: { count: 2, division: 4 } }
-					]
-				}
-			]
-			, title: 'test123'
-			, tempo: 100			
-			, duration: { count: 16, division: 4 }
-		};
-		return p;
-	}
+	
 	testChooser(xx: number, yy) {
 		console.log('testChooser', xx, yy);
 	}

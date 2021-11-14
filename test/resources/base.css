@@ -3,7 +3,7 @@ html {
 	height: 100%;
 	margin: 0px;
 	padding: 0px;
-	background-color: #333333;
+	background-color: var(--background_color);
 	font-family: 'Norican', cursive;
 }
 

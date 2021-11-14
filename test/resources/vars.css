@@ -1,0 +1,15 @@
+:root {
+	--background_color: #ccddff;
+	--tone_step_1: #550044;
+	--tone_step_2_min: #00ff00;
+	--tone_step_2_max: #abc837;
+	--tone_step_3_min: #0000ff;
+	--tone_step_3_max: #ff0000;
+	--tone_step_4: #ff00cc;
+	--tone_step_t: #b3b3b3;
+	--tone_step_5: #bc5fd3;
+	--tone_step_6_min: #55d400;
+	--tone_step_6_max: #008000;
+	--tone_step_7_min: #ffcc00;
+	--tone_step_7_max: #c87137;
+}

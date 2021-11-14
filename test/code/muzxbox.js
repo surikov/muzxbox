@@ -13,6 +13,7 @@ var MuzXBox = (function () {
         console.log('initAll');
         var me = this;
         this.zInputDeviceHandler = new ZInputDeviceHandler();
+        this.muzLoader = new MuzLoader();
         this.createUI();
     };
     MuzXBox.prototype.createUI = function () {
@@ -21,7 +22,7 @@ var MuzXBox = (function () {
         var backgroundLayerGroup = document.getElementById('backgroundLayerGroup');
         var minZoom = 1;
         var maxZoom = 100;
-        testProject = this.createTestProject();
+        testProject = this.muzLoader.createTestProject();
         console.log(testProject);
         firstAnchor = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: minZoom, hideZoom: maxZoom + 1, content: [] };
         menuAnchor = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: minZoom, hideZoom: maxZoom + 1, content: [] };
@@ -42,37 +43,6 @@ var MuzXBox = (function () {
                 curPoint = DUU(curPoint).plus(pattern.duration);
             }
         }
-    };
-    MuzXBox.prototype.createTestProject = function () {
-        var p = {
-            tracks: [
-                {
-                    patterns: [
-                        { pattern: 0, skip: { count: 0, division: 4 }, duration: { count: 1, division: 4 } },
-                        { pattern: 1, skip: { count: 6, division: 4 }, duration: { count: 1, division: 4 } },
-                        { pattern: 0, skip: { count: 0, division: 4 }, duration: { count: 1, division: 4 } },
-                        { pattern: 2, skip: { count: 6, division: 4 }, duration: { count: 1, division: 4 } }
-                    ]
-                }, {
-                    patterns: [
-                        { pattern: 3, skip: { count: 0, division: 4 }, duration: { count: 4, division: 4 } }
-                    ]
-                }, {
-                    patterns: [
-                        { pattern: 4, skip: { count: 1, division: 4 }, duration: { count: 1, division: 4 } }
-                    ]
-                }, {
-                    patterns: [
-                        { pattern: 15, skip: { count: 4, division: 4 }, duration: { count: 2, division: 4 } },
-                        { pattern: 10, skip: { count: 6, division: 4 }, duration: { count: 2, division: 4 } }
-                    ]
-                }
-            ],
-            title: 'test123',
-            tempo: 100,
-            duration: { count: 16, division: 4 }
-        };
-        return p;
     };
     MuzXBox.prototype.testChooser = function (xx, yy) {
         console.log('testChooser', xx, yy);
@@ -174,6 +144,42 @@ var ZInputDeviceHandler = (function () {
         console.log('down');
     };
     return ZInputDeviceHandler;
+}());
+var MuzLoader = (function () {
+    function MuzLoader() {
+    }
+    MuzLoader.prototype.createTestProject = function () {
+        var p = {
+            tracks: [
+                {
+                    patterns: [
+                        { pattern: 0, skip: { count: 0, division: 4 }, duration: { count: 1, division: 4 } },
+                        { pattern: 1, skip: { count: 6, division: 4 }, duration: { count: 1, division: 4 } },
+                        { pattern: 0, skip: { count: 0, division: 4 }, duration: { count: 1, division: 4 } },
+                        { pattern: 2, skip: { count: 6, division: 4 }, duration: { count: 1, division: 4 } }
+                    ]
+                }, {
+                    patterns: [
+                        { pattern: 3, skip: { count: 0, division: 4 }, duration: { count: 4, division: 4 } }
+                    ]
+                }, {
+                    patterns: [
+                        { pattern: 4, skip: { count: 1, division: 4 }, duration: { count: 1, division: 4 } }
+                    ]
+                }, {
+                    patterns: [
+                        { pattern: 15, skip: { count: 4, division: 4 }, duration: { count: 2, division: 4 } },
+                        { pattern: 10, skip: { count: 6, division: 4 }, duration: { count: 2, division: 4 } }
+                    ]
+                }
+            ],
+            title: 'test123',
+            tempo: 100,
+            duration: { count: 16, division: 4 }
+        };
+        return p;
+    };
+    return MuzLoader;
 }());
 console.log('tilelevel v2.17');
 var TileLevel = (function () {
@@ -313,7 +319,7 @@ var TileLevel = (function () {
                 this._translateZ = z;
             }
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(TileLevel.prototype, "translateX", {
@@ -325,7 +331,7 @@ var TileLevel = (function () {
                 this._translateX = x;
             }
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(TileLevel.prototype, "translateY", {
@@ -337,7 +343,7 @@ var TileLevel = (function () {
                 this._translateY = y;
             }
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     TileLevel.prototype.dump = function () {

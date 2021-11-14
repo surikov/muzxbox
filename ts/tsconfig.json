@@ -25,6 +25,7 @@
 	,"files": [
 		"main.ts"
 		,"input.ts"
+		,"loader.ts"
 		,"tilelevel.ts"
 		,"tilelevelutil.ts"
 		,"zvoogtypes.ts"

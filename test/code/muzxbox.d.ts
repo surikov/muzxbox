@@ -5,10 +5,10 @@ declare let testProject: MuzXBoxProject;
 declare let sizeRatio: number;
 declare class MuzXBox {
     zInputDeviceHandler: ZInputDeviceHandler;
+    muzLoader: MuzLoader;
     constructor();
     initAll(): void;
     createUI(): void;
-    createTestProject(): MuzXBoxProject;
     testChooser(xx: number, yy: any): void;
     openMenu(): void;
     closeMenu(): void;
@@ -26,6 +26,9 @@ declare class ZInputDeviceHandler {
     processArrowRight(): void;
     processArrowUp(): void;
     processArrowDown(): void;
+}
+declare class MuzLoader {
+    createTestProject(): MuzXBoxProject;
 }
 declare class TileLevel {
     svg: SVGElement;
@@ -94,12 +97,9 @@ declare class TileLevel {
     isTileGroup(t: TileItem): t is TileAnchor;
     isLayerNormal(t: TileLayerDefinition): t is TileModelLayer;
     rid(): string;
-    get translateZ(): number;
-    set translateZ(z: number);
-    get translateX(): number;
-    set translateX(x: number);
-    get translateY(): number;
-    set translateY(y: number);
+    translateZ: number;
+    translateX: number;
+    translateY: number;
     constructor(svgObject: SVGElement, inWidth: number, inHeight: number, minZoom: number, curZoom: number, maxZoom: number, layers: TileModelLayer[]);
     dump(): void;
     setupTapSize(): void;
