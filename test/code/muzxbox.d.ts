@@ -1,7 +1,6 @@
 declare let firstAnchor: TileAnchor;
 declare let menuAnchor: TileAnchor;
 declare let tileLevel: TileLevel;
-declare let testProject: MuzXBoxProject;
 declare let sizeRatio: number;
 declare class MuzXBox {
     zInputDeviceHandler: ZInputDeviceHandler;
@@ -9,6 +8,7 @@ declare class MuzXBox {
     constructor();
     initAll(): void;
     createUI(): void;
+    resetSong(testProject: MuzXBoxProject): void;
     testChooser(xx: number, yy: any): void;
     openMenu(): void;
     closeMenu(): void;
@@ -97,9 +97,12 @@ declare class TileLevel {
     isTileGroup(t: TileItem): t is TileAnchor;
     isLayerNormal(t: TileLayerDefinition): t is TileModelLayer;
     rid(): string;
-    translateZ: number;
-    translateX: number;
-    translateY: number;
+    get translateZ(): number;
+    set translateZ(z: number);
+    get translateX(): number;
+    set translateX(x: number);
+    get translateY(): number;
+    set translateY(y: number);
     constructor(svgObject: SVGElement, inWidth: number, inHeight: number, minZoom: number, curZoom: number, maxZoom: number, layers: TileModelLayer[]);
     dump(): void;
     setupTapSize(): void;

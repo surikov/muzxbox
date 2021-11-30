@@ -3,7 +3,6 @@ console.log('MuzXBox v1.01');
 var firstAnchor;
 var menuAnchor;
 var tileLevel;
-var testProject;
 var sizeRatio = 2;
 var MuzXBox = (function () {
     function MuzXBox() {
@@ -17,18 +16,23 @@ var MuzXBox = (function () {
         this.createUI();
     };
     MuzXBox.prototype.createUI = function () {
-        var _this = this;
         var layers = [];
         var backgroundLayerGroup = document.getElementById('backgroundLayerGroup');
         var minZoom = 1;
         var maxZoom = 100;
-        testProject = this.muzLoader.createTestProject();
+        var testProject = this.muzLoader.createTestProject();
         console.log(testProject);
         firstAnchor = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: minZoom, hideZoom: maxZoom + 1, content: [] };
         menuAnchor = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: minZoom, hideZoom: maxZoom + 1, content: [] };
         layers.push({ g: backgroundLayerGroup, anchors: [firstAnchor] });
         layers.push({ g: backgroundLayerGroup, anchors: [menuAnchor] });
         tileLevel = new TileLevel(document.getElementById('contentSVG'), 1000, 1000, minZoom, minZoom, maxZoom, layers);
+        this.resetSong(testProject);
+    };
+    MuzXBox.prototype.resetSong = function (testProject) {
+        var _this = this;
+        var time = duration2seconds(testProject.tempo, duration384(testProject.duration));
+        firstAnchor.content.push({ x: 0, y: 0, w: 50 * time, h: testProject.tracks.length * 11, rx: 0.1, ry: 0.1, css: 'debug' });
         for (var tt = 0; tt < testProject.tracks.length; tt++) {
             var track = testProject.tracks[tt];
             var curPoint = { count: 0, division: 4 };
@@ -36,13 +40,15 @@ var MuzXBox = (function () {
             for (var pp = 0; pp < track.patterns.length; pp++) {
                 var pattern = track.patterns[pp];
                 curPoint = DUU(curPoint).plus(pattern.skip);
-                var time = duration2seconds(testProject.tempo, duration384(curPoint));
+                var time_1 = duration2seconds(testProject.tempo, duration384(curPoint));
                 var sz = duration2seconds(testProject.tempo, duration384(pattern.duration));
-                console.log(curPoint, time, sz, duration384(curPoint), curPoint.count, curPoint.division);
-                firstAnchor.content.push({ x: 2 * time, y: tt, w: 2 * sz, h: 1, rx: 0.1, ry: 0.1, css: 'debug', action: function () { _this.testChooser(20, 16); } });
+                console.log(curPoint, time_1, sz, duration384(curPoint), curPoint.count, curPoint.division);
+                firstAnchor.content.push({ x: 50 * time_1, y: tt * 11, w: 50 * sz, h: 11, rx: 0.1, ry: 0.1, css: 'debug', action: function () { _this.testChooser(20, 16); } });
                 curPoint = DUU(curPoint).plus(pattern.duration);
             }
         }
+        tileLevel.innerWidth = 50 * time * tileLevel.tapSize;
+        tileLevel.innerHeight = testProject.tracks.length * 11 * tileLevel.tapSize;
     };
     MuzXBox.prototype.testChooser = function (xx, yy) {
         console.log('testChooser', xx, yy);
@@ -319,7 +325,7 @@ var TileLevel = (function () {
                 this._translateZ = z;
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(TileLevel.prototype, "translateX", {
@@ -331,7 +337,7 @@ var TileLevel = (function () {
                 this._translateX = x;
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(TileLevel.prototype, "translateY", {
@@ -343,7 +349,7 @@ var TileLevel = (function () {
                 this._translateY = y;
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     TileLevel.prototype.dump = function () {
