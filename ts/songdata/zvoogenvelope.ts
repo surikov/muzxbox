@@ -1,0 +1,3 @@
+type ZvoogEnvelope = {
+	pitches: ZvoogPitch[]
+};

@@ -1,11 +1,13 @@
-class ZvoogFxGain implements ZvoogEffect {
+class ZvoogFxGain implements ZvoogFilterPlugin {
 	base: GainNode;
-	params: ZvoogAudioParam[];
+	params: ZvoogPluginParameter[];
 	lockedState = new ZvoogPluginLock();
 	state(): ZvoogPluginLock {
 		return this.lockedState;
 	}
+	passthrough(value: boolean): void{
 
+	}
 	prepare(audioContext: AudioContext, data: string): void {
 		if (this.base) {
 			//
@@ -13,7 +15,7 @@ class ZvoogFxGain implements ZvoogEffect {
 			this.base = audioContext.createGain();
 			this.params = [];
 			//this.params.push((this.base.gain as any) as ZvoogAudioParam);
-			this.params.push(new RangedAudioParam120(((this.base.gain as any) as ZvoogAudioParam), 0, 1));
+			this.params.push(new RangedAudioParam120(((this.base.gain as any) as ZvoogPluginParameter), 0, 1));
 		}
 	}
 	getInput(): AudioNode {
@@ -22,7 +24,7 @@ class ZvoogFxGain implements ZvoogEffect {
 	getOutput(): AudioNode {
 		return this.base;
 	}
-	getParams(): ZvoogAudioParam[] {
+	getParams(): ZvoogPluginParameter[] {
 		return this.params;
 	}
 

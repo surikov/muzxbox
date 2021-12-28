@@ -1,13 +1,15 @@
-class ZvoogSineSource implements ZvoogSource {
+class ZvoogSineSource implements ZvoogPerformerPlugin {
 	out: GainNode;
-	params: ZvoogAudioParam[];
+	params: ZvoogPluginParameter[];
 	audioContext: AudioContext;
 	poll: { node: OscillatorNode, end: number }[];
 	lockedState = new ZvoogPluginLock();
 	state(): ZvoogPluginLock {
 		return this.lockedState;
 	}
+	passthrough(value: boolean): void{
 
+	}
 	prepare(audioContext: AudioContext, data: string): void {
 		if (this.out) {
 			//
@@ -21,7 +23,7 @@ class ZvoogSineSource implements ZvoogSource {
 	getOutput(): AudioNode {
 		return this.out;
 	}
-	getParams(): ZvoogAudioParam[] {
+	getParams(): ZvoogPluginParameter[] {
 		return this.params;
 	}
 	cancelSchedule(): void {

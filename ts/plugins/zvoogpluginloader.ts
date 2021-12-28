@@ -1,132 +1,27 @@
-/*type ZvoogValue = {
-	data: string
-	, label: string
-	, hint: string
-};*/
-interface ZvoogAudioParam {
-	cancelScheduledValues(cancelTime: number): void;
-	linearRampToValueAtTime(value: number, endTime: number): void;
-	setValueAtTime(value: number, startTime: number): void;
-}
-class RangedAudioParam120 implements ZvoogAudioParam {
-	baseParam: ZvoogAudioParam;
-	minValue: number;
-	maxValue: number;
-	constructor(base: ZvoogAudioParam, min: number, max: number) {
-		this.baseParam = base;
-		this.minValue = min;
-		this.maxValue = max;
-	}
-	recalulate(value: number): number {
-		if (value < 0) console.log('wrong 1-119', value);
-		if (value < 0) value = 0;
-		if (value > 119) value = 119;
-		let ratio = (this.maxValue - this.minValue) / 119;
-		let nn = this.minValue + value * ratio;
-		//console.log('recalulate', value, 'min', this.minValue, 'max', this.maxValue, 'result', nn);
-		return nn;
-	}
-	cancelScheduledValues(cancelTime: number): void {
-		this.baseParam.cancelScheduledValues(cancelTime);
-	}
-	linearRampToValueAtTime(value: number, endTime: number): void {
-		this.baseParam.linearRampToValueAtTime(this.recalulate(value), endTime);
-	}
-	setValueAtTime(value: number, startTime: number): void {
-		this.baseParam.setValueAtTime(this.recalulate(value), startTime);
-	}
-}
-interface ZvoogPlugin {
-	//id(): string; //plugin id
-	getParams(): ZvoogAudioParam[]; //parameters automation
-	//, getValues: () => ZvoogValue[] //properties from UI
-	getOutput(): AudioNode;
-	prepare(audioContext: AudioContext, data: string): void;
-	busy(): number;
-	state(): ZvoogPluginLock;
-	//setData(data:string):void;
-}
-type ZvoogEffect = ZvoogPlugin & {
-	getInput: () => AudioNode
-
-}
-type ZvoogSource = ZvoogPlugin & {
-	addSchedule: (when: number, tempo: number, envelopes: ZvoogEnvelope[], variation: number) => void
-	, cancelSchedule: () => void
-}
-class ZvoogPluginLock {
-	lockedState: boolean;
-	lock(): void {
-		this.lockedState = true;
-	}
-	unlock(): void {
-		this.lockedState = false;
-	}
-	locked(): boolean {
-		return this.lockedState;
-	}
-}
-class ZvoogFilterSourceEmpty implements ZvoogSource, ZvoogEffect {
-	base: GainNode;
-	params: ZvoogAudioParam[];
-	//values: ZvoogValue[];
-	//ZvoogPlugin
-	lockedState = new ZvoogPluginLock();
-	setData(data: string): void {
-
-	}
-	state(): ZvoogPluginLock {
-		return this.lockedState;
-	}
-	prepare(audioContext: AudioContext): void {
-		if (this.base) {
-
-		} else {
-			this.base = audioContext.createGain();
-		}
-		this.params = [];
-		//this.values = [];
-	}
-	getOutput(): AudioNode {
-		return this.base;
-	}
-	getParams(): ZvoogAudioParam[] {
-		return this.params;
-	}
-
-	busy(): number {
-		return 0;
-	}
-	/*id(): string {
-		return 'empty';
-	}*/
-	//getValues(): ZvoogValue[] {
-	//	return this.values;
-	//}
-	//ZvoogPlugin
-	cancelSchedule(): void {
-		//
-	}
-	addSchedule(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void {
-		//
-	}
-	//ZvoogEffect
-	getInput(): AudioNode {
-		return this.base;
-	}
-}
-
-let cachedFilterSourceEmptyPlugins: ZvoogFilterSourceEmpty[] = [];
-function takeZvoogFilterSourceEmpty(): ZvoogFilterSourceEmpty {
-	for (let i = 0; i < cachedFilterSourceEmptyPlugins.length; i++) {
-		if (!cachedFilterSourceEmptyPlugins[i].state().locked()) {
-			cachedFilterSourceEmptyPlugins[i].state().lock();
-			return cachedFilterSourceEmptyPlugins[i];
+let cachedPerformerStubPlugins: ZvoogPerformerStub[] = [];
+function takeZvoogPerformerStub(): ZvoogPerformerStub {
+	for (let i = 0; i < cachedPerformerStubPlugins.length; i++) {
+		if (!cachedPerformerStubPlugins[i].state().locked()) {
+			cachedPerformerStubPlugins[i].state().lock();
+			return cachedPerformerStubPlugins[i];
 		}
 	}
-	let plugin = new ZvoogFilterSourceEmpty();
+	let plugin = new ZvoogPerformerStub();
 	plugin.state().lock();
-	cachedFilterSourceEmptyPlugins.push(plugin);
+	cachedPerformerStubPlugins.push(plugin);
+	return plugin;
+}
+let cachedFilterStubPlugins: ZvoogFilterStub[] = [];
+function takeZvoogFilterStub(): ZvoogFilterStub {
+	for (let i = 0; i < cachedFilterStubPlugins.length; i++) {
+		if (!cachedFilterStubPlugins[i].state().locked()) {
+			cachedFilterStubPlugins[i].state().lock();
+			return cachedFilterStubPlugins[i];
+		}
+	}
+	let plugin = new ZvoogFilterStub();
+	plugin.state().lock();
+	cachedFilterStubPlugins.push(plugin);
 	return plugin;
 }
 let cachedWAFEchoPlugins: WAFEcho[] = [];
@@ -220,16 +115,16 @@ function takeZvoogSineSource(): ZvoogSineSource {
 	cachedZvoogSineSourcePlugins.push(plugin);
 	return plugin;
 }
-function createPluginEffect(id: string): ZvoogEffect {
+function createPluginEffect(id: string): ZvoogFilterPlugin {
 	//console.log('createPluginEffect', id, cachedZvoogFxGainPlugins.length, cachedWAFEqualizerPlugins.length);
 	if (id == 'echo') return takeWAFEcho();//new WAFEcho();
 	if (id == 'equalizer') return takeWAFEqualizer();//new WAFEqualizer();
 	if (id == 'gain') return takeZvoogFxGain();//new ZvoogFxGain();
 	//console.log('empty plugin effect for', id);
 	//return new ZvoogFilterSourceEmpty();
-	return takeZvoogFilterSourceEmpty();
+	return takeZvoogFilterStub();
 }
-function createPluginSource(id: string): ZvoogSource {
+function createPluginSource(id: string): ZvoogPerformerPlugin {
 	//console.log('createPluginSource', id, cachedWAFInsSourcePlugins.length, cachedWAFPercSourcePlugins.length);
 	if (id == 'audio') {
 		//var t = [0, 1, 2];
@@ -242,5 +137,5 @@ function createPluginSource(id: string): ZvoogSource {
 	if (id == 'sine') return takeZvoogSineSource();//new ZvoogSineSource();
 	//console.log('empty plugin source for', id);
 	//return new ZvoogFilterSourceEmpty();
-	return takeZvoogFilterSourceEmpty();
+	return takeZvoogPerformerStub();
 }

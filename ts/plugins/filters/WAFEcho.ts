@@ -1,11 +1,14 @@
-class WAFEcho implements ZvoogEffect {
+class WAFEcho implements ZvoogFilterPlugin {
 	inpt: GainNode;
 	outpt: GainNode;
 	rvrbrtr: any;
-	params: ZvoogAudioParam[];
+	params: ZvoogPluginParameter[];
 	lockedState = new ZvoogPluginLock();
 	state(): ZvoogPluginLock {
 		return this.lockedState;
+	}
+	passthrough(value: boolean): void{
+
 	}
 	setData(data: string): void {
 
@@ -21,12 +24,12 @@ class WAFEcho implements ZvoogEffect {
 			this.initWAF();
 			this.rvrbrtr = (window as any).wafPlayer.createReverberator(audioContext);
 
-			this.params.push(new RangedAudioParam120(((this.rvrbrtr.wet.gain as any) as ZvoogAudioParam), 0, 1));
-			this.params.push(new RangedAudioParam120(((this.rvrbrtr.compressor.threshold as any) as ZvoogAudioParam), -100, 0));
-			this.params.push(new RangedAudioParam120(((this.rvrbrtr.compressor.knee as any) as ZvoogAudioParam), 0, 40));
-			this.params.push(new RangedAudioParam120(((this.rvrbrtr.compressor.ratio as any) as ZvoogAudioParam), 2, 20));
-			this.params.push(new RangedAudioParam120(((this.rvrbrtr.compressor.attack as any) as ZvoogAudioParam), 0, 1));
-			this.params.push(new RangedAudioParam120(((this.rvrbrtr.compressor.release as any) as ZvoogAudioParam), 0, 1));
+			this.params.push(new RangedAudioParam120(((this.rvrbrtr.wet.gain as any) as ZvoogPluginParameter), 0, 1));
+			this.params.push(new RangedAudioParam120(((this.rvrbrtr.compressor.threshold as any) as ZvoogPluginParameter), -100, 0));
+			this.params.push(new RangedAudioParam120(((this.rvrbrtr.compressor.knee as any) as ZvoogPluginParameter), 0, 40));
+			this.params.push(new RangedAudioParam120(((this.rvrbrtr.compressor.ratio as any) as ZvoogPluginParameter), 2, 20));
+			this.params.push(new RangedAudioParam120(((this.rvrbrtr.compressor.attack as any) as ZvoogPluginParameter), 0, 1));
+			this.params.push(new RangedAudioParam120(((this.rvrbrtr.compressor.release as any) as ZvoogPluginParameter), 0, 1));
 			//this.params=[];
 			this.rvrbrtr.compressorDry.gain.setValueAtTime(1, 0);
 			this.rvrbrtr.compressorWet.gain.setValueAtTime(0, 0);
@@ -65,7 +68,7 @@ class WAFEcho implements ZvoogEffect {
 	getOutput(): AudioNode {
 		return this.outpt;
 	}
-	getParams(): ZvoogAudioParam[] {
+	getParams(): ZvoogPluginParameter[] {
 		return this.params;
 	}
 

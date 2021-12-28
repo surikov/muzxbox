@@ -1,7 +1,7 @@
 declare function WebAudioFontPlayer(): void;
-class WAFInsSource implements ZvoogSource {
+class WAFInsSource implements ZvoogPerformerPlugin {
 	out: GainNode;
-	params: ZvoogAudioParam[];
+	params: ZvoogPluginParameter[];
 	audioContext: AudioContext;
 	poll: { node: OscillatorNode, end: number }[];
 	ins: number = 0;
@@ -10,7 +10,9 @@ class WAFInsSource implements ZvoogSource {
 	state(): ZvoogPluginLock {
 		return this.lockedState;
 	}
+	passthrough(value: boolean): void{
 
+	}
 	cancelSchedule(): void {
 		(window as any).wafPlayer.cancelQueue(this.audioContext);
 	}
@@ -87,7 +89,7 @@ class WAFInsSource implements ZvoogSource {
 	getOutput(): AudioNode {
 		return this.out;
 	}
-	getParams(): ZvoogAudioParam[] {
+	getParams(): ZvoogPluginParameter[] {
 		return this.params;
 	}
 	busy(): number {

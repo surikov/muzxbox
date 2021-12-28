@@ -1,6 +1,6 @@
-class AudioFileSource implements ZvoogSource {
+class AudioFileSource implements ZvoogPerformerPlugin {
 	out: GainNode;
-	params: ZvoogAudioParam[];
+	params: ZvoogPluginParameter[];
 	audioContext: AudioContext;
 	rawData: Uint8Array;
 	buffer: AudioBuffer;
@@ -13,6 +13,9 @@ class AudioFileSource implements ZvoogSource {
 	lockedState = new ZvoogPluginLock();
 	state(): ZvoogPluginLock {
 		return this.lockedState;
+	}
+	passthrough(value: boolean): void{
+
 	}
 	setData(base64file: string): void {
 		//https://base64.guru/converter/encode/file
@@ -59,7 +62,7 @@ class AudioFileSource implements ZvoogSource {
 	getOutput(): AudioNode {
 		return this.out;
 	}
-	getParams(): ZvoogAudioParam[] {
+	getParams(): ZvoogPluginParameter[] {
 		return this.params;
 	}
 	cancelSchedule(): void {

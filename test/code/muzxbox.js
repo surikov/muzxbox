@@ -1085,19 +1085,19 @@ var TileLevel = (function () {
     TileLevel.prototype.addElement = function (g, dd, layer) {
         var element = null;
         if (this.isTileRectangle(dd)) {
-            element = this.tileRectangle(g, dd.x * this.tapSize, dd.y * this.tapSize, dd.w * this.tapSize, dd.h * this.tapSize, (dd.rx ? dd.rx : 0) * this.tapSize, (dd.ry ? dd.ry : 0) * this.tapSize, (dd.css ? dd.css : ''));
+            element = tileRectangle(this.svgns, this.tapSize, g, dd.x * this.tapSize, dd.y * this.tapSize, dd.w * this.tapSize, dd.h * this.tapSize, (dd.rx ? dd.rx : 0) * this.tapSize, (dd.ry ? dd.ry : 0) * this.tapSize, (dd.css ? dd.css : ''));
         }
         if (this.isTileText(dd)) {
-            element = this.tileText(g, dd.x * this.tapSize, dd.y * this.tapSize, dd.text, dd.css ? dd.css : '');
+            element = tileText(this.svgns, this.tapSize, g, dd.x * this.tapSize, dd.y * this.tapSize, dd.text, dd.css ? dd.css : '');
         }
         if (this.isTilePath(dd)) {
-            element = this.tilePath(g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, (dd.scale ? dd.scale : 0), dd.points, dd.css ? dd.css : '');
+            element = tilePath(this.svgns, this.tapSize, g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, (dd.scale ? dd.scale : 0), dd.points, dd.css ? dd.css : '');
         }
         if (this.isTilePolygon(dd)) {
-            element = this.tilePolygon(g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, dd.scale, dd.dots, dd.css);
+            element = tilePolygon(this.svgns, this.tapSize, g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, dd.scale, dd.dots, dd.css);
         }
         if (this.isTileLine(dd)) {
-            element = this.tileLine(g, dd.x1 * this.tapSize, dd.y1 * this.tapSize, dd.x2 * this.tapSize, dd.y2 * this.tapSize, dd.css);
+            element = tileLine(this.svgns, this.tapSize, g, dd.x1 * this.tapSize, dd.y1 * this.tapSize, dd.x2 * this.tapSize, dd.y2 * this.tapSize, dd.css);
         }
         if (this.isTileGroup(dd)) {
             this.addGroupTile(g, dd, layer);
@@ -1143,91 +1143,6 @@ var TileLevel = (function () {
                 }
             }
         }
-    };
-    TileLevel.prototype.tilePolygon = function (g, x, y, z, dots, cssClass) {
-        var polygon = document.createElementNS(this.svgns, 'polygon');
-        var points = '';
-        var dlmtr = '';
-        for (var i = 0; i < dots.length; i = i + 2) {
-            points = points + dlmtr + dots[i] * this.tapSize + ',' + dots[i + 1] * this.tapSize;
-            dlmtr = ', ';
-        }
-        polygon.setAttributeNS(null, 'points', points);
-        var t = "";
-        if ((x) || (y)) {
-            t = 'translate(' + x + ',' + y + ')';
-        }
-        if (z) {
-            t = t + ' scale(' + z + ')';
-        }
-        if (t.length > 0) {
-            polygon.setAttributeNS(null, 'transform', t);
-        }
-        if (cssClass) {
-            polygon.classList.add(cssClass);
-        }
-        g.appendChild(polygon);
-        return polygon;
-    };
-    TileLevel.prototype.tilePath = function (g, x, y, z, data, cssClass) {
-        var path = document.createElementNS(this.svgns, 'path');
-        path.setAttributeNS(null, 'd', data);
-        var t = "";
-        if ((x) || (y)) {
-            t = 'translate(' + x + ',' + y + ')';
-        }
-        if (z) {
-            t = t + ' scale(' + z + ')';
-        }
-        if (t.length > 0) {
-            path.setAttributeNS(null, 'transform', t);
-        }
-        if (cssClass) {
-            path.classList.add(cssClass);
-        }
-        g.appendChild(path);
-        return path;
-    };
-    TileLevel.prototype.tileRectangle = function (g, x, y, w, h, rx, ry, cssClass) {
-        var rect = document.createElementNS(this.svgns, 'rect');
-        rect.setAttributeNS(null, 'x', '' + x);
-        rect.setAttributeNS(null, 'y', '' + y);
-        rect.setAttributeNS(null, 'height', '' + h);
-        rect.setAttributeNS(null, 'width', '' + w);
-        if (rx) {
-            rect.setAttributeNS(null, 'rx', '' + rx);
-        }
-        if (ry) {
-            rect.setAttributeNS(null, 'ry', '' + ry);
-        }
-        if (cssClass) {
-            rect.classList.add(cssClass);
-        }
-        g.appendChild(rect);
-        return rect;
-    };
-    TileLevel.prototype.tileLine = function (g, x1, y1, x2, y2, cssClass) {
-        var line = document.createElementNS(this.svgns, 'line');
-        line.setAttributeNS(null, 'x1', '' + x1);
-        line.setAttributeNS(null, 'y1', '' + y1);
-        line.setAttributeNS(null, 'x2', '' + x2);
-        line.setAttributeNS(null, 'y2', '' + y2);
-        if (cssClass) {
-            line.classList.add(cssClass);
-        }
-        g.appendChild(line);
-        return line;
-    };
-    TileLevel.prototype.tileText = function (g, x, y, html, cssClass) {
-        var txt = document.createElementNS(this.svgns, 'text');
-        txt.setAttributeNS(null, 'x', '' + x);
-        txt.setAttributeNS(null, 'y', '' + y);
-        if (cssClass) {
-            txt.setAttributeNS(null, 'class', cssClass);
-        }
-        txt.innerHTML = html;
-        g.appendChild(txt);
-        return txt;
     };
     TileLevel.prototype.clearAllDetails = function () {
         if (this.model) {
@@ -1350,207 +1265,90 @@ var CannyDo = (function () {
     };
     return CannyDo;
 }());
-var RangedAudioParam120 = (function () {
-    function RangedAudioParam120(base, min, max) {
-        this.baseParam = base;
-        this.minValue = min;
-        this.maxValue = max;
+function tilePolygon(svgns, tapSize, g, x, y, z, dots, cssClass) {
+    var polygon = document.createElementNS(svgns, 'polygon');
+    var points = '';
+    var dlmtr = '';
+    for (var i = 0; i < dots.length; i = i + 2) {
+        points = points + dlmtr + dots[i] * tapSize + ',' + dots[i + 1] * tapSize;
+        dlmtr = ', ';
     }
-    RangedAudioParam120.prototype.recalulate = function (value) {
-        if (value < 0)
-            console.log('wrong 1-119', value);
-        if (value < 0)
-            value = 0;
-        if (value > 119)
-            value = 119;
-        var ratio = (this.maxValue - this.minValue) / 119;
-        var nn = this.minValue + value * ratio;
-        return nn;
-    };
-    RangedAudioParam120.prototype.cancelScheduledValues = function (cancelTime) {
-        this.baseParam.cancelScheduledValues(cancelTime);
-    };
-    RangedAudioParam120.prototype.linearRampToValueAtTime = function (value, endTime) {
-        this.baseParam.linearRampToValueAtTime(this.recalulate(value), endTime);
-    };
-    RangedAudioParam120.prototype.setValueAtTime = function (value, startTime) {
-        this.baseParam.setValueAtTime(this.recalulate(value), startTime);
-    };
-    return RangedAudioParam120;
-}());
-var ZvoogPluginLock = (function () {
-    function ZvoogPluginLock() {
+    polygon.setAttributeNS(null, 'points', points);
+    var t = "";
+    if ((x) || (y)) {
+        t = 'translate(' + x + ',' + y + ')';
     }
-    ZvoogPluginLock.prototype.lock = function () {
-        this.lockedState = true;
-    };
-    ZvoogPluginLock.prototype.unlock = function () {
-        this.lockedState = false;
-    };
-    ZvoogPluginLock.prototype.locked = function () {
-        return this.lockedState;
-    };
-    return ZvoogPluginLock;
-}());
-var ZvoogFilterSourceEmpty = (function () {
-    function ZvoogFilterSourceEmpty() {
-        this.lockedState = new ZvoogPluginLock();
+    if (z) {
+        t = t + ' scale(' + z + ')';
     }
-    ZvoogFilterSourceEmpty.prototype.setData = function (data) {
-    };
-    ZvoogFilterSourceEmpty.prototype.state = function () {
-        return this.lockedState;
-    };
-    ZvoogFilterSourceEmpty.prototype.prepare = function (audioContext) {
-        if (this.base) {
-        }
-        else {
-            this.base = audioContext.createGain();
-        }
-        this.params = [];
-    };
-    ZvoogFilterSourceEmpty.prototype.getOutput = function () {
-        return this.base;
-    };
-    ZvoogFilterSourceEmpty.prototype.getParams = function () {
-        return this.params;
-    };
-    ZvoogFilterSourceEmpty.prototype.busy = function () {
-        return 0;
-    };
-    ZvoogFilterSourceEmpty.prototype.cancelSchedule = function () {
-    };
-    ZvoogFilterSourceEmpty.prototype.addSchedule = function (when, tempo, chord, variation) {
-    };
-    ZvoogFilterSourceEmpty.prototype.getInput = function () {
-        return this.base;
-    };
-    return ZvoogFilterSourceEmpty;
-}());
-var cachedFilterSourceEmptyPlugins = [];
-function takeZvoogFilterSourceEmpty() {
-    for (var i = 0; i < cachedFilterSourceEmptyPlugins.length; i++) {
-        if (!cachedFilterSourceEmptyPlugins[i].state().locked()) {
-            cachedFilterSourceEmptyPlugins[i].state().lock();
-            return cachedFilterSourceEmptyPlugins[i];
-        }
+    if (t.length > 0) {
+        polygon.setAttributeNS(null, 'transform', t);
     }
-    var plugin = new ZvoogFilterSourceEmpty();
-    plugin.state().lock();
-    cachedFilterSourceEmptyPlugins.push(plugin);
-    return plugin;
+    if (cssClass) {
+        polygon.classList.add(cssClass);
+    }
+    g.appendChild(polygon);
+    return polygon;
 }
-var cachedWAFEchoPlugins = [];
-function takeWAFEcho() {
-    for (var i = 0; i < cachedWAFEchoPlugins.length; i++) {
-        if (!cachedWAFEchoPlugins[i].state().locked()) {
-            cachedWAFEchoPlugins[i].state().lock();
-            return cachedWAFEchoPlugins[i];
-        }
+function tilePath(svgns, tapSize, g, x, y, z, data, cssClass) {
+    var path = document.createElementNS(svgns, 'path');
+    path.setAttributeNS(null, 'd', data);
+    var t = "";
+    if ((x) || (y)) {
+        t = 'translate(' + x + ',' + y + ')';
     }
-    var plugin = new WAFEcho();
-    plugin.state().lock();
-    cachedWAFEchoPlugins.push(plugin);
-    return plugin;
-}
-var cachedWAFEqualizerPlugins = [];
-function takeWAFEqualizer() {
-    for (var i = 0; i < cachedWAFEqualizerPlugins.length; i++) {
-        if (!cachedWAFEqualizerPlugins[i].state().locked()) {
-            cachedWAFEqualizerPlugins[i].state().lock();
-            return cachedWAFEqualizerPlugins[i];
-        }
+    if (z) {
+        t = t + ' scale(' + z + ')';
     }
-    var plugin = new WAFEqualizer();
-    plugin.state().lock();
-    cachedWAFEqualizerPlugins.push(plugin);
-    return plugin;
-}
-var cachedZvoogFxGainPlugins = [];
-function takeZvoogFxGain() {
-    for (var i = 0; i < cachedZvoogFxGainPlugins.length; i++) {
-        if (!cachedZvoogFxGainPlugins[i].state().locked()) {
-            cachedZvoogFxGainPlugins[i].state().lock();
-            return cachedZvoogFxGainPlugins[i];
-        }
+    if (t.length > 0) {
+        path.setAttributeNS(null, 'transform', t);
     }
-    var plugin = new ZvoogFxGain();
-    plugin.state().lock();
-    cachedZvoogFxGainPlugins.push(plugin);
-    return plugin;
-}
-var cachedAudioFileSourcePlugins = [];
-function takeAudioFileSource() {
-    for (var i = 0; i < cachedAudioFileSourcePlugins.length; i++) {
-        if (!cachedAudioFileSourcePlugins[i].state().locked()) {
-            cachedAudioFileSourcePlugins[i].state().lock();
-            return cachedAudioFileSourcePlugins[i];
-        }
+    if (cssClass) {
+        path.classList.add(cssClass);
     }
-    var plugin = new AudioFileSource();
-    plugin.state().lock();
-    cachedAudioFileSourcePlugins.push(plugin);
-    return plugin;
+    g.appendChild(path);
+    return path;
 }
-var cachedWAFInsSourcePlugins = [];
-function takeWAFInsSource() {
-    for (var i = 0; i < cachedWAFInsSourcePlugins.length; i++) {
-        if (!cachedWAFInsSourcePlugins[i].state().locked()) {
-            cachedWAFInsSourcePlugins[i].state().lock();
-            return cachedWAFInsSourcePlugins[i];
-        }
+function tileRectangle(svgns, tapSize, g, x, y, w, h, rx, ry, cssClass) {
+    var rect = document.createElementNS(svgns, 'rect');
+    rect.setAttributeNS(null, 'x', '' + x);
+    rect.setAttributeNS(null, 'y', '' + y);
+    rect.setAttributeNS(null, 'height', '' + h);
+    rect.setAttributeNS(null, 'width', '' + w);
+    if (rx) {
+        rect.setAttributeNS(null, 'rx', '' + rx);
     }
-    var plugin = new WAFInsSource();
-    plugin.state().lock();
-    cachedWAFInsSourcePlugins.push(plugin);
-    return plugin;
-}
-var cachedWAFPercSourcePlugins = [];
-function takeWAFPercSource() {
-    for (var i = 0; i < cachedWAFPercSourcePlugins.length; i++) {
-        if (!cachedWAFPercSourcePlugins[i].state().locked()) {
-            cachedWAFPercSourcePlugins[i].state().lock();
-            return cachedWAFPercSourcePlugins[i];
-        }
+    if (ry) {
+        rect.setAttributeNS(null, 'ry', '' + ry);
     }
-    var plugin = new WAFPercSource();
-    plugin.state().lock();
-    cachedWAFPercSourcePlugins.push(plugin);
-    return plugin;
-}
-var cachedZvoogSineSourcePlugins = [];
-function takeZvoogSineSource() {
-    for (var i = 0; i < cachedZvoogSineSourcePlugins.length; i++) {
-        if (!cachedZvoogSineSourcePlugins[i].state().locked()) {
-            cachedZvoogSineSourcePlugins[i].state().lock();
-            return cachedZvoogSineSourcePlugins[i];
-        }
+    if (cssClass) {
+        rect.classList.add(cssClass);
     }
-    var plugin = new ZvoogSineSource();
-    plugin.state().lock();
-    cachedZvoogSineSourcePlugins.push(plugin);
-    return plugin;
+    g.appendChild(rect);
+    return rect;
 }
-function createPluginEffect(id) {
-    if (id == 'echo')
-        return takeWAFEcho();
-    if (id == 'equalizer')
-        return takeWAFEqualizer();
-    if (id == 'gain')
-        return takeZvoogFxGain();
-    return takeZvoogFilterSourceEmpty();
-}
-function createPluginSource(id) {
-    if (id == 'audio') {
-        return takeAudioFileSource();
+function tileLine(svgns, tapSize, g, x1, y1, x2, y2, cssClass) {
+    var line = document.createElementNS(svgns, 'line');
+    line.setAttributeNS(null, 'x1', '' + x1);
+    line.setAttributeNS(null, 'y1', '' + y1);
+    line.setAttributeNS(null, 'x2', '' + x2);
+    line.setAttributeNS(null, 'y2', '' + y2);
+    if (cssClass) {
+        line.classList.add(cssClass);
     }
-    if (id == 'wafinstrument')
-        return takeWAFInsSource();
-    if (id == 'wafdrum')
-        return takeWAFPercSource();
-    if (id == 'sine')
-        return takeZvoogSineSource();
-    return takeZvoogFilterSourceEmpty();
+    g.appendChild(line);
+    return line;
+}
+function tileText(svgns, tapSize, g, x, y, html, cssClass) {
+    var txt = document.createElementNS(svgns, 'text');
+    txt.setAttributeNS(null, 'x', '' + x);
+    txt.setAttributeNS(null, 'y', '' + y);
+    if (cssClass) {
+        txt.setAttributeNS(null, 'class', cssClass);
+    }
+    txt.innerHTML = html;
+    g.appendChild(txt);
+    return txt;
 }
 function duration2seconds(bpm, duration384) {
     var n4 = 60 / bpm;
@@ -1763,105 +1561,14 @@ function adjustVoiceLowHigh(voice, originalProg, targetProg, measures, trackIsBa
         }
     }
 }
-function DUU(u) {
-    return new DurationUnitUtil(u);
-}
-var DurationUnitUtil = (function () {
-    function DurationUnitUtil(u) {
-        this._unit = u;
-    }
-    DurationUnitUtil.prototype.clone = function () {
-        return { count: this._unit.count, division: this._unit.division };
-    };
-    DurationUnitUtil.prototype.plus = function (b) {
-        if (this._unit.division == b.division) {
-            return { count: this._unit.count + b.count, division: this._unit.division };
-        }
-        else {
-            var r = { count: this._unit.count * b.division + b.count * this._unit.division, division: this._unit.division * b.division };
-            return r;
-        }
-    };
-    DurationUnitUtil.prototype.minus = function (b) {
-        if (this._unit.division == b.division) {
-            return { count: this._unit.count - b.count, division: this._unit.division };
-        }
-        else {
-            var r = { count: this._unit.count * b.division - b.count * this._unit.division, division: this._unit.division * b.division };
-            return r;
-        }
-    };
-    DurationUnitUtil.prototype._meterMore = function (b) {
-        var a1 = this.plus({ count: 0, division: b.division });
-        var b1 = DUU(b).plus({ count: 0, division: this._unit.division });
-        if (a1.count == b1.count) {
-            return 0;
-        }
-        else {
-            if (a1.count > b1.count) {
-                return 1;
-            }
-            else {
-                return -1;
-            }
-        }
-    };
-    DurationUnitUtil.prototype.moreThen = function (b) {
-        if (this._meterMore(b) == 1) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    };
-    DurationUnitUtil.prototype.notMoreThen = function (b) {
-        if (this._meterMore(b) == 1) {
-            return false;
-        }
-        else {
-            return true;
-        }
-    };
-    DurationUnitUtil.prototype.lessThen = function (b) {
-        if (this._meterMore(b) == -1) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    };
-    DurationUnitUtil.prototype.notLessThen = function (b) {
-        if (this._meterMore(b) == -1) {
-            return false;
-        }
-        else {
-            return true;
-        }
-    };
-    DurationUnitUtil.prototype.equalsTo = function (b) {
-        if (this._meterMore(b) == 0) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    };
-    DurationUnitUtil.prototype.simplify = function () {
-        var r = this.clone();
-        while (r.division % 2 == 0 && r.count % 2 == 0) {
-            r.division = r.division / 2;
-            r.count = r.count / 2;
-        }
-        return r;
-    };
-    return DurationUnitUtil;
-}());
 var ZvoogFxGain = (function () {
     function ZvoogFxGain() {
         this.lockedState = new ZvoogPluginLock();
     }
     ZvoogFxGain.prototype.state = function () {
         return this.lockedState;
+    };
+    ZvoogFxGain.prototype.passthrough = function (value) {
     };
     ZvoogFxGain.prototype.prepare = function (audioContext, data) {
         if (this.base) {
@@ -1892,6 +1599,8 @@ var WAFEcho = (function () {
     }
     WAFEcho.prototype.state = function () {
         return this.lockedState;
+    };
+    WAFEcho.prototype.passthrough = function (value) {
     };
     WAFEcho.prototype.setData = function (data) {
     };
@@ -1969,6 +1678,8 @@ var WAFEqualizer = (function () {
     WAFEqualizer.prototype.state = function () {
         return this.lockedState;
     };
+    WAFEqualizer.prototype.passthrough = function (value) {
+    };
     WAFEqualizer.prototype.prepare = function (audioContext, data) {
         if (this.inpt) {
         }
@@ -2017,6 +1728,8 @@ var ZvoogSineSource = (function () {
     }
     ZvoogSineSource.prototype.state = function () {
         return this.lockedState;
+    };
+    ZvoogSineSource.prototype.passthrough = function (value) {
     };
     ZvoogSineSource.prototype.prepare = function (audioContext, data) {
         if (this.out) {
@@ -2101,6 +1814,8 @@ var WAFInsSource = (function () {
     }
     WAFInsSource.prototype.state = function () {
         return this.lockedState;
+    };
+    WAFInsSource.prototype.passthrough = function (value) {
     };
     WAFInsSource.prototype.cancelSchedule = function () {
         window.wafPlayer.cancelQueue(this.audioContext);
@@ -2191,6 +1906,8 @@ var WAFPercSource = (function () {
     WAFPercSource.prototype.state = function () {
         return this.lockedState;
     };
+    WAFPercSource.prototype.passthrough = function (value) {
+    };
     WAFPercSource.prototype.cancelSchedule = function () {
         window.wafPlayer.cancelQueue(this.audioContext);
     };
@@ -2260,6 +1977,8 @@ var AudioFileSource = (function () {
     }
     AudioFileSource.prototype.state = function () {
         return this.lockedState;
+    };
+    AudioFileSource.prototype.passthrough = function (value) {
     };
     AudioFileSource.prototype.setData = function (base64file) {
         var t = [];
@@ -2391,4 +2110,344 @@ var AudioFileSource = (function () {
     };
     return AudioFileSource;
 }());
+function DUU(u) {
+    return new DurationUnitUtil(u);
+}
+var DurationUnitUtil = (function () {
+    function DurationUnitUtil(u) {
+        this._unit = u;
+    }
+    DurationUnitUtil.prototype.clone = function () {
+        return { count: this._unit.count, division: this._unit.division };
+    };
+    DurationUnitUtil.prototype.plus = function (b) {
+        if (this._unit.division == b.division) {
+            return { count: this._unit.count + b.count, division: this._unit.division };
+        }
+        else {
+            var r = { count: this._unit.count * b.division + b.count * this._unit.division, division: this._unit.division * b.division };
+            return r;
+        }
+    };
+    DurationUnitUtil.prototype.minus = function (b) {
+        if (this._unit.division == b.division) {
+            return { count: this._unit.count - b.count, division: this._unit.division };
+        }
+        else {
+            var r = { count: this._unit.count * b.division - b.count * this._unit.division, division: this._unit.division * b.division };
+            return r;
+        }
+    };
+    DurationUnitUtil.prototype._meterMore = function (b) {
+        var a1 = this.plus({ count: 0, division: b.division });
+        var b1 = DUU(b).plus({ count: 0, division: this._unit.division });
+        if (a1.count == b1.count) {
+            return 0;
+        }
+        else {
+            if (a1.count > b1.count) {
+                return 1;
+            }
+            else {
+                return -1;
+            }
+        }
+    };
+    DurationUnitUtil.prototype.moreThen = function (b) {
+        if (this._meterMore(b) == 1) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    DurationUnitUtil.prototype.notMoreThen = function (b) {
+        if (this._meterMore(b) == 1) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    };
+    DurationUnitUtil.prototype.lessThen = function (b) {
+        if (this._meterMore(b) == -1) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    DurationUnitUtil.prototype.notLessThen = function (b) {
+        if (this._meterMore(b) == -1) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    };
+    DurationUnitUtil.prototype.equalsTo = function (b) {
+        if (this._meterMore(b) == 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    DurationUnitUtil.prototype.simplify = function () {
+        var r = this.clone();
+        while (r.division % 2 == 0 && r.count % 2 == 0) {
+            r.division = r.division / 2;
+            r.count = r.count / 2;
+        }
+        return r;
+    };
+    return DurationUnitUtil;
+}());
+var ZvoogPluginLock = (function () {
+    function ZvoogPluginLock() {
+    }
+    ZvoogPluginLock.prototype.lock = function () {
+        this.lockedState = true;
+    };
+    ZvoogPluginLock.prototype.unlock = function () {
+        this.lockedState = false;
+    };
+    ZvoogPluginLock.prototype.locked = function () {
+        return this.lockedState;
+    };
+    return ZvoogPluginLock;
+}());
+var RangedAudioParam120 = (function () {
+    function RangedAudioParam120(base, min, max) {
+        this.baseParam = base;
+        this.minValue = min;
+        this.maxValue = max;
+    }
+    RangedAudioParam120.prototype.recalulate = function (value) {
+        if (value < 0)
+            console.log('wrong 1-119', value);
+        if (value < 0)
+            value = 0;
+        if (value > 119)
+            value = 119;
+        var ratio = (this.maxValue - this.minValue) / 119;
+        var nn = this.minValue + value * ratio;
+        return nn;
+    };
+    RangedAudioParam120.prototype.cancelScheduledValues = function (cancelTime) {
+        this.baseParam.cancelScheduledValues(cancelTime);
+    };
+    RangedAudioParam120.prototype.linearRampToValueAtTime = function (value, endTime) {
+        this.baseParam.linearRampToValueAtTime(this.recalulate(value), endTime);
+    };
+    RangedAudioParam120.prototype.setValueAtTime = function (value, startTime) {
+        this.baseParam.setValueAtTime(this.recalulate(value), startTime);
+    };
+    return RangedAudioParam120;
+}());
+var ZvoogPerformerStub = (function () {
+    function ZvoogPerformerStub() {
+        this.lockedState = new ZvoogPluginLock();
+    }
+    ZvoogPerformerStub.prototype.setData = function (data) {
+    };
+    ZvoogPerformerStub.prototype.state = function () {
+        return this.lockedState;
+    };
+    ZvoogPerformerStub.prototype.passthrough = function (value) {
+    };
+    ZvoogPerformerStub.prototype.prepare = function (audioContext) {
+        if (this.base) {
+        }
+        else {
+            this.base = audioContext.createGain();
+        }
+        this.params = [];
+    };
+    ZvoogPerformerStub.prototype.getOutput = function () {
+        return this.base;
+    };
+    ZvoogPerformerStub.prototype.getParams = function () {
+        return this.params;
+    };
+    ZvoogPerformerStub.prototype.busy = function () {
+        return 0;
+    };
+    ZvoogPerformerStub.prototype.cancelSchedule = function () {
+    };
+    ZvoogPerformerStub.prototype.addSchedule = function (when, tempo, chord, variation) {
+    };
+    return ZvoogPerformerStub;
+}());
+var ZvoogFilterStub = (function () {
+    function ZvoogFilterStub() {
+        this.lockedState = new ZvoogPluginLock();
+    }
+    ZvoogFilterStub.prototype.setData = function (data) {
+    };
+    ZvoogFilterStub.prototype.passthrough = function (value) {
+    };
+    ZvoogFilterStub.prototype.state = function () {
+        return this.lockedState;
+    };
+    ZvoogFilterStub.prototype.prepare = function (audioContext) {
+        if (this.base) {
+        }
+        else {
+            this.base = audioContext.createGain();
+        }
+        this.params = [];
+    };
+    ZvoogFilterStub.prototype.getOutput = function () {
+        return this.base;
+    };
+    ZvoogFilterStub.prototype.getParams = function () {
+        return this.params;
+    };
+    ZvoogFilterStub.prototype.busy = function () {
+        return 0;
+    };
+    ZvoogFilterStub.prototype.getInput = function () {
+        return this.base;
+    };
+    return ZvoogFilterStub;
+}());
+var cachedPerformerStubPlugins = [];
+function takeZvoogPerformerStub() {
+    for (var i = 0; i < cachedPerformerStubPlugins.length; i++) {
+        if (!cachedPerformerStubPlugins[i].state().locked()) {
+            cachedPerformerStubPlugins[i].state().lock();
+            return cachedPerformerStubPlugins[i];
+        }
+    }
+    var plugin = new ZvoogPerformerStub();
+    plugin.state().lock();
+    cachedPerformerStubPlugins.push(plugin);
+    return plugin;
+}
+var cachedFilterStubPlugins = [];
+function takeZvoogFilterStub() {
+    for (var i = 0; i < cachedFilterStubPlugins.length; i++) {
+        if (!cachedFilterStubPlugins[i].state().locked()) {
+            cachedFilterStubPlugins[i].state().lock();
+            return cachedFilterStubPlugins[i];
+        }
+    }
+    var plugin = new ZvoogFilterStub();
+    plugin.state().lock();
+    cachedFilterStubPlugins.push(plugin);
+    return plugin;
+}
+var cachedWAFEchoPlugins = [];
+function takeWAFEcho() {
+    for (var i = 0; i < cachedWAFEchoPlugins.length; i++) {
+        if (!cachedWAFEchoPlugins[i].state().locked()) {
+            cachedWAFEchoPlugins[i].state().lock();
+            return cachedWAFEchoPlugins[i];
+        }
+    }
+    var plugin = new WAFEcho();
+    plugin.state().lock();
+    cachedWAFEchoPlugins.push(plugin);
+    return plugin;
+}
+var cachedWAFEqualizerPlugins = [];
+function takeWAFEqualizer() {
+    for (var i = 0; i < cachedWAFEqualizerPlugins.length; i++) {
+        if (!cachedWAFEqualizerPlugins[i].state().locked()) {
+            cachedWAFEqualizerPlugins[i].state().lock();
+            return cachedWAFEqualizerPlugins[i];
+        }
+    }
+    var plugin = new WAFEqualizer();
+    plugin.state().lock();
+    cachedWAFEqualizerPlugins.push(plugin);
+    return plugin;
+}
+var cachedZvoogFxGainPlugins = [];
+function takeZvoogFxGain() {
+    for (var i = 0; i < cachedZvoogFxGainPlugins.length; i++) {
+        if (!cachedZvoogFxGainPlugins[i].state().locked()) {
+            cachedZvoogFxGainPlugins[i].state().lock();
+            return cachedZvoogFxGainPlugins[i];
+        }
+    }
+    var plugin = new ZvoogFxGain();
+    plugin.state().lock();
+    cachedZvoogFxGainPlugins.push(plugin);
+    return plugin;
+}
+var cachedAudioFileSourcePlugins = [];
+function takeAudioFileSource() {
+    for (var i = 0; i < cachedAudioFileSourcePlugins.length; i++) {
+        if (!cachedAudioFileSourcePlugins[i].state().locked()) {
+            cachedAudioFileSourcePlugins[i].state().lock();
+            return cachedAudioFileSourcePlugins[i];
+        }
+    }
+    var plugin = new AudioFileSource();
+    plugin.state().lock();
+    cachedAudioFileSourcePlugins.push(plugin);
+    return plugin;
+}
+var cachedWAFInsSourcePlugins = [];
+function takeWAFInsSource() {
+    for (var i = 0; i < cachedWAFInsSourcePlugins.length; i++) {
+        if (!cachedWAFInsSourcePlugins[i].state().locked()) {
+            cachedWAFInsSourcePlugins[i].state().lock();
+            return cachedWAFInsSourcePlugins[i];
+        }
+    }
+    var plugin = new WAFInsSource();
+    plugin.state().lock();
+    cachedWAFInsSourcePlugins.push(plugin);
+    return plugin;
+}
+var cachedWAFPercSourcePlugins = [];
+function takeWAFPercSource() {
+    for (var i = 0; i < cachedWAFPercSourcePlugins.length; i++) {
+        if (!cachedWAFPercSourcePlugins[i].state().locked()) {
+            cachedWAFPercSourcePlugins[i].state().lock();
+            return cachedWAFPercSourcePlugins[i];
+        }
+    }
+    var plugin = new WAFPercSource();
+    plugin.state().lock();
+    cachedWAFPercSourcePlugins.push(plugin);
+    return plugin;
+}
+var cachedZvoogSineSourcePlugins = [];
+function takeZvoogSineSource() {
+    for (var i = 0; i < cachedZvoogSineSourcePlugins.length; i++) {
+        if (!cachedZvoogSineSourcePlugins[i].state().locked()) {
+            cachedZvoogSineSourcePlugins[i].state().lock();
+            return cachedZvoogSineSourcePlugins[i];
+        }
+    }
+    var plugin = new ZvoogSineSource();
+    plugin.state().lock();
+    cachedZvoogSineSourcePlugins.push(plugin);
+    return plugin;
+}
+function createPluginEffect(id) {
+    if (id == 'echo')
+        return takeWAFEcho();
+    if (id == 'equalizer')
+        return takeWAFEqualizer();
+    if (id == 'gain')
+        return takeZvoogFxGain();
+    return takeZvoogFilterStub();
+}
+function createPluginSource(id) {
+    if (id == 'audio') {
+        return takeAudioFileSource();
+    }
+    if (id == 'wafinstrument')
+        return takeWAFInsSource();
+    if (id == 'wafdrum')
+        return takeWAFPercSource();
+    if (id == 'sine')
+        return takeZvoogSineSource();
+    return takeZvoogPerformerStub();
+}
 //# sourceMappingURL=muzxbox.js.map

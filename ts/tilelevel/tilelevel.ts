@@ -1058,25 +1058,25 @@ class TileLevel {
 		//if (d.draw == 'rectangle') {
 		if (this.isTileRectangle(dd)) {
 			//let r=d as TileRectangle;
-			element = this.tileRectangle(g, dd.x * this.tapSize, dd.y * this.tapSize
+			element = tileRectangle(this.svgns,this.tapSize,g, dd.x * this.tapSize, dd.y * this.tapSize
 				, dd.w * this.tapSize, dd.h * this.tapSize
 				, (dd.rx ? dd.rx : 0) * this.tapSize, (dd.ry ? dd.ry : 0) * this.tapSize
 				, (dd.css ? dd.css : ''));
 		}
 		//if (d.draw == 'text') {
 		if (this.isTileText(dd)) {
-			element = this.tileText(g, dd.x * this.tapSize, dd.y * this.tapSize, dd.text, dd.css ? dd.css : '');
+			element = tileText(this.svgns,this.tapSize,g, dd.x * this.tapSize, dd.y * this.tapSize, dd.text, dd.css ? dd.css : '');
 		}
 		//if (d.draw == 'path') {
 		if (this.isTilePath(dd)) {
-			element = this.tilePath(g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, (dd.scale ? dd.scale : 0), dd.points, dd.css ? dd.css : '');
+			element = tilePath(this.svgns,this.tapSize,g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, (dd.scale ? dd.scale : 0), dd.points, dd.css ? dd.css : '');
 		}
 		if (this.isTilePolygon(dd)) {
-			element = this.tilePolygon(g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, dd.scale, dd.dots, dd.css);
+			element = tilePolygon(this.svgns,this.tapSize,g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, dd.scale, dd.dots, dd.css);
 		}
 		//if (d.draw == 'line') {
 		if (this.isTileLine(dd)) {
-			element = this.tileLine(g, dd.x1 * this.tapSize, dd.y1 * this.tapSize, dd.x2 * this.tapSize, dd.y2 * this.tapSize, dd.css);
+			element = tileLine(this.svgns,this.tapSize,g, dd.x1 * this.tapSize, dd.y1 * this.tapSize, dd.x2 * this.tapSize, dd.y2 * this.tapSize, dd.css);
 		}
 		//if (d.draw == 'group') {
 		if (this.isTileGroup(dd)) {
@@ -1139,94 +1139,11 @@ class TileLevel {
 			}
 		}
 	}
-	tilePolygon(g: SVGElement, x: number, y: number, z: number | undefined, dots: number[], cssClass: string | undefined): TileSVGElement {
-		let polygon: TileSVGElement = document.createElementNS(this.svgns, 'polygon') as TileSVGElement;
-		let points: string = '';
-		let dlmtr = '';
-		for (let i = 0; i < dots.length; i = i + 2) {
-			points = points + dlmtr + dots[i] * this.tapSize + ',' + dots[i + 1] * this.tapSize;
-			dlmtr = ', ';
-		}
-		polygon.setAttributeNS(null, 'points', points);
-		let t: string = "";
-		if ((x) || (y)) {
-			t = 'translate(' + x + ',' + y + ')';
-		}
-		if (z) {
-			t = t + ' scale(' + z + ')';
-		}
-		if (t.length > 0) {
-			polygon.setAttributeNS(null, 'transform', t);
-		}
-		if (cssClass) {
-			polygon.classList.add(cssClass);
-		}
-		g.appendChild(polygon);
-		return polygon;
-	}
-	tilePath(g: SVGElement, x: number, y: number, z: number, data: string, cssClass: string): TileSVGElement {
-		let path: TileSVGElement = document.createElementNS(this.svgns, 'path') as TileSVGElement;
-		path.setAttributeNS(null, 'd', data);
-		let t: string = "";
-		if ((x) || (y)) {
-			t = 'translate(' + x + ',' + y + ')';
-		}
-		if (z) {
-			t = t + ' scale(' + z + ')';
-		}
-		if (t.length > 0) {
-			path.setAttributeNS(null, 'transform', t);
-		}
-		if (cssClass) {
-			path.classList.add(cssClass);
-		}
-		g.appendChild(path);
-		return path;
-	}
-	tileRectangle(g: SVGElement, x: number, y: number, w: number, h: number, rx: number | undefined, ry: number | undefined, cssClass: string): TileSVGElement {
-		let rect: TileSVGElement = document.createElementNS(this.svgns, 'rect') as TileSVGElement;
-		rect.setAttributeNS(null, 'x', '' + x);
-		rect.setAttributeNS(null, 'y', '' + y);
-		rect.setAttributeNS(null, 'height', '' + h);
-		rect.setAttributeNS(null, 'width', '' + w);
-		if (rx) {
-			rect.setAttributeNS(null, 'rx', '' + rx);
-		}
-		if (ry) {
-			rect.setAttributeNS(null, 'ry', '' + ry);
-		}
-		if (cssClass) {
-			rect.classList.add(cssClass);
-		}
-		g.appendChild(rect);
-		//console.log(cssClass,rect);
-		return rect;
-	}
-	tileLine(g: SVGElement, x1: number, y1: number, x2: number, y2: number, cssClass: string | undefined): TileSVGElement {
-		let line: TileSVGElement = document.createElementNS(this.svgns, 'line') as TileSVGElement;
-		line.setAttributeNS(null, 'x1', '' + x1);
-		line.setAttributeNS(null, 'y1', '' + y1);
-		line.setAttributeNS(null, 'x2', '' + x2);
-		line.setAttributeNS(null, 'y2', '' + y2);
-		if (cssClass) {
-			line.classList.add(cssClass);
-		}
-		g.appendChild(line);
-		return line;
-	}
-	tileText(g: SVGElement, x: number, y: number, html: string, cssClass: string): TileSVGElement {
-
-		let txt: TileSVGElement = document.createElementNS(this.svgns, 'text') as TileSVGElement;
-		txt.setAttributeNS(null, 'x', '' + x);
-		txt.setAttributeNS(null, 'y', '' + y);
-		if (cssClass) {
-			txt.setAttributeNS(null, 'class', cssClass);
-		}
-		txt.innerHTML = html;
-		g.appendChild(txt);
-		//console.log('tileText',g,txt);
-		return txt;
-	}
+	
+	
+	
+	
+	
 	clearAllDetails() {
 		if (this.model) {
 			for (let i: number = 0; i < this.model.length; i++) {
