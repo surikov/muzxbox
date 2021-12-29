@@ -14,9 +14,7 @@ class AudioFileSource implements ZvoogPerformerPlugin {
 	state(): ZvoogPluginLock {
 		return this.lockedState;
 	}
-	passthrough(value: boolean): void{
-
-	}
+	
 	setData(base64file: string): void {
 		//https://base64.guru/converter/encode/file
 		//474824__j3rryz808__hard-trap-female-vocal.mp3

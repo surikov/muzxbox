@@ -53,70 +53,7 @@ class TileLevel {
 	dragTranslateY: number = 0;
 
 	mouseDownMode: boolean = false;
-	anchor(xx: number, yy: number, ww: number, hh: number, showZoom: number, hideZoom: number): TileAnchor {
-		return { xx: xx, yy: yy, ww: ww, hh: hh, showZoom: showZoom, hideZoom: hideZoom, content: [] };
-	}
-	rectangle(x: number, y: number, w: number, h: number, rx?: number, ry?: number, css?: string): TileRectangle {
-		return { x: x, y: y, w: w, h: h, rx: rx, ry: ry, css: css };
-	}
-	actionRectangle(action: (x: number, y: number) => void | undefined, x: number, y: number, w: number, h: number, rx?: number, ry?: number, css?: string): TileRectangle {
-		return { x: x, y: y, w: w, h: h, rx: rx, ry: ry, css: css, action: action };
-	}
-	line(x1: number, y1: number, x2: number, y2: number, css?: string): TileLine {
-		return { x1: x1, y1: y1, x2: x2, y2: y2, css: css };
-	}
-	text(x: number, y: number, text: string, css?: string): TileText {
-		return { x: x, y: y, text: text, css: css };
-	}
-	pathImage(x: number, y: number, scale: number, points: string, css?: string): TilePath {
-		return { x: x, y: y, scale: scale, points: points, css: css };
-	}
-
-
-	isLayerStickTop(t: TileLayerDefinition): t is TileLayerStickTop {
-		return (t as TileLayerStickTop).stickTop !== undefined;
-	}
-	isLayerStickBottom(t: TileLayerDefinition): t is TileLayerStickBottom {
-		return (t as TileLayerStickBottom).stickBottom !== undefined;
-	}
-	isLayerStickRight(t: TileLayerDefinition): t is TileLayerStickRight {
-		return (t as TileLayerStickRight).stickRight !== undefined;
-	}
-	isLayerOverlay(t: TileLayerDefinition): t is TileLayerOverlay {
-		return (t as TileLayerOverlay).overlay !== undefined;
-	}
-	isTilePath(t: TileItem): t is TilePath {
-		return (t as TilePath).points !== undefined;
-	}
-	isTileText(t: TileItem): t is TileText {
-		return (t as TileText).text !== undefined;
-	}
-	isTileLine(t: TileItem): t is TileLine {
-		return (t as TileLine).x1 !== undefined;
-	}
-	isTilePolygon(t: TileItem): t is TilePolygon {
-		return (t as TilePolygon).dots !== undefined;
-	}
-	isLayerStickLeft(t: TileLayerDefinition): t is TileLayerStickLeft {
-		return (t as TileLayerStickLeft).stickLeft !== undefined;
-	}
-	isTileRectangle(t: TileItem): t is TileRectangle {
-		return (t as TileRectangle).h !== undefined;
-	}
-	isTileGroup(t: TileItem): t is TileAnchor {
-		return (t as TileAnchor).content !== undefined;
-	}
-	isLayerNormal(t: TileLayerDefinition): t is TileModelLayer {
-		return (t as any).stickLeft === undefined
-			&& (t as any).stickTop === undefined
-			&& (t as any).stickBottom === undefined
-			&& (t as any).stickRight === undefined
-			&& (t as any).overlay === undefined
-			;
-	}
-	rid() {
-		return 'id' + Math.floor(Math.random() * 1000000000);
-	}
+	
 	get translateZ(): number {
 		return this._translateZ;
 	}
@@ -601,28 +538,28 @@ class TileLevel {
 				if (this.viewHeight * this.translateZ > this.innerHeight) {
 					cY = (this.viewHeight * this.translateZ - this.innerHeight) / 2;
 				}
-				if (this.isLayerOverlay(layer)) {
+				if (isLayerOverlay(layer)) {
 					tz = this.translateZ;
 					tx = -this.translateX;
 					ty = -this.translateY;
 					cX = 0;
 					cY = 0;
 				} else {
-					if (this.isLayerStickLeft(layer)) {
+					if (isLayerStickLeft(layer)) {
 						tx = -this.translateX;
 						cX = 0;
 						if (layer.stickLeft) {
 							sX = layer.stickLeft * this.tapSize * this.translateZ;
 						}
 					} else {
-						if (this.isLayerStickTop(layer)) {
+						if (isLayerStickTop(layer)) {
 							ty = -this.translateY;
 							cY = 0;
 							if (layer.stickTop) {
 								sY = layer.stickTop * this.tapSize * this.translateZ;
 							}
 						} else {
-							if (this.isLayerStickBottom(layer)) {
+							if (isLayerStickBottom(layer)) {
 								ty = -this.translateY;
 								cY = 0;
 								sY = this.viewHeight * this.translateZ;
@@ -631,7 +568,7 @@ class TileLevel {
 								}
 							} else {
 
-								if (this.isLayerStickRight(layer)) {
+								if (isLayerStickRight(layer)) {
 									tx = -this.translateX;
 									cX = 0;
 									sX = this.viewWidth * this.translateZ;
@@ -867,24 +804,24 @@ class TileLevel {
 			cY = (this.viewHeight * this.translateZ - this.innerHeight) / 2;
 			y = y - cY;
 		}
-		if (this.isLayerOverlay(layer)) {
+		if (isLayerOverlay(layer)) {
 			//if (kind == layerModeOverlay) {
 			x = 0;
 			y = 0;
 		} else {
-			if (this.isLayerStickLeft(layer)) {
+			if (isLayerStickLeft(layer)) {
 				//if (kind == layerModeLockX) {
 				x = 0;
 			} else {
-				if (this.isLayerStickTop(layer)) {
+				if (isLayerStickTop(layer)) {
 					//if (kind == layerModeLockY) {
 					y = 0;
 				} else {
-					if (this.isLayerStickRight(layer)) {
+					if (isLayerStickRight(layer)) {
 						//if (kind == layerModeStickRight) {
 						x = 0;
 					} else {
-						if (this.isLayerStickBottom(layer)) {
+						if (isLayerStickBottom(layer)) {
 							//if (kind == layerModeStickBottom) {
 							y = 0;
 						}
@@ -963,24 +900,24 @@ class TileLevel {
 			cY = (this.viewHeight * this.translateZ - this.innerHeight) / 2;
 			y = y - cY;
 		}
-		if (this.isLayerOverlay(layer)) {
+		if (isLayerOverlay(layer)) {
 			//if (layerKind == layerModeOverlay) {
 			x = 0;
 			y = 0;
 		} else {
-			if (this.isLayerStickLeft(layer)) {
+			if (isLayerStickLeft(layer)) {
 				//if (layerKind == layerModeLockX) {
 				x = 0;
 			} else {
-				if (this.isLayerStickTop(layer)) {
+				if (isLayerStickTop(layer)) {
 					//if (layerKind == layerModeLockY) {
 					y = 0;
 				} else {
-					if (this.isLayerStickRight(layer)) {
+					if (isLayerStickRight(layer)) {
 						//if (layerKind == layerModeStickRight) {
 						x = 0;
 					} else {
-						if (this.isLayerStickBottom(layer)) {
+						if (isLayerStickBottom(layer)) {
 							//if (layerKind == layerModeStickBottom) {
 							y = 0;
 						}
@@ -1009,7 +946,7 @@ class TileLevel {
 					for (let n = 0; n < anchor.content.length; n++) {
 						let d = anchor.content[n];
 						//if (d.draw == 'group') {
-						if (this.isTileGroup(d)) {
+						if (isTileGroup(d)) {
 							//console.log(n, d);
 							this.addElement(xg, d, layer);
 						}
@@ -1056,7 +993,7 @@ class TileLevel {
 
 		let element: TileSVGElement | null = null;
 		//if (d.draw == 'rectangle') {
-		if (this.isTileRectangle(dd)) {
+		if (isTileRectangle(dd)) {
 			//let r=d as TileRectangle;
 			element = tileRectangle(this.svgns,this.tapSize,g, dd.x * this.tapSize, dd.y * this.tapSize
 				, dd.w * this.tapSize, dd.h * this.tapSize
@@ -1064,22 +1001,22 @@ class TileLevel {
 				, (dd.css ? dd.css : ''));
 		}
 		//if (d.draw == 'text') {
-		if (this.isTileText(dd)) {
+		if (isTileText(dd)) {
 			element = tileText(this.svgns,this.tapSize,g, dd.x * this.tapSize, dd.y * this.tapSize, dd.text, dd.css ? dd.css : '');
 		}
 		//if (d.draw == 'path') {
-		if (this.isTilePath(dd)) {
+		if (isTilePath(dd)) {
 			element = tilePath(this.svgns,this.tapSize,g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, (dd.scale ? dd.scale : 0), dd.points, dd.css ? dd.css : '');
 		}
-		if (this.isTilePolygon(dd)) {
+		if (isTilePolygon(dd)) {
 			element = tilePolygon(this.svgns,this.tapSize,g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, dd.scale, dd.dots, dd.css);
 		}
 		//if (d.draw == 'line') {
-		if (this.isTileLine(dd)) {
+		if (isTileLine(dd)) {
 			element = tileLine(this.svgns,this.tapSize,g, dd.x1 * this.tapSize, dd.y1 * this.tapSize, dd.x2 * this.tapSize, dd.y2 * this.tapSize, dd.css);
 		}
 		//if (d.draw == 'group') {
-		if (this.isTileGroup(dd)) {
+		if (isTileGroup(dd)) {
 			this.addGroupTile(g, dd, layer);
 		}
 		if (element) {
@@ -1165,12 +1102,12 @@ class TileLevel {
 
 					if (!(definition[i].id)) {
 						//definition[i].id = 'id' + Math.floor(Math.random() * 1000000000);
-						definition[i].id = this.rid();
+						definition[i].id = rid();
 						//console.log('/',definition[i]);
 					}
 					//let tt:TileGroup|TileDefinition=definition[i];
 					//this.autoID(tt.sub);
-					if (this.isTileGroup(definition[i])) {
+					if (isTileGroup(definition[i])) {
 						let group: TileAnchor = definition[i] as TileAnchor;
 						this.autoID(group.content);
 					}

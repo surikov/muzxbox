@@ -10,9 +10,7 @@ class WAFInsSource implements ZvoogPerformerPlugin {
 	state(): ZvoogPluginLock {
 		return this.lockedState;
 	}
-	passthrough(value: boolean): void{
-
-	}
+	
 	cancelSchedule(): void {
 		(window as any).wafPlayer.cancelQueue(this.audioContext);
 	}

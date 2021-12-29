@@ -1,7 +1,7 @@
 type ZvoogSchedule = {
 	title: string
 	, tracks: ZvoogTrack[]
-	, effects: ZvoogFilterSetting[]
+	, filters: ZvoogFilterSetting[]
 	, measures: ZvoogMeasure[]
 	, harmony: ZvoogProgression
 };

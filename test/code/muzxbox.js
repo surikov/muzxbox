@@ -28,6 +28,17 @@ var MuzXBox = (function () {
         layers.push({ g: backgroundLayerGroup, anchors: [menuAnchor] });
         tileLevel = new TileLevel(document.getElementById('contentSVG'), 1000, 1000, minZoom, minZoom, maxZoom, layers);
         this.resetSong(testProject);
+        var menuButton = {
+            x: 0,
+            y: 0,
+            w: 10,
+            h: 10,
+            rx: 3,
+            ry: 3,
+            css: 'debug',
+            action: this.testFS
+        };
+        firstAnchor.content.push(menuButton);
     };
     MuzXBox.prototype.resetSong = function (testProject) {
         var _this = this;
@@ -59,6 +70,12 @@ var MuzXBox = (function () {
     };
     MuzXBox.prototype.closeMenu = function () {
         document.getElementById('menuDiv1').style.width = '0%';
+    };
+    MuzXBox.prototype.testFS = function () {
+        var test = new MIDIFileImporter();
+        test.readSongData("none", function (result) {
+            console.log('result', result);
+        });
     };
     return MuzXBox;
 }());
@@ -255,67 +272,6 @@ var TileLevel = (function () {
         this.applyZoomPosition();
         this.clearUselessDetails();
     }
-    TileLevel.prototype.anchor = function (xx, yy, ww, hh, showZoom, hideZoom) {
-        return { xx: xx, yy: yy, ww: ww, hh: hh, showZoom: showZoom, hideZoom: hideZoom, content: [] };
-    };
-    TileLevel.prototype.rectangle = function (x, y, w, h, rx, ry, css) {
-        return { x: x, y: y, w: w, h: h, rx: rx, ry: ry, css: css };
-    };
-    TileLevel.prototype.actionRectangle = function (action, x, y, w, h, rx, ry, css) {
-        return { x: x, y: y, w: w, h: h, rx: rx, ry: ry, css: css, action: action };
-    };
-    TileLevel.prototype.line = function (x1, y1, x2, y2, css) {
-        return { x1: x1, y1: y1, x2: x2, y2: y2, css: css };
-    };
-    TileLevel.prototype.text = function (x, y, text, css) {
-        return { x: x, y: y, text: text, css: css };
-    };
-    TileLevel.prototype.pathImage = function (x, y, scale, points, css) {
-        return { x: x, y: y, scale: scale, points: points, css: css };
-    };
-    TileLevel.prototype.isLayerStickTop = function (t) {
-        return t.stickTop !== undefined;
-    };
-    TileLevel.prototype.isLayerStickBottom = function (t) {
-        return t.stickBottom !== undefined;
-    };
-    TileLevel.prototype.isLayerStickRight = function (t) {
-        return t.stickRight !== undefined;
-    };
-    TileLevel.prototype.isLayerOverlay = function (t) {
-        return t.overlay !== undefined;
-    };
-    TileLevel.prototype.isTilePath = function (t) {
-        return t.points !== undefined;
-    };
-    TileLevel.prototype.isTileText = function (t) {
-        return t.text !== undefined;
-    };
-    TileLevel.prototype.isTileLine = function (t) {
-        return t.x1 !== undefined;
-    };
-    TileLevel.prototype.isTilePolygon = function (t) {
-        return t.dots !== undefined;
-    };
-    TileLevel.prototype.isLayerStickLeft = function (t) {
-        return t.stickLeft !== undefined;
-    };
-    TileLevel.prototype.isTileRectangle = function (t) {
-        return t.h !== undefined;
-    };
-    TileLevel.prototype.isTileGroup = function (t) {
-        return t.content !== undefined;
-    };
-    TileLevel.prototype.isLayerNormal = function (t) {
-        return t.stickLeft === undefined
-            && t.stickTop === undefined
-            && t.stickBottom === undefined
-            && t.stickRight === undefined
-            && t.overlay === undefined;
-    };
-    TileLevel.prototype.rid = function () {
-        return 'id' + Math.floor(Math.random() * 1000000000);
-    };
     Object.defineProperty(TileLevel.prototype, "translateZ", {
         get: function () {
             return this._translateZ;
@@ -661,7 +617,7 @@ var TileLevel = (function () {
                 if (this.viewHeight * this.translateZ > this.innerHeight) {
                     cY = (this.viewHeight * this.translateZ - this.innerHeight) / 2;
                 }
-                if (this.isLayerOverlay(layer)) {
+                if (isLayerOverlay(layer)) {
                     tz = this.translateZ;
                     tx = -this.translateX;
                     ty = -this.translateY;
@@ -669,7 +625,7 @@ var TileLevel = (function () {
                     cY = 0;
                 }
                 else {
-                    if (this.isLayerStickLeft(layer)) {
+                    if (isLayerStickLeft(layer)) {
                         tx = -this.translateX;
                         cX = 0;
                         if (layer.stickLeft) {
@@ -677,7 +633,7 @@ var TileLevel = (function () {
                         }
                     }
                     else {
-                        if (this.isLayerStickTop(layer)) {
+                        if (isLayerStickTop(layer)) {
                             ty = -this.translateY;
                             cY = 0;
                             if (layer.stickTop) {
@@ -685,7 +641,7 @@ var TileLevel = (function () {
                             }
                         }
                         else {
-                            if (this.isLayerStickBottom(layer)) {
+                            if (isLayerStickBottom(layer)) {
                                 ty = -this.translateY;
                                 cY = 0;
                                 sY = this.viewHeight * this.translateZ;
@@ -694,7 +650,7 @@ var TileLevel = (function () {
                                 }
                             }
                             else {
-                                if (this.isLayerStickRight(layer)) {
+                                if (isLayerStickRight(layer)) {
                                     tx = -this.translateX;
                                     cX = 0;
                                     sX = this.viewWidth * this.translateZ;
@@ -920,24 +876,24 @@ var TileLevel = (function () {
             cY = (this.viewHeight * this.translateZ - this.innerHeight) / 2;
             y = y - cY;
         }
-        if (this.isLayerOverlay(layer)) {
+        if (isLayerOverlay(layer)) {
             x = 0;
             y = 0;
         }
         else {
-            if (this.isLayerStickLeft(layer)) {
+            if (isLayerStickLeft(layer)) {
                 x = 0;
             }
             else {
-                if (this.isLayerStickTop(layer)) {
+                if (isLayerStickTop(layer)) {
                     y = 0;
                 }
                 else {
-                    if (this.isLayerStickRight(layer)) {
+                    if (isLayerStickRight(layer)) {
                         x = 0;
                     }
                     else {
-                        if (this.isLayerStickBottom(layer)) {
+                        if (isLayerStickBottom(layer)) {
                             y = 0;
                         }
                     }
@@ -1015,24 +971,24 @@ var TileLevel = (function () {
             cY = (this.viewHeight * this.translateZ - this.innerHeight) / 2;
             y = y - cY;
         }
-        if (this.isLayerOverlay(layer)) {
+        if (isLayerOverlay(layer)) {
             x = 0;
             y = 0;
         }
         else {
-            if (this.isLayerStickLeft(layer)) {
+            if (isLayerStickLeft(layer)) {
                 x = 0;
             }
             else {
-                if (this.isLayerStickTop(layer)) {
+                if (isLayerStickTop(layer)) {
                     y = 0;
                 }
                 else {
-                    if (this.isLayerStickRight(layer)) {
+                    if (isLayerStickRight(layer)) {
                         x = 0;
                     }
                     else {
-                        if (this.isLayerStickBottom(layer)) {
+                        if (isLayerStickBottom(layer)) {
                             y = 0;
                         }
                     }
@@ -1046,7 +1002,7 @@ var TileLevel = (function () {
                 if (xg) {
                     for (var n = 0; n < anchor.content.length; n++) {
                         var d = anchor.content[n];
-                        if (this.isTileGroup(d)) {
+                        if (isTileGroup(d)) {
                             this.addElement(xg, d, layer);
                         }
                     }
@@ -1084,22 +1040,22 @@ var TileLevel = (function () {
     };
     TileLevel.prototype.addElement = function (g, dd, layer) {
         var element = null;
-        if (this.isTileRectangle(dd)) {
+        if (isTileRectangle(dd)) {
             element = tileRectangle(this.svgns, this.tapSize, g, dd.x * this.tapSize, dd.y * this.tapSize, dd.w * this.tapSize, dd.h * this.tapSize, (dd.rx ? dd.rx : 0) * this.tapSize, (dd.ry ? dd.ry : 0) * this.tapSize, (dd.css ? dd.css : ''));
         }
-        if (this.isTileText(dd)) {
+        if (isTileText(dd)) {
             element = tileText(this.svgns, this.tapSize, g, dd.x * this.tapSize, dd.y * this.tapSize, dd.text, dd.css ? dd.css : '');
         }
-        if (this.isTilePath(dd)) {
+        if (isTilePath(dd)) {
             element = tilePath(this.svgns, this.tapSize, g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, (dd.scale ? dd.scale : 0), dd.points, dd.css ? dd.css : '');
         }
-        if (this.isTilePolygon(dd)) {
+        if (isTilePolygon(dd)) {
             element = tilePolygon(this.svgns, this.tapSize, g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, dd.scale, dd.dots, dd.css);
         }
-        if (this.isTileLine(dd)) {
+        if (isTileLine(dd)) {
             element = tileLine(this.svgns, this.tapSize, g, dd.x1 * this.tapSize, dd.y1 * this.tapSize, dd.x2 * this.tapSize, dd.y2 * this.tapSize, dd.css);
         }
-        if (this.isTileGroup(dd)) {
+        if (isTileGroup(dd)) {
             this.addGroupTile(g, dd, layer);
         }
         if (element) {
@@ -1163,9 +1119,9 @@ var TileLevel = (function () {
             if (definition.length) {
                 for (var i = 0; i < definition.length; i++) {
                     if (!(definition[i].id)) {
-                        definition[i].id = this.rid();
+                        definition[i].id = rid();
                     }
-                    if (this.isTileGroup(definition[i])) {
+                    if (isTileGroup(definition[i])) {
                         var group = definition[i];
                         this.autoID(group.content);
                     }
@@ -1349,6 +1305,67 @@ function tileText(svgns, tapSize, g, x, y, html, cssClass) {
     txt.innerHTML = html;
     g.appendChild(txt);
     return txt;
+}
+function anchor(xx, yy, ww, hh, showZoom, hideZoom) {
+    return { xx: xx, yy: yy, ww: ww, hh: hh, showZoom: showZoom, hideZoom: hideZoom, content: [] };
+}
+function rectangle(x, y, w, h, rx, ry, css) {
+    return { x: x, y: y, w: w, h: h, rx: rx, ry: ry, css: css };
+}
+function actionRectangle(action, x, y, w, h, rx, ry, css) {
+    return { x: x, y: y, w: w, h: h, rx: rx, ry: ry, css: css, action: action };
+}
+function line(x1, y1, x2, y2, css) {
+    return { x1: x1, y1: y1, x2: x2, y2: y2, css: css };
+}
+function text(x, y, text, css) {
+    return { x: x, y: y, text: text, css: css };
+}
+function pathImage(x, y, scale, points, css) {
+    return { x: x, y: y, scale: scale, points: points, css: css };
+}
+function isLayerStickTop(t) {
+    return t.stickTop !== undefined;
+}
+function isLayerStickBottom(t) {
+    return t.stickBottom !== undefined;
+}
+function isLayerStickRight(t) {
+    return t.stickRight !== undefined;
+}
+function isLayerOverlay(t) {
+    return t.overlay !== undefined;
+}
+function isTilePath(t) {
+    return t.points !== undefined;
+}
+function isTileText(t) {
+    return t.text !== undefined;
+}
+function isTileLine(t) {
+    return t.x1 !== undefined;
+}
+function isTilePolygon(t) {
+    return t.dots !== undefined;
+}
+function isLayerStickLeft(t) {
+    return t.stickLeft !== undefined;
+}
+function isTileRectangle(t) {
+    return t.h !== undefined;
+}
+function isTileGroup(t) {
+    return t.content !== undefined;
+}
+function isLayerNormal(t) {
+    return t.stickLeft === undefined
+        && t.stickTop === undefined
+        && t.stickBottom === undefined
+        && t.stickRight === undefined
+        && t.overlay === undefined;
+}
+function rid() {
+    return 'id' + Math.floor(Math.random() * 1000000000);
 }
 function duration2seconds(bpm, duration384) {
     var n4 = 60 / bpm;
@@ -1568,8 +1585,6 @@ var ZvoogFxGain = (function () {
     ZvoogFxGain.prototype.state = function () {
         return this.lockedState;
     };
-    ZvoogFxGain.prototype.passthrough = function (value) {
-    };
     ZvoogFxGain.prototype.prepare = function (audioContext, data) {
         if (this.base) {
         }
@@ -1599,8 +1614,6 @@ var WAFEcho = (function () {
     }
     WAFEcho.prototype.state = function () {
         return this.lockedState;
-    };
-    WAFEcho.prototype.passthrough = function (value) {
     };
     WAFEcho.prototype.setData = function (data) {
     };
@@ -1678,8 +1691,6 @@ var WAFEqualizer = (function () {
     WAFEqualizer.prototype.state = function () {
         return this.lockedState;
     };
-    WAFEqualizer.prototype.passthrough = function (value) {
-    };
     WAFEqualizer.prototype.prepare = function (audioContext, data) {
         if (this.inpt) {
         }
@@ -1728,8 +1739,6 @@ var ZvoogSineSource = (function () {
     }
     ZvoogSineSource.prototype.state = function () {
         return this.lockedState;
-    };
-    ZvoogSineSource.prototype.passthrough = function (value) {
     };
     ZvoogSineSource.prototype.prepare = function (audioContext, data) {
         if (this.out) {
@@ -1814,8 +1823,6 @@ var WAFInsSource = (function () {
     }
     WAFInsSource.prototype.state = function () {
         return this.lockedState;
-    };
-    WAFInsSource.prototype.passthrough = function (value) {
     };
     WAFInsSource.prototype.cancelSchedule = function () {
         window.wafPlayer.cancelQueue(this.audioContext);
@@ -1906,8 +1913,6 @@ var WAFPercSource = (function () {
     WAFPercSource.prototype.state = function () {
         return this.lockedState;
     };
-    WAFPercSource.prototype.passthrough = function (value) {
-    };
     WAFPercSource.prototype.cancelSchedule = function () {
         window.wafPlayer.cancelQueue(this.audioContext);
     };
@@ -1977,8 +1982,6 @@ var AudioFileSource = (function () {
     }
     AudioFileSource.prototype.state = function () {
         return this.lockedState;
-    };
-    AudioFileSource.prototype.passthrough = function (value) {
     };
     AudioFileSource.prototype.setData = function (base64file) {
         var t = [];
@@ -2254,8 +2257,6 @@ var ZvoogPerformerStub = (function () {
     ZvoogPerformerStub.prototype.state = function () {
         return this.lockedState;
     };
-    ZvoogPerformerStub.prototype.passthrough = function (value) {
-    };
     ZvoogPerformerStub.prototype.prepare = function (audioContext) {
         if (this.base) {
         }
@@ -2284,8 +2285,6 @@ var ZvoogFilterStub = (function () {
         this.lockedState = new ZvoogPluginLock();
     }
     ZvoogFilterStub.prototype.setData = function (data) {
-    };
-    ZvoogFilterStub.prototype.passthrough = function (value) {
     };
     ZvoogFilterStub.prototype.state = function () {
         return this.lockedState;
@@ -2450,4 +2449,960 @@ function createPluginSource(id) {
         return takeZvoogSineSource();
     return takeZvoogPerformerStub();
 }
+var MIDIFileImporter = (function () {
+    function MIDIFileImporter() {
+    }
+    MIDIFileImporter.prototype.list = function (onFinish) { };
+    ;
+    MIDIFileImporter.prototype.goFolder = function (title, onFinish) { };
+    ;
+    MIDIFileImporter.prototype.goUp = function (onFinish) { };
+    ;
+    MIDIFileImporter.prototype.readSongData = function (title, onFinish) {
+        console.log('readSongData', title);
+        var fileSelector = document.createElement('input');
+        fileSelector.setAttribute('type', 'file');
+        fileSelector.setAttribute('accept', 'audio/midi, audio/x-midi');
+        fileSelector.addEventListener("change", function (ev) {
+            if (fileSelector.files) {
+                var file = fileSelector.files[0];
+                var fileReader = new FileReader();
+                fileReader.onload = function (progressEvent) {
+                    if (progressEvent.target) {
+                        var arrayBuffer = progressEvent.target.result;
+                        var midiParser = new MidiParser(arrayBuffer);
+                        var res = midiParser.convert();
+                        onFinish(res);
+                    }
+                };
+                fileReader.readAsArrayBuffer(file);
+            }
+        }, false);
+        fileSelector.click();
+    };
+    ;
+    MIDIFileImporter.prototype.createSongData = function (title, schedule, onFinish) { };
+    ;
+    MIDIFileImporter.prototype.updateSongData = function (title, schedule, onFinish) { };
+    ;
+    MIDIFileImporter.prototype.deleteSongData = function (title, onFinish) { };
+    ;
+    MIDIFileImporter.prototype.renameSongData = function (title, newTitle, onFinish) { };
+    ;
+    MIDIFileImporter.prototype.createFolder = function (title, onFinish) { };
+    ;
+    MIDIFileImporter.prototype.deleteFolder = function (title, onFinish) { };
+    ;
+    MIDIFileImporter.prototype.renameFolder = function (title, newTitle, onFinish) { };
+    ;
+    return MIDIFileImporter;
+}());
+;
+var DataViewStream = (function () {
+    function DataViewStream(dv) {
+        this.position = 0;
+        this.buffer = dv;
+    }
+    DataViewStream.prototype.readUint8 = function () {
+        var n = this.buffer.getUint8(this.position);
+        this.position++;
+        return n;
+    };
+    DataViewStream.prototype.readUint16 = function () {
+        var v = this.buffer.getUint16(this.position);
+        this.position = this.position + 2;
+        return v;
+    };
+    DataViewStream.prototype.readVarInt = function () {
+        var v = 0;
+        var i = 0;
+        var b;
+        while (i < 4) {
+            b = this.readUint8();
+            if (b & 0x80) {
+                v = v + (b & 0x7f);
+                v = v << 7;
+            }
+            else {
+                return v + b;
+            }
+            i++;
+        }
+        throw new Error('readVarInt ' + i);
+    };
+    DataViewStream.prototype.readBytes = function (length) {
+        var bytes = [];
+        for (var i = 0; i < length; i++) {
+            bytes.push(this.readUint8());
+        }
+        return bytes;
+    };
+    DataViewStream.prototype.offset = function () {
+        return this.buffer.byteOffset + this.position;
+    };
+    DataViewStream.prototype.end = function () {
+        return this.position == this.buffer.byteLength;
+    };
+    return DataViewStream;
+}());
+var MIDIFileHeader = (function () {
+    function MIDIFileHeader(buffer) {
+        this.HEADER_LENGTH = 14;
+        this.tempoBPM = 120;
+        this.tempos = [];
+        this.meterCount = 4;
+        this.meterDivision = 4;
+        this.keyFlatSharp = 0;
+        this.keyMajMin = 0;
+        this.lastNonZeroQuarter = 0;
+        this.datas = new DataView(buffer, 0, this.HEADER_LENGTH);
+        this.format = this.datas.getUint16(8);
+        this.trackCount = this.datas.getUint16(10);
+    }
+    MIDIFileHeader.prototype.getTickResolution = function (tempo) {
+        if (tempo) {
+            this.lastNonZeroQuarter = tempo;
+        }
+        else {
+            if (this.lastNonZeroQuarter) {
+                tempo = this.lastNonZeroQuarter;
+            }
+            else {
+                tempo = 60000000 / this.tempoBPM;
+            }
+        }
+        if (this.datas.getUint16(12) & 0x8000) {
+            var r = 1000000 / (this.getSMPTEFrames() * this.getTicksPerFrame());
+            return r;
+        }
+        else {
+            tempo = tempo || 500000;
+            var r = tempo / this.getTicksPerBeat();
+            return r;
+        }
+    };
+    MIDIFileHeader.prototype.getTicksPerBeat = function () {
+        var divisionWord = this.datas.getUint16(12);
+        return divisionWord;
+    };
+    MIDIFileHeader.prototype.getTicksPerFrame = function () {
+        var divisionWord = this.datas.getUint16(12);
+        return divisionWord & 0x00ff;
+    };
+    MIDIFileHeader.prototype.getSMPTEFrames = function () {
+        var divisionWord = this.datas.getUint16(12);
+        var smpteFrames;
+        smpteFrames = divisionWord & 0x7f00;
+        if (smpteFrames == 29) {
+            return 29.97;
+        }
+        else {
+            return smpteFrames;
+        }
+    };
+    return MIDIFileHeader;
+}());
+var MIDIFileTrack = (function () {
+    function MIDIFileTrack(buffer, start) {
+        this.HDR_LENGTH = 8;
+        this.chords = [];
+        this.datas = new DataView(buffer, start, this.HDR_LENGTH);
+        this.trackLength = this.datas.getUint32(4);
+        this.datas = new DataView(buffer, start, this.HDR_LENGTH + this.trackLength);
+        this.trackContent = new DataView(this.datas.buffer, this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
+        this.events = [];
+        this.volumes = [];
+    }
+    return MIDIFileTrack;
+}());
+var MidiParser = (function () {
+    function MidiParser(arrayBuffer) {
+        this.instrumentNamesArray = [];
+        this.drumNamesArray = [];
+        this.EVENT_META = 0xff;
+        this.EVENT_SYSEX = 0xf0;
+        this.EVENT_DIVSYSEX = 0xf7;
+        this.EVENT_MIDI = 0x8;
+        this.EVENT_META_SEQUENCE_NUMBER = 0x00;
+        this.EVENT_META_TEXT = 0x01;
+        this.EVENT_META_COPYRIGHT_NOTICE = 0x02;
+        this.EVENT_META_TRACK_NAME = 0x03;
+        this.EVENT_META_INSTRUMENT_NAME = 0x04;
+        this.EVENT_META_LYRICS = 0x05;
+        this.EVENT_META_MARKER = 0x06;
+        this.EVENT_META_CUE_POINT = 0x07;
+        this.EVENT_META_MIDI_CHANNEL_PREFIX = 0x20;
+        this.EVENT_META_END_OF_TRACK = 0x2f;
+        this.EVENT_META_SET_TEMPO = 0x51;
+        this.EVENT_META_SMTPE_OFFSET = 0x54;
+        this.EVENT_META_TIME_SIGNATURE = 0x58;
+        this.EVENT_META_KEY_SIGNATURE = 0x59;
+        this.EVENT_META_SEQUENCER_SPECIFIC = 0x7f;
+        this.EVENT_MIDI_NOTE_OFF = 0x8;
+        this.EVENT_MIDI_NOTE_ON = 0x9;
+        this.EVENT_MIDI_NOTE_AFTERTOUCH = 0xa;
+        this.EVENT_MIDI_CONTROLLER = 0xb;
+        this.EVENT_MIDI_PROGRAM_CHANGE = 0xc;
+        this.EVENT_MIDI_CHANNEL_AFTERTOUCH = 0xd;
+        this.EVENT_MIDI_PITCH_BEND = 0xe;
+        this.midiEventType = 0;
+        this.midiEventChannel = 0;
+        this.midiEventParam1 = 0;
+        console.log('start constructor');
+        this.header = new MIDIFileHeader(arrayBuffer);
+        this.parseTracks(arrayBuffer);
+    }
+    MidiParser.prototype.parseTracks = function (arrayBuffer) {
+        console.log('start parseTracks');
+        var curIndex = this.header.HEADER_LENGTH;
+        var trackCount = this.header.trackCount;
+        this.tracks = [];
+        for (var i = 0; i < trackCount; i++) {
+            var track = new MIDIFileTrack(arrayBuffer, curIndex);
+            this.tracks.push(track);
+            curIndex = curIndex + track.trackLength + 8;
+        }
+        for (var i = 0; i < this.tracks.length; i++) {
+            this.parseEvents(this.tracks[i]);
+        }
+        this.parseNotes();
+        this.simplify();
+    };
+    MidiParser.prototype.toText = function (arr) {
+        var r = '';
+        for (var i = 0; i < arr.length; i++) {
+            r = r + String.fromCharCode(arr[i]);
+        }
+        return r;
+    };
+    MidiParser.prototype.findChordBefore = function (when, track, channel) {
+        for (var i = 0; i < track.chords.length; i++) {
+            var chord = track.chords[track.chords.length - i - 1];
+            if (chord.when < when && chord.channel == channel) {
+                return chord;
+            }
+        }
+        return null;
+    };
+    MidiParser.prototype.findOpenedNoteBefore = function (firstPitch, when, track, channel) {
+        var before = when;
+        var chord = this.findChordBefore(before, track, channel);
+        while (chord) {
+            for (var i = 0; i < chord.notes.length; i++) {
+                var note = chord.notes[i];
+                if (!(note.closed)) {
+                    if (firstPitch == note.points[0].pitch) {
+                        return { chord: chord, note: note };
+                    }
+                }
+            }
+            before = chord.when;
+            chord = this.findChordBefore(before, track, channel);
+        }
+        return null;
+    };
+    MidiParser.prototype.takeChord = function (when, track, channel) {
+        for (var i = 0; i < track.chords.length; i++) {
+            if (track.chords[i].when == when && track.chords[i].channel == channel) {
+                return track.chords[i];
+            }
+        }
+        var ch = {
+            when: when,
+            channel: channel,
+            notes: []
+        };
+        track.chords.push(ch);
+        return ch;
+    };
+    MidiParser.prototype.takeOpenedNote = function (first, when, track, channel) {
+        var chord = this.takeChord(when, track, channel);
+        for (var i = 0; i < chord.notes.length; i++) {
+            if (!(chord.notes[i].closed)) {
+                if (chord.notes[i].points[0].pitch == first) {
+                    return chord.notes[i];
+                }
+            }
+        }
+        var pi = { closed: false, points: [] };
+        pi.points.push({ pointDuration: -1, pitch: first });
+        chord.notes.push(pi);
+        return pi;
+    };
+    MidiParser.prototype.distanceToPoint = function (line, point) {
+        var m = (line.p2.y - line.p1.y) / (line.p2.x - line.p1.x);
+        var b = line.p1.y - (m * line.p1.x);
+        var d = [];
+        d.push(Math.abs(point.y - (m * point.x) - b) / Math.sqrt(Math.pow(m, 2) + 1));
+        d.push(Math.sqrt(Math.pow((point.x - line.p1.x), 2) + Math.pow((point.y - line.p1.y), 2)));
+        d.push(Math.sqrt(Math.pow((point.x - line.p2.x), 2) + Math.pow((point.y - line.p2.y), 2)));
+        d.sort(function (a, b) {
+            return (a - b);
+        });
+        return d[0];
+    };
+    ;
+    MidiParser.prototype.douglasPeucker = function (points, tolerance) {
+        if (points.length <= 2) {
+            return [points[0]];
+        }
+        var returnPoints = [];
+        var line = { p1: points[0], p2: points[points.length - 1] };
+        var maxDistance = 0;
+        var maxDistanceIndex = 0;
+        var p;
+        for (var i = 1; i <= points.length - 2; i++) {
+            var distance = this.distanceToPoint(line, points[i]);
+            if (distance > maxDistance) {
+                maxDistance = distance;
+                maxDistanceIndex = i;
+            }
+        }
+        if (maxDistance >= tolerance) {
+            p = points[maxDistanceIndex];
+            this.distanceToPoint(line, p);
+            returnPoints = returnPoints.concat(this.douglasPeucker(points.slice(0, maxDistanceIndex + 1), tolerance));
+            returnPoints = returnPoints.concat(this.douglasPeucker(points.slice(maxDistanceIndex, points.length), tolerance));
+        }
+        else {
+            p = points[maxDistanceIndex];
+            this.distanceToPoint(line, p);
+            returnPoints = [points[0]];
+        }
+        return returnPoints;
+    };
+    ;
+    MidiParser.prototype.simplifyPath = function (points, tolerance) {
+        var arr = this.douglasPeucker(points, tolerance);
+        arr.push(points[points.length - 1]);
+        return arr;
+    };
+    MidiParser.prototype.simplify = function () {
+        for (var t = 0; t < this.tracks.length; t++) {
+            var track = this.tracks[t];
+            for (var ch = 0; ch < track.chords.length; ch++) {
+                var chord = track.chords[ch];
+                for (var n = 0; n < chord.notes.length; n++) {
+                    var note = chord.notes[n];
+                    if (note.points.length > 5) {
+                        var xx = 0;
+                        var pnts = [];
+                        for (var p = 0; p < note.points.length; p++) {
+                            note.points[p].pointDuration = Math.max(note.points[p].pointDuration, 0);
+                            pnts.push({ x: xx, y: note.points[p].pitch });
+                            xx = xx + note.points[p].pointDuration;
+                        }
+                        pnts.push({ x: xx, y: note.points[note.points.length - 1].pitch });
+                        var lessPoints = this.simplifyPath(pnts, 1.5);
+                        note.points = [];
+                        for (var p = 0; p < lessPoints.length - 1; p++) {
+                            var xypoint = lessPoints[p];
+                            var xyduration = lessPoints[p + 1].x - xypoint.x;
+                            note.points.push({ pointDuration: xyduration, pitch: xypoint.y });
+                        }
+                    }
+                    else {
+                        if (note.points.length == 1) {
+                            if (note.points[0].pointDuration > 4321) {
+                                note.points[0].pointDuration = 1234;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+    MidiParser.prototype.parseNotes = function () {
+        var tickResolutionPre = 0;
+        for (var t = 0; t < this.tracks.length; t++) {
+            var track = this.tracks[t];
+            var playTimeTicks = 0;
+            var tickResolution = this.header.getTickResolution(0);
+            if (tickResolutionPre != tickResolution) {
+                console.log('start tickResolutionPre', tickResolutionPre, tickResolution);
+                tickResolutionPre = tickResolution;
+            }
+            for (var e = 0; e < track.events.length; e++) {
+                var evnt = track.events[e];
+                var curDelta = 0.0;
+                if (evnt.delta)
+                    curDelta = evnt.delta;
+                playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
+                if (evnt.basetype === this.EVENT_META) {
+                    if (evnt.subtype === this.EVENT_META_SET_TEMPO) {
+                        if (evnt.tempo) {
+                            tickResolution = this.header.getTickResolution(evnt.tempo);
+                            if (tickResolutionPre != tickResolution) {
+                                console.log('set tickResolutionPre', tickResolutionPre, tickResolution);
+                                tickResolutionPre = tickResolution;
+                            }
+                        }
+                    }
+                }
+                evnt.playTimeMs = playTimeTicks;
+            }
+            for (var e = 0; e < track.events.length; e++) {
+                var evnt = track.events[e];
+                if (evnt.basetype == this.EVENT_MIDI) {
+                    evnt.param1 = evnt.param1 ? evnt.param1 : 0;
+                    if (evnt.subtype == this.EVENT_MIDI_NOTE_ON) {
+                        if (evnt.param1 >= 0 && evnt.param1 <= 127) {
+                            var pitch = evnt.param1 ? evnt.param1 : 0;
+                            var when = 0;
+                            if (evnt.playTimeMs)
+                                when = evnt.playTimeMs;
+                            this.takeOpenedNote(pitch, when, track, evnt.midiChannel ? evnt.midiChannel : 0);
+                        }
+                    }
+                    else {
+                        if (evnt.subtype == this.EVENT_MIDI_NOTE_OFF) {
+                            if (evnt.param1 >= 0 && evnt.param1 <= 127) {
+                                var pitch = evnt.param1 ? evnt.param1 : 0;
+                                var when = 0;
+                                if (evnt.playTimeMs)
+                                    when = evnt.playTimeMs;
+                                var chpi = this.findOpenedNoteBefore(pitch, when, track, evnt.midiChannel ? evnt.midiChannel : 0);
+                                if (chpi) {
+                                    var duration = 0;
+                                    for (var i = 0; i < chpi.note.points.length - 1; i++) {
+                                        duration = duration + chpi.note.points[i].pointDuration;
+                                    }
+                                    chpi.note.points[chpi.note.points.length - 1].pointDuration = when - chpi.chord.when - duration;
+                                    chpi.note.closed = true;
+                                }
+                            }
+                        }
+                        else {
+                            if (evnt.subtype == this.EVENT_MIDI_PROGRAM_CHANGE) {
+                                if (evnt.param1 >= 0 && evnt.param1 <= 127) {
+                                    track.program = evnt.param1 ? evnt.param1 : 0;
+                                }
+                            }
+                            else {
+                                if (evnt.subtype == this.EVENT_MIDI_PITCH_BEND) {
+                                    var pitch = evnt.param1 ? evnt.param1 : 0;
+                                    var slide = ((evnt.param2 ? evnt.param2 : 0) - 64) / 6;
+                                    var when = evnt.playTimeMs ? evnt.playTimeMs : 0;
+                                    var chord = this.findChordBefore(when, track, evnt.midiChannel ? evnt.midiChannel : 0);
+                                    if (chord) {
+                                        for (var i = 0; i < chord.notes.length; i++) {
+                                            var note = chord.notes[i];
+                                            if (!(note.closed)) {
+                                                var duration = 0;
+                                                for (var k = 0; k < note.points.length - 1; k++) {
+                                                    duration = duration + note.points[k].pointDuration;
+                                                }
+                                                note.points[note.points.length - 1].pointDuration = when - chord.when - duration;
+                                                var firstpitch = note.points[0].pitch + slide;
+                                                var point = {
+                                                    pointDuration: -1,
+                                                    pitch: firstpitch
+                                                };
+                                                note.points.push(point);
+                                            }
+                                        }
+                                    }
+                                }
+                                else {
+                                    if (evnt.subtype == this.EVENT_MIDI_CONTROLLER && evnt.param1 == 7) {
+                                        var v = evnt.param2 ? evnt.param2 / 127 : 0;
+                                        track.volumes.push({ ms: evnt.playTimeMs, value: v });
+                                    }
+                                    else {
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else {
+                    if (evnt.subtype == this.EVENT_META_TEXT) {
+                    }
+                    if (evnt.subtype == this.EVENT_META_COPYRIGHT_NOTICE) {
+                    }
+                    if (evnt.subtype == this.EVENT_META_TRACK_NAME) {
+                        track.title = this.toText(evnt.data ? evnt.data : []);
+                    }
+                    if (evnt.subtype == this.EVENT_META_INSTRUMENT_NAME) {
+                        track.instrument = this.toText(evnt.data ? evnt.data : []);
+                    }
+                    if (evnt.subtype == this.EVENT_META_LYRICS) {
+                    }
+                    if (evnt.subtype == this.EVENT_META_LYRICS) {
+                    }
+                    if (evnt.subtype == this.EVENT_META_KEY_SIGNATURE) {
+                        var key = evnt.key ? evnt.key : 0;
+                        if (key > 127)
+                            key = key - 256;
+                        this.header.keyFlatSharp = key;
+                        this.header.keyMajMin = evnt.scale ? evnt.scale : 0;
+                    }
+                    if (evnt.subtype == this.EVENT_META_SET_TEMPO) {
+                        this.header.tempoBPM = evnt.tempoBPM ? evnt.tempoBPM : 120;
+                        this.header.tempos.push({ ms: evnt.playTimeMs ? evnt.playTimeMs : 0, bmp: this.header.tempoBPM });
+                    }
+                    if (evnt.subtype == this.EVENT_META_TIME_SIGNATURE) {
+                        this.header.meterCount = evnt.param1 ? evnt.param1 : 4;
+                        var dvsn = evnt.param2 ? evnt.param2 : 2;
+                        if (dvsn == 1)
+                            this.header.meterDivision = 2;
+                        else if (dvsn == 2)
+                            this.header.meterDivision = 4;
+                        else if (dvsn == 3)
+                            this.header.meterDivision = 8;
+                        else if (dvsn == 4)
+                            this.header.meterDivision = 16;
+                        else if (dvsn == 5)
+                            this.header.meterDivision = 32;
+                    }
+                }
+            }
+        }
+    };
+    MidiParser.prototype.nextEvent = function (stream) {
+        var index = stream.offset();
+        var delta = stream.readVarInt();
+        var eventTypeByte = stream.readUint8();
+        var event = { offset: index, delta: delta, eventTypeByte: eventTypeByte, playTimeMs: 0 };
+        if (0xf0 === (eventTypeByte & 0xf0)) {
+            if (eventTypeByte === this.EVENT_META) {
+                event.basetype = this.EVENT_META;
+                event.subtype = stream.readUint8();
+                event.length = stream.readVarInt();
+                switch (event.subtype) {
+                    case this.EVENT_META_SEQUENCE_NUMBER:
+                        event.msb = stream.readUint8();
+                        event.lsb = stream.readUint8();
+                        console.log('EVENT_META_SEQUENCE_NUMBER', event);
+                        return event;
+                    case this.EVENT_META_TEXT:
+                    case this.EVENT_META_COPYRIGHT_NOTICE:
+                    case this.EVENT_META_TRACK_NAME:
+                    case this.EVENT_META_INSTRUMENT_NAME:
+                    case this.EVENT_META_LYRICS:
+                    case this.EVENT_META_MARKER:
+                    case this.EVENT_META_CUE_POINT:
+                        event.data = stream.readBytes(event.length);
+                        event.text = this.toText(event.data ? event.data : []);
+                        return event;
+                    case this.EVENT_META_MIDI_CHANNEL_PREFIX:
+                        event.prefix = stream.readUint8();
+                        return event;
+                    case this.EVENT_META_END_OF_TRACK:
+                        return event;
+                    case this.EVENT_META_SET_TEMPO:
+                        event.tempo = (stream.readUint8() << 16) + (stream.readUint8() << 8) + stream.readUint8();
+                        event.tempoBPM = 60000000 / event.tempo;
+                        return event;
+                    case this.EVENT_META_SMTPE_OFFSET:
+                        event.hour = stream.readUint8();
+                        event.minutes = stream.readUint8();
+                        event.seconds = stream.readUint8();
+                        event.frames = stream.readUint8();
+                        event.subframes = stream.readUint8();
+                        return event;
+                    case this.EVENT_META_KEY_SIGNATURE:
+                        event.key = stream.readUint8();
+                        event.scale = stream.readUint8();
+                        return event;
+                    case this.EVENT_META_TIME_SIGNATURE:
+                        event.data = stream.readBytes(event.length);
+                        event.param1 = event.data[0];
+                        event.param2 = event.data[1];
+                        event.param3 = event.data[2];
+                        event.param4 = event.data[3];
+                        return event;
+                    case this.EVENT_META_SEQUENCER_SPECIFIC:
+                        event.data = stream.readBytes(event.length);
+                        return event;
+                    default:
+                        event.data = stream.readBytes(event.length);
+                        return event;
+                }
+            }
+            else {
+                if (eventTypeByte === this.EVENT_SYSEX || eventTypeByte === this.EVENT_DIVSYSEX) {
+                    event.basetype = eventTypeByte;
+                    event.length = stream.readVarInt();
+                    event.data = stream.readBytes(event.length);
+                    return event;
+                }
+                else {
+                    event.basetype = eventTypeByte;
+                    event.badsubtype = stream.readVarInt();
+                    event.length = stream.readUint8();
+                    event.data = stream.readBytes(event.length);
+                    return event;
+                }
+            }
+        }
+        else {
+            if (0 === (eventTypeByte & 0x80)) {
+                if (!this.midiEventType) {
+                    throw new Error('no pre event' + stream.offset());
+                }
+                this.midiEventParam1 = eventTypeByte;
+            }
+            else {
+                this.midiEventType = eventTypeByte >> 4;
+                this.midiEventChannel = eventTypeByte & 0x0f;
+                this.midiEventParam1 = stream.readUint8();
+            }
+            event.basetype = this.EVENT_MIDI;
+            event.subtype = this.midiEventType;
+            event.midiChannel = this.midiEventChannel;
+            event.param1 = this.midiEventParam1;
+            switch (this.midiEventType) {
+                case this.EVENT_MIDI_NOTE_OFF:
+                    event.param2 = stream.readUint8();
+                    return event;
+                case this.EVENT_MIDI_NOTE_ON:
+                    event.param2 = stream.readUint8();
+                    if (!event.param2) {
+                        event.subtype = this.EVENT_MIDI_NOTE_OFF;
+                        event.param2 = 127;
+                    }
+                    return event;
+                case this.EVENT_MIDI_NOTE_AFTERTOUCH:
+                    event.param2 = stream.readUint8();
+                    return event;
+                case this.EVENT_MIDI_CONTROLLER:
+                    event.param2 = stream.readUint8();
+                    if (event.param1 == 7) {
+                    }
+                    return event;
+                case this.EVENT_MIDI_PROGRAM_CHANGE:
+                    return event;
+                case this.EVENT_MIDI_CHANNEL_AFTERTOUCH:
+                    return event;
+                case this.EVENT_MIDI_PITCH_BEND:
+                    event.param2 = stream.readUint8();
+                    return event;
+                default:
+                    console.log('unknown note', event);
+                    return event;
+            }
+        }
+    };
+    MidiParser.prototype.parseEvents = function (track) {
+        var stream = new DataViewStream(track.trackContent);
+        this.midiEventType = 0;
+        this.midiEventChannel = 0;
+        this.midiEventParam1 = 0;
+        while (!stream.end()) {
+            var e = this.nextEvent(stream);
+            track.events.push(e);
+        }
+    };
+    MidiParser.prototype.takeMeasure = function (track, when, bpm, meter) {
+        var q = 60 / bpm;
+        var duration = 1000 * q * meter * 4;
+        var idx = Math.floor(when / duration);
+        for (var i = 0; i <= idx; i++) {
+            if (track.measures.length < 1 + idx) {
+                var m = {
+                    duration: duration,
+                    songchords: []
+                };
+                track.measures.push(m);
+            }
+        }
+        return track.measures[idx];
+    };
+    MidiParser.prototype.takeDrumVoice = function (drum, drumVoices) {
+        for (var i = 0; i < drumVoices.length; i++) {
+            if (drumVoices[i].drum == drum) {
+                return drumVoices[i];
+            }
+        }
+        var voice = {
+            measureChords: [],
+            performer: {
+                performerPlugin: null,
+                parameters: [],
+                kind: "wafdrum",
+                initial: "" + drum
+            },
+            filters: [],
+            title: 'Drum ' + drum + ': ' + this.drumTitles()[drum]
+        };
+        var drvc = { voice: voice, drum: drum };
+        drumVoices.push(drvc);
+        return drvc;
+    };
+    MidiParser.prototype.findMeasureNum = function (measures, ms) {
+        var k = { nn: 0, startMs: 0 };
+        for (var m = 0; m < measures.length; m++) {
+            var measure = measures[m];
+            if (ms >= k.startMs && ms < k.startMs + measure.duration) {
+                break;
+            }
+            k.startMs = k.startMs + measure.duration;
+            k.nn++;
+        }
+        return k;
+    };
+    MidiParser.prototype.convert = function () {
+        var midisong = this.dump();
+        var schedule = {
+            title: "import from *.mid",
+            tracks: [],
+            filters: [],
+            measures: [],
+            harmony: {
+                tone: "",
+                mode: "",
+                progression: []
+            }
+        };
+        schedule.filters.push({
+            filterPlugin: null,
+            parameters: [],
+            kind: "gain",
+            initial: ""
+        });
+        return schedule;
+    };
+    MidiParser.prototype.dump = function () {
+        var a = {
+            parser: '1.01',
+            duration: 0,
+            bpm: this.header.tempoBPM,
+            tempos: this.header.tempos,
+            key: this.header.keyFlatSharp,
+            mode: this.header.keyMajMin,
+            meter: { count: this.header.meterCount, division: this.header.meterDivision },
+            tracks: [],
+            speedMode: 0,
+            lineMode: 0
+        };
+        for (var i = 0; i < this.tracks.length; i++) {
+            var miditrack = this.tracks[i];
+            var tr = {
+                order: i,
+                title: miditrack.title ? miditrack.title : '',
+                volumes: miditrack.volumes,
+                program: miditrack.program ? miditrack.program : 0,
+                measures: []
+            };
+            for (var ch = 0; ch < miditrack.chords.length; ch++) {
+                var midichord = miditrack.chords[ch];
+                var newchord = { when: midichord.when, notes: [], channel: midichord.channel };
+                var measure = this.takeMeasure(tr, midichord.when, this.header.tempoBPM, this.header.meterCount / this.header.meterDivision);
+                measure.songchords.push(newchord);
+                for (var n = 0; n < midichord.notes.length; n++) {
+                    var midinote = midichord.notes[n];
+                    var newnote = { points: [] };
+                    newchord.notes.push(newnote);
+                    for (var v = 0; v < midinote.points.length; v++) {
+                        var midipoint = midinote.points[v];
+                        var newpoint = { pitch: midipoint.pitch, duration: midipoint.pointDuration };
+                        newnote.points.push(newpoint);
+                    }
+                }
+            }
+            if (tr.measures.length > 0) {
+                a.tracks.push(tr);
+                var d = tr.measures.length * tr.measures[0].duration;
+                if (a.duration < d)
+                    a.duration = d;
+            }
+        }
+        return a;
+    };
+    MidiParser.prototype.instrumentTitles = function () {
+        if (this.instrumentNamesArray.length > 0) {
+        }
+        else {
+            var insNames = [];
+            insNames[0] = "Acoustic Grand Piano: Piano";
+            insNames[1] = "Bright Acoustic Piano: Piano";
+            insNames[2] = "Electric Grand Piano: Piano";
+            insNames[3] = "Honky-tonk Piano: Piano";
+            insNames[4] = "Electric Piano 1: Piano";
+            insNames[5] = "Electric Piano 2: Piano";
+            insNames[6] = "Harpsichord: Piano";
+            insNames[7] = "Clavinet: Piano";
+            insNames[8] = "Celesta: Chromatic Percussion";
+            insNames[9] = "Glockenspiel: Chromatic Percussion";
+            insNames[10] = "Music Box: Chromatic Percussion";
+            insNames[11] = "Vibraphone: Chromatic Percussion";
+            insNames[12] = "Marimba: Chromatic Percussion";
+            insNames[13] = "Xylophone: Chromatic Percussion";
+            insNames[14] = "Tubular Bells: Chromatic Percussion";
+            insNames[15] = "Dulcimer: Chromatic Percussion";
+            insNames[16] = "Drawbar Organ: Organ";
+            insNames[17] = "Percussive Organ: Organ";
+            insNames[18] = "Rock Organ: Organ";
+            insNames[19] = "Church Organ: Organ";
+            insNames[20] = "Reed Organ: Organ";
+            insNames[21] = "Accordion: Organ";
+            insNames[22] = "Harmonica: Organ";
+            insNames[23] = "Tango Accordion: Organ";
+            insNames[24] = "Acoustic Guitar (nylon): Guitar";
+            insNames[25] = "Acoustic Guitar (steel): Guitar";
+            insNames[26] = "Electric Guitar (jazz): Guitar";
+            insNames[27] = "Electric Guitar (clean): Guitar";
+            insNames[28] = "Electric Guitar (muted): Guitar";
+            insNames[29] = "Overdriven Guitar: Guitar";
+            insNames[30] = "Distortion Guitar: Guitar";
+            insNames[31] = "Guitar Harmonics: Guitar";
+            insNames[32] = "Acoustic Bass: Bass";
+            insNames[33] = "Electric Bass (finger): Bass";
+            insNames[34] = "Electric Bass (pick): Bass";
+            insNames[35] = "Fretless Bass: Bass";
+            insNames[36] = "Slap Bass 1: Bass";
+            insNames[37] = "Slap Bass 2: Bass";
+            insNames[38] = "Synth Bass 1: Bass";
+            insNames[39] = "Synth Bass 2: Bass";
+            insNames[40] = "Violin: Strings";
+            insNames[41] = "Viola: Strings";
+            insNames[42] = "Cello: Strings";
+            insNames[43] = "Contrabass: Strings";
+            insNames[44] = "Tremolo Strings: Strings";
+            insNames[45] = "Pizzicato Strings: Strings";
+            insNames[46] = "Orchestral Harp: Strings";
+            insNames[47] = "Timpani: Strings";
+            insNames[48] = "String Ensemble 1: Ensemble";
+            insNames[49] = "String Ensemble 2: Ensemble";
+            insNames[50] = "Synth Strings 1: Ensemble";
+            insNames[51] = "Synth Strings 2: Ensemble";
+            insNames[52] = "Choir Aahs: Ensemble";
+            insNames[53] = "Voice Oohs: Ensemble";
+            insNames[54] = "Synth Choir: Ensemble";
+            insNames[55] = "Orchestra Hit: Ensemble";
+            insNames[56] = "Trumpet: Brass";
+            insNames[57] = "Trombone: Brass";
+            insNames[58] = "Tuba: Brass";
+            insNames[59] = "Muted Trumpet: Brass";
+            insNames[60] = "French Horn: Brass";
+            insNames[61] = "Brass Section: Brass";
+            insNames[62] = "Synth Brass 1: Brass";
+            insNames[63] = "Synth Brass 2: Brass";
+            insNames[64] = "Soprano Sax: Reed";
+            insNames[65] = "Alto Sax: Reed";
+            insNames[66] = "Tenor Sax: Reed";
+            insNames[67] = "Baritone Sax: Reed";
+            insNames[68] = "Oboe: Reed";
+            insNames[69] = "English Horn: Reed";
+            insNames[70] = "Bassoon: Reed";
+            insNames[71] = "Clarinet: Reed";
+            insNames[72] = "Piccolo: Pipe";
+            insNames[73] = "Flute: Pipe";
+            insNames[74] = "Recorder: Pipe";
+            insNames[75] = "Pan Flute: Pipe";
+            insNames[76] = "Blown bottle: Pipe";
+            insNames[77] = "Shakuhachi: Pipe";
+            insNames[78] = "Whistle: Pipe";
+            insNames[79] = "Ocarina: Pipe";
+            insNames[80] = "Lead 1 (square): Synth Lead";
+            insNames[81] = "Lead 2 (sawtooth): Synth Lead";
+            insNames[82] = "Lead 3 (calliope): Synth Lead";
+            insNames[83] = "Lead 4 (chiff): Synth Lead";
+            insNames[84] = "Lead 5 (charang): Synth Lead";
+            insNames[85] = "Lead 6 (voice): Synth Lead";
+            insNames[86] = "Lead 7 (fifths): Synth Lead";
+            insNames[87] = "Lead 8 (bass + lead): Synth Lead";
+            insNames[88] = "Pad 1 (new age): Synth Pad";
+            insNames[89] = "Pad 2 (warm): Synth Pad";
+            insNames[90] = "Pad 3 (polysynth): Synth Pad";
+            insNames[91] = "Pad 4 (choir): Synth Pad";
+            insNames[92] = "Pad 5 (bowed): Synth Pad";
+            insNames[93] = "Pad 6 (metallic): Synth Pad";
+            insNames[94] = "Pad 7 (halo): Synth Pad";
+            insNames[95] = "Pad 8 (sweep): Synth Pad";
+            insNames[96] = "FX 1 (rain): Synth Effects";
+            insNames[97] = "FX 2 (soundtrack): Synth Effects";
+            insNames[98] = "FX 3 (crystal): Synth Effects";
+            insNames[99] = "FX 4 (atmosphere): Synth Effects";
+            insNames[100] = "FX 5 (brightness): Synth Effects";
+            insNames[101] = "FX 6 (goblins): Synth Effects";
+            insNames[102] = "FX 7 (echoes): Synth Effects";
+            insNames[103] = "FX 8 (sci-fi): Synth Effects";
+            insNames[104] = "Sitar: Ethnic";
+            insNames[105] = "Banjo: Ethnic";
+            insNames[106] = "Shamisen: Ethnic";
+            insNames[107] = "Koto: Ethnic";
+            insNames[108] = "Kalimba: Ethnic";
+            insNames[109] = "Bagpipe: Ethnic";
+            insNames[110] = "Fiddle: Ethnic";
+            insNames[111] = "Shanai: Ethnic";
+            insNames[112] = "Tinkle Bell: Percussive";
+            insNames[113] = "Agogo: Percussive";
+            insNames[114] = "Steel Drums: Percussive";
+            insNames[115] = "Woodblock: Percussive";
+            insNames[116] = "Taiko Drum: Percussive";
+            insNames[117] = "Melodic Tom: Percussive";
+            insNames[118] = "Synth Drum: Percussive";
+            insNames[119] = "Reverse Cymbal: Percussive";
+            insNames[120] = "Guitar Fret Noise: Sound effects";
+            insNames[121] = "Breath Noise: Sound effects";
+            insNames[122] = "Seashore: Sound effects";
+            insNames[123] = "Bird Tweet: Sound effects";
+            insNames[124] = "Telephone Ring: Sound effects";
+            insNames[125] = "Helicopter: Sound effects";
+            insNames[126] = "Applause: Sound effects";
+            insNames[127] = "Gunshot: Sound effects";
+            this.instrumentNamesArray = insNames;
+        }
+        return this.instrumentNamesArray;
+    };
+    ;
+    MidiParser.prototype.drumTitles = function () {
+        if (this.drumNamesArray.length < 1) {
+            var drumNames = [];
+            drumNames[35] = "Bass Drum 2";
+            drumNames[36] = "Bass Drum 1";
+            drumNames[37] = "Side Stick/Rimshot";
+            drumNames[38] = "Snare Drum 1";
+            drumNames[39] = "Hand Clap";
+            drumNames[40] = "Snare Drum 2";
+            drumNames[41] = "Low Tom 2";
+            drumNames[42] = "Closed Hi-hat";
+            drumNames[43] = "Low Tom 1";
+            drumNames[44] = "Pedal Hi-hat";
+            drumNames[45] = "Mid Tom 2";
+            drumNames[46] = "Open Hi-hat";
+            drumNames[47] = "Mid Tom 1";
+            drumNames[48] = "High Tom 2";
+            drumNames[49] = "Crash Cymbal 1";
+            drumNames[50] = "High Tom 1";
+            drumNames[51] = "Ride Cymbal 1";
+            drumNames[52] = "Chinese Cymbal";
+            drumNames[53] = "Ride Bell";
+            drumNames[54] = "Tambourine";
+            drumNames[55] = "Splash Cymbal";
+            drumNames[56] = "Cowbell";
+            drumNames[57] = "Crash Cymbal 2";
+            drumNames[58] = "Vibra Slap";
+            drumNames[59] = "Ride Cymbal 2";
+            drumNames[60] = "High Bongo";
+            drumNames[61] = "Low Bongo";
+            drumNames[62] = "Mute High Conga";
+            drumNames[63] = "Open High Conga";
+            drumNames[64] = "Low Conga";
+            drumNames[65] = "High Timbale";
+            drumNames[66] = "Low Timbale";
+            drumNames[67] = "High Agogo";
+            drumNames[68] = "Low Agogo";
+            drumNames[69] = "Cabasa";
+            drumNames[70] = "Maracas";
+            drumNames[71] = "Short Whistle";
+            drumNames[72] = "Long Whistle";
+            drumNames[73] = "Short Guiro";
+            drumNames[74] = "Long Guiro";
+            drumNames[75] = "Claves";
+            drumNames[76] = "High Wood Block";
+            drumNames[77] = "Low Wood Block";
+            drumNames[78] = "Mute Cuica";
+            drumNames[79] = "Open Cuica";
+            drumNames[80] = "Mute Triangle";
+            drumNames[81] = "Open Triangle";
+            this.drumNamesArray = drumNames;
+        }
+        return this.drumNamesArray;
+    };
+    ;
+    return MidiParser;
+}());
 //# sourceMappingURL=muzxbox.js.map

@@ -8,9 +8,7 @@ class ZvoogPerformerStub implements ZvoogPerformerPlugin {
 	state(): ZvoogPluginLock {
 		return this.lockedState;
 	}
-	passthrough(value: boolean): void{
-
-	}
+	
 	prepare(audioContext: AudioContext): void {
 		if (this.base) {
 			//

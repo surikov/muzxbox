@@ -7,9 +7,7 @@ class WAFEcho implements ZvoogFilterPlugin {
 	state(): ZvoogPluginLock {
 		return this.lockedState;
 	}
-	passthrough(value: boolean): void{
-
-	}
+	
 	setData(data: string): void {
 
 	}

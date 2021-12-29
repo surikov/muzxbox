@@ -7,9 +7,7 @@ class ZvoogFilterStub implements ZvoogFilterPlugin {
 	setData(data: string): void {
 		//
 	}
-	passthrough(value: boolean): void{
-
-	}
+	
 	state(): ZvoogPluginLock {
 		return this.lockedState;
 	}

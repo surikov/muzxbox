@@ -4,7 +4,7 @@ type ZvoogVoice = {
 	, filters: ZvoogFilterSetting[]
 	//, bass: boolean
 	, title: string
-	, stringPattern: ZvoogStringPattern | null//16th
-	, strumPattern: ZvoogStrumPattern | null//16th
-	, keyPattern: ZvoogKeyPattern | null//16th
+	//, stringPattern: ZvoogStringPattern | null//16th
+	//, strumPattern: ZvoogStrumPattern | null//16th
+	//, keyPattern: ZvoogKeyPattern | null//16th
 };

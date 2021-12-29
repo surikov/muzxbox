@@ -12,6 +12,7 @@ declare class MuzXBox {
     testChooser(xx: number, yy: any): void;
     openMenu(): void;
     closeMenu(): void;
+    testFS(): void;
 }
 declare class ZInputDeviceHandler {
     constructor();
@@ -78,25 +79,6 @@ declare class TileLevel {
     dragTranslateX: number;
     dragTranslateY: number;
     mouseDownMode: boolean;
-    anchor(xx: number, yy: number, ww: number, hh: number, showZoom: number, hideZoom: number): TileAnchor;
-    rectangle(x: number, y: number, w: number, h: number, rx?: number, ry?: number, css?: string): TileRectangle;
-    actionRectangle(action: (x: number, y: number) => void | undefined, x: number, y: number, w: number, h: number, rx?: number, ry?: number, css?: string): TileRectangle;
-    line(x1: number, y1: number, x2: number, y2: number, css?: string): TileLine;
-    text(x: number, y: number, text: string, css?: string): TileText;
-    pathImage(x: number, y: number, scale: number, points: string, css?: string): TilePath;
-    isLayerStickTop(t: TileLayerDefinition): t is TileLayerStickTop;
-    isLayerStickBottom(t: TileLayerDefinition): t is TileLayerStickBottom;
-    isLayerStickRight(t: TileLayerDefinition): t is TileLayerStickRight;
-    isLayerOverlay(t: TileLayerDefinition): t is TileLayerOverlay;
-    isTilePath(t: TileItem): t is TilePath;
-    isTileText(t: TileItem): t is TileText;
-    isTileLine(t: TileItem): t is TileLine;
-    isTilePolygon(t: TileItem): t is TilePolygon;
-    isLayerStickLeft(t: TileLayerDefinition): t is TileLayerStickLeft;
-    isTileRectangle(t: TileItem): t is TileRectangle;
-    isTileGroup(t: TileItem): t is TileAnchor;
-    isLayerNormal(t: TileLayerDefinition): t is TileModelLayer;
-    rid(): string;
     get translateZ(): number;
     set translateZ(z: number);
     get translateX(): number;
@@ -258,6 +240,25 @@ declare function tilePath(svgns: string, tapSize: number, g: SVGElement, x: numb
 declare function tileRectangle(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, w: number, h: number, rx: number | undefined, ry: number | undefined, cssClass: string): TileSVGElement;
 declare function tileLine(svgns: string, tapSize: number, g: SVGElement, x1: number, y1: number, x2: number, y2: number, cssClass: string | undefined): TileSVGElement;
 declare function tileText(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, html: string, cssClass: string): TileSVGElement;
+declare function anchor(xx: number, yy: number, ww: number, hh: number, showZoom: number, hideZoom: number): TileAnchor;
+declare function rectangle(x: number, y: number, w: number, h: number, rx?: number, ry?: number, css?: string): TileRectangle;
+declare function actionRectangle(action: (x: number, y: number) => void | undefined, x: number, y: number, w: number, h: number, rx?: number, ry?: number, css?: string): TileRectangle;
+declare function line(x1: number, y1: number, x2: number, y2: number, css?: string): TileLine;
+declare function text(x: number, y: number, text: string, css?: string): TileText;
+declare function pathImage(x: number, y: number, scale: number, points: string, css?: string): TilePath;
+declare function isLayerStickTop(t: TileLayerDefinition): t is TileLayerStickTop;
+declare function isLayerStickBottom(t: TileLayerDefinition): t is TileLayerStickBottom;
+declare function isLayerStickRight(t: TileLayerDefinition): t is TileLayerStickRight;
+declare function isLayerOverlay(t: TileLayerDefinition): t is TileLayerOverlay;
+declare function isTilePath(t: TileItem): t is TilePath;
+declare function isTileText(t: TileItem): t is TileText;
+declare function isTileLine(t: TileItem): t is TileLine;
+declare function isTilePolygon(t: TileItem): t is TilePolygon;
+declare function isLayerStickLeft(t: TileLayerDefinition): t is TileLayerStickLeft;
+declare function isTileRectangle(t: TileItem): t is TileRectangle;
+declare function isTileGroup(t: TileItem): t is TileAnchor;
+declare function isLayerNormal(t: TileLayerDefinition): t is TileModelLayer;
+declare function rid(): string;
 declare type MuzXBoxPattern = {
     skip: ZvoogMeter;
     duration: ZvoogMeter;
@@ -287,18 +288,25 @@ declare type ZvoogStoreListItem = {
     title: string;
     isFolder: boolean;
 };
+declare type ZvoogStoreDoneEvent = {};
 interface ZvoogStore {
-    getList(): ZvoogStoreListItem[];
-    goFolder(): boolean;
-    goUp(): boolean;
-    readSongData(): ZvoogSchedule;
+    list(onFinish: (items: ZvoogStoreListItem[]) => void): void;
+    goFolder(title: string, onFinish: (error: string) => void): void;
+    goUp(onFinish: (error: string) => void): void;
+    readSongData(title: string, onFinish: (result: ZvoogSchedule | null) => void): void;
+    createSongData(title: string, schedule: ZvoogSchedule, onFinish: (error: string) => void): void;
+    updateSongData(title: string, schedule: ZvoogSchedule, onFinish: (error: string) => void): void;
+    deleteSongData(title: string, onFinish: (error: string) => void): void;
+    renameSongData(title: string, newTitle: string, onFinish: (error: string) => void): void;
+    createFolder(title: string, onFinish: (error: string) => void): void;
+    deleteFolder(title: string, onFinish: (error: string) => void): void;
+    renameFolder(title: string, newTitle: string, onFinish: (error: string) => void): void;
 }
 declare class ZvoogFxGain implements ZvoogFilterPlugin {
     base: GainNode;
     params: ZvoogPluginParameter[];
     lockedState: ZvoogPluginLock;
     state(): ZvoogPluginLock;
-    passthrough(value: boolean): void;
     prepare(audioContext: AudioContext, data: string): void;
     getInput(): AudioNode;
     getOutput(): AudioNode;
@@ -312,7 +320,6 @@ declare class WAFEcho implements ZvoogFilterPlugin {
     params: ZvoogPluginParameter[];
     lockedState: ZvoogPluginLock;
     state(): ZvoogPluginLock;
-    passthrough(value: boolean): void;
     setData(data: string): void;
     prepare(audioContext: AudioContext, data: string): void;
     getInput(): AudioNode;
@@ -328,7 +335,6 @@ declare class WAFEqualizer implements ZvoogFilterPlugin {
     params: ZvoogPluginParameter[];
     lockedState: ZvoogPluginLock;
     state(): ZvoogPluginLock;
-    passthrough(value: boolean): void;
     prepare(audioContext: AudioContext, data: string): void;
     getInput(): AudioNode;
     getOutput(): AudioNode;
@@ -346,7 +352,6 @@ declare class ZvoogSineSource implements ZvoogPerformerPlugin {
     }[];
     lockedState: ZvoogPluginLock;
     state(): ZvoogPluginLock;
-    passthrough(value: boolean): void;
     prepare(audioContext: AudioContext, data: string): void;
     getOutput(): AudioNode;
     getParams(): ZvoogPluginParameter[];
@@ -371,7 +376,6 @@ declare class WAFInsSource implements ZvoogPerformerPlugin {
     zones: any;
     lockedState: ZvoogPluginLock;
     state(): ZvoogPluginLock;
-    passthrough(value: boolean): void;
     cancelSchedule(): void;
     addSchedule(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void;
     prepare(audioContext: AudioContext, data: string): void;
@@ -394,7 +398,6 @@ declare class WAFPercSource implements ZvoogPerformerPlugin {
     zones: any;
     lockedState: ZvoogPluginLock;
     state(): ZvoogPluginLock;
-    passthrough(value: boolean): void;
     cancelSchedule(): void;
     addSchedule(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void;
     prepare(audioContext: AudioContext, data: string): void;
@@ -422,7 +425,6 @@ declare class AudioFileSource implements ZvoogPerformerPlugin {
     afterTime: number;
     lockedState: ZvoogPluginLock;
     state(): ZvoogPluginLock;
-    passthrough(value: boolean): void;
     setData(base64file: string): void;
     prepare(audioContext: AudioContext, data: string): void;
     getOutput(): AudioNode;
@@ -494,7 +496,6 @@ interface ZvoogPlugin {
     prepare(audioContext: AudioContext, data: string): void;
     busy(): number;
     state(): ZvoogPluginLock;
-    passthrough(value: boolean): void;
 }
 declare type ZvoogParameterData = {
     points: ZvoogCurvePoint[];
@@ -504,9 +505,6 @@ declare type ZvoogVoice = {
     performer: ZvoogPerformerSetting;
     filters: ZvoogFilterSetting[];
     title: string;
-    stringPattern: ZvoogStringPattern | null;
-    strumPattern: ZvoogStrumPattern | null;
-    keyPattern: ZvoogKeyPattern | null;
 };
 declare type ZvoogMeasureChord = {
     chords: ZvoogChordStrings[];
@@ -572,7 +570,6 @@ declare class ZvoogPerformerStub implements ZvoogPerformerPlugin {
     lockedState: ZvoogPluginLock;
     setData(data: string): void;
     state(): ZvoogPluginLock;
-    passthrough(value: boolean): void;
     prepare(audioContext: AudioContext): void;
     getOutput(): AudioNode;
     getParams(): ZvoogPluginParameter[];
@@ -585,7 +582,6 @@ declare class ZvoogFilterStub implements ZvoogFilterPlugin {
     params: ZvoogPluginParameter[];
     lockedState: ZvoogPluginLock;
     setData(data: string): void;
-    passthrough(value: boolean): void;
     state(): ZvoogPluginLock;
     prepare(audioContext: AudioContext): void;
     getOutput(): AudioNode;
@@ -601,7 +597,7 @@ declare type ZvoogTrack = {
 declare type ZvoogSchedule = {
     title: string;
     tracks: ZvoogTrack[];
-    effects: ZvoogFilterSetting[];
+    filters: ZvoogFilterSetting[];
     measures: ZvoogMeasure[];
     harmony: ZvoogProgression;
 };
@@ -644,3 +640,231 @@ declare let cachedZvoogSineSourcePlugins: ZvoogSineSource[];
 declare function takeZvoogSineSource(): ZvoogSineSource;
 declare function createPluginEffect(id: string): ZvoogFilterPlugin;
 declare function createPluginSource(id: string): ZvoogPerformerPlugin;
+declare class MIDIFileImporter implements ZvoogStore {
+    list(onFinish: (items: ZvoogStoreListItem[]) => void): void;
+    goFolder(title: string, onFinish: (error: string) => void): void;
+    goUp(onFinish: (error: string) => void): void;
+    readSongData(title: string, onFinish: (result: ZvoogSchedule | null) => void): void;
+    createSongData(title: string, schedule: ZvoogSchedule, onFinish: (error: string) => void): void;
+    updateSongData(title: string, schedule: ZvoogSchedule, onFinish: (error: string) => void): void;
+    deleteSongData(title: string, onFinish: (error: string) => void): void;
+    renameSongData(title: string, newTitle: string, onFinish: (error: string) => void): void;
+    createFolder(title: string, onFinish: (error: string) => void): void;
+    deleteFolder(title: string, onFinish: (error: string) => void): void;
+    renameFolder(title: string, newTitle: string, onFinish: (error: string) => void): void;
+}
+declare type XYp = {
+    x: number;
+    y: number;
+};
+declare type PP = {
+    p1: XYp;
+    p2: XYp;
+};
+declare class DataViewStream {
+    position: number;
+    buffer: DataView;
+    constructor(dv: DataView);
+    readUint8(): number;
+    readUint16(): number;
+    readVarInt(): number;
+    readBytes(length: number): number[];
+    offset(): number;
+    end(): boolean;
+}
+declare class MIDIFileHeader {
+    datas: DataView;
+    HEADER_LENGTH: number;
+    format: number;
+    trackCount: number;
+    tempoBPM: number;
+    tempos: {
+        ms: number;
+        bmp: number;
+    }[];
+    meterCount: number;
+    meterDivision: number;
+    keyFlatSharp: number;
+    keyMajMin: number;
+    lastNonZeroQuarter: number;
+    constructor(buffer: ArrayBuffer);
+    getTickResolution(tempo: number): number;
+    getTicksPerBeat(): number;
+    getTicksPerFrame(): number;
+    getSMPTEFrames(): number;
+}
+declare type TrackChord = {
+    when: number;
+    channel: number;
+    notes: TrackNote[];
+};
+declare type TrackNote = {
+    closed: boolean;
+    points: NotePitch[];
+};
+declare type NotePitch = {
+    pointDuration: number;
+    pitch: number;
+};
+declare class MIDIFileTrack {
+    datas: DataView;
+    HDR_LENGTH: number;
+    trackLength: number;
+    trackContent: DataView;
+    events: MIDIEvent[];
+    title: string;
+    instrument: string;
+    program: number;
+    volumes: {
+        ms: number;
+        value: number;
+    }[];
+    chords: TrackChord[];
+    constructor(buffer: ArrayBuffer, start: number);
+}
+declare type MIDIEvent = {
+    offset: number;
+    delta: number;
+    eventTypeByte: number;
+    basetype?: number;
+    subtype?: number;
+    index?: string;
+    length?: number;
+    msb?: number;
+    lsb?: number;
+    prefix?: number;
+    data?: number[];
+    tempo?: number;
+    tempoBPM?: number;
+    hour?: number;
+    minutes?: number;
+    seconds?: number;
+    frames?: number;
+    subframes?: number;
+    key?: number;
+    param1?: number;
+    param2?: number;
+    param3?: number;
+    param4?: number;
+    scale?: number;
+    badsubtype?: number;
+    midiChannel?: number;
+    playTimeMs: number;
+    trackNum?: number;
+    text?: string;
+};
+declare class MidiParser {
+    header: MIDIFileHeader;
+    tracks: MIDIFileTrack[];
+    instrumentNamesArray: string[];
+    drumNamesArray: string[];
+    EVENT_META: number;
+    EVENT_SYSEX: number;
+    EVENT_DIVSYSEX: number;
+    EVENT_MIDI: number;
+    EVENT_META_SEQUENCE_NUMBER: number;
+    EVENT_META_TEXT: number;
+    EVENT_META_COPYRIGHT_NOTICE: number;
+    EVENT_META_TRACK_NAME: number;
+    EVENT_META_INSTRUMENT_NAME: number;
+    EVENT_META_LYRICS: number;
+    EVENT_META_MARKER: number;
+    EVENT_META_CUE_POINT: number;
+    EVENT_META_MIDI_CHANNEL_PREFIX: number;
+    EVENT_META_END_OF_TRACK: number;
+    EVENT_META_SET_TEMPO: number;
+    EVENT_META_SMTPE_OFFSET: number;
+    EVENT_META_TIME_SIGNATURE: number;
+    EVENT_META_KEY_SIGNATURE: number;
+    EVENT_META_SEQUENCER_SPECIFIC: number;
+    EVENT_MIDI_NOTE_OFF: number;
+    EVENT_MIDI_NOTE_ON: number;
+    EVENT_MIDI_NOTE_AFTERTOUCH: number;
+    EVENT_MIDI_CONTROLLER: number;
+    EVENT_MIDI_PROGRAM_CHANGE: number;
+    EVENT_MIDI_CHANNEL_AFTERTOUCH: number;
+    EVENT_MIDI_PITCH_BEND: number;
+    midiEventType: number;
+    midiEventChannel: number;
+    midiEventParam1: number;
+    constructor(arrayBuffer: ArrayBuffer);
+    parseTracks(arrayBuffer: ArrayBuffer): void;
+    toText(arr: number[]): string;
+    findChordBefore(when: number, track: MIDIFileTrack, channel: number): TrackChord | null;
+    findOpenedNoteBefore(firstPitch: number, when: number, track: MIDIFileTrack, channel: number): {
+        chord: TrackChord;
+        note: TrackNote;
+    } | null;
+    takeChord(when: number, track: MIDIFileTrack, channel: number): TrackChord;
+    takeOpenedNote(first: number, when: number, track: MIDIFileTrack, channel: number): TrackNote;
+    distanceToPoint(line: PP, point: XYp): number;
+    douglasPeucker(points: XYp[], tolerance: number): XYp[];
+    simplifyPath(points: XYp[], tolerance: number): XYp[];
+    simplify(): void;
+    parseNotes(): void;
+    nextEvent(stream: DataViewStream): MIDIEvent;
+    parseEvents(track: MIDIFileTrack): void;
+    takeMeasure(track: MIDISongTrack, when: number, bpm: number, meter: number): MIDISongMeasure;
+    takeDrumVoice(drum: number, drumVoices: {
+        voice: ZvoogVoice;
+        drum: number;
+    }[]): {
+        voice: ZvoogVoice;
+        drum: number;
+    };
+    findMeasureNum(measures: MIDISongMeasure[], ms: number): {
+        nn: number;
+        startMs: number;
+    };
+    convert(): ZvoogSchedule;
+    dump(): MIDISongData;
+    instrumentTitles(): string[];
+    drumTitles(): string[];
+}
+declare type MIDISongMeasure = {
+    duration: number;
+    songchords: MIDISongChord[];
+};
+declare type MIDISongPoint = {
+    pitch: number;
+    duration: number;
+};
+declare type MIDISongNote = {
+    points: MIDISongPoint[];
+    nn?: number;
+};
+declare type MIDISongChord = {
+    when: number;
+    channel: number;
+    notes: MIDISongNote[];
+};
+declare type MIDISongTrack = {
+    title: string;
+    program: number;
+    volumes: {
+        ms: number;
+        value: number;
+        meausre?: number;
+        skip384?: number;
+    }[];
+    measures: MIDISongMeasure[];
+    order: number;
+};
+declare type MIDISongData = {
+    duration: number;
+    parser: string;
+    bpm: number;
+    tempos: {
+        ms: number;
+        bmp: number;
+    }[];
+    key: number;
+    mode: number;
+    meter: {
+        count: number;
+        division: number;
+    };
+    tracks: MIDISongTrack[];
+    speedMode: number;
+    lineMode: number;
+};

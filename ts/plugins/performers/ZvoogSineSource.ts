@@ -7,9 +7,7 @@ class ZvoogSineSource implements ZvoogPerformerPlugin {
 	state(): ZvoogPluginLock {
 		return this.lockedState;
 	}
-	passthrough(value: boolean): void{
-
-	}
+	
 	prepare(audioContext: AudioContext, data: string): void {
 		if (this.out) {
 			//

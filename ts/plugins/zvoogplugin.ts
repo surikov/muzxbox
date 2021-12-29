@@ -49,7 +49,7 @@ interface ZvoogPlugin {
 	prepare(audioContext: AudioContext, data: string): void;
 	busy(): number;
 	state(): ZvoogPluginLock;
-	passthrough(value: boolean): void;
+	//passthrough(value: boolean): void;
 }
 
 

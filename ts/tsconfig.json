@@ -33,6 +33,7 @@
 		,"tilelevel/tilerectangle.ts"
 		,"tilelevel/tileline.ts"
 		,"tilelevel/tiletext.ts"
+		,"tilelevel/shortnames.ts"
 
 		,"muzxboxproject.ts"
 
@@ -69,5 +70,7 @@
 		,"plugins/zvoogfilterplugin.ts"
 		,"plugins/zvoogperformerplugin.ts"
 		,"plugins/zvoogpluginloader.ts"
+
+		,"plugins/storages/MIDIFileImporter.ts"
 	]
 }
