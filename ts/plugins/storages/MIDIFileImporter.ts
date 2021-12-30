@@ -4,7 +4,7 @@ class MIDIFileImporter implements ZvoogStore {
 	goUp(onFinish: (error: string) => void): void { };
 
 	readSongData(title: string, onFinish: (result: ZvoogSchedule | null) => void): void {
-		console.log('readSongData', title);
+		console.log('MIDIFileImporter readSongData', title);
 		var fileSelector:HTMLInputElement = document.createElement('input');
 		fileSelector.setAttribute('type', 'file');
 		fileSelector.setAttribute('accept', 'audio/midi, audio/x-midi');
@@ -104,6 +104,7 @@ class MIDIFileHeader {
 	//ticksPerFrame: number;
 	tempoBPM: number = 120;
 	tempos: { ms: number, bmp: number }[] = [];
+	lyrics: { ms: number, txt: string }[] = [];
 	meterCount: number = 4;
 	meterDivision: number = 4;
 	keyFlatSharp: number = 0;
@@ -467,7 +468,7 @@ class MidiParser {
 			let playTimeTicks: number = 0;
 			let tickResolution: number = this.header.getTickResolution(0);
 			if (tickResolutionPre != tickResolution) {
-				console.log('start tickResolutionPre', tickResolutionPre, tickResolution);
+				console.log('parseNotes start tickResolutionPre', tickResolutionPre, tickResolution);
 				tickResolutionPre = tickResolution;
 			}
 			//console.log(t, 'start parseNotes tickResolution', tickResolution);
@@ -488,7 +489,7 @@ class MidiParser {
 						if (evnt.tempo) {
 							tickResolution = this.header.getTickResolution(evnt.tempo);
 							if (tickResolutionPre != tickResolution) {
-								console.log('set tickResolutionPre', tickResolutionPre, tickResolution);
+								console.log('parseNotes set tickResolutionPre', tickResolutionPre, tickResolution);
 								tickResolutionPre = tickResolution;
 							}
 
@@ -606,29 +607,28 @@ class MidiParser {
 				} else {
 					//console.log((evnt.subtype?evnt.subtype:0).toString(16), evnt);
 					if (evnt.subtype == this.EVENT_META_TEXT) {
-						//console.log('EVENT_META_TEXT', this.eventText(evnt), evnt);
+						//console.log('EVENT_META_TEXT', evnt);
+						this.header.lyrics.push({ ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text?evnt.text:"?" });
 					}
 					if (evnt.subtype == this.EVENT_META_COPYRIGHT_NOTICE) {
-						//console.log('EVENT_META_COPYRIGHT_NOTICE', this.eventText(evnt), evnt);
+						//console.log('EVENT_META_COPYRIGHT_NOTICE', evnt);
+						this.header.lyrics.push({ ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text?evnt.text:"?" });
 					}
 					if (evnt.subtype == this.EVENT_META_TRACK_NAME) {
-						//console.log('EVENT_META_TRACK_NAME', this.eventText(evnt), evnt);
+						//console.log('EVENT_META_TRACK_NAME', evnt);
 						//this.setTitle(evnt);
 						//console.log(t,this.toText(evnt.data?evnt.data:[]), evnt);
 						track.title = this.toText(evnt.data ? evnt.data : []);
 					}
 					if (evnt.subtype == this.EVENT_META_INSTRUMENT_NAME) {
-						//console.log('EVENT_META_INSTRUMENT_NAME', this.eventText(evnt), evnt);
+						//console.log('EVENT_META_INSTRUMENT_NAME', evnt);
 						//console.log(t,this.toText(evnt.data?evnt.data:[]), evnt);
 						track.instrument = this.toText(evnt.data ? evnt.data : []);
 					}
 					if (evnt.subtype == this.EVENT_META_LYRICS) {
-						//console.log('EVENT_META_LYRICS', this.eventText(evnt), evnt);
+						//console.log('EVENT_META_LYRICS', evnt);
 						//console.log(t,this.toText(evnt.data?evnt.data:[]), evnt);
-					}
-					if (evnt.subtype == this.EVENT_META_LYRICS) {
-						//console.log('EVENT_META_LYRICS', this.eventText(evnt), evnt);
-						//console.log(t,this.toText(evnt.data?evnt.data:[]), evnt);
+						this.header.lyrics.push({ ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text?evnt.text:"?" });
 					}
 					if (evnt.subtype == this.EVENT_META_KEY_SIGNATURE) {
 						//console.log(t, 'noytes EVENT_META_KEY_SIGNATURE', evnt.key, evnt.scale);
@@ -934,6 +934,7 @@ class MidiParser {
 	}
 	convert(): ZvoogSchedule {
 		var midisong: MIDISongData = this.dump();
+		console.log('midisong',midisong);
 		/*var gridPat: ZvoogGridStep[] = this.meter44();
 		if (midisong.meter.count == 2 && midisong.meter.division == 4) {
 			gridPat = this.meter24();
@@ -1209,6 +1210,7 @@ class MidiParser {
 			, duration: 0
 			, bpm: this.header.tempoBPM
 			, tempos: this.header.tempos
+			, lyrics: this.header.lyrics
 			, key: this.header.keyFlatSharp
 			, mode: this.header.keyMajMin
 			, meter: { count: this.header.meterCount, division: this.header.meterDivision }
@@ -1221,6 +1223,7 @@ class MidiParser {
 			var tr: MIDISongTrack = {
 				order: i
 				, title: miditrack.title ? miditrack.title : ''
+				, instrument: miditrack.instrument ? miditrack.instrument : ''
 				//, volume: miditrack.volume ? miditrack.volume : 1
 				, volumes: miditrack.volumes
 				, program: miditrack.program ? miditrack.program : 0
@@ -1465,6 +1468,7 @@ type MIDISongChord = {
 };
 type MIDISongTrack = {
 	title: string;
+	instrument: string;
 	program: number;
 	//volume: number;
 	volumes: { ms: number, value: number, meausre?: number, skip384?: number }[];
@@ -1476,6 +1480,7 @@ type MIDISongData = {
 	parser: string;
 	bpm: number;
 	tempos: { ms: number, bmp: number }[];
+	lyrics:{ ms: number, txt: string }[];
 	key: number;
 	mode: number;
 	meter: { count: number, division: number };

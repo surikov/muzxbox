@@ -47,13 +47,11 @@ var MuzXBox = (function () {
         for (var tt = 0; tt < testProject.tracks.length; tt++) {
             var track = testProject.tracks[tt];
             var curPoint = { count: 0, division: 4 };
-            console.log(tt, track);
             for (var pp = 0; pp < track.patterns.length; pp++) {
                 var pattern = track.patterns[pp];
                 curPoint = DUU(curPoint).plus(pattern.skip);
                 var time_1 = duration2seconds(testProject.tempo, duration384(curPoint));
                 var sz = duration2seconds(testProject.tempo, duration384(pattern.duration));
-                console.log(curPoint, time_1, sz, duration384(curPoint), curPoint.count, curPoint.division);
                 firstAnchor.content.push({ x: 50 * time_1, y: tt * 11, w: 50 * sz, h: 11, rx: 0.1, ry: 0.1, css: 'debug', action: function () { _this.testChooser(20, 16); } });
                 curPoint = DUU(curPoint).plus(pattern.duration);
             }
@@ -73,8 +71,8 @@ var MuzXBox = (function () {
     };
     MuzXBox.prototype.testFS = function () {
         var test = new MIDIFileImporter();
-        test.readSongData("none", function (result) {
-            console.log('result', result);
+        test.readSongData("any", function (result) {
+            console.log('testFS result', result);
         });
     };
     return MuzXBox;
@@ -2459,7 +2457,7 @@ var MIDIFileImporter = (function () {
     MIDIFileImporter.prototype.goUp = function (onFinish) { };
     ;
     MIDIFileImporter.prototype.readSongData = function (title, onFinish) {
-        console.log('readSongData', title);
+        console.log('MIDIFileImporter readSongData', title);
         var fileSelector = document.createElement('input');
         fileSelector.setAttribute('type', 'file');
         fileSelector.setAttribute('accept', 'audio/midi, audio/x-midi');
@@ -2550,6 +2548,7 @@ var MIDIFileHeader = (function () {
         this.HEADER_LENGTH = 14;
         this.tempoBPM = 120;
         this.tempos = [];
+        this.lyrics = [];
         this.meterCount = 4;
         this.meterDivision = 4;
         this.keyFlatSharp = 0;
@@ -2819,7 +2818,7 @@ var MidiParser = (function () {
             var playTimeTicks = 0;
             var tickResolution = this.header.getTickResolution(0);
             if (tickResolutionPre != tickResolution) {
-                console.log('start tickResolutionPre', tickResolutionPre, tickResolution);
+                console.log('parseNotes start tickResolutionPre', tickResolutionPre, tickResolution);
                 tickResolutionPre = tickResolution;
             }
             for (var e = 0; e < track.events.length; e++) {
@@ -2833,7 +2832,7 @@ var MidiParser = (function () {
                         if (evnt.tempo) {
                             tickResolution = this.header.getTickResolution(evnt.tempo);
                             if (tickResolutionPre != tickResolution) {
-                                console.log('set tickResolutionPre', tickResolutionPre, tickResolution);
+                                console.log('parseNotes set tickResolutionPre', tickResolutionPre, tickResolution);
                                 tickResolutionPre = tickResolution;
                             }
                         }
@@ -2917,8 +2916,10 @@ var MidiParser = (function () {
                 }
                 else {
                     if (evnt.subtype == this.EVENT_META_TEXT) {
+                        this.header.lyrics.push({ ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text ? evnt.text : "?" });
                     }
                     if (evnt.subtype == this.EVENT_META_COPYRIGHT_NOTICE) {
+                        this.header.lyrics.push({ ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text ? evnt.text : "?" });
                     }
                     if (evnt.subtype == this.EVENT_META_TRACK_NAME) {
                         track.title = this.toText(evnt.data ? evnt.data : []);
@@ -2927,8 +2928,7 @@ var MidiParser = (function () {
                         track.instrument = this.toText(evnt.data ? evnt.data : []);
                     }
                     if (evnt.subtype == this.EVENT_META_LYRICS) {
-                    }
-                    if (evnt.subtype == this.EVENT_META_LYRICS) {
+                        this.header.lyrics.push({ ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text ? evnt.text : "?" });
                     }
                     if (evnt.subtype == this.EVENT_META_KEY_SIGNATURE) {
                         var key = evnt.key ? evnt.key : 0;
@@ -3144,6 +3144,7 @@ var MidiParser = (function () {
     };
     MidiParser.prototype.convert = function () {
         var midisong = this.dump();
+        console.log('midisong', midisong);
         var schedule = {
             title: "import from *.mid",
             tracks: [],
@@ -3169,6 +3170,7 @@ var MidiParser = (function () {
             duration: 0,
             bpm: this.header.tempoBPM,
             tempos: this.header.tempos,
+            lyrics: this.header.lyrics,
             key: this.header.keyFlatSharp,
             mode: this.header.keyMajMin,
             meter: { count: this.header.meterCount, division: this.header.meterDivision },
@@ -3181,6 +3183,7 @@ var MidiParser = (function () {
             var tr = {
                 order: i,
                 title: miditrack.title ? miditrack.title : '',
+                instrument: miditrack.instrument ? miditrack.instrument : '',
                 volumes: miditrack.volumes,
                 program: miditrack.program ? miditrack.program : 0,
                 measures: []

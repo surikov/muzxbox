@@ -682,6 +682,10 @@ declare class MIDIFileHeader {
         ms: number;
         bmp: number;
     }[];
+    lyrics: {
+        ms: number;
+        txt: string;
+    }[];
     meterCount: number;
     meterDivision: number;
     keyFlatSharp: number;
@@ -840,6 +844,7 @@ declare type MIDISongChord = {
 };
 declare type MIDISongTrack = {
     title: string;
+    instrument: string;
     program: number;
     volumes: {
         ms: number;
@@ -857,6 +862,10 @@ declare type MIDISongData = {
     tempos: {
         ms: number;
         bmp: number;
+    }[];
+    lyrics: {
+        ms: number;
+        txt: string;
     }[];
     key: number;
     mode: number;

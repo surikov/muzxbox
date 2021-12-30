@@ -83,13 +83,13 @@ class MuzXBox {
 		for (let tt = 0; tt < testProject.tracks.length; tt++) {
 			let track: MuzXBoxTrack = testProject.tracks[tt];
 			let curPoint: ZvoogMeter = { count: 0, division: 4 };
-			console.log(tt, track);
+			//console.log(tt, track);
 			for (let pp = 0; pp < track.patterns.length; pp++) {
 				let pattern: MuzXBoxPattern = track.patterns[pp];
 				curPoint = DUU(curPoint).plus(pattern.skip);
 				let time = duration2seconds(testProject.tempo, duration384(curPoint));
 				let sz = duration2seconds(testProject.tempo, duration384(pattern.duration));
-				console.log(curPoint, time, sz, duration384(curPoint), curPoint.count, curPoint.division);
+				//console.log(curPoint, time, sz, duration384(curPoint), curPoint.count, curPoint.division);
 				firstAnchor.content.push({ x: 50 * time, y: tt * 11, w: 50 * sz, h: 11, rx: 0.1, ry: 0.1, css: 'debug', action: () => { this.testChooser(20, 16); } });
 				curPoint = DUU(curPoint).plus(pattern.duration);
 
@@ -112,8 +112,8 @@ class MuzXBox {
 	}
 	testFS() {
 		let test: ZvoogStore = new MIDIFileImporter();
-		test.readSongData("none", function (result: ZvoogSchedule | null): void {
-			console.log('result', result);
+		test.readSongData("any", function (result: ZvoogSchedule | null): void {
+			console.log('testFS result', result);
 		});
 	}
 }
