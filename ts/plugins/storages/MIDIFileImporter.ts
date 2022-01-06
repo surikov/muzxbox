@@ -5,18 +5,18 @@ class MIDIFileImporter implements ZvoogStore {
 
 	readSongData(title: string, onFinish: (result: ZvoogSchedule | null) => void): void {
 		console.log('MIDIFileImporter readSongData', title);
-		var fileSelector:HTMLInputElement = document.createElement('input');
+		var fileSelector: HTMLInputElement = document.createElement('input');
 		fileSelector.setAttribute('type', 'file');
 		fileSelector.setAttribute('accept', 'audio/midi, audio/x-midi');
-		fileSelector.addEventListener("change", function(ev: Event)  {
-			if(fileSelector.files){
+		fileSelector.addEventListener("change", function (ev: Event) {
+			if (fileSelector.files) {
 				let file = fileSelector.files[0];
 				let fileReader: FileReader = new FileReader();
 				fileReader.onload = function (progressEvent) {
 					if (progressEvent.target) {
 						let arrayBuffer: ArrayBuffer = (progressEvent.target as any).result as ArrayBuffer;
 						let midiParser: MidiParser = new MidiParser(arrayBuffer);
-						var res:ZvoogSchedule = midiParser.convert();
+						var res: ZvoogSchedule = midiParser.convert();
 						onFinish(res);
 					}
 				};
@@ -103,8 +103,10 @@ class MIDIFileHeader {
 	//ticksPerBeat: number;
 	//ticksPerFrame: number;
 	tempoBPM: number = 120;
-	tempos: { ms: number, bmp: number }[] = [];
-	lyrics: { ms: number, txt: string }[] = [];
+	tempos: { track: number, ms: number, bmp: number }[] = [];
+	meters: { track: number, ms: number, count: number, division: number }[] = [];
+	lyrics: { track: number, ms: number, txt: string }[] = [];
+	signs: { track: number, ms: number, sign: string }[] = [];
 	meterCount: number = 4;
 	meterDivision: number = 4;
 	keyFlatSharp: number = 0;
@@ -468,7 +470,7 @@ class MidiParser {
 			let playTimeTicks: number = 0;
 			let tickResolution: number = this.header.getTickResolution(0);
 			if (tickResolutionPre != tickResolution) {
-				console.log('parseNotes start tickResolutionPre', tickResolutionPre, tickResolution);
+				//console.log('parseNotes start tickResolutionPre', tickResolutionPre, tickResolution);
 				tickResolutionPre = tickResolution;
 			}
 			//console.log(t, 'start parseNotes tickResolution', tickResolution);
@@ -489,7 +491,7 @@ class MidiParser {
 						if (evnt.tempo) {
 							tickResolution = this.header.getTickResolution(evnt.tempo);
 							if (tickResolutionPre != tickResolution) {
-								console.log('parseNotes set tickResolutionPre', tickResolutionPre, tickResolution);
+								//console.log('parseNotes set tickResolutionPre', tickResolutionPre, tickResolution);
 								tickResolutionPre = tickResolution;
 							}
 
@@ -608,11 +610,11 @@ class MidiParser {
 					//console.log((evnt.subtype?evnt.subtype:0).toString(16), evnt);
 					if (evnt.subtype == this.EVENT_META_TEXT) {
 						//console.log('EVENT_META_TEXT', evnt);
-						this.header.lyrics.push({ ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text?evnt.text:"?" });
+						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text ? evnt.text : "?" });
 					}
 					if (evnt.subtype == this.EVENT_META_COPYRIGHT_NOTICE) {
 						//console.log('EVENT_META_COPYRIGHT_NOTICE', evnt);
-						this.header.lyrics.push({ ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text?evnt.text:"?" });
+						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text ? evnt.text : "?" });
 					}
 					if (evnt.subtype == this.EVENT_META_TRACK_NAME) {
 						//console.log('EVENT_META_TRACK_NAME', evnt);
@@ -628,22 +630,45 @@ class MidiParser {
 					if (evnt.subtype == this.EVENT_META_LYRICS) {
 						//console.log('EVENT_META_LYRICS', evnt);
 						//console.log(t,this.toText(evnt.data?evnt.data:[]), evnt);
-						this.header.lyrics.push({ ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text?evnt.text:"?" });
+						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text ? evnt.text : "?" });
 					}
 					if (evnt.subtype == this.EVENT_META_KEY_SIGNATURE) {
-						//console.log(t, 'noytes EVENT_META_KEY_SIGNATURE', evnt.key, evnt.scale);
+						var majSharpCircleOfFifths: string[] = ['C', 'G', 'D', 'A', 'E', 'B', 'F#'];
+						var majFlatCircleOfFifths: string[] = ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'];
+						var minSharpCircleOfFifths: string[] = ['Am', 'Em', 'Bm', 'F#m', 'C#m', 'G#m', 'D#'];
+						var minFlatCircleOfFifths: string[] = ['Am', 'Dm', 'Gm', 'Cm', 'Fm', 'Bbm', 'Ebm'];
+
 						var key: number = evnt.key ? evnt.key : 0;
 						if (key > 127) key = key - 256;
-						this.header.keyFlatSharp = key;//-sharp+flat
+						this.header.keyFlatSharp = key;//+sharp-flat
 						this.header.keyMajMin = evnt.scale ? evnt.scale : 0;//0-maj, 1 min
+
+						var signature = 'C';
+						if (this.header.keyFlatSharp >= 0) {
+							if (this.header.keyMajMin < 1) {
+								signature = majSharpCircleOfFifths[this.header.keyFlatSharp];
+							} else {
+								signature = minSharpCircleOfFifths[this.header.keyFlatSharp];
+							}
+						} else {
+							if (this.header.keyMajMin < 1) {
+								signature = majFlatCircleOfFifths[this.header.keyFlatSharp];
+							} else {
+								signature = minFlatCircleOfFifths[this.header.keyFlatSharp];
+							}
+						}
+
+						//console.log(t, 'notes EVENT_META_KEY_SIGNATURE', evnt.key, evnt.scale
+						//,this.header.keyFlatSharp,this.header.keyMajMin,signature);
+						this.header.signs.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, sign: signature });
 					}
 					if (evnt.subtype == this.EVENT_META_SET_TEMPO) {
 						//console.log('track', t, 'EVENT_META_SET_TEMPO', evnt.tempoBPM, evnt);
 						this.header.tempoBPM = evnt.tempoBPM ? evnt.tempoBPM : 120;
-						this.header.tempos.push({ ms: evnt.playTimeMs ? evnt.playTimeMs : 0, bmp: this.header.tempoBPM });
+						this.header.tempos.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, bmp: this.header.tempoBPM });
 					}
 					if (evnt.subtype == this.EVENT_META_TIME_SIGNATURE) {
-						//console.log(t, 'notes EVENT_META_TIME_SIGNATURE', evnt);
+
 						this.header.meterCount = evnt.param1 ? evnt.param1 : 4;
 						var dvsn: number = evnt.param2 ? evnt.param2 : 2;
 						if (dvsn == 1) this.header.meterDivision = 2
@@ -651,6 +676,16 @@ class MidiParser {
 						else if (dvsn == 3) this.header.meterDivision = 8
 						else if (dvsn == 4) this.header.meterDivision = 16
 						else if (dvsn == 5) this.header.meterDivision = 32
+
+						this.header.meters.push({
+							track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0
+							, count: this.header.meterCount, division: this.header.meterDivision
+						});
+
+
+
+
+						//console.log(t, 'notes EVENT_META_TIME_SIGNATURE', this.header.meterCount,'/',this.header.meterDivision,evnt);
 
 						//console.log(t,'EVENT_META_TIME_SIGNATURE',this.header.meterCount,this.header.meterDivision,evnt);
 					}
@@ -808,7 +843,7 @@ class MidiParser {
 			track.events.push(e);
 		}
 	}
-	takeMeasure(track: MIDISongTrack, when: number, bpm: number, meter: number): MIDISongMeasure {
+	/*takeMeasure(track: MIDISongTrack, when: number, bpm: number, meter: number): MIDISongMeasure {
 		var q: number = 60 / bpm;
 		var duration: number = 1000 * q * meter * 4;
 		var idx = Math.floor(when / duration);
@@ -823,7 +858,7 @@ class MidiParser {
 		}
 		//console.log(when,track.measures.length,idx,meter,duration);
 		return track.measures[idx];
-	}
+	}*/
 	takeDrumVoice(drum: number, drumVoices: { voice: ZvoogVoice, drum: number }[]): { voice: ZvoogVoice, drum: number } {
 		for (var i = 0; i < drumVoices.length; i++) {
 			if (drumVoices[i].drum == drum) {
@@ -918,7 +953,7 @@ class MidiParser {
 			, { duration: 384 / 16, power: 0 }
 		];
 	}*/
-	findMeasureNum(measures: MIDISongMeasure[], ms: number): { nn: number, startMs: number } {
+	/*findMeasureNum(measures: MIDISongMeasure[], ms: number): { nn: number, startMs: number } {
 		var k = { nn: 0, startMs: 0 };
 		//var t = 0;
 		for (var m = 0; m < measures.length; m++) {
@@ -931,10 +966,129 @@ class MidiParser {
 			k.nn++;
 		}
 		return k;
-	}
+	}*/
 	convert(): ZvoogSchedule {
 		var midisong: MIDISongData = this.dump();
-		console.log('midisong',midisong);
+		console.log('midisong', midisong);
+		/*var splits: number[] = [];
+		for (var i = 0; i < midisong.tempos.length; i++) {
+			splits.push(midisong.tempos[i].ms);
+		}
+		for (var i = 0; i < midisong.meters.length; i++) {
+			splits.push(midisong.meters[i].ms);
+		}
+		for (var i = 0; i < midisong.signs.length; i++) {
+			splits.push(midisong.signs[i].ms);
+		}
+		splits.sort();
+		console.log(splits);
+*/
+		var count = 4;
+		var division = 4;
+		var sign = 'C';
+		/*if (midisong.meters.length) {
+			if (midisong.meters[0].ms == 0) {
+				count = midisong.meters[0].count;
+				division = midisong.meters[0].division;
+			}
+		}*/
+		var ms = 0;
+		var tempo = 120;
+		/*if (midisong.tempos.length) {
+			if (midisong.tempos[0].ms == 0) {
+				tempo = midisong.tempos[0].bmp;
+			}
+		}*/
+		var meterIdx = 1;
+		//var measureDuration = 1000 * count * (4 * 60 / tempo) / division;
+		/*var durationChanges: { ms: number, tempo: number, count: number, division: number }[] = [];
+		for (var ti = 0; ti < midisong.tempos.length; ti++) {
+			durationChanges.push({ms: midisong.tempos[ti].ms, tempo: midisong.tempos[ti].bmp, count: 0, division: 0});
+		}
+		for (var mi = 0; mi < midisong.meters.length; mi++) {
+			durationChanges.push({ms: midisong.meters[mi].ms, tempo: 0, count: midisong.meters[mi].count, division: midisong.meters[mi].division});
+		}
+		durationChanges.sort((a,b)=>{return a.ms-b.ms;});
+		*/
+		//var changesIdx:number=0;
+
+		//console.log(durationChanges);
+		var timeline: { bpm: number, c: number, d: number, split: number, preTempo: number, s: string, ms: number, len: number }[] = [];
+		while (ms < midisong.duration) {
+			var tempoRatio = 4 * 60 / tempo;
+			var measureDuration = 1000 * tempoRatio * count / division;
+			for (var mi = 0; mi < midisong.meters.length; mi++) {
+				if (midisong.meters[mi].ms >= ms && midisong.meters[mi].ms < ms + measureDuration) {
+					count = midisong.meters[mi].count;
+					division = midisong.meters[mi].division;
+					measureDuration = 1000 * tempoRatio * count / division;
+				}
+			}
+			var tempoChange: { delta: number, bmp: number }[] = [];
+			var tt = tempo;
+			for (var i = 0; i < midisong.tempos.length; i++) {
+				if (midisong.tempos[i].ms >= ms && midisong.tempos[i].ms < ms + measureDuration) {
+					if (midisong.tempos[i].bmp != tt) {
+						tempoChange.push({ delta: midisong.tempos[i].ms - ms, bmp: midisong.tempos[i].bmp });
+					}
+				}
+			}
+			if (tempoChange.length) {
+				//if(tempoChange[0].delta>1){
+
+				//}
+				//measureDuration = 1000 * tempoRatio * count / division;
+				var part = tempoChange[0].delta / measureDuration;
+				var startMs = ms;
+				//console.log(meterIdx, ms, '|', tempoChange[0].delta,'=',part,'*',measureDuration,  tempo,':', count, '/',division);
+				//console.log(meterIdx, ms,'split', tempoChange);
+				//console.log(part, tempoChange);
+				var preTempo = tempo;
+				tempo = tempoChange[0].bmp;
+				tempoRatio = 4 * 60 / tempo;
+				var measureDuration2 = (1000 * tempoRatio * count / division) * (1 - part);
+				//console.log(meterIdx, ms,'start');
+
+				ms = ms + tempoChange[0].delta;
+				//console.log('/',ms,part,'of',measureDuration);
+				//if(measureDuration2>1){
+				//console.log(meterIdx, ms, '||', measureDuration2 ,'=',(1 - part),'*',(1000 * tempoRatio * count / division),  tempo);
+				//}
+				for (var i = 0; i < midisong.signs.length; i++) {
+					if (midisong.signs[i].ms >= ms && midisong.signs[i].ms < ms + tempoChange[0].delta + measureDuration2) {
+						sign = midisong.signs[i].sign;
+					}
+				}
+				timeline.push({
+					bpm: tempo, c: count
+					, d: division, split: startMs + tempoChange[0].delta, s: sign, preTempo: preTempo, ms: startMs, len: tempoChange[0].delta + measureDuration2
+				});
+				ms = ms + measureDuration2 * (1 - part);
+				//console.log('/',(1 - part),'of',measureDuration2);
+				/*for (var ii = 0; ii < tempoChange.length; ii++) {
+					tempo = tempoChange[ii].bmp;
+					tempoRatio = 4 * 60 / tempo;
+					measureDuration = 1000 * tempoRatio * count / division;
+					ms = ms + tempoChange[ii].delta;
+				}*/
+			} else {
+				measureDuration = 1000 * tempoRatio * count / division;
+				//console.log(meterIdx, ms, '+', measureDuration, ':', count, '/', division, ':', tempo);
+				for (var i = 0; i < midisong.signs.length; i++) {
+					if (midisong.signs[i].ms >= ms && midisong.signs[i].ms < ms + measureDuration) {
+						sign = midisong.signs[i].sign;
+					}
+				}
+				timeline.push({
+					bpm: tempo, c: count
+					, d: division, split: 0, s: sign, preTempo: 0, ms: ms, len: measureDuration
+				});
+				ms = ms + measureDuration;
+			}
+			meterIdx++;
+		}
+		//console.log('timeline', timeline);
+
 		/*var gridPat: ZvoogGridStep[] = this.meter44();
 		if (midisong.meter.count == 2 && midisong.meter.division == 4) {
 			gridPat = this.meter24();
@@ -980,6 +1134,75 @@ class MidiParser {
 			, kind: "gain"
 			, initial: ""
 		});
+		for (var i = 0; i < timeline.length; i++) {
+			schedule.measures.push({
+				meter: { count: Math.round(timeline[i].c), division: Math.round(timeline[i].d) }
+				, tempo: Math.round(timeline[i].bpm / 5) * 5
+			});
+		}
+		for (var i = 0; i < midisong.tracks.length; i++) {
+			var trackTictle: string = '';
+			if (midisong.tracks[i].title) {
+				trackTictle = midisong.tracks[i].title;
+				if (midisong.tracks[i].instrument) {
+					trackTictle = midisong.tracks[i].title + ': ' + midisong.tracks[i].instrument;
+				}
+			} else {
+				if (midisong.tracks[i].instrument) {
+					trackTictle = midisong.tracks[i].instrument;
+				} else {
+					trackTictle = 'track ' + i;
+				}
+			}
+			var track: ZvoogTrack = {
+				title: trackTictle
+				, voices: []
+				, filters: []
+			};
+			schedule.tracks.push(track);
+			var firstChannelNum = 0;
+			for (var ch = 0; ch < midisong.tracks[i].songchords.length; ch++) {
+				firstChannelNum = midisong.tracks[i].songchords[ch].channel;
+				break;
+			}
+			if (firstChannelNum == 9) {
+				var drumNums:number[]=[];
+				for (var ch = 0; ch < midisong.tracks[i].songchords.length; ch++) {
+					for(var nn=0;nn<midisong.tracks[i].songchords[ch].notes.length;nn++){
+						var pinum:number=midisong.tracks[i].songchords[ch].notes[nn].points[0].pitch;
+						if(drumNums.indexOf(pinum)<0){
+							drumNums.push(pinum);
+							var voice: ZvoogVoice = {
+								measureChords: []
+								, performer: {
+									performerPlugin: null
+									, parameters: []
+									, kind: 'wafdrum'
+									, initial: '' + pinum
+								}
+								, filters: []
+								, title: 'drum ' + pinum
+							};
+							track.voices.push(voice);
+						}
+					}
+				}
+			} else {
+				var voice: ZvoogVoice = {
+					measureChords: []
+					, performer: {
+						performerPlugin: null
+						, parameters: []
+						, kind: 'wafinstrument'
+						, initial: '' + midisong.tracks[i].program
+					}
+					, filters: []
+					, title: 'channel ' + firstChannelNum
+				};
+				track.voices.push(voice);
+			}
+		}
+
 		/*
 	for (var o = 0; o < 10; o++) {
 		schedule.keyPattern.push(3);
@@ -1201,7 +1424,7 @@ class MidiParser {
 			schedule.tracks.push(track);
 		}
 */
-
+		//console.log(schedule);
 		return schedule;
 	}
 	dump(): MIDISongData {
@@ -1214,6 +1437,8 @@ class MidiParser {
 			, key: this.header.keyFlatSharp
 			, mode: this.header.keyMajMin
 			, meter: { count: this.header.meterCount, division: this.header.meterDivision }
+			, meters: this.header.meters
+			, signs: this.header.signs
 			, tracks: []
 			, speedMode: 0
 			, lineMode: 0
@@ -1227,15 +1452,21 @@ class MidiParser {
 				//, volume: miditrack.volume ? miditrack.volume : 1
 				, volumes: miditrack.volumes
 				, program: miditrack.program ? miditrack.program : 0
-				, measures: []
+				//, measures: []
+				, songchords: []
 			};
+			var maxWhen = 0;
 			for (var ch = 0; ch < miditrack.chords.length; ch++) {
 				var midichord: TrackChord = miditrack.chords[ch];
 				var newchord: MIDISongChord = { when: midichord.when, notes: [], channel: midichord.channel };
-				var measure: MIDISongMeasure = this.takeMeasure(tr, midichord.when, this.header.tempoBPM, this.header.meterCount / this.header.meterDivision);
+				if (maxWhen < midichord.when) {
+					maxWhen = midichord.when;
+				}
+				//var measure: MIDISongMeasure = this.takeMeasure(tr, midichord.when, this.header.tempoBPM, this.header.meterCount / this.header.meterDivision);
 				//tr.chords.push(newchord);
 				//console.log(ch,midichord,measure);
-				measure.songchords.push(newchord);
+				//measure.songchords.push(newchord);
+				tr.songchords.push(newchord);
 				for (var n = 0; n < midichord.notes.length; n++) {
 					var midinote: TrackNote = midichord.notes[n];
 					var newnote: MIDISongNote = { points: [] };
@@ -1247,13 +1478,16 @@ class MidiParser {
 					}
 				}
 			}
-			if (tr.measures.length > 0) {
+			if (tr.songchords.length > 0) {
 				a.tracks.push(tr);
-				var d = tr.measures.length * tr.measures[0].duration;
-				if (a.duration < d) a.duration = d;
+				//var d = tr.measures.length * tr.measures[0].duration;
+				if (a.duration < maxWhen) {
+					a.duration = 54321 + maxWhen;
+					//console.log('duration',a.duration);
+				}
 			}
 		}
-		//console.log(this);
+		//console.log('duration',a.duration,this);
 		//console.log(a);
 		return a;
 	}
@@ -1449,10 +1683,10 @@ class MidiParser {
 		return this.drumNamesArray;
 	};
 }
-type MIDISongMeasure = {
+/*type MIDISongMeasure = {
 	duration: number;
 	songchords: MIDISongChord[];
-};
+};*/
 type MIDISongPoint = {
 	pitch: number;
 	duration: number;
@@ -1472,18 +1706,21 @@ type MIDISongTrack = {
 	program: number;
 	//volume: number;
 	volumes: { ms: number, value: number, meausre?: number, skip384?: number }[];
-	measures: MIDISongMeasure[];
+	//measures: MIDISongMeasure[];
+	songchords: MIDISongChord[];
 	order: number;
 };
 type MIDISongData = {
 	duration: number;
 	parser: string;
 	bpm: number;
-	tempos: { ms: number, bmp: number }[];
-	lyrics:{ ms: number, txt: string }[];
+	tempos: { track: number, ms: number, bmp: number }[];
+	meters: { track: number, ms: number, count: number, division: number }[];
+	lyrics: { track: number, ms: number, txt: string }[];
 	key: number;
 	mode: number;
 	meter: { count: number, division: number };
+	signs: { track: number, ms: number, sign: string }[];
 	tracks: MIDISongTrack[];
 	speedMode: number;
 	lineMode: number;

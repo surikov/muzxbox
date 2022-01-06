@@ -679,12 +679,25 @@ declare class MIDIFileHeader {
     trackCount: number;
     tempoBPM: number;
     tempos: {
+        track: number;
         ms: number;
         bmp: number;
     }[];
+    meters: {
+        track: number;
+        ms: number;
+        count: number;
+        division: number;
+    }[];
     lyrics: {
+        track: number;
         ms: number;
         txt: string;
+    }[];
+    signs: {
+        track: number;
+        ms: number;
+        sign: string;
     }[];
     meterCount: number;
     meterDivision: number;
@@ -808,7 +821,6 @@ declare class MidiParser {
     parseNotes(): void;
     nextEvent(stream: DataViewStream): MIDIEvent;
     parseEvents(track: MIDIFileTrack): void;
-    takeMeasure(track: MIDISongTrack, when: number, bpm: number, meter: number): MIDISongMeasure;
     takeDrumVoice(drum: number, drumVoices: {
         voice: ZvoogVoice;
         drum: number;
@@ -816,19 +828,11 @@ declare class MidiParser {
         voice: ZvoogVoice;
         drum: number;
     };
-    findMeasureNum(measures: MIDISongMeasure[], ms: number): {
-        nn: number;
-        startMs: number;
-    };
     convert(): ZvoogSchedule;
     dump(): MIDISongData;
     instrumentTitles(): string[];
     drumTitles(): string[];
 }
-declare type MIDISongMeasure = {
-    duration: number;
-    songchords: MIDISongChord[];
-};
 declare type MIDISongPoint = {
     pitch: number;
     duration: number;
@@ -852,7 +856,7 @@ declare type MIDISongTrack = {
         meausre?: number;
         skip384?: number;
     }[];
-    measures: MIDISongMeasure[];
+    songchords: MIDISongChord[];
     order: number;
 };
 declare type MIDISongData = {
@@ -860,10 +864,18 @@ declare type MIDISongData = {
     parser: string;
     bpm: number;
     tempos: {
+        track: number;
         ms: number;
         bmp: number;
     }[];
+    meters: {
+        track: number;
+        ms: number;
+        count: number;
+        division: number;
+    }[];
     lyrics: {
+        track: number;
         ms: number;
         txt: string;
     }[];
@@ -873,6 +885,11 @@ declare type MIDISongData = {
         count: number;
         division: number;
     };
+    signs: {
+        track: number;
+        ms: number;
+        sign: string;
+    }[];
     tracks: MIDISongTrack[];
     speedMode: number;
     lineMode: number;
