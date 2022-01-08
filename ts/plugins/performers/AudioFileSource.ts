@@ -133,10 +133,12 @@ class AudioFileSource implements ZvoogPerformerPlugin {
 		return envelope;
 	};
 	single(when: number, tempo: number, line: ZvoogEnvelope): void {
-		let seconds = duration2seconds(tempo, duration384(line.pitches[0].duration));
+		//let seconds = duration2seconds(tempo, duration384(line.pitches[0].duration));
+		let seconds = meter2seconds(tempo, line.pitches[0].duration);
 		let nextPointSeconds = when + seconds;
 		for (let i = 1; i < line.pitches.length; i++) {
-			let seconds = duration2seconds(tempo, duration384(line.pitches[i].duration));
+			//let seconds = duration2seconds(tempo, duration384(line.pitches[i].duration));
+			let seconds = meter2seconds(tempo, line.pitches[i].duration);
 			nextPointSeconds = nextPointSeconds + seconds;
 		}
 		let e = this.findEnvelope(when, nextPointSeconds - when);

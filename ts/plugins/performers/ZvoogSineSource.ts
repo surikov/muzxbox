@@ -39,12 +39,14 @@ class ZvoogSineSource implements ZvoogPerformerPlugin {
 		//console.log('sendLine',when,tempo,line);
 		let oscillator = this.audioContext.createOscillator();
 		oscillator.type = 'sine';
-		let seconds = duration2seconds(tempo, duration384(line.pitches[0].duration));
+		//let seconds = duration2seconds(tempo, duration384(line.pitches[0].duration));
+		let seconds = meter2seconds(tempo, line.pitches[0].duration);
 		//console.log('start',when,line.pitches[0].pitch);
 		oscillator.frequency.setValueAtTime(this.freq(line.pitches[0].pitch), when);
 		let nextPointSeconds = when + seconds;
 		for (let i = 1; i < line.pitches.length; i++) {
-			let seconds = duration2seconds(tempo, duration384(line.pitches[i].duration));
+			//let seconds = duration2seconds(tempo, duration384(line.pitches[i].duration));
+			let seconds = meter2seconds(tempo, line.pitches[i].duration);
 			oscillator.frequency.linearRampToValueAtTime(this.freq(line.pitches[i].pitch), nextPointSeconds);
 			//console.log('change',nextPointSeconds,line.pitches[i].pitch);
 			nextPointSeconds = nextPointSeconds + seconds;

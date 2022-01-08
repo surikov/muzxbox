@@ -42,7 +42,7 @@ var MuzXBox = (function () {
     };
     MuzXBox.prototype.resetSong = function (testProject) {
         var _this = this;
-        var time = duration2seconds(testProject.tempo, duration384(testProject.duration));
+        var time = meter2seconds(testProject.tempo, testProject.duration);
         firstAnchor.content.push({ x: 0, y: 0, w: 50 * time, h: testProject.tracks.length * 11, rx: 0.1, ry: 0.1, css: 'debug' });
         for (var tt = 0; tt < testProject.tracks.length; tt++) {
             var track = testProject.tracks[tt];
@@ -50,8 +50,8 @@ var MuzXBox = (function () {
             for (var pp = 0; pp < track.patterns.length; pp++) {
                 var pattern = track.patterns[pp];
                 curPoint = DUU(curPoint).plus(pattern.skip);
-                var time_1 = duration2seconds(testProject.tempo, duration384(curPoint));
-                var sz = duration2seconds(testProject.tempo, duration384(pattern.duration));
+                var time_1 = meter2seconds(testProject.tempo, curPoint);
+                var sz = meter2seconds(testProject.tempo, pattern.duration);
                 firstAnchor.content.push({ x: 50 * time_1, y: tt * 11, w: 50 * sz, h: 11, rx: 0.1, ry: 0.1, css: 'debug', action: function () { _this.testChooser(20, 16); } });
                 curPoint = DUU(curPoint).plus(pattern.duration);
             }
@@ -1365,33 +1365,6 @@ function isLayerNormal(t) {
 function rid() {
     return 'id' + Math.floor(Math.random() * 1000000000);
 }
-function duration2seconds(bpm, duration384) {
-    var n4 = 60 / bpm;
-    var part = 384 / (4 * duration384);
-    return n4 / part;
-}
-function durations2time(measures) {
-    var t = 0;
-    for (var i = 0; i < measures.length; i++) {
-        t = t + duration2seconds(measures[i].tempo, duration384(measures[i].meter));
-    }
-    return t;
-}
-function seconds2Duration384(time, bpm) {
-    var n4 = 60 / bpm;
-    var n384 = n4 / 96;
-    return Math.round(time / n384);
-}
-function duration384(meter) {
-    return meter.count * (384 / meter.division);
-}
-function calculateEnvelopeDuration(envelope) {
-    var d = { count: 0, division: 1 };
-    for (var i = 0; i < envelope.pitches.length; i++) {
-        d = DUU(d).plus(envelope.pitches[i].duration);
-    }
-    return d;
-}
 function scheduleDuration(measures) {
     var duration = { count: 0, division: 1 };
     for (var i = 0; i < measures.length; i++) {
@@ -1768,11 +1741,11 @@ var ZvoogSineSource = (function () {
     ZvoogSineSource.prototype.sendLine = function (when, tempo, line) {
         var oscillator = this.audioContext.createOscillator();
         oscillator.type = 'sine';
-        var seconds = duration2seconds(tempo, duration384(line.pitches[0].duration));
+        var seconds = meter2seconds(tempo, line.pitches[0].duration);
         oscillator.frequency.setValueAtTime(this.freq(line.pitches[0].pitch), when);
         var nextPointSeconds = when + seconds;
         for (var i = 1; i < line.pitches.length; i++) {
-            var seconds_1 = duration2seconds(tempo, duration384(line.pitches[i].duration));
+            var seconds_1 = meter2seconds(tempo, line.pitches[i].duration);
             oscillator.frequency.linearRampToValueAtTime(this.freq(line.pitches[i].pitch), nextPointSeconds);
             nextPointSeconds = nextPointSeconds + seconds_1;
         }
@@ -1832,16 +1805,15 @@ var WAFInsSource = (function () {
             pitches.push(envelope_1.pitches[0].pitch);
         }
         var envelope = chord[0];
-        var duration = duration2seconds(tempo, duration384(envelope.pitches[0].duration));
+        var duration = meter2seconds(tempo, envelope.pitches[0].duration);
         var slides = [];
         var tt = 0;
         for (var n = 1; n < envelope.pitches.length; n++) {
-            tt = tt + duration2seconds(tempo, duration384(envelope.pitches[n - 1].duration));
             slides.push({
                 pitch: envelope.pitches[n].pitch,
                 when: tt
             });
-            duration = duration + duration2seconds(tempo, duration384(envelope.pitches[n].duration));
+            duration = duration + meter2seconds(tempo, envelope.pitches[n].duration);
         }
         if (variation == 1 || variation == 2 || variation == 3) {
             if (variation == 1) {
@@ -1918,15 +1890,15 @@ var WAFPercSource = (function () {
         for (var i = 0; i < chord.length; i++) {
             var envelope = chord[i];
             var slides = [];
-            var duration = duration2seconds(tempo, duration384(envelope.pitches[0].duration));
+            var duration = meter2seconds(tempo, envelope.pitches[0].duration);
             var t = 0;
             for (var n = 1; n < envelope.pitches.length; n++) {
-                t = t + duration2seconds(tempo, duration384(envelope.pitches[n - 1].duration));
+                t = t + meter2seconds(tempo, envelope.pitches[n - 1].duration);
                 slides.push({
                     pitch: envelope.pitches[n].pitch,
                     when: t
                 });
-                duration = duration + duration2seconds(tempo, duration384(envelope.pitches[n].duration));
+                duration = duration + meter2seconds(tempo, envelope.pitches[n].duration);
             }
             window.wafPlayer.queueWaveTable(this.audioContext, this.out, this.zones, when, envelope.pitches[0].pitch, duration, 0.99, slides);
         }
@@ -2095,10 +2067,10 @@ var AudioFileSource = (function () {
     };
     ;
     AudioFileSource.prototype.single = function (when, tempo, line) {
-        var seconds = duration2seconds(tempo, duration384(line.pitches[0].duration));
+        var seconds = meter2seconds(tempo, line.pitches[0].duration);
         var nextPointSeconds = when + seconds;
         for (var i = 1; i < line.pitches.length; i++) {
-            var seconds_2 = duration2seconds(tempo, duration384(line.pitches[i].duration));
+            var seconds_2 = meter2seconds(tempo, line.pitches[i].duration);
             nextPointSeconds = nextPointSeconds + seconds_2;
         }
         var e = this.findEnvelope(when, nextPointSeconds - when);
@@ -2111,6 +2083,24 @@ var AudioFileSource = (function () {
     };
     return AudioFileSource;
 }());
+function meter2seconds(bpm, meter) {
+    var wholeNoteSeconds = 60 / bpm;
+    var meterSeconds = wholeNoteSeconds * meter.count / meter.division;
+    return meterSeconds;
+}
+function seconds2meter32(bpm, seconds) {
+    var note32Seconds = (4 * 60 / bpm) / 32;
+    var part = seconds / note32Seconds;
+    return { count: Math.round(part),
+        division: 32 };
+}
+function calculateEnvelopeDuration(envelope) {
+    var d = { count: 0, division: 1 };
+    for (var i = 0; i < envelope.pitches.length; i++) {
+        d = DUU(d).plus(envelope.pitches[i].duration);
+    }
+    return d;
+}
 function DUU(u) {
     return new DurationUnitUtil(u);
 }
@@ -2196,9 +2186,17 @@ var DurationUnitUtil = (function () {
     };
     DurationUnitUtil.prototype.simplify = function () {
         var r = this.clone();
+        while (r.division % 3 == 0) {
+            r.division = r.division / 3;
+            r.count = Math.round(r.count / 3);
+        }
         while (r.division % 2 == 0 && r.count % 2 == 0) {
             r.division = r.division / 2;
-            r.count = r.count / 2;
+            r.count = Math.round(r.count / 2);
+        }
+        if (r.division % r.count == 0) {
+            r.division = r.division / r.count;
+            r.count = 1;
         }
         return r;
     };
@@ -2560,7 +2558,7 @@ var MIDIFileHeader = (function () {
         this.format = this.datas.getUint16(8);
         this.trackCount = this.datas.getUint16(10);
     }
-    MIDIFileHeader.prototype.getTickResolution = function (tempo) {
+    MIDIFileHeader.prototype.______getTickResolution = function (tempo) {
         if (tempo) {
             this.lastNonZeroQuarter = tempo;
         }
@@ -2571,6 +2569,36 @@ var MIDIFileHeader = (function () {
             else {
                 tempo = 60000000 / this.tempoBPM;
             }
+        }
+        if (this.datas.getUint16(12) & 0x8000) {
+            var r = 1000000 / (this.getSMPTEFrames() * this.getTicksPerFrame());
+            return r;
+        }
+        else {
+            tempo = tempo || 500000;
+            var r = tempo / this.getTicksPerBeat();
+            return r;
+        }
+    };
+    MIDIFileHeader.prototype.getCalculatedTickResolution = function (tempo) {
+        this.lastNonZeroQuarter = tempo;
+        if (this.datas.getUint16(12) & 0x8000) {
+            var r = 1000000 / (this.getSMPTEFrames() * this.getTicksPerFrame());
+            return r;
+        }
+        else {
+            tempo = tempo || 500000;
+            var r = tempo / this.getTicksPerBeat();
+            return r;
+        }
+    };
+    MIDIFileHeader.prototype.get0TickResolution = function () {
+        var tempo = 0;
+        if (this.lastNonZeroQuarter) {
+            tempo = this.lastNonZeroQuarter;
+        }
+        else {
+            tempo = 60000000 / this.tempoBPM;
         }
         if (this.datas.getUint16(12) & 0x8000) {
             var r = 1000000 / (this.getSMPTEFrames() * this.getTicksPerFrame());
@@ -2611,7 +2639,7 @@ var MIDIFileTrack = (function () {
         this.trackLength = this.datas.getUint32(4);
         this.datas = new DataView(buffer, start, this.HDR_LENGTH + this.trackLength);
         this.trackContent = new DataView(this.datas.buffer, this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
-        this.events = [];
+        this.trackevents = [];
         this.volumes = [];
     }
     return MIDIFileTrack;
@@ -2664,7 +2692,7 @@ var MidiParser = (function () {
             curIndex = curIndex + track.trackLength + 8;
         }
         for (var i = 0; i < this.tracks.length; i++) {
-            this.parseEvents(this.tracks[i]);
+            this.parseTrackEvents(this.tracks[i]);
         }
         this.parseNotes();
         this.simplify();
@@ -2813,17 +2841,15 @@ var MidiParser = (function () {
             }
         }
     };
-    MidiParser.prototype.parseNotes = function () {
-        var tickResolutionPre = 0;
+    MidiParser.prototype.dumpResolutionChanges = function () {
+        var changes = [];
+        var tickResolution = this.header.get0TickResolution();
+        changes.push({ track: -1, ms: -1, resolution: tickResolution, bpm: 120 });
         for (var t = 0; t < this.tracks.length; t++) {
             var track = this.tracks[t];
             var playTimeTicks = 0;
-            var tickResolution = this.header.getTickResolution(0);
-            if (tickResolutionPre != tickResolution) {
-                tickResolutionPre = tickResolution;
-            }
-            for (var e = 0; e < track.events.length; e++) {
-                var evnt = track.events[e];
+            for (var e = 0; e < track.trackevents.length; e++) {
+                var evnt = track.trackevents[e];
                 var curDelta = 0.0;
                 if (evnt.delta)
                     curDelta = evnt.delta;
@@ -2831,17 +2857,45 @@ var MidiParser = (function () {
                 if (evnt.basetype === this.EVENT_META) {
                     if (evnt.subtype === this.EVENT_META_SET_TEMPO) {
                         if (evnt.tempo) {
-                            tickResolution = this.header.getTickResolution(evnt.tempo);
-                            if (tickResolutionPre != tickResolution) {
-                                tickResolutionPre = tickResolution;
-                            }
+                            tickResolution = this.header.getCalculatedTickResolution(evnt.tempo);
+                            changes.push({ track: t, ms: playTimeTicks, resolution: tickResolution, bpm: evnt.tempo });
                         }
                     }
                 }
-                evnt.playTimeMs = playTimeTicks;
             }
-            for (var e = 0; e < track.events.length; e++) {
-                var evnt = track.events[e];
+        }
+        changes.sort(function (a, b) { return a.ms - b.ms; });
+        return changes;
+    };
+    MidiParser.prototype.lastResolution = function (ms, changes) {
+        for (var i = changes.length - 1; i >= 0; i--) {
+            if (changes[i].ms <= ms) {
+                return changes[i].resolution;
+            }
+        }
+        return 0;
+    };
+    MidiParser.prototype.parseTicks2time = function (changes, track) {
+        var tickResolution = this.lastResolution(0, changes);
+        var playTimeTicks = 0;
+        for (var e = 0; e < track.trackevents.length; e++) {
+            var evnt = track.trackevents[e];
+            var curDelta = 0.0;
+            if (evnt.delta)
+                curDelta = evnt.delta;
+            var searchPlayTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
+            tickResolution = this.lastResolution(searchPlayTimeTicks, changes);
+            playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
+            evnt.playTimeMs = playTimeTicks;
+        }
+    };
+    MidiParser.prototype.parseNotes = function () {
+        var changes = this.dumpResolutionChanges();
+        for (var t = 0; t < this.tracks.length; t++) {
+            var track = this.tracks[t];
+            this.parseTicks2time(changes, track);
+            for (var e = 0; e < track.trackevents.length; e++) {
+                var evnt = track.trackevents[e];
                 if (evnt.basetype == this.EVENT_MIDI) {
                     evnt.param1 = evnt.param1 ? evnt.param1 : 0;
                     if (evnt.subtype == this.EVENT_MIDI_NOTE_ON) {
@@ -3110,14 +3164,14 @@ var MidiParser = (function () {
             }
         }
     };
-    MidiParser.prototype.parseEvents = function (track) {
+    MidiParser.prototype.parseTrackEvents = function (track) {
         var stream = new DataViewStream(track.trackContent);
         this.midiEventType = 0;
         this.midiEventChannel = 0;
         this.midiEventParam1 = 0;
         while (!stream.end()) {
             var e = this.nextEvent(stream);
-            track.events.push(e);
+            track.trackevents.push(e);
         }
     };
     MidiParser.prototype.takeDrumVoice = function (drum, drumVoices) {
@@ -3144,6 +3198,7 @@ var MidiParser = (function () {
     MidiParser.prototype.convert = function () {
         var midisong = this.dump();
         console.log('midisong', midisong);
+        console.log('from', this);
         var count = 4;
         var division = 4;
         var sign = 'C';
@@ -3273,6 +3328,9 @@ var MidiParser = (function () {
                                 title: 'drum ' + pinum
                             };
                             track.voices.push(voice);
+                            for (var mc = 0; mc < timeline.length; mc++) {
+                                voice.measureChords.push({ chords: [] });
+                            }
                         }
                     }
                 }
@@ -3287,9 +3345,26 @@ var MidiParser = (function () {
                         initial: '' + midisong.tracks[i].program
                     },
                     filters: [],
-                    title: 'channel ' + firstChannelNum
+                    title: 'program ' + midisong.tracks[i].program
                 };
                 track.voices.push(voice);
+                for (var mc = 0; mc < timeline.length; mc++) {
+                    voice.measureChords.push({ chords: [] });
+                }
+                console.log(track);
+                for (var chn = 0; chn < midisong.tracks[i].songchords.length; chn++) {
+                    var midichord = midisong.tracks[i].songchords[chn];
+                    for (var tc = 0; tc < timeline.length; tc++) {
+                        if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
+                            var timelineMeasure = timeline[tc - 1];
+                            var skipInMeasureMs = midichord.when - timelineMeasure.ms;
+                            var skipMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
+                            skipMeter = DUU(skipMeter).simplify();
+                            console.log(i, tc, timelineMeasure.ms, midichord.when, skipMeter);
+                            break;
+                        }
+                    }
+                }
             }
         }
         return schedule;

@@ -273,11 +273,6 @@ declare type MuzXBoxProject = {
     tempo: number;
     duration: ZvoogMeter;
 };
-declare function duration2seconds(bpm: number, duration384: number): number;
-declare function durations2time(measures: ZvoogMeasure[]): number;
-declare function seconds2Duration384(time: number, bpm: number): number;
-declare function duration384(meter: ZvoogMeter): number;
-declare function calculateEnvelopeDuration(envelope: ZvoogEnvelope): ZvoogMeter;
 declare function scheduleDuration(measures: ZvoogMeasure[]): ZvoogMeter;
 declare function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter;
 declare function adjustPartLeadPad(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
@@ -445,6 +440,9 @@ declare type ZvoogMeter = {
     count: number;
     division: number;
 };
+declare function meter2seconds(bpm: number, meter: ZvoogMeter): number;
+declare function seconds2meter32(bpm: number, seconds: number): ZvoogMeter;
+declare function calculateEnvelopeDuration(envelope: ZvoogEnvelope): ZvoogMeter;
 declare function DUU(u: ZvoogMeter): DurationUnitUtil;
 declare class DurationUnitUtil {
     _unit: ZvoogMeter;
@@ -705,7 +703,9 @@ declare class MIDIFileHeader {
     keyMajMin: number;
     lastNonZeroQuarter: number;
     constructor(buffer: ArrayBuffer);
-    getTickResolution(tempo: number): number;
+    ______getTickResolution(tempo: number): number;
+    getCalculatedTickResolution(tempo: number): number;
+    get0TickResolution(): number;
     getTicksPerBeat(): number;
     getTicksPerFrame(): number;
     getSMPTEFrames(): number;
@@ -728,7 +728,7 @@ declare class MIDIFileTrack {
     HDR_LENGTH: number;
     trackLength: number;
     trackContent: DataView;
-    events: MIDIEvent[];
+    trackevents: MIDIEvent[];
     title: string;
     instrument: string;
     program: number;
@@ -818,9 +818,27 @@ declare class MidiParser {
     douglasPeucker(points: XYp[], tolerance: number): XYp[];
     simplifyPath(points: XYp[], tolerance: number): XYp[];
     simplify(): void;
+    dumpResolutionChanges(): {
+        track: number;
+        ms: number;
+        resolution: number;
+        bpm: number;
+    }[];
+    lastResolution(ms: number, changes: {
+        track: number;
+        ms: number;
+        resolution: number;
+        bpm: number;
+    }[]): number;
+    parseTicks2time(changes: {
+        track: number;
+        ms: number;
+        resolution: number;
+        bpm: number;
+    }[], track: MIDIFileTrack): void;
     parseNotes(): void;
     nextEvent(stream: DataViewStream): MIDIEvent;
-    parseEvents(track: MIDIFileTrack): void;
+    parseTrackEvents(track: MIDIFileTrack): void;
     takeDrumVoice(drum: number, drumVoices: {
         voice: ZvoogVoice;
         drum: number;

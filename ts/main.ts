@@ -77,7 +77,8 @@ class MuzXBox {
 		*/
 	}
 	resetSong(testProject: MuzXBoxProject) {
-		let time = duration2seconds(testProject.tempo, duration384(testProject.duration));
+		//let time = duration2seconds(testProject.tempo, duration384(testProject.duration));
+		let time = meter2seconds(testProject.tempo, testProject.duration);
 		firstAnchor.content.push({ x: 0, y: 0, w: 50 * time, h: testProject.tracks.length * 11, rx: 0.1, ry: 0.1, css: 'debug' });
 		//firstAnchor.content.push({ x: 1, y: 1, w: 1, h: 1, rx: 0.1, ry: 0.1, css: 'debug', action: () => { this.testChooser(20, 16); } });
 		for (let tt = 0; tt < testProject.tracks.length; tt++) {
@@ -87,8 +88,8 @@ class MuzXBox {
 			for (let pp = 0; pp < track.patterns.length; pp++) {
 				let pattern: MuzXBoxPattern = track.patterns[pp];
 				curPoint = DUU(curPoint).plus(pattern.skip);
-				let time = duration2seconds(testProject.tempo, duration384(curPoint));
-				let sz = duration2seconds(testProject.tempo, duration384(pattern.duration));
+				let time = meter2seconds(testProject.tempo, curPoint);
+				let sz = meter2seconds(testProject.tempo, pattern.duration);
 				//console.log(curPoint, time, sz, duration384(curPoint), curPoint.count, curPoint.division);
 				firstAnchor.content.push({ x: 50 * time, y: tt * 11, w: 50 * sz, h: 11, rx: 0.1, ry: 0.1, css: 'debug', action: () => { this.testChooser(20, 16); } });
 				curPoint = DUU(curPoint).plus(pattern.duration);

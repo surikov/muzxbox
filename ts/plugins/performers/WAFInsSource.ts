@@ -38,16 +38,19 @@ class WAFInsSource implements ZvoogPerformerPlugin {
 			pitches.push(envelope.pitches[0].pitch);
 		}
 		let envelope: ZvoogEnvelope = chord[0];
-		let duration: number = duration2seconds(tempo, duration384(envelope.pitches[0].duration));
+		//let duration: number = duration2seconds(tempo, duration384(envelope.pitches[0].duration));
+		let duration: number = meter2seconds(tempo, envelope.pitches[0].duration);
+		
 		let slides: { pitch: number, when: number }[] = [];
 		let tt = 0;
 		for (let n = 1; n < envelope.pitches.length; n++) {
-			tt = tt + duration2seconds(tempo, duration384(envelope.pitches[n - 1].duration));
+			//tt = tt + duration2seconds(tempo, duration384(envelope.pitches[n - 1].duration));
 			slides.push({
 				pitch: envelope.pitches[n].pitch
 				, when: tt
 			});
-			duration = duration + duration2seconds(tempo, duration384(envelope.pitches[n].duration));
+			//duration = duration + duration2seconds(tempo, duration384(envelope.pitches[n].duration));
+			duration = duration + meter2seconds(tempo, envelope.pitches[n].duration);
 		}
 		if (variation == 1 || variation == 2 || variation == 3) {
 			if (variation == 1) {
