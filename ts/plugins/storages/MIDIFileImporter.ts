@@ -1066,7 +1066,7 @@ class MidiParser {
 		//var changesIdx:number=0;
 
 		//console.log(durationChanges);
-		var timeline: { bpm: number, c: number, d: number, split: number, preTempo: number, s: string, ms: number, len: number }[] = [];
+		var timeline: { bpm: number, c: number, d: number, split: number, s: string, ms: number, len: number }[] = [];
 		while (ms < midisong.duration) {
 			var tempoRatio = 4 * 60 / tempo;
 			var measureDuration = 1000 * tempoRatio * count / division;
@@ -1087,26 +1087,12 @@ class MidiParser {
 				}
 			}
 			if (tempoChange.length) {
-				//if(tempoChange[0].delta>1){
-
-				//}
-				//measureDuration = 1000 * tempoRatio * count / division;
-				var part = tempoChange[0].delta / measureDuration;
+				/*var part = tempoChange[0].delta / measureDuration;
 				var startMs = ms;
-				//console.log(meterIdx, ms, '|', tempoChange[0].delta,'=',part,'*',measureDuration,  tempo,':', count, '/',division);
-				//console.log(meterIdx, ms,'split', tempoChange);
-				//console.log(part, tempoChange);
-				var preTempo = tempo;
 				tempo = tempoChange[0].bmp;
 				tempoRatio = 4 * 60 / tempo;
 				var measureDuration2 = (1000 * tempoRatio * count / division) * (1 - part);
-				//console.log(meterIdx, ms,'start');
-
 				ms = ms + tempoChange[0].delta;
-				//console.log('/',ms,part,'of',measureDuration);
-				//if(measureDuration2>1){
-				//console.log(meterIdx, ms, '||', measureDuration2 ,'=',(1 - part),'*',(1000 * tempoRatio * count / division),  tempo);
-				//}
 				for (var i = 0; i < midisong.signs.length; i++) {
 					if (midisong.signs[i].ms >= ms && midisong.signs[i].ms < ms + tempoChange[0].delta + measureDuration2) {
 						sign = midisong.signs[i].sign;
@@ -1114,16 +1100,23 @@ class MidiParser {
 				}
 				timeline.push({
 					bpm: tempo, c: count
-					, d: division, split: startMs + tempoChange[0].delta, s: sign, preTempo: preTempo, ms: startMs, len: tempoChange[0].delta + measureDuration2
+					, d: division, split: startMs + tempoChange[0].delta, s: sign, ms: startMs, len: tempoChange[0].delta + measureDuration2
 				});
 				ms = ms + measureDuration2 * (1 - part);
-				//console.log('/',(1 - part),'of',measureDuration2);
-				/*for (var ii = 0; ii < tempoChange.length; ii++) {
-					tempo = tempoChange[ii].bmp;
-					tempoRatio = 4 * 60 / tempo;
-					measureDuration = 1000 * tempoRatio * count / division;
-					ms = ms + tempoChange[ii].delta;
-				}*/
+				*/
+				tempo = tempoChange[tempoChange.length-1].bmp;
+				tempoRatio = 4 * 60 / tempo;
+				var measureDuration2 = 1000 * tempoRatio * count / division;
+				for (var i = 0; i < midisong.signs.length; i++) {
+					if (midisong.signs[i].ms >= ms && midisong.signs[i].ms < ms + measureDuration2) {
+						sign = midisong.signs[i].sign;
+					}
+				}
+				timeline.push({
+					bpm: tempo, c: count
+					, d: division, split: ms + tempoChange[0].delta, s: sign, ms: ms, len: measureDuration2
+				});
+				ms = ms + measureDuration2;
 			} else {
 				measureDuration = 1000 * tempoRatio * count / division;
 				//console.log(meterIdx, ms, '+', measureDuration, ':', count, '/', division, ':', tempo);
@@ -1134,13 +1127,13 @@ class MidiParser {
 				}
 				timeline.push({
 					bpm: tempo, c: count
-					, d: division, split: 0, s: sign, preTempo: 0, ms: ms, len: measureDuration
+					, d: division, split: 0, s: sign, ms: ms, len: measureDuration
 				});
 				ms = ms + measureDuration;
 			}
 			meterIdx++;
 		}
-		//console.log('timeline', timeline);
+		console.log('timeline', timeline);
 
 		/*var gridPat: ZvoogGridStep[] = this.meter44();
 		if (midisong.meter.count == 2 && midisong.meter.division == 4) {
@@ -1259,7 +1252,7 @@ class MidiParser {
 				for (var mc = 0; mc < timeline.length; mc++) {
 					voice.measureChords.push({ chords: [] });
 				}
-				console.log(track);
+				
 				for (var chn = 0; chn < midisong.tracks[i].songchords.length; chn++) {
 					var midichord: MIDISongChord = midisong.tracks[i].songchords[chn];
 					for (var tc = 0; tc < timeline.length; tc++) {
@@ -1268,12 +1261,14 @@ class MidiParser {
 							var skipInMeasureMs = midichord.when - timelineMeasure.ms;
 							var skipMeter: ZvoogMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
 							skipMeter = DUU(skipMeter).simplify();
-							console.log(i,tc, timelineMeasure.ms,midichord.when,skipMeter);
+							console.log('measure',tc, timelineMeasure.ms,timelineMeasure.len
+								,'chord',midichord.when,midichord.notes[0].points[0].pitch,skipMeter);
 							break;
 						}
 					}
 				}
 			}
+			console.log(firstChannelNum,track);
 		}
 
 		/*
