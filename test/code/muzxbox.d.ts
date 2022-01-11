@@ -79,9 +79,12 @@ declare class TileLevel {
     dragTranslateX: number;
     dragTranslateY: number;
     mouseDownMode: boolean;
-    translateZ: number;
-    translateX: number;
-    translateY: number;
+    get translateZ(): number;
+    set translateZ(z: number);
+    get translateX(): number;
+    set translateX(x: number);
+    get translateY(): number;
+    set translateY(y: number);
     constructor(svgObject: SVGElement, inWidth: number, inHeight: number, minZoom: number, curZoom: number, maxZoom: number, layers: TileModelLayer[]);
     dump(): void;
     setupTapSize(): void;
@@ -673,10 +676,11 @@ declare class MIDIFileHeader {
     format: number;
     trackCount: number;
     tempoBPM: number;
-    tempos: {
+    changes: {
         track: number;
         ms: number;
-        bmp: number;
+        resolution: number;
+        bpm: number;
     }[];
     meters: {
         track: number;
@@ -815,24 +819,9 @@ declare class MidiParser {
     douglasPeucker(points: XYp[], tolerance: number): XYp[];
     simplifyPath(points: XYp[], tolerance: number): XYp[];
     simplify(): void;
-    dumpResolutionChanges(): {
-        track: number;
-        ms: number;
-        resolution: number;
-        bpm: number;
-    }[];
-    lastResolution(ms: number, changes: {
-        track: number;
-        ms: number;
-        resolution: number;
-        bpm: number;
-    }[]): number;
-    parseTicks2time(changes: {
-        track: number;
-        ms: number;
-        resolution: number;
-        bpm: number;
-    }[], track: MIDIFileTrack): void;
+    dumpResolutionChanges(): void;
+    lastResolution(ms: number): number;
+    parseTicks2time(track: MIDIFileTrack): void;
     parseNotes(): void;
     nextEvent(stream: DataViewStream): MIDIEvent;
     parseTrackEvents(track: MIDIFileTrack): void;
@@ -850,11 +839,10 @@ declare class MidiParser {
 }
 declare type MIDISongPoint = {
     pitch: number;
-    duration: number;
+    durationms: number;
 };
 declare type MIDISongNote = {
     points: MIDISongPoint[];
-    nn?: number;
 };
 declare type MIDISongChord = {
     when: number;
@@ -878,10 +866,11 @@ declare type MIDISongData = {
     duration: number;
     parser: string;
     bpm: number;
-    tempos: {
+    changes: {
         track: number;
         ms: number;
-        bmp: number;
+        resolution: number;
+        bpm: number;
     }[];
     meters: {
         track: number;
