@@ -49,14 +49,14 @@ function scheduleDuration(schedule: ZvoogSchedule): ZvoogMeter {
 	}
 	return duration;
 }*/
-function scheduleDuration(measures: ZvoogMeasure[]): ZvoogMeter {
+/*function scheduleDuration(measures: ZvoogMeasure[]): ZvoogMeter {
 	let duration: ZvoogMeter = { count: 0, division: 1 };
 	for (let i = 0; i < measures.length; i++) {
 		//duration = plusMeter(duration, measures[i].meter);
 		duration = DUU(duration).plus(measures[i].meter);
 	}
 	return duration;
-}
+}*/
 function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter {
 	let duration: ZvoogMeter = { count: 0, division: 1 };
 	for (let i = 0; i < progression.length; i++) {

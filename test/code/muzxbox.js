@@ -21,7 +21,6 @@ var MuzXBox = (function () {
         var minZoom = 1;
         var maxZoom = 100;
         var testProject = this.muzLoader.createTestProject();
-        console.log(testProject);
         firstAnchor = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: minZoom, hideZoom: maxZoom + 1, content: [] };
         menuAnchor = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: minZoom, hideZoom: maxZoom + 1, content: [] };
         layers.push({ g: backgroundLayerGroup, anchors: [firstAnchor] });
@@ -59,6 +58,23 @@ var MuzXBox = (function () {
         tileLevel.innerWidth = 50 * time * tileLevel.tapSize;
         tileLevel.innerHeight = testProject.tracks.length * 11 * tileLevel.tapSize;
     };
+    MuzXBox.prototype.drawSchedule = function (song) {
+        console.log('drawSchedule', song);
+        var songDuration = scheduleDuration(song);
+        firstAnchor.content.length = 0;
+        firstAnchor.content.push({ x: 0, y: 0, w: 100 * songDuration, h: 128 * 3, rx: 0.1, ry: 0.1, css: 'debug' });
+        var time = 0;
+        for (var i = 0; i < song.measures.length; i++) {
+            var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+            firstAnchor.content.push({ x: time * 100, y: 0, w: 100 * measureDuration, h: 128 * 3, rx: 10, ry: 10, css: 'debug' });
+            time = time + measureDuration;
+        }
+        tileLevel.translateZ = 32;
+        tileLevel.innerWidth = 100 * songDuration * tileLevel.tapSize;
+        tileLevel.innerHeight = 128 * 3 * tileLevel.tapSize;
+        tileLevel.resetModel();
+        console.log(tileLevel.translateZ);
+    };
     MuzXBox.prototype.testChooser = function (xx, yy) {
         console.log('testChooser', xx, yy);
     };
@@ -72,12 +88,18 @@ var MuzXBox = (function () {
     MuzXBox.prototype.testFS = function () {
         var test = new MIDIFileImporter();
         test.readSongData("any", function (result) {
-            console.log('testFS result', result);
+            if (result) {
+                var me = window['MZXB'];
+                console.log(me);
+                if (me) {
+                    me.drawSchedule(result);
+                }
+            }
         });
     };
     return MuzXBox;
 }());
-window['MuzXBox'] = new MuzXBox();
+window['MZXB'] = new MuzXBox();
 console.log('MuzXBox v1.01');
 var ZInputDeviceHandler = (function () {
     function ZInputDeviceHandler() {
@@ -1365,13 +1387,6 @@ function isLayerNormal(t) {
 function rid() {
     return 'id' + Math.floor(Math.random() * 1000000000);
 }
-function scheduleDuration(measures) {
-    var duration = { count: 0, division: 1 };
-    for (var i = 0; i < measures.length; i++) {
-        duration = DUU(duration).plus(measures[i].meter);
-    }
-    return duration;
-}
 function progressionDuration(progression) {
     var duration = { count: 0, division: 1 };
     for (var i = 0; i < progression.length; i++) {
@@ -2084,7 +2099,7 @@ var AudioFileSource = (function () {
     return AudioFileSource;
 }());
 function meter2seconds(bpm, meter) {
-    var wholeNoteSeconds = 60 / bpm;
+    var wholeNoteSeconds = 4 * 60 / bpm;
     var meterSeconds = wholeNoteSeconds * meter.count / meter.division;
     return meterSeconds;
 }
@@ -2307,6 +2322,13 @@ var ZvoogFilterStub = (function () {
     };
     return ZvoogFilterStub;
 }());
+function scheduleDuration(song) {
+    var ss = 0;
+    for (var i = 0; i < song.measures.length; i++) {
+        ss = ss + meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+    }
+    return ss;
+}
 var cachedPerformerStubPlugins = [];
 function takeZvoogPerformerStub() {
     for (var i = 0; i < cachedPerformerStubPlugins.length; i++) {
@@ -2455,7 +2477,6 @@ var MIDIFileImporter = (function () {
     MIDIFileImporter.prototype.goUp = function (onFinish) { };
     ;
     MIDIFileImporter.prototype.readSongData = function (title, onFinish) {
-        console.log('MIDIFileImporter readSongData', title);
         var fileSelector = document.createElement('input');
         fileSelector.setAttribute('type', 'file');
         fileSelector.setAttribute('accept', 'audio/midi, audio/x-midi');
@@ -2677,12 +2698,10 @@ var MidiParser = (function () {
         this.midiEventType = 0;
         this.midiEventChannel = 0;
         this.midiEventParam1 = 0;
-        console.log('start constructor');
         this.header = new MIDIFileHeader(arrayBuffer);
         this.parseTracks(arrayBuffer);
     }
     MidiParser.prototype.parseTracks = function (arrayBuffer) {
-        console.log('start parseTracks');
         var curIndex = this.header.HEADER_LENGTH;
         var trackCount = this.header.trackCount;
         this.tracks = [];
@@ -2844,7 +2863,6 @@ var MidiParser = (function () {
     MidiParser.prototype.dumpResolutionChanges = function () {
         this.header.changes = [];
         var tickResolution = this.header.get0TickResolution();
-        console.log('head tickResolution', tickResolution);
         this.header.changes.push({ track: -1, ms: -1, resolution: tickResolution, bpm: 120 });
         for (var t = 0; t < this.tracks.length; t++) {
             var track = this.tracks[t];
@@ -2859,7 +2877,6 @@ var MidiParser = (function () {
                     if (evnt.subtype === this.EVENT_META_SET_TEMPO) {
                         if (evnt.tempo) {
                             tickResolution = this.header.getCalculatedTickResolution(evnt.tempo);
-                            console.log(t, 'tickResolution', tickResolution, 'tempo', evnt.tempoBPM, 'at', playTimeTicks);
                             this.header.changes.push({ track: t, ms: playTimeTicks, resolution: tickResolution, bpm: (evnt.tempoBPM) ? evnt.tempoBPM : 120 });
                         }
                     }
@@ -2867,7 +2884,6 @@ var MidiParser = (function () {
             }
         }
         this.header.changes.sort(function (a, b) { return a.ms - b.ms; });
-        console.log('dumpResolutionChanges', this.header.changes);
     };
     MidiParser.prototype.lastResolution = function (ms) {
         for (var i = this.header.changes.length - 1; i >= 0; i--) {
@@ -3198,8 +3214,6 @@ var MidiParser = (function () {
     };
     MidiParser.prototype.convert = function () {
         var midisong = this.dump();
-        console.log('midisong', midisong);
-        console.log('from', this);
         var count = 4;
         var division = 4;
         var sign = 'C';
@@ -3256,7 +3270,6 @@ var MidiParser = (function () {
             }
             meterIdx++;
         }
-        console.log('timeline', timeline);
         var schedule = {
             title: "import from *.mid",
             tracks: [],
@@ -3307,7 +3320,6 @@ var MidiParser = (function () {
                 firstChannelNum = midisong.tracks[i].songchords[ch].channel;
                 break;
             }
-            console.log(firstChannelNum, track.title);
             if (firstChannelNum == 9) {
                 var drumNums = [];
                 for (var ch = 0; ch < midisong.tracks[i].songchords.length; ch++) {
@@ -3338,7 +3350,6 @@ var MidiParser = (function () {
                                         var skipInMeasureMs = midichord.when - timelineMeasure.ms;
                                         var skipMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
                                         skipMeter = DUU(skipMeter).simplify();
-                                        console.log('dr', pinum, 'measure', tc, timelineMeasure.ms, timelineMeasure.bpm, midichord.notes[0].points[0].pitch, skipMeter);
                                         var onechord = {
                                             when: skipMeter,
                                             envelopes: [],
@@ -3393,7 +3404,6 @@ var MidiParser = (function () {
                             var skipInMeasureMs = midichord.when - timelineMeasure.ms;
                             var skipMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
                             skipMeter = DUU(skipMeter).simplify();
-                            console.log('measure', tc, timelineMeasure.ms, timelineMeasure.bpm, midichord.notes[0].points[0].pitch, skipMeter);
                             var onechord = {
                                 when: skipMeter,
                                 envelopes: [],
@@ -3417,7 +3427,6 @@ var MidiParser = (function () {
                     }
                 }
             }
-            console.log(track);
         }
         return schedule;
     };

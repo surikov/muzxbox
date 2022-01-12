@@ -27,7 +27,7 @@ class MuzXBox {
 		let testProject = this.muzLoader.createTestProject();
 
 
-		console.log(testProject);
+		//console.log(testProject);
 		firstAnchor = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: minZoom, hideZoom: maxZoom + 1, content: [] };
 		menuAnchor = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: minZoom, hideZoom: maxZoom + 1, content: [] };
 		layers.push({ g: backgroundLayerGroup, anchors: [firstAnchor] });
@@ -99,6 +99,24 @@ class MuzXBox {
 		tileLevel.innerWidth = 50 * time * tileLevel.tapSize;
 		tileLevel.innerHeight = testProject.tracks.length * 11 * tileLevel.tapSize;
 	}
+	drawSchedule(song: ZvoogSchedule) {
+		console.log('drawSchedule', song);
+		var songDuration = scheduleDuration(song);
+		firstAnchor.content.length = 0;
+		firstAnchor.content.push({ x: 0, y: 0, w: 100 * songDuration, h: 128 * 3, rx: 0.1, ry: 0.1, css: 'debug' });
+		var time = 0;
+		for (var i = 0; i < song.measures.length; i++) {
+			var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+			firstAnchor.content.push({ x: time * 100, y: 0, w: 100 * measureDuration, h: 128 * 3, rx: 10, ry: 10, css: 'debug' });
+			time = time + measureDuration;
+			//console.log(time , measureDuration,song.measures[i].tempo, song.measures[i].meter);
+		}
+		tileLevel.translateZ = 32;
+		tileLevel.innerWidth = 100 * songDuration * tileLevel.tapSize;
+		tileLevel.innerHeight = 128 * 3 * tileLevel.tapSize;
+		tileLevel.resetModel();
+		//console.log(tileLevel.translateZ);
+	}
 	testChooser(xx: number, yy) {
 		console.log('testChooser', xx, yy);
 	}
@@ -113,9 +131,17 @@ class MuzXBox {
 	}
 	testFS() {
 		let test: ZvoogStore = new MIDIFileImporter();
+		//var me=this;
 		test.readSongData("any", function (result: ZvoogSchedule | null): void {
-			console.log('testFS result', result);
+			//console.log('testFS result', result);
+			if (result) {
+				var me = window['MZXB'];
+				console.log(me);
+				if (me) {
+					me.drawSchedule(result);
+				}
+			}
 		});
 	}
 }
-window['MuzXBox'] = new MuzXBox();
+window['MZXB'] = new MuzXBox();

@@ -9,6 +9,7 @@ declare class MuzXBox {
     initAll(): void;
     createUI(): void;
     resetSong(testProject: MuzXBoxProject): void;
+    drawSchedule(song: ZvoogSchedule): void;
     testChooser(xx: number, yy: any): void;
     openMenu(): void;
     closeMenu(): void;
@@ -273,7 +274,6 @@ declare type MuzXBoxProject = {
     tempo: number;
     duration: ZvoogMeter;
 };
-declare function scheduleDuration(measures: ZvoogMeasure[]): ZvoogMeter;
 declare function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter;
 declare function adjustPartLeadPad(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
 declare function adjustPartBass(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
@@ -599,6 +599,7 @@ declare type ZvoogSchedule = {
     measures: ZvoogMeasure[];
     harmony: ZvoogProgression;
 };
+declare function scheduleDuration(song: ZvoogSchedule): number;
 declare type ZvoogFilterSetting = {
     filterPlugin: ZvoogFilterPlugin | null;
     parameters: ZvoogParameterData[];

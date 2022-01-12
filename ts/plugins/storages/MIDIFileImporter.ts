@@ -4,7 +4,7 @@ class MIDIFileImporter implements ZvoogStore {
 	goUp(onFinish: (error: string) => void): void { };
 
 	readSongData(title: string, onFinish: (result: ZvoogSchedule | null) => void): void {
-		console.log('MIDIFileImporter readSongData', title);
+		//console.log('MIDIFileImporter readSongData', title);
 		var fileSelector: HTMLInputElement = document.createElement('input');
 		fileSelector.setAttribute('type', 'file');
 		fileSelector.setAttribute('accept', 'audio/midi, audio/x-midi');
@@ -312,7 +312,7 @@ class MidiParser {
 	midiEventParam1: number = 0;
 
 	constructor(arrayBuffer: ArrayBuffer) {
-		console.log('start constructor');
+		//console.log('start constructor');
 		/*this.MIDI_1PARAM_EVENTS = [
 			this.EVENT_MIDI_PROGRAM_CHANGE,
 			this.EVENT_MIDI_CHANNEL_AFTERTOUCH,
@@ -328,7 +328,7 @@ class MidiParser {
 		this.parseTracks(arrayBuffer);
 	}
 	parseTracks(arrayBuffer: ArrayBuffer) {
-		console.log('start parseTracks');
+		//console.log('start parseTracks');
 		var curIndex: number = this.header.HEADER_LENGTH;
 		var trackCount: number = this.header.trackCount;
 		this.tracks = [];
@@ -495,7 +495,7 @@ class MidiParser {
 		//var changes: { track: number, ms: number, resolution: number, bpm: number }[] = [];
 		this.header.changes = [];
 		let tickResolution: number = this.header.get0TickResolution();
-		console.log('head tickResolution', tickResolution);
+		//console.log('head tickResolution', tickResolution);
 		this.header.changes.push({ track: -1, ms: -1, resolution: tickResolution, bpm: 120 });
 		for (var t = 0; t < this.tracks.length; t++) {
 			var track: MIDIFileTrack = this.tracks[t];
@@ -509,7 +509,7 @@ class MidiParser {
 					if (evnt.subtype === this.EVENT_META_SET_TEMPO) {
 						if (evnt.tempo) {
 							tickResolution = this.header.getCalculatedTickResolution(evnt.tempo);
-							console.log(t, 'tickResolution', tickResolution, 'tempo', evnt.tempoBPM, 'at', playTimeTicks);
+							//console.log(t, 'tickResolution', tickResolution, 'tempo', evnt.tempoBPM, 'at', playTimeTicks);
 							this.header.changes.push({ track: t, ms: playTimeTicks, resolution: tickResolution, bpm: (evnt.tempoBPM) ? evnt.tempoBPM : 120 });
 						}
 					}
@@ -517,7 +517,7 @@ class MidiParser {
 			}
 		}
 		this.header.changes.sort((a, b) => { return a.ms - b.ms; });
-		console.log('dumpResolutionChanges', this.header.changes);
+		//console.log('dumpResolutionChanges', this.header.changes);
 		//return changes;
 	}
 	lastResolution(ms: number): number {
@@ -1023,8 +1023,8 @@ class MidiParser {
 	}*/
 	convert(): ZvoogSchedule {
 		var midisong: MIDISongData = this.dump();
-		console.log('midisong', midisong);
-		console.log('from', this);
+		//console.log('midisong', midisong);
+		//console.log('from', this);
 		/*var splits: number[] = [];
 		for (var i = 0; i < midisong.tempos.length; i++) {
 			splits.push(midisong.tempos[i].ms);
@@ -1135,7 +1135,7 @@ class MidiParser {
 			}
 			meterIdx++;
 		}
-		console.log('timeline', timeline);
+		//console.log('timeline', timeline);
 
 		/*var gridPat: ZvoogGridStep[] = this.meter44();
 		if (midisong.meter.count == 2 && midisong.meter.division == 4) {
@@ -1213,7 +1213,7 @@ class MidiParser {
 				firstChannelNum = midisong.tracks[i].songchords[ch].channel;
 				break;
 			}
-			console.log(firstChannelNum, track.title);
+			//console.log(firstChannelNum, track.title);
 			if (firstChannelNum == 9) {
 				var drumNums: number[] = [];
 				for (var ch = 0; ch < midisong.tracks[i].songchords.length; ch++) {
@@ -1244,7 +1244,7 @@ class MidiParser {
 										var skipInMeasureMs = midichord.when - timelineMeasure.ms;
 										var skipMeter: ZvoogMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
 										skipMeter = DUU(skipMeter).simplify();
-										console.log('dr', pinum, 'measure', tc, timelineMeasure.ms, timelineMeasure.bpm, midichord.notes[0].points[0].pitch, skipMeter);
+										//console.log('dr', pinum, 'measure', tc, timelineMeasure.ms, timelineMeasure.bpm, midichord.notes[0].points[0].pitch, skipMeter);
 										var onechord: ZvoogChordStrings = {
 											when: skipMeter
 											, envelopes: []
@@ -1299,7 +1299,7 @@ class MidiParser {
 							var skipInMeasureMs = midichord.when - timelineMeasure.ms;
 							var skipMeter: ZvoogMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
 							skipMeter = DUU(skipMeter).simplify();
-							console.log('measure', tc, timelineMeasure.ms, timelineMeasure.bpm, midichord.notes[0].points[0].pitch, skipMeter);
+							//console.log('measure', tc, timelineMeasure.ms, timelineMeasure.bpm, midichord.notes[0].points[0].pitch, skipMeter);
 							var onechord: ZvoogChordStrings = {
 								when: skipMeter
 								, envelopes: []
@@ -1323,7 +1323,7 @@ class MidiParser {
 					}
 				}
 			}
-			console.log(track);
+			//console.log(track);
 		}
 
 		/*
