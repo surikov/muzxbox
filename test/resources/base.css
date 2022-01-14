@@ -4,7 +4,9 @@ html {
 	margin: 0px;
 	padding: 0px;
 	background-color: var(--background_color);
-	font-family: 'Norican', cursive;
+	font-family: serif, cursive;
+	font-style: italic;
+	font-weight: bold;
 }
 
 body {
@@ -33,5 +35,43 @@ a {
 	fill-opacity: 25%;
 	stroke: #ff0000;
 	stroke-opacity: 50%;
-
 }
+
+.barNumber{
+	font-size: 90cm;
+	fill: #112266;
+}
+.textSize025{
+	font-size: 0.25cm;
+}
+.textSize05{
+	font-size: 0.51cm;
+}
+.textSize1{
+	font-size: 1cm;
+}
+.textSize2{
+	font-size: 2cm;
+}
+.textSize4{
+	font-size: 4cm;
+}
+.textSize8{
+	font-size: 8cm;
+}
+.textSize16{
+	font-size: 16cm;
+}
+.textSize32{
+	font-size: 32cm;
+}
+.textSize64{
+	font-size: 64cm;
+}
+.textSize128{
+	font-size: 128cm;
+}
+.textSize256{
+	font-size: 256cm;
+}
+

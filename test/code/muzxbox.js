@@ -1,11 +1,38 @@
 "use strict";
 console.log('MuzXBox v1.01');
-var firstAnchor;
-var menuAnchor;
+var debugAnchor0;
+var debugAnchor1;
+var debugAnchor4;
+var debugAnchor16;
+var debugAnchor64;
+var debugAnchor256;
+var measuresAnchor1;
+var measuresAnchor4;
+var measuresAnchor16;
+var measuresAnchor64;
+var measuresAnchor256;
 var tileLevel;
+var ratioDuration = 100;
+var ratioThickness = 3;
 var sizeRatio = 2;
 var MuzXBox = (function () {
     function MuzXBox() {
+        this.zoomMin = 1;
+        this.zoomNote = 4;
+        this.zoomMeasure = 16;
+        this.zoomSong = 64;
+        this.zoomFar = 256;
+        this.zoomMax = 10000;
+        this.menuButton = {
+            x: 0,
+            y: 0,
+            w: 10,
+            h: 10,
+            rx: 3,
+            ry: 3,
+            css: 'debug',
+            action: this.testFS
+        };
         console.log('start');
     }
     MuzXBox.prototype.initAll = function () {
@@ -18,31 +45,33 @@ var MuzXBox = (function () {
     MuzXBox.prototype.createUI = function () {
         var layers = [];
         var backgroundLayerGroup = document.getElementById('backgroundLayerGroup');
-        var minZoom = 1;
-        var maxZoom = 100;
+        var gridLayerGroup = document.getElementById('gridLayerGroup');
+        var otherContentLayerGroup = document.getElementById('otherContentLayerGroup');
+        var subContentLayerGroup = document.getElementById('subContentLayerGroup');
+        var activeContentLayerGroup = document.getElementById('activeContentLayerGroup');
+        var foregroundLayerGroup = document.getElementById('foregroundLayerGroup');
         var testProject = this.muzLoader.createTestProject();
-        firstAnchor = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: minZoom, hideZoom: maxZoom + 1, content: [] };
-        menuAnchor = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: minZoom, hideZoom: maxZoom + 1, content: [] };
-        layers.push({ g: backgroundLayerGroup, anchors: [firstAnchor] });
-        layers.push({ g: backgroundLayerGroup, anchors: [menuAnchor] });
-        tileLevel = new TileLevel(document.getElementById('contentSVG'), 1000, 1000, minZoom, minZoom, maxZoom, layers);
+        debugAnchor0 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomMax + 1, content: [] };
+        debugAnchor1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
+        debugAnchor4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
+        debugAnchor16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
+        debugAnchor64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
+        debugAnchor256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
+        measuresAnchor1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
+        measuresAnchor4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
+        measuresAnchor16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
+        measuresAnchor64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
+        measuresAnchor256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
+        layers.push({ g: foregroundLayerGroup, anchors: [debugAnchor1, debugAnchor4, debugAnchor16, debugAnchor64, debugAnchor256, debugAnchor0] });
+        var measureGroup = { g: gridLayerGroup, stickBottom: 0, anchors: [measuresAnchor1, measuresAnchor4, measuresAnchor16, measuresAnchor64, measuresAnchor256] };
+        layers.push(measureGroup);
+        tileLevel = new TileLevel(document.getElementById('contentSVG'), 1000, 1000, this.zoomMin, this.zoomMin, this.zoomMax, layers);
         this.resetSong(testProject);
-        var menuButton = {
-            x: 0,
-            y: 0,
-            w: 10,
-            h: 10,
-            rx: 3,
-            ry: 3,
-            css: 'debug',
-            action: this.testFS
-        };
-        firstAnchor.content.push(menuButton);
     };
     MuzXBox.prototype.resetSong = function (testProject) {
         var _this = this;
         var time = meter2seconds(testProject.tempo, testProject.duration);
-        firstAnchor.content.push({ x: 0, y: 0, w: 50 * time, h: testProject.tracks.length * 11, rx: 0.1, ry: 0.1, css: 'debug' });
+        debugAnchor1.content.push({ x: 0, y: 0, w: 50 * time, h: testProject.tracks.length * 11, rx: 0.1, ry: 0.1, css: 'debug' });
         for (var tt = 0; tt < testProject.tracks.length; tt++) {
             var track = testProject.tracks[tt];
             var curPoint = { count: 0, division: 4 };
@@ -51,29 +80,79 @@ var MuzXBox = (function () {
                 curPoint = DUU(curPoint).plus(pattern.skip);
                 var time_1 = meter2seconds(testProject.tempo, curPoint);
                 var sz = meter2seconds(testProject.tempo, pattern.duration);
-                firstAnchor.content.push({ x: 50 * time_1, y: tt * 11, w: 50 * sz, h: 11, rx: 0.1, ry: 0.1, css: 'debug', action: function () { _this.testChooser(20, 16); } });
+                debugAnchor1.content.push({ x: 50 * time_1, y: tt * 11, w: 50 * sz, h: 11, rx: 0.1, ry: 0.1, css: 'debug', action: function () { _this.testChooser(20, 16); } });
                 curPoint = DUU(curPoint).plus(pattern.duration);
             }
         }
+        debugAnchor1.content.push(this.menuButton);
         tileLevel.innerWidth = 50 * time * tileLevel.tapSize;
         tileLevel.innerHeight = testProject.tracks.length * 11 * tileLevel.tapSize;
+    };
+    MuzXBox.prototype.clearSingleAnchor = function (anchor, songDuration) {
+        anchor.content.length = 0;
+        anchor.ww = ratioDuration * songDuration;
+        anchor.hh = 128 * ratioThickness;
+    };
+    MuzXBox.prototype.clearAnchorsContent = function (songDuration) {
+        var anchors = [debugAnchor0, debugAnchor1, debugAnchor4, debugAnchor16, debugAnchor64, debugAnchor256,
+            measuresAnchor1, measuresAnchor4, measuresAnchor16, measuresAnchor64, measuresAnchor256
+        ];
+        for (var i = 0; i < anchors.length; i++) {
+            this.clearSingleAnchor(anchors[i], songDuration);
+        }
+        tileLevel.innerWidth = ratioDuration * songDuration * tileLevel.tapSize;
+        tileLevel.innerHeight = 128 * ratioThickness * tileLevel.tapSize;
     };
     MuzXBox.prototype.drawSchedule = function (song) {
         console.log('drawSchedule', song);
         var songDuration = scheduleDuration(song);
-        firstAnchor.content.length = 0;
-        firstAnchor.content.push({ x: 0, y: 0, w: 100 * songDuration, h: 128 * 3, rx: 0.1, ry: 0.1, css: 'debug' });
+        this.clearAnchorsContent(songDuration);
+        debugAnchor1.content.push({ x: 0, y: 0, w: ratioDuration * songDuration, h: 128 * ratioThickness, rx: 0.1, ry: 0.1, css: 'debug' });
         var time = 0;
         for (var i = 0; i < song.measures.length; i++) {
             var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-            firstAnchor.content.push({ x: time * 100, y: 0, w: 100 * measureDuration, h: 128 * 3, rx: 10, ry: 10, css: 'debug' });
+            var singleMeasuresAnchor1 = {
+                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
+                showZoom: measuresAnchor1.showZoom, hideZoom: measuresAnchor1.hideZoom, content: []
+            };
+            singleMeasuresAnchor1.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
+            singleMeasuresAnchor1.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize1', text: ('1-' + (i + 1)) });
+            measuresAnchor1.content.push(singleMeasuresAnchor1);
+            var singleMeasuresAnchor4 = {
+                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
+                showZoom: measuresAnchor4.showZoom, hideZoom: measuresAnchor4.hideZoom, content: []
+            };
+            singleMeasuresAnchor4.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 15, ry: 15, css: 'debug' });
+            singleMeasuresAnchor4.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize4', text: ('4-' + (i + 1)) });
+            measuresAnchor4.content.push(singleMeasuresAnchor4);
+            var singleMeasuresAnchor16 = {
+                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
+                showZoom: measuresAnchor16.showZoom, hideZoom: measuresAnchor16.hideZoom, content: []
+            };
+            singleMeasuresAnchor16.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 20, ry: 20, css: 'debug' });
+            singleMeasuresAnchor16.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize16', text: ('16-' + (i + 1)) });
+            measuresAnchor16.content.push(singleMeasuresAnchor16);
+            var singleMeasuresAnchor64 = {
+                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
+                showZoom: measuresAnchor64.showZoom, hideZoom: measuresAnchor64.hideZoom, content: []
+            };
+            singleMeasuresAnchor64.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 30, ry: 30, css: 'debug' });
+            if (i % 5 == 0)
+                singleMeasuresAnchor64.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize64', text: ('64-' + (i + 1)) });
+            measuresAnchor64.content.push(singleMeasuresAnchor64);
+            var singleMeasuresAnchor256 = {
+                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
+                showZoom: measuresAnchor256.showZoom, hideZoom: measuresAnchor256.hideZoom, content: []
+            };
+            singleMeasuresAnchor256.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 50, ry: 50, css: 'debug' });
+            if (i % 10 == 0)
+                singleMeasuresAnchor256.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize256', text: ('256-' + (i + 1)) });
+            measuresAnchor256.content.push(singleMeasuresAnchor256);
             time = time + measureDuration;
         }
+        debugAnchor0.content.push(this.menuButton);
         tileLevel.translateZ = 32;
-        tileLevel.innerWidth = 100 * songDuration * tileLevel.tapSize;
-        tileLevel.innerHeight = 128 * 3 * tileLevel.tapSize;
         tileLevel.resetModel();
-        console.log(tileLevel.translateZ);
     };
     MuzXBox.prototype.testChooser = function (xx, yy) {
         console.log('testChooser', xx, yy);

@@ -20,11 +20,11 @@
 	<svg id="contentSVG" class='contentSVG' viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
 		xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 		<g id='backgroundLayerGroup'></g>
-		<g id='bottomScaleLayerGroup'></g>
-		<g id='leftScaleLayerGroup'></g>
+		<g id='gridLayerGroup'></g>
+		<g id='otherContentLayerGroup'></g>
+		<g id='subContentLayerGroup'></g>
+		<g id='activeContentLayerGroup'></g>
 		<g id='foregroundLayerGroup'></g>
-		<g id='selectionLayerGroup'></g>
-		<g id='menuLayerGroup'></g>
 	</svg>
 	<div id='menuDiv1' class='mainmenu' onclick='MuzXBox.closeMenu();'>
 		<div id="mydiv">
@@ -78,7 +78,7 @@
 		function waitMBx(){
 			console.log('waitMBx');
 			if(window['MZXB']){
-				console.log(MuzXBox);
+				//console.log(MuzXBox);
 				MZXB.initAll();
 			}else{
 				setTimeout(waitMBx,333);
