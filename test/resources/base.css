@@ -75,3 +75,31 @@ a {
 	font-size: 256cm;
 }
 
+.mainFill {
+	fill: #000000;
+	fill-opacity: 75%;
+}
+.secondFill {
+	fill: #000000;
+	fill-opacity: 50%;
+}
+.otherFill {
+	fill: #330099;
+	fill-opacity: 25%;
+}
+
+.mainLine {
+	stroke: #000000;
+	stroke-width:1cm;
+	stroke-opacity: 75%;
+}
+.secondLine {
+	stroke: #000000;
+	stroke-width:1cm;
+	stroke-opacity: 50%;
+}
+.otherLine {
+	stroke: #330099;
+	stroke-width:1cm;
+	stroke-opacity: 25%;
+}

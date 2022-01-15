@@ -6,11 +6,11 @@ var debugAnchor4;
 var debugAnchor16;
 var debugAnchor64;
 var debugAnchor256;
-var measuresAnchor1;
-var measuresAnchor4;
-var measuresAnchor16;
-var measuresAnchor64;
-var measuresAnchor256;
+var measuresTimelineAnchor1;
+var measuresTimelineAnchor4;
+var measuresTimelineAnchor16;
+var measuresTimelineAnchor64;
+var measuresTimelineAnchor256;
 var tileLevel;
 var ratioDuration = 100;
 var ratioThickness = 3;
@@ -44,12 +44,9 @@ var MuzXBox = (function () {
     };
     MuzXBox.prototype.createUI = function () {
         var layers = [];
-        var backgroundLayerGroup = document.getElementById('backgroundLayerGroup');
-        var gridLayerGroup = document.getElementById('gridLayerGroup');
-        var otherContentLayerGroup = document.getElementById('otherContentLayerGroup');
-        var subContentLayerGroup = document.getElementById('subContentLayerGroup');
-        var activeContentLayerGroup = document.getElementById('activeContentLayerGroup');
-        var foregroundLayerGroup = document.getElementById('foregroundLayerGroup');
+        var measureLayerGroup = document.getElementById('backgroundLayerGroup');
+        var bottomTimelineLayerGroup = document.getElementById('bottomTimelineLayerGroup');
+        var debugLayerGroup = document.getElementById('debugLayerGroup');
         var testProject = this.muzLoader.createTestProject();
         debugAnchor0 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomMax + 1, content: [] };
         debugAnchor1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
@@ -57,14 +54,14 @@ var MuzXBox = (function () {
         debugAnchor16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
         debugAnchor64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
         debugAnchor256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
-        measuresAnchor1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
-        measuresAnchor4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
-        measuresAnchor16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
-        measuresAnchor64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
-        measuresAnchor256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
-        layers.push({ g: foregroundLayerGroup, anchors: [debugAnchor1, debugAnchor4, debugAnchor16, debugAnchor64, debugAnchor256, debugAnchor0] });
-        var measureGroup = { g: gridLayerGroup, stickBottom: 0, anchors: [measuresAnchor1, measuresAnchor4, measuresAnchor16, measuresAnchor64, measuresAnchor256] };
-        layers.push(measureGroup);
+        measuresTimelineAnchor1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
+        measuresTimelineAnchor4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
+        measuresTimelineAnchor16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
+        measuresTimelineAnchor64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
+        measuresTimelineAnchor256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
+        layers.push({ g: debugLayerGroup, anchors: [debugAnchor1, debugAnchor4, debugAnchor16, debugAnchor64, debugAnchor256, debugAnchor0] });
+        var measureTimeLineGroup = { g: bottomTimelineLayerGroup, stickBottom: 0, anchors: [measuresTimelineAnchor1, measuresTimelineAnchor4, measuresTimelineAnchor16, measuresTimelineAnchor64, measuresTimelineAnchor256] };
+        layers.push(measureTimeLineGroup);
         tileLevel = new TileLevel(document.getElementById('contentSVG'), 1000, 1000, this.zoomMin, this.zoomMin, this.zoomMax, layers);
         this.resetSong(testProject);
     };
@@ -95,7 +92,7 @@ var MuzXBox = (function () {
     };
     MuzXBox.prototype.clearAnchorsContent = function (songDuration) {
         var anchors = [debugAnchor0, debugAnchor1, debugAnchor4, debugAnchor16, debugAnchor64, debugAnchor256,
-            measuresAnchor1, measuresAnchor4, measuresAnchor16, measuresAnchor64, measuresAnchor256
+            measuresTimelineAnchor1, measuresTimelineAnchor4, measuresTimelineAnchor16, measuresTimelineAnchor64, measuresTimelineAnchor256
         ];
         for (var i = 0; i < anchors.length; i++) {
             this.clearSingleAnchor(anchors[i], songDuration);
@@ -107,47 +104,47 @@ var MuzXBox = (function () {
         console.log('drawSchedule', song);
         var songDuration = scheduleDuration(song);
         this.clearAnchorsContent(songDuration);
-        debugAnchor1.content.push({ x: 0, y: 0, w: ratioDuration * songDuration, h: 128 * ratioThickness, rx: 0.1, ry: 0.1, css: 'debug' });
         var time = 0;
         for (var i = 0; i < song.measures.length; i++) {
             var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-            var singleMeasuresAnchor1 = {
+            debugAnchor0.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
+            var singlemeasuresTimelineAnchor1 = {
                 xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: measuresAnchor1.showZoom, hideZoom: measuresAnchor1.hideZoom, content: []
+                showZoom: measuresTimelineAnchor1.showZoom, hideZoom: measuresTimelineAnchor1.hideZoom, content: []
             };
-            singleMeasuresAnchor1.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-            singleMeasuresAnchor1.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize1', text: ('1-' + (i + 1)) });
-            measuresAnchor1.content.push(singleMeasuresAnchor1);
-            var singleMeasuresAnchor4 = {
+            singlemeasuresTimelineAnchor1.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
+            singlemeasuresTimelineAnchor1.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize1', text: ('1-' + (i + 1)) });
+            measuresTimelineAnchor1.content.push(singlemeasuresTimelineAnchor1);
+            var singlemeasuresTimelineAnchor4 = {
                 xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: measuresAnchor4.showZoom, hideZoom: measuresAnchor4.hideZoom, content: []
+                showZoom: measuresTimelineAnchor4.showZoom, hideZoom: measuresTimelineAnchor4.hideZoom, content: []
             };
-            singleMeasuresAnchor4.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 15, ry: 15, css: 'debug' });
-            singleMeasuresAnchor4.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize4', text: ('4-' + (i + 1)) });
-            measuresAnchor4.content.push(singleMeasuresAnchor4);
-            var singleMeasuresAnchor16 = {
+            singlemeasuresTimelineAnchor4.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 15, ry: 15, css: 'debug' });
+            singlemeasuresTimelineAnchor4.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize4', text: ('4-' + (i + 1)) });
+            measuresTimelineAnchor4.content.push(singlemeasuresTimelineAnchor4);
+            var singlemeasuresTimelineAnchor16 = {
                 xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: measuresAnchor16.showZoom, hideZoom: measuresAnchor16.hideZoom, content: []
+                showZoom: measuresTimelineAnchor16.showZoom, hideZoom: measuresTimelineAnchor16.hideZoom, content: []
             };
-            singleMeasuresAnchor16.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 20, ry: 20, css: 'debug' });
-            singleMeasuresAnchor16.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize16', text: ('16-' + (i + 1)) });
-            measuresAnchor16.content.push(singleMeasuresAnchor16);
-            var singleMeasuresAnchor64 = {
+            singlemeasuresTimelineAnchor16.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 20, ry: 20, css: 'debug' });
+            singlemeasuresTimelineAnchor16.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize16', text: ('16-' + (i + 1)) });
+            measuresTimelineAnchor16.content.push(singlemeasuresTimelineAnchor16);
+            var singlemeasuresTimelineAnchor64 = {
                 xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: measuresAnchor64.showZoom, hideZoom: measuresAnchor64.hideZoom, content: []
+                showZoom: measuresTimelineAnchor64.showZoom, hideZoom: measuresTimelineAnchor64.hideZoom, content: []
             };
-            singleMeasuresAnchor64.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 30, ry: 30, css: 'debug' });
+            singlemeasuresTimelineAnchor64.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 30, ry: 30, css: 'debug' });
             if (i % 5 == 0)
-                singleMeasuresAnchor64.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize64', text: ('64-' + (i + 1)) });
-            measuresAnchor64.content.push(singleMeasuresAnchor64);
-            var singleMeasuresAnchor256 = {
+                singlemeasuresTimelineAnchor64.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize64', text: ('64-' + (i + 1)) });
+            measuresTimelineAnchor64.content.push(singlemeasuresTimelineAnchor64);
+            var singlemeasuresTimelineAnchor256 = {
                 xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: measuresAnchor256.showZoom, hideZoom: measuresAnchor256.hideZoom, content: []
+                showZoom: measuresTimelineAnchor256.showZoom, hideZoom: measuresTimelineAnchor256.hideZoom, content: []
             };
-            singleMeasuresAnchor256.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 50, ry: 50, css: 'debug' });
+            singlemeasuresTimelineAnchor256.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 50, ry: 50, css: 'debug' });
             if (i % 10 == 0)
-                singleMeasuresAnchor256.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize256', text: ('256-' + (i + 1)) });
-            measuresAnchor256.content.push(singleMeasuresAnchor256);
+                singlemeasuresTimelineAnchor256.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize256', text: ('256-' + (i + 1)) });
+            measuresTimelineAnchor256.content.push(singlemeasuresTimelineAnchor256);
             time = time + measureDuration;
         }
         debugAnchor0.content.push(this.menuButton);
@@ -380,7 +377,7 @@ var TileLevel = (function () {
                 this._translateZ = z;
             }
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(TileLevel.prototype, "translateX", {
@@ -392,7 +389,7 @@ var TileLevel = (function () {
                 this._translateX = x;
             }
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(TileLevel.prototype, "translateY", {
@@ -404,7 +401,7 @@ var TileLevel = (function () {
                 this._translateY = y;
             }
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     TileLevel.prototype.dump = function () {
