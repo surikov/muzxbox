@@ -86,36 +86,59 @@ class MuzXBox {
 		debugAnchor16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
 		debugAnchor64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
 		debugAnchor256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
+		layers.push({
+			g: debugLayerGroup, anchors: [
+				debugAnchor1, debugAnchor4, debugAnchor16, debugAnchor64, debugAnchor256, debugAnchor0
+			]
+		});
 
 		measuresTimelineAnchor1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
 		measuresTimelineAnchor4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
 		measuresTimelineAnchor16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
 		measuresTimelineAnchor64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
 		measuresTimelineAnchor256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
+		layers.push({
+			g: bottomTimelineLayerGroup, stickBottom: 0, anchors: [
+				measuresTimelineAnchor1, measuresTimelineAnchor4, measuresTimelineAnchor16, measuresTimelineAnchor64, measuresTimelineAnchor256
+			]
+		});
 
 		contentMain1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
 		contentMain4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
 		contentMain16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
 		contentMain64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
 		contentMain256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
+		layers.push({
+			g: measureMainVoiceLayerGroup, anchors: [
+				contentMain1, contentMain4, contentMain16, contentMain64, contentMain256
+			]
+		});
 
 		contentSecond1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
 		contentSecond4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
 		contentSecond16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
 		contentSecond64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
 		contentSecond256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
+		layers.push({
+			g: measureSecondVoicesLayerGroup, anchors: [
+				contentSecond1, contentSecond4, contentSecond16, contentSecond64, contentSecond256
+			]
+		});
 
 		contentOther1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
 		contentOther4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
 		contentOther16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
 		contentOther64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
 		contentOther256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
+		layers.push({
+			g: measureOtherVoicesLayerGroup, anchors: [
+				contentOther1, contentOther4, contentOther16, contentOther64, contentOther256
+			]
+		});
 
 		//debugAnchor = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomMax + 1, content: [] };
 		//menuAnchor = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: minZoom, hideZoom: maxZoom + 1, content: [] };
-		layers.push({ g: debugLayerGroup, anchors: [debugAnchor1, debugAnchor4, debugAnchor16, debugAnchor64, debugAnchor256, debugAnchor0] });
-		let measureTimeLineGroup:TileLayerStickBottom={ g: bottomTimelineLayerGroup, stickBottom:0,anchors: [measuresTimelineAnchor1, measuresTimelineAnchor4, measuresTimelineAnchor16, measuresTimelineAnchor64, measuresTimelineAnchor256] };
-		layers.push(measureTimeLineGroup);
+		//let measureTimeLineGroup:TileLayerStickBottom={ g: bottomTimelineLayerGroup, stickBottom:0,anchors: [measuresTimelineAnchor1, measuresTimelineAnchor4, measuresTimelineAnchor16, measuresTimelineAnchor64, measuresTimelineAnchor256] };
 
 
 		//layers.push({ g: foregroundLayerGroup, anchors: [debugAnchor4] });
@@ -237,17 +260,18 @@ class MuzXBox {
 		this.clearAnchorsContent(songDuration);
 		//debugAnchor1.content.length = 0;
 
-		
+
 		var time = 0;
 		for (var i = 0; i < song.measures.length; i++) {
 			var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-			debugAnchor0.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-			//measuresTimelineAnchor256.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
+
+			//debugAnchor0.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
+			contentMain1.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
+
 			let singlemeasuresTimelineAnchor1: TileAnchor = {
 				xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness
 				, showZoom: measuresTimelineAnchor1.showZoom, hideZoom: measuresTimelineAnchor1.hideZoom, content: []
 			};
-			singlemeasuresTimelineAnchor1.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
 			singlemeasuresTimelineAnchor1.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize1', text: ('1-' + (i + 1)) });
 			measuresTimelineAnchor1.content.push(singlemeasuresTimelineAnchor1);
 
@@ -255,7 +279,6 @@ class MuzXBox {
 				xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness
 				, showZoom: measuresTimelineAnchor4.showZoom, hideZoom: measuresTimelineAnchor4.hideZoom, content: []
 			};
-			singlemeasuresTimelineAnchor4.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 15, ry: 15, css: 'debug' });
 			singlemeasuresTimelineAnchor4.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize4', text: ('4-' + (i + 1)) });
 			measuresTimelineAnchor4.content.push(singlemeasuresTimelineAnchor4);
 
@@ -263,7 +286,6 @@ class MuzXBox {
 				xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness
 				, showZoom: measuresTimelineAnchor16.showZoom, hideZoom: measuresTimelineAnchor16.hideZoom, content: []
 			};
-			singlemeasuresTimelineAnchor16.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 20, ry: 20, css: 'debug' });
 			singlemeasuresTimelineAnchor16.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize16', text: ('16-' + (i + 1)) });
 			measuresTimelineAnchor16.content.push(singlemeasuresTimelineAnchor16);
 
@@ -271,29 +293,77 @@ class MuzXBox {
 				xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness
 				, showZoom: measuresTimelineAnchor64.showZoom, hideZoom: measuresTimelineAnchor64.hideZoom, content: []
 			};
-			singlemeasuresTimelineAnchor64.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 30, ry: 30, css: 'debug' });
-			if (i % 5 == 0)singlemeasuresTimelineAnchor64.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize64', text: ('64-' + (i + 1)) });
+			if (i % 5 == 0) singlemeasuresTimelineAnchor64.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize64', text: ('64-' + (i + 1)) });
 			measuresTimelineAnchor64.content.push(singlemeasuresTimelineAnchor64);
 
 			let singlemeasuresTimelineAnchor256: TileAnchor = {
 				xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness
 				, showZoom: measuresTimelineAnchor256.showZoom, hideZoom: measuresTimelineAnchor256.hideZoom, content: []
 			};
-			singlemeasuresTimelineAnchor256.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 50, ry: 50, css: 'debug' });
 			if (i % 10 == 0) singlemeasuresTimelineAnchor256.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize256', text: ('256-' + (i + 1)) });
 			measuresTimelineAnchor256.content.push(singlemeasuresTimelineAnchor256);
 
-			//measuresTimelineAnchor4.content.push({ x: time * ratioDuration, y: 128 * ratioThickness, css: 'barNumber textSize4', text: ('' + (i + 1)) });
-			//measuresTimelineAnchor16.content.push({ x: time * ratioDuration, y: 128 * ratioThickness, css: 'barNumber textSize16', text: ('' + (i + 1)) });
-			//measuresTimelineAnchor64.content.push({ x: time * ratioDuration, y: 128 * ratioThickness, css: 'barNumber textSize64', text: ('' + (i + 1)) });
-			//measuresTimelineAnchor256.content.push({ x: time * ratioDuration, y: 128 * ratioThickness, css: 'barNumber textSize256', text: ('' + (i + 1)) });
+			let singleMasuresContentAnchor1: TileAnchor = {
+				xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness
+				, showZoom: contentMain1.showZoom, hideZoom: contentMain1.hideZoom, content: []
+			};
+			let singleMasuresContentAnchor4: TileAnchor = {
+				xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness
+				, showZoom: contentMain4.showZoom, hideZoom: contentMain4.hideZoom, content: []
+			};
+			let singleMasuresContentAnchor16: TileAnchor = {
+				xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness
+				, showZoom: contentMain16.showZoom, hideZoom: contentMain16.hideZoom, content: []
+			};
+			let singleMasuresContentAnchor64: TileAnchor = {
+				xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness
+				, showZoom: contentMain64.showZoom, hideZoom: contentMain64.hideZoom, content: []
+			};
+			let singleMasuresContentAnchor256: TileAnchor = {
+				xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness
+				, showZoom: contentMain256.showZoom, hideZoom: contentMain256.hideZoom, content: []
+			};
+
+			contentMain1.content.push(singleMasuresContentAnchor1);
+			contentMain4.content.push(singleMasuresContentAnchor4);
+			contentMain16.content.push(singleMasuresContentAnchor16);
+			contentMain64.content.push(singleMasuresContentAnchor64);
+			contentMain256.content.push(singleMasuresContentAnchor256);
+
+			var prePitch: ZvoogPitch;
+			for (var tt = 0; tt < song.tracks.length; tt++) {
+				var track = song.tracks[tt];
+				for (var vv = 0; vv < track.voices.length; vv++) {
+					var voice = track.voices[vv];
+					var measure = voice.measureChords[i];
+					for (var cc = 0; cc < measure.chords.length; cc++) {
+						var chord = measure.chords[cc];
+						for (var ee = 0; ee < chord.envelopes.length; ee++) {
+							var envelope = chord.envelopes[ee];
+							for (var pp = 0; pp < envelope.pitches.length; pp++) {
+								var pitch = envelope.pitches[pp];
+								var pitchStart = meter2seconds(song.measures[i].tempo, chord.when);
+								var pitchDuration = meter2seconds(song.measures[i].tempo, pitch.duration);
+								var line: TileLine = {
+									x1: (time + pitchStart) * ratioDuration+0.5 * ratioThickness
+									, x2: (time + pitchStart + pitchDuration ) * ratioDuration- 0.999 * ratioThickness
+									, y1: (128 - pitch.pitch) * ratioThickness
+									, y2: (128 - pitch.pitch) * ratioThickness
+									, css: 'mainLine'
+								};
+								//console.log(line);
+								debugAnchor0.content.push(line);
+							}
+						}
+					}
+				}
+			}
 			time = time + measureDuration;
-			//console.log(time , measureDuration,song.measures[i].tempo, song.measures[i].meter);
 		}
 		debugAnchor0.content.push(this.menuButton);
 		tileLevel.translateZ = 32;
 
-		//console.log(tileLevel.translateZ);
+		console.log(tileLevel.model);
 		tileLevel.resetModel();
 
 	}
