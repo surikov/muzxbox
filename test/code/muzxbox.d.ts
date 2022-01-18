@@ -271,6 +271,8 @@ declare type TileSVGElement = SVGElement & {
     translateX: number;
     translateY: number;
 };
+declare function cloneBaseDefiition(from: TileBaseDefinition): TileBaseDefinition;
+declare function cloneLine(from: TileLine): TileLine;
 declare function tilePolygon(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, z: number | undefined, dots: number[], cssClass: string | undefined): TileSVGElement;
 declare function tilePath(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, z: number, data: string, cssClass: string): TileSVGElement;
 declare function tileRectangle(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, w: number, h: number, rx: number | undefined, ry: number | undefined, cssClass: string): TileSVGElement;

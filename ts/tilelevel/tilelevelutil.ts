@@ -128,3 +128,19 @@ type TileSVGElement = SVGElement & {
 	, translateX: number
 	, translateY: number
 };
+function cloneBaseDefiition(from: TileBaseDefinition): TileBaseDefinition {
+	var to: TileBaseDefinition = {};
+	//if (from.action) to.action = from.action;
+	if (from.css) to.css = from.css;
+	if (from.dragX) to.dragX = from.dragX;
+	if (from.dragY) to.dragY = from.dragY;
+	return to;
+}
+function cloneLine(from: TileLine): TileLine {
+	var to: TileLine = cloneBaseDefiition(from) as TileLine;
+	to.x1 = from.x1;
+	to.x2 = from.x2;
+	to.y1 = from.y1;
+	to.y2 = from.y2;
+	return to;
+}
