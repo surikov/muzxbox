@@ -72,5 +72,7 @@
 		,"plugins/zvoogpluginloader.ts"
 
 		,"plugins/storages/MIDIFileImporter.ts"
+		,"plugins/storages/MusicXMLFileImporter.ts"
+		,"treevalue.ts"
 	]
 }

@@ -48,6 +48,7 @@ declare class MuzXBox {
     testChooser(xx: number, yy: any): void;
     openMenu(): void;
     closeMenu(): void;
+    testFSmidi(): void;
     testFS(): void;
 }
 declare class ZInputDeviceHandler {
@@ -936,3 +937,29 @@ declare type MIDISongData = {
     speedMode: number;
     lineMode: number;
 };
+declare class MusicXMLFileImporter implements ZvoogStore {
+    list(onFinish: (items: ZvoogStoreListItem[]) => void): void;
+    goFolder(title: string, onFinish: (error: string) => void): void;
+    goUp(onFinish: (error: string) => void): void;
+    readSongData(title: string, onFinish: (result: ZvoogSchedule | null) => void): void;
+    parseMXML(mxml: TreeValue): ZvoogSchedule;
+    createSongData(title: string, schedule: ZvoogSchedule, onFinish: (error: string) => void): void;
+    updateSongData(title: string, schedule: ZvoogSchedule, onFinish: (error: string) => void): void;
+    deleteSongData(title: string, onFinish: (error: string) => void): void;
+    renameSongData(title: string, newTitle: string, onFinish: (error: string) => void): void;
+    createFolder(title: string, onFinish: (error: string) => void): void;
+    deleteFolder(title: string, onFinish: (error: string) => void): void;
+    renameFolder(title: string, newTitle: string, onFinish: (error: string) => void): void;
+}
+declare class TreeValue {
+    name: string;
+    value: string;
+    children: TreeValue[];
+    constructor(name: string, value: string, children: TreeValue[]);
+    clone(): TreeValue;
+    first(name: string): TreeValue;
+    every(name: string): TreeValue[];
+    seek(name: string, subname: string, subvalue: string): TreeValue;
+    readDocChildren(node: any): TreeValue[];
+    fill(document: Document): void;
+}

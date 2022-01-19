@@ -484,7 +484,7 @@ class MuzXBox {
 
 
 		var me = this;
-		debugAnchor0.content.push({ x: 10, y: 30, css: 'textSize16', text: song.tracks[0].title });
+		if (song.tracks.length > 0) { debugAnchor0.content.push({ x: 10, y: 30, css: 'textSize16', text: song.tracks[0].title }); }
 		debugAnchor0.content.push({
 			x: 0, y: 20, w: 10, h: 10, rx: 3, ry: 3, css: 'debug'
 			, action: function () {
@@ -496,15 +496,17 @@ class MuzXBox {
 				}
 			}
 		});
-		debugAnchor0.content.push({ x: 10, y: 50, css: 'textSize16', text: song.tracks[0].voices[0].title });
+		if (song.tracks.length > 0) { debugAnchor0.content.push({ x: 10, y: 50, css: 'textSize16', text: song.tracks[0].voices[0].title }); }
 		debugAnchor0.content.push({
 			x: 0, y: 40, w: 10, h: 10, rx: 3, ry: 3, css: 'debug'
 			, action: function () {
 				//console.log('voice');
-				var vv = song.tracks[0].voices.shift();
-				if (vv) {
-					song.tracks[0].voices.push(vv);
-					me.drawSchedule(song)
+				if (song.tracks.length > 0) {
+					var vv = song.tracks[0].voices.shift();
+					if (vv) {
+						song.tracks[0].voices.push(vv);
+						me.drawSchedule(song)
+					}
 				}
 			}
 		});
@@ -526,7 +528,7 @@ class MuzXBox {
 		//console.log('closeMenu');
 		(document.getElementById('menuDiv1') as any).style.width = '0%';
 	}
-	testFS() {
+	testFSmidi() {
 		let test: ZvoogStore = new MIDIFileImporter();
 		//var me=this;
 		test.readSongData("any", function (result: ZvoogSchedule | null): void {
@@ -535,6 +537,21 @@ class MuzXBox {
 				var me = window['MZXB'];
 				console.log(me);
 				if (me) {
+					me.drawSchedule(result);
+				}
+			}
+		});
+	}
+	testFS() {
+		let test: ZvoogStore = new MusicXMLFileImporter();
+		//var me=this;
+		test.readSongData("any", function (result: ZvoogSchedule | null): void {
+			//console.log('testFS result', result);
+			if (result) {
+				var me = window['MZXB'];
+				//console.log(me);
+				if (me) {
+					console.log(result);
 					me.drawSchedule(result);
 				}
 			}

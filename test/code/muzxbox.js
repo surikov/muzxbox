@@ -344,7 +344,9 @@ var MuzXBox = (function () {
         debugAnchor0.content.push(this.menuButton);
         debugAnchor0.content.push({ x: 10, y: 10, css: 'textSize16', text: 'import' });
         var me = this;
-        debugAnchor0.content.push({ x: 10, y: 30, css: 'textSize16', text: song.tracks[0].title });
+        if (song.tracks.length > 0) {
+            debugAnchor0.content.push({ x: 10, y: 30, css: 'textSize16', text: song.tracks[0].title });
+        }
         debugAnchor0.content.push({
             x: 0, y: 20, w: 10, h: 10, rx: 3, ry: 3, css: 'debug',
             action: function () {
@@ -355,14 +357,18 @@ var MuzXBox = (function () {
                 }
             }
         });
-        debugAnchor0.content.push({ x: 10, y: 50, css: 'textSize16', text: song.tracks[0].voices[0].title });
+        if (song.tracks.length > 0) {
+            debugAnchor0.content.push({ x: 10, y: 50, css: 'textSize16', text: song.tracks[0].voices[0].title });
+        }
         debugAnchor0.content.push({
             x: 0, y: 40, w: 10, h: 10, rx: 3, ry: 3, css: 'debug',
             action: function () {
-                var vv = song.tracks[0].voices.shift();
-                if (vv) {
-                    song.tracks[0].voices.push(vv);
-                    me.drawSchedule(song);
+                if (song.tracks.length > 0) {
+                    var vv = song.tracks[0].voices.shift();
+                    if (vv) {
+                        song.tracks[0].voices.push(vv);
+                        me.drawSchedule(song);
+                    }
                 }
             }
         });
@@ -378,13 +384,25 @@ var MuzXBox = (function () {
     MuzXBox.prototype.closeMenu = function () {
         document.getElementById('menuDiv1').style.width = '0%';
     };
-    MuzXBox.prototype.testFS = function () {
+    MuzXBox.prototype.testFSmidi = function () {
         var test = new MIDIFileImporter();
         test.readSongData("any", function (result) {
             if (result) {
                 var me = window['MZXB'];
                 console.log(me);
                 if (me) {
+                    me.drawSchedule(result);
+                }
+            }
+        });
+    };
+    MuzXBox.prototype.testFS = function () {
+        var test = new MusicXMLFileImporter();
+        test.readSongData("any", function (result) {
+            if (result) {
+                var me = window['MZXB'];
+                if (me) {
+                    console.log(result);
                     me.drawSchedule(result);
                 }
             }
@@ -3989,5 +4007,153 @@ var MidiParser = (function () {
     };
     ;
     return MidiParser;
+}());
+var MusicXMLFileImporter = (function () {
+    function MusicXMLFileImporter() {
+    }
+    MusicXMLFileImporter.prototype.list = function (onFinish) { };
+    ;
+    MusicXMLFileImporter.prototype.goFolder = function (title, onFinish) { };
+    ;
+    MusicXMLFileImporter.prototype.goUp = function (onFinish) { };
+    ;
+    MusicXMLFileImporter.prototype.readSongData = function (title, onFinish) {
+        var fileSelector = document.createElement('input');
+        fileSelector.setAttribute('type', 'file');
+        var me = this;
+        fileSelector.addEventListener("change", function (ev) {
+            if (fileSelector.files) {
+                var file = fileSelector.files[0];
+                var fileReader = new FileReader();
+                fileReader.onload = function (progressEvent) {
+                    if (progressEvent.target) {
+                        var xml = progressEvent.target.result;
+                        var domParser = new DOMParser();
+                        var _document = domParser.parseFromString(xml, "text/xml");
+                        var mxml = new TreeValue('', '', []);
+                        mxml.fill(_document);
+                        var zvoogSchedule = me.parseMXML(mxml);
+                        onFinish(zvoogSchedule);
+                    }
+                };
+                fileReader.readAsBinaryString(file);
+            }
+        }, false);
+        fileSelector.click();
+    };
+    ;
+    MusicXMLFileImporter.prototype.parseMXML = function (mxml) {
+        console.log(mxml);
+        var zvoogSchedule = {
+            title: '',
+            tracks: [],
+            filters: [],
+            measures: [],
+            harmony: {
+                tone: '',
+                mode: '',
+                progression: []
+            }
+        };
+        var scorePart = mxml.first('part-list').every('score-part');
+        for (var i = 0; i < scorePart.length; i++) {
+            console.log(scorePart[i].first('part-name').value);
+            var midiInstrument = scorePart[i].every('midi-instrument');
+            for (var kk = 0; kk < midiInstrument.length; kk++) {
+                console.log('-', midiInstrument[kk].first('midi-program').value, '/', midiInstrument[kk].first('midi-unpitched').value);
+            }
+        }
+        return zvoogSchedule;
+    };
+    MusicXMLFileImporter.prototype.createSongData = function (title, schedule, onFinish) { };
+    ;
+    MusicXMLFileImporter.prototype.updateSongData = function (title, schedule, onFinish) { };
+    ;
+    MusicXMLFileImporter.prototype.deleteSongData = function (title, onFinish) { };
+    ;
+    MusicXMLFileImporter.prototype.renameSongData = function (title, newTitle, onFinish) { };
+    ;
+    MusicXMLFileImporter.prototype.createFolder = function (title, onFinish) { };
+    ;
+    MusicXMLFileImporter.prototype.deleteFolder = function (title, onFinish) { };
+    ;
+    MusicXMLFileImporter.prototype.renameFolder = function (title, newTitle, onFinish) { };
+    ;
+    return MusicXMLFileImporter;
+}());
+;
+var TreeValue = (function () {
+    function TreeValue(name, value, children) {
+        this.name = name;
+        this.value = value;
+        this.children = children;
+    }
+    TreeValue.prototype.clone = function () {
+        var r = new TreeValue('', '', []);
+        r.name = this.name;
+        r.value = this.value;
+        r.children = [];
+        for (var i = 0; i < this.children.length; i++) {
+            r.children.push(this.children[i].clone());
+        }
+        return r;
+    };
+    TreeValue.prototype.first = function (name) {
+        for (var i = 0; i < this.children.length; i++) {
+            if (this.children[i].name == name) {
+                return this.children[i];
+            }
+        }
+        return new TreeValue('', '', []);
+    };
+    TreeValue.prototype.every = function (name) {
+        var r = [];
+        for (var i = 0; i < this.children.length; i++) {
+            if (this.children[i].name == name) {
+                r.push(this.children[i]);
+            }
+        }
+        return r;
+    };
+    TreeValue.prototype.seek = function (name, subname, subvalue) {
+        for (var i = 0; i < this.children.length; i++) {
+            if (this.children[i].name == name) {
+                var t = this.children[i].first(subname);
+                if (t.value == subvalue) {
+                    return this.children[i];
+                }
+            }
+        }
+        return new TreeValue('', '', []);
+    };
+    TreeValue.prototype.readDocChildren = function (node) {
+        var children = [];
+        if (node.children) {
+            for (var i = 0; i < node.children.length; i++) {
+                var c = node.children[i];
+                var t = '';
+                if (c.childNodes && c.childNodes[0] && c.childNodes[0].nodeName == '#text') {
+                    t = ('' + c.childNodes[0].nodeValue).trim();
+                }
+                children.push(new TreeValue(c.localName, t, this.readDocChildren(c)));
+            }
+        }
+        if (node.attributes) {
+            for (var i = 0; i < node.attributes.length; i++) {
+                var a = node.attributes[i];
+                children.push(new TreeValue(a.localName, a.value, []));
+            }
+        }
+        return children;
+    };
+    TreeValue.prototype.fill = function (document) {
+        var tt = this.readDocChildren(document);
+        if (tt.length > 0) {
+            this.name = tt[0].name;
+            this.value = tt[0].value;
+            this.children = tt[0].children;
+        }
+    };
+    return TreeValue;
 }());
 //# sourceMappingURL=muzxbox.js.map
