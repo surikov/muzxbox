@@ -28,6 +28,7 @@ declare let tileLevel: TileLevel;
 declare let ratioDuration: number;
 declare let ratioThickness: number;
 declare let sizeRatio: number;
+declare let midiDrumPitchShift: number;
 declare class MuzXBox {
     zInputDeviceHandler: ZInputDeviceHandler;
     muzLoader: MuzLoader;

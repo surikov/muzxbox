@@ -37,6 +37,8 @@ let ratioThickness = 3;
 
 let sizeRatio = 2;
 
+let midiDrumPitchShift=23;
+
 class MuzXBox {
 	zInputDeviceHandler: ZInputDeviceHandler;
 	muzLoader: MuzLoader;

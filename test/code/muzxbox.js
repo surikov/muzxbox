@@ -30,6 +30,7 @@ var tileLevel;
 var ratioDuration = 200;
 var ratioThickness = 3;
 var sizeRatio = 2;
+var midiDrumPitchShift = 23;
 var MuzXBox = (function () {
     function MuzXBox() {
         this.zoomMin = 1;
@@ -3692,7 +3693,7 @@ var MidiParser = (function () {
                                                     var mipoint = mino.points[px];
                                                     env.pitches.push({
                                                         duration: DUU(seconds2meter32(mipoint.durationms / 1000, timelineMeasure.bpm)).simplify(),
-                                                        pitch: mipoint.pitch - 33
+                                                        pitch: mipoint.pitch - midiDrumPitchShift
                                                     });
                                                 }
                                                 onechord.envelopes.push(env);
@@ -4055,12 +4056,84 @@ var MusicXMLFileImporter = (function () {
                 progression: []
             }
         };
+        var firstPartMeasures = mxml.first('part').every('measure');
+        var timecount = '4';
+        var timediv = '4';
+        var fifths = '';
+        for (var mm = 0; mm < firstPartMeasures.length; mm++) {
+            var attributes = firstPartMeasures[mm].first('attributes');
+            if (((attributes.first('time').first('beats').value) && attributes.first('time').first('beats').value != timecount)
+                || ((attributes.first('time').first('beat-type').value) && attributes.first('time').first('beat-type').value != timediv)
+                || ((attributes.first('key').first('fifths').value) && fifths != attributes.first('key').first('fifths').value)) {
+                timecount = attributes.first('time').first('beats').value;
+                timediv = attributes.first('time').first('beat-type').value;
+                fifths = attributes.first('key').first('fifths').value;
+                console.log(mm, 'time', timecount, timediv, 'fifths', attributes.first('key').first('fifths').value);
+            }
+            var directions = firstPartMeasures[mm].every('direction');
+            for (var dd = 0; dd < directions.length; dd++) {
+                var dirtype = directions[dd].first('direction-type').children[0];
+                if (dirtype.name == 'rehearsal') {
+                    console.log(dirtype.name, mm, dirtype.value);
+                }
+                else {
+                    if (dirtype.name == 'dynamics') {
+                        console.log(dirtype.name, mm, directions[dd].first('sound').first('dynamics').value);
+                    }
+                    else {
+                        if (dirtype.name == 'metronome') {
+                            console.log(dirtype.name, mm, dirtype.first('per-minute').value, dirtype.first('beat-unit').value);
+                        }
+                        else {
+                            if (dirtype.name == 'words') {
+                                console.log(dirtype.name, mm, dirtype.value);
+                            }
+                            else {
+                                if (dirtype.name == 'bracket') {
+                                    console.log(dirtype.name, mm, dirtype.first('type').value, dirtype.first('number').value, dirtype.first('line-end').value, dirtype.first('end-length').value);
+                                }
+                                else {
+                                    console.log(dirtype.name, mm, directions[dd]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         var scorePart = mxml.first('part-list').every('score-part');
         for (var i = 0; i < scorePart.length; i++) {
-            console.log(scorePart[i].first('part-name').value);
+            var newtrack = {
+                title: scorePart[i].first('id').value + ': ' + scorePart[i].first('part-name').value,
+                voices: [],
+                filters: []
+            };
+            zvoogSchedule.tracks.push(newtrack);
             var midiInstrument = scorePart[i].every('midi-instrument');
             for (var kk = 0; kk < midiInstrument.length; kk++) {
-                console.log('-', midiInstrument[kk].first('midi-program').value, '/', midiInstrument[kk].first('midi-unpitched').value);
+                var unpitched = midiInstrument[kk].first('midi-unpitched').value;
+                var newvoice = {
+                    measureChords: [],
+                    performer: {
+                        performerPlugin: null,
+                        parameters: [],
+                        kind: '',
+                        initial: ''
+                    },
+                    filters: [],
+                    title: ''
+                };
+                newtrack.voices.push(newvoice);
+                if (unpitched) {
+                    newvoice.title = 'drum ' + unpitched;
+                    newvoice.performer.kind = 'wafdrum';
+                    newvoice.performer.initial = unpitched;
+                }
+                else {
+                    newvoice.title = 'program ' + midiInstrument[kk].first('midi-program').value;
+                    newvoice.performer.kind = 'wafinstrument';
+                    newvoice.performer.initial = midiInstrument[kk].first('midi-program').value;
+                }
             }
         }
         return zvoogSchedule;

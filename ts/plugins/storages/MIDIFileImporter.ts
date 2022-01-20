@@ -1259,7 +1259,7 @@ class MidiParser {
 													var mipoint: MIDISongPoint = mino.points[px];
 													env.pitches.push({
 														duration: DUU(seconds2meter32(mipoint.durationms / 1000, timelineMeasure.bpm)).simplify()
-														, pitch: mipoint.pitch-33
+														, pitch: mipoint.pitch-midiDrumPitchShift
 													});
 												}
 												onechord.envelopes.push(env);
