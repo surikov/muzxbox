@@ -310,6 +310,7 @@ declare class ZRender {
     clearSingleAnchor(anchor: TileAnchor, songDuration: number): void;
     clearAnchorsContent(songDuration: number): void;
     drawSchedule(song: ZvoogSchedule, menuButton: TileRectangle): void;
+    addVoice(song: ZvoogSchedule, voice: ZvoogVoice, i: number, time: number, tt: number, vv: number, singleMasuresContentAnchor1: any, singleMasuresContentAnchor4: any, singleMasuresContentAnchor16: any, singleMasuresContentAnchor64: any, singleMasuresContentAnchor256: any, singleMasuresSecondAnchor1: any, singleMasuresSecondAnchor4: any, singleMasuresSecondAnchor16: any, singleMasuresSecondAnchor64: any, singleMasuresSecondAnchor256: any, singleMasuresOtherAnchor1: any, singleMasuresOtherAnchor4: any, singleMasuresOtherAnchor16: any, singleMasuresOtherAnchor64: any, singleMasuresOtherAnchor256: any): void;
     addDebugButtons(song: ZvoogSchedule, menuButton: TileRectangle): void;
 }
 declare function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter;

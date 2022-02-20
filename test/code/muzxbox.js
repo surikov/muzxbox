@@ -1578,69 +1578,72 @@ var ZRender = (function () {
                 var track = song.tracks[tt];
                 for (var vv = 0; vv < track.voices.length; vv++) {
                     var voice = track.voices[vv];
-                    var measure = voice.measureChords[i];
-                    for (var cc = 0; cc < measure.chords.length; cc++) {
-                        var chord = measure.chords[cc];
-                        for (var ee = 0; ee < chord.envelopes.length; ee++) {
-                            var envelope = chord.envelopes[ee];
-                            var pitchWhen = meter2seconds(song.measures[i].tempo, chord.when);
-                            for (var pp = 0; pp < envelope.pitches.length; pp++) {
-                                var pitch = envelope.pitches[pp];
-                                var slide = pitch.pitch;
-                                if (pp + 1 < envelope.pitches.length) {
-                                    slide = envelope.pitches[pp + 1].pitch;
-                                }
-                                var pitchDuration = meter2seconds(song.measures[i].tempo, pitch.duration);
-                                var startShift = 0;
-                                if (pp == 0) {
-                                    startShift = 0.5 * this.ratioThickness;
-                                }
-                                var endShift = 0;
-                                if (pp == envelope.pitches.length - 1) {
-                                    endShift = -0.49 * this.ratioThickness;
-                                }
-                                var line = {
-                                    x1: (time + pitchWhen) * this.ratioDuration + startShift,
-                                    x2: (time + pitchWhen + pitchDuration) * this.ratioDuration + endShift,
-                                    y1: (128 - pitch.pitch) * this.ratioThickness,
-                                    y2: (128 - slide) * this.ratioThickness,
-                                    css: 'debug'
-                                };
-                                if (tt == 0) {
-                                    if (vv == 0) {
-                                        line.css = 'mainLine';
-                                        singleMasuresContentAnchor1.content.push(cloneLine(line));
-                                        singleMasuresContentAnchor4.content.push(cloneLine(line));
-                                        singleMasuresContentAnchor16.content.push(cloneLine(line));
-                                        singleMasuresContentAnchor64.content.push(cloneLine(line));
-                                        singleMasuresContentAnchor256.content.push(cloneLine(line));
-                                    }
-                                    else {
-                                        line.css = 'secondLine';
-                                        singleMasuresSecondAnchor1.content.push(cloneLine(line));
-                                        singleMasuresSecondAnchor4.content.push(cloneLine(line));
-                                        singleMasuresSecondAnchor16.content.push(cloneLine(line));
-                                        singleMasuresSecondAnchor64.content.push(cloneLine(line));
-                                        singleMasuresSecondAnchor256.content.push(cloneLine(line));
-                                    }
-                                }
-                                else {
-                                    line.css = 'otherLine';
-                                    singleMasuresOtherAnchor1.content.push(cloneLine(line));
-                                    singleMasuresOtherAnchor4.content.push(cloneLine(line));
-                                    singleMasuresOtherAnchor16.content.push(cloneLine(line));
-                                    singleMasuresOtherAnchor64.content.push(cloneLine(line));
-                                }
-                                pitchWhen = pitchWhen + pitchDuration;
-                            }
-                        }
-                    }
+                    this.addVoice(song, voice, i, time, tt, vv, singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256, singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64, singleMasuresSecondAnchor256, singleMasuresOtherAnchor1, singleMasuresOtherAnchor4, singleMasuresOtherAnchor16, singleMasuresOtherAnchor64, singleMasuresOtherAnchor256);
                 }
             }
             time = time + measureDuration;
         }
         this.addDebugButtons(song, menuButton);
         this.tileLevel.resetModel();
+    };
+    ZRender.prototype.addVoice = function (song, voice, i, time, tt, vv, singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256, singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64, singleMasuresSecondAnchor256, singleMasuresOtherAnchor1, singleMasuresOtherAnchor4, singleMasuresOtherAnchor16, singleMasuresOtherAnchor64, singleMasuresOtherAnchor256) {
+        var measure = voice.measureChords[i];
+        for (var cc = 0; cc < measure.chords.length; cc++) {
+            var chord = measure.chords[cc];
+            for (var ee = 0; ee < chord.envelopes.length; ee++) {
+                var envelope = chord.envelopes[ee];
+                var pitchWhen = meter2seconds(song.measures[i].tempo, chord.when);
+                for (var pp = 0; pp < envelope.pitches.length; pp++) {
+                    var pitch = envelope.pitches[pp];
+                    var slide = pitch.pitch;
+                    if (pp + 1 < envelope.pitches.length) {
+                        slide = envelope.pitches[pp + 1].pitch;
+                    }
+                    var pitchDuration = meter2seconds(song.measures[i].tempo, pitch.duration);
+                    var startShift = 0;
+                    if (pp == 0) {
+                        startShift = 0.5 * this.ratioThickness;
+                    }
+                    var endShift = 0;
+                    if (pp == envelope.pitches.length - 1) {
+                        endShift = -0.49 * this.ratioThickness;
+                    }
+                    var line = {
+                        x1: (time + pitchWhen) * this.ratioDuration + startShift,
+                        x2: (time + pitchWhen + pitchDuration) * this.ratioDuration + endShift,
+                        y1: (128 - pitch.pitch) * this.ratioThickness,
+                        y2: (128 - slide) * this.ratioThickness,
+                        css: 'debug'
+                    };
+                    if (tt == 0) {
+                        if (vv == 0) {
+                            line.css = 'mainLine';
+                            singleMasuresContentAnchor1.content.push(cloneLine(line));
+                            singleMasuresContentAnchor4.content.push(cloneLine(line));
+                            singleMasuresContentAnchor16.content.push(cloneLine(line));
+                            singleMasuresContentAnchor64.content.push(cloneLine(line));
+                            singleMasuresContentAnchor256.content.push(cloneLine(line));
+                        }
+                        else {
+                            line.css = 'secondLine';
+                            singleMasuresSecondAnchor1.content.push(cloneLine(line));
+                            singleMasuresSecondAnchor4.content.push(cloneLine(line));
+                            singleMasuresSecondAnchor16.content.push(cloneLine(line));
+                            singleMasuresSecondAnchor64.content.push(cloneLine(line));
+                            singleMasuresSecondAnchor256.content.push(cloneLine(line));
+                        }
+                    }
+                    else {
+                        line.css = 'otherLine';
+                        singleMasuresOtherAnchor1.content.push(cloneLine(line));
+                        singleMasuresOtherAnchor4.content.push(cloneLine(line));
+                        singleMasuresOtherAnchor16.content.push(cloneLine(line));
+                        singleMasuresOtherAnchor64.content.push(cloneLine(line));
+                    }
+                    pitchWhen = pitchWhen + pitchDuration;
+                }
+            }
+        }
     };
     ZRender.prototype.addDebugButtons = function (song, menuButton) {
         this.debugAnchor0.content.push(menuButton);
