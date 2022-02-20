@@ -38,9 +38,6 @@ var MuzXBox = (function () {
         };
         this.zrenderer.drawSchedule(emptySchedule, this.menuButton);
     };
-    MuzXBox.prototype.testChooser = function (xx, yy) {
-        console.log('testChooser', xx, yy);
-    };
     MuzXBox.prototype.openMenu = function () {
         document.getElementById('menuContentDiv').style.visibility = 'visible';
         document.getElementById('menuDiv1').style.width = '100%';
@@ -1642,11 +1639,19 @@ var ZRender = (function () {
             }
             time = time + measureDuration;
         }
+        this.addDebugButtons(song, menuButton);
+        this.tileLevel.resetModel();
+    };
+    ZRender.prototype.addDebugButtons = function (song, menuButton) {
         this.debugAnchor0.content.push(menuButton);
-        this.debugAnchor0.content.push({ x: 10, y: 10, css: 'textSize16', text: 'import' });
+        this.debugAnchor0.content.push({
+            x: 10, y: 10, css: 'textSize16', text: 'import'
+        });
         var me = this;
         if (song.tracks.length > 0) {
-            this.debugAnchor0.content.push({ x: 10, y: 30, css: 'textSize16', text: song.tracks[0].title });
+            this.debugAnchor0.content.push({
+                x: 10, y: 30, css: 'textSize16', text: song.tracks[0].title
+            });
         }
         this.debugAnchor0.content.push({
             x: 0, y: 20, w: 10, h: 10, rx: 3, ry: 3, css: 'debug',
@@ -1659,7 +1664,9 @@ var ZRender = (function () {
             }
         });
         if (song.tracks.length > 0) {
-            this.debugAnchor0.content.push({ x: 10, y: 50, css: 'textSize16', text: song.tracks[0].voices[0].title });
+            this.debugAnchor0.content.push({
+                x: 10, y: 50, css: 'textSize16', text: song.tracks[0].voices[0].title
+            });
         }
         this.debugAnchor0.content.push({
             x: 0, y: 40, w: 10, h: 10, rx: 3, ry: 3, css: 'debug',
@@ -1673,7 +1680,6 @@ var ZRender = (function () {
                 }
             }
         });
-        this.tileLevel.resetModel();
     };
     return ZRender;
 }());

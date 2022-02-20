@@ -6,7 +6,6 @@ declare class MuzXBox {
     constructor();
     initAll(): void;
     createUI(): void;
-    testChooser(xx: number, yy: any): void;
     openMenu(): void;
     closeMenu(): void;
     testFSmidi(): void;
@@ -311,6 +310,7 @@ declare class ZRender {
     clearSingleAnchor(anchor: TileAnchor, songDuration: number): void;
     clearAnchorsContent(songDuration: number): void;
     drawSchedule(song: ZvoogSchedule, menuButton: TileRectangle): void;
+    addDebugButtons(song: ZvoogSchedule, menuButton: TileRectangle): void;
 }
 declare function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter;
 declare function adjustPartLeadPad(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;

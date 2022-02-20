@@ -152,46 +152,13 @@ class ZRender {
         this.tileLevel.innerHeight = 128 * this.ratioThickness * this.tileLevel.tapSize;
 
     }
-    /*resetSong(testProject: MuzXBoxProject, menuButton: TileRectangle, onAction: (n1: number, n2: number) => void) {
-        let time = meter2seconds(testProject.tempo, testProject.duration);
-        this.debugAnchor1.content.push({ x: 0, y: 0, w: 50 * time, h: testProject.tracks.length * 11, rx: 0.1, ry: 0.1, css: 'debug' });
-        for (let tt = 0; tt < testProject.tracks.length; tt++) {
-            let track: MuzXBoxTrack = testProject.tracks[tt];
-            let curPoint: ZvoogMeter = { count: 0, division: 4 };
-            for (let pp = 0; pp < track.patterns.length; pp++) {
-                let pattern: MuzXBoxPattern = track.patterns[pp];
-                curPoint = DUU(curPoint).plus(pattern.skip);
-                let time = meter2seconds(testProject.tempo, curPoint);
-                let sz = meter2seconds(testProject.tempo, pattern.duration);
-                this.debugAnchor1.content.push({
-                    x: 50 * time, y: tt * 11, w: 50 * sz, h: 11, rx: 0.1, ry: 0.1, css: 'debug'
-                    , action: () => {
-                        //this.testChooser(20, 16); 
-                        onAction(20, 16);
-                    }
-                });
-                curPoint = DUU(curPoint).plus(pattern.duration);
-            }
-        }
-        this.debugAnchor1.content.push(menuButton);
-        this.tileLevel.innerWidth = 50 * time * this.tileLevel.tapSize;
-        this.tileLevel.innerHeight = testProject.tracks.length * 11 * this.tileLevel.tapSize;
-    }*/
-
 
     drawSchedule(song: ZvoogSchedule, menuButton: TileRectangle) {
-        //console.log('drawSchedule', song);
         var songDuration = scheduleDuration(song);
         this.clearAnchorsContent(songDuration);
-        //debugAnchor1.content.length = 0;
-
-
         var time = 0;
         for (var i = 0; i < song.measures.length; i++) {
             var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-
-            //debugAnchor0.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-
             let singlemeasuresTimelineAnchor1: TileAnchor = {
                 xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness
                 , showZoom: this.measuresTimelineAnchor1.showZoom, hideZoom: this.measuresTimelineAnchor1.hideZoom, content: []
@@ -251,19 +218,11 @@ class ZRender {
                 xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness
                 , showZoom: this.contentMain256.showZoom, hideZoom: this.contentMain256.hideZoom, content: []
             };
-
             this.contentMain1.content.push(singleMasuresContentAnchor1);
             this.contentMain4.content.push(singleMasuresContentAnchor4);
             this.contentMain16.content.push(singleMasuresContentAnchor16);
             this.contentMain64.content.push(singleMasuresContentAnchor64);
             this.contentMain256.content.push(singleMasuresContentAnchor256);
-
-			/*singleMasuresContentAnchor1.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-			singleMasuresContentAnchor4.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-			singleMasuresContentAnchor16.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-			singleMasuresContentAnchor64.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-			singleMasuresContentAnchor256.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-*/
             let singleMasuresSecondAnchor1: TileAnchor = {
                 xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness
                 , showZoom: this.contentSecond1.showZoom, hideZoom: this.contentSecond1.hideZoom, content: []
@@ -284,19 +243,11 @@ class ZRender {
                 xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness
                 , showZoom: this.contentSecond256.showZoom, hideZoom: this.contentSecond256.hideZoom, content: []
             };
-
             this.contentSecond1.content.push(singleMasuresSecondAnchor1);
             this.contentSecond4.content.push(singleMasuresSecondAnchor4);
             this.contentSecond16.content.push(singleMasuresSecondAnchor16);
             this.contentSecond64.content.push(singleMasuresSecondAnchor64);
             this.contentSecond256.content.push(singleMasuresSecondAnchor256);
-
-			/*singleMasuresSecondAnchor1.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-			singleMasuresSecondAnchor4.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-			singleMasuresSecondAnchor16.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-			singleMasuresSecondAnchor64.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-			singleMasuresSecondAnchor256.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-*/
             let singleMasuresOtherAnchor1: TileAnchor = {
                 xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness
                 , showZoom: this.contentOther1.showZoom, hideZoom: this.contentOther1.hideZoom, content: []
@@ -317,99 +268,95 @@ class ZRender {
                 xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness
                 , showZoom: this.contentOther256.showZoom, hideZoom: this.contentOther256.hideZoom, content: []
             };
-
             this.contentOther1.content.push(singleMasuresOtherAnchor1);
             this.contentOther4.content.push(singleMasuresOtherAnchor4);
             this.contentOther16.content.push(singleMasuresOtherAnchor16);
             this.contentOther64.content.push(singleMasuresOtherAnchor64);
             this.contentOther256.content.push(singleMasuresOtherAnchor256);
-
-			/*singleMasuresOtherAnchor1.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-			singleMasuresOtherAnchor4.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-			singleMasuresOtherAnchor16.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-			singleMasuresOtherAnchor64.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-			singleMasuresOtherAnchor256.content.push({ x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 10, ry: 10, css: 'debug' });
-*/
-
-            //var prePitch: ZvoogPitch;
             for (var tt = 0; tt < song.tracks.length; tt++) {
                 var track = song.tracks[tt];
                 for (var vv = 0; vv < track.voices.length; vv++) {
-                    var voice = track.voices[vv];
-                    var measure = voice.measureChords[i];
-                    for (var cc = 0; cc < measure.chords.length; cc++) {
-                        var chord = measure.chords[cc];
-                        for (var ee = 0; ee < chord.envelopes.length; ee++) {
-                            var envelope = chord.envelopes[ee];
-							/*if (envelope.pitches.length > 5) {
-								console.log(i, voice.title, chord);
-							}*/
-                            var pitchWhen = meter2seconds(song.measures[i].tempo, chord.when);
-                            for (var pp = 0; pp < envelope.pitches.length; pp++) {
-                                var pitch = envelope.pitches[pp];
-                                var slide = pitch.pitch;
-                                if (pp + 1 < envelope.pitches.length) {
-                                    slide = envelope.pitches[pp + 1].pitch;
-                                }
-
-                                var pitchDuration = meter2seconds(song.measures[i].tempo, pitch.duration);
-                                var startShift = 0;
-                                if (pp == 0) {
-                                    startShift = 0.5 * this.ratioThickness;
-                                }
-                                var endShift = 0;
-                                if (pp == envelope.pitches.length - 1) {
-                                    endShift = -0.49 * this.ratioThickness;
-                                }
-                                var line: TileLine = {
-                                    x1: (time + pitchWhen) * this.ratioDuration + startShift
-                                    , x2: (time + pitchWhen + pitchDuration) * this.ratioDuration + endShift
-                                    , y1: (128 - pitch.pitch) * this.ratioThickness
-                                    , y2: (128 - slide) * this.ratioThickness
-                                    , css: 'debug'
-                                };
-                                if (tt == 0) {
-                                    if (vv == 0) {
-                                        line.css = 'mainLine';
-                                        singleMasuresContentAnchor1.content.push(cloneLine(line));
-                                        singleMasuresContentAnchor4.content.push(cloneLine(line));
-                                        singleMasuresContentAnchor16.content.push(cloneLine(line));
-                                        singleMasuresContentAnchor64.content.push(cloneLine(line));
-                                        singleMasuresContentAnchor256.content.push(cloneLine(line));
-                                    } else {
-                                        line.css = 'secondLine';
-                                        singleMasuresSecondAnchor1.content.push(cloneLine(line));
-                                        singleMasuresSecondAnchor4.content.push(cloneLine(line));
-                                        singleMasuresSecondAnchor16.content.push(cloneLine(line));
-                                        singleMasuresSecondAnchor64.content.push(cloneLine(line));
-                                        singleMasuresSecondAnchor256.content.push(cloneLine(line));
-                                    }
-                                } else {
-                                    line.css = 'otherLine';
-                                    singleMasuresOtherAnchor1.content.push(cloneLine(line));
-                                    singleMasuresOtherAnchor4.content.push(cloneLine(line));
-                                    singleMasuresOtherAnchor16.content.push(cloneLine(line));
-                                    singleMasuresOtherAnchor64.content.push(cloneLine(line));
-                                    //singleMasuresOtherAnchor256.content.push(cloneLine(line));
-                                }
-                                pitchWhen = pitchWhen + pitchDuration;
-                            }
-                        }
-                    }
+                    var voice: ZvoogVoice = track.voices[vv];
+                    this.addVoice(song, voice, i, time, tt, vv);
                 }
             }
             time = time + measureDuration;
         }
+        this.addDebugButtons(song, menuButton);
+        this.tileLevel.resetModel();
+    }
+    addVoice(song: ZvoogSchedule, voice: ZvoogVoice, i: number, time: number, tt: number, vv: number) {
+        var measure = voice.measureChords[i];
+        for (var cc = 0; cc < measure.chords.length; cc++) {
+            var chord = measure.chords[cc];
+            for (var ee = 0; ee < chord.envelopes.length; ee++) {
+                var envelope = chord.envelopes[ee];
+                var pitchWhen = meter2seconds(song.measures[i].tempo, chord.when);
+                for (var pp = 0; pp < envelope.pitches.length; pp++) {
+                    var pitch = envelope.pitches[pp];
+                    var slide = pitch.pitch;
+                    if (pp + 1 < envelope.pitches.length) {
+                        slide = envelope.pitches[pp + 1].pitch;
+                    }
+
+                    var pitchDuration = meter2seconds(song.measures[i].tempo, pitch.duration);
+                    var startShift = 0;
+                    if (pp == 0) {
+                        startShift = 0.5 * this.ratioThickness;
+                    }
+                    var endShift = 0;
+                    if (pp == envelope.pitches.length - 1) {
+                        endShift = -0.49 * this.ratioThickness;
+                    }
+                    var line: TileLine = {
+                        x1: (time + pitchWhen) * this.ratioDuration + startShift
+                        , x2: (time + pitchWhen + pitchDuration) * this.ratioDuration + endShift
+                        , y1: (128 - pitch.pitch) * this.ratioThickness
+                        , y2: (128 - slide) * this.ratioThickness
+                        , css: 'debug'
+                    };
+                    if (tt == 0) {
+                        if (vv == 0) {
+                            line.css = 'mainLine';
+                            singleMasuresContentAnchor1.content.push(cloneLine(line));
+                            singleMasuresContentAnchor4.content.push(cloneLine(line));
+                            singleMasuresContentAnchor16.content.push(cloneLine(line));
+                            singleMasuresContentAnchor64.content.push(cloneLine(line));
+                            singleMasuresContentAnchor256.content.push(cloneLine(line));
+                        } else {
+                            line.css = 'secondLine';
+                            singleMasuresSecondAnchor1.content.push(cloneLine(line));
+                            singleMasuresSecondAnchor4.content.push(cloneLine(line));
+                            singleMasuresSecondAnchor16.content.push(cloneLine(line));
+                            singleMasuresSecondAnchor64.content.push(cloneLine(line));
+                            singleMasuresSecondAnchor256.content.push(cloneLine(line));
+                        }
+                    } else {
+                        line.css = 'otherLine';
+                        singleMasuresOtherAnchor1.content.push(cloneLine(line));
+                        singleMasuresOtherAnchor4.content.push(cloneLine(line));
+                        singleMasuresOtherAnchor16.content.push(cloneLine(line));
+                        singleMasuresOtherAnchor64.content.push(cloneLine(line));
+                    }
+                    pitchWhen = pitchWhen + pitchDuration;
+                }
+            }
+        }
+    }
+    addDebugButtons(song: ZvoogSchedule, menuButton: TileRectangle) {
         this.debugAnchor0.content.push(menuButton);
-        this.debugAnchor0.content.push({ x: 10, y: 10, css: 'textSize16', text: 'import' });
-
-
+        this.debugAnchor0.content.push({
+            x: 10, y: 10, css: 'textSize16', text: 'import'
+        });
         var me = this;
-        if (song.tracks.length > 0) { this.debugAnchor0.content.push({ x: 10, y: 30, css: 'textSize16', text: song.tracks[0].title }); }
+        if (song.tracks.length > 0) {
+            this.debugAnchor0.content.push({
+                x: 10, y: 30, css: 'textSize16', text: song.tracks[0].title
+            });
+        }
         this.debugAnchor0.content.push({
             x: 0, y: 20, w: 10, h: 10, rx: 3, ry: 3, css: 'debug'
             , action: function () {
-                //console.log('track');
                 var tt = song.tracks.shift();
                 if (tt) {
                     song.tracks.push(tt);
@@ -417,11 +364,14 @@ class ZRender {
                 }
             }
         });
-        if (song.tracks.length > 0) { this.debugAnchor0.content.push({ x: 10, y: 50, css: 'textSize16', text: song.tracks[0].voices[0].title }); }
+        if (song.tracks.length > 0) {
+            this.debugAnchor0.content.push({
+                x: 10, y: 50, css: 'textSize16', text: song.tracks[0].voices[0].title
+            });
+        }
         this.debugAnchor0.content.push({
             x: 0, y: 40, w: 10, h: 10, rx: 3, ry: 3, css: 'debug'
             , action: function () {
-                //console.log('voice');
                 if (song.tracks.length > 0) {
                     var vv = song.tracks[0].voices.shift();
                     if (vv) {
@@ -431,10 +381,5 @@ class ZRender {
                 }
             }
         });
-        //tileLevel.translateZ = 32;
-
-        //console.log(tileLevel.model);
-        this.tileLevel.resetModel();
-
     }
 }
