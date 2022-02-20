@@ -1,44 +1,8 @@
 "use strict";
 console.log('MuzXBox v1.01');
-var debugAnchor0;
-var debugAnchor1;
-var debugAnchor4;
-var debugAnchor16;
-var debugAnchor64;
-var debugAnchor256;
-var measuresTimelineAnchor1;
-var measuresTimelineAnchor4;
-var measuresTimelineAnchor16;
-var measuresTimelineAnchor64;
-var measuresTimelineAnchor256;
-var contentMain1;
-var contentMain4;
-var contentMain16;
-var contentMain64;
-var contentMain256;
-var contentSecond1;
-var contentSecond4;
-var contentSecond16;
-var contentSecond64;
-var contentSecond256;
-var contentOther1;
-var contentOther4;
-var contentOther16;
-var contentOther64;
-var contentOther256;
-var tileLevel;
-var ratioDuration = 200;
-var ratioThickness = 3;
-var sizeRatio = 2;
 var midiDrumPitchShift = 23;
 var MuzXBox = (function () {
     function MuzXBox() {
-        this.zoomMin = 1;
-        this.zoomNote = 4;
-        this.zoomMeasure = 16;
-        this.zoomSong = 64;
-        this.zoomFar = 256;
-        this.zoomMax = 10000;
         this.menuButton = {
             x: 0,
             y: 0,
@@ -47,333 +11,32 @@ var MuzXBox = (function () {
             rx: 3,
             ry: 3,
             css: 'debug',
-            action: this.testFS
+            action: this.testFS,
+            id: 'menuButtonTest1'
         };
         console.log('start');
     }
     MuzXBox.prototype.initAll = function () {
         console.log('initAll');
         var me = this;
+        this.zrenderer = new ZRender();
         this.zInputDeviceHandler = new ZInputDeviceHandler();
-        this.muzLoader = new MuzLoader();
+        this.zrenderer.bindLayers();
+        this.zrenderer.initUI();
         this.createUI();
     };
     MuzXBox.prototype.createUI = function () {
-        var layers = [];
-        var measureOtherVoicesLayerGroup = document.getElementById('measureOtherVoicesLayerGroup');
-        var measureSecondVoicesLayerGroup = document.getElementById('measureSecondVoicesLayerGroup');
-        var measureMainVoiceLayerGroup = document.getElementById('measureMainVoiceLayerGroup');
-        var bottomTimelineLayerGroup = document.getElementById('bottomTimelineLayerGroup');
-        var debugLayerGroup = document.getElementById('debugLayerGroup');
-        var testProject = this.muzLoader.createTestProject();
-        debugAnchor0 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomMax + 1, content: [] };
-        debugAnchor1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
-        debugAnchor4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
-        debugAnchor16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
-        debugAnchor64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
-        debugAnchor256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
-        layers.push({
-            g: debugLayerGroup, anchors: [
-                debugAnchor1, debugAnchor4, debugAnchor16, debugAnchor64, debugAnchor256, debugAnchor0
-            ]
-        });
-        measuresTimelineAnchor1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
-        measuresTimelineAnchor4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
-        measuresTimelineAnchor16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
-        measuresTimelineAnchor64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
-        measuresTimelineAnchor256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
-        layers.push({
-            g: bottomTimelineLayerGroup, stickBottom: 0, anchors: [
-                measuresTimelineAnchor1, measuresTimelineAnchor4, measuresTimelineAnchor16, measuresTimelineAnchor64, measuresTimelineAnchor256
-            ]
-        });
-        contentMain1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
-        contentMain4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
-        contentMain16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
-        contentMain64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
-        contentMain256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
-        layers.push({
-            g: measureMainVoiceLayerGroup, anchors: [
-                contentMain1, contentMain4, contentMain16, contentMain64, contentMain256
-            ]
-        });
-        contentSecond1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
-        contentSecond4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
-        contentSecond16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
-        contentSecond64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
-        contentSecond256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
-        layers.push({
-            g: measureSecondVoicesLayerGroup, anchors: [
-                contentSecond1, contentSecond4, contentSecond16, contentSecond64, contentSecond256
-            ]
-        });
-        contentOther1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
-        contentOther4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
-        contentOther16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
-        contentOther64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
-        contentOther256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
-        layers.push({
-            g: measureOtherVoicesLayerGroup, anchors: [
-                contentOther1, contentOther4, contentOther16, contentOther64, contentOther256
-            ]
-        });
-        tileLevel = new TileLevel(document.getElementById('contentSVG'), 1000, 1000, this.zoomMin, this.zoomMin, this.zoomMax, layers);
-        this.resetSong(testProject);
-    };
-    MuzXBox.prototype.resetSong = function (testProject) {
-        var _this = this;
-        var time = meter2seconds(testProject.tempo, testProject.duration);
-        debugAnchor1.content.push({ x: 0, y: 0, w: 50 * time, h: testProject.tracks.length * 11, rx: 0.1, ry: 0.1, css: 'debug' });
-        for (var tt = 0; tt < testProject.tracks.length; tt++) {
-            var track = testProject.tracks[tt];
-            var curPoint = { count: 0, division: 4 };
-            for (var pp = 0; pp < track.patterns.length; pp++) {
-                var pattern = track.patterns[pp];
-                curPoint = DUU(curPoint).plus(pattern.skip);
-                var time_1 = meter2seconds(testProject.tempo, curPoint);
-                var sz = meter2seconds(testProject.tempo, pattern.duration);
-                debugAnchor1.content.push({ x: 50 * time_1, y: tt * 11, w: 50 * sz, h: 11, rx: 0.1, ry: 0.1, css: 'debug', action: function () { _this.testChooser(20, 16); } });
-                curPoint = DUU(curPoint).plus(pattern.duration);
+        var emptySchedule = {
+            title: 'Empty project', tracks: [],
+            filters: [],
+            measures: [],
+            harmony: {
+                tone: '',
+                mode: '',
+                progression: []
             }
-        }
-        debugAnchor1.content.push(this.menuButton);
-        tileLevel.innerWidth = 50 * time * tileLevel.tapSize;
-        tileLevel.innerHeight = testProject.tracks.length * 11 * tileLevel.tapSize;
-    };
-    MuzXBox.prototype.clearSingleAnchor = function (anchor, songDuration) {
-        anchor.content.length = 0;
-        anchor.ww = ratioDuration * songDuration;
-        anchor.hh = 128 * ratioThickness;
-    };
-    MuzXBox.prototype.clearAnchorsContent = function (songDuration) {
-        var anchors = [
-            debugAnchor0, debugAnchor1, debugAnchor4, debugAnchor16, debugAnchor64, debugAnchor256,
-            measuresTimelineAnchor1, measuresTimelineAnchor4, measuresTimelineAnchor16, measuresTimelineAnchor64, measuresTimelineAnchor256,
-            contentMain1, contentMain4, contentMain16, contentMain64, contentMain256,
-            contentSecond1, contentSecond4, contentSecond16, contentSecond64, contentSecond256,
-            contentOther1, contentOther4, contentOther16, contentOther64, contentOther256
-        ];
-        for (var i = 0; i < anchors.length; i++) {
-            this.clearSingleAnchor(anchors[i], songDuration);
-        }
-        tileLevel.innerWidth = ratioDuration * songDuration * tileLevel.tapSize;
-        tileLevel.innerHeight = 128 * ratioThickness * tileLevel.tapSize;
-    };
-    MuzXBox.prototype.drawSchedule = function (song) {
-        var songDuration = scheduleDuration(song);
-        this.clearAnchorsContent(songDuration);
-        var time = 0;
-        for (var i = 0; i < song.measures.length; i++) {
-            var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-            var singlemeasuresTimelineAnchor1 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: measuresTimelineAnchor1.showZoom, hideZoom: measuresTimelineAnchor1.hideZoom, content: []
-            };
-            singlemeasuresTimelineAnchor1.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize1', text: ('1-' + (i + 1)) });
-            singlemeasuresTimelineAnchor1.content.push({ x: time * ratioDuration, y: -1, css: 'barNumber textSize1', text: '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division });
-            measuresTimelineAnchor1.content.push(singlemeasuresTimelineAnchor1);
-            var singlemeasuresTimelineAnchor4 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: measuresTimelineAnchor4.showZoom, hideZoom: measuresTimelineAnchor4.hideZoom, content: []
-            };
-            singlemeasuresTimelineAnchor4.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize4', text: ('4-' + (i + 1)) });
-            singlemeasuresTimelineAnchor4.content.push({ x: time * ratioDuration, y: -4, css: 'barNumber textSize4', text: '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division });
-            measuresTimelineAnchor4.content.push(singlemeasuresTimelineAnchor4);
-            var singlemeasuresTimelineAnchor16 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: measuresTimelineAnchor16.showZoom, hideZoom: measuresTimelineAnchor16.hideZoom, content: []
-            };
-            singlemeasuresTimelineAnchor16.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize16', text: ('16-' + (i + 1)) });
-            singlemeasuresTimelineAnchor16.content.push({ x: time * ratioDuration, y: -16, css: 'barNumber textSize16', text: '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division });
-            measuresTimelineAnchor16.content.push(singlemeasuresTimelineAnchor16);
-            var singlemeasuresTimelineAnchor64 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: measuresTimelineAnchor64.showZoom, hideZoom: measuresTimelineAnchor64.hideZoom, content: []
-            };
-            if (i % 4 == 0)
-                singlemeasuresTimelineAnchor64.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize64', text: ('64-' + (i + 1)) });
-            if (i % 4 == 0)
-                singlemeasuresTimelineAnchor64.content.push({ x: time * ratioDuration, y: -64, css: 'barNumber textSize64', text: '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division });
-            measuresTimelineAnchor64.content.push(singlemeasuresTimelineAnchor64);
-            var singlemeasuresTimelineAnchor256 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: measuresTimelineAnchor256.showZoom, hideZoom: measuresTimelineAnchor256.hideZoom, content: []
-            };
-            if (i % 16 == 0)
-                singlemeasuresTimelineAnchor256.content.push({ x: time * ratioDuration, y: 0, css: 'barNumber textSize256', text: ('256-' + (i + 1)) });
-            measuresTimelineAnchor256.content.push(singlemeasuresTimelineAnchor256);
-            var singleMasuresContentAnchor1 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: contentMain1.showZoom, hideZoom: contentMain1.hideZoom, content: []
-            };
-            var singleMasuresContentAnchor4 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: contentMain4.showZoom, hideZoom: contentMain4.hideZoom, content: []
-            };
-            var singleMasuresContentAnchor16 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: contentMain16.showZoom, hideZoom: contentMain16.hideZoom, content: []
-            };
-            var singleMasuresContentAnchor64 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: contentMain64.showZoom, hideZoom: contentMain64.hideZoom, content: []
-            };
-            var singleMasuresContentAnchor256 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: contentMain256.showZoom, hideZoom: contentMain256.hideZoom, content: []
-            };
-            contentMain1.content.push(singleMasuresContentAnchor1);
-            contentMain4.content.push(singleMasuresContentAnchor4);
-            contentMain16.content.push(singleMasuresContentAnchor16);
-            contentMain64.content.push(singleMasuresContentAnchor64);
-            contentMain256.content.push(singleMasuresContentAnchor256);
-            var singleMasuresSecondAnchor1 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: contentSecond1.showZoom, hideZoom: contentSecond1.hideZoom, content: []
-            };
-            var singleMasuresSecondAnchor4 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: contentSecond4.showZoom, hideZoom: contentSecond4.hideZoom, content: []
-            };
-            var singleMasuresSecondAnchor16 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: contentSecond16.showZoom, hideZoom: contentSecond16.hideZoom, content: []
-            };
-            var singleMasuresSecondAnchor64 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: contentSecond64.showZoom, hideZoom: contentSecond64.hideZoom, content: []
-            };
-            var singleMasuresSecondAnchor256 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: contentSecond256.showZoom, hideZoom: contentSecond256.hideZoom, content: []
-            };
-            contentSecond1.content.push(singleMasuresSecondAnchor1);
-            contentSecond4.content.push(singleMasuresSecondAnchor4);
-            contentSecond16.content.push(singleMasuresSecondAnchor16);
-            contentSecond64.content.push(singleMasuresSecondAnchor64);
-            contentSecond256.content.push(singleMasuresSecondAnchor256);
-            var singleMasuresOtherAnchor1 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: contentOther1.showZoom, hideZoom: contentOther1.hideZoom, content: []
-            };
-            var singleMasuresOtherAnchor4 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: contentOther4.showZoom, hideZoom: contentOther4.hideZoom, content: []
-            };
-            var singleMasuresOtherAnchor16 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: contentOther16.showZoom, hideZoom: contentOther16.hideZoom, content: []
-            };
-            var singleMasuresOtherAnchor64 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: contentOther64.showZoom, hideZoom: contentOther64.hideZoom, content: []
-            };
-            var singleMasuresOtherAnchor256 = {
-                xx: time * ratioDuration, yy: 0, ww: ratioDuration * measureDuration, hh: 128 * ratioThickness,
-                showZoom: contentOther256.showZoom, hideZoom: contentOther256.hideZoom, content: []
-            };
-            contentOther1.content.push(singleMasuresOtherAnchor1);
-            contentOther4.content.push(singleMasuresOtherAnchor4);
-            contentOther16.content.push(singleMasuresOtherAnchor16);
-            contentOther64.content.push(singleMasuresOtherAnchor64);
-            contentOther256.content.push(singleMasuresOtherAnchor256);
-            for (var tt = 0; tt < song.tracks.length; tt++) {
-                var track = song.tracks[tt];
-                for (var vv = 0; vv < track.voices.length; vv++) {
-                    var voice = track.voices[vv];
-                    var measure = voice.measureChords[i];
-                    for (var cc = 0; cc < measure.chords.length; cc++) {
-                        var chord = measure.chords[cc];
-                        for (var ee = 0; ee < chord.envelopes.length; ee++) {
-                            var envelope = chord.envelopes[ee];
-                            var pitchWhen = meter2seconds(song.measures[i].tempo, chord.when);
-                            for (var pp = 0; pp < envelope.pitches.length; pp++) {
-                                var pitch = envelope.pitches[pp];
-                                var slide = pitch.pitch;
-                                if (pp + 1 < envelope.pitches.length) {
-                                    slide = envelope.pitches[pp + 1].pitch;
-                                }
-                                var pitchDuration = meter2seconds(song.measures[i].tempo, pitch.duration);
-                                var startShift = 0;
-                                if (pp == 0) {
-                                    startShift = 0.5 * ratioThickness;
-                                }
-                                var endShift = 0;
-                                if (pp == envelope.pitches.length - 1) {
-                                    endShift = -0.49 * ratioThickness;
-                                }
-                                var line = {
-                                    x1: (time + pitchWhen) * ratioDuration + startShift,
-                                    x2: (time + pitchWhen + pitchDuration) * ratioDuration + endShift,
-                                    y1: (128 - pitch.pitch) * ratioThickness,
-                                    y2: (128 - slide) * ratioThickness,
-                                    css: 'debug'
-                                };
-                                if (tt == 0) {
-                                    if (vv == 0) {
-                                        line.css = 'mainLine';
-                                        singleMasuresContentAnchor1.content.push(cloneLine(line));
-                                        singleMasuresContentAnchor4.content.push(cloneLine(line));
-                                        singleMasuresContentAnchor16.content.push(cloneLine(line));
-                                        singleMasuresContentAnchor64.content.push(cloneLine(line));
-                                        singleMasuresContentAnchor256.content.push(cloneLine(line));
-                                    }
-                                    else {
-                                        line.css = 'secondLine';
-                                        singleMasuresSecondAnchor1.content.push(cloneLine(line));
-                                        singleMasuresSecondAnchor4.content.push(cloneLine(line));
-                                        singleMasuresSecondAnchor16.content.push(cloneLine(line));
-                                        singleMasuresSecondAnchor64.content.push(cloneLine(line));
-                                        singleMasuresSecondAnchor256.content.push(cloneLine(line));
-                                    }
-                                }
-                                else {
-                                    line.css = 'otherLine';
-                                    singleMasuresOtherAnchor1.content.push(cloneLine(line));
-                                    singleMasuresOtherAnchor4.content.push(cloneLine(line));
-                                    singleMasuresOtherAnchor16.content.push(cloneLine(line));
-                                    singleMasuresOtherAnchor64.content.push(cloneLine(line));
-                                }
-                                pitchWhen = pitchWhen + pitchDuration;
-                            }
-                        }
-                    }
-                }
-            }
-            time = time + measureDuration;
-        }
-        debugAnchor0.content.push(this.menuButton);
-        debugAnchor0.content.push({ x: 10, y: 10, css: 'textSize16', text: 'import' });
-        var me = this;
-        if (song.tracks.length > 0) {
-            debugAnchor0.content.push({ x: 10, y: 30, css: 'textSize16', text: song.tracks[0].title });
-        }
-        debugAnchor0.content.push({
-            x: 0, y: 20, w: 10, h: 10, rx: 3, ry: 3, css: 'debug',
-            action: function () {
-                var tt = song.tracks.shift();
-                if (tt) {
-                    song.tracks.push(tt);
-                    me.drawSchedule(song);
-                }
-            }
-        });
-        if (song.tracks.length > 0) {
-            debugAnchor0.content.push({ x: 10, y: 50, css: 'textSize16', text: song.tracks[0].voices[0].title });
-        }
-        debugAnchor0.content.push({
-            x: 0, y: 40, w: 10, h: 10, rx: 3, ry: 3, css: 'debug',
-            action: function () {
-                if (song.tracks.length > 0) {
-                    var vv = song.tracks[0].voices.shift();
-                    if (vv) {
-                        song.tracks[0].voices.push(vv);
-                        me.drawSchedule(song);
-                    }
-                }
-            }
-        });
-        tileLevel.resetModel();
+        };
+        this.zrenderer.drawSchedule(emptySchedule, this.menuButton);
     };
     MuzXBox.prototype.testChooser = function (xx, yy) {
         console.log('testChooser', xx, yy);
@@ -392,22 +55,28 @@ var MuzXBox = (function () {
                 var me = window['MZXB'];
                 console.log(me);
                 if (me) {
-                    me.drawSchedule(result);
+                    me.zrenderer.drawSchedule(result, me.menuButton);
                 }
             }
         });
     };
-    MuzXBox.prototype.testFS = function () {
+    MuzXBox.prototype.testFSmxml = function () {
         var test = new MusicXMLFileImporter();
         test.readSongData("any", function (result) {
             if (result) {
                 var me = window['MZXB'];
                 if (me) {
                     console.log(result);
-                    me.drawSchedule(result);
+                    me.zrenderer.drawSchedule(result, me.menuButton);
                 }
             }
         });
+    };
+    MuzXBox.prototype.testFS = function () {
+        var me = window['MZXB'];
+        if (me) {
+            me.testFSmidi();
+        }
     };
     return MuzXBox;
 }());
@@ -499,42 +168,6 @@ var ZInputDeviceHandler = (function () {
         console.log('down');
     };
     return ZInputDeviceHandler;
-}());
-var MuzLoader = (function () {
-    function MuzLoader() {
-    }
-    MuzLoader.prototype.createTestProject = function () {
-        var p = {
-            tracks: [
-                {
-                    patterns: [
-                        { pattern: 0, skip: { count: 0, division: 4 }, duration: { count: 1, division: 4 } },
-                        { pattern: 1, skip: { count: 6, division: 4 }, duration: { count: 1, division: 4 } },
-                        { pattern: 0, skip: { count: 0, division: 4 }, duration: { count: 1, division: 4 } },
-                        { pattern: 2, skip: { count: 6, division: 4 }, duration: { count: 1, division: 4 } }
-                    ]
-                }, {
-                    patterns: [
-                        { pattern: 3, skip: { count: 0, division: 4 }, duration: { count: 4, division: 4 } }
-                    ]
-                }, {
-                    patterns: [
-                        { pattern: 4, skip: { count: 1, division: 4 }, duration: { count: 1, division: 4 } }
-                    ]
-                }, {
-                    patterns: [
-                        { pattern: 15, skip: { count: 4, division: 4 }, duration: { count: 2, division: 4 } },
-                        { pattern: 10, skip: { count: 6, division: 4 }, duration: { count: 2, division: 4 } }
-                    ]
-                }
-            ],
-            title: 'test123',
-            tempo: 100,
-            duration: { count: 16, division: 4 }
-        };
-        return p;
-    };
-    return MuzLoader;
 }());
 console.log('tilelevel v2.17');
 var TileLevel = (function () {
@@ -1717,6 +1350,333 @@ function isLayerNormal(t) {
 function rid() {
     return 'id' + Math.floor(Math.random() * 1000000000);
 }
+var ZRender = (function () {
+    function ZRender() {
+        this.layers = [];
+        this.zoomMin = 1;
+        this.zoomNote = 4;
+        this.zoomMeasure = 16;
+        this.zoomSong = 64;
+        this.zoomFar = 256;
+        this.zoomMax = 10000;
+        this.ratioDuration = 200;
+        this.ratioThickness = 3;
+        this.sizeRatio = 2;
+        this.bindLayers();
+    }
+    ZRender.prototype.bindLayers = function () {
+        this.measureOtherVoicesLayerGroup = document.getElementById('measureOtherVoicesLayerGroup');
+        this.measureSecondVoicesLayerGroup = document.getElementById('measureSecondVoicesLayerGroup');
+        this.measureMainVoiceLayerGroup = document.getElementById('measureMainVoiceLayerGroup');
+        this.bottomTimelineLayerGroup = document.getElementById('bottomTimelineLayerGroup');
+        this.debugLayerGroup = document.getElementById('debugLayerGroup');
+        this.tileLevel = new TileLevel(document.getElementById('contentSVG'), 1000, 1000, this.zoomMin, this.zoomMin, this.zoomMax, this.layers);
+    };
+    ZRender.prototype.initUI = function () {
+        this.initDebugAnchors();
+        this.initTimelineAnchors();
+        this.initMainAnchors();
+        this.initSecondAnchors();
+        this.initOthersAnchors();
+    };
+    ZRender.prototype.initDebugAnchors = function () {
+        this.debugAnchor0 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomMax + 1, content: [] };
+        this.debugAnchor1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
+        this.debugAnchor4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
+        this.debugAnchor16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
+        this.debugAnchor64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
+        this.debugAnchor256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
+        this.layers.push({
+            g: this.debugLayerGroup, anchors: [
+                this.debugAnchor1, this.debugAnchor4, this.debugAnchor16, this.debugAnchor64, this.debugAnchor256, this.debugAnchor0
+            ]
+        });
+    };
+    ZRender.prototype.initTimelineAnchors = function () {
+        this.measuresTimelineAnchor1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
+        this.measuresTimelineAnchor4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
+        this.measuresTimelineAnchor16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
+        this.measuresTimelineAnchor64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
+        this.measuresTimelineAnchor256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
+        this.layers.push({
+            g: this.bottomTimelineLayerGroup, stickBottom: 0, anchors: [
+                this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256
+            ]
+        });
+    };
+    ZRender.prototype.initMainAnchors = function () {
+        this.contentMain1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
+        this.contentMain4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
+        this.contentMain16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
+        this.contentMain64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
+        this.contentMain256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
+        this.layers.push({
+            g: this.measureMainVoiceLayerGroup, anchors: [
+                this.contentMain1, this.contentMain4, this.contentMain16, this.contentMain64, this.contentMain256
+            ]
+        });
+    };
+    ZRender.prototype.initSecondAnchors = function () {
+        this.contentSecond1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
+        this.contentSecond4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
+        this.contentSecond16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
+        this.contentSecond64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
+        this.contentSecond256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
+        this.layers.push({
+            g: this.measureSecondVoicesLayerGroup, anchors: [
+                this.contentSecond1, this.contentSecond4, this.contentSecond16, this.contentSecond64, this.contentSecond256
+            ]
+        });
+    };
+    ZRender.prototype.initOthersAnchors = function () {
+        this.contentOther1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMin, hideZoom: this.zoomNote, content: [] };
+        this.contentOther4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomNote, hideZoom: this.zoomMeasure, content: [] };
+        this.contentOther16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomMeasure, hideZoom: this.zoomSong, content: [] };
+        this.contentOther64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomSong, hideZoom: this.zoomFar, content: [] };
+        this.contentOther256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: this.zoomFar, hideZoom: this.zoomMax + 1, content: [] };
+        this.layers.push({
+            g: this.measureOtherVoicesLayerGroup, anchors: [
+                this.contentOther1, this.contentOther4, this.contentOther16, this.contentOther64, this.contentOther256
+            ]
+        });
+    };
+    ZRender.prototype.clearSingleAnchor = function (anchor, songDuration) {
+        anchor.content.length = 0;
+        anchor.ww = this.ratioDuration * songDuration;
+        anchor.hh = 128 * this.ratioThickness;
+    };
+    ZRender.prototype.clearAnchorsContent = function (songDuration) {
+        var anchors = [
+            this.debugAnchor0, this.debugAnchor1, this.debugAnchor4, this.debugAnchor16, this.debugAnchor64, this.debugAnchor256,
+            this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256,
+            this.contentMain1, this.contentMain4, this.contentMain16, this.contentMain64, this.contentMain256,
+            this.contentSecond1, this.contentSecond4, this.contentSecond16, this.contentSecond64, this.contentSecond256,
+            this.contentOther1, this.contentOther4, this.contentOther16, this.contentOther64, this.contentOther256
+        ];
+        for (var i = 0; i < anchors.length; i++) {
+            this.clearSingleAnchor(anchors[i], songDuration);
+        }
+        this.tileLevel.innerWidth = this.ratioDuration * songDuration * this.tileLevel.tapSize;
+        this.tileLevel.innerHeight = 128 * this.ratioThickness * this.tileLevel.tapSize;
+    };
+    ZRender.prototype.drawSchedule = function (song, menuButton) {
+        var songDuration = scheduleDuration(song);
+        this.clearAnchorsContent(songDuration);
+        var time = 0;
+        for (var i = 0; i < song.measures.length; i++) {
+            var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+            var singlemeasuresTimelineAnchor1 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.measuresTimelineAnchor1.showZoom, hideZoom: this.measuresTimelineAnchor1.hideZoom, content: []
+            };
+            singlemeasuresTimelineAnchor1.content.push({ x: time * this.ratioDuration, y: 0, css: 'barNumber textSize1', text: ('1-' + (i + 1)) });
+            singlemeasuresTimelineAnchor1.content.push({ x: time * this.ratioDuration, y: -1, css: 'barNumber textSize1', text: '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division });
+            this.measuresTimelineAnchor1.content.push(singlemeasuresTimelineAnchor1);
+            var singlemeasuresTimelineAnchor4 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.measuresTimelineAnchor4.showZoom, hideZoom: this.measuresTimelineAnchor4.hideZoom, content: []
+            };
+            singlemeasuresTimelineAnchor4.content.push({ x: time * this.ratioDuration, y: 0, css: 'barNumber textSize4', text: ('4-' + (i + 1)) });
+            singlemeasuresTimelineAnchor4.content.push({ x: time * this.ratioDuration, y: -4, css: 'barNumber textSize4', text: '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division });
+            this.measuresTimelineAnchor4.content.push(singlemeasuresTimelineAnchor4);
+            var singlemeasuresTimelineAnchor16 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.measuresTimelineAnchor16.showZoom, hideZoom: this.measuresTimelineAnchor16.hideZoom, content: []
+            };
+            singlemeasuresTimelineAnchor16.content.push({ x: time * this.ratioDuration, y: 0, css: 'barNumber textSize16', text: ('16-' + (i + 1)) });
+            singlemeasuresTimelineAnchor16.content.push({ x: time * this.ratioDuration, y: -16, css: 'barNumber textSize16', text: '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division });
+            this.measuresTimelineAnchor16.content.push(singlemeasuresTimelineAnchor16);
+            var singlemeasuresTimelineAnchor64 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.measuresTimelineAnchor64.showZoom, hideZoom: this.measuresTimelineAnchor64.hideZoom, content: []
+            };
+            if (i % 4 == 0)
+                singlemeasuresTimelineAnchor64.content.push({ x: time * this.ratioDuration, y: 0, css: 'barNumber textSize64', text: ('64-' + (i + 1)) });
+            if (i % 4 == 0)
+                singlemeasuresTimelineAnchor64.content.push({ x: time * this.ratioDuration, y: -64, css: 'barNumber textSize64', text: '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division });
+            this.measuresTimelineAnchor64.content.push(singlemeasuresTimelineAnchor64);
+            var singlemeasuresTimelineAnchor256 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.measuresTimelineAnchor256.showZoom, hideZoom: this.measuresTimelineAnchor256.hideZoom, content: []
+            };
+            if (i % 16 == 0)
+                singlemeasuresTimelineAnchor256.content.push({ x: time * this.ratioDuration, y: 0, css: 'barNumber textSize256', text: ('256-' + (i + 1)) });
+            this.measuresTimelineAnchor256.content.push(singlemeasuresTimelineAnchor256);
+            var singleMasuresContentAnchor1 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.contentMain1.showZoom, hideZoom: this.contentMain1.hideZoom, content: []
+            };
+            var singleMasuresContentAnchor4 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.contentMain4.showZoom, hideZoom: this.contentMain4.hideZoom, content: []
+            };
+            var singleMasuresContentAnchor16 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.contentMain16.showZoom, hideZoom: this.contentMain16.hideZoom, content: []
+            };
+            var singleMasuresContentAnchor64 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.contentMain64.showZoom, hideZoom: this.contentMain64.hideZoom, content: []
+            };
+            var singleMasuresContentAnchor256 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.contentMain256.showZoom, hideZoom: this.contentMain256.hideZoom, content: []
+            };
+            this.contentMain1.content.push(singleMasuresContentAnchor1);
+            this.contentMain4.content.push(singleMasuresContentAnchor4);
+            this.contentMain16.content.push(singleMasuresContentAnchor16);
+            this.contentMain64.content.push(singleMasuresContentAnchor64);
+            this.contentMain256.content.push(singleMasuresContentAnchor256);
+            var singleMasuresSecondAnchor1 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.contentSecond1.showZoom, hideZoom: this.contentSecond1.hideZoom, content: []
+            };
+            var singleMasuresSecondAnchor4 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.contentSecond4.showZoom, hideZoom: this.contentSecond4.hideZoom, content: []
+            };
+            var singleMasuresSecondAnchor16 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.contentSecond16.showZoom, hideZoom: this.contentSecond16.hideZoom, content: []
+            };
+            var singleMasuresSecondAnchor64 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.contentSecond64.showZoom, hideZoom: this.contentSecond64.hideZoom, content: []
+            };
+            var singleMasuresSecondAnchor256 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.contentSecond256.showZoom, hideZoom: this.contentSecond256.hideZoom, content: []
+            };
+            this.contentSecond1.content.push(singleMasuresSecondAnchor1);
+            this.contentSecond4.content.push(singleMasuresSecondAnchor4);
+            this.contentSecond16.content.push(singleMasuresSecondAnchor16);
+            this.contentSecond64.content.push(singleMasuresSecondAnchor64);
+            this.contentSecond256.content.push(singleMasuresSecondAnchor256);
+            var singleMasuresOtherAnchor1 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.contentOther1.showZoom, hideZoom: this.contentOther1.hideZoom, content: []
+            };
+            var singleMasuresOtherAnchor4 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.contentOther4.showZoom, hideZoom: this.contentOther4.hideZoom, content: []
+            };
+            var singleMasuresOtherAnchor16 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.contentOther16.showZoom, hideZoom: this.contentOther16.hideZoom, content: []
+            };
+            var singleMasuresOtherAnchor64 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.contentOther64.showZoom, hideZoom: this.contentOther64.hideZoom, content: []
+            };
+            var singleMasuresOtherAnchor256 = {
+                xx: time * this.ratioDuration, yy: 0, ww: this.ratioDuration * measureDuration, hh: 128 * this.ratioThickness,
+                showZoom: this.contentOther256.showZoom, hideZoom: this.contentOther256.hideZoom, content: []
+            };
+            this.contentOther1.content.push(singleMasuresOtherAnchor1);
+            this.contentOther4.content.push(singleMasuresOtherAnchor4);
+            this.contentOther16.content.push(singleMasuresOtherAnchor16);
+            this.contentOther64.content.push(singleMasuresOtherAnchor64);
+            this.contentOther256.content.push(singleMasuresOtherAnchor256);
+            for (var tt = 0; tt < song.tracks.length; tt++) {
+                var track = song.tracks[tt];
+                for (var vv = 0; vv < track.voices.length; vv++) {
+                    var voice = track.voices[vv];
+                    var measure = voice.measureChords[i];
+                    for (var cc = 0; cc < measure.chords.length; cc++) {
+                        var chord = measure.chords[cc];
+                        for (var ee = 0; ee < chord.envelopes.length; ee++) {
+                            var envelope = chord.envelopes[ee];
+                            var pitchWhen = meter2seconds(song.measures[i].tempo, chord.when);
+                            for (var pp = 0; pp < envelope.pitches.length; pp++) {
+                                var pitch = envelope.pitches[pp];
+                                var slide = pitch.pitch;
+                                if (pp + 1 < envelope.pitches.length) {
+                                    slide = envelope.pitches[pp + 1].pitch;
+                                }
+                                var pitchDuration = meter2seconds(song.measures[i].tempo, pitch.duration);
+                                var startShift = 0;
+                                if (pp == 0) {
+                                    startShift = 0.5 * this.ratioThickness;
+                                }
+                                var endShift = 0;
+                                if (pp == envelope.pitches.length - 1) {
+                                    endShift = -0.49 * this.ratioThickness;
+                                }
+                                var line = {
+                                    x1: (time + pitchWhen) * this.ratioDuration + startShift,
+                                    x2: (time + pitchWhen + pitchDuration) * this.ratioDuration + endShift,
+                                    y1: (128 - pitch.pitch) * this.ratioThickness,
+                                    y2: (128 - slide) * this.ratioThickness,
+                                    css: 'debug'
+                                };
+                                if (tt == 0) {
+                                    if (vv == 0) {
+                                        line.css = 'mainLine';
+                                        singleMasuresContentAnchor1.content.push(cloneLine(line));
+                                        singleMasuresContentAnchor4.content.push(cloneLine(line));
+                                        singleMasuresContentAnchor16.content.push(cloneLine(line));
+                                        singleMasuresContentAnchor64.content.push(cloneLine(line));
+                                        singleMasuresContentAnchor256.content.push(cloneLine(line));
+                                    }
+                                    else {
+                                        line.css = 'secondLine';
+                                        singleMasuresSecondAnchor1.content.push(cloneLine(line));
+                                        singleMasuresSecondAnchor4.content.push(cloneLine(line));
+                                        singleMasuresSecondAnchor16.content.push(cloneLine(line));
+                                        singleMasuresSecondAnchor64.content.push(cloneLine(line));
+                                        singleMasuresSecondAnchor256.content.push(cloneLine(line));
+                                    }
+                                }
+                                else {
+                                    line.css = 'otherLine';
+                                    singleMasuresOtherAnchor1.content.push(cloneLine(line));
+                                    singleMasuresOtherAnchor4.content.push(cloneLine(line));
+                                    singleMasuresOtherAnchor16.content.push(cloneLine(line));
+                                    singleMasuresOtherAnchor64.content.push(cloneLine(line));
+                                }
+                                pitchWhen = pitchWhen + pitchDuration;
+                            }
+                        }
+                    }
+                }
+            }
+            time = time + measureDuration;
+        }
+        this.debugAnchor0.content.push(menuButton);
+        this.debugAnchor0.content.push({ x: 10, y: 10, css: 'textSize16', text: 'import' });
+        var me = this;
+        if (song.tracks.length > 0) {
+            this.debugAnchor0.content.push({ x: 10, y: 30, css: 'textSize16', text: song.tracks[0].title });
+        }
+        this.debugAnchor0.content.push({
+            x: 0, y: 20, w: 10, h: 10, rx: 3, ry: 3, css: 'debug',
+            action: function () {
+                var tt = song.tracks.shift();
+                if (tt) {
+                    song.tracks.push(tt);
+                    me.drawSchedule(song, menuButton);
+                }
+            }
+        });
+        if (song.tracks.length > 0) {
+            this.debugAnchor0.content.push({ x: 10, y: 50, css: 'textSize16', text: song.tracks[0].voices[0].title });
+        }
+        this.debugAnchor0.content.push({
+            x: 0, y: 40, w: 10, h: 10, rx: 3, ry: 3, css: 'debug',
+            action: function () {
+                if (song.tracks.length > 0) {
+                    var vv = song.tracks[0].voices.shift();
+                    if (vv) {
+                        song.tracks[0].voices.push(vv);
+                        me.drawSchedule(song, menuButton);
+                    }
+                }
+            }
+        });
+        this.tileLevel.resetModel();
+    };
+    return ZRender;
+}());
 function progressionDuration(progression) {
     var duration = { count: 0, division: 1 };
     for (var i = 0; i < progression.length; i++) {

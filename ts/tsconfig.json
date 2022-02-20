@@ -25,7 +25,7 @@
 	,"files": [
 		"main.ts"
 		,"input.ts"
-		,"loader.ts"
+		//,"loader.ts"
 		,"tilelevel/tilelevel.ts"
 		,"tilelevel/tilelevelutil.ts"
 		,"tilelevel/tilepolygon.ts"
@@ -34,8 +34,9 @@
 		,"tilelevel/tileline.ts"
 		,"tilelevel/tiletext.ts"
 		,"tilelevel/shortnames.ts"
+		,"renderer/ZRender.ts"
 
-		,"muzxboxproject.ts"
+		//,"muzxboxproject.ts"
 
 		,"zvoogutil.ts"
 		,"plugins/zvoogstore.ts"
@@ -74,5 +75,6 @@
 		,"plugins/storages/MIDIFileImporter.ts"
 		,"plugins/storages/MusicXMLFileImporter.ts"
 		,"treevalue.ts"
+		
 	]
 }

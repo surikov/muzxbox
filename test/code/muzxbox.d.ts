@@ -1,55 +1,16 @@
-declare let debugAnchor0: TileAnchor;
-declare let debugAnchor1: TileAnchor;
-declare let debugAnchor4: TileAnchor;
-declare let debugAnchor16: TileAnchor;
-declare let debugAnchor64: TileAnchor;
-declare let debugAnchor256: TileAnchor;
-declare let measuresTimelineAnchor1: TileAnchor;
-declare let measuresTimelineAnchor4: TileAnchor;
-declare let measuresTimelineAnchor16: TileAnchor;
-declare let measuresTimelineAnchor64: TileAnchor;
-declare let measuresTimelineAnchor256: TileAnchor;
-declare let contentMain1: TileAnchor;
-declare let contentMain4: TileAnchor;
-declare let contentMain16: TileAnchor;
-declare let contentMain64: TileAnchor;
-declare let contentMain256: TileAnchor;
-declare let contentSecond1: TileAnchor;
-declare let contentSecond4: TileAnchor;
-declare let contentSecond16: TileAnchor;
-declare let contentSecond64: TileAnchor;
-declare let contentSecond256: TileAnchor;
-declare let contentOther1: TileAnchor;
-declare let contentOther4: TileAnchor;
-declare let contentOther16: TileAnchor;
-declare let contentOther64: TileAnchor;
-declare let contentOther256: TileAnchor;
-declare let tileLevel: TileLevel;
-declare let ratioDuration: number;
-declare let ratioThickness: number;
-declare let sizeRatio: number;
 declare let midiDrumPitchShift: number;
 declare class MuzXBox {
+    zrenderer: ZRender;
     zInputDeviceHandler: ZInputDeviceHandler;
-    muzLoader: MuzLoader;
-    zoomMin: number;
-    zoomNote: number;
-    zoomMeasure: number;
-    zoomSong: number;
-    zoomFar: number;
-    zoomMax: number;
     menuButton: TileRectangle;
     constructor();
     initAll(): void;
     createUI(): void;
-    resetSong(testProject: MuzXBoxProject): void;
-    clearSingleAnchor(anchor: TileAnchor, songDuration: number): void;
-    clearAnchorsContent(songDuration: number): void;
-    drawSchedule(song: ZvoogSchedule): void;
     testChooser(xx: number, yy: any): void;
     openMenu(): void;
     closeMenu(): void;
     testFSmidi(): void;
+    testFSmxml(): void;
     testFS(): void;
 }
 declare class ZInputDeviceHandler {
@@ -65,9 +26,6 @@ declare class ZInputDeviceHandler {
     processArrowRight(): void;
     processArrowUp(): void;
     processArrowDown(): void;
-}
-declare class MuzLoader {
-    createTestProject(): MuzXBoxProject;
 }
 declare class TileLevel {
     svg: SVGElement;
@@ -299,20 +257,61 @@ declare function isTileRectangle(t: TileItem): t is TileRectangle;
 declare function isTileGroup(t: TileItem): t is TileAnchor;
 declare function isLayerNormal(t: TileLayerDefinition): t is TileModelLayer;
 declare function rid(): string;
-declare type MuzXBoxPattern = {
-    skip: ZvoogMeter;
-    duration: ZvoogMeter;
-    pattern: number;
-};
-declare type MuzXBoxTrack = {
-    patterns: MuzXBoxPattern[];
-};
-declare type MuzXBoxProject = {
-    tracks: MuzXBoxTrack[];
-    title: string;
-    tempo: number;
-    duration: ZvoogMeter;
-};
+declare class ZRender {
+    tileLevel: TileLevel;
+    layers: TileLayerDefinition[];
+    zoomMin: number;
+    zoomNote: number;
+    zoomMeasure: number;
+    zoomSong: number;
+    zoomFar: number;
+    zoomMax: number;
+    ratioDuration: number;
+    ratioThickness: number;
+    sizeRatio: number;
+    measureOtherVoicesLayerGroup: SVGElement;
+    measureSecondVoicesLayerGroup: SVGElement;
+    measureMainVoiceLayerGroup: SVGElement;
+    bottomTimelineLayerGroup: SVGElement;
+    debugLayerGroup: SVGElement;
+    debugAnchor0: TileAnchor;
+    debugAnchor1: TileAnchor;
+    debugAnchor4: TileAnchor;
+    debugAnchor16: TileAnchor;
+    debugAnchor64: TileAnchor;
+    debugAnchor256: TileAnchor;
+    measuresTimelineAnchor1: TileAnchor;
+    measuresTimelineAnchor4: TileAnchor;
+    measuresTimelineAnchor16: TileAnchor;
+    measuresTimelineAnchor64: TileAnchor;
+    measuresTimelineAnchor256: TileAnchor;
+    contentMain1: TileAnchor;
+    contentMain4: TileAnchor;
+    contentMain16: TileAnchor;
+    contentMain64: TileAnchor;
+    contentMain256: TileAnchor;
+    contentSecond1: TileAnchor;
+    contentSecond4: TileAnchor;
+    contentSecond16: TileAnchor;
+    contentSecond64: TileAnchor;
+    contentSecond256: TileAnchor;
+    contentOther1: TileAnchor;
+    contentOther4: TileAnchor;
+    contentOther16: TileAnchor;
+    contentOther64: TileAnchor;
+    contentOther256: TileAnchor;
+    constructor();
+    bindLayers(): void;
+    initUI(): void;
+    initDebugAnchors(): void;
+    initTimelineAnchors(): void;
+    initMainAnchors(): void;
+    initSecondAnchors(): void;
+    initOthersAnchors(): void;
+    clearSingleAnchor(anchor: TileAnchor, songDuration: number): void;
+    clearAnchorsContent(songDuration: number): void;
+    drawSchedule(song: ZvoogSchedule, menuButton: TileRectangle): void;
+}
 declare function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter;
 declare function adjustPartLeadPad(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
 declare function adjustPartBass(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
