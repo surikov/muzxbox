@@ -277,7 +277,12 @@ class ZRender {
                 var track = song.tracks[tt];
                 for (var vv = 0; vv < track.voices.length; vv++) {
                     var voice: ZvoogVoice = track.voices[vv];
-                    this.addVoice(song, voice, i, time, tt, vv);
+                    this.addVoice(song, voice, i, time, tt, vv
+                        ,singleMasuresContentAnchor1,singleMasuresContentAnchor4,singleMasuresContentAnchor16,singleMasuresContentAnchor64,singleMasuresContentAnchor256
+                        ,singleMasuresSecondAnchor1,singleMasuresSecondAnchor4,singleMasuresSecondAnchor16,singleMasuresSecondAnchor64,singleMasuresSecondAnchor256
+                        ,singleMasuresOtherAnchor1,singleMasuresOtherAnchor4,singleMasuresOtherAnchor16,singleMasuresOtherAnchor64,singleMasuresOtherAnchor256
+       
+                        );
                 }
             }
             time = time + measureDuration;
@@ -285,7 +290,12 @@ class ZRender {
         this.addDebugButtons(song, menuButton);
         this.tileLevel.resetModel();
     }
-    addVoice(song: ZvoogSchedule, voice: ZvoogVoice, i: number, time: number, tt: number, vv: number) {
+    addVoice(song: ZvoogSchedule, voice: ZvoogVoice, i: number, time: number, tt: number, vv: number
+        ,singleMasuresContentAnchor1,singleMasuresContentAnchor4,singleMasuresContentAnchor16,singleMasuresContentAnchor64,singleMasuresContentAnchor256
+        ,singleMasuresSecondAnchor1,singleMasuresSecondAnchor4,singleMasuresSecondAnchor16,singleMasuresSecondAnchor64,singleMasuresSecondAnchor256
+        ,singleMasuresOtherAnchor1,singleMasuresOtherAnchor4,singleMasuresOtherAnchor16,singleMasuresOtherAnchor64,singleMasuresOtherAnchor256
+        
+        ) {
         var measure = voice.measureChords[i];
         for (var cc = 0; cc < measure.chords.length; cc++) {
             var chord = measure.chords[cc];
@@ -298,7 +308,6 @@ class ZRender {
                     if (pp + 1 < envelope.pitches.length) {
                         slide = envelope.pitches[pp + 1].pitch;
                     }
-
                     var pitchDuration = meter2seconds(song.measures[i].tempo, pitch.duration);
                     var startShift = 0;
                     if (pp == 0) {
