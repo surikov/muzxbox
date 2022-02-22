@@ -188,6 +188,7 @@ declare type TileAnchor = {
     hideZoom: number;
     content: TileItem[];
 } & TileBaseDefinition;
+declare function TAnchor(xx: number, yy: number, ww: number, hh: number, showZoom: number, hideZoom: number): TileAnchor;
 declare type TileRectangle = {
     x: number;
     y: number;
@@ -201,6 +202,7 @@ declare type TileText = {
     y: number;
     text: string;
 } & TileBaseDefinition;
+declare function TText(x: number, y: number, css: string, text: string): TileText;
 declare type TilePath = {
     x?: number;
     y?: number;
@@ -264,6 +266,7 @@ declare class ZRender {
     zoomMeasure: number;
     zoomSong: number;
     zoomFar: number;
+    zoomBig: number;
     zoomMax: number;
     ratioDuration: number;
     ratioThickness: number;
@@ -309,8 +312,13 @@ declare class ZRender {
     initOthersAnchors(): void;
     clearSingleAnchor(anchor: TileAnchor, songDuration: number): void;
     clearAnchorsContent(songDuration: number): void;
+    fillTimeLine1(song: ZvoogSchedule): void;
+    fillTimeLine4(song: ZvoogSchedule): void;
+    fillTimeLine16(song: ZvoogSchedule): void;
+    fillTimeLine64(song: ZvoogSchedule): void;
+    fillTimeLine256(song: ZvoogSchedule): void;
     drawSchedule(song: ZvoogSchedule, menuButton: TileRectangle): void;
-    addVoice(song: ZvoogSchedule, voice: ZvoogVoice, i: number, time: number, tt: number, vv: number, singleMasuresContentAnchor1: any, singleMasuresContentAnchor4: any, singleMasuresContentAnchor16: any, singleMasuresContentAnchor64: any, singleMasuresContentAnchor256: any, singleMasuresSecondAnchor1: any, singleMasuresSecondAnchor4: any, singleMasuresSecondAnchor16: any, singleMasuresSecondAnchor64: any, singleMasuresSecondAnchor256: any, singleMasuresOtherAnchor1: any, singleMasuresOtherAnchor4: any, singleMasuresOtherAnchor16: any, singleMasuresOtherAnchor64: any, singleMasuresOtherAnchor256: any): void;
+    addVoiceMeasure(song: ZvoogSchedule, voice: ZvoogVoice, i: number, time: number, css: string, anchors: TileAnchor[]): void;
     addDebugButtons(song: ZvoogSchedule, menuButton: TileRectangle): void;
 }
 declare function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter;

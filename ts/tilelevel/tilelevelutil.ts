@@ -79,7 +79,9 @@ type TileAnchor = {
 	, hideZoom: number
 	, content: TileItem[]
 } & TileBaseDefinition;
-
+function TAnchor(xx: number, yy: number, ww: number, hh: number, showZoom: number, hideZoom: number): TileAnchor {
+	return { xx: xx, yy: yy, ww: ww, hh: hh, showZoom: showZoom, hideZoom: hideZoom, content: [] };
+}
 
 type TileRectangle = {
 	x: number
@@ -89,12 +91,18 @@ type TileRectangle = {
 	, rx?: number
 	, ry?: number
 } & TileBaseDefinition;
+/*function TRectangle(x: number, y: number, w: number, h: number, rx?: number, ry?: number, id?: string, css?: string, dragX?: boolean, dragY?: boolean, action?: (x: number, y: number) => void | undefined): TileRectangle {
+	return { x: x, y: y, w: w, h: h, rx: rx, ry: ry, id: id, css: css, dragX: dragX, dragY: dragY, action: action };
+}*/
 
 type TileText = {
 	x: number
 	, y: number
 	, text: string
 } & TileBaseDefinition;
+function TText(x: number, y: number, css: string, text: string): TileText {
+	return { x: x, y: y, text: text, css: css,  };
+}
 
 type TilePath = {
 	x?: number
@@ -102,6 +110,9 @@ type TilePath = {
 	, scale?: number
 	, points: string//path definition
 } & TileBaseDefinition;
+/*function TPath(x: number, y: number,scale: number, points: string, id?: string, css?: string, dragX?: boolean, dragY?: boolean, action?: (x: number, y: number) => void | undefined): TilePath {
+	return { x: x, y: y, scale: scale, points: points, id: id, css: css, dragX: dragX, dragY: dragY, action: action };
+}*/
 
 type TileLine = {
 	x1: number
