@@ -75,6 +75,7 @@
 		,"plugins/storages/MIDIFileImporter.ts"
 		,"plugins/storages/MusicXMLFileImporter.ts"
 		,"treevalue.ts"
+		,"menu.ts"
 		
 	]
 }

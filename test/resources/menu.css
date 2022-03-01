@@ -1,4 +1,4 @@
-.mainmenu {
+.aaaaaaaaaaaaaamainmenu {
 	height: 100%;
 	width: 0cm;
 	position: fixed;
@@ -14,7 +14,7 @@
 	font-size: 0.75cm;
 }
 
-.menubuttonRow {
+.aaaaaaaaaaaaaaamenubuttonRow {
 	margin: 0;
 	padding-top: 0.1cm;
 	font-size: 75%;
@@ -22,11 +22,60 @@
 	overflow: hidden;
 	white-space: nowrap;
 }
-.menucontent {
+.aaaaaaaaaaaaaaaamenucontent {
 	overflow-x: hidden;
 	overflow-y: scroll;
 	background-color: #ccccff;
 	box-shadow: 0px 0px 0.93cm #000000;
 	height:100%;
 	width:7cm;
+}
+
+#menuButtonDiv{
+	z-index: 2;
+	top: 0;
+	right: 0;
+	margin: 0px;
+	padding: 0px;
+	position: fixed;
+}
+#menuButtonImage{
+	width:1cm;
+	height:1cm;
+	margin: 0px;
+	padding: 0px;
+}
+.menuPane{
+	height: 100%;
+	width: 0cm;
+	position: fixed;
+	z-index: 2;
+	top: 0;
+	right: 0;
+	background-color: var(--background_color);
+	transition: 0.25s;
+	margin: 0px;
+	padding: 0px;
+	font-size: 0.75cm;
+	box-shadow: 0px 0px 0.93cm #000000;
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+.menuHead{
+	background-color: #ff9966;
+	position: fixed;
+	height:1cm;
+	width: 100%;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+.menuContent{
+	margin-top: 1.5cm;
+}
+.menuRow{
+	border-bottom: solid;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
 }

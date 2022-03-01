@@ -2,18 +2,18 @@ declare let midiDrumPitchShift: number;
 declare class MuzXBox {
     zrenderer: ZRender;
     zInputDeviceHandler: ZInputDeviceHandler;
+    zMainMenu: ZMainMenu;
     menuButton: TileRectangle;
     constructor();
     initAll(): void;
     createUI(): void;
-    openMenu(): void;
-    closeMenu(): void;
     testFSmidi(): void;
     testFSmxml(): void;
     testFS(): void;
 }
 declare class ZInputDeviceHandler {
-    constructor();
+    muzXBox: MuzXBox;
+    constructor(from: MuzXBox);
     processKeyboardEvent(keyboardEvent: KeyboardEvent): void;
     processKeyX(): void;
     processKeyY(): void;
@@ -971,4 +971,22 @@ declare class TreeValue {
     seek(name: string, subname: string, subvalue: string): TreeValue;
     readDocChildren(node: any): TreeValue[];
     fill(document: Document): void;
+}
+declare class ZMainMenu {
+    muzXBox: MuzXBox;
+    level1: CSSStyleDeclaration;
+    level2: CSSStyleDeclaration;
+    level3: CSSStyleDeclaration;
+    level4: CSSStyleDeclaration;
+    level5: CSSStyleDeclaration;
+    currentLevel: number;
+    constructor(from: MuzXBox);
+    openNextLevel(): void;
+    backPreLevel(): void;
+    hideMenu(): void;
+    open_1_level(): void;
+    open_2_level(): void;
+    open_3_level(): void;
+    open_4_level(): void;
+    open_5_level(): void;
 }

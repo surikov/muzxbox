@@ -1,7 +1,9 @@
 console.log('MuzXBox v1.01');
 class ZInputDeviceHandler {
-	constructor() {
+	muzXBox: MuzXBox;
+	constructor(from: MuzXBox) {
 		let me = this;
+		this.muzXBox = from;
 		window.addEventListener("keydown", function (keyboardEvent: KeyboardEvent) {
 			me.processKeyboardEvent(keyboardEvent);
 		});
@@ -62,12 +64,15 @@ class ZInputDeviceHandler {
 	}
 	processKeyY() {
 		console.log('KeyY');
+		this.muzXBox.zMainMenu.openNextLevel();
 	}
 	processKeyA() {
 		console.log('KeyA');
+		this.muzXBox.zMainMenu.openNextLevel();
 	}
 	processKeyB() {
 		console.log('KeyB');
+		this.muzXBox.zMainMenu.backPreLevel();
 	}
 	processAnyPlus() {
 		console.log('+');

@@ -5,6 +5,7 @@ let midiDrumPitchShift = 23;
 class MuzXBox {
 	zrenderer: ZRender;
 	zInputDeviceHandler: ZInputDeviceHandler;
+	zMainMenu: ZMainMenu;
 	menuButton: TileRectangle = {
 		x: 0
 		, y: 0
@@ -21,9 +22,10 @@ class MuzXBox {
 	}
 	initAll() {
 		console.log('initAll');
-		let me = this;
+		//let me = this;
 		this.zrenderer = new ZRender();
-		this.zInputDeviceHandler = new ZInputDeviceHandler();
+		this.zInputDeviceHandler = new ZInputDeviceHandler(this);
+		this.zMainMenu = new ZMainMenu(this);
 		this.zrenderer.bindLayers();
 		this.zrenderer.initUI();
 		this.createUI();
@@ -41,13 +43,13 @@ class MuzXBox {
 		};
 		this.zrenderer.drawSchedule(emptySchedule, this.menuButton);
 	}
-	openMenu() {
+	/*openMenu() {
 		(document.getElementById('menuContentDiv') as any).style.visibility = 'visible';
 		(document.getElementById('menuDiv1') as any).style.width = '100%';
 	}
 	closeMenu() {
 		(document.getElementById('menuDiv1') as any).style.width = '0%';
-	}
+	}*/
 	testFSmidi() {
 		let test: ZvoogStore = new MIDIFileImporter();
 		test.readSongData("any", function (result: ZvoogSchedule | null): void {

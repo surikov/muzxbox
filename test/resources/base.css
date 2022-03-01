@@ -1,3 +1,6 @@
+::-webkit-scrollbar {
+	display: none;
+  }
 html {
 	width: 100%;
 	height: 100%;
@@ -21,7 +24,14 @@ a {
 	color: var(--main-color);
 	text-decoration: none;
 }
-
+button{
+	background: transparent;
+    border: none !important;
+    font-size:0;
+	margin: 0px;
+	padding: 0px;
+	outline:none;
+}
 .contentSVG {
 	width: 100%;
 	height: 100%;

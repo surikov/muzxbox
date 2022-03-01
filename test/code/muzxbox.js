@@ -18,9 +18,9 @@ var MuzXBox = (function () {
     }
     MuzXBox.prototype.initAll = function () {
         console.log('initAll');
-        var me = this;
         this.zrenderer = new ZRender();
-        this.zInputDeviceHandler = new ZInputDeviceHandler();
+        this.zInputDeviceHandler = new ZInputDeviceHandler(this);
+        this.zMainMenu = new ZMainMenu(this);
         this.zrenderer.bindLayers();
         this.zrenderer.initUI();
         this.createUI();
@@ -37,13 +37,6 @@ var MuzXBox = (function () {
             }
         };
         this.zrenderer.drawSchedule(emptySchedule, this.menuButton);
-    };
-    MuzXBox.prototype.openMenu = function () {
-        document.getElementById('menuContentDiv').style.visibility = 'visible';
-        document.getElementById('menuDiv1').style.width = '100%';
-    };
-    MuzXBox.prototype.closeMenu = function () {
-        document.getElementById('menuDiv1').style.width = '0%';
     };
     MuzXBox.prototype.testFSmidi = function () {
         var test = new MIDIFileImporter();
@@ -80,8 +73,9 @@ var MuzXBox = (function () {
 window['MZXB'] = new MuzXBox();
 console.log('MuzXBox v1.01');
 var ZInputDeviceHandler = (function () {
-    function ZInputDeviceHandler() {
+    function ZInputDeviceHandler(from) {
         var me = this;
+        this.muzXBox = from;
         window.addEventListener("keydown", function (keyboardEvent) {
             me.processKeyboardEvent(keyboardEvent);
         });
@@ -139,12 +133,15 @@ var ZInputDeviceHandler = (function () {
     };
     ZInputDeviceHandler.prototype.processKeyY = function () {
         console.log('KeyY');
+        this.muzXBox.zMainMenu.openNextLevel();
     };
     ZInputDeviceHandler.prototype.processKeyA = function () {
         console.log('KeyA');
+        this.muzXBox.zMainMenu.openNextLevel();
     };
     ZInputDeviceHandler.prototype.processKeyB = function () {
         console.log('KeyB');
+        this.muzXBox.zMainMenu.backPreLevel();
     };
     ZInputDeviceHandler.prototype.processAnyPlus = function () {
         console.log('+');
@@ -4180,5 +4177,113 @@ var TreeValue = (function () {
         }
     };
     return TreeValue;
+}());
+var ZMainMenu = (function () {
+    function ZMainMenu(from) {
+        this.currentLevel = 0;
+        this.muzXBox = from;
+        var el = document.getElementById('menuPaneDiv1');
+        if (el) {
+            this.level1 = el.style;
+        }
+        el = document.getElementById('menuPaneDiv2');
+        if (el) {
+            this.level2 = el.style;
+        }
+        el = document.getElementById('menuPaneDiv3');
+        if (el) {
+            this.level3 = el.style;
+        }
+        el = document.getElementById('menuPaneDiv4');
+        if (el) {
+            this.level4 = el.style;
+        }
+        el = document.getElementById('menuPaneDiv5');
+        if (el) {
+            this.level5 = el.style;
+        }
+    }
+    ZMainMenu.prototype.openNextLevel = function () {
+        if (this.currentLevel == 0) {
+            this.open_1_level();
+            this.currentLevel++;
+            return;
+        }
+        if (this.currentLevel == 1) {
+            this.open_2_level();
+            this.currentLevel++;
+            return;
+        }
+        if (this.currentLevel == 2) {
+            this.open_3_level();
+            this.currentLevel++;
+            return;
+        }
+        if (this.currentLevel == 3) {
+            this.open_4_level();
+            this.currentLevel++;
+            return;
+        }
+        if (this.currentLevel == 4) {
+            this.open_5_level();
+            this.currentLevel++;
+            return;
+        }
+    };
+    ZMainMenu.prototype.backPreLevel = function () {
+        if (this.currentLevel == 1) {
+            this.level1.width = '0cm';
+            this.currentLevel--;
+            return;
+        }
+        if (this.currentLevel == 2) {
+            this.level2.width = '0cm';
+            this.currentLevel--;
+            return;
+        }
+        if (this.currentLevel == 3) {
+            this.level3.width = '0cm';
+            this.currentLevel--;
+            return;
+        }
+        if (this.currentLevel == 4) {
+            this.level4.width = '0cm';
+            this.currentLevel--;
+            return;
+        }
+        if (this.currentLevel == 5) {
+            this.level5.width = '0cm';
+            this.currentLevel--;
+            return;
+        }
+    };
+    ZMainMenu.prototype.hideMenu = function () {
+        this.level1.width = '0cm';
+        this.level2.width = '0cm';
+        this.level3.width = '0cm';
+        this.level4.width = '0cm';
+        this.level5.width = '0cm';
+    };
+    ZMainMenu.prototype.open_1_level = function () {
+        console.log('open_1_level');
+        this.level1.width = '5cm';
+    };
+    ZMainMenu.prototype.open_2_level = function () {
+        console.log('open_2_level');
+        this.level2.width = '4.5cm';
+    };
+    ZMainMenu.prototype.open_3_level = function () {
+        console.log('open_3_level');
+        this.level3.width = '4.0cm';
+    };
+    ZMainMenu.prototype.open_4_level = function () {
+        console.log('open_4_level');
+        this.level4.width = '3.5cm';
+    };
+    ZMainMenu.prototype.open_5_level = function () {
+        console.log('open_5_level');
+        this.level5.width = '3.0cm';
+    };
+    return ZMainMenu;
 }());
 //# sourceMappingURL=muzxbox.js.map
