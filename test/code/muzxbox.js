@@ -4621,6 +4621,17 @@ var MuzXBox = (function () {
         this.zrenderer = new ZRender();
         this.zInputDeviceHandler = new ZInputDeviceHandler(this);
         this.zMainMenu = new ZMainMenu(this);
+        this.zMainMenu.menuRoot.items.push({
+            label: 'import midi',
+            action: function () {
+                var me = window['MZXB'];
+                if (me) {
+                    me.testFSmidi();
+                }
+            },
+            autoclose: true,
+            icon: ''
+        });
         this.zrenderer.bindLayers();
         this.zrenderer.initUI();
         this.createUI();

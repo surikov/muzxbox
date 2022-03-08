@@ -25,10 +25,21 @@ class MuzXBox {
 	initAll() {
 		console.log('initAll');
 		//let me = this;
-		
+
 		this.zrenderer = new ZRender();
 		this.zInputDeviceHandler = new ZInputDeviceHandler(this);
 		this.zMainMenu = new ZMainMenu(this);
+		this.zMainMenu.menuRoot.items.push({
+			label: 'import midi'
+			, action: () => {
+				var me: MuzXBox = window['MZXB'] as MuzXBox;
+				if (me) {
+					me.testFSmidi();
+				}
+			}
+			, autoclose: true
+			, icon: ''
+		});
 		this.zrenderer.bindLayers();
 		this.zrenderer.initUI();
 		this.createUI();
