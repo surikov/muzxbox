@@ -23,8 +23,8 @@
         ]
 	}
 	,"files": [
-		"main.ts"
-		,"input.ts"
+		
+		"input.ts"
 		//,"loader.ts"
 		,"tilelevel/tilelevel.ts"
 		,"tilelevel/tilelevelutil.ts"
@@ -35,6 +35,7 @@
 		,"tilelevel/tiletext.ts"
 		,"tilelevel/shortnames.ts"
 		,"renderer/ZRender.ts"
+		,"renderer/usersetting.ts"
 
 		//,"muzxboxproject.ts"
 
@@ -77,5 +78,6 @@
 		,"treevalue.ts"
 		,"menu.ts"
 		
+		,"main.ts"
 	]
 }

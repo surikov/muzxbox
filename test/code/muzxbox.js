@@ -1,77 +1,5 @@
 "use strict";
 console.log('MuzXBox v1.01');
-var midiDrumPitchShift = 23;
-var MuzXBox = (function () {
-    function MuzXBox() {
-        this.menuButton = {
-            x: 0,
-            y: 0,
-            w: 10,
-            h: 10,
-            rx: 3,
-            ry: 3,
-            css: 'debug',
-            action: this.testFS,
-            id: 'menuButtonTest1'
-        };
-        console.log('start');
-    }
-    MuzXBox.prototype.initAll = function () {
-        console.log('initAll');
-        this.zrenderer = new ZRender();
-        this.zInputDeviceHandler = new ZInputDeviceHandler(this);
-        this.zMainMenu = new ZMainMenu(this);
-        this.zrenderer.bindLayers();
-        this.zrenderer.initUI();
-        this.createUI();
-    };
-    MuzXBox.prototype.createUI = function () {
-        var emptySchedule = {
-            title: 'Empty project', tracks: [],
-            filters: [],
-            measures: [],
-            harmony: {
-                tone: '',
-                mode: '',
-                progression: []
-            }
-        };
-        this.zrenderer.drawSchedule(emptySchedule, this.menuButton);
-    };
-    MuzXBox.prototype.testFSmidi = function () {
-        var test = new MIDIFileImporter();
-        test.readSongData("any", function (result) {
-            if (result) {
-                var me = window['MZXB'];
-                console.log(me);
-                if (me) {
-                    me.zrenderer.drawSchedule(result, me.menuButton);
-                }
-            }
-        });
-    };
-    MuzXBox.prototype.testFSmxml = function () {
-        var test = new MusicXMLFileImporter();
-        test.readSongData("any", function (result) {
-            if (result) {
-                var me = window['MZXB'];
-                if (me) {
-                    console.log(result);
-                    me.zrenderer.drawSchedule(result, me.menuButton);
-                }
-            }
-        });
-    };
-    MuzXBox.prototype.testFS = function () {
-        var me = window['MZXB'];
-        if (me) {
-            me.testFSmidi();
-        }
-    };
-    return MuzXBox;
-}());
-window['MZXB'] = new MuzXBox();
-console.log('MuzXBox v1.01');
 var ZInputDeviceHandler = (function () {
     function ZInputDeviceHandler(from) {
         var me = this;
@@ -1665,6 +1593,29 @@ var ZRender = (function () {
         });
     };
     return ZRender;
+}());
+var ZUserSetting = (function () {
+    function ZUserSetting() {
+        this.mode = "";
+        this.texts = [];
+        this.fillModeValues();
+    }
+    ZUserSetting.prototype.fillModeValues = function () {
+        this.texts.push({ mode: 'ru', id: 'testText', txt: 'rutest' });
+        this.texts.push({ mode: 'en', id: 'testText', txt: 'entest' });
+    };
+    ZUserSetting.prototype.selectMode = function (mode) {
+        this.mode = mode;
+    };
+    ZUserSetting.prototype.txt = function (id) {
+        for (var i = 0; i < this.texts.length; i++) {
+            if (this.texts[i].mode == this.mode && this.texts[i].id == id) {
+                return this.texts[i].txt;
+            }
+        }
+        return this.mode + "?" + id;
+    };
+    return ZUserSetting;
 }());
 function progressionDuration(progression) {
     var duration = { count: 0, division: 1 };
@@ -4180,29 +4131,250 @@ var TreeValue = (function () {
 }());
 var ZMainMenu = (function () {
     function ZMainMenu(from) {
+        this.selection1level = 0;
+        this.selection2level = 0;
+        this.selection3level = 0;
+        this.selection4level = 0;
+        this.selection5level = 0;
         this.currentLevel = 0;
         this.muzXBox = from;
         var el = document.getElementById('menuPaneDiv1');
         if (el) {
-            this.level1 = el.style;
+            this.level1style = el.style;
         }
         el = document.getElementById('menuPaneDiv2');
         if (el) {
-            this.level2 = el.style;
+            this.level2style = el.style;
         }
         el = document.getElementById('menuPaneDiv3');
         if (el) {
-            this.level3 = el.style;
+            this.level3style = el.style;
         }
         el = document.getElementById('menuPaneDiv4');
         if (el) {
-            this.level4 = el.style;
+            this.level4style = el.style;
         }
         el = document.getElementById('menuPaneDiv5');
         if (el) {
-            this.level5 = el.style;
+            this.level5style = el.style;
         }
+        el = document.getElementById('menu1textHead');
+        if (el) {
+            this.menu1textHead = el;
+        }
+        el = document.getElementById('menu2textHead');
+        if (el) {
+            this.menu2textHead = el;
+        }
+        el = document.getElementById('menu3textHead');
+        if (el) {
+            this.menu3textHead = el;
+        }
+        el = document.getElementById('menu4textHead');
+        if (el) {
+            this.menu4textHead = el;
+        }
+        el = document.getElementById('menu5textHead');
+        if (el) {
+            this.menu5textHead = el;
+        }
+        el = document.getElementById('menu1content');
+        if (el) {
+            this.menu1content = el;
+        }
+        el = document.getElementById('menu2content');
+        if (el) {
+            this.menu2content = el;
+        }
+        el = document.getElementById('menu3content');
+        if (el) {
+            this.menu3content = el;
+        }
+        el = document.getElementById('menu4content');
+        if (el) {
+            this.menu4content = el;
+        }
+        el = document.getElementById('menu5content');
+        if (el) {
+            this.menu5content = el;
+        }
+        this.fillStaticMenu();
     }
+    ZMainMenu.prototype.fillStaticMenu = function () {
+        this.menuRoot = {
+            path: 'Menu',
+            icon: '',
+            folders: [
+                {
+                    path: 'first-1', icon: '',
+                    folders: [
+                        {
+                            path: 'second-1', icon: '',
+                            folders: [
+                                {
+                                    path: 'third-1', icon: '',
+                                    folders: [
+                                        {
+                                            path: 'forth-1', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
+                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
+                                        }, {
+                                            path: 'forth-2', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
+                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
+                                        }
+                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
+                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
+                                }, {
+                                    path: 'third-2', icon: '',
+                                    folders: [
+                                        {
+                                            path: 'forth-3', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
+                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
+                                        }, {
+                                            path: 'forth-4', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
+                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
+                                        }
+                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
+                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
+                                }
+                            ], items: [{ label: 'it3-3', autoclose: true, icon: '', action: function () { console.log('it3-3'); } },
+                                { label: 'it3-4', autoclose: true, icon: '', action: function () { console.log('it3-4'); } }]
+                        }, {
+                            path: 'second-2', icon: '',
+                            folders: [
+                                {
+                                    path: 'third-3', icon: '',
+                                    folders: [
+                                        {
+                                            path: 'forth-5', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
+                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
+                                        }, {
+                                            path: 'forth-6', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
+                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
+                                        }
+                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
+                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
+                                }, {
+                                    path: 'third-4', icon: '',
+                                    folders: [
+                                        {
+                                            path: 'forth-7', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
+                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
+                                        }, {
+                                            path: 'forth-8', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
+                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
+                                        }
+                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
+                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
+                                }
+                            ], items: [{ label: 'it3-3', autoclose: true, icon: '', action: function () { console.log('it3-3'); } },
+                                { label: 'it3-4', autoclose: true, icon: '', action: function () { console.log('it3-4'); } }]
+                        }
+                    ], items: [{ label: 'it2-3', autoclose: true, icon: '', action: function () { console.log('it2-3'); } },
+                        { label: 'it2-4', autoclose: true, icon: '', action: function () { console.log('it2-4'); } }]
+                }, {
+                    path: 'f1-2', icon: '',
+                    folders: [
+                        {
+                            path: 'f2-1', icon: '',
+                            folders: [
+                                {
+                                    path: 'f3-1', icon: '',
+                                    folders: [
+                                        {
+                                            path: 'f4-1', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
+                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
+                                        }, {
+                                            path: 'f4-2', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
+                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
+                                        }
+                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
+                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
+                                }, {
+                                    path: 'f3-2', icon: '',
+                                    folders: [
+                                        {
+                                            path: 'f4-3', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
+                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
+                                        }, {
+                                            path: 'f4-4', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
+                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
+                                        }
+                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
+                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
+                                }
+                            ], items: [{ label: 'it3-3', autoclose: true, icon: '', action: function () { console.log('it3-3'); } },
+                                { label: 'it3-4', autoclose: true, icon: '', action: function () { console.log('it3-4'); } }]
+                        }, {
+                            path: 'f2-2', icon: '',
+                            folders: [
+                                {
+                                    path: 'f3-3', icon: '',
+                                    folders: [
+                                        {
+                                            path: 'f4-5', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
+                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
+                                        }, {
+                                            path: 'f4-6', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
+                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
+                                        }
+                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
+                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
+                                }, {
+                                    path: 'f3-4', icon: '',
+                                    folders: [
+                                        {
+                                            path: 'f4-7', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
+                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
+                                        }, {
+                                            path: 'f4-8', icon: '',
+                                            folders: [],
+                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
+                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
+                                        }
+                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
+                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
+                                }
+                            ], items: [{ label: 'it3-3', autoclose: true, icon: '', action: function () { console.log('it3-3'); } },
+                                { label: 'it3-4', autoclose: true, icon: '', action: function () { console.log('it3-4'); } }]
+                        }
+                    ], items: [{ label: 'it2-3', autoclose: true, icon: '', action: function () { console.log('it2-3'); } },
+                        { label: 'it2-4', autoclose: true, icon: '', action: function () { console.log('it2-4'); } }]
+                }
+            ], items: [{ label: 'it1-1', autoclose: true, icon: '', action: function () { console.log('it1-1'); } },
+                { label: 'it1-2', autoclose: true, icon: '', action: function () { console.log('it1-2'); } }]
+        };
+        console.log(this.menuRoot);
+    };
     ZMainMenu.prototype.openNextLevel = function () {
         if (this.currentLevel == 0) {
             this.open_1_level();
@@ -4232,58 +4404,278 @@ var ZMainMenu = (function () {
     };
     ZMainMenu.prototype.backPreLevel = function () {
         if (this.currentLevel == 1) {
-            this.level1.width = '0cm';
+            this.level1style.width = '0cm';
             this.currentLevel--;
             return;
         }
         if (this.currentLevel == 2) {
-            this.level2.width = '0cm';
+            this.level2style.width = '0cm';
             this.currentLevel--;
             return;
         }
         if (this.currentLevel == 3) {
-            this.level3.width = '0cm';
+            this.level3style.width = '0cm';
             this.currentLevel--;
             return;
         }
         if (this.currentLevel == 4) {
-            this.level4.width = '0cm';
+            this.level4style.width = '0cm';
             this.currentLevel--;
             return;
         }
         if (this.currentLevel == 5) {
-            this.level5.width = '0cm';
+            this.level5style.width = '0cm';
             this.currentLevel--;
             return;
         }
     };
     ZMainMenu.prototype.hideMenu = function () {
-        this.level1.width = '0cm';
-        this.level2.width = '0cm';
-        this.level3.width = '0cm';
-        this.level4.width = '0cm';
-        this.level5.width = '0cm';
+        this.level1style.width = '0cm';
+        this.level2style.width = '0cm';
+        this.level3style.width = '0cm';
+        this.level4style.width = '0cm';
+        this.level5style.width = '0cm';
+        this.currentLevel = 0;
+    };
+    ZMainMenu.prototype.moveSelection = function (level, row) {
+        var div = this.menu1content;
+        if (level == 2) {
+            div = this.menu2content;
+        }
+        if (level == 3) {
+            div = this.menu3content;
+        }
+        if (level == 4) {
+            div = this.menu4content;
+        }
+        if (level == 5) {
+            div = this.menu5content;
+        }
+        for (var i = 0; i < div.childNodes.length; i++) {
+            var child = div.childNodes[i];
+            child.dataset['rowSelection'] = 'no';
+        }
+        var child = div.childNodes[row];
+        child.dataset['rowSelection'] = 'yes';
+    };
+    ZMainMenu.prototype.createFolderClick = function (idx) {
+        var _this = this;
+        return function () {
+            _this.moveSelection(_this.currentLevel, idx);
+            _this.currentLevel++;
+            if (_this.currentLevel == 2) {
+                _this.selection1level = idx;
+                _this.open_2_level();
+            }
+            if (_this.currentLevel == 3) {
+                _this.selection2level = idx;
+                _this.open_3_level();
+            }
+            if (_this.currentLevel == 4) {
+                _this.selection3level = idx;
+                _this.open_4_level();
+            }
+            if (_this.currentLevel == 5) {
+                _this.selection4level = idx;
+                _this.open_5_level();
+            }
+        };
+    };
+    ZMainMenu.prototype.createActionClick = function (nn, item) {
+        var _this = this;
+        return function () {
+            if (_this.currentLevel == 1) {
+                _this.selection1level = nn;
+            }
+            if (_this.currentLevel == 2) {
+                _this.selection2level = nn;
+            }
+            if (_this.currentLevel == 3) {
+                _this.selection3level = nn;
+            }
+            if (_this.currentLevel == 5) {
+                _this.selection5level = nn;
+            }
+            if (item.autoclose) {
+                _this.hideMenu();
+            }
+            else {
+                _this.moveSelection(_this.currentLevel, nn);
+            }
+            item.action();
+        };
+    };
+    ZMainMenu.prototype.reFillMenulevel = function (menuContent, subRoot, selectedLevel) {
+        console.log(subRoot);
+        while (menuContent.lastChild) {
+            menuContent.removeChild(menuContent.lastChild);
+        }
+        for (var i = 0; i < subRoot.folders.length; i++) {
+            var folder = subRoot.folders[i];
+            var div = document.createElement('div');
+            div.classList.add('menuFolderRow');
+            div.id = 'menuFolder1-' + i;
+            div.onclick = this.createFolderClick(i);
+            div.innerText = folder.path;
+            menuContent.appendChild(div);
+            if (selectedLevel == i) {
+                div.dataset['rowSelection'] = 'yes';
+            }
+            else {
+                div.dataset['rowSelection'] = 'no';
+            }
+        }
+        for (var i = 0; i < subRoot.items.length; i++) {
+            var item = subRoot.items[i];
+            var div = document.createElement('div');
+            div.classList.add('menuActionRow');
+            div.id = 'menuItem1-' + i;
+            div.onclick = this.createActionClick(subRoot.folders.length + i, item);
+            div.innerText = item.label;
+            menuContent.appendChild(div);
+            if (selectedLevel == subRoot.folders.length + i) {
+                div.dataset['rowSelection'] = 'yes';
+            }
+            else {
+                div.dataset['rowSelection'] = 'no';
+            }
+        }
     };
     ZMainMenu.prototype.open_1_level = function () {
         console.log('open_1_level');
-        this.level1.width = '5cm';
+        this.menu1textHead.innerText = this.menuRoot.path;
+        this.level1style.width = '5cm';
+        this.reFillMenulevel(this.menu1content, this.menuRoot, this.selection1level);
     };
     ZMainMenu.prototype.open_2_level = function () {
         console.log('open_2_level');
-        this.level2.width = '4.5cm';
+        this.menu2textHead.innerText = this.menuRoot
+            .folders[this.selection1level]
+            .path;
+        this.level2style.width = '4.5cm';
+        this.reFillMenulevel(this.menu2content, this.menuRoot
+            .folders[this.selection1level], this.selection2level);
     };
     ZMainMenu.prototype.open_3_level = function () {
         console.log('open_3_level');
-        this.level3.width = '4.0cm';
+        this.menu3textHead.innerText = this.menuRoot
+            .folders[this.selection1level]
+            .folders[this.selection2level]
+            .path;
+        this.level3style.width = '4.0cm';
+        this.reFillMenulevel(this.menu3content, this.menuRoot
+            .folders[this.selection1level]
+            .folders[this.selection2level], this.selection3level);
     };
     ZMainMenu.prototype.open_4_level = function () {
         console.log('open_4_level');
-        this.level4.width = '3.5cm';
+        this.menu4textHead.innerText = this.menuRoot
+            .folders[this.selection1level]
+            .folders[this.selection2level]
+            .folders[this.selection3level]
+            .path;
+        this.level4style.width = '3.5cm';
+        this.reFillMenulevel(this.menu4content, this.menuRoot
+            .folders[this.selection1level]
+            .folders[this.selection2level]
+            .folders[this.selection3level], this.selection4level);
     };
     ZMainMenu.prototype.open_5_level = function () {
         console.log('open_5_level');
-        this.level5.width = '3.0cm';
+        this.menu5textHead.innerText = this.menuRoot
+            .folders[this.selection1level]
+            .folders[this.selection2level]
+            .folders[this.selection3level]
+            .folders[this.selection4level]
+            .path;
+        this.level5style.width = '3.0cm';
+        this.reFillMenulevel(this.menu5content, this.menuRoot
+            .folders[this.selection1level]
+            .folders[this.selection2level]
+            .folders[this.selection3level]
+            .folders[this.selection4level], this.selection5level);
     };
     return ZMainMenu;
 }());
+console.log('MuzXBox v1.01');
+var midiDrumPitchShift = 23;
+var us;
+var MuzXBox = (function () {
+    function MuzXBox() {
+        this.menuButton = {
+            x: 0,
+            y: 0,
+            w: 10,
+            h: 10,
+            rx: 3,
+            ry: 3,
+            css: 'debug',
+            action: this.testFS,
+            id: 'menuButtonTest1'
+        };
+        console.log('start');
+        us = new ZUserSetting();
+    }
+    MuzXBox.prototype.initAll = function () {
+        console.log('initAll');
+        this.zrenderer = new ZRender();
+        this.zInputDeviceHandler = new ZInputDeviceHandler(this);
+        this.zMainMenu = new ZMainMenu(this);
+        this.zrenderer.bindLayers();
+        this.zrenderer.initUI();
+        this.createUI();
+        us.selectMode('ru');
+        console.log(us.txt('testText'));
+        us.selectMode('en');
+        console.log(us.txt('testText'));
+        us.selectMode('wwwwwww');
+        console.log(us.txt('testText'));
+        us.selectMode('en');
+    };
+    MuzXBox.prototype.createUI = function () {
+        var emptySchedule = {
+            title: 'Empty project', tracks: [],
+            filters: [],
+            measures: [],
+            harmony: {
+                tone: '',
+                mode: '',
+                progression: []
+            }
+        };
+        this.zrenderer.drawSchedule(emptySchedule, this.menuButton);
+    };
+    MuzXBox.prototype.testFSmidi = function () {
+        var test = new MIDIFileImporter();
+        test.readSongData("any", function (result) {
+            if (result) {
+                var me = window['MZXB'];
+                console.log(me);
+                if (me) {
+                    me.zrenderer.drawSchedule(result, me.menuButton);
+                }
+            }
+        });
+    };
+    MuzXBox.prototype.testFSmxml = function () {
+        var test = new MusicXMLFileImporter();
+        test.readSongData("any", function (result) {
+            if (result) {
+                var me = window['MZXB'];
+                if (me) {
+                    console.log(result);
+                    me.zrenderer.drawSchedule(result, me.menuButton);
+                }
+            }
+        });
+    };
+    MuzXBox.prototype.testFS = function () {
+        var me = window['MZXB'];
+        if (me) {
+            me.testFSmidi();
+        }
+    };
+    return MuzXBox;
+}());
+window['MZXB'] = new MuzXBox();
 //# sourceMappingURL=muzxbox.js.map

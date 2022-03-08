@@ -1,6 +1,7 @@
 console.log('MuzXBox v1.01');
 
 let midiDrumPitchShift = 23;
+let us: ZUserSetting;
 
 class MuzXBox {
 	zrenderer: ZRender;
@@ -19,16 +20,26 @@ class MuzXBox {
 	};
 	constructor() {
 		console.log('start');
+		us = new ZUserSetting();
 	}
 	initAll() {
 		console.log('initAll');
 		//let me = this;
+		
 		this.zrenderer = new ZRender();
 		this.zInputDeviceHandler = new ZInputDeviceHandler(this);
 		this.zMainMenu = new ZMainMenu(this);
 		this.zrenderer.bindLayers();
 		this.zrenderer.initUI();
 		this.createUI();
+
+		us.selectMode('ru');
+		console.log(us.txt('testText'));
+		us.selectMode('en');
+		console.log(us.txt('testText'));
+		us.selectMode('wwwwwww');
+		console.log(us.txt('testText'));
+		us.selectMode('en');
 	}
 	createUI() {
 		var emptySchedule: ZvoogSchedule = {
@@ -82,3 +93,4 @@ class MuzXBox {
 	}
 }
 window['MZXB'] = new MuzXBox();
+

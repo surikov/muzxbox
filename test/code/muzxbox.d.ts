@@ -1,16 +1,3 @@
-declare let midiDrumPitchShift: number;
-declare class MuzXBox {
-    zrenderer: ZRender;
-    zInputDeviceHandler: ZInputDeviceHandler;
-    zMainMenu: ZMainMenu;
-    menuButton: TileRectangle;
-    constructor();
-    initAll(): void;
-    createUI(): void;
-    testFSmidi(): void;
-    testFSmxml(): void;
-    testFS(): void;
-}
 declare class ZInputDeviceHandler {
     muzXBox: MuzXBox;
     constructor(from: MuzXBox);
@@ -320,6 +307,19 @@ declare class ZRender {
     drawSchedule(song: ZvoogSchedule, menuButton: TileRectangle): void;
     addVoiceMeasure(song: ZvoogSchedule, voice: ZvoogVoice, i: number, time: number, css: string, anchors: TileAnchor[]): void;
     addDebugButtons(song: ZvoogSchedule, menuButton: TileRectangle): void;
+}
+declare type ZUIModeValue = {
+    mode: string;
+    txt: string;
+    id: string;
+};
+declare class ZUserSetting {
+    mode: string;
+    texts: ZUIModeValue[];
+    constructor();
+    fillModeValues(): void;
+    selectMode(mode: string): void;
+    txt(id: string): string;
 }
 declare function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter;
 declare function adjustPartLeadPad(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
@@ -972,21 +972,68 @@ declare class TreeValue {
     readDocChildren(node: any): TreeValue[];
     fill(document: Document): void;
 }
+declare type ZMenuItem = {
+    label: string;
+    action: () => void;
+    autoclose: boolean;
+    icon: string;
+};
+declare type ZMenuFolder = {
+    path: string;
+    icon: string;
+    folders: ZMenuFolder[];
+    items: ZMenuItem[];
+};
 declare class ZMainMenu {
     muzXBox: MuzXBox;
-    level1: CSSStyleDeclaration;
-    level2: CSSStyleDeclaration;
-    level3: CSSStyleDeclaration;
-    level4: CSSStyleDeclaration;
-    level5: CSSStyleDeclaration;
+    level1style: CSSStyleDeclaration;
+    level2style: CSSStyleDeclaration;
+    level3style: CSSStyleDeclaration;
+    level4style: CSSStyleDeclaration;
+    level5style: CSSStyleDeclaration;
+    selection1level: number;
+    selection2level: number;
+    selection3level: number;
+    selection4level: number;
+    selection5level: number;
+    menu1textHead: HTMLElement;
+    menu2textHead: HTMLElement;
+    menu3textHead: HTMLElement;
+    menu4textHead: HTMLElement;
+    menu5textHead: HTMLElement;
+    menu1content: HTMLElement;
+    menu2content: HTMLElement;
+    menu3content: HTMLElement;
+    menu4content: HTMLElement;
+    menu5content: HTMLElement;
     currentLevel: number;
+    menuRoot: ZMenuFolder;
     constructor(from: MuzXBox);
+    fillStaticMenu(): void;
     openNextLevel(): void;
     backPreLevel(): void;
     hideMenu(): void;
+    moveSelection(level: number, row: number): void;
+    createFolderClick(idx: number): () => void;
+    createActionClick(nn: number, item: ZMenuItem): () => void;
+    reFillMenulevel(menuContent: HTMLElement, subRoot: ZMenuFolder, selectedLevel: number): void;
     open_1_level(): void;
     open_2_level(): void;
     open_3_level(): void;
     open_4_level(): void;
     open_5_level(): void;
+}
+declare let midiDrumPitchShift: number;
+declare let us: ZUserSetting;
+declare class MuzXBox {
+    zrenderer: ZRender;
+    zInputDeviceHandler: ZInputDeviceHandler;
+    zMainMenu: ZMainMenu;
+    menuButton: TileRectangle;
+    constructor();
+    initAll(): void;
+    createUI(): void;
+    testFSmidi(): void;
+    testFSmxml(): void;
+    testFS(): void;
 }

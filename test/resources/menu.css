@@ -73,9 +73,29 @@
 .menuContent{
 	margin-top: 1.5cm;
 }
-.menuRow{
+.menuFolderRow{
 	border-bottom: solid;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;
+}
+.menuFolderRow[data-row-selection='yes']{
+	border-bottom: solid;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	background-color: #cc99ff;
+}
+.menuActionRow{
+	border-bottom: dashed;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+.menuActionRow[data-row-selection='yes']{
+	border-bottom: soldashedid;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	background-color: #cc99ff;
 }
