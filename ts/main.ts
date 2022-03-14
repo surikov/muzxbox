@@ -80,6 +80,7 @@ class MuzXBox {
 				console.log(me);
 				if (me) {
 					me.zrenderer.drawSchedule(result, me.menuButton);
+					me.zMainMenu.fillFrom(result);
 				}
 			}
 		});

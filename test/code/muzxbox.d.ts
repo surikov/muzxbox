@@ -1022,6 +1022,7 @@ declare class ZMainMenu {
     open_3_level(): void;
     open_4_level(): void;
     open_5_level(): void;
+    fillFrom(prj: ZvoogSchedule): void;
 }
 declare let midiDrumPitchShift: number;
 declare let us: ZUserSetting;

@@ -342,13 +342,14 @@ class ZMainMenu {
 	reFillMenulevel(menuContent: HTMLElement, subRoot: ZMenuFolder, selectedLevel: number) {
 		console.log(subRoot);
 		while (menuContent.lastChild) { menuContent.removeChild(menuContent.lastChild); }
-		for (var i = 0; i < subRoot.folders.length; i++) {
-			var folder: ZMenuFolder = subRoot.folders[i];
-			var div = document.createElement('div');
-			div.classList.add('menuFolderRow');
-			div.id = 'menuFolder1-' + i;
-			div.onclick = this.createFolderClick(i);
-			div.innerText = folder.path;
+
+		for (var i = 0; i < subRoot.items.length; i++) {
+			var item: ZMenuItem = subRoot.items[i];
+			var div: HTMLDivElement = document.createElement('div');
+			div.classList.add('menuActionRow');
+			div.id = 'menuItem1-' + i;
+			div.onclick = this.createActionClick(i, item);
+			div.innerText = item.label;
 			menuContent.appendChild(div);
 			if (selectedLevel == i) {
 				div.dataset['rowSelection'] = 'yes';
@@ -356,20 +357,21 @@ class ZMainMenu {
 				div.dataset['rowSelection'] = 'no';
 			}
 		}
-		for (var i = 0; i < subRoot.items.length; i++) {
-			var item: ZMenuItem = subRoot.items[i];
-			var div: HTMLDivElement = document.createElement('div');
-			div.classList.add('menuActionRow');
-			div.id = 'menuItem1-' + i;
-			div.onclick = this.createActionClick(subRoot.folders.length + i, item);
-			div.innerText = item.label;
+		for (var i = 0; i < subRoot.folders.length; i++) {
+			var folder: ZMenuFolder = subRoot.folders[i];
+			var div = document.createElement('div');
+			div.classList.add('menuFolderRow');
+			div.id = 'menuFolder1-' + i;
+			div.onclick = this.createFolderClick(subRoot.items.length + i);
+			div.innerText = folder.path;
 			menuContent.appendChild(div);
-			if (selectedLevel == subRoot.folders.length + i) {
+			if (selectedLevel == subRoot.items.length + i) {
 				div.dataset['rowSelection'] = 'yes';
 			} else {
 				div.dataset['rowSelection'] = 'no';
 			}
 		}
+
 	}
 	open_1_level() {
 		console.log('open_1_level');
@@ -409,52 +411,65 @@ class ZMainMenu {
 	}
 	open_2_level() {
 		console.log('open_2_level');
-		this.menu2textHead.innerText = this.menuRoot
-			.folders[this.selection1level]
-			.path;
+		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
+		this.menu2textHead.innerText = this.menuRoot.folders[folderIdx1].path;
 		this.level2style.width = '4.5cm';
-		this.reFillMenulevel(this.menu2content, this.menuRoot
-			.folders[this.selection1level], this.selection2level);
+		this.reFillMenulevel(this.menu2content, this.menuRoot.folders[folderIdx1], this.selection2level);
 	}
 	open_3_level() {
 		console.log('open_3_level');
-		this.menu3textHead.innerText = this.menuRoot
-			.folders[this.selection1level]
-			.folders[this.selection2level]
-			.path;
+		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
+		var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
+		this.menu3textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].path;
 		this.level3style.width = '4.0cm';
-		this.reFillMenulevel(this.menu3content, this.menuRoot
-			.folders[this.selection1level]
-			.folders[this.selection2level], this.selection3level);
+		this.reFillMenulevel(this.menu3content, this.menuRoot.folders[folderIdx1].folders[folderIdx2], this.selection3level);
 	}
 	open_4_level() {
 		console.log('open_4_level');
-		this.menu4textHead.innerText = this.menuRoot
-			.folders[this.selection1level]
-			.folders[this.selection2level]
-			.folders[this.selection3level]
-			.path;
+		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
+		var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
+		var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
+		this.menu4textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].path;
 		this.level4style.width = '3.5cm';
-		this.reFillMenulevel(this.menu4content, this.menuRoot
-			.folders[this.selection1level]
-			.folders[this.selection2level]
-			.folders[this.selection3level], this.selection4level);
+		this.reFillMenulevel(this.menu4content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3], this.selection4level);
 
 	}
 	open_5_level() {
 		console.log('open_5_level');
-		this.menu5textHead.innerText = this.menuRoot
-			.folders[this.selection1level]
-			.folders[this.selection2level]
-			.folders[this.selection3level]
-			.folders[this.selection4level]
-			.path;
+		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
+		var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
+		var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
+		var folderIdx4 = this.selection4level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].items.length;
+		this.menu5textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].path;
 		this.level5style.width = '3.0cm';
-		this.reFillMenulevel(this.menu5content, this.menuRoot
-			.folders[this.selection1level]
-			.folders[this.selection2level]
-			.folders[this.selection3level]
-			.folders[this.selection4level], this.selection5level);
+		this.reFillMenulevel(this.menu5content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4], this.selection5level);
 
+	}
+	fillFrom(prj: ZvoogSchedule) {
+		var songFolder: ZMenuFolder = { path: "Current song", icon: "", folders: [], items: [] };
+		var songTracksFolder: ZMenuFolder = { path: "tracks", icon: "", folders: [], items: [] };
+		var songFiltersFolder: ZMenuFolder = { path: "filters", icon: "", folders: [], items: [] };
+		for (var i = 0; i < prj.filters.length; i++) {
+			var filter: ZMenuFolder = { path: prj.filters[i].kind, icon: "", folders: [], items: [] };
+			songFiltersFolder.folders.push(filter);
+			var songfilter= prj.filters[i];
+			for (var kk = 0; kk < songfilter.parameters.length; kk++) {
+				var par: ZMenuItem = { label: "par " + kk, icon: "", autoclose: false, action: () => { console.log('click'); } };
+				filter.items.push(par);
+			}
+		}
+		for (var i = 0; i < prj.tracks.length; i++) {
+			var songtrack=prj.tracks[i];
+			var tr: ZMenuFolder = { path: songtrack.title, icon: "", folders: [], items: [] };
+			songTracksFolder.folders.push(tr);
+			for(var vv=0;vv<songtrack.voices.length;vv++){
+				var songvox=songtrack.voices[vv];
+				var vox: ZMenuFolder = { path: songvox.title, icon: "", folders: [], items: [] };
+				tr.folders.push(vox);
+			}
+		}
+		songFolder.folders.push(songTracksFolder);
+		songFolder.folders.push(songFiltersFolder);
+		this.menuRoot.folders.push(songFolder);
 	}
 }
