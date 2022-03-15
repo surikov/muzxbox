@@ -340,7 +340,7 @@ class ZMainMenu {
 		};
 	}
 	reFillMenulevel(menuContent: HTMLElement, subRoot: ZMenuFolder, selectedLevel: number) {
-		console.log(subRoot);
+		//console.log(subRoot);
 		while (menuContent.lastChild) { menuContent.removeChild(menuContent.lastChild); }
 
 		for (var i = 0; i < subRoot.items.length; i++) {
@@ -376,7 +376,7 @@ class ZMainMenu {
 	open_1_level() {
 		console.log('open_1_level');
 		this.menu1textHead.innerText = this.menuRoot.path;
-		this.level1style.width = '5cm';
+		this.level1style.width = '8cm';
 		this.reFillMenulevel(this.menu1content, this.menuRoot
 			, this.selection1level);
 		/*while (this.menu1content.lastChild) { this.menu1content.removeChild(this.menu1content.lastChild); }
@@ -413,7 +413,7 @@ class ZMainMenu {
 		console.log('open_2_level');
 		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
 		this.menu2textHead.innerText = this.menuRoot.folders[folderIdx1].path;
-		this.level2style.width = '4.5cm';
+		this.level2style.width = '7.5cm';
 		this.reFillMenulevel(this.menu2content, this.menuRoot.folders[folderIdx1], this.selection2level);
 	}
 	open_3_level() {
@@ -421,7 +421,7 @@ class ZMainMenu {
 		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
 		var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
 		this.menu3textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].path;
-		this.level3style.width = '4.0cm';
+		this.level3style.width = '7.0cm';
 		this.reFillMenulevel(this.menu3content, this.menuRoot.folders[folderIdx1].folders[folderIdx2], this.selection3level);
 	}
 	open_4_level() {
@@ -430,7 +430,7 @@ class ZMainMenu {
 		var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
 		var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
 		this.menu4textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].path;
-		this.level4style.width = '3.5cm';
+		this.level4style.width = '6.5cm';
 		this.reFillMenulevel(this.menu4content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3], this.selection4level);
 
 	}
@@ -441,35 +441,88 @@ class ZMainMenu {
 		var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
 		var folderIdx4 = this.selection4level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].items.length;
 		this.menu5textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].path;
-		this.level5style.width = '3.0cm';
+		this.level5style.width = '6.0cm';
 		this.reFillMenulevel(this.menu5content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4], this.selection5level);
 
 	}
 	fillFrom(prj: ZvoogSchedule) {
+		this.menuRoot.items.length = 0;
+		this.menuRoot.folders.length = 0;
+		this.menuRoot.items.push(this.muzXBox.itemImportMIDI);
 		var songFolder: ZMenuFolder = { path: "Current song", icon: "", folders: [], items: [] };
-		var songTracksFolder: ZMenuFolder = { path: "tracks", icon: "", folders: [], items: [] };
-		var songFiltersFolder: ZMenuFolder = { path: "filters", icon: "", folders: [], items: [] };
-		for (var i = 0; i < prj.filters.length; i++) {
-			var filter: ZMenuFolder = { path: prj.filters[i].kind, icon: "", folders: [], items: [] };
-			songFiltersFolder.folders.push(filter);
-			var songfilter= prj.filters[i];
+		for (var ff = 0; ff < prj.filters.length; ff++) {
+			var filter: ZMenuFolder = { path: 'fx ' + prj.filters[ff].kind, icon: "", folders: [], items: [] };
+			songFolder.folders.push(filter);
+			var songfilter = prj.filters[ff];
 			for (var kk = 0; kk < songfilter.parameters.length; kk++) {
-				var par: ZMenuItem = { label: "par " + kk, icon: "", autoclose: false, action: () => { console.log('click'); } };
+				var par: ZMenuItem = { label: "par " + kk, icon: "", autoclose: false, action: this.upSongFxParam(ff, kk) };
 				filter.items.push(par);
 			}
 		}
-		for (var i = 0; i < prj.tracks.length; i++) {
-			var songtrack=prj.tracks[i];
-			var tr: ZMenuFolder = { path: songtrack.title, icon: "", folders: [], items: [] };
-			songTracksFolder.folders.push(tr);
-			for(var vv=0;vv<songtrack.voices.length;vv++){
-				var songvox=songtrack.voices[vv];
-				var vox: ZMenuFolder = { path: songvox.title, icon: "", folders: [], items: [] };
+		for (var tt = 0; tt < prj.tracks.length; tt++) {
+			var songtrack = prj.tracks[tt];
+			var tr: ZMenuFolder = { path: 'track ' + songtrack.title, icon: "", folders: [], items: [] };
+			songFolder.folders.push(tr);
+			for (var ff = 0; ff < songtrack.filters.length; ff++) {
+				var filter: ZMenuFolder = { path: 'fx ' + songtrack.filters[ff].kind, icon: "", folders: [], items: [] };
+				tr.folders.push(filter);
+				var songfilter = songtrack.filters[ff];
+				for (var kk = 0; kk < songfilter.parameters.length; kk++) {
+					var par: ZMenuItem = { label: "par " + kk, icon: "", autoclose: false, action: this.upTrackFxParam(tt, ff, kk) };
+					filter.items.push(par);
+				}
+			}
+			for (var vv = 0; vv < songtrack.voices.length; vv++) {
+				var songvox = songtrack.voices[vv];
+				var vox: ZMenuFolder = { path: 'vox ' + songvox.title, icon: "", folders: [], items: [] };
 				tr.folders.push(vox);
+				var source: ZMenuFolder = { path: 'src ' + songvox.performer.kind, icon: "", folders: [], items: [] };
+				for (var kk = 0; kk < songvox.performer.parameters.length; kk++) {
+					var par: ZMenuItem = { label: "par " + kk, icon: "", autoclose: false, action: this.upVoxProviderParam(tt, vv, kk) };
+					source.items.push(par);
+				}
+				vox.folders.push(source);
+				for (var ff = 0; ff < songvox.filters.length; ff++) {
+					var filter: ZMenuFolder = { path: 'fx ' + songvox.filters[ff].kind, icon: "", folders: [], items: [] };
+					vox.folders.push(filter);
+					var songfilter = songvox.filters[ff];
+					for (var kk = 0; kk < songfilter.parameters.length; kk++) {
+						var par: ZMenuItem = { label: "par " + kk, icon: "", autoclose: false, action: this.upVoxFxParam(tt, vv, ff, kk) };
+						filter.items.push(par);
+					}
+				}
 			}
 		}
-		songFolder.folders.push(songTracksFolder);
-		songFolder.folders.push(songFiltersFolder);
+
 		this.menuRoot.folders.push(songFolder);
+	}
+	upSongFx(fx: number): () => void {
+		return () => { console.log('upSongFx', fx); };
+	}
+	upSongFxParam(fx: number, param: number): () => void {
+		return () => { console.log('upSongFxParam', fx, param); };
+	}
+	upTrack(trk: number): () => void {
+		return () => { console.log('upSongFx', trk); };
+	}
+	upTrackFx(trk: number, fx: number): () => void {
+		return () => { console.log('upTrack', fx); };
+	}
+	upTrackFxParam(trk: number, fx: number, param: number): () => void {
+		return () => { console.log('upTrackFxParam', trk, fx, param); };
+	}
+
+	upVox(trk: number, vox: number): () => void {
+		return () => { console.log('upVox', trk, vox); };
+	}
+	upVoxFx(trk: number, vox: number, fx: number): () => void {
+		return () => { console.log('upVoxFx', trk, vox, fx); };
+	}
+	upVoxFxParam(trk: number, vox: number, fx: number, param: number): () => void {
+		return () => { console.log('upVoxFxParam', trk, vox, fx, param); };
+	}
+
+	upVoxProviderParam(trk: number, vox: number, param: number): () => void {
+		return () => { console.log('upVoxProviderParam', trk, vox, param); };
 	}
 }

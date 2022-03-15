@@ -1205,7 +1205,12 @@ class MidiParser {
 			var track: ZvoogTrack = {
 				title: trackTictle
 				, voices: []
-				, filters: []
+				, filters: [{
+					filterPlugin: null
+					, parameters: [{ points: [] }]
+					, kind: "gain"
+					, initial: ""
+				}]
 			};
 			schedule.tracks.push(track);
 			var firstChannelNum = 0;
@@ -1225,11 +1230,16 @@ class MidiParser {
 								measureChords: []
 								, performer: {
 									performerPlugin: null
-									, parameters: []
+									, parameters: [{ points: [] }]
 									, kind: 'wafdrum'
 									, initial: '' + pinum
 								}
-								, filters: []
+								, filters: [{
+									filterPlugin: null
+									, parameters: [{ points: [] }]
+									, kind: "gain"
+									, initial: ""
+								}]
 								, title: 'drum ' + pinum
 							};
 							track.voices.push(voice);
@@ -1280,11 +1290,16 @@ class MidiParser {
 					measureChords: []
 					, performer: {
 						performerPlugin: null
-						, parameters: []
+						, parameters: [{ points: [] }]
 						, kind: 'wafinstrument'
 						, initial: '' + midisong.tracks[i].program
 					}
-					, filters: []
+					, filters: [{
+						filterPlugin: null
+						, parameters: [{ points: [] }]
+						, kind: "gain"
+						, initial: ""
+					}]
 					, title: 'program ' + midisong.tracks[i].program
 				};
 				track.voices.push(voice);
@@ -1547,7 +1562,7 @@ class MidiParser {
 			schedule.tracks.push(track);
 		}
 */
-		//console.log(schedule);
+		console.log(schedule);
 		return schedule;
 	}
 	dump(): MIDISongData {

@@ -3542,7 +3542,12 @@ var MidiParser = (function () {
             var track = {
                 title: trackTictle,
                 voices: [],
-                filters: []
+                filters: [{
+                        filterPlugin: null,
+                        parameters: [{ points: [] }],
+                        kind: "gain",
+                        initial: ""
+                    }]
             };
             schedule.tracks.push(track);
             var firstChannelNum = 0;
@@ -3561,11 +3566,16 @@ var MidiParser = (function () {
                                 measureChords: [],
                                 performer: {
                                     performerPlugin: null,
-                                    parameters: [],
+                                    parameters: [{ points: [] }],
                                     kind: 'wafdrum',
                                     initial: '' + pinum
                                 },
-                                filters: [],
+                                filters: [{
+                                        filterPlugin: null,
+                                        parameters: [{ points: [] }],
+                                        kind: "gain",
+                                        initial: ""
+                                    }],
                                 title: 'drum ' + pinum
                             };
                             track.voices.push(voice);
@@ -3615,11 +3625,16 @@ var MidiParser = (function () {
                     measureChords: [],
                     performer: {
                         performerPlugin: null,
-                        parameters: [],
+                        parameters: [{ points: [] }],
                         kind: 'wafinstrument',
                         initial: '' + midisong.tracks[i].program
                     },
-                    filters: [],
+                    filters: [{
+                            filterPlugin: null,
+                            parameters: [{ points: [] }],
+                            kind: "gain",
+                            initial: ""
+                        }],
                     title: 'program ' + midisong.tracks[i].program
                 };
                 track.voices.push(voice);
@@ -3658,6 +3673,7 @@ var MidiParser = (function () {
                 }
             }
         }
+        console.log(schedule);
         return schedule;
     };
     MidiParser.prototype.dump = function () {
@@ -4506,7 +4522,6 @@ var ZMainMenu = (function () {
         };
     };
     ZMainMenu.prototype.reFillMenulevel = function (menuContent, subRoot, selectedLevel) {
-        console.log(subRoot);
         while (menuContent.lastChild) {
             menuContent.removeChild(menuContent.lastChild);
         }
@@ -4544,14 +4559,14 @@ var ZMainMenu = (function () {
     ZMainMenu.prototype.open_1_level = function () {
         console.log('open_1_level');
         this.menu1textHead.innerText = this.menuRoot.path;
-        this.level1style.width = '5cm';
+        this.level1style.width = '8cm';
         this.reFillMenulevel(this.menu1content, this.menuRoot, this.selection1level);
     };
     ZMainMenu.prototype.open_2_level = function () {
         console.log('open_2_level');
         var folderIdx1 = this.selection1level - this.menuRoot.items.length;
         this.menu2textHead.innerText = this.menuRoot.folders[folderIdx1].path;
-        this.level2style.width = '4.5cm';
+        this.level2style.width = '7.5cm';
         this.reFillMenulevel(this.menu2content, this.menuRoot.folders[folderIdx1], this.selection2level);
     };
     ZMainMenu.prototype.open_3_level = function () {
@@ -4559,7 +4574,7 @@ var ZMainMenu = (function () {
         var folderIdx1 = this.selection1level - this.menuRoot.items.length;
         var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
         this.menu3textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].path;
-        this.level3style.width = '4.0cm';
+        this.level3style.width = '7.0cm';
         this.reFillMenulevel(this.menu3content, this.menuRoot.folders[folderIdx1].folders[folderIdx2], this.selection3level);
     };
     ZMainMenu.prototype.open_4_level = function () {
@@ -4568,7 +4583,7 @@ var ZMainMenu = (function () {
         var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
         var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
         this.menu4textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].path;
-        this.level4style.width = '3.5cm';
+        this.level4style.width = '6.5cm';
         this.reFillMenulevel(this.menu4content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3], this.selection4level);
     };
     ZMainMenu.prototype.open_5_level = function () {
@@ -4578,35 +4593,85 @@ var ZMainMenu = (function () {
         var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
         var folderIdx4 = this.selection4level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].items.length;
         this.menu5textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].path;
-        this.level5style.width = '3.0cm';
+        this.level5style.width = '6.0cm';
         this.reFillMenulevel(this.menu5content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4], this.selection5level);
     };
     ZMainMenu.prototype.fillFrom = function (prj) {
+        this.menuRoot.items.length = 0;
+        this.menuRoot.folders.length = 0;
+        this.menuRoot.items.push(this.muzXBox.itemImportMIDI);
         var songFolder = { path: "Current song", icon: "", folders: [], items: [] };
-        var songTracksFolder = { path: "tracks", icon: "", folders: [], items: [] };
-        var songFiltersFolder = { path: "filters", icon: "", folders: [], items: [] };
-        for (var i = 0; i < prj.filters.length; i++) {
-            var filter = { path: prj.filters[i].kind, icon: "", folders: [], items: [] };
-            songFiltersFolder.folders.push(filter);
-            var songfilter = prj.filters[i];
+        for (var ff = 0; ff < prj.filters.length; ff++) {
+            var filter = { path: 'fx ' + prj.filters[ff].kind, icon: "", folders: [], items: [] };
+            songFolder.folders.push(filter);
+            var songfilter = prj.filters[ff];
             for (var kk = 0; kk < songfilter.parameters.length; kk++) {
-                var par = { label: "par " + kk, icon: "", autoclose: false, action: function () { console.log('click'); } };
+                var par = { label: "par " + kk, icon: "", autoclose: false, action: this.upSongFxParam(ff, kk) };
                 filter.items.push(par);
             }
         }
-        for (var i = 0; i < prj.tracks.length; i++) {
-            var songtrack = prj.tracks[i];
-            var tr = { path: songtrack.title, icon: "", folders: [], items: [] };
-            songTracksFolder.folders.push(tr);
+        for (var tt = 0; tt < prj.tracks.length; tt++) {
+            var songtrack = prj.tracks[tt];
+            var tr = { path: 'track ' + songtrack.title, icon: "", folders: [], items: [] };
+            songFolder.folders.push(tr);
+            for (var ff = 0; ff < songtrack.filters.length; ff++) {
+                var filter = { path: 'fx ' + songtrack.filters[ff].kind, icon: "", folders: [], items: [] };
+                tr.folders.push(filter);
+                var songfilter = songtrack.filters[ff];
+                for (var kk = 0; kk < songfilter.parameters.length; kk++) {
+                    var par = { label: "par " + kk, icon: "", autoclose: false, action: this.upTrackFxParam(tt, ff, kk) };
+                    filter.items.push(par);
+                }
+            }
             for (var vv = 0; vv < songtrack.voices.length; vv++) {
                 var songvox = songtrack.voices[vv];
-                var vox = { path: songvox.title, icon: "", folders: [], items: [] };
+                var vox = { path: 'vox ' + songvox.title, icon: "", folders: [], items: [] };
                 tr.folders.push(vox);
+                var source = { path: 'src ' + songvox.performer.kind, icon: "", folders: [], items: [] };
+                for (var kk = 0; kk < songvox.performer.parameters.length; kk++) {
+                    var par = { label: "par " + kk, icon: "", autoclose: false, action: this.upVoxProviderParam(tt, vv, kk) };
+                    source.items.push(par);
+                }
+                vox.folders.push(source);
+                for (var ff = 0; ff < songvox.filters.length; ff++) {
+                    var filter = { path: 'fx ' + songvox.filters[ff].kind, icon: "", folders: [], items: [] };
+                    vox.folders.push(filter);
+                    var songfilter = songvox.filters[ff];
+                    for (var kk = 0; kk < songfilter.parameters.length; kk++) {
+                        var par = { label: "par " + kk, icon: "", autoclose: false, action: this.upVoxFxParam(tt, vv, ff, kk) };
+                        filter.items.push(par);
+                    }
+                }
             }
         }
-        songFolder.folders.push(songTracksFolder);
-        songFolder.folders.push(songFiltersFolder);
         this.menuRoot.folders.push(songFolder);
+    };
+    ZMainMenu.prototype.upSongFx = function (fx) {
+        return function () { console.log('upSongFx', fx); };
+    };
+    ZMainMenu.prototype.upSongFxParam = function (fx, param) {
+        return function () { console.log('upSongFxParam', fx, param); };
+    };
+    ZMainMenu.prototype.upTrack = function (trk) {
+        return function () { console.log('upSongFx', trk); };
+    };
+    ZMainMenu.prototype.upTrackFx = function (trk, fx) {
+        return function () { console.log('upTrack', fx); };
+    };
+    ZMainMenu.prototype.upTrackFxParam = function (trk, fx, param) {
+        return function () { console.log('upTrackFxParam', trk, fx, param); };
+    };
+    ZMainMenu.prototype.upVox = function (trk, vox) {
+        return function () { console.log('upVox', trk, vox); };
+    };
+    ZMainMenu.prototype.upVoxFx = function (trk, vox, fx) {
+        return function () { console.log('upVoxFx', trk, vox, fx); };
+    };
+    ZMainMenu.prototype.upVoxFxParam = function (trk, vox, fx, param) {
+        return function () { console.log('upVoxFxParam', trk, vox, fx, param); };
+    };
+    ZMainMenu.prototype.upVoxProviderParam = function (trk, vox, param) {
+        return function () { console.log('upVoxProviderParam', trk, vox, param); };
     };
     return ZMainMenu;
 }());
@@ -4615,6 +4680,17 @@ var midiDrumPitchShift = 23;
 var us;
 var MuzXBox = (function () {
     function MuzXBox() {
+        this.itemImportMIDI = {
+            label: 'import midi',
+            action: function () {
+                var me = window['MZXB'];
+                if (me) {
+                    me.testFSmidi();
+                }
+            },
+            autoclose: true,
+            icon: ''
+        };
         this.menuButton = {
             x: 0,
             y: 0,
@@ -4634,17 +4710,7 @@ var MuzXBox = (function () {
         this.zrenderer = new ZRender();
         this.zInputDeviceHandler = new ZInputDeviceHandler(this);
         this.zMainMenu = new ZMainMenu(this);
-        this.zMainMenu.menuRoot.items.push({
-            label: 'import midi',
-            action: function () {
-                var me = window['MZXB'];
-                if (me) {
-                    me.testFSmidi();
-                }
-            },
-            autoclose: true,
-            icon: ''
-        });
+        this.zMainMenu.menuRoot.items.push(this.itemImportMIDI);
         this.zrenderer.bindLayers();
         this.zrenderer.initUI();
         this.createUI();

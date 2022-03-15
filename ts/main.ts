@@ -7,6 +7,17 @@ class MuzXBox {
 	zrenderer: ZRender;
 	zInputDeviceHandler: ZInputDeviceHandler;
 	zMainMenu: ZMainMenu;
+	itemImportMIDI:ZMenuItem={
+		label: 'import midi'
+		, action: () => {
+			var me: MuzXBox = window['MZXB'] as MuzXBox;
+			if (me) {
+				me.testFSmidi();
+			}
+		}
+		, autoclose: true
+		, icon: ''
+	};
 	menuButton: TileRectangle = {
 		x: 0
 		, y: 0
@@ -29,17 +40,7 @@ class MuzXBox {
 		this.zrenderer = new ZRender();
 		this.zInputDeviceHandler = new ZInputDeviceHandler(this);
 		this.zMainMenu = new ZMainMenu(this);
-		this.zMainMenu.menuRoot.items.push({
-			label: 'import midi'
-			, action: () => {
-				var me: MuzXBox = window['MZXB'] as MuzXBox;
-				if (me) {
-					me.testFSmidi();
-				}
-			}
-			, autoclose: true
-			, icon: ''
-		});
+		this.zMainMenu.menuRoot.items.push(this.itemImportMIDI);
 		this.zrenderer.bindLayers();
 		this.zrenderer.initUI();
 		this.createUI();

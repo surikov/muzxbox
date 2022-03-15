@@ -1023,6 +1023,15 @@ declare class ZMainMenu {
     open_4_level(): void;
     open_5_level(): void;
     fillFrom(prj: ZvoogSchedule): void;
+    upSongFx(fx: number): () => void;
+    upSongFxParam(fx: number, param: number): () => void;
+    upTrack(trk: number): () => void;
+    upTrackFx(trk: number, fx: number): () => void;
+    upTrackFxParam(trk: number, fx: number, param: number): () => void;
+    upVox(trk: number, vox: number): () => void;
+    upVoxFx(trk: number, vox: number, fx: number): () => void;
+    upVoxFxParam(trk: number, vox: number, fx: number, param: number): () => void;
+    upVoxProviderParam(trk: number, vox: number, param: number): () => void;
 }
 declare let midiDrumPitchShift: number;
 declare let us: ZUserSetting;
@@ -1030,6 +1039,7 @@ declare class MuzXBox {
     zrenderer: ZRender;
     zInputDeviceHandler: ZInputDeviceHandler;
     zMainMenu: ZMainMenu;
+    itemImportMIDI: ZMenuItem;
     menuButton: TileRectangle;
     constructor();
     initAll(): void;
