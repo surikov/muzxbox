@@ -9,6 +9,7 @@ type ZMenuFolder = {
 	, icon: string
 	, folders: ZMenuFolder[]
 	, items: ZMenuItem[]
+	, afterOpen: () => void
 };
 class ZMainMenu {
 	muzXBox: MuzXBox;
@@ -68,168 +69,175 @@ class ZMainMenu {
 		if (el) { this.menu5content = el; }
 		//console.log('this.level1',this.level1);
 		//(document.getElementById('menuPaneDiv1') as any).style
-		this.fillStaticMenu();
-	}
-	fillStaticMenu() {
+		//this.fillStaticMenu();
 		this.menuRoot = {
 			path: 'Menu'
 			, icon: ''
-			, folders: [
-				{
-					path: 'first-1', icon: ''
-					, folders: [
-						{
-							path: 'second-1', icon: ''
-							, folders: [
-								{
-									path: 'third-1', icon: ''
-									, folders: [
-										{
-											path: 'forth-1', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-												, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-										}, {
-											path: 'forth-2', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-												, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-										}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-											, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-								}, {
-									path: 'third-2', icon: ''
-									, folders: [
-										{
-											path: 'forth-3', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-												, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-										}, {
-											path: 'forth-4', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-												, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-										}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-											, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-								}], items: [{ label: 'it3-3', autoclose: true, icon: '', action: () => { console.log('it3-3'); } }
-									, { label: 'it3-4', autoclose: true, icon: '', action: () => { console.log('it3-4'); } }]
-						}, {
-							path: 'second-2', icon: ''
-							, folders: [
-								{
-									path: 'third-3', icon: ''
-									, folders: [
-										{
-											path: 'forth-5', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-												, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-										}, {
-											path: 'forth-6', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-												, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-										}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-											, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-								}, {
-									path: 'third-4', icon: ''
-									, folders: [
-										{
-											path: 'forth-7', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-												, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-										}, {
-											path: 'forth-8', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-												, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-										}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-											, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-								}], items: [{ label: 'it3-3', autoclose: true, icon: '', action: () => { console.log('it3-3'); } }
-									, { label: 'it3-4', autoclose: true, icon: '', action: () => { console.log('it3-4'); } }]
-						}], items: [{ label: 'it2-3', autoclose: true, icon: '', action: () => { console.log('it2-3'); } }
-							, { label: 'it2-4', autoclose: true, icon: '', action: () => { console.log('it2-4'); } }]
-				}, {
-					path: 'f1-2', icon: ''
-					, folders: [
-						{
-							path: 'f2-1', icon: ''
-							, folders: [
-								{
-									path: 'f3-1', icon: ''
-									, folders: [
-										{
-											path: 'f4-1', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-												, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-										}, {
-											path: 'f4-2', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-												, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-										}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-											, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-								}, {
-									path: 'f3-2', icon: ''
-									, folders: [
-										{
-											path: 'f4-3', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-												, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-										}, {
-											path: 'f4-4', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-												, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-										}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-											, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-								}], items: [{ label: 'it3-3', autoclose: true, icon: '', action: () => { console.log('it3-3'); } }
-									, { label: 'it3-4', autoclose: true, icon: '', action: () => { console.log('it3-4'); } }]
-						}, {
-							path: 'f2-2', icon: ''
-							, folders: [
-								{
-									path: 'f3-3', icon: ''
-									, folders: [
-										{
-											path: 'f4-5', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-												, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-										}, {
-											path: 'f4-6', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-												, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-										}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-											, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-								}, {
-									path: 'f3-4', icon: ''
-									, folders: [
-										{
-											path: 'f4-7', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-												, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-										}, {
-											path: 'f4-8', icon: ''
-											, folders: [
-											], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-												, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-										}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-											, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-								}], items: [{ label: 'it3-3', autoclose: true, icon: '', action: () => { console.log('it3-3'); } }
-									, { label: 'it3-4', autoclose: true, icon: '', action: () => { console.log('it3-4'); } }]
-						}], items: [{ label: 'it2-3', autoclose: true, icon: '', action: () => { console.log('it2-3'); } }
-							, { label: 'it2-4', autoclose: true, icon: '', action: () => { console.log('it2-4'); } }]
-				}], items: [{ label: 'it1-1', autoclose: true, icon: '', action: () => { console.log('it1-1'); } }
-					, { label: 'it1-2', autoclose: true, icon: '', action: () => { console.log('it1-2'); } }]
+			, folders: []
+			, items: []
+			, afterOpen: () => { }
 		};
-		console.log(this.menuRoot);
 	}
+	/*	fillStaticMenu() {
+			this.menuRoot = {
+				path: 'Menu'
+				, icon: ''
+				, folders: [
+					{
+						path: 'first-1', icon: ''
+						, folders: [
+							{
+								path: 'second-1', icon: ''
+								, folders: [
+									{
+										path: 'third-1', icon: ''
+										, folders: [
+											{
+												path: 'forth-1', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
+													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
+											}, {
+												path: 'forth-2', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
+													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
+											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
+												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
+									}, {
+										path: 'third-2', icon: ''
+										, folders: [
+											{
+												path: 'forth-3', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
+													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
+											}, {
+												path: 'forth-4', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
+													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
+											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
+												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
+									}], items: [{ label: 'it3-3', autoclose: true, icon: '', action: () => { console.log('it3-3'); } }
+										, { label: 'it3-4', autoclose: true, icon: '', action: () => { console.log('it3-4'); } }]
+							}, {
+								path: 'second-2', icon: ''
+								, folders: [
+									{
+										path: 'third-3', icon: ''
+										, folders: [
+											{
+												path: 'forth-5', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
+													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
+											}, {
+												path: 'forth-6', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
+													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
+											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
+												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
+									}, {
+										path: 'third-4', icon: ''
+										, folders: [
+											{
+												path: 'forth-7', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
+													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
+											}, {
+												path: 'forth-8', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
+													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
+											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
+												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
+									}], items: [{ label: 'it3-3', autoclose: true, icon: '', action: () => { console.log('it3-3'); } }
+										, { label: 'it3-4', autoclose: true, icon: '', action: () => { console.log('it3-4'); } }]
+							}], items: [{ label: 'it2-3', autoclose: true, icon: '', action: () => { console.log('it2-3'); } }
+								, { label: 'it2-4', autoclose: true, icon: '', action: () => { console.log('it2-4'); } }]
+					}, {
+						path: 'f1-2', icon: ''
+						, folders: [
+							{
+								path: 'f2-1', icon: ''
+								, folders: [
+									{
+										path: 'f3-1', icon: ''
+										, folders: [
+											{
+												path: 'f4-1', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
+													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
+											}, {
+												path: 'f4-2', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
+													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
+											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
+												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
+									}, {
+										path: 'f3-2', icon: ''
+										, folders: [
+											{
+												path: 'f4-3', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
+													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
+											}, {
+												path: 'f4-4', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
+													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
+											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
+												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
+									}], items: [{ label: 'it3-3', autoclose: true, icon: '', action: () => { console.log('it3-3'); } }
+										, { label: 'it3-4', autoclose: true, icon: '', action: () => { console.log('it3-4'); } }]
+							}, {
+								path: 'f2-2', icon: ''
+								, folders: [
+									{
+										path: 'f3-3', icon: ''
+										, folders: [
+											{
+												path: 'f4-5', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
+													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
+											}, {
+												path: 'f4-6', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
+													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
+											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
+												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
+									}, {
+										path: 'f3-4', icon: ''
+										, folders: [
+											{
+												path: 'f4-7', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
+													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
+											}, {
+												path: 'f4-8', icon: ''
+												, folders: [
+												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
+													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
+											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
+												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
+									}], items: [{ label: 'it3-3', autoclose: true, icon: '', action: () => { console.log('it3-3'); } }
+										, { label: 'it3-4', autoclose: true, icon: '', action: () => { console.log('it3-4'); } }]
+							}], items: [{ label: 'it2-3', autoclose: true, icon: '', action: () => { console.log('it2-3'); } }
+								, { label: 'it2-4', autoclose: true, icon: '', action: () => { console.log('it2-4'); } }]
+					}], items: [{ label: 'it1-1', autoclose: true, icon: '', action: () => { console.log('it1-1'); } }
+						, { label: 'it1-2', autoclose: true, icon: '', action: () => { console.log('it1-2'); } }]
+			};
+			console.log(this.menuRoot);
+		}*/
 	openNextLevel() {
 		if (this.currentLevel == 0) {
 			this.open_1_level();
@@ -374,7 +382,7 @@ class ZMainMenu {
 
 	}
 	open_1_level() {
-		console.log('open_1_level');
+		//console.log('open_1_level');
 		this.menu1textHead.innerText = this.menuRoot.path;
 		this.level1style.width = '8cm';
 		this.reFillMenulevel(this.menu1content, this.menuRoot
@@ -410,36 +418,40 @@ class ZMainMenu {
 		}*/
 	}
 	open_2_level() {
-		console.log('open_2_level');
+		//console.log('open_2_level');
 		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
 		this.menu2textHead.innerText = this.menuRoot.folders[folderIdx1].path;
+		this.menuRoot.folders[folderIdx1].afterOpen();
 		this.level2style.width = '7.5cm';
 		this.reFillMenulevel(this.menu2content, this.menuRoot.folders[folderIdx1], this.selection2level);
 	}
 	open_3_level() {
-		console.log('open_3_level');
+		//console.log('open_3_level');
 		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
 		var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
+		this.menuRoot.folders[folderIdx1].folders[folderIdx2].afterOpen();
 		this.menu3textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].path;
 		this.level3style.width = '7.0cm';
 		this.reFillMenulevel(this.menu3content, this.menuRoot.folders[folderIdx1].folders[folderIdx2], this.selection3level);
 	}
 	open_4_level() {
-		console.log('open_4_level');
+		//console.log('open_4_level');
 		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
 		var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
 		var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
+		this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].afterOpen();
 		this.menu4textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].path;
 		this.level4style.width = '6.5cm';
 		this.reFillMenulevel(this.menu4content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3], this.selection4level);
 
 	}
 	open_5_level() {
-		console.log('open_5_level');
+		//console.log('open_5_level');
 		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
 		var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
 		var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
 		var folderIdx4 = this.selection4level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].items.length;
+		this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].afterOpen();
 		this.menu5textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].path;
 		this.level5style.width = '6.0cm';
 		this.reFillMenulevel(this.menu5content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4], this.selection5level);
@@ -449,11 +461,14 @@ class ZMainMenu {
 		this.menuRoot.items.length = 0;
 		this.menuRoot.folders.length = 0;
 		this.menuRoot.items.push(this.muzXBox.itemImportMIDI);
-		var songFolder: ZMenuFolder = { path: "Current song", icon: "", folders: [], items: [] };
+		var songFolder: ZMenuFolder = { path: "Current song", icon: "", folders: [], items: [], afterOpen: () => { } };
 		for (var ff = 0; ff < prj.filters.length; ff++) {
-			var filter: ZMenuFolder = { path: 'fx ' + prj.filters[ff].kind, icon: "", folders: [], items: [] };
+			songFolder.items.push({ label: "+track", icon: "", autoclose: false, action: () => { console.log('+track'); } });
+			songFolder.items.push({ label: "+fx", icon: "", autoclose: false, action: () => { console.log('+fx'); } });
+			var filter: ZMenuFolder = { path: 'fx ' + prj.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upSongFx(ff) };
 			songFolder.folders.push(filter);
 			var songfilter = prj.filters[ff];
+			filter.items.push({ label: "-fx", icon: "", autoclose: false, action: () => { console.log('-fx'); } });
 			for (var kk = 0; kk < songfilter.parameters.length; kk++) {
 				var par: ZMenuItem = { label: "par " + kk, icon: "", autoclose: false, action: this.upSongFxParam(ff, kk) };
 				filter.items.push(par);
@@ -461,31 +476,38 @@ class ZMainMenu {
 		}
 		for (var tt = 0; tt < prj.tracks.length; tt++) {
 			var songtrack = prj.tracks[tt];
-			var tr: ZMenuFolder = { path: 'track ' + songtrack.title, icon: "", folders: [], items: [] };
+			var tr: ZMenuFolder = { path: 'track ' + songtrack.title, icon: "", folders: [], items: [], afterOpen: this.upTrack(tt) };
 			songFolder.folders.push(tr);
 			for (var ff = 0; ff < songtrack.filters.length; ff++) {
-				var filter: ZMenuFolder = { path: 'fx ' + songtrack.filters[ff].kind, icon: "", folders: [], items: [] };
+				var filter: ZMenuFolder = { path: 'fx ' + songtrack.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upTrackFx(tt, ff) };
 				tr.folders.push(filter);
 				var songfilter = songtrack.filters[ff];
+				filter.items.push({ label: "-fx", icon: "", autoclose: false, action: () => { console.log('-fx'); } });
 				for (var kk = 0; kk < songfilter.parameters.length; kk++) {
 					var par: ZMenuItem = { label: "par " + kk, icon: "", autoclose: false, action: this.upTrackFxParam(tt, ff, kk) };
 					filter.items.push(par);
 				}
+				tr.items.push({ label: "-track", icon: "", autoclose: false, action: () => { console.log('-track'); } });
+				tr.items.push({ label: "+tfx", icon: "", autoclose: false, action: () => { console.log('+tfx'); } });
+				tr.items.push({ label: "+vox", icon: "", autoclose: false, action: () => { console.log('+vox'); } });
 			}
 			for (var vv = 0; vv < songtrack.voices.length; vv++) {
 				var songvox = songtrack.voices[vv];
-				var vox: ZMenuFolder = { path: 'vox ' + songvox.title, icon: "", folders: [], items: [] };
+				var vox: ZMenuFolder = { path: 'vox ' + songvox.title, icon: "", folders: [], items: [], afterOpen: this.upVox(tt, vv) };
 				tr.folders.push(vox);
-				var source: ZMenuFolder = { path: 'src ' + songvox.performer.kind, icon: "", folders: [], items: [] };
+				vox.items.push({ label: "+vfx", icon: "", autoclose: false, action: () => { console.log('+vfx'); } });
+				var source: ZMenuFolder = { path: 'src ' + songvox.performer.kind, icon: "", folders: [], items: [], afterOpen: this.upVoxProvider(tt, vv) };
+				source.items.push({ label: "?src", icon: "", autoclose: false, action: () => { console.log('?src'); } });
 				for (var kk = 0; kk < songvox.performer.parameters.length; kk++) {
 					var par: ZMenuItem = { label: "par " + kk, icon: "", autoclose: false, action: this.upVoxProviderParam(tt, vv, kk) };
 					source.items.push(par);
 				}
 				vox.folders.push(source);
 				for (var ff = 0; ff < songvox.filters.length; ff++) {
-					var filter: ZMenuFolder = { path: 'fx ' + songvox.filters[ff].kind, icon: "", folders: [], items: [] };
+					var filter: ZMenuFolder = { path: 'fx ' + songvox.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upVoxFx(tt, vv, ff) };
 					vox.folders.push(filter);
 					var songfilter = songvox.filters[ff];
+					filter.items.push({ label: "-vfx", icon: "", autoclose: false, action: () => { console.log('-vfx'); } });
 					for (var kk = 0; kk < songfilter.parameters.length; kk++) {
 						var par: ZMenuItem = { label: "par " + kk, icon: "", autoclose: false, action: this.upVoxFxParam(tt, vv, ff, kk) };
 						filter.items.push(par);
@@ -497,16 +519,25 @@ class ZMainMenu {
 		this.menuRoot.folders.push(songFolder);
 	}
 	upSongFx(fx: number): () => void {
-		return () => { console.log('upSongFx', fx); };
+		return () => {
+			console.log('upSongFx', fx);
+
+		};
 	}
 	upSongFxParam(fx: number, param: number): () => void {
 		return () => { console.log('upSongFxParam', fx, param); };
 	}
 	upTrack(trk: number): () => void {
-		return () => { console.log('upSongFx', trk); };
+		return () => {
+			console.log('upSongFx', trk);
+			var tracks: ZvoogTrack[] = this.muzXBox.currentSchedule.tracks.splice(trk, 1);
+			this.muzXBox.currentSchedule.tracks.push(tracks[0]);
+			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+		};
 	}
 	upTrackFx(trk: number, fx: number): () => void {
-		return () => { console.log('upTrack', fx); };
+		return () => { console.log('upTrack', trk, fx); };
 	}
 	upTrackFxParam(trk: number, fx: number, param: number): () => void {
 		return () => { console.log('upTrackFxParam', trk, fx, param); };
@@ -521,7 +552,9 @@ class ZMainMenu {
 	upVoxFxParam(trk: number, vox: number, fx: number, param: number): () => void {
 		return () => { console.log('upVoxFxParam', trk, vox, fx, param); };
 	}
-
+	upVoxProvider(trk: number, vox: number): () => void {
+		return () => { console.log('upVoxProvider', trk, vox); };
+	}
 	upVoxProviderParam(trk: number, vox: number, param: number): () => void {
 		return () => { console.log('upVoxProviderParam', trk, vox, param); };
 	}

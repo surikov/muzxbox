@@ -1452,7 +1452,7 @@ var ZRender = (function () {
             time = time + measureDuration;
         }
     };
-    ZRender.prototype.drawSchedule = function (song, menuButton) {
+    ZRender.prototype.drawSchedule = function (song) {
         var songDuration = scheduleDuration(song);
         this.clearAnchorsContent(songDuration);
         this.fillTimeLine1(song);
@@ -1512,7 +1512,6 @@ var ZRender = (function () {
             }
             time = time + measureDuration;
         }
-        this.addDebugButtons(song, menuButton);
         this.tileLevel.resetModel();
     };
     ZRender.prototype.addVoiceMeasure = function (song, voice, i, time, css, anchors) {
@@ -1570,7 +1569,6 @@ var ZRender = (function () {
                 var tt = song.tracks.shift();
                 if (tt) {
                     song.tracks.push(tt);
-                    me.drawSchedule(song, menuButton);
                 }
             }
         });
@@ -1586,7 +1584,6 @@ var ZRender = (function () {
                     var vv = song.tracks[0].voices.shift();
                     if (vv) {
                         song.tracks[0].voices.push(vv);
-                        me.drawSchedule(song, menuButton);
                     }
                 }
             }
@@ -4214,183 +4211,14 @@ var ZMainMenu = (function () {
         if (el) {
             this.menu5content = el;
         }
-        this.fillStaticMenu();
-    }
-    ZMainMenu.prototype.fillStaticMenu = function () {
         this.menuRoot = {
             path: 'Menu',
             icon: '',
-            folders: [
-                {
-                    path: 'first-1', icon: '',
-                    folders: [
-                        {
-                            path: 'second-1', icon: '',
-                            folders: [
-                                {
-                                    path: 'third-1', icon: '',
-                                    folders: [
-                                        {
-                                            path: 'forth-1', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
-                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
-                                        }, {
-                                            path: 'forth-2', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
-                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
-                                        }
-                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
-                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
-                                }, {
-                                    path: 'third-2', icon: '',
-                                    folders: [
-                                        {
-                                            path: 'forth-3', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
-                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
-                                        }, {
-                                            path: 'forth-4', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
-                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
-                                        }
-                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
-                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
-                                }
-                            ], items: [{ label: 'it3-3', autoclose: true, icon: '', action: function () { console.log('it3-3'); } },
-                                { label: 'it3-4', autoclose: true, icon: '', action: function () { console.log('it3-4'); } }]
-                        }, {
-                            path: 'second-2', icon: '',
-                            folders: [
-                                {
-                                    path: 'third-3', icon: '',
-                                    folders: [
-                                        {
-                                            path: 'forth-5', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
-                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
-                                        }, {
-                                            path: 'forth-6', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
-                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
-                                        }
-                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
-                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
-                                }, {
-                                    path: 'third-4', icon: '',
-                                    folders: [
-                                        {
-                                            path: 'forth-7', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
-                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
-                                        }, {
-                                            path: 'forth-8', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
-                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
-                                        }
-                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
-                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
-                                }
-                            ], items: [{ label: 'it3-3', autoclose: true, icon: '', action: function () { console.log('it3-3'); } },
-                                { label: 'it3-4', autoclose: true, icon: '', action: function () { console.log('it3-4'); } }]
-                        }
-                    ], items: [{ label: 'it2-3', autoclose: true, icon: '', action: function () { console.log('it2-3'); } },
-                        { label: 'it2-4', autoclose: true, icon: '', action: function () { console.log('it2-4'); } }]
-                }, {
-                    path: 'f1-2', icon: '',
-                    folders: [
-                        {
-                            path: 'f2-1', icon: '',
-                            folders: [
-                                {
-                                    path: 'f3-1', icon: '',
-                                    folders: [
-                                        {
-                                            path: 'f4-1', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
-                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
-                                        }, {
-                                            path: 'f4-2', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
-                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
-                                        }
-                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
-                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
-                                }, {
-                                    path: 'f3-2', icon: '',
-                                    folders: [
-                                        {
-                                            path: 'f4-3', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
-                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
-                                        }, {
-                                            path: 'f4-4', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
-                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
-                                        }
-                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
-                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
-                                }
-                            ], items: [{ label: 'it3-3', autoclose: true, icon: '', action: function () { console.log('it3-3'); } },
-                                { label: 'it3-4', autoclose: true, icon: '', action: function () { console.log('it3-4'); } }]
-                        }, {
-                            path: 'f2-2', icon: '',
-                            folders: [
-                                {
-                                    path: 'f3-3', icon: '',
-                                    folders: [
-                                        {
-                                            path: 'f4-5', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
-                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
-                                        }, {
-                                            path: 'f4-6', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
-                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
-                                        }
-                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
-                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
-                                }, {
-                                    path: 'f3-4', icon: '',
-                                    folders: [
-                                        {
-                                            path: 'f4-7', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-3', autoclose: true, icon: '', action: function () { console.log('it5-3'); } },
-                                                { label: 'it5-4', autoclose: true, icon: '', action: function () { console.log('it5-4'); } }]
-                                        }, {
-                                            path: 'f4-8', icon: '',
-                                            folders: [],
-                                            items: [{ label: 'it5-5', autoclose: true, icon: '', action: function () { console.log('it5-5'); } },
-                                                { label: 'it5-6', autoclose: true, icon: '', action: function () { console.log('it5-6'); } }]
-                                        }
-                                    ], items: [{ label: 'it4-3', autoclose: true, icon: '', action: function () { console.log('it4-3'); } },
-                                        { label: 'it4-4', autoclose: true, icon: '', action: function () { console.log('it4-4'); } }]
-                                }
-                            ], items: [{ label: 'it3-3', autoclose: true, icon: '', action: function () { console.log('it3-3'); } },
-                                { label: 'it3-4', autoclose: true, icon: '', action: function () { console.log('it3-4'); } }]
-                        }
-                    ], items: [{ label: 'it2-3', autoclose: true, icon: '', action: function () { console.log('it2-3'); } },
-                        { label: 'it2-4', autoclose: true, icon: '', action: function () { console.log('it2-4'); } }]
-                }
-            ], items: [{ label: 'it1-1', autoclose: true, icon: '', action: function () { console.log('it1-1'); } },
-                { label: 'it1-2', autoclose: true, icon: '', action: function () { console.log('it1-2'); } }]
+            folders: [],
+            items: [],
+            afterOpen: function () { }
         };
-        console.log(this.menuRoot);
-    };
+    }
     ZMainMenu.prototype.openNextLevel = function () {
         if (this.currentLevel == 0) {
             this.open_1_level();
@@ -4557,41 +4385,40 @@ var ZMainMenu = (function () {
         }
     };
     ZMainMenu.prototype.open_1_level = function () {
-        console.log('open_1_level');
         this.menu1textHead.innerText = this.menuRoot.path;
         this.level1style.width = '8cm';
         this.reFillMenulevel(this.menu1content, this.menuRoot, this.selection1level);
     };
     ZMainMenu.prototype.open_2_level = function () {
-        console.log('open_2_level');
         var folderIdx1 = this.selection1level - this.menuRoot.items.length;
         this.menu2textHead.innerText = this.menuRoot.folders[folderIdx1].path;
+        this.menuRoot.folders[folderIdx1].afterOpen();
         this.level2style.width = '7.5cm';
         this.reFillMenulevel(this.menu2content, this.menuRoot.folders[folderIdx1], this.selection2level);
     };
     ZMainMenu.prototype.open_3_level = function () {
-        console.log('open_3_level');
         var folderIdx1 = this.selection1level - this.menuRoot.items.length;
         var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
+        this.menuRoot.folders[folderIdx1].folders[folderIdx2].afterOpen();
         this.menu3textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].path;
         this.level3style.width = '7.0cm';
         this.reFillMenulevel(this.menu3content, this.menuRoot.folders[folderIdx1].folders[folderIdx2], this.selection3level);
     };
     ZMainMenu.prototype.open_4_level = function () {
-        console.log('open_4_level');
         var folderIdx1 = this.selection1level - this.menuRoot.items.length;
         var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
         var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
+        this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].afterOpen();
         this.menu4textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].path;
         this.level4style.width = '6.5cm';
         this.reFillMenulevel(this.menu4content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3], this.selection4level);
     };
     ZMainMenu.prototype.open_5_level = function () {
-        console.log('open_5_level');
         var folderIdx1 = this.selection1level - this.menuRoot.items.length;
         var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
         var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
         var folderIdx4 = this.selection4level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].items.length;
+        this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].afterOpen();
         this.menu5textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].path;
         this.level5style.width = '6.0cm';
         this.reFillMenulevel(this.menu5content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4], this.selection5level);
@@ -4600,11 +4427,14 @@ var ZMainMenu = (function () {
         this.menuRoot.items.length = 0;
         this.menuRoot.folders.length = 0;
         this.menuRoot.items.push(this.muzXBox.itemImportMIDI);
-        var songFolder = { path: "Current song", icon: "", folders: [], items: [] };
+        var songFolder = { path: "Current song", icon: "", folders: [], items: [], afterOpen: function () { } };
         for (var ff = 0; ff < prj.filters.length; ff++) {
-            var filter = { path: 'fx ' + prj.filters[ff].kind, icon: "", folders: [], items: [] };
+            songFolder.items.push({ label: "+track", icon: "", autoclose: false, action: function () { console.log('+track'); } });
+            songFolder.items.push({ label: "+fx", icon: "", autoclose: false, action: function () { console.log('+fx'); } });
+            var filter = { path: 'fx ' + prj.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upSongFx(ff) };
             songFolder.folders.push(filter);
             var songfilter = prj.filters[ff];
+            filter.items.push({ label: "-fx", icon: "", autoclose: false, action: function () { console.log('-fx'); } });
             for (var kk = 0; kk < songfilter.parameters.length; kk++) {
                 var par = { label: "par " + kk, icon: "", autoclose: false, action: this.upSongFxParam(ff, kk) };
                 filter.items.push(par);
@@ -4612,31 +4442,38 @@ var ZMainMenu = (function () {
         }
         for (var tt = 0; tt < prj.tracks.length; tt++) {
             var songtrack = prj.tracks[tt];
-            var tr = { path: 'track ' + songtrack.title, icon: "", folders: [], items: [] };
+            var tr = { path: 'track ' + songtrack.title, icon: "", folders: [], items: [], afterOpen: this.upTrack(tt) };
             songFolder.folders.push(tr);
             for (var ff = 0; ff < songtrack.filters.length; ff++) {
-                var filter = { path: 'fx ' + songtrack.filters[ff].kind, icon: "", folders: [], items: [] };
+                var filter = { path: 'fx ' + songtrack.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upTrackFx(tt, ff) };
                 tr.folders.push(filter);
                 var songfilter = songtrack.filters[ff];
+                filter.items.push({ label: "-fx", icon: "", autoclose: false, action: function () { console.log('-fx'); } });
                 for (var kk = 0; kk < songfilter.parameters.length; kk++) {
                     var par = { label: "par " + kk, icon: "", autoclose: false, action: this.upTrackFxParam(tt, ff, kk) };
                     filter.items.push(par);
                 }
+                tr.items.push({ label: "-track", icon: "", autoclose: false, action: function () { console.log('-track'); } });
+                tr.items.push({ label: "+tfx", icon: "", autoclose: false, action: function () { console.log('+tfx'); } });
+                tr.items.push({ label: "+vox", icon: "", autoclose: false, action: function () { console.log('+vox'); } });
             }
             for (var vv = 0; vv < songtrack.voices.length; vv++) {
                 var songvox = songtrack.voices[vv];
-                var vox = { path: 'vox ' + songvox.title, icon: "", folders: [], items: [] };
+                var vox = { path: 'vox ' + songvox.title, icon: "", folders: [], items: [], afterOpen: this.upVox(tt, vv) };
                 tr.folders.push(vox);
-                var source = { path: 'src ' + songvox.performer.kind, icon: "", folders: [], items: [] };
+                vox.items.push({ label: "+vfx", icon: "", autoclose: false, action: function () { console.log('+vfx'); } });
+                var source = { path: 'src ' + songvox.performer.kind, icon: "", folders: [], items: [], afterOpen: this.upVoxProvider(tt, vv) };
+                source.items.push({ label: "?src", icon: "", autoclose: false, action: function () { console.log('?src'); } });
                 for (var kk = 0; kk < songvox.performer.parameters.length; kk++) {
                     var par = { label: "par " + kk, icon: "", autoclose: false, action: this.upVoxProviderParam(tt, vv, kk) };
                     source.items.push(par);
                 }
                 vox.folders.push(source);
                 for (var ff = 0; ff < songvox.filters.length; ff++) {
-                    var filter = { path: 'fx ' + songvox.filters[ff].kind, icon: "", folders: [], items: [] };
+                    var filter = { path: 'fx ' + songvox.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upVoxFx(tt, vv, ff) };
                     vox.folders.push(filter);
                     var songfilter = songvox.filters[ff];
+                    filter.items.push({ label: "-vfx", icon: "", autoclose: false, action: function () { console.log('-vfx'); } });
                     for (var kk = 0; kk < songfilter.parameters.length; kk++) {
                         var par = { label: "par " + kk, icon: "", autoclose: false, action: this.upVoxFxParam(tt, vv, ff, kk) };
                         filter.items.push(par);
@@ -4647,16 +4484,25 @@ var ZMainMenu = (function () {
         this.menuRoot.folders.push(songFolder);
     };
     ZMainMenu.prototype.upSongFx = function (fx) {
-        return function () { console.log('upSongFx', fx); };
+        return function () {
+            console.log('upSongFx', fx);
+        };
     };
     ZMainMenu.prototype.upSongFxParam = function (fx, param) {
         return function () { console.log('upSongFxParam', fx, param); };
     };
     ZMainMenu.prototype.upTrack = function (trk) {
-        return function () { console.log('upSongFx', trk); };
+        var _this = this;
+        return function () {
+            console.log('upSongFx', trk);
+            var tracks = _this.muzXBox.currentSchedule.tracks.splice(trk, 1);
+            _this.muzXBox.currentSchedule.tracks.push(tracks[0]);
+            _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+        };
     };
     ZMainMenu.prototype.upTrackFx = function (trk, fx) {
-        return function () { console.log('upTrack', fx); };
+        return function () { console.log('upTrack', trk, fx); };
     };
     ZMainMenu.prototype.upTrackFxParam = function (trk, fx, param) {
         return function () { console.log('upTrackFxParam', trk, fx, param); };
@@ -4669,6 +4515,9 @@ var ZMainMenu = (function () {
     };
     ZMainMenu.prototype.upVoxFxParam = function (trk, vox, fx, param) {
         return function () { console.log('upVoxFxParam', trk, vox, fx, param); };
+    };
+    ZMainMenu.prototype.upVoxProvider = function (trk, vox) {
+        return function () { console.log('upVoxProvider', trk, vox); };
     };
     ZMainMenu.prototype.upVoxProviderParam = function (trk, vox, param) {
         return function () { console.log('upVoxProviderParam', trk, vox, param); };
@@ -4710,7 +4559,6 @@ var MuzXBox = (function () {
         this.zrenderer = new ZRender();
         this.zInputDeviceHandler = new ZInputDeviceHandler(this);
         this.zMainMenu = new ZMainMenu(this);
-        this.zMainMenu.menuRoot.items.push(this.itemImportMIDI);
         this.zrenderer.bindLayers();
         this.zrenderer.initUI();
         this.createUI();
@@ -4733,7 +4581,9 @@ var MuzXBox = (function () {
                 progression: []
             }
         };
-        this.zrenderer.drawSchedule(emptySchedule, this.menuButton);
+        this.currentSchedule = emptySchedule;
+        this.zrenderer.drawSchedule(emptySchedule);
+        this.zMainMenu.fillFrom(this.currentSchedule);
     };
     MuzXBox.prototype.testFSmidi = function () {
         var test = new MIDIFileImporter();
@@ -4742,7 +4592,8 @@ var MuzXBox = (function () {
                 var me = window['MZXB'];
                 console.log(me);
                 if (me) {
-                    me.zrenderer.drawSchedule(result, me.menuButton);
+                    me.currentSchedule = result;
+                    me.zrenderer.drawSchedule(result);
                     me.zMainMenu.fillFrom(result);
                 }
             }
@@ -4755,7 +4606,8 @@ var MuzXBox = (function () {
                 var me = window['MZXB'];
                 if (me) {
                     console.log(result);
-                    me.zrenderer.drawSchedule(result, me.menuButton);
+                    me.currentSchedule = result;
+                    me.zrenderer.drawSchedule(result);
                 }
             }
         });

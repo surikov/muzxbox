@@ -228,7 +228,7 @@ class ZRender {
 			time = time + measureDuration;
 		}
 	}
-	drawSchedule(song: ZvoogSchedule, menuButton: TileRectangle) {
+	drawSchedule(song: ZvoogSchedule){//}, menuButton: TileRectangle) {
 		var songDuration = scheduleDuration(song);
 		this.clearAnchorsContent(songDuration);
 		this.fillTimeLine1(song);
@@ -286,7 +286,7 @@ class ZRender {
 			}
 			time = time + measureDuration;
 		}
-		this.addDebugButtons(song, menuButton);
+		//this.addDebugButtons(song, menuButton);
 		this.tileLevel.resetModel();
 	}
 	addVoiceMeasure(song: ZvoogSchedule, voice: ZvoogVoice, i: number, time: number, css: string, anchors: TileAnchor[]) {
@@ -344,7 +344,7 @@ class ZRender {
 				var tt = song.tracks.shift();
 				if (tt) {
 					song.tracks.push(tt);
-					me.drawSchedule(song, menuButton)
+					//me.drawSchedule(song, menuButton)
 				}
 			}
 		});
@@ -360,7 +360,7 @@ class ZRender {
 					var vv = song.tracks[0].voices.shift();
 					if (vv) {
 						song.tracks[0].voices.push(vv);
-						me.drawSchedule(song, menuButton)
+						//me.drawSchedule(song, menuButton)
 					}
 				}
 			}

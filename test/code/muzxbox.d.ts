@@ -304,7 +304,7 @@ declare class ZRender {
     fillTimeLine16(song: ZvoogSchedule): void;
     fillTimeLine64(song: ZvoogSchedule): void;
     fillTimeLine256(song: ZvoogSchedule): void;
-    drawSchedule(song: ZvoogSchedule, menuButton: TileRectangle): void;
+    drawSchedule(song: ZvoogSchedule): void;
     addVoiceMeasure(song: ZvoogSchedule, voice: ZvoogVoice, i: number, time: number, css: string, anchors: TileAnchor[]): void;
     addDebugButtons(song: ZvoogSchedule, menuButton: TileRectangle): void;
 }
@@ -983,6 +983,7 @@ declare type ZMenuFolder = {
     icon: string;
     folders: ZMenuFolder[];
     items: ZMenuItem[];
+    afterOpen: () => void;
 };
 declare class ZMainMenu {
     muzXBox: MuzXBox;
@@ -1009,7 +1010,6 @@ declare class ZMainMenu {
     currentLevel: number;
     menuRoot: ZMenuFolder;
     constructor(from: MuzXBox);
-    fillStaticMenu(): void;
     openNextLevel(): void;
     backPreLevel(): void;
     hideMenu(): void;
@@ -1031,11 +1031,13 @@ declare class ZMainMenu {
     upVox(trk: number, vox: number): () => void;
     upVoxFx(trk: number, vox: number, fx: number): () => void;
     upVoxFxParam(trk: number, vox: number, fx: number, param: number): () => void;
+    upVoxProvider(trk: number, vox: number): () => void;
     upVoxProviderParam(trk: number, vox: number, param: number): () => void;
 }
 declare let midiDrumPitchShift: number;
 declare let us: ZUserSetting;
 declare class MuzXBox {
+    currentSchedule: ZvoogSchedule;
     zrenderer: ZRender;
     zInputDeviceHandler: ZInputDeviceHandler;
     zMainMenu: ZMainMenu;

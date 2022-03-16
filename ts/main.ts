@@ -4,6 +4,7 @@ let midiDrumPitchShift = 23;
 let us: ZUserSetting;
 
 class MuzXBox {
+	currentSchedule: ZvoogSchedule;
 	zrenderer: ZRender;
 	zInputDeviceHandler: ZInputDeviceHandler;
 	zMainMenu: ZMainMenu;
@@ -40,7 +41,8 @@ class MuzXBox {
 		this.zrenderer = new ZRender();
 		this.zInputDeviceHandler = new ZInputDeviceHandler(this);
 		this.zMainMenu = new ZMainMenu(this);
-		this.zMainMenu.menuRoot.items.push(this.itemImportMIDI);
+		//this.zMainMenu.menuRoot.items.push(this.itemImportMIDI);
+		//this.zMainMenu.fillFrom(this.currentSchedule);
 		this.zrenderer.bindLayers();
 		this.zrenderer.initUI();
 		this.createUI();
@@ -64,7 +66,9 @@ class MuzXBox {
 				, progression: []
 			}
 		};
-		this.zrenderer.drawSchedule(emptySchedule, this.menuButton);
+		this.currentSchedule=emptySchedule;
+		this.zrenderer.drawSchedule(emptySchedule);//, this.menuButton);
+		this.zMainMenu.fillFrom(this.currentSchedule);
 	}
 	/*openMenu() {
 		(document.getElementById('menuContentDiv') as any).style.visibility = 'visible';
@@ -80,7 +84,8 @@ class MuzXBox {
 				var me: MuzXBox = window['MZXB'] as MuzXBox;
 				console.log(me);
 				if (me) {
-					me.zrenderer.drawSchedule(result, me.menuButton);
+					me.currentSchedule=result;
+					me.zrenderer.drawSchedule(result);//, me.menuButton);
 					me.zMainMenu.fillFrom(result);
 				}
 			}
@@ -93,7 +98,8 @@ class MuzXBox {
 				var me: MuzXBox = window['MZXB'] as MuzXBox;
 				if (me) {
 					console.log(result);
-					me.zrenderer.drawSchedule(result, me.menuButton);
+					me.currentSchedule=result;
+					me.zrenderer.drawSchedule(result);//, me.menuButton);
 				}
 			}
 		});
