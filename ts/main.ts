@@ -48,11 +48,11 @@ class MuzXBox {
 		this.createUI();
 
 		us.selectMode('ru');
-		console.log(us.txt('testText'));
+		//console.log(us.txt('testText'));
 		us.selectMode('en');
-		console.log(us.txt('testText'));
+		//console.log(us.txt('testText'));
 		us.selectMode('wwwwwww');
-		console.log(us.txt('testText'));
+		//console.log(us.txt('testText'));
 		us.selectMode('en');
 	}
 	createUI() {
@@ -82,7 +82,7 @@ class MuzXBox {
 		test.readSongData("any", function (result: ZvoogSchedule | null): void {
 			if (result) {
 				var me: MuzXBox = window['MZXB'] as MuzXBox;
-				console.log(me);
+				//console.log(me);
 				if (me) {
 					me.currentSchedule=result;
 					me.zrenderer.drawSchedule(result);//, me.menuButton);

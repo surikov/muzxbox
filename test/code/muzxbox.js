@@ -57,37 +57,27 @@ var ZInputDeviceHandler = (function () {
         }
     };
     ZInputDeviceHandler.prototype.processKeyX = function () {
-        console.log('KeyX');
     };
     ZInputDeviceHandler.prototype.processKeyY = function () {
-        console.log('KeyY');
         this.muzXBox.zMainMenu.openNextLevel();
     };
     ZInputDeviceHandler.prototype.processKeyA = function () {
-        console.log('KeyA');
         this.muzXBox.zMainMenu.openNextLevel();
     };
     ZInputDeviceHandler.prototype.processKeyB = function () {
-        console.log('KeyB');
         this.muzXBox.zMainMenu.backPreLevel();
     };
     ZInputDeviceHandler.prototype.processAnyPlus = function () {
-        console.log('+');
     };
     ZInputDeviceHandler.prototype.processAnyMinus = function () {
-        console.log('-');
     };
     ZInputDeviceHandler.prototype.processArrowLeft = function () {
-        console.log('left');
     };
     ZInputDeviceHandler.prototype.processArrowRight = function () {
-        console.log('right');
     };
     ZInputDeviceHandler.prototype.processArrowUp = function () {
-        console.log('up');
     };
     ZInputDeviceHandler.prototype.processArrowDown = function () {
-        console.log('down');
     };
     return ZInputDeviceHandler;
 }());
@@ -1819,6 +1809,12 @@ var ZvoogFxGain = (function () {
     ZvoogFxGain.prototype.busy = function () {
         return 0;
     };
+    ZvoogFxGain.prototype.getParId = function (nn) {
+        switch (nn) {
+            case 0: return 'volume';
+        }
+        return null;
+    };
     return ZvoogFxGain;
 }());
 var WAFEcho = (function () {
@@ -1877,6 +1873,18 @@ var WAFEcho = (function () {
         }
         this.inpt.connect(this.rvrbrtr.input);
         this.rvrbrtr.output.connect(this.outpt);
+    };
+    WAFEcho.prototype.getParId = function (nn) {
+        switch (nn) {
+            case 0: return 'reverberation';
+            case 1: return 'threshold';
+            case 2: return 'knee';
+            case 3: return 'ratio';
+            case 4: return 'attack';
+            case 5: return 'release';
+            case 6: return 'level';
+        }
+        return null;
     };
     WAFEcho.prototype.getInput = function () {
         return this.inpt;
@@ -1943,6 +1951,21 @@ var WAFEqualizer = (function () {
         if (!(window.wafPlayer)) {
             window.wafPlayer = new WebAudioFontPlayer();
         }
+    };
+    WAFEqualizer.prototype.getParId = function (nn) {
+        switch (nn) {
+            case 0: return '32';
+            case 1: return '64';
+            case 2: return '128';
+            case 3: return '256';
+            case 4: return '512';
+            case 5: return '1k';
+            case 6: return '2k';
+            case 7: return '4k';
+            case 8: return '8k';
+            case 9: return '16k';
+        }
+        return null;
     };
     return WAFEqualizer;
 }());
@@ -2026,6 +2049,9 @@ var ZvoogSineSource = (function () {
         while (this.nextClear()) {
         }
         ;
+    };
+    ZvoogSineSource.prototype.getParId = function (nn) {
+        return null;
     };
     return ZvoogSineSource;
 }());
@@ -2115,6 +2141,9 @@ var WAFInsSource = (function () {
             me.zones = window[info.variable];
         });
     };
+    WAFInsSource.prototype.getParId = function (nn) {
+        return null;
+    };
     return WAFInsSource;
 }());
 var WAFPercSource = (function () {
@@ -2184,6 +2213,9 @@ var WAFPercSource = (function () {
         window.wafPlayer.loader.waitLoad(function () {
             me.zones = window[info.variable];
         });
+    };
+    WAFPercSource.prototype.getParId = function (nn) {
+        return null;
     };
     return WAFPercSource;
 }());
@@ -2322,6 +2354,9 @@ var AudioFileSource = (function () {
         audioBufferSourceNode.start(when);
         audioBufferSourceNode.stop(nextPointSeconds + this.afterTime);
         this.waves.push({ audio: audioBufferSourceNode, end: nextPointSeconds + this.afterTime });
+    };
+    AudioFileSource.prototype.getParId = function (nn) {
+        return null;
     };
     return AudioFileSource;
 }());
@@ -2516,6 +2551,9 @@ var ZvoogPerformerStub = (function () {
     };
     ZvoogPerformerStub.prototype.addSchedule = function (when, tempo, chord, variation) {
     };
+    ZvoogPerformerStub.prototype.getParId = function (nn) {
+        return null;
+    };
     return ZvoogPerformerStub;
 }());
 var ZvoogFilterStub = (function () {
@@ -2546,6 +2584,9 @@ var ZvoogFilterStub = (function () {
     };
     ZvoogFilterStub.prototype.getInput = function () {
         return this.base;
+    };
+    ZvoogFilterStub.prototype.getParId = function (nn) {
+        return null;
     };
     return ZvoogFilterStub;
 }());
@@ -3439,6 +3480,17 @@ var MidiParser = (function () {
         drumVoices.push(drvc);
         return drvc;
     };
+    MidiParser.prototype.parametersDefs = function (plugin) {
+        var pars = [];
+        var pp = 0;
+        var pName = plugin.getParId(pp);
+        while (pName) {
+            pars.push({ caption: pName, points: [] });
+            pp++;
+            pName = plugin.getParId(pp);
+        }
+        return pars;
+    };
     MidiParser.prototype.convert = function () {
         var midisong = this.dump();
         var count = 4;
@@ -3508,9 +3560,20 @@ var MidiParser = (function () {
                 progression: []
             }
         };
+        var testEcho = new WAFEcho();
+        var testGain = new ZvoogFxGain();
+        var testEQ = new WAFEqualizer();
+        var wafdrum = new WAFPercSource();
+        var wafinstrument = new WAFInsSource();
         schedule.filters.push({
             filterPlugin: null,
-            parameters: [{ points: [] }],
+            parameters: this.parametersDefs(testEcho),
+            kind: "echo",
+            initial: ""
+        });
+        schedule.filters.push({
+            filterPlugin: null,
+            parameters: this.parametersDefs(testGain),
             kind: "gain",
             initial: ""
         });
@@ -3541,7 +3604,7 @@ var MidiParser = (function () {
                 voices: [],
                 filters: [{
                         filterPlugin: null,
-                        parameters: [{ points: [] }],
+                        parameters: this.parametersDefs(testGain),
                         kind: "gain",
                         initial: ""
                     }]
@@ -3553,6 +3616,12 @@ var MidiParser = (function () {
                 break;
             }
             if (firstChannelNum == 9) {
+                track.filters.push({
+                    filterPlugin: null,
+                    parameters: this.parametersDefs(testEQ),
+                    kind: "equalizer",
+                    initial: ""
+                });
                 var drumNums = [];
                 for (var ch = 0; ch < midisong.tracks[i].songchords.length; ch++) {
                     for (var nn = 0; nn < midisong.tracks[i].songchords[ch].notes.length; nn++) {
@@ -3563,13 +3632,13 @@ var MidiParser = (function () {
                                 measureChords: [],
                                 performer: {
                                     performerPlugin: null,
-                                    parameters: [{ points: [] }],
+                                    parameters: this.parametersDefs(wafdrum),
                                     kind: 'wafdrum',
                                     initial: '' + pinum
                                 },
                                 filters: [{
                                         filterPlugin: null,
-                                        parameters: [{ points: [] }],
+                                        parameters: this.parametersDefs(testGain),
                                         kind: "gain",
                                         initial: ""
                                     }],
@@ -3622,14 +3691,19 @@ var MidiParser = (function () {
                     measureChords: [],
                     performer: {
                         performerPlugin: null,
-                        parameters: [{ points: [] }],
+                        parameters: this.parametersDefs(wafinstrument),
                         kind: 'wafinstrument',
                         initial: '' + midisong.tracks[i].program
                     },
                     filters: [{
                             filterPlugin: null,
-                            parameters: [{ points: [] }],
+                            parameters: this.parametersDefs(testGain),
                             kind: "gain",
+                            initial: ""
+                        }, {
+                            filterPlugin: null,
+                            parameters: this.parametersDefs(testEQ),
+                            kind: "equalizer",
                             initial: ""
                         }],
                     title: 'program ' + midisong.tracks[i].program
@@ -4428,35 +4502,15 @@ var ZMainMenu = (function () {
         this.menuRoot.folders.length = 0;
         this.menuRoot.items.push(this.muzXBox.itemImportMIDI);
         var songFolder = { path: "Current song", icon: "", folders: [], items: [], afterOpen: function () { } };
-        for (var ff = 0; ff < prj.filters.length; ff++) {
-            songFolder.items.push({ label: "+track", icon: "", autoclose: false, action: function () { console.log('+track'); } });
-            songFolder.items.push({ label: "+fx", icon: "", autoclose: false, action: function () { console.log('+fx'); } });
-            var filter = { path: 'fx ' + prj.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upSongFx(ff) };
-            songFolder.folders.push(filter);
-            var songfilter = prj.filters[ff];
-            filter.items.push({ label: "-fx", icon: "", autoclose: false, action: function () { console.log('-fx'); } });
-            for (var kk = 0; kk < songfilter.parameters.length; kk++) {
-                var par = { label: "par " + kk, icon: "", autoclose: false, action: this.upSongFxParam(ff, kk) };
-                filter.items.push(par);
-            }
-        }
+        songFolder.items.push({ label: "+track", icon: "", autoclose: false, action: function () { console.log('+track'); } });
+        songFolder.items.push({ label: "+fx", icon: "", autoclose: false, action: function () { console.log('+fx'); } });
         for (var tt = 0; tt < prj.tracks.length; tt++) {
             var songtrack = prj.tracks[tt];
             var tr = { path: 'track ' + songtrack.title, icon: "", folders: [], items: [], afterOpen: this.upTrack(tt) };
             songFolder.folders.push(tr);
-            for (var ff = 0; ff < songtrack.filters.length; ff++) {
-                var filter = { path: 'fx ' + songtrack.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upTrackFx(tt, ff) };
-                tr.folders.push(filter);
-                var songfilter = songtrack.filters[ff];
-                filter.items.push({ label: "-fx", icon: "", autoclose: false, action: function () { console.log('-fx'); } });
-                for (var kk = 0; kk < songfilter.parameters.length; kk++) {
-                    var par = { label: "par " + kk, icon: "", autoclose: false, action: this.upTrackFxParam(tt, ff, kk) };
-                    filter.items.push(par);
-                }
-                tr.items.push({ label: "-track", icon: "", autoclose: false, action: function () { console.log('-track'); } });
-                tr.items.push({ label: "+tfx", icon: "", autoclose: false, action: function () { console.log('+tfx'); } });
-                tr.items.push({ label: "+vox", icon: "", autoclose: false, action: function () { console.log('+vox'); } });
-            }
+            tr.items.push({ label: "-track", icon: "", autoclose: false, action: function () { console.log('-track'); } });
+            tr.items.push({ label: "+tfx", icon: "", autoclose: false, action: function () { console.log('+tfx'); } });
+            tr.items.push({ label: "+vox", icon: "", autoclose: false, action: function () { console.log('+vox'); } });
             for (var vv = 0; vv < songtrack.voices.length; vv++) {
                 var songvox = songtrack.voices[vv];
                 var vox = { path: 'vox ' + songvox.title, icon: "", folders: [], items: [], afterOpen: this.upVox(tt, vv) };
@@ -4465,62 +4519,133 @@ var ZMainMenu = (function () {
                 var source = { path: 'src ' + songvox.performer.kind, icon: "", folders: [], items: [], afterOpen: this.upVoxProvider(tt, vv) };
                 source.items.push({ label: "?src", icon: "", autoclose: false, action: function () { console.log('?src'); } });
                 for (var kk = 0; kk < songvox.performer.parameters.length; kk++) {
-                    var par = { label: "par " + kk, icon: "", autoclose: false, action: this.upVoxProviderParam(tt, vv, kk) };
+                    var par = { label: "par " + kk + " " + songvox.performer.parameters[kk].caption, icon: "", autoclose: false, action: this.upVoxProviderParam(tt, vv, kk) };
                     source.items.push(par);
                 }
                 vox.folders.push(source);
                 for (var ff = 0; ff < songvox.filters.length; ff++) {
                     var filter = { path: 'fx ' + songvox.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upVoxFx(tt, vv, ff) };
                     vox.folders.push(filter);
-                    var songfilter = songvox.filters[ff];
+                    var voxfilter = songvox.filters[ff];
                     filter.items.push({ label: "-vfx", icon: "", autoclose: false, action: function () { console.log('-vfx'); } });
-                    for (var kk = 0; kk < songfilter.parameters.length; kk++) {
-                        var par = { label: "par " + kk, icon: "", autoclose: false, action: this.upVoxFxParam(tt, vv, ff, kk) };
+                    for (var kk = 0; kk < voxfilter.parameters.length; kk++) {
+                        var par = { label: "par " + kk + " " + voxfilter.parameters[kk].caption, icon: "", autoclose: false, action: this.upVoxFxParam(tt, vv, ff, kk) };
                         filter.items.push(par);
                     }
                 }
+            }
+            for (var ff = 0; ff < songtrack.filters.length; ff++) {
+                var filter = { path: 'fx ' + songtrack.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upTrackFx(tt, ff) };
+                tr.folders.push(filter);
+                var trfilter = songtrack.filters[ff];
+                filter.items.push({ label: "-fx", icon: "", autoclose: false, action: function () { console.log('-fx'); } });
+                for (var kk = 0; kk < trfilter.parameters.length; kk++) {
+                    var par = { label: "par " + kk + " " + trfilter.parameters[kk].caption, icon: "", autoclose: false, action: this.upTrackFxParam(tt, ff, kk) };
+                    filter.items.push(par);
+                }
+            }
+        }
+        for (var ff = 0; ff < prj.filters.length; ff++) {
+            var filter = { path: 'fx ' + prj.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upSongFx(ff) };
+            songFolder.folders.push(filter);
+            var songfilter = prj.filters[ff];
+            filter.items.push({ label: "-fx", icon: "", autoclose: false, action: function () { console.log('-fx'); } });
+            for (var kk = 0; kk < songfilter.parameters.length; kk++) {
+                var par = { label: "par " + kk + " " + songfilter.parameters[kk].caption, icon: "", autoclose: false, action: this.upSongFxParam(ff, kk) };
+                filter.items.push(par);
             }
         }
         this.menuRoot.folders.push(songFolder);
     };
     ZMainMenu.prototype.upSongFx = function (fx) {
+        var _this = this;
         return function () {
             console.log('upSongFx', fx);
+            _this.muzXBox.currentSchedule.obverse = _this.muzXBox.currentSchedule.tracks.length + fx;
+            _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
     };
     ZMainMenu.prototype.upSongFxParam = function (fx, param) {
-        return function () { console.log('upSongFxParam', fx, param); };
+        var _this = this;
+        return function () {
+            console.log('upSongFxParam', fx, param);
+            _this.muzXBox.currentSchedule.filters[fx].obverse = param;
+            _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+        };
     };
     ZMainMenu.prototype.upTrack = function (trk) {
         var _this = this;
         return function () {
-            console.log('upSongFx', trk);
-            var tracks = _this.muzXBox.currentSchedule.tracks.splice(trk, 1);
-            _this.muzXBox.currentSchedule.tracks.push(tracks[0]);
+            console.log('upTrack', trk);
+            _this.muzXBox.currentSchedule.obverse = trk;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
     };
     ZMainMenu.prototype.upTrackFx = function (trk, fx) {
-        return function () { console.log('upTrack', trk, fx); };
+        var _this = this;
+        return function () {
+            console.log('upTrackFx', trk, fx);
+            _this.muzXBox.currentSchedule.tracks[trk].obverse = fx;
+            _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+        };
     };
     ZMainMenu.prototype.upTrackFxParam = function (trk, fx, param) {
-        return function () { console.log('upTrackFxParam', trk, fx, param); };
+        var _this = this;
+        return function () {
+            _this.muzXBox.currentSchedule.tracks[trk].filters[fx].obverse = param;
+            _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+            console.log('upTrackFxParam', trk, fx, param);
+        };
     };
     ZMainMenu.prototype.upVox = function (trk, vox) {
-        return function () { console.log('upVox', trk, vox); };
+        var _this = this;
+        return function () {
+            console.log('upVox', trk, vox);
+            _this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
+            _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+        };
     };
     ZMainMenu.prototype.upVoxFx = function (trk, vox, fx) {
-        return function () { console.log('upVoxFx', trk, vox, fx); };
+        var _this = this;
+        return function () {
+            console.log('upVoxFx', trk, vox, fx);
+            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = fx + 1;
+            _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+        };
     };
     ZMainMenu.prototype.upVoxFxParam = function (trk, vox, fx, param) {
-        return function () { console.log('upVoxFxParam', trk, vox, fx, param); };
+        var _this = this;
+        return function () {
+            console.log('upVoxFxParam', trk, vox, fx, param);
+            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].filters[fx].obverse = fx;
+            _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+        };
     };
     ZMainMenu.prototype.upVoxProvider = function (trk, vox) {
-        return function () { console.log('upVoxProvider', trk, vox); };
+        var _this = this;
+        return function () {
+            console.log('upVoxProvider', trk, vox);
+            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = 0;
+            _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+        };
     };
     ZMainMenu.prototype.upVoxProviderParam = function (trk, vox, param) {
-        return function () { console.log('upVoxProviderParam', trk, vox, param); };
+        var _this = this;
+        return function () {
+            console.log('upVoxProviderParam', trk, vox, param);
+            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].performer.obverse = 0;
+            _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+        };
     };
     return ZMainMenu;
 }());
@@ -4563,11 +4688,8 @@ var MuzXBox = (function () {
         this.zrenderer.initUI();
         this.createUI();
         us.selectMode('ru');
-        console.log(us.txt('testText'));
         us.selectMode('en');
-        console.log(us.txt('testText'));
         us.selectMode('wwwwwww');
-        console.log(us.txt('testText'));
         us.selectMode('en');
     };
     MuzXBox.prototype.createUI = function () {
@@ -4590,7 +4712,6 @@ var MuzXBox = (function () {
         test.readSongData("any", function (result) {
             if (result) {
                 var me = window['MZXB'];
-                console.log(me);
                 if (me) {
                     me.currentSchedule = result;
                     me.zrenderer.drawSchedule(result);

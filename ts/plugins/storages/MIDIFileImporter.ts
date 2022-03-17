@@ -1021,6 +1021,17 @@ class MidiParser {
 		}
 		return k;
 	}*/
+	parametersDefs(plugin: ZvoogPlugin): ZvoogParameterData[]{
+		var pars: ZvoogParameterData[] = [];
+		var pp = 0;
+		var pName = plugin.getParId(pp);
+		while (pName) {
+			pars.push({ caption: pName, points: [] });
+			pp++;
+			pName = plugin.getParId(pp);
+		}
+		return pars;
+	}
 	convert(): ZvoogSchedule {
 		var midisong: MIDISongData = this.dump();
 		//console.log('midisong', midisong);
@@ -1176,9 +1187,21 @@ class MidiParser {
 				, progression: []
 			}
 		};
+		var testEcho: ZvoogPlugin = new WAFEcho();
+		var testGain: ZvoogPlugin = new ZvoogFxGain();
+		var testEQ: ZvoogPlugin = new WAFEqualizer();
+		var wafdrum:ZvoogPlugin=new WAFPercSource();
+		var wafinstrument=new WAFInsSource();
+		
 		schedule.filters.push({
 			filterPlugin: null
-			, parameters: [{ points: [] }]
+			, parameters: this.parametersDefs(testEcho)
+			, kind: "echo"
+			, initial: ""
+		});
+		schedule.filters.push({
+			filterPlugin: null
+			, parameters: this.parametersDefs(testGain)
 			, kind: "gain"
 			, initial: ""
 		});
@@ -1207,7 +1230,7 @@ class MidiParser {
 				, voices: []
 				, filters: [{
 					filterPlugin: null
-					, parameters: [{ points: [] }]
+					, parameters: this.parametersDefs(testGain)
 					, kind: "gain"
 					, initial: ""
 				}]
@@ -1220,6 +1243,12 @@ class MidiParser {
 			}
 			//console.log(firstChannelNum, track.title);
 			if (firstChannelNum == 9) {
+				track.filters.push({
+					filterPlugin: null
+					, parameters: this.parametersDefs(testEQ)
+					, kind: "equalizer"
+					, initial: ""
+				});
 				var drumNums: number[] = [];
 				for (var ch = 0; ch < midisong.tracks[i].songchords.length; ch++) {
 					for (var nn = 0; nn < midisong.tracks[i].songchords[ch].notes.length; nn++) {
@@ -1230,13 +1259,13 @@ class MidiParser {
 								measureChords: []
 								, performer: {
 									performerPlugin: null
-									, parameters: [{ points: [] }]
+									, parameters: this.parametersDefs(wafdrum)
 									, kind: 'wafdrum'
 									, initial: '' + pinum
 								}
 								, filters: [{
 									filterPlugin: null
-									, parameters: [{ points: [] }]
+									, parameters: this.parametersDefs(testGain)
 									, kind: "gain"
 									, initial: ""
 								}]
@@ -1290,14 +1319,19 @@ class MidiParser {
 					measureChords: []
 					, performer: {
 						performerPlugin: null
-						, parameters: [{ points: [] }]
+						, parameters: this.parametersDefs(wafinstrument)
 						, kind: 'wafinstrument'
 						, initial: '' + midisong.tracks[i].program
 					}
 					, filters: [{
 						filterPlugin: null
-						, parameters: [{ points: [] }]
+						, parameters: this.parametersDefs(testGain)
 						, kind: "gain"
+						, initial: ""
+					}, {
+						filterPlugin: null
+						, parameters: this.parametersDefs(testEQ)
+						, kind: "equalizer"
 						, initial: ""
 					}]
 					, title: 'program ' + midisong.tracks[i].program

@@ -7,7 +7,7 @@ class WAFEqualizer implements ZvoogFilterPlugin {
 	state(): ZvoogPluginLock {
 		return this.lockedState;
 	}
-	
+
 	prepare(audioContext: AudioContext, data: string): void {
 		if (this.inpt) {
 			//
@@ -48,5 +48,20 @@ class WAFEqualizer implements ZvoogFilterPlugin {
 		if (!((window as any).wafPlayer)) {
 			(window as any).wafPlayer = new WebAudioFontPlayer();
 		}
+	}
+	getParId(nn: number): string | null {
+		switch (nn) {
+			case 0: return '32';
+			case 1: return '64';
+			case 2: return '128';
+			case 3: return '256';
+			case 4: return '512';
+			case 5: return '1k';
+			case 6: return '2k';
+			case 7: return '4k';
+			case 8: return '8k';
+			case 9: return '16k';
+		}
+		return null;
 	}
 }

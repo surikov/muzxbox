@@ -149,4 +149,7 @@ class AudioFileSource implements ZvoogPerformerPlugin {
 		audioBufferSourceNode.stop(nextPointSeconds + this.afterTime);
 		this.waves.push({ audio: audioBufferSourceNode, end: nextPointSeconds + this.afterTime });
 	}
+	getParId(nn: number): string | null {
+		return null;
+	}
 }

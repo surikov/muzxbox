@@ -354,6 +354,7 @@ declare class ZvoogFxGain implements ZvoogFilterPlugin {
     getOutput(): AudioNode;
     getParams(): ZvoogPluginParameter[];
     busy(): number;
+    getParId(nn: number): string | null;
 }
 declare class WAFEcho implements ZvoogFilterPlugin {
     inpt: GainNode;
@@ -364,6 +365,7 @@ declare class WAFEcho implements ZvoogFilterPlugin {
     state(): ZvoogPluginLock;
     setData(data: string): void;
     prepare(audioContext: AudioContext, data: string): void;
+    getParId(nn: number): string | null;
     getInput(): AudioNode;
     getOutput(): AudioNode;
     getParams(): ZvoogPluginParameter[];
@@ -383,6 +385,7 @@ declare class WAFEqualizer implements ZvoogFilterPlugin {
     getParams(): ZvoogPluginParameter[];
     busy(): number;
     initWAF(): void;
+    getParId(nn: number): string | null;
 }
 declare class ZvoogSineSource implements ZvoogPerformerPlugin {
     out: GainNode;
@@ -404,6 +407,7 @@ declare class ZvoogSineSource implements ZvoogPerformerPlugin {
     freq(key: number): number;
     nextClear(): boolean;
     cleanup(): void;
+    getParId(nn: number): string | null;
 }
 declare function WebAudioFontPlayer(): void;
 declare class WAFInsSource implements ZvoogPerformerPlugin {
@@ -426,6 +430,7 @@ declare class WAFInsSource implements ZvoogPerformerPlugin {
     busy(): number;
     initWAF(): void;
     selectIns(nn: number): void;
+    getParId(nn: number): string | null;
 }
 declare function WebAudioFontPlayer(): void;
 declare class WAFPercSource implements ZvoogPerformerPlugin {
@@ -448,6 +453,7 @@ declare class WAFPercSource implements ZvoogPerformerPlugin {
     busy(): number;
     initWAF(): void;
     selectDrum(nn: number): void;
+    getParId(nn: number): string | null;
 }
 declare class AudioFileSource implements ZvoogPerformerPlugin {
     out: GainNode;
@@ -482,6 +488,7 @@ declare class AudioFileSource implements ZvoogPerformerPlugin {
         base: GainNode;
     };
     single(when: number, tempo: number, line: ZvoogEnvelope): void;
+    getParId(nn: number): string | null;
 }
 declare type ZvoogMeter = {
     count: number;
@@ -537,6 +544,7 @@ declare class RangedAudioParam120 implements ZvoogPluginParameter {
 }
 interface ZvoogPlugin {
     getParams(): ZvoogPluginParameter[];
+    getParId(nn: number): string | null;
     getOutput(): AudioNode;
     prepare(audioContext: AudioContext, data: string): void;
     busy(): number;
@@ -544,12 +552,14 @@ interface ZvoogPlugin {
 }
 declare type ZvoogParameterData = {
     points: ZvoogCurvePoint[];
+    caption: string;
 };
 declare type ZvoogVoice = {
     measureChords: ZvoogMeasureChord[];
     performer: ZvoogPerformerSetting;
     filters: ZvoogFilterSetting[];
     title: string;
+    obverse?: number;
 };
 declare type ZvoogMeasureChord = {
     chords: ZvoogChordStrings[];
@@ -621,6 +631,7 @@ declare class ZvoogPerformerStub implements ZvoogPerformerPlugin {
     busy(): number;
     cancelSchedule(): void;
     addSchedule(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void;
+    getParId(nn: number): string | null;
 }
 declare class ZvoogFilterStub implements ZvoogFilterPlugin {
     base: GainNode;
@@ -633,11 +644,13 @@ declare class ZvoogFilterStub implements ZvoogFilterPlugin {
     getParams(): ZvoogPluginParameter[];
     busy(): number;
     getInput(): AudioNode;
+    getParId(nn: number): string | null;
 }
 declare type ZvoogTrack = {
     title: string;
     voices: ZvoogVoice[];
     filters: ZvoogFilterSetting[];
+    obverse?: number;
 };
 declare type ZvoogSchedule = {
     title: string;
@@ -645,6 +658,7 @@ declare type ZvoogSchedule = {
     filters: ZvoogFilterSetting[];
     measures: ZvoogMeasure[];
     harmony: ZvoogProgression;
+    obverse?: number;
 };
 declare function scheduleDuration(song: ZvoogSchedule): number;
 declare type ZvoogFilterSetting = {
@@ -652,12 +666,14 @@ declare type ZvoogFilterSetting = {
     parameters: ZvoogParameterData[];
     kind: string;
     initial: string;
+    obverse?: number;
 };
 declare type ZvoogPerformerSetting = {
     performerPlugin: ZvoogPerformerPlugin | null;
     parameters: ZvoogParameterData[];
     kind: string;
     initial: string;
+    obverse?: number;
 };
 declare type ZvoogFilterPlugin = ZvoogPlugin & {
     getInput: () => AudioNode;
@@ -880,6 +896,7 @@ declare class MidiParser {
         voice: ZvoogVoice;
         drum: number;
     };
+    parametersDefs(plugin: ZvoogPlugin): ZvoogParameterData[];
     convert(): ZvoogSchedule;
     dump(): MIDISongData;
     instrumentTitles(): string[];

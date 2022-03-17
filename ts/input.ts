@@ -60,37 +60,37 @@ class ZInputDeviceHandler {
 		}
 	}
 	processKeyX() {
-		console.log('KeyX');
+		//console.log('KeyX');
 	}
 	processKeyY() {
-		console.log('KeyY');
+		//console.log('KeyY');
 		this.muzXBox.zMainMenu.openNextLevel();
 	}
 	processKeyA() {
-		console.log('KeyA');
+		//console.log('KeyA');
 		this.muzXBox.zMainMenu.openNextLevel();
 	}
 	processKeyB() {
-		console.log('KeyB');
+		//console.log('KeyB');
 		this.muzXBox.zMainMenu.backPreLevel();
 	}
 	processAnyPlus() {
-		console.log('+');
+		//console.log('+');
 	}
 	processAnyMinus() {
-		console.log('-');
+		//console.log('-');
 	}
 	processArrowLeft() {
-		console.log('left');
+		//console.log('left');
 	}
 	processArrowRight() {
-		console.log('right');
+		//console.log('right');
 	}
 	processArrowUp() {
-		console.log('up');
+		//console.log('up');
 	}
 	processArrowDown() {
-		console.log('down');
+		//console.log('down');
 	}
 
 	

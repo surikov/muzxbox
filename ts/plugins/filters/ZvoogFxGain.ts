@@ -5,7 +5,7 @@ class ZvoogFxGain implements ZvoogFilterPlugin {
 	state(): ZvoogPluginLock {
 		return this.lockedState;
 	}
-	
+
 	prepare(audioContext: AudioContext, data: string): void {
 		if (this.base) {
 			//
@@ -28,5 +28,11 @@ class ZvoogFxGain implements ZvoogFilterPlugin {
 
 	busy(): number {
 		return 0;
+	}
+	getParId(nn: number): string | null {
+		switch (nn) {
+			case 0: return 'volume';
+		}
+		return null;
 	}
 }

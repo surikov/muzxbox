@@ -45,6 +45,7 @@ class RangedAudioParam120 implements ZvoogPluginParameter {
 }
 interface ZvoogPlugin {
 	getParams(): ZvoogPluginParameter[]; //parameters automation
+	getParId(nn: number): string|null;
 	getOutput(): AudioNode;
 	prepare(audioContext: AudioContext, data: string): void;
 	busy(): number;

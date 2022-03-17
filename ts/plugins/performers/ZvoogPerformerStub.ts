@@ -32,4 +32,7 @@ class ZvoogPerformerStub implements ZvoogPerformerPlugin {
 	addSchedule(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void {
 		//
 	}
+	getParId(nn: number): string | null {
+		return null;
+	}
 }

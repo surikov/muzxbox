@@ -31,4 +31,7 @@ class ZvoogFilterStub implements ZvoogFilterPlugin {
 	getInput(): AudioNode {
 		return this.base;
 	}
+	getParId(nn: number): string | null {
+		return null;
+	}
 }

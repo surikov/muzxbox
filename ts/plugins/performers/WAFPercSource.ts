@@ -81,4 +81,7 @@ class WAFPercSource implements ZvoogPerformerPlugin {
 			me.zones = window[info.variable];
 		});
 	}
+	getParId(nn: number): string | null {
+		return null;
+	}
 }

@@ -119,4 +119,7 @@ class WAFInsSource implements ZvoogPerformerPlugin {
 			//console.log(me.zones);
 		});
 	}
+	getParId(nn: number): string | null {
+		return null;
+	}
 }

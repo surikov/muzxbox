@@ -7,7 +7,7 @@ class WAFEcho implements ZvoogFilterPlugin {
 	state(): ZvoogPluginLock {
 		return this.lockedState;
 	}
-	
+
 	setData(data: string): void {
 
 	}
@@ -46,7 +46,6 @@ class WAFEcho implements ZvoogFilterPlugin {
 					me.rvrbrtr.compressorWet.gain.linearRampToValueAtTime(wet, endTime);
 				}
 				, setValueAtTime: (value: number, startTime: number): void => {
-
 					let wet = value / 119;
 					if (wet < 0) wet = 0;
 					if (wet > 1) wet = 1;
@@ -59,6 +58,18 @@ class WAFEcho implements ZvoogFilterPlugin {
 		}
 		this.inpt.connect(this.rvrbrtr.input);
 		this.rvrbrtr.output.connect(this.outpt);
+	}
+	getParId(nn: number): string | null {
+		switch (nn) {
+			case 0: return 'reverberation';
+			case 1: return 'threshold';
+			case 2: return 'knee';
+			case 3: return 'ratio';
+			case 4: return 'attack';
+			case 5: return 'release';
+			case 6: return 'level';
+		}
+		return null;
 	}
 	getInput(): AudioNode {
 		return this.inpt;

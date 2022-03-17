@@ -7,7 +7,7 @@ class ZvoogSineSource implements ZvoogPerformerPlugin {
 	state(): ZvoogPluginLock {
 		return this.lockedState;
 	}
-	
+
 	prepare(audioContext: AudioContext, data: string): void {
 		if (this.out) {
 			//
@@ -87,6 +87,8 @@ class ZvoogSineSource implements ZvoogPerformerPlugin {
 			//
 		};
 	}
-
+	getParId(nn: number): string | null {
+		return null;
+	}
 
 }

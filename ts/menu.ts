@@ -462,35 +462,17 @@ class ZMainMenu {
 		this.menuRoot.folders.length = 0;
 		this.menuRoot.items.push(this.muzXBox.itemImportMIDI);
 		var songFolder: ZMenuFolder = { path: "Current song", icon: "", folders: [], items: [], afterOpen: () => { } };
-		for (var ff = 0; ff < prj.filters.length; ff++) {
-			songFolder.items.push({ label: "+track", icon: "", autoclose: false, action: () => { console.log('+track'); } });
-			songFolder.items.push({ label: "+fx", icon: "", autoclose: false, action: () => { console.log('+fx'); } });
-			var filter: ZMenuFolder = { path: 'fx ' + prj.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upSongFx(ff) };
-			songFolder.folders.push(filter);
-			var songfilter = prj.filters[ff];
-			filter.items.push({ label: "-fx", icon: "", autoclose: false, action: () => { console.log('-fx'); } });
-			for (var kk = 0; kk < songfilter.parameters.length; kk++) {
-				var par: ZMenuItem = { label: "par " + kk, icon: "", autoclose: false, action: this.upSongFxParam(ff, kk) };
-				filter.items.push(par);
-			}
-		}
+		songFolder.items.push({ label: "+track", icon: "", autoclose: false, action: () => { console.log('+track'); } });
+		songFolder.items.push({ label: "+fx", icon: "", autoclose: false, action: () => { console.log('+fx'); } });
+
 		for (var tt = 0; tt < prj.tracks.length; tt++) {
 			var songtrack = prj.tracks[tt];
 			var tr: ZMenuFolder = { path: 'track ' + songtrack.title, icon: "", folders: [], items: [], afterOpen: this.upTrack(tt) };
 			songFolder.folders.push(tr);
-			for (var ff = 0; ff < songtrack.filters.length; ff++) {
-				var filter: ZMenuFolder = { path: 'fx ' + songtrack.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upTrackFx(tt, ff) };
-				tr.folders.push(filter);
-				var songfilter = songtrack.filters[ff];
-				filter.items.push({ label: "-fx", icon: "", autoclose: false, action: () => { console.log('-fx'); } });
-				for (var kk = 0; kk < songfilter.parameters.length; kk++) {
-					var par: ZMenuItem = { label: "par " + kk, icon: "", autoclose: false, action: this.upTrackFxParam(tt, ff, kk) };
-					filter.items.push(par);
-				}
-				tr.items.push({ label: "-track", icon: "", autoclose: false, action: () => { console.log('-track'); } });
-				tr.items.push({ label: "+tfx", icon: "", autoclose: false, action: () => { console.log('+tfx'); } });
-				tr.items.push({ label: "+vox", icon: "", autoclose: false, action: () => { console.log('+vox'); } });
-			}
+
+			tr.items.push({ label: "-track", icon: "", autoclose: false, action: () => { console.log('-track'); } });
+			tr.items.push({ label: "+tfx", icon: "", autoclose: false, action: () => { console.log('+tfx'); } });
+			tr.items.push({ label: "+vox", icon: "", autoclose: false, action: () => { console.log('+vox'); } });
 			for (var vv = 0; vv < songtrack.voices.length; vv++) {
 				var songvox = songtrack.voices[vv];
 				var vox: ZMenuFolder = { path: 'vox ' + songvox.title, icon: "", folders: [], items: [], afterOpen: this.upVox(tt, vv) };
@@ -499,20 +481,42 @@ class ZMainMenu {
 				var source: ZMenuFolder = { path: 'src ' + songvox.performer.kind, icon: "", folders: [], items: [], afterOpen: this.upVoxProvider(tt, vv) };
 				source.items.push({ label: "?src", icon: "", autoclose: false, action: () => { console.log('?src'); } });
 				for (var kk = 0; kk < songvox.performer.parameters.length; kk++) {
-					var par: ZMenuItem = { label: "par " + kk, icon: "", autoclose: false, action: this.upVoxProviderParam(tt, vv, kk) };
+					var par: ZMenuItem = { label: "par " + kk + " " + songvox.performer.parameters[kk].caption, icon: "", autoclose: false, action: this.upVoxProviderParam(tt, vv, kk) };
 					source.items.push(par);
 				}
 				vox.folders.push(source);
 				for (var ff = 0; ff < songvox.filters.length; ff++) {
 					var filter: ZMenuFolder = { path: 'fx ' + songvox.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upVoxFx(tt, vv, ff) };
 					vox.folders.push(filter);
-					var songfilter = songvox.filters[ff];
+					var voxfilter = songvox.filters[ff];
 					filter.items.push({ label: "-vfx", icon: "", autoclose: false, action: () => { console.log('-vfx'); } });
-					for (var kk = 0; kk < songfilter.parameters.length; kk++) {
-						var par: ZMenuItem = { label: "par " + kk, icon: "", autoclose: false, action: this.upVoxFxParam(tt, vv, ff, kk) };
+					for (var kk = 0; kk < voxfilter.parameters.length; kk++) {
+						var par: ZMenuItem = { label: "par " + kk + " " + voxfilter.parameters[kk].caption, icon: "", autoclose: false, action: this.upVoxFxParam(tt, vv, ff, kk) };
 						filter.items.push(par);
 					}
 				}
+			}
+			for (var ff = 0; ff < songtrack.filters.length; ff++) {
+				var filter: ZMenuFolder = { path: 'fx ' + songtrack.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upTrackFx(tt, ff) };
+				tr.folders.push(filter);
+				var trfilter = songtrack.filters[ff];
+				filter.items.push({ label: "-fx", icon: "", autoclose: false, action: () => { console.log('-fx'); } });
+				for (var kk = 0; kk < trfilter.parameters.length; kk++) {
+					var par: ZMenuItem = { label: "par " + kk + " " + trfilter.parameters[kk].caption, icon: "", autoclose: false, action: this.upTrackFxParam(tt, ff, kk) };
+					filter.items.push(par);
+				}
+
+			}
+		}
+
+		for (var ff = 0; ff < prj.filters.length; ff++) {
+			var filter: ZMenuFolder = { path: 'fx ' + prj.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upSongFx(ff) };
+			songFolder.folders.push(filter);
+			var songfilter = prj.filters[ff];
+			filter.items.push({ label: "-fx", icon: "", autoclose: false, action: () => { console.log('-fx'); } });
+			for (var kk = 0; kk < songfilter.parameters.length; kk++) {
+				var par: ZMenuItem = { label: "par " + kk + " " + songfilter.parameters[kk].caption, icon: "", autoclose: false, action: this.upSongFxParam(ff, kk) };
+				filter.items.push(par);
 			}
 		}
 
@@ -521,41 +525,84 @@ class ZMainMenu {
 	upSongFx(fx: number): () => void {
 		return () => {
 			console.log('upSongFx', fx);
-
+			this.muzXBox.currentSchedule.obverse = this.muzXBox.currentSchedule.tracks.length + fx;
+			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
 		};
 	}
 	upSongFxParam(fx: number, param: number): () => void {
-		return () => { console.log('upSongFxParam', fx, param); };
+		return () => {
+			console.log('upSongFxParam', fx, param);
+			this.muzXBox.currentSchedule.filters[fx].obverse = param;
+			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+		};
 	}
 	upTrack(trk: number): () => void {
 		return () => {
-			console.log('upSongFx', trk);
-			var tracks: ZvoogTrack[] = this.muzXBox.currentSchedule.tracks.splice(trk, 1);
-			this.muzXBox.currentSchedule.tracks.push(tracks[0]);
+			console.log('upTrack', trk);
+			//var tracks: ZvoogTrack[] = this.muzXBox.currentSchedule.tracks.splice(trk, 1);
+			//this.muzXBox.currentSchedule.tracks.push(tracks[0]);
+			this.muzXBox.currentSchedule.obverse = trk;
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
 		};
 	}
 	upTrackFx(trk: number, fx: number): () => void {
-		return () => { console.log('upTrack', trk, fx); };
+		return () => {
+			console.log('upTrackFx', trk, fx);
+			this.muzXBox.currentSchedule.tracks[trk].obverse = fx;
+			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+		};
 	}
 	upTrackFxParam(trk: number, fx: number, param: number): () => void {
-		return () => { console.log('upTrackFxParam', trk, fx, param); };
+		return () => {
+			this.muzXBox.currentSchedule.tracks[trk].filters[fx].obverse = param;
+			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+			console.log('upTrackFxParam', trk, fx, param);
+		};
 	}
 
 	upVox(trk: number, vox: number): () => void {
-		return () => { console.log('upVox', trk, vox); };
+		return () => {
+			console.log('upVox', trk, vox);
+			this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
+			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+		};
 	}
 	upVoxFx(trk: number, vox: number, fx: number): () => void {
-		return () => { console.log('upVoxFx', trk, vox, fx); };
+		return () => {
+			console.log('upVoxFx', trk, vox, fx);
+			this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = fx + 1;
+			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+		};
 	}
 	upVoxFxParam(trk: number, vox: number, fx: number, param: number): () => void {
-		return () => { console.log('upVoxFxParam', trk, vox, fx, param); };
+		return () => {
+			console.log('upVoxFxParam', trk, vox, fx, param);
+			this.muzXBox.currentSchedule.tracks[trk].voices[vox].filters[fx].obverse = fx;
+			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+		};
 	}
 	upVoxProvider(trk: number, vox: number): () => void {
-		return () => { console.log('upVoxProvider', trk, vox); };
+		return () => {
+			console.log('upVoxProvider', trk, vox);
+			this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = 0;
+			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+		};
 	}
 	upVoxProviderParam(trk: number, vox: number, param: number): () => void {
-		return () => { console.log('upVoxProviderParam', trk, vox, param); };
+		return () => {
+			console.log('upVoxProviderParam', trk, vox, param);
+			this.muzXBox.currentSchedule.tracks[trk].voices[vox].performer.obverse = 0;
+			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+		};
 	}
 }
