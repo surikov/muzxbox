@@ -1021,12 +1021,12 @@ class MidiParser {
 		}
 		return k;
 	}*/
-	parametersDefs(plugin: ZvoogPlugin): ZvoogParameterData[]{
+	parametersDefs(plugin: ZvoogPlugin): ZvoogParameterData[] {
 		var pars: ZvoogParameterData[] = [];
 		var pp = 0;
 		var pName = plugin.getParId(pp);
 		while (pName) {
-			pars.push({ caption: pName, points: [] });
+			pars.push({ caption: pName, points: [{ skipMeasures: 0, skip384: 0, velocity: 60 }] });
 			pp++;
 			pName = plugin.getParId(pp);
 		}
@@ -1190,9 +1190,9 @@ class MidiParser {
 		var testEcho: ZvoogPlugin = new WAFEcho();
 		var testGain: ZvoogPlugin = new ZvoogFxGain();
 		var testEQ: ZvoogPlugin = new WAFEqualizer();
-		var wafdrum:ZvoogPlugin=new WAFPercSource();
-		var wafinstrument=new WAFInsSource();
-		
+		var wafdrum: ZvoogPlugin = new WAFPercSource();
+		var wafinstrument = new WAFInsSource();
+
 		schedule.filters.push({
 			filterPlugin: null
 			, parameters: this.parametersDefs(testEcho)
