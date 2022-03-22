@@ -1451,6 +1451,7 @@ var ZRender = (function () {
         this.fillTimeLine64(song);
         this.fillTimeLine256(song);
         var time = 0;
+        song.obverse = (song.obverse) ? song.obverse : 0;
         for (var i = 0; i < song.measures.length; i++) {
             var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
             var singleMasuresContentAnchor1 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
@@ -1485,10 +1486,11 @@ var ZRender = (function () {
             this.contentOther256.content.push(singleMasuresOtherAnchor256);
             for (var tt = 0; tt < song.tracks.length; tt++) {
                 var track = song.tracks[tt];
+                track.obverse = (track.obverse) ? track.obverse : 0;
                 for (var vv = 0; vv < track.voices.length; vv++) {
                     var voice = track.voices[vv];
-                    if (tt == 0) {
-                        if (vv == 0) {
+                    if (tt == song.obverse) {
+                        if (vv == track.obverse) {
                             this.addVoiceMeasure(song, voice, i, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
                         }
                         else {
@@ -4562,6 +4564,7 @@ var ZMainMenu = (function () {
         return function () {
             console.log('upSongFx', fx);
             _this.muzXBox.currentSchedule.obverse = _this.muzXBox.currentSchedule.tracks.length + fx;
+            _this.muzXBox.currentSchedule.filters[fx].obverse = 0;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -4570,6 +4573,7 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upSongFxParam', fx, param);
+            _this.muzXBox.currentSchedule.obverse = _this.muzXBox.currentSchedule.tracks.length + fx;
             _this.muzXBox.currentSchedule.filters[fx].obverse = param;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
@@ -4580,6 +4584,9 @@ var ZMainMenu = (function () {
         return function () {
             console.log('upTrack', trk);
             _this.muzXBox.currentSchedule.obverse = trk;
+            if (_this.muzXBox.currentSchedule.tracks.length) {
+                _this.muzXBox.currentSchedule.tracks[trk].obverse = 0;
+            }
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -4588,7 +4595,8 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upTrackFx', trk, fx);
-            _this.muzXBox.currentSchedule.tracks[trk].obverse = fx;
+            _this.muzXBox.currentSchedule.obverse = trk;
+            _this.muzXBox.currentSchedule.tracks[trk].obverse = _this.muzXBox.currentSchedule.tracks[trk].voices.length + fx;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -4596,6 +4604,8 @@ var ZMainMenu = (function () {
     ZMainMenu.prototype.upTrackFxParam = function (trk, fx, param) {
         var _this = this;
         return function () {
+            _this.muzXBox.currentSchedule.obverse = trk;
+            _this.muzXBox.currentSchedule.tracks[trk].obverse = _this.muzXBox.currentSchedule.tracks[trk].voices.length + fx;
             _this.muzXBox.currentSchedule.tracks[trk].filters[fx].obverse = param;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
@@ -4606,6 +4616,7 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upVox', trk, vox);
+            _this.muzXBox.currentSchedule.obverse = trk;
             _this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
@@ -4615,6 +4626,8 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upVoxFx', trk, vox, fx);
+            _this.muzXBox.currentSchedule.obverse = trk;
+            _this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
             _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = fx + 1;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
@@ -4624,6 +4637,9 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upVoxFxParam', trk, vox, fx, param);
+            _this.muzXBox.currentSchedule.obverse = trk;
+            _this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
+            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = fx + 1;
             _this.muzXBox.currentSchedule.tracks[trk].voices[vox].filters[fx].obverse = fx;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
@@ -4633,6 +4649,8 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upVoxProvider', trk, vox);
+            _this.muzXBox.currentSchedule.obverse = trk;
+            _this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
             _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = 0;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
@@ -4642,6 +4660,9 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upVoxProviderParam', trk, vox, param);
+            _this.muzXBox.currentSchedule.obverse = trk;
+            _this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
+            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = 0;
             _this.muzXBox.currentSchedule.tracks[trk].voices[vox].performer.obverse = 0;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
