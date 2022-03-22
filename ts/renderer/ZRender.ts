@@ -238,8 +238,8 @@ class ZRender {
 		this.fillTimeLine256(song);
 		var time = 0;
 		song.obverse=(song.obverse)?song.obverse:0;
-		for (var i = 0; i < song.measures.length; i++) {
-			var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+		for (var mm = 0; mm < song.measures.length; mm++) {
+			var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
 			let singleMasuresContentAnchor1: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
 			let singleMasuresContentAnchor4: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
 			let singleMasuresContentAnchor16: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
@@ -275,25 +275,36 @@ class ZRender {
 				track.obverse=(track.obverse)?track.obverse:0;
 				for (var vv = 0; vv < track.voices.length; vv++) {
 					var voice: ZvoogVoice = track.voices[vv];
+					for(var pp=0;pp<voice.performer.parameters.length;pp++){
+						var paremeter=voice.performer.parameters[pp];
+					}
 					if (tt == song.obverse) {
 						if (vv == track.obverse) {
-							this.addVoiceMeasure(song, voice, i, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+							this.addVoiceMeasure(song, voice, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
 						} else {
-							this.addVoiceMeasure(song, voice, i, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+							this.addVoiceMeasure(song, voice, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
 						}
 					} else {
-						this.addVoiceMeasure(song, voice, i, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
+						this.addVoiceMeasure(song, voice, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
 					}
-
-					/*if (tt == 0) {
-						if (vv == 0) {
-							this.addVoiceMeasure(song, voice, i, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
-						} else {
-							this.addVoiceMeasure(song, voice, i, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+					for(var ff=0;ff<voice.filters.length;ff++){
+						var filter=voice.filters[ff];
+						for(var pp=0;pp<filter.parameters.length;ff++){
+							var paremeter=filter.parameters[pp];
 						}
-					} else {
-						this.addVoiceMeasure(song, voice, i, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
-					}*/
+					}
+				}
+				for(var ff=0;ff<track.filters.length;ff++){
+					var filter=track.filters[ff];
+					for(var pp=0;pp<filter.parameters.length;pp++){
+						var paremeter=filter.parameters[pp];
+					}
+				}
+			}
+			for(var ff=0;ff<song.filters.length;ff++){
+				var filter=song.filters[ff];
+				for(var pp=0;pp<filter.parameters.length;ff++){
+					var paremeter=filter.parameters[pp];
 				}
 			}
 			time = time + measureDuration;
