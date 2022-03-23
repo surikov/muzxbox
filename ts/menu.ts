@@ -67,9 +67,6 @@ class ZMainMenu {
 		if (el) { this.menu4content = el; }
 		el = document.getElementById('menu5content');
 		if (el) { this.menu5content = el; }
-		//console.log('this.level1',this.level1);
-		//(document.getElementById('menuPaneDiv1') as any).style
-		//this.fillStaticMenu();
 		this.menuRoot = {
 			path: 'Menu'
 			, icon: ''
@@ -78,166 +75,6 @@ class ZMainMenu {
 			, afterOpen: () => { }
 		};
 	}
-	/*	fillStaticMenu() {
-			this.menuRoot = {
-				path: 'Menu'
-				, icon: ''
-				, folders: [
-					{
-						path: 'first-1', icon: ''
-						, folders: [
-							{
-								path: 'second-1', icon: ''
-								, folders: [
-									{
-										path: 'third-1', icon: ''
-										, folders: [
-											{
-												path: 'forth-1', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-											}, {
-												path: 'forth-2', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-									}, {
-										path: 'third-2', icon: ''
-										, folders: [
-											{
-												path: 'forth-3', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-											}, {
-												path: 'forth-4', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-									}], items: [{ label: 'it3-3', autoclose: true, icon: '', action: () => { console.log('it3-3'); } }
-										, { label: 'it3-4', autoclose: true, icon: '', action: () => { console.log('it3-4'); } }]
-							}, {
-								path: 'second-2', icon: ''
-								, folders: [
-									{
-										path: 'third-3', icon: ''
-										, folders: [
-											{
-												path: 'forth-5', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-											}, {
-												path: 'forth-6', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-									}, {
-										path: 'third-4', icon: ''
-										, folders: [
-											{
-												path: 'forth-7', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-											}, {
-												path: 'forth-8', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-									}], items: [{ label: 'it3-3', autoclose: true, icon: '', action: () => { console.log('it3-3'); } }
-										, { label: 'it3-4', autoclose: true, icon: '', action: () => { console.log('it3-4'); } }]
-							}], items: [{ label: 'it2-3', autoclose: true, icon: '', action: () => { console.log('it2-3'); } }
-								, { label: 'it2-4', autoclose: true, icon: '', action: () => { console.log('it2-4'); } }]
-					}, {
-						path: 'f1-2', icon: ''
-						, folders: [
-							{
-								path: 'f2-1', icon: ''
-								, folders: [
-									{
-										path: 'f3-1', icon: ''
-										, folders: [
-											{
-												path: 'f4-1', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-											}, {
-												path: 'f4-2', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-									}, {
-										path: 'f3-2', icon: ''
-										, folders: [
-											{
-												path: 'f4-3', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-											}, {
-												path: 'f4-4', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-									}], items: [{ label: 'it3-3', autoclose: true, icon: '', action: () => { console.log('it3-3'); } }
-										, { label: 'it3-4', autoclose: true, icon: '', action: () => { console.log('it3-4'); } }]
-							}, {
-								path: 'f2-2', icon: ''
-								, folders: [
-									{
-										path: 'f3-3', icon: ''
-										, folders: [
-											{
-												path: 'f4-5', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-											}, {
-												path: 'f4-6', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-									}, {
-										path: 'f3-4', icon: ''
-										, folders: [
-											{
-												path: 'f4-7', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-3', autoclose: true, icon: '', action: () => { console.log('it5-3'); } }
-													, { label: 'it5-4', autoclose: true, icon: '', action: () => { console.log('it5-4'); } }]
-											}, {
-												path: 'f4-8', icon: ''
-												, folders: [
-												], items: [{ label: 'it5-5', autoclose: true, icon: '', action: () => { console.log('it5-5'); } }
-													, { label: 'it5-6', autoclose: true, icon: '', action: () => { console.log('it5-6'); } }]
-											}], items: [{ label: 'it4-3', autoclose: true, icon: '', action: () => { console.log('it4-3'); } }
-												, { label: 'it4-4', autoclose: true, icon: '', action: () => { console.log('it4-4'); } }]
-									}], items: [{ label: 'it3-3', autoclose: true, icon: '', action: () => { console.log('it3-3'); } }
-										, { label: 'it3-4', autoclose: true, icon: '', action: () => { console.log('it3-4'); } }]
-							}], items: [{ label: 'it2-3', autoclose: true, icon: '', action: () => { console.log('it2-3'); } }
-								, { label: 'it2-4', autoclose: true, icon: '', action: () => { console.log('it2-4'); } }]
-					}], items: [{ label: 'it1-1', autoclose: true, icon: '', action: () => { console.log('it1-1'); } }
-						, { label: 'it1-2', autoclose: true, icon: '', action: () => { console.log('it1-2'); } }]
-			};
-			console.log(this.menuRoot);
-		}*/
 	openNextLevel() {
 		if (this.currentLevel == 0) {
 			this.open_1_level();
@@ -266,14 +103,12 @@ class ZMainMenu {
 		}
 	}
 	backPreLevel() {
-		//console.log('backPreLevel',this.currentLevel);
 		if (this.currentLevel == 1) {
 			this.level1style.width = '0cm';
 			this.currentLevel--;
 			return;
 		}
 		if (this.currentLevel == 2) {
-			//console.log('this.level2style.width',this.level2style.width);
 			this.level2style.width = '0cm';
 			this.currentLevel--;
 			return;
@@ -323,22 +158,15 @@ class ZMainMenu {
 			if (this.currentLevel == 3) { this.selection2level = idx; this.open_3_level(); }
 			if (this.currentLevel == 4) { this.selection3level = idx; this.open_4_level(); }
 			if (this.currentLevel == 5) { this.selection4level = idx; this.open_5_level(); }
-			//if (this.currentLevel == 5) { this.selection1level = nn; }
-
 		};
 	}
 	createActionClick(nn: number, item: ZMenuItem) {
 		return () => {
-
-			//if (this.currentLevel == 1) { this.selection1level = this.menuRoot.folders.length + nn; }
 			if (this.currentLevel == 1) { this.selection1level = nn; }
-			//if (this.currentLevel == 2) { this.selection2level = this.menuRoot.folders[this.selection1level].folders.length + nn; }
 			if (this.currentLevel == 2) { this.selection2level = nn; }
-			//if (this.currentLevel == 3) { this.selection3level = this.menuRoot.folders[this.selection1level].folders[this.selection2level].folders.length + nn; }
 			if (this.currentLevel == 3) { this.selection3level = nn; }
-			//if (this.currentLevel == 4) { this.selection4level = this.menuRoot.folders[this.selection1level].folders[this.selection2level].folders[this.selection2level].folders.length + nn; }
+			if (this.currentLevel == 4) { this.selection4level = nn; }
 			if (this.currentLevel == 5) { this.selection5level = nn; }
-			//console.log(nn, item.label);
 			if (item.autoclose) {
 				this.hideMenu();
 			} else {
@@ -348,9 +176,7 @@ class ZMainMenu {
 		};
 	}
 	reFillMenulevel(menuContent: HTMLElement, subRoot: ZMenuFolder, selectedLevel: number) {
-		//console.log(subRoot);
 		while (menuContent.lastChild) { menuContent.removeChild(menuContent.lastChild); }
-
 		for (var i = 0; i < subRoot.items.length; i++) {
 			var item: ZMenuItem = subRoot.items[i];
 			var div: HTMLDivElement = document.createElement('div');
@@ -382,43 +208,12 @@ class ZMainMenu {
 
 	}
 	open_1_level() {
-		//console.log('open_1_level');
 		this.menu1textHead.innerText = this.menuRoot.path;
 		this.level1style.width = '8cm';
 		this.reFillMenulevel(this.menu1content, this.menuRoot
 			, this.selection1level);
-		/*while (this.menu1content.lastChild) { this.menu1content.removeChild(this.menu1content.lastChild); }
-		for (var i = 0; i < this.menuRoot.folders.length; i++) {
-			var folder: ZMenuFolder = this.menuRoot.folders[i];
-			var div = document.createElement('div');
-			div.classList.add('menuFolderRow');
-			div.id = 'menuFolder1-' + i;
-			div.onclick = this.createFolderClick(i);
-			div.innerText = folder.label;
-			this.menu1content.appendChild(div);
-			if (this.selection1level == i) {
-				div.dataset['rowSelection'] = 'yes';
-			} else {
-				div.dataset['rowSelection'] = 'no';
-			}
-		}
-		for (var i = 0; i < this.menuRoot.items.length; i++) {
-			var item: ZMenuItem = this.menuRoot.items[i];
-			var div: HTMLDivElement = document.createElement('div');
-			div.classList.add('menuActionRow');
-			div.id = 'menuItem1-' + i;
-			div.onclick = this.createActionClick(this.menuRoot.folders.length + i, item);
-			div.innerText = item.label;
-			this.menu1content.appendChild(div);
-			if (this.selection1level == this.menuRoot.folders.length + i) {
-				div.dataset['rowSelection'] = 'yes';
-			} else {
-				div.dataset['rowSelection'] = 'no';
-			}
-		}*/
 	}
 	open_2_level() {
-		//console.log('open_2_level');
 		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
 		this.menu2textHead.innerText = this.menuRoot.folders[folderIdx1].path;
 		this.menuRoot.folders[folderIdx1].afterOpen();
@@ -426,7 +221,6 @@ class ZMainMenu {
 		this.reFillMenulevel(this.menu2content, this.menuRoot.folders[folderIdx1], this.selection2level);
 	}
 	open_3_level() {
-		//console.log('open_3_level');
 		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
 		var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
 		this.menuRoot.folders[folderIdx1].folders[folderIdx2].afterOpen();
@@ -435,7 +229,6 @@ class ZMainMenu {
 		this.reFillMenulevel(this.menu3content, this.menuRoot.folders[folderIdx1].folders[folderIdx2], this.selection3level);
 	}
 	open_4_level() {
-		//console.log('open_4_level');
 		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
 		var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
 		var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
@@ -443,10 +236,8 @@ class ZMainMenu {
 		this.menu4textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].path;
 		this.level4style.width = '6.5cm';
 		this.reFillMenulevel(this.menu4content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3], this.selection4level);
-
 	}
 	open_5_level() {
-		//console.log('open_5_level');
 		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
 		var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
 		var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
@@ -455,7 +246,6 @@ class ZMainMenu {
 		this.menu5textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].path;
 		this.level5style.width = '6.0cm';
 		this.reFillMenulevel(this.menu5content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4], this.selection5level);
-
 	}
 	fillFrom(prj: ZvoogSchedule) {
 		this.menuRoot.items.length = 0;
@@ -464,12 +254,10 @@ class ZMainMenu {
 		var songFolder: ZMenuFolder = { path: "Current song", icon: "", folders: [], items: [], afterOpen: () => { } };
 		songFolder.items.push({ label: "+track", icon: "", autoclose: false, action: () => { console.log('+track'); } });
 		songFolder.items.push({ label: "+fx", icon: "", autoclose: false, action: () => { console.log('+fx'); } });
-
 		for (var tt = 0; tt < prj.tracks.length; tt++) {
 			var songtrack = prj.tracks[tt];
 			var tr: ZMenuFolder = { path: 'track ' + songtrack.title, icon: "", folders: [], items: [], afterOpen: this.upTrack(tt) };
 			songFolder.folders.push(tr);
-
 			tr.items.push({ label: "-track", icon: "", autoclose: false, action: () => { console.log('-track'); } });
 			tr.items.push({ label: "+tfx", icon: "", autoclose: false, action: () => { console.log('+tfx'); } });
 			tr.items.push({ label: "+vox", icon: "", autoclose: false, action: () => { console.log('+vox'); } });
@@ -508,7 +296,6 @@ class ZMainMenu {
 
 			}
 		}
-
 		for (var ff = 0; ff < prj.filters.length; ff++) {
 			var filter: ZMenuFolder = { path: 'fx ' + prj.filters[ff].kind, icon: "", folders: [], items: [], afterOpen: this.upSongFx(ff) };
 			songFolder.folders.push(filter);
@@ -519,19 +306,13 @@ class ZMainMenu {
 				filter.items.push(par);
 			}
 		}
-
 		this.menuRoot.folders.push(songFolder);
 	}
 	upSongFx(fx: number): () => void {
 		return () => {
 			console.log('upSongFx', fx);
-			this.muzXBox.currentSchedule.obverse = this.muzXBox.currentSchedule.tracks.length + fx;
-			this.muzXBox.currentSchedule.filters[fx].obverse = 0;
-			//this.selection1level = 0;
-			//this.selection2level = 0;
-			//this.selection3level = 0;
-			//this.selection4level = 0;
-			//this.selection5level = 0;
+			this.muzXBox.currentSchedule.obverseTrackFilter = this.muzXBox.currentSchedule.tracks.length + fx;
+			this.muzXBox.currentSchedule.filters[fx].obverseParameter = 0;
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
 		};
@@ -539,8 +320,8 @@ class ZMainMenu {
 	upSongFxParam(fx: number, param: number): () => void {
 		return () => {
 			console.log('upSongFxParam', fx, param);
-			this.muzXBox.currentSchedule.obverse = this.muzXBox.currentSchedule.tracks.length + fx;
-			this.muzXBox.currentSchedule.filters[fx].obverse = param;
+			this.muzXBox.currentSchedule.obverseTrackFilter = this.muzXBox.currentSchedule.tracks.length + fx;
+			this.muzXBox.currentSchedule.filters[fx].obverseParameter = param;
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
 		};
@@ -548,11 +329,9 @@ class ZMainMenu {
 	upTrack(trk: number): () => void {
 		return () => {
 			console.log('upTrack', trk);
-			//var tracks: ZvoogTrack[] = this.muzXBox.currentSchedule.tracks.splice(trk, 1);
-			//this.muzXBox.currentSchedule.tracks.push(tracks[0]);
-			this.muzXBox.currentSchedule.obverse = trk;
+			this.muzXBox.currentSchedule.obverseTrackFilter = trk;
 			if (this.muzXBox.currentSchedule.tracks.length) {
-				this.muzXBox.currentSchedule.tracks[trk].obverse = 0;
+				this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = 0;
 			}
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
@@ -561,17 +340,17 @@ class ZMainMenu {
 	upTrackFx(trk: number, fx: number): () => void {
 		return () => {
 			console.log('upTrackFx', trk, fx);
-			this.muzXBox.currentSchedule.obverse = trk;
-			this.muzXBox.currentSchedule.tracks[trk].obverse = this.muzXBox.currentSchedule.tracks[trk].voices.length + fx;
+			this.muzXBox.currentSchedule.obverseTrackFilter = trk;
+			this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = this.muzXBox.currentSchedule.tracks[trk].voices.length + fx;
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
 		};
 	}
 	upTrackFxParam(trk: number, fx: number, param: number): () => void {
 		return () => {
-			this.muzXBox.currentSchedule.obverse = trk;
-			this.muzXBox.currentSchedule.tracks[trk].obverse = this.muzXBox.currentSchedule.tracks[trk].voices.length + fx;
-			this.muzXBox.currentSchedule.tracks[trk].filters[fx].obverse = param;
+			this.muzXBox.currentSchedule.obverseTrackFilter = trk;
+			this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = this.muzXBox.currentSchedule.tracks[trk].voices.length + fx;
+			this.muzXBox.currentSchedule.tracks[trk].filters[fx].obverseParameter = param;
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
 			console.log('upTrackFxParam', trk, fx, param);
@@ -581,8 +360,8 @@ class ZMainMenu {
 	upVox(trk: number, vox: number): () => void {
 		return () => {
 			console.log('upVox', trk, vox);
-			this.muzXBox.currentSchedule.obverse = trk;
-			this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
+			this.muzXBox.currentSchedule.obverseTrackFilter = trk;
+			this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
 		};
@@ -590,9 +369,9 @@ class ZMainMenu {
 	upVoxFx(trk: number, vox: number, fx: number): () => void {
 		return () => {
 			console.log('upVoxFx', trk, vox, fx);
-			this.muzXBox.currentSchedule.obverse = trk;
-			this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
-			this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = fx + 1;
+			this.muzXBox.currentSchedule.obverseTrackFilter = trk;
+			this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
+			this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = fx + 1;
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
 		};
@@ -600,10 +379,10 @@ class ZMainMenu {
 	upVoxFxParam(trk: number, vox: number, fx: number, param: number): () => void {
 		return () => {
 			console.log('upVoxFxParam', trk, vox, fx, param);
-			this.muzXBox.currentSchedule.obverse = trk;
-			this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
-			this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = fx + 1;
-			this.muzXBox.currentSchedule.tracks[trk].voices[vox].filters[fx].obverse = fx;
+			this.muzXBox.currentSchedule.obverseTrackFilter = trk;
+			this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
+			this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = fx + 1;
+			this.muzXBox.currentSchedule.tracks[trk].voices[vox].filters[fx].obverseParameter = fx;
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
 		};
@@ -611,9 +390,9 @@ class ZMainMenu {
 	upVoxProvider(trk: number, vox: number): () => void {
 		return () => {
 			console.log('upVoxProvider', trk, vox);
-			this.muzXBox.currentSchedule.obverse = trk;
-			this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
-			this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = 0;
+			this.muzXBox.currentSchedule.obverseTrackFilter = trk;
+			this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
+			this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = 0;
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
 		};
@@ -621,10 +400,10 @@ class ZMainMenu {
 	upVoxProviderParam(trk: number, vox: number, param: number): () => void {
 		return () => {
 			console.log('upVoxProviderParam', trk, vox, param);
-			this.muzXBox.currentSchedule.obverse = trk;
-			this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
-			this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = 0;
-			this.muzXBox.currentSchedule.tracks[trk].voices[vox].performer.obverse = 0;
+			this.muzXBox.currentSchedule.obverseTrackFilter = trk;
+			this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
+			this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = 0;
+			this.muzXBox.currentSchedule.tracks[trk].voices[vox].performer.obverseParameter = 0;
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
 		};

@@ -305,7 +305,8 @@ declare class ZRender {
     fillTimeLine64(song: ZvoogSchedule): void;
     fillTimeLine256(song: ZvoogSchedule): void;
     drawSchedule(song: ZvoogSchedule): void;
-    addVoiceMeasure(song: ZvoogSchedule, voice: ZvoogVoice, i: number, time: number, css: string, anchors: TileAnchor[]): void;
+    addParameterMeasure(song: ZvoogSchedule, parameter: ZvoogParameterData, measureNum: number, time: number, css: string, anchors: TileAnchor[]): void;
+    addVoiceMeasure(song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): void;
     addDebugButtons(song: ZvoogSchedule, menuButton: TileRectangle): void;
 }
 declare type ZUIModeValue = {
@@ -559,7 +560,7 @@ declare type ZvoogVoice = {
     performer: ZvoogPerformerSetting;
     filters: ZvoogFilterSetting[];
     title: string;
-    obverse?: number;
+    obversePerformerFilter?: number;
 };
 declare type ZvoogMeasureChord = {
     chords: ZvoogChordStrings[];
@@ -650,7 +651,7 @@ declare type ZvoogTrack = {
     title: string;
     voices: ZvoogVoice[];
     filters: ZvoogFilterSetting[];
-    obverse?: number;
+    obverseVoiceFilter?: number;
 };
 declare type ZvoogSchedule = {
     title: string;
@@ -658,7 +659,7 @@ declare type ZvoogSchedule = {
     filters: ZvoogFilterSetting[];
     measures: ZvoogMeasure[];
     harmony: ZvoogProgression;
-    obverse?: number;
+    obverseTrackFilter?: number;
 };
 declare function scheduleDuration(song: ZvoogSchedule): number;
 declare type ZvoogFilterSetting = {
@@ -666,14 +667,14 @@ declare type ZvoogFilterSetting = {
     parameters: ZvoogParameterData[];
     kind: string;
     initial: string;
-    obverse?: number;
+    obverseParameter?: number;
 };
 declare type ZvoogPerformerSetting = {
     performerPlugin: ZvoogPerformerPlugin | null;
     parameters: ZvoogParameterData[];
     kind: string;
     initial: string;
-    obverse?: number;
+    obverseParameter?: number;
 };
 declare type ZvoogFilterPlugin = ZvoogPlugin & {
     getInput: () => AudioNode;

@@ -114,19 +114,19 @@ button{
 .mainLine {
 	stroke: #000000;
 	stroke-width: 3cm;
-	stroke-opacity: 75%;
+	stroke-opacity2: 75%;
 	stroke-linecap: round;
 }
 
 .secondLine {
-	stroke: #3333cc;
+	stroke: #003300;
 	stroke-width: 3cm;
-	stroke-opacity: 50%;
+	stroke-opacity2: 50%;
 	stroke-linecap: round;
 }
 
 .otherLine {
-	stroke: #660099;
+	stroke: #000099;
 	stroke-width: 3cm;
 	stroke-opacity: 25%;
 	stroke-linecap: round;

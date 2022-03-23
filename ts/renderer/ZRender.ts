@@ -139,14 +139,14 @@ class ZRender {
 		anchor.hh = 128 * this.ratioThickness;
 	}
 	clearAnchorsContent(songDuration: number): void {
-		var anchors: TileAnchor[] = [
+		let anchors: TileAnchor[] = [
 			this.debugAnchor0, this.debugAnchor1, this.debugAnchor4, this.debugAnchor16, this.debugAnchor64, this.debugAnchor256
 			, this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256
 			, this.contentMain1, this.contentMain4, this.contentMain16, this.contentMain64, this.contentMain256
 			, this.contentSecond1, this.contentSecond4, this.contentSecond16, this.contentSecond64, this.contentSecond256
 			, this.contentOther1, this.contentOther4, this.contentOther16, this.contentOther64, this.contentOther256
 		];
-		for (var i = 0; i < anchors.length; i++) {
+		for (let i = 0; i < anchors.length; i++) {
 			this.clearSingleAnchor(anchors[i], songDuration);
 		}
 		this.tileLevel.innerWidth = this.ratioDuration * songDuration * this.tileLevel.tapSize;
@@ -154,10 +154,10 @@ class ZRender {
 
 	}
 	fillTimeLine1(song: ZvoogSchedule) {
-		var time = 0;
-		for (var i = 0; i < song.measures.length; i++) {
-			var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-			var tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
+		let time = 0;
+		for (let i = 0; i < song.measures.length; i++) {
+			let measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+			let tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
 			let singlemeasuresTimelineAnchor1: TileAnchor = TAnchor(
 				time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness
 				, this.measuresTimelineAnchor1.showZoom, this.measuresTimelineAnchor1.hideZoom
@@ -169,10 +169,10 @@ class ZRender {
 		}
 	}
 	fillTimeLine4(song: ZvoogSchedule) {
-		var time = 0;
-		for (var i = 0; i < song.measures.length; i++) {
-			var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-			var tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
+		let time = 0;
+		for (let i = 0; i < song.measures.length; i++) {
+			let measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+			let tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
 			let singlemeasuresTimelineAnchor4: TileAnchor = TAnchor(
 				time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness
 				, this.measuresTimelineAnchor4.showZoom, this.measuresTimelineAnchor4.hideZoom
@@ -184,10 +184,10 @@ class ZRender {
 		}
 	}
 	fillTimeLine16(song: ZvoogSchedule) {
-		var time = 0;
-		for (var i = 0; i < song.measures.length; i++) {
-			var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-			var tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
+		let time = 0;
+		for (let i = 0; i < song.measures.length; i++) {
+			let measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+			let tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
 			let singlemeasuresTimelineAnchor16: TileAnchor = TAnchor(
 				time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness
 				, this.measuresTimelineAnchor16.showZoom, this.measuresTimelineAnchor16.hideZoom
@@ -199,10 +199,10 @@ class ZRender {
 		}
 	}
 	fillTimeLine64(song: ZvoogSchedule) {
-		var time = 0;
-		for (var i = 0; i < song.measures.length; i++) {
-			var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-			var tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
+		let time = 0;
+		for (let i = 0; i < song.measures.length; i++) {
+			let measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+			let tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
 			let singlemeasuresTimelineAnchor64: TileAnchor = TAnchor(
 				time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness
 				, this.measuresTimelineAnchor64.showZoom, this.measuresTimelineAnchor64.hideZoom
@@ -214,10 +214,10 @@ class ZRender {
 		}
 	}
 	fillTimeLine256(song: ZvoogSchedule) {
-		var time = 0;
-		for (var i = 0; i < song.measures.length; i++) {
-			var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-			var tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
+		let time = 0;
+		for (let i = 0; i < song.measures.length; i++) {
+			let measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+			let tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
 			let singlemeasuresTimelineAnchor256: TileAnchor = TAnchor(
 				time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness
 				, this.measuresTimelineAnchor256.showZoom, this.measuresTimelineAnchor256.hideZoom
@@ -229,17 +229,17 @@ class ZRender {
 		}
 	}
 	drawSchedule(song: ZvoogSchedule) {//}, menuButton: TileRectangle) {
-		var songDuration = scheduleDuration(song);
+		let songDuration = scheduleDuration(song);
 		this.clearAnchorsContent(songDuration);
 		this.fillTimeLine1(song);
 		this.fillTimeLine4(song);
 		this.fillTimeLine16(song);
 		this.fillTimeLine64(song);
 		this.fillTimeLine256(song);
-		var time = 0;
-		song.obverse=(song.obverse)?song.obverse:0;
-		for (var mm = 0; mm < song.measures.length; mm++) {
-			var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
+		let time = 0;
+		song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
+		for (let mm = 0; mm < song.measures.length; mm++) {
+			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
 			let singleMasuresContentAnchor1: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
 			let singleMasuresContentAnchor4: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
 			let singleMasuresContentAnchor16: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
@@ -270,16 +270,47 @@ class ZRender {
 			this.contentOther16.content.push(singleMasuresOtherAnchor16);
 			this.contentOther64.content.push(singleMasuresOtherAnchor64);
 			this.contentOther256.content.push(singleMasuresOtherAnchor256);
-			for (var tt = 0; tt < song.tracks.length; tt++) {
-				var track = song.tracks[tt];
-				track.obverse=(track.obverse)?track.obverse:0;
-				for (var vv = 0; vv < track.voices.length; vv++) {
-					var voice: ZvoogVoice = track.voices[vv];
-					for(var pp=0;pp<voice.performer.parameters.length;pp++){
-						var paremeter=voice.performer.parameters[pp];
+
+
+			let measuresquare: TileRectangle = {
+				x: time * this.ratioDuration, y: 0, w: this.ratioDuration * measureDuration, h: 128 * this.ratioThickness
+				, rx: 20
+				, ry: 20
+				, css: 'debug'
+			};
+			let measurenum: TileText = { x: time * this.ratioDuration, y: 64, text: ''+mm, css: 'debug textSize64' };
+			singleMasuresContentAnchor1.content.push(measurenum);
+			singleMasuresContentAnchor4.content.push(measurenum);
+			singleMasuresContentAnchor16.content.push(measurenum);
+			singleMasuresContentAnchor64.content.push(measurenum);
+			singleMasuresContentAnchor256.content.push(measurenum);
+			singleMasuresContentAnchor1.content.push(measuresquare);
+			singleMasuresContentAnchor4.content.push(measuresquare);
+			singleMasuresContentAnchor16.content.push(measuresquare);
+			singleMasuresContentAnchor64.content.push(measuresquare);
+			singleMasuresContentAnchor256.content.push(measuresquare);
+
+			for (let tt = 0; tt < song.tracks.length; tt++) {
+				let track = song.tracks[tt];
+				track.obverseVoiceFilter = (track.obverseVoiceFilter) ? track.obverseVoiceFilter : 0;
+				for (let vv = 0; vv < track.voices.length; vv++) {
+					let voice: ZvoogVoice = track.voices[vv];
+					voice.obversePerformerFilter = (voice.obversePerformerFilter) ? voice.obversePerformerFilter : 0;
+					for (let pp = 0; pp < voice.performer.parameters.length; pp++) {
+						let paremeter = voice.performer.parameters[pp];
+						if (song.obverseTrackFilter == tt && track.obverseVoiceFilter == vv && voice.obversePerformerFilter == 0) {
+							voice.performer.obverseParameter = (voice.performer.obverseParameter) ? voice.performer.obverseParameter : 0;
+							if (voice.performer.obverseParameter == pp) {
+								this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+							} else {
+								this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+							}
+						} else {
+							this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
+						}
 					}
-					if (tt == song.obverse) {
-						if (vv == track.obverse) {
+					if (tt == song.obverseTrackFilter) {
+						if (vv == track.obverseVoiceFilter) {
 							this.addVoiceMeasure(song, voice, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
 						} else {
 							this.addVoiceMeasure(song, voice, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
@@ -287,24 +318,54 @@ class ZRender {
 					} else {
 						this.addVoiceMeasure(song, voice, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
 					}
-					for(var ff=0;ff<voice.filters.length;ff++){
-						var filter=voice.filters[ff];
-						for(var pp=0;pp<filter.parameters.length;ff++){
-							var paremeter=filter.parameters[pp];
+					for (let ff = 0; ff < voice.filters.length; ff++) {
+						let filter = voice.filters[ff];
+						for (let pp = 0; pp < filter.parameters.length; pp++) {
+							let paremeter = filter.parameters[pp];
+							if (song.obverseTrackFilter == tt && track.obverseVoiceFilter == vv && voice.obversePerformerFilter == ff + 1) {
+								filter.obverseParameter = (filter.obverseParameter) ? filter.obverseParameter : 0;
+								if (filter.obverseParameter == pp) {
+									this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+								} else {
+									this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+								}
+							} else {
+								this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
+							}
 						}
 					}
 				}
-				for(var ff=0;ff<track.filters.length;ff++){
-					var filter=track.filters[ff];
-					for(var pp=0;pp<filter.parameters.length;pp++){
-						var paremeter=filter.parameters[pp];
+				for (let ff = 0; ff < track.filters.length; ff++) {
+					let filter = track.filters[ff];
+					for (let pp = 0; pp < filter.parameters.length; pp++) {
+						let paremeter = filter.parameters[pp];
+						if (song.obverseTrackFilter == tt && track.obverseVoiceFilter == track.voices.length + ff) {
+							filter.obverseParameter = (filter.obverseParameter) ? filter.obverseParameter : 0;
+							if (filter.obverseParameter == pp) {
+								this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+							} else {
+								this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+							}
+						} else {
+							this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
+						}
 					}
 				}
 			}
-			for(var ff=0;ff<song.filters.length;ff++){
-				var filter=song.filters[ff];
-				for(var pp=0;pp<filter.parameters.length;ff++){
-					var paremeter=filter.parameters[pp];
+			for (let ff = 0; ff < song.filters.length; ff++) {
+				let filter = song.filters[ff];
+				for (let pp = 0; pp < filter.parameters.length; pp++) {
+					let paremeter = filter.parameters[pp];
+					if (song.obverseTrackFilter == song.tracks.length + ff) {
+						filter.obverseParameter = (filter.obverseParameter) ? filter.obverseParameter : 0;
+						if (filter.obverseParameter == pp) {
+							this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+						} else {
+							this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+						}
+					} else {
+						this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
+					}
 				}
 			}
 			time = time + measureDuration;
@@ -312,37 +373,50 @@ class ZRender {
 		//this.addDebugButtons(song, menuButton);
 		this.tileLevel.resetModel();
 	}
-	addVoiceMeasure(song: ZvoogSchedule, voice: ZvoogVoice, i: number, time: number, css: string, anchors: TileAnchor[]) {
-		var measure = voice.measureChords[i];
-		for (var cc = 0; cc < measure.chords.length; cc++) {
-			var chord = measure.chords[cc];
-			for (var ee = 0; ee < chord.envelopes.length; ee++) {
-				var envelope = chord.envelopes[ee];
-				var pitchWhen = meter2seconds(song.measures[i].tempo, chord.when);
-				for (var pp = 0; pp < envelope.pitches.length; pp++) {
-					var pitch = envelope.pitches[pp];
-					var slide = pitch.pitch;
+	addParameterMeasure(song: ZvoogSchedule, parameter: ZvoogParameterData, measureNum: number, time: number, css: string, anchors: TileAnchor[]) {
+		let point: ZvoogCurvePoint = parameter.points[0];
+		for (let aa = 0; aa < anchors.length; aa++) {
+			let line: TileLine = {
+				x1: 0
+				, x2: 0 + 1
+				, y1: 128 - point.velocity
+				, y2: 128 - point.velocity + 1
+				, css: css
+			};
+			anchors[aa].content.push(cloneLine(line));
+		}
+	}
+	addVoiceMeasure(song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]) {
+		let measure = voice.measureChords[measureNum];
+		for (let cc = 0; cc < measure.chords.length; cc++) {
+			let chord = measure.chords[cc];
+			for (let ee = 0; ee < chord.envelopes.length; ee++) {
+				let envelope = chord.envelopes[ee];
+				let pitchWhen = meter2seconds(song.measures[measureNum].tempo, chord.when);
+				for (let pp = 0; pp < envelope.pitches.length; pp++) {
+					let pitch = envelope.pitches[pp];
+					let slide = pitch.pitch;
 					if (pp + 1 < envelope.pitches.length) {
 						slide = envelope.pitches[pp + 1].pitch;
 					}
-					var pitchDuration = meter2seconds(song.measures[i].tempo, pitch.duration);
-					var startShift = 0;
+					let pitchDuration = meter2seconds(song.measures[measureNum].tempo, pitch.duration);
+					let startShift = 0;
 					if (pp == 0) {
 						startShift = 0.5 * this.ratioThickness;
 					}
-					var endShift = 0;
+					let endShift = 0;
 					if (pp == envelope.pitches.length - 1) {
 						endShift = -0.49 * this.ratioThickness;
 					}
-					var line: TileLine = {
+					let line: TileLine = {
 						x1: (time + pitchWhen) * this.ratioDuration + startShift
 						, x2: (time + pitchWhen + pitchDuration) * this.ratioDuration + endShift
 						, y1: (128 - pitch.pitch) * this.ratioThickness
 						, y2: (128 - slide) * this.ratioThickness
-						, css: 'debug'
+						, css: css
 					};
-					line.css = css;
-					for (var aa = 0; aa < anchors.length; aa++) {
+					//line.css = css;
+					for (let aa = 0; aa < anchors.length; aa++) {
 						anchors[aa].content.push(cloneLine(line));
 					}
 					pitchWhen = pitchWhen + pitchDuration;
@@ -355,7 +429,7 @@ class ZRender {
 		this.debugAnchor0.content.push({
 			x: 10, y: 10, css: 'textSize16', text: 'import'
 		});
-		var me = this;
+		let me = this;
 		if (song.tracks.length > 0) {
 			this.debugAnchor0.content.push({
 				x: 10, y: 30, css: 'textSize16', text: '(' + song.tracks.length + ')' + song.tracks[0].title
@@ -364,7 +438,7 @@ class ZRender {
 		this.debugAnchor0.content.push({
 			x: 0, y: 20, w: 10, h: 10, rx: 3, ry: 3, css: 'debug'
 			, action: function () {
-				var tt = song.tracks.shift();
+				let tt = song.tracks.shift();
 				if (tt) {
 					song.tracks.push(tt);
 					//me.drawSchedule(song, menuButton)
@@ -380,7 +454,7 @@ class ZRender {
 			x: 0, y: 40, w: 10, h: 10, rx: 3, ry: 3, css: 'debug'
 			, action: function () {
 				if (song.tracks.length > 0) {
-					var vv = song.tracks[0].voices.shift();
+					let vv = song.tracks[0].voices.shift();
 					if (vv) {
 						song.tracks[0].voices.push(vv);
 						//me.drawSchedule(song, menuButton)

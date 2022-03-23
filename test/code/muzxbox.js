@@ -1451,9 +1451,9 @@ var ZRender = (function () {
         this.fillTimeLine64(song);
         this.fillTimeLine256(song);
         var time = 0;
-        song.obverse = (song.obverse) ? song.obverse : 0;
-        for (var i = 0; i < song.measures.length; i++) {
-            var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+        song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
+        for (var mm = 0; mm < song.measures.length; mm++) {
+            var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
             var singleMasuresContentAnchor1 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
             var singleMasuresContentAnchor4 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
             var singleMasuresContentAnchor16 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
@@ -1484,21 +1484,108 @@ var ZRender = (function () {
             this.contentOther16.content.push(singleMasuresOtherAnchor16);
             this.contentOther64.content.push(singleMasuresOtherAnchor64);
             this.contentOther256.content.push(singleMasuresOtherAnchor256);
+            var measuresquare = {
+                x: time * this.ratioDuration, y: 0, w: this.ratioDuration * measureDuration, h: 128 * this.ratioThickness,
+                rx: 20,
+                ry: 20,
+                css: 'debug'
+            };
+            var measurenum = { x: time * this.ratioDuration, y: 64, text: '' + mm, css: 'debug textSize64' };
+            singleMasuresContentAnchor1.content.push(measurenum);
+            singleMasuresContentAnchor4.content.push(measurenum);
+            singleMasuresContentAnchor16.content.push(measurenum);
+            singleMasuresContentAnchor64.content.push(measurenum);
+            singleMasuresContentAnchor256.content.push(measurenum);
+            singleMasuresContentAnchor1.content.push(measuresquare);
+            singleMasuresContentAnchor4.content.push(measuresquare);
+            singleMasuresContentAnchor16.content.push(measuresquare);
+            singleMasuresContentAnchor64.content.push(measuresquare);
+            singleMasuresContentAnchor256.content.push(measuresquare);
             for (var tt = 0; tt < song.tracks.length; tt++) {
                 var track = song.tracks[tt];
-                track.obverse = (track.obverse) ? track.obverse : 0;
+                track.obverseVoiceFilter = (track.obverseVoiceFilter) ? track.obverseVoiceFilter : 0;
                 for (var vv = 0; vv < track.voices.length; vv++) {
                     var voice = track.voices[vv];
-                    if (tt == song.obverse) {
-                        if (vv == track.obverse) {
-                            this.addVoiceMeasure(song, voice, i, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+                    voice.obversePerformerFilter = (voice.obversePerformerFilter) ? voice.obversePerformerFilter : 0;
+                    for (var pp = 0; pp < voice.performer.parameters.length; pp++) {
+                        var paremeter = voice.performer.parameters[pp];
+                        if (song.obverseTrackFilter == tt && track.obverseVoiceFilter == vv && voice.obversePerformerFilter == 0) {
+                            voice.performer.obverseParameter = (voice.performer.obverseParameter) ? voice.performer.obverseParameter : 0;
+                            if (voice.performer.obverseParameter == pp) {
+                                this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+                            }
+                            else {
+                                this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+                            }
                         }
                         else {
-                            this.addVoiceMeasure(song, voice, i, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+                            this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
+                        }
+                    }
+                    if (tt == song.obverseTrackFilter) {
+                        if (vv == track.obverseVoiceFilter) {
+                            this.addVoiceMeasure(song, voice, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+                        }
+                        else {
+                            this.addVoiceMeasure(song, voice, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
                         }
                     }
                     else {
-                        this.addVoiceMeasure(song, voice, i, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
+                        this.addVoiceMeasure(song, voice, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
+                    }
+                    for (var ff = 0; ff < voice.filters.length; ff++) {
+                        var filter = voice.filters[ff];
+                        for (var pp = 0; pp < filter.parameters.length; pp++) {
+                            var paremeter = filter.parameters[pp];
+                            if (song.obverseTrackFilter == tt && track.obverseVoiceFilter == vv && voice.obversePerformerFilter == ff + 1) {
+                                filter.obverseParameter = (filter.obverseParameter) ? filter.obverseParameter : 0;
+                                if (filter.obverseParameter == pp) {
+                                    this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+                                }
+                                else {
+                                    this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+                                }
+                            }
+                            else {
+                                this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
+                            }
+                        }
+                    }
+                }
+                for (var ff = 0; ff < track.filters.length; ff++) {
+                    var filter = track.filters[ff];
+                    for (var pp = 0; pp < filter.parameters.length; pp++) {
+                        var paremeter = filter.parameters[pp];
+                        if (song.obverseTrackFilter == tt && track.obverseVoiceFilter == track.voices.length + ff) {
+                            filter.obverseParameter = (filter.obverseParameter) ? filter.obverseParameter : 0;
+                            if (filter.obverseParameter == pp) {
+                                this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+                            }
+                            else {
+                                this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+                            }
+                        }
+                        else {
+                            this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
+                        }
+                    }
+                }
+            }
+            for (var ff = 0; ff < song.filters.length; ff++) {
+                var filter = song.filters[ff];
+                for (var pp = 0; pp < filter.parameters.length; pp++) {
+                    var paremeter = filter.parameters[pp];
+                    if (song.obverseTrackFilter == song.tracks.length + ff) {
+                        filter.obverseParameter = (filter.obverseParameter) ? filter.obverseParameter : 0;
+                        if (filter.obverseParameter == pp) {
+                            this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+                        }
+                        else {
+                            this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+                        }
+                    }
+                    else {
+                        this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
                     }
                 }
             }
@@ -1506,20 +1593,33 @@ var ZRender = (function () {
         }
         this.tileLevel.resetModel();
     };
-    ZRender.prototype.addVoiceMeasure = function (song, voice, i, time, css, anchors) {
-        var measure = voice.measureChords[i];
+    ZRender.prototype.addParameterMeasure = function (song, parameter, measureNum, time, css, anchors) {
+        var point = parameter.points[0];
+        for (var aa = 0; aa < anchors.length; aa++) {
+            var line_1 = {
+                x1: 0,
+                x2: 0 + 1,
+                y1: 128 - point.velocity,
+                y2: 128 - point.velocity + 1,
+                css: css
+            };
+            anchors[aa].content.push(cloneLine(line_1));
+        }
+    };
+    ZRender.prototype.addVoiceMeasure = function (song, voice, measureNum, time, css, anchors) {
+        var measure = voice.measureChords[measureNum];
         for (var cc = 0; cc < measure.chords.length; cc++) {
             var chord = measure.chords[cc];
             for (var ee = 0; ee < chord.envelopes.length; ee++) {
                 var envelope = chord.envelopes[ee];
-                var pitchWhen = meter2seconds(song.measures[i].tempo, chord.when);
+                var pitchWhen = meter2seconds(song.measures[measureNum].tempo, chord.when);
                 for (var pp = 0; pp < envelope.pitches.length; pp++) {
                     var pitch = envelope.pitches[pp];
                     var slide = pitch.pitch;
                     if (pp + 1 < envelope.pitches.length) {
                         slide = envelope.pitches[pp + 1].pitch;
                     }
-                    var pitchDuration = meter2seconds(song.measures[i].tempo, pitch.duration);
+                    var pitchDuration = meter2seconds(song.measures[measureNum].tempo, pitch.duration);
                     var startShift = 0;
                     if (pp == 0) {
                         startShift = 0.5 * this.ratioThickness;
@@ -1528,16 +1628,15 @@ var ZRender = (function () {
                     if (pp == envelope.pitches.length - 1) {
                         endShift = -0.49 * this.ratioThickness;
                     }
-                    var line = {
+                    var line_2 = {
                         x1: (time + pitchWhen) * this.ratioDuration + startShift,
                         x2: (time + pitchWhen + pitchDuration) * this.ratioDuration + endShift,
                         y1: (128 - pitch.pitch) * this.ratioThickness,
                         y2: (128 - slide) * this.ratioThickness,
-                        css: 'debug'
+                        css: css
                     };
-                    line.css = css;
                     for (var aa = 0; aa < anchors.length; aa++) {
-                        anchors[aa].content.push(cloneLine(line));
+                        anchors[aa].content.push(cloneLine(line_2));
                     }
                     pitchWhen = pitchWhen + pitchDuration;
                 }
@@ -4413,6 +4512,9 @@ var ZMainMenu = (function () {
             if (_this.currentLevel == 3) {
                 _this.selection3level = nn;
             }
+            if (_this.currentLevel == 4) {
+                _this.selection4level = nn;
+            }
             if (_this.currentLevel == 5) {
                 _this.selection5level = nn;
             }
@@ -4563,8 +4665,8 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upSongFx', fx);
-            _this.muzXBox.currentSchedule.obverse = _this.muzXBox.currentSchedule.tracks.length + fx;
-            _this.muzXBox.currentSchedule.filters[fx].obverse = 0;
+            _this.muzXBox.currentSchedule.obverseTrackFilter = _this.muzXBox.currentSchedule.tracks.length + fx;
+            _this.muzXBox.currentSchedule.filters[fx].obverseParameter = 0;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -4573,8 +4675,8 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upSongFxParam', fx, param);
-            _this.muzXBox.currentSchedule.obverse = _this.muzXBox.currentSchedule.tracks.length + fx;
-            _this.muzXBox.currentSchedule.filters[fx].obverse = param;
+            _this.muzXBox.currentSchedule.obverseTrackFilter = _this.muzXBox.currentSchedule.tracks.length + fx;
+            _this.muzXBox.currentSchedule.filters[fx].obverseParameter = param;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -4583,9 +4685,9 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upTrack', trk);
-            _this.muzXBox.currentSchedule.obverse = trk;
+            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
             if (_this.muzXBox.currentSchedule.tracks.length) {
-                _this.muzXBox.currentSchedule.tracks[trk].obverse = 0;
+                _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = 0;
             }
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
@@ -4595,8 +4697,8 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upTrackFx', trk, fx);
-            _this.muzXBox.currentSchedule.obverse = trk;
-            _this.muzXBox.currentSchedule.tracks[trk].obverse = _this.muzXBox.currentSchedule.tracks[trk].voices.length + fx;
+            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
+            _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = _this.muzXBox.currentSchedule.tracks[trk].voices.length + fx;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -4604,9 +4706,9 @@ var ZMainMenu = (function () {
     ZMainMenu.prototype.upTrackFxParam = function (trk, fx, param) {
         var _this = this;
         return function () {
-            _this.muzXBox.currentSchedule.obverse = trk;
-            _this.muzXBox.currentSchedule.tracks[trk].obverse = _this.muzXBox.currentSchedule.tracks[trk].voices.length + fx;
-            _this.muzXBox.currentSchedule.tracks[trk].filters[fx].obverse = param;
+            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
+            _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = _this.muzXBox.currentSchedule.tracks[trk].voices.length + fx;
+            _this.muzXBox.currentSchedule.tracks[trk].filters[fx].obverseParameter = param;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
             console.log('upTrackFxParam', trk, fx, param);
@@ -4616,8 +4718,8 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upVox', trk, vox);
-            _this.muzXBox.currentSchedule.obverse = trk;
-            _this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
+            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
+            _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -4626,9 +4728,9 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upVoxFx', trk, vox, fx);
-            _this.muzXBox.currentSchedule.obverse = trk;
-            _this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
-            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = fx + 1;
+            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
+            _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
+            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = fx + 1;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -4637,10 +4739,10 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upVoxFxParam', trk, vox, fx, param);
-            _this.muzXBox.currentSchedule.obverse = trk;
-            _this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
-            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = fx + 1;
-            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].filters[fx].obverse = fx;
+            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
+            _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
+            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = fx + 1;
+            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].filters[fx].obverseParameter = fx;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -4649,9 +4751,9 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upVoxProvider', trk, vox);
-            _this.muzXBox.currentSchedule.obverse = trk;
-            _this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
-            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = 0;
+            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
+            _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
+            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = 0;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -4660,10 +4762,10 @@ var ZMainMenu = (function () {
         var _this = this;
         return function () {
             console.log('upVoxProviderParam', trk, vox, param);
-            _this.muzXBox.currentSchedule.obverse = trk;
-            _this.muzXBox.currentSchedule.tracks[trk].obverse = vox;
-            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obverse = 0;
-            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].performer.obverse = 0;
+            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
+            _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
+            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = 0;
+            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].performer.obverseParameter = 0;
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
