@@ -14,12 +14,16 @@ class CannyDo {
 	start(ms: number, action: () => void) {
 		var startId = -1;
 		this.currentID = setTimeout(function () {
-			//console.log(startId,this.currentID,this);
+			
 			if (startId == this.currentID) {
+				//console.log('do',startId);
 				action();
+			}else{
+				//console.log('skip',startId,'for',this.currentID);
 			}
 		}.bind(this), ms);
 		startId = this.currentID;
+		//console.log('wait',startId);
 	}
 }
 

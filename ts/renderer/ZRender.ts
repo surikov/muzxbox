@@ -50,7 +50,7 @@ class ZRender {
 	contentOther256: TileAnchor;
 
 	constructor() {
-		this.bindLayers();
+		//this.bindLayers();
 	}
 	bindLayers() {
 		this.measureOtherVoicesLayerGroup = (document.getElementById('measureOtherVoicesLayerGroup') as any) as SVGElement;
@@ -240,31 +240,31 @@ class ZRender {
 		song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-			let singleMasuresContentAnchor1: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
-			let singleMasuresContentAnchor4: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
-			let singleMasuresContentAnchor16: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
-			let singleMasuresContentAnchor64: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain64.showZoom, this.contentMain64.hideZoom);
-			let singleMasuresContentAnchor256: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain256.showZoom, this.contentMain256.hideZoom);
+			let singleMasuresContentAnchor1: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
+			let singleMasuresContentAnchor4: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
+			let singleMasuresContentAnchor16: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
+			let singleMasuresContentAnchor64: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain64.showZoom, this.contentMain64.hideZoom);
+			let singleMasuresContentAnchor256: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain256.showZoom, this.contentMain256.hideZoom);
 			this.contentMain1.content.push(singleMasuresContentAnchor1);
 			this.contentMain4.content.push(singleMasuresContentAnchor4);
 			this.contentMain16.content.push(singleMasuresContentAnchor16);
 			this.contentMain64.content.push(singleMasuresContentAnchor64);
 			this.contentMain256.content.push(singleMasuresContentAnchor256);
-			let singleMasuresSecondAnchor1: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond1.showZoom, this.contentSecond1.hideZoom);
-			let singleMasuresSecondAnchor4: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond4.showZoom, this.contentSecond4.hideZoom);
-			let singleMasuresSecondAnchor16: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond16.showZoom, this.contentSecond16.hideZoom);
-			let singleMasuresSecondAnchor64: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond64.showZoom, this.contentSecond64.hideZoom);
-			let singleMasuresSecondAnchor256: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond256.showZoom, this.contentSecond256.hideZoom);
+			let singleMasuresSecondAnchor1: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond1.showZoom, this.contentSecond1.hideZoom);
+			let singleMasuresSecondAnchor4: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond4.showZoom, this.contentSecond4.hideZoom);
+			let singleMasuresSecondAnchor16: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond16.showZoom, this.contentSecond16.hideZoom);
+			let singleMasuresSecondAnchor64: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond64.showZoom, this.contentSecond64.hideZoom);
+			let singleMasuresSecondAnchor256: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond256.showZoom, this.contentSecond256.hideZoom);
 			this.contentSecond1.content.push(singleMasuresSecondAnchor1);
 			this.contentSecond4.content.push(singleMasuresSecondAnchor4);
 			this.contentSecond16.content.push(singleMasuresSecondAnchor16);
 			this.contentSecond64.content.push(singleMasuresSecondAnchor64);
 			this.contentSecond256.content.push(singleMasuresSecondAnchor256);
-			let singleMasuresOtherAnchor1: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther1.showZoom, this.contentOther1.hideZoom);
-			let singleMasuresOtherAnchor4: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther4.showZoom, this.contentOther4.hideZoom);
-			let singleMasuresOtherAnchor16: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther16.showZoom, this.contentOther16.hideZoom);
-			let singleMasuresOtherAnchor64: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther64.showZoom, this.contentOther64.hideZoom);
-			let singleMasuresOtherAnchor256: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther256.showZoom, this.contentOther256.hideZoom);
+			let singleMasuresOtherAnchor1: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther1.showZoom, this.contentOther1.hideZoom);
+			let singleMasuresOtherAnchor4: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther4.showZoom, this.contentOther4.hideZoom);
+			let singleMasuresOtherAnchor16: TileAnchor = TAnchor(time * this.ratioDuration, 0,3* this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther16.showZoom, this.contentOther16.hideZoom);
+			let singleMasuresOtherAnchor64: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther64.showZoom, this.contentOther64.hideZoom);
+			let singleMasuresOtherAnchor256: TileAnchor = TAnchor(time * this.ratioDuration, 0,3* this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther256.showZoom, this.contentOther256.hideZoom);
 			this.contentOther1.content.push(singleMasuresOtherAnchor1);
 			this.contentOther4.content.push(singleMasuresOtherAnchor4);
 			this.contentOther16.content.push(singleMasuresOtherAnchor16);

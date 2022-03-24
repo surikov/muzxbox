@@ -18,7 +18,7 @@ class TileLevel {
 	clickX: number = 0;
 	clickY: number = 0;
 	dragZoom: number = 1;
-	allTilesOK: boolean = false;
+	_allTilesOK: boolean = false;
 	clicked: boolean = false;
 	mx: number = 100;
 	mn: number = 1;
@@ -53,7 +53,17 @@ class TileLevel {
 	dragTranslateY: number = 0;
 
 	mouseDownMode: boolean = false;
-	
+
+	get allTilesOK(): boolean {
+		return this._allTilesOK;
+	}
+	set allTilesOK(bb: boolean) {
+		if (bb != this._allTilesOK) {
+			//console.log('allTilesOK',bb);
+			this._allTilesOK = bb;
+		}
+	}
+
 	get translateZ(): number {
 		return this._translateZ;
 	}
@@ -69,7 +79,7 @@ class TileLevel {
 	}
 	set translateX(x: number) {
 		if (x != this._translateX) {
-			//console.log('x',this._translateX,'=>',x);
+			//console.trace('x',this._translateX,'=>',x);
 			this._translateX = x;
 		}
 
@@ -86,7 +96,7 @@ class TileLevel {
 	}
 
 	constructor(svgObject: SVGElement, inWidth: number, inHeight: number, minZoom: number, curZoom: number, maxZoom: number, layers: TileModelLayer[]) {
-		//console.log('TileLevel');
+		//console.trace('TileLevel',layers);
 		//this = this;
 		this.svg = svgObject;
 		this.setupTapSize();
@@ -180,6 +190,7 @@ class TileLevel {
 		//}
 	}
 	rakeMouseWheel(e: WheelEvent) {
+		//console.log('wheel',this.translateX,this.translateY,this.translateZ);
 		//console.log('rakeMouseWheel',e);
 		this.slidingLockTo = -1;
 		//console.log('rakeMouseWheel',e.wheelDelta,e.detail,e.deltaX,e.deltaY,e.deltaZ,e);
@@ -195,12 +206,20 @@ class TileLevel {
 		if (zoom > this.maxZoom()) {
 			zoom = this.maxZoom();
 		}
+		/*console.log('wheel'
+			, 'x', this.translateX, this.translateX - (this.translateZ - zoom) * e.offsetX
+			, 'y', this.translateY, this.translateY - (this.translateZ - zoom) * e.offsetY
+			, 'z', this.translateZ, this.translateZ - delta * (this.translateZ) * 0.077, this.minZoom(), this.maxZoom()
+			, 'e', e.offsetX, e.offsetY
+			,new Date().getTime());*/
 		this.translateX = this.translateX - (this.translateZ - zoom) * e.offsetX;
 		this.translateY = this.translateY - (this.translateZ - zoom) * e.offsetY;
 		this.translateZ = zoom;
+		//console.log('wheel',this.translateX,this.translateY,this.translateZ,e.offsetX,e.offsetY);
 		this.applyZoomPosition();
 		this.adjustContentPosition();
 		this.allTilesOK = false;
+		//console.log('done wheel', this.translateX, this.translateY, this.translateZ);
 		return false;
 	}
 	rakeMouseDown(mouseEvent: MouseEvent) {
@@ -249,19 +268,19 @@ class TileLevel {
 					//		let ey: number = parseFloat(sy);
 					//		ex = ex + dX * this.translateZ;
 					//		ey = ey + dY * this.translateZ;
-							let ex = this.dragTranslateX + dX * this.translateZ;
-							let ey = this.dragTranslateY + dY * this.translateZ;
-							if(!(this.dragTileItem.dragX))ex=0;
-							if(!(this.dragTileItem.dragY))ey=0;
-							this.draggedX = this.draggedX + dX;
-							this.draggedY = this.draggedY + dY;
-							//this.dragSVGelement.setAttributeNS(null, 'x', '' + ex);
-							//this.dragSVGelement.setAttributeNS(null, 'y', '' + ey);
-							//console.log(dX,dY,ex,ey);
-							if(this.dragSVGparent)this.dragSVGparent.setAttributeNS(null, 'transform', 'translate('+ex+', '+ey+')');
-							this.dragTranslateX=ex;
-							this.dragTranslateY=ey;
-							//transform="translate(100, 100)"
+					let ex = this.dragTranslateX + dX * this.translateZ;
+					let ey = this.dragTranslateY + dY * this.translateZ;
+					if (!(this.dragTileItem.dragX)) ex = 0;
+					if (!(this.dragTileItem.dragY)) ey = 0;
+					this.draggedX = this.draggedX + dX;
+					this.draggedY = this.draggedY + dY;
+					//this.dragSVGelement.setAttributeNS(null, 'x', '' + ex);
+					//this.dragSVGelement.setAttributeNS(null, 'y', '' + ey);
+					//console.log(dX,dY,ex,ey);
+					if (this.dragSVGparent) this.dragSVGparent.setAttributeNS(null, 'transform', 'translate(' + ex + ', ' + ey + ')');
+					this.dragTranslateX = ex;
+					this.dragTranslateY = ey;
+					//transform="translate(100, 100)"
 					//	}
 					//}
 				}
@@ -332,7 +351,7 @@ class TileLevel {
 					}
 				}
 				this.dragTileItem = null;
-			this.dragTileSVGelement = null;
+				this.dragTileSVGelement = null;
 			}
 		}
 		this.dragTileItem = null;
@@ -424,24 +443,24 @@ class TileLevel {
 					//	let ex: number = parseFloat(sx);
 					//	let sy = this.dragSVGelement.getAttribute('y');
 					//	if (sy) {
-							let dX: number = touchEvent.touches[0].clientX - this.startMouseScreenX;
-							let dY: number = touchEvent.touches[0].clientY - this.startMouseScreenY;
-							this.startMouseScreenX = touchEvent.touches[0].clientX;
-							this.startMouseScreenY = touchEvent.touches[0].clientY;
+					let dX: number = touchEvent.touches[0].clientX - this.startMouseScreenX;
+					let dY: number = touchEvent.touches[0].clientY - this.startMouseScreenY;
+					this.startMouseScreenX = touchEvent.touches[0].clientX;
+					this.startMouseScreenY = touchEvent.touches[0].clientY;
 					//		let ey: number = parseFloat(sy);
 					//		ex = ex + dX * this.translateZ;
 					//		ey = ey + dY * this.translateZ;
-							let ex = this.dragTranslateX + dX * this.translateZ;
-							let ey = this.dragTranslateY + dY * this.translateZ;
-							if(!(this.dragTileItem.dragX))ex=0;
-							if(!(this.dragTileItem.dragY))ey=0;
-							this.draggedX = this.draggedX + dX;
-							this.draggedY = this.draggedY + dY;
-							//this.dragSVGelement.setAttributeNS(null, 'x', '' + ex);
-							//this.dragSVGelement.setAttributeNS(null, 'y', '' + ey);
-							if(this.dragSVGparent)this.dragSVGparent.setAttributeNS(null, 'transform', 'translate('+ex+', '+ey+')');
-							this.dragTranslateX=ex;
-							this.dragTranslateY=ey;
+					let ex = this.dragTranslateX + dX * this.translateZ;
+					let ey = this.dragTranslateY + dY * this.translateZ;
+					if (!(this.dragTileItem.dragX)) ex = 0;
+					if (!(this.dragTileItem.dragY)) ey = 0;
+					this.draggedX = this.draggedX + dX;
+					this.draggedY = this.draggedY + dY;
+					//this.dragSVGelement.setAttributeNS(null, 'x', '' + ex);
+					//this.dragSVGelement.setAttributeNS(null, 'y', '' + ey);
+					if (this.dragSVGparent) this.dragSVGparent.setAttributeNS(null, 'transform', 'translate(' + ex + ', ' + ey + ')');
+					this.dragTranslateX = ex;
+					this.dragTranslateY = ey;
 					//	}
 					//}
 				}
@@ -523,6 +542,7 @@ class TileLevel {
 		let rh: number = this.viewHeight * this.translateZ * this.dragZoom;
 		this.svg.setAttribute('viewBox', rx + ' ' + ry + ' ' + rw + ' ' + rh);
 		if (this.model) {
+			//console.log('applyZoomPosition',this.translateX,this.translateY,this.translateZ,this.tapSize);
 			for (let k: number = 0; k < this.model.length; k++) {
 				let layer: TileModelLayer = this.model[k];
 				let tx: number = 0;
@@ -582,15 +602,16 @@ class TileLevel {
 				}
 				layer.g.setAttribute('transform', 'translate(' + (tx + cX + sX) + ',' + (ty + cY + sY) + ') scale(' + tz + ',' + tz + ')');
 			}
+			//console.log('done',this.translateX,this.translateY,this.translateZ);
 		}
 		this.checkAfterZoom();
-		//console.log(this.translateX,this.translateY,this.translateZ);
+
 	}
 	checkAfterZoom() {
 		//if (this.afterZoomCallback) {
 		this.onZoom.start(555, function () {
-			//console.log('afterZoom', this);
-			if(this.afterZoomCallback)this.afterZoomCallback();
+			//console.log('afterZoom', this.afterZoomCallback);
+			if (this.afterZoomCallback) this.afterZoomCallback();
 		}.bind(this));
 		//}
 	}
@@ -616,6 +637,7 @@ class TileLevel {
 			this.translateY = a.y;
 			this.translateZ = a.z;
 			this.applyZoomPosition();
+			//console.log('adjustContentPosition',this.translateX,this.translateY,this.translateZ,this.tapSize);
 		}
 	}
 	calculateValidContentPosition(): TileZoom {
@@ -778,8 +800,10 @@ class TileLevel {
 		}
 	}
 	queueTiles() {
+		//console.log('queueTiles',this.translateX,this.translateY,this.translateZ,this.tapSize);
 		this.clearUselessDetails();
 		this.tileFromModel();
+		//console.log('done queueTiles',this.translateX,this.translateY,this.translateZ,this.tapSize);
 	}
 	clearUselessDetails() {
 		if (this.model) {
@@ -995,25 +1019,25 @@ class TileLevel {
 		//if (d.draw == 'rectangle') {
 		if (isTileRectangle(dd)) {
 			//let r=d as TileRectangle;
-			element = tileRectangle(this.svgns,this.tapSize,g, dd.x * this.tapSize, dd.y * this.tapSize
+			element = tileRectangle(this.svgns, this.tapSize, g, dd.x * this.tapSize, dd.y * this.tapSize
 				, dd.w * this.tapSize, dd.h * this.tapSize
 				, (dd.rx ? dd.rx : 0) * this.tapSize, (dd.ry ? dd.ry : 0) * this.tapSize
 				, (dd.css ? dd.css : ''));
 		}
 		//if (d.draw == 'text') {
 		if (isTileText(dd)) {
-			element = tileText(this.svgns,this.tapSize,g, dd.x * this.tapSize, dd.y * this.tapSize, dd.text, dd.css ? dd.css : '');
+			element = tileText(this.svgns, this.tapSize, g, dd.x * this.tapSize, dd.y * this.tapSize, dd.text, dd.css ? dd.css : '');
 		}
 		//if (d.draw == 'path') {
 		if (isTilePath(dd)) {
-			element = tilePath(this.svgns,this.tapSize,g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, (dd.scale ? dd.scale : 0), dd.points, dd.css ? dd.css : '');
+			element = tilePath(this.svgns, this.tapSize, g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, (dd.scale ? dd.scale : 0), dd.points, dd.css ? dd.css : '');
 		}
 		if (isTilePolygon(dd)) {
-			element = tilePolygon(this.svgns,this.tapSize,g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, dd.scale, dd.dots, dd.css);
+			element = tilePolygon(this.svgns, this.tapSize, g, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, dd.scale, dd.dots, dd.css);
 		}
 		//if (d.draw == 'line') {
 		if (isTileLine(dd)) {
-			element = tileLine(this.svgns,this.tapSize,g, dd.x1 * this.tapSize, dd.y1 * this.tapSize, dd.x2 * this.tapSize, dd.y2 * this.tapSize, dd.css);
+			element = tileLine(this.svgns, this.tapSize, g, dd.x1 * this.tapSize, dd.y1 * this.tapSize, dd.x2 * this.tapSize, dd.y2 * this.tapSize, dd.css);
 		}
 		//if (d.draw == 'group') {
 		if (isTileGroup(dd)) {
@@ -1047,19 +1071,19 @@ class TileLevel {
 				element.onclick = click;
 				element.ontouchend = click;
 				if ((dd.dragX) || (dd.dragY)) {
-					let onStartDrag = function (elmnt: TileSVGElement|null, ev:TouchEvent|MouseEvent) {
+					let onStartDrag = function (elmnt: TileSVGElement | null, ev: TouchEvent | MouseEvent) {
 
 						//console.log('onStartDrag', dd,g);
 						//console.log('element', element);
 						me.dragTileItem = dd;
 						me.dragTileSVGelement = element;
-						me.dragSVGparent=g;
+						me.dragSVGparent = g;
 						me.draggedX = 0;
 						me.draggedY = 0;
-						me.dragTranslateX=0;
-						me.dragTranslateY=0;
+						me.dragTranslateX = 0;
+						me.dragTranslateY = 0;
 						//(elmnt as any).setAttributeNS(null, 'x', '555');
-						me.startedTouch=false;
+						me.startedTouch = false;
 					};
 					let startTouchDrag: ((this: GlobalEventHandlers, ev: TouchEvent) => any) | null
 						= function (this: GlobalEventHandlers, ev: TouchEvent): any {
@@ -1076,11 +1100,11 @@ class TileLevel {
 			}
 		}
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
 	clearAllDetails() {
 		if (this.model) {
 			for (let i: number = 0; i < this.model.length; i++) {
@@ -1197,6 +1221,7 @@ class TileLevel {
 		step();
 	}*/
 	startLoop() {
+		//console.log('TileLevel startLoop');
 		this.lastTickTime = new Date().getTime();
 		this.tick();
 	}
@@ -1204,7 +1229,9 @@ class TileLevel {
 		let now = new Date().getTime();
 		if (this.lastTickTime + 33 < now) {
 			if (!(this.allTilesOK)) {
+				//console.log('queueTiles', this.translateX, this.translateY, this.translateZ, this.tapSize,new Date().getTime());
 				this.queueTiles();
+				//console.log('done queueTiles', this.allTilesOK);
 			}
 			this.lastTickTime = new Date().getTime();
 		}

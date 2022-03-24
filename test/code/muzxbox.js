@@ -100,7 +100,7 @@ var TileLevel = (function () {
         this.clickX = 0;
         this.clickY = 0;
         this.dragZoom = 1;
-        this.allTilesOK = false;
+        this._allTilesOK = false;
         this.clicked = false;
         this.mx = 100;
         this.mn = 1;
@@ -149,6 +149,18 @@ var TileLevel = (function () {
         this.applyZoomPosition();
         this.clearUselessDetails();
     }
+    Object.defineProperty(TileLevel.prototype, "allTilesOK", {
+        get: function () {
+            return this._allTilesOK;
+        },
+        set: function (bb) {
+            if (bb != this._allTilesOK) {
+                this._allTilesOK = bb;
+            }
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(TileLevel.prototype, "translateZ", {
         get: function () {
             return this._translateZ;
@@ -1093,6 +1105,8 @@ var CannyDo = (function () {
             if (startId == this.currentID) {
                 action();
             }
+            else {
+            }
         }.bind(this), ms);
         startId = this.currentID;
     };
@@ -1281,7 +1295,6 @@ var ZRender = (function () {
         this.ratioDuration = 200;
         this.ratioThickness = 3;
         this.sizeRatio = 2;
-        this.bindLayers();
     }
     ZRender.prototype.bindLayers = function () {
         this.measureOtherVoicesLayerGroup = document.getElementById('measureOtherVoicesLayerGroup');
@@ -1454,31 +1467,31 @@ var ZRender = (function () {
         song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-            var singleMasuresContentAnchor1 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
-            var singleMasuresContentAnchor4 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
-            var singleMasuresContentAnchor16 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
-            var singleMasuresContentAnchor64 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain64.showZoom, this.contentMain64.hideZoom);
-            var singleMasuresContentAnchor256 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain256.showZoom, this.contentMain256.hideZoom);
+            var singleMasuresContentAnchor1 = TAnchor(time * this.ratioDuration, 0, 3 * this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
+            var singleMasuresContentAnchor4 = TAnchor(time * this.ratioDuration, 0, 3 * this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
+            var singleMasuresContentAnchor16 = TAnchor(time * this.ratioDuration, 0, 3 * this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
+            var singleMasuresContentAnchor64 = TAnchor(time * this.ratioDuration, 0, 3 * this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain64.showZoom, this.contentMain64.hideZoom);
+            var singleMasuresContentAnchor256 = TAnchor(time * this.ratioDuration, 0, 3 * this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain256.showZoom, this.contentMain256.hideZoom);
             this.contentMain1.content.push(singleMasuresContentAnchor1);
             this.contentMain4.content.push(singleMasuresContentAnchor4);
             this.contentMain16.content.push(singleMasuresContentAnchor16);
             this.contentMain64.content.push(singleMasuresContentAnchor64);
             this.contentMain256.content.push(singleMasuresContentAnchor256);
-            var singleMasuresSecondAnchor1 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond1.showZoom, this.contentSecond1.hideZoom);
-            var singleMasuresSecondAnchor4 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond4.showZoom, this.contentSecond4.hideZoom);
-            var singleMasuresSecondAnchor16 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond16.showZoom, this.contentSecond16.hideZoom);
-            var singleMasuresSecondAnchor64 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond64.showZoom, this.contentSecond64.hideZoom);
-            var singleMasuresSecondAnchor256 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond256.showZoom, this.contentSecond256.hideZoom);
+            var singleMasuresSecondAnchor1 = TAnchor(time * this.ratioDuration, 0, 3 * this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond1.showZoom, this.contentSecond1.hideZoom);
+            var singleMasuresSecondAnchor4 = TAnchor(time * this.ratioDuration, 0, 3 * this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond4.showZoom, this.contentSecond4.hideZoom);
+            var singleMasuresSecondAnchor16 = TAnchor(time * this.ratioDuration, 0, 3 * this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond16.showZoom, this.contentSecond16.hideZoom);
+            var singleMasuresSecondAnchor64 = TAnchor(time * this.ratioDuration, 0, 3 * this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond64.showZoom, this.contentSecond64.hideZoom);
+            var singleMasuresSecondAnchor256 = TAnchor(time * this.ratioDuration, 0, 3 * this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond256.showZoom, this.contentSecond256.hideZoom);
             this.contentSecond1.content.push(singleMasuresSecondAnchor1);
             this.contentSecond4.content.push(singleMasuresSecondAnchor4);
             this.contentSecond16.content.push(singleMasuresSecondAnchor16);
             this.contentSecond64.content.push(singleMasuresSecondAnchor64);
             this.contentSecond256.content.push(singleMasuresSecondAnchor256);
-            var singleMasuresOtherAnchor1 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther1.showZoom, this.contentOther1.hideZoom);
-            var singleMasuresOtherAnchor4 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther4.showZoom, this.contentOther4.hideZoom);
-            var singleMasuresOtherAnchor16 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther16.showZoom, this.contentOther16.hideZoom);
-            var singleMasuresOtherAnchor64 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther64.showZoom, this.contentOther64.hideZoom);
-            var singleMasuresOtherAnchor256 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther256.showZoom, this.contentOther256.hideZoom);
+            var singleMasuresOtherAnchor1 = TAnchor(time * this.ratioDuration, 0, 3 * this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther1.showZoom, this.contentOther1.hideZoom);
+            var singleMasuresOtherAnchor4 = TAnchor(time * this.ratioDuration, 0, 3 * this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther4.showZoom, this.contentOther4.hideZoom);
+            var singleMasuresOtherAnchor16 = TAnchor(time * this.ratioDuration, 0, 3 * this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther16.showZoom, this.contentOther16.hideZoom);
+            var singleMasuresOtherAnchor64 = TAnchor(time * this.ratioDuration, 0, 3 * this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther64.showZoom, this.contentOther64.hideZoom);
+            var singleMasuresOtherAnchor256 = TAnchor(time * this.ratioDuration, 0, 3 * this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther256.showZoom, this.contentOther256.hideZoom);
             this.contentOther1.content.push(singleMasuresOtherAnchor1);
             this.contentOther4.content.push(singleMasuresOtherAnchor4);
             this.contentOther16.content.push(singleMasuresOtherAnchor16);

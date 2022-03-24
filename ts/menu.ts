@@ -208,6 +208,11 @@ class ZMainMenu {
 
 	}
 	open_1_level() {
+		/*console.log(':'
+			, this.muzXBox.zrenderer.tileLevel.translateX
+			, this.muzXBox.zrenderer.tileLevel.translateY
+			, this.muzXBox.zrenderer.tileLevel.translateZ
+			, this.muzXBox.zrenderer.tileLevel.tapSize);*/
 		this.menu1textHead.innerText = this.menuRoot.path;
 		this.level1style.width = '8cm';
 		this.reFillMenulevel(this.menu1content, this.menuRoot

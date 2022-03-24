@@ -31,7 +31,7 @@ declare class TileLevel {
     clickX: number;
     clickY: number;
     dragZoom: number;
-    allTilesOK: boolean;
+    _allTilesOK: boolean;
     clicked: boolean;
     mx: number;
     mn: number;
@@ -61,6 +61,8 @@ declare class TileLevel {
     dragTranslateX: number;
     dragTranslateY: number;
     mouseDownMode: boolean;
+    get allTilesOK(): boolean;
+    set allTilesOK(bb: boolean);
     get translateZ(): number;
     set translateZ(z: number);
     get translateX(): number;
