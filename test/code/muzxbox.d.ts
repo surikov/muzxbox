@@ -12,6 +12,8 @@ declare class ZInputDeviceHandler {
     processArrowRight(): void;
     processArrowUp(): void;
     processArrowDown(): void;
+    changePositionTo(xx: number, yy: number): void;
+    changeZoomTo(zoom: number): void;
 }
 declare class TileLevel {
     svg: SVGElement;

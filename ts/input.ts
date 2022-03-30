@@ -64,35 +64,99 @@ class ZInputDeviceHandler {
 	}
 	processKeyY() {
 		//console.log('KeyY');
-		this.muzXBox.zMainMenu.openNextLevel();
+		//this.muzXBox.zMainMenu.openNextLevel();
 	}
 	processKeyA() {
 		//console.log('KeyA');
-		this.muzXBox.zMainMenu.openNextLevel();
+		//this.muzXBox.zMainMenu.openNextLevel();
 	}
 	processKeyB() {
 		//console.log('KeyB');
-		this.muzXBox.zMainMenu.backPreLevel();
+		//this.muzXBox.zMainMenu.backPreLevel();
 	}
 	processAnyPlus() {
 		//console.log('+');
+		if (this.muzXBox.zMainMenu.currentLevel) {
+			//console.log('skip');
+		} else {
+			let zoom: number = this.muzXBox.zrenderer.tileLevel.translateZ - this.muzXBox.zrenderer.tileLevel.translateZ * 0.25;
+			this.changeZoomTo(zoom);
+		}
 	}
 	processAnyMinus() {
 		//console.log('-');
+		if (this.muzXBox.zMainMenu.currentLevel) {
+			//console.log('skip');
+		} else {
+			let zoom: number = this.muzXBox.zrenderer.tileLevel.translateZ + this.muzXBox.zrenderer.tileLevel.translateZ * 0.25;
+			this.changeZoomTo(zoom);
+		}
 	}
 	processArrowLeft() {
 		//console.log('left');
+		if (this.muzXBox.zMainMenu.currentLevel) {
+			//console.log('skip');
+		} else {
+			let nn: number = this.muzXBox.zrenderer.tileLevel.translateX - this.muzXBox.zrenderer.tileLevel.translateZ * 25;
+			this.changePositionTo(nn, this.muzXBox.zrenderer.tileLevel.translateY);
+		}
 	}
 	processArrowRight() {
 		//console.log('right');
+		if (this.muzXBox.zMainMenu.currentLevel) {
+			//console.log('skip');
+		} else {
+			let nn: number = this.muzXBox.zrenderer.tileLevel.translateX + this.muzXBox.zrenderer.tileLevel.translateZ * 25;
+			this.changePositionTo(nn, this.muzXBox.zrenderer.tileLevel.translateY);
+		}
 	}
 	processArrowUp() {
 		//console.log('up');
+		if (this.muzXBox.zMainMenu.currentLevel) {
+			//console.log('skip');
+		} else {
+			let nn: number = this.muzXBox.zrenderer.tileLevel.translateY - this.muzXBox.zrenderer.tileLevel.translateZ * 25;
+			this.changePositionTo(this.muzXBox.zrenderer.tileLevel.translateX, nn);
+		}
 	}
 	processArrowDown() {
 		//console.log('down');
+		if (this.muzXBox.zMainMenu.currentLevel) {
+			//console.log('skip');
+		} else {
+			let nn: number = this.muzXBox.zrenderer.tileLevel.translateY + this.muzXBox.zrenderer.tileLevel.translateZ * 25;
+			this.changePositionTo(this.muzXBox.zrenderer.tileLevel.translateX, nn);
+		}
 	}
 
-	
+	changePositionTo(xx: number, yy: number) {
+		//console.log(this.muzXBox.zrenderer.tileLevel.translateX, xx, this.muzXBox.zrenderer.tileLevel.translateY, yy);
+		this.muzXBox.zrenderer.tileLevel.translateX = xx;
+		this.muzXBox.zrenderer.tileLevel.translateY = yy;
+		this.muzXBox.zrenderer.tileLevel.applyZoomPosition();
+		this.muzXBox.zrenderer.tileLevel.onMove(xx, yy);
+		//this.slideToContentPosition();
+		let a = this.muzXBox.zrenderer.tileLevel.calculateValidContentPosition();
+		//console.log(a,this.translateX,this.translateY,this.translateZ);
+		if (a.x != this.muzXBox.zrenderer.tileLevel.translateX || a.y != this.muzXBox.zrenderer.tileLevel.translateY || a.z != this.muzXBox.zrenderer.tileLevel.translateZ) {
+			this.muzXBox.zrenderer.tileLevel.translateX = a.x;
+			this.muzXBox.zrenderer.tileLevel.translateY = a.y;
+		}
+		this.muzXBox.zrenderer.tileLevel.allTilesOK = false;
+	}
+	changeZoomTo(zoom: number) {
+		if (zoom < this.muzXBox.zrenderer.tileLevel.minZoom()) {
+			zoom = this.muzXBox.zrenderer.tileLevel.minZoom();
+		}
+		if (zoom > this.muzXBox.zrenderer.tileLevel.maxZoom()) {
+			zoom = this.muzXBox.zrenderer.tileLevel.maxZoom();
+		}
+		//console.log('zoom', this.muzXBox.zrenderer.tileLevel.translateZ, zoom);
+		this.muzXBox.zrenderer.tileLevel.translateZ = zoom;
+		this.muzXBox.zrenderer.tileLevel.applyZoomPosition();
+		this.muzXBox.zrenderer.tileLevel.adjustContentPosition();
+		this.muzXBox.zrenderer.tileLevel.allTilesOK = false;
+	}
+
 }
 

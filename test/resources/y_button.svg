@@ -61,45 +61,6 @@
        xlink:href="#linearGradient880"
        inkscape:collect="always" />
     <filter
-       height="1.24"
-       y="-0.12"
-       width="1.24"
-       x="-0.12"
-       id="filter903"
-       style="color-interpolation-filters:sRGB"
-       inkscape:collect="always">
-      <feGaussianBlur
-         id="feGaussianBlur905"
-         stdDeviation="20"
-         inkscape:collect="always" />
-    </filter>
-    <filter
-       height="1.2226729"
-       y="-0.11133647"
-       width="1.2602512"
-       x="-0.13012559"
-       id="filter1021"
-       style="color-interpolation-filters:sRGB"
-       inkscape:collect="always">
-      <feGaussianBlur
-         id="feGaussianBlur1023"
-         stdDeviation="8.9941516"
-         inkscape:collect="always" />
-    </filter>
-    <filter
-       height="1.242176"
-       y="-0.12108798"
-       width="1.2378628"
-       x="-0.1189314"
-       id="filter1043"
-       style="color-interpolation-filters:sRGB"
-       inkscape:collect="always">
-      <feGaussianBlur
-         id="feGaussianBlur1045"
-         stdDeviation="9.781913"
-         inkscape:collect="always" />
-    </filter>
-    <filter
        height="1.2401612"
        y="-0.12008059"
        width="1.239839"
@@ -112,6 +73,19 @@
          stdDeviation="9.7005327"
          inkscape:collect="always" />
     </filter>
+    <filter
+       height="1.168"
+       y="-0.084"
+       width="1.168"
+       x="-0.084"
+       id="filter35"
+       style="color-interpolation-filters:sRGB"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur37"
+         stdDeviation="14"
+         inkscape:collect="always" />
+    </filter>
   </defs>
   <sodipodi:namedview
      inkscape:guide-bbox="true"
@@ -121,9 +95,9 @@
      inkscape:document-rotation="0"
      inkscape:current-layer="layer1"
      inkscape:document-units="mm"
-     inkscape:cy="-218.88887"
-     inkscape:cx="-694.45813"
-     inkscape:zoom="0.15834095"
+     inkscape:cy="260.61613"
+     inkscape:cx="141.62246"
+     inkscape:zoom="1.2667276"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -138,24 +112,24 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
+     style="display:inline"
      id="layer1"
      inkscape:groupmode="layer"
      inkscape:label="Layer 1">
     <circle
-       sodipodi:insensitive="true"
-       style="display:inline;fill:#d4aa00;stroke-width:1.30974;stroke-linejoin:round;filter:url(#filter903)"
+       transform="matrix(1.0701752,0,0,1.0700661,10.273681,10.272634)"
+       style="display:inline;fill:#d4aa00;stroke-width:1.30974;stroke-linejoin:round;filter:url(#filter35)"
        id="path10-7"
-       cx="250"
-       cy="250"
+       cx="224"
+       cy="224"
        inkscape:label="colorGlow"
        r="200" />
     <circle
-       sodipodi:insensitive="true"
        r="200"
        inkscape:label="colorBack"
        cy="250"
@@ -163,40 +137,42 @@
        id="path10"
        style="display:inline;fill:#d4aa00;stroke-width:1.30974;stroke-linejoin:round" />
     <circle
-       sodipodi:insensitive="true"
        r="200"
        inkscape:label="colorShadow"
-       style="fill:url(#radialGradient864);fill-opacity:1;stroke-width:1.30974;stroke-linejoin:round"
+       style="display:inline;fill:url(#radialGradient864);fill-opacity:1;stroke-width:1.30974;stroke-linejoin:round"
        id="path10-0"
        cx="250"
        cy="250" />
   </g>
   <g
+     style="display:inline"
+     sodipodi:insensitive="true"
      inkscape:label="Layer 2"
      id="layer2"
      inkscape:groupmode="layer">
     <text
        id="text932-4-7-2-5"
        y="343.88043"
-       x="153.82812"
+       x="158.36516"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:266.667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;filter:url(#filter1069)"
        xml:space="preserve"><tspan
          id="tspan1047"
          y="343.88043"
-         x="153.82812"
+         x="158.36516"
          sodipodi:role="line">Y</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:266.667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
-       x="153.82812"
+       x="158.36516"
        y="343.88043"
        id="text932-4-7-2-5-5"><tspan
          sodipodi:role="line"
-         x="153.82812"
+         x="158.36516"
          y="343.88043"
          id="tspan1047-4">Y</tspan></text>
   </g>
   <g
+     style="display:inline"
      sodipodi:insensitive="true"
      inkscape:label="Layer 3"
      id="layer3"

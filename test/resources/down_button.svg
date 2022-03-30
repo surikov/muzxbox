@@ -61,16 +61,16 @@
        xlink:href="#linearGradient880"
        inkscape:collect="always" />
     <filter
-       height="1.24"
-       y="-0.12"
-       width="1.24"
-       x="-0.12"
+       height="1.168"
+       y="-0.084"
+       width="1.168"
+       x="-0.084"
        id="filter903"
        style="color-interpolation-filters:sRGB"
        inkscape:collect="always">
       <feGaussianBlur
          id="feGaussianBlur905"
-         stdDeviation="20"
+         stdDeviation="14"
          inkscape:collect="always" />
     </filter>
     <filter
@@ -96,7 +96,7 @@
      inkscape:current-layer="layer1"
      inkscape:document-units="mm"
      inkscape:cy="-113.9695"
-     inkscape:cx="-250.94612"
+     inkscape:cx="-1068.8015"
      inkscape:zoom="0.3166819"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -117,17 +117,18 @@
     </rdf:RDF>
   </metadata>
   <g
+     style="display:inline"
      id="layer1"
      inkscape:groupmode="layer"
      inkscape:label="Layer 1">
     <circle
-       sodipodi:insensitive="true"
-       style="display:inline;fill:#939dac;stroke-width:1.30974;stroke-linejoin:round;filter:url(#filter903)"
+       style="display:inline;fill:#37abc8;stroke-width:1.30974;stroke-linejoin:round;filter:url(#filter903);fill-opacity:1"
        id="path10-7"
        cx="250"
        cy="250"
        inkscape:label="colorGlow"
-       r="200" />
+       r="200"
+       transform="matrix(1.0699981,0,0,1.0697363,-17.547969,-17.543676)" />
     <circle
        sodipodi:insensitive="true"
        r="200"
@@ -146,6 +147,7 @@
        cy="250" />
   </g>
   <g
+     style="display:inline"
      inkscape:label="Layer 2"
      id="layer2"
      inkscape:groupmode="layer">
@@ -187,6 +189,7 @@
        transform="matrix(0,1,1,0,-3.2264278e-6,500.11794)" />
   </g>
   <g
+     style="display:inline"
      sodipodi:insensitive="true"
      inkscape:label="Layer 3"
      id="layer3"

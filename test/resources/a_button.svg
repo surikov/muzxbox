@@ -8,102 +8,102 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   sodipodi:docname="a_button.svg"
-   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
-   id="svg8"
-   version="1.1"
-   viewBox="0 0 500 500"
+   width="500"
    height="500"
-   width="500">
+   viewBox="0 0 500 500"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   sodipodi:docname="a_button.svg">
   <defs
      id="defs2">
     <linearGradient
-       id="linearGradient880"
-       inkscape:collect="always">
+       inkscape:collect="always"
+       id="linearGradient880">
       <stop
-         id="stop876"
+         style="stop-color:#ffffff;stop-opacity:1;"
          offset="0"
-         style="stop-color:#ffffff;stop-opacity:1;" />
+         id="stop876" />
       <stop
-         id="stop878"
+         style="stop-color:#ffffff;stop-opacity:0;"
          offset="1"
-         style="stop-color:#ffffff;stop-opacity:0;" />
+         id="stop878" />
     </linearGradient>
     <linearGradient
-       id="fillBlack"
-       inkscape:collect="always">
+       inkscape:collect="always"
+       id="fillBlack">
       <stop
-         id="stop27"
+         style="stop-color:#000000;stop-opacity:0;"
          offset="0.7"
-         style="stop-color:#000000;stop-opacity:0;" />
+         id="stop27" />
       <stop
-         id="stop29"
+         style="stop-color:#000000;stop-opacity:1;"
          offset="1"
-         style="stop-color:#000000;stop-opacity:1;" />
+         id="stop29" />
     </linearGradient>
     <radialGradient
-       r="250"
-       fy="250"
-       fx="250"
-       cy="250"
-       cx="250"
-       gradientUnits="userSpaceOnUse"
-       id="radialGradient864"
+       inkscape:collect="always"
        xlink:href="#fillBlack"
-       inkscape:collect="always" />
-    <linearGradient
+       id="radialGradient864"
        gradientUnits="userSpaceOnUse"
-       y2="200"
-       x2="0"
-       y1="60"
-       x1="0"
-       id="linearGradient882"
+       cx="250"
+       cy="250"
+       fx="250"
+       fy="250"
+       r="250" />
+    <linearGradient
+       inkscape:collect="always"
        xlink:href="#linearGradient880"
-       inkscape:collect="always" />
+       id="linearGradient882"
+       x1="0"
+       y1="60"
+       x2="0"
+       y2="200"
+       gradientUnits="userSpaceOnUse" />
     <filter
-       height="1.24"
-       y="-0.12"
-       width="1.24"
-       x="-0.12"
-       id="filter903"
+       inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
-       inkscape:collect="always">
+       id="filter903"
+       x="-0.084"
+       width="1.168"
+       y="-0.084"
+       height="1.168">
       <feGaussianBlur
-         id="feGaussianBlur905"
-         stdDeviation="20"
-         inkscape:collect="always" />
+         inkscape:collect="always"
+         stdDeviation="14"
+         id="feGaussianBlur905" />
     </filter>
     <filter
-       height="1.2442713"
-       y="-0.12213566"
-       width="1.2358755"
-       x="-0.11793774"
-       id="filter999"
+       inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
-       inkscape:collect="always">
+       id="filter999"
+       x="-0.11793774"
+       width="1.2358755"
+       y="-0.12213566"
+       height="1.2442713">
       <feGaussianBlur
-         id="feGaussianBlur1001"
+         inkscape:collect="always"
          stdDeviation="9.8665485"
-         inkscape:collect="always" />
+         id="feGaussianBlur1001" />
     </filter>
   </defs>
   <sodipodi:namedview
-     inkscape:guide-bbox="true"
-     showguides="true"
-     units="px"
-     showgrid="false"
-     inkscape:document-rotation="0"
-     inkscape:current-layer="layer2"
-     inkscape:document-units="mm"
-     inkscape:cy="-218.88887"
-     inkscape:cx="-694.45813"
-     inkscape:zoom="0.15834095"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0.0"
-     borderopacity="1.0"
-     bordercolor="#666666"
+     id="base"
      pagecolor="#ffffff"
-     id="base" />
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.2667276"
+     inkscape:cx="131.41589"
+     inkscape:cy="269.87733"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     units="px"
+     showguides="true"
+     inkscape:guide-bbox="true" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -112,76 +112,77 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
-     id="layer1"
+     inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     inkscape:label="Layer 1">
+     id="layer1">
     <circle
-       sodipodi:insensitive="true"
-       style="display:inline;fill:#008000;stroke-width:1.30974;stroke-linejoin:round;filter:url(#filter903)"
-       id="path10-7"
-       cx="250"
-       cy="250"
+       transform="matrix(1.0690377,0,0,1.0700194,-17.532202,-17.548319)"
+       r="200"
        inkscape:label="colorGlow"
-       r="200" />
-    <circle
-       sodipodi:insensitive="true"
-       r="200"
-       inkscape:label="colorBack"
        cy="250"
        cx="250"
-       id="path10"
-       style="display:inline;fill:#008000;stroke-width:1.30974;stroke-linejoin:round" />
+       id="path10-7"
+       style="display:inline;fill:#008000;stroke-width:1.30974;stroke-linejoin:round;filter:url(#filter903)"
+       sodipodi:insensitive="true" />
     <circle
-       sodipodi:insensitive="true"
-       r="200"
-       inkscape:label="colorShadow"
-       style="fill:url(#radialGradient864);fill-opacity:1;stroke-width:1.30974;stroke-linejoin:round"
-       id="path10-0"
+       style="display:inline;fill:#008000;stroke-width:1.30974;stroke-linejoin:round"
+       id="path10"
        cx="250"
-       cy="250" />
+       cy="250"
+       inkscape:label="colorBack"
+       r="200"
+       sodipodi:insensitive="true" />
+    <circle
+       cy="250"
+       cx="250"
+       id="path10-0"
+       style="fill:url(#radialGradient864);fill-opacity:1;stroke-width:1.30974;stroke-linejoin:round"
+       inkscape:label="colorShadow"
+       r="200"
+       sodipodi:insensitive="true" />
   </g>
   <g
-     inkscape:label="Layer 2"
+     inkscape:groupmode="layer"
      id="layer2"
-     inkscape:groupmode="layer">
+     inkscape:label="Layer 2">
     <text
-       xml:space="preserve"
+       id="text932-4"
+       y="343.88043"
+       x="149.89771"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:266.667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;filter:url(#filter999)"
-       x="146.875"
-       y="343.88043"
-       id="text932-4"><tspan
-         sodipodi:role="line"
-         id="tspan930-5"
-         x="146.875"
-         y="343.88043">A</tspan></text>
-    <text
-       id="text932-4-7"
-       y="343.88043"
-       x="146.875"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:266.667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;"
        xml:space="preserve"><tspan
          y="343.88043"
-         x="146.875"
-         id="tspan930-5-2"
+         x="149.89771"
+         id="tspan930-5"
          sodipodi:role="line">A</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:266.667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       x="149.89771"
+       y="343.88043"
+       id="text932-4-7"><tspan
+         sodipodi:role="line"
+         id="tspan930-5-2"
+         x="149.89771"
+         y="343.88043">A</tspan></text>
   </g>
   <g
-     sodipodi:insensitive="true"
-     inkscape:label="Layer 3"
+     inkscape:groupmode="layer"
      id="layer3"
-     inkscape:groupmode="layer">
+     inkscape:label="Layer 3"
+     sodipodi:insensitive="true">
     <circle
-       sodipodi:insensitive="true"
-       inkscape:label="whiteFlare"
-       r="150"
-       cy="210"
-       cx="250"
+       style="fill:url(#linearGradient882);fill-opacity:1;stroke-width:1.09878;stroke-linejoin:round"
        id="path866"
-       style="fill:url(#linearGradient882);fill-opacity:1;stroke-width:1.09878;stroke-linejoin:round" />
+       cx="250"
+       cy="210"
+       r="150"
+       inkscape:label="whiteFlare"
+       sodipodi:insensitive="true" />
   </g>
 </svg>

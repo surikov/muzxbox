@@ -8,102 +8,102 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   sodipodi:docname="up_button.svg"
-   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
-   id="svg8"
-   version="1.1"
-   viewBox="0 0 500 500"
+   width="500"
    height="500"
-   width="500">
+   viewBox="0 0 500 500"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   sodipodi:docname="up_button.svg">
   <defs
      id="defs2">
     <linearGradient
-       id="linearGradient880"
-       inkscape:collect="always">
+       inkscape:collect="always"
+       id="linearGradient880">
       <stop
-         id="stop876"
+         style="stop-color:#ffffff;stop-opacity:1;"
          offset="0"
-         style="stop-color:#ffffff;stop-opacity:1;" />
+         id="stop876" />
       <stop
-         id="stop878"
+         style="stop-color:#ffffff;stop-opacity:0;"
          offset="1"
-         style="stop-color:#ffffff;stop-opacity:0;" />
+         id="stop878" />
     </linearGradient>
     <linearGradient
-       id="fillBlack"
-       inkscape:collect="always">
+       inkscape:collect="always"
+       id="fillBlack">
       <stop
-         id="stop27"
+         style="stop-color:#000000;stop-opacity:0;"
          offset="0.7"
-         style="stop-color:#000000;stop-opacity:0;" />
+         id="stop27" />
       <stop
-         id="stop29"
+         style="stop-color:#000000;stop-opacity:1;"
          offset="1"
-         style="stop-color:#000000;stop-opacity:1;" />
+         id="stop29" />
     </linearGradient>
     <radialGradient
-       r="250"
-       fy="250"
-       fx="250"
-       cy="250"
-       cx="250"
-       gradientUnits="userSpaceOnUse"
-       id="radialGradient864"
+       inkscape:collect="always"
        xlink:href="#fillBlack"
-       inkscape:collect="always" />
-    <linearGradient
+       id="radialGradient864"
        gradientUnits="userSpaceOnUse"
-       y2="200"
-       x2="0"
-       y1="60"
-       x1="0"
-       id="linearGradient882"
+       cx="250"
+       cy="250"
+       fx="250"
+       fy="250"
+       r="250" />
+    <linearGradient
+       inkscape:collect="always"
        xlink:href="#linearGradient880"
-       inkscape:collect="always" />
-    <filter
-       height="1.24"
-       y="-0.12"
-       width="1.24"
-       x="-0.12"
-       id="filter903"
-       style="color-interpolation-filters:sRGB"
-       inkscape:collect="always">
-      <feGaussianBlur
-         id="feGaussianBlur905"
-         stdDeviation="20"
-         inkscape:collect="always" />
-    </filter>
+       id="linearGradient882"
+       x1="0"
+       y1="60"
+       x2="0"
+       y2="200"
+       gradientUnits="userSpaceOnUse" />
     <filter
        inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
-       id="filter128"
-       x="-0.11196152"
-       width="1.223923"
-       y="-0.12928203"
-       height="1.2585641">
+       id="filter903"
+       x="-0.084"
+       width="1.168"
+       y="-0.084"
+       height="1.168">
       <feGaussianBlur
          inkscape:collect="always"
+         stdDeviation="14"
+         id="feGaussianBlur905" />
+    </filter>
+    <filter
+       height="1.2585641"
+       y="-0.12928203"
+       width="1.223923"
+       x="-0.11196152"
+       id="filter128"
+       style="color-interpolation-filters:sRGB"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur130"
          stdDeviation="10.779856"
-         id="feGaussianBlur130" />
+         inkscape:collect="always" />
     </filter>
   </defs>
   <sodipodi:namedview
-     inkscape:guide-bbox="true"
-     showguides="true"
-     units="px"
-     showgrid="false"
-     inkscape:document-rotation="0"
-     inkscape:current-layer="layer1"
-     inkscape:document-units="mm"
-     inkscape:cy="-113.9695"
-     inkscape:cx="-250.94612"
-     inkscape:zoom="0.3166819"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0.0"
-     borderopacity="1.0"
-     bordercolor="#666666"
+     id="base"
      pagecolor="#ffffff"
-     id="base" />
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.3166819"
+     inkscape:cx="-659.87382"
+     inkscape:cy="-113.9695"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     units="px"
+     showguides="true"
+     inkscape:guide-bbox="true" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -117,38 +117,57 @@
     </rdf:RDF>
   </metadata>
   <g
-     id="layer1"
+     inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     inkscape:label="Layer 1">
+     id="layer1">
     <circle
-       sodipodi:insensitive="true"
-       style="display:inline;fill:#37abc8;stroke-width:1.30974;stroke-linejoin:round;filter:url(#filter903)"
-       id="path10-7"
-       cx="250"
-       cy="250"
+       transform="matrix(1.0700039,0,0,1.0696588,-17.548064,-17.542405)"
+       r="200"
        inkscape:label="colorGlow"
-       r="200" />
-    <circle
-       sodipodi:insensitive="true"
-       r="200"
-       inkscape:label="colorBack"
        cy="250"
        cx="250"
-       id="path10"
-       style="display:inline;fill:#37abc8;stroke-width:1.30974;stroke-linejoin:round" />
+       id="path10-7"
+       style="display:inline;fill:#37abc8;stroke-width:1.30974;stroke-linejoin:round;filter:url(#filter903)"
+       sodipodi:insensitive="true" />
     <circle
-       sodipodi:insensitive="true"
-       r="200"
-       inkscape:label="colorShadow"
-       style="fill:url(#radialGradient864);fill-opacity:1;stroke-width:1.30974;stroke-linejoin:round"
-       id="path10-0"
+       style="display:inline;fill:#37abc8;stroke-width:1.30974;stroke-linejoin:round"
+       id="path10"
        cx="250"
-       cy="250" />
+       cy="250"
+       inkscape:label="colorBack"
+       r="200"
+       sodipodi:insensitive="true" />
+    <circle
+       cy="250"
+       cx="250"
+       id="path10-0"
+       style="fill:url(#radialGradient864);fill-opacity:1;stroke-width:1.30974;stroke-linejoin:round"
+       inkscape:label="colorShadow"
+       r="200"
+       sodipodi:insensitive="true" />
   </g>
   <g
-     inkscape:label="Layer 2"
+     inkscape:groupmode="layer"
      id="layer2"
-     inkscape:groupmode="layer">
+     inkscape:label="Layer 2">
+    <path
+       transform="rotate(-90,-1.5e-6,1.5e-6)"
+       sodipodi:type="star"
+       style="fill:#000000;stroke-width:0.88445;stroke-linejoin:round;filter:url(#filter128)"
+       id="path29-2-8-3"
+       sodipodi:sides="3"
+       sodipodi:cx="-258.41196"
+       sodipodi:cy="250.53815"
+       sodipodi:r1="133.41196"
+       sodipodi:r2="66.705986"
+       sodipodi:arg1="0"
+       sodipodi:arg2="1.0471976"
+       inkscape:flatsided="true"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m -125,250.53815 -200.11794,115.53814 0,-231.07629 z"
+       inkscape:transform-center-x="-9.208752e-06"
+       inkscape:transform-center-y="-33.353004" />
     <path
        inkscape:transform-center-y="-33.353004"
        inkscape:transform-center-x="-9.208752e-06"
@@ -163,41 +182,23 @@
        sodipodi:cy="250.53815"
        sodipodi:cx="-258.41196"
        sodipodi:sides="3"
-       id="path29-2-8-3"
-       style="fill:#000000;stroke-width:0.88445;stroke-linejoin:round;filter:url(#filter128)"
-       sodipodi:type="star"
-       transform="rotate(-90,-1.5e-6,1.5e-6)" />
-    <path
-       transform="rotate(-90,-5e-6,5e-6)"
-       sodipodi:type="star"
-       style="fill:#000000;stroke-width:0.88445;stroke-linejoin:round"
        id="path29-2-8-3-9"
-       sodipodi:sides="3"
-       sodipodi:cx="-258.41196"
-       sodipodi:cy="250.53815"
-       sodipodi:r1="133.41196"
-       sodipodi:r2="66.705986"
-       sodipodi:arg1="0"
-       sodipodi:arg2="1.0471976"
-       inkscape:flatsided="true"
-       inkscape:rounded="0"
-       inkscape:randomized="0"
-       d="m -125,250.53815 -200.11794,115.53814 0,-231.07629 z"
-       inkscape:transform-center-x="-9.208752e-06"
-       inkscape:transform-center-y="-33.353004" />
+       style="fill:#000000;stroke-width:0.88445;stroke-linejoin:round"
+       sodipodi:type="star"
+       transform="rotate(-90,-5e-6,5e-6)" />
   </g>
   <g
-     sodipodi:insensitive="true"
-     inkscape:label="Layer 3"
+     inkscape:groupmode="layer"
      id="layer3"
-     inkscape:groupmode="layer">
+     inkscape:label="Layer 3"
+     sodipodi:insensitive="true">
     <circle
-       sodipodi:insensitive="true"
-       inkscape:label="whiteFlare"
-       r="150"
-       cy="210"
-       cx="250"
+       style="fill:url(#linearGradient882);fill-opacity:1;stroke-width:1.09878;stroke-linejoin:round"
        id="path866"
-       style="fill:url(#linearGradient882);fill-opacity:1;stroke-width:1.09878;stroke-linejoin:round" />
+       cx="250"
+       cy="210"
+       r="150"
+       inkscape:label="whiteFlare"
+       sodipodi:insensitive="true" />
   </g>
 </svg>

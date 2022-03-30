@@ -59,25 +59,82 @@ var ZInputDeviceHandler = (function () {
     ZInputDeviceHandler.prototype.processKeyX = function () {
     };
     ZInputDeviceHandler.prototype.processKeyY = function () {
-        this.muzXBox.zMainMenu.openNextLevel();
     };
     ZInputDeviceHandler.prototype.processKeyA = function () {
-        this.muzXBox.zMainMenu.openNextLevel();
     };
     ZInputDeviceHandler.prototype.processKeyB = function () {
-        this.muzXBox.zMainMenu.backPreLevel();
     };
     ZInputDeviceHandler.prototype.processAnyPlus = function () {
+        if (this.muzXBox.zMainMenu.currentLevel) {
+        }
+        else {
+            var zoom = this.muzXBox.zrenderer.tileLevel.translateZ - this.muzXBox.zrenderer.tileLevel.translateZ * 0.25;
+            this.changeZoomTo(zoom);
+        }
     };
     ZInputDeviceHandler.prototype.processAnyMinus = function () {
+        if (this.muzXBox.zMainMenu.currentLevel) {
+        }
+        else {
+            var zoom = this.muzXBox.zrenderer.tileLevel.translateZ + this.muzXBox.zrenderer.tileLevel.translateZ * 0.25;
+            this.changeZoomTo(zoom);
+        }
     };
     ZInputDeviceHandler.prototype.processArrowLeft = function () {
+        if (this.muzXBox.zMainMenu.currentLevel) {
+        }
+        else {
+            var nn = this.muzXBox.zrenderer.tileLevel.translateX - this.muzXBox.zrenderer.tileLevel.translateZ * 25;
+            this.changePositionTo(nn, this.muzXBox.zrenderer.tileLevel.translateY);
+        }
     };
     ZInputDeviceHandler.prototype.processArrowRight = function () {
+        if (this.muzXBox.zMainMenu.currentLevel) {
+        }
+        else {
+            var nn = this.muzXBox.zrenderer.tileLevel.translateX + this.muzXBox.zrenderer.tileLevel.translateZ * 25;
+            this.changePositionTo(nn, this.muzXBox.zrenderer.tileLevel.translateY);
+        }
     };
     ZInputDeviceHandler.prototype.processArrowUp = function () {
+        if (this.muzXBox.zMainMenu.currentLevel) {
+        }
+        else {
+            var nn = this.muzXBox.zrenderer.tileLevel.translateY - this.muzXBox.zrenderer.tileLevel.translateZ * 25;
+            this.changePositionTo(this.muzXBox.zrenderer.tileLevel.translateX, nn);
+        }
     };
     ZInputDeviceHandler.prototype.processArrowDown = function () {
+        if (this.muzXBox.zMainMenu.currentLevel) {
+        }
+        else {
+            var nn = this.muzXBox.zrenderer.tileLevel.translateY + this.muzXBox.zrenderer.tileLevel.translateZ * 25;
+            this.changePositionTo(this.muzXBox.zrenderer.tileLevel.translateX, nn);
+        }
+    };
+    ZInputDeviceHandler.prototype.changePositionTo = function (xx, yy) {
+        this.muzXBox.zrenderer.tileLevel.translateX = xx;
+        this.muzXBox.zrenderer.tileLevel.translateY = yy;
+        this.muzXBox.zrenderer.tileLevel.applyZoomPosition();
+        this.muzXBox.zrenderer.tileLevel.onMove(xx, yy);
+        var a = this.muzXBox.zrenderer.tileLevel.calculateValidContentPosition();
+        if (a.x != this.muzXBox.zrenderer.tileLevel.translateX || a.y != this.muzXBox.zrenderer.tileLevel.translateY || a.z != this.muzXBox.zrenderer.tileLevel.translateZ) {
+            this.muzXBox.zrenderer.tileLevel.translateX = a.x;
+            this.muzXBox.zrenderer.tileLevel.translateY = a.y;
+        }
+        this.muzXBox.zrenderer.tileLevel.allTilesOK = false;
+    };
+    ZInputDeviceHandler.prototype.changeZoomTo = function (zoom) {
+        if (zoom < this.muzXBox.zrenderer.tileLevel.minZoom()) {
+            zoom = this.muzXBox.zrenderer.tileLevel.minZoom();
+        }
+        if (zoom > this.muzXBox.zrenderer.tileLevel.maxZoom()) {
+            zoom = this.muzXBox.zrenderer.tileLevel.maxZoom();
+        }
+        this.muzXBox.zrenderer.tileLevel.translateZ = zoom;
+        this.muzXBox.zrenderer.tileLevel.applyZoomPosition();
+        this.muzXBox.zrenderer.tileLevel.adjustContentPosition();
+        this.muzXBox.zrenderer.tileLevel.allTilesOK = false;
     };
     return ZInputDeviceHandler;
 }());
