@@ -17,6 +17,7 @@ class ZRender {
 	measureMainVoiceLayerGroup: SVGElement;
 	bottomTimelineLayerGroup: SVGElement;
 	debugLayerGroup: SVGElement;
+	gridLayerGroup: SVGElement;
 
 	debugAnchor0: TileAnchor;
 	debugAnchor1: TileAnchor;
@@ -24,6 +25,13 @@ class ZRender {
 	debugAnchor16: TileAnchor;
 	debugAnchor64: TileAnchor;
 	debugAnchor256: TileAnchor;
+
+	gridAnchor0: TileAnchor;
+	gridAnchor1: TileAnchor;
+	gridAnchor4: TileAnchor;
+	gridAnchor16: TileAnchor;
+	gridAnchor64: TileAnchor;
+	gridAnchor256: TileAnchor;
 
 	measuresTimelineAnchor1: TileAnchor;
 	measuresTimelineAnchor4: TileAnchor;
@@ -58,6 +66,7 @@ class ZRender {
 		this.measureMainVoiceLayerGroup = (document.getElementById('measureMainVoiceLayerGroup') as any) as SVGElement;
 		this.bottomTimelineLayerGroup = (document.getElementById('bottomTimelineLayerGroup') as any) as SVGElement;
 		this.debugLayerGroup = (document.getElementById('debugLayerGroup') as any) as SVGElement;
+		this.gridLayerGroup = (document.getElementById('gridLayerGroup') as any) as SVGElement;
 		this.tileLevel = new TileLevel((document.getElementById('contentSVG') as any) as SVGElement
 			, 1000//50*time
 			, 1000//testProject.tracks.length*11
@@ -70,7 +79,7 @@ class ZRender {
 		this.initMainAnchors();
 		this.initSecondAnchors();
 		this.initOthersAnchors();
-
+		this.initGridAnchors();
 	}
 	initDebugAnchors() {
 		this.debugAnchor0 = TAnchor(0, 0, 1111, 1111, this.zoomMin, this.zoomMax + 1);
@@ -82,6 +91,19 @@ class ZRender {
 		this.layers.push({
 			g: this.debugLayerGroup, anchors: [
 				this.debugAnchor1, this.debugAnchor4, this.debugAnchor16, this.debugAnchor64, this.debugAnchor256, this.debugAnchor0
+			]
+		});
+	}
+	initGridAnchors() {
+		this.gridAnchor0 = TAnchor(0, 0, 1111, 1111, this.zoomMin, this.zoomMax + 1);
+		this.gridAnchor1 = TAnchor(0, 0, 1111, 1111, this.zoomMin, this.zoomNote);
+		this.gridAnchor4 = TAnchor(0, 0, 1111, 1111, this.zoomNote, this.zoomMeasure);
+		this.gridAnchor16 = TAnchor(0, 0, 1111, 1111, this.zoomMeasure, this.zoomSong);
+		this.gridAnchor64 = TAnchor(0, 0, 1111, 1111, this.zoomSong, this.zoomFar);
+		this.gridAnchor256 = TAnchor(0, 0, 1111, 1111, this.zoomFar, this.zoomMax + 1);
+		this.layers.push({
+			g: this.gridLayerGroup, anchors: [
+				this.gridAnchor1, this.gridAnchor4, this.gridAnchor16, this.gridAnchor64, this.gridAnchor256, this.gridAnchor0
 			]
 		});
 	}
@@ -145,6 +167,7 @@ class ZRender {
 			, this.contentMain1, this.contentMain4, this.contentMain16, this.contentMain64, this.contentMain256
 			, this.contentSecond1, this.contentSecond4, this.contentSecond16, this.contentSecond64, this.contentSecond256
 			, this.contentOther1, this.contentOther4, this.contentOther16, this.contentOther64, this.contentOther256
+			, this.gridAnchor1, this.gridAnchor4, this.gridAnchor16, this.gridAnchor64, this.gridAnchor256
 		];
 		for (let i = 0; i < anchors.length; i++) {
 			this.clearSingleAnchor(anchors[i], songDuration);
@@ -240,55 +263,63 @@ class ZRender {
 		song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-			let singleMasuresContentAnchor1: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
-			let singleMasuresContentAnchor4: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
-			let singleMasuresContentAnchor16: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
-			let singleMasuresContentAnchor64: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain64.showZoom, this.contentMain64.hideZoom);
-			let singleMasuresContentAnchor256: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain256.showZoom, this.contentMain256.hideZoom);
-			this.contentMain1.content.push(singleMasuresContentAnchor1);
-			this.contentMain4.content.push(singleMasuresContentAnchor4);
-			this.contentMain16.content.push(singleMasuresContentAnchor16);
-			this.contentMain64.content.push(singleMasuresContentAnchor64);
-			this.contentMain256.content.push(singleMasuresContentAnchor256);
-			let singleMasuresSecondAnchor1: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond1.showZoom, this.contentSecond1.hideZoom);
-			let singleMasuresSecondAnchor4: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond4.showZoom, this.contentSecond4.hideZoom);
-			let singleMasuresSecondAnchor16: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond16.showZoom, this.contentSecond16.hideZoom);
-			let singleMasuresSecondAnchor64: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond64.showZoom, this.contentSecond64.hideZoom);
-			let singleMasuresSecondAnchor256: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond256.showZoom, this.contentSecond256.hideZoom);
-			this.contentSecond1.content.push(singleMasuresSecondAnchor1);
-			this.contentSecond4.content.push(singleMasuresSecondAnchor4);
-			this.contentSecond16.content.push(singleMasuresSecondAnchor16);
-			this.contentSecond64.content.push(singleMasuresSecondAnchor64);
-			this.contentSecond256.content.push(singleMasuresSecondAnchor256);
-			let singleMasuresOtherAnchor1: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther1.showZoom, this.contentOther1.hideZoom);
-			let singleMasuresOtherAnchor4: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther4.showZoom, this.contentOther4.hideZoom);
-			let singleMasuresOtherAnchor16: TileAnchor = TAnchor(time * this.ratioDuration, 0,3* this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther16.showZoom, this.contentOther16.hideZoom);
-			let singleMasuresOtherAnchor64: TileAnchor = TAnchor(time * this.ratioDuration, 0, 3*this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther64.showZoom, this.contentOther64.hideZoom);
-			let singleMasuresOtherAnchor256: TileAnchor = TAnchor(time * this.ratioDuration, 0,3* this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther256.showZoom, this.contentOther256.hideZoom);
-			this.contentOther1.content.push(singleMasuresOtherAnchor1);
-			this.contentOther4.content.push(singleMasuresOtherAnchor4);
-			this.contentOther16.content.push(singleMasuresOtherAnchor16);
-			this.contentOther64.content.push(singleMasuresOtherAnchor64);
-			this.contentOther256.content.push(singleMasuresOtherAnchor256);
 
+			let contentMeasure1: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
+			let contentMeasure4: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
+			let contentMeasure16: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
+			let contentMeasure64: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain64.showZoom, this.contentMain64.hideZoom);
+			let contentMeasure256: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain256.showZoom, this.contentMain256.hideZoom);
+			this.contentMain1.content.push(contentMeasure1);
+			this.contentMain4.content.push(contentMeasure4);
+			this.contentMain16.content.push(contentMeasure16);
+			this.contentMain64.content.push(contentMeasure64);
+			this.contentMain256.content.push(contentMeasure256);
 
-			let measuresquare: TileRectangle = {
-				x: time * this.ratioDuration, y: 0, w: this.ratioDuration * measureDuration, h: 128 * this.ratioThickness
-				, rx: 20
-				, ry: 20
-				, css: 'debug'
-			};
-			let measurenum: TileText = { x: time * this.ratioDuration, y: 64, text: ''+mm, css: 'debug textSize64' };
-			singleMasuresContentAnchor1.content.push(measurenum);
-			singleMasuresContentAnchor4.content.push(measurenum);
-			singleMasuresContentAnchor16.content.push(measurenum);
-			singleMasuresContentAnchor64.content.push(measurenum);
-			singleMasuresContentAnchor256.content.push(measurenum);
-			singleMasuresContentAnchor1.content.push(measuresquare);
-			singleMasuresContentAnchor4.content.push(measuresquare);
-			singleMasuresContentAnchor16.content.push(measuresquare);
-			singleMasuresContentAnchor64.content.push(measuresquare);
-			singleMasuresContentAnchor256.content.push(measuresquare);
+			let secondMeasure1: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond1.showZoom, this.contentSecond1.hideZoom);
+			let secondMeasure4: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond4.showZoom, this.contentSecond4.hideZoom);
+			let secondMeasure16: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond16.showZoom, this.contentSecond16.hideZoom);
+			let secondMeasure64: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond64.showZoom, this.contentSecond64.hideZoom);
+			let secondMeasure256: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentSecond256.showZoom, this.contentSecond256.hideZoom);
+			this.contentSecond1.content.push(secondMeasure1);
+			this.contentSecond4.content.push(secondMeasure4);
+			this.contentSecond16.content.push(secondMeasure16);
+			this.contentSecond64.content.push(secondMeasure64);
+			this.contentSecond256.content.push(secondMeasure256);
+
+			let otherMeasure1: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther1.showZoom, this.contentOther1.hideZoom);
+			let otherMeasure4: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther4.showZoom, this.contentOther4.hideZoom);
+			let otherMeasure16: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther16.showZoom, this.contentOther16.hideZoom);
+			let otherMeasure64: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther64.showZoom, this.contentOther64.hideZoom);
+			let otherMeasure256: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentOther256.showZoom, this.contentOther256.hideZoom);
+			this.contentOther1.content.push(otherMeasure1);
+			this.contentOther4.content.push(otherMeasure4);
+			this.contentOther16.content.push(otherMeasure16);
+			this.contentOther64.content.push(otherMeasure64);
+			this.contentOther256.content.push(otherMeasure256);
+
+			let gridMeasure1: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
+			let gridMeasure4: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
+			let gridMeasure16: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
+			let gridMeasure64: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain64.showZoom, this.contentMain64.hideZoom);
+			let gridMeasure256: TileAnchor = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.contentMain256.showZoom, this.contentMain256.hideZoom);
+			this.gridAnchor1.content.push(gridMeasure1);
+			this.gridAnchor4.content.push(gridMeasure4);
+			this.gridAnchor16.content.push(gridMeasure16);
+			this.gridAnchor64.content.push(gridMeasure64);
+			this.gridAnchor256.content.push(gridMeasure256);
+
+			let measuresquare: TileRectangle = { x: time * this.ratioDuration, y: 0, w: this.ratioDuration * measureDuration, h: 128 * this.ratioThickness, rx: 20, ry: 20, css: 'debug' };
+			gridMeasure1.content.push(measuresquare);
+			gridMeasure4.content.push(measuresquare);
+			gridMeasure16.content.push(measuresquare);
+			gridMeasure64.content.push(measuresquare);
+			gridMeasure256.content.push(measuresquare);
+			let measurenum: TileText = { x: time * this.ratioDuration, y: 64, text: '' + mm, css: 'debug textSize64' };
+			gridMeasure1.content.push(measurenum);
+			gridMeasure4.content.push(measurenum);
+			gridMeasure16.content.push(measurenum);
+			gridMeasure64.content.push(measurenum);
+			gridMeasure256.content.push(measurenum);
 
 			for (let tt = 0; tt < song.tracks.length; tt++) {
 				let track = song.tracks[tt];
@@ -301,22 +332,46 @@ class ZRender {
 						if (song.obverseTrackFilter == tt && track.obverseVoiceFilter == vv && voice.obversePerformerFilter == 0) {
 							voice.performer.obverseParameter = (voice.performer.obverseParameter) ? voice.performer.obverseParameter : 0;
 							if (voice.performer.obverseParameter == pp) {
-								this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+								this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [
+									contentMeasure1
+									, contentMeasure4
+									, contentMeasure16
+									, contentMeasure64
+									, contentMeasure256]);
 							} else {
-								this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+								this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [
+									secondMeasure1
+									, secondMeasure4
+									, secondMeasure16
+									, secondMeasure64]);
 							}
 						} else {
-							this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
+							this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [
+								secondMeasure1
+								, secondMeasure4
+								, secondMeasure16]);
 						}
 					}
 					if (tt == song.obverseTrackFilter) {
 						if (vv == track.obverseVoiceFilter) {
-							this.addVoiceMeasure(song, voice, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+							this.addVoiceMeasure(song, voice, mm, time, 'mainLine', [
+								contentMeasure1
+								, contentMeasure4
+								, contentMeasure16
+								, contentMeasure64
+								, contentMeasure256]);
 						} else {
-							this.addVoiceMeasure(song, voice, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+							this.addVoiceMeasure(song, voice, mm, time, 'secondLine', [
+								secondMeasure1
+								, secondMeasure4
+								, secondMeasure16
+								, secondMeasure64]);
 						}
 					} else {
-						this.addVoiceMeasure(song, voice, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
+						this.addVoiceMeasure(song, voice, mm, time, 'otherLine', [
+							secondMeasure1
+							, secondMeasure4
+							, secondMeasure16]);
 					}
 					for (let ff = 0; ff < voice.filters.length; ff++) {
 						let filter = voice.filters[ff];
@@ -325,12 +380,24 @@ class ZRender {
 							if (song.obverseTrackFilter == tt && track.obverseVoiceFilter == vv && voice.obversePerformerFilter == ff + 1) {
 								filter.obverseParameter = (filter.obverseParameter) ? filter.obverseParameter : 0;
 								if (filter.obverseParameter == pp) {
-									this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+									this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [
+										contentMeasure1
+										, contentMeasure4
+										, contentMeasure16
+										, contentMeasure64
+										, contentMeasure256]);
 								} else {
-									this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+									this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [
+										secondMeasure1
+										, secondMeasure4
+										, secondMeasure16
+										, secondMeasure64]);
 								}
 							} else {
-								this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
+								this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [
+									secondMeasure1
+									, secondMeasure4
+									, secondMeasure16]);
 							}
 						}
 					}
@@ -342,12 +409,24 @@ class ZRender {
 						if (song.obverseTrackFilter == tt && track.obverseVoiceFilter == track.voices.length + ff) {
 							filter.obverseParameter = (filter.obverseParameter) ? filter.obverseParameter : 0;
 							if (filter.obverseParameter == pp) {
-								this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+								this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [
+									contentMeasure1
+									, contentMeasure4
+									, contentMeasure16
+									, contentMeasure64
+									, contentMeasure256]);
 							} else {
-								this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+								this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [
+									secondMeasure1
+									, secondMeasure4
+									, secondMeasure16
+									, secondMeasure64]);
 							}
 						} else {
-							this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
+							this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [
+								secondMeasure1
+								, secondMeasure4
+								, secondMeasure16]);
 						}
 					}
 				}
@@ -359,12 +438,24 @@ class ZRender {
 					if (song.obverseTrackFilter == song.tracks.length + ff) {
 						filter.obverseParameter = (filter.obverseParameter) ? filter.obverseParameter : 0;
 						if (filter.obverseParameter == pp) {
-							this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [singleMasuresContentAnchor1, singleMasuresContentAnchor4, singleMasuresContentAnchor16, singleMasuresContentAnchor64, singleMasuresContentAnchor256]);
+							this.addParameterMeasure(song, paremeter, mm, time, 'mainLine', [
+								contentMeasure1
+								, contentMeasure4
+								, contentMeasure16
+								, contentMeasure64
+								, contentMeasure256]);
 						} else {
-							this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16, singleMasuresSecondAnchor64]);
+							this.addParameterMeasure(song, paremeter, mm, time, 'secondLine', [
+								secondMeasure1
+								, secondMeasure4
+								, secondMeasure16
+								, secondMeasure64]);
 						}
 					} else {
-						this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [singleMasuresSecondAnchor1, singleMasuresSecondAnchor4, singleMasuresSecondAnchor16]);
+						this.addParameterMeasure(song, paremeter, mm, time, 'otherLine', [
+							secondMeasure1
+							, secondMeasure4
+							, secondMeasure16]);
 					}
 				}
 			}
@@ -423,44 +514,5 @@ class ZRender {
 				}
 			}
 		}
-	}
-	addDebugButtons(song: ZvoogSchedule, menuButton: TileRectangle) {
-		this.debugAnchor0.content.push(menuButton);
-		this.debugAnchor0.content.push({
-			x: 10, y: 10, css: 'textSize16', text: 'import'
-		});
-		let me = this;
-		if (song.tracks.length > 0) {
-			this.debugAnchor0.content.push({
-				x: 10, y: 30, css: 'textSize16', text: '(' + song.tracks.length + ')' + song.tracks[0].title
-			});
-		}
-		this.debugAnchor0.content.push({
-			x: 0, y: 20, w: 10, h: 10, rx: 3, ry: 3, css: 'debug'
-			, action: function () {
-				let tt = song.tracks.shift();
-				if (tt) {
-					song.tracks.push(tt);
-					//me.drawSchedule(song, menuButton)
-				}
-			}
-		});
-		if (song.tracks.length > 0) {
-			this.debugAnchor0.content.push({
-				x: 10, y: 50, css: 'textSize16', text: '(' + song.tracks[0].voices.length + ')' + song.tracks[0].voices[0].title
-			});
-		}
-		this.debugAnchor0.content.push({
-			x: 0, y: 40, w: 10, h: 10, rx: 3, ry: 3, css: 'debug'
-			, action: function () {
-				if (song.tracks.length > 0) {
-					let vv = song.tracks[0].voices.shift();
-					if (vv) {
-						song.tracks[0].voices.push(vv);
-						//me.drawSchedule(song, menuButton)
-					}
-				}
-			}
-		});
 	}
 }

@@ -267,12 +267,19 @@ declare class ZRender {
     measureMainVoiceLayerGroup: SVGElement;
     bottomTimelineLayerGroup: SVGElement;
     debugLayerGroup: SVGElement;
+    gridLayerGroup: SVGElement;
     debugAnchor0: TileAnchor;
     debugAnchor1: TileAnchor;
     debugAnchor4: TileAnchor;
     debugAnchor16: TileAnchor;
     debugAnchor64: TileAnchor;
     debugAnchor256: TileAnchor;
+    gridAnchor0: TileAnchor;
+    gridAnchor1: TileAnchor;
+    gridAnchor4: TileAnchor;
+    gridAnchor16: TileAnchor;
+    gridAnchor64: TileAnchor;
+    gridAnchor256: TileAnchor;
     measuresTimelineAnchor1: TileAnchor;
     measuresTimelineAnchor4: TileAnchor;
     measuresTimelineAnchor16: TileAnchor;
@@ -297,6 +304,7 @@ declare class ZRender {
     bindLayers(): void;
     initUI(): void;
     initDebugAnchors(): void;
+    initGridAnchors(): void;
     initTimelineAnchors(): void;
     initMainAnchors(): void;
     initSecondAnchors(): void;
@@ -311,7 +319,6 @@ declare class ZRender {
     drawSchedule(song: ZvoogSchedule): void;
     addParameterMeasure(song: ZvoogSchedule, parameter: ZvoogParameterData, measureNum: number, time: number, css: string, anchors: TileAnchor[]): void;
     addVoiceMeasure(song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): void;
-    addDebugButtons(song: ZvoogSchedule, menuButton: TileRectangle): void;
 }
 declare type ZUIModeValue = {
     mode: string;
