@@ -1580,23 +1580,18 @@ var ZRender = (function () {
             this.gridAnchor16.content.push(gridMeasure16);
             this.gridAnchor64.content.push(gridMeasure64);
             this.gridAnchor256.content.push(gridMeasure256);
-            var measuresquare = {
-                x: time * this.ratioDuration, y: 0, w: this.ratioDuration * measureDuration, h: 128 * this.ratioThickness,
-                rx: 20,
-                ry: 20,
-                css: 'debug'
-            };
+            var measuresquare = { x: time * this.ratioDuration, y: 0, w: this.ratioDuration * measureDuration, h: 128 * this.ratioThickness, rx: 20, ry: 20, css: 'debug' };
+            gridMeasure1.content.push(measuresquare);
+            gridMeasure4.content.push(measuresquare);
+            gridMeasure16.content.push(measuresquare);
+            gridMeasure64.content.push(measuresquare);
+            gridMeasure256.content.push(measuresquare);
             var measurenum = { x: time * this.ratioDuration, y: 64, text: '' + mm, css: 'debug textSize64' };
             gridMeasure1.content.push(measurenum);
             gridMeasure4.content.push(measurenum);
             gridMeasure16.content.push(measurenum);
             gridMeasure64.content.push(measurenum);
             gridMeasure256.content.push(measurenum);
-            gridMeasure1.content.push(measuresquare);
-            gridMeasure4.content.push(measuresquare);
-            gridMeasure16.content.push(measuresquare);
-            gridMeasure64.content.push(measuresquare);
-            gridMeasure256.content.push(measuresquare);
             for (var tt = 0; tt < song.tracks.length; tt++) {
                 var track = song.tracks[tt];
                 track.obverseVoiceFilter = (track.obverseVoiceFilter) ? track.obverseVoiceFilter : 0;
