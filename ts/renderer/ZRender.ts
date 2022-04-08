@@ -308,18 +308,18 @@ class ZRender {
 			this.gridAnchor64.content.push(gridMeasure64);
 			this.gridAnchor256.content.push(gridMeasure256);
 
-			let measuresquare: TileRectangle = { x: time * this.ratioDuration, y: 0, w: this.ratioDuration * measureDuration, h: 128 * this.ratioThickness, rx: 20, ry: 20, css: 'debug' };
-			gridMeasure1.content.push(measuresquare);
-			gridMeasure4.content.push(measuresquare);
-			gridMeasure16.content.push(measuresquare);
-			gridMeasure64.content.push(measuresquare);
-			gridMeasure256.content.push(measuresquare);
-			let measurenum: TileText = { x: time * this.ratioDuration, y: 64, text: '' + mm, css: 'debug textSize64' };
-			gridMeasure1.content.push(measurenum);
-			gridMeasure4.content.push(measurenum);
-			gridMeasure16.content.push(measurenum);
-			gridMeasure64.content.push(measurenum);
-			gridMeasure256.content.push(measurenum);
+			let measureDebugSquare: TileRectangle = { x: time * this.ratioDuration, y: 0, w: this.ratioDuration * measureDuration, h: 128 * this.ratioThickness, rx: 20, ry: 20, css: 'debug' };
+			gridMeasure1.content.push(measureDebugSquare);
+			gridMeasure4.content.push(measureDebugSquare);
+			gridMeasure16.content.push(measureDebugSquare);
+			gridMeasure64.content.push(measureDebugSquare);
+			gridMeasure256.content.push(measureDebugSquare);
+			let measureDebugNum: TileText = { x: time * this.ratioDuration, y: 64, text: '' + mm, css: 'debug textSize64' };
+			gridMeasure1.content.push(measureDebugNum);
+			gridMeasure4.content.push(measureDebugNum);
+			gridMeasure16.content.push(measureDebugNum);
+			gridMeasure64.content.push(measureDebugNum);
+			gridMeasure256.content.push(measureDebugNum);
 
 			for (let tt = 0; tt < song.tracks.length; tt++) {
 				let track = song.tracks[tt];
@@ -354,12 +354,13 @@ class ZRender {
 					}
 					if (tt == song.obverseTrackFilter) {
 						if (vv == track.obverseVoiceFilter) {
-							this.addVoiceMeasure(song, voice, mm, time, 'mainLine', [
+							let maxMeasureLen = this.addVoiceMeasure(song, voice, mm, time, 'mainLine', [
 								contentMeasure1
 								, contentMeasure4
 								, contentMeasure16
 								, contentMeasure64
 								, contentMeasure256]);
+							measureDebugSquare.w = maxMeasureLen;
 						} else {
 							this.addVoiceMeasure(song, voice, mm, time, 'secondLine', [
 								secondMeasure1
@@ -477,8 +478,9 @@ class ZRender {
 			anchors[aa].content.push(cloneLine(line));
 		}
 	}
-	addVoiceMeasure(song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]) {
+	addVoiceMeasure(song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number {
 		let measure = voice.measureChords[measureNum];
+		var measureMaxLen = anchors[0].ww;
 		for (let cc = 0; cc < measure.chords.length; cc++) {
 			let chord = measure.chords[cc];
 			for (let ee = 0; ee < chord.envelopes.length; ee++) {
@@ -506,13 +508,22 @@ class ZRender {
 						, y2: (128 - slide) * this.ratioThickness
 						, css: css
 					};
+
 					//line.css = css;
 					for (let aa = 0; aa < anchors.length; aa++) {
+						if (line.x2 - anchors[aa].xx > anchors[aa].ww) {
+							//console.log((line.x2- anchors[aa].xx), anchors[aa].ww);
+							anchors[aa].ww = line.x2 - anchors[aa].xx;
+						}
 						anchors[aa].content.push(cloneLine(line));
+						if (measureMaxLen < anchors[aa].ww) {
+							measureMaxLen = anchors[aa].ww;
+						}
 					}
 					pitchWhen = pitchWhen + pitchDuration;
 				}
 			}
 		}
+		return measureMaxLen;
 	}
 }

@@ -318,7 +318,7 @@ declare class ZRender {
     fillTimeLine256(song: ZvoogSchedule): void;
     drawSchedule(song: ZvoogSchedule): void;
     addParameterMeasure(song: ZvoogSchedule, parameter: ZvoogParameterData, measureNum: number, time: number, css: string, anchors: TileAnchor[]): void;
-    addVoiceMeasure(song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): void;
+    addVoiceMeasure(song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number;
 }
 declare type ZUIModeValue = {
     mode: string;

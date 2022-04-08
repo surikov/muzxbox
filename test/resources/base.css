@@ -7,7 +7,7 @@ html {
 	margin: 0px;
 	padding: 0px;
 	background-color: var(--background_color);
-	font-family: serif, cursive;
+	font-family: 'Zen Kurenaido', serif, cursive;
 	font-style: italic;
 	font-weight: bold;
 }
