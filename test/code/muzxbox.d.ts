@@ -262,10 +262,10 @@ declare class ZRender {
     ratioDuration: number;
     ratioThickness: number;
     sizeRatio: number;
+    measureInfoRenderer: MeasureInfoRenderer;
     measureOtherVoicesLayerGroup: SVGElement;
     measureSecondVoicesLayerGroup: SVGElement;
     measureMainVoiceLayerGroup: SVGElement;
-    bottomTimelineLayerGroup: SVGElement;
     debugLayerGroup: SVGElement;
     gridLayerGroup: SVGElement;
     debugAnchor0: TileAnchor;
@@ -280,11 +280,6 @@ declare class ZRender {
     gridAnchor16: TileAnchor;
     gridAnchor64: TileAnchor;
     gridAnchor256: TileAnchor;
-    measuresTimelineAnchor1: TileAnchor;
-    measuresTimelineAnchor4: TileAnchor;
-    measuresTimelineAnchor16: TileAnchor;
-    measuresTimelineAnchor64: TileAnchor;
-    measuresTimelineAnchor256: TileAnchor;
     contentMain1: TileAnchor;
     contentMain4: TileAnchor;
     contentMain16: TileAnchor;
@@ -305,17 +300,11 @@ declare class ZRender {
     initUI(): void;
     initDebugAnchors(): void;
     initGridAnchors(): void;
-    initTimelineAnchors(): void;
     initMainAnchors(): void;
     initSecondAnchors(): void;
     initOthersAnchors(): void;
     clearSingleAnchor(anchor: TileAnchor, songDuration: number): void;
     clearAnchorsContent(songDuration: number): void;
-    fillTimeLine1(song: ZvoogSchedule): void;
-    fillTimeLine4(song: ZvoogSchedule): void;
-    fillTimeLine16(song: ZvoogSchedule): void;
-    fillTimeLine64(song: ZvoogSchedule): void;
-    fillTimeLine256(song: ZvoogSchedule): void;
     drawSchedule(song: ZvoogSchedule): void;
     addParameterMeasure(song: ZvoogSchedule, parameter: ZvoogParameterData, measureNum: number, time: number, css: string, anchors: TileAnchor[]): void;
     addVoiceMeasure(song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number;
@@ -1078,4 +1067,21 @@ declare class MuzXBox {
     testFSmidi(): void;
     testFSmxml(): void;
     testFS(): void;
+}
+declare class MeasureInfoRenderer {
+    measuresMeasureInfoAnchor1: TileAnchor;
+    measuresMeasureInfoAnchor4: TileAnchor;
+    measuresMeasureInfoAnchor16: TileAnchor;
+    measuresMeasureInfoAnchor64: TileAnchor;
+    measuresMeasureInfoAnchor256: TileAnchor;
+    bottomTimelineLayerGroup: SVGElement;
+    attach(zRender: ZRender): void;
+    fillMeasureInfo(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
+    initMeasureInfoAnchors(zRender: ZRender): void;
+    clearAnchorsContent(zRender: ZRender, songDuration: number): void;
+    fillMeasureInfo1(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
+    fillMeasureInfo4(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
+    fillMeasureInfo16(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
+    fillMeasureInfo64(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
+    fillMeasureInfo256(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
 }

@@ -1352,23 +1352,23 @@ var ZRender = (function () {
         this.ratioDuration = 200;
         this.ratioThickness = 3;
         this.sizeRatio = 2;
+        this.measureInfoRenderer = new MeasureInfoRenderer();
     }
     ZRender.prototype.bindLayers = function () {
         this.measureOtherVoicesLayerGroup = document.getElementById('measureOtherVoicesLayerGroup');
         this.measureSecondVoicesLayerGroup = document.getElementById('measureSecondVoicesLayerGroup');
         this.measureMainVoiceLayerGroup = document.getElementById('measureMainVoiceLayerGroup');
-        this.bottomTimelineLayerGroup = document.getElementById('bottomTimelineLayerGroup');
         this.debugLayerGroup = document.getElementById('debugLayerGroup');
         this.gridLayerGroup = document.getElementById('gridLayerGroup');
         this.tileLevel = new TileLevel(document.getElementById('contentSVG'), 1000, 1000, this.zoomMin, this.zoomMin, this.zoomMax, this.layers);
     };
     ZRender.prototype.initUI = function () {
         this.initDebugAnchors();
-        this.initTimelineAnchors();
         this.initMainAnchors();
         this.initSecondAnchors();
         this.initOthersAnchors();
         this.initGridAnchors();
+        this.measureInfoRenderer.attach(this);
     };
     ZRender.prototype.initDebugAnchors = function () {
         this.debugAnchor0 = TAnchor(0, 0, 1111, 1111, this.zoomMin, this.zoomMax + 1);
@@ -1393,18 +1393,6 @@ var ZRender = (function () {
         this.layers.push({
             g: this.gridLayerGroup, anchors: [
                 this.gridAnchor1, this.gridAnchor4, this.gridAnchor16, this.gridAnchor64, this.gridAnchor256, this.gridAnchor0
-            ]
-        });
-    };
-    ZRender.prototype.initTimelineAnchors = function () {
-        this.measuresTimelineAnchor1 = TAnchor(0, 0, 1111, 1111, this.zoomMin, this.zoomNote);
-        this.measuresTimelineAnchor4 = TAnchor(0, 0, 1111, 1111, this.zoomNote, this.zoomMeasure);
-        this.measuresTimelineAnchor16 = TAnchor(0, 0, 1111, 1111, this.zoomMeasure, this.zoomSong);
-        this.measuresTimelineAnchor64 = TAnchor(0, 0, 1111, 1111, this.zoomSong, this.zoomFar);
-        this.measuresTimelineAnchor256 = TAnchor(0, 0, 1111, 1111, this.zoomFar, this.zoomBig + 1);
-        this.layers.push({
-            g: this.bottomTimelineLayerGroup, stickBottom: 0, anchors: [
-                this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256
             ]
         });
     };
@@ -1452,7 +1440,6 @@ var ZRender = (function () {
     ZRender.prototype.clearAnchorsContent = function (songDuration) {
         var anchors = [
             this.debugAnchor0, this.debugAnchor1, this.debugAnchor4, this.debugAnchor16, this.debugAnchor64, this.debugAnchor256,
-            this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256,
             this.contentMain1, this.contentMain4, this.contentMain16, this.contentMain64, this.contentMain256,
             this.contentSecond1, this.contentSecond4, this.contentSecond16, this.contentSecond64, this.contentSecond256,
             this.contentOther1, this.contentOther4, this.contentOther16, this.contentOther64, this.contentOther256,
@@ -1461,81 +1448,14 @@ var ZRender = (function () {
         for (var i = 0; i < anchors.length; i++) {
             this.clearSingleAnchor(anchors[i], songDuration);
         }
+        this.measureInfoRenderer.clearAnchorsContent(this, songDuration);
         this.tileLevel.innerWidth = this.ratioDuration * songDuration * this.tileLevel.tapSize;
         this.tileLevel.innerHeight = 128 * this.ratioThickness * this.tileLevel.tapSize;
-    };
-    ZRender.prototype.fillTimeLine1 = function (song) {
-        var time = 0;
-        for (var i = 0; i < song.measures.length; i++) {
-            var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-            var tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
-            var singlemeasuresTimelineAnchor1 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.measuresTimelineAnchor1.showZoom, this.measuresTimelineAnchor1.hideZoom);
-            singlemeasuresTimelineAnchor1.content.push(TText(time * this.ratioDuration, 0, 'barNumber textSize1', '1-' + (i + 1)));
-            singlemeasuresTimelineAnchor1.content.push(TText(time * this.ratioDuration, -1, 'barNumber textSize1', tempoMeterLabel));
-            this.measuresTimelineAnchor1.content.push(singlemeasuresTimelineAnchor1);
-            time = time + measureDuration;
-        }
-    };
-    ZRender.prototype.fillTimeLine4 = function (song) {
-        var time = 0;
-        for (var i = 0; i < song.measures.length; i++) {
-            var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-            var tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
-            var singlemeasuresTimelineAnchor4 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.measuresTimelineAnchor4.showZoom, this.measuresTimelineAnchor4.hideZoom);
-            singlemeasuresTimelineAnchor4.content.push(TText(time * this.ratioDuration, 0, 'barNumber textSize4', ('4-' + (i + 1))));
-            singlemeasuresTimelineAnchor4.content.push(TText(time * this.ratioDuration, -4, 'barNumber textSize4', tempoMeterLabel));
-            this.measuresTimelineAnchor4.content.push(singlemeasuresTimelineAnchor4);
-            time = time + measureDuration;
-        }
-    };
-    ZRender.prototype.fillTimeLine16 = function (song) {
-        var time = 0;
-        for (var i = 0; i < song.measures.length; i++) {
-            var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-            var tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
-            var singlemeasuresTimelineAnchor16 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.measuresTimelineAnchor16.showZoom, this.measuresTimelineAnchor16.hideZoom);
-            singlemeasuresTimelineAnchor16.content.push(TText(time * this.ratioDuration, 0, 'barNumber textSize16', ('16-' + (i + 1))));
-            singlemeasuresTimelineAnchor16.content.push({ x: time * this.ratioDuration, y: -16, css: 'barNumber textSize16', text: tempoMeterLabel });
-            this.measuresTimelineAnchor16.content.push(singlemeasuresTimelineAnchor16);
-            time = time + measureDuration;
-        }
-    };
-    ZRender.prototype.fillTimeLine64 = function (song) {
-        var time = 0;
-        for (var i = 0; i < song.measures.length; i++) {
-            var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-            var tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
-            var singlemeasuresTimelineAnchor64 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.measuresTimelineAnchor64.showZoom, this.measuresTimelineAnchor64.hideZoom);
-            if (i % 4 == 0)
-                singlemeasuresTimelineAnchor64.content.push(TText(time * this.ratioDuration, 0, 'barNumber textSize64', ('64-' + (i + 1))));
-            if (i % 4 == 0)
-                singlemeasuresTimelineAnchor64.content.push({ x: time * this.ratioDuration, y: -64, css: 'barNumber textSize64', text: tempoMeterLabel });
-            this.measuresTimelineAnchor64.content.push(singlemeasuresTimelineAnchor64);
-            time = time + measureDuration;
-        }
-    };
-    ZRender.prototype.fillTimeLine256 = function (song) {
-        var time = 0;
-        for (var i = 0; i < song.measures.length; i++) {
-            var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-            var tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
-            var singlemeasuresTimelineAnchor256 = TAnchor(time * this.ratioDuration, 0, this.ratioDuration * measureDuration, 128 * this.ratioThickness, this.measuresTimelineAnchor256.showZoom, this.measuresTimelineAnchor256.hideZoom);
-            if (i % 16 == 0)
-                singlemeasuresTimelineAnchor256.content.push({ x: time * this.ratioDuration, y: 0, css: 'barNumber textSize256', text: ('256-' + (i + 1)) });
-            if (i % 16 == 0)
-                singlemeasuresTimelineAnchor256.content.push({ x: time * this.ratioDuration, y: -256, css: 'barNumber textSize256', text: tempoMeterLabel });
-            this.measuresTimelineAnchor256.content.push(singlemeasuresTimelineAnchor256);
-            time = time + measureDuration;
-        }
     };
     ZRender.prototype.drawSchedule = function (song) {
         var songDuration = scheduleDuration(song);
         this.clearAnchorsContent(songDuration);
-        this.fillTimeLine1(song);
-        this.fillTimeLine4(song);
-        this.fillTimeLine16(song);
-        this.fillTimeLine64(song);
-        this.fillTimeLine256(song);
+        this.measureInfoRenderer.fillMeasureInfo(song, this.ratioDuration, this.ratioThickness);
         var time = 0;
         song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
@@ -1580,18 +1500,12 @@ var ZRender = (function () {
             this.gridAnchor16.content.push(gridMeasure16);
             this.gridAnchor64.content.push(gridMeasure64);
             this.gridAnchor256.content.push(gridMeasure256);
-            var measureDebugSquare = { x: time * this.ratioDuration, y: 0, w: this.ratioDuration * measureDuration, h: 128 * this.ratioThickness, rx: 20, ry: 20, css: 'debug' };
+            var measureDebugSquare = { x: time * this.ratioDuration, y: 0, w: this.ratioDuration * measureDuration, h: 128 * this.ratioThickness, rx: 8, ry: 8, css: 'measureBackground' };
             gridMeasure1.content.push(measureDebugSquare);
             gridMeasure4.content.push(measureDebugSquare);
             gridMeasure16.content.push(measureDebugSquare);
             gridMeasure64.content.push(measureDebugSquare);
             gridMeasure256.content.push(measureDebugSquare);
-            var measureDebugNum = { x: time * this.ratioDuration, y: 64, text: '' + mm, css: 'debug textSize64' };
-            gridMeasure1.content.push(measureDebugNum);
-            gridMeasure4.content.push(measureDebugNum);
-            gridMeasure16.content.push(measureDebugNum);
-            gridMeasure64.content.push(measureDebugNum);
-            gridMeasure256.content.push(measureDebugNum);
             for (var tt = 0; tt < song.tracks.length; tt++) {
                 var track = song.tracks[tt];
                 track.obverseVoiceFilter = (track.obverseVoiceFilter) ? track.obverseVoiceFilter : 0;
@@ -5003,4 +4917,148 @@ var MuzXBox = (function () {
     return MuzXBox;
 }());
 window['MZXB'] = new MuzXBox();
+var MeasureInfoRenderer = (function () {
+    function MeasureInfoRenderer() {
+    }
+    MeasureInfoRenderer.prototype.attach = function (zRender) {
+        this.bottomTimelineLayerGroup = document.getElementById('bottomTimelineLayerGroup');
+        this.initMeasureInfoAnchors(zRender);
+    };
+    MeasureInfoRenderer.prototype.fillMeasureInfo = function (song, ratioDuration, ratioThickness) {
+        this.fillMeasureInfo1(song, ratioDuration, ratioThickness);
+        this.fillMeasureInfo4(song, ratioDuration, ratioThickness);
+        this.fillMeasureInfo16(song, ratioDuration, ratioThickness);
+        this.fillMeasureInfo64(song, ratioDuration, ratioThickness);
+        this.fillMeasureInfo256(song, ratioDuration, ratioThickness);
+    };
+    MeasureInfoRenderer.prototype.initMeasureInfoAnchors = function (zRender) {
+        this.measuresMeasureInfoAnchor1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
+        this.measuresMeasureInfoAnchor4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
+        this.measuresMeasureInfoAnchor16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
+        this.measuresMeasureInfoAnchor64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar);
+        this.measuresMeasureInfoAnchor256 = TAnchor(0, 0, 1111, 1111, zRender.zoomFar, zRender.zoomBig + 1);
+        zRender.layers.push({
+            g: this.bottomTimelineLayerGroup, stickBottom: 0, anchors: [
+                this.measuresMeasureInfoAnchor1, this.measuresMeasureInfoAnchor4, this.measuresMeasureInfoAnchor16, this.measuresMeasureInfoAnchor64, this.measuresMeasureInfoAnchor256
+            ]
+        });
+    };
+    MeasureInfoRenderer.prototype.clearAnchorsContent = function (zRender, songDuration) {
+        var anchors = [
+            this.measuresMeasureInfoAnchor1, this.measuresMeasureInfoAnchor4, this.measuresMeasureInfoAnchor16, this.measuresMeasureInfoAnchor64, this.measuresMeasureInfoAnchor256
+        ];
+        for (var i = 0; i < anchors.length; i++) {
+            zRender.clearSingleAnchor(anchors[i], songDuration);
+        }
+    };
+    MeasureInfoRenderer.prototype.fillMeasureInfo1 = function (song, ratioDuration, ratioThickness) {
+        var time = 0;
+        var curMeterCount = 0;
+        var curDivision = 0;
+        var curTempo = 0;
+        for (var i = 0; i < song.measures.length; i++) {
+            var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+            var singlemeasuresTimelineAnchor1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.measuresMeasureInfoAnchor1.showZoom, this.measuresMeasureInfoAnchor1.hideZoom);
+            if (curMeterCount != song.measures[i].meter.count || curDivision != song.measures[i].meter.division || curTempo != song.measures[i].tempo) {
+                curMeterCount = song.measures[i].meter.count;
+                curDivision = song.measures[i].meter.division;
+                curTempo = song.measures[i].tempo;
+                singlemeasuresTimelineAnchor1.content.push(TText(time * ratioDuration, -1, 'barNumber textSize1', (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)));
+            }
+            this.measuresMeasureInfoAnchor1.content.push(singlemeasuresTimelineAnchor1);
+            time = time + measureDuration;
+        }
+    };
+    MeasureInfoRenderer.prototype.fillMeasureInfo4 = function (song, ratioDuration, ratioThickness) {
+        var time = 0;
+        var curMeterCount = 0;
+        var curDivision = 0;
+        var curTempo = 0;
+        for (var i = 0; i < song.measures.length; i++) {
+            var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+            var singlemeasuresTimelineAnchor4 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.measuresMeasureInfoAnchor4.showZoom, this.measuresMeasureInfoAnchor4.hideZoom);
+            if (curMeterCount != song.measures[i].meter.count || curDivision != song.measures[i].meter.division || curTempo != song.measures[i].tempo) {
+                curMeterCount = song.measures[i].meter.count;
+                curDivision = song.measures[i].meter.division;
+                curTempo = song.measures[i].tempo;
+                singlemeasuresTimelineAnchor4.content.push(TText(time * ratioDuration, -4, 'barNumber textSize4', (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)));
+            }
+            this.measuresMeasureInfoAnchor4.content.push(singlemeasuresTimelineAnchor4);
+            time = time + measureDuration;
+        }
+    };
+    MeasureInfoRenderer.prototype.fillMeasureInfo16 = function (song, ratioDuration, ratioThickness) {
+        var time = 0;
+        var curMeterCount = 0;
+        var curDivision = 0;
+        var curTempo = 0;
+        for (var i = 0; i < song.measures.length; i++) {
+            var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+            var singlemeasuresTimelineAnchor16 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.measuresMeasureInfoAnchor16.showZoom, this.measuresMeasureInfoAnchor16.hideZoom);
+            if (curMeterCount != song.measures[i].meter.count || curDivision != song.measures[i].meter.division || curTempo != song.measures[i].tempo) {
+                curMeterCount = song.measures[i].meter.count;
+                curDivision = song.measures[i].meter.division;
+                curTempo = song.measures[i].tempo;
+                singlemeasuresTimelineAnchor16.content.push({
+                    x: time * ratioDuration, y: -16, css: 'barNumber textSize16',
+                    text: (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)
+                });
+            }
+            this.measuresMeasureInfoAnchor16.content.push(singlemeasuresTimelineAnchor16);
+            time = time + measureDuration;
+        }
+    };
+    MeasureInfoRenderer.prototype.fillMeasureInfo64 = function (song, ratioDuration, ratioThickness) {
+        var time = 0;
+        var curMeterCount = 0;
+        var curDivision = 0;
+        var curTempo = 0;
+        var lastMeasureNum = -123456;
+        for (var i = 0; i < song.measures.length; i++) {
+            var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+            var singlemeasuresTimelineAnchor64 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.measuresMeasureInfoAnchor64.showZoom, this.measuresMeasureInfoAnchor64.hideZoom);
+            if (curMeterCount != song.measures[i].meter.count || curDivision != song.measures[i].meter.division || curTempo != song.measures[i].tempo) {
+                curMeterCount = song.measures[i].meter.count;
+                curDivision = song.measures[i].meter.division;
+                curTempo = song.measures[i].tempo;
+                if (i - lastMeasureNum > 2) {
+                    lastMeasureNum = i;
+                    singlemeasuresTimelineAnchor64.content.push({
+                        x: time * ratioDuration, y: -64, css: 'barNumber textSize64',
+                        text: (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)
+                    });
+                    console.log('singlemeasuresTimelineAnchor64', i);
+                }
+            }
+            this.measuresMeasureInfoAnchor64.content.push(singlemeasuresTimelineAnchor64);
+            time = time + measureDuration;
+        }
+    };
+    MeasureInfoRenderer.prototype.fillMeasureInfo256 = function (song, ratioDuration, ratioThickness) {
+        var time = 0;
+        var curMeterCount = 0;
+        var curDivision = 0;
+        var curTempo = 0;
+        var lastMeasureNum = -123456;
+        for (var i = 0; i < song.measures.length; i++) {
+            var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+            var singlemeasuresTimelineAnchor256 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.measuresMeasureInfoAnchor256.showZoom, this.measuresMeasureInfoAnchor256.hideZoom);
+            if (curMeterCount != song.measures[i].meter.count || curDivision != song.measures[i].meter.division || curTempo != song.measures[i].tempo) {
+                curMeterCount = song.measures[i].meter.count;
+                curDivision = song.measures[i].meter.division;
+                curTempo = song.measures[i].tempo;
+                if (i - lastMeasureNum > 8) {
+                    lastMeasureNum = i;
+                    singlemeasuresTimelineAnchor256.content.push({
+                        x: time * ratioDuration, y: -256, css: 'barNumber textSize256',
+                        text: (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)
+                    });
+                }
+            }
+            this.measuresMeasureInfoAnchor256.content.push(singlemeasuresTimelineAnchor256);
+            time = time + measureDuration;
+        }
+    };
+    return MeasureInfoRenderer;
+}());
 //# sourceMappingURL=muzxbox.js.map

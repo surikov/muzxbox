@@ -79,5 +79,7 @@
 		,"menu.ts"
 		
 		,"main.ts"
+
+		,"renderer/MeasureInfoRenderer.ts"
 	]
 }
