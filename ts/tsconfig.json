@@ -81,5 +81,8 @@
 		,"main.ts"
 
 		,"renderer/MeasureInfoRenderer.ts"
+		,"renderer/PianoRollRenderer.ts"
+		,"renderer/GridRenderer.ts"
+		
 	]
 }
