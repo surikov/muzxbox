@@ -265,6 +265,7 @@ declare class ZRender {
     measureInfoRenderer: MeasureInfoRenderer;
     pianoRollRenderer: PianoRollRenderer;
     gridRenderer: GridRenderer;
+    timeLineRenderer: TimeLineRenderer;
     debugLayerGroup: SVGElement;
     debugAnchor0: TileAnchor;
     debugAnchor1: TileAnchor;
@@ -1096,4 +1097,17 @@ declare class GridRenderer {
     initGridAnchors(zRender: ZRender): void;
     clearAnchorsContent(zRender: ZRender, songDuration: number): void;
     drawSchedule(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
+}
+declare class TimeLineRenderer {
+    upperSelectionScale: SVGElement;
+    measuresTimelineAnchor1: TileAnchor;
+    measuresTimelineAnchor4: TileAnchor;
+    measuresTimelineAnchor16: TileAnchor;
+    measuresTimelineAnchor64: TileAnchor;
+    measuresTimelineAnchor256: TileAnchor;
+    attach(zRender: ZRender): void;
+    initTimeScaleAnchors(zRender: ZRender): void;
+    clearAnchorsContent(zRender: ZRender, songDuration: number): void;
+    drawSchedule(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
+    drawLevel(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, layerAnchor: TileAnchor, textSize: string, yy: number): void;
 }

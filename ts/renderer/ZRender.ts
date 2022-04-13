@@ -7,15 +7,15 @@ class ZRender {
 	zoomSong: number = 64;
 	zoomFar: number = 256;
 	zoomBig: number = 512;
-	zoomMax: number = 10000;
-	ratioDuration = 200;
+	zoomMax: number = 1024;
+	ratioDuration = 50;
 	ratioThickness = 3;
 	sizeRatio = 2;
 
 	measureInfoRenderer: MeasureInfoRenderer = new MeasureInfoRenderer();
 	pianoRollRenderer: PianoRollRenderer = new PianoRollRenderer();
 	gridRenderer:GridRenderer=new GridRenderer();
-	
+	timeLineRenderer:TimeLineRenderer=new TimeLineRenderer();
 
 	//upperSelectionScale: SVGElement;
 	debugLayerGroup: SVGElement;
@@ -30,11 +30,7 @@ class ZRender {
 
 	
 	/*
-		measuresTimelineAnchor1: TileAnchor;
-		measuresTimelineAnchor4: TileAnchor;
-		measuresTimelineAnchor16: TileAnchor;
-		measuresTimelineAnchor64: TileAnchor;
-		measuresTimelineAnchor256: TileAnchor;*/
+		*/
 
 
 
@@ -65,6 +61,7 @@ class ZRender {
 		this.measureInfoRenderer.attach(this);
 		this.pianoRollRenderer.attach(this);
 		this.gridRenderer.attach(this);
+		this.timeLineRenderer.attach(this);
 	}
 	initDebugAnchors() {
 		this.debugAnchor0 = TAnchor(0, 0, 1111, 1111, this.zoomMin, this.zoomMax + 1);
@@ -81,18 +78,7 @@ class ZRender {
 	}
 	
 	/*
-	initTimeScaleAnchors() {
-		this.measuresTimelineAnchor1 = TAnchor(0, 0, 1111, 1111, this.zoomMin, this.zoomNote);
-		this.measuresTimelineAnchor4 = TAnchor(0, 0, 1111, 1111, this.zoomNote, this.zoomMeasure);
-		this.measuresTimelineAnchor16 = TAnchor(0, 0, 1111, 1111, this.zoomMeasure, this.zoomSong);
-		this.measuresTimelineAnchor64 = TAnchor(0, 0, 1111, 1111, this.zoomSong, this.zoomFar);
-		this.measuresTimelineAnchor256 = TAnchor(0, 0, 1111, 1111, this.zoomFar, this.zoomBig + 1);
-		this.layers.push({
-			g: this.upperSelectionScale, stickTop: 0, anchors: [
-				this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256
-			]
-		});
-	}*/
+	*/
 	
 	clearSingleAnchor(anchor: TileAnchor, songDuration: number) {
 		anchor.content.length = 0;
@@ -110,9 +96,11 @@ class ZRender {
 		for (let i = 0; i < anchors.length; i++) {
 			this.clearSingleAnchor(anchors[i], songDuration);
 		}
-		this.gridRenderer.clearAnchorsContent(this, songDuration)
-		this.measureInfoRenderer.clearAnchorsContent(this, songDuration)
-		this.pianoRollRenderer.clearAnchorsContent(this, songDuration)
+		this.gridRenderer.clearAnchorsContent(this, songDuration);
+		this.measureInfoRenderer.clearAnchorsContent(this, songDuration);
+		this.pianoRollRenderer.clearAnchorsContent(this, songDuration);
+		this.timeLineRenderer.clearAnchorsContent(this, songDuration);
+		
 		this.tileLevel.innerWidth = this.ratioDuration * songDuration * this.tileLevel.tapSize;
 		this.tileLevel.innerHeight = 128 * this.ratioThickness * this.tileLevel.tapSize;
 
@@ -124,6 +112,7 @@ class ZRender {
 		this.measureInfoRenderer.fillMeasureInfo(song, this.ratioDuration, this.ratioThickness);
 		this.pianoRollRenderer.drawSchedule(song, this.ratioDuration, this.ratioThickness);
 		this.gridRenderer.drawSchedule(this,song, this.ratioDuration, this.ratioThickness);
+		this.timeLineRenderer.drawSchedule(this,song, this.ratioDuration, this.ratioThickness);
 		let time = 0;
 		song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
 		for (let mm = 0; mm < song.measures.length; mm++) {

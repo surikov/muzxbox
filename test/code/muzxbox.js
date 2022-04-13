@@ -1348,13 +1348,14 @@ var ZRender = (function () {
         this.zoomSong = 64;
         this.zoomFar = 256;
         this.zoomBig = 512;
-        this.zoomMax = 10000;
-        this.ratioDuration = 200;
+        this.zoomMax = 1024;
+        this.ratioDuration = 50;
         this.ratioThickness = 3;
         this.sizeRatio = 2;
         this.measureInfoRenderer = new MeasureInfoRenderer();
         this.pianoRollRenderer = new PianoRollRenderer();
         this.gridRenderer = new GridRenderer();
+        this.timeLineRenderer = new TimeLineRenderer();
     }
     ZRender.prototype.bindLayers = function () {
         this.debugLayerGroup = document.getElementById('debugLayerGroup');
@@ -1365,6 +1366,7 @@ var ZRender = (function () {
         this.measureInfoRenderer.attach(this);
         this.pianoRollRenderer.attach(this);
         this.gridRenderer.attach(this);
+        this.timeLineRenderer.attach(this);
     };
     ZRender.prototype.initDebugAnchors = function () {
         this.debugAnchor0 = TAnchor(0, 0, 1111, 1111, this.zoomMin, this.zoomMax + 1);
@@ -1394,6 +1396,7 @@ var ZRender = (function () {
         this.gridRenderer.clearAnchorsContent(this, songDuration);
         this.measureInfoRenderer.clearAnchorsContent(this, songDuration);
         this.pianoRollRenderer.clearAnchorsContent(this, songDuration);
+        this.timeLineRenderer.clearAnchorsContent(this, songDuration);
         this.tileLevel.innerWidth = this.ratioDuration * songDuration * this.tileLevel.tapSize;
         this.tileLevel.innerHeight = 128 * this.ratioThickness * this.tileLevel.tapSize;
     };
@@ -1403,6 +1406,7 @@ var ZRender = (function () {
         this.measureInfoRenderer.fillMeasureInfo(song, this.ratioDuration, this.ratioThickness);
         this.pianoRollRenderer.drawSchedule(song, this.ratioDuration, this.ratioThickness);
         this.gridRenderer.drawSchedule(this, song, this.ratioDuration, this.ratioThickness);
+        this.timeLineRenderer.drawSchedule(this, song, this.ratioDuration, this.ratioThickness);
         var time = 0;
         song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
@@ -5102,15 +5106,92 @@ var GridRenderer = (function () {
             this.gridAnchor16.content.push(gridMeasure16);
             this.gridAnchor64.content.push(gridMeasure64);
             this.gridAnchor256.content.push(gridMeasure256);
-            var measureDebugSquare = { x: time * ratioDuration, y: 0, w: ratioDuration * measureDuration, h: 128 * ratioThickness, rx: 8, ry: 8, css: 'measureBackground' };
-            gridMeasure1.content.push(measureDebugSquare);
-            gridMeasure4.content.push(measureDebugSquare);
-            gridMeasure16.content.push(measureDebugSquare);
-            gridMeasure64.content.push(measureDebugSquare);
-            gridMeasure256.content.push(measureDebugSquare);
+            gridMeasure1.content.push({ x1: time * ratioDuration, y1: 0, x2: time * ratioDuration, y2: 128 * ratioThickness, css: 'barLine1' });
+            gridMeasure4.content.push({ x1: time * ratioDuration, y1: 0, x2: time * ratioDuration, y2: 128 * ratioThickness, css: 'barLine4' });
+            gridMeasure16.content.push({ x1: time * ratioDuration, y1: 0, x2: time * ratioDuration, y2: 128 * ratioThickness, css: 'barLine16' });
+            gridMeasure64.content.push({ x1: time * ratioDuration, y1: 0, x2: time * ratioDuration, y2: 128 * ratioThickness, css: 'barLine64' });
+            gridMeasure256.content.push({ x1: time * ratioDuration, y1: 0, x2: time * ratioDuration, y2: 128 * ratioThickness, css: 'barLine256' });
+            for (var i = 1; i < 128; i = i + 12) {
+                gridMeasure16.content.push({
+                    x1: time * ratioDuration, y1: (128.5 - i) * ratioThickness,
+                    x2: (time + measureDuration) * ratioDuration, y2: (128.5 - i) * ratioThickness, css: 'barLine16'
+                });
+            }
+            for (var i = 1; i < 128; i = i + 1) {
+                if (i % 12 == 0) {
+                    gridMeasure4.content.push({
+                        x1: time * ratioDuration, y1: (128.5 - i) * ratioThickness,
+                        x2: (time + measureDuration) * ratioDuration, y2: (128.5 - i) * ratioThickness, css: 'barLine4'
+                    });
+                }
+                else {
+                    gridMeasure4.content.push({
+                        x1: time * ratioDuration, y1: (128.5 - i) * ratioThickness,
+                        x2: (time + measureDuration) * ratioDuration, y2: (128.5 - i) * ratioThickness, css: 'pitchLine4'
+                    });
+                }
+            }
             time = time + measureDuration;
         }
     };
     return GridRenderer;
+}());
+var TimeLineRenderer = (function () {
+    function TimeLineRenderer() {
+    }
+    TimeLineRenderer.prototype.attach = function (zRender) {
+        this.upperSelectionScale = document.getElementById('upperSelectionScale');
+        this.initTimeScaleAnchors(zRender);
+    };
+    TimeLineRenderer.prototype.initTimeScaleAnchors = function (zRender) {
+        this.measuresTimelineAnchor1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
+        this.measuresTimelineAnchor4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
+        this.measuresTimelineAnchor16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
+        this.measuresTimelineAnchor64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar);
+        this.measuresTimelineAnchor256 = TAnchor(0, 0, 1111, 1111, zRender.zoomFar, zRender.zoomBig + 1);
+        zRender.layers.push({
+            g: this.upperSelectionScale, stickTop: 0, anchors: [
+                this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256
+            ]
+        });
+    };
+    TimeLineRenderer.prototype.clearAnchorsContent = function (zRender, songDuration) {
+        var anchors = [
+            this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256
+        ];
+        for (var i = 0; i < anchors.length; i++) {
+            zRender.clearSingleAnchor(anchors[i], songDuration);
+        }
+    };
+    TimeLineRenderer.prototype.drawSchedule = function (zRender, song, ratioDuration, ratioThickness) {
+        this.drawLevel(song, ratioDuration, ratioThickness, this.measuresTimelineAnchor1, 'textSize1', 1);
+        this.drawLevel(song, ratioDuration, ratioThickness, this.measuresTimelineAnchor4, 'textSize4', 4);
+        this.drawLevel(song, ratioDuration, ratioThickness, this.measuresTimelineAnchor16, 'textSize16', 16);
+        this.drawLevel(song, ratioDuration, ratioThickness, this.measuresTimelineAnchor64, 'textSize64', 64);
+        this.drawLevel(song, ratioDuration, ratioThickness, this.measuresTimelineAnchor256, 'textSize256', 256);
+    };
+    TimeLineRenderer.prototype.drawLevel = function (song, ratioDuration, ratioThickness, layerAnchor, textSize, yy) {
+        var time = 0;
+        for (var i = 0; i < song.measures.length; i++) {
+            var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+            if (yy < 64 || (i % 8 == 0)) {
+                var measureAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, layerAnchor.showZoom, layerAnchor.hideZoom);
+                measureAnchor.content.push(TText(time * ratioDuration, yy * 2, 'barNumber ' + textSize, ('' + (1 + i))));
+                if (yy < 16) {
+                    var step = { count: 1, division: 8 };
+                    var part = { count: 1, division: 8 };
+                    while (DUU(part).lessThen(song.measures[i].meter)) {
+                        var duration = meter2seconds(song.measures[i].tempo, part);
+                        var simple = DUU(part).simplify();
+                        measureAnchor.content.push(TText((time + duration) * ratioDuration, yy, 'barNumber ' + textSize, ('' + simple.count + '/' + simple.division)));
+                        part = DUU(part).plus(step);
+                    }
+                }
+                layerAnchor.content.push(measureAnchor);
+            }
+            time = time + measureDuration;
+        }
+    };
+    return TimeLineRenderer;
 }());
 //# sourceMappingURL=muzxbox.js.map
