@@ -2,7 +2,7 @@ class ZRender {
 	tileLevel: TileLevel;
 	layers: TileLayerDefinition[] = [];
 	zoomMin: number = 1;
-	zoomNote: number = 4;
+	zoomNote: number = 2;
 	zoomMeasure: number = 16;
 	zoomSong: number = 64;
 	zoomFar: number = 256;
@@ -11,6 +11,12 @@ class ZRender {
 	ratioDuration = 50;
 	ratioThickness = 3;
 	sizeRatio = 2;
+
+	rhythmPatternTest = [
+		{ count: 1, division: 16 }, { count: 1, division: 16 }
+		, { count: 1, division: 4 }, { count: 1, division: 8 }
+
+	];
 
 	measureInfoRenderer: MeasureInfoRenderer = new MeasureInfoRenderer();
 	pianoRollRenderer: PianoRollRenderer = new PianoRollRenderer();
@@ -111,7 +117,7 @@ class ZRender {
 		this.clearAnchorsContent(songDuration);
 		this.measureInfoRenderer.fillMeasureInfo(song, this.ratioDuration, this.ratioThickness);
 		this.pianoRollRenderer.drawSchedule(song, this.ratioDuration, this.ratioThickness);
-		this.gridRenderer.drawSchedule(this,song, this.ratioDuration, this.ratioThickness);
+		this.gridRenderer.drawSchedule(this,song, this.ratioDuration, this.ratioThickness,this.rhythmPatternTest);
 		this.timeLineRenderer.drawSchedule(this,song, this.ratioDuration, this.ratioThickness);
 		let time = 0;
 		song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;

@@ -33,7 +33,7 @@ class GridRenderer {
 		}
 
 	}
-	drawSchedule(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {//}, menuButton: TileRectangle) {
+	drawSchedule(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, rhythmPattern: ZvoogMeter[]) {//}, menuButton: TileRectangle) {
 		let songDuration = scheduleDuration(song);
 
 		let time = 0;
@@ -84,6 +84,28 @@ class GridRenderer {
 						, x2: (time + measureDuration) * ratioDuration, y2: (128.5 - i) * ratioThickness, css: 'pitchLine4'
 					});
 				}
+			}
+			let stepNN = 0;
+			//let step: ZvoogMeter = rhythmPattern[0];
+			let position: ZvoogMeter = rhythmPattern[stepNN];
+			while (DUU(position).lessThen(song.measures[mm].meter)) {
+				let positionDuration = meter2seconds(song.measures[mm].tempo, position);
+				let css='pitchLine4';
+				if(stepNN == rhythmPattern.length-1){
+					css='pitchWideLine4';
+				}
+				gridMeasure4.content.push({
+					x1: (time + positionDuration) * ratioDuration
+					, y1: 0
+					, x2: (time + positionDuration) * ratioDuration
+					, y2: 128 * ratioThickness
+					, css: css
+				});				
+				stepNN++;
+				if (stepNN >= rhythmPattern.length) {
+					stepNN = 0;
+				}
+				position = DUU(position).plus(rhythmPattern[stepNN]);
 			}
 
 			time = time + measureDuration;

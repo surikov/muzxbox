@@ -262,6 +262,10 @@ declare class ZRender {
     ratioDuration: number;
     ratioThickness: number;
     sizeRatio: number;
+    rhythmPatternTest: {
+        count: number;
+        division: number;
+    }[];
     measureInfoRenderer: MeasureInfoRenderer;
     pianoRollRenderer: PianoRollRenderer;
     gridRenderer: GridRenderer;
@@ -1096,7 +1100,7 @@ declare class GridRenderer {
     attach(zRender: ZRender): void;
     initGridAnchors(zRender: ZRender): void;
     clearAnchorsContent(zRender: ZRender, songDuration: number): void;
-    drawSchedule(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
+    drawSchedule(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, rhythmPattern: ZvoogMeter[]): void;
 }
 declare class TimeLineRenderer {
     upperSelectionScale: SVGElement;

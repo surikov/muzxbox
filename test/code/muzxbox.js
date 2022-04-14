@@ -1343,7 +1343,7 @@ var ZRender = (function () {
     function ZRender() {
         this.layers = [];
         this.zoomMin = 1;
-        this.zoomNote = 4;
+        this.zoomNote = 2;
         this.zoomMeasure = 16;
         this.zoomSong = 64;
         this.zoomFar = 256;
@@ -1352,6 +1352,10 @@ var ZRender = (function () {
         this.ratioDuration = 50;
         this.ratioThickness = 3;
         this.sizeRatio = 2;
+        this.rhythmPatternTest = [
+            { count: 1, division: 16 }, { count: 1, division: 16 },
+            { count: 1, division: 4 }, { count: 1, division: 8 }
+        ];
         this.measureInfoRenderer = new MeasureInfoRenderer();
         this.pianoRollRenderer = new PianoRollRenderer();
         this.gridRenderer = new GridRenderer();
@@ -1405,7 +1409,7 @@ var ZRender = (function () {
         this.clearAnchorsContent(songDuration);
         this.measureInfoRenderer.fillMeasureInfo(song, this.ratioDuration, this.ratioThickness);
         this.pianoRollRenderer.drawSchedule(song, this.ratioDuration, this.ratioThickness);
-        this.gridRenderer.drawSchedule(this, song, this.ratioDuration, this.ratioThickness);
+        this.gridRenderer.drawSchedule(this, song, this.ratioDuration, this.ratioThickness, this.rhythmPatternTest);
         this.timeLineRenderer.drawSchedule(this, song, this.ratioDuration, this.ratioThickness);
         var time = 0;
         song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
@@ -5090,7 +5094,7 @@ var GridRenderer = (function () {
             zRender.clearSingleAnchor(anchors[i], songDuration);
         }
     };
-    GridRenderer.prototype.drawSchedule = function (zRender, song, ratioDuration, ratioThickness) {
+    GridRenderer.prototype.drawSchedule = function (zRender, song, ratioDuration, ratioThickness, rhythmPattern) {
         var songDuration = scheduleDuration(song);
         var time = 0;
         song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
@@ -5130,6 +5134,27 @@ var GridRenderer = (function () {
                         x2: (time + measureDuration) * ratioDuration, y2: (128.5 - i) * ratioThickness, css: 'pitchLine4'
                     });
                 }
+            }
+            var stepNN = 0;
+            var position = rhythmPattern[stepNN];
+            while (DUU(position).lessThen(song.measures[mm].meter)) {
+                var positionDuration = meter2seconds(song.measures[mm].tempo, position);
+                var css = 'pitchLine4';
+                if (stepNN == rhythmPattern.length - 1) {
+                    css = 'pitchWideLine4';
+                }
+                gridMeasure4.content.push({
+                    x1: (time + positionDuration) * ratioDuration,
+                    y1: 0,
+                    x2: (time + positionDuration) * ratioDuration,
+                    y2: 128 * ratioThickness,
+                    css: css
+                });
+                stepNN++;
+                if (stepNN >= rhythmPattern.length) {
+                    stepNN = 0;
+                }
+                position = DUU(position).plus(rhythmPattern[stepNN]);
             }
             time = time + measureDuration;
         }

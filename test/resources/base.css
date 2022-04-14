@@ -174,3 +174,9 @@ button{
 	stroke-opacity: 75%;
 	stroke-linecap: round;
 }
+.pitchWideLine4 {
+	stroke: #ffffff;
+	stroke-width: 0.2cm;
+	stroke-opacity: 75%;
+	stroke-linecap: round;
+}
