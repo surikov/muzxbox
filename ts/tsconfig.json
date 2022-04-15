@@ -24,7 +24,7 @@
 	}
 	,"files": [
 		
-		"input.ts"
+		"uiinput/input.ts"
 		//,"loader.ts"
 		,"tilelevel/tilelevel.ts"
 		,"tilelevel/tilelevelutil.ts"
@@ -39,7 +39,7 @@
 
 		//,"muzxboxproject.ts"
 
-		,"zvoogutil.ts"
+		,"util/zvoogutil.ts"
 		,"plugins/zvoogstore.ts"
 		,"plugins/filters/ZvoogFxGain.ts"
 		,"plugins/filters/WAFEcho.ts"
@@ -75,8 +75,10 @@
 
 		,"plugins/storages/MIDIFileImporter.ts"
 		,"plugins/storages/MusicXMLFileImporter.ts"
-		,"treevalue.ts"
-		,"menu.ts"
+		,"util/treevalue.ts"
+		,"menu/ZMainMenu.ts"
+		,"menu/SingleMenuPanel.ts"
+		
 		
 		,"main.ts"
 

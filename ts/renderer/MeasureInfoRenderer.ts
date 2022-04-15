@@ -152,7 +152,7 @@ class MeasureInfoRenderer{
 						x: time * ratioDuration, y: -64, css: 'barNumber textSize64'
 						, text: (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)
 					});
-					console.log('singlemeasuresTimelineAnchor64',i);
+					//console.log('singlemeasuresTimelineAnchor64',i);
 				}
 			}
 			this.measuresMeasureInfoAnchor64.content.push(singlemeasuresTimelineAnchor64);

@@ -13,7 +13,7 @@ type ZMenuFolder = {
 };
 class ZMainMenu {
 	muzXBox: MuzXBox;
-	level1style: CSSStyleDeclaration;
+	/*level1style: CSSStyleDeclaration;
 	level2style: CSSStyleDeclaration;
 	level3style: CSSStyleDeclaration;
 	level4style: CSSStyleDeclaration;
@@ -33,10 +33,18 @@ class ZMainMenu {
 	menu3content: HTMLElement;
 	menu4content: HTMLElement;
 	menu5content: HTMLElement;
+	*/
 	currentLevel = 0;
 	menuRoot: ZMenuFolder;
+	panels: SingleMenuPanel[] = [];
 	constructor(from: MuzXBox) {
 		this.muzXBox = from;
+		this.panels.push(new SingleMenuPanel('menuPaneDiv1', 'menu1textHead', 'menu1content'));
+		this.panels.push(new SingleMenuPanel('menuPaneDiv2', 'menu2textHead', 'menu2content'));
+		this.panels.push(new SingleMenuPanel('menuPaneDiv3', 'menu3textHead', 'menu3content'));
+		this.panels.push(new SingleMenuPanel('menuPaneDiv4', 'menu4textHead', 'menu4content'));
+		this.panels.push(new SingleMenuPanel('menuPaneDiv5', 'menu5textHead', 'menu5content'));
+		/*
 		var el: HTMLElement | null = document.getElementById('menuPaneDiv1');
 		if (el) { this.level1style = el.style; }
 		el = document.getElementById('menuPaneDiv2');
@@ -67,6 +75,7 @@ class ZMainMenu {
 		if (el) { this.menu4content = el; }
 		el = document.getElementById('menu5content');
 		if (el) { this.menu5content = el; }
+		*/
 		this.menuRoot = {
 			path: 'Menu'
 			, icon: ''
@@ -76,7 +85,8 @@ class ZMainMenu {
 		};
 	}
 	openNextLevel() {
-		if (this.currentLevel == 0) {
+		//console.log('openNextLevel from', this.currentLevel);
+		/*if (this.currentLevel == 0) {
 			this.open_1_level();
 			this.currentLevel++;
 			return;
@@ -100,10 +110,16 @@ class ZMainMenu {
 			this.open_5_level();
 			this.currentLevel++;
 			return;
-		}
+		}*/
+		this.open_nn_level(this.currentLevel);
+		this.currentLevel++;
 	}
 	backPreLevel() {
-		if (this.currentLevel == 1) {
+		if (this.currentLevel - 1 >= 0 && this.currentLevel - 1 < this.panels.length) {
+			this.panels[this.currentLevel - 1].off();
+		}
+		this.currentLevel--;
+		/*if (this.currentLevel == 1) {
 			this.level1style.width = '0cm';
 			this.currentLevel--;
 			return;
@@ -127,18 +143,22 @@ class ZMainMenu {
 			this.level5style.width = '0cm';
 			this.currentLevel--;
 			return;
-		}
+		}*/
 	}
 	hideMenu() {
-		this.level1style.width = '0cm';
-		this.level2style.width = '0cm';
-		this.level3style.width = '0cm';
-		this.level4style.width = '0cm';
-		this.level5style.width = '0cm';
+		//this.level1style.width = '0cm';
+		//this.level2style.width = '0cm';
+		//this.level3style.width = '0cm';
+		//this.level4style.width = '0cm';
+		//this.level5style.width = '0cm';
+		for (let i = 0; i < this.panels.length; i++) {
+			this.panels[i].off();
+		}
 		this.currentLevel = 0;
 	}
 	moveSelection(level: number, row: number) {
-		var div: HTMLElement = this.menu1content;
+		this.panels[level - 1].moveSelection(row);
+		/*var div: HTMLElement = this.menu1content;
 		if (level == 2) { div = this.menu2content; }
 		if (level == 3) { div = this.menu3content; }
 		if (level == 4) { div = this.menu4content; }
@@ -149,24 +169,29 @@ class ZMainMenu {
 		}
 		var child: HTMLDivElement = div.childNodes[row] as HTMLDivElement;
 		child.dataset['rowSelection'] = 'yes';
+		*/
 	}
 	createFolderClick(idx: number) {
 		return () => {
+			//console.log('folder', idx, 'from', this.currentLevel);
 			this.moveSelection(this.currentLevel, idx);
 			this.currentLevel++;
-			if (this.currentLevel == 2) { this.selection1level = idx; this.open_2_level(); }
-			if (this.currentLevel == 3) { this.selection2level = idx; this.open_3_level(); }
-			if (this.currentLevel == 4) { this.selection3level = idx; this.open_4_level(); }
-			if (this.currentLevel == 5) { this.selection4level = idx; this.open_5_level(); }
+			this.panels[this.currentLevel - 2].selection = idx;
+			this.open_nn_level(this.currentLevel - 1);
+			//if (this.currentLevel == 2) { this.panels[0].selection = idx; this.open_2_level(); }
+			//if (this.currentLevel == 3) { this.panels[1].selection = idx; this.open_3_level(); }
+			//if (this.currentLevel == 4) { this.panels[2].selection = idx; this.open_4_level(); }
+			//if (this.currentLevel == 5) { this.panels[3].selection = idx; this.open_5_level(); }
 		};
 	}
 	createActionClick(nn: number, item: ZMenuItem) {
 		return () => {
-			if (this.currentLevel == 1) { this.selection1level = nn; }
-			if (this.currentLevel == 2) { this.selection2level = nn; }
-			if (this.currentLevel == 3) { this.selection3level = nn; }
-			if (this.currentLevel == 4) { this.selection4level = nn; }
-			if (this.currentLevel == 5) { this.selection5level = nn; }
+			//if (this.currentLevel == 1) { this.selection1level = nn; }
+			//if (this.currentLevel == 2) { this.selection2level = nn; }
+			//if (this.currentLevel == 3) { this.selection3level = nn; }
+			//if (this.currentLevel == 4) { this.selection4level = nn; }
+			//if (this.currentLevel == 5) { this.selection5level = nn; }
+			this.panels[this.currentLevel - 1].selection = nn;
 			if (item.autoclose) {
 				this.hideMenu();
 			} else {
@@ -207,51 +232,85 @@ class ZMainMenu {
 		}
 
 	}
-	open_1_level() {
-		/*console.log(':'
-			, this.muzXBox.zrenderer.tileLevel.translateX
-			, this.muzXBox.zrenderer.tileLevel.translateY
-			, this.muzXBox.zrenderer.tileLevel.translateZ
-			, this.muzXBox.zrenderer.tileLevel.tapSize);*/
-		this.menu1textHead.innerText = this.menuRoot.path;
-		this.level1style.width = '8cm';
-		this.reFillMenulevel(this.menu1content, this.menuRoot
-			, this.selection1level);
+	open_nn_level(nn: number) {
+		let wi = '' + (6 + (4 - nn) * 0.5) + 'cm';
+		this.panels[nn].levelStyle.width = wi;
+		let subRoot: ZMenuFolder = this.menuRoot;
+		let txt = this.menuRoot.path;
+		let action: undefined | (() => void) = undefined;
+		if (nn == 1) {
+			var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
+			action = this.menuRoot.folders[folderIdx1].afterOpen;
+			txt = this.menuRoot.folders[folderIdx1].path;
+			subRoot = this.menuRoot.folders[folderIdx1];
+		}
+		if (nn == 2) {
+			var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
+			var folderIdx2 = this.panels[1].selection - this.menuRoot.folders[folderIdx1].items.length;
+			action = this.menuRoot.folders[folderIdx1].folders[folderIdx2].afterOpen;
+			txt = this.menuRoot.folders[folderIdx1].path;
+			subRoot = this.menuRoot.folders[folderIdx1].folders[folderIdx2];
+		}
+		if (nn == 3) {
+			var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
+			var folderIdx2 = this.panels[1].selection - this.menuRoot.folders[folderIdx1].items.length;
+			var folderIdx3 = this.panels[2].selection - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
+			action = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].afterOpen;
+			txt = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].path;
+			subRoot = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3];
+		}
+		if (nn == 4) {
+			var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
+			var folderIdx2 = this.panels[1].selection - this.menuRoot.folders[folderIdx1].items.length;
+			var folderIdx3 = this.panels[2].selection - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
+			var folderIdx4 = this.panels[3].selection - this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].items.length;
+			action = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].afterOpen;
+			this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].path;
+			subRoot = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4];
+		}
+		this.reFillMenulevel(this.panels[nn].menuContent, subRoot, this.panels[nn].selection);
+		this.panels[nn].menuTextHead.innerText = txt;
+		if (action) action();
+	}
+	/*open_1_level() {
+		this.panels[0].menuTextHead.innerText = this.menuRoot.path;
+		this.panels[0].levelStyle.width = '8cm';
+		this.reFillMenulevel(this.panels[0].menuContent, this.menuRoot, this.panels[0].selection);
 	}
 	open_2_level() {
-		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
-		this.menu2textHead.innerText = this.menuRoot.folders[folderIdx1].path;
+		var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
+		this.panels[1].menuTextHead.innerText = this.menuRoot.folders[folderIdx1].path;
 		this.menuRoot.folders[folderIdx1].afterOpen();
-		this.level2style.width = '7.5cm';
-		this.reFillMenulevel(this.menu2content, this.menuRoot.folders[folderIdx1], this.selection2level);
+		this.panels[1].levelStyle.width = '7.5cm';
+		this.reFillMenulevel(this.panels[1].menuContent, this.menuRoot.folders[folderIdx1], this.panels[1].selection);
 	}
 	open_3_level() {
-		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
-		var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
+		var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
+		var folderIdx2 = this.panels[1].selection - this.menuRoot.folders[folderIdx1].items.length;
 		this.menuRoot.folders[folderIdx1].folders[folderIdx2].afterOpen();
-		this.menu3textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].path;
-		this.level3style.width = '7.0cm';
-		this.reFillMenulevel(this.menu3content, this.menuRoot.folders[folderIdx1].folders[folderIdx2], this.selection3level);
+		this.panels[2].menuTextHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].path;
+		this.panels[2].levelStyle.width = '7.0cm';
+		this.reFillMenulevel(this.panels[2].menuContent, this.menuRoot.folders[folderIdx1].folders[folderIdx2], this.panels[2].selection);
 	}
 	open_4_level() {
-		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
-		var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
-		var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
+		var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
+		var folderIdx2 = this.panels[1].selection - this.menuRoot.folders[folderIdx1].items.length;
+		var folderIdx3 = this.panels[2].selection - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
 		this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].afterOpen();
-		this.menu4textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].path;
-		this.level4style.width = '6.5cm';
-		this.reFillMenulevel(this.menu4content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3], this.selection4level);
+		this.panels[3].menuTextHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].path;
+		this.panels[3].levelStyle.width = '6.5cm';
+		this.reFillMenulevel(this.panels[3].menuContent, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3], this.panels[3].selection);
 	}
 	open_5_level() {
-		var folderIdx1 = this.selection1level - this.menuRoot.items.length;
-		var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
-		var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
-		var folderIdx4 = this.selection4level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].items.length;
+		var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
+		var folderIdx2 = this.panels[1].selection - this.menuRoot.folders[folderIdx1].items.length;
+		var folderIdx3 = this.panels[2].selection - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
+		var folderIdx4 = this.panels[3].selection - this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].items.length;
 		this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].afterOpen();
-		this.menu5textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].path;
-		this.level5style.width = '6.0cm';
-		this.reFillMenulevel(this.menu5content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4], this.selection5level);
-	}
+		this.panels[4].menuTextHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].path;
+		this.panels[4].levelStyle.width = '6.0cm';
+		this.reFillMenulevel(this.panels[4].menuContent, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4], this.panels[4].selection);
+	}*/
 	fillFrom(prj: ZvoogSchedule) {
 		this.menuRoot.items.length = 0;
 		this.menuRoot.folders.length = 0;

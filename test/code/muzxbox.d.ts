@@ -981,28 +981,9 @@ declare type ZMenuFolder = {
 };
 declare class ZMainMenu {
     muzXBox: MuzXBox;
-    level1style: CSSStyleDeclaration;
-    level2style: CSSStyleDeclaration;
-    level3style: CSSStyleDeclaration;
-    level4style: CSSStyleDeclaration;
-    level5style: CSSStyleDeclaration;
-    selection1level: number;
-    selection2level: number;
-    selection3level: number;
-    selection4level: number;
-    selection5level: number;
-    menu1textHead: HTMLElement;
-    menu2textHead: HTMLElement;
-    menu3textHead: HTMLElement;
-    menu4textHead: HTMLElement;
-    menu5textHead: HTMLElement;
-    menu1content: HTMLElement;
-    menu2content: HTMLElement;
-    menu3content: HTMLElement;
-    menu4content: HTMLElement;
-    menu5content: HTMLElement;
     currentLevel: number;
     menuRoot: ZMenuFolder;
+    panels: SingleMenuPanel[];
     constructor(from: MuzXBox);
     openNextLevel(): void;
     backPreLevel(): void;
@@ -1011,11 +992,7 @@ declare class ZMainMenu {
     createFolderClick(idx: number): () => void;
     createActionClick(nn: number, item: ZMenuItem): () => void;
     reFillMenulevel(menuContent: HTMLElement, subRoot: ZMenuFolder, selectedLevel: number): void;
-    open_1_level(): void;
-    open_2_level(): void;
-    open_3_level(): void;
-    open_4_level(): void;
-    open_5_level(): void;
+    open_nn_level(nn: number): void;
     fillFrom(prj: ZvoogSchedule): void;
     upSongFx(fx: number): () => void;
     upSongFxParam(fx: number, param: number): () => void;
@@ -1027,6 +1004,15 @@ declare class ZMainMenu {
     upVoxFxParam(trk: number, vox: number, fx: number, param: number): () => void;
     upVoxProvider(trk: number, vox: number): () => void;
     upVoxProviderParam(trk: number, vox: number, param: number): () => void;
+}
+declare class SingleMenuPanel {
+    levelStyle: CSSStyleDeclaration;
+    menuTextHead: HTMLElement;
+    menuContent: HTMLElement;
+    selection: number;
+    constructor(menuPaneDivID: string, menuTextHeadID: string, menuContentID: string);
+    off(): void;
+    moveSelection(row: number): void;
 }
 declare let midiDrumPitchShift: number;
 declare let us: ZUserSetting;

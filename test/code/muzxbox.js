@@ -4058,73 +4058,14 @@ var TreeValue = (function () {
 }());
 var ZMainMenu = (function () {
     function ZMainMenu(from) {
-        this.selection1level = 0;
-        this.selection2level = 0;
-        this.selection3level = 0;
-        this.selection4level = 0;
-        this.selection5level = 0;
         this.currentLevel = 0;
+        this.panels = [];
         this.muzXBox = from;
-        var el = document.getElementById('menuPaneDiv1');
-        if (el) {
-            this.level1style = el.style;
-        }
-        el = document.getElementById('menuPaneDiv2');
-        if (el) {
-            this.level2style = el.style;
-        }
-        el = document.getElementById('menuPaneDiv3');
-        if (el) {
-            this.level3style = el.style;
-        }
-        el = document.getElementById('menuPaneDiv4');
-        if (el) {
-            this.level4style = el.style;
-        }
-        el = document.getElementById('menuPaneDiv5');
-        if (el) {
-            this.level5style = el.style;
-        }
-        el = document.getElementById('menu1textHead');
-        if (el) {
-            this.menu1textHead = el;
-        }
-        el = document.getElementById('menu2textHead');
-        if (el) {
-            this.menu2textHead = el;
-        }
-        el = document.getElementById('menu3textHead');
-        if (el) {
-            this.menu3textHead = el;
-        }
-        el = document.getElementById('menu4textHead');
-        if (el) {
-            this.menu4textHead = el;
-        }
-        el = document.getElementById('menu5textHead');
-        if (el) {
-            this.menu5textHead = el;
-        }
-        el = document.getElementById('menu1content');
-        if (el) {
-            this.menu1content = el;
-        }
-        el = document.getElementById('menu2content');
-        if (el) {
-            this.menu2content = el;
-        }
-        el = document.getElementById('menu3content');
-        if (el) {
-            this.menu3content = el;
-        }
-        el = document.getElementById('menu4content');
-        if (el) {
-            this.menu4content = el;
-        }
-        el = document.getElementById('menu5content');
-        if (el) {
-            this.menu5content = el;
-        }
+        this.panels.push(new SingleMenuPanel('menuPaneDiv1', 'menu1textHead', 'menu1content'));
+        this.panels.push(new SingleMenuPanel('menuPaneDiv2', 'menu2textHead', 'menu2content'));
+        this.panels.push(new SingleMenuPanel('menuPaneDiv3', 'menu3textHead', 'menu3content'));
+        this.panels.push(new SingleMenuPanel('menuPaneDiv4', 'menu4textHead', 'menu4content'));
+        this.panels.push(new SingleMenuPanel('menuPaneDiv5', 'menu5textHead', 'menu5content'));
         this.menuRoot = {
             path: 'Menu',
             icon: '',
@@ -4134,129 +4075,37 @@ var ZMainMenu = (function () {
         };
     }
     ZMainMenu.prototype.openNextLevel = function () {
-        if (this.currentLevel == 0) {
-            this.open_1_level();
-            this.currentLevel++;
-            return;
-        }
-        if (this.currentLevel == 1) {
-            this.open_2_level();
-            this.currentLevel++;
-            return;
-        }
-        if (this.currentLevel == 2) {
-            this.open_3_level();
-            this.currentLevel++;
-            return;
-        }
-        if (this.currentLevel == 3) {
-            this.open_4_level();
-            this.currentLevel++;
-            return;
-        }
-        if (this.currentLevel == 4) {
-            this.open_5_level();
-            this.currentLevel++;
-            return;
-        }
+        this.open_nn_level(this.currentLevel);
+        this.currentLevel++;
     };
     ZMainMenu.prototype.backPreLevel = function () {
-        if (this.currentLevel == 1) {
-            this.level1style.width = '0cm';
-            this.currentLevel--;
-            return;
+        if (this.currentLevel - 1 >= 0 && this.currentLevel - 1 < this.panels.length) {
+            this.panels[this.currentLevel - 1].off();
         }
-        if (this.currentLevel == 2) {
-            this.level2style.width = '0cm';
-            this.currentLevel--;
-            return;
-        }
-        if (this.currentLevel == 3) {
-            this.level3style.width = '0cm';
-            this.currentLevel--;
-            return;
-        }
-        if (this.currentLevel == 4) {
-            this.level4style.width = '0cm';
-            this.currentLevel--;
-            return;
-        }
-        if (this.currentLevel == 5) {
-            this.level5style.width = '0cm';
-            this.currentLevel--;
-            return;
-        }
+        this.currentLevel--;
     };
     ZMainMenu.prototype.hideMenu = function () {
-        this.level1style.width = '0cm';
-        this.level2style.width = '0cm';
-        this.level3style.width = '0cm';
-        this.level4style.width = '0cm';
-        this.level5style.width = '0cm';
+        for (var i = 0; i < this.panels.length; i++) {
+            this.panels[i].off();
+        }
         this.currentLevel = 0;
     };
     ZMainMenu.prototype.moveSelection = function (level, row) {
-        var div = this.menu1content;
-        if (level == 2) {
-            div = this.menu2content;
-        }
-        if (level == 3) {
-            div = this.menu3content;
-        }
-        if (level == 4) {
-            div = this.menu4content;
-        }
-        if (level == 5) {
-            div = this.menu5content;
-        }
-        for (var i = 0; i < div.childNodes.length; i++) {
-            var child = div.childNodes[i];
-            child.dataset['rowSelection'] = 'no';
-        }
-        var child = div.childNodes[row];
-        child.dataset['rowSelection'] = 'yes';
+        this.panels[level - 1].moveSelection(row);
     };
     ZMainMenu.prototype.createFolderClick = function (idx) {
         var _this = this;
         return function () {
             _this.moveSelection(_this.currentLevel, idx);
             _this.currentLevel++;
-            if (_this.currentLevel == 2) {
-                _this.selection1level = idx;
-                _this.open_2_level();
-            }
-            if (_this.currentLevel == 3) {
-                _this.selection2level = idx;
-                _this.open_3_level();
-            }
-            if (_this.currentLevel == 4) {
-                _this.selection3level = idx;
-                _this.open_4_level();
-            }
-            if (_this.currentLevel == 5) {
-                _this.selection4level = idx;
-                _this.open_5_level();
-            }
+            _this.panels[_this.currentLevel - 2].selection = idx;
+            _this.open_nn_level(_this.currentLevel - 1);
         };
     };
     ZMainMenu.prototype.createActionClick = function (nn, item) {
         var _this = this;
         return function () {
-            if (_this.currentLevel == 1) {
-                _this.selection1level = nn;
-            }
-            if (_this.currentLevel == 2) {
-                _this.selection2level = nn;
-            }
-            if (_this.currentLevel == 3) {
-                _this.selection3level = nn;
-            }
-            if (_this.currentLevel == 4) {
-                _this.selection4level = nn;
-            }
-            if (_this.currentLevel == 5) {
-                _this.selection5level = nn;
-            }
+            _this.panels[_this.currentLevel - 1].selection = nn;
             if (item.autoclose) {
                 _this.hideMenu();
             }
@@ -4301,44 +4150,46 @@ var ZMainMenu = (function () {
             }
         }
     };
-    ZMainMenu.prototype.open_1_level = function () {
-        this.menu1textHead.innerText = this.menuRoot.path;
-        this.level1style.width = '8cm';
-        this.reFillMenulevel(this.menu1content, this.menuRoot, this.selection1level);
-    };
-    ZMainMenu.prototype.open_2_level = function () {
-        var folderIdx1 = this.selection1level - this.menuRoot.items.length;
-        this.menu2textHead.innerText = this.menuRoot.folders[folderIdx1].path;
-        this.menuRoot.folders[folderIdx1].afterOpen();
-        this.level2style.width = '7.5cm';
-        this.reFillMenulevel(this.menu2content, this.menuRoot.folders[folderIdx1], this.selection2level);
-    };
-    ZMainMenu.prototype.open_3_level = function () {
-        var folderIdx1 = this.selection1level - this.menuRoot.items.length;
-        var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
-        this.menuRoot.folders[folderIdx1].folders[folderIdx2].afterOpen();
-        this.menu3textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].path;
-        this.level3style.width = '7.0cm';
-        this.reFillMenulevel(this.menu3content, this.menuRoot.folders[folderIdx1].folders[folderIdx2], this.selection3level);
-    };
-    ZMainMenu.prototype.open_4_level = function () {
-        var folderIdx1 = this.selection1level - this.menuRoot.items.length;
-        var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
-        var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
-        this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].afterOpen();
-        this.menu4textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].path;
-        this.level4style.width = '6.5cm';
-        this.reFillMenulevel(this.menu4content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3], this.selection4level);
-    };
-    ZMainMenu.prototype.open_5_level = function () {
-        var folderIdx1 = this.selection1level - this.menuRoot.items.length;
-        var folderIdx2 = this.selection2level - this.menuRoot.folders[folderIdx1].items.length;
-        var folderIdx3 = this.selection3level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
-        var folderIdx4 = this.selection4level - this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].items.length;
-        this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].afterOpen();
-        this.menu5textHead.innerText = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].path;
-        this.level5style.width = '6.0cm';
-        this.reFillMenulevel(this.menu5content, this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4], this.selection5level);
+    ZMainMenu.prototype.open_nn_level = function (nn) {
+        var wi = '' + (6 + (4 - nn) * 0.5) + 'cm';
+        this.panels[nn].levelStyle.width = wi;
+        var subRoot = this.menuRoot;
+        var txt = this.menuRoot.path;
+        var action = undefined;
+        if (nn == 1) {
+            var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
+            action = this.menuRoot.folders[folderIdx1].afterOpen;
+            txt = this.menuRoot.folders[folderIdx1].path;
+            subRoot = this.menuRoot.folders[folderIdx1];
+        }
+        if (nn == 2) {
+            var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
+            var folderIdx2 = this.panels[1].selection - this.menuRoot.folders[folderIdx1].items.length;
+            action = this.menuRoot.folders[folderIdx1].folders[folderIdx2].afterOpen;
+            txt = this.menuRoot.folders[folderIdx1].path;
+            subRoot = this.menuRoot.folders[folderIdx1].folders[folderIdx2];
+        }
+        if (nn == 3) {
+            var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
+            var folderIdx2 = this.panels[1].selection - this.menuRoot.folders[folderIdx1].items.length;
+            var folderIdx3 = this.panels[2].selection - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
+            action = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].afterOpen;
+            txt = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].path;
+            subRoot = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3];
+        }
+        if (nn == 4) {
+            var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
+            var folderIdx2 = this.panels[1].selection - this.menuRoot.folders[folderIdx1].items.length;
+            var folderIdx3 = this.panels[2].selection - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
+            var folderIdx4 = this.panels[3].selection - this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].items.length;
+            action = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].afterOpen;
+            this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].path;
+            subRoot = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4];
+        }
+        this.reFillMenulevel(this.panels[nn].menuContent, subRoot, this.panels[nn].selection);
+        this.panels[nn].menuTextHead.innerText = txt;
+        if (action)
+            action();
     };
     ZMainMenu.prototype.fillFrom = function (prj) {
         this.menuRoot.items.length = 0;
@@ -4510,6 +4361,35 @@ var ZMainMenu = (function () {
         };
     };
     return ZMainMenu;
+}());
+var SingleMenuPanel = (function () {
+    function SingleMenuPanel(menuPaneDivID, menuTextHeadID, menuContentID) {
+        this.selection = 0;
+        var el = document.getElementById(menuPaneDivID);
+        if (el) {
+            this.levelStyle = el.style;
+        }
+        el = document.getElementById(menuTextHeadID);
+        if (el) {
+            this.menuTextHead = el;
+        }
+        el = document.getElementById(menuContentID);
+        if (el) {
+            this.menuContent = el;
+        }
+    }
+    SingleMenuPanel.prototype.off = function () {
+        this.levelStyle.width = '0cm';
+    };
+    SingleMenuPanel.prototype.moveSelection = function (row) {
+        for (var i = 0; i < this.menuContent.childNodes.length; i++) {
+            var child = this.menuContent.childNodes[i];
+            child.dataset['rowSelection'] = 'no';
+        }
+        var child = this.menuContent.childNodes[row];
+        child.dataset['rowSelection'] = 'yes';
+    };
+    return SingleMenuPanel;
 }());
 console.log('MuzXBox v1.01');
 var midiDrumPitchShift = 23;
@@ -4714,7 +4594,6 @@ var MeasureInfoRenderer = (function () {
                         x: time * ratioDuration, y: -64, css: 'barNumber textSize64',
                         text: (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)
                     });
-                    console.log('singlemeasuresTimelineAnchor64', i);
                 }
             }
             this.measuresMeasureInfoAnchor64.content.push(singlemeasuresTimelineAnchor64);
