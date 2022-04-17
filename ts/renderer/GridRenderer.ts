@@ -33,8 +33,8 @@ class GridRenderer {
 		}
 
 	}
-	drawSchedule(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, rhythmPattern: ZvoogMeter[]) {//}, menuButton: TileRectangle) {
-		let songDuration = scheduleDuration(song);
+	drawGrid(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, rhythmPattern: ZvoogMeter[]) {//}, menuButton: TileRectangle) {
+		//let songDuration = scheduleDuration(song);
 
 		let time = 0;
 		song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;

@@ -8,17 +8,7 @@ class MuzXBox {
 	zrenderer: ZRender;
 	zInputDeviceHandler: ZInputDeviceHandler;
 	zMainMenu: ZMainMenu;
-	itemImportMIDI:ZMenuItem={
-		label: 'import midi'
-		, action: () => {
-			var me: MuzXBox = window['MZXB'] as MuzXBox;
-			if (me) {
-				me.testFSmidi();
-			}
-		}
-		, autoclose: true
-		, icon: ''
-	};
+	
 	menuButton: TileRectangle = {
 		x: 0
 		, y: 0

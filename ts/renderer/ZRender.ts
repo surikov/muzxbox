@@ -12,9 +12,9 @@ class ZRender {
 	ratioThickness = 3;
 	sizeRatio = 2;
 
-	rhythmPatternTest = [
-		{ count: 1, division: 16 }, { count: 1, division: 16 }
-		, { count: 1, division: 4 }, { count: 1, division: 8 }
+	rhythmPatternDefault:ZvoogMeter[] = [
+		{ count: 1, division: 8 }, { count: 1, division: 8 }
+		, { count: 1, division: 8 }, { count: 1, division: 8 }
 
 	];
 
@@ -117,7 +117,13 @@ class ZRender {
 		this.clearAnchorsContent(songDuration);
 		this.measureInfoRenderer.fillMeasureInfo(song, this.ratioDuration, this.ratioThickness);
 		this.pianoRollRenderer.drawSchedule(song, this.ratioDuration, this.ratioThickness);
-		this.gridRenderer.drawSchedule(this,song, this.ratioDuration, this.ratioThickness,this.rhythmPatternTest);
+		let rhythm:ZvoogMeter[]=this.rhythmPatternDefault;
+		if(song.rhythm){
+			if(song.rhythm.length){
+				rhythm=song.rhythm;
+			}
+		}
+		this.gridRenderer.drawGrid(this,song, this.ratioDuration, this.ratioThickness,rhythm);
 		this.timeLineRenderer.drawSchedule(this,song, this.ratioDuration, this.ratioThickness);
 		let time = 0;
 		song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;

@@ -262,10 +262,7 @@ declare class ZRender {
     ratioDuration: number;
     ratioThickness: number;
     sizeRatio: number;
-    rhythmPatternTest: {
-        count: number;
-        division: number;
-    }[];
+    rhythmPatternDefault: ZvoogMeter[];
     measureInfoRenderer: MeasureInfoRenderer;
     pianoRollRenderer: PianoRollRenderer;
     gridRenderer: GridRenderer;
@@ -636,6 +633,7 @@ declare type ZvoogSchedule = {
     measures: ZvoogMeasure[];
     harmony: ZvoogProgression;
     obverseTrackFilter?: number;
+    rhythm?: ZvoogMeter[];
 };
 declare function scheduleDuration(song: ZvoogSchedule): number;
 declare type ZvoogFilterSetting = {
@@ -981,9 +979,11 @@ declare type ZMenuFolder = {
 };
 declare class ZMainMenu {
     muzXBox: MuzXBox;
+    layerSelector: LayerSelector;
     currentLevel: number;
     menuRoot: ZMenuFolder;
     panels: SingleMenuPanel[];
+    songFolder: ZMenuFolder;
     constructor(from: MuzXBox);
     openNextLevel(): void;
     backPreLevel(): void;
@@ -993,17 +993,8 @@ declare class ZMainMenu {
     createActionClick(nn: number, item: ZMenuItem): () => void;
     reFillMenulevel(menuContent: HTMLElement, subRoot: ZMenuFolder, selectedLevel: number): void;
     open_nn_level(nn: number): void;
+    reBuildMenu(): void;
     fillFrom(prj: ZvoogSchedule): void;
-    upSongFx(fx: number): () => void;
-    upSongFxParam(fx: number, param: number): () => void;
-    upTrack(trk: number): () => void;
-    upTrackFx(trk: number, fx: number): () => void;
-    upTrackFxParam(trk: number, fx: number, param: number): () => void;
-    upVox(trk: number, vox: number): () => void;
-    upVoxFx(trk: number, vox: number, fx: number): () => void;
-    upVoxFxParam(trk: number, vox: number, fx: number, param: number): () => void;
-    upVoxProvider(trk: number, vox: number): () => void;
-    upVoxProviderParam(trk: number, vox: number, param: number): () => void;
 }
 declare class SingleMenuPanel {
     levelStyle: CSSStyleDeclaration;
@@ -1021,7 +1012,6 @@ declare class MuzXBox {
     zrenderer: ZRender;
     zInputDeviceHandler: ZInputDeviceHandler;
     zMainMenu: ZMainMenu;
-    itemImportMIDI: ZMenuItem;
     menuButton: TileRectangle;
     constructor();
     initAll(): void;
@@ -1086,7 +1076,7 @@ declare class GridRenderer {
     attach(zRender: ZRender): void;
     initGridAnchors(zRender: ZRender): void;
     clearAnchorsContent(zRender: ZRender, songDuration: number): void;
-    drawSchedule(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, rhythmPattern: ZvoogMeter[]): void;
+    drawGrid(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, rhythmPattern: ZvoogMeter[]): void;
 }
 declare class TimeLineRenderer {
     upperSelectionScale: SVGElement;
@@ -1100,4 +1090,18 @@ declare class TimeLineRenderer {
     clearAnchorsContent(zRender: ZRender, songDuration: number): void;
     drawSchedule(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
     drawLevel(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, layerAnchor: TileAnchor, textSize: string, yy: number): void;
+}
+declare class LayerSelector {
+    muzXBox: MuzXBox;
+    constructor(from: MuzXBox);
+    upSongFx(fx: number): () => void;
+    upSongFxParam(fx: number, param: number): () => void;
+    upTrack(trk: number): () => void;
+    upTrackFx(trk: number, fx: number): () => void;
+    upTrackFxParam(trk: number, fx: number, param: number): () => void;
+    upVox(trk: number, vox: number): () => void;
+    upVoxFx(trk: number, vox: number, fx: number): () => void;
+    upVoxFxParam(trk: number, vox: number, fx: number, param: number): () => void;
+    upVoxProvider(trk: number, vox: number): () => void;
+    upVoxProviderParam(trk: number, vox: number, param: number): () => void;
 }

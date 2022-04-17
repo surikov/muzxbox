@@ -86,7 +86,7 @@
 		,"renderer/PianoRollRenderer.ts"
 		,"renderer/GridRenderer.ts"
 		,"renderer/TimeLineRenderer.ts"
-		
+		,"menu/LayerSelector.ts"
 		
 	]
 }
