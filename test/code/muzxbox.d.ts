@@ -267,6 +267,7 @@ declare class ZRender {
     pianoRollRenderer: PianoRollRenderer;
     gridRenderer: GridRenderer;
     timeLineRenderer: TimeLineRenderer;
+    focusManager: FocusManagement;
     debugLayerGroup: SVGElement;
     debugAnchor0: TileAnchor;
     debugAnchor1: TileAnchor;
@@ -1104,4 +1105,8 @@ declare class LayerSelector {
     upVoxFxParam(trk: number, vox: number, fx: number, param: number): () => void;
     upVoxProvider(trk: number, vox: number): () => void;
     upVoxProviderParam(trk: number, vox: number, param: number): () => void;
+}
+declare class FocusManagement {
+    focusMarkerLayer: SVGElement;
+    attach(zRender: ZRender): void;
 }

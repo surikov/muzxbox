@@ -1,6 +1,7 @@
 console.log('MuzXBox v1.01');
 class ZInputDeviceHandler {
 	muzXBox: MuzXBox;
+	
 	constructor(from: MuzXBox) {
 		let me = this;
 		this.muzXBox = from;

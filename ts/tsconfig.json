@@ -87,6 +87,7 @@
 		,"renderer/GridRenderer.ts"
 		,"renderer/TimeLineRenderer.ts"
 		,"menu/LayerSelector.ts"
+		,"uiinput/focusManagement.ts"
 		
 	]
 }

@@ -12,7 +12,7 @@ class ZRender {
 	ratioThickness = 3;
 	sizeRatio = 2;
 
-	rhythmPatternDefault:ZvoogMeter[] = [
+	rhythmPatternDefault: ZvoogMeter[] = [
 		{ count: 1, division: 8 }, { count: 1, division: 8 }
 		, { count: 1, division: 8 }, { count: 1, division: 8 }
 
@@ -20,12 +20,13 @@ class ZRender {
 
 	measureInfoRenderer: MeasureInfoRenderer = new MeasureInfoRenderer();
 	pianoRollRenderer: PianoRollRenderer = new PianoRollRenderer();
-	gridRenderer:GridRenderer=new GridRenderer();
-	timeLineRenderer:TimeLineRenderer=new TimeLineRenderer();
+	gridRenderer: GridRenderer = new GridRenderer();
+	timeLineRenderer: TimeLineRenderer = new TimeLineRenderer();
+	focusManager:FocusManagement=new FocusManagement();
 
 	//upperSelectionScale: SVGElement;
 	debugLayerGroup: SVGElement;
-	
+
 
 	debugAnchor0: TileAnchor;
 	debugAnchor1: TileAnchor;
@@ -34,19 +35,19 @@ class ZRender {
 	debugAnchor64: TileAnchor;
 	debugAnchor256: TileAnchor;
 
-	
+
 	/*
 		*/
 
 
 
-	
+
 
 	constructor() {
 		//this.bindLayers();
 	}
 	bindLayers() {
-		
+
 
 		//this.upperSelectionScale= (document.getElementById('upperSelectionScale') as any) as SVGElement;
 		this.debugLayerGroup = (document.getElementById('debugLayerGroup') as any) as SVGElement;
@@ -62,12 +63,13 @@ class ZRender {
 		this.initDebugAnchors();
 		//this.initTimelineAnchors();
 		//this.initMeasureInfoAnchors();
-		
+
 		//this.initGridAnchors();
 		this.measureInfoRenderer.attach(this);
 		this.pianoRollRenderer.attach(this);
 		this.gridRenderer.attach(this);
 		this.timeLineRenderer.attach(this);
+		this.focusManager.attach(this);
 	}
 	initDebugAnchors() {
 		this.debugAnchor0 = TAnchor(0, 0, 1111, 1111, this.zoomMin, this.zoomMax + 1);
@@ -82,10 +84,10 @@ class ZRender {
 			]
 		});
 	}
-	
+
 	/*
 	*/
-	
+
 	clearSingleAnchor(anchor: TileAnchor, songDuration: number) {
 		anchor.content.length = 0;
 		anchor.ww = this.ratioDuration * songDuration;
@@ -95,7 +97,7 @@ class ZRender {
 		let anchors: TileAnchor[] = [
 			this.debugAnchor0, this.debugAnchor1, this.debugAnchor4, this.debugAnchor16, this.debugAnchor64, this.debugAnchor256
 			//, this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256
-			
+
 			//, this.gridAnchor1, this.gridAnchor4, this.gridAnchor16, this.gridAnchor64, this.gridAnchor256
 		];
 
@@ -106,7 +108,7 @@ class ZRender {
 		this.measureInfoRenderer.clearAnchorsContent(this, songDuration);
 		this.pianoRollRenderer.clearAnchorsContent(this, songDuration);
 		this.timeLineRenderer.clearAnchorsContent(this, songDuration);
-		
+
 		this.tileLevel.innerWidth = this.ratioDuration * songDuration * this.tileLevel.tapSize;
 		this.tileLevel.innerHeight = 128 * this.ratioThickness * this.tileLevel.tapSize;
 
@@ -117,23 +119,23 @@ class ZRender {
 		this.clearAnchorsContent(songDuration);
 		this.measureInfoRenderer.fillMeasureInfo(song, this.ratioDuration, this.ratioThickness);
 		this.pianoRollRenderer.drawSchedule(song, this.ratioDuration, this.ratioThickness);
-		let rhythm:ZvoogMeter[]=this.rhythmPatternDefault;
-		if(song.rhythm){
-			if(song.rhythm.length){
-				rhythm=song.rhythm;
+		let rhythm: ZvoogMeter[] = this.rhythmPatternDefault;
+		if (song.rhythm) {
+			if (song.rhythm.length) {
+				rhythm = song.rhythm;
 			}
 		}
-		this.gridRenderer.drawGrid(this,song, this.ratioDuration, this.ratioThickness,rhythm);
-		this.timeLineRenderer.drawSchedule(this,song, this.ratioDuration, this.ratioThickness);
+		this.gridRenderer.drawGrid(this, song, this.ratioDuration, this.ratioThickness, rhythm);
+		this.timeLineRenderer.drawSchedule(this, song, this.ratioDuration, this.ratioThickness);
 		let time = 0;
 		song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
 
-			
+
 			time = time + measureDuration;
 		}
 		this.tileLevel.resetModel();
 	}
-	
+
 }

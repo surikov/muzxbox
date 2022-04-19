@@ -1360,6 +1360,7 @@ var ZRender = (function () {
         this.pianoRollRenderer = new PianoRollRenderer();
         this.gridRenderer = new GridRenderer();
         this.timeLineRenderer = new TimeLineRenderer();
+        this.focusManager = new FocusManagement();
     }
     ZRender.prototype.bindLayers = function () {
         this.debugLayerGroup = document.getElementById('debugLayerGroup');
@@ -1371,6 +1372,7 @@ var ZRender = (function () {
         this.pianoRollRenderer.attach(this);
         this.gridRenderer.attach(this);
         this.timeLineRenderer.attach(this);
+        this.focusManager.attach(this);
     };
     ZRender.prototype.initDebugAnchors = function () {
         this.debugAnchor0 = TAnchor(0, 0, 1111, 1111, this.zoomMin, this.zoomMax + 1);
@@ -4224,11 +4226,9 @@ var ZMainMenu = (function () {
         });
         this.menuRoot.folders.push(this.songFolder);
         this.menuRoot.folders.push({
-            path: "Rhythm patterns", icon: "", folders: [],
-            items: [
+            path: "Rhythm patterns", icon: "", folders: [], items: [
                 {
-                    label: 'plain 1/16', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/16', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 1, division: 16 }, { count: 1, division: 16 },
                             { count: 1, division: 16 }, { count: 1, division: 16 },
@@ -4239,8 +4239,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/8', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/8', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 1, division: 8 }, { count: 1, division: 8 },
                             { count: 1, division: 8 }, { count: 1, division: 8 }
@@ -4249,8 +4248,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'swing 1/8', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'swing 1/8', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 5, division: 32 }, { count: 3, division: 32 },
                             { count: 5, division: 32 }, { count: 3, division: 32 }
@@ -5188,5 +5186,13 @@ var LayerSelector = (function () {
         };
     };
     return LayerSelector;
+}());
+var FocusManagement = (function () {
+    function FocusManagement() {
+    }
+    FocusManagement.prototype.attach = function (zRender) {
+        this.focusMarkerLayer = document.getElementById('gridLayerGroup');
+    };
+    return FocusManagement;
 }());
 //# sourceMappingURL=muzxbox.js.map
