@@ -4438,14 +4438,7 @@ var MuzXBox = (function () {
     };
     MuzXBox.prototype.setGrid = function (meters) {
         this.currentSchedule.rhythm = meters;
-        this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor1, this.zrenderer.gridRenderer.gridLayerGroup);
-        this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor4, this.zrenderer.gridRenderer.gridLayerGroup);
-        this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor16, this.zrenderer.gridRenderer.gridLayerGroup);
-        this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor64, this.zrenderer.gridRenderer.gridLayerGroup);
-        this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor256, this.zrenderer.gridRenderer.gridLayerGroup);
-        this.zrenderer.gridRenderer.drawGrid(this.zrenderer, this.currentSchedule, this.zrenderer.ratioDuration, this.zrenderer.ratioThickness, this.currentSchedule.rhythm);
-        this.zrenderer.tileLevel.allTilesOK = false;
-        console.log(this.zrenderer.gridRenderer.gridLayerGroup);
+        this.zrenderer.gridRenderer.reSetGrid(this.zrenderer, meters, this.currentSchedule);
     };
     MuzXBox.prototype.testFSmidi = function () {
         var test = new MIDIFileImporter();
@@ -5040,6 +5033,15 @@ var GridRenderer = (function () {
             time = time + measureDuration;
         }
         zRender.tileLevel.autoID(this.gridLayer.anchors);
+    };
+    GridRenderer.prototype.reSetGrid = function (zrenderer, meters, currentSchedule) {
+        zrenderer.tileLevel.resetAnchor(zrenderer.gridRenderer.gridAnchor1, zrenderer.gridRenderer.gridLayerGroup);
+        zrenderer.tileLevel.resetAnchor(zrenderer.gridRenderer.gridAnchor4, zrenderer.gridRenderer.gridLayerGroup);
+        zrenderer.tileLevel.resetAnchor(zrenderer.gridRenderer.gridAnchor16, zrenderer.gridRenderer.gridLayerGroup);
+        zrenderer.tileLevel.resetAnchor(zrenderer.gridRenderer.gridAnchor64, zrenderer.gridRenderer.gridLayerGroup);
+        zrenderer.tileLevel.resetAnchor(zrenderer.gridRenderer.gridAnchor256, zrenderer.gridRenderer.gridLayerGroup);
+        zrenderer.gridRenderer.drawGrid(zrenderer, currentSchedule, zrenderer.ratioDuration, zrenderer.ratioThickness, meters);
+        zrenderer.tileLevel.allTilesOK = false;
     };
     return GridRenderer;
 }());

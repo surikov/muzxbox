@@ -136,6 +136,7 @@ class ZRender {
 			time = time + measureDuration;
 		}
 		this.tileLevel.resetModel();
+		this.focusManager.reSetFocus(this,song);
 	}
 
 }

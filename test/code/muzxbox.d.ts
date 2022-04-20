@@ -1079,6 +1079,7 @@ declare class GridRenderer {
     initGridAnchors(zRender: ZRender): void;
     clearAnchorsContent(zRender: ZRender, songDuration: number): void;
     drawGrid(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, rhythmPattern: ZvoogMeter[]): void;
+    reSetGrid(zrenderer: ZRender, meters: ZvoogMeter[], currentSchedule: ZvoogSchedule): void;
 }
 declare class TimeLineRenderer {
     upperSelectionScale: SVGElement;

@@ -120,4 +120,18 @@ class GridRenderer {
 		zRender.tileLevel.autoID(this.gridLayer.anchors);
 		//console.log(this.gridAnchor4);
 	}
+	reSetGrid(zrenderer: ZRender,meters: ZvoogMeter[],currentSchedule:ZvoogSchedule) {
+		zrenderer.tileLevel.resetAnchor(this.gridAnchor1, this.gridLayerGroup);
+		zrenderer.tileLevel.resetAnchor(this.gridAnchor4, this.gridLayerGroup);
+		zrenderer.tileLevel.resetAnchor(this.gridAnchor16, this.gridLayerGroup);
+		zrenderer.tileLevel.resetAnchor(this.gridAnchor64, this.gridLayerGroup);
+		zrenderer.tileLevel.resetAnchor(this.gridAnchor256, this.gridLayerGroup);
+		this.drawGrid(zrenderer
+			, currentSchedule
+			, zrenderer.ratioDuration
+			, zrenderer.ratioThickness
+			, meters);
+		zrenderer.tileLevel.allTilesOK=false;
+		//console.log(this.zrenderer.gridRenderer.gridLayerGroup);
+	}
 }
