@@ -1162,11 +1162,12 @@ class TileLevel {
 		this.slideToContentPosition();
 		this.allTilesOK = false;
 	}
-	resetAnchor(anchor: TileAnchor, svgGroup: SVGElement) {
+	resetAnchor(anchor: TileAnchor, fromSVGGroup: SVGElement) {
 		var gid: string = anchor.id ? anchor.id : '';
-		let xg: SVGElement | null = this.childExists(svgGroup, gid);
+		let xg: SVGElement | null = this.childExists(fromSVGGroup, gid);
 		if (xg) {
-			svgGroup.removeChild(xg);
+			fromSVGGroup.removeChild(xg);
+			//console.log('resetAnchor',anchor,xg);
 		}
 	}
 	redrawAnchor(anchor: TileAnchor) {

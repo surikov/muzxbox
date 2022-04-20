@@ -172,34 +172,40 @@ class ZMainMenu {
 			path: "Rhythm patterns", icon: "", folders: [], items: [
 				{
 					label: 'plain 1/16', autoclose: true, icon: '', action: () => {
-						let rr:ZvoogMeter[] = [
+						let rr: ZvoogMeter[] = [
 							{ count: 1, division: 16 }, { count: 1, division: 16 }
 							, { count: 1, division: 16 }, { count: 1, division: 16 }
 							, { count: 1, division: 16 }, { count: 1, division: 16 }
 							, { count: 1, division: 16 }, { count: 1, division: 16 }
-					
+
 						];
-						console.log('plain 1/16',rr);
+						console.log('plain 1/16', rr);
+						var me: MuzXBox = window['MZXB'] as MuzXBox;
+						if (me) { me.setGrid(rr); }
 					}
 				}
-				,{
+				, {
 					label: 'plain 1/8', autoclose: true, icon: '', action: () => {
-						let rr:ZvoogMeter[] = [
+						let rr: ZvoogMeter[] = [
 							{ count: 1, division: 8 }, { count: 1, division: 8 }
 							, { count: 1, division: 8 }, { count: 1, division: 8 }
-					
+
 						];
-						console.log('plain 1/8',rr);
+						console.log('plain 1/8', rr);
+						var me: MuzXBox = window['MZXB'] as MuzXBox;
+						if (me) { me.setGrid(rr); }
 					}
 				}
-				,{
+				, {
 					label: 'swing 1/8', autoclose: true, icon: '', action: () => {
-						let rr:ZvoogMeter[] = [
+						let rr: ZvoogMeter[] = [
 							{ count: 5, division: 32 }, { count: 3, division: 32 }
 							, { count: 5, division: 32 }, { count: 3, division: 32 }
-					
+
 						];
-						console.log('swing 1/8',rr);
+						console.log('swing 1/8', rr);
+						var me: MuzXBox = window['MZXB'] as MuzXBox;
+						if (me) { me.setGrid(rr); }
 					}
 				}
 			], afterOpen: () => { }

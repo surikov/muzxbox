@@ -8,7 +8,7 @@ class MuzXBox {
 	zrenderer: ZRender;
 	zInputDeviceHandler: ZInputDeviceHandler;
 	zMainMenu: ZMainMenu;
-	
+
 	menuButton: TileRectangle = {
 		x: 0
 		, y: 0
@@ -56,7 +56,7 @@ class MuzXBox {
 				, progression: []
 			}
 		};
-		this.currentSchedule=emptySchedule;
+		this.currentSchedule = emptySchedule;
 		this.zrenderer.drawSchedule(emptySchedule);//, this.menuButton);
 		this.zMainMenu.fillFrom(this.currentSchedule);
 	}
@@ -67,6 +67,21 @@ class MuzXBox {
 	closeMenu() {
 		(document.getElementById('menuDiv1') as any).style.width = '0%';
 	}*/
+	setGrid(meters: ZvoogMeter[]) {
+		this.currentSchedule.rhythm = meters;
+		this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor1, this.zrenderer.gridRenderer.gridLayerGroup);
+		this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor4, this.zrenderer.gridRenderer.gridLayerGroup);
+		this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor16, this.zrenderer.gridRenderer.gridLayerGroup);
+		this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor64, this.zrenderer.gridRenderer.gridLayerGroup);
+		this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor256, this.zrenderer.gridRenderer.gridLayerGroup);
+		this.zrenderer.gridRenderer.drawGrid(this.zrenderer
+			, this.currentSchedule
+			, this.zrenderer.ratioDuration
+			, this.zrenderer.ratioThickness
+			, this.currentSchedule.rhythm);
+		this.zrenderer.tileLevel.allTilesOK=false;
+		console.log(this.zrenderer.gridRenderer.gridLayerGroup);
+	}
 	testFSmidi() {
 		let test: ZvoogStore = new MIDIFileImporter();
 		test.readSongData("any", function (result: ZvoogSchedule | null): void {
@@ -74,7 +89,7 @@ class MuzXBox {
 				var me: MuzXBox = window['MZXB'] as MuzXBox;
 				//console.log(me);
 				if (me) {
-					me.currentSchedule=result;
+					me.currentSchedule = result;
 					me.zrenderer.drawSchedule(result);//, me.menuButton);
 					me.zMainMenu.fillFrom(result);
 				}
@@ -88,7 +103,7 @@ class MuzXBox {
 				var me: MuzXBox = window['MZXB'] as MuzXBox;
 				if (me) {
 					console.log(result);
-					me.currentSchedule=result;
+					me.currentSchedule = result;
 					me.zrenderer.drawSchedule(result);//, me.menuButton);
 				}
 			}

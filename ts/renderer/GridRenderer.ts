@@ -1,27 +1,29 @@
 class GridRenderer {
 	gridLayerGroup: SVGElement;
-	gridAnchor0: TileAnchor;
+	//gridAnchor0: TileAnchor;
 	gridAnchor1: TileAnchor;
 	gridAnchor4: TileAnchor;
 	gridAnchor16: TileAnchor;
 	gridAnchor64: TileAnchor;
 	gridAnchor256: TileAnchor;
+	gridLayer: TileLayerDefinition;
 	attach(zRender: ZRender) {
 		this.gridLayerGroup = (document.getElementById('gridLayerGroup') as any) as SVGElement;
 		this.initGridAnchors(zRender);
 	}
 	initGridAnchors(zRender: ZRender) {
-		this.gridAnchor0 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomMax + 1);
+		//this.gridAnchor0 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomMax + 1);
 		this.gridAnchor1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
 		this.gridAnchor4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
 		this.gridAnchor16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
 		this.gridAnchor64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar);
 		this.gridAnchor256 = TAnchor(0, 0, 1111, 1111, zRender.zoomFar, zRender.zoomMax + 1);
-		zRender.layers.push({
+		this.gridLayer = {
 			g: this.gridLayerGroup, anchors: [
-				this.gridAnchor1, this.gridAnchor4, this.gridAnchor16, this.gridAnchor64, this.gridAnchor256, this.gridAnchor0
+				this.gridAnchor1, this.gridAnchor4, this.gridAnchor16, this.gridAnchor64, this.gridAnchor256//, this.gridAnchor0
 			]
-		});
+		};
+		zRender.layers.push(this.gridLayer);
 	}
 	clearAnchorsContent(zRender: ZRender, songDuration: number): void {
 		let anchors: TileAnchor[] = [
@@ -36,6 +38,11 @@ class GridRenderer {
 	drawGrid(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, rhythmPattern: ZvoogMeter[]) {//}, menuButton: TileRectangle) {
 		//let songDuration = scheduleDuration(song);
 
+		this.gridAnchor1.content = [];
+		this.gridAnchor4.content = [];
+		this.gridAnchor16.content = [];
+		this.gridAnchor64.content = [];
+		this.gridAnchor256.content = [];
 		let time = 0;
 		song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
 		for (let mm = 0; mm < song.measures.length; mm++) {
@@ -90,9 +97,9 @@ class GridRenderer {
 			let position: ZvoogMeter = rhythmPattern[stepNN];
 			while (DUU(position).lessThen(song.measures[mm].meter)) {
 				let positionDuration = meter2seconds(song.measures[mm].tempo, position);
-				let css='pitchLine4';
-				if(stepNN == rhythmPattern.length-1){
-					css='pitchWideLine4';
+				let css = 'pitchLine4';
+				if (stepNN == rhythmPattern.length - 1) {
+					css = 'pitchWideLine4';
 				}
 				gridMeasure4.content.push({
 					x1: (time + positionDuration) * ratioDuration
@@ -100,7 +107,7 @@ class GridRenderer {
 					, x2: (time + positionDuration) * ratioDuration
 					, y2: 128 * ratioThickness
 					, css: css
-				});				
+				});
 				stepNN++;
 				if (stepNN >= rhythmPattern.length) {
 					stepNN = 0;
@@ -110,5 +117,7 @@ class GridRenderer {
 
 			time = time + measureDuration;
 		}
+		zRender.tileLevel.autoID(this.gridLayer.anchors);
+		//console.log(this.gridAnchor4);
 	}
 }

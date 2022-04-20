@@ -1095,11 +1095,11 @@ var TileLevel = (function () {
         this.slideToContentPosition();
         this.allTilesOK = false;
     };
-    TileLevel.prototype.resetAnchor = function (anchor, svgGroup) {
+    TileLevel.prototype.resetAnchor = function (anchor, fromSVGGroup) {
         var gid = anchor.id ? anchor.id : '';
-        var xg = this.childExists(svgGroup, gid);
+        var xg = this.childExists(fromSVGGroup, gid);
         if (xg) {
-            svgGroup.removeChild(xg);
+            fromSVGGroup.removeChild(xg);
         }
     };
     TileLevel.prototype.redrawAnchor = function (anchor) {
@@ -4236,6 +4236,10 @@ var ZMainMenu = (function () {
                             { count: 1, division: 16 }, { count: 1, division: 16 }
                         ];
                         console.log('plain 1/16', rr);
+                        var me = window['MZXB'];
+                        if (me) {
+                            me.setGrid(rr);
+                        }
                     }
                 },
                 {
@@ -4245,6 +4249,10 @@ var ZMainMenu = (function () {
                             { count: 1, division: 8 }, { count: 1, division: 8 }
                         ];
                         console.log('plain 1/8', rr);
+                        var me = window['MZXB'];
+                        if (me) {
+                            me.setGrid(rr);
+                        }
                     }
                 },
                 {
@@ -4254,6 +4262,10 @@ var ZMainMenu = (function () {
                             { count: 5, division: 32 }, { count: 3, division: 32 }
                         ];
                         console.log('swing 1/8', rr);
+                        var me = window['MZXB'];
+                        if (me) {
+                            me.setGrid(rr);
+                        }
                     }
                 }
             ], afterOpen: function () { }
@@ -4423,6 +4435,17 @@ var MuzXBox = (function () {
         this.currentSchedule = emptySchedule;
         this.zrenderer.drawSchedule(emptySchedule);
         this.zMainMenu.fillFrom(this.currentSchedule);
+    };
+    MuzXBox.prototype.setGrid = function (meters) {
+        this.currentSchedule.rhythm = meters;
+        this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor1, this.zrenderer.gridRenderer.gridLayerGroup);
+        this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor4, this.zrenderer.gridRenderer.gridLayerGroup);
+        this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor16, this.zrenderer.gridRenderer.gridLayerGroup);
+        this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor64, this.zrenderer.gridRenderer.gridLayerGroup);
+        this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor256, this.zrenderer.gridRenderer.gridLayerGroup);
+        this.zrenderer.gridRenderer.drawGrid(this.zrenderer, this.currentSchedule, this.zrenderer.ratioDuration, this.zrenderer.ratioThickness, this.currentSchedule.rhythm);
+        this.zrenderer.tileLevel.allTilesOK = false;
+        console.log(this.zrenderer.gridRenderer.gridLayerGroup);
     };
     MuzXBox.prototype.testFSmidi = function () {
         var test = new MIDIFileImporter();
@@ -4928,17 +4951,17 @@ var GridRenderer = (function () {
         this.initGridAnchors(zRender);
     };
     GridRenderer.prototype.initGridAnchors = function (zRender) {
-        this.gridAnchor0 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomMax + 1);
         this.gridAnchor1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
         this.gridAnchor4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
         this.gridAnchor16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
         this.gridAnchor64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar);
         this.gridAnchor256 = TAnchor(0, 0, 1111, 1111, zRender.zoomFar, zRender.zoomMax + 1);
-        zRender.layers.push({
+        this.gridLayer = {
             g: this.gridLayerGroup, anchors: [
-                this.gridAnchor1, this.gridAnchor4, this.gridAnchor16, this.gridAnchor64, this.gridAnchor256, this.gridAnchor0
+                this.gridAnchor1, this.gridAnchor4, this.gridAnchor16, this.gridAnchor64, this.gridAnchor256
             ]
-        });
+        };
+        zRender.layers.push(this.gridLayer);
     };
     GridRenderer.prototype.clearAnchorsContent = function (zRender, songDuration) {
         var anchors = [
@@ -4949,6 +4972,11 @@ var GridRenderer = (function () {
         }
     };
     GridRenderer.prototype.drawGrid = function (zRender, song, ratioDuration, ratioThickness, rhythmPattern) {
+        this.gridAnchor1.content = [];
+        this.gridAnchor4.content = [];
+        this.gridAnchor16.content = [];
+        this.gridAnchor64.content = [];
+        this.gridAnchor256.content = [];
         var time = 0;
         song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
@@ -5011,6 +5039,7 @@ var GridRenderer = (function () {
             }
             time = time + measureDuration;
         }
+        zRender.tileLevel.autoID(this.gridLayer.anchors);
     };
     return GridRenderer;
 }());
@@ -5191,7 +5220,12 @@ var FocusManagement = (function () {
     function FocusManagement() {
     }
     FocusManagement.prototype.attach = function (zRender) {
-        this.focusMarkerLayer = document.getElementById('gridLayerGroup');
+        this.focusMarkerLayer = document.getElementById('focusMarkerLayer');
+        this.focusAnchor1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
+        this.focusAnchor4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
+        this.focusAnchor16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
+        this.focusAnchor64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar);
+        this.focusAnchor256 = TAnchor(0, 0, 1111, 1111, zRender.zoomFar, zRender.zoomMax + 1);
     };
     return FocusManagement;
 }());

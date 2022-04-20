@@ -123,7 +123,7 @@ declare class TileLevel {
     setModel(layers: TileModelLayer[]): void;
     resetModelAndRun(afterDone: () => void): void;
     resetModel(): void;
-    resetAnchor(anchor: TileAnchor, svgGroup: SVGElement): void;
+    resetAnchor(anchor: TileAnchor, fromSVGGroup: SVGElement): void;
     redrawAnchor(anchor: TileAnchor): boolean;
     removeFromTree(anchor: TileAnchor, parentSVG: SVGElement, layer: TileLayerDefinition): boolean;
     startLoop(): void;
@@ -1017,6 +1017,7 @@ declare class MuzXBox {
     constructor();
     initAll(): void;
     createUI(): void;
+    setGrid(meters: ZvoogMeter[]): void;
     testFSmidi(): void;
     testFSmxml(): void;
     testFS(): void;
@@ -1068,12 +1069,12 @@ declare class PianoRollRenderer {
 }
 declare class GridRenderer {
     gridLayerGroup: SVGElement;
-    gridAnchor0: TileAnchor;
     gridAnchor1: TileAnchor;
     gridAnchor4: TileAnchor;
     gridAnchor16: TileAnchor;
     gridAnchor64: TileAnchor;
     gridAnchor256: TileAnchor;
+    gridLayer: TileLayerDefinition;
     attach(zRender: ZRender): void;
     initGridAnchors(zRender: ZRender): void;
     clearAnchorsContent(zRender: ZRender, songDuration: number): void;
@@ -1108,5 +1109,10 @@ declare class LayerSelector {
 }
 declare class FocusManagement {
     focusMarkerLayer: SVGElement;
+    focusAnchor1: TileAnchor;
+    focusAnchor4: TileAnchor;
+    focusAnchor16: TileAnchor;
+    focusAnchor64: TileAnchor;
+    focusAnchor256: TileAnchor;
     attach(zRender: ZRender): void;
 }
