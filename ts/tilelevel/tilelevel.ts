@@ -54,6 +54,8 @@ class TileLevel {
 
 	mouseDownMode: boolean = false;
 
+	
+
 	get allTilesOK(): boolean {
 		return this._allTilesOK;
 	}

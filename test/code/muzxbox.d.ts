@@ -1,6 +1,7 @@
 declare class ZInputDeviceHandler {
     muzXBox: MuzXBox;
     constructor(from: MuzXBox);
+    bindEvents(): void;
     processKeyboardEvent(keyboardEvent: KeyboardEvent): void;
     processKeyX(): void;
     processKeyY(): void;
@@ -277,6 +278,7 @@ declare class ZRender {
     debugAnchor256: TileAnchor;
     constructor();
     bindLayers(): void;
+    levelOfDetails(zz: number): 1 | 4 | 16 | 64 | 256;
     initUI(): void;
     initDebugAnchors(): void;
     clearSingleAnchor(anchor: TileAnchor, songDuration: number): void;
@@ -1110,10 +1112,16 @@ declare class LayerSelector {
 }
 declare class FocusManagement {
     focusMarkerLayer: SVGElement;
-    focusAnchor1: TileAnchor;
-    focusAnchor4: TileAnchor;
-    focusAnchor16: TileAnchor;
-    focusAnchor64: TileAnchor;
-    focusAnchor256: TileAnchor;
+    focusAnchor: TileAnchor;
+    focusLayer: TileLayerDefinition;
+    levelOfDetails: number;
     attach(zRender: ZRender): void;
+    addSpot(): void;
+    reSetFocus(zrenderer: ZRender, song: ZvoogSchedule): void;
+    spotUp(): void;
+    spotDown(): void;
+    spotLeft(): void;
+    spotRight(): void;
+    spotReset(): void;
+    spotSelectA(): void;
 }

@@ -1,13 +1,26 @@
 console.log('MuzXBox v1.01');
 class ZInputDeviceHandler {
 	muzXBox: MuzXBox;
-	
+
 	constructor(from: MuzXBox) {
 		let me = this;
 		this.muzXBox = from;
 		window.addEventListener("keydown", function (keyboardEvent: KeyboardEvent) {
 			me.processKeyboardEvent(keyboardEvent);
 		});
+
+	}
+	bindEvents() {
+		var lastLevelOfDetails = 1;
+		this.muzXBox.zrenderer.tileLevel.afterZoomCallback = () => {
+			var curLOD = this.muzXBox.zrenderer.levelOfDetails(this.muzXBox.zrenderer.tileLevel.translateZ);
+			if (curLOD != lastLevelOfDetails) {
+				lastLevelOfDetails = curLOD;
+				new CannyDo().start(50, () => {
+					console.log('run afterZoomCallback', lastLevelOfDetails);
+				});
+			}
+		};
 	}
 	processKeyboardEvent(keyboardEvent: KeyboardEvent) {
 		//console.log(keyboardEvent.code);
@@ -98,8 +111,9 @@ class ZInputDeviceHandler {
 		if (this.muzXBox.zMainMenu.currentLevel) {
 			//console.log('skip');
 		} else {
-			let nn: number = this.muzXBox.zrenderer.tileLevel.translateX - this.muzXBox.zrenderer.tileLevel.translateZ * 25;
-			this.changePositionTo(nn, this.muzXBox.zrenderer.tileLevel.translateY);
+			//let nn: number = this.muzXBox.zrenderer.tileLevel.translateX - this.muzXBox.zrenderer.tileLevel.translateZ * 25;
+			//this.changePositionTo(nn, this.muzXBox.zrenderer.tileLevel.translateY);
+			this.muzXBox.zrenderer.focusManager.spotLeft();
 		}
 	}
 	processArrowRight() {
@@ -107,8 +121,9 @@ class ZInputDeviceHandler {
 		if (this.muzXBox.zMainMenu.currentLevel) {
 			//console.log('skip');
 		} else {
-			let nn: number = this.muzXBox.zrenderer.tileLevel.translateX + this.muzXBox.zrenderer.tileLevel.translateZ * 25;
-			this.changePositionTo(nn, this.muzXBox.zrenderer.tileLevel.translateY);
+			//let nn: number = this.muzXBox.zrenderer.tileLevel.translateX + this.muzXBox.zrenderer.tileLevel.translateZ * 25;
+			//this.changePositionTo(nn, this.muzXBox.zrenderer.tileLevel.translateY);
+			this.muzXBox.zrenderer.focusManager.spotRight();
 		}
 	}
 	processArrowUp() {
@@ -116,8 +131,9 @@ class ZInputDeviceHandler {
 		if (this.muzXBox.zMainMenu.currentLevel) {
 			//console.log('skip');
 		} else {
-			let nn: number = this.muzXBox.zrenderer.tileLevel.translateY - this.muzXBox.zrenderer.tileLevel.translateZ * 25;
-			this.changePositionTo(this.muzXBox.zrenderer.tileLevel.translateX, nn);
+			//let nn: number = this.muzXBox.zrenderer.tileLevel.translateY - this.muzXBox.zrenderer.tileLevel.translateZ * 25;
+			//this.changePositionTo(this.muzXBox.zrenderer.tileLevel.translateX, nn);
+			this.muzXBox.zrenderer.focusManager.spotUp();
 		}
 	}
 	processArrowDown() {
@@ -125,8 +141,9 @@ class ZInputDeviceHandler {
 		if (this.muzXBox.zMainMenu.currentLevel) {
 			//console.log('skip');
 		} else {
-			let nn: number = this.muzXBox.zrenderer.tileLevel.translateY + this.muzXBox.zrenderer.tileLevel.translateZ * 25;
-			this.changePositionTo(this.muzXBox.zrenderer.tileLevel.translateX, nn);
+			//let nn: number = this.muzXBox.zrenderer.tileLevel.translateY + this.muzXBox.zrenderer.tileLevel.translateZ * 25;
+			//this.changePositionTo(this.muzXBox.zrenderer.tileLevel.translateX, nn);
+			this.muzXBox.zrenderer.focusManager.spotDown();
 		}
 	}
 

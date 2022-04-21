@@ -44,6 +44,8 @@ class MuzXBox {
 		us.selectMode('wwwwwww');
 		//console.log(us.txt('testText'));
 		us.selectMode('en');
+
+		this.zInputDeviceHandler.bindEvents();
 	}
 	createUI() {
 		var emptySchedule: ZvoogSchedule = {

@@ -22,7 +22,7 @@ class ZRender {
 	pianoRollRenderer: PianoRollRenderer = new PianoRollRenderer();
 	gridRenderer: GridRenderer = new GridRenderer();
 	timeLineRenderer: TimeLineRenderer = new TimeLineRenderer();
-	focusManager:FocusManagement=new FocusManagement();
+	focusManager: FocusManagement = new FocusManagement();
 
 	//upperSelectionScale: SVGElement;
 	debugLayerGroup: SVGElement;
@@ -46,6 +46,7 @@ class ZRender {
 	constructor() {
 		//this.bindLayers();
 	}
+
 	bindLayers() {
 
 
@@ -58,6 +59,25 @@ class ZRender {
 			, this.zoomMin, this.zoomMin, this.zoomMax
 			, this.layers);
 		//this.measureInfoRenderer.attach(this);
+		/*var lastLevelOfDetails = 1;
+		this.tileLevel.afterZoomCallback = () => {
+			var curLOD = this.levelOfDetails(this.tileLevel.translateZ);
+			if (curLOD != lastLevelOfDetails) {
+				lastLevelOfDetails = curLOD;
+				new CannyDo().start(50, () => {
+					console.log('run afterZoomCallback',lastLevelOfDetails);
+				});
+			}
+		};*/
+		
+	}
+
+	levelOfDetails(zz: number) {
+		if (zz < this.zoomNote) { return 1; }
+		if (zz < this.zoomMeasure) { return 4; }
+		if (zz < this.zoomSong) { return 16; }
+		if (zz < this.zoomFar) { return 64; }
+		return 256;
 	}
 	initUI() {
 		this.initDebugAnchors();
@@ -136,7 +156,7 @@ class ZRender {
 			time = time + measureDuration;
 		}
 		this.tileLevel.resetModel();
-		this.focusManager.reSetFocus(this,song);
+		this.focusManager.reSetFocus(this, song);
 	}
 
 }
