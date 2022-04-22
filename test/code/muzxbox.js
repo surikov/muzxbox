@@ -1375,6 +1375,57 @@ var ZRender = (function () {
         this.debugLayerGroup = document.getElementById('debugLayerGroup');
         this.tileLevel = new TileLevel(document.getElementById('contentSVG'), 1000, 1000, this.zoomMin, this.zoomMin, this.zoomMax, this.layers);
     };
+    ZRender.prototype.resetLabel = function (song) {
+        var s1 = '';
+        var s2 = '';
+        var s3 = '';
+        var s4 = '';
+        var obTrFx = song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
+        if (obTrFx < song.tracks.length) {
+            if (song.tracks.length) {
+                var track = song.tracks[obTrFx];
+                var obVxFx = (track.obverseVoiceFilter) ? track.obverseVoiceFilter : 0;
+                if (obVxFx < track.voices.length) {
+                }
+                else {
+                    if (track.filters.length) {
+                        var trfx = track.filters[obVxFx - track.voices.length];
+                        if (trfx.parameters)
+                            if (trfx.parameters.length > 0) {
+                                var trfxparnu = trfx.obverseParameter ? trfx.obverseParameter : 0;
+                                s1 = trfx.parameters[trfxparnu].caption;
+                                s2 = trfx.kind;
+                                s3 = track.title;
+                            }
+                    }
+                }
+            }
+        }
+        else {
+            if (song.filters.length) {
+                var fx = song.filters[obTrFx - song.tracks.length];
+                if (fx.parameters)
+                    if (fx.parameters.length > 0) {
+                        var parnu = fx.obverseParameter ? fx.obverseParameter : 0;
+                        s1 = fx.parameters[parnu].caption;
+                        s2 = fx.kind;
+                    }
+            }
+        }
+        console.log('resetLabel', s4, '/', s3, '/', s2, '/', s1);
+        var i1 = document.getElementById('selectionInfo1');
+        if (i1)
+            i1.innerText = s1;
+        var i2 = document.getElementById('selectionInfo2');
+        if (i2)
+            i2.innerText = s2;
+        var i3 = document.getElementById('selectionInfo3');
+        if (i3)
+            i3.innerText = s3;
+        var i4 = document.getElementById('selectionInfo4');
+        if (i4)
+            i4.innerText = s4;
+    };
     ZRender.prototype.levelOfDetails = function (zz) {
         if (zz < this.zoomNote) {
             return 1;
@@ -1451,6 +1502,7 @@ var ZRender = (function () {
         }
         this.tileLevel.resetModel();
         this.focusManager.reSetFocus(this, song);
+        this.resetLabel(song);
     };
     return ZRender;
 }());

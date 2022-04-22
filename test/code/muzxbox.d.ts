@@ -278,6 +278,7 @@ declare class ZRender {
     debugAnchor256: TileAnchor;
     constructor();
     bindLayers(): void;
+    resetLabel(song: ZvoogSchedule): void;
     levelOfDetails(zz: number): 1 | 4 | 16 | 64 | 256;
     initUI(): void;
     initDebugAnchors(): void;

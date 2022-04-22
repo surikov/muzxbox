@@ -1,6 +1,7 @@
 ::-webkit-scrollbar {
 	display: none;
-  }
+}
+
 html {
 	width: 100%;
 	height: 100%;
@@ -24,14 +25,16 @@ a {
 	color: var(--main-color);
 	text-decoration: none;
 }
-button{
+
+button {
 	background: transparent;
-    border: none !important;
-    font-size:0;
+	border: none !important;
+	font-size: 0;
 	margin: 0px;
 	padding: 0px;
-	outline:none;
+	outline: none;
 }
+
 .contentSVG {
 	width: 100%;
 	height: 100%;
@@ -132,7 +135,7 @@ button{
 	stroke-linecap: round;
 }
 
-.measureBackground{
+.measureBackground {
 	fill: #ffffff;
 	stroke-opacity: 75%;
 }
@@ -143,24 +146,28 @@ button{
 	stroke-opacity: 25%;
 	stroke-linecap: round;
 }
+
 .barLine4 {
 	stroke: #000000;
 	stroke-width: 0.25cm;
 	stroke-opacity: 25%;
 	stroke-linecap: round;
 }
+
 .barLine16 {
 	stroke: #000000;
 	stroke-width: 0.5cm;
 	stroke-opacity: 25%;
 	stroke-linecap: round;
 }
+
 .barLine64 {
 	stroke: #000000;
 	stroke-width: 1cm;
 	stroke-opacity: 25%;
 	stroke-linecap: round;
 }
+
 .barLine256 {
 	stroke: #000000;
 	stroke-width: 2cm;
@@ -174,9 +181,44 @@ button{
 	stroke-opacity: 75%;
 	stroke-linecap: round;
 }
+
 .pitchWideLine4 {
 	stroke: #ffffff;
 	stroke-width: 0.2cm;
 	stroke-opacity: 75%;
 	stroke-linecap: round;
+}
+
+.infoLabelPanel {
+	background-color3: #99ffcc;
+	position: fixed;
+	z-index: -1;
+	transform: rotate(90deg);
+	transform-origin: 0% 0%;
+	left: 100vw;
+	width: 100vh;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+#selectionInfo1 {
+	font-size: 10vh;
+	color: rgba(0, 0, 0, 0.2);
+	text-overflow: ellipsis;
+}
+
+#selectionInfo2 {
+	font-size: 7vh;
+	color: rgba(0, 0, 0, 0.1);
+	top: 3cm;
+}
+
+#selectionInfo3 {
+	font-size: 5vh;
+	color: rgba(0, 0, 0, 0.1);
+}
+#selectionInfo4 {
+	font-size: 3vh;
+	color: rgba(0, 0, 0, 0.1);
 }

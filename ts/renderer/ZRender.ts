@@ -69,9 +69,56 @@ class ZRender {
 				});
 			}
 		};*/
-		
-	}
 
+	}
+	resetLabel(song: ZvoogSchedule) {
+		let s1: string = '';
+		let s2: string = '';
+		let s3: string = '';
+		let s4: string = '';
+		let obTrFx = song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
+		if (obTrFx < song.tracks.length) {
+
+			if (song.tracks.length) {
+				let track = song.tracks[obTrFx];
+				let obVxFx = (track.obverseVoiceFilter) ? track.obverseVoiceFilter : 0;
+				if (obVxFx < track.voices.length) {
+					if (track.voices.length) {
+						let vx: ZvoogVoice = track.voices[obVxFx];
+						vx.obversePerformerFilter;
+					}
+				} else {
+					if (track.filters.length) {
+						let trfx: ZvoogFilterSetting = track.filters[obVxFx - track.voices.length];
+						if (trfx.parameters) if (trfx.parameters.length > 0) {
+							let trfxparnu: number = trfx.obverseParameter ? trfx.obverseParameter : 0;
+							s1 = trfx.parameters[trfxparnu].caption;
+							s2 = trfx.kind;
+							s3 = track.title;
+						}
+					}
+				}
+			}
+		} else {
+			if (song.filters.length) {
+				let fx: ZvoogFilterSetting = song.filters[obTrFx - song.tracks.length];
+				if (fx.parameters) if (fx.parameters.length > 0) {
+					let parnu: number = fx.obverseParameter ? fx.obverseParameter : 0;
+					s1 = fx.parameters[parnu].caption;
+					s2 = fx.kind;
+				}
+			}
+		}
+		console.log('resetLabel', s4, '/', s3, '/', s2, '/', s1);
+		let i1 = document.getElementById('selectionInfo1');
+		if (i1) i1.innerText = s1;
+		let i2 = document.getElementById('selectionInfo2');
+		if (i2) i2.innerText = s2;
+		let i3 = document.getElementById('selectionInfo3');
+		if (i3) i3.innerText = s3;
+		let i4 = document.getElementById('selectionInfo4');
+		if (i4) i4.innerText = s4;
+	}
 	levelOfDetails(zz: number) {
 		if (zz < this.zoomNote) { return 1; }
 		if (zz < this.zoomMeasure) { return 4; }
@@ -147,6 +194,7 @@ class ZRender {
 		}
 		this.gridRenderer.drawGrid(this, song, this.ratioDuration, this.ratioThickness, rhythm);
 		this.timeLineRenderer.drawSchedule(this, song, this.ratioDuration, this.ratioThickness);
+		/*
 		let time = 0;
 		song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
 		for (let mm = 0; mm < song.measures.length; mm++) {
@@ -155,8 +203,10 @@ class ZRender {
 
 			time = time + measureDuration;
 		}
+*/
 		this.tileLevel.resetModel();
 		this.focusManager.reSetFocus(this, song);
+		this.resetLabel(song);
 	}
 
 }

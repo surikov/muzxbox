@@ -2,8 +2,7 @@
 
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport"
-		content="initial-scale=1.0, width=device-width, height=device-height, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
+	<meta name="viewport" content="initial-scale=1.0, width=device-width, height=device-height, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
 	<link rel="stylesheet" type="text/css" href="resources/vars.css">
 	<link rel="stylesheet" type="text/css" href="resources/font/font.css">
 	<link rel="stylesheet" type="text/css" href="resources/base.css">
@@ -13,13 +12,21 @@
 </head>
 
 <body>
-	<!--
-	<p>test 1</p>
-	<p><button onclick='MuzXBox.openMenu();'>test</button></p>
-	<p>test 2</p>
-	-->
-	<svg id="contentSVG" class='contentSVG' viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
-		xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+
+	<div class='infoLabelPanel'>
+		<div id='selectionInfo1'>Test main label with long text</div>
+	</div>
+	<div class='infoLabelPanel'>
+		<div id='selectionInfo2'>Label with long text</div>
+	</div>
+	<div class='infoLabelPanel'>
+		<div id='selectionInfo3'>Third label with long text</div>
+	</div>
+	<div class='infoLabelPanel'>
+		<div id='selectionInfo4'>Some more text</div>
+	</div>
+
+	<svg id="contentSVG" class='contentSVG' viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 		<g id='gridLayerGroup'></g>
 		<g id='bottomTimelineLayerGroup'></g>
 		<g id='upperSelectionScale'></g>
@@ -29,165 +36,54 @@
 		<g id='focusMarkerLayer'></g>
 		<g id='debugLayerGroup'></g>
 	</svg>
-	<!--
-	<div id='menuDiv1' class='mainmenu' onclick='MuzXBox.closeMenu();'>
-		<div id="mydiv">
-			<div id="mydivheader"></div>
-		</div>
-		<div id='menuContentDiv' class='menucontent'>
-			<p>
-				<button onclick='MuzXBox.closeMenu();'>close</button>
-			</p>
-			<p class='menubuttonRow'>
-				Another long string to fill whole width
-			</p>
-			<p class='menubuttonRow'>
-				Second long string to fill whole width
-			</p>
-			<p class='menubuttonRow'>1</p>
-			<p class='menubuttonRow'>2</p>
-			<p class='menubuttonRow'>3</p>
-			<p class='menubuttonRow'>4</p>
-			<p class='menubuttonRow'>5</p>
-			<p class='menubuttonRow'>6</p>
-			<p class='menubuttonRow'>7</p>
-			<p class='menubuttonRow' id='dragstarter'>[[[[[dragtest]]]</p>
-			<p class='menubuttonRow'>8</p>
-			<p class='menubuttonRow'>9</p>
-			<p class='menubuttonRow'>10</p>
-			<p class='menubuttonRow'>11</p>
-			<p class='menubuttonRow'>12</p>
-			<p class='menubuttonRow'>13</p>
-			<p class='menubuttonRow'>14</p>
-			<p class='menubuttonRow'>15</p>
-			<p class='menubuttonRow'>16</p>
-			<p class='menubuttonRow'>17</p>
-			<p class='menubuttonRow'>18</p>
-			<p class='menubuttonRow'>19</p>
-			<p class='menubuttonRow'>20</p>
-			<p class='menubuttonRow'>21</p>
-			<p class='menubuttonRow'>22</p>
-			<p class='menubuttonRow'>23</p>
-			<p class='menubuttonRow'>24</p>
-			<p class='menubuttonRow'>25</p>
-			<p class='menubuttonRow'>26</p>
-			<p class='menubuttonRow'>27</p>
-			<p class='menubuttonRow'>28</p>
-			<p class='menubuttonRow'>29</p>
-			<p class='menubuttonRow'>30</p>
 
-		</div>
-	</div>
--->
 	<div id='menuButtonDiv'>
 		<img id='menuButtonImage' src="resources/y_button.svg" onclick="MZXB.zMainMenu.openNextLevel();" />
-		<!--
-		<img id='menuButtonImage' src="resources/x_button.svg" onclick="MZXB.zInputDeviceHandler.processKeyY();" />
-		<img id='menuButtonImage' src="resources/a_button.svg" onclick="MZXB.zInputDeviceHandler.processKeyY();" />
-		<img id='menuButtonImage' src="resources/b_button.svg" onclick="MZXB.zInputDeviceHandler.processKeyY();" />
-		<img id='menuButtonImage' src="resources/left_button.svg" onclick="MZXB.zInputDeviceHandler.processKeyY();" />
-		<img id='menuButtonImage' src="resources/up_button.svg" onclick="MZXB.zInputDeviceHandler.processKeyY();" />
-		<img id='menuButtonImage' src="resources/down_button.svg" onclick="MZXB.zInputDeviceHandler.processKeyY();" />
-		<img id='menuButtonImage' src="resources/right_button.svg" onclick="MZXB.zInputDeviceHandler.processKeyY();" />
-		<img id='menuButtonImage' src="resources/minus_button.svg" onclick="MZXB.zInputDeviceHandler.processKeyY();" />
-		<img id='menuButtonImage' src="resources/plus_button.svg" onclick="MZXB.zInputDeviceHandler.processKeyY();" />
-		-->
 	</div>
-	
+
 	<div id='menuPaneDiv1' class='menuPane'>
 		<div class='menuHead' onclick="MZXB.zMainMenu.backPreLevel();">
 			<span id='menu1textHead'>header for return back action</span>
 		</div>
-		<div class='menuContent' id='menu1content'>
-			<div class='menuRow' id='menuRow1-0' onclick="MZXB.zInputDeviceHandler.processKeyA();">
-				1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21
-			</div>
-			<div class='menuRow' id='menuRow1-1' onclick="MZXB.zInputDeviceHandler.processKeyA();">
-				dthndrt jdtym dtym dtymdtym
-			</div>
-			<div data-row-selection="yes" class='menuRow' id='menuRow1-2' onclick="MZXB.zInputDeviceHandler.processKeyA();">
-				sdsgn xsssrt saa aaa re
-			</div>
-		</div>
+		<div class='menuContent' id='menu1content'> </div>
 	</div>
 
 	<div id='menuPaneDiv2' class='menuPane'>
 		<div class='menuHead' onclick="MZXB.zMainMenu.backPreLevel();">
 			<span id='menu2textHead'>header for return back action</span>
 		</div>
-		<div class='menuContent' id='menu2content'>
-			<div class='menuRow' id='menuRow2-0' onclick="MZXB.zInputDeviceHandler.processKeyA();">
-				xnrndty mt mtym 
-			</div>
-			<div class='menuRow' id='menuRow2-1' onclick="MZXB.zInputDeviceHandler.processKeyA();">
-				e6uj56eje56j56e w45mdtym
-			</div>
-			<div class='menuRow' id='menuRow2-2' onclick="MZXB.zInputDeviceHandler.processKeyA();">
-				w4y4w6yu4ew6j6j64
-			</div>
-		</div>
+		<div class='menuContent' id='menu2content'> </div>
 	</div>
 
 	<div id='menuPaneDiv3' class='menuPane'>
 		<div class='menuHead' onclick="MZXB.zMainMenu.backPreLevel();">
 			<span id='menu3textHead'>header for return back action</span>
 		</div>
-		<div class='menuContent' id='menu3content'>
-			<div class='menuRow' id='menuRow3-0' onclick="MZXB.zInputDeviceHandler.processKeyA();">
-				xnrndty mt mtym 
-			</div>
-			<div class='menuRow' id='menuRow3-1' onclick="MZXB.zInputDeviceHandler.processKeyA();">
-				e6uj56eje56j56e w45mdtym
-			</div>
-			<div class='menuRow' id='menuRow3-2' onclick="MZXB.zInputDeviceHandler.processKeyA();">
-				w4y4w6yu4ew6j6j64
-			</div>
-		</div>
+		<div class='menuContent' id='menu3content'> </div>
 	</div>
 
 	<div id='menuPaneDiv4' class='menuPane'>
 		<div class='menuHead' onclick="MZXB.zMainMenu.backPreLevel();">
 			<span id='menu4textHead'>header for return back action</span>
 		</div>
-		<div class='menuContent' id='menu4content'>
-			<div class='menuRow' id='menuRow4-0' onclick="MZXB.zInputDeviceHandler.processKeyA();">
-				xnrndty mt mtym 
-			</div>
-			<div class='menuRow' id='menuRow4-1' onclick="MZXB.zInputDeviceHandler.processKeyA();">
-				e6uj56eje56j56e w45mdtym
-			</div>
-			<div class='menuRow' id='menuRow4-3' onclick="MZXB.zInputDeviceHandler.processKeyA();">
-				w4y4w6yu4ew6j6j64
-			</div>
-		</div>
+		<div class='menuContent' id='menu4content'> </div>
 	</div>
 
 	<div id='menuPaneDiv5' class='menuPane'>
 		<div class='menuHead' onclick="MZXB.zMainMenu.backPreLevel();">
 			<span id='menu5textHead'>header for return back action</span>
 		</div>
-		<div class='menuContent' id='menu5content'>
-			<div class='menuRow' id='menuRow5-0' onclick="MZXB.zInputDeviceHandler.processKeyA();">
-				xnrndty mt mtym 
-			</div>
-			<div class='menuRow' id='menuRow5-1' onclick="MZXB.zInputDeviceHandler.processKeyA();">
-				e6uj56eje56j56e w45mdtym
-			</div>
-			<div class='menuRow' id='menuRow5-1' onclick="MZXB.zInputDeviceHandler.processKeyA();">
-				w4y4w6yu4ew6j6j64
-			</div>
-		</div>
+		<div class='menuContent' id='menu5content'> </div>
 	</div>
 
-	
+
 	<script>
-		function waitMBx(){
+		function waitMBx() {
 			console.log('waitMBx');
-			if(window['MZXB']){
-				//console.log(MuzXBox);
+			if (window['MZXB']) {
 				MZXB.initAll();
-			}else{
-				setTimeout(waitMBx,333);
+			} else {
+				setTimeout(waitMBx, 333);
 			}
 		}
 		waitMBx();

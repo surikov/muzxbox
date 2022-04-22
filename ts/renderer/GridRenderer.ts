@@ -11,6 +11,7 @@ class GridRenderer {
 		this.gridLayerGroup = (document.getElementById('gridLayerGroup') as any) as SVGElement;
 		this.initGridAnchors(zRender);
 	}
+	
 	initGridAnchors(zRender: ZRender) {
 		//this.gridAnchor0 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomMax + 1);
 		this.gridAnchor1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
