@@ -3,5 +3,6 @@ type ZvoogFilterSetting = {
 	, parameters: ZvoogParameterData[]
 	, kind: string
 	, initial: string
-	, obverseParameter?: number
+	//, obverseParameter?: number
+	, focus?: boolean
 };

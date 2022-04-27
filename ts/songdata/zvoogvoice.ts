@@ -7,5 +7,6 @@ type ZvoogVoice = {
 	//, stringPattern: ZvoogStringPattern | null//16th
 	//, strumPattern: ZvoogStrumPattern | null//16th
 	//, keyPattern: ZvoogKeyPattern | null//16th
-	, obversePerformerFilter?: number
+	//, obversePerformerFilter?: number
+	, focus?: boolean
 };

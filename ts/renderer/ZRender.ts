@@ -76,7 +76,56 @@ class ZRender {
 		let s2: string = '';
 		let s3: string = '';
 		let s4: string = '';
-		let obTrFx = song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
+		let numsf = this.pianoRollRenderer.findFocusedFilter(song.filters);
+		if (numsf > -1) {
+			s2 = song.filters[numsf].kind;
+			let numparam = this.pianoRollRenderer.findFocusedParam(song.filters[numsf].parameters);
+			if (numparam > -1) s1 = song.filters[numsf].parameters[numparam].caption;
+		} else {
+			let trnum = this.pianoRollRenderer.findFocusedTrack(song.tracks);
+			if (trnum < 0) trnum = 0;
+			if (trnum < song.tracks.length) {
+				let track = song.tracks[trnum];
+				let vonum = this.pianoRollRenderer.findFocusedVoice(track.voices);
+				if (vonum < 0) vonum = 0;
+				if (vonum < track.voices.length && this.pianoRollRenderer.needToFocusVoice(song, trnum, vonum)) {
+					s2 = track.title;
+					s1 = track.voices[vonum].title;
+				} else {
+					s3 = track.title;
+					let trfi = this.pianoRollRenderer.findFocusedFilter(track.filters);
+					if (trfi > -1) {
+						s3 = track.title;
+						s2 = track.filters[trfi].kind;
+						let trfipa = this.pianoRollRenderer.findFocusedParam(track.filters[trfi].parameters);
+						if (trfipa > -1) s1 = track.filters[trfi].parameters[trfipa].caption;
+					} else {
+						if (vonum < track.voices.length) {
+							let voice = track.voices[vonum];
+							if (voice.performer.focus) {
+								s4 = track.title;
+								s3 = voice.title;
+								s2 = voice.performer.kind;
+								let ppar = this.pianoRollRenderer.findFocusedParam(voice.performer.parameters);
+								if (ppar > -1) {
+									s1 = voice.performer.parameters[ppar].caption;
+								}
+							} else {
+								s4 = track.title;
+								s3 = voice.title;
+								let vofi = this.pianoRollRenderer.findFocusedFilter(voice.filters);
+								if (vofi > -1) {
+									s2 = voice.filters[vofi].kind;
+									let vfpar = this.pianoRollRenderer.findFocusedParam(voice.filters[vofi].parameters);
+									if (vfpar > -1) s1 = voice.filters[vofi].parameters[vfpar].caption;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		/*let obTrFx = song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
 		if (obTrFx < song.tracks.length) {
 
 			if (song.tracks.length) {
@@ -108,8 +157,8 @@ class ZRender {
 					s2 = fx.kind;
 				}
 			}
-		}
-		console.log('resetLabel', s4, '/', s3, '/', s2, '/', s1);
+		}*/
+		console.log('resetLabel', s4, '/', s3, '/', s2, '/', s1, song);
 		let i1 = document.getElementById('selectionInfo1');
 		if (i1) i1.innerText = s1;
 		let i2 = document.getElementById('selectionInfo2');

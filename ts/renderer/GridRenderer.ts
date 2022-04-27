@@ -45,7 +45,7 @@ class GridRenderer {
 		this.gridAnchor64.content = [];
 		this.gridAnchor256.content = [];
 		let time = 0;
-		song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
+		//song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
 

@@ -4,7 +4,7 @@ type ZvoogSchedule = {
 	, filters: ZvoogFilterSetting[]
 	, measures: ZvoogMeasure[]
 	, harmony: ZvoogProgression
-	, obverseTrackFilter?: number
+	//, obverseTrackFilter?: number
 	, rhythm?: ZvoogMeter[]
 };
 function scheduleDuration(song: ZvoogSchedule): number {

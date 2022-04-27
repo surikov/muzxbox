@@ -1380,39 +1380,65 @@ var ZRender = (function () {
         var s2 = '';
         var s3 = '';
         var s4 = '';
-        var obTrFx = song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
-        if (obTrFx < song.tracks.length) {
-            if (song.tracks.length) {
-                var track = song.tracks[obTrFx];
-                var obVxFx = (track.obverseVoiceFilter) ? track.obverseVoiceFilter : 0;
-                if (obVxFx < track.voices.length) {
-                }
-                else {
-                    if (track.filters.length) {
-                        var trfx = track.filters[obVxFx - track.voices.length];
-                        if (trfx.parameters)
-                            if (trfx.parameters.length > 0) {
-                                var trfxparnu = trfx.obverseParameter ? trfx.obverseParameter : 0;
-                                s1 = trfx.parameters[trfxparnu].caption;
-                                s2 = trfx.kind;
-                                s3 = track.title;
-                            }
-                    }
-                }
-            }
+        var numsf = this.pianoRollRenderer.findFocusedFilter(song.filters);
+        if (numsf > -1) {
+            s2 = song.filters[numsf].kind;
+            var numparam = this.pianoRollRenderer.findFocusedParam(song.filters[numsf].parameters);
+            if (numparam > -1)
+                s1 = song.filters[numsf].parameters[numparam].caption;
         }
         else {
-            if (song.filters.length) {
-                var fx = song.filters[obTrFx - song.tracks.length];
-                if (fx.parameters)
-                    if (fx.parameters.length > 0) {
-                        var parnu = fx.obverseParameter ? fx.obverseParameter : 0;
-                        s1 = fx.parameters[parnu].caption;
-                        s2 = fx.kind;
+            var trnum = this.pianoRollRenderer.findFocusedTrack(song.tracks);
+            if (trnum < 0)
+                trnum = 0;
+            if (trnum < song.tracks.length) {
+                var track = song.tracks[trnum];
+                var vonum = this.pianoRollRenderer.findFocusedVoice(track.voices);
+                if (vonum < 0)
+                    vonum = 0;
+                if (vonum < track.voices.length && this.pianoRollRenderer.needToFocusVoice(song, trnum, vonum)) {
+                    s2 = track.title;
+                    s1 = track.voices[vonum].title;
+                }
+                else {
+                    s3 = track.title;
+                    var trfi = this.pianoRollRenderer.findFocusedFilter(track.filters);
+                    if (trfi > -1) {
+                        s3 = track.title;
+                        s2 = track.filters[trfi].kind;
+                        var trfipa = this.pianoRollRenderer.findFocusedParam(track.filters[trfi].parameters);
+                        if (trfipa > -1)
+                            s1 = track.filters[trfi].parameters[trfipa].caption;
                     }
+                    else {
+                        if (vonum < track.voices.length) {
+                            var voice = track.voices[vonum];
+                            if (voice.performer.focus) {
+                                s4 = track.title;
+                                s3 = voice.title;
+                                s2 = voice.performer.kind;
+                                var ppar = this.pianoRollRenderer.findFocusedParam(voice.performer.parameters);
+                                if (ppar > -1) {
+                                    s1 = voice.performer.parameters[ppar].caption;
+                                }
+                            }
+                            else {
+                                s4 = track.title;
+                                s3 = voice.title;
+                                var vofi = this.pianoRollRenderer.findFocusedFilter(voice.filters);
+                                if (vofi > -1) {
+                                    s2 = voice.filters[vofi].kind;
+                                    var vfpar = this.pianoRollRenderer.findFocusedParam(voice.filters[vofi].parameters);
+                                    if (vfpar > -1)
+                                        s1 = voice.filters[vofi].parameters[vfpar].caption;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
-        console.log('resetLabel', s4, '/', s3, '/', s2, '/', s1);
+        console.log('resetLabel', s4, '/', s3, '/', s2, '/', s1, song);
         var i1 = document.getElementById('selectionInfo1');
         if (i1)
             i1.innerText = s1;
@@ -1494,12 +1520,6 @@ var ZRender = (function () {
         }
         this.gridRenderer.drawGrid(this, song, this.ratioDuration, this.ratioThickness, rhythm);
         this.timeLineRenderer.drawSchedule(this, song, this.ratioDuration, this.ratioThickness);
-        var time = 0;
-        song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
-        for (var mm = 0; mm < song.measures.length; mm++) {
-            var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-            time = time + measureDuration;
-        }
         this.tileLevel.resetModel();
         this.focusManager.reSetFocus(this, song);
         this.resetLabel(song);
@@ -4811,9 +4831,96 @@ var PianoRollRenderer = (function () {
         }
         return measureMaxLen;
     };
+    PianoRollRenderer.prototype.needToFocusVoice = function (song, trackNum, voiceNum) {
+        var sonfino = this.findFocusedFilter(song.filters);
+        if (sonfino < 0) {
+            var tt = this.findFocusedTrack(song.tracks);
+            if (tt < 0)
+                tt = 0;
+            if (tt == trackNum) {
+                if (trackNum < song.tracks.length) {
+                    var track = song.tracks[trackNum];
+                    var trafi = this.findFocusedFilter(track.filters);
+                    if (trafi < 0) {
+                        var vv = this.findFocusedVoice(track.voices);
+                        if (vv < 0)
+                            vv = 0;
+                        if (vv == voiceNum) {
+                            if (voiceNum < track.voices.length) {
+                                var voice = track.voices[voiceNum];
+                                if (!voice.performer.focus) {
+                                    var vofi = this.findFocusedFilter(voice.filters);
+                                    if (vofi < 0)
+                                        return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    };
+    PianoRollRenderer.prototype.needToSubFocusVoice = function (song, trackNum, voiceNum) {
+        var sonfino = this.findFocusedFilter(song.filters);
+        if (sonfino < 0) {
+            var tt = this.findFocusedTrack(song.tracks);
+            if (tt < 0)
+                tt = 0;
+            if (tt == trackNum) {
+                if (trackNum < song.tracks.length) {
+                    var track = song.tracks[trackNum];
+                    var trafi = this.findFocusedFilter(track.filters);
+                    if (trafi < 0) {
+                        var vv = this.findFocusedVoice(track.voices);
+                        if (vv < 0)
+                            vv = 0;
+                        if (vv != voiceNum) {
+                            if (vv < track.voices.length) {
+                                var avoice = track.voices[vv];
+                                if (!avoice.performer.focus) {
+                                    var vofi = this.findFocusedFilter(avoice.filters);
+                                    if (vofi < 0)
+                                        return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    };
+    PianoRollRenderer.prototype.findFocusedTrack = function (tracks) {
+        for (var i = 0; i < tracks.length; i++) {
+            if (tracks[i].focus)
+                return i;
+        }
+        return -1;
+    };
+    PianoRollRenderer.prototype.findFocusedFilter = function (filters) {
+        for (var i = 0; i < filters.length; i++) {
+            if (filters[i].focus)
+                return i;
+        }
+        return -1;
+    };
+    PianoRollRenderer.prototype.findFocusedVoice = function (voices) {
+        for (var i = 0; i < voices.length; i++) {
+            if (voices[i].focus)
+                return i;
+        }
+        return -1;
+    };
+    PianoRollRenderer.prototype.findFocusedParam = function (pars) {
+        for (var ii = 0; ii < pars.length; ii++) {
+            if (pars[ii].focus)
+                return ii;
+        }
+        return -1;
+    };
     PianoRollRenderer.prototype.drawSchedule = function (song, ratioDuration, ratioThickness) {
         var time = 0;
-        song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
             var contentMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
@@ -4848,95 +4955,64 @@ var PianoRollRenderer = (function () {
             this.contentOther256.content.push(otherMeasure256);
             for (var tt = 0; tt < song.tracks.length; tt++) {
                 var track = song.tracks[tt];
-                track.obverseVoiceFilter = (track.obverseVoiceFilter) ? track.obverseVoiceFilter : 0;
                 for (var vv = 0; vv < track.voices.length; vv++) {
                     var voice = track.voices[vv];
-                    voice.obversePerformerFilter = (voice.obversePerformerFilter) ? voice.obversePerformerFilter : 0;
                     for (var pp = 0; pp < voice.performer.parameters.length; pp++) {
-                        var paremeter = voice.performer.parameters[pp];
-                        if (song.obverseTrackFilter == tt && track.obverseVoiceFilter == vv && voice.obversePerformerFilter == 0) {
-                            voice.performer.obverseParameter = (voice.performer.obverseParameter) ? voice.performer.obverseParameter : 0;
-                            if (voice.performer.obverseParameter == pp) {
-                                this.addParameterMeasure(ratioDuration, ratioThickness, song, paremeter, mm, time, 'mainLine', [
-                                    contentMeasure1,
-                                    contentMeasure4,
-                                    contentMeasure16,
-                                    contentMeasure64,
-                                    contentMeasure256
+                        var parameter = voice.performer.parameters[pp];
+                        if (track.focus && voice.focus && voice.performer.focus) {
+                            if (parameter.focus) {
+                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
+                                    contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64, contentMeasure256
                                 ]);
                             }
                             else {
-                                this.addParameterMeasure(ratioDuration, ratioThickness, song, paremeter, mm, time, 'secondLine', [
-                                    secondMeasure1,
-                                    secondMeasure4,
-                                    secondMeasure16,
-                                    secondMeasure64
+                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
+                                    secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64
                                 ]);
                             }
                         }
                         else {
-                            this.addParameterMeasure(ratioDuration, ratioThickness, song, paremeter, mm, time, 'otherLine', [
-                                secondMeasure1,
-                                secondMeasure4,
-                                secondMeasure16
+                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
+                                secondMeasure1, secondMeasure4, secondMeasure16
                             ]);
                         }
                     }
-                    if (tt == song.obverseTrackFilter) {
-                        if (vv == track.obverseVoiceFilter) {
-                            var maxMeasureLen = this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'mainLine', [
-                                contentMeasure1,
-                                contentMeasure4,
-                                contentMeasure16,
-                                contentMeasure64,
-                                contentMeasure256
+                    if (this.needToFocusVoice(song, tt, vv)) {
+                        this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'mainLine', [
+                            contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64, contentMeasure256
+                        ]);
+                    }
+                    else {
+                        if (this.needToSubFocusVoice(song, tt, vv)) {
+                            this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'secondLine', [
+                                secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64
                             ]);
                         }
                         else {
-                            this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'secondLine', [
-                                secondMeasure1,
-                                secondMeasure4,
-                                secondMeasure16,
-                                secondMeasure64
+                            this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'otherLine', [
+                                secondMeasure1, secondMeasure4, secondMeasure16
                             ]);
                         }
-                    }
-                    else {
-                        this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'otherLine', [
-                            secondMeasure1,
-                            secondMeasure4,
-                            secondMeasure16
-                        ]);
                     }
                     for (var ff = 0; ff < voice.filters.length; ff++) {
                         var filter = voice.filters[ff];
                         for (var pp = 0; pp < filter.parameters.length; pp++) {
-                            var paremeter = filter.parameters[pp];
-                            if (song.obverseTrackFilter == tt && track.obverseVoiceFilter == vv && voice.obversePerformerFilter == ff + 1) {
-                                filter.obverseParameter = (filter.obverseParameter) ? filter.obverseParameter : 0;
-                                if (filter.obverseParameter == pp) {
-                                    this.addParameterMeasure(ratioDuration, ratioThickness, song, paremeter, mm, time, 'mainLine', [
-                                        contentMeasure1,
-                                        contentMeasure4,
-                                        contentMeasure16,
-                                        contentMeasure64,
-                                        contentMeasure256
+                            var parameter = filter.parameters[pp];
+                            if (track.focus && voice.focus && filter.focus) {
+                                if (parameter.focus) {
+                                    this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
+                                        contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64, contentMeasure256
                                     ]);
                                 }
                                 else {
-                                    this.addParameterMeasure(ratioDuration, ratioThickness, song, paremeter, mm, time, 'secondLine', [
-                                        secondMeasure1,
-                                        secondMeasure4,
-                                        secondMeasure16,
-                                        secondMeasure64
+                                    this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
+                                        secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64
                                     ]);
                                 }
                             }
                             else {
-                                this.addParameterMeasure(ratioDuration, ratioThickness, song, paremeter, mm, time, 'otherLine', [
-                                    secondMeasure1,
-                                    secondMeasure4,
-                                    secondMeasure16
+                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
+                                    secondMeasure1, secondMeasure4, secondMeasure16
                                 ]);
                             }
                         }
@@ -4945,32 +5021,22 @@ var PianoRollRenderer = (function () {
                 for (var ff = 0; ff < track.filters.length; ff++) {
                     var filter = track.filters[ff];
                     for (var pp = 0; pp < filter.parameters.length; pp++) {
-                        var paremeter = filter.parameters[pp];
-                        if (song.obverseTrackFilter == tt && track.obverseVoiceFilter == track.voices.length + ff) {
-                            filter.obverseParameter = (filter.obverseParameter) ? filter.obverseParameter : 0;
-                            if (filter.obverseParameter == pp) {
-                                this.addParameterMeasure(ratioDuration, ratioThickness, song, paremeter, mm, time, 'mainLine', [
-                                    contentMeasure1,
-                                    contentMeasure4,
-                                    contentMeasure16,
-                                    contentMeasure64,
-                                    contentMeasure256
+                        var parameter = filter.parameters[pp];
+                        if (track.focus && filter.focus) {
+                            if (parameter.focus) {
+                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
+                                    contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64, contentMeasure256
                                 ]);
                             }
                             else {
-                                this.addParameterMeasure(ratioDuration, ratioThickness, song, paremeter, mm, time, 'secondLine', [
-                                    secondMeasure1,
-                                    secondMeasure4,
-                                    secondMeasure16,
-                                    secondMeasure64
+                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
+                                    secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64
                                 ]);
                             }
                         }
                         else {
-                            this.addParameterMeasure(ratioDuration, ratioThickness, song, paremeter, mm, time, 'otherLine', [
-                                secondMeasure1,
-                                secondMeasure4,
-                                secondMeasure16
+                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
+                                secondMeasure1, secondMeasure4, secondMeasure16
                             ]);
                         }
                     }
@@ -4979,32 +5045,22 @@ var PianoRollRenderer = (function () {
             for (var ff = 0; ff < song.filters.length; ff++) {
                 var filter = song.filters[ff];
                 for (var pp = 0; pp < filter.parameters.length; pp++) {
-                    var paremeter = filter.parameters[pp];
-                    if (song.obverseTrackFilter == song.tracks.length + ff) {
-                        filter.obverseParameter = (filter.obverseParameter) ? filter.obverseParameter : 0;
-                        if (filter.obverseParameter == pp) {
-                            this.addParameterMeasure(ratioDuration, ratioThickness, song, paremeter, mm, time, 'mainLine', [
-                                contentMeasure1,
-                                contentMeasure4,
-                                contentMeasure16,
-                                contentMeasure64,
-                                contentMeasure256
+                    var parameter = filter.parameters[pp];
+                    if (filter.focus) {
+                        if (parameter.focus) {
+                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
+                                contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64, contentMeasure256
                             ]);
                         }
                         else {
-                            this.addParameterMeasure(ratioDuration, ratioThickness, song, paremeter, mm, time, 'secondLine', [
-                                secondMeasure1,
-                                secondMeasure4,
-                                secondMeasure16,
-                                secondMeasure64
+                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
+                                secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64
                             ]);
                         }
                     }
                     else {
-                        this.addParameterMeasure(ratioDuration, ratioThickness, song, paremeter, mm, time, 'otherLine', [
-                            secondMeasure1,
-                            secondMeasure4,
-                            secondMeasure16
+                        this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
+                            secondMeasure1, secondMeasure4, secondMeasure16
                         ]);
                     }
                 }
@@ -5049,7 +5105,6 @@ var GridRenderer = (function () {
         this.gridAnchor64.content = [];
         this.gridAnchor256.content = [];
         var time = 0;
-        song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
             var gridMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, zRender.pianoRollRenderer.contentMain1.showZoom, zRender.pianoRollRenderer.contentMain1.hideZoom);
@@ -5189,8 +5244,7 @@ var LayerSelector = (function () {
         var _this = this;
         return function () {
             console.log('upSongFx', fx);
-            _this.muzXBox.currentSchedule.obverseTrackFilter = _this.muzXBox.currentSchedule.tracks.length + fx;
-            _this.muzXBox.currentSchedule.filters[fx].obverseParameter = 0;
+            _this.selectSongFx(_this.muzXBox.currentSchedule, fx);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -5199,8 +5253,7 @@ var LayerSelector = (function () {
         var _this = this;
         return function () {
             console.log('upSongFxParam', fx, param);
-            _this.muzXBox.currentSchedule.obverseTrackFilter = _this.muzXBox.currentSchedule.tracks.length + fx;
-            _this.muzXBox.currentSchedule.filters[fx].obverseParameter = param;
+            _this.selectSongFxParam(_this.muzXBox.currentSchedule, fx, param);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -5209,10 +5262,7 @@ var LayerSelector = (function () {
         var _this = this;
         return function () {
             console.log('upTrack', trk);
-            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
-            if (_this.muzXBox.currentSchedule.tracks.length) {
-                _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = 0;
-            }
+            _this.selectSongTrack(_this.muzXBox.currentSchedule, trk);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -5221,8 +5271,7 @@ var LayerSelector = (function () {
         var _this = this;
         return function () {
             console.log('upTrackFx', trk, fx);
-            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
-            _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = _this.muzXBox.currentSchedule.tracks[trk].voices.length + fx;
+            _this.selectSongTrackFx(_this.muzXBox.currentSchedule, trk, fx);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -5230,9 +5279,8 @@ var LayerSelector = (function () {
     LayerSelector.prototype.upTrackFxParam = function (trk, fx, param) {
         var _this = this;
         return function () {
-            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
-            _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = _this.muzXBox.currentSchedule.tracks[trk].voices.length + fx;
-            _this.muzXBox.currentSchedule.tracks[trk].filters[fx].obverseParameter = param;
+            console.log('upTrackFxParam', trk, fx, param);
+            _this.selectSongTrackFxParam(_this.muzXBox.currentSchedule, trk, fx, param);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
             console.log('upTrackFxParam', trk, fx, param);
@@ -5242,8 +5290,7 @@ var LayerSelector = (function () {
         var _this = this;
         return function () {
             console.log('upVox', trk, vox);
-            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
-            _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
+            _this.selectSongTrackVox(_this.muzXBox.currentSchedule, trk, vox);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -5252,9 +5299,7 @@ var LayerSelector = (function () {
         var _this = this;
         return function () {
             console.log('upVoxFx', trk, vox, fx);
-            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
-            _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
-            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = fx + 1;
+            _this.selectSongTrackVoxFx(_this.muzXBox.currentSchedule, trk, vox, fx);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -5263,10 +5308,7 @@ var LayerSelector = (function () {
         var _this = this;
         return function () {
             console.log('upVoxFxParam', trk, vox, fx, param);
-            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
-            _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
-            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = fx + 1;
-            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].filters[fx].obverseParameter = fx;
+            _this.selectSongTrackVoxFxParam(_this.muzXBox.currentSchedule, trk, vox, fx, param);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -5275,9 +5317,7 @@ var LayerSelector = (function () {
         var _this = this;
         return function () {
             console.log('upVoxProvider', trk, vox);
-            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
-            _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
-            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = 0;
+            _this.selectSongTrackVoxPerformer(_this.muzXBox.currentSchedule, trk, vox);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
@@ -5286,13 +5326,124 @@ var LayerSelector = (function () {
         var _this = this;
         return function () {
             console.log('upVoxProviderParam', trk, vox, param);
-            _this.muzXBox.currentSchedule.obverseTrackFilter = trk;
-            _this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
-            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = 0;
-            _this.muzXBox.currentSchedule.tracks[trk].voices[vox].performer.obverseParameter = 0;
+            _this.selectSongTrackVoxPerformerParam(_this.muzXBox.currentSchedule, trk, vox, param);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
         };
+    };
+    LayerSelector.prototype.clearLevelFocus = function (song) {
+        for (var fx = 0; fx < song.filters.length; fx++) {
+            var filter = song.filters[fx];
+            filter.focus = false;
+            for (var fxpr = 0; fxpr < filter.parameters.length; fxpr++) {
+                filter.parameters[fxpr].focus = false;
+            }
+        }
+        for (var tr = 0; tr < song.tracks.length; tr++) {
+            var track = song.tracks[tr];
+            track.focus = false;
+            for (var fx = 0; fx < track.filters.length; fx++) {
+                var filter = track.filters[fx];
+                filter.focus = false;
+                for (var fxpr = 0; fxpr < filter.parameters.length; fxpr++) {
+                    filter.parameters[fxpr].focus = false;
+                }
+            }
+            for (var vc = 0; vc < track.voices.length; vc++) {
+                var voice = track.voices[vc];
+                voice.focus = false;
+                voice.performer.focus = false;
+                for (var prpr = 0; prpr < voice.performer.parameters.length; prpr++) {
+                    voice.performer.parameters[prpr].focus = false;
+                }
+                for (var fx = 0; fx < voice.filters.length; fx++) {
+                    var filter = voice.filters[fx];
+                    filter.focus = false;
+                    for (var fxpr = 0; fxpr < filter.parameters.length; fxpr++) {
+                        filter.parameters[fxpr].focus = false;
+                    }
+                }
+            }
+        }
+    };
+    LayerSelector.prototype.selectSongFx = function (song, fxNum) {
+        this.clearLevelFocus(song);
+        song.filters[fxNum].focus = true;
+    };
+    LayerSelector.prototype.selectSongFxParam = function (song, fxNum, prNum) {
+        this.clearLevelFocus(song);
+        song.filters[fxNum].focus = true;
+        song.filters[fxNum].parameters[prNum].focus = true;
+    };
+    LayerSelector.prototype.selectSongTrack = function (song, trNum) {
+        this.clearLevelFocus(song);
+        song.tracks[trNum].focus = true;
+    };
+    LayerSelector.prototype.selectSongTrackFx = function (song, trNum, fxNum) {
+        this.clearLevelFocus(song);
+        song.tracks[trNum].focus = true;
+        song.tracks[trNum].filters[fxNum].focus = true;
+    };
+    LayerSelector.prototype.selectSongTrackFxParam = function (song, trNum, fxNum, prNum) {
+        this.clearLevelFocus(song);
+        song.tracks[trNum].focus = true;
+        song.tracks[trNum].filters[fxNum].focus = true;
+        song.tracks[trNum].filters[fxNum].parameters[prNum].focus = true;
+    };
+    LayerSelector.prototype.selectSongTrackVox = function (song, trNum, voxNum) {
+        this.clearLevelFocus(song);
+        song.tracks[trNum].focus = true;
+        song.tracks[trNum].voices[voxNum].focus = true;
+    };
+    LayerSelector.prototype.selectSongTrackVoxPerformer = function (song, trNum, voxNum) {
+        this.clearLevelFocus(song);
+        song.tracks[trNum].focus = true;
+        song.tracks[trNum].voices[voxNum].focus = true;
+        song.tracks[trNum].voices[voxNum].performer.focus = true;
+    };
+    LayerSelector.prototype.selectSongTrackVoxPerformerParam = function (song, trNum, voxNum, prNum) {
+        this.clearLevelFocus(song);
+        song.tracks[trNum].focus = true;
+        song.tracks[trNum].voices[voxNum].focus = true;
+        song.tracks[trNum].voices[voxNum].performer.focus = true;
+        song.tracks[trNum].voices[voxNum].performer.parameters[prNum].focus = true;
+    };
+    LayerSelector.prototype.selectSongTrackVoxFx = function (song, trNum, voxNum, fxNum) {
+        this.clearLevelFocus(song);
+        song.tracks[trNum].focus = true;
+        song.tracks[trNum].voices[voxNum].focus = true;
+        song.tracks[trNum].voices[voxNum].filters[fxNum].focus = true;
+    };
+    LayerSelector.prototype.selectSongTrackVoxFxParam = function (song, trNum, voxNum, fxNum, prNum) {
+        this.clearLevelFocus(song);
+        song.tracks[trNum].focus = true;
+        song.tracks[trNum].voices[voxNum].focus = true;
+        song.tracks[trNum].voices[voxNum].filters[fxNum].focus = true;
+        song.tracks[trNum].voices[voxNum].filters[fxNum].parameters[prNum].focus = true;
+    };
+    LayerSelector.prototype.almostFirstInSong = function (song) {
+        for (var fx = 0; fx < song.filters.length; fx++) {
+            if (song.filters[fx].focus)
+                return;
+        }
+        for (var tr = 0; tr < song.tracks.length; tr++) {
+            if (song.tracks[tr].focus)
+                return;
+        }
+        if (song.tracks.length > 0)
+            song.tracks[0].focus = true;
+    };
+    LayerSelector.prototype.almostFirstInTrack = function (track) {
+        for (var fx = 0; fx < track.filters.length; fx++) {
+            if (track.filters[fx].focus)
+                return;
+        }
+        for (var vx = 0; vx < track.voices.length; vx++) {
+            if (track.voices[vx].focus)
+                return;
+        }
+        if (track.voices.length > 0)
+            track.voices[0].focus = true;
     };
     return LayerSelector;
 }());

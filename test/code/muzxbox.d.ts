@@ -531,13 +531,14 @@ interface ZvoogPlugin {
 declare type ZvoogParameterData = {
     points: ZvoogCurvePoint[];
     caption: string;
+    focus?: boolean;
 };
 declare type ZvoogVoice = {
     measureChords: ZvoogMeasureChord[];
     performer: ZvoogPerformerSetting;
     filters: ZvoogFilterSetting[];
     title: string;
-    obversePerformerFilter?: number;
+    focus?: boolean;
 };
 declare type ZvoogMeasureChord = {
     chords: ZvoogChordStrings[];
@@ -628,7 +629,7 @@ declare type ZvoogTrack = {
     title: string;
     voices: ZvoogVoice[];
     filters: ZvoogFilterSetting[];
-    obverseVoiceFilter?: number;
+    focus?: boolean;
 };
 declare type ZvoogSchedule = {
     title: string;
@@ -636,7 +637,6 @@ declare type ZvoogSchedule = {
     filters: ZvoogFilterSetting[];
     measures: ZvoogMeasure[];
     harmony: ZvoogProgression;
-    obverseTrackFilter?: number;
     rhythm?: ZvoogMeter[];
 };
 declare function scheduleDuration(song: ZvoogSchedule): number;
@@ -645,14 +645,14 @@ declare type ZvoogFilterSetting = {
     parameters: ZvoogParameterData[];
     kind: string;
     initial: string;
-    obverseParameter?: number;
+    focus?: boolean;
 };
 declare type ZvoogPerformerSetting = {
     performerPlugin: ZvoogPerformerPlugin | null;
     parameters: ZvoogParameterData[];
     kind: string;
     initial: string;
-    obverseParameter?: number;
+    focus?: boolean;
 };
 declare type ZvoogFilterPlugin = ZvoogPlugin & {
     getInput: () => AudioNode;
@@ -1068,6 +1068,12 @@ declare class PianoRollRenderer {
     initOthersAnchors(zRender: ZRender): void;
     addParameterMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, parameter: ZvoogParameterData, measureNum: number, time: number, css: string, anchors: TileAnchor[]): void;
     addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number;
+    needToFocusVoice(song: ZvoogSchedule, trackNum: number, voiceNum: number): boolean;
+    needToSubFocusVoice(song: ZvoogSchedule, trackNum: number, voiceNum: number): boolean;
+    findFocusedTrack(tracks: ZvoogTrack[]): number;
+    findFocusedFilter(filters: ZvoogFilterSetting[]): number;
+    findFocusedVoice(voices: ZvoogVoice[]): number;
+    findFocusedParam(pars: ZvoogParameterData[]): number;
     drawSchedule(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
 }
 declare class GridRenderer {
@@ -1110,6 +1116,19 @@ declare class LayerSelector {
     upVoxFxParam(trk: number, vox: number, fx: number, param: number): () => void;
     upVoxProvider(trk: number, vox: number): () => void;
     upVoxProviderParam(trk: number, vox: number, param: number): () => void;
+    clearLevelFocus(song: ZvoogSchedule): void;
+    selectSongFx(song: ZvoogSchedule, fxNum: number): void;
+    selectSongFxParam(song: ZvoogSchedule, fxNum: number, prNum: number): void;
+    selectSongTrack(song: ZvoogSchedule, trNum: number): void;
+    selectSongTrackFx(song: ZvoogSchedule, trNum: number, fxNum: number): void;
+    selectSongTrackFxParam(song: ZvoogSchedule, trNum: number, fxNum: number, prNum: number): void;
+    selectSongTrackVox(song: ZvoogSchedule, trNum: number, voxNum: number): void;
+    selectSongTrackVoxPerformer(song: ZvoogSchedule, trNum: number, voxNum: number): void;
+    selectSongTrackVoxPerformerParam(song: ZvoogSchedule, trNum: number, voxNum: number, prNum: number): void;
+    selectSongTrackVoxFx(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number): void;
+    selectSongTrackVoxFxParam(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number, prNum: number): void;
+    almostFirstInSong(song: ZvoogSchedule): void;
+    almostFirstInTrack(track: ZvoogTrack): void;
 }
 declare class FocusManagement {
     focusMarkerLayer: SVGElement;

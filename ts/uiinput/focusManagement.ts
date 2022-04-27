@@ -2,7 +2,7 @@ class FocusManagement {
 	focusMarkerLayer: SVGElement;
 	focusAnchor: TileAnchor;
 	focusLayer: TileLayerDefinition;
-	levelOfDetails:number=0;
+	levelOfDetails: number = 0;
 	attach(zRender: ZRender) {
 		this.focusMarkerLayer = (document.getElementById('focusMarkerLayer') as any) as SVGElement;
 		this.focusAnchor = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomMax + 1);
@@ -21,22 +21,23 @@ class FocusManagement {
 		this.addSpot();
 		zrenderer.tileLevel.allTilesOK = false;
 	}
-	spotUp(){
+	spotUp() {
 		console.log('spotUp');
 	}
-	spotDown(){
+	spotDown() {
 		console.log('spotDown');
 	}
-	spotLeft(){
+	spotLeft() {
 		console.log('spotLeft');
 	}
-	spotRight(){
+	spotRight() {
 		console.log('spotRight');
 	}
-	spotReset(){
+	spotReset() {
 		console.log('spotReset');
 	}
-	spotSelectA(){
+	spotSelectA() {
 		console.log('spotSelectA');
 	}
+	
 }

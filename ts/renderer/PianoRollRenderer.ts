@@ -1,4 +1,4 @@
-class PianoRollRenderer{
+class PianoRollRenderer {
 	contentMain1: TileAnchor;
 	contentMain4: TileAnchor;
 	contentMain16: TileAnchor;
@@ -21,7 +21,7 @@ class PianoRollRenderer{
 	measureSecondVoicesLayerGroup: SVGElement;
 	measureMainVoiceLayerGroup: SVGElement;
 
-	attach(zRender:ZRender){
+	attach(zRender: ZRender) {
 		this.measureOtherVoicesLayerGroup = (document.getElementById('measureOtherVoicesLayerGroup') as any) as SVGElement;
 		this.measureSecondVoicesLayerGroup = (document.getElementById('measureSecondVoicesLayerGroup') as any) as SVGElement;
 		this.measureMainVoiceLayerGroup = (document.getElementById('measureMainVoiceLayerGroup') as any) as SVGElement;
@@ -29,19 +29,19 @@ class PianoRollRenderer{
 		this.initSecondAnchors(zRender);
 		this.initOthersAnchors(zRender);
 	}
-	clearAnchorsContent(zRender:ZRender,songDuration: number): void {
+	clearAnchorsContent(zRender: ZRender, songDuration: number): void {
 		let anchors: TileAnchor[] = [
 			this.contentMain1, this.contentMain4, this.contentMain16, this.contentMain64, this.contentMain256
 			, this.contentSecond1, this.contentSecond4, this.contentSecond16, this.contentSecond64, this.contentSecond256
 			, this.contentOther1, this.contentOther4, this.contentOther16, this.contentOther64, this.contentOther256
 		];
-		
+
 		for (let i = 0; i < anchors.length; i++) {
 			zRender.clearSingleAnchor(anchors[i], songDuration);
 		}
 
 	}
-	initMainAnchors(zRender:ZRender) {
+	initMainAnchors(zRender: ZRender) {
 		this.contentMain1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomMin, hideZoom: zRender.zoomNote, content: [] };
 		this.contentMain4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomNote, hideZoom: zRender.zoomMeasure, content: [] };
 		this.contentMain16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomMeasure, hideZoom: zRender.zoomSong, content: [] };
@@ -53,7 +53,7 @@ class PianoRollRenderer{
 			]
 		});
 	}
-	initSecondAnchors(zRender:ZRender) {
+	initSecondAnchors(zRender: ZRender) {
 		this.contentSecond1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
 		this.contentSecond4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
 		this.contentSecond16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
@@ -65,7 +65,7 @@ class PianoRollRenderer{
 			]
 		});
 	}
-	initOthersAnchors(zRender:ZRender) {
+	initOthersAnchors(zRender: ZRender) {
 		this.contentOther1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
 		this.contentOther4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
 		this.contentOther16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
@@ -77,7 +77,7 @@ class PianoRollRenderer{
 			]
 		});
 	}
-	addParameterMeasure(ratioDuration:number,ratioThickness:number,song: ZvoogSchedule, parameter: ZvoogParameterData, measureNum: number, time: number, css: string, anchors: TileAnchor[]) {
+	addParameterMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, parameter: ZvoogParameterData, measureNum: number, time: number, css: string, anchors: TileAnchor[]) {
 		let point: ZvoogCurvePoint = parameter.points[0];
 		for (let aa = 0; aa < anchors.length; aa++) {
 			let line: TileLine = {
@@ -90,7 +90,7 @@ class PianoRollRenderer{
 			anchors[aa].content.push(cloneLine(line));
 		}
 	}
-	addVoiceMeasure(ratioDuration:number,ratioThickness:number,song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number {
+	addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number {
 		let measure = voice.measureChords[measureNum];
 		var measureMaxLen = anchors[0].ww;
 		for (let cc = 0; cc < measure.chords.length; cc++) {
@@ -138,16 +138,91 @@ class PianoRollRenderer{
 		}
 		return measureMaxLen;
 	}
-	drawSchedule(song: ZvoogSchedule,ratioDuration:number,ratioThickness:number) {//}, menuButton: TileRectangle) {
-		//let songDuration = scheduleDuration(song);
-		//this.clearAnchorsContent(songDuration);
-		//this.measureInfoRenderer.fillMeasureInfo(song, this.ratioDuration, this.ratioThickness);
-		//this.fillTimeLine4(song);
-		//this.fillTimeLine16(song);
-		//this.fillTimeLine64(song);
-		//this.fillTimeLine256(song);
+	needToFocusVoice(song: ZvoogSchedule, trackNum: number, voiceNum: number): boolean {
+		let sonfino = this.findFocusedFilter(song.filters);
+		if (sonfino < 0) {
+			let tt = this.findFocusedTrack(song.tracks);
+			if (tt < 0) tt = 0;
+			if (tt == trackNum) {
+				if (trackNum < song.tracks.length) {
+					let track = song.tracks[trackNum];
+					let trafi = this.findFocusedFilter(track.filters);
+					if (trafi < 0) {
+						let vv = this.findFocusedVoice(track.voices);
+						if (vv < 0) vv = 0;
+						if (vv == voiceNum) {
+							if (voiceNum < track.voices.length) {
+								let voice = track.voices[voiceNum];
+								if (!voice.performer.focus) {
+									let vofi = this.findFocusedFilter(voice.filters);
+									if (vofi < 0) return true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+	needToSubFocusVoice(song: ZvoogSchedule, trackNum: number, voiceNum: number): boolean {
+		let sonfino = this.findFocusedFilter(song.filters);
+		if (sonfino < 0) {
+			let tt = this.findFocusedTrack(song.tracks);
+			if (tt < 0) tt = 0;
+			if (tt == trackNum) {
+				if (trackNum < song.tracks.length) {
+					let track = song.tracks[trackNum];
+					let trafi = this.findFocusedFilter(track.filters);
+					if (trafi < 0) {
+						let vv = this.findFocusedVoice(track.voices);
+						if (vv < 0) vv = 0;
+						if (vv != voiceNum) {
+							if (vv < track.voices.length) {
+								let avoice = track.voices[vv];
+								if (!avoice.performer.focus) {
+									let vofi = this.findFocusedFilter(avoice.filters);
+									if (vofi < 0) return true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+
+	findFocusedTrack(tracks: ZvoogTrack[]): number {
+		for (let i = 0; i < tracks.length; i++) {
+			if (tracks[i].focus) return i;
+		}
+		return -1;
+	}
+	findFocusedFilter(filters: ZvoogFilterSetting[]): number {
+		for (let i = 0; i < filters.length; i++) {
+			if (filters[i].focus) return i;
+		}
+		return -1;
+	}
+	findFocusedVoice(voices: ZvoogVoice[]): number {
+		for (let i = 0; i < voices.length; i++) {
+			if (voices[i].focus) return i;
+		}
+		return -1;
+	}
+	findFocusedParam(pars: ZvoogParameterData[]): number {
+		for (let ii = 0; ii < pars.length; ii++) {
+			if (pars[ii].focus) return ii;
+		}
+		return -1;
+	}
+
+
+	drawSchedule(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {//}, menuButton: TileRectangle) {
 		let time = 0;
-		song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
+
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
 
@@ -183,86 +258,64 @@ class PianoRollRenderer{
 			this.contentOther16.content.push(otherMeasure16);
 			this.contentOther64.content.push(otherMeasure64);
 			this.contentOther256.content.push(otherMeasure256);
-
-
 			for (let tt = 0; tt < song.tracks.length; tt++) {
 				let track = song.tracks[tt];
-				track.obverseVoiceFilter = (track.obverseVoiceFilter) ? track.obverseVoiceFilter : 0;
 				for (let vv = 0; vv < track.voices.length; vv++) {
 					let voice: ZvoogVoice = track.voices[vv];
-					voice.obversePerformerFilter = (voice.obversePerformerFilter) ? voice.obversePerformerFilter : 0;
 					for (let pp = 0; pp < voice.performer.parameters.length; pp++) {
-						let paremeter = voice.performer.parameters[pp];
-						if (song.obverseTrackFilter == tt && track.obverseVoiceFilter == vv && voice.obversePerformerFilter == 0) {
-							voice.performer.obverseParameter = (voice.performer.obverseParameter) ? voice.performer.obverseParameter : 0;
-							if (voice.performer.obverseParameter == pp) {
-								this.addParameterMeasure(ratioDuration,ratioThickness,song, paremeter, mm, time, 'mainLine', [
-									contentMeasure1
-									, contentMeasure4
-									, contentMeasure16
-									, contentMeasure64
-									, contentMeasure256]);
+						let parameter = voice.performer.parameters[pp];
+						if (track.focus && voice.focus && voice.performer.focus) {
+							if (parameter.focus) {
+								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
+									contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64, contentMeasure256]);
 							} else {
-								this.addParameterMeasure(ratioDuration,ratioThickness,song, paremeter, mm, time, 'secondLine', [
-									secondMeasure1
-									, secondMeasure4
-									, secondMeasure16
-									, secondMeasure64]);
+								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
+									secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
 							}
 						} else {
-							this.addParameterMeasure(ratioDuration,ratioThickness,song, paremeter, mm, time, 'otherLine', [
-								secondMeasure1
-								, secondMeasure4
-								, secondMeasure16]);
+							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
+								secondMeasure1, secondMeasure4, secondMeasure16]);
 						}
 					}
-					if (tt == song.obverseTrackFilter) {
-						if (vv == track.obverseVoiceFilter) {
-							let maxMeasureLen = this.addVoiceMeasure(ratioDuration,ratioThickness,song, voice, mm, time, 'mainLine', [
-								contentMeasure1
-								, contentMeasure4
-								, contentMeasure16
-								, contentMeasure64
-								, contentMeasure256]);
-							//measureDebugSquare.w = maxMeasureLen;
+					if (this.needToFocusVoice(song, tt, vv)) {
+						this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'mainLine', [
+							contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64, contentMeasure256]);
+					} else {
+						if (this.needToSubFocusVoice(song, tt, vv)) {
+							this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'secondLine', [
+								secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
 						} else {
-							this.addVoiceMeasure(ratioDuration,ratioThickness,song, voice, mm, time, 'secondLine', [
-								secondMeasure1
-								, secondMeasure4
-								, secondMeasure16
-								, secondMeasure64]);
+							this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'otherLine', [
+								secondMeasure1, secondMeasure4, secondMeasure16]);
+						}
+					}
+					/*if (track.focus) {
+						if (voice.focus) {
+							let maxMeasureLen = this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'mainLine', [
+								contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64, contentMeasure256]);
+						} else {
+							this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'secondLine', [
+								secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
 						}
 					} else {
-						this.addVoiceMeasure(ratioDuration,ratioThickness,song, voice, mm, time, 'otherLine', [
-							secondMeasure1
-							, secondMeasure4
-							, secondMeasure16]);
-					}
+						this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'otherLine', [
+							secondMeasure1, secondMeasure4, secondMeasure16]);
+					}*/
 					for (let ff = 0; ff < voice.filters.length; ff++) {
 						let filter = voice.filters[ff];
 						for (let pp = 0; pp < filter.parameters.length; pp++) {
-							let paremeter = filter.parameters[pp];
-							if (song.obverseTrackFilter == tt && track.obverseVoiceFilter == vv && voice.obversePerformerFilter == ff + 1) {
-								filter.obverseParameter = (filter.obverseParameter) ? filter.obverseParameter : 0;
-								if (filter.obverseParameter == pp) {
-									this.addParameterMeasure(ratioDuration,ratioThickness,song, paremeter, mm, time, 'mainLine', [
-										contentMeasure1
-										, contentMeasure4
-										, contentMeasure16
-										, contentMeasure64
-										, contentMeasure256]);
+							let parameter = filter.parameters[pp];
+							if (track.focus && voice.focus && filter.focus) {
+								if (parameter.focus) {
+									this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
+										contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64, contentMeasure256]);
 								} else {
-									this.addParameterMeasure(ratioDuration,ratioThickness,song, paremeter, mm, time, 'secondLine', [
-										secondMeasure1
-										, secondMeasure4
-										, secondMeasure16
-										, secondMeasure64]);
+									this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
+										secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
 								}
 							} else {
-								this.addParameterMeasure(ratioDuration,ratioThickness,song, paremeter, mm, time, 'otherLine', [
-									secondMeasure1
-									, secondMeasure4
-									, secondMeasure16]);
+								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
+									secondMeasure1, secondMeasure4, secondMeasure16]);
 							}
 						}
 					}
@@ -270,28 +323,18 @@ class PianoRollRenderer{
 				for (let ff = 0; ff < track.filters.length; ff++) {
 					let filter = track.filters[ff];
 					for (let pp = 0; pp < filter.parameters.length; pp++) {
-						let paremeter = filter.parameters[pp];
-						if (song.obverseTrackFilter == tt && track.obverseVoiceFilter == track.voices.length + ff) {
-							filter.obverseParameter = (filter.obverseParameter) ? filter.obverseParameter : 0;
-							if (filter.obverseParameter == pp) {
-								this.addParameterMeasure(ratioDuration,ratioThickness,song, paremeter, mm, time, 'mainLine', [
-									contentMeasure1
-									, contentMeasure4
-									, contentMeasure16
-									, contentMeasure64
-									, contentMeasure256]);
+						let parameter = filter.parameters[pp];
+						if (track.focus && filter.focus) {
+							if (parameter.focus) {
+								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
+									contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64, contentMeasure256]);
 							} else {
-								this.addParameterMeasure(ratioDuration,ratioThickness,song, paremeter, mm, time, 'secondLine', [
-									secondMeasure1
-									, secondMeasure4
-									, secondMeasure16
-									, secondMeasure64]);
+								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
+									secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
 							}
 						} else {
-							this.addParameterMeasure(ratioDuration,ratioThickness,song, paremeter, mm, time, 'otherLine', [
-								secondMeasure1
-								, secondMeasure4
-								, secondMeasure16]);
+							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
+								secondMeasure1, secondMeasure4, secondMeasure16]);
 						}
 					}
 				}
@@ -299,34 +342,22 @@ class PianoRollRenderer{
 			for (let ff = 0; ff < song.filters.length; ff++) {
 				let filter = song.filters[ff];
 				for (let pp = 0; pp < filter.parameters.length; pp++) {
-					let paremeter = filter.parameters[pp];
-					if (song.obverseTrackFilter == song.tracks.length + ff) {
-						filter.obverseParameter = (filter.obverseParameter) ? filter.obverseParameter : 0;
-						if (filter.obverseParameter == pp) {
-							this.addParameterMeasure(ratioDuration,ratioThickness,song, paremeter, mm, time, 'mainLine', [
-								contentMeasure1
-								, contentMeasure4
-								, contentMeasure16
-								, contentMeasure64
-								, contentMeasure256]);
+					let parameter = filter.parameters[pp];
+					if (filter.focus) {
+						if (parameter.focus) {
+							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
+								contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64, contentMeasure256]);
 						} else {
-							this.addParameterMeasure(ratioDuration,ratioThickness,song, paremeter, mm, time, 'secondLine', [
-								secondMeasure1
-								, secondMeasure4
-								, secondMeasure16
-								, secondMeasure64]);
+							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
+								secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
 						}
 					} else {
-						this.addParameterMeasure(ratioDuration,ratioThickness,song, paremeter, mm, time, 'otherLine', [
-							secondMeasure1
-							, secondMeasure4
-							, secondMeasure16]);
+						this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
+							secondMeasure1, secondMeasure4, secondMeasure16]);
 					}
 				}
 			}
 			time = time + measureDuration;
 		}
-		//this.addDebugButtons(song, menuButton);
-		//this.tileLevel.resetModel();
 	}
 }
