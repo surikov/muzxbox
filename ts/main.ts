@@ -72,6 +72,8 @@ class MuzXBox {
 	setGrid(meters: ZvoogMeter[]) {
 		this.currentSchedule.rhythm = meters;
 		this.zrenderer.gridRenderer.reSetGrid(this.zrenderer,meters,this.currentSchedule);
+		this.zrenderer.timeLineRenderer.reSetGrid(this.zrenderer,meters,this.currentSchedule);
+		this.zrenderer.tileLevel.allTilesOK=false;
 		/*this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor1, this.zrenderer.gridRenderer.gridLayerGroup);
 		this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor4, this.zrenderer.gridRenderer.gridLayerGroup);
 		this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor16, this.zrenderer.gridRenderer.gridLayerGroup);

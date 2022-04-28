@@ -264,10 +264,12 @@ declare class ZRender {
     ratioThickness: number;
     sizeRatio: number;
     rhythmPatternDefault: ZvoogMeter[];
+    rhythmPatternDefault335: ZvoogMeter[];
     measureInfoRenderer: MeasureInfoRenderer;
     pianoRollRenderer: PianoRollRenderer;
     gridRenderer: GridRenderer;
     timeLineRenderer: TimeLineRenderer;
+    leftKeysRenderer: LeftKeysRenderer;
     focusManager: FocusManagement;
     debugLayerGroup: SVGElement;
     debugAnchor0: TileAnchor;
@@ -1097,11 +1099,13 @@ declare class TimeLineRenderer {
     measuresTimelineAnchor16: TileAnchor;
     measuresTimelineAnchor64: TileAnchor;
     measuresTimelineAnchor256: TileAnchor;
+    timeLayer: TileLayerDefinition;
     attach(zRender: ZRender): void;
     initTimeScaleAnchors(zRender: ZRender): void;
     clearAnchorsContent(zRender: ZRender, songDuration: number): void;
     drawSchedule(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
-    drawLevel(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, layerAnchor: TileAnchor, textSize: string, yy: number): void;
+    drawLevel(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, layerAnchor: TileAnchor, subSize: string | null, textSize: string, yy: number): void;
+    reSetGrid(zrenderer: ZRender, meters: ZvoogMeter[], currentSchedule: ZvoogSchedule): void;
 }
 declare class LayerSelector {
     muzXBox: MuzXBox;
@@ -1144,4 +1148,14 @@ declare class FocusManagement {
     spotRight(): void;
     spotReset(): void;
     spotSelectA(): void;
+}
+declare class LeftKeysRenderer {
+    leftKeysGroup: SVGElement;
+    keysAnchor1: TileAnchor;
+    keysAnchor4: TileAnchor;
+    keysLayer: TileLayerDefinition;
+    attach(zRender: ZRender): void;
+    initLeftKeysGroup(zRender: ZRender): void;
+    clearAnchorsContent(zRender: ZRender, songDuration: number): void;
+    drawKeys(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
 }

@@ -17,7 +17,7 @@ class ZInputDeviceHandler {
 			if (curLOD != lastLevelOfDetails) {
 				lastLevelOfDetails = curLOD;
 				new CannyDo().start(50, () => {
-					console.log('run afterZoomCallback', lastLevelOfDetails);
+					//console.log('run afterZoomCallback', lastLevelOfDetails);
 				});
 			}
 		};

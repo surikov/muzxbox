@@ -9,8 +9,9 @@ html {
 	padding: 0px;
 	background-color: var(--background_color);
 	font-family: 'Zen Kurenaido', serif, cursive;
-	font-style: italic;
-	font-weight: bold;
+	font-style2: italic;
+	font-weight2: bold;
+	user-select: none;
 }
 
 body {
@@ -170,8 +171,8 @@ button {
 
 .barLine256 {
 	stroke: #000000;
-	stroke-width: 2cm;
-	stroke-opacity: 25%;
+	stroke-width: 4cm;
+	stroke-opacity: 75%;
 	stroke-linecap: round;
 }
 

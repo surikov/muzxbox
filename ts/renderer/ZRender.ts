@@ -15,13 +15,17 @@ class ZRender {
 	rhythmPatternDefault: ZvoogMeter[] = [
 		{ count: 1, division: 8 }, { count: 1, division: 8 }
 		, { count: 1, division: 8 }, { count: 1, division: 8 }
-
+	];
+	rhythmPatternDefault335: ZvoogMeter[] = [
+		{ count: 5, division: 32 }, { count: 3, division: 32 }
+		, { count: 5, division: 32 }, { count: 3, division: 32 }
 	];
 
 	measureInfoRenderer: MeasureInfoRenderer = new MeasureInfoRenderer();
 	pianoRollRenderer: PianoRollRenderer = new PianoRollRenderer();
 	gridRenderer: GridRenderer = new GridRenderer();
 	timeLineRenderer: TimeLineRenderer = new TimeLineRenderer();
+	leftKeysRenderer: LeftKeysRenderer = new LeftKeysRenderer();
 	focusManager: FocusManagement = new FocusManagement();
 
 	//upperSelectionScale: SVGElement;
@@ -158,7 +162,7 @@ class ZRender {
 				}
 			}
 		}*/
-		console.log('resetLabel', s4, '/', s3, '/', s2, '/', s1, song);
+		//console.log('resetLabel', s4, '/', s3, '/', s2, '/', s1, song);
 		let i1 = document.getElementById('selectionInfo1');
 		if (i1) i1.innerText = s1;
 		let i2 = document.getElementById('selectionInfo2');
@@ -186,6 +190,8 @@ class ZRender {
 		this.gridRenderer.attach(this);
 		this.timeLineRenderer.attach(this);
 		this.focusManager.attach(this);
+		this.leftKeysRenderer.attach(this);
+		
 	}
 	initDebugAnchors() {
 		this.debugAnchor0 = TAnchor(0, 0, 1111, 1111, this.zoomMin, this.zoomMax + 1);
@@ -224,7 +230,7 @@ class ZRender {
 		this.measureInfoRenderer.clearAnchorsContent(this, songDuration);
 		this.pianoRollRenderer.clearAnchorsContent(this, songDuration);
 		this.timeLineRenderer.clearAnchorsContent(this, songDuration);
-
+		this.leftKeysRenderer.clearAnchorsContent(this, songDuration);
 		this.tileLevel.innerWidth = this.ratioDuration * songDuration * this.tileLevel.tapSize;
 		this.tileLevel.innerHeight = 128 * this.ratioThickness * this.tileLevel.tapSize;
 
@@ -243,6 +249,7 @@ class ZRender {
 		}
 		this.gridRenderer.drawGrid(this, song, this.ratioDuration, this.ratioThickness, rhythm);
 		this.timeLineRenderer.drawSchedule(this, song, this.ratioDuration, this.ratioThickness);
+		this.leftKeysRenderer.drawKeys(this, song, this.ratioDuration, this.ratioThickness);
 		/*
 		let time = 0;
 		song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;

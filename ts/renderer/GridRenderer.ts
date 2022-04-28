@@ -76,20 +76,20 @@ class GridRenderer {
 
 			for (let i = 1; i < 128; i = i + 12) {
 				gridMeasure16.content.push({
-					x1: time * ratioDuration, y1: (128.5 - i) * ratioThickness
-					, x2: (time + measureDuration) * ratioDuration, y2: (128.5 - i) * ratioThickness, css: 'barLine16'
+					x1: time * ratioDuration, y1: (128.0 - i) * ratioThickness
+					, x2: (time + measureDuration) * ratioDuration, y2: (128.0 - i) * ratioThickness, css: 'barLine16'
 				});
 			}
 			for (let i = 1; i < 128; i = i + 1) {
 				if (i % 12 == 0) {
 					gridMeasure4.content.push({
-						x1: time * ratioDuration, y1: (128.5 - i) * ratioThickness
-						, x2: (time + measureDuration) * ratioDuration, y2: (128.5 - i) * ratioThickness, css: 'barLine4'
+						x1: time * ratioDuration, y1: (128.0 - i) * ratioThickness
+						, x2: (time + measureDuration) * ratioDuration, y2: (128.0 - i) * ratioThickness, css: 'barLine4'
 					});
 				} else {
 					gridMeasure4.content.push({
-						x1: time * ratioDuration, y1: (128.5 - i) * ratioThickness
-						, x2: (time + measureDuration) * ratioDuration, y2: (128.5 - i) * ratioThickness, css: 'pitchLine4'
+						x1: time * ratioDuration, y1: (128.0 - i) * ratioThickness
+						, x2: (time + measureDuration) * ratioDuration, y2: (128.0 - i) * ratioThickness, css: 'pitchLine4'
 					});
 				}
 			}
@@ -132,7 +132,7 @@ class GridRenderer {
 			, zrenderer.ratioDuration
 			, zrenderer.ratioThickness
 			, meters);
-		zrenderer.tileLevel.allTilesOK=false;
+		//zrenderer.tileLevel.allTilesOK=false;
 		//console.log(this.zrenderer.gridRenderer.gridLayerGroup);
 	}
 }

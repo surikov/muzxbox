@@ -1,22 +1,22 @@
-class MeasureInfoRenderer{
+class MeasureInfoRenderer {
 	measuresMeasureInfoAnchor1: TileAnchor;
 	measuresMeasureInfoAnchor4: TileAnchor;
 	measuresMeasureInfoAnchor16: TileAnchor;
 	measuresMeasureInfoAnchor64: TileAnchor;
 	measuresMeasureInfoAnchor256: TileAnchor;
 	bottomTimelineLayerGroup: SVGElement;
-	attach(zRender:ZRender){
+	attach(zRender: ZRender) {
 		this.bottomTimelineLayerGroup = (document.getElementById('bottomTimelineLayerGroup') as any) as SVGElement;
 		this.initMeasureInfoAnchors(zRender);
 	}
-	fillMeasureInfo(song: ZvoogSchedule,ratioDuration:number,ratioThickness:number){
-		this.fillMeasureInfo1(song,ratioDuration,ratioThickness);
-		this.fillMeasureInfo4(song,ratioDuration,ratioThickness);
-		this.fillMeasureInfo16(song,ratioDuration,ratioThickness);
-		this.fillMeasureInfo64(song,ratioDuration,ratioThickness);
-		this.fillMeasureInfo256(song,ratioDuration,ratioThickness);
+	fillMeasureInfo(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
+		this.fillMeasureInfo1(song, ratioDuration, ratioThickness);
+		this.fillMeasureInfo4(song, ratioDuration, ratioThickness);
+		this.fillMeasureInfo16(song, ratioDuration, ratioThickness);
+		this.fillMeasureInfo64(song, ratioDuration, ratioThickness);
+		this.fillMeasureInfo256(song, ratioDuration, ratioThickness);
 	}
-	initMeasureInfoAnchors(zRender:ZRender) {
+	initMeasureInfoAnchors(zRender: ZRender) {
 		this.measuresMeasureInfoAnchor1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
 		this.measuresMeasureInfoAnchor4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
 		this.measuresMeasureInfoAnchor16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
@@ -40,21 +40,21 @@ class MeasureInfoRenderer{
 			]
 		});
 	}*/
-	clearAnchorsContent(zRender:ZRender,songDuration: number): void {
+	clearAnchorsContent(zRender: ZRender, songDuration: number): void {
 		let anchors: TileAnchor[] = [
 			this.measuresMeasureInfoAnchor1, this.measuresMeasureInfoAnchor4, this.measuresMeasureInfoAnchor16, this.measuresMeasureInfoAnchor64, this.measuresMeasureInfoAnchor256
 		];
-		
+
 		for (let i = 0; i < anchors.length; i++) {
 			zRender.clearSingleAnchor(anchors[i], songDuration);
 		}
 
 	}
-	fillMeasureInfo1(song: ZvoogSchedule,ratioDuration:number,ratioThickness:number) {
+	fillMeasureInfo1(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
 		let time = 0;
-		let curMeterCount = 0;
-		let curDivision = 0;
-		let curTempo = 0;
+		//let curMeterCount = 0;
+		//let curDivision = 0;
+		//let curTempo = 0;
 		for (let i = 0; i < song.measures.length; i++) {
 			let measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
 			//let tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
@@ -64,22 +64,22 @@ class MeasureInfoRenderer{
 			);
 			//singlemeasuresTimelineAnchor1.content.push(TText(time * this.ratioDuration, 0, 'barNumber textSize1', '1-' + (i + 1)));
 			//singlemeasuresTimelineAnchor1.content.push(TText(time * this.ratioDuration, -1, 'barNumber textSize1', tempoMeterLabel));
-			if (curMeterCount != song.measures[i].meter.count || curDivision != song.measures[i].meter.division || curTempo != song.measures[i].tempo) {
-				curMeterCount = song.measures[i].meter.count;
-				curDivision = song.measures[i].meter.division;
-				curTempo = song.measures[i].tempo;
-				singlemeasuresTimelineAnchor1.content.push(TText(time * ratioDuration, -1, 'barNumber textSize1'
-					, (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)));
-			}
+			//if (curMeterCount != song.measures[i].meter.count || curDivision != song.measures[i].meter.division || curTempo != song.measures[i].tempo) {
+			//	curMeterCount = song.measures[i].meter.count;
+			//	curDivision = song.measures[i].meter.division;
+			//	curTempo = song.measures[i].tempo;
+			singlemeasuresTimelineAnchor1.content.push(TText(time * ratioDuration, -1 / 4, 'barNumber textSize1'
+				, (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)));
+			//}
 			this.measuresMeasureInfoAnchor1.content.push(singlemeasuresTimelineAnchor1);
 			time = time + measureDuration;
 		}
 	}
-	fillMeasureInfo4(song: ZvoogSchedule,ratioDuration:number,ratioThickness:number) {
+	fillMeasureInfo4(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
 		let time = 0;
-		let curMeterCount = 0;
-		let curDivision = 0;
-		let curTempo = 0;
+		//let curMeterCount = 0;
+		//let curDivision = 0;
+		//let curTempo = 0;
 		for (let i = 0; i < song.measures.length; i++) {
 			let measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
 			//let tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
@@ -89,18 +89,18 @@ class MeasureInfoRenderer{
 			);
 			//singlemeasuresTimelineAnchor4.content.push(TText(time * this.ratioDuration, 0, 'barNumber textSize4', ('4-' + (i + 1))));
 			//singlemeasuresTimelineAnchor4.content.push(TText(time * this.ratioDuration, -4, 'barNumber textSize4', tempoMeterLabel));
-			if (curMeterCount != song.measures[i].meter.count || curDivision != song.measures[i].meter.division || curTempo != song.measures[i].tempo) {
-				curMeterCount = song.measures[i].meter.count;
-				curDivision = song.measures[i].meter.division;
-				curTempo = song.measures[i].tempo;
-				singlemeasuresTimelineAnchor4.content.push(TText(time * ratioDuration, -4, 'barNumber textSize4'
-					, (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)));
-			}
+			//if (curMeterCount != song.measures[i].meter.count || curDivision != song.measures[i].meter.division || curTempo != song.measures[i].tempo) {
+			//	curMeterCount = song.measures[i].meter.count;
+			//	curDivision = song.measures[i].meter.division;
+			//	curTempo = song.measures[i].tempo;
+			singlemeasuresTimelineAnchor4.content.push(TText(time * ratioDuration, -4 / 4, 'barNumber textSize4'
+				, (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)));
+			//}
 			this.measuresMeasureInfoAnchor4.content.push(singlemeasuresTimelineAnchor4);
 			time = time + measureDuration;
 		}
 	}
-	fillMeasureInfo16(song: ZvoogSchedule,ratioDuration:number,ratioThickness:number) {
+	fillMeasureInfo16(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
 		let time = 0;
 		let curMeterCount = 0;
 		let curDivision = 0;
@@ -119,7 +119,7 @@ class MeasureInfoRenderer{
 				curDivision = song.measures[i].meter.division;
 				curTempo = song.measures[i].tempo;
 				singlemeasuresTimelineAnchor16.content.push({
-					x: time * ratioDuration, y: -16, css: 'barNumber textSize16'
+					x: time * ratioDuration, y: -16 / 4, css: 'barNumber textSize16'
 					, text: (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)
 				});
 			}
@@ -127,7 +127,7 @@ class MeasureInfoRenderer{
 			time = time + measureDuration;
 		}
 	}
-	fillMeasureInfo64(song: ZvoogSchedule,ratioDuration:number,ratioThickness:number) {
+	fillMeasureInfo64(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
 		let time = 0;
 		let curMeterCount = 0;
 		let curDivision = 0;
@@ -149,7 +149,7 @@ class MeasureInfoRenderer{
 				if (i - lastMeasureNum > 2) {
 					lastMeasureNum = i;
 					singlemeasuresTimelineAnchor64.content.push({
-						x: time * ratioDuration, y: -64, css: 'barNumber textSize64'
+						x: time * ratioDuration, y: -64 / 4, css: 'barNumber textSize64'
 						, text: (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)
 					});
 					//console.log('singlemeasuresTimelineAnchor64',i);
@@ -159,7 +159,7 @@ class MeasureInfoRenderer{
 			time = time + measureDuration;
 		}
 	}
-	fillMeasureInfo256(song: ZvoogSchedule,ratioDuration:number,ratioThickness:number) {
+	fillMeasureInfo256(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
 		let time = 0;
 		let curMeterCount = 0;
 		let curDivision = 0;
@@ -167,13 +167,10 @@ class MeasureInfoRenderer{
 		let lastMeasureNum = -123456;
 		for (let i = 0; i < song.measures.length; i++) {
 			let measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-			//let tempoMeterLabel = '' + song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division;
 			let singlemeasuresTimelineAnchor256: TileAnchor = TAnchor(
 				time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness
 				, this.measuresMeasureInfoAnchor256.showZoom, this.measuresMeasureInfoAnchor256.hideZoom
 			);
-			//if (i % 16 == 0) singlemeasuresTimelineAnchor256.content.push({ x: time * this.ratioDuration, y: 0, css: 'barNumber textSize256', text: ('256-' + (i + 1)) });
-			//if (i % 16 == 0) singlemeasuresTimelineAnchor256.content.push({ x: time * this.ratioDuration, y: -256, css: 'barNumber textSize256', text: tempoMeterLabel });
 			if (curMeterCount != song.measures[i].meter.count || curDivision != song.measures[i].meter.division || curTempo != song.measures[i].tempo) {
 				curMeterCount = song.measures[i].meter.count;
 				curDivision = song.measures[i].meter.division;
@@ -182,7 +179,11 @@ class MeasureInfoRenderer{
 					lastMeasureNum = i;
 					singlemeasuresTimelineAnchor256.content.push({
 						x: time * ratioDuration, y: -256, css: 'barNumber textSize256'
-						, text: (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)
+						, text: ('' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)
+					});
+					singlemeasuresTimelineAnchor256.content.push({
+						x: time * ratioDuration, y: -256 / 4, css: 'barNumber textSize256'
+						, text: ('' + song.measures[i].tempo)
 					});
 				}
 			}

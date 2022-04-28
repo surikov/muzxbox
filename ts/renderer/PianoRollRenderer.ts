@@ -83,8 +83,8 @@ class PianoRollRenderer {
 			let line: TileLine = {
 				x1: 0
 				, x2: 0 + 1
-				, y1: 128 - point.velocity
-				, y2: 128 - point.velocity + 1
+				, y1: 128 - point.velocity-0.5*ratioThickness
+				, y2: 128 - point.velocity + 1-0.5*ratioThickness
 				, css: css
 			};
 			anchors[aa].content.push(cloneLine(line));
@@ -116,8 +116,8 @@ class PianoRollRenderer {
 					let line: TileLine = {
 						x1: (time + pitchWhen) * ratioDuration + startShift
 						, x2: (time + pitchWhen + pitchDuration) * ratioDuration + endShift
-						, y1: (128 - pitch.pitch) * ratioThickness
-						, y2: (128 - slide) * ratioThickness
+						, y1: (128 - pitch.pitch) * ratioThickness-0.5*ratioThickness
+						, y2: (128 - slide) * ratioThickness-0.5*ratioThickness
 						, css: css
 					};
 
