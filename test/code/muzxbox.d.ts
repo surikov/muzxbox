@@ -74,7 +74,7 @@ declare class TileLevel {
     set translateY(y: number);
     constructor(svgObject: SVGElement, inWidth: number, inHeight: number, minZoom: number, curZoom: number, maxZoom: number, layers: TileModelLayer[]);
     dump(): void;
-    setupTapSize(): void;
+    setupTapSize(baseSize: number): void;
     onAfterResize(): void;
     onMove(dx: number, dy: number): void;
     moveTail(speed: number): void;
@@ -1022,6 +1022,8 @@ declare class MuzXBox {
     constructor();
     initAll(): void;
     createUI(): void;
+    setLayoutBig(): void;
+    setLayoutNormal(): void;
     setGrid(meters: ZvoogMeter[]): void;
     testFSmidi(): void;
     testFSmxml(): void;
@@ -1098,13 +1100,12 @@ declare class TimeLineRenderer {
     measuresTimelineAnchor4: TileAnchor;
     measuresTimelineAnchor16: TileAnchor;
     measuresTimelineAnchor64: TileAnchor;
-    measuresTimelineAnchor256: TileAnchor;
     timeLayer: TileLayerDefinition;
     attach(zRender: ZRender): void;
     initTimeScaleAnchors(zRender: ZRender): void;
     clearAnchorsContent(zRender: ZRender, songDuration: number): void;
     drawSchedule(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
-    drawLevel(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, layerAnchor: TileAnchor, subSize: string | null, textSize: string, yy: number): void;
+    drawLevel(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, layerAnchor: TileAnchor, subSize: string | null, textSize: string, yy: number, skip8: boolean): void;
     reSetGrid(zrenderer: ZRender, meters: ZvoogMeter[], currentSchedule: ZvoogSchedule): void;
 }
 declare class LayerSelector {

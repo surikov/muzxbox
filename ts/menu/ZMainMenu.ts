@@ -106,7 +106,21 @@ class ZMainMenu {
 
 	}
 	open_nn_level(nn: number) {
-		let wi = '' + (6 + (4 - nn) * 0.5) + 'cm';
+		let pageWidth: number = document.body.offsetWidth;
+		let levelPad = 0.5;
+		//let layMin = 6;
+		let layMx = 12;
+		let pgwi = pageWidth / this.muzXBox.zrenderer.tileLevel.tapSize;
+		let layerDiWidth = layMx;//pgwi/3;
+		if (layerDiWidth > pgwi) layerDiWidth = pgwi;
+
+		//console.log(pgwi,pageWidth ,this.muzXBox.zrenderer.tileLevel.tapSize,layerDiWidth);
+		//if (layerDiWidth < layMin) layerDiWidth = pgwi;
+		//if (layerDiWidth >layMx) layerDiWidth = layMx;
+
+		//let wi = '' + (6 + (4 - nn) * 0.5) + 'cm';
+		let wi = '' + (layerDiWidth - (1 + nn) * levelPad) + 'cm';
+		//console.log(pgwi,pageWidth ,this.muzXBox.zrenderer.tileLevel.tapSize,layerDiWidth,wi);
 		this.panels[nn].levelStyle.width = wi;
 		let subRoot: ZMenuFolder = this.menuRoot;
 		let txt = this.menuRoot.path;
@@ -210,7 +224,24 @@ class ZMainMenu {
 				}
 			], afterOpen: () => { }
 		});
+		this.menuRoot.folders.push({
+			path: "Screen size", icon: "", folders: [], items: [
+				{
+					label: 'normal', autoclose: true, icon: '', action: () => {
+						var me: MuzXBox = window['MZXB'] as MuzXBox;
+						if (me) { me.setLayoutNormal(); }
+					}
+				}
+				, {
+					label: 'big', autoclose: true, icon: '', action: () => {
+						var me: MuzXBox = window['MZXB'] as MuzXBox;
+						if (me) { me.setLayoutBig(); }
+					}
+				}
+			], afterOpen: () => { }
+		});
 	}
+
 	fillFrom(prj: ZvoogSchedule) {
 		this.songFolder.items.length = 0;
 		this.songFolder.folders.length = 0;

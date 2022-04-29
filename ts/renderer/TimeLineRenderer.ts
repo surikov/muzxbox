@@ -4,8 +4,8 @@ class TimeLineRenderer {
 	measuresTimelineAnchor4: TileAnchor;
 	measuresTimelineAnchor16: TileAnchor;
 	measuresTimelineAnchor64: TileAnchor;
-	measuresTimelineAnchor256: TileAnchor;
-	timeLayer:TileLayerDefinition;
+	//measuresTimelineAnchor256: TileAnchor;
+	timeLayer: TileLayerDefinition;
 	attach(zRender: ZRender) {
 		this.upperSelectionScale = (document.getElementById('upperSelectionScale') as any) as SVGElement;
 		this.initTimeScaleAnchors(zRender);
@@ -15,19 +15,18 @@ class TimeLineRenderer {
 		this.measuresTimelineAnchor4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
 		this.measuresTimelineAnchor16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
 		this.measuresTimelineAnchor64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar);
-		this.measuresTimelineAnchor256 = TAnchor(0, 0, 1111, 1111, zRender.zoomFar, zRender.zoomBig + 1);
-		this.timeLayer={
+		//this.measuresTimelineAnchor256 = TAnchor(0, 0, 1111, 1111, zRender.zoomFar, zRender.zoomBig + 1);
+		this.timeLayer = {
 			g: this.upperSelectionScale, stickTop: 0, anchors: [
-				this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256
+				this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64//, this.measuresTimelineAnchor256
 			]
 		};
 		zRender.layers.push(this.timeLayer);
 	}
 	clearAnchorsContent(zRender: ZRender, songDuration: number): void {
 		let anchors: TileAnchor[] = [
-			this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256
+			this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64//, this.measuresTimelineAnchor256
 		];
-
 		for (let i = 0; i < anchors.length; i++) {
 			zRender.clearSingleAnchor(anchors[i], songDuration);
 		}
@@ -35,26 +34,30 @@ class TimeLineRenderer {
 	}
 	drawSchedule(zRender: ZRender, song: ZvoogSchedule
 		, ratioDuration: number, ratioThickness: number
-		) {
-		this.drawLevel(zRender,song, ratioDuration, ratioThickness, this.measuresTimelineAnchor1, 'textSize05', 'textSize1', 1);
-		this.drawLevel(zRender,song, ratioDuration, ratioThickness, this.measuresTimelineAnchor4, 'textSize2', 'textSize4', 4);
-		this.drawLevel(zRender,song, ratioDuration, ratioThickness, this.measuresTimelineAnchor16, null, 'textSize16', 16);
-		this.drawLevel(zRender,song, ratioDuration, ratioThickness, this.measuresTimelineAnchor64, null, 'textSize64', 64);
-		this.drawLevel(zRender,song, ratioDuration, ratioThickness, this.measuresTimelineAnchor256, null, 'textSize256', 256);
+	) {
+
+		this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor1, 'textSize05', 'textSize1', 1, false);
+		this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor4, 'textSize2', 'textSize4', 4, false);
+		this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor16, null, 'textSize16', 16, false);
+		this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor64, null, 'textSize64', 64, true);
+		//this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor256, null, 'textSize256', 256, true);
 	}
-	drawLevel(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, layerAnchor: TileAnchor, subSize: string | null, textSize: string, yy: number) {
+	drawLevel(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, layerAnchor: TileAnchor
+		, subSize: string | null, textSize: string, yy: number, skip8: boolean) {
 		this.measuresTimelineAnchor64.content = [];
 		layerAnchor.content = [];
 		let time = 0;
+
 		for (let i = 0; i < song.measures.length; i++) {
 			let measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-			if (yy < 64 || (i % 8 == 0)) {
+			if (!skip8 || (skip8 && i % 8 == 0)) {
+				//console.log(song.measures.length, yy, i);
 				let measureAnchor: TileAnchor = TAnchor(
 					time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness
 					, layerAnchor.showZoom, layerAnchor.hideZoom
 				);
 				measureAnchor.content.push(TText(time * ratioDuration, yy * 1, 'barNumber ' + textSize, ('' + (1 + i))));
-				let rhythmPattern:ZvoogMeter[]=song.rhythm?song.rhythm:zRender.rhythmPatternDefault;
+				let rhythmPattern: ZvoogMeter[] = song.rhythm ? song.rhythm : zRender.rhythmPatternDefault;
 				if (subSize) {
 					let stepNN = 0;
 					let position: ZvoogMeter = rhythmPattern[stepNN];
@@ -75,17 +78,17 @@ class TimeLineRenderer {
 		}
 		zRender.tileLevel.autoID(this.timeLayer.anchors);
 	}
-	reSetGrid(zrenderer: ZRender,meters: ZvoogMeter[],currentSchedule:ZvoogSchedule) {
+	reSetGrid(zrenderer: ZRender, meters: ZvoogMeter[], currentSchedule: ZvoogSchedule) {
 		zrenderer.tileLevel.resetAnchor(this.measuresTimelineAnchor1, this.upperSelectionScale);
 		zrenderer.tileLevel.resetAnchor(this.measuresTimelineAnchor4, this.upperSelectionScale);
 		zrenderer.tileLevel.resetAnchor(this.measuresTimelineAnchor16, this.upperSelectionScale);
 		zrenderer.tileLevel.resetAnchor(this.measuresTimelineAnchor64, this.upperSelectionScale);
-		zrenderer.tileLevel.resetAnchor(this.measuresTimelineAnchor256, this.upperSelectionScale);
+		//zrenderer.tileLevel.resetAnchor(this.measuresTimelineAnchor256, this.upperSelectionScale);
 		this.drawSchedule(zrenderer
 			, currentSchedule
 			, zrenderer.ratioDuration
 			, zrenderer.ratioThickness
-			);
+		);
 		//zrenderer.tileLevel.allTilesOK=false;
 		//console.log(this.zrenderer.gridRenderer.gridLayerGroup);
 	}

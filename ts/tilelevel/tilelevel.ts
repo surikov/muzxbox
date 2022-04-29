@@ -101,7 +101,7 @@ class TileLevel {
 		//console.trace('TileLevel',layers);
 		//this = this;
 		this.svg = svgObject;
-		this.setupTapSize();
+		this.setupTapSize(1);
 
 		this.viewWidth = this.svg.clientWidth;
 		this.viewHeight = this.svg.clientHeight;
@@ -143,10 +143,12 @@ class TileLevel {
 		this.clearUselessDetails();
 		//console.log('start', this);
 	}*/
-	setupTapSize() {
+	setupTapSize(baseSize:number) {
 		let rect: Element = document.createElementNS(this.svgns, 'rect');
-		rect.setAttributeNS(null, 'height', '1cm');
-		rect.setAttributeNS(null, 'width', '1cm');
+		//rect.setAttributeNS(null, 'height', '1cm');
+		//rect.setAttributeNS(null, 'width', '1cm');
+		rect.setAttributeNS(null, 'height', ''+baseSize+'cm');
+		rect.setAttributeNS(null, 'width', ''+baseSize+'cm');
 		this.svg.appendChild(rect);
 		let tbb: DOMRect = (rect as SVGSVGElement).getBBox();
 		this.tapSize = tbb.width;

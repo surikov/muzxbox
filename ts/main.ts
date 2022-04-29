@@ -69,11 +69,23 @@ class MuzXBox {
 	closeMenu() {
 		(document.getElementById('menuDiv1') as any).style.width = '0%';
 	}*/
+	setLayoutBig() {
+		console.log('setLayoutBig');
+		this.zrenderer.tileLevel.setupTapSize(3);
+		this.zrenderer.drawSchedule(this.currentSchedule);
+		this.zMainMenu.fillFrom(this.currentSchedule);
+	}
+	setLayoutNormal() {
+		console.log('setLayoutNormal');
+		this.zrenderer.tileLevel.setupTapSize(1);
+		this.zrenderer.drawSchedule(this.currentSchedule);
+		this.zMainMenu.fillFrom(this.currentSchedule);
+	}
 	setGrid(meters: ZvoogMeter[]) {
 		this.currentSchedule.rhythm = meters;
-		this.zrenderer.gridRenderer.reSetGrid(this.zrenderer,meters,this.currentSchedule);
-		this.zrenderer.timeLineRenderer.reSetGrid(this.zrenderer,meters,this.currentSchedule);
-		this.zrenderer.tileLevel.allTilesOK=false;
+		this.zrenderer.gridRenderer.reSetGrid(this.zrenderer, meters, this.currentSchedule);
+		this.zrenderer.timeLineRenderer.reSetGrid(this.zrenderer, meters, this.currentSchedule);
+		this.zrenderer.tileLevel.allTilesOK = false;
 		/*this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor1, this.zrenderer.gridRenderer.gridLayerGroup);
 		this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor4, this.zrenderer.gridRenderer.gridLayerGroup);
 		this.zrenderer.tileLevel.resetAnchor(this.zrenderer.gridRenderer.gridAnchor16, this.zrenderer.gridRenderer.gridLayerGroup);

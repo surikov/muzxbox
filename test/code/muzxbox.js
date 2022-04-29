@@ -193,7 +193,7 @@ var TileLevel = (function () {
         this.dragTranslateY = 0;
         this.mouseDownMode = false;
         this.svg = svgObject;
-        this.setupTapSize();
+        this.setupTapSize(1);
         this.viewWidth = this.svg.clientWidth;
         this.viewHeight = this.svg.clientHeight;
         this.innerWidth = inWidth * this.tapSize;
@@ -265,10 +265,10 @@ var TileLevel = (function () {
     TileLevel.prototype.dump = function () {
         console.log('dump', this);
     };
-    TileLevel.prototype.setupTapSize = function () {
+    TileLevel.prototype.setupTapSize = function (baseSize) {
         var rect = document.createElementNS(this.svgns, 'rect');
-        rect.setAttributeNS(null, 'height', '1cm');
-        rect.setAttributeNS(null, 'width', '1cm');
+        rect.setAttributeNS(null, 'height', '' + baseSize + 'cm');
+        rect.setAttributeNS(null, 'width', '' + baseSize + 'cm');
         this.svg.appendChild(rect);
         var tbb = rect.getBBox();
         this.tapSize = tbb.width;
@@ -4265,7 +4265,14 @@ var ZMainMenu = (function () {
         }
     };
     ZMainMenu.prototype.open_nn_level = function (nn) {
-        var wi = '' + (6 + (4 - nn) * 0.5) + 'cm';
+        var pageWidth = document.body.offsetWidth;
+        var levelPad = 0.5;
+        var layMx = 12;
+        var pgwi = pageWidth / this.muzXBox.zrenderer.tileLevel.tapSize;
+        var layerDiWidth = layMx;
+        if (layerDiWidth > pgwi)
+            layerDiWidth = pgwi;
+        var wi = '' + (layerDiWidth - (1 + nn) * levelPad) + 'cm';
         this.panels[nn].levelStyle.width = wi;
         var subRoot = this.menuRoot;
         var txt = this.menuRoot.path;
@@ -4368,6 +4375,26 @@ var ZMainMenu = (function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setGrid(rr);
+                        }
+                    }
+                }
+            ], afterOpen: function () { }
+        });
+        this.menuRoot.folders.push({
+            path: "Screen size", icon: "", folders: [], items: [
+                {
+                    label: 'normal', autoclose: true, icon: '', action: function () {
+                        var me = window['MZXB'];
+                        if (me) {
+                            me.setLayoutNormal();
+                        }
+                    }
+                },
+                {
+                    label: 'big', autoclose: true, icon: '', action: function () {
+                        var me = window['MZXB'];
+                        if (me) {
+                            me.setLayoutBig();
                         }
                     }
                 }
@@ -4538,6 +4565,18 @@ var MuzXBox = (function () {
         };
         this.currentSchedule = emptySchedule;
         this.zrenderer.drawSchedule(emptySchedule);
+        this.zMainMenu.fillFrom(this.currentSchedule);
+    };
+    MuzXBox.prototype.setLayoutBig = function () {
+        console.log('setLayoutBig');
+        this.zrenderer.tileLevel.setupTapSize(3);
+        this.zrenderer.drawSchedule(this.currentSchedule);
+        this.zMainMenu.fillFrom(this.currentSchedule);
+    };
+    MuzXBox.prototype.setLayoutNormal = function () {
+        console.log('setLayoutNormal');
+        this.zrenderer.tileLevel.setupTapSize(1);
+        this.zrenderer.drawSchedule(this.currentSchedule);
         this.zMainMenu.fillFrom(this.currentSchedule);
     };
     MuzXBox.prototype.setGrid = function (meters) {
@@ -5185,36 +5224,34 @@ var TimeLineRenderer = (function () {
         this.measuresTimelineAnchor4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
         this.measuresTimelineAnchor16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
         this.measuresTimelineAnchor64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar);
-        this.measuresTimelineAnchor256 = TAnchor(0, 0, 1111, 1111, zRender.zoomFar, zRender.zoomBig + 1);
         this.timeLayer = {
             g: this.upperSelectionScale, stickTop: 0, anchors: [
-                this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256
+                this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64
             ]
         };
         zRender.layers.push(this.timeLayer);
     };
     TimeLineRenderer.prototype.clearAnchorsContent = function (zRender, songDuration) {
         var anchors = [
-            this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256
+            this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64
         ];
         for (var i = 0; i < anchors.length; i++) {
             zRender.clearSingleAnchor(anchors[i], songDuration);
         }
     };
     TimeLineRenderer.prototype.drawSchedule = function (zRender, song, ratioDuration, ratioThickness) {
-        this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor1, 'textSize05', 'textSize1', 1);
-        this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor4, 'textSize2', 'textSize4', 4);
-        this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor16, null, 'textSize16', 16);
-        this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor64, null, 'textSize64', 64);
-        this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor256, null, 'textSize256', 256);
+        this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor1, 'textSize05', 'textSize1', 1, false);
+        this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor4, 'textSize2', 'textSize4', 4, false);
+        this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor16, null, 'textSize16', 16, false);
+        this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor64, null, 'textSize64', 64, true);
     };
-    TimeLineRenderer.prototype.drawLevel = function (zRender, song, ratioDuration, ratioThickness, layerAnchor, subSize, textSize, yy) {
+    TimeLineRenderer.prototype.drawLevel = function (zRender, song, ratioDuration, ratioThickness, layerAnchor, subSize, textSize, yy, skip8) {
         this.measuresTimelineAnchor64.content = [];
         layerAnchor.content = [];
         var time = 0;
         for (var i = 0; i < song.measures.length; i++) {
             var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-            if (yy < 64 || (i % 8 == 0)) {
+            if (!skip8 || (skip8 && i % 8 == 0)) {
                 var measureAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, layerAnchor.showZoom, layerAnchor.hideZoom);
                 measureAnchor.content.push(TText(time * ratioDuration, yy * 1, 'barNumber ' + textSize, ('' + (1 + i))));
                 var rhythmPattern = song.rhythm ? song.rhythm : zRender.rhythmPatternDefault;
@@ -5243,7 +5280,6 @@ var TimeLineRenderer = (function () {
         zrenderer.tileLevel.resetAnchor(this.measuresTimelineAnchor4, this.upperSelectionScale);
         zrenderer.tileLevel.resetAnchor(this.measuresTimelineAnchor16, this.upperSelectionScale);
         zrenderer.tileLevel.resetAnchor(this.measuresTimelineAnchor64, this.upperSelectionScale);
-        zrenderer.tileLevel.resetAnchor(this.measuresTimelineAnchor256, this.upperSelectionScale);
         this.drawSchedule(zrenderer, currentSchedule, zrenderer.ratioDuration, zrenderer.ratioThickness);
     };
     return TimeLineRenderer;
