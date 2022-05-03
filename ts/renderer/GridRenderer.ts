@@ -32,7 +32,7 @@ class GridRenderer {
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			zRender.clearSingleAnchor(anchors[i], songDuration);
+			zRender.clearResizeSingleAnchor(anchors[i], songDuration);
 		}
 
 	}

@@ -613,9 +613,12 @@ class TileLevel {
 	}
 	checkAfterZoom() {
 		//if (this.afterZoomCallback) {
-		this.onZoom.start(555, function () {
-			//console.log('afterZoom', this.afterZoomCallback);
-			if (this.afterZoomCallback) this.afterZoomCallback();
+		this.onZoom.start(123, function () {
+			
+			if (this.afterZoomCallback) {
+				//console.log('afterZoom', this.afterZoomCallback);
+				this.afterZoomCallback();
+			}
 		}.bind(this));
 		//}
 	}

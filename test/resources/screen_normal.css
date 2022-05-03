@@ -1,4 +1,16 @@
-base1{
+:root {
+	--background_color: #ffddff;
+}
+html {
+	font-family: 'Zen Kurenaido', serif, cursive;
+}
+.menuHead{
+	height:1cm;
+}
+.menuContent{
+	margin-top: 1.5cm;
+}
+#menuButtonImage{
 	width:1cm;
 	height:1cm;
 }

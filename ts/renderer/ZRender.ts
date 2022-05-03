@@ -39,7 +39,7 @@ class ZRender {
 	debugAnchor64: TileAnchor;
 	debugAnchor256: TileAnchor;
 
-
+	muzXBox:MuzXBox;
 	/*
 		*/
 
@@ -47,8 +47,9 @@ class ZRender {
 
 
 
-	constructor() {
+	constructor(bx:MuzXBox) {
 		//this.bindLayers();
+		this.muzXBox=bx;
 	}
 
 	bindLayers() {
@@ -63,16 +64,27 @@ class ZRender {
 			, this.zoomMin, this.zoomMin, this.zoomMax
 			, this.layers);
 		//this.measureInfoRenderer.attach(this);
-		/*var lastLevelOfDetails = 1;
+		var lastLevelOfDetails = this.zoomMin;
 		this.tileLevel.afterZoomCallback = () => {
-			var curLOD = this.levelOfDetails(this.tileLevel.translateZ);
+			//console.log('check afterZoomCallback', lastLevelOfDetails, this.tileLevel.translateZ);
+				
+			var curLOD = this.zoomMin;
+			if (this.tileLevel.translateZ >= this.zoomMin) curLOD = this.zoomMin;
+			if (this.tileLevel.translateZ >= this.zoomNote) curLOD = this.zoomNote;
+			if (this.tileLevel.translateZ >= this.zoomMeasure) curLOD = this.zoomMeasure;
+			if (this.tileLevel.translateZ >= this.zoomSong) curLOD = this.zoomSong;
+			if (this.tileLevel.translateZ >= this.zoomFar) curLOD = this.zoomFar;
+			if (this.tileLevel.translateZ >= this.zoomBig) curLOD = this.zoomBig;
+			if (this.tileLevel.translateZ >= this.zoomMax) curLOD = this.zoomMax;
+
+
 			if (curLOD != lastLevelOfDetails) {
+				let songDuration = scheduleDuration(this.muzXBox.currentSchedule);
+				console.log('run afterZoomCallback', lastLevelOfDetails, curLOD,this.tileLevel.translateZ);
 				lastLevelOfDetails = curLOD;
-				new CannyDo().start(50, () => {
-					console.log('run afterZoomCallback',lastLevelOfDetails);
-				});
+				this.focusManager.reSetFocus(this,songDuration);
 			}
-		};*/
+		};
 
 	}
 	resetLabel(song: ZvoogSchedule) {
@@ -179,7 +191,7 @@ class ZRender {
 		if (zz < this.zoomFar) { return 64; }
 		return 256;
 	}
-	initUI() {
+	initUI(bx: MuzXBox) {
 		this.initDebugAnchors();
 		//this.initTimelineAnchors();
 		//this.initMeasureInfoAnchors();
@@ -189,9 +201,9 @@ class ZRender {
 		this.pianoRollRenderer.attach(this);
 		this.gridRenderer.attach(this);
 		this.timeLineRenderer.attach(this);
-		this.focusManager.attach(this);
+		this.focusManager.attachFocus(bx, this);
 		this.leftKeysRenderer.attach(this);
-		
+
 	}
 	initDebugAnchors() {
 		this.debugAnchor0 = TAnchor(0, 0, 1111, 1111, this.zoomMin, this.zoomMax + 1);
@@ -210,7 +222,7 @@ class ZRender {
 	/*
 	*/
 
-	clearSingleAnchor(anchor: TileAnchor, songDuration: number) {
+	clearResizeSingleAnchor(anchor: TileAnchor, songDuration: number) {
 		anchor.content.length = 0;
 		anchor.ww = this.ratioDuration * songDuration;
 		anchor.hh = 128 * this.ratioThickness;
@@ -224,8 +236,9 @@ class ZRender {
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			this.clearSingleAnchor(anchors[i], songDuration);
+			this.clearResizeSingleAnchor(anchors[i], songDuration);
 		}
+		this.focusManager.clearAnchorsContent(this, songDuration);
 		this.gridRenderer.clearAnchorsContent(this, songDuration);
 		this.measureInfoRenderer.clearAnchorsContent(this, songDuration);
 		this.pianoRollRenderer.clearAnchorsContent(this, songDuration);
@@ -261,7 +274,7 @@ class ZRender {
 		}
 */
 		this.tileLevel.resetModel();
-		this.focusManager.reSetFocus(this, song);
+		this.focusManager.reSetFocus(this,songDuration);//, song,this.tileLevel.translateX,this.tileLevel.translateY,this.tileLevel.translateZ);
 		this.resetLabel(song);
 	}
 

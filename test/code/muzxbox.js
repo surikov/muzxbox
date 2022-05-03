@@ -9,16 +9,6 @@ var ZInputDeviceHandler = (function () {
         });
     }
     ZInputDeviceHandler.prototype.bindEvents = function () {
-        var _this = this;
-        var lastLevelOfDetails = 1;
-        this.muzXBox.zrenderer.tileLevel.afterZoomCallback = function () {
-            var curLOD = _this.muzXBox.zrenderer.levelOfDetails(_this.muzXBox.zrenderer.tileLevel.translateZ);
-            if (curLOD != lastLevelOfDetails) {
-                lastLevelOfDetails = curLOD;
-                new CannyDo().start(50, function () {
-                });
-            }
-        };
     };
     ZInputDeviceHandler.prototype.processKeyboardEvent = function (keyboardEvent) {
         switch (keyboardEvent.code) {
@@ -80,16 +70,14 @@ var ZInputDeviceHandler = (function () {
         if (this.muzXBox.zMainMenu.currentLevel) {
         }
         else {
-            var zoom = this.muzXBox.zrenderer.tileLevel.translateZ - this.muzXBox.zrenderer.tileLevel.translateZ * 0.25;
-            this.changeZoomTo(zoom);
+            this.muzXBox.zrenderer.focusManager.spotPlus();
         }
     };
     ZInputDeviceHandler.prototype.processAnyMinus = function () {
         if (this.muzXBox.zMainMenu.currentLevel) {
         }
         else {
-            var zoom = this.muzXBox.zrenderer.tileLevel.translateZ + this.muzXBox.zrenderer.tileLevel.translateZ * 0.25;
-            this.changeZoomTo(zoom);
+            this.muzXBox.zrenderer.focusManager.spotMinus();
         }
     };
     ZInputDeviceHandler.prototype.processArrowLeft = function () {
@@ -119,30 +107,6 @@ var ZInputDeviceHandler = (function () {
         else {
             this.muzXBox.zrenderer.focusManager.spotDown();
         }
-    };
-    ZInputDeviceHandler.prototype.changePositionTo = function (xx, yy) {
-        this.muzXBox.zrenderer.tileLevel.translateX = xx;
-        this.muzXBox.zrenderer.tileLevel.translateY = yy;
-        this.muzXBox.zrenderer.tileLevel.applyZoomPosition();
-        this.muzXBox.zrenderer.tileLevel.onMove(xx, yy);
-        var a = this.muzXBox.zrenderer.tileLevel.calculateValidContentPosition();
-        if (a.x != this.muzXBox.zrenderer.tileLevel.translateX || a.y != this.muzXBox.zrenderer.tileLevel.translateY || a.z != this.muzXBox.zrenderer.tileLevel.translateZ) {
-            this.muzXBox.zrenderer.tileLevel.translateX = a.x;
-            this.muzXBox.zrenderer.tileLevel.translateY = a.y;
-        }
-        this.muzXBox.zrenderer.tileLevel.allTilesOK = false;
-    };
-    ZInputDeviceHandler.prototype.changeZoomTo = function (zoom) {
-        if (zoom < this.muzXBox.zrenderer.tileLevel.minZoom()) {
-            zoom = this.muzXBox.zrenderer.tileLevel.minZoom();
-        }
-        if (zoom > this.muzXBox.zrenderer.tileLevel.maxZoom()) {
-            zoom = this.muzXBox.zrenderer.tileLevel.maxZoom();
-        }
-        this.muzXBox.zrenderer.tileLevel.translateZ = zoom;
-        this.muzXBox.zrenderer.tileLevel.applyZoomPosition();
-        this.muzXBox.zrenderer.tileLevel.adjustContentPosition();
-        this.muzXBox.zrenderer.tileLevel.allTilesOK = false;
     };
     return ZInputDeviceHandler;
 }());
@@ -622,9 +586,10 @@ var TileLevel = (function () {
         this.checkAfterZoom();
     };
     TileLevel.prototype.checkAfterZoom = function () {
-        this.onZoom.start(555, function () {
-            if (this.afterZoomCallback)
+        this.onZoom.start(123, function () {
+            if (this.afterZoomCallback) {
                 this.afterZoomCallback();
+            }
         }.bind(this));
     };
     TileLevel.prototype.slideToContentPosition = function () {
@@ -1348,7 +1313,7 @@ function rid() {
     return 'id' + Math.floor(Math.random() * 1000000000);
 }
 var ZRender = (function () {
-    function ZRender() {
+    function ZRender(bx) {
         this.layers = [];
         this.zoomMin = 1;
         this.zoomNote = 2;
@@ -1374,10 +1339,36 @@ var ZRender = (function () {
         this.timeLineRenderer = new TimeLineRenderer();
         this.leftKeysRenderer = new LeftKeysRenderer();
         this.focusManager = new FocusManagement();
+        this.muzXBox = bx;
     }
     ZRender.prototype.bindLayers = function () {
+        var _this = this;
         this.debugLayerGroup = document.getElementById('debugLayerGroup');
         this.tileLevel = new TileLevel(document.getElementById('contentSVG'), 1000, 1000, this.zoomMin, this.zoomMin, this.zoomMax, this.layers);
+        var lastLevelOfDetails = this.zoomMin;
+        this.tileLevel.afterZoomCallback = function () {
+            var curLOD = _this.zoomMin;
+            if (_this.tileLevel.translateZ >= _this.zoomMin)
+                curLOD = _this.zoomMin;
+            if (_this.tileLevel.translateZ >= _this.zoomNote)
+                curLOD = _this.zoomNote;
+            if (_this.tileLevel.translateZ >= _this.zoomMeasure)
+                curLOD = _this.zoomMeasure;
+            if (_this.tileLevel.translateZ >= _this.zoomSong)
+                curLOD = _this.zoomSong;
+            if (_this.tileLevel.translateZ >= _this.zoomFar)
+                curLOD = _this.zoomFar;
+            if (_this.tileLevel.translateZ >= _this.zoomBig)
+                curLOD = _this.zoomBig;
+            if (_this.tileLevel.translateZ >= _this.zoomMax)
+                curLOD = _this.zoomMax;
+            if (curLOD != lastLevelOfDetails) {
+                var songDuration = scheduleDuration(_this.muzXBox.currentSchedule);
+                console.log('run afterZoomCallback', lastLevelOfDetails, curLOD, _this.tileLevel.translateZ);
+                lastLevelOfDetails = curLOD;
+                _this.focusManager.reSetFocus(_this, songDuration);
+            }
+        };
     };
     ZRender.prototype.resetLabel = function (song) {
         var s1 = '';
@@ -1470,13 +1461,13 @@ var ZRender = (function () {
         }
         return 256;
     };
-    ZRender.prototype.initUI = function () {
+    ZRender.prototype.initUI = function (bx) {
         this.initDebugAnchors();
         this.measureInfoRenderer.attach(this);
         this.pianoRollRenderer.attach(this);
         this.gridRenderer.attach(this);
         this.timeLineRenderer.attach(this);
-        this.focusManager.attach(this);
+        this.focusManager.attachFocus(bx, this);
         this.leftKeysRenderer.attach(this);
     };
     ZRender.prototype.initDebugAnchors = function () {
@@ -1492,7 +1483,7 @@ var ZRender = (function () {
             ]
         });
     };
-    ZRender.prototype.clearSingleAnchor = function (anchor, songDuration) {
+    ZRender.prototype.clearResizeSingleAnchor = function (anchor, songDuration) {
         anchor.content.length = 0;
         anchor.ww = this.ratioDuration * songDuration;
         anchor.hh = 128 * this.ratioThickness;
@@ -1502,8 +1493,9 @@ var ZRender = (function () {
             this.debugAnchor0, this.debugAnchor1, this.debugAnchor4, this.debugAnchor16, this.debugAnchor64, this.debugAnchor256
         ];
         for (var i = 0; i < anchors.length; i++) {
-            this.clearSingleAnchor(anchors[i], songDuration);
+            this.clearResizeSingleAnchor(anchors[i], songDuration);
         }
+        this.focusManager.clearAnchorsContent(this, songDuration);
         this.gridRenderer.clearAnchorsContent(this, songDuration);
         this.measureInfoRenderer.clearAnchorsContent(this, songDuration);
         this.pianoRollRenderer.clearAnchorsContent(this, songDuration);
@@ -1527,7 +1519,7 @@ var ZRender = (function () {
         this.timeLineRenderer.drawSchedule(this, song, this.ratioDuration, this.ratioThickness);
         this.leftKeysRenderer.drawKeys(this, song, this.ratioDuration, this.ratioThickness);
         this.tileLevel.resetModel();
-        this.focusManager.reSetFocus(this, song);
+        this.focusManager.reSetFocus(this, songDuration);
         this.resetLabel(song);
     };
     return ZRender;
@@ -4336,9 +4328,11 @@ var ZMainMenu = (function () {
         });
         this.menuRoot.folders.push(this.songFolder);
         this.menuRoot.folders.push({
-            path: "Rhythm patterns", icon: "", folders: [], items: [
+            path: "Rhythm patterns", icon: "", folders: [],
+            items: [
                 {
-                    label: 'plain 1/16', autoclose: true, icon: '', action: function () {
+                    label: 'plain 1/16', autoclose: true, icon: '',
+                    action: function () {
                         var rr = [
                             { count: 1, division: 16 }, { count: 1, division: 16 },
                             { count: 1, division: 16 }, { count: 1, division: 16 },
@@ -4353,7 +4347,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/8', autoclose: true, icon: '', action: function () {
+                    label: 'plain 1/8', autoclose: true, icon: '',
+                    action: function () {
                         var rr = [
                             { count: 1, division: 8 }, { count: 1, division: 8 },
                             { count: 1, division: 8 }, { count: 1, division: 8 }
@@ -4366,7 +4361,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'swing 1/8', autoclose: true, icon: '', action: function () {
+                    label: 'swing 1/8', autoclose: true, icon: '',
+                    action: function () {
                         var rr = [
                             { count: 5, division: 32 }, { count: 3, division: 32 },
                             { count: 5, division: 32 }, { count: 3, division: 32 }
@@ -4381,9 +4377,11 @@ var ZMainMenu = (function () {
             ], afterOpen: function () { }
         });
         this.menuRoot.folders.push({
-            path: "Screen size", icon: "", folders: [], items: [
+            path: "Screen size", icon: "", folders: [],
+            items: [
                 {
-                    label: 'normal', autoclose: true, icon: '', action: function () {
+                    label: 'normal', autoclose: true, icon: '',
+                    action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutNormal();
@@ -4391,7 +4389,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'big', autoclose: true, icon: '', action: function () {
+                    label: 'big', autoclose: true, icon: '',
+                    action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutBig();
@@ -4540,11 +4539,11 @@ var MuzXBox = (function () {
     }
     MuzXBox.prototype.initAll = function () {
         console.log('initAll');
-        this.zrenderer = new ZRender();
+        this.zrenderer = new ZRender(this);
         this.zInputDeviceHandler = new ZInputDeviceHandler(this);
         this.zMainMenu = new ZMainMenu(this);
         this.zrenderer.bindLayers();
-        this.zrenderer.initUI();
+        this.zrenderer.initUI(this);
         this.createUI();
         us.selectMode('ru');
         us.selectMode('en');
@@ -4567,14 +4566,31 @@ var MuzXBox = (function () {
         this.zrenderer.drawSchedule(emptySchedule);
         this.zMainMenu.fillFrom(this.currentSchedule);
     };
+    MuzXBox.prototype.changeCSS = function (cssHref, cssLinkIndex) {
+        var oldLink = document.getElementsByTagName("link").item(cssLinkIndex);
+        if (oldLink) {
+            var newLink = document.createElement("link");
+            newLink.setAttribute("rel", "stylesheet");
+            newLink.setAttribute("type", "text/css");
+            newLink.setAttribute("href", cssHref);
+            console.log('newLink', newLink);
+            var headItem = document.getElementsByTagName("head").item(cssLinkIndex);
+            console.log('headItem', oldLink);
+            if (headItem) {
+                headItem.appendChild(newLink);
+            }
+        }
+    };
     MuzXBox.prototype.setLayoutBig = function () {
         console.log('setLayoutBig');
+        this.changeCSS('resources/screen_big.css', 0);
         this.zrenderer.tileLevel.setupTapSize(3);
         this.zrenderer.drawSchedule(this.currentSchedule);
         this.zMainMenu.fillFrom(this.currentSchedule);
     };
     MuzXBox.prototype.setLayoutNormal = function () {
         console.log('setLayoutNormal');
+        this.changeCSS('resources/screen_normal.css', 0);
         this.zrenderer.tileLevel.setupTapSize(1);
         this.zrenderer.drawSchedule(this.currentSchedule);
         this.zMainMenu.fillFrom(this.currentSchedule);
@@ -4651,7 +4667,7 @@ var MeasureInfoRenderer = (function () {
             this.measuresMeasureInfoAnchor1, this.measuresMeasureInfoAnchor4, this.measuresMeasureInfoAnchor16, this.measuresMeasureInfoAnchor64, this.measuresMeasureInfoAnchor256
         ];
         for (var i = 0; i < anchors.length; i++) {
-            zRender.clearSingleAnchor(anchors[i], songDuration);
+            zRender.clearResizeSingleAnchor(anchors[i], songDuration);
         }
     };
     MeasureInfoRenderer.prototype.fillMeasureInfo1 = function (song, ratioDuration, ratioThickness) {
@@ -4769,7 +4785,7 @@ var PianoRollRenderer = (function () {
             this.contentOther1, this.contentOther4, this.contentOther16, this.contentOther64, this.contentOther256
         ];
         for (var i = 0; i < anchors.length; i++) {
-            zRender.clearSingleAnchor(anchors[i], songDuration);
+            zRender.clearResizeSingleAnchor(anchors[i], songDuration);
         }
     };
     PianoRollRenderer.prototype.initMainAnchors = function (zRender) {
@@ -5130,7 +5146,7 @@ var GridRenderer = (function () {
             this.gridAnchor1, this.gridAnchor4, this.gridAnchor16, this.gridAnchor64, this.gridAnchor256
         ];
         for (var i = 0; i < anchors.length; i++) {
-            zRender.clearSingleAnchor(anchors[i], songDuration);
+            zRender.clearResizeSingleAnchor(anchors[i], songDuration);
         }
     };
     GridRenderer.prototype.drawGrid = function (zRender, song, ratioDuration, ratioThickness, rhythmPattern) {
@@ -5236,7 +5252,7 @@ var TimeLineRenderer = (function () {
             this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64
         ];
         for (var i = 0; i < anchors.length; i++) {
-            zRender.clearSingleAnchor(anchors[i], songDuration);
+            zRender.clearResizeSingleAnchor(anchors[i], songDuration);
         }
     };
     TimeLineRenderer.prototype.drawSchedule = function (zRender, song, ratioDuration, ratioThickness) {
@@ -5495,11 +5511,122 @@ var LayerSelector = (function () {
     };
     return LayerSelector;
 }());
+var FocusOtherLevel = (function () {
+    function FocusOtherLevel() {
+    }
+    FocusOtherLevel.prototype.isMatch = function (zoomLevel, zRender) {
+        return true;
+    };
+    FocusOtherLevel.prototype.addSpot = function (mngmnt) {
+    };
+    FocusOtherLevel.prototype.spotUp = function () {
+        console.log('other spotUp');
+    };
+    FocusOtherLevel.prototype.spotDown = function () {
+        console.log('other spotDown');
+    };
+    FocusOtherLevel.prototype.spotLeft = function () {
+        console.log('other spotLeft');
+    };
+    FocusOtherLevel.prototype.spotRight = function () {
+        console.log('other spotRight');
+    };
+    return FocusOtherLevel;
+}());
+var FocusZoomNote = (function () {
+    function FocusZoomNote() {
+    }
+    FocusZoomNote.prototype.isMatch = function (zoomLevel, zRender) {
+        if (zoomLevel < zRender.zoomNote) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    FocusZoomNote.prototype.addSpot = function (mngmnt) {
+        mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'debug' });
+    };
+    FocusZoomNote.prototype.spotUp = function () {
+        console.log('note spotUp');
+    };
+    FocusZoomNote.prototype.spotDown = function () {
+        console.log('note spotDown');
+    };
+    FocusZoomNote.prototype.spotLeft = function () {
+        console.log('note spotLeft');
+    };
+    FocusZoomNote.prototype.spotRight = function () {
+        console.log('note spotRight');
+    };
+    return FocusZoomNote;
+}());
+var FocusZoomMeasure = (function () {
+    function FocusZoomMeasure() {
+    }
+    FocusZoomMeasure.prototype.isMatch = function (zoomLevel, zRender) {
+        if (zoomLevel >= zRender.zoomNote && zoomLevel < zRender.zoomMeasure) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    FocusZoomMeasure.prototype.addSpot = function (mngmnt) {
+        var r = mngmnt.muzXBox.zrenderer.ratioThickness;
+        mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: r, h: r, rx: 0, ry: 0, css: 'debug' });
+    };
+    FocusZoomMeasure.prototype.spotUp = function () {
+        console.log('measure spotUp');
+    };
+    FocusZoomMeasure.prototype.spotDown = function () {
+        console.log('measure spotDown');
+    };
+    FocusZoomMeasure.prototype.spotLeft = function () {
+        console.log('measure spotLeft');
+    };
+    FocusZoomMeasure.prototype.spotRight = function () {
+        console.log('measure spotRight');
+    };
+    return FocusZoomMeasure;
+}());
+var FocusZoomSong = (function () {
+    function FocusZoomSong() {
+    }
+    FocusZoomSong.prototype.isMatch = function (zoomLevel, zRender) {
+        if (zoomLevel >= zRender.zoomMeasure && zoomLevel < zRender.zoomSong) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    FocusZoomSong.prototype.addSpot = function (mngmnt) {
+        var r = mngmnt.muzXBox.zrenderer.ratioThickness;
+        mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: r * 127, h: r * 127, rx: 0, ry: 0, css: 'debug' });
+    };
+    FocusZoomSong.prototype.spotUp = function () {
+        console.log('song spotUp');
+    };
+    FocusZoomSong.prototype.spotDown = function () {
+        console.log('song spotDown');
+    };
+    FocusZoomSong.prototype.spotLeft = function () {
+        console.log('song spotLeft');
+    };
+    FocusZoomSong.prototype.spotRight = function () {
+        console.log('song spotRight');
+    };
+    return FocusZoomSong;
+}());
 var FocusManagement = (function () {
     function FocusManagement() {
         this.levelOfDetails = 0;
+        this.focusLevels = [new FocusZoomSong(), new FocusZoomMeasure(), new FocusZoomNote(), new FocusOtherLevel()];
     }
-    FocusManagement.prototype.attach = function (zRender) {
+    FocusManagement.prototype.attachFocus = function (bx, zRender) {
+        console.log('attachFocus');
+        this.muzXBox = bx;
         this.focusMarkerLayer = document.getElementById('focusMarkerLayer');
         this.focusAnchor = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomMax + 1);
         this.focusLayer = {
@@ -5509,30 +5636,81 @@ var FocusManagement = (function () {
         };
         zRender.layers.push(this.focusLayer);
     };
-    FocusManagement.prototype.addSpot = function () {
+    FocusManagement.prototype.clearAnchorsContent = function (zRender, songDuration) {
+        var anchors = [
+            this.focusAnchor
+        ];
+        for (var i = 0; i < anchors.length; i++) {
+            zRender.clearResizeSingleAnchor(anchors[i], songDuration);
+        }
     };
-    FocusManagement.prototype.reSetFocus = function (zrenderer, song) {
+    FocusManagement.prototype.currentFocusLevelX = function () {
+        for (var i = 0; i < this.focusLevels.length; i++) {
+            if (this.focusLevels[i].isMatch(this.muzXBox.zrenderer.tileLevel.translateZ, this.muzXBox.zrenderer)) {
+                return this.focusLevels[i];
+            }
+        }
+        return this.focusLevels[this.focusLevels.length - 1];
+    };
+    FocusManagement.prototype.reSetFocus = function (zrenderer, songDuration) {
+        console.log('reSetFocus');
         zrenderer.tileLevel.resetAnchor(this.focusAnchor, this.focusMarkerLayer);
-        this.addSpot();
+        zrenderer.clearResizeSingleAnchor(this.focusAnchor, songDuration);
+        this.currentFocusLevelX().addSpot(this);
         zrenderer.tileLevel.allTilesOK = false;
     };
     FocusManagement.prototype.spotUp = function () {
-        console.log('spotUp');
+        this.currentFocusLevelX().spotUp();
     };
     FocusManagement.prototype.spotDown = function () {
-        console.log('spotDown');
+        this.currentFocusLevelX().spotDown();
     };
     FocusManagement.prototype.spotLeft = function () {
-        console.log('spotLeft');
+        this.currentFocusLevelX().spotLeft();
     };
     FocusManagement.prototype.spotRight = function () {
-        console.log('spotRight');
-    };
-    FocusManagement.prototype.spotReset = function () {
-        console.log('spotReset');
+        this.currentFocusLevelX().spotRight();
     };
     FocusManagement.prototype.spotSelectA = function () {
         console.log('spotSelectA');
+    };
+    FocusManagement.prototype.spotPlus = function () {
+        console.log('spotPlus');
+        var zoom = this.muzXBox.zrenderer.tileLevel.translateZ
+            - this.muzXBox.zrenderer.tileLevel.translateZ * 0.25;
+        this.changeZoomTo(zoom);
+    };
+    FocusManagement.prototype.spotMinus = function () {
+        console.log('spotMinus');
+        var zoom = this.muzXBox.zrenderer.tileLevel.translateZ
+            + this.muzXBox.zrenderer.tileLevel.translateZ * 0.25;
+        this.changeZoomTo(zoom);
+    };
+    FocusManagement.prototype.changePositionTo = function (xx, yy) {
+        this.muzXBox.zrenderer.tileLevel.translateX = xx;
+        this.muzXBox.zrenderer.tileLevel.translateY = yy;
+        this.muzXBox.zrenderer.tileLevel.applyZoomPosition();
+        this.muzXBox.zrenderer.tileLevel.onMove(xx, yy);
+        var a = this.muzXBox.zrenderer.tileLevel.calculateValidContentPosition();
+        if (a.x != this.muzXBox.zrenderer.tileLevel.translateX
+            || a.y != this.muzXBox.zrenderer.tileLevel.translateY
+            || a.z != this.muzXBox.zrenderer.tileLevel.translateZ) {
+            this.muzXBox.zrenderer.tileLevel.translateX = a.x;
+            this.muzXBox.zrenderer.tileLevel.translateY = a.y;
+        }
+        this.muzXBox.zrenderer.tileLevel.allTilesOK = false;
+    };
+    FocusManagement.prototype.changeZoomTo = function (zoom) {
+        if (zoom < this.muzXBox.zrenderer.tileLevel.minZoom()) {
+            zoom = this.muzXBox.zrenderer.tileLevel.minZoom();
+        }
+        if (zoom > this.muzXBox.zrenderer.tileLevel.maxZoom()) {
+            zoom = this.muzXBox.zrenderer.tileLevel.maxZoom();
+        }
+        this.muzXBox.zrenderer.tileLevel.translateZ = zoom;
+        this.muzXBox.zrenderer.tileLevel.applyZoomPosition();
+        this.muzXBox.zrenderer.tileLevel.adjustContentPosition();
+        this.muzXBox.zrenderer.tileLevel.allTilesOK = false;
     };
     return FocusManagement;
 }());
@@ -5558,7 +5736,7 @@ var LeftKeysRenderer = (function () {
             this.keysAnchor1, this.keysAnchor4
         ];
         for (var i = 0; i < anchors.length; i++) {
-            zRender.clearSingleAnchor(anchors[i], songDuration);
+            zRender.clearResizeSingleAnchor(anchors[i], songDuration);
         }
     };
     LeftKeysRenderer.prototype.drawKeys = function (zRender, song, ratioDuration, ratioThickness) {

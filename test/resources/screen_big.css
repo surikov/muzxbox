@@ -1,4 +1,16 @@
-base1{
+:root {
+	--background_color: #ccffff;
+}
+html {
+	font-family: serif;
+}
+.menuHead{
+	height:3cm;
+}
+.menuContent{
+	margin-top: 4cm;
+}
+#menuButtonImage{
 	width:3cm;
 	height:3cm;
 }

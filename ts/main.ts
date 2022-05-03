@@ -28,13 +28,13 @@ class MuzXBox {
 		console.log('initAll');
 		//let me = this;
 
-		this.zrenderer = new ZRender();
+		this.zrenderer = new ZRender(this);
 		this.zInputDeviceHandler = new ZInputDeviceHandler(this);
 		this.zMainMenu = new ZMainMenu(this);
 		//this.zMainMenu.menuRoot.items.push(this.itemImportMIDI);
 		//this.zMainMenu.fillFrom(this.currentSchedule);
 		this.zrenderer.bindLayers();
-		this.zrenderer.initUI();
+		this.zrenderer.initUI(this);
 		this.createUI();
 
 		us.selectMode('ru');
@@ -69,14 +69,38 @@ class MuzXBox {
 	closeMenu() {
 		(document.getElementById('menuDiv1') as any).style.width = '0%';
 	}*/
+	changeCSS(cssHref: string, cssLinkIndex: number) {
+		var oldLink = document.getElementsByTagName("link").item(cssLinkIndex);
+		//console.log('oldLink',oldLink);
+		if (oldLink) {
+			var newLink = document.createElement("link");
+			newLink.setAttribute("rel", "stylesheet");
+			newLink.setAttribute("type", "text/css");
+			newLink.setAttribute("href", cssHref);
+			console.log('newLink',newLink);
+			let headItem = document.getElementsByTagName("head").item(cssLinkIndex);
+			console.log('headItem',oldLink);
+			if (headItem) {
+				//headItem.replaceChild(newLink, oldLink);
+				headItem.appendChild(newLink);
+			}
+			//console.log('oldLink2',oldLink);
+			//console.log('newLink2',newLink);
+			//console.log('headItem2',oldLink);
+			//oldLink.setAttribute("href", cssHref);
+			//console.log('now oldLink',oldLink);
+		}
+	}
 	setLayoutBig() {
 		console.log('setLayoutBig');
+		this.changeCSS('resources/screen_big.css', 0);
 		this.zrenderer.tileLevel.setupTapSize(3);
 		this.zrenderer.drawSchedule(this.currentSchedule);
 		this.zMainMenu.fillFrom(this.currentSchedule);
 	}
 	setLayoutNormal() {
 		console.log('setLayoutNormal');
+		this.changeCSS('resources/screen_normal.css', 0);
 		this.zrenderer.tileLevel.setupTapSize(1);
 		this.zrenderer.drawSchedule(this.currentSchedule);
 		this.zMainMenu.fillFrom(this.currentSchedule);

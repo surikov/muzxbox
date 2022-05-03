@@ -13,8 +13,6 @@ declare class ZInputDeviceHandler {
     processArrowRight(): void;
     processArrowUp(): void;
     processArrowDown(): void;
-    changePositionTo(xx: number, yy: number): void;
-    changeZoomTo(zoom: number): void;
 }
 declare class TileLevel {
     svg: SVGElement;
@@ -278,13 +276,14 @@ declare class ZRender {
     debugAnchor16: TileAnchor;
     debugAnchor64: TileAnchor;
     debugAnchor256: TileAnchor;
-    constructor();
+    muzXBox: MuzXBox;
+    constructor(bx: MuzXBox);
     bindLayers(): void;
     resetLabel(song: ZvoogSchedule): void;
-    levelOfDetails(zz: number): 1 | 4 | 16 | 64 | 256;
-    initUI(): void;
+    levelOfDetails(zz: number): 1 | 16 | 64 | 256 | 4;
+    initUI(bx: MuzXBox): void;
     initDebugAnchors(): void;
-    clearSingleAnchor(anchor: TileAnchor, songDuration: number): void;
+    clearResizeSingleAnchor(anchor: TileAnchor, songDuration: number): void;
     clearAnchorsContent(songDuration: number): void;
     drawSchedule(song: ZvoogSchedule): void;
 }
@@ -1022,6 +1021,7 @@ declare class MuzXBox {
     constructor();
     initAll(): void;
     createUI(): void;
+    changeCSS(cssHref: string, cssLinkIndex: number): void;
     setLayoutBig(): void;
     setLayoutNormal(): void;
     setGrid(meters: ZvoogMeter[]): void;
@@ -1135,20 +1135,66 @@ declare class LayerSelector {
     almostFirstInSong(song: ZvoogSchedule): void;
     almostFirstInTrack(track: ZvoogTrack): void;
 }
+interface FocusLevel {
+    isMatch(zoomLevel: number, zRender: ZRender): boolean;
+    addSpot(mngmnt: FocusManagement): void;
+    spotUp(): void;
+    spotDown(): void;
+    spotLeft(): void;
+    spotRight(): void;
+}
+declare class FocusOtherLevel implements FocusLevel {
+    isMatch(zoomLevel: number, zRender: ZRender): boolean;
+    addSpot(mngmnt: FocusManagement): void;
+    spotUp(): void;
+    spotDown(): void;
+    spotLeft(): void;
+    spotRight(): void;
+}
+declare class FocusZoomNote implements FocusLevel {
+    isMatch(zoomLevel: number, zRender: ZRender): boolean;
+    addSpot(mngmnt: FocusManagement): void;
+    spotUp(): void;
+    spotDown(): void;
+    spotLeft(): void;
+    spotRight(): void;
+}
+declare class FocusZoomMeasure implements FocusLevel {
+    isMatch(zoomLevel: number, zRender: ZRender): boolean;
+    addSpot(mngmnt: FocusManagement): void;
+    spotUp(): void;
+    spotDown(): void;
+    spotLeft(): void;
+    spotRight(): void;
+}
+declare class FocusZoomSong implements FocusLevel {
+    isMatch(zoomLevel: number, zRender: ZRender): boolean;
+    addSpot(mngmnt: FocusManagement): void;
+    spotUp(): void;
+    spotDown(): void;
+    spotLeft(): void;
+    spotRight(): void;
+}
 declare class FocusManagement {
     focusMarkerLayer: SVGElement;
     focusAnchor: TileAnchor;
     focusLayer: TileLayerDefinition;
     levelOfDetails: number;
-    attach(zRender: ZRender): void;
-    addSpot(): void;
-    reSetFocus(zrenderer: ZRender, song: ZvoogSchedule): void;
+    muzXBox: MuzXBox;
+    focusLevels: FocusLevel[];
+    attachFocus(bx: MuzXBox, zRender: ZRender): void;
+    clearAnchorsContent(zRender: ZRender, songDuration: number): void;
+    currentFocusLevelX(): FocusLevel;
+    reSetFocus(zrenderer: ZRender, songDuration: number): void;
     spotUp(): void;
     spotDown(): void;
     spotLeft(): void;
     spotRight(): void;
-    spotReset(): void;
     spotSelectA(): void;
+    spotPlus(): void;
+    spotMinus(): void;
+    changePositionTo(xx: number, yy: number): void;
+    changeZoomTo(zoom: number): void;
 }
 declare class LeftKeysRenderer {
     leftKeysGroup: SVGElement;
