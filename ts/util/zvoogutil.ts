@@ -57,6 +57,35 @@ function scheduleDuration(schedule: ZvoogSchedule): ZvoogMeter {
 	}
 	return duration;
 }*/
+function measuresAndStepDuration(song: ZvoogSchedule, count: number, step: number, rhythmPattern: ZvoogMeter[]): number {
+	let time = 0;
+	let midx = 0;
+	let positionDuration = 0;
+	for (let mm = 0; mm < song.measures.length; mm++) {
+		midx = mm;
+		if (mm < count) {
+			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
+			time = time + measureDuration;
+		} else {
+			break;
+		}
+	}
+	let stepNN = 0;
+	let stepCnt = 0;
+	let position: ZvoogMeter = { count: 0, division: 1 };
+	if (midx < song.measures.length) {
+		while (DUU(position).lessThen(song.measures[midx].meter) && stepCnt < step) {
+			position = DUU(position).plus(rhythmPattern[stepNN]);
+			stepNN++;
+			stepCnt++;
+			if (stepNN >= rhythmPattern.length) {
+				stepNN = 0;
+			}
+		}
+		positionDuration = meter2seconds(song.measures[midx].tempo, position);
+	}
+	return time + positionDuration;
+}
 function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter {
 	let duration: ZvoogMeter = { count: 0, division: 1 };
 	for (let i = 0; i < progression.length; i++) {

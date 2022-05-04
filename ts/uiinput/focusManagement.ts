@@ -1,10 +1,10 @@
 interface FocusLevel {
 	isMatch(zoomLevel: number, zRender: ZRender): boolean;
 	addSpot(mngmnt: FocusManagement): void;
-	spotUp():void;
-	spotDown():void;
-	spotLeft():void;
-	spotRight():void;
+	spotUp(mngmnt: FocusManagement): void;
+	spotDown(mngmnt: FocusManagement): void;
+	spotLeft(mngmnt: FocusManagement): void;
+	spotRight(mngmnt: FocusManagement): void;
 }
 class FocusOtherLevel implements FocusLevel {
 	isMatch(zoomLevel: number, zRender: ZRender): boolean {
@@ -13,16 +13,16 @@ class FocusOtherLevel implements FocusLevel {
 	addSpot(mngmnt: FocusManagement) {
 		//
 	}
-	spotUp() {
+	spotUp(mngmnt: FocusManagement) {
 		console.log('other spotUp');
 	}
-	spotDown() {
+	spotDown(mngmnt: FocusManagement) {
 		console.log('other spotDown');
 	}
-	spotLeft() {
+	spotLeft(mngmnt: FocusManagement) {
 		console.log('other spotLeft');
 	}
-	spotRight() {
+	spotRight(mngmnt: FocusManagement) {
 		console.log('other spotRight');
 	}
 }
@@ -37,20 +37,23 @@ class FocusZoomNote implements FocusLevel {
 	addSpot(mngmnt: FocusManagement) {
 		mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'debug' });
 	}
-	spotUp() {
+	spotUp(mngmnt: FocusManagement) {
 		console.log('note spotUp');
 	}
-	spotDown() {
+	spotDown(mngmnt: FocusManagement) {
 		console.log('note spotDown');
 	}
-	spotLeft() {
+	spotLeft(mngmnt: FocusManagement) {
 		console.log('note spotLeft');
 	}
-	spotRight() {
+	spotRight(mngmnt: FocusManagement) {
 		console.log('note spotRight');
 	}
 }
 class FocusZoomMeasure implements FocusLevel {
+	currentPitch: number = 3;
+	currentMeasure: number = 2;
+	currentStep: number = 5;
 	isMatch(zoomLevel: number, zRender: ZRender): boolean {
 		if (zoomLevel >= zRender.zoomNote && zoomLevel < zRender.zoomMeasure) {
 			return true;
@@ -59,20 +62,31 @@ class FocusZoomMeasure implements FocusLevel {
 		}
 	}
 	addSpot(mngmnt: FocusManagement) {
-		var r=mngmnt.muzXBox.zrenderer.ratioThickness;
-		mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: r, h: r, rx: 0, ry: 0, css: 'debug' });
+		var r = mngmnt.muzXBox.zrenderer.ratioThickness;
+		let defrhy: ZvoogMeter[] = [
+			{ count: 1, division: 8 }, { count: 1, division: 8 }
+			, { count: 1, division: 8 }, { count: 1, division: 8 }
+
+		];
+		var rhythmPattern: ZvoogMeter[] = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : defrhy;
+		let xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
+		mngmnt.focusAnchor.content.push({ x: xx, y: 0, w: r, h: r, rx: 0, ry: 0, css: 'debug' });
 	}
-	spotUp() {
+	spotUp(mngmnt: FocusManagement) {
 		console.log('measure spotUp');
 	}
-	spotDown() {
+	spotDown(mngmnt: FocusManagement) {
 		console.log('measure spotDown');
 	}
-	spotLeft() {
+	spotLeft(mngmnt: FocusManagement) {
 		console.log('measure spotLeft');
 	}
-	spotRight() {
-		console.log('measure spotRight');
+	spotRight(mngmnt: FocusManagement) {
+		console.log('measure spotRight'
+			, mngmnt.muzXBox.zrenderer.tileLevel.translateX, mngmnt.muzXBox.zrenderer.tileLevel.translateY, mngmnt.muzXBox.zrenderer.tileLevel.translateZ
+		);
+
+
 	}
 }
 class FocusZoomSong implements FocusLevel {
@@ -84,8 +98,8 @@ class FocusZoomSong implements FocusLevel {
 		}
 	}
 	addSpot(mngmnt: FocusManagement) {
-		var r=mngmnt.muzXBox.zrenderer.ratioThickness;
-		mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: r*127, h: r*127, rx: 0, ry: 0, css: 'debug' });
+		var r = mngmnt.muzXBox.zrenderer.ratioThickness;
+		mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: r * 127, h: r * 127, rx: 0, ry: 0, css: 'debug' });
 	}
 	spotUp() {
 		console.log('song spotUp');
@@ -146,16 +160,16 @@ class FocusManagement {
 		zrenderer.tileLevel.allTilesOK = false;
 	}
 	spotUp() {
-		this.currentFocusLevelX().spotUp();
+		this.currentFocusLevelX().spotUp(this);
 	}
 	spotDown() {
-		this.currentFocusLevelX().spotDown();
+		this.currentFocusLevelX().spotDown(this);
 	}
 	spotLeft() {
-		this.currentFocusLevelX().spotLeft();
+		this.currentFocusLevelX().spotLeft(this);
 	}
 	spotRight() {
-		this.currentFocusLevelX().spotRight();
+		this.currentFocusLevelX().spotRight(this);
 	}
 	/*spotReset() {
 		console.log('spotReset');

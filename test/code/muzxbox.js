@@ -1547,6 +1547,36 @@ var ZUserSetting = (function () {
     };
     return ZUserSetting;
 }());
+function measuresAndStepDuration(song, count, step, rhythmPattern) {
+    var time = 0;
+    var midx = 0;
+    var positionDuration = 0;
+    for (var mm = 0; mm < song.measures.length; mm++) {
+        midx = mm;
+        if (mm < count) {
+            var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
+            time = time + measureDuration;
+        }
+        else {
+            break;
+        }
+    }
+    var stepNN = 0;
+    var stepCnt = 0;
+    var position = { count: 0, division: 1 };
+    if (midx < song.measures.length) {
+        while (DUU(position).lessThen(song.measures[midx].meter) && stepCnt < step) {
+            position = DUU(position).plus(rhythmPattern[stepNN]);
+            stepNN++;
+            stepCnt++;
+            if (stepNN >= rhythmPattern.length) {
+                stepNN = 0;
+            }
+        }
+        positionDuration = meter2seconds(song.measures[midx].tempo, position);
+    }
+    return time + positionDuration;
+}
 function progressionDuration(progression) {
     var duration = { count: 0, division: 1 };
     for (var i = 0; i < progression.length; i++) {
@@ -4328,11 +4358,9 @@ var ZMainMenu = (function () {
         });
         this.menuRoot.folders.push(this.songFolder);
         this.menuRoot.folders.push({
-            path: "Rhythm patterns", icon: "", folders: [],
-            items: [
+            path: "Rhythm patterns", icon: "", folders: [], items: [
                 {
-                    label: 'plain 1/16', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/16', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 1, division: 16 }, { count: 1, division: 16 },
                             { count: 1, division: 16 }, { count: 1, division: 16 },
@@ -4347,8 +4375,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/8', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/8', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 1, division: 8 }, { count: 1, division: 8 },
                             { count: 1, division: 8 }, { count: 1, division: 8 }
@@ -4361,8 +4388,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'swing 1/8', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'swing 1/8', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 5, division: 32 }, { count: 3, division: 32 },
                             { count: 5, division: 32 }, { count: 3, division: 32 }
@@ -4377,11 +4403,9 @@ var ZMainMenu = (function () {
             ], afterOpen: function () { }
         });
         this.menuRoot.folders.push({
-            path: "Screen size", icon: "", folders: [],
-            items: [
+            path: "Screen size", icon: "", folders: [], items: [
                 {
-                    label: 'normal', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'normal', autoclose: true, icon: '', action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutNormal();
@@ -4389,8 +4413,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'big', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'big', autoclose: true, icon: '', action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutBig();
@@ -5519,16 +5542,16 @@ var FocusOtherLevel = (function () {
     };
     FocusOtherLevel.prototype.addSpot = function (mngmnt) {
     };
-    FocusOtherLevel.prototype.spotUp = function () {
+    FocusOtherLevel.prototype.spotUp = function (mngmnt) {
         console.log('other spotUp');
     };
-    FocusOtherLevel.prototype.spotDown = function () {
+    FocusOtherLevel.prototype.spotDown = function (mngmnt) {
         console.log('other spotDown');
     };
-    FocusOtherLevel.prototype.spotLeft = function () {
+    FocusOtherLevel.prototype.spotLeft = function (mngmnt) {
         console.log('other spotLeft');
     };
-    FocusOtherLevel.prototype.spotRight = function () {
+    FocusOtherLevel.prototype.spotRight = function (mngmnt) {
         console.log('other spotRight');
     };
     return FocusOtherLevel;
@@ -5547,22 +5570,25 @@ var FocusZoomNote = (function () {
     FocusZoomNote.prototype.addSpot = function (mngmnt) {
         mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'debug' });
     };
-    FocusZoomNote.prototype.spotUp = function () {
+    FocusZoomNote.prototype.spotUp = function (mngmnt) {
         console.log('note spotUp');
     };
-    FocusZoomNote.prototype.spotDown = function () {
+    FocusZoomNote.prototype.spotDown = function (mngmnt) {
         console.log('note spotDown');
     };
-    FocusZoomNote.prototype.spotLeft = function () {
+    FocusZoomNote.prototype.spotLeft = function (mngmnt) {
         console.log('note spotLeft');
     };
-    FocusZoomNote.prototype.spotRight = function () {
+    FocusZoomNote.prototype.spotRight = function (mngmnt) {
         console.log('note spotRight');
     };
     return FocusZoomNote;
 }());
 var FocusZoomMeasure = (function () {
     function FocusZoomMeasure() {
+        this.currentPitch = 3;
+        this.currentMeasure = 2;
+        this.currentStep = 5;
     }
     FocusZoomMeasure.prototype.isMatch = function (zoomLevel, zRender) {
         if (zoomLevel >= zRender.zoomNote && zoomLevel < zRender.zoomMeasure) {
@@ -5574,19 +5600,25 @@ var FocusZoomMeasure = (function () {
     };
     FocusZoomMeasure.prototype.addSpot = function (mngmnt) {
         var r = mngmnt.muzXBox.zrenderer.ratioThickness;
-        mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: r, h: r, rx: 0, ry: 0, css: 'debug' });
+        var defrhy = [
+            { count: 1, division: 8 }, { count: 1, division: 8 },
+            { count: 1, division: 8 }, { count: 1, division: 8 }
+        ];
+        var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : defrhy;
+        var xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
+        mngmnt.focusAnchor.content.push({ x: xx, y: 0, w: r, h: r, rx: 0, ry: 0, css: 'debug' });
     };
-    FocusZoomMeasure.prototype.spotUp = function () {
+    FocusZoomMeasure.prototype.spotUp = function (mngmnt) {
         console.log('measure spotUp');
     };
-    FocusZoomMeasure.prototype.spotDown = function () {
+    FocusZoomMeasure.prototype.spotDown = function (mngmnt) {
         console.log('measure spotDown');
     };
-    FocusZoomMeasure.prototype.spotLeft = function () {
+    FocusZoomMeasure.prototype.spotLeft = function (mngmnt) {
         console.log('measure spotLeft');
     };
-    FocusZoomMeasure.prototype.spotRight = function () {
-        console.log('measure spotRight');
+    FocusZoomMeasure.prototype.spotRight = function (mngmnt) {
+        console.log('measure spotRight', mngmnt.muzXBox.zrenderer.tileLevel.translateX, mngmnt.muzXBox.zrenderer.tileLevel.translateY, mngmnt.muzXBox.zrenderer.tileLevel.translateZ);
     };
     return FocusZoomMeasure;
 }());
@@ -5660,16 +5692,16 @@ var FocusManagement = (function () {
         zrenderer.tileLevel.allTilesOK = false;
     };
     FocusManagement.prototype.spotUp = function () {
-        this.currentFocusLevelX().spotUp();
+        this.currentFocusLevelX().spotUp(this);
     };
     FocusManagement.prototype.spotDown = function () {
-        this.currentFocusLevelX().spotDown();
+        this.currentFocusLevelX().spotDown(this);
     };
     FocusManagement.prototype.spotLeft = function () {
-        this.currentFocusLevelX().spotLeft();
+        this.currentFocusLevelX().spotLeft(this);
     };
     FocusManagement.prototype.spotRight = function () {
-        this.currentFocusLevelX().spotRight();
+        this.currentFocusLevelX().spotRight(this);
     };
     FocusManagement.prototype.spotSelectA = function () {
         console.log('spotSelectA');

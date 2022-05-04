@@ -300,6 +300,7 @@ declare class ZUserSetting {
     selectMode(mode: string): void;
     txt(id: string): string;
 }
+declare function measuresAndStepDuration(song: ZvoogSchedule, count: number, step: number, rhythmPattern: ZvoogMeter[]): number;
 declare function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter;
 declare function adjustPartLeadPad(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
 declare function adjustPartBass(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
@@ -1138,34 +1139,37 @@ declare class LayerSelector {
 interface FocusLevel {
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
-    spotUp(): void;
-    spotDown(): void;
-    spotLeft(): void;
-    spotRight(): void;
+    spotUp(mngmnt: FocusManagement): void;
+    spotDown(mngmnt: FocusManagement): void;
+    spotLeft(mngmnt: FocusManagement): void;
+    spotRight(mngmnt: FocusManagement): void;
 }
 declare class FocusOtherLevel implements FocusLevel {
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
-    spotUp(): void;
-    spotDown(): void;
-    spotLeft(): void;
-    spotRight(): void;
+    spotUp(mngmnt: FocusManagement): void;
+    spotDown(mngmnt: FocusManagement): void;
+    spotLeft(mngmnt: FocusManagement): void;
+    spotRight(mngmnt: FocusManagement): void;
 }
 declare class FocusZoomNote implements FocusLevel {
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
-    spotUp(): void;
-    spotDown(): void;
-    spotLeft(): void;
-    spotRight(): void;
+    spotUp(mngmnt: FocusManagement): void;
+    spotDown(mngmnt: FocusManagement): void;
+    spotLeft(mngmnt: FocusManagement): void;
+    spotRight(mngmnt: FocusManagement): void;
 }
 declare class FocusZoomMeasure implements FocusLevel {
+    currentPitch: number;
+    currentMeasure: number;
+    currentStep: number;
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
-    spotUp(): void;
-    spotDown(): void;
-    spotLeft(): void;
-    spotRight(): void;
+    spotUp(mngmnt: FocusManagement): void;
+    spotDown(mngmnt: FocusManagement): void;
+    spotLeft(mngmnt: FocusManagement): void;
+    spotRight(mngmnt: FocusManagement): void;
 }
 declare class FocusZoomSong implements FocusLevel {
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
