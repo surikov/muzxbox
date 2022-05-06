@@ -54,13 +54,6 @@ declare class TileLevel {
     lastMoveDx: number;
     lastMoveDy: number;
     lastMoveDt: number;
-    dragTileItem: TileItem | null;
-    dragTileSVGelement: TileSVGElement | null;
-    dragSVGparent: SVGElement | null;
-    draggedX: number;
-    draggedY: number;
-    dragTranslateX: number;
-    dragTranslateY: number;
     mouseDownMode: boolean;
     get allTilesOK(): boolean;
     set allTilesOK(bb: boolean);
@@ -114,7 +107,7 @@ declare class TileLevel {
     collision2(x: number, w: number, left: number, width: number): boolean;
     tileFromModel(): void;
     addGroupTile(parentSVGElement: SVGElement, anchor: TileAnchor, layer: TileLayerDefinition): void;
-    childExists(group: SVGElement, id: string): SVGElement | null;
+    groupChildWithID(group: SVGElement, id: string): SVGElement | null;
     addElement(g: SVGElement, dd: TileItem, layer: TileLayerDefinition): void;
     clearAllDetails(): void;
     clearGroupDetails(group: SVGElement): void;
@@ -163,8 +156,6 @@ declare type TileLayerOverlay = {
 declare type TileBaseDefinition = {
     id?: string;
     css?: string;
-    dragX?: boolean;
-    dragY?: boolean;
     action?: (x: number, y: number) => void | undefined;
 };
 declare type TileLayerDefinition = TileModelLayer | TileLayerStickLeft | TileLayerStickTop | TileLayerStickBottom | TileLayerStickRight | TileLayerOverlay;
@@ -300,7 +291,11 @@ declare class ZUserSetting {
     selectMode(mode: string): void;
     txt(id: string): string;
 }
-declare function measuresAndStepDuration(song: ZvoogSchedule, count: number, step: number, rhythmPattern: ZvoogMeter[]): number;
+declare type StartDuration = {
+    start: number;
+    duration: number;
+};
+declare function measuresAndStepDuration(song: ZvoogSchedule, count: number, step: number, rhythmPattern: ZvoogMeter[]): StartDuration;
 declare function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter;
 declare function adjustPartLeadPad(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
 declare function adjustPartBass(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
@@ -1139,26 +1134,26 @@ declare class LayerSelector {
 interface FocusLevel {
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
-    spotUp(mngmnt: FocusManagement): void;
-    spotDown(mngmnt: FocusManagement): void;
-    spotLeft(mngmnt: FocusManagement): void;
-    spotRight(mngmnt: FocusManagement): void;
+    spotUp(mngmnt: FocusManagement): boolean;
+    spotDown(mngmnt: FocusManagement): boolean;
+    spotLeft(mngmnt: FocusManagement): boolean;
+    spotRight(mngmnt: FocusManagement): boolean;
 }
 declare class FocusOtherLevel implements FocusLevel {
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
-    spotUp(mngmnt: FocusManagement): void;
-    spotDown(mngmnt: FocusManagement): void;
-    spotLeft(mngmnt: FocusManagement): void;
-    spotRight(mngmnt: FocusManagement): void;
+    spotUp(mngmnt: FocusManagement): boolean;
+    spotDown(mngmnt: FocusManagement): boolean;
+    spotLeft(mngmnt: FocusManagement): boolean;
+    spotRight(mngmnt: FocusManagement): boolean;
 }
 declare class FocusZoomNote implements FocusLevel {
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
-    spotUp(mngmnt: FocusManagement): void;
-    spotDown(mngmnt: FocusManagement): void;
-    spotLeft(mngmnt: FocusManagement): void;
-    spotRight(mngmnt: FocusManagement): void;
+    spotUp(mngmnt: FocusManagement): boolean;
+    spotDown(mngmnt: FocusManagement): boolean;
+    spotLeft(mngmnt: FocusManagement): boolean;
+    spotRight(mngmnt: FocusManagement): boolean;
 }
 declare class FocusZoomMeasure implements FocusLevel {
     currentPitch: number;
@@ -1166,18 +1161,18 @@ declare class FocusZoomMeasure implements FocusLevel {
     currentStep: number;
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
-    spotUp(mngmnt: FocusManagement): void;
-    spotDown(mngmnt: FocusManagement): void;
-    spotLeft(mngmnt: FocusManagement): void;
-    spotRight(mngmnt: FocusManagement): void;
+    spotUp(mngmnt: FocusManagement): boolean;
+    spotDown(mngmnt: FocusManagement): boolean;
+    spotLeft(mngmnt: FocusManagement): boolean;
+    spotRight(mngmnt: FocusManagement): boolean;
 }
 declare class FocusZoomSong implements FocusLevel {
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
-    spotUp(): void;
-    spotDown(): void;
-    spotLeft(): void;
-    spotRight(): void;
+    spotUp(): boolean;
+    spotDown(): boolean;
+    spotLeft(): boolean;
+    spotRight(): boolean;
 }
 declare class FocusManagement {
     focusMarkerLayer: SVGElement;
@@ -1199,6 +1194,7 @@ declare class FocusManagement {
     spotMinus(): void;
     changePositionTo(xx: number, yy: number): void;
     changeZoomTo(zoom: number): void;
+    wrongActionWarning(): void;
 }
 declare class LeftKeysRenderer {
     leftKeysGroup: SVGElement;

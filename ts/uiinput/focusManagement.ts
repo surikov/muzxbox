@@ -1,10 +1,10 @@
 interface FocusLevel {
 	isMatch(zoomLevel: number, zRender: ZRender): boolean;
 	addSpot(mngmnt: FocusManagement): void;
-	spotUp(mngmnt: FocusManagement): void;
-	spotDown(mngmnt: FocusManagement): void;
-	spotLeft(mngmnt: FocusManagement): void;
-	spotRight(mngmnt: FocusManagement): void;
+	spotUp(mngmnt: FocusManagement): boolean;
+	spotDown(mngmnt: FocusManagement): boolean;
+	spotLeft(mngmnt: FocusManagement): boolean;
+	spotRight(mngmnt: FocusManagement): boolean;
 }
 class FocusOtherLevel implements FocusLevel {
 	isMatch(zoomLevel: number, zRender: ZRender): boolean {
@@ -13,17 +13,21 @@ class FocusOtherLevel implements FocusLevel {
 	addSpot(mngmnt: FocusManagement) {
 		//
 	}
-	spotUp(mngmnt: FocusManagement) {
+	spotUp(mngmnt: FocusManagement): boolean {
 		console.log('other spotUp');
+		return false;
 	}
-	spotDown(mngmnt: FocusManagement) {
+	spotDown(mngmnt: FocusManagement): boolean {
 		console.log('other spotDown');
+		return false;
 	}
-	spotLeft(mngmnt: FocusManagement) {
+	spotLeft(mngmnt: FocusManagement): boolean {
 		console.log('other spotLeft');
+		return false;
 	}
-	spotRight(mngmnt: FocusManagement) {
+	spotRight(mngmnt: FocusManagement): boolean {
 		console.log('other spotRight');
+		return false;
 	}
 }
 class FocusZoomNote implements FocusLevel {
@@ -37,17 +41,21 @@ class FocusZoomNote implements FocusLevel {
 	addSpot(mngmnt: FocusManagement) {
 		mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'debug' });
 	}
-	spotUp(mngmnt: FocusManagement) {
+	spotUp(mngmnt: FocusManagement): boolean {
 		console.log('note spotUp');
+		return false;
 	}
-	spotDown(mngmnt: FocusManagement) {
+	spotDown(mngmnt: FocusManagement): boolean {
 		console.log('note spotDown');
+		return false;
 	}
-	spotLeft(mngmnt: FocusManagement) {
+	spotLeft(mngmnt: FocusManagement): boolean {
 		console.log('note spotLeft');
+		return false;
 	}
-	spotRight(mngmnt: FocusManagement) {
+	spotRight(mngmnt: FocusManagement): boolean {
 		console.log('note spotRight');
+		return false;
 	}
 }
 class FocusZoomMeasure implements FocusLevel {
@@ -62,30 +70,47 @@ class FocusZoomMeasure implements FocusLevel {
 		}
 	}
 	addSpot(mngmnt: FocusManagement) {
-		var r = mngmnt.muzXBox.zrenderer.ratioThickness;
+		//var rr = mngmnt.muzXBox.zrenderer.ratioThickness;
 		let defrhy: ZvoogMeter[] = [
 			{ count: 1, division: 8 }, { count: 1, division: 8 }
 			, { count: 1, division: 8 }, { count: 1, division: 8 }
 
 		];
 		var rhythmPattern: ZvoogMeter[] = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : defrhy;
-		let xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
-		mngmnt.focusAnchor.content.push({ x: xx, y: 0, w: r, h: r, rx: 0, ry: 0, css: 'debug' });
+		let measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
+		let xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
+		let ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
+		let hh = mngmnt.muzXBox.zrenderer.ratioThickness;
+		let yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
+		mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'debug' });
 	}
-	spotUp(mngmnt: FocusManagement) {
-		console.log('measure spotUp');
+	spotUp(mngmnt: FocusManagement): boolean {
+		if (this.currentPitch < 127) {
+			this.currentPitch++;
+			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+			return true;
+		} else {
+			return false;
+		}
 	}
-	spotDown(mngmnt: FocusManagement) {
-		console.log('measure spotDown');
+	spotDown(mngmnt: FocusManagement): boolean {
+		if (this.currentPitch > 0) {
+			this.currentPitch--;
+			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+			return true;
+		} else {
+			return false;
+		}
 	}
-	spotLeft(mngmnt: FocusManagement) {
+	spotLeft(mngmnt: FocusManagement): boolean {
 		console.log('measure spotLeft');
+		return true;
 	}
-	spotRight(mngmnt: FocusManagement) {
+	spotRight(mngmnt: FocusManagement): boolean {
 		console.log('measure spotRight'
 			, mngmnt.muzXBox.zrenderer.tileLevel.translateX, mngmnt.muzXBox.zrenderer.tileLevel.translateY, mngmnt.muzXBox.zrenderer.tileLevel.translateZ
 		);
-
+		return true;
 
 	}
 }
@@ -101,17 +126,21 @@ class FocusZoomSong implements FocusLevel {
 		var r = mngmnt.muzXBox.zrenderer.ratioThickness;
 		mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: r * 127, h: r * 127, rx: 0, ry: 0, css: 'debug' });
 	}
-	spotUp() {
+	spotUp(): boolean {
 		console.log('song spotUp');
+		return false;
 	}
-	spotDown() {
+	spotDown(): boolean {
 		console.log('song spotDown');
+		return false;
 	}
-	spotLeft() {
+	spotLeft(): boolean {
 		console.log('song spotLeft');
+		return false;
 	}
-	spotRight() {
+	spotRight(): boolean {
 		console.log('song spotRight');
+		return false;
 	}
 }
 class FocusManagement {
@@ -160,16 +189,16 @@ class FocusManagement {
 		zrenderer.tileLevel.allTilesOK = false;
 	}
 	spotUp() {
-		this.currentFocusLevelX().spotUp(this);
+		if (!this.currentFocusLevelX().spotUp(this)) this.wrongActionWarning();
 	}
 	spotDown() {
-		this.currentFocusLevelX().spotDown(this);
+		if (!this.currentFocusLevelX().spotDown(this)) this.wrongActionWarning();
 	}
 	spotLeft() {
-		this.currentFocusLevelX().spotLeft(this);
+		if (!this.currentFocusLevelX().spotLeft(this)) this.wrongActionWarning();
 	}
 	spotRight() {
-		this.currentFocusLevelX().spotRight(this);
+		if (!this.currentFocusLevelX().spotRight(this)) this.wrongActionWarning();
 	}
 	/*spotReset() {
 		console.log('spotReset');
@@ -219,5 +248,8 @@ class FocusManagement {
 		this.muzXBox.zrenderer.tileLevel.applyZoomPosition();
 		this.muzXBox.zrenderer.tileLevel.adjustContentPosition();
 		this.muzXBox.zrenderer.tileLevel.allTilesOK = false;
+	}
+	wrongActionWarning(): void {
+		console.log('wrongActionWarning');
 	}
 }

@@ -68,8 +68,8 @@ type TileLayerOverlay = {
 type TileBaseDefinition = {
 	id?: string// = 'id'+Math.floor(Math.random()*1000000000)
 	, css?: string// string
-	, dragX?: boolean// string
-	, dragY?: boolean// string
+	//, dragX?: boolean// string
+	//, dragY?: boolean// string
 	, action?: (x: number, y: number) => void | undefined
 };
 type TileLayerDefinition = TileModelLayer | TileLayerStickLeft | TileLayerStickTop | TileLayerStickBottom | TileLayerStickRight | TileLayerOverlay;
@@ -147,8 +147,8 @@ function cloneBaseDefiition(from: TileBaseDefinition): TileBaseDefinition {
 	var to: TileBaseDefinition = {};
 	//if (from.action) to.action = from.action;
 	if (from.css) to.css = from.css;
-	if (from.dragX) to.dragX = from.dragX;
-	if (from.dragY) to.dragY = from.dragY;
+	//if (from.dragX) to.dragX = from.dragX;
+	//if (from.dragY) to.dragY = from.dragY;
 	return to;
 }
 function cloneLine(from: TileLine): TileLine {

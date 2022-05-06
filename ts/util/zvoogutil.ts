@@ -57,34 +57,42 @@ function scheduleDuration(schedule: ZvoogSchedule): ZvoogMeter {
 	}
 	return duration;
 }*/
-function measuresAndStepDuration(song: ZvoogSchedule, count: number, step: number, rhythmPattern: ZvoogMeter[]): number {
-	let time = 0;
-	let midx = 0;
-	let positionDuration = 0;
+type StartDuration = {
+	start: number;
+	duration: number;
+};
+function measuresAndStepDuration(song: ZvoogSchedule, count: number, step: number, rhythmPattern: ZvoogMeter[]): StartDuration {
+	let measureStartTime = 0;
+	let measureIdx = 0;
+
 	for (let mm = 0; mm < song.measures.length; mm++) {
-		midx = mm;
+		measureIdx = mm;
 		if (mm < count) {
 			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-			time = time + measureDuration;
+			measureStartTime = measureStartTime + measureDuration;
 		} else {
 			break;
 		}
 	}
 	let stepNN = 0;
 	let stepCnt = 0;
-	let position: ZvoogMeter = { count: 0, division: 1 };
-	if (midx < song.measures.length) {
-		while (DUU(position).lessThen(song.measures[midx].meter) && stepCnt < step) {
-			position = DUU(position).plus(rhythmPattern[stepNN]);
+	let stepStartTime = 0;
+	let currentStepStart: ZvoogMeter = { count: 0, division: 1 };
+	if (measureIdx < song.measures.length) {
+		while (DUU(currentStepStart).lessThen(song.measures[measureIdx].meter) && stepCnt < step) {
+			currentStepStart = DUU(currentStepStart).plus(rhythmPattern[stepNN]);
 			stepNN++;
 			stepCnt++;
 			if (stepNN >= rhythmPattern.length) {
 				stepNN = 0;
 			}
 		}
-		positionDuration = meter2seconds(song.measures[midx].tempo, position);
+		stepStartTime = meter2seconds(song.measures[measureIdx].tempo, currentStepStart);
 	}
-	return time + positionDuration;
+	return {
+		start: measureStartTime + stepStartTime
+		, duration: meter2seconds(song.measures[measureIdx].tempo, rhythmPattern[stepNN])
+	};
 }
 function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter {
 	let duration: ZvoogMeter = { count: 0, division: 1 };

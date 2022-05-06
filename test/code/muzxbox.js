@@ -148,13 +148,6 @@ var TileLevel = (function () {
         this.lastMoveDx = 0;
         this.lastMoveDy = 0;
         this.lastMoveDt = 0;
-        this.dragTileItem = null;
-        this.dragTileSVGelement = null;
-        this.dragSVGparent = null;
-        this.draggedX = 0;
-        this.draggedY = 0;
-        this.dragTranslateX = 0;
-        this.dragTranslateY = 0;
         this.mouseDownMode = false;
         this.svg = svgObject;
         this.setupTapSize(1);
@@ -252,7 +245,6 @@ var TileLevel = (function () {
         }.bind(this));
     };
     TileLevel.prototype.onMove = function (dx, dy) {
-        var d = new Date();
         this.lastMoveDx = dx;
         this.lastMoveDy = dy;
         this.lastMoveDt = Date.now();
@@ -289,15 +281,11 @@ var TileLevel = (function () {
         mouseEvent.preventDefault();
         this.startMouseScreenX = mouseEvent.offsetX;
         this.startMouseScreenY = mouseEvent.offsetY;
-        if (this.dragTileItem) {
-        }
-        else {
-            this.mouseDownMode = true;
-            this.clickX = this.startMouseScreenX;
-            this.clickY = this.startMouseScreenY;
-            this.clicked = false;
-            this.startDragZoom();
-        }
+        this.mouseDownMode = true;
+        this.clickX = this.startMouseScreenX;
+        this.clickY = this.startMouseScreenY;
+        this.clicked = false;
+        this.startDragZoom();
     };
     TileLevel.prototype.rakeMouseMove = function (mouseEvent) {
         var dX = mouseEvent.offsetX - this.startMouseScreenX;
@@ -310,24 +298,6 @@ var TileLevel = (function () {
             this.translateY = this.translateY + dY * this.translateZ;
             this.applyZoomPosition();
             this.onMove(dX, dY);
-        }
-        else {
-            if (this.dragTileItem) {
-                if (this.dragTileSVGelement) {
-                    var ex = this.dragTranslateX + dX * this.translateZ;
-                    var ey = this.dragTranslateY + dY * this.translateZ;
-                    if (!(this.dragTileItem.dragX))
-                        ex = 0;
-                    if (!(this.dragTileItem.dragY))
-                        ey = 0;
-                    this.draggedX = this.draggedX + dX;
-                    this.draggedY = this.draggedY + dY;
-                    if (this.dragSVGparent)
-                        this.dragSVGparent.setAttributeNS(null, 'transform', 'translate(' + ex + ', ' + ey + ')');
-                    this.dragTranslateX = ex;
-                    this.dragTranslateY = ey;
-                }
-            }
         }
     };
     TileLevel.prototype.rakeMouseUp = function (mouseEvent) {
@@ -348,43 +318,24 @@ var TileLevel = (function () {
                 this.allTilesOK = false;
             }
         }
-        else {
-            if (this.dragTileItem) {
-                this.clearAllDetails();
-                this.applyZoomPosition();
-                this.allTilesOK = false;
-                if (this.dragTileSVGelement) {
-                    if (this.dragTileSVGelement.onClickFunction) {
-                        this.dragTileSVGelement.onClickFunction(this.draggedX * this.translateZ / this.tapSize, this.draggedY * this.translateZ / this.tapSize);
-                    }
-                }
-                this.dragTileItem = null;
-                this.dragTileSVGelement = null;
-            }
-        }
-        this.dragTileItem = null;
     };
     TileLevel.prototype.rakeTouchStart = function (touchEvent) {
         this.slidingLockTo = -1;
         touchEvent.preventDefault();
-        if (this.dragTileItem) {
+        this.startedTouch = true;
+        this.clicked = false;
+        if (touchEvent.touches.length < 2) {
+            this.twoZoom = false;
+            this.startMouseScreenX = touchEvent.touches[0].clientX;
+            this.startMouseScreenY = touchEvent.touches[0].clientY;
+            this.clickX = this.startMouseScreenX;
+            this.clickY = this.startMouseScreenY;
+            this.twodistance = 0;
+            this.startDragZoom();
+            return;
         }
         else {
-            this.startedTouch = true;
-            this.clicked = false;
-            if (touchEvent.touches.length < 2) {
-                this.twoZoom = false;
-                this.startMouseScreenX = touchEvent.touches[0].clientX;
-                this.startMouseScreenY = touchEvent.touches[0].clientY;
-                this.clickX = this.startMouseScreenX;
-                this.clickY = this.startMouseScreenY;
-                this.twodistance = 0;
-                this.startDragZoom();
-                return;
-            }
-            else {
-                this.startTouchZoom(touchEvent);
-            }
+            this.startTouchZoom(touchEvent);
         }
     };
     TileLevel.prototype.rakeTouchMove = function (touchEvent) {
@@ -437,71 +388,35 @@ var TileLevel = (function () {
                 }
             }
         }
-        else {
-            if (this.dragTileItem) {
-                if (this.dragTileSVGelement) {
-                    var dX = touchEvent.touches[0].clientX - this.startMouseScreenX;
-                    var dY = touchEvent.touches[0].clientY - this.startMouseScreenY;
-                    this.startMouseScreenX = touchEvent.touches[0].clientX;
-                    this.startMouseScreenY = touchEvent.touches[0].clientY;
-                    var ex = this.dragTranslateX + dX * this.translateZ;
-                    var ey = this.dragTranslateY + dY * this.translateZ;
-                    if (!(this.dragTileItem.dragX))
-                        ex = 0;
-                    if (!(this.dragTileItem.dragY))
-                        ey = 0;
-                    this.draggedX = this.draggedX + dX;
-                    this.draggedY = this.draggedY + dY;
-                    if (this.dragSVGparent)
-                        this.dragSVGparent.setAttributeNS(null, 'transform', 'translate(' + ex + ', ' + ey + ')');
-                    this.dragTranslateX = ex;
-                    this.dragTranslateY = ey;
-                }
-            }
-        }
     };
     TileLevel.prototype.rakeTouchEnd = function (touchEvent) {
         touchEvent.preventDefault();
-        if (this.dragTileItem) {
-            this.clearAllDetails();
-            this.applyZoomPosition();
-            this.allTilesOK = false;
-            if (this.dragTileSVGelement) {
-                if (this.dragTileSVGelement.onClickFunction) {
-                    this.dragTileSVGelement.onClickFunction(this.draggedX * this.translateZ / this.tapSize, this.draggedY * this.translateZ / this.tapSize);
-                }
-            }
-            this.dragTileItem = null;
-            this.dragTileSVGelement = null;
-        }
-        else {
-            this.allTilesOK = false;
-            if (!this.twoZoom) {
-                if (touchEvent.touches.length < 2) {
-                    this.cancelDragZoom();
-                    this.clicked = false;
-                    if (this.startedTouch) {
-                        var diffX = Math.abs(this.clickX - this.startMouseScreenX);
-                        var diffY = Math.abs(this.clickY - this.startMouseScreenY);
-                        if (diffX < this.clickLimit && diffY < this.clickLimit) {
-                            this.clicked = true;
-                            this.slideToContentPosition();
-                        }
-                        else {
-                            this.clicked = false;
-                            this.slideToContentPosition();
-                        }
+        this.allTilesOK = false;
+        if (!this.twoZoom) {
+            if (touchEvent.touches.length < 2) {
+                this.cancelDragZoom();
+                this.clicked = false;
+                if (this.startedTouch) {
+                    var diffX = Math.abs(this.clickX - this.startMouseScreenX);
+                    var diffY = Math.abs(this.clickY - this.startMouseScreenY);
+                    if (diffX < this.clickLimit && diffY < this.clickLimit) {
+                        this.clicked = true;
+                        this.slideToContentPosition();
                     }
                     else {
+                        this.clicked = false;
+                        this.slideToContentPosition();
                     }
-                    return;
                 }
+                else {
+                }
+                return;
             }
-            this.twoZoom = false;
-            this.startedTouch = false;
-            this.cancelDragZoom();
-            this.slideToContentPosition();
         }
+        this.twoZoom = false;
+        this.startedTouch = false;
+        this.cancelDragZoom();
+        this.slideToContentPosition();
     };
     TileLevel.prototype.startDragZoom = function () {
         this.dragZoom = 1.002;
@@ -917,12 +832,12 @@ var TileLevel = (function () {
         if (anchor.showZoom <= this.translateZ && anchor.hideZoom > this.translateZ) {
             if (this.collision(anchor.xx * this.tapSize, anchor.yy * this.tapSize, anchor.ww * this.tapSize, anchor.hh * this.tapSize, x, y, w, h)) {
                 var gid = anchor.id ? anchor.id : '';
-                var xg = this.childExists(parentSVGElement, gid);
-                if (xg) {
+                var existedSVGchild = this.groupChildWithID(parentSVGElement, gid);
+                if (existedSVGchild) {
                     for (var n = 0; n < anchor.content.length; n++) {
                         var d = anchor.content[n];
                         if (isTileGroup(d)) {
-                            this.addElement(xg, d, layer);
+                            this.addElement(existedSVGchild, d, layer);
                         }
                     }
                 }
@@ -944,7 +859,7 @@ var TileLevel = (function () {
             }
         }
     };
-    TileLevel.prototype.childExists = function (group, id) {
+    TileLevel.prototype.groupChildWithID = function (group, id) {
         if (id) {
             if (group)
                 this.msEdgeHook(group);
@@ -996,26 +911,6 @@ var TileLevel = (function () {
                 };
                 element.onclick = click;
                 element.ontouchend = click;
-                if ((dd.dragX) || (dd.dragY)) {
-                    var onStartDrag_1 = function (elmnt, ev) {
-                        me_1.dragTileItem = dd;
-                        me_1.dragTileSVGelement = element;
-                        me_1.dragSVGparent = g;
-                        me_1.draggedX = 0;
-                        me_1.draggedY = 0;
-                        me_1.dragTranslateX = 0;
-                        me_1.dragTranslateY = 0;
-                        me_1.startedTouch = false;
-                    };
-                    var startTouchDrag = function (ev) {
-                        onStartDrag_1(element, ev);
-                    };
-                    var startMouseDrag = function (ev) {
-                        onStartDrag_1(element, ev);
-                    };
-                    element.onmousedown = startMouseDrag;
-                    element.ontouchstart = startTouchDrag;
-                }
             }
         }
     };
@@ -1070,9 +965,9 @@ var TileLevel = (function () {
     };
     TileLevel.prototype.resetAnchor = function (anchor, fromSVGGroup) {
         var gid = anchor.id ? anchor.id : '';
-        var xg = this.childExists(fromSVGGroup, gid);
-        if (xg) {
-            fromSVGGroup.removeChild(xg);
+        var existedSVGchild = this.groupChildWithID(fromSVGGroup, gid);
+        if (existedSVGchild) {
+            fromSVGGroup.removeChild(existedSVGchild);
         }
     };
     TileLevel.prototype.redrawAnchor = function (anchor) {
@@ -1152,10 +1047,6 @@ function cloneBaseDefiition(from) {
     var to = {};
     if (from.css)
         to.css = from.css;
-    if (from.dragX)
-        to.dragX = from.dragX;
-    if (from.dragY)
-        to.dragY = from.dragY;
     return to;
 }
 function cloneLine(from) {
@@ -1548,14 +1439,13 @@ var ZUserSetting = (function () {
     return ZUserSetting;
 }());
 function measuresAndStepDuration(song, count, step, rhythmPattern) {
-    var time = 0;
-    var midx = 0;
-    var positionDuration = 0;
+    var measureStartTime = 0;
+    var measureIdx = 0;
     for (var mm = 0; mm < song.measures.length; mm++) {
-        midx = mm;
+        measureIdx = mm;
         if (mm < count) {
             var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-            time = time + measureDuration;
+            measureStartTime = measureStartTime + measureDuration;
         }
         else {
             break;
@@ -1563,19 +1453,23 @@ function measuresAndStepDuration(song, count, step, rhythmPattern) {
     }
     var stepNN = 0;
     var stepCnt = 0;
-    var position = { count: 0, division: 1 };
-    if (midx < song.measures.length) {
-        while (DUU(position).lessThen(song.measures[midx].meter) && stepCnt < step) {
-            position = DUU(position).plus(rhythmPattern[stepNN]);
+    var stepStartTime = 0;
+    var currentStepStart = { count: 0, division: 1 };
+    if (measureIdx < song.measures.length) {
+        while (DUU(currentStepStart).lessThen(song.measures[measureIdx].meter) && stepCnt < step) {
+            currentStepStart = DUU(currentStepStart).plus(rhythmPattern[stepNN]);
             stepNN++;
             stepCnt++;
             if (stepNN >= rhythmPattern.length) {
                 stepNN = 0;
             }
         }
-        positionDuration = meter2seconds(song.measures[midx].tempo, position);
+        stepStartTime = meter2seconds(song.measures[measureIdx].tempo, currentStepStart);
     }
-    return time + positionDuration;
+    return {
+        start: measureStartTime + stepStartTime,
+        duration: meter2seconds(song.measures[measureIdx].tempo, rhythmPattern[stepNN])
+    };
 }
 function progressionDuration(progression) {
     var duration = { count: 0, division: 1 };
@@ -5544,15 +5438,19 @@ var FocusOtherLevel = (function () {
     };
     FocusOtherLevel.prototype.spotUp = function (mngmnt) {
         console.log('other spotUp');
+        return false;
     };
     FocusOtherLevel.prototype.spotDown = function (mngmnt) {
         console.log('other spotDown');
+        return false;
     };
     FocusOtherLevel.prototype.spotLeft = function (mngmnt) {
         console.log('other spotLeft');
+        return false;
     };
     FocusOtherLevel.prototype.spotRight = function (mngmnt) {
         console.log('other spotRight');
+        return false;
     };
     return FocusOtherLevel;
 }());
@@ -5572,15 +5470,19 @@ var FocusZoomNote = (function () {
     };
     FocusZoomNote.prototype.spotUp = function (mngmnt) {
         console.log('note spotUp');
+        return false;
     };
     FocusZoomNote.prototype.spotDown = function (mngmnt) {
         console.log('note spotDown');
+        return false;
     };
     FocusZoomNote.prototype.spotLeft = function (mngmnt) {
         console.log('note spotLeft');
+        return false;
     };
     FocusZoomNote.prototype.spotRight = function (mngmnt) {
         console.log('note spotRight');
+        return false;
     };
     return FocusZoomNote;
 }());
@@ -5599,26 +5501,45 @@ var FocusZoomMeasure = (function () {
         }
     };
     FocusZoomMeasure.prototype.addSpot = function (mngmnt) {
-        var r = mngmnt.muzXBox.zrenderer.ratioThickness;
         var defrhy = [
             { count: 1, division: 8 }, { count: 1, division: 8 },
             { count: 1, division: 8 }, { count: 1, division: 8 }
         ];
         var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : defrhy;
-        var xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
-        mngmnt.focusAnchor.content.push({ x: xx, y: 0, w: r, h: r, rx: 0, ry: 0, css: 'debug' });
+        var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
+        var xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
+        var ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
+        var hh = mngmnt.muzXBox.zrenderer.ratioThickness;
+        var yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
+        mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'debug' });
     };
     FocusZoomMeasure.prototype.spotUp = function (mngmnt) {
-        console.log('measure spotUp');
+        if (this.currentPitch < 127) {
+            this.currentPitch++;
+            mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+            return true;
+        }
+        else {
+            return false;
+        }
     };
     FocusZoomMeasure.prototype.spotDown = function (mngmnt) {
-        console.log('measure spotDown');
+        if (this.currentPitch > 0) {
+            this.currentPitch--;
+            mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+            return true;
+        }
+        else {
+            return false;
+        }
     };
     FocusZoomMeasure.prototype.spotLeft = function (mngmnt) {
         console.log('measure spotLeft');
+        return true;
     };
     FocusZoomMeasure.prototype.spotRight = function (mngmnt) {
         console.log('measure spotRight', mngmnt.muzXBox.zrenderer.tileLevel.translateX, mngmnt.muzXBox.zrenderer.tileLevel.translateY, mngmnt.muzXBox.zrenderer.tileLevel.translateZ);
+        return true;
     };
     return FocusZoomMeasure;
 }());
@@ -5639,15 +5560,19 @@ var FocusZoomSong = (function () {
     };
     FocusZoomSong.prototype.spotUp = function () {
         console.log('song spotUp');
+        return false;
     };
     FocusZoomSong.prototype.spotDown = function () {
         console.log('song spotDown');
+        return false;
     };
     FocusZoomSong.prototype.spotLeft = function () {
         console.log('song spotLeft');
+        return false;
     };
     FocusZoomSong.prototype.spotRight = function () {
         console.log('song spotRight');
+        return false;
     };
     return FocusZoomSong;
 }());
@@ -5692,16 +5617,20 @@ var FocusManagement = (function () {
         zrenderer.tileLevel.allTilesOK = false;
     };
     FocusManagement.prototype.spotUp = function () {
-        this.currentFocusLevelX().spotUp(this);
+        if (!this.currentFocusLevelX().spotUp(this))
+            this.wrongActionWarning();
     };
     FocusManagement.prototype.spotDown = function () {
-        this.currentFocusLevelX().spotDown(this);
+        if (!this.currentFocusLevelX().spotDown(this))
+            this.wrongActionWarning();
     };
     FocusManagement.prototype.spotLeft = function () {
-        this.currentFocusLevelX().spotLeft(this);
+        if (!this.currentFocusLevelX().spotLeft(this))
+            this.wrongActionWarning();
     };
     FocusManagement.prototype.spotRight = function () {
-        this.currentFocusLevelX().spotRight(this);
+        if (!this.currentFocusLevelX().spotRight(this))
+            this.wrongActionWarning();
     };
     FocusManagement.prototype.spotSelectA = function () {
         console.log('spotSelectA');
@@ -5743,6 +5672,9 @@ var FocusManagement = (function () {
         this.muzXBox.zrenderer.tileLevel.applyZoomPosition();
         this.muzXBox.zrenderer.tileLevel.adjustContentPosition();
         this.muzXBox.zrenderer.tileLevel.allTilesOK = false;
+    };
+    FocusManagement.prototype.wrongActionWarning = function () {
+        console.log('wrongActionWarning');
     };
     return FocusManagement;
 }());
