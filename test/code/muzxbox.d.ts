@@ -55,14 +55,10 @@ declare class TileLevel {
     lastMoveDy: number;
     lastMoveDt: number;
     mouseDownMode: boolean;
-    get allTilesOK(): boolean;
-    set allTilesOK(bb: boolean);
-    get translateZ(): number;
-    set translateZ(z: number);
-    get translateX(): number;
-    set translateX(x: number);
-    get translateY(): number;
-    set translateY(y: number);
+    allTilesOK: boolean;
+    translateZ: number;
+    translateX: number;
+    translateY: number;
     constructor(svgObject: SVGElement, inWidth: number, inHeight: number, minZoom: number, curZoom: number, maxZoom: number, layers: TileModelLayer[]);
     dump(): void;
     setupTapSize(baseSize: number): void;
@@ -295,6 +291,7 @@ declare type StartDuration = {
     start: number;
     duration: number;
 };
+declare function countMeasureSteps(meter: ZvoogMeter, rhythm: ZvoogMeter[]): number;
 declare function measuresAndStepDuration(song: ZvoogSchedule, count: number, step: number, rhythmPattern: ZvoogMeter[]): StartDuration;
 declare function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter;
 declare function adjustPartLeadPad(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;

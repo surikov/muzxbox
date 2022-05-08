@@ -1,5 +1,4 @@
 "use strict";
-console.log('MuzXBox v1.01');
 var ZInputDeviceHandler = (function () {
     function ZInputDeviceHandler(from) {
         var me = this;
@@ -110,7 +109,7 @@ var ZInputDeviceHandler = (function () {
     };
     return ZInputDeviceHandler;
 }());
-console.log('tilelevel v2.17');
+console.log('tilelevel v2.20.001');
 var TileLevel = (function () {
     function TileLevel(svgObject, inWidth, inHeight, minZoom, curZoom, maxZoom, layers) {
         this.tapSize = 50;
@@ -180,7 +179,7 @@ var TileLevel = (function () {
                 this._allTilesOK = bb;
             }
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(TileLevel.prototype, "translateZ", {
@@ -192,7 +191,7 @@ var TileLevel = (function () {
                 this._translateZ = z;
             }
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(TileLevel.prototype, "translateX", {
@@ -204,7 +203,7 @@ var TileLevel = (function () {
                 this._translateX = x;
             }
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(TileLevel.prototype, "translateY", {
@@ -216,7 +215,7 @@ var TileLevel = (function () {
                 this._translateY = y;
             }
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     TileLevel.prototype.dump = function () {
@@ -1438,38 +1437,60 @@ var ZUserSetting = (function () {
     };
     return ZUserSetting;
 }());
-function measuresAndStepDuration(song, count, step, rhythmPattern) {
-    var measureStartTime = 0;
-    var measureIdx = 0;
-    for (var mm = 0; mm < song.measures.length; mm++) {
-        measureIdx = mm;
-        if (mm < count) {
-            var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-            measureStartTime = measureStartTime + measureDuration;
-        }
-        else {
-            break;
-        }
-    }
+function countMeasureSteps(meter, rhythm) {
+    var currentStepStart = { count: 0, division: 1 };
     var stepNN = 0;
     var stepCnt = 0;
-    var stepStartTime = 0;
-    var currentStepStart = { count: 0, division: 1 };
-    if (measureIdx < song.measures.length) {
-        while (DUU(currentStepStart).lessThen(song.measures[measureIdx].meter) && stepCnt < step) {
-            currentStepStart = DUU(currentStepStart).plus(rhythmPattern[stepNN]);
-            stepNN++;
-            stepCnt++;
-            if (stepNN >= rhythmPattern.length) {
-                stepNN = 0;
+    while (DUU(currentStepStart).lessThen(meter)) {
+        currentStepStart = DUU(currentStepStart).plus(rhythm[stepNN]);
+        stepNN++;
+        stepCnt++;
+        if (stepNN >= rhythm.length) {
+            stepNN = 0;
+        }
+    }
+    return stepCnt;
+}
+function measuresAndStepDuration(song, count, step, rhythmPattern) {
+    if (count < song.measures.length) {
+        var measureStartTime = 0;
+        var measureIdx = 0;
+        for (var mm = 0; mm < song.measures.length; mm++) {
+            measureIdx = mm;
+            if (mm < count) {
+                var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
+                measureStartTime = measureStartTime + measureDuration;
+            }
+            else {
+                break;
             }
         }
-        stepStartTime = meter2seconds(song.measures[measureIdx].tempo, currentStepStart);
+        var stepNN = 0;
+        var stepCnt = 0;
+        var stepStartTime = 0;
+        var currentStepStart = { count: 0, division: 1 };
+        if (measureIdx < song.measures.length) {
+            while (DUU(currentStepStart).lessThen(song.measures[measureIdx].meter) && stepCnt < step) {
+                currentStepStart = DUU(currentStepStart).plus(rhythmPattern[stepNN]);
+                stepNN++;
+                stepCnt++;
+                if (stepNN >= rhythmPattern.length) {
+                    stepNN = 0;
+                }
+            }
+            stepStartTime = meter2seconds(song.measures[measureIdx].tempo, currentStepStart);
+        }
+        return {
+            start: measureStartTime + stepStartTime,
+            duration: meter2seconds(song.measures[measureIdx].tempo, rhythmPattern[stepNN])
+        };
     }
-    return {
-        start: measureStartTime + stepStartTime,
-        duration: meter2seconds(song.measures[measureIdx].tempo, rhythmPattern[stepNN])
-    };
+    else {
+        return {
+            start: 0,
+            duration: 1
+        };
+    }
 }
 function progressionDuration(progression) {
     var duration = { count: 0, division: 1 };
@@ -4435,7 +4456,7 @@ var SingleMenuPanel = (function () {
     };
     return SingleMenuPanel;
 }());
-console.log('MuzXBox v1.01');
+console.log('MuzXBox v1.02.001');
 var midiDrumPitchShift = 23;
 var us;
 var MuzXBox = (function () {
@@ -5488,9 +5509,9 @@ var FocusZoomNote = (function () {
 }());
 var FocusZoomMeasure = (function () {
     function FocusZoomMeasure() {
-        this.currentPitch = 3;
+        this.currentPitch = 33;
         this.currentMeasure = 2;
-        this.currentStep = 5;
+        this.currentStep = 1;
     }
     FocusZoomMeasure.prototype.isMatch = function (zoomLevel, zRender) {
         if (zoomLevel >= zRender.zoomNote && zoomLevel < zRender.zoomMeasure) {
@@ -5534,12 +5555,54 @@ var FocusZoomMeasure = (function () {
         }
     };
     FocusZoomMeasure.prototype.spotLeft = function (mngmnt) {
-        console.log('measure spotLeft');
-        return true;
+        console.log('measure spotLeft', this.currentMeasure, this.currentStep);
+        if (this.currentStep > 0) {
+            this.currentStep--;
+            mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+            return true;
+        }
+        else {
+            if (this.currentMeasure > 0) {
+                var defrhy = [
+                    { count: 1, division: 8 }, { count: 1, division: 8 },
+                    { count: 1, division: 8 }, { count: 1, division: 8 }
+                ];
+                var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : defrhy;
+                var count = countMeasureSteps(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter, rhythmPattern);
+                this.currentStep = count - 1;
+                this.currentMeasure--;
+                mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
     };
     FocusZoomMeasure.prototype.spotRight = function (mngmnt) {
         console.log('measure spotRight', mngmnt.muzXBox.zrenderer.tileLevel.translateX, mngmnt.muzXBox.zrenderer.tileLevel.translateY, mngmnt.muzXBox.zrenderer.tileLevel.translateZ);
-        return true;
+        var defrhy = [
+            { count: 1, division: 8 }, { count: 1, division: 8 },
+            { count: 1, division: 8 }, { count: 1, division: 8 }
+        ];
+        var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : defrhy;
+        var count = countMeasureSteps(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter, rhythmPattern);
+        if (this.currentStep < count - 1) {
+            this.currentStep++;
+            mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+            return true;
+        }
+        else {
+            if (this.currentMeasure < mngmnt.muzXBox.currentSchedule.measures.length - 1) {
+                this.currentMeasure++;
+                this.currentStep = 0;
+                mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
     };
     return FocusZoomMeasure;
 }());

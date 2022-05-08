@@ -1,4 +1,4 @@
-console.log('MuzXBox v1.01');
+//console.log('MuzXBox v1.01');
 class ZInputDeviceHandler {
 	muzXBox: MuzXBox;
 

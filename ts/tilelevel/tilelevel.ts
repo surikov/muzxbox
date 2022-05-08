@@ -1,4 +1,4 @@
-console.log('tilelevel v2.17');
+console.log('tilelevel v2.20.001');
 
 class TileLevel {
 	svg: SVGElement;

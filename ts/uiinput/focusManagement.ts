@@ -59,9 +59,9 @@ class FocusZoomNote implements FocusLevel {
 	}
 }
 class FocusZoomMeasure implements FocusLevel {
-	currentPitch: number = 3;
+	currentPitch: number = 33;
 	currentMeasure: number = 2;
-	currentStep: number = 5;
+	currentStep: number = 1;
 	isMatch(zoomLevel: number, zRender: ZRender): boolean {
 		if (zoomLevel >= zRender.zoomNote && zoomLevel < zRender.zoomMeasure) {
 			return true;
@@ -78,6 +78,7 @@ class FocusZoomMeasure implements FocusLevel {
 		];
 		var rhythmPattern: ZvoogMeter[] = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : defrhy;
 		let measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
+		//console.log(this.currentMeasure,this.currentStep,':',measuresAndStep.start);
 		let xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
 		let ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
 		let hh = mngmnt.muzXBox.zrenderer.ratioThickness;
@@ -103,15 +104,57 @@ class FocusZoomMeasure implements FocusLevel {
 		}
 	}
 	spotLeft(mngmnt: FocusManagement): boolean {
-		console.log('measure spotLeft');
-		return true;
+		console.log('measure spotLeft', this.currentMeasure,this.currentStep
+		);
+		if (this.currentStep > 0) {
+			this.currentStep--;
+			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+			return true;
+		} else {
+			if (this.currentMeasure > 0) {
+				let defrhy: ZvoogMeter[] = [
+					{ count: 1, division: 8 }, { count: 1, division: 8 }
+					, { count: 1, division: 8 }, { count: 1, division: 8 }
+
+				];
+				var rhythmPattern: ZvoogMeter[] = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : defrhy;
+				let count = countMeasureSteps(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter
+					, rhythmPattern);
+				this.currentStep = count - 1;
+				this.currentMeasure--;
+				mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+				return true;
+			} else {
+				return false;
+			}
+		}
 	}
 	spotRight(mngmnt: FocusManagement): boolean {
 		console.log('measure spotRight'
 			, mngmnt.muzXBox.zrenderer.tileLevel.translateX, mngmnt.muzXBox.zrenderer.tileLevel.translateY, mngmnt.muzXBox.zrenderer.tileLevel.translateZ
 		);
-		return true;
+		let defrhy: ZvoogMeter[] = [
+			{ count: 1, division: 8 }, { count: 1, division: 8 }
+			, { count: 1, division: 8 }, { count: 1, division: 8 }
 
+		];
+		var rhythmPattern: ZvoogMeter[] = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : defrhy;
+		let count = countMeasureSteps(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter
+			, rhythmPattern);
+		if (this.currentStep < count - 1) {
+			this.currentStep++;
+			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+			return true;
+		} else {
+			if (this.currentMeasure < mngmnt.muzXBox.currentSchedule.measures.length - 1) {
+				this.currentMeasure++;
+				this.currentStep = 0;
+				mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+				return true;
+			} else {
+				return false;
+			}
+		}
 	}
 }
 class FocusZoomSong implements FocusLevel {

@@ -1,4 +1,4 @@
-console.log('MuzXBox v1.01');
+console.log('MuzXBox v1.02.001');
 
 let midiDrumPitchShift = 23;
 let us: ZUserSetting;
