@@ -200,14 +200,10 @@ class ZMainMenu {
 				}
 				, {
 					label: 'plain 1/8', autoclose: true, icon: '', action: () => {
-						let rr: ZvoogMeter[] = [
-							{ count: 1, division: 8 }, { count: 1, division: 8 }
-							, { count: 1, division: 8 }, { count: 1, division: 8 }
-
-						];
-						console.log('plain 1/8', rr);
+						
+						console.log('plain 1/8', default8rhytym);
 						var me: MuzXBox = window['MZXB'] as MuzXBox;
-						if (me) { me.setGrid(rr); }
+						if (me) { me.setGrid(default8rhytym); }
 					}
 				}
 				, {

@@ -179,7 +179,7 @@ var TileLevel = (function () {
                 this._allTilesOK = bb;
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(TileLevel.prototype, "translateZ", {
@@ -191,7 +191,7 @@ var TileLevel = (function () {
                 this._translateZ = z;
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(TileLevel.prototype, "translateX", {
@@ -203,7 +203,7 @@ var TileLevel = (function () {
                 this._translateX = x;
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(TileLevel.prototype, "translateY", {
@@ -215,7 +215,7 @@ var TileLevel = (function () {
                 this._translateY = y;
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     TileLevel.prototype.dump = function () {
@@ -1669,6 +1669,10 @@ function adjustVoiceLowHigh(voice, originalProg, targetProg, measures, trackIsBa
         }
     }
 }
+var default8rhytym = [
+    { count: 1, division: 8 }, { count: 1, division: 8 },
+    { count: 1, division: 8 }, { count: 1, division: 8 }
+];
 var ZvoogFxGain = (function () {
     function ZvoogFxGain() {
         this.lockedState = new ZvoogPluginLock();
@@ -4273,9 +4277,11 @@ var ZMainMenu = (function () {
         });
         this.menuRoot.folders.push(this.songFolder);
         this.menuRoot.folders.push({
-            path: "Rhythm patterns", icon: "", folders: [], items: [
+            path: "Rhythm patterns", icon: "", folders: [],
+            items: [
                 {
-                    label: 'plain 1/16', autoclose: true, icon: '', action: function () {
+                    label: 'plain 1/16', autoclose: true, icon: '',
+                    action: function () {
                         var rr = [
                             { count: 1, division: 16 }, { count: 1, division: 16 },
                             { count: 1, division: 16 }, { count: 1, division: 16 },
@@ -4290,20 +4296,18 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/8', autoclose: true, icon: '', action: function () {
-                        var rr = [
-                            { count: 1, division: 8 }, { count: 1, division: 8 },
-                            { count: 1, division: 8 }, { count: 1, division: 8 }
-                        ];
-                        console.log('plain 1/8', rr);
+                    label: 'plain 1/8', autoclose: true, icon: '',
+                    action: function () {
+                        console.log('plain 1/8', default8rhytym);
                         var me = window['MZXB'];
                         if (me) {
-                            me.setGrid(rr);
+                            me.setGrid(default8rhytym);
                         }
                     }
                 },
                 {
-                    label: 'swing 1/8', autoclose: true, icon: '', action: function () {
+                    label: 'swing 1/8', autoclose: true, icon: '',
+                    action: function () {
                         var rr = [
                             { count: 5, division: 32 }, { count: 3, division: 32 },
                             { count: 5, division: 32 }, { count: 3, division: 32 }
@@ -4318,9 +4322,11 @@ var ZMainMenu = (function () {
             ], afterOpen: function () { }
         });
         this.menuRoot.folders.push({
-            path: "Screen size", icon: "", folders: [], items: [
+            path: "Screen size", icon: "", folders: [],
+            items: [
                 {
-                    label: 'normal', autoclose: true, icon: '', action: function () {
+                    label: 'normal', autoclose: true, icon: '',
+                    action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutNormal();
@@ -4328,7 +4334,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'big', autoclose: true, icon: '', action: function () {
+                    label: 'big', autoclose: true, icon: '',
+                    action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutBig();
@@ -5449,196 +5456,6 @@ var LayerSelector = (function () {
     };
     return LayerSelector;
 }());
-var FocusOtherLevel = (function () {
-    function FocusOtherLevel() {
-    }
-    FocusOtherLevel.prototype.isMatch = function (zoomLevel, zRender) {
-        return true;
-    };
-    FocusOtherLevel.prototype.addSpot = function (mngmnt) {
-    };
-    FocusOtherLevel.prototype.spotUp = function (mngmnt) {
-        console.log('other spotUp');
-        return false;
-    };
-    FocusOtherLevel.prototype.spotDown = function (mngmnt) {
-        console.log('other spotDown');
-        return false;
-    };
-    FocusOtherLevel.prototype.spotLeft = function (mngmnt) {
-        console.log('other spotLeft');
-        return false;
-    };
-    FocusOtherLevel.prototype.spotRight = function (mngmnt) {
-        console.log('other spotRight');
-        return false;
-    };
-    return FocusOtherLevel;
-}());
-var FocusZoomNote = (function () {
-    function FocusZoomNote() {
-    }
-    FocusZoomNote.prototype.isMatch = function (zoomLevel, zRender) {
-        if (zoomLevel < zRender.zoomNote) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    };
-    FocusZoomNote.prototype.addSpot = function (mngmnt) {
-        mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'debug' });
-    };
-    FocusZoomNote.prototype.spotUp = function (mngmnt) {
-        console.log('note spotUp');
-        return false;
-    };
-    FocusZoomNote.prototype.spotDown = function (mngmnt) {
-        console.log('note spotDown');
-        return false;
-    };
-    FocusZoomNote.prototype.spotLeft = function (mngmnt) {
-        console.log('note spotLeft');
-        return false;
-    };
-    FocusZoomNote.prototype.spotRight = function (mngmnt) {
-        console.log('note spotRight');
-        return false;
-    };
-    return FocusZoomNote;
-}());
-var FocusZoomMeasure = (function () {
-    function FocusZoomMeasure() {
-        this.currentPitch = 33;
-        this.currentMeasure = 2;
-        this.currentStep = 1;
-    }
-    FocusZoomMeasure.prototype.isMatch = function (zoomLevel, zRender) {
-        if (zoomLevel >= zRender.zoomNote && zoomLevel < zRender.zoomMeasure) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    };
-    FocusZoomMeasure.prototype.addSpot = function (mngmnt) {
-        var defrhy = [
-            { count: 1, division: 8 }, { count: 1, division: 8 },
-            { count: 1, division: 8 }, { count: 1, division: 8 }
-        ];
-        var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : defrhy;
-        var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
-        var xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
-        var ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
-        var hh = mngmnt.muzXBox.zrenderer.ratioThickness;
-        var yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
-        mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'debug' });
-    };
-    FocusZoomMeasure.prototype.spotUp = function (mngmnt) {
-        if (this.currentPitch < 127) {
-            this.currentPitch++;
-            mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
-            return true;
-        }
-        else {
-            return false;
-        }
-    };
-    FocusZoomMeasure.prototype.spotDown = function (mngmnt) {
-        if (this.currentPitch > 0) {
-            this.currentPitch--;
-            mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
-            return true;
-        }
-        else {
-            return false;
-        }
-    };
-    FocusZoomMeasure.prototype.spotLeft = function (mngmnt) {
-        console.log('measure spotLeft', this.currentMeasure, this.currentStep);
-        if (this.currentStep > 0) {
-            this.currentStep--;
-            mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
-            return true;
-        }
-        else {
-            if (this.currentMeasure > 0) {
-                var defrhy = [
-                    { count: 1, division: 8 }, { count: 1, division: 8 },
-                    { count: 1, division: 8 }, { count: 1, division: 8 }
-                ];
-                var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : defrhy;
-                var count = countMeasureSteps(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter, rhythmPattern);
-                this.currentStep = count - 1;
-                this.currentMeasure--;
-                mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-    };
-    FocusZoomMeasure.prototype.spotRight = function (mngmnt) {
-        console.log('measure spotRight', mngmnt.muzXBox.zrenderer.tileLevel.translateX, mngmnt.muzXBox.zrenderer.tileLevel.translateY, mngmnt.muzXBox.zrenderer.tileLevel.translateZ);
-        var defrhy = [
-            { count: 1, division: 8 }, { count: 1, division: 8 },
-            { count: 1, division: 8 }, { count: 1, division: 8 }
-        ];
-        var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : defrhy;
-        var count = countMeasureSteps(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter, rhythmPattern);
-        if (this.currentStep < count - 1) {
-            this.currentStep++;
-            mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
-            return true;
-        }
-        else {
-            if (this.currentMeasure < mngmnt.muzXBox.currentSchedule.measures.length - 1) {
-                this.currentMeasure++;
-                this.currentStep = 0;
-                mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-    };
-    return FocusZoomMeasure;
-}());
-var FocusZoomSong = (function () {
-    function FocusZoomSong() {
-    }
-    FocusZoomSong.prototype.isMatch = function (zoomLevel, zRender) {
-        if (zoomLevel >= zRender.zoomMeasure && zoomLevel < zRender.zoomSong) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    };
-    FocusZoomSong.prototype.addSpot = function (mngmnt) {
-        var r = mngmnt.muzXBox.zrenderer.ratioThickness;
-        mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: r * 127, h: r * 127, rx: 0, ry: 0, css: 'debug' });
-    };
-    FocusZoomSong.prototype.spotUp = function () {
-        console.log('song spotUp');
-        return false;
-    };
-    FocusZoomSong.prototype.spotDown = function () {
-        console.log('song spotDown');
-        return false;
-    };
-    FocusZoomSong.prototype.spotLeft = function () {
-        console.log('song spotLeft');
-        return false;
-    };
-    FocusZoomSong.prototype.spotRight = function () {
-        console.log('song spotRight');
-        return false;
-    };
-    return FocusZoomSong;
-}());
 var FocusManagement = (function () {
     function FocusManagement() {
         this.levelOfDetails = 0;
@@ -5673,7 +5490,6 @@ var FocusManagement = (function () {
         return this.focusLevels[this.focusLevels.length - 1];
     };
     FocusManagement.prototype.reSetFocus = function (zrenderer, songDuration) {
-        console.log('reSetFocus');
         zrenderer.tileLevel.resetAnchor(this.focusAnchor, this.focusMarkerLayer);
         zrenderer.clearResizeSingleAnchor(this.focusAnchor, songDuration);
         this.currentFocusLevelX().addSpot(this);
@@ -5740,6 +5556,234 @@ var FocusManagement = (function () {
         console.log('wrongActionWarning');
     };
     return FocusManagement;
+}());
+var FocusOtherLevel = (function () {
+    function FocusOtherLevel() {
+    }
+    FocusOtherLevel.prototype.isMatch = function (zoomLevel, zRender) {
+        return true;
+    };
+    FocusOtherLevel.prototype.addSpot = function (mngmnt) {
+    };
+    FocusOtherLevel.prototype.spotUp = function (mngmnt) {
+        console.log('other spotUp');
+        return false;
+    };
+    FocusOtherLevel.prototype.spotDown = function (mngmnt) {
+        console.log('other spotDown');
+        return false;
+    };
+    FocusOtherLevel.prototype.spotLeft = function (mngmnt) {
+        console.log('other spotLeft');
+        return false;
+    };
+    FocusOtherLevel.prototype.spotRight = function (mngmnt) {
+        console.log('other spotRight');
+        return false;
+    };
+    return FocusOtherLevel;
+}());
+var FocusZoomMeasure = (function () {
+    function FocusZoomMeasure() {
+        this.currentPitch = 33;
+        this.currentMeasure = 2;
+        this.currentStep = 1;
+    }
+    FocusZoomMeasure.prototype.isMatch = function (zoomLevel, zRender) {
+        if (zoomLevel >= zRender.zoomNote && zoomLevel < zRender.zoomMeasure) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    FocusZoomMeasure.prototype.addSpot = function (mngmnt) {
+        var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
+        var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
+        var xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
+        var ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
+        var hh = mngmnt.muzXBox.zrenderer.ratioThickness;
+        var yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
+        mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'debug' });
+    };
+    FocusZoomMeasure.prototype.spotUp = function (mngmnt) {
+        if (this.currentPitch < 127) {
+            this.currentPitch++;
+            var yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
+            var ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+            if (yy < -ty) {
+                mngmnt.muzXBox.zrenderer.tileLevel.translateY = -yy * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+                mngmnt.muzXBox.zrenderer.tileLevel.applyZoomPosition();
+            }
+            mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    FocusZoomMeasure.prototype.spotDown = function (mngmnt) {
+        if (this.currentPitch > 0) {
+            this.currentPitch--;
+            var hh = mngmnt.muzXBox.zrenderer.ratioThickness;
+            var yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
+            var ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+            var tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+            var vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
+            if (yy + hh > vh - ty) {
+                mngmnt.muzXBox.zrenderer.tileLevel.translateY = (vh - yy - hh) * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+                mngmnt.muzXBox.zrenderer.tileLevel.applyZoomPosition();
+            }
+            mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    FocusZoomMeasure.prototype.checkMoveLeft = function (mngmnt) {
+        var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
+        var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
+        var xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
+        var tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        if (xx < -tx) {
+            mngmnt.muzXBox.zrenderer.tileLevel.translateX = -xx * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+            mngmnt.muzXBox.zrenderer.tileLevel.applyZoomPosition();
+        }
+    };
+    FocusZoomMeasure.prototype.spotLeft = function (mngmnt) {
+        console.log('measure spotLeft', this.currentMeasure, this.currentStep);
+        if (this.currentStep > 0) {
+            this.currentStep--;
+            this.checkMoveLeft(mngmnt);
+            mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+            return true;
+        }
+        else {
+            if (this.currentMeasure > 0) {
+                var defrhy = [
+                    { count: 1, division: 8 }, { count: 1, division: 8 },
+                    { count: 1, division: 8 }, { count: 1, division: 8 }
+                ];
+                var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : defrhy;
+                var count = countMeasureSteps(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter, rhythmPattern);
+                this.currentStep = count - 1;
+                this.currentMeasure--;
+                this.checkMoveLeft(mngmnt);
+                mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    };
+    FocusZoomMeasure.prototype.checkMoveRight = function (mngmnt) {
+        var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
+        var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
+        var xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
+        var ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
+        var tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        var tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        var vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
+        if (xx + ww > vw - tx) {
+            mngmnt.muzXBox.zrenderer.tileLevel.translateX = (vw - xx - ww) * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+            mngmnt.muzXBox.zrenderer.tileLevel.applyZoomPosition();
+        }
+    };
+    FocusZoomMeasure.prototype.spotRight = function (mngmnt) {
+        console.log('measure spotRight', mngmnt.muzXBox.zrenderer.tileLevel.translateX, mngmnt.muzXBox.zrenderer.tileLevel.translateY, mngmnt.muzXBox.zrenderer.tileLevel.translateZ);
+        var defrhy = [
+            { count: 1, division: 8 }, { count: 1, division: 8 },
+            { count: 1, division: 8 }, { count: 1, division: 8 }
+        ];
+        var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : defrhy;
+        var count = countMeasureSteps(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter, rhythmPattern);
+        if (this.currentStep < count - 1) {
+            this.currentStep++;
+            this.checkMoveRight(mngmnt);
+            mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+            return true;
+        }
+        else {
+            if (this.currentMeasure < mngmnt.muzXBox.currentSchedule.measures.length - 1) {
+                this.currentMeasure++;
+                this.currentStep = 0;
+                this.checkMoveRight(mngmnt);
+                mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    };
+    return FocusZoomMeasure;
+}());
+var FocusZoomNote = (function () {
+    function FocusZoomNote() {
+    }
+    FocusZoomNote.prototype.isMatch = function (zoomLevel, zRender) {
+        if (zoomLevel < zRender.zoomNote) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    FocusZoomNote.prototype.addSpot = function (mngmnt) {
+        mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'debug' });
+    };
+    FocusZoomNote.prototype.spotUp = function (mngmnt) {
+        console.log('note spotUp');
+        return false;
+    };
+    FocusZoomNote.prototype.spotDown = function (mngmnt) {
+        console.log('note spotDown');
+        return false;
+    };
+    FocusZoomNote.prototype.spotLeft = function (mngmnt) {
+        console.log('note spotLeft');
+        return false;
+    };
+    FocusZoomNote.prototype.spotRight = function (mngmnt) {
+        console.log('note spotRight');
+        return false;
+    };
+    return FocusZoomNote;
+}());
+var FocusZoomSong = (function () {
+    function FocusZoomSong() {
+    }
+    FocusZoomSong.prototype.isMatch = function (zoomLevel, zRender) {
+        if (zoomLevel >= zRender.zoomMeasure && zoomLevel < zRender.zoomSong) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    FocusZoomSong.prototype.addSpot = function (mngmnt) {
+        var r = mngmnt.muzXBox.zrenderer.ratioThickness;
+        mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: r * 127, h: r * 127, rx: 0, ry: 0, css: 'debug' });
+    };
+    FocusZoomSong.prototype.spotUp = function () {
+        console.log('song spotUp');
+        return false;
+    };
+    FocusZoomSong.prototype.spotDown = function () {
+        console.log('song spotDown');
+        return false;
+    };
+    FocusZoomSong.prototype.spotLeft = function () {
+        console.log('song spotLeft');
+        return false;
+    };
+    FocusZoomSong.prototype.spotRight = function () {
+        console.log('song spotRight');
+        return false;
+    };
+    return FocusZoomSong;
 }());
 var LeftKeysRenderer = (function () {
     function LeftKeysRenderer() {

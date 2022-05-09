@@ -88,6 +88,10 @@
 		,"renderer/TimeLineRenderer.ts"
 		,"menu/LayerSelector.ts"
 		,"uiinput/focusManagement.ts"
+		,"uiinput/FocusOtherLevel.ts"
+		,"uiinput/FocusZoomMeasure.ts"
+		,"uiinput/FocusZoomNote.ts"
+		,"uiinput/FocusZoomSong.ts"
 		,"renderer/LeftKeysRenderer.ts"
 		
 	]

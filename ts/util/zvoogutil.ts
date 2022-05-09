@@ -305,3 +305,8 @@ function adjustVoiceLowHigh(voice: ZvoogVoice, originalProg: ZvoogChordMelody[],
 		}
 	}
 }
+let default8rhytym: ZvoogMeter[] = [
+	{ count: 1, division: 8 }, { count: 1, division: 8 }
+	, { count: 1, division: 8 }, { count: 1, division: 8 }
+
+];

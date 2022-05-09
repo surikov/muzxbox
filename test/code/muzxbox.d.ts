@@ -55,10 +55,14 @@ declare class TileLevel {
     lastMoveDy: number;
     lastMoveDt: number;
     mouseDownMode: boolean;
-    allTilesOK: boolean;
-    translateZ: number;
-    translateX: number;
-    translateY: number;
+    get allTilesOK(): boolean;
+    set allTilesOK(bb: boolean);
+    get translateZ(): number;
+    set translateZ(z: number);
+    get translateX(): number;
+    set translateX(x: number);
+    get translateY(): number;
+    set translateY(y: number);
     constructor(svgObject: SVGElement, inWidth: number, inHeight: number, minZoom: number, curZoom: number, maxZoom: number, layers: TileModelLayer[]);
     dump(): void;
     setupTapSize(baseSize: number): void;
@@ -298,6 +302,7 @@ declare function adjustPartLeadPad(voice: ZvoogVoice, fromPosition: ZvoogMeter, 
 declare function adjustPartBass(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
 declare function createBreakList(originalProg: ZvoogChordMelody[], targetProg: ZvoogChordMelody[], measures: ZvoogMeasure[]): ZvoogMeter[];
 declare function adjustVoiceLowHigh(voice: ZvoogVoice, originalProg: ZvoogChordMelody[], targetProg: ZvoogChordMelody[], measures: ZvoogMeasure[], trackIsBass: boolean): void;
+declare let default8rhytym: ZvoogMeter[];
 declare type ZvoogStoreListItem = {
     title: string;
     isFolder: boolean;
@@ -1136,41 +1141,6 @@ interface FocusLevel {
     spotLeft(mngmnt: FocusManagement): boolean;
     spotRight(mngmnt: FocusManagement): boolean;
 }
-declare class FocusOtherLevel implements FocusLevel {
-    isMatch(zoomLevel: number, zRender: ZRender): boolean;
-    addSpot(mngmnt: FocusManagement): void;
-    spotUp(mngmnt: FocusManagement): boolean;
-    spotDown(mngmnt: FocusManagement): boolean;
-    spotLeft(mngmnt: FocusManagement): boolean;
-    spotRight(mngmnt: FocusManagement): boolean;
-}
-declare class FocusZoomNote implements FocusLevel {
-    isMatch(zoomLevel: number, zRender: ZRender): boolean;
-    addSpot(mngmnt: FocusManagement): void;
-    spotUp(mngmnt: FocusManagement): boolean;
-    spotDown(mngmnt: FocusManagement): boolean;
-    spotLeft(mngmnt: FocusManagement): boolean;
-    spotRight(mngmnt: FocusManagement): boolean;
-}
-declare class FocusZoomMeasure implements FocusLevel {
-    currentPitch: number;
-    currentMeasure: number;
-    currentStep: number;
-    isMatch(zoomLevel: number, zRender: ZRender): boolean;
-    addSpot(mngmnt: FocusManagement): void;
-    spotUp(mngmnt: FocusManagement): boolean;
-    spotDown(mngmnt: FocusManagement): boolean;
-    spotLeft(mngmnt: FocusManagement): boolean;
-    spotRight(mngmnt: FocusManagement): boolean;
-}
-declare class FocusZoomSong implements FocusLevel {
-    isMatch(zoomLevel: number, zRender: ZRender): boolean;
-    addSpot(mngmnt: FocusManagement): void;
-    spotUp(): boolean;
-    spotDown(): boolean;
-    spotLeft(): boolean;
-    spotRight(): boolean;
-}
 declare class FocusManagement {
     focusMarkerLayer: SVGElement;
     focusAnchor: TileAnchor;
@@ -1192,6 +1162,43 @@ declare class FocusManagement {
     changePositionTo(xx: number, yy: number): void;
     changeZoomTo(zoom: number): void;
     wrongActionWarning(): void;
+}
+declare class FocusOtherLevel implements FocusLevel {
+    isMatch(zoomLevel: number, zRender: ZRender): boolean;
+    addSpot(mngmnt: FocusManagement): void;
+    spotUp(mngmnt: FocusManagement): boolean;
+    spotDown(mngmnt: FocusManagement): boolean;
+    spotLeft(mngmnt: FocusManagement): boolean;
+    spotRight(mngmnt: FocusManagement): boolean;
+}
+declare class FocusZoomMeasure implements FocusLevel {
+    currentPitch: number;
+    currentMeasure: number;
+    currentStep: number;
+    isMatch(zoomLevel: number, zRender: ZRender): boolean;
+    addSpot(mngmnt: FocusManagement): void;
+    spotUp(mngmnt: FocusManagement): boolean;
+    spotDown(mngmnt: FocusManagement): boolean;
+    checkMoveLeft(mngmnt: FocusManagement): void;
+    spotLeft(mngmnt: FocusManagement): boolean;
+    checkMoveRight(mngmnt: FocusManagement): void;
+    spotRight(mngmnt: FocusManagement): boolean;
+}
+declare class FocusZoomNote implements FocusLevel {
+    isMatch(zoomLevel: number, zRender: ZRender): boolean;
+    addSpot(mngmnt: FocusManagement): void;
+    spotUp(mngmnt: FocusManagement): boolean;
+    spotDown(mngmnt: FocusManagement): boolean;
+    spotLeft(mngmnt: FocusManagement): boolean;
+    spotRight(mngmnt: FocusManagement): boolean;
+}
+declare class FocusZoomSong implements FocusLevel {
+    isMatch(zoomLevel: number, zRender: ZRender): boolean;
+    addSpot(mngmnt: FocusManagement): void;
+    spotUp(): boolean;
+    spotDown(): boolean;
+    spotLeft(): boolean;
+    spotRight(): boolean;
 }
 declare class LeftKeysRenderer {
     leftKeysGroup: SVGElement;
