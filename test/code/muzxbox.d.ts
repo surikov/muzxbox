@@ -1140,6 +1140,7 @@ interface FocusLevel {
     spotDown(mngmnt: FocusManagement): boolean;
     spotLeft(mngmnt: FocusManagement): boolean;
     spotRight(mngmnt: FocusManagement): boolean;
+    moveSpotIntoView(mngmnt: FocusManagement): void;
 }
 declare class FocusManagement {
     focusMarkerLayer: SVGElement;
@@ -1152,6 +1153,7 @@ declare class FocusManagement {
     clearAnchorsContent(zRender: ZRender, songDuration: number): void;
     currentFocusLevelX(): FocusLevel;
     reSetFocus(zrenderer: ZRender, songDuration: number): void;
+    resetSpotPosition(): void;
     spotUp(): void;
     spotDown(): void;
     spotLeft(): void;
@@ -1170,6 +1172,7 @@ declare class FocusOtherLevel implements FocusLevel {
     spotDown(mngmnt: FocusManagement): boolean;
     spotLeft(mngmnt: FocusManagement): boolean;
     spotRight(mngmnt: FocusManagement): boolean;
+    moveSpotIntoView(mngmnt: FocusManagement): void;
 }
 declare class FocusZoomMeasure implements FocusLevel {
     currentPitch: number;
@@ -1179,10 +1182,10 @@ declare class FocusZoomMeasure implements FocusLevel {
     addSpot(mngmnt: FocusManagement): void;
     spotUp(mngmnt: FocusManagement): boolean;
     spotDown(mngmnt: FocusManagement): boolean;
-    checkMoveLeft(mngmnt: FocusManagement): void;
     spotLeft(mngmnt: FocusManagement): boolean;
-    checkMoveRight(mngmnt: FocusManagement): void;
     spotRight(mngmnt: FocusManagement): boolean;
+    moveViewToShowSpot(mngmnt: FocusManagement): void;
+    moveSpotIntoView(mngmnt: FocusManagement): void;
 }
 declare class FocusZoomNote implements FocusLevel {
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
@@ -1191,6 +1194,7 @@ declare class FocusZoomNote implements FocusLevel {
     spotDown(mngmnt: FocusManagement): boolean;
     spotLeft(mngmnt: FocusManagement): boolean;
     spotRight(mngmnt: FocusManagement): boolean;
+    moveSpotIntoView(mngmnt: FocusManagement): void;
 }
 declare class FocusZoomSong implements FocusLevel {
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
@@ -1199,6 +1203,7 @@ declare class FocusZoomSong implements FocusLevel {
     spotDown(): boolean;
     spotLeft(): boolean;
     spotRight(): boolean;
+    moveSpotIntoView(mngmnt: FocusManagement): void;
 }
 declare class LeftKeysRenderer {
     leftKeysGroup: SVGElement;

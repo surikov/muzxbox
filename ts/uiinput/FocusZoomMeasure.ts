@@ -22,12 +22,7 @@ class FocusZoomMeasure implements FocusLevel {
 		if (this.currentPitch < 127) {
 			this.currentPitch++;
 
-			let yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
-			let ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
-			if (yy < -ty) {
-				mngmnt.muzXBox.zrenderer.tileLevel.translateY = -yy * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
-				mngmnt.muzXBox.zrenderer.tileLevel.applyZoomPosition();
-			}
+			this.moveViewToShowSpot(mngmnt);
 
 			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
 			return true;
@@ -39,15 +34,7 @@ class FocusZoomMeasure implements FocusLevel {
 		if (this.currentPitch > 0) {
 			this.currentPitch--;
 
-			let hh = mngmnt.muzXBox.zrenderer.ratioThickness;
-			let yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
-			let ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
-			let tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize
-			let vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
-			if (yy + hh > vh - ty) {
-				mngmnt.muzXBox.zrenderer.tileLevel.translateY = (vh - yy - hh) * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
-				mngmnt.muzXBox.zrenderer.tileLevel.applyZoomPosition();
-			}
+			this.moveViewToShowSpot(mngmnt);
 
 			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
 			return true;
@@ -55,22 +42,12 @@ class FocusZoomMeasure implements FocusLevel {
 			return false;
 		}
 	}
-	checkMoveLeft(mngmnt: FocusManagement) {
-		var rhythmPattern: ZvoogMeter[] = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
-		let measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
-		let xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
-		let tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
-		if (xx < -tx) {
-			mngmnt.muzXBox.zrenderer.tileLevel.translateX = -xx * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
-			mngmnt.muzXBox.zrenderer.tileLevel.applyZoomPosition();
-		}
-	}
 	spotLeft(mngmnt: FocusManagement): boolean {
-		console.log('measure spotLeft', this.currentMeasure, this.currentStep
-		);
+		//console.log('measure spotLeft', this.currentMeasure, this.currentStep
+		//);
 		if (this.currentStep > 0) {
 			this.currentStep--;
-			this.checkMoveLeft(mngmnt);
+			this.moveViewToShowSpot(mngmnt);
 			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
 			return true;
 		} else {
@@ -85,7 +62,7 @@ class FocusZoomMeasure implements FocusLevel {
 					, rhythmPattern);
 				this.currentStep = count - 1;
 				this.currentMeasure--;
-				this.checkMoveLeft(mngmnt);
+				this.moveViewToShowSpot(mngmnt);
 				mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
 				return true;
 			} else {
@@ -93,23 +70,10 @@ class FocusZoomMeasure implements FocusLevel {
 			}
 		}
 	}
-	checkMoveRight(mngmnt: FocusManagement) {
-		var rhythmPattern: ZvoogMeter[] = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
-		let measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
-		let xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
-		let ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
-		let tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
-		let tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize
-		let vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
-		if (xx + ww > vw - tx) {
-			mngmnt.muzXBox.zrenderer.tileLevel.translateX = (vw - xx - ww) * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
-			mngmnt.muzXBox.zrenderer.tileLevel.applyZoomPosition();
-		}
-	}
 	spotRight(mngmnt: FocusManagement): boolean {
-		console.log('measure spotRight'
-			, mngmnt.muzXBox.zrenderer.tileLevel.translateX, mngmnt.muzXBox.zrenderer.tileLevel.translateY, mngmnt.muzXBox.zrenderer.tileLevel.translateZ
-		);
+		//console.log('measure spotRight'
+		//	, mngmnt.muzXBox.zrenderer.tileLevel.translateX, mngmnt.muzXBox.zrenderer.tileLevel.translateY, mngmnt.muzXBox.zrenderer.tileLevel.translateZ
+		//);
 		let defrhy: ZvoogMeter[] = [
 			{ count: 1, division: 8 }, { count: 1, division: 8 }
 			, { count: 1, division: 8 }, { count: 1, division: 8 }
@@ -120,19 +84,74 @@ class FocusZoomMeasure implements FocusLevel {
 			, rhythmPattern);
 		if (this.currentStep < count - 1) {
 			this.currentStep++;
-			this.checkMoveRight(mngmnt);
+			this.moveViewToShowSpot(mngmnt);
 			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
 			return true;
 		} else {
 			if (this.currentMeasure < mngmnt.muzXBox.currentSchedule.measures.length - 1) {
 				this.currentMeasure++;
 				this.currentStep = 0;
-				this.checkMoveRight(mngmnt);
+				this.moveViewToShowSpot(mngmnt);
 				mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
 				return true;
 			} else {
 				return false;
 			}
+		}
+	}
+	moveViewToShowSpot(mngmnt: FocusManagement) {
+		var rhythmPattern: ZvoogMeter[] = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
+		let measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
+		let xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
+		let yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
+		let ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
+		let hh = mngmnt.muzXBox.zrenderer.ratioThickness;
+		let tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+		let ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+		let tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize
+		let vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
+		let vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
+		if (xx + ww > vw - tx) {//right
+			mngmnt.muzXBox.zrenderer.tileLevel.translateX = (vw - xx - ww) * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+		}
+		if (xx < -tx) {//left
+			mngmnt.muzXBox.zrenderer.tileLevel.translateX = -xx * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+		}
+		if (yy + hh > vh - ty) {//down
+			mngmnt.muzXBox.zrenderer.tileLevel.translateY = (vh - yy - hh) * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+		}
+		if (yy < -ty) {//up
+			mngmnt.muzXBox.zrenderer.tileLevel.translateY = -yy * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+		}
+		mngmnt.muzXBox.zrenderer.tileLevel.applyZoomPosition();
+	}
+	moveSpotIntoView(mngmnt: FocusManagement): void {
+		var rhythmPattern: ZvoogMeter[] = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
+		let measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
+		let xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
+		let yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
+		let ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
+		let hh = mngmnt.muzXBox.zrenderer.ratioThickness;
+		let tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+		let ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+		let tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize
+		let vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
+		let vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
+		if (xx + ww > vw - tx) {//right
+			console.log('from right');
+		}
+		if (xx < -tx) {//left
+			console.log('from left');
+
+		}
+		if (yy + hh > vh - ty) {//down
+			let newY = vh - ty - hh;
+			let newPitch = 127 - Math.floor(newY / mngmnt.muzXBox.zrenderer.ratioThickness);
+			console.log('from down', this.currentPitch, newPitch);
+			this.currentPitch = newPitch;
+		}
+		if (yy < -ty) {//up
+			console.log('from up');
 		}
 	}
 }

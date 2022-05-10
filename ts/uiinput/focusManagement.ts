@@ -5,6 +5,7 @@ interface FocusLevel {
 	spotDown(mngmnt: FocusManagement): boolean;
 	spotLeft(mngmnt: FocusManagement): boolean;
 	spotRight(mngmnt: FocusManagement): boolean;
+	moveSpotIntoView(mngmnt: FocusManagement):void;
 }
 
 
@@ -54,6 +55,9 @@ class FocusManagement {
 		zrenderer.clearResizeSingleAnchor(this.focusAnchor, songDuration);
 		this.currentFocusLevelX().addSpot(this);
 		zrenderer.tileLevel.allTilesOK = false;
+	}
+	resetSpotPosition(){
+		this.currentFocusLevelX().moveSpotIntoView(this);
 	}
 	spotUp() {
 		if (!this.currentFocusLevelX().spotUp(this)) this.wrongActionWarning();

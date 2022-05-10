@@ -21,4 +21,7 @@ class FocusOtherLevel implements FocusLevel {
 		console.log('other spotRight');
 		return false;
 	}
+	moveSpotIntoView(mngmnt: FocusManagement) :void{
+		
+	}
 }

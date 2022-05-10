@@ -25,4 +25,7 @@ class FocusZoomNote implements FocusLevel {
 		console.log('note spotRight');
 		return false;
 	}
+	moveSpotIntoView(mngmnt: FocusManagement) :void{
+		
+	}
 }

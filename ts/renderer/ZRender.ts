@@ -82,6 +82,7 @@ class ZRender {
 				let songDuration = scheduleDuration(this.muzXBox.currentSchedule);
 				console.log('run afterZoomCallback', lastLevelOfDetails, curLOD,this.tileLevel.translateZ);
 				lastLevelOfDetails = curLOD;
+				this.focusManager.resetSpotPosition();
 				this.focusManager.reSetFocus(this,songDuration);
 			}
 		};

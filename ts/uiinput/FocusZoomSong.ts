@@ -26,4 +26,7 @@ class FocusZoomSong implements FocusLevel {
 		console.log('song spotRight');
 		return false;
 	}
+	moveSpotIntoView(mngmnt: FocusManagement) :void{
+		
+	}
 }
