@@ -126,6 +126,7 @@ class FocusZoomMeasure implements FocusLevel {
 		mngmnt.muzXBox.zrenderer.tileLevel.applyZoomPosition();
 	}
 	moveSpotIntoView(mngmnt: FocusManagement): void {
+		console.log('moveSpotIntoView from', this.currentPitch, ':', this.currentMeasure, this.currentStep);
 		var rhythmPattern: ZvoogMeter[] = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
 		let measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
 		let xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
@@ -139,10 +140,58 @@ class FocusZoomMeasure implements FocusLevel {
 		let vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
 		if (xx + ww > vw - tx) {//right
 			console.log('from right');
+			let measureStartTime = 0;
+			//let old = this.currentMeasure;
+			let measureDuration = 0;
+			for (this.currentMeasure = 0; this.currentMeasure < mngmnt.muzXBox.currentSchedule.measures.length; this.currentMeasure++) {
+				measureDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter);
+				if ((measureStartTime + measureDuration) * mngmnt.muzXBox.zrenderer.ratioDuration > ww + vw - tx) {
+					//console.log(':', tx, this.currentMeasure, (measureStartTime + measureDuration) * mngmnt.muzXBox.zrenderer.ratioDuration);
+					break;
+				}
+				measureStartTime = measureStartTime + measureDuration;
+			}
+			let nn = 0;
+			this.currentStep = 0;
+			let currentStepEnd: ZvoogMeter = rhythmPattern[nn];
+			let inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
+			while (inDuration < measureDuration && (measureStartTime + inDuration) * mngmnt.muzXBox.zrenderer.ratioDuration < -ww + vw - tx) {
+				nn++;
+				this.currentStep++;
+				if (nn >= rhythmPattern.length) {
+					nn = 0;
+				}
+				currentStepEnd = DUU(currentStepEnd).plus(rhythmPattern[nn]);
+				inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
+			}
+			console.log('from right', this.currentMeasure, this.currentStep);
 		}
 		if (xx < -tx) {//left
-			console.log('from left');
-
+			let measureStartTime = 0;
+			//let old = this.currentMeasure;
+			let measureDuration = 0;
+			for (this.currentMeasure = 0; this.currentMeasure < mngmnt.muzXBox.currentSchedule.measures.length; this.currentMeasure++) {
+				measureDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter);
+				if ((measureStartTime + measureDuration) * mngmnt.muzXBox.zrenderer.ratioDuration > -tx) {
+					//console.log(':', tx, this.currentMeasure, (measureStartTime + measureDuration) * mngmnt.muzXBox.zrenderer.ratioDuration);
+					break;
+				}
+				measureStartTime = measureStartTime + measureDuration;
+			}
+			let nn = 0;
+			this.currentStep = 0;
+			let currentStepEnd: ZvoogMeter = rhythmPattern[nn];
+			let inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
+			while (inDuration < measureDuration && (measureStartTime + inDuration) * mngmnt.muzXBox.zrenderer.ratioDuration < -tx) {
+				nn++;
+				this.currentStep++;
+				if (nn >= rhythmPattern.length) {
+					nn = 0;
+				}
+				currentStepEnd = DUU(currentStepEnd).plus(rhythmPattern[nn]);
+				inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
+			}
+			console.log('from left', this.currentMeasure, this.currentStep);
 		}
 		if (yy + hh > vh - ty) {//down
 			let newY = vh - ty - hh;
@@ -151,7 +200,11 @@ class FocusZoomMeasure implements FocusLevel {
 			this.currentPitch = newPitch;
 		}
 		if (yy < -ty) {//up
-			console.log('from up');
+			let newY = -ty;
+			let newPitch = 127 - Math.ceil(newY / mngmnt.muzXBox.zrenderer.ratioThickness);
+			console.log('from up', this.currentPitch, newPitch);
+			this.currentPitch = newPitch;
 		}
+		console.log('to', this.currentPitch, ':', this.currentMeasure, this.currentStep);
 	}
 }

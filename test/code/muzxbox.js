@@ -4278,11 +4278,9 @@ var ZMainMenu = (function () {
         });
         this.menuRoot.folders.push(this.songFolder);
         this.menuRoot.folders.push({
-            path: "Rhythm patterns", icon: "", folders: [],
-            items: [
+            path: "Rhythm patterns", icon: "", folders: [], items: [
                 {
-                    label: 'plain 1/16', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/16', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 1, division: 16 }, { count: 1, division: 16 },
                             { count: 1, division: 16 }, { count: 1, division: 16 },
@@ -4297,8 +4295,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/8', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/8', autoclose: true, icon: '', action: function () {
                         console.log('plain 1/8', default8rhytym);
                         var me = window['MZXB'];
                         if (me) {
@@ -4307,8 +4304,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'swing 1/8', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'swing 1/8', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 5, division: 32 }, { count: 3, division: 32 },
                             { count: 5, division: 32 }, { count: 3, division: 32 }
@@ -4323,11 +4319,9 @@ var ZMainMenu = (function () {
             ], afterOpen: function () { }
         });
         this.menuRoot.folders.push({
-            path: "Screen size", icon: "", folders: [],
-            items: [
+            path: "Screen size", icon: "", folders: [], items: [
                 {
-                    label: 'normal', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'normal', autoclose: true, icon: '', action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutNormal();
@@ -4335,8 +4329,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'big', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'big', autoclose: true, icon: '', action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutBig();
@@ -5713,6 +5706,7 @@ var FocusZoomMeasure = (function () {
         mngmnt.muzXBox.zrenderer.tileLevel.applyZoomPosition();
     };
     FocusZoomMeasure.prototype.moveSpotIntoView = function (mngmnt) {
+        console.log('moveSpotIntoView from', this.currentPitch, ':', this.currentMeasure, this.currentStep);
         var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
         var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
         var xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
@@ -5726,9 +5720,54 @@ var FocusZoomMeasure = (function () {
         var vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
         if (xx + ww > vw - tx) {
             console.log('from right');
+            var measureStartTime = 0;
+            var measureDuration = 0;
+            for (this.currentMeasure = 0; this.currentMeasure < mngmnt.muzXBox.currentSchedule.measures.length; this.currentMeasure++) {
+                measureDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter);
+                if ((measureStartTime + measureDuration) * mngmnt.muzXBox.zrenderer.ratioDuration > ww + vw - tx) {
+                    break;
+                }
+                measureStartTime = measureStartTime + measureDuration;
+            }
+            var nn = 0;
+            this.currentStep = 0;
+            var currentStepEnd = rhythmPattern[nn];
+            var inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
+            while (inDuration < measureDuration && (measureStartTime + inDuration) * mngmnt.muzXBox.zrenderer.ratioDuration < -ww + vw - tx) {
+                nn++;
+                this.currentStep++;
+                if (nn >= rhythmPattern.length) {
+                    nn = 0;
+                }
+                currentStepEnd = DUU(currentStepEnd).plus(rhythmPattern[nn]);
+                inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
+            }
+            console.log('from right', this.currentMeasure, this.currentStep);
         }
         if (xx < -tx) {
-            console.log('from left');
+            var measureStartTime = 0;
+            var measureDuration = 0;
+            for (this.currentMeasure = 0; this.currentMeasure < mngmnt.muzXBox.currentSchedule.measures.length; this.currentMeasure++) {
+                measureDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter);
+                if ((measureStartTime + measureDuration) * mngmnt.muzXBox.zrenderer.ratioDuration > -tx) {
+                    break;
+                }
+                measureStartTime = measureStartTime + measureDuration;
+            }
+            var nn = 0;
+            this.currentStep = 0;
+            var currentStepEnd = rhythmPattern[nn];
+            var inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
+            while (inDuration < measureDuration && (measureStartTime + inDuration) * mngmnt.muzXBox.zrenderer.ratioDuration < -tx) {
+                nn++;
+                this.currentStep++;
+                if (nn >= rhythmPattern.length) {
+                    nn = 0;
+                }
+                currentStepEnd = DUU(currentStepEnd).plus(rhythmPattern[nn]);
+                inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
+            }
+            console.log('from left', this.currentMeasure, this.currentStep);
         }
         if (yy + hh > vh - ty) {
             var newY = vh - ty - hh;
@@ -5737,8 +5776,12 @@ var FocusZoomMeasure = (function () {
             this.currentPitch = newPitch;
         }
         if (yy < -ty) {
-            console.log('from up');
+            var newY = -ty;
+            var newPitch = 127 - Math.ceil(newY / mngmnt.muzXBox.zrenderer.ratioThickness);
+            console.log('from up', this.currentPitch, newPitch);
+            this.currentPitch = newPitch;
         }
+        console.log('to', this.currentPitch, ':', this.currentMeasure, this.currentStep);
     };
     return FocusZoomMeasure;
 }());

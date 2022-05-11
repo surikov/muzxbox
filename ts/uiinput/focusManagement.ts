@@ -5,7 +5,7 @@ interface FocusLevel {
 	spotDown(mngmnt: FocusManagement): boolean;
 	spotLeft(mngmnt: FocusManagement): boolean;
 	spotRight(mngmnt: FocusManagement): boolean;
-	moveSpotIntoView(mngmnt: FocusManagement):void;
+	moveSpotIntoView(mngmnt: FocusManagement): void;
 }
 
 
@@ -56,7 +56,7 @@ class FocusManagement {
 		this.currentFocusLevelX().addSpot(this);
 		zrenderer.tileLevel.allTilesOK = false;
 	}
-	resetSpotPosition(){
+	resetSpotPosition() {
 		this.currentFocusLevelX().moveSpotIntoView(this);
 	}
 	spotUp() {
