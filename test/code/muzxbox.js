@@ -1452,6 +1452,47 @@ function countMeasureSteps(meter, rhythm) {
     }
     return stepCnt;
 }
+function countSteps(meter, rhythmPattern) {
+    var stepStartMeter = { count: 0, division: 1 };
+    var nn = 0;
+    var stepIdx = 0;
+    while (DUU(stepStartMeter).lessThen(meter)) {
+        stepStartMeter = DUU(stepStartMeter).plus(rhythmPattern[nn]);
+        nn++;
+        stepIdx++;
+        if (nn >= rhythmPattern.length) {
+            nn = 0;
+        }
+    }
+    return stepIdx;
+}
+function findMeasureStep(measures, rhythmPattern, ratioDuration, xx) {
+    var measureStartX = 0;
+    var measureIdx = 0;
+    for (measureIdx = 0; measureIdx < measures.length; measureIdx++) {
+        var measure = measures[measureIdx];
+        var measureLength = ratioDuration * meter2seconds(measure.tempo, measure.meter);
+        if (measureStartX + measureLength > xx) {
+            var stepStartMeter = { count: 0, division: 1 };
+            var nn = 0;
+            var stepIdx = -1;
+            while (measureStartX + ratioDuration * meter2seconds(measure.tempo, stepStartMeter) < xx) {
+                stepStartMeter = DUU(stepStartMeter).plus(rhythmPattern[nn]);
+                nn++;
+                stepIdx++;
+                if (nn >= rhythmPattern.length) {
+                    nn = 0;
+                }
+            }
+            if (stepIdx < 0) {
+                stepIdx = 0;
+            }
+            return { measure: measureIdx, step: stepIdx };
+        }
+        measureStartX = measureStartX + measureLength;
+    }
+    return null;
+}
 function measuresAndStepDuration(song, count, step, rhythmPattern) {
     if (count < song.measures.length) {
         var measureStartTime = 0;
@@ -5691,6 +5732,8 @@ var FocusZoomMeasure = (function () {
         var tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
         var vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
         var vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
+        console.log(tx, findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern, mngmnt.muzXBox.zrenderer.ratioDuration, -tx));
+        console.log(vw, findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern, mngmnt.muzXBox.zrenderer.ratioDuration, vw - tx));
         if (xx + ww > vw - tx) {
             mngmnt.muzXBox.zrenderer.tileLevel.translateX = (vw - xx - ww) * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
         }
@@ -5718,70 +5761,19 @@ var FocusZoomMeasure = (function () {
         var tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
         var vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
         var vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
-        if (xx + ww > vw - tx) {
-            console.log('from right');
-            var measureStartTime = 0;
-            var measureDuration = 0;
-            for (this.currentMeasure = 0; this.currentMeasure < mngmnt.muzXBox.currentSchedule.measures.length; this.currentMeasure++) {
-                measureDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter);
-                if ((measureStartTime + measureDuration) * mngmnt.muzXBox.zrenderer.ratioDuration > ww + vw - tx) {
-                    break;
-                }
-                measureStartTime = measureStartTime + measureDuration;
+        if ((xx + ww > vw - tx)
+            || (xx < -tx)
+            || (yy + hh > vh - ty)
+            || (yy < -ty)) {
+            var p = findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern, mngmnt.muzXBox.zrenderer.ratioDuration, -tx + vw / 2);
+            if (p) {
+                this.currentMeasure = p.measure;
+                this.currentStep = p.step;
             }
-            var nn = 0;
-            this.currentStep = 0;
-            var currentStepEnd = rhythmPattern[nn];
-            var inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
-            while (inDuration < measureDuration && (measureStartTime + inDuration) * mngmnt.muzXBox.zrenderer.ratioDuration < -ww + vw - tx) {
-                nn++;
-                this.currentStep++;
-                if (nn >= rhythmPattern.length) {
-                    nn = 0;
-                }
-                currentStepEnd = DUU(currentStepEnd).plus(rhythmPattern[nn]);
-                inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
-            }
-            console.log('from right', this.currentMeasure, this.currentStep);
-        }
-        if (xx < -tx) {
-            var measureStartTime = 0;
-            var measureDuration = 0;
-            for (this.currentMeasure = 0; this.currentMeasure < mngmnt.muzXBox.currentSchedule.measures.length; this.currentMeasure++) {
-                measureDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter);
-                if ((measureStartTime + measureDuration) * mngmnt.muzXBox.zrenderer.ratioDuration > -tx) {
-                    break;
-                }
-                measureStartTime = measureStartTime + measureDuration;
-            }
-            var nn = 0;
-            this.currentStep = 0;
-            var currentStepEnd = rhythmPattern[nn];
-            var inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
-            while (inDuration < measureDuration && (measureStartTime + inDuration) * mngmnt.muzXBox.zrenderer.ratioDuration < -tx) {
-                nn++;
-                this.currentStep++;
-                if (nn >= rhythmPattern.length) {
-                    nn = 0;
-                }
-                currentStepEnd = DUU(currentStepEnd).plus(rhythmPattern[nn]);
-                inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
-            }
-            console.log('from left', this.currentMeasure, this.currentStep);
-        }
-        if (yy + hh > vh - ty) {
-            var newY = vh - ty - hh;
-            var newPitch = 127 - Math.floor(newY / mngmnt.muzXBox.zrenderer.ratioThickness);
-            console.log('from down', this.currentPitch, newPitch);
-            this.currentPitch = newPitch;
-        }
-        if (yy < -ty) {
-            var newY = -ty;
+            var newY = vh / 2 - ty;
             var newPitch = 127 - Math.ceil(newY / mngmnt.muzXBox.zrenderer.ratioThickness);
-            console.log('from up', this.currentPitch, newPitch);
             this.currentPitch = newPitch;
         }
-        console.log('to', this.currentPitch, ':', this.currentMeasure, this.currentStep);
     };
     return FocusZoomMeasure;
 }());

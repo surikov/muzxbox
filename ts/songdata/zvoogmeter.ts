@@ -2,6 +2,10 @@ type ZvoogMeter = {
 	count: number
 	, division: number
 };
+type ZvoogStepIndex = {
+	measure: number
+	, step: number
+};
 function meter2seconds(bpm: number, meter: ZvoogMeter): number {
 	let wholeNoteSeconds = 4*60 / bpm;
 	let meterSeconds = wholeNoteSeconds * meter.count / meter.division;

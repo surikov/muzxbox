@@ -111,6 +111,8 @@ class FocusZoomMeasure implements FocusLevel {
 		let tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize
 		let vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
 		let vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
+		console.log(tx, findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern, mngmnt.muzXBox.zrenderer.ratioDuration, -tx));
+		console.log(vw, findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern, mngmnt.muzXBox.zrenderer.ratioDuration, vw - tx));
 		if (xx + ww > vw - tx) {//right
 			mngmnt.muzXBox.zrenderer.tileLevel.translateX = (vw - xx - ww) * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
 		}
@@ -138,60 +140,28 @@ class FocusZoomMeasure implements FocusLevel {
 		let tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize
 		let vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
 		let vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
-		if (xx + ww > vw - tx) {//right
-			console.log('from right');
-			let measureStartTime = 0;
-			//let old = this.currentMeasure;
-			let measureDuration = 0;
-			for (this.currentMeasure = 0; this.currentMeasure < mngmnt.muzXBox.currentSchedule.measures.length; this.currentMeasure++) {
-				measureDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter);
-				if ((measureStartTime + measureDuration) * mngmnt.muzXBox.zrenderer.ratioDuration > ww + vw - tx) {
-					//console.log(':', tx, this.currentMeasure, (measureStartTime + measureDuration) * mngmnt.muzXBox.zrenderer.ratioDuration);
-					break;
-				}
-				measureStartTime = measureStartTime + measureDuration;
+		if (
+			(xx + ww > vw - tx) //right
+			|| (xx < -tx)//left
+			|| (yy + hh > vh - ty) //down
+			|| (yy < -ty) //up
+		) {
+			let p: null | ZvoogStepIndex = findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern, mngmnt.muzXBox.zrenderer.ratioDuration, -tx + vw / 2);
+			if (p) {
+				this.currentMeasure = p.measure;
+				this.currentStep = p.step;
 			}
-			let nn = 0;
-			this.currentStep = 0;
-			let currentStepEnd: ZvoogMeter = rhythmPattern[nn];
-			let inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
-			while (inDuration < measureDuration && (measureStartTime + inDuration) * mngmnt.muzXBox.zrenderer.ratioDuration < -ww + vw - tx) {
-				nn++;
-				this.currentStep++;
-				if (nn >= rhythmPattern.length) {
-					nn = 0;
-				}
-				currentStepEnd = DUU(currentStepEnd).plus(rhythmPattern[nn]);
-				inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
-			}
-			console.log('from right', this.currentMeasure, this.currentStep);
+			let newY = vh / 2 - ty;
+			let newPitch = 127 - Math.ceil(newY / mngmnt.muzXBox.zrenderer.ratioThickness);
+			this.currentPitch = newPitch;
 		}
-		if (xx < -tx) {//left
-			let measureStartTime = 0;
-			//let old = this.currentMeasure;
-			let measureDuration = 0;
-			for (this.currentMeasure = 0; this.currentMeasure < mngmnt.muzXBox.currentSchedule.measures.length; this.currentMeasure++) {
-				measureDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter);
-				if ((measureStartTime + measureDuration) * mngmnt.muzXBox.zrenderer.ratioDuration > -tx) {
-					//console.log(':', tx, this.currentMeasure, (measureStartTime + measureDuration) * mngmnt.muzXBox.zrenderer.ratioDuration);
-					break;
-				}
-				measureStartTime = measureStartTime + measureDuration;
+		/*if (xx < -tx) {//left
+			let p: null | ZvoogStepIndex = findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern, mngmnt.muzXBox.zrenderer.ratioDuration, -tx + vw / 2);
+			if (p) {
+				this.currentMeasure = p.measure;
+				this.currentStep = p.step;
 			}
-			let nn = 0;
-			this.currentStep = 0;
-			let currentStepEnd: ZvoogMeter = rhythmPattern[nn];
-			let inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
-			while (inDuration < measureDuration && (measureStartTime + inDuration) * mngmnt.muzXBox.zrenderer.ratioDuration < -tx) {
-				nn++;
-				this.currentStep++;
-				if (nn >= rhythmPattern.length) {
-					nn = 0;
-				}
-				currentStepEnd = DUU(currentStepEnd).plus(rhythmPattern[nn]);
-				inDuration = meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, currentStepEnd);
-			}
-			console.log('from left', this.currentMeasure, this.currentStep);
+			console.log('from left', tx, vw, p);
 		}
 		if (yy + hh > vh - ty) {//down
 			let newY = vh - ty - hh;
@@ -205,6 +175,6 @@ class FocusZoomMeasure implements FocusLevel {
 			console.log('from up', this.currentPitch, newPitch);
 			this.currentPitch = newPitch;
 		}
-		console.log('to', this.currentPitch, ':', this.currentMeasure, this.currentStep);
+		console.log('to', this.currentPitch, ':', this.currentMeasure, this.currentStep);*/
 	}
 }

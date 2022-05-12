@@ -296,6 +296,8 @@ declare type StartDuration = {
     duration: number;
 };
 declare function countMeasureSteps(meter: ZvoogMeter, rhythm: ZvoogMeter[]): number;
+declare function countSteps(meter: ZvoogMeter, rhythmPattern: ZvoogMeter[]): number;
+declare function findMeasureStep(measures: ZvoogMeasure[], rhythmPattern: ZvoogMeter[], ratioDuration: number, xx: number): null | ZvoogStepIndex;
 declare function measuresAndStepDuration(song: ZvoogSchedule, count: number, step: number, rhythmPattern: ZvoogMeter[]): StartDuration;
 declare function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter;
 declare function adjustPartLeadPad(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
@@ -470,6 +472,10 @@ declare class AudioFileSource implements ZvoogPerformerPlugin {
 declare type ZvoogMeter = {
     count: number;
     division: number;
+};
+declare type ZvoogStepIndex = {
+    measure: number;
+    step: number;
 };
 declare function meter2seconds(bpm: number, meter: ZvoogMeter): number;
 declare function seconds2meter32(bpm: number, seconds: number): ZvoogMeter;
