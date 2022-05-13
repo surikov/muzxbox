@@ -1,19 +1,37 @@
 :root {
 	--background_color: #dddfff;
+	
+	--background_base: #ccddeeff;
+	--grid_base: #ffffffff;
+	--grid_lite: #ffffff66;
+	--prime_base: #000000ff;
+	--prime_lite: #00000066;
+	--secondary_base: #115522ff;
+	--secondary_lite: #11552299;
+	--decor_base:#226699ff;
+	--decor_lite:#22669999;
+	--decor_onion:#22669966;
+	--active_base:#660022ff;
+	--active_lite:#66002233;
 }
+
 html {
 	font-family: 'Zen Kurenaido', serif, cursive;
 }
-.menuHead{
-	height:1cm;
+
+.menuHead {
+	height: 1cm;
 }
-.menuContent{
+
+.menuContent {
 	margin-top: 1.5cm;
 }
-#menuButtonImage{
-	width:1cm;
-	height:1cm;
+
+#menuButtonImage {
+	width: 1cm;
+	height: 1cm;
 }
+
 /*
-https://coolors.co/palette/ccddee-000000-005544-226666-660022
+https://coolors.co/ccddee-ffffff-000000-115522-226699-660022
 */
