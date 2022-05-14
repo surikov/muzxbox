@@ -30,13 +30,13 @@ class FocusManagement {
 		};
 		zRender.layers.push(this.focusLayer);
 	}
-	clearAnchorsContent(zRender: ZRender, songDuration: number): void {
+	clearFocusAnchorsContent(zRender: ZRender, viewWidth: number): void {
 		let anchors: TileAnchor[] = [
 			this.focusAnchor
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			zRender.clearResizeSingleAnchor(anchors[i], songDuration);
+			zRender.clearResizeSingleAnchor(anchors[i], viewWidth);
 		}
 
 	}
@@ -49,10 +49,10 @@ class FocusManagement {
 		return this.focusLevels[this.focusLevels.length - 1];
 	}
 
-	reSetFocus(zrenderer: ZRender, songDuration: number) {
+	reSetFocus(zrenderer: ZRender, viewWidth: number) {
 		//console.log('reSetFocus');
 		zrenderer.tileLevel.resetAnchor(this.focusAnchor, this.focusMarkerLayer);
-		zrenderer.clearResizeSingleAnchor(this.focusAnchor, songDuration);
+		zrenderer.clearResizeSingleAnchor(this.focusAnchor, viewWidth);
 		this.currentFocusLevelX().addSpot(this);
 		zrenderer.tileLevel.allTilesOK = false;
 	}

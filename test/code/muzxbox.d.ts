@@ -55,14 +55,10 @@ declare class TileLevel {
     lastMoveDy: number;
     lastMoveDt: number;
     mouseDownMode: boolean;
-    get allTilesOK(): boolean;
-    set allTilesOK(bb: boolean);
-    get translateZ(): number;
-    set translateZ(z: number);
-    get translateX(): number;
-    set translateX(x: number);
-    get translateY(): number;
-    set translateY(y: number);
+    allTilesOK: boolean;
+    translateZ: number;
+    translateX: number;
+    translateY: number;
     constructor(svgObject: SVGElement, inWidth: number, inHeight: number, minZoom: number, curZoom: number, maxZoom: number, layers: TileModelLayer[]);
     dump(): void;
     setupTapSize(baseSize: number): void;
@@ -274,8 +270,8 @@ declare class ZRender {
     levelOfDetails(zz: number): 1 | 16 | 64 | 256 | 4;
     initUI(bx: MuzXBox): void;
     initDebugAnchors(): void;
-    clearResizeSingleAnchor(anchor: TileAnchor, songDuration: number): void;
-    clearAnchorsContent(songDuration: number): void;
+    clearResizeSingleAnchor(anchor: TileAnchor, viewWidth: number): void;
+    clearAnchorsContent(viewWidth: number): void;
     drawSchedule(song: ZvoogSchedule): void;
 }
 declare type ZUIModeValue = {
@@ -644,7 +640,11 @@ declare type ZvoogSchedule = {
     harmony: ZvoogProgression;
     rhythm?: ZvoogMeter[];
 };
-declare function scheduleDuration(song: ZvoogSchedule): number;
+declare function scheduleSecondsDuration(song: ZvoogSchedule): number;
+declare function gridWidthTp(song: ZvoogSchedule, ratioDuration: number): number;
+declare function viewWidthTp(song: ZvoogSchedule, ratioDuration: number): number;
+declare function gridHeightTp(ratioThickness: number): number;
+declare function viewHeightTp(ratioThickness: number): number;
 declare type ZvoogFilterSetting = {
     filterPlugin: ZvoogFilterPlugin | null;
     parameters: ZvoogParameterData[];
@@ -1015,6 +1015,12 @@ declare class SingleMenuPanel {
     moveSelection(row: number): void;
 }
 declare let midiDrumPitchShift: number;
+declare let leftGridMargin: number;
+declare let rightGridMargin: number;
+declare let topGridMargin: number;
+declare let bottomGridMargin: number;
+declare let ocataveStart: number;
+declare let ocataveCount: number;
 declare let us: ZUserSetting;
 declare class MuzXBox {
     currentSchedule: ZvoogSchedule;
@@ -1043,7 +1049,7 @@ declare class MeasureInfoRenderer {
     attach(zRender: ZRender): void;
     fillMeasureInfo(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
     initMeasureInfoAnchors(zRender: ZRender): void;
-    clearAnchorsContent(zRender: ZRender, songDuration: number): void;
+    clearMeasuresAnchorsContent(zRender: ZRender, viewWidth: number): void;
     fillMeasureInfo1(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
     fillMeasureInfo4(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
     fillMeasureInfo16(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
@@ -1070,7 +1076,7 @@ declare class PianoRollRenderer {
     measureSecondVoicesLayerGroup: SVGElement;
     measureMainVoiceLayerGroup: SVGElement;
     attach(zRender: ZRender): void;
-    clearAnchorsContent(zRender: ZRender, songDuration: number): void;
+    clearPRAnchorsContent(zRender: ZRender, viewWidth: number): void;
     initMainAnchors(zRender: ZRender): void;
     initSecondAnchors(zRender: ZRender): void;
     initOthersAnchors(zRender: ZRender): void;
@@ -1094,7 +1100,7 @@ declare class GridRenderer {
     gridLayer: TileLayerDefinition;
     attach(zRender: ZRender): void;
     initGridAnchors(zRender: ZRender): void;
-    clearAnchorsContent(zRender: ZRender, songDuration: number): void;
+    clearGridAnchorsContent(zRender: ZRender, viewWidth: number): void;
     drawGrid(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, rhythmPattern: ZvoogMeter[]): void;
     reSetGrid(zrenderer: ZRender, meters: ZvoogMeter[], currentSchedule: ZvoogSchedule): void;
 }
@@ -1107,7 +1113,7 @@ declare class TimeLineRenderer {
     timeLayer: TileLayerDefinition;
     attach(zRender: ZRender): void;
     initTimeScaleAnchors(zRender: ZRender): void;
-    clearAnchorsContent(zRender: ZRender, songDuration: number): void;
+    clearTLAnchorsContent(zRender: ZRender, viewWidth: number): void;
     drawSchedule(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
     drawLevel(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, layerAnchor: TileAnchor, subSize: string | null, textSize: string, yy: number, skip8: boolean): void;
     reSetGrid(zrenderer: ZRender, meters: ZvoogMeter[], currentSchedule: ZvoogSchedule): void;
@@ -1156,9 +1162,9 @@ declare class FocusManagement {
     muzXBox: MuzXBox;
     focusLevels: FocusLevel[];
     attachFocus(bx: MuzXBox, zRender: ZRender): void;
-    clearAnchorsContent(zRender: ZRender, songDuration: number): void;
+    clearFocusAnchorsContent(zRender: ZRender, viewWidth: number): void;
     currentFocusLevelX(): FocusLevel;
-    reSetFocus(zrenderer: ZRender, songDuration: number): void;
+    reSetFocus(zrenderer: ZRender, viewWidth: number): void;
     resetSpotPosition(): void;
     spotUp(): void;
     spotDown(): void;
@@ -1218,6 +1224,6 @@ declare class LeftKeysRenderer {
     keysLayer: TileLayerDefinition;
     attach(zRender: ZRender): void;
     initLeftKeysGroup(zRender: ZRender): void;
-    clearAnchorsContent(zRender: ZRender, songDuration: number): void;
+    clearKeysAnchorsContent(zRender: ZRender, viewWidth: number): void;
     drawKeys(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
 }

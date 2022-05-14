@@ -17,13 +17,13 @@ class LeftKeysRenderer {
 		};
 		zRender.layers.push(this.keysLayer);
 	}
-	clearAnchorsContent(zRender: ZRender, songDuration: number): void {
+	clearKeysAnchorsContent(zRender: ZRender, viewWidth: number): void {
 		let anchors: TileAnchor[] = [
 			this.keysAnchor1, this.keysAnchor4
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			zRender.clearResizeSingleAnchor(anchors[i], songDuration);
+			zRender.clearResizeSingleAnchor(anchors[i], viewWidth);
 		}
 
 	}

@@ -24,7 +24,7 @@ class FocusZoomMeasure implements FocusLevel {
 
 			this.moveViewToShowSpot(mngmnt);
 
-			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleSecondsDuration(mngmnt.muzXBox.currentSchedule));
 			return true;
 		} else {
 			return false;
@@ -36,7 +36,7 @@ class FocusZoomMeasure implements FocusLevel {
 
 			this.moveViewToShowSpot(mngmnt);
 
-			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleSecondsDuration(mngmnt.muzXBox.currentSchedule));
 			return true;
 		} else {
 			return false;
@@ -48,7 +48,7 @@ class FocusZoomMeasure implements FocusLevel {
 		if (this.currentStep > 0) {
 			this.currentStep--;
 			this.moveViewToShowSpot(mngmnt);
-			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleSecondsDuration(mngmnt.muzXBox.currentSchedule));
 			return true;
 		} else {
 			if (this.currentMeasure > 0) {
@@ -63,7 +63,7 @@ class FocusZoomMeasure implements FocusLevel {
 				this.currentStep = count - 1;
 				this.currentMeasure--;
 				this.moveViewToShowSpot(mngmnt);
-				mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+				mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleSecondsDuration(mngmnt.muzXBox.currentSchedule));
 				return true;
 			} else {
 				return false;
@@ -85,14 +85,14 @@ class FocusZoomMeasure implements FocusLevel {
 		if (this.currentStep < count - 1) {
 			this.currentStep++;
 			this.moveViewToShowSpot(mngmnt);
-			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleSecondsDuration(mngmnt.muzXBox.currentSchedule));
 			return true;
 		} else {
 			if (this.currentMeasure < mngmnt.muzXBox.currentSchedule.measures.length - 1) {
 				this.currentMeasure++;
 				this.currentStep = 0;
 				this.moveViewToShowSpot(mngmnt);
-				mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleDuration(mngmnt.muzXBox.currentSchedule));
+				mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleSecondsDuration(mngmnt.muzXBox.currentSchedule));
 				return true;
 			} else {
 				return false;

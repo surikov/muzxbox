@@ -29,7 +29,7 @@ class PianoRollRenderer {
 		this.initSecondAnchors(zRender);
 		this.initOthersAnchors(zRender);
 	}
-	clearAnchorsContent(zRender: ZRender, songDuration: number): void {
+	clearPRAnchorsContent(zRender: ZRender, viewWidth: number): void {
 		let anchors: TileAnchor[] = [
 			this.contentMain1, this.contentMain4, this.contentMain16, this.contentMain64, this.contentMain256
 			, this.contentSecond1, this.contentSecond4, this.contentSecond16, this.contentSecond64, this.contentSecond256
@@ -37,7 +37,7 @@ class PianoRollRenderer {
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			zRender.clearResizeSingleAnchor(anchors[i], songDuration);
+			zRender.clearResizeSingleAnchor(anchors[i], viewWidth);
 		}
 
 	}

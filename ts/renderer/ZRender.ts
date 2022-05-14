@@ -39,7 +39,7 @@ class ZRender {
 	debugAnchor64: TileAnchor;
 	debugAnchor256: TileAnchor;
 
-	muzXBox:MuzXBox;
+	muzXBox: MuzXBox;
 	/*
 		*/
 
@@ -47,9 +47,9 @@ class ZRender {
 
 
 
-	constructor(bx:MuzXBox) {
+	constructor(bx: MuzXBox) {
 		//this.bindLayers();
-		this.muzXBox=bx;
+		this.muzXBox = bx;
 	}
 
 	bindLayers() {
@@ -67,7 +67,7 @@ class ZRender {
 		var lastLevelOfDetails = this.zoomMin;
 		this.tileLevel.afterZoomCallback = () => {
 			//console.log('check afterZoomCallback', lastLevelOfDetails, this.tileLevel.translateZ);
-				
+
 			var curLOD = this.zoomMin;
 			if (this.tileLevel.translateZ >= this.zoomMin) curLOD = this.zoomMin;
 			if (this.tileLevel.translateZ >= this.zoomNote) curLOD = this.zoomNote;
@@ -79,11 +79,11 @@ class ZRender {
 
 
 			if (curLOD != lastLevelOfDetails) {
-				let songDuration = scheduleDuration(this.muzXBox.currentSchedule);
-				console.log('run afterZoomCallback', lastLevelOfDetails, curLOD,this.tileLevel.translateZ);
+				let songDuration = scheduleSecondsDuration(this.muzXBox.currentSchedule);
+				console.log('run afterZoomCallback', lastLevelOfDetails, curLOD, this.tileLevel.translateZ);
 				lastLevelOfDetails = curLOD;
 				this.focusManager.resetSpotPosition();
-				this.focusManager.reSetFocus(this,songDuration);
+				this.focusManager.reSetFocus(this, songDuration);
 			}
 		};
 
@@ -223,12 +223,14 @@ class ZRender {
 	/*
 	*/
 
-	clearResizeSingleAnchor(anchor: TileAnchor, songDuration: number) {
+	clearResizeSingleAnchor(anchor: TileAnchor, viewWidth: number) {
 		anchor.content.length = 0;
-		anchor.ww = this.ratioDuration * songDuration;
-		anchor.hh = 128 * this.ratioThickness;
+		//anchor.ww = this.ratioDuration * songDuration;
+		anchor.ww = viewWidth;
+		//anchor.hh = 128 * this.ratioThickness;
+		anchor.hh = viewHeightTp(this.ratioThickness);
 	}
-	clearAnchorsContent(songDuration: number): void {
+	clearAnchorsContent(viewWidth: number): void {
 		let anchors: TileAnchor[] = [
 			this.debugAnchor0, this.debugAnchor1, this.debugAnchor4, this.debugAnchor16, this.debugAnchor64, this.debugAnchor256
 			//, this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256
@@ -237,22 +239,23 @@ class ZRender {
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			this.clearResizeSingleAnchor(anchors[i], songDuration);
+			this.clearResizeSingleAnchor(anchors[i], viewWidth);
 		}
-		this.focusManager.clearAnchorsContent(this, songDuration);
-		this.gridRenderer.clearAnchorsContent(this, songDuration);
-		this.measureInfoRenderer.clearAnchorsContent(this, songDuration);
-		this.pianoRollRenderer.clearAnchorsContent(this, songDuration);
-		this.timeLineRenderer.clearAnchorsContent(this, songDuration);
-		this.leftKeysRenderer.clearAnchorsContent(this, songDuration);
-		this.tileLevel.innerWidth = this.ratioDuration * songDuration * this.tileLevel.tapSize;
+		this.focusManager.clearFocusAnchorsContent(this, viewWidth);
+		this.gridRenderer.clearGridAnchorsContent(this, viewWidth);
+		this.measureInfoRenderer.clearMeasuresAnchorsContent(this, viewWidth);
+		this.pianoRollRenderer.clearPRAnchorsContent(this, viewWidth);
+		this.timeLineRenderer.clearTLAnchorsContent(this, viewWidth);
+		this.leftKeysRenderer.clearKeysAnchorsContent(this, viewWidth);
+		this.tileLevel.innerWidth = this.ratioDuration * viewWidth * this.tileLevel.tapSize;
 		this.tileLevel.innerHeight = 128 * this.ratioThickness * this.tileLevel.tapSize;
 
 	}
 
 	drawSchedule(song: ZvoogSchedule) {//}, menuButton: TileRectangle) {
-		let songDuration = scheduleDuration(song);
-		this.clearAnchorsContent(songDuration);
+		//let songDuration = scheduleSecondsDuration(song);
+		let viewWidth = viewWidthTp(song, this.ratioDuration);
+		this.clearAnchorsContent(viewWidth);
 		this.measureInfoRenderer.fillMeasureInfo(song, this.ratioDuration, this.ratioThickness);
 		this.pianoRollRenderer.drawSchedule(song, this.ratioDuration, this.ratioThickness);
 		let rhythm: ZvoogMeter[] = this.rhythmPatternDefault;
@@ -264,6 +267,21 @@ class ZRender {
 		this.gridRenderer.drawGrid(this, song, this.ratioDuration, this.ratioThickness, rhythm);
 		this.timeLineRenderer.drawSchedule(this, song, this.ratioDuration, this.ratioThickness);
 		this.leftKeysRenderer.drawKeys(this, song, this.ratioDuration, this.ratioThickness);
+		this.debugAnchor0.content.push({
+			x: leftGridMargin
+			, y: topGridMargin
+			, w: gridWidthTp(song, this.ratioDuration)//songDuration * this.ratioDuration
+			, h: gridHeightTp(this.ratioThickness)//(ocataveCount * 12) * this.ratioThickness
+			, css: 'debug'
+		});
+		this.debugAnchor0.content.push({
+			x: 0
+			, y: 0
+			, w: viewWidthTp(song, this.ratioDuration)//songDuration * this.ratioDuration+leftGridMargin+rightGridMargin
+			, h: viewHeightTp(this.ratioThickness)//(ocataveCount * 12) * this.ratioThickness + topGridMargin + bottomGridMargin
+			, css: 'debug'
+		});
+
 		/*
 		let time = 0;
 		song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;
@@ -275,7 +293,7 @@ class ZRender {
 		}
 */
 		this.tileLevel.resetModel();
-		this.focusManager.reSetFocus(this,songDuration);//, song,this.tileLevel.translateX,this.tileLevel.translateY,this.tileLevel.translateZ);
+		this.focusManager.reSetFocus(this, viewWidth);//, song,this.tileLevel.translateX,this.tileLevel.translateY,this.tileLevel.translateZ);
 		this.resetLabel(song);
 	}
 

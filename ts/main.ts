@@ -1,12 +1,12 @@
 console.log('MuzXBox v1.02.001');
 
 let midiDrumPitchShift = 23;
-let leftGridMargin=10;
-let rightGridMargin=50;
-let topGridMargin=2;
-let bottomGridMargin=20;
+let leftGridMargin=20;
+let rightGridMargin=150;
+let topGridMargin=50;
+let bottomGridMargin=30;
 let ocataveStart=2;
-let ocataveCount=6;
+let ocataveCount=8;
 
 let us: ZUserSetting;
 
