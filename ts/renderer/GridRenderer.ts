@@ -87,6 +87,15 @@ class GridRenderer {
 				, y2: topGridMargin + gridHeightTp(ratioThickness)
 				, css: 'barLine256'
 			});
+			for (let n = 1; n < 12; n++) {
+				gridMeasure4.content.push({
+					x1: leftGridMargin + time * ratioDuration
+					, y1: topGridMargin + (12 * (ocataveCount - 0) - n) * ratioThickness
+					, x2: leftGridMargin + (time + measureDuration) * ratioDuration
+					, y2: topGridMargin + (12 * (ocataveCount - 0) - n) * ratioThickness
+					, css: 'pitchLine4'
+				});
+			}
 			for (let i = 1; i < ocataveCount; i++) {
 				gridMeasure16.content.push({
 					x1: leftGridMargin + time * ratioDuration
@@ -95,42 +104,30 @@ class GridRenderer {
 					, y2: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
 					, css: 'barLine16'
 				});
-				/*gridMeasure4.content.push({
+				gridMeasure4.content.push({
 					x1: leftGridMargin + time * ratioDuration
 					, y1: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
 					, x2: leftGridMargin + (time + measureDuration) * ratioDuration
 					, y2: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
 					, css: 'barLine4'
 				});
+				gridMeasure1.content.push({
+					x1: leftGridMargin + time * ratioDuration
+					, y1: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
+					, x2: leftGridMargin + (time + measureDuration) * ratioDuration
+					, y2: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
+					, css: 'barLine1'
+				});
 				for (let n = 1; n < 12; n++) {
 					gridMeasure4.content.push({
 						x1: leftGridMargin + time * ratioDuration
-						, y1: topGridMargin + 12 * (ocataveCount - i - n) * ratioThickness
+						, y1: topGridMargin + (12 * (ocataveCount - i) - n) * ratioThickness
 						, x2: leftGridMargin + (time + measureDuration) * ratioDuration
-						, y2: topGridMargin + 12 * (ocataveCount - i - n) * ratioThickness
-						, css: 'pitchLine4'
-					});
-				}*/
-			}
-			/*for (let i = 1; i < ocataveCount * 12; i = i + 1) {
-				if (i % 12 == 0) {
-					gridMeasure4.content.push({
-						x1: leftGridMargin + time * ratioDuration
-						, y1: (128.0 - i) * ratioThickness
-						, x2: leftGridMargin + (time + measureDuration) * ratioDuration
-						, y2: (128.0 - i) * ratioThickness
-						, css: 'barLine4'
-					});
-				} else {
-					gridMeasure4.content.push({
-						x1: leftGridMargin + time * ratioDuration
-						, y1: (128.0 - i) * ratioThickness
-						, x2: leftGridMargin + (time + measureDuration) * ratioDuration
-						, y2: (128.0 - i) * ratioThickness
+						, y2: topGridMargin + (12 * (ocataveCount - i) - n) * ratioThickness
 						, css: 'pitchLine4'
 					});
 				}
-			}*/
+			}
 			let stepNN = 0;
 			let position: ZvoogMeter = rhythmPattern[stepNN];
 			while (DUU(position).lessThen(song.measures[mm].meter)) {
@@ -139,13 +136,13 @@ class GridRenderer {
 				if (stepNN == rhythmPattern.length - 1) {
 					css = 'pitchWideLine4';
 				}
-				/*gridMeasure4.content.push({
+				gridMeasure4.content.push({
 					x1: leftGridMargin + (time + positionDuration) * ratioDuration
 					, y1: topGridMargin
 					, x2: leftGridMargin + (time + positionDuration) * ratioDuration
 					, y2: topGridMargin + gridHeightTp(ratioThickness)
 					, css: css
-				});*/
+				});
 				stepNN++;
 				if (stepNN >= rhythmPattern.length) {
 					stepNN = 0;

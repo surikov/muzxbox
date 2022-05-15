@@ -30,22 +30,22 @@ class LeftKeysRenderer {
 	drawKeys(zRender: ZRender, song: ZvoogSchedule
 		, ratioDuration: number, ratioThickness: number
 	) {
-		for (let i = 0; i < 10; i++) {
-			this.keysAnchor1.content.push(TText(0, (128 - i * 12 - 1) * ratioThickness, 'barNumber textSize4', '' + (i + 1)));
-			
-			this.keysAnchor1.content.push({ x: 0, y: (128 - i * 12 - 2) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-			this.keysAnchor1.content.push({ x: 0, y: (128 - i * 12 - 4) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-			this.keysAnchor1.content.push({ x: 0, y: (128 - i * 12 - 7) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-			this.keysAnchor1.content.push({ x: 0, y: (128 - i * 12 - 9) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-			this.keysAnchor1.content.push({ x: 0, y: (128 - i * 12 - 11) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+		for (let i = 0; i < ocataveCount; i++) {
+			this.keysAnchor1.content.push(TText(0, topGridMargin + ((ocataveCount - i) * 12) * ratioThickness, 'barNumber textSize4', '' + (i + 1)));
 
-			this.keysAnchor4.content.push(TText(0, (128 - i * 12 - 1) * ratioThickness, 'barNumber textSize16', '' + (i + 1)));
+			this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 2) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+			this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 4) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+			this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 7) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+			this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 9) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+			this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 11) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
 
-			this.keysAnchor4.content.push({ x: 0, y: (128 - i * 12 - 2) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-			this.keysAnchor4.content.push({ x: 0, y: (128 - i * 12 - 4) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-			this.keysAnchor4.content.push({ x: 0, y: (128 - i * 12 - 7) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-			this.keysAnchor4.content.push({ x: 0, y: (128 - i * 12 - 9) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-			this.keysAnchor4.content.push({ x: 0, y: (128 - i * 12 - 11) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+			this.keysAnchor4.content.push(TText(0, topGridMargin + ((ocataveCount - i) * 12) * ratioThickness, 'barNumber textSize16', '' + (i + 1)));
+
+			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 2) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 4) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 7) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 9) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 11) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
 		}
 		zRender.tileLevel.autoID(this.keysLayer.anchors);
 	}

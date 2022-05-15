@@ -51,12 +51,17 @@ class TimeLineRenderer {
 		for (let i = 0; i < song.measures.length; i++) {
 			let measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
 			if (!skip8 || (skip8 && i % 8 == 0)) {
-				//console.log(song.measures.length, yy, i);
 				let measureAnchor: TileAnchor = TAnchor(
-					time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness
+					leftGridMargin + time * ratioDuration
+					, 0
+					, ratioDuration * measureDuration
+					, viewHeightTp(ratioThickness)
 					, layerAnchor.showZoom, layerAnchor.hideZoom
 				);
-				measureAnchor.content.push(TText(time * ratioDuration, yy * 1, 'barNumber ' + textSize, ('' + (1 + i))));
+				measureAnchor.content.push(TText(
+					leftGridMargin +time * ratioDuration
+					, yy * 1
+					, 'barNumber ' + textSize, ('' + (1 + i))));
 				let rhythmPattern: ZvoogMeter[] = song.rhythm ? song.rhythm : zRender.rhythmPatternDefault;
 				if (subSize) {
 					let stepNN = 0;
@@ -64,7 +69,10 @@ class TimeLineRenderer {
 					while (DUU(position).lessThen(song.measures[i].meter)) {
 						let positionDuration = meter2seconds(song.measures[i].tempo, position);
 						let simple = DUU(position).simplify();
-						measureAnchor.content.push(TText((time + positionDuration) * ratioDuration, yy, 'barNumber ' + subSize, ('' + simple.count + '/' + simple.division)));
+						measureAnchor.content.push(TText(
+							leftGridMargin + (time + positionDuration) * ratioDuration
+							, yy
+							, 'barNumber ' + subSize, ('' + simple.count + '/' + simple.division)));
 						stepNN++;
 						if (stepNN >= rhythmPattern.length) {
 							stepNN = 0;

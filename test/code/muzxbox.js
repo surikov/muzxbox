@@ -179,7 +179,7 @@ var TileLevel = (function () {
                 this._allTilesOK = bb;
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(TileLevel.prototype, "translateZ", {
@@ -191,7 +191,7 @@ var TileLevel = (function () {
                 this._translateZ = z;
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(TileLevel.prototype, "translateX", {
@@ -203,7 +203,7 @@ var TileLevel = (function () {
                 this._translateX = x;
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(TileLevel.prototype, "translateY", {
@@ -215,7 +215,7 @@ var TileLevel = (function () {
                 this._translateY = y;
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     TileLevel.prototype.dump = function () {
@@ -1409,20 +1409,6 @@ var ZRender = (function () {
         this.gridRenderer.drawGrid(this, song, this.ratioDuration, this.ratioThickness, rhythm);
         this.timeLineRenderer.drawSchedule(this, song, this.ratioDuration, this.ratioThickness);
         this.leftKeysRenderer.drawKeys(this, song, this.ratioDuration, this.ratioThickness);
-        this.debugAnchor0.content.push({
-            x: leftGridMargin,
-            y: topGridMargin,
-            w: gridWidthTp(song, this.ratioDuration),
-            h: gridHeightTp(this.ratioThickness),
-            css: 'debug'
-        });
-        this.debugAnchor0.content.push({
-            x: 0,
-            y: 0,
-            w: viewWidthTp(song, this.ratioDuration),
-            h: viewHeightTp(this.ratioThickness),
-            css: 'debug'
-        });
         this.tileLevel.resetModel();
         this.focusManager.reSetFocus(this, viewWidth);
         this.resetLabel(song);
@@ -4347,9 +4333,11 @@ var ZMainMenu = (function () {
         });
         this.menuRoot.folders.push(this.songFolder);
         this.menuRoot.folders.push({
-            path: "Rhythm patterns", icon: "", folders: [], items: [
+            path: "Rhythm patterns", icon: "", folders: [],
+            items: [
                 {
-                    label: 'plain 1/16', autoclose: true, icon: '', action: function () {
+                    label: 'plain 1/16', autoclose: true, icon: '',
+                    action: function () {
                         var rr = [
                             { count: 1, division: 16 }, { count: 1, division: 16 },
                             { count: 1, division: 16 }, { count: 1, division: 16 },
@@ -4364,7 +4352,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/8', autoclose: true, icon: '', action: function () {
+                    label: 'plain 1/8', autoclose: true, icon: '',
+                    action: function () {
                         console.log('plain 1/8', default8rhytym);
                         var me = window['MZXB'];
                         if (me) {
@@ -4373,7 +4362,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'swing 1/8', autoclose: true, icon: '', action: function () {
+                    label: 'swing 1/8', autoclose: true, icon: '',
+                    action: function () {
                         var rr = [
                             { count: 5, division: 32 }, { count: 3, division: 32 },
                             { count: 5, division: 32 }, { count: 3, division: 32 }
@@ -4388,9 +4378,11 @@ var ZMainMenu = (function () {
             ], afterOpen: function () { }
         });
         this.menuRoot.folders.push({
-            path: "Screen size", icon: "", folders: [], items: [
+            path: "Screen size", icon: "", folders: [],
+            items: [
                 {
-                    label: 'normal', autoclose: true, icon: '', action: function () {
+                    label: 'normal', autoclose: true, icon: '',
+                    action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutNormal();
@@ -4398,7 +4390,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'big', autoclose: true, icon: '', action: function () {
+                    label: 'big', autoclose: true, icon: '',
+                    action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutBig();
@@ -4527,7 +4520,7 @@ var SingleMenuPanel = (function () {
     return SingleMenuPanel;
 }());
 console.log('MuzXBox v1.02.001');
-var midiDrumPitchShift = 23;
+var midiDrumPitchShift = 11;
 var leftGridMargin = 20;
 var rightGridMargin = 150;
 var topGridMargin = 50;
@@ -4688,8 +4681,8 @@ var MeasureInfoRenderer = (function () {
         var time = 0;
         for (var i = 0; i < song.measures.length; i++) {
             var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-            var singlemeasuresTimelineAnchor1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.measuresMeasureInfoAnchor1.showZoom, this.measuresMeasureInfoAnchor1.hideZoom);
-            singlemeasuresTimelineAnchor1.content.push(TText(time * ratioDuration, -1 / 4, 'barNumber textSize1', (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)));
+            var singlemeasuresTimelineAnchor1 = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.measuresMeasureInfoAnchor1.showZoom, this.measuresMeasureInfoAnchor1.hideZoom);
+            singlemeasuresTimelineAnchor1.content.push(TText(leftGridMargin + time * ratioDuration, -1 / 4, 'barNumber textSize1', (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)));
             this.measuresMeasureInfoAnchor1.content.push(singlemeasuresTimelineAnchor1);
             time = time + measureDuration;
         }
@@ -4698,8 +4691,8 @@ var MeasureInfoRenderer = (function () {
         var time = 0;
         for (var i = 0; i < song.measures.length; i++) {
             var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-            var singlemeasuresTimelineAnchor4 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.measuresMeasureInfoAnchor4.showZoom, this.measuresMeasureInfoAnchor4.hideZoom);
-            singlemeasuresTimelineAnchor4.content.push(TText(time * ratioDuration, -4 / 4, 'barNumber textSize4', (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)));
+            var singlemeasuresTimelineAnchor4 = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.measuresMeasureInfoAnchor4.showZoom, this.measuresMeasureInfoAnchor4.hideZoom);
+            singlemeasuresTimelineAnchor4.content.push(TText(leftGridMargin + time * ratioDuration, -4 / 4, 'barNumber textSize4', (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)));
             this.measuresMeasureInfoAnchor4.content.push(singlemeasuresTimelineAnchor4);
             time = time + measureDuration;
         }
@@ -4711,13 +4704,13 @@ var MeasureInfoRenderer = (function () {
         var curTempo = 0;
         for (var i = 0; i < song.measures.length; i++) {
             var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-            var singlemeasuresTimelineAnchor16 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.measuresMeasureInfoAnchor16.showZoom, this.measuresMeasureInfoAnchor16.hideZoom);
+            var singlemeasuresTimelineAnchor16 = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.measuresMeasureInfoAnchor16.showZoom, this.measuresMeasureInfoAnchor16.hideZoom);
             if (curMeterCount != song.measures[i].meter.count || curDivision != song.measures[i].meter.division || curTempo != song.measures[i].tempo) {
                 curMeterCount = song.measures[i].meter.count;
                 curDivision = song.measures[i].meter.division;
                 curTempo = song.measures[i].tempo;
                 singlemeasuresTimelineAnchor16.content.push({
-                    x: time * ratioDuration, y: -16 / 4, css: 'barNumber textSize16',
+                    x: leftGridMargin + time * ratioDuration, y: -16 / 4, css: 'barNumber textSize16',
                     text: (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)
                 });
             }
@@ -4733,7 +4726,7 @@ var MeasureInfoRenderer = (function () {
         var lastMeasureNum = -123456;
         for (var i = 0; i < song.measures.length; i++) {
             var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-            var singlemeasuresTimelineAnchor64 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.measuresMeasureInfoAnchor64.showZoom, this.measuresMeasureInfoAnchor64.hideZoom);
+            var singlemeasuresTimelineAnchor64 = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.measuresMeasureInfoAnchor64.showZoom, this.measuresMeasureInfoAnchor64.hideZoom);
             if (curMeterCount != song.measures[i].meter.count || curDivision != song.measures[i].meter.division || curTempo != song.measures[i].tempo) {
                 curMeterCount = song.measures[i].meter.count;
                 curDivision = song.measures[i].meter.division;
@@ -4741,7 +4734,7 @@ var MeasureInfoRenderer = (function () {
                 if (i - lastMeasureNum > 2) {
                     lastMeasureNum = i;
                     singlemeasuresTimelineAnchor64.content.push({
-                        x: time * ratioDuration, y: -64 / 4, css: 'barNumber textSize64',
+                        x: leftGridMargin + time * ratioDuration, y: -64 / 4, css: 'barNumber textSize64',
                         text: (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)
                     });
                 }
@@ -4758,7 +4751,7 @@ var MeasureInfoRenderer = (function () {
         var lastMeasureNum = -123456;
         for (var i = 0; i < song.measures.length; i++) {
             var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
-            var singlemeasuresTimelineAnchor256 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.measuresMeasureInfoAnchor256.showZoom, this.measuresMeasureInfoAnchor256.hideZoom);
+            var singlemeasuresTimelineAnchor256 = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.measuresMeasureInfoAnchor256.showZoom, this.measuresMeasureInfoAnchor256.hideZoom);
             if (curMeterCount != song.measures[i].meter.count || curDivision != song.measures[i].meter.division || curTempo != song.measures[i].tempo) {
                 curMeterCount = song.measures[i].meter.count;
                 curDivision = song.measures[i].meter.division;
@@ -4766,7 +4759,7 @@ var MeasureInfoRenderer = (function () {
                 if (i - lastMeasureNum > 8) {
                     lastMeasureNum = i;
                     singlemeasuresTimelineAnchor256.content.push({
-                        x: time * ratioDuration, y: -256, css: 'barNumber textSize256',
+                        x: leftGridMargin + time * ratioDuration, y: -256, css: 'barNumber textSize256',
                         text: ('' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)
                     });
                     singlemeasuresTimelineAnchor256.content.push({
@@ -4854,6 +4847,7 @@ var PianoRollRenderer = (function () {
     PianoRollRenderer.prototype.addVoiceMeasure = function (ratioDuration, ratioThickness, song, voice, measureNum, time, css, anchors) {
         var measure = voice.measureChords[measureNum];
         var measureMaxLen = anchors[0].ww;
+        var yShift = gridHeightTp(ratioThickness) - (0.5 - ocataveStart * 12) * ratioThickness;
         for (var cc = 0; cc < measure.chords.length; cc++) {
             var chord = measure.chords[cc];
             for (var ee = 0; ee < chord.envelopes.length; ee++) {
@@ -4875,10 +4869,10 @@ var PianoRollRenderer = (function () {
                         endShift = -0.49 * ratioThickness;
                     }
                     var line_2 = {
-                        x1: (time + pitchWhen) * ratioDuration + startShift,
-                        x2: (time + pitchWhen + pitchDuration) * ratioDuration + endShift,
-                        y1: (128 - pitch.pitch) * ratioThickness - 0.5 * ratioThickness,
-                        y2: (128 - slide) * ratioThickness - 0.5 * ratioThickness,
+                        x1: leftGridMargin + (time + pitchWhen) * ratioDuration + startShift,
+                        x2: leftGridMargin + (time + pitchWhen + pitchDuration) * ratioDuration + endShift,
+                        y1: topGridMargin + yShift - pitch.pitch * ratioThickness,
+                        y2: topGridMargin + yShift - slide * ratioThickness,
                         css: css
                     };
                     for (var aa = 0; aa < anchors.length; aa++) {
@@ -5217,6 +5211,15 @@ var GridRenderer = (function () {
                 y2: topGridMargin + gridHeightTp(ratioThickness),
                 css: 'barLine256'
             });
+            for (var n = 1; n < 12; n++) {
+                gridMeasure4.content.push({
+                    x1: leftGridMargin + time * ratioDuration,
+                    y1: topGridMargin + (12 * (ocataveCount - 0) - n) * ratioThickness,
+                    x2: leftGridMargin + (time + measureDuration) * ratioDuration,
+                    y2: topGridMargin + (12 * (ocataveCount - 0) - n) * ratioThickness,
+                    css: 'pitchLine4'
+                });
+            }
             for (var i = 1; i < ocataveCount; i++) {
                 gridMeasure16.content.push({
                     x1: leftGridMargin + time * ratioDuration,
@@ -5225,6 +5228,29 @@ var GridRenderer = (function () {
                     y2: topGridMargin + 12 * (ocataveCount - i) * ratioThickness,
                     css: 'barLine16'
                 });
+                gridMeasure4.content.push({
+                    x1: leftGridMargin + time * ratioDuration,
+                    y1: topGridMargin + 12 * (ocataveCount - i) * ratioThickness,
+                    x2: leftGridMargin + (time + measureDuration) * ratioDuration,
+                    y2: topGridMargin + 12 * (ocataveCount - i) * ratioThickness,
+                    css: 'barLine4'
+                });
+                gridMeasure1.content.push({
+                    x1: leftGridMargin + time * ratioDuration,
+                    y1: topGridMargin + 12 * (ocataveCount - i) * ratioThickness,
+                    x2: leftGridMargin + (time + measureDuration) * ratioDuration,
+                    y2: topGridMargin + 12 * (ocataveCount - i) * ratioThickness,
+                    css: 'barLine1'
+                });
+                for (var n = 1; n < 12; n++) {
+                    gridMeasure4.content.push({
+                        x1: leftGridMargin + time * ratioDuration,
+                        y1: topGridMargin + (12 * (ocataveCount - i) - n) * ratioThickness,
+                        x2: leftGridMargin + (time + measureDuration) * ratioDuration,
+                        y2: topGridMargin + (12 * (ocataveCount - i) - n) * ratioThickness,
+                        css: 'pitchLine4'
+                    });
+                }
             }
             var stepNN = 0;
             var position = rhythmPattern[stepNN];
@@ -5234,6 +5260,13 @@ var GridRenderer = (function () {
                 if (stepNN == rhythmPattern.length - 1) {
                     css = 'pitchWideLine4';
                 }
+                gridMeasure4.content.push({
+                    x1: leftGridMargin + (time + positionDuration) * ratioDuration,
+                    y1: topGridMargin,
+                    x2: leftGridMargin + (time + positionDuration) * ratioDuration,
+                    y2: topGridMargin + gridHeightTp(ratioThickness),
+                    css: css
+                });
                 stepNN++;
                 if (stepNN >= rhythmPattern.length) {
                     stepNN = 0;
@@ -5294,8 +5327,8 @@ var TimeLineRenderer = (function () {
         for (var i = 0; i < song.measures.length; i++) {
             var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
             if (!skip8 || (skip8 && i % 8 == 0)) {
-                var measureAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, layerAnchor.showZoom, layerAnchor.hideZoom);
-                measureAnchor.content.push(TText(time * ratioDuration, yy * 1, 'barNumber ' + textSize, ('' + (1 + i))));
+                var measureAnchor = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, viewHeightTp(ratioThickness), layerAnchor.showZoom, layerAnchor.hideZoom);
+                measureAnchor.content.push(TText(leftGridMargin + time * ratioDuration, yy * 1, 'barNumber ' + textSize, ('' + (1 + i))));
                 var rhythmPattern = song.rhythm ? song.rhythm : zRender.rhythmPatternDefault;
                 if (subSize) {
                     var stepNN = 0;
@@ -5303,7 +5336,7 @@ var TimeLineRenderer = (function () {
                     while (DUU(position).lessThen(song.measures[i].meter)) {
                         var positionDuration = meter2seconds(song.measures[i].tempo, position);
                         var simple = DUU(position).simplify();
-                        measureAnchor.content.push(TText((time + positionDuration) * ratioDuration, yy, 'barNumber ' + subSize, ('' + simple.count + '/' + simple.division)));
+                        measureAnchor.content.push(TText(leftGridMargin + (time + positionDuration) * ratioDuration, yy, 'barNumber ' + subSize, ('' + simple.count + '/' + simple.division)));
                         stepNN++;
                         if (stepNN >= rhythmPattern.length) {
                             stepNN = 0;
@@ -5686,10 +5719,13 @@ var FocusZoomMeasure = (function () {
     FocusZoomMeasure.prototype.addSpot = function (mngmnt) {
         var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
         var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
-        var xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
+        var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
         var ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
         var hh = mngmnt.muzXBox.zrenderer.ratioThickness;
-        var yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
+        var yy = topGridMargin
+            + gridHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness)
+            + ocataveStart * 12 * mngmnt.muzXBox.zrenderer.ratioThickness
+            - this.currentPitch * mngmnt.muzXBox.zrenderer.ratioThickness;
         mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'debug' });
     };
     FocusZoomMeasure.prototype.spotUp = function (mngmnt) {
@@ -5769,8 +5805,11 @@ var FocusZoomMeasure = (function () {
     FocusZoomMeasure.prototype.moveViewToShowSpot = function (mngmnt) {
         var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
         var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
-        var xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
-        var yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
+        var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
+        var yy = topGridMargin
+            + gridHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness)
+            + ocataveStart * 12 * mngmnt.muzXBox.zrenderer.ratioThickness
+            - this.currentPitch * mngmnt.muzXBox.zrenderer.ratioThickness;
         var ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
         var hh = mngmnt.muzXBox.zrenderer.ratioThickness;
         var tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
@@ -5778,8 +5817,6 @@ var FocusZoomMeasure = (function () {
         var tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
         var vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
         var vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
-        console.log(tx, findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern, mngmnt.muzXBox.zrenderer.ratioDuration, -tx));
-        console.log(vw, findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern, mngmnt.muzXBox.zrenderer.ratioDuration, vw - tx));
         if (xx + ww > vw - tx) {
             mngmnt.muzXBox.zrenderer.tileLevel.translateX = (vw - xx - ww) * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
         }
@@ -5798,8 +5835,11 @@ var FocusZoomMeasure = (function () {
         console.log('moveSpotIntoView from', this.currentPitch, ':', this.currentMeasure, this.currentStep);
         var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
         var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
-        var xx = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
-        var yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
+        var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
+        var yy = topGridMargin
+            + gridHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness)
+            + ocataveStart * 12 * mngmnt.muzXBox.zrenderer.ratioThickness
+            - this.currentPitch * mngmnt.muzXBox.zrenderer.ratioThickness;
         var ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
         var hh = mngmnt.muzXBox.zrenderer.ratioThickness;
         var tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
@@ -5807,19 +5847,15 @@ var FocusZoomMeasure = (function () {
         var tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
         var vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
         var vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
-        if ((xx + ww > vw - tx)
-            || (xx < -tx)
-            || (yy + hh > vh - ty)
-            || (yy < -ty)) {
-            var p = findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern, mngmnt.muzXBox.zrenderer.ratioDuration, -tx + vw / 2);
-            if (p) {
-                this.currentMeasure = p.measure;
-                this.currentStep = p.step;
-            }
-            var newY = vh / 2 - ty;
-            var newPitch = 127 - Math.ceil(newY / mngmnt.muzXBox.zrenderer.ratioThickness);
-            this.currentPitch = newPitch;
+        var p = findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern, mngmnt.muzXBox.zrenderer.ratioDuration, leftGridMargin - tx + vw / 2);
+        if (p) {
+            this.currentMeasure = p.measure;
+            this.currentStep = p.step;
         }
+        var newY = topGridMargin + vh / 2 - ty;
+        var newPitch = (ocataveCount + ocataveStart) * 12 - Math.ceil(newY / mngmnt.muzXBox.zrenderer.ratioThickness);
+        this.currentPitch = newPitch;
+        console.log('to', this.currentPitch, ':', this.currentMeasure, this.currentStep);
     };
     return FocusZoomMeasure;
 }());
@@ -5918,19 +5954,19 @@ var LeftKeysRenderer = (function () {
         }
     };
     LeftKeysRenderer.prototype.drawKeys = function (zRender, song, ratioDuration, ratioThickness) {
-        for (var i = 0; i < 10; i++) {
-            this.keysAnchor1.content.push(TText(0, (128 - i * 12 - 1) * ratioThickness, 'barNumber textSize4', '' + (i + 1)));
-            this.keysAnchor1.content.push({ x: 0, y: (128 - i * 12 - 2) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-            this.keysAnchor1.content.push({ x: 0, y: (128 - i * 12 - 4) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-            this.keysAnchor1.content.push({ x: 0, y: (128 - i * 12 - 7) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-            this.keysAnchor1.content.push({ x: 0, y: (128 - i * 12 - 9) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-            this.keysAnchor1.content.push({ x: 0, y: (128 - i * 12 - 11) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-            this.keysAnchor4.content.push(TText(0, (128 - i * 12 - 1) * ratioThickness, 'barNumber textSize16', '' + (i + 1)));
-            this.keysAnchor4.content.push({ x: 0, y: (128 - i * 12 - 2) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-            this.keysAnchor4.content.push({ x: 0, y: (128 - i * 12 - 4) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-            this.keysAnchor4.content.push({ x: 0, y: (128 - i * 12 - 7) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-            this.keysAnchor4.content.push({ x: 0, y: (128 - i * 12 - 9) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
-            this.keysAnchor4.content.push({ x: 0, y: (128 - i * 12 - 11) * ratioThickness, w: 4, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+        for (var i = 0; i < ocataveCount; i++) {
+            this.keysAnchor1.content.push(TText(0, topGridMargin + ((ocataveCount - i) * 12) * ratioThickness, 'barNumber textSize4', '' + (i + 1)));
+            this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 2) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+            this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 4) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+            this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 7) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+            this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 9) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+            this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 11) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+            this.keysAnchor4.content.push(TText(0, topGridMargin + ((ocataveCount - i) * 12) * ratioThickness, 'barNumber textSize16', '' + (i + 1)));
+            this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 2) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+            this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 4) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+            this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 7) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+            this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 9) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
+            this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 11) * ratioThickness, w: 5, h: ratioThickness, rx: 0.5, ry: 0.5, css: 'otherFill' });
         }
         zRender.tileLevel.autoID(this.keysLayer.anchors);
     };

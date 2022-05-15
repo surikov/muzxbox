@@ -55,10 +55,14 @@ declare class TileLevel {
     lastMoveDy: number;
     lastMoveDt: number;
     mouseDownMode: boolean;
-    allTilesOK: boolean;
-    translateZ: number;
-    translateX: number;
-    translateY: number;
+    get allTilesOK(): boolean;
+    set allTilesOK(bb: boolean);
+    get translateZ(): number;
+    set translateZ(z: number);
+    get translateX(): number;
+    set translateX(x: number);
+    get translateY(): number;
+    set translateY(y: number);
     constructor(svgObject: SVGElement, inWidth: number, inHeight: number, minZoom: number, curZoom: number, maxZoom: number, layers: TileModelLayer[]);
     dump(): void;
     setupTapSize(baseSize: number): void;

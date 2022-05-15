@@ -267,6 +267,7 @@ class ZRender {
 		this.gridRenderer.drawGrid(this, song, this.ratioDuration, this.ratioThickness, rhythm);
 		this.timeLineRenderer.drawSchedule(this, song, this.ratioDuration, this.ratioThickness);
 		this.leftKeysRenderer.drawKeys(this, song, this.ratioDuration, this.ratioThickness);
+		/*
 		this.debugAnchor0.content.push({
 			x: leftGridMargin
 			, y: topGridMargin
@@ -281,7 +282,7 @@ class ZRender {
 			, h: viewHeightTp(this.ratioThickness)//(ocataveCount * 12) * this.ratioThickness + topGridMargin + bottomGridMargin
 			, css: 'debug'
 		});
-
+*/
 		/*
 		let time = 0;
 		song.obverseTrackFilter = (song.obverseTrackFilter) ? song.obverseTrackFilter : 0;

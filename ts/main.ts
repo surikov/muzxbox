@@ -1,6 +1,6 @@
 console.log('MuzXBox v1.02.001');
 
-let midiDrumPitchShift = 23;
+let midiDrumPitchShift = 11;
 let leftGridMargin=20;
 let rightGridMargin=150;
 let topGridMargin=50;

@@ -83,8 +83,8 @@ class PianoRollRenderer {
 			let line: TileLine = {
 				x1: 0
 				, x2: 0 + 1
-				, y1: 128 - point.velocity-0.5*ratioThickness
-				, y2: 128 - point.velocity + 1-0.5*ratioThickness
+				, y1: 128 - point.velocity - 0.5 * ratioThickness
+				, y2: 128 - point.velocity + 1 - 0.5 * ratioThickness
 				, css: css
 			};
 			anchors[aa].content.push(cloneLine(line));
@@ -93,6 +93,7 @@ class PianoRollRenderer {
 	addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number {
 		let measure = voice.measureChords[measureNum];
 		var measureMaxLen = anchors[0].ww;
+		let yShift = gridHeightTp(ratioThickness) - (0.5 - ocataveStart * 12)* ratioThickness;
 		for (let cc = 0; cc < measure.chords.length; cc++) {
 			let chord = measure.chords[cc];
 			for (let ee = 0; ee < chord.envelopes.length; ee++) {
@@ -114,10 +115,10 @@ class PianoRollRenderer {
 						endShift = -0.49 * ratioThickness;
 					}
 					let line: TileLine = {
-						x1: (time + pitchWhen) * ratioDuration + startShift
-						, x2: (time + pitchWhen + pitchDuration) * ratioDuration + endShift
-						, y1: (128 - pitch.pitch) * ratioThickness-0.5*ratioThickness
-						, y2: (128 - slide) * ratioThickness-0.5*ratioThickness
+						x1: leftGridMargin + (time + pitchWhen) * ratioDuration + startShift
+						, x2: leftGridMargin + (time + pitchWhen + pitchDuration) * ratioDuration + endShift
+						, y1: topGridMargin + yShift - pitch.pitch * ratioThickness//(128 - pitch.pitch) * ratioThickness-0.5*ratioThickness
+						, y2: topGridMargin + yShift - slide * ratioThickness//(128 - slide) * ratioThickness - 0.5 * ratioThickness
 						, css: css
 					};
 
