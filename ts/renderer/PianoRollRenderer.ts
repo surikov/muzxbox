@@ -29,7 +29,7 @@ class PianoRollRenderer {
 		this.initSecondAnchors(zRender);
 		this.initOthersAnchors(zRender);
 	}
-	clearPRAnchorsContent(zRender: ZRender, viewWidth: number): void {
+	clearPRAnchorsContent(zRender: ZRender, wholeWidth: number): void {
 		let anchors: TileAnchor[] = [
 			this.contentMain1, this.contentMain4, this.contentMain16, this.contentMain64, this.contentMain256
 			, this.contentSecond1, this.contentSecond4, this.contentSecond16, this.contentSecond64, this.contentSecond256
@@ -37,7 +37,7 @@ class PianoRollRenderer {
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			zRender.clearResizeSingleAnchor(anchors[i], viewWidth);
+			zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
 		}
 
 	}
@@ -93,7 +93,7 @@ class PianoRollRenderer {
 	addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number {
 		let measure = voice.measureChords[measureNum];
 		var measureMaxLen = anchors[0].ww;
-		let yShift = gridHeightTp(ratioThickness) - (0.5 - ocataveStart * 12)* ratioThickness;
+		let yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12)* ratioThickness;
 		for (let cc = 0; cc < measure.chords.length; cc++) {
 			let chord = measure.chords[cc];
 			for (let ee = 0; ee < chord.envelopes.length; ee++) {

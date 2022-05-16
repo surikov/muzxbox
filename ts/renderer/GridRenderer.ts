@@ -23,13 +23,13 @@ class GridRenderer {
 		};
 		zRender.layers.push(this.gridLayer);
 	}
-	clearGridAnchorsContent(zRender: ZRender, viewWidth: number): void {
+	clearGridAnchorsContent(zRender: ZRender, wholeWidth: number): void {
 		let anchors: TileAnchor[] = [
 			this.gridAnchor1, this.gridAnchor4, this.gridAnchor16, this.gridAnchor64, this.gridAnchor256
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			zRender.clearResizeSingleAnchor(anchors[i], viewWidth);
+			zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
 		}
 
 	}

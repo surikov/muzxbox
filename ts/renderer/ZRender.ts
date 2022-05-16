@@ -79,11 +79,12 @@ class ZRender {
 
 
 			if (curLOD != lastLevelOfDetails) {
-				let songDuration = scheduleSecondsDuration(this.muzXBox.currentSchedule);
+				//let songDuration = scheduleSecondsDuration(this.muzXBox.currentSchedule);
+				let wholeWidth = gridWidthTp(this.muzXBox.currentSchedule, this.muzXBox.zrenderer.ratioDuration);
 				console.log('run afterZoomCallback', lastLevelOfDetails, curLOD, this.tileLevel.translateZ);
 				lastLevelOfDetails = curLOD;
 				this.focusManager.resetSpotPosition();
-				this.focusManager.reSetFocus(this, songDuration);
+				this.focusManager.reSetFocus(this, wholeWidth);
 			}
 		};
 
@@ -223,14 +224,14 @@ class ZRender {
 	/*
 	*/
 
-	clearResizeSingleAnchor(anchor: TileAnchor, viewWidth: number) {
+	clearResizeSingleAnchor(anchor: TileAnchor, wholeWidth: number) {
 		anchor.content.length = 0;
 		//anchor.ww = this.ratioDuration * songDuration;
-		anchor.ww = viewWidth;
+		anchor.ww = wholeWidth;
 		//anchor.hh = 128 * this.ratioThickness;
-		anchor.hh = viewHeightTp(this.ratioThickness);
+		anchor.hh = wholeHeightTp(this.ratioThickness);
 	}
-	clearAnchorsContent(viewWidth: number): void {
+	clearAnchorsContent(wholeWidth: number): void {
 		let anchors: TileAnchor[] = [
 			this.debugAnchor0, this.debugAnchor1, this.debugAnchor4, this.debugAnchor16, this.debugAnchor64, this.debugAnchor256
 			//, this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256
@@ -239,23 +240,23 @@ class ZRender {
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			this.clearResizeSingleAnchor(anchors[i], viewWidth);
+			this.clearResizeSingleAnchor(anchors[i], wholeWidth);
 		}
-		this.focusManager.clearFocusAnchorsContent(this, viewWidth);
-		this.gridRenderer.clearGridAnchorsContent(this, viewWidth);
-		this.measureInfoRenderer.clearMeasuresAnchorsContent(this, viewWidth);
-		this.pianoRollRenderer.clearPRAnchorsContent(this, viewWidth);
-		this.timeLineRenderer.clearTLAnchorsContent(this, viewWidth);
-		this.leftKeysRenderer.clearKeysAnchorsContent(this, viewWidth);
-		this.tileLevel.innerWidth = this.ratioDuration * viewWidth * this.tileLevel.tapSize;
+		this.focusManager.clearFocusAnchorsContent(this, wholeWidth);
+		this.gridRenderer.clearGridAnchorsContent(this, wholeWidth);
+		this.measureInfoRenderer.clearMeasuresAnchorsContent(this, wholeWidth);
+		this.pianoRollRenderer.clearPRAnchorsContent(this, wholeWidth);
+		this.timeLineRenderer.clearTLAnchorsContent(this, wholeWidth);
+		this.leftKeysRenderer.clearKeysAnchorsContent(this, wholeWidth);
+		this.tileLevel.innerWidth = this.ratioDuration * wholeWidth * this.tileLevel.tapSize;
 		this.tileLevel.innerHeight = 128 * this.ratioThickness * this.tileLevel.tapSize;
 
 	}
 
 	drawSchedule(song: ZvoogSchedule) {//}, menuButton: TileRectangle) {
 		//let songDuration = scheduleSecondsDuration(song);
-		let viewWidth = viewWidthTp(song, this.ratioDuration);
-		this.clearAnchorsContent(viewWidth);
+		let wholeWidth = wholeWidthTp(song, this.ratioDuration);
+		this.clearAnchorsContent(wholeWidth);
 		this.measureInfoRenderer.fillMeasureInfo(song, this.ratioDuration, this.ratioThickness);
 		this.pianoRollRenderer.drawSchedule(song, this.ratioDuration, this.ratioThickness);
 		let rhythm: ZvoogMeter[] = this.rhythmPatternDefault;
@@ -294,7 +295,7 @@ class ZRender {
 		}
 */
 		this.tileLevel.resetModel();
-		this.focusManager.reSetFocus(this, viewWidth);//, song,this.tileLevel.translateX,this.tileLevel.translateY,this.tileLevel.translateZ);
+		this.focusManager.reSetFocus(this, wholeWidth);//, song,this.tileLevel.translateX,this.tileLevel.translateY,this.tileLevel.translateZ);
 		this.resetLabel(song);
 	}
 

@@ -18,13 +18,13 @@ function gridWidthTp(song: ZvoogSchedule, ratioDuration: number): number {
 	let songDuration = scheduleSecondsDuration(song);
 	return songDuration * ratioDuration;
 }
-function viewWidthTp(song: ZvoogSchedule, ratioDuration: number): number {
+function wholeWidthTp(song: ZvoogSchedule, ratioDuration: number): number {
 	let songDuration = scheduleSecondsDuration(song);
 	return leftGridMargin + songDuration * ratioDuration + rightGridMargin;
 }
 function gridHeightTp(ratioThickness: number): number {
 	return (ocataveCount * 12) * ratioThickness;
 }
-function viewHeightTp(ratioThickness: number): number {
+function wholeHeightTp(ratioThickness: number): number {
 	return topGridMargin + (ocataveCount * 12) * ratioThickness + bottomGridMargin;
 }

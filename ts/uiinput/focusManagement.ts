@@ -30,14 +30,16 @@ class FocusManagement {
 		};
 		zRender.layers.push(this.focusLayer);
 	}
-	clearFocusAnchorsContent(zRender: ZRender, viewWidth: number): void {
+	clearFocusAnchorsContent(zRender: ZRender, wholeWidth: number): void {
 		let anchors: TileAnchor[] = [
 			this.focusAnchor
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			zRender.clearResizeSingleAnchor(anchors[i], viewWidth);
+			zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
 		}
+
+		//console.log('wholeWidth',wholeWidth);
 
 	}
 	currentFocusLevelX(): FocusLevel {
@@ -49,10 +51,10 @@ class FocusManagement {
 		return this.focusLevels[this.focusLevels.length - 1];
 	}
 
-	reSetFocus(zrenderer: ZRender, viewWidth: number) {
-		//console.log('reSetFocus');
+	reSetFocus(zrenderer: ZRender, wholeWidth: number) {
+		//console.log('reSetFocus',wholeWidth);
 		zrenderer.tileLevel.resetAnchor(this.focusAnchor, this.focusMarkerLayer);
-		zrenderer.clearResizeSingleAnchor(this.focusAnchor, viewWidth);
+		zrenderer.clearResizeSingleAnchor(this.focusAnchor, wholeWidth);
 		this.currentFocusLevelX().addSpot(this);
 		zrenderer.tileLevel.allTilesOK = false;
 	}

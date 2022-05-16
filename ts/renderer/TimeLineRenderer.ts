@@ -23,12 +23,12 @@ class TimeLineRenderer {
 		};
 		zRender.layers.push(this.timeLayer);
 	}
-	clearTLAnchorsContent(zRender: ZRender, viewWidth: number): void {
+	clearTLAnchorsContent(zRender: ZRender, wholeWidth: number): void {
 		let anchors: TileAnchor[] = [
 			this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64//, this.measuresTimelineAnchor256
 		];
 		for (let i = 0; i < anchors.length; i++) {
-			zRender.clearResizeSingleAnchor(anchors[i], viewWidth);
+			zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
 		}
 
 	}
@@ -55,7 +55,7 @@ class TimeLineRenderer {
 					leftGridMargin + time * ratioDuration
 					, 0
 					, ratioDuration * measureDuration
-					, viewHeightTp(ratioThickness)
+					, wholeHeightTp(ratioThickness)
 					, layerAnchor.showZoom, layerAnchor.hideZoom
 				);
 				measureAnchor.content.push(TText(

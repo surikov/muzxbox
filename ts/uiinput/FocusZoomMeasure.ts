@@ -18,29 +18,29 @@ class FocusZoomMeasure implements FocusLevel {
 		//let yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
 		let yy = topGridMargin
 			+ gridHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness)
-			+ ocataveStart * 12 * mngmnt.muzXBox.zrenderer.ratioThickness
+			+ 0 * 12 * mngmnt.muzXBox.zrenderer.ratioThickness
 			- this.currentPitch * mngmnt.muzXBox.zrenderer.ratioThickness;
 		mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'debug' });
 	}
 	spotUp(mngmnt: FocusManagement): boolean {
-		if (this.currentPitch < 127) {
+		if (this.currentPitch < ocataveCount * 12) {
 			this.currentPitch++;
 
 			this.moveViewToShowSpot(mngmnt);
 
-			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleSecondsDuration(mngmnt.muzXBox.currentSchedule));
+			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, gridWidthTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.ratioDuration));
 			return true;
 		} else {
 			return false;
 		}
 	}
 	spotDown(mngmnt: FocusManagement): boolean {
-		if (this.currentPitch > 0) {
+		if (this.currentPitch > 1) {
 			this.currentPitch--;
 
 			this.moveViewToShowSpot(mngmnt);
 
-			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleSecondsDuration(mngmnt.muzXBox.currentSchedule));
+			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, gridWidthTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.ratioDuration));
 			return true;
 		} else {
 			return false;
@@ -52,7 +52,7 @@ class FocusZoomMeasure implements FocusLevel {
 		if (this.currentStep > 0) {
 			this.currentStep--;
 			this.moveViewToShowSpot(mngmnt);
-			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleSecondsDuration(mngmnt.muzXBox.currentSchedule));
+			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, gridWidthTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.ratioDuration));
 			return true;
 		} else {
 			if (this.currentMeasure > 0) {
@@ -67,7 +67,7 @@ class FocusZoomMeasure implements FocusLevel {
 				this.currentStep = count - 1;
 				this.currentMeasure--;
 				this.moveViewToShowSpot(mngmnt);
-				mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleSecondsDuration(mngmnt.muzXBox.currentSchedule));
+				mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, gridWidthTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.ratioDuration));
 				return true;
 			} else {
 				return false;
@@ -89,14 +89,14 @@ class FocusZoomMeasure implements FocusLevel {
 		if (this.currentStep < count - 1) {
 			this.currentStep++;
 			this.moveViewToShowSpot(mngmnt);
-			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleSecondsDuration(mngmnt.muzXBox.currentSchedule));
+			mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, gridWidthTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.ratioDuration));
 			return true;
 		} else {
 			if (this.currentMeasure < mngmnt.muzXBox.currentSchedule.measures.length - 1) {
 				this.currentMeasure++;
 				this.currentStep = 0;
 				this.moveViewToShowSpot(mngmnt);
-				mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, scheduleSecondsDuration(mngmnt.muzXBox.currentSchedule));
+				mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, gridWidthTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.ratioDuration));
 				return true;
 			} else {
 				return false;
@@ -110,7 +110,7 @@ class FocusZoomMeasure implements FocusLevel {
 		//let yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
 		let yy = topGridMargin
 			+ gridHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness)
-			+ ocataveStart * 12 * mngmnt.muzXBox.zrenderer.ratioThickness
+			+ 0 * 12 * mngmnt.muzXBox.zrenderer.ratioThickness
 			- this.currentPitch * mngmnt.muzXBox.zrenderer.ratioThickness;
 		let ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
 		let hh = mngmnt.muzXBox.zrenderer.ratioThickness;
@@ -143,7 +143,7 @@ class FocusZoomMeasure implements FocusLevel {
 		//let yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
 		let yy = topGridMargin
 			+ gridHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness)
-			+ ocataveStart * 12 * mngmnt.muzXBox.zrenderer.ratioThickness
+			+ 0 * 12 * mngmnt.muzXBox.zrenderer.ratioThickness
 			- this.currentPitch * mngmnt.muzXBox.zrenderer.ratioThickness;
 		let ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
 		let hh = mngmnt.muzXBox.zrenderer.ratioThickness;
@@ -152,22 +152,29 @@ class FocusZoomMeasure implements FocusLevel {
 		let tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize
 		let vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
 		let vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
+		let ih = mngmnt.muzXBox.zrenderer.tileLevel.innerHeight * tz;
+		console.log(
+			mngmnt.muzXBox.zrenderer.tileLevel.translateY/mngmnt.muzXBox.zrenderer.tileLevel.translateZ
+			, mngmnt.muzXBox.zrenderer.tileLevel.viewHeight
+			, mngmnt.muzXBox.zrenderer.tileLevel.innerHeight/mngmnt.muzXBox.zrenderer.tileLevel.translateZ
+		);
 		/*if (
 			(xx + ww > vw - tx) //right
 			|| (xx < -tx)//left
 			|| (yy + hh > vh - ty) //down
 			|| (yy < -ty) //up
 		) {*/
-			let p: null | ZvoogStepIndex = findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern
-				, mngmnt.muzXBox.zrenderer.ratioDuration
-				, leftGridMargin - tx + vw / 2);
-			if (p) {
-				this.currentMeasure = p.measure;
-				this.currentStep = p.step;
-			}
-			let newY = topGridMargin + vh / 2 - ty;
-			let newPitch = (ocataveCount + ocataveStart) * 12 - Math.ceil(newY / mngmnt.muzXBox.zrenderer.ratioThickness);
-			this.currentPitch = newPitch;
+		/*let p: null | ZvoogStepIndex = findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern
+			, mngmnt.muzXBox.zrenderer.ratioDuration
+			, leftGridMargin - tx + vw / 2);
+		if (p) {
+			this.currentMeasure = p.measure;
+			this.currentStep = p.step;
+		}*/
+		let newY = //topGridMargin * mngmnt.muzXBox.zrenderer.tileLevel.tapSize + 
+			vh / 2 - ty;
+		//let newPitch = (ocataveCount + 0) * 12 - Math.ceil(newY / mngmnt.muzXBox.zrenderer.ratioThickness);
+		//this.currentPitch = newPitch;
 		//}
 		console.log('to', this.currentPitch, ':', this.currentMeasure, this.currentStep);
 	}
