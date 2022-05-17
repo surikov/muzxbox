@@ -275,7 +275,7 @@ declare class ZRender {
     initUI(bx: MuzXBox): void;
     initDebugAnchors(): void;
     clearResizeSingleAnchor(anchor: TileAnchor, wholeWidth: number): void;
-    clearAnchorsContent(wholeWidth: number): void;
+    clearAnchorsContent(wholeWidth: number, wholeHeight: number): void;
     drawSchedule(song: ZvoogSchedule): void;
 }
 declare type ZUIModeValue = {

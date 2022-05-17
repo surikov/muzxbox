@@ -1237,7 +1237,6 @@ var ZRender = (function () {
         this.tileLevel = new TileLevel(document.getElementById('contentSVG'), 1000, 1000, this.zoomMin, this.zoomMin, this.zoomMax, this.layers);
         var lastLevelOfDetails = this.zoomMin;
         this.tileLevel.afterZoomCallback = function () {
-            console.log('check afterZoomCallback', lastLevelOfDetails, _this.tileLevel.translateZ);
             var curLOD = _this.zoomMin;
             if (_this.tileLevel.translateZ >= _this.zoomMin)
                 curLOD = _this.zoomMin;
@@ -1255,7 +1254,6 @@ var ZRender = (function () {
                 curLOD = _this.zoomMax;
             if (curLOD != lastLevelOfDetails) {
                 var wholeWidth = gridWidthTp(_this.muzXBox.currentSchedule, _this.muzXBox.zrenderer.ratioDuration);
-                console.log('run afterZoomCallback', lastLevelOfDetails, curLOD, _this.tileLevel.translateZ);
                 lastLevelOfDetails = curLOD;
                 _this.focusManager.resetSpotPosition();
                 _this.focusManager.reSetFocus(_this, wholeWidth);
@@ -1380,7 +1378,7 @@ var ZRender = (function () {
         anchor.ww = wholeWidth;
         anchor.hh = wholeHeightTp(this.ratioThickness);
     };
-    ZRender.prototype.clearAnchorsContent = function (wholeWidth) {
+    ZRender.prototype.clearAnchorsContent = function (wholeWidth, wholeHeight) {
         var anchors = [
             this.debugAnchor0, this.debugAnchor1, this.debugAnchor4, this.debugAnchor16, this.debugAnchor64, this.debugAnchor256
         ];
@@ -1393,12 +1391,13 @@ var ZRender = (function () {
         this.pianoRollRenderer.clearPRAnchorsContent(this, wholeWidth);
         this.timeLineRenderer.clearTLAnchorsContent(this, wholeWidth);
         this.leftKeysRenderer.clearKeysAnchorsContent(this, wholeWidth);
-        this.tileLevel.innerWidth = this.ratioDuration * wholeWidth * this.tileLevel.tapSize;
-        this.tileLevel.innerHeight = 128 * this.ratioThickness * this.tileLevel.tapSize;
+        this.tileLevel.innerWidth = wholeWidth * this.tileLevel.tapSize;
+        this.tileLevel.innerHeight = wholeHeight * this.tileLevel.tapSize;
     };
     ZRender.prototype.drawSchedule = function (song) {
         var wholeWidth = wholeWidthTp(song, this.ratioDuration);
-        this.clearAnchorsContent(wholeWidth);
+        var wholeHeight = wholeHeightTp(this.ratioThickness);
+        this.clearAnchorsContent(wholeWidth, wholeHeight);
         this.measureInfoRenderer.fillMeasureInfo(song, this.ratioDuration, this.ratioThickness);
         this.pianoRollRenderer.drawSchedule(song, this.ratioDuration, this.ratioThickness);
         var rhythm = this.rhythmPatternDefault;
@@ -4517,8 +4516,8 @@ console.log('MuzXBox v1.02.001');
 var midiDrumPitchShift = 11;
 var midiInstrumentPitchShift = 24;
 var leftGridMargin = 20;
-var rightGridMargin = 150;
-var topGridMargin = 50;
+var rightGridMargin = 1;
+var topGridMargin = 10;
 var bottomGridMargin = 30;
 var ocataveCount = 4;
 var us;
@@ -4554,14 +4553,28 @@ var MuzXBox = (function () {
     };
     MuzXBox.prototype.createUI = function () {
         var emptySchedule = {
-            title: 'Empty project', tracks: [],
+            title: 'Empty project',
+            tracks: [{
+                    title: "First", filters: [], voices: [
+                        {
+                            filters: [],
+                            title: 'Single',
+                            performer: { performerPlugin: null, parameters: [], kind: 'none', initial: '' },
+                            measureChords: [{
+                                    chords: [{
+                                            when: { count: 1, division: 4 }, variation: 0, envelopes: [{
+                                                    pitches: [{ duration: { count: 5, division: 8 }, pitch: 24 }, { duration: { count: 1, division: 8 }, pitch: 36 }]
+                                                }]
+                                        }]
+                                }, {
+                                    chords: []
+                                }]
+                        }
+                    ]
+                }],
             filters: [],
-            measures: [],
-            harmony: {
-                tone: '',
-                mode: '',
-                progression: []
-            }
+            measures: [{ meter: { count: 3, division: 4 }, tempo: 120 }, { meter: { count: 4, division: 4 }, tempo: 90 }],
+            harmony: { tone: '', mode: '', progression: [] }
         };
         this.currentSchedule = emptySchedule;
         this.zrenderer.drawSchedule(emptySchedule);
@@ -5829,6 +5842,7 @@ var FocusZoomMeasure = (function () {
         console.log('moveSpotIntoView from', this.currentPitch, ':', this.currentMeasure, this.currentStep);
         var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
         var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
+        var tp = mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
         var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
         var yy = topGridMargin
             + gridHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness)
@@ -5836,15 +5850,21 @@ var FocusZoomMeasure = (function () {
             - this.currentPitch * mngmnt.muzXBox.zrenderer.ratioThickness;
         var ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
         var hh = mngmnt.muzXBox.zrenderer.ratioThickness;
-        var tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
-        var ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
-        var tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        var tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / tp;
+        var ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / mngmnt.muzXBox.zrenderer.tileLevel.translateZ;
+        var tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ;
         var vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
-        var vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
-        var ih = mngmnt.muzXBox.zrenderer.tileLevel.innerHeight * tz;
-        console.log(mngmnt.muzXBox.zrenderer.tileLevel.translateY / mngmnt.muzXBox.zrenderer.tileLevel.translateZ, mngmnt.muzXBox.zrenderer.tileLevel.viewHeight, mngmnt.muzXBox.zrenderer.tileLevel.innerHeight / mngmnt.muzXBox.zrenderer.tileLevel.translateZ);
-        var newY = vh / 2 - ty;
-        console.log('to', this.currentPitch, ':', this.currentMeasure, this.currentStep);
+        var vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight;
+        var ih = mngmnt.muzXBox.zrenderer.tileLevel.innerHeight / mngmnt.muzXBox.zrenderer.tileLevel.translateZ;
+        console.log('t', ty, 'vew', vh, 'inner', ih, 'zoom', tz);
+        if (vh < ih) {
+            var newY = vh / 2 - ty;
+            var newPitch = tp * (topGridMargin + ocataveCount * 12 * mngmnt.muzXBox.zrenderer.ratioThickness) - newY;
+            console.log('view', newY, newPitch);
+        }
+        else {
+            console.log('inner');
+        }
     };
     return FocusZoomMeasure;
 }());
@@ -5894,8 +5914,15 @@ var FocusZoomSong = (function () {
         }
     };
     FocusZoomSong.prototype.addSpot = function (mngmnt) {
-        var r = mngmnt.muzXBox.zrenderer.ratioThickness;
-        mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: r * 127, h: r * 127, rx: 0, ry: 0, css: 'debug' });
+        mngmnt.focusAnchor.content.push({
+            x: 0,
+            y: 0,
+            w: wholeWidthTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.ratioDuration),
+            h: wholeHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness),
+            rx: 0,
+            ry: 0,
+            css: 'debug'
+        });
     };
     FocusZoomSong.prototype.spotUp = function () {
         console.log('song spotUp');

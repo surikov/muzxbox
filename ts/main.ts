@@ -2,12 +2,12 @@ console.log('MuzXBox v1.02.001');
 
 let midiDrumPitchShift = 11;
 let midiInstrumentPitchShift = 24;
-let leftGridMargin=20;
-let rightGridMargin=150;
-let topGridMargin=50;
-let bottomGridMargin=30;
+let leftGridMargin = 20;
+let rightGridMargin = 1;
+let topGridMargin = 10;
+let bottomGridMargin = 30;
 //let ocataveStart=2;
-let ocataveCount=4;
+let ocataveCount = 4;
 
 let us: ZUserSetting;
 
@@ -57,14 +57,28 @@ class MuzXBox {
 	}
 	createUI() {
 		var emptySchedule: ZvoogSchedule = {
-			title: 'Empty project', tracks: []
+			title: 'Empty project'
+			, tracks: [{
+				title: "First", filters: [], voices: [
+					{
+						filters: []
+						, title: 'Single'
+						, performer: { performerPlugin: null, parameters: [], kind: 'none', initial: '' }
+						, measureChords: [{
+							chords: [{
+								when: { count: 1, division: 4 }, variation: 0, envelopes: [{
+									pitches: [{ duration: { count: 5, division: 8 }, pitch: 24 },{ duration: { count: 1, division: 8 }, pitch: 36 }]
+								}]
+							}]
+						},{
+							chords: []
+						}]
+					}
+				]
+			}]
 			, filters: []
-			, measures: []
-			, harmony: {
-				tone: ''
-				, mode: ''
-				, progression: []
-			}
+			, measures: [{ meter: { count: 3, division: 4 }, tempo: 120 }, { meter: { count: 4, division: 4 }, tempo: 90 }]
+			, harmony: { tone: '', mode: '', progression: [] }
 		};
 		this.currentSchedule = emptySchedule;
 		this.zrenderer.drawSchedule(emptySchedule);//, this.menuButton);
@@ -85,9 +99,9 @@ class MuzXBox {
 			newLink.setAttribute("rel", "stylesheet");
 			newLink.setAttribute("type", "text/css");
 			newLink.setAttribute("href", cssHref);
-			console.log('newLink',newLink);
+			console.log('newLink', newLink);
 			let headItem = document.getElementsByTagName("head").item(cssLinkIndex);
-			console.log('headItem',oldLink);
+			console.log('headItem', oldLink);
 			if (headItem) {
 				//headItem.replaceChild(newLink, oldLink);
 				headItem.appendChild(newLink);
