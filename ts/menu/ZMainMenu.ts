@@ -134,26 +134,59 @@ class ZMainMenu {
 		if (nn == 2) {
 			var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
 			var folderIdx2 = this.panels[1].selection - this.menuRoot.folders[folderIdx1].items.length;
-			action = this.menuRoot.folders[folderIdx1].folders[folderIdx2].afterOpen;
-			txt = this.menuRoot.folders[folderIdx1].path;
-			subRoot = this.menuRoot.folders[folderIdx1].folders[folderIdx2];
+			action = this.menuRoot
+				.folders[folderIdx1]
+				.folders[folderIdx2]
+				.afterOpen;
+			txt = this.menuRoot
+				.folders[folderIdx1]
+				.folders[folderIdx2]
+				.path;
+			subRoot = this.menuRoot
+				.folders[folderIdx1]
+				.folders[folderIdx2];
 		}
 		if (nn == 3) {
 			var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
 			var folderIdx2 = this.panels[1].selection - this.menuRoot.folders[folderIdx1].items.length;
 			var folderIdx3 = this.panels[2].selection - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
-			action = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].afterOpen;
-			txt = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].path;
-			subRoot = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3];
+			action = this.menuRoot
+				.folders[folderIdx1]
+				.folders[folderIdx2]
+				.folders[folderIdx3]
+				.afterOpen;
+			txt = this.menuRoot
+				.folders[folderIdx1]
+				.folders[folderIdx2]
+				.folders[folderIdx3]
+				.path;
+			subRoot = this.menuRoot
+				.folders[folderIdx1]
+				.folders[folderIdx2]
+				.folders[folderIdx3];
 		}
 		if (nn == 4) {
 			var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
 			var folderIdx2 = this.panels[1].selection - this.menuRoot.folders[folderIdx1].items.length;
 			var folderIdx3 = this.panels[2].selection - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
 			var folderIdx4 = this.panels[3].selection - this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].items.length;
-			action = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].afterOpen;
-			this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].path;
-			subRoot = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4];
+			action = this.menuRoot
+				.folders[folderIdx1]
+				.folders[folderIdx2]
+				.folders[folderIdx3]
+				.folders[folderIdx4]
+				.afterOpen;
+			txt=this.menuRoot
+				.folders[folderIdx1]
+				.folders[folderIdx2]
+				.folders[folderIdx3]
+				.folders[folderIdx4]
+				.path;
+			subRoot = this.menuRoot
+				.folders[folderIdx1]
+				.folders[folderIdx2]
+				.folders[folderIdx3]
+				.folders[folderIdx4];
 		}
 		this.reFillMenulevel(this.panels[nn].menuContent, subRoot, this.panels[nn].selection);
 		this.panels[nn].menuTextHead.innerText = txt;
@@ -200,7 +233,7 @@ class ZMainMenu {
 				}
 				, {
 					label: 'plain 1/8', autoclose: true, icon: '', action: () => {
-						
+
 						console.log('plain 1/8', default8rhytym);
 						var me: MuzXBox = window['MZXB'] as MuzXBox;
 						if (me) { me.setGrid(default8rhytym); }
@@ -248,7 +281,8 @@ class ZMainMenu {
 		for (var tt = 0; tt < prj.tracks.length; tt++) {
 			var songtrack = prj.tracks[tt];
 			var tr: ZMenuFolder = {
-				path: 'track ' + songtrack.title, icon: "", folders: [], items: []
+				path: //'track ' + 
+					songtrack.title, icon: "", folders: [], items: []
 				, afterOpen: this.layerSelector.upTrack(tt)
 			};
 			this.songFolder.folders.push(tr);
@@ -258,7 +292,8 @@ class ZMainMenu {
 			for (var vv = 0; vv < songtrack.voices.length; vv++) {
 				var songvox = songtrack.voices[vv];
 				var vox: ZMenuFolder = {
-					path: 'vox ' + songvox.title, icon: "", folders: [], items: []
+					path: //'vox ' + 
+						songvox.title, icon: "", folders: [], items: []
 					, afterOpen: this.layerSelector.upVox(tt, vv)
 				};
 				tr.folders.push(vox);

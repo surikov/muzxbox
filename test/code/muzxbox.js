@@ -2683,6 +2683,199 @@ function createPluginSource(id) {
         return takeZvoogSineSource();
     return takeZvoogPerformerStub();
 }
+var instrumentNamesArray = [];
+var drumNamesArray = [];
+function drumTitles() {
+    if (drumNamesArray.length == 0) {
+        var drumNames = [];
+        drumNames[35] = "Bass Drum 2";
+        drumNames[36] = "Bass Drum 1";
+        drumNames[37] = "Side Stick/Rimshot";
+        drumNames[38] = "Snare Drum 1";
+        drumNames[39] = "Hand Clap";
+        drumNames[40] = "Snare Drum 2";
+        drumNames[41] = "Low Tom 2";
+        drumNames[42] = "Closed Hi-hat";
+        drumNames[43] = "Low Tom 1";
+        drumNames[44] = "Pedal Hi-hat";
+        drumNames[45] = "Mid Tom 2";
+        drumNames[46] = "Open Hi-hat";
+        drumNames[47] = "Mid Tom 1";
+        drumNames[48] = "High Tom 2";
+        drumNames[49] = "Crash Cymbal 1";
+        drumNames[50] = "High Tom 1";
+        drumNames[51] = "Ride Cymbal 1";
+        drumNames[52] = "Chinese Cymbal";
+        drumNames[53] = "Ride Bell";
+        drumNames[54] = "Tambourine";
+        drumNames[55] = "Splash Cymbal";
+        drumNames[56] = "Cowbell";
+        drumNames[57] = "Crash Cymbal 2";
+        drumNames[58] = "Vibra Slap";
+        drumNames[59] = "Ride Cymbal 2";
+        drumNames[60] = "High Bongo";
+        drumNames[61] = "Low Bongo";
+        drumNames[62] = "Mute High Conga";
+        drumNames[63] = "Open High Conga";
+        drumNames[64] = "Low Conga";
+        drumNames[65] = "High Timbale";
+        drumNames[66] = "Low Timbale";
+        drumNames[67] = "High Agogo";
+        drumNames[68] = "Low Agogo";
+        drumNames[69] = "Cabasa";
+        drumNames[70] = "Maracas";
+        drumNames[71] = "Short Whistle";
+        drumNames[72] = "Long Whistle";
+        drumNames[73] = "Short Guiro";
+        drumNames[74] = "Long Guiro";
+        drumNames[75] = "Claves";
+        drumNames[76] = "High Wood Block";
+        drumNames[77] = "Low Wood Block";
+        drumNames[78] = "Mute Cuica";
+        drumNames[79] = "Open Cuica";
+        drumNames[80] = "Mute Triangle";
+        drumNames[81] = "Open Triangle";
+        drumNamesArray = drumNames;
+    }
+    return drumNamesArray;
+}
+;
+function instrumentTitles() {
+    if (instrumentNamesArray.length == 0) {
+        var insNames = [];
+        insNames[0] = "Acoustic Grand Piano: Piano";
+        insNames[1] = "Bright Acoustic Piano: Piano";
+        insNames[2] = "Electric Grand Piano: Piano";
+        insNames[3] = "Honky-tonk Piano: Piano";
+        insNames[4] = "Electric Piano 1: Piano";
+        insNames[5] = "Electric Piano 2: Piano";
+        insNames[6] = "Harpsichord: Piano";
+        insNames[7] = "Clavinet: Piano";
+        insNames[8] = "Celesta: Chromatic Percussion";
+        insNames[9] = "Glockenspiel: Chromatic Percussion";
+        insNames[10] = "Music Box: Chromatic Percussion";
+        insNames[11] = "Vibraphone: Chromatic Percussion";
+        insNames[12] = "Marimba: Chromatic Percussion";
+        insNames[13] = "Xylophone: Chromatic Percussion";
+        insNames[14] = "Tubular Bells: Chromatic Percussion";
+        insNames[15] = "Dulcimer: Chromatic Percussion";
+        insNames[16] = "Drawbar Organ: Organ";
+        insNames[17] = "Percussive Organ: Organ";
+        insNames[18] = "Rock Organ: Organ";
+        insNames[19] = "Church Organ: Organ";
+        insNames[20] = "Reed Organ: Organ";
+        insNames[21] = "Accordion: Organ";
+        insNames[22] = "Harmonica: Organ";
+        insNames[23] = "Tango Accordion: Organ";
+        insNames[24] = "Acoustic Guitar (nylon): Guitar";
+        insNames[25] = "Acoustic Guitar (steel): Guitar";
+        insNames[26] = "Electric Guitar (jazz): Guitar";
+        insNames[27] = "Electric Guitar (clean): Guitar";
+        insNames[28] = "Electric Guitar (muted): Guitar";
+        insNames[29] = "Overdriven Guitar: Guitar";
+        insNames[30] = "Distortion Guitar: Guitar";
+        insNames[31] = "Guitar Harmonics: Guitar";
+        insNames[32] = "Acoustic Bass: Bass";
+        insNames[33] = "Electric Bass (finger): Bass";
+        insNames[34] = "Electric Bass (pick): Bass";
+        insNames[35] = "Fretless Bass: Bass";
+        insNames[36] = "Slap Bass 1: Bass";
+        insNames[37] = "Slap Bass 2: Bass";
+        insNames[38] = "Synth Bass 1: Bass";
+        insNames[39] = "Synth Bass 2: Bass";
+        insNames[40] = "Violin: Strings";
+        insNames[41] = "Viola: Strings";
+        insNames[42] = "Cello: Strings";
+        insNames[43] = "Contrabass: Strings";
+        insNames[44] = "Tremolo Strings: Strings";
+        insNames[45] = "Pizzicato Strings: Strings";
+        insNames[46] = "Orchestral Harp: Strings";
+        insNames[47] = "Timpani: Strings";
+        insNames[48] = "String Ensemble 1: Ensemble";
+        insNames[49] = "String Ensemble 2: Ensemble";
+        insNames[50] = "Synth Strings 1: Ensemble";
+        insNames[51] = "Synth Strings 2: Ensemble";
+        insNames[52] = "Choir Aahs: Ensemble";
+        insNames[53] = "Voice Oohs: Ensemble";
+        insNames[54] = "Synth Choir: Ensemble";
+        insNames[55] = "Orchestra Hit: Ensemble";
+        insNames[56] = "Trumpet: Brass";
+        insNames[57] = "Trombone: Brass";
+        insNames[58] = "Tuba: Brass";
+        insNames[59] = "Muted Trumpet: Brass";
+        insNames[60] = "French Horn: Brass";
+        insNames[61] = "Brass Section: Brass";
+        insNames[62] = "Synth Brass 1: Brass";
+        insNames[63] = "Synth Brass 2: Brass";
+        insNames[64] = "Soprano Sax: Reed";
+        insNames[65] = "Alto Sax: Reed";
+        insNames[66] = "Tenor Sax: Reed";
+        insNames[67] = "Baritone Sax: Reed";
+        insNames[68] = "Oboe: Reed";
+        insNames[69] = "English Horn: Reed";
+        insNames[70] = "Bassoon: Reed";
+        insNames[71] = "Clarinet: Reed";
+        insNames[72] = "Piccolo: Pipe";
+        insNames[73] = "Flute: Pipe";
+        insNames[74] = "Recorder: Pipe";
+        insNames[75] = "Pan Flute: Pipe";
+        insNames[76] = "Blown bottle: Pipe";
+        insNames[77] = "Shakuhachi: Pipe";
+        insNames[78] = "Whistle: Pipe";
+        insNames[79] = "Ocarina: Pipe";
+        insNames[80] = "Lead 1 (square): Synth Lead";
+        insNames[81] = "Lead 2 (sawtooth): Synth Lead";
+        insNames[82] = "Lead 3 (calliope): Synth Lead";
+        insNames[83] = "Lead 4 (chiff): Synth Lead";
+        insNames[84] = "Lead 5 (charang): Synth Lead";
+        insNames[85] = "Lead 6 (voice): Synth Lead";
+        insNames[86] = "Lead 7 (fifths): Synth Lead";
+        insNames[87] = "Lead 8 (bass + lead): Synth Lead";
+        insNames[88] = "Pad 1 (new age): Synth Pad";
+        insNames[89] = "Pad 2 (warm): Synth Pad";
+        insNames[90] = "Pad 3 (polysynth): Synth Pad";
+        insNames[91] = "Pad 4 (choir): Synth Pad";
+        insNames[92] = "Pad 5 (bowed): Synth Pad";
+        insNames[93] = "Pad 6 (metallic): Synth Pad";
+        insNames[94] = "Pad 7 (halo): Synth Pad";
+        insNames[95] = "Pad 8 (sweep): Synth Pad";
+        insNames[96] = "FX 1 (rain): Synth Effects";
+        insNames[97] = "FX 2 (soundtrack): Synth Effects";
+        insNames[98] = "FX 3 (crystal): Synth Effects";
+        insNames[99] = "FX 4 (atmosphere): Synth Effects";
+        insNames[100] = "FX 5 (brightness): Synth Effects";
+        insNames[101] = "FX 6 (goblins): Synth Effects";
+        insNames[102] = "FX 7 (echoes): Synth Effects";
+        insNames[103] = "FX 8 (sci-fi): Synth Effects";
+        insNames[104] = "Sitar: Ethnic";
+        insNames[105] = "Banjo: Ethnic";
+        insNames[106] = "Shamisen: Ethnic";
+        insNames[107] = "Koto: Ethnic";
+        insNames[108] = "Kalimba: Ethnic";
+        insNames[109] = "Bagpipe: Ethnic";
+        insNames[110] = "Fiddle: Ethnic";
+        insNames[111] = "Shanai: Ethnic";
+        insNames[112] = "Tinkle Bell: Percussive";
+        insNames[113] = "Agogo: Percussive";
+        insNames[114] = "Steel Drums: Percussive";
+        insNames[115] = "Woodblock: Percussive";
+        insNames[116] = "Taiko Drum: Percussive";
+        insNames[117] = "Melodic Tom: Percussive";
+        insNames[118] = "Synth Drum: Percussive";
+        insNames[119] = "Reverse Cymbal: Percussive";
+        insNames[120] = "Guitar Fret Noise: Sound effects";
+        insNames[121] = "Breath Noise: Sound effects";
+        insNames[122] = "Seashore: Sound effects";
+        insNames[123] = "Bird Tweet: Sound effects";
+        insNames[124] = "Telephone Ring: Sound effects";
+        insNames[125] = "Helicopter: Sound effects";
+        insNames[126] = "Applause: Sound effects";
+        insNames[127] = "Gunshot: Sound effects";
+        instrumentNamesArray = insNames;
+    }
+    return instrumentNamesArray;
+}
+;
 var MIDIFileImporter = (function () {
     function MIDIFileImporter() {
     }
@@ -3590,7 +3783,7 @@ var MidiParser = (function () {
                                         kind: "gain",
                                         initial: ""
                                     }],
-                                title: 'drum ' + pinum
+                                title: drumTitles()[pinum]
                             };
                             track.voices.push(voice);
                             for (var mc = 0; mc < timeline.length; mc++) {
@@ -3654,7 +3847,7 @@ var MidiParser = (function () {
                             kind: "equalizer",
                             initial: ""
                         }],
-                    title: 'program ' + midisong.tracks[i].program
+                    title: instrumentTitles()[midisong.tracks[i].program]
                 };
                 track.voices.push(voice);
                 for (var mc = 0; mc < timeline.length; mc++) {
@@ -4283,26 +4476,59 @@ var ZMainMenu = (function () {
         if (nn == 2) {
             var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
             var folderIdx2 = this.panels[1].selection - this.menuRoot.folders[folderIdx1].items.length;
-            action = this.menuRoot.folders[folderIdx1].folders[folderIdx2].afterOpen;
-            txt = this.menuRoot.folders[folderIdx1].path;
-            subRoot = this.menuRoot.folders[folderIdx1].folders[folderIdx2];
+            action = this.menuRoot
+                .folders[folderIdx1]
+                .folders[folderIdx2]
+                .afterOpen;
+            txt = this.menuRoot
+                .folders[folderIdx1]
+                .folders[folderIdx2]
+                .path;
+            subRoot = this.menuRoot
+                .folders[folderIdx1]
+                .folders[folderIdx2];
         }
         if (nn == 3) {
             var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
             var folderIdx2 = this.panels[1].selection - this.menuRoot.folders[folderIdx1].items.length;
             var folderIdx3 = this.panels[2].selection - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
-            action = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].afterOpen;
-            txt = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].path;
-            subRoot = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3];
+            action = this.menuRoot
+                .folders[folderIdx1]
+                .folders[folderIdx2]
+                .folders[folderIdx3]
+                .afterOpen;
+            txt = this.menuRoot
+                .folders[folderIdx1]
+                .folders[folderIdx2]
+                .folders[folderIdx3]
+                .path;
+            subRoot = this.menuRoot
+                .folders[folderIdx1]
+                .folders[folderIdx2]
+                .folders[folderIdx3];
         }
         if (nn == 4) {
             var folderIdx1 = this.panels[0].selection - this.menuRoot.items.length;
             var folderIdx2 = this.panels[1].selection - this.menuRoot.folders[folderIdx1].items.length;
             var folderIdx3 = this.panels[2].selection - this.menuRoot.folders[folderIdx1].folders[folderIdx2].items.length;
             var folderIdx4 = this.panels[3].selection - this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].items.length;
-            action = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].afterOpen;
-            this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4].path;
-            subRoot = this.menuRoot.folders[folderIdx1].folders[folderIdx2].folders[folderIdx3].folders[folderIdx4];
+            action = this.menuRoot
+                .folders[folderIdx1]
+                .folders[folderIdx2]
+                .folders[folderIdx3]
+                .folders[folderIdx4]
+                .afterOpen;
+            txt = this.menuRoot
+                .folders[folderIdx1]
+                .folders[folderIdx2]
+                .folders[folderIdx3]
+                .folders[folderIdx4]
+                .path;
+            subRoot = this.menuRoot
+                .folders[folderIdx1]
+                .folders[folderIdx2]
+                .folders[folderIdx3]
+                .folders[folderIdx4];
         }
         this.reFillMenulevel(this.panels[nn].menuContent, subRoot, this.panels[nn].selection);
         this.panels[nn].menuTextHead.innerText = txt;
@@ -4402,7 +4628,7 @@ var ZMainMenu = (function () {
         for (var tt = 0; tt < prj.tracks.length; tt++) {
             var songtrack = prj.tracks[tt];
             var tr = {
-                path: 'track ' + songtrack.title, icon: "", folders: [], items: [],
+                path: songtrack.title, icon: "", folders: [], items: [],
                 afterOpen: this.layerSelector.upTrack(tt)
             };
             this.songFolder.folders.push(tr);
@@ -4412,7 +4638,7 @@ var ZMainMenu = (function () {
             for (var vv = 0; vv < songtrack.voices.length; vv++) {
                 var songvox = songtrack.voices[vv];
                 var vox = {
-                    path: 'vox ' + songvox.title, icon: "", folders: [], items: [],
+                    path: songvox.title, icon: "", folders: [], items: [],
                     afterOpen: this.layerSelector.upVox(tt, vv)
                 };
                 tr.folders.push(vox);
@@ -4513,13 +4739,13 @@ var SingleMenuPanel = (function () {
     return SingleMenuPanel;
 }());
 console.log('MuzXBox v1.02.001');
-var midiDrumPitchShift = 11;
+var midiDrumPitchShift = 35;
 var midiInstrumentPitchShift = 24;
 var leftGridMargin = 20;
 var rightGridMargin = 1;
 var topGridMargin = 10;
 var bottomGridMargin = 30;
-var ocataveCount = 4;
+var ocataveCount = 8;
 var us;
 var MuzXBox = (function () {
     function MuzXBox() {
@@ -5839,31 +6065,44 @@ var FocusZoomMeasure = (function () {
         mngmnt.muzXBox.zrenderer.tileLevel.applyZoomPosition();
     };
     FocusZoomMeasure.prototype.moveSpotIntoView = function (mngmnt) {
-        console.log('moveSpotIntoView from', this.currentPitch, ':', this.currentMeasure, this.currentStep);
         var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
         var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
         var tp = mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
-        var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
-        var yy = topGridMargin
-            + gridHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness)
-            + 0 * 12 * mngmnt.muzXBox.zrenderer.ratioThickness
-            - this.currentPitch * mngmnt.muzXBox.zrenderer.ratioThickness;
         var ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
         var hh = mngmnt.muzXBox.zrenderer.ratioThickness;
-        var tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / tp;
-        var ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / mngmnt.muzXBox.zrenderer.tileLevel.translateZ;
         var tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ;
-        var vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
+        var tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / tz;
+        var ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / tz;
+        var vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth;
         var vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight;
-        var ih = mngmnt.muzXBox.zrenderer.tileLevel.innerHeight / mngmnt.muzXBox.zrenderer.tileLevel.translateZ;
-        console.log('t', ty, 'vew', vh, 'inner', ih, 'zoom', tz);
+        var ih = mngmnt.muzXBox.zrenderer.tileLevel.innerHeight / tz;
+        var iw = mngmnt.muzXBox.zrenderer.tileLevel.innerWidth / tz;
+        var newY = ih / 2;
         if (vh < ih) {
-            var newY = vh / 2 - ty;
-            var newPitch = tp * (topGridMargin + ocataveCount * 12 * mngmnt.muzXBox.zrenderer.ratioThickness) - newY;
-            console.log('view', newY, newPitch);
+            newY = vh / 2 - ty;
+        }
+        var pitchY = tp * topGridMargin + tp * ocataveCount * 12 * mngmnt.muzXBox.zrenderer.ratioThickness - newY * tz;
+        this.currentPitch = Math.ceil(pitchY / (tp * mngmnt.muzXBox.zrenderer.ratioThickness));
+        if (this.currentPitch < 0) {
+            this.currentPitch = 0;
+        }
+        if (this.currentPitch >= ocataveCount * 12) {
+            this.currentPitch = ocataveCount * 12;
+        }
+        var newX = iw / 2;
+        if (vw < iw) {
+            newX = vw / 2 - tx;
+        }
+        var stepX = -tp * leftGridMargin / tz + newX;
+        var findX = tz * stepX / tp;
+        var measureStep = findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern, mngmnt.muzXBox.zrenderer.ratioDuration, findX);
+        if (measureStep) {
+            this.currentMeasure = measureStep.measure;
+            this.currentStep = measureStep.step;
         }
         else {
-            console.log('inner');
+            this.currentMeasure = 0;
+            this.currentStep = 0;
         }
     };
     return FocusZoomMeasure;

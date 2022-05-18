@@ -37,6 +37,7 @@ function findMeasureStep(measures: ZvoogMeasure[], rhythmPattern: ZvoogMeter[], 
 	for (measureIdx = 0; measureIdx < measures.length; measureIdx++) {
 		let measure = measures[measureIdx];
 		let measureLength = ratioDuration * meter2seconds(measure.tempo, measure.meter);
+		//console.log('findMeasureStep',measureStartX , measureLength , xx);
 		if (measureStartX + measureLength > xx) {
 			let stepStartMeter: ZvoogMeter = { count: 0, division: 1 };
 			let nn = 0;

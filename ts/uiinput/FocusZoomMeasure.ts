@@ -136,27 +136,31 @@ class FocusZoomMeasure implements FocusLevel {
 		mngmnt.muzXBox.zrenderer.tileLevel.applyZoomPosition();
 	}
 	moveSpotIntoView(mngmnt: FocusManagement): void {
-		console.log('moveSpotIntoView from', this.currentPitch, ':', this.currentMeasure, this.currentStep);
+		//console.log('moveSpotIntoView from', this.currentPitch, ':', this.currentMeasure, this.currentStep);
 		var rhythmPattern: ZvoogMeter[] = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
 		let measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, this.currentStep, rhythmPattern);
 		let tp = mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
-		let xx = leftGridMargin + mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
+		//let xx = leftGridMargin + mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
 		//let yy = (127 - this.currentPitch) * mngmnt.muzXBox.zrenderer.ratioThickness;
-		let yy = topGridMargin
-			+ gridHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness)
-			+ 0 * 12 * mngmnt.muzXBox.zrenderer.ratioThickness
-			- this.currentPitch * mngmnt.muzXBox.zrenderer.ratioThickness;
+		//let yy = topGridMargin
+		//	+ gridHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness)
+		//	+ 0 * 12 * mngmnt.muzXBox.zrenderer.ratioThickness
+		//	- this.currentPitch * mngmnt.muzXBox.zrenderer.ratioThickness;
 		let ww = mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.duration;
 		let hh = mngmnt.muzXBox.zrenderer.ratioThickness;
-		let tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / tp;
-		let ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / mngmnt.muzXBox.zrenderer.tileLevel.translateZ;
-		let tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ
-		let vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
+
+		let tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ;
+		let tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / tz;
+		let ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / tz;
+
+		let vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth;
 		let vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight;
-		let ih = mngmnt.muzXBox.zrenderer.tileLevel.innerHeight / mngmnt.muzXBox.zrenderer.tileLevel.translateZ;
-		console.log(
-			't', ty, 'vew', vh, 'inner', ih, 'zoom', tz
-		);
+
+		let ih = mngmnt.muzXBox.zrenderer.tileLevel.innerHeight / tz;
+		let iw = mngmnt.muzXBox.zrenderer.tileLevel.innerWidth / tz;
+		//console.log(
+		//	't', ty, 'vew', vh, 'inner', ih, 'zoom', tz
+		//);
 		/*if (
 			(xx + ww > vw - tx) //right
 			|| (xx < -tx)//left
@@ -176,12 +180,33 @@ class FocusZoomMeasure implements FocusLevel {
 		//this.currentPitch = newPitch;
 		//}
 		//console.log('to', this.currentPitch, ':', this.currentMeasure, this.currentStep);
+		let newY = ih / 2;
 		if (vh < ih) {
-			let newY = vh / 2 - ty;
-			let newPitch = tp * (topGridMargin + ocataveCount * 12 * mngmnt.muzXBox.zrenderer.ratioThickness) - newY;
-			console.log('view', newY, newPitch);
-		} else {
-			console.log('inner');
+			newY = vh / 2 - ty;
 		}
+		let pitchY = tp * topGridMargin + tp * ocataveCount * 12 * mngmnt.muzXBox.zrenderer.ratioThickness - newY * tz;
+		this.currentPitch = Math.ceil(pitchY / (tp * mngmnt.muzXBox.zrenderer.ratioThickness));
+		if (this.currentPitch < 0) {
+			this.currentPitch = 0;
+		}
+		if (this.currentPitch >= ocataveCount * 12) {
+			this.currentPitch = ocataveCount * 12;
+		}
+		let newX = iw / 2;
+		if (vw < iw) {
+			newX = vw / 2 - tx;
+		}
+		let stepX = -tp * leftGridMargin / tz + newX;
+		let findX = tz * stepX / tp;
+		let measureStep = findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern, mngmnt.muzXBox.zrenderer.ratioDuration, findX);
+		if (measureStep) {
+			this.currentMeasure = measureStep.measure;
+			this.currentStep = measureStep.step;
+		} else {
+			this.currentMeasure = 0;
+			this.currentStep = 0;
+		}
+		//console.log(newX, stepX, findX, iw, vw, tx, tz);
+		//console.log(measureStep);
 	}
 }

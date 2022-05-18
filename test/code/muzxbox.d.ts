@@ -690,6 +690,10 @@ declare let cachedZvoogSineSourcePlugins: ZvoogSineSource[];
 declare function takeZvoogSineSource(): ZvoogSineSource;
 declare function createPluginEffect(id: string): ZvoogFilterPlugin;
 declare function createPluginSource(id: string): ZvoogPerformerPlugin;
+declare let instrumentNamesArray: string[];
+declare let drumNamesArray: string[];
+declare function drumTitles(): string[];
+declare function instrumentTitles(): string[];
 declare class MIDIFileImporter implements ZvoogStore {
     list(onFinish: (items: ZvoogStoreListItem[]) => void): void;
     goFolder(title: string, onFinish: (error: string) => void): void;
