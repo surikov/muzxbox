@@ -36,10 +36,10 @@ class TimeLineRenderer {
 		, ratioDuration: number, ratioThickness: number
 	) {
 
-		this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor1, 'textSize05', 'textSize1', 1, false);
-		this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor4, 'textSize2', 'textSize4', 4, false);
-		this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor16, null, 'textSize16', 16, false);
-		this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor64, null, 'textSize64', 64, true);
+		this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor1, 'timelineBarSubNote', 'timelineBarLabelNote', 1, false);
+		this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor4, 'timelineBarSubMeasure', 'timelineBarLabelMeasure', 4, false);
+		this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor16, null, 'timelineBarLabelSong', 16, false);
+		this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor64, null, 'timelineBarLabelSongFar', 64, true);
 		//this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor256, null, 'textSize256', 256, true);
 	}
 	drawLevel(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, layerAnchor: TileAnchor
@@ -61,7 +61,9 @@ class TimeLineRenderer {
 				measureAnchor.content.push(TText(
 					leftGridMargin +time * ratioDuration
 					, yy * 1
-					, 'barNumber ' + textSize, ('' + (1 + i))));
+					//, 'barNumber ' + textSize
+					,  textSize
+					, ('' + (1 + i))));
 				let rhythmPattern: ZvoogMeter[] = song.rhythm ? song.rhythm : zRender.rhythmPatternDefault;
 				if (subSize) {
 					let stepNN = 0;
@@ -72,7 +74,9 @@ class TimeLineRenderer {
 						measureAnchor.content.push(TText(
 							leftGridMargin + (time + positionDuration) * ratioDuration
 							, yy
-							, 'barNumber ' + subSize, ('' + simple.count + '/' + simple.division)));
+							//, 'barNumber ' + subSize
+							, 'barNumber ' + subSize
+							, ('' + simple.count + '/' + simple.division)));
 						stepNN++;
 						if (stepNN >= rhythmPattern.length) {
 							stepNN = 0;

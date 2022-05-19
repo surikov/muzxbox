@@ -141,41 +141,41 @@ button {
 	stroke-opacity: 75%;
 }
 
-.barLine1 {
+.barLine1a {
 	stroke: #000000;
 	stroke-width: 0.05cm;
-	stroke-opacity: 25%;
+	_stroke-opacity: 25%;
 	stroke-linecap: round;
 }
 
-.barLine4 {
+.barLine4a {
 	stroke: #000000;
 	stroke-width: 0.25cm;
-	stroke-opacity: 25%;
+	_stroke-opacity: 25%;
 	stroke-linecap: round;
 }
 
-.barLine16 {
+.barLine16a {
 	stroke: #000000;
 	stroke-width: 0.5cm;
-	stroke-opacity: 25%;
+	_stroke-opacity: 25%;
 	stroke-linecap: round;
 }
 
-.barLine64 {
+.barLine64a {
 	stroke: #000000;
 	stroke-width: 1cm;
-	stroke-opacity: 25%;
+	_stroke-opacity: 25%;
 	stroke-linecap: round;
 }
 
-.barLine256 {
+.barLine256a {
 	stroke: #000000;
 	stroke-width: 4cm;
-	stroke-opacity: 75%;
+	_stroke-opacity: 75%;
 	stroke-linecap: round;
 }
-
+/*
 .pitchLine4 {
 	stroke: #ffffff;
 	stroke-width: 0.1cm;
@@ -188,7 +188,7 @@ button {
 	stroke-width: 0.2cm;
 	stroke-opacity: 75%;
 	stroke-linecap: round;
-}
+}*/
 
 .infoLabelPanel {
 	background-color3: #99ffcc;

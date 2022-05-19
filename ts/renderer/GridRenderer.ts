@@ -102,21 +102,21 @@ class GridRenderer {
 					, y1: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
 					, x2: leftGridMargin + (time + measureDuration) * ratioDuration
 					, y2: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
-					, css: 'barLine16'
+					, css: 'octaveLine16'
 				});
 				gridMeasure4.content.push({
 					x1: leftGridMargin + time * ratioDuration
 					, y1: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
 					, x2: leftGridMargin + (time + measureDuration) * ratioDuration
 					, y2: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
-					, css: 'barLine4'
+					, css: 'octaveLine4'
 				});
 				gridMeasure1.content.push({
 					x1: leftGridMargin + time * ratioDuration
 					, y1: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
 					, x2: leftGridMargin + (time + measureDuration) * ratioDuration
 					, y2: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
-					, css: 'barLine1'
+					, css: 'octaveLine1'
 				});
 				for (let n = 1; n < 12; n++) {
 					gridMeasure4.content.push({
@@ -132,9 +132,9 @@ class GridRenderer {
 			let position: ZvoogMeter = rhythmPattern[stepNN];
 			while (DUU(position).lessThen(song.measures[mm].meter)) {
 				let positionDuration = meter2seconds(song.measures[mm].tempo, position);
-				let css = 'pitchLine4';
+				let css = 'rhythmLine4';
 				if (stepNN == rhythmPattern.length - 1) {
-					css = 'pitchWideLine4';
+					css = 'rhythmWideLine4';
 				}
 				gridMeasure4.content.push({
 					x1: leftGridMargin + (time + positionDuration) * ratioDuration

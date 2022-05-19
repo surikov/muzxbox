@@ -64,7 +64,7 @@ class MeasureInfoRenderer {
 			singlemeasuresTimelineAnchor1.content.push(TText(
 				leftGridMargin + time * ratioDuration
 				, -1 / 4
-				, 'barNumber textSize1'
+				, 'barInfoLabelNote'
 				, (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)));
 			this.measuresMeasureInfoAnchor1.content.push(singlemeasuresTimelineAnchor1);
 			time = time + measureDuration;
@@ -88,7 +88,7 @@ class MeasureInfoRenderer {
 			//	curMeterCount = song.measures[i].meter.count;
 			//	curDivision = song.measures[i].meter.division;
 			//	curTempo = song.measures[i].tempo;
-			singlemeasuresTimelineAnchor4.content.push(TText(leftGridMargin + time * ratioDuration, -4 / 4, 'barNumber textSize4'
+			singlemeasuresTimelineAnchor4.content.push(TText(leftGridMargin + time * ratioDuration, -4 / 4, 'barInfoLabelMeasure'
 				, (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)));
 			//}
 			this.measuresMeasureInfoAnchor4.content.push(singlemeasuresTimelineAnchor4);
@@ -114,7 +114,7 @@ class MeasureInfoRenderer {
 				curDivision = song.measures[i].meter.division;
 				curTempo = song.measures[i].tempo;
 				singlemeasuresTimelineAnchor16.content.push({
-					x: leftGridMargin + time * ratioDuration, y: -16 / 4, css: 'barNumber textSize16'
+					x: leftGridMargin + time * ratioDuration, y: -16 / 4, css: 'barInfoLabelSong'
 					, text: (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)
 				});
 			}
@@ -144,7 +144,7 @@ class MeasureInfoRenderer {
 				if (i - lastMeasureNum > 2) {
 					lastMeasureNum = i;
 					singlemeasuresTimelineAnchor64.content.push({
-						x: leftGridMargin + time * ratioDuration, y: -64 / 4, css: 'barNumber textSize64'
+						x: leftGridMargin + time * ratioDuration, y: -64 / 4, css: 'barInfoLabelFar'
 						, text: (song.measures[i].tempo + ': ' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)
 					});
 					//console.log('singlemeasuresTimelineAnchor64',i);
@@ -173,11 +173,11 @@ class MeasureInfoRenderer {
 				if (i - lastMeasureNum > 8) {
 					lastMeasureNum = i;
 					singlemeasuresTimelineAnchor256.content.push({
-						x: leftGridMargin + time * ratioDuration, y: -256, css: 'barNumber textSize256'
+						x: leftGridMargin + time * ratioDuration, y: -256, css: 'barInfoLabelBig'
 						, text: ('' + song.measures[i].meter.count + '/' + song.measures[i].meter.division)
 					});
 					singlemeasuresTimelineAnchor256.content.push({
-						x: time * ratioDuration, y: -256 / 4, css: 'barNumber textSize256'
+						x: time * ratioDuration, y: -256 / 4, css: 'barInfoLabelBig'
 						, text: ('' + song.measures[i].tempo)
 					});
 				}
