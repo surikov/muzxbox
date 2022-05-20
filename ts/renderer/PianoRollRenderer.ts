@@ -93,7 +93,7 @@ class PianoRollRenderer {
 	addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number {
 		let measure = voice.measureChords[measureNum];
 		var measureMaxLen = anchors[0].ww;
-		let yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12)* ratioThickness;
+		let yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12) * ratioThickness;
 		for (let cc = 0; cc < measure.chords.length; cc++) {
 			let chord = measure.chords[cc];
 			for (let ee = 0; ee < chord.envelopes.length; ee++) {
@@ -227,7 +227,7 @@ class PianoRollRenderer {
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
 
-			let contentMeasure1: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
+			let contentMeasure1: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 12 * ocataveCount * ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
 			let contentMeasure4: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
 			let contentMeasure16: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
 			let contentMeasure64: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain64.showZoom, this.contentMain64.hideZoom);
@@ -358,6 +358,56 @@ class PianoRollRenderer {
 					}
 				}
 			}
+			time = time + measureDuration;
+		}
+		let chordCount = 0;
+		//let minCount = 12345678;
+		//let maxCount = 0;
+		for (let mm = 0; mm < song.measures.length; mm++) {
+			let measureChords = 0;
+			for (let tt = 0; tt < song.tracks.length; tt++) {
+				let track = song.tracks[tt];
+				for (let vv = 0; vv < track.voices.length; vv++) {
+					let voice: ZvoogVoice = track.voices[vv];
+					measureChords = measureChords + voice.measureChords[mm].chords.length;
+				}
+			}
+			chordCount = chordCount + measureChords;
+			//if (minCount > measureChords) { minCount = measureChords; }
+			//if (maxCount < measureChords) { maxCount = measureChords; }
+		}
+		//console.log('average', chordCount / song.measures.length, minCount, maxCount);
+		time = 0;
+		for (let mm = 0; mm < song.measures.length; mm++) {
+			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
+			let css = 'average3';
+			let curChordCount = 0;
+			for (let tt = 0; tt < song.tracks.length; tt++) {
+				let track = song.tracks[tt];
+				for (let vv = 0; vv < track.voices.length; vv++) {
+					let voice: ZvoogVoice = track.voices[vv];
+					curChordCount = curChordCount + voice.measureChords[mm].chords.length;
+				}
+			}
+			if (curChordCount < 0.99 * chordCount / song.measures.length) {
+				css = 'average1';
+			} else {
+				if (curChordCount < 1.66 * chordCount / song.measures.length) {
+					css = 'average2';
+				}
+			}
+			//console.log(mm, chordCount, curChordCount, css);
+			let measquare = {
+				x: leftGridMargin + time * ratioDuration
+				, y: topGridMargin
+				, w: ratioDuration * measureDuration - 5
+				, h: 12 * ocataveCount * ratioThickness
+				, rx: 0
+				, ry: 0
+				, css: css
+			};
+			this.contentOther64.content.push(measquare);
+			this.contentOther256.content.push(measquare);
 			time = time + measureDuration;
 		}
 	}

@@ -1,7 +1,7 @@
 :root {
 	--background_color: #ddeeff;
 
-	--background_base: #ddeeff;
+	--background_base: #c8d8e0;
 	--grid_base: #ffffffff;
 	--grid_lite: #ffffff66;
 	--prime_base: #000000ff;
@@ -9,11 +9,22 @@
 	--secondary_base: #115522ff;
 	--secondary_lite: #11552299;
 	--decor_base: #226699ff;
+	--decor_solid: #226699cc;
 	--decor_lite: #22669999;
 	--decor_onion: #22669966;
 	--active_base: #660022ff;
 	--active_lite: #66002233;
 }
+.average1 {
+	fill: var(--decor_onion);
+}
+.average2 {
+	fill: var(--decor_lite);
+}
+.average3 {
+	fill: var(--decor_solid);
+}
+
 html {
 	width: 100%;
 	height: 100%;
@@ -23,20 +34,25 @@ html {
 	font-family: 'Zen Kurenaido', serif, cursive;
 	user-select: none;
 }
+
 .keysNote {
 	fill: var(--decor_onion);
 }
+
 .keysMeasure {
 	fill: var(--decor_onion);
 }
+
 .octaveNumNote {
 	fill: var(--decor_onion);
 	font-size: 6cm;
 }
+
 .octaveNumMeasure {
 	fill: var(--decor_onion);
 	font-size: 16cm;
 }
+
 .infoLabelPanel {
 	position: fixed;
 	z-index: -1;
@@ -49,136 +65,264 @@ html {
 	white-space: nowrap;
 	overflow: hidden;
 }
+
 #selectionInfo1 {
 	font-size: 10vh;
 	color: var(--decor_onion);
 	text-overflow: ellipsis;
-	transform: translate(0cm,1.8cm);
+	transform: translate(0cm, 1.8cm);
 }
+
 #selectionInfo2 {
 	font-size: 7vh;
 	color: var(--decor_onion);
 	text-overflow: ellipsis;
-	transform: translate(1cm,0.7cm);
+	transform: translate(1cm, 0.7cm);
 }
+
 #selectionInfo3 {
 	font-size: 5vh;
 	color: var(--decor_onion);
 	text-overflow: ellipsis;
-	transform: translate(1.5cm,0cm);
+	transform: translate(1.5cm, 0cm);
 }
+
 #selectionInfo4 {
 	font-size: 3vh;
 	color: var(--decor_onion);
 	text-overflow: ellipsis;
-	transform: translate(2cm,-0.5cm);
+	transform: translate(2cm, -0.5cm);
 }
+
 .timelineBarLabelNote {
 	fill: var(--decor_onion);
 	font-size: 1cm;
 }
+
 .timelineBarLabelMeasure {
 	fill: var(--decor_onion);
 	font-size: 4cm;
 }
+
 .timelineBarLabelSong {
 	fill: var(--decor_onion);
 	font-size: 16cm;
 }
+
 .timelineBarLabelSongFar {
 	fill: var(--decor_onion);
 	font-size: 64cm;
 }
+
 .timelineBarSubNote {
 	fill: var(--decor_onion);
 	font-size: 0.5cm;
 }
+
 .timelineBarSubMeasure {
 	fill: var(--decor_onion);
 	font-size: 2cm;
 }
+
 .barInfoLabelNote {
 	fill: var(--decor_onion);
 	font-size: 1cm;
 }
+
 .barInfoLabelMeasure {
 	fill: var(--decor_onion);
 	font-size: 4cm;
 }
+
 .barInfoLabelSong {
 	fill: var(--decor_onion);
 	font-size: 16cm;
 }
+
 .barInfoLabelFar {
 	fill: var(--decor_onion);
 	font-size: 64cm;
 }
+
 .barInfoLabelBig {
 	fill: var(--decor_onion);
 	font-size: 256cm;
 }
+
 .barLine1 {
 	stroke: var(--decor_lite);
-	stroke-width:0.5cm;
+	stroke-width: 0.25cm;
 	stroke-linecap: round;
 }
+
 .barLine4 {
 	stroke: var(--decor_lite);
-	stroke-width: 1cm;
-	stroke-linecap: round;
-}
-.barLine16 {
-	stroke: var(--decor_lite);
-	stroke-width: 4cm;
-	stroke-linecap: round;
-}
-.barLine64 {
-	stroke: var(--decor_lite);
-	stroke-width: 8cm;
-	stroke-linecap: round;
-}
-.barLine256 {
-	stroke: var(--decor_lite);
-	stroke-width: 16cm;
-	stroke-linecap: round;
-}
-.octaveLine1 {
-	stroke: var(--decor_onion);
 	stroke-width: 0.5cm;
 	stroke-linecap: round;
 }
-.octaveLine4 {
-	stroke: var(--decor_onion);
+
+.barLine16 {
+	stroke: var(--decor_lite);
 	stroke-width: 1cm;
 	stroke-linecap: round;
 }
-.octaveLine16 {
-	stroke: var(--decor_onion);
+
+.barLine64 {
+	stroke: var(--decor_lite);
+	stroke-width: 2cm;
+	stroke-linecap: round;
+}
+
+.barLine256 {
+	stroke: var(--decor_lite);
 	stroke-width: 4cm;
 	stroke-linecap: round;
 }
+
+.octaveLine1 {
+	stroke: var(--decor_lite);
+	stroke-width: 0.25cm;
+	stroke-linecap: round;
+}
+
+.octaveLine4 {
+	stroke: var(--decor_lite);
+	stroke-width: 0.5cm;
+	stroke-linecap: round;
+}
+
+.octaveLine16 {
+	stroke: var(--decor_lite);
+	stroke-width: 1cm;
+	stroke-linecap: round;
+}
+
 .pitchLine4 {
-	stroke: var(--decor_onion);
-	stroke-width: 0.1cm;
+	stroke: var(--grid_lite);
+	stroke-width: 0.2cm;
 	stroke-linecap: round;
 }
+
 .rhythmLine4 {
-	stroke: var(--decor_onion);
-	stroke-width: 0.1cm;
+	stroke: var(--grid_lite);
+	stroke-width: 0.2cm;
 	stroke-linecap: round;
 }
+
 .rhythmWideLine4 {
-	stroke: var(--decor_onion);
-	stroke-width: 0.3cm;
+	stroke: var(--grid_lite);
+	stroke-width: 0.7cm;
 	stroke-linecap: round;
+}
+
+.mainLine {
+	stroke: var(--prime_base);
+	stroke-width: 7cm;
+	stroke-linecap: round;
+}
+
+.secondLine {
+	stroke: var(--secondary_lite);
+	stroke-width: 7cm;
+	stroke-linecap: round;
+}
+
+.otherLine {
+	stroke: var(--decor_lite);
+	stroke-width: 7cm;
+	stroke-opacity: 25%;
+	stroke-linecap: round;
+}
+
+.actionPoint {
+	fill: var(--active_lite);
+	animation-name: actionBlink;
+	animation-duration: 1s;
+	animation-iteration-count: infinite;
+	animation-direction: alternate-reverse;
+	animation-timing-function: ease-in;
+}
+
+@keyframes actionBlink {
+	from {
+		fill: var(--active_base);
+	}
+	to {
+		fill: var(--active_lite);
+	}
 }
 
 
 
 
-
-.menuHead {
-	height: 1cm;
+.menuPane{
+	height: 100%;
+	width: 0cm;
+	position: fixed;
+	z-index: 2;
+	top: 0;
+	right: 0;
+	background-color: var(--background_base);
+	transition: 0.25s;
+	margin: 0px;
+	padding: 0px;
+	font-size: 0.75cm;
+	box-shadow: 0px 0px 0.93cm #000000;
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+.menuHead{
+	color: var(--grid_base);
+	font-size: 0.5cm;
+	background-color:var(--decor_onion);
+	position: fixed;
+	height:1cm;
+	width: 100%;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	padding-left: 0.5cm;
+	padding-right: 0.1cm;
+	padding-top: 0.0cm;
+	padding-bottom: 0.0cm;
+}
+.menuActionRow{
+	border-bottom: solid;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	color: var(--prime_base);
+	font-size: 0.5cm;
+	border-color: var(--decor_onion);
+	border-width: 1px;
+	padding-left: 0.5cm;
+	padding-right: 0.1cm;
+	padding-top: 0.0cm;
+	padding-bottom: 0.0cm;
+}
+.menuActionRow[data-row-selection='yes']{
+	border-bottom: none;
+	color: var(--grid_base);
+	background-color: var(--active_base);
+}
+.menuFolderRow{
+	border-bottom: solid;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	color: var(--prime_base);
+	font-size: 0.5cm;
+	border-color: var(--decor_onion);
+	border-width: 1px;
+	padding-left: 0.5cm;
+	padding-right: 0.1cm;
+	padding-top: 0.0cm;
+	padding-bottom: 0.0cm;
+}
+.menuFolderRow[data-row-selection='yes']{
+	border-bottom: none;
+	color: var(--grid_base);
+	background-color: var(--active_base);
 }
 
 .menuContent {

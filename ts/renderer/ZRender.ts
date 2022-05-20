@@ -9,17 +9,14 @@ class ZRender {
 	zoomBig: number = 512;
 	zoomMax: number = 1024;
 	ratioDuration = 50;
-	ratioThickness = 3;
+	ratioThickness = 7;
 	sizeRatio = 2;
 
 	rhythmPatternDefault: ZvoogMeter[] = [
 		{ count: 1, division: 8 }, { count: 1, division: 8 }
 		, { count: 1, division: 8 }, { count: 1, division: 8 }
 	];
-	rhythmPatternDefault335: ZvoogMeter[] = [
-		{ count: 5, division: 32 }, { count: 3, division: 32 }
-		, { count: 5, division: 32 }, { count: 3, division: 32 }
-	];
+	
 
 	measureInfoRenderer: MeasureInfoRenderer = new MeasureInfoRenderer();
 	pianoRollRenderer: PianoRollRenderer = new PianoRollRenderer();

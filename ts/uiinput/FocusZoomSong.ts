@@ -10,11 +10,11 @@ class FocusZoomSong implements FocusLevel {
 		mngmnt.focusAnchor.content.push({
 			x: 0
 			, y: 0
-			, w: wholeWidthTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.ratioDuration)
-			, h: wholeHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness)
+			, w: 5//wholeWidthTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.ratioDuration)
+			, h: 5//wholeHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness)
 			, rx: 0
 			, ry: 0
-			, css: 'debug'
+			, css: 'actionPoint'
 		});
 	}
 	spotUp(): boolean {

@@ -253,7 +253,6 @@ declare class ZRender {
     ratioThickness: number;
     sizeRatio: number;
     rhythmPatternDefault: ZvoogMeter[];
-    rhythmPatternDefault335: ZvoogMeter[];
     measureInfoRenderer: MeasureInfoRenderer;
     pianoRollRenderer: PianoRollRenderer;
     gridRenderer: GridRenderer;
@@ -1103,8 +1102,6 @@ declare class GridRenderer {
     gridAnchor1: TileAnchor;
     gridAnchor4: TileAnchor;
     gridAnchor16: TileAnchor;
-    gridAnchor64: TileAnchor;
-    gridAnchor256: TileAnchor;
     gridLayer: TileLayerDefinition;
     attach(zRender: ZRender): void;
     initGridAnchors(zRender: ZRender): void;

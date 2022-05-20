@@ -1213,15 +1213,11 @@ var ZRender = (function () {
         this.zoomBig = 512;
         this.zoomMax = 1024;
         this.ratioDuration = 50;
-        this.ratioThickness = 3;
+        this.ratioThickness = 7;
         this.sizeRatio = 2;
         this.rhythmPatternDefault = [
             { count: 1, division: 8 }, { count: 1, division: 8 },
             { count: 1, division: 8 }, { count: 1, division: 8 }
-        ];
-        this.rhythmPatternDefault335 = [
-            { count: 5, division: 32 }, { count: 3, division: 32 },
-            { count: 5, division: 32 }, { count: 3, division: 32 }
         ];
         this.measureInfoRenderer = new MeasureInfoRenderer();
         this.pianoRollRenderer = new PianoRollRenderer();
@@ -3741,7 +3737,7 @@ var MidiParser = (function () {
                 }
             }
             var track = {
-                title: trackTictle,
+                title: '' + i,
                 voices: [],
                 filters: [{
                         filterPlugin: null,
@@ -3786,6 +3782,7 @@ var MidiParser = (function () {
                                 title: drumTitles()[pinum]
                             };
                             track.voices.push(voice);
+                            track.title = '' + pinum + ': Drums';
                             for (var mc = 0; mc < timeline.length; mc++) {
                                 voice.measureChords.push({ chords: [] });
                             }
@@ -3850,6 +3847,7 @@ var MidiParser = (function () {
                     title: instrumentTitles()[midisong.tracks[i].program]
                 };
                 track.voices.push(voice);
+                track.title = '' + midisong.tracks[i].program + ': ' + voice.title;
                 for (var mc = 0; mc < timeline.length; mc++) {
                     voice.measureChords.push({ chords: [] });
                 }
@@ -5215,7 +5213,7 @@ var PianoRollRenderer = (function () {
         var time = 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-            var contentMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
+            var contentMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 12 * ocataveCount * ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
             var contentMeasure4 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
             var contentMeasure16 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
             var contentMeasure64 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain64.showZoom, this.contentMain64.hideZoom);
@@ -5359,6 +5357,51 @@ var PianoRollRenderer = (function () {
             }
             time = time + measureDuration;
         }
+        var chordCount = 0;
+        for (var mm = 0; mm < song.measures.length; mm++) {
+            var measureChords = 0;
+            for (var tt = 0; tt < song.tracks.length; tt++) {
+                var track = song.tracks[tt];
+                for (var vv = 0; vv < track.voices.length; vv++) {
+                    var voice = track.voices[vv];
+                    measureChords = measureChords + voice.measureChords[mm].chords.length;
+                }
+            }
+            chordCount = chordCount + measureChords;
+        }
+        time = 0;
+        for (var mm = 0; mm < song.measures.length; mm++) {
+            var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
+            var css = 'average3';
+            var curChordCount = 0;
+            for (var tt = 0; tt < song.tracks.length; tt++) {
+                var track = song.tracks[tt];
+                for (var vv = 0; vv < track.voices.length; vv++) {
+                    var voice = track.voices[vv];
+                    curChordCount = curChordCount + voice.measureChords[mm].chords.length;
+                }
+            }
+            if (curChordCount < 0.99 * chordCount / song.measures.length) {
+                css = 'average1';
+            }
+            else {
+                if (curChordCount < 1.66 * chordCount / song.measures.length) {
+                    css = 'average2';
+                }
+            }
+            var measquare = {
+                x: leftGridMargin + time * ratioDuration,
+                y: topGridMargin,
+                w: ratioDuration * measureDuration - 5,
+                h: 12 * ocataveCount * ratioThickness,
+                rx: 0,
+                ry: 0,
+                css: css
+            };
+            this.contentOther64.content.push(measquare);
+            this.contentOther256.content.push(measquare);
+            time = time + measureDuration;
+        }
     };
     return PianoRollRenderer;
 }());
@@ -5373,18 +5416,16 @@ var GridRenderer = (function () {
         this.gridAnchor1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
         this.gridAnchor4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
         this.gridAnchor16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
-        this.gridAnchor64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar);
-        this.gridAnchor256 = TAnchor(0, 0, 1111, 1111, zRender.zoomFar, zRender.zoomMax + 1);
         this.gridLayer = {
             g: this.gridLayerGroup, anchors: [
-                this.gridAnchor1, this.gridAnchor4, this.gridAnchor16, this.gridAnchor64, this.gridAnchor256
+                this.gridAnchor1, this.gridAnchor4, this.gridAnchor16
             ]
         };
         zRender.layers.push(this.gridLayer);
     };
     GridRenderer.prototype.clearGridAnchorsContent = function (zRender, wholeWidth) {
         var anchors = [
-            this.gridAnchor1, this.gridAnchor4, this.gridAnchor16, this.gridAnchor64, this.gridAnchor256
+            this.gridAnchor1, this.gridAnchor4, this.gridAnchor16
         ];
         for (var i = 0; i < anchors.length; i++) {
             zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
@@ -5394,21 +5435,15 @@ var GridRenderer = (function () {
         this.gridAnchor1.content = [];
         this.gridAnchor4.content = [];
         this.gridAnchor16.content = [];
-        this.gridAnchor64.content = [];
-        this.gridAnchor256.content = [];
         var time = 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
             var gridMeasure1 = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, gridHeightTp(ratioThickness), zRender.pianoRollRenderer.contentMain1.showZoom, zRender.pianoRollRenderer.contentMain1.hideZoom);
             var gridMeasure4 = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, gridHeightTp(ratioThickness), zRender.pianoRollRenderer.contentMain4.showZoom, zRender.pianoRollRenderer.contentMain4.hideZoom);
             var gridMeasure16 = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, gridHeightTp(ratioThickness), zRender.pianoRollRenderer.contentMain16.showZoom, zRender.pianoRollRenderer.contentMain16.hideZoom);
-            var gridMeasure64 = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, gridHeightTp(ratioThickness), zRender.pianoRollRenderer.contentMain64.showZoom, zRender.pianoRollRenderer.contentMain64.hideZoom);
-            var gridMeasure256 = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, gridHeightTp(ratioThickness), zRender.pianoRollRenderer.contentMain256.showZoom, zRender.pianoRollRenderer.contentMain256.hideZoom);
             this.gridAnchor1.content.push(gridMeasure1);
             this.gridAnchor4.content.push(gridMeasure4);
             this.gridAnchor16.content.push(gridMeasure16);
-            this.gridAnchor64.content.push(gridMeasure64);
-            this.gridAnchor256.content.push(gridMeasure256);
             gridMeasure1.content.push({
                 x1: leftGridMargin + time * ratioDuration,
                 y1: topGridMargin,
@@ -5429,20 +5464,6 @@ var GridRenderer = (function () {
                 x2: leftGridMargin + time * ratioDuration,
                 y2: topGridMargin + gridHeightTp(ratioThickness),
                 css: 'barLine16'
-            });
-            gridMeasure64.content.push({
-                x1: leftGridMargin + time * ratioDuration,
-                y1: topGridMargin,
-                x2: leftGridMargin + time * ratioDuration,
-                y2: topGridMargin + gridHeightTp(ratioThickness),
-                css: 'barLine64'
-            });
-            gridMeasure256.content.push({
-                x1: leftGridMargin + time * ratioDuration,
-                y1: topGridMargin,
-                x2: leftGridMargin + time * ratioDuration,
-                y2: topGridMargin + gridHeightTp(ratioThickness),
-                css: 'barLine256'
             });
             for (var n = 1; n < 12; n++) {
                 gridMeasure4.content.push({
@@ -5514,8 +5535,6 @@ var GridRenderer = (function () {
         zrenderer.tileLevel.resetAnchor(this.gridAnchor1, this.gridLayerGroup);
         zrenderer.tileLevel.resetAnchor(this.gridAnchor4, this.gridLayerGroup);
         zrenderer.tileLevel.resetAnchor(this.gridAnchor16, this.gridLayerGroup);
-        zrenderer.tileLevel.resetAnchor(this.gridAnchor64, this.gridLayerGroup);
-        zrenderer.tileLevel.resetAnchor(this.gridAnchor256, this.gridLayerGroup);
         this.drawGrid(zrenderer, currentSchedule, zrenderer.ratioDuration, zrenderer.ratioThickness, meters);
     };
     return GridRenderer;
@@ -5959,7 +5978,7 @@ var FocusZoomMeasure = (function () {
             + gridHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness)
             + 0 * 12 * mngmnt.muzXBox.zrenderer.ratioThickness
             - this.currentPitch * mngmnt.muzXBox.zrenderer.ratioThickness;
-        mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'debug' });
+        mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'actionPoint' });
     };
     FocusZoomMeasure.prototype.spotUp = function (mngmnt) {
         if (this.currentPitch < ocataveCount * 12) {
@@ -6119,7 +6138,7 @@ var FocusZoomNote = (function () {
         }
     };
     FocusZoomNote.prototype.addSpot = function (mngmnt) {
-        mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'debug' });
+        mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'actionPoint' });
     };
     FocusZoomNote.prototype.spotUp = function (mngmnt) {
         console.log('note spotUp');
@@ -6156,11 +6175,11 @@ var FocusZoomSong = (function () {
         mngmnt.focusAnchor.content.push({
             x: 0,
             y: 0,
-            w: wholeWidthTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.ratioDuration),
-            h: wholeHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness),
+            w: 5,
+            h: 5,
             rx: 0,
             ry: 0,
-            css: 'debug'
+            css: 'actionPoint'
         });
     };
     FocusZoomSong.prototype.spotUp = function () {

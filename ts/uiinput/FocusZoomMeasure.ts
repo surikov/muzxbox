@@ -20,7 +20,7 @@ class FocusZoomMeasure implements FocusLevel {
 			+ gridHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness)
 			+ 0 * 12 * mngmnt.muzXBox.zrenderer.ratioThickness
 			- this.currentPitch * mngmnt.muzXBox.zrenderer.ratioThickness;
-		mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'debug' });
+		mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'actionPoint' });
 	}
 	spotUp(mngmnt: FocusManagement): boolean {
 		if (this.currentPitch < ocataveCount * 12) {

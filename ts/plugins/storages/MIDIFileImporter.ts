@@ -1417,7 +1417,8 @@ class MidiParser {
 				}
 			}
 			var track: ZvoogTrack = {
-				title: trackTictle
+				//title: trackTictle
+				title: '' + i
 				, voices: []
 				, filters: [{
 					filterPlugin: null
@@ -1464,6 +1465,7 @@ class MidiParser {
 								, title: drumTitles()[pinum]
 							};
 							track.voices.push(voice);
+							track.title = '' + pinum + ': Drums';
 							for (var mc = 0; mc < timeline.length; mc++) {
 								voice.measureChords.push({ chords: [] });
 							}
@@ -1530,6 +1532,7 @@ class MidiParser {
 					, title: instrumentTitles()[midisong.tracks[i].program]
 				};
 				track.voices.push(voice);
+				track.title = '' + midisong.tracks[i].program + ': ' + voice.title;
 				for (var mc = 0; mc < timeline.length; mc++) {
 					voice.measureChords.push({ chords: [] });
 				}
