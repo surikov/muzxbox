@@ -828,7 +828,7 @@ declare type MIDIEvent = {
 };
 declare class MidiParser {
     header: MIDIFileHeader;
-    tracks: MIDIFileTrack[];
+    paesedtracks: MIDIFileTrack[];
     instrumentNamesArray: string[];
     drumNamesArray: string[];
     EVENT_META: number;
@@ -950,7 +950,7 @@ declare type MIDISongData = {
         ms: number;
         sign: string;
     }[];
-    tracks: MIDISongTrack[];
+    miditracks: MIDISongTrack[];
     speedMode: number;
     lineMode: number;
 };
@@ -1096,6 +1096,8 @@ declare class PianoRollRenderer {
     findFocusedVoice(voices: ZvoogVoice[]): number;
     findFocusedParam(pars: ZvoogParameterData[]): number;
     drawSchedule(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
+    fillFar(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
+    fillBig(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
 }
 declare class GridRenderer {
     gridLayerGroup: SVGElement;
@@ -1182,7 +1184,16 @@ declare class FocusManagement {
     changeZoomTo(zoom: number): void;
     wrongActionWarning(): void;
 }
-declare class FocusOtherLevel implements FocusLevel {
+declare class FocusZoomFar implements FocusLevel {
+    isMatch(zoomLevel: number, zRender: ZRender): boolean;
+    addSpot(mngmnt: FocusManagement): void;
+    spotUp(mngmnt: FocusManagement): boolean;
+    spotDown(mngmnt: FocusManagement): boolean;
+    spotLeft(mngmnt: FocusManagement): boolean;
+    spotRight(mngmnt: FocusManagement): boolean;
+    moveSpotIntoView(mngmnt: FocusManagement): void;
+}
+declare class FocusZoomBig implements FocusLevel {
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
     spotUp(mngmnt: FocusManagement): boolean;

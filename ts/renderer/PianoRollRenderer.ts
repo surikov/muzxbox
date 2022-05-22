@@ -360,9 +360,11 @@ class PianoRollRenderer {
 			}
 			time = time + measureDuration;
 		}
+		this.fillFar(song, ratioDuration, ratioThickness);
+		this.fillBig(song, ratioDuration, ratioThickness);
+	}
+	fillFar(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
 		let chordCount = 0;
-		//let minCount = 12345678;
-		//let maxCount = 0;
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureChords = 0;
 			for (let tt = 0; tt < song.tracks.length; tt++) {
@@ -373,14 +375,11 @@ class PianoRollRenderer {
 				}
 			}
 			chordCount = chordCount + measureChords;
-			//if (minCount > measureChords) { minCount = measureChords; }
-			//if (maxCount < measureChords) { maxCount = measureChords; }
 		}
-		//console.log('average', chordCount / song.measures.length, minCount, maxCount);
-		time = 0;
+		let time = 0;
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-			let css = 'average3';
+			let css = 'average6';
 			let curChordCount = 0;
 			for (let tt = 0; tt < song.tracks.length; tt++) {
 				let track = song.tracks[tt];
@@ -389,26 +388,103 @@ class PianoRollRenderer {
 					curChordCount = curChordCount + voice.measureChords[mm].chords.length;
 				}
 			}
-			if (curChordCount < 0.99 * chordCount / song.measures.length) {
+			if (curChordCount < 0.5 * chordCount / song.measures.length) {
 				css = 'average1';
 			} else {
-				if (curChordCount < 1.66 * chordCount / song.measures.length) {
+				if (curChordCount < 0.8 * chordCount / song.measures.length) {
 					css = 'average2';
+				} else {
+					if (curChordCount < 1.1 * chordCount / song.measures.length) {
+						css = 'average3';
+					} else {
+						if (curChordCount < 1.4 * chordCount / song.measures.length) {
+							css = 'average4';
+						} else {
+							if (curChordCount < 1.7 * chordCount / song.measures.length) {
+								css = 'average5';
+							}
+						}
+					}
 				}
 			}
-			//console.log(mm, chordCount, curChordCount, css);
 			let measquare = {
 				x: leftGridMargin + time * ratioDuration
 				, y: topGridMargin
-				, w: ratioDuration * measureDuration - 5
+				, w: ratioDuration * measureDuration - 1
 				, h: 12 * ocataveCount * ratioThickness
 				, rx: 0
 				, ry: 0
 				, css: css
 			};
 			this.contentOther64.content.push(measquare);
-			this.contentOther256.content.push(measquare);
+			//this.contentOther256.content.push(measquare);
 			time = time + measureDuration;
+		}
+	}
+	fillBig(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
+		let nx = 16;
+		let chordCount = 0;
+		for (let mm = 0; mm < song.measures.length; mm++) {
+			let measureChords = 0;
+			for (let tt = 0; tt < song.tracks.length; tt++) {
+				let track = song.tracks[tt];
+				for (let vv = 0; vv < track.voices.length; vv++) {
+					let voice: ZvoogVoice = track.voices[vv];
+					measureChords = measureChords + voice.measureChords[mm].chords.length;
+				}
+			}
+			chordCount = chordCount + measureChords;
+		}
+		
+		let time = 0;
+		for (let m10 = 0; m10 < song.measures.length; m10 = m10 + nx) {
+			let curChordCount = 0;
+			let duration10 = 0;
+			let preTime=time;
+			for (let msi = 0; msi < nx && m10 + msi < song.measures.length; msi++) {
+				let measureDuration = meter2seconds(song.measures[m10 + msi].tempo, song.measures[m10 + msi].meter);
+				duration10 = duration10 + measureDuration;
+				for (let tt = 0; tt < song.tracks.length; tt++) {
+					let track = song.tracks[tt];
+					for (let vv = 0; vv < track.voices.length; vv++) {
+						let voice: ZvoogVoice = track.voices[vv];
+						curChordCount = curChordCount + voice.measureChords[m10 + msi].chords.length;
+					}
+				}
+				time = time + measureDuration;
+			}
+			let css = 'average6';
+			if (curChordCount < 0.5 * nx*chordCount / song.measures.length) {
+				css = 'average1';
+			} else {
+				if (curChordCount < 0.8 * nx*chordCount / song.measures.length) {
+					css = 'average2';
+				} else {
+					if (curChordCount < 1.1 * nx*chordCount / song.measures.length) {
+						css = 'average3';
+					} else {
+						if (curChordCount < 1.4 * nx*chordCount / song.measures.length) {
+							css = 'average4';
+						} else {
+							if (curChordCount < 1.7 * nx*chordCount / song.measures.length) {
+								css = 'average5';
+							}
+						}
+					}
+				}
+			}
+			//console.log(m10,preTime,duration10,(nx*chordCount/ song.measures.length),curChordCount);
+			let measquare = {
+				x: leftGridMargin + preTime * ratioDuration
+				, y: topGridMargin
+				, w: ratioDuration * duration10 - 5
+				, h: 12 * ocataveCount * ratioThickness
+				, rx: 0
+				, ry: 0
+				, css: css
+			};
+			//this.contentOther64.content.push(measquare);
+			this.contentOther256.content.push(measquare);
 		}
 	}
 }

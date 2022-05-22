@@ -16,13 +16,22 @@
 	--active_lite: #66002233;
 }
 .average1 {
-	fill: var(--decor_onion);
+	fill: #22669922;
 }
 .average2 {
-	fill: var(--decor_lite);
+	fill: #22669944;
 }
 .average3 {
-	fill: var(--decor_solid);
+	fill: #22669966;
+}
+.average4 {
+	fill: #22669988;
+}
+.average5 {
+	fill: #226699aa;
+}
+.average6 {
+	fill: #226699cc;
 }
 
 html {

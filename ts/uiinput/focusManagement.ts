@@ -17,7 +17,13 @@ class FocusManagement {
 	focusLayer: TileLayerDefinition;
 	levelOfDetails: number = 0;
 	muzXBox: MuzXBox;
-	focusLevels: FocusLevel[] = [new FocusZoomSong(), new FocusZoomMeasure(), new FocusZoomNote(), new FocusOtherLevel()];
+	focusLevels: FocusLevel[] = [
+		new FocusZoomSong()
+		, new FocusZoomMeasure()
+		, new FocusZoomNote()
+		, new FocusZoomFar()
+		, new FocusZoomBig()
+	];
 	attachFocus(bx: MuzXBox, zRender: ZRender) {
 		console.log('attachFocus');
 		this.muzXBox = bx;

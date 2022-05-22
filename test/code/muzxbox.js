@@ -3107,16 +3107,17 @@ var MidiParser = (function () {
         this.parseTracks(arrayBuffer);
     }
     MidiParser.prototype.parseTracks = function (arrayBuffer) {
+        console.log('start parseTracks');
         var curIndex = this.header.HEADER_LENGTH;
         var trackCount = this.header.trackCount;
-        this.tracks = [];
+        this.paesedtracks = [];
         for (var i = 0; i < trackCount; i++) {
             var track = new MIDIFileTrack(arrayBuffer, curIndex);
-            this.tracks.push(track);
+            this.paesedtracks.push(track);
             curIndex = curIndex + track.trackLength + 8;
         }
-        for (var i = 0; i < this.tracks.length; i++) {
-            this.parseTrackEvents(this.tracks[i]);
+        for (var i = 0; i < this.paesedtracks.length; i++) {
+            this.parseTrackEvents(this.paesedtracks[i]);
         }
         this.parseNotes();
         this.simplify();
@@ -3231,8 +3232,8 @@ var MidiParser = (function () {
         return arr;
     };
     MidiParser.prototype.simplify = function () {
-        for (var t = 0; t < this.tracks.length; t++) {
-            var track = this.tracks[t];
+        for (var t = 0; t < this.paesedtracks.length; t++) {
+            var track = this.paesedtracks[t];
             for (var ch = 0; ch < track.chords.length; ch++) {
                 var chord = track.chords[ch];
                 for (var n = 0; n < chord.notes.length; n++) {
@@ -3269,8 +3270,8 @@ var MidiParser = (function () {
         this.header.changes = [];
         var tickResolution = this.header.get0TickResolution();
         this.header.changes.push({ track: -1, ms: -1, resolution: tickResolution, bpm: 120 });
-        for (var t = 0; t < this.tracks.length; t++) {
-            var track = this.tracks[t];
+        for (var t = 0; t < this.paesedtracks.length; t++) {
+            var track = this.paesedtracks[t];
             var playTimeTicks = 0;
             for (var e = 0; e < track.trackevents.length; e++) {
                 var evnt = track.trackevents[e];
@@ -3314,8 +3315,8 @@ var MidiParser = (function () {
     };
     MidiParser.prototype.parseNotes = function () {
         var changes = this.dumpResolutionChanges();
-        for (var t = 0; t < this.tracks.length; t++) {
-            var track = this.tracks[t];
+        for (var t = 0; t < this.paesedtracks.length; t++) {
+            var track = this.paesedtracks[t];
             this.parseTicks2time(track);
             for (var e = 0; e < track.trackevents.length; e++) {
                 var evnt = track.trackevents[e];
@@ -3351,6 +3352,7 @@ var MidiParser = (function () {
                         else {
                             if (evnt.subtype == this.EVENT_MIDI_PROGRAM_CHANGE) {
                                 if (evnt.param1 >= 0 && evnt.param1 <= 127) {
+                                    console.log('EVENT_MIDI_PROGRAM_CHANGE', evnt.param1, evnt.param2, evnt);
                                     track.program = evnt.param1 ? evnt.param1 : 0;
                                 }
                             }
@@ -3629,7 +3631,44 @@ var MidiParser = (function () {
         return pars;
     };
     MidiParser.prototype.convert = function () {
+        console.log('MidiParser', this);
         var midisong = this.dump();
+        console.log('midisong', midisong);
+        var minIns = 123456;
+        var maxIns = -1;
+        var minDr = 123456;
+        var maxDr = -1;
+        for (var tt_1 = 0; tt_1 < midisong.miditracks.length; tt_1++) {
+            var onetrack = midisong.miditracks[tt_1];
+            for (var ch_1 = 0; ch_1 < onetrack.songchords.length; ch_1++) {
+                var onechord_1 = onetrack.songchords[ch_1];
+                for (var nn_1 = 0; nn_1 < onechord_1.notes.length; nn_1++) {
+                    var pp = onechord_1.notes[nn_1].points[0].pitch;
+                    if (onechord_1.channel == 9) {
+                        if (maxDr < pp) {
+                            maxDr = pp;
+                        }
+                        else {
+                            if (minDr > pp) {
+                                minDr = pp;
+                            }
+                        }
+                    }
+                    else {
+                        if (maxIns < pp) {
+                            maxIns = pp;
+                        }
+                        else {
+                            if (minIns > pp) {
+                                minIns = pp;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        console.log('ins', minIns, maxIns);
+        console.log('dr', minDr, maxDr);
         var count = 4;
         var division = 4;
         var sign = 'C';
@@ -3720,17 +3759,17 @@ var MidiParser = (function () {
                 tempo: Math.round(timeline[i].bpm / 5) * 5
             });
         }
-        for (var i = 0; i < midisong.tracks.length; i++) {
+        for (var i = 0; i < midisong.miditracks.length; i++) {
             var trackTictle = '';
-            if (midisong.tracks[i].title) {
-                trackTictle = midisong.tracks[i].title;
-                if (midisong.tracks[i].instrument) {
-                    trackTictle = midisong.tracks[i].title + ': ' + midisong.tracks[i].instrument;
+            if (midisong.miditracks[i].title) {
+                trackTictle = midisong.miditracks[i].title;
+                if (midisong.miditracks[i].instrument) {
+                    trackTictle = midisong.miditracks[i].title + ': ' + midisong.miditracks[i].instrument;
                 }
             }
             else {
-                if (midisong.tracks[i].instrument) {
-                    trackTictle = midisong.tracks[i].instrument;
+                if (midisong.miditracks[i].instrument) {
+                    trackTictle = midisong.miditracks[i].instrument;
                 }
                 else {
                     trackTictle = 'track ' + i;
@@ -3748,8 +3787,8 @@ var MidiParser = (function () {
             };
             schedule.tracks.push(track);
             var firstChannelNum = 0;
-            for (var ch = 0; ch < midisong.tracks[i].songchords.length; ch++) {
-                firstChannelNum = midisong.tracks[i].songchords[ch].channel;
+            for (var ch = 0; ch < midisong.miditracks[i].songchords.length; ch++) {
+                firstChannelNum = midisong.miditracks[i].songchords[ch].channel;
                 break;
             }
             if (firstChannelNum == 9) {
@@ -3760,9 +3799,9 @@ var MidiParser = (function () {
                     initial: ""
                 });
                 var drumNums = [];
-                for (var ch = 0; ch < midisong.tracks[i].songchords.length; ch++) {
-                    for (var nn = 0; nn < midisong.tracks[i].songchords[ch].notes.length; nn++) {
-                        var pinum = midisong.tracks[i].songchords[ch].notes[nn].points[0].pitch;
+                for (var ch = 0; ch < midisong.miditracks[i].songchords.length; ch++) {
+                    for (var nn = 0; nn < midisong.miditracks[i].songchords[ch].notes.length; nn++) {
+                        var pinum = midisong.miditracks[i].songchords[ch].notes[nn].points[0].pitch;
                         if (drumNums.indexOf(pinum) < 0) {
                             drumNums.push(pinum);
                             var voice = {
@@ -3786,8 +3825,8 @@ var MidiParser = (function () {
                             for (var mc = 0; mc < timeline.length; mc++) {
                                 voice.measureChords.push({ chords: [] });
                             }
-                            for (var chn = 0; chn < midisong.tracks[i].songchords.length; chn++) {
-                                var midichord = midisong.tracks[i].songchords[chn];
+                            for (var chn = 0; chn < midisong.miditracks[i].songchords.length; chn++) {
+                                var midichord = midisong.miditracks[i].songchords[chn];
                                 for (var tc = 0; tc < timeline.length; tc++) {
                                     if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
                                         var timelineMeasure = timeline[tc - 1];
@@ -3805,9 +3844,13 @@ var MidiParser = (function () {
                                             if (mino.points[0].pitch == pinum) {
                                                 for (var px = 0; px < mino.points.length; px++) {
                                                     var mipoint = mino.points[px];
+                                                    var midiDrumIndex = mipoint.pitch;
+                                                    if (mipoint.pitch < 35 || mipoint.pitch > 81) {
+                                                        midiDrumIndex = 42;
+                                                    }
                                                     env.pitches.push({
                                                         duration: DUU(seconds2meter32(mipoint.durationms / 1000, timelineMeasure.bpm)).simplify(),
-                                                        pitch: mipoint.pitch - midiDrumPitchShift
+                                                        pitch: midiDrumIndex - midiDrumPitchShift
                                                     });
                                                 }
                                                 onechord.envelopes.push(env);
@@ -3831,7 +3874,7 @@ var MidiParser = (function () {
                         performerPlugin: null,
                         parameters: this.parametersDefs(wafinstrument),
                         kind: 'wafinstrument',
-                        initial: '' + midisong.tracks[i].program
+                        initial: '' + midisong.miditracks[i].program
                     },
                     filters: [{
                             filterPlugin: null,
@@ -3844,15 +3887,15 @@ var MidiParser = (function () {
                             kind: "equalizer",
                             initial: ""
                         }],
-                    title: instrumentTitles()[midisong.tracks[i].program]
+                    title: instrumentTitles()[midisong.miditracks[i].program]
                 };
                 track.voices.push(voice);
-                track.title = '' + midisong.tracks[i].program + ': ' + voice.title;
+                track.title = '' + midisong.miditracks[i].program + ': ' + voice.title;
                 for (var mc = 0; mc < timeline.length; mc++) {
                     voice.measureChords.push({ chords: [] });
                 }
-                for (var chn = 0; chn < midisong.tracks[i].songchords.length; chn++) {
-                    var midichord = midisong.tracks[i].songchords[chn];
+                for (var chn = 0; chn < midisong.miditracks[i].songchords.length; chn++) {
+                    var midichord = midisong.miditracks[i].songchords[chn];
                     for (var tc = 0; tc < timeline.length; tc++) {
                         if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
                             var timelineMeasure = timeline[tc - 1];
@@ -3898,12 +3941,12 @@ var MidiParser = (function () {
             meter: { count: this.header.meterCount, division: this.header.meterDivision },
             meters: this.header.meters,
             signs: this.header.signs,
-            tracks: [],
+            miditracks: [],
             speedMode: 0,
             lineMode: 0
         };
-        for (var i = 0; i < this.tracks.length; i++) {
-            var miditrack = this.tracks[i];
+        for (var i = 0; i < this.paesedtracks.length; i++) {
+            var miditrack = this.paesedtracks[i];
             var tr = {
                 order: i,
                 title: miditrack.title ? miditrack.title : '',
@@ -3932,7 +3975,7 @@ var MidiParser = (function () {
                 }
             }
             if (tr.songchords.length > 0) {
-                a.tracks.push(tr);
+                a.miditracks.push(tr);
                 if (a.duration < maxWhen) {
                     a.duration = 54321 + maxWhen;
                 }
@@ -4557,9 +4600,11 @@ var ZMainMenu = (function () {
         });
         this.menuRoot.folders.push(this.songFolder);
         this.menuRoot.folders.push({
-            path: "Rhythm patterns", icon: "", folders: [], items: [
+            path: "Rhythm patterns", icon: "", folders: [],
+            items: [
                 {
-                    label: 'plain 1/16', autoclose: true, icon: '', action: function () {
+                    label: 'plain 1/16', autoclose: true, icon: '',
+                    action: function () {
                         var rr = [
                             { count: 1, division: 16 }, { count: 1, division: 16 },
                             { count: 1, division: 16 }, { count: 1, division: 16 },
@@ -4574,7 +4619,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/8', autoclose: true, icon: '', action: function () {
+                    label: 'plain 1/8', autoclose: true, icon: '',
+                    action: function () {
                         console.log('plain 1/8', default8rhytym);
                         var me = window['MZXB'];
                         if (me) {
@@ -4583,7 +4629,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'swing 1/8', autoclose: true, icon: '', action: function () {
+                    label: 'swing 1/8', autoclose: true, icon: '',
+                    action: function () {
                         var rr = [
                             { count: 5, division: 32 }, { count: 3, division: 32 },
                             { count: 5, division: 32 }, { count: 3, division: 32 }
@@ -4598,9 +4645,11 @@ var ZMainMenu = (function () {
             ], afterOpen: function () { }
         });
         this.menuRoot.folders.push({
-            path: "Screen size", icon: "", folders: [], items: [
+            path: "Screen size", icon: "", folders: [],
+            items: [
                 {
-                    label: 'normal', autoclose: true, icon: '', action: function () {
+                    label: 'normal', autoclose: true, icon: '',
+                    action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutNormal();
@@ -4608,7 +4657,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'big', autoclose: true, icon: '', action: function () {
+                    label: 'big', autoclose: true, icon: '',
+                    action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutBig();
@@ -5357,6 +5407,10 @@ var PianoRollRenderer = (function () {
             }
             time = time + measureDuration;
         }
+        this.fillFar(song, ratioDuration, ratioThickness);
+        this.fillBig(song, ratioDuration, ratioThickness);
+    };
+    PianoRollRenderer.prototype.fillFar = function (song, ratioDuration, ratioThickness) {
         var chordCount = 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureChords = 0;
@@ -5369,10 +5423,10 @@ var PianoRollRenderer = (function () {
             }
             chordCount = chordCount + measureChords;
         }
-        time = 0;
+        var time = 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-            var css = 'average3';
+            var css = 'average6';
             var curChordCount = 0;
             for (var tt = 0; tt < song.tracks.length; tt++) {
                 var track = song.tracks[tt];
@@ -5381,26 +5435,107 @@ var PianoRollRenderer = (function () {
                     curChordCount = curChordCount + voice.measureChords[mm].chords.length;
                 }
             }
-            if (curChordCount < 0.99 * chordCount / song.measures.length) {
+            if (curChordCount < 0.5 * chordCount / song.measures.length) {
                 css = 'average1';
             }
             else {
-                if (curChordCount < 1.66 * chordCount / song.measures.length) {
+                if (curChordCount < 0.8 * chordCount / song.measures.length) {
                     css = 'average2';
+                }
+                else {
+                    if (curChordCount < 1.1 * chordCount / song.measures.length) {
+                        css = 'average3';
+                    }
+                    else {
+                        if (curChordCount < 1.4 * chordCount / song.measures.length) {
+                            css = 'average4';
+                        }
+                        else {
+                            if (curChordCount < 1.7 * chordCount / song.measures.length) {
+                                css = 'average5';
+                            }
+                        }
+                    }
                 }
             }
             var measquare = {
                 x: leftGridMargin + time * ratioDuration,
                 y: topGridMargin,
-                w: ratioDuration * measureDuration - 5,
+                w: ratioDuration * measureDuration - 1,
                 h: 12 * ocataveCount * ratioThickness,
                 rx: 0,
                 ry: 0,
                 css: css
             };
             this.contentOther64.content.push(measquare);
-            this.contentOther256.content.push(measquare);
             time = time + measureDuration;
+        }
+    };
+    PianoRollRenderer.prototype.fillBig = function (song, ratioDuration, ratioThickness) {
+        var nx = 16;
+        var chordCount = 0;
+        for (var mm = 0; mm < song.measures.length; mm++) {
+            var measureChords = 0;
+            for (var tt = 0; tt < song.tracks.length; tt++) {
+                var track = song.tracks[tt];
+                for (var vv = 0; vv < track.voices.length; vv++) {
+                    var voice = track.voices[vv];
+                    measureChords = measureChords + voice.measureChords[mm].chords.length;
+                }
+            }
+            chordCount = chordCount + measureChords;
+        }
+        var time = 0;
+        for (var m10 = 0; m10 < song.measures.length; m10 = m10 + nx) {
+            var curChordCount = 0;
+            var duration10 = 0;
+            var preTime = time;
+            for (var msi = 0; msi < nx && m10 + msi < song.measures.length; msi++) {
+                var measureDuration = meter2seconds(song.measures[m10 + msi].tempo, song.measures[m10 + msi].meter);
+                duration10 = duration10 + measureDuration;
+                for (var tt = 0; tt < song.tracks.length; tt++) {
+                    var track = song.tracks[tt];
+                    for (var vv = 0; vv < track.voices.length; vv++) {
+                        var voice = track.voices[vv];
+                        curChordCount = curChordCount + voice.measureChords[m10 + msi].chords.length;
+                    }
+                }
+                time = time + measureDuration;
+            }
+            var css = 'average6';
+            if (curChordCount < 0.5 * nx * chordCount / song.measures.length) {
+                css = 'average1';
+            }
+            else {
+                if (curChordCount < 0.8 * nx * chordCount / song.measures.length) {
+                    css = 'average2';
+                }
+                else {
+                    if (curChordCount < 1.1 * nx * chordCount / song.measures.length) {
+                        css = 'average3';
+                    }
+                    else {
+                        if (curChordCount < 1.4 * nx * chordCount / song.measures.length) {
+                            css = 'average4';
+                        }
+                        else {
+                            if (curChordCount < 1.7 * nx * chordCount / song.measures.length) {
+                                css = 'average5';
+                            }
+                        }
+                    }
+                }
+            }
+            var measquare = {
+                x: leftGridMargin + preTime * ratioDuration,
+                y: topGridMargin,
+                w: ratioDuration * duration10 - 5,
+                h: 12 * ocataveCount * ratioThickness,
+                rx: 0,
+                ry: 0,
+                css: css
+            };
+            this.contentOther256.content.push(measquare);
         }
     };
     return PianoRollRenderer;
@@ -5825,7 +5960,13 @@ var LayerSelector = (function () {
 var FocusManagement = (function () {
     function FocusManagement() {
         this.levelOfDetails = 0;
-        this.focusLevels = [new FocusZoomSong(), new FocusZoomMeasure(), new FocusZoomNote(), new FocusOtherLevel()];
+        this.focusLevels = [
+            new FocusZoomSong(),
+            new FocusZoomMeasure(),
+            new FocusZoomNote(),
+            new FocusZoomFar(),
+            new FocusZoomBig()
+        ];
     }
     FocusManagement.prototype.attachFocus = function (bx, zRender) {
         console.log('attachFocus');
@@ -5926,33 +6067,71 @@ var FocusManagement = (function () {
     };
     return FocusManagement;
 }());
-var FocusOtherLevel = (function () {
-    function FocusOtherLevel() {
+var FocusZoomFar = (function () {
+    function FocusZoomFar() {
     }
-    FocusOtherLevel.prototype.isMatch = function (zoomLevel, zRender) {
-        return true;
+    FocusZoomFar.prototype.isMatch = function (zoomLevel, zRender) {
+        if (zoomLevel >= zRender.zoomSong && zoomLevel < zRender.zoomFar) {
+            return true;
+        }
+        else {
+            return false;
+        }
     };
-    FocusOtherLevel.prototype.addSpot = function (mngmnt) {
+    FocusZoomFar.prototype.addSpot = function (mngmnt) {
     };
-    FocusOtherLevel.prototype.spotUp = function (mngmnt) {
-        console.log('other spotUp');
+    FocusZoomFar.prototype.spotUp = function (mngmnt) {
+        console.log('FocusZoomFar spotUp');
         return false;
     };
-    FocusOtherLevel.prototype.spotDown = function (mngmnt) {
-        console.log('other spotDown');
+    FocusZoomFar.prototype.spotDown = function (mngmnt) {
+        console.log('FocusZoomFar spotDown');
         return false;
     };
-    FocusOtherLevel.prototype.spotLeft = function (mngmnt) {
-        console.log('other spotLeft');
+    FocusZoomFar.prototype.spotLeft = function (mngmnt) {
+        console.log('FocusZoomFar spotLeft');
         return false;
     };
-    FocusOtherLevel.prototype.spotRight = function (mngmnt) {
-        console.log('other spotRight');
+    FocusZoomFar.prototype.spotRight = function (mngmnt) {
+        console.log('FocusZoomFar spotRight');
         return false;
     };
-    FocusOtherLevel.prototype.moveSpotIntoView = function (mngmnt) {
+    FocusZoomFar.prototype.moveSpotIntoView = function (mngmnt) {
     };
-    return FocusOtherLevel;
+    return FocusZoomFar;
+}());
+var FocusZoomBig = (function () {
+    function FocusZoomBig() {
+    }
+    FocusZoomBig.prototype.isMatch = function (zoomLevel, zRender) {
+        if (zoomLevel >= zRender.zoomFar) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    FocusZoomBig.prototype.addSpot = function (mngmnt) {
+    };
+    FocusZoomBig.prototype.spotUp = function (mngmnt) {
+        console.log('FocusZoomBig spotUp');
+        return false;
+    };
+    FocusZoomBig.prototype.spotDown = function (mngmnt) {
+        console.log('FocusZoomBig spotDown');
+        return false;
+    };
+    FocusZoomBig.prototype.spotLeft = function (mngmnt) {
+        console.log('FocusZoomBig spotLeft');
+        return false;
+    };
+    FocusZoomBig.prototype.spotRight = function (mngmnt) {
+        console.log('FocusZoomBig spotRight');
+        return false;
+    };
+    FocusZoomBig.prototype.moveSpotIntoView = function (mngmnt) {
+    };
+    return FocusZoomBig;
 }());
 var FocusZoomMeasure = (function () {
     function FocusZoomMeasure() {
