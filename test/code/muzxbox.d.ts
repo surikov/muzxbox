@@ -787,7 +787,10 @@ declare class MIDIFileTrack {
     trackevents: MIDIEvent[];
     title: string;
     instrument: string;
-    program: number;
+    programChannel: {
+        program: number;
+        channel: number;
+    }[];
     volumes: {
         ms: number;
         value: number;
@@ -828,7 +831,7 @@ declare type MIDIEvent = {
 };
 declare class MidiParser {
     header: MIDIFileHeader;
-    paesedtracks: MIDIFileTrack[];
+    parsedTracks: MIDIFileTrack[];
     instrumentNamesArray: string[];
     drumNamesArray: string[];
     EVENT_META: number;
@@ -889,6 +892,15 @@ declare class MidiParser {
     };
     parametersDefs(plugin: ZvoogPlugin): ZvoogParameterData[];
     convert(): ZvoogSchedule;
+    findOrCreateTrack(trackNum: number, channelNum: number, trackChannel: {
+        trackNum: number;
+        channelNum: number;
+        track: MIDISongTrack;
+    }[]): {
+        trackNum: number;
+        channelNum: number;
+        track: MIDISongTrack;
+    };
     dump(): MIDISongData;
     instrumentTitles(): string[];
     drumTitles(): string[];
@@ -1027,7 +1039,7 @@ declare let leftGridMargin: number;
 declare let rightGridMargin: number;
 declare let topGridMargin: number;
 declare let bottomGridMargin: number;
-declare let ocataveCount: number;
+declare let octaveCount: number;
 declare let us: ZUserSetting;
 declare class MuzXBox {
     currentSchedule: ZvoogSchedule;

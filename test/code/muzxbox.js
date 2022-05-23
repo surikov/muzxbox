@@ -2536,10 +2536,10 @@ function wholeWidthTp(song, ratioDuration) {
     return leftGridMargin + songDuration * ratioDuration + rightGridMargin;
 }
 function gridHeightTp(ratioThickness) {
-    return (ocataveCount * 12) * ratioThickness;
+    return (octaveCount * 12) * ratioThickness;
 }
 function wholeHeightTp(ratioThickness) {
-    return topGridMargin + (ocataveCount * 12) * ratioThickness + bottomGridMargin;
+    return topGridMargin + (octaveCount * 12) * ratioThickness + bottomGridMargin;
 }
 var cachedPerformerStubPlugins = [];
 function takeZvoogPerformerStub() {
@@ -3067,6 +3067,7 @@ var MIDIFileTrack = (function () {
         this.trackContent = new DataView(this.datas.buffer, this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
         this.trackevents = [];
         this.volumes = [];
+        this.programChannel = [];
     }
     return MIDIFileTrack;
 }());
@@ -3110,14 +3111,14 @@ var MidiParser = (function () {
         console.log('start parseTracks');
         var curIndex = this.header.HEADER_LENGTH;
         var trackCount = this.header.trackCount;
-        this.paesedtracks = [];
+        this.parsedTracks = [];
         for (var i = 0; i < trackCount; i++) {
             var track = new MIDIFileTrack(arrayBuffer, curIndex);
-            this.paesedtracks.push(track);
+            this.parsedTracks.push(track);
             curIndex = curIndex + track.trackLength + 8;
         }
-        for (var i = 0; i < this.paesedtracks.length; i++) {
-            this.parseTrackEvents(this.paesedtracks[i]);
+        for (var i = 0; i < this.parsedTracks.length; i++) {
+            this.parseTrackEvents(this.parsedTracks[i]);
         }
         this.parseNotes();
         this.simplify();
@@ -3232,8 +3233,8 @@ var MidiParser = (function () {
         return arr;
     };
     MidiParser.prototype.simplify = function () {
-        for (var t = 0; t < this.paesedtracks.length; t++) {
-            var track = this.paesedtracks[t];
+        for (var t = 0; t < this.parsedTracks.length; t++) {
+            var track = this.parsedTracks[t];
             for (var ch = 0; ch < track.chords.length; ch++) {
                 var chord = track.chords[ch];
                 for (var n = 0; n < chord.notes.length; n++) {
@@ -3270,8 +3271,8 @@ var MidiParser = (function () {
         this.header.changes = [];
         var tickResolution = this.header.get0TickResolution();
         this.header.changes.push({ track: -1, ms: -1, resolution: tickResolution, bpm: 120 });
-        for (var t = 0; t < this.paesedtracks.length; t++) {
-            var track = this.paesedtracks[t];
+        for (var t = 0; t < this.parsedTracks.length; t++) {
+            var track = this.parsedTracks[t];
             var playTimeTicks = 0;
             for (var e = 0; e < track.trackevents.length; e++) {
                 var evnt = track.trackevents[e];
@@ -3314,12 +3315,12 @@ var MidiParser = (function () {
         }
     };
     MidiParser.prototype.parseNotes = function () {
-        var changes = this.dumpResolutionChanges();
-        for (var t = 0; t < this.paesedtracks.length; t++) {
-            var track = this.paesedtracks[t];
-            this.parseTicks2time(track);
-            for (var e = 0; e < track.trackevents.length; e++) {
-                var evnt = track.trackevents[e];
+        this.dumpResolutionChanges();
+        for (var t = 0; t < this.parsedTracks.length; t++) {
+            var singleParsedTrack = this.parsedTracks[t];
+            this.parseTicks2time(singleParsedTrack);
+            for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
+                var evnt = singleParsedTrack.trackevents[e];
                 if (evnt.basetype == this.EVENT_MIDI) {
                     evnt.param1 = evnt.param1 ? evnt.param1 : 0;
                     if (evnt.subtype == this.EVENT_MIDI_NOTE_ON) {
@@ -3328,7 +3329,7 @@ var MidiParser = (function () {
                             var when = 0;
                             if (evnt.playTimeMs)
                                 when = evnt.playTimeMs;
-                            this.takeOpenedNote(pitch, when, track, evnt.midiChannel ? evnt.midiChannel : 0);
+                            this.takeOpenedNote(pitch, when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
                         }
                     }
                     else {
@@ -3338,7 +3339,7 @@ var MidiParser = (function () {
                                 var when = 0;
                                 if (evnt.playTimeMs)
                                     when = evnt.playTimeMs;
-                                var chpi = this.findOpenedNoteBefore(pitch, when, track, evnt.midiChannel ? evnt.midiChannel : 0);
+                                var chpi = this.findOpenedNoteBefore(pitch, when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
                                 if (chpi) {
                                     var duration = 0;
                                     for (var i = 0; i < chpi.note.points.length - 1; i++) {
@@ -3352,8 +3353,10 @@ var MidiParser = (function () {
                         else {
                             if (evnt.subtype == this.EVENT_MIDI_PROGRAM_CHANGE) {
                                 if (evnt.param1 >= 0 && evnt.param1 <= 127) {
-                                    console.log('EVENT_MIDI_PROGRAM_CHANGE', evnt.param1, evnt.param2, evnt);
-                                    track.program = evnt.param1 ? evnt.param1 : 0;
+                                    singleParsedTrack.programChannel.push({
+                                        program: evnt.param1 ? evnt.param1 : 0,
+                                        channel: evnt.midiChannel ? evnt.midiChannel : 0
+                                    });
                                 }
                             }
                             else {
@@ -3361,7 +3364,7 @@ var MidiParser = (function () {
                                     var pitch = evnt.param1 ? evnt.param1 : 0;
                                     var slide = ((evnt.param2 ? evnt.param2 : 0) - 64) / 6;
                                     var when = evnt.playTimeMs ? evnt.playTimeMs : 0;
-                                    var chord = this.findChordBefore(when, track, evnt.midiChannel ? evnt.midiChannel : 0);
+                                    var chord = this.findChordBefore(when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
                                     if (chord) {
                                         for (var i = 0; i < chord.notes.length; i++) {
                                             var note = chord.notes[i];
@@ -3384,7 +3387,7 @@ var MidiParser = (function () {
                                 else {
                                     if (evnt.subtype == this.EVENT_MIDI_CONTROLLER && evnt.param1 == 7) {
                                         var v = evnt.param2 ? evnt.param2 / 127 : 0;
-                                        track.volumes.push({ ms: evnt.playTimeMs, value: v });
+                                        singleParsedTrack.volumes.push({ ms: evnt.playTimeMs, value: v });
                                     }
                                     else {
                                     }
@@ -3401,10 +3404,10 @@ var MidiParser = (function () {
                         this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text ? evnt.text : "?" });
                     }
                     if (evnt.subtype == this.EVENT_META_TRACK_NAME) {
-                        track.title = this.toText(evnt.data ? evnt.data : []);
+                        singleParsedTrack.title = this.toText(evnt.data ? evnt.data : []);
                     }
                     if (evnt.subtype == this.EVENT_META_INSTRUMENT_NAME) {
-                        track.instrument = this.toText(evnt.data ? evnt.data : []);
+                        singleParsedTrack.instrument = this.toText(evnt.data ? evnt.data : []);
                     }
                     if (evnt.subtype == this.EVENT_META_LYRICS) {
                         this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text ? evnt.text : "?" });
@@ -3631,7 +3634,6 @@ var MidiParser = (function () {
         return pars;
     };
     MidiParser.prototype.convert = function () {
-        console.log('MidiParser', this);
         var midisong = this.dump();
         console.log('midisong', midisong);
         var minIns = 123456;
@@ -3929,6 +3931,25 @@ var MidiParser = (function () {
         console.log(schedule);
         return schedule;
     };
+    MidiParser.prototype.findOrCreateTrack = function (trackNum, channelNum, trackChannel) {
+        for (var i = 0; i < trackChannel.length; i++) {
+            if (trackChannel[i].trackNum == trackNum && trackChannel[i].channelNum == channelNum) {
+                return trackChannel[i];
+            }
+        }
+        var it = {
+            trackNum: trackNum, channelNum: channelNum, track: {
+                order: 0,
+                title: 'unknown',
+                instrument: '0',
+                volumes: [],
+                program: 0,
+                songchords: []
+            }
+        };
+        trackChannel.push(it);
+        return it;
+    };
     MidiParser.prototype.dump = function () {
         var a = {
             parser: '1.01',
@@ -3945,24 +3966,22 @@ var MidiParser = (function () {
             speedMode: 0,
             lineMode: 0
         };
-        for (var i = 0; i < this.paesedtracks.length; i++) {
-            var miditrack = this.paesedtracks[i];
-            var tr = {
-                order: i,
-                title: miditrack.title ? miditrack.title : '',
-                instrument: miditrack.instrument ? miditrack.instrument : '',
-                volumes: miditrack.volumes,
-                program: miditrack.program ? miditrack.program : 0,
-                songchords: []
-            };
-            var maxWhen = 0;
+        var trackChannel = [];
+        for (var i_1 = 0; i_1 < this.parsedTracks.length; i_1++) {
+            var parsedtrack = this.parsedTracks[i_1];
+            for (var k = 0; k < parsedtrack.programChannel.length; k++) {
+                this.findOrCreateTrack(i_1, parsedtrack.programChannel[k].channel, trackChannel);
+            }
+        }
+        var maxWhen = 0;
+        for (var i = 0; i < this.parsedTracks.length; i++) {
+            var miditrack = this.parsedTracks[i];
             for (var ch = 0; ch < miditrack.chords.length; ch++) {
                 var midichord = miditrack.chords[ch];
                 var newchord = { when: midichord.when, notes: [], channel: midichord.channel };
                 if (maxWhen < midichord.when) {
                     maxWhen = midichord.when;
                 }
-                tr.songchords.push(newchord);
                 for (var n = 0; n < midichord.notes.length; n++) {
                     var midinote = midichord.notes[n];
                     var newnote = { points: [] };
@@ -3973,11 +3992,31 @@ var MidiParser = (function () {
                         newnote.points.push(newpoint);
                     }
                 }
+                var chanTrack = this.findOrCreateTrack(i, newchord.channel, trackChannel);
+                chanTrack.track.songchords.push(newchord);
             }
-            if (tr.songchords.length > 0) {
-                a.miditracks.push(tr);
+            for (var i_2 = 0; i_2 < trackChannel.length; i_2++) {
+                if (trackChannel[i_2].trackNum == i_2) {
+                    trackChannel[i_2].track.title = miditrack.title ? miditrack.title : '';
+                    trackChannel[i_2].track.volumes = miditrack.volumes;
+                    trackChannel[i_2].track.instrument = miditrack.instrument ? miditrack.instrument : '';
+                }
+            }
+        }
+        for (var tt = 0; tt < trackChannel.length; tt++) {
+            var trackChan = trackChannel[tt];
+            if (trackChan.track.songchords.length > 0) {
+                a.miditracks.push(trackChannel[tt].track);
                 if (a.duration < maxWhen) {
                     a.duration = 54321 + maxWhen;
+                }
+                for (var i_3 = 0; i_3 < this.parsedTracks.length; i_3++) {
+                    var miditrack_1 = this.parsedTracks[i_3];
+                    for (var kk = 0; kk < miditrack_1.programChannel.length; kk++) {
+                        if (miditrack_1.programChannel[kk].channel == trackChan.channelNum) {
+                            trackChan.track.program = miditrack_1.programChannel[kk].program;
+                        }
+                    }
                 }
             }
         }
@@ -4600,11 +4639,9 @@ var ZMainMenu = (function () {
         });
         this.menuRoot.folders.push(this.songFolder);
         this.menuRoot.folders.push({
-            path: "Rhythm patterns", icon: "", folders: [],
-            items: [
+            path: "Rhythm patterns", icon: "", folders: [], items: [
                 {
-                    label: 'plain 1/16', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/16', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 1, division: 16 }, { count: 1, division: 16 },
                             { count: 1, division: 16 }, { count: 1, division: 16 },
@@ -4619,8 +4656,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/8', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/8', autoclose: true, icon: '', action: function () {
                         console.log('plain 1/8', default8rhytym);
                         var me = window['MZXB'];
                         if (me) {
@@ -4629,8 +4665,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'swing 1/8', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'swing 1/8', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 5, division: 32 }, { count: 3, division: 32 },
                             { count: 5, division: 32 }, { count: 3, division: 32 }
@@ -4645,11 +4680,9 @@ var ZMainMenu = (function () {
             ], afterOpen: function () { }
         });
         this.menuRoot.folders.push({
-            path: "Screen size", icon: "", folders: [],
-            items: [
+            path: "Screen size", icon: "", folders: [], items: [
                 {
-                    label: 'normal', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'normal', autoclose: true, icon: '', action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutNormal();
@@ -4657,8 +4690,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'big', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'big', autoclose: true, icon: '', action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutBig();
@@ -4788,12 +4820,12 @@ var SingleMenuPanel = (function () {
 }());
 console.log('MuzXBox v1.02.001');
 var midiDrumPitchShift = 35;
-var midiInstrumentPitchShift = 24;
+var midiInstrumentPitchShift = 12;
 var leftGridMargin = 20;
 var rightGridMargin = 1;
 var topGridMargin = 10;
 var bottomGridMargin = 30;
-var ocataveCount = 8;
+var octaveCount = 9;
 var us;
 var MuzXBox = (function () {
     function MuzXBox() {
@@ -5263,7 +5295,7 @@ var PianoRollRenderer = (function () {
         var time = 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-            var contentMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 12 * ocataveCount * ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
+            var contentMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 12 * octaveCount * ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
             var contentMeasure4 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
             var contentMeasure16 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
             var contentMeasure64 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain64.showZoom, this.contentMain64.hideZoom);
@@ -5462,7 +5494,7 @@ var PianoRollRenderer = (function () {
                 x: leftGridMargin + time * ratioDuration,
                 y: topGridMargin,
                 w: ratioDuration * measureDuration - 1,
-                h: 12 * ocataveCount * ratioThickness,
+                h: 12 * octaveCount * ratioThickness,
                 rx: 0,
                 ry: 0,
                 css: css
@@ -5530,7 +5562,7 @@ var PianoRollRenderer = (function () {
                 x: leftGridMargin + preTime * ratioDuration,
                 y: topGridMargin,
                 w: ratioDuration * duration10 - 5,
-                h: 12 * ocataveCount * ratioThickness,
+                h: 12 * octaveCount * ratioThickness,
                 rx: 0,
                 ry: 0,
                 css: css
@@ -5603,40 +5635,40 @@ var GridRenderer = (function () {
             for (var n = 1; n < 12; n++) {
                 gridMeasure4.content.push({
                     x1: leftGridMargin + time * ratioDuration,
-                    y1: topGridMargin + (12 * (ocataveCount - 0) - n) * ratioThickness,
+                    y1: topGridMargin + (12 * (octaveCount - 0) - n) * ratioThickness,
                     x2: leftGridMargin + (time + measureDuration) * ratioDuration,
-                    y2: topGridMargin + (12 * (ocataveCount - 0) - n) * ratioThickness,
+                    y2: topGridMargin + (12 * (octaveCount - 0) - n) * ratioThickness,
                     css: 'pitchLine4'
                 });
             }
-            for (var i = 1; i < ocataveCount; i++) {
+            for (var i = 1; i < octaveCount; i++) {
                 gridMeasure16.content.push({
                     x1: leftGridMargin + time * ratioDuration,
-                    y1: topGridMargin + 12 * (ocataveCount - i) * ratioThickness,
+                    y1: topGridMargin + 12 * (octaveCount - i) * ratioThickness,
                     x2: leftGridMargin + (time + measureDuration) * ratioDuration,
-                    y2: topGridMargin + 12 * (ocataveCount - i) * ratioThickness,
+                    y2: topGridMargin + 12 * (octaveCount - i) * ratioThickness,
                     css: 'octaveLine16'
                 });
                 gridMeasure4.content.push({
                     x1: leftGridMargin + time * ratioDuration,
-                    y1: topGridMargin + 12 * (ocataveCount - i) * ratioThickness,
+                    y1: topGridMargin + 12 * (octaveCount - i) * ratioThickness,
                     x2: leftGridMargin + (time + measureDuration) * ratioDuration,
-                    y2: topGridMargin + 12 * (ocataveCount - i) * ratioThickness,
+                    y2: topGridMargin + 12 * (octaveCount - i) * ratioThickness,
                     css: 'octaveLine4'
                 });
                 gridMeasure1.content.push({
                     x1: leftGridMargin + time * ratioDuration,
-                    y1: topGridMargin + 12 * (ocataveCount - i) * ratioThickness,
+                    y1: topGridMargin + 12 * (octaveCount - i) * ratioThickness,
                     x2: leftGridMargin + (time + measureDuration) * ratioDuration,
-                    y2: topGridMargin + 12 * (ocataveCount - i) * ratioThickness,
+                    y2: topGridMargin + 12 * (octaveCount - i) * ratioThickness,
                     css: 'octaveLine1'
                 });
                 for (var n = 1; n < 12; n++) {
                     gridMeasure4.content.push({
                         x1: leftGridMargin + time * ratioDuration,
-                        y1: topGridMargin + (12 * (ocataveCount - i) - n) * ratioThickness,
+                        y1: topGridMargin + (12 * (octaveCount - i) - n) * ratioThickness,
                         x2: leftGridMargin + (time + measureDuration) * ratioDuration,
-                        y2: topGridMargin + (12 * (ocataveCount - i) - n) * ratioThickness,
+                        y2: topGridMargin + (12 * (octaveCount - i) - n) * ratioThickness,
                         css: 'pitchLine4'
                     });
                 }
@@ -6160,7 +6192,7 @@ var FocusZoomMeasure = (function () {
         mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'actionPoint' });
     };
     FocusZoomMeasure.prototype.spotUp = function (mngmnt) {
-        if (this.currentPitch < ocataveCount * 12) {
+        if (this.currentPitch < octaveCount * 12) {
             this.currentPitch++;
             this.moveViewToShowSpot(mngmnt);
             mngmnt.reSetFocus(mngmnt.muzXBox.zrenderer, gridWidthTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.ratioDuration));
@@ -6279,13 +6311,13 @@ var FocusZoomMeasure = (function () {
         if (vh < ih) {
             newY = vh / 2 - ty;
         }
-        var pitchY = tp * topGridMargin + tp * ocataveCount * 12 * mngmnt.muzXBox.zrenderer.ratioThickness - newY * tz;
+        var pitchY = tp * topGridMargin + tp * octaveCount * 12 * mngmnt.muzXBox.zrenderer.ratioThickness - newY * tz;
         this.currentPitch = Math.ceil(pitchY / (tp * mngmnt.muzXBox.zrenderer.ratioThickness));
         if (this.currentPitch < 0) {
             this.currentPitch = 0;
         }
-        if (this.currentPitch >= ocataveCount * 12) {
-            this.currentPitch = ocataveCount * 12;
+        if (this.currentPitch >= octaveCount * 12) {
+            this.currentPitch = octaveCount * 12;
         }
         var newX = iw / 2;
         if (vw < iw) {
@@ -6407,19 +6439,19 @@ var LeftKeysRenderer = (function () {
         }
     };
     LeftKeysRenderer.prototype.drawKeys = function (zRender, song, ratioDuration, ratioThickness) {
-        for (var i = 0; i < ocataveCount; i++) {
-            this.keysAnchor1.content.push(TText(0, topGridMargin + ((ocataveCount - i) * 12) * ratioThickness, 'octaveNumNote', '' + (i + 1)));
-            this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 2) * ratioThickness, w: 5, h: ratioThickness, rx: 0.125, ry: 0.25, css: 'keysNote' });
-            this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 4) * ratioThickness, w: 5, h: ratioThickness, rx: 0.125, ry: 0.25, css: 'keysNote' });
-            this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 7) * ratioThickness, w: 5, h: ratioThickness, rx: 0.125, ry: 0.25, css: 'keysNote' });
-            this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 9) * ratioThickness, w: 5, h: ratioThickness, rx: 0.125, ry: 0.25, css: 'keysNote' });
-            this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 11) * ratioThickness, w: 5, h: ratioThickness, rx: 0.125, ry: 0.25, css: 'keysNote' });
-            this.keysAnchor4.content.push(TText(0, topGridMargin + ((ocataveCount - i) * 12) * ratioThickness, 'octaveNumMeasure', '' + (i + 1)));
-            this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 2) * ratioThickness, w: 5, h: ratioThickness, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
-            this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 4) * ratioThickness, w: 5, h: ratioThickness, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
-            this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 7) * ratioThickness, w: 5, h: ratioThickness, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
-            this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 9) * ratioThickness, w: 5, h: ratioThickness, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
-            this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((ocataveCount - i) * 12 - 11) * ratioThickness, w: 5, h: ratioThickness, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
+        for (var i = 0; i < octaveCount; i++) {
+            this.keysAnchor1.content.push(TText(0, topGridMargin + ((octaveCount - i) * 12) * ratioThickness, 'octaveNumNote', '' + (i + 1)));
+            this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 2) * ratioThickness, w: 5, h: ratioThickness, rx: 0.125, ry: 0.25, css: 'keysNote' });
+            this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 4) * ratioThickness, w: 5, h: ratioThickness, rx: 0.125, ry: 0.25, css: 'keysNote' });
+            this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 7) * ratioThickness, w: 5, h: ratioThickness, rx: 0.125, ry: 0.25, css: 'keysNote' });
+            this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 9) * ratioThickness, w: 5, h: ratioThickness, rx: 0.125, ry: 0.25, css: 'keysNote' });
+            this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 11) * ratioThickness, w: 5, h: ratioThickness, rx: 0.125, ry: 0.25, css: 'keysNote' });
+            this.keysAnchor4.content.push(TText(0, topGridMargin + ((octaveCount - i) * 12) * ratioThickness, 'octaveNumMeasure', '' + (i + 1)));
+            this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 2) * ratioThickness, w: 5, h: ratioThickness, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
+            this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 4) * ratioThickness, w: 5, h: ratioThickness, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
+            this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 7) * ratioThickness, w: 5, h: ratioThickness, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
+            this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 9) * ratioThickness, w: 5, h: ratioThickness, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
+            this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 11) * ratioThickness, w: 5, h: ratioThickness, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
         }
         zRender.tileLevel.autoID(this.keysLayer.anchors);
     };

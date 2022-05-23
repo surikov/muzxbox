@@ -410,7 +410,7 @@ class MIDIFileTrack {
 	trackevents: MIDIEvent[];
 	title: string;
 	instrument: string;
-	program: number;
+	programChannel: { program: number, channel: number }[];
 	volumes: { ms: number, value: number }[];
 	chords: TrackChord[] = [];
 	constructor(buffer: ArrayBuffer, start: number) {
@@ -425,6 +425,7 @@ class MIDIFileTrack {
 		this.trackContent = new DataView(this.datas.buffer, this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
 		this.trackevents = [];
 		this.volumes = [];
+		this.programChannel = [];
 	}
 }
 type MIDIEvent = {
@@ -461,7 +462,7 @@ type MIDIEvent = {
 }
 class MidiParser {
 	header: MIDIFileHeader;
-	paesedtracks: MIDIFileTrack[];
+	parsedTracks: MIDIFileTrack[];
 
 	instrumentNamesArray: string[] = [];
 	drumNamesArray: string[] = [];
@@ -522,15 +523,15 @@ class MidiParser {
 		console.log('start parseTracks');
 		var curIndex: number = this.header.HEADER_LENGTH;
 		var trackCount: number = this.header.trackCount;
-		this.paesedtracks = [];
+		this.parsedTracks = [];
 		for (var i = 0; i < trackCount; i++) {
 			var track: MIDIFileTrack = new MIDIFileTrack(arrayBuffer, curIndex);
-			this.paesedtracks.push(track);
+			this.parsedTracks.push(track);
 			// Updating index to the track end
 			curIndex = curIndex + track.trackLength + 8;
 		}
-		for (var i = 0; i < this.paesedtracks.length; i++) {
-			this.parseTrackEvents(this.paesedtracks[i]);
+		for (var i = 0; i < this.parsedTracks.length; i++) {
+			this.parseTrackEvents(this.parsedTracks[i]);
 		}
 		this.parseNotes();
 		this.simplify();
@@ -644,8 +645,8 @@ class MidiParser {
 		return arr;
 	}
 	simplify() {
-		for (var t = 0; t < this.paesedtracks.length; t++) {
-			var track: MIDIFileTrack = this.paesedtracks[t];
+		for (var t = 0; t < this.parsedTracks.length; t++) {
+			var track: MIDIFileTrack = this.parsedTracks[t];
 			for (var ch = 0; ch < track.chords.length; ch++) {
 				var chord: TrackChord = track.chords[ch];
 				for (var n = 0; n < chord.notes.length; n++) {
@@ -688,8 +689,8 @@ class MidiParser {
 		let tickResolution: number = this.header.get0TickResolution();
 		//console.log('head tickResolution', tickResolution);
 		this.header.changes.push({ track: -1, ms: -1, resolution: tickResolution, bpm: 120 });
-		for (var t = 0; t < this.paesedtracks.length; t++) {
-			var track: MIDIFileTrack = this.paesedtracks[t];
+		for (var t = 0; t < this.parsedTracks.length; t++) {
+			var track: MIDIFileTrack = this.parsedTracks[t];
 			let playTimeTicks: number = 0;
 			for (var e = 0; e < track.trackevents.length; e++) {
 				var evnt = track.trackevents[e];
@@ -733,11 +734,16 @@ class MidiParser {
 		}
 	}
 	parseNotes() {
-		var changes = this.dumpResolutionChanges();
+		//var changes = 
+		this.dumpResolutionChanges();
+		//let trackChannel: { trackNum: number, channelNum: number,track: MIDIFileTrack }[] = [];
+		//for (let t = 0; t < this.parsedTracks.length; t++) {
 
-		for (var t = 0; t < this.paesedtracks.length; t++) {
-			var track: MIDIFileTrack = this.paesedtracks[t];
-			this.parseTicks2time(track);
+		//}
+
+		for (let t = 0; t < this.parsedTracks.length; t++) {
+			var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
+			this.parseTicks2time(singleParsedTrack);
 			/*let playTimeTicks: number = 0;
 			let tickResolution: number = this.header.get0TickResolution();
 			for (var e = 0; e < track.trackevents.length; e++) {
@@ -757,8 +763,8 @@ class MidiParser {
 				evnt.playTimeMs = playTimeTicks;
 			}*/
 			//console.log(t, playTime);
-			for (var e = 0; e < track.trackevents.length; e++) {
-				var evnt = track.trackevents[e];
+			for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
+				var evnt = singleParsedTrack.trackevents[e];
 				//console.log(t, evnt);
 				if (evnt.basetype == this.EVENT_MIDI) {
 
@@ -782,7 +788,7 @@ class MidiParser {
 							var pitch = evnt.param1 ? evnt.param1 : 0;
 							var when = 0;
 							if (evnt.playTimeMs) when = evnt.playTimeMs;
-							this.takeOpenedNote(pitch, when, track, evnt.midiChannel ? evnt.midiChannel : 0);
+							this.takeOpenedNote(pitch, when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
 						}
 					} else {
 						if (evnt.subtype == this.EVENT_MIDI_NOTE_OFF) {
@@ -791,7 +797,7 @@ class MidiParser {
 								var pitch = evnt.param1 ? evnt.param1 : 0;
 								var when = 0;
 								if (evnt.playTimeMs) when = evnt.playTimeMs;
-								var chpi = this.findOpenedNoteBefore(pitch, when, track, evnt.midiChannel ? evnt.midiChannel : 0);
+								var chpi = this.findOpenedNoteBefore(pitch, when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
 								if (chpi) {
 									var duration = 0;
 									for (var i = 0; i < chpi.note.points.length - 1; i++) {
@@ -805,8 +811,12 @@ class MidiParser {
 							if (evnt.subtype == this.EVENT_MIDI_PROGRAM_CHANGE) {
 								if (evnt.param1 >= 0 && evnt.param1 <= 127) {
 									//this.setProgram(evnt);
-									console.log('EVENT_MIDI_PROGRAM_CHANGE', evnt.param1,evnt.param2,evnt);
-									track.program = evnt.param1 ? evnt.param1 : 0;
+									//console.log(t, 'EVENT_MIDI_PROGRAM_CHANGE', evnt.param1, evnt.midiChannel);
+									//singleParsedTrack.program = evnt.param1 ? evnt.param1 : 0;
+									singleParsedTrack.programChannel.push({
+										program: evnt.param1 ? evnt.param1 : 0
+										, channel: evnt.midiChannel ? evnt.midiChannel : 0
+									});
 									//track.volume = evnt.param2 ? evnt.param2 : 0.001;
 								}
 							} else {
@@ -816,7 +826,7 @@ class MidiParser {
 									var pitch = evnt.param1 ? evnt.param1 : 0;
 									var slide = ((evnt.param2 ? evnt.param2 : 0) - 64) / 6;
 									var when = evnt.playTimeMs ? evnt.playTimeMs : 0;
-									var chord: TrackChord | null = this.findChordBefore(when, track, evnt.midiChannel ? evnt.midiChannel : 0);
+									var chord: TrackChord | null = this.findChordBefore(when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
 									if (chord) {
 										for (var i = 0; i < chord.notes.length; i++) {
 											var note: TrackNote = chord.notes[i];
@@ -841,7 +851,7 @@ class MidiParser {
 									if (evnt.subtype == this.EVENT_MIDI_CONTROLLER && evnt.param1 == 7) {
 
 										var v = evnt.param2 ? evnt.param2 / 127 : 0;
-										track.volumes.push({ ms: evnt.playTimeMs, value: v });
+										singleParsedTrack.volumes.push({ ms: evnt.playTimeMs, value: v });
 										//console.log(t, 'track.volume', track.volumes[track.volumes.length - 1], track.title);
 									} else {
 										//
@@ -865,12 +875,12 @@ class MidiParser {
 						//console.log('EVENT_META_TRACK_NAME', evnt);
 						//this.setTitle(evnt);
 						//console.log(t,this.toText(evnt.data?evnt.data:[]), evnt);
-						track.title = this.toText(evnt.data ? evnt.data : []);
+						singleParsedTrack.title = this.toText(evnt.data ? evnt.data : []);
 					}
 					if (evnt.subtype == this.EVENT_META_INSTRUMENT_NAME) {
 						//console.log('EVENT_META_INSTRUMENT_NAME', evnt);
 						//console.log(t,this.toText(evnt.data?evnt.data:[]), evnt);
-						track.instrument = this.toText(evnt.data ? evnt.data : []);
+						singleParsedTrack.instrument = this.toText(evnt.data ? evnt.data : []);
 					}
 					if (evnt.subtype == this.EVENT_META_LYRICS) {
 						//console.log('EVENT_META_LYRICS', evnt);
@@ -1224,7 +1234,7 @@ class MidiParser {
 		return pars;
 	}
 	convert(): ZvoogSchedule {
-		console.log('MidiParser', this);
+		//console.log('MidiParser', this);
 		var midisong: MIDISongData = this.dump();
 		console.log('midisong', midisong);
 		let minIns = 123456;
@@ -1240,7 +1250,7 @@ class MidiParser {
 					if (onechord.channel == 9) {
 						if (maxDr < pp) {
 							maxDr = pp;
-						}else{
+						} else {
 							if (minDr > pp) {
 								minDr = pp;
 							}
@@ -1248,7 +1258,7 @@ class MidiParser {
 					} else {
 						if (maxIns < pp) {
 							maxIns = pp;
-						}else{
+						} else {
 							if (minIns > pp) {
 								minIns = pp;
 							}
@@ -1523,9 +1533,9 @@ class MidiParser {
 											if (mino.points[0].pitch == pinum) {
 												for (var px = 0; px < mino.points.length; px++) {
 													var mipoint: MIDISongPoint = mino.points[px];
-													let midiDrumIndex=mipoint.pitch;
-													if(mipoint.pitch<35 || mipoint.pitch>81){
-														midiDrumIndex=42;
+													let midiDrumIndex = mipoint.pitch;
+													if (mipoint.pitch < 35 || mipoint.pitch > 81) {
+														midiDrumIndex = 42;
 														//console.log('drum replace',mipoint.pitch);
 													}
 													env.pitches.push({
@@ -1833,6 +1843,25 @@ class MidiParser {
 		console.log(schedule);
 		return schedule;
 	}
+	findOrCreateTrack(trackNum: number, channelNum: number, trackChannel: { trackNum: number, channelNum: number, track: MIDISongTrack }[]): { trackNum: number, channelNum: number, track: MIDISongTrack } {
+		for (let i = 0; i < trackChannel.length; i++) {
+			if (trackChannel[i].trackNum == trackNum && trackChannel[i].channelNum == channelNum) {
+				return trackChannel[i];
+			}
+		}
+		let it: { trackNum: number, channelNum: number, track: MIDISongTrack } = {
+			trackNum: trackNum, channelNum: channelNum, track: {
+				order: 0
+				, title: 'unknown'
+				, instrument: '0'
+				, volumes: []
+				, program: 0//miditrack.program ? miditrack.program : 0
+				, songchords: []
+			}
+		};
+		trackChannel.push(it);
+		return it;
+	}
 	dump(): MIDISongData {
 		var a: MIDISongData = {
 			parser: '1.01'
@@ -1850,19 +1879,31 @@ class MidiParser {
 			, speedMode: 0
 			, lineMode: 0
 		};
-		for (var i = 0; i < this.paesedtracks.length; i++) {
-			var miditrack: MIDIFileTrack = this.paesedtracks[i];
+		let trackChannel: { trackNum: number, channelNum: number, track: MIDISongTrack }[] = [];
+		for (let i = 0; i < this.parsedTracks.length; i++) {
+			let parsedtrack: MIDIFileTrack = this.parsedTracks[i];
+			for (let k = 0; k < parsedtrack.programChannel.length; k++) {
+				this.findOrCreateTrack(i, parsedtrack.programChannel[k].channel, trackChannel);
+			}
+
+		}
+		//console.log(trackChannel);
+		var maxWhen = 0;
+		for (var i = 0; i < this.parsedTracks.length; i++) {
+			var miditrack: MIDIFileTrack = this.parsedTracks[i];
+			/*
 			var tr: MIDISongTrack = {
 				order: i
 				, title: miditrack.title ? miditrack.title : ''
 				, instrument: miditrack.instrument ? miditrack.instrument : ''
 				//, volume: miditrack.volume ? miditrack.volume : 1
 				, volumes: miditrack.volumes
-				, program: miditrack.program ? miditrack.program : 0
+				, program: 0//miditrack.program ? miditrack.program : 0
 				//, measures: []
 				, songchords: []
 			};
-			var maxWhen = 0;
+			*/
+
 			for (var ch = 0; ch < miditrack.chords.length; ch++) {
 				var midichord: TrackChord = miditrack.chords[ch];
 				var newchord: MIDISongChord = { when: midichord.when, notes: [], channel: midichord.channel };
@@ -1873,7 +1914,8 @@ class MidiParser {
 				//tr.chords.push(newchord);
 				//console.log(ch,midichord,measure);
 				//measure.songchords.push(newchord);
-				tr.songchords.push(newchord);
+
+				//tr.songchords.push(newchord);
 				for (var n = 0; n < midichord.notes.length; n++) {
 					var midinote: TrackNote = midichord.notes[n];
 					var newnote: MIDISongNote = { points: [] };
@@ -1884,16 +1926,46 @@ class MidiParser {
 						newnote.points.push(newpoint);
 					}
 				}
+				let chanTrack = this.findOrCreateTrack(i, newchord.channel, trackChannel);
+				chanTrack.track.songchords.push(newchord);
 			}
-			if (tr.songchords.length > 0) {
+			for (let i = 0; i < trackChannel.length; i++) {
+				if (trackChannel[i].trackNum == i) {
+					trackChannel[i].track.title = miditrack.title ? miditrack.title : '';
+					trackChannel[i].track.volumes = miditrack.volumes;
+					trackChannel[i].track.instrument = miditrack.instrument ? miditrack.instrument : ''
+				}
+			}
+			//miditrack.programChannel
+			/*if (tr.songchords.length > 0) {
 				a.miditracks.push(tr);
 				//var d = tr.measures.length * tr.measures[0].duration;
 				if (a.duration < maxWhen) {
 					a.duration = 54321 + maxWhen;
 					//console.log('duration',a.duration);
 				}
+			}*/
+		}
+		for (let tt = 0; tt < trackChannel.length; tt++) {
+			let trackChan = trackChannel[tt];
+			if (trackChan.track.songchords.length > 0) {
+				a.miditracks.push(trackChannel[tt].track);
+				//var d = tr.measures.length * tr.measures[0].duration;
+				if (a.duration < maxWhen) {
+					a.duration = 54321 + maxWhen;
+					//console.log('duration',a.duration);
+				}
+				for (let i = 0; i < this.parsedTracks.length; i++) {
+					let miditrack: MIDIFileTrack = this.parsedTracks[i];
+					for (let kk = 0; kk < miditrack.programChannel.length; kk++) {
+						if (miditrack.programChannel[kk].channel == trackChan.channelNum) {
+							trackChan.track.program = miditrack.programChannel[kk].program;
+						}
+					}
+				}
 			}
 		}
+
 		//console.log('duration',a.duration,this);
 		//console.log(a);
 		return a;

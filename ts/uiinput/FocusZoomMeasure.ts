@@ -23,7 +23,7 @@ class FocusZoomMeasure implements FocusLevel {
 		mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'actionPoint' });
 	}
 	spotUp(mngmnt: FocusManagement): boolean {
-		if (this.currentPitch < ocataveCount * 12) {
+		if (this.currentPitch < octaveCount * 12) {
 			this.currentPitch++;
 
 			this.moveViewToShowSpot(mngmnt);
@@ -184,13 +184,13 @@ class FocusZoomMeasure implements FocusLevel {
 		if (vh < ih) {
 			newY = vh / 2 - ty;
 		}
-		let pitchY = tp * topGridMargin + tp * ocataveCount * 12 * mngmnt.muzXBox.zrenderer.ratioThickness - newY * tz;
+		let pitchY = tp * topGridMargin + tp * octaveCount * 12 * mngmnt.muzXBox.zrenderer.ratioThickness - newY * tz;
 		this.currentPitch = Math.ceil(pitchY / (tp * mngmnt.muzXBox.zrenderer.ratioThickness));
 		if (this.currentPitch < 0) {
 			this.currentPitch = 0;
 		}
-		if (this.currentPitch >= ocataveCount * 12) {
-			this.currentPitch = ocataveCount * 12;
+		if (this.currentPitch >= octaveCount * 12) {
+			this.currentPitch = octaveCount * 12;
 		}
 		let newX = iw / 2;
 		if (vw < iw) {

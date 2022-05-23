@@ -90,40 +90,40 @@ class GridRenderer {
 			for (let n = 1; n < 12; n++) {
 				gridMeasure4.content.push({
 					x1: leftGridMargin + time * ratioDuration
-					, y1: topGridMargin + (12 * (ocataveCount - 0) - n) * ratioThickness
+					, y1: topGridMargin + (12 * (octaveCount - 0) - n) * ratioThickness
 					, x2: leftGridMargin + (time + measureDuration) * ratioDuration
-					, y2: topGridMargin + (12 * (ocataveCount - 0) - n) * ratioThickness
+					, y2: topGridMargin + (12 * (octaveCount - 0) - n) * ratioThickness
 					, css: 'pitchLine4'
 				});
 			}
-			for (let i = 1; i < ocataveCount; i++) {
+			for (let i = 1; i < octaveCount; i++) {
 				gridMeasure16.content.push({
 					x1: leftGridMargin + time * ratioDuration
-					, y1: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
+					, y1: topGridMargin + 12 * (octaveCount - i) * ratioThickness
 					, x2: leftGridMargin + (time + measureDuration) * ratioDuration
-					, y2: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
+					, y2: topGridMargin + 12 * (octaveCount - i) * ratioThickness
 					, css: 'octaveLine16'
 				});
 				gridMeasure4.content.push({
 					x1: leftGridMargin + time * ratioDuration
-					, y1: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
+					, y1: topGridMargin + 12 * (octaveCount - i) * ratioThickness
 					, x2: leftGridMargin + (time + measureDuration) * ratioDuration
-					, y2: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
+					, y2: topGridMargin + 12 * (octaveCount - i) * ratioThickness
 					, css: 'octaveLine4'
 				});
 				gridMeasure1.content.push({
 					x1: leftGridMargin + time * ratioDuration
-					, y1: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
+					, y1: topGridMargin + 12 * (octaveCount - i) * ratioThickness
 					, x2: leftGridMargin + (time + measureDuration) * ratioDuration
-					, y2: topGridMargin + 12 * (ocataveCount - i) * ratioThickness
+					, y2: topGridMargin + 12 * (octaveCount - i) * ratioThickness
 					, css: 'octaveLine1'
 				});
 				for (let n = 1; n < 12; n++) {
 					gridMeasure4.content.push({
 						x1: leftGridMargin + time * ratioDuration
-						, y1: topGridMargin + (12 * (ocataveCount - i) - n) * ratioThickness
+						, y1: topGridMargin + (12 * (octaveCount - i) - n) * ratioThickness
 						, x2: leftGridMargin + (time + measureDuration) * ratioDuration
-						, y2: topGridMargin + (12 * (ocataveCount - i) - n) * ratioThickness
+						, y2: topGridMargin + (12 * (octaveCount - i) - n) * ratioThickness
 						, css: 'pitchLine4'
 					});
 				}

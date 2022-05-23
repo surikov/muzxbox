@@ -227,7 +227,7 @@ class PianoRollRenderer {
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
 
-			let contentMeasure1: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 12 * ocataveCount * ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
+			let contentMeasure1: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 12 * octaveCount * ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
 			let contentMeasure4: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
 			let contentMeasure16: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
 			let contentMeasure64: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain64.showZoom, this.contentMain64.hideZoom);
@@ -411,7 +411,7 @@ class PianoRollRenderer {
 				x: leftGridMargin + time * ratioDuration
 				, y: topGridMargin
 				, w: ratioDuration * measureDuration - 1
-				, h: 12 * ocataveCount * ratioThickness
+				, h: 12 * octaveCount * ratioThickness
 				, rx: 0
 				, ry: 0
 				, css: css
@@ -478,7 +478,7 @@ class PianoRollRenderer {
 				x: leftGridMargin + preTime * ratioDuration
 				, y: topGridMargin
 				, w: ratioDuration * duration10 - 5
-				, h: 12 * ocataveCount * ratioThickness
+				, h: 12 * octaveCount * ratioThickness
 				, rx: 0
 				, ry: 0
 				, css: css

@@ -23,8 +23,8 @@ function wholeWidthTp(song: ZvoogSchedule, ratioDuration: number): number {
 	return leftGridMargin + songDuration * ratioDuration + rightGridMargin;
 }
 function gridHeightTp(ratioThickness: number): number {
-	return (ocataveCount * 12) * ratioThickness;
+	return (octaveCount * 12) * ratioThickness;
 }
 function wholeHeightTp(ratioThickness: number): number {
-	return topGridMargin + (ocataveCount * 12) * ratioThickness + bottomGridMargin;
+	return topGridMargin + (octaveCount * 12) * ratioThickness + bottomGridMargin;
 }
