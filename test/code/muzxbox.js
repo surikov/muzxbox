@@ -4820,12 +4820,12 @@ var SingleMenuPanel = (function () {
 }());
 console.log('MuzXBox v1.02.001');
 var midiDrumPitchShift = 35;
-var midiInstrumentPitchShift = 12;
+var midiInstrumentPitchShift = 24;
 var leftGridMargin = 20;
 var rightGridMargin = 1;
 var topGridMargin = 10;
 var bottomGridMargin = 30;
-var octaveCount = 9;
+var octaveCount = 7;
 var us;
 var MuzXBox = (function () {
     function MuzXBox() {

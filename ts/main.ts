@@ -1,13 +1,13 @@
 console.log('MuzXBox v1.02.001');
 
 let midiDrumPitchShift = 35;
-let midiInstrumentPitchShift = 12;
+let midiInstrumentPitchShift = 24;
 let leftGridMargin = 20;
 let rightGridMargin = 1;
 let topGridMargin = 10;
 let bottomGridMargin = 30;
 //let ocataveStart=2;
-let octaveCount = 9;
+let octaveCount = 7;
 
 let us: ZUserSetting;
 
