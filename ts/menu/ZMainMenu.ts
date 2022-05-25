@@ -218,6 +218,24 @@ class ZMainMenu {
 		this.menuRoot.folders.push({
 			path: "Rhythm patterns", icon: "", folders: [], items: [
 				{
+					label: 'plain 1/32', autoclose: true, icon: '', action: () => {
+						let rr: ZvoogMeter[] = [
+							{ count: 1, division: 32 }, { count: 1, division: 32 }
+							, { count: 1, division: 32 }, { count: 1, division: 32 }
+							, { count: 1, division: 32 }, { count: 1, division: 32 }
+							, { count: 1, division: 32 }, { count: 1, division: 32 }
+							, { count: 1, division: 32 }, { count: 1, division: 32 }
+							, { count: 1, division: 32 }, { count: 1, division: 32 }
+							, { count: 1, division: 32 }, { count: 1, division: 32 }
+							, { count: 1, division: 32 }, { count: 1, division: 32 }
+						];
+						console.log('plain 1/32', rr);
+						var me: MuzXBox = window['MZXB'] as MuzXBox;
+						if (me) { me.setGrid(rr); }
+					}
+				}
+				,
+				{
 					label: 'plain 1/16', autoclose: true, icon: '', action: () => {
 						let rr: ZvoogMeter[] = [
 							{ count: 1, division: 16 }, { count: 1, division: 16 }

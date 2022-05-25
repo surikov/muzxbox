@@ -33,19 +33,19 @@ class LeftKeysRenderer {
 		for (let i = 0; i < octaveCount; i++) {
 			this.keysAnchor1.content.push(TText(0, topGridMargin + ((octaveCount - i) * 12) * ratioThickness, 'octaveNumNote', '' + (i + 1)));
 
-			this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 2) * ratioThickness, w: 5, h: ratioThickness, rx: 0.125, ry: 0.25, css: 'keysNote' });
-			this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 4) * ratioThickness, w: 5, h: ratioThickness, rx: 0.125, ry: 0.25, css: 'keysNote' });
-			this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 7) * ratioThickness, w: 5, h: ratioThickness, rx: 0.125, ry: 0.25, css: 'keysNote' });
-			this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 9) * ratioThickness, w: 5, h: ratioThickness, rx: 0.125, ry: 0.25, css: 'keysNote' });
-			this.keysAnchor1.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 11) * ratioThickness, w: 5, h: ratioThickness, rx: 0.125, ry: 0.25, css: 'keysNote' });
+			this.keysAnchor1.content.push({ x: -1, y: topGridMargin + (0.05+(octaveCount - i) * 12 - 2) * ratioThickness, w: 5, h: ratioThickness*0.9, rx: 0.125, ry: 0.25, css: 'keysNote' });
+			this.keysAnchor1.content.push({ x: -1, y: topGridMargin + (0.05+(octaveCount - i) * 12 - 4) * ratioThickness, w: 5, h: ratioThickness*0.9, rx: 0.125, ry: 0.25, css: 'keysNote' });
+			this.keysAnchor1.content.push({ x: -1, y: topGridMargin + (0.05+(octaveCount - i) * 12 - 7) * ratioThickness, w: 5, h: ratioThickness*0.9, rx: 0.125, ry: 0.25, css: 'keysNote' });
+			this.keysAnchor1.content.push({ x: -1, y: topGridMargin + (0.05+(octaveCount - i) * 12 - 9) * ratioThickness, w: 5, h: ratioThickness*0.9, rx: 0.125, ry: 0.25, css: 'keysNote' });
+			this.keysAnchor1.content.push({ x: -1, y: topGridMargin + (0.05+(octaveCount - i) * 12 - 11) * ratioThickness, w: 5, h: ratioThickness*0.9, rx: 0.125, ry: 0.25, css: 'keysNote' });
 
 			this.keysAnchor4.content.push(TText(0, topGridMargin + ((octaveCount - i) * 12) * ratioThickness, 'octaveNumMeasure', '' + (i + 1)));
 
-			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 2) * ratioThickness, w: 5, h: ratioThickness, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
-			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 4) * ratioThickness, w: 5, h: ratioThickness, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
-			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 7) * ratioThickness, w: 5, h: ratioThickness, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
-			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 9) * ratioThickness, w: 5, h: ratioThickness, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
-			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + ((octaveCount - i) * 12 - 11) * ratioThickness, w: 5, h: ratioThickness, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
+			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + (0.05+(octaveCount - i) * 12 - 2) * ratioThickness, w: 5, h: ratioThickness*0.9, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
+			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + (0.05+(octaveCount - i) * 12 - 4) * ratioThickness, w: 5, h: ratioThickness*0.9, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
+			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + (0.05+(octaveCount - i) * 12 - 7) * ratioThickness, w: 5, h: ratioThickness*0.9, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
+			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + (0.05+(octaveCount - i) * 12 - 9) * ratioThickness, w: 5, h: ratioThickness*0.9, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
+			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + (0.05+(octaveCount - i) * 12 - 11) * ratioThickness, w: 5, h: ratioThickness*0.9, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
 		}
 		zRender.tileLevel.autoID(this.keysLayer.anchors);
 	}

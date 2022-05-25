@@ -1080,12 +1080,10 @@ declare class PianoRollRenderer {
     contentMain4: TileAnchor;
     contentMain16: TileAnchor;
     contentMain64: TileAnchor;
-    contentMain256: TileAnchor;
     contentSecond1: TileAnchor;
     contentSecond4: TileAnchor;
     contentSecond16: TileAnchor;
     contentSecond64: TileAnchor;
-    contentSecond256: TileAnchor;
     contentOther1: TileAnchor;
     contentOther4: TileAnchor;
     contentOther16: TileAnchor;
