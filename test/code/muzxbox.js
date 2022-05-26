@@ -146,7 +146,6 @@ var TileLevel = (function () {
         this.fastenRight = true;
         this.lastMoveDx = 0;
         this.lastMoveDy = 0;
-        this.lastMoveDt = 0;
         this.mouseDownMode = false;
         this.svg = svgObject;
         this.setupTapSize(1);
@@ -246,7 +245,6 @@ var TileLevel = (function () {
     TileLevel.prototype.onMove = function (dx, dy) {
         this.lastMoveDx = dx;
         this.lastMoveDy = dy;
-        this.lastMoveDt = Date.now();
     };
     TileLevel.prototype.moveTail = function (speed) {
         var dx = this.translateX + 2 * this.tapSize * speed * this.lastMoveDx;
@@ -5225,6 +5223,41 @@ var PianoRollRenderer = (function () {
         }
         return measureMaxLen;
     };
+    PianoRollRenderer.prototype.addSubVoiceKnobs = function (ratioDuration, ratioThickness, song, voice, measureNum, time, anchor) {
+        var measure = voice.measureChords[measureNum];
+        var yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12) * ratioThickness;
+        for (var cc = 0; cc < measure.chords.length; cc++) {
+            var chord = measure.chords[cc];
+            for (var ee = 0; ee < chord.envelopes.length; ee++) {
+                var envelope = chord.envelopes[ee];
+                var pitchWhen = meter2seconds(song.measures[measureNum].tempo, chord.when);
+                var pp = 0;
+                var pitch = envelope.pitches[pp];
+                var pitchDuration = meter2seconds(song.measures[measureNum].tempo, pitch.duration);
+                var startShift = 0;
+                if (pp == 0) {
+                    startShift = 0.5 * ratioThickness;
+                }
+                var endShift = 0;
+                if (pp == envelope.pitches.length - 1) {
+                    endShift = -0.49 * ratioThickness;
+                }
+                var xx = leftGridMargin + (time + pitchWhen) * ratioDuration + startShift;
+                var yy = topGridMargin + yShift - pitch.pitch * ratioThickness;
+                var knob = {
+                    x: xx - 0.5,
+                    y: yy - 0.5,
+                    w: 1,
+                    h: 1,
+                    rx: 0.5,
+                    ry: 0.5,
+                    css: 'actionSpot'
+                };
+                anchor.content.push(knob);
+                pitchWhen = pitchWhen + pitchDuration;
+            }
+        }
+    };
     PianoRollRenderer.prototype.needToFocusVoice = function (song, trackNum, voiceNum) {
         var sonfino = this.findFocusedFilter(song.filters);
         if (sonfino < 0) {
@@ -5349,37 +5382,28 @@ var PianoRollRenderer = (function () {
                         var parameter = voice.performer.parameters[pp];
                         if (track.focus && voice.focus && voice.performer.focus) {
                             if (parameter.focus) {
-                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
-                                    contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64
-                                ]);
+                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);
                             }
                             else {
-                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
-                                    secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64
-                                ]);
+                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
                             }
                         }
                         else {
-                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
-                                secondMeasure1, secondMeasure4, secondMeasure16
-                            ]);
+                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [secondMeasure1, secondMeasure4, secondMeasure16]);
                         }
                     }
                     if (this.needToFocusVoice(song, tt, vv)) {
-                        this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'mainLine', [
-                            contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64
-                        ]);
+                        this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'mainLine', [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);
+                        this.addSubVoiceKnobs(ratioDuration, ratioThickness, song, voice, mm, time, contentMeasure1);
                     }
                     else {
                         if (this.needToSubFocusVoice(song, tt, vv)) {
-                            this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'secondLine', [
-                                secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64
-                            ]);
+                            this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'secondLine', [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
+                            this.addSubVoiceKnobs(ratioDuration, ratioThickness, song, voice, mm, time, secondMeasure1);
                         }
                         else {
-                            this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'otherLine', [
-                                secondMeasure1, secondMeasure4, secondMeasure16
-                            ]);
+                            this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'otherLine', [otherMeasure1, otherMeasure4, otherMeasure16]);
+                            this.addSubVoiceKnobs(ratioDuration, ratioThickness, song, voice, mm, time, otherMeasure1);
                         }
                     }
                     for (var ff = 0; ff < voice.filters.length; ff++) {
@@ -5388,20 +5412,14 @@ var PianoRollRenderer = (function () {
                             var parameter = filter.parameters[pp];
                             if (track.focus && voice.focus && filter.focus) {
                                 if (parameter.focus) {
-                                    this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
-                                        contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64
-                                    ]);
+                                    this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);
                                 }
                                 else {
-                                    this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
-                                        secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64
-                                    ]);
+                                    this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
                                 }
                             }
                             else {
-                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
-                                    secondMeasure1, secondMeasure4, secondMeasure16
-                                ]);
+                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [secondMeasure1, secondMeasure4, secondMeasure16]);
                             }
                         }
                     }
@@ -5412,20 +5430,14 @@ var PianoRollRenderer = (function () {
                         var parameter = filter.parameters[pp];
                         if (track.focus && filter.focus) {
                             if (parameter.focus) {
-                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
-                                    contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64
-                                ]);
+                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);
                             }
                             else {
-                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
-                                    secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64
-                                ]);
+                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
                             }
                         }
                         else {
-                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
-                                secondMeasure1, secondMeasure4, secondMeasure16
-                            ]);
+                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [secondMeasure1, secondMeasure4, secondMeasure16]);
                         }
                     }
                 }
@@ -5436,20 +5448,14 @@ var PianoRollRenderer = (function () {
                     var parameter = filter.parameters[pp];
                     if (filter.focus) {
                         if (parameter.focus) {
-                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
-                                contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64
-                            ]);
+                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);
                         }
                         else {
-                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
-                                secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64
-                            ]);
+                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
                         }
                     }
                     else {
-                        this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
-                            secondMeasure1, secondMeasure4, secondMeasure16
-                        ]);
+                        this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [secondMeasure1, secondMeasure4, secondMeasure16]);
                     }
                 }
             }

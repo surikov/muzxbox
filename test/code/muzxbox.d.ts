@@ -53,7 +53,6 @@ declare class TileLevel {
     fastenRight: boolean;
     lastMoveDx: number;
     lastMoveDy: number;
-    lastMoveDt: number;
     mouseDownMode: boolean;
     get allTilesOK(): boolean;
     set allTilesOK(bb: boolean);
@@ -1099,6 +1098,7 @@ declare class PianoRollRenderer {
     initOthersAnchors(zRender: ZRender): void;
     addParameterMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, parameter: ZvoogParameterData, measureNum: number, time: number, css: string, anchors: TileAnchor[]): void;
     addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number;
+    addSubVoiceKnobs(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, anchor: TileAnchor): void;
     needToFocusVoice(song: ZvoogSchedule, trackNum: number, voiceNum: number): boolean;
     needToSubFocusVoice(song: ZvoogSchedule, trackNum: number, voiceNum: number): boolean;
     findFocusedTrack(tracks: ZvoogTrack[]): number;

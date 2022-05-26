@@ -42,7 +42,7 @@ class TileLevel {
 
 	lastMoveDx: number = 0;
 	lastMoveDy: number = 0;
-	lastMoveDt: number = 0;
+	//lastMoveDt: number = 0;
 
 	mouseDownMode: boolean = false;
 
@@ -131,7 +131,7 @@ class TileLevel {
 	onMove(dx: number, dy: number) {
 		this.lastMoveDx = dx;
 		this.lastMoveDy = dy;
-		this.lastMoveDt = Date.now();
+		//this.lastMoveDt = Date.now();
 	}
 	moveTail(speed: number) {
 		var dx = this.translateX + 2 * this.tapSize * speed * this.lastMoveDx;

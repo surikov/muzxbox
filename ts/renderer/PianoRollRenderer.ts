@@ -144,6 +144,49 @@ class PianoRollRenderer {
 		}
 		return measureMaxLen;
 	}
+	addSubVoiceKnobs(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice
+		, measureNum: number, time: number
+		, anchor: TileAnchor): void {
+		let measure = voice.measureChords[measureNum];
+		let yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12) * ratioThickness;
+		for (let cc = 0; cc < measure.chords.length; cc++) {
+			let chord = measure.chords[cc];
+			for (let ee = 0; ee < chord.envelopes.length; ee++) {
+				let envelope = chord.envelopes[ee];
+				let pitchWhen = meter2seconds(song.measures[measureNum].tempo, chord.when);
+				let pp = 0;
+				//for (let pp = 0; pp < envelope.pitches.length; pp++) {
+				let pitch = envelope.pitches[pp];
+				/*let slide = pitch.pitch;
+				if (pp + 1 < envelope.pitches.length) {
+					slide = envelope.pitches[pp + 1].pitch;
+				}*/
+				let pitchDuration = meter2seconds(song.measures[measureNum].tempo, pitch.duration);
+				let startShift = 0;
+				if (pp == 0) {
+					startShift = 0.5 * ratioThickness;
+				}
+				let endShift = 0;
+				if (pp == envelope.pitches.length - 1) {
+					endShift = -0.49 * ratioThickness;
+				}
+				let xx = leftGridMargin + (time + pitchWhen) * ratioDuration + startShift;
+				let yy = topGridMargin + yShift - pitch.pitch * ratioThickness;
+				let knob: TileRectangle = {
+					x: xx - 0.5
+					, y: yy - 0.5
+					, w: 1
+					, h: 1
+					, rx: 0.5
+					, ry: 0.5
+					, css: 'actionSpot'
+				};
+				anchor.content.push(knob);
+				pitchWhen = pitchWhen + pitchDuration;
+				//}
+			}
+		}
+	}
 	needToFocusVoice(song: ZvoogSchedule, trackNum: number, voiceNum: number): boolean {
 		let sonfino = this.findFocusedFilter(song.filters);
 		if (sonfino < 0) {
@@ -272,27 +315,30 @@ class PianoRollRenderer {
 						let parameter = voice.performer.parameters[pp];
 						if (track.focus && voice.focus && voice.performer.focus) {
 							if (parameter.focus) {
-								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
-									contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
+								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine'
+									, [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
 							} else {
-								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
-									secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
+								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine'
+									, [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
 							}
 						} else {
-							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
-								secondMeasure1, secondMeasure4, secondMeasure16]);
+							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine'
+								, [secondMeasure1, secondMeasure4, secondMeasure16]);
 						}
 					}
 					if (this.needToFocusVoice(song, tt, vv)) {
-						this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'mainLine', [
-							contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
+						this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'mainLine'
+							, [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
+						this.addSubVoiceKnobs(ratioDuration, ratioThickness, song, voice, mm, time, contentMeasure1);
 					} else {
 						if (this.needToSubFocusVoice(song, tt, vv)) {
-							this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'secondLine', [
-								secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
+							this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'secondLine'
+								, [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
+							this.addSubVoiceKnobs(ratioDuration, ratioThickness, song, voice, mm, time, secondMeasure1);
 						} else {
-							this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'otherLine', [
-								secondMeasure1, secondMeasure4, secondMeasure16]);
+							this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'otherLine'
+								, [otherMeasure1, otherMeasure4, otherMeasure16]);
+							this.addSubVoiceKnobs(ratioDuration, ratioThickness, song, voice, mm, time, otherMeasure1);
 						}
 					}
 					/*if (track.focus) {
@@ -313,15 +359,15 @@ class PianoRollRenderer {
 							let parameter = filter.parameters[pp];
 							if (track.focus && voice.focus && filter.focus) {
 								if (parameter.focus) {
-									this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
-										contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
+									this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine'
+										, [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
 								} else {
-									this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
-										secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
+									this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine'
+										, [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
 								}
 							} else {
-								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
-									secondMeasure1, secondMeasure4, secondMeasure16]);
+								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine'
+									, [secondMeasure1, secondMeasure4, secondMeasure16]);
 							}
 						}
 					}
@@ -332,15 +378,15 @@ class PianoRollRenderer {
 						let parameter = filter.parameters[pp];
 						if (track.focus && filter.focus) {
 							if (parameter.focus) {
-								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
-									contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
+								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine'
+									, [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
 							} else {
-								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
-									secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
+								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine'
+									, [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
 							}
 						} else {
-							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
-								secondMeasure1, secondMeasure4, secondMeasure16]);
+							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine'
+								, [secondMeasure1, secondMeasure4, secondMeasure16]);
 						}
 					}
 				}
@@ -351,15 +397,15 @@ class PianoRollRenderer {
 					let parameter = filter.parameters[pp];
 					if (filter.focus) {
 						if (parameter.focus) {
-							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [
-								contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
+							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine'
+								, [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
 						} else {
-							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine', [
-								secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
+							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine'
+								, [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
 						}
 					} else {
-						this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [
-							secondMeasure1, secondMeasure4, secondMeasure16]);
+						this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine'
+							, [secondMeasure1, secondMeasure4, secondMeasure16]);
 					}
 				}
 			}

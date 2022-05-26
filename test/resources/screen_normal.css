@@ -12,6 +12,7 @@
 	--decor_solid: #226699cc;
 	--decor_lite: #22669999;
 	--decor_onion: #22669966;
+	--decor_weak: #22669933;
 	--active_base: #660022ff;
 	--active_lite: #66002233;
 }
@@ -45,11 +46,11 @@ html {
 }
 
 .keysNote {
-	fill: var(--decor_onion);
+	fill: var(--decor_weak);
 }
 
 .keysMeasure {
-	fill: var(--decor_onion);
+	fill: var(--decor_weak);
 }
 
 .octaveNumNote {
@@ -159,49 +160,49 @@ html {
 }
 
 .barLine1 {
-	stroke: var(--decor_lite);
+	stroke: var(--decor_onion);
 	stroke-width: 0.25cm;
 	stroke-linecap: round;
 }
 
 .barLine4 {
-	stroke: var(--decor_lite);
+	stroke: var(--decor_onion);
 	stroke-width: 0.5cm;
 	stroke-linecap: round;
 }
 
 .barLine16 {
-	stroke: var(--decor_lite);
+	stroke: var(--decor_onion);
 	stroke-width: 1cm;
 	stroke-linecap: round;
 }
-
+/*
 .barLine64 {
-	stroke: var(--decor_lite);
+	stroke: var(--decor_onion);
 	stroke-width: 2cm;
 	stroke-linecap: round;
 }
 
 .barLine256 {
-	stroke: var(--decor_lite);
+	stroke: var(--decor_onion);
 	stroke-width: 4cm;
 	stroke-linecap: round;
 }
-
+*/
 .octaveLine1 {
-	stroke: var(--decor_lite);
+	stroke: var(--decor_onion);
 	stroke-width: 0.25cm;
 	stroke-linecap: round;
 }
 
 .octaveLine4 {
-	stroke: var(--decor_lite);
+	stroke: var(--decor_onion);
 	stroke-width: 0.5cm;
 	stroke-linecap: round;
 }
 
 .octaveLine16 {
-	stroke: var(--decor_lite);
+	stroke: var(--decor_onion);
 	stroke-width: 1cm;
 	stroke-linecap: round;
 }
@@ -341,6 +342,13 @@ html {
 #menuButtonImage {
 	width: 1cm;
 	height: 1cm;
+}
+
+.actionSpot {
+	fill: var(--active_lite);
+	fill-opacity2: 25%;
+	stroke: var(--active_base);
+	stroke-opacity2: 75%;
 }
 
 /*
