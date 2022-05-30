@@ -1393,7 +1393,7 @@ var ZRender = (function () {
         var wholeHeight = wholeHeightTp(this.ratioThickness);
         this.clearAnchorsContent(wholeWidth, wholeHeight);
         this.measureInfoRenderer.fillMeasureInfo(song, this.ratioDuration, this.ratioThickness);
-        this.pianoRollRenderer.drawSchedule(song, this.ratioDuration, this.ratioThickness);
+        this.pianoRollRenderer.addPianoRoll(this.muzXBox.zMainMenu.layerSelector, song, this.ratioDuration, this.ratioThickness);
         var rhythm = this.rhythmPatternDefault;
         if (song.rhythm) {
             if (song.rhythm.length) {
@@ -5223,7 +5223,19 @@ var PianoRollRenderer = (function () {
         }
         return measureMaxLen;
     };
-    PianoRollRenderer.prototype.addSubVoiceKnobs = function (ratioDuration, ratioThickness, song, voice, measureNum, time, anchor) {
+    PianoRollRenderer.prototype.createNoteUpAction = function (layerSelector, tt, vv) {
+        var up = layerSelector.upVox(tt, vv);
+        return function (x, y) {
+            up();
+        };
+    };
+    PianoRollRenderer.prototype.createNoteMenuAction = function (layerSelector, tt, vv) {
+        return function (x, y) {
+            console.log('menu', x, y);
+        };
+    };
+    PianoRollRenderer.prototype.addNotesKnobs = function (layerSelector, ratioDuration, ratioThickness, song, trackNum, voiceNum, measureNum, time, isMain, anchor) {
+        var voice = song.tracks[trackNum].voices[voiceNum];
         var measure = voice.measureChords[measureNum];
         var yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12) * ratioThickness;
         for (var cc = 0; cc < measure.chords.length; cc++) {
@@ -5234,24 +5246,17 @@ var PianoRollRenderer = (function () {
                 var pp = 0;
                 var pitch = envelope.pitches[pp];
                 var pitchDuration = meter2seconds(song.measures[measureNum].tempo, pitch.duration);
-                var startShift = 0;
-                if (pp == 0) {
-                    startShift = 0.5 * ratioThickness;
-                }
-                var endShift = 0;
-                if (pp == envelope.pitches.length - 1) {
-                    endShift = -0.49 * ratioThickness;
-                }
-                var xx = leftGridMargin + (time + pitchWhen) * ratioDuration + startShift;
-                var yy = topGridMargin + yShift - pitch.pitch * ratioThickness;
+                var xx = leftGridMargin + (time + pitchWhen) * ratioDuration + 0.5;
+                var yy = topGridMargin + yShift - pitch.pitch * ratioThickness + ratioThickness / 2 - 0.5;
                 var knob = {
                     x: xx - 0.5,
                     y: yy - 0.5,
-                    w: 1,
+                    w: isMain ? 3 : 1,
                     h: 1,
                     rx: 0.5,
                     ry: 0.5,
-                    css: 'actionSpot'
+                    css: 'actionSpot',
+                    action: isMain ? this.createNoteMenuAction(layerSelector, trackNum, voiceNum) : this.createNoteUpAction(layerSelector, trackNum, voiceNum)
                 };
                 anchor.content.push(knob);
                 pitchWhen = pitchWhen + pitchDuration;
@@ -5346,7 +5351,7 @@ var PianoRollRenderer = (function () {
         }
         return -1;
     };
-    PianoRollRenderer.prototype.drawSchedule = function (song, ratioDuration, ratioThickness) {
+    PianoRollRenderer.prototype.addPianoRoll = function (layerSelector, song, ratioDuration, ratioThickness) {
         var time = 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
@@ -5394,16 +5399,16 @@ var PianoRollRenderer = (function () {
                     }
                     if (this.needToFocusVoice(song, tt, vv)) {
                         this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'mainLine', [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);
-                        this.addSubVoiceKnobs(ratioDuration, ratioThickness, song, voice, mm, time, contentMeasure1);
+                        this.addNotesKnobs(layerSelector, ratioDuration, ratioThickness, song, tt, vv, mm, time, true, contentMeasure1);
                     }
                     else {
                         if (this.needToSubFocusVoice(song, tt, vv)) {
                             this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'secondLine', [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
-                            this.addSubVoiceKnobs(ratioDuration, ratioThickness, song, voice, mm, time, secondMeasure1);
+                            this.addNotesKnobs(layerSelector, ratioDuration, ratioThickness, song, tt, vv, mm, time, false, secondMeasure1);
                         }
                         else {
                             this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'otherLine', [otherMeasure1, otherMeasure4, otherMeasure16]);
-                            this.addSubVoiceKnobs(ratioDuration, ratioThickness, song, voice, mm, time, otherMeasure1);
+                            this.addNotesKnobs(layerSelector, ratioDuration, ratioThickness, song, tt, vv, mm, time, false, otherMeasure1);
                         }
                     }
                     for (var ff = 0; ff < voice.filters.length; ff++) {
@@ -6371,25 +6376,36 @@ var FocusZoomNote = (function () {
         }
     };
     FocusZoomNote.prototype.addSpot = function (mngmnt) {
+        console.log('addSpot');
+        this.dumpSpots();
         mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'actionPoint' });
     };
     FocusZoomNote.prototype.spotUp = function (mngmnt) {
         console.log('note spotUp');
+        this.dumpSpots();
         return false;
     };
     FocusZoomNote.prototype.spotDown = function (mngmnt) {
         console.log('note spotDown');
+        this.dumpSpots();
         return false;
     };
     FocusZoomNote.prototype.spotLeft = function (mngmnt) {
         console.log('note spotLeft');
+        this.dumpSpots();
         return false;
     };
     FocusZoomNote.prototype.spotRight = function (mngmnt) {
         console.log('note spotRight');
+        this.dumpSpots();
         return false;
     };
     FocusZoomNote.prototype.moveSpotIntoView = function (mngmnt) {
+        console.log('moveSpotIntoView');
+        this.dumpSpots();
+    };
+    FocusZoomNote.prototype.dumpSpots = function () {
+        console.log('dumpSpots');
     };
     return FocusZoomNote;
 }());

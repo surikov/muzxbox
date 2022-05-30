@@ -1098,14 +1098,16 @@ declare class PianoRollRenderer {
     initOthersAnchors(zRender: ZRender): void;
     addParameterMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, parameter: ZvoogParameterData, measureNum: number, time: number, css: string, anchors: TileAnchor[]): void;
     addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number;
-    addSubVoiceKnobs(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, anchor: TileAnchor): void;
+    createNoteUpAction(layerSelector: LayerSelector, tt: number, vv: number): (x: number, y: number) => void;
+    createNoteMenuAction(layerSelector: LayerSelector, tt: number, vv: number): (x: number, y: number) => void;
+    addNotesKnobs(layerSelector: LayerSelector, ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, trackNum: number, voiceNum: number, measureNum: number, time: number, isMain: boolean, anchor: TileAnchor): void;
     needToFocusVoice(song: ZvoogSchedule, trackNum: number, voiceNum: number): boolean;
     needToSubFocusVoice(song: ZvoogSchedule, trackNum: number, voiceNum: number): boolean;
     findFocusedTrack(tracks: ZvoogTrack[]): number;
     findFocusedFilter(filters: ZvoogFilterSetting[]): number;
     findFocusedVoice(voices: ZvoogVoice[]): number;
     findFocusedParam(pars: ZvoogParameterData[]): number;
-    drawSchedule(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
+    addPianoRoll(layerSelector: LayerSelector, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
     fillFar(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
     fillBig(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
 }
@@ -1233,6 +1235,7 @@ declare class FocusZoomNote implements FocusLevel {
     spotLeft(mngmnt: FocusManagement): boolean;
     spotRight(mngmnt: FocusManagement): boolean;
     moveSpotIntoView(mngmnt: FocusManagement): void;
+    dumpSpots(): void;
 }
 declare class FocusZoomSong implements FocusLevel {
     isMatch(zoomLevel: number, zRender: ZRender): boolean;

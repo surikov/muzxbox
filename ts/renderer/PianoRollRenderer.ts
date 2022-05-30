@@ -144,9 +144,26 @@ class PianoRollRenderer {
 		}
 		return measureMaxLen;
 	}
-	addSubVoiceKnobs(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice
-		, measureNum: number, time: number
+	createNoteUpAction(layerSelector: LayerSelector, tt: number, vv: number): (x: number, y: number) => void {
+		let up = layerSelector.upVox(tt, vv);
+		return (x: number, y: number) => {
+			up();
+			//console.log('click', x, y); 
+		};
+	}
+	createNoteMenuAction(layerSelector: LayerSelector, tt: number, vv: number): (x: number, y: number) => void {
+		//let up=layerSelector.upVox(tt, vv);
+		return (x: number, y: number) => {
+			//up();
+			console.log('menu', x, y);
+		};
+	}
+	addNotesKnobs(layerSelector: LayerSelector, ratioDuration: number, ratioThickness: number, song: ZvoogSchedule
+		//, voice: ZvoogVoice
+		, trackNum: number, voiceNum: number
+		, measureNum: number, time: number, isMain: boolean
 		, anchor: TileAnchor): void {
+		let voice = song.tracks[trackNum].voices[voiceNum];
 		let measure = voice.measureChords[measureNum];
 		let yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12) * ratioThickness;
 		for (let cc = 0; cc < measure.chords.length; cc++) {
@@ -162,24 +179,27 @@ class PianoRollRenderer {
 					slide = envelope.pitches[pp + 1].pitch;
 				}*/
 				let pitchDuration = meter2seconds(song.measures[measureNum].tempo, pitch.duration);
-				let startShift = 0;
-				if (pp == 0) {
-					startShift = 0.5 * ratioThickness;
-				}
-				let endShift = 0;
-				if (pp == envelope.pitches.length - 1) {
-					endShift = -0.49 * ratioThickness;
-				}
-				let xx = leftGridMargin + (time + pitchWhen) * ratioDuration + startShift;
-				let yy = topGridMargin + yShift - pitch.pitch * ratioThickness;
+				//let startShift = 0;
+				//if (pp == 0) {
+				//	startShift = 0.5 * ratioThickness;
+				//}
+				//let endShift = 0;
+				//if (pp == envelope.pitches.length - 1) {
+				//	endShift = -0.49 * ratioThickness;
+				//}
+				let xx = leftGridMargin + (time + pitchWhen) * ratioDuration + 0.5;// + startShift;
+				let yy = topGridMargin + yShift - pitch.pitch * ratioThickness + ratioThickness / 2 - 0.5;
+				//let yy = topGridMargin  - pitch.pitch * ratioThickness;
+
 				let knob: TileRectangle = {
 					x: xx - 0.5
 					, y: yy - 0.5
-					, w: 1
+					, w: isMain ?3:1
 					, h: 1
 					, rx: 0.5
 					, ry: 0.5
 					, css: 'actionSpot'
+					, action: isMain ? this.createNoteMenuAction(layerSelector, trackNum, voiceNum) : this.createNoteUpAction(layerSelector, trackNum, voiceNum)
 				};
 				anchor.content.push(knob);
 				pitchWhen = pitchWhen + pitchDuration;
@@ -269,7 +289,7 @@ class PianoRollRenderer {
 	}
 
 
-	drawSchedule(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {//}, menuButton: TileRectangle) {
+	addPianoRoll(layerSelector: LayerSelector, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {//}, menuButton: TileRectangle) {
 		let time = 0;
 
 		for (let mm = 0; mm < song.measures.length; mm++) {
@@ -329,16 +349,16 @@ class PianoRollRenderer {
 					if (this.needToFocusVoice(song, tt, vv)) {
 						this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'mainLine'
 							, [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
-						this.addSubVoiceKnobs(ratioDuration, ratioThickness, song, voice, mm, time, contentMeasure1);
+						this.addNotesKnobs(layerSelector, ratioDuration, ratioThickness, song, tt, vv, mm, time, true, contentMeasure1);
 					} else {
 						if (this.needToSubFocusVoice(song, tt, vv)) {
 							this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'secondLine'
 								, [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
-							this.addSubVoiceKnobs(ratioDuration, ratioThickness, song, voice, mm, time, secondMeasure1);
+							this.addNotesKnobs(layerSelector, ratioDuration, ratioThickness, song, tt, vv, mm, time, false, secondMeasure1);
 						} else {
 							this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'otherLine'
 								, [otherMeasure1, otherMeasure4, otherMeasure16]);
-							this.addSubVoiceKnobs(ratioDuration, ratioThickness, song, voice, mm, time, otherMeasure1);
+							this.addNotesKnobs(layerSelector, ratioDuration, ratioThickness, song, tt, vv, mm, time, false, otherMeasure1);
 						}
 					}
 					/*if (track.focus) {

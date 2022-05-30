@@ -14,7 +14,7 @@
 	--decor_onion: #22669966;
 	--decor_weak: #22669933;
 	--active_base: #660022ff;
-	--active_lite: #66002233;
+	--active_lite: #66002299;
 }
 .average1 {
 	fill: #22669922;
@@ -346,9 +346,7 @@ html {
 
 .actionSpot {
 	fill: var(--active_lite);
-	fill-opacity2: 25%;
 	stroke: var(--active_base);
-	stroke-opacity2: 75%;
 }
 
 /*

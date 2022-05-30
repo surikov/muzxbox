@@ -256,7 +256,8 @@ class ZRender {
 		let wholeHeight = wholeHeightTp(this.ratioThickness);
 		this.clearAnchorsContent(wholeWidth, wholeHeight);
 		this.measureInfoRenderer.fillMeasureInfo(song, this.ratioDuration, this.ratioThickness);
-		this.pianoRollRenderer.drawSchedule(song, this.ratioDuration, this.ratioThickness);
+		this.pianoRollRenderer.addPianoRoll(this.muzXBox.zMainMenu.layerSelector,
+			song, this.ratioDuration, this.ratioThickness);
 		let rhythm: ZvoogMeter[] = this.rhythmPatternDefault;
 		if (song.rhythm) {
 			if (song.rhythm.length) {
