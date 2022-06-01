@@ -4843,6 +4843,7 @@ var rightGridMargin = 1;
 var topGridMargin = 10;
 var bottomGridMargin = 30;
 var octaveCount = 7;
+var bigGroupMeasure = 16;
 var us;
 var MuzXBox = (function () {
     function MuzXBox() {
@@ -5531,7 +5532,6 @@ var PianoRollRenderer = (function () {
         }
     };
     PianoRollRenderer.prototype.fillBig = function (song, ratioDuration, ratioThickness) {
-        var nx = 16;
         var chordCount = 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureChords = 0;
@@ -5545,11 +5545,11 @@ var PianoRollRenderer = (function () {
             chordCount = chordCount + measureChords;
         }
         var time = 0;
-        for (var m10 = 0; m10 < song.measures.length; m10 = m10 + nx) {
+        for (var m10 = 0; m10 < song.measures.length; m10 = m10 + bigGroupMeasure) {
             var curChordCount = 0;
             var duration10 = 0;
             var preTime = time;
-            for (var msi = 0; msi < nx && m10 + msi < song.measures.length; msi++) {
+            for (var msi = 0; msi < bigGroupMeasure && m10 + msi < song.measures.length; msi++) {
                 var measureDuration = meter2seconds(song.measures[m10 + msi].tempo, song.measures[m10 + msi].meter);
                 duration10 = duration10 + measureDuration;
                 for (var tt = 0; tt < song.tracks.length; tt++) {
@@ -5562,23 +5562,23 @@ var PianoRollRenderer = (function () {
                 time = time + measureDuration;
             }
             var css = 'average6';
-            if (curChordCount < 0.5 * nx * chordCount / song.measures.length) {
+            if (curChordCount < 0.5 * bigGroupMeasure * chordCount / song.measures.length) {
                 css = 'average1';
             }
             else {
-                if (curChordCount < 0.8 * nx * chordCount / song.measures.length) {
+                if (curChordCount < 0.8 * bigGroupMeasure * chordCount / song.measures.length) {
                     css = 'average2';
                 }
                 else {
-                    if (curChordCount < 1.1 * nx * chordCount / song.measures.length) {
+                    if (curChordCount < 1.1 * bigGroupMeasure * chordCount / song.measures.length) {
                         css = 'average3';
                     }
                     else {
-                        if (curChordCount < 1.4 * nx * chordCount / song.measures.length) {
+                        if (curChordCount < 1.4 * bigGroupMeasure * chordCount / song.measures.length) {
                             css = 'average4';
                         }
                         else {
-                            if (curChordCount < 1.7 * nx * chordCount / song.measures.length) {
+                            if (curChordCount < 1.7 * bigGroupMeasure * chordCount / song.measures.length) {
                                 css = 'average5';
                             }
                         }
@@ -6128,6 +6128,7 @@ var FocusManagement = (function () {
 }());
 var FocusZoomFar = (function () {
     function FocusZoomFar() {
+        this.currentMeasure = 6;
     }
     FocusZoomFar.prototype.isMatch = function (zoomLevel, zRender) {
         if (zoomLevel >= zRender.zoomSong && zoomLevel < zRender.zoomFar) {
@@ -6138,6 +6139,24 @@ var FocusZoomFar = (function () {
         }
     };
     FocusZoomFar.prototype.addSpot = function (mngmnt) {
+        if (this.currentMeasure >= mngmnt.muzXBox.currentSchedule.measures.length) {
+            this.currentMeasure = mngmnt.muzXBox.currentSchedule.measures.length - 1;
+        }
+        var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
+        var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, 0, rhythmPattern);
+        var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
+        var ww = mngmnt.muzXBox.zrenderer.ratioDuration * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter);
+        var hh = 12 * octaveCount * mngmnt.muzXBox.zrenderer.ratioThickness;
+        var yy = topGridMargin;
+        mngmnt.focusAnchor.content.push({
+            x: xx,
+            y: yy,
+            w: ww,
+            h: hh,
+            rx: 0,
+            ry: 0,
+            css: 'actionPoint'
+        });
     };
     FocusZoomFar.prototype.spotUp = function (mngmnt) {
         console.log('FocusZoomFar spotUp');
@@ -6161,6 +6180,7 @@ var FocusZoomFar = (function () {
 }());
 var FocusZoomBig = (function () {
     function FocusZoomBig() {
+        this.currentGroup = 10;
     }
     FocusZoomBig.prototype.isMatch = function (zoomLevel, zRender) {
         if (zoomLevel >= zRender.zoomFar) {
@@ -6171,6 +6191,35 @@ var FocusZoomBig = (function () {
         }
     };
     FocusZoomBig.prototype.addSpot = function (mngmnt) {
+        var xx = 0;
+        var groupIdx = 0;
+        var kk = 0;
+        while (groupIdx < this.currentGroup) {
+            for (var i = 0; i < bigGroupMeasure; i++) {
+                kk = groupIdx * bigGroupMeasure + i;
+                if (kk < mngmnt.muzXBox.currentSchedule.measures.length) {
+                    xx = xx + mngmnt.muzXBox.zrenderer.ratioDuration * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[kk].tempo, mngmnt.muzXBox.currentSchedule.measures[kk].meter);
+                }
+            }
+            groupIdx++;
+        }
+        var ww = 0;
+        for (var i = 0; i < bigGroupMeasure; i++) {
+            if (kk + i < mngmnt.muzXBox.currentSchedule.measures.length) {
+                ww = ww + mngmnt.muzXBox.zrenderer.ratioDuration * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[kk + i].tempo, mngmnt.muzXBox.currentSchedule.measures[kk + i].meter);
+            }
+        }
+        var hh = 12 * octaveCount * mngmnt.muzXBox.zrenderer.ratioThickness;
+        var yy = topGridMargin;
+        mngmnt.focusAnchor.content.push({
+            x: xx,
+            y: yy,
+            w: ww,
+            h: hh,
+            rx: 0,
+            ry: 0,
+            css: 'actionPoint'
+        });
     };
     FocusZoomBig.prototype.spotUp = function (mngmnt) {
         console.log('FocusZoomBig spotUp');
@@ -6411,6 +6460,8 @@ var FocusZoomNote = (function () {
 }());
 var FocusZoomSong = (function () {
     function FocusZoomSong() {
+        this.currentMeasure = 2;
+        this.currentOctave = 5;
     }
     FocusZoomSong.prototype.isMatch = function (zoomLevel, zRender) {
         if (zoomLevel >= zRender.zoomMeasure && zoomLevel < zRender.zoomSong) {
@@ -6421,11 +6472,23 @@ var FocusZoomSong = (function () {
         }
     };
     FocusZoomSong.prototype.addSpot = function (mngmnt) {
+        if (this.currentMeasure >= mngmnt.muzXBox.currentSchedule.measures.length) {
+            this.currentMeasure = mngmnt.muzXBox.currentSchedule.measures.length - 1;
+        }
+        var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
+        var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, 0, rhythmPattern);
+        var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
+        var ww = mngmnt.muzXBox.zrenderer.ratioDuration * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter);
+        var hh = 12 * mngmnt.muzXBox.zrenderer.ratioThickness;
+        var yy = topGridMargin
+            + gridHeightTp(mngmnt.muzXBox.zrenderer.ratioThickness)
+            + 0 * 12 * mngmnt.muzXBox.zrenderer.ratioThickness
+            - 12 * this.currentOctave * mngmnt.muzXBox.zrenderer.ratioThickness;
         mngmnt.focusAnchor.content.push({
-            x: 0,
-            y: 0,
-            w: 5,
-            h: 5,
+            x: xx,
+            y: yy,
+            w: ww,
+            h: hh,
             rx: 0,
             ry: 0,
             css: 'actionPoint'

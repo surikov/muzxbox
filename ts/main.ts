@@ -8,7 +8,7 @@ let topGridMargin = 10;
 let bottomGridMargin = 30;
 //let ocataveStart=2;
 let octaveCount = 7;
-
+let bigGroupMeasure = 16;
 let us: ZUserSetting;
 
 class MuzXBox {

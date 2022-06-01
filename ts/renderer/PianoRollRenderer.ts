@@ -493,7 +493,7 @@ class PianoRollRenderer {
 		}
 	}
 	fillBig(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
-		let nx = 16;
+		//let nx = 16;
 		let chordCount = 0;
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureChords = 0;
@@ -508,11 +508,11 @@ class PianoRollRenderer {
 		}
 
 		let time = 0;
-		for (let m10 = 0; m10 < song.measures.length; m10 = m10 + nx) {
+		for (let m10 = 0; m10 < song.measures.length; m10 = m10 + bigGroupMeasure) {
 			let curChordCount = 0;
 			let duration10 = 0;
 			let preTime = time;
-			for (let msi = 0; msi < nx && m10 + msi < song.measures.length; msi++) {
+			for (let msi = 0; msi < bigGroupMeasure && m10 + msi < song.measures.length; msi++) {
 				let measureDuration = meter2seconds(song.measures[m10 + msi].tempo, song.measures[m10 + msi].meter);
 				duration10 = duration10 + measureDuration;
 				for (let tt = 0; tt < song.tracks.length; tt++) {
@@ -525,19 +525,19 @@ class PianoRollRenderer {
 				time = time + measureDuration;
 			}
 			let css = 'average6';
-			if (curChordCount < 0.5 * nx * chordCount / song.measures.length) {
+			if (curChordCount < 0.5 * bigGroupMeasure * chordCount / song.measures.length) {
 				css = 'average1';
 			} else {
-				if (curChordCount < 0.8 * nx * chordCount / song.measures.length) {
+				if (curChordCount < 0.8 * bigGroupMeasure * chordCount / song.measures.length) {
 					css = 'average2';
 				} else {
-					if (curChordCount < 1.1 * nx * chordCount / song.measures.length) {
+					if (curChordCount < 1.1 * bigGroupMeasure * chordCount / song.measures.length) {
 						css = 'average3';
 					} else {
-						if (curChordCount < 1.4 * nx * chordCount / song.measures.length) {
+						if (curChordCount < 1.4 * bigGroupMeasure * chordCount / song.measures.length) {
 							css = 'average4';
 						} else {
-							if (curChordCount < 1.7 * nx * chordCount / song.measures.length) {
+							if (curChordCount < 1.7 * bigGroupMeasure * chordCount / song.measures.length) {
 								css = 'average5';
 							}
 						}

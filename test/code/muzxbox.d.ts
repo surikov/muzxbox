@@ -1039,6 +1039,7 @@ declare let rightGridMargin: number;
 declare let topGridMargin: number;
 declare let bottomGridMargin: number;
 declare let octaveCount: number;
+declare let bigGroupMeasure: number;
 declare let us: ZUserSetting;
 declare class MuzXBox {
     currentSchedule: ZvoogSchedule;
@@ -1197,6 +1198,7 @@ declare class FocusManagement {
     wrongActionWarning(): void;
 }
 declare class FocusZoomFar implements FocusLevel {
+    currentMeasure: number;
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
     spotUp(mngmnt: FocusManagement): boolean;
@@ -1206,6 +1208,7 @@ declare class FocusZoomFar implements FocusLevel {
     moveSpotIntoView(mngmnt: FocusManagement): void;
 }
 declare class FocusZoomBig implements FocusLevel {
+    currentGroup: number;
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
     spotUp(mngmnt: FocusManagement): boolean;
@@ -1238,6 +1241,8 @@ declare class FocusZoomNote implements FocusLevel {
     dumpSpots(): void;
 }
 declare class FocusZoomSong implements FocusLevel {
+    currentMeasure: number;
+    currentOctave: number;
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
     spotUp(): boolean;
