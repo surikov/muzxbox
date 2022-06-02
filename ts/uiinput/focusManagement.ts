@@ -6,6 +6,7 @@ interface FocusLevel {
 	spotLeft(mngmnt: FocusManagement): boolean;
 	spotRight(mngmnt: FocusManagement): boolean;
 	moveSpotIntoView(mngmnt: FocusManagement): void;
+	moveViewToShowSpot(mngmnt: FocusManagement) :void;
 }
 
 
@@ -68,16 +69,36 @@ class FocusManagement {
 		this.currentFocusLevelX().moveSpotIntoView(this);
 	}
 	spotUp() {
-		if (!this.currentFocusLevelX().spotUp(this)) this.wrongActionWarning();
+		if (this.currentFocusLevelX().spotUp(this)) {
+			this.currentFocusLevelX().moveViewToShowSpot(this);
+			this.reSetFocus(this.muzXBox.zrenderer, gridWidthTp(this.muzXBox.currentSchedule, this.muzXBox.zrenderer.secondWidthInTaps));
+		} else {
+			this.wrongActionWarning();
+		}
 	}
 	spotDown() {
-		if (!this.currentFocusLevelX().spotDown(this)) this.wrongActionWarning();
+		if (this.currentFocusLevelX().spotDown(this)) {
+			this.currentFocusLevelX().moveViewToShowSpot(this);
+			this.reSetFocus(this.muzXBox.zrenderer, gridWidthTp(this.muzXBox.currentSchedule, this.muzXBox.zrenderer.secondWidthInTaps));
+		} else {
+			this.wrongActionWarning();
+		}
 	}
 	spotLeft() {
-		if (!this.currentFocusLevelX().spotLeft(this)) this.wrongActionWarning();
+		if (this.currentFocusLevelX().spotLeft(this)) {
+			this.currentFocusLevelX().moveViewToShowSpot(this);
+			this.reSetFocus(this.muzXBox.zrenderer, gridWidthTp(this.muzXBox.currentSchedule, this.muzXBox.zrenderer.secondWidthInTaps));
+		} else {
+			this.wrongActionWarning();
+		}
 	}
 	spotRight() {
-		if (!this.currentFocusLevelX().spotRight(this)) this.wrongActionWarning();
+		if (this.currentFocusLevelX().spotRight(this)) {
+			this.currentFocusLevelX().moveViewToShowSpot(this);
+			this.reSetFocus(this.muzXBox.zrenderer, gridWidthTp(this.muzXBox.currentSchedule, this.muzXBox.zrenderer.secondWidthInTaps));
+		} else {
+			this.wrongActionWarning();
+		}
 	}
 	/*spotReset() {
 		console.log('spotReset');

@@ -98,8 +98,8 @@ class TimeLineRenderer {
 		//zrenderer.tileLevel.resetAnchor(this.measuresTimelineAnchor256, this.upperSelectionScale);
 		this.drawSchedule(zrenderer
 			, currentSchedule
-			, zrenderer.ratioDuration
-			, zrenderer.ratioThickness
+			, zrenderer.secondWidthInTaps
+			, zrenderer.pitchLineThicknessInTaps
 		);
 		//zrenderer.tileLevel.allTilesOK=false;
 		//console.log(this.zrenderer.gridRenderer.gridLayerGroup);

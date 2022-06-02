@@ -39,4 +39,7 @@ class FocusZoomNote implements FocusLevel {
 		console.log('dumpSpots');
 
 	}
+	moveViewToShowSpot(mngmnt: FocusManagement): void {
+
+	}
 }

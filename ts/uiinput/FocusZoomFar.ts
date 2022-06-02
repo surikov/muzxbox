@@ -13,9 +13,9 @@ class FocusZoomFar implements FocusLevel {
 		}
 		var rhythmPattern: ZvoogMeter[] = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
 		let measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, 0, rhythmPattern);
-		let xx = leftGridMargin + mngmnt.muzXBox.zrenderer.ratioDuration * measuresAndStep.start;
-		let ww = mngmnt.muzXBox.zrenderer.ratioDuration *meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter);
-		let hh = 12 *octaveCount* mngmnt.muzXBox.zrenderer.ratioThickness;
+		let xx = leftGridMargin + mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.start;
+		let ww = mngmnt.muzXBox.zrenderer.secondWidthInTaps *meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter);
+		let hh = 12 *octaveCount* mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
 		let yy = topGridMargin ;
 		mngmnt.focusAnchor.content.push({
 			x: xx
@@ -45,5 +45,8 @@ class FocusZoomFar implements FocusLevel {
 	}
 	moveSpotIntoView(mngmnt: FocusManagement) :void{
 		
+	}
+	moveViewToShowSpot(mngmnt: FocusManagement): void {
+
 	}
 }

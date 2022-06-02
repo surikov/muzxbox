@@ -248,8 +248,8 @@ declare class ZRender {
     zoomFar: number;
     zoomBig: number;
     zoomMax: number;
-    ratioDuration: number;
-    ratioThickness: number;
+    secondWidthInTaps: number;
+    pitchLineThicknessInTaps: number;
     sizeRatio: number;
     rhythmPatternDefault: ZvoogMeter[];
     measureInfoRenderer: MeasureInfoRenderer;
@@ -1173,6 +1173,7 @@ interface FocusLevel {
     spotLeft(mngmnt: FocusManagement): boolean;
     spotRight(mngmnt: FocusManagement): boolean;
     moveSpotIntoView(mngmnt: FocusManagement): void;
+    moveViewToShowSpot(mngmnt: FocusManagement): void;
 }
 declare class FocusManagement {
     focusMarkerLayer: SVGElement;
@@ -1206,9 +1207,10 @@ declare class FocusZoomFar implements FocusLevel {
     spotLeft(mngmnt: FocusManagement): boolean;
     spotRight(mngmnt: FocusManagement): boolean;
     moveSpotIntoView(mngmnt: FocusManagement): void;
+    moveViewToShowSpot(mngmnt: FocusManagement): void;
 }
 declare class FocusZoomBig implements FocusLevel {
-    currentGroup: number;
+    currentGroupIndx: number;
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
     spotUp(mngmnt: FocusManagement): boolean;
@@ -1216,11 +1218,12 @@ declare class FocusZoomBig implements FocusLevel {
     spotLeft(mngmnt: FocusManagement): boolean;
     spotRight(mngmnt: FocusManagement): boolean;
     moveSpotIntoView(mngmnt: FocusManagement): void;
+    moveViewToShowSpot(mngmnt: FocusManagement): void;
 }
 declare class FocusZoomMeasure implements FocusLevel {
-    currentPitch: number;
-    currentMeasure: number;
-    currentStep: number;
+    pitchLineIdx: number;
+    idxMeasure: number;
+    idxStep: number;
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
     spotUp(mngmnt: FocusManagement): boolean;
@@ -1239,16 +1242,18 @@ declare class FocusZoomNote implements FocusLevel {
     spotRight(mngmnt: FocusManagement): boolean;
     moveSpotIntoView(mngmnt: FocusManagement): void;
     dumpSpots(): void;
+    moveViewToShowSpot(mngmnt: FocusManagement): void;
 }
 declare class FocusZoomSong implements FocusLevel {
-    currentMeasure: number;
-    currentOctave: number;
+    indexMeasure: number;
+    indexOctave: number;
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
-    spotUp(): boolean;
-    spotDown(): boolean;
-    spotLeft(): boolean;
-    spotRight(): boolean;
+    spotUp(mngmnt: FocusManagement): boolean;
+    spotDown(mngmnt: FocusManagement): boolean;
+    spotLeft(mngmnt: FocusManagement): boolean;
+    spotRight(mngmnt: FocusManagement): boolean;
+    moveViewToShowSpot(mngmnt: FocusManagement): void;
     moveSpotIntoView(mngmnt: FocusManagement): void;
 }
 declare class LeftKeysRenderer {

@@ -8,8 +8,8 @@ class ZRender {
 	zoomFar: number = 256;
 	zoomBig: number = 512;
 	zoomMax: number = 1024;
-	ratioDuration = 50;
-	ratioThickness = 7;
+	secondWidthInTaps = 50;
+	pitchLineThicknessInTaps = 7;
 	sizeRatio = 2;
 
 	rhythmPatternDefault: ZvoogMeter[] = [
@@ -77,7 +77,7 @@ class ZRender {
 
 			if (curLOD != lastLevelOfDetails) {
 				//let songDuration = scheduleSecondsDuration(this.muzXBox.currentSchedule);
-				let wholeWidth = gridWidthTp(this.muzXBox.currentSchedule, this.muzXBox.zrenderer.ratioDuration);
+				let wholeWidth = gridWidthTp(this.muzXBox.currentSchedule, this.muzXBox.zrenderer.secondWidthInTaps);
 				//console.log('run afterZoomCallback', lastLevelOfDetails, curLOD, this.tileLevel.translateZ);
 				lastLevelOfDetails = curLOD;
 				this.focusManager.resetSpotPosition();
@@ -226,7 +226,7 @@ class ZRender {
 		//anchor.ww = this.ratioDuration * songDuration;
 		anchor.ww = wholeWidth;
 		//anchor.hh = 128 * this.ratioThickness;
-		anchor.hh = wholeHeightTp(this.ratioThickness);
+		anchor.hh = wholeHeightTp(this.pitchLineThicknessInTaps);
 	}
 	clearAnchorsContent(wholeWidth: number, wholeHeight: number): void {
 		let anchors: TileAnchor[] = [
@@ -252,21 +252,21 @@ class ZRender {
 
 	drawSchedule(song: ZvoogSchedule) {//}, menuButton: TileRectangle) {
 		//let songDuration = scheduleSecondsDuration(song);
-		let wholeWidth = wholeWidthTp(song, this.ratioDuration);
-		let wholeHeight = wholeHeightTp(this.ratioThickness);
+		let wholeWidth = wholeWidthTp(song, this.secondWidthInTaps);
+		let wholeHeight = wholeHeightTp(this.pitchLineThicknessInTaps);
 		this.clearAnchorsContent(wholeWidth, wholeHeight);
-		this.measureInfoRenderer.fillMeasureInfo(song, this.ratioDuration, this.ratioThickness);
+		this.measureInfoRenderer.fillMeasureInfo(song, this.secondWidthInTaps, this.pitchLineThicknessInTaps);
 		this.pianoRollRenderer.addPianoRoll(this.muzXBox.zMainMenu.layerSelector,
-			song, this.ratioDuration, this.ratioThickness);
+			song, this.secondWidthInTaps, this.pitchLineThicknessInTaps);
 		let rhythm: ZvoogMeter[] = this.rhythmPatternDefault;
 		if (song.rhythm) {
 			if (song.rhythm.length) {
 				rhythm = song.rhythm;
 			}
 		}
-		this.gridRenderer.drawGrid(this, song, this.ratioDuration, this.ratioThickness, rhythm);
-		this.timeLineRenderer.drawSchedule(this, song, this.ratioDuration, this.ratioThickness);
-		this.leftKeysRenderer.drawKeys(this, song, this.ratioDuration, this.ratioThickness);
+		this.gridRenderer.drawGrid(this, song, this.secondWidthInTaps, this.pitchLineThicknessInTaps, rhythm);
+		this.timeLineRenderer.drawSchedule(this, song, this.secondWidthInTaps, this.pitchLineThicknessInTaps);
+		this.leftKeysRenderer.drawKeys(this, song, this.secondWidthInTaps, this.pitchLineThicknessInTaps);
 		/*
 		this.debugAnchor0.content.push({
 			x: leftGridMargin

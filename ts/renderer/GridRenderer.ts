@@ -162,8 +162,8 @@ class GridRenderer {
 		//zrenderer.tileLevel.resetAnchor(this.gridAnchor256, this.gridLayerGroup);
 		this.drawGrid(zrenderer
 			, currentSchedule
-			, zrenderer.ratioDuration
-			, zrenderer.ratioThickness
+			, zrenderer.secondWidthInTaps
+			, zrenderer.pitchLineThicknessInTaps
 			, meters);
 	}
 }

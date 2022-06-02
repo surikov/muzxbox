@@ -67,17 +67,55 @@ class MuzXBox {
 						, measureChords: [{
 							chords: [{
 								when: { count: 1, division: 4 }, variation: 0, envelopes: [{
-									pitches: [{ duration: { count: 5, division: 8 }, pitch: 24 },{ duration: { count: 1, division: 8 }, pitch: 36 }]
+									pitches: [{ duration: { count: 5, division: 8 }, pitch: 24 }, { duration: { count: 1, division: 8 }, pitch: 36 }]
 								}]
 							}]
-						},{
-							chords: []
-						}]
+						}
+							, { chords: [] }
+							, { chords: [] }
+						]
+					}
+					, {
+						filters: []
+						, title: 'Another'
+						, performer: { performerPlugin: null, parameters: [], kind: 'none', initial: '' }
+						, measureChords: [
+							{ chords: [] }
+							, {
+								chords: [{
+									when: { count: 2, division: 4 }, variation: 0, envelopes: [{
+										pitches: [{ duration: { count: 4, division: 8 }, pitch: 54 }]
+									}]
+								}]
+							}
+							, { chords: [] }
+						]
 					}
 				]
-			}]
+			}
+				, {
+				title: "Second", filters: [], voices: [
+					{
+						filters: []
+						, title: 'Another'
+						, performer: { performerPlugin: null, parameters: [], kind: 'none', initial: '' }
+						, measureChords: [
+							{ chords: [] }
+							, { chords: [] }
+							, {
+								chords: [{
+									when: { count: 1, division: 16 }, variation: 0, envelopes: [{
+										pitches: [{ duration: { count: 15, division: 16 }, pitch: 70 }]
+									}]
+								}]
+							}
+						]
+					}
+				]
+			}
+			]
 			, filters: []
-			, measures: [{ meter: { count: 3, division: 4 }, tempo: 120 }, { meter: { count: 4, division: 4 }, tempo: 90 }]
+			, measures: [{ meter: { count: 3, division: 4 }, tempo: 120 }, { meter: { count: 4, division: 4 }, tempo: 90 }, { meter: { count: 4, division: 4 }, tempo: 180 }]
 			, harmony: { tone: '', mode: '', progression: [] }
 		};
 		this.currentSchedule = emptySchedule;

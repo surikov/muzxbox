@@ -245,7 +245,8 @@ html {
 }
 
 .actionPoint {
-	fill: var(--active_lite);
+	fill2: var(--decor_base);
+	text-shadow2: 2111px 2111px 5px red;
 	animation-name: actionBlink;
 	animation-duration: 1s;
 	animation-iteration-count: infinite;
@@ -255,10 +256,10 @@ html {
 
 @keyframes actionBlink {
 	from {
-		fill: var(--active_base);
+		fill: var(--decor_solid);
 	}
 	to {
-		fill: var(--active_lite);
+		fill: var(--active_base);
 	}
 }
 
