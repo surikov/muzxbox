@@ -268,6 +268,7 @@ declare class ZRender {
     muzXBox: MuzXBox;
     constructor(bx: MuzXBox);
     bindLayers(): void;
+    zToLOD(zz: number): number;
     resetLabel(song: ZvoogSchedule): void;
     levelOfDetails(zz: number): 1 | 16 | 64 | 256 | 4;
     initUI(bx: MuzXBox): void;
@@ -1199,7 +1200,7 @@ declare class FocusManagement {
     wrongActionWarning(): void;
 }
 declare class FocusZoomFar implements FocusLevel {
-    currentMeasure: number;
+    idxMeasureStart: number;
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
     spotUp(mngmnt: FocusManagement): boolean;
@@ -1210,7 +1211,7 @@ declare class FocusZoomFar implements FocusLevel {
     moveViewToShowSpot(mngmnt: FocusManagement): void;
 }
 declare class FocusZoomBig implements FocusLevel {
-    currentGroupIndx: number;
+    measureGroupIndx: number;
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
     spotUp(mngmnt: FocusManagement): boolean;

@@ -74,17 +74,28 @@ class ZRender {
 			if (this.tileLevel.translateZ >= this.zoomBig) curLOD = this.zoomBig;
 			if (this.tileLevel.translateZ >= this.zoomMax) curLOD = this.zoomMax;
 
-
+			var curLOD = this.zToLOD(this.tileLevel.translateZ);
 			if (curLOD != lastLevelOfDetails) {
 				//let songDuration = scheduleSecondsDuration(this.muzXBox.currentSchedule);
 				let wholeWidth = gridWidthTp(this.muzXBox.currentSchedule, this.muzXBox.zrenderer.secondWidthInTaps);
-				//console.log('run afterZoomCallback', lastLevelOfDetails, curLOD, this.tileLevel.translateZ);
+				console.log('LOD', lastLevelOfDetails, curLOD, this.tileLevel.translateZ);
 				lastLevelOfDetails = curLOD;
 				this.focusManager.resetSpotPosition();
 				this.focusManager.reSetFocus(this, wholeWidth);
 			}
 		};
 
+	}
+	zToLOD(zz:number):number{
+		var curLOD = this.zoomMin;
+		if (zz >= this.zoomMin) curLOD = this.zoomMin;
+		if (zz >= this.zoomNote) curLOD = this.zoomNote;
+		if (zz >= this.zoomMeasure) curLOD = this.zoomMeasure;
+		if (zz >= this.zoomSong) curLOD = this.zoomSong;
+		if (zz >= this.zoomFar) curLOD = this.zoomFar;
+		if (zz >= this.zoomBig) curLOD = this.zoomBig;
+		if (zz >= this.zoomMax) curLOD = this.zoomMax;
+		return curLOD;
 	}
 	resetLabel(song: ZvoogSchedule) {
 		let s1: string = '';

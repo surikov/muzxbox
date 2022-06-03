@@ -1246,13 +1246,33 @@ var ZRender = (function () {
                 curLOD = _this.zoomBig;
             if (_this.tileLevel.translateZ >= _this.zoomMax)
                 curLOD = _this.zoomMax;
+            var curLOD = _this.zToLOD(_this.tileLevel.translateZ);
             if (curLOD != lastLevelOfDetails) {
                 var wholeWidth = gridWidthTp(_this.muzXBox.currentSchedule, _this.muzXBox.zrenderer.secondWidthInTaps);
+                console.log('LOD', lastLevelOfDetails, curLOD, _this.tileLevel.translateZ);
                 lastLevelOfDetails = curLOD;
                 _this.focusManager.resetSpotPosition();
                 _this.focusManager.reSetFocus(_this, wholeWidth);
             }
         };
+    };
+    ZRender.prototype.zToLOD = function (zz) {
+        var curLOD = this.zoomMin;
+        if (zz >= this.zoomMin)
+            curLOD = this.zoomMin;
+        if (zz >= this.zoomNote)
+            curLOD = this.zoomNote;
+        if (zz >= this.zoomMeasure)
+            curLOD = this.zoomMeasure;
+        if (zz >= this.zoomSong)
+            curLOD = this.zoomSong;
+        if (zz >= this.zoomFar)
+            curLOD = this.zoomFar;
+        if (zz >= this.zoomBig)
+            curLOD = this.zoomBig;
+        if (zz >= this.zoomMax)
+            curLOD = this.zoomMax;
+        return curLOD;
     };
     ZRender.prototype.resetLabel = function (song) {
         var s1 = '';
@@ -6066,7 +6086,6 @@ var FocusManagement = (function () {
         ];
     }
     FocusManagement.prototype.attachFocus = function (bx, zRender) {
-        console.log('attachFocus');
         this.muzXBox = bx;
         this.focusMarkerLayer = document.getElementById('focusMarkerLayer');
         this.focusAnchor = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomMax + 1);
@@ -6142,13 +6161,11 @@ var FocusManagement = (function () {
         console.log('spotSelectA');
     };
     FocusManagement.prototype.spotPlus = function () {
-        console.log('spotPlus');
         var zoom = this.muzXBox.zrenderer.tileLevel.translateZ
             - this.muzXBox.zrenderer.tileLevel.translateZ * 0.25;
         this.changeZoomTo(zoom);
     };
     FocusManagement.prototype.spotMinus = function () {
-        console.log('spotMinus');
         var zoom = this.muzXBox.zrenderer.tileLevel.translateZ
             + this.muzXBox.zrenderer.tileLevel.translateZ * 0.25;
         this.changeZoomTo(zoom);
@@ -6174,9 +6191,16 @@ var FocusManagement = (function () {
         if (zoom > this.muzXBox.zrenderer.tileLevel.maxZoom()) {
             zoom = this.muzXBox.zrenderer.tileLevel.maxZoom();
         }
+        var oldLOD = this.muzXBox.zrenderer.zToLOD(this.muzXBox.zrenderer.tileLevel.translateZ);
         this.muzXBox.zrenderer.tileLevel.translateZ = zoom;
+        var newLOD = this.muzXBox.zrenderer.zToLOD(this.muzXBox.zrenderer.tileLevel.translateZ);
         this.muzXBox.zrenderer.tileLevel.applyZoomPosition();
         this.muzXBox.zrenderer.tileLevel.adjustContentPosition();
+        console.log('moveViewToShowSpot');
+        if (oldLOD != newLOD) {
+            this.currentFocusLevelX().moveSpotIntoView(this);
+        }
+        this.currentFocusLevelX().moveViewToShowSpot(this);
         this.muzXBox.zrenderer.tileLevel.allTilesOK = false;
     };
     FocusManagement.prototype.wrongActionWarning = function () {
@@ -6186,7 +6210,7 @@ var FocusManagement = (function () {
 }());
 var FocusZoomFar = (function () {
     function FocusZoomFar() {
-        this.currentMeasure = 6;
+        this.idxMeasureStart = 6;
     }
     FocusZoomFar.prototype.isMatch = function (zoomLevel, zRender) {
         if (zoomLevel >= zRender.zoomSong && zoomLevel < zRender.zoomFar) {
@@ -6197,13 +6221,14 @@ var FocusZoomFar = (function () {
         }
     };
     FocusZoomFar.prototype.addSpot = function (mngmnt) {
-        if (this.currentMeasure >= mngmnt.muzXBox.currentSchedule.measures.length) {
-            this.currentMeasure = mngmnt.muzXBox.currentSchedule.measures.length - 1;
+        if (this.idxMeasureStart >= mngmnt.muzXBox.currentSchedule.measures.length) {
+            this.idxMeasureStart = mngmnt.muzXBox.currentSchedule.measures.length - 1;
         }
         var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
-        var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.currentMeasure, 0, rhythmPattern);
+        var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.idxMeasureStart, 0, rhythmPattern);
         var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.start;
-        var ww = mngmnt.muzXBox.zrenderer.secondWidthInTaps * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.currentMeasure].meter);
+        var ww = mngmnt.muzXBox.zrenderer.secondWidthInTaps
+            * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.idxMeasureStart].tempo, mngmnt.muzXBox.currentSchedule.measures[this.idxMeasureStart].meter);
         var hh = 12 * octaveCount * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
         var yy = topGridMargin;
         mngmnt.focusAnchor.content.push({
@@ -6225,22 +6250,76 @@ var FocusZoomFar = (function () {
         return false;
     };
     FocusZoomFar.prototype.spotLeft = function (mngmnt) {
-        console.log('FocusZoomFar spotLeft');
-        return false;
+        if (this.idxMeasureStart > 0) {
+            this.idxMeasureStart--;
+            return true;
+        }
+        else {
+            return false;
+        }
     };
     FocusZoomFar.prototype.spotRight = function (mngmnt) {
-        console.log('FocusZoomFar spotRight');
-        return false;
+        if (this.idxMeasureStart < mngmnt.muzXBox.currentSchedule.measures.length - 1) {
+            this.idxMeasureStart++;
+            return true;
+        }
+        else {
+            return false;
+        }
     };
     FocusZoomFar.prototype.moveSpotIntoView = function (mngmnt) {
+        var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
+        var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.idxMeasureStart, 0, rhythmPattern);
+        var tp = mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        var ww = mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.duration;
+        var hh = mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+        var tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ;
+        var tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / tz;
+        var ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / tz;
+        var vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth;
+        var vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight;
+        var ih = mngmnt.muzXBox.zrenderer.tileLevel.innerHeight / tz;
+        var iw = mngmnt.muzXBox.zrenderer.tileLevel.innerWidth / tz;
+        var newX = iw / 2;
+        if (vw < iw) {
+            newX = vw / 2 - tx;
+        }
+        var stepX = -tp * leftGridMargin / tz + newX;
+        var findX = tz * stepX / tp;
+        var measureStep = findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern, mngmnt.muzXBox.zrenderer.secondWidthInTaps, findX);
+        if (measureStep) {
+            this.idxMeasureStart = measureStep.measure;
+        }
+        else {
+            this.idxMeasureStart = 0;
+        }
     };
     FocusZoomFar.prototype.moveViewToShowSpot = function (mngmnt) {
+        var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
+        var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.idxMeasureStart, 0, rhythmPattern);
+        var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.start;
+        var yy = topGridMargin;
+        var ww = mngmnt.muzXBox.zrenderer.secondWidthInTaps
+            * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.idxMeasureStart].tempo, mngmnt.muzXBox.currentSchedule.measures[this.idxMeasureStart].meter);
+        var hh = 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+        var tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        var ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        var tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        var vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
+        var vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
+        if (xx + ww > vw - tx) {
+            mngmnt.muzXBox.zrenderer.tileLevel.translateX = (vw - xx - ww) * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        }
+        if (xx < -tx) {
+            mngmnt.muzXBox.zrenderer.tileLevel.translateX = -xx * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        }
+        mngmnt.muzXBox.zrenderer.tileLevel.applyZoomPosition();
     };
     return FocusZoomFar;
 }());
 var FocusZoomBig = (function () {
     function FocusZoomBig() {
-        this.currentGroupIndx = 10;
+        this.measureGroupIndx = 2;
     }
     FocusZoomBig.prototype.isMatch = function (zoomLevel, zRender) {
         if (zoomLevel >= zRender.zoomFar) {
@@ -6254,7 +6333,7 @@ var FocusZoomBig = (function () {
         var xx = 0;
         var groupIdx = 0;
         var kk = 0;
-        while (groupIdx < this.currentGroupIndx) {
+        while (groupIdx < this.measureGroupIndx) {
             for (var i = 0; i < bigGroupMeasure && groupIdx * bigGroupMeasure + i < mngmnt.muzXBox.currentSchedule.measures.length - 1; i++) {
                 kk = groupIdx * bigGroupMeasure + i;
                 if (kk < mngmnt.muzXBox.currentSchedule.measures.length) {
@@ -6290,16 +6369,79 @@ var FocusZoomBig = (function () {
         return false;
     };
     FocusZoomBig.prototype.spotLeft = function (mngmnt) {
-        console.log('FocusZoomBig spotLeft');
-        return false;
+        if (this.measureGroupIndx > 0) {
+            this.measureGroupIndx--;
+            return true;
+        }
+        else {
+            return false;
+        }
     };
     FocusZoomBig.prototype.spotRight = function (mngmnt) {
-        console.log('FocusZoomBig spotRight');
-        return false;
+        if (this.measureGroupIndx * bigGroupMeasure + bigGroupMeasure < mngmnt.muzXBox.currentSchedule.measures.length) {
+            this.measureGroupIndx++;
+            return true;
+        }
+        else {
+            return false;
+        }
     };
     FocusZoomBig.prototype.moveSpotIntoView = function (mngmnt) {
+        var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
+        var firstMeasureIdx = this.measureGroupIndx * bigGroupMeasure;
+        var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, firstMeasureIdx, 0, rhythmPattern);
+        var tp = mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        var ww = 0;
+        for (var i = 0; i < bigGroupMeasure && i + firstMeasureIdx < mngmnt.muzXBox.currentSchedule.measures.length; i++) {
+            ww = ww + mngmnt.muzXBox.zrenderer.secondWidthInTaps
+                * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[firstMeasureIdx + i].tempo, mngmnt.muzXBox.currentSchedule.measures[firstMeasureIdx + i].meter);
+        }
+        var hh = mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+        var tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ;
+        var tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / tz;
+        var ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / tz;
+        var vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth;
+        var vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight;
+        var ih = mngmnt.muzXBox.zrenderer.tileLevel.innerHeight / tz;
+        var iw = mngmnt.muzXBox.zrenderer.tileLevel.innerWidth / tz;
+        var newX = iw / 2;
+        if (vw < iw) {
+            newX = vw / 2 - tx;
+        }
+        var stepX = -tp * leftGridMargin / tz + newX;
+        var findX = tz * stepX / tp;
+        var measureStep = findMeasureStep(mngmnt.muzXBox.currentSchedule.measures, rhythmPattern, mngmnt.muzXBox.zrenderer.secondWidthInTaps, findX);
+        if (measureStep) {
+            this.measureGroupIndx = Math.round(measureStep.measure / bigGroupMeasure);
+        }
+        else {
+            this.measureGroupIndx = 0;
+        }
     };
     FocusZoomBig.prototype.moveViewToShowSpot = function (mngmnt) {
+        var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
+        var firstMeasureIdx = this.measureGroupIndx * bigGroupMeasure;
+        var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, firstMeasureIdx, 0, rhythmPattern);
+        var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.start;
+        var yy = topGridMargin;
+        var ww = 0;
+        for (var i = 0; i < bigGroupMeasure && i + firstMeasureIdx < mngmnt.muzXBox.currentSchedule.measures.length; i++) {
+            ww = ww + mngmnt.muzXBox.zrenderer.secondWidthInTaps
+                * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[firstMeasureIdx + i].tempo, mngmnt.muzXBox.currentSchedule.measures[firstMeasureIdx + i].meter);
+        }
+        var hh = 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+        var tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        var ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        var tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        var vw = mngmnt.muzXBox.zrenderer.tileLevel.viewWidth * tz;
+        var vh = mngmnt.muzXBox.zrenderer.tileLevel.viewHeight * tz;
+        if (xx + ww > vw - tx) {
+            mngmnt.muzXBox.zrenderer.tileLevel.translateX = (vw - xx - ww) * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        }
+        if (xx < -tx) {
+            mngmnt.muzXBox.zrenderer.tileLevel.translateX = -xx * mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
+        }
+        mngmnt.muzXBox.zrenderer.tileLevel.applyZoomPosition();
     };
     return FocusZoomBig;
 }());
@@ -6388,8 +6530,7 @@ var FocusZoomMeasure = (function () {
         var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.start;
         var yy = topGridMargin
             + gridHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
-            + 0 * 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps
-            - this.pitchLineIdx * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+            - (this.pitchLineIdx + 1) * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
         var ww = mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.duration;
         var hh = mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
         var tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
@@ -6466,36 +6607,29 @@ var FocusZoomNote = (function () {
         }
     };
     FocusZoomNote.prototype.addSpot = function (mngmnt) {
-        console.log('addSpot');
         this.dumpSpots();
         mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'actionPoint' });
     };
     FocusZoomNote.prototype.spotUp = function (mngmnt) {
-        console.log('note spotUp');
         this.dumpSpots();
         return false;
     };
     FocusZoomNote.prototype.spotDown = function (mngmnt) {
-        console.log('note spotDown');
         this.dumpSpots();
         return false;
     };
     FocusZoomNote.prototype.spotLeft = function (mngmnt) {
-        console.log('note spotLeft');
         this.dumpSpots();
         return false;
     };
     FocusZoomNote.prototype.spotRight = function (mngmnt) {
-        console.log('note spotRight');
         this.dumpSpots();
         return false;
     };
     FocusZoomNote.prototype.moveSpotIntoView = function (mngmnt) {
-        console.log('moveSpotIntoView');
         this.dumpSpots();
     };
     FocusZoomNote.prototype.dumpSpots = function () {
-        console.log('dumpSpots');
     };
     FocusZoomNote.prototype.moveViewToShowSpot = function (mngmnt) {
     };

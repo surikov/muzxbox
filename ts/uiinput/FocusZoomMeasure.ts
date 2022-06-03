@@ -93,8 +93,8 @@ class FocusZoomMeasure implements FocusLevel {
 		let xx = leftGridMargin + mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.start;
 		let yy = topGridMargin
 			+ gridHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
-			+ 0 * 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps
-			- this.pitchLineIdx * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+			//+ 0 * 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps
+			- (this.pitchLineIdx+1) * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
 		let ww = mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.duration;
 		let hh = mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
 		let tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;

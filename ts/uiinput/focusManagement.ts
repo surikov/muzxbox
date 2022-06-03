@@ -26,7 +26,7 @@ class FocusManagement {
 		, new FocusZoomBig()
 	];
 	attachFocus(bx: MuzXBox, zRender: ZRender) {
-		console.log('attachFocus');
+		//console.log('attachFocus');
 		this.muzXBox = bx;
 		this.focusMarkerLayer = (document.getElementById('focusMarkerLayer') as any) as SVGElement;
 		this.focusAnchor = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomMax + 1);
@@ -107,13 +107,13 @@ class FocusManagement {
 		console.log('spotSelectA');
 	}
 	spotPlus() {
-		console.log('spotPlus');
+		//console.log('spotPlus');
 		let zoom: number = this.muzXBox.zrenderer.tileLevel.translateZ
 			- this.muzXBox.zrenderer.tileLevel.translateZ * 0.25;
 		this.changeZoomTo(zoom);
 	}
 	spotMinus() {
-		console.log('spotMinus');
+		//console.log('spotMinus');
 		let zoom: number = this.muzXBox.zrenderer.tileLevel.translateZ
 			+ this.muzXBox.zrenderer.tileLevel.translateZ * 0.25;
 		this.changeZoomTo(zoom);
@@ -144,9 +144,22 @@ class FocusManagement {
 			zoom = this.muzXBox.zrenderer.tileLevel.maxZoom();
 		}
 		//console.log('zoom', this.muzXBox.zrenderer.tileLevel.translateZ, zoom);
+		var oldLOD=this.muzXBox.zrenderer.zToLOD(this.muzXBox.zrenderer.tileLevel.translateZ);
 		this.muzXBox.zrenderer.tileLevel.translateZ = zoom;
+		var newLOD=this.muzXBox.zrenderer.zToLOD(this.muzXBox.zrenderer.tileLevel.translateZ);
+
+		//this.currentFocusLevelX().moveViewToShowSpot(this);
+
 		this.muzXBox.zrenderer.tileLevel.applyZoomPosition();
 		this.muzXBox.zrenderer.tileLevel.adjustContentPosition();
+
+		console.log('moveViewToShowSpot');
+
+		if(oldLOD!=newLOD){
+			this.currentFocusLevelX().moveSpotIntoView(this);
+		}
+		
+		this.currentFocusLevelX().moveViewToShowSpot(this);
 		this.muzXBox.zrenderer.tileLevel.allTilesOK = false;
 	}
 	wrongActionWarning(): void {
