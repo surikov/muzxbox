@@ -78,7 +78,7 @@ class ZRender {
 			if (curLOD != lastLevelOfDetails) {
 				//let songDuration = scheduleSecondsDuration(this.muzXBox.currentSchedule);
 				let wholeWidth = gridWidthTp(this.muzXBox.currentSchedule, this.muzXBox.zrenderer.secondWidthInTaps);
-				console.log('LOD', lastLevelOfDetails, curLOD, this.tileLevel.translateZ);
+				//console.log('LOD', lastLevelOfDetails, curLOD, this.tileLevel.translateZ);
 				lastLevelOfDetails = curLOD;
 				this.focusManager.resetSpotPosition();
 				this.focusManager.reSetFocus(this, wholeWidth);

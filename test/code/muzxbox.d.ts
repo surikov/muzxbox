@@ -502,6 +502,7 @@ declare type ZvoogCurvePoint = {
 declare type ZvoogMeasure = {
     meter: ZvoogMeter;
     tempo: number;
+    points: ZvoogMeasurePoint[];
 };
 declare class ZvoogPluginLock {
     lockedState: boolean;
@@ -546,6 +547,10 @@ declare type ZvoogVoice = {
 };
 declare type ZvoogMeasureChord = {
     chords: ZvoogChordStrings[];
+};
+declare type ZvoogMeasurePoint = {
+    when: ZvoogMeter;
+    lyrics: string;
 };
 declare type ZvoogChordStrings = {
     when: ZvoogMeter;
@@ -689,6 +694,119 @@ declare let cachedZvoogSineSourcePlugins: ZvoogSineSource[];
 declare function takeZvoogSineSource(): ZvoogSineSource;
 declare function createPluginEffect(id: string): ZvoogFilterPlugin;
 declare function createPluginSource(id: string): ZvoogPerformerPlugin;
+declare type XYp = {
+    x: number;
+    y: number;
+};
+declare type PP = {
+    p1: XYp;
+    p2: XYp;
+};
+declare type TrackChord = {
+    when: number;
+    channel: number;
+    notes: TrackNote[];
+};
+declare type TrackNote = {
+    closed: boolean;
+    points: NotePitch[];
+};
+declare type NotePitch = {
+    pointDuration: number;
+    pitch: number;
+};
+declare type MIDIEvent = {
+    offset: number;
+    delta: number;
+    eventTypeByte: number;
+    basetype?: number;
+    subtype?: number;
+    index?: string;
+    length?: number;
+    msb?: number;
+    lsb?: number;
+    prefix?: number;
+    data?: number[];
+    tempo?: number;
+    tempoBPM?: number;
+    hour?: number;
+    minutes?: number;
+    seconds?: number;
+    frames?: number;
+    subframes?: number;
+    key?: number;
+    param1?: number;
+    param2?: number;
+    param3?: number;
+    param4?: number;
+    scale?: number;
+    badsubtype?: number;
+    midiChannel?: number;
+    playTimeMs: number;
+    trackNum?: number;
+    text?: string;
+};
+declare type MIDISongPoint = {
+    pitch: number;
+    durationms: number;
+};
+declare type MIDISongNote = {
+    points: MIDISongPoint[];
+};
+declare type MIDISongChord = {
+    when: number;
+    channel: number;
+    notes: MIDISongNote[];
+};
+declare type MIDISongTrack = {
+    title: string;
+    instrument: string;
+    program: number;
+    volumes: {
+        ms: number;
+        value: number;
+        meausre?: number;
+        skip384?: number;
+    }[];
+    songchords: MIDISongChord[];
+    order: number;
+};
+declare type MIDISongData = {
+    duration: number;
+    parser: string;
+    bpm: number;
+    changes: {
+        track: number;
+        ms: number;
+        resolution: number;
+        bpm: number;
+    }[];
+    meters: {
+        track: number;
+        ms: number;
+        count: number;
+        division: number;
+    }[];
+    lyrics: {
+        track: number;
+        ms: number;
+        txt: string;
+    }[];
+    key: number;
+    mode: number;
+    meter: {
+        count: number;
+        division: number;
+    };
+    signs: {
+        track: number;
+        ms: number;
+        sign: string;
+    }[];
+    miditracks: MIDISongTrack[];
+    speedMode: number;
+    lineMode: number;
+};
 declare let instrumentNamesArray: string[];
 declare let drumNamesArray: string[];
 declare function drumTitles(): string[];
@@ -706,14 +824,6 @@ declare class MIDIFileImporter implements ZvoogStore {
     deleteFolder(title: string, onFinish: (error: string) => void): void;
     renameFolder(title: string, newTitle: string, onFinish: (error: string) => void): void;
 }
-declare type XYp = {
-    x: number;
-    y: number;
-};
-declare type PP = {
-    p1: XYp;
-    p2: XYp;
-};
 declare class DataViewStream {
     position: number;
     buffer: DataView;
@@ -759,26 +869,12 @@ declare class MIDIFileHeader {
     keyMajMin: number;
     lastNonZeroQuarter: number;
     constructor(buffer: ArrayBuffer);
-    ______getTickResolution(tempo: number): number;
     getCalculatedTickResolution(tempo: number): number;
     get0TickResolution(): number;
     getTicksPerBeat(): number;
     getTicksPerFrame(): number;
     getSMPTEFrames(): number;
 }
-declare type TrackChord = {
-    when: number;
-    channel: number;
-    notes: TrackNote[];
-};
-declare type TrackNote = {
-    closed: boolean;
-    points: NotePitch[];
-};
-declare type NotePitch = {
-    pointDuration: number;
-    pitch: number;
-};
 declare class MIDIFileTrack {
     datas: DataView;
     HDR_LENGTH: number;
@@ -798,37 +894,6 @@ declare class MIDIFileTrack {
     chords: TrackChord[];
     constructor(buffer: ArrayBuffer, start: number);
 }
-declare type MIDIEvent = {
-    offset: number;
-    delta: number;
-    eventTypeByte: number;
-    basetype?: number;
-    subtype?: number;
-    index?: string;
-    length?: number;
-    msb?: number;
-    lsb?: number;
-    prefix?: number;
-    data?: number[];
-    tempo?: number;
-    tempoBPM?: number;
-    hour?: number;
-    minutes?: number;
-    seconds?: number;
-    frames?: number;
-    subframes?: number;
-    key?: number;
-    param1?: number;
-    param2?: number;
-    param3?: number;
-    param4?: number;
-    scale?: number;
-    badsubtype?: number;
-    midiChannel?: number;
-    playTimeMs: number;
-    trackNum?: number;
-    text?: string;
-};
 declare class MidiParser {
     header: MIDIFileHeader;
     parsedTracks: MIDIFileTrack[];
@@ -902,70 +967,7 @@ declare class MidiParser {
         track: MIDISongTrack;
     };
     dump(): MIDISongData;
-    instrumentTitles(): string[];
-    drumTitles(): string[];
 }
-declare type MIDISongPoint = {
-    pitch: number;
-    durationms: number;
-};
-declare type MIDISongNote = {
-    points: MIDISongPoint[];
-};
-declare type MIDISongChord = {
-    when: number;
-    channel: number;
-    notes: MIDISongNote[];
-};
-declare type MIDISongTrack = {
-    title: string;
-    instrument: string;
-    program: number;
-    volumes: {
-        ms: number;
-        value: number;
-        meausre?: number;
-        skip384?: number;
-    }[];
-    songchords: MIDISongChord[];
-    order: number;
-};
-declare type MIDISongData = {
-    duration: number;
-    parser: string;
-    bpm: number;
-    changes: {
-        track: number;
-        ms: number;
-        resolution: number;
-        bpm: number;
-    }[];
-    meters: {
-        track: number;
-        ms: number;
-        count: number;
-        division: number;
-    }[];
-    lyrics: {
-        track: number;
-        ms: number;
-        txt: string;
-    }[];
-    key: number;
-    mode: number;
-    meter: {
-        count: number;
-        division: number;
-    };
-    signs: {
-        track: number;
-        ms: number;
-        sign: string;
-    }[];
-    miditracks: MIDISongTrack[];
-    speedMode: number;
-    lineMode: number;
-};
 declare class MusicXMLFileImporter implements ZvoogStore {
     list(onFinish: (items: ZvoogStoreListItem[]) => void): void;
     goFolder(title: string, onFinish: (error: string) => void): void;
@@ -1110,6 +1112,7 @@ declare class PianoRollRenderer {
     findFocusedVoice(voices: ZvoogVoice[]): number;
     findFocusedParam(pars: ZvoogParameterData[]): number;
     addPianoRoll(layerSelector: LayerSelector, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
+    fillLyrics(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
     fillFar(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
     fillBig(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
 }

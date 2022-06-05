@@ -350,6 +350,11 @@ html {
 	stroke: var(--active_base);
 }
 
+.lyricsText {
+	font-size: 8cm;
+	fill: var(--decor_base);
+}
+
 /*
 https://coolors.co/ccddee-ffffff-000000-115522-226699-660022
 */

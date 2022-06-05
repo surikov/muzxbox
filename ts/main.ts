@@ -115,7 +115,7 @@ class MuzXBox {
 			}
 			]
 			, filters: []
-			, measures: [{ meter: { count: 3, division: 4 }, tempo: 120 }, { meter: { count: 4, division: 4 }, tempo: 90 }, { meter: { count: 4, division: 4 }, tempo: 180 }]
+			, measures: [{ meter: { count: 3, division: 4 }, tempo: 120,points:[] }, { meter: { count: 4, division: 4 }, tempo: 90,points:[] }, { meter: { count: 4, division: 4 }, tempo: 180,points:[] }]
 			, harmony: { tone: '', mode: '', progression: [] }
 		};
 		this.currentSchedule = emptySchedule;

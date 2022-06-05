@@ -194,7 +194,7 @@ class PianoRollRenderer {
 				let knob: TileRectangle = {
 					x: xx - 0.5
 					, y: yy - 0.5
-					, w: isMain ?3:1
+					, w: isMain ? 3 : 1
 					, h: 1
 					, rx: 0.5
 					, ry: 0.5
@@ -433,6 +433,26 @@ class PianoRollRenderer {
 		}
 		this.fillFar(song, ratioDuration, ratioThickness);
 		this.fillBig(song, ratioDuration, ratioThickness);
+		this.fillLyrics(song, ratioDuration, ratioThickness);
+	}
+	fillLyrics(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
+		let time = 0;
+		for (let mm = 0; mm < song.measures.length; mm++) {
+			let measure = song.measures[mm];
+			for (let pp = 0; pp < measure.points.length; pp++) {
+				let point = measure.points[pp];
+				let txt: TileText = {
+					x: leftGridMargin + (time + meter2seconds(measure.tempo, point.when)) * ratioDuration
+					, y: topGridMargin + 12 * octaveCount * ratioThickness
+					, text: point.lyrics
+					,css:'lyricsText'
+				};
+				this.contentOther16.content.push(txt);
+				//console.log(txt);
+			}
+			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
+			time = time + measureDuration;
+		}
 	}
 	fillFar(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
 		let chordCount = 0;

@@ -56,6 +56,7 @@
 		,"songdata/zvoogparameterdata.ts"
 		,"songdata/zvoogvoice.ts"
 		,"songdata/zvoogmeasurechord.ts"
+		,"songdata/zvoogmeasurepoint.ts"
 
 		,"songdata/zvoogchordstrings.ts"
 		,"songdata/zvoogenvelope.ts"
