@@ -28,7 +28,7 @@ class FocusZoomSong implements FocusLevel {
 			, h: hh
 			, rx: 0
 			, ry: 0
-			, css: 'actionPoint'
+			, css: 'actionPointSong'
 		});
 
 	}

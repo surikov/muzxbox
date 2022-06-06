@@ -8,7 +8,7 @@ class ZRender {
 	zoomFar: number = 256;
 	zoomBig: number = 512;
 	zoomMax: number = 1024;
-	secondWidthInTaps = 50;
+	secondWidthInTaps = 75;
 	pitchLineThicknessInTaps = 7;
 	sizeRatio = 2;
 

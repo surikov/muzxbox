@@ -90,6 +90,27 @@ class PianoRollRenderer {
 			anchors[aa].content.push(cloneLine(line));
 		}
 	}
+	addMeasureLyrics(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor, css: string) {
+		//let time = 0;
+		//for (let mm = 0; mm < song.measures.length; mm++) {
+		let measure = song.measures[mm];
+		for (let pp = 0; pp < measure.points.length; pp++) {
+			//let yShift = (pp % 2) ? 20: 10;
+			let yShift=16;
+			let point = measure.points[pp];
+			let txt: TileText = {
+				x: leftGridMargin + (time + meter2seconds(measure.tempo, point.when)) * ratioDuration
+				, y: topGridMargin + 12 * octaveCount * ratioThickness + yShift
+				, text: point.lyrics
+				, css: css
+			};
+			anchor.content.push(txt);
+			//console.log(txt);
+		}
+		let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
+		//time = time + measureDuration;
+		//}
+	}
 	addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number {
 		let measure = voice.measureChords[measureNum];
 		var measureMaxLen = anchors[0].ww;
@@ -295,10 +316,10 @@ class PianoRollRenderer {
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
 
-			let contentMeasure1: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 12 * octaveCount * ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
-			let contentMeasure4: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
-			let contentMeasure16: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
-			let contentMeasure64: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain64.showZoom, this.contentMain64.hideZoom);
+			let contentMeasure1: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain1.showZoom, this.contentMain1.hideZoom);
+			let contentMeasure4: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain4.showZoom, this.contentMain4.hideZoom);
+			let contentMeasure16: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain16.showZoom, this.contentMain16.hideZoom);
+			let contentMeasure64: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain64.showZoom, this.contentMain64.hideZoom);
 			//let contentMeasure256: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain256.showZoom, this.contentMain256.hideZoom);
 			this.contentMain1.content.push(contentMeasure1);
 			this.contentMain4.content.push(contentMeasure4);
@@ -306,10 +327,10 @@ class PianoRollRenderer {
 			this.contentMain64.content.push(contentMeasure64);
 			//this.contentMain256.content.push(contentMeasure256);
 
-			let secondMeasure1: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentSecond1.showZoom, this.contentSecond1.hideZoom);
-			let secondMeasure4: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentSecond4.showZoom, this.contentSecond4.hideZoom);
-			let secondMeasure16: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentSecond16.showZoom, this.contentSecond16.hideZoom);
-			let secondMeasure64: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentSecond64.showZoom, this.contentSecond64.hideZoom);
+			let secondMeasure1: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration,topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentSecond1.showZoom, this.contentSecond1.hideZoom);
+			let secondMeasure4: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentSecond4.showZoom, this.contentSecond4.hideZoom);
+			let secondMeasure16: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentSecond16.showZoom, this.contentSecond16.hideZoom);
+			let secondMeasure64: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentSecond64.showZoom, this.contentSecond64.hideZoom);
 			//let secondMeasure256: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentSecond256.showZoom, this.contentSecond256.hideZoom);
 			this.contentSecond1.content.push(secondMeasure1);
 			this.contentSecond4.content.push(secondMeasure4);
@@ -317,16 +338,19 @@ class PianoRollRenderer {
 			this.contentSecond64.content.push(secondMeasure64);
 			//this.contentSecond256.content.push(secondMeasure256);
 
-			let otherMeasure1: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentOther1.showZoom, this.contentOther1.hideZoom);
-			let otherMeasure4: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentOther4.showZoom, this.contentOther4.hideZoom);
-			let otherMeasure16: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentOther16.showZoom, this.contentOther16.hideZoom);
-			let otherMeasure64: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentOther64.showZoom, this.contentOther64.hideZoom);
+			let otherMeasure1: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther1.showZoom, this.contentOther1.hideZoom);
+			let otherMeasure4: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther4.showZoom, this.contentOther4.hideZoom);
+			let otherMeasure16: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther16.showZoom, this.contentOther16.hideZoom);
+			let otherMeasure64: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther64.showZoom, this.contentOther64.hideZoom);
 			//let otherMeasure256: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentOther256.showZoom, this.contentOther256.hideZoom);
 			this.contentOther1.content.push(otherMeasure1);
 			this.contentOther4.content.push(otherMeasure4);
 			this.contentOther16.content.push(otherMeasure16);
 			this.contentOther64.content.push(otherMeasure64);
 			//this.contentOther256.content.push(otherMeasure256);
+			this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure1, 'lyricsText1');
+			this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure4, 'lyricsText4');
+			this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, 'lyricsText16');
 			for (let tt = 0; tt < song.tracks.length; tt++) {
 				let track = song.tracks[tt];
 				for (let vv = 0; vv < track.voices.length; vv++) {
@@ -361,6 +385,7 @@ class PianoRollRenderer {
 							this.addNotesKnobs(layerSelector, ratioDuration, ratioThickness, song, tt, vv, mm, time, false, otherMeasure1);
 						}
 					}
+
 					/*if (track.focus) {
 						if (voice.focus) {
 							let maxMeasureLen = this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'mainLine', [
@@ -433,27 +458,9 @@ class PianoRollRenderer {
 		}
 		this.fillFar(song, ratioDuration, ratioThickness);
 		this.fillBig(song, ratioDuration, ratioThickness);
-		this.fillLyrics(song, ratioDuration, ratioThickness);
+		//this.fillLyrics(song, ratioDuration, ratioThickness);
 	}
-	fillLyrics(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
-		let time = 0;
-		for (let mm = 0; mm < song.measures.length; mm++) {
-			let measure = song.measures[mm];
-			for (let pp = 0; pp < measure.points.length; pp++) {
-				let point = measure.points[pp];
-				let txt: TileText = {
-					x: leftGridMargin + (time + meter2seconds(measure.tempo, point.when)) * ratioDuration
-					, y: topGridMargin + 12 * octaveCount * ratioThickness
-					, text: point.lyrics
-					,css:'lyricsText'
-				};
-				this.contentOther16.content.push(txt);
-				//console.log(txt);
-			}
-			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-			time = time + measureDuration;
-		}
-	}
+
 	fillFar(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
 		let chordCount = 0;
 		for (let mm = 0; mm < song.measures.length; mm++) {

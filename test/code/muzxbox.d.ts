@@ -1101,6 +1101,7 @@ declare class PianoRollRenderer {
     initSecondAnchors(zRender: ZRender): void;
     initOthersAnchors(zRender: ZRender): void;
     addParameterMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, parameter: ZvoogParameterData, measureNum: number, time: number, css: string, anchors: TileAnchor[]): void;
+    addMeasureLyrics(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor, css: string): void;
     addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number;
     createNoteUpAction(layerSelector: LayerSelector, tt: number, vv: number): (x: number, y: number) => void;
     createNoteMenuAction(layerSelector: LayerSelector, tt: number, vv: number): (x: number, y: number) => void;
@@ -1112,7 +1113,6 @@ declare class PianoRollRenderer {
     findFocusedVoice(voices: ZvoogVoice[]): number;
     findFocusedParam(pars: ZvoogParameterData[]): number;
     addPianoRoll(layerSelector: LayerSelector, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
-    fillLyrics(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
     fillFar(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
     fillBig(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
 }

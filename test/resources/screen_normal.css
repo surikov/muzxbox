@@ -4,7 +4,7 @@
 	--background_base: #c8d8e0;
 	--grid_base: #ffffffff;
 	--grid_lite: #ffffff66;
-	--prime_base: #000000ff;
+	--prime_base: #000000dd;
 	--prime_lite: #00000066;
 	--secondary_base: #115522ff;
 	--secondary_lite: #11552299;
@@ -253,13 +253,63 @@ html {
 	animation-direction: alternate-reverse;
 	animation-timing-function: ease-in;
 }
+.actionPointNote {
+	animation-name: actionBlink;
+	animation-duration: 1s;
+	animation-iteration-count: infinite;
+	animation-direction: alternate-reverse;
+	animation-timing-function: ease-in;
+	stroke-width: 0.1cm;
+	stroke-linecap: round;
+	fill: none;
+}
+.actionPointMeasure {
+	animation-name: actionBlink;
+	animation-duration: 1s;
+	animation-iteration-count: infinite;
+	animation-direction: alternate-reverse;
+	animation-timing-function: ease-in;
+	stroke-width: 1cm;
+	stroke-linecap: round;
+	fill: none;
+}
+.actionPointSong {
+	animation-name: actionBlink;
+	animation-duration: 1s;
+	animation-iteration-count: infinite;
+	animation-direction: alternate-reverse;
+	animation-timing-function: ease-in;
+	stroke-width: 8cm;
+	stroke-linecap: round;
+	fill: none;
+}
+.actionPointFar {
+	animation-name: actionBlink;
+	animation-duration: 1s;
+	animation-iteration-count: infinite;
+	animation-direction: alternate-reverse;
+	animation-timing-function: ease-in;
+	stroke-width: 16cm;
+	stroke-linecap: round;
+	fill: none;
+}
+.actionPointBig {
+	animation-name: actionBlink;
+	animation-duration: 1s;
+	animation-iteration-count: infinite;
+	animation-direction: alternate-reverse;
+	animation-timing-function: ease-in;
+	stroke-width: 32cm;
+	stroke-linecap: round;
+	fill: none;
+}
 
 @keyframes actionBlink {
 	from {
-		fill: var(--decor_solid);
+		stroke: var(--decor_solid);
 	}
 	to {
-		fill: var(--active_base);
+		stroke: var(--active_base);
 	}
 }
 
@@ -350,8 +400,16 @@ html {
 	stroke: var(--active_base);
 }
 
-.lyricsText {
+.lyricsText16 {
+	font-size: 10cm;
+	fill: var(--decor_base);
+}
+.lyricsText4 {
 	font-size: 8cm;
+	fill: var(--decor_base);
+}
+.lyricsText1 {
+	font-size: 4cm;
 	fill: var(--decor_base);
 }
 

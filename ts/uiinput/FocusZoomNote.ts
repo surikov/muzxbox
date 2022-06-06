@@ -9,7 +9,7 @@ class FocusZoomNote implements FocusLevel {
 	addSpot(mngmnt: FocusManagement) {
 		//console.log('addSpot');
 		this.dumpSpots();
-		mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'actionPoint' });
+		mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'actionPointNote' });
 	}
 	spotUp(mngmnt: FocusManagement): boolean {
 		//console.log('note spotUp');

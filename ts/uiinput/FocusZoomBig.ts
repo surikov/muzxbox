@@ -41,7 +41,7 @@ class FocusZoomBig implements FocusLevel {
 			, h: hh
 			, rx: 0
 			, ry: 0
-			, css: 'actionPoint'
+			, css: 'actionPointBig'
 		});
 	}
 	spotUp(mngmnt: FocusManagement): boolean {

@@ -27,7 +27,7 @@ class FocusZoomFar implements FocusLevel {
 			, h: hh
 			, rx: 0
 			, ry: 0
-			, css: 'actionPoint'
+			, css: 'actionPointFar'
 		});
 	}
 	spotUp(mngmnt: FocusManagement): boolean {

@@ -1210,7 +1210,7 @@ var ZRender = (function () {
         this.zoomFar = 256;
         this.zoomBig = 512;
         this.zoomMax = 1024;
-        this.secondWidthInTaps = 50;
+        this.secondWidthInTaps = 75;
         this.pitchLineThicknessInTaps = 7;
         this.sizeRatio = 2;
         this.rhythmPatternDefault = [
@@ -4447,11 +4447,9 @@ var ZMainMenu = (function () {
         });
         this.menuRoot.folders.push(this.songFolder);
         this.menuRoot.folders.push({
-            path: "Rhythm patterns", icon: "", folders: [],
-            items: [
+            path: "Rhythm patterns", icon: "", folders: [], items: [
                 {
-                    label: 'plain 1/32', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/32', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 1, division: 32 }, { count: 1, division: 32 },
                             { count: 1, division: 32 }, { count: 1, division: 32 },
@@ -4470,8 +4468,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/16', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/16', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 1, division: 16 }, { count: 1, division: 16 },
                             { count: 1, division: 16 }, { count: 1, division: 16 },
@@ -4486,8 +4483,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/8', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/8', autoclose: true, icon: '', action: function () {
                         console.log('plain 1/8', default8rhytym);
                         var me = window['MZXB'];
                         if (me) {
@@ -4496,8 +4492,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'swing 1/8', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'swing 1/8', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 5, division: 32 }, { count: 3, division: 32 },
                             { count: 5, division: 32 }, { count: 3, division: 32 }
@@ -4512,11 +4507,9 @@ var ZMainMenu = (function () {
             ], afterOpen: function () { }
         });
         this.menuRoot.folders.push({
-            path: "Screen size", icon: "", folders: [],
-            items: [
+            path: "Screen size", icon: "", folders: [], items: [
                 {
-                    label: 'normal', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'normal', autoclose: true, icon: '', action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutNormal();
@@ -4524,8 +4517,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'big', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'big', autoclose: true, icon: '', action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutBig();
@@ -5029,6 +5021,21 @@ var PianoRollRenderer = (function () {
             anchors[aa].content.push(cloneLine(line_1));
         }
     };
+    PianoRollRenderer.prototype.addMeasureLyrics = function (song, time, mm, ratioDuration, ratioThickness, anchor, css) {
+        var measure = song.measures[mm];
+        for (var pp = 0; pp < measure.points.length; pp++) {
+            var yShift = 16;
+            var point = measure.points[pp];
+            var txt = {
+                x: leftGridMargin + (time + meter2seconds(measure.tempo, point.when)) * ratioDuration,
+                y: topGridMargin + 12 * octaveCount * ratioThickness + yShift,
+                text: point.lyrics,
+                css: css
+            };
+            anchor.content.push(txt);
+        }
+        var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
+    };
     PianoRollRenderer.prototype.addVoiceMeasure = function (ratioDuration, ratioThickness, song, voice, measureNum, time, css, anchors) {
         var measure = voice.measureChords[measureNum];
         var measureMaxLen = anchors[0].ww;
@@ -5212,30 +5219,33 @@ var PianoRollRenderer = (function () {
         var time = 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-            var contentMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 12 * octaveCount * ratioThickness, this.contentMain1.showZoom, this.contentMain1.hideZoom);
-            var contentMeasure4 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain4.showZoom, this.contentMain4.hideZoom);
-            var contentMeasure16 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain16.showZoom, this.contentMain16.hideZoom);
-            var contentMeasure64 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain64.showZoom, this.contentMain64.hideZoom);
+            var contentMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain1.showZoom, this.contentMain1.hideZoom);
+            var contentMeasure4 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain4.showZoom, this.contentMain4.hideZoom);
+            var contentMeasure16 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain16.showZoom, this.contentMain16.hideZoom);
+            var contentMeasure64 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain64.showZoom, this.contentMain64.hideZoom);
             this.contentMain1.content.push(contentMeasure1);
             this.contentMain4.content.push(contentMeasure4);
             this.contentMain16.content.push(contentMeasure16);
             this.contentMain64.content.push(contentMeasure64);
-            var secondMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentSecond1.showZoom, this.contentSecond1.hideZoom);
-            var secondMeasure4 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentSecond4.showZoom, this.contentSecond4.hideZoom);
-            var secondMeasure16 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentSecond16.showZoom, this.contentSecond16.hideZoom);
-            var secondMeasure64 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentSecond64.showZoom, this.contentSecond64.hideZoom);
+            var secondMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentSecond1.showZoom, this.contentSecond1.hideZoom);
+            var secondMeasure4 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentSecond4.showZoom, this.contentSecond4.hideZoom);
+            var secondMeasure16 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentSecond16.showZoom, this.contentSecond16.hideZoom);
+            var secondMeasure64 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentSecond64.showZoom, this.contentSecond64.hideZoom);
             this.contentSecond1.content.push(secondMeasure1);
             this.contentSecond4.content.push(secondMeasure4);
             this.contentSecond16.content.push(secondMeasure16);
             this.contentSecond64.content.push(secondMeasure64);
-            var otherMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentOther1.showZoom, this.contentOther1.hideZoom);
-            var otherMeasure4 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentOther4.showZoom, this.contentOther4.hideZoom);
-            var otherMeasure16 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentOther16.showZoom, this.contentOther16.hideZoom);
-            var otherMeasure64 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentOther64.showZoom, this.contentOther64.hideZoom);
+            var otherMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther1.showZoom, this.contentOther1.hideZoom);
+            var otherMeasure4 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther4.showZoom, this.contentOther4.hideZoom);
+            var otherMeasure16 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther16.showZoom, this.contentOther16.hideZoom);
+            var otherMeasure64 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther64.showZoom, this.contentOther64.hideZoom);
             this.contentOther1.content.push(otherMeasure1);
             this.contentOther4.content.push(otherMeasure4);
             this.contentOther16.content.push(otherMeasure16);
             this.contentOther64.content.push(otherMeasure64);
+            this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure1, 'lyricsText1');
+            this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure4, 'lyricsText4');
+            this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, 'lyricsText16');
             for (var tt = 0; tt < song.tracks.length; tt++) {
                 var track = song.tracks[tt];
                 for (var vv = 0; vv < track.voices.length; vv++) {
@@ -5325,25 +5335,6 @@ var PianoRollRenderer = (function () {
         }
         this.fillFar(song, ratioDuration, ratioThickness);
         this.fillBig(song, ratioDuration, ratioThickness);
-        this.fillLyrics(song, ratioDuration, ratioThickness);
-    };
-    PianoRollRenderer.prototype.fillLyrics = function (song, ratioDuration, ratioThickness) {
-        var time = 0;
-        for (var mm = 0; mm < song.measures.length; mm++) {
-            var measure = song.measures[mm];
-            for (var pp = 0; pp < measure.points.length; pp++) {
-                var point = measure.points[pp];
-                var txt = {
-                    x: leftGridMargin + (time + meter2seconds(measure.tempo, point.when)) * ratioDuration,
-                    y: topGridMargin + 12 * octaveCount * ratioThickness,
-                    text: point.lyrics,
-                    css: 'lyricsText'
-                };
-                this.contentOther16.content.push(txt);
-            }
-            var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-            time = time + measureDuration;
-        }
     };
     PianoRollRenderer.prototype.fillFar = function (song, ratioDuration, ratioThickness) {
         var chordCount = 0;
@@ -6055,7 +6046,7 @@ var FocusZoomFar = (function () {
             h: hh,
             rx: 0,
             ry: 0,
-            css: 'actionPoint'
+            css: 'actionPointFar'
         });
     };
     FocusZoomFar.prototype.spotUp = function (mngmnt) {
@@ -6174,7 +6165,7 @@ var FocusZoomBig = (function () {
             h: hh,
             rx: 0,
             ry: 0,
-            css: 'actionPoint'
+            css: 'actionPointBig'
         });
     };
     FocusZoomBig.prototype.spotUp = function (mngmnt) {
@@ -6285,7 +6276,7 @@ var FocusZoomMeasure = (function () {
         var yy = topGridMargin
             + gridHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
             - (this.pitchLineIdx + 1) * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
-        mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'actionPoint' });
+        mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'actionPointMeasure' });
     };
     FocusZoomMeasure.prototype.spotUp = function (mngmnt) {
         if (this.pitchLineIdx < octaveCount * 12 - 1) {
@@ -6425,7 +6416,7 @@ var FocusZoomNote = (function () {
     };
     FocusZoomNote.prototype.addSpot = function (mngmnt) {
         this.dumpSpots();
-        mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'actionPoint' });
+        mngmnt.focusAnchor.content.push({ x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'actionPointNote' });
     };
     FocusZoomNote.prototype.spotUp = function (mngmnt) {
         this.dumpSpots();
@@ -6485,7 +6476,7 @@ var FocusZoomSong = (function () {
             h: hh,
             rx: 0,
             ry: 0,
-            css: 'actionPoint'
+            css: 'actionPointSong'
         });
     };
     FocusZoomSong.prototype.spotUp = function (mngmnt) {
