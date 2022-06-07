@@ -43,7 +43,7 @@ class TimeLineRenderer {
 		//this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor256, null, 'textSize256', 256, true);
 	}
 	drawLevel(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, layerAnchor: TileAnchor
-		, subSize: string | null, textSize: string, yy: number, skip8: boolean) {
+		, subCSS: string | null, textCSS: string, yy: number, skip8: boolean) {
 		this.measuresTimelineAnchor64.content = [];
 		layerAnchor.content = [];
 		let time = 0;
@@ -62,10 +62,10 @@ class TimeLineRenderer {
 					leftGridMargin +time * ratioDuration
 					, yy * 1
 					//, 'barNumber ' + textSize
-					,  textSize
+					,  textCSS
 					, ('' + (1 + i))));
 				let rhythmPattern: ZvoogMeter[] = song.rhythm ? song.rhythm : zRender.rhythmPatternDefault;
-				if (subSize) {
+				if (subCSS) {
 					let stepNN = 0;
 					let position: ZvoogMeter = rhythmPattern[stepNN];
 					while (DUU(position).lessThen(song.measures[i].meter)) {
@@ -75,7 +75,8 @@ class TimeLineRenderer {
 							leftGridMargin + (time + positionDuration) * ratioDuration
 							, yy
 							//, 'barNumber ' + subSize
-							, 'barNumber ' + subSize
+							//, 'barNumber ' + subSize
+							,subCSS
 							, ('' + simple.count + '/' + simple.division)));
 						stepNN++;
 						if (stepNN >= rhythmPattern.length) {

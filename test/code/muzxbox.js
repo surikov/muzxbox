@@ -4650,8 +4650,8 @@ var midiDrumPitchShift = 35;
 var midiInstrumentPitchShift = 24;
 var leftGridMargin = 20;
 var rightGridMargin = 1;
-var topGridMargin = 10;
-var bottomGridMargin = 30;
+var topGridMargin = 20;
+var bottomGridMargin = 110;
 var octaveCount = 7;
 var bigGroupMeasure = 16;
 var us;
@@ -5024,7 +5024,7 @@ var PianoRollRenderer = (function () {
     PianoRollRenderer.prototype.addMeasureLyrics = function (song, time, mm, ratioDuration, ratioThickness, anchor, css) {
         var measure = song.measures[mm];
         for (var pp = 0; pp < measure.points.length; pp++) {
-            var yShift = 16;
+            var yShift = 44;
             var point = measure.points[pp];
             var txt = {
                 x: leftGridMargin + (time + meter2seconds(measure.tempo, point.when)) * ratioDuration,
@@ -5034,7 +5034,63 @@ var PianoRollRenderer = (function () {
             };
             anchor.content.push(txt);
         }
-        var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
+    };
+    PianoRollRenderer.prototype.addFarMeasureKnobs = function (song, time, mm, ratioDuration, ratioThickness, anchor) {
+        var knob = {
+            x: leftGridMargin + time * ratioDuration,
+            y: topGridMargin + 12 * octaveCount * ratioThickness + 2 * ratioThickness,
+            w: 8 * ratioThickness,
+            h: 8 * ratioThickness,
+            rx: 4 * ratioThickness,
+            ry: 4 * ratioThickness,
+            css: 'actionSpot64'
+        };
+        anchor.content.push(knob);
+        var txt = {
+            x: leftGridMargin + time * ratioDuration + 2 * ratioThickness,
+            y: topGridMargin + 12 * octaveCount * ratioThickness + 7 * ratioThickness,
+            text: 'options',
+            css: 'knobLabel64'
+        };
+        anchor.content.push(txt);
+    };
+    PianoRollRenderer.prototype.addMeasureSelectKnobs = function (song, time, mm, ratioDuration, ratioThickness, anchor) {
+        var knob = {
+            x: leftGridMargin + time * ratioDuration,
+            y: topGridMargin + 12 * octaveCount * ratioThickness + 2 * ratioThickness,
+            w: 4 * ratioThickness,
+            h: 4 * ratioThickness,
+            rx: 2 * ratioThickness,
+            ry: 2 * ratioThickness,
+            css: 'actionSpot16'
+        };
+        anchor.content.push(knob);
+        var txt = {
+            x: leftGridMargin + time * ratioDuration + 1 * ratioThickness,
+            y: topGridMargin + 12 * octaveCount * ratioThickness + 5 * ratioThickness,
+            text: 'options',
+            css: 'knobLabel16'
+        };
+        anchor.content.push(txt);
+    };
+    PianoRollRenderer.prototype.addStepSelectKnobs = function (song, time, mm, ratioDuration, ratioThickness, anchor) {
+        var knob = {
+            x: leftGridMargin + time * ratioDuration,
+            y: topGridMargin + 12 * octaveCount * ratioThickness + 2 * ratioThickness,
+            w: 2 * ratioThickness,
+            h: 2 * ratioThickness,
+            rx: ratioThickness,
+            ry: ratioThickness,
+            css: 'actionSpot4'
+        };
+        anchor.content.push(knob);
+        var txt = {
+            x: leftGridMargin + time * ratioDuration + 0.5 * ratioThickness,
+            y: topGridMargin + 12 * octaveCount * ratioThickness + 3.5 * ratioThickness,
+            text: 'options',
+            css: 'knobLabel4'
+        };
+        anchor.content.push(txt);
     };
     PianoRollRenderer.prototype.addVoiceMeasure = function (ratioDuration, ratioThickness, song, voice, measureNum, time, css, anchors) {
         var measure = voice.measureChords[measureNum];
@@ -5246,6 +5302,9 @@ var PianoRollRenderer = (function () {
             this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure1, 'lyricsText1');
             this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure4, 'lyricsText4');
             this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, 'lyricsText16');
+            this.addFarMeasureKnobs(song, time, mm, ratioDuration, ratioThickness, secondMeasure64);
+            this.addMeasureSelectKnobs(song, time, mm, ratioDuration, ratioThickness, secondMeasure16);
+            this.addStepSelectKnobs(song, time, mm, ratioDuration, ratioThickness, secondMeasure4);
             for (var tt = 0; tt < song.tracks.length; tt++) {
                 var track = song.tracks[tt];
                 for (var vv = 0; vv < track.voices.length; vv++) {
@@ -5632,7 +5691,7 @@ var TimeLineRenderer = (function () {
         this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor16, null, 'timelineBarLabelSong', 16, false);
         this.drawLevel(zRender, song, ratioDuration, ratioThickness, this.measuresTimelineAnchor64, null, 'timelineBarLabelSongFar', 64, true);
     };
-    TimeLineRenderer.prototype.drawLevel = function (zRender, song, ratioDuration, ratioThickness, layerAnchor, subSize, textSize, yy, skip8) {
+    TimeLineRenderer.prototype.drawLevel = function (zRender, song, ratioDuration, ratioThickness, layerAnchor, subCSS, textCSS, yy, skip8) {
         this.measuresTimelineAnchor64.content = [];
         layerAnchor.content = [];
         var time = 0;
@@ -5640,15 +5699,15 @@ var TimeLineRenderer = (function () {
             var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
             if (!skip8 || (skip8 && i % 8 == 0)) {
                 var measureAnchor = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, wholeHeightTp(ratioThickness), layerAnchor.showZoom, layerAnchor.hideZoom);
-                measureAnchor.content.push(TText(leftGridMargin + time * ratioDuration, yy * 1, textSize, ('' + (1 + i))));
+                measureAnchor.content.push(TText(leftGridMargin + time * ratioDuration, yy * 1, textCSS, ('' + (1 + i))));
                 var rhythmPattern = song.rhythm ? song.rhythm : zRender.rhythmPatternDefault;
-                if (subSize) {
+                if (subCSS) {
                     var stepNN = 0;
                     var position = rhythmPattern[stepNN];
                     while (DUU(position).lessThen(song.measures[i].meter)) {
                         var positionDuration = meter2seconds(song.measures[i].tempo, position);
                         var simple = DUU(position).simplify();
-                        measureAnchor.content.push(TText(leftGridMargin + (time + positionDuration) * ratioDuration, yy, 'barNumber ' + subSize, ('' + simple.count + '/' + simple.division)));
+                        measureAnchor.content.push(TText(leftGridMargin + (time + positionDuration) * ratioDuration, yy, subCSS, ('' + simple.count + '/' + simple.division)));
                         stepNN++;
                         if (stepNN >= rhythmPattern.length) {
                             stepNN = 0;
