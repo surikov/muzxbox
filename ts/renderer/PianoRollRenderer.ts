@@ -111,62 +111,95 @@ class PianoRollRenderer {
 		//time = time + measureDuration;
 		//}
 	}
-	addFarMeasureKnobs(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor) {
+	addSelectKnobs64(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor) {
 		let knob: TileRectangle = {
 			x: leftGridMargin + time * ratioDuration
-			, y: topGridMargin + 12 * octaveCount * ratioThickness + 2 * ratioThickness
+			, y: topGridMargin + 12 * octaveCount * ratioThickness
 			, w: 8 * ratioThickness
 			, h: 8 * ratioThickness
-			, rx: 4*ratioThickness
-			, ry: 4*ratioThickness
 			, css: 'actionSpot64'
+			,action:(x: number, y: number) => {console.log('click',x,y);}
 		};
 		anchor.content.push(knob);
 		let txt: TileText = {
-			x: leftGridMargin + time * ratioDuration+2*ratioThickness
-			, y: topGridMargin + 12 * octaveCount * ratioThickness + 7 * ratioThickness
+			x: leftGridMargin + time * ratioDuration + 2 * ratioThickness
+			, y: topGridMargin + 12 * octaveCount * ratioThickness + 3 * ratioThickness
 			, text: 'options'
 			, css: 'knobLabel64'
+			,action:(x: number, y: number) => {console.log('click',x,y);}
 		};
 		anchor.content.push(txt);
 	}
-	addMeasureSelectKnobs(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor) {
+	addSelectKnobs16(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor) {
 		let knob: TileRectangle = {
 			x: leftGridMargin + time * ratioDuration
-			, y: topGridMargin + 12 * octaveCount * ratioThickness + 2 * ratioThickness
+			, y: topGridMargin + 12 * octaveCount * ratioThickness
 			, w: 4 * ratioThickness
 			, h: 4 * ratioThickness
-			, rx: 2*ratioThickness
-			, ry: 2*ratioThickness
 			, css: 'actionSpot16'
+			,action:(x: number, y: number) => {console.log('click',x,y);}
 		};
 		anchor.content.push(knob);
 		let txt: TileText = {
-			x: leftGridMargin + time * ratioDuration+1*ratioThickness
-			, y: topGridMargin + 12 * octaveCount * ratioThickness  + 5 * ratioThickness
+			x: leftGridMargin + time * ratioDuration + 1 * ratioThickness
+			, y: topGridMargin + 12 * octaveCount * ratioThickness + 2 * ratioThickness
 			, text: 'options'
 			, css: 'knobLabel16'
+			,action:(x: number, y: number) => {console.log('click',x,y);}
 		};
 		anchor.content.push(txt);
 	}
-	addStepSelectKnobs(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor) {
+	addSelectKnobs4(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor) {
 		let knob: TileRectangle = {
-			x: leftGridMargin + time * ratioDuration
-			, y: topGridMargin + 12 * octaveCount * ratioThickness + 2 * ratioThickness
+			x:  leftGridMargin + time * ratioDuration
+			, y: topGridMargin + 12 * octaveCount * ratioThickness
 			, w: 2 * ratioThickness
 			, h: 2 * ratioThickness
-			, rx: ratioThickness
-			, ry: ratioThickness
 			, css: 'actionSpot4'
+			,action:(x: number, y: number) => {console.log('click',x,y);}
 		};
 		anchor.content.push(knob);
 		let txt: TileText = {
-			x: leftGridMargin + time * ratioDuration+0.5*ratioThickness
-			, y: topGridMargin + 12 * octaveCount * ratioThickness + 3.5 * ratioThickness
-			, text: 'options'
+			x: leftGridMargin + time * ratioDuration + 0.5 * ratioThickness
+			, y: topGridMargin + 12 * octaveCount * ratioThickness + 1 * ratioThickness
+			, text: '' + mm + 'opt'
 			, css: 'knobLabel4'
+			,action:(x: number, y: number) => {console.log('click',x,y);}
 		};
 		anchor.content.push(txt);
+	}
+	addSelectKnobs1(song: ZvoogSchedule, time: number, mm: number, rhythmPattern: ZvoogMeter[], ratioDuration: number, ratioThickness: number, anchor: TileAnchor) {
+		let stepNN = 0;
+		let position: ZvoogMeter = rhythmPattern[stepNN];
+		let positionDuration = 0;
+		while (DUU(position).notMoreThen(song.measures[mm].meter)) {
+			let posX = leftGridMargin + (time + positionDuration) * ratioDuration;
+
+			let knob: TileRectangle = {
+				x: posX
+				, y: topGridMargin + 12 * octaveCount * ratioThickness
+				, w: 1
+				, h: 1
+				, css: 'actionSpot1'
+				,action:(x: number, y: number) => {console.log('click',x,y);}
+			};
+			anchor.content.push(knob);
+			let txt: TileText = {
+				x: posX + 0.005 * ratioThickness
+				, y: topGridMargin + 12 * octaveCount * ratioThickness + 1
+				, text: 'options'
+				, css: 'knobLabel1'
+				,action:(x: number, y: number) => {console.log('click',x,y);}
+			};
+			anchor.content.push(txt);
+
+			positionDuration = meter2seconds(song.measures[mm].tempo, position);
+			stepNN++;
+			if (stepNN >= rhythmPattern.length) {
+				stepNN = 0;
+			}
+			position = DUU(position).plus(rhythmPattern[stepNN]);
+		}
 	}
 	addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number {
 		let measure = voice.measureChords[measureNum];
@@ -367,7 +400,15 @@ class PianoRollRenderer {
 	}
 
 
-	addPianoRoll(layerSelector: LayerSelector, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {//}, menuButton: TileRectangle) {
+	addPianoRoll(zRender: ZRender, layerSelector: LayerSelector, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {//}, menuButton: TileRectangle) {
+
+		let rhythm: ZvoogMeter[] = zRender.rhythmPatternDefault;
+		if (song.rhythm) {
+			if (song.rhythm.length) {
+				rhythm = song.rhythm;
+			}
+		}
+
 		let time = 0;
 
 		for (let mm = 0; mm < song.measures.length; mm++) {
@@ -409,9 +450,10 @@ class PianoRollRenderer {
 			this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure4, 'lyricsText4');
 			this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, 'lyricsText16');
 
-			this.addFarMeasureKnobs(song, time, mm, ratioDuration, ratioThickness, secondMeasure64);
-			this.addMeasureSelectKnobs(song, time, mm, ratioDuration, ratioThickness, secondMeasure16);
-			this.addStepSelectKnobs(song, time, mm, ratioDuration, ratioThickness, secondMeasure4);
+			this.addSelectKnobs64(song, time, mm, ratioDuration, ratioThickness, secondMeasure64);
+			this.addSelectKnobs16(song, time, mm, ratioDuration, ratioThickness, secondMeasure16);
+			this.addSelectKnobs4(song, time, mm, ratioDuration, ratioThickness, secondMeasure4);
+			this.addSelectKnobs1(song, time, mm, rhythm, ratioDuration, ratioThickness, secondMeasure1);
 
 			for (let tt = 0; tt < song.tracks.length; tt++) {
 				let track = song.tracks[tt];

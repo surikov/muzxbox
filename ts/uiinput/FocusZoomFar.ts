@@ -1,5 +1,6 @@
 class FocusZoomFar implements FocusLevel {
 	idxMeasureStart: number = 6;
+	idxRow: number = -1;
 	isMatch(zoomLevel: number, zRender: ZRender): boolean {
 		if (zoomLevel >= zRender.zoomSong && zoomLevel < zRender.zoomFar) {
 			return true;
@@ -20,6 +21,10 @@ class FocusZoomFar implements FocusLevel {
 				, mngmnt.muzXBox.currentSchedule.measures[this.idxMeasureStart].meter);
 		let hh = 12 * octaveCount * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
 		let yy = topGridMargin;
+		if(this.idxRow<0){
+			hh=bottomGridMargin;
+			yy=topGridMargin+12 * octaveCount * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+		}
 		mngmnt.focusAnchor.content.push({
 			x: xx
 			, y: yy
@@ -31,12 +36,21 @@ class FocusZoomFar implements FocusLevel {
 		});
 	}
 	spotUp(mngmnt: FocusManagement): boolean {
-		console.log('FocusZoomFar spotUp');
-		return false;
+		if (this.idxRow < 0) {
+			this.idxRow = 0;
+			return true;
+		} else {
+			return false;
+		}
+
 	}
 	spotDown(mngmnt: FocusManagement): boolean {
-		console.log('FocusZoomFar spotDown');
-		return false;
+		if (this.idxRow > -1) {
+			this.idxRow = -1;
+			return true;
+		} else {
+			return false;
+		}
 	}
 	spotLeft(mngmnt: FocusManagement): boolean {
 		if (this.idxMeasureStart > 0) {
@@ -71,7 +85,7 @@ class FocusZoomFar implements FocusLevel {
 		let ih = mngmnt.muzXBox.zrenderer.tileLevel.innerHeight / tz;
 		let iw = mngmnt.muzXBox.zrenderer.tileLevel.innerWidth / tz;
 
-		
+
 		let newX = iw / 2;
 		if (vw < iw) {
 			newX = vw / 2 - tx;

@@ -19,8 +19,10 @@ class FocusZoomSong implements FocusLevel {
 		let hh = 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
 		let yy = topGridMargin
 			+ gridHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
-			+ 0 * 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps
-			- 12 * this.indexOctave * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+			- 12 *(1+ this.indexOctave) * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+		if(this.indexOctave<0){
+			hh = bottomGridMargin;
+		}
 		mngmnt.focusAnchor.content.push({
 			x: xx
 			, y: yy
@@ -33,7 +35,7 @@ class FocusZoomSong implements FocusLevel {
 
 	}
 	spotUp(mngmnt: FocusManagement): boolean {
-		if (this.indexOctave < octaveCount) {
+		if (this.indexOctave < octaveCount-1) {
 			this.indexOctave++;
 			return true;
 		} else {
@@ -41,7 +43,7 @@ class FocusZoomSong implements FocusLevel {
 		}
 	}
 	spotDown(mngmnt: FocusManagement): boolean {
-		if (this.indexOctave > 1) {
+		if (this.indexOctave > -1) {
 			this.indexOctave--;
 			return true;
 		} else {

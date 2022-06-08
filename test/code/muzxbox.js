@@ -1412,7 +1412,7 @@ var ZRender = (function () {
         var wholeHeight = wholeHeightTp(this.pitchLineThicknessInTaps);
         this.clearAnchorsContent(wholeWidth, wholeHeight);
         this.measureInfoRenderer.fillMeasureInfo(song, this.secondWidthInTaps, this.pitchLineThicknessInTaps);
-        this.pianoRollRenderer.addPianoRoll(this.muzXBox.zMainMenu.layerSelector, song, this.secondWidthInTaps, this.pitchLineThicknessInTaps);
+        this.pianoRollRenderer.addPianoRoll(this, this.muzXBox.zMainMenu.layerSelector, song, this.secondWidthInTaps, this.pitchLineThicknessInTaps);
         var rhythm = this.rhythmPatternDefault;
         if (song.rhythm) {
             if (song.rhythm.length) {
@@ -5035,62 +5035,93 @@ var PianoRollRenderer = (function () {
             anchor.content.push(txt);
         }
     };
-    PianoRollRenderer.prototype.addFarMeasureKnobs = function (song, time, mm, ratioDuration, ratioThickness, anchor) {
+    PianoRollRenderer.prototype.addSelectKnobs64 = function (song, time, mm, ratioDuration, ratioThickness, anchor) {
         var knob = {
             x: leftGridMargin + time * ratioDuration,
-            y: topGridMargin + 12 * octaveCount * ratioThickness + 2 * ratioThickness,
+            y: topGridMargin + 12 * octaveCount * ratioThickness,
             w: 8 * ratioThickness,
             h: 8 * ratioThickness,
-            rx: 4 * ratioThickness,
-            ry: 4 * ratioThickness,
-            css: 'actionSpot64'
+            css: 'actionSpot64',
+            action: function (x, y) { console.log('click', x, y); }
         };
         anchor.content.push(knob);
         var txt = {
             x: leftGridMargin + time * ratioDuration + 2 * ratioThickness,
-            y: topGridMargin + 12 * octaveCount * ratioThickness + 7 * ratioThickness,
+            y: topGridMargin + 12 * octaveCount * ratioThickness + 3 * ratioThickness,
             text: 'options',
-            css: 'knobLabel64'
+            css: 'knobLabel64',
+            action: function (x, y) { console.log('click', x, y); }
         };
         anchor.content.push(txt);
     };
-    PianoRollRenderer.prototype.addMeasureSelectKnobs = function (song, time, mm, ratioDuration, ratioThickness, anchor) {
+    PianoRollRenderer.prototype.addSelectKnobs16 = function (song, time, mm, ratioDuration, ratioThickness, anchor) {
         var knob = {
             x: leftGridMargin + time * ratioDuration,
-            y: topGridMargin + 12 * octaveCount * ratioThickness + 2 * ratioThickness,
+            y: topGridMargin + 12 * octaveCount * ratioThickness,
             w: 4 * ratioThickness,
             h: 4 * ratioThickness,
-            rx: 2 * ratioThickness,
-            ry: 2 * ratioThickness,
-            css: 'actionSpot16'
+            css: 'actionSpot16',
+            action: function (x, y) { console.log('click', x, y); }
         };
         anchor.content.push(knob);
         var txt = {
             x: leftGridMargin + time * ratioDuration + 1 * ratioThickness,
-            y: topGridMargin + 12 * octaveCount * ratioThickness + 5 * ratioThickness,
+            y: topGridMargin + 12 * octaveCount * ratioThickness + 2 * ratioThickness,
             text: 'options',
-            css: 'knobLabel16'
+            css: 'knobLabel16',
+            action: function (x, y) { console.log('click', x, y); }
         };
         anchor.content.push(txt);
     };
-    PianoRollRenderer.prototype.addStepSelectKnobs = function (song, time, mm, ratioDuration, ratioThickness, anchor) {
+    PianoRollRenderer.prototype.addSelectKnobs4 = function (song, time, mm, ratioDuration, ratioThickness, anchor) {
         var knob = {
             x: leftGridMargin + time * ratioDuration,
-            y: topGridMargin + 12 * octaveCount * ratioThickness + 2 * ratioThickness,
+            y: topGridMargin + 12 * octaveCount * ratioThickness,
             w: 2 * ratioThickness,
             h: 2 * ratioThickness,
-            rx: ratioThickness,
-            ry: ratioThickness,
-            css: 'actionSpot4'
+            css: 'actionSpot4',
+            action: function (x, y) { console.log('click', x, y); }
         };
         anchor.content.push(knob);
         var txt = {
             x: leftGridMargin + time * ratioDuration + 0.5 * ratioThickness,
-            y: topGridMargin + 12 * octaveCount * ratioThickness + 3.5 * ratioThickness,
-            text: 'options',
-            css: 'knobLabel4'
+            y: topGridMargin + 12 * octaveCount * ratioThickness + 1 * ratioThickness,
+            text: '' + mm + 'opt',
+            css: 'knobLabel4',
+            action: function (x, y) { console.log('click', x, y); }
         };
         anchor.content.push(txt);
+    };
+    PianoRollRenderer.prototype.addSelectKnobs1 = function (song, time, mm, rhythmPattern, ratioDuration, ratioThickness, anchor) {
+        var stepNN = 0;
+        var position = rhythmPattern[stepNN];
+        var positionDuration = 0;
+        while (DUU(position).notMoreThen(song.measures[mm].meter)) {
+            var posX = leftGridMargin + (time + positionDuration) * ratioDuration;
+            var knob = {
+                x: posX,
+                y: topGridMargin + 12 * octaveCount * ratioThickness,
+                w: 1,
+                h: 1,
+                css: 'actionSpot1',
+                action: function (x, y) { console.log('click', x, y); }
+            };
+            anchor.content.push(knob);
+            var txt = {
+                x: posX + 0.005 * ratioThickness,
+                y: topGridMargin + 12 * octaveCount * ratioThickness + 1,
+                text: 'options',
+                css: 'knobLabel1',
+                action: function (x, y) { console.log('click', x, y); }
+            };
+            anchor.content.push(txt);
+            positionDuration = meter2seconds(song.measures[mm].tempo, position);
+            stepNN++;
+            if (stepNN >= rhythmPattern.length) {
+                stepNN = 0;
+            }
+            position = DUU(position).plus(rhythmPattern[stepNN]);
+        }
     };
     PianoRollRenderer.prototype.addVoiceMeasure = function (ratioDuration, ratioThickness, song, voice, measureNum, time, css, anchors) {
         var measure = voice.measureChords[measureNum];
@@ -5271,7 +5302,13 @@ var PianoRollRenderer = (function () {
         }
         return -1;
     };
-    PianoRollRenderer.prototype.addPianoRoll = function (layerSelector, song, ratioDuration, ratioThickness) {
+    PianoRollRenderer.prototype.addPianoRoll = function (zRender, layerSelector, song, ratioDuration, ratioThickness) {
+        var rhythm = zRender.rhythmPatternDefault;
+        if (song.rhythm) {
+            if (song.rhythm.length) {
+                rhythm = song.rhythm;
+            }
+        }
         var time = 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
@@ -5302,9 +5339,10 @@ var PianoRollRenderer = (function () {
             this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure1, 'lyricsText1');
             this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure4, 'lyricsText4');
             this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, 'lyricsText16');
-            this.addFarMeasureKnobs(song, time, mm, ratioDuration, ratioThickness, secondMeasure64);
-            this.addMeasureSelectKnobs(song, time, mm, ratioDuration, ratioThickness, secondMeasure16);
-            this.addStepSelectKnobs(song, time, mm, ratioDuration, ratioThickness, secondMeasure4);
+            this.addSelectKnobs64(song, time, mm, ratioDuration, ratioThickness, secondMeasure64);
+            this.addSelectKnobs16(song, time, mm, ratioDuration, ratioThickness, secondMeasure16);
+            this.addSelectKnobs4(song, time, mm, ratioDuration, ratioThickness, secondMeasure4);
+            this.addSelectKnobs1(song, time, mm, rhythm, ratioDuration, ratioThickness, secondMeasure1);
             for (var tt = 0; tt < song.tracks.length; tt++) {
                 var track = song.tracks[tt];
                 for (var vv = 0; vv < track.voices.length; vv++) {
@@ -5557,8 +5595,8 @@ var GridRenderer = (function () {
         var time = 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-            var gridMeasure1 = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, gridHeightTp(ratioThickness), zRender.pianoRollRenderer.contentMain1.showZoom, zRender.pianoRollRenderer.contentMain1.hideZoom);
-            var gridMeasure4 = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, gridHeightTp(ratioThickness), zRender.pianoRollRenderer.contentMain4.showZoom, zRender.pianoRollRenderer.contentMain4.hideZoom);
+            var gridMeasure1 = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, gridHeightTp(ratioThickness) + bottomGridMargin, zRender.pianoRollRenderer.contentMain1.showZoom, zRender.pianoRollRenderer.contentMain1.hideZoom);
+            var gridMeasure4 = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, gridHeightTp(ratioThickness) + bottomGridMargin, zRender.pianoRollRenderer.contentMain4.showZoom, zRender.pianoRollRenderer.contentMain4.hideZoom);
             var gridMeasure16 = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, gridHeightTp(ratioThickness), zRender.pianoRollRenderer.contentMain16.showZoom, zRender.pianoRollRenderer.contentMain16.hideZoom);
             this.gridAnchor1.content.push(gridMeasure1);
             this.gridAnchor4.content.push(gridMeasure4);
@@ -5567,14 +5605,14 @@ var GridRenderer = (function () {
                 x1: leftGridMargin + time * ratioDuration,
                 y1: topGridMargin,
                 x2: leftGridMargin + time * ratioDuration,
-                y2: topGridMargin + gridHeightTp(ratioThickness),
+                y2: topGridMargin + gridHeightTp(ratioThickness) + bottomGridMargin,
                 css: 'barLine1'
             });
             gridMeasure4.content.push({
                 x1: leftGridMargin + time * ratioDuration,
                 y1: topGridMargin,
                 x2: leftGridMargin + time * ratioDuration,
-                y2: topGridMargin + gridHeightTp(ratioThickness),
+                y2: topGridMargin + gridHeightTp(ratioThickness) + bottomGridMargin,
                 css: 'barLine4'
             });
             gridMeasure16.content.push({
@@ -5633,13 +5671,15 @@ var GridRenderer = (function () {
                 if (stepNN == rhythmPattern.length - 1) {
                     css = 'rhythmWideLine4';
                 }
-                gridMeasure4.content.push({
+                var line_3 = {
                     x1: leftGridMargin + (time + positionDuration) * ratioDuration,
                     y1: topGridMargin,
                     x2: leftGridMargin + (time + positionDuration) * ratioDuration,
-                    y2: topGridMargin + gridHeightTp(ratioThickness),
+                    y2: topGridMargin + gridHeightTp(ratioThickness) + bottomGridMargin,
                     css: css
-                });
+                };
+                gridMeasure4.content.push(line_3);
+                gridMeasure1.content.push(line_3);
                 stepNN++;
                 if (stepNN >= rhythmPattern.length) {
                     stepNN = 0;
@@ -6078,6 +6118,7 @@ var FocusManagement = (function () {
 var FocusZoomFar = (function () {
     function FocusZoomFar() {
         this.idxMeasureStart = 6;
+        this.idxRow = -1;
     }
     FocusZoomFar.prototype.isMatch = function (zoomLevel, zRender) {
         if (zoomLevel >= zRender.zoomSong && zoomLevel < zRender.zoomFar) {
@@ -6098,6 +6139,10 @@ var FocusZoomFar = (function () {
             * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.idxMeasureStart].tempo, mngmnt.muzXBox.currentSchedule.measures[this.idxMeasureStart].meter);
         var hh = 12 * octaveCount * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
         var yy = topGridMargin;
+        if (this.idxRow < 0) {
+            hh = bottomGridMargin;
+            yy = topGridMargin + 12 * octaveCount * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+        }
         mngmnt.focusAnchor.content.push({
             x: xx,
             y: yy,
@@ -6109,12 +6154,22 @@ var FocusZoomFar = (function () {
         });
     };
     FocusZoomFar.prototype.spotUp = function (mngmnt) {
-        console.log('FocusZoomFar spotUp');
-        return false;
+        if (this.idxRow < 0) {
+            this.idxRow = 0;
+            return true;
+        }
+        else {
+            return false;
+        }
     };
     FocusZoomFar.prototype.spotDown = function (mngmnt) {
-        console.log('FocusZoomFar spotDown');
-        return false;
+        if (this.idxRow > -1) {
+            this.idxRow = -1;
+            return true;
+        }
+        else {
+            return false;
+        }
     };
     FocusZoomFar.prototype.spotLeft = function (mngmnt) {
         if (this.idxMeasureStart > 0) {
@@ -6335,6 +6390,9 @@ var FocusZoomMeasure = (function () {
         var yy = topGridMargin
             + gridHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
             - (this.pitchLineIdx + 1) * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+        if (this.pitchLineIdx < 0) {
+            hh = bottomGridMargin;
+        }
         mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'actionPointMeasure' });
     };
     FocusZoomMeasure.prototype.spotUp = function (mngmnt) {
@@ -6347,7 +6405,7 @@ var FocusZoomMeasure = (function () {
         }
     };
     FocusZoomMeasure.prototype.spotDown = function (mngmnt) {
-        if (this.pitchLineIdx > 0) {
+        if (this.pitchLineIdx > -1) {
             this.pitchLineIdx--;
             return true;
         }
@@ -6526,8 +6584,10 @@ var FocusZoomSong = (function () {
         var hh = 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
         var yy = topGridMargin
             + gridHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
-            + 0 * 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps
-            - 12 * this.indexOctave * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+            - 12 * (1 + this.indexOctave) * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+        if (this.indexOctave < 0) {
+            hh = bottomGridMargin;
+        }
         mngmnt.focusAnchor.content.push({
             x: xx,
             y: yy,
@@ -6539,7 +6599,7 @@ var FocusZoomSong = (function () {
         });
     };
     FocusZoomSong.prototype.spotUp = function (mngmnt) {
-        if (this.indexOctave < octaveCount) {
+        if (this.indexOctave < octaveCount - 1) {
             this.indexOctave++;
             return true;
         }
@@ -6548,7 +6608,7 @@ var FocusZoomSong = (function () {
         }
     };
     FocusZoomSong.prototype.spotDown = function (mngmnt) {
-        if (this.indexOctave > 1) {
+        if (this.indexOctave > -1) {
             this.indexOctave--;
             return true;
         }

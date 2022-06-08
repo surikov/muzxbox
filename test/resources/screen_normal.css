@@ -306,7 +306,7 @@ html {
 
 @keyframes actionBlink {
 	from {
-		stroke: var(--prime_base);
+		stroke: var(--active_base);
 	}
 	to {
 		stroke: var(--secondary_base);
@@ -399,19 +399,23 @@ html {
 	fill: var(--active_lite);
 	stroke: var(--active_base);
 }
-
+.actionSpot1 {
+	fill: var(--active_lite);
+	stroke: var(--active_base);
+	stroke-width: 0.1cm;
+}
 .actionSpot4 {
-	fill: none;
+	fill: var(--active_lite);
 	stroke: var(--active_base);
 	stroke-width: 1cm;
 }
 .actionSpot16 {
-	fill: none;
+	fill: var(--active_lite);
 	stroke: var(--active_base);
 	stroke-width: 2cm;
 }
 .actionSpot64 {
-	fill: none;
+	fill: var(--active_lite);
 	stroke: var(--active_base);
 	stroke-width: 4cm;
 }
@@ -430,6 +434,11 @@ html {
 	fill: var(--decor_base);
 }
 
+
+.knobLabel1 {
+	font-size: 1cm;
+	fill: var(--prime_base);
+}
 .knobLabel4 {
 	font-size: 10cm;
 	fill: var(--prime_base);

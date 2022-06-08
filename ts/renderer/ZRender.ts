@@ -16,7 +16,7 @@ class ZRender {
 		{ count: 1, division: 8 }, { count: 1, division: 8 }
 		, { count: 1, division: 8 }, { count: 1, division: 8 }
 	];
-	
+
 
 	measureInfoRenderer: MeasureInfoRenderer = new MeasureInfoRenderer();
 	pianoRollRenderer: PianoRollRenderer = new PianoRollRenderer();
@@ -86,7 +86,7 @@ class ZRender {
 		};
 
 	}
-	zToLOD(zz:number):number{
+	zToLOD(zz: number): number {
 		var curLOD = this.zoomMin;
 		if (zz >= this.zoomMin) curLOD = this.zoomMin;
 		if (zz >= this.zoomNote) curLOD = this.zoomNote;
@@ -256,7 +256,7 @@ class ZRender {
 		this.pianoRollRenderer.clearPRAnchorsContent(this, wholeWidth);
 		this.timeLineRenderer.clearTLAnchorsContent(this, wholeWidth);
 		this.leftKeysRenderer.clearKeysAnchorsContent(this, wholeWidth);
-		this.tileLevel.innerWidth =  wholeWidth * this.tileLevel.tapSize;
+		this.tileLevel.innerWidth = wholeWidth * this.tileLevel.tapSize;
 		this.tileLevel.innerHeight = wholeHeight * this.tileLevel.tapSize;
 
 	}
@@ -267,7 +267,7 @@ class ZRender {
 		let wholeHeight = wholeHeightTp(this.pitchLineThicknessInTaps);
 		this.clearAnchorsContent(wholeWidth, wholeHeight);
 		this.measureInfoRenderer.fillMeasureInfo(song, this.secondWidthInTaps, this.pitchLineThicknessInTaps);
-		this.pianoRollRenderer.addPianoRoll(this.muzXBox.zMainMenu.layerSelector,
+		this.pianoRollRenderer.addPianoRoll(this, this.muzXBox.zMainMenu.layerSelector,
 			song, this.secondWidthInTaps, this.pitchLineThicknessInTaps);
 		let rhythm: ZvoogMeter[] = this.rhythmPatternDefault;
 		if (song.rhythm) {

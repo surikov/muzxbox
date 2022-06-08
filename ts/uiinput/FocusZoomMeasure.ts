@@ -19,6 +19,9 @@ class FocusZoomMeasure implements FocusLevel {
 			+ gridHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
 			- (this.pitchLineIdx + 1) * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps
 			;
+		if(this.pitchLineIdx<0){
+			hh=bottomGridMargin;
+		}
 		mngmnt.focusAnchor.content.push({ x: xx, y: yy, w: ww, h: hh, rx: 0, ry: 0, css: 'actionPointMeasure' });
 	}
 	spotUp(mngmnt: FocusManagement): boolean {
@@ -34,7 +37,7 @@ class FocusZoomMeasure implements FocusLevel {
 		}
 	}
 	spotDown(mngmnt: FocusManagement): boolean {
-		if (this.pitchLineIdx > 0) {
+		if (this.pitchLineIdx > -1) {
 			this.pitchLineIdx--;
 
 			//this.moveViewToShowSpot(mngmnt);
