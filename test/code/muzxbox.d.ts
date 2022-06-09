@@ -1243,6 +1243,8 @@ declare class FocusZoomMeasure implements FocusLevel {
     moveSpotIntoView(mngmnt: FocusManagement): void;
 }
 declare class FocusZoomNote implements FocusLevel {
+    xxPoint: number;
+    yyPoint: number;
     isMatch(zoomLevel: number, zRender: ZRender): boolean;
     addSpot(mngmnt: FocusManagement): void;
     spotUp(mngmnt: FocusManagement): boolean;
@@ -1250,7 +1252,6 @@ declare class FocusZoomNote implements FocusLevel {
     spotLeft(mngmnt: FocusManagement): boolean;
     spotRight(mngmnt: FocusManagement): boolean;
     moveSpotIntoView(mngmnt: FocusManagement): void;
-    dumpSpots(): void;
     moveViewToShowSpot(mngmnt: FocusManagement): void;
 }
 declare class FocusZoomSong implements FocusLevel {
