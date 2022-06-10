@@ -6,6 +6,7 @@ class MusicXMLFileImporter implements ZvoogStore {
 	readSongData(title: string, onFinish: (result: ZvoogSchedule | null) => void): void {
 		var fileSelector: HTMLInputElement = document.createElement('input');
 		fileSelector.setAttribute('type', 'file');
+		fileSelector.setAttribute('accept', 'application/vnd.recordare.musicxml+xml');
 		var me = this;
 		fileSelector.addEventListener("change", function (ev: Event) {
 			if (fileSelector.files) {
@@ -16,10 +17,11 @@ class MusicXMLFileImporter implements ZvoogStore {
 						let xml: string = (progressEvent.target as any).result;
 						var domParser: DOMParser = new DOMParser();
 						var _document: Document = domParser.parseFromString(xml, "text/xml");
-						var mxml: TreeValue = new TreeValue('', '', []);
+						var mxml: Extra = new Extra('', '', []);
 						mxml.fill(_document);
 						var zvoogSchedule: ZvoogSchedule = me.parseMXML(mxml);
-						onFinish(zvoogSchedule);
+						console.log('parsed musicxml', zvoogSchedule);
+						//onFinish(zvoogSchedule);
 					}
 				};
 				fileReader.readAsBinaryString(file);
@@ -28,8 +30,8 @@ class MusicXMLFileImporter implements ZvoogStore {
 		fileSelector.click();
 	};
 
-	parseMXML(mxml: TreeValue): ZvoogSchedule {
-		console.log(mxml);
+	parseMXML(mxml: Extra): ZvoogSchedule {
+		console.log('parseMXML', mxml);
 		var zvoogSchedule: ZvoogSchedule = {
 			title: ''
 			, tracks: []
@@ -41,7 +43,13 @@ class MusicXMLFileImporter implements ZvoogStore {
 				, progression: []
 			}
 		};
-		var firstPartMeasures: TreeValue[] = mxml.first('part').every('measure');
+		let scoreParts: Extra[] = mxml.first('part-list').every('score-part');
+		for (var pp = 0; pp < scoreParts.length; pp++) {
+			let part = scoreParts[pp];
+			console.log(part.first('id').value, part.first('part-name').value, part);
+		}
+		/*
+		var firstPartMeasures: Extra[] = mxml.first('part').every('measure');
 		var timecount = '4';
 		var timediv = '4';
 		var fifths = '';
@@ -64,7 +72,7 @@ class MusicXMLFileImporter implements ZvoogStore {
 			var directions = firstPartMeasures[mm].every('direction');
 
 			for (var dd = 0; dd < directions.length; dd++) {
-				var dirtype = directions[dd].first('direction-type').children[0];
+				var dirtype = directions[dd].first('direction-type').brood[0];
 				if (dirtype.name == 'rehearsal') {
 					console.log(dirtype.name, mm, dirtype.value);
 				} else {
@@ -80,7 +88,7 @@ class MusicXMLFileImporter implements ZvoogStore {
 								if (dirtype.name == 'bracket') {
 									console.log(dirtype.name, mm, dirtype.first('type').value, dirtype.first('number').value, dirtype.first('line-end').value, dirtype.first('end-length').value);
 								} else {
-									console.log(dirtype.name, mm, directions[dd]);
+									console.log('?',dirtype.name, mm, directions[dd]);
 								}
 							}
 						}
@@ -88,16 +96,18 @@ class MusicXMLFileImporter implements ZvoogStore {
 				}
 			}
 		}
-		var scorePart: TreeValue[] = mxml.first('part-list').every('score-part');
+		*/
+		/*
+		var scorePart: Extra[] = mxml.first('part-list').every('score-part');
 		for (var i = 0; i < scorePart.length; i++) {
-			//console.log(scorePart[i].first('id').value, scorePart[i].first('part-name').value);
+			console.log(scorePart[i].first('id').value, scorePart[i].first('part-name').value);
 			var newtrack: ZvoogTrack = {
 				title: scorePart[i].first('id').value + ': ' + scorePart[i].first('part-name').value
 				, voices: []
 				, filters: []
 			};
 			zvoogSchedule.tracks.push(newtrack);
-			var midiInstrument: TreeValue[] = scorePart[i].every('midi-instrument');
+			var midiInstrument: Extra[] = scorePart[i].every('midi-instrument');
 			for (var kk = 0; kk < midiInstrument.length; kk++) {
 				var unpitched = midiInstrument[kk].first('midi-unpitched').value;
 				//console.log('program', midiInstrument[kk].first('midi-program').value, 'unpitched', midiInstrument[kk].first('midi-unpitched').value);
@@ -122,15 +132,6 @@ class MusicXMLFileImporter implements ZvoogStore {
 					newvoice.performer.kind = 'wafinstrument';
 					newvoice.performer.initial = midiInstrument[kk].first('midi-program').value;
 				}
-			}
-		}
-		//console.log(mxml.seek('credit','credit-type','title').first('credit-words').value);
-		//console.log(mxml.seek('credit','credit-type','subtitle').first('credit-words').value);
-		/*var credits: TreeValue[] = mxml.every('credit');
-		for (var i = 0; i < credits.length; i++) {
-			if (credits[i].first('credit-type').value == 'title') {
-				zvoogSchedule.title = credits[i].first('credit-words').value;
-
 			}
 		}*/
 		return zvoogSchedule;

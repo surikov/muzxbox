@@ -973,7 +973,7 @@ declare class MusicXMLFileImporter implements ZvoogStore {
     goFolder(title: string, onFinish: (error: string) => void): void;
     goUp(onFinish: (error: string) => void): void;
     readSongData(title: string, onFinish: (result: ZvoogSchedule | null) => void): void;
-    parseMXML(mxml: TreeValue): ZvoogSchedule;
+    parseMXML(mxml: Extra): ZvoogSchedule;
     createSongData(title: string, schedule: ZvoogSchedule, onFinish: (error: string) => void): void;
     updateSongData(title: string, schedule: ZvoogSchedule, onFinish: (error: string) => void): void;
     deleteSongData(title: string, onFinish: (error: string) => void): void;
@@ -982,16 +982,16 @@ declare class MusicXMLFileImporter implements ZvoogStore {
     deleteFolder(title: string, onFinish: (error: string) => void): void;
     renameFolder(title: string, newTitle: string, onFinish: (error: string) => void): void;
 }
-declare class TreeValue {
+declare class Extra {
     name: string;
     value: string;
-    children: TreeValue[];
-    constructor(name: string, value: string, children: TreeValue[]);
-    clone(): TreeValue;
-    first(name: string): TreeValue;
-    every(name: string): TreeValue[];
-    seek(name: string, subname: string, subvalue: string): TreeValue;
-    readDocChildren(node: any): TreeValue[];
+    brood: Extra[];
+    constructor(name: string, value: string, children: Extra[]);
+    clone(): Extra;
+    first(name: string): Extra;
+    every(name: string): Extra[];
+    seek(name: string, subname: string, subvalue: string): Extra;
+    readDocChildren(node: any): Extra[];
     fill(document: Document): void;
 }
 declare type ZMenuItem = {
@@ -1049,7 +1049,6 @@ declare class MuzXBox {
     zrenderer: ZRender;
     zInputDeviceHandler: ZInputDeviceHandler;
     zMainMenu: ZMainMenu;
-    menuButton: TileRectangle;
     constructor();
     initAll(): void;
     createUI(): void;
@@ -1059,7 +1058,6 @@ declare class MuzXBox {
     setGrid(meters: ZvoogMeter[]): void;
     testFSmidi(): void;
     testFSmxml(): void;
-    testFS(): void;
 }
 declare class MeasureInfoRenderer {
     measuresMeasureInfoAnchor1: TileAnchor;

@@ -207,6 +207,17 @@ class ZMainMenu {
 			, icon: ''
 		});
 		this.menuRoot.items.push({
+			label: 'import MXML'
+			, action: () => {
+				var me: MuzXBox = window['MZXB'] as MuzXBox;
+				if (me) {
+					me.testFSmxml();
+				}
+			}
+			, autoclose: true
+			, icon: ''
+		});
+		this.menuRoot.items.push({
 			label: 'play/stop'
 			, action: () => {
 				console.log('play/stop');

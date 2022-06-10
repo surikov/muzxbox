@@ -16,7 +16,7 @@ class MuzXBox {
 	zrenderer: ZRender;
 	zInputDeviceHandler: ZInputDeviceHandler;
 	zMainMenu: ZMainMenu;
-
+/*
 	menuButton: TileRectangle = {
 		x: 0
 		, y: 0
@@ -27,7 +27,7 @@ class MuzXBox {
 		, css: 'debug'
 		, action: this.testFS
 		, id: 'menuButtonTest1'
-	};
+	};*/
 	constructor() {
 		console.log('start');
 		us = new ZUserSetting();
@@ -210,12 +210,12 @@ class MuzXBox {
 			}
 		});
 	}
-	testFS() {
+	/*testFS() {
 		var me: MuzXBox = window['MZXB'] as MuzXBox;
 		if (me) {
 			me.testFSmidi();
 		}
-	}
+	}*/
 }
 window['MZXB'] = new MuzXBox();
 

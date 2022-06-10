@@ -1,52 +1,52 @@
-class TreeValue {
+class Extra {
 	name: string;
 	value: string;
-	children: TreeValue[];
-	constructor(name: string, value: string, children: TreeValue[]) {
+	brood: Extra[];
+	constructor(name: string, value: string, children: Extra[]) {
 		this.name = name;
 		this.value = value;
-		this.children = children;
+		this.brood = children;
 	}
-	clone(): TreeValue {
-		var r = new TreeValue('', '', []);
+	clone(): Extra {
+		var r = new Extra('', '', []);
 		r.name = this.name;
 		r.value = this.value;
-		r.children = [];
-		for (var i = 0; i < this.children.length; i++) {
-			r.children.push(this.children[i].clone());
+		r.brood = [];
+		for (var i = 0; i < this.brood.length; i++) {
+			r.brood.push(this.brood[i].clone());
 		}
 		return r;
 	}
-	first(name: string): TreeValue {
-		for (let i = 0; i < this.children.length; i++) {
-			if (this.children[i].name == name) {
-				return this.children[i];
+	first(name: string): Extra {
+		for (let i = 0; i < this.brood.length; i++) {
+			if (this.brood[i].name == name) {
+				return this.brood[i];
 			}
 		}
-		return new TreeValue('', '', []);
+		return new Extra('', '', []);
 	}
-	every(name: string): TreeValue[] {
-		let r: TreeValue[] = [];
-		for (let i = 0; i < this.children.length; i++) {
-			if (this.children[i].name == name) {
-				r.push(this.children[i]);
+	every(name: string): Extra[] {
+		let r: Extra[] = [];
+		for (let i = 0; i < this.brood.length; i++) {
+			if (this.brood[i].name == name) {
+				r.push(this.brood[i]);
 			}
 		}
 		return r;
 	}
-	seek(name: string, subname: string, subvalue: string): TreeValue {
-		for (let i = 0; i < this.children.length; i++) {
-			if (this.children[i].name == name) {
-				var t = this.children[i].first(subname);
+	seek(name: string, subname: string, subvalue: string): Extra {
+		for (let i = 0; i < this.brood.length; i++) {
+			if (this.brood[i].name == name) {
+				var t = this.brood[i].first(subname);
 				if (t.value == subvalue) {
-					return this.children[i];
+					return this.brood[i];
 				}
 			}
 		}
-		return new TreeValue('', '', []);
+		return new Extra('', '', []);
 	}
-	readDocChildren(node: any): TreeValue[] {
-		let children: TreeValue[] = [];
+	readDocChildren(node: any): Extra[] {
+		let children: Extra[] = [];
 		if (node.children) {
 			for (let i = 0; i < node.children.length; i++) {
 				let c = node.children[i];
@@ -54,23 +54,23 @@ class TreeValue {
 				if (c.childNodes && c.childNodes[0] && c.childNodes[0].nodeName == '#text') {
 					t = ('' + c.childNodes[0].nodeValue).trim();
 				}
-				children.push(new TreeValue(c.localName, t, this.readDocChildren(c)));
+				children.push(new Extra(c.localName, t, this.readDocChildren(c)));
 			}
 		}
 		if (node.attributes) {
 			for (let i = 0; i < node.attributes.length; i++) {
 				let a = node.attributes[i];
-				children.push(new TreeValue(a.localName, a.value, []));
+				children.push(new Extra(a.localName, a.value, []));
 			}
 		}
 		return children;
 	}
 	fill(document: Document) {
-		var tt: TreeValue[] = this.readDocChildren(document);
+		var tt: Extra[] = this.readDocChildren(document);
 		if (tt.length > 0) {
 			this.name = tt[0].name;
 			this.value = tt[0].value;
-			this.children = tt[0].children;
+			this.brood = tt[0].brood;
 		}
 	}
 }

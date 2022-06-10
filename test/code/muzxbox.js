@@ -4037,6 +4037,7 @@ var MusicXMLFileImporter = (function () {
     MusicXMLFileImporter.prototype.readSongData = function (title, onFinish) {
         var fileSelector = document.createElement('input');
         fileSelector.setAttribute('type', 'file');
+        fileSelector.setAttribute('accept', 'application/vnd.recordare.musicxml+xml');
         var me = this;
         fileSelector.addEventListener("change", function (ev) {
             if (fileSelector.files) {
@@ -4047,10 +4048,10 @@ var MusicXMLFileImporter = (function () {
                         var xml = progressEvent.target.result;
                         var domParser = new DOMParser();
                         var _document = domParser.parseFromString(xml, "text/xml");
-                        var mxml = new TreeValue('', '', []);
+                        var mxml = new Extra('', '', []);
                         mxml.fill(_document);
                         var zvoogSchedule = me.parseMXML(mxml);
-                        onFinish(zvoogSchedule);
+                        console.log('parsed musicxml', zvoogSchedule);
                     }
                 };
                 fileReader.readAsBinaryString(file);
@@ -4060,7 +4061,7 @@ var MusicXMLFileImporter = (function () {
     };
     ;
     MusicXMLFileImporter.prototype.parseMXML = function (mxml) {
-        console.log(mxml);
+        console.log('parseMXML', mxml);
         var zvoogSchedule = {
             title: '',
             tracks: [],
@@ -4072,85 +4073,10 @@ var MusicXMLFileImporter = (function () {
                 progression: []
             }
         };
-        var firstPartMeasures = mxml.first('part').every('measure');
-        var timecount = '4';
-        var timediv = '4';
-        var fifths = '';
-        for (var mm = 0; mm < firstPartMeasures.length; mm++) {
-            var attributes = firstPartMeasures[mm].first('attributes');
-            if (((attributes.first('time').first('beats').value) && attributes.first('time').first('beats').value != timecount)
-                || ((attributes.first('time').first('beat-type').value) && attributes.first('time').first('beat-type').value != timediv)
-                || ((attributes.first('key').first('fifths').value) && fifths != attributes.first('key').first('fifths').value)) {
-                timecount = attributes.first('time').first('beats').value;
-                timediv = attributes.first('time').first('beat-type').value;
-                fifths = attributes.first('key').first('fifths').value;
-                console.log(mm, 'time', timecount, timediv, 'fifths', attributes.first('key').first('fifths').value);
-            }
-            var directions = firstPartMeasures[mm].every('direction');
-            for (var dd = 0; dd < directions.length; dd++) {
-                var dirtype = directions[dd].first('direction-type').children[0];
-                if (dirtype.name == 'rehearsal') {
-                    console.log(dirtype.name, mm, dirtype.value);
-                }
-                else {
-                    if (dirtype.name == 'dynamics') {
-                        console.log(dirtype.name, mm, directions[dd].first('sound').first('dynamics').value);
-                    }
-                    else {
-                        if (dirtype.name == 'metronome') {
-                            console.log(dirtype.name, mm, dirtype.first('per-minute').value, dirtype.first('beat-unit').value);
-                        }
-                        else {
-                            if (dirtype.name == 'words') {
-                                console.log(dirtype.name, mm, dirtype.value);
-                            }
-                            else {
-                                if (dirtype.name == 'bracket') {
-                                    console.log(dirtype.name, mm, dirtype.first('type').value, dirtype.first('number').value, dirtype.first('line-end').value, dirtype.first('end-length').value);
-                                }
-                                else {
-                                    console.log(dirtype.name, mm, directions[dd]);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        var scorePart = mxml.first('part-list').every('score-part');
-        for (var i = 0; i < scorePart.length; i++) {
-            var newtrack = {
-                title: scorePart[i].first('id').value + ': ' + scorePart[i].first('part-name').value,
-                voices: [],
-                filters: []
-            };
-            zvoogSchedule.tracks.push(newtrack);
-            var midiInstrument = scorePart[i].every('midi-instrument');
-            for (var kk = 0; kk < midiInstrument.length; kk++) {
-                var unpitched = midiInstrument[kk].first('midi-unpitched').value;
-                var newvoice = {
-                    measureChords: [],
-                    performer: {
-                        performerPlugin: null,
-                        parameters: [],
-                        kind: '',
-                        initial: ''
-                    },
-                    filters: [],
-                    title: ''
-                };
-                newtrack.voices.push(newvoice);
-                if (unpitched) {
-                    newvoice.title = 'drum ' + unpitched;
-                    newvoice.performer.kind = 'wafdrum';
-                    newvoice.performer.initial = unpitched;
-                }
-                else {
-                    newvoice.title = 'program ' + midiInstrument[kk].first('midi-program').value;
-                    newvoice.performer.kind = 'wafinstrument';
-                    newvoice.performer.initial = midiInstrument[kk].first('midi-program').value;
-                }
-            }
+        var scoreParts = mxml.first('part-list').every('score-part');
+        for (var pp = 0; pp < scoreParts.length; pp++) {
+            var part = scoreParts[pp];
+            console.log(part.first('id').value, part.first('part-name').value, part);
         }
         return zvoogSchedule;
     };
@@ -4171,51 +4097,51 @@ var MusicXMLFileImporter = (function () {
     return MusicXMLFileImporter;
 }());
 ;
-var TreeValue = (function () {
-    function TreeValue(name, value, children) {
+var Extra = (function () {
+    function Extra(name, value, children) {
         this.name = name;
         this.value = value;
-        this.children = children;
+        this.brood = children;
     }
-    TreeValue.prototype.clone = function () {
-        var r = new TreeValue('', '', []);
+    Extra.prototype.clone = function () {
+        var r = new Extra('', '', []);
         r.name = this.name;
         r.value = this.value;
-        r.children = [];
-        for (var i = 0; i < this.children.length; i++) {
-            r.children.push(this.children[i].clone());
+        r.brood = [];
+        for (var i = 0; i < this.brood.length; i++) {
+            r.brood.push(this.brood[i].clone());
         }
         return r;
     };
-    TreeValue.prototype.first = function (name) {
-        for (var i = 0; i < this.children.length; i++) {
-            if (this.children[i].name == name) {
-                return this.children[i];
+    Extra.prototype.first = function (name) {
+        for (var i = 0; i < this.brood.length; i++) {
+            if (this.brood[i].name == name) {
+                return this.brood[i];
             }
         }
-        return new TreeValue('', '', []);
+        return new Extra('', '', []);
     };
-    TreeValue.prototype.every = function (name) {
+    Extra.prototype.every = function (name) {
         var r = [];
-        for (var i = 0; i < this.children.length; i++) {
-            if (this.children[i].name == name) {
-                r.push(this.children[i]);
+        for (var i = 0; i < this.brood.length; i++) {
+            if (this.brood[i].name == name) {
+                r.push(this.brood[i]);
             }
         }
         return r;
     };
-    TreeValue.prototype.seek = function (name, subname, subvalue) {
-        for (var i = 0; i < this.children.length; i++) {
-            if (this.children[i].name == name) {
-                var t = this.children[i].first(subname);
+    Extra.prototype.seek = function (name, subname, subvalue) {
+        for (var i = 0; i < this.brood.length; i++) {
+            if (this.brood[i].name == name) {
+                var t = this.brood[i].first(subname);
                 if (t.value == subvalue) {
-                    return this.children[i];
+                    return this.brood[i];
                 }
             }
         }
-        return new TreeValue('', '', []);
+        return new Extra('', '', []);
     };
-    TreeValue.prototype.readDocChildren = function (node) {
+    Extra.prototype.readDocChildren = function (node) {
         var children = [];
         if (node.children) {
             for (var i = 0; i < node.children.length; i++) {
@@ -4224,26 +4150,26 @@ var TreeValue = (function () {
                 if (c.childNodes && c.childNodes[0] && c.childNodes[0].nodeName == '#text') {
                     t = ('' + c.childNodes[0].nodeValue).trim();
                 }
-                children.push(new TreeValue(c.localName, t, this.readDocChildren(c)));
+                children.push(new Extra(c.localName, t, this.readDocChildren(c)));
             }
         }
         if (node.attributes) {
             for (var i = 0; i < node.attributes.length; i++) {
                 var a = node.attributes[i];
-                children.push(new TreeValue(a.localName, a.value, []));
+                children.push(new Extra(a.localName, a.value, []));
             }
         }
         return children;
     };
-    TreeValue.prototype.fill = function (document) {
+    Extra.prototype.fill = function (document) {
         var tt = this.readDocChildren(document);
         if (tt.length > 0) {
             this.name = tt[0].name;
             this.value = tt[0].value;
-            this.children = tt[0].children;
+            this.brood = tt[0].brood;
         }
     };
-    return TreeValue;
+    return Extra;
 }());
 var ZMainMenu = (function () {
     function ZMainMenu(from) {
@@ -4432,6 +4358,17 @@ var ZMainMenu = (function () {
                 var me = window['MZXB'];
                 if (me) {
                     me.testFSmidi();
+                }
+            },
+            autoclose: true,
+            icon: ''
+        });
+        this.menuRoot.items.push({
+            label: 'import MXML',
+            action: function () {
+                var me = window['MZXB'];
+                if (me) {
+                    me.testFSmxml();
                 }
             },
             autoclose: true,
@@ -4657,17 +4594,6 @@ var bigGroupMeasure = 16;
 var us;
 var MuzXBox = (function () {
     function MuzXBox() {
-        this.menuButton = {
-            x: 0,
-            y: 0,
-            w: 10,
-            h: 10,
-            rx: 3,
-            ry: 3,
-            css: 'debug',
-            action: this.testFS,
-            id: 'menuButtonTest1'
-        };
         console.log('start');
         us = new ZUserSetting();
     }
@@ -4812,12 +4738,6 @@ var MuzXBox = (function () {
                 }
             }
         });
-    };
-    MuzXBox.prototype.testFS = function () {
-        var me = window['MZXB'];
-        if (me) {
-            me.testFSmidi();
-        }
     };
     return MuzXBox;
 }());
