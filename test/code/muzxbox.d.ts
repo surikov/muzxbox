@@ -1024,7 +1024,7 @@ declare class ZMainMenu {
     reFillMenulevel(menuContent: HTMLElement, subRoot: ZMenuFolder, selectedLevel: number): void;
     open_nn_level(nn: number): void;
     reBuildMenu(): void;
-    fillFrom(prj: ZvoogSchedule): void;
+    fillSongMenuFrom(prj: ZvoogSchedule): void;
 }
 declare class SingleMenuPanel {
     levelStyle: CSSStyleDeclaration;

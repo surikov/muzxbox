@@ -11,7 +11,7 @@ class LayerSelector {
 			//this.muzXBox.currentSchedule.filters[fx].obverseParameter = 0;
 			this.selectSongFx(this.muzXBox.currentSchedule, fx);
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
-			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
 		};
 	}
 	upSongFxParam(fx: number, param: number): () => void {
@@ -21,7 +21,7 @@ class LayerSelector {
 			//this.muzXBox.currentSchedule.filters[fx].obverseParameter = param;
 			this.selectSongFxParam(this.muzXBox.currentSchedule, fx, param);
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
-			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
 		};
 	}
 	upTrack(trk: number): () => void {
@@ -33,7 +33,7 @@ class LayerSelector {
 			//}
 			this.selectSongTrack(this.muzXBox.currentSchedule, trk)
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
-			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
 		};
 	}
 	upTrackFx(trk: number, fx: number): () => void {
@@ -43,7 +43,7 @@ class LayerSelector {
 			//this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = this.muzXBox.currentSchedule.tracks[trk].voices.length + fx;
 			this.selectSongTrackFx(this.muzXBox.currentSchedule, trk, fx);
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
-			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
 		};
 	}
 	upTrackFxParam(trk: number, fx: number, param: number): () => void {
@@ -54,7 +54,7 @@ class LayerSelector {
 			//this.muzXBox.currentSchedule.tracks[trk].filters[fx].obverseParameter = param;
 			this.selectSongTrackFxParam(this.muzXBox.currentSchedule, trk, fx, param);
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
-			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
 			console.log('upTrackFxParam', trk, fx, param);
 		};
 	}
@@ -66,7 +66,7 @@ class LayerSelector {
 			//this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
 			this.selectSongTrackVox(this.muzXBox.currentSchedule, trk, vox)
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
-			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
 		};
 	}
 	upVoxFx(trk: number, vox: number, fx: number): () => void {
@@ -77,7 +77,7 @@ class LayerSelector {
 			//this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = fx + 1;
 			this.selectSongTrackVoxFx(this.muzXBox.currentSchedule, trk, vox, fx);
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
-			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
 		};
 	}
 	upVoxFxParam(trk: number, vox: number, fx: number, param: number): () => void {
@@ -89,7 +89,7 @@ class LayerSelector {
 			//this.muzXBox.currentSchedule.tracks[trk].voices[vox].filters[fx].obverseParameter = fx;
 			this.selectSongTrackVoxFxParam(this.muzXBox.currentSchedule, trk, vox, fx, param);
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
-			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
 		};
 	}
 	upVoxProvider(trk: number, vox: number): () => void {
@@ -100,7 +100,7 @@ class LayerSelector {
 			//this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = 0;
 			this.selectSongTrackVoxPerformer(this.muzXBox.currentSchedule, trk, vox);
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
-			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
 		};
 	}
 	upVoxProviderParam(trk: number, vox: number, param: number): () => void {
@@ -112,7 +112,7 @@ class LayerSelector {
 			//this.muzXBox.currentSchedule.tracks[trk].voices[vox].performer.obverseParameter = 0;
 			this.selectSongTrackVoxPerformerParam(this.muzXBox.currentSchedule, trk, vox, param);
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
-			this.muzXBox.zMainMenu.fillFrom(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
 		};
 	}
 

@@ -4095,24 +4095,20 @@ var MusicXMLFileImporter = (function () {
                 var beats = partmeasures[mm].first("attributes").first("time").first("beats").value;
                 var beattype = partmeasures[mm].first("attributes").first("time").first("beat-type").value;
                 if ((beats) && (beattype)) {
-                    console.log('meter', mm, beats, beattype);
                 }
                 var octaveChange = partmeasures[mm].first("attributes").first("transpose").first("octave-change").value;
                 if (octaveChange) {
-                    console.log('octaveChange', octaveChange);
                 }
                 var directions = partmeasures[mm].every('direction');
                 for (var dd = 0; dd < directions.length; dd++) {
                     var dirtype = directions[dd].first('direction-type').content[0];
                     if (dirtype.name == 'rehearsal') {
-                        console.log('label', mm, dirtype.value);
                     }
                     else {
                         if (dirtype.name == 'dynamics') {
                         }
                         else {
                             if (dirtype.name == 'metronome') {
-                                console.log('tempo', mm, dirtype.first('per-minute').value, dirtype.first('beat-unit').value);
                             }
                             else {
                                 if (dirtype.name == 'words') {
@@ -4124,7 +4120,6 @@ var MusicXMLFileImporter = (function () {
                                 }
                                 else {
                                     if (dirtype.name == 'bracket') {
-                                        console.log(dirtype.name, mm, dirtype.first('type').value, dirtype.first('number').value, dirtype.first('line-end').value, dirtype.first('end-length').value);
                                     }
                                     else {
                                         console.log('?', mm, directions[dd]);
@@ -4140,6 +4135,25 @@ var MusicXMLFileImporter = (function () {
             var part = scoreParts[pp];
             var partid = part.first('id').value;
             var partdata = mxml.seek('part', 'id', partid);
+            var songtrack = {
+                title: part.first('part-name').value,
+                voices: [],
+                filters: []
+            };
+            zvoogSchedule.tracks.push(songtrack);
+            var partmeasures = partdata.every('measure');
+            var currentDivisions = 1;
+            for (var mm = 0; mm < partmeasures.length; mm++) {
+                var measurenotes = partmeasures[mm].every('note');
+                var divisions = partmeasures[mm].first('attributes').first('divisions').value;
+                if (divisions) {
+                    var currentDivisions_1 = parseInt(divisions);
+                    console.log(pp, mm, divisions);
+                }
+                for (var nn = 0; nn < measurenotes.length; nn++) {
+                    var notedef = measurenotes[nn];
+                }
+            }
         }
         return zvoogSchedule;
     };
@@ -4535,7 +4549,7 @@ var ZMainMenu = (function () {
             ], afterOpen: function () { }
         });
     };
-    ZMainMenu.prototype.fillFrom = function (prj) {
+    ZMainMenu.prototype.fillSongMenuFrom = function (prj) {
         this.songFolder.items.length = 0;
         this.songFolder.folders.length = 0;
         this.songFolder.items.push({ label: "+track", icon: "", autoclose: false, action: function () { console.log('+track'); } });
@@ -4747,7 +4761,7 @@ var MuzXBox = (function () {
         };
         this.currentSchedule = emptySchedule;
         this.zrenderer.drawSchedule(emptySchedule);
-        this.zMainMenu.fillFrom(this.currentSchedule);
+        this.zMainMenu.fillSongMenuFrom(this.currentSchedule);
     };
     MuzXBox.prototype.changeCSS = function (cssHref, cssLinkIndex) {
         var oldLink = document.getElementsByTagName("link").item(cssLinkIndex);
@@ -4769,14 +4783,14 @@ var MuzXBox = (function () {
         this.changeCSS('resources/screen_big.css', 0);
         this.zrenderer.tileLevel.setupTapSize(3);
         this.zrenderer.drawSchedule(this.currentSchedule);
-        this.zMainMenu.fillFrom(this.currentSchedule);
+        this.zMainMenu.fillSongMenuFrom(this.currentSchedule);
     };
     MuzXBox.prototype.setLayoutNormal = function () {
         console.log('setLayoutNormal');
         this.changeCSS('resources/screen_normal.css', 0);
         this.zrenderer.tileLevel.setupTapSize(1);
         this.zrenderer.drawSchedule(this.currentSchedule);
-        this.zMainMenu.fillFrom(this.currentSchedule);
+        this.zMainMenu.fillSongMenuFrom(this.currentSchedule);
     };
     MuzXBox.prototype.setGrid = function (meters) {
         this.currentSchedule.rhythm = meters;
@@ -4792,7 +4806,7 @@ var MuzXBox = (function () {
                 if (me) {
                     me.currentSchedule = result;
                     me.zrenderer.drawSchedule(result);
-                    me.zMainMenu.fillFrom(result);
+                    me.zMainMenu.fillSongMenuFrom(result);
                 }
             }
         });
@@ -4806,6 +4820,7 @@ var MuzXBox = (function () {
                     console.log(result);
                     me.currentSchedule = result;
                     me.zrenderer.drawSchedule(result);
+                    me.zMainMenu.fillSongMenuFrom(result);
                 }
             }
         });
@@ -5771,7 +5786,7 @@ var LayerSelector = (function () {
             console.log('upSongFx', fx);
             _this.selectSongFx(_this.muzXBox.currentSchedule, fx);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
-            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
         };
     };
     LayerSelector.prototype.upSongFxParam = function (fx, param) {
@@ -5780,7 +5795,7 @@ var LayerSelector = (function () {
             console.log('upSongFxParam', fx, param);
             _this.selectSongFxParam(_this.muzXBox.currentSchedule, fx, param);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
-            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
         };
     };
     LayerSelector.prototype.upTrack = function (trk) {
@@ -5789,7 +5804,7 @@ var LayerSelector = (function () {
             console.log('upTrack', trk);
             _this.selectSongTrack(_this.muzXBox.currentSchedule, trk);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
-            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
         };
     };
     LayerSelector.prototype.upTrackFx = function (trk, fx) {
@@ -5798,7 +5813,7 @@ var LayerSelector = (function () {
             console.log('upTrackFx', trk, fx);
             _this.selectSongTrackFx(_this.muzXBox.currentSchedule, trk, fx);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
-            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
         };
     };
     LayerSelector.prototype.upTrackFxParam = function (trk, fx, param) {
@@ -5807,7 +5822,7 @@ var LayerSelector = (function () {
             console.log('upTrackFxParam', trk, fx, param);
             _this.selectSongTrackFxParam(_this.muzXBox.currentSchedule, trk, fx, param);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
-            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
             console.log('upTrackFxParam', trk, fx, param);
         };
     };
@@ -5817,7 +5832,7 @@ var LayerSelector = (function () {
             console.log('upVox', trk, vox);
             _this.selectSongTrackVox(_this.muzXBox.currentSchedule, trk, vox);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
-            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
         };
     };
     LayerSelector.prototype.upVoxFx = function (trk, vox, fx) {
@@ -5826,7 +5841,7 @@ var LayerSelector = (function () {
             console.log('upVoxFx', trk, vox, fx);
             _this.selectSongTrackVoxFx(_this.muzXBox.currentSchedule, trk, vox, fx);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
-            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
         };
     };
     LayerSelector.prototype.upVoxFxParam = function (trk, vox, fx, param) {
@@ -5835,7 +5850,7 @@ var LayerSelector = (function () {
             console.log('upVoxFxParam', trk, vox, fx, param);
             _this.selectSongTrackVoxFxParam(_this.muzXBox.currentSchedule, trk, vox, fx, param);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
-            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
         };
     };
     LayerSelector.prototype.upVoxProvider = function (trk, vox) {
@@ -5844,7 +5859,7 @@ var LayerSelector = (function () {
             console.log('upVoxProvider', trk, vox);
             _this.selectSongTrackVoxPerformer(_this.muzXBox.currentSchedule, trk, vox);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
-            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
         };
     };
     LayerSelector.prototype.upVoxProviderParam = function (trk, vox, param) {
@@ -5853,7 +5868,7 @@ var LayerSelector = (function () {
             console.log('upVoxProviderParam', trk, vox, param);
             _this.selectSongTrackVoxPerformerParam(_this.muzXBox.currentSchedule, trk, vox, param);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
-            _this.muzXBox.zMainMenu.fillFrom(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
         };
     };
     LayerSelector.prototype.clearLevelFocus = function (song) {

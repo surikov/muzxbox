@@ -1,3 +1,4 @@
+//https://w3c.github.io/musicxml/tutorial/notation-basics/
 class MusicXMLFileImporter implements ZvoogStore {
 	list(onFinish: (items: ZvoogStoreListItem[]) => void): void { };
 	goFolder(title: string, onFinish: (error: string) => void): void { };
@@ -49,6 +50,7 @@ class MusicXMLFileImporter implements ZvoogStore {
 			let partid = part.first('id').value;
 			let partdata = mxml.seek('part', 'id', partid);
 			console.log(partid, part.first('part-name').value, partdata);
+
 			let partmeasures = partdata.every('measure');
 			for (let mm = 0; mm < partmeasures.length; mm++) {
 				if (zvoogSchedule.measures.length <= mm) {
@@ -66,24 +68,24 @@ class MusicXMLFileImporter implements ZvoogStore {
 				let beats = partmeasures[mm].first("attributes").first("time").first("beats").value;
 				let beattype = partmeasures[mm].first("attributes").first("time").first("beat-type").value;
 				if ((beats) && (beattype)) {
-					console.log('meter', mm, beats, beattype);
+					//console.log('meter', mm, beats, beattype);
 				}
 				let octaveChange = partmeasures[mm].first("attributes").first("transpose").first("octave-change").value;
 				if (octaveChange) {
-					console.log('octaveChange', octaveChange);
+					//console.log('octaveChange', octaveChange);
 				}
 				var directions = partmeasures[mm].every('direction');
 
 				for (var dd = 0; dd < directions.length; dd++) {
 					var dirtype = directions[dd].first('direction-type').content[0];
 					if (dirtype.name == 'rehearsal') {
-						console.log('label', mm, dirtype.value);
+						//console.log('label', mm, dirtype.value);
 					} else {
 						if (dirtype.name == 'dynamics') {
 							//console.log(dirtype.name, mm, directions[dd].first('sound').first('dynamics').value);
 						} else {
 							if (dirtype.name == 'metronome') {
-								console.log('tempo', mm, dirtype.first('per-minute').value, dirtype.first('beat-unit').value);
+								//console.log('tempo', mm, dirtype.first('per-minute').value, dirtype.first('beat-unit').value);
 							} else {
 								if (dirtype.name == 'words') {
 									if (dirtype.value == 'P.M.') {
@@ -93,7 +95,7 @@ class MusicXMLFileImporter implements ZvoogStore {
 									}
 								} else {
 									if (dirtype.name == 'bracket') {
-										console.log(dirtype.name, mm, dirtype.first('type').value, dirtype.first('number').value, dirtype.first('line-end').value, dirtype.first('end-length').value);
+										//console.log(dirtype.name, mm, dirtype.first('type').value, dirtype.first('number').value, dirtype.first('line-end').value, dirtype.first('end-length').value);
 									} else {
 										console.log('?', mm, directions[dd]);
 									}
@@ -102,13 +104,33 @@ class MusicXMLFileImporter implements ZvoogStore {
 						}
 					}
 				}
+
+
 			}
 		}
 		for (var pp = 0; pp < scoreParts.length; pp++) {
 			let part = scoreParts[pp];
 			let partid = part.first('id').value;
 			let partdata = mxml.seek('part', 'id', partid);
-
+			let songtrack: ZvoogTrack = {
+				title: part.first('part-name').value
+				, voices: []
+				, filters: []
+			};
+			zvoogSchedule.tracks.push(songtrack);
+			let partmeasures = partdata.every('measure');
+			let currentDivisions = 1;
+			for (let mm = 0; mm < partmeasures.length; mm++) {
+				let measurenotes = partmeasures[mm].every('note');
+				let divisions = partmeasures[mm].first('attributes').first('divisions').value;
+				if (divisions) {
+					let currentDivisions = parseInt(divisions);
+					console.log(pp,mm, divisions);
+				}
+				for (let nn = 0; nn < measurenotes.length; nn++) {
+					let notedef = measurenotes[nn];
+				}
+			}
 		}
 
 		/*

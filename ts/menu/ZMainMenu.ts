@@ -300,7 +300,7 @@ class ZMainMenu {
 		});
 	}
 
-	fillFrom(prj: ZvoogSchedule) {
+	fillSongMenuFrom(prj: ZvoogSchedule) {
 		this.songFolder.items.length = 0;
 		this.songFolder.folders.length = 0;
 		//this.menuRoot.items.push(this.muzXBox.itemImportMIDI);

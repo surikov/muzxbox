@@ -120,7 +120,7 @@ class MuzXBox {
 		};
 		this.currentSchedule = emptySchedule;
 		this.zrenderer.drawSchedule(emptySchedule);//, this.menuButton);
-		this.zMainMenu.fillFrom(this.currentSchedule);
+		this.zMainMenu.fillSongMenuFrom(this.currentSchedule);
 	}
 	/*openMenu() {
 		(document.getElementById('menuContentDiv') as any).style.visibility = 'visible';
@@ -156,14 +156,14 @@ class MuzXBox {
 		this.changeCSS('resources/screen_big.css', 0);
 		this.zrenderer.tileLevel.setupTapSize(3);
 		this.zrenderer.drawSchedule(this.currentSchedule);
-		this.zMainMenu.fillFrom(this.currentSchedule);
+		this.zMainMenu.fillSongMenuFrom(this.currentSchedule);
 	}
 	setLayoutNormal() {
 		console.log('setLayoutNormal');
 		this.changeCSS('resources/screen_normal.css', 0);
 		this.zrenderer.tileLevel.setupTapSize(1);
 		this.zrenderer.drawSchedule(this.currentSchedule);
-		this.zMainMenu.fillFrom(this.currentSchedule);
+		this.zMainMenu.fillSongMenuFrom(this.currentSchedule);
 	}
 	setGrid(meters: ZvoogMeter[]) {
 		this.currentSchedule.rhythm = meters;
@@ -192,7 +192,7 @@ class MuzXBox {
 				if (me) {
 					me.currentSchedule = result;
 					me.zrenderer.drawSchedule(result);//, me.menuButton);
-					me.zMainMenu.fillFrom(result);
+					me.zMainMenu.fillSongMenuFrom(result);
 				}
 			}
 		});
@@ -206,6 +206,7 @@ class MuzXBox {
 					console.log(result);
 					me.currentSchedule = result;
 					me.zrenderer.drawSchedule(result);//, me.menuButton);
+					me.zMainMenu.fillSongMenuFrom(result);
 				}
 			}
 		});
