@@ -4048,10 +4048,11 @@ var MusicXMLFileImporter = (function () {
                         var xml = progressEvent.target.result;
                         var domParser = new DOMParser();
                         var _document = domParser.parseFromString(xml, "text/xml");
-                        var mxml = new Extra('', '', []);
+                        var mxml = new XV('', '', []);
                         mxml.fill(_document);
                         var zvoogSchedule = me.parseMXML(mxml);
                         console.log('parsed musicxml', zvoogSchedule);
+                        onFinish(zvoogSchedule);
                     }
                 };
                 fileReader.readAsBinaryString(file);
@@ -4076,7 +4077,69 @@ var MusicXMLFileImporter = (function () {
         var scoreParts = mxml.first('part-list').every('score-part');
         for (var pp = 0; pp < scoreParts.length; pp++) {
             var part = scoreParts[pp];
-            console.log(part.first('id').value, part.first('part-name').value, part);
+            var partid = part.first('id').value;
+            var partdata = mxml.seek('part', 'id', partid);
+            console.log(partid, part.first('part-name').value, partdata);
+            var partmeasures = partdata.every('measure');
+            for (var mm = 0; mm < partmeasures.length; mm++) {
+                if (zvoogSchedule.measures.length <= mm) {
+                    zvoogSchedule.measures.push({
+                        meter: {
+                            count: 4,
+                            division: 4
+                        },
+                        tempo: 120,
+                        points: []
+                    });
+                }
+                var beats = partmeasures[mm].first("attributes").first("time").first("beats").value;
+                var beattype = partmeasures[mm].first("attributes").first("time").first("beat-type").value;
+                if ((beats) && (beattype)) {
+                    console.log('meter', mm, beats, beattype);
+                }
+                var octaveChange = partmeasures[mm].first("attributes").first("transpose").first("octave-change").value;
+                if (octaveChange) {
+                    console.log('octaveChange', octaveChange);
+                }
+                var directions = partmeasures[mm].every('direction');
+                for (var dd = 0; dd < directions.length; dd++) {
+                    var dirtype = directions[dd].first('direction-type').content[0];
+                    if (dirtype.name == 'rehearsal') {
+                        console.log('label', mm, dirtype.value);
+                    }
+                    else {
+                        if (dirtype.name == 'dynamics') {
+                        }
+                        else {
+                            if (dirtype.name == 'metronome') {
+                                console.log('tempo', mm, dirtype.first('per-minute').value, dirtype.first('beat-unit').value);
+                            }
+                            else {
+                                if (dirtype.name == 'words') {
+                                    if (dirtype.value == 'P.M.') {
+                                    }
+                                    else {
+                                        console.log(dirtype.name, mm, dirtype.value);
+                                    }
+                                }
+                                else {
+                                    if (dirtype.name == 'bracket') {
+                                        console.log(dirtype.name, mm, dirtype.first('type').value, dirtype.first('number').value, dirtype.first('line-end').value, dirtype.first('end-length').value);
+                                    }
+                                    else {
+                                        console.log('?', mm, directions[dd]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for (var pp = 0; pp < scoreParts.length; pp++) {
+            var part = scoreParts[pp];
+            var partid = part.first('id').value;
+            var partdata = mxml.seek('part', 'id', partid);
         }
         return zvoogSchedule;
     };
@@ -4097,51 +4160,51 @@ var MusicXMLFileImporter = (function () {
     return MusicXMLFileImporter;
 }());
 ;
-var Extra = (function () {
-    function Extra(name, value, children) {
+var XV = (function () {
+    function XV(name, value, children) {
         this.name = name;
         this.value = value;
-        this.brood = children;
+        this.content = children;
     }
-    Extra.prototype.clone = function () {
-        var r = new Extra('', '', []);
+    XV.prototype.clone = function () {
+        var r = new XV('', '', []);
         r.name = this.name;
         r.value = this.value;
-        r.brood = [];
-        for (var i = 0; i < this.brood.length; i++) {
-            r.brood.push(this.brood[i].clone());
+        r.content = [];
+        for (var i = 0; i < this.content.length; i++) {
+            r.content.push(this.content[i].clone());
         }
         return r;
     };
-    Extra.prototype.first = function (name) {
-        for (var i = 0; i < this.brood.length; i++) {
-            if (this.brood[i].name == name) {
-                return this.brood[i];
+    XV.prototype.first = function (name) {
+        for (var i = 0; i < this.content.length; i++) {
+            if (this.content[i].name == name) {
+                return this.content[i];
             }
         }
-        return new Extra('', '', []);
+        return new XV('', '', []);
     };
-    Extra.prototype.every = function (name) {
+    XV.prototype.every = function (name) {
         var r = [];
-        for (var i = 0; i < this.brood.length; i++) {
-            if (this.brood[i].name == name) {
-                r.push(this.brood[i]);
+        for (var i = 0; i < this.content.length; i++) {
+            if (this.content[i].name == name) {
+                r.push(this.content[i]);
             }
         }
         return r;
     };
-    Extra.prototype.seek = function (name, subname, subvalue) {
-        for (var i = 0; i < this.brood.length; i++) {
-            if (this.brood[i].name == name) {
-                var t = this.brood[i].first(subname);
+    XV.prototype.seek = function (name, subname, subvalue) {
+        for (var i = 0; i < this.content.length; i++) {
+            if (this.content[i].name == name) {
+                var t = this.content[i].first(subname);
                 if (t.value == subvalue) {
-                    return this.brood[i];
+                    return this.content[i];
                 }
             }
         }
-        return new Extra('', '', []);
+        return new XV('', '', []);
     };
-    Extra.prototype.readDocChildren = function (node) {
+    XV.prototype.readDocChildren = function (node) {
         var children = [];
         if (node.children) {
             for (var i = 0; i < node.children.length; i++) {
@@ -4150,26 +4213,26 @@ var Extra = (function () {
                 if (c.childNodes && c.childNodes[0] && c.childNodes[0].nodeName == '#text') {
                     t = ('' + c.childNodes[0].nodeValue).trim();
                 }
-                children.push(new Extra(c.localName, t, this.readDocChildren(c)));
+                children.push(new XV(c.localName, t, this.readDocChildren(c)));
             }
         }
         if (node.attributes) {
             for (var i = 0; i < node.attributes.length; i++) {
                 var a = node.attributes[i];
-                children.push(new Extra(a.localName, a.value, []));
+                children.push(new XV(a.localName, a.value, []));
             }
         }
         return children;
     };
-    Extra.prototype.fill = function (document) {
+    XV.prototype.fill = function (document) {
         var tt = this.readDocChildren(document);
         if (tt.length > 0) {
             this.name = tt[0].name;
             this.value = tt[0].value;
-            this.brood = tt[0].brood;
+            this.content = tt[0].content;
         }
     };
-    return Extra;
+    return XV;
 }());
 var ZMainMenu = (function () {
     function ZMainMenu(from) {
@@ -4384,9 +4447,11 @@ var ZMainMenu = (function () {
         });
         this.menuRoot.folders.push(this.songFolder);
         this.menuRoot.folders.push({
-            path: "Rhythm patterns", icon: "", folders: [], items: [
+            path: "Rhythm patterns", icon: "", folders: [],
+            items: [
                 {
-                    label: 'plain 1/32', autoclose: true, icon: '', action: function () {
+                    label: 'plain 1/32', autoclose: true, icon: '',
+                    action: function () {
                         var rr = [
                             { count: 1, division: 32 }, { count: 1, division: 32 },
                             { count: 1, division: 32 }, { count: 1, division: 32 },
@@ -4405,7 +4470,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/16', autoclose: true, icon: '', action: function () {
+                    label: 'plain 1/16', autoclose: true, icon: '',
+                    action: function () {
                         var rr = [
                             { count: 1, division: 16 }, { count: 1, division: 16 },
                             { count: 1, division: 16 }, { count: 1, division: 16 },
@@ -4420,7 +4486,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/8', autoclose: true, icon: '', action: function () {
+                    label: 'plain 1/8', autoclose: true, icon: '',
+                    action: function () {
                         console.log('plain 1/8', default8rhytym);
                         var me = window['MZXB'];
                         if (me) {
@@ -4429,7 +4496,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'swing 1/8', autoclose: true, icon: '', action: function () {
+                    label: 'swing 1/8', autoclose: true, icon: '',
+                    action: function () {
                         var rr = [
                             { count: 5, division: 32 }, { count: 3, division: 32 },
                             { count: 5, division: 32 }, { count: 3, division: 32 }
@@ -4444,9 +4512,11 @@ var ZMainMenu = (function () {
             ], afterOpen: function () { }
         });
         this.menuRoot.folders.push({
-            path: "Screen size", icon: "", folders: [], items: [
+            path: "Screen size", icon: "", folders: [],
+            items: [
                 {
-                    label: 'normal', autoclose: true, icon: '', action: function () {
+                    label: 'normal', autoclose: true, icon: '',
+                    action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutNormal();
@@ -4454,7 +4524,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'big', autoclose: true, icon: '', action: function () {
+                    label: 'big', autoclose: true, icon: '',
+                    action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutBig();

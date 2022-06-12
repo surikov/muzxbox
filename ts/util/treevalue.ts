@@ -1,52 +1,52 @@
-class Extra {
+class XV {
 	name: string;
 	value: string;
-	brood: Extra[];
-	constructor(name: string, value: string, children: Extra[]) {
+	content: XV[];
+	constructor(name: string, value: string, children: XV[]) {
 		this.name = name;
 		this.value = value;
-		this.brood = children;
+		this.content = children;
 	}
-	clone(): Extra {
-		var r = new Extra('', '', []);
+	clone(): XV {
+		var r = new XV('', '', []);
 		r.name = this.name;
 		r.value = this.value;
-		r.brood = [];
-		for (var i = 0; i < this.brood.length; i++) {
-			r.brood.push(this.brood[i].clone());
+		r.content = [];
+		for (var i = 0; i < this.content.length; i++) {
+			r.content.push(this.content[i].clone());
 		}
 		return r;
 	}
-	first(name: string): Extra {
-		for (let i = 0; i < this.brood.length; i++) {
-			if (this.brood[i].name == name) {
-				return this.brood[i];
+	first(name: string): XV {
+		for (let i = 0; i < this.content.length; i++) {
+			if (this.content[i].name == name) {
+				return this.content[i];
 			}
 		}
-		return new Extra('', '', []);
+		return new XV('', '', []);
 	}
-	every(name: string): Extra[] {
-		let r: Extra[] = [];
-		for (let i = 0; i < this.brood.length; i++) {
-			if (this.brood[i].name == name) {
-				r.push(this.brood[i]);
+	every(name: string): XV[] {
+		let r: XV[] = [];
+		for (let i = 0; i < this.content.length; i++) {
+			if (this.content[i].name == name) {
+				r.push(this.content[i]);
 			}
 		}
 		return r;
 	}
-	seek(name: string, subname: string, subvalue: string): Extra {
-		for (let i = 0; i < this.brood.length; i++) {
-			if (this.brood[i].name == name) {
-				var t = this.brood[i].first(subname);
+	seek(name: string, subname: string, subvalue: string): XV {
+		for (let i = 0; i < this.content.length; i++) {
+			if (this.content[i].name == name) {
+				var t = this.content[i].first(subname);
 				if (t.value == subvalue) {
-					return this.brood[i];
+					return this.content[i];
 				}
 			}
 		}
-		return new Extra('', '', []);
+		return new XV('', '', []);
 	}
-	readDocChildren(node: any): Extra[] {
-		let children: Extra[] = [];
+	readDocChildren(node: any): XV[] {
+		let children: XV[] = [];
 		if (node.children) {
 			for (let i = 0; i < node.children.length; i++) {
 				let c = node.children[i];
@@ -54,23 +54,23 @@ class Extra {
 				if (c.childNodes && c.childNodes[0] && c.childNodes[0].nodeName == '#text') {
 					t = ('' + c.childNodes[0].nodeValue).trim();
 				}
-				children.push(new Extra(c.localName, t, this.readDocChildren(c)));
+				children.push(new XV(c.localName, t, this.readDocChildren(c)));
 			}
 		}
 		if (node.attributes) {
 			for (let i = 0; i < node.attributes.length; i++) {
 				let a = node.attributes[i];
-				children.push(new Extra(a.localName, a.value, []));
+				children.push(new XV(a.localName, a.value, []));
 			}
 		}
 		return children;
 	}
 	fill(document: Document) {
-		var tt: Extra[] = this.readDocChildren(document);
+		var tt: XV[] = this.readDocChildren(document);
 		if (tt.length > 0) {
 			this.name = tt[0].name;
 			this.value = tt[0].value;
-			this.brood = tt[0].brood;
+			this.content = tt[0].content;
 		}
 	}
 }

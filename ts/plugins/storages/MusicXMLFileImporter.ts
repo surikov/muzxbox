@@ -17,11 +17,11 @@ class MusicXMLFileImporter implements ZvoogStore {
 						let xml: string = (progressEvent.target as any).result;
 						var domParser: DOMParser = new DOMParser();
 						var _document: Document = domParser.parseFromString(xml, "text/xml");
-						var mxml: Extra = new Extra('', '', []);
+						var mxml: XV = new XV('', '', []);
 						mxml.fill(_document);
 						var zvoogSchedule: ZvoogSchedule = me.parseMXML(mxml);
 						console.log('parsed musicxml', zvoogSchedule);
-						//onFinish(zvoogSchedule);
+						onFinish(zvoogSchedule);
 					}
 				};
 				fileReader.readAsBinaryString(file);
@@ -30,7 +30,7 @@ class MusicXMLFileImporter implements ZvoogStore {
 		fileSelector.click();
 	};
 
-	parseMXML(mxml: Extra): ZvoogSchedule {
+	parseMXML(mxml: XV): ZvoogSchedule {
 		console.log('parseMXML', mxml);
 		var zvoogSchedule: ZvoogSchedule = {
 			title: ''
@@ -43,11 +43,74 @@ class MusicXMLFileImporter implements ZvoogStore {
 				, progression: []
 			}
 		};
-		let scoreParts: Extra[] = mxml.first('part-list').every('score-part');
+		let scoreParts: XV[] = mxml.first('part-list').every('score-part');
 		for (var pp = 0; pp < scoreParts.length; pp++) {
 			let part = scoreParts[pp];
-			console.log(part.first('id').value, part.first('part-name').value, part);
+			let partid = part.first('id').value;
+			let partdata = mxml.seek('part', 'id', partid);
+			console.log(partid, part.first('part-name').value, partdata);
+			let partmeasures = partdata.every('measure');
+			for (let mm = 0; mm < partmeasures.length; mm++) {
+				if (zvoogSchedule.measures.length <= mm) {
+					zvoogSchedule.measures.push(
+						{
+							meter: {
+								count: 4
+								, division: 4
+							}
+							, tempo: 120
+							, points: []
+						}
+					);
+				}
+				let beats = partmeasures[mm].first("attributes").first("time").first("beats").value;
+				let beattype = partmeasures[mm].first("attributes").first("time").first("beat-type").value;
+				if ((beats) && (beattype)) {
+					console.log('meter', mm, beats, beattype);
+				}
+				let octaveChange = partmeasures[mm].first("attributes").first("transpose").first("octave-change").value;
+				if (octaveChange) {
+					console.log('octaveChange', octaveChange);
+				}
+				var directions = partmeasures[mm].every('direction');
+
+				for (var dd = 0; dd < directions.length; dd++) {
+					var dirtype = directions[dd].first('direction-type').content[0];
+					if (dirtype.name == 'rehearsal') {
+						console.log('label', mm, dirtype.value);
+					} else {
+						if (dirtype.name == 'dynamics') {
+							//console.log(dirtype.name, mm, directions[dd].first('sound').first('dynamics').value);
+						} else {
+							if (dirtype.name == 'metronome') {
+								console.log('tempo', mm, dirtype.first('per-minute').value, dirtype.first('beat-unit').value);
+							} else {
+								if (dirtype.name == 'words') {
+									if (dirtype.value == 'P.M.') {
+										//
+									} else {
+										console.log(dirtype.name, mm, dirtype.value);
+									}
+								} else {
+									if (dirtype.name == 'bracket') {
+										console.log(dirtype.name, mm, dirtype.first('type').value, dirtype.first('number').value, dirtype.first('line-end').value, dirtype.first('end-length').value);
+									} else {
+										console.log('?', mm, directions[dd]);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
+		for (var pp = 0; pp < scoreParts.length; pp++) {
+			let part = scoreParts[pp];
+			let partid = part.first('id').value;
+			let partdata = mxml.seek('part', 'id', partid);
+
+		}
+
 		/*
 		var firstPartMeasures: Extra[] = mxml.first('part').every('measure');
 		var timecount = '4';

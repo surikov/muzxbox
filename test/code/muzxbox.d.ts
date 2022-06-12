@@ -973,7 +973,7 @@ declare class MusicXMLFileImporter implements ZvoogStore {
     goFolder(title: string, onFinish: (error: string) => void): void;
     goUp(onFinish: (error: string) => void): void;
     readSongData(title: string, onFinish: (result: ZvoogSchedule | null) => void): void;
-    parseMXML(mxml: Extra): ZvoogSchedule;
+    parseMXML(mxml: XV): ZvoogSchedule;
     createSongData(title: string, schedule: ZvoogSchedule, onFinish: (error: string) => void): void;
     updateSongData(title: string, schedule: ZvoogSchedule, onFinish: (error: string) => void): void;
     deleteSongData(title: string, onFinish: (error: string) => void): void;
@@ -982,16 +982,16 @@ declare class MusicXMLFileImporter implements ZvoogStore {
     deleteFolder(title: string, onFinish: (error: string) => void): void;
     renameFolder(title: string, newTitle: string, onFinish: (error: string) => void): void;
 }
-declare class Extra {
+declare class XV {
     name: string;
     value: string;
-    brood: Extra[];
-    constructor(name: string, value: string, children: Extra[]);
-    clone(): Extra;
-    first(name: string): Extra;
-    every(name: string): Extra[];
-    seek(name: string, subname: string, subvalue: string): Extra;
-    readDocChildren(node: any): Extra[];
+    content: XV[];
+    constructor(name: string, value: string, children: XV[]);
+    clone(): XV;
+    first(name: string): XV;
+    every(name: string): XV[];
+    seek(name: string, subname: string, subvalue: string): XV;
+    readDocChildren(node: any): XV[];
     fill(document: Document): void;
 }
 declare type ZMenuItem = {
