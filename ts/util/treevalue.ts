@@ -25,6 +25,14 @@ class XV {
 		}
 		return new XV('', '', []);
 	}
+	exists(name: string): boolean {
+		for (let i = 0; i < this.content.length; i++) {
+			if (this.content[i].name == name) {
+				return true;
+			}
+		}
+		return false;
+	}
 	every(name: string): XV[] {
 		let r: XV[] = [];
 		for (let i = 0; i < this.content.length; i++) {

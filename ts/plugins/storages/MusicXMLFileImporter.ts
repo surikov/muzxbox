@@ -30,7 +30,51 @@ class MusicXMLFileImporter implements ZvoogStore {
 		}, false);
 		fileSelector.click();
 	};
+	takeChord(songVoice: ZvoogVoice, measureIdx: number, when: ZvoogMeter): ZvoogChordStrings {
+		let cnt = songVoice.measureChords.length;
+		for (let i = cnt; i < measureIdx; i++) {
+			songVoice.measureChords.push({
+				chords: []
+			});
+		}
+		let imeasure=songVoice.measureChords[measureIdx];
+		for(let i=0;i<imeasure.chords.length;i++){
+			if(DUU(imeasure.chords[i].when).equalsTo(when)){
+				return imeasure.chords[i];
+			}
+		}
+		let chorddef: ZvoogChordStrings = {
+			when: when
+			, envelopes: []
+			, variation: 0
+		};
+		imeasure.chords.push(chorddef);
+		return chorddef;
 
+	}
+	takeVoice(voiceid: string, songtrack: ZvoogTrack): ZvoogVoice {
+		for (let i = 0; i < songtrack.voices.length; i++) {
+			if (songtrack.voices[i].title == voiceid) {
+				return songtrack.voices[i];
+			}
+		}
+		let trackvoice: ZvoogVoice = {
+			measureChords: []
+			, performer: {
+				performerPlugin: null
+				, parameters: []
+				, kind: ''
+				, initial: ''
+			}
+			, filters: []
+			, title: voiceid
+		};
+		songtrack.voices.push(trackvoice);
+		return trackvoice;
+	}
+	parsePitch(step:string,octave:string):number{
+return 0;
+	}
 	parseMXML(mxml: XV): ZvoogSchedule {
 		console.log('parseMXML', mxml);
 		var zvoogSchedule: ZvoogSchedule = {
@@ -119,16 +163,36 @@ class MusicXMLFileImporter implements ZvoogStore {
 			};
 			zvoogSchedule.tracks.push(songtrack);
 			let partmeasures = partdata.every('measure');
-			let currentDivisions = 1;
+			let currentDivisions4 = 1;
 			for (let mm = 0; mm < partmeasures.length; mm++) {
 				let measurenotes = partmeasures[mm].every('note');
 				let divisions = partmeasures[mm].first('attributes').first('divisions').value;
 				if (divisions) {
-					let currentDivisions = parseInt(divisions);
-					console.log(pp,mm, divisions);
+					currentDivisions4 = parseInt(divisions);
+					console.log(pp, mm, divisions);
 				}
+				let when: ZvoogMeter = {
+					count: 0 / 1
+					, division: 4
+				};
 				for (let nn = 0; nn < measurenotes.length; nn++) {
 					let notedef = measurenotes[nn];
+					let voiceId = notedef.first('voice').value;
+					let dividuration = parseInt(notedef.first('duration').value);
+					let noteDuration: ZvoogMeter = {
+						count: dividuration / currentDivisions4
+						, division: 4
+					};
+					let songvoice = this.takeVoice(voiceId, songtrack);
+					let songchord=this.takeChord(songvoice,mm,when);
+					let pitch=this.parsePitch(notedef.first('pitch').first('step').value,notedef.first('pitch').first('octave').value);
+					let songnote:ZvoogEnvelope = {
+						pitches: [{
+							duration: noteDuration
+							, pitch: pitch
+						}]
+					};
+					songchord.envelopes.push(songnote);
 				}
 			}
 		}

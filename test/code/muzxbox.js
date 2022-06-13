@@ -4061,6 +4061,50 @@ var MusicXMLFileImporter = (function () {
         fileSelector.click();
     };
     ;
+    MusicXMLFileImporter.prototype.takeChord = function (songVoice, measureIdx, when) {
+        var cnt = songVoice.measureChords.length;
+        for (var i = cnt; i < measureIdx; i++) {
+            songVoice.measureChords.push({
+                chords: []
+            });
+        }
+        var imeasure = songVoice.measureChords[measureIdx];
+        for (var i = 0; i < imeasure.chords.length; i++) {
+            if (DUU(imeasure.chords[i].when).equalsTo(when)) {
+                return imeasure.chords[i];
+            }
+        }
+        var chorddef = {
+            when: when,
+            envelopes: [],
+            variation: 0
+        };
+        imeasure.chords.push(chorddef);
+        return chorddef;
+    };
+    MusicXMLFileImporter.prototype.takeVoice = function (voiceid, songtrack) {
+        for (var i = 0; i < songtrack.voices.length; i++) {
+            if (songtrack.voices[i].title == voiceid) {
+                return songtrack.voices[i];
+            }
+        }
+        var trackvoice = {
+            measureChords: [],
+            performer: {
+                performerPlugin: null,
+                parameters: [],
+                kind: '',
+                initial: ''
+            },
+            filters: [],
+            title: voiceid
+        };
+        songtrack.voices.push(trackvoice);
+        return trackvoice;
+    };
+    MusicXMLFileImporter.prototype.parsePitch = function (step, octave) {
+        return 0;
+    };
     MusicXMLFileImporter.prototype.parseMXML = function (mxml) {
         console.log('parseMXML', mxml);
         var zvoogSchedule = {
@@ -4142,16 +4186,36 @@ var MusicXMLFileImporter = (function () {
             };
             zvoogSchedule.tracks.push(songtrack);
             var partmeasures = partdata.every('measure');
-            var currentDivisions = 1;
+            var currentDivisions4 = 1;
             for (var mm = 0; mm < partmeasures.length; mm++) {
                 var measurenotes = partmeasures[mm].every('note');
                 var divisions = partmeasures[mm].first('attributes').first('divisions').value;
                 if (divisions) {
-                    var currentDivisions_1 = parseInt(divisions);
+                    currentDivisions4 = parseInt(divisions);
                     console.log(pp, mm, divisions);
                 }
+                var when = {
+                    count: 0 / 1,
+                    division: 4
+                };
                 for (var nn = 0; nn < measurenotes.length; nn++) {
                     var notedef = measurenotes[nn];
+                    var voiceId = notedef.first('voice').value;
+                    var dividuration = parseInt(notedef.first('duration').value);
+                    var noteDuration = {
+                        count: dividuration / currentDivisions4,
+                        division: 4
+                    };
+                    var songvoice = this.takeVoice(voiceId, songtrack);
+                    var songchord = this.takeChord(songvoice, mm, when);
+                    var pitch = this.parsePitch(notedef.first('pitch').first('step').value, notedef.first('pitch').first('octave').value);
+                    var songnote = {
+                        pitches: [{
+                                duration: noteDuration,
+                                pitch: pitch
+                            }]
+                    };
+                    songchord.envelopes.push(songnote);
                 }
             }
         }
@@ -4197,6 +4261,14 @@ var XV = (function () {
             }
         }
         return new XV('', '', []);
+    };
+    XV.prototype.exists = function (name) {
+        for (var i = 0; i < this.content.length; i++) {
+            if (this.content[i].name == name) {
+                return true;
+            }
+        }
+        return false;
     };
     XV.prototype.every = function (name) {
         var r = [];

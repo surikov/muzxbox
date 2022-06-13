@@ -973,6 +973,9 @@ declare class MusicXMLFileImporter implements ZvoogStore {
     goFolder(title: string, onFinish: (error: string) => void): void;
     goUp(onFinish: (error: string) => void): void;
     readSongData(title: string, onFinish: (result: ZvoogSchedule | null) => void): void;
+    takeChord(songVoice: ZvoogVoice, measureIdx: number, when: ZvoogMeter): ZvoogChordStrings;
+    takeVoice(voiceid: string, songtrack: ZvoogTrack): ZvoogVoice;
+    parsePitch(step: string, octave: string): number;
     parseMXML(mxml: XV): ZvoogSchedule;
     createSongData(title: string, schedule: ZvoogSchedule, onFinish: (error: string) => void): void;
     updateSongData(title: string, schedule: ZvoogSchedule, onFinish: (error: string) => void): void;
@@ -989,6 +992,7 @@ declare class XV {
     constructor(name: string, value: string, children: XV[]);
     clone(): XV;
     first(name: string): XV;
+    exists(name: string): boolean;
     every(name: string): XV[];
     seek(name: string, subname: string, subvalue: string): XV;
     readDocChildren(node: any): XV[];
