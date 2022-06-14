@@ -1,13 +1,13 @@
 console.log('MuzXBox v1.02.001');
 
 let midiDrumPitchShift = 35;
-let midiInstrumentPitchShift = 24;
+let midiInstrumentPitchShift = 12;
 let leftGridMargin = 20;
 let rightGridMargin = 1;
 let topGridMargin = 20;
 let bottomGridMargin = 110;
 //let ocataveStart=2;
-let octaveCount = 7;
+let octaveCount = 8;
 let bigGroupMeasure = 16;
 let us: ZUserSetting;
 
@@ -203,7 +203,7 @@ class MuzXBox {
 			if (result) {
 				var me: MuzXBox = window['MZXB'] as MuzXBox;
 				if (me) {
-					console.log(result);
+					//console.log(result);
 					me.currentSchedule = result;
 					me.zrenderer.drawSchedule(result);//, me.menuButton);
 					me.zMainMenu.fillSongMenuFrom(result);

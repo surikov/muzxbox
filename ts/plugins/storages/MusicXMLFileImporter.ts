@@ -32,14 +32,14 @@ class MusicXMLFileImporter implements ZvoogStore {
 	};
 	takeChord(songVoice: ZvoogVoice, measureIdx: number, when: ZvoogMeter): ZvoogChordStrings {
 		let cnt = songVoice.measureChords.length;
-		for (let i = cnt; i < measureIdx; i++) {
+		for (let i = cnt; i <= measureIdx; i++) {
 			songVoice.measureChords.push({
 				chords: []
 			});
 		}
-		let imeasure=songVoice.measureChords[measureIdx];
-		for(let i=0;i<imeasure.chords.length;i++){
-			if(DUU(imeasure.chords[i].when).equalsTo(when)){
+		let imeasure = songVoice.measureChords[measureIdx];
+		for (let i = 0; i < imeasure.chords.length; i++) {
+			if (DUU(imeasure.chords[i].when).equalsTo(when)) {
 				return imeasure.chords[i];
 			}
 		}
@@ -72,8 +72,26 @@ class MusicXMLFileImporter implements ZvoogStore {
 		songtrack.voices.push(trackvoice);
 		return trackvoice;
 	}
-	parsePitch(step:string,octave:string):number{
-return 0;
+	parsePitch(step: string, octave: string, alter: string): number {
+		if ((step) && (octave)) {
+			let p = 0;
+			if (step.toUpperCase().trim() == 'C') p = 0;
+			if (step.toUpperCase().trim() == 'D') p = 2;
+			if (step.toUpperCase().trim() == 'E') p = 4;
+			if (step.toUpperCase().trim() == 'F') p = 5;
+			if (step.toUpperCase().trim() == 'G') p = 7;
+			if (step.toUpperCase().trim() == 'A') p = 9;
+			if (step.toUpperCase().trim() == 'B') p = 11;
+			if (step.toUpperCase().trim() == 'H') p = 1;
+			if (alter == '-1') p = p - 1;
+			if (alter == '-2') p = p - 2;
+			if (alter == '1') p = p + 1;
+			if (alter == '2') p = p + 2;
+			p = p + parseInt(octave) * 12 - 12 * 0;
+			return p;
+		} else {
+			return -1;
+		}
 	}
 	parseMXML(mxml: XV): ZvoogSchedule {
 		console.log('parseMXML', mxml);
@@ -93,7 +111,7 @@ return 0;
 			let part = scoreParts[pp];
 			let partid = part.first('id').value;
 			let partdata = mxml.seek('part', 'id', partid);
-			console.log(partid, part.first('part-name').value, partdata);
+			//console.log(partid, part.first('part-name').value, partdata);
 
 			let partmeasures = partdata.every('measure');
 			for (let mm = 0; mm < partmeasures.length; mm++) {
@@ -152,6 +170,7 @@ return 0;
 
 			}
 		}
+
 		for (var pp = 0; pp < scoreParts.length; pp++) {
 			let part = scoreParts[pp];
 			let partid = part.first('id').value;
@@ -169,7 +188,7 @@ return 0;
 				let divisions = partmeasures[mm].first('attributes').first('divisions').value;
 				if (divisions) {
 					currentDivisions4 = parseInt(divisions);
-					console.log(pp, mm, divisions);
+					//console.log(pp, mm, divisions);
 				}
 				let when: ZvoogMeter = {
 					count: 0 / 1
@@ -184,19 +203,37 @@ return 0;
 						, division: 4
 					};
 					let songvoice = this.takeVoice(voiceId, songtrack);
-					let songchord=this.takeChord(songvoice,mm,when);
-					let pitch=this.parsePitch(notedef.first('pitch').first('step').value,notedef.first('pitch').first('octave').value);
-					let songnote:ZvoogEnvelope = {
-						pitches: [{
-							duration: noteDuration
-							, pitch: pitch
-						}]
-					};
-					songchord.envelopes.push(songnote);
+					let songchord = this.takeChord(songvoice, mm, when);
+					let pitch = this.parsePitch(notedef.first('pitch').first('step').value, notedef.first('pitch').first('octave').value, notedef.first('pitch').first('alter').value);
+					if (pitch >= 0) {
+						let songnote: ZvoogEnvelope = {
+							pitches: [{
+								duration: noteDuration
+								, pitch: pitch
+							}]
+						};
+						songchord.envelopes.push(songnote);
+					}
+					if (!notedef.exists('chord')) {
+						when = DUU(when).plus(noteDuration);
+					}
 				}
 			}
 		}
-
+		for (let mm = 0; mm < zvoogSchedule.measures.length; mm++) {
+			for (let tt = 0; tt < zvoogSchedule.tracks.length; tt++) {
+				let track = zvoogSchedule.tracks[tt];
+				for (let vv = 0; vv < track.voices.length; vv++) {
+					let voice = track.voices[vv];
+					if (voice.measureChords[mm]) {
+						//
+					} else {
+						voice.measureChords[mm] = { chords: [] };
+						//console.log('fill', tt, vv, mm);
+					}
+				}
+			}
+		}
 		/*
 		var firstPartMeasures: Extra[] = mxml.first('part').every('measure');
 		var timecount = '4';

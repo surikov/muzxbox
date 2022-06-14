@@ -975,7 +975,7 @@ declare class MusicXMLFileImporter implements ZvoogStore {
     readSongData(title: string, onFinish: (result: ZvoogSchedule | null) => void): void;
     takeChord(songVoice: ZvoogVoice, measureIdx: number, when: ZvoogMeter): ZvoogChordStrings;
     takeVoice(voiceid: string, songtrack: ZvoogTrack): ZvoogVoice;
-    parsePitch(step: string, octave: string): number;
+    parsePitch(step: string, octave: string, alter: string): number;
     parseMXML(mxml: XV): ZvoogSchedule;
     createSongData(title: string, schedule: ZvoogSchedule, onFinish: (error: string) => void): void;
     updateSongData(title: string, schedule: ZvoogSchedule, onFinish: (error: string) => void): void;
@@ -1105,7 +1105,7 @@ declare class PianoRollRenderer {
     addParameterMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, parameter: ZvoogParameterData, measureNum: number, time: number, css: string, anchors: TileAnchor[]): void;
     addMeasureLyrics(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor, css: string): void;
     addSelectKnobs64(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor): void;
-    addSelectKnobs16(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor): void;
+    addSelectKnobs16(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor, action: (x: number, y: number) => void | undefined): void;
     addSelectKnobs4(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor): void;
     addSelectKnobs1(song: ZvoogSchedule, time: number, mm: number, rhythmPattern: ZvoogMeter[], ratioDuration: number, ratioThickness: number, anchor: TileAnchor): void;
     addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number;
@@ -1118,6 +1118,7 @@ declare class PianoRollRenderer {
     findFocusedFilter(filters: ZvoogFilterSetting[]): number;
     findFocusedVoice(voices: ZvoogVoice[]): number;
     findFocusedParam(pars: ZvoogParameterData[]): number;
+    createSlectMeasureAction(measureIdx: number): (x: number, y: number) => void;
     addPianoRoll(zRender: ZRender, layerSelector: LayerSelector, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
     fillFar(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
     fillBig(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;

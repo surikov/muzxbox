@@ -118,7 +118,7 @@ class PianoRollRenderer {
 			, w: 8 * ratioThickness
 			, h: 8 * ratioThickness
 			, css: 'actionSpot64'
-			,action:(x: number, y: number) => {console.log('click',x,y);}
+			, action: (x: number, y: number) => { console.log('click', x, y); }
 		};
 		anchor.content.push(knob);
 		let txt: TileText = {
@@ -126,18 +126,18 @@ class PianoRollRenderer {
 			, y: topGridMargin + 12 * octaveCount * ratioThickness + 3 * ratioThickness
 			, text: 'options'
 			, css: 'knobLabel64'
-			,action:(x: number, y: number) => {console.log('click',x,y);}
+			, action: (x: number, y: number) => { console.log('click', x, y); }
 		};
 		anchor.content.push(txt);
 	}
-	addSelectKnobs16(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor) {
+	addSelectKnobs16(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor, action: (x: number, y: number) => void | undefined) {
 		let knob: TileRectangle = {
 			x: leftGridMargin + time * ratioDuration
 			, y: topGridMargin + 12 * octaveCount * ratioThickness
 			, w: 4 * ratioThickness
 			, h: 4 * ratioThickness
 			, css: 'actionSpot16'
-			,action:(x: number, y: number) => {console.log('click',x,y);}
+			, action: action
 		};
 		anchor.content.push(knob);
 		let txt: TileText = {
@@ -145,18 +145,18 @@ class PianoRollRenderer {
 			, y: topGridMargin + 12 * octaveCount * ratioThickness + 2 * ratioThickness
 			, text: 'options'
 			, css: 'knobLabel16'
-			,action:(x: number, y: number) => {console.log('click',x,y);}
+			, action: action
 		};
 		anchor.content.push(txt);
 	}
 	addSelectKnobs4(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor) {
 		let knob: TileRectangle = {
-			x:  leftGridMargin + time * ratioDuration
+			x: leftGridMargin + time * ratioDuration
 			, y: topGridMargin + 12 * octaveCount * ratioThickness
 			, w: 2 * ratioThickness
 			, h: 2 * ratioThickness
 			, css: 'actionSpot4'
-			,action:(x: number, y: number) => {console.log('click',x,y);}
+			, action: (x: number, y: number) => { console.log('click', x, y); }
 		};
 		anchor.content.push(knob);
 		let txt: TileText = {
@@ -164,7 +164,7 @@ class PianoRollRenderer {
 			, y: topGridMargin + 12 * octaveCount * ratioThickness + 1 * ratioThickness
 			, text: '' + mm + 'opt'
 			, css: 'knobLabel4'
-			,action:(x: number, y: number) => {console.log('click',x,y);}
+			, action: (x: number, y: number) => { console.log('click', x, y); }
 		};
 		anchor.content.push(txt);
 	}
@@ -181,7 +181,7 @@ class PianoRollRenderer {
 				, w: 1
 				, h: 1
 				, css: 'actionSpot1'
-				,action:(x: number, y: number) => {console.log('click',x,y);}
+				, action: (x: number, y: number) => { console.log('click', x, y); }
 			};
 			anchor.content.push(knob);
 			let txt: TileText = {
@@ -189,7 +189,7 @@ class PianoRollRenderer {
 				, y: topGridMargin + 12 * octaveCount * ratioThickness + 1
 				, text: 'options'
 				, css: 'knobLabel1'
-				,action:(x: number, y: number) => {console.log('click',x,y);}
+				, action: (x: number, y: number) => { console.log('click', x, y); }
 			};
 			anchor.content.push(txt);
 
@@ -399,6 +399,10 @@ class PianoRollRenderer {
 		return -1;
 	}
 
+	createSlectMeasureAction(measureIdx:number):(x: number, y: number) => void{
+		let actionSelect: (x: number, y: number) => void = (x: number, y: number) => { console.log('measureIdx', measureIdx); }
+		return actionSelect;
+	}
 
 	addPianoRoll(zRender: ZRender, layerSelector: LayerSelector, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {//}, menuButton: TileRectangle) {
 
@@ -451,7 +455,7 @@ class PianoRollRenderer {
 			this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, 'lyricsText16');
 
 			this.addSelectKnobs64(song, time, mm, ratioDuration, ratioThickness, secondMeasure64);
-			this.addSelectKnobs16(song, time, mm, ratioDuration, ratioThickness, secondMeasure16);
+			this.addSelectKnobs16(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, this.createSlectMeasureAction(mm));
 			this.addSelectKnobs4(song, time, mm, ratioDuration, ratioThickness, secondMeasure4);
 			this.addSelectKnobs1(song, time, mm, rhythm, ratioDuration, ratioThickness, secondMeasure1);
 

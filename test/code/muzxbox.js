@@ -4063,7 +4063,7 @@ var MusicXMLFileImporter = (function () {
     ;
     MusicXMLFileImporter.prototype.takeChord = function (songVoice, measureIdx, when) {
         var cnt = songVoice.measureChords.length;
-        for (var i = cnt; i < measureIdx; i++) {
+        for (var i = cnt; i <= measureIdx; i++) {
             songVoice.measureChords.push({
                 chords: []
             });
@@ -4102,8 +4102,39 @@ var MusicXMLFileImporter = (function () {
         songtrack.voices.push(trackvoice);
         return trackvoice;
     };
-    MusicXMLFileImporter.prototype.parsePitch = function (step, octave) {
-        return 0;
+    MusicXMLFileImporter.prototype.parsePitch = function (step, octave, alter) {
+        if ((step) && (octave)) {
+            var p = 0;
+            if (step.toUpperCase().trim() == 'C')
+                p = 0;
+            if (step.toUpperCase().trim() == 'D')
+                p = 2;
+            if (step.toUpperCase().trim() == 'E')
+                p = 4;
+            if (step.toUpperCase().trim() == 'F')
+                p = 5;
+            if (step.toUpperCase().trim() == 'G')
+                p = 7;
+            if (step.toUpperCase().trim() == 'A')
+                p = 9;
+            if (step.toUpperCase().trim() == 'B')
+                p = 11;
+            if (step.toUpperCase().trim() == 'H')
+                p = 1;
+            if (alter == '-1')
+                p = p - 1;
+            if (alter == '-2')
+                p = p - 2;
+            if (alter == '1')
+                p = p + 1;
+            if (alter == '2')
+                p = p + 2;
+            p = p + parseInt(octave) * 12 - 12 * 0;
+            return p;
+        }
+        else {
+            return -1;
+        }
     };
     MusicXMLFileImporter.prototype.parseMXML = function (mxml) {
         console.log('parseMXML', mxml);
@@ -4123,7 +4154,6 @@ var MusicXMLFileImporter = (function () {
             var part = scoreParts[pp];
             var partid = part.first('id').value;
             var partdata = mxml.seek('part', 'id', partid);
-            console.log(partid, part.first('part-name').value, partdata);
             var partmeasures = partdata.every('measure');
             for (var mm = 0; mm < partmeasures.length; mm++) {
                 if (zvoogSchedule.measures.length <= mm) {
@@ -4192,7 +4222,6 @@ var MusicXMLFileImporter = (function () {
                 var divisions = partmeasures[mm].first('attributes').first('divisions').value;
                 if (divisions) {
                     currentDivisions4 = parseInt(divisions);
-                    console.log(pp, mm, divisions);
                 }
                 var when = {
                     count: 0 / 1,
@@ -4208,14 +4237,32 @@ var MusicXMLFileImporter = (function () {
                     };
                     var songvoice = this.takeVoice(voiceId, songtrack);
                     var songchord = this.takeChord(songvoice, mm, when);
-                    var pitch = this.parsePitch(notedef.first('pitch').first('step').value, notedef.first('pitch').first('octave').value);
-                    var songnote = {
-                        pitches: [{
-                                duration: noteDuration,
-                                pitch: pitch
-                            }]
-                    };
-                    songchord.envelopes.push(songnote);
+                    var pitch = this.parsePitch(notedef.first('pitch').first('step').value, notedef.first('pitch').first('octave').value, notedef.first('pitch').first('alter').value);
+                    if (pitch >= 0) {
+                        var songnote = {
+                            pitches: [{
+                                    duration: noteDuration,
+                                    pitch: pitch
+                                }]
+                        };
+                        songchord.envelopes.push(songnote);
+                    }
+                    if (!notedef.exists('chord')) {
+                        when = DUU(when).plus(noteDuration);
+                    }
+                }
+            }
+        }
+        for (var mm = 0; mm < zvoogSchedule.measures.length; mm++) {
+            for (var tt = 0; tt < zvoogSchedule.tracks.length; tt++) {
+                var track = zvoogSchedule.tracks[tt];
+                for (var vv = 0; vv < track.voices.length; vv++) {
+                    var voice = track.voices[vv];
+                    if (voice.measureChords[mm]) {
+                    }
+                    else {
+                        voice.measureChords[mm] = { chords: [] };
+                    }
                 }
             }
         }
@@ -4533,11 +4580,9 @@ var ZMainMenu = (function () {
         });
         this.menuRoot.folders.push(this.songFolder);
         this.menuRoot.folders.push({
-            path: "Rhythm patterns", icon: "", folders: [],
-            items: [
+            path: "Rhythm patterns", icon: "", folders: [], items: [
                 {
-                    label: 'plain 1/32', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/32', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 1, division: 32 }, { count: 1, division: 32 },
                             { count: 1, division: 32 }, { count: 1, division: 32 },
@@ -4556,8 +4601,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/16', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/16', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 1, division: 16 }, { count: 1, division: 16 },
                             { count: 1, division: 16 }, { count: 1, division: 16 },
@@ -4572,8 +4616,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/8', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/8', autoclose: true, icon: '', action: function () {
                         console.log('plain 1/8', default8rhytym);
                         var me = window['MZXB'];
                         if (me) {
@@ -4582,8 +4625,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'swing 1/8', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'swing 1/8', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 5, division: 32 }, { count: 3, division: 32 },
                             { count: 5, division: 32 }, { count: 3, division: 32 }
@@ -4598,11 +4640,9 @@ var ZMainMenu = (function () {
             ], afterOpen: function () { }
         });
         this.menuRoot.folders.push({
-            path: "Screen size", icon: "", folders: [],
-            items: [
+            path: "Screen size", icon: "", folders: [], items: [
                 {
-                    label: 'normal', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'normal', autoclose: true, icon: '', action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutNormal();
@@ -4610,8 +4650,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'big', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'big', autoclose: true, icon: '', action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutBig();
@@ -4741,12 +4780,12 @@ var SingleMenuPanel = (function () {
 }());
 console.log('MuzXBox v1.02.001');
 var midiDrumPitchShift = 35;
-var midiInstrumentPitchShift = 24;
+var midiInstrumentPitchShift = 12;
 var leftGridMargin = 20;
 var rightGridMargin = 1;
 var topGridMargin = 20;
 var bottomGridMargin = 110;
-var octaveCount = 7;
+var octaveCount = 8;
 var bigGroupMeasure = 16;
 var us;
 var MuzXBox = (function () {
@@ -4889,7 +4928,6 @@ var MuzXBox = (function () {
             if (result) {
                 var me = window['MZXB'];
                 if (me) {
-                    console.log(result);
                     me.currentSchedule = result;
                     me.zrenderer.drawSchedule(result);
                     me.zMainMenu.fillSongMenuFrom(result);
@@ -5132,14 +5170,14 @@ var PianoRollRenderer = (function () {
         };
         anchor.content.push(txt);
     };
-    PianoRollRenderer.prototype.addSelectKnobs16 = function (song, time, mm, ratioDuration, ratioThickness, anchor) {
+    PianoRollRenderer.prototype.addSelectKnobs16 = function (song, time, mm, ratioDuration, ratioThickness, anchor, action) {
         var knob = {
             x: leftGridMargin + time * ratioDuration,
             y: topGridMargin + 12 * octaveCount * ratioThickness,
             w: 4 * ratioThickness,
             h: 4 * ratioThickness,
             css: 'actionSpot16',
-            action: function (x, y) { console.log('click', x, y); }
+            action: action
         };
         anchor.content.push(knob);
         var txt = {
@@ -5147,7 +5185,7 @@ var PianoRollRenderer = (function () {
             y: topGridMargin + 12 * octaveCount * ratioThickness + 2 * ratioThickness,
             text: 'options',
             css: 'knobLabel16',
-            action: function (x, y) { console.log('click', x, y); }
+            action: action
         };
         anchor.content.push(txt);
     };
@@ -5380,6 +5418,10 @@ var PianoRollRenderer = (function () {
         }
         return -1;
     };
+    PianoRollRenderer.prototype.createSlectMeasureAction = function (measureIdx) {
+        var actionSelect = function (x, y) { console.log('measureIdx', measureIdx); };
+        return actionSelect;
+    };
     PianoRollRenderer.prototype.addPianoRoll = function (zRender, layerSelector, song, ratioDuration, ratioThickness) {
         var rhythm = zRender.rhythmPatternDefault;
         if (song.rhythm) {
@@ -5418,7 +5460,7 @@ var PianoRollRenderer = (function () {
             this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure4, 'lyricsText4');
             this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, 'lyricsText16');
             this.addSelectKnobs64(song, time, mm, ratioDuration, ratioThickness, secondMeasure64);
-            this.addSelectKnobs16(song, time, mm, ratioDuration, ratioThickness, secondMeasure16);
+            this.addSelectKnobs16(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, this.createSlectMeasureAction(mm));
             this.addSelectKnobs4(song, time, mm, ratioDuration, ratioThickness, secondMeasure4);
             this.addSelectKnobs1(song, time, mm, rhythm, ratioDuration, ratioThickness, secondMeasure1);
             for (var tt = 0; tt < song.tracks.length; tt++) {
