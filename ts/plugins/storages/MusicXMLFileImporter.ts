@@ -205,7 +205,7 @@ class MusicXMLFileImporter implements ZvoogStore {
 					let songvoice = this.takeVoice(voiceId, songtrack);
 					let songchord = this.takeChord(songvoice, mm, when);
 					let pitch = this.parsePitch(notedef.first('pitch').first('step').value, notedef.first('pitch').first('octave').value, notedef.first('pitch').first('alter').value);
-					if (pitch >= 0) {
+					if (pitch >= 0 || notedef.exists('unpitched')) {
 						let songnote: ZvoogEnvelope = {
 							pitches: [{
 								duration: noteDuration

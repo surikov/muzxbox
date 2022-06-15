@@ -1048,6 +1048,8 @@ declare let bottomGridMargin: number;
 declare let octaveCount: number;
 declare let bigGroupMeasure: number;
 declare let us: ZUserSetting;
+declare let startSlecetionMeasureIdx: number;
+declare let endSlecetionMeasureIdx: number;
 declare class MuzXBox {
     currentSchedule: ZvoogSchedule;
     zrenderer: ZRender;
@@ -1118,7 +1120,7 @@ declare class PianoRollRenderer {
     findFocusedFilter(filters: ZvoogFilterSetting[]): number;
     findFocusedVoice(voices: ZvoogVoice[]): number;
     findFocusedParam(pars: ZvoogParameterData[]): number;
-    createSlectMeasureAction(measureIdx: number): (x: number, y: number) => void;
+    createSlectMeasureAction(zRender: ZRender, measureIdx: number): (x: number, y: number) => void;
     addPianoRoll(zRender: ZRender, layerSelector: LayerSelector, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
     fillFar(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;
     fillBig(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;

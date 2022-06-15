@@ -452,6 +452,10 @@ html {
 	fill: var(--prime_base);
 }
 
+.selectionBackGround {
+	fill: var(--prime_lite);
+}
+
 /*
 https://coolors.co/ccddee-ffffff-000000-115522-226699-660022
 */

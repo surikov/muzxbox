@@ -399,8 +399,27 @@ class PianoRollRenderer {
 		return -1;
 	}
 
-	createSlectMeasureAction(measureIdx:number):(x: number, y: number) => void{
-		let actionSelect: (x: number, y: number) => void = (x: number, y: number) => { console.log('measureIdx', measureIdx); }
+	createSlectMeasureAction(zRender: ZRender, measureIdx: number): (x: number, y: number) => void {
+		let actionSelect: (x: number, y: number) => void = (x: number, y: number) => {
+			if (startSlecetionMeasureIdx < 0) {
+				startSlecetionMeasureIdx = measureIdx;
+			} else {
+				if (endSlecetionMeasureIdx < 0) {
+					if (measureIdx < startSlecetionMeasureIdx) {
+						endSlecetionMeasureIdx = startSlecetionMeasureIdx;
+						startSlecetionMeasureIdx = measureIdx;
+					} else {
+						endSlecetionMeasureIdx = measureIdx;
+					}
+				} else {
+					startSlecetionMeasureIdx = -1;
+					endSlecetionMeasureIdx = -1;
+				}
+			}
+			console.log('measureIdx', measureIdx, 'selection', startSlecetionMeasureIdx, endSlecetionMeasureIdx);
+			zRender.focusManager.currentFocusLevelX().moveViewToShowSpot(zRender.focusManager);
+			zRender.focusManager.reSetFocus(zRender.muzXBox.zrenderer, gridWidthTp(zRender.muzXBox.currentSchedule, zRender.muzXBox.zrenderer.secondWidthInTaps));
+		}
 		return actionSelect;
 	}
 
@@ -455,7 +474,7 @@ class PianoRollRenderer {
 			this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, 'lyricsText16');
 
 			this.addSelectKnobs64(song, time, mm, ratioDuration, ratioThickness, secondMeasure64);
-			this.addSelectKnobs16(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, this.createSlectMeasureAction(mm));
+			this.addSelectKnobs16(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, this.createSlectMeasureAction(zRender,mm));
 			this.addSelectKnobs4(song, time, mm, ratioDuration, ratioThickness, secondMeasure4);
 			this.addSelectKnobs1(song, time, mm, rhythm, ratioDuration, ratioThickness, secondMeasure1);
 

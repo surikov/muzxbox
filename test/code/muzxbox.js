@@ -4238,7 +4238,7 @@ var MusicXMLFileImporter = (function () {
                     var songvoice = this.takeVoice(voiceId, songtrack);
                     var songchord = this.takeChord(songvoice, mm, when);
                     var pitch = this.parsePitch(notedef.first('pitch').first('step').value, notedef.first('pitch').first('octave').value, notedef.first('pitch').first('alter').value);
-                    if (pitch >= 0) {
+                    if (pitch >= 0 || notedef.exists('unpitched')) {
                         var songnote = {
                             pitches: [{
                                     duration: noteDuration,
@@ -4788,6 +4788,8 @@ var bottomGridMargin = 110;
 var octaveCount = 8;
 var bigGroupMeasure = 16;
 var us;
+var startSlecetionMeasureIdx = -1;
+var endSlecetionMeasureIdx = -1;
 var MuzXBox = (function () {
     function MuzXBox() {
         console.log('start');
@@ -5418,8 +5420,30 @@ var PianoRollRenderer = (function () {
         }
         return -1;
     };
-    PianoRollRenderer.prototype.createSlectMeasureAction = function (measureIdx) {
-        var actionSelect = function (x, y) { console.log('measureIdx', measureIdx); };
+    PianoRollRenderer.prototype.createSlectMeasureAction = function (zRender, measureIdx) {
+        var actionSelect = function (x, y) {
+            if (startSlecetionMeasureIdx < 0) {
+                startSlecetionMeasureIdx = measureIdx;
+            }
+            else {
+                if (endSlecetionMeasureIdx < 0) {
+                    if (measureIdx < startSlecetionMeasureIdx) {
+                        endSlecetionMeasureIdx = startSlecetionMeasureIdx;
+                        startSlecetionMeasureIdx = measureIdx;
+                    }
+                    else {
+                        endSlecetionMeasureIdx = measureIdx;
+                    }
+                }
+                else {
+                    startSlecetionMeasureIdx = -1;
+                    endSlecetionMeasureIdx = -1;
+                }
+            }
+            console.log('measureIdx', measureIdx, 'selection', startSlecetionMeasureIdx, endSlecetionMeasureIdx);
+            zRender.focusManager.currentFocusLevelX().moveViewToShowSpot(zRender.focusManager);
+            zRender.focusManager.reSetFocus(zRender.muzXBox.zrenderer, gridWidthTp(zRender.muzXBox.currentSchedule, zRender.muzXBox.zrenderer.secondWidthInTaps));
+        };
         return actionSelect;
     };
     PianoRollRenderer.prototype.addPianoRoll = function (zRender, layerSelector, song, ratioDuration, ratioThickness) {
@@ -5460,7 +5484,7 @@ var PianoRollRenderer = (function () {
             this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure4, 'lyricsText4');
             this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, 'lyricsText16');
             this.addSelectKnobs64(song, time, mm, ratioDuration, ratioThickness, secondMeasure64);
-            this.addSelectKnobs16(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, this.createSlectMeasureAction(mm));
+            this.addSelectKnobs16(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, this.createSlectMeasureAction(zRender, mm));
             this.addSelectKnobs4(song, time, mm, ratioDuration, ratioThickness, secondMeasure4);
             this.addSelectKnobs1(song, time, mm, rhythm, ratioDuration, ratioThickness, secondMeasure1);
             for (var tt = 0; tt < song.tracks.length; tt++) {
@@ -6777,6 +6801,27 @@ var FocusZoomSong = (function () {
             ry: 0,
             css: 'actionPointSong'
         });
+        var ww2 = mngmnt.muzXBox.zrenderer.secondWidthInTaps * 0.1;
+        if (startSlecetionMeasureIdx > -1) {
+            var measuresAndStep2 = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, startSlecetionMeasureIdx, 0, rhythmPattern);
+            var xx2 = mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep2.start;
+            if (endSlecetionMeasureIdx > -1) {
+                ww2 = 0;
+                for (var kk = startSlecetionMeasureIdx; kk <= endSlecetionMeasureIdx; kk++) {
+                    ww2 = ww2 + mngmnt.muzXBox.zrenderer.secondWidthInTaps
+                        * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[kk].tempo, mngmnt.muzXBox.currentSchedule.measures[kk].meter);
+                }
+            }
+            mngmnt.focusAnchor.content.push({
+                x: leftGridMargin + xx2,
+                y: topGridMargin,
+                w: ww2,
+                h: octaveCount * 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps,
+                rx: 0,
+                ry: 0,
+                css: 'selectionBackGround'
+            });
+        }
     };
     FocusZoomSong.prototype.spotUp = function (mngmnt) {
         if (this.indexOctave < octaveCount - 1) {

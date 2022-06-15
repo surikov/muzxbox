@@ -19,8 +19,8 @@ class FocusZoomSong implements FocusLevel {
 		let hh = 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
 		let yy = topGridMargin
 			+ gridHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
-			- 12 *(1+ this.indexOctave) * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
-		if(this.indexOctave<0){
+			- 12 * (1 + this.indexOctave) * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+		if (this.indexOctave < 0) {
 			hh = bottomGridMargin;
 		}
 		mngmnt.focusAnchor.content.push({
@@ -32,10 +32,33 @@ class FocusZoomSong implements FocusLevel {
 			, ry: 0
 			, css: 'actionPointSong'
 		});
+		let ww2 = mngmnt.muzXBox.zrenderer.secondWidthInTaps *0.1;
+		if (startSlecetionMeasureIdx > -1) {
+			let measuresAndStep2 = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, startSlecetionMeasureIdx, 0, rhythmPattern);
+			let xx2 = mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep2.start;
+			if (endSlecetionMeasureIdx > -1) {
+				ww2 = 0;
+				for (let kk = startSlecetionMeasureIdx; kk <= endSlecetionMeasureIdx; kk++) {
+					ww2 = ww2 + mngmnt.muzXBox.zrenderer.secondWidthInTaps
+						* meter2seconds(mngmnt.muzXBox.currentSchedule.measures[kk].tempo
+							, mngmnt.muzXBox.currentSchedule.measures[kk].meter);
+				}
+			}
+			mngmnt.focusAnchor.content.push({
+				x: leftGridMargin + xx2
+				, y: topGridMargin
+				, w: ww2
+				, h: octaveCount * 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps
+				, rx: 0
+				, ry: 0
+				, css: 'selectionBackGround'
+			});
+		}
+
 
 	}
 	spotUp(mngmnt: FocusManagement): boolean {
-		if (this.indexOctave < octaveCount-1) {
+		if (this.indexOctave < octaveCount - 1) {
 			this.indexOctave++;
 			return true;
 		} else {
@@ -77,8 +100,8 @@ class FocusZoomSong implements FocusLevel {
 		let yy = topGridMargin
 			+ gridHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
 			- 12 * this.indexOctave * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
-		let ww =  mngmnt.muzXBox.zrenderer.secondWidthInTaps*meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.indexMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.indexMeasure].meter);
-		let hh = 12*mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+		let ww = mngmnt.muzXBox.zrenderer.secondWidthInTaps * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.indexMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.indexMeasure].meter);
+		let hh = 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
 		let tx = mngmnt.muzXBox.zrenderer.tileLevel.translateX / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
 		let ty = mngmnt.muzXBox.zrenderer.tileLevel.translateY / mngmnt.muzXBox.zrenderer.tileLevel.tapSize;
 		let tz = mngmnt.muzXBox.zrenderer.tileLevel.translateZ / mngmnt.muzXBox.zrenderer.tileLevel.tapSize

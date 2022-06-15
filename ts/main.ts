@@ -11,6 +11,9 @@ let octaveCount = 8;
 let bigGroupMeasure = 16;
 let us: ZUserSetting;
 
+let startSlecetionMeasureIdx=-1;
+let endSlecetionMeasureIdx=-1;
+
 class MuzXBox {
 	currentSchedule: ZvoogSchedule;
 	zrenderer: ZRender;
