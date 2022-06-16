@@ -1,4 +1,4 @@
-class ZvoogPerformerStub implements ZvoogPerformerPlugin {
+class ZvoogPerformerStub implements ZvoogInstrumentPlugin,ZvoogPercussionPlugin {
 	base: GainNode;
 	params: ZvoogPluginParameter[];
 	lockedState = new ZvoogPluginLock();
@@ -29,7 +29,10 @@ class ZvoogPerformerStub implements ZvoogPerformerPlugin {
 	cancelSchedule(): void {
 		//
 	}
-	addSchedule(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void {
+	scheduleChord(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void {
+		//
+	}
+	scheduleHit(when: number): void {
 		//
 	}
 	getParId(nn: number): string | null {

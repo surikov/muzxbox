@@ -17,6 +17,7 @@ function countMeasureSteps(meter: ZvoogMeter, rhythm: ZvoogMeter[]): number {
 	}
 	return stepCnt;
 }
+
 function countSteps(meter: ZvoogMeter, rhythmPattern: ZvoogMeter[]): number {
 	let stepStartMeter: ZvoogMeter = { count: 0, division: 1 };
 	let nn = 0;
@@ -106,7 +107,7 @@ function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter {
 	}
 	return duration;
 }
-function adjustPartLeadPad(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]) {
+function adjustPartLeadPad(voice: ZvoogInstrumentVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]) {
 	let lowest = 120;
 	let highest = 0;
 	let measurePosition: ZvoogMeter = { count: 0, division: 1 };
@@ -191,7 +192,7 @@ function adjustPartLeadPad(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPositi
 		}
 	}
 }
-function adjustPartBass(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]) {
+function adjustPartBass(voice: ZvoogInstrumentVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]) {
 	let lowest = 120;
 	let measurePosition: ZvoogMeter = { count: 0, division: 1 };
 	for (let m = 0; m < voice.measureChords.length; m++) {
@@ -278,7 +279,7 @@ function createBreakList(originalProg: ZvoogChordMelody[], targetProg: ZvoogChor
 	}
 	return list;
 }
-function adjustVoiceLowHigh(voice: ZvoogVoice, originalProg: ZvoogChordMelody[], targetProg: ZvoogChordMelody[], measures: ZvoogMeasure[], trackIsBass: boolean) {
+function adjustVoiceLowHigh(voice: ZvoogInstrumentVoice, originalProg: ZvoogChordMelody[], targetProg: ZvoogChordMelody[], measures: ZvoogMeasure[], trackIsBass: boolean) {
 	let list = createBreakList(originalProg, targetProg, measures);
 	for (let i = 0; i < list.length - 1; i++) {
 		if (trackIsBass) {

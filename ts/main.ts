@@ -4,7 +4,8 @@ let midiDrumPitchShift = 35;
 let midiInstrumentPitchShift = 12;
 let leftGridMargin = 20;
 let rightGridMargin = 1;
-let topGridMargin = 20;
+let topContentMargin = 20;
+let drumGridPadding = 5;
 let bottomGridMargin = 110;
 //let ocataveStart=2;
 let octaveCount = 8;
@@ -62,11 +63,11 @@ class MuzXBox {
 		var emptySchedule: ZvoogSchedule = {
 			title: 'Empty project'
 			, tracks: [{
-				title: "First", filters: [], voices: [
+				title: "First", filters: [], percussions: [], instruments: [
 					{
 						filters: []
 						, title: 'Single'
-						, performer: { performerPlugin: null, parameters: [], kind: 'none', initial: '' }
+						, instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'none', initial: '' }
 						, measureChords: [{
 							chords: [{
 								when: { count: 1, division: 4 }, variation: 0, envelopes: [{
@@ -81,7 +82,7 @@ class MuzXBox {
 					, {
 						filters: []
 						, title: 'Another'
-						, performer: { performerPlugin: null, parameters: [], kind: 'none', initial: '' }
+						, instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'none', initial: '' }
 						, measureChords: [
 							{ chords: [] }
 							, {
@@ -97,11 +98,11 @@ class MuzXBox {
 				]
 			}
 				, {
-				title: "Second", filters: [], voices: [
+				title: "Second", filters: [], percussions: [], instruments: [
 					{
 						filters: []
 						, title: 'Another'
-						, performer: { performerPlugin: null, parameters: [], kind: 'none', initial: '' }
+						, instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'none', initial: '' }
 						, measureChords: [
 							{ chords: [] }
 							, { chords: [] }

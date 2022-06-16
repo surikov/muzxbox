@@ -318,8 +318,8 @@ class ZMainMenu {
 			tr.items.push({ label: "-track", icon: "", autoclose: false, action: () => { console.log('-track'); } });
 			tr.items.push({ label: "+tfx", icon: "", autoclose: false, action: () => { console.log('+tfx'); } });
 			tr.items.push({ label: "+vox", icon: "", autoclose: false, action: () => { console.log('+vox'); } });
-			for (var vv = 0; vv < songtrack.voices.length; vv++) {
-				var songvox = songtrack.voices[vv];
+			for (var vv = 0; vv < songtrack.instruments.length; vv++) {
+				var songvox = songtrack.instruments[vv];
 				var vox: ZMenuFolder = {
 					path: //'vox ' + 
 						songvox.title, icon: "", folders: [], items: []
@@ -328,13 +328,13 @@ class ZMainMenu {
 				tr.folders.push(vox);
 				vox.items.push({ label: "+vfx", icon: "", autoclose: false, action: () => { console.log('+vfx'); } });
 				var source: ZMenuFolder = {
-					path: 'src ' + songvox.performer.kind, icon: "", folders: [], items: []
+					path: 'src ' + songvox.instrumentSetting.kind, icon: "", folders: [], items: []
 					, afterOpen: this.layerSelector.upVoxProvider(tt, vv)
 				};
 				source.items.push({ label: "?src", icon: "", autoclose: false, action: () => { console.log('?src'); } });
-				for (var kk = 0; kk < songvox.performer.parameters.length; kk++) {
+				for (var kk = 0; kk < songvox.instrumentSetting.parameters.length; kk++) {
 					var par: ZMenuItem = {
-						label: "par " + kk + " " + songvox.performer.parameters[kk].caption, icon: "", autoclose: false
+						label: "par " + kk + " " + songvox.instrumentSetting.parameters[kk].caption, icon: "", autoclose: false
 						, action: this.layerSelector.upVoxProviderParam(tt, vv, kk)
 					};
 					source.items.push(par);

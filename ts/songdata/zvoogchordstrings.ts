@@ -1,5 +1,7 @@
-type ZvoogChordStrings = {
+type ZvoogChordPoint = {
 	when: ZvoogMeter
-	, envelopes: ZvoogEnvelope[]
+};
+type ZvoogChordStrings = ZvoogChordPoint & {
+	envelopes: ZvoogEnvelope[]
 	, variation: number
 };

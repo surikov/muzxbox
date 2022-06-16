@@ -1,12 +1,13 @@
-type ZvoogVoice = {
-	measureChords: ZvoogMeasureChord[]
-	, performer: ZvoogPerformerSetting
-	, filters: ZvoogFilterSetting[]
-	//, bass: boolean
+type ZvoogTrackVoice = {
+	filters: ZvoogFilterSetting[]
 	, title: string
-	//, stringPattern: ZvoogStringPattern | null//16th
-	//, strumPattern: ZvoogStrumPattern | null//16th
-	//, keyPattern: ZvoogKeyPattern | null//16th
-	//, obversePerformerFilter?: number
 	, focus?: boolean
+};
+type ZvoogInstrumentVoice = ZvoogTrackVoice & {
+	instrumentSetting: ZvoogInstrumentSetting
+	, measureChords: ZvoogChordsInMeasure[]
+};
+type ZvoogPercussionVoice = ZvoogTrackVoice & {
+	percussionSetting: ZvoogPercussionSetting
+	, measureBunches: ZvoogBunchesInMeasure[]
 };

@@ -37,7 +37,7 @@ class PianoRollRenderer {
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
+			zRender.clearResizeSingleAnchor(zRender.muzXBox.currentSchedule,anchors[i], wholeWidth);
 		}
 
 	}
@@ -91,6 +91,7 @@ class PianoRollRenderer {
 		}
 	}
 	addMeasureLyrics(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor, css: string) {
+		let topGridMargin=topGridMarginTp(song,ratioThickness);
 		//let time = 0;
 		//for (let mm = 0; mm < song.measures.length; mm++) {
 		let measure = song.measures[mm];
@@ -112,6 +113,7 @@ class PianoRollRenderer {
 		//}
 	}
 	addSelectKnobs64(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor) {
+		let topGridMargin=topGridMarginTp(song,ratioThickness);
 		let knob: TileRectangle = {
 			x: leftGridMargin + time * ratioDuration
 			, y: topGridMargin + 12 * octaveCount * ratioThickness
@@ -131,6 +133,7 @@ class PianoRollRenderer {
 		anchor.content.push(txt);
 	}
 	addSelectKnobs16(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor, action: (x: number, y: number) => void | undefined) {
+		let topGridMargin=topGridMarginTp(song,ratioThickness);
 		let knob: TileRectangle = {
 			x: leftGridMargin + time * ratioDuration
 			, y: topGridMargin + 12 * octaveCount * ratioThickness
@@ -150,6 +153,7 @@ class PianoRollRenderer {
 		anchor.content.push(txt);
 	}
 	addSelectKnobs4(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor) {
+		let topGridMargin=topGridMarginTp(song,ratioThickness);
 		let knob: TileRectangle = {
 			x: leftGridMargin + time * ratioDuration
 			, y: topGridMargin + 12 * octaveCount * ratioThickness
@@ -169,6 +173,7 @@ class PianoRollRenderer {
 		anchor.content.push(txt);
 	}
 	addSelectKnobs1(song: ZvoogSchedule, time: number, mm: number, rhythmPattern: ZvoogMeter[], ratioDuration: number, ratioThickness: number, anchor: TileAnchor) {
+		let topGridMargin=topGridMarginTp(song,ratioThickness);
 		let stepNN = 0;
 		let position: ZvoogMeter = rhythmPattern[stepNN];
 		let positionDuration = 0;
@@ -201,7 +206,8 @@ class PianoRollRenderer {
 			position = DUU(position).plus(rhythmPattern[stepNN]);
 		}
 	}
-	addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number {
+	addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogInstrumentVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number {
+		let topGridMargin=topGridMarginTp(song,ratioThickness);
 		let measure = voice.measureChords[measureNum];
 		var measureMaxLen = anchors[0].ww;
 		let yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12) * ratioThickness;
@@ -274,7 +280,8 @@ class PianoRollRenderer {
 		, trackNum: number, voiceNum: number
 		, measureNum: number, time: number, isMain: boolean
 		, anchor: TileAnchor): void {
-		let voice = song.tracks[trackNum].voices[voiceNum];
+			let topGridMargin=topGridMarginTp(song,ratioThickness);
+		let voice = song.tracks[trackNum].instruments[voiceNum];
 		let measure = voice.measureChords[measureNum];
 		let yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12) * ratioThickness;
 		for (let cc = 0; cc < measure.chords.length; cc++) {
@@ -328,12 +335,12 @@ class PianoRollRenderer {
 					let track = song.tracks[trackNum];
 					let trafi = this.findFocusedFilter(track.filters);
 					if (trafi < 0) {
-						let vv = this.findFocusedVoice(track.voices);
+						let vv = this.findFocusedVoice(track.instruments);
 						if (vv < 0) vv = 0;
 						if (vv == voiceNum) {
-							if (voiceNum < track.voices.length) {
-								let voice = track.voices[voiceNum];
-								if (!voice.performer.focus) {
+							if (voiceNum < track.instruments.length) {
+								let voice = track.instruments[voiceNum];
+								if (!voice.instrumentSetting.focus) {
 									let vofi = this.findFocusedFilter(voice.filters);
 									if (vofi < 0) return true;
 								}
@@ -355,12 +362,12 @@ class PianoRollRenderer {
 					let track = song.tracks[trackNum];
 					let trafi = this.findFocusedFilter(track.filters);
 					if (trafi < 0) {
-						let vv = this.findFocusedVoice(track.voices);
+						let vv = this.findFocusedVoice(track.instruments);
 						if (vv < 0) vv = 0;
 						if (vv != voiceNum) {
-							if (vv < track.voices.length) {
-								let avoice = track.voices[vv];
-								if (!avoice.performer.focus) {
+							if (vv < track.instruments.length) {
+								let avoice = track.instruments[vv];
+								if (!avoice.instrumentSetting.focus) {
 									let vofi = this.findFocusedFilter(avoice.filters);
 									if (vofi < 0) return true;
 								}
@@ -386,7 +393,7 @@ class PianoRollRenderer {
 		}
 		return -1;
 	}
-	findFocusedVoice(voices: ZvoogVoice[]): number {
+	findFocusedVoice(voices: ZvoogInstrumentVoice[]): number {
 		for (let i = 0; i < voices.length; i++) {
 			if (voices[i].focus) return i;
 		}
@@ -424,7 +431,7 @@ class PianoRollRenderer {
 	}
 
 	addPianoRoll(zRender: ZRender, layerSelector: LayerSelector, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {//}, menuButton: TileRectangle) {
-
+		let topGridMargin=topGridMarginTp(song,ratioThickness);
 		let rhythm: ZvoogMeter[] = zRender.rhythmPatternDefault;
 		if (song.rhythm) {
 			if (song.rhythm.length) {
@@ -480,11 +487,11 @@ class PianoRollRenderer {
 
 			for (let tt = 0; tt < song.tracks.length; tt++) {
 				let track = song.tracks[tt];
-				for (let vv = 0; vv < track.voices.length; vv++) {
-					let voice: ZvoogVoice = track.voices[vv];
-					for (let pp = 0; pp < voice.performer.parameters.length; pp++) {
-						let parameter = voice.performer.parameters[pp];
-						if (track.focus && voice.focus && voice.performer.focus) {
+				for (let vv = 0; vv < track.instruments.length; vv++) {
+					let voice: ZvoogInstrumentVoice = track.instruments[vv];
+					for (let pp = 0; pp < voice.instrumentSetting.parameters.length; pp++) {
+						let parameter = voice.instrumentSetting.parameters[pp];
+						if (track.focus && voice.focus && voice.instrumentSetting.focus) {
 							if (parameter.focus) {
 								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine'
 									, [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
@@ -589,13 +596,14 @@ class PianoRollRenderer {
 	}
 
 	fillFar(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
+		let topGridMargin=topGridMarginTp(song,ratioThickness);
 		let chordCount = 0;
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureChords = 0;
 			for (let tt = 0; tt < song.tracks.length; tt++) {
 				let track = song.tracks[tt];
-				for (let vv = 0; vv < track.voices.length; vv++) {
-					let voice: ZvoogVoice = track.voices[vv];
+				for (let vv = 0; vv < track.instruments.length; vv++) {
+					let voice: ZvoogInstrumentVoice = track.instruments[vv];
 					measureChords = measureChords + voice.measureChords[mm].chords.length;
 				}
 			}
@@ -608,8 +616,8 @@ class PianoRollRenderer {
 			let curChordCount = 0;
 			for (let tt = 0; tt < song.tracks.length; tt++) {
 				let track = song.tracks[tt];
-				for (let vv = 0; vv < track.voices.length; vv++) {
-					let voice: ZvoogVoice = track.voices[vv];
+				for (let vv = 0; vv < track.instruments.length; vv++) {
+					let voice: ZvoogInstrumentVoice = track.instruments[vv];
 					curChordCount = curChordCount + voice.measureChords[mm].chords.length;
 				}
 			}
@@ -647,14 +655,15 @@ class PianoRollRenderer {
 		}
 	}
 	fillBig(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
+		let topGridMargin=topGridMarginTp(song,ratioThickness);
 		//let nx = 16;
 		let chordCount = 0;
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureChords = 0;
 			for (let tt = 0; tt < song.tracks.length; tt++) {
 				let track = song.tracks[tt];
-				for (let vv = 0; vv < track.voices.length; vv++) {
-					let voice: ZvoogVoice = track.voices[vv];
+				for (let vv = 0; vv < track.instruments.length; vv++) {
+					let voice: ZvoogInstrumentVoice = track.instruments[vv];
 					measureChords = measureChords + voice.measureChords[mm].chords.length;
 				}
 			}
@@ -671,8 +680,8 @@ class PianoRollRenderer {
 				duration10 = duration10 + measureDuration;
 				for (let tt = 0; tt < song.tracks.length; tt++) {
 					let track = song.tracks[tt];
-					for (let vv = 0; vv < track.voices.length; vv++) {
-						let voice: ZvoogVoice = track.voices[vv];
+					for (let vv = 0; vv < track.instruments.length; vv++) {
+						let voice: ZvoogInstrumentVoice = track.instruments[vv];
 						curChordCount = curChordCount + voice.measureChords[m10 + msi].chords.length;
 					}
 				}

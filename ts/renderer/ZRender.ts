@@ -112,11 +112,11 @@ class ZRender {
 			if (trnum < 0) trnum = 0;
 			if (trnum < song.tracks.length) {
 				let track = song.tracks[trnum];
-				let vonum = this.pianoRollRenderer.findFocusedVoice(track.voices);
+				let vonum = this.pianoRollRenderer.findFocusedVoice(track.instruments);
 				if (vonum < 0) vonum = 0;
-				if (vonum < track.voices.length && this.pianoRollRenderer.needToFocusVoice(song, trnum, vonum)) {
+				if (vonum < track.instruments.length && this.pianoRollRenderer.needToFocusVoice(song, trnum, vonum)) {
 					s2 = track.title;
-					s1 = track.voices[vonum].title;
+					s1 = track.instruments[vonum].title;
 				} else {
 					s3 = track.title;
 					let trfi = this.pianoRollRenderer.findFocusedFilter(track.filters);
@@ -126,15 +126,15 @@ class ZRender {
 						let trfipa = this.pianoRollRenderer.findFocusedParam(track.filters[trfi].parameters);
 						if (trfipa > -1) s1 = track.filters[trfi].parameters[trfipa].caption;
 					} else {
-						if (vonum < track.voices.length) {
-							let voice = track.voices[vonum];
-							if (voice.performer.focus) {
+						if (vonum < track.instruments.length) {
+							let voice = track.instruments[vonum];
+							if (voice.instrumentSetting.focus) {
 								s4 = track.title;
 								s3 = voice.title;
-								s2 = voice.performer.kind;
-								let ppar = this.pianoRollRenderer.findFocusedParam(voice.performer.parameters);
+								s2 = voice.instrumentSetting.kind;
+								let ppar = this.pianoRollRenderer.findFocusedParam(voice.instrumentSetting.parameters);
 								if (ppar > -1) {
-									s1 = voice.performer.parameters[ppar].caption;
+									s1 = voice.instrumentSetting.parameters[ppar].caption;
 								}
 							} else {
 								s4 = track.title;
@@ -232,14 +232,14 @@ class ZRender {
 	/*
 	*/
 
-	clearResizeSingleAnchor(anchor: TileAnchor, wholeWidth: number) {
+	clearResizeSingleAnchor(song: ZvoogSchedule,anchor: TileAnchor, wholeWidth: number) {
 		anchor.content.length = 0;
 		//anchor.ww = this.ratioDuration * songDuration;
 		anchor.ww = wholeWidth;
 		//anchor.hh = 128 * this.ratioThickness;
-		anchor.hh = wholeHeightTp(this.pitchLineThicknessInTaps);
+		anchor.hh = wholeHeightTp(song,this.pitchLineThicknessInTaps);
 	}
-	clearAnchorsContent(wholeWidth: number, wholeHeight: number): void {
+	clearAnchorsContent(song: ZvoogSchedule,wholeWidth: number, wholeHeight: number): void {
 		let anchors: TileAnchor[] = [
 			this.debugAnchor0, this.debugAnchor1, this.debugAnchor4, this.debugAnchor16, this.debugAnchor64, this.debugAnchor256
 			//, this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64, this.measuresTimelineAnchor256
@@ -248,7 +248,7 @@ class ZRender {
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			this.clearResizeSingleAnchor(anchors[i], wholeWidth);
+			this.clearResizeSingleAnchor(song,anchors[i], wholeWidth);
 		}
 		this.focusManager.clearFocusAnchorsContent(this, wholeWidth);
 		this.gridRenderer.clearGridAnchorsContent(this, wholeWidth);
@@ -264,8 +264,8 @@ class ZRender {
 	drawSchedule(song: ZvoogSchedule) {//}, menuButton: TileRectangle) {
 		//let songDuration = scheduleSecondsDuration(song);
 		let wholeWidth = wholeWidthTp(song, this.secondWidthInTaps);
-		let wholeHeight = wholeHeightTp(this.pitchLineThicknessInTaps);
-		this.clearAnchorsContent(wholeWidth, wholeHeight);
+		let wholeHeight = wholeHeightTp(song,this.pitchLineThicknessInTaps);
+		this.clearAnchorsContent(song,wholeWidth, wholeHeight);
 		this.measureInfoRenderer.fillMeasureInfo(song, this.secondWidthInTaps, this.pitchLineThicknessInTaps);
 		this.pianoRollRenderer.addPianoRoll(this, this.muzXBox.zMainMenu.layerSelector,
 			song, this.secondWidthInTaps, this.pitchLineThicknessInTaps);

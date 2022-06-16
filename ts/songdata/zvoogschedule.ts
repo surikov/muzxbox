@@ -25,6 +25,17 @@ function wholeWidthTp(song: ZvoogSchedule, ratioDuration: number): number {
 function gridHeightTp(ratioThickness: number): number {
 	return (octaveCount * 12) * ratioThickness;
 }
-function wholeHeightTp(ratioThickness: number): number {
-	return topGridMargin + (octaveCount * 12) * ratioThickness + bottomGridMargin;
+function drumRowsCount(song: ZvoogSchedule): number {
+	let rr = 0;
+	for (let tt = 0; tt < song.tracks.length; tt++) {
+		rr = rr + song.tracks[tt].percussions.length;
+	}
+	return rr;
+}
+function topGridMarginTp(song: ZvoogSchedule, pitchLineThicknessInTaps: number): number {
+	let drHH = drumRowsCount(song) * pitchLineThicknessInTaps;
+	return topContentMargin + drHH + drumGridPadding;
+}
+function wholeHeightTp(song: ZvoogSchedule,ratioThickness: number): number {
+	return topGridMarginTp(song,ratioThickness) + (octaveCount * 12) * ratioThickness + bottomGridMargin;
 }

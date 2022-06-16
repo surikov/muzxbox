@@ -961,17 +961,17 @@ class MidiParser {
 			track.trackevents.push(e);
 		}
 	}
-	takeDrumVoice(drum: number, drumVoices: { voice: ZvoogVoice, drum: number }[]): { voice: ZvoogVoice, drum: number } {
+	takeDrumVoice(drum: number, drumVoices: { voice: ZvoogInstrumentVoice, drum: number }[]): { voice: ZvoogInstrumentVoice, drum: number } {
 		for (var i = 0; i < drumVoices.length; i++) {
 			if (drumVoices[i].drum == drum) {
 				return drumVoices[i];
 			}
 		}
-		var voice: ZvoogVoice = {
+		var voice: ZvoogInstrumentVoice = {
 			measureChords: []
 			//, disabled: false
-			, performer: {
-				performerPlugin: null//new WafPercSource()//drum)
+			, instrumentSetting: {
+				instrumentPlugin: null//new WafPercSource()//drum)
 				, parameters: []
 				, kind: "wafdrum"
 				, initial: "" + drum
@@ -1159,7 +1159,7 @@ class MidiParser {
 			}*/
 			var track: ZvoogTrack = {
 				title: '' + i
-				, voices: []
+				, instruments: [],percussions:[]
 				, filters: [{
 					filterPlugin: null
 					, parameters: this.parametersDefs(testGain)
@@ -1186,10 +1186,10 @@ class MidiParser {
 						var pinum: number = midisong.miditracks[i].songchords[ch].notes[nn].points[0].pitch;
 						if (drumNums.indexOf(pinum) < 0) {
 							drumNums.push(pinum);
-							var voice: ZvoogVoice = {
-								measureChords: []
-								, performer: {
-									performerPlugin: null
+							let voice: ZvoogPercussionVoice = {
+								measureBunches: []
+								, percussionSetting: {
+									percussionPlugin: null
 									, parameters: this.parametersDefs(wafdrum)
 									, kind: 'wafdrum'
 									, initial: '' + pinum
@@ -1202,10 +1202,10 @@ class MidiParser {
 								}]
 								, title: drumTitles()[pinum]
 							};
-							track.voices.push(voice);
+							track.percussions.push(voice);
 							track.title = '' + pinum + ': Drums';
 							for (var mc = 0; mc < timeline.length; mc++) {
-								voice.measureChords.push({ chords: [] });
+								voice.measureBunches.push({ bunches: [] });
 							}
 							for (var chn = 0; chn < midisong.miditracks[i].songchords.length; chn++) {
 								var midichord: MIDISongChord = midisong.miditracks[i].songchords[chn];
@@ -1215,32 +1215,10 @@ class MidiParser {
 										var skipInMeasureMs = midichord.when - timelineMeasure.ms;
 										var skipMeter: ZvoogMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
 										skipMeter = DUU(skipMeter).simplify();
-										var onechord: ZvoogChordStrings = {
+										let onehit: ZvoogChordPoint = {
 											when: skipMeter
-											, envelopes: []
-											, variation: 0
 										}
-										for (var nx = 0; nx < midichord.notes.length; nx++) {
-											var env: ZvoogEnvelope = { pitches: [] };
-											var mino: MIDISongNote = midichord.notes[nx];
-											if (mino.points[0].pitch == pinum) {
-												for (var px = 0; px < mino.points.length; px++) {
-													var mipoint: MIDISongPoint = mino.points[px];
-													let midiDrumIndex = mipoint.pitch;
-													if (mipoint.pitch < 35 || mipoint.pitch > 81) {
-														midiDrumIndex = 42;
-													}
-													env.pitches.push({
-														duration: DUU(seconds2meter32(mipoint.durationms / 1000, timelineMeasure.bpm)).simplify()
-														, pitch: midiDrumIndex - midiDrumPitchShift
-													});
-												}
-												onechord.envelopes.push(env);
-											}
-										}
-										if (onechord.envelopes.length > 0) {
-											voice.measureChords[tc - 1].chords.push(onechord);
-										}
+										voice.measureBunches[tc - 1].bunches.push(onehit);
 										break;
 									}
 								}
@@ -1249,10 +1227,10 @@ class MidiParser {
 					}
 				}
 			} else {
-				var voice: ZvoogVoice = {
+				let voice: ZvoogInstrumentVoice = {
 					measureChords: []
-					, performer: {
-						performerPlugin: null
+					, instrumentSetting: {
+						instrumentPlugin: null
 						, parameters: this.parametersDefs(wafinstrument)
 						, kind: 'wafinstrument'
 						, initial: '' + midisong.miditracks[i].program
@@ -1270,7 +1248,7 @@ class MidiParser {
 					}]
 					, title: instrumentTitles()[midisong.miditracks[i].program]
 				};
-				track.voices.push(voice);
+				track.instruments.push(voice);
 				track.title = '' + midisong.miditracks[i].program + ': ' + voice.title;
 				for (var mc = 0; mc < timeline.length; mc++) {
 					voice.measureChords.push({ chords: [] });

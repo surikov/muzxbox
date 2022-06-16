@@ -17,6 +17,7 @@ class FocusZoomSong implements FocusLevel {
 		let xx = leftGridMargin + mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.start;
 		let ww = mngmnt.muzXBox.zrenderer.secondWidthInTaps * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.indexMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.indexMeasure].meter);
 		let hh = 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+		let topGridMargin=topGridMarginTp(mngmnt.muzXBox.currentSchedule,mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps);
 		let yy = topGridMargin
 			+ gridHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
 			- 12 * (1 + this.indexOctave) * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
@@ -97,6 +98,7 @@ class FocusZoomSong implements FocusLevel {
 		var rhythmPattern: ZvoogMeter[] = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
 		let measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.indexMeasure, 0, rhythmPattern);
 		let xx = leftGridMargin + mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.start;
+		let topGridMargin=topGridMarginTp(mngmnt.muzXBox.currentSchedule,mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps);
 		let yy = topGridMargin
 			+ gridHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
 			- 12 * this.indexOctave * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
@@ -145,6 +147,7 @@ class FocusZoomSong implements FocusLevel {
 		if (vh < ih) {
 			newY = vh / 2 - ty;
 		}
+		let topGridMargin=topGridMarginTp(mngmnt.muzXBox.currentSchedule,mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps);
 		let pitchY = tp * topGridMargin + tp * octaveCount * 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps - newY * tz;
 		let pitchLineIdx = this.indexOctave * 12;
 		pitchLineIdx = Math.ceil(pitchY / (tp * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps));

@@ -43,7 +43,7 @@ class FocusManagement {
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
+			zRender.clearResizeSingleAnchor(zRender.muzXBox.currentSchedule,anchors[i], wholeWidth);
 		}
 
 		//console.log('wholeWidth',wholeWidth);
@@ -61,7 +61,7 @@ class FocusManagement {
 	reSetFocus(zrenderer: ZRender, wholeWidth: number) {
 		//console.log('reSetFocus',wholeWidth);
 		zrenderer.tileLevel.resetAnchor(this.focusAnchor, this.focusMarkerLayer);
-		zrenderer.clearResizeSingleAnchor(this.focusAnchor, wholeWidth);
+		zrenderer.clearResizeSingleAnchor(zrenderer.muzXBox.currentSchedule,this.focusAnchor, wholeWidth);
 		this.currentFocusLevelX().addSpot(this);
 		zrenderer.tileLevel.allTilesOK = false;
 	}

@@ -273,8 +273,8 @@ declare class ZRender {
     levelOfDetails(zz: number): 1 | 16 | 64 | 256 | 4;
     initUI(bx: MuzXBox): void;
     initDebugAnchors(): void;
-    clearResizeSingleAnchor(anchor: TileAnchor, wholeWidth: number): void;
-    clearAnchorsContent(wholeWidth: number, wholeHeight: number): void;
+    clearResizeSingleAnchor(song: ZvoogSchedule, anchor: TileAnchor, wholeWidth: number): void;
+    clearAnchorsContent(song: ZvoogSchedule, wholeWidth: number, wholeHeight: number): void;
     drawSchedule(song: ZvoogSchedule): void;
 }
 declare type ZUIModeValue = {
@@ -299,10 +299,10 @@ declare function countSteps(meter: ZvoogMeter, rhythmPattern: ZvoogMeter[]): num
 declare function findMeasureStep(measures: ZvoogMeasure[], rhythmPattern: ZvoogMeter[], ratioDuration: number, xx: number): null | ZvoogStepIndex;
 declare function measuresAndStepDuration(song: ZvoogSchedule, count: number, step: number, rhythmPattern: ZvoogMeter[]): StartDuration;
 declare function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter;
-declare function adjustPartLeadPad(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
-declare function adjustPartBass(voice: ZvoogVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
+declare function adjustPartLeadPad(voice: ZvoogInstrumentVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
+declare function adjustPartBass(voice: ZvoogInstrumentVoice, fromPosition: ZvoogMeter, toPosition: ZvoogMeter, measures: ZvoogMeasure[]): void;
 declare function createBreakList(originalProg: ZvoogChordMelody[], targetProg: ZvoogChordMelody[], measures: ZvoogMeasure[]): ZvoogMeter[];
-declare function adjustVoiceLowHigh(voice: ZvoogVoice, originalProg: ZvoogChordMelody[], targetProg: ZvoogChordMelody[], measures: ZvoogMeasure[], trackIsBass: boolean): void;
+declare function adjustVoiceLowHigh(voice: ZvoogInstrumentVoice, originalProg: ZvoogChordMelody[], targetProg: ZvoogChordMelody[], measures: ZvoogMeasure[], trackIsBass: boolean): void;
 declare let default8rhytym: ZvoogMeter[];
 declare type ZvoogStoreListItem = {
     title: string;
@@ -365,7 +365,7 @@ declare class WAFEqualizer implements ZvoogFilterPlugin {
     initWAF(): void;
     getParId(nn: number): string | null;
 }
-declare class ZvoogSineSource implements ZvoogPerformerPlugin {
+declare class ZvoogSineSource implements ZvoogInstrumentPlugin {
     out: GainNode;
     params: ZvoogPluginParameter[];
     audioContext: AudioContext;
@@ -379,7 +379,7 @@ declare class ZvoogSineSource implements ZvoogPerformerPlugin {
     getOutput(): AudioNode;
     getParams(): ZvoogPluginParameter[];
     cancelSchedule(): void;
-    addSchedule(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void;
+    scheduleChord(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void;
     sendLine(when: number, tempo: number, line: ZvoogEnvelope): void;
     busy(): number;
     freq(key: number): number;
@@ -388,7 +388,7 @@ declare class ZvoogSineSource implements ZvoogPerformerPlugin {
     getParId(nn: number): string | null;
 }
 declare function WebAudioFontPlayer(): void;
-declare class WAFInsSource implements ZvoogPerformerPlugin {
+declare class WAFInsSource implements ZvoogInstrumentPlugin {
     out: GainNode;
     params: ZvoogPluginParameter[];
     audioContext: AudioContext;
@@ -401,7 +401,7 @@ declare class WAFInsSource implements ZvoogPerformerPlugin {
     lockedState: ZvoogPluginLock;
     state(): ZvoogPluginLock;
     cancelSchedule(): void;
-    addSchedule(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void;
+    scheduleChord(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void;
     prepare(audioContext: AudioContext, data: string): void;
     getOutput(): AudioNode;
     getParams(): ZvoogPluginParameter[];
@@ -411,7 +411,7 @@ declare class WAFInsSource implements ZvoogPerformerPlugin {
     getParId(nn: number): string | null;
 }
 declare function WebAudioFontPlayer(): void;
-declare class WAFPercSource implements ZvoogPerformerPlugin {
+declare class WAFPercSource implements ZvoogPercussionPlugin {
     out: GainNode;
     params: ZvoogPluginParameter[];
     audioContext: AudioContext;
@@ -424,7 +424,7 @@ declare class WAFPercSource implements ZvoogPerformerPlugin {
     lockedState: ZvoogPluginLock;
     state(): ZvoogPluginLock;
     cancelSchedule(): void;
-    addSchedule(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void;
+    scheduleHit(when: number): void;
     prepare(audioContext: AudioContext, data: string): void;
     getOutput(): AudioNode;
     getParams(): ZvoogPluginParameter[];
@@ -433,7 +433,7 @@ declare class WAFPercSource implements ZvoogPerformerPlugin {
     selectDrum(nn: number): void;
     getParId(nn: number): string | null;
 }
-declare class AudioFileSource implements ZvoogPerformerPlugin {
+declare class AudioFileSource implements ZvoogPercussionPlugin {
     out: GainNode;
     params: ZvoogPluginParameter[];
     audioContext: AudioContext;
@@ -456,7 +456,7 @@ declare class AudioFileSource implements ZvoogPerformerPlugin {
     getOutput(): AudioNode;
     getParams(): ZvoogPluginParameter[];
     cancelSchedule(): void;
-    addSchedule(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void;
+    scheduleHit(when: number): void;
     busy(): number;
     nextClear(): boolean;
     cleanup(): void;
@@ -465,7 +465,7 @@ declare class AudioFileSource implements ZvoogPerformerPlugin {
         duration: number;
         base: GainNode;
     };
-    single(when: number, tempo: number, line: ZvoogEnvelope): void;
+    hit(when: number): void;
     getParId(nn: number): string | null;
 }
 declare type ZvoogMeter = {
@@ -538,22 +538,33 @@ declare type ZvoogParameterData = {
     caption: string;
     focus?: boolean;
 };
-declare type ZvoogVoice = {
-    measureChords: ZvoogMeasureChord[];
-    performer: ZvoogPerformerSetting;
+declare type ZvoogTrackVoice = {
     filters: ZvoogFilterSetting[];
     title: string;
     focus?: boolean;
 };
-declare type ZvoogMeasureChord = {
+declare type ZvoogInstrumentVoice = ZvoogTrackVoice & {
+    instrumentSetting: ZvoogInstrumentSetting;
+    measureChords: ZvoogChordsInMeasure[];
+};
+declare type ZvoogPercussionVoice = ZvoogTrackVoice & {
+    percussionSetting: ZvoogPercussionSetting;
+    measureBunches: ZvoogBunchesInMeasure[];
+};
+declare type ZvoogChordsInMeasure = {
     chords: ZvoogChordStrings[];
+};
+declare type ZvoogBunchesInMeasure = {
+    bunches: ZvoogChordPoint[];
 };
 declare type ZvoogMeasurePoint = {
     when: ZvoogMeter;
     lyrics: string;
 };
-declare type ZvoogChordStrings = {
+declare type ZvoogChordPoint = {
     when: ZvoogMeter;
+};
+declare type ZvoogChordStrings = ZvoogChordPoint & {
     envelopes: ZvoogEnvelope[];
     variation: number;
 };
@@ -607,7 +618,7 @@ declare type IntervalMode = {
     flat: boolean;
     priority: number;
 };
-declare class ZvoogPerformerStub implements ZvoogPerformerPlugin {
+declare class ZvoogPerformerStub implements ZvoogInstrumentPlugin, ZvoogPercussionPlugin {
     base: GainNode;
     params: ZvoogPluginParameter[];
     lockedState: ZvoogPluginLock;
@@ -618,7 +629,8 @@ declare class ZvoogPerformerStub implements ZvoogPerformerPlugin {
     getParams(): ZvoogPluginParameter[];
     busy(): number;
     cancelSchedule(): void;
-    addSchedule(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void;
+    scheduleChord(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void;
+    scheduleHit(when: number): void;
     getParId(nn: number): string | null;
 }
 declare class ZvoogFilterStub implements ZvoogFilterPlugin {
@@ -636,7 +648,8 @@ declare class ZvoogFilterStub implements ZvoogFilterPlugin {
 }
 declare type ZvoogTrack = {
     title: string;
-    voices: ZvoogVoice[];
+    instruments: ZvoogInstrumentVoice[];
+    percussions: ZvoogPercussionVoice[];
     filters: ZvoogFilterSetting[];
     focus?: boolean;
 };
@@ -652,7 +665,9 @@ declare function scheduleSecondsDuration(song: ZvoogSchedule): number;
 declare function gridWidthTp(song: ZvoogSchedule, ratioDuration: number): number;
 declare function wholeWidthTp(song: ZvoogSchedule, ratioDuration: number): number;
 declare function gridHeightTp(ratioThickness: number): number;
-declare function wholeHeightTp(ratioThickness: number): number;
+declare function drumRowsCount(song: ZvoogSchedule): number;
+declare function topGridMarginTp(song: ZvoogSchedule, pitchLineThicknessInTaps: number): number;
+declare function wholeHeightTp(song: ZvoogSchedule, ratioThickness: number): number;
 declare type ZvoogFilterSetting = {
     filterPlugin: ZvoogFilterPlugin | null;
     parameters: ZvoogParameterData[];
@@ -660,22 +675,33 @@ declare type ZvoogFilterSetting = {
     initial: string;
     focus?: boolean;
 };
-declare type ZvoogPerformerSetting = {
-    performerPlugin: ZvoogPerformerPlugin | null;
+declare type ZvoogAudioPerformerSetting = {
     parameters: ZvoogParameterData[];
     kind: string;
     initial: string;
     focus?: boolean;
 };
+declare type ZvoogInstrumentSetting = ZvoogAudioPerformerSetting & {
+    instrumentPlugin: ZvoogInstrumentPlugin | null;
+};
+declare type ZvoogPercussionSetting = ZvoogAudioPerformerSetting & {
+    percussionPlugin: ZvoogPercussionPlugin | null;
+};
 declare type ZvoogFilterPlugin = ZvoogPlugin & {
     getInput: () => AudioNode;
 };
-declare type ZvoogPerformerPlugin = ZvoogPlugin & {
-    addSchedule: (when: number, tempo: number, envelopes: ZvoogEnvelope[], variation: number) => void;
+declare type ZvoogAudioPerformerPlugin = ZvoogPlugin & {
     cancelSchedule: () => void;
 };
+declare type ZvoogInstrumentPlugin = ZvoogAudioPerformerPlugin & {
+    scheduleChord: (when: number, tempo: number, envelopes: ZvoogEnvelope[], variation: number) => void;
+};
+declare type ZvoogPercussionPlugin = ZvoogAudioPerformerPlugin & {
+    scheduleHit: (when: number) => void;
+};
 declare let cachedPerformerStubPlugins: ZvoogPerformerStub[];
-declare function takeZvoogPerformerStub(): ZvoogPerformerStub;
+declare function takeZvoogInstrumentStub(): ZvoogPerformerStub;
+declare function takeZvoogPercussionStub(): ZvoogPerformerStub;
 declare let cachedFilterStubPlugins: ZvoogFilterStub[];
 declare function takeZvoogFilterStub(): ZvoogFilterStub;
 declare let cachedWAFEchoPlugins: WAFEcho[];
@@ -693,7 +719,8 @@ declare function takeWAFPercSource(): WAFPercSource;
 declare let cachedZvoogSineSourcePlugins: ZvoogSineSource[];
 declare function takeZvoogSineSource(): ZvoogSineSource;
 declare function createPluginEffect(id: string): ZvoogFilterPlugin;
-declare function createPluginSource(id: string): ZvoogPerformerPlugin;
+declare function createPluginInstrument(id: string): ZvoogInstrumentPlugin;
+declare function createPluginPercussion(id: string): ZvoogPercussionPlugin;
 declare type XYp = {
     x: number;
     y: number;
@@ -949,10 +976,10 @@ declare class MidiParser {
     nextEvent(stream: DataViewStream): MIDIEvent;
     parseTrackEvents(track: MIDIFileTrack): void;
     takeDrumVoice(drum: number, drumVoices: {
-        voice: ZvoogVoice;
+        voice: ZvoogInstrumentVoice;
         drum: number;
     }[]): {
-        voice: ZvoogVoice;
+        voice: ZvoogInstrumentVoice;
         drum: number;
     };
     parametersDefs(plugin: ZvoogPlugin): ZvoogParameterData[];
@@ -973,8 +1000,8 @@ declare class MusicXMLFileImporter implements ZvoogStore {
     goFolder(title: string, onFinish: (error: string) => void): void;
     goUp(onFinish: (error: string) => void): void;
     readSongData(title: string, onFinish: (result: ZvoogSchedule | null) => void): void;
-    takeChord(songVoice: ZvoogVoice, measureIdx: number, when: ZvoogMeter): ZvoogChordStrings;
-    takeVoice(voiceid: string, songtrack: ZvoogTrack): ZvoogVoice;
+    takeChord(songVoice: ZvoogInstrumentVoice, measureIdx: number, when: ZvoogMeter): ZvoogChordStrings;
+    takeVoice(voiceid: string, songtrack: ZvoogTrack): ZvoogInstrumentVoice;
     parsePitch(step: string, octave: string, alter: string): number;
     parseMXML(mxml: XV): ZvoogSchedule;
     createSongData(title: string, schedule: ZvoogSchedule, onFinish: (error: string) => void): void;
@@ -1043,7 +1070,8 @@ declare let midiDrumPitchShift: number;
 declare let midiInstrumentPitchShift: number;
 declare let leftGridMargin: number;
 declare let rightGridMargin: number;
-declare let topGridMargin: number;
+declare let topContentMargin: number;
+declare let drumGridPadding: number;
 declare let bottomGridMargin: number;
 declare let octaveCount: number;
 declare let bigGroupMeasure: number;
@@ -1110,7 +1138,7 @@ declare class PianoRollRenderer {
     addSelectKnobs16(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor, action: (x: number, y: number) => void | undefined): void;
     addSelectKnobs4(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor): void;
     addSelectKnobs1(song: ZvoogSchedule, time: number, mm: number, rhythmPattern: ZvoogMeter[], ratioDuration: number, ratioThickness: number, anchor: TileAnchor): void;
-    addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number;
+    addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogInstrumentVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number;
     createNoteUpAction(layerSelector: LayerSelector, tt: number, vv: number): (x: number, y: number) => void;
     createNoteMenuAction(layerSelector: LayerSelector, tt: number, vv: number): (x: number, y: number) => void;
     addNotesKnobs(layerSelector: LayerSelector, ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, trackNum: number, voiceNum: number, measureNum: number, time: number, isMain: boolean, anchor: TileAnchor): void;
@@ -1118,7 +1146,7 @@ declare class PianoRollRenderer {
     needToSubFocusVoice(song: ZvoogSchedule, trackNum: number, voiceNum: number): boolean;
     findFocusedTrack(tracks: ZvoogTrack[]): number;
     findFocusedFilter(filters: ZvoogFilterSetting[]): number;
-    findFocusedVoice(voices: ZvoogVoice[]): number;
+    findFocusedVoice(voices: ZvoogInstrumentVoice[]): number;
     findFocusedParam(pars: ZvoogParameterData[]): number;
     createSlectMeasureAction(zRender: ZRender, measureIdx: number): (x: number, y: number) => void;
     addPianoRoll(zRender: ZRender, layerSelector: LayerSelector, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number): void;

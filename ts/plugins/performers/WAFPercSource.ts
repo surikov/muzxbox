@@ -1,5 +1,5 @@
 declare function WebAudioFontPlayer(): void;
-class WAFPercSource implements ZvoogPerformerPlugin {
+class WAFPercSource implements ZvoogPercussionPlugin {
 	out: GainNode;
 	params: ZvoogPluginParameter[];
 	audioContext: AudioContext;
@@ -14,29 +14,11 @@ class WAFPercSource implements ZvoogPerformerPlugin {
 	cancelSchedule(): void {
 		(window as any).wafPlayer.cancelQueue(this.audioContext);
 	}
-	addSchedule(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void {
-		//if (this.busy()==0) {
-		for (let i = 0; i < chord.length; i++) {
-			let envelope: ZvoogEnvelope = chord[i];
-			let slides: { pitch: number, when: number }[] = [];
-			//let duration: number = duration2seconds(tempo, duration384(envelope.pitches[0].duration));
-			let duration: number = meter2seconds(tempo, envelope.pitches[0].duration);
-			
-			let t = 0;
-			for (let n = 1; n < envelope.pitches.length; n++) {
-				//t = t + duration2seconds(tempo, duration384(envelope.pitches[n - 1].duration));
-				t = t + meter2seconds(tempo, envelope.pitches[n - 1].duration);
-				slides.push({
-					pitch: envelope.pitches[n].pitch
-					, when: t
-				});
-				//duration = duration + duration2seconds(tempo, duration384(envelope.pitches[n].duration));
-				duration = duration + meter2seconds(tempo, envelope.pitches[n].duration);
-			}
-			(window as any).wafPlayer.queueWaveTable(this.audioContext
-				, this.out, this.zones, when, envelope.pitches[0].pitch, duration, 0.99, slides);
-		}
-		//}
+	scheduleHit(when: number): void {
+		let drumPitch=33;
+		let duration=1;
+		(window as any).wafPlayer.queueWaveTable(this.audioContext
+			, this.out, this.zones, when, drumPitch, duration, 0.99);
 	}
 	prepare(audioContext: AudioContext, data: string): void {
 		if (this.out) {

@@ -46,7 +46,7 @@ class MeasureInfoRenderer {
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
+			zRender.clearResizeSingleAnchor(zRender.muzXBox.currentSchedule,anchors[i], wholeWidth);
 		}
 
 	}

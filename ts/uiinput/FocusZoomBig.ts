@@ -32,7 +32,7 @@ class FocusZoomBig implements FocusLevel {
 			}
 		}
 		let hh = 12 * octaveCount * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
-		let yy = topGridMargin;
+		let yy = topGridMarginTp(mngmnt.muzXBox.currentSchedule,mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps);
 		//console.log(kk, xx, ww);
 		mngmnt.focusAnchor.content.push({
 			x: xx
@@ -114,7 +114,7 @@ class FocusZoomBig implements FocusLevel {
 		let firstMeasureIdx = this.measureGroupIndx * bigGroupMeasure;
 		let measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, firstMeasureIdx, 0, rhythmPattern);
 		let xx = leftGridMargin + mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.start;
-		let yy = topGridMargin;
+		//let yy = topGridMargin;
 		let ww = 0;
 		for (let i = 0; i < bigGroupMeasure && i + firstMeasureIdx < mngmnt.muzXBox.currentSchedule.measures.length; i++) {
 			ww = ww + mngmnt.muzXBox.zrenderer.secondWidthInTaps

@@ -1,5 +1,5 @@
 declare function WebAudioFontPlayer(): void;
-class WAFInsSource implements ZvoogPerformerPlugin {
+class WAFInsSource implements ZvoogInstrumentPlugin {
 	out: GainNode;
 	params: ZvoogPluginParameter[];
 	audioContext: AudioContext;
@@ -14,7 +14,7 @@ class WAFInsSource implements ZvoogPerformerPlugin {
 	cancelSchedule(): void {
 		(window as any).wafPlayer.cancelQueue(this.audioContext);
 	}
-	addSchedule(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void {
+	scheduleChord(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void {
         /*for (let i = 0; i < chord.length; i++) {
             let envelope: ZvoogEnvelope = chord[i];
             let slides: { pitch: number, when: number }[] = [];

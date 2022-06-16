@@ -20,7 +20,7 @@ class FocusZoomNote implements FocusLevel {
 		}
 	}
 	spotDown(mngmnt: FocusManagement): boolean {
-		let hh = wholeHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps);
+		let hh = wholeHeightTp(mngmnt.muzXBox.currentSchedule,mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps);
 		if (this.yyPoint < hh - 1) {
 			this.yyPoint++;
 			return true;

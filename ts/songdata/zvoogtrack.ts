@@ -1,6 +1,8 @@
 type ZvoogTrack = {
 	title: string
-	, voices: ZvoogVoice[]
+	//, voices: ZvoogVoice[]
+	, instruments: ZvoogInstrumentVoice[]
+	, percussions: ZvoogPercussionVoice[]
 	, filters: ZvoogFilterSetting[]
 	//, obverseVoiceFilter?: number
 	, focus?: boolean

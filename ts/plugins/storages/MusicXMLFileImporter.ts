@@ -30,7 +30,7 @@ class MusicXMLFileImporter implements ZvoogStore {
 		}, false);
 		fileSelector.click();
 	};
-	takeChord(songVoice: ZvoogVoice, measureIdx: number, when: ZvoogMeter): ZvoogChordStrings {
+	takeChord(songVoice: ZvoogInstrumentVoice, measureIdx: number, when: ZvoogMeter): ZvoogChordStrings {
 		let cnt = songVoice.measureChords.length;
 		for (let i = cnt; i <= measureIdx; i++) {
 			songVoice.measureChords.push({
@@ -52,16 +52,16 @@ class MusicXMLFileImporter implements ZvoogStore {
 		return chorddef;
 
 	}
-	takeVoice(voiceid: string, songtrack: ZvoogTrack): ZvoogVoice {
-		for (let i = 0; i < songtrack.voices.length; i++) {
-			if (songtrack.voices[i].title == voiceid) {
-				return songtrack.voices[i];
+	takeVoice(voiceid: string, songtrack: ZvoogTrack): ZvoogInstrumentVoice {
+		for (let i = 0; i < songtrack.instruments.length; i++) {
+			if (songtrack.instruments[i].title == voiceid) {
+				return songtrack.instruments[i];
 			}
 		}
-		let trackvoice: ZvoogVoice = {
+		let trackvoice: ZvoogInstrumentVoice = {
 			measureChords: []
-			, performer: {
-				performerPlugin: null
+			, instrumentSetting: {
+				instrumentPlugin: null
 				, parameters: []
 				, kind: ''
 				, initial: ''
@@ -69,7 +69,7 @@ class MusicXMLFileImporter implements ZvoogStore {
 			, filters: []
 			, title: voiceid
 		};
-		songtrack.voices.push(trackvoice);
+		songtrack.instruments.push(trackvoice);
 		return trackvoice;
 	}
 	parsePitch(step: string, octave: string, alter: string): number {
@@ -177,7 +177,7 @@ class MusicXMLFileImporter implements ZvoogStore {
 			let partdata = mxml.seek('part', 'id', partid);
 			let songtrack: ZvoogTrack = {
 				title: part.first('part-name').value
-				, voices: []
+				, instruments: [],percussions:[]
 				, filters: []
 			};
 			zvoogSchedule.tracks.push(songtrack);
@@ -223,8 +223,8 @@ class MusicXMLFileImporter implements ZvoogStore {
 		for (let mm = 0; mm < zvoogSchedule.measures.length; mm++) {
 			for (let tt = 0; tt < zvoogSchedule.tracks.length; tt++) {
 				let track = zvoogSchedule.tracks[tt];
-				for (let vv = 0; vv < track.voices.length; vv++) {
-					let voice = track.voices[vv];
+				for (let vv = 0; vv < track.instruments.length; vv++) {
+					let voice = track.instruments[vv];
 					if (voice.measureChords[mm]) {
 						//
 					} else {

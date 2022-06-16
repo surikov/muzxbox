@@ -134,12 +134,12 @@ class LayerSelector {
 					filter.parameters[fxpr].focus = false;
 				}
 			}
-			for (let vc = 0; vc < track.voices.length; vc++) {
-				let voice = track.voices[vc];
+			for (let vc = 0; vc < track.instruments.length; vc++) {
+				let voice = track.instruments[vc];
 				voice.focus = false;
-				voice.performer.focus = false;
-				for (let prpr = 0; prpr < voice.performer.parameters.length; prpr++) {
-					voice.performer.parameters[prpr].focus = false;
+				voice.instrumentSetting.focus = false;
+				for (let prpr = 0; prpr < voice.instrumentSetting.parameters.length; prpr++) {
+					voice.instrumentSetting.parameters[prpr].focus = false;
 				}
 				for (let fx = 0; fx < voice.filters.length; fx++) {
 					let filter = voice.filters[fx]
@@ -178,34 +178,34 @@ class LayerSelector {
 	selectSongTrackVox(song: ZvoogSchedule, trNum: number, voxNum: number) {
 		this.clearLevelFocus(song);
 		song.tracks[trNum].focus = true;
-		song.tracks[trNum].voices[voxNum].focus = true;
+		song.tracks[trNum].instruments[voxNum].focus = true;
 		//console.log('selectSongTrackVox',trNum,song.tracks[trNum].title,voxNum,song.tracks[trNum].voices[voxNum].title);
 	}
 	selectSongTrackVoxPerformer(song: ZvoogSchedule, trNum: number, voxNum: number) {
 		this.clearLevelFocus(song);
 		song.tracks[trNum].focus = true;
-		song.tracks[trNum].voices[voxNum].focus = true;
-		song.tracks[trNum].voices[voxNum].performer.focus = true;
+		song.tracks[trNum].instruments[voxNum].focus = true;
+		song.tracks[trNum].instruments[voxNum].instrumentSetting.focus = true;
 	}
 	selectSongTrackVoxPerformerParam(song: ZvoogSchedule, trNum: number, voxNum: number, prNum: number) {
 		this.clearLevelFocus(song);
 		song.tracks[trNum].focus = true;
-		song.tracks[trNum].voices[voxNum].focus = true;
-		song.tracks[trNum].voices[voxNum].performer.focus = true;
-		song.tracks[trNum].voices[voxNum].performer.parameters[prNum].focus = true;
+		song.tracks[trNum].instruments[voxNum].focus = true;
+		song.tracks[trNum].instruments[voxNum].instrumentSetting.focus = true;
+		song.tracks[trNum].instruments[voxNum].instrumentSetting.parameters[prNum].focus = true;
 	}
 	selectSongTrackVoxFx(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number) {
 		this.clearLevelFocus(song);
 		song.tracks[trNum].focus = true;
-		song.tracks[trNum].voices[voxNum].focus = true;
-		song.tracks[trNum].voices[voxNum].filters[fxNum].focus = true;
+		song.tracks[trNum].instruments[voxNum].focus = true;
+		song.tracks[trNum].instruments[voxNum].filters[fxNum].focus = true;
 	}
 	selectSongTrackVoxFxParam(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number, prNum: number) {
 		this.clearLevelFocus(song);
 		song.tracks[trNum].focus = true;
-		song.tracks[trNum].voices[voxNum].focus = true;
-		song.tracks[trNum].voices[voxNum].filters[fxNum].focus = true;
-		song.tracks[trNum].voices[voxNum].filters[fxNum].parameters[prNum].focus = true;
+		song.tracks[trNum].instruments[voxNum].focus = true;
+		song.tracks[trNum].instruments[voxNum].filters[fxNum].focus = true;
+		song.tracks[trNum].instruments[voxNum].filters[fxNum].parameters[prNum].focus = true;
 	}
 
 	almostFirstInSong(song: ZvoogSchedule) {
@@ -221,10 +221,10 @@ class LayerSelector {
 		for (let fx = 0; fx < track.filters.length; fx++) {
 			if (track.filters[fx].focus) return;
 		}
-		for (let vx = 0; vx < track.voices.length; vx++) {
-			if (track.voices[vx].focus) return;
+		for (let vx = 0; vx < track.instruments.length; vx++) {
+			if (track.instruments[vx].focus) return;
 		}
-		if (track.voices.length > 0) track.voices[0].focus = true;
+		if (track.instruments.length > 0) track.instruments[0].focus = true;
 	}
 	
 	

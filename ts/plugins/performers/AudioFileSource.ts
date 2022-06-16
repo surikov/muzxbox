@@ -1,4 +1,4 @@
-class AudioFileSource implements ZvoogPerformerPlugin {
+class AudioFileSource implements ZvoogPercussionPlugin {
 	out: GainNode;
 	params: ZvoogPluginParameter[];
 	audioContext: AudioContext;
@@ -68,11 +68,15 @@ class AudioFileSource implements ZvoogPerformerPlugin {
 			this.waves[i].audio.stop();
 		}
 	}
-	addSchedule(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void {
+	/*scheduleChord(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void {
 		this.cleanup();
 		for (let i = 0; i < chord.length; i++) {
 			this.single(when, tempo, chord[i]);
 		}
+	}*/
+	scheduleHit(when: number): void {
+		this.cleanup();
+		this.hit(when);
 	}
 
 	busy(): number {
@@ -132,7 +136,7 @@ class AudioFileSource implements ZvoogPerformerPlugin {
 		envelope.base.gain.linearRampToValueAtTime(0, when + duration + this.afterTime);
 		return envelope;
 	};
-	single(when: number, tempo: number, line: ZvoogEnvelope): void {
+	/*single(when: number, tempo: number, line: ZvoogEnvelope): void {
 		//let seconds = duration2seconds(tempo, duration384(line.pitches[0].duration));
 		let seconds = meter2seconds(tempo, line.pitches[0].duration);
 		let nextPointSeconds = when + seconds;
@@ -141,6 +145,17 @@ class AudioFileSource implements ZvoogPerformerPlugin {
 			let seconds = meter2seconds(tempo, line.pitches[i].duration);
 			nextPointSeconds = nextPointSeconds + seconds;
 		}
+		let e = this.findEnvelope(when, nextPointSeconds - when);
+		let audioBufferSourceNode = this.audioContext.createBufferSource();
+		audioBufferSourceNode.buffer = this.buffer;
+		audioBufferSourceNode.connect(e.base);
+		audioBufferSourceNode.start(when);
+		audioBufferSourceNode.stop(nextPointSeconds + this.afterTime);
+		this.waves.push({ audio: audioBufferSourceNode, end: nextPointSeconds + this.afterTime });
+	}*/
+	hit(when: number): void {
+		let seconds = 10;
+		let nextPointSeconds = when + seconds;
 		let e = this.findEnvelope(when, nextPointSeconds - when);
 		let audioBufferSourceNode = this.audioContext.createBufferSource();
 		audioBufferSourceNode.buffer = this.buffer;

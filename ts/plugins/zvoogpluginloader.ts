@@ -1,5 +1,17 @@
 let cachedPerformerStubPlugins: ZvoogPerformerStub[] = [];
-function takeZvoogPerformerStub(): ZvoogPerformerStub {
+function takeZvoogInstrumentStub(): ZvoogPerformerStub {
+	for (let i = 0; i < cachedPerformerStubPlugins.length; i++) {
+		if (!cachedPerformerStubPlugins[i].state().locked()) {
+			cachedPerformerStubPlugins[i].state().lock();
+			return cachedPerformerStubPlugins[i];
+		}
+	}
+	let plugin = new ZvoogPerformerStub();
+	plugin.state().lock();
+	cachedPerformerStubPlugins.push(plugin);
+	return plugin;
+}
+function takeZvoogPercussionStub(): ZvoogPerformerStub {
 	for (let i = 0; i < cachedPerformerStubPlugins.length; i++) {
 		if (!cachedPerformerStubPlugins[i].state().locked()) {
 			cachedPerformerStubPlugins[i].state().lock();
@@ -122,20 +134,17 @@ function createPluginEffect(id: string): ZvoogFilterPlugin {
 	if (id == 'gain') return takeZvoogFxGain();//new ZvoogFxGain();
 	//console.log('empty plugin effect for', id);
 	//return new ZvoogFilterSourceEmpty();
+	console.log('createPluginEffect wrong', id);
 	return takeZvoogFilterStub();
 }
-function createPluginSource(id: string): ZvoogPerformerPlugin {
-	//console.log('createPluginSource', id, cachedWAFInsSourcePlugins.length, cachedWAFPercSourcePlugins.length);
-	if (id == 'audio') {
-		//var t = [0, 1, 2];
-		//var arr: Uint8Array;
-		//arr = Uint8Array.from(t);
-		return takeAudioFileSource();//new AudioFileSource(arr);
-	}
-	if (id == 'wafinstrument') return takeWAFInsSource();//new WAFInsSource(parseInt(data));
-	if (id == 'wafdrum') return takeWAFPercSource();//new WAFPercSource(parseInt(data));
-	if (id == 'sine') return takeZvoogSineSource();//new ZvoogSineSource();
-	//console.log('empty plugin source for', id);
-	//return new ZvoogFilterSourceEmpty();
-	return takeZvoogPerformerStub();
+function createPluginInstrument(id: string): ZvoogInstrumentPlugin {
+	if (id == 'wafinstrument') return takeWAFInsSource();
+	if (id == 'sine') return takeZvoogSineSource();
+	console.log('createPluginInstrument wrong', id);
+	return takeZvoogInstrumentStub();
+}
+function createPluginPercussion(id: string): ZvoogPercussionPlugin {
+	if (id == 'wafdrum') return takeWAFPercSource();
+	console.log('createPluginPercussion wrong', id);
+	return takeZvoogInstrumentStub();
 }

@@ -29,11 +29,12 @@ class GridRenderer {
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
+			zRender.clearResizeSingleAnchor(zRender.muzXBox.currentSchedule,anchors[i], wholeWidth);
 		}
 
 	}
 	drawGrid(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, rhythmPattern: ZvoogMeter[]) {//}, menuButton: TileRectangle) {
+		let topGridMargin=topGridMarginTp(song,ratioThickness);
 		this.gridAnchor1.content = [];
 		this.gridAnchor4.content = [];
 		this.gridAnchor16.content = [];

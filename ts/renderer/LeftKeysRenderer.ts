@@ -23,13 +23,14 @@ class LeftKeysRenderer {
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
+			zRender.clearResizeSingleAnchor(zRender.muzXBox.currentSchedule,anchors[i], wholeWidth);
 		}
 
 	}
 	drawKeys(zRender: ZRender, song: ZvoogSchedule
 		, ratioDuration: number, ratioThickness: number
 	) {
+		let topGridMargin=topGridMarginTp(song,ratioThickness);
 		for (let i = 0; i < octaveCount; i++) {
 			this.keysAnchor1.content.push(TText(0, topGridMargin + ((octaveCount - i) * 12) * ratioThickness, 'octaveNumNote', '' + (i + 1)));
 

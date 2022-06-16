@@ -1291,12 +1291,12 @@ var ZRender = (function () {
                 trnum = 0;
             if (trnum < song.tracks.length) {
                 var track = song.tracks[trnum];
-                var vonum = this.pianoRollRenderer.findFocusedVoice(track.voices);
+                var vonum = this.pianoRollRenderer.findFocusedVoice(track.instruments);
                 if (vonum < 0)
                     vonum = 0;
-                if (vonum < track.voices.length && this.pianoRollRenderer.needToFocusVoice(song, trnum, vonum)) {
+                if (vonum < track.instruments.length && this.pianoRollRenderer.needToFocusVoice(song, trnum, vonum)) {
                     s2 = track.title;
-                    s1 = track.voices[vonum].title;
+                    s1 = track.instruments[vonum].title;
                 }
                 else {
                     s3 = track.title;
@@ -1309,15 +1309,15 @@ var ZRender = (function () {
                             s1 = track.filters[trfi].parameters[trfipa].caption;
                     }
                     else {
-                        if (vonum < track.voices.length) {
-                            var voice = track.voices[vonum];
-                            if (voice.performer.focus) {
+                        if (vonum < track.instruments.length) {
+                            var voice = track.instruments[vonum];
+                            if (voice.instrumentSetting.focus) {
                                 s4 = track.title;
                                 s3 = voice.title;
-                                s2 = voice.performer.kind;
-                                var ppar = this.pianoRollRenderer.findFocusedParam(voice.performer.parameters);
+                                s2 = voice.instrumentSetting.kind;
+                                var ppar = this.pianoRollRenderer.findFocusedParam(voice.instrumentSetting.parameters);
                                 if (ppar > -1) {
-                                    s1 = voice.performer.parameters[ppar].caption;
+                                    s1 = voice.instrumentSetting.parameters[ppar].caption;
                                 }
                             }
                             else {
@@ -1386,17 +1386,17 @@ var ZRender = (function () {
             ]
         });
     };
-    ZRender.prototype.clearResizeSingleAnchor = function (anchor, wholeWidth) {
+    ZRender.prototype.clearResizeSingleAnchor = function (song, anchor, wholeWidth) {
         anchor.content.length = 0;
         anchor.ww = wholeWidth;
-        anchor.hh = wholeHeightTp(this.pitchLineThicknessInTaps);
+        anchor.hh = wholeHeightTp(song, this.pitchLineThicknessInTaps);
     };
-    ZRender.prototype.clearAnchorsContent = function (wholeWidth, wholeHeight) {
+    ZRender.prototype.clearAnchorsContent = function (song, wholeWidth, wholeHeight) {
         var anchors = [
             this.debugAnchor0, this.debugAnchor1, this.debugAnchor4, this.debugAnchor16, this.debugAnchor64, this.debugAnchor256
         ];
         for (var i = 0; i < anchors.length; i++) {
-            this.clearResizeSingleAnchor(anchors[i], wholeWidth);
+            this.clearResizeSingleAnchor(song, anchors[i], wholeWidth);
         }
         this.focusManager.clearFocusAnchorsContent(this, wholeWidth);
         this.gridRenderer.clearGridAnchorsContent(this, wholeWidth);
@@ -1409,8 +1409,8 @@ var ZRender = (function () {
     };
     ZRender.prototype.drawSchedule = function (song) {
         var wholeWidth = wholeWidthTp(song, this.secondWidthInTaps);
-        var wholeHeight = wholeHeightTp(this.pitchLineThicknessInTaps);
-        this.clearAnchorsContent(wholeWidth, wholeHeight);
+        var wholeHeight = wholeHeightTp(song, this.pitchLineThicknessInTaps);
+        this.clearAnchorsContent(song, wholeWidth, wholeHeight);
         this.measureInfoRenderer.fillMeasureInfo(song, this.secondWidthInTaps, this.pitchLineThicknessInTaps);
         this.pianoRollRenderer.addPianoRoll(this, this.muzXBox.zMainMenu.layerSelector, song, this.secondWidthInTaps, this.pitchLineThicknessInTaps);
         var rhythm = this.rhythmPatternDefault;
@@ -1944,7 +1944,7 @@ var ZvoogSineSource = (function () {
             this.poll[i].node.stop();
         }
     };
-    ZvoogSineSource.prototype.addSchedule = function (when, tempo, chord, variation) {
+    ZvoogSineSource.prototype.scheduleChord = function (when, tempo, chord, variation) {
         this.cleanup();
         for (var i = 0; i < chord.length; i++) {
             this.sendLine(when, tempo, chord[i]);
@@ -2013,7 +2013,7 @@ var WAFInsSource = (function () {
     WAFInsSource.prototype.cancelSchedule = function () {
         window.wafPlayer.cancelQueue(this.audioContext);
     };
-    WAFInsSource.prototype.addSchedule = function (when, tempo, chord, variation) {
+    WAFInsSource.prototype.scheduleChord = function (when, tempo, chord, variation) {
         var pitches = [];
         for (var i = 0; i < chord.length; i++) {
             var envelope_1 = chord[i];
@@ -2104,22 +2104,10 @@ var WAFPercSource = (function () {
     WAFPercSource.prototype.cancelSchedule = function () {
         window.wafPlayer.cancelQueue(this.audioContext);
     };
-    WAFPercSource.prototype.addSchedule = function (when, tempo, chord, variation) {
-        for (var i = 0; i < chord.length; i++) {
-            var envelope = chord[i];
-            var slides = [];
-            var duration = meter2seconds(tempo, envelope.pitches[0].duration);
-            var t = 0;
-            for (var n = 1; n < envelope.pitches.length; n++) {
-                t = t + meter2seconds(tempo, envelope.pitches[n - 1].duration);
-                slides.push({
-                    pitch: envelope.pitches[n].pitch,
-                    when: t
-                });
-                duration = duration + meter2seconds(tempo, envelope.pitches[n].duration);
-            }
-            window.wafPlayer.queueWaveTable(this.audioContext, this.out, this.zones, when, envelope.pitches[0].pitch, duration, 0.99, slides);
-        }
+    WAFPercSource.prototype.scheduleHit = function (when) {
+        var drumPitch = 33;
+        var duration = 1;
+        window.wafPlayer.queueWaveTable(this.audioContext, this.out, this.zones, when, drumPitch, duration, 0.99);
     };
     WAFPercSource.prototype.prepare = function (audioContext, data) {
         if (this.out) {
@@ -2224,11 +2212,9 @@ var AudioFileSource = (function () {
             this.waves[i].audio.stop();
         }
     };
-    AudioFileSource.prototype.addSchedule = function (when, tempo, chord, variation) {
+    AudioFileSource.prototype.scheduleHit = function (when) {
         this.cleanup();
-        for (var i = 0; i < chord.length; i++) {
-            this.single(when, tempo, chord[i]);
-        }
+        this.hit(when);
     };
     AudioFileSource.prototype.busy = function () {
         if (this.buffer) {
@@ -2287,13 +2273,9 @@ var AudioFileSource = (function () {
         return envelope;
     };
     ;
-    AudioFileSource.prototype.single = function (when, tempo, line) {
-        var seconds = meter2seconds(tempo, line.pitches[0].duration);
+    AudioFileSource.prototype.hit = function (when) {
+        var seconds = 10;
         var nextPointSeconds = when + seconds;
-        for (var i = 1; i < line.pitches.length; i++) {
-            var seconds_2 = meter2seconds(tempo, line.pitches[i].duration);
-            nextPointSeconds = nextPointSeconds + seconds_2;
-        }
         var e = this.findEnvelope(when, nextPointSeconds - when);
         var audioBufferSourceNode = this.audioContext.createBufferSource();
         audioBufferSourceNode.buffer = this.buffer;
@@ -2496,7 +2478,9 @@ var ZvoogPerformerStub = (function () {
     };
     ZvoogPerformerStub.prototype.cancelSchedule = function () {
     };
-    ZvoogPerformerStub.prototype.addSchedule = function (when, tempo, chord, variation) {
+    ZvoogPerformerStub.prototype.scheduleChord = function (when, tempo, chord, variation) {
+    };
+    ZvoogPerformerStub.prototype.scheduleHit = function (when) {
     };
     ZvoogPerformerStub.prototype.getParId = function (nn) {
         return null;
@@ -2555,11 +2539,34 @@ function wholeWidthTp(song, ratioDuration) {
 function gridHeightTp(ratioThickness) {
     return (octaveCount * 12) * ratioThickness;
 }
-function wholeHeightTp(ratioThickness) {
-    return topGridMargin + (octaveCount * 12) * ratioThickness + bottomGridMargin;
+function drumRowsCount(song) {
+    var rr = 0;
+    for (var tt = 0; tt < song.tracks.length; tt++) {
+        rr = rr + song.tracks[tt].percussions.length;
+    }
+    return rr;
+}
+function topGridMarginTp(song, pitchLineThicknessInTaps) {
+    var drHH = drumRowsCount(song) * pitchLineThicknessInTaps;
+    return topContentMargin + drHH + drumGridPadding;
+}
+function wholeHeightTp(song, ratioThickness) {
+    return topGridMarginTp(song, ratioThickness) + (octaveCount * 12) * ratioThickness + bottomGridMargin;
 }
 var cachedPerformerStubPlugins = [];
-function takeZvoogPerformerStub() {
+function takeZvoogInstrumentStub() {
+    for (var i = 0; i < cachedPerformerStubPlugins.length; i++) {
+        if (!cachedPerformerStubPlugins[i].state().locked()) {
+            cachedPerformerStubPlugins[i].state().lock();
+            return cachedPerformerStubPlugins[i];
+        }
+    }
+    var plugin = new ZvoogPerformerStub();
+    plugin.state().lock();
+    cachedPerformerStubPlugins.push(plugin);
+    return plugin;
+}
+function takeZvoogPercussionStub() {
     for (var i = 0; i < cachedPerformerStubPlugins.length; i++) {
         if (!cachedPerformerStubPlugins[i].state().locked()) {
             cachedPerformerStubPlugins[i].state().lock();
@@ -2682,19 +2689,22 @@ function createPluginEffect(id) {
         return takeWAFEqualizer();
     if (id == 'gain')
         return takeZvoogFxGain();
+    console.log('createPluginEffect wrong', id);
     return takeZvoogFilterStub();
 }
-function createPluginSource(id) {
-    if (id == 'audio') {
-        return takeAudioFileSource();
-    }
+function createPluginInstrument(id) {
     if (id == 'wafinstrument')
         return takeWAFInsSource();
-    if (id == 'wafdrum')
-        return takeWAFPercSource();
     if (id == 'sine')
         return takeZvoogSineSource();
-    return takeZvoogPerformerStub();
+    console.log('createPluginInstrument wrong', id);
+    return takeZvoogInstrumentStub();
+}
+function createPluginPercussion(id) {
+    if (id == 'wafdrum')
+        return takeWAFPercSource();
+    console.log('createPluginPercussion wrong', id);
+    return takeZvoogInstrumentStub();
 }
 var instrumentNamesArray = [];
 var drumNamesArray = [];
@@ -3604,8 +3614,8 @@ var MidiParser = (function () {
         }
         var voice = {
             measureChords: [],
-            performer: {
-                performerPlugin: null,
+            instrumentSetting: {
+                instrumentPlugin: null,
                 parameters: [],
                 kind: "wafdrum",
                 initial: "" + drum
@@ -3780,7 +3790,7 @@ var MidiParser = (function () {
         for (var i = 0; i < midisong.miditracks.length; i++) {
             var track = {
                 title: '' + i,
-                voices: [],
+                instruments: [], percussions: [],
                 filters: [{
                         filterPlugin: null,
                         parameters: this.parametersDefs(testGain),
@@ -3808,9 +3818,9 @@ var MidiParser = (function () {
                         if (drumNums.indexOf(pinum) < 0) {
                             drumNums.push(pinum);
                             var voice = {
-                                measureChords: [],
-                                performer: {
-                                    performerPlugin: null,
+                                measureBunches: [],
+                                percussionSetting: {
+                                    percussionPlugin: null,
                                     parameters: this.parametersDefs(wafdrum),
                                     kind: 'wafdrum',
                                     initial: '' + pinum
@@ -3823,10 +3833,10 @@ var MidiParser = (function () {
                                     }],
                                 title: drumTitles()[pinum]
                             };
-                            track.voices.push(voice);
+                            track.percussions.push(voice);
                             track.title = '' + pinum + ': Drums';
                             for (var mc = 0; mc < timeline.length; mc++) {
-                                voice.measureChords.push({ chords: [] });
+                                voice.measureBunches.push({ bunches: [] });
                             }
                             for (var chn = 0; chn < midisong.miditracks[i].songchords.length; chn++) {
                                 var midichord = midisong.miditracks[i].songchords[chn];
@@ -3836,32 +3846,10 @@ var MidiParser = (function () {
                                         var skipInMeasureMs = midichord.when - timelineMeasure.ms;
                                         var skipMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
                                         skipMeter = DUU(skipMeter).simplify();
-                                        var onechord = {
-                                            when: skipMeter,
-                                            envelopes: [],
-                                            variation: 0
+                                        var onehit = {
+                                            when: skipMeter
                                         };
-                                        for (var nx = 0; nx < midichord.notes.length; nx++) {
-                                            var env = { pitches: [] };
-                                            var mino = midichord.notes[nx];
-                                            if (mino.points[0].pitch == pinum) {
-                                                for (var px = 0; px < mino.points.length; px++) {
-                                                    var mipoint = mino.points[px];
-                                                    var midiDrumIndex = mipoint.pitch;
-                                                    if (mipoint.pitch < 35 || mipoint.pitch > 81) {
-                                                        midiDrumIndex = 42;
-                                                    }
-                                                    env.pitches.push({
-                                                        duration: DUU(seconds2meter32(mipoint.durationms / 1000, timelineMeasure.bpm)).simplify(),
-                                                        pitch: midiDrumIndex - midiDrumPitchShift
-                                                    });
-                                                }
-                                                onechord.envelopes.push(env);
-                                            }
-                                        }
-                                        if (onechord.envelopes.length > 0) {
-                                            voice.measureChords[tc - 1].chords.push(onechord);
-                                        }
+                                        voice.measureBunches[tc - 1].bunches.push(onehit);
                                         break;
                                     }
                                 }
@@ -3873,8 +3861,8 @@ var MidiParser = (function () {
             else {
                 var voice = {
                     measureChords: [],
-                    performer: {
-                        performerPlugin: null,
+                    instrumentSetting: {
+                        instrumentPlugin: null,
                         parameters: this.parametersDefs(wafinstrument),
                         kind: 'wafinstrument',
                         initial: '' + midisong.miditracks[i].program
@@ -3892,7 +3880,7 @@ var MidiParser = (function () {
                         }],
                     title: instrumentTitles()[midisong.miditracks[i].program]
                 };
-                track.voices.push(voice);
+                track.instruments.push(voice);
                 track.title = '' + midisong.miditracks[i].program + ': ' + voice.title;
                 for (var mc = 0; mc < timeline.length; mc++) {
                     voice.measureChords.push({ chords: [] });
@@ -4083,15 +4071,15 @@ var MusicXMLFileImporter = (function () {
         return chorddef;
     };
     MusicXMLFileImporter.prototype.takeVoice = function (voiceid, songtrack) {
-        for (var i = 0; i < songtrack.voices.length; i++) {
-            if (songtrack.voices[i].title == voiceid) {
-                return songtrack.voices[i];
+        for (var i = 0; i < songtrack.instruments.length; i++) {
+            if (songtrack.instruments[i].title == voiceid) {
+                return songtrack.instruments[i];
             }
         }
         var trackvoice = {
             measureChords: [],
-            performer: {
-                performerPlugin: null,
+            instrumentSetting: {
+                instrumentPlugin: null,
                 parameters: [],
                 kind: '',
                 initial: ''
@@ -4099,7 +4087,7 @@ var MusicXMLFileImporter = (function () {
             filters: [],
             title: voiceid
         };
-        songtrack.voices.push(trackvoice);
+        songtrack.instruments.push(trackvoice);
         return trackvoice;
     };
     MusicXMLFileImporter.prototype.parsePitch = function (step, octave, alter) {
@@ -4211,7 +4199,7 @@ var MusicXMLFileImporter = (function () {
             var partdata = mxml.seek('part', 'id', partid);
             var songtrack = {
                 title: part.first('part-name').value,
-                voices: [],
+                instruments: [], percussions: [],
                 filters: []
             };
             zvoogSchedule.tracks.push(songtrack);
@@ -4256,8 +4244,8 @@ var MusicXMLFileImporter = (function () {
         for (var mm = 0; mm < zvoogSchedule.measures.length; mm++) {
             for (var tt = 0; tt < zvoogSchedule.tracks.length; tt++) {
                 var track = zvoogSchedule.tracks[tt];
-                for (var vv = 0; vv < track.voices.length; vv++) {
-                    var voice = track.voices[vv];
+                for (var vv = 0; vv < track.instruments.length; vv++) {
+                    var voice = track.instruments[vv];
                     if (voice.measureChords[mm]) {
                     }
                     else {
@@ -4675,8 +4663,8 @@ var ZMainMenu = (function () {
             tr.items.push({ label: "-track", icon: "", autoclose: false, action: function () { console.log('-track'); } });
             tr.items.push({ label: "+tfx", icon: "", autoclose: false, action: function () { console.log('+tfx'); } });
             tr.items.push({ label: "+vox", icon: "", autoclose: false, action: function () { console.log('+vox'); } });
-            for (var vv = 0; vv < songtrack.voices.length; vv++) {
-                var songvox = songtrack.voices[vv];
+            for (var vv = 0; vv < songtrack.instruments.length; vv++) {
+                var songvox = songtrack.instruments[vv];
                 var vox = {
                     path: songvox.title, icon: "", folders: [], items: [],
                     afterOpen: this.layerSelector.upVox(tt, vv)
@@ -4684,13 +4672,13 @@ var ZMainMenu = (function () {
                 tr.folders.push(vox);
                 vox.items.push({ label: "+vfx", icon: "", autoclose: false, action: function () { console.log('+vfx'); } });
                 var source = {
-                    path: 'src ' + songvox.performer.kind, icon: "", folders: [], items: [],
+                    path: 'src ' + songvox.instrumentSetting.kind, icon: "", folders: [], items: [],
                     afterOpen: this.layerSelector.upVoxProvider(tt, vv)
                 };
                 source.items.push({ label: "?src", icon: "", autoclose: false, action: function () { console.log('?src'); } });
-                for (var kk = 0; kk < songvox.performer.parameters.length; kk++) {
+                for (var kk = 0; kk < songvox.instrumentSetting.parameters.length; kk++) {
                     var par = {
-                        label: "par " + kk + " " + songvox.performer.parameters[kk].caption, icon: "", autoclose: false,
+                        label: "par " + kk + " " + songvox.instrumentSetting.parameters[kk].caption, icon: "", autoclose: false,
                         action: this.layerSelector.upVoxProviderParam(tt, vv, kk)
                     };
                     source.items.push(par);
@@ -4783,7 +4771,8 @@ var midiDrumPitchShift = 35;
 var midiInstrumentPitchShift = 12;
 var leftGridMargin = 20;
 var rightGridMargin = 1;
-var topGridMargin = 20;
+var topContentMargin = 20;
+var drumGridPadding = 5;
 var bottomGridMargin = 110;
 var octaveCount = 8;
 var bigGroupMeasure = 16;
@@ -4813,11 +4802,11 @@ var MuzXBox = (function () {
         var emptySchedule = {
             title: 'Empty project',
             tracks: [{
-                    title: "First", filters: [], voices: [
+                    title: "First", filters: [], percussions: [], instruments: [
                         {
                             filters: [],
                             title: 'Single',
-                            performer: { performerPlugin: null, parameters: [], kind: 'none', initial: '' },
+                            instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'none', initial: '' },
                             measureChords: [{
                                     chords: [{
                                             when: { count: 1, division: 4 }, variation: 0, envelopes: [{
@@ -4832,7 +4821,7 @@ var MuzXBox = (function () {
                         {
                             filters: [],
                             title: 'Another',
-                            performer: { performerPlugin: null, parameters: [], kind: 'none', initial: '' },
+                            instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'none', initial: '' },
                             measureChords: [
                                 { chords: [] },
                                 {
@@ -4848,11 +4837,11 @@ var MuzXBox = (function () {
                     ]
                 },
                 {
-                    title: "Second", filters: [], voices: [
+                    title: "Second", filters: [], percussions: [], instruments: [
                         {
                             filters: [],
                             title: 'Another',
-                            performer: { performerPlugin: null, parameters: [], kind: 'none', initial: '' },
+                            instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'none', initial: '' },
                             measureChords: [
                                 { chords: [] },
                                 { chords: [] },
@@ -4971,7 +4960,7 @@ var MeasureInfoRenderer = (function () {
             this.measuresMeasureInfoAnchor1, this.measuresMeasureInfoAnchor4, this.measuresMeasureInfoAnchor16, this.measuresMeasureInfoAnchor64, this.measuresMeasureInfoAnchor256
         ];
         for (var i = 0; i < anchors.length; i++) {
-            zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
+            zRender.clearResizeSingleAnchor(zRender.muzXBox.currentSchedule, anchors[i], wholeWidth);
         }
     };
     MeasureInfoRenderer.prototype.fillMeasureInfo1 = function (song, ratioDuration, ratioThickness) {
@@ -5089,7 +5078,7 @@ var PianoRollRenderer = (function () {
             this.contentOther1, this.contentOther4, this.contentOther16, this.contentOther64, this.contentOther256
         ];
         for (var i = 0; i < anchors.length; i++) {
-            zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
+            zRender.clearResizeSingleAnchor(zRender.muzXBox.currentSchedule, anchors[i], wholeWidth);
         }
     };
     PianoRollRenderer.prototype.initMainAnchors = function (zRender) {
@@ -5140,6 +5129,7 @@ var PianoRollRenderer = (function () {
         }
     };
     PianoRollRenderer.prototype.addMeasureLyrics = function (song, time, mm, ratioDuration, ratioThickness, anchor, css) {
+        var topGridMargin = topGridMarginTp(song, ratioThickness);
         var measure = song.measures[mm];
         for (var pp = 0; pp < measure.points.length; pp++) {
             var yShift = 44;
@@ -5154,6 +5144,7 @@ var PianoRollRenderer = (function () {
         }
     };
     PianoRollRenderer.prototype.addSelectKnobs64 = function (song, time, mm, ratioDuration, ratioThickness, anchor) {
+        var topGridMargin = topGridMarginTp(song, ratioThickness);
         var knob = {
             x: leftGridMargin + time * ratioDuration,
             y: topGridMargin + 12 * octaveCount * ratioThickness,
@@ -5173,6 +5164,7 @@ var PianoRollRenderer = (function () {
         anchor.content.push(txt);
     };
     PianoRollRenderer.prototype.addSelectKnobs16 = function (song, time, mm, ratioDuration, ratioThickness, anchor, action) {
+        var topGridMargin = topGridMarginTp(song, ratioThickness);
         var knob = {
             x: leftGridMargin + time * ratioDuration,
             y: topGridMargin + 12 * octaveCount * ratioThickness,
@@ -5192,6 +5184,7 @@ var PianoRollRenderer = (function () {
         anchor.content.push(txt);
     };
     PianoRollRenderer.prototype.addSelectKnobs4 = function (song, time, mm, ratioDuration, ratioThickness, anchor) {
+        var topGridMargin = topGridMarginTp(song, ratioThickness);
         var knob = {
             x: leftGridMargin + time * ratioDuration,
             y: topGridMargin + 12 * octaveCount * ratioThickness,
@@ -5211,6 +5204,7 @@ var PianoRollRenderer = (function () {
         anchor.content.push(txt);
     };
     PianoRollRenderer.prototype.addSelectKnobs1 = function (song, time, mm, rhythmPattern, ratioDuration, ratioThickness, anchor) {
+        var topGridMargin = topGridMarginTp(song, ratioThickness);
         var stepNN = 0;
         var position = rhythmPattern[stepNN];
         var positionDuration = 0;
@@ -5242,6 +5236,7 @@ var PianoRollRenderer = (function () {
         }
     };
     PianoRollRenderer.prototype.addVoiceMeasure = function (ratioDuration, ratioThickness, song, voice, measureNum, time, css, anchors) {
+        var topGridMargin = topGridMarginTp(song, ratioThickness);
         var measure = voice.measureChords[measureNum];
         var measureMaxLen = anchors[0].ww;
         var yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12) * ratioThickness;
@@ -5304,7 +5299,8 @@ var PianoRollRenderer = (function () {
         };
     };
     PianoRollRenderer.prototype.addNotesKnobs = function (layerSelector, ratioDuration, ratioThickness, song, trackNum, voiceNum, measureNum, time, isMain, anchor) {
-        var voice = song.tracks[trackNum].voices[voiceNum];
+        var topGridMargin = topGridMarginTp(song, ratioThickness);
+        var voice = song.tracks[trackNum].instruments[voiceNum];
         var measure = voice.measureChords[measureNum];
         var yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12) * ratioThickness;
         for (var cc = 0; cc < measure.chords.length; cc++) {
@@ -5343,13 +5339,13 @@ var PianoRollRenderer = (function () {
                     var track = song.tracks[trackNum];
                     var trafi = this.findFocusedFilter(track.filters);
                     if (trafi < 0) {
-                        var vv = this.findFocusedVoice(track.voices);
+                        var vv = this.findFocusedVoice(track.instruments);
                         if (vv < 0)
                             vv = 0;
                         if (vv == voiceNum) {
-                            if (voiceNum < track.voices.length) {
-                                var voice = track.voices[voiceNum];
-                                if (!voice.performer.focus) {
+                            if (voiceNum < track.instruments.length) {
+                                var voice = track.instruments[voiceNum];
+                                if (!voice.instrumentSetting.focus) {
                                     var vofi = this.findFocusedFilter(voice.filters);
                                     if (vofi < 0)
                                         return true;
@@ -5373,13 +5369,13 @@ var PianoRollRenderer = (function () {
                     var track = song.tracks[trackNum];
                     var trafi = this.findFocusedFilter(track.filters);
                     if (trafi < 0) {
-                        var vv = this.findFocusedVoice(track.voices);
+                        var vv = this.findFocusedVoice(track.instruments);
                         if (vv < 0)
                             vv = 0;
                         if (vv != voiceNum) {
-                            if (vv < track.voices.length) {
-                                var avoice = track.voices[vv];
-                                if (!avoice.performer.focus) {
+                            if (vv < track.instruments.length) {
+                                var avoice = track.instruments[vv];
+                                if (!avoice.instrumentSetting.focus) {
                                     var vofi = this.findFocusedFilter(avoice.filters);
                                     if (vofi < 0)
                                         return true;
@@ -5447,6 +5443,7 @@ var PianoRollRenderer = (function () {
         return actionSelect;
     };
     PianoRollRenderer.prototype.addPianoRoll = function (zRender, layerSelector, song, ratioDuration, ratioThickness) {
+        var topGridMargin = topGridMarginTp(song, ratioThickness);
         var rhythm = zRender.rhythmPatternDefault;
         if (song.rhythm) {
             if (song.rhythm.length) {
@@ -5489,11 +5486,11 @@ var PianoRollRenderer = (function () {
             this.addSelectKnobs1(song, time, mm, rhythm, ratioDuration, ratioThickness, secondMeasure1);
             for (var tt = 0; tt < song.tracks.length; tt++) {
                 var track = song.tracks[tt];
-                for (var vv = 0; vv < track.voices.length; vv++) {
-                    var voice = track.voices[vv];
-                    for (var pp = 0; pp < voice.performer.parameters.length; pp++) {
-                        var parameter = voice.performer.parameters[pp];
-                        if (track.focus && voice.focus && voice.performer.focus) {
+                for (var vv = 0; vv < track.instruments.length; vv++) {
+                    var voice = track.instruments[vv];
+                    for (var pp = 0; pp < voice.instrumentSetting.parameters.length; pp++) {
+                        var parameter = voice.instrumentSetting.parameters[pp];
+                        if (track.focus && voice.focus && voice.instrumentSetting.focus) {
                             if (parameter.focus) {
                                 this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine', [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);
                             }
@@ -5578,13 +5575,14 @@ var PianoRollRenderer = (function () {
         this.fillBig(song, ratioDuration, ratioThickness);
     };
     PianoRollRenderer.prototype.fillFar = function (song, ratioDuration, ratioThickness) {
+        var topGridMargin = topGridMarginTp(song, ratioThickness);
         var chordCount = 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureChords = 0;
             for (var tt = 0; tt < song.tracks.length; tt++) {
                 var track = song.tracks[tt];
-                for (var vv = 0; vv < track.voices.length; vv++) {
-                    var voice = track.voices[vv];
+                for (var vv = 0; vv < track.instruments.length; vv++) {
+                    var voice = track.instruments[vv];
                     measureChords = measureChords + voice.measureChords[mm].chords.length;
                 }
             }
@@ -5597,8 +5595,8 @@ var PianoRollRenderer = (function () {
             var curChordCount = 0;
             for (var tt = 0; tt < song.tracks.length; tt++) {
                 var track = song.tracks[tt];
-                for (var vv = 0; vv < track.voices.length; vv++) {
-                    var voice = track.voices[vv];
+                for (var vv = 0; vv < track.instruments.length; vv++) {
+                    var voice = track.instruments[vv];
                     curChordCount = curChordCount + voice.measureChords[mm].chords.length;
                 }
             }
@@ -5639,13 +5637,14 @@ var PianoRollRenderer = (function () {
         }
     };
     PianoRollRenderer.prototype.fillBig = function (song, ratioDuration, ratioThickness) {
+        var topGridMargin = topGridMarginTp(song, ratioThickness);
         var chordCount = 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureChords = 0;
             for (var tt = 0; tt < song.tracks.length; tt++) {
                 var track = song.tracks[tt];
-                for (var vv = 0; vv < track.voices.length; vv++) {
-                    var voice = track.voices[vv];
+                for (var vv = 0; vv < track.instruments.length; vv++) {
+                    var voice = track.instruments[vv];
                     measureChords = measureChords + voice.measureChords[mm].chords.length;
                 }
             }
@@ -5661,8 +5660,8 @@ var PianoRollRenderer = (function () {
                 duration10 = duration10 + measureDuration;
                 for (var tt = 0; tt < song.tracks.length; tt++) {
                     var track = song.tracks[tt];
-                    for (var vv = 0; vv < track.voices.length; vv++) {
-                        var voice = track.voices[vv];
+                    for (var vv = 0; vv < track.instruments.length; vv++) {
+                        var voice = track.instruments[vv];
                         curChordCount = curChordCount + voice.measureChords[m10 + msi].chords.length;
                     }
                 }
@@ -5729,10 +5728,11 @@ var GridRenderer = (function () {
             this.gridAnchor1, this.gridAnchor4, this.gridAnchor16
         ];
         for (var i = 0; i < anchors.length; i++) {
-            zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
+            zRender.clearResizeSingleAnchor(zRender.muzXBox.currentSchedule, anchors[i], wholeWidth);
         }
     };
     GridRenderer.prototype.drawGrid = function (zRender, song, ratioDuration, ratioThickness, rhythmPattern) {
+        var topGridMargin = topGridMarginTp(song, ratioThickness);
         this.gridAnchor1.content = [];
         this.gridAnchor4.content = [];
         this.gridAnchor16.content = [];
@@ -5866,7 +5866,7 @@ var TimeLineRenderer = (function () {
             this.measuresTimelineAnchor1, this.measuresTimelineAnchor4, this.measuresTimelineAnchor16, this.measuresTimelineAnchor64
         ];
         for (var i = 0; i < anchors.length; i++) {
-            zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
+            zRender.clearResizeSingleAnchor(zRender.muzXBox.currentSchedule, anchors[i], wholeWidth);
         }
     };
     TimeLineRenderer.prototype.drawSchedule = function (zRender, song, ratioDuration, ratioThickness) {
@@ -5882,7 +5882,7 @@ var TimeLineRenderer = (function () {
         for (var i = 0; i < song.measures.length; i++) {
             var measureDuration = meter2seconds(song.measures[i].tempo, song.measures[i].meter);
             if (!skip8 || (skip8 && i % 8 == 0)) {
-                var measureAnchor = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, wholeHeightTp(ratioThickness), layerAnchor.showZoom, layerAnchor.hideZoom);
+                var measureAnchor = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, wholeHeightTp(song, ratioThickness), layerAnchor.showZoom, layerAnchor.hideZoom);
                 measureAnchor.content.push(TText(leftGridMargin + time * ratioDuration, yy * 1, textCSS, ('' + (1 + i))));
                 var rhythmPattern = song.rhythm ? song.rhythm : zRender.rhythmPatternDefault;
                 if (subCSS) {
@@ -6027,12 +6027,12 @@ var LayerSelector = (function () {
                     filter.parameters[fxpr].focus = false;
                 }
             }
-            for (var vc = 0; vc < track.voices.length; vc++) {
-                var voice = track.voices[vc];
+            for (var vc = 0; vc < track.instruments.length; vc++) {
+                var voice = track.instruments[vc];
                 voice.focus = false;
-                voice.performer.focus = false;
-                for (var prpr = 0; prpr < voice.performer.parameters.length; prpr++) {
-                    voice.performer.parameters[prpr].focus = false;
+                voice.instrumentSetting.focus = false;
+                for (var prpr = 0; prpr < voice.instrumentSetting.parameters.length; prpr++) {
+                    voice.instrumentSetting.parameters[prpr].focus = false;
                 }
                 for (var fx = 0; fx < voice.filters.length; fx++) {
                     var filter = voice.filters[fx];
@@ -6071,33 +6071,33 @@ var LayerSelector = (function () {
     LayerSelector.prototype.selectSongTrackVox = function (song, trNum, voxNum) {
         this.clearLevelFocus(song);
         song.tracks[trNum].focus = true;
-        song.tracks[trNum].voices[voxNum].focus = true;
+        song.tracks[trNum].instruments[voxNum].focus = true;
     };
     LayerSelector.prototype.selectSongTrackVoxPerformer = function (song, trNum, voxNum) {
         this.clearLevelFocus(song);
         song.tracks[trNum].focus = true;
-        song.tracks[trNum].voices[voxNum].focus = true;
-        song.tracks[trNum].voices[voxNum].performer.focus = true;
+        song.tracks[trNum].instruments[voxNum].focus = true;
+        song.tracks[trNum].instruments[voxNum].instrumentSetting.focus = true;
     };
     LayerSelector.prototype.selectSongTrackVoxPerformerParam = function (song, trNum, voxNum, prNum) {
         this.clearLevelFocus(song);
         song.tracks[trNum].focus = true;
-        song.tracks[trNum].voices[voxNum].focus = true;
-        song.tracks[trNum].voices[voxNum].performer.focus = true;
-        song.tracks[trNum].voices[voxNum].performer.parameters[prNum].focus = true;
+        song.tracks[trNum].instruments[voxNum].focus = true;
+        song.tracks[trNum].instruments[voxNum].instrumentSetting.focus = true;
+        song.tracks[trNum].instruments[voxNum].instrumentSetting.parameters[prNum].focus = true;
     };
     LayerSelector.prototype.selectSongTrackVoxFx = function (song, trNum, voxNum, fxNum) {
         this.clearLevelFocus(song);
         song.tracks[trNum].focus = true;
-        song.tracks[trNum].voices[voxNum].focus = true;
-        song.tracks[trNum].voices[voxNum].filters[fxNum].focus = true;
+        song.tracks[trNum].instruments[voxNum].focus = true;
+        song.tracks[trNum].instruments[voxNum].filters[fxNum].focus = true;
     };
     LayerSelector.prototype.selectSongTrackVoxFxParam = function (song, trNum, voxNum, fxNum, prNum) {
         this.clearLevelFocus(song);
         song.tracks[trNum].focus = true;
-        song.tracks[trNum].voices[voxNum].focus = true;
-        song.tracks[trNum].voices[voxNum].filters[fxNum].focus = true;
-        song.tracks[trNum].voices[voxNum].filters[fxNum].parameters[prNum].focus = true;
+        song.tracks[trNum].instruments[voxNum].focus = true;
+        song.tracks[trNum].instruments[voxNum].filters[fxNum].focus = true;
+        song.tracks[trNum].instruments[voxNum].filters[fxNum].parameters[prNum].focus = true;
     };
     LayerSelector.prototype.almostFirstInSong = function (song) {
         for (var fx = 0; fx < song.filters.length; fx++) {
@@ -6116,12 +6116,12 @@ var LayerSelector = (function () {
             if (track.filters[fx].focus)
                 return;
         }
-        for (var vx = 0; vx < track.voices.length; vx++) {
-            if (track.voices[vx].focus)
+        for (var vx = 0; vx < track.instruments.length; vx++) {
+            if (track.instruments[vx].focus)
                 return;
         }
-        if (track.voices.length > 0)
-            track.voices[0].focus = true;
+        if (track.instruments.length > 0)
+            track.instruments[0].focus = true;
     };
     return LayerSelector;
 }());
@@ -6152,7 +6152,7 @@ var FocusManagement = (function () {
             this.focusAnchor
         ];
         for (var i = 0; i < anchors.length; i++) {
-            zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
+            zRender.clearResizeSingleAnchor(zRender.muzXBox.currentSchedule, anchors[i], wholeWidth);
         }
     };
     FocusManagement.prototype.currentFocusLevelX = function () {
@@ -6165,7 +6165,7 @@ var FocusManagement = (function () {
     };
     FocusManagement.prototype.reSetFocus = function (zrenderer, wholeWidth) {
         zrenderer.tileLevel.resetAnchor(this.focusAnchor, this.focusMarkerLayer);
-        zrenderer.clearResizeSingleAnchor(this.focusAnchor, wholeWidth);
+        zrenderer.clearResizeSingleAnchor(zrenderer.muzXBox.currentSchedule, this.focusAnchor, wholeWidth);
         this.currentFocusLevelX().addSpot(this);
         zrenderer.tileLevel.allTilesOK = false;
     };
@@ -6282,10 +6282,10 @@ var FocusZoomFar = (function () {
         var ww = mngmnt.muzXBox.zrenderer.secondWidthInTaps
             * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.idxMeasureStart].tempo, mngmnt.muzXBox.currentSchedule.measures[this.idxMeasureStart].meter);
         var hh = 12 * octaveCount * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
-        var yy = topGridMargin;
+        var yy = topGridMarginTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps);
         if (this.idxRow < 0) {
             hh = bottomGridMargin;
-            yy = topGridMargin + 12 * octaveCount * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+            yy = topGridMarginTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps) + 12 * octaveCount * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
         }
         mngmnt.focusAnchor.content.push({
             x: xx,
@@ -6364,7 +6364,6 @@ var FocusZoomFar = (function () {
         var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
         var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.idxMeasureStart, 0, rhythmPattern);
         var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.start;
-        var yy = topGridMargin;
         var ww = mngmnt.muzXBox.zrenderer.secondWidthInTaps
             * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.idxMeasureStart].tempo, mngmnt.muzXBox.currentSchedule.measures[this.idxMeasureStart].meter);
         var hh = 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
@@ -6415,7 +6414,7 @@ var FocusZoomBig = (function () {
             }
         }
         var hh = 12 * octaveCount * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
-        var yy = topGridMargin;
+        var yy = topGridMarginTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps);
         mngmnt.focusAnchor.content.push({
             x: xx,
             y: yy,
@@ -6489,7 +6488,6 @@ var FocusZoomBig = (function () {
         var firstMeasureIdx = this.measureGroupIndx * bigGroupMeasure;
         var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, firstMeasureIdx, 0, rhythmPattern);
         var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.start;
-        var yy = topGridMargin;
         var ww = 0;
         for (var i = 0; i < bigGroupMeasure && i + firstMeasureIdx < mngmnt.muzXBox.currentSchedule.measures.length; i++) {
             ww = ww + mngmnt.muzXBox.zrenderer.secondWidthInTaps
@@ -6531,7 +6529,7 @@ var FocusZoomMeasure = (function () {
         var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.start;
         var ww = mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.duration;
         var hh = mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
-        var yy = topGridMargin
+        var yy = topGridMarginTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
             + gridHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
             - (this.pitchLineIdx + 1) * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
         if (this.pitchLineIdx < 0) {
@@ -6597,7 +6595,7 @@ var FocusZoomMeasure = (function () {
         var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
         var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.idxMeasure, this.idxStep, rhythmPattern);
         var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.start;
-        var yy = topGridMargin
+        var yy = topGridMarginTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
             + gridHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
             - (this.pitchLineIdx + 1) * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
         var ww = mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.duration;
@@ -6638,6 +6636,7 @@ var FocusZoomMeasure = (function () {
         if (vh < ih) {
             newY = vh / 2 - ty;
         }
+        var topGridMargin = topGridMarginTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps);
         var pitchY = tp * topGridMargin + tp * octaveCount * 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps - newY * tz;
         this.pitchLineIdx = Math.ceil(pitchY / (tp * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps));
         if (this.pitchLineIdx < 0) {
@@ -6690,7 +6689,7 @@ var FocusZoomNote = (function () {
         }
     };
     FocusZoomNote.prototype.spotDown = function (mngmnt) {
-        var hh = wholeHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps);
+        var hh = wholeHeightTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps);
         if (this.yyPoint < hh - 1) {
             this.yyPoint++;
             return true;
@@ -6786,6 +6785,7 @@ var FocusZoomSong = (function () {
         var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.start;
         var ww = mngmnt.muzXBox.zrenderer.secondWidthInTaps * meter2seconds(mngmnt.muzXBox.currentSchedule.measures[this.indexMeasure].tempo, mngmnt.muzXBox.currentSchedule.measures[this.indexMeasure].meter);
         var hh = 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
+        var topGridMargin = topGridMarginTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps);
         var yy = topGridMargin
             + gridHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
             - 12 * (1 + this.indexOctave) * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
@@ -6863,6 +6863,7 @@ var FocusZoomSong = (function () {
         var rhythmPattern = mngmnt.muzXBox.currentSchedule.rhythm ? mngmnt.muzXBox.currentSchedule.rhythm : default8rhytym;
         var measuresAndStep = measuresAndStepDuration(mngmnt.muzXBox.currentSchedule, this.indexMeasure, 0, rhythmPattern);
         var xx = leftGridMargin + mngmnt.muzXBox.zrenderer.secondWidthInTaps * measuresAndStep.start;
+        var topGridMargin = topGridMarginTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps);
         var yy = topGridMargin
             + gridHeightTp(mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps)
             - 12 * this.indexOctave * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps;
@@ -6904,6 +6905,7 @@ var FocusZoomSong = (function () {
         if (vh < ih) {
             newY = vh / 2 - ty;
         }
+        var topGridMargin = topGridMarginTp(mngmnt.muzXBox.currentSchedule, mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps);
         var pitchY = tp * topGridMargin + tp * octaveCount * 12 * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps - newY * tz;
         var pitchLineIdx = this.indexOctave * 12;
         pitchLineIdx = Math.ceil(pitchY / (tp * mngmnt.muzXBox.zrenderer.pitchLineThicknessInTaps));
@@ -6952,10 +6954,11 @@ var LeftKeysRenderer = (function () {
             this.keysAnchor1, this.keysAnchor4
         ];
         for (var i = 0; i < anchors.length; i++) {
-            zRender.clearResizeSingleAnchor(anchors[i], wholeWidth);
+            zRender.clearResizeSingleAnchor(zRender.muzXBox.currentSchedule, anchors[i], wholeWidth);
         }
     };
     LeftKeysRenderer.prototype.drawKeys = function (zRender, song, ratioDuration, ratioThickness) {
+        var topGridMargin = topGridMarginTp(song, ratioThickness);
         for (var i = 0; i < octaveCount; i++) {
             this.keysAnchor1.content.push(TText(0, topGridMargin + ((octaveCount - i) * 12) * ratioThickness, 'octaveNumNote', '' + (i + 1)));
             this.keysAnchor1.content.push({ x: -1, y: topGridMargin + (0.05 + (octaveCount - i) * 12 - 2) * ratioThickness, w: 5, h: ratioThickness * 0.9, rx: 0.125, ry: 0.25, css: 'keysNote' });

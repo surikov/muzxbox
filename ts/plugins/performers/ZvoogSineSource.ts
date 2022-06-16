@@ -1,4 +1,4 @@
-class ZvoogSineSource implements ZvoogPerformerPlugin {
+class ZvoogSineSource implements ZvoogInstrumentPlugin {
 	out: GainNode;
 	params: ZvoogPluginParameter[];
 	audioContext: AudioContext;
@@ -29,7 +29,7 @@ class ZvoogSineSource implements ZvoogPerformerPlugin {
 			this.poll[i].node.stop();
 		}
 	}
-	addSchedule(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void {
+	scheduleChord(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void {
 		this.cleanup();
 		for (let i = 0; i < chord.length; i++) {
 			this.sendLine(when, tempo, chord[i]);
