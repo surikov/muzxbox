@@ -5,23 +5,71 @@ class GridRenderer {
 	gridAnchor16: TileAnchor;
 	//gridAnchor64: TileAnchor;
 	//gridAnchor256: TileAnchor;
+	backGroundAnchor: TileAnchor;
+	backGroundRectangle: TileRectangle
 	gridLayer: TileLayerDefinition;
+	zoomrender: ZRender;
 	attach(zRender: ZRender) {
 		this.gridLayerGroup = (document.getElementById('gridLayerGroup') as any) as SVGElement;
 		this.initGridAnchors(zRender);
 	}
 	initGridAnchors(zRender: ZRender) {
+		this.zoomrender = zRender;
 		this.gridAnchor1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
 		this.gridAnchor4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
 		this.gridAnchor16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
+		this.backGroundAnchor = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomMax + 1);
 		//this.gridAnchor64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar);
 		//this.gridAnchor256 = TAnchor(0, 0, 1111, 1111, zRender.zoomFar, zRender.zoomMax + 1);
 		this.gridLayer = {
 			g: this.gridLayerGroup, anchors: [
-				this.gridAnchor1, this.gridAnchor4, this.gridAnchor16//, this.gridAnchor64, this.gridAnchor256//, this.gridAnchor0
+				this.backGroundAnchor, this.gridAnchor1, this.gridAnchor4, this.gridAnchor16//, this.gridAnchor64, this.gridAnchor256//, this.gridAnchor0
 			]
 		};
+		this.backGroundRectangle = {
+			x: 0
+			, y: 0
+			, w: 1111
+			, h: 2222
+			//, rx: 1000
+			//, ry: 1000
+			, css: "backGroundFill"
+		};
+		console.log('initGridAnchors');
+		this.backGroundAnchor.content.push(this.backGroundRectangle);
 		zRender.layers.push(this.gridLayer);
+
+	}
+	resizeBackgroundFill() {
+		let rw = this.zoomrender.tileLevel.viewWidth * this.zoomrender.zoomMax;
+		let rh = this.zoomrender.tileLevel.viewHeight * this.zoomrender.zoomMax;
+		let dx = ((rw - this.zoomrender.tileLevel.innerWidth) / this.zoomrender.tileLevel.tapSize) / 2;
+		let dy = ((rh - this.zoomrender.tileLevel.innerHeight) / this.zoomrender.tileLevel.tapSize) / 2;
+
+		if (rw < this.zoomrender.tileLevel.innerWidth) dx = 0;
+		if (rh < this.zoomrender.tileLevel.innerHeight) dy = 0;
+
+		console.log('afterResizeCallback', this.zoomrender.tileLevel.innerWidth, this.zoomrender.tileLevel.innerHeight
+			, '/', this.zoomrender.tileLevel.viewWidth, this.zoomrender.tileLevel.viewHeight);
+		console.log('real', rw, rh
+			, 'shift', dx, dy
+		);
+		let nw = rw / this.zoomrender.tileLevel.tapSize;
+		let nh = rh / this.zoomrender.tileLevel.tapSize;
+
+		if (rw < this.zoomrender.tileLevel.innerWidth) nw = this.zoomrender.tileLevel.innerWidth / this.zoomrender.tileLevel.tapSize;
+		if (rh < this.zoomrender.tileLevel.innerHeight) nh = this.zoomrender.tileLevel.innerHeight / this.zoomrender.tileLevel.tapSize;
+
+		this.backGroundRectangle.x = -dx;
+		this.backGroundRectangle.y = -dy;
+		this.backGroundRectangle.w = nw;
+		this.backGroundRectangle.h = nh;
+
+		this.backGroundAnchor.xx = -dx;
+		this.backGroundAnchor.yy = -dy;
+		this.backGroundAnchor.ww = nw;
+		this.backGroundAnchor.hh = nh;
+
 	}
 	clearGridAnchorsContent(zRender: ZRender, wholeWidth: number): void {
 		let anchors: TileAnchor[] = [
@@ -29,12 +77,12 @@ class GridRenderer {
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			zRender.clearResizeSingleAnchor(zRender.muzXBox.currentSchedule,anchors[i], wholeWidth);
+			zRender.clearResizeSingleAnchor(zRender.muzXBox.currentSchedule, anchors[i], wholeWidth);
 		}
 
 	}
 	drawGrid(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, rhythmPattern: ZvoogMeter[]) {//}, menuButton: TileRectangle) {
-		let topGridMargin=topGridMarginTp(song,ratioThickness);
+		let topGridMargin = topGridMarginTp(song, ratioThickness);
 		this.gridAnchor1.content = [];
 		this.gridAnchor4.content = [];
 		this.gridAnchor16.content = [];

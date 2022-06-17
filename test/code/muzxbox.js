@@ -294,6 +294,7 @@ var TileLevel = (function () {
             this.translateX = this.translateX + dX * this.translateZ;
             this.translateY = this.translateY + dY * this.translateZ;
             this.applyZoomPosition();
+            this.adjustContentPosition();
             this.onMove(dX, dY);
         }
     };
@@ -349,6 +350,7 @@ var TileLevel = (function () {
                     this.startMouseScreenX = touchEvent.touches[0].clientX;
                     this.startMouseScreenY = touchEvent.touches[0].clientY;
                     this.applyZoomPosition();
+                    this.adjustContentPosition();
                     this.onMove(dX, dY);
                     return;
                 }
@@ -382,6 +384,7 @@ var TileLevel = (function () {
                     this.translateZ = zoom;
                     this.dragZoom = 1.0;
                     this.applyZoomPosition();
+                    this.adjustContentPosition();
                 }
             }
         }
@@ -1254,6 +1257,9 @@ var ZRender = (function () {
                 _this.focusManager.reSetFocus(_this, wholeWidth);
             }
         };
+        this.tileLevel.afterResizeCallback = function () {
+            _this.drawSchedule(_this.muzXBox.currentSchedule);
+        };
     };
     ZRender.prototype.zToLOD = function (zz) {
         var curLOD = this.zoomMin;
@@ -1425,6 +1431,7 @@ var ZRender = (function () {
         this.tileLevel.resetModel();
         this.focusManager.reSetFocus(this, wholeWidth);
         this.resetLabel(song);
+        this.gridRenderer.resizeBackgroundFill();
     };
     return ZRender;
 }());
@@ -4835,8 +4842,7 @@ var MuzXBox = (function () {
                             ]
                         }
                     ]
-                },
-                {
+                }, {
                     title: "Second", filters: [], percussions: [], instruments: [
                         {
                             filters: [],
@@ -4861,6 +4867,17 @@ var MuzXBox = (function () {
             measures: [{ meter: { count: 3, division: 4 }, tempo: 120, points: [] }, { meter: { count: 4, division: 4 }, tempo: 90, points: [] }, { meter: { count: 4, division: 4 }, tempo: 180, points: [] }],
             harmony: { tone: '', mode: '', progression: [] }
         };
+        for (var i = 0; i < 100; i++) {
+            emptySchedule.measures.push({ meter: { count: 3, division: 4 }, tempo: 120, points: [] });
+            for (var tt = 0; tt < emptySchedule.tracks.length; tt++) {
+                for (var ii = 0; ii < emptySchedule.tracks[tt].instruments.length; ii++) {
+                    emptySchedule.tracks[tt].instruments[ii].measureChords.push({ chords: [] });
+                }
+                for (var pp = 0; pp < emptySchedule.tracks[tt].percussions.length; pp++) {
+                    emptySchedule.tracks[tt].percussions[pp].measureBunches.push({ bunches: [] });
+                }
+            }
+        }
         this.currentSchedule = emptySchedule;
         this.zrenderer.drawSchedule(emptySchedule);
         this.zMainMenu.fillSongMenuFrom(this.currentSchedule);
@@ -5713,15 +5730,52 @@ var GridRenderer = (function () {
         this.initGridAnchors(zRender);
     };
     GridRenderer.prototype.initGridAnchors = function (zRender) {
+        this.zoomrender = zRender;
         this.gridAnchor1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
         this.gridAnchor4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
         this.gridAnchor16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
+        this.backGroundAnchor = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomMax + 1);
         this.gridLayer = {
             g: this.gridLayerGroup, anchors: [
-                this.gridAnchor1, this.gridAnchor4, this.gridAnchor16
+                this.backGroundAnchor, this.gridAnchor1, this.gridAnchor4, this.gridAnchor16
             ]
         };
+        this.backGroundRectangle = {
+            x: 0,
+            y: 0,
+            w: 1111,
+            h: 2222,
+            css: "backGroundFill"
+        };
+        console.log('initGridAnchors');
+        this.backGroundAnchor.content.push(this.backGroundRectangle);
         zRender.layers.push(this.gridLayer);
+    };
+    GridRenderer.prototype.resizeBackgroundFill = function () {
+        var rw = this.zoomrender.tileLevel.viewWidth * this.zoomrender.zoomMax;
+        var rh = this.zoomrender.tileLevel.viewHeight * this.zoomrender.zoomMax;
+        var dx = ((rw - this.zoomrender.tileLevel.innerWidth) / this.zoomrender.tileLevel.tapSize) / 2;
+        var dy = ((rh - this.zoomrender.tileLevel.innerHeight) / this.zoomrender.tileLevel.tapSize) / 2;
+        if (rw < this.zoomrender.tileLevel.innerWidth)
+            dx = 0;
+        if (rh < this.zoomrender.tileLevel.innerHeight)
+            dy = 0;
+        console.log('afterResizeCallback', this.zoomrender.tileLevel.innerWidth, this.zoomrender.tileLevel.innerHeight, '/', this.zoomrender.tileLevel.viewWidth, this.zoomrender.tileLevel.viewHeight);
+        console.log('real', rw, rh, 'shift', dx, dy);
+        var nw = rw / this.zoomrender.tileLevel.tapSize;
+        var nh = rh / this.zoomrender.tileLevel.tapSize;
+        if (rw < this.zoomrender.tileLevel.innerWidth)
+            nw = this.zoomrender.tileLevel.innerWidth / this.zoomrender.tileLevel.tapSize;
+        if (rh < this.zoomrender.tileLevel.innerHeight)
+            nh = this.zoomrender.tileLevel.innerHeight / this.zoomrender.tileLevel.tapSize;
+        this.backGroundRectangle.x = -dx;
+        this.backGroundRectangle.y = -dy;
+        this.backGroundRectangle.w = nw;
+        this.backGroundRectangle.h = nh;
+        this.backGroundAnchor.xx = -dx;
+        this.backGroundAnchor.yy = -dy;
+        this.backGroundAnchor.ww = nw;
+        this.backGroundAnchor.hh = nh;
     };
     GridRenderer.prototype.clearGridAnchorsContent = function (zRender, wholeWidth) {
         var anchors = [

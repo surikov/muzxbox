@@ -41,7 +41,8 @@ button {
 	height: 100%;
 	margin: 0px;
 	padding: 0px;
-	background-color: var(--background-color);
+	background-color22: var(--background-color);
+	background2: linear-gradient(45deg, rgba(242,115,246,1) 0%, rgba(60,233,244,1) 46%, rgba(255,240,98,1) 100%);
 }
 
 .debug {

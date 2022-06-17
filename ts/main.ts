@@ -12,26 +12,26 @@ let octaveCount = 8;
 let bigGroupMeasure = 16;
 let us: ZUserSetting;
 
-let startSlecetionMeasureIdx=-1;
-let endSlecetionMeasureIdx=-1;
+let startSlecetionMeasureIdx = -1;
+let endSlecetionMeasureIdx = -1;
 
 class MuzXBox {
 	currentSchedule: ZvoogSchedule;
 	zrenderer: ZRender;
 	zInputDeviceHandler: ZInputDeviceHandler;
 	zMainMenu: ZMainMenu;
-/*
-	menuButton: TileRectangle = {
-		x: 0
-		, y: 0
-		, w: 10
-		, h: 10
-		, rx: 3
-		, ry: 3
-		, css: 'debug'
-		, action: this.testFS
-		, id: 'menuButtonTest1'
-	};*/
+	/*
+		menuButton: TileRectangle = {
+			x: 0
+			, y: 0
+			, w: 10
+			, h: 10
+			, rx: 3
+			, ry: 3
+			, css: 'debug'
+			, action: this.testFS
+			, id: 'menuButtonTest1'
+		};*/
 	constructor() {
 		console.log('start');
 		us = new ZUserSetting();
@@ -96,8 +96,7 @@ class MuzXBox {
 						]
 					}
 				]
-			}
-				, {
+			}, {
 				title: "Second", filters: [], percussions: [], instruments: [
 					{
 						filters: []
@@ -119,9 +118,20 @@ class MuzXBox {
 			}
 			]
 			, filters: []
-			, measures: [{ meter: { count: 3, division: 4 }, tempo: 120,points:[] }, { meter: { count: 4, division: 4 }, tempo: 90,points:[] }, { meter: { count: 4, division: 4 }, tempo: 180,points:[] }]
+			, measures: [{ meter: { count: 3, division: 4 }, tempo: 120, points: [] }, { meter: { count: 4, division: 4 }, tempo: 90, points: [] }, { meter: { count: 4, division: 4 }, tempo: 180, points: [] }]
 			, harmony: { tone: '', mode: '', progression: [] }
 		};
+		for (let i = 0; i < 100; i++) {
+			emptySchedule.measures.push({ meter: { count: 3, division: 4 }, tempo: 120, points: [] });
+			for(let tt=0;tt<emptySchedule.tracks.length;tt++){
+				for(let ii=0;ii<emptySchedule.tracks[tt].instruments.length;ii++){
+					emptySchedule.tracks[tt].instruments[ii].measureChords.push({chords:[]});
+				}
+				for(let pp=0;pp<emptySchedule.tracks[tt].percussions.length;pp++){
+					emptySchedule.tracks[tt].percussions[pp].measureBunches.push({bunches:[]});
+				}
+			}
+		}
 		this.currentSchedule = emptySchedule;
 		this.zrenderer.drawSchedule(emptySchedule);//, this.menuButton);
 		this.zMainMenu.fillSongMenuFrom(this.currentSchedule);

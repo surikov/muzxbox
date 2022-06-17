@@ -181,6 +181,7 @@ class TileLevel {
 			this.translateX = this.translateX + dX * this.translateZ;
 			this.translateY = this.translateY + dY * this.translateZ;
 			this.applyZoomPosition();
+			this.adjustContentPosition();
 			this.onMove(dX, dY);
 		}
 	}
@@ -234,6 +235,7 @@ class TileLevel {
 					this.startMouseScreenX = touchEvent.touches[0].clientX;
 					this.startMouseScreenY = touchEvent.touches[0].clientY;
 					this.applyZoomPosition();
+					this.adjustContentPosition();
 					this.onMove(dX, dY);
 					return;
 				}
@@ -265,6 +267,7 @@ class TileLevel {
 					this.translateZ = zoom;
 					this.dragZoom = 1.0;
 					this.applyZoomPosition();
+					this.adjustContentPosition();
 				}
 			}
 		}

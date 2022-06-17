@@ -84,8 +84,13 @@ class ZRender {
 				this.focusManager.reSetFocus(this, wholeWidth);
 			}
 		};
+		this.tileLevel.afterResizeCallback = () => {
+			//this.gridRenderer.resizeBackgroundFill();
+			this.drawSchedule(this.muzXBox.currentSchedule);
+		};
 
 	}
+
 	zToLOD(zz: number): number {
 		var curLOD = this.zoomMin;
 		if (zz >= this.zoomMin) curLOD = this.zoomMin;
@@ -214,6 +219,8 @@ class ZRender {
 		this.focusManager.attachFocus(bx, this);
 		this.leftKeysRenderer.attach(this);
 
+		//this.gridRenderer.resizeBackgroundFill();
+
 	}
 	initDebugAnchors() {
 		this.debugAnchor0 = TAnchor(0, 0, 1111, 1111, this.zoomMin, this.zoomMax + 1);
@@ -307,6 +314,7 @@ class ZRender {
 		this.tileLevel.resetModel();
 		this.focusManager.reSetFocus(this, wholeWidth);//, song,this.tileLevel.translateX,this.tileLevel.translateY,this.tileLevel.translateZ);
 		this.resetLabel(song);
+		this.gridRenderer.resizeBackgroundFill();
 	}
 
 }

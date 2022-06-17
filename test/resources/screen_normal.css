@@ -62,7 +62,12 @@ html {
 	fill: var(--decor_onion);
 	font-size: 16cm;
 }
-
+#trackInfoPanel{
+	z-index: 1;
+	top:0;
+	position: fixed;
+	pointer-events: none;
+}
 .infoLabelPanel {
 	position: fixed;
 	z-index: -1;
@@ -454,6 +459,12 @@ html {
 
 .selectionBackGround {
 	fill: var(--prime_lite);
+}
+
+.backGroundFill {
+	fill22: radial-gradient(red 5%, green 15%, blue 60%);
+	ff:radial-gradient(#e66465, #9198e5);
+	fill:url(#bgFillRectangle) blue;
 }
 
 /*

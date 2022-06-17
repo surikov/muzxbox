@@ -16,21 +16,14 @@
 </head>
 
 <body>
-
-	<div class='infoLabelPanel'>
-		<div id='selectionInfo1'>Test main label with long text</div>
-	</div>
-	<div class='infoLabelPanel'>
-		<div id='selectionInfo2'>Label with long text</div>
-	</div>
-	<div class='infoLabelPanel'>
-		<div id='selectionInfo3'>Third label with long text</div>
-	</div>
-	<div class='infoLabelPanel'>
-		<div id='selectionInfo4'>Some more text</div>
-	</div>
+	
 
 	<svg id="contentSVG" class='contentSVG' viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+		<radialGradient id="bgFillRectangle" cx="100%" cy="50%" r="100%" fx="100%" fy="50%">
+			<stop offset="0%" stop-color=var(--background_base)></stop>
+			<stop offset="100%" stop-color=var(--secondary_lite)></stop>
+		</radialGradient >
+        
 		<g id='gridLayerGroup'></g>
 		<g id='leftKeysGroup'></g>
 		<g id='bottomTimelineLayerGroup'></g>
@@ -41,6 +34,21 @@
 		<g id='focusMarkerLayer'></g>
 		<g id='debugLayerGroup'></g>
 	</svg>
+
+	<div id='trackInfoPanel'>
+		<div class='infoLabelPanel'>
+			<div id='selectionInfo1'>Test main label with long text</div>
+		</div>
+		<div class='infoLabelPanel'>
+			<div id='selectionInfo2'>Label with long text</div>
+		</div>
+		<div class='infoLabelPanel'>
+			<div id='selectionInfo3'>Third label with long text</div>
+		</div>
+		<div class='infoLabelPanel'>
+			<div id='selectionInfo4'>Some more text</div>
+		</div>
+	</div>
 
 	<div id='menuButtonDiv'>
 		<img id='menuButtonImage' src="resources/y_button.svg" onclick="MZXB.zMainMenu.openNextLevel();" />

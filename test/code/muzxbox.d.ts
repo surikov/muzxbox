@@ -1158,9 +1158,13 @@ declare class GridRenderer {
     gridAnchor1: TileAnchor;
     gridAnchor4: TileAnchor;
     gridAnchor16: TileAnchor;
+    backGroundAnchor: TileAnchor;
+    backGroundRectangle: TileRectangle;
     gridLayer: TileLayerDefinition;
+    zoomrender: ZRender;
     attach(zRender: ZRender): void;
     initGridAnchors(zRender: ZRender): void;
+    resizeBackgroundFill(): void;
     clearGridAnchorsContent(zRender: ZRender, wholeWidth: number): void;
     drawGrid(zRender: ZRender, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number, rhythmPattern: ZvoogMeter[]): void;
     reSetGrid(zrenderer: ZRender, meters: ZvoogMeter[], currentSchedule: ZvoogSchedule): void;
