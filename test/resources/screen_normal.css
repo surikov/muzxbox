@@ -57,11 +57,20 @@ html {
 	fill: var(--decor_onion);
 	font-size: 6cm;
 }
-
 .octaveNumMeasure {
 	fill: var(--decor_onion);
 	font-size: 16cm;
 }
+
+.drumTitleNote {
+	fill: var(--decor_solid);
+	font-size: 1cm;
+}
+.drumTitleMeasure {
+	fill: var(--decor_solid);
+	font-size: 6cm;
+}
+
 #trackInfoPanel{
 	z-index: 1;
 	top:0;

@@ -35,7 +35,7 @@ class GridRenderer {
 			//, ry: 1000
 			, css: "backGroundFill"
 		};
-		console.log('initGridAnchors');
+		//console.log('initGridAnchors');
 		this.backGroundAnchor.content.push(this.backGroundRectangle);
 		zRender.layers.push(this.gridLayer);
 
@@ -49,11 +49,11 @@ class GridRenderer {
 		if (rw < this.zoomrender.tileLevel.innerWidth) dx = 0;
 		if (rh < this.zoomrender.tileLevel.innerHeight) dy = 0;
 
-		console.log('afterResizeCallback', this.zoomrender.tileLevel.innerWidth, this.zoomrender.tileLevel.innerHeight
-			, '/', this.zoomrender.tileLevel.viewWidth, this.zoomrender.tileLevel.viewHeight);
-		console.log('real', rw, rh
-			, 'shift', dx, dy
-		);
+		//console.log('afterResizeCallback', this.zoomrender.tileLevel.innerWidth, this.zoomrender.tileLevel.innerHeight
+		//	, '/', this.zoomrender.tileLevel.viewWidth, this.zoomrender.tileLevel.viewHeight);
+		//console.log('real', rw, rh
+		//	, 'shift', dx, dy
+		//);
 		let nw = rw / this.zoomrender.tileLevel.tapSize;
 		let nh = rh / this.zoomrender.tileLevel.tapSize;
 

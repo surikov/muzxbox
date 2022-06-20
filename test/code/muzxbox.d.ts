@@ -836,6 +836,7 @@ declare type MIDISongData = {
 };
 declare let instrumentNamesArray: string[];
 declare let drumNamesArray: string[];
+declare function findrumTitles(nn: number): string;
 declare function drumTitles(): string[];
 declare function instrumentTitles(): string[];
 declare class MIDIFileImporter implements ZvoogStore {
@@ -975,13 +976,6 @@ declare class MidiParser {
     parseNotes(): void;
     nextEvent(stream: DataViewStream): MIDIEvent;
     parseTrackEvents(track: MIDIFileTrack): void;
-    takeDrumVoice(drum: number, drumVoices: {
-        voice: ZvoogInstrumentVoice;
-        drum: number;
-    }[]): {
-        voice: ZvoogInstrumentVoice;
-        drum: number;
-    };
     parametersDefs(plugin: ZvoogPlugin): ZvoogParameterData[];
     convert(): ZvoogSchedule;
     findOrCreateTrack(trackNum: number, channelNum: number, trackChannel: {
@@ -1191,22 +1185,32 @@ declare class LayerSelector {
     upTrack(trk: number): () => void;
     upTrackFx(trk: number, fx: number): () => void;
     upTrackFxParam(trk: number, fx: number, param: number): () => void;
-    upVox(trk: number, vox: number): () => void;
-    upVoxFx(trk: number, vox: number, fx: number): () => void;
-    upVoxFxParam(trk: number, vox: number, fx: number, param: number): () => void;
-    upVoxProvider(trk: number, vox: number): () => void;
-    upVoxProviderParam(trk: number, vox: number, param: number): () => void;
+    upInstrument(trk: number, vox: number): () => void;
+    upDrum(trk: number, vox: number): () => void;
+    upInstrumentFx(trk: number, vox: number, fx: number): () => void;
+    upDrumFx(trk: number, vox: number, fx: number): () => void;
+    upInstrumentFxParam(trk: number, vox: number, fx: number, param: number): () => void;
+    upDrumFxParam(trk: number, vox: number, fx: number, param: number): () => void;
+    upInstrumentProvider(trk: number, vox: number): () => void;
+    upDrumProvider(trk: number, vox: number): () => void;
+    upInstrumentProviderParam(trk: number, vox: number, param: number): () => void;
+    upDrumProviderParam(trk: number, vox: number, param: number): () => void;
     clearLevelFocus(song: ZvoogSchedule): void;
     selectSongFx(song: ZvoogSchedule, fxNum: number): void;
     selectSongFxParam(song: ZvoogSchedule, fxNum: number, prNum: number): void;
     selectSongTrack(song: ZvoogSchedule, trNum: number): void;
     selectSongTrackFx(song: ZvoogSchedule, trNum: number, fxNum: number): void;
     selectSongTrackFxParam(song: ZvoogSchedule, trNum: number, fxNum: number, prNum: number): void;
-    selectSongTrackVox(song: ZvoogSchedule, trNum: number, voxNum: number): void;
-    selectSongTrackVoxPerformer(song: ZvoogSchedule, trNum: number, voxNum: number): void;
-    selectSongTrackVoxPerformerParam(song: ZvoogSchedule, trNum: number, voxNum: number, prNum: number): void;
-    selectSongTrackVoxFx(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number): void;
-    selectSongTrackVoxFxParam(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number, prNum: number): void;
+    selectSongTrackInstrument(song: ZvoogSchedule, trNum: number, voxNum: number): void;
+    selectSongTrackDrum(song: ZvoogSchedule, trNum: number, voxNum: number): void;
+    selectSongTrackInstrumentPerformer(song: ZvoogSchedule, trNum: number, voxNum: number): void;
+    selectSongTrackDrumPerformer(song: ZvoogSchedule, trNum: number, voxNum: number): void;
+    selectSongTrackInstrumentPerformerParam(song: ZvoogSchedule, trNum: number, voxNum: number, prNum: number): void;
+    selectSongTrackDrumPerformerParam(song: ZvoogSchedule, trNum: number, voxNum: number, prNum: number): void;
+    selectSongTrackInstrumentFx(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number): void;
+    selectSongTrackDrumFx(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number): void;
+    selectSongTrackInstrumentFxParam(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number, prNum: number): void;
+    selectSongTrackDrumFxParam(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number, prNum: number): void;
     almostFirstInSong(song: ZvoogSchedule): void;
     almostFirstInTrack(track: ZvoogTrack): void;
 }

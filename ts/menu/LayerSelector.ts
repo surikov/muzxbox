@@ -59,58 +59,82 @@ class LayerSelector {
 		};
 	}
 
-	upVox(trk: number, vox: number): () => void {
+	upInstrument(trk: number, vox: number): () => void {
 		return () => {
-			console.log('upVox', trk, vox);
-			//this.muzXBox.currentSchedule.obverseTrackFilter = trk;
-			//this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
-			this.selectSongTrackVox(this.muzXBox.currentSchedule, trk, vox)
+			console.log('upInstrument', trk, vox);
+			this.selectSongTrackInstrument(this.muzXBox.currentSchedule, trk, vox)
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
 		};
 	}
-	upVoxFx(trk: number, vox: number, fx: number): () => void {
+	upDrum(trk: number, vox: number): () => void {
 		return () => {
-			console.log('upVoxFx', trk, vox, fx);
-			//this.muzXBox.currentSchedule.obverseTrackFilter = trk;
-			//this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
-			//this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = fx + 1;
-			this.selectSongTrackVoxFx(this.muzXBox.currentSchedule, trk, vox, fx);
+			console.log('upDrum', trk, vox);
+			this.selectSongTrackDrum(this.muzXBox.currentSchedule, trk, vox)
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
 		};
 	}
-	upVoxFxParam(trk: number, vox: number, fx: number, param: number): () => void {
+	upInstrumentFx(trk: number, vox: number, fx: number): () => void {
 		return () => {
-			console.log('upVoxFxParam', trk, vox, fx, param);
-			//this.muzXBox.currentSchedule.obverseTrackFilter = trk;
-			//this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
-			//this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = fx + 1;
-			//this.muzXBox.currentSchedule.tracks[trk].voices[vox].filters[fx].obverseParameter = fx;
-			this.selectSongTrackVoxFxParam(this.muzXBox.currentSchedule, trk, vox, fx, param);
+			console.log('upInstrumentFx', trk, vox, fx);
+			this.selectSongTrackInstrumentFx(this.muzXBox.currentSchedule, trk, vox, fx);
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
 		};
 	}
-	upVoxProvider(trk: number, vox: number): () => void {
+	upDrumFx(trk: number, vox: number, fx: number): () => void {
 		return () => {
-			console.log('upVoxProvider', trk, vox);
-			//this.muzXBox.currentSchedule.obverseTrackFilter = trk;
-			//this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
-			//this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = 0;
-			this.selectSongTrackVoxPerformer(this.muzXBox.currentSchedule, trk, vox);
+			console.log('upDrumFx', trk, vox, fx);
+			this.selectSongTrackDrumFx(this.muzXBox.currentSchedule, trk, vox, fx);
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
 		};
 	}
-	upVoxProviderParam(trk: number, vox: number, param: number): () => void {
+	upInstrumentFxParam(trk: number, vox: number, fx: number, param: number): () => void {
+		return () => {
+			console.log('upInstrumentFxParam', trk, vox, fx, param);
+			this.selectSongTrackInstrumentFxParam(this.muzXBox.currentSchedule, trk, vox, fx, param);
+			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
+		};
+	}
+	upDrumFxParam(trk: number, vox: number, fx: number, param: number): () => void {
+		return () => {
+			console.log('upDrumFxParam', trk, vox, fx, param);
+			this.selectSongTrackDrumFxParam(this.muzXBox.currentSchedule, trk, vox, fx, param);
+			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
+		};
+	}
+	upInstrumentProvider(trk: number, vox: number): () => void {
+		return () => {
+			console.log('upInstrumentProvider', trk, vox);
+			this.selectSongTrackInstrumentPerformer(this.muzXBox.currentSchedule, trk, vox);
+			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
+		};
+	}
+	upDrumProvider(trk: number, vox: number): () => void {
+		return () => {
+			console.log('upDrumProvider', trk, vox);
+			this.selectSongTrackDrumPerformer(this.muzXBox.currentSchedule, trk, vox);
+			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
+		};
+	}
+	upInstrumentProviderParam(trk: number, vox: number, param: number): () => void {
 		return () => {
 			console.log('upVoxProviderParam', trk, vox, param);
-			//this.muzXBox.currentSchedule.obverseTrackFilter = trk;
-			//this.muzXBox.currentSchedule.tracks[trk].obverseVoiceFilter = vox;
-			//this.muzXBox.currentSchedule.tracks[trk].voices[vox].obversePerformerFilter = 0;
-			//this.muzXBox.currentSchedule.tracks[trk].voices[vox].performer.obverseParameter = 0;
-			this.selectSongTrackVoxPerformerParam(this.muzXBox.currentSchedule, trk, vox, param);
+			this.selectSongTrackInstrumentPerformerParam(this.muzXBox.currentSchedule, trk, vox, param);
+			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
+			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
+		};
+	}
+	upDrumProviderParam(trk: number, vox: number, param: number): () => void {
+		return () => {
+			console.log('upDrumProviderParam', trk, vox, param);
+			this.selectSongTrackDrumPerformerParam(this.muzXBox.currentSchedule, trk, vox, param);
 			this.muzXBox.zrenderer.drawSchedule(this.muzXBox.currentSchedule);
 			this.muzXBox.zMainMenu.fillSongMenuFrom(this.muzXBox.currentSchedule);
 		};
@@ -149,6 +173,21 @@ class LayerSelector {
 					}
 				}
 			}
+			for (let pp = 0; pp < track.percussions.length; pp++) {
+				let voice = track.percussions[pp];
+				voice.focus = false;
+				voice.percussionSetting.focus = false;
+				for (let prpr = 0; prpr < voice.percussionSetting.parameters.length; prpr++) {
+					voice.percussionSetting.parameters[prpr].focus = false;
+				}
+				for (let fx = 0; fx < voice.filters.length; fx++) {
+					let filter = voice.filters[fx]
+					filter.focus = false;
+					for (let fxpr = 0; fxpr < filter.parameters.length; fxpr++) {
+						filter.parameters[fxpr].focus = false;
+					}
+				}
+			}
 		}
 	}
 	selectSongFx(song: ZvoogSchedule, fxNum: number) {
@@ -175,37 +214,69 @@ class LayerSelector {
 		song.tracks[trNum].filters[fxNum].focus = true;
 		song.tracks[trNum].filters[fxNum].parameters[prNum].focus = true;
 	}
-	selectSongTrackVox(song: ZvoogSchedule, trNum: number, voxNum: number) {
+	selectSongTrackInstrument(song: ZvoogSchedule, trNum: number, voxNum: number) {
 		this.clearLevelFocus(song);
 		song.tracks[trNum].focus = true;
 		song.tracks[trNum].instruments[voxNum].focus = true;
 		//console.log('selectSongTrackVox',trNum,song.tracks[trNum].title,voxNum,song.tracks[trNum].voices[voxNum].title);
 	}
-	selectSongTrackVoxPerformer(song: ZvoogSchedule, trNum: number, voxNum: number) {
+	selectSongTrackDrum(song: ZvoogSchedule, trNum: number, voxNum: number) {
+		this.clearLevelFocus(song);
+		song.tracks[trNum].focus = true;
+		song.tracks[trNum].percussions[voxNum].focus = true;
+		//console.log('selectSongTrackVox',trNum,song.tracks[trNum].title,voxNum,song.tracks[trNum].voices[voxNum].title);
+	}
+	selectSongTrackInstrumentPerformer(song: ZvoogSchedule, trNum: number, voxNum: number) {
 		this.clearLevelFocus(song);
 		song.tracks[trNum].focus = true;
 		song.tracks[trNum].instruments[voxNum].focus = true;
 		song.tracks[trNum].instruments[voxNum].instrumentSetting.focus = true;
 	}
-	selectSongTrackVoxPerformerParam(song: ZvoogSchedule, trNum: number, voxNum: number, prNum: number) {
+	selectSongTrackDrumPerformer(song: ZvoogSchedule, trNum: number, voxNum: number) {
+		this.clearLevelFocus(song);
+		song.tracks[trNum].focus = true;
+		song.tracks[trNum].percussions[voxNum].focus = true;
+		song.tracks[trNum].percussions[voxNum].percussionSetting.focus = true;
+	}
+	selectSongTrackInstrumentPerformerParam(song: ZvoogSchedule, trNum: number, voxNum: number, prNum: number) {
 		this.clearLevelFocus(song);
 		song.tracks[trNum].focus = true;
 		song.tracks[trNum].instruments[voxNum].focus = true;
 		song.tracks[trNum].instruments[voxNum].instrumentSetting.focus = true;
 		song.tracks[trNum].instruments[voxNum].instrumentSetting.parameters[prNum].focus = true;
 	}
-	selectSongTrackVoxFx(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number) {
+	selectSongTrackDrumPerformerParam(song: ZvoogSchedule, trNum: number, voxNum: number, prNum: number) {
+		this.clearLevelFocus(song);
+		song.tracks[trNum].focus = true;
+		song.tracks[trNum].percussions[voxNum].focus = true;
+		song.tracks[trNum].percussions[voxNum].percussionSetting.focus = true;
+		song.tracks[trNum].percussions[voxNum].percussionSetting.parameters[prNum].focus = true;
+	}
+	selectSongTrackInstrumentFx(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number) {
 		this.clearLevelFocus(song);
 		song.tracks[trNum].focus = true;
 		song.tracks[trNum].instruments[voxNum].focus = true;
 		song.tracks[trNum].instruments[voxNum].filters[fxNum].focus = true;
 	}
-	selectSongTrackVoxFxParam(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number, prNum: number) {
+	selectSongTrackDrumFx(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number) {
+		this.clearLevelFocus(song);
+		song.tracks[trNum].focus = true;
+		song.tracks[trNum].percussions[voxNum].focus = true;
+		song.tracks[trNum].percussions[voxNum].filters[fxNum].focus = true;
+	}
+	selectSongTrackInstrumentFxParam(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number, prNum: number) {
 		this.clearLevelFocus(song);
 		song.tracks[trNum].focus = true;
 		song.tracks[trNum].instruments[voxNum].focus = true;
 		song.tracks[trNum].instruments[voxNum].filters[fxNum].focus = true;
 		song.tracks[trNum].instruments[voxNum].filters[fxNum].parameters[prNum].focus = true;
+	}
+	selectSongTrackDrumFxParam(song: ZvoogSchedule, trNum: number, voxNum: number, fxNum: number, prNum: number) {
+		this.clearLevelFocus(song);
+		song.tracks[trNum].focus = true;
+		song.tracks[trNum].percussions[voxNum].focus = true;
+		song.tracks[trNum].percussions[voxNum].filters[fxNum].focus = true;
+		song.tracks[trNum].percussions[voxNum].filters[fxNum].parameters[prNum].focus = true;
 	}
 
 	almostFirstInSong(song: ZvoogSchedule) {
@@ -224,7 +295,17 @@ class LayerSelector {
 		for (let vx = 0; vx < track.instruments.length; vx++) {
 			if (track.instruments[vx].focus) return;
 		}
-		if (track.instruments.length > 0) track.instruments[0].focus = true;
+		for (let vx = 0; vx < track.percussions.length; vx++) {
+			if (track.percussions[vx].focus) return;
+		}
+		if (track.instruments.length > 0) {
+			track.instruments[0].focus = true;
+			return;
+		}
+		if (track.percussions.length > 0) {
+			track.percussions[0].focus = true;
+			return;
+		}
 	}
 	
 	

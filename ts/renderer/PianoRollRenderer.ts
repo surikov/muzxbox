@@ -262,7 +262,7 @@ class PianoRollRenderer {
 		return measureMaxLen;
 	}
 	createNoteUpAction(layerSelector: LayerSelector, tt: number, vv: number): (x: number, y: number) => void {
-		let up = layerSelector.upVox(tt, vv);
+		let up = layerSelector.upInstrument(tt, vv);
 		return (x: number, y: number) => {
 			up();
 			//console.log('click', x, y); 

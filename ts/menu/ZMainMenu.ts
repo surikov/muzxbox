@@ -318,24 +318,24 @@ class ZMainMenu {
 			tr.items.push({ label: "-track", icon: "", autoclose: false, action: () => { console.log('-track'); } });
 			tr.items.push({ label: "+tfx", icon: "", autoclose: false, action: () => { console.log('+tfx'); } });
 			tr.items.push({ label: "+vox", icon: "", autoclose: false, action: () => { console.log('+vox'); } });
-			for (var vv = 0; vv < songtrack.instruments.length; vv++) {
-				var songvox = songtrack.instruments[vv];
-				var vox: ZMenuFolder = {
+			for (let vv = 0; vv < songtrack.instruments.length; vv++) {
+				let songvox = songtrack.instruments[vv];
+				let vox: ZMenuFolder = {
 					path: //'vox ' + 
 						songvox.title, icon: "", folders: [], items: []
-					, afterOpen: this.layerSelector.upVox(tt, vv)
+					, afterOpen: this.layerSelector.upInstrument(tt, vv)
 				};
 				tr.folders.push(vox);
 				vox.items.push({ label: "+vfx", icon: "", autoclose: false, action: () => { console.log('+vfx'); } });
-				var source: ZMenuFolder = {
+				let source: ZMenuFolder = {
 					path: 'src ' + songvox.instrumentSetting.kind, icon: "", folders: [], items: []
-					, afterOpen: this.layerSelector.upVoxProvider(tt, vv)
+					, afterOpen: this.layerSelector.upInstrumentProvider(tt, vv)
 				};
 				source.items.push({ label: "?src", icon: "", autoclose: false, action: () => { console.log('?src'); } });
 				for (var kk = 0; kk < songvox.instrumentSetting.parameters.length; kk++) {
 					var par: ZMenuItem = {
 						label: "par " + kk + " " + songvox.instrumentSetting.parameters[kk].caption, icon: "", autoclose: false
-						, action: this.layerSelector.upVoxProviderParam(tt, vv, kk)
+						, action: this.layerSelector.upInstrumentProviderParam(tt, vv, kk)
 					};
 					source.items.push(par);
 				}
@@ -343,7 +343,7 @@ class ZMainMenu {
 				for (var ff = 0; ff < songvox.filters.length; ff++) {
 					var filter: ZMenuFolder = {
 						path: 'fx ' + songvox.filters[ff].kind, icon: "", folders: [], items: []
-						, afterOpen: this.layerSelector.upVoxFx(tt, vv, ff)
+						, afterOpen: this.layerSelector.upInstrumentFx(tt, vv, ff)
 					};
 					vox.folders.push(filter);
 					var voxfilter = songvox.filters[ff];
@@ -351,7 +351,46 @@ class ZMainMenu {
 					for (var kk = 0; kk < voxfilter.parameters.length; kk++) {
 						var par: ZMenuItem = {
 							label: "par " + kk + " " + voxfilter.parameters[kk].caption, icon: "", autoclose: false
-							, action: this.layerSelector.upVoxFxParam(tt, vv, ff, kk)
+							, action: this.layerSelector.upInstrumentFxParam(tt, vv, ff, kk)
+						};
+						filter.items.push(par);
+					}
+				}
+			}
+			for (let pp = 0; pp < songtrack.percussions.length; pp++) {
+				let songvox = songtrack.percussions[pp];
+				let vox: ZMenuFolder = {
+					path: //'vox ' + 
+						songvox.title, icon: "", folders: [], items: []
+					, afterOpen: this.layerSelector.upDrum(tt, pp)
+				};
+				tr.folders.push(vox);
+				vox.items.push({ label: "+vfx", icon: "", autoclose: false, action: () => { console.log('+vfx'); } });
+				let source: ZMenuFolder = {
+					path: 'src ' + songvox.percussionSetting.kind, icon: "", folders: [], items: []
+					, afterOpen: this.layerSelector.upDrumProvider(tt, pp)
+				};
+				source.items.push({ label: "?src", icon: "", autoclose: false, action: () => { console.log('?src'); } });
+				for (var kk = 0; kk < songvox.percussionSetting.parameters.length; kk++) {
+					var par: ZMenuItem = {
+						label: "par " + kk + " " + songvox.percussionSetting.parameters[kk].caption, icon: "", autoclose: false
+						, action: this.layerSelector.upDrumProviderParam(tt, pp, kk)
+					};
+					source.items.push(par);
+				}
+				vox.folders.push(source);
+				for (var ff = 0; ff < songvox.filters.length; ff++) {
+					var filter: ZMenuFolder = {
+						path: 'fx ' + songvox.filters[ff].kind, icon: "", folders: [], items: []
+						, afterOpen: this.layerSelector.upDrumFx(tt, pp, ff)
+					};
+					vox.folders.push(filter);
+					var voxfilter = songvox.filters[ff];
+					filter.items.push({ label: "-vfx", icon: "", autoclose: false, action: () => { console.log('-vfx'); } });
+					for (var kk = 0; kk < voxfilter.parameters.length; kk++) {
+						var par: ZMenuItem = {
+							label: "par " + kk + " " + voxfilter.parameters[kk].caption, icon: "", autoclose: false
+							, action: this.layerSelector.upDrumFxParam(tt, pp, ff, kk)
 						};
 						filter.items.push(par);
 					}

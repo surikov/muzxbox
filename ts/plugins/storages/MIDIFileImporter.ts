@@ -87,6 +87,15 @@ type MIDISongData = {
 };
 let instrumentNamesArray: string[] = [];
 let drumNamesArray: string[] = [];
+function findrumTitles(nn: number): string {
+	let name = drumTitles()[nn];
+	if (name) {
+		return '' + name;
+	} else {
+		return 'MIDI' + nn;
+	}
+
+}
 function drumTitles(): string[] {
 	if (drumNamesArray.length == 0) {
 		var drumNames: string[] = [];
@@ -961,28 +970,28 @@ class MidiParser {
 			track.trackevents.push(e);
 		}
 	}
-	takeDrumVoice(drum: number, drumVoices: { voice: ZvoogInstrumentVoice, drum: number }[]): { voice: ZvoogInstrumentVoice, drum: number } {
+	/* __takeDrumVoice(drum: number, drumVoices: { voice: ZvoogPercussionVoice, drum: number }[]): { voice: ZvoogPercussionVoice, drum: number } {
 		for (var i = 0; i < drumVoices.length; i++) {
 			if (drumVoices[i].drum == drum) {
 				return drumVoices[i];
 			}
 		}
-		var voice: ZvoogInstrumentVoice = {
-			measureChords: []
+		var voice: ZvoogPercussionVoice = {
+			measureBunches: []
 			//, disabled: false
-			, instrumentSetting: {
-				instrumentPlugin: null//new WafPercSource()//drum)
+			, percussionSetting: {
+				percussionPlugin: null//new WafPercSource()//drum)
 				, parameters: []
 				, kind: "wafdrum"
 				, initial: "" + drum
 			}
 			, filters: []
-			, title: 'Drum ' + drum + ': ' + drumTitles()[drum]
+			, title: 'Drum ' + drum + ': ' + findrumTitles(drum)
 		};
 		var drvc = { voice: voice, drum: drum };
 		drumVoices.push(drvc);
 		return drvc;
-	}
+	}*/
 	parametersDefs(plugin: ZvoogPlugin): ZvoogParameterData[] {
 		var pars: ZvoogParameterData[] = [];
 		var pp = 0;
@@ -1137,13 +1146,13 @@ class MidiParser {
 						when: skipMeter
 						, lyrics: lyricsPiece.txt
 					}
-					schedule.measures[tc-1].points.push(point);
+					schedule.measures[tc - 1].points.push(point);
 					//console.log(tc,skipMeter,lyricsPiece);
 					break;
 				}
 			}
 		}
-		for (var i = 0; i < midisong.miditracks.length; i++) {
+		for (let i = 0; i < midisong.miditracks.length; i++) {
 			/*var trackTictle: string = '';
 			if (midisong.miditracks[i].title) {
 				trackTictle = midisong.miditracks[i].title;
@@ -1157,9 +1166,9 @@ class MidiParser {
 					trackTictle = 'track ' + i;
 				}
 			}*/
-			var track: ZvoogTrack = {
+			let track: ZvoogTrack = {
 				title: '' + i
-				, instruments: [],percussions:[]
+				, instruments: [], percussions: []
 				, filters: [{
 					filterPlugin: null
 					, parameters: this.parametersDefs(testGain)
@@ -1168,8 +1177,8 @@ class MidiParser {
 				}]
 			};
 			schedule.tracks.push(track);
-			var firstChannelNum = 0;
-			for (var ch = 0; ch < midisong.miditracks[i].songchords.length; ch++) {
+			let firstChannelNum = 0;
+			for (let ch = 0; ch < midisong.miditracks[i].songchords.length; ch++) {
 				firstChannelNum = midisong.miditracks[i].songchords[ch].channel;
 				break;
 			}
@@ -1180,13 +1189,17 @@ class MidiParser {
 					, kind: "equalizer"
 					, initial: ""
 				});
-				var drumNums: number[] = [];
-				for (var ch = 0; ch < midisong.miditracks[i].songchords.length; ch++) {
-					for (var nn = 0; nn < midisong.miditracks[i].songchords[ch].notes.length; nn++) {
-						var pinum: number = midisong.miditracks[i].songchords[ch].notes[nn].points[0].pitch;
-						if (drumNums.indexOf(pinum) < 0) {
+				let drumNums: number[] = [];
+				for (let ch = 0; ch < midisong.miditracks[i].songchords.length; ch++) {
+					var midichord: MIDISongChord = midisong.miditracks[i].songchords[ch];
+					for (let nn = 0; nn < midichord.notes.length; nn++) {
+						let pinum: number = midichord.notes[nn].points[0].pitch;
+						let idx = drumNums.indexOf(pinum);
+						let voice: ZvoogPercussionVoice;
+						//console.log(idx,pinum);
+						if (idx < 0) {
 							drumNums.push(pinum);
-							let voice: ZvoogPercussionVoice = {
+							voice = {
 								measureBunches: []
 								, percussionSetting: {
 									percussionPlugin: null
@@ -1200,32 +1213,74 @@ class MidiParser {
 									, kind: "gain"
 									, initial: ""
 								}]
-								, title: drumTitles()[pinum]
+								, title: '' + pinum + ' ' + findrumTitles(pinum)
 							};
 							track.percussions.push(voice);
-							track.title = '' + pinum + ': Drums';
-							for (var mc = 0; mc < timeline.length; mc++) {
+							track.title = 'Drums';
+							for (let mc = 0; mc < timeline.length; mc++) {
 								voice.measureBunches.push({ bunches: [] });
 							}
-							for (var chn = 0; chn < midisong.miditracks[i].songchords.length; chn++) {
-								var midichord: MIDISongChord = midisong.miditracks[i].songchords[chn];
-								for (var tc = 0; tc < timeline.length; tc++) {
-									if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
-										var timelineMeasure = timeline[tc - 1];
-										var skipInMeasureMs = midichord.when - timelineMeasure.ms;
-										var skipMeter: ZvoogMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
-										skipMeter = DUU(skipMeter).simplify();
-										let onehit: ZvoogChordPoint = {
-											when: skipMeter
-										}
-										voice.measureBunches[tc - 1].bunches.push(onehit);
-										break;
-									}
+							//console.log(voice.title);
+						} else {
+							voice = track.percussions[idx];
+						}
+						for (var tc = 0; tc < timeline.length; tc++) {
+							if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
+								var timelineMeasure = timeline[tc - 1];
+								var skipInMeasureMs = midichord.when - timelineMeasure.ms;
+								var skipMeter: ZvoogMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
+								skipMeter = DUU(skipMeter).simplify();
+								let onehit: ZvoogChordPoint = {
+									when: skipMeter
 								}
+								voice.measureBunches[tc - 1].bunches.push(onehit);
+								break;
 							}
 						}
+
+						//if (drumNums.indexOf(pinum) < 0) {
+						/*drumNums.push(pinum);
+						let voice: ZvoogPercussionVoice = {
+							measureBunches: []
+							, percussionSetting: {
+								percussionPlugin: null
+								, parameters: this.parametersDefs(wafdrum)
+								, kind: 'wafdrum'
+								, initial: '' + pinum
+							}
+							, filters: [{
+								filterPlugin: null
+								, parameters: this.parametersDefs(testGain)
+								, kind: "gain"
+								, initial: ""
+							}]
+							, title: '' + pinum + ' ' + findrumTitles(pinum)
+						};
+						track.percussions.push(voice);
+						track.title = '' + pinum + ': Drums';*/
+						/*for (var mc = 0; mc < timeline.length; mc++) {
+							voice.measureBunches.push({ bunches: [] });
+						}*/
+						/*for (var chn = 0; chn < midisong.miditracks[i].songchords.length; chn++) {
+							var midichord: MIDISongChord = midisong.miditracks[i].songchords[chn];
+							for (var tc = 0; tc < timeline.length; tc++) {
+								if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
+									var timelineMeasure = timeline[tc - 1];
+									var skipInMeasureMs = midichord.when - timelineMeasure.ms;
+									var skipMeter: ZvoogMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
+									skipMeter = DUU(skipMeter).simplify();
+									let onehit: ZvoogChordPoint = {
+										when: skipMeter
+									}
+									voice.measureBunches[tc - 1].bunches.push(onehit);
+									break;
+								}
+							}
+						}*/
+						//}
 					}
 				}
+				//console.log(i, firstChannelNum, drumNums);
 			} else {
 				let voice: ZvoogInstrumentVoice = {
 					measureChords: []

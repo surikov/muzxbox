@@ -2715,6 +2715,15 @@ function createPluginPercussion(id) {
 }
 var instrumentNamesArray = [];
 var drumNamesArray = [];
+function findrumTitles(nn) {
+    var name = drumTitles()[nn];
+    if (name) {
+        return '' + name;
+    }
+    else {
+        return 'MIDI' + nn;
+    }
+}
 function drumTitles() {
     if (drumNamesArray.length == 0) {
         var drumNames = [];
@@ -3613,27 +3622,6 @@ var MidiParser = (function () {
             track.trackevents.push(e);
         }
     };
-    MidiParser.prototype.takeDrumVoice = function (drum, drumVoices) {
-        for (var i = 0; i < drumVoices.length; i++) {
-            if (drumVoices[i].drum == drum) {
-                return drumVoices[i];
-            }
-        }
-        var voice = {
-            measureChords: [],
-            instrumentSetting: {
-                instrumentPlugin: null,
-                parameters: [],
-                kind: "wafdrum",
-                initial: "" + drum
-            },
-            filters: [],
-            title: 'Drum ' + drum + ': ' + drumTitles()[drum]
-        };
-        var drvc = { voice: voice, drum: drum };
-        drumVoices.push(drvc);
-        return drvc;
-    };
     MidiParser.prototype.parametersDefs = function (plugin) {
         var pars = [];
         var pp = 0;
@@ -3654,10 +3642,10 @@ var MidiParser = (function () {
         var maxDr = -1;
         for (var tt_1 = 0; tt_1 < midisong.miditracks.length; tt_1++) {
             var onetrack = midisong.miditracks[tt_1];
-            for (var ch_1 = 0; ch_1 < onetrack.songchords.length; ch_1++) {
-                var onechord_1 = onetrack.songchords[ch_1];
-                for (var nn_1 = 0; nn_1 < onechord_1.notes.length; nn_1++) {
-                    var pp = onechord_1.notes[nn_1].points[0].pitch;
+            for (var ch = 0; ch < onetrack.songchords.length; ch++) {
+                var onechord_1 = onetrack.songchords[ch];
+                for (var nn = 0; nn < onechord_1.notes.length; nn++) {
+                    var pp = onechord_1.notes[nn].points[0].pitch;
                     if (onechord_1.channel == 9) {
                         if (maxDr < pp) {
                             maxDr = pp;
@@ -3794,9 +3782,9 @@ var MidiParser = (function () {
                 }
             }
         }
-        for (var i = 0; i < midisong.miditracks.length; i++) {
+        for (var i_2 = 0; i_2 < midisong.miditracks.length; i_2++) {
             var track = {
-                title: '' + i,
+                title: '' + i_2,
                 instruments: [], percussions: [],
                 filters: [{
                         filterPlugin: null,
@@ -3807,8 +3795,8 @@ var MidiParser = (function () {
             };
             schedule.tracks.push(track);
             var firstChannelNum = 0;
-            for (var ch = 0; ch < midisong.miditracks[i].songchords.length; ch++) {
-                firstChannelNum = midisong.miditracks[i].songchords[ch].channel;
+            for (var ch = 0; ch < midisong.miditracks[i_2].songchords.length; ch++) {
+                firstChannelNum = midisong.miditracks[i_2].songchords[ch].channel;
                 break;
             }
             if (firstChannelNum == 9) {
@@ -3819,12 +3807,15 @@ var MidiParser = (function () {
                     initial: ""
                 });
                 var drumNums = [];
-                for (var ch = 0; ch < midisong.miditracks[i].songchords.length; ch++) {
-                    for (var nn = 0; nn < midisong.miditracks[i].songchords[ch].notes.length; nn++) {
-                        var pinum = midisong.miditracks[i].songchords[ch].notes[nn].points[0].pitch;
-                        if (drumNums.indexOf(pinum) < 0) {
+                for (var ch = 0; ch < midisong.miditracks[i_2].songchords.length; ch++) {
+                    var midichord = midisong.miditracks[i_2].songchords[ch];
+                    for (var nn = 0; nn < midichord.notes.length; nn++) {
+                        var pinum = midichord.notes[nn].points[0].pitch;
+                        var idx = drumNums.indexOf(pinum);
+                        var voice = void 0;
+                        if (idx < 0) {
                             drumNums.push(pinum);
-                            var voice = {
+                            voice = {
                                 measureBunches: [],
                                 percussionSetting: {
                                     percussionPlugin: null,
@@ -3838,28 +3829,28 @@ var MidiParser = (function () {
                                         kind: "gain",
                                         initial: ""
                                     }],
-                                title: drumTitles()[pinum]
+                                title: '' + pinum + ' ' + findrumTitles(pinum)
                             };
                             track.percussions.push(voice);
-                            track.title = '' + pinum + ': Drums';
-                            for (var mc = 0; mc < timeline.length; mc++) {
+                            track.title = 'Drums';
+                            for (var mc_1 = 0; mc_1 < timeline.length; mc_1++) {
                                 voice.measureBunches.push({ bunches: [] });
                             }
-                            for (var chn = 0; chn < midisong.miditracks[i].songchords.length; chn++) {
-                                var midichord = midisong.miditracks[i].songchords[chn];
-                                for (var tc = 0; tc < timeline.length; tc++) {
-                                    if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
-                                        var timelineMeasure = timeline[tc - 1];
-                                        var skipInMeasureMs = midichord.when - timelineMeasure.ms;
-                                        var skipMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
-                                        skipMeter = DUU(skipMeter).simplify();
-                                        var onehit = {
-                                            when: skipMeter
-                                        };
-                                        voice.measureBunches[tc - 1].bunches.push(onehit);
-                                        break;
-                                    }
-                                }
+                        }
+                        else {
+                            voice = track.percussions[idx];
+                        }
+                        for (var tc = 0; tc < timeline.length; tc++) {
+                            if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
+                                var timelineMeasure = timeline[tc - 1];
+                                var skipInMeasureMs = midichord.when - timelineMeasure.ms;
+                                var skipMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
+                                skipMeter = DUU(skipMeter).simplify();
+                                var onehit = {
+                                    when: skipMeter
+                                };
+                                voice.measureBunches[tc - 1].bunches.push(onehit);
+                                break;
                             }
                         }
                     }
@@ -3872,7 +3863,7 @@ var MidiParser = (function () {
                         instrumentPlugin: null,
                         parameters: this.parametersDefs(wafinstrument),
                         kind: 'wafinstrument',
-                        initial: '' + midisong.miditracks[i].program
+                        initial: '' + midisong.miditracks[i_2].program
                     },
                     filters: [{
                             filterPlugin: null,
@@ -3885,15 +3876,15 @@ var MidiParser = (function () {
                             kind: "equalizer",
                             initial: ""
                         }],
-                    title: instrumentTitles()[midisong.miditracks[i].program]
+                    title: instrumentTitles()[midisong.miditracks[i_2].program]
                 };
                 track.instruments.push(voice);
-                track.title = '' + midisong.miditracks[i].program + ': ' + voice.title;
+                track.title = '' + midisong.miditracks[i_2].program + ': ' + voice.title;
                 for (var mc = 0; mc < timeline.length; mc++) {
                     voice.measureChords.push({ chords: [] });
                 }
-                for (var chn = 0; chn < midisong.miditracks[i].songchords.length; chn++) {
-                    var midichord = midisong.miditracks[i].songchords[chn];
+                for (var chn = 0; chn < midisong.miditracks[i_2].songchords.length; chn++) {
+                    var midichord = midisong.miditracks[i_2].songchords[chn];
                     for (var tc = 0; tc < timeline.length; tc++) {
                         if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
                             var timelineMeasure = timeline[tc - 1];
@@ -3963,10 +3954,10 @@ var MidiParser = (function () {
             lineMode: 0
         };
         var trackChannel = [];
-        for (var i_2 = 0; i_2 < this.parsedTracks.length; i_2++) {
-            var parsedtrack = this.parsedTracks[i_2];
+        for (var i_3 = 0; i_3 < this.parsedTracks.length; i_3++) {
+            var parsedtrack = this.parsedTracks[i_3];
             for (var k = 0; k < parsedtrack.programChannel.length; k++) {
-                this.findOrCreateTrack(i_2, parsedtrack.programChannel[k].channel, trackChannel);
+                this.findOrCreateTrack(i_3, parsedtrack.programChannel[k].channel, trackChannel);
             }
         }
         var maxWhen = 0;
@@ -3991,11 +3982,11 @@ var MidiParser = (function () {
                 var chanTrack = this.findOrCreateTrack(i, newchord.channel, trackChannel);
                 chanTrack.track.songchords.push(newchord);
             }
-            for (var i_3 = 0; i_3 < trackChannel.length; i_3++) {
-                if (trackChannel[i_3].trackNum == i_3) {
-                    trackChannel[i_3].track.title = miditrack.title ? miditrack.title : '';
-                    trackChannel[i_3].track.volumes = miditrack.volumes;
-                    trackChannel[i_3].track.instrument = miditrack.instrument ? miditrack.instrument : '';
+            for (var i_4 = 0; i_4 < trackChannel.length; i_4++) {
+                if (trackChannel[i_4].trackNum == i_4) {
+                    trackChannel[i_4].track.title = miditrack.title ? miditrack.title : '';
+                    trackChannel[i_4].track.volumes = miditrack.volumes;
+                    trackChannel[i_4].track.instrument = miditrack.instrument ? miditrack.instrument : '';
                 }
             }
         }
@@ -4006,8 +3997,8 @@ var MidiParser = (function () {
                 if (a.duration < maxWhen) {
                     a.duration = 54321 + maxWhen;
                 }
-                for (var i_4 = 0; i_4 < this.parsedTracks.length; i_4++) {
-                    var miditrack_1 = this.parsedTracks[i_4];
+                for (var i_5 = 0; i_5 < this.parsedTracks.length; i_5++) {
+                    var miditrack_1 = this.parsedTracks[i_5];
                     for (var kk = 0; kk < miditrack_1.programChannel.length; kk++) {
                         if (miditrack_1.programChannel[kk].channel == trackChan.channelNum) {
                             trackChan.track.program = miditrack_1.programChannel[kk].program;
@@ -4674,19 +4665,19 @@ var ZMainMenu = (function () {
                 var songvox = songtrack.instruments[vv];
                 var vox = {
                     path: songvox.title, icon: "", folders: [], items: [],
-                    afterOpen: this.layerSelector.upVox(tt, vv)
+                    afterOpen: this.layerSelector.upInstrument(tt, vv)
                 };
                 tr.folders.push(vox);
                 vox.items.push({ label: "+vfx", icon: "", autoclose: false, action: function () { console.log('+vfx'); } });
                 var source = {
                     path: 'src ' + songvox.instrumentSetting.kind, icon: "", folders: [], items: [],
-                    afterOpen: this.layerSelector.upVoxProvider(tt, vv)
+                    afterOpen: this.layerSelector.upInstrumentProvider(tt, vv)
                 };
                 source.items.push({ label: "?src", icon: "", autoclose: false, action: function () { console.log('?src'); } });
                 for (var kk = 0; kk < songvox.instrumentSetting.parameters.length; kk++) {
                     var par = {
                         label: "par " + kk + " " + songvox.instrumentSetting.parameters[kk].caption, icon: "", autoclose: false,
-                        action: this.layerSelector.upVoxProviderParam(tt, vv, kk)
+                        action: this.layerSelector.upInstrumentProviderParam(tt, vv, kk)
                     };
                     source.items.push(par);
                 }
@@ -4694,7 +4685,7 @@ var ZMainMenu = (function () {
                 for (var ff = 0; ff < songvox.filters.length; ff++) {
                     var filter = {
                         path: 'fx ' + songvox.filters[ff].kind, icon: "", folders: [], items: [],
-                        afterOpen: this.layerSelector.upVoxFx(tt, vv, ff)
+                        afterOpen: this.layerSelector.upInstrumentFx(tt, vv, ff)
                     };
                     vox.folders.push(filter);
                     var voxfilter = songvox.filters[ff];
@@ -4702,7 +4693,45 @@ var ZMainMenu = (function () {
                     for (var kk = 0; kk < voxfilter.parameters.length; kk++) {
                         var par = {
                             label: "par " + kk + " " + voxfilter.parameters[kk].caption, icon: "", autoclose: false,
-                            action: this.layerSelector.upVoxFxParam(tt, vv, ff, kk)
+                            action: this.layerSelector.upInstrumentFxParam(tt, vv, ff, kk)
+                        };
+                        filter.items.push(par);
+                    }
+                }
+            }
+            for (var pp = 0; pp < songtrack.percussions.length; pp++) {
+                var songvox = songtrack.percussions[pp];
+                var vox = {
+                    path: songvox.title, icon: "", folders: [], items: [],
+                    afterOpen: this.layerSelector.upDrum(tt, pp)
+                };
+                tr.folders.push(vox);
+                vox.items.push({ label: "+vfx", icon: "", autoclose: false, action: function () { console.log('+vfx'); } });
+                var source = {
+                    path: 'src ' + songvox.percussionSetting.kind, icon: "", folders: [], items: [],
+                    afterOpen: this.layerSelector.upDrumProvider(tt, pp)
+                };
+                source.items.push({ label: "?src", icon: "", autoclose: false, action: function () { console.log('?src'); } });
+                for (var kk = 0; kk < songvox.percussionSetting.parameters.length; kk++) {
+                    var par = {
+                        label: "par " + kk + " " + songvox.percussionSetting.parameters[kk].caption, icon: "", autoclose: false,
+                        action: this.layerSelector.upDrumProviderParam(tt, pp, kk)
+                    };
+                    source.items.push(par);
+                }
+                vox.folders.push(source);
+                for (var ff = 0; ff < songvox.filters.length; ff++) {
+                    var filter = {
+                        path: 'fx ' + songvox.filters[ff].kind, icon: "", folders: [], items: [],
+                        afterOpen: this.layerSelector.upDrumFx(tt, pp, ff)
+                    };
+                    vox.folders.push(filter);
+                    var voxfilter = songvox.filters[ff];
+                    filter.items.push({ label: "-vfx", icon: "", autoclose: false, action: function () { console.log('-vfx'); } });
+                    for (var kk = 0; kk < voxfilter.parameters.length; kk++) {
+                        var par = {
+                            label: "par " + kk + " " + voxfilter.parameters[kk].caption, icon: "", autoclose: false,
+                            action: this.layerSelector.upDrumFxParam(tt, pp, ff, kk)
                         };
                         filter.items.push(par);
                     }
@@ -4788,11 +4817,9 @@ var startSlecetionMeasureIdx = -1;
 var endSlecetionMeasureIdx = -1;
 var MuzXBox = (function () {
     function MuzXBox() {
-        console.log('start');
         us = new ZUserSetting();
     }
     MuzXBox.prototype.initAll = function () {
-        console.log('initAll');
         this.zrenderer = new ZRender(this);
         this.zInputDeviceHandler = new ZInputDeviceHandler(this);
         this.zMainMenu = new ZMainMenu(this);
@@ -5305,7 +5332,7 @@ var PianoRollRenderer = (function () {
         return measureMaxLen;
     };
     PianoRollRenderer.prototype.createNoteUpAction = function (layerSelector, tt, vv) {
-        var up = layerSelector.upVox(tt, vv);
+        var up = layerSelector.upInstrument(tt, vv);
         return function (x, y) {
             up();
         };
@@ -5747,7 +5774,6 @@ var GridRenderer = (function () {
             h: 2222,
             css: "backGroundFill"
         };
-        console.log('initGridAnchors');
         this.backGroundAnchor.content.push(this.backGroundRectangle);
         zRender.layers.push(this.gridLayer);
     };
@@ -5760,8 +5786,6 @@ var GridRenderer = (function () {
             dx = 0;
         if (rh < this.zoomrender.tileLevel.innerHeight)
             dy = 0;
-        console.log('afterResizeCallback', this.zoomrender.tileLevel.innerWidth, this.zoomrender.tileLevel.innerHeight, '/', this.zoomrender.tileLevel.viewWidth, this.zoomrender.tileLevel.viewHeight);
-        console.log('real', rw, rh, 'shift', dx, dy);
         var nw = rw / this.zoomrender.tileLevel.tapSize;
         var nh = rh / this.zoomrender.tileLevel.tapSize;
         if (rw < this.zoomrender.tileLevel.innerWidth)
@@ -6018,47 +6042,92 @@ var LayerSelector = (function () {
             console.log('upTrackFxParam', trk, fx, param);
         };
     };
-    LayerSelector.prototype.upVox = function (trk, vox) {
+    LayerSelector.prototype.upInstrument = function (trk, vox) {
         var _this = this;
         return function () {
-            console.log('upVox', trk, vox);
-            _this.selectSongTrackVox(_this.muzXBox.currentSchedule, trk, vox);
+            console.log('upInstrument', trk, vox);
+            _this.selectSongTrackInstrument(_this.muzXBox.currentSchedule, trk, vox);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
         };
     };
-    LayerSelector.prototype.upVoxFx = function (trk, vox, fx) {
+    LayerSelector.prototype.upDrum = function (trk, vox) {
         var _this = this;
         return function () {
-            console.log('upVoxFx', trk, vox, fx);
-            _this.selectSongTrackVoxFx(_this.muzXBox.currentSchedule, trk, vox, fx);
+            console.log('upDrum', trk, vox);
+            _this.selectSongTrackDrum(_this.muzXBox.currentSchedule, trk, vox);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
         };
     };
-    LayerSelector.prototype.upVoxFxParam = function (trk, vox, fx, param) {
+    LayerSelector.prototype.upInstrumentFx = function (trk, vox, fx) {
         var _this = this;
         return function () {
-            console.log('upVoxFxParam', trk, vox, fx, param);
-            _this.selectSongTrackVoxFxParam(_this.muzXBox.currentSchedule, trk, vox, fx, param);
+            console.log('upInstrumentFx', trk, vox, fx);
+            _this.selectSongTrackInstrumentFx(_this.muzXBox.currentSchedule, trk, vox, fx);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
         };
     };
-    LayerSelector.prototype.upVoxProvider = function (trk, vox) {
+    LayerSelector.prototype.upDrumFx = function (trk, vox, fx) {
         var _this = this;
         return function () {
-            console.log('upVoxProvider', trk, vox);
-            _this.selectSongTrackVoxPerformer(_this.muzXBox.currentSchedule, trk, vox);
+            console.log('upDrumFx', trk, vox, fx);
+            _this.selectSongTrackDrumFx(_this.muzXBox.currentSchedule, trk, vox, fx);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
         };
     };
-    LayerSelector.prototype.upVoxProviderParam = function (trk, vox, param) {
+    LayerSelector.prototype.upInstrumentFxParam = function (trk, vox, fx, param) {
+        var _this = this;
+        return function () {
+            console.log('upInstrumentFxParam', trk, vox, fx, param);
+            _this.selectSongTrackInstrumentFxParam(_this.muzXBox.currentSchedule, trk, vox, fx, param);
+            _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
+        };
+    };
+    LayerSelector.prototype.upDrumFxParam = function (trk, vox, fx, param) {
+        var _this = this;
+        return function () {
+            console.log('upDrumFxParam', trk, vox, fx, param);
+            _this.selectSongTrackDrumFxParam(_this.muzXBox.currentSchedule, trk, vox, fx, param);
+            _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
+        };
+    };
+    LayerSelector.prototype.upInstrumentProvider = function (trk, vox) {
+        var _this = this;
+        return function () {
+            console.log('upInstrumentProvider', trk, vox);
+            _this.selectSongTrackInstrumentPerformer(_this.muzXBox.currentSchedule, trk, vox);
+            _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
+        };
+    };
+    LayerSelector.prototype.upDrumProvider = function (trk, vox) {
+        var _this = this;
+        return function () {
+            console.log('upDrumProvider', trk, vox);
+            _this.selectSongTrackDrumPerformer(_this.muzXBox.currentSchedule, trk, vox);
+            _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
+        };
+    };
+    LayerSelector.prototype.upInstrumentProviderParam = function (trk, vox, param) {
         var _this = this;
         return function () {
             console.log('upVoxProviderParam', trk, vox, param);
-            _this.selectSongTrackVoxPerformerParam(_this.muzXBox.currentSchedule, trk, vox, param);
+            _this.selectSongTrackInstrumentPerformerParam(_this.muzXBox.currentSchedule, trk, vox, param);
+            _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
+            _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
+        };
+    };
+    LayerSelector.prototype.upDrumProviderParam = function (trk, vox, param) {
+        var _this = this;
+        return function () {
+            console.log('upDrumProviderParam', trk, vox, param);
+            _this.selectSongTrackDrumPerformerParam(_this.muzXBox.currentSchedule, trk, vox, param);
             _this.muzXBox.zrenderer.drawSchedule(_this.muzXBox.currentSchedule);
             _this.muzXBox.zMainMenu.fillSongMenuFrom(_this.muzXBox.currentSchedule);
         };
@@ -6096,6 +6165,21 @@ var LayerSelector = (function () {
                     }
                 }
             }
+            for (var pp = 0; pp < track.percussions.length; pp++) {
+                var voice = track.percussions[pp];
+                voice.focus = false;
+                voice.percussionSetting.focus = false;
+                for (var prpr = 0; prpr < voice.percussionSetting.parameters.length; prpr++) {
+                    voice.percussionSetting.parameters[prpr].focus = false;
+                }
+                for (var fx = 0; fx < voice.filters.length; fx++) {
+                    var filter = voice.filters[fx];
+                    filter.focus = false;
+                    for (var fxpr = 0; fxpr < filter.parameters.length; fxpr++) {
+                        filter.parameters[fxpr].focus = false;
+                    }
+                }
+            }
         }
     };
     LayerSelector.prototype.selectSongFx = function (song, fxNum) {
@@ -6122,36 +6206,67 @@ var LayerSelector = (function () {
         song.tracks[trNum].filters[fxNum].focus = true;
         song.tracks[trNum].filters[fxNum].parameters[prNum].focus = true;
     };
-    LayerSelector.prototype.selectSongTrackVox = function (song, trNum, voxNum) {
+    LayerSelector.prototype.selectSongTrackInstrument = function (song, trNum, voxNum) {
         this.clearLevelFocus(song);
         song.tracks[trNum].focus = true;
         song.tracks[trNum].instruments[voxNum].focus = true;
     };
-    LayerSelector.prototype.selectSongTrackVoxPerformer = function (song, trNum, voxNum) {
+    LayerSelector.prototype.selectSongTrackDrum = function (song, trNum, voxNum) {
+        this.clearLevelFocus(song);
+        song.tracks[trNum].focus = true;
+        song.tracks[trNum].percussions[voxNum].focus = true;
+    };
+    LayerSelector.prototype.selectSongTrackInstrumentPerformer = function (song, trNum, voxNum) {
         this.clearLevelFocus(song);
         song.tracks[trNum].focus = true;
         song.tracks[trNum].instruments[voxNum].focus = true;
         song.tracks[trNum].instruments[voxNum].instrumentSetting.focus = true;
     };
-    LayerSelector.prototype.selectSongTrackVoxPerformerParam = function (song, trNum, voxNum, prNum) {
+    LayerSelector.prototype.selectSongTrackDrumPerformer = function (song, trNum, voxNum) {
+        this.clearLevelFocus(song);
+        song.tracks[trNum].focus = true;
+        song.tracks[trNum].percussions[voxNum].focus = true;
+        song.tracks[trNum].percussions[voxNum].percussionSetting.focus = true;
+    };
+    LayerSelector.prototype.selectSongTrackInstrumentPerformerParam = function (song, trNum, voxNum, prNum) {
         this.clearLevelFocus(song);
         song.tracks[trNum].focus = true;
         song.tracks[trNum].instruments[voxNum].focus = true;
         song.tracks[trNum].instruments[voxNum].instrumentSetting.focus = true;
         song.tracks[trNum].instruments[voxNum].instrumentSetting.parameters[prNum].focus = true;
     };
-    LayerSelector.prototype.selectSongTrackVoxFx = function (song, trNum, voxNum, fxNum) {
+    LayerSelector.prototype.selectSongTrackDrumPerformerParam = function (song, trNum, voxNum, prNum) {
+        this.clearLevelFocus(song);
+        song.tracks[trNum].focus = true;
+        song.tracks[trNum].percussions[voxNum].focus = true;
+        song.tracks[trNum].percussions[voxNum].percussionSetting.focus = true;
+        song.tracks[trNum].percussions[voxNum].percussionSetting.parameters[prNum].focus = true;
+    };
+    LayerSelector.prototype.selectSongTrackInstrumentFx = function (song, trNum, voxNum, fxNum) {
         this.clearLevelFocus(song);
         song.tracks[trNum].focus = true;
         song.tracks[trNum].instruments[voxNum].focus = true;
         song.tracks[trNum].instruments[voxNum].filters[fxNum].focus = true;
     };
-    LayerSelector.prototype.selectSongTrackVoxFxParam = function (song, trNum, voxNum, fxNum, prNum) {
+    LayerSelector.prototype.selectSongTrackDrumFx = function (song, trNum, voxNum, fxNum) {
+        this.clearLevelFocus(song);
+        song.tracks[trNum].focus = true;
+        song.tracks[trNum].percussions[voxNum].focus = true;
+        song.tracks[trNum].percussions[voxNum].filters[fxNum].focus = true;
+    };
+    LayerSelector.prototype.selectSongTrackInstrumentFxParam = function (song, trNum, voxNum, fxNum, prNum) {
         this.clearLevelFocus(song);
         song.tracks[trNum].focus = true;
         song.tracks[trNum].instruments[voxNum].focus = true;
         song.tracks[trNum].instruments[voxNum].filters[fxNum].focus = true;
         song.tracks[trNum].instruments[voxNum].filters[fxNum].parameters[prNum].focus = true;
+    };
+    LayerSelector.prototype.selectSongTrackDrumFxParam = function (song, trNum, voxNum, fxNum, prNum) {
+        this.clearLevelFocus(song);
+        song.tracks[trNum].focus = true;
+        song.tracks[trNum].percussions[voxNum].focus = true;
+        song.tracks[trNum].percussions[voxNum].filters[fxNum].focus = true;
+        song.tracks[trNum].percussions[voxNum].filters[fxNum].parameters[prNum].focus = true;
     };
     LayerSelector.prototype.almostFirstInSong = function (song) {
         for (var fx = 0; fx < song.filters.length; fx++) {
@@ -6174,8 +6289,18 @@ var LayerSelector = (function () {
             if (track.instruments[vx].focus)
                 return;
         }
-        if (track.instruments.length > 0)
+        for (var vx = 0; vx < track.percussions.length; vx++) {
+            if (track.percussions[vx].focus)
+                return;
+        }
+        if (track.instruments.length > 0) {
             track.instruments[0].focus = true;
+            return;
+        }
+        if (track.percussions.length > 0) {
+            track.percussions[0].focus = true;
+            return;
+        }
     };
     return LayerSelector;
 }());
@@ -7026,6 +7151,16 @@ var LeftKeysRenderer = (function () {
             this.keysAnchor4.content.push({ x: -1, y: topGridMargin + (0.05 + (octaveCount - i) * 12 - 7) * ratioThickness, w: 5, h: ratioThickness * 0.9, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
             this.keysAnchor4.content.push({ x: -1, y: topGridMargin + (0.05 + (octaveCount - i) * 12 - 9) * ratioThickness, w: 5, h: ratioThickness * 0.9, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
             this.keysAnchor4.content.push({ x: -1, y: topGridMargin + (0.05 + (octaveCount - i) * 12 - 11) * ratioThickness, w: 5, h: ratioThickness * 0.9, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
+        }
+        var cntr = 0;
+        for (var tt = 0; tt < song.tracks.length; tt++) {
+            var track = song.tracks[tt];
+            for (var pp = 0; pp < track.percussions.length; pp++) {
+                var drum = track.percussions[pp];
+                this.keysAnchor1.content.push(TText(0, cntr * ratioThickness, 'drumTitleNote', drum.title));
+                this.keysAnchor4.content.push(TText(0, cntr * ratioThickness, 'drumTitleMeasure', drum.title));
+                cntr++;
+            }
         }
         zRender.tileLevel.autoID(this.keysLayer.anchors);
     };

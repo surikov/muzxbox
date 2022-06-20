@@ -33,11 +33,11 @@ class MuzXBox {
 			, id: 'menuButtonTest1'
 		};*/
 	constructor() {
-		console.log('start');
+		//console.log('start');
 		us = new ZUserSetting();
 	}
 	initAll() {
-		console.log('initAll');
+		//console.log('initAll');
 		//let me = this;
 
 		this.zrenderer = new ZRender(this);
