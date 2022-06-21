@@ -244,11 +244,17 @@ html {
 	stroke-width: 7cm;
 	stroke-linecap: round;
 }
+.mainDot {
+	fill: var(--prime_base);
+}
 
 .secondLine {
 	stroke: var(--secondary_lite);
 	stroke-width: 7cm;
 	stroke-linecap: round;
+}
+.secondDot {
+	fill: var(--secondary_lite);
 }
 
 .otherLine {
@@ -256,6 +262,9 @@ html {
 	stroke-width: 7cm;
 	stroke-opacity: 25%;
 	stroke-linecap: round;
+}
+.otherDot {
+	fill: var(--decor_lite);
 }
 
 .actionPoint {

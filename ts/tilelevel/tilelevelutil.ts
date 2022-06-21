@@ -159,3 +159,13 @@ function cloneLine(from: TileLine): TileLine {
 	to.y2 = from.y2;
 	return to;
 }
+function cloneRectangle(from: TileRectangle): TileRectangle {
+	var to: TileRectangle = cloneBaseDefiition(from) as TileRectangle;
+	to.x = from.x;
+	to.y = from.y;
+	to.w = from.w;
+	to.h = from.h;
+	to.rx = from.rx;
+	to.ry = from.ry;
+	return to;
+}

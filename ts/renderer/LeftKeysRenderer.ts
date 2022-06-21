@@ -48,7 +48,7 @@ class LeftKeysRenderer {
 			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + (0.05 + (octaveCount - i) * 12 - 9) * ratioThickness, w: 5, h: ratioThickness * 0.9, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
 			this.keysAnchor4.content.push({ x: -1, y: topGridMargin + (0.05 + (octaveCount - i) * 12 - 11) * ratioThickness, w: 5, h: ratioThickness * 0.9, rx: 0.25, ry: 0.25, css: 'keysMeasure' });
 		}
-		let cntr = 0;
+		let cntr = 1;
 		for (let tt = 0; tt < song.tracks.length; tt++) {
 			let track = song.tracks[tt];
 			for (let pp = 0; pp < track.percussions.length; pp++) {

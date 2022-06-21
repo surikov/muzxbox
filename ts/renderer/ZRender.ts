@@ -8,7 +8,7 @@ class ZRender {
 	zoomFar: number = 256;
 	zoomBig: number = 512;
 	zoomMax: number = 1024;
-	secondWidthInTaps = 75;
+	secondWidthInTaps = 96;
 	pitchLineThicknessInTaps = 7;
 	sizeRatio = 2;
 
@@ -117,7 +117,7 @@ class ZRender {
 			if (trnum < 0) trnum = 0;
 			if (trnum < song.tracks.length) {
 				let track = song.tracks[trnum];
-				let vonum = this.pianoRollRenderer.findFocusedVoice(track.instruments);
+				let vonum = this.pianoRollRenderer.findFocusedInstrument(track.instruments);
 				if (vonum < 0) vonum = 0;
 				if (vonum < track.instruments.length && this.pianoRollRenderer.needToFocusVoice(song, trnum, vonum)) {
 					s2 = track.title;

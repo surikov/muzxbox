@@ -89,11 +89,13 @@ class GridRenderer {
 		//this.gridAnchor64.content = [];
 		//this.gridAnchor256.content = [];
 		let time = 0;
+		let drumCount=drumRowsCount(song);
+		//console.log(drumCount,ratioThickness);
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-			let gridMeasure1: TileAnchor = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, gridHeightTp(ratioThickness) + bottomGridMargin, zRender.pianoRollRenderer.contentMain1.showZoom, zRender.pianoRollRenderer.contentMain1.hideZoom);
-			let gridMeasure4: TileAnchor = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, gridHeightTp(ratioThickness) + bottomGridMargin, zRender.pianoRollRenderer.contentMain4.showZoom, zRender.pianoRollRenderer.contentMain4.hideZoom);
-			let gridMeasure16: TileAnchor = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, gridHeightTp(ratioThickness), zRender.pianoRollRenderer.contentMain16.showZoom, zRender.pianoRollRenderer.contentMain16.hideZoom);
+			let gridMeasure1: TileAnchor = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + gridHeightTp(ratioThickness) + bottomGridMargin, zRender.pianoRollRenderer.contentMain1.showZoom, zRender.pianoRollRenderer.contentMain1.hideZoom);
+			let gridMeasure4: TileAnchor = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + gridHeightTp(ratioThickness) + bottomGridMargin, zRender.pianoRollRenderer.contentMain4.showZoom, zRender.pianoRollRenderer.contentMain4.hideZoom);
+			let gridMeasure16: TileAnchor = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + gridHeightTp(ratioThickness), zRender.pianoRollRenderer.contentMain16.showZoom, zRender.pianoRollRenderer.contentMain16.hideZoom);
 			//let gridMeasure64: TileAnchor = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, gridHeightTp(ratioThickness), zRender.pianoRollRenderer.contentMain64.showZoom, zRender.pianoRollRenderer.contentMain64.hideZoom);
 			//let gridMeasure256: TileAnchor = TAnchor(leftGridMargin + time * ratioDuration, 0, ratioDuration * measureDuration, gridHeightTp(ratioThickness), zRender.pianoRollRenderer.contentMain256.showZoom, zRender.pianoRollRenderer.contentMain256.hideZoom);
 			this.gridAnchor1.content.push(gridMeasure1);
@@ -108,6 +110,11 @@ class GridRenderer {
 				, y2: topGridMargin + gridHeightTp(ratioThickness) + bottomGridMargin
 				, css: 'barLine1'
 			});
+			gridMeasure1.content.push({
+				x1: leftGridMargin + time * ratioDuration, y1: 0
+				, x2: leftGridMargin + time * ratioDuration, y2: drumCount * ratioThickness
+				, css: 'barLine1'
+			});
 			gridMeasure4.content.push({
 				x1: leftGridMargin + time * ratioDuration
 				, y1: topGridMargin
@@ -115,11 +122,21 @@ class GridRenderer {
 				, y2: topGridMargin + gridHeightTp(ratioThickness) + bottomGridMargin
 				, css: 'barLine4'
 			});
+			gridMeasure4.content.push({
+				x1: leftGridMargin + time * ratioDuration, y1: 0
+				, x2: leftGridMargin + time * ratioDuration, y2: drumCount * ratioThickness
+				, css: 'barLine4'
+			});
 			gridMeasure16.content.push({
 				x1: leftGridMargin + time * ratioDuration
 				, y1: topGridMargin
 				, x2: leftGridMargin + time * ratioDuration
 				, y2: topGridMargin + gridHeightTp(ratioThickness)
+				, css: 'barLine16'
+			});
+			gridMeasure16.content.push({
+				x1: leftGridMargin + time * ratioDuration, y1: 0
+				, x2: leftGridMargin + time * ratioDuration, y2: drumCount * ratioThickness
 				, css: 'barLine16'
 			});
 			/*gridMeasure64.content.push({
@@ -142,6 +159,15 @@ class GridRenderer {
 					, y1: topGridMargin + (12 * (octaveCount - 0) - n) * ratioThickness
 					, x2: leftGridMargin + (time + measureDuration) * ratioDuration
 					, y2: topGridMargin + (12 * (octaveCount - 0) - n) * ratioThickness
+					, css: 'pitchLine4'
+				});
+			}
+			for (let n = 0; n < drumCount; n++) {
+				gridMeasure4.content.push({
+					x1: leftGridMargin + time * ratioDuration
+					, y1: (1+n) * ratioThickness
+					, x2: leftGridMargin + (time + measureDuration) * ratioDuration
+					, y2: (1+n) * ratioThickness
 					, css: 'pitchLine4'
 				});
 			}
@@ -194,6 +220,17 @@ class GridRenderer {
 				};
 				gridMeasure4.content.push(line);
 				gridMeasure1.content.push(line);
+
+				let line2 = {
+					x1: leftGridMargin + (time + positionDuration) * ratioDuration
+					, y1: 0
+					, x2: leftGridMargin + (time + positionDuration) * ratioDuration
+					, y2: drumCount * ratioThickness
+					, css: css
+				};
+				gridMeasure4.content.push(line2);
+				gridMeasure1.content.push(line2);
+
 				stepNN++;
 				if (stepNN >= rhythmPattern.length) {
 					stepNN = 0;

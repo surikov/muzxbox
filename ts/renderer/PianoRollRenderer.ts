@@ -37,7 +37,7 @@ class PianoRollRenderer {
 		];
 
 		for (let i = 0; i < anchors.length; i++) {
-			zRender.clearResizeSingleAnchor(zRender.muzXBox.currentSchedule,anchors[i], wholeWidth);
+			zRender.clearResizeSingleAnchor(zRender.muzXBox.currentSchedule, anchors[i], wholeWidth);
 		}
 
 	}
@@ -91,7 +91,7 @@ class PianoRollRenderer {
 		}
 	}
 	addMeasureLyrics(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor, css: string) {
-		let topGridMargin=topGridMarginTp(song,ratioThickness);
+		let topGridMargin = topGridMarginTp(song, ratioThickness);
 		//let time = 0;
 		//for (let mm = 0; mm < song.measures.length; mm++) {
 		let measure = song.measures[mm];
@@ -113,7 +113,7 @@ class PianoRollRenderer {
 		//}
 	}
 	addSelectKnobs64(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor) {
-		let topGridMargin=topGridMarginTp(song,ratioThickness);
+		let topGridMargin = topGridMarginTp(song, ratioThickness);
 		let knob: TileRectangle = {
 			x: leftGridMargin + time * ratioDuration
 			, y: topGridMargin + 12 * octaveCount * ratioThickness
@@ -133,7 +133,7 @@ class PianoRollRenderer {
 		anchor.content.push(txt);
 	}
 	addSelectKnobs16(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor, action: (x: number, y: number) => void | undefined) {
-		let topGridMargin=topGridMarginTp(song,ratioThickness);
+		let topGridMargin = topGridMarginTp(song, ratioThickness);
 		let knob: TileRectangle = {
 			x: leftGridMargin + time * ratioDuration
 			, y: topGridMargin + 12 * octaveCount * ratioThickness
@@ -153,7 +153,7 @@ class PianoRollRenderer {
 		anchor.content.push(txt);
 	}
 	addSelectKnobs4(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor) {
-		let topGridMargin=topGridMarginTp(song,ratioThickness);
+		let topGridMargin = topGridMarginTp(song, ratioThickness);
 		let knob: TileRectangle = {
 			x: leftGridMargin + time * ratioDuration
 			, y: topGridMargin + 12 * octaveCount * ratioThickness
@@ -173,7 +173,7 @@ class PianoRollRenderer {
 		anchor.content.push(txt);
 	}
 	addSelectKnobs1(song: ZvoogSchedule, time: number, mm: number, rhythmPattern: ZvoogMeter[], ratioDuration: number, ratioThickness: number, anchor: TileAnchor) {
-		let topGridMargin=topGridMarginTp(song,ratioThickness);
+		let topGridMargin = topGridMarginTp(song, ratioThickness);
 		let stepNN = 0;
 		let position: ZvoogMeter = rhythmPattern[stepNN];
 		let positionDuration = 0;
@@ -206,8 +206,8 @@ class PianoRollRenderer {
 			position = DUU(position).plus(rhythmPattern[stepNN]);
 		}
 	}
-	addVoiceMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogInstrumentVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number {
-		let topGridMargin=topGridMarginTp(song,ratioThickness);
+	addInstrumentMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogInstrumentVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number {
+		let topGridMargin = topGridMarginTp(song, ratioThickness);
 		let measure = voice.measureChords[measureNum];
 		var measureMaxLen = anchors[0].ww;
 		let yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12) * ratioThickness;
@@ -261,6 +261,75 @@ class PianoRollRenderer {
 		}
 		return measureMaxLen;
 	}
+	addDrumMeasure(drumCounter: number, ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogPercussionVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number {
+		//let topGridMargin = topGridMarginTp(song, ratioThickness);
+		let measure = voice.measureBunches[measureNum];
+		var measureMaxLen = anchors[0].ww;
+		//let yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12) * ratioThickness;
+		for (let cc = 0; cc < measure.bunches.length; cc++) {
+			let chord: ZvoogChordPoint = measure.bunches[cc];
+			//for (let ee = 0; ee < chord.envelopes.length; ee++) {
+			//let envelope = chord.envelopes[ee];
+			let pitchWhen = meter2seconds(song.measures[measureNum].tempo, chord.when);
+			//for (let pp = 0; pp < envelope.pitches.length; pp++) {
+			//let pitch = envelope.pitches[pp];
+			//let slide = pitch.pitch;
+			//if (pp + 1 < envelope.pitches.length) {
+			//	slide = envelope.pitches[pp + 1].pitch;
+			//}
+			//let pitchDuration = meter2seconds(song.measures[measureNum].tempo, pitch.duration);
+			//let startShift = 0;
+			//if (pp == 0) {
+			//	startShift = 0.5 * ratioThickness;
+			//}
+			//let endShift = 0;
+			//if (pp == envelope.pitches.length - 1) {
+			//	endShift = -0.49 * ratioThickness;
+			//}
+			let xx1 = leftGridMargin + (time + pitchWhen) * ratioDuration;// + startShift;
+			let xx2 = leftGridMargin + (time + pitchWhen + ratioThickness) * ratioDuration;// + endShift;
+			if (xx1 >= xx2) {
+				xx2 = xx1 + 1;
+			}
+			/*let line: TileLine = {
+				x1: xx1//leftGridMargin + (time + pitchWhen) * ratioDuration + startShift
+				, x2: xx2//leftGridMargin + (time + pitchWhen + pitchDuration) * ratioDuration + endShift
+				, y1: topGridMargin + yShift - drumCounter * ratioThickness//(128 - pitch.pitch) * ratioThickness-0.5*ratioThickness
+				, y2: topGridMargin + yShift// - slide * ratioThickness//(128 - slide) * ratioThickness - 0.5 * ratioThickness
+				, css: css
+			};*/
+			let dot: TileRectangle = {
+				x: xx1
+				, y: drumCounter * ratioThickness
+				, w: ratioThickness
+				, h: ratioThickness
+				, rx: ratioThickness / 8
+				, ry: ratioThickness / 8
+				, css: css
+			}
+
+
+			//line.css = css;
+			for (let aa = 0; aa < anchors.length; aa++) {
+				if (dot.x + dot.w - anchors[aa].xx > anchors[aa].ww) {
+					//console.log((line.x2- anchors[aa].xx), anchors[aa].ww);
+					anchors[aa].ww = dot.x + dot.w - anchors[aa].xx;
+				}
+				anchors[aa].content.push(cloneRectangle(dot));
+				if (measureMaxLen < anchors[aa].ww) {
+					measureMaxLen = anchors[aa].ww;
+				}
+			}
+			//pitchWhen = pitchWhen + pitchDuration;
+			//}
+			//}
+		}
+		return measureMaxLen;
+	}
+
+
+
+
 	createNoteUpAction(layerSelector: LayerSelector, tt: number, vv: number): (x: number, y: number) => void {
 		let up = layerSelector.upInstrument(tt, vv);
 		return (x: number, y: number) => {
@@ -280,7 +349,7 @@ class PianoRollRenderer {
 		, trackNum: number, voiceNum: number
 		, measureNum: number, time: number, isMain: boolean
 		, anchor: TileAnchor): void {
-			let topGridMargin=topGridMarginTp(song,ratioThickness);
+		let topGridMargin = topGridMarginTp(song, ratioThickness);
 		let voice = song.tracks[trackNum].instruments[voiceNum];
 		let measure = voice.measureChords[measureNum];
 		let yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12) * ratioThickness;
@@ -335,7 +404,7 @@ class PianoRollRenderer {
 					let track = song.tracks[trackNum];
 					let trafi = this.findFocusedFilter(track.filters);
 					if (trafi < 0) {
-						let vv = this.findFocusedVoice(track.instruments);
+						let vv = this.findFocusedInstrument(track.instruments);
 						if (vv < 0) vv = 0;
 						if (vv == voiceNum) {
 							if (voiceNum < track.instruments.length) {
@@ -352,7 +421,7 @@ class PianoRollRenderer {
 		}
 		return false;
 	}
-	needToSubFocusVoice(song: ZvoogSchedule, trackNum: number, voiceNum: number): boolean {
+	needToFocusDrum(song: ZvoogSchedule, trackNum: number, drumNum: number): boolean {
 		let sonfino = this.findFocusedFilter(song.filters);
 		if (sonfino < 0) {
 			let tt = this.findFocusedTrack(song.tracks);
@@ -362,12 +431,66 @@ class PianoRollRenderer {
 					let track = song.tracks[trackNum];
 					let trafi = this.findFocusedFilter(track.filters);
 					if (trafi < 0) {
-						let vv = this.findFocusedVoice(track.instruments);
+						let vv = this.findFocusedDrum(track.percussions);
+						if (vv < 0) vv = 0;
+						if (vv == drumNum) {
+							if (drumNum < track.percussions.length) {
+								let voice = track.percussions[drumNum];
+								if (!voice.percussionSetting.focus) {
+									let vofi = this.findFocusedFilter(voice.filters);
+									if (vofi < 0) return true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+	needToSubFocusInstrument(song: ZvoogSchedule, trackNum: number, voiceNum: number): boolean {
+		let sonfino = this.findFocusedFilter(song.filters);
+		if (sonfino < 0) {
+			let tt = this.findFocusedTrack(song.tracks);
+			if (tt < 0) tt = 0;
+			if (tt == trackNum) {
+				if (trackNum < song.tracks.length) {
+					let track = song.tracks[trackNum];
+					let trafi = this.findFocusedFilter(track.filters);
+					if (trafi < 0) {
+						let vv = this.findFocusedInstrument(track.instruments);
 						if (vv < 0) vv = 0;
 						if (vv != voiceNum) {
 							if (vv < track.instruments.length) {
 								let avoice = track.instruments[vv];
 								if (!avoice.instrumentSetting.focus) {
+									let vofi = this.findFocusedFilter(avoice.filters);
+									if (vofi < 0) return true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+	needToSubFocusDrum(song: ZvoogSchedule, trackNum: number, drumNum: number): boolean {
+		let sonfino = this.findFocusedFilter(song.filters);
+		if (sonfino < 0) {
+			let tt = this.findFocusedTrack(song.tracks);
+			if (tt < 0) tt = 0;
+			if (tt == trackNum) {
+				if (trackNum < song.tracks.length) {
+					let track = song.tracks[trackNum];
+					let trafi = this.findFocusedFilter(track.filters);
+					if (trafi < 0) {
+						let vv = this.findFocusedDrum(track.percussions);
+						if (vv < 0) vv = 0;
+						if (vv != drumNum) {
+							if (vv < track.percussions.length) {
+								let avoice = track.percussions[vv];
+								if (!avoice.percussionSetting.focus) {
 									let vofi = this.findFocusedFilter(avoice.filters);
 									if (vofi < 0) return true;
 								}
@@ -393,7 +516,13 @@ class PianoRollRenderer {
 		}
 		return -1;
 	}
-	findFocusedVoice(voices: ZvoogInstrumentVoice[]): number {
+	findFocusedInstrument(voices: ZvoogInstrumentVoice[]): number {
+		for (let i = 0; i < voices.length; i++) {
+			if (voices[i].focus) return i;
+		}
+		return -1;
+	}
+	findFocusedDrum(voices: ZvoogPercussionVoice[]): number {
 		for (let i = 0; i < voices.length; i++) {
 			if (voices[i].focus) return i;
 		}
@@ -431,7 +560,7 @@ class PianoRollRenderer {
 	}
 
 	addPianoRoll(zRender: ZRender, layerSelector: LayerSelector, song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {//}, menuButton: TileRectangle) {
-		let topGridMargin=topGridMarginTp(song,ratioThickness);
+		let topGridMargin = topGridMarginTp(song, ratioThickness);
 		let rhythm: ZvoogMeter[] = zRender.rhythmPatternDefault;
 		if (song.rhythm) {
 			if (song.rhythm.length) {
@@ -481,9 +610,11 @@ class PianoRollRenderer {
 			this.addMeasureLyrics(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, 'lyricsText16');
 
 			this.addSelectKnobs64(song, time, mm, ratioDuration, ratioThickness, secondMeasure64);
-			this.addSelectKnobs16(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, this.createSlectMeasureAction(zRender,mm));
+			this.addSelectKnobs16(song, time, mm, ratioDuration, ratioThickness, secondMeasure16, this.createSlectMeasureAction(zRender, mm));
 			this.addSelectKnobs4(song, time, mm, ratioDuration, ratioThickness, secondMeasure4);
 			this.addSelectKnobs1(song, time, mm, rhythm, ratioDuration, ratioThickness, secondMeasure1);
+
+			let drumCounter = 0
 
 			for (let tt = 0; tt < song.tracks.length; tt++) {
 				let track = song.tracks[tt];
@@ -505,33 +636,20 @@ class PianoRollRenderer {
 						}
 					}
 					if (this.needToFocusVoice(song, tt, vv)) {
-						this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'mainLine'
+						this.addInstrumentMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'mainLine'
 							, [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
 						this.addNotesKnobs(layerSelector, ratioDuration, ratioThickness, song, tt, vv, mm, time, true, contentMeasure1);
 					} else {
-						if (this.needToSubFocusVoice(song, tt, vv)) {
-							this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'secondLine'
+						if (this.needToSubFocusInstrument(song, tt, vv)) {
+							this.addInstrumentMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'secondLine'
 								, [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
 							this.addNotesKnobs(layerSelector, ratioDuration, ratioThickness, song, tt, vv, mm, time, false, secondMeasure1);
 						} else {
-							this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'otherLine'
+							this.addInstrumentMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'otherLine'
 								, [otherMeasure1, otherMeasure4, otherMeasure16]);
 							this.addNotesKnobs(layerSelector, ratioDuration, ratioThickness, song, tt, vv, mm, time, false, otherMeasure1);
 						}
 					}
-
-					/*if (track.focus) {
-						if (voice.focus) {
-							let maxMeasureLen = this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'mainLine', [
-								contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64, contentMeasure256]);
-						} else {
-							this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'secondLine', [
-								secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
-						}
-					} else {
-						this.addVoiceMeasure(ratioDuration, ratioThickness, song, voice, mm, time, 'otherLine', [
-							secondMeasure1, secondMeasure4, secondMeasure16]);
-					}*/
 					for (let ff = 0; ff < voice.filters.length; ff++) {
 						let filter = voice.filters[ff];
 						for (let pp = 0; pp < filter.parameters.length; pp++) {
@@ -551,6 +669,81 @@ class PianoRollRenderer {
 						}
 					}
 				}
+
+
+
+
+
+
+
+				for (let vv = 0; vv < track.percussions.length; vv++) {
+					let voice: ZvoogPercussionVoice = track.percussions[vv];
+					for (let pp = 0; pp < voice.percussionSetting.parameters.length; pp++) {
+						let parameter = voice.percussionSetting.parameters[pp];
+						if (track.focus && voice.focus && voice.percussionSetting.focus) {
+							if (parameter.focus) {
+								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine'
+									, [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
+							} else {
+								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine'
+									, [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
+							}
+						} else {
+							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine'
+								, [secondMeasure1, secondMeasure4, secondMeasure16]);
+						}
+					}
+					if (this.needToFocusDrum(song, tt, vv)) {
+						this.addDrumMeasure(drumCounter, ratioDuration, ratioThickness, song, voice, mm, time, 'mainDot'
+							, [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
+						//this.addNotesKnobs(layerSelector, ratioDuration, ratioThickness, song, tt, vv, mm, time, true, contentMeasure1);
+					} else {
+						if (this.needToSubFocusDrum(song, tt, vv)) {
+							this.addDrumMeasure(drumCounter, ratioDuration, ratioThickness, song, voice, mm, time, 'secondDot'
+								, [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
+							//this.addNotesKnobs(layerSelector, ratioDuration, ratioThickness, song, tt, vv, mm, time, false, secondMeasure1);
+						} else {
+							this.addDrumMeasure(drumCounter, ratioDuration, ratioThickness, song, voice, mm, time, 'otherDot'
+								, [otherMeasure1, otherMeasure4, otherMeasure16]);
+							//this.addNotesKnobs(layerSelector, ratioDuration, ratioThickness, song, tt, vv, mm, time, false, otherMeasure1);
+						}
+					}
+					for (let ff = 0; ff < voice.filters.length; ff++) {
+						let filter = voice.filters[ff];
+						for (let pp = 0; pp < filter.parameters.length; pp++) {
+							let parameter = filter.parameters[pp];
+							if (track.focus && voice.focus && filter.focus) {
+								if (parameter.focus) {
+									this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'mainLine'
+										, [contentMeasure1, contentMeasure4, contentMeasure16, contentMeasure64]);//, contentMeasure256]);
+								} else {
+									this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'secondLine'
+										, [secondMeasure1, secondMeasure4, secondMeasure16, secondMeasure64]);
+								}
+							} else {
+								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine'
+									, [secondMeasure1, secondMeasure4, secondMeasure16]);
+							}
+						}
+					}
+					drumCounter++;
+				}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 				for (let ff = 0; ff < track.filters.length; ff++) {
 					let filter = track.filters[ff];
 					for (let pp = 0; pp < filter.parameters.length; pp++) {
@@ -596,7 +789,7 @@ class PianoRollRenderer {
 	}
 
 	fillFar(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
-		let topGridMargin=topGridMarginTp(song,ratioThickness);
+		let topGridMargin = topGridMarginTp(song, ratioThickness);
 		let chordCount = 0;
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureChords = 0;
@@ -655,7 +848,7 @@ class PianoRollRenderer {
 		}
 	}
 	fillBig(song: ZvoogSchedule, ratioDuration: number, ratioThickness: number) {
-		let topGridMargin=topGridMarginTp(song,ratioThickness);
+		let topGridMargin = topGridMarginTp(song, ratioThickness);
 		//let nx = 16;
 		let chordCount = 0;
 		for (let mm = 0; mm < song.measures.length; mm++) {
