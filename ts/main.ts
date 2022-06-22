@@ -20,6 +20,7 @@ class MuzXBox {
 	zrenderer: ZRender;
 	zInputDeviceHandler: ZInputDeviceHandler;
 	zMainMenu: ZMainMenu;
+	zTicker: ZvoogTicker;
 	/*
 		menuButton: TileRectangle = {
 			x: 0
@@ -58,6 +59,8 @@ class MuzXBox {
 		us.selectMode('en');
 
 		this.zInputDeviceHandler.bindEvents();
+
+		this.zTicker = new ZvoogTicker();
 	}
 	createUI() {
 		var emptySchedule: ZvoogSchedule = {
@@ -123,12 +126,12 @@ class MuzXBox {
 		};
 		for (let i = 0; i < 100; i++) {
 			emptySchedule.measures.push({ meter: { count: 3, division: 4 }, tempo: 120, points: [] });
-			for(let tt=0;tt<emptySchedule.tracks.length;tt++){
-				for(let ii=0;ii<emptySchedule.tracks[tt].instruments.length;ii++){
-					emptySchedule.tracks[tt].instruments[ii].measureChords.push({chords:[]});
+			for (let tt = 0; tt < emptySchedule.tracks.length; tt++) {
+				for (let ii = 0; ii < emptySchedule.tracks[tt].instruments.length; ii++) {
+					emptySchedule.tracks[tt].instruments[ii].measureChords.push({ chords: [] });
 				}
-				for(let pp=0;pp<emptySchedule.tracks[tt].percussions.length;pp++){
-					emptySchedule.tracks[tt].percussions[pp].measureBunches.push({bunches:[]});
+				for (let pp = 0; pp < emptySchedule.tracks[tt].percussions.length; pp++) {
+					emptySchedule.tracks[tt].percussions[pp].measureBunches.push({ bunches: [] });
 				}
 			}
 		}

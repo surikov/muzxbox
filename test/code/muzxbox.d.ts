@@ -722,6 +722,26 @@ declare function takeZvoogSineSource(): ZvoogSineSource;
 declare function createPluginEffect(id: string): ZvoogFilterPlugin;
 declare function createPluginInstrument(id: string): ZvoogInstrumentPlugin;
 declare function createPluginPercussion(id: string): ZvoogPercussionPlugin;
+declare function startPausePlay(): void;
+declare class ZvoogTicker {
+    stateStoped: number;
+    statePlay: number;
+    stateEnding: number;
+    state: number;
+    stepDuration: number;
+    lastPosition: number;
+    audioContext: AudioContext;
+    constructor();
+    tryToResumeAudioContext(): void;
+    createFilterPlugins(filters: ZvoogFilterSetting[]): void;
+    createSongPlugins(song: ZvoogSchedule): void;
+    tryToInitPlugins(song: ZvoogSchedule): boolean;
+    tryToInitEffects(filters: ZvoogFilterSetting[]): boolean;
+    toggleStatePlay(song: ZvoogSchedule): void;
+    startTicks(audioContext: AudioContext, onTick: (when: number, from: number, to: number) => void, loopStart: number, loopPosition: number, loopEnd: number, onEnd: (loopPosition: number) => void): void;
+    tick(audioContext: AudioContext, nextAudioTime: number, onTick: (when: number, from: number, to: number) => void, loopStart: number, loopPosition: number, loopEnd: number, onEnd: (loopPosition: number) => void): void;
+    cancel(): void;
+}
 declare type XYp = {
     x: number;
     y: number;
@@ -1078,6 +1098,7 @@ declare class MuzXBox {
     zrenderer: ZRender;
     zInputDeviceHandler: ZInputDeviceHandler;
     zMainMenu: ZMainMenu;
+    zTicker: ZvoogTicker;
     constructor();
     initAll(): void;
     createUI(): void;

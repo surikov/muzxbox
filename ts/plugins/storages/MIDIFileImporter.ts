@@ -1315,6 +1315,7 @@ class MidiParser {
 							var timelineMeasure = timeline[tc - 1];
 							var skipInMeasureMs = midichord.when - timelineMeasure.ms;
 							var skipMeter: ZvoogMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
+							//console.log(i,tc,skipInMeasureMs,skipMeter,DUU(skipMeter).simplify());
 							skipMeter = DUU(skipMeter).simplify();
 							var onechord: ZvoogChordStrings = {
 								when: skipMeter

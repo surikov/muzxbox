@@ -220,7 +220,7 @@ class ZMainMenu {
 		this.menuRoot.items.push({
 			label: 'play/stop'
 			, action: () => {
-				console.log('play/stop');
+				startPausePlay();
 			}
 			, autoclose: true
 			, icon: ''
