@@ -1,5 +1,5 @@
 type ZvoogCurvePoint = {
 	skipMeasures: number
-	, skip384: number
+	, skipSteps: ZvoogMeter
 	, velocity: number
 };

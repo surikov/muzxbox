@@ -2049,19 +2049,19 @@ var WAFInsSource = (function () {
         }
         if (variation == 1 || variation == 2 || variation == 3) {
             if (variation == 1) {
-                window.wafPlayer.queueStrumDown(this.audioContext, this.out, this.zones, when, pitches, duration, 0.99, slides);
+                window.wafPlayer.queueStrumDown(this.audioContext, this.audioContext.destination, this.zones, when, pitches, duration, 0.99, slides);
             }
             else {
                 if (variation == 2) {
-                    window.wafPlayer.queueStrumUp(this.audioContext, this.out, this.zones, when, pitches, duration, 0.99, slides);
+                    window.wafPlayer.queueStrumUp(this.audioContext, this.audioContext.destination, this.zones, when, pitches, duration, 0.99, slides);
                 }
                 else {
-                    window.wafPlayer.queueSnap(this.audioContext, this.out, this.zones, when, pitches, duration, 0.99, slides);
+                    window.wafPlayer.queueSnap(this.audioContext, this.audioContext.destination, this.zones, when, pitches, duration, 0.99, slides);
                 }
             }
         }
         else {
-            window.wafPlayer.queueChord(this.audioContext, this.out, this.zones, when, pitches, duration, 0.99, slides);
+            window.wafPlayer.queueChord(this.audioContext, this.audioContext.destination, this.zones, when, pitches, duration, 0.99, slides);
         }
     };
     WAFInsSource.prototype.prepare = function (audioContext, data) {
@@ -2735,7 +2735,7 @@ var ZvoogTicker = (function () {
         this.statePlay = 2;
         this.stateEnding = 3;
         this.state = this.stateStoped;
-        this.stepDuration = 0.91;
+        this.stepDuration = 1.0;
         this.lastPosition = 0;
         var AudioContextFunc = window.AudioContext || window['webkitAudioContext'];
         this.audioContext = new AudioContextFunc();
@@ -2763,7 +2763,7 @@ var ZvoogTicker = (function () {
     };
     ZvoogTicker.prototype.createSongPlugins = function (song) {
         this.createFilterPlugins(song.filters);
-        for (var tt = 0; tt > song.tracks.length; tt++) {
+        for (var tt = 0; tt < song.tracks.length; tt++) {
             var track = song.tracks[tt];
             this.createFilterPlugins(track.filters);
             for (var vv = 0; vv < track.instruments.length; vv++) {
@@ -2781,7 +2781,6 @@ var ZvoogTicker = (function () {
                 if (voice.percussionSetting.percussionPlugin) {
                 }
                 else {
-                    console.log('empty percussion', tt, track.title, vv, voice.title);
                     voice.percussionSetting.percussionPlugin = createPluginPercussion(voice.percussionSetting.kind);
                 }
             }
@@ -2790,7 +2789,7 @@ var ZvoogTicker = (function () {
     ZvoogTicker.prototype.tryToInitPlugins = function (song) {
         this.createSongPlugins(song);
         if (this.tryToInitEffects(song.filters)) {
-            for (var tt = 0; tt > song.tracks.length; tt++) {
+            for (var tt = 0; tt < song.tracks.length; tt++) {
                 var track = song.tracks[tt];
                 if (this.tryToInitEffects(track.filters)) {
                     for (var vv = 0; vv < track.instruments.length; vv++) {
@@ -2798,11 +2797,7 @@ var ZvoogTicker = (function () {
                         if (this.tryToInitEffects(voice.filters)) {
                             var plugin = voice.instrumentSetting.instrumentPlugin;
                             if (plugin) {
-                                plugin.prepare(this.audioContext, "");
-                                if (plugin.busy()) {
-                                    console.log('busy instrument', tt, track.title, vv, voice.title);
-                                    return false;
-                                }
+                                plugin.prepare(this.audioContext, voice.instrumentSetting.initial);
                             }
                             else {
                                 console.log('empty instrument', tt, track.title, vv, voice.title);
@@ -2810,6 +2805,7 @@ var ZvoogTicker = (function () {
                             }
                         }
                         else {
+                            console.log('empty filter', tt, track.title, vv, voice.title);
                             return false;
                         }
                     }
@@ -2818,11 +2814,7 @@ var ZvoogTicker = (function () {
                         if (this.tryToInitEffects(voice.filters)) {
                             var plugin = voice.percussionSetting.percussionPlugin;
                             if (plugin) {
-                                plugin.prepare(this.audioContext, "");
-                                if (plugin.busy()) {
-                                    console.log('busy percussion', tt, track.title, vv, voice.title);
-                                    return false;
-                                }
+                                plugin.prepare(this.audioContext, voice.percussionSetting.initial);
                             }
                             else {
                                 console.log('empty percussion', tt, track.title, vv, voice.title);
@@ -2830,8 +2822,48 @@ var ZvoogTicker = (function () {
                             }
                         }
                         else {
-                            console.log('empty instrument', tt, track.title, vv, voice.title);
+                            console.log('empty filter', tt, track.title, vv, voice.title);
                             return false;
+                        }
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+        else {
+            return false;
+        }
+        return true;
+    };
+    ZvoogTicker.prototype.checkNotBusyState = function (song) {
+        if (this.checkNotBusyEffects(song.filters)) {
+            for (var tt = 0; tt < song.tracks.length; tt++) {
+                var track = song.tracks[tt];
+                if (this.checkNotBusyEffects(track.filters)) {
+                    for (var vv = 0; vv < track.instruments.length; vv++) {
+                        var voice = track.instruments[vv];
+                        if (this.checkNotBusyEffects(voice.filters)) {
+                            var plugin = voice.instrumentSetting.instrumentPlugin;
+                            if (plugin) {
+                                if (plugin.busy()) {
+                                    console.log('busy instrument', tt, track.title, vv, voice.title);
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                    for (var vv = 0; vv < track.percussions.length; vv++) {
+                        var voice = track.percussions[vv];
+                        if (this.checkNotBusyEffects(voice.filters)) {
+                            var plugin = voice.percussionSetting.percussionPlugin;
+                            if (plugin) {
+                                if (plugin.busy()) {
+                                    console.log('busy percussion', tt, track.title, vv, voice.title);
+                                    return false;
+                                }
+                            }
                         }
                     }
                 }
@@ -2850,7 +2882,7 @@ var ZvoogTicker = (function () {
             var filter = filters[ff];
             var plugin = filter.filterPlugin;
             if (plugin) {
-                plugin.prepare(this.audioContext, "");
+                plugin.prepare(this.audioContext, filter.initial);
                 if (plugin.busy()) {
                     console.log('busy filter', ff, filter.kind);
                     return false;
@@ -2863,12 +2895,103 @@ var ZvoogTicker = (function () {
         }
         return true;
     };
+    ZvoogTicker.prototype.checkNotBusyEffects = function (filters) {
+        for (var ff = 0; ff < filters.length; ff++) {
+            var filter = filters[ff];
+            var plugin = filter.filterPlugin;
+            if (plugin) {
+                if (plugin.busy()) {
+                    console.log('busy filter', ff, filter.kind);
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+    ZvoogTicker.prototype.sendInstrumentEvents = function (instrument, song, when, from, to) {
+        this.sendAllParameters(instrument.instrumentSetting.parameters, song, when, from, to);
+        var plugin = instrument.instrumentSetting.instrumentPlugin;
+        if (plugin) {
+            var time = 0;
+            for (var mm = 0; mm < song.measures.length; mm++) {
+                var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
+                if (from >= time && to < time + measureDuration) {
+                    for (var cc = 0; cc < instrument.measureChords[mm].chords.length; cc++) {
+                        var strings = instrument.measureChords[mm].chords[cc];
+                        var start = time + meter2seconds(song.measures[mm].tempo, strings.when);
+                        if (start >= from && start < to) {
+                            plugin.scheduleChord(when + start - from, song.measures[mm].tempo, strings.envelopes, strings.variation);
+                        }
+                    }
+                }
+                time = time + measureDuration;
+                if (time > to) {
+                    break;
+                }
+            }
+        }
+    };
+    ZvoogTicker.prototype.sendDrumEvents = function (drum, song, when, from, to) {
+        this.sendAllParameters(drum.percussionSetting.parameters, song, when, from, to);
+    };
+    ZvoogTicker.prototype.sendAllFilterEvents = function (filters, song, when, from, to) {
+        for (var i = 0; i < filters.length; i++) {
+            this.sendSingleFilterEvents(filters[i], song, when, from, to);
+        }
+    };
+    ZvoogTicker.prototype.sendSingleFilterEvents = function (filter, song, when, from, to) {
+        this.sendAllParameters(filter.parameters, song, when, from, to);
+    };
+    ZvoogTicker.prototype.sendAllParameters = function (parameters, song, when, from, to) {
+        for (var i = 0; i < parameters.length; i++) {
+            this.sendParameterPoints(parameters[i].points, song, when, from, to);
+        }
+    };
+    ZvoogTicker.prototype.sendParameterPoints = function (points, song, when, from, to) {
+        for (var i = 0; i < points.length; i++) {
+            var point = points[i];
+            if (point) {
+            }
+        }
+    };
+    ZvoogTicker.prototype.sendTickEvents = function (song, when, from, to) {
+        for (var tt = 0; tt < song.tracks.length; tt++) {
+            var track = song.tracks[tt];
+            for (var vv = 0; vv < track.instruments.length; vv++) {
+                var voice = track.instruments[vv];
+                this.sendAllFilterEvents(voice.filters, song, when, from, to);
+                this.sendInstrumentEvents(voice, song, when, from, to);
+            }
+            for (var vv = 0; vv < track.percussions.length; vv++) {
+                var voice = track.percussions[vv];
+                this.sendAllFilterEvents(voice.filters, song, when, from, to);
+                this.sendDrumEvents(voice, song, when, from, to);
+            }
+            this.sendAllFilterEvents(track.filters, song, when, from, to);
+        }
+        this.sendAllFilterEvents(song.filters, song, when, from, to);
+    };
     ZvoogTicker.prototype.toggleStatePlay = function (song) {
+        var _this = this;
         console.log('toggleStatePlay');
         this.tryToResumeAudioContext();
         if (this.state == this.stateStoped) {
-            if (this.tryToInitPlugins(song)) {
-                this.startTicks(this.audioContext, function (when, from, to) { console.log('onTick', when, from, to); }, 0, 0, 5, function (loopPosition) { console.log('onEnd', loopPosition); });
+            if (this.tryToInitPlugins(song) && this.checkNotBusyState(song)) {
+                var startLoopTime = 0;
+                if (startSlecetionMeasureIdx > -1) {
+                    for (var i = 0; i < startSlecetionMeasureIdx; i++) {
+                        startLoopTime = startLoopTime + meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+                    }
+                }
+                var endLoopTime = scheduleSecondsDuration(song);
+                if (endSlecetionMeasureIdx > -1) {
+                    for (var i = 0; i <= endSlecetionMeasureIdx; i++) {
+                        endLoopTime = endLoopTime + meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+                    }
+                }
+                this.startTicks(this.audioContext, function (when, from, to) {
+                    _this.sendTickEvents(song, when, from, to);
+                }, startLoopTime, startLoopTime, endLoopTime, function (loopPosition) { console.log('onEnd', loopPosition); });
             }
         }
         else {
@@ -3844,7 +3967,7 @@ var MidiParser = (function () {
         var pp = 0;
         var pName = plugin.getParId(pp);
         while (pName) {
-            pars.push({ caption: pName, points: [{ skipMeasures: 0, skip384: 0, velocity: 60 }] });
+            pars.push({ caption: pName, points: [{ skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: 60 }] });
             pp++;
             pName = plugin.getParId(pp);
         }
@@ -5112,17 +5235,6 @@ var MuzXBox = (function () {
             measures: [{ meter: { count: 3, division: 4 }, tempo: 120, points: [] }, { meter: { count: 4, division: 4 }, tempo: 90, points: [] }, { meter: { count: 4, division: 4 }, tempo: 180, points: [] }],
             harmony: { tone: '', mode: '', progression: [] }
         };
-        for (var i = 0; i < 100; i++) {
-            emptySchedule.measures.push({ meter: { count: 3, division: 4 }, tempo: 120, points: [] });
-            for (var tt = 0; tt < emptySchedule.tracks.length; tt++) {
-                for (var ii = 0; ii < emptySchedule.tracks[tt].instruments.length; ii++) {
-                    emptySchedule.tracks[tt].instruments[ii].measureChords.push({ chords: [] });
-                }
-                for (var pp = 0; pp < emptySchedule.tracks[tt].percussions.length; pp++) {
-                    emptySchedule.tracks[tt].percussions[pp].measureBunches.push({ bunches: [] });
-                }
-            }
-        }
         this.currentSchedule = emptySchedule;
         this.zrenderer.drawSchedule(emptySchedule);
         this.zMainMenu.fillSongMenuFrom(this.currentSchedule);

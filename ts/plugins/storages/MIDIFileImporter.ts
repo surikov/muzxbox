@@ -997,7 +997,7 @@ class MidiParser {
 		var pp = 0;
 		var pName = plugin.getParId(pp);
 		while (pName) {
-			pars.push({ caption: pName, points: [{ skipMeasures: 0, skip384: 0, velocity: 60 }] });
+			pars.push({ caption: pName, points: [{ skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: 60 }] });
 			pp++;
 			pName = plugin.getParId(pp);
 		}

@@ -497,7 +497,7 @@ declare class DurationUnitUtil {
 }
 declare type ZvoogCurvePoint = {
     skipMeasures: number;
-    skip384: number;
+    skipSteps: ZvoogMeter;
     velocity: number;
 };
 declare type ZvoogMeasure = {
@@ -736,7 +736,16 @@ declare class ZvoogTicker {
     createFilterPlugins(filters: ZvoogFilterSetting[]): void;
     createSongPlugins(song: ZvoogSchedule): void;
     tryToInitPlugins(song: ZvoogSchedule): boolean;
+    checkNotBusyState(song: ZvoogSchedule): boolean;
     tryToInitEffects(filters: ZvoogFilterSetting[]): boolean;
+    checkNotBusyEffects(filters: ZvoogFilterSetting[]): boolean;
+    sendInstrumentEvents(instrument: ZvoogInstrumentVoice, song: ZvoogSchedule, when: number, from: number, to: number): void;
+    sendDrumEvents(drum: ZvoogPercussionVoice, song: ZvoogSchedule, when: number, from: number, to: number): void;
+    sendAllFilterEvents(filters: ZvoogFilterSetting[], song: ZvoogSchedule, when: number, from: number, to: number): void;
+    sendSingleFilterEvents(filter: ZvoogFilterSetting, song: ZvoogSchedule, when: number, from: number, to: number): void;
+    sendAllParameters(parameters: ZvoogParameterData[], song: ZvoogSchedule, when: number, from: number, to: number): void;
+    sendParameterPoints(points: ZvoogCurvePoint[], song: ZvoogSchedule, when: number, from: number, to: number): void;
+    sendTickEvents(song: ZvoogSchedule, when: number, from: number, to: number): void;
     toggleStatePlay(song: ZvoogSchedule): void;
     startTicks(audioContext: AudioContext, onTick: (when: number, from: number, to: number) => void, loopStart: number, loopPosition: number, loopEnd: number, onEnd: (loopPosition: number) => void): void;
     tick(audioContext: AudioContext, nextAudioTime: number, onTick: (when: number, from: number, to: number) => void, loopStart: number, loopPosition: number, loopEnd: number, onEnd: (loopPosition: number) => void): void;
