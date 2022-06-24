@@ -164,7 +164,7 @@ class ZvoogTicker {
 	statePlay = 2;
 	stateEnding = 3;
 	state = this.stateStoped;
-	stepDuration = 1.0;
+	stepDuration = 0.9;
 	lastPosition = 0;
 
 	audioContext: AudioContext;
@@ -337,29 +337,29 @@ class ZvoogTicker {
 		return true;
 	}
 
-	sendInstrumentEvents(instrument: ZvoogInstrumentVoice, song: ZvoogSchedule, when: number, from: number, to: number) {
-		this.sendAllParameters(instrument.instrumentSetting.parameters, song, when, from, to);
+	sendInstrumentEvents(instrument: ZvoogInstrumentVoice, song: ZvoogSchedule, scheduleWhen: number, tickStart: number, tickEnd: number) {
+		this.sendAllParameters(instrument.instrumentSetting.parameters, song, scheduleWhen, tickStart, tickEnd);
 		let plugin = instrument.instrumentSetting.instrumentPlugin;
 
 		if (plugin) {
-			let time = 0;
+			let measureStart = 0;
 			for (let mm = 0; mm < song.measures.length; mm++) {
 				let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-
-				if (from >= time && to < time + measureDuration) {
-					//console.log(from,to,'/',time,measureDuration);
+				//console.log('check', mm, 'at', measureStart, 'duration', measureDuration);
+				if (tickStart >= measureStart && tickEnd < measureStart + measureDuration) {
+					//console.log('voice', instrument.title, 'at', measureStart, 'measure', mm, 'duration', measureDuration);
 					for (let cc = 0; cc < instrument.measureChords[mm].chords.length; cc++) {
 						let strings = instrument.measureChords[mm].chords[cc];
-						let start = time + meter2seconds(song.measures[mm].tempo, strings.when);
+						let chordStart = measureStart + meter2seconds(song.measures[mm].tempo, strings.when);
 						//console.log(instrument.instrumentSetting.initial, mm, 'from', from, 'start', start, 'to', to);
-						if (start >= from && start < to) {
-
-							plugin.scheduleChord(when + start - from, song.measures[mm].tempo, strings.envelopes, strings.variation);
+						if (chordStart >= tickStart && chordStart < tickEnd) {
+							console.log('found', mm,'at',(scheduleWhen + chordStart - tickStart),'chord',chordStart);
+							plugin.scheduleChord(scheduleWhen + chordStart - tickStart, song.measures[mm].tempo, strings.envelopes, strings.variation);
 						}
 					}
 				}
-				time = time + measureDuration;
-				if (time > to) {
+				measureStart = measureStart + measureDuration;
+				if (measureStart > tickEnd) {
 					break;
 				}
 			}
@@ -390,6 +390,7 @@ class ZvoogTicker {
 		}
 	}
 	sendTickEvents(song: ZvoogSchedule, when: number, from: number, to: number) {
+		console.log('sendTickEvents', from, to, 'when', when);
 		for (let tt = 0; tt < song.tracks.length; tt++) {
 			let track = song.tracks[tt];
 			for (let vv = 0; vv < track.instruments.length; vv++) {
@@ -423,8 +424,10 @@ class ZvoogTicker {
 						endLoopTime = endLoopTime + meter2seconds(song.measures[i].tempo, song.measures[i].meter);
 					}
 				}
-				this.startTicks(
-					this.audioContext
+
+				this.connectSongMixer(this.audioContext, song);
+				this.startTicks(song
+					, this.audioContext
 					, (when: number, from: number, to: number) => {
 						//console.log('onTick', this.audioContext.currentTime, 'when', when, 'loop', from, to);
 						this.sendTickEvents(song, when, from, to);
@@ -439,7 +442,7 @@ class ZvoogTicker {
 			this.cancel();
 		}
 	}
-	startTicks(audioContext: AudioContext
+	startTicks(song: ZvoogSchedule, audioContext: AudioContext
 		, onTick: (when: number, from: number, to: number) => void
 		, loopStart: number
 		, loopPosition: number
@@ -448,10 +451,11 @@ class ZvoogTicker {
 	) {
 		if (this.state == this.stateStoped) {
 			this.state = this.statePlay;
-			this.tick(audioContext, audioContext.currentTime, onTick, loopStart, loopPosition, loopEnd, onEnd);
+			this.tick(song, audioContext, audioContext.currentTime, onTick, loopStart, loopPosition, loopEnd, onEnd);
 		}
 	}
-	tick(audioContext: AudioContext
+	tick(song: ZvoogSchedule
+		, audioContext: AudioContext
 		, nextAudioTime: number
 		, onTick: (when: number, from: number, to: number) => void
 		, loopStart: number
@@ -462,6 +466,7 @@ class ZvoogTicker {
 		this.lastPosition = loopPosition;
 		if (this.state == this.stateEnding) {
 			this.state = this.stateStoped;
+			this.disConnectSongMixer(this.audioContext, song);
 			onEnd(loopPosition);
 		} else {
 			if (this.state == this.statePlay) {
@@ -492,7 +497,7 @@ class ZvoogTicker {
 				}
 				var me = this;
 				window.requestAnimationFrame(function (time) {
-					me.tick(audioContext, nextAudioTime, onTick, loopStart, loopPosition, loopEnd, onEnd);
+					me.tick(song, audioContext, nextAudioTime, onTick, loopStart, loopPosition, loopEnd, onEnd);
 				});
 			}
 		}
@@ -502,5 +507,75 @@ class ZvoogTicker {
 			this.state = this.stateEnding;
 		}
 	};
+	connectFiltersMixer(destination: AudioNode, filters: ZvoogFilterSetting[]): AudioNode {
+		let current = destination;
+		for (let ff = 0; ff < filters.length; ff++) {
+			let filter: ZvoogFilterPlugin | null = filters[ff].filterPlugin;
+			if (filter) {
+				let out: AudioNode = filter.getOutput();
+				out.connect(current);
+				current = out;
+			}
+		}
+		return current;
+	}
+	disConnectFiltersMixer(destination: AudioNode, filters: ZvoogFilterSetting[]): AudioNode {
+		let current = destination;
+		for (let ff = 0; ff < filters.length; ff++) {
+			let filter: ZvoogFilterPlugin | null = filters[ff].filterPlugin;
+			if (filter) {
+				let out: AudioNode = filter.getOutput();
+				out.disconnect(current);
+				current = out;
+			}
+		}
+		return current;
+	}
+	connectSongMixer(audioContext: AudioContext, song: ZvoogSchedule) {
+		let songOut = this.connectFiltersMixer(audioContext.destination, song.filters);
+		for (let tt = 0; tt < song.tracks.length; tt++) {
+			let track = song.tracks[tt];
+			let trackOut = this.connectFiltersMixer(songOut, track.filters);
+			for (let ii = 0; ii < track.instruments.length; ii++) {
+				let instr = track.instruments[ii];
+				let instrOut = this.connectFiltersMixer(trackOut, instr.filters);
+				let instrPlugin = instr.instrumentSetting.instrumentPlugin;
+				if (instrPlugin) {
+					instrPlugin.getOutput().connect(instrOut);
+				}
+			}
+			for (let pp = 0; pp < track.percussions.length; pp++) {
+				let perc = track.percussions[pp];
+				let percOut = this.connectFiltersMixer(trackOut, perc.filters);
+				let percPlugin = perc.percussionSetting.percussionPlugin;
+				if (percPlugin) {
+					percPlugin.getOutput().connect(percOut);
+				}
+			}
+		}
+	}
+	disConnectSongMixer(audioContext: AudioContext, song: ZvoogSchedule) {
+		let songOut = this.disConnectFiltersMixer(audioContext.destination, song.filters);
+		for (let tt = 0; tt < song.tracks.length; tt++) {
+			let track = song.tracks[tt];
+			let trackOut = this.disConnectFiltersMixer(songOut, track.filters);
+			for (let ii = 0; ii < track.instruments.length; ii++) {
+				let instr = track.instruments[ii];
+				let instrOut = this.disConnectFiltersMixer(trackOut, instr.filters);
+				let instrPlugin = instr.instrumentSetting.instrumentPlugin;
+				if (instrPlugin) {
+					instrPlugin.getOutput().disconnect(instrOut);
+				}
+			}
+			for (let pp = 0; pp < track.percussions.length; pp++) {
+				let perc = track.percussions[pp];
+				let percOut = this.disConnectFiltersMixer(trackOut, perc.filters);
+				let percPlugin = perc.percussionSetting.percussionPlugin;
+				if (percPlugin) {
+					percPlugin.getOutput().disconnect(percOut);
+				}
+			}
+		}
+	}
 }
 

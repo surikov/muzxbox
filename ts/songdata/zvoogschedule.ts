@@ -39,3 +39,6 @@ function topGridMarginTp(song: ZvoogSchedule, pitchLineThicknessInTaps: number):
 function wholeHeightTp(song: ZvoogSchedule,ratioThickness: number): number {
 	return topGridMarginTp(song,ratioThickness) + (octaveCount * 12) * ratioThickness + bottomGridMargin;
 }
+function coverProject(song: ZvoogSchedule){
+	
+}

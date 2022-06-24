@@ -669,6 +669,7 @@ declare function gridHeightTp(ratioThickness: number): number;
 declare function drumRowsCount(song: ZvoogSchedule): number;
 declare function topGridMarginTp(song: ZvoogSchedule, pitchLineThicknessInTaps: number): number;
 declare function wholeHeightTp(song: ZvoogSchedule, ratioThickness: number): number;
+declare function coverProject(song: ZvoogSchedule): void;
 declare type ZvoogFilterSetting = {
     filterPlugin: ZvoogFilterPlugin | null;
     parameters: ZvoogParameterData[];
@@ -739,7 +740,7 @@ declare class ZvoogTicker {
     checkNotBusyState(song: ZvoogSchedule): boolean;
     tryToInitEffects(filters: ZvoogFilterSetting[]): boolean;
     checkNotBusyEffects(filters: ZvoogFilterSetting[]): boolean;
-    sendInstrumentEvents(instrument: ZvoogInstrumentVoice, song: ZvoogSchedule, when: number, from: number, to: number): void;
+    sendInstrumentEvents(instrument: ZvoogInstrumentVoice, song: ZvoogSchedule, scheduleWhen: number, tickStart: number, tickEnd: number): void;
     sendDrumEvents(drum: ZvoogPercussionVoice, song: ZvoogSchedule, when: number, from: number, to: number): void;
     sendAllFilterEvents(filters: ZvoogFilterSetting[], song: ZvoogSchedule, when: number, from: number, to: number): void;
     sendSingleFilterEvents(filter: ZvoogFilterSetting, song: ZvoogSchedule, when: number, from: number, to: number): void;
@@ -747,9 +748,13 @@ declare class ZvoogTicker {
     sendParameterPoints(points: ZvoogCurvePoint[], song: ZvoogSchedule, when: number, from: number, to: number): void;
     sendTickEvents(song: ZvoogSchedule, when: number, from: number, to: number): void;
     toggleStatePlay(song: ZvoogSchedule): void;
-    startTicks(audioContext: AudioContext, onTick: (when: number, from: number, to: number) => void, loopStart: number, loopPosition: number, loopEnd: number, onEnd: (loopPosition: number) => void): void;
-    tick(audioContext: AudioContext, nextAudioTime: number, onTick: (when: number, from: number, to: number) => void, loopStart: number, loopPosition: number, loopEnd: number, onEnd: (loopPosition: number) => void): void;
+    startTicks(song: ZvoogSchedule, audioContext: AudioContext, onTick: (when: number, from: number, to: number) => void, loopStart: number, loopPosition: number, loopEnd: number, onEnd: (loopPosition: number) => void): void;
+    tick(song: ZvoogSchedule, audioContext: AudioContext, nextAudioTime: number, onTick: (when: number, from: number, to: number) => void, loopStart: number, loopPosition: number, loopEnd: number, onEnd: (loopPosition: number) => void): void;
     cancel(): void;
+    connectFiltersMixer(destination: AudioNode, filters: ZvoogFilterSetting[]): AudioNode;
+    disConnectFiltersMixer(destination: AudioNode, filters: ZvoogFilterSetting[]): AudioNode;
+    connectSongMixer(audioContext: AudioContext, song: ZvoogSchedule): void;
+    disConnectSongMixer(audioContext: AudioContext, song: ZvoogSchedule): void;
 }
 declare type XYp = {
     x: number;
