@@ -345,15 +345,15 @@ class ZvoogTicker {
 			let measureStart = 0;
 			for (let mm = 0; mm < song.measures.length; mm++) {
 				let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-				//console.log('check', mm, 'at', measureStart, 'duration', measureDuration);
-				if (tickStart >= measureStart && tickEnd < measureStart + measureDuration) {
+				//console.log('check measure', mm, 'at', measureStart, 'duration', measureDuration,'tick',tickStart,tickEnd);
+				if (tickStart < measureStart+ measureDuration && tickEnd >= measureStart ) {
 					//console.log('voice', instrument.title, 'at', measureStart, 'measure', mm, 'duration', measureDuration);
 					for (let cc = 0; cc < instrument.measureChords[mm].chords.length; cc++) {
 						let strings = instrument.measureChords[mm].chords[cc];
 						let chordStart = measureStart + meter2seconds(song.measures[mm].tempo, strings.when);
-						//console.log(instrument.instrumentSetting.initial, mm, 'from', from, 'start', start, 'to', to);
+						//console.log(instrument.instrumentSetting.initial, tickStart , chordStart , tickEnd);
 						if (chordStart >= tickStart && chordStart < tickEnd) {
-							console.log('found', mm,'at',(scheduleWhen + chordStart - tickStart),'chord',chordStart);
+							//console.log('found', mm,'at',(scheduleWhen + chordStart - tickStart),'chord',chordStart);
 							plugin.scheduleChord(scheduleWhen + chordStart - tickStart, song.measures[mm].tempo, strings.envelopes, strings.variation);
 						}
 					}
@@ -390,7 +390,7 @@ class ZvoogTicker {
 		}
 	}
 	sendTickEvents(song: ZvoogSchedule, when: number, from: number, to: number) {
-		console.log('sendTickEvents', from, to, 'when', when);
+		//console.log('sendTickEvents', from, to, 'when', when);
 		for (let tt = 0; tt < song.tracks.length; tt++) {
 			let track = song.tracks[tt];
 			for (let vv = 0; vv < track.instruments.length; vv++) {

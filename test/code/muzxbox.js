@@ -2023,6 +2023,7 @@ var WAFInsSource = (function () {
     function WAFInsSource() {
         this.ins = 0;
         this.lockedState = new ZvoogPluginLock();
+        this.transpose = 1 * 12;
     }
     WAFInsSource.prototype.state = function () {
         return this.lockedState;
@@ -2034,7 +2035,7 @@ var WAFInsSource = (function () {
         var pitches = [];
         for (var i = 0; i < chord.length; i++) {
             var envelope_1 = chord[i];
-            pitches.push(envelope_1.pitches[0].pitch);
+            pitches.push(envelope_1.pitches[0].pitch + this.transpose);
         }
         var envelope = chord[0];
         var duration = meter2seconds(tempo, envelope.pitches[0].duration);
@@ -2042,7 +2043,7 @@ var WAFInsSource = (function () {
         var tt = 0;
         for (var n = 1; n < envelope.pitches.length; n++) {
             slides.push({
-                pitch: envelope.pitches[n].pitch,
+                pitch: envelope.pitches[n].pitch + this.transpose,
                 when: tt
             });
             duration = duration + meter2seconds(tempo, envelope.pitches[n].duration);
@@ -2917,13 +2918,11 @@ var ZvoogTicker = (function () {
             var measureStart = 0;
             for (var mm = 0; mm < song.measures.length; mm++) {
                 var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-                if (tickStart >= measureStart && tickEnd < measureStart + measureDuration) {
-                    console.log('voice', instrument.title, 'at', measureStart, 'measure', mm, 'duration', measureDuration);
+                if (tickStart < measureStart + measureDuration && tickEnd >= measureStart) {
                     for (var cc = 0; cc < instrument.measureChords[mm].chords.length; cc++) {
                         var strings = instrument.measureChords[mm].chords[cc];
                         var chordStart = measureStart + meter2seconds(song.measures[mm].tempo, strings.when);
                         if (chordStart >= tickStart && chordStart < tickEnd) {
-                            console.log('found', mm, 'at', (scheduleWhen + chordStart - tickStart), 'chord', chordStart);
                             plugin.scheduleChord(scheduleWhen + chordStart - tickStart, song.measures[mm].tempo, strings.envelopes, strings.variation);
                         }
                     }
@@ -2959,7 +2958,6 @@ var ZvoogTicker = (function () {
         }
     };
     ZvoogTicker.prototype.sendTickEvents = function (song, when, from, to) {
-        console.log('sendTickEvents', from, to, 'when', when);
         for (var tt = 0; tt < song.tracks.length; tt++) {
             var track = song.tracks[tt];
             for (var vv = 0; vv < track.instruments.length; vv++) {
@@ -4983,9 +4981,11 @@ var ZMainMenu = (function () {
         });
         this.menuRoot.folders.push(this.songFolder);
         this.menuRoot.folders.push({
-            path: "Rhythm patterns", icon: "", folders: [], items: [
+            path: "Rhythm patterns", icon: "", folders: [],
+            items: [
                 {
-                    label: 'plain 1/32', autoclose: true, icon: '', action: function () {
+                    label: 'plain 1/32', autoclose: true, icon: '',
+                    action: function () {
                         var rr = [
                             { count: 1, division: 32 }, { count: 1, division: 32 },
                             { count: 1, division: 32 }, { count: 1, division: 32 },
@@ -5004,7 +5004,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/16', autoclose: true, icon: '', action: function () {
+                    label: 'plain 1/16', autoclose: true, icon: '',
+                    action: function () {
                         var rr = [
                             { count: 1, division: 16 }, { count: 1, division: 16 },
                             { count: 1, division: 16 }, { count: 1, division: 16 },
@@ -5019,7 +5020,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/8', autoclose: true, icon: '', action: function () {
+                    label: 'plain 1/8', autoclose: true, icon: '',
+                    action: function () {
                         console.log('plain 1/8', default8rhytym);
                         var me = window['MZXB'];
                         if (me) {
@@ -5028,7 +5030,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'swing 1/8', autoclose: true, icon: '', action: function () {
+                    label: 'swing 1/8', autoclose: true, icon: '',
+                    action: function () {
                         var rr = [
                             { count: 5, division: 32 }, { count: 3, division: 32 },
                             { count: 5, division: 32 }, { count: 3, division: 32 }
@@ -5043,9 +5046,11 @@ var ZMainMenu = (function () {
             ], afterOpen: function () { }
         });
         this.menuRoot.folders.push({
-            path: "Screen size", icon: "", folders: [], items: [
+            path: "Screen size", icon: "", folders: [],
+            items: [
                 {
-                    label: 'normal', autoclose: true, icon: '', action: function () {
+                    label: 'normal', autoclose: true, icon: '',
+                    action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutNormal();
@@ -5053,7 +5058,8 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'big', autoclose: true, icon: '', action: function () {
+                    label: 'big', autoclose: true, icon: '',
+                    action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutBig();
@@ -5260,11 +5266,7 @@ var MuzXBox = (function () {
                             title: 'Single',
                             instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'none', initial: '' },
                             measureChords: [{
-                                    chords: [{
-                                            when: { count: 1, division: 4 }, variation: 0, envelopes: [{
-                                                    pitches: [{ duration: { count: 5, division: 8 }, pitch: 24 }, { duration: { count: 1, division: 8 }, pitch: 36 }]
-                                                }]
-                                        }]
+                                    chords: []
                                 },
                                 { chords: [] },
                                 { chords: [] }
@@ -5275,7 +5277,13 @@ var MuzXBox = (function () {
                             title: 'Another',
                             instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'none', initial: '' },
                             measureChords: [
-                                { chords: [] },
+                                {
+                                    chords: [
+                                        { when: { count: 0, division: 4 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 60 }] }] },
+                                        { when: { count: 1, division: 4 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 61 }] }] },
+                                        { when: { count: 2, division: 4 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 62 }] }] }
+                                    ]
+                                },
                                 {
                                     chords: [{
                                             when: { count: 2, division: 4 }, variation: 0, envelopes: [{

@@ -400,6 +400,7 @@ declare class WAFInsSource implements ZvoogInstrumentPlugin {
     ins: number;
     zones: any;
     lockedState: ZvoogPluginLock;
+    transpose: number;
     state(): ZvoogPluginLock;
     cancelSchedule(): void;
     scheduleChord(when: number, tempo: number, chord: ZvoogEnvelope[], variation: number): void;

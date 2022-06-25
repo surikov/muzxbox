@@ -72,11 +72,15 @@ class MuzXBox {
 						, title: 'Single'
 						, instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'none', initial: '' }
 						, measureChords: [{
-							chords: [{
-								when: { count: 1, division: 4 }, variation: 0, envelopes: [{
-									pitches: [{ duration: { count: 5, division: 8 }, pitch: 24 }, { duration: { count: 1, division: 8 }, pitch: 36 }]
+							chords: [
+								/*{
+								when: { count: 1, division: 4 }, variation: 0
+								, envelopes: [{
+									pitches: [{ duration: { count: 5, division: 8 }, pitch: 24 }
+										, { duration: { count: 1, division: 8 }, pitch: 36 }]
 								}]
-							}]
+							}*/
+						]
 						}
 							, { chords: [] }
 							, { chords: [] }
@@ -87,7 +91,13 @@ class MuzXBox {
 						, title: 'Another'
 						, instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'none', initial: '' }
 						, measureChords: [
-							{ chords: [] }
+							{
+								chords: [
+									{ when: { count: 0, division: 4 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 60 }] }] }
+									,{ when: { count: 1, division: 4 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 61 }] }] }
+									,{ when: { count: 2, division: 4 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 62 }] }] }
+								]
+							}
 							, {
 								chords: [{
 									when: { count: 2, division: 4 }, variation: 0, envelopes: [{

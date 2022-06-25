@@ -7,6 +7,7 @@ class WAFInsSource implements ZvoogInstrumentPlugin {
 	ins: number = 0;
 	zones: any;
 	lockedState = new ZvoogPluginLock();
+	transpose = 1 * 12;
 	state(): ZvoogPluginLock {
 		return this.lockedState;
 	}
@@ -36,7 +37,7 @@ class WAFInsSource implements ZvoogInstrumentPlugin {
 		let pitches: number[] = [];
 		for (let i = 0; i < chord.length; i++) {
 			let envelope: ZvoogEnvelope = chord[i];
-			pitches.push(envelope.pitches[0].pitch);
+			pitches.push(envelope.pitches[0].pitch + this.transpose);
 		}
 		let envelope: ZvoogEnvelope = chord[0];
 		//let duration: number = duration2seconds(tempo, duration384(envelope.pitches[0].duration));
@@ -47,7 +48,7 @@ class WAFInsSource implements ZvoogInstrumentPlugin {
 		for (let n = 1; n < envelope.pitches.length; n++) {
 			//tt = tt + duration2seconds(tempo, duration384(envelope.pitches[n - 1].duration));
 			slides.push({
-				pitch: envelope.pitches[n].pitch
+				pitch: envelope.pitches[n].pitch + this.transpose
 				, when: tt
 			});
 			//duration = duration + duration2seconds(tempo, duration384(envelope.pitches[n].duration));
