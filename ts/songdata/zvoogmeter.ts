@@ -14,8 +14,8 @@ function meter2seconds(bpm: number, meter: ZvoogMeter): number {
 function seconds2meter32(bpm:number,seconds:number):ZvoogMeter{
 	let note32Seconds = (4*60 / bpm)/32;
 	let part=seconds/note32Seconds;
-	return {count: Math.floor(part)
-		, division: 32};
+	//return {count: Math.floor(part) , division: 32};
+	return {count: Math.round(part) , division: 32};
 }
 /*function duration2seconds(bpm: number, duration384: number): number {
 	let n4 = 60 / bpm;

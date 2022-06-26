@@ -816,6 +816,7 @@ class MidiParser {
 						this.header.tempoBPM = evnt.tempoBPM ? evnt.tempoBPM : 120;
 					}
 					if (evnt.subtype == this.EVENT_META_TIME_SIGNATURE) {
+						//console.log('EVENT_META_TIME_SIGNATURE', evnt.param1, '2"',evnt.param2, 'metronome',evnt.param3, evnt.param4);
 						this.header.meterCount = evnt.param1 ? evnt.param1 : 4;
 						var dvsn: number = evnt.param2 ? evnt.param2 : 2;
 						if (dvsn == 1) this.header.meterDivision = 2
@@ -1044,7 +1045,15 @@ class MidiParser {
 		var ms = 0;
 		var tempo = 120;
 		//var meterIdx = 1;
-		var timeline: { bpm: number, c: number, d: number, split: number, s: string, ms: number, len: number }[] = [];
+		var timeline: {
+			bpm: number
+			, count: number
+			, division: number
+			, split: number
+			, sign: string
+			, ms: number
+			, len: number
+		}[] = [];
 		while (ms < midisong.duration) {
 			var tempoRatio = 4 * 60 / tempo;
 			var measureDuration = 1000 * tempoRatio * count / division;
@@ -1075,10 +1084,10 @@ class MidiParser {
 				}
 				timeline.push({
 					bpm: tempo
-					, c: count
-					, d: division
+					, count: count
+					, division: division
 					, split: ms + tempoChange[0].delta
-					, s: sign
+					, sign: sign
 					, ms: ms
 					, len: measureDuration2
 				});
@@ -1091,8 +1100,13 @@ class MidiParser {
 					}
 				}
 				timeline.push({
-					bpm: tempo, c: count
-					, d: division, split: 0, s: sign, ms: ms, len: measureDuration
+					bpm: tempo
+					, count: count
+					, division: division
+					, split: 0
+					, sign: sign
+					, ms: ms
+					, len: measureDuration
 				});
 				ms = ms + measureDuration;
 			}
@@ -1126,10 +1140,12 @@ class MidiParser {
 			, kind: "gain"
 			, initial: ""
 		});
+		console.log('timeline', timeline);
 		for (var i = 0; i < timeline.length; i++) {
 			schedule.measures.push({
-				meter: { count: Math.round(timeline[i].c), division: Math.round(timeline[i].d) }
-				, tempo: Math.round(timeline[i].bpm / 5) * 5
+				meter: { count: Math.round(timeline[i].count), division: Math.round(timeline[i].division) }
+				//, tempo: Math.round(timeline[i].bpm / 5) * 5
+				, tempo: Math.round(timeline[i].bpm)
 				, points: []
 			});
 		}

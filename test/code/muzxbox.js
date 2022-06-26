@@ -2315,8 +2315,7 @@ function meter2seconds(bpm, meter) {
 function seconds2meter32(bpm, seconds) {
     var note32Seconds = (4 * 60 / bpm) / 32;
     var part = seconds / note32Seconds;
-    return { count: Math.floor(part),
-        division: 32 };
+    return { count: Math.round(part), division: 32 };
 }
 function calculateEnvelopeDuration(envelope) {
     var d = { count: 0, division: 1 };
@@ -4122,10 +4121,10 @@ var MidiParser = (function () {
                 }
                 timeline.push({
                     bpm: tempo,
-                    c: count,
-                    d: division,
+                    count: count,
+                    division: division,
                     split: ms + tempoChange[0].delta,
-                    s: sign,
+                    sign: sign,
                     ms: ms,
                     len: measureDuration2
                 });
@@ -4139,8 +4138,13 @@ var MidiParser = (function () {
                     }
                 }
                 timeline.push({
-                    bpm: tempo, c: count,
-                    d: division, split: 0, s: sign, ms: ms, len: measureDuration
+                    bpm: tempo,
+                    count: count,
+                    division: division,
+                    split: 0,
+                    sign: sign,
+                    ms: ms,
+                    len: measureDuration
                 });
                 ms = ms + measureDuration;
             }
@@ -4173,10 +4177,11 @@ var MidiParser = (function () {
             kind: "gain",
             initial: ""
         });
+        console.log('timeline', timeline);
         for (var i = 0; i < timeline.length; i++) {
             schedule.measures.push({
-                meter: { count: Math.round(timeline[i].c), division: Math.round(timeline[i].d) },
-                tempo: Math.round(timeline[i].bpm / 5) * 5,
+                meter: { count: Math.round(timeline[i].count), division: Math.round(timeline[i].division) },
+                tempo: Math.round(timeline[i].bpm),
                 points: []
             });
         }
