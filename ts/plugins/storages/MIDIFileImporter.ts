@@ -14,6 +14,9 @@ type TrackChord = {
 type TrackNote = {
 	closed: boolean
 	, points: NotePitch[]
+	, openEvent?: MIDIEvent
+	, closeEvent?: MIDIEvent
+	, volume?: number
 }
 type NotePitch = {
 	pointDuration: number
@@ -47,12 +50,15 @@ type MIDIEvent = {
 	, badsubtype?: number
 	, midiChannel?: number
 	, playTimeMs: number
+	, preTimeMs?: number
+	, deltaTimeMs?: number
 	, trackNum?: number
 	, text?: string
 }
 type MIDISongPoint = {
 	pitch: number;
 	durationms: number;
+	midipoint?: TrackNote;
 }
 type MIDISongNote = {
 	points: MIDISongPoint[];
@@ -685,19 +691,28 @@ class MidiParser {
 	parseTicks2time(track: MIDIFileTrack) {
 		let tickResolution: number = this.lastResolution(0);
 		let playTimeTicks: number = 0;
-		for (var e = 0; e < track.trackevents.length; e++) {
-			var evnt = track.trackevents[e];
+		for (let e = 0; e < track.trackevents.length; e++) {
+
+			let evnt = track.trackevents[e];
+
 			let curDelta: number = 0.0;
 			if (evnt.delta) curDelta = evnt.delta;
-			var searchPlayTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
+			let searchPlayTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
 			tickResolution = this.lastResolution(searchPlayTimeTicks);
+
+			evnt.preTimeMs = playTimeTicks;
 			playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
+
 			evnt.playTimeMs = playTimeTicks;
+			evnt.deltaTimeMs = curDelta * tickResolution / 1000.0;
+
+			//if(e<133)console.log(evnt);
 		}
 	}
 	parseNotes() {
 		this.dumpResolutionChanges();
 		for (let t = 0; t < this.parsedTracks.length; t++) {
+			console.log('start parseNotes', t);
 			var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
 			this.parseTicks2time(singleParsedTrack);
 			for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
@@ -709,7 +724,9 @@ class MidiParser {
 							var pitch = evnt.param1 ? evnt.param1 : 0;
 							var when = 0;
 							if (evnt.playTimeMs) when = evnt.playTimeMs;
-							this.takeOpenedNote(pitch, when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
+							let trno = this.takeOpenedNote(pitch, when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
+							trno.volume = evnt.param2;
+							trno.openEvent = evnt;
 						}
 					} else {
 						if (evnt.subtype == this.EVENT_MIDI_NOTE_OFF) {
@@ -725,6 +742,7 @@ class MidiParser {
 									}
 									chpi.note.points[chpi.note.points.length - 1].pointDuration = when - chpi.chord.when - duration;
 									chpi.note.closed = true;
+									chpi.note.closeEvent = evnt;
 								}
 							}
 						} else {
@@ -935,7 +953,8 @@ class MidiParser {
 					// If velocity is 0, it's a note off event in fact
 					if (!event.param2) {
 						event.subtype = this.EVENT_MIDI_NOTE_OFF;
-						event.param2 = 127; // Find a standard telling what to do here
+						//event.param2 = 127; // Find a standard telling what to do here
+						event.param2 = -1;
 					}
 					return event;
 				case this.EVENT_MIDI_NOTE_AFTERTOUCH:
@@ -1005,8 +1024,11 @@ class MidiParser {
 		return pars;
 	}
 	convert(): ZvoogSchedule {
+
 		var midisong: MIDISongData = this.dump();
 		console.log('midisong', midisong);
+
+
 		let minIns = 123456;
 		let maxIns = -1;
 		let minDr = 123456;
@@ -1156,7 +1178,7 @@ class MidiParser {
 				if (Math.round(lyricsPiece.ms) < Math.round(timeline[tc].ms)) {
 					var timelineMeasure = timeline[tc - 1];
 					var skipInMeasureMs = lyricsPiece.ms - timelineMeasure.ms;
-					var skipMeter: ZvoogMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
+					var skipMeter: ZvoogMeter = seconds2meterRound(skipInMeasureMs / 1000, timelineMeasure.bpm);
 					skipMeter = DUU(skipMeter).simplify();
 					var point: ZvoogMeasurePoint = {
 						when: skipMeter
@@ -1244,7 +1266,7 @@ class MidiParser {
 							if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
 								var timelineMeasure = timeline[tc - 1];
 								var skipInMeasureMs = midichord.when - timelineMeasure.ms;
-								var skipMeter: ZvoogMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
+								var skipMeter: ZvoogMeter = seconds2meterRound(skipInMeasureMs / 1000, timelineMeasure.bpm);
 								skipMeter = DUU(skipMeter).simplify();
 								let onehit: ZvoogChordPoint = {
 									when: skipMeter
@@ -1330,7 +1352,7 @@ class MidiParser {
 						if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
 							var timelineMeasure = timeline[tc - 1];
 							var skipInMeasureMs = midichord.when - timelineMeasure.ms;
-							var skipMeter: ZvoogMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
+							var skipMeter: ZvoogMeter = seconds2meterRound(skipInMeasureMs / 1000, timelineMeasure.bpm);
 							//console.log(i,tc,skipInMeasureMs,skipMeter,DUU(skipMeter).simplify());
 							skipMeter = DUU(skipMeter).simplify();
 							var onechord: ZvoogChordStrings = {
@@ -1343,8 +1365,10 @@ class MidiParser {
 								var mino: MIDISongNote = midichord.notes[nx];
 								for (var px = 0; px < mino.points.length; px++) {
 									var mipoint: MIDISongPoint = mino.points[px];
+									let vol=mipoint.midipoint?.volume;
+									//console.log(vol);
 									env.pitches.push({
-										duration: DUU(seconds2meter32(mipoint.durationms / 1000, timelineMeasure.bpm)).simplify()
+										duration: DUU(seconds2meterRound(mipoint.durationms / 1000, timelineMeasure.bpm)).simplify()
 										, pitch: mipoint.pitch - midiInstrumentPitchShift
 									});
 								}
@@ -1357,7 +1381,8 @@ class MidiParser {
 				}
 			}
 		}
-		console.log(schedule);
+		console.log('converter', this);
+		console.log('result', schedule);
 		return schedule;
 	}
 	findOrCreateTrack(trackNum: number, channelNum: number, trackChannel: { trackNum: number, channelNum: number, track: MIDISongTrack }[]): { trackNum: number, channelNum: number, track: MIDISongTrack } {
@@ -1380,7 +1405,7 @@ class MidiParser {
 		return it;
 	}
 	dump(): MIDISongData {
-		var a: MIDISongData = {
+		let midiSongData: MIDISongData = {
 			parser: '1.01'
 			, duration: 0
 			, bpm: this.header.tempoBPM
@@ -1419,6 +1444,7 @@ class MidiParser {
 					for (var v = 0; v < midinote.points.length; v++) {
 						var midipoint: NotePitch = midinote.points[v];
 						var newpoint: MIDISongPoint = { pitch: midipoint.pitch, durationms: midipoint.pointDuration };
+						newpoint.midipoint = midinote;
 						newnote.points.push(newpoint);
 					}
 				}
@@ -1436,9 +1462,9 @@ class MidiParser {
 		for (let tt = 0; tt < trackChannel.length; tt++) {
 			let trackChan = trackChannel[tt];
 			if (trackChan.track.songchords.length > 0) {
-				a.miditracks.push(trackChannel[tt].track);
-				if (a.duration < maxWhen) {
-					a.duration = 54321 + maxWhen;
+				midiSongData.miditracks.push(trackChannel[tt].track);
+				if (midiSongData.duration < maxWhen) {
+					midiSongData.duration = 54321 + maxWhen;
 				}
 				for (let i = 0; i < this.parsedTracks.length; i++) {
 					let miditrack: MIDIFileTrack = this.parsedTracks[i];
@@ -1450,7 +1476,7 @@ class MidiParser {
 				}
 			}
 		}
-		return a;
+		return midiSongData;
 	}
 }
 

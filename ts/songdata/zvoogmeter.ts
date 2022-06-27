@@ -11,11 +11,13 @@ function meter2seconds(bpm: number, meter: ZvoogMeter): number {
 	let meterSeconds = wholeNoteSeconds * meter.count / meter.division;
 	return meterSeconds;
 }
-function seconds2meter32(bpm:number,seconds:number):ZvoogMeter{
-	let note32Seconds = (4*60 / bpm)/32;
-	let part=seconds/note32Seconds;
+function seconds2meterRound(bpm:number,seconds:number):ZvoogMeter{
+	//let note32Seconds = (4*60 / bpm)/32;
+	let note16Seconds = (4*60 / bpm)/16;
+	//let part=seconds/note32Seconds;
+	let part=seconds/note16Seconds;
 	//return {count: Math.floor(part) , division: 32};
-	return {count: Math.round(part) , division: 32};
+	return {count: Math.round(part) , division: 16};
 }
 /*function duration2seconds(bpm: number, duration384: number): number {
 	let n4 = 60 / bpm;

@@ -479,7 +479,7 @@ declare type ZvoogStepIndex = {
     step: number;
 };
 declare function meter2seconds(bpm: number, meter: ZvoogMeter): number;
-declare function seconds2meter32(bpm: number, seconds: number): ZvoogMeter;
+declare function seconds2meterRound(bpm: number, seconds: number): ZvoogMeter;
 declare function calculateEnvelopeDuration(envelope: ZvoogEnvelope): ZvoogMeter;
 declare function DUU(u: ZvoogMeter): DurationUnitUtil;
 declare class DurationUnitUtil {
@@ -742,7 +742,7 @@ declare class ZvoogTicker {
     tryToInitEffects(filters: ZvoogFilterSetting[]): boolean;
     checkNotBusyEffects(filters: ZvoogFilterSetting[]): boolean;
     sendInstrumentEvents(instrument: ZvoogInstrumentVoice, song: ZvoogSchedule, scheduleWhen: number, tickStart: number, tickEnd: number): void;
-    sendDrumEvents(drum: ZvoogPercussionVoice, song: ZvoogSchedule, when: number, from: number, to: number): void;
+    sendDrumEvents(drum: ZvoogPercussionVoice, song: ZvoogSchedule, scheduleWhen: number, tickStart: number, tickEnd: number): void;
     sendAllFilterEvents(filters: ZvoogFilterSetting[], song: ZvoogSchedule, when: number, from: number, to: number): void;
     sendSingleFilterEvents(filter: ZvoogFilterSetting, song: ZvoogSchedule, when: number, from: number, to: number): void;
     sendAllParameters(parameters: ZvoogParameterData[], song: ZvoogSchedule, when: number, from: number, to: number): void;
@@ -773,6 +773,9 @@ declare type TrackChord = {
 declare type TrackNote = {
     closed: boolean;
     points: NotePitch[];
+    openEvent?: MIDIEvent;
+    closeEvent?: MIDIEvent;
+    volume?: number;
 };
 declare type NotePitch = {
     pointDuration: number;
@@ -806,12 +809,15 @@ declare type MIDIEvent = {
     badsubtype?: number;
     midiChannel?: number;
     playTimeMs: number;
+    preTimeMs?: number;
+    deltaTimeMs?: number;
     trackNum?: number;
     text?: string;
 };
 declare type MIDISongPoint = {
     pitch: number;
     durationms: number;
+    midipoint?: TrackNote;
 };
 declare type MIDISongNote = {
     points: MIDISongPoint[];

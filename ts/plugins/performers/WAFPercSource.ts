@@ -15,10 +15,10 @@ class WAFPercSource implements ZvoogPercussionPlugin {
 		(window as any).wafPlayer.cancelQueue(this.audioContext);
 	}
 	scheduleHit(when: number): void {
-		let drumPitch=33;
+		//let drumPitch=33;
 		let duration=1;
 		(window as any).wafPlayer.queueWaveTable(this.audioContext
-			, this.out, this.zones, when, drumPitch, duration, 0.99);
+			, this.out, this.zones, when, this.ins, duration, 0.99);
 	}
 	prepare(audioContext: AudioContext, data: string): void {
 		if (this.out) {
@@ -57,7 +57,9 @@ class WAFPercSource implements ZvoogPercussionPlugin {
 	}
 	selectDrum(nn: number): void {
 		let me = this;
-		let info = (window as any).wafPlayer.loader.drumInfo(nn);
+		let idx=(window as any).wafPlayer.loader.findDrum(nn);
+		let info = (window as any).wafPlayer.loader.drumInfo(idx);
+		//console.log(nn,idx,info);
 		(window as any).wafPlayer.loader.startLoad(this.audioContext, info.url, info.variable);
 		(window as any).wafPlayer.loader.waitLoad(function () {
 			me.zones = window[info.variable];

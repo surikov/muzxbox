@@ -365,8 +365,29 @@ class ZvoogTicker {
 			}
 		}
 	}
-	sendDrumEvents(drum: ZvoogPercussionVoice, song: ZvoogSchedule, when: number, from: number, to: number) {
-		this.sendAllParameters(drum.percussionSetting.parameters, song, when, from, to);
+	sendDrumEvents(drum: ZvoogPercussionVoice, song: ZvoogSchedule, scheduleWhen: number, tickStart: number, tickEnd: number) {
+		this.sendAllParameters(drum.percussionSetting.parameters, song,scheduleWhen, tickStart, tickEnd);
+		let plugin = drum.percussionSetting.percussionPlugin;
+
+		if (plugin) {
+			let measureStart = 0;
+			for (let mm = 0; mm < song.measures.length; mm++) {
+				let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
+				if (tickStart < measureStart+ measureDuration && tickEnd >= measureStart ) {
+					for (let cc = 0; cc < drum.measureBunches[mm].bunches.length; cc++) {
+						let strings = drum.measureBunches[mm].bunches[cc];
+						let chordStart = measureStart + meter2seconds(song.measures[mm].tempo, strings.when);
+						if (chordStart >= tickStart && chordStart < tickEnd) {
+							plugin.scheduleHit(scheduleWhen + chordStart - tickStart);
+						}
+					}
+				}
+				measureStart = measureStart + measureDuration;
+				if (measureStart > tickEnd) {
+					break;
+				}
+			}
+		}
 	}
 	sendAllFilterEvents(filters: ZvoogFilterSetting[], song: ZvoogSchedule, when: number, from: number, to: number) {
 		for (let i = 0; i < filters.length; i++) {

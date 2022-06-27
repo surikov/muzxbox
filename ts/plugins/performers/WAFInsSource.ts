@@ -122,8 +122,9 @@ class WAFInsSource implements ZvoogInstrumentPlugin {
 	}
 	selectIns(nn: number): void {
 		let me = this;
-		let info = (window as any).wafPlayer.loader.instrumentInfo(nn);
-		//console.log(info);
+		let idx=(window as any).wafPlayer.loader.findInstrument(nn);
+		let info = (window as any).wafPlayer.loader.instrumentInfo(idx);
+		//console.log(nn,idx,info);
 		(window as any).wafPlayer.loader.startLoad(this.audioContext, info.url, info.variable);
 		(window as any).wafPlayer.loader.waitLoad(function () {
 			me.zones = window[info.variable];

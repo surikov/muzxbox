@@ -2100,7 +2100,8 @@ var WAFInsSource = (function () {
     };
     WAFInsSource.prototype.selectIns = function (nn) {
         var me = this;
-        var info = window.wafPlayer.loader.instrumentInfo(nn);
+        var idx = window.wafPlayer.loader.findInstrument(nn);
+        var info = window.wafPlayer.loader.instrumentInfo(idx);
         window.wafPlayer.loader.startLoad(this.audioContext, info.url, info.variable);
         window.wafPlayer.loader.waitLoad(function () {
             me.zones = window[info.variable];
@@ -2123,9 +2124,8 @@ var WAFPercSource = (function () {
         window.wafPlayer.cancelQueue(this.audioContext);
     };
     WAFPercSource.prototype.scheduleHit = function (when) {
-        var drumPitch = 33;
         var duration = 1;
-        window.wafPlayer.queueWaveTable(this.audioContext, this.out, this.zones, when, drumPitch, duration, 0.99);
+        window.wafPlayer.queueWaveTable(this.audioContext, this.out, this.zones, when, this.ins, duration, 0.99);
     };
     WAFPercSource.prototype.prepare = function (audioContext, data) {
         if (this.out) {
@@ -2161,7 +2161,8 @@ var WAFPercSource = (function () {
     };
     WAFPercSource.prototype.selectDrum = function (nn) {
         var me = this;
-        var info = window.wafPlayer.loader.drumInfo(nn);
+        var idx = window.wafPlayer.loader.findDrum(nn);
+        var info = window.wafPlayer.loader.drumInfo(idx);
         window.wafPlayer.loader.startLoad(this.audioContext, info.url, info.variable);
         window.wafPlayer.loader.waitLoad(function () {
             me.zones = window[info.variable];
@@ -2312,10 +2313,10 @@ function meter2seconds(bpm, meter) {
     var meterSeconds = wholeNoteSeconds * meter.count / meter.division;
     return meterSeconds;
 }
-function seconds2meter32(bpm, seconds) {
-    var note32Seconds = (4 * 60 / bpm) / 32;
-    var part = seconds / note32Seconds;
-    return { count: Math.round(part), division: 32 };
+function seconds2meterRound(bpm, seconds) {
+    var note16Seconds = (4 * 60 / bpm) / 16;
+    var part = seconds / note16Seconds;
+    return { count: Math.round(part), division: 16 };
 }
 function calculateEnvelopeDuration(envelope) {
     var d = { count: 0, division: 1 };
@@ -2933,8 +2934,28 @@ var ZvoogTicker = (function () {
             }
         }
     };
-    ZvoogTicker.prototype.sendDrumEvents = function (drum, song, when, from, to) {
-        this.sendAllParameters(drum.percussionSetting.parameters, song, when, from, to);
+    ZvoogTicker.prototype.sendDrumEvents = function (drum, song, scheduleWhen, tickStart, tickEnd) {
+        this.sendAllParameters(drum.percussionSetting.parameters, song, scheduleWhen, tickStart, tickEnd);
+        var plugin = drum.percussionSetting.percussionPlugin;
+        if (plugin) {
+            var measureStart = 0;
+            for (var mm = 0; mm < song.measures.length; mm++) {
+                var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
+                if (tickStart < measureStart + measureDuration && tickEnd >= measureStart) {
+                    for (var cc = 0; cc < drum.measureBunches[mm].bunches.length; cc++) {
+                        var strings = drum.measureBunches[mm].bunches[cc];
+                        var chordStart = measureStart + meter2seconds(song.measures[mm].tempo, strings.when);
+                        if (chordStart >= tickStart && chordStart < tickEnd) {
+                            plugin.scheduleHit(scheduleWhen + chordStart - tickStart);
+                        }
+                    }
+                }
+                measureStart = measureStart + measureDuration;
+                if (measureStart > tickEnd) {
+                    break;
+                }
+            }
+        }
     };
     ZvoogTicker.prototype.sendAllFilterEvents = function (filters, song, when, from, to) {
         for (var i = 0; i < filters.length; i++) {
@@ -3745,13 +3766,16 @@ var MidiParser = (function () {
                 curDelta = evnt.delta;
             var searchPlayTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
             tickResolution = this.lastResolution(searchPlayTimeTicks);
+            evnt.preTimeMs = playTimeTicks;
             playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
             evnt.playTimeMs = playTimeTicks;
+            evnt.deltaTimeMs = curDelta * tickResolution / 1000.0;
         }
     };
     MidiParser.prototype.parseNotes = function () {
         this.dumpResolutionChanges();
         for (var t = 0; t < this.parsedTracks.length; t++) {
+            console.log('start parseNotes', t);
             var singleParsedTrack = this.parsedTracks[t];
             this.parseTicks2time(singleParsedTrack);
             for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
@@ -3764,7 +3788,9 @@ var MidiParser = (function () {
                             var when = 0;
                             if (evnt.playTimeMs)
                                 when = evnt.playTimeMs;
-                            this.takeOpenedNote(pitch, when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
+                            var trno = this.takeOpenedNote(pitch, when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
+                            trno.volume = evnt.param2;
+                            trno.openEvent = evnt;
                         }
                     }
                     else {
@@ -3782,6 +3808,7 @@ var MidiParser = (function () {
                                     }
                                     chpi.note.points[chpi.note.points.length - 1].pointDuration = when - chpi.chord.when - duration;
                                     chpi.note.closed = true;
+                                    chpi.note.closeEvent = evnt;
                                 }
                             }
                         }
@@ -4002,7 +4029,7 @@ var MidiParser = (function () {
                     event.param2 = stream.readUint8();
                     if (!event.param2) {
                         event.subtype = this.EVENT_MIDI_NOTE_OFF;
-                        event.param2 = 127;
+                        event.param2 = -1;
                     }
                     return event;
                 case this.EVENT_MIDI_NOTE_AFTERTOUCH:
@@ -4048,6 +4075,7 @@ var MidiParser = (function () {
         return pars;
     };
     MidiParser.prototype.convert = function () {
+        var _a;
         var midisong = this.dump();
         console.log('midisong', midisong);
         var minIns = 123456;
@@ -4191,7 +4219,7 @@ var MidiParser = (function () {
                 if (Math.round(lyricsPiece.ms) < Math.round(timeline[tc].ms)) {
                     var timelineMeasure = timeline[tc - 1];
                     var skipInMeasureMs = lyricsPiece.ms - timelineMeasure.ms;
-                    var skipMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
+                    var skipMeter = seconds2meterRound(skipInMeasureMs / 1000, timelineMeasure.bpm);
                     skipMeter = DUU(skipMeter).simplify();
                     var point = {
                         when: skipMeter,
@@ -4264,7 +4292,7 @@ var MidiParser = (function () {
                             if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
                                 var timelineMeasure = timeline[tc - 1];
                                 var skipInMeasureMs = midichord.when - timelineMeasure.ms;
-                                var skipMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
+                                var skipMeter = seconds2meterRound(skipInMeasureMs / 1000, timelineMeasure.bpm);
                                 skipMeter = DUU(skipMeter).simplify();
                                 var onehit = {
                                     when: skipMeter
@@ -4309,7 +4337,7 @@ var MidiParser = (function () {
                         if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
                             var timelineMeasure = timeline[tc - 1];
                             var skipInMeasureMs = midichord.when - timelineMeasure.ms;
-                            var skipMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
+                            var skipMeter = seconds2meterRound(skipInMeasureMs / 1000, timelineMeasure.bpm);
                             skipMeter = DUU(skipMeter).simplify();
                             var onechord = {
                                 when: skipMeter,
@@ -4321,8 +4349,9 @@ var MidiParser = (function () {
                                 var mino = midichord.notes[nx];
                                 for (var px = 0; px < mino.points.length; px++) {
                                     var mipoint = mino.points[px];
+                                    var vol = (_a = mipoint.midipoint) === null || _a === void 0 ? void 0 : _a.volume;
                                     env.pitches.push({
-                                        duration: DUU(seconds2meter32(mipoint.durationms / 1000, timelineMeasure.bpm)).simplify(),
+                                        duration: DUU(seconds2meterRound(mipoint.durationms / 1000, timelineMeasure.bpm)).simplify(),
                                         pitch: mipoint.pitch - midiInstrumentPitchShift
                                     });
                                 }
@@ -4335,7 +4364,8 @@ var MidiParser = (function () {
                 }
             }
         }
-        console.log(schedule);
+        console.log('converter', this);
+        console.log('result', schedule);
         return schedule;
     };
     MidiParser.prototype.findOrCreateTrack = function (trackNum, channelNum, trackChannel) {
@@ -4358,7 +4388,7 @@ var MidiParser = (function () {
         return it;
     };
     MidiParser.prototype.dump = function () {
-        var a = {
+        var midiSongData = {
             parser: '1.01',
             duration: 0,
             bpm: this.header.tempoBPM,
@@ -4396,6 +4426,7 @@ var MidiParser = (function () {
                     for (var v = 0; v < midinote.points.length; v++) {
                         var midipoint = midinote.points[v];
                         var newpoint = { pitch: midipoint.pitch, durationms: midipoint.pointDuration };
+                        newpoint.midipoint = midinote;
                         newnote.points.push(newpoint);
                     }
                 }
@@ -4413,9 +4444,9 @@ var MidiParser = (function () {
         for (var tt = 0; tt < trackChannel.length; tt++) {
             var trackChan = trackChannel[tt];
             if (trackChan.track.songchords.length > 0) {
-                a.miditracks.push(trackChannel[tt].track);
-                if (a.duration < maxWhen) {
-                    a.duration = 54321 + maxWhen;
+                midiSongData.miditracks.push(trackChannel[tt].track);
+                if (midiSongData.duration < maxWhen) {
+                    midiSongData.duration = 54321 + maxWhen;
                 }
                 for (var i_5 = 0; i_5 < this.parsedTracks.length; i_5++) {
                     var miditrack_1 = this.parsedTracks[i_5];
@@ -4427,7 +4458,7 @@ var MidiParser = (function () {
                 }
             }
         }
-        return a;
+        return midiSongData;
     };
     return MidiParser;
 }());
@@ -4986,11 +5017,9 @@ var ZMainMenu = (function () {
         });
         this.menuRoot.folders.push(this.songFolder);
         this.menuRoot.folders.push({
-            path: "Rhythm patterns", icon: "", folders: [],
-            items: [
+            path: "Rhythm patterns", icon: "", folders: [], items: [
                 {
-                    label: 'plain 1/32', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/32', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 1, division: 32 }, { count: 1, division: 32 },
                             { count: 1, division: 32 }, { count: 1, division: 32 },
@@ -5009,8 +5038,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/16', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/16', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 1, division: 16 }, { count: 1, division: 16 },
                             { count: 1, division: 16 }, { count: 1, division: 16 },
@@ -5025,8 +5053,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'plain 1/8', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'plain 1/8', autoclose: true, icon: '', action: function () {
                         console.log('plain 1/8', default8rhytym);
                         var me = window['MZXB'];
                         if (me) {
@@ -5035,8 +5062,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'swing 1/8', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'swing 1/8', autoclose: true, icon: '', action: function () {
                         var rr = [
                             { count: 5, division: 32 }, { count: 3, division: 32 },
                             { count: 5, division: 32 }, { count: 3, division: 32 }
@@ -5051,11 +5077,9 @@ var ZMainMenu = (function () {
             ], afterOpen: function () { }
         });
         this.menuRoot.folders.push({
-            path: "Screen size", icon: "", folders: [],
-            items: [
+            path: "Screen size", icon: "", folders: [], items: [
                 {
-                    label: 'normal', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'normal', autoclose: true, icon: '', action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutNormal();
@@ -5063,8 +5087,7 @@ var ZMainMenu = (function () {
                     }
                 },
                 {
-                    label: 'big', autoclose: true, icon: '',
-                    action: function () {
+                    label: 'big', autoclose: true, icon: '', action: function () {
                         var me = window['MZXB'];
                         if (me) {
                             me.setLayoutBig();
