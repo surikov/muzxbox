@@ -32,6 +32,27 @@ function countSteps(meter: ZvoogMeter, rhythmPattern: ZvoogMeter[]): number {
 	}
 	return stepIdx;
 }
+function findNextCurvePoint(points: ZvoogCurvePoint[], last: ZvoogCurvePoint): null | ZvoogCurvePoint {
+	let current: ZvoogCurvePoint = { skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: 0 };
+	for (let pp = 0; pp < points.length; pp++) {
+		let point = points[pp];
+		if (point.skipMeasures) {
+			current.skipMeasures = current.skipMeasures + point.skipMeasures;
+			current.skipSteps = { count: 0, division: 1 };
+		} else {
+			current.skipSteps = DUU(current.skipSteps).plus(point.skipSteps);
+		}
+		//console.log(current);
+		if (
+			(last.skipMeasures < current.skipMeasures)
+			|| (last.skipMeasures == current.skipMeasures
+				&& DUU(last.skipSteps).lessThen(current.skipSteps))
+		) {
+			return current;
+		}
+	}
+	return null;
+}
 function findMeasureStep(measures: ZvoogMeasure[], rhythmPattern: ZvoogMeter[], ratioDuration: number, xx: number): null | ZvoogStepIndex {
 	let measureStartX = 0;
 	let measureIdx = 0;

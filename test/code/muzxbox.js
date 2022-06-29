@@ -1496,6 +1496,25 @@ function countSteps(meter, rhythmPattern) {
     }
     return stepIdx;
 }
+function findNextCurvePoint(points, last) {
+    var current = { skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: 0 };
+    for (var pp = 0; pp < points.length; pp++) {
+        var point = points[pp];
+        if (point.skipMeasures) {
+            current.skipMeasures = current.skipMeasures + point.skipMeasures;
+            current.skipSteps = { count: 0, division: 1 };
+        }
+        else {
+            current.skipSteps = DUU(current.skipSteps).plus(point.skipSteps);
+        }
+        if ((last.skipMeasures < current.skipMeasures)
+            || (last.skipMeasures == current.skipMeasures
+                && DUU(last.skipSteps).lessThen(current.skipSteps))) {
+            return current;
+        }
+    }
+    return null;
+}
 function findMeasureStep(measures, rhythmPattern, ratioDuration, xx) {
     var measureStartX = 0;
     var measureIdx = 0;
@@ -5344,8 +5363,42 @@ var MuzXBox = (function () {
                     ]
                 }
             ],
-            filters: [],
-            measures: [{ meter: { count: 3, division: 4 }, tempo: 120, points: [] }, { meter: { count: 4, division: 4 }, tempo: 90, points: [] }, { meter: { count: 4, division: 4 }, tempo: 180, points: [] }],
+            filters: [
+                {
+                    filterPlugin: null,
+                    parameters: [{
+                            points: [{
+                                    skipMeasures: 0,
+                                    skipSteps: {
+                                        count: 0,
+                                        division: 1
+                                    },
+                                    velocity: 100
+                                }],
+                            caption: 'test gain'
+                        }],
+                    kind: 'gain',
+                    initial: ''
+                },
+                {
+                    filterPlugin: null,
+                    parameters: [{
+                            points: [
+                                { skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: 88 },
+                                { skipMeasures: 2, skipSteps: { count: 2, division: 4 }, velocity: 88 },
+                                { skipMeasures: 0, skipSteps: { count: 2, division: 1 }, velocity: 0 }
+                            ],
+                            caption: 'another gain'
+                        }],
+                    kind: 'gain',
+                    initial: ''
+                }
+            ],
+            measures: [
+                { meter: { count: 3, division: 4 }, tempo: 120, points: [] },
+                { meter: { count: 4, division: 4 }, tempo: 90, points: [] },
+                { meter: { count: 4, division: 4 }, tempo: 180, points: [] }
+            ],
             harmony: { tone: '', mode: '', progression: [] }
         };
         this.currentSchedule = emptySchedule;
@@ -5603,17 +5656,12 @@ var PianoRollRenderer = (function () {
         });
     };
     PianoRollRenderer.prototype.addParameterMeasure = function (ratioDuration, ratioThickness, song, parameter, measureNum, time, css, anchors) {
-        var point = parameter.points[0];
-        for (var aa = 0; aa < anchors.length; aa++) {
-            var line_1 = {
-                x1: 0,
-                x2: 0 + 1,
-                y1: 128 - point.velocity - 0.5 * ratioThickness,
-                y2: 128 - point.velocity + 1 - 0.5 * ratioThickness,
-                css: css
-            };
-            anchors[aa].content.push(cloneLine(line_1));
-        }
+        var last = {
+            skipMeasures: measureNum,
+            skipSteps: { count: -1, division: 1 },
+            velocity: 0
+        };
+        console.log(measureNum, parameter, findNextCurvePoint(parameter.points, last));
     };
     PianoRollRenderer.prototype.addMeasureLyrics = function (song, time, mm, ratioDuration, ratioThickness, anchor, css) {
         var topGridMargin = topGridMarginTp(song, ratioThickness);
@@ -5752,7 +5800,7 @@ var PianoRollRenderer = (function () {
                     if (xx1 >= xx2) {
                         xx2 = xx1 + 1;
                     }
-                    var line_2 = {
+                    var line_1 = {
                         x1: xx1,
                         x2: xx2,
                         y1: topGridMargin + yShift - pitch.pitch * ratioThickness,
@@ -5760,10 +5808,10 @@ var PianoRollRenderer = (function () {
                         css: css
                     };
                     for (var aa = 0; aa < anchors.length; aa++) {
-                        if (line_2.x2 - anchors[aa].xx > anchors[aa].ww) {
-                            anchors[aa].ww = line_2.x2 - anchors[aa].xx;
+                        if (line_1.x2 - anchors[aa].xx > anchors[aa].ww) {
+                            anchors[aa].ww = line_1.x2 - anchors[aa].xx;
                         }
-                        anchors[aa].content.push(cloneLine(line_2));
+                        anchors[aa].content.push(cloneLine(line_1));
                         if (measureMaxLen < anchors[aa].ww) {
                             measureMaxLen = anchors[aa].ww;
                         }
@@ -6507,15 +6555,15 @@ var GridRenderer = (function () {
                 if (stepNN == rhythmPattern.length - 1) {
                     css = 'rhythmWideLine4';
                 }
-                var line_3 = {
+                var line_2 = {
                     x1: leftGridMargin + (time + positionDuration) * ratioDuration,
                     y1: topGridMargin,
                     x2: leftGridMargin + (time + positionDuration) * ratioDuration,
                     y2: topGridMargin + gridHeightTp(ratioThickness) + bottomGridMargin,
                     css: css
                 };
-                gridMeasure4.content.push(line_3);
-                gridMeasure1.content.push(line_3);
+                gridMeasure4.content.push(line_2);
+                gridMeasure1.content.push(line_2);
                 var line2 = {
                     x1: leftGridMargin + (time + positionDuration) * ratioDuration,
                     y1: 0,

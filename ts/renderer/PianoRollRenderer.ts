@@ -77,7 +77,21 @@ class PianoRollRenderer {
 			]
 		});
 	}
-	addParameterMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, parameter: ZvoogParameterData, measureNum: number, time: number, css: string, anchors: TileAnchor[]) {
+
+	addParameterMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, parameter: ZvoogParameterData
+		, measureNum: number, time: number, css: string, anchors: TileAnchor[]) {
+		let last = {
+			skipMeasures: measureNum
+			, skipSteps: { count: -1, division: 1 }
+			, velocity: 0
+		};
+		console.log(measureNum,parameter, findNextCurvePoint(parameter.points, last));
+		//let pointMeasure = 0;
+		//let pointStep = { count: 0, division: 1 };
+		//for (let pp = 0; pp > parameter.points.length; pp++) {
+
+		//}
+		/*
 		let point: ZvoogCurvePoint = parameter.points[0];
 		for (let aa = 0; aa < anchors.length; aa++) {
 			let line: TileLine = {
@@ -88,7 +102,7 @@ class PianoRollRenderer {
 				, css: css
 			};
 			anchors[aa].content.push(cloneLine(line));
-		}
+		}*/
 	}
 	addMeasureLyrics(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor, css: string) {
 		let topGridMargin = topGridMarginTp(song, ratioThickness);

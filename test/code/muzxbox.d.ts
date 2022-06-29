@@ -297,6 +297,7 @@ declare type StartDuration = {
 };
 declare function countMeasureSteps(meter: ZvoogMeter, rhythm: ZvoogMeter[]): number;
 declare function countSteps(meter: ZvoogMeter, rhythmPattern: ZvoogMeter[]): number;
+declare function findNextCurvePoint(points: ZvoogCurvePoint[], last: ZvoogCurvePoint): null | ZvoogCurvePoint;
 declare function findMeasureStep(measures: ZvoogMeasure[], rhythmPattern: ZvoogMeter[], ratioDuration: number, xx: number): null | ZvoogStepIndex;
 declare function measuresAndStepDuration(song: ZvoogSchedule, count: number, step: number, rhythmPattern: ZvoogMeter[]): StartDuration;
 declare function progressionDuration(progression: ZvoogChordMelody[]): ZvoogMeter;

@@ -80,7 +80,7 @@ class MuzXBox {
 										, { duration: { count: 1, division: 8 }, pitch: 36 }]
 								}]
 							}*/
-						]
+							]
 						}
 							, { chords: [] }
 							, { chords: [] }
@@ -94,8 +94,8 @@ class MuzXBox {
 							{
 								chords: [
 									{ when: { count: 0, division: 4 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 60 }] }] }
-									,{ when: { count: 1, division: 4 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 61 }] }] }
-									,{ when: { count: 2, division: 4 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 62 }] }] }
+									, { when: { count: 1, division: 4 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 61 }] }] }
+									, { when: { count: 2, division: 4 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 62 }] }] }
 								]
 							}
 							, {
@@ -130,8 +130,42 @@ class MuzXBox {
 				]
 			}
 			]
-			, filters: []
-			, measures: [{ meter: { count: 3, division: 4 }, tempo: 120, points: [] }, { meter: { count: 4, division: 4 }, tempo: 90, points: [] }, { meter: { count: 4, division: 4 }, tempo: 180, points: [] }]
+			, filters: [
+				{
+					filterPlugin: null
+					, parameters: [{
+						points: [{
+							skipMeasures: 0
+							, skipSteps: {
+								count: 0
+								, division: 1
+							}
+							, velocity: 100
+						}]
+						, caption: 'test gain'
+					}]
+					, kind: 'gain'
+					, initial: ''
+				}
+				, {
+					filterPlugin: null
+					, parameters: [{
+						points: [
+							{ skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: 88 }
+							, { skipMeasures: 2, skipSteps: { count: 2, division: 4 }, velocity: 88 }
+							,{ skipMeasures: 0, skipSteps: { count: 2, division: 1 }, velocity: 0 }
+						]
+						, caption: 'another gain'
+					}]
+					, kind: 'gain'
+					, initial: ''
+				}
+			]
+			, measures: [
+				{ meter: { count: 3, division: 4 }, tempo: 120, points: [] }
+				, { meter: { count: 4, division: 4 }, tempo: 90, points: [] }
+				, { meter: { count: 4, division: 4 }, tempo: 180, points: [] }
+			]
 			, harmony: { tone: '', mode: '', progression: [] }
 		};
 		/*for (let i = 0; i < 100; i++) {
