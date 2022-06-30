@@ -1037,8 +1037,8 @@ var CannyDo = (function () {
     };
     return CannyDo;
 }());
-function TAnchor(xx, yy, ww, hh, showZoom, hideZoom) {
-    return { xx: xx, yy: yy, ww: ww, hh: hh, showZoom: showZoom, hideZoom: hideZoom, content: [] };
+function TAnchor(xx, yy, ww, hh, showZoom, hideZoom, id) {
+    return { xx: xx, yy: yy, ww: ww, hh: hh, showZoom: showZoom, hideZoom: hideZoom, content: [], id: id };
 }
 function TText(x, y, css, text) {
     return { x: x, y: y, text: text, css: css, };
@@ -1510,6 +1510,7 @@ function findNextCurvePoint(points, last) {
         if ((last.skipMeasures < current.skipMeasures)
             || (last.skipMeasures == current.skipMeasures
                 && DUU(last.skipSteps).lessThen(current.skipSteps))) {
+            current.velocity = point.velocity;
             return current;
         }
     }
@@ -2327,6 +2328,16 @@ var AudioFileSource = (function () {
     };
     return AudioFileSource;
 }());
+function point2seconds(song, point) {
+    var ss = 0;
+    for (var i = 0; i < point.skipMeasures; i++) {
+        ss = ss + meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+    }
+    if (point.skipMeasures < song.measures.length) {
+        ss = ss + meter2seconds(song.measures[point.skipMeasures].tempo, point.skipSteps);
+    }
+    return ss;
+}
 function meter2seconds(bpm, meter) {
     var wholeNoteSeconds = 4 * 60 / bpm;
     var meterSeconds = wholeNoteSeconds * meter.count / meter.division;
@@ -5370,8 +5381,8 @@ var MuzXBox = (function () {
                             points: [{
                                     skipMeasures: 0,
                                     skipSteps: {
-                                        count: 0,
-                                        division: 1
+                                        count: 1,
+                                        division: 2
                                     },
                                     velocity: 100
                                 }],
@@ -5384,13 +5395,15 @@ var MuzXBox = (function () {
                     filterPlugin: null,
                     parameters: [{
                             points: [
-                                { skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: 88 },
+                                { skipMeasures: 0, skipSteps: { count: 1, division: 4 }, velocity: 88 },
                                 { skipMeasures: 2, skipSteps: { count: 2, division: 4 }, velocity: 88 },
-                                { skipMeasures: 0, skipSteps: { count: 2, division: 1 }, velocity: 0 }
+                                { skipMeasures: 0, skipSteps: { count: 1, division: 16 }, velocity: 22 },
+                                { skipMeasures: 0, skipSteps: { count: 1, division: 16 }, velocity: 66 },
+                                { skipMeasures: 1, skipSteps: { count: 1, division: 2 }, velocity: 44 }
                             ],
-                            caption: 'another gain'
+                            caption: 'another echo'
                         }],
-                    kind: 'gain',
+                    kind: 'echo',
                     initial: ''
                 }
             ],
@@ -5622,10 +5635,10 @@ var PianoRollRenderer = (function () {
         }
     };
     PianoRollRenderer.prototype.initMainAnchors = function (zRender) {
-        this.contentMain1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomMin, hideZoom: zRender.zoomNote, content: [] };
-        this.contentMain4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomNote, hideZoom: zRender.zoomMeasure, content: [] };
-        this.contentMain16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomMeasure, hideZoom: zRender.zoomSong, content: [] };
-        this.contentMain64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomSong, hideZoom: zRender.zoomFar, content: [] };
+        this.contentMain1 = { id: 'contentMain1', xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomMin, hideZoom: zRender.zoomNote, content: [] };
+        this.contentMain4 = { id: 'contentMain4', xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomNote, hideZoom: zRender.zoomMeasure, content: [] };
+        this.contentMain16 = { id: 'contentMain16', xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomMeasure, hideZoom: zRender.zoomSong, content: [] };
+        this.contentMain64 = { id: 'contentMain64', xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomSong, hideZoom: zRender.zoomFar, content: [] };
         zRender.layers.push({
             g: this.measureMainVoiceLayerGroup, anchors: [
                 this.contentMain1, this.contentMain4, this.contentMain16, this.contentMain64
@@ -5633,10 +5646,10 @@ var PianoRollRenderer = (function () {
         });
     };
     PianoRollRenderer.prototype.initSecondAnchors = function (zRender) {
-        this.contentSecond1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
-        this.contentSecond4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
-        this.contentSecond16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
-        this.contentSecond64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar);
+        this.contentSecond1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote, 'contentSecond1');
+        this.contentSecond4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure, 'contentSecond4');
+        this.contentSecond16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong, 'contentSecond16');
+        this.contentSecond64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar, 'contentSecond64');
         zRender.layers.push({
             g: this.measureSecondVoicesLayerGroup, anchors: [
                 this.contentSecond1, this.contentSecond4, this.contentSecond16, this.contentSecond64
@@ -5644,11 +5657,11 @@ var PianoRollRenderer = (function () {
         });
     };
     PianoRollRenderer.prototype.initOthersAnchors = function (zRender) {
-        this.contentOther1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
-        this.contentOther4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
-        this.contentOther16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
-        this.contentOther64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar);
-        this.contentOther256 = TAnchor(0, 0, 1111, 1111, zRender.zoomFar, zRender.zoomMax + 1);
+        this.contentOther1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote, 'contentOther1');
+        this.contentOther4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure, 'contentOther4');
+        this.contentOther16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong, 'contentOther16');
+        this.contentOther64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar, 'contentOther64');
+        this.contentOther256 = TAnchor(0, 0, 1111, 1111, zRender.zoomFar, zRender.zoomMax + 1, 'contentOther256');
         zRender.layers.push({
             g: this.measureOtherVoicesLayerGroup, anchors: [
                 this.contentOther1, this.contentOther4, this.contentOther16, this.contentOther64, this.contentOther256
@@ -5656,12 +5669,45 @@ var PianoRollRenderer = (function () {
         });
     };
     PianoRollRenderer.prototype.addParameterMeasure = function (ratioDuration, ratioThickness, song, parameter, measureNum, time, css, anchors) {
-        var last = {
+        var beforeFirst = {
             skipMeasures: measureNum,
             skipSteps: { count: -1, division: 1 },
             velocity: 0
         };
-        console.log(measureNum, parameter, findNextCurvePoint(parameter.points, last));
+        var current = findNextCurvePoint(parameter.points, beforeFirst);
+        if (measureNum == 0 && (current == null || current.skipMeasures > 0 || current.skipSteps.count > 0)) {
+            current = {
+                skipMeasures: 0,
+                skipSteps: { count: 0, division: 1 },
+                velocity: 0
+            };
+        }
+        var topGridMargin = topGridMarginTp(song, ratioThickness);
+        while ((current) && current.skipMeasures == measureNum) {
+            var to = findNextCurvePoint(parameter.points, current);
+            if (to == null) {
+                to = {
+                    skipMeasures: song.measures.length,
+                    skipSteps: { count: 0, division: 1 },
+                    velocity: current.velocity
+                };
+            }
+            var line_1 = {
+                x1: leftGridMargin + point2seconds(song, current) * ratioDuration,
+                x2: leftGridMargin + point2seconds(song, to) * ratioDuration,
+                y1: topGridMargin + (128 - current.velocity + 0.5) * ratioThickness,
+                y2: topGridMargin + (128 - to.velocity + 1 - 0.5) * ratioThickness,
+                css: css
+            };
+            for (var aa = 0; aa < anchors.length; aa++) {
+                var clone = cloneLine(line_1);
+                clone.id = 'param-' + aa + '-' + measureNum + '-' + rid();
+                console.log(clone);
+                anchors[aa].content.push(cloneLine(line_1));
+            }
+            console.log(anchors);
+            current = to;
+        }
     };
     PianoRollRenderer.prototype.addMeasureLyrics = function (song, time, mm, ratioDuration, ratioThickness, anchor, css) {
         var topGridMargin = topGridMarginTp(song, ratioThickness);
@@ -5800,7 +5846,7 @@ var PianoRollRenderer = (function () {
                     if (xx1 >= xx2) {
                         xx2 = xx1 + 1;
                     }
-                    var line_1 = {
+                    var line_2 = {
                         x1: xx1,
                         x2: xx2,
                         y1: topGridMargin + yShift - pitch.pitch * ratioThickness,
@@ -5808,10 +5854,10 @@ var PianoRollRenderer = (function () {
                         css: css
                     };
                     for (var aa = 0; aa < anchors.length; aa++) {
-                        if (line_1.x2 - anchors[aa].xx > anchors[aa].ww) {
-                            anchors[aa].ww = line_1.x2 - anchors[aa].xx;
+                        if (line_2.x2 - anchors[aa].xx > anchors[aa].ww) {
+                            anchors[aa].ww = line_2.x2 - anchors[aa].xx;
                         }
-                        anchors[aa].content.push(cloneLine(line_1));
+                        anchors[aa].content.push(cloneLine(line_2));
                         if (measureMaxLen < anchors[aa].ww) {
                             measureMaxLen = anchors[aa].ww;
                         }
@@ -6087,10 +6133,10 @@ var PianoRollRenderer = (function () {
         var time = 0;
         for (var mm = 0; mm < song.measures.length; mm++) {
             var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-            var contentMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain1.showZoom, this.contentMain1.hideZoom);
-            var contentMeasure4 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain4.showZoom, this.contentMain4.hideZoom);
-            var contentMeasure16 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain16.showZoom, this.contentMain16.hideZoom);
-            var contentMeasure64 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain64.showZoom, this.contentMain64.hideZoom);
+            var contentMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain1.showZoom, this.contentMain1.hideZoom, 'contentMeasure1-' + mm);
+            var contentMeasure4 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain4.showZoom, this.contentMain4.hideZoom, 'contentMeasure4-' + mm);
+            var contentMeasure16 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain16.showZoom, this.contentMain16.hideZoom, 'contentMeasure16-' + mm);
+            var contentMeasure64 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain64.showZoom, this.contentMain64.hideZoom, 'contentMeasure64-' + mm);
             this.contentMain1.content.push(contentMeasure1);
             this.contentMain4.content.push(contentMeasure4);
             this.contentMain16.content.push(contentMeasure16);
@@ -6103,10 +6149,10 @@ var PianoRollRenderer = (function () {
             this.contentSecond4.content.push(secondMeasure4);
             this.contentSecond16.content.push(secondMeasure16);
             this.contentSecond64.content.push(secondMeasure64);
-            var otherMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther1.showZoom, this.contentOther1.hideZoom);
-            var otherMeasure4 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther4.showZoom, this.contentOther4.hideZoom);
-            var otherMeasure16 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther16.showZoom, this.contentOther16.hideZoom);
-            var otherMeasure64 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther64.showZoom, this.contentOther64.hideZoom);
+            var otherMeasure1 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther1.showZoom, this.contentOther1.hideZoom, 'otherMeasure1-' + mm);
+            var otherMeasure4 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther4.showZoom, this.contentOther4.hideZoom, 'otherMeasure4-' + mm);
+            var otherMeasure16 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther16.showZoom, this.contentOther16.hideZoom, 'otherMeasure16-' + mm);
+            var otherMeasure64 = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther64.showZoom, this.contentOther64.hideZoom, 'otherMeasure64-' + mm);
             this.contentOther1.content.push(otherMeasure1);
             this.contentOther4.content.push(otherMeasure4);
             this.contentOther16.content.push(otherMeasure16);
@@ -6134,7 +6180,7 @@ var PianoRollRenderer = (function () {
                             }
                         }
                         else {
-                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [secondMeasure1, secondMeasure4, secondMeasure16]);
+                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [otherMeasure1, otherMeasure4, otherMeasure16]);
                         }
                     }
                     if (this.needToFocusVoice(song, tt, vv)) {
@@ -6164,7 +6210,7 @@ var PianoRollRenderer = (function () {
                                 }
                             }
                             else {
-                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [secondMeasure1, secondMeasure4, secondMeasure16]);
+                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [otherMeasure1, otherMeasure4, otherMeasure16]);
                             }
                         }
                     }
@@ -6182,7 +6228,7 @@ var PianoRollRenderer = (function () {
                             }
                         }
                         else {
-                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [secondMeasure1, secondMeasure4, secondMeasure16]);
+                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [otherMeasure1, otherMeasure4, otherMeasure16]);
                         }
                     }
                     if (this.needToFocusDrum(song, tt, vv)) {
@@ -6209,7 +6255,7 @@ var PianoRollRenderer = (function () {
                                 }
                             }
                             else {
-                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [secondMeasure1, secondMeasure4, secondMeasure16]);
+                                this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [otherMeasure1, otherMeasure4, otherMeasure16]);
                             }
                         }
                     }
@@ -6228,7 +6274,7 @@ var PianoRollRenderer = (function () {
                             }
                         }
                         else {
-                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [secondMeasure1, secondMeasure4, secondMeasure16]);
+                            this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [otherMeasure1, otherMeasure4, otherMeasure16]);
                         }
                     }
                 }
@@ -6246,7 +6292,7 @@ var PianoRollRenderer = (function () {
                         }
                     }
                     else {
-                        this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [secondMeasure1, secondMeasure4, secondMeasure16]);
+                        this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine', [otherMeasure1, otherMeasure4, otherMeasure16]);
                     }
                 }
             }
@@ -6555,15 +6601,15 @@ var GridRenderer = (function () {
                 if (stepNN == rhythmPattern.length - 1) {
                     css = 'rhythmWideLine4';
                 }
-                var line_2 = {
+                var line_3 = {
                     x1: leftGridMargin + (time + positionDuration) * ratioDuration,
                     y1: topGridMargin,
                     x2: leftGridMargin + (time + positionDuration) * ratioDuration,
                     y2: topGridMargin + gridHeightTp(ratioThickness) + bottomGridMargin,
                     css: css
                 };
-                gridMeasure4.content.push(line_2);
-                gridMeasure1.content.push(line_2);
+                gridMeasure4.content.push(line_3);
+                gridMeasure1.content.push(line_3);
                 var line2 = {
                     x1: leftGridMargin + (time + positionDuration) * ratioDuration,
                     y1: 0,

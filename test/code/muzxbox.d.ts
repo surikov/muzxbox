@@ -168,7 +168,7 @@ declare type TileAnchor = {
     hideZoom: number;
     content: TileItem[];
 } & TileBaseDefinition;
-declare function TAnchor(xx: number, yy: number, ww: number, hh: number, showZoom: number, hideZoom: number): TileAnchor;
+declare function TAnchor(xx: number, yy: number, ww: number, hh: number, showZoom: number, hideZoom: number, id?: string): TileAnchor;
 declare type TileRectangle = {
     x: number;
     y: number;
@@ -479,6 +479,7 @@ declare type ZvoogStepIndex = {
     measure: number;
     step: number;
 };
+declare function point2seconds(song: ZvoogSchedule, point: ZvoogCurvePoint): number;
 declare function meter2seconds(bpm: number, meter: ZvoogMeter): number;
 declare function seconds2meterRound(bpm: number, seconds: number): ZvoogMeter;
 declare function calculateEnvelopeDuration(envelope: ZvoogEnvelope): ZvoogMeter;

@@ -6,18 +6,28 @@ type ZvoogStepIndex = {
 	measure: number
 	, step: number
 };
+function point2seconds(song: ZvoogSchedule, point: ZvoogCurvePoint): number {
+	let ss = 0;
+	for (let i = 0; i < point.skipMeasures; i++) {
+		ss = ss + meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+	}
+	if (point.skipMeasures < song.measures.length) {
+		ss = ss + meter2seconds(song.measures[point.skipMeasures].tempo, point.skipSteps);
+	}
+	return ss;
+}
 function meter2seconds(bpm: number, meter: ZvoogMeter): number {
-	let wholeNoteSeconds = 4*60 / bpm;
+	let wholeNoteSeconds = 4 * 60 / bpm;
 	let meterSeconds = wholeNoteSeconds * meter.count / meter.division;
 	return meterSeconds;
 }
-function seconds2meterRound(bpm:number,seconds:number):ZvoogMeter{
+function seconds2meterRound(bpm: number, seconds: number): ZvoogMeter {
 	//let note32Seconds = (4*60 / bpm)/32;
-	let note16Seconds = (4*60 / bpm)/16;
+	let note16Seconds = (4 * 60 / bpm) / 16;
 	//let part=seconds/note32Seconds;
-	let part=seconds/note16Seconds;
+	let part = seconds / note16Seconds;
 	//return {count: Math.floor(part) , division: 32};
-	return {count: Math.round(part) , division: 16};
+	return { count: Math.round(part), division: 16 };
 }
 /*function duration2seconds(bpm: number, duration384: number): number {
 	let n4 = 60 / bpm;
@@ -130,7 +140,7 @@ class DurationUnitUtil {
 			r.division = r.division / 3;
 			r.count = Math.round(r.count / 3);
 		}
-		while (r.division % 2 == 0 && r.count % 2 ==0) {
+		while (r.division % 2 == 0 && r.count % 2 == 0) {
 			r.division = r.division / 2;
 			r.count = Math.round(r.count / 2);
 		}

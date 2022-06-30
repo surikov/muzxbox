@@ -137,8 +137,8 @@ class MuzXBox {
 						points: [{
 							skipMeasures: 0
 							, skipSteps: {
-								count: 0
-								, division: 1
+								count: 1
+								, division: 2
 							}
 							, velocity: 100
 						}]
@@ -151,13 +151,15 @@ class MuzXBox {
 					filterPlugin: null
 					, parameters: [{
 						points: [
-							{ skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: 88 }
+							{ skipMeasures: 0, skipSteps: { count: 1, division: 4 }, velocity: 88 }
 							, { skipMeasures: 2, skipSteps: { count: 2, division: 4 }, velocity: 88 }
-							,{ skipMeasures: 0, skipSteps: { count: 2, division: 1 }, velocity: 0 }
+							, { skipMeasures: 0, skipSteps: { count: 1, division: 16 }, velocity: 22 }
+							, { skipMeasures: 0, skipSteps: { count: 1, division: 16 }, velocity: 66 }
+							,{ skipMeasures: 1, skipSteps: { count: 1, division: 2 }, velocity: 44 }
 						]
-						, caption: 'another gain'
+						, caption: 'another echo'
 					}]
-					, kind: 'gain'
+					, kind: 'echo'
 					, initial: ''
 				}
 			]

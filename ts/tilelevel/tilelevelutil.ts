@@ -83,8 +83,8 @@ type TileAnchor = {
 	, hideZoom: number
 	, content: TileItem[]
 } & TileBaseDefinition;
-function TAnchor(xx: number, yy: number, ww: number, hh: number, showZoom: number, hideZoom: number): TileAnchor {
-	return { xx: xx, yy: yy, ww: ww, hh: hh, showZoom: showZoom, hideZoom: hideZoom, content: [] };
+function TAnchor(xx: number, yy: number, ww: number, hh: number, showZoom: number, hideZoom: number,id?:string): TileAnchor {
+	return { xx: xx, yy: yy, ww: ww, hh: hh, showZoom: showZoom, hideZoom: hideZoom, content: [] ,id:id};
 }
 
 type TileRectangle = {

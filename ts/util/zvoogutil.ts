@@ -48,6 +48,7 @@ function findNextCurvePoint(points: ZvoogCurvePoint[], last: ZvoogCurvePoint): n
 			|| (last.skipMeasures == current.skipMeasures
 				&& DUU(last.skipSteps).lessThen(current.skipSteps))
 		) {
+			current.velocity=point.velocity;
 			return current;
 		}
 	}

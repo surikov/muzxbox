@@ -42,10 +42,10 @@ class PianoRollRenderer {
 
 	}
 	initMainAnchors(zRender: ZRender) {
-		this.contentMain1 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomMin, hideZoom: zRender.zoomNote, content: [] };
-		this.contentMain4 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomNote, hideZoom: zRender.zoomMeasure, content: [] };
-		this.contentMain16 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomMeasure, hideZoom: zRender.zoomSong, content: [] };
-		this.contentMain64 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomSong, hideZoom: zRender.zoomFar, content: [] };
+		this.contentMain1 = { id: 'contentMain1', xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomMin, hideZoom: zRender.zoomNote, content: [] };
+		this.contentMain4 = { id: 'contentMain4', xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomNote, hideZoom: zRender.zoomMeasure, content: [] };
+		this.contentMain16 = { id: 'contentMain16', xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomMeasure, hideZoom: zRender.zoomSong, content: [] };
+		this.contentMain64 = { id: 'contentMain64', xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomSong, hideZoom: zRender.zoomFar, content: [] };
 		//this.contentMain256 = { xx: 0, yy: 0, ww: 1111, hh: 1111, showZoom: zRender.zoomFar, hideZoom: zRender.zoomMax + 1, content: [] };
 		zRender.layers.push({
 			g: this.measureMainVoiceLayerGroup, anchors: [
@@ -54,10 +54,10 @@ class PianoRollRenderer {
 		});
 	}
 	initSecondAnchors(zRender: ZRender) {
-		this.contentSecond1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
-		this.contentSecond4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
-		this.contentSecond16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
-		this.contentSecond64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar);
+		this.contentSecond1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote,  'contentSecond1' );
+		this.contentSecond4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure,'contentSecond4');
+		this.contentSecond16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong,'contentSecond16');
+		this.contentSecond64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar,'contentSecond64');
 		//this.contentSecond256 = TAnchor(0, 0, 1111, 1111, zRender.zoomFar, zRender.zoomMax + 1);
 		zRender.layers.push({
 			g: this.measureSecondVoicesLayerGroup, anchors: [
@@ -66,11 +66,11 @@ class PianoRollRenderer {
 		});
 	}
 	initOthersAnchors(zRender: ZRender) {
-		this.contentOther1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote);
-		this.contentOther4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure);
-		this.contentOther16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong);
-		this.contentOther64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar);
-		this.contentOther256 = TAnchor(0, 0, 1111, 1111, zRender.zoomFar, zRender.zoomMax + 1);
+		this.contentOther1 = TAnchor(0, 0, 1111, 1111, zRender.zoomMin, zRender.zoomNote,'contentOther1');
+		this.contentOther4 = TAnchor(0, 0, 1111, 1111, zRender.zoomNote, zRender.zoomMeasure,'contentOther4');
+		this.contentOther16 = TAnchor(0, 0, 1111, 1111, zRender.zoomMeasure, zRender.zoomSong,'contentOther16');
+		this.contentOther64 = TAnchor(0, 0, 1111, 1111, zRender.zoomSong, zRender.zoomFar,'contentOther64');
+		this.contentOther256 = TAnchor(0, 0, 1111, 1111, zRender.zoomFar, zRender.zoomMax + 1,'contentOther256');
 		zRender.layers.push({
 			g: this.measureOtherVoicesLayerGroup, anchors: [
 				this.contentOther1, this.contentOther4, this.contentOther16, this.contentOther64, this.contentOther256
@@ -80,12 +80,48 @@ class PianoRollRenderer {
 
 	addParameterMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, parameter: ZvoogParameterData
 		, measureNum: number, time: number, css: string, anchors: TileAnchor[]) {
-		let last = {
+		let beforeFirst: null | ZvoogCurvePoint = {
 			skipMeasures: measureNum
 			, skipSteps: { count: -1, division: 1 }
 			, velocity: 0
 		};
-		console.log(measureNum,parameter, findNextCurvePoint(parameter.points, last));
+		let current: null | ZvoogCurvePoint = findNextCurvePoint(parameter.points, beforeFirst);
+		if (measureNum == 0 && (current == null || current.skipMeasures > 0 || current.skipSteps.count > 0)) {
+			current = {
+				skipMeasures: 0
+				, skipSteps: { count: 0, division: 1 }
+				, velocity: 0
+			};
+		}
+		let topGridMargin = topGridMarginTp(song, ratioThickness);
+		while ((current) && current.skipMeasures == measureNum) {
+			//console.log(measureNum, parameter, current);
+			let to: null | ZvoogCurvePoint = findNextCurvePoint(parameter.points, current);
+			if (to == null) {
+				to = {
+					skipMeasures: song.measures.length
+					, skipSteps: { count: 0, division: 1 }
+					, velocity: current.velocity
+				};
+			}
+			//console.log(measureNum, parameter.caption, current.skipMeasures, current.skipSteps, current.velocity, '>', to.skipMeasures, to.skipSteps, to.velocity);
+			let line: TileLine = {
+				x1: leftGridMargin + point2seconds(song, current) * ratioDuration
+				, x2: leftGridMargin + point2seconds(song, to) * ratioDuration
+				, y1: topGridMargin + (128 - current.velocity + 0.5) * ratioThickness
+				, y2: topGridMargin + (128 - to.velocity + 1 - 0.5) * ratioThickness
+				, css: css
+			};
+			
+			for (let aa = 0; aa < anchors.length; aa++) {
+				let clone=cloneLine(line);
+				clone.id='param-'+aa+'-'+measureNum+'-'+rid();
+				console.log(clone);
+				anchors[aa].content.push(cloneLine(line));
+			}
+			console.log(anchors);
+			current = to;
+		}
 		//let pointMeasure = 0;
 		//let pointStep = { count: 0, division: 1 };
 		//for (let pp = 0; pp > parameter.points.length; pp++) {
@@ -587,15 +623,16 @@ class PianoRollRenderer {
 		for (let mm = 0; mm < song.measures.length; mm++) {
 			let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
 
-			let contentMeasure1: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain1.showZoom, this.contentMain1.hideZoom);
-			let contentMeasure4: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain4.showZoom, this.contentMain4.hideZoom);
-			let contentMeasure16: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain16.showZoom, this.contentMain16.hideZoom);
-			let contentMeasure64: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain64.showZoom, this.contentMain64.hideZoom);
+			let contentMeasure1: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain1.showZoom, this.contentMain1.hideZoom, 'contentMeasure1-' + mm);
+			let contentMeasure4: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain4.showZoom, this.contentMain4.hideZoom, 'contentMeasure4-' + mm);
+			let contentMeasure16: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain16.showZoom, this.contentMain16.hideZoom, 'contentMeasure16-' + mm);
+			let contentMeasure64: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentMain64.showZoom, this.contentMain64.hideZoom, 'contentMeasure64-' + mm);
 			//let contentMeasure256: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentMain256.showZoom, this.contentMain256.hideZoom);
 			this.contentMain1.content.push(contentMeasure1);
 			this.contentMain4.content.push(contentMeasure4);
 			this.contentMain16.content.push(contentMeasure16);
 			this.contentMain64.content.push(contentMeasure64);
+
 			//this.contentMain256.content.push(contentMeasure256);
 
 			let secondMeasure1: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentSecond1.showZoom, this.contentSecond1.hideZoom);
@@ -609,10 +646,10 @@ class PianoRollRenderer {
 			this.contentSecond64.content.push(secondMeasure64);
 			//this.contentSecond256.content.push(secondMeasure256);
 
-			let otherMeasure1: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther1.showZoom, this.contentOther1.hideZoom);
-			let otherMeasure4: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther4.showZoom, this.contentOther4.hideZoom);
-			let otherMeasure16: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther16.showZoom, this.contentOther16.hideZoom);
-			let otherMeasure64: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther64.showZoom, this.contentOther64.hideZoom);
+			let otherMeasure1: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther1.showZoom, this.contentOther1.hideZoom,'otherMeasure1-'+mm);
+			let otherMeasure4: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther4.showZoom, this.contentOther4.hideZoom,'otherMeasure4-'+mm);
+			let otherMeasure16: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther16.showZoom, this.contentOther16.hideZoom,'otherMeasure16-'+mm);
+			let otherMeasure64: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, topGridMargin + 12 * octaveCount * ratioThickness + bottomGridMargin, this.contentOther64.showZoom, this.contentOther64.hideZoom,'otherMeasure64-'+mm);
 			//let otherMeasure256: TileAnchor = TAnchor(time * ratioDuration, 0, ratioDuration * measureDuration, 128 * ratioThickness, this.contentOther256.showZoom, this.contentOther256.hideZoom);
 			this.contentOther1.content.push(otherMeasure1);
 			this.contentOther4.content.push(otherMeasure4);
@@ -646,7 +683,7 @@ class PianoRollRenderer {
 							}
 						} else {
 							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine'
-								, [secondMeasure1, secondMeasure4, secondMeasure16]);
+								, [otherMeasure1, otherMeasure4, otherMeasure16]);
 						}
 					}
 					if (this.needToFocusVoice(song, tt, vv)) {
@@ -678,7 +715,7 @@ class PianoRollRenderer {
 								}
 							} else {
 								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine'
-									, [secondMeasure1, secondMeasure4, secondMeasure16]);
+									, [otherMeasure1, otherMeasure4, otherMeasure16]);
 							}
 						}
 					}
@@ -704,7 +741,7 @@ class PianoRollRenderer {
 							}
 						} else {
 							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine'
-								, [secondMeasure1, secondMeasure4, secondMeasure16]);
+								, [otherMeasure1,otherMeasure4, otherMeasure16]);
 						}
 					}
 					if (this.needToFocusDrum(song, tt, vv)) {
@@ -736,7 +773,7 @@ class PianoRollRenderer {
 								}
 							} else {
 								this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine'
-									, [secondMeasure1, secondMeasure4, secondMeasure16]);
+									, [otherMeasure1, otherMeasure4, otherMeasure16]);
 							}
 						}
 					}
@@ -772,7 +809,7 @@ class PianoRollRenderer {
 							}
 						} else {
 							this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine'
-								, [secondMeasure1, secondMeasure4, secondMeasure16]);
+								, [otherMeasure1, otherMeasure4, otherMeasure16]);
 						}
 					}
 				}
@@ -791,7 +828,7 @@ class PianoRollRenderer {
 						}
 					} else {
 						this.addParameterMeasure(ratioDuration, ratioThickness, song, parameter, mm, time, 'otherLine'
-							, [secondMeasure1, secondMeasure4, secondMeasure16]);
+							, [otherMeasure1, otherMeasure4, otherMeasure16]);
 					}
 				}
 			}
