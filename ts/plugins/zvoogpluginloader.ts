@@ -164,7 +164,7 @@ class ZvoogTicker {
 	statePlay = 2;
 	stateEnding = 3;
 	state = this.stateStoped;
-	stepDuration = 0.9;
+	stepDuration = 0.25;
 	lastPosition = 0;
 
 	audioContext: AudioContext;
@@ -346,7 +346,7 @@ class ZvoogTicker {
 			for (let mm = 0; mm < song.measures.length; mm++) {
 				let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
 				//console.log('check measure', mm, 'at', measureStart, 'duration', measureDuration,'tick',tickStart,tickEnd);
-				if (tickStart < measureStart+ measureDuration && tickEnd >= measureStart ) {
+				if (tickStart < measureStart + measureDuration && tickEnd >= measureStart) {
 					//console.log('voice', instrument.title, 'at', measureStart, 'measure', mm, 'duration', measureDuration);
 					for (let cc = 0; cc < instrument.measureChords[mm].chords.length; cc++) {
 						let strings = instrument.measureChords[mm].chords[cc];
@@ -366,14 +366,14 @@ class ZvoogTicker {
 		}
 	}
 	sendDrumEvents(drum: ZvoogPercussionVoice, song: ZvoogSchedule, scheduleWhen: number, tickStart: number, tickEnd: number) {
-		this.sendAllParameters(drum.percussionSetting.parameters, song,scheduleWhen, tickStart, tickEnd);
+		this.sendAllParameters(drum.percussionSetting.parameters, song, scheduleWhen, tickStart, tickEnd);
 		let plugin = drum.percussionSetting.percussionPlugin;
 
 		if (plugin) {
 			let measureStart = 0;
 			for (let mm = 0; mm < song.measures.length; mm++) {
 				let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
-				if (tickStart < measureStart+ measureDuration && tickEnd >= measureStart ) {
+				if (tickStart < measureStart + measureDuration && tickEnd >= measureStart) {
 					for (let cc = 0; cc < drum.measureBunches[mm].bunches.length; cc++) {
 						let strings = drum.measureBunches[mm].bunches[cc];
 						let chordStart = measureStart + meter2seconds(song.measures[mm].tempo, strings.when);
@@ -403,11 +403,31 @@ class ZvoogTicker {
 		}
 	}
 	sendParameterPoints(points: ZvoogCurvePoint[], song: ZvoogSchedule, when: number, from: number, to: number) {
-		for (let i = 0; i < points.length; i++) {
+		/*for (let i = 0; i < points.length; i++) {
 			let point = points[i];
 			if (point) {
 
+
+
 			}
+		}*/
+		let beforeFirst: null | ZvoogCurvePoint = { skipMeasures: 0, skipSteps: { count: -1, division: 1 }, velocity: 0 };
+		let current: null | ZvoogCurvePoint = findNextCurvePoint(points, beforeFirst);
+		if (current == null || current.skipMeasures > 0 || current.skipSteps.count > 0) {
+			current = { skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: 0 };
+		}
+		let songDuration = scheduleSecondsDuration(song);
+		while (current) {
+			let nextPoint: null | ZvoogCurvePoint = findNextCurvePoint(points, current);
+			let pointTime = point2seconds(song, current);
+			if (from <= pointTime && pointTime < to) {
+				let nextTime = songDuration;
+				if (nextPoint) {
+					nextTime = point2seconds(song, nextPoint);
+					console.log(from, '<=', pointTime, '>', to, '=', current.velocity, '>', nextPoint.velocity, '/', nextTime);
+				}
+			}
+			current = nextPoint;
 		}
 	}
 	sendTickEvents(song: ZvoogSchedule, when: number, from: number, to: number) {

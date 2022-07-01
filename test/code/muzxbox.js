@@ -2768,7 +2768,7 @@ var ZvoogTicker = (function () {
         this.statePlay = 2;
         this.stateEnding = 3;
         this.state = this.stateStoped;
-        this.stepDuration = 0.9;
+        this.stepDuration = 0.25;
         this.lastPosition = 0;
         var AudioContextFunc = window.AudioContext || window['webkitAudioContext'];
         this.audioContext = new AudioContextFunc();
@@ -3001,10 +3001,23 @@ var ZvoogTicker = (function () {
         }
     };
     ZvoogTicker.prototype.sendParameterPoints = function (points, song, when, from, to) {
-        for (var i = 0; i < points.length; i++) {
-            var point = points[i];
-            if (point) {
+        var beforeFirst = { skipMeasures: 0, skipSteps: { count: -1, division: 1 }, velocity: 0 };
+        var current = findNextCurvePoint(points, beforeFirst);
+        if (current == null || current.skipMeasures > 0 || current.skipSteps.count > 0) {
+            current = { skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: 0 };
+        }
+        var songDuration = scheduleSecondsDuration(song);
+        while (current) {
+            var nextPoint = findNextCurvePoint(points, current);
+            var pointTime = point2seconds(song, current);
+            if (from <= pointTime && pointTime < to) {
+                var nextTime = songDuration;
+                if (nextPoint) {
+                    nextTime = point2seconds(song, nextPoint);
+                    console.log(from, '<=', pointTime, '>', to, '=', current.velocity, '>', nextPoint.velocity, '/', nextTime);
+                }
             }
+            current = nextPoint;
         }
     };
     ZvoogTicker.prototype.sendTickEvents = function (song, when, from, to) {
@@ -5317,14 +5330,23 @@ var MuzXBox = (function () {
     MuzXBox.prototype.createUI = function () {
         var emptySchedule = {
             title: 'Empty project',
-            tracks: [{
+            tracks: [
+                {
                     title: "First", filters: [], percussions: [], instruments: [
                         {
                             filters: [],
                             title: 'Single',
                             instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'none', initial: '' },
                             measureChords: [{
-                                    chords: []
+                                    chords: [
+                                        {
+                                            when: { count: 1, division: 4 }, variation: 0,
+                                            envelopes: [{
+                                                    pitches: [{ duration: { count: 5, division: 8 }, pitch: 24 },
+                                                        { duration: { count: 1, division: 8 }, pitch: 36 }]
+                                                }]
+                                        }
+                                    ]
                                 },
                                 { chords: [] },
                                 { chords: [] }
@@ -5333,27 +5355,46 @@ var MuzXBox = (function () {
                         {
                             filters: [],
                             title: 'Another',
-                            instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'none', initial: '' },
+                            instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'wafinstrument', initial: '33' },
                             measureChords: [
                                 {
                                     chords: [
-                                        { when: { count: 0, division: 4 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 60 }] }] },
-                                        { when: { count: 1, division: 4 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 61 }] }] },
-                                        { when: { count: 2, division: 4 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 62 }] }] }
+                                        { when: { count: 0, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] },
+                                        { when: { count: 1, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] },
+                                        { when: { count: 2, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] },
+                                        { when: { count: 3, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] },
+                                        { when: { count: 4, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] },
+                                        { when: { count: 5, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] }
                                     ]
                                 },
                                 {
-                                    chords: [{
-                                            when: { count: 2, division: 4 }, variation: 0, envelopes: [{
-                                                    pitches: [{ duration: { count: 4, division: 8 }, pitch: 54 }]
-                                                }]
-                                        }]
+                                    chords: [{ when: { count: 0, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 5 }] }] },
+                                        { when: { count: 1, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 17 }] }] },
+                                        { when: { count: 2, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 5 }] }] },
+                                        { when: { count: 3, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 17 }] }] },
+                                        { when: { count: 4, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 5 }] }] },
+                                        { when: { count: 5, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 17 }] }] },
+                                        { when: { count: 6, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 5 }] }] },
+                                        { when: { count: 7, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 17 }] }] }
+                                    ]
                                 },
-                                { chords: [] }
+                                {
+                                    chords: [
+                                        { when: { count: 0, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] },
+                                        { when: { count: 1, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] },
+                                        { when: { count: 2, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] },
+                                        { when: { count: 3, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] },
+                                        { when: { count: 4, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] },
+                                        { when: { count: 5, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] },
+                                        { when: { count: 6, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] },
+                                        { when: { count: 7, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] }
+                                    ]
+                                }
                             ]
                         }
                     ]
-                }, {
+                },
+                {
                     title: "Second", filters: [], percussions: [], instruments: [
                         {
                             filters: [],
@@ -5364,9 +5405,10 @@ var MuzXBox = (function () {
                                 { chords: [] },
                                 {
                                     chords: [{
-                                            when: { count: 1, division: 16 }, variation: 0, envelopes: [{
-                                                    pitches: [{ duration: { count: 15, division: 16 }, pitch: 70 }]
-                                                }]
+                                            when: { count: 1, division: 8 }, variation: 0, envelopes: [
+                                                { pitches: [{ duration: { count: 14, division: 16 }, pitch: 70 }] },
+                                                { pitches: [{ duration: { count: 14, division: 16 }, pitch: 77 }] }
+                                            ]
                                         }]
                                 }
                             ]
@@ -5378,39 +5420,21 @@ var MuzXBox = (function () {
                 {
                     filterPlugin: null,
                     parameters: [{
-                            points: [{
-                                    skipMeasures: 0,
-                                    skipSteps: {
-                                        count: 1,
-                                        division: 2
-                                    },
-                                    velocity: 100
-                                }],
+                            points: [
+                                { skipMeasures: 0, skipSteps: { count: 0, division: 2 }, velocity: 79 },
+                                { skipMeasures: 0, skipSteps: { count: 1, division: 2 }, velocity: 33 },
+                                { skipMeasures: 1, skipSteps: { count: 3, division: 4 }, velocity: 72 }
+                            ],
                             caption: 'test gain'
                         }],
                     kind: 'gain',
                     initial: ''
-                },
-                {
-                    filterPlugin: null,
-                    parameters: [{
-                            points: [
-                                { skipMeasures: 0, skipSteps: { count: 1, division: 4 }, velocity: 88 },
-                                { skipMeasures: 2, skipSteps: { count: 2, division: 4 }, velocity: 88 },
-                                { skipMeasures: 0, skipSteps: { count: 1, division: 16 }, velocity: 22 },
-                                { skipMeasures: 0, skipSteps: { count: 1, division: 16 }, velocity: 66 },
-                                { skipMeasures: 1, skipSteps: { count: 1, division: 2 }, velocity: 44 }
-                            ],
-                            caption: 'another echo'
-                        }],
-                    kind: 'echo',
-                    initial: ''
                 }
             ],
             measures: [
-                { meter: { count: 3, division: 4 }, tempo: 120, points: [] },
-                { meter: { count: 4, division: 4 }, tempo: 90, points: [] },
-                { meter: { count: 4, division: 4 }, tempo: 180, points: [] }
+                { meter: { count: 4, division: 4 }, tempo: 120, points: [] },
+                { meter: { count: 4, division: 4 }, tempo: 120, points: [] },
+                { meter: { count: 4, division: 4 }, tempo: 120, points: [] }
             ],
             harmony: { tone: '', mode: '', progression: [] }
         };
@@ -5693,19 +5717,17 @@ var PianoRollRenderer = (function () {
                 };
             }
             var line_1 = {
-                x1: leftGridMargin + point2seconds(song, current) * ratioDuration,
-                x2: leftGridMargin + point2seconds(song, to) * ratioDuration,
-                y1: topGridMargin + (128 - current.velocity + 0.5) * ratioThickness,
-                y2: topGridMargin + (128 - to.velocity + 1 - 0.5) * ratioThickness,
+                x1: leftGridMargin + point2seconds(song, current) * ratioDuration + 0.5 * ratioThickness,
+                x2: leftGridMargin + point2seconds(song, to) * ratioDuration + 0.5 * ratioThickness,
+                y1: topGridMargin + (12 * octaveCount - current.velocity + 0.5) * ratioThickness,
+                y2: topGridMargin + (12 * octaveCount - to.velocity + 1 - 0.5) * ratioThickness,
                 css: css
             };
             for (var aa = 0; aa < anchors.length; aa++) {
                 var clone = cloneLine(line_1);
                 clone.id = 'param-' + aa + '-' + measureNum + '-' + rid();
-                console.log(clone);
                 anchors[aa].content.push(cloneLine(line_1));
             }
-            console.log(anchors);
             current = to;
         }
     };
