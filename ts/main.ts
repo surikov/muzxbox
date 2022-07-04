@@ -94,12 +94,12 @@ class MuzXBox {
 							, measureChords: [
 								{
 									chords: [
-										{ when: { count: 0, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] }
-										, { when: { count: 1, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] }
-										, { when: { count: 2, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] }
-										, { when: { count: 3, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] }
-										, { when: { count: 4, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] }
-										, { when: { count: 5, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] }
+										{ when: { count: 0, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] }
+										, { when: { count: 1, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 34 }] }] }
+										, { when: { count: 2, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] }
+										, { when: { count: 3, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 34 }] }] }
+										, { when: { count: 4, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] }
+										, { when: { count: 5, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 34 }] }] }
 									]
 								}
 								, {
@@ -156,9 +156,9 @@ class MuzXBox {
 					filterPlugin: null
 					, parameters: [{
 						points: [
-							{ skipMeasures: 0, skipSteps: { count: 0, division: 2 }, velocity: 79 }
-							,{ skipMeasures: 0, skipSteps: { count: 1, division: 2 }, velocity: 33 }
-							,{ skipMeasures: 1, skipSteps: { count: 3, division: 4 }, velocity: 72 }
+							{ skipMeasures: 0, skipSteps: { count: 0, division: 2 }, velocity: 99 }
+							,{ skipMeasures: 1, skipSteps: { count: 1, division: 2 }, velocity: 22 }
+							,{ skipMeasures: 0, skipSteps: { count: 3, division: 4 }, velocity: 72 }
 						]
 						, caption: 'test gain'
 					}]
@@ -182,9 +182,9 @@ class MuzXBox {
 				}*/
 			]
 			, measures: [
-				{ meter: { count: 4, division: 4 }, tempo: 120, points: [] }
-				, { meter: { count: 4, division: 4 }, tempo: 120, points: [] }
-				, { meter: { count: 4, division: 4 }, tempo: 120, points: [] }
+				{ meter: { count: 3, division: 4 }, tempo: 120, points: [] }
+				, { meter: { count: 4, division: 4 }, tempo: 90, points: [] }
+				, { meter: { count: 4, division: 4 }, tempo: 150, points: [] }
 			]
 			, harmony: { tone: '', mode: '', progression: [] }
 		};

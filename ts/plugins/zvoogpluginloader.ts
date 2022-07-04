@@ -338,10 +338,12 @@ class ZvoogTicker {
 	}
 
 	sendInstrumentEvents(instrument: ZvoogInstrumentVoice, song: ZvoogSchedule, scheduleWhen: number, tickStart: number, tickEnd: number) {
-		this.sendAllParameters(instrument.instrumentSetting.parameters, song, scheduleWhen, tickStart, tickEnd);
+		//if (instrument.instrumentSetting.instrumentPlugin)
+		//	this.sendAllParameters(instrument.instrumentSetting.instrumentPlugin, instrument.instrumentSetting.parameters, song, scheduleWhen, tickStart, tickEnd);
 		let plugin = instrument.instrumentSetting.instrumentPlugin;
 
 		if (plugin) {
+			this.sendAllParameters(plugin, instrument.instrumentSetting.parameters, song, scheduleWhen, tickStart, tickEnd);
 			let measureStart = 0;
 			for (let mm = 0; mm < song.measures.length; mm++) {
 				let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
@@ -366,10 +368,12 @@ class ZvoogTicker {
 		}
 	}
 	sendDrumEvents(drum: ZvoogPercussionVoice, song: ZvoogSchedule, scheduleWhen: number, tickStart: number, tickEnd: number) {
-		this.sendAllParameters(drum.percussionSetting.parameters, song, scheduleWhen, tickStart, tickEnd);
+		//if (drum.percussionSetting.percussionPlugin)
+		//	this.sendAllParameters(drum.percussionSetting.percussionPlugin, drum.percussionSetting.parameters, song, scheduleWhen, tickStart, tickEnd);
 		let plugin = drum.percussionSetting.percussionPlugin;
 
 		if (plugin) {
+			this.sendAllParameters(plugin, drum.percussionSetting.parameters, song, scheduleWhen, tickStart, tickEnd);
 			let measureStart = 0;
 			for (let mm = 0; mm < song.measures.length; mm++) {
 				let measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
@@ -391,18 +395,22 @@ class ZvoogTicker {
 	}
 	sendAllFilterEvents(filters: ZvoogFilterSetting[], song: ZvoogSchedule, when: number, from: number, to: number) {
 		for (let i = 0; i < filters.length; i++) {
-			this.sendSingleFilterEvents(filters[i], song, when, from, to);
+			let plugin: ZvoogFilterPlugin | null = filters[i].filterPlugin;
+			if (plugin) {
+				this.sendSinglePluginEvents(plugin, filters[i].parameters, song, when, from, to);
+			}
 		}
 	}
-	sendSingleFilterEvents(filter: ZvoogFilterSetting, song: ZvoogSchedule, when: number, from: number, to: number) {
-		this.sendAllParameters(filter.parameters, song, when, from, to);
+	sendSinglePluginEvents(plugin: ZvoogPlugin, parameters: ZvoogParameterData[], song: ZvoogSchedule, when: number, from: number, to: number) {
+		this.sendAllParameters(plugin, parameters, song, when, from, to);
 	}
-	sendAllParameters(parameters: ZvoogParameterData[], song: ZvoogSchedule, when: number, from: number, to: number) {
+	sendAllParameters(plugin: ZvoogPlugin, parameters: ZvoogParameterData[], song: ZvoogSchedule, when: number, from: number, to: number) {
 		for (let i = 0; i < parameters.length; i++) {
-			this.sendParameterPoints(parameters[i].points, song, when, from, to);
+			this.sendParameterPoints(plugin.getParams()[i], parameters[i].points, song, when, from, to);
 		}
 	}
-	sendParameterPoints(points: ZvoogCurvePoint[], song: ZvoogSchedule, when: number, from: number, to: number) {
+	sendParameterPoints(pluginParameeter: ZvoogPluginParameter, points: ZvoogCurvePoint[], song: ZvoogSchedule, when: number, from: number, to: number) {
+		//console.log(from, '>', to);
 		/*for (let i = 0; i < points.length; i++) {
 			let point = points[i];
 			if (point) {
@@ -424,7 +432,14 @@ class ZvoogTicker {
 				let nextTime = songDuration;
 				if (nextPoint) {
 					nextTime = point2seconds(song, nextPoint);
-					console.log(from, '<=', pointTime, '>', to, '=', current.velocity, '>', nextPoint.velocity, '/', nextTime);
+					/*console.log( 
+						pointTime,  ':' , current.velocity
+						,'=>'
+						,nextTime,  ':' , nextPoint.velocity
+						, '/', when,(when+pointTime-from),(when+nextTime-from)
+						);*/
+					pluginParameeter.setValueAtTime(current.velocity, when + pointTime - from);
+					pluginParameeter.linearRampToValueAtTime(nextPoint.velocity, when + nextTime - from-0.0001);
 				}
 			}
 			current = nextPoint;

@@ -2942,9 +2942,9 @@ var ZvoogTicker = (function () {
         return true;
     };
     ZvoogTicker.prototype.sendInstrumentEvents = function (instrument, song, scheduleWhen, tickStart, tickEnd) {
-        this.sendAllParameters(instrument.instrumentSetting.parameters, song, scheduleWhen, tickStart, tickEnd);
         var plugin = instrument.instrumentSetting.instrumentPlugin;
         if (plugin) {
+            this.sendAllParameters(plugin, instrument.instrumentSetting.parameters, song, scheduleWhen, tickStart, tickEnd);
             var measureStart = 0;
             for (var mm = 0; mm < song.measures.length; mm++) {
                 var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
@@ -2965,9 +2965,9 @@ var ZvoogTicker = (function () {
         }
     };
     ZvoogTicker.prototype.sendDrumEvents = function (drum, song, scheduleWhen, tickStart, tickEnd) {
-        this.sendAllParameters(drum.percussionSetting.parameters, song, scheduleWhen, tickStart, tickEnd);
         var plugin = drum.percussionSetting.percussionPlugin;
         if (plugin) {
+            this.sendAllParameters(plugin, drum.percussionSetting.parameters, song, scheduleWhen, tickStart, tickEnd);
             var measureStart = 0;
             for (var mm = 0; mm < song.measures.length; mm++) {
                 var measureDuration = meter2seconds(song.measures[mm].tempo, song.measures[mm].meter);
@@ -2989,18 +2989,21 @@ var ZvoogTicker = (function () {
     };
     ZvoogTicker.prototype.sendAllFilterEvents = function (filters, song, when, from, to) {
         for (var i = 0; i < filters.length; i++) {
-            this.sendSingleFilterEvents(filters[i], song, when, from, to);
+            var plugin = filters[i].filterPlugin;
+            if (plugin) {
+                this.sendSinglePluginEvents(plugin, filters[i].parameters, song, when, from, to);
+            }
         }
     };
-    ZvoogTicker.prototype.sendSingleFilterEvents = function (filter, song, when, from, to) {
-        this.sendAllParameters(filter.parameters, song, when, from, to);
+    ZvoogTicker.prototype.sendSinglePluginEvents = function (plugin, parameters, song, when, from, to) {
+        this.sendAllParameters(plugin, parameters, song, when, from, to);
     };
-    ZvoogTicker.prototype.sendAllParameters = function (parameters, song, when, from, to) {
+    ZvoogTicker.prototype.sendAllParameters = function (plugin, parameters, song, when, from, to) {
         for (var i = 0; i < parameters.length; i++) {
-            this.sendParameterPoints(parameters[i].points, song, when, from, to);
+            this.sendParameterPoints(plugin.getParams()[i], parameters[i].points, song, when, from, to);
         }
     };
-    ZvoogTicker.prototype.sendParameterPoints = function (points, song, when, from, to) {
+    ZvoogTicker.prototype.sendParameterPoints = function (pluginParameeter, points, song, when, from, to) {
         var beforeFirst = { skipMeasures: 0, skipSteps: { count: -1, division: 1 }, velocity: 0 };
         var current = findNextCurvePoint(points, beforeFirst);
         if (current == null || current.skipMeasures > 0 || current.skipSteps.count > 0) {
@@ -3014,7 +3017,8 @@ var ZvoogTicker = (function () {
                 var nextTime = songDuration;
                 if (nextPoint) {
                     nextTime = point2seconds(song, nextPoint);
-                    console.log(from, '<=', pointTime, '>', to, '=', current.velocity, '>', nextPoint.velocity, '/', nextTime);
+                    pluginParameeter.setValueAtTime(current.velocity, when + pointTime - from);
+                    pluginParameeter.linearRampToValueAtTime(nextPoint.velocity, when + nextTime - from - 0.0001);
                 }
             }
             current = nextPoint;
@@ -5359,12 +5363,12 @@ var MuzXBox = (function () {
                             measureChords: [
                                 {
                                     chords: [
-                                        { when: { count: 0, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] },
-                                        { when: { count: 1, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] },
-                                        { when: { count: 2, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] },
-                                        { when: { count: 3, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] },
-                                        { when: { count: 4, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] },
-                                        { when: { count: 5, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] }
+                                        { when: { count: 0, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] },
+                                        { when: { count: 1, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 34 }] }] },
+                                        { when: { count: 2, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] },
+                                        { when: { count: 3, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 34 }] }] },
+                                        { when: { count: 4, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] },
+                                        { when: { count: 5, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 34 }] }] }
                                     ]
                                 },
                                 {
@@ -5421,9 +5425,9 @@ var MuzXBox = (function () {
                     filterPlugin: null,
                     parameters: [{
                             points: [
-                                { skipMeasures: 0, skipSteps: { count: 0, division: 2 }, velocity: 79 },
-                                { skipMeasures: 0, skipSteps: { count: 1, division: 2 }, velocity: 33 },
-                                { skipMeasures: 1, skipSteps: { count: 3, division: 4 }, velocity: 72 }
+                                { skipMeasures: 0, skipSteps: { count: 0, division: 2 }, velocity: 99 },
+                                { skipMeasures: 1, skipSteps: { count: 1, division: 2 }, velocity: 22 },
+                                { skipMeasures: 0, skipSteps: { count: 3, division: 4 }, velocity: 72 }
                             ],
                             caption: 'test gain'
                         }],
@@ -5432,9 +5436,9 @@ var MuzXBox = (function () {
                 }
             ],
             measures: [
-                { meter: { count: 4, division: 4 }, tempo: 120, points: [] },
-                { meter: { count: 4, division: 4 }, tempo: 120, points: [] },
-                { meter: { count: 4, division: 4 }, tempo: 120, points: [] }
+                { meter: { count: 3, division: 4 }, tempo: 120, points: [] },
+                { meter: { count: 4, division: 4 }, tempo: 90, points: [] },
+                { meter: { count: 4, division: 4 }, tempo: 150, points: [] }
             ],
             harmony: { tone: '', mode: '', progression: [] }
         };

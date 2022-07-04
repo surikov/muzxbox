@@ -746,9 +746,9 @@ declare class ZvoogTicker {
     sendInstrumentEvents(instrument: ZvoogInstrumentVoice, song: ZvoogSchedule, scheduleWhen: number, tickStart: number, tickEnd: number): void;
     sendDrumEvents(drum: ZvoogPercussionVoice, song: ZvoogSchedule, scheduleWhen: number, tickStart: number, tickEnd: number): void;
     sendAllFilterEvents(filters: ZvoogFilterSetting[], song: ZvoogSchedule, when: number, from: number, to: number): void;
-    sendSingleFilterEvents(filter: ZvoogFilterSetting, song: ZvoogSchedule, when: number, from: number, to: number): void;
-    sendAllParameters(parameters: ZvoogParameterData[], song: ZvoogSchedule, when: number, from: number, to: number): void;
-    sendParameterPoints(points: ZvoogCurvePoint[], song: ZvoogSchedule, when: number, from: number, to: number): void;
+    sendSinglePluginEvents(plugin: ZvoogPlugin, parameters: ZvoogParameterData[], song: ZvoogSchedule, when: number, from: number, to: number): void;
+    sendAllParameters(plugin: ZvoogPlugin, parameters: ZvoogParameterData[], song: ZvoogSchedule, when: number, from: number, to: number): void;
+    sendParameterPoints(pluginParameeter: ZvoogPluginParameter, points: ZvoogCurvePoint[], song: ZvoogSchedule, when: number, from: number, to: number): void;
     sendTickEvents(song: ZvoogSchedule, when: number, from: number, to: number): void;
     toggleStatePlay(song: ZvoogSchedule): void;
     startTicks(song: ZvoogSchedule, audioContext: AudioContext, onTick: (when: number, from: number, to: number) => void, loopStart: number, loopPosition: number, loopEnd: number, onEnd: (loopPosition: number) => void): void;
