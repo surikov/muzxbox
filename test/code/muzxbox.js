@@ -3055,6 +3055,7 @@ var ZvoogTicker = (function () {
                 }
                 var endLoopTime = scheduleSecondsDuration(song);
                 if (endSlecetionMeasureIdx > -1) {
+                    endLoopTime = 0;
                     for (var i = 0; i <= endSlecetionMeasureIdx; i++) {
                         endLoopTime = endLoopTime + meter2seconds(song.measures[i].tempo, song.measures[i].meter);
                     }
@@ -3071,6 +3072,7 @@ var ZvoogTicker = (function () {
     };
     ZvoogTicker.prototype.startTicks = function (song, audioContext, onTick, loopStart, loopPosition, loopEnd, onEnd) {
         if (this.state == this.stateStoped) {
+            console.log('startTicks', loopStart, loopPosition, loopEnd);
             this.state = this.statePlay;
             this.tick(song, audioContext, audioContext.currentTime, onTick, loopStart, loopPosition, loopEnd, onEnd);
         }
@@ -4122,9 +4124,8 @@ var MidiParser = (function () {
         return pars;
     };
     MidiParser.prototype.convert = function () {
-        var _a;
+        var _a, _b;
         var midisong = this.dump();
-        console.log('midisong', midisong);
         var minIns = 123456;
         var maxIns = -1;
         var minDr = 123456;
@@ -4252,7 +4253,6 @@ var MidiParser = (function () {
             kind: "gain",
             initial: ""
         });
-        console.log('timeline', timeline);
         for (var i = 0; i < timeline.length; i++) {
             schedule.measures.push({
                 meter: { count: Math.round(timeline[i].count), division: Math.round(timeline[i].division) },
@@ -4278,16 +4278,19 @@ var MidiParser = (function () {
             }
         }
         for (var i_2 = 0; i_2 < midisong.miditracks.length; i_2++) {
+            console.log(i_2, midisong.miditracks[i_2]);
             var track = {
                 title: '' + i_2,
                 instruments: [], percussions: [],
-                filters: [{
-                        filterPlugin: null,
-                        parameters: this.parametersDefs(testGain),
-                        kind: "gain",
-                        initial: ""
-                    }]
+                filters: []
             };
+            var trackGain = {
+                filterPlugin: null,
+                parameters: this.parametersDefs(testGain),
+                kind: "gain",
+                initial: ""
+            };
+            track.filters.push(trackGain);
             schedule.tracks.push(track);
             var firstChannelNum = 0;
             for (var ch = 0; ch < midisong.miditracks[i_2].songchords.length; ch++) {
@@ -4306,6 +4309,7 @@ var MidiParser = (function () {
                     var midichord = midisong.miditracks[i_2].songchords[ch];
                     for (var nn = 0; nn < midichord.notes.length; nn++) {
                         var pinum = midichord.notes[nn].points[0].pitch;
+                        var volume = (_a = midichord.notes[nn].points[0].midipoint) === null || _a === void 0 ? void 0 : _a.volume;
                         var idx = drumNums.indexOf(pinum);
                         var voice = void 0;
                         if (idx < 0) {
@@ -4345,6 +4349,23 @@ var MidiParser = (function () {
                                     when: skipMeter
                                 };
                                 voice.measureBunches[tc - 1].bunches.push(onehit);
+                                if (volume) {
+                                    var lastPoint = voice.filters[0].parameters[0].points[voice.filters[0].parameters[0].points.length - 1];
+                                    if (lastPoint.velocity == volume) {
+                                    }
+                                    else {
+                                        var nextPoint = {
+                                            skipMeasures: 0,
+                                            skipSteps: {
+                                                count: 0,
+                                                division: voice.filters[0].parameters[0].points.length
+                                            },
+                                            velocity: volume
+                                        };
+                                        voice.filters[0].parameters[0].points.push(nextPoint);
+                                        console.log(idx, voice.title, onehit.when, volume, nextPoint);
+                                    }
+                                }
                                 break;
                             }
                         }
@@ -4396,7 +4417,7 @@ var MidiParser = (function () {
                                 var mino = midichord.notes[nx];
                                 for (var px = 0; px < mino.points.length; px++) {
                                     var mipoint = mino.points[px];
-                                    var vol = (_a = mipoint.midipoint) === null || _a === void 0 ? void 0 : _a.volume;
+                                    var vol = (_b = mipoint.midipoint) === null || _b === void 0 ? void 0 : _b.volume;
                                     env.pitches.push({
                                         duration: DUU(seconds2meterRound(mipoint.durationms / 1000, timelineMeasure.bpm)).simplify(),
                                         pitch: mipoint.pitch - midiInstrumentPitchShift
@@ -5376,7 +5397,7 @@ var MuzXBox = (function () {
                                         { when: { count: 1, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 17 }] }] },
                                         { when: { count: 2, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 5 }] }] },
                                         { when: { count: 3, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 17 }] }] },
-                                        { when: { count: 4, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 5 }] }] },
+                                        { when: { count: 4, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 29 }] }] },
                                         { when: { count: 5, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 17 }] }] },
                                         { when: { count: 6, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 5 }] }] },
                                         { when: { count: 7, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 17 }] }] }
@@ -5731,6 +5752,9 @@ var PianoRollRenderer = (function () {
                 var clone = cloneLine(line_1);
                 clone.id = 'param-' + aa + '-' + measureNum + '-' + rid();
                 anchors[aa].content.push(cloneLine(line_1));
+                if (anchors[aa].ww < line_1.x2 - anchors[aa].xx) {
+                    anchors[aa].ww = line_1.x2 - anchors[aa].xx;
+                }
             }
             current = to;
         }
@@ -5845,7 +5869,6 @@ var PianoRollRenderer = (function () {
     PianoRollRenderer.prototype.addInstrumentMeasure = function (ratioDuration, ratioThickness, song, voice, measureNum, time, css, anchors) {
         var topGridMargin = topGridMarginTp(song, ratioThickness);
         var measure = voice.measureChords[measureNum];
-        var measureMaxLen = anchors[0].ww;
         var yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12) * ratioThickness;
         for (var cc = 0; cc < measure.chords.length; cc++) {
             var chord = measure.chords[cc];
@@ -5884,15 +5907,14 @@ var PianoRollRenderer = (function () {
                             anchors[aa].ww = line_2.x2 - anchors[aa].xx;
                         }
                         anchors[aa].content.push(cloneLine(line_2));
-                        if (measureMaxLen < anchors[aa].ww) {
-                            measureMaxLen = anchors[aa].ww;
+                        if (anchors[aa].ww < line_2.x2 - anchors[aa].xx) {
+                            anchors[aa].ww = line_2.x2 - anchors[aa].xx;
                         }
                     }
                     pitchWhen = pitchWhen + pitchDuration;
                 }
             }
         }
-        return measureMaxLen;
     };
     PianoRollRenderer.prototype.addDrumMeasure = function (drumCounter, ratioDuration, ratioThickness, song, voice, measureNum, time, css, anchors) {
         var measure = voice.measureBunches[measureNum];

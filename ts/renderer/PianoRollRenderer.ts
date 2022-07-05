@@ -80,6 +80,7 @@ class PianoRollRenderer {
 
 	addParameterMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, parameter: ZvoogParameterData
 		, measureNum: number, time: number, css: string, anchors: TileAnchor[]) {
+		//let measureMaxLen=anchors[0].ww;
 		let beforeFirst: null | ZvoogCurvePoint = {
 			skipMeasures: measureNum
 			, skipSteps: { count: -1, division: 1 }
@@ -106,8 +107,8 @@ class PianoRollRenderer {
 			}
 			//console.log(measureNum, parameter.caption, current.skipMeasures, current.skipSteps, current.velocity, '>', to.skipMeasures, to.skipSteps, to.velocity);
 			let line: TileLine = {
-				x1: leftGridMargin + point2seconds(song, current) * ratioDuration+0.5*ratioThickness
-				, x2: leftGridMargin + point2seconds(song, to) * ratioDuration+0.5*ratioThickness
+				x1: leftGridMargin + point2seconds(song, current) * ratioDuration + 0.5 * ratioThickness
+				, x2: leftGridMargin + point2seconds(song, to) * ratioDuration + 0.5 * ratioThickness
 				, y1: topGridMargin + (12 * octaveCount - current.velocity + 0.5) * ratioThickness
 				, y2: topGridMargin + (12 * octaveCount - to.velocity + 1 - 0.5) * ratioThickness
 				, css: css
@@ -118,6 +119,9 @@ class PianoRollRenderer {
 				clone.id = 'param-' + aa + '-' + measureNum + '-' + rid();
 				//console.log(clone);
 				anchors[aa].content.push(cloneLine(line));
+				if (anchors[aa].ww < line.x2 - anchors[aa].xx) {
+					anchors[aa].ww = line.x2 - anchors[aa].xx;
+				}
 			}
 			//console.log(line);
 			current = to;
@@ -138,6 +142,16 @@ class PianoRollRenderer {
 				, css: css
 			};
 			anchors[aa].content.push(cloneLine(line));
+		}*/
+		/*for (let aa = 0; aa < anchors.length; aa++) {
+			if (line.x2 - anchors[aa].xx > anchors[aa].ww) {
+				//console.log((line.x2- anchors[aa].xx), anchors[aa].ww);
+				anchors[aa].ww = line.x2 - anchors[aa].xx;
+			}
+			anchors[aa].content.push(cloneLine(line));
+			if (measureMaxLen < anchors[aa].ww) {
+				measureMaxLen = anchors[aa].ww;
+			}
 		}*/
 	}
 	addMeasureLyrics(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor, css: string) {
@@ -256,10 +270,11 @@ class PianoRollRenderer {
 			position = DUU(position).plus(rhythmPattern[stepNN]);
 		}
 	}
-	addInstrumentMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogInstrumentVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number {
+	addInstrumentMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogInstrumentVoice, measureNum: number, time: number
+		, css: string, anchors: TileAnchor[]) {//}: number {
 		let topGridMargin = topGridMarginTp(song, ratioThickness);
 		let measure = voice.measureChords[measureNum];
-		var measureMaxLen = anchors[0].ww;
+		//var measureMaxLen = anchors[0].ww;
 		let yShift = gridHeightTp(ratioThickness) - (0.5 - 0 * 12) * ratioThickness;
 		for (let cc = 0; cc < measure.chords.length; cc++) {
 			let chord = measure.chords[cc];
@@ -301,15 +316,18 @@ class PianoRollRenderer {
 							anchors[aa].ww = line.x2 - anchors[aa].xx;
 						}
 						anchors[aa].content.push(cloneLine(line));
-						if (measureMaxLen < anchors[aa].ww) {
-							measureMaxLen = anchors[aa].ww;
+						if(anchors[aa].ww < line.x2 - anchors[aa].xx){
+							anchors[aa].ww = line.x2 - anchors[aa].xx;
 						}
+						/*if (measureMaxLen < anchors[aa].ww) {
+							measureMaxLen = anchors[aa].ww;
+						}*/
 					}
 					pitchWhen = pitchWhen + pitchDuration;
 				}
 			}
 		}
-		return measureMaxLen;
+		//return measureMaxLen;
 	}
 	addDrumMeasure(drumCounter: number, ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogPercussionVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number {
 		//let topGridMargin = topGridMarginTp(song, ratioThickness);

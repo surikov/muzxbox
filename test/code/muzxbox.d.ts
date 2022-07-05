@@ -1177,7 +1177,7 @@ declare class PianoRollRenderer {
     addSelectKnobs16(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor, action: (x: number, y: number) => void | undefined): void;
     addSelectKnobs4(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor): void;
     addSelectKnobs1(song: ZvoogSchedule, time: number, mm: number, rhythmPattern: ZvoogMeter[], ratioDuration: number, ratioThickness: number, anchor: TileAnchor): void;
-    addInstrumentMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogInstrumentVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number;
+    addInstrumentMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogInstrumentVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): void;
     addDrumMeasure(drumCounter: number, ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, voice: ZvoogPercussionVoice, measureNum: number, time: number, css: string, anchors: TileAnchor[]): number;
     createNoteUpAction(layerSelector: LayerSelector, tt: number, vv: number): (x: number, y: number) => void;
     createNoteMenuAction(layerSelector: LayerSelector, tt: number, vv: number): (x: number, y: number) => void;

@@ -439,7 +439,7 @@ class ZvoogTicker {
 						, '/', when,(when+pointTime-from),(when+nextTime-from)
 						);*/
 					pluginParameeter.setValueAtTime(current.velocity, when + pointTime - from);
-					pluginParameeter.linearRampToValueAtTime(nextPoint.velocity, when + nextTime - from-0.0001);
+					pluginParameeter.linearRampToValueAtTime(nextPoint.velocity, when + nextTime - from - 0.0001);
 				}
 			}
 			current = nextPoint;
@@ -476,6 +476,7 @@ class ZvoogTicker {
 				}
 				let endLoopTime = scheduleSecondsDuration(song);
 				if (endSlecetionMeasureIdx > -1) {
+					endLoopTime = 0;
 					for (let i = 0; i <= endSlecetionMeasureIdx; i++) {
 						endLoopTime = endLoopTime + meter2seconds(song.measures[i].tempo, song.measures[i].meter);
 					}
@@ -485,7 +486,7 @@ class ZvoogTicker {
 				this.startTicks(song
 					, this.audioContext
 					, (when: number, from: number, to: number) => {
-						//console.log('onTick', this.audioContext.currentTime, 'when', when, 'loop', from, to);
+						//console.log('onTick', Math.round(1000*this.audioContext.currentTime), 'when',Math.round(1000* when), 'loop', Math.round(1000*from),Math.round(1000* to));
 						this.sendTickEvents(song, when, from, to);
 					}
 					, startLoopTime
@@ -506,6 +507,7 @@ class ZvoogTicker {
 		, onEnd: (loopPosition: number) => void
 	) {
 		if (this.state == this.stateStoped) {
+			console.log('startTicks', loopStart, loopPosition, loopEnd);
 			this.state = this.statePlay;
 			this.tick(song, audioContext, audioContext.currentTime, onTick, loopStart, loopPosition, loopEnd, onEnd);
 		}
