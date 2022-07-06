@@ -2338,6 +2338,27 @@ function point2seconds(song, point) {
     }
     return ss;
 }
+function points2meter(points) {
+    var r = {
+        skipMeasures: 0,
+        skipSteps: {
+            count: 0,
+            division: 1
+        },
+        velocity: 0
+    };
+    for (var i = 0; i < points.length; i++) {
+        if (points[i].skipMeasures > 0) {
+            r.skipMeasures = r.skipMeasures + points[i].skipMeasures;
+            r.skipSteps = points[i].skipSteps;
+        }
+        else {
+            r.skipSteps = DUU(r.skipSteps).plus(points[i].skipSteps);
+        }
+        r.velocity = points[i].velocity;
+    }
+    return r;
+}
 function meter2seconds(bpm, meter) {
     var wholeNoteSeconds = 4 * 60 / bpm;
     var meterSeconds = wholeNoteSeconds * meter.count / meter.division;
@@ -4350,20 +4371,31 @@ var MidiParser = (function () {
                                 };
                                 voice.measureBunches[tc - 1].bunches.push(onehit);
                                 if (volume) {
-                                    var lastPoint = voice.filters[0].parameters[0].points[voice.filters[0].parameters[0].points.length - 1];
-                                    if (lastPoint.velocity == volume) {
+                                    volume = volume / 1.5;
+                                    var lastPointMeter = points2meter(voice.filters[0].parameters[0].points);
+                                    if (lastPointMeter.velocity == volume) {
                                     }
                                     else {
+                                        var nextMeasure = tc - 1;
                                         var nextPoint = {
                                             skipMeasures: 0,
                                             skipSteps: {
                                                 count: 0,
-                                                division: voice.filters[0].parameters[0].points.length
+                                                division: 4
                                             },
                                             velocity: volume
                                         };
+                                        if (nextMeasure > lastPointMeter.skipMeasures) {
+                                            nextPoint.skipMeasures = nextMeasure - lastPointMeter.skipMeasures;
+                                            nextPoint.skipSteps = skipMeter;
+                                        }
+                                        else {
+                                            nextPoint.skipMeasures = 0;
+                                            nextPoint.skipSteps = DUU(skipMeter).minus(lastPointMeter.skipSteps);
+                                        }
                                         voice.filters[0].parameters[0].points.push(nextPoint);
-                                        console.log(idx, voice.title, onehit.when, volume, nextPoint);
+                                        console.log(idx, voice.title, (tc - 1), skipMeter, volume, midichord.when, nextPoint, lastPointMeter);
+                                        volume = lastPointMeter.velocity;
                                     }
                                 }
                                 break;

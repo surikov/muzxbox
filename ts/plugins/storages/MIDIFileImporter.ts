@@ -1287,38 +1287,43 @@ class MidiParser {
 								}
 								voice.measureBunches[tc - 1].bunches.push(onehit);
 								if (volume) {
+									volume=volume/1.5;
 									//let lastPoint: ZvoogCurvePoint;// = voice.filters[0].parameters[0].points[voice.filters[0].parameters[0].points.length - 1];
 									//console.log(voice, 'len', voice.filters[0].parameters[0].points.length);
 									//if (voice.filters[0].parameters[0].points.length > 0) {
-									let lastPoint: ZvoogCurvePoint = voice.filters[0].parameters[0].points[voice.filters[0].parameters[0].points.length - 1];
+									//let lastPoint: ZvoogCurvePoint = voice.filters[0].parameters[0].points[voice.filters[0].parameters[0].points.length - 1];
+									let lastPointMeter = points2meter(voice.filters[0].parameters[0].points);
 									//console.log(lastPoint.velocity, volume, (lastPoint.velocity == volume), lastPoint);
-									if (lastPoint.velocity == volume) {
+									if (lastPointMeter.velocity == volume) {
 										//
 									} else {
+										let nextMeasure = tc - 1;
+										//let nextStep = skipMeter;
+										//let lastMeasure = 0;
+
+
+
+
 										let nextPoint: ZvoogCurvePoint = {
 											skipMeasures: 0
 											, skipSteps: {
 												count: 0
-												, division: voice.filters[0].parameters[0].points.length
+												, division: 4//.voice.filters[0].parameters[0].points.length
 											}
-											, velocity: volume
+											, velocity: volume//lastPointMeter.velocity//volume
+										}
+										if (nextMeasure > lastPointMeter.skipMeasures) {
+											nextPoint.skipMeasures = nextMeasure - lastPointMeter.skipMeasures;
+											nextPoint.skipSteps = skipMeter;
+										} else {
+											nextPoint.skipMeasures = 0;
+											nextPoint.skipSteps = DUU(skipMeter).minus(lastPointMeter.skipSteps)
 										}
 										voice.filters[0].parameters[0].points.push(nextPoint);
-										//let indertPoint: ZvoogCurvePoint = voice.filters[0].parameters[0].points[voice.filters[0].parameters[0].points.length - 1];
-										console.log(idx, voice.title, onehit.when, volume, nextPoint);
+										//voice.filters[0].parameters[0].points.push({ skipMeasures: 0, skipSteps: { count: 0, division: 4 }, velocity: volume });
+										console.log(idx, voice.title, (tc - 1), skipMeter, volume, midichord.when, nextPoint, lastPointMeter);
+										volume=lastPointMeter.velocity;
 									}
-									/*} else {
-										let firstPoint: ZvoogCurvePoint = {
-											skipMeasures: 0
-											, skipSteps: {
-												count: 0
-												, division: voice.filters[0].parameters[0].points.length
-											}
-											, velocity: volume
-										};
-										voice.filters[0].parameters[0].points.push(firstPoint);
-									}*/
-
 								}
 								break;
 							}

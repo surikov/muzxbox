@@ -480,6 +480,7 @@ declare type ZvoogStepIndex = {
     step: number;
 };
 declare function point2seconds(song: ZvoogSchedule, point: ZvoogCurvePoint): number;
+declare function points2meter(points: ZvoogCurvePoint[]): ZvoogCurvePoint;
 declare function meter2seconds(bpm: number, meter: ZvoogMeter): number;
 declare function seconds2meterRound(bpm: number, seconds: number): ZvoogMeter;
 declare function calculateEnvelopeDuration(envelope: ZvoogEnvelope): ZvoogMeter;

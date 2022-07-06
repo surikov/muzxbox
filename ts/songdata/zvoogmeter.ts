@@ -16,6 +16,26 @@ function point2seconds(song: ZvoogSchedule, point: ZvoogCurvePoint): number {
 	}
 	return ss;
 }
+function points2meter(points: ZvoogCurvePoint[]): ZvoogCurvePoint {
+	let r: ZvoogCurvePoint = {
+		skipMeasures: 0
+		, skipSteps: {
+			count: 0
+			, division: 1
+		}
+		, velocity: 0
+	};
+	for (let i = 0; i < points.length; i++) {
+		if (points[i].skipMeasures > 0) {
+			r.skipMeasures = r.skipMeasures + points[i].skipMeasures;
+			r.skipSteps = points[i].skipSteps;
+		} else {
+			r.skipSteps = DUU(r.skipSteps).plus(points[i].skipSteps);
+		}
+		r.velocity = points[i].velocity;
+	}
+	return r;
+}
 function meter2seconds(bpm: number, meter: ZvoogMeter): number {
 	let wholeNoteSeconds = 4 * 60 / bpm;
 	let meterSeconds = wholeNoteSeconds * meter.count / meter.division;
