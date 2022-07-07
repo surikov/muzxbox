@@ -513,7 +513,7 @@ class MidiParser {
 			this.parseTrackEvents(this.parsedTracks[i]);
 		}
 		this.parseNotes();
-		this.simplify();
+		this.simplifyAllPaths();
 	}
 	toText(arr: number[]): string {
 		var r: string = '';
@@ -622,7 +622,7 @@ class MidiParser {
 		arr.push(points[points.length - 1]);
 		return arr;
 	}
-	simplify() {
+	simplifyAllPaths() {
 		for (var t = 0; t < this.parsedTracks.length; t++) {
 			var track: MIDIFileTrack = this.parsedTracks[t];
 			for (var ch = 0; ch < track.chords.length; ch++) {
@@ -712,7 +712,7 @@ class MidiParser {
 	parseNotes() {
 		this.dumpResolutionChanges();
 		for (let t = 0; t < this.parsedTracks.length; t++) {
-			console.log('start parseNotes', t);
+			//console.log('start parseNotes', t);
 			var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
 			this.parseTicks2time(singleParsedTrack);
 			for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
@@ -1191,7 +1191,7 @@ class MidiParser {
 			}
 		}
 		for (let i = 0; i < midisong.miditracks.length; i++) {
-			console.log(i, midisong.miditracks[i]);
+			//console.log(i, midisong.miditracks[i]);
 			/*var trackTictle: string = '';
 			if (midisong.miditracks[i].title) {
 				trackTictle = midisong.miditracks[i].title;
@@ -1276,102 +1276,41 @@ class MidiParser {
 						} else {
 							voice = track.percussions[idx];
 						}
+						let filterParameterPoints = voice.filters[0].parameters[0].points;
 						for (var tc = 0; tc < timeline.length; tc++) {
 							if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
 								var timelineMeasure = timeline[tc - 1];
 								var skipInMeasureMs = midichord.when - timelineMeasure.ms;
 								var skipMeter: ZvoogMeter = seconds2meterRound(skipInMeasureMs / 1000, timelineMeasure.bpm);
 								skipMeter = DUU(skipMeter).simplify();
-								let onehit: ZvoogChordPoint = {
-									when: skipMeter
-								}
+								let onehit: ZvoogChordPoint = { when: skipMeter };
 								voice.measureBunches[tc - 1].bunches.push(onehit);
 								if (volume) {
-									volume=volume/1.5;
-									//let lastPoint: ZvoogCurvePoint;// = voice.filters[0].parameters[0].points[voice.filters[0].parameters[0].points.length - 1];
-									//console.log(voice, 'len', voice.filters[0].parameters[0].points.length);
-									//if (voice.filters[0].parameters[0].points.length > 0) {
-									//let lastPoint: ZvoogCurvePoint = voice.filters[0].parameters[0].points[voice.filters[0].parameters[0].points.length - 1];
-									let lastPointMeter = points2meter(voice.filters[0].parameters[0].points);
-									//console.log(lastPoint.velocity, volume, (lastPoint.velocity == volume), lastPoint);
+									volume = volume / 1.5;
+									let lastPointMeter = points2meter(filterParameterPoints);
 									if (lastPointMeter.velocity == volume) {
 										//
 									} else {
 										let nextMeasure = tc - 1;
-										//let nextStep = skipMeter;
-										//let lastMeasure = 0;
-
-
-
-
-										let nextPoint: ZvoogCurvePoint = {
-											skipMeasures: 0
-											, skipSteps: {
-												count: 0
-												, division: 4//.voice.filters[0].parameters[0].points.length
-											}
-											, velocity: volume//lastPointMeter.velocity//volume
-										}
+										let nextPoint: ZvoogCurvePoint = { skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: lastPointMeter.velocity };
+										let knee: ZvoogCurvePoint = { skipMeasures: 0, skipSteps: { count: 1, division: 32 }, velocity:  volume};
 										if (nextMeasure > lastPointMeter.skipMeasures) {
 											nextPoint.skipMeasures = nextMeasure - lastPointMeter.skipMeasures;
 											nextPoint.skipSteps = skipMeter;
 										} else {
 											nextPoint.skipMeasures = 0;
-											nextPoint.skipSteps = DUU(skipMeter).minus(lastPointMeter.skipSteps)
+											nextPoint.skipSteps = DUU(DUU(skipMeter).minus(lastPointMeter.skipSteps)).simplify();
 										}
-										voice.filters[0].parameters[0].points.push(nextPoint);
-										//voice.filters[0].parameters[0].points.push({ skipMeasures: 0, skipSteps: { count: 0, division: 4 }, velocity: volume });
-										console.log(idx, voice.title, (tc - 1), skipMeter, volume, midichord.when, nextPoint, lastPointMeter);
-										volume=lastPointMeter.velocity;
+										filterParameterPoints.push(nextPoint);
+										filterParameterPoints.push(knee);
+										//volume = lastPointMeter.velocity;
 									}
 								}
 								break;
 							}
 						}
-
-						//if (drumNums.indexOf(pinum) < 0) {
-						/*drumNums.push(pinum);
-						let voice: ZvoogPercussionVoice = {
-							measureBunches: []
-							, percussionSetting: {
-								percussionPlugin: null
-								, parameters: this.parametersDefs(wafdrum)
-								, kind: 'wafdrum'
-								, initial: '' + pinum
-							}
-							, filters: [{
-								filterPlugin: null
-								, parameters: this.parametersDefs(testGain)
-								, kind: "gain"
-								, initial: ""
-							}]
-							, title: '' + pinum + ' ' + findrumTitles(pinum)
-						};
-						track.percussions.push(voice);
-						track.title = '' + pinum + ': Drums';*/
-						/*for (var mc = 0; mc < timeline.length; mc++) {
-							voice.measureBunches.push({ bunches: [] });
-						}*/
-						/*for (var chn = 0; chn < midisong.miditracks[i].songchords.length; chn++) {
-							var midichord: MIDISongChord = midisong.miditracks[i].songchords[chn];
-							for (var tc = 0; tc < timeline.length; tc++) {
-								if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
-									var timelineMeasure = timeline[tc - 1];
-									var skipInMeasureMs = midichord.when - timelineMeasure.ms;
-									var skipMeter: ZvoogMeter = seconds2meter32(skipInMeasureMs / 1000, timelineMeasure.bpm);
-									skipMeter = DUU(skipMeter).simplify();
-									let onehit: ZvoogChordPoint = {
-										when: skipMeter
-									}
-									voice.measureBunches[tc - 1].bunches.push(onehit);
-									break;
-								}
-							}
-						}*/
-						//}
 					}
 				}
-				//console.log(i, firstChannelNum, drumNums);
 			} else {
 				let voice: ZvoogInstrumentVoice = {
 					measureChords: []

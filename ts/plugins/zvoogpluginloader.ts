@@ -440,6 +440,7 @@ class ZvoogTicker {
 						);*/
 					pluginParameeter.setValueAtTime(current.velocity, when + pointTime - from);
 					pluginParameeter.linearRampToValueAtTime(nextPoint.velocity, when + nextTime - from - 0.0001);
+					//pluginParameeter.setValueAtTime(current.velocity, when + pointTime - from);
 				}
 			}
 			current = nextPoint;

@@ -38,7 +38,7 @@ function findNextCurvePoint(points: ZvoogCurvePoint[], last: ZvoogCurvePoint): n
 		let point = points[pp];
 		if (point.skipMeasures) {
 			current.skipMeasures = current.skipMeasures + point.skipMeasures;
-			current.skipSteps = { count: 0, division: 1 };
+			current.skipSteps = point.skipSteps;//{ count: 0, division: 1 };
 		} else {
 			current.skipSteps = DUU(current.skipSteps).plus(point.skipSteps);
 		}

@@ -239,6 +239,7 @@ declare function isTileRectangle(t: TileItem): t is TileRectangle;
 declare function isTileGroup(t: TileItem): t is TileAnchor;
 declare function isLayerNormal(t: TileLayerDefinition): t is TileModelLayer;
 declare function rid(): string;
+declare function nonEmptyID(id?: string): string;
 declare class ZRender {
     tileLevel: TileLevel;
     layers: TileLayerDefinition[];
@@ -1014,7 +1015,7 @@ declare class MidiParser {
     distanceToPoint(line: PP, point: XYp): number;
     douglasPeucker(points: XYp[], tolerance: number): XYp[];
     simplifyPath(points: XYp[], tolerance: number): XYp[];
-    simplify(): void;
+    simplifyAllPaths(): void;
     dumpResolutionChanges(): void;
     lastResolution(ms: number): number;
     parseTicks2time(track: MIDIFileTrack): void;

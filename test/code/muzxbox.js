@@ -1213,6 +1213,14 @@ function isLayerNormal(t) {
 function rid() {
     return 'id' + Math.floor(Math.random() * 1000000000);
 }
+function nonEmptyID(id) {
+    if (id) {
+        return id;
+    }
+    else {
+        return 'ID' + Math.floor(Math.random() * 1000000000);
+    }
+}
 var ZRender = (function () {
     function ZRender(bx) {
         this.layers = [];
@@ -1502,7 +1510,7 @@ function findNextCurvePoint(points, last) {
         var point = points[pp];
         if (point.skipMeasures) {
             current.skipMeasures = current.skipMeasures + point.skipMeasures;
-            current.skipSteps = { count: 0, division: 1 };
+            current.skipSteps = point.skipSteps;
         }
         else {
             current.skipSteps = DUU(current.skipSteps).plus(point.skipSteps);
@@ -3647,7 +3655,7 @@ var MidiParser = (function () {
             this.parseTrackEvents(this.parsedTracks[i]);
         }
         this.parseNotes();
-        this.simplify();
+        this.simplifyAllPaths();
     };
     MidiParser.prototype.toText = function (arr) {
         var r = '';
@@ -3758,7 +3766,7 @@ var MidiParser = (function () {
         arr.push(points[points.length - 1]);
         return arr;
     };
-    MidiParser.prototype.simplify = function () {
+    MidiParser.prototype.simplifyAllPaths = function () {
         for (var t = 0; t < this.parsedTracks.length; t++) {
             var track = this.parsedTracks[t];
             for (var ch = 0; ch < track.chords.length; ch++) {
@@ -3845,7 +3853,6 @@ var MidiParser = (function () {
     MidiParser.prototype.parseNotes = function () {
         this.dumpResolutionChanges();
         for (var t = 0; t < this.parsedTracks.length; t++) {
-            console.log('start parseNotes', t);
             var singleParsedTrack = this.parsedTracks[t];
             this.parseTicks2time(singleParsedTrack);
             for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
@@ -4299,7 +4306,6 @@ var MidiParser = (function () {
             }
         }
         for (var i_2 = 0; i_2 < midisong.miditracks.length; i_2++) {
-            console.log(i_2, midisong.miditracks[i_2]);
             var track = {
                 title: '' + i_2,
                 instruments: [], percussions: [],
@@ -4360,42 +4366,34 @@ var MidiParser = (function () {
                         else {
                             voice = track.percussions[idx];
                         }
+                        var filterParameterPoints = voice.filters[0].parameters[0].points;
                         for (var tc = 0; tc < timeline.length; tc++) {
                             if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
                                 var timelineMeasure = timeline[tc - 1];
                                 var skipInMeasureMs = midichord.when - timelineMeasure.ms;
                                 var skipMeter = seconds2meterRound(skipInMeasureMs / 1000, timelineMeasure.bpm);
                                 skipMeter = DUU(skipMeter).simplify();
-                                var onehit = {
-                                    when: skipMeter
-                                };
+                                var onehit = { when: skipMeter };
                                 voice.measureBunches[tc - 1].bunches.push(onehit);
                                 if (volume) {
                                     volume = volume / 1.5;
-                                    var lastPointMeter = points2meter(voice.filters[0].parameters[0].points);
+                                    var lastPointMeter = points2meter(filterParameterPoints);
                                     if (lastPointMeter.velocity == volume) {
                                     }
                                     else {
                                         var nextMeasure = tc - 1;
-                                        var nextPoint = {
-                                            skipMeasures: 0,
-                                            skipSteps: {
-                                                count: 0,
-                                                division: 4
-                                            },
-                                            velocity: volume
-                                        };
+                                        var nextPoint = { skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: lastPointMeter.velocity };
+                                        var knee = { skipMeasures: 0, skipSteps: { count: 1, division: 32 }, velocity: volume };
                                         if (nextMeasure > lastPointMeter.skipMeasures) {
                                             nextPoint.skipMeasures = nextMeasure - lastPointMeter.skipMeasures;
                                             nextPoint.skipSteps = skipMeter;
                                         }
                                         else {
                                             nextPoint.skipMeasures = 0;
-                                            nextPoint.skipSteps = DUU(skipMeter).minus(lastPointMeter.skipSteps);
+                                            nextPoint.skipSteps = DUU(DUU(skipMeter).minus(lastPointMeter.skipSteps)).simplify();
                                         }
-                                        voice.filters[0].parameters[0].points.push(nextPoint);
-                                        console.log(idx, voice.title, (tc - 1), skipMeter, volume, midichord.when, nextPoint, lastPointMeter);
-                                        volume = lastPointMeter.velocity;
+                                        filterParameterPoints.push(nextPoint);
+                                        filterParameterPoints.push(knee);
                                     }
                                 }
                                 break;
@@ -5480,7 +5478,7 @@ var MuzXBox = (function () {
                             points: [
                                 { skipMeasures: 0, skipSteps: { count: 0, division: 2 }, velocity: 99 },
                                 { skipMeasures: 1, skipSteps: { count: 1, division: 2 }, velocity: 22 },
-                                { skipMeasures: 0, skipSteps: { count: 3, division: 4 }, velocity: 72 }
+                                { skipMeasures: 0, skipSteps: { count: 1, division: 32 }, velocity: 72 }
                             ],
                             caption: 'test gain'
                         }],
@@ -5765,30 +5763,28 @@ var PianoRollRenderer = (function () {
         }
         var topGridMargin = topGridMarginTp(song, ratioThickness);
         while ((current) && current.skipMeasures == measureNum) {
-            var to = findNextCurvePoint(parameter.points, current);
-            if (to == null) {
-                to = {
+            var changeTo = findNextCurvePoint(parameter.points, current);
+            if (changeTo == null) {
+                changeTo = {
                     skipMeasures: song.measures.length,
-                    skipSteps: { count: 0, division: 1 },
+                    skipSteps: { count: 1, division: 32 },
                     velocity: current.velocity
                 };
             }
-            var line_1 = {
-                x1: leftGridMargin + point2seconds(song, current) * ratioDuration + 0.5 * ratioThickness,
-                x2: leftGridMargin + point2seconds(song, to) * ratioDuration + 0.5 * ratioThickness,
-                y1: topGridMargin + (12 * octaveCount - current.velocity + 0.5) * ratioThickness,
-                y2: topGridMargin + (12 * octaveCount - to.velocity + 1 - 0.5) * ratioThickness,
-                css: css
-            };
+            console.log(measureNum, '/', current.skipMeasures, current.skipSteps.count, current.skipSteps.division, '/', changeTo.skipMeasures, changeTo.skipSteps.count, changeTo.skipSteps.division);
+            var xx1 = leftGridMargin + point2seconds(song, current) * ratioDuration + 0.5 * ratioThickness;
+            var xx2 = leftGridMargin + point2seconds(song, changeTo) * ratioDuration + 0.5 * ratioThickness;
+            var yy1 = topGridMargin + (12 * octaveCount - current.velocity + 0.5) * ratioThickness;
+            var yy2 = topGridMargin + (12 * octaveCount - changeTo.velocity + 1 - 0.5) * ratioThickness;
+            var line_1 = { x1: xx1, x2: xx2, y1: yy1, y2: yy2, css: css };
             for (var aa = 0; aa < anchors.length; aa++) {
                 var clone = cloneLine(line_1);
-                clone.id = 'param-' + aa + '-' + measureNum + '-' + rid();
-                anchors[aa].content.push(cloneLine(line_1));
-                if (anchors[aa].ww < line_1.x2 - anchors[aa].xx) {
-                    anchors[aa].ww = line_1.x2 - anchors[aa].xx;
+                anchors[aa].content.push(clone);
+                if (anchors[aa].ww < xx2 - anchors[aa].xx) {
+                    anchors[aa].ww = xx2 - anchors[aa].xx;
                 }
             }
-            current = to;
+            current = changeTo;
         }
     };
     PianoRollRenderer.prototype.addMeasureLyrics = function (song, time, mm, ratioDuration, ratioThickness, anchor, css) {

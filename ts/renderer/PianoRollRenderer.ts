@@ -80,7 +80,7 @@ class PianoRollRenderer {
 
 	addParameterMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, parameter: ZvoogParameterData
 		, measureNum: number, time: number, css: string, anchors: TileAnchor[]) {
-		//let measureMaxLen=anchors[0].ww;
+		//if (1 == 1) return;
 		let beforeFirst: null | ZvoogCurvePoint = {
 			skipMeasures: measureNum
 			, skipSteps: { count: -1, division: 1 }
@@ -96,63 +96,48 @@ class PianoRollRenderer {
 		}
 		let topGridMargin = topGridMarginTp(song, ratioThickness);
 		while ((current) && current.skipMeasures == measureNum) {
-			//console.log(measureNum, parameter, current);
-			let to: null | ZvoogCurvePoint = findNextCurvePoint(parameter.points, current);
-			if (to == null) {
-				to = {
+			let changeTo: null | ZvoogCurvePoint = findNextCurvePoint(parameter.points, current);
+			if (changeTo == null) {
+				changeTo = {
 					skipMeasures: song.measures.length
-					, skipSteps: { count: 0, division: 1 }
+					, skipSteps: { count: 1, division: 32 }
 					, velocity: current.velocity
 				};
 			}
-			//console.log(measureNum, parameter.caption, current.skipMeasures, current.skipSteps, current.velocity, '>', to.skipMeasures, to.skipSteps, to.velocity);
-			let line: TileLine = {
-				x1: leftGridMargin + point2seconds(song, current) * ratioDuration + 0.5 * ratioThickness
-				, x2: leftGridMargin + point2seconds(song, to) * ratioDuration + 0.5 * ratioThickness
-				, y1: topGridMargin + (12 * octaveCount - current.velocity + 0.5) * ratioThickness
-				, y2: topGridMargin + (12 * octaveCount - to.velocity + 1 - 0.5) * ratioThickness
+			console.log(measureNum, '/', current.skipMeasures, current.skipSteps.count, current.skipSteps.division, '/', changeTo.skipMeasures, changeTo.skipSteps.count, changeTo.skipSteps.division);
+			let xx1 = leftGridMargin + point2seconds(song, current) * ratioDuration + 0.5 * ratioThickness;
+			let xx2 = leftGridMargin + point2seconds(song, changeTo) * ratioDuration + 0.5 * ratioThickness;
+			let yy1 = topGridMargin + (12 * octaveCount - current.velocity + 0.5) * ratioThickness;
+			let yy2 = topGridMargin + (12 * octaveCount - changeTo.velocity + 1 - 0.5) * ratioThickness;
+			let line: TileLine = { x1: xx1, x2: xx2, y1: yy1, y2: yy2, css: css };
+			/*
+			let line1: TileLine = {
+				x1: xx1
+				, x2: xx2
+				, y1: yy1
+				, y2: yy1
 				, css: css
 			};
-
+			let line2: TileLine = {
+				x1: xx2
+				, x2: xx2
+				, y1: yy1
+				, y2: yy2
+				, css: css
+			};*/
 			for (let aa = 0; aa < anchors.length; aa++) {
 				let clone = cloneLine(line);
-				clone.id = 'param-' + aa + '-' + measureNum + '-' + rid();
-				//console.log(clone);
-				anchors[aa].content.push(cloneLine(line));
-				if (anchors[aa].ww < line.x2 - anchors[aa].xx) {
-					anchors[aa].ww = line.x2 - anchors[aa].xx;
+				//let clone1 = cloneLine(line1);
+				//let clone2 = cloneLine(line2);
+				anchors[aa].content.push(clone);
+				//anchors[aa].content.push(clone1);
+				//anchors[aa].content.push(clone2);
+				if (anchors[aa].ww < xx2 - anchors[aa].xx) {
+					anchors[aa].ww = xx2 - anchors[aa].xx;
 				}
 			}
-			//console.log(line);
-			current = to;
+			current = changeTo;
 		}
-		//let pointMeasure = 0;
-		//let pointStep = { count: 0, division: 1 };
-		//for (let pp = 0; pp > parameter.points.length; pp++) {
-
-		//}
-		/*
-		let point: ZvoogCurvePoint = parameter.points[0];
-		for (let aa = 0; aa < anchors.length; aa++) {
-			let line: TileLine = {
-				x1: 0
-				, x2: 0 + 1
-				, y1: 128 - point.velocity - 0.5 * ratioThickness
-				, y2: 128 - point.velocity + 1 - 0.5 * ratioThickness
-				, css: css
-			};
-			anchors[aa].content.push(cloneLine(line));
-		}*/
-		/*for (let aa = 0; aa < anchors.length; aa++) {
-			if (line.x2 - anchors[aa].xx > anchors[aa].ww) {
-				//console.log((line.x2- anchors[aa].xx), anchors[aa].ww);
-				anchors[aa].ww = line.x2 - anchors[aa].xx;
-			}
-			anchors[aa].content.push(cloneLine(line));
-			if (measureMaxLen < anchors[aa].ww) {
-				measureMaxLen = anchors[aa].ww;
-			}
-		}*/
 	}
 	addMeasureLyrics(song: ZvoogSchedule, time: number, mm: number, ratioDuration: number, ratioThickness: number, anchor: TileAnchor, css: string) {
 		let topGridMargin = topGridMarginTp(song, ratioThickness);
@@ -161,6 +146,7 @@ class PianoRollRenderer {
 		let measure = song.measures[mm];
 		for (let pp = 0; pp < measure.points.length; pp++) {
 			//let yShift = (pp % 2) ? 20: 10;
+
 			let yShift = 44;
 			let point = measure.points[pp];
 			let txt: TileText = {
@@ -316,7 +302,7 @@ class PianoRollRenderer {
 							anchors[aa].ww = line.x2 - anchors[aa].xx;
 						}
 						anchors[aa].content.push(cloneLine(line));
-						if(anchors[aa].ww < line.x2 - anchors[aa].xx){
+						if (anchors[aa].ww < line.x2 - anchors[aa].xx) {
 							anchors[aa].ww = line.x2 - anchors[aa].xx;
 						}
 						/*if (measureMaxLen < anchors[aa].ww) {

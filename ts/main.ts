@@ -158,7 +158,7 @@ class MuzXBox {
 						points: [
 							{ skipMeasures: 0, skipSteps: { count: 0, division: 2 }, velocity: 99 }
 							,{ skipMeasures: 1, skipSteps: { count: 1, division: 2 }, velocity: 22 }
-							,{ skipMeasures: 0, skipSteps: { count: 3, division: 4 }, velocity: 72 }
+							,{ skipMeasures: 0, skipSteps: { count: 1, division: 32 }, velocity: 72 }
 						]
 						, caption: 'test gain'
 					}]

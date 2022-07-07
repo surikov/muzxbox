@@ -59,6 +59,11 @@ function isLayerNormal(t: TileLayerDefinition): t is TileModelLayer {
 		&& (t as any).overlay === undefined
 		;
 }
-function rid() {
+function rid(): string {
 	return 'id' + Math.floor(Math.random() * 1000000000);
+}
+function nonEmptyID(id?: string): string {
+	if (id) { return id; } else {
+		return 'ID' + Math.floor(Math.random() * 1000000000);
+	}
 }

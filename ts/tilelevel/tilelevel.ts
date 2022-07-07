@@ -646,6 +646,7 @@ class TileLevel {
 					this.addGroupTile(svggroup, a, this.model[k]);
 				}
 			}
+			//console.log('tileFromModel',this.model);
 		}
 		this.allTilesOK = true;
 	}
@@ -771,6 +772,7 @@ class TileLevel {
 				element.onclick = click;
 				element.ontouchend = click;
 			}
+			//if(dd.id)if(!dd.id.startsWith('id'))console.log(dd.id,element);
 		}
 	}
 	clearAllDetails() {
