@@ -1023,6 +1023,31 @@ class MidiParser {
 		}
 		return pars;
 	}
+	fillVolumeParameterPoints(filterParameterPoints: ZvoogCurvePoint[], volume: number, timelineIdx: number, skipMeter: ZvoogMeter) {
+		//if (volume) {
+		volume = volume / 1.5;
+		let lastPointMeter = points2meter(filterParameterPoints);
+		if (lastPointMeter.velocity == volume) {
+			//
+		} else {
+			let nextMeasure = timelineIdx - 1;
+			let nextPoint: ZvoogCurvePoint = { skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: lastPointMeter.velocity };
+			let knee: ZvoogCurvePoint = { skipMeasures: 0, skipSteps: { count: 1, division: 128 }, velocity: volume };
+			if (nextMeasure > lastPointMeter.skipMeasures) {
+				nextPoint.skipMeasures = nextMeasure - lastPointMeter.skipMeasures;
+				nextPoint.skipSteps = skipMeter;
+			} else {
+				nextPoint.skipMeasures = 0;
+				nextPoint.skipSteps = DUU(skipMeter).simplify();
+			}
+			filterParameterPoints.push(nextPoint);
+			filterParameterPoints.push(knee);
+			if (nextPoint.skipSteps.division < 0 || knee.skipSteps.division < 0) {
+				console.log(nextPoint, knee);
+			}
+		}
+		//}
+	}
 	convert(): ZvoogSchedule {
 
 		var midisong: MIDISongData = this.dump();
@@ -1191,20 +1216,6 @@ class MidiParser {
 			}
 		}
 		for (let i = 0; i < midisong.miditracks.length; i++) {
-			//console.log(i, midisong.miditracks[i]);
-			/*var trackTictle: string = '';
-			if (midisong.miditracks[i].title) {
-				trackTictle = midisong.miditracks[i].title;
-				if (midisong.miditracks[i].instrument) {
-					trackTictle = midisong.miditracks[i].title + ': ' + midisong.miditracks[i].instrument;
-				}
-			} else {
-				if (midisong.miditracks[i].instrument) {
-					trackTictle = midisong.miditracks[i].instrument;
-				} else {
-					trackTictle = 'track ' + i;
-				}
-			}*/
 			let track: ZvoogTrack = {
 				title: '' + i
 				, instruments: [], percussions: []
@@ -1231,8 +1242,6 @@ class MidiParser {
 					, initial: ""
 				});
 				let drumNums: number[] = [];
-
-				//let lastGainPoint: ZvoogCurvePoint = { skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: 100 };
 				for (let ch = 0; ch < midisong.miditracks[i].songchords.length; ch++) {
 					var midichord: MIDISongChord = midisong.miditracks[i].songchords[ch];
 					for (let nn = 0; nn < midichord.notes.length; nn++) {
@@ -1240,7 +1249,6 @@ class MidiParser {
 						let volume = midichord.notes[nn].points[0].midipoint?.volume;
 						let idx = drumNums.indexOf(pinum);
 						let voice: ZvoogPercussionVoice;
-						//console.log(idx,pinum);
 						if (idx < 0) {
 							drumNums.push(pinum);
 							voice = {
@@ -1264,15 +1272,6 @@ class MidiParser {
 							for (let mc = 0; mc < timeline.length; mc++) {
 								voice.measureBunches.push({ bunches: [] });
 							}
-							//console.log(voice.title);
-							//idx=drumNums.indexOf(pinum);
-							/*let voxGain: ZvoogFilterSetting = {
-								filterPlugin: null
-								, parameters: this.parametersDefs(testGain)
-								, kind: "gain"
-								, initial: ""
-							};*/
-							//voice.filters.push(voxGain);
 						} else {
 							voice = track.percussions[idx];
 						}
@@ -1286,6 +1285,7 @@ class MidiParser {
 								let onehit: ZvoogChordPoint = { when: skipMeter };
 								voice.measureBunches[tc - 1].bunches.push(onehit);
 								if (volume) {
+									/*
 									volume = volume / 1.5;
 									let lastPointMeter = points2meter(filterParameterPoints);
 									if (lastPointMeter.velocity == volume) {
@@ -1293,18 +1293,21 @@ class MidiParser {
 									} else {
 										let nextMeasure = tc - 1;
 										let nextPoint: ZvoogCurvePoint = { skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: lastPointMeter.velocity };
-										let knee: ZvoogCurvePoint = { skipMeasures: 0, skipSteps: { count: 1, division: 32 }, velocity:  volume};
+										let knee: ZvoogCurvePoint = { skipMeasures: 0, skipSteps: { count: 1, division: 128 }, velocity: volume };
 										if (nextMeasure > lastPointMeter.skipMeasures) {
 											nextPoint.skipMeasures = nextMeasure - lastPointMeter.skipMeasures;
 											nextPoint.skipSteps = skipMeter;
 										} else {
 											nextPoint.skipMeasures = 0;
-											nextPoint.skipSteps = DUU(DUU(skipMeter).minus(lastPointMeter.skipSteps)).simplify();
+											nextPoint.skipSteps = DUU(skipMeter).simplify();
 										}
 										filterParameterPoints.push(nextPoint);
 										filterParameterPoints.push(knee);
-										//volume = lastPointMeter.velocity;
-									}
+										if (nextPoint.skipSteps.division < 0 || knee.skipSteps.division < 0) {
+											console.log(nextPoint, knee);
+										}
+									}*/
+									this.fillVolumeParameterPoints(filterParameterPoints, volume, tc, skipMeter);
 								}
 								break;
 							}
@@ -1340,6 +1343,7 @@ class MidiParser {
 				}
 				for (var chn = 0; chn < midisong.miditracks[i].songchords.length; chn++) {
 					var midichord: MIDISongChord = midisong.miditracks[i].songchords[chn];
+					let filterParameterPoints = voice.filters[0].parameters[0].points;
 					for (var tc = 0; tc < timeline.length; tc++) {
 						if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
 							var timelineMeasure = timeline[tc - 1];
@@ -1352,12 +1356,13 @@ class MidiParser {
 								, envelopes: []
 								, variation: 0
 							}
+							let volume: number | undefined = 0;
 							for (var nx = 0; nx < midichord.notes.length; nx++) {
 								var env: ZvoogEnvelope = { pitches: [] };
 								var mino: MIDISongNote = midichord.notes[nx];
 								for (var px = 0; px < mino.points.length; px++) {
 									var mipoint: MIDISongPoint = mino.points[px];
-									let vol = mipoint.midipoint?.volume;
+									volume = mipoint.midipoint?.volume;
 									//console.log(vol);
 									env.pitches.push({
 										duration: DUU(seconds2meterRound(mipoint.durationms / 1000, timelineMeasure.bpm)).simplify()
@@ -1367,6 +1372,9 @@ class MidiParser {
 								onechord.envelopes.push(env);
 							}
 							voice.measureChords[tc - 1].chords.push(onechord);
+							if (volume) {
+								this.fillVolumeParameterPoints(filterParameterPoints, volume, tc, skipMeter);
+							}
 							break;
 						}
 					}
@@ -1377,6 +1385,7 @@ class MidiParser {
 		console.log('result', schedule);
 		return schedule;
 	}
+	
 	findOrCreateTrack(trackNum: number, channelNum: number, trackChannel: { trackNum: number, channelNum: number, track: MIDISongTrack }[]): { trackNum: number, channelNum: number, track: MIDISongTrack } {
 		for (let i = 0; i < trackChannel.length; i++) {
 			if (trackChannel[i].trackNum == trackNum && trackChannel[i].channelNum == channelNum) {

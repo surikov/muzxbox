@@ -33,6 +33,11 @@ function countSteps(meter: ZvoogMeter, rhythmPattern: ZvoogMeter[]): number {
 	return stepIdx;
 }
 function findNextCurvePoint(points: ZvoogCurvePoint[], last: ZvoogCurvePoint): null | ZvoogCurvePoint {
+	/*console.log('last',last);
+	if(last.skipSteps.count<0){
+		console.log('wrong',points);
+		return null;
+	}*/
 	let current: ZvoogCurvePoint = { skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: 0 };
 	for (let pp = 0; pp < points.length; pp++) {
 		let point = points[pp];
@@ -45,10 +50,13 @@ function findNextCurvePoint(points: ZvoogCurvePoint[], last: ZvoogCurvePoint): n
 		//console.log(current);
 		if (
 			(last.skipMeasures < current.skipMeasures)
-			|| (last.skipMeasures == current.skipMeasures
-				&& DUU(last.skipSteps).lessThen(current.skipSteps))
+			|| (last.skipMeasures == current.skipMeasures && DUU(last.skipSteps).lessThen(current.skipSteps))
 		) {
-			current.velocity=point.velocity;
+			current.velocity = point.velocity;
+			if (current.skipSteps.count < 0) {
+				console.log(pp,'nefound', current, ':', points, last);
+				return null;
+			}
 			return current;
 		}
 	}

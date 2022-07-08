@@ -675,12 +675,8 @@ declare function drumRowsCount(song: ZvoogSchedule): number;
 declare function topGridMarginTp(song: ZvoogSchedule, pitchLineThicknessInTaps: number): number;
 declare function wholeHeightTp(song: ZvoogSchedule, ratioThickness: number): number;
 declare function coverProject(song: ZvoogSchedule): void;
-declare type ZvoogFilterSetting = {
+declare type ZvoogFilterSetting = ZvoogAudioPerformerSetting & {
     filterPlugin: ZvoogFilterPlugin | null;
-    parameters: ZvoogParameterData[];
-    kind: string;
-    initial: string;
-    focus?: boolean;
 };
 declare type ZvoogAudioPerformerSetting = {
     parameters: ZvoogParameterData[];
@@ -1023,6 +1019,7 @@ declare class MidiParser {
     nextEvent(stream: DataViewStream): MIDIEvent;
     parseTrackEvents(track: MIDIFileTrack): void;
     parametersDefs(plugin: ZvoogPlugin): ZvoogParameterData[];
+    fillVolumeParameterPoints(filterParameterPoints: ZvoogCurvePoint[], volume: number, timelineIdx: number, skipMeter: ZvoogMeter): void;
     convert(): ZvoogSchedule;
     findOrCreateTrack(trackNum: number, channelNum: number, trackChannel: {
         trackNum: number;

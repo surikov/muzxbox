@@ -1516,9 +1516,12 @@ function findNextCurvePoint(points, last) {
             current.skipSteps = DUU(current.skipSteps).plus(point.skipSteps);
         }
         if ((last.skipMeasures < current.skipMeasures)
-            || (last.skipMeasures == current.skipMeasures
-                && DUU(last.skipSteps).lessThen(current.skipSteps))) {
+            || (last.skipMeasures == current.skipMeasures && DUU(last.skipSteps).lessThen(current.skipSteps))) {
             current.velocity = point.velocity;
+            if (current.skipSteps.count < 0) {
+                console.log(pp, 'nefound', current, ':', points, last);
+                return null;
+            }
             return current;
         }
     }
@@ -3059,11 +3062,19 @@ var ZvoogTicker = (function () {
             for (var vv = 0; vv < track.instruments.length; vv++) {
                 var voice = track.instruments[vv];
                 this.sendAllFilterEvents(voice.filters, song, when, from, to);
+                var plugin = voice.instrumentSetting.instrumentPlugin;
+                if (plugin) {
+                    this.sendSinglePluginEvents(plugin, voice.instrumentSetting.parameters, song, when, from, to);
+                }
                 this.sendInstrumentEvents(voice, song, when, from, to);
             }
             for (var vv = 0; vv < track.percussions.length; vv++) {
                 var voice = track.percussions[vv];
                 this.sendAllFilterEvents(voice.filters, song, when, from, to);
+                var plugin = voice.percussionSetting.percussionPlugin;
+                if (plugin) {
+                    this.sendSinglePluginEvents(plugin, voice.percussionSetting.parameters, song, when, from, to);
+                }
                 this.sendDrumEvents(voice, song, when, from, to);
             }
             this.sendAllFilterEvents(track.filters, song, when, from, to);
@@ -4151,6 +4162,30 @@ var MidiParser = (function () {
         }
         return pars;
     };
+    MidiParser.prototype.fillVolumeParameterPoints = function (filterParameterPoints, volume, timelineIdx, skipMeter) {
+        volume = volume / 1.5;
+        var lastPointMeter = points2meter(filterParameterPoints);
+        if (lastPointMeter.velocity == volume) {
+        }
+        else {
+            var nextMeasure = timelineIdx - 1;
+            var nextPoint = { skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: lastPointMeter.velocity };
+            var knee = { skipMeasures: 0, skipSteps: { count: 1, division: 128 }, velocity: volume };
+            if (nextMeasure > lastPointMeter.skipMeasures) {
+                nextPoint.skipMeasures = nextMeasure - lastPointMeter.skipMeasures;
+                nextPoint.skipSteps = skipMeter;
+            }
+            else {
+                nextPoint.skipMeasures = 0;
+                nextPoint.skipSteps = DUU(skipMeter).simplify();
+            }
+            filterParameterPoints.push(nextPoint);
+            filterParameterPoints.push(knee);
+            if (nextPoint.skipSteps.division < 0 || knee.skipSteps.division < 0) {
+                console.log(nextPoint, knee);
+            }
+        }
+    };
     MidiParser.prototype.convert = function () {
         var _a, _b;
         var midisong = this.dump();
@@ -4376,25 +4411,7 @@ var MidiParser = (function () {
                                 var onehit = { when: skipMeter };
                                 voice.measureBunches[tc - 1].bunches.push(onehit);
                                 if (volume) {
-                                    volume = volume / 1.5;
-                                    var lastPointMeter = points2meter(filterParameterPoints);
-                                    if (lastPointMeter.velocity == volume) {
-                                    }
-                                    else {
-                                        var nextMeasure = tc - 1;
-                                        var nextPoint = { skipMeasures: 0, skipSteps: { count: 0, division: 1 }, velocity: lastPointMeter.velocity };
-                                        var knee = { skipMeasures: 0, skipSteps: { count: 1, division: 32 }, velocity: volume };
-                                        if (nextMeasure > lastPointMeter.skipMeasures) {
-                                            nextPoint.skipMeasures = nextMeasure - lastPointMeter.skipMeasures;
-                                            nextPoint.skipSteps = skipMeter;
-                                        }
-                                        else {
-                                            nextPoint.skipMeasures = 0;
-                                            nextPoint.skipSteps = DUU(DUU(skipMeter).minus(lastPointMeter.skipSteps)).simplify();
-                                        }
-                                        filterParameterPoints.push(nextPoint);
-                                        filterParameterPoints.push(knee);
-                                    }
+                                    this.fillVolumeParameterPoints(filterParameterPoints, volume, tc, skipMeter);
                                 }
                                 break;
                             }
@@ -4431,6 +4448,7 @@ var MidiParser = (function () {
                 }
                 for (var chn = 0; chn < midisong.miditracks[i_2].songchords.length; chn++) {
                     var midichord = midisong.miditracks[i_2].songchords[chn];
+                    var filterParameterPoints = voice.filters[0].parameters[0].points;
                     for (var tc = 0; tc < timeline.length; tc++) {
                         if (Math.round(midichord.when) < Math.round(timeline[tc].ms)) {
                             var timelineMeasure = timeline[tc - 1];
@@ -4442,12 +4460,13 @@ var MidiParser = (function () {
                                 envelopes: [],
                                 variation: 0
                             };
+                            var volume = 0;
                             for (var nx = 0; nx < midichord.notes.length; nx++) {
                                 var env = { pitches: [] };
                                 var mino = midichord.notes[nx];
                                 for (var px = 0; px < mino.points.length; px++) {
                                     var mipoint = mino.points[px];
-                                    var vol = (_b = mipoint.midipoint) === null || _b === void 0 ? void 0 : _b.volume;
+                                    volume = (_b = mipoint.midipoint) === null || _b === void 0 ? void 0 : _b.volume;
                                     env.pitches.push({
                                         duration: DUU(seconds2meterRound(mipoint.durationms / 1000, timelineMeasure.bpm)).simplify(),
                                         pitch: mipoint.pitch - midiInstrumentPitchShift
@@ -4456,6 +4475,9 @@ var MidiParser = (function () {
                                 onechord.envelopes.push(env);
                             }
                             voice.measureChords[tc - 1].chords.push(onechord);
+                            if (volume) {
+                                this.fillVolumeParameterPoints(filterParameterPoints, volume, tc, skipMeter);
+                            }
                             break;
                         }
                     }
@@ -5771,7 +5793,8 @@ var PianoRollRenderer = (function () {
                     velocity: current.velocity
                 };
             }
-            console.log(measureNum, '/', current.skipMeasures, current.skipSteps.count, current.skipSteps.division, '/', changeTo.skipMeasures, changeTo.skipSteps.count, changeTo.skipSteps.division);
+            current.skipSteps = DUU(current.skipSteps).simplify();
+            changeTo.skipSteps = DUU(changeTo.skipSteps).simplify();
             var xx1 = leftGridMargin + point2seconds(song, current) * ratioDuration + 0.5 * ratioThickness;
             var xx2 = leftGridMargin + point2seconds(song, changeTo) * ratioDuration + 0.5 * ratioThickness;
             var yy1 = topGridMargin + (12 * octaveCount - current.velocity + 0.5) * ratioThickness;

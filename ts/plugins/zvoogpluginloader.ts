@@ -401,6 +401,7 @@ class ZvoogTicker {
 			}
 		}
 	}
+
 	sendSinglePluginEvents(plugin: ZvoogPlugin, parameters: ZvoogParameterData[], song: ZvoogSchedule, when: number, from: number, to: number) {
 		this.sendAllParameters(plugin, parameters, song, when, from, to);
 	}
@@ -453,11 +454,19 @@ class ZvoogTicker {
 			for (let vv = 0; vv < track.instruments.length; vv++) {
 				let voice = track.instruments[vv];
 				this.sendAllFilterEvents(voice.filters, song, when, from, to);
+				let plugin: ZvoogPlugin | null = voice.instrumentSetting.instrumentPlugin;
+				if (plugin) {
+					this.sendSinglePluginEvents(plugin, voice.instrumentSetting.parameters, song, when, from, to);
+				}
 				this.sendInstrumentEvents(voice, song, when, from, to);
 			}
 			for (let vv = 0; vv < track.percussions.length; vv++) {
 				let voice = track.percussions[vv];
 				this.sendAllFilterEvents(voice.filters, song, when, from, to);
+				let plugin: ZvoogPlugin | null = voice.percussionSetting.percussionPlugin;
+				if (plugin) {
+					this.sendSinglePluginEvents(plugin, voice.percussionSetting.parameters, song, when, from, to);
+				}
 				this.sendDrumEvents(voice, song, when, from, to);
 			}
 			this.sendAllFilterEvents(track.filters, song, when, from, to);

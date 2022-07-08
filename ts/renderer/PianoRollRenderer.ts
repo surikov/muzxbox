@@ -80,6 +80,7 @@ class PianoRollRenderer {
 
 	addParameterMeasure(ratioDuration: number, ratioThickness: number, song: ZvoogSchedule, parameter: ZvoogParameterData
 		, measureNum: number, time: number, css: string, anchors: TileAnchor[]) {
+			//console.log(parameter.points);
 		//if (1 == 1) return;
 		let beforeFirst: null | ZvoogCurvePoint = {
 			skipMeasures: measureNum
@@ -96,6 +97,7 @@ class PianoRollRenderer {
 		}
 		let topGridMargin = topGridMarginTp(song, ratioThickness);
 		while ((current) && current.skipMeasures == measureNum) {
+			
 			let changeTo: null | ZvoogCurvePoint = findNextCurvePoint(parameter.points, current);
 			if (changeTo == null) {
 				changeTo = {
@@ -104,7 +106,9 @@ class PianoRollRenderer {
 					, velocity: current.velocity
 				};
 			}
-			console.log(measureNum, '/', current.skipMeasures, current.skipSteps.count, current.skipSteps.division, '/', changeTo.skipMeasures, changeTo.skipSteps.count, changeTo.skipSteps.division);
+			current.skipSteps=DUU(current.skipSteps).simplify();
+			changeTo.skipSteps=DUU(changeTo.skipSteps).simplify();
+			//console.log(measureNum, '/', current.skipMeasures, current.skipSteps.count, current.skipSteps.division, '/', changeTo.skipMeasures, changeTo.skipSteps.count, changeTo.skipSteps.division);
 			let xx1 = leftGridMargin + point2seconds(song, current) * ratioDuration + 0.5 * ratioThickness;
 			let xx2 = leftGridMargin + point2seconds(song, changeTo) * ratioDuration + 0.5 * ratioThickness;
 			let yy1 = topGridMargin + (12 * octaveCount - current.velocity + 0.5) * ratioThickness;
