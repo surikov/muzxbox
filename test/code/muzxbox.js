@@ -2063,10 +2063,10 @@ var WAFInsSource = (function () {
         window.wafPlayer.cancelQueue(this.audioContext);
     };
     WAFInsSource.prototype.scheduleChord = function (when, tempo, chord, variation) {
-        var pitches = [];
+        var strumpitches = [];
         for (var i = 0; i < chord.length; i++) {
             var envelope_1 = chord[i];
-            pitches.push(envelope_1.pitches[0].pitch + this.transpose);
+            strumpitches.push(envelope_1.pitches[0].pitch + this.transpose);
         }
         var envelope = chord[0];
         var duration = meter2seconds(tempo, envelope.pitches[0].duration);
@@ -2074,26 +2074,29 @@ var WAFInsSource = (function () {
         var tt = 0;
         for (var n = 1; n < envelope.pitches.length; n++) {
             slides.push({
-                pitch: envelope.pitches[n].pitch + this.transpose,
+                pitch: (envelope.pitches[0].pitch - envelope.pitches[n].pitch) + this.transpose,
                 when: tt
             });
             duration = duration + meter2seconds(tempo, envelope.pitches[n].duration);
         }
+        if (envelope.pitches.length > 0) {
+            console.log(strumpitches, envelope.pitches, slides);
+        }
         if (variation == 1 || variation == 2 || variation == 3) {
             if (variation == 1) {
-                window.wafPlayer.queueStrumDown(this.audioContext, this.out, this.zones, when, pitches, duration, 0.99, slides);
+                window.wafPlayer.queueStrumDown(this.audioContext, this.out, this.zones, when, strumpitches, duration, 0.99, slides);
             }
             else {
                 if (variation == 2) {
-                    window.wafPlayer.queueStrumUp(this.audioContext, this.out, this.zones, when, pitches, duration, 0.99, slides);
+                    window.wafPlayer.queueStrumUp(this.audioContext, this.out, this.zones, when, strumpitches, duration, 0.99, slides);
                 }
                 else {
-                    window.wafPlayer.queueSnap(this.audioContext, this.out, this.zones, when, pitches, duration, 0.99, slides);
+                    window.wafPlayer.queueSnap(this.audioContext, this.out, this.zones, when, strumpitches, duration, 0.99, slides);
                 }
             }
         }
         else {
-            window.wafPlayer.queueChord(this.audioContext, this.out, this.zones, when, pitches, duration, 0.99, slides);
+            window.wafPlayer.queueChord(this.audioContext, this.out, this.zones, when, strumpitches, duration, 0.99, slides);
         }
     };
     WAFInsSource.prototype.prepare = function (audioContext, data) {
