@@ -6,8 +6,10 @@
 		<pre id='msgp'>tet749</pre>
 		<p>
 			<button onclick='clickRandomize();'>random</button>
-			<button onclick='clickGoUp();'>up</button>
-			<button onclick='clickGoDown();'>down</button>
+			<button onclick='clickGoSkip(-5);'>forward 5</button>
+			<button onclick='clickGoSkip(-1);'>forward 1</button>
+			<button onclick='clickGoSkip(1);'>back 1</button>
+			<button onclick='clickGoSkip(5);'>back 5</button>
 		</p>
 		<svg id='svgpane' width="1300" height="5000">
   			<rect width="1300" height="5000" rx="20" ry="20" fill="#eee" />

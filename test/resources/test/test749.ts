@@ -1,5 +1,5 @@
 let skipRowsCount = 0;
-let sversion = 'test749 v1.03';
+let sversion = 'test749 v1.04';
 var levelA: SVGElement;
 var levelB: SVGElement;
 var dataBalls: string[];
@@ -250,16 +250,13 @@ function clickRandomize() {
 	skipRowsCount = Math.round(Math.random() * 1500);
 	fillCells();
 }
-function clickGoUp() {
-	skipRowsCount--;
+function clickGoSkip(nn:number) {
+	skipRowsCount=skipRowsCount+nn;
 	if (skipRowsCount < 0) skipRowsCount = 0;
-	fillCells();
-}
-function clickGoDown() {
-	skipRowsCount++;
 	if (skipRowsCount > datarows.length - 100) skipRowsCount = datarows.length - 100;
 	fillCells();
 }
+
 /////////////////
 init();
 clickRandomize();
