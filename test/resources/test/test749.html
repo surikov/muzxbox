@@ -1,22 +1,35 @@
 <html>
-	<head>
-		<meta charset="UTF-8">
-	</head>
-	<body>
-		<pre id='msgp'>tet749</pre>
-		<p>
-			<button onclick='clickRandomize();'>random</button>
-			<button onclick='clickGoSkip(-5);'>forward 5</button>
-			<button onclick='clickGoSkip(-1);'>forward 1</button>
-			<button onclick='clickGoSkip(1);'>back 1</button>
-			<button onclick='clickGoSkip(5);'>back 5</button>
-		</p>
-		<svg id='svgpane' width="1300" height="5000">
-  			<rect width="1300" height="5000" rx="20" ry="20" fill="#eee" />
-  			<g id='levelA'></g>
-  			<g id='levelB'></g>
-		</svg>
-		<script src="a749data.js"></script>
-		<script src="test749.js"></script>
-	</body>
+
+<head>
+	<meta charset="UTF-8">
+	<style>
+		#fogRect {
+			fill: #ff000001;
+
+		}
+	</style>
+</head>
+
+<body>
+	<pre id='msgp'>tet749</pre>
+	<p>
+		<button onclick='clickRandomize();'>random</button>
+		<button onclick='clickGoSkip(-5);'>forward 5</button>
+		<button onclick='clickGoSkip(-1);'>forward 1</button>
+		<button onclick='clickGoSkip(1);'>back 1</button>
+		<button onclick='clickGoSkip(5);'>back 5</button>
+		<button onclick='clickClearLines();'>clear</button>
+	</p>
+	<svg id='svgpane' width="1300" height="5000">
+		<rect width="1300" height="5000" rx="20" ry="20" fill="#eee" />
+		<g id='levelA'></g>
+		<g id='linesLevel'></g>
+		<rect id="fogRect" x="0" y="0" width="1300" height="5000" onclick="clickFog(event);"/>
+		<rect id="lineMark" width="1" height="1" x="0" y="0" fill="#ff000099" />
+	</svg>
+	<script src="a749data.js"></script>
+	<script src="d645data.js"></script>
+	<script src="test749.js"></script>
+</body>
+
 </html>

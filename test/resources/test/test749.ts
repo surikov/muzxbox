@@ -1,9 +1,17 @@
 let skipRowsCount = 0;
-let sversion = 'test749 v1.04';
+let sversion = 'test749 v1.06';
 var levelA: SVGElement;
-var levelB: SVGElement;
+var linesLevel: SVGElement;
 var dataBalls: string[];
 var datarows: BallsRow[];
+let dataName = 'data645';
+let rowLen = 45;
+let ballsInRow = 6;
+let markX = -1;
+let markY = -1;
+let cellSize = 8;
+let topShift = cellSize * 22;
+let markLines: { fromX: number, fromY: number, toX: number, toY: number }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
 	key: string;
 	balls: number[];
@@ -21,11 +29,18 @@ function sliceRows(rows: BallsRow[], firstRowNum: number, lastRowNum: number): B
 }
 function readParseStat(dataBalls: string[]): BallsRow[] {
 	let dlmtr: string = '  ';
-	let ballsInRow: number = 7;
+	//let ballsInRow: number = 7;
 	var rows: BallsRow[] = [{
-		balls: [0, 0, 0, 0, 0, 0, 0],
+		balls: [],
 		key: 'next'
 	}];
+	for (let i = 0; i < ballsInRow; i++) {
+		rows[0].balls.push(0);
+	}
+	//var rows: BallsRow[] = [{
+	//	balls: [0, 0, 0, 0, 0, 0, 0],
+	//	key: 'next'
+	//}];
 	for (var i = 0; i < dataBalls.length; i++) {
 		var txt = dataBalls[i].trim();
 		var arr = txt.split(dlmtr);
@@ -46,9 +61,9 @@ function readParseStat(dataBalls: string[]): BallsRow[] {
 	}
 	return rows;
 }
-function ballExists(ball: number, len: number, row: BallsRow): boolean {
-	while (ball < 1) ball = ball + len;
-	while (ball > len) ball = ball - len;
+function ballExists(ball: number, row: BallsRow): boolean {
+	while (ball < 1) ball = ball + rowLen;
+	while (ball > rowLen) ball = ball - rowLen;
 	for (var i = 0; i < row.balls.length; i++) {
 		if (row.balls[i] == ball) {
 			return true;
@@ -62,7 +77,7 @@ function addSmallText(svg: SVGElement, x: number, y: number, txt: string) {
 	var tx: Element = document.createElementNS(svgNS, 'text');
 	tx.setAttributeNS(null, "x", '' + x);
 	tx.setAttributeNS(null, "y", '' + y);
-	tx.setAttributeNS(null, "font-size", "11");
+	tx.setAttributeNS(null, "font-size", "7");
 	tx.setAttribute("fill", '#000000');
 	svg.append(tx);
 	tx.appendChild(nd);
@@ -125,21 +140,24 @@ function init() {
 
 	levelA = (document.getElementById('levelA') as any) as SVGElement;
 	//console.log(levelA);
-	levelB = (document.getElementById('levelA') as any) as SVGElement;
+	linesLevel = (document.getElementById('linesLevel') as any) as SVGElement;
 	//console.log(levelB);
-	dataBalls = window['data749'];
-	//console.log(dataBalls);
+	//dataBalls = window['data749'];
+	dataBalls = window[dataName];
+
+	console.log(dataBalls);
 	datarows = readParseStat(dataBalls);
 	//randomizeData(datarows);
 	console.log(datarows);
 }
 function randomizeData(rows: BallsRow[]) {
 	for (let i = 0; i < rows.length; i++) {
-		for (let nn = 0; nn < 7; nn++) {
+		for (let nn = 0; nn < ballsInRow; nn++) {
 			rows[i].balls[nn] = Math.floor(Math.random() * 50);
 		}
 	}
 }
+
 //function drawStat2(svg: SVGElement, rows: BallsRow[]) {
 //	var cx = 500;
 //	var cy = 500;
@@ -199,20 +217,69 @@ function drawStat1(svg: SVGElement, rows: BallsRow[]) {
 	}
 
 }*/
-function drawStat3(svg: SVGElement, rows: BallsRow[], fillColor: (rowCount: number, rowLen: number, ballNum: number, row: BallsRow, rows: BallsRow[]) => { strokeColor: string, fillColor: string }) {
+function clickClearLines(){
+	markLines=[];
+	drawLines();
+}
+function clickFog(vnt) {
+	let xx = Math.round((vnt.offsetX - 0.5 * cellSize) / cellSize);
+	let yy = skipRowsCount + Math.round((vnt.offsetY - 0.5 * cellSize) / cellSize);
+	if (markX < 0) {
+		let exists: boolean = false;
+		for (let i = 0; i < markLines.length; i++) {
+			if ((xx == markLines[i].fromX && yy == markLines[i].fromY) || (xx == markLines[i].toX && yy == markLines[i].toY)) {
+				markLines.splice(i, 1);
+				exists = true;
+				break;
+			}
+		}
+		if (!exists) {
+			markX = xx;
+			markY = yy;
+		}
+	} else {
+		markLines.push({
+			fromX: xx, fromY: yy, toX: markX, toY: markY
+		});
+		markX = -1;
+		markY = -1;
+	}
+	let mark = (document.getElementById('lineMark') as any) as any;
+	mark.setAttribute('width', cellSize * 1.5);
+	mark.setAttribute('height', cellSize * 1.5);
+	mark.setAttribute('x', cellSize * markX - 0.25 * cellSize);
+	mark.setAttribute('y', cellSize * (markY - skipRowsCount) - 0.25 * cellSize);
+	drawLines();
+}
+function drawLines() {
+	clearSVGgroup(linesLevel);
+	for (let i = 0; i < markLines.length; i++) {
+		addLine(linesLevel
+			, markLines[i].fromX * cellSize + 0.5 * cellSize
+			, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize
+			, markLines[i].toX * cellSize + 0.5 * cellSize
+			, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize
+			, cellSize / 2, '#ffff0099');
+	}
+}
+function drawStat3(svg: SVGElement, rows: BallsRow[], fillColor: (ballNum: number, row: BallsRow, rows: BallsRow[]) => { strokeColor: string, fillColor: string }) {
+	drawLines();
+	//let rowCount = 7;
+	//let rowLen = 49;
 
-	let rowCount = 7;
-	let rowLen = 49;
-	let cellSize = 8;
 	addRect(svg, rowLen * cellSize + cellSize / 2, 0, rowLen * cellSize, cellSize, '#ffffff');
 	for (let rowNum = 0; rowNum < rows.length; rowNum++) {
 		let row = rows[rowNum];
 		for (let colNum = 1; colNum <= rowLen; colNum++) {
-			let colors: { strokeColor: string, fillColor: string } = fillColor(rowCount, rowLen, colNum, row, rows);;
-			addCircle(svg, colNum * cellSize + 0 * rowLen * cellSize, 30 + rowNum * cellSize, cellSize / 2 - 0.5, colors.strokeColor, colors.fillColor);
-			addCircle(svg, colNum * cellSize + 1 * rowLen * cellSize, 30 + rowNum * cellSize, cellSize / 2 - 0.5, colors.strokeColor, colors.fillColor);
+			let colors: { strokeColor: string, fillColor: string } = fillColor(colNum, row, rows);;
+			addCircle(svg, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 2 - 0.5, colors.strokeColor, colors.fillColor);
+			addCircle(svg, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 2 - 0.5, colors.strokeColor, colors.fillColor);
 			//addCircle(svg, colNum * cellSize + 2 * rowLen * cellSize, 30 + rowNum * cellSize, cellSize / 2 - 0.5, colors.strokeColor, colors.fillColor);
+
 		}
+	}
+	for (let colNum = 1; colNum <= rowLen; colNum++) {
+		addSmallText(svg, colNum * cellSize - cellSize, topShift, "" + colNum);
 	}
 	//for (let i = 1; i <= rowLen; i++) {
 	//	console.log(i, countSummExists(i, rowCount, rows) / rows.length);
@@ -238,8 +305,8 @@ function fillCells() {
 	clearSVGgroup(levelA);
 
 	//addCircle(levelA,200,100,4,'#666666');
-	drawStat3(levelA, slicedrows, (rowCount: number, rowLen: number, ballNum: number, row: BallsRow, rows: BallsRow[]) => {
-		if (ballExists(ballNum, rowLen, row)) {
+	drawStat3(levelA, slicedrows, (ballNum: number, row: BallsRow, rows: BallsRow[]) => {
+		if (ballExists(ballNum, row)) {
 			return { strokeColor: '#000000', fillColor: '#000000' };
 		} else {
 			return { strokeColor: '#cccccc', fillColor: '#cccccc' }
@@ -247,11 +314,11 @@ function fillCells() {
 	});
 }
 function clickRandomize() {
-	skipRowsCount = Math.round(Math.random() * 1500);
+	skipRowsCount = Math.round(Math.random() * (datarows.length - 100));
 	fillCells();
 }
-function clickGoSkip(nn:number) {
-	skipRowsCount=skipRowsCount+nn;
+function clickGoSkip(nn: number) {
+	skipRowsCount = skipRowsCount + nn;
 	if (skipRowsCount < 0) skipRowsCount = 0;
 	if (skipRowsCount > datarows.length - 100) skipRowsCount = datarows.length - 100;
 	fillCells();
