@@ -1,5 +1,5 @@
 let skipRowsCount = 0;
-let sversion = 'test749 v1.08';
+let sversion = 'test749 v1.09';
 var levelA: SVGElement;
 var linesLevel: SVGElement;
 var dataBalls: string[];
@@ -10,7 +10,7 @@ let ballsInRow = 6;
 let markX = -1;
 let markY = -1;
 let cellSize = 8;
-let topShift = cellSize * 22;
+let topShift = cellSize * 8;
 let rowsVisibleCount = 80;
 let rowsAvgCount = 10;
 //let opacityRatio = 10;
