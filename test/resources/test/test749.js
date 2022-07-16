@@ -1,5 +1,5 @@
 var skipRowsCount = 0;
-var sversion = 'test749 v1.07';
+var sversion = 'test749 v1.08';
 var levelA;
 var linesLevel;
 var dataBalls;
@@ -12,8 +12,8 @@ var markY = -1;
 var cellSize = 8;
 var topShift = cellSize * 22;
 var rowsVisibleCount = 80;
-var rowsAvgCount = 12;
-var opacityRatio = 10;
+var rowsAvgCount = 10;
+//let opacityRatio = 10;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
@@ -206,18 +206,48 @@ function drawStat3(svg, rows, fillColor) {
     }
 }
 function fillColorFunc(ballNum, rowNum, rows) {
-    var cnt = 0;
-    for (var i = 1; i < rowsAvgCount; i++) {
-        //console.log(rows.length,rowNum,(rowNum + i + 1), ballNum, rows[rowNum + i + 1]);
-        if (ballExists(ballNum, rows[rowNum + i])) {
-            cnt++;
+    //let cnt = 0;
+    var counts = [];
+    for (var bb = 0; bb < rowLen; bb++) {
+        var ballCount = { ballNum: bb + 1, count: 0 };
+        counts.push(ballCount);
+        for (var i = 1; i < rowsAvgCount; i++) {
+            //console.log(rows.length,rowNum,(rowNum + i + 1), ballNum, rows[rowNum + i + 1]);
+            if (ballExists(bb + 1, rows[rowNum + i])) {
+                ballCount.count++;
+            }
         }
     }
-    var opac = cnt / opacityRatio;
+    var groups = [];
+    for (var ii = 0; ii < counts.length; ii++) {
+        var oneCount = counts[ii];
+        var flagExists = false;
+        for (var kk = 0; kk < groups.length; kk++) {
+            if (groups[kk].count == oneCount.count) {
+                flagExists = true;
+                groups[kk].balls.push(oneCount.ballNum);
+                break;
+            }
+        }
+        if (!flagExists) {
+            groups.push({ balls: [oneCount.ballNum], count: oneCount.count });
+        }
+    }
+    //counts.sort((a: { ballNum: number, count: number }, b: { ballNum: number, count: number }) => { return a.count - b.count; });
+    groups.sort(function (a, b) { return a.count - b.count; });
+    var orderNum = 0;
+    for (var ii = 0; ii < groups.length; ii++) {
+        if (groups[ii].balls.indexOf(ballNum) > -1) {
+            orderNum = ii;
+            break;
+        }
+    }
+    //let opac = counts[ballNum-1].count / opacityRatio;
+    var opac = 0.5 * orderNum / groups.length;
     if (opac > 1)
         opac = 1;
     var fll = 'rgba(0,0,255,' + opac + ')';
-    //console.log(rows[rowNum].key, ballNum, cnt);
+    //console.log(rows[rowNum].key, ballNum, orderNum,opac,counts,groups);
     if (ballExists(ballNum, rows[rowNum])) {
         return { strokeColor: '#000000ff', fillColor: fll };
     }

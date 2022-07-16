@@ -1,5 +1,5 @@
 let skipRowsCount = 0;
-let sversion = 'test749 v1.07';
+let sversion = 'test749 v1.08';
 var levelA: SVGElement;
 var linesLevel: SVGElement;
 var dataBalls: string[];
@@ -12,8 +12,8 @@ let markY = -1;
 let cellSize = 8;
 let topShift = cellSize * 22;
 let rowsVisibleCount = 80;
-let rowsAvgCount = 12;
-let opacityRatio=10;
+let rowsAvgCount = 10;
+//let opacityRatio = 10;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let markLines: { fromX: number, fromY: number, toX: number, toY: number }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
@@ -224,17 +224,47 @@ function drawStat3(svg: SVGElement, rows: BallsRow[], fillColor: (ballNum: numbe
 	}
 }
 function fillColorFunc(ballNum: number, rowNum: number, rows: BallsRow[]): { strokeColor: string, fillColor: string } {
-	let cnt = 0;
-	for (let i = 1; i < rowsAvgCount; i++) {
-		//console.log(rows.length,rowNum,(rowNum + i + 1), ballNum, rows[rowNum + i + 1]);
-		if (ballExists(ballNum, rows[rowNum + i])) {
-			cnt++;
+	//let cnt = 0;
+	let counts: { ballNum: number, count: number }[] = [];
+	for (let bb = 0; bb < rowLen; bb++) {
+		let ballCount = { ballNum: bb + 1, count: 0 };
+		counts.push(ballCount)
+		for (let i = 1; i < rowsAvgCount; i++) {
+			//console.log(rows.length,rowNum,(rowNum + i + 1), ballNum, rows[rowNum + i + 1]);
+			if (ballExists(bb + 1, rows[rowNum + i])) {
+				ballCount.count++;
+			}
 		}
 	}
-	let opac = cnt / opacityRatio;
+	let groups: { balls: number[], count: number }[] = [];
+	for (let ii = 0; ii < counts.length; ii++) {
+		let oneCount = counts[ii];
+		let flagExists = false;
+		for (let kk = 0; kk < groups.length; kk++) {
+			if(groups[kk].count==oneCount.count){
+				flagExists=true;
+				groups[kk].balls.push(oneCount.ballNum);
+				break;
+			}
+		}
+		if(!flagExists){
+			groups.push({ balls: [oneCount.ballNum], count: oneCount.count });
+		}
+	}
+	//counts.sort((a: { ballNum: number, count: number }, b: { ballNum: number, count: number }) => { return a.count - b.count; });
+	groups.sort((a: { balls: number[], count: number }, b: { balls: number[], count: number }) => { return a.count - b.count; })
+	let orderNum = 0;
+	for (let ii = 0; ii < groups.length; ii++) {
+		if (groups[ii].balls.indexOf( ballNum)>-1) {
+			orderNum = ii;
+			break;
+		}
+	}
+	//let opac = counts[ballNum-1].count / opacityRatio;
+	let opac = 0.5*orderNum / groups.length;
 	if (opac > 1) opac = 1;
 	let fll = 'rgba(0,0,255,' + opac + ')';
-	//console.log(rows[rowNum].key, ballNum, cnt);
+	//console.log(rows[rowNum].key, ballNum, orderNum,opac,counts,groups);
 	if (ballExists(ballNum, rows[rowNum])) {
 		return { strokeColor: '#000000ff', fillColor: fll };
 	} else {
