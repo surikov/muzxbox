@@ -12,7 +12,8 @@ var markY = -1;
 var cellSize = 8;
 var topShift = cellSize * 22;
 var rowsVisibleCount = 80;
-var rowsAvgCount = 10;
+var rowsAvgCount = 12;
+var opacityRatio = 10;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
@@ -212,7 +213,7 @@ function fillColorFunc(ballNum, rowNum, rows) {
             cnt++;
         }
     }
-    var opac = cnt / 9;
+    var opac = cnt / opacityRatio;
     if (opac > 1)
         opac = 1;
     var fll = 'rgba(0,0,255,' + opac + ')';

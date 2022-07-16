@@ -12,7 +12,8 @@ let markY = -1;
 let cellSize = 8;
 let topShift = cellSize * 22;
 let rowsVisibleCount = 80;
-let rowsAvgCount = 10;
+let rowsAvgCount = 12;
+let opacityRatio=10;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let markLines: { fromX: number, fromY: number, toX: number, toY: number }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
@@ -230,7 +231,7 @@ function fillColorFunc(ballNum: number, rowNum: number, rows: BallsRow[]): { str
 			cnt++;
 		}
 	}
-	let opac = cnt / 9;
+	let opac = cnt / opacityRatio;
 	if (opac > 1) opac = 1;
 	let fll = 'rgba(0,0,255,' + opac + ')';
 	//console.log(rows[rowNum].key, ballNum, cnt);
