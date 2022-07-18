@@ -1,5 +1,5 @@
 let skipRowsCount = 0;
-let sversion = 'test749 v1.11';
+let sversion = 'test749 v1.12';
 var levelA: SVGElement;
 var linesLevel: SVGElement;
 var dataBalls: string[];
@@ -13,7 +13,6 @@ let cellSize = 8;
 let topShift = cellSize * 8;
 let rowsVisibleCount = 80;
 let rowsAvgCount = 19;
-//let opacityRatio = 10;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let markLines: { fromX: number, fromY: number, toX: number, toY: number }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
@@ -196,10 +195,9 @@ function drawStat3(svg: SVGElement, rows: BallsRow[], fillColor: (ballNum: numbe
 	drawLines();
 	addRect(svg, rowLen * cellSize + cellSize / 2, 0, rowLen * cellSize, cellSize, '#ffffff');
 	for (let rowNum = 0; rowNum < rowsVisibleCount; rowNum++) {
-		let row = rows[rowNum];
+		addSmallText(svg, 2*rowLen * cellSize +2, topShift+(1+rowNum)*cellSize-2, rows[rowNum].key);
 		for (let colNum = 1; colNum <= rowLen; colNum++) {
 			let colors: { strokeColor: string, fillColor: string } = fillColor(colNum, rowNum, rows);;
-			//addCircle(svg, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 2 - 0.5, colors.strokeColor, colors.fillColor);
 			addRect(svg
 				, colNum * cellSize - 1 * cellSize + 0 * rowLen * cellSize
 				, topShift + 0 * cellSize + rowNum * cellSize
@@ -208,7 +206,6 @@ function drawStat3(svg: SVGElement, rows: BallsRow[], fillColor: (ballNum: numbe
 				, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize
 				, topShift + 0.5 * cellSize + rowNum * cellSize
 				, cellSize / 2 - 0.5, colors.strokeColor, '#33221100');
-			//addCircle(svg, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 2 - 0.5, colors.strokeColor, colors.fillColor);
 			addRect(svg
 				, colNum * cellSize - 1 * cellSize + 1 * rowLen * cellSize
 				, topShift + 0 * cellSize + rowNum * cellSize
@@ -224,13 +221,11 @@ function drawStat3(svg: SVGElement, rows: BallsRow[], fillColor: (ballNum: numbe
 	}
 }
 function fillColorFunc(ballNum: number, rowNum: number, rows: BallsRow[]): { strokeColor: string, fillColor: string } {
-	//let cnt = 0;
 	let counts: { ballNum: number, count: number }[] = [];
 	for (let bb = 0; bb < rowLen; bb++) {
 		let ballCount = { ballNum: bb + 1, count: 0 };
 		counts.push(ballCount)
 		for (let i = 1; i < rowsAvgCount; i++) {
-			//console.log(rows.length,rowNum,(rowNum + i + 1), ballNum, rows[rowNum + i + 1]);
 			if (ballExists(bb + 1, rows[rowNum + i])) {
 				ballCount.count++;
 			}
@@ -251,7 +246,6 @@ function fillColorFunc(ballNum: number, rowNum: number, rows: BallsRow[]): { str
 			groups.push({ balls: [oneCount.ballNum], count: oneCount.count });
 		}
 	}
-	//counts.sort((a: { ballNum: number, count: number }, b: { ballNum: number, count: number }) => { return a.count - b.count; });
 	groups.sort((a: { balls: number[], count: number }, b: { balls: number[], count: number }) => { return a.count - b.count; })
 	let orderNum = 0;
 	for (let ii = 0; ii < groups.length; ii++) {
@@ -260,11 +254,9 @@ function fillColorFunc(ballNum: number, rowNum: number, rows: BallsRow[]): { str
 			break;
 		}
 	}
-	//let opac = counts[ballNum-1].count / opacityRatio;
 	let opac = 0.5*orderNum / groups.length;
 	if (opac > 1) opac = 1;
 	let fll = 'rgba(0,0,255,' + opac + ')';
-	//console.log(rows[rowNum].key, ballNum, orderNum,opac,counts,groups);
 	if (ballExists(ballNum, rows[rowNum])) {
 		return { strokeColor: '#000000ff', fillColor: fll };
 	} else {
@@ -273,16 +265,8 @@ function fillColorFunc(ballNum: number, rowNum: number, rows: BallsRow[]): { str
 }
 function fillCells() {
 	dumpInfo(skipRowsCount);
-
 	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
 	clearSVGgroup(levelA);
-	/*drawStat3(levelA, slicedrows, (ballNum: number, row: BallsRow, rows: BallsRow[]) => {
-		if (ballExists(ballNum, row)) {
-			return { strokeColor: '#000000', fillColor: '#000000' };
-		} else {
-			return { strokeColor: '#cccccc', fillColor: '#cccccc' }
-		}
-	});*/
 	drawStat3(levelA, slicedrows, fillColorFunc);
 }
 function clickRandomize() {
