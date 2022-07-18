@@ -1,5 +1,5 @@
 let skipRowsCount = 0;
-let sversion = 'test749 v1.09';
+let sversion = 'test749 v1.11';
 var levelA: SVGElement;
 var linesLevel: SVGElement;
 var dataBalls: string[];
@@ -12,7 +12,7 @@ let markY = -1;
 let cellSize = 8;
 let topShift = cellSize * 8;
 let rowsVisibleCount = 80;
-let rowsAvgCount = 10;
+let rowsAvgCount = 19;
 //let opacityRatio = 10;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let markLines: { fromX: number, fromY: number, toX: number, toY: number }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];

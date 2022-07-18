@@ -1,5 +1,5 @@
 var skipRowsCount = 0;
-var sversion = 'test749 v1.09';
+var sversion = 'test749 v1.11';
 var levelA;
 var linesLevel;
 var dataBalls;
@@ -12,7 +12,7 @@ var markY = -1;
 var cellSize = 8;
 var topShift = cellSize * 8;
 var rowsVisibleCount = 80;
-var rowsAvgCount = 10;
+var rowsAvgCount = 19;
 //let opacityRatio = 10;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
