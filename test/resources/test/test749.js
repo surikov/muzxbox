@@ -1,5 +1,5 @@
 var skipRowsCount = 0;
-var sversion = 'test749 v1.12';
+var sversion = 'test749 v1.13';
 var levelA;
 var linesLevel;
 var dataBalls;
@@ -193,9 +193,13 @@ function drawStat3(svg, rows, fillColor) {
             var colors = fillColor(colNum, rowNum, rows);
             ;
             addRect(svg, colNum * cellSize - 1 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rowNum * cellSize, cellSize, cellSize - 0.1, colors.fillColor);
-            addCircle(svg, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 2 - 0.5, colors.strokeColor, '#33221100');
+            if (rowNum > 0) {
+                addCircle(svg, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 2 - 0.5, colors.strokeColor, '#33221100');
+            }
             addRect(svg, colNum * cellSize - 1 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rowNum * cellSize, cellSize, cellSize - 0.1, colors.fillColor);
-            addCircle(svg, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 2 - 0.5, colors.strokeColor, '#33221100');
+            if (rowNum > 0) {
+                addCircle(svg, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 2 - 0.5, colors.strokeColor, '#33221100');
+            }
         }
     }
     for (var colNum = 1; colNum <= rowLen; colNum++) {

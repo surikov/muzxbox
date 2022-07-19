@@ -1,5 +1,5 @@
 let skipRowsCount = 0;
-let sversion = 'test749 v1.12';
+let sversion = 'test749 v1.13';
 var levelA: SVGElement;
 var linesLevel: SVGElement;
 var dataBalls: string[];
@@ -195,25 +195,29 @@ function drawStat3(svg: SVGElement, rows: BallsRow[], fillColor: (ballNum: numbe
 	drawLines();
 	addRect(svg, rowLen * cellSize + cellSize / 2, 0, rowLen * cellSize, cellSize, '#ffffff');
 	for (let rowNum = 0; rowNum < rowsVisibleCount; rowNum++) {
-		addSmallText(svg, 2*rowLen * cellSize +2, topShift+(1+rowNum)*cellSize-2, rows[rowNum].key);
+		addSmallText(svg, 2 * rowLen * cellSize + 2, topShift + (1 + rowNum) * cellSize - 2, rows[rowNum].key);
 		for (let colNum = 1; colNum <= rowLen; colNum++) {
 			let colors: { strokeColor: string, fillColor: string } = fillColor(colNum, rowNum, rows);;
 			addRect(svg
 				, colNum * cellSize - 1 * cellSize + 0 * rowLen * cellSize
 				, topShift + 0 * cellSize + rowNum * cellSize
 				, cellSize, cellSize - 0.1, colors.fillColor);
-			addCircle(svg
-				, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize
-				, topShift + 0.5 * cellSize + rowNum * cellSize
-				, cellSize / 2 - 0.5, colors.strokeColor, '#33221100');
+			if (rowNum > 0) {
+				addCircle(svg
+					, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize
+					, topShift + 0.5 * cellSize + rowNum * cellSize
+					, cellSize / 2 - 0.5, colors.strokeColor, '#33221100');
+			}
 			addRect(svg
 				, colNum * cellSize - 1 * cellSize + 1 * rowLen * cellSize
 				, topShift + 0 * cellSize + rowNum * cellSize
 				, cellSize, cellSize - 0.1, colors.fillColor);
-			addCircle(svg
-				, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize
-				, topShift + 0.5 * cellSize + rowNum * cellSize
-				, cellSize / 2 - 0.5, colors.strokeColor, '#33221100');
+			if (rowNum > 0) {
+				addCircle(svg
+					, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize
+					, topShift + 0.5 * cellSize + rowNum * cellSize
+					, cellSize / 2 - 0.5, colors.strokeColor, '#33221100');
+			}
 		}
 	}
 	for (let colNum = 1; colNum <= rowLen; colNum++) {
@@ -236,25 +240,25 @@ function fillColorFunc(ballNum: number, rowNum: number, rows: BallsRow[]): { str
 		let oneCount = counts[ii];
 		let flagExists = false;
 		for (let kk = 0; kk < groups.length; kk++) {
-			if(groups[kk].count==oneCount.count){
-				flagExists=true;
+			if (groups[kk].count == oneCount.count) {
+				flagExists = true;
 				groups[kk].balls.push(oneCount.ballNum);
 				break;
 			}
 		}
-		if(!flagExists){
+		if (!flagExists) {
 			groups.push({ balls: [oneCount.ballNum], count: oneCount.count });
 		}
 	}
 	groups.sort((a: { balls: number[], count: number }, b: { balls: number[], count: number }) => { return a.count - b.count; })
 	let orderNum = 0;
 	for (let ii = 0; ii < groups.length; ii++) {
-		if (groups[ii].balls.indexOf( ballNum)>-1) {
+		if (groups[ii].balls.indexOf(ballNum) > -1) {
 			orderNum = ii;
 			break;
 		}
 	}
-	let opac = 0.5*orderNum / groups.length;
+	let opac = 0.5 * orderNum / groups.length;
 	if (opac > 1) opac = 1;
 	let fll = 'rgba(0,0,255,' + opac + ')';
 	if (ballExists(ballNum, rows[rowNum])) {
