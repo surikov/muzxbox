@@ -1,5 +1,5 @@
 let skipRowsCount = 0;
-let sversion = 'test749 v1.13';
+let sversion = 'test749 v1.14';
 var levelA: SVGElement;
 var linesLevel: SVGElement;
 var dataBalls: string[];
@@ -283,7 +283,11 @@ function clickGoSkip(nn: number) {
 	if (skipRowsCount > datarows.length - 200) skipRowsCount = datarows.length - 200;
 	fillCells();
 }
-
+function setAvg(nn:number){
+	rowsAvgCount=nn;
+	rowsSliceCount = rowsVisibleCount + rowsAvgCount;
+	fillCells();
+}
 /////////////////
 init();
 fillCells();

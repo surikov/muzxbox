@@ -1,5 +1,5 @@
 var skipRowsCount = 0;
-var sversion = 'test749 v1.13';
+var sversion = 'test749 v1.14';
 var levelA;
 var linesLevel;
 var dataBalls;
@@ -267,6 +267,11 @@ function clickGoSkip(nn) {
         skipRowsCount = 0;
     if (skipRowsCount > datarows.length - 200)
         skipRowsCount = datarows.length - 200;
+    fillCells();
+}
+function setAvg(nn) {
+    rowsAvgCount = nn;
+    rowsSliceCount = rowsVisibleCount + rowsAvgCount;
     fillCells();
 }
 /////////////////
