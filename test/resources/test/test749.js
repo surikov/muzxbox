@@ -1,5 +1,5 @@
 var skipRowsCount = 0;
-var sversion = 'test749 v1.15';
+var sversion = 'test749 v1.16';
 var levelA;
 var linesLevel;
 var dataBalls;
@@ -136,12 +136,15 @@ function init() {
     datarows = readParseStat(dataBalls);
     console.log(datarows);
 }
-function randomizeData(rows) {
+function randomizeData(originalrows) {
+    var json = JSON.stringify(originalrows);
+    var rows = JSON.parse(json);
     for (var i = 0; i < rows.length; i++) {
         for (var nn = 0; nn < ballsInRow; nn++) {
             rows[i].balls[nn] = Math.floor(Math.random() * 50);
         }
     }
+    return rows;
 }
 function clickClearLines() {
     markLines = [];
@@ -257,7 +260,15 @@ function fillCells() {
     clearSVGgroup(levelA);
     drawStat3(levelA, slicedrows, fillColorFunc);
 }
-function clickRandomize() {
+function randomizeCells() {
+    var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
+    var randomrows = randomizeData(slicedrows);
+    clearSVGgroup(levelA);
+    drawStat3(levelA, randomrows, fillColorFunc);
+    var msgp = document.getElementById('msgp');
+    msgp.innerText = sversion + ': ' + skipRowsCount + ' random';
+}
+function clickHop() {
     skipRowsCount = Math.round(Math.random() * (datarows.length - 100));
     fillCells();
 }

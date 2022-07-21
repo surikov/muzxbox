@@ -1,5 +1,5 @@
 let skipRowsCount = 0;
-let sversion = 'test749 v1.15';
+let sversion = 'test749 v1.16';
 var levelA: SVGElement;
 var linesLevel: SVGElement;
 var dataBalls: string[];
@@ -139,12 +139,15 @@ function init() {
 	datarows = readParseStat(dataBalls);
 	console.log(datarows);
 }
-function randomizeData(rows: BallsRow[]) {
+function randomizeData(originalrows: BallsRow[]) {
+	let json=JSON.stringify(originalrows);
+	let rows=JSON.parse(json);
 	for (let i = 0; i < rows.length; i++) {
 		for (let nn = 0; nn < ballsInRow; nn++) {
 			rows[i].balls[nn] = Math.floor(Math.random() * 50);
 		}
 	}
+	return rows;
 }
 function clickClearLines() {
 	markLines = [];
@@ -273,7 +276,16 @@ function fillCells() {
 	clearSVGgroup(levelA);
 	drawStat3(levelA, slicedrows, fillColorFunc);
 }
-function clickRandomize() {
+function randomizeCells() {
+	
+	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
+	let randomrows: BallsRow[]=randomizeData(slicedrows);
+	clearSVGgroup(levelA);
+	drawStat3(levelA, randomrows, fillColorFunc);
+	var msgp: HTMLElement = (document.getElementById('msgp') as any) as HTMLElement;
+	msgp.innerText = sversion + ': ' + skipRowsCount+' random';
+}
+function clickHop() {
 	skipRowsCount = Math.round(Math.random() * (datarows.length - 100));
 	fillCells();
 }
