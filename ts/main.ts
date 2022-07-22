@@ -94,9 +94,16 @@ class MuzXBox {
 							, measureChords: [
 								{
 									chords: [
-										{ when: { count: 0, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 4 }, pitch: 22 },{ duration: { count: 0, division: 8 }, pitch: 34 }] }] }
+										{ when: { count: 0, division: 8 }, variation: 0, envelopes: [{ pitches: [
+											{ duration: { count: 1, division: 4 }, pitch: 22 }
+											,{ duration: { count: 0, division: 8 }, pitch: 34 }
+										] }] }
 										//, { when: { count: 1, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 34 }] }] }
-										, { when: { count: 2, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 4 }, pitch: 22 },{ duration: { count: 0, division: 16 }, pitch: 46 }] }] }
+										, { when: { count: 2, division: 8 }, variation: 0, envelopes: [{ pitches: [
+											{ duration: { count: 1, division: 8 }, pitch: 22 }
+											,{ duration: { count: 1, division: 8 }, pitch: 46 }
+											,{ duration: { count: 0, division: 8 }, pitch: 34 }
+										] }] }
 										//, { when: { count: 3, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 34 },{ duration: { count: 0, division: 16 }, pitch: 22 }] }] }
 										//, { when: { count: 3, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 34 }] }] }
 										, { when: { count: 4, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 4 }, pitch: 22 }] }] }

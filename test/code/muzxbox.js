@@ -2064,39 +2064,40 @@ var WAFInsSource = (function () {
     };
     WAFInsSource.prototype.scheduleChord = function (when, tempo, chord, variation) {
         var strumpitches = [];
+        var pitchslides = [];
+        var chordDuration = 0;
         for (var i = 0; i < chord.length; i++) {
-            var envelope_1 = chord[i];
-            strumpitches.push(envelope_1.pitches[0].pitch + this.transpose);
-        }
-        var envelope = chord[0];
-        var duration = meter2seconds(tempo, envelope.pitches[0].duration);
-        var slides = [];
-        var tt = 0;
-        for (var n = 1; n < envelope.pitches.length; n++) {
-            slides.push({
-                pitch: (envelope.pitches[0].pitch - envelope.pitches[n].pitch) + this.transpose,
-                when: tt
-            });
-            duration = duration + meter2seconds(tempo, envelope.pitches[n].duration);
-        }
-        if (envelope.pitches.length > 0) {
-            console.log(strumpitches, envelope.pitches, slides);
+            var envelope = chord[i];
+            strumpitches.push(envelope.pitches[0].pitch + this.transpose);
+            var duration = meter2seconds(tempo, envelope.pitches[0].duration);
+            var slides = [];
+            for (var n = 1; n < envelope.pitches.length; n++) {
+                slides.push({
+                    delta: (envelope.pitches[0].pitch - envelope.pitches[n].pitch) + this.transpose,
+                    when: duration
+                });
+                duration = duration + meter2seconds(tempo, envelope.pitches[n].duration);
+            }
+            pitchslides.push(slides);
+            if (duration > chordDuration) {
+                chordDuration = duration;
+            }
         }
         if (variation == 1 || variation == 2 || variation == 3) {
             if (variation == 1) {
-                window.wafPlayer.queueStrumDown(this.audioContext, this.out, this.zones, when, strumpitches, duration, 0.99, slides);
+                window.wafPlayer.queueStrumDown(this.audioContext, this.out, this.zones, when, strumpitches, chordDuration, 0.99, pitchslides);
             }
             else {
                 if (variation == 2) {
-                    window.wafPlayer.queueStrumUp(this.audioContext, this.out, this.zones, when, strumpitches, duration, 0.99, slides);
+                    window.wafPlayer.queueStrumUp(this.audioContext, this.out, this.zones, when, strumpitches, chordDuration, 0.99, pitchslides);
                 }
                 else {
-                    window.wafPlayer.queueSnap(this.audioContext, this.out, this.zones, when, strumpitches, duration, 0.99, slides);
+                    window.wafPlayer.queueSnap(this.audioContext, this.out, this.zones, when, strumpitches, chordDuration, 0.99, pitchslides);
                 }
             }
         }
         else {
-            window.wafPlayer.queueChord(this.audioContext, this.out, this.zones, when, strumpitches, duration, 0.99, slides);
+            window.wafPlayer.queueChord(this.audioContext, this.out, this.zones, when, strumpitches, chordDuration, 0.99, pitchslides);
         }
     };
     WAFInsSource.prototype.prepare = function (audioContext, data) {
@@ -5439,8 +5440,15 @@ var MuzXBox = (function () {
                             measureChords: [
                                 {
                                     chords: [
-                                        { when: { count: 0, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 4 }, pitch: 22 }, { duration: { count: 0, division: 8 }, pitch: 34 }] }] },
-                                        { when: { count: 2, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 4 }, pitch: 22 }, { duration: { count: 0, division: 16 }, pitch: 46 }] }] },
+                                        { when: { count: 0, division: 8 }, variation: 0, envelopes: [{ pitches: [
+                                                        { duration: { count: 1, division: 4 }, pitch: 22 },
+                                                        { duration: { count: 0, division: 8 }, pitch: 34 }
+                                                    ] }] },
+                                        { when: { count: 2, division: 8 }, variation: 0, envelopes: [{ pitches: [
+                                                        { duration: { count: 1, division: 8 }, pitch: 22 },
+                                                        { duration: { count: 1, division: 8 }, pitch: 46 },
+                                                        { duration: { count: 0, division: 8 }, pitch: 34 }
+                                                    ] }] },
                                         { when: { count: 4, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 4 }, pitch: 22 }] }] }
                                     ]
                                 },

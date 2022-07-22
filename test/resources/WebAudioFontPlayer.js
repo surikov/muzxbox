@@ -1,4 +1,5 @@
 'use strict';
+console.log('waf test');
 var WebAudioFontChannel = /** @class */ (function () {
     function WebAudioFontChannel(audioContext) {
         this.audioContext = audioContext;
@@ -808,14 +809,21 @@ var WebAudioFontPlayer = /** @class */ (function () {
         return volume;
     };
     ;
+
+
+
+
+
     WebAudioFontPlayer.prototype.queueChord = function (audioContext, target, preset, when, pitches, duration, volume, slides) {
-        volume = this.limitVolume(volume);
+        //if(slides)if(slides.length>0)console.log('queueChord',pitches,slides);
+		volume = this.limitVolume(volume);
         var envelopes = [];
         for (var i = 0; i < pitches.length; i++) {
             var singleSlide = undefined;
             if (slides) {
                 singleSlide = slides[i];
             }
+			//console.log('singleSlide',singleSlide);
             var envlp = this.queueWaveTable(audioContext, target, preset, when, pitches[i], duration, volume - Math.random() * 0.01, singleSlide);
             if (envlp)
                 envelopes.push(envlp);
@@ -838,6 +846,7 @@ var WebAudioFontPlayer = /** @class */ (function () {
     };
     ;
     WebAudioFontPlayer.prototype.queueStrum = function (audioContext, target, preset, when, pitches, duration, volume, slides) {
+		//if(slides)if(slides.length>0)console.log('queueStrum',slides);
         volume = this.limitVolume(volume);
         if (when < audioContext.currentTime) {
             when = audioContext.currentTime;
@@ -875,6 +884,7 @@ var WebAudioFontPlayer = /** @class */ (function () {
         }
     };
     WebAudioFontPlayer.prototype.queueWaveTable = function (audioContext, target, preset, when, pitch, duration, volume, slides) {
+		if(slides)if(slides.length>0)console.log('queueWaveTable',slides);
         this.resumeContext(audioContext);
         volume = this.limitVolume(volume);
         var zone = this.findZone(audioContext, preset, pitch);
@@ -909,6 +919,7 @@ var WebAudioFontPlayer = /** @class */ (function () {
                     for (var i = 0; i < slides.length; i++) {
                         var nextPitch = pitch + slides[i].delta;
                         var newPlaybackRate = 1.0 * Math.pow(2, (100.0 * nextPitch - baseDetune) / 1200.0);
+						//console.log(i,newPlaybackRate,nextPitch,baseDetune,pitch,slides[i].delta,slides);
                         var newWhen = when + slides[i].when;
                         envelope.audioBufferSourceNode.playbackRate.linearRampToValueAtTime(newPlaybackRate, newWhen);
                     }

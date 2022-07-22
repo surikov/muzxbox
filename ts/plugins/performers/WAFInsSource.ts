@@ -35,47 +35,65 @@ class WAFInsSource implements ZvoogInstrumentPlugin {
 		}*/
 		//if (this.busy()==0) {
 		let strumpitches: number[] = [];
+		let pitchslides: { delta: number, when: number }[][] = [];
+		let chordDuration: number = 0;
 		for (let i = 0; i < chord.length; i++) {
 			let envelope: ZvoogEnvelope = chord[i];
 			strumpitches.push(envelope.pitches[0].pitch + this.transpose);
+			let duration: number = meter2seconds(tempo, envelope.pitches[0].duration);
+			let slides: { delta: number, when: number }[] = [];
+			for (let n = 1; n < envelope.pitches.length; n++) {
+				//tt = tt + duration2seconds(tempo, duration384(envelope.pitches[n - 1].duration));
+				slides.push({
+					delta: (envelope.pitches[0].pitch - envelope.pitches[n].pitch) + this.transpose
+					, when: duration
+				});
+				duration = duration + meter2seconds(tempo, envelope.pitches[n].duration);
+			}
+			pitchslides.push(slides);
+			if(duration>chordDuration){
+				chordDuration=duration;
+			}
 		}
-		let envelope: ZvoogEnvelope = chord[0];
+		//let envelope: ZvoogEnvelope = chord[0];
 		//let duration: number = duration2seconds(tempo, duration384(envelope.pitches[0].duration));
-		let duration: number = meter2seconds(tempo, envelope.pitches[0].duration);
+		//let duration: number = meter2seconds(tempo, envelope.pitches[0].duration);
 
-		let slides: { pitch: number, when: number }[] = [];
-		let tt = 0;
+		//let slides: { delta: number, when: number }[] = [];
+		//let tt = 0;
+		/*
 		for (let n = 1; n < envelope.pitches.length; n++) {
 			//tt = tt + duration2seconds(tempo, duration384(envelope.pitches[n - 1].duration));
 			slides.push({
 				//pitch: envelope.pitches[n].pitch + this.transpose
-				pitch: (envelope.pitches[0].pitch - envelope.pitches[n].pitch) + this.transpose
-				, when: tt
+				delta: (envelope.pitches[0].pitch - envelope.pitches[n].pitch) + this.transpose
+				, when: duration
 			});
 			//duration = duration + duration2seconds(tempo, duration384(envelope.pitches[n].duration));
 			duration = duration + meter2seconds(tempo, envelope.pitches[n].duration);
 		}
-		if(envelope.pitches.length>0){
-			console.log(strumpitches,envelope.pitches,slides)
-		}
+		*/
+		//if(envelope.pitches.length>0 && slides.length>0){
+		//	console.log(variation,strumpitches,envelope.pitches,slides)
+		//}
 		//this.out=this.audioContext.destination;
 		if (variation == 1 || variation == 2 || variation == 3) {
 			if (variation == 1) {
 				(window as any).wafPlayer.queueStrumDown(this.audioContext
 					, this.out
 					//, this.audioContext.destination
-					, this.zones, when, strumpitches, duration, 0.99, slides);
+					, this.zones, when, strumpitches, chordDuration, 0.99, pitchslides);
 			} else {
 				if (variation == 2) {
 					(window as any).wafPlayer.queueStrumUp(this.audioContext
 						, this.out
 						//, this.audioContext.destination
-						, this.zones, when, strumpitches, duration, 0.99, slides);
+						, this.zones, when, strumpitches, chordDuration, 0.99, pitchslides);
 				} else {
 					(window as any).wafPlayer.queueSnap(this.audioContext
 						, this.out
 						//, this.audioContext.destination
-						, this.zones, when, strumpitches, duration, 0.99, slides);
+						, this.zones, when, strumpitches, chordDuration, 0.99, pitchslides);
 				}
 			}
 		} else {
@@ -83,7 +101,7 @@ class WAFInsSource implements ZvoogInstrumentPlugin {
 			(window as any).wafPlayer.queueChord(this.audioContext
 				, this.out
 				//, this.audioContext.destination
-				, this.zones, when, strumpitches, duration, 0.99, slides);
+				, this.zones, when, strumpitches, chordDuration, 0.99, pitchslides);
 		}
 		//}
 	}
