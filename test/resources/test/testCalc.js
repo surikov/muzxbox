@@ -1,12 +1,9 @@
 var skipRowsCount = 0;
-var sversion = 'test749 v1.16';
 var levelA;
 var linesLevel;
 var dataBalls;
 var datarows;
-var dataName = 'data645';
-var rowLen = 45;
-var ballsInRow = 6;
+var sversion = 'v1.17 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 8;

@@ -1,12 +1,17 @@
 let skipRowsCount = 0;
-let sversion = 'test749 v1.16';
+
 var levelA: SVGElement;
 var linesLevel: SVGElement;
 var dataBalls: string[];
 var datarows: BallsRow[];
-let dataName = 'data645';
-let rowLen = 45;
-let ballsInRow = 6;
+
+
+declare var dataName: string;
+declare var rowLen: number;
+declare var ballsInRow: number;
+
+let sversion = 'v1.17 '+dataName+': '+ballsInRow+'/'+rowLen;
+
 let markX = -1;
 let markY = -1;
 let cellSize = 8;
