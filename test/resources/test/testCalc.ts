@@ -10,7 +10,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.17 '+dataName+': '+ballsInRow+'/'+rowLen;
+let sversion = 'v1.18 '+dataName+': '+ballsInRow+'/'+rowLen;
 
 let markX = -1;
 let markY = -1;

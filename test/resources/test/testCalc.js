@@ -3,7 +3,7 @@ var levelA;
 var linesLevel;
 var dataBalls;
 var datarows;
-var sversion = 'v1.17 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.18 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 8;
