@@ -17,7 +17,7 @@ let markY = -1;
 let cellSize = 8;
 let topShift = cellSize * 11;
 let rowsVisibleCount = 80;
-let rowsAvgCount = 19;
+let rowsAvgCount = 5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let markLines: { fromX: number, fromY: number, toX: number, toY: number }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
@@ -238,9 +238,14 @@ function fillColorFunc(ballNum: number, rowNum: number, rows: BallsRow[]): { str
 		let ballCount = { ballNum: bb + 1, count: 0 };
 		counts.push(ballCount)
 		for (let i = 1; i < rowsAvgCount; i++) {
-			if (ballExists(bb + 1, rows[rowNum + i])) {
-				ballCount.count++;
-			}
+			//if (ballExists(bb + 1, rows[rowNum + i])) {
+			//	ballCount.count++;
+			//}
+			if (ballExists(bb - 1, rows[rowNum + i])) { ballCount.count=ballCount.count+1; }
+			if (ballExists(bb + 0, rows[rowNum + i])) { ballCount.count=ballCount.count+2; }
+			if (ballExists(bb + 1, rows[rowNum + i])) { ballCount.count=ballCount.count+3; }
+			if (ballExists(bb + 2, rows[rowNum + i])) { ballCount.count=ballCount.count+2; }
+			if (ballExists(bb + 3, rows[rowNum + i])) { ballCount.count=ballCount.count+1; }
 		}
 	}
 	let groups: { balls: number[], count: number }[] = [];
@@ -305,6 +310,11 @@ function setAvg(nn:number){
 	rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 	fillCells();
 }
+function countNeighbors(ball:number,row:number,far:number,rows:BallsRow[]){
+	console.log(rows[row]);
+}
+
 /////////////////
 init();
 fillCells();
+//countNeighbors(7,0,1,datarows);

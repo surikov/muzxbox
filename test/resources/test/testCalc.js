@@ -9,7 +9,7 @@ var markY = -1;
 var cellSize = 8;
 var topShift = cellSize * 11;
 var rowsVisibleCount = 80;
-var rowsAvgCount = 19;
+var rowsAvgCount = 5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
@@ -212,8 +212,23 @@ function fillColorFunc(ballNum, rowNum, rows) {
         var ballCount = { ballNum: bb + 1, count: 0 };
         counts.push(ballCount);
         for (var i = 1; i < rowsAvgCount; i++) {
+            //if (ballExists(bb + 1, rows[rowNum + i])) {
+            //	ballCount.count++;
+            //}
+            if (ballExists(bb - 1, rows[rowNum + i])) {
+                ballCount.count = ballCount.count + 1;
+            }
+            if (ballExists(bb + 0, rows[rowNum + i])) {
+                ballCount.count = ballCount.count + 2;
+            }
             if (ballExists(bb + 1, rows[rowNum + i])) {
-                ballCount.count++;
+                ballCount.count = ballCount.count + 3;
+            }
+            if (ballExists(bb + 2, rows[rowNum + i])) {
+                ballCount.count = ballCount.count + 2;
+            }
+            if (ballExists(bb + 3, rows[rowNum + i])) {
+                ballCount.count = ballCount.count + 1;
             }
         }
     }
@@ -282,6 +297,10 @@ function setAvg(nn) {
     rowsSliceCount = rowsVisibleCount + rowsAvgCount;
     fillCells();
 }
+function countNeighbors(ball, row, far, rows) {
+    console.log(rows[row]);
+}
 /////////////////
 init();
 fillCells();
+//countNeighbors(7,0,1,datarows);
