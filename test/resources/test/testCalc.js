@@ -3,7 +3,7 @@ var levelA;
 var linesLevel;
 var dataBalls;
 var datarows;
-var sversion = 'v1.18 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.20 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 8;
@@ -271,6 +271,93 @@ function fillCells() {
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
     clearSVGgroup(levelA);
     drawStat3(levelA, slicedrows, fillColorFunc);
+    //console.log(slicedrows);
+    drawTriad(slicedrows);
+}
+function drawTriad(slicedrows) {
+    var yes1 = 0;
+    var yes2 = 0;
+    var pro = [];
+    for (var dx = -22; dx <= 22; dx++) {
+        for (var dy = 1; dy <= 27; dy++) {
+            var cnt = calcTriad(1, slicedrows, dx, dy);
+            if (cnt) {
+                //console.log(dx,dy,':',cnt);
+                for (var bb = 0; bb < rowLen; bb++) {
+                    if (ballExists(bb + 1 + 1 * dx, slicedrows[0 + 1 * dy])
+                        && ballExists(bb + 1 + 2 * dx, slicedrows[0 + 2 * dy])) {
+                        var exsts = false;
+                        for (var pp = 0; pp < pro.length; pp++) {
+                            if (pro[pp].ball == bb + 1) {
+                                exsts = true;
+                                pro[pp].cnt++;
+                                break;
+                            }
+                        }
+                        if (!exsts) {
+                            pro.push({ cnt: 1, ball: bb + 1, ex: '' });
+                        }
+                    }
+                }
+            }
+        }
+    }
+    //pro = 
+    pro.sort(function (n1, n2) { return n1.ball - n2.ball; });
+    //console.log(pro);
+    for (var ii = 0; ii < pro.length; ii++) {
+        addLine(levelA, pro[ii].ball * cellSize - 0.5 * cellSize, topShift - 1.5 * cellSize, pro[ii].ball * cellSize - 0.5 * cellSize, topShift - 1.5 * cellSize - pro[ii].cnt * cellSize + 0.9 * cellSize, cellSize * 0.9, '#0000ff66');
+        addLine(levelA, pro[ii].ball * cellSize - 0.5 * cellSize + rowLen * cellSize, topShift - 1.5 * cellSize, pro[ii].ball * cellSize - 0.5 * cellSize + rowLen * cellSize, topShift - 1.5 * cellSize - pro[ii].cnt * cellSize + 0.9 * cellSize, cellSize * 0.9, '#0000ff66');
+        console.log(pro[ii]);
+    }
+}
+function drawTriadTest(slicedrows) {
+    var yes1 = 0;
+    var yes2 = 0;
+    var pro = [];
+    for (var dx = -3; dx <= 3; dx++) {
+        for (var dy = 1; dy <= 5; dy++) {
+            var cnt1 = calcTriad(1, slicedrows, dx, dy);
+            var cnt2 = calcTriad(2, slicedrows, dx, dy);
+            if (cnt2) {
+                yes2++;
+                if (cnt1) {
+                    yes1++;
+                }
+                for (var bb = 0; bb < rowLen; bb++) {
+                    if (ballExists(bb + 1 + 1 * dx, slicedrows[1 + 1 * dy])
+                        && ballExists(bb + 1 + 2 * dx, slicedrows[1 + 2 * dy])) {
+                        var exsts = false;
+                        for (var pp = 0; pp < pro.length; pp++) {
+                            if (pro[pp].ball == bb + 1) {
+                                exsts = true;
+                                pro[pp].cnt++;
+                                break;
+                            }
+                        }
+                        if (!exsts) {
+                            pro.push({ cnt: 1, ball: bb + 1, ex: (ballExists(bb + 1 + 0 * dx, slicedrows[1 + 0 * dy]) ? 'x' : '') });
+                        }
+                    }
+                }
+                console.log(dx, dy, ':', cnt1, '<', cnt2);
+            }
+        }
+    }
+    //pro = 
+    pro.sort(function (n1, n2) { return n1.ball - n2.ball; });
+    console.log(yes1, yes2, pro);
+}
+function calcTriad(rr, rows, dx, dy) {
+    var cntr = 0;
+    for (var bb = 0; bb < rowLen; bb++) {
+        if (ballExists(bb + 1 + 0 * dx, rows[rr + 0 * dy])
+            && ballExists(bb + 1 + 1 * dx, rows[rr + 1 * dy])
+            && ballExists(bb + 1 + 2 * dx, rows[rr + 2 * dy])) {
+            cntr++;
+        }
+    }
+    return cntr;
 }
 function randomizeCells() {
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
