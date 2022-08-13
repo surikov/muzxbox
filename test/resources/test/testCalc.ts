@@ -332,48 +332,11 @@ function drawTriad(slicedrows: BallsRow[]){
 			, topShift -1.5* cellSize
 			, pro[ii].ball * cellSize - 0.5 * cellSize+rowLen* cellSize
 			,  topShift -1.5* cellSize-pro[ii].cnt*cellSize+ 0.9 * cellSize
-			, cellSize *0.9, '#0000ff66');
+			, cellSize *0.9, '#0000ff33');
 		console.log(pro[ii]);
 	}
 }
-function drawTriadTest(slicedrows: BallsRow[]){
-	let yes1=0;
-	let yes2=0;
-	let pro:{cnt:number,ball:number,ex:string}[]=[];
-	for(let dx=-3;dx<=3;dx++){
-		for(let dy=1;dy<=5;dy++){
-			let cnt1=calcTriad(1,slicedrows,dx,dy);
-			let cnt2=calcTriad(2,slicedrows,dx,dy);
-			if(cnt2){
-				yes2++;
-				if(cnt1){
-					yes1++;
-				}
-				for(let bb=0;bb<rowLen;bb++){
-					if(	ballExists(bb + 1+1*dx, slicedrows[1 +1*dy]) 
-					 && ballExists(bb + 1+2*dx, slicedrows[1 +2*dy])
-						){
-						let exsts=false;
-						for(let pp=0;pp<pro.length;pp++){
-							if(pro[pp].ball==bb+1){
-								exsts=true;
-								pro[pp].cnt++;
-								break;
-							}
-						}
-						if(!exsts){
-							pro.push({cnt:1,ball:bb+1,ex:(ballExists(bb + 1+0*dx, slicedrows[1 +0*dy])?'x':'')});
-						}
-					}
-				}
-				console.log(dx,dy,':',cnt1,'<',cnt2);
-			}
-		}
-	}
-	//pro = 
-	pro.sort((n1,n2) => { return n1.ball - n2.ball; });
-	console.log(yes1,yes2,pro);
-}
+
 function calcTriad(rr:number,rows: BallsRow[],dx:number,dy:number):number{
 	let cntr=0;
 	for(let bb=0;bb<rowLen;bb++){
