@@ -19,11 +19,10 @@
 		<button onclick='clickGoSkip(1);'>back 1</button>
 		<button onclick='clickGoSkip(5);'>back 5</button>
 		<button onclick='clickClearLines();'>clear</button>
-		<button onclick='setAvg(3);'>3</button>
-		<button onclick='setAvg(5);'>5</button>
-		<button onclick='setAvg(7);'>7</button>
-		<button onclick='setAvg(9);'>9</button>
-		<button onclick='setAvg(11);'>11</button>
+		<button onclick='changeHeight(-1);'>h-</button>
+		<button onclick='changeHeight(+1);'>+h</button>
+		<button onclick='changeWidth(-1);'>w-</button>
+		<button onclick='changeWidth(+1);'>+w</button>
 		<button onclick='randomizeCells();'>random</button>
 	</p>
 	<svg id='svgpane' width="1300" height="5000">
@@ -39,6 +38,8 @@
 		let dataName = 'data645';
 		let rowLen = 45;
 		let ballsInRow = 6;
+		let calcHalfWidth=22;
+		let calcHeight=29;
 	</script>
 	<script src="testCalc.js"></script>
 </body>

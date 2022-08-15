@@ -3,7 +3,7 @@ var levelA;
 var linesLevel;
 var dataBalls;
 var datarows;
-var sversion = 'v1.20 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.21 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 8;
@@ -275,14 +275,12 @@ function fillCells() {
     drawTriad(slicedrows);
 }
 function drawTriad(slicedrows) {
-    var yes1 = 0;
-    var yes2 = 0;
+    console.log(calcHalfWidth, calcHeight);
     var pro = [];
-    for (var dx = -22; dx <= 22; dx++) {
-        for (var dy = 1; dy <= 27; dy++) {
+    for (var dx = -calcHalfWidth; dx <= calcHalfWidth; dx++) {
+        for (var dy = 1; dy <= calcHeight; dy++) {
             var cnt = calcTriad(1, slicedrows, dx, dy);
             if (cnt) {
-                //console.log(dx,dy,':',cnt);
                 for (var bb = 0; bb < rowLen; bb++) {
                     if (ballExists(bb + 1 + 1 * dx, slicedrows[0 + 1 * dy])
                         && ballExists(bb + 1 + 2 * dx, slicedrows[0 + 2 * dy])) {
@@ -302,14 +300,13 @@ function drawTriad(slicedrows) {
             }
         }
     }
-    //pro = 
     pro.sort(function (n1, n2) { return n1.ball - n2.ball; });
-    //console.log(pro);
     for (var ii = 0; ii < pro.length; ii++) {
         addLine(levelA, pro[ii].ball * cellSize - 0.5 * cellSize, topShift - 1.5 * cellSize, pro[ii].ball * cellSize - 0.5 * cellSize, topShift - 1.5 * cellSize - pro[ii].cnt * cellSize + 0.9 * cellSize, cellSize * 0.9, '#0000ff66');
         addLine(levelA, pro[ii].ball * cellSize - 0.5 * cellSize + rowLen * cellSize, topShift - 1.5 * cellSize, pro[ii].ball * cellSize - 0.5 * cellSize + rowLen * cellSize, topShift - 1.5 * cellSize - pro[ii].cnt * cellSize + 0.9 * cellSize, cellSize * 0.9, '#0000ff33');
-        console.log(pro[ii]);
+        //console.log(pro[ii]);
     }
+    console.log(pro);
 }
 function calcTriad(rr, rows, dx, dy) {
     var cntr = 0;
@@ -342,9 +339,17 @@ function clickGoSkip(nn) {
         skipRowsCount = datarows.length - 200;
     fillCells();
 }
-function setAvg(nn) {
-    rowsAvgCount = nn;
+/*function setAvg(nn:number){
+    rowsAvgCount=nn;
     rowsSliceCount = rowsVisibleCount + rowsAvgCount;
+    fillCells();
+}*/
+function changeWidth(nn) {
+    calcHalfWidth = calcHalfWidth + nn;
+    fillCells();
+}
+function changeHeight(nn) {
+    calcHeight = calcHeight + nn;
     fillCells();
 }
 function countNeighbors(ball, row, far, rows) {

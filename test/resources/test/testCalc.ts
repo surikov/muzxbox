@@ -10,7 +10,10 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.20 '+dataName+': '+ballsInRow+'/'+rowLen;
+declare var calcHalfWidth: number;
+declare var calcHeight: number;
+
+let sversion = 'v1.21 '+dataName+': '+ballsInRow+'/'+rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -289,14 +292,12 @@ function fillCells() {
 	drawTriad(slicedrows);
 }
 function drawTriad(slicedrows: BallsRow[]){
-	let yes1=0;
-	let yes2=0;
+	console.log(calcHalfWidth,calcHeight);
 	let pro:{cnt:number,ball:number,ex:string}[]=[];
-	for(let dx=-22;dx<=22;dx++){
-		for(let dy=1;dy<=27;dy++){
+	for(let dx=-calcHalfWidth;dx<=calcHalfWidth;dx++){
+		for(let dy=1;dy<=calcHeight;dy++){
 			let cnt=calcTriad(1,slicedrows,dx,dy);
 			if(cnt){
-				//console.log(dx,dy,':',cnt);
 				for(let bb=0;bb<rowLen;bb++){
 					if(	ballExists(bb + 1+1*dx, slicedrows[0 +1*dy]) 
 					 && ballExists(bb + 1+2*dx, slicedrows[0 +2*dy])
@@ -317,9 +318,7 @@ function drawTriad(slicedrows: BallsRow[]){
 			}
 		}
 	}
-	//pro = 
 	pro.sort((n1,n2) => { return n1.ball - n2.ball; });
-	//console.log(pro);
 	for(var ii=0;ii<pro.length;ii++){
 		addLine(levelA
 			, pro[ii].ball * cellSize - 0.5 * cellSize
@@ -333,8 +332,9 @@ function drawTriad(slicedrows: BallsRow[]){
 			, pro[ii].ball * cellSize - 0.5 * cellSize+rowLen* cellSize
 			,  topShift -1.5* cellSize-pro[ii].cnt*cellSize+ 0.9 * cellSize
 			, cellSize *0.9, '#0000ff33');
-		console.log(pro[ii]);
+		//console.log(pro[ii]);
 	}
+	console.log(pro);
 }
 
 function calcTriad(rr:number,rows: BallsRow[],dx:number,dy:number):number{
@@ -369,9 +369,17 @@ function clickGoSkip(nn: number) {
 	if (skipRowsCount > datarows.length - 200) skipRowsCount = datarows.length - 200;
 	fillCells();
 }
-function setAvg(nn:number){
+/*function setAvg(nn:number){
 	rowsAvgCount=nn;
 	rowsSliceCount = rowsVisibleCount + rowsAvgCount;
+	fillCells();
+}*/
+function changeWidth(nn:number){
+	calcHalfWidth=calcHalfWidth+nn;
+	fillCells();
+}
+function changeHeight(nn:number){
+	calcHeight=calcHeight+nn;
 	fillCells();
 }
 function countNeighbors(ball:number,row:number,far:number,rows:BallsRow[]){
