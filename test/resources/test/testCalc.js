@@ -3,7 +3,8 @@ var levelA;
 var linesLevel;
 var dataBalls;
 var datarows;
-var sversion = 'v1.21 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var showFirstRow = false;
+var sversion = 'v1.22 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 8;
@@ -193,11 +194,11 @@ function drawStat3(svg, rows, fillColor) {
             var colors = fillColor(colNum, rowNum, rows);
             ;
             addRect(svg, colNum * cellSize - 1 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rowNum * cellSize, cellSize, cellSize - 0.1, colors.fillColor);
-            if (rowNum > 0) {
+            if (rowNum > 0 || showFirstRow) {
                 addCircle(svg, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 2 - 0.5, colors.strokeColor, '#33221100');
             }
             addRect(svg, colNum * cellSize - 1 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rowNum * cellSize, cellSize, cellSize - 0.1, colors.fillColor);
-            if (rowNum > 0) {
+            if (rowNum > 0 || showFirstRow) {
                 addCircle(svg, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 2 - 0.5, colors.strokeColor, '#33221100');
             }
         }
@@ -329,6 +330,10 @@ function randomizeCells() {
 }
 function clickHop() {
     skipRowsCount = Math.round(Math.random() * (datarows.length - 100));
+    fillCells();
+}
+function toggleFirst() {
+    showFirstRow = !showFirstRow;
     fillCells();
 }
 function clickGoSkip(nn) {
