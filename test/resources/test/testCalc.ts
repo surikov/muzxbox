@@ -11,10 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-//declare var calcHalfWidth: number;
-//declare var calcHeight: number;
-
-let sversion = 'v1.23 '+dataName+': '+ballsInRow+'/'+rowLen;
+let sversion = 'v1.24 '+dataName+': '+ballsInRow+'/'+rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -205,35 +202,24 @@ function drawLines() {
 	}
 }
 
-function drawStat3(svg: SVGElement, rows: BallsRow[]){//, fillColor: (ballNum: number, rowNum: number, rows: BallsRow[]) => { strokeColor: string, fillColor: string }) {
+function drawStat3(svg: SVGElement, rows: BallsRow[]){
 	drawLines();
 	addRect(svg, rowLen * cellSize + cellSize / 2, 0, rowLen * cellSize, cellSize, '#ffffff');
 	for (let rowNum = 0; rowNum < rowsVisibleCount; rowNum++) {
 		addSmallText(svg, 2 * rowLen * cellSize + 2, topShift + (1 + rowNum) * cellSize - 2, rows[rowNum].key);
 		for (let colNum = 1; colNum <= rowLen; colNum++) {
-			/*let colors: { strokeColor: string, fillColor: string } = fillColor(colNum, rowNum, rows);;
-			addRect(svg
-				, colNum * cellSize - 1 * cellSize + 0 * rowLen * cellSize
-				, topShift + 0 * cellSize + rowNum * cellSize
-				, cellSize, cellSize - 0.1, colors.fillColor);
-			
-			addRect(svg
-				, colNum * cellSize - 1 * cellSize + 1 * rowLen * cellSize
-				, topShift + 0 * cellSize + rowNum * cellSize
-				, cellSize, cellSize - 0.1, colors.fillColor);
-				*/
 			if(ballExists(colNum,rows[rowNum])){
 				if (rowNum > 0 || showFirstRow) {
 					addCircle(svg
 						, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize
 						, topShift + 0.5 * cellSize + rowNum * cellSize
-						, cellSize / 3 - 0.5, '#003300ff', '#33221100');
+						, cellSize / 3 - 0.5, '#ff0000ff', '#33221100');
 				}
 				if (rowNum > 0 || showFirstRow) {
 					addCircle(svg
 						, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize
 						, topShift + 0.5 * cellSize + rowNum * cellSize
-						, cellSize / 3 - 0.5, '#003300ff', '#33221100');
+						, cellSize / 3 - 0.5, '#ff0000ff', '#33221100');
 				}
 			}
 		}
@@ -242,95 +228,50 @@ function drawStat3(svg: SVGElement, rows: BallsRow[]){//, fillColor: (ballNum: n
 		addSmallText(svg, colNum * cellSize - cellSize, topShift, "" + colNum);
 	}
 }
-/*
-function fillColorFunc(ballNum: number, rowNum: number, rows: BallsRow[]): { strokeColor: string, fillColor: string } {
-	let counts: { ballNum: number, count: number }[] = [];
-	for (let bb = 0; bb < rowLen; bb++) {
-		let ballCount = { ballNum: bb + 1, count: 0 };
-		counts.push(ballCount)
-		for (let i = 1; i < rowsAvgCount; i++) {
-			//if (ballExists(bb + 1, rows[rowNum + i])) {
-			//	ballCount.count++;
-			//}
-			if (ballExists(bb - 1, rows[rowNum + i])) { ballCount.count=ballCount.count+1; }
-			if (ballExists(bb + 0, rows[rowNum + i])) { ballCount.count=ballCount.count+2; }
-			if (ballExists(bb + 1, rows[rowNum + i])) { ballCount.count=ballCount.count+3; }
-			if (ballExists(bb + 2, rows[rowNum + i])) { ballCount.count=ballCount.count+2; }
-			if (ballExists(bb + 3, rows[rowNum + i])) { ballCount.count=ballCount.count+1; }
-		}
-	}
-	let groups: { balls: number[], count: number }[] = [];
-	for (let ii = 0; ii < counts.length; ii++) {
-		let oneCount = counts[ii];
-		let flagExists = false;
-		for (let kk = 0; kk < groups.length; kk++) {
-			if (groups[kk].count == oneCount.count) {
-				flagExists = true;
-				groups[kk].balls.push(oneCount.ballNum);
-				break;
-			}
-		}
-		if (!flagExists) {
-			groups.push({ balls: [oneCount.ballNum], count: oneCount.count });
-		}
-	}
-	groups.sort((a: { balls: number[], count: number }, b: { balls: number[], count: number }) => { return a.count - b.count; })
-	let orderNum = 0;
-	for (let ii = 0; ii < groups.length; ii++) {
-		if (groups[ii].balls.indexOf(ballNum) > -1) {
-			orderNum = ii;
-			break;
-		}
-	}
-	let opac = 0.5 * orderNum / groups.length;
-	if (opac > 1) opac = 1;
-	let fll = 'rgba(0,0,255,' + opac + ')';
-	if (ballExists(ballNum, rows[rowNum])) {
-		return { strokeColor: '#000000ff', fillColor: fll };
-	} else {
-		return { strokeColor: '#33221100', fillColor: fll }
-	}
-}*/
-function pairExists(ball:number,rowNum:number,dx:number,dy:number,rows: BallsRow[]):boolean{
-	return ballExists(ball,rows[rowNum]) && ballExists(ball+dx,rows[rowNum+dy]);
+function triadExists(ball:number,rowNum:number,dx1:number,dx2:number,rows: BallsRow[]):boolean{
+	return ballExists(ball,rows[rowNum]) && ballExists(ball+dx1,rows[rowNum+1]) && ballExists(ball+dx2,rows[rowNum+2]);
 }
-function pairFills(ball:number,rowNum:number,dx:number,dy:number,rows: BallsRow[]):boolean{
-	return ballExists(ball+dx,rows[rowNum+dy]);
+function triadFills(ball:number,rowNum:number,dx1:number,dx2:number,rows: BallsRow[]):boolean{
+	return ballExists(ball+dx1,rows[rowNum+1]) && ballExists(ball+dx2,rows[rowNum+2]);
 }
-function calcPairs(rowNum:number,dx:number,dy:number,rows: BallsRow[]):number{
+function calcTriads(rowNum:number,dx1:number,dx2:number,rows: BallsRow[]):number{
 	let cnt=0;
 	for(let ii=0;ii<rowLen;ii++){
-		if(pairExists(ii+1,rowNum,dx,dy,rows)){
+		if(triadExists(ii+1,rowNum,dx1,dx2,rows)){
 			cnt++;
 		}
 	}
 	return cnt;
 }
-function calcRowPatterns(rowNum:number,dy:number,rows: BallsRow[]):number[]{
+function calcRowPatterns(rowNum:number,rows: BallsRow[]):number[]{
 	let cnts:number[]=[];
-	for(let ii=0;ii<rowLen;ii++){
-		cnts.push(calcPairs(rowNum,ii,dy,rows));
+	for(let dx1=0;dx1<rowLen;dx1++){
+		for(let dx2=0;dx2<rowLen;dx2++){
+			cnts.push(calcTriads(rowNum,dx1,dx2,rows));
+		}
 	}
 	return cnts;
 }
-function calcRowFills(rowNum:number,dy:number,rows: BallsRow[],counts:number[]):{ball:number,dy:number,fills:number[],count:number}[]{
-	let resu:{ball:number,dy:number,fills:number[],count:number}[]=[];
+function calcRowFills(rowNum:number,rows: BallsRow[],counts:number[]):{ball:number,fills:{dx1:number,dx2:number}[],count:number}[]{
+	let resu:{ball:number,fills:{dx1:number,dx2:number}[],count:number}[]=[];
 	for(let nn=0;nn<rowLen;nn++){
-		let one:{ball:number,dy:number,fills:number[],count:number}={ball:nn+1,dy:dy,fills:[],count:0};
+		let one:{ball:number,fills:{dx1:number,dx2:number}[],count:number}={ball:nn+1,fills:[],count:0};
 		resu.push(one);
-		for(let dx=0;dx<rowLen;dx++){
-			if(pairFills(nn+1,rowNum,dx,dy,rows)){
-				one.fills.push(dx);
-				one.count=one.count+counts[dx];
+		for(let dx1=0;dx1<rowLen;dx1++){
+			for(let dx2=0;dx2<rowLen;dx2++){
+				if(triadFills(nn+1,rowNum,dx1,dx2,rows)){
+					one.fills.push({dx1:dx1,dx2:dx2});
+					one.count=one.count+counts[dx1*rowLen+dx2];
+				}
 			}
 		}
 	}
 	return resu;
 }
-function dumpPairs(svg: SVGElement, rows: BallsRow[]){
+function dumpTriads(svg: SVGElement, rows: BallsRow[]){
 	for (let rr = 0; rr < rowsVisibleCount; rr++) {
-		let precounts=calcRowPatterns(rr+1,1,rows);
-		let calcs=calcRowFills(rr,1,rows,precounts);
+		let precounts=calcRowPatterns(rr+1,rows);
+		let calcs=calcRowFills(rr,rows,precounts);
 		let minCnt=99999;
 		let mxCount=0;
 		for(let ii=0;ii<rowLen;ii++){
@@ -338,12 +279,9 @@ function dumpPairs(svg: SVGElement, rows: BallsRow[]){
 			if(calcs[ii].count<minCnt)minCnt=calcs[ii].count;
 		}
 		let df=mxCount-minCnt;
-		//console.log(minCnt,mxCount,df);
 		for(let ii=0;ii<rowLen;ii++){
-			
-			let idx=0.5*(calcs[ii].count-minCnt)/df;
+			let idx=0.99*(calcs[ii].count-minCnt)/df;
 			let color='rgba(0,0,255,'+idx+')';
-			//console.log(ii,color);
 			addRect(svg
 					, ii * cellSize -0 * cellSize + 0 * rowLen * cellSize
 					, topShift + 0 * cellSize + rr * cellSize
@@ -357,93 +295,23 @@ function dumpPairs(svg: SVGElement, rows: BallsRow[]){
 					, cellSize - 0.1
 					, color);
 		}
-		//console.log(precounts);
-		//console.log(calcs);
 	}
 }
 function fillCells() {
 	clearSVGgroup(levelA);
 	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
-	dumpPairs(levelA,slicedrows);
+	dumpTriads(levelA,slicedrows);
 	dumpInfo(skipRowsCount);
-	
 	drawLines();
-	
-	drawStat3(levelA, slicedrows);//, fillColorFunc);
-	//console.log(slicedrows);
-	//drawTriad(slicedrows);
-	
+	drawStat3(levelA, slicedrows);
+	/*
+	let precounts=calcRowPatterns(0+1,slicedrows);
+	let calcs=calcRowFills(0,slicedrows,precounts);
+	console.log(calcs);
+	for(let ii=0;ii<10;ii++){
+		console.log(calcRowPatterns(ii+0,slicedrows));
+	}*/
 }
-/*
-function drawTriad(slicedrows: BallsRow[]){
-	console.log(calcHalfWidth,calcHeight);
-	let pro:{cnt:number,ball:number,ex:string}[]=[];
-	for(let dx=-calcHalfWidth;dx<=calcHalfWidth;dx++){
-		for(let dy=1;dy<=calcHeight;dy++){
-			let cnt=calcTriad(1,slicedrows,dx,dy);
-			if(cnt){
-				for(let bb=0;bb<rowLen;bb++){
-					if(	ballExists(bb + 1+1*dx, slicedrows[0 +1*dy]) 
-					 && ballExists(bb + 1+2*dx, slicedrows[0 +2*dy])
-						){
-						let exsts=false;
-						for(let pp=0;pp<pro.length;pp++){
-							if(pro[pp].ball==bb+1){
-								exsts=true;
-								pro[pp].cnt++;
-								break;
-							}
-						}
-						if(!exsts){
-							pro.push({cnt:1,ball:bb+1,ex:''});
-						}
-					}
-				}
-			}
-		}
-	}
-	pro.sort((n1,n2) => { return n1.ball - n2.ball; });
-	for(var ii=0;ii<pro.length;ii++){
-		addLine(levelA
-			, pro[ii].ball * cellSize - 0.5 * cellSize
-			, topShift -1.5* cellSize
-			, pro[ii].ball * cellSize - 0.5 * cellSize
-			,  topShift -1.5* cellSize-pro[ii].cnt*cellSize+ 0.9 * cellSize
-			, cellSize *0.9, '#0000ff66');
-		addLine(levelA
-			, pro[ii].ball * cellSize - 0.5 * cellSize+rowLen* cellSize
-			, topShift -1.5* cellSize
-			, pro[ii].ball * cellSize - 0.5 * cellSize+rowLen* cellSize
-			,  topShift -1.5* cellSize-pro[ii].cnt*cellSize+ 0.9 * cellSize
-			, cellSize *0.9, '#0000ff33');
-		//console.log(pro[ii]);
-	}
-	console.log(pro);
-}
-
-function calcTriad(rr:number,rows: BallsRow[],dx:number,dy:number):number{
-	let cntr=0;
-	for(let bb=0;bb<rowLen;bb++){
-		if(		   ballExists(bb + 1+0*dx, rows[rr +0*dy]) 
-				&& ballExists(bb + 1+1*dx, rows[rr +1*dy]) 
-				&& ballExists(bb + 1+2*dx, rows[rr +2*dy])
-			){
-			cntr++;
-		}
-	}
-
-	return cntr;
-}
-*/
-/*function randomizeCells() {
-	
-	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
-	let randomrows: BallsRow[]=randomizeData(slicedrows);
-	clearSVGgroup(levelA);
-	drawStat3(levelA, randomrows, fillColorFunc);
-	var msgp: HTMLElement = (document.getElementById('msgp') as any) as HTMLElement;
-	msgp.innerText = sversion + ': ' + skipRowsCount+' random';
-}*/
 function clickHop() {
 	skipRowsCount = Math.round(Math.random() * (datarows.length - 100));
 	fillCells();
@@ -458,25 +326,6 @@ function clickGoSkip(nn: number) {
 	if (skipRowsCount > datarows.length - 200) skipRowsCount = datarows.length - 200;
 	fillCells();
 }
-/*function setAvg(nn:number){
-	rowsAvgCount=nn;
-	rowsSliceCount = rowsVisibleCount + rowsAvgCount;
-	fillCells();
-}*/
-/*
-function changeWidth(nn:number){
-	calcHalfWidth=calcHalfWidth+nn;
-	fillCells();
-}
-function changeHeight(nn:number){
-	calcHeight=calcHeight+nn;
-	fillCells();
-}
-function countNeighbors(ball:number,row:number,far:number,rows:BallsRow[]){
-	console.log(rows[row]);
-}*/
-
 /////////////////
 init();
 fillCells();
-//countNeighbors(7,0,1,datarows);
