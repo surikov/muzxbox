@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.24 '+dataName+': '+ballsInRow+'/'+rowLen;
+let sversion = 'v1.25 '+dataName+': '+ballsInRow+'/'+rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -213,13 +213,13 @@ function drawStat3(svg: SVGElement, rows: BallsRow[]){
 					addCircle(svg
 						, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize
 						, topShift + 0.5 * cellSize + rowNum * cellSize
-						, cellSize / 3 - 0.5, '#ff0000ff', '#33221100');
+						, cellSize / 5 - 0.5, '#ff0000ff', '#ff0000ff');
 				}
 				if (rowNum > 0 || showFirstRow) {
 					addCircle(svg
 						, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize
 						, topShift + 0.5 * cellSize + rowNum * cellSize
-						, cellSize / 3 - 0.5, '#ff0000ff', '#33221100');
+						, cellSize / 5 - 0.5, '#ff0000ff', '#ff0000ff');
 				}
 			}
 		}

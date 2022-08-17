@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.24 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.25 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 8;
@@ -193,10 +193,10 @@ function drawStat3(svg, rows) {
         for (var colNum = 1; colNum <= rowLen; colNum++) {
             if (ballExists(colNum, rows[rowNum])) {
                 if (rowNum > 0 || showFirstRow) {
-                    addCircle(svg, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 3 - 0.5, '#ff0000ff', '#33221100');
+                    addCircle(svg, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 5 - 0.5, '#ff0000ff', '#ff0000ff');
                 }
                 if (rowNum > 0 || showFirstRow) {
-                    addCircle(svg, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 3 - 0.5, '#ff0000ff', '#33221100');
+                    addCircle(svg, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 5 - 0.5, '#ff0000ff', '#ff0000ff');
                 }
             }
         }
