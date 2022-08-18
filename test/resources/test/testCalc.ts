@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.25 '+dataName+': '+ballsInRow+'/'+rowLen;
+let sversion = 'v1.27 '+dataName+': '+ballsInRow+'/'+rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -19,6 +19,7 @@ let cellSize = 8;
 let topShift = cellSize * 11;
 let rowsVisibleCount = 80;
 let rowsAvgCount = 5;
+let ratioPre=0.33;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let markLines: { fromX: number, fromY: number, toX: number, toY: number }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
@@ -261,7 +262,8 @@ function calcRowFills(rowNum:number,rows: BallsRow[],counts:number[]):{ball:numb
 			for(let dx2=0;dx2<rowLen;dx2++){
 				if(triadFills(nn+1,rowNum,dx1,dx2,rows)){
 					one.fills.push({dx1:dx1,dx2:dx2});
-					one.count=one.count+counts[dx1*rowLen+dx2];
+					let cc=counts[dx1*rowLen+dx2]
+					one.count=one.count+cc*cc;
 				}
 			}
 		}
@@ -280,7 +282,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]){
 		}
 		let df=mxCount-minCnt;
 		for(let ii=0;ii<rowLen;ii++){
-			let idx=0.99*(calcs[ii].count-minCnt)/df;
+			let idx=ratioPre*(calcs[ii].count-minCnt)/df;
 			let color='rgba(0,0,255,'+idx+')';
 			addRect(svg
 					, ii * cellSize -0 * cellSize + 0 * rowLen * cellSize
@@ -324,6 +326,12 @@ function clickGoSkip(nn: number) {
 	skipRowsCount = skipRowsCount + nn;
 	if (skipRowsCount < 0) skipRowsCount = 0;
 	if (skipRowsCount > datarows.length - 200) skipRowsCount = datarows.length - 200;
+	fillCells();
+}
+function toggleRatioPre(){
+	if(ratioPre==0.33)ratioPre=0.66;
+	else if(ratioPre==0.66)ratioPre=0.99;
+	else ratioPre=0.33;
 	fillCells();
 }
 /////////////////

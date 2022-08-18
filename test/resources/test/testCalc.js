@@ -4,13 +4,14 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.25 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.27 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 8;
 var topShift = cellSize * 11;
 var rowsVisibleCount = 80;
 var rowsAvgCount = 5;
+var ratioPre = 0.33;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
@@ -238,7 +239,8 @@ function calcRowFills(rowNum, rows, counts) {
             for (var dx2 = 0; dx2 < rowLen; dx2++) {
                 if (triadFills(nn + 1, rowNum, dx1, dx2, rows)) {
                     one.fills.push({ dx1: dx1, dx2: dx2 });
-                    one.count = one.count + counts[dx1 * rowLen + dx2];
+                    var cc = counts[dx1 * rowLen + dx2];
+                    one.count = one.count + cc * cc;
                 }
             }
         }
@@ -259,7 +261,7 @@ function dumpTriads(svg, rows) {
         }
         var df = mxCount - minCnt;
         for (var ii = 0; ii < rowLen; ii++) {
-            var idx = 0.99 * (calcs[ii].count - minCnt) / df;
+            var idx = ratioPre * (calcs[ii].count - minCnt) / df;
             var color = 'rgba(0,0,255,' + idx + ')';
             addRect(svg, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize - 0.1, color);
             addRect(svg, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize - 0.1, color);
@@ -295,6 +297,15 @@ function clickGoSkip(nn) {
         skipRowsCount = 0;
     if (skipRowsCount > datarows.length - 200)
         skipRowsCount = datarows.length - 200;
+    fillCells();
+}
+function toggleRatioPre() {
+    if (ratioPre == 0.33)
+        ratioPre = 0.66;
+    else if (ratioPre == 0.66)
+        ratioPre = 0.99;
+    else
+        ratioPre = 0.33;
     fillCells();
 }
 /////////////////
