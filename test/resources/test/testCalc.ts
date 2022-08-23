@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.29 '+dataName+': '+ballsInRow+'/'+rowLen;
+let sversion = 'v1.30 '+dataName+': '+ballsInRow+'/'+rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -199,7 +199,7 @@ function drawLines() {
 			, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize
 			, markLines[i].toX * cellSize + 0.5 * cellSize
 			, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize
-			, cellSize / 2, '#ffff0099');
+			, cellSize / 0.99, '#ffff0099');
 	}
 }
 

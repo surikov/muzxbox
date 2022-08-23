@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.29 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.30 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -183,7 +183,7 @@ function clickFog(vnt) {
 function drawLines() {
     clearSVGgroup(linesLevel);
     for (var i = 0; i < markLines.length; i++) {
-        addLine(linesLevel, markLines[i].fromX * cellSize + 0.5 * cellSize, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize, markLines[i].toX * cellSize + 0.5 * cellSize, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize, cellSize / 2, '#ffff0099');
+        addLine(linesLevel, markLines[i].fromX * cellSize + 0.5 * cellSize, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize, markLines[i].toX * cellSize + 0.5 * cellSize, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize, cellSize / 0.99, '#ffff0099');
     }
 }
 function drawStat3(svg, rows) {
