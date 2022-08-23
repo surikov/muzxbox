@@ -253,21 +253,21 @@ function calcRowPatterns(rowNum:number,rows: BallsRow[]):number[]{
 	}
 	return cnts;
 }
-function calcRowFills(rowNum:number,rows: BallsRow[],counts:number[]):{ball:number,fills:{dx1:number,dx2:number}[],count:number}[]{
-	let resu:{ball:number,fills:{dx1:number,dx2:number}[],count:number}[]=[];
+function calcRowFills(rowNum:number,rows: BallsRow[],counts:number[]):{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}[]{
+	let resu:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}[]=[];
 	for(let nn=0;nn<rowLen;nn++){
-		let one:{ball:number,fills:{dx1:number,dx2:number}[],count:number}={ball:nn+1,fills:[],count:0};
+		let one:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}={ball:nn+1,fills:[],summ:0,logr:0};
 		resu.push(one);
 		for(let dx1=0;dx1<rowLen;dx1++){
 			for(let dx2=0;dx2<rowLen;dx2++){
 				if(triadFills(nn+1,rowNum,dx1,dx2,rows)){
 					one.fills.push({dx1:dx1,dx2:dx2});
 					let cc=counts[dx1*rowLen+dx2]
-					one.count=one.count+cc*cc;
+					one.summ=one.summ+cc*cc;
 				}
 			}
 		}
-		one.count=one.count*one.count;
+		one.logr=one.summ*one.summ;
 	}
 	return resu;
 }
@@ -278,12 +278,12 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]){
 		let minCnt=99999;
 		let mxCount=0;
 		for(let ii=0;ii<rowLen;ii++){
-			if(calcs[ii].count>mxCount)mxCount=calcs[ii].count;
-			if(calcs[ii].count<minCnt)minCnt=calcs[ii].count;
+			if(calcs[ii].logr>mxCount)mxCount=calcs[ii].logr;
+			if(calcs[ii].logr<minCnt)minCnt=calcs[ii].logr;
 		}
 		let df=mxCount-minCnt;
 		for(let ii=0;ii<rowLen;ii++){
-			let idx=ratioPre*(calcs[ii].count-minCnt)/df;
+			let idx=ratioPre*(calcs[ii].logr-minCnt)/df;
 			let color='rgba(0,0,255,'+idx+')';
 			addRect(svg
 					, ii * cellSize -0 * cellSize + 0 * rowLen * cellSize
@@ -298,7 +298,9 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]){
 					, cellSize - 0.1
 					, color);
 		}
+		if(rr==0)console.log(calcs);
 	}
+
 }
 function fillCells() {
 	clearSVGgroup(levelA);

@@ -233,18 +233,18 @@ function calcRowPatterns(rowNum, rows) {
 function calcRowFills(rowNum, rows, counts) {
     var resu = [];
     for (var nn = 0; nn < rowLen; nn++) {
-        var one = { ball: nn + 1, fills: [], count: 0 };
+        var one = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
         resu.push(one);
         for (var dx1 = 0; dx1 < rowLen; dx1++) {
             for (var dx2 = 0; dx2 < rowLen; dx2++) {
                 if (triadFills(nn + 1, rowNum, dx1, dx2, rows)) {
                     one.fills.push({ dx1: dx1, dx2: dx2 });
                     var cc = counts[dx1 * rowLen + dx2];
-                    one.count = one.count + cc * cc;
+                    one.summ = one.summ + cc * cc;
                 }
             }
         }
-        one.count = one.count * one.count;
+        one.logr = one.summ * one.summ;
     }
     return resu;
 }
@@ -255,18 +255,20 @@ function dumpTriads(svg, rows) {
         var minCnt = 99999;
         var mxCount = 0;
         for (var ii = 0; ii < rowLen; ii++) {
-            if (calcs[ii].count > mxCount)
-                mxCount = calcs[ii].count;
-            if (calcs[ii].count < minCnt)
-                minCnt = calcs[ii].count;
+            if (calcs[ii].logr > mxCount)
+                mxCount = calcs[ii].logr;
+            if (calcs[ii].logr < minCnt)
+                minCnt = calcs[ii].logr;
         }
         var df = mxCount - minCnt;
         for (var ii = 0; ii < rowLen; ii++) {
-            var idx = ratioPre * (calcs[ii].count - minCnt) / df;
+            var idx = ratioPre * (calcs[ii].logr - minCnt) / df;
             var color = 'rgba(0,0,255,' + idx + ')';
             addRect(svg, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize - 0.1, color);
             addRect(svg, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize - 0.1, color);
         }
+        if (rr == 0)
+            console.log(calcs);
     }
 }
 function fillCells() {
