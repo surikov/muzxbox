@@ -4,14 +4,14 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.27 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.28 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 8;
 var topShift = cellSize * 11;
 var rowsVisibleCount = 80;
 var rowsAvgCount = 5;
-var ratioPre = 0.33;
+var ratioPre = 0.75;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
@@ -244,6 +244,7 @@ function calcRowFills(rowNum, rows, counts) {
                 }
             }
         }
+        one.count = one.count * one.count;
     }
     return resu;
 }
@@ -300,12 +301,12 @@ function clickGoSkip(nn) {
     fillCells();
 }
 function toggleRatioPre() {
-    if (ratioPre == 0.33)
-        ratioPre = 0.66;
-    else if (ratioPre == 0.66)
+    if (ratioPre == 0.5)
+        ratioPre = 0.75;
+    else if (ratioPre == 0.75)
         ratioPre = 0.99;
     else
-        ratioPre = 0.33;
+        ratioPre = 0.5;
     fillCells();
 }
 /////////////////

@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.27 '+dataName+': '+ballsInRow+'/'+rowLen;
+let sversion = 'v1.28 '+dataName+': '+ballsInRow+'/'+rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -19,7 +19,7 @@ let cellSize = 8;
 let topShift = cellSize * 11;
 let rowsVisibleCount = 80;
 let rowsAvgCount = 5;
-let ratioPre=0.33;
+let ratioPre=0.75;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let markLines: { fromX: number, fromY: number, toX: number, toY: number }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
@@ -267,6 +267,7 @@ function calcRowFills(rowNum:number,rows: BallsRow[],counts:number[]):{ball:numb
 				}
 			}
 		}
+		one.count=one.count*one.count;
 	}
 	return resu;
 }
@@ -329,9 +330,9 @@ function clickGoSkip(nn: number) {
 	fillCells();
 }
 function toggleRatioPre(){
-	if(ratioPre==0.33)ratioPre=0.66;
-	else if(ratioPre==0.66)ratioPre=0.99;
-	else ratioPre=0.33;
+	if(ratioPre==0.5)ratioPre=0.75;
+	else if(ratioPre==0.75)ratioPre=0.99;
+	else ratioPre=0.5;
 	fillCells();
 }
 /////////////////
