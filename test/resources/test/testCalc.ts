@@ -11,11 +11,11 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.28 '+dataName+': '+ballsInRow+'/'+rowLen;
+let sversion = 'v1.29 '+dataName+': '+ballsInRow+'/'+rowLen;
 
 let markX = -1;
 let markY = -1;
-let cellSize = 8;
+let cellSize = 12;
 let topShift = cellSize * 11;
 let rowsVisibleCount = 80;
 let rowsAvgCount = 5;
