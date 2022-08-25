@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.30 '+dataName+': '+ballsInRow+'/'+rowLen;
+let sversion = 'v1.31 '+dataName+': '+ballsInRow+'/'+rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -21,6 +21,7 @@ let rowsVisibleCount = 80;
 let rowsAvgCount = 5;
 let ratioPre=0.75;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
+//let prewide=5;
 let markLines: { fromX: number, fromY: number, toX: number, toY: number }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
 	key: string;
@@ -253,6 +254,28 @@ function calcRowPatterns(rowNum:number,rows: BallsRow[]):number[]{
 	}
 	return cnts;
 }
+/*function setWide(resu:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}[]){
+	for(let nn=0;nn<rowLen;nn++){
+		let one:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}=resu[nn];
+		one.logr=one.summ;
+		for(let kk=0;kk<prewide;kk++){
+			let idx=nn+kk;
+			if(idx>=rowLen)idx=idx-rowLen;
+			let nextOne:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}=resu[idx];
+			one.logr=one.logr*nextOne.summ;
+		}
+		//one.logr=one.summ*one.summ;
+	}
+	for(let nn=0;nn<rowLen;nn=nn+prewide){
+		let one:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}=resu[nn];
+		for(let kk=1;kk<prewide;kk++){
+			let idx=nn+kk;
+			if(idx>=rowLen)idx=idx-rowLen;
+			let nextOne:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}=resu[idx];
+			nextOne.logr=one.logr;
+		}
+	}
+}*/
 function calcRowFills(rowNum:number,rows: BallsRow[],counts:number[]):{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}[]{
 	let resu:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}[]=[];
 	for(let nn=0;nn<rowLen;nn++){
@@ -267,8 +290,9 @@ function calcRowFills(rowNum:number,rows: BallsRow[],counts:number[]):{ball:numb
 				}
 			}
 		}
-		one.logr=one.summ*one.summ;
+		one.logr=one.summ*one.summ*one.summ;
 	}
+	//setWide(resu);
 	return resu;
 }
 function dumpTriads(svg: SVGElement, rows: BallsRow[]){

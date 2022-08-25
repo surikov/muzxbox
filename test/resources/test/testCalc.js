@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.30 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.31 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -13,6 +13,7 @@ var rowsVisibleCount = 80;
 var rowsAvgCount = 5;
 var ratioPre = 0.75;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
+//let prewide=5;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
     var msgp = document.getElementById('msgp');
@@ -230,6 +231,28 @@ function calcRowPatterns(rowNum, rows) {
     }
     return cnts;
 }
+/*function setWide(resu:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}[]){
+    for(let nn=0;nn<rowLen;nn++){
+        let one:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}=resu[nn];
+        one.logr=one.summ;
+        for(let kk=0;kk<prewide;kk++){
+            let idx=nn+kk;
+            if(idx>=rowLen)idx=idx-rowLen;
+            let nextOne:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}=resu[idx];
+            one.logr=one.logr*nextOne.summ;
+        }
+        //one.logr=one.summ*one.summ;
+    }
+    for(let nn=0;nn<rowLen;nn=nn+prewide){
+        let one:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}=resu[nn];
+        for(let kk=1;kk<prewide;kk++){
+            let idx=nn+kk;
+            if(idx>=rowLen)idx=idx-rowLen;
+            let nextOne:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}=resu[idx];
+            nextOne.logr=one.logr;
+        }
+    }
+}*/
 function calcRowFills(rowNum, rows, counts) {
     var resu = [];
     for (var nn = 0; nn < rowLen; nn++) {
@@ -244,8 +267,9 @@ function calcRowFills(rowNum, rows, counts) {
                 }
             }
         }
-        one.logr = one.summ * one.summ;
+        one.logr = one.summ * one.summ * one.summ;
     }
+    //setWide(resu);
     return resu;
 }
 function dumpTriads(svg, rows) {

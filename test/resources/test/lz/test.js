@@ -1,0 +1,10 @@
+var probe='N4IgxgFg9gTgJiAXKAZgSwHYHMCmMDOSA2kQGwA0ATOaPhAIYAOOSIALjGvdgDYsC+AXXJEAzFWFFqlSQFZy40GCg9YrGFgBG9ABSkALOQAEARgAMZ45VEVTAShBCRhxexwAPNqwDqjySYVBYRBtGBgcQkQiQX5yEHwcNjZMLEjQWDQcDDZ6ZKgMVgA3PGSweh4QOPw2AE8+VgxYAFtyyviOFMiKEBRwtkj5EEYofDQ8gsQAkAwAVzYAZTQALxZEMwA6UkHktj4AMXyF5dX9AA445VUYVgBiCzM26pgoAGscbzQ4Nggkah6+xYrJAmdaDbRgF5YZ4zDBwADCKjUiGm+RYcXQ7hwcAAIlwofQmgAFEZjND5JAocoJOJsGEpYggNptF4vJlxJnBHb1ZHYpoAdkc-CAA';
+console.log(probe.length,probe);
+var result=LZString.decompressFromEncodedURIComponent(probe);
+console.log(result.length,result);
+var obj=JSON.parse(result);
+console.log(obj);
+var json=JSON.stringify(obj,null,3);
+console.log(json);
+var compressed = LZString.compressToEncodedURIComponent(json);
+console.log(compressed.length,compressed);
