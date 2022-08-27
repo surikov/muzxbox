@@ -110,6 +110,26 @@ function addLine(svg: SVGElement, x1: number, y1: number, x2: number, y2: number
 	newLine.setAttribute("stroke-linecap", 'round');
 	svg.append(newLine);
 }
+function composeLine(svg: SVGElement, x1: number, y1: number, x2: number, y2: number, strokeWidth: number, color: string) {
+	addLine(svg, x1, y1, x2, y2, strokeWidth/3, color);
+	/*addCircle(svg, x2, y2, strokeWidth/2, color, color);
+	let stepCount=Math.abs(x1-x2)/cellSize;
+	if(stepCount<Math.abs(y1-y2)/cellSize)stepCount=Math.abs(y1-y2)/cellSize;
+	let dx=(x1-x2)/stepCount;
+	let dy=(y1-y2)/stepCount;
+	let cx=x2;
+	let cy=y2;
+	for(var ii=1;ii<=stepCount;ii++){
+		if(Math.round(cx+ii*dx)!=cx || Math.round(cy+ii*dy)!=cy){
+			cx=Math.round(x2+ii*dx);
+			cy=Math.round(y2+ii*dy);
+			console.log(cx,cy);
+			let xx=cellSize*Math.round(cx/cellSize);
+			let yy=cellSize*Math.round(cy/cellSize);
+			addCircle(svg, xx, yy, strokeWidth/2, color, color);
+		}
+	}*/
+}
 function addCircle(svg: SVGElement, x: number, y: number, r: number, strokecolor: string, fillcolor: string) {
 	var rect: SVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
 	rect.setAttribute('x', '' + (x - r));
@@ -195,7 +215,7 @@ function clickFog(vnt) {
 function drawLines() {
 	clearSVGgroup(linesLevel);
 	for (let i = 0; i < markLines.length; i++) {
-		addLine(linesLevel
+		composeLine(linesLevel
 			, markLines[i].fromX * cellSize + 0.5 * cellSize
 			, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize
 			, markLines[i].toX * cellSize + 0.5 * cellSize

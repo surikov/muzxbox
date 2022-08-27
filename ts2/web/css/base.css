@@ -1,0 +1,34 @@
+::-webkit-scrollbar {
+	display: none;
+}
+:root {
+
+	--background_base: #c8d8e0;
+
+}
+
+html {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+	background-color: var(--background_base);
+	font-family: 'Zen Kurenaido', serif, cursive;
+	user-select: none;
+}
+
+body {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+	touch-action: manipulation;
+}
+
+.debug {
+	fill: #ff0000;
+	fill-opacity: 25%;
+	stroke: #ff0000;
+	stroke-opacity: 75%;
+}
+

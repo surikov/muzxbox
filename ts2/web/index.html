@@ -1,0 +1,33 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1.0, width=device-width, height=device-height, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
+
+	<link rel="stylesheet" type="text/css" href="./font/font.css">
+	<link rel="stylesheet" type="text/css" href="css/base.css">
+	
+	<script type='text/javascript' src='./js/muzxboxapp.js'></script>
+	
+	<title>MuzXBox</title>
+</head>
+
+<body>
+	
+	<h1>Test</h1>
+	<p>Test</p>
+
+	<script>
+		function waitMBx() {
+			console.log('waitMBx');
+			if (window['MZXBA']) {
+				MZXBA.initAll();
+			} else {
+				setTimeout(waitMBx, 333);
+			}
+		}
+		waitMBx();
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,39 @@
+{
+	"compilerOptions": {
+		"target": "es5"
+		,"outFile": "./web/js/muzxboxapp.js"
+		,"strictNullChecks": true
+		,"alwaysStrict": true
+		,"esModuleInterop": true
+		,"noResolve": false
+        ,"noImplicitAny": false
+        ,"removeComments": true
+        ,"preserveConstEnums": true
+        ,"sourceMap": true
+        ,"experimentalDecorators": true
+        ,"isolatedModules": false
+		,"module": "AMD"
+        ,"lib": [
+            "dom"
+            ,"es2015"
+            ,"es5"
+        ]
+        ,"declaration": true
+		,"types": [
+        ]
+	}
+	,"files": [
+		
+		"init/startup.ts"
+		,"tilelevel/tilelevel.ts"
+		,"tilelevel/tilelevelutil.ts"
+		,"tilelevel/tilepolygon.ts"
+		,"tilelevel/tilepath.ts"
+		,"tilelevel/tilerectangle.ts"
+		,"tilelevel/tileline.ts"
+		,"tilelevel/tiletext.ts"
+		,"./tilelevel/shortnames.ts"
+
+
+	]
+}
