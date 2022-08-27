@@ -19,7 +19,7 @@ let cellSize = 12;
 let topShift = cellSize * 11;
 let rowsVisibleCount = 80;
 let rowsAvgCount = 5;
-let ratioPre=0.75;
+let ratioPre=0.5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 //let prewide=5;
 let markLines: { fromX: number, fromY: number, toX: number, toY: number }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
@@ -206,7 +206,7 @@ function drawLines() {
 
 function drawStat3(svg: SVGElement, rows: BallsRow[]){
 	drawLines();
-	addRect(svg, rowLen * cellSize + cellSize / 2, 0, rowLen * cellSize, cellSize, '#ffffff');
+	addRect(svg, rowLen * cellSize + cellSize / 2, 0, rowLen * cellSize, cellSize, '#eee');
 	for (let rowNum = 0; rowNum < rowsVisibleCount; rowNum++) {
 		addSmallText(svg, 2 * rowLen * cellSize + 2, topShift + (1 + rowNum) * cellSize - 2, rows[rowNum].key);
 		for (let colNum = 1; colNum <= rowLen; colNum++) {

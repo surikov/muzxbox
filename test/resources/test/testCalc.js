@@ -11,7 +11,7 @@ var cellSize = 12;
 var topShift = cellSize * 11;
 var rowsVisibleCount = 80;
 var rowsAvgCount = 5;
-var ratioPre = 0.75;
+var ratioPre = 0.5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 //let prewide=5;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
@@ -189,7 +189,7 @@ function drawLines() {
 }
 function drawStat3(svg, rows) {
     drawLines();
-    addRect(svg, rowLen * cellSize + cellSize / 2, 0, rowLen * cellSize, cellSize, '#ffffff');
+    addRect(svg, rowLen * cellSize + cellSize / 2, 0, rowLen * cellSize, cellSize, '#eee');
     for (var rowNum = 0; rowNum < rowsVisibleCount; rowNum++) {
         addSmallText(svg, 2 * rowLen * cellSize + 2, topShift + (1 + rowNum) * cellSize - 2, rows[rowNum].key);
         for (var colNum = 1; colNum <= rowLen; colNum++) {
