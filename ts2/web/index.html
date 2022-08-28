@@ -14,8 +14,14 @@
 
 <body>
 	
-	<h1>Test</h1>
-	<p>Test</p>
+	<svg id="contentSVG" class='contentSVG' viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+		<radialGradient id="bgFillRectangle" cx="100%" cy="50%" r="100%" fx="100%" fy="50%">
+			<stop offset="0%" stop-color=var(--background_base)></stop>
+			<stop offset="100%" stop-color=var(--secondary_lite)></stop>
+		</radialGradient >
+        <g id='debugLayerGroup'></g>
+		<g id='debugLayerGroup'></g>
+	</svg>
 
 	<script>
 		function waitMBx() {

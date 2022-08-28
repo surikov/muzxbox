@@ -6,6 +6,10 @@ class MuzXBoxApplication {
 	}
 	initAll(){
 		console.log('initAll');
+		this.bindLayers();
+	}
+	bindLayers(){
+
 	}
 	
 }

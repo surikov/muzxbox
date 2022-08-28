@@ -25,6 +25,9 @@
 	,"files": [
 		
 		"init/startup.ts"
+		,"init/songUI.ts"
+		,"init/focusManager.ts"
+
 		,"tilelevel/tilelevel.ts"
 		,"tilelevel/tilelevelutil.ts"
 		,"tilelevel/tilepolygon.ts"
@@ -33,6 +36,26 @@
 		,"tilelevel/tileline.ts"
 		,"tilelevel/tiletext.ts"
 		,"./tilelevel/shortnames.ts"
+
+		,"songdata/zvoogmeter.ts"
+		,"songdata/zvoogcurvepoint.ts"
+		,"songdata/zvoogmeasure.ts"
+		,"songdata/zvoogparameterdata.ts"
+		,"songdata/zvoogvoice.ts"
+		,"songdata/zvoogmeasurechord.ts"
+		,"songdata/zvoogmeasurepoint.ts"
+		,"songdata/zvoogchordstrings.ts"
+		,"songdata/zvoogenvelope.ts"
+		,"songdata/zvoogpitch.ts"
+		,"songdata/zvoogprogression.ts"
+		,"songdata/zvoogtrack.ts"
+		,"songdata/zvoogschedule.ts"
+		,"songdata/zvoogfiltersetting.ts"
+		,"songdata/zvoogperformersetting.ts"
+
+		,"plugins/zvoogfilterplugin.ts"
+		,"plugins/zvoogperformerplugin.ts"
+		,"plugins/zvoogplugin.ts"
 
 
 	]

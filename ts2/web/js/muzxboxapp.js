@@ -6,10 +6,23 @@ var MuzXBoxApplication = (function () {
     }
     MuzXBoxApplication.prototype.initAll = function () {
         console.log('initAll');
+        this.bindLayers();
+    };
+    MuzXBoxApplication.prototype.bindLayers = function () {
     };
     return MuzXBoxApplication;
 }());
 window['MZXBA'] = new MuzXBoxApplication();
+var SongUI = (function () {
+    function SongUI() {
+    }
+    return SongUI;
+}());
+var FocusManager = (function () {
+    function FocusManager() {
+    }
+    return FocusManager;
+}());
 console.log('tilelevel v2.20.001');
 var TileLevel = (function () {
     function TileLevel(svgObject, inWidth, inHeight, minZoom, curZoom, maxZoom, layers) {
@@ -1122,4 +1135,324 @@ function nonEmptyID(id) {
         return 'ID' + Math.floor(Math.random() * 1000000000);
     }
 }
+function point2seconds(song, point) {
+    var ss = 0;
+    for (var i = 0; i < point.skipMeasures; i++) {
+        ss = ss + meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+    }
+    if (point.skipMeasures < song.measures.length) {
+        ss = ss + meter2seconds(song.measures[point.skipMeasures].tempo, point.skipSteps);
+    }
+    return ss;
+}
+function points2meter(points) {
+    var r = {
+        skipMeasures: 0,
+        skipSteps: {
+            count: 0,
+            division: 1
+        },
+        velocity: 0
+    };
+    for (var i = 0; i < points.length; i++) {
+        if (points[i].skipMeasures > 0) {
+            r.skipMeasures = r.skipMeasures + points[i].skipMeasures;
+            r.skipSteps = points[i].skipSteps;
+        }
+        else {
+            r.skipSteps = DUU(r.skipSteps).plus(points[i].skipSteps);
+        }
+        r.velocity = points[i].velocity;
+    }
+    return r;
+}
+function meter2seconds(bpm, meter) {
+    var wholeNoteSeconds = 4 * 60 / bpm;
+    var meterSeconds = wholeNoteSeconds * meter.count / meter.division;
+    return meterSeconds;
+}
+function seconds2meterRound(bpm, seconds) {
+    var note16Seconds = (4 * 60 / bpm) / 16;
+    var part = seconds / note16Seconds;
+    return { count: Math.round(part), division: 16 };
+}
+function calculateEnvelopeDuration(envelope) {
+    var d = { count: 0, division: 1 };
+    for (var i = 0; i < envelope.pitches.length; i++) {
+        d = DUU(d).plus(envelope.pitches[i].duration);
+    }
+    return d;
+}
+function DUU(u) {
+    return new DurationUnitUtil(u);
+}
+var DurationUnitUtil = (function () {
+    function DurationUnitUtil(u) {
+        this._unit = u;
+    }
+    DurationUnitUtil.prototype.clone = function () {
+        return { count: this._unit.count, division: this._unit.division };
+    };
+    DurationUnitUtil.prototype.plus = function (b) {
+        if (this._unit.division == b.division) {
+            return { count: this._unit.count + b.count, division: this._unit.division };
+        }
+        else {
+            var r = { count: this._unit.count * b.division + b.count * this._unit.division, division: this._unit.division * b.division };
+            return r;
+        }
+    };
+    DurationUnitUtil.prototype.minus = function (b) {
+        if (this._unit.division == b.division) {
+            return { count: this._unit.count - b.count, division: this._unit.division };
+        }
+        else {
+            var r = { count: this._unit.count * b.division - b.count * this._unit.division, division: this._unit.division * b.division };
+            return r;
+        }
+    };
+    DurationUnitUtil.prototype._meterMore = function (b) {
+        var a1 = this.plus({ count: 0, division: b.division });
+        var b1 = DUU(b).plus({ count: 0, division: this._unit.division });
+        if (a1.count == b1.count) {
+            return 0;
+        }
+        else {
+            if (a1.count > b1.count) {
+                return 1;
+            }
+            else {
+                return -1;
+            }
+        }
+    };
+    DurationUnitUtil.prototype.moreThen = function (b) {
+        if (this._meterMore(b) == 1) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    DurationUnitUtil.prototype.notMoreThen = function (b) {
+        if (this._meterMore(b) == 1) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    };
+    DurationUnitUtil.prototype.lessThen = function (b) {
+        if (this._meterMore(b) == -1) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    DurationUnitUtil.prototype.notLessThen = function (b) {
+        if (this._meterMore(b) == -1) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    };
+    DurationUnitUtil.prototype.equalsTo = function (b) {
+        if (this._meterMore(b) == 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    DurationUnitUtil.prototype.simplify = function () {
+        var r = this.clone();
+        while (r.division % 3 == 0) {
+            r.division = r.division / 3;
+            r.count = Math.round(r.count / 3);
+        }
+        while (r.division % 2 == 0 && r.count % 2 == 0) {
+            r.division = r.division / 2;
+            r.count = Math.round(r.count / 2);
+        }
+        if (r.division % r.count == 0) {
+            r.division = r.division / r.count;
+            r.count = 1;
+        }
+        return r;
+    };
+    return DurationUnitUtil;
+}());
+function scheduleSecondsDuration(song) {
+    var ss = 0;
+    for (var i = 0; i < song.measures.length; i++) {
+        ss = ss + meter2seconds(song.measures[i].tempo, song.measures[i].meter);
+    }
+    return ss;
+}
+var defaultEmptySchedule = {
+    title: 'Empty project',
+    tracks: [
+        {
+            title: "First", filters: [], percussions: [], instruments: [
+                {
+                    filters: [],
+                    title: 'Single',
+                    instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'none', initial: '' },
+                    measureChords: [{
+                            chords: [
+                                {
+                                    when: { count: 1, division: 4 }, variation: 0,
+                                    envelopes: [{
+                                            pitches: [{ duration: { count: 5, division: 8 }, pitch: 24 },
+                                                { duration: { count: 1, division: 8 }, pitch: 36 }]
+                                        }]
+                                }
+                            ]
+                        },
+                        { chords: [] },
+                        { chords: [] }
+                    ]
+                },
+                {
+                    filters: [],
+                    title: 'Another',
+                    instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'wafinstrument', initial: '33' },
+                    measureChords: [
+                        {
+                            chords: [
+                                {
+                                    when: { count: 0, division: 8 }, variation: 0, envelopes: [{
+                                            pitches: [
+                                                { duration: { count: 1, division: 4 }, pitch: 22 },
+                                                { duration: { count: 0, division: 8 }, pitch: 34 }
+                                            ]
+                                        }]
+                                },
+                                {
+                                    when: { count: 2, division: 8 }, variation: 0, envelopes: [{
+                                            pitches: [
+                                                { duration: { count: 1, division: 8 }, pitch: 22 },
+                                                { duration: { count: 1, division: 8 }, pitch: 46 },
+                                                { duration: { count: 0, division: 8 }, pitch: 34 }
+                                            ]
+                                        }]
+                                },
+                                { when: { count: 4, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 4 }, pitch: 22 }] }] }
+                            ]
+                        },
+                        {
+                            chords: [{ when: { count: 0, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 5 }] }] },
+                                { when: { count: 1, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 17 }] }] },
+                                { when: { count: 2, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 5 }] }] },
+                                { when: { count: 3, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 17 }] }] },
+                                { when: { count: 4, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 29 }] }] },
+                                { when: { count: 5, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 17 }] }] },
+                                { when: { count: 6, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 5 }] }] },
+                                { when: { count: 7, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 17 }] }] }
+                            ]
+                        },
+                        {
+                            chords: [
+                                { when: { count: 0, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] },
+                                { when: { count: 1, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] },
+                                { when: { count: 2, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] },
+                                { when: { count: 3, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] },
+                                { when: { count: 4, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] },
+                                { when: { count: 5, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] },
+                                { when: { count: 6, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 10 }] }] },
+                                { when: { count: 7, division: 8 }, variation: 0, envelopes: [{ pitches: [{ duration: { count: 1, division: 8 }, pitch: 22 }] }] }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            title: "Second", filters: [], percussions: [], instruments: [
+                {
+                    filters: [],
+                    title: 'Another',
+                    instrumentSetting: { instrumentPlugin: null, parameters: [], kind: 'none', initial: '' },
+                    measureChords: [
+                        { chords: [] },
+                        { chords: [] },
+                        {
+                            chords: [{
+                                    when: { count: 1, division: 8 }, variation: 0, envelopes: [
+                                        { pitches: [{ duration: { count: 14, division: 16 }, pitch: 70 }] },
+                                        { pitches: [{ duration: { count: 14, division: 16 }, pitch: 77 }] }
+                                    ]
+                                }]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    filters: [
+        {
+            filterPlugin: null,
+            parameters: [{
+                    points: [
+                        { skipMeasures: 0, skipSteps: { count: 0, division: 2 }, velocity: 99 },
+                        { skipMeasures: 1, skipSteps: { count: 1, division: 2 }, velocity: 22 },
+                        { skipMeasures: 0, skipSteps: { count: 1, division: 32 }, velocity: 72 }
+                    ],
+                    caption: 'test gain'
+                }],
+            kind: 'gain',
+            initial: ''
+        }
+    ],
+    measures: [
+        { meter: { count: 3, division: 4 }, tempo: 120, points: [] },
+        { meter: { count: 4, division: 4 }, tempo: 90, points: [] },
+        { meter: { count: 4, division: 4 }, tempo: 150, points: [] }
+    ],
+    harmony: { tone: '', mode: '', progression: [] }
+};
+var ZvoogPluginLock = (function () {
+    function ZvoogPluginLock() {
+    }
+    ZvoogPluginLock.prototype.lock = function () {
+        this.lockedState = true;
+    };
+    ZvoogPluginLock.prototype.unlock = function () {
+        this.lockedState = false;
+    };
+    ZvoogPluginLock.prototype.locked = function () {
+        return this.lockedState;
+    };
+    return ZvoogPluginLock;
+}());
+var RangedAudioParam120 = (function () {
+    function RangedAudioParam120(base, min, max) {
+        this.baseParam = base;
+        this.minValue = min;
+        this.maxValue = max;
+    }
+    RangedAudioParam120.prototype.recalulate = function (value) {
+        if (value < 0)
+            console.log('wrong 1-119', value);
+        if (value < 0)
+            value = 0;
+        if (value > 119)
+            value = 119;
+        var ratio = (this.maxValue - this.minValue) / 119;
+        var nn = this.minValue + value * ratio;
+        return nn;
+    };
+    RangedAudioParam120.prototype.cancelScheduledValues = function (cancelTime) {
+        this.baseParam.cancelScheduledValues(cancelTime);
+    };
+    RangedAudioParam120.prototype.linearRampToValueAtTime = function (value, endTime) {
+        this.baseParam.linearRampToValueAtTime(this.recalulate(value), endTime);
+    };
+    RangedAudioParam120.prototype.setValueAtTime = function (value, startTime) {
+        this.baseParam.setValueAtTime(this.recalulate(value), startTime);
+    };
+    return RangedAudioParam120;
+}());
 //# sourceMappingURL=muzxboxapp.js.map
