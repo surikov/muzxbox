@@ -21,7 +21,7 @@ let rowsVisibleCount = 80;
 let rowsAvgCount = 5;
 let ratioPre=0.5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
-let tailOrder=0;
+//let tailOrder=0;
 //let prewide=5;
 let markLines: { fromX: number, fromY: number, toX: number, toY: number }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
@@ -409,18 +409,24 @@ function sobstvennoe(balls: number[]):number{
 }
 function addTails(){
 	markLines = [];
-	tailOrder++;
-	if(tailOrder>ballsInRow)tailOrder=0;
-	if(tailOrder){
+	//tailOrder++;
+	//if(tailOrder>ballsInRow)tailOrder=0;
+	//if(tailOrder){
 		//let cntEx=0;
 		//let cntNo=0;
 		let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
 		for(let ii=1;ii<slicedrows.length-1-1;ii++){
-			let bb=tailOrder-1;
+			//let bb=tailOrder-1;
 			markLines.push({
-				fromX: slicedrows[ii].balls[bb]-1
+				fromX: slicedrows[ii].balls[0]-1
 				, fromY: Math.round(topShift/cellSize)+skipRowsCount +ii
-				, toX: slicedrows[ii+1].balls[bb]-1
+				, toX: slicedrows[ii+1].balls[0]-1
+				, toY: Math.round(topShift/cellSize)+skipRowsCount +ii+1
+			});
+			markLines.push({
+				fromX: slicedrows[ii].balls[ballsInRow-1]-1
+				, fromY: Math.round(topShift/cellSize)+skipRowsCount +ii
+				, toX: slicedrows[ii+1].balls[ballsInRow-1]-1
 				, toY: Math.round(topShift/cellSize)+skipRowsCount +ii+1
 			});
 			/*
@@ -437,7 +443,7 @@ function addTails(){
 			*/
 		}
 		//console.log(cntEx/(cntEx+cntNo));
-	}
+	//}
 	fillCells();
 }
 /////////////////

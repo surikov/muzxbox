@@ -13,7 +13,7 @@ var rowsVisibleCount = 80;
 var rowsAvgCount = 5;
 var ratioPre = 0.5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
-var tailOrder = 0;
+//let tailOrder=0;
 //let prewide=5;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
@@ -384,36 +384,41 @@ function sobstvennoe(balls) {
 }
 function addTails() {
     markLines = [];
-    tailOrder++;
-    if (tailOrder > ballsInRow)
-        tailOrder = 0;
-    if (tailOrder) {
-        //let cntEx=0;
-        //let cntNo=0;
-        var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
-        for (var ii = 1; ii < slicedrows.length - 1 - 1; ii++) {
-            var bb = tailOrder - 1;
-            markLines.push({
-                fromX: slicedrows[ii].balls[bb] - 1,
-                fromY: Math.round(topShift / cellSize) + skipRowsCount + ii,
-                toX: slicedrows[ii + 1].balls[bb] - 1,
-                toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
-            });
-            /*
-            let rr='no';
-            let prime=sobstvennoe(slicedrows[ii].balls);
-            if(slicedrows[ii-1].balls.indexOf(Math.abs(prime)) >-1){
-            //if(slicedrows[ii-1].balls.indexOf(14)>-1){//{Math.abs(prime)) >-1){
-                rr='true';
-                cntEx++;
-            }else{
-                cntNo++;
-            }
-            //console.log(rr,slicedrows[ii],prime);
-            */
+    //tailOrder++;
+    //if(tailOrder>ballsInRow)tailOrder=0;
+    //if(tailOrder){
+    //let cntEx=0;
+    //let cntNo=0;
+    var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
+    for (var ii = 1; ii < slicedrows.length - 1 - 1; ii++) {
+        //let bb=tailOrder-1;
+        markLines.push({
+            fromX: slicedrows[ii].balls[0] - 1,
+            fromY: Math.round(topShift / cellSize) + skipRowsCount + ii,
+            toX: slicedrows[ii + 1].balls[0] - 1,
+            toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
+        });
+        markLines.push({
+            fromX: slicedrows[ii].balls[ballsInRow - 1] - 1,
+            fromY: Math.round(topShift / cellSize) + skipRowsCount + ii,
+            toX: slicedrows[ii + 1].balls[ballsInRow - 1] - 1,
+            toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
+        });
+        /*
+        let rr='no';
+        let prime=sobstvennoe(slicedrows[ii].balls);
+        if(slicedrows[ii-1].balls.indexOf(Math.abs(prime)) >-1){
+        //if(slicedrows[ii-1].balls.indexOf(14)>-1){//{Math.abs(prime)) >-1){
+            rr='true';
+            cntEx++;
+        }else{
+            cntNo++;
         }
-        //console.log(cntEx/(cntEx+cntNo));
+        //console.log(rr,slicedrows[ii],prime);
+        */
     }
+    //console.log(cntEx/(cntEx+cntNo));
+    //}
     fillCells();
 }
 /////////////////
