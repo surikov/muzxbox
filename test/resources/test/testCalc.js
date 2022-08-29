@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.31 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.32 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -384,14 +384,8 @@ function sobstvennoe(balls) {
 }
 function addTails() {
     markLines = [];
-    //tailOrder++;
-    //if(tailOrder>ballsInRow)tailOrder=0;
-    //if(tailOrder){
-    //let cntEx=0;
-    //let cntNo=0;
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
     for (var ii = 1; ii < slicedrows.length - 1 - 1; ii++) {
-        //let bb=tailOrder-1;
         markLines.push({
             fromX: slicedrows[ii].balls[0] - 1,
             fromY: Math.round(topShift / cellSize) + skipRowsCount + ii,
@@ -404,21 +398,19 @@ function addTails() {
             toX: slicedrows[ii + 1].balls[ballsInRow - 1] - 1,
             toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
         });
-        /*
-        let rr='no';
-        let prime=sobstvennoe(slicedrows[ii].balls);
-        if(slicedrows[ii-1].balls.indexOf(Math.abs(prime)) >-1){
-        //if(slicedrows[ii-1].balls.indexOf(14)>-1){//{Math.abs(prime)) >-1){
-            rr='true';
-            cntEx++;
-        }else{
-            cntNo++;
-        }
-        //console.log(rr,slicedrows[ii],prime);
-        */
+        markLines.push({
+            fromX: slicedrows[ii].balls[0] - 1 + rowLen,
+            fromY: Math.round(topShift / cellSize) + skipRowsCount + ii,
+            toX: slicedrows[ii + 1].balls[0] - 1 + rowLen,
+            toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
+        });
+        markLines.push({
+            fromX: slicedrows[ii].balls[ballsInRow - 1] - 1 + rowLen,
+            fromY: Math.round(topShift / cellSize) + skipRowsCount + ii,
+            toX: slicedrows[ii + 1].balls[ballsInRow - 1] - 1 + rowLen,
+            toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
+        });
     }
-    //console.log(cntEx/(cntEx+cntNo));
-    //}
     fillCells();
 }
 /////////////////

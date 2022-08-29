@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.31 '+dataName+': '+ballsInRow+'/'+rowLen;
+let sversion = 'v1.32 '+dataName+': '+ballsInRow+'/'+rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -409,41 +409,33 @@ function sobstvennoe(balls: number[]):number{
 }
 function addTails(){
 	markLines = [];
-	//tailOrder++;
-	//if(tailOrder>ballsInRow)tailOrder=0;
-	//if(tailOrder){
-		//let cntEx=0;
-		//let cntNo=0;
-		let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
-		for(let ii=1;ii<slicedrows.length-1-1;ii++){
-			//let bb=tailOrder-1;
-			markLines.push({
-				fromX: slicedrows[ii].balls[0]-1
-				, fromY: Math.round(topShift/cellSize)+skipRowsCount +ii
-				, toX: slicedrows[ii+1].balls[0]-1
-				, toY: Math.round(topShift/cellSize)+skipRowsCount +ii+1
-			});
-			markLines.push({
-				fromX: slicedrows[ii].balls[ballsInRow-1]-1
-				, fromY: Math.round(topShift/cellSize)+skipRowsCount +ii
-				, toX: slicedrows[ii+1].balls[ballsInRow-1]-1
-				, toY: Math.round(topShift/cellSize)+skipRowsCount +ii+1
-			});
-			/*
-			let rr='no';
-			let prime=sobstvennoe(slicedrows[ii].balls);
-			if(slicedrows[ii-1].balls.indexOf(Math.abs(prime)) >-1){
-			//if(slicedrows[ii-1].balls.indexOf(14)>-1){//{Math.abs(prime)) >-1){
-				rr='true';
-				cntEx++;
-			}else{
-				cntNo++;
-			}
-			//console.log(rr,slicedrows[ii],prime);
-			*/
-		}
-		//console.log(cntEx/(cntEx+cntNo));
-	//}
+	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
+	for(let ii=1;ii<slicedrows.length-1-1;ii++){
+		markLines.push({
+			fromX: slicedrows[ii].balls[0]-1
+			, fromY: Math.round(topShift/cellSize)+skipRowsCount +ii
+			, toX: slicedrows[ii+1].balls[0]-1
+			, toY: Math.round(topShift/cellSize)+skipRowsCount +ii+1
+		});
+		markLines.push({
+			fromX: slicedrows[ii].balls[ballsInRow-1]-1
+			, fromY: Math.round(topShift/cellSize)+skipRowsCount +ii
+			, toX: slicedrows[ii+1].balls[ballsInRow-1]-1
+			, toY: Math.round(topShift/cellSize)+skipRowsCount +ii+1
+		});
+		markLines.push({
+			fromX: slicedrows[ii].balls[0]-1+rowLen
+			, fromY: Math.round(topShift/cellSize)+skipRowsCount +ii
+			, toX: slicedrows[ii+1].balls[0]-1+rowLen
+			, toY: Math.round(topShift/cellSize)+skipRowsCount +ii+1
+		});
+		markLines.push({
+			fromX: slicedrows[ii].balls[ballsInRow-1]-1+rowLen
+			, fromY: Math.round(topShift/cellSize)+skipRowsCount +ii
+			, toX: slicedrows[ii+1].balls[ballsInRow-1]-1+rowLen
+			, toY: Math.round(topShift/cellSize)+skipRowsCount +ii+1
+		});
+	}
 	fillCells();
 }
 /////////////////
