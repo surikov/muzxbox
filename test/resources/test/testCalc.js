@@ -13,6 +13,7 @@ var rowsVisibleCount = 80;
 var rowsAvgCount = 5;
 var ratioPre = 0.5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
+var tailOrder = 0;
 //let prewide=5;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
@@ -47,6 +48,8 @@ function readParseStat(dataBalls) {
                 var ballnum = 1 * arr[k];
                 row.balls.push(ballnum);
             }
+            row.balls.sort(function (a, b) { return a - b; });
+            //console.log(row.balls);
             row.key = dataBalls[i - 1].trim();
             row.key = row.key.replace(':00', ':00 #');
             row.key = row.key.replace(':30', ':30 #');
@@ -353,6 +356,64 @@ function toggleRatioPre() {
         ratioPre = 0.99;
     else
         ratioPre = 0.5;
+    fillCells();
+}
+function sobstvennoe(balls) {
+    //console.log(balls);
+    var pre = balls;
+    //let prepre:number[]=[];
+    var nxt = [];
+    while (1 == 1) {
+        //console.log(pre,nxt);
+        nxt = [];
+        for (var bb = 1; bb < pre.length; bb++) {
+            nxt.push(Math.abs(pre[bb - 1] - pre[bb]));
+        }
+        //console.log(nxt);
+        if (nxt.length < 2)
+            break;
+        pre = [];
+        for (var bb = 0; bb < nxt.length; bb++) {
+            pre[bb] = nxt[bb];
+        }
+    }
+    var r0 = nxt[0];
+    if (r0 < 2)
+        r0 = -(pre[1] + pre[0]);
+    return r0;
+}
+function addTails() {
+    markLines = [];
+    tailOrder++;
+    if (tailOrder > ballsInRow)
+        tailOrder = 0;
+    if (tailOrder) {
+        //let cntEx=0;
+        //let cntNo=0;
+        var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
+        for (var ii = 1; ii < slicedrows.length - 1 - 1; ii++) {
+            var bb = tailOrder - 1;
+            markLines.push({
+                fromX: slicedrows[ii].balls[bb] - 1,
+                fromY: Math.round(topShift / cellSize) + skipRowsCount + ii,
+                toX: slicedrows[ii + 1].balls[bb] - 1,
+                toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
+            });
+            /*
+            let rr='no';
+            let prime=sobstvennoe(slicedrows[ii].balls);
+            if(slicedrows[ii-1].balls.indexOf(Math.abs(prime)) >-1){
+            //if(slicedrows[ii-1].balls.indexOf(14)>-1){//{Math.abs(prime)) >-1){
+                rr='true';
+                cntEx++;
+            }else{
+                cntNo++;
+            }
+            //console.log(rr,slicedrows[ii],prime);
+            */
+        }
+        //console.log(cntEx/(cntEx+cntNo));
+    }
     fillCells();
 }
 /////////////////

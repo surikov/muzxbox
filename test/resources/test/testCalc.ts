@@ -21,6 +21,7 @@ let rowsVisibleCount = 80;
 let rowsAvgCount = 5;
 let ratioPre=0.5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
+let tailOrder=0;
 //let prewide=5;
 let markLines: { fromX: number, fromY: number, toX: number, toY: number }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
@@ -59,6 +60,8 @@ function readParseStat(dataBalls: string[]): BallsRow[] {
 				var ballnum: number = 1 * ((arr[k] as unknown) as number);
 				row.balls.push(ballnum);
 			}
+			row.balls.sort((a, b) => a-b);
+			//console.log(row.balls);
 			row.key = dataBalls[i - 1].trim();
 			row.key = row.key.replace(':00', ':00 #');
 			row.key = row.key.replace(':30', ':30 #');
@@ -381,6 +384,63 @@ function toggleRatioPre(){
 	else ratioPre=0.5;
 	fillCells();
 }
+function sobstvennoe(balls: number[]):number{
+	//console.log(balls);
+	let pre:number[]=balls;
+	//let prepre:number[]=[];
+	let nxt:number[]=[];
+	while(1==1){
+		//console.log(pre,nxt);
+		nxt=[];
+		for(let bb=1;bb<pre.length;bb++){
+			nxt.push(Math.abs(pre[bb-1]-pre[bb]));
+		}
+		//console.log(nxt);
+		if(nxt.length<2)break;
+		pre=[];
+		for(let bb=0;bb<nxt.length;bb++){
+			pre[bb]=nxt[bb];
+		}
+		
+	}
+	let r0=nxt[0];
+	if(r0<2)r0=-(pre[1]+pre[0]);
+	return r0;
+}
+function addTails(){
+	markLines = [];
+	tailOrder++;
+	if(tailOrder>ballsInRow)tailOrder=0;
+	if(tailOrder){
+		//let cntEx=0;
+		//let cntNo=0;
+		let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
+		for(let ii=1;ii<slicedrows.length-1-1;ii++){
+			let bb=tailOrder-1;
+			markLines.push({
+				fromX: slicedrows[ii].balls[bb]-1
+				, fromY: Math.round(topShift/cellSize)+skipRowsCount +ii
+				, toX: slicedrows[ii+1].balls[bb]-1
+				, toY: Math.round(topShift/cellSize)+skipRowsCount +ii+1
+			});
+			/*
+			let rr='no';
+			let prime=sobstvennoe(slicedrows[ii].balls);
+			if(slicedrows[ii-1].balls.indexOf(Math.abs(prime)) >-1){
+			//if(slicedrows[ii-1].balls.indexOf(14)>-1){//{Math.abs(prime)) >-1){
+				rr='true';
+				cntEx++;
+			}else{
+				cntNo++;
+			}
+			//console.log(rr,slicedrows[ii],prime);
+			*/
+		}
+		//console.log(cntEx/(cntEx+cntNo));
+	}
+	fillCells();
+}
 /////////////////
 init();
 fillCells();
+
