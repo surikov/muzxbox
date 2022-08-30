@@ -9,10 +9,11 @@ var markX = -1;
 var markY = -1;
 var cellSize = 12;
 var topShift = cellSize * 11;
-var rowsVisibleCount = 80;
+var rowsVisibleCount = 44;
 var rowsAvgCount = 5;
 var ratioPre = 0.5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
+var reduceRatio = 1;
 //let tailOrder=0;
 //let prewide=5;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
@@ -20,10 +21,21 @@ function dumpInfo(r) {
     var msgp = document.getElementById('msgp');
     msgp.innerText = sversion + ': ' + r;
 }
+/*
+function reducedRows(ech:number,rows: BallsRow[]): BallsRow[]{
+    let newrows: BallsRow[]=[];
+    for(let i=0;i<rows.length;i=i+ech){
+        newrows.push(rows[i]);
+    }
+    return newrows;
+}*/
 function sliceRows(rows, firstRowNum, lastRowNum) {
     var sliced = [];
+    var nn = firstRowNum;
     for (var i = firstRowNum; i <= lastRowNum; i++) {
-        sliced.push(rows[i]);
+        //sliced.push(rows[i]);
+        sliced.push(rows[nn]);
+        nn = nn + reduceRatio;
     }
     return sliced;
 }
@@ -59,13 +71,15 @@ function readParseStat(dataBalls) {
     return rows;
 }
 function ballExists(ball, row) {
-    while (ball < 1)
-        ball = ball + rowLen;
-    while (ball > rowLen)
-        ball = ball - rowLen;
-    for (var i = 0; i < row.balls.length; i++) {
-        if (row.balls[i] == ball) {
-            return true;
+    if (row) {
+        while (ball < 1)
+            ball = ball + rowLen;
+        while (ball > rowLen)
+            ball = ball - rowLen;
+        for (var i = 0; i < row.balls.length; i++) {
+            if (row.balls[i] == ball) {
+                return true;
+            }
         }
     }
     return false;
@@ -214,14 +228,16 @@ function drawStat3(svg, rows) {
     drawLines();
     addRect(svg, rowLen * cellSize + cellSize / 2, 0, rowLen * cellSize, cellSize, '#eee');
     for (var rowNum = 0; rowNum < rowsVisibleCount; rowNum++) {
-        addSmallText(svg, 2 * rowLen * cellSize + 2, topShift + (1 + rowNum) * cellSize - 2, rows[rowNum].key);
-        for (var colNum = 1; colNum <= rowLen; colNum++) {
-            if (ballExists(colNum, rows[rowNum])) {
-                if (rowNum > 0 || showFirstRow) {
-                    addCircle(svg, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 5 - 0.5, '#ff0000ff', '#ff0000ff');
-                }
-                if (rowNum > 0 || showFirstRow) {
-                    addCircle(svg, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 5 - 0.5, '#ff0000ff', '#ff0000ff');
+        if (rows[rowNum]) {
+            addSmallText(svg, 2 * rowLen * cellSize + 2, topShift + (1 + rowNum) * cellSize - 2, rows[rowNum].key);
+            for (var colNum = 1; colNum <= rowLen; colNum++) {
+                if (ballExists(colNum, rows[rowNum])) {
+                    if (rowNum > 0 || showFirstRow) {
+                        addCircle(svg, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 5 - 0.5, '#ff0000ff', '#ff0000ff');
+                    }
+                    if (rowNum > 0 || showFirstRow) {
+                        addCircle(svg, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 5 - 0.5, '#ff0000ff', '#ff0000ff');
+                    }
                 }
             }
         }
@@ -238,6 +254,7 @@ function triadFills(ball, rowNum, dx1, dx2, rows) {
 }
 function calcTriads(rowNum, dx1, dx2, rows) {
     var cnt = 0;
+    //console.log(rowNum,rows.length);
     for (var ii = 0; ii < rowLen; ii++) {
         if (triadExists(ii + 1, rowNum, dx1, dx2, rows)) {
             cnt++;
@@ -297,6 +314,9 @@ function calcRowFills(rowNum, rows, counts) {
 }
 function dumpTriads(svg, rows) {
     for (var rr = 0; rr < rowsVisibleCount; rr++) {
+        if (rr > rows.length - 6)
+            break;
+        //console.log(rr,rows.length);
         var precounts = calcRowPatterns(rr + 1, rows);
         var calcs = calcRowFills(rr, rows, precounts);
         var minCnt = 99999;
@@ -332,9 +352,11 @@ function fillCells() {
     for(let ii=0;ii<10;ii++){
         console.log(calcRowPatterns(ii+0,slicedrows));
     }*/
+    console.log('reduceRatio', reduceRatio);
 }
 function clickHop() {
-    skipRowsCount = Math.round(Math.random() * (datarows.length - 100));
+    console.log(datarows.length, reduceRatio);
+    skipRowsCount = Math.round(Math.random() * (datarows.length / reduceRatio - 100));
     fillCells();
 }
 function toggleFirst() {
@@ -345,8 +367,8 @@ function clickGoSkip(nn) {
     skipRowsCount = skipRowsCount + nn;
     if (skipRowsCount < 0)
         skipRowsCount = 0;
-    if (skipRowsCount > datarows.length - 200)
-        skipRowsCount = datarows.length - 200;
+    if (skipRowsCount > datarows.length / reduceRatio - 200)
+        skipRowsCount = datarows.length / reduceRatio - 200;
     fillCells();
 }
 function toggleRatioPre() {
@@ -356,6 +378,16 @@ function toggleRatioPre() {
         ratioPre = 0.99;
     else
         ratioPre = 0.5;
+    fillCells();
+}
+function moreReduceRatio() {
+    reduceRatio = reduceRatio + 1;
+    fillCells();
+}
+function lessReduceRatio() {
+    reduceRatio = reduceRatio - 1;
+    if (reduceRatio < 1)
+        reduceRatio = 1;
     fillCells();
 }
 function sobstvennoe(balls) {

@@ -17,10 +17,11 @@ let markX = -1;
 let markY = -1;
 let cellSize = 12;
 let topShift = cellSize * 11;
-let rowsVisibleCount = 80;
+let rowsVisibleCount = 44;
 let rowsAvgCount = 5;
 let ratioPre=0.5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
+let reduceRatio=1;
 //let tailOrder=0;
 //let prewide=5;
 let markLines: { fromX: number, fromY: number, toX: number, toY: number }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
@@ -32,10 +33,21 @@ function dumpInfo(r: number) {
 	var msgp: HTMLElement = (document.getElementById('msgp') as any) as HTMLElement;
 	msgp.innerText = sversion + ': ' + r;
 }
+/*
+function reducedRows(ech:number,rows: BallsRow[]): BallsRow[]{
+	let newrows: BallsRow[]=[];
+	for(let i=0;i<rows.length;i=i+ech){
+		newrows.push(rows[i]);
+	}
+	return newrows;
+}*/
 function sliceRows(rows: BallsRow[], firstRowNum: number, lastRowNum: number): BallsRow[] {
 	var sliced: BallsRow[] = [];
+	let nn=firstRowNum;
 	for (var i = firstRowNum; i <= lastRowNum; i++) {
-		sliced.push(rows[i]);
+		//sliced.push(rows[i]);
+		sliced.push(rows[nn]);
+		nn=nn+reduceRatio;
 	}
 	return sliced;
 }
@@ -71,11 +83,13 @@ function readParseStat(dataBalls: string[]): BallsRow[] {
 	return rows;
 }
 function ballExists(ball: number, row: BallsRow): boolean {
-	while (ball < 1) ball = ball + rowLen;
-	while (ball > rowLen) ball = ball - rowLen;
-	for (var i = 0; i < row.balls.length; i++) {
-		if (row.balls[i] == ball) {
-			return true;
+	if(row){
+		while (ball < 1) ball = ball + rowLen;
+		while (ball > rowLen) ball = ball - rowLen;
+		for (var i = 0; i < row.balls.length; i++) {
+			if (row.balls[i] == ball) {
+				return true;
+			}
 		}
 	}
 	return false;
@@ -231,20 +245,22 @@ function drawStat3(svg: SVGElement, rows: BallsRow[]){
 	drawLines();
 	addRect(svg, rowLen * cellSize + cellSize / 2, 0, rowLen * cellSize, cellSize, '#eee');
 	for (let rowNum = 0; rowNum < rowsVisibleCount; rowNum++) {
-		addSmallText(svg, 2 * rowLen * cellSize + 2, topShift + (1 + rowNum) * cellSize - 2, rows[rowNum].key);
-		for (let colNum = 1; colNum <= rowLen; colNum++) {
-			if(ballExists(colNum,rows[rowNum])){
-				if (rowNum > 0 || showFirstRow) {
-					addCircle(svg
-						, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize
-						, topShift + 0.5 * cellSize + rowNum * cellSize
-						, cellSize / 5 - 0.5, '#ff0000ff', '#ff0000ff');
-				}
-				if (rowNum > 0 || showFirstRow) {
-					addCircle(svg
-						, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize
-						, topShift + 0.5 * cellSize + rowNum * cellSize
-						, cellSize / 5 - 0.5, '#ff0000ff', '#ff0000ff');
+		if(rows[rowNum]){
+			addSmallText(svg, 2 * rowLen * cellSize + 2, topShift + (1 + rowNum) * cellSize - 2, rows[rowNum].key);
+			for (let colNum = 1; colNum <= rowLen; colNum++) {
+				if(ballExists(colNum,rows[rowNum])){
+					if (rowNum > 0 || showFirstRow) {
+						addCircle(svg
+							, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize
+							, topShift + 0.5 * cellSize + rowNum * cellSize
+							, cellSize / 5 - 0.5, '#ff0000ff', '#ff0000ff');
+					}
+					if (rowNum > 0 || showFirstRow) {
+						addCircle(svg
+							, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize
+							, topShift + 0.5 * cellSize + rowNum * cellSize
+							, cellSize / 5 - 0.5, '#ff0000ff', '#ff0000ff');
+					}
 				}
 			}
 		}
@@ -261,6 +277,7 @@ function triadFills(ball:number,rowNum:number,dx1:number,dx2:number,rows: BallsR
 }
 function calcTriads(rowNum:number,dx1:number,dx2:number,rows: BallsRow[]):number{
 	let cnt=0;
+	//console.log(rowNum,rows.length);
 	for(let ii=0;ii<rowLen;ii++){
 		if(triadExists(ii+1,rowNum,dx1,dx2,rows)){
 			cnt++;
@@ -320,6 +337,8 @@ function calcRowFills(rowNum:number,rows: BallsRow[],counts:number[]):{ball:numb
 }
 function dumpTriads(svg: SVGElement, rows: BallsRow[]){
 	for (let rr = 0; rr < rowsVisibleCount; rr++) {
+		if(rr>rows.length-6)break;
+		//console.log(rr,rows.length);
 		let precounts=calcRowPatterns(rr+1,rows);
 		let calcs=calcRowFills(rr,rows,precounts);
 		let minCnt=99999;
@@ -363,9 +382,11 @@ function fillCells() {
 	for(let ii=0;ii<10;ii++){
 		console.log(calcRowPatterns(ii+0,slicedrows));
 	}*/
+	console.log('reduceRatio',reduceRatio);
 }
 function clickHop() {
-	skipRowsCount = Math.round(Math.random() * (datarows.length - 100));
+	console.log(datarows.length,reduceRatio);
+	skipRowsCount = Math.round(Math.random() * (datarows.length/reduceRatio - 100));
 	fillCells();
 }
 function toggleFirst(){
@@ -375,13 +396,22 @@ function toggleFirst(){
 function clickGoSkip(nn: number) {
 	skipRowsCount = skipRowsCount + nn;
 	if (skipRowsCount < 0) skipRowsCount = 0;
-	if (skipRowsCount > datarows.length - 200) skipRowsCount = datarows.length - 200;
+	if (skipRowsCount > datarows.length/reduceRatio - 200) skipRowsCount = datarows.length/reduceRatio - 200;
 	fillCells();
 }
 function toggleRatioPre(){
 	if(ratioPre==0.5)ratioPre=0.75;
 	else if(ratioPre==0.75)ratioPre=0.99;
 	else ratioPre=0.5;
+	fillCells();
+}
+function moreReduceRatio(){
+	reduceRatio=reduceRatio+1;
+	fillCells();
+}
+function lessReduceRatio(){
+	reduceRatio=reduceRatio-1;
+	if(reduceRatio<1)reduceRatio=1;
 	fillCells();
 }
 function sobstvennoe(balls: number[]):number{
