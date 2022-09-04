@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.32 '+dataName+': '+ballsInRow+'/'+rowLen;
+let sversion = 'v1.33 '+dataName+': '+ballsInRow+'/'+rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -383,6 +383,8 @@ function fillCells() {
 		console.log(calcRowPatterns(ii+0,slicedrows));
 	}*/
 	console.log('reduceRatio',reduceRatio);
+	var msgp: HTMLElement = (document.getElementById('stepsize') as any) as HTMLElement;
+	msgp.innerText = ''+reduceRatio;
 }
 function clickHop() {
 	console.log(datarows.length,reduceRatio);

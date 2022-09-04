@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.32 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.33 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -353,6 +353,8 @@ function fillCells() {
         console.log(calcRowPatterns(ii+0,slicedrows));
     }*/
     console.log('reduceRatio', reduceRatio);
+    var msgp = document.getElementById('stepsize');
+    msgp.innerText = '' + reduceRatio;
 }
 function clickHop() {
     console.log(datarows.length, reduceRatio);
