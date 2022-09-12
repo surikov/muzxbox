@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.33 '+dataName+': '+ballsInRow+'/'+rowLen;
+let sversion = 'v1.34 '+dataName+': '+ballsInRow+'/'+rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -396,10 +396,15 @@ function toggleFirst(){
 	fillCells();
 }
 function clickGoSkip(nn: number) {
-	skipRowsCount = skipRowsCount + nn;
-	if (skipRowsCount < 0) skipRowsCount = 0;
-	if (skipRowsCount > datarows.length/reduceRatio - 200) skipRowsCount = datarows.length/reduceRatio - 200;
-	fillCells();
+	console.log('clickGoSkip',nn,nn*reduceRatio,skipRowsCount,datarows.length);
+	if (skipRowsCount + nn*reduceRatio >= 0){
+		if (skipRowsCount + nn*reduceRatio < datarows.length - 200){
+			skipRowsCount = skipRowsCount + nn*reduceRatio;
+			//if (skipRowsCount < 0) skipRowsCount = 0;
+			//if (skipRowsCount > datarows.length/reduceRatio - 200) skipRowsCount = datarows.length/reduceRatio - 200;
+			fillCells();
+		}
+	}
 }
 function toggleRatioPre(){
 	if(ratioPre==0.5)ratioPre=0.75;
