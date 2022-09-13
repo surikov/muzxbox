@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.34 '+dataName+': '+ballsInRow+'/'+rowLen;
+let sversion = 'v1.35 '+dataName+': '+ballsInRow+'/'+rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -184,6 +184,7 @@ function init() {
 	datarows = readParseStat(dataBalls);
 	console.log(datarows);
 }
+/*
 function randomizeData(originalrows: BallsRow[]) {
 	let json=JSON.stringify(originalrows);
 	let rows=JSON.parse(json);
@@ -193,7 +194,7 @@ function randomizeData(originalrows: BallsRow[]) {
 		}
 	}
 	return rows;
-}
+}*/
 function clickClearLines() {
 	markLines = [];
 	drawLines();
@@ -229,9 +230,12 @@ function clickFog(vnt) {
 	mark.setAttribute('y', cellSize * (markY - skipRowsCount) - 0.25 * cellSize);
 	drawLines();
 }
-function drawLines() {
+function drawLines() {//reduceRatio
 	clearSVGgroup(linesLevel);
+	console.log(markLines);
 	for (let i = 0; i < markLines.length; i++) {
+		//let fy=markLines[i].fromY - skipRowsCount;
+		//let ty=markLines[i].toY - skipRowsCount;
 		composeLine(linesLevel
 			, markLines[i].fromX * cellSize + 0.5 * cellSize
 			, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize
@@ -402,6 +406,10 @@ function clickGoSkip(nn: number) {
 			skipRowsCount = skipRowsCount + nn*reduceRatio;
 			//if (skipRowsCount < 0) skipRowsCount = 0;
 			//if (skipRowsCount > datarows.length/reduceRatio - 200) skipRowsCount = datarows.length/reduceRatio - 200;
+			for (let i = 0; i < markLines.length; i++) {
+				markLines[i].fromY=markLines[i].fromY+nn*(reduceRatio-1);
+				markLines[i].toY=markLines[i].toY+nn*(reduceRatio-1);
+			}
 			fillCells();
 		}
 	}
@@ -417,8 +425,16 @@ function moreReduceRatio(){
 	fillCells();
 }
 function lessReduceRatio(){
+	/*for (let i = 0; i < markLines.length; i++) {
+		markLines[i].fromY=markLines[i].fromY/reduceRatio;
+		markLines[i].toY=markLines[i].toY*reduceRatio;
+	}*/
 	reduceRatio=reduceRatio-1;
 	if(reduceRatio<1)reduceRatio=1;
+	/*for (let i = 0; i < markLines.length; i++) {
+		markLines[i].fromY=markLines[i].fromY/reduceRatio;
+		markLines[i].toY=markLines[i].toY*reduceRatio;
+	}*/
 	fillCells();
 }
 function sobstvennoe(balls: number[]):number{

@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.34 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.35 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -173,16 +173,17 @@ function init() {
     datarows = readParseStat(dataBalls);
     console.log(datarows);
 }
-function randomizeData(originalrows) {
-    var json = JSON.stringify(originalrows);
-    var rows = JSON.parse(json);
-    for (var i = 0; i < rows.length; i++) {
-        for (var nn = 0; nn < ballsInRow; nn++) {
+/*
+function randomizeData(originalrows: BallsRow[]) {
+    let json=JSON.stringify(originalrows);
+    let rows=JSON.parse(json);
+    for (let i = 0; i < rows.length; i++) {
+        for (let nn = 0; nn < ballsInRow; nn++) {
             rows[i].balls[nn] = Math.floor(Math.random() * 50);
         }
     }
     return rows;
-}
+}*/
 function clickClearLines() {
     markLines = [];
     drawLines();
@@ -220,7 +221,10 @@ function clickFog(vnt) {
 }
 function drawLines() {
     clearSVGgroup(linesLevel);
+    console.log(markLines);
     for (var i = 0; i < markLines.length; i++) {
+        //let fy=markLines[i].fromY - skipRowsCount;
+        //let ty=markLines[i].toY - skipRowsCount;
         composeLine(linesLevel, markLines[i].fromX * cellSize + 0.5 * cellSize, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize, markLines[i].toX * cellSize + 0.5 * cellSize, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize, cellSize / 0.99, '#ffff0099');
     }
 }
@@ -372,6 +376,10 @@ function clickGoSkip(nn) {
             skipRowsCount = skipRowsCount + nn * reduceRatio;
             //if (skipRowsCount < 0) skipRowsCount = 0;
             //if (skipRowsCount > datarows.length/reduceRatio - 200) skipRowsCount = datarows.length/reduceRatio - 200;
+            for (var i = 0; i < markLines.length; i++) {
+                markLines[i].fromY = markLines[i].fromY + nn * (reduceRatio - 1);
+                markLines[i].toY = markLines[i].toY + nn * (reduceRatio - 1);
+            }
             fillCells();
         }
     }
@@ -390,9 +398,17 @@ function moreReduceRatio() {
     fillCells();
 }
 function lessReduceRatio() {
+    /*for (let i = 0; i < markLines.length; i++) {
+        markLines[i].fromY=markLines[i].fromY/reduceRatio;
+        markLines[i].toY=markLines[i].toY*reduceRatio;
+    }*/
     reduceRatio = reduceRatio - 1;
     if (reduceRatio < 1)
         reduceRatio = 1;
+    /*for (let i = 0; i < markLines.length; i++) {
+        markLines[i].fromY=markLines[i].fromY/reduceRatio;
+        markLines[i].toY=markLines[i].toY*reduceRatio;
+    }*/
     fillCells();
 }
 function sobstvennoe(balls) {
