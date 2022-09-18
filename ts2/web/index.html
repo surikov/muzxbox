@@ -19,15 +19,28 @@
 			<stop offset="0%" stop-color=var(--background_base)></stop>
 			<stop offset="100%" stop-color=var(--secondary_lite)></stop>
 		</radialGradient >
-        <g id='debugLayerGroup'></g>
+		<g id='gridLayerGroup'></g>
+
+		<g id='auxiliaryLayerGroup'></g>
+		<g id='secondaryLayerGroup'></g>
+
+		<g id='leftLayerGroup'></g>
+		<g id='rightLayerGroup'></g>
+		<g id='topLayerGroup'></g>
+		<g id='bottomLayerGroup'></g>
+		
+		<g id='leadingLayerGroup'></g>
+
 		<g id='debugLayerGroup'></g>
+
+		<g id='inputLayerGroup'></g>
 	</svg>
 
 	<script>
 		function waitMBx() {
 			console.log('waitMBx');
 			if (window['MZXBA']) {
-				MZXBA.initAll();
+				MZXBA.startup();
 			} else {
 				setTimeout(waitMBx, 333);
 			}

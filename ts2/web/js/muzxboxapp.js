@@ -4,11 +4,20 @@ var MuzXBoxApplication = (function () {
     function MuzXBoxApplication() {
         console.log('MuzXBoxApplication');
     }
-    MuzXBoxApplication.prototype.initAll = function () {
+    MuzXBoxApplication.prototype.startup = function () {
         console.log('initAll');
         this.bindLayers();
     };
     MuzXBoxApplication.prototype.bindLayers = function () {
+        this.gridLayerGroup = document.getElementById('gridLayerGroup');
+        this.auxiliaryLayerGroup = document.getElementById('auxiliaryLayerGroup');
+        this.secondaryLayerGroup = document.getElementById('secondaryLayerGroup');
+        this.leftLayerGroup = document.getElementById('leftLayerGroup');
+        this.rightLayerGroup = document.getElementById('rightLayerGroup');
+        this.topLayerGroup = document.getElementById('topLayerGroup');
+        this.leadingLayerGroup = document.getElementById('leadingLayerGroup');
+        this.debugLayerGroup = document.getElementById('debugLayerGroup');
+        this.inputLayerGroup = document.getElementById('inputLayerGroup');
     };
     return MuzXBoxApplication;
 }());

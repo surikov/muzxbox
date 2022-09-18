@@ -1,6 +1,16 @@
 declare class MuzXBoxApplication {
+    gridLayerGroup: SVGElement;
+    auxiliaryLayerGroup: SVGElement;
+    secondaryLayerGroup: SVGElement;
+    leftLayerGroup: SVGElement;
+    rightLayerGroup: SVGElement;
+    topLayerGroup: SVGElement;
+    bottomLayerGroup: SVGElement;
+    leadingLayerGroup: SVGElement;
+    debugLayerGroup: SVGElement;
+    inputLayerGroup: SVGElement;
     constructor();
-    initAll(): void;
+    startup(): void;
     bindLayers(): void;
 }
 declare class SongUI {
