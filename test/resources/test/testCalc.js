@@ -4,18 +4,20 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.35 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.36 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
 var topShift = cellSize * 11;
 var rowsVisibleCount = 44;
 var rowsAvgCount = 5;
-var ratioPre = 0.5;
+//let ratioPre=0.5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 var reduceRatio = 1;
+var highLightMode = 0;
 //let tailOrder=0;
 //let prewide=5;
+var calcLen = 9;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
     var msgp = document.getElementById('msgp');
@@ -316,13 +318,51 @@ function calcRowFills(rowNum, rows, counts) {
     //setWide(resu);
     return resu;
 }
+function calcRowFreqs(rowNum, rows) {
+    var resu = [];
+    //console.log(rows);
+    for (var nn = 0; nn < rowLen; nn++) {
+        var one = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
+        resu.push(one);
+        if (rows.length > rowNum + 1 + calcLen) {
+            for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
+                if (ballExists(nn + 0, rows[rr])) {
+                    one.summ = one.summ + 0.5;
+                }
+                if (ballExists(nn + 1, rows[rr])) {
+                    one.summ++;
+                }
+                if (ballExists(nn + 2, rows[rr])) {
+                    one.summ = one.summ + 0.5;
+                }
+            }
+            one.logr = one.summ * one.summ;
+        }
+    }
+    return resu;
+}
 function dumpTriads(svg, rows) {
+    var ratioPre = 0.5;
+    if (highLightMode == 1) {
+        ratioPre = 0;
+    }
+    else {
+        if (highLightMode == 2) {
+            ratioPre = 0.75;
+        }
+    }
     for (var rr = 0; rr < rowsVisibleCount; rr++) {
         if (rr > rows.length - 6)
             break;
         //console.log(rr,rows.length);
         var precounts = calcRowPatterns(rr + 1, rows);
-        var calcs = calcRowFills(rr, rows, precounts);
+        var calcs = void 0;
+        if (highLightMode == 2) {
+            calcs = calcRowFreqs(rr, rows);
+        }
+        else {
+            calcs = calcRowFills(rr, rows, precounts);
+        }
         var minCnt = 99999;
         var mxCount = 0;
         for (var ii = 0; ii < rowLen; ii++) {
@@ -344,7 +384,7 @@ function dumpTriads(svg, rows) {
 }
 function fillCells() {
     clearSVGgroup(levelA);
-    var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
+    var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount + calcLen);
     dumpTriads(levelA, slicedrows);
     dumpInfo(skipRowsCount);
     drawLines();
@@ -385,12 +425,20 @@ function clickGoSkip(nn) {
     }
 }
 function toggleRatioPre() {
-    if (ratioPre == 0.5)
-        ratioPre = 0.75;
-    else if (ratioPre == 0.75)
-        ratioPre = 0.99;
-    else
-        ratioPre = 0.5;
+    if (highLightMode == 0) {
+        highLightMode = 1;
+    }
+    else {
+        if (highLightMode == 1) {
+            highLightMode = 2;
+        }
+        else {
+            highLightMode = 0;
+        }
+    }
+    //if(ratioPre==0.5)ratioPre=0.75;
+    //else if(ratioPre==0.75)ratioPre=0.99;
+    //else ratioPre=0.5;
     fillCells();
 }
 function moreReduceRatio() {

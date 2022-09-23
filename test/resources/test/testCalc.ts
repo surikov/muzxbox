@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.35 '+dataName+': '+ballsInRow+'/'+rowLen;
+let sversion = 'v1.36 '+dataName+': '+ballsInRow+'/'+rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -19,11 +19,13 @@ let cellSize = 12;
 let topShift = cellSize * 11;
 let rowsVisibleCount = 44;
 let rowsAvgCount = 5;
-let ratioPre=0.5;
+//let ratioPre=0.5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let reduceRatio=1;
+let highLightMode=0;
 //let tailOrder=0;
 //let prewide=5;
+var calcLen=9;
 let markLines: { fromX: number, fromY: number, toX: number, toY: number }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
 	key: string;
@@ -339,12 +341,43 @@ function calcRowFills(rowNum:number,rows: BallsRow[],counts:number[]):{ball:numb
 	//setWide(resu);
 	return resu;
 }
+function calcRowFreqs(rowNum:number,rows: BallsRow[]):{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}[]{
+	let resu:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}[]=[];
+	//console.log(rows);
+	
+	for(let nn=0;nn<rowLen;nn++){
+		let one:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}={ball:nn+1,fills:[],summ:0,logr:0};
+		resu.push(one);
+		if(rows.length>rowNum+1+calcLen){
+			for(var rr=rowNum+1;rr<rowNum+1+calcLen;rr++){
+				if(ballExists(nn+0,rows[rr])){ one.summ=one.summ+0.5; }
+				if(ballExists(nn+1,rows[rr])){ one.summ++; }
+				if(ballExists(nn+2,rows[rr])){ one.summ=one.summ+0.5; }
+			}
+			one.logr=one.summ*one.summ;
+		}
+	}
+	return resu;
+}
 function dumpTriads(svg: SVGElement, rows: BallsRow[]){
+	let ratioPre=0.5;
+	if(highLightMode==1){
+		ratioPre=0;
+	}else{
+		if(highLightMode==2){
+			ratioPre=0.75;
+		}
+	}
 	for (let rr = 0; rr < rowsVisibleCount; rr++) {
 		if(rr>rows.length-6)break;
 		//console.log(rr,rows.length);
 		let precounts=calcRowPatterns(rr+1,rows);
-		let calcs=calcRowFills(rr,rows,precounts);
+		let calcs:{ball:number,fills:{dx1:number,dx2:number}[],summ:number,logr:number}[];
+		if(highLightMode==2){
+			calcs=calcRowFreqs(rr,rows);
+		}else{
+			calcs=calcRowFills(rr,rows,precounts);
+		}
 		let minCnt=99999;
 		let mxCount=0;
 		for(let ii=0;ii<rowLen;ii++){
@@ -374,7 +407,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]){
 }
 function fillCells() {
 	clearSVGgroup(levelA);
-	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
+	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount+calcLen);
 	dumpTriads(levelA,slicedrows);
 	dumpInfo(skipRowsCount);
 	drawLines();
@@ -415,9 +448,20 @@ function clickGoSkip(nn: number) {
 	}
 }
 function toggleRatioPre(){
-	if(ratioPre==0.5)ratioPre=0.75;
-	else if(ratioPre==0.75)ratioPre=0.99;
-	else ratioPre=0.5;
+	if(highLightMode==0){
+		highLightMode=1;
+	}else{
+		if(highLightMode==1){
+			highLightMode=2;
+		}else{
+			highLightMode=0;
+		}
+	}
+	
+	//if(ratioPre==0.5)ratioPre=0.75;
+	//else if(ratioPre==0.75)ratioPre=0.99;
+	//else ratioPre=0.5;
+	
 	fillCells();
 }
 function moreReduceRatio(){
