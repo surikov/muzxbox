@@ -223,7 +223,7 @@ function clickFog(vnt) {
 }
 function drawLines() {
     clearSVGgroup(linesLevel);
-    console.log(markLines);
+    //console.log(markLines);
     for (var i = 0; i < markLines.length; i++) {
         //let fy=markLines[i].fromY - skipRowsCount;
         //let ty=markLines[i].toY - skipRowsCount;
@@ -378,8 +378,7 @@ function dumpTriads(svg, rows) {
             addRect(svg, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize - 0.1, color);
             addRect(svg, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize - 0.1, color);
         }
-        if (rr == 0)
-            console.log(calcs);
+        //if (rr == 0) console.log(calcs);
     }
 }
 function fillCells() {
@@ -486,34 +485,220 @@ function sobstvennoe(balls) {
 function addTails() {
     markLines = [];
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
-    for (var ii = 1; ii < slicedrows.length - 1 - 1; ii++) {
-        markLines.push({
-            fromX: slicedrows[ii].balls[0] - 1,
-            fromY: Math.round(topShift / cellSize) + skipRowsCount + ii,
-            toX: slicedrows[ii + 1].balls[0] - 1,
-            toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
-        });
-        markLines.push({
-            fromX: slicedrows[ii].balls[ballsInRow - 1] - 1,
-            fromY: Math.round(topShift / cellSize) + skipRowsCount + ii,
-            toX: slicedrows[ii + 1].balls[ballsInRow - 1] - 1,
-            toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
-        });
-        markLines.push({
-            fromX: slicedrows[ii].balls[0] - 1 + rowLen,
-            fromY: Math.round(topShift / cellSize) + skipRowsCount + ii,
-            toX: slicedrows[ii + 1].balls[0] - 1 + rowLen,
-            toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
-        });
-        markLines.push({
-            fromX: slicedrows[ii].balls[ballsInRow - 1] - 1 + rowLen,
-            fromY: Math.round(topShift / cellSize) + skipRowsCount + ii,
-            toX: slicedrows[ii + 1].balls[ballsInRow - 1] - 1 + rowLen,
-            toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
-        });
+    var firsts = [];
+    for (var ii = 1; ii < slicedrows.length - 1 - 1 - 1; ii++) {
+        if (slicedrows[ii + 1]) {
+            //console.log(slicedrows[ii], slicedrows[ii].balls[0]);
+            firsts.splice(0, 0, 100 + slicedrows[ii].balls[0]);
+            markLines.push({
+                fromX: slicedrows[ii].balls[0] - 1,
+                fromY: Math.round(topShift / cellSize) + skipRowsCount + ii,
+                toX: slicedrows[ii + 1].balls[0] - 1,
+                toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
+            });
+            markLines.push({
+                fromX: slicedrows[ii].balls[ballsInRow - 1] - 1,
+                fromY: Math.round(topShift / cellSize) + skipRowsCount + ii,
+                toX: slicedrows[ii + 1].balls[ballsInRow - 1] - 1,
+                toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
+            });
+            markLines.push({
+                fromX: slicedrows[ii].balls[0] - 1 + rowLen,
+                fromY: Math.round(topShift / cellSize) + skipRowsCount + ii,
+                toX: slicedrows[ii + 1].balls[0] - 1 + rowLen,
+                toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
+            });
+            markLines.push({
+                fromX: slicedrows[ii].balls[ballsInRow - 1] - 1 + rowLen,
+                fromY: Math.round(topShift / cellSize) + skipRowsCount + ii,
+                toX: slicedrows[ii + 1].balls[ballsInRow - 1] - 1 + rowLen,
+                toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
+            });
+        }
     }
+    dumpLineFirst(firsts);
     fillCells();
+}
+function dumpLineFirst(firsts) {
+    console.log(firsts);
+    var alpha = 0.5 // overall smoothing component
+    , beta = 0.4 // trend smoothing component
+    , gamma = 0.6 // seasonal smoothing component
+    , period = 4 // # of observations per season
+    , m = 1 // # of future observations to forecast
+    , predictions = [];
+    var sz = Math.floor(firsts.length / period) * period;
+    console.log(sz);
+    firsts.splice(0, firsts.length - sz);
+    console.log(firsts);
+    predictions = forecast(firsts, alpha, beta, gamma, period, m);
+    // -> [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 594.8043646513713, 357.12171044215734, ...]
+    console.log(predictions);
+    console.log(predictions[predictions.length - 1] - 100);
+}
+////////////////////////
+/* Holt-Winters triple exponential smoothing
+ * see: http://www.itl.nist.gov/div898/handbook/pmc/section4/pmc435.htm
+ *
+ * @param {array} data input data (Float64Array)
+ * @param {number} alpha overall smoothing parameter (float)
+ * @param {number} beta seasonal smoothing parameter (float)
+ * @param {number} gamma trend smoothing parameter (float)
+ * @param {number} period (int)
+ * @param {number} m how many periods to forecast ahead (int)
+ *
+ * @return {Float64Array}
+ */
+function forecast(data, alpha, beta, gamma, period, m) {
+    var seasons, seasonal;
+    if (!validArgs(data, alpha, beta, gamma, period, m))
+        return;
+    seasons = data.length / period;
+    var st_1 = data[0];
+    var bt_1 = initialTrend(data, period);
+    seasonal = seasonalIndices(data, period, seasons);
+    return calcHoltWinters(data, st_1, bt_1, alpha, beta, gamma, seasonal, period, m);
+}
+//module.exports = forecast;
+function validArgs(data, alpha, beta, gamma, period, m) {
+    if (!data.length)
+        return false;
+    if (m <= 0)
+        return false;
+    if (m > period)
+        return false;
+    if (alpha < 0.0 || alpha > 1.0)
+        return false;
+    if (beta < 0.0 || beta > 1.0)
+        return false;
+    if (gamma < 0.0 || gamma > 1.0)
+        return false;
+    return true;
+}
+function initialTrend(data, period) {
+    var sum = 0;
+    for (var i = 0; i < period; i++) {
+        sum = sum + (data[period + i] - data[i]);
+    }
+    return sum / (period * period);
+}
+function seasonalIndices(data, period, seasons) {
+    var savg, obsavg, si, i, j;
+    savg = Array(seasons);
+    obsavg = Array(data.length);
+    si = Array(period);
+    // zero-fill savg[] and si[]
+    for (var i_2 = 0; i_2 < seasons; i_2++) {
+        savg[i_2] = 0.0;
+    }
+    for (var i_3 = 0; i_3 < period; i_3++) {
+        si[i_3] = 0.0;
+    }
+    // seasonal averages
+    for (var i_4 = 0; i_4 < seasons; i_4++) {
+        for (var j_1 = 0; j_1 < period; j_1++) {
+            savg[i_4] = savg[i_4] + data[(i_4 * period) + j_1];
+        }
+        savg[i_4] = savg[i_4] / period;
+    }
+    // averaged observations
+    for (var i_5 = 0; i_5 < seasons; i_5++) {
+        for (var j_2 = 0; j_2 < period; j_2++) {
+            obsavg[(i_5 * period) + j_2] = data[(i_5 * period) + j_2] / savg[i_5];
+        }
+    }
+    // seasonal indices
+    for (var i_6 = 0; i_6 < period; i_6++) {
+        for (var j_3 = 0; j_3 < seasons; j_3++) {
+            si[i_6] = si[i_6] + obsavg[(j_3 * period) + i_6];
+        }
+        si[i_6] = si[i_6] / seasons;
+    }
+    return si;
+}
+function calcHoltWinters(data, st_1, bt_1, alpha, beta, gamma, seasonal, period, m) {
+    var len = data.length, st = Array(len), // overall smoothing component
+    bt = Array(len), // trend smoothing component
+    it = Array(len), // seasonal smoothing component
+    ft = Array(len), // generated forecast
+    i; // reusable idx
+    // initial level st[1] == st_1 == data[0] ... see function forecast()
+    st[1] = st_1;
+    // initial trend bt[1] == bt_1 == initialTrend(data, period) ... see function forecast()
+    bt[1] = bt_1;
+    // zero-fill ft[] (to clean up undefined values at start of forecast array --i.e. ft[])
+    for (i = 0; i < len; i++) {
+        ft[i] = 0.0;
+    }
+    // initial seasonal indices it[]
+    for (i = 0; i < period; i++) {
+        it[i] = seasonal[i];
+    }
+    for (var i_7 = 2; i_7 < len; i_7++) {
+        // overall level smoothing component st[]
+        if (i_7 - period >= 0) {
+            st[i_7] = ((alpha * data[i_7]) / it[i_7 - period]) + ((1.0 - alpha) * (st[i_7 - 1] + bt[i_7 - 1]));
+        }
+        else {
+            st[i_7] = (alpha * data[i_7]) + ((1.0 - alpha) * (st[i_7 - 1] + bt[i_7 - 1]));
+        }
+        // trend smoothing component bt[]
+        bt[i_7] = (gamma * (st[i_7] - st[i_7 - 1])) + ((1 - gamma) * bt[i_7 - 1]);
+        // seasonal smoothing component it[]
+        if (i_7 - period >= 0) {
+            it[i_7] = ((beta * data[i_7]) / st[i_7]) + ((1.0 - beta) * it[i_7 - period]);
+        }
+        // generate forecast as ft[]
+        if (i_7 + m >= period) {
+            ft[i_7 + m] = (st[i_7] + (m * bt[i_7])) * it[i_7 - period + m];
+        }
+    }
+    // -> forecast[]
+    return ft;
 }
 /////////////////
 init();
 fillCells();
+// plain-vanilla
+/*
+var forecast = require('nostradamus')
+  , data = [
+      362, 385, 432, 341, 382, 409,
+      498, 387, 473, 513, 582, 474,
+      544, 582, 681, 557, 628, 707,
+      773, 592, 627, 725, 854, 661
+    ]
+  , alpha = 0.5  // overall smoothing component
+  , beta = 0.4   // trend smoothing component
+  , gamma = 0.6  // seasonal smoothing component
+  , period = 4   // # of observations per season
+  , m = 4        // # of future observations to forecast
+  , predictions = [];
+*/
+/*
+var data1 = [
+    362, 385, 432, 341, 382, 409,
+    498, 387, 473, 513, 582, 474,
+    544, 582, 681, 557, 628, 707,
+    773, 592, 627, 725, 854, 661
+];
+var data = [
+    100,200,300,400,200,300
+    ,100,200,300,500,200,300
+    ,100,200,300,400,200,300
+    ,100,200,300,600,200,300
+];
+    var alpha = 0.5  // overall smoothing component
+    , beta = 0.4   // trend smoothing component
+    , gamma = 0.6  // seasonal smoothing component
+    , period = 12   // # of observations per season
+    , m = 1        // # of future observations to forecast
+    , predictions = [];
+console.log(data);
+predictions = forecast(data, alpha, beta, gamma, period, m);
+// -> [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 594.8043646513713, 357.12171044215734, ...]
+console.log(predictions);
+for(let i=0;i<predictions.length;i++){
+    console.log(i,data[i],Math.round(predictions[i]));
+}
+*/
