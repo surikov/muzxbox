@@ -26,5 +26,7 @@
 		
 		"sssengine.ts"
 		,"sssschedule.ts"
+		,"util/treevalue.ts"
+		,"util/metermath.ts"
 	]
 }
