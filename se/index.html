@@ -1,0 +1,34 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+
+	
+	<script type='text/javascript' src='./se.js'></script>
+	
+	<title>SE</title>
+</head>
+
+<body>
+	<p><button onclick="startTest();">startTest</button></p>
+	<p><button onclick="play();">play</button></p>
+	<p><button onclick="pause();">pause</button></p>
+	<p><button onclick="reset();">reset</button></p>
+
+	<script>
+		function startTest() {
+			window['sssengine'].init();
+		}
+		function play() {
+			console.log('play');
+		}
+		function pause() {
+			console.log('pause');
+		}
+		function reset() {
+			console.log('reset');
+		}
+	</script>
+</body>
+
+</html>

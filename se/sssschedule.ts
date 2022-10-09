@@ -4,14 +4,14 @@ type SSSMeter = {
 };
 type SSSFilter = {
 	id: string;
-	parameters: SSSPitchStep[];
+	parameters: SSSPoint[];
 };
 type SSSPerformer = {
 	id: string;
-	parameters: SSSPitchStep[];
+	parameters: SSSPoint[];
 };
 type SSSHop = {
-	count: number;
+	ticks: number;
 	meter: SSSMeter;
 };
 type SSSTick = {
@@ -32,6 +32,7 @@ type SSSTrack = {
 };
 type SSSChord = {
 	notes: SSSNote[];
+	start: SSSMeter;
 };
 type SSSNote = {
 	pitches: SSSPitchStep[];
@@ -42,7 +43,11 @@ type SSSMeasure = {
 	chords: SSSChord;
 };
 type SSSPitchStep = {
-	value: SSSMeter;
+	value: number;
+	duration: SSSMeter;
+};
+type SSSPoint = {
+	data: object;
 	skip: SSSHop;
 };
 
