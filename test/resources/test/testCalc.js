@@ -327,13 +327,13 @@ function calcRowFreqs(rowNum, rows) {
         if (rows.length > rowNum + 1 + calcLen) {
             for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
                 if (ballExists(nn + 0, rows[rr])) {
-                    one.summ = one.summ + 0.5;
+                    one.summ = one.summ + 0.15;
                 }
                 if (ballExists(nn + 1, rows[rr])) {
                     one.summ++;
                 }
                 if (ballExists(nn + 2, rows[rr])) {
-                    one.summ = one.summ + 0.5;
+                    one.summ = one.summ + 0.15;
                 }
             }
             one.logr = one.summ * one.summ;
@@ -343,25 +343,26 @@ function calcRowFreqs(rowNum, rows) {
 }
 function calcRowHot(rowNum, rows) {
     var resu = [];
-    //console.log(rows);
     for (var nn = 0; nn < rowLen; nn++) {
         var one = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
         resu.push(one);
-        if (rows.length > rowNum + 1 + calcLen) {
-            for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
-                if (ballExists(nn + 0, rows[rr])) {
-                    one.summ = one.summ + 0.15;
+        for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
+            /*for (let cc = 0; cc < 99; cc++) {
+                one.summ++;
+                if (rows.length > rr + cc) {
+                    if (ballExists(nn + 1, rows[rr + cc])) {
+                        break;
+                    }
                 }
-                if (ballExists(nn + 1, rows[rr])) {
-                    one.summ++;
-                }
-                if (ballExists(nn + 2, rows[rr])) {
-                    one.summ = one.summ + 0.15;
-                }
+            }*/
+            one.summ = rr;
+            if (ballExists(nn + 1, rows[rr + 0])) {
+                //one.summ =9;
             }
-            one.logr = one.summ * one.summ;
         }
+        one.logr = one.summ * one.summ;
     }
+    console.log(rows[rowNum], resu);
     return resu;
 }
 function dumpTriads(svg, rows) {

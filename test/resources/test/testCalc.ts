@@ -350,24 +350,6 @@ function calcRowFreqs(rowNum: number, rows: BallsRow[]): { ball: number, fills: 
 		resu.push(one);
 		if (rows.length > rowNum + 1 + calcLen) {
 			for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
-				if (ballExists(nn + 0, rows[rr])) { one.summ = one.summ + 0.5; }
-				if (ballExists(nn + 1, rows[rr])) { one.summ++; }
-				if (ballExists(nn + 2, rows[rr])) { one.summ = one.summ + 0.5; }
-			}
-			one.logr = one.summ * one.summ;
-		}
-	}
-	return resu;
-}
-function calcRowHot(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
-	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
-	//console.log(rows);
-
-	for (let nn = 0; nn < rowLen; nn++) {
-		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
-		resu.push(one);
-		if (rows.length > rowNum + 1 + calcLen) {
-			for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
 				if (ballExists(nn + 0, rows[rr])) { one.summ = one.summ + 0.15; }
 				if (ballExists(nn + 1, rows[rr])) { one.summ++; }
 				if (ballExists(nn + 2, rows[rr])) { one.summ = one.summ + 0.15; }
@@ -377,8 +359,32 @@ function calcRowHot(rowNum: number, rows: BallsRow[]): { ball: number, fills: { 
 	}
 	return resu;
 }
+function calcRowHot(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
+	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
+	for (let nn = 0; nn < rowLen; nn++) {
+		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
+		resu.push(one);
+		for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
+			/*for (let cc = 0; cc < 99; cc++) {
+				one.summ++;
+				if (rows.length > rr + cc) {
+					if (ballExists(nn + 1, rows[rr + cc])) {
+						break;
+					}
+				}
+			}*/
+			one.summ = rr;
+			if (ballExists(nn + 1, rows[rr + 0])) {
+				//one.summ =9;
+			}
+		}
+		one.logr = one.summ * one.summ;
+	}
+	console.log(rows[rowNum],resu);
+	return resu;
+}
 function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
-	console.log('dumpTriads',highLightMode);
+	console.log('dumpTriads', highLightMode);
 	let ratioPre = 0.75;
 	if (highLightMode == 1) {
 		ratioPre = 0.75;
@@ -397,7 +403,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		} else {
 			if (highLightMode == 1) {
 				calcs = calcRowHot(rr, rows);
-			}else{
+			} else {
 				calcs = calcRowFills(rr, rows, precounts);
 			}
 		}
@@ -534,7 +540,7 @@ function addTails() {
 	for (let ii = 1; ii < slicedrows.length - 1 - 1 - 1; ii++) {
 		if (slicedrows[ii + 1]) {
 			//console.log(slicedrows[ii], slicedrows[ii].balls[0]);
-			firsts.splice(0, 0, 100+slicedrows[ii].balls[0]);
+			firsts.splice(0, 0, 100 + slicedrows[ii].balls[0]);
 			markLines.push({
 				fromX: slicedrows[ii].balls[0] - 1
 				, fromY: Math.round(topShift / cellSize) + skipRowsCount + ii
@@ -580,7 +586,7 @@ function dumpLineFirst(firsts: number[]) {
 	predictions = forecast(firsts, alpha, beta, gamma, period, m);
 	// -> [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 594.8043646513713, 357.12171044215734, ...]
 	console.log(predictions);
-	console.log(predictions[predictions.length-1]-100);
+	console.log(predictions[predictions.length - 1] - 100);
 }
 ////////////////////////
 /* Holt-Winters triple exponential smoothing
