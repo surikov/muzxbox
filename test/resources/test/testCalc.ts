@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.36 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.37 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -373,21 +373,22 @@ function calcRowHot(rowNum: number, rows: BallsRow[]): { ball: number, fills: { 
 					}
 				}
 			}*/
-			one.summ = rr;
-			if (ballExists(nn + 1, rows[rr + 0])) {
-				//one.summ =9;
+			//one.summ = nn+rr;
+			if (ballExists(nn + 1, rows[rr])) {
+				break;
 			}
+			one.summ++;
 		}
 		one.logr = one.summ * one.summ;
 	}
-	console.log(rows[rowNum],resu);
+	console.log(rowNum,rows[rowNum],resu);
 	return resu;
 }
 function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 	console.log('dumpTriads', highLightMode);
-	let ratioPre = 0.75;
+	let ratioPre = 0.88;
 	if (highLightMode == 1) {
-		ratioPre = 0.75;
+		ratioPre = 0.5;
 	} else {
 		if (highLightMode == 2) {
 			ratioPre = 0.75;
