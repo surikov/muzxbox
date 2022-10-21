@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.37 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.38 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -361,16 +361,16 @@ function calcRowHot(rowNum, rows) {
             }
             one.summ++;
         }
-        one.logr = one.summ * one.summ;
+        one.logr = one.summ;
     }
     console.log(rowNum, rows[rowNum], resu);
     return resu;
 }
 function dumpTriads(svg, rows) {
     console.log('dumpTriads', highLightMode);
-    var ratioPre = 0.88;
+    var ratioPre = 0.99;
     if (highLightMode == 1) {
-        ratioPre = 0.5;
+        ratioPre = 0.33;
     }
     else {
         if (highLightMode == 2) {
