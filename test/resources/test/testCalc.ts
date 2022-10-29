@@ -336,7 +336,7 @@ function calcRowFills(rowNum: number, rows: BallsRow[], counts: number[]): { bal
 				}
 			}
 		}
-		one.logr = one.summ * one.summ * one.summ;
+		one.logr = one.summ * one.summ * one.summ* one.summ;
 	}
 	//setWide(resu);
 	return resu;
@@ -381,11 +381,11 @@ function calcRowHot(rowNum: number, rows: BallsRow[]): { ball: number, fills: { 
 		}
 		one.logr = one.summ ;
 	}
-	console.log(rowNum,rows[rowNum],resu);
+	//console.log(rowNum,rows[rowNum],resu);
 	return resu;
 }
 function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
-	console.log('dumpTriads', highLightMode);
+	//console.log('dumpTriads', highLightMode);
 	let ratioPre = 0.99;
 	if (highLightMode == 1) {
 		ratioPre = 0.33;
@@ -449,12 +449,12 @@ function fillCells() {
 	for(let ii=0;ii<10;ii++){
 		console.log(calcRowPatterns(ii+0,slicedrows));
 	}*/
-	console.log('reduceRatio', reduceRatio);
+	//console.log('reduceRatio', reduceRatio);
 	var msgp: HTMLElement = (document.getElementById('stepsize') as any) as HTMLElement;
 	msgp.innerText = '' + reduceRatio;
 }
 function clickHop() {
-	console.log(datarows.length, reduceRatio);
+	//console.log(datarows.length, reduceRatio);
 	skipRowsCount = Math.round(Math.random() * (datarows.length / reduceRatio - 100));
 	fillCells();
 }
@@ -702,10 +702,52 @@ function calcHoltWinters(data: number[], st_1: number, bt_1: number, alpha: numb
 	// -> forecast[]
 	return ft;
 }
+function dumpStatAll(){
+	let idx=Math.floor(Math.random()*rowLen);
+	for(let sz=1;sz<=ballsInRow;sz++){
+		dumpStatIne(idx,sz);
+	}
+}
+function dumpStatIne(idx,sz){
+	console.log('dumpStatAll',idx,sz);
+	let count0=0;
+	let count1=0;
+	let count2=0;
+	let count3=0;
+	let count4=0;
+	let count5=0;
+	let count6=0;
+	let count7=0;
+	
+	for(let rr=1;rr<datarows.length;rr++){
+		let count=0;
+		for(let bb=0;bb<sz;bb++){
+			if(ballExists(bb+1+idx,datarows[rr])){
+				count++;
+			}
+		}
+		if(count==0){count0++;}
+		if(count==1){count1++;}
+		if(count==2){count2++;}
+		if(count==3){count3++;}
+		if(count==4){count4++;}
+		if(count==5){count5++;}
+		if(count==6){count6++;}
+		if(count==7){count7++;}
+	}
+	console.log(0,count0,Math.round(100*count0/datarows.length),'%');
+	console.log(1,count1,Math.round(100*count1/datarows.length),'%');
+	console.log(2,count2,Math.round(100*count2/datarows.length),'%');
+	console.log(3,count3,Math.round(100*count3/datarows.length),'%');
+	console.log(4,count4,Math.round(100*count4/datarows.length),'%');
+	console.log(5,count5,Math.round(100*count5/datarows.length),'%');
+	console.log(6,count6,Math.round(100*count6/datarows.length),'%');
+	console.log(7,count7,Math.round(100*count7/datarows.length),'%');
+}
 /////////////////
 init();
 fillCells();
-
+dumpStatAll();
 
 // plain-vanilla
 /*
