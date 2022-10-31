@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.38 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.39 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -249,7 +249,8 @@ function drawStat3(svg, rows) {
         }
     }
     for (var colNum = 1; colNum <= rowLen; colNum++) {
-        addSmallText(svg, colNum * cellSize - cellSize, topShift, "" + colNum);
+        addSmallText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
+        addSmallText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
     }
 }
 function triadExists(ball, rowNum, dx1, dx2, rows) {
