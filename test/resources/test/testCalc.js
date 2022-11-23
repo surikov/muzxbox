@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.39 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.40 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -375,7 +375,7 @@ function dumpTriads(svg, rows) {
     }
     else {
         if (highLightMode == 2) {
-            ratioPre = 0.75;
+            ratioPre = 0.66;
         }
     }
     for (var rr = 0; rr < rowsVisibleCount; rr++) {
@@ -430,6 +430,8 @@ function fillCells() {
     //console.log('reduceRatio', reduceRatio);
     var msgp = document.getElementById('stepsize');
     msgp.innerText = '' + reduceRatio;
+    msgp = document.getElementById('calcLen');
+    msgp.innerText = '' + calcLen;
 }
 function clickHop() {
     //console.log(datarows.length, reduceRatio);
@@ -488,6 +490,16 @@ function lessReduceRatio() {
         markLines[i].fromY=markLines[i].fromY/reduceRatio;
         markLines[i].toY=markLines[i].toY*reduceRatio;
     }*/
+    fillCells();
+}
+function moreCalcLen() {
+    calcLen = calcLen + 1;
+    fillCells();
+}
+function lessCalcLen() {
+    calcLen = calcLen - 1;
+    if (calcLen < 3)
+        calcLen = 3;
     fillCells();
 }
 function sobstvennoe(balls) {

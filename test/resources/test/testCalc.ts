@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.39 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.40 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -380,7 +380,7 @@ function calcRowHot(rowNum: number, rows: BallsRow[]): { ball: number, fills: { 
 			}
 			one.summ++;
 		}
-		one.logr = one.summ ;
+		one.logr = one.summ  ;
 	}
 	//console.log(rowNum,rows[rowNum],resu);
 	return resu;
@@ -392,7 +392,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		ratioPre = 0.33;
 	} else {
 		if (highLightMode == 2) {
-			ratioPre = 0.75;
+			ratioPre = 0.66;
 		}
 	}
 	for (let rr = 0; rr < rowsVisibleCount; rr++) {
@@ -453,6 +453,8 @@ function fillCells() {
 	//console.log('reduceRatio', reduceRatio);
 	var msgp: HTMLElement = (document.getElementById('stepsize') as any) as HTMLElement;
 	msgp.innerText = '' + reduceRatio;
+	msgp = (document.getElementById('calcLen') as any) as HTMLElement;
+	msgp.innerText = '' + calcLen;
 }
 function clickHop() {
 	//console.log(datarows.length, reduceRatio);
@@ -512,6 +514,16 @@ function lessReduceRatio() {
 	}*/
 	fillCells();
 }
+function moreCalcLen() {
+	calcLen = calcLen + 1;
+	fillCells();
+}
+function lessCalcLen() {
+	calcLen = calcLen - 1;
+	if (calcLen < 3) calcLen = 3;
+	fillCells();
+}
+
 function sobstvennoe(balls: number[]): number {
 	//console.log(balls);
 	let pre: number[] = balls;
