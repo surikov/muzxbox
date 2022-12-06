@@ -22,7 +22,7 @@ let rowsAvgCount = 5;
 //let ratioPre=0.5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let reduceRatio = 1;
-let highLightMode = 0;
+let highLightMode = 1;
 //let tailOrder=0;
 //let prewide=5;
 var calcLen = 9;
@@ -102,7 +102,18 @@ function addSmallText(svg: SVGElement, x: number, y: number, txt: string) {
 	var tx: Element = document.createElementNS(svgNS, 'text');
 	tx.setAttributeNS(null, "x", '' + x);
 	tx.setAttributeNS(null, "y", '' + y);
-	tx.setAttributeNS(null, "font-size", "7");
+	tx.setAttributeNS(null, "font-size", "9");
+	tx.setAttribute("fill", '#000000');
+	svg.append(tx);
+	tx.appendChild(nd);
+}
+function addBigText(svg: SVGElement, x: number, y: number, txt: string) {
+	var svgNS: string = "http://www.w3.org/2000/svg";
+	var nd: Text = document.createTextNode(txt);
+	var tx: Element = document.createElementNS(svgNS, 'text');
+	tx.setAttributeNS(null, "x", '' + x);
+	tx.setAttributeNS(null, "y", '' + y);
+	tx.setAttributeNS(null, "font-size", "12");
 	tx.setAttribute("fill", '#000000');
 	svg.append(tx);
 	tx.appendChild(nd);
@@ -272,8 +283,13 @@ function drawStat3(svg: SVGElement, rows: BallsRow[]) {
 		}
 	}
 	for (let colNum = 1; colNum <= rowLen; colNum++) {
-		addSmallText(svg, colNum * cellSize - cellSize*0.8, topShift-2, "" + colNum);
-		addSmallText(svg, (colNum+rowLen) * cellSize - cellSize*0.8, topShift-5, "" + colNum);
+		if(colNum%10==0){
+			addBigText(svg, colNum * cellSize - cellSize*0.8, topShift-2, "" + colNum);
+			addBigText(svg, (colNum+rowLen) * cellSize - cellSize*0.8, topShift-5, "" + colNum);
+		}else{
+			addSmallText(svg, colNum * cellSize - cellSize*0.8, topShift-2, "" + colNum);
+			addSmallText(svg, (colNum+rowLen) * cellSize - cellSize*0.8, topShift-5, "" + colNum);
+		}
 	}
 }
 function triadExists(ball: number, rowNum: number, dx1: number, dx2: number, rows: BallsRow[]): boolean {
