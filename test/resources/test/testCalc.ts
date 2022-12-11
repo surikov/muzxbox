@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.39 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.40 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -22,7 +22,7 @@ let rowsAvgCount = 5;
 //let ratioPre=0.5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let reduceRatio = 1;
-let highLightMode = 0;
+let highLightMode = 1;
 //let tailOrder=0;
 //let prewide=5;
 var calcLen = 9;
@@ -102,7 +102,18 @@ function addSmallText(svg: SVGElement, x: number, y: number, txt: string) {
 	var tx: Element = document.createElementNS(svgNS, 'text');
 	tx.setAttributeNS(null, "x", '' + x);
 	tx.setAttributeNS(null, "y", '' + y);
-	tx.setAttributeNS(null, "font-size", "7");
+	tx.setAttributeNS(null, "font-size", "9");
+	tx.setAttribute("fill", '#000000');
+	svg.append(tx);
+	tx.appendChild(nd);
+}
+function addBigText(svg: SVGElement, x: number, y: number, txt: string) {
+	var svgNS: string = "http://www.w3.org/2000/svg";
+	var nd: Text = document.createTextNode(txt);
+	var tx: Element = document.createElementNS(svgNS, 'text');
+	tx.setAttributeNS(null, "x", '' + x);
+	tx.setAttributeNS(null, "y", '' + y);
+	tx.setAttributeNS(null, "font-size", "12");
 	tx.setAttribute("fill", '#000000');
 	svg.append(tx);
 	tx.appendChild(nd);
@@ -272,8 +283,13 @@ function drawStat3(svg: SVGElement, rows: BallsRow[]) {
 		}
 	}
 	for (let colNum = 1; colNum <= rowLen; colNum++) {
-		addSmallText(svg, colNum * cellSize - cellSize*0.8, topShift-2, "" + colNum);
-		addSmallText(svg, (colNum+rowLen) * cellSize - cellSize*0.8, topShift-5, "" + colNum);
+		if(colNum%10==0){
+			addBigText(svg, colNum * cellSize - cellSize*0.8, topShift-2, "" + colNum);
+			addBigText(svg, (colNum+rowLen) * cellSize - cellSize*0.8, topShift-5, "" + colNum);
+		}else{
+			addSmallText(svg, colNum * cellSize - cellSize*0.8, topShift-2, "" + colNum);
+			addSmallText(svg, (colNum+rowLen) * cellSize - cellSize*0.8, topShift-5, "" + colNum);
+		}
 	}
 }
 function triadExists(ball: number, rowNum: number, dx1: number, dx2: number, rows: BallsRow[]): boolean {
@@ -380,7 +396,7 @@ function calcRowHot(rowNum: number, rows: BallsRow[]): { ball: number, fills: { 
 			}
 			one.summ++;
 		}
-		one.logr = one.summ ;
+		one.logr = one.summ  ;
 	}
 	//console.log(rowNum,rows[rowNum],resu);
 	return resu;
@@ -392,7 +408,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		ratioPre = 0.33;
 	} else {
 		if (highLightMode == 2) {
-			ratioPre = 0.75;
+			ratioPre = 0.66;
 		}
 	}
 	for (let rr = 0; rr < rowsVisibleCount; rr++) {
@@ -453,6 +469,8 @@ function fillCells() {
 	//console.log('reduceRatio', reduceRatio);
 	var msgp: HTMLElement = (document.getElementById('stepsize') as any) as HTMLElement;
 	msgp.innerText = '' + reduceRatio;
+	msgp = (document.getElementById('calcLen') as any) as HTMLElement;
+	msgp.innerText = '' + calcLen;
 }
 function clickHop() {
 	//console.log(datarows.length, reduceRatio);
@@ -512,6 +530,16 @@ function lessReduceRatio() {
 	}*/
 	fillCells();
 }
+function moreCalcLen() {
+	calcLen = calcLen + 1;
+	fillCells();
+}
+function lessCalcLen() {
+	calcLen = calcLen - 1;
+	if (calcLen < 3) calcLen = 3;
+	fillCells();
+}
+
 function sobstvennoe(balls: number[]): number {
 	//console.log(balls);
 	let pre: number[] = balls;

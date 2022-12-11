@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.39 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.40 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -14,7 +14,7 @@ var rowsAvgCount = 5;
 //let ratioPre=0.5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 var reduceRatio = 1;
-var highLightMode = 0;
+var highLightMode = 1;
 //let tailOrder=0;
 //let prewide=5;
 var calcLen = 9;
@@ -92,7 +92,18 @@ function addSmallText(svg, x, y, txt) {
     var tx = document.createElementNS(svgNS, 'text');
     tx.setAttributeNS(null, "x", '' + x);
     tx.setAttributeNS(null, "y", '' + y);
-    tx.setAttributeNS(null, "font-size", "7");
+    tx.setAttributeNS(null, "font-size", "9");
+    tx.setAttribute("fill", '#000000');
+    svg.append(tx);
+    tx.appendChild(nd);
+}
+function addBigText(svg, x, y, txt) {
+    var svgNS = "http://www.w3.org/2000/svg";
+    var nd = document.createTextNode(txt);
+    var tx = document.createElementNS(svgNS, 'text');
+    tx.setAttributeNS(null, "x", '' + x);
+    tx.setAttributeNS(null, "y", '' + y);
+    tx.setAttributeNS(null, "font-size", "12");
     tx.setAttribute("fill", '#000000');
     svg.append(tx);
     tx.appendChild(nd);
@@ -249,8 +260,14 @@ function drawStat3(svg, rows) {
         }
     }
     for (var colNum = 1; colNum <= rowLen; colNum++) {
-        addSmallText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
-        addSmallText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
+        if (colNum % 10 == 0) {
+            addBigText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
+            addBigText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
+        }
+        else {
+            addSmallText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
+            addSmallText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
+        }
     }
 }
 function triadExists(ball, rowNum, dx1, dx2, rows) {
@@ -375,7 +392,7 @@ function dumpTriads(svg, rows) {
     }
     else {
         if (highLightMode == 2) {
-            ratioPre = 0.75;
+            ratioPre = 0.66;
         }
     }
     for (var rr = 0; rr < rowsVisibleCount; rr++) {
@@ -430,6 +447,8 @@ function fillCells() {
     //console.log('reduceRatio', reduceRatio);
     var msgp = document.getElementById('stepsize');
     msgp.innerText = '' + reduceRatio;
+    msgp = document.getElementById('calcLen');
+    msgp.innerText = '' + calcLen;
 }
 function clickHop() {
     //console.log(datarows.length, reduceRatio);
@@ -488,6 +507,16 @@ function lessReduceRatio() {
         markLines[i].fromY=markLines[i].fromY/reduceRatio;
         markLines[i].toY=markLines[i].toY*reduceRatio;
     }*/
+    fillCells();
+}
+function moreCalcLen() {
+    calcLen = calcLen + 1;
+    fillCells();
+}
+function lessCalcLen() {
+    calcLen = calcLen - 1;
+    if (calcLen < 3)
+        calcLen = 3;
     fillCells();
 }
 function sobstvennoe(balls) {
