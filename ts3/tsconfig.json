@@ -24,7 +24,10 @@
 	}
 	,"files": [
 		
-		"musicengine.ts"
+		
+		"src/musicengine.ts"
+		,"src/tester.ts"
+		,"src/musicmetremath.ts"
 
 
 	]

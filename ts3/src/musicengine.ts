@@ -1,5 +1,6 @@
 console.log('Music Engine');
 class SurikovEngine{
+	 tester:LibTester=new LibTester();
     constructor(){
 
     }
