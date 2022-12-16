@@ -1,11 +1,11 @@
-console.log('Music Engine');
+console.log('Surikov\'s API for Regular Music');
 class SurikovEngine{
-	 tester:LibTester=new LibTester();
+	tester:LibTester=new LibTester();
     constructor(){
 
     }
     version():string{
-        return 'Surikov Engine v1.0.01';
+        return 'Surikov\'s API for Regular Music v1.0.01';
     }
     createContext():void{
         

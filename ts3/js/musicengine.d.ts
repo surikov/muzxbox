@@ -7,14 +7,28 @@ declare class SurikovEngine {
 declare class LibTester {
     startTest1(): void;
 }
-declare type MusicMetre = {
-    count: number;
-    part: number;
+declare namespace Surikov {
+    type Metre = {
+        count: number;
+        part: number;
+    };
+    class MusicMetreMath {
+        count: number;
+        part: number;
+        constructor(from: Metre);
+        metre(): Metre;
+        simplyfy(): MusicMetreMath;
+        strip(toPart: number): MusicMetreMath;
+        equals(metre: Metre): boolean;
+        less(metre: Metre): boolean;
+        more(metre: Metre): boolean;
+        plus(metre: Metre): MusicMetreMath;
+        minus(metre: Metre): MusicMetreMath;
+        duration(metre: Metre, tempo: number): number;
+    }
+}
+declare type MusicScale = {
+    basePitch: number;
 };
-declare function MMM(metre: MusicMetre): MusicMetreMath;
-declare class MusicMetreMath {
-    count: number;
-    part: number;
-    constructor(from: MusicMetre);
-    metre(): MusicMetre;
+declare class MusicScaleMath {
 }
