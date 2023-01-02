@@ -1,0 +1,26 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <!--<script type='text/javascript' src='../require/require.js'></script>-->
+    <script type='text/javascript' src='../js/apilib.js'></script>
+    <script type='text/javascript' src='../custom/build/testcustom.js'></script>
+    <title>SE</title>
+</head>
+
+<body>
+    <p>test</p>
+
+    <script >
+        console.log('init',window);
+    // type="module">
+        //import { sayHi } from 'path/to/greetings.js';
+        exportedMain();
+        var apitester=new APIMainSpace.APITest();
+        apitester.methodFromAPIClass();
+        APIMainSpace.apiFunction();
+        customFunction();
+    </script>
+</body>
+
+</html>
