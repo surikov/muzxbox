@@ -1,29 +1,3 @@
-declare class MZXBX_MetreMath implements MZXBX_MetreMathType {
-    count: number;
-    part: number;
-    set(from: MZXBX_Metre): MZXBX_MetreMath;
-    metre(): MZXBX_Metre;
-    simplyfy(): MZXBX_MetreMath;
-    strip(toPart: number): MZXBX_MetreMath;
-    equals(metre: MZXBX_Metre): boolean;
-    less(metre: MZXBX_Metre): boolean;
-    more(metre: MZXBX_Metre): boolean;
-    plus(metre: MZXBX_Metre): MZXBX_MetreMath;
-    minus(metre: MZXBX_Metre): MZXBX_MetreMath;
-    duration(metre: MZXBX_Metre, tempo: number): number;
-}
-declare class MZXBX_ScaleMath implements MZXBX_ScaleMathType {
-    basePitch: MZXBX_HalfTone;
-    step2: MZXBX_StepSkip;
-    step3: MZXBX_StepSkip;
-    step4: MZXBX_StepSkip;
-    step5: MZXBX_StepSkip;
-    step6: MZXBX_StepSkip;
-    step7: MZXBX_StepSkip;
-    set(scale: MZXBX_Scale): MZXBX_ScaleMath;
-    scale(): MZXBX_Scale;
-    pitch(note: MZXBX_Note): number;
-}
 declare type MZXBX_Metre = {
     count: number;
     part: number;
@@ -87,7 +61,7 @@ declare type MZXBX_PluginFilter = MZXBX_PluginBase | {
 declare type MZXBX_PluginPerformer = MZXBX_PluginBase | {
     output: string;
 };
-declare type MZXBX_PluginSampler = MZXBX_PluginBase | {
+declare type MZXBX_PluginBeat = MZXBX_PluginBase | {
     output: string;
 };
 declare type MZXBX_ParameterData = {
@@ -109,21 +83,17 @@ declare type MZXBX_AudioPerformer = {
     id: string;
     parameters: MZXBX_PluginParameter[];
 };
-declare type MZXBX_AudioSampler = {
-    id: string;
-    parameters: MZXBX_PluginParameter[];
-};
 declare type MZXBX_Chord = {
     skip: MZXBX_Metre;
     notes: MZXBX_Note[];
 };
-declare type MZXBX_TrackMeasure = {
+declare type MZXBX_Bar = {
     chords: MZXBX_Chord[];
 };
 declare type MZXBX_PercussionBeat = {
-    skips: MZXBX_Metre[];
+    beats: MZXBX_Metre[];
 };
-declare type MZXBX_PercussionMeasure = {
+declare type MZXBX_PercussionBar = {
     beats: MZXBX_PercussionBeat[];
 };
 declare type MZXBX_Measure = {
@@ -133,37 +103,23 @@ declare type MZXBX_Measure = {
 };
 declare type MZXBX_PercussionTrack = {
     title: string;
-    measures: MZXBX_PercussionMeasure[];
+    bars: MZXBX_PercussionBar[];
     filters: MZXBX_AudioFilter[];
-    beat: MZXBX_AudioSampler;
+    beat: MZXBX_PluginBeat;
 };
-declare type MZXBX_MusicTrack = {
+declare type MZXBX_Track = {
     title: string;
-    measures: MZXBX_TrackMeasure[];
+    bars: MZXBX_Bar[];
     filters: MZXBX_AudioFilter[];
     performer: MZXBX_AudioPerformer;
 };
 declare type MZXBX_Project = {
     title: string;
     timeline: MZXBX_Measure[];
-    tracks: MZXBX_MusicTrack[];
+    tracks: MZXBX_Track[];
     percussions: MZXBX_PercussionTrack[];
     filters: MZXBX_AudioFilter[];
 };
 declare let testIonianC: MZXBX_Scale;
 declare let testMetre44: MZXBX_Metre;
 declare let testSongProject: MZXBX_Project;
-declare class MuzXbox {
-    uiStarted: boolean;
-    audioContext: AudioContext;
-    constructor();
-    initAfterLoad(): void;
-    initFromUI(): void;
-    initAudioContext(): void;
-}
-declare class MusicTicker {
-    startPlay(): void;
-    cancelPlay(): void;
-    setPosition(seconds: number): void;
-    getPosition(): number;
-}

@@ -8,11 +8,13 @@
 
 <body>
     <p>MuzXbox test page</p>
-	<p><button onclick='main.initFromUI();'>initFromUI</button></p>
-    <script >
+    <p><button onclick='main.initFromUI();'>initFromUI</button></p>
+    <script>
         console.log('init html');
-		var main=new MuzXbox();
-		
+        var main = new MuzXbox();
+        console.log('testSong', testSongProject);
+        var testme={count:9,part:16};
+        console.log(testme,(new MusicMetreMath().set(testme).strip(4)).metre());
     </script>
 </body>
 

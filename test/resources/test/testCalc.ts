@@ -11,13 +11,13 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.40 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.41 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
 let cellSize = 12;
 let topShift = cellSize * 11;
-let rowsVisibleCount = 44;
+let rowsVisibleCount = 99;
 let rowsAvgCount = 5;
 //let ratioPre=0.5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
@@ -353,7 +353,7 @@ function calcRowFills(rowNum: number, rows: BallsRow[], counts: number[]): { bal
 				}
 			}
 		}
-		one.logr = one.summ * one.summ * one.summ* one.summ;
+		one.logr = one.summ * one.summ;// * one.summ* one.summ;
 	}
 	//setWide(resu);
 	return resu;

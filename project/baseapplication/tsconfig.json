@@ -14,12 +14,19 @@
         "isolatedModules": false,
         "module": "AMD",
         "lib": [
-            "dom", "es2015", "es5"
+            "dom",
+            "es2015",
+            "es5"
         ],
         "declaration": true,
         "types": []
     },
     "files": [
-        "./code/metre.ts", "./code/scale.ts", "../publicapi/musicenginetypes.ts","./code/main.ts"
+        "./code/metre.ts",
+        "./code/scale.ts",
+        "../publicapi/musicenginetypes.ts",
+        "../publicapi/testSong.ts",
+        "./code/main.ts"
+        ,"./code/ticker.ts"
     ]
 }

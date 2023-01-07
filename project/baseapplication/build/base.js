@@ -1,5 +1,5 @@
 "use strict";
-class MusicMetreMath {
+class MZXBX_MetreMath {
     set(from) {
         this.count = from.count;
         this.part = from.part;
@@ -17,15 +17,15 @@ class MusicMetreMath {
                 pp = pp / 2;
             }
         }
-        return new MusicMetreMath().set({ count: cc, part: pp });
+        return new MZXBX_MetreMath().set({ count: cc, part: pp });
     }
     strip(toPart) {
         let cc = this.count;
         let pp = this.part;
         let rr = pp / toPart;
-        cc = Math.round(cc / rr);
+        cc = Math.ceil(cc / rr);
         pp = toPart;
-        return new MusicMetreMath().set({ count: cc, part: pp });
+        return new MZXBX_MetreMath().set({ count: cc, part: pp });
     }
     equals(metre) {
         let countMe = this.count * metre.part;
@@ -61,13 +61,13 @@ class MusicMetreMath {
         let countMe = this.count * metre.part;
         let countTo = metre.count * this.part;
         let rr = { count: countMe + countTo, part: metre.part * this.part };
-        return new MusicMetreMath().set(rr).simplyfy();
+        return new MZXBX_MetreMath().set(rr).simplyfy();
     }
     minus(metre) {
         let countMe = this.count * metre.part;
         let countTo = metre.count * this.part;
         let rr = { count: countMe - countTo, part: metre.part * this.part };
-        return new MusicMetreMath().set(rr).simplyfy();
+        return new MZXBX_MetreMath().set(rr).simplyfy();
     }
     duration(metre, tempo) {
         let wholeNoteSeconds = (4 * 60) / tempo;
@@ -75,7 +75,7 @@ class MusicMetreMath {
         return meterSeconds;
     }
 }
-class MusicScaleMath {
+class MZXBX_ScaleMath {
     set(scale) {
         this.basePitch = scale.basePitch;
         this.step2 = scale.step2;
@@ -94,7 +94,7 @@ class MusicScaleMath {
             step4: this.step4,
             step5: this.step5,
             step6: this.step6,
-            step7: this.step7,
+            step7: this.step7
         };
     }
     pitch(note) {
@@ -120,19 +120,11 @@ class MusicScaleMath {
                 break;
             }
             case 6: {
-                pp =
-                    pp + this.step2 + this.step3 + this.step4 + this.step5 + this.step6;
+                pp = pp + this.step2 + this.step3 + this.step4 + this.step5 + this.step6;
                 break;
             }
             case 7: {
-                pp =
-                    pp +
-                        this.step2 +
-                        this.step3 +
-                        this.step4 +
-                        this.step5 +
-                        this.step6 +
-                        this.step7;
+                pp = pp + this.step2 + this.step3 + this.step4 + this.step5 + this.step6 + this.step7;
                 break;
             }
         }
@@ -140,6 +132,41 @@ class MusicScaleMath {
         return 0;
     }
 }
+let testIonianC = {
+    basePitch: 0,
+    step2: 2,
+    step3: 2,
+    step4: 1,
+    step5: 2,
+    step6: 2,
+    step7: 2
+};
+let testMetre44 = {
+    count: 4,
+    part: 4
+};
+let testSongProject = {
+    title: "Test song",
+    timeline: [
+        { tempo: 120, metre: testMetre44, scale: testIonianC },
+        { tempo: 120, metre: testMetre44, scale: testIonianC },
+        { tempo: 120, metre: testMetre44, scale: testIonianC },
+        { tempo: 120, metre: testMetre44, scale: testIonianC }
+    ],
+    tracks: [],
+    percussions: [],
+    filters: [
+        {
+            id: "simple_volume",
+            parameters: [
+                {
+                    title: "value",
+                    places: [{ items: [{ skip: { count: 0, part: 4 }, data: "0.7" }] }, { items: [] }, { items: [] }, { items: [] }]
+                }
+            ]
+        }
+    ]
+};
 console.log("MuzXbox v1.0.1");
 class MuzXbox {
     constructor() {
@@ -159,7 +186,20 @@ class MuzXbox {
         }
     }
     initAudioContext() {
-        this.uiStarted = true;
+        let AudioContextFunc = window.AudioContext || window.webkitAudioContext;
+        this.audioContext = new AudioContextFunc();
+        console.log(this.audioContext);
+        if (this.audioContext.state == "running") {
+            this.uiStarted = true;
+        }
+    }
+}
+class MusicTicker {
+    startPlay() { }
+    cancelPlay() { }
+    setPosition(seconds) { }
+    getPosition() {
+        return 0;
     }
 }
 //# sourceMappingURL=base.js.map

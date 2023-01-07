@@ -1,56 +1,133 @@
-type MusicMetre = {
-  count: number;
-  part: number;
+type MZXBX_Metre = {
+	count: number;
+	part: number;
 };
-interface MusicMetreMathType {
-  count: number;
-  part: number;
-  set(from: MusicMetre): MusicMetreMathType;
-  metre(): MusicMetre;
-  simplyfy(): MusicMetreMathType;
-  strip(toPart: number): MusicMetreMathType;
-  equals(metre: MusicMetre): boolean;
-  less(metre: MusicMetre): boolean;
-  more(metre: MusicMetre): boolean;
-  plus(metre: MusicMetre): MusicMetreMathType;
-  minus(metre: MusicMetre): MusicMetreMathType;
-  duration(metre: MusicMetre, tempo: number): number;
+interface MZXBX_MetreMathType {
+	count: number;
+	part: number;
+	set(from: MZXBX_Metre): MZXBX_MetreMathType;
+	metre(): MZXBX_Metre;
+	simplyfy(): MZXBX_MetreMathType;
+	strip(toPart: number): MZXBX_MetreMathType;
+	equals(metre: MZXBX_Metre): boolean;
+	less(metre: MZXBX_Metre): boolean;
+	more(metre: MZXBX_Metre): boolean;
+	plus(metre: MZXBX_Metre): MZXBX_MetreMathType;
+	minus(metre: MZXBX_Metre): MZXBX_MetreMathType;
+	duration(metre: MZXBX_Metre, tempo: number): number;
 }
-type MusicOctave = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-type MusicStep = 1 | 2 | 3 | 4 | 5 | 6 | 7;
-type StepShift = -2 | -1 | 0 | 1 | 2;
-type StepSkip = 1 | 2;
-type MusicScale = {
-  basePitch: number;
-  step2: StepSkip;
-  step3: StepSkip;
-  step4: StepSkip;
-  step5: StepSkip;
-  step6: StepSkip;
-  step7: StepSkip;
+type MZXBX_HalfTone = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
+type MZXBX_Octave = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+type MZXBX_Step = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+type MZXBX_StepShift = -2 | -1 | 0 | 1 | 2;
+type MZXBX_StepSkip = 1 | 2;
+type MZXBX_Scale = {
+	basePitch: MZXBX_HalfTone;
+	step2: MZXBX_StepSkip;
+	step3: MZXBX_StepSkip;
+	step4: MZXBX_StepSkip;
+	step5: MZXBX_StepSkip;
+	step6: MZXBX_StepSkip;
+	step7: MZXBX_StepSkip;
 };
-type MusicNote = {
-  step: 1 | 2 | 3 | 4 | 5 | 6 | 7;
-  shift: StepShift;
-  octave: MusicOctave;
+type MZXBX_Slide = {
+	duration: MZXBX_Metre;
+	delta: number;
 };
-interface MusicScaleMathType {
-  basePitch: number;
-  step2: StepSkip;
-  step3: StepSkip;
-  step4: StepSkip;
-  step5: StepSkip;
-  step6: StepSkip;
-  step7: StepSkip;
-  set(scale: MusicScale): MusicScaleMath;
-  scale(): MusicScale;
-  pitch(musicNote: MusicNote): number;
+type MZXBX_Note = {
+	step: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+	shift: MZXBX_StepShift;
+	octave: MZXBX_Octave;
+	sides: MZXBX_Slide[];
+};
+interface MZXBX_ScaleMathType {
+	basePitch: MZXBX_HalfTone;
+	step2: MZXBX_StepSkip;
+	step3: MZXBX_StepSkip;
+	step4: MZXBX_StepSkip;
+	step5: MZXBX_StepSkip;
+	step6: MZXBX_StepSkip;
+	step7: MZXBX_StepSkip;
+	set(scale: MZXBX_Scale): MZXBX_ScaleMathType;
+	scale(): MZXBX_Scale;
+	pitch(musicNote: MZXBX_Note): number;
 }
-type MusicTrack = {
-  title: string;
+type MZXBX_PluginBase = {
+	setup: (audioContext: AudioContext) => boolean;
 };
-type MusicProject = {
-  title: string;
-  timeline: MusicMetre[];
-  tracks: MusicTrack[];
+type MZXBX_PluginFilter =
+	| MZXBX_PluginBase
+	| {
+			input: string;
+	  };
+type MZXBX_PluginPerformer =
+	| MZXBX_PluginBase
+	| {
+			output: string;
+			schedule: (chord: MZXBX_Chord, when: number) => boolean;
+	  };
+type MZXBX_PluginSampler =
+	| MZXBX_PluginBase
+	| {
+			output: string;
+	  };
+type MZXBX_ParameterData = {
+	skip: MZXBX_Metre;
+	data: string;
+};
+type MZXBX_ParameterMeasure = {
+	states: MZXBX_ParameterData[];
+};
+type MZXBX_PluginParameter = {
+	title: string;
+	measures: MZXBX_ParameterMeasure[];
+};
+type MZXBX_AudioFilter = {
+	id: string;
+	parameters: MZXBX_PluginParameter[];
+};
+type MZXBX_AudioPerformer = {
+	id: string;
+	parameters: MZXBX_PluginParameter[];
+};
+type MZXBX_AudioSampler = {
+	id: string;
+	parameters: MZXBX_PluginParameter[];
+};
+type MZXBX_Chord = {
+	skip: MZXBX_Metre;
+	notes: MZXBX_Note[];
+};
+type MZXBX_TrackMeasure = {
+	chords: MZXBX_Chord[];
+};
+type MZXBX_PercussionBeat = {
+	skips: MZXBX_Metre[];
+};
+type MZXBX_PercussionMeasure = {
+	beats: MZXBX_PercussionBeat[];
+};
+type MZXBX_Measure = {
+	tempo: number;
+	metre: MZXBX_Metre;
+	scale: MZXBX_Scale;
+};
+type MZXBX_PercussionTrack = {
+	title: string;
+	measures: MZXBX_PercussionMeasure[];
+	filters: MZXBX_AudioFilter[];
+	beat: MZXBX_AudioSampler;
+};
+type MZXBX_MusicTrack = {
+	title: string;
+	measures: MZXBX_TrackMeasure[];
+	filters: MZXBX_AudioFilter[];
+	performer: MZXBX_AudioPerformer;
+};
+type MZXBX_Project = {
+	title: string;
+	timeline: MZXBX_Measure[];
+	tracks: MZXBX_MusicTrack[];
+	percussions: MZXBX_PercussionTrack[];
+	filters: MZXBX_AudioFilter[];
 };

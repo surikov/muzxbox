@@ -4,12 +4,12 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.40 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.41 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
 var topShift = cellSize * 11;
-var rowsVisibleCount = 44;
+var rowsVisibleCount = 99;
 var rowsAvgCount = 5;
 //let ratioPre=0.5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
@@ -331,7 +331,7 @@ function calcRowFills(rowNum, rows, counts) {
                 }
             }
         }
-        one.logr = one.summ * one.summ * one.summ * one.summ;
+        one.logr = one.summ * one.summ; // * one.summ* one.summ;
     }
     //setWide(resu);
     return resu;
