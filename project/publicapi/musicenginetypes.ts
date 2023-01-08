@@ -35,7 +35,7 @@ type MZXBX_Slide = {
 	delta: number;
 };
 type MZXBX_Note = {
-	step: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+	step: MZXBX_Step;
 	shift: MZXBX_StepShift;
 	octave: MZXBX_Octave;
 	sides: MZXBX_Slide[];
@@ -71,7 +71,7 @@ type MZXBX_PluginSampler =
 	| {
 			output: string;
 	  };
-type MZXBX_ParameterData = {
+/*type MZXBX_ParameterData = {
 	skip: MZXBX_Metre;
 	data: string;
 };
@@ -81,18 +81,21 @@ type MZXBX_ParameterMeasure = {
 type MZXBX_PluginParameter = {
 	title: string;
 	measures: MZXBX_ParameterMeasure[];
-};
+};*/
 type MZXBX_AudioFilter = {
 	id: string;
-	parameters: MZXBX_PluginParameter[];
+	//parameters: MZXBX_PluginParameter[];
+	data: string;
 };
 type MZXBX_AudioPerformer = {
 	id: string;
-	parameters: MZXBX_PluginParameter[];
+	//parameters: MZXBX_PluginParameter[];
+	data: string;
 };
 type MZXBX_AudioSampler = {
 	id: string;
-	parameters: MZXBX_PluginParameter[];
+	//parameters: MZXBX_PluginParameter[];
+	data: string;
 };
 type MZXBX_Chord = {
 	skip: MZXBX_Metre;
@@ -101,13 +104,13 @@ type MZXBX_Chord = {
 type MZXBX_TrackMeasure = {
 	chords: MZXBX_Chord[];
 };
-type MZXBX_PercussionBeat = {
+/*type MZXBX_PercussionBeat = {
+	skips: MZXBX_Metre[];
+};*/
+type MZXBX_PercussionMeasure = {
 	skips: MZXBX_Metre[];
 };
-type MZXBX_PercussionMeasure = {
-	beats: MZXBX_PercussionBeat[];
-};
-type MZXBX_Measure = {
+type MZXBX_SongMeasure = {
 	tempo: number;
 	metre: MZXBX_Metre;
 	scale: MZXBX_Scale;
@@ -116,7 +119,7 @@ type MZXBX_PercussionTrack = {
 	title: string;
 	measures: MZXBX_PercussionMeasure[];
 	filters: MZXBX_AudioFilter[];
-	beat: MZXBX_AudioSampler;
+	sampler: MZXBX_AudioSampler;
 };
 type MZXBX_MusicTrack = {
 	title: string;
@@ -126,7 +129,7 @@ type MZXBX_MusicTrack = {
 };
 type MZXBX_Project = {
 	title: string;
-	timeline: MZXBX_Measure[];
+	timeline: MZXBX_SongMeasure[];
 	tracks: MZXBX_MusicTrack[];
 	percussions: MZXBX_PercussionTrack[];
 	filters: MZXBX_AudioFilter[];

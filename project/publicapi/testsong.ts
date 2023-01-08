@@ -24,12 +24,7 @@ let testSongProject: MZXBX_Project = {
 	filters: [
 		{
 			id: "simple_volume",
-			parameters: [
-				{
-					title: "value",
-					measures: [{ states: [{ skip: { count: 0, part: 4 }, data: "0.7" }] }, { states: [] }, { states: [] }, { states: [] }]
-				}
-			]
+			data: "0.77"
 		}
 	]
 };

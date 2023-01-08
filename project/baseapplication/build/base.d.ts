@@ -79,39 +79,29 @@ interface MZXBX_ScaleMathType {
     pitch(musicNote: MZXBX_Note): number;
 }
 declare type MZXBX_PluginBase = {
-    id: string;
+    setup: (audioContext: AudioContext) => boolean;
 };
 declare type MZXBX_PluginFilter = MZXBX_PluginBase | {
     input: string;
 };
 declare type MZXBX_PluginPerformer = MZXBX_PluginBase | {
     output: string;
+    schedule: (chord: MZXBX_Chord, when: number) => boolean;
 };
 declare type MZXBX_PluginSampler = MZXBX_PluginBase | {
     output: string;
 };
-declare type MZXBX_ParameterData = {
-    skip: MZXBX_Metre;
-    data: string;
-};
-declare type MZXBX_ParameterPlace = {
-    items: MZXBX_ParameterData[];
-};
-declare type MZXBX_PluginParameter = {
-    title: string;
-    places: MZXBX_ParameterPlace[];
-};
 declare type MZXBX_AudioFilter = {
     id: string;
-    parameters: MZXBX_PluginParameter[];
+    data: string;
 };
 declare type MZXBX_AudioPerformer = {
     id: string;
-    parameters: MZXBX_PluginParameter[];
+    data: string;
 };
 declare type MZXBX_AudioSampler = {
     id: string;
-    parameters: MZXBX_PluginParameter[];
+    data: string;
 };
 declare type MZXBX_Chord = {
     skip: MZXBX_Metre;
@@ -120,13 +110,10 @@ declare type MZXBX_Chord = {
 declare type MZXBX_TrackMeasure = {
     chords: MZXBX_Chord[];
 };
-declare type MZXBX_PercussionBeat = {
+declare type MZXBX_PercussionMeasure = {
     skips: MZXBX_Metre[];
 };
-declare type MZXBX_PercussionMeasure = {
-    beats: MZXBX_PercussionBeat[];
-};
-declare type MZXBX_Measure = {
+declare type MZXBX_SongMeasure = {
     tempo: number;
     metre: MZXBX_Metre;
     scale: MZXBX_Scale;
@@ -135,7 +122,7 @@ declare type MZXBX_PercussionTrack = {
     title: string;
     measures: MZXBX_PercussionMeasure[];
     filters: MZXBX_AudioFilter[];
-    beat: MZXBX_AudioSampler;
+    sampler: MZXBX_AudioSampler;
 };
 declare type MZXBX_MusicTrack = {
     title: string;
@@ -145,7 +132,7 @@ declare type MZXBX_MusicTrack = {
 };
 declare type MZXBX_Project = {
     title: string;
-    timeline: MZXBX_Measure[];
+    timeline: MZXBX_SongMeasure[];
     tracks: MZXBX_MusicTrack[];
     percussions: MZXBX_PercussionTrack[];
     filters: MZXBX_AudioFilter[];

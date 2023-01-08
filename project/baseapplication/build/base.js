@@ -158,12 +158,7 @@ let testSongProject = {
     filters: [
         {
             id: "simple_volume",
-            parameters: [
-                {
-                    title: "value",
-                    places: [{ items: [{ skip: { count: 0, part: 4 }, data: "0.7" }] }, { items: [] }, { items: [] }, { items: [] }]
-                }
-            ]
+            data: "0.77"
         }
     ]
 };
