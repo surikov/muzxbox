@@ -55,22 +55,16 @@ interface MZXBX_ScaleMathType {
 type MZXBX_PluginBase = {
 	setup: (audioContext: AudioContext) => boolean;
 };
-type MZXBX_PluginFilter =
-	| MZXBX_PluginBase
-	| {
-			input: string;
-	  };
-type MZXBX_PluginPerformer =
-	| MZXBX_PluginBase
-	| {
-			output: string;
-			schedule: (chord: MZXBX_Chord, when: number) => boolean;
-	  };
-type MZXBX_PluginSampler =
-	| MZXBX_PluginBase
-	| {
-			output: string;
-	  };
+type MZXBX_PluginFilter = MZXBX_PluginBase | {
+	input: string;
+};
+type MZXBX_PluginPerformer = MZXBX_PluginBase | {
+	output: string;
+	schedule: (chord: MZXBX_Chord, when: number) => boolean;
+};
+type MZXBX_PluginSampler = MZXBX_PluginBase | {
+	output: string;
+};
 /*type MZXBX_ParameterData = {
 	skip: MZXBX_Metre;
 	data: string;
@@ -134,3 +128,39 @@ type MZXBX_Project = {
 	percussions: MZXBX_PercussionTrack[];
 	filters: MZXBX_AudioFilter[];
 };
+type MZXBX_Channel = {
+	id: string;
+	filters: MZXBX_AudioFilter[];
+};
+type MZXBX_ChannelSampler = MZXBX_Channel | {
+	id: string;
+	sampler: MZXBX_AudioSampler;
+};
+type MZXBX_ChannelPerformer = MZXBX_Channel | {
+	id: string;
+	performer: MZXBX_AudioPerformer;
+};
+type MZXBX_PlayItem = {
+	skip: number;
+	channel: string;
+};
+type MZXBX_SamplerItem = MZXBX_PlayItem | {
+
+};
+type MZXBX_PerformerItem = MZXBX_PlayItem | {
+	pitch: number;
+};
+type MZXBX_Set = {
+	duration: number;
+	items: MZXBX_PlayItem[];
+};
+type MZXBX_Schedule = {
+	series: MZXBX_Set[];
+	channels: MZXBX_Channel[];
+	filters: MZXBX_AudioFilter[];
+};
+
+
+
+
+
