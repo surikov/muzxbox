@@ -128,36 +128,46 @@ type MZXBX_Project = {
 	percussions: MZXBX_PercussionTrack[];
 	filters: MZXBX_AudioFilter[];
 };
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 type MZXBX_Channel = {
 	id: string;
-	filters: MZXBX_AudioFilter[];
+	filters: MZXBX_ChannelPlugin[];
+	performer: MZXBX_ChannelPlugin;
 };
-type MZXBX_ChannelSampler = MZXBX_Channel | {
-	id: string;
-	sampler: MZXBX_AudioSampler;
-};
-type MZXBX_ChannelPerformer = MZXBX_Channel | {
-	id: string;
-	performer: MZXBX_AudioPerformer;
-};
+type MZXBX_SlideItem = {
+	duration: number;
+	delta: number;
+}
 type MZXBX_PlayItem = {
+	groupId: string;
 	skip: number;
-	channel: string;
-};
-type MZXBX_SamplerItem = MZXBX_PlayItem | {
-
-};
-type MZXBX_PerformerItem = MZXBX_PlayItem | {
+	channelId: string;
 	pitch: number;
+	volume: number;
+	slides: MZXBX_SlideItem;
 };
 type MZXBX_Set = {
 	duration: number;
 	items: MZXBX_PlayItem[];
 };
+type MZXBX_ChannelPlugin = {
+	id: string;
+	kind: string;
+	properties: string;
+};
+type MZXBX_ChannelFilter = {
+	reset: (context: AudioContext, parameters: string) => boolean;
+};
+
+type MZXBX_ChannelPerformer = {
+	reset: (context: AudioContext, parameters: string) => boolean;
+	schedule: (when: number, pitch: number, volume: number, slides: MZXBX_SlideItem[]) => void;
+	cancel: () => void;
+};
 type MZXBX_Schedule = {
 	series: MZXBX_Set[];
 	channels: MZXBX_Channel[];
-	filters: MZXBX_AudioFilter[];
+	filters: MZXBX_ChannelPlugin[];
 };
 
 
