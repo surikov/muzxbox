@@ -169,7 +169,12 @@ type MZXBX_Schedule = {
 	channels: MZXBX_Channel[];
 	filters: MZXBX_ChannelPlugin[];
 };
-
+type MZXBX_Player = {
+	setup: (context: AudioContext, schedule: MZXBX_Schedule) => boolean;
+	start: (from: number, to: number) => boolean;
+	cancel: () => void;
+	position: () => number;
+}
 
 
 
