@@ -25,3 +25,19 @@ class MuzXbox {
 		}
 	}
 }
+class SchedulePlayer implements MZXBX_Player {
+	audioContext: AudioContext;
+	setup(context: AudioContext, schedule: MZXBX_Schedule) {
+		this.audioContext=context;
+		return false;
+	}
+	startLoop(from: number, position: number, to: number) {
+		return false;
+	}
+	cancel() {
+
+	}
+	position() {
+		return 0;
+	}
+}

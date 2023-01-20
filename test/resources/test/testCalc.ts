@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.42 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.43 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -378,15 +378,17 @@ function calcRowFills(rowNum: number, rows: BallsRow[], counts: number[]): { bal
 }*/
 function calcRowPreFreqs(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
 	let w0=0;
-	let w1=1/3;
-	let w2=1/5;
-	let w3=1/7;
-	let w4=1/9;
+	let w1=1/5;
+	let w2=1/9;
+	let w3=1/13;
+	let w4=1/17;
+	let w5=1/23;
 	let sums=[
 		 w4,w3,w2,w1,w1,w1,w2,w3,w4//
-		,w0,w4,w3,w2,w2,w2,w3,w4,w0//
-		,w0,w4,w4,w3,w3,w3,w4,w4,w0//
-		,w0,w0,w0,w4,w4,w4,w0,w0,w0//
+		,w5,w4,w3,w2,w1,w2,w3,w4,w5//
+		,w5,w4,w4,w3,w3,w3,w4,w4,w5//
+		,w0,w5,w4,w4,w4,w4,w4,w5,w0//
+		,w0,w0,w5,w5,w5,w5,w5,w0,w0//
 	];
 	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
 	//console.log(rowNum,rows[0]);
@@ -402,9 +404,9 @@ function calcRowPreFreqs(rowNum: number, rows: BallsRow[]): { ball: number, fill
 			}
 			one.logr = one.summ * one.summ;*/
 				for(let ax=-4;ax<=4;ax++){
-					for(let ay=0;ay<4;ay++){
+					for(let ay=0;ay<5;ay++){
 						let rr=sums[ax+4+9*ay];
-						if (ballExists(nn + ax, rows[rowNum+ay+1])) { one.logr=one.logr+rr; }
+						if (ballExists(nn + ax, rows[rowNum+ay+1])) { one.logr=one.logr+rr*rr; }
 					}
 				}
 		}

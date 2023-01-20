@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.42 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.43 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -356,18 +356,21 @@ function calcRowFills(rowNum, rows, counts) {
 }*/
 function calcRowPreFreqs(rowNum, rows) {
     var w0 = 0;
-    var w1 = 1 / 3;
-    var w2 = 1 / 5;
-    var w3 = 1 / 7;
-    var w4 = 1 / 9;
+    var w1 = 1 / 5;
+    var w2 = 1 / 9;
+    var w3 = 1 / 13;
+    var w4 = 1 / 17;
+    var w5 = 1 / 23;
     var sums = [
         w4, w3, w2, w1, w1, w1, w2, w3, w4 //
         ,
-        w0, w4, w3, w2, w2, w2, w3, w4, w0 //
+        w5, w4, w3, w2, w1, w2, w3, w4, w5 //
         ,
-        w0, w4, w4, w3, w3, w3, w4, w4, w0 //
+        w5, w4, w4, w3, w3, w3, w4, w4, w5 //
         ,
-        w0, w0, w0, w4, w4, w4, w0, w0, w0 //
+        w0, w5, w4, w4, w4, w4, w4, w5, w0 //
+        ,
+        w0, w0, w5, w5, w5, w5, w5, w0, w0 //
     ];
     var resu = [];
     //console.log(rowNum,rows[0]);
@@ -382,10 +385,10 @@ function calcRowPreFreqs(rowNum, rows) {
             }
             one.logr = one.summ * one.summ;*/
             for (var ax = -4; ax <= 4; ax++) {
-                for (var ay = 0; ay < 4; ay++) {
+                for (var ay = 0; ay < 5; ay++) {
                     var rr = sums[ax + 4 + 9 * ay];
                     if (ballExists(nn + ax, rows[rowNum + ay + 1])) {
-                        one.logr = one.logr + rr;
+                        one.logr = one.logr + rr * rr;
                     }
                 }
             }
