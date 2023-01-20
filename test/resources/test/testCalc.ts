@@ -11,13 +11,13 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.41 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.42 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
 let cellSize = 12;
 let topShift = cellSize * 11;
-let rowsVisibleCount = 99;
+let rowsVisibleCount = 66;
 let rowsAvgCount = 5;
 //let ratioPre=0.5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
@@ -358,7 +358,7 @@ function calcRowFills(rowNum: number, rows: BallsRow[], counts: number[]): { bal
 	//setWide(resu);
 	return resu;
 }
-function calcRowFreqs(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
+/*function calcRowFreqs(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
 	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
 	//console.log(rows);
 
@@ -374,6 +374,42 @@ function calcRowFreqs(rowNum: number, rows: BallsRow[]): { ball: number, fills: 
 			one.logr = one.summ * one.summ;
 		}
 	}
+	return resu;
+}*/
+function calcRowPreFreqs(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
+	let w0=0;
+	let w1=1/3;
+	let w2=1/5;
+	let w3=1/7;
+	let w4=1/9;
+	let sums=[
+		 w4,w3,w2,w1,w1,w1,w2,w3,w4//
+		,w0,w4,w3,w2,w2,w2,w3,w4,w0//
+		,w0,w4,w4,w3,w3,w3,w4,w4,w0//
+		,w0,w0,w0,w4,w4,w4,w0,w0,w0//
+	];
+	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
+	//console.log(rowNum,rows[0]);
+
+	for (let nn = 0; nn < rowLen; nn++) {
+		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
+		resu.push(one);
+		if (rows.length > rowNum + 1 + calcLen) {
+			/*for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
+				if (ballExists(nn + 0, rows[rr])) { one.summ = one.summ + 0.15; }
+				if (ballExists(nn + 1, rows[rr])) { one.summ++; }
+				if (ballExists(nn + 2, rows[rr])) { one.summ = one.summ + 0.15; }
+			}
+			one.logr = one.summ * one.summ;*/
+				for(let ax=-4;ax<=4;ax++){
+					for(let ay=0;ay<4;ay++){
+						let rr=sums[ax+4+9*ay];
+						if (ballExists(nn + ax, rows[rowNum+ay+1])) { one.logr=one.logr+rr; }
+					}
+				}
+		}
+	}
+	//console.log(resu);
 	return resu;
 }
 function calcRowHot(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
@@ -417,7 +453,8 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		let precounts = calcRowPatterns(rr + 1, rows);
 		let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[];
 		if (highLightMode == 2) {
-			calcs = calcRowFreqs(rr, rows);
+			//calcs = calcRowFreqs(rr, rows);
+			calcs = calcRowPreFreqs(rr, rows);
 		} else {
 			if (highLightMode == 1) {
 				calcs = calcRowHot(rr, rows);
@@ -597,10 +634,11 @@ function addTails() {
 			});
 		}
 	}
-	dumpLineFirst(firsts);
+	//dumpLineFirst(firsts);
 	fillCells();
 
 }
+/*
 function dumpLineFirst(firsts: number[]) {
 	console.log(firsts);
 	var alpha = 0.5  // overall smoothing component
@@ -617,7 +655,7 @@ function dumpLineFirst(firsts: number[]) {
 	// -> [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 594.8043646513713, 357.12171044215734, ...]
 	console.log(predictions);
 	console.log(predictions[predictions.length - 1] - 100);
-}
+}*/
 ////////////////////////
 /* Holt-Winters triple exponential smoothing
  * see: http://www.itl.nist.gov/div898/handbook/pmc/section4/pmc435.htm
@@ -631,6 +669,7 @@ function dumpLineFirst(firsts: number[]) {
  *
  * @return {Float64Array}
  */
+ /*
 function forecast(data: number[], alpha: number, beta: number, gamma: number, period: number, m): number[] {
 	var seasons: number, seasonal: number[];
 	if (!validArgs(data, alpha, beta, gamma, period, m)) return;
@@ -730,7 +769,7 @@ function calcHoltWinters(data: number[], st_1: number, bt_1: number, alpha: numb
 	}
 	// -> forecast[]
 	return ft;
-}
+}*/
 function dumpStatAll(){
 	let idx=Math.floor(Math.random()*rowLen);
 	for(let sz=1;sz<=ballsInRow;sz++){

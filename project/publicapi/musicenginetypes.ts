@@ -171,7 +171,7 @@ type MZXBX_Schedule = {
 };
 type MZXBX_Player = {
 	setup: (context: AudioContext, schedule: MZXBX_Schedule) => boolean;
-	start: (from: number, to: number) => boolean;
+	startLoop: (from: number, position:number,to: number) => boolean;
 	cancel: () => void;
 	position: () => number;
 }

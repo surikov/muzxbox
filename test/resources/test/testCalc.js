@@ -4,12 +4,12 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.41 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.42 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
 var topShift = cellSize * 11;
-var rowsVisibleCount = 99;
+var rowsVisibleCount = 66;
 var rowsAvgCount = 5;
 //let ratioPre=0.5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
@@ -336,27 +336,62 @@ function calcRowFills(rowNum, rows, counts) {
     //setWide(resu);
     return resu;
 }
-function calcRowFreqs(rowNum, rows) {
-    var resu = [];
+/*function calcRowFreqs(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
+    let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
     //console.log(rows);
-    for (var nn = 0; nn < rowLen; nn++) {
-        var one = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
+
+    for (let nn = 0; nn < rowLen; nn++) {
+        let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
         resu.push(one);
         if (rows.length > rowNum + 1 + calcLen) {
             for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
-                if (ballExists(nn + 0, rows[rr])) {
-                    one.summ = one.summ + 0.15;
-                }
-                if (ballExists(nn + 1, rows[rr])) {
-                    one.summ++;
-                }
-                if (ballExists(nn + 2, rows[rr])) {
-                    one.summ = one.summ + 0.15;
-                }
+                if (ballExists(nn + 0, rows[rr])) { one.summ = one.summ + 0.15; }
+                if (ballExists(nn + 1, rows[rr])) { one.summ++; }
+                if (ballExists(nn + 2, rows[rr])) { one.summ = one.summ + 0.15; }
             }
             one.logr = one.summ * one.summ;
         }
     }
+    return resu;
+}*/
+function calcRowPreFreqs(rowNum, rows) {
+    var w0 = 0;
+    var w1 = 1 / 3;
+    var w2 = 1 / 5;
+    var w3 = 1 / 7;
+    var w4 = 1 / 9;
+    var sums = [
+        w4, w3, w2, w1, w1, w1, w2, w3, w4 //
+        ,
+        w0, w4, w3, w2, w2, w2, w3, w4, w0 //
+        ,
+        w0, w4, w4, w3, w3, w3, w4, w4, w0 //
+        ,
+        w0, w0, w0, w4, w4, w4, w0, w0, w0 //
+    ];
+    var resu = [];
+    //console.log(rowNum,rows[0]);
+    for (var nn = 0; nn < rowLen; nn++) {
+        var one = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
+        resu.push(one);
+        if (rows.length > rowNum + 1 + calcLen) {
+            /*for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
+                if (ballExists(nn + 0, rows[rr])) { one.summ = one.summ + 0.15; }
+                if (ballExists(nn + 1, rows[rr])) { one.summ++; }
+                if (ballExists(nn + 2, rows[rr])) { one.summ = one.summ + 0.15; }
+            }
+            one.logr = one.summ * one.summ;*/
+            for (var ax = -4; ax <= 4; ax++) {
+                for (var ay = 0; ay < 4; ay++) {
+                    var rr = sums[ax + 4 + 9 * ay];
+                    if (ballExists(nn + ax, rows[rowNum + ay + 1])) {
+                        one.logr = one.logr + rr;
+                    }
+                }
+            }
+        }
+    }
+    //console.log(resu);
     return resu;
 }
 function calcRowHot(rowNum, rows) {
@@ -402,7 +437,8 @@ function dumpTriads(svg, rows) {
         var precounts = calcRowPatterns(rr + 1, rows);
         var calcs = void 0;
         if (highLightMode == 2) {
-            calcs = calcRowFreqs(rr, rows);
+            //calcs = calcRowFreqs(rr, rows);
+            calcs = calcRowPreFreqs(rr, rows);
         }
         else {
             if (highLightMode == 1) {
@@ -577,17 +613,18 @@ function addTails() {
             });
         }
     }
-    dumpLineFirst(firsts);
+    //dumpLineFirst(firsts);
     fillCells();
 }
-function dumpLineFirst(firsts) {
+/*
+function dumpLineFirst(firsts: number[]) {
     console.log(firsts);
-    var alpha = 0.5 // overall smoothing component
-    , beta = 0.4 // trend smoothing component
-    , gamma = 0.6 // seasonal smoothing component
-    , period = 4 // # of observations per season
-    , m = 1 // # of future observations to forecast
-    , predictions = [];
+    var alpha = 0.5  // overall smoothing component
+        , beta = 0.4   // trend smoothing component
+        , gamma = 0.6  // seasonal smoothing component
+        , period = 4   // # of observations per season
+        , m = 1        // # of future observations to forecast
+        , predictions = [];
     var sz = Math.floor(firsts.length / period) * period;
     console.log(sz);
     firsts.splice(0, firsts.length - sz);
@@ -596,7 +633,7 @@ function dumpLineFirst(firsts) {
     // -> [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 594.8043646513713, 357.12171044215734, ...]
     console.log(predictions);
     console.log(predictions[predictions.length - 1] - 100);
-}
+}*/
 ////////////////////////
 /* Holt-Winters triple exponential smoothing
  * see: http://www.itl.nist.gov/div898/handbook/pmc/section4/pmc435.htm
@@ -610,113 +647,107 @@ function dumpLineFirst(firsts) {
  *
  * @return {Float64Array}
  */
-function forecast(data, alpha, beta, gamma, period, m) {
-    var seasons, seasonal;
-    if (!validArgs(data, alpha, beta, gamma, period, m))
-        return;
-    seasons = data.length / period;
-    var st_1 = data[0];
-    var bt_1 = initialTrend(data, period);
-    seasonal = seasonalIndices(data, period, seasons);
-    return calcHoltWinters(data, st_1, bt_1, alpha, beta, gamma, seasonal, period, m);
+/*
+function forecast(data: number[], alpha: number, beta: number, gamma: number, period: number, m): number[] {
+   var seasons: number, seasonal: number[];
+   if (!validArgs(data, alpha, beta, gamma, period, m)) return;
+   seasons = data.length / period;
+   var st_1: number = data[0];
+   var bt_1: number = initialTrend(data, period);
+   seasonal = seasonalIndices(data, period, seasons);
+   return calcHoltWinters(data, st_1, bt_1, alpha, beta, gamma, seasonal, period, m);
 }
 //module.exports = forecast;
-function validArgs(data, alpha, beta, gamma, period, m) {
-    if (!data.length)
-        return false;
-    if (m <= 0)
-        return false;
-    if (m > period)
-        return false;
-    if (alpha < 0.0 || alpha > 1.0)
-        return false;
-    if (beta < 0.0 || beta > 1.0)
-        return false;
-    if (gamma < 0.0 || gamma > 1.0)
-        return false;
-    return true;
+function validArgs(data: number[], alpha: number, beta: number, gamma: number, period: number, m: number): boolean {
+   if (!data.length) return false;
+   if (m <= 0) return false;
+   if (m > period) return false;
+   if (alpha < 0.0 || alpha > 1.0) return false;
+   if (beta < 0.0 || beta > 1.0) return false;
+   if (gamma < 0.0 || gamma > 1.0) return false;
+   return true;
 }
-function initialTrend(data, period) {
-    var sum = 0;
-    for (var i = 0; i < period; i++) {
-        sum = sum + (data[period + i] - data[i]);
-    }
-    return sum / (period * period);
+function initialTrend(data: number[], period: number): number {
+   var sum = 0;
+   for (var i = 0; i < period; i++) {
+       sum = sum + (data[period + i] - data[i]);
+   }
+   return sum / (period * period);
 }
-function seasonalIndices(data, period, seasons) {
-    var savg, obsavg, si, i, j;
-    savg = Array(seasons);
-    obsavg = Array(data.length);
-    si = Array(period);
-    // zero-fill savg[] and si[]
-    for (var i_2 = 0; i_2 < seasons; i_2++) {
-        savg[i_2] = 0.0;
-    }
-    for (var i_3 = 0; i_3 < period; i_3++) {
-        si[i_3] = 0.0;
-    }
-    // seasonal averages
-    for (var i_4 = 0; i_4 < seasons; i_4++) {
-        for (var j_1 = 0; j_1 < period; j_1++) {
-            savg[i_4] = savg[i_4] + data[(i_4 * period) + j_1];
-        }
-        savg[i_4] = savg[i_4] / period;
-    }
-    // averaged observations
-    for (var i_5 = 0; i_5 < seasons; i_5++) {
-        for (var j_2 = 0; j_2 < period; j_2++) {
-            obsavg[(i_5 * period) + j_2] = data[(i_5 * period) + j_2] / savg[i_5];
-        }
-    }
-    // seasonal indices
-    for (var i_6 = 0; i_6 < period; i_6++) {
-        for (var j_3 = 0; j_3 < seasons; j_3++) {
-            si[i_6] = si[i_6] + obsavg[(j_3 * period) + i_6];
-        }
-        si[i_6] = si[i_6] / seasons;
-    }
-    return si;
+function seasonalIndices(data: number[], period: number, seasons: number): number[] {
+   var savg: number[], obsavg: number[], si: number[], i: number, j: number;
+   savg = Array(seasons);
+   obsavg = Array(data.length);
+   si = Array(period);
+   // zero-fill savg[] and si[]
+   for (let i: number = 0; i < seasons; i++) {
+       savg[i] = 0.0;
+   }
+   for (let i = 0; i < period; i++) {
+       si[i] = 0.0;
+   }
+   // seasonal averages
+   for (let i = 0; i < seasons; i++) {
+       for (let j = 0; j < period; j++) {
+           savg[i] = savg[i] + data[(i * period) + j];
+       }
+       savg[i] = savg[i] / period;
+   }
+   // averaged observations
+   for (let i = 0; i < seasons; i++) {
+       for (let j = 0; j < period; j++) {
+           obsavg[(i * period) + j] = data[(i * period) + j] / savg[i];
+       }
+   }
+   // seasonal indices
+   for (let i = 0; i < period; i++) {
+       for (let j = 0; j < seasons; j++) {
+           si[i] = si[i] + obsavg[(j * period) + i];
+       }
+       si[i] = si[i] / seasons;
+   }
+   return si;
 }
-function calcHoltWinters(data, st_1, bt_1, alpha, beta, gamma, seasonal, period, m) {
-    var len = data.length, st = Array(len), // overall smoothing component
-    bt = Array(len), // trend smoothing component
-    it = Array(len), // seasonal smoothing component
-    ft = Array(len), // generated forecast
-    i; // reusable idx
-    // initial level st[1] == st_1 == data[0] ... see function forecast()
-    st[1] = st_1;
-    // initial trend bt[1] == bt_1 == initialTrend(data, period) ... see function forecast()
-    bt[1] = bt_1;
-    // zero-fill ft[] (to clean up undefined values at start of forecast array --i.e. ft[])
-    for (i = 0; i < len; i++) {
-        ft[i] = 0.0;
-    }
-    // initial seasonal indices it[]
-    for (i = 0; i < period; i++) {
-        it[i] = seasonal[i];
-    }
-    for (var i_7 = 2; i_7 < len; i_7++) {
-        // overall level smoothing component st[]
-        if (i_7 - period >= 0) {
-            st[i_7] = ((alpha * data[i_7]) / it[i_7 - period]) + ((1.0 - alpha) * (st[i_7 - 1] + bt[i_7 - 1]));
-        }
-        else {
-            st[i_7] = (alpha * data[i_7]) + ((1.0 - alpha) * (st[i_7 - 1] + bt[i_7 - 1]));
-        }
-        // trend smoothing component bt[]
-        bt[i_7] = (gamma * (st[i_7] - st[i_7 - 1])) + ((1 - gamma) * bt[i_7 - 1]);
-        // seasonal smoothing component it[]
-        if (i_7 - period >= 0) {
-            it[i_7] = ((beta * data[i_7]) / st[i_7]) + ((1.0 - beta) * it[i_7 - period]);
-        }
-        // generate forecast as ft[]
-        if (i_7 + m >= period) {
-            ft[i_7 + m] = (st[i_7] + (m * bt[i_7])) * it[i_7 - period + m];
-        }
-    }
-    // -> forecast[]
-    return ft;
-}
+function calcHoltWinters(data: number[], st_1: number, bt_1: number, alpha: number, beta: number, gamma: number, seasonal: number[], period: number, m: number): number[] {
+   var len: number = data.length,
+       st: number[] = Array(len), // overall smoothing component
+       bt: number[] = Array(len), // trend smoothing component
+       it: number[] = Array(len), // seasonal smoothing component
+       ft: number[] = Array(len), // generated forecast
+       i: number; // reusable idx
+   // initial level st[1] == st_1 == data[0] ... see function forecast()
+   st[1] = st_1;
+   // initial trend bt[1] == bt_1 == initialTrend(data, period) ... see function forecast()
+   bt[1] = bt_1;
+   // zero-fill ft[] (to clean up undefined values at start of forecast array --i.e. ft[])
+   for (i = 0; i < len; i++) {
+       ft[i] = 0.0;
+   }
+   // initial seasonal indices it[]
+   for (i = 0; i < period; i++) {
+       it[i] = seasonal[i];
+   }
+   for (let i = 2; i < len; i++) {
+       // overall level smoothing component st[]
+       if (i - period >= 0) {
+           st[i] = ((alpha * data[i]) / it[i - period]) + ((1.0 - alpha) * (st[i - 1] + bt[i - 1]));
+       } else {
+           st[i] = (alpha * data[i]) + ((1.0 - alpha) * (st[i - 1] + bt[i - 1]));
+       }
+       // trend smoothing component bt[]
+       bt[i] = (gamma * (st[i] - st[i - 1])) + ((1 - gamma) * bt[i - 1]);
+       // seasonal smoothing component it[]
+       if (i - period >= 0) {
+           it[i] = ((beta * data[i]) / st[i]) + ((1.0 - beta) * it[i - period]);
+       }
+       // generate forecast as ft[]
+       if (i + m >= period) {
+           ft[i + m] = (st[i] + (m * bt[i])) * it[i - period + m];
+       }
+   }
+   // -> forecast[]
+   return ft;
+}*/
 function dumpStatAll() {
     var idx = Math.floor(Math.random() * rowLen);
     for (var sz = 1; sz <= ballsInRow; sz++) {
