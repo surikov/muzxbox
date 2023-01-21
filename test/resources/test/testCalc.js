@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.43 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.44 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
