@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.43 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.44 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -378,11 +378,11 @@ function calcRowFills(rowNum: number, rows: BallsRow[], counts: number[]): { bal
 }*/
 function calcRowPreFreqs(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
 	let w0=0;
-	let w1=1/5;
-	let w2=1/9;
-	let w3=1/13;
-	let w4=1/17;
-	let w5=1/23;
+	let w1=100;
+	let w2=75;
+	let w3=50;
+	let w4=30;
+	let w5=10;
 	let sums=[
 		 w4,w3,w2,w1,w1,w1,w2,w3,w4//
 		,w5,w4,w3,w2,w1,w2,w3,w4,w5//
@@ -391,27 +391,18 @@ function calcRowPreFreqs(rowNum: number, rows: BallsRow[]): { ball: number, fill
 		,w0,w0,w5,w5,w5,w5,w5,w0,w0//
 	];
 	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
-	//console.log(rowNum,rows[0]);
-
 	for (let nn = 0; nn < rowLen; nn++) {
 		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
 		resu.push(one);
 		if (rows.length > rowNum + 1 + calcLen) {
-			/*for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
-				if (ballExists(nn + 0, rows[rr])) { one.summ = one.summ + 0.15; }
-				if (ballExists(nn + 1, rows[rr])) { one.summ++; }
-				if (ballExists(nn + 2, rows[rr])) { one.summ = one.summ + 0.15; }
-			}
-			one.logr = one.summ * one.summ;*/
-				for(let ax=-4;ax<=4;ax++){
-					for(let ay=0;ay<5;ay++){
-						let rr=sums[ax+4+9*ay];
-						if (ballExists(nn + ax, rows[rowNum+ay+1])) { one.logr=one.logr+rr*rr; }
-					}
+			for(let ax=-4;ax<=4;ax++){
+				for(let ay=0;ay<5;ay++){
+					let rr=sums[ax+4+9*ay];
+					if (ballExists(nn + ax+1, rows[rowNum+ay+1])) { one.logr=one.logr+rr; }
 				}
+			}
 		}
 	}
-	//console.log(resu);
 	return resu;
 }
 function calcRowHot(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {

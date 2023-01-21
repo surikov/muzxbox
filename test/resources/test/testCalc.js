@@ -356,11 +356,11 @@ function calcRowFills(rowNum, rows, counts) {
 }*/
 function calcRowPreFreqs(rowNum, rows) {
     var w0 = 0;
-    var w1 = 1 / 5;
-    var w2 = 1 / 9;
-    var w3 = 1 / 13;
-    var w4 = 1 / 17;
-    var w5 = 1 / 23;
+    var w1 = 100;
+    var w2 = 75;
+    var w3 = 50;
+    var w4 = 30;
+    var w5 = 10;
     var sums = [
         w4, w3, w2, w1, w1, w1, w2, w3, w4 //
         ,
@@ -373,28 +373,20 @@ function calcRowPreFreqs(rowNum, rows) {
         w0, w0, w5, w5, w5, w5, w5, w0, w0 //
     ];
     var resu = [];
-    //console.log(rowNum,rows[0]);
     for (var nn = 0; nn < rowLen; nn++) {
         var one = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
         resu.push(one);
         if (rows.length > rowNum + 1 + calcLen) {
-            /*for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
-                if (ballExists(nn + 0, rows[rr])) { one.summ = one.summ + 0.15; }
-                if (ballExists(nn + 1, rows[rr])) { one.summ++; }
-                if (ballExists(nn + 2, rows[rr])) { one.summ = one.summ + 0.15; }
-            }
-            one.logr = one.summ * one.summ;*/
             for (var ax = -4; ax <= 4; ax++) {
                 for (var ay = 0; ay < 5; ay++) {
                     var rr = sums[ax + 4 + 9 * ay];
-                    if (ballExists(nn + ax, rows[rowNum + ay + 1])) {
-                        one.logr = one.logr + rr * rr;
+                    if (ballExists(nn + ax + 1, rows[rowNum + ay + 1])) {
+                        one.logr = one.logr + rr;
                     }
                 }
             }
         }
     }
-    //console.log(resu);
     return resu;
 }
 function calcRowHot(rowNum, rows) {
