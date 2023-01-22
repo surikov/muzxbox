@@ -131,8 +131,8 @@ type MZXBX_Project = {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 type MZXBX_Channel = {
     id: string;
-    filters: MZXBX_ChannelPlugin[];
-    performer: MZXBX_ChannelPlugin;
+    filters: MZXBX_ChannelFilter[];
+    performer: MZXBX_ChannelPerformer;
 };
 type MZXBX_SlideItem = {
     duration: number;
@@ -150,16 +150,20 @@ type MZXBX_Set = {
     duration: number;
     items: MZXBX_PlayItem[];
 };
-type MZXBX_ChannelPlugin = {
+type MZXBX_ChannelFilter = {
     id: string;
     kind: string;
     properties: string;
 };
-type MZXBX_ChannelFilter = {
+type MZXBX_AudioFilterPlugin = {
     reset: (context: AudioContext, parameters: string) => boolean;
 };
-
 type MZXBX_ChannelPerformer = {
+    id: string;
+    kind: string;
+    properties: string;
+};
+type MZXBX_AudioPerformerPlugin = {
     reset: (context: AudioContext, parameters: string) => boolean;
     schedule: (when: number, pitch: number, volume: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
@@ -167,13 +171,13 @@ type MZXBX_ChannelPerformer = {
 type MZXBX_Schedule = {
     series: MZXBX_Set[];
     channels: MZXBX_Channel[];
-    filters: MZXBX_ChannelPlugin[];
+    filters: MZXBX_ChannelFilter[];
 };
 type MZXBX_Player = {
     setup: (context: AudioContext, schedule: MZXBX_Schedule) => boolean;
-    startLoop: (from: number, position: number, to: number) => boolean;
+    start: (from: number, position: number, to: number) => boolean;
     cancel: () => void;
-    position: () => number;
+    position:  number;
 }
 
 
