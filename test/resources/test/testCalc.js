@@ -324,7 +324,7 @@ function calcRowFills(rowNum, rows, counts) {
         resu.push(one);
         for (var dx1 = 0; dx1 < rowLen; dx1++) {
             for (var dx2 = 0; dx2 < rowLen; dx2++) {
-                if (triadFills(nn + 1, rowNum, dx1, dx2, rows)) {
+                if (triadFills(one.ball, rowNum, dx1, dx2, rows)) {
                     one.fills.push({ dx1: dx1, dx2: dx2 });
                     var cc = counts[dx1 * rowLen + dx2];
                     one.summ = one.summ + cc * cc;
@@ -429,7 +429,6 @@ function dumpTriads(svg, rows) {
         if (rr > rows.length - 6)
             break;
         //console.log(rr,rows.length);
-        var precounts = calcRowPatterns(rr + 1, rows);
         var calcs = void 0;
         if (highLightMode == 2) {
             //calcs = calcRowFreqs(rr, rows);
@@ -440,7 +439,11 @@ function dumpTriads(svg, rows) {
                 calcs = calcRowHot(rr, rows);
             }
             else {
+                var precounts = calcRowPatterns(rr + 1, rows);
                 calcs = calcRowFills(rr, rows, precounts);
+                if (rr == 0) {
+                    //console.log(calcs,precounts);
+                }
             }
         }
         var minCnt = 99999;

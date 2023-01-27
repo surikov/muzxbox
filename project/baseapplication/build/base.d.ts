@@ -61,7 +61,7 @@ declare type MZXBX_Slide = {
     delta: number;
 };
 declare type MZXBX_Note = {
-    step: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+    step: MZXBX_Step;
     shift: MZXBX_StepShift;
     octave: MZXBX_Octave;
     sides: MZXBX_Slide[];
@@ -137,6 +137,56 @@ declare type MZXBX_Project = {
     percussions: MZXBX_PercussionTrack[];
     filters: MZXBX_AudioFilter[];
 };
+declare type MZXBX_Channel = {
+    id: string;
+    filters: MZXBX_ChannelFilter[];
+    performer: MZXBX_ChannelPerformer;
+};
+declare type MZXBX_SlideItem = {
+    duration: number;
+    delta: number;
+};
+declare type MZXBX_PlayItem = {
+    groupId: string;
+    skip: number;
+    channelId: string;
+    pitch: number;
+    volume: number;
+    slides: MZXBX_SlideItem;
+};
+declare type MZXBX_Set = {
+    duration: number;
+    items: MZXBX_PlayItem[];
+};
+declare type MZXBX_ChannelFilter = {
+    id: string;
+    kind: string;
+    properties: string;
+};
+declare type MZXBX_AudioFilterPlugin = {
+    reset: (context: AudioContext, parameters: string) => boolean;
+};
+declare type MZXBX_ChannelPerformer = {
+    id: string;
+    kind: string;
+    properties: string;
+};
+declare type MZXBX_AudioPerformerPlugin = {
+    reset: (context: AudioContext, parameters: string) => boolean;
+    schedule: (when: number, pitch: number, volume: number, slides: MZXBX_SlideItem[]) => void;
+    cancel: () => void;
+};
+declare type MZXBX_Schedule = {
+    series: MZXBX_Set[];
+    channels: MZXBX_Channel[];
+    filters: MZXBX_ChannelFilter[];
+};
+declare type MZXBX_Player = {
+    setup: (context: AudioContext, schedule: MZXBX_Schedule) => void;
+    start: (from: number, position: number, to: number) => boolean;
+    cancel: () => void;
+    position: number;
+};
 declare let testIonianC: MZXBX_Scale;
 declare let testMetre44: MZXBX_Metre;
 declare let testSongProject: MZXBX_Project;
@@ -147,6 +197,48 @@ declare class MuzXbox {
     initAfterLoad(): void;
     initFromUI(): void;
     initAudioContext(): void;
+}
+declare class SchedulePlayer implements MZXBX_Player {
+    position: number;
+    audioContext: AudioContext;
+    schedule: MZXBX_Schedule;
+    performers: {
+        plugin: MZXBX_AudioPerformerPlugin | null;
+        id: string;
+        kind: string;
+    }[];
+    filters: {
+        plugin: MZXBX_AudioFilterPlugin | null;
+        id: string;
+        kind: string;
+    }[];
+    pluginsList: {
+        url: string;
+        name: string;
+        kind: string;
+    }[];
+    pluginURLs: {
+        kind: string;
+        url: string;
+        functionName: string;
+    }[];
+    setup(context: AudioContext, schedule: MZXBX_Schedule): void;
+    startSetupPlugins(): void;
+    сollectFilterPlugin(id: string, kind: string): void;
+    сollectPerformerPlugin(id: string, kind: string): void;
+    waitLoadFilter(functionName: string, filterItem: {
+        plugin: MZXBX_AudioFilterPlugin | null;
+        id: string;
+        kind: string;
+    }): void;
+    startLoadFilter(filterItem: {
+        plugin: MZXBX_AudioFilterPlugin | null;
+        id: string;
+        kind: string;
+    }): void;
+    startLoadCollectedPlugins(): void;
+    start(from: number, position: number, to: number): boolean;
+    cancel(): void;
 }
 declare class MusicTicker {
     startPlay(): void;

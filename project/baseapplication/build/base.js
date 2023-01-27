@@ -189,6 +189,90 @@ class MuzXbox {
         }
     }
 }
+class SchedulePlayer {
+    constructor() {
+        this.position = 0;
+        this.pluginURLs = [
+            { kind: 'volume_filter_1_test', functionName: 'testPluginForVolume1', url: './plugins/filters/testvolume.js' },
+            { kind: 'compressor_filter_1_test', functionName: 'testPluginForCompressor1', url: './plugins/filters/testcompr.js' },
+            { kind: 'echo_filter_1_test', functionName: 'testPluginForEcho1', url: './plugins/filters/testecho.js' },
+            { kind: 'waf_ins_performer_1_test', functionName: 'testPluginForInstrum1', url: './plugins/performer/testins.js' },
+            { kind: 'waf_drums_performer_1_test', functionName: 'testPluginForDrum1', url: './plugins/performer/testperc.js' }
+        ];
+    }
+    setup(context, schedule) {
+        this.audioContext = context;
+        this.schedule = schedule;
+        this.startSetupPlugins();
+    }
+    startSetupPlugins() {
+        this.performers = [];
+        this.filters = [];
+        for (let ff = 0; ff < this.schedule.filters.length; ff++) {
+            let filter = this.schedule.filters[ff];
+            this.сollectFilterPlugin(filter.id, filter.kind);
+        }
+        for (let ch = 0; ch < this.schedule.channels.length; ch++) {
+            let performer = this.schedule.channels[ch].performer;
+            this.сollectPerformerPlugin(performer.id, performer.kind);
+            for (let ff = 0; ff < this.schedule.channels[ch].filters.length; ff++) {
+                let filter = this.schedule.channels[ch].filters[ff];
+                this.сollectFilterPlugin(filter.id, filter.kind);
+            }
+        }
+        this.startLoadCollectedPlugins();
+    }
+    сollectFilterPlugin(id, kind) {
+        for (let ii = 0; ii < this.filters.length; ii++) {
+            if (this.filters[ii].id == id) {
+                return;
+            }
+        }
+        this.filters.push({ plugin: null, id: id, kind: kind });
+    }
+    сollectPerformerPlugin(id, kind) {
+        for (let ii = 0; ii < this.performers.length; ii++) {
+            if (this.performers[ii].id == id) {
+                return;
+            }
+        }
+        this.performers.push({ plugin: null, id: id, kind: kind });
+    }
+    waitLoadFilter(functionName, filterItem) {
+        if (window[functionName]) {
+            let exe = window[functionName];
+            filterItem.plugin = exe();
+        }
+        else {
+        }
+    }
+    startLoadFilter(filterItem) {
+        for (let ll = 0; ll < this.pluginURLs.length; ll++) {
+            if (this.pluginURLs[ll].kind == filterItem.kind) {
+                var rr = document.createElement('script');
+                rr.setAttribute("type", "text/javascript");
+                rr.setAttribute("src", this.pluginURLs[ll].url);
+                document.getElementsByTagName("head")[0].appendChild(rr);
+                this.waitLoadFilter(this.pluginURLs[ll].functionName, filterItem);
+                return;
+            }
+        }
+    }
+    startLoadCollectedPlugins() {
+        for (let ff = 0; ff < this.filters.length; ff++) {
+            if (this.filters[ff].plugin) {
+            }
+            else {
+                this.startLoadFilter(this.filters[ff]);
+            }
+        }
+    }
+    start(from, position, to) {
+        return false;
+    }
+    cancel() {
+    }
+}
 class MusicTicker {
     startPlay() { }
     cancelPlay() { }
