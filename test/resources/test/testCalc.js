@@ -331,7 +331,7 @@ function calcRowFills(rowNum, rows, counts) {
                 }
             }
         }
-        one.logr = one.summ * one.summ * one.summ * one.summ;
+        one.logr = one.summ * one.summ * one.summ;
     }
     //setWide(resu);
     return resu;

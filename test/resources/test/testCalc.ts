@@ -353,7 +353,7 @@ function calcRowFills(rowNum: number, rows: BallsRow[], counts: number[]): { bal
                 }
             }
         }
-        one.logr = one.summ * one.summ * one.summ*one.summ;
+        one.logr = one.summ * one.summ * one.summ;
     }
     //setWide(resu);
     return resu;
