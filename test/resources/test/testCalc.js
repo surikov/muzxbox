@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.44 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.45 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -327,11 +327,11 @@ function calcRowFills(rowNum, rows, counts) {
                 if (triadFills(one.ball, rowNum, dx1, dx2, rows)) {
                     one.fills.push({ dx1: dx1, dx2: dx2 });
                     var cc = counts[dx1 * rowLen + dx2];
-                    one.summ = one.summ + cc * cc;
+                    one.summ = one.summ + cc;
                 }
             }
         }
-        one.logr = one.summ * one.summ; // * one.summ* one.summ;
+        one.logr = one.summ * one.summ * one.summ * one.summ;
     }
     //setWide(resu);
     return resu;
@@ -442,7 +442,7 @@ function dumpTriads(svg, rows) {
                 var precounts = calcRowPatterns(rr + 1, rows);
                 calcs = calcRowFills(rr, rows, precounts);
                 if (rr == 0) {
-                    //console.log(calcs,precounts);
+                    console.log(calcs, precounts);
                 }
             }
         }
