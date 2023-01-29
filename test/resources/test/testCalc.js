@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.45 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.46 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -414,6 +414,26 @@ function calcRowHot(rowNum, rows) {
     //console.log(rowNum,rows[rowNum],resu);
     return resu;
 }
+function dumpRowFills(inrows) {
+    var oldReduceRatio = reduceRatio;
+    var arr = [];
+    for (var bb = 0; bb < rowLen; bb++) {
+        arr.push({ ball: bb + 1, sums: [] });
+    }
+    for (var thd = 1; thd <= 20; thd++) {
+        reduceRatio = thd;
+        var rows = sliceRows(inrows, 0, 100);
+        var precounts = calcRowPatterns(0 + 1, rows);
+        var calcs = void 0;
+        calcs = calcRowFills(0, rows, precounts);
+        //console.log(calcs);
+        for (var bb = 0; bb < rowLen; bb++) {
+            arr[bb].sums.push(calcs[bb].summ);
+        }
+    }
+    reduceRatio = oldReduceRatio;
+    console.log(arr);
+}
 function dumpTriads(svg, rows) {
     //console.log('dumpTriads', highLightMode);
     var ratioPre = 0.99;
@@ -443,6 +463,7 @@ function dumpTriads(svg, rows) {
                 calcs = calcRowFills(rr, rows, precounts);
                 if (rr == 0) {
                     console.log(calcs, precounts);
+                    dumpRowFills(rows);
                 }
             }
         }

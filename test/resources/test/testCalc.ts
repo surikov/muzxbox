@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.45 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.46 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -430,6 +430,26 @@ function calcRowHot(rowNum: number, rows: BallsRow[]): { ball: number, fills: { 
     //console.log(rowNum,rows[rowNum],resu);
     return resu;
 }
+function dumpRowFills(inrows: BallsRow[]){
+    let oldReduceRatio=reduceRatio;
+    let arr:{ball:number,sums:number[]}[]=[];
+    for(let bb=0;bb<rowLen;bb++){
+        arr.push({ball:bb+1,sums:[]});
+    }
+    for(let thd=1;thd<=20;thd++){
+        reduceRatio=thd;
+        let rows: BallsRow[]=sliceRows(inrows,0,100);
+        let precounts = calcRowPatterns(0 + 1, rows);
+        let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[];
+        calcs = calcRowFills(0, rows, precounts);
+        //console.log(calcs);
+        for(let bb=0;bb<rowLen;bb++){
+            arr[bb].sums.push(calcs[bb].summ);
+        }
+    }
+    reduceRatio=oldReduceRatio;
+    console.log(arr);
+}
 function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
     //console.log('dumpTriads', highLightMode);
     let ratioPre = 0.99;
@@ -456,6 +476,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
                 calcs = calcRowFills(rr, rows, precounts);
                 if (rr == 0) {
                     console.log(calcs,precounts);
+                    dumpRowFills(rows);
                 }
             }
         }
