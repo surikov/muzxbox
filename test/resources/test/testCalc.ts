@@ -432,11 +432,11 @@ function calcRowHot(rowNum: number, rows: BallsRow[]): { ball: number, fills: { 
 }
 function dumpRowFills(inrows: BallsRow[]){
     let oldReduceRatio=reduceRatio;
-    let arr:{ball:number,sums:number[]}[]=[];
+    let arr:{ball:number,avg:number,sums:number[]}[]=[];
     for(let bb=0;bb<rowLen;bb++){
-        arr.push({ball:bb+1,sums:[]});
+        arr.push({ball:bb+1,avg:0,sums:[]});
     }
-    for(let thd=1;thd<=20;thd++){
+    for(let thd=1;thd<=30;thd++){
         reduceRatio=thd;
         let rows: BallsRow[]=sliceRows(inrows,0,100);
         let precounts = calcRowPatterns(0 + 1, rows);
@@ -446,6 +446,25 @@ function dumpRowFills(inrows: BallsRow[]){
         for(let bb=0;bb<rowLen;bb++){
             arr[bb].sums.push(calcs[bb].summ);
         }
+    }
+    for(let bb=0;bb<rowLen;bb++){
+        arr[bb].avg=0;
+        for(let ii=0;ii< arr[bb].sums.length;ii++){
+            arr[bb].avg=arr[bb].avg+arr[bb].sums[ii];
+        }
+        arr[bb].avg=arr[bb].avg/arr[bb].sums.length;
+        markLines.push({
+            fromX: bb
+            , fromY: Math.round(topShift / cellSize) + skipRowsCount + 0-2
+            , toX: bb
+            , toY: Math.round(topShift / cellSize) + skipRowsCount -arr[bb].avg*2
+        });
+        markLines.push({
+            fromX: bb+rowLen
+            , fromY: Math.round(topShift / cellSize) + skipRowsCount + 0-2
+            , toX: bb+rowLen
+            , toY: Math.round(topShift / cellSize) + skipRowsCount -arr[bb].avg*2
+        });
     }
     reduceRatio=oldReduceRatio;
     console.log(arr);
@@ -475,8 +494,8 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
                 let precounts = calcRowPatterns(rr + 1, rows);
                 calcs = calcRowFills(rr, rows, precounts);
                 if (rr == 0) {
-                    console.log(calcs,precounts);
-                    dumpRowFills(rows);
+                    //console.log(calcs,precounts);
+                    //dumpRowFills(rows);
                 }
             }
         }
@@ -620,7 +639,7 @@ function sobstvennoe(balls: number[]): number {
 }
 function addTails() {
     markLines = [];
-    let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
+    let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount*2);
     let firsts: number[] = [];
     for (let ii = 1; ii < slicedrows.length - 1 - 1 - 1; ii++) {
         if (slicedrows[ii + 1]) {
@@ -652,6 +671,7 @@ function addTails() {
             });
         }
     }
+    dumpRowFills(slicedrows);
     //dumpLineFirst(firsts);
     fillCells();
 

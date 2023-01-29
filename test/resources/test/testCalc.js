@@ -418,9 +418,9 @@ function dumpRowFills(inrows) {
     var oldReduceRatio = reduceRatio;
     var arr = [];
     for (var bb = 0; bb < rowLen; bb++) {
-        arr.push({ ball: bb + 1, sums: [] });
+        arr.push({ ball: bb + 1, avg: 0, sums: [] });
     }
-    for (var thd = 1; thd <= 20; thd++) {
+    for (var thd = 1; thd <= 30; thd++) {
         reduceRatio = thd;
         var rows = sliceRows(inrows, 0, 100);
         var precounts = calcRowPatterns(0 + 1, rows);
@@ -430,6 +430,25 @@ function dumpRowFills(inrows) {
         for (var bb = 0; bb < rowLen; bb++) {
             arr[bb].sums.push(calcs[bb].summ);
         }
+    }
+    for (var bb = 0; bb < rowLen; bb++) {
+        arr[bb].avg = 0;
+        for (var ii = 0; ii < arr[bb].sums.length; ii++) {
+            arr[bb].avg = arr[bb].avg + arr[bb].sums[ii];
+        }
+        arr[bb].avg = arr[bb].avg / arr[bb].sums.length;
+        markLines.push({
+            fromX: bb,
+            fromY: Math.round(topShift / cellSize) + skipRowsCount + 0 - 2,
+            toX: bb,
+            toY: Math.round(topShift / cellSize) + skipRowsCount - arr[bb].avg * 2
+        });
+        markLines.push({
+            fromX: bb + rowLen,
+            fromY: Math.round(topShift / cellSize) + skipRowsCount + 0 - 2,
+            toX: bb + rowLen,
+            toY: Math.round(topShift / cellSize) + skipRowsCount - arr[bb].avg * 2
+        });
     }
     reduceRatio = oldReduceRatio;
     console.log(arr);
@@ -462,8 +481,8 @@ function dumpTriads(svg, rows) {
                 var precounts = calcRowPatterns(rr + 1, rows);
                 calcs = calcRowFills(rr, rows, precounts);
                 if (rr == 0) {
-                    console.log(calcs, precounts);
-                    dumpRowFills(rows);
+                    //console.log(calcs,precounts);
+                    //dumpRowFills(rows);
                 }
             }
         }
@@ -600,7 +619,7 @@ function sobstvennoe(balls) {
 }
 function addTails() {
     markLines = [];
-    var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount);
+    var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
     var firsts = [];
     for (var ii = 1; ii < slicedrows.length - 1 - 1 - 1; ii++) {
         if (slicedrows[ii + 1]) {
@@ -632,6 +651,7 @@ function addTails() {
             });
         }
     }
+    dumpRowFills(slicedrows);
     //dumpLineFirst(firsts);
     fillCells();
 }
