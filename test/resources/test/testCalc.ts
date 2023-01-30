@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.46 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.47 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -141,7 +141,7 @@ function addLine(svg: SVGElement, x1: number, y1: number, x2: number, y2: number
     svg.append(newLine);
 }
 function composeLine(svg: SVGElement, x1: number, y1: number, x2: number, y2: number, strokeWidth: number, color: string) {
-    addLine(svg, x1, y1, x2, y2, strokeWidth / 3, color);
+    addLine(svg, x1, y1, x2, y2, strokeWidth / 2, color);
 	/*addCircle(svg, x2, y2, strokeWidth/2, color, color);
 	let stepCount=Math.abs(x1-x2)/cellSize;
 	if(stepCount<Math.abs(y1-y2)/cellSize)stepCount=Math.abs(y1-y2)/cellSize;
@@ -254,7 +254,7 @@ function drawLines() {//reduceRatio
             , (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize
             , markLines[i].toX * cellSize + 0.5 * cellSize
             , (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize
-            , cellSize / 0.99, '#ffff0099');
+            , cellSize / 0.99, '#00ff0066');
     }
 }
 
@@ -447,23 +447,31 @@ function dumpRowFills(inrows: BallsRow[]){
             arr[bb].sums.push(calcs[bb].summ);
         }
     }
-    for(let bb=0;bb<rowLen;bb++){
+	let mx=0;
+	for(let bb=0;bb<rowLen;bb++){
         arr[bb].avg=0;
         for(let ii=0;ii< arr[bb].sums.length;ii++){
             arr[bb].avg=arr[bb].avg+arr[bb].sums[ii];
-        }
-        arr[bb].avg=arr[bb].avg/arr[bb].sums.length;
+		}
+		arr[bb].avg=arr[bb].avg/arr[bb].sums.length;
+		if(mx<arr[bb].avg)mx=arr[bb].avg;
+	}
+	let hr=mx*mx*mx/(topShift/cellSize);
+	//console.log('mx',mx,hr);
+    for(let bb=0;bb<rowLen;bb++){
+       let hh=arr[bb].avg*arr[bb].avg*arr[bb].avg/hr;
+		//arr[bb].avg=arr[bb].avg*arr[bb].avg*arr[bb].avg/40;
         markLines.push({
             fromX: bb
             , fromY: Math.round(topShift / cellSize) + skipRowsCount + 0-2
             , toX: bb
-            , toY: Math.round(topShift / cellSize) + skipRowsCount -arr[bb].avg*2
+            , toY: Math.round(topShift / cellSize) + skipRowsCount -hh
         });
         markLines.push({
             fromX: bb+rowLen
             , fromY: Math.round(topShift / cellSize) + skipRowsCount + 0-2
             , toX: bb+rowLen
-            , toY: Math.round(topShift / cellSize) + skipRowsCount -arr[bb].avg*2
+            , toY: Math.round(topShift / cellSize) + skipRowsCount -hh
         });
     }
     reduceRatio=oldReduceRatio;

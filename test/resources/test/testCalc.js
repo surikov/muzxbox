@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.46 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.47 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -131,7 +131,7 @@ function addLine(svg, x1, y1, x2, y2, strokeWidth, color) {
     svg.append(newLine);
 }
 function composeLine(svg, x1, y1, x2, y2, strokeWidth, color) {
-    addLine(svg, x1, y1, x2, y2, strokeWidth / 3, color);
+    addLine(svg, x1, y1, x2, y2, strokeWidth / 2, color);
     /*addCircle(svg, x2, y2, strokeWidth/2, color, color);
     let stepCount=Math.abs(x1-x2)/cellSize;
     if(stepCount<Math.abs(y1-y2)/cellSize)stepCount=Math.abs(y1-y2)/cellSize;
@@ -238,7 +238,7 @@ function drawLines() {
     for (var i = 0; i < markLines.length; i++) {
         //let fy=markLines[i].fromY - skipRowsCount;
         //let ty=markLines[i].toY - skipRowsCount;
-        composeLine(linesLevel, markLines[i].fromX * cellSize + 0.5 * cellSize, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize, markLines[i].toX * cellSize + 0.5 * cellSize, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize, cellSize / 0.99, '#ffff0099');
+        composeLine(linesLevel, markLines[i].fromX * cellSize + 0.5 * cellSize, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize, markLines[i].toX * cellSize + 0.5 * cellSize, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize, cellSize / 0.99, '#00ff0066');
     }
 }
 function drawStat3(svg, rows) {
@@ -431,23 +431,32 @@ function dumpRowFills(inrows) {
             arr[bb].sums.push(calcs[bb].summ);
         }
     }
+    var mx = 0;
     for (var bb = 0; bb < rowLen; bb++) {
         arr[bb].avg = 0;
         for (var ii = 0; ii < arr[bb].sums.length; ii++) {
             arr[bb].avg = arr[bb].avg + arr[bb].sums[ii];
         }
         arr[bb].avg = arr[bb].avg / arr[bb].sums.length;
+        if (mx < arr[bb].avg)
+            mx = arr[bb].avg;
+    }
+    var hr = mx * mx * mx / (topShift / cellSize);
+    //console.log('mx',mx,hr);
+    for (var bb = 0; bb < rowLen; bb++) {
+        var hh = arr[bb].avg * arr[bb].avg * arr[bb].avg / hr;
+        //arr[bb].avg=arr[bb].avg*arr[bb].avg*arr[bb].avg/40;
         markLines.push({
             fromX: bb,
             fromY: Math.round(topShift / cellSize) + skipRowsCount + 0 - 2,
             toX: bb,
-            toY: Math.round(topShift / cellSize) + skipRowsCount - arr[bb].avg * 2
+            toY: Math.round(topShift / cellSize) + skipRowsCount - hh
         });
         markLines.push({
             fromX: bb + rowLen,
             fromY: Math.round(topShift / cellSize) + skipRowsCount + 0 - 2,
             toX: bb + rowLen,
-            toY: Math.round(topShift / cellSize) + skipRowsCount - arr[bb].avg * 2
+            toY: Math.round(topShift / cellSize) + skipRowsCount - hh
         });
     }
     reduceRatio = oldReduceRatio;
