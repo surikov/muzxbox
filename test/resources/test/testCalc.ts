@@ -438,6 +438,7 @@ function fillCells() {
 }
 function clickHop() {
 	skipRowsCount = Math.round(Math.random() * (datarows.length / reduceRatio - 100));
+	showFirstRow=false;
 	fillCells();
 }
 function toggleFirst() {
