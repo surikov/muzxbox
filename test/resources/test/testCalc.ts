@@ -510,7 +510,7 @@ function sobstvennoe(balls: number[]): number {
 function addTails() {
 	markLines = [];
 	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
-	let firsts: number[] = [];
+	/*let firsts: number[] = [];
 	for (let ii = 1; ii < slicedrows.length - 1 - 1 - 1; ii++) {
 		if (slicedrows[ii + 1]) {
 			firsts.splice(0, 0, 100 + slicedrows[ii].balls[0]);
@@ -539,7 +539,7 @@ function addTails() {
 				, toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
 			});
 		}
-	}
+	}*/
 	dumpRowFills(slicedrows);
 	fillCells();
 }
