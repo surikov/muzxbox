@@ -1,29 +1,7 @@
-declare class MZXBX_MetreMath implements MZXBX_MetreMathType {
-    count: number;
-    part: number;
-    set(from: MZXBX_Metre): MZXBX_MetreMath;
-    metre(): MZXBX_Metre;
-    simplyfy(): MZXBX_MetreMath;
-    strip(toPart: number): MZXBX_MetreMath;
-    equals(metre: MZXBX_Metre): boolean;
-    less(metre: MZXBX_Metre): boolean;
-    more(metre: MZXBX_Metre): boolean;
-    plus(metre: MZXBX_Metre): MZXBX_MetreMath;
-    minus(metre: MZXBX_Metre): MZXBX_MetreMath;
-    duration(metre: MZXBX_Metre, tempo: number): number;
+declare class SimpleTestVolumePlugin implements MZXBX_AudioFilterPlugin {
+    reset(context: AudioContext, parameters: string): boolean;
 }
-declare class MZXBX_ScaleMath implements MZXBX_ScaleMathType {
-    basePitch: MZXBX_HalfTone;
-    step2: MZXBX_StepSkip;
-    step3: MZXBX_StepSkip;
-    step4: MZXBX_StepSkip;
-    step5: MZXBX_StepSkip;
-    step6: MZXBX_StepSkip;
-    step7: MZXBX_StepSkip;
-    set(scale: MZXBX_Scale): MZXBX_ScaleMath;
-    scale(): MZXBX_Scale;
-    pitch(note: MZXBX_Note): number;
-}
+declare function testPluginForVolume1(): MZXBX_AudioFilterPlugin;
 declare type MZXBX_Metre = {
     count: number;
     part: number;
@@ -187,69 +165,3 @@ declare type MZXBX_Player = {
     cancel: () => void;
     position: number;
 };
-declare let testIonianC: MZXBX_Scale;
-declare let testMetre44: MZXBX_Metre;
-declare let testSongProject: MZXBX_Project;
-declare class MuzXbox {
-    uiStarted: boolean;
-    audioContext: AudioContext;
-    constructor();
-    initAfterLoad(): void;
-    initFromUI(): void;
-    initAudioContext(): void;
-    startTest(): void;
-}
-declare class SchedulePlayer implements MZXBX_Player {
-    position: number;
-    audioContext: AudioContext;
-    schedule: MZXBX_Schedule | null;
-    performers: {
-        plugin: MZXBX_AudioPerformerPlugin | null;
-        id: string;
-        kind: string;
-    }[];
-    filters: {
-        plugin: MZXBX_AudioFilterPlugin | null;
-        id: string;
-        kind: string;
-    }[];
-    pluginsList: {
-        url: string;
-        name: string;
-        kind: string;
-    }[];
-    pluginURLs: {
-        kind: string;
-        url: string;
-        functionName: string;
-    }[];
-    setup(context: AudioContext, schedule: MZXBX_Schedule): void;
-    startSetupPlugins(): void;
-    сollectFilterPlugin(id: string, kind: string): void;
-    сollectPerformerPlugin(id: string, kind: string): void;
-    tryToCreateFilter(functionName: string): null | MZXBX_AudioFilterPlugin;
-    waitLoadFilter(functionName: string, filterItem: {
-        plugin: MZXBX_AudioFilterPlugin | null;
-        id: string;
-        kind: string;
-    }): void;
-    setItemFilterPluginAndNext(plugin: MZXBX_AudioFilterPlugin, filterItem: {
-        plugin: MZXBX_AudioFilterPlugin | null;
-        id: string;
-        kind: string;
-    }): void;
-    startLoadFilter(filterItem: {
-        plugin: MZXBX_AudioFilterPlugin | null;
-        id: string;
-        kind: string;
-    }): void;
-    startLoadCollectedPlugins(): void;
-    start(from: number, position: number, to: number): boolean;
-    cancel(): void;
-}
-declare class MusicTicker {
-    startPlay(): void;
-    cancelPlay(): void;
-    setPosition(seconds: number): void;
-    getPosition(): number;
-}

@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.48 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.49 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -284,7 +284,7 @@ function calcRowFills(rowNum: number, rows: BallsRow[], counts: number[]): { bal
 				}
 			}
 		}
-		one.logr = one.summ ;
+		one.logr = one.summ *one.summ;
 	}
 	return resu;
 }
@@ -349,6 +349,7 @@ function dumpRowFills(inrows: BallsRow[]) {
 		}
 	}
 	let mx = 0;
+	let min=98765;
 	for (let bb = 0; bb < rowLen; bb++) {
 		arr[bb].avg = 0;
 		for (let ii = 0; ii < arr[bb].sums.length; ii++) {
@@ -356,21 +357,24 @@ function dumpRowFills(inrows: BallsRow[]) {
 		}
 		arr[bb].avg = arr[bb].avg / arr[bb].sums.length;
 		if (mx < arr[bb].avg) mx = arr[bb].avg;
+		if (min > arr[bb].avg) min = arr[bb].avg;
 	}
-	let hr = mx * mx * mx / (topShift / cellSize);
+	//let hr = mx * mx * mx / (topShift / cellSize);
+	let hr = (mx-min) / (topShift / cellSize-2);
 	for (let bb = 0; bb < rowLen; bb++) {
-		let hh = arr[bb].avg * arr[bb].avg * arr[bb].avg / hr;
+		//let hh = arr[bb].avg * arr[bb].avg * arr[bb].avg / hr;
+		let hh = (arr[bb].avg-min) / hr;
 		markLines.push({
 			fromX: bb
-			, fromY: Math.round(topShift / cellSize) + skipRowsCount + 0 - 2
+			, fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - 0-2
 			, toX: bb
-			, toY: Math.round(topShift / cellSize) + skipRowsCount - hh
+			, toY: Math.round((topShift) / cellSize) + skipRowsCount - hh- 0-2
 		});
 		markLines.push({
 			fromX: bb + rowLen
-			, fromY: Math.round(topShift / cellSize) + skipRowsCount + 0 - 2
+			, fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - 0-2
 			, toX: bb + rowLen
-			, toY: Math.round(topShift / cellSize) + skipRowsCount - hh
+			, toY: Math.round((topShift) / cellSize) + skipRowsCount - hh- 0-2
 		});
 	}
 	reduceRatio = oldReduceRatio;
@@ -438,8 +442,9 @@ function fillCells() {
 }
 function clickHop() {
 	skipRowsCount = Math.round(Math.random() * (datarows.length / reduceRatio - 100));
-	showFirstRow=false;
-	fillCells();
+	//showFirstRow=false;
+	//fillCells();
+	addTails();
 }
 function toggleFirst() {
 	showFirstRow = !showFirstRow;
@@ -454,7 +459,8 @@ function clickGoSkip(nn: number) {
 				markLines[i].fromY = markLines[i].fromY + nn * (reduceRatio - 1);
 				markLines[i].toY = markLines[i].toY + nn * (reduceRatio - 1);
 			}
-			fillCells();
+			//fillCells();
+			addTails();
 		}
 	}
 }

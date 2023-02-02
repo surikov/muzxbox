@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.48 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.49 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -264,7 +264,7 @@ function calcRowFills(rowNum, rows, counts) {
                 }
             }
         }
-        one.logr = one.summ;
+        one.logr = one.summ * one.summ;
     }
     return resu;
 }
@@ -335,6 +335,7 @@ function dumpRowFills(inrows) {
         }
     }
     var mx = 0;
+    var min = 98765;
     for (var bb = 0; bb < rowLen; bb++) {
         arr[bb].avg = 0;
         for (var ii = 0; ii < arr[bb].sums.length; ii++) {
@@ -343,21 +344,25 @@ function dumpRowFills(inrows) {
         arr[bb].avg = arr[bb].avg / arr[bb].sums.length;
         if (mx < arr[bb].avg)
             mx = arr[bb].avg;
+        if (min > arr[bb].avg)
+            min = arr[bb].avg;
     }
-    var hr = mx * mx * mx / (topShift / cellSize);
+    //let hr = mx * mx * mx / (topShift / cellSize);
+    var hr = (mx - min) / (topShift / cellSize - 2);
     for (var bb = 0; bb < rowLen; bb++) {
-        var hh = arr[bb].avg * arr[bb].avg * arr[bb].avg / hr;
+        //let hh = arr[bb].avg * arr[bb].avg * arr[bb].avg / hr;
+        var hh = (arr[bb].avg - min) / hr;
         markLines.push({
             fromX: bb,
-            fromY: Math.round(topShift / cellSize) + skipRowsCount + 0 - 2,
+            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - 0 - 2,
             toX: bb,
-            toY: Math.round(topShift / cellSize) + skipRowsCount - hh
+            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
         });
         markLines.push({
             fromX: bb + rowLen,
-            fromY: Math.round(topShift / cellSize) + skipRowsCount + 0 - 2,
+            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - 0 - 2,
             toX: bb + rowLen,
-            toY: Math.round(topShift / cellSize) + skipRowsCount - hh
+            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
         });
     }
     reduceRatio = oldReduceRatio;
@@ -420,8 +425,9 @@ function fillCells() {
 }
 function clickHop() {
     skipRowsCount = Math.round(Math.random() * (datarows.length / reduceRatio - 100));
-    showFirstRow = false;
-    fillCells();
+    //showFirstRow=false;
+    //fillCells();
+    addTails();
 }
 function toggleFirst() {
     showFirstRow = !showFirstRow;
@@ -436,7 +442,8 @@ function clickGoSkip(nn) {
                 markLines[i].fromY = markLines[i].fromY + nn * (reduceRatio - 1);
                 markLines[i].toY = markLines[i].toY + nn * (reduceRatio - 1);
             }
-            fillCells();
+            //fillCells();
+            addTails();
         }
     }
 }

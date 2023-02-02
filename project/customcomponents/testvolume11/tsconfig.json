@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es2015"
-        ,"outFile": "../js/apilib.js"
+        ,"outFile": "../../web/plugins/filters/testvolume.js"
         //,"outDir":"../js"
 		,"strictNullChecks": true
 		,"alwaysStrict": true
@@ -25,8 +25,7 @@
 	,"files": [
 		
 		
-		"apiexample.ts"
-        ,"apianother.ts"
-        ,"../shared/types.ts"
+		"testvolplug.ts"
+        ,"../../publicapi/musicenginetypes.ts"
 	]
 }

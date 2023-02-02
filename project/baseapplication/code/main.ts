@@ -1,4 +1,4 @@
-console.log("MuzXbox v1.0.1");
+console.log("MuzXbox v1.0.2");
 class MuzXbox {
 	uiStarted: boolean = false;
 	audioContext: AudioContext;
@@ -22,15 +22,25 @@ class MuzXbox {
 		console.log(this.audioContext);
 		if (this.audioContext.state == "running") {
 			this.uiStarted = true;
+		} else {
+			console.log('AudioContext state is ', this.audioContext.state);
 		}
+	}
+	startTest() {
+		console.log('start test');
+		let player: SchedulePlayer = new SchedulePlayer();
+		player.filters.push({ plugin: null, id: 'test111', kind: 'volume_filter_1_test' });
+		player.filters.push({ plugin: null, id: 'test22', kind: 'volume_filter_1_test' });
+		player.filters.push({ plugin: null, id: 'test333', kind: 'echo_filter_1_test' });
+		player.startSetupPlugins();
 	}
 }
 class SchedulePlayer implements MZXBX_Player {
 	position: number = 0;
 	audioContext: AudioContext;
-	schedule: MZXBX_Schedule;
-	performers: { plugin: MZXBX_AudioPerformerPlugin | null, id: string, kind: string }[];
-	filters: { plugin: MZXBX_AudioFilterPlugin | null, id: string, kind: string }[];
+	schedule: MZXBX_Schedule | null = null;
+	performers: { plugin: MZXBX_AudioPerformerPlugin | null, id: string, kind: string }[] = [];
+	filters: { plugin: MZXBX_AudioFilterPlugin | null, id: string, kind: string }[] = [];
 	pluginsList: { url: string, name: string, kind: string }[];
 	pluginURLs: { kind: string, url: string, functionName: string }[] = [
 		{ kind: 'volume_filter_1_test', functionName: 'testPluginForVolume1', url: './plugins/filters/testvolume.js' }
@@ -45,18 +55,18 @@ class SchedulePlayer implements MZXBX_Player {
 		this.startSetupPlugins();
 	}
 	startSetupPlugins() {
-		this.performers = [];
-		this.filters = [];
-		for (let ff = 0; ff < this.schedule.filters.length; ff++) {
-			let filter: MZXBX_ChannelFilter = this.schedule.filters[ff];
-			this.сollectFilterPlugin(filter.id, filter.kind);
-		}
-		for (let ch = 0; ch < this.schedule.channels.length; ch++) {
-			let performer: MZXBX_ChannelPerformer = this.schedule.channels[ch].performer;
-			this.сollectPerformerPlugin(performer.id, performer.kind);
-			for (let ff = 0; ff < this.schedule.channels[ch].filters.length; ff++) {
-				let filter: MZXBX_ChannelFilter = this.schedule.channels[ch].filters[ff];
+		if (this.schedule) {
+			for (let ff = 0; ff < this.schedule.filters.length; ff++) {
+				let filter: MZXBX_ChannelFilter = this.schedule.filters[ff];
 				this.сollectFilterPlugin(filter.id, filter.kind);
+			}
+			for (let ch = 0; ch < this.schedule.channels.length; ch++) {
+				let performer: MZXBX_ChannelPerformer = this.schedule.channels[ch].performer;
+				this.сollectPerformerPlugin(performer.id, performer.kind);
+				for (let ff = 0; ff < this.schedule.channels[ch].filters.length; ff++) {
+					let filter: MZXBX_ChannelFilter = this.schedule.channels[ch].filters[ff];
+					this.сollectFilterPlugin(filter.id, filter.kind);
+				}
 			}
 		}
 		this.startLoadCollectedPlugins();
@@ -78,23 +88,30 @@ class SchedulePlayer implements MZXBX_Player {
 		this.performers.push({ plugin: null, id: id, kind: kind });
 	}
 	tryToCreateFilter(functionName: string): null | MZXBX_AudioFilterPlugin {
+
 		if (window[functionName]) {
+			//console.log('tryToCreateFilter', functionName);
 			let exe: () => MZXBX_AudioFilterPlugin = window[functionName];
 			let plugin: MZXBX_AudioFilterPlugin = exe();
 			return plugin;
 		} else {
+			console.log('no ', functionName);
 			return null;
 		}
 	}
 	waitLoadFilter(functionName: string, filterItem: { plugin: MZXBX_AudioFilterPlugin | null, id: string, kind: string }) {
+		//console.log('waitLoadFilter', functionName);
 		let plugin: null | MZXBX_AudioFilterPlugin = this.tryToCreateFilter(functionName);
 		if (plugin) {
 			this.setItemFilterPluginAndNext(plugin, filterItem);
 		} else {
-
+			setTimeout(() => {
+				this.waitLoadFilter(functionName, filterItem);
+			}, 333);
 		}
 	}
 	setItemFilterPluginAndNext(plugin: MZXBX_AudioFilterPlugin, filterItem: { plugin: MZXBX_AudioFilterPlugin | null, id: string, kind: string }) {
+		//console.log('setItemFilterPluginAndNext', filterItem.id, filterItem.kind);
 		filterItem.plugin = plugin;
 		this.startLoadCollectedPlugins();
 	}
@@ -116,11 +133,13 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 	}
 	startLoadCollectedPlugins() {
+		//console.log('startLoadCollectedPlugins',this.filters,this.performers);
 		for (let ff = 0; ff < this.filters.length; ff++) {
 			if (this.filters[ff].plugin) {
 				//
 			} else {
 				this.startLoadFilter(this.filters[ff]);
+				return;
 			}
 		}
 	}

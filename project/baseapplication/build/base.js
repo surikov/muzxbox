@@ -162,7 +162,7 @@ let testSongProject = {
         }
     ]
 };
-console.log("MuzXbox v1.0.1");
+console.log("MuzXbox v1.0.2");
 class MuzXbox {
     constructor() {
         this.uiStarted = false;
@@ -187,11 +187,25 @@ class MuzXbox {
         if (this.audioContext.state == "running") {
             this.uiStarted = true;
         }
+        else {
+            console.log('AudioContext state is ', this.audioContext.state);
+        }
+    }
+    startTest() {
+        console.log('start test');
+        let player = new SchedulePlayer();
+        player.filters.push({ plugin: null, id: 'test111', kind: 'volume_filter_1_test' });
+        player.filters.push({ plugin: null, id: 'test22', kind: 'volume_filter_1_test' });
+        player.filters.push({ plugin: null, id: 'test333', kind: 'echo_filter_1_test' });
+        player.startSetupPlugins();
     }
 }
 class SchedulePlayer {
     constructor() {
         this.position = 0;
+        this.schedule = null;
+        this.performers = [];
+        this.filters = [];
         this.pluginURLs = [
             { kind: 'volume_filter_1_test', functionName: 'testPluginForVolume1', url: './plugins/filters/testvolume.js' },
             { kind: 'compressor_filter_1_test', functionName: 'testPluginForCompressor1', url: './plugins/filters/testcompr.js' },
@@ -206,18 +220,18 @@ class SchedulePlayer {
         this.startSetupPlugins();
     }
     startSetupPlugins() {
-        this.performers = [];
-        this.filters = [];
-        for (let ff = 0; ff < this.schedule.filters.length; ff++) {
-            let filter = this.schedule.filters[ff];
-            this.сollectFilterPlugin(filter.id, filter.kind);
-        }
-        for (let ch = 0; ch < this.schedule.channels.length; ch++) {
-            let performer = this.schedule.channels[ch].performer;
-            this.сollectPerformerPlugin(performer.id, performer.kind);
-            for (let ff = 0; ff < this.schedule.channels[ch].filters.length; ff++) {
-                let filter = this.schedule.channels[ch].filters[ff];
+        if (this.schedule) {
+            for (let ff = 0; ff < this.schedule.filters.length; ff++) {
+                let filter = this.schedule.filters[ff];
                 this.сollectFilterPlugin(filter.id, filter.kind);
+            }
+            for (let ch = 0; ch < this.schedule.channels.length; ch++) {
+                let performer = this.schedule.channels[ch].performer;
+                this.сollectPerformerPlugin(performer.id, performer.kind);
+                for (let ff = 0; ff < this.schedule.channels[ch].filters.length; ff++) {
+                    let filter = this.schedule.channels[ch].filters[ff];
+                    this.сollectFilterPlugin(filter.id, filter.kind);
+                }
             }
         }
         this.startLoadCollectedPlugins();
@@ -238,23 +252,47 @@ class SchedulePlayer {
         }
         this.performers.push({ plugin: null, id: id, kind: kind });
     }
-    waitLoadFilter(functionName, filterItem) {
+    tryToCreateFilter(functionName) {
         if (window[functionName]) {
             let exe = window[functionName];
-            filterItem.plugin = exe();
+            let plugin = exe();
+            return plugin;
         }
         else {
+            console.log('no ', functionName);
+            return null;
         }
+    }
+    waitLoadFilter(functionName, filterItem) {
+        let plugin = this.tryToCreateFilter(functionName);
+        if (plugin) {
+            this.setItemFilterPluginAndNext(plugin, filterItem);
+        }
+        else {
+            setTimeout(() => {
+                this.waitLoadFilter(functionName, filterItem);
+            }, 333);
+        }
+    }
+    setItemFilterPluginAndNext(plugin, filterItem) {
+        filterItem.plugin = plugin;
+        this.startLoadCollectedPlugins();
     }
     startLoadFilter(filterItem) {
         for (let ll = 0; ll < this.pluginURLs.length; ll++) {
             if (this.pluginURLs[ll].kind == filterItem.kind) {
-                var rr = document.createElement('script');
-                rr.setAttribute("type", "text/javascript");
-                rr.setAttribute("src", this.pluginURLs[ll].url);
-                document.getElementsByTagName("head")[0].appendChild(rr);
-                this.waitLoadFilter(this.pluginURLs[ll].functionName, filterItem);
-                return;
+                let plugin = this.tryToCreateFilter(this.pluginURLs[ll].functionName);
+                if (plugin) {
+                    this.setItemFilterPluginAndNext(plugin, filterItem);
+                }
+                else {
+                    var rr = document.createElement('script');
+                    rr.setAttribute("type", "text/javascript");
+                    rr.setAttribute("src", this.pluginURLs[ll].url);
+                    document.getElementsByTagName("head")[0].appendChild(rr);
+                    this.waitLoadFilter(this.pluginURLs[ll].functionName, filterItem);
+                    return;
+                }
             }
         }
     }
@@ -264,6 +302,7 @@ class SchedulePlayer {
             }
             else {
                 this.startLoadFilter(this.filters[ff]);
+                return;
             }
         }
     }
