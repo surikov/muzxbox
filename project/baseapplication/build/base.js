@@ -200,19 +200,46 @@ class MuzXbox {
         player.startSetupPlugins();
     }
 }
+function waitLoadCheckNext(sleepMs, url, variableName, onFinish) {
+    if (window[variableName]) {
+        onFinish();
+    }
+    else {
+        if (!scriptExistsInDocument(url)) {
+            appendScriptURL(url);
+        }
+        setTimeout(() => {
+            waitLoadCheckNext(sleepMs, url, variableName, onFinish);
+        }, sleepMs);
+    }
+}
+function appendScriptURL(url) {
+    var scriptElement = document.createElement('script');
+    scriptElement.setAttribute("type", "text/javascript");
+    scriptElement.setAttribute("src", url);
+    scriptElement.lockedLoaderURL = url;
+    let head = document.getElementsByTagName("head")[0];
+    head.appendChild(scriptElement);
+    return false;
+}
+function scriptExistsInDocument(url) {
+    let scripts = document.getElementsByTagName("script");
+    for (let ii = 0; ii < scripts.length; ii++) {
+        let script = scripts.item(ii);
+        if (script) {
+            if (url == script.lockedLoaderURL) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 class SchedulePlayer {
     constructor() {
         this.position = 0;
         this.schedule = null;
         this.performers = [];
         this.filters = [];
-        this.pluginURLs = [
-            { kind: 'volume_filter_1_test', functionName: 'testPluginForVolume1', url: './plugins/filters/testvolume.js' },
-            { kind: 'compressor_filter_1_test', functionName: 'testPluginForCompressor1', url: './plugins/filters/testcompr.js' },
-            { kind: 'echo_filter_1_test', functionName: 'testPluginForEcho1', url: './plugins/filters/testecho.js' },
-            { kind: 'waf_ins_performer_1_test', functionName: 'testPluginForInstrum1', url: './plugins/performer/testins.js' },
-            { kind: 'waf_drums_performer_1_test', functionName: 'testPluginForDrum1', url: './plugins/performer/testperc.js' }
-        ];
     }
     setup(context, schedule) {
         this.audioContext = context;
@@ -252,55 +279,34 @@ class SchedulePlayer {
         }
         this.performers.push({ plugin: null, id: id, kind: kind });
     }
-    tryToCreateFilter(functionName) {
-        if (window[functionName]) {
-            let exe = window[functionName];
-            let plugin = exe();
-            return plugin;
+    findPluginInfo(kind) {
+        for (let ll = 0; ll < pluginListKindUrlName.length; ll++) {
+            if (pluginListKindUrlName[ll].kind == kind) {
+                return pluginListKindUrlName[ll];
+            }
         }
-        else {
-            console.log('no ', functionName);
-            return null;
-        }
-    }
-    waitLoadFilter(functionName, filterItem) {
-        let plugin = this.tryToCreateFilter(functionName);
-        if (plugin) {
-            this.setItemFilterPluginAndNext(plugin, filterItem);
-        }
-        else {
-            setTimeout(() => {
-                this.waitLoadFilter(functionName, filterItem);
-            }, 333);
-        }
-    }
-    setItemFilterPluginAndNext(plugin, filterItem) {
-        filterItem.plugin = plugin;
-        this.startLoadCollectedPlugins();
+        console.log('startLoadFilter', kind);
+        return null;
     }
     startLoadFilter(filterItem) {
-        for (let ll = 0; ll < this.pluginURLs.length; ll++) {
-            if (this.pluginURLs[ll].kind == filterItem.kind) {
-                let plugin = this.tryToCreateFilter(this.pluginURLs[ll].functionName);
-                if (plugin) {
-                    this.setItemFilterPluginAndNext(plugin, filterItem);
+        console.log('startLoadFilter', filterItem);
+        let pluginInfo = this.findPluginInfo(filterItem.kind);
+        if (pluginInfo) {
+            waitLoadCheckNext(250, pluginInfo.url, pluginInfo.functionName, () => {
+                if (pluginInfo) {
+                    let exe = window[pluginInfo.functionName];
+                    let plugin = exe();
+                    if (plugin) {
+                        filterItem.plugin = plugin;
+                        this.startLoadCollectedPlugins();
+                    }
                 }
-                else {
-                    var rr = document.createElement('script');
-                    rr.setAttribute("type", "text/javascript");
-                    rr.setAttribute("src", this.pluginURLs[ll].url);
-                    document.getElementsByTagName("head")[0].appendChild(rr);
-                    this.waitLoadFilter(this.pluginURLs[ll].functionName, filterItem);
-                    return;
-                }
-            }
+            });
         }
     }
     startLoadCollectedPlugins() {
         for (let ff = 0; ff < this.filters.length; ff++) {
-            if (this.filters[ff].plugin) {
-            }
-            else {
+            if (!(this.filters[ff].plugin)) {
                 this.startLoadFilter(this.filters[ff]);
                 return;
             }

@@ -27,6 +27,7 @@
         "../publicapi/musicenginetypes.ts",
         "../publicapi/testSong.ts",
         "./code/main.ts"
+		,"./code/player.ts"
         ,"./code/ticker.ts"
     ]
 }
