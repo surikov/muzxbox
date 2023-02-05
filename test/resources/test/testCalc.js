@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.49 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.50 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -179,7 +179,7 @@ function clickFog(vnt) {
     }
     else {
         markLines.push({
-            fromX: xx, fromY: yy, toX: markX, toY: markY
+            fromX: xx, fromY: yy, toX: markX, toY: markY, color: '#99990066'
         });
         markX = -1;
         markY = -1;
@@ -194,7 +194,7 @@ function clickFog(vnt) {
 function drawLines() {
     clearSVGgroup(linesLevel);
     for (var i = 0; i < markLines.length; i++) {
-        composeLine(linesLevel, markLines[i].fromX * cellSize + 0.5 * cellSize, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize, markLines[i].toX * cellSize + 0.5 * cellSize, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize, cellSize / 0.99, '#00ff0066');
+        composeLine(linesLevel, markLines[i].fromX * cellSize + 0.5 * cellSize, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize, markLines[i].toX * cellSize + 0.5 * cellSize, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize, cellSize / 0.99, markLines[i].color); //'#00ff0066');
     }
 }
 function drawStat3(svg, rows) {
@@ -319,6 +319,13 @@ function calcRowHot(rowNum, rows) {
     return resu;
 }
 function dumpRowFills(inrows) {
+    if (reduceRatio == 1) {
+        dumpRowFillsColor(sliceRows(inrows, 2, 100 + 2), '#00cc0011', 0.1);
+        dumpRowFillsColor(sliceRows(inrows, 1, 100 + 1), '#00cc0044', -0.1);
+    }
+    dumpRowFillsColor(inrows, '#00cc00cc', 0);
+}
+function dumpRowFillsColor(inrows, color, shiftX) {
     var oldReduceRatio = reduceRatio;
     var arr = [];
     for (var bb = 0; bb < rowLen; bb++) {
@@ -349,24 +356,42 @@ function dumpRowFills(inrows) {
     }
     //let hr = mx * mx * mx / (topShift / cellSize);
     var hr = (mx - min) / (topShift / cellSize - 2);
+    var prehh = (arr[rowLen - 1].avg - min) / hr;
     for (var bb = 0; bb < rowLen; bb++) {
-        //let hh = arr[bb].avg * arr[bb].avg * arr[bb].avg / hr;
+        //------------let hh = arr[bb].avg * arr[bb].avg * arr[bb].avg / hr;
         var hh = (arr[bb].avg - min) / hr;
         markLines.push({
-            fromX: bb,
-            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - 0 - 2,
-            toX: bb,
-            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            fromX: bb + shiftX - 1,
+            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
+            toX: bb + shiftX,
+            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2,
+            color: color
         });
         markLines.push({
-            fromX: bb + rowLen,
-            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - 0 - 2,
-            toX: bb + rowLen,
-            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            fromX: bb + shiftX - 1 + rowLen,
+            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
+            toX: bb + shiftX + rowLen,
+            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2,
+            color: color
         });
+        prehh = hh;
+        /*markLines.push({
+            fromX: bb + shiftX
+            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - 0 - 2
+            , toX: bb + shiftX
+            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color
+        });
+        markLines.push({
+            fromX: bb + rowLen + shiftX
+            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - 0 - 2
+            , toX: bb + rowLen + shiftX
+            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color
+        });*/
     }
     reduceRatio = oldReduceRatio;
-    console.log(arr);
+    console.log(reduceRatio, arr[0]);
 }
 function dumpTriads(svg, rows) {
     var ratioPre = 0.99;
