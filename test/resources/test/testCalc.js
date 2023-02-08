@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.50 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.51 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -320,10 +320,10 @@ function calcRowHot(rowNum, rows) {
 }
 function dumpRowFills(inrows) {
     if (reduceRatio == 1) {
-        dumpRowFillsColor(sliceRows(inrows, 2, 100 + 2), '#00cc0011', 0.1);
-        dumpRowFillsColor(sliceRows(inrows, 1, 100 + 1), '#00cc0044', -0.1);
+        dumpRowFillsColor(sliceRows(inrows, 2, 100 + 2), '#cccc0066', 0.1);
+        dumpRowFillsColor(sliceRows(inrows, 1, 100 + 1), '#66cc0099', -0.1);
     }
-    dumpRowFillsColor(inrows, '#00cc00cc', 0);
+    dumpRowFillsColor(inrows, '#006600cc', 0);
 }
 function dumpRowFillsColor(inrows, color, shiftX) {
     var oldReduceRatio = reduceRatio;

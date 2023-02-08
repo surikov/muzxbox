@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.50 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.51 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -334,10 +334,10 @@ function calcRowHot(rowNum: number, rows: BallsRow[]): { ball: number, fills: { 
 }
 function dumpRowFills(inrows: BallsRow[]) {
     if (reduceRatio == 1) {
-        dumpRowFillsColor(sliceRows(inrows, 2, 100+2), '#00cc0011',0.1);
-        dumpRowFillsColor(sliceRows(inrows, 1, 100 + 1), '#00cc0044', -0.1);
+        dumpRowFillsColor(sliceRows(inrows, 2, 100+2), '#cccc0066',0.1);
+        dumpRowFillsColor(sliceRows(inrows, 1, 100 + 1), '#66cc0099', -0.1);
     }
-    dumpRowFillsColor(inrows, '#00cc00cc', 0);
+    dumpRowFillsColor(inrows, '#006600cc', 0);
 }
 function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
     let oldReduceRatio = reduceRatio;
