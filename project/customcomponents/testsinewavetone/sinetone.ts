@@ -1,11 +1,17 @@
 console.log('test volume plugin v1.01');
-class SimpleTestVolumePlugin implements MZXBX_AudioFilterPlugin {
+class SimpleSinePerformer implements MZXBX_AudioPerformerPlugin {
 	reset(context: AudioContext, parameters: string): boolean {
 		console.log('reset', this);
 		return true;
 	}
+	schedule(when: number, pitch: number, volume: number, slides: MZXBX_SlideItem[]): void {
+		console.log('schedule', this);
+	}
+	cancel(): void {
+		console.log('cancel', this);
+	}
 }
-function testPluginForVolume1(): MZXBX_AudioFilterPlugin {
-	console.log('new SimpleTestVolumePlugin');
-	return new SimpleTestVolumePlugin();
+function testPluginSingleWave(): MZXBX_AudioPerformerPlugin {
+	console.log('new testPluginSingleWave');
+	return new SimpleSinePerformer();
 }

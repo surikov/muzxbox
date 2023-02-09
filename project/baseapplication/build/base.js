@@ -194,10 +194,7 @@ class MuzXbox {
     startTest() {
         console.log('start test');
         let player = new SchedulePlayer();
-        player.filters.push({ plugin: null, id: 'test111', kind: 'volume_filter_1_test' });
-        player.filters.push({ plugin: null, id: 'test22', kind: 'volume_filter_1_test' });
-        player.filters.push({ plugin: null, id: 'test333', kind: 'echo_filter_1_test' });
-        player.startSetupPlugins();
+        player.setup(this.audioContext, testSchedule);
     }
 }
 function waitLoadCheckNext(sleepMs, url, variableName, onFinish) {
@@ -304,10 +301,32 @@ class SchedulePlayer {
             });
         }
     }
+    startLoadPerformer(performerItem) {
+        console.log('startLoadPerformer', performerItem);
+        let pluginInfo = this.findPluginInfo(performerItem.kind);
+        if (pluginInfo) {
+            waitLoadCheckNext(250, pluginInfo.url, pluginInfo.functionName, () => {
+                if (pluginInfo) {
+                    let exe = window[pluginInfo.functionName];
+                    let plugin = exe();
+                    if (plugin) {
+                        performerItem.plugin = plugin;
+                        this.startLoadCollectedPlugins();
+                    }
+                }
+            });
+        }
+    }
     startLoadCollectedPlugins() {
         for (let ff = 0; ff < this.filters.length; ff++) {
             if (!(this.filters[ff].plugin)) {
                 this.startLoadFilter(this.filters[ff]);
+                return;
+            }
+        }
+        for (let pp = 0; pp < this.performers.length; pp++) {
+            if (!(this.performers[pp].plugin)) {
+                this.startLoadPerformer(this.performers[pp]);
                 return;
             }
         }

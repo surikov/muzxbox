@@ -403,7 +403,7 @@ function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
         });*/
     }
     reduceRatio = oldReduceRatio;
-    console.log(reduceRatio,arr[0]);
+    //console.log(reduceRatio,arr[0]);
 }
 function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
     let ratioPre = 0.99;

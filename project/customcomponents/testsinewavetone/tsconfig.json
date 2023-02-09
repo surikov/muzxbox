@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es2015"
-        ,"outFile": "../../web/plugins/filters/testsinewave.js"
+        ,"outFile": "../../web/plugins/performers/testsinewave.js"
         //,"outDir":"../js"
 		,"strictNullChecks": true
 		,"alwaysStrict": true

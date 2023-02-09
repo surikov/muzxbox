@@ -1,4 +1,5 @@
 console.log("MuzXbox v1.0.2");
+declare let testSchedule:MZXBX_Schedule;
 class MuzXbox {
 	uiStarted: boolean = false;
 	audioContext: AudioContext;
@@ -27,17 +28,18 @@ class MuzXbox {
 		}
 	}
 	startTest() {
-		console.log('start test');
+		console.log('start test');//,testSchedule);
 		/*let url='./sabvaebv/vvv.f';
 		appendScriptURL(url);
 		console.log(scriptExistsInDocument(url));
 		console.log(scriptExistsInDocument('url'));
 		*/
 		let player: SchedulePlayer = new SchedulePlayer();
-		player.filters.push({ plugin: null, id: 'test111', kind: 'volume_filter_1_test' });
-		player.filters.push({ plugin: null, id: 'test22', kind: 'volume_filter_1_test' });
-		player.filters.push({ plugin: null, id: 'test333', kind: 'echo_filter_1_test' });
-		player.startSetupPlugins();
+		player.setup(this.audioContext,testSchedule);
+		//player.filters.push({ plugin: null, id: 'test111', kind: 'volume_filter_1_test' });
+		//player.filters.push({ plugin: null, id: 'test22', kind: 'volume_filter_1_test' });
+		//player.filters.push({ plugin: null, id: 'test333', kind: 'echo_filter_1_test' });
+		//player.startSetupPlugins();
 	}
 }
 

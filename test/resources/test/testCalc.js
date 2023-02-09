@@ -391,7 +391,7 @@ function dumpRowFillsColor(inrows, color, shiftX) {
         });*/
     }
     reduceRatio = oldReduceRatio;
-    console.log(reduceRatio, arr[0]);
+    //console.log(reduceRatio,arr[0]);
 }
 function dumpTriads(svg, rows) {
     var ratioPre = 0.99;
