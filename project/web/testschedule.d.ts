@@ -122,12 +122,11 @@ declare type MZXBX_SlideItem = {
     delta: number;
 };
 declare type MZXBX_PlayItem = {
-    groupId: string;
     skip: number;
     channelId: string;
     pitch: number;
     volume: number;
-    slides: MZXBX_SlideItem;
+    slides: MZXBX_SlideItem[];
 };
 declare type MZXBX_Set = {
     duration: number;

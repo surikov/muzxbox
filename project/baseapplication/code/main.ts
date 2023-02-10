@@ -1,5 +1,5 @@
 console.log("MuzXbox v1.0.2");
-declare let testSchedule:MZXBX_Schedule;
+declare let testSchedule: MZXBX_Schedule;
 class MuzXbox {
 	uiStarted: boolean = false;
 	audioContext: AudioContext;
@@ -35,7 +35,15 @@ class MuzXbox {
 		console.log(scriptExistsInDocument('url'));
 		*/
 		let player: SchedulePlayer = new SchedulePlayer();
-		player.setup(this.audioContext,testSchedule);
+		player.setup(this.audioContext, testSchedule);
+		waitForCondition(500, () => player.stateSetupDone, () => {
+			console.log('loaded');
+			let duration=0;
+			for(let ii=0;ii<testSchedule.series.length;ii++){
+				duration=duration+testSchedule.series[ii].duration;
+			}
+			player.start(0,0,duration);
+		});
 		//player.filters.push({ plugin: null, id: 'test111', kind: 'volume_filter_1_test' });
 		//player.filters.push({ plugin: null, id: 'test22', kind: 'volume_filter_1_test' });
 		//player.filters.push({ plugin: null, id: 'test333', kind: 'echo_filter_1_test' });

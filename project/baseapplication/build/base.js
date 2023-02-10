@@ -195,41 +195,37 @@ class MuzXbox {
         console.log('start test');
         let player = new SchedulePlayer();
         player.setup(this.audioContext, testSchedule);
+        waitForCondition(500, () => player.stateSetupDone, () => {
+            console.log('loaded');
+        });
     }
 }
-function waitLoadCheckNext(sleepMs, url, variableName, onFinish) {
-    if (window[variableName]) {
+function waitForCondition(sleepMs, isDone, onFinish) {
+    if (isDone()) {
         onFinish();
     }
     else {
-        if (!scriptExistsInDocument(url)) {
-            appendScriptURL(url);
-        }
         setTimeout(() => {
-            waitLoadCheckNext(sleepMs, url, variableName, onFinish);
+            waitForCondition(sleepMs, isDone, onFinish);
         }, sleepMs);
     }
 }
 function appendScriptURL(url) {
+    let scripts = document.getElementsByTagName("script");
+    for (let ii = 0; ii < scripts.length; ii++) {
+        let script = scripts.item(ii);
+        if (script) {
+            if (url == script.lockedLoaderURL) {
+                return;
+            }
+        }
+    }
     var scriptElement = document.createElement('script');
     scriptElement.setAttribute("type", "text/javascript");
     scriptElement.setAttribute("src", url);
     scriptElement.lockedLoaderURL = url;
     let head = document.getElementsByTagName("head")[0];
     head.appendChild(scriptElement);
-    return false;
-}
-function scriptExistsInDocument(url) {
-    let scripts = document.getElementsByTagName("script");
-    for (let ii = 0; ii < scripts.length; ii++) {
-        let script = scripts.item(ii);
-        if (script) {
-            if (url == script.lockedLoaderURL) {
-                return true;
-            }
-        }
-    }
-    return false;
 }
 class SchedulePlayer {
     constructor() {
@@ -237,10 +233,12 @@ class SchedulePlayer {
         this.schedule = null;
         this.performers = [];
         this.filters = [];
+        this.stateSetupDone = false;
     }
     setup(context, schedule) {
         this.audioContext = context;
         this.schedule = schedule;
+        this.stateSetupDone = false;
         this.startSetupPlugins();
     }
     startSetupPlugins() {
@@ -287,34 +285,40 @@ class SchedulePlayer {
     }
     startLoadFilter(filterItem) {
         console.log('startLoadFilter', filterItem);
-        let pluginInfo = this.findPluginInfo(filterItem.kind);
-        if (pluginInfo) {
-            waitLoadCheckNext(250, pluginInfo.url, pluginInfo.functionName, () => {
-                if (pluginInfo) {
-                    let exe = window[pluginInfo.functionName];
-                    let plugin = exe();
-                    if (plugin) {
-                        filterItem.plugin = plugin;
-                        this.startLoadCollectedPlugins();
-                    }
+        let tt = this.findPluginInfo(filterItem.kind);
+        if (tt) {
+            let info = tt;
+            appendScriptURL(info.url);
+            waitForCondition(250, () => { return (window[info.functionName]); }, () => {
+                let exe = window[info.functionName];
+                let plugin = exe();
+                if (plugin) {
+                    filterItem.plugin = plugin;
+                    this.startLoadCollectedPlugins();
                 }
             });
+        }
+        else {
+            console.log('Not found ', filterItem.kind);
         }
     }
     startLoadPerformer(performerItem) {
         console.log('startLoadPerformer', performerItem);
-        let pluginInfo = this.findPluginInfo(performerItem.kind);
-        if (pluginInfo) {
-            waitLoadCheckNext(250, pluginInfo.url, pluginInfo.functionName, () => {
-                if (pluginInfo) {
-                    let exe = window[pluginInfo.functionName];
-                    let plugin = exe();
-                    if (plugin) {
-                        performerItem.plugin = plugin;
-                        this.startLoadCollectedPlugins();
-                    }
+        let tt = this.findPluginInfo(performerItem.kind);
+        if (tt) {
+            let info = tt;
+            appendScriptURL(info.url);
+            waitForCondition(250, () => { return (window[info.functionName]); }, () => {
+                let exe = window[info.functionName];
+                let plugin = exe();
+                if (plugin) {
+                    performerItem.plugin = plugin;
+                    this.startLoadCollectedPlugins();
                 }
             });
+        }
+        else {
+            console.log('Not found ', performerItem.kind);
         }
     }
     startLoadCollectedPlugins() {
@@ -330,6 +334,7 @@ class SchedulePlayer {
                 return;
             }
         }
+        this.stateSetupDone = true;
     }
     start(from, position, to) {
         return false;

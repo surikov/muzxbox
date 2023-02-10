@@ -139,12 +139,11 @@ type MZXBX_SlideItem = {
     delta: number;
 }
 type MZXBX_PlayItem = {
-    groupId: string;
     skip: number;
     channelId: string;
     pitch: number;
     volume: number;
-    slides: MZXBX_SlideItem;
+    slides: MZXBX_SlideItem[];
 };
 type MZXBX_Set = {
     duration: number;

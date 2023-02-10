@@ -147,12 +147,11 @@ declare type MZXBX_SlideItem = {
     delta: number;
 };
 declare type MZXBX_PlayItem = {
-    groupId: string;
     skip: number;
     channelId: string;
     pitch: number;
     volume: number;
-    slides: MZXBX_SlideItem;
+    slides: MZXBX_SlideItem[];
 };
 declare type MZXBX_Set = {
     duration: number;
@@ -205,9 +204,8 @@ declare let pluginListKindUrlName: {
     url: string;
     functionName: string;
 }[];
-declare function waitLoadCheckNext(sleepMs: number, url: string, variableName: string, onFinish: () => void): void;
-declare function appendScriptURL(url: string): boolean;
-declare function scriptExistsInDocument(url: string): boolean;
+declare function waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
+declare function appendScriptURL(url: string): void;
 declare class SchedulePlayer implements MZXBX_Player {
     position: number;
     audioContext: AudioContext;
@@ -227,6 +225,7 @@ declare class SchedulePlayer implements MZXBX_Player {
         name: string;
         kind: string;
     }[];
+    stateSetupDone: boolean;
     setup(context: AudioContext, schedule: MZXBX_Schedule): void;
     startSetupPlugins(): void;
     сollectFilterPlugin(id: string, kind: string): void;

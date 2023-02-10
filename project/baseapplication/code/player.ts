@@ -1,39 +1,31 @@
 declare let pluginListKindUrlName: { kind: string, url: string, functionName: string }[];
 
-function waitLoadCheckNext(sleepMs: number, url: string, variableName: string, onFinish: () => void): void {
-	if (window[variableName]) {
+function waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void {
+	if (isDone()) {
 		onFinish();
 	} else {
-		if (!scriptExistsInDocument(url)) {
-			appendScriptURL(url);
-		}
 		setTimeout(() => {
-			waitLoadCheckNext(sleepMs, url, variableName, onFinish);
+			waitForCondition(sleepMs, isDone, onFinish);
 		}, sleepMs);
 	}
 }
-function appendScriptURL(url: string): boolean {
+function appendScriptURL(url: string): void {
+	let scripts: HTMLCollectionOf<HTMLScriptElement> = document.getElementsByTagName("script");
+	for (let ii = 0; ii < scripts.length; ii++) {
+		let script: HTMLScriptElement | null = scripts.item(ii);
+		if (script) {
+			if (url == (script as any).lockedLoaderURL) {
+				return;
+			}
+		}
+	}
 	var scriptElement: HTMLScriptElement = document.createElement('script');
 	scriptElement.setAttribute("type", "text/javascript");
 	scriptElement.setAttribute("src", url);
 	(scriptElement as any).lockedLoaderURL = url;
 	let head: HTMLHeadElement = document.getElementsByTagName("head")[0];
 	head.appendChild(scriptElement);
-	return false;
 }
-function scriptExistsInDocument(url: string): boolean {
-	let scripts: HTMLCollectionOf<HTMLScriptElement> = document.getElementsByTagName("script");
-	for (let ii = 0; ii < scripts.length; ii++) {
-		let script: HTMLScriptElement | null = scripts.item(ii);
-		if (script) {
-			if (url == (script as any).lockedLoaderURL) {
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
 class SchedulePlayer implements MZXBX_Player {
 	position: number = 0;
 	audioContext: AudioContext;
@@ -41,16 +33,11 @@ class SchedulePlayer implements MZXBX_Player {
 	performers: { plugin: MZXBX_AudioPerformerPlugin | null, id: string, kind: string }[] = [];
 	filters: { plugin: MZXBX_AudioFilterPlugin | null, id: string, kind: string }[] = [];
 	pluginsList: { url: string, name: string, kind: string }[];
-	/*pluginURLs: { kind: string, url: string, functionName: string }[] = [
-		{ kind: 'volume_filter_1_test', functionName: 'testPluginForVolume1', url: './plugins/filters/testvolume.js' }
-		, { kind: 'compressor_filter_1_test', functionName: 'testPluginForCompressor1', url: './plugins/filters/testcompr.js' }
-		, { kind: 'echo_filter_1_test', functionName: 'testPluginForEcho1', url: './plugins/filters/testecho.js' }
-		, { kind: 'waf_ins_performer_1_test', functionName: 'testPluginForInstrum1', url: './plugins/performer/testins.js' }
-		, { kind: 'waf_drums_performer_1_test', functionName: 'testPluginForDrum1', url: './plugins/performer/testperc.js' }
-	];*/
+	stateSetupDone:boolean=false;
 	setup(context: AudioContext, schedule: MZXBX_Schedule): void {
 		this.audioContext = context;
 		this.schedule = schedule;
+		this.stateSetupDone=false;
 		this.startSetupPlugins();
 	}
 	startSetupPlugins() {
@@ -97,34 +84,38 @@ class SchedulePlayer implements MZXBX_Player {
 	}
 	startLoadFilter(filterItem: { plugin: MZXBX_AudioFilterPlugin | null, id: string, kind: string }) {
 		console.log('startLoadFilter', filterItem);
-		let pluginInfo = this.findPluginInfo(filterItem.kind);
-		if (pluginInfo) {
-			waitLoadCheckNext(250, pluginInfo.url, pluginInfo.functionName, () => {
-				if (pluginInfo) {
-					let exe: () => MZXBX_AudioFilterPlugin = window[pluginInfo.functionName];
-					let plugin: MZXBX_AudioFilterPlugin = exe();
-					if (plugin) {
-						filterItem.plugin = plugin;
-						this.startLoadCollectedPlugins();
-					}
+		let tt = this.findPluginInfo(filterItem.kind);
+		if (tt) {
+			let info: { kind: string, url: string, functionName: string } = tt;
+			appendScriptURL(info.url);
+			waitForCondition(250, () => { return (window[info.functionName]); }, () => {
+				let exe: () => MZXBX_AudioFilterPlugin = window[info.functionName];
+				let plugin: MZXBX_AudioFilterPlugin = exe();
+				if (plugin) {
+					filterItem.plugin = plugin;
+					this.startLoadCollectedPlugins();
 				}
 			});
+		} else {
+			console.log('Not found ', filterItem.kind);
 		}
 	}
 	startLoadPerformer(performerItem: { plugin: MZXBX_AudioPerformerPlugin | null, id: string, kind: string }) {
 		console.log('startLoadPerformer', performerItem);
-		let pluginInfo = this.findPluginInfo(performerItem.kind);
-		if (pluginInfo) {
-			waitLoadCheckNext(250, pluginInfo.url, pluginInfo.functionName, () => {
-				if (pluginInfo) {
-					let exe: () => MZXBX_AudioPerformerPlugin = window[pluginInfo.functionName];
-					let plugin: MZXBX_AudioPerformerPlugin = exe();
-					if (plugin) {
-						performerItem.plugin = plugin;
-						this.startLoadCollectedPlugins();
-					}
+		let tt = this.findPluginInfo(performerItem.kind);
+		if (tt) {
+			let info: { kind: string, url: string, functionName: string } = tt;
+			appendScriptURL(info.url);
+			waitForCondition(250, () => { return (window[info.functionName]); }, () => {
+				let exe: () => MZXBX_AudioPerformerPlugin = window[info.functionName];
+				let plugin: MZXBX_AudioPerformerPlugin = exe();
+				if (plugin) {
+					performerItem.plugin = plugin;
+					this.startLoadCollectedPlugins();
 				}
 			});
+		} else {
+			console.log('Not found ', performerItem.kind);
 		}
 	}
 	startLoadCollectedPlugins() {
@@ -140,8 +131,10 @@ class SchedulePlayer implements MZXBX_Player {
 				return;
 			}
 		}
+		this.stateSetupDone=true;
 	}
 	start(from: number, position: number, to: number): boolean {
+		
 		return false;
 	}
 	cancel(): void {
