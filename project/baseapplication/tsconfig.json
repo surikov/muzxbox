@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es2015",
-        "outFile": "./build/base.js",
+        "outFile": "../web/engine/base.js",
         "strictNullChecks": true,
         "alwaysStrict": true,
         "esModuleInterop": true,
