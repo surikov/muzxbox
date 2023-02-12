@@ -226,6 +226,9 @@ declare class SchedulePlayer implements MZXBX_Player {
         kind: string;
     }[];
     stateSetupDone: boolean;
+    nextAudioContextStart: number;
+    currentPosition: number;
+    tickDuration: number;
     setup(context: AudioContext, schedule: MZXBX_Schedule): void;
     startSetupPlugins(): void;
     сollectFilterPlugin(id: string, kind: string): void;
@@ -235,16 +238,7 @@ declare class SchedulePlayer implements MZXBX_Player {
         url: string;
         functionName: string;
     } | null;
-    startLoadFilter(filterItem: {
-        plugin: MZXBX_AudioFilterPlugin | null;
-        id: string;
-        kind: string;
-    }): void;
-    startLoadPerformer(performerItem: {
-        plugin: MZXBX_AudioPerformerPlugin | null;
-        id: string;
-        kind: string;
-    }): void;
+    startLoadPluginStarter(kind: string, onDone: (plugin: any) => void): void;
     startLoadCollectedPlugins(): void;
     start(from: number, position: number, to: number): boolean;
     cancel(): void;

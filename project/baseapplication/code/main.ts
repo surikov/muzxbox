@@ -37,7 +37,7 @@ class MuzXbox {
 		let player: SchedulePlayer = new SchedulePlayer();
 		player.setup(this.audioContext, testSchedule);
 		waitForCondition(500, () => player.stateSetupDone, () => {
-			console.log('loaded');
+			console.log('loaded',player.filters,player.performers);
 			let duration=0;
 			for(let ii=0;ii<testSchedule.series.length;ii++){
 				duration=duration+testSchedule.series[ii].duration;

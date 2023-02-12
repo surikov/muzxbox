@@ -196,7 +196,7 @@ class MuzXbox {
         let player = new SchedulePlayer();
         player.setup(this.audioContext, testSchedule);
         waitForCondition(500, () => player.stateSetupDone, () => {
-            console.log('loaded');
+            console.log('loaded', player.filters, player.performers);
             let duration = 0;
             for (let ii = 0; ii < testSchedule.series.length; ii++) {
                 duration = duration + testSchedule.series[ii].duration;
@@ -239,6 +239,9 @@ class SchedulePlayer {
         this.performers = [];
         this.filters = [];
         this.stateSetupDone = false;
+        this.nextAudioContextStart = 0;
+        this.currentPosition = 0;
+        this.tickDuration = 0.3;
     }
     setup(context, schedule) {
         this.audioContext = context;
@@ -288,9 +291,9 @@ class SchedulePlayer {
         console.log('startLoadFilter', kind);
         return null;
     }
-    startLoadFilter(filterItem) {
-        console.log('startLoadFilter', filterItem);
-        let tt = this.findPluginInfo(filterItem.kind);
+    startLoadPluginStarter(kind, onDone) {
+        console.log('startLoadSinglePlugin', kind);
+        let tt = this.findPluginInfo(kind);
         if (tt) {
             let info = tt;
             appendScriptURL(info.url);
@@ -298,50 +301,36 @@ class SchedulePlayer {
                 let exe = window[info.functionName];
                 let plugin = exe();
                 if (plugin) {
-                    filterItem.plugin = plugin;
+                    onDone(plugin);
                     this.startLoadCollectedPlugins();
                 }
             });
         }
         else {
-            console.log('Not found ', filterItem.kind);
-        }
-    }
-    startLoadPerformer(performerItem) {
-        console.log('startLoadPerformer', performerItem);
-        let tt = this.findPluginInfo(performerItem.kind);
-        if (tt) {
-            let info = tt;
-            appendScriptURL(info.url);
-            waitForCondition(250, () => { return (window[info.functionName]); }, () => {
-                let exe = window[info.functionName];
-                let plugin = exe();
-                if (plugin) {
-                    performerItem.plugin = plugin;
-                    this.startLoadCollectedPlugins();
-                }
-            });
-        }
-        else {
-            console.log('Not found ', performerItem.kind);
+            console.log('Not found ', kind);
         }
     }
     startLoadCollectedPlugins() {
         for (let ff = 0; ff < this.filters.length; ff++) {
             if (!(this.filters[ff].plugin)) {
-                this.startLoadFilter(this.filters[ff]);
+                this.startLoadPluginStarter(this.filters[ff].kind, (plugin) => {
+                    this.filters[ff].plugin = plugin;
+                });
                 return;
             }
         }
         for (let pp = 0; pp < this.performers.length; pp++) {
             if (!(this.performers[pp].plugin)) {
-                this.startLoadPerformer(this.performers[pp]);
+                this.startLoadPluginStarter(this.performers[pp].kind, (plugin) => {
+                    this.performers[pp].plugin = plugin;
+                });
                 return;
             }
         }
         this.stateSetupDone = true;
     }
     start(from, position, to) {
+        console.log('start', from, position, to);
         return false;
     }
     cancel() {
