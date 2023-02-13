@@ -358,7 +358,7 @@ function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
     for (let bb = 0; bb < rowLen; bb++) {
         arr.push({ ball: bb + 1, avg: 0, sums: [] });
     }
-    for (let thd = 1; thd <= 30; thd++) {
+    for (let thd = 1; thd <= 1; thd++) {
         reduceRatio = thd;
         let rows: BallsRow[] = sliceRows(inrows, 0, 100);
         let precounts = calcRowPatterns(0 + 1, rows);

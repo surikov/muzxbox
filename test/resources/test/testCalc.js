@@ -333,7 +333,7 @@ function dumpRowFillsColor(inrows, color, shiftX) {
     for (var bb = 0; bb < rowLen; bb++) {
         arr.push({ ball: bb + 1, avg: 0, sums: [] });
     }
-    for (var thd = 1; thd <= 30; thd++) {
+    for (var thd = 1; thd <= 1; thd++) {
         reduceRatio = thd;
         var rows = sliceRows(inrows, 0, 100);
         var precounts = calcRowPatterns(0 + 1, rows);
