@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.52 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.53 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -189,7 +189,7 @@ function clickFog(vnt) {
         }
     } else {
         markLines.push({
-            fromX: xx, fromY: yy, toX: markX, toY: markY, color: '#99990066'
+            fromX: xx, fromY: yy, toX: markX, toY: markY, color: '#ff000066'
         });
         markX = -1;
         markY = -1;
@@ -236,6 +236,7 @@ function drawStat3(svg: SVGElement, rows: BallsRow[]) {
             }
         }
     }
+
     for (let colNum = 1; colNum <= rowLen; colNum++) {
         if (colNum % 10 == 0) {
             addBigText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
@@ -244,6 +245,18 @@ function drawStat3(svg: SVGElement, rows: BallsRow[]) {
             addSmallText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
             addSmallText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
         }
+		composeLine(levelA
+            , colNum * cellSize - cellSize 
+            , 0
+            , colNum * cellSize - cellSize 
+            , topShift
+            , cellSize / 20, '#0000ff66');
+		composeLine(levelA
+            , colNum * cellSize - cellSize + rowLen*cellSize
+            , 0
+            , colNum * cellSize - cellSize + rowLen*cellSize
+            , topShift
+            , cellSize / 20, '#0000ff66');
     }
 }
 function triadExists(ball: number, rowNum: number, dx1: number, dx2: number, rows: BallsRow[]): boolean {

@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.52 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.53 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -179,7 +179,7 @@ function clickFog(vnt) {
     }
     else {
         markLines.push({
-            fromX: xx, fromY: yy, toX: markX, toY: markY, color: '#99990066'
+            fromX: xx, fromY: yy, toX: markX, toY: markY, color: '#ff000066'
         });
         markX = -1;
         markY = -1;
@@ -224,6 +224,8 @@ function drawStat3(svg, rows) {
             addSmallText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
             addSmallText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
         }
+        composeLine(levelA, colNum * cellSize - cellSize, 0, colNum * cellSize - cellSize, topShift, cellSize / 20, '#0000ff66');
+        composeLine(levelA, colNum * cellSize - cellSize + rowLen * cellSize, 0, colNum * cellSize - cellSize + rowLen * cellSize, topShift, cellSize / 20, '#0000ff66');
     }
 }
 function triadExists(ball, rowNum, dx1, dx2, rows) {
