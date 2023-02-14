@@ -193,16 +193,25 @@ class MuzXbox {
     }
     startTest() {
         console.log('start test');
-        let player = new SchedulePlayer();
-        player.setup(this.audioContext, testSchedule);
-        waitForCondition(500, () => player.stateSetupDone, () => {
-            console.log('loaded', player.filters, player.performers);
-            let duration = 0;
-            for (let ii = 0; ii < testSchedule.series.length; ii++) {
-                duration = duration + testSchedule.series[ii].duration;
-            }
-            player.start(0, 0, duration);
-        });
+        if (this.player) {
+        }
+        else {
+            this.player = new SchedulePlayer();
+            this.player.setup(this.audioContext, testSchedule);
+        }
+        if (this.player.onAir) {
+            this.player.onAir = false;
+        }
+        else {
+            waitForCondition(500, () => this.player.stateSetupDone, () => {
+                console.log('loaded', this.player.filters, this.player.performers);
+                let duration = 0;
+                for (let ii = 0; ii < testSchedule.series.length; ii++) {
+                    duration = duration + testSchedule.series[ii].duration;
+                }
+                this.player.start(0, 0, duration);
+            });
+        }
     }
 }
 function waitForCondition(sleepMs, isDone, onFinish) {
@@ -240,8 +249,8 @@ class SchedulePlayer {
         this.filters = [];
         this.stateSetupDone = false;
         this.nextAudioContextStart = 0;
-        this.currentPosition = 0;
         this.tickDuration = 0.3;
+        this.onAir = false;
     }
     setup(context, schedule) {
         this.audioContext = context;
@@ -331,9 +340,41 @@ class SchedulePlayer {
     }
     start(from, position, to) {
         console.log('start', from, position, to);
+        this.nextAudioContextStart = this.audioContext.currentTime;
+        this.position = position;
+        this.onAir = true;
+        this.tick(from, to);
         return false;
     }
+    tick(from, to) {
+        let sendFrom = this.position;
+        let sendTo = this.position + this.tickDuration;
+        if (this.audioContext.currentTime > this.nextAudioContextStart - this.tickDuration) {
+            console.log('position', this.position);
+            if (sendTo > to) {
+                this.send(sendFrom, to, this.nextAudioContextStart);
+                sendFrom = from;
+                sendTo = from + (sendTo - to);
+            }
+            this.send(sendFrom, sendTo, this.nextAudioContextStart);
+            this.position = sendTo;
+            this.nextAudioContextStart = this.nextAudioContextStart + this.tickDuration;
+            if (this.nextAudioContextStart < this.audioContext.currentTime) {
+                this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
+            }
+        }
+        let me = this;
+        if (this.onAir) {
+            window.requestAnimationFrame(function (time) {
+                me.tick(from, to);
+            });
+        }
+    }
+    send(from, to, when) {
+        console.log('send', from, to);
+    }
     cancel() {
+        this.onAir = false;
     }
 }
 class MusicTicker {

@@ -193,6 +193,7 @@ declare let testSchedule: MZXBX_Schedule;
 declare class MuzXbox {
     uiStarted: boolean;
     audioContext: AudioContext;
+    player: SchedulePlayer;
     constructor();
     initAfterLoad(): void;
     initFromUI(): void;
@@ -227,8 +228,8 @@ declare class SchedulePlayer implements MZXBX_Player {
     }[];
     stateSetupDone: boolean;
     nextAudioContextStart: number;
-    currentPosition: number;
     tickDuration: number;
+    onAir: boolean;
     setup(context: AudioContext, schedule: MZXBX_Schedule): void;
     startSetupPlugins(): void;
     сollectFilterPlugin(id: string, kind: string): void;
@@ -241,6 +242,8 @@ declare class SchedulePlayer implements MZXBX_Player {
     startLoadPluginStarter(kind: string, onDone: (plugin: any) => void): void;
     startLoadCollectedPlugins(): void;
     start(from: number, position: number, to: number): boolean;
+    tick(from: number, to: number): void;
+    send(from: number, to: number, when: number): void;
     cancel(): void;
 }
 declare class MusicTicker {

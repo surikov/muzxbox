@@ -3,6 +3,7 @@ declare let testSchedule: MZXBX_Schedule;
 class MuzXbox {
 	uiStarted: boolean = false;
 	audioContext: AudioContext;
+	player: SchedulePlayer;
 	constructor() {
 		this.initAfterLoad();
 	}
@@ -34,16 +35,24 @@ class MuzXbox {
 		console.log(scriptExistsInDocument(url));
 		console.log(scriptExistsInDocument('url'));
 		*/
-		let player: SchedulePlayer = new SchedulePlayer();
-		player.setup(this.audioContext, testSchedule);
-		waitForCondition(500, () => player.stateSetupDone, () => {
-			console.log('loaded',player.filters,player.performers);
-			let duration=0;
-			for(let ii=0;ii<testSchedule.series.length;ii++){
-				duration=duration+testSchedule.series[ii].duration;
-			}
-			player.start(0,0,duration);
-		});
+		if (this.player) {
+			//
+		} else {
+			this.player = new SchedulePlayer();
+			this.player.setup(this.audioContext, testSchedule);
+		}
+		if (this.player.onAir) {
+			this.player.onAir=false;
+		} else {
+			waitForCondition(500, () => this.player.stateSetupDone, () => {
+				console.log('loaded', this.player.filters, this.player.performers);
+				let duration = 0;
+				for (let ii = 0; ii < testSchedule.series.length; ii++) {
+					duration = duration + testSchedule.series[ii].duration;
+				}
+				this.player.start(0, 0, duration);
+			});
+		}
 		//player.filters.push({ plugin: null, id: 'test111', kind: 'volume_filter_1_test' });
 		//player.filters.push({ plugin: null, id: 'test22', kind: 'volume_filter_1_test' });
 		//player.filters.push({ plugin: null, id: 'test333', kind: 'echo_filter_1_test' });
