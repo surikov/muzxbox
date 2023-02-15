@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.53 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.54 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -23,7 +23,7 @@ let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let reduceRatio = 1;
 let highLightMode = 1;
 var calcLen = 9;
-let markLines: { fromX: number, fromY: number, toX: number, toY: number, color: string }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
+let markLines: { fromX: number, fromY: number, toX: number, toY: number, color: string ,manual:boolean}[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
     key: string;
     balls: number[];
@@ -171,6 +171,15 @@ function clickClearLines() {
     markLines = [];
     drawLines();
 }
+function clearNonManual(){
+	let newarr: { fromX: number, fromY: number, toX: number, toY: number, color: string ,manual:boolean}[] = [];
+	for(let ii=0;ii<markLines.length;ii++){
+		if(markLines[ii].manual){
+			newarr.push(markLines[ii]);
+		}
+	}
+	markLines = newarr;
+}
 function clickFog(vnt) {
     let xx = Math.round((vnt.offsetX - 0.5 * cellSize) / cellSize);
     let yy = skipRowsCount + Math.round((vnt.offsetY - 0.5 * cellSize) / cellSize);
@@ -189,7 +198,7 @@ function clickFog(vnt) {
         }
     } else {
         markLines.push({
-            fromX: xx, fromY: yy, toX: markX, toY: markY, color: '#ff000066'
+            fromX: xx, fromY: yy, toX: markX, toY: markY, color: '#ff000066',manual:true
         });
         markX = -1;
         markY = -1;
@@ -390,14 +399,14 @@ function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
             , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
             , toX: bb + shiftX
             , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
-            , color: color
+            , color: color,manual:false
         });
         markLines.push({
             fromX: bb + shiftX-1+ rowLen
             , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
             , toX: bb + shiftX+ rowLen
             , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
-            , color: color
+            , color: color,manual:false
         });
         prehh=hh;
         /*markLines.push({
@@ -516,12 +525,14 @@ function toggleRatioPre() {
 }
 function moreReduceRatio() {
     reduceRatio = reduceRatio + 1;
-    fillCells();
+	addTails();
+    //fillCells();
 }
 function lessReduceRatio() {
     reduceRatio = reduceRatio - 1;
     if (reduceRatio < 1) reduceRatio = 1;
-    fillCells();
+    //fillCells();
+	addTails();
 }
 function moreCalcLen() {
     calcLen = calcLen + 1;
@@ -553,7 +564,8 @@ function sobstvennoe(balls: number[]): number {
     return r0;
 }
 function addTails() {
-    markLines = [];
+    //markLines = [];
+	clearNonManual();
     let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
 	/*let firsts: number[] = [];
 	for (let ii = 1; ii < slicedrows.length - 1 - 1 - 1; ii++) {

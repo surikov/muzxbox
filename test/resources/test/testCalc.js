@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.53 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.54 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -160,6 +160,15 @@ function clickClearLines() {
     markLines = [];
     drawLines();
 }
+function clearNonManual() {
+    var newarr = [];
+    for (var ii = 0; ii < markLines.length; ii++) {
+        if (markLines[ii].manual) {
+            newarr.push(markLines[ii]);
+        }
+    }
+    markLines = newarr;
+}
 function clickFog(vnt) {
     var xx = Math.round((vnt.offsetX - 0.5 * cellSize) / cellSize);
     var yy = skipRowsCount + Math.round((vnt.offsetY - 0.5 * cellSize) / cellSize);
@@ -179,7 +188,7 @@ function clickFog(vnt) {
     }
     else {
         markLines.push({
-            fromX: xx, fromY: yy, toX: markX, toY: markY, color: '#ff000066'
+            fromX: xx, fromY: yy, toX: markX, toY: markY, color: '#ff000066', manual: true
         });
         markX = -1;
         markY = -1;
@@ -367,14 +376,14 @@ function dumpRowFillsColor(inrows, color, shiftX) {
             fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
             toX: bb + shiftX,
             toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2,
-            color: color
+            color: color, manual: false
         });
         markLines.push({
             fromX: bb + shiftX - 1 + rowLen,
             fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
             toX: bb + shiftX + rowLen,
             toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2,
-            color: color
+            color: color, manual: false
         });
         prehh = hh;
         /*markLines.push({
@@ -490,13 +499,15 @@ function toggleRatioPre() {
 }
 function moreReduceRatio() {
     reduceRatio = reduceRatio + 1;
-    fillCells();
+    addTails();
+    //fillCells();
 }
 function lessReduceRatio() {
     reduceRatio = reduceRatio - 1;
     if (reduceRatio < 1)
         reduceRatio = 1;
-    fillCells();
+    //fillCells();
+    addTails();
 }
 function moreCalcLen() {
     calcLen = calcLen + 1;
@@ -529,7 +540,8 @@ function sobstvennoe(balls) {
     return r0;
 }
 function addTails() {
-    markLines = [];
+    //markLines = [];
+    clearNonManual();
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
     /*let firsts: number[] = [];
     for (let ii = 1; ii < slicedrows.length - 1 - 1 - 1; ii++) {
