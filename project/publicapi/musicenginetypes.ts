@@ -156,6 +156,8 @@ type MZXBX_ChannelFilter = {
 };
 type MZXBX_AudioFilterPlugin = {
     reset: (context: AudioContext, parameters: string) => boolean;
+	input: () => AudioNode|null;
+	output: () => AudioNode|null;
 };
 type MZXBX_ChannelPerformer = {
     id: string;
@@ -166,6 +168,7 @@ type MZXBX_AudioPerformerPlugin = {
     reset: (context: AudioContext, parameters: string) => boolean;
     schedule: (when: number, pitch: number, volume: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
+	output: () => AudioNode|null;
 };
 type MZXBX_Schedule = {
     series: MZXBX_Set[];

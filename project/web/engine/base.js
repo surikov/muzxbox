@@ -338,25 +338,34 @@ class SchedulePlayer {
         }
         this.stateSetupDone = true;
     }
-    start(from, position, to) {
-        console.log('start', from, position, to);
+    start(loopStart, currentPosition, loopEnd) {
+        console.log('start', loopStart, currentPosition, loopEnd);
+        this.connect();
         this.nextAudioContextStart = this.audioContext.currentTime;
-        this.position = position;
+        this.position = currentPosition;
         this.onAir = true;
-        this.tick(from, to);
+        this.tick(loopStart, loopEnd);
         return false;
     }
-    tick(from, to) {
+    connect() {
+        console.log('connect');
+    }
+    disconnect() {
+        console.log('disconnect');
+    }
+    tick(loopStart, loopEnd) {
         let sendFrom = this.position;
         let sendTo = this.position + this.tickDuration;
         if (this.audioContext.currentTime > this.nextAudioContextStart - this.tickDuration) {
             console.log('position', this.position);
-            if (sendTo > to) {
-                this.send(sendFrom, to, this.nextAudioContextStart);
-                sendFrom = from;
-                sendTo = from + (sendTo - to);
+            let atTime = this.nextAudioContextStart;
+            if (sendTo > loopEnd) {
+                this.sendPiece(sendFrom, loopEnd, atTime);
+                sendFrom = loopStart;
+                atTime = atTime + (sendTo - loopEnd);
+                sendTo = loopStart + (sendTo - loopEnd);
             }
-            this.send(sendFrom, sendTo, this.nextAudioContextStart);
+            this.sendPiece(sendFrom, sendTo, atTime);
             this.position = sendTo;
             this.nextAudioContextStart = this.nextAudioContextStart + this.tickDuration;
             if (this.nextAudioContextStart < this.audioContext.currentTime) {
@@ -366,12 +375,49 @@ class SchedulePlayer {
         let me = this;
         if (this.onAir) {
             window.requestAnimationFrame(function (time) {
-                me.tick(from, to);
+                me.tick(loopStart, loopEnd);
             });
         }
+        else {
+            this.disconnect();
+        }
     }
-    send(from, to, when) {
-        console.log('send', from, to);
+    sendNote(it, whenAudio) {
+        console.log(it, whenAudio);
+        if (this.schedule) {
+            for (let ii = 0; ii < this.schedule.channels.length; ii++) {
+                if (this.schedule.channels[ii].id == it.channelId) {
+                    let performerId = this.schedule.channels[ii].performer.id;
+                    for (let nn = 0; nn < this.performers.length; nn++) {
+                        let performer = this.performers[nn];
+                        if (performerId == performer.id) {
+                            if (performer.plugin) {
+                                let plugin = performer.plugin;
+                                plugin.schedule(whenAudio, it.pitch, it.volume, it.slides);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    sendPiece(fromPosition, toPosition, whenAudio) {
+        console.log('send', fromPosition, toPosition, whenAudio);
+        if (this.schedule) {
+            let serieStart = 0;
+            for (let ii = 0; ii < this.schedule.series.length; ii++) {
+                let cuSerie = this.schedule.series[ii];
+                if (serieStart < toPosition && serieStart + cuSerie.duration >= fromPosition) {
+                    for (let nn = 0; nn < cuSerie.items.length; nn++) {
+                        let it = cuSerie.items[nn];
+                        if (serieStart + it.skip >= fromPosition && serieStart + it.skip < toPosition) {
+                            this.sendNote(it, whenAudio + serieStart + it.skip - fromPosition);
+                        }
+                    }
+                }
+                serieStart = serieStart + cuSerie.duration;
+            }
+        }
     }
     cancel() {
         this.onAir = false;

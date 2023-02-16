@@ -123,32 +123,34 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 		this.stateSetupDone = true;
 	}
-	start(from: number, position: number, to: number): boolean {
-		console.log('start', from, position, to);
+	start(loopStart: number, currentPosition: number, loopEnd: number): boolean {
+		console.log('start', loopStart, currentPosition, loopEnd);
 		this.connect();
 		this.nextAudioContextStart = this.audioContext.currentTime;
-		this.position = position;
+		this.position = currentPosition;
 		this.onAir = true;
-		this.tick(from, to);
+		this.tick(loopStart, loopEnd);
 		return false;
 	}
-	connect(){
+	connect() {
 		console.log('connect');
 	}
-	disconnect(){
+	disconnect() {
 		console.log('disconnect');
 	}
-	tick(from: number, to: number) {
+	tick(loopStart: number, loopEnd: number) {
 		let sendFrom = this.position;
 		let sendTo = this.position + this.tickDuration;
 		if (this.audioContext.currentTime > this.nextAudioContextStart - this.tickDuration) {
 			console.log('position', this.position);//, when);
-			if (sendTo > to) {
-				this.send(sendFrom, to, this.nextAudioContextStart);
-				sendFrom = from;
-				sendTo = from + (sendTo - to);
+			let atTime = this.nextAudioContextStart;
+			if (sendTo > loopEnd) {
+				this.sendPiece(sendFrom, loopEnd, atTime);
+				sendFrom = loopStart;
+				atTime = atTime + (sendTo - loopEnd);
+				sendTo = loopStart + (sendTo - loopEnd);
 			}
-			this.send(sendFrom, sendTo, this.nextAudioContextStart);
+			this.sendPiece(sendFrom, sendTo, atTime);
 			this.position = sendTo;
 			this.nextAudioContextStart = this.nextAudioContextStart + this.tickDuration;
 			if (this.nextAudioContextStart < this.audioContext.currentTime) {
@@ -158,14 +160,48 @@ class SchedulePlayer implements MZXBX_Player {
 		let me = this;
 		if (this.onAir) {
 			window.requestAnimationFrame(function (time) {
-				me.tick(from, to);
+				me.tick(loopStart, loopEnd);
 			});
-		}else{
+		} else {
 			this.disconnect();
 		}
 	}
-	send(from: number, to: number, when: number) {
-		//console.log('send', from, to);//, when);
+	sendNote(it: MZXBX_PlayItem, whenAudio: number) {
+		console.log(it, whenAudio);
+		if (this.schedule) {
+			for (let ii = 0; ii < this.schedule.channels.length; ii++) {
+				if (this.schedule.channels[ii].id == it.channelId) {
+					let performerId = this.schedule.channels[ii].performer.id;
+					for (let nn = 0; nn < this.performers.length; nn++) {
+						let performer = this.performers[nn];
+						if (performerId == performer.id) {
+							if (performer.plugin) {
+								let plugin: MZXBX_AudioPerformerPlugin = performer.plugin;
+								plugin.schedule(whenAudio, it.pitch, it.volume, it.slides);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	sendPiece(fromPosition: number, toPosition: number, whenAudio: number) {
+		console.log('send', fromPosition, toPosition, whenAudio);
+		if (this.schedule) {
+			let serieStart = 0;
+			for (let ii = 0; ii < this.schedule.series.length; ii++) {
+				let cuSerie: MZXBX_Set = this.schedule.series[ii];
+				if (serieStart < toPosition && serieStart + cuSerie.duration >= fromPosition) {
+					for (let nn = 0; nn < cuSerie.items.length; nn++) {
+						let it: MZXBX_PlayItem = cuSerie.items[nn];
+						if (serieStart + it.skip >= fromPosition && serieStart + it.skip < toPosition) {
+							this.sendNote(it, whenAudio + serieStart + it.skip - fromPosition);
+						}
+					}
+				}
+				serieStart = serieStart + cuSerie.duration;
+			}
+		}
 	}
 	cancel(): void {
 		this.onAir = false;

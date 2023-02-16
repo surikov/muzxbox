@@ -1,5 +1,12 @@
 declare class SimpleEchoTestPlugin implements MZXBX_AudioFilterPlugin {
+    inpt: GainNode;
+    outpt: GainNode;
+    fx: GainNode;
+    pass: GainNode;
+    convolver: ConvolverNode;
     reset(context: AudioContext, parameters: string): boolean;
+    output(): AudioNode | null;
+    input(): AudioNode | null;
 }
 declare function testPluginForEcho1(): MZXBX_AudioFilterPlugin;
 declare type MZXBX_Metre = {
@@ -125,12 +132,11 @@ declare type MZXBX_SlideItem = {
     delta: number;
 };
 declare type MZXBX_PlayItem = {
-    groupId: string;
     skip: number;
     channelId: string;
     pitch: number;
     volume: number;
-    slides: MZXBX_SlideItem;
+    slides: MZXBX_SlideItem[];
 };
 declare type MZXBX_Set = {
     duration: number;
@@ -143,6 +149,8 @@ declare type MZXBX_ChannelFilter = {
 };
 declare type MZXBX_AudioFilterPlugin = {
     reset: (context: AudioContext, parameters: string) => boolean;
+    input: () => AudioNode | null;
+    output: () => AudioNode | null;
 };
 declare type MZXBX_ChannelPerformer = {
     id: string;
@@ -153,6 +161,7 @@ declare type MZXBX_AudioPerformerPlugin = {
     reset: (context: AudioContext, parameters: string) => boolean;
     schedule: (when: number, pitch: number, volume: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
+    output: () => AudioNode | null;
 };
 declare type MZXBX_Schedule = {
     series: MZXBX_Set[];

@@ -241,9 +241,12 @@ declare class SchedulePlayer implements MZXBX_Player {
     } | null;
     startLoadPluginStarter(kind: string, onDone: (plugin: any) => void): void;
     startLoadCollectedPlugins(): void;
-    start(from: number, position: number, to: number): boolean;
-    tick(from: number, to: number): void;
-    send(from: number, to: number, when: number): void;
+    start(loopStart: number, currentPosition: number, loopEnd: number): boolean;
+    connect(): void;
+    disconnect(): void;
+    tick(loopStart: number, loopEnd: number): void;
+    sendNote(it: MZXBX_PlayItem, whenAudio: number): void;
+    sendPiece(fromPosition: number, toPosition: number, whenAudio: number): void;
     cancel(): void;
 }
 declare class MusicTicker {
