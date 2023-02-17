@@ -166,9 +166,24 @@ class SchedulePlayer implements MZXBX_Player {
 			this.disconnect();
 		}
 	}
-	sendNote(it: MZXBX_PlayItem, whenAudio: number) {
+	findChannel(id: string): MZXBX_Channel | null {
+		if (this.schedule) {
+			for (let ii = 0; ii < this.schedule.channels.length; ii++) {
+				if (this.schedule.channels[ii].id == id) {
+					return this.schedule.channels[ii];
+				}
+			}
+		}
+		return null;
+	}
+	sendPerformerItem(it: MZXBX_PlayItem, whenAudio: number) {
 		console.log(it, whenAudio);
 		if (this.schedule) {
+			let channel:MZXBX_Channel|null=this.findChannel(it.channelId);
+			if(channel){
+				let performerId = channel.performer.id;
+				
+			}
 			for (let ii = 0; ii < this.schedule.channels.length; ii++) {
 				if (this.schedule.channels[ii].id == it.channelId) {
 					let performerId = this.schedule.channels[ii].performer.id;
@@ -177,11 +192,18 @@ class SchedulePlayer implements MZXBX_Player {
 						if (performerId == performer.id) {
 							if (performer.plugin) {
 								let plugin: MZXBX_AudioPerformerPlugin = performer.plugin;
-								plugin.schedule(whenAudio, it.pitch, it.volume, it.slides);
+								plugin.schedule(whenAudio, it.pitch, it.slides);
 							}
 						}
 					}
 				}
+			}
+		}
+	}
+	sendFilterItem(state: MZXBX_FilterState, whenAudio: number) {
+		if (this.schedule) {
+			for (let ii = 0; ii < this.schedule.filters.length; ii++) {
+
 			}
 		}
 	}
@@ -195,7 +217,13 @@ class SchedulePlayer implements MZXBX_Player {
 					for (let nn = 0; nn < cuSerie.items.length; nn++) {
 						let it: MZXBX_PlayItem = cuSerie.items[nn];
 						if (serieStart + it.skip >= fromPosition && serieStart + it.skip < toPosition) {
-							this.sendNote(it, whenAudio + serieStart + it.skip - fromPosition);
+							this.sendPerformerItem(it, whenAudio + serieStart + it.skip - fromPosition);
+						}
+					}
+					for (let nn = 0; nn < cuSerie.states.length; nn++) {
+						let state: MZXBX_FilterState = cuSerie.states[nn];
+						if (serieStart + state.skip >= fromPosition && serieStart + state.skip < toPosition) {
+							this.sendFilterItem(state, whenAudio + serieStart + state.skip - fromPosition);
 						}
 					}
 				}

@@ -6,7 +6,7 @@ let testSchedule: MZXBX_Schedule = {
 				, { skip: 0, channelId: 'ch1', pitch: 12 * 5 + 4, volume: 0.75, slides: [{ duration: 0.25, delta: 0 }] }
 				, { skip: 0, channelId: 'ch1', pitch: 12 * 5 + 7, volume: 0.75, slides: [{ duration: 0.25, delta: 0 }] }
 				, { skip: 0.25, channelId: 'ch1', pitch: 12 * 5 + 12, volume: 0.75, slides: [{ duration: 0.75, delta: 0 }] }
-			]
+			],states:[]
 		}, {
 			duration: 1, items: [
 				{ skip: 0, channelId: 'ch1', pitch: 12 * 5 + 0, volume: 0.75, slides: [{ duration: 0.25, delta: 0 }] }
@@ -21,7 +21,7 @@ let testSchedule: MZXBX_Schedule = {
 						, { duration: 0.15, delta: 1 }
 					]
 				}
-			]
+			],states:[]
 		}
 	]
 	, channels: [{
