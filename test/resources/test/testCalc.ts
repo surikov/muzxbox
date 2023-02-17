@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.54 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.55 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -306,7 +306,7 @@ function calcRowFills(rowNum: number, rows: BallsRow[], counts: number[]): { bal
                 }
             }
         }
-        one.logr = one.summ * one.summ;
+        one.logr = one.summ;//* one.summ;
     }
     return resu;
 }
@@ -374,7 +374,7 @@ function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
         let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[];
         calcs = calcRowFills(0, rows, precounts);
         for (let bb = 0; bb < rowLen; bb++) {
-            arr[bb].sums.push(calcs[bb].summ);
+            arr[bb].sums.push(calcs[bb].logr);
         }
     }
     let mx = 0;

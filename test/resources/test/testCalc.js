@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = false;
-var sversion = 'v1.54 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.55 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -275,7 +275,7 @@ function calcRowFills(rowNum, rows, counts) {
                 }
             }
         }
-        one.logr = one.summ * one.summ;
+        one.logr = one.summ; //* one.summ;
     }
     return resu;
 }
@@ -349,7 +349,7 @@ function dumpRowFillsColor(inrows, color, shiftX) {
         var calcs = void 0;
         calcs = calcRowFills(0, rows, precounts);
         for (var bb = 0; bb < rowLen; bb++) {
-            arr[bb].sums.push(calcs[bb].summ);
+            arr[bb].sums.push(calcs[bb].logr);
         }
     }
     var mx = 0;
