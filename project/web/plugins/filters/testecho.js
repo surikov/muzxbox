@@ -1,6 +1,9 @@
 "use strict";
 console.log('test echo plugin v1.01');
 class SimpleEchoTestPlugin {
+    schedule(when, parameters) {
+        console.log('not implemented yet');
+    }
     reset(context, parameters) {
         console.log('reset', this);
         if (!(this.inpt)) {

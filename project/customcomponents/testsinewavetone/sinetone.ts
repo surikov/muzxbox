@@ -14,7 +14,7 @@ class SimpleSinePerformer implements MZXBX_AudioPerformerPlugin {
 		}
 		return true;
 	}
-	schedule(when: number, pitch: number, volume: number, slides: MZXBX_SlideItem[]): void {
+	schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void {
 		console.log('schedule', this);
 		this.cleanup();
 		let oscillator = this.audioContext.createOscillator();

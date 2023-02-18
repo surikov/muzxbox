@@ -12,7 +12,7 @@ class SimpleSinePerformer {
         }
         return true;
     }
-    schedule(when, pitch, volume, slides) {
+    schedule(when, pitch, slides) {
         console.log('schedule', this);
         this.cleanup();
         let oscillator = this.audioContext.createOscillator();

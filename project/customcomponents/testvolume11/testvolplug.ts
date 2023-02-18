@@ -1,6 +1,9 @@
 console.log('test volume plugin v1.01');
 class SimpleTestVolumePlugin implements MZXBX_AudioFilterPlugin {
-	base: GainNode;
+    base: GainNode;
+    schedule(when: number, parameters: string) {
+        console.log('not implemented yet');
+    }
 	reset(context: AudioContext, parameters: string): boolean {
 		console.log('reset', this);
 		if (!(this.base)) {

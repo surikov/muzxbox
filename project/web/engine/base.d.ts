@@ -153,9 +153,15 @@ declare type MZXBX_PlayItem = {
     volume: number;
     slides: MZXBX_SlideItem[];
 };
+declare type MZXBX_FilterState = {
+    skip: number;
+    filterId: string;
+    data: string;
+};
 declare type MZXBX_Set = {
     duration: number;
     items: MZXBX_PlayItem[];
+    states: MZXBX_FilterState[];
 };
 declare type MZXBX_ChannelFilter = {
     id: string;
@@ -164,6 +170,9 @@ declare type MZXBX_ChannelFilter = {
 };
 declare type MZXBX_AudioFilterPlugin = {
     reset: (context: AudioContext, parameters: string) => boolean;
+    schedule: (when: number, parameters: string) => void;
+    input: () => AudioNode | null;
+    output: () => AudioNode | null;
 };
 declare type MZXBX_ChannelPerformer = {
     id: string;
@@ -172,8 +181,9 @@ declare type MZXBX_ChannelPerformer = {
 };
 declare type MZXBX_AudioPerformerPlugin = {
     reset: (context: AudioContext, parameters: string) => boolean;
-    schedule: (when: number, pitch: number, volume: number, slides: MZXBX_SlideItem[]) => void;
+    schedule: (when: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
+    output: () => AudioNode | null;
 };
 declare type MZXBX_Schedule = {
     series: MZXBX_Set[];
@@ -186,9 +196,6 @@ declare type MZXBX_Player = {
     cancel: () => void;
     position: number;
 };
-declare let testIonianC: MZXBX_Scale;
-declare let testMetre44: MZXBX_Metre;
-declare let testSongProject: MZXBX_Project;
 declare let testSchedule: MZXBX_Schedule;
 declare class MuzXbox {
     uiStarted: boolean;
@@ -245,7 +252,9 @@ declare class SchedulePlayer implements MZXBX_Player {
     connect(): void;
     disconnect(): void;
     tick(loopStart: number, loopEnd: number): void;
-    sendNote(it: MZXBX_PlayItem, whenAudio: number): void;
+    findChannel(id: string): MZXBX_Channel | null;
+    sendPerformerItem(it: MZXBX_PlayItem, whenAudio: number): void;
+    sendFilterItem(state: MZXBX_FilterState, whenAudio: number): void;
     sendPiece(fromPosition: number, toPosition: number, whenAudio: number): void;
     cancel(): void;
 }

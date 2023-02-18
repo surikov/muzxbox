@@ -25,7 +25,6 @@
         "./code/metre.ts",
         "./code/scale.ts",
         "../publicapi/musicenginetypes.ts",
-        "../publicapi/testSong.ts",
         "./code/main.ts"
 		,"./code/player.ts"
         ,"./code/ticker.ts"

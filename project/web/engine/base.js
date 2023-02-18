@@ -132,36 +132,6 @@ class MZXBX_ScaleMath {
         return 0;
     }
 }
-let testIonianC = {
-    basePitch: 0,
-    step2: 2,
-    step3: 2,
-    step4: 1,
-    step5: 2,
-    step6: 2,
-    step7: 2
-};
-let testMetre44 = {
-    count: 4,
-    part: 4
-};
-let testSongProject = {
-    title: "Test song",
-    timeline: [
-        { tempo: 120, metre: testMetre44, scale: testIonianC },
-        { tempo: 120, metre: testMetre44, scale: testIonianC },
-        { tempo: 120, metre: testMetre44, scale: testIonianC },
-        { tempo: 120, metre: testMetre44, scale: testIonianC }
-    ],
-    tracks: [],
-    percussions: [],
-    filters: [
-        {
-            id: "simple_volume",
-            data: "0.77"
-        }
-    ]
-};
 console.log("MuzXbox v1.0.2");
 class MuzXbox {
     constructor() {
@@ -382,9 +352,23 @@ class SchedulePlayer {
             this.disconnect();
         }
     }
-    sendNote(it, whenAudio) {
+    findChannel(id) {
+        if (this.schedule) {
+            for (let ii = 0; ii < this.schedule.channels.length; ii++) {
+                if (this.schedule.channels[ii].id == id) {
+                    return this.schedule.channels[ii];
+                }
+            }
+        }
+        return null;
+    }
+    sendPerformerItem(it, whenAudio) {
         console.log(it, whenAudio);
         if (this.schedule) {
+            let channel = this.findChannel(it.channelId);
+            if (channel) {
+                let performerId = channel.performer.id;
+            }
             for (let ii = 0; ii < this.schedule.channels.length; ii++) {
                 if (this.schedule.channels[ii].id == it.channelId) {
                     let performerId = this.schedule.channels[ii].performer.id;
@@ -393,11 +377,17 @@ class SchedulePlayer {
                         if (performerId == performer.id) {
                             if (performer.plugin) {
                                 let plugin = performer.plugin;
-                                plugin.schedule(whenAudio, it.pitch, it.volume, it.slides);
+                                plugin.schedule(whenAudio, it.pitch, it.slides);
                             }
                         }
                     }
                 }
+            }
+        }
+    }
+    sendFilterItem(state, whenAudio) {
+        if (this.schedule) {
+            for (let ii = 0; ii < this.schedule.filters.length; ii++) {
             }
         }
     }
@@ -411,7 +401,13 @@ class SchedulePlayer {
                     for (let nn = 0; nn < cuSerie.items.length; nn++) {
                         let it = cuSerie.items[nn];
                         if (serieStart + it.skip >= fromPosition && serieStart + it.skip < toPosition) {
-                            this.sendNote(it, whenAudio + serieStart + it.skip - fromPosition);
+                            this.sendPerformerItem(it, whenAudio + serieStart + it.skip - fromPosition);
+                        }
+                    }
+                    for (let nn = 0; nn < cuSerie.states.length; nn++) {
+                        let state = cuSerie.states[nn];
+                        if (serieStart + state.skip >= fromPosition && serieStart + state.skip < toPosition) {
+                            this.sendFilterItem(state, whenAudio + serieStart + state.skip - fromPosition);
                         }
                     }
                 }
