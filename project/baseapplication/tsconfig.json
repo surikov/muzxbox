@@ -28,5 +28,6 @@
         "./code/main.ts"
 		,"./code/player.ts"
         ,"./code/ticker.ts"
+        ,"./code/loader.ts"
     ]
 }

@@ -1,18 +1,26 @@
 declare class SimpleSinePerformer implements MZXBX_AudioPerformerPlugin {
+    velocityRatio: number;
+    preRamp: number;
+    afterRamp: number;
+    rampZero: number;
     out: GainNode;
     audioContext: AudioContext;
     poll: {
-        node: OscillatorNode;
+        gainNode: GainNode;
+        oscillatorNode: OscillatorNode | null;
         end: number;
     }[];
+    type: OscillatorType;
     reset(context: AudioContext, parameters: string): boolean;
-    schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void;
-    cancel(): void;
+    schedule(when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[]): void;
     output(): AudioNode | null;
     freq(key: number): number;
-    cancelSchedule(): void;
-    nextClear(): boolean;
-    cleanup(): void;
+    cancel(): void;
+    takePollItem(): {
+        gainNode: GainNode;
+        oscillatorNode: OscillatorNode | null;
+        end: number;
+    };
 }
 declare function testPluginSingleWave(): MZXBX_AudioPerformerPlugin;
 declare type MZXBX_Metre = {
@@ -172,7 +180,7 @@ declare type MZXBX_ChannelPerformer = {
 };
 declare type MZXBX_AudioPerformerPlugin = {
     reset: (context: AudioContext, parameters: string) => boolean;
-    schedule: (when: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
+    schedule: (when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
 };
@@ -182,7 +190,7 @@ declare type MZXBX_Schedule = {
     filters: MZXBX_ChannelFilter[];
 };
 declare type MZXBX_Player = {
-    setup: (context: AudioContext, schedule: MZXBX_Schedule) => void;
+    setup: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;
     start: (from: number, position: number, to: number) => boolean;
     cancel: () => void;
     position: number;

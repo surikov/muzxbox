@@ -163,7 +163,7 @@ declare type MZXBX_ChannelPerformer = {
 };
 declare type MZXBX_AudioPerformerPlugin = {
     reset: (context: AudioContext, parameters: string) => boolean;
-    schedule: (when: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
+    schedule: (when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
 };
@@ -173,7 +173,7 @@ declare type MZXBX_Schedule = {
     filters: MZXBX_ChannelFilter[];
 };
 declare type MZXBX_Player = {
-    setup: (context: AudioContext, schedule: MZXBX_Schedule) => void;
+    setup: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;
     start: (from: number, position: number, to: number) => boolean;
     cancel: () => void;
     position: number;

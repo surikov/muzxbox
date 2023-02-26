@@ -181,7 +181,7 @@ declare type MZXBX_ChannelPerformer = {
 };
 declare type MZXBX_AudioPerformerPlugin = {
     reset: (context: AudioContext, parameters: string) => boolean;
-    schedule: (when: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
+    schedule: (when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
 };
@@ -191,7 +191,7 @@ declare type MZXBX_Schedule = {
     filters: MZXBX_ChannelFilter[];
 };
 declare type MZXBX_Player = {
-    setup: (context: AudioContext, schedule: MZXBX_Schedule) => void;
+    setup: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;
     start: (from: number, position: number, to: number) => boolean;
     cancel: () => void;
     position: number;
@@ -201,6 +201,7 @@ declare class MuzXbox {
     uiStarted: boolean;
     audioContext: AudioContext;
     player: SchedulePlayer;
+    setupDone: boolean;
     constructor();
     initAfterLoad(): void;
     initFromUI(): void;
@@ -212,6 +213,18 @@ declare let pluginListKindUrlName: {
     url: string;
     functionName: string;
 }[];
+declare type FilterHolder = {
+    plugin: MZXBX_AudioFilterPlugin | null;
+    id: string;
+    kind: string;
+    properties: string;
+};
+declare type PerformerHolder = {
+    plugin: MZXBX_AudioPerformerPlugin | null;
+    id: string;
+    kind: string;
+    properties: string;
+};
 declare function waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function appendScriptURL(url: string): void;
 declare class SchedulePlayer implements MZXBX_Player {
@@ -222,38 +235,22 @@ declare class SchedulePlayer implements MZXBX_Player {
         plugin: MZXBX_AudioPerformerPlugin | null;
         id: string;
         kind: string;
+        properties: string;
     }[];
-    filters: {
-        plugin: MZXBX_AudioFilterPlugin | null;
-        id: string;
-        kind: string;
-    }[];
-    pluginsList: {
-        url: string;
-        name: string;
-        kind: string;
-    }[];
-    stateSetupDone: boolean;
+    filters: FilterHolder[];
+    pluginsList: PerformerHolder[];
     nextAudioContextStart: number;
     tickDuration: number;
     onAir: boolean;
-    setup(context: AudioContext, schedule: MZXBX_Schedule): void;
-    startSetupPlugins(): void;
-    сollectFilterPlugin(id: string, kind: string): void;
-    сollectPerformerPlugin(id: string, kind: string): void;
-    findPluginInfo(kind: string): {
-        kind: string;
-        url: string;
-        functionName: string;
-    } | null;
-    startLoadPluginStarter(kind: string, onDone: (plugin: any) => void): void;
-    startLoadCollectedPlugins(): void;
+    setup(context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void): void;
+    resetCollectedPlugins(): boolean;
     start(loopStart: number, currentPosition: number, loopEnd: number): boolean;
-    connect(): void;
+    connect(): boolean;
     disconnect(): void;
     tick(loopStart: number, loopEnd: number): void;
-    findChannel(id: string): MZXBX_Channel | null;
+    findPerformerPlugin(channelId: string): MZXBX_AudioPerformerPlugin | null;
     sendPerformerItem(it: MZXBX_PlayItem, whenAudio: number): void;
+    findFilterPlugin(filterId: string): MZXBX_AudioFilterPlugin | null;
     sendFilterItem(state: MZXBX_FilterState, whenAudio: number): void;
     sendPiece(fromPosition: number, toPosition: number, whenAudio: number): void;
     cancel(): void;
@@ -263,4 +260,16 @@ declare class MusicTicker {
     cancelPlay(): void;
     setPosition(seconds: number): void;
     getPosition(): number;
+}
+declare class PluginLoader {
+    collectLoadPlugins(schedule: MZXBX_Schedule, filters: FilterHolder[], performers: PerformerHolder[], afterLoad: () => void): void;
+    startLoadCollectedPlugins(filters: FilterHolder[], performers: PerformerHolder[], afterLoad: () => void): void;
+    startLoadPluginStarter(kind: string, filters: FilterHolder[], performers: PerformerHolder[], onDone: (plugin: any) => void, afterLoad: () => void): void;
+    сollectFilterPlugin(id: string, kind: string, properties: string, filters: FilterHolder[]): void;
+    сollectPerformerPlugin(id: string, kind: string, properties: string, performers: PerformerHolder[]): void;
+    findPluginInfo(kind: string): {
+        kind: string;
+        url: string;
+        functionName: string;
+    } | null;
 }

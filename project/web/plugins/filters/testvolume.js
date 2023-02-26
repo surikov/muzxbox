@@ -1,11 +1,9 @@
 "use strict";
-console.log('test volume plugin v1.01');
 class SimpleTestVolumePlugin {
     schedule(when, parameters) {
         console.log('not implemented yet');
     }
     reset(context, parameters) {
-        console.log('reset', this);
         if (!(this.base)) {
             this.base = context.createGain();
         }
@@ -21,7 +19,6 @@ class SimpleTestVolumePlugin {
     }
 }
 function testPluginForVolume1() {
-    console.log('new SimpleTestVolumePlugin');
     return new SimpleTestVolumePlugin();
 }
 //# sourceMappingURL=testvolume.js.map
