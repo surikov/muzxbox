@@ -3,8 +3,8 @@ var levelA;
 var linesLevel;
 var dataBalls;
 var datarows;
-var showFirstRow = false;
-var sversion = 'v1.55 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var showFirstRow = true;
+var sversion = 'v1.56 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -330,10 +330,10 @@ function calcRowHot(rowNum, rows) {
     return resu;
 }
 function dumpRowFills(inrows) {
-    if (reduceRatio == 1) {
-        dumpRowFillsColor(sliceRows(inrows, 2, 100 + 2), '#cccc0066', 0.1);
+    /*if (reduceRatio == 1) {
+        dumpRowFillsColor(sliceRows(inrows, 2, 100+2), '#cccc0066',0.1);
         dumpRowFillsColor(sliceRows(inrows, 1, 100 + 1), '#66cc0099', -0.1);
-    }
+    }*/
     dumpRowFillsColor(inrows, '#006600cc', 0);
 }
 function dumpRowFillsColor(inrows, color, shiftX) {

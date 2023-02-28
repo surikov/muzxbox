@@ -5,13 +5,13 @@ var linesLevel: SVGElement;
 var dataBalls: string[];
 var datarows: BallsRow[];
 
-let showFirstRow = false;
+let showFirstRow = true;
 
 declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.55 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.56 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -355,10 +355,10 @@ function calcRowHot(rowNum: number, rows: BallsRow[]): { ball: number, fills: { 
     return resu;
 }
 function dumpRowFills(inrows: BallsRow[]) {
-    if (reduceRatio == 1) {
+    /*if (reduceRatio == 1) {
         dumpRowFillsColor(sliceRows(inrows, 2, 100+2), '#cccc0066',0.1);
         dumpRowFillsColor(sliceRows(inrows, 1, 100 + 1), '#66cc0099', -0.1);
-    }
+    }*/
     dumpRowFillsColor(inrows, '#006600cc', 0);
 }
 function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
