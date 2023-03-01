@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.56 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.57 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -488,7 +488,7 @@ function fillCells() {
     msgp.innerText = '' + calcLen;
 }
 function clickHop() {
-    skipRowsCount = Math.round(Math.random() * (datarows.length / reduceRatio - 100));
+    skipRowsCount = Math.round(Math.random() * (datarows.length - reduceRatio * rowsVisibleCount));
     //showFirstRow=false;
     //fillCells();
     addTails();
@@ -499,8 +499,8 @@ function toggleFirst() {
 }
 function clickGoSkip(nn: number) {
     console.log('clickGoSkip', nn, nn * reduceRatio, skipRowsCount, datarows.length);
-    if (skipRowsCount + nn * reduceRatio >= 0) {
-        if (skipRowsCount + nn * reduceRatio < datarows.length - 200) {
+    if (skipRowsCount + nn* reduceRatio  >= 0) {
+        if (skipRowsCount + nn* reduceRatio  < datarows.length-rowsVisibleCount* reduceRatio) {
             skipRowsCount = skipRowsCount + nn * reduceRatio;
             for (let i = 0; i < markLines.length; i++) {
                 markLines[i].fromY = markLines[i].fromY + nn * (reduceRatio - 1);
