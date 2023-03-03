@@ -5,5 +5,6 @@ let pluginListKindUrlName :{ kind: string, url: string, functionName: string }[]
 	, { kind: 'waf_ins_performer_1_test', functionName: 'testPluginForInstrum1', url: './plugins/performers/testins.js' }
 	, { kind: 'waf_drums_performer_1_test', functionName: 'testPluginForDrum1', url: './plugins/performers/testperc.js' }
 	, { kind: 'sinewave_performer_1_test', functionName: 'testPluginSingleWave', url: './plugins/performers/testsinewave.js' }
+	, { kind: 'waf_performer_1_test', functionName: 'testPluginWAF', url: './plugins/performers/testwaf.js' }
 ];
 console.log(pluginListKindUrlName);

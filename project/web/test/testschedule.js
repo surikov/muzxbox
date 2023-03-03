@@ -46,7 +46,7 @@ let testSchedule = {
     channels: [{
             id: "bass",
             filters: [{ id: "bassVolume123", kind: "volume_filter_1_test", properties: "20%" }],
-            performer: { id: 'p1', kind: 'sinewave_performer_1_test', properties: 'square' }
+            performer: { id: 'p1', kind: 'waf_performer_1_test', properties: 'square' }
         }, {
             id: "pad",
             filters: [{ id: "padVolume3", kind: "volume_filter_1_test", properties: "10%" }],

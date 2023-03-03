@@ -1,34 +1,17 @@
-declare class DefaultBaseOscillatorPlayer {
-    velocityRatio: number;
-    preRamp: number;
-    afterRamp: number;
-    rampZero: number;
-    audioContext: AudioContext;
-    poll: {
-        gainNode: GainNode;
-        oscillatorNode: OscillatorNode | null;
-        end: number;
-    }[];
+declare class PublicWAFPerformerPlayer {
     setup(context: AudioContext): boolean;
-    send(when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[], target: AudioNode, type: OscillatorType): void;
-    freq(key: number): number;
+    send(when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[]): void;
     cancel(): void;
-    takePollItem(target: AudioNode): {
-        gainNode: GainNode;
-        oscillatorNode: OscillatorNode | null;
-        end: number;
-    };
 }
-declare class SimpleSinePerformer implements MZXBX_AudioPerformerPlugin {
+declare class PerformerPluginWAF implements MZXBX_AudioPerformerPlugin {
     out: GainNode;
-    type: OscillatorType;
-    player: DefaultBaseOscillatorPlayer;
+    player: PublicWAFPerformerPlayer;
     reset(context: AudioContext, parameters: string): boolean;
     schedule(when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[]): void;
     output(): AudioNode | null;
     cancel(): void;
 }
-declare function testPluginSingleWave(): MZXBX_AudioPerformerPlugin;
+declare function testPluginWAF(): MZXBX_AudioPerformerPlugin;
 declare type MZXBX_Metre = {
     count: number;
     part: number;

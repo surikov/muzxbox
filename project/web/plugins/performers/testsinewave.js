@@ -1,32 +1,22 @@
 "use strict";
-class SimpleSinePerformer {
+class DefaultBaseOscillatorPlayer {
     constructor() {
         this.velocityRatio = 0.001;
         this.preRamp = 0.01;
         this.afterRamp = 0.05;
         this.rampZero = 0.000001;
-        this.type = 'sine';
     }
-    reset(context, parameters) {
-        if (!(this.out)) {
+    setup(context) {
+        if (!(this.audioContext)) {
             this.audioContext = context;
-            this.out = this.audioContext.createGain();
             this.poll = [];
-            if (parameters == 'sine')
-                this.type = 'sine';
-            if (parameters == 'square')
-                this.type = 'square';
-            if (parameters == 'sawtooth')
-                this.type = 'sawtooth';
-            if (parameters == 'triangle')
-                this.type = 'triangle';
         }
         return true;
     }
-    schedule(when, volume, pitch, slides) {
-        let it = this.takePollItem();
+    send(when, volume, pitch, slides, target, type) {
+        let it = this.takePollItem(target);
         it.oscillatorNode = this.audioContext.createOscillator();
-        it.oscillatorNode.type = this.type;
+        it.oscillatorNode.type = type;
         it.oscillatorNode.frequency.setValueAtTime(this.freq(pitch), when);
         let duration = 0;
         for (let i = 1; i < slides.length; i++) {
@@ -47,9 +37,6 @@ class SimpleSinePerformer {
         it.gainNode.gain.exponentialRampToValueAtTime(this.rampZero, nextPointSeconds + this.afterRamp);
         it.end = nextPointSeconds + this.preRamp + this.afterRamp;
     }
-    output() {
-        return this.out;
-    }
     freq(key) {
         let O4 = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88];
         let half = Math.floor(key % 12);
@@ -65,7 +52,7 @@ class SimpleSinePerformer {
             }
         }
     }
-    takePollItem() {
+    takePollItem(target) {
         for (let i = 0; i < this.poll.length; i++) {
             if (this.poll[i].end < this.audioContext.currentTime && this.poll[i].end > -1) {
                 let o = this.poll[i].oscillatorNode;
@@ -76,9 +63,48 @@ class SimpleSinePerformer {
             }
         }
         let it = { gainNode: this.audioContext.createGain(), oscillatorNode: null, end: -1 };
-        it.gainNode.connect(this.out);
+        it.gainNode.connect(target);
         this.poll.push(it);
         return it;
+    }
+}
+class SimpleSinePerformer {
+    constructor() {
+        this.type = 'sine';
+    }
+    reset(context, parameters) {
+        if (this.player) {
+        }
+        else {
+            if (window['PublicDefaultBaseOscillatorPlayer']) {
+            }
+            else {
+                window['PublicDefaultBaseOscillatorPlayer'] = new DefaultBaseOscillatorPlayer();
+                window['PublicDefaultBaseOscillatorPlayer'].setup(context);
+            }
+            this.player = window['PublicDefaultBaseOscillatorPlayer'];
+        }
+        if (!(this.out)) {
+            this.out = context.createGain();
+            if (parameters == 'sine')
+                this.type = 'sine';
+            if (parameters == 'square')
+                this.type = 'square';
+            if (parameters == 'sawtooth')
+                this.type = 'sawtooth';
+            if (parameters == 'triangle')
+                this.type = 'triangle';
+        }
+        return true;
+    }
+    schedule(when, volume, pitch, slides) {
+        this.player.send(when, volume, pitch, slides, this.out, this.type);
+    }
+    output() {
+        return this.out;
+    }
+    cancel() {
+        this.player.cancel();
     }
 }
 function testPluginSingleWave() {
