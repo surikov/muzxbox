@@ -1,7 +1,7 @@
 "use strict";
 class DefaultBaseOscillatorPlayer {
     constructor() {
-        this.velocityRatio = 0.001;
+        this.velocityRatio = 0.0002;
         this.preRamp = 0.01;
         this.afterRamp = 0.05;
         this.rampZero = 0.000001;
@@ -11,21 +11,22 @@ class DefaultBaseOscillatorPlayer {
             this.audioContext = context;
             this.poll = [];
         }
-        return true;
     }
     send(when, volume, pitch, slides, target, type) {
         let it = this.takePollItem(target);
         it.oscillatorNode = this.audioContext.createOscillator();
         it.oscillatorNode.type = type;
-        it.oscillatorNode.frequency.setValueAtTime(this.freq(pitch), when);
+        it.oscillatorNode.frequency.setValueAtTime(this.freq(pitch), when - this.preRamp);
         let duration = 0;
         for (let i = 1; i < slides.length; i++) {
             duration = duration + slides[i].duration;
         }
         let nextPointSeconds = when + slides[0].duration;
-        for (let i = 1; i < slides.length; i++) {
-            it.oscillatorNode.frequency.linearRampToValueAtTime(this.freq(slides[i].delta + pitch), nextPointSeconds);
-            nextPointSeconds = nextPointSeconds + slides[i].duration;
+        if (slides.length > 0) {
+            for (let i = 1; i < slides.length; i++) {
+                it.oscillatorNode.frequency.linearRampToValueAtTime(this.freq(slides[i].delta + pitch), nextPointSeconds);
+                nextPointSeconds = nextPointSeconds + slides[i].duration;
+            }
         }
         it.oscillatorNode.connect(it.gainNode);
         it.oscillatorNode.start(when - this.preRamp);
@@ -49,6 +50,7 @@ class DefaultBaseOscillatorPlayer {
             let o = this.poll[i].oscillatorNode;
             if (o) {
                 o.stop();
+                o.disconnect(this.poll[i].gainNode);
             }
         }
     }
@@ -76,13 +78,8 @@ class SimpleSinePerformer {
         if (this.player) {
         }
         else {
-            if (window['PublicDefaultBaseOscillatorPlayer']) {
-            }
-            else {
-                window['PublicDefaultBaseOscillatorPlayer'] = new DefaultBaseOscillatorPlayer();
-                window['PublicDefaultBaseOscillatorPlayer'].setup(context);
-            }
-            this.player = window['PublicDefaultBaseOscillatorPlayer'];
+            this.player = new DefaultBaseOscillatorPlayer();
+            this.player.setup(context);
         }
         if (!(this.out)) {
             this.out = context.createGain();

@@ -206,6 +206,7 @@ declare class MuzXbox {
     initAfterLoad(): void;
     initFromUI(): void;
     initAudioContext(): void;
+    resumeContext(audioContext: AudioContext): void;
     startTest(): void;
 }
 declare let pluginListKindUrlName: {
@@ -225,8 +226,8 @@ declare type PerformerHolder = {
     kind: string;
     properties: string;
 };
-declare function waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
-declare function appendScriptURL(url: string): void;
+declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
+declare function MZXBX_appendScriptURL(url: string): boolean;
 declare class SchedulePlayer implements MZXBX_Player {
     position: number;
     audioContext: AudioContext;

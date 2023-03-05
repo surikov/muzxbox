@@ -44,8 +44,8 @@ class PluginLoader {
         let tt = this.findPluginInfo(kind);
         if (tt) {
             let info: { kind: string, url: string, functionName: string } = tt;
-            appendScriptURL(info.url);
-            waitForCondition(250, () => { return (window[info.functionName]); }, () => {
+            MZXBX_appendScriptURL(info.url);
+            MZXBX_waitForCondition(250, () => { return (window[info.functionName]); }, () => {
                 let exe = window[info.functionName];
                 let plugin = exe();
                 if (plugin) {

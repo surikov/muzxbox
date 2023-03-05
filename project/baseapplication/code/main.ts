@@ -29,6 +29,16 @@ class MuzXbox {
             console.log('AudioContext state is ', this.audioContext.state);
         }
     }
+    resumeContext(audioContext: AudioContext) {
+		try {
+			if (audioContext.state == 'suspended') {
+				console.log('audioContext.resume', audioContext);
+				audioContext.resume();
+			}
+		} catch (e) {
+			//don't care
+		}
+	}
     startTest() {
         console.log('start test');//,testSchedule);
 		/*let url='./sabvaebv/vvv.f';
@@ -51,7 +61,7 @@ class MuzXbox {
         if (this.player.onAir) {
             this.player.onAir = false;
         } else {
-			waitForCondition(500, () => this.setupDone, () => {
+			MZXBX_waitForCondition(500, () => this.setupDone, () => {
 				console.log('loaded', this.player.filters, this.player.performers);
 				let duration = 0;
 				for (let ii = 0; ii < testSchedule.series.length; ii++) {

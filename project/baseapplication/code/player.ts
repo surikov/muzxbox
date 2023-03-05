@@ -11,22 +11,22 @@ type PerformerHolder = {
     , kind: string
     , properties: string
 };
-function waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void {
+function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void {
     if (isDone()) {
         onFinish();
     } else {
         setTimeout(() => {
-            waitForCondition(sleepMs, isDone, onFinish);
+            MZXBX_waitForCondition(sleepMs, isDone, onFinish);
         }, sleepMs);
     }
 }
-function appendScriptURL(url: string): void {
+function MZXBX_appendScriptURL(url: string): boolean {
     let scripts: HTMLCollectionOf<HTMLScriptElement> = document.getElementsByTagName("script");
     for (let ii = 0; ii < scripts.length; ii++) {
         let script: HTMLScriptElement | null = scripts.item(ii);
         if (script) {
             if (url == (script as any).lockedLoaderURL) {
-                return;
+                return false;
             }
         }
     }
@@ -36,6 +36,7 @@ function appendScriptURL(url: string): void {
     (scriptElement as any).lockedLoaderURL = url;
     let head: HTMLHeadElement = document.getElementsByTagName("head")[0];
     head.appendChild(scriptElement);
+    return true;
 }
 class SchedulePlayer implements MZXBX_Player {
     position: number = 0;
@@ -68,7 +69,7 @@ class SchedulePlayer implements MZXBX_Player {
         for (let ff = 0; ff < this.filters.length; ff++) {
             let plugin: MZXBX_AudioFilterPlugin | null = this.filters[ff].plugin;
             if (plugin) {
-                //console.log('reset', this.filters[ff].id, this.filters[ff].kind, this.filters[ff].properties);
+                console.log('reset', this.filters[ff].id, this.filters[ff].kind, this.filters[ff].properties);
                 if (!plugin.reset(this.audioContext, this.filters[ff].properties)) {
                     console.log('filter ' + this.filters[ff].id + ' is not ready for reset');
                     return false;
@@ -81,7 +82,7 @@ class SchedulePlayer implements MZXBX_Player {
         for (let pp = 0; pp < this.performers.length; pp++) {
             let plugin: MZXBX_AudioPerformerPlugin | null = this.performers[pp].plugin;
             if (plugin) {
-                //console.log('reset', this.performers[pp].id, this.performers[pp].kind, this.performers[pp].properties);
+                console.log('reset', this.performers[pp].id, this.performers[pp].kind, this.performers[pp].properties);
                 if (!plugin.reset(this.audioContext, this.performers[pp].properties)) {
                     console.log('performer ' + this.performers[pp].id + ' is not ready for reset');
                     return false;

@@ -161,6 +161,16 @@ class MuzXbox {
             console.log('AudioContext state is ', this.audioContext.state);
         }
     }
+    resumeContext(audioContext) {
+        try {
+            if (audioContext.state == 'suspended') {
+                console.log('audioContext.resume', audioContext);
+                audioContext.resume();
+            }
+        }
+        catch (e) {
+        }
+    }
     startTest() {
         console.log('start test');
         if (this.player) {
@@ -179,7 +189,7 @@ class MuzXbox {
             this.player.onAir = false;
         }
         else {
-            waitForCondition(500, () => this.setupDone, () => {
+            MZXBX_waitForCondition(500, () => this.setupDone, () => {
                 console.log('loaded', this.player.filters, this.player.performers);
                 let duration = 0;
                 for (let ii = 0; ii < testSchedule.series.length; ii++) {
@@ -190,23 +200,23 @@ class MuzXbox {
         }
     }
 }
-function waitForCondition(sleepMs, isDone, onFinish) {
+function MZXBX_waitForCondition(sleepMs, isDone, onFinish) {
     if (isDone()) {
         onFinish();
     }
     else {
         setTimeout(() => {
-            waitForCondition(sleepMs, isDone, onFinish);
+            MZXBX_waitForCondition(sleepMs, isDone, onFinish);
         }, sleepMs);
     }
 }
-function appendScriptURL(url) {
+function MZXBX_appendScriptURL(url) {
     let scripts = document.getElementsByTagName("script");
     for (let ii = 0; ii < scripts.length; ii++) {
         let script = scripts.item(ii);
         if (script) {
             if (url == script.lockedLoaderURL) {
-                return;
+                return false;
             }
         }
     }
@@ -216,6 +226,7 @@ function appendScriptURL(url) {
     scriptElement.lockedLoaderURL = url;
     let head = document.getElementsByTagName("head")[0];
     head.appendChild(scriptElement);
+    return true;
 }
 class SchedulePlayer {
     constructor() {
@@ -240,6 +251,7 @@ class SchedulePlayer {
         for (let ff = 0; ff < this.filters.length; ff++) {
             let plugin = this.filters[ff].plugin;
             if (plugin) {
+                console.log('reset', this.filters[ff].id, this.filters[ff].kind, this.filters[ff].properties);
                 if (!plugin.reset(this.audioContext, this.filters[ff].properties)) {
                     console.log('filter ' + this.filters[ff].id + ' is not ready for reset');
                     return false;
@@ -253,6 +265,7 @@ class SchedulePlayer {
         for (let pp = 0; pp < this.performers.length; pp++) {
             let plugin = this.performers[pp].plugin;
             if (plugin) {
+                console.log('reset', this.performers[pp].id, this.performers[pp].kind, this.performers[pp].properties);
                 if (!plugin.reset(this.audioContext, this.performers[pp].properties)) {
                     console.log('performer ' + this.performers[pp].id + ' is not ready for reset');
                     return false;
@@ -523,8 +536,8 @@ class PluginLoader {
         let tt = this.findPluginInfo(kind);
         if (tt) {
             let info = tt;
-            appendScriptURL(info.url);
-            waitForCondition(250, () => { return (window[info.functionName]); }, () => {
+            MZXBX_appendScriptURL(info.url);
+            MZXBX_waitForCondition(250, () => { return (window[info.functionName]); }, () => {
                 let exe = window[info.functionName];
                 let plugin = exe();
                 if (plugin) {

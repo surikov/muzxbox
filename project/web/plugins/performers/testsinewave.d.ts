@@ -9,7 +9,7 @@ declare class DefaultBaseOscillatorPlayer {
         oscillatorNode: OscillatorNode | null;
         end: number;
     }[];
-    setup(context: AudioContext): boolean;
+    setup(context: AudioContext): void;
     send(when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[], target: AudioNode, type: OscillatorType): void;
     freq(key: number): number;
     cancel(): void;

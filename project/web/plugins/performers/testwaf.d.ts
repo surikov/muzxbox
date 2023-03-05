@@ -1,17 +1,74 @@
-declare class PublicWAFPerformerPlayer {
-    setup(context: AudioContext): boolean;
-    send(when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[]): void;
-    cancel(): void;
+declare type PresetInstrument = {
+    variable: string;
+    url: string;
+};
+declare type WaveZone = {
+    keyRangeLow: number;
+    keyRangeHigh: number;
+    originalPitch: number;
+    coarseTune: number;
+    fineTune: number;
+    loopStart: number;
+    loopEnd: number;
+    buffer?: AudioBuffer;
+    sampleRate: number;
+    delay?: number;
+    ahdsr?: boolean | WaveAHDSR[];
+    sample?: string;
+    file?: string;
+    sustain?: number;
+};
+declare type WavePreset = {
+    zones: WaveZone[];
+};
+declare type WaveAHDSR = {
+    duration: number;
+    volume: number;
+};
+declare type WaveEnvelope = {
+    audioBufferSourceNode?: AudioBufferSourceNode | null;
+    out: AudioNode;
+    when: number;
+    duration: number;
+    cancel: () => void;
+    pitch: number;
+    preset: WavePreset;
+};
+declare class PublicWAFMIDITonePerformerPlayer {
+    audioContext: AudioContext;
+    instrumentKeyArray: string[];
+    instrumentNamesArray: string[];
+    envelopes: WaveEnvelope[];
+    afterTime: number;
+    nearZero: number;
+    setup(context: AudioContext): void;
+    startLoadPreset(nn: number): void;
+    presetReady(nn: number): boolean;
+    adjustPreset(preset: WavePreset): void;
+    adjustZone(zone: WaveZone): void;
+    numValue(aValue: any, defValue: number): number;
+    findZone(audioContext: AudioContext, preset: WavePreset, pitch: number): WaveZone | null;
+    findEnvelope(audioContext: AudioContext, out: AudioNode): WaveEnvelope;
+    setupEnvelope(audioContext: AudioContext, envelope: WaveEnvelope, zone: WaveZone, volume: number, when: number, sampleDuration: number, noteDuration: number): void;
+    noZeroVolume(n: number): number;
+    queueWaveTable(out: AudioNode, preset: WavePreset, when: number, pitch: number, volume: number, slides: MZXBX_SlideItem[]): WaveEnvelope | null;
+    cancelQueue(): void;
+    instrumentInfo(n: number): PresetInstrument;
+    instrumentKeys(): string[];
 }
 declare class PerformerPluginWAF implements MZXBX_AudioPerformerPlugin {
     out: GainNode;
-    player: PublicWAFPerformerPlayer;
+    player: PublicWAFMIDITonePerformerPlayer;
+    index: number;
+    velocityRatio: number;
     reset(context: AudioContext, parameters: string): boolean;
     schedule(when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[]): void;
     output(): AudioNode | null;
     cancel(): void;
 }
 declare function testPluginWAF(): MZXBX_AudioPerformerPlugin;
+declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
+declare function MZXBX_appendScriptURL(url: string): boolean;
 declare type MZXBX_Metre = {
     count: number;
     part: number;
