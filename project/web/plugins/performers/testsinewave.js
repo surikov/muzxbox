@@ -1,7 +1,7 @@
 "use strict";
 class DefaultBaseOscillatorPlayer {
     constructor() {
-        this.velocityRatio = 0.0002;
+        this.velocityRatio = 0.5;
         this.preRamp = 0.01;
         this.afterRamp = 0.05;
         this.rampZero = 0.000001;
@@ -80,18 +80,16 @@ class SimpleSinePerformer {
         else {
             this.player = new DefaultBaseOscillatorPlayer();
             this.player.setup(context);
-        }
-        if (!(this.out)) {
             this.out = context.createGain();
-            if (parameters == 'sine')
-                this.type = 'sine';
-            if (parameters == 'square')
-                this.type = 'square';
-            if (parameters == 'sawtooth')
-                this.type = 'sawtooth';
-            if (parameters == 'triangle')
-                this.type = 'triangle';
         }
+        if (parameters == 'sine')
+            this.type = 'sine';
+        if (parameters == 'square')
+            this.type = 'square';
+        if (parameters == 'sawtooth')
+            this.type = 'sawtooth';
+        if (parameters == 'triangle')
+            this.type = 'triangle';
         return true;
     }
     schedule(when, volume, pitch, slides) {

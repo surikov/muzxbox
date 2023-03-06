@@ -545,7 +545,7 @@ class PublicWAFMIDITonePerformerPlayer {
 class PerformerPluginWAF {
     constructor() {
         this.index = -1;
-        this.velocityRatio = 0.0005;
+        this.velocityRatio = 0.75;
     }
     reset(context, parameters) {
         if (this.player) {

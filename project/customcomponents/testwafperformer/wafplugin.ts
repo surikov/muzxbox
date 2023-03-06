@@ -572,7 +572,7 @@ class PerformerPluginWAF implements MZXBX_AudioPerformerPlugin {
     out: GainNode;
     player: PublicWAFMIDITonePerformerPlayer;
     index: number = -1;
-    velocityRatio = 0.0005;
+    velocityRatio = 0.75;
     reset(context: AudioContext, parameters: string): boolean {
         if (this.player) {
             return this.player.presetReady(this.index);

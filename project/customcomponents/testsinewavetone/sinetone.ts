@@ -1,5 +1,5 @@
 class DefaultBaseOscillatorPlayer {
-    velocityRatio = 0.0002;
+    velocityRatio = 0.33;
     preRamp = 0.01;
     afterRamp = 0.05;
     rampZero = 0.000001;
@@ -80,14 +80,13 @@ class SimpleSinePerformer implements MZXBX_AudioPerformerPlugin {
         } else {
             this.player = new DefaultBaseOscillatorPlayer();
             this.player.setup(context);
+			this.out = context.createGain();
         }
-        if (!(this.out)) {
-            this.out = context.createGain();
-            if (parameters == 'sine') this.type = 'sine';
-            if (parameters == 'square') this.type = 'square';
-            if (parameters == 'sawtooth') this.type = 'sawtooth';
-            if (parameters == 'triangle') this.type = 'triangle';
-        }
+        if (parameters == 'sine') this.type = 'sine';
+		if (parameters == 'square') this.type = 'square';
+		if (parameters == 'sawtooth') this.type = 'sawtooth';
+		if (parameters == 'triangle') this.type = 'triangle';
+		//console.log('reset SimpleSinePerformer',this);
         return true;
     }
     schedule(when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[]): void {

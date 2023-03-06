@@ -5,12 +5,13 @@ class SimpleTestVolumePlugin implements MZXBX_AudioFilterPlugin {
         console.log('not implemented yet');
     }
 	reset(context: AudioContext, parameters: string): boolean {
-		//console.log('reset', this);
+		//console.log('reset', this,parameters);
 		if (!(this.base)) {
 			this.base = context.createGain();
 		}
 		let nn01: number = parseFloat(parameters);
-        this.base.gain.value = nn01;
+		//console.log('gain', nn01);
+        this.base.gain.value = nn01/100;
         //console.log('value', nn01);
 		return true;
 	}

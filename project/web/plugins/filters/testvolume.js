@@ -8,7 +8,7 @@ class SimpleTestVolumePlugin {
             this.base = context.createGain();
         }
         let nn01 = parseFloat(parameters);
-        this.base.gain.value = nn01;
+        this.base.gain.value = nn01 / 100;
         return true;
     }
     output() {
