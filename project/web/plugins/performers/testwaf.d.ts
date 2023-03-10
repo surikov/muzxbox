@@ -1,3 +1,5 @@
+declare var WAFMIDIPresetURLs: string[];
+declare var WAFMIDIDrumURLs: string[];
 declare type PresetInstrument = {
     variable: string;
     url: string;
