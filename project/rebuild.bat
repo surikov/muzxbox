@@ -19,6 +19,9 @@ call tsc
 cd ..\testvolume11
 cd
 call tsc
+cd ..\testdrumsperformer
+cd
+call tsc
 cd ..\..\
 cd
 pause

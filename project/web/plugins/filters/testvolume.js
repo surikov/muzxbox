@@ -1,7 +1,8 @@
 "use strict";
 class SimpleTestVolumePlugin {
     schedule(when, parameters) {
-        console.log('not implemented yet');
+        let nn01 = parseFloat(parameters);
+        this.base.gain.setValueAtTime(nn01 / 100, when);
     }
     reset(context, parameters) {
         if (!(this.base)) {

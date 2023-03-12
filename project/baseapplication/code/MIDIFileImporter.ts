@@ -1,603 +1,110 @@
-"use strict";
-class MZXBX_MetreMath {
-    set(from) {
-        this.count = from.count;
-        this.part = from.part;
-        return this;
-    }
-    metre() {
-        return { count: this.count, part: this.part };
-    }
-    simplyfy() {
-        let cc = this.count;
-        let pp = this.part;
-        if (cc > 0 && pp > 0) {
-            while (cc % 2 == 0 && pp % 2 == 0) {
-                cc = cc / 2;
-                pp = pp / 2;
-            }
-        }
-        return new MZXBX_MetreMath().set({ count: cc, part: pp });
-    }
-    strip(toPart) {
-        let cc = this.count;
-        let pp = this.part;
-        let rr = pp / toPart;
-        cc = Math.ceil(cc / rr);
-        pp = toPart;
-        return new MZXBX_MetreMath().set({ count: cc, part: pp });
-    }
-    equals(metre) {
-        let countMe = this.count * metre.part;
-        let countTo = metre.count * this.part;
-        if (countMe == countTo) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    less(metre) {
-        let countMe = this.count * metre.part;
-        let countTo = metre.count * this.part;
-        if (countMe < countTo) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    more(metre) {
-        let countMe = this.count * metre.part;
-        let countTo = metre.count * this.part;
-        if (countMe > countTo) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    plus(metre) {
-        let countMe = this.count * metre.part;
-        let countTo = metre.count * this.part;
-        let rr = { count: countMe + countTo, part: metre.part * this.part };
-        return new MZXBX_MetreMath().set(rr).simplyfy();
-    }
-    minus(metre) {
-        let countMe = this.count * metre.part;
-        let countTo = metre.count * this.part;
-        let rr = { count: countMe - countTo, part: metre.part * this.part };
-        return new MZXBX_MetreMath().set(rr).simplyfy();
-    }
-    duration(metre, tempo) {
-        let wholeNoteSeconds = (4 * 60) / tempo;
-        let meterSeconds = (wholeNoteSeconds * metre.count) / metre.part;
-        return meterSeconds;
-    }
+type XYp = {
+    x: number;
+    y: number;
+};
+type PP = {
+    p1: XYp;
+    p2: XYp;
+};
+type TrackChord = {
+    when: number
+    , channel: number
+    , notes: TrackNote[]
+};
+type TrackNote = {
+    closed: boolean
+    , points: NotePitch[]
+    , openEvent?: MIDIEvent
+    , closeEvent?: MIDIEvent
+    , volume?: number
 }
-class MZXBX_ScaleMath {
-    set(scale) {
-        this.basePitch = scale.basePitch;
-        this.step2 = scale.step2;
-        this.step3 = scale.step3;
-        this.step4 = scale.step4;
-        this.step5 = scale.step5;
-        this.step6 = scale.step6;
-        this.step7 = scale.step7;
-        return this;
-    }
-    scale() {
-        return {
-            basePitch: this.basePitch,
-            step2: this.step2,
-            step3: this.step3,
-            step4: this.step4,
-            step5: this.step5,
-            step6: this.step6,
-            step7: this.step7
-        };
-    }
-    pitch(note) {
-        let pp = this.basePitch + 12 * note.octave;
-        switch (note.step) {
-            case 1: {
-                break;
-            }
-            case 2: {
-                pp = pp + this.step2;
-                break;
-            }
-            case 3: {
-                pp = pp + this.step2 + this.step3;
-                break;
-            }
-            case 4: {
-                pp = pp + this.step2 + this.step3 + this.step4;
-                break;
-            }
-            case 5: {
-                pp = pp + this.step2 + this.step3 + this.step4 + this.step5;
-                break;
-            }
-            case 6: {
-                pp = pp + this.step2 + this.step3 + this.step4 + this.step5 + this.step6;
-                break;
-            }
-            case 7: {
-                pp = pp + this.step2 + this.step3 + this.step4 + this.step5 + this.step6 + this.step7;
-                break;
-            }
-        }
-        pp = pp + note.shift;
-        return 0;
-    }
+type NotePitch = {
+    pointDuration: number
+    , pitch: number
 }
-console.log("MuzXbox v1.0.2");
-class MuzXbox {
-    constructor() {
-        this.uiStarted = false;
-        this.initAfterLoad();
-    }
-    initAfterLoad() {
-        console.log("MuzXbox loaded");
-    }
-    initFromUI() {
-        if (this.uiStarted) {
-            console.log("skip initFromUI");
-        }
-        else {
-            console.log("start initFromUI");
-            this.initAudioContext();
-        }
-    }
-    initAudioContext() {
-        let AudioContextFunc = window.AudioContext || window.webkitAudioContext;
-        this.audioContext = new AudioContextFunc();
-        console.log(this.audioContext);
-        if (this.audioContext.state == "running") {
-            this.uiStarted = true;
-        }
-        else {
-            console.log('AudioContext state is ', this.audioContext.state);
-        }
-    }
-    resumeContext(audioContext) {
-        try {
-            if (audioContext.state == 'suspended') {
-                console.log('audioContext.resume', audioContext);
-                audioContext.resume();
-            }
-        }
-        catch (e) {
-        }
-    }
-    startTest() {
-        console.log('start test');
-        if (this.player) {
-        }
-        else {
-            this.player = new SchedulePlayer();
-        }
-        if (!this.setupDone) {
-            let me = this;
-            this.player.setup(this.audioContext, testSchedule, () => {
-                me.setupDone = true;
-                console.log('done setup');
-            });
-        }
-        if (this.player.onAir) {
-            this.player.onAir = false;
-        }
-        else {
-            MZXBX_waitForCondition(500, () => this.setupDone, () => {
-                console.log('loaded', this.player.filters, this.player.performers);
-                let duration = 0;
-                for (let ii = 0; ii < testSchedule.series.length; ii++) {
-                    duration = duration + testSchedule.series[ii].duration;
-                }
-                this.player.start(0, 0, duration);
-            });
-        }
-    }
+type MIDIEvent = {
+    offset: number
+    , delta: number
+    , eventTypeByte: number
+    , basetype?: number
+    , subtype?: number
+    , index?: string
+    , length?: number
+    , msb?: number
+    , lsb?: number
+    , prefix?: number
+    , data?: number[]
+    , tempo?: number
+    , tempoBPM?: number
+    , hour?: number
+    , minutes?: number
+    , seconds?: number
+    , frames?: number
+    , subframes?: number
+    , key?: number
+    , param1?: number
+    , param2?: number
+    , param3?: number
+    , param4?: number
+    , scale?: number
+    , badsubtype?: number
+    , midiChannel?: number
+    , playTimeMs: number
+    , preTimeMs?: number
+    , deltaTimeMs?: number
+    , trackNum?: number
+    , text?: string
 }
-function MZXBX_waitForCondition(sleepMs, isDone, onFinish) {
-    if (isDone()) {
-        onFinish();
-    }
-    else {
-        setTimeout(() => {
-            MZXBX_waitForCondition(sleepMs, isDone, onFinish);
-        }, sleepMs);
-    }
+type MIDISongPoint = {
+    pitch: number;
+    durationms: number;
+    midipoint?: TrackNote;
 }
-function MZXBX_appendScriptURL(url) {
-    let scripts = document.getElementsByTagName("script");
-    for (let ii = 0; ii < scripts.length; ii++) {
-        let script = scripts.item(ii);
-        if (script) {
-            if (url == script.lockedLoaderURL) {
-                return false;
-            }
-        }
-    }
-    var scriptElement = document.createElement('script');
-    scriptElement.setAttribute("type", "text/javascript");
-    scriptElement.setAttribute("src", url);
-    scriptElement.lockedLoaderURL = url;
-    let head = document.getElementsByTagName("head")[0];
-    head.appendChild(scriptElement);
-    return true;
+type MIDISongNote = {
+    points: MIDISongPoint[];
 }
-class SchedulePlayer {
-    constructor() {
-        this.position = 0;
-        this.schedule = null;
-        this.performers = [];
-        this.filters = [];
-        this.pluginsList = [];
-        this.nextAudioContextStart = 0;
-        this.tickDuration = 0.35;
-        this.onAir = false;
-    }
-    setup(context, schedule, onDone) {
-        this.audioContext = context;
-        this.schedule = schedule;
-        if (this.schedule) {
-            let pluginLoader = new PluginLoader();
-            pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers, onDone);
-        }
-    }
-    resetCollectedPlugins() {
-        let ready = true;
-        for (let ff = 0; ff < this.filters.length; ff++) {
-            let plugin = this.filters[ff].plugin;
-            if (plugin) {
-                console.log('reset', this.filters[ff].id, this.filters[ff].kind, this.filters[ff].properties);
-                if (!plugin.reset(this.audioContext, this.filters[ff].properties)) {
-                    console.log('filter ' + this.filters[ff].id + ' is not ready for reset');
-                    ready = false;
-                }
-            }
-            else {
-                console.log('empty filter ', this.filters[ff]);
-                return false;
-            }
-        }
-        for (let pp = 0; pp < this.performers.length; pp++) {
-            let plugin = this.performers[pp].plugin;
-            if (plugin) {
-                console.log('reset', this.performers[pp].id, this.performers[pp].kind, this.performers[pp].properties);
-                if (!plugin.reset(this.audioContext, this.performers[pp].properties)) {
-                    console.log('performer ' + this.performers[pp].id + ' is not ready for reset');
-                    ready = false;
-                }
-            }
-            else {
-                console.log('empty performer ', this.performers[pp]);
-                return false;
-            }
-        }
-        return ready;
-    }
-    start(loopStart, currentPosition, loopEnd) {
-        console.log('start', loopStart, currentPosition, loopEnd);
-        if (this.connect()) {
-            this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
-            this.position = currentPosition;
-            this.onAir = true;
-            this.tick(loopStart, loopEnd);
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    connect() {
-        console.log('connect');
-        if (this.resetCollectedPlugins()) {
-            if (this.schedule) {
-                let toNode = this.audioContext.destination;
-                for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
-                    let filter = this.schedule.filters[ff];
-                    let plugin = this.findFilterPlugin(filter.id);
-                    if (plugin) {
-                        let output = plugin.output();
-                        if (output) {
-                            output.connect(toNode);
-                            let input = plugin.input();
-                            if (input) {
-                                toNode = input;
-                            }
-                        }
-                    }
-                }
-                for (let cc = 0; cc < this.schedule.channels.length; cc++) {
-                    let channel = this.schedule.channels[cc];
-                    let channelOutput = toNode;
-                    for (let ff = channel.filters.length - 1; ff >= 0; ff--) {
-                        let filter = channel.filters[ff];
-                        let plugin = this.findFilterPlugin(filter.id);
-                        if (plugin) {
-                            let output = plugin.output();
-                            if (output) {
-                                output.connect(channelOutput);
-                                let input = plugin.input();
-                                if (input) {
-                                    channelOutput = input;
-                                }
-                            }
-                        }
-                    }
-                    let plugin = this.findPerformerPlugin(channel.id);
-                    if (plugin) {
-                        let output = plugin.output();
-                        if (output) {
-                            output.connect(channelOutput);
-                        }
-                    }
-                }
-            }
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    disconnect() {
-        console.log('disconnect');
-        if (this.schedule) {
-            let toNode = this.audioContext.destination;
-            for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
-                let filter = this.schedule.filters[ff];
-                let plugin = this.findFilterPlugin(filter.id);
-                if (plugin) {
-                    let output = plugin.output();
-                    if (output) {
-                        output.disconnect(toNode);
-                        let input = plugin.input();
-                        if (input) {
-                            toNode = input;
-                        }
-                    }
-                }
-            }
-            for (let cc = 0; cc < this.schedule.channels.length; cc++) {
-                let channel = this.schedule.channels[cc];
-                let channelOutput = toNode;
-                for (let ff = channel.filters.length - 1; ff >= 0; ff--) {
-                    let filter = channel.filters[ff];
-                    let plugin = this.findFilterPlugin(filter.id);
-                    if (plugin) {
-                        let output = plugin.output();
-                        if (output) {
-                            try {
-                                output.disconnect(channelOutput);
-                            }
-                            catch (ex) {
-                            }
-                            let input = plugin.input();
-                            if (input) {
-                                channelOutput = input;
-                            }
-                        }
-                    }
-                }
-                let plugin = this.findPerformerPlugin(channel.id);
-                if (plugin) {
-                    let output = plugin.output();
-                    if (output) {
-                        try {
-                            output.disconnect(channelOutput);
-                        }
-                        catch (ex) {
-                        }
-                    }
-                }
-            }
-        }
-    }
-    tick(loopStart, loopEnd) {
-        let sendFrom = this.position;
-        let sendTo = this.position + this.tickDuration;
-        if (this.audioContext.currentTime > this.nextAudioContextStart - this.tickDuration) {
-            let atTime = this.nextAudioContextStart;
-            if (sendTo > loopEnd) {
-                this.sendPiece(sendFrom, loopEnd, atTime);
-                atTime = atTime + (loopEnd - sendFrom);
-                sendFrom = loopStart;
-                sendTo = loopStart + (sendTo - loopEnd);
-            }
-            this.sendPiece(sendFrom, sendTo, atTime);
-            this.position = sendTo;
-            this.nextAudioContextStart = this.nextAudioContextStart + this.tickDuration;
-            if (this.nextAudioContextStart < this.audioContext.currentTime) {
-                this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
-            }
-        }
-        let me = this;
-        if (this.onAir) {
-            window.requestAnimationFrame(function (time) {
-                me.tick(loopStart, loopEnd);
-            });
-        }
-        else {
-            this.disconnect();
-        }
-    }
-    findPerformerPlugin(channelId) {
-        if (this.schedule) {
-            for (let ii = 0; ii < this.schedule.channels.length; ii++) {
-                if (this.schedule.channels[ii].id == channelId) {
-                    let performerId = this.schedule.channels[ii].performer.id;
-                    for (let nn = 0; nn < this.performers.length; nn++) {
-                        let performer = this.performers[nn];
-                        if (performerId == performer.id) {
-                            if (performer.plugin) {
-                                let plugin = performer.plugin;
-                                return plugin;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-    sendPerformerItem(it, whenAudio) {
-        let plugin = this.findPerformerPlugin(it.channelId);
-        if (plugin) {
-            plugin.schedule(whenAudio, it.pitch, it.slides);
-        }
-    }
-    findFilterPlugin(filterId) {
-        if (this.schedule) {
-            for (let nn = 0; nn < this.filters.length; nn++) {
-                let filter = this.filters[nn];
-                if (filter.id == filterId) {
-                    if (filter.plugin) {
-                        let plugin = filter.plugin;
-                        if (plugin) {
-                            return plugin;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-    sendFilterItem(state, whenAudio) {
-        let plugin = this.findFilterPlugin(state.filterId);
-        if (plugin) {
-            plugin.schedule(whenAudio, state.data);
-        }
-    }
-    sendPiece(fromPosition, toPosition, whenAudio) {
-        if (this.schedule) {
-            let serieStart = 0;
-            for (let ii = 0; ii < this.schedule.series.length; ii++) {
-                let cuSerie = this.schedule.series[ii];
-                if (serieStart < toPosition && serieStart + cuSerie.duration >= fromPosition) {
-                    for (let nn = 0; nn < cuSerie.items.length; nn++) {
-                        let it = cuSerie.items[nn];
-                        if (serieStart + it.skip >= fromPosition && serieStart + it.skip < toPosition) {
-                            this.sendPerformerItem(it, whenAudio + serieStart + it.skip - fromPosition);
-                        }
-                    }
-                    for (let nn = 0; nn < cuSerie.states.length; nn++) {
-                        let state = cuSerie.states[nn];
-                        if (serieStart + state.skip >= fromPosition && serieStart + state.skip < toPosition) {
-                            this.sendFilterItem(state, whenAudio + serieStart + state.skip - fromPosition);
-                        }
-                    }
-                }
-                serieStart = serieStart + cuSerie.duration;
-            }
-        }
-    }
-    cancel() {
-        this.onAir = false;
-    }
-}
-class MusicTicker {
-    startPlay() { }
-    cancelPlay() { }
-    setPosition(seconds) { }
-    getPosition() {
-        return 0;
-    }
-}
-class PluginLoader {
-    collectLoadPlugins(schedule, filters, performers, afterLoad) {
-        for (let ff = 0; ff < schedule.filters.length; ff++) {
-            let filter = schedule.filters[ff];
-            this.сollectFilterPlugin(filter.id, filter.kind, filter.properties, filters);
-        }
-        for (let ch = 0; ch < schedule.channels.length; ch++) {
-            let performer = schedule.channels[ch].performer;
-            this.сollectPerformerPlugin(performer.id, performer.kind, performer.properties, performers);
-            for (let ff = 0; ff < schedule.channels[ch].filters.length; ff++) {
-                let filter = schedule.channels[ch].filters[ff];
-                this.сollectFilterPlugin(filter.id, filter.kind, filter.properties, filters);
-            }
-        }
-        this.startLoadCollectedPlugins(filters, performers, afterLoad);
-    }
-    startLoadCollectedPlugins(filters, performers, afterLoad) {
-        for (let ff = 0; ff < filters.length; ff++) {
-            if (!(filters[ff].plugin)) {
-                this.startLoadPluginStarter(filters[ff].kind, filters, performers, (plugin) => {
-                    filters[ff].plugin = plugin;
-                }, afterLoad);
-                return;
-            }
-        }
-        for (let pp = 0; pp < performers.length; pp++) {
-            if (!(performers[pp].plugin)) {
-                this.startLoadPluginStarter(performers[pp].kind, filters, performers, (plugin) => {
-                    performers[pp].plugin = plugin;
-                }, afterLoad);
-                return;
-            }
-        }
-        afterLoad();
-    }
-    startLoadPluginStarter(kind, filters, performers, onDone, afterLoad) {
-        let tt = this.findPluginInfo(kind);
-        if (tt) {
-            let info = tt;
-            MZXBX_appendScriptURL(info.url);
-            MZXBX_waitForCondition(250, () => { return (window[info.functionName]); }, () => {
-                let exe = window[info.functionName];
-                let plugin = exe();
-                if (plugin) {
-                    onDone(plugin);
-                    this.startLoadCollectedPlugins(filters, performers, afterLoad);
-                }
-            });
-        }
-        else {
-            console.log('Not found ', kind);
-        }
-    }
-    сollectFilterPlugin(id, kind, properties, filters) {
-        for (let ii = 0; ii < filters.length; ii++) {
-            if (filters[ii].id == id) {
-                return;
-            }
-        }
-        filters.push({ plugin: null, id: id, kind: kind, properties: properties });
-    }
-    сollectPerformerPlugin(id, kind, properties, performers) {
-        for (let ii = 0; ii < performers.length; ii++) {
-            if (performers[ii].id == id) {
-                return;
-            }
-        }
-        performers.push({ plugin: null, id: id, kind: kind, properties: properties });
-    }
-    findPluginInfo(kind) {
-        for (let ll = 0; ll < pluginListKindUrlName.length; ll++) {
-            if (pluginListKindUrlName[ll].kind == kind) {
-                return pluginListKindUrlName[ll];
-            }
-        }
-        return null;
-    }
-}
-let instrumentNamesArray = [];
-let drumNamesArray = [];
-function findrumTitles(nn) {
+type MIDISongChord = {
+    when: number;
+    channel: number;
+    notes: MIDISongNote[];
+};
+type MIDISongTrack = {
+    title: string;
+    instrument: string;
+    program: number;
+    volumes: { ms: number, value: number, meausre?: number, skip384?: number }[];
+    songchords: MIDISongChord[];
+    order: number;
+};
+type MIDISongData = {
+    duration: number;
+    parser: string;
+    bpm: number;
+    changes: { track: number, ms: number, resolution: number, bpm: number }[];
+    meters: { track: number, ms: number, count: number, division: number }[];
+    lyrics: { track: number, ms: number, txt: string }[];
+    key: number;
+    mode: number;
+    meter: { count: number, division: number };
+    signs: { track: number, ms: number, sign: string }[];
+    miditracks: MIDISongTrack[];
+    speedMode: number;
+    lineMode: number;
+};
+let instrumentNamesArray: string[] = [];
+let drumNamesArray: string[] = [];
+function findrumTitles(nn: number): string {
     let name = drumTitles()[nn];
     if (name) {
         return '' + name;
-    }
-    else {
+    } else {
         return 'MIDI' + nn;
     }
+
 }
-function drumTitles() {
+function drumTitles(): string[] {
     if (drumNamesArray.length == 0) {
-        var drumNames = [];
+        var drumNames: string[] = [];
         drumNames[35] = "Bass Drum 2";
         drumNames[36] = "Bass Drum 1";
         drumNames[37] = "Side Stick/Rimshot";
@@ -648,11 +155,10 @@ function drumTitles() {
         drumNamesArray = drumNames;
     }
     return drumNamesArray;
-}
-;
-function instrumentTitles() {
+};
+function instrumentTitles(): string[] {
     if (instrumentNamesArray.length == 0) {
-        var insNames = [];
+        var insNames: string[] = [];
         insNames[0] = "Acoustic Grand Piano: Piano";
         insNames[1] = "Bright Acoustic Piano: Piano";
         insNames[2] = "Electric Grand Piano: Piano";
@@ -784,125 +290,131 @@ function instrumentTitles() {
         instrumentNamesArray = insNames;
     }
     return instrumentNamesArray;
-}
-;
+};
 class DataViewStream {
-    constructor(dv) {
-        this.position = 0;
+    position = 0;
+    buffer: DataView;
+    constructor(dv: DataView) {
         this.buffer = dv;
     }
-    readUint8() {
-        var n = this.buffer.getUint8(this.position);
+    readUint8(): number {
+        var n: number = (this.buffer as DataView).getUint8(this.position);
         this.position++;
         return n;
     }
-    readUint16() {
-        var v = this.buffer.getUint16(this.position);
+    readUint16(): number {
+        var v = (this.buffer as DataView).getUint16(this.position);
         this.position = this.position + 2;
         return v;
     }
-    readVarInt() {
-        var v = 0;
-        var i = 0;
-        var b;
+    readVarInt(): number {
+        var v: number = 0;
+        var i: number = 0;
+        var b: number;
         while (i < 4) {
             b = this.readUint8();
             if (b & 0x80) {
                 v = v + (b & 0x7f);
                 v = v << 7;
-            }
-            else {
+            } else {
                 return v + b;
             }
             i++;
         }
         throw new Error('readVarInt ' + i);
     }
-    readBytes(length) {
-        var bytes = [];
+    readBytes(length: number): number[] {
+        var bytes: number[] = [];
         for (var i = 0; i < length; i++) {
             bytes.push(this.readUint8());
         }
         return bytes;
     }
-    offset() {
+    offset(): number {
         return this.buffer.byteOffset + this.position;
     }
-    end() {
+    end(): boolean {
         return this.position == this.buffer.byteLength;
     }
 }
 class MIDIFileHeader {
-    constructor(buffer) {
-        this.HEADER_LENGTH = 14;
-        this.tempoBPM = 120;
-        this.changes = [];
-        this.meters = [];
-        this.lyrics = [];
-        this.signs = [];
-        this.meterCount = 4;
-        this.meterDivision = 4;
-        this.keyFlatSharp = 0;
-        this.keyMajMin = 0;
-        this.lastNonZeroQuarter = 0;
+    datas: DataView;
+    HEADER_LENGTH: number = 14;
+    format: number;
+    trackCount: number;
+    tempoBPM: number = 120;
+    changes: { track: number, ms: number, resolution: number, bpm: number }[] = [];
+    meters: { track: number, ms: number, count: number, division: number }[] = [];
+    lyrics: { track: number, ms: number, txt: string }[] = [];
+    signs: { track: number, ms: number, sign: string }[] = [];
+    meterCount: number = 4;
+    meterDivision: number = 4;
+    keyFlatSharp: number = 0;
+    keyMajMin: number = 0;
+    lastNonZeroQuarter: number = 0;
+    constructor(buffer: ArrayBuffer) {
         this.datas = new DataView(buffer, 0, this.HEADER_LENGTH);
         this.format = this.datas.getUint16(8);
         this.trackCount = this.datas.getUint16(10);
     }
-    getCalculatedTickResolution(tempo) {
+    getCalculatedTickResolution(tempo: number): number {
         this.lastNonZeroQuarter = tempo;
         if (this.datas.getUint16(12) & 0x8000) {
             var r = 1000000 / (this.getSMPTEFrames() * this.getTicksPerFrame());
             return r;
-        }
-        else {
+        } else {
             tempo = tempo || 500000;
-            var r = tempo / this.getTicksPerBeat();
+            var r: number = tempo / this.getTicksPerBeat();
             return r;
         }
     }
-    get0TickResolution() {
+    get0TickResolution(): number {
         var tempo = 0;
         if (this.lastNonZeroQuarter) {
             tempo = this.lastNonZeroQuarter;
-        }
-        else {
+        } else {
             tempo = 60000000 / this.tempoBPM;
         }
         if (this.datas.getUint16(12) & 0x8000) {
             var r = 1000000 / (this.getSMPTEFrames() * this.getTicksPerFrame());
             return r;
-        }
-        else {
+        } else {
             tempo = tempo || 500000;
-            var r = tempo / this.getTicksPerBeat();
+            var r: number = tempo / this.getTicksPerBeat();
             return r;
         }
     }
-    getTicksPerBeat() {
+    getTicksPerBeat(): number {
         var divisionWord = this.datas.getUint16(12);
         return divisionWord;
     }
-    getTicksPerFrame() {
+    getTicksPerFrame(): number {
         const divisionWord = this.datas.getUint16(12);
         return divisionWord & 0x00ff;
     }
-    getSMPTEFrames() {
+    getSMPTEFrames(): number {
         const divisionWord = this.datas.getUint16(12);
-        let smpteFrames;
+        let smpteFrames: number;
         smpteFrames = divisionWord & 0x7f00;
         if (smpteFrames == 29) {
-            return 29.97;
-        }
-        else {
+            return 29.97
+        } else {
             return smpteFrames;
         }
     }
 }
 class MIDIFileTrack {
-    constructor(buffer, start) {
-        this.HDR_LENGTH = 8;
-        this.chords = [];
+    datas: DataView;
+    HDR_LENGTH: number = 8;
+    trackLength: number;
+    trackContent: DataView;
+    trackevents: MIDIEvent[];
+    title: string;
+    instrument: string;
+    programChannel: { program: number, channel: number }[];
+    volumes: { ms: number, value: number }[];
+    chords: TrackChord[] = [];
+    constructor(buffer: ArrayBuffer, start: number) {
         this.datas = new DataView(buffer, start, this.HDR_LENGTH);
         this.trackLength = this.datas.getUint32(4);
         this.datas = new DataView(buffer, start, this.HDR_LENGTH + this.trackLength);
@@ -912,50 +424,56 @@ class MIDIFileTrack {
         this.programChannel = [];
     }
 }
+
 class MidiParser {
-    constructor(arrayBuffer) {
-        this.instrumentNamesArray = [];
-        this.drumNamesArray = [];
-        this.EVENT_META = 0xff;
-        this.EVENT_SYSEX = 0xf0;
-        this.EVENT_DIVSYSEX = 0xf7;
-        this.EVENT_MIDI = 0x8;
-        this.EVENT_META_SEQUENCE_NUMBER = 0x00;
-        this.EVENT_META_TEXT = 0x01;
-        this.EVENT_META_COPYRIGHT_NOTICE = 0x02;
-        this.EVENT_META_TRACK_NAME = 0x03;
-        this.EVENT_META_INSTRUMENT_NAME = 0x04;
-        this.EVENT_META_LYRICS = 0x05;
-        this.EVENT_META_MARKER = 0x06;
-        this.EVENT_META_CUE_POINT = 0x07;
-        this.EVENT_META_MIDI_CHANNEL_PREFIX = 0x20;
-        this.EVENT_META_END_OF_TRACK = 0x2f;
-        this.EVENT_META_SET_TEMPO = 0x51;
-        this.EVENT_META_SMTPE_OFFSET = 0x54;
-        this.EVENT_META_TIME_SIGNATURE = 0x58;
-        this.EVENT_META_KEY_SIGNATURE = 0x59;
-        this.EVENT_META_SEQUENCER_SPECIFIC = 0x7f;
-        this.EVENT_MIDI_NOTE_OFF = 0x8;
-        this.EVENT_MIDI_NOTE_ON = 0x9;
-        this.EVENT_MIDI_NOTE_AFTERTOUCH = 0xa;
-        this.EVENT_MIDI_CONTROLLER = 0xb;
-        this.EVENT_MIDI_PROGRAM_CHANGE = 0xc;
-        this.EVENT_MIDI_CHANNEL_AFTERTOUCH = 0xd;
-        this.EVENT_MIDI_PITCH_BEND = 0xe;
-        this.midiEventType = 0;
-        this.midiEventChannel = 0;
-        this.midiEventParam1 = 0;
+    header: MIDIFileHeader;
+    parsedTracks: MIDIFileTrack[];
+    instrumentNamesArray: string[] = [];
+    drumNamesArray: string[] = [];
+    EVENT_META: number = 0xff;
+    EVENT_SYSEX: number = 0xf0;
+    EVENT_DIVSYSEX: number = 0xf7;
+    EVENT_MIDI: number = 0x8;
+    // Meta event types https://www.recordingblogs.com/wiki/midi-meta-messages
+    EVENT_META_SEQUENCE_NUMBER: number = 0x00;//
+    EVENT_META_TEXT: number = 0x01;
+    EVENT_META_COPYRIGHT_NOTICE: number = 0x02;
+    EVENT_META_TRACK_NAME: number = 0x03;
+    EVENT_META_INSTRUMENT_NAME: number = 0x04;
+    EVENT_META_LYRICS: number = 0x05;
+    EVENT_META_MARKER: number = 0x06;
+    EVENT_META_CUE_POINT: number = 0x07;
+    EVENT_META_MIDI_CHANNEL_PREFIX: number = 0x20;//https://www.recordingblogs.com/wiki/midi-channel-prefix-meta-message
+    EVENT_META_END_OF_TRACK: number = 0x2f;
+    EVENT_META_SET_TEMPO: number = 0x51;
+    EVENT_META_SMTPE_OFFSET: number = 0x54;
+    EVENT_META_TIME_SIGNATURE: number = 0x58;//https://www.recordingblogs.com/wiki/midi-time-signature-meta-message
+    EVENT_META_KEY_SIGNATURE: number = 0x59;//https://www.recordingblogs.com/wiki/midi-key-signature-meta-message
+    EVENT_META_SEQUENCER_SPECIFIC: number = 0x7f;
+    // MIDI event types
+    EVENT_MIDI_NOTE_OFF: number = 0x8;
+    EVENT_MIDI_NOTE_ON: number = 0x9;
+    EVENT_MIDI_NOTE_AFTERTOUCH: number = 0xa;
+    EVENT_MIDI_CONTROLLER: number = 0xb;
+    EVENT_MIDI_PROGRAM_CHANGE: number = 0xc;
+    EVENT_MIDI_CHANNEL_AFTERTOUCH: number = 0xd;
+    EVENT_MIDI_PITCH_BEND: number = 0xe;
+    midiEventType: number = 0;
+    midiEventChannel: number = 0;
+    midiEventParam1: number = 0;
+    constructor(arrayBuffer: ArrayBuffer) {
         this.header = new MIDIFileHeader(arrayBuffer);
         this.parseTracks(arrayBuffer);
     }
-    parseTracks(arrayBuffer) {
+    parseTracks(arrayBuffer: ArrayBuffer) {
         console.log('start parseTracks');
-        var curIndex = this.header.HEADER_LENGTH;
-        var trackCount = this.header.trackCount;
+        var curIndex: number = this.header.HEADER_LENGTH;
+        var trackCount: number = this.header.trackCount;
         this.parsedTracks = [];
         for (var i = 0; i < trackCount; i++) {
-            var track = new MIDIFileTrack(arrayBuffer, curIndex);
+            var track: MIDIFileTrack = new MIDIFileTrack(arrayBuffer, curIndex);
             this.parsedTracks.push(track);
+            // Updating index to the track end
             curIndex = curIndex + track.trackLength + 8;
         }
         for (var i = 0; i < this.parsedTracks.length; i++) {
@@ -964,14 +482,14 @@ class MidiParser {
         this.parseNotes();
         this.simplifyAllPaths();
     }
-    toText(arr) {
-        var r = '';
+    toText(arr: number[]): string {
+        var r: string = '';
         for (var i = 0; i < arr.length; i++) {
             r = r + String.fromCharCode(arr[i]);
         }
         return r;
     }
-    findChordBefore(when, track, channel) {
+    findChordBefore(when: number, track: MIDIFileTrack, channel: number): TrackChord | null {
         for (var i = 0; i < track.chords.length; i++) {
             var chord = track.chords[track.chords.length - i - 1];
             if (chord.when < when && chord.channel == channel) {
@@ -980,12 +498,12 @@ class MidiParser {
         }
         return null;
     }
-    findOpenedNoteBefore(firstPitch, when, track, channel) {
+    findOpenedNoteBefore(firstPitch: number, when: number, track: MIDIFileTrack, channel: number): { chord: TrackChord, note: TrackNote } | null {
         var before = when;
         var chord = this.findChordBefore(before, track, channel);
         while (chord) {
             for (var i = 0; i < chord.notes.length; i++) {
-                var note = chord.notes[i];
+                var note: TrackNote = chord.notes[i];
                 if (!(note.closed)) {
                     if (firstPitch == note.points[0].pitch) {
                         return { chord: chord, note: note };
@@ -997,22 +515,22 @@ class MidiParser {
         }
         return null;
     }
-    takeChord(when, track, channel) {
+    takeChord(when: number, track: MIDIFileTrack, channel: number): TrackChord {
         for (var i = 0; i < track.chords.length; i++) {
             if (track.chords[i].when == when && track.chords[i].channel == channel) {
                 return track.chords[i];
             }
         }
-        var ch = {
-            when: when,
-            channel: channel,
-            notes: []
+        var ch: TrackChord = {
+            when: when
+            , channel: channel
+            , notes: []
         };
         track.chords.push(ch);
         return ch;
     }
-    takeOpenedNote(first, when, track, channel) {
-        var chord = this.takeChord(when, track, channel);
+    takeOpenedNote(first: number, when: number, track: MIDIFileTrack, channel: number): TrackNote {
+        var chord: TrackChord = this.takeChord(when, track, channel);
         for (var i = 0; i < chord.notes.length; i++) {
             if (!(chord.notes[i].closed)) {
                 if (chord.notes[i].points[0].pitch == first) {
@@ -1020,15 +538,16 @@ class MidiParser {
                 }
             }
         }
-        var pi = { closed: false, points: [] };
+        var pi: TrackNote = { closed: false, points: [] };
         pi.points.push({ pointDuration: -1, pitch: first });
         chord.notes.push(pi);
         return pi;
     }
-    distanceToPoint(line, point) {
-        var m = (line.p2.y - line.p1.y) / (line.p2.x - line.p1.x);
-        var b = line.p1.y - (m * line.p1.x);
-        var d = [];
+
+    distanceToPoint(line: PP, point: XYp): number {
+        var m: number = (line.p2.y - line.p1.y) / (line.p2.x - line.p1.x);
+        var b: number = line.p1.y - (m * line.p1.x);
+        var d: number[] = [];
         d.push(Math.abs(point.y - (m * point.x) - b) / Math.sqrt(Math.pow(m, 2) + 1));
         d.push(Math.sqrt(Math.pow((point.x - line.p1.x), 2) + Math.pow((point.y - line.p1.y), 2)));
         d.push(Math.sqrt(Math.pow((point.x - line.p2.x), 2) + Math.pow((point.y - line.p2.y), 2)));
@@ -1036,17 +555,16 @@ class MidiParser {
             return (a - b);
         });
         return d[0];
-    }
-    ;
-    douglasPeucker(points, tolerance) {
+    };
+    douglasPeucker(points: XYp[], tolerance: number): XYp[] {
         if (points.length <= 2) {
             return [points[0]];
         }
-        var returnPoints = [];
-        var line = { p1: points[0], p2: points[points.length - 1] };
+        var returnPoints: XYp[] = [];
+        var line: PP = { p1: points[0], p2: points[points.length - 1] };
         var maxDistance = 0;
         var maxDistanceIndex = 0;
-        var p;
+        var p: XYp;
         for (var i = 1; i <= points.length - 2; i++) {
             var distance = this.distanceToPoint(line, points[i]);
             if (distance > maxDistance) {
@@ -1059,45 +577,42 @@ class MidiParser {
             this.distanceToPoint(line, p);
             returnPoints = returnPoints.concat(this.douglasPeucker(points.slice(0, maxDistanceIndex + 1), tolerance));
             returnPoints = returnPoints.concat(this.douglasPeucker(points.slice(maxDistanceIndex, points.length), tolerance));
-        }
-        else {
+        } else {
             p = points[maxDistanceIndex];
             this.distanceToPoint(line, p);
             returnPoints = [points[0]];
         }
         return returnPoints;
-    }
-    ;
-    simplifyPath(points, tolerance) {
-        var arr = this.douglasPeucker(points, tolerance);
+    };
+    simplifyPath(points: XYp[], tolerance: number): XYp[] {
+        var arr: XYp[] = this.douglasPeucker(points, tolerance);
         arr.push(points[points.length - 1]);
         return arr;
     }
     simplifyAllPaths() {
         for (var t = 0; t < this.parsedTracks.length; t++) {
-            var track = this.parsedTracks[t];
+            var track: MIDIFileTrack = this.parsedTracks[t];
             for (var ch = 0; ch < track.chords.length; ch++) {
-                var chord = track.chords[ch];
+                var chord: TrackChord = track.chords[ch];
                 for (var n = 0; n < chord.notes.length; n++) {
-                    var note = chord.notes[n];
+                    var note: TrackNote = chord.notes[n];
                     if (note.points.length > 5) {
                         var xx = 0;
-                        var pnts = [];
+                        var pnts: XYp[] = [];
                         for (var p = 0; p < note.points.length; p++) {
                             note.points[p].pointDuration = Math.max(note.points[p].pointDuration, 0);
                             pnts.push({ x: xx, y: note.points[p].pitch });
                             xx = xx + note.points[p].pointDuration;
                         }
                         pnts.push({ x: xx, y: note.points[note.points.length - 1].pitch });
-                        var lessPoints = this.simplifyPath(pnts, 1.5);
+                        var lessPoints: XYp[] = this.simplifyPath(pnts, 1.5);
                         note.points = [];
                         for (var p = 0; p < lessPoints.length - 1; p++) {
-                            var xypoint = lessPoints[p];
+                            var xypoint: XYp = lessPoints[p];
                             var xyduration = lessPoints[p + 1].x - xypoint.x;
                             note.points.push({ pointDuration: xyduration, pitch: xypoint.y });
                         }
-                    }
-                    else {
+                    } else {
                         if (note.points.length == 1) {
                             if (note.points[0].pointDuration > 4321) {
                                 note.points[0].pointDuration = 1234;
@@ -1108,18 +623,17 @@ class MidiParser {
             }
         }
     }
-    dumpResolutionChanges() {
+    dumpResolutionChanges(): void {
         this.header.changes = [];
-        let tickResolution = this.header.get0TickResolution();
+        let tickResolution: number = this.header.get0TickResolution();
         this.header.changes.push({ track: -1, ms: -1, resolution: tickResolution, bpm: 120 });
         for (var t = 0; t < this.parsedTracks.length; t++) {
-            var track = this.parsedTracks[t];
-            let playTimeTicks = 0;
+            var track: MIDIFileTrack = this.parsedTracks[t];
+            let playTimeTicks: number = 0;
             for (var e = 0; e < track.trackevents.length; e++) {
                 var evnt = track.trackevents[e];
-                let curDelta = 0.0;
-                if (evnt.delta)
-                    curDelta = evnt.delta;
+                let curDelta: number = 0.0;
+                if (evnt.delta) curDelta = evnt.delta;
                 playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
                 if (evnt.basetype === this.EVENT_META) {
                     if (evnt.subtype === this.EVENT_META_SET_TEMPO) {
@@ -1133,34 +647,40 @@ class MidiParser {
         }
         this.header.changes.sort((a, b) => { return a.ms - b.ms; });
     }
-    lastResolution(ms) {
+    lastResolution(ms: number): number {
         for (var i = this.header.changes.length - 1; i >= 0; i--) {
             if (this.header.changes[i].ms <= ms) {
-                return this.header.changes[i].resolution;
+                return this.header.changes[i].resolution
             }
         }
         return 0;
     }
-    parseTicks2time(track) {
-        let tickResolution = this.lastResolution(0);
-        let playTimeTicks = 0;
+    parseTicks2time(track: MIDIFileTrack) {
+        let tickResolution: number = this.lastResolution(0);
+        let playTimeTicks: number = 0;
         for (let e = 0; e < track.trackevents.length; e++) {
+
             let evnt = track.trackevents[e];
-            let curDelta = 0.0;
-            if (evnt.delta)
-                curDelta = evnt.delta;
+
+            let curDelta: number = 0.0;
+            if (evnt.delta) curDelta = evnt.delta;
             let searchPlayTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
             tickResolution = this.lastResolution(searchPlayTimeTicks);
+
             evnt.preTimeMs = playTimeTicks;
             playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
+
             evnt.playTimeMs = playTimeTicks;
             evnt.deltaTimeMs = curDelta * tickResolution / 1000.0;
+
+            //if(e<133)console.log(evnt);
         }
     }
     parseNotes() {
         this.dumpResolutionChanges();
         for (let t = 0; t < this.parsedTracks.length; t++) {
-            var singleParsedTrack = this.parsedTracks[t];
+            //console.log('start parseNotes', t);
+            var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
             this.parseTicks2time(singleParsedTrack);
             for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
                 var evnt = singleParsedTrack.trackevents[e];
@@ -1170,20 +690,17 @@ class MidiParser {
                         if (evnt.param1 >= 0 && evnt.param1 <= 127) {
                             var pitch = evnt.param1 ? evnt.param1 : 0;
                             var when = 0;
-                            if (evnt.playTimeMs)
-                                when = evnt.playTimeMs;
+                            if (evnt.playTimeMs) when = evnt.playTimeMs;
                             let trno = this.takeOpenedNote(pitch, when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
                             trno.volume = evnt.param2;
                             trno.openEvent = evnt;
                         }
-                    }
-                    else {
+                    } else {
                         if (evnt.subtype == this.EVENT_MIDI_NOTE_OFF) {
                             if (evnt.param1 >= 0 && evnt.param1 <= 127) {
                                 var pitch = evnt.param1 ? evnt.param1 : 0;
                                 var when = 0;
-                                if (evnt.playTimeMs)
-                                    when = evnt.playTimeMs;
+                                if (evnt.playTimeMs) when = evnt.playTimeMs;
                                 var chpi = this.findOpenedNoteBefore(pitch, when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
                                 if (chpi) {
                                     var duration = 0;
@@ -1195,54 +712,51 @@ class MidiParser {
                                     chpi.note.closeEvent = evnt;
                                 }
                             }
-                        }
-                        else {
+                        } else {
                             if (evnt.subtype == this.EVENT_MIDI_PROGRAM_CHANGE) {
                                 if (evnt.param1 >= 0 && evnt.param1 <= 127) {
                                     singleParsedTrack.programChannel.push({
-                                        program: evnt.param1 ? evnt.param1 : 0,
-                                        channel: evnt.midiChannel ? evnt.midiChannel : 0
+                                        program: evnt.param1 ? evnt.param1 : 0
+                                        , channel: evnt.midiChannel ? evnt.midiChannel : 0
                                     });
                                 }
-                            }
-                            else {
+                            } else {
                                 if (evnt.subtype == this.EVENT_MIDI_PITCH_BEND) {
                                     var pitch = evnt.param1 ? evnt.param1 : 0;
                                     var slide = ((evnt.param2 ? evnt.param2 : 0) - 64) / 6;
                                     var when = evnt.playTimeMs ? evnt.playTimeMs : 0;
-                                    var chord = this.findChordBefore(when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
+                                    var chord: TrackChord | null = this.findChordBefore(when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
                                     if (chord) {
                                         for (var i = 0; i < chord.notes.length; i++) {
-                                            var note = chord.notes[i];
+                                            var note: TrackNote = chord.notes[i];
                                             if (!(note.closed)) {
                                                 var duration = 0;
                                                 for (var k = 0; k < note.points.length - 1; k++) {
                                                     duration = duration + note.points[k].pointDuration;
                                                 }
                                                 note.points[note.points.length - 1].pointDuration = when - chord.when - duration;
-                                                var firstpitch = note.points[0].pitch + slide;
-                                                var point = {
-                                                    pointDuration: -1,
-                                                    pitch: firstpitch
+                                                var firstpitch: number = note.points[0].pitch + slide;
+                                                var point: NotePitch = {
+                                                    pointDuration: -1
+                                                    , pitch: firstpitch
                                                 };
                                                 note.points.push(point);
                                             }
                                         }
                                     }
-                                }
-                                else {
+                                } else {
                                     if (evnt.subtype == this.EVENT_MIDI_CONTROLLER && evnt.param1 == 7) {
                                         var v = evnt.param2 ? evnt.param2 / 127 : 0;
                                         singleParsedTrack.volumes.push({ ms: evnt.playTimeMs, value: v });
-                                    }
-                                    else {
+                                    } else {
+                                        //
                                     }
                                 }
                             }
                         }
                     }
-                }
-                else {
+                    //}
+                } else {
                     if (evnt.subtype == this.EVENT_META_TEXT) {
                         this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text ? evnt.text : "?" });
                     }
@@ -1259,29 +773,25 @@ class MidiParser {
                         this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text ? evnt.text : "?" });
                     }
                     if (evnt.subtype == this.EVENT_META_KEY_SIGNATURE) {
-                        var majSharpCircleOfFifths = ['C', 'G', 'D', 'A', 'E', 'B', 'F#'];
-                        var majFlatCircleOfFifths = ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'];
-                        var minSharpCircleOfFifths = ['Am', 'Em', 'Bm', 'F#m', 'C#m', 'G#m', 'D#'];
-                        var minFlatCircleOfFifths = ['Am', 'Dm', 'Gm', 'Cm', 'Fm', 'Bbm', 'Ebm'];
-                        var key = evnt.key ? evnt.key : 0;
-                        if (key > 127)
-                            key = key - 256;
-                        this.header.keyFlatSharp = key;
-                        this.header.keyMajMin = evnt.scale ? evnt.scale : 0;
+                        var majSharpCircleOfFifths: string[] = ['C', 'G', 'D', 'A', 'E', 'B', 'F#'];
+                        var majFlatCircleOfFifths: string[] = ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'];
+                        var minSharpCircleOfFifths: string[] = ['Am', 'Em', 'Bm', 'F#m', 'C#m', 'G#m', 'D#'];
+                        var minFlatCircleOfFifths: string[] = ['Am', 'Dm', 'Gm', 'Cm', 'Fm', 'Bbm', 'Ebm'];
+                        var key: number = evnt.key ? evnt.key : 0;
+                        if (key > 127) key = key - 256;
+                        this.header.keyFlatSharp = key;//+sharp-flat
+                        this.header.keyMajMin = evnt.scale ? evnt.scale : 0;//0-maj, 1 min
                         var signature = 'C';
                         if (this.header.keyFlatSharp >= 0) {
                             if (this.header.keyMajMin < 1) {
                                 signature = majSharpCircleOfFifths[this.header.keyFlatSharp];
-                            }
-                            else {
+                            } else {
                                 signature = minSharpCircleOfFifths[this.header.keyFlatSharp];
                             }
-                        }
-                        else {
+                        } else {
                             if (this.header.keyMajMin < 1) {
                                 signature = majFlatCircleOfFifths[this.header.keyFlatSharp];
-                            }
-                            else {
+                            } else {
                                 signature = minFlatCircleOfFifths[this.header.keyFlatSharp];
                             }
                         }
@@ -1291,33 +801,30 @@ class MidiParser {
                         this.header.tempoBPM = evnt.tempoBPM ? evnt.tempoBPM : 120;
                     }
                     if (evnt.subtype == this.EVENT_META_TIME_SIGNATURE) {
+                        //console.log('EVENT_META_TIME_SIGNATURE', evnt.param1, '2"',evnt.param2, 'metronome',evnt.param3, evnt.param4);
                         this.header.meterCount = evnt.param1 ? evnt.param1 : 4;
-                        var dvsn = evnt.param2 ? evnt.param2 : 2;
-                        if (dvsn == 1)
-                            this.header.meterDivision = 2;
-                        else if (dvsn == 2)
-                            this.header.meterDivision = 4;
-                        else if (dvsn == 3)
-                            this.header.meterDivision = 8;
-                        else if (dvsn == 4)
-                            this.header.meterDivision = 16;
-                        else if (dvsn == 5)
-                            this.header.meterDivision = 32;
+                        var dvsn: number = evnt.param2 ? evnt.param2 : 2;
+                        if (dvsn == 1) this.header.meterDivision = 2
+                        else if (dvsn == 2) this.header.meterDivision = 4
+                        else if (dvsn == 3) this.header.meterDivision = 8
+                        else if (dvsn == 4) this.header.meterDivision = 16
+                        else if (dvsn == 5) this.header.meterDivision = 32
                         this.header.meters.push({
-                            track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0,
-                            count: this.header.meterCount, division: this.header.meterDivision
+                            track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0
+                            , count: this.header.meterCount, division: this.header.meterDivision
                         });
                     }
                 }
             }
         }
     }
-    nextEvent(stream) {
+    nextEvent(stream: DataViewStream): MIDIEvent {
         var index = stream.offset();
         var delta = stream.readVarInt();
-        var eventTypeByte = stream.readUint8();
-        var event = { offset: index, delta: delta, eventTypeByte: eventTypeByte, playTimeMs: 0 };
+        var eventTypeByte: number = stream.readUint8();
+        var event: MIDIEvent = { offset: index, delta: delta, eventTypeByte: eventTypeByte, playTimeMs: 0 };
         if (0xf0 === (eventTypeByte & 0xf0)) {
+            // Meta events
             if (eventTypeByte === this.EVENT_META) {
                 event.basetype = this.EVENT_META;
                 event.subtype = stream.readUint8();
@@ -1372,15 +879,15 @@ class MidiParser {
                         event.data = stream.readBytes(event.length);
                         return event;
                 }
-            }
-            else {
+                // System events
+            } else {
                 if (eventTypeByte === this.EVENT_SYSEX || eventTypeByte === this.EVENT_DIVSYSEX) {
                     event.basetype = eventTypeByte;
                     event.length = stream.readVarInt();
                     event.data = stream.readBytes(event.length);
                     return event;
-                }
-                else {
+                    // Unknown event, assuming it's system like event
+                } else {
                     event.basetype = eventTypeByte;
                     event.badsubtype = stream.readVarInt();
                     event.length = stream.readUint8();
@@ -1388,15 +895,14 @@ class MidiParser {
                     return event;
                 }
             }
-        }
-        else {
+        } else {
+            // running status
             if (0 === (eventTypeByte & 0x80)) {
                 if (!this.midiEventType) {
                     throw new Error('no pre event' + stream.offset());
                 }
                 this.midiEventParam1 = eventTypeByte;
-            }
-            else {
+            } else {
                 this.midiEventType = eventTypeByte >> 4;
                 this.midiEventChannel = eventTypeByte & 0x0f;
                 this.midiEventParam1 = stream.readUint8();
@@ -1411,8 +917,10 @@ class MidiParser {
                     return event;
                 case this.EVENT_MIDI_NOTE_ON:
                     event.param2 = stream.readUint8();
+                    // If velocity is 0, it's a note off event in fact
                     if (!event.param2) {
                         event.subtype = this.EVENT_MIDI_NOTE_OFF;
+                        //event.param2 = 127; // Find a standard telling what to do here
                         event.param2 = -1;
                     }
                     return event;
@@ -1422,9 +930,11 @@ class MidiParser {
                 case this.EVENT_MIDI_CONTROLLER:
                     event.param2 = stream.readUint8();
                     if (event.param1 == 7) {
+                        //
                     }
                     return event;
                 case this.EVENT_MIDI_PROGRAM_CHANGE:
+                    //
                     return event;
                 case this.EVENT_MIDI_CHANNEL_AFTERTOUCH:
                     return event;
@@ -1437,74 +947,79 @@ class MidiParser {
             }
         }
     }
-    parseTrackEvents(track) {
-        var stream = new DataViewStream(track.trackContent);
+    parseTrackEvents(track: MIDIFileTrack) {
+        var stream: DataViewStream = new DataViewStream(track.trackContent);
         this.midiEventType = 0;
         this.midiEventChannel = 0;
         this.midiEventParam1 = 0;
         while (!stream.end()) {
-            var e = this.nextEvent(stream);
+            var e: MIDIEvent = this.nextEvent(stream);
             track.trackevents.push(e);
         }
     }
-    findOrCreateTrack(trackNum, channelNum, trackChannel) {
+
+
+
+
+    findOrCreateTrack(trackNum: number, channelNum: number, trackChannel: { trackNum: number, channelNum: number, track: MIDISongTrack }[]): { trackNum: number, channelNum: number, track: MIDISongTrack } {
         for (let i = 0; i < trackChannel.length; i++) {
             if (trackChannel[i].trackNum == trackNum && trackChannel[i].channelNum == channelNum) {
                 return trackChannel[i];
             }
         }
-        let it = {
+        let it: { trackNum: number, channelNum: number, track: MIDISongTrack } = {
             trackNum: trackNum, channelNum: channelNum, track: {
-                order: 0,
-                title: 'unknown',
-                instrument: '0',
-                volumes: [],
-                program: 0,
-                songchords: []
+                order: 0
+                , title: 'unknown'
+                , instrument: '0'
+                , volumes: []
+                , program: 0
+                , songchords: []
             }
         };
         trackChannel.push(it);
         return it;
     }
-    dump() {
-        let midiSongData = {
-            parser: '1.01',
-            duration: 0,
-            bpm: this.header.tempoBPM,
-            changes: this.header.changes,
-            lyrics: this.header.lyrics,
-            key: this.header.keyFlatSharp,
-            mode: this.header.keyMajMin,
-            meter: { count: this.header.meterCount, division: this.header.meterDivision },
-            meters: this.header.meters,
-            signs: this.header.signs,
-            miditracks: [],
-            speedMode: 0,
-            lineMode: 0
+    dump(): MIDISongData {
+        let midiSongData: MIDISongData = {
+            parser: '1.01'
+            , duration: 0
+            , bpm: this.header.tempoBPM
+            , changes: this.header.changes
+            , lyrics: this.header.lyrics
+            , key: this.header.keyFlatSharp
+            , mode: this.header.keyMajMin
+            , meter: { count: this.header.meterCount, division: this.header.meterDivision }
+            , meters: this.header.meters
+            , signs: this.header.signs
+            , miditracks: []
+            , speedMode: 0
+            , lineMode: 0
         };
-        let trackChannel = [];
+        let trackChannel: { trackNum: number, channelNum: number, track: MIDISongTrack }[] = [];
         for (let i = 0; i < this.parsedTracks.length; i++) {
-            let parsedtrack = this.parsedTracks[i];
+            let parsedtrack: MIDIFileTrack = this.parsedTracks[i];
             for (let k = 0; k < parsedtrack.programChannel.length; k++) {
                 this.findOrCreateTrack(i, parsedtrack.programChannel[k].channel, trackChannel);
             }
+
         }
         var maxWhen = 0;
         for (var i = 0; i < this.parsedTracks.length; i++) {
-            var miditrack = this.parsedTracks[i];
+            var miditrack: MIDIFileTrack = this.parsedTracks[i];
             for (var ch = 0; ch < miditrack.chords.length; ch++) {
-                var midichord = miditrack.chords[ch];
-                var newchord = { when: midichord.when, notes: [], channel: midichord.channel };
+                var midichord: TrackChord = miditrack.chords[ch];
+                var newchord: MIDISongChord = { when: midichord.when, notes: [], channel: midichord.channel };
                 if (maxWhen < midichord.when) {
                     maxWhen = midichord.when;
                 }
                 for (var n = 0; n < midichord.notes.length; n++) {
-                    var midinote = midichord.notes[n];
-                    var newnote = { points: [] };
+                    var midinote: TrackNote = midichord.notes[n];
+                    var newnote: MIDISongNote = { points: [] };
                     newchord.notes.push(newnote);
                     for (var v = 0; v < midinote.points.length; v++) {
-                        var midipoint = midinote.points[v];
-                        var newpoint = { pitch: midipoint.pitch, durationms: midipoint.pointDuration };
+                        var midipoint: NotePitch = midinote.points[v];
+                        var newpoint: MIDISongPoint = { pitch: midipoint.pitch, durationms: midipoint.pointDuration };
                         newpoint.midipoint = midinote;
                         newnote.points.push(newpoint);
                     }
@@ -1516,7 +1031,7 @@ class MidiParser {
                 if (trackChannel[i].trackNum == i) {
                     trackChannel[i].track.title = miditrack.title ? miditrack.title : '';
                     trackChannel[i].track.volumes = miditrack.volumes;
-                    trackChannel[i].track.instrument = miditrack.instrument ? miditrack.instrument : '';
+                    trackChannel[i].track.instrument = miditrack.instrument ? miditrack.instrument : ''
                 }
             }
         }
@@ -1528,7 +1043,7 @@ class MidiParser {
                     midiSongData.duration = 54321 + maxWhen;
                 }
                 for (let i = 0; i < this.parsedTracks.length; i++) {
-                    let miditrack = this.parsedTracks[i];
+                    let miditrack: MIDIFileTrack = this.parsedTracks[i];
                     for (let kk = 0; kk < miditrack.programChannel.length; kk++) {
                         if (miditrack.programChannel[kk].channel == trackChan.channelNum) {
                             trackChan.track.program = miditrack.programChannel[kk].program;
@@ -1540,4 +1055,5 @@ class MidiParser {
         return midiSongData;
     }
 }
-//# sourceMappingURL=base.js.map
+
+

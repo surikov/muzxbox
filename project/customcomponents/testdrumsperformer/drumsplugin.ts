@@ -1,133 +1,4 @@
-var WAFMIDIPresetURLs:string[]=[];
-WAFMIDIPresetURLs[1]="0000_JCLive_sf2_file";
-WAFMIDIPresetURLs[2]="0010_Aspirin_sf2_file";
-WAFMIDIPresetURLs[3]="0020_Aspirin_sf2_file";
-WAFMIDIPresetURLs[4]="0030_Aspirin_sf2_file";
-WAFMIDIPresetURLs[5]="0040_Aspirin_sf2_file";
-WAFMIDIPresetURLs[6]="0050_Aspirin_sf2_file";
-WAFMIDIPresetURLs[7]="0060_Aspirin_sf2_file";
-WAFMIDIPresetURLs[8]="0070_Aspirin_sf2_file";
-WAFMIDIPresetURLs[9]="0080_Aspirin_sf2_file";
-WAFMIDIPresetURLs[10]="0090_Aspirin_sf2_file";
-WAFMIDIPresetURLs[11]="0100_Aspirin_sf2_file";
-WAFMIDIPresetURLs[12]="0110_Aspirin_sf2_file";
-WAFMIDIPresetURLs[13]="0120_Aspirin_sf2_file";
-WAFMIDIPresetURLs[14]="0130_Aspirin_sf2_file";
-WAFMIDIPresetURLs[15]="0140_Aspirin_sf2_file";
-WAFMIDIPresetURLs[16]="0150_Aspirin_sf2_file";
-WAFMIDIPresetURLs[17]="0160_Aspirin_sf2_file";
-WAFMIDIPresetURLs[18]="0170_Aspirin_sf2_file";
-WAFMIDIPresetURLs[19]="0180_Aspirin_sf2_file";
-WAFMIDIPresetURLs[20]="0190_Aspirin_sf2_file";
-WAFMIDIPresetURLs[21]="0200_Aspirin_sf2_file";
-WAFMIDIPresetURLs[22]="0210_Aspirin_sf2_file";
-WAFMIDIPresetURLs[23]="0220_Aspirin_sf2_file";
-WAFMIDIPresetURLs[24]="0230_Aspirin_sf2_file";
-WAFMIDIPresetURLs[25]="0240_Aspirin_sf2_file";
-WAFMIDIPresetURLs[26]="0253_Acoustic_Guitar_sf2_file";
-WAFMIDIPresetURLs[27]="0260_Aspirin_sf2_file";
-WAFMIDIPresetURLs[28]="0270_Aspirin_sf2_file";
-WAFMIDIPresetURLs[29]="0280_Aspirin_sf2_file";
-WAFMIDIPresetURLs[30]="0290_Aspirin_sf2_file";
-WAFMIDIPresetURLs[31]="0300_Aspirin_sf2_file";
-WAFMIDIPresetURLs[32]="0310_Aspirin_sf2_file";
-WAFMIDIPresetURLs[33]="0320_Aspirin_sf2_file";
-WAFMIDIPresetURLs[34]="0330_Aspirin_sf2_file";
-WAFMIDIPresetURLs[35]="0340_Aspirin_sf2_file";
-WAFMIDIPresetURLs[36]="0350_Aspirin_sf2_file";
-WAFMIDIPresetURLs[37]="0360_Aspirin_sf2_file";
-WAFMIDIPresetURLs[38]="0370_Aspirin_sf2_file";
-WAFMIDIPresetURLs[39]="0385_GeneralUserGS_sf2_file";
-WAFMIDIPresetURLs[40]="0390_Aspirin_sf2_file";
-WAFMIDIPresetURLs[41]="0400_Aspirin_sf2_file";
-WAFMIDIPresetURLs[42]="0410_Aspirin_sf2_file";
-WAFMIDIPresetURLs[43]="0420_Aspirin_sf2_file";
-WAFMIDIPresetURLs[44]="0430_Aspirin_sf2_file";
-WAFMIDIPresetURLs[45]="0440_Aspirin_sf2_file";
-WAFMIDIPresetURLs[46]="0450_Aspirin_sf2_file";
-WAFMIDIPresetURLs[47]="0460_Aspirin_sf2_file";
-WAFMIDIPresetURLs[48]="0470_Aspirin_sf2_file";
-WAFMIDIPresetURLs[49]="0480_Aspirin_sf2_file";
-WAFMIDIPresetURLs[50]="0490_Aspirin_sf2_file";
-WAFMIDIPresetURLs[51]="0500_Aspirin_sf2_file";
-WAFMIDIPresetURLs[52]="0510_Aspirin_sf2_file";
-WAFMIDIPresetURLs[53]="0520_Aspirin_sf2_file";
-WAFMIDIPresetURLs[54]="0530_Aspirin_sf2_file";
-WAFMIDIPresetURLs[55]="0540_Aspirin_sf2_file";
-WAFMIDIPresetURLs[56]="0550_Aspirin_sf2_file";
-WAFMIDIPresetURLs[57]="0560_Aspirin_sf2_file";
-WAFMIDIPresetURLs[58]="0570_Aspirin_sf2_file";
-WAFMIDIPresetURLs[59]="0580_Aspirin_sf2_file";
-WAFMIDIPresetURLs[60]="0590_Aspirin_sf2_file";
-WAFMIDIPresetURLs[61]="0600_Aspirin_sf2_file";
-WAFMIDIPresetURLs[62]="0610_Aspirin_sf2_file";
-WAFMIDIPresetURLs[63]="0620_Aspirin_sf2_file";
-WAFMIDIPresetURLs[64]="0630_Aspirin_sf2_file";
-WAFMIDIPresetURLs[65]="0640_Aspirin_sf2_file";
-WAFMIDIPresetURLs[66]="0650_Aspirin_sf2_file";
-WAFMIDIPresetURLs[67]="0660_Aspirin_sf2_file";
-WAFMIDIPresetURLs[68]="0670_Aspirin_sf2_file";
-WAFMIDIPresetURLs[69]="0680_Aspirin_sf2_file";
-WAFMIDIPresetURLs[70]="0690_Aspirin_sf2_file";
-WAFMIDIPresetURLs[71]="0700_Aspirin_sf2_file";
-WAFMIDIPresetURLs[72]="0710_Aspirin_sf2_file";
-WAFMIDIPresetURLs[73]="0720_Aspirin_sf2_file";
-WAFMIDIPresetURLs[74]="0730_Aspirin_sf2_file";
-WAFMIDIPresetURLs[75]="0740_Aspirin_sf2_file";
-WAFMIDIPresetURLs[76]="0750_Aspirin_sf2_file";
-WAFMIDIPresetURLs[77]="0760_Aspirin_sf2_file";
-WAFMIDIPresetURLs[78]="0770_Aspirin_sf2_file";
-WAFMIDIPresetURLs[79]="0780_Aspirin_sf2_file";
-WAFMIDIPresetURLs[80]="0790_Aspirin_sf2_file";
-WAFMIDIPresetURLs[81]="0800_Aspirin_sf2_file";
-WAFMIDIPresetURLs[82]="0810_Aspirin_sf2_file";
-WAFMIDIPresetURLs[83]="0820_Aspirin_sf2_file";
-WAFMIDIPresetURLs[84]="0830_Aspirin_sf2_file";
-WAFMIDIPresetURLs[85]="0840_Aspirin_sf2_file";
-WAFMIDIPresetURLs[86]="0850_Aspirin_sf2_file";
-WAFMIDIPresetURLs[87]="0860_Aspirin_sf2_file";
-WAFMIDIPresetURLs[88]="0870_Aspirin_sf2_file";
-WAFMIDIPresetURLs[89]="0880_Aspirin_sf2_file";
-WAFMIDIPresetURLs[90]="0890_Aspirin_sf2_file";
-WAFMIDIPresetURLs[91]="0900_Aspirin_sf2_file";
-WAFMIDIPresetURLs[92]="0910_Aspirin_sf2_file";
-WAFMIDIPresetURLs[93]="0920_Aspirin_sf2_file";
-WAFMIDIPresetURLs[94]="0930_Aspirin_sf2_file";
-WAFMIDIPresetURLs[95]="0940_Aspirin_sf2_file";
-WAFMIDIPresetURLs[96]="0950_Aspirin_sf2_file";
-WAFMIDIPresetURLs[97]="0960_Aspirin_sf2_file";
-WAFMIDIPresetURLs[98]="0970_Aspirin_sf2_file";
-WAFMIDIPresetURLs[99]="0980_Aspirin_sf2_file";
-WAFMIDIPresetURLs[100]="0990_Aspirin_sf2_file";
-WAFMIDIPresetURLs[101]="1000_Aspirin_sf2_file";
-WAFMIDIPresetURLs[102]="1010_Aspirin_sf2_file";
-WAFMIDIPresetURLs[103]="1020_Aspirin_sf2_file";
-WAFMIDIPresetURLs[104]="1030_Aspirin_sf2_file";
-WAFMIDIPresetURLs[105]="1040_Aspirin_sf2_file";
-WAFMIDIPresetURLs[106]="1050_Aspirin_sf2_file";
-WAFMIDIPresetURLs[107]="1060_Aspirin_sf2_file";
-WAFMIDIPresetURLs[108]="1070_Aspirin_sf2_file";
-WAFMIDIPresetURLs[109]="1080_Aspirin_sf2_file";
-WAFMIDIPresetURLs[110]="1090_Aspirin_sf2_file";
-WAFMIDIPresetURLs[111]="1100_Aspirin_sf2_file";
-WAFMIDIPresetURLs[112]="1110_Aspirin_sf2_file";
-WAFMIDIPresetURLs[113]="1120_Aspirin_sf2_file";
-WAFMIDIPresetURLs[114]="1130_Aspirin_sf2_file";
-WAFMIDIPresetURLs[115]="1140_Aspirin_sf2_file";
-WAFMIDIPresetURLs[116]="1150_Aspirin_sf2_file";
-WAFMIDIPresetURLs[117]="1160_Aspirin_sf2_file";
-WAFMIDIPresetURLs[118]="1170_Aspirin_sf2_file";
-WAFMIDIPresetURLs[119]="1180_Aspirin_sf2_file";
-WAFMIDIPresetURLs[120]="1190_Aspirin_sf2_file";
-WAFMIDIPresetURLs[121]="1200_Aspirin_sf2_file";
-WAFMIDIPresetURLs[122]="1210_Aspirin_sf2_file";
-WAFMIDIPresetURLs[123]="1220_Aspirin_sf2_file";
-WAFMIDIPresetURLs[124]="1230_Aspirin_sf2_file";
-WAFMIDIPresetURLs[125]="1240_Aspirin_sf2_file";
-WAFMIDIPresetURLs[126]="1250_Aspirin_sf2_file";
-WAFMIDIPresetURLs[127]="1260_Aspirin_sf2_file";
-WAFMIDIPresetURLs[128]="1270_Aspirin_sf2_file";
-/*var WAFMIDIDrumURLs:string[]=[];
+var WAFMIDIDrumURLs:string[]=[];
 WAFMIDIDrumURLs[35]="35_0_Chaos_sf2_file";
 WAFMIDIDrumURLs[36]="36_0_SBLive_sf2";
 WAFMIDIDrumURLs[37]="37_0_SBLive_sf2";
@@ -174,10 +45,11 @@ WAFMIDIDrumURLs[77]="77_0_SBLive_sf2";
 WAFMIDIDrumURLs[78]="78_0_SBLive_sf2";
 WAFMIDIDrumURLs[79]="79_0_SBLive_sf2";
 WAFMIDIDrumURLs[80]="80_0_SBLive_sf2";
-WAFMIDIDrumURLs[81]="81_0_SBLive_sf2";*/
-type PresetInstrument = {
+WAFMIDIDrumURLs[81]="81_0_SBLive_sf2";
+type PresetDrum = {
     variable: string
     , url: string
+    ,pitch:number
 };
 type WaveZone = {
     keyRangeLow: number
@@ -211,7 +83,7 @@ type WaveEnvelope = {
     , pitch: number
     , preset: WavePreset
 };
-class PublicWAFMIDITonePerformerPlayer {
+class PublicWAFMIDIDrummer {
     audioContext: AudioContext;
     instrumentKeyArray: string[] = [];
     instrumentNamesArray: string[] = [];
@@ -224,7 +96,7 @@ class PublicWAFMIDITonePerformerPlayer {
         }
     }
     startLoadPreset(nn: number) {
-        let info: PresetInstrument = this.instrumentInfo(nn);
+        let info: PresetDrum = this.instrumentInfo(nn);
         let me = this;
         if (MZXBX_appendScriptURL(info.url)) {
             MZXBX_waitForCondition(250, () => { return (window[info.variable]); }, () => {
@@ -234,7 +106,7 @@ class PublicWAFMIDITonePerformerPlayer {
         }
     }
     presetReady(nn: number): boolean {
-        let info: PresetInstrument = this.instrumentInfo(nn);
+        let info: PresetDrum = this.instrumentInfo(nn);
         let loaded = window[info.variable];
         if (loaded) {
             let preset: WavePreset = loaded as WavePreset;
@@ -497,43 +369,44 @@ class PublicWAFMIDITonePerformerPlayer {
             }
         }
     }
-    instrumentInfo(n: number): PresetInstrument {
-        var key: string = WAFMIDIPresetURLs[n];
+    instrumentInfo(n: number): PresetDrum {
+        var key: string = WAFMIDIDrumURLs[n];
         if (!(key)) {
-            console.log('not found instrument definition for', n);
+            console.log('not found drum definition for', n);
         }
         return {
-            variable: '_tone_' + key,
-            url: 'https://surikov.github.io/webaudiofontdata/sound/' + key + '.js'
+            variable: '_drum_' + key,
+			url: 'https://surikov.github.io/webaudiofontdata/sound/128' + key + '.js',
+			pitch: n
         };
     };
 }
-class PerformerPluginWAF implements MZXBX_AudioPerformerPlugin {
+class PerformerPluginDrums implements MZXBX_AudioPerformerPlugin {
     out: GainNode;
-    player: PublicWAFMIDITonePerformerPlayer;
-    midiProgram: number = -1;
+    player: PublicWAFMIDIDrummer;
+    midiDrum: number = -1;
     //velocityRatio = 0.75;
     reset(context: AudioContext, parameters: string): boolean {
         if (this.player) {
-            return this.player.presetReady(this.midiProgram);
+            return this.player.presetReady(this.midiDrum);
         } else {
             this.out = context.createGain();
-            this.player = new PublicWAFMIDITonePerformerPlayer();
+            this.player = new PublicWAFMIDIDrummer();
             this.player.setup(context);
             let nn: number = parseInt(parameters);
-            if (this.midiProgram == nn) {
+            if (this.midiDrum == nn) {
                 //
             } else {
-                this.midiProgram = nn;
-                this.player.startLoadPreset(this.midiProgram);
+                this.midiDrum = nn;
+                this.player.startLoadPreset(this.midiDrum);
             }
-            return this.player.presetReady(this.midiProgram);
+            return this.player.presetReady(this.midiDrum);
         }
     }
     schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void {
-        let info: PresetInstrument = this.player.instrumentInfo(this.midiProgram);
+        let info: PresetDrum = this.player.instrumentInfo(this.midiDrum);
         let preset: WavePreset = window[info.variable] as WavePreset;
-        let rr = this.player.queueWaveTable(this.out, preset, when, pitch, slides);
+        let rr = this.player.queueWaveTable(this.out, preset, when, info.pitch, slides);
         //console.log(rr);
     }
     output(): AudioNode | null {
@@ -543,6 +416,6 @@ class PerformerPluginWAF implements MZXBX_AudioPerformerPlugin {
         this.player.cancelQueue();
     }
 }
-function testPluginWAF(): MZXBX_AudioPerformerPlugin {
-    return new PerformerPluginWAF();
+function testPluginDrums(): MZXBX_AudioPerformerPlugin {
+    return new PerformerPluginDrums();
 }

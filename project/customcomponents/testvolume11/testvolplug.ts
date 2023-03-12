@@ -2,7 +2,9 @@
 class SimpleTestVolumePlugin implements MZXBX_AudioFilterPlugin {
     base: GainNode;
     schedule(when: number, parameters: string) {
-        console.log('not implemented yet');
+        //console.log('not implemented yet');
+        let nn01: number = parseFloat(parameters);
+        this.base.gain.setValueAtTime(nn01/100,when);
     }
 	reset(context: AudioContext, parameters: string): boolean {
 		//console.log('reset', this,parameters);

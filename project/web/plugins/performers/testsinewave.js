@@ -1,7 +1,7 @@
 "use strict";
 class DefaultBaseOscillatorPlayer {
     constructor() {
-        this.velocityRatio = 0.5;
+        this.velocityRatio = 0.33;
         this.preRamp = 0.01;
         this.afterRamp = 0.05;
         this.rampZero = 0.000001;
@@ -12,7 +12,8 @@ class DefaultBaseOscillatorPlayer {
             this.poll = [];
         }
     }
-    send(when, volume, pitch, slides, target, type) {
+    send(when, pitch, slides, target, type) {
+        let volume = 0.95;
         let it = this.takePollItem(target);
         it.oscillatorNode = this.audioContext.createOscillator();
         it.oscillatorNode.type = type;
@@ -92,8 +93,8 @@ class SimpleSinePerformer {
             this.type = 'triangle';
         return true;
     }
-    schedule(when, volume, pitch, slides) {
-        this.player.send(when, volume, pitch, slides, this.out, this.type);
+    schedule(when, pitch, slides) {
+        this.player.send(when, pitch, slides, this.out, this.type);
     }
     output() {
         return this.out;

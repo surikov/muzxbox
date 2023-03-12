@@ -129,7 +129,6 @@ declare type MZXBX_PlayItem = {
     skip: number;
     channelId: string;
     pitch: number;
-    volume: number;
     slides: MZXBX_SlideItem[];
 };
 declare type MZXBX_FilterState = {
@@ -160,7 +159,7 @@ declare type MZXBX_ChannelPerformer = {
 };
 declare type MZXBX_AudioPerformerPlugin = {
     reset: (context: AudioContext, parameters: string) => boolean;
-    schedule: (when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
+    schedule: (when: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
 };
@@ -174,4 +173,7 @@ declare type MZXBX_Player = {
     start: (from: number, position: number, to: number) => boolean;
     cancel: () => void;
     position: number;
+};
+declare type MZXBX_import = {
+    import: () => MZXBX_Schedule | null;
 };
