@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.57 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.58 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -22,7 +22,7 @@ let rowsAvgCount = 5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let reduceRatio = 1;
 let highLightMode = 1;
-var calcLen = 9;
+var calcLen = 15;
 let markLines: { fromX: number, fromY: number, toX: number, toY: number, color: string ,manual:boolean}[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
     key: string;
@@ -165,7 +165,16 @@ function init() {
     dataBalls = window[dataName];
     console.log(dataBalls);
     datarows = readParseStat(dataBalls);
-    console.log(datarows);
+	//randomizedatarows();
+    console.log('datarows',datarows);
+}
+function randomizedatarows(){
+	for(var ii=0;ii<datarows.length;ii++){
+		var row=datarows[ii];
+		for(var bb=0;bb<ballsInRow;bb++){
+			row.balls[bb]=Math.floor(Math.random()*rowLen);
+		}
+	}
 }
 function clickClearLines() {
     markLines = [];
@@ -359,7 +368,54 @@ function dumpRowFills(inrows: BallsRow[]) {
         dumpRowFillsColor(sliceRows(inrows, 2, 100+2), '#cccc0066',0.1);
         dumpRowFillsColor(sliceRows(inrows, 1, 100 + 1), '#66cc0099', -0.1);
     }*/
-    dumpRowFillsColor(inrows, '#006600cc', 0);
+	if(highLightMode==0){
+		dumpRowFillsColor(inrows, '#ff000099', 0);
+		dumpRowWaitColor(inrows, '#00009933', 0);
+	}else{
+		dumpRowWaitColor(inrows, '#ff000099', 0);
+		dumpRowFillsColor(inrows, '#00009933', 0);
+	}
+}
+function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
+	//let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
+	let arr: { ball: number, summ: number }[] = [];
+	var rowNum=0;
+    for (let nn = 0; nn < rowLen; nn++) {
+        //let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
+		let one: { ball: number, summ: number} = { ball: nn + 1, summ:  0 };
+        arr.push(one);
+        for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
+            if (ballExists(nn + 1, rows[rr])) {
+                break;
+            }
+            one.summ++;
+        }
+    }
+	let mx = 0;
+    let min = 98765;
+    for (let bb = 0; bb < rowLen; bb++) {
+        if (mx < arr[bb].summ) mx = arr[bb].summ;
+        if (min > arr[bb].summ) min = arr[bb].summ;
+    }
+    let hr = (mx - min) / (topShift / cellSize - 2);
+    let prehh=(arr[rowLen-1].summ - min) / hr;
+    for (let bb = 0; bb < rowLen; bb++) {
+        let hh = (arr[bb].summ - min) / hr;
+        markLines.push({ fromX: bb + shiftX-1
+            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
+            , toX: bb + shiftX
+            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color,manual:false
+        });
+        markLines.push({ fromX: bb + shiftX-1+ rowLen
+            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
+            , toX: bb + shiftX+ rowLen
+            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color,manual:false
+        });
+        prehh=hh;
+    }
+	console.log(arr);
 }
 function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
     let oldReduceRatio = reduceRatio;
@@ -515,13 +571,15 @@ function toggleRatioPre() {
     if (highLightMode == 0) {
         highLightMode = 1;
     } else {
-        if (highLightMode == 1) {
-            highLightMode = 2;
-        } else {
-            highLightMode = 0;
-        }
+		highLightMode = 0;
+        //if (highLightMode == 1) {
+        //    highLightMode = 2;
+        //} else {
+        //    highLightMode = 0;
+        //}
     }
-    fillCells();
+    //fillCells();
+	addTails();
 }
 function moreReduceRatio() {
     reduceRatio = reduceRatio + 1;

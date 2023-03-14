@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.57 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.58 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -14,7 +14,7 @@ var rowsAvgCount = 5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 var reduceRatio = 1;
 var highLightMode = 1;
-var calcLen = 9;
+var calcLen = 15;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
     var msgp = document.getElementById('msgp');
@@ -154,7 +154,16 @@ function init() {
     dataBalls = window[dataName];
     console.log(dataBalls);
     datarows = readParseStat(dataBalls);
-    console.log(datarows);
+    //randomizedatarows();
+    console.log('datarows', datarows);
+}
+function randomizedatarows() {
+    for (var ii = 0; ii < datarows.length; ii++) {
+        var row = datarows[ii];
+        for (var bb = 0; bb < ballsInRow; bb++) {
+            row.balls[bb] = Math.floor(Math.random() * rowLen);
+        }
+    }
 }
 function clickClearLines() {
     markLines = [];
@@ -334,7 +343,57 @@ function dumpRowFills(inrows) {
         dumpRowFillsColor(sliceRows(inrows, 2, 100+2), '#cccc0066',0.1);
         dumpRowFillsColor(sliceRows(inrows, 1, 100 + 1), '#66cc0099', -0.1);
     }*/
-    dumpRowFillsColor(inrows, '#006600cc', 0);
+    if (highLightMode == 0) {
+        dumpRowFillsColor(inrows, '#ff000099', 0);
+        dumpRowWaitColor(inrows, '#00009933', 0);
+    }
+    else {
+        dumpRowWaitColor(inrows, '#ff000099', 0);
+        dumpRowFillsColor(inrows, '#00009933', 0);
+    }
+}
+function dumpRowWaitColor(rows, color, shiftX) {
+    //let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
+    var arr = [];
+    var rowNum = 0;
+    for (var nn = 0; nn < rowLen; nn++) {
+        //let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
+        var one = { ball: nn + 1, summ: 0 };
+        arr.push(one);
+        for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
+            if (ballExists(nn + 1, rows[rr])) {
+                break;
+            }
+            one.summ++;
+        }
+    }
+    var mx = 0;
+    var min = 98765;
+    for (var bb = 0; bb < rowLen; bb++) {
+        if (mx < arr[bb].summ)
+            mx = arr[bb].summ;
+        if (min > arr[bb].summ)
+            min = arr[bb].summ;
+    }
+    var hr = (mx - min) / (topShift / cellSize - 2);
+    var prehh = (arr[rowLen - 1].summ - min) / hr;
+    for (var bb = 0; bb < rowLen; bb++) {
+        var hh = (arr[bb].summ - min) / hr;
+        markLines.push({ fromX: bb + shiftX - 1,
+            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
+            toX: bb + shiftX,
+            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2,
+            color: color, manual: false
+        });
+        markLines.push({ fromX: bb + shiftX - 1 + rowLen,
+            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
+            toX: bb + shiftX + rowLen,
+            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2,
+            color: color, manual: false
+        });
+        prehh = hh;
+    }
+    console.log(arr);
 }
 function dumpRowFillsColor(inrows, color, shiftX) {
     var oldReduceRatio = reduceRatio;
@@ -488,14 +547,15 @@ function toggleRatioPre() {
         highLightMode = 1;
     }
     else {
-        if (highLightMode == 1) {
-            highLightMode = 2;
-        }
-        else {
-            highLightMode = 0;
-        }
+        highLightMode = 0;
+        //if (highLightMode == 1) {
+        //    highLightMode = 2;
+        //} else {
+        //    highLightMode = 0;
+        //}
     }
-    fillCells();
+    //fillCells();
+    addTails();
 }
 function moreReduceRatio() {
     reduceRatio = reduceRatio + 1;
