@@ -1,5 +1,4 @@
 declare var WAFMIDIPresetURLs: string[];
-declare var WAFMIDIDrumURLs: string[];
 declare type PresetInstrument = {
     variable: string;
     url: string;
@@ -53,18 +52,16 @@ declare class PublicWAFMIDITonePerformerPlayer {
     findEnvelope(audioContext: AudioContext, out: AudioNode): WaveEnvelope;
     setupEnvelope(audioContext: AudioContext, envelope: WaveEnvelope, zone: WaveZone, volume: number, when: number, sampleDuration: number, noteDuration: number): void;
     noZeroVolume(n: number): number;
-    queueWaveTable(out: AudioNode, preset: WavePreset, when: number, pitch: number, volume: number, slides: MZXBX_SlideItem[]): WaveEnvelope | null;
+    queueWaveTable(out: AudioNode, preset: WavePreset, when: number, pitch: number, slides: MZXBX_SlideItem[]): WaveEnvelope | null;
     cancelQueue(): void;
     instrumentInfo(n: number): PresetInstrument;
-    instrumentKeys(): string[];
 }
 declare class PerformerPluginWAF implements MZXBX_AudioPerformerPlugin {
     out: GainNode;
     player: PublicWAFMIDITonePerformerPlayer;
-    index: number;
-    velocityRatio: number;
+    midiProgram: number;
     reset(context: AudioContext, parameters: string): boolean;
-    schedule(when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[]): void;
+    schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void;
     output(): AudioNode | null;
     cancel(): void;
 }
@@ -197,7 +194,6 @@ declare type MZXBX_PlayItem = {
     skip: number;
     channelId: string;
     pitch: number;
-    volume: number;
     slides: MZXBX_SlideItem[];
 };
 declare type MZXBX_FilterState = {
@@ -228,7 +224,7 @@ declare type MZXBX_ChannelPerformer = {
 };
 declare type MZXBX_AudioPerformerPlugin = {
     reset: (context: AudioContext, parameters: string) => boolean;
-    schedule: (when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
+    schedule: (when: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
 };
@@ -242,4 +238,7 @@ declare type MZXBX_Player = {
     start: (from: number, position: number, to: number) => boolean;
     cancel: () => void;
     position: number;
+};
+declare type MZXBX_import = {
+    import: () => MZXBX_Schedule | null;
 };

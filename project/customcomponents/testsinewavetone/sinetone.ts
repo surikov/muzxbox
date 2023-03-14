@@ -11,8 +11,9 @@ class DefaultBaseOscillatorPlayer {
             this.poll = [];
         }
     }
-    send(when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[], target: AudioNode, type: OscillatorType): void {
+    send(when: number, pitch: number, slides: MZXBX_SlideItem[], target: AudioNode, type: OscillatorType): void {
         //console.log(volume,volume*this.velocityRatio);
+        let volume=0.95;
         let it = this.takePollItem(target);
         it.oscillatorNode = this.audioContext.createOscillator();
         it.oscillatorNode.type = type;
@@ -89,8 +90,8 @@ class SimpleSinePerformer implements MZXBX_AudioPerformerPlugin {
 		//console.log('reset SimpleSinePerformer',this);
         return true;
     }
-    schedule(when: number, volume: number, pitch: number, slides: MZXBX_SlideItem[]): void {
-        this.player.send(when, volume, pitch, slides, this.out, this.type);
+    schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void {
+        this.player.send(when, pitch, slides, this.out, this.type);
     }
     output(): AudioNode | null {
         return this.out;

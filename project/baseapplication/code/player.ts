@@ -66,13 +66,15 @@ class SchedulePlayer implements MZXBX_Player {
 
 
     resetCollectedPlugins(): boolean {
+        let ready:boolean=true;
         for (let ff = 0; ff < this.filters.length; ff++) {
             let plugin: MZXBX_AudioFilterPlugin | null = this.filters[ff].plugin;
             if (plugin) {
                 console.log('reset', this.filters[ff].id, this.filters[ff].kind, this.filters[ff].properties);
                 if (!plugin.reset(this.audioContext, this.filters[ff].properties)) {
                     console.log('filter ' + this.filters[ff].id + ' is not ready for reset');
-                    return false;
+                    //return false;
+                    ready=false;
                 }
             } else {
                 console.log('empty filter ', this.filters[ff]);
@@ -85,7 +87,8 @@ class SchedulePlayer implements MZXBX_Player {
                 console.log('reset', this.performers[pp].id, this.performers[pp].kind, this.performers[pp].properties);
                 if (!plugin.reset(this.audioContext, this.performers[pp].properties)) {
                     console.log('performer ' + this.performers[pp].id + ' is not ready for reset');
-                    return false;
+                    //return false;
+                    ready=false;
                 }
             } else {
                 console.log('empty performer ', this.performers[pp]);
@@ -94,7 +97,7 @@ class SchedulePlayer implements MZXBX_Player {
             }
         }
         //this.stateSetupDone = true;
-        return true;
+        return ready;
     }
     start(loopStart: number, currentPosition: number, loopEnd: number): boolean {
         console.log('start', loopStart, currentPosition, loopEnd);
@@ -194,7 +197,11 @@ class SchedulePlayer implements MZXBX_Player {
                     if (plugin) {
                         let output = plugin.output();
                         if (output) {
-                            output.disconnect(channelOutput);
+                            try{
+                                output.disconnect(channelOutput);
+                            }catch(ex){
+                                //ignore
+                            }
                             let input = plugin.input();
                             if (input) {
                                 channelOutput = input;
@@ -206,7 +213,11 @@ class SchedulePlayer implements MZXBX_Player {
                 if (plugin) {
                     let output = plugin.output();
                     if (output) {
-                        output.disconnect(channelOutput);
+                        try{
+                            output.disconnect(channelOutput);
+                        }catch(ex){
+                            //ignore
+                        }
                     }
                 }
             }
@@ -281,7 +292,7 @@ class SchedulePlayer implements MZXBX_Player {
         }*/
         let plugin: MZXBX_AudioPerformerPlugin | null = this.findPerformerPlugin(it.channelId);
         if (plugin) {
-            plugin.schedule(whenAudio, it.volume, it.pitch, it.slides);
+            plugin.schedule(whenAudio, it.pitch, it.slides);
         }
     }
     findFilterPlugin(filterId: string): MZXBX_AudioFilterPlugin | null {
