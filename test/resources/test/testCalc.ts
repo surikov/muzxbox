@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.59 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.60 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -301,7 +301,7 @@ function calcRowPatterns(rowNum: number, rows: BallsRow[]): number[] {
     }
     return cnts;
 }
-function calcRowFills(rowNum: number, rows: BallsRow[], counts: number[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
+function calcRowFills(log:boolean,rowNum: number, rows: BallsRow[], counts: number[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
     let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
     for (let nn = 0; nn < rowLen; nn++) {
         let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
@@ -315,7 +315,9 @@ function calcRowFills(rowNum: number, rows: BallsRow[], counts: number[]): { bal
                 }
             }
         }
-        one.logr = one.summ;//* one.summ;
+		
+        one.logr = one.summ;
+		if(log){one.logr = one.summ*one.summ;}
     }
     return resu;
 }
@@ -428,7 +430,7 @@ function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
         let rows: BallsRow[] = sliceRows(inrows, 0, 100);
         let precounts = calcRowPatterns(0 + 1, rows);
         let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[];
-        calcs = calcRowFills(0, rows, precounts);
+        calcs = calcRowFills(false,0, rows, precounts);
         for (let bb = 0; bb < rowLen; bb++) {
             arr[bb].sums.push(calcs[bb].logr);
         }
@@ -486,7 +488,7 @@ function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
 function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
     let ratioPre = 0.99;
     if (highLightMode == 1) {
-        ratioPre = 0.33;
+        ratioPre = 0.66;
     } else {
         if (highLightMode == 2) {
             ratioPre = 0.66;
@@ -502,7 +504,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
                 calcs = calcRowHot(rr, rows);
             } else {
                 let precounts = calcRowPatterns(rr + 1, rows);
-                calcs = calcRowFills(rr, rows, precounts);
+                calcs = calcRowFills(true,rr, rows, precounts);
             }
         }
         let minCnt = 99999;
