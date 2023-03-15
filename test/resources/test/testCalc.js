@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.60 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.61 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -347,11 +347,11 @@ function dumpRowFills(inrows) {
         dumpRowFillsColor(sliceRows(inrows, 1, 100 + 1), '#66cc0099', -0.1);
     }*/
     if (highLightMode == 0) {
-        dumpRowFillsColor(inrows, '#ff000099', 0);
+        dumpRowFillsColor(inrows, '#009900cc', 0);
         dumpRowWaitColor(inrows, '#00009933', 0);
     }
     else {
-        dumpRowWaitColor(inrows, '#ff000099', 0);
+        dumpRowWaitColor(inrows, '#009900cc', 0);
         dumpRowFillsColor(inrows, '#00009933', 0);
     }
 }
