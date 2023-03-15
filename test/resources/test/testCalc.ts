@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.58 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.59 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -22,7 +22,7 @@ let rowsAvgCount = 5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let reduceRatio = 1;
 let highLightMode = 1;
-var calcLen = 15;
+var calcLen = 21;
 let markLines: { fromX: number, fromY: number, toX: number, toY: number, color: string ,manual:boolean}[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
     key: string;
@@ -594,12 +594,14 @@ function lessReduceRatio() {
 }
 function moreCalcLen() {
     calcLen = calcLen + 1;
-    fillCells();
+    //fillCells();
+	addTails();
 }
 function lessCalcLen() {
     calcLen = calcLen - 1;
     if (calcLen < 3) calcLen = 3;
-    fillCells();
+    //fillCells();
+	addTails();
 }
 
 function sobstvennoe(balls: number[]): number {

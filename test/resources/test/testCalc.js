@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.58 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.59 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -14,7 +14,7 @@ var rowsAvgCount = 5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 var reduceRatio = 1;
 var highLightMode = 1;
-var calcLen = 15;
+var calcLen = 21;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
     var msgp = document.getElementById('msgp');
@@ -571,13 +571,15 @@ function lessReduceRatio() {
 }
 function moreCalcLen() {
     calcLen = calcLen + 1;
-    fillCells();
+    //fillCells();
+    addTails();
 }
 function lessCalcLen() {
     calcLen = calcLen - 1;
     if (calcLen < 3)
         calcLen = 3;
-    fillCells();
+    //fillCells();
+    addTails();
 }
 function sobstvennoe(balls) {
     var pre = balls;
