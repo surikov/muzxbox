@@ -6,7 +6,7 @@ class SimpleTestVolumePlugin implements MZXBX_AudioFilterPlugin {
         let nn01: number = parseFloat(parameters);
         this.base.gain.setValueAtTime(nn01/100,when);
     }
-	reset(context: AudioContext, parameters: string): boolean {
+	launch(context: AudioContext, parameters: string): void {
 		//console.log('reset', this,parameters);
 		if (!(this.base)) {
 			this.base = context.createGain();
@@ -15,7 +15,10 @@ class SimpleTestVolumePlugin implements MZXBX_AudioFilterPlugin {
 		//console.log('gain', nn01);
         this.base.gain.value = nn01/100;
         //console.log('value', nn01);
-		return true;
+		//return true;
+	}
+	busy():null|string{
+		return null;
 	}
 	output(): AudioNode | null {
 		return this.base;

@@ -60,10 +60,11 @@ declare class PerformerPluginWAF implements MZXBX_AudioPerformerPlugin {
     out: GainNode;
     player: PublicWAFMIDITonePerformerPlayer;
     midiProgram: number;
-    reset(context: AudioContext, parameters: string): boolean;
+    launch(context: AudioContext, parameters: string): void;
     schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void;
     output(): AudioNode | null;
     cancel(): void;
+    busy(): string | null;
 }
 declare function testPluginWAF(): MZXBX_AudioPerformerPlugin;
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
@@ -212,7 +213,8 @@ declare type MZXBX_ChannelFilter = {
     properties: string;
 };
 declare type MZXBX_AudioFilterPlugin = {
-    reset: (context: AudioContext, parameters: string) => boolean;
+    launch: (context: AudioContext, parameters: string) => void;
+    busy: () => null | string;
     schedule: (when: number, parameters: string) => void;
     input: () => AudioNode | null;
     output: () => AudioNode | null;
@@ -223,7 +225,8 @@ declare type MZXBX_ChannelPerformer = {
     properties: string;
 };
 declare type MZXBX_AudioPerformerPlugin = {
-    reset: (context: AudioContext, parameters: string) => boolean;
+    launch: (context: AudioContext, parameters: string) => void;
+    busy: () => null | string;
     schedule: (when: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
@@ -235,7 +238,7 @@ declare type MZXBX_Schedule = {
 };
 declare type MZXBX_Player = {
     setup: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;
-    start: (from: number, position: number, to: number) => boolean;
+    startLoop: (from: number, position: number, to: number) => void;
     cancel: () => void;
     position: number;
 };

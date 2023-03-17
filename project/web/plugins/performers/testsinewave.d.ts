@@ -23,7 +23,8 @@ declare class SimpleSinePerformer implements MZXBX_AudioPerformerPlugin {
     out: GainNode;
     type: OscillatorType;
     player: DefaultBaseOscillatorPlayer;
-    reset(context: AudioContext, parameters: string): boolean;
+    launch(context: AudioContext, parameters: string): void;
+    busy(): null | string;
     schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void;
     output(): AudioNode | null;
     cancel(): void;
@@ -173,7 +174,8 @@ declare type MZXBX_ChannelFilter = {
     properties: string;
 };
 declare type MZXBX_AudioFilterPlugin = {
-    reset: (context: AudioContext, parameters: string) => boolean;
+    launch: (context: AudioContext, parameters: string) => void;
+    busy: () => null | string;
     schedule: (when: number, parameters: string) => void;
     input: () => AudioNode | null;
     output: () => AudioNode | null;
@@ -184,7 +186,8 @@ declare type MZXBX_ChannelPerformer = {
     properties: string;
 };
 declare type MZXBX_AudioPerformerPlugin = {
-    reset: (context: AudioContext, parameters: string) => boolean;
+    launch: (context: AudioContext, parameters: string) => void;
+    busy: () => null | string;
     schedule: (when: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
@@ -196,7 +199,7 @@ declare type MZXBX_Schedule = {
 };
 declare type MZXBX_Player = {
     setup: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;
-    start: (from: number, position: number, to: number) => boolean;
+    startLoop: (from: number, position: number, to: number) => void;
     cancel: () => void;
     position: number;
 };

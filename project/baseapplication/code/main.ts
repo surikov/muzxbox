@@ -67,7 +67,7 @@ class MuzXbox {
 				for (let ii = 0; ii < testSchedule.series.length; ii++) {
 					duration = duration + testSchedule.series[ii].duration;
 				}
-				this.player.start(0, 0, duration);
+				this.player.startLoop(0, 0, duration);
 			});
         }
         //player.filters.push({ plugin: null, id: 'test111', kind: 'volume_filter_1_test' });

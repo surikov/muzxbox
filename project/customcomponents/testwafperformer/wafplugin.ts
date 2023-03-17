@@ -513,22 +513,23 @@ class PerformerPluginWAF implements MZXBX_AudioPerformerPlugin {
     player: PublicWAFMIDITonePerformerPlayer;
     midiProgram: number = -1;
     //velocityRatio = 0.75;
-    reset(context: AudioContext, parameters: string): boolean {
+    launch(context: AudioContext, parameters: string): void {
         if (this.player) {
-            return this.player.presetReady(this.midiProgram);
+            //return this.player.presetReady(this.midiProgram);
         } else {
             this.out = context.createGain();
             this.player = new PublicWAFMIDITonePerformerPlayer();
             this.player.setup(context);
-            let nn: number = parseInt(parameters);
+            
+            //return this.player.presetReady(this.midiProgram);
+        }
+		let nn: number = parseInt(parameters);
             if (this.midiProgram == nn) {
                 //
             } else {
                 this.midiProgram = nn;
                 this.player.startLoadPreset(this.midiProgram);
             }
-            return this.player.presetReady(this.midiProgram);
-        }
     }
     schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void {
         let info: PresetInstrument = this.player.instrumentInfo(this.midiProgram);
@@ -542,6 +543,13 @@ class PerformerPluginWAF implements MZXBX_AudioPerformerPlugin {
     cancel(): void {
         this.player.cancelQueue();
     }
+	busy(): string |null{
+		if( this.player.presetReady(this.midiProgram)){
+			return null;
+		}else{
+			return 'program '+this.midiProgram+' isn\'t ready';
+		}
+	}
 }
 function testPluginWAF(): MZXBX_AudioPerformerPlugin {
     return new PerformerPluginWAF();

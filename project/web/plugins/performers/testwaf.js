@@ -441,22 +441,20 @@ class PerformerPluginWAF {
     constructor() {
         this.midiProgram = -1;
     }
-    reset(context, parameters) {
+    launch(context, parameters) {
         if (this.player) {
-            return this.player.presetReady(this.midiProgram);
         }
         else {
             this.out = context.createGain();
             this.player = new PublicWAFMIDITonePerformerPlayer();
             this.player.setup(context);
-            let nn = parseInt(parameters);
-            if (this.midiProgram == nn) {
-            }
-            else {
-                this.midiProgram = nn;
-                this.player.startLoadPreset(this.midiProgram);
-            }
-            return this.player.presetReady(this.midiProgram);
+        }
+        let nn = parseInt(parameters);
+        if (this.midiProgram == nn) {
+        }
+        else {
+            this.midiProgram = nn;
+            this.player.startLoadPreset(this.midiProgram);
         }
     }
     schedule(when, pitch, slides) {
@@ -469,6 +467,14 @@ class PerformerPluginWAF {
     }
     cancel() {
         this.player.cancelQueue();
+    }
+    busy() {
+        if (this.player.presetReady(this.midiProgram)) {
+            return null;
+        }
+        else {
+            return 'program ' + this.midiProgram + ' isn\'t ready';
+        }
     }
 }
 function testPluginWAF() {

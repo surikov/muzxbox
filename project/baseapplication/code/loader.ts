@@ -63,7 +63,7 @@ class PluginLoader {
                 return;
             }
         }
-        filters.push({ plugin: null, id: id, kind: kind, properties: properties });
+        filters.push({ plugin: null, id: id, kind: kind, properties: properties, launched: false });
     }
     сollectPerformerPlugin(id: string, kind: string, properties: string, performers: PerformerHolder[]): void {
         for (let ii = 0; ii < performers.length; ii++) {
@@ -71,7 +71,7 @@ class PluginLoader {
                 return;
             }
         }
-        performers.push({ plugin: null, id: id, kind: kind, properties: properties });
+        performers.push({ plugin: null, id: id, kind: kind, properties: properties, launched: false });
     }
     findPluginInfo(kind: string): { kind: string, url: string, functionName: string } | null {
         for (let ll = 0; ll < pluginListKindUrlName.length; ll++) {

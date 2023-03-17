@@ -361,22 +361,26 @@ class PerformerPluginDrums {
     constructor() {
         this.midiDrum = -1;
     }
-    reset(context, parameters) {
-        if (this.player) {
-            return this.player.presetReady(this.midiDrum);
-        }
-        else {
+    launch(context, parameters) {
+        if (!(this.player)) {
             this.out = context.createGain();
             this.player = new PublicWAFMIDIDrummer();
             this.player.setup(context);
-            let nn = parseInt(parameters);
-            if (this.midiDrum == nn) {
-            }
-            else {
-                this.midiDrum = nn;
-                this.player.startLoadPreset(this.midiDrum);
-            }
-            return this.player.presetReady(this.midiDrum);
+        }
+        let nn = parseInt(parameters);
+        if (this.midiDrum == nn) {
+        }
+        else {
+            this.midiDrum = nn;
+            this.player.startLoadPreset(this.midiDrum);
+        }
+    }
+    busy() {
+        if (this.player.presetReady(this.midiDrum)) {
+            return null;
+        }
+        else {
+            return 'wave ' + this.midiDrum + ' isn\'t ready';
         }
     }
     schedule(when, pitch, slides) {

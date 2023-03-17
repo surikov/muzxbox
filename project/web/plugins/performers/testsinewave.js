@@ -75,7 +75,7 @@ class SimpleSinePerformer {
     constructor() {
         this.type = 'sine';
     }
-    reset(context, parameters) {
+    launch(context, parameters) {
         if (this.player) {
         }
         else {
@@ -91,7 +91,9 @@ class SimpleSinePerformer {
             this.type = 'sawtooth';
         if (parameters == 'triangle')
             this.type = 'triangle';
-        return true;
+    }
+    busy() {
+        return null;
     }
     schedule(when, pitch, slides) {
         this.player.send(when, pitch, slides, this.out, this.type);

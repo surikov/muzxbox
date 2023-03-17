@@ -75,7 +75,7 @@ class SimpleSinePerformer implements MZXBX_AudioPerformerPlugin {
     out: GainNode;
     type: OscillatorType = 'sine';
     player: DefaultBaseOscillatorPlayer;
-    reset(context: AudioContext, parameters: string): boolean {
+    launch(context: AudioContext, parameters: string): void {
         if (this.player) {
             //
         } else {
@@ -88,8 +88,11 @@ class SimpleSinePerformer implements MZXBX_AudioPerformerPlugin {
 		if (parameters == 'sawtooth') this.type = 'sawtooth';
 		if (parameters == 'triangle') this.type = 'triangle';
 		//console.log('reset SimpleSinePerformer',this);
-        return true;
+        //return true;
     }
+	busy():null|string{
+		return null;
+	}
     schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void {
         this.player.send(when, pitch, slides, this.out, this.type);
     }

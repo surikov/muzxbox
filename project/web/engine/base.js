@@ -195,7 +195,7 @@ class MuzXbox {
                 for (let ii = 0; ii < testSchedule.series.length; ii++) {
                     duration = duration + testSchedule.series[ii].duration;
                 }
-                this.player.start(0, 0, duration);
+                this.player.startLoop(0, 0, duration);
             });
         }
     }
@@ -247,101 +247,116 @@ class SchedulePlayer {
             pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers, onDone);
         }
     }
-    resetCollectedPlugins() {
-        let ready = true;
+    launchCollectedPlugins() {
         for (let ff = 0; ff < this.filters.length; ff++) {
             let plugin = this.filters[ff].plugin;
             if (plugin) {
-                console.log('reset', this.filters[ff].id, this.filters[ff].kind, this.filters[ff].properties);
-                if (!plugin.reset(this.audioContext, this.filters[ff].properties)) {
-                    console.log('filter ' + this.filters[ff].id + ' is not ready for reset');
-                    ready = false;
+                if (!this.filters[ff].launched) {
+                    plugin.launch(this.audioContext, this.filters[ff].properties);
+                    this.filters[ff].launched = true;
                 }
-            }
-            else {
-                console.log('empty filter ', this.filters[ff]);
-                return false;
             }
         }
         for (let pp = 0; pp < this.performers.length; pp++) {
             let plugin = this.performers[pp].plugin;
             if (plugin) {
-                console.log('reset', this.performers[pp].id, this.performers[pp].kind, this.performers[pp].properties);
-                if (!plugin.reset(this.audioContext, this.performers[pp].properties)) {
-                    console.log('performer ' + this.performers[pp].id + ' is not ready for reset');
-                    ready = false;
+                if (!this.performers[pp].launched) {
+                    plugin.launch(this.audioContext, this.performers[pp].properties);
+                    this.performers[pp].launched = true;
+                }
+            }
+        }
+        return null;
+    }
+    checkCollectedPlugins() {
+        for (let ff = 0; ff < this.filters.length; ff++) {
+            let plugin = this.filters[ff].plugin;
+            if (plugin) {
+                if (plugin.busy()) {
+                    return 'filter ' + this.filters[ff].id + ' ' + plugin.busy();
                 }
             }
             else {
-                console.log('empty performer ', this.performers[pp]);
-                return false;
+                return 'empty plugin for filter ' + this.filters[ff].id;
             }
         }
-        return ready;
+        for (let pp = 0; pp < this.performers.length; pp++) {
+            let plugin = this.performers[pp].plugin;
+            if (plugin) {
+                if (plugin.busy()) {
+                    return 'performer ' + this.performers[pp].id + ' ' + plugin.busy();
+                }
+            }
+            else {
+                return 'empty performer ' + this.performers[pp];
+            }
+        }
+        return null;
     }
-    start(loopStart, currentPosition, loopEnd) {
+    startLoop(loopStart, currentPosition, loopEnd) {
         console.log('start', loopStart, currentPosition, loopEnd);
-        if (this.connect()) {
+        let msg = this.connect();
+        if (msg) {
+            console.log('Can\'t start loop:', msg);
+        }
+        else {
             this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
             this.position = currentPosition;
             this.onAir = true;
             this.tick(loopStart, loopEnd);
-            return true;
-        }
-        else {
-            return false;
         }
     }
     connect() {
         console.log('connect');
-        if (this.resetCollectedPlugins()) {
-            if (this.schedule) {
-                let toNode = this.audioContext.destination;
-                for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
-                    let filter = this.schedule.filters[ff];
-                    let plugin = this.findFilterPlugin(filter.id);
-                    if (plugin) {
-                        let output = plugin.output();
-                        if (output) {
-                            output.connect(toNode);
-                            let input = plugin.input();
-                            if (input) {
-                                toNode = input;
-                            }
-                        }
-                    }
-                }
-                for (let cc = 0; cc < this.schedule.channels.length; cc++) {
-                    let channel = this.schedule.channels[cc];
-                    let channelOutput = toNode;
-                    for (let ff = channel.filters.length - 1; ff >= 0; ff--) {
-                        let filter = channel.filters[ff];
-                        let plugin = this.findFilterPlugin(filter.id);
-                        if (plugin) {
-                            let output = plugin.output();
-                            if (output) {
-                                output.connect(channelOutput);
-                                let input = plugin.input();
-                                if (input) {
-                                    channelOutput = input;
-                                }
-                            }
-                        }
-                    }
-                    let plugin = this.findPerformerPlugin(channel.id);
-                    if (plugin) {
-                        let output = plugin.output();
-                        if (output) {
-                            output.connect(channelOutput);
+        let msg = this.launchCollectedPlugins();
+        if (msg)
+            return msg;
+        msg = this.checkCollectedPlugins();
+        if (msg)
+            return msg;
+        if (this.schedule) {
+            let toNode = this.audioContext.destination;
+            for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
+                let filter = this.schedule.filters[ff];
+                let plugin = this.findFilterPlugin(filter.id);
+                if (plugin) {
+                    let output = plugin.output();
+                    if (output) {
+                        output.connect(toNode);
+                        let input = plugin.input();
+                        if (input) {
+                            toNode = input;
                         }
                     }
                 }
             }
-            return true;
+            for (let cc = 0; cc < this.schedule.channels.length; cc++) {
+                let channel = this.schedule.channels[cc];
+                let channelOutput = toNode;
+                for (let ff = channel.filters.length - 1; ff >= 0; ff--) {
+                    let filter = channel.filters[ff];
+                    let plugin = this.findFilterPlugin(filter.id);
+                    if (plugin) {
+                        let output = plugin.output();
+                        if (output) {
+                            output.connect(channelOutput);
+                            let input = plugin.input();
+                            if (input) {
+                                channelOutput = input;
+                            }
+                        }
+                    }
+                }
+                let plugin = this.findPerformerPlugin(channel.id);
+                if (plugin) {
+                    let output = plugin.output();
+                    if (output) {
+                        output.connect(channelOutput);
+                    }
+                }
+            }
         }
-        else {
-            return false;
-        }
+        return null;
     }
     disconnect() {
         console.log('disconnect');
@@ -565,7 +580,7 @@ class PluginLoader {
                 return;
             }
         }
-        filters.push({ plugin: null, id: id, kind: kind, properties: properties });
+        filters.push({ plugin: null, id: id, kind: kind, properties: properties, launched: false });
     }
     сollectPerformerPlugin(id, kind, properties, performers) {
         for (let ii = 0; ii < performers.length; ii++) {
@@ -573,7 +588,7 @@ class PluginLoader {
                 return;
             }
         }
-        performers.push({ plugin: null, id: id, kind: kind, properties: properties });
+        performers.push({ plugin: null, id: id, kind: kind, properties: properties, launched: false });
     }
     findPluginInfo(kind) {
         for (let ll = 0; ll < pluginListKindUrlName.length; ll++) {

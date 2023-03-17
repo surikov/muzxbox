@@ -168,7 +168,8 @@ declare type MZXBX_ChannelFilter = {
     properties: string;
 };
 declare type MZXBX_AudioFilterPlugin = {
-    reset: (context: AudioContext, parameters: string) => boolean;
+    launch: (context: AudioContext, parameters: string) => void;
+    busy: () => null | string;
     schedule: (when: number, parameters: string) => void;
     input: () => AudioNode | null;
     output: () => AudioNode | null;
@@ -179,7 +180,8 @@ declare type MZXBX_ChannelPerformer = {
     properties: string;
 };
 declare type MZXBX_AudioPerformerPlugin = {
-    reset: (context: AudioContext, parameters: string) => boolean;
+    launch: (context: AudioContext, parameters: string) => void;
+    busy: () => null | string;
     schedule: (when: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
@@ -191,7 +193,7 @@ declare type MZXBX_Schedule = {
 };
 declare type MZXBX_Player = {
     setup: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;
-    start: (from: number, position: number, to: number) => boolean;
+    startLoop: (from: number, position: number, to: number) => void;
     cancel: () => void;
     position: number;
 };
@@ -221,12 +223,14 @@ declare type FilterHolder = {
     id: string;
     kind: string;
     properties: string;
+    launched: boolean;
 };
 declare type PerformerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | null;
     id: string;
     kind: string;
     properties: string;
+    launched: boolean;
 };
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function MZXBX_appendScriptURL(url: string): boolean;
@@ -239,6 +243,7 @@ declare class SchedulePlayer implements MZXBX_Player {
         id: string;
         kind: string;
         properties: string;
+        launched: boolean;
     }[];
     filters: FilterHolder[];
     pluginsList: PerformerHolder[];
@@ -246,9 +251,10 @@ declare class SchedulePlayer implements MZXBX_Player {
     tickDuration: number;
     onAir: boolean;
     setup(context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void): void;
-    resetCollectedPlugins(): boolean;
-    start(loopStart: number, currentPosition: number, loopEnd: number): boolean;
-    connect(): boolean;
+    launchCollectedPlugins(): null | string;
+    checkCollectedPlugins(): null | string;
+    startLoop(loopStart: number, currentPosition: number, loopEnd: number): void;
+    connect(): string | null;
     disconnect(): void;
     tick(loopStart: number, loopEnd: number): void;
     findPerformerPlugin(channelId: string): MZXBX_AudioPerformerPlugin | null;
