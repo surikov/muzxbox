@@ -148,6 +148,28 @@ class MuzXbox {
         else {
             console.log("start initFromUI");
             this.initAudioContext();
+            let filesinput = document.getElementById('filesinput');
+            if (filesinput) {
+                let listener = function () {
+                    console.log('event', event);
+                    var file = event.target.files[0];
+                    console.log(file);
+                    var fileReader = new FileReader();
+                    fileReader.onload = function (progressEvent) {
+                        console.log('progressEvent', progressEvent);
+                        if (progressEvent != null) {
+                            var arrayBuffer = progressEvent.target.result;
+                            console.log(arrayBuffer);
+                            var midiParser = new MidiParser(arrayBuffer);
+                            let data = midiParser.dump();
+                            console.log(data);
+                        }
+                    };
+                    fileReader.readAsArrayBuffer(file);
+                };
+                filesinput.addEventListener('change', listener, false);
+            }
+            console.log('filesinput', filesinput);
         }
     }
     initAudioContext() {
@@ -1286,18 +1308,18 @@ class MidiParser {
                         var signature = 'C';
                         if (this.header.keyFlatSharp >= 0) {
                             if (this.header.keyMajMin < 1) {
-                                signature = majSharpCircleOfFifths[this.header.keyFlatSharp];
+                                signature = majSharpCircleOfFifths[Math.abs(this.header.keyFlatSharp)];
                             }
                             else {
-                                signature = minSharpCircleOfFifths[this.header.keyFlatSharp];
+                                signature = minSharpCircleOfFifths[Math.abs(this.header.keyFlatSharp)];
                             }
                         }
                         else {
                             if (this.header.keyMajMin < 1) {
-                                signature = majFlatCircleOfFifths[this.header.keyFlatSharp];
+                                signature = majFlatCircleOfFifths[Math.abs(this.header.keyFlatSharp)];
                             }
                             else {
-                                signature = minFlatCircleOfFifths[this.header.keyFlatSharp];
+                                signature = minFlatCircleOfFifths[Math.abs(this.header.keyFlatSharp)];
                             }
                         }
                         this.header.signs.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, sign: signature });

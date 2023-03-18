@@ -17,6 +17,30 @@ class MuzXbox {
         } else {
             console.log("start initFromUI");
             this.initAudioContext();
+            let filesinput: HTMLElement | null = document.getElementById('filesinput');
+            if (filesinput) {
+                let listener: (this: HTMLElement, event: HTMLElementEventMap['change']) => any = function () {
+                    console.log('event',event);
+                    var file = (event as any).target.files[0];
+                    console.log(file);
+                    var fileReader = new FileReader();
+                    fileReader.onload = function (progressEvent:any) {
+                        console.log('progressEvent',progressEvent);
+                        if(progressEvent!=null){
+                        var arrayBuffer = progressEvent.target.result;
+                        console.log(arrayBuffer);
+                        var midiParser = new MidiParser(arrayBuffer);
+                        let data=midiParser.dump();
+                        console.log(data);
+                        //var song = midiFile.parseSong();
+                        //startLoad(song);
+                    }
+                    };
+                    fileReader.readAsArrayBuffer(file);
+                };
+                filesinput.addEventListener('change', listener, false);
+            }
+            console.log('filesinput',filesinput);
         }
     }
     initAudioContext() {
@@ -30,15 +54,15 @@ class MuzXbox {
         }
     }
     resumeContext(audioContext: AudioContext) {
-		try {
-			if (audioContext.state == 'suspended') {
-				console.log('audioContext.resume', audioContext);
-				audioContext.resume();
-			}
-		} catch (e) {
-			//don't care
-		}
-	}
+        try {
+            if (audioContext.state == 'suspended') {
+                console.log('audioContext.resume', audioContext);
+                audioContext.resume();
+            }
+        } catch (e) {
+            //don't care
+        }
+    }
     startTest() {
         console.log('start test');//,testSchedule);
 		/*let url='./sabvaebv/vvv.f';
@@ -50,6 +74,7 @@ class MuzXbox {
             //
         } else {
             this.player = new SchedulePlayer();
+            
         }
         if (!this.setupDone) {
             let me = this;
@@ -61,14 +86,14 @@ class MuzXbox {
         if (this.player.onAir) {
             this.player.onAir = false;
         } else {
-			MZXBX_waitForCondition(500, () => this.setupDone, () => {
-				console.log('loaded', this.player.filters, this.player.performers);
-				let duration = 0;
-				for (let ii = 0; ii < testSchedule.series.length; ii++) {
-					duration = duration + testSchedule.series[ii].duration;
-				}
-				this.player.startLoop(0, 0, duration);
-			});
+            MZXBX_waitForCondition(500, () => this.setupDone, () => {
+                console.log('loaded', this.player.filters, this.player.performers);
+                let duration = 0;
+                for (let ii = 0; ii < testSchedule.series.length; ii++) {
+                    duration = duration + testSchedule.series[ii].duration;
+                }
+                this.player.startLoop(0, 0, duration);
+            });
         }
         //player.filters.push({ plugin: null, id: 'test111', kind: 'volume_filter_1_test' });
         //player.filters.push({ plugin: null, id: 'test22', kind: 'volume_filter_1_test' });

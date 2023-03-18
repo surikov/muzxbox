@@ -773,26 +773,33 @@ class MidiParser {
                         this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text ? evnt.text : "?" });
                     }
                     if (evnt.subtype == this.EVENT_META_KEY_SIGNATURE) {
+                        
                         var majSharpCircleOfFifths: string[] = ['C', 'G', 'D', 'A', 'E', 'B', 'F#'];
                         var majFlatCircleOfFifths: string[] = ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'];
                         var minSharpCircleOfFifths: string[] = ['Am', 'Em', 'Bm', 'F#m', 'C#m', 'G#m', 'D#'];
                         var minFlatCircleOfFifths: string[] = ['Am', 'Dm', 'Gm', 'Cm', 'Fm', 'Bbm', 'Ebm'];
+                        
                         var key: number = evnt.key ? evnt.key : 0;
+                        
                         if (key > 127) key = key - 256;
+                        
                         this.header.keyFlatSharp = key;//+sharp-flat
                         this.header.keyMajMin = evnt.scale ? evnt.scale : 0;//0-maj, 1 min
+
+                        //console.log('EVENT_META_KEY_SIGNATURE',this.header.keyFlatSharp,this.header.keyMajMin);
+
                         var signature = 'C';
                         if (this.header.keyFlatSharp >= 0) {
                             if (this.header.keyMajMin < 1) {
-                                signature = majSharpCircleOfFifths[this.header.keyFlatSharp];
+                                signature = majSharpCircleOfFifths[Math.abs(this.header.keyFlatSharp)];
                             } else {
-                                signature = minSharpCircleOfFifths[this.header.keyFlatSharp];
+                                signature = minSharpCircleOfFifths[Math.abs(this.header.keyFlatSharp)];
                             }
                         } else {
                             if (this.header.keyMajMin < 1) {
-                                signature = majFlatCircleOfFifths[this.header.keyFlatSharp];
+                                signature = majFlatCircleOfFifths[Math.abs(this.header.keyFlatSharp)];
                             } else {
-                                signature = minFlatCircleOfFifths[this.header.keyFlatSharp];
+                                signature = minFlatCircleOfFifths[Math.abs(this.header.keyFlatSharp)];
                             }
                         }
                         this.header.signs.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, sign: signature });

@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.61 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.62 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -346,13 +346,13 @@ function dumpRowFills(inrows) {
         dumpRowFillsColor(sliceRows(inrows, 2, 100+2), '#cccc0066',0.1);
         dumpRowFillsColor(sliceRows(inrows, 1, 100 + 1), '#66cc0099', -0.1);
     }*/
-    if (highLightMode == 0) {
+    if (highLightMode == 1) {
         dumpRowFillsColor(inrows, '#009900cc', 0);
-        dumpRowWaitColor(inrows, '#00009933', 0);
+        dumpRowWaitColor(inrows, '#00000033', 0);
     }
     else {
         dumpRowWaitColor(inrows, '#009900cc', 0);
-        dumpRowFillsColor(inrows, '#00009933', 0);
+        dumpRowFillsColor(inrows, '#00000033', 0);
     }
 }
 function dumpRowWaitColor(rows, color, shiftX) {
@@ -379,9 +379,9 @@ function dumpRowWaitColor(rows, color, shiftX) {
             min = arr[bb].summ;
     }
     var hr = (mx - min) / (topShift / cellSize - 2);
-    var prehh = (arr[rowLen - 1].summ - min) / hr;
+    var prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
     for (var bb = 0; bb < rowLen; bb++) {
-        var hh = (arr[bb].summ - min) / hr;
+        var hh = (mx - min - (arr[bb].summ - min)) / hr;
         markLines.push({ fromX: bb + shiftX - 1,
             fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
             toX: bb + shiftX,
@@ -448,20 +448,6 @@ function dumpRowFillsColor(inrows, color, shiftX) {
             color: color, manual: false
         });
         prehh = hh;
-        /*markLines.push({
-            fromX: bb + shiftX
-            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - 0 - 2
-            , toX: bb + shiftX
-            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
-            , color: color
-        });
-        markLines.push({
-            fromX: bb + rowLen + shiftX
-            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - 0 - 2
-            , toX: bb + rowLen + shiftX
-            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
-            , color: color
-        });*/
     }
     reduceRatio = oldReduceRatio;
     //console.log(reduceRatio,arr[0]);
