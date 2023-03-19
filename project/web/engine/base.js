@@ -1484,7 +1484,7 @@ class MidiParser {
             track.trackevents.push(e);
         }
     }
-    findOrCreateTrack(trackNum, channelNum, trackChannel) {
+    findOrCreateTrack(parsedtrack, trackNum, channelNum, trackChannel) {
         for (let i = 0; i < trackChannel.length; i++) {
             if (trackChannel[i].trackNum == trackNum && trackChannel[i].channelNum == channelNum) {
                 return trackChannel[i];
@@ -1493,10 +1493,10 @@ class MidiParser {
         let it = {
             trackNum: trackNum, channelNum: channelNum, track: {
                 order: 0,
-                title: 'unknown',
-                instrument: '0',
-                volumes: [],
-                program: 0,
+                title: parsedtrack.title,
+                channelNum: channelNum,
+                trackVolumes: parsedtrack.volumes,
+                program: -1,
                 songchords: []
             }
         };
@@ -1504,6 +1504,7 @@ class MidiParser {
         return it;
     }
     dump() {
+        console.log(this);
         let midiSongData = {
             parser: '1.01',
             duration: 0,
@@ -1523,7 +1524,7 @@ class MidiParser {
         for (let i = 0; i < this.parsedTracks.length; i++) {
             let parsedtrack = this.parsedTracks[i];
             for (let k = 0; k < parsedtrack.programChannel.length; k++) {
-                this.findOrCreateTrack(i, parsedtrack.programChannel[k].channel, trackChannel);
+                this.findOrCreateTrack(parsedtrack, i, parsedtrack.programChannel[k].channel, trackChannel);
             }
         }
         var maxWhen = 0;
@@ -1546,14 +1547,11 @@ class MidiParser {
                         newnote.points.push(newpoint);
                     }
                 }
-                let chanTrack = this.findOrCreateTrack(i, newchord.channel, trackChannel);
+                let chanTrack = this.findOrCreateTrack(miditrack, i, newchord.channel, trackChannel);
                 chanTrack.track.songchords.push(newchord);
             }
             for (let i = 0; i < trackChannel.length; i++) {
                 if (trackChannel[i].trackNum == i) {
-                    trackChannel[i].track.title = miditrack.title ? miditrack.title : '';
-                    trackChannel[i].track.volumes = miditrack.volumes;
-                    trackChannel[i].track.instrument = miditrack.instrument ? miditrack.instrument : '';
                 }
             }
         }

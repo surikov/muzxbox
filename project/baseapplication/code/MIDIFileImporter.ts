@@ -70,9 +70,10 @@ type MIDISongChord = {
 };
 type MIDISongTrack = {
     title: string;
-    instrument: string;
+    //instrument: string;
+    channelNum:number;
     program: number;
-    volumes: { ms: number, value: number, meausre?: number, skip384?: number }[];
+    trackVolumes: { ms: number, value: number, meausre?: number, skip384?: number }[];
     songchords: MIDISongChord[];
     order: number;
 };
@@ -748,6 +749,7 @@ class MidiParser {
                                     if (evnt.subtype == this.EVENT_MIDI_CONTROLLER && evnt.param1 == 7) {
                                         var v = evnt.param2 ? evnt.param2 / 127 : 0;
                                         singleParsedTrack.volumes.push({ ms: evnt.playTimeMs, value: v });
+                                        //console.log('volumes',evnt.playTimeMs,v,singleParsedTrack);
                                     } else {
                                         //
                                     }
@@ -968,7 +970,8 @@ class MidiParser {
 
 
 
-    findOrCreateTrack(trackNum: number, channelNum: number, trackChannel: { trackNum: number, channelNum: number, track: MIDISongTrack }[]): { trackNum: number, channelNum: number, track: MIDISongTrack } {
+    findOrCreateTrack(parsedtrack: MIDIFileTrack,trackNum: number, channelNum: number, trackChannel: { trackNum: number, channelNum: number, track: MIDISongTrack }[])
+    : { trackNum: number, channelNum: number, track: MIDISongTrack } {
         for (let i = 0; i < trackChannel.length; i++) {
             if (trackChannel[i].trackNum == trackNum && trackChannel[i].channelNum == channelNum) {
                 return trackChannel[i];
@@ -977,17 +980,20 @@ class MidiParser {
         let it: { trackNum: number, channelNum: number, track: MIDISongTrack } = {
             trackNum: trackNum, channelNum: channelNum, track: {
                 order: 0
-                , title: 'unknown'
-                , instrument: '0'
-                , volumes: []
-                , program: 0
+                , title: parsedtrack.title
+                //, instrument: '0'
+                ,channelNum:channelNum
+                , trackVolumes: parsedtrack.volumes
+                , program: -1
                 , songchords: []
             }
         };
         trackChannel.push(it);
+        //console.log('create',it,'from',parsedtrack);
         return it;
     }
     dump(): MIDISongData {
+        console.log(this);
         let midiSongData: MIDISongData = {
             parser: '1.01'
             , duration: 0
@@ -1007,7 +1013,7 @@ class MidiParser {
         for (let i = 0; i < this.parsedTracks.length; i++) {
             let parsedtrack: MIDIFileTrack = this.parsedTracks[i];
             for (let k = 0; k < parsedtrack.programChannel.length; k++) {
-                this.findOrCreateTrack(i, parsedtrack.programChannel[k].channel, trackChannel);
+                this.findOrCreateTrack(parsedtrack,i, parsedtrack.programChannel[k].channel, trackChannel);
             }
 
         }
@@ -1031,14 +1037,14 @@ class MidiParser {
                         newnote.points.push(newpoint);
                     }
                 }
-                let chanTrack = this.findOrCreateTrack(i, newchord.channel, trackChannel);
+                let chanTrack = this.findOrCreateTrack(miditrack,i, newchord.channel, trackChannel);
                 chanTrack.track.songchords.push(newchord);
             }
             for (let i = 0; i < trackChannel.length; i++) {
                 if (trackChannel[i].trackNum == i) {
-                    trackChannel[i].track.title = miditrack.title ? miditrack.title : '';
-                    trackChannel[i].track.volumes = miditrack.volumes;
-                    trackChannel[i].track.instrument = miditrack.instrument ? miditrack.instrument : ''
+                    //trackChannel[i].track.title = miditrack.title ? miditrack.title : '';
+                    //trackChannel[i].track.volumes = miditrack.volumes;
+                    //trackChannel[i].track.instrument = miditrack.instrument ? miditrack.instrument : ''
                 }
             }
         }

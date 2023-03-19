@@ -354,9 +354,9 @@ declare type MIDISongChord = {
 };
 declare type MIDISongTrack = {
     title: string;
-    instrument: string;
+    channelNum: number;
     program: number;
-    volumes: {
+    trackVolumes: {
         ms: number;
         value: number;
         meausre?: number;
@@ -530,7 +530,7 @@ declare class MidiParser {
     parseNotes(): void;
     nextEvent(stream: DataViewStream): MIDIEvent;
     parseTrackEvents(track: MIDIFileTrack): void;
-    findOrCreateTrack(trackNum: number, channelNum: number, trackChannel: {
+    findOrCreateTrack(parsedtrack: MIDIFileTrack, trackNum: number, channelNum: number, trackChannel: {
         trackNum: number;
         channelNum: number;
         track: MIDISongTrack;
