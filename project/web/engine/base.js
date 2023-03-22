@@ -1572,6 +1572,51 @@ class MidiParser {
                 }
             }
         }
+        let schedule = {
+            series: [],
+            channels: [],
+            filters: []
+        };
+        for (let mt = 0; mt < midiSongData.miditracks.length; mt++) {
+            let miditrack = midiSongData.miditracks[mt];
+            let channel = {
+                id: 'channel' + mt,
+                comment: miditrack.title,
+                filters: [],
+                performer: {
+                    id: 'channel' + mt + 'performer',
+                    kind: '',
+                    properties: ''
+                }
+            };
+            for (let ch = 0; ch < miditrack.songchords.length; ch++) {
+                let chord = miditrack.songchords[ch];
+                for (let nn = 0; nn < chord.notes.length; nn++) {
+                    let note = chord.notes[nn];
+                    let timeIndex = Math.floor(chord.when / 1000.0);
+                    let item = {
+                        skip: (Math.round(chord.when) % 1000.0) / 1000.0,
+                        channelId: channel.id,
+                        pitch: note.points[0].pitch,
+                        slides: []
+                    };
+                    for (let pp = 0; pp < note.points.length; pp++) {
+                        item.slides.push({
+                            duration: note.points[pp].durationms / 1000,
+                            delta: note.points[pp].pitch - item.pitch
+                        });
+                    }
+                    for (let ii = 0; ii <= timeIndex; ii++) {
+                        if (!(schedule.series[timeIndex])) {
+                            schedule.series[timeIndex] = { duration: 1, items: [], states: [] };
+                        }
+                    }
+                    schedule.series[timeIndex].items.push(item);
+                }
+            }
+            schedule.channels.push(channel);
+        }
+        console.log('schedule', schedule);
         return midiSongData;
     }
 }

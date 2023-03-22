@@ -131,6 +131,7 @@ type MZXBX_Project = {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 type MZXBX_Channel = {
     id: string;
+	comment?: string;
     filters: MZXBX_ChannelFilter[];
     performer: MZXBX_ChannelPerformer;
 };

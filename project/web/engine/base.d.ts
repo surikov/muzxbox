@@ -139,6 +139,7 @@ declare type MZXBX_Project = {
 };
 declare type MZXBX_Channel = {
     id: string;
+    comment?: string;
     filters: MZXBX_ChannelFilter[];
     performer: MZXBX_ChannelPerformer;
 };
