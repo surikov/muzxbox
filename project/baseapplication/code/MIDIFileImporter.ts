@@ -992,7 +992,7 @@ class MidiParser {
 		//console.log('create',it,'from',parsedtrack);
 		return it;
 	}
-	dump(): MIDISongData {
+	dump(): MZXBX_Schedule {
 		console.log(this);
 		let midiSongData: MIDISongData = {
 			parser: '1.01'
@@ -1065,6 +1065,7 @@ class MidiParser {
 				}
 			}
 		}
+		console.log('midiSongData', midiSongData);
 		let schedule: MZXBX_Schedule = {
 			series: []
 			, channels: []
@@ -1072,32 +1073,53 @@ class MidiParser {
 		};
 		for (let mt = 0; mt < midiSongData.miditracks.length; mt++) {
 			let miditrack = midiSongData.miditracks[mt];
-			let channel: MZXBX_Channel = {
+			let midinum = 1 + Math.round(miditrack.program);
+			if (midinum < 1) midinum = 1;
+			if (midinum > 128) midinum = 128;
+			//let set: MZXBX_Channel[] = [];
+			/*let channel: MZXBX_Channel = {
 				id: 'channel' + mt// + ': ' + miditrack.title
 				, comment: miditrack.title
 				, filters: []
 				, performer: {
 					id: 'channel' + mt + 'performer'
-					, kind: ''
-					, properties: ''
+					, kind: 'waf_performer_1_test'
+					, properties: ''+midinum
 				}
 			};
+			if(mt==9){
+				channel.performer.kind='drums_performer_1_test';
+			}*/
 			for (let ch = 0; ch < miditrack.songchords.length; ch++) {
 				let chord = miditrack.songchords[ch];
 				for (let nn = 0; nn < chord.notes.length; nn++) {
 					let note = chord.notes[nn];
 					let timeIndex = Math.floor(chord.when / 1000.0);
+					let channelId: string = 'channel' + mt;
+					if (miditrack.channelNum == 9) {
+						channelId = 'channel' + mt + '.' + note.points[0].pitch;
+					}
 					let item: MZXBX_PlayItem = {
-						skip: (Math.round(chord.when)%1000.0)/1000.0
-						, channelId: channel.id
+						skip: (Math.round(chord.when) % 1000.0) / 1000.0
+						, channelId: channelId//channel.id
 						, pitch: note.points[0].pitch
 						, slides: []
 					};
-					for (let pp = 0; pp < note.points.length; pp++) {
-						item.slides.push({
-							duration: note.points[pp].durationms / 1000
-							, delta: note.points[pp].pitch - item.pitch
-						});
+					item.slides.push({ duration: note.points[0].durationms / 1000, delta: 0 });
+					if (miditrack.channelNum == 9) {
+						//item.slides.push({ duration: note.points[0].durationms / 1000, delta: 0 });
+					} else {
+						if (note.points.length > 1) {
+							for (let pp = 1; pp < note.points.length; pp++) {
+								item.slides.push({
+									duration: note.points[pp ].durationms / 1000
+									, delta: note.points[pp].pitch - item.pitch
+								});
+							}
+							console.log(note, item);
+						} /*else {
+							item.slides.push({ duration: note.points[0].durationms / 1000, delta: 0 });
+						}*/
 					}
 					/*if (note.points.length > 1) {
 						console.log(note);
@@ -1106,18 +1128,41 @@ class MidiParser {
 						item.slides.push({ duration: note.points[0].durationms / 1000, delta: 0 });
 					}*/
 					for (let ii = 0; ii <= timeIndex; ii++) {
-						if (!(schedule.series[timeIndex])) {
-							schedule.series[timeIndex] = { duration: 1, items: [], states: [] };
+						if (!(schedule.series[ii])) {
+							schedule.series[ii] = { duration: 1, items: [], states: [] };
 						}
 					}
 					schedule.series[timeIndex].items.push(item);
+					let exsts = false;
+					for (let ch = 0; ch < schedule.channels.length; ch++) {
+						if (schedule.channels[ch].id == channelId) {
+							exsts = true;
+							break;
+						}
+					}
+					if (!exsts) {
+						if (miditrack.channelNum == 9) {
+							let drumNum = note.points[0].pitch;
+							if (drumNum < 35) drumNum = 35;
+							if (drumNum > 81) drumNum = 81;
+							schedule.channels.push({
+								id: channelId, comment: miditrack.title, filters: []
+								, performer: { id: 'channel' + mt + '.' + drumNum + 'performer', kind: 'drums_performer_1_test', properties: '' + drumNum }
+							});
+						} else {
+							schedule.channels.push({
+								id: channelId, comment: miditrack.title, filters: []
+								, performer: { id: 'channel' + mt + 'performer', kind: 'waf_performer_1_test', properties: '' + midinum }
+							});
+						}
+					}
 				}
 			}
 
-			schedule.channels.push(channel);
+			//schedule.channels.push(channel);
 		}
-		console.log('schedule', schedule);
-		return midiSongData;
+		//console.log('schedule', schedule);
+		return schedule;//midiSongData;
 	}
 }
 

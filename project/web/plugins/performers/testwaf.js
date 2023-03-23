@@ -361,11 +361,11 @@ class PublicWAFMIDITonePerformerPlayer {
             if (startWhen < this.audioContext.currentTime) {
                 startWhen = this.audioContext.currentTime;
             }
-            let duration = 0;
+            let noteDuration = 0;
             for (let i = 0; i < slides.length; i++) {
-                duration = duration + slides[i].duration;
+                noteDuration = noteDuration + slides[i].duration;
             }
-            var waveDuration = duration + this.afterTime;
+            var waveDuration = noteDuration + this.afterTime;
             var loop = true;
             if (zone.loopStart < 1 || zone.loopStart >= zone.loopEnd) {
                 loop = false;
@@ -376,16 +376,15 @@ class PublicWAFMIDITonePerformerPlayer {
                 }
             }
             var envelope = this.findEnvelope(this.audioContext, out);
-            this.setupEnvelope(this.audioContext, envelope, zone, volume, startWhen, waveDuration, duration);
+            this.setupEnvelope(this.audioContext, envelope, zone, volume, startWhen, waveDuration, noteDuration);
             envelope.audioBufferSourceNode = this.audioContext.createBufferSource();
             envelope.audioBufferSourceNode.playbackRate.setValueAtTime(playbackRate, 0);
-            if (slides.length > 1) {
-                for (var i = 0; i < slides.length; i++) {
-                    var nextPitch = pitch + slides[i].delta;
-                    var newPlaybackRate = 1.0 * Math.pow(2, (100.0 * nextPitch - baseDetune) / 1200.0);
-                    var newWhen = when + slides[i].duration;
-                    envelope.audioBufferSourceNode.playbackRate.linearRampToValueAtTime(newPlaybackRate, newWhen);
-                }
+            var newWhen = startWhen;
+            for (var ii = 0; ii < slides.length; ii++) {
+                var nextPitch = pitch + slides[ii].delta;
+                var newPlaybackRate = 1.0 * Math.pow(2, (100.0 * nextPitch - baseDetune) / 1200.0);
+                var newWhen = newWhen + slides[ii].duration;
+                envelope.audioBufferSourceNode.playbackRate.linearRampToValueAtTime(newPlaybackRate, newWhen);
             }
             envelope.audioBufferSourceNode.buffer = zone.buffer;
             if (loop) {

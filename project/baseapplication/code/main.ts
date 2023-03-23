@@ -30,10 +30,9 @@ class MuzXbox {
                         var arrayBuffer = progressEvent.target.result;
                         console.log(arrayBuffer);
                         var midiParser = new MidiParser(arrayBuffer);
-                        let data=midiParser.dump();
-                        console.log(data);
-                        //var song = midiFile.parseSong();
-                        //startLoad(song);
+						testSchedule=midiParser.dump();
+                        console.log(testSchedule);
+                        
                     }
                     };
                     fileReader.readAsArrayBuffer(file);
@@ -90,6 +89,7 @@ class MuzXbox {
                 console.log('loaded', this.player.filters, this.player.performers);
                 let duration = 0;
                 for (let ii = 0; ii < testSchedule.series.length; ii++) {
+					//console.log(ii,testSchedule.series[ii]);
                     duration = duration + testSchedule.series[ii].duration;
                 }
                 this.player.startLoop(0, 0, duration);

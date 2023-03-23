@@ -19,25 +19,23 @@ class DefaultBaseOscillatorPlayer {
         it.oscillatorNode.type = type;
         it.oscillatorNode.frequency.setValueAtTime(this.freq(pitch), when - this.preRamp);
         let duration = 0;
-        for (let i = 1; i < slides.length; i++) {
+        for (let i = 0; i < slides.length; i++) {
             duration = duration + slides[i].duration;
         }
         let nextPointSeconds = when + slides[0].duration;
-        if (slides.length > 0) {
-            for (let i = 1; i < slides.length; i++) {
-                it.oscillatorNode.frequency.linearRampToValueAtTime(this.freq(slides[i].delta + pitch), nextPointSeconds);
-                nextPointSeconds = nextPointSeconds + slides[i].duration;
-            }
+        for (let i = 0; i < slides.length; i++) {
+            it.oscillatorNode.frequency.linearRampToValueAtTime(this.freq(slides[i].delta + pitch), nextPointSeconds);
+            nextPointSeconds = nextPointSeconds + slides[i].duration;
         }
         it.oscillatorNode.connect(it.gainNode);
         it.oscillatorNode.start(when - this.preRamp);
-        it.oscillatorNode.stop(nextPointSeconds + this.afterRamp);
+        it.oscillatorNode.stop(when + duration + this.afterRamp);
         it.gainNode.gain.cancelScheduledValues(when - this.preRamp);
         it.gainNode.gain.exponentialRampToValueAtTime(this.rampZero, when - this.preRamp);
         it.gainNode.gain.exponentialRampToValueAtTime(volume * this.velocityRatio, when);
-        it.gainNode.gain.exponentialRampToValueAtTime(volume * this.velocityRatio, nextPointSeconds);
-        it.gainNode.gain.exponentialRampToValueAtTime(this.rampZero, nextPointSeconds + this.afterRamp);
-        it.end = nextPointSeconds + this.preRamp + this.afterRamp;
+        it.gainNode.gain.exponentialRampToValueAtTime(volume * this.velocityRatio, when + duration);
+        it.gainNode.gain.exponentialRampToValueAtTime(this.rampZero, when + duration + this.afterRamp);
+        it.end = when + duration + this.preRamp + this.afterRamp;
     }
     freq(key) {
         let O4 = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88];

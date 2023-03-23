@@ -540,5 +540,5 @@ declare class MidiParser {
         channelNum: number;
         track: MIDISongTrack;
     };
-    dump(): MIDISongData;
+    dump(): MZXBX_Schedule;
 }

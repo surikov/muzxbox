@@ -7,9 +7,9 @@ let testSchedule = {
                 { skip: 0.25, channelId: 'bass', pitch: 12 * 4 + 0, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0.5, channelId: 'bass', pitch: 12 * 3 + 0, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0.75, channelId: 'bass', pitch: 12 * 4 + 0, slides: [{ duration: 0.25, delta: 0 }] },
-                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 0, slides: [{ duration: 1, delta: 0 }] },
-                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 0 + 5, slides: [{ duration: 1, delta: 0 }] },
-                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 0 + 7, slides: [{ duration: 1, delta: 0 }] }
+                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 0, slides: [{ duration: 0.26, delta: 4 }, { duration: 0.24, delta: 0 }, { duration: 0.23, delta: 4 }, { duration: 0.27, delta: 0 }] },
+                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 0 + 4, slides: [{ duration: 0.26, delta: 4 }, { duration: 0.24, delta: 0 }, { duration: 0.23, delta: 4 }, { duration: 0.27, delta: 0 }] },
+                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 0 + 7, slides: [{ duration: 0.26, delta: 4 }, { duration: 0.24, delta: 0 }, { duration: 0.23, delta: 4 }, { duration: 0.27, delta: 0 }] }
             ], states: [
                 { skip: 0, filterId: 'bassVolume123', data: '10%' }
             ]
@@ -19,9 +19,9 @@ let testSchedule = {
                 { skip: 0.25, channelId: 'bass', pitch: 12 * 3 + 5, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0.5, channelId: 'bass', pitch: 12 * 2 + 5, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0.75, channelId: 'bass', pitch: 12 * 3 + 5, slides: [{ duration: 0.25, delta: 0 }] },
-                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 5, slides: [{ duration: 1, delta: 0 }] },
-                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 5 + 5, slides: [{ duration: 1, delta: 0 }] },
-                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 5 + 7, slides: [{ duration: 1, delta: 0 }] }
+                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 5, slides: [{ duration: 0.99, delta: 7 }] },
+                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 5 + 4, slides: [{ duration: 0.98, delta: 7 }] },
+                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 5 + 7, slides: [{ duration: 0.96, delta: 7 }] }
             ], states: [
                 { skip: 0, filterId: 'bassVolume123', data: '15%' }
             ]
@@ -32,7 +32,7 @@ let testSchedule = {
                 { skip: 0.5, channelId: 'bass', pitch: 12 * 2 + 7, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0.75, channelId: 'bass', pitch: 12 * 3 + 7, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0, channelId: 'pad', pitch: 12 * 5 + 7, slides: [{ duration: 1, delta: 0 }] },
-                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 7 + 5, slides: [{ duration: 1, delta: 0 }] },
+                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 7 + 4, slides: [{ duration: 1, delta: 0 }] },
                 { skip: 0, channelId: 'pad', pitch: 12 * 5 + 7 + 7, slides: [{ duration: 1, delta: 0 }] }
             ], states: [
                 { skip: 0, filterId: 'bassVolume123', data: '20%' }
@@ -44,7 +44,7 @@ let testSchedule = {
                 { skip: 0.5, channelId: 'bass', pitch: 12 * 2 + 9, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0.75, channelId: 'bass', pitch: 12 * 3 + 4, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0, channelId: 'pad', pitch: 12 * 5 + 9, slides: [{ duration: 1, delta: 0 }] },
-                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 9 + 4, slides: [{ duration: 1, delta: 0 }] },
+                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 9 + 3, slides: [{ duration: 1, delta: 0 }] },
                 { skip: 0, channelId: 'pad', pitch: 12 * 5 + 9 + 7, slides: [{ duration: 1, delta: 0 }] },
                 { skip: 0, channelId: 'drumSnare', pitch: 0, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0.25, channelId: 'drumSnare', pitch: 0, slides: [{ duration: 0.25, delta: 0 }] },
@@ -61,7 +61,7 @@ let testSchedule = {
                 { skip: 0.5, channelId: 'bass', pitch: 12 * 3 + 0, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0.75, channelId: 'bass', pitch: 12 * 4 + 0, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0, channelId: 'pad', pitch: 12 * 5 + 0, slides: [{ duration: 1, delta: 0 }] },
-                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 0 + 5, slides: [{ duration: 1, delta: 0 }] },
+                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 0 + 4, slides: [{ duration: 1, delta: 0 }] },
                 { skip: 0, channelId: 'pad', pitch: 12 * 5 + 0 + 7, slides: [{ duration: 1, delta: 0 }] },
                 { skip: 0, channelId: 'drumBass', pitch: 0, slides: [{ duration: 0.5, delta: 0 }] },
                 { skip: 0.5, channelId: 'drumSnare', pitch: 0, slides: [{ duration: 0.5, delta: 0 }] },
@@ -79,7 +79,7 @@ let testSchedule = {
                 { skip: 0.5, channelId: 'bass', pitch: 12 * 2 + 5, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0.75, channelId: 'bass', pitch: 12 * 3 + 5, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0, channelId: 'pad', pitch: 12 * 5 + 5, slides: [{ duration: 1, delta: 0 }] },
-                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 5 + 5, slides: [{ duration: 1, delta: 0 }] },
+                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 5 + 4, slides: [{ duration: 1, delta: 0 }] },
                 { skip: 0, channelId: 'pad', pitch: 12 * 5 + 5 + 7, slides: [{ duration: 1, delta: 0 }] },
                 { skip: 0, channelId: 'drumBass', pitch: 0, slides: [{ duration: 0.5, delta: 0 }] },
                 { skip: 0.5, channelId: 'drumSnare', pitch: 0, slides: [{ duration: 0.5, delta: 0 }] },
@@ -95,7 +95,7 @@ let testSchedule = {
                 { skip: 0.5, channelId: 'bass', pitch: 12 * 2 + 7, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0.75, channelId: 'bass', pitch: 12 * 3 + 7, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0, channelId: 'pad', pitch: 12 * 5 + 7, slides: [{ duration: 1, delta: 0 }] },
-                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 7 + 5, slides: [{ duration: 1, delta: 0 }] },
+                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 7 + 4, slides: [{ duration: 1, delta: 0 }] },
                 { skip: 0, channelId: 'pad', pitch: 12 * 5 + 7 + 7, slides: [{ duration: 1, delta: 0 }] },
                 { skip: 0, channelId: 'drumBass', pitch: 0, slides: [{ duration: 0.5, delta: 0 }] },
                 { skip: 0.5, channelId: 'drumSnare', pitch: 0, slides: [{ duration: 0.5, delta: 0 }] },
@@ -111,7 +111,7 @@ let testSchedule = {
                 { skip: 0.5, channelId: 'bass', pitch: 12 * 2 + 9, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0.75, channelId: 'bass', pitch: 12 * 3 + 4, slides: [{ duration: 0.25, delta: 0 }] },
                 { skip: 0, channelId: 'pad', pitch: 12 * 5 + 9, slides: [{ duration: 1, delta: 0 }] },
-                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 9 + 4, slides: [{ duration: 1, delta: 0 }] },
+                { skip: 0, channelId: 'pad', pitch: 12 * 5 + 9 + 3, slides: [{ duration: 1, delta: 0 }] },
                 { skip: 0, channelId: 'pad', pitch: 12 * 5 + 9 + 7, slides: [{ duration: 1, delta: 0 }] },
                 { skip: 0, channelId: 'drumBass', pitch: 0, slides: [{ duration: 0.5, delta: 0 }] },
                 { skip: 0.5, channelId: 'drumSnare', pitch: 0, slides: [{ duration: 0.5, delta: 0 }] },
@@ -140,7 +140,7 @@ let testSchedule = {
             performer: { id: 'hh1', kind: 'drums_performer_1_test', properties: '42' }
         }, { id: "pad",
             filters: [{ id: "padVolume3", kind: "volume_filter_1_test", properties: "75%" }],
-            performer: { id: '22', kind: 'sinewave_performer_1_test', properties: 'sine' }
+            performer: { id: '22', kind: 'waf_performer_1_test', properties: '21' }
         }],
     filters: [
         { id: "f1", kind: "volume_filter_1_test", properties: "75%" },
