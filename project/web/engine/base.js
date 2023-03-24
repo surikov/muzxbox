@@ -1605,12 +1605,16 @@ class MidiParser {
                     }
                     else {
                         if (note.points.length > 1) {
-                            for (let pp = 1; pp < note.points.length; pp++) {
+                            for (let pp = 0; pp < note.points.length - 1; pp++) {
                                 item.slides.push({
                                     duration: note.points[pp].durationms / 1000,
-                                    delta: note.points[pp].pitch - item.pitch
+                                    delta: note.points[pp + 1].pitch - item.pitch
                                 });
                             }
+                            item.slides.push({
+                                duration: note.points[note.points.length - 1].durationms / 1000,
+                                delta: note.points[note.points.length - 1].pitch - item.pitch
+                            });
                             console.log(note, item);
                         }
                     }
