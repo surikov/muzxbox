@@ -150,26 +150,21 @@ class MuzXbox {
             this.initAudioContext();
             let filesinput = document.getElementById('filesinput');
             if (filesinput) {
-                let listener = function () {
-                    console.log('event', event);
-                    var file = event.target.files[0];
-                    console.log(file);
+                let listener = function (ievent) {
+                    var file = ievent.target.files[0];
                     var fileReader = new FileReader();
                     fileReader.onload = function (progressEvent) {
-                        console.log('progressEvent', progressEvent);
                         if (progressEvent != null) {
                             var arrayBuffer = progressEvent.target.result;
-                            console.log(arrayBuffer);
                             var midiParser = new MidiParser(arrayBuffer);
                             testSchedule = midiParser.dump();
-                            console.log(testSchedule);
+                            console.log('MZXBX_Schedule', testSchedule);
                         }
                     };
                     fileReader.readAsArrayBuffer(file);
                 };
                 filesinput.addEventListener('change', listener, false);
             }
-            console.log('filesinput', filesinput);
         }
     }
     initAudioContext() {
@@ -945,7 +940,7 @@ class MIDIFileTrack {
         this.datas = new DataView(buffer, start, this.HDR_LENGTH + this.trackLength);
         this.trackContent = new DataView(this.datas.buffer, this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
         this.trackevents = [];
-        this.volumes = [];
+        this.trackVolumePoints = [];
         this.programChannel = [];
     }
 }
@@ -1270,7 +1265,9 @@ class MidiParser {
                                 else {
                                     if (evnt.subtype == this.EVENT_MIDI_CONTROLLER && evnt.param1 == 7) {
                                         var v = evnt.param2 ? evnt.param2 / 127 : 0;
-                                        singleParsedTrack.volumes.push({ ms: evnt.playTimeMs, value: v });
+                                        let point = { ms: evnt.playTimeMs, value: v, channel: evnt.midiChannel ? evnt.midiChannel : 0 };
+                                        singleParsedTrack.trackVolumePoints.push(point);
+                                        console.log('trackVolumePoints', point);
                                     }
                                     else {
                                     }
@@ -1495,16 +1492,21 @@ class MidiParser {
                 order: 0,
                 title: parsedtrack.title,
                 channelNum: channelNum,
-                trackVolumes: parsedtrack.volumes,
+                trackVolumes: [],
                 program: -1,
                 songchords: []
             }
         };
+        for (let vv = 0; vv < parsedtrack.trackVolumePoints.length; vv++) {
+            if (parsedtrack.trackVolumePoints[vv].channel == it.track.channelNum) {
+                it.track.trackVolumes.push(parsedtrack.trackVolumePoints[vv]);
+            }
+        }
         trackChannel.push(it);
         return it;
     }
     dump() {
-        console.log(this);
+        console.log('MidiParser', this);
         let midiSongData = {
             parser: '1.01',
             duration: 0,
@@ -1572,7 +1574,7 @@ class MidiParser {
                 }
             }
         }
-        console.log('midiSongData', midiSongData);
+        console.log('MIDISongData', midiSongData);
         let schedule = {
             series: [],
             channels: [],
@@ -1615,7 +1617,6 @@ class MidiParser {
                                 duration: note.points[note.points.length - 1].durationms / 1000,
                                 delta: note.points[note.points.length - 1].pitch - item.pitch
                             });
-                            console.log(note, item);
                         }
                     }
                     for (let ii = 0; ii <= timeIndex; ii++) {
@@ -1638,16 +1639,44 @@ class MidiParser {
                                 drumNum = 35;
                             if (drumNum > 81)
                                 drumNum = 81;
+                            let volumeID = 'channel' + mt + '.' + drumNum + 'volume';
                             schedule.channels.push({
-                                id: channelId, comment: miditrack.title, filters: [],
+                                id: channelId, comment: miditrack.title, filters: [{ id: volumeID, kind: 'volume_filter_1_test', properties: '100%' }],
                                 performer: { id: 'channel' + mt + '.' + drumNum + 'performer', kind: 'drums_performer_1_test', properties: '' + drumNum }
                             });
+                            for (let vv = 0; vv < miditrack.trackVolumes.length; vv++) {
+                                let setIndex = Math.floor(miditrack.trackVolumes[vv].ms / 1000.0);
+                                for (let ii = 0; ii <= setIndex; ii++) {
+                                    if (!(schedule.series[ii])) {
+                                        schedule.series[ii] = { duration: 1, items: [], states: [] };
+                                    }
+                                }
+                                schedule.series[setIndex].states.push({
+                                    skip: (Math.round(miditrack.trackVolumes[vv].ms) % 1000.0) / 1000.0,
+                                    filterId: volumeID,
+                                    data: '' + Math.round(100 * miditrack.trackVolumes[vv].value) + '%'
+                                });
+                            }
                         }
                         else {
+                            let volumeID = 'channel' + mt + 'volume';
                             schedule.channels.push({
-                                id: channelId, comment: miditrack.title, filters: [],
+                                id: channelId, comment: miditrack.title, filters: [{ id: volumeID, kind: 'volume_filter_1_test', properties: '100%' }],
                                 performer: { id: 'channel' + mt + 'performer', kind: 'waf_performer_1_test', properties: '' + midinum }
                             });
+                            for (let vv = 0; vv < miditrack.trackVolumes.length; vv++) {
+                                let setIndex = Math.floor(miditrack.trackVolumes[vv].ms / 1000.0);
+                                for (let ii = 0; ii <= setIndex; ii++) {
+                                    if (!(schedule.series[ii])) {
+                                        schedule.series[ii] = { duration: 1, items: [], states: [] };
+                                    }
+                                }
+                                schedule.series[setIndex].states.push({
+                                    skip: (Math.round(miditrack.trackVolumes[vv].ms) % 1000.0) / 1000.0,
+                                    filterId: volumeID,
+                                    data: '' + Math.round(100 * miditrack.trackVolumes[vv].value) + '%'
+                                });
+                            }
                         }
                     }
                 }

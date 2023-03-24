@@ -405,6 +405,7 @@ class MIDIFileHeader {
 	}
 }
 class MIDIFileTrack {
+	//nn:number
 	datas: DataView;
 	HDR_LENGTH: number = 8;
 	trackLength: number;
@@ -413,7 +414,7 @@ class MIDIFileTrack {
 	title: string;
 	instrument: string;
 	programChannel: { program: number, channel: number }[];
-	volumes: { ms: number, value: number }[];
+	trackVolumePoints: { ms: number, value: number, channel: number }[];
 	chords: TrackChord[] = [];
 	constructor(buffer: ArrayBuffer, start: number) {
 		this.datas = new DataView(buffer, start, this.HDR_LENGTH);
@@ -421,7 +422,7 @@ class MIDIFileTrack {
 		this.datas = new DataView(buffer, start, this.HDR_LENGTH + this.trackLength);
 		this.trackContent = new DataView(this.datas.buffer, this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
 		this.trackevents = [];
-		this.volumes = [];
+		this.trackVolumePoints = [];
 		this.programChannel = [];
 	}
 }
@@ -682,6 +683,7 @@ class MidiParser {
 		for (let t = 0; t < this.parsedTracks.length; t++) {
 			//console.log('start parseNotes', t);
 			var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
+			//singleParsedTrack.nn=t;
 			this.parseTicks2time(singleParsedTrack);
 			for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
 				var evnt = singleParsedTrack.trackevents[e];
@@ -748,8 +750,9 @@ class MidiParser {
 								} else {
 									if (evnt.subtype == this.EVENT_MIDI_CONTROLLER && evnt.param1 == 7) {
 										var v = evnt.param2 ? evnt.param2 / 127 : 0;
-										singleParsedTrack.volumes.push({ ms: evnt.playTimeMs, value: v });
-										//console.log('volumes',evnt.playTimeMs,v,singleParsedTrack);
+										let point = { ms: evnt.playTimeMs, value: v, channel: evnt.midiChannel ? evnt.midiChannel : 0 };
+										singleParsedTrack.trackVolumePoints.push(point);
+										console.log('trackVolumePoints', point);
 									} else {
 										//
 									}
@@ -983,17 +986,22 @@ class MidiParser {
 				, title: parsedtrack.title
 				//, instrument: '0'
 				, channelNum: channelNum
-				, trackVolumes: parsedtrack.volumes
+				, trackVolumes: []//parsedtrack.trackVolumePoints
 				, program: -1
 				, songchords: []
 			}
 		};
+		for (let vv = 0; vv < parsedtrack.trackVolumePoints.length; vv++) {
+			if (parsedtrack.trackVolumePoints[vv].channel == it.track.channelNum) {
+				it.track.trackVolumes.push(parsedtrack.trackVolumePoints[vv]);
+			}
+		}
 		trackChannel.push(it);
 		//console.log('create',it,'from',parsedtrack);
 		return it;
 	}
 	dump(): MZXBX_Schedule {
-		console.log(this);
+		console.log('MidiParser', this);
 		let midiSongData: MIDISongData = {
 			parser: '1.01'
 			, duration: 0
@@ -1065,7 +1073,7 @@ class MidiParser {
 				}
 			}
 		}
-		console.log('midiSongData', midiSongData);
+		console.log('MIDISongData', midiSongData);
 		let schedule: MZXBX_Schedule = {
 			series: []
 			, channels: []
@@ -1110,17 +1118,17 @@ class MidiParser {
 						//item.slides.push({ duration: note.points[0].durationms / 1000, delta: 0 });
 					} else {
 						if (note.points.length > 1) {
-							for (let pp = 0; pp < note.points.length-1; pp++) {
+							for (let pp = 0; pp < note.points.length - 1; pp++) {
 								item.slides.push({
-									duration: note.points[pp ].durationms / 1000
-									, delta: note.points[pp+1].pitch - item.pitch
+									duration: note.points[pp].durationms / 1000
+									, delta: note.points[pp + 1].pitch - item.pitch
 								});
 							}
 							item.slides.push({
-								duration: note.points[note.points.length-1 ].durationms / 1000
-								, delta: note.points[note.points.length-1].pitch - item.pitch
+								duration: note.points[note.points.length - 1].durationms / 1000
+								, delta: note.points[note.points.length - 1].pitch - item.pitch
 							});
-							console.log(note, item);
+							//console.log(note, item);
 						} /*else {
 							item.slides.push({ duration: note.points[0].durationms / 1000, delta: 0 });
 						}*/
@@ -1149,15 +1157,43 @@ class MidiParser {
 							let drumNum = note.points[0].pitch;
 							if (drumNum < 35) drumNum = 35;
 							if (drumNum > 81) drumNum = 81;
+							let volumeID='channel' + mt + '.' + drumNum + 'volume';
 							schedule.channels.push({
-								id: channelId, comment: miditrack.title, filters: []
+								id: channelId, comment: miditrack.title, filters: [{ id: volumeID, kind: 'volume_filter_1_test', properties: '100%' }]
 								, performer: { id: 'channel' + mt + '.' + drumNum + 'performer', kind: 'drums_performer_1_test', properties: '' + drumNum }
 							});
+							for(let vv=0;vv<miditrack.trackVolumes.length;vv++){
+								let setIndex=Math.floor(miditrack.trackVolumes[vv].ms / 1000.0);
+								for (let ii = 0; ii <= setIndex; ii++) {
+									if (!(schedule.series[ii])) {
+										schedule.series[ii] = { duration: 1, items: [], states: [] };
+									}
+								}
+								schedule.series[setIndex].states.push({
+									skip: (Math.round(miditrack.trackVolumes[vv].ms) % 1000.0) / 1000.0
+									,filterId: volumeID
+									,data: ''+Math.round(100*miditrack.trackVolumes[vv].value)+'%'
+								});
+							}
 						} else {
+							let volumeID='channel' + mt + 'volume';
 							schedule.channels.push({
-								id: channelId, comment: miditrack.title, filters: []
+								id: channelId, comment: miditrack.title, filters: [{ id: volumeID, kind: 'volume_filter_1_test', properties: '100%' }]
 								, performer: { id: 'channel' + mt + 'performer', kind: 'waf_performer_1_test', properties: '' + midinum }
 							});
+							for(let vv=0;vv<miditrack.trackVolumes.length;vv++){
+								let setIndex=Math.floor(miditrack.trackVolumes[vv].ms / 1000.0);
+								for (let ii = 0; ii <= setIndex; ii++) {
+									if (!(schedule.series[ii])) {
+										schedule.series[ii] = { duration: 1, items: [], states: [] };
+									}
+								}
+								schedule.series[setIndex].states.push({
+									skip: (Math.round(miditrack.trackVolumes[vv].ms) % 1000.0) / 1000.0
+									,filterId: volumeID
+									,data: ''+Math.round(100*miditrack.trackVolumes[vv].value)+'%'
+								});
+							}
 						}
 					}
 				}

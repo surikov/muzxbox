@@ -19,27 +19,26 @@ class MuzXbox {
             this.initAudioContext();
             let filesinput: HTMLElement | null = document.getElementById('filesinput');
             if (filesinput) {
-                let listener: (this: HTMLElement, event: HTMLElementEventMap['change']) => any = function () {
-                    console.log('event',event);
-                    var file = (event as any).target.files[0];
-                    console.log(file);
+                let listener: (this: HTMLElement, event: HTMLElementEventMap['change']) => any = function (this: HTMLElement, ievent: HTMLElementEventMap['change']) {
+                    //console.log('event',event);
+                    var file = (ievent as any).target.files[0];
+                    //console.log(file);
                     var fileReader = new FileReader();
                     fileReader.onload = function (progressEvent:any) {
-                        console.log('progressEvent',progressEvent);
+                        //console.log('progressEvent',progressEvent);
                         if(progressEvent!=null){
                         var arrayBuffer = progressEvent.target.result;
-                        console.log(arrayBuffer);
+                        //console.log(arrayBuffer);
                         var midiParser = new MidiParser(arrayBuffer);
 						testSchedule=midiParser.dump();
-                        console.log(testSchedule);
-                        
+                        console.log('MZXBX_Schedule',testSchedule);
                     }
                     };
                     fileReader.readAsArrayBuffer(file);
                 };
                 filesinput.addEventListener('change', listener, false);
             }
-            console.log('filesinput',filesinput);
+            //console.log('filesinput',filesinput);
         }
     }
     initAudioContext() {

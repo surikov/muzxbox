@@ -470,9 +470,10 @@ declare class MIDIFileTrack {
         program: number;
         channel: number;
     }[];
-    volumes: {
+    trackVolumePoints: {
         ms: number;
         value: number;
+        channel: number;
     }[];
     chords: TrackChord[];
     constructor(buffer: ArrayBuffer, start: number);
