@@ -340,6 +340,7 @@ class SchedulePlayer implements MZXBX_Player {
 		}*/
 		let plugin: MZXBX_AudioFilterPlugin | null = this.findFilterPlugin(state.filterId);
 		if (plugin) {
+            //console.log('sendFilterItem',state.filterId,whenAudio, state.data);
 			plugin.schedule(whenAudio, state.data);
 		}
 	}

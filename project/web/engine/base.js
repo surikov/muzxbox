@@ -931,6 +931,21 @@ class MIDIFileHeader {
         }
     }
 }
+class LastKeyVal {
+    constructor() {
+        this.data = [];
+    }
+    take(keyName) {
+        for (let ii = 0; ii < this.data.length; ii++) {
+            if (this.data[ii].name == keyName) {
+                return this.data[ii];
+            }
+        }
+        let newit = { name: keyName, value: -1 };
+        this.data.push(newit);
+        return newit;
+    }
+}
 class MIDIFileTrack {
     constructor(buffer, start) {
         this.HDR_LENGTH = 8;
@@ -1265,9 +1280,8 @@ class MidiParser {
                                 else {
                                     if (evnt.subtype == this.EVENT_MIDI_CONTROLLER && evnt.param1 == 7) {
                                         var v = evnt.param2 ? evnt.param2 / 127 : 0;
-                                        let point = { ms: evnt.playTimeMs, value: v, channel: evnt.midiChannel ? evnt.midiChannel : 0 };
+                                        let point = { ms: evnt.playTimeMs, value: v, channel: evnt.midiChannel ? evnt.midiChannel : 0, track: t };
                                         singleParsedTrack.trackVolumePoints.push(point);
-                                        console.log('trackVolumePoints', point);
                                     }
                                     else {
                                     }
@@ -1522,11 +1536,11 @@ class MidiParser {
             speedMode: 0,
             lineMode: 0
         };
-        let trackChannel = [];
+        let tracksChannels = [];
         for (let i = 0; i < this.parsedTracks.length; i++) {
             let parsedtrack = this.parsedTracks[i];
             for (let k = 0; k < parsedtrack.programChannel.length; k++) {
-                this.findOrCreateTrack(parsedtrack, i, parsedtrack.programChannel[k].channel, trackChannel);
+                this.findOrCreateTrack(parsedtrack, i, parsedtrack.programChannel[k].channel, tracksChannels);
             }
         }
         var maxWhen = 0;
@@ -1549,18 +1563,14 @@ class MidiParser {
                         newnote.points.push(newpoint);
                     }
                 }
-                let chanTrack = this.findOrCreateTrack(miditrack, i, newchord.channel, trackChannel);
+                let chanTrack = this.findOrCreateTrack(miditrack, i, newchord.channel, tracksChannels);
                 chanTrack.track.songchords.push(newchord);
             }
-            for (let i = 0; i < trackChannel.length; i++) {
-                if (trackChannel[i].trackNum == i) {
-                }
-            }
         }
-        for (let tt = 0; tt < trackChannel.length; tt++) {
-            let trackChan = trackChannel[tt];
+        for (let tt = 0; tt < tracksChannels.length; tt++) {
+            let trackChan = tracksChannels[tt];
             if (trackChan.track.songchords.length > 0) {
-                midiSongData.miditracks.push(trackChannel[tt].track);
+                midiSongData.miditracks.push(tracksChannels[tt].track);
                 if (midiSongData.duration < maxWhen) {
                     midiSongData.duration = 54321 + maxWhen;
                 }
@@ -1580,6 +1590,7 @@ class MidiParser {
             channels: [],
             filters: []
         };
+        let volumeCashe = new LastKeyVal();
         for (let mt = 0; mt < midiSongData.miditracks.length; mt++) {
             let miditrack = midiSongData.miditracks[mt];
             let midinum = 1 + Math.round(miditrack.program);
@@ -1592,9 +1603,11 @@ class MidiParser {
                 for (let nn = 0; nn < chord.notes.length; nn++) {
                     let note = chord.notes[nn];
                     let timeIndex = Math.floor(chord.when / 1000.0);
-                    let channelId = 'channel' + mt;
+                    let channelId = 'track' + mt;
+                    let tID = 'track' + mt + 'subVolume';
                     if (miditrack.channelNum == 9) {
-                        channelId = 'channel' + mt + '.' + note.points[0].pitch;
+                        channelId = 'track' + mt + '.' + note.points[0].pitch;
+                        tID = 'track' + mt + '.' + note.points[0].pitch + 'subVolume';
                     }
                     let item = {
                         skip: (Math.round(chord.when) % 1000.0) / 1000.0,
@@ -1619,6 +1632,29 @@ class MidiParser {
                             });
                         }
                     }
+                    if (note.points[0].midipoint) {
+                        if (note.points[0].midipoint.volume) {
+                            let volVal = Math.round(100 * note.points[0].midipoint.volume / 127);
+                            let lastVol = volumeCashe.take(tID);
+                            if (lastVol.value == volVal) {
+                            }
+                            else {
+                                lastVol.value = volVal;
+                                let newVol = '' + volVal + '%';
+                                console.log(tID, newVol, timeIndex, item.skip);
+                                for (let ii = 0; ii <= timeIndex; ii++) {
+                                    if (!(schedule.series[ii])) {
+                                        schedule.series[ii] = { duration: 1, items: [], states: [] };
+                                    }
+                                }
+                                schedule.series[timeIndex].states.push({
+                                    skip: item.skip,
+                                    filterId: tID,
+                                    data: newVol
+                                });
+                            }
+                        }
+                    }
                     for (let ii = 0; ii <= timeIndex; ii++) {
                         if (!(schedule.series[ii])) {
                             schedule.series[ii] = { duration: 1, items: [], states: [] };
@@ -1639,10 +1675,14 @@ class MidiParser {
                                 drumNum = 35;
                             if (drumNum > 81)
                                 drumNum = 81;
-                            let volumeID = 'channel' + mt + '.' + drumNum + 'volume';
+                            let volumeID = 'track' + mt + '.' + drumNum + 'volume';
+                            let tID = 'track' + mt + '.' + drumNum + 'subVolume';
                             schedule.channels.push({
-                                id: channelId, comment: miditrack.title, filters: [{ id: volumeID, kind: 'volume_filter_1_test', properties: '100%' }],
-                                performer: { id: 'channel' + mt + '.' + drumNum + 'performer', kind: 'drums_performer_1_test', properties: '' + drumNum }
+                                id: channelId, comment: miditrack.title, filters: [
+                                    { id: volumeID, kind: 'volume_filter_1_test', properties: '100%' },
+                                    { id: tID, kind: 'volume_filter_1_test', properties: '100%' }
+                                ],
+                                performer: { id: 'track' + mt + '.' + drumNum + 'performer', kind: 'drums_performer_1_test', properties: '' + drumNum }
                             });
                             for (let vv = 0; vv < miditrack.trackVolumes.length; vv++) {
                                 let setIndex = Math.floor(miditrack.trackVolumes[vv].ms / 1000.0);
@@ -1659,10 +1699,14 @@ class MidiParser {
                             }
                         }
                         else {
-                            let volumeID = 'channel' + mt + 'volume';
+                            let volumeID = 'track' + mt + 'volume';
+                            let tID = 'track' + mt + 'subVolume';
                             schedule.channels.push({
-                                id: channelId, comment: miditrack.title, filters: [{ id: volumeID, kind: 'volume_filter_1_test', properties: '100%' }],
-                                performer: { id: 'channel' + mt + 'performer', kind: 'waf_performer_1_test', properties: '' + midinum }
+                                id: channelId, comment: miditrack.title, filters: [
+                                    { id: volumeID, kind: 'volume_filter_1_test', properties: '100%' },
+                                    { id: tID, kind: 'volume_filter_1_test', properties: '100%' }
+                                ],
+                                performer: { id: 'track' + mt + 'performer', kind: 'waf_performer_1_test', properties: '' + midinum }
                             });
                             for (let vv = 0; vv < miditrack.trackVolumes.length; vv++) {
                                 let setIndex = Math.floor(miditrack.trackVolumes[vv].ms / 1000.0);
@@ -1682,6 +1726,7 @@ class MidiParser {
                 }
             }
         }
+        console.log(volumeCashe);
         return schedule;
     }
 }

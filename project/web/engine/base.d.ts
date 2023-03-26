@@ -458,6 +458,16 @@ declare class MIDIFileHeader {
     getTicksPerFrame(): number;
     getSMPTEFrames(): number;
 }
+declare class LastKeyVal {
+    data: {
+        name: string;
+        value: number;
+    }[];
+    take(keyName: string): {
+        name: string;
+        value: number;
+    };
+}
 declare class MIDIFileTrack {
     datas: DataView;
     HDR_LENGTH: number;
