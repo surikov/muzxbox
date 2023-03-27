@@ -127,54 +127,7 @@ WAFMIDIPresetURLs[125] = "1240_Aspirin_sf2_file";
 WAFMIDIPresetURLs[126] = "1250_Aspirin_sf2_file";
 WAFMIDIPresetURLs[127] = "1260_Aspirin_sf2_file";
 WAFMIDIPresetURLs[128] = "1270_Aspirin_sf2_file";
-/*var WAFMIDIDrumURLs:string[]=[];
-WAFMIDIDrumURLs[35]="35_0_Chaos_sf2_file";
-WAFMIDIDrumURLs[36]="36_0_SBLive_sf2";
-WAFMIDIDrumURLs[37]="37_0_SBLive_sf2";
-WAFMIDIDrumURLs[38]="38_0_SBLive_sf2";
-WAFMIDIDrumURLs[39]="39_0_SBLive_sf2";
-WAFMIDIDrumURLs[40]="40_0_SBLive_sf2";
-WAFMIDIDrumURLs[41]="41_0_SBLive_sf2";
-WAFMIDIDrumURLs[42]="42_0_SBLive_sf2";
-WAFMIDIDrumURLs[43]="43_0_SBLive_sf2";
-WAFMIDIDrumURLs[44]="44_0_SBLive_sf2";
-WAFMIDIDrumURLs[45]="45_0_SBLive_sf2";
-WAFMIDIDrumURLs[46]="46_0_SBLive_sf2";
-WAFMIDIDrumURLs[47]="47_0_SBLive_sf2";
-WAFMIDIDrumURLs[48]="48_0_SBLive_sf2";
-WAFMIDIDrumURLs[49]="49_0_SBLive_sf2";
-WAFMIDIDrumURLs[50]="50_0_SBLive_sf2";
-WAFMIDIDrumURLs[51]="51_0_SBLive_sf2";
-WAFMIDIDrumURLs[52]="52_0_SBLive_sf2";
-WAFMIDIDrumURLs[53]="53_0_SBLive_sf2";
-WAFMIDIDrumURLs[54]="54_0_SBLive_sf2";
-WAFMIDIDrumURLs[55]="55_0_SBLive_sf2";
-WAFMIDIDrumURLs[56]="56_0_SBLive_sf2";
-WAFMIDIDrumURLs[57]="57_0_SBLive_sf2";
-WAFMIDIDrumURLs[58]="58_0_SBLive_sf2";
-WAFMIDIDrumURLs[59]="59_0_SBLive_sf2";
-WAFMIDIDrumURLs[60]="60_0_SBLive_sf2";
-WAFMIDIDrumURLs[61]="61_0_SBLive_sf2";
-WAFMIDIDrumURLs[62]="62_0_SBLive_sf2";
-WAFMIDIDrumURLs[63]="63_0_SBLive_sf2";
-WAFMIDIDrumURLs[64]="64_0_SBLive_sf2";
-WAFMIDIDrumURLs[65]="65_0_SBLive_sf2";
-WAFMIDIDrumURLs[66]="66_0_SBLive_sf2";
-WAFMIDIDrumURLs[67]="67_0_SBLive_sf2";
-WAFMIDIDrumURLs[68]="68_0_SBLive_sf2";
-WAFMIDIDrumURLs[69]="69_0_SBLive_sf2";
-WAFMIDIDrumURLs[70]="70_0_SBLive_sf2";
-WAFMIDIDrumURLs[71]="71_0_SBLive_sf2";
-WAFMIDIDrumURLs[72]="72_0_SBLive_sf2";
-WAFMIDIDrumURLs[73]="73_0_SBLive_sf2";
-WAFMIDIDrumURLs[74]="74_0_SBLive_sf2";
-WAFMIDIDrumURLs[75]="75_0_SBLive_sf2";
-WAFMIDIDrumURLs[76]="76_0_SBLive_sf2";
-WAFMIDIDrumURLs[77]="77_0_SBLive_sf2";
-WAFMIDIDrumURLs[78]="78_0_SBLive_sf2";
-WAFMIDIDrumURLs[79]="79_0_SBLive_sf2";
-WAFMIDIDrumURLs[80]="80_0_SBLive_sf2";
-WAFMIDIDrumURLs[81]="81_0_SBLive_sf2";*/
+
 type PresetInstrument = {
 	variable: string
 	, url: string
@@ -211,16 +164,48 @@ type WaveEnvelope = {
 	, pitch: number
 	, preset: WavePreset
 };
-class PublicWAFMIDITonePerformerPlayer {
-	audioContext: AudioContext;
+
+class PerformerPluginWAF implements MZXBX_AudioPerformerPlugin {
+	out: GainNode;
+	midiProgram: number = -1;
 	instrumentKeyArray: string[] = [];
 	instrumentNamesArray: string[] = [];
 	envelopes: WaveEnvelope[] = [];
 	afterTime = 0.05;
 	nearZero = 0.000001;
-	setup(context: AudioContext): void {
-		if (!(this.audioContext)) {
+	audioContext: AudioContext;
+	launch(context: AudioContext, parameters: string): void {
+		if (this.out) {
+			//
+		} else {
 			this.audioContext = context;
+			this.out = this.audioContext.createGain();
+		}
+		let nn: number = parseInt(parameters);
+		if (this.midiProgram == nn) {
+			//
+		} else {
+			this.midiProgram = nn;
+			this.startLoadPreset(this.midiProgram);
+		}
+	}
+	schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void {
+		let info: PresetInstrument = this.instrumentInfo(this.midiProgram);
+		let preset: WavePreset = window[info.variable] as WavePreset;
+		let rr = this.queueWaveTable(this.out, preset, when, pitch, slides);
+		//console.log(rr);
+	}
+	output(): AudioNode | null {
+		return this.out;
+	}
+	cancel(): void {
+		this.cancelQueue();
+	}
+	busy(): string | null {
+		if (this.presetReady(this.midiProgram)) {
+			return null;
+		} else {
+			return 'program ' + this.midiProgram + ' isn\'t ready';
 		}
 	}
 	startLoadPreset(nn: number) {
@@ -420,9 +405,7 @@ class PublicWAFMIDITonePerformerPlayer {
 		}
 	};
 	queueWaveTable(out: AudioNode, preset: WavePreset, when: number, pitch: number, slides: MZXBX_SlideItem[]): WaveEnvelope | null {
-		//this.resumeContext(audioContext);
-		//volume = this.limitVolume(volume);
-		let volume = 0.75;
+		let volume = 0.33;
 		var zone: WaveZone | null = this.findZone(this.audioContext, preset, pitch);
 		if (zone) {
 			if (!(zone.buffer)) {
@@ -453,21 +436,13 @@ class PublicWAFMIDITonePerformerPlayer {
 			this.setupEnvelope(this.audioContext, envelope, zone, volume, startWhen, waveDuration, noteDuration);
 			envelope.audioBufferSourceNode = this.audioContext.createBufferSource();
 			envelope.audioBufferSourceNode.playbackRate.setValueAtTime(playbackRate, 0);
-			//if (slides) {
-			//console.log(pitch, startWhen, noteDuration, slides);
-			//if (slides.length > 0) {
-			//envelope.audioBufferSourceNode.playbackRate.setValueAtTime(playbackRate, when);
 			var newWhen = startWhen;
 			for (var ii = 0; ii < slides.length; ii++) {
-				//if(slides[i].delta!=0)console.log(i,slides[i]);
 				var nextPitch = pitch + slides[ii].delta;
 				var newPlaybackRate = 1.0 * Math.pow(2, (100.0 * nextPitch - baseDetune) / 1200.0);
 				var newWhen = newWhen + slides[ii].duration;
 				envelope.audioBufferSourceNode.playbackRate.linearRampToValueAtTime(newPlaybackRate, newWhen);
-				//console.log(pitch, startWhen, noteDuration,  slides[ii].duration, nextPitch, newWhen);
 			}
-			//}
-			//}
 			envelope.audioBufferSourceNode.buffer = zone.buffer;
 			if (loop) {
 				envelope.audioBufferSourceNode.loop = true;
@@ -511,49 +486,6 @@ class PublicWAFMIDITonePerformerPlayer {
 			url: 'https://surikov.github.io/webaudiofontdata/sound/' + key + '.js'
 		};
 	};
-}
-class PerformerPluginWAF implements MZXBX_AudioPerformerPlugin {
-	out: GainNode;
-	player: PublicWAFMIDITonePerformerPlayer;
-	midiProgram: number = -1;
-	//velocityRatio = 0.75;
-	launch(context: AudioContext, parameters: string): void {
-		if (this.player) {
-			//return this.player.presetReady(this.midiProgram);
-		} else {
-			this.out = context.createGain();
-			this.player = new PublicWAFMIDITonePerformerPlayer();
-			this.player.setup(context);
-
-			//return this.player.presetReady(this.midiProgram);
-		}
-		let nn: number = parseInt(parameters);
-		if (this.midiProgram == nn) {
-			//
-		} else {
-			this.midiProgram = nn;
-			this.player.startLoadPreset(this.midiProgram);
-		}
-	}
-	schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void {
-		let info: PresetInstrument = this.player.instrumentInfo(this.midiProgram);
-		let preset: WavePreset = window[info.variable] as WavePreset;
-		let rr = this.player.queueWaveTable(this.out, preset, when, pitch, slides);
-		//console.log(rr);
-	}
-	output(): AudioNode | null {
-		return this.out;
-	}
-	cancel(): void {
-		this.player.cancelQueue();
-	}
-	busy(): string | null {
-		if (this.player.presetReady(this.midiProgram)) {
-			return null;
-		} else {
-			return 'program ' + this.midiProgram + ' isn\'t ready';
-		}
-	}
 }
 function testPluginWAF(): MZXBX_AudioPerformerPlugin {
 	return new PerformerPluginWAF();

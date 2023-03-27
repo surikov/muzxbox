@@ -7,7 +7,8 @@ let pluginListKindUrlName = [
     { kind: 'waf_drums_performer_1_test', functionName: 'testPluginForDrum1', url: './plugins/performers/testperc.js' },
     { kind: 'sinewave_performer_1_test', functionName: 'testPluginSingleWave', url: './plugins/performers/testsinewave.js' },
     { kind: 'waf_performer_1_test', functionName: 'testPluginWAF', url: './plugins/performers/testwaf.js' },
-    { kind: 'drums_performer_1_test', functionName: 'testPluginDrums', url: './plugins/performers/drumswaf.js' }
+    { kind: 'drums_performer_1_test', functionName: 'testPluginDrums', url: './plugins/performers/drumswaf.js' },
+    { kind: 'emptySilent', functionName: 'testCreateEmpty', url: './plugins/performers/testempty.js' }
 ];
 console.log(pluginListKindUrlName);
 //# sourceMappingURL=catalog.js.map

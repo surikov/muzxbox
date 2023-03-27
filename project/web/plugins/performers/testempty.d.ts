@@ -1,70 +1,12 @@
-declare var WAFMIDIPresetURLs: string[];
-declare type PresetInstrument = {
-    variable: string;
-    url: string;
-};
-declare type WaveZone = {
-    keyRangeLow: number;
-    keyRangeHigh: number;
-    originalPitch: number;
-    coarseTune: number;
-    fineTune: number;
-    loopStart: number;
-    loopEnd: number;
-    buffer?: AudioBuffer;
-    sampleRate: number;
-    delay?: number;
-    ahdsr?: boolean | WaveAHDSR[];
-    sample?: string;
-    file?: string;
-    sustain?: number;
-};
-declare type WavePreset = {
-    zones: WaveZone[];
-};
-declare type WaveAHDSR = {
-    duration: number;
-    volume: number;
-};
-declare type WaveEnvelope = {
-    audioBufferSourceNode?: AudioBufferSourceNode | null;
-    out: AudioNode;
-    when: number;
-    duration: number;
-    cancel: () => void;
-    pitch: number;
-    preset: WavePreset;
-};
-declare class PerformerPluginWAF implements MZXBX_AudioPerformerPlugin {
+declare class EmptyPerformer implements MZXBX_AudioPerformerPlugin {
     out: GainNode;
-    midiProgram: number;
-    instrumentKeyArray: string[];
-    instrumentNamesArray: string[];
-    envelopes: WaveEnvelope[];
-    afterTime: number;
-    nearZero: number;
-    audioContext: AudioContext;
     launch(context: AudioContext, parameters: string): void;
+    busy(): null | string;
     schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void;
     output(): AudioNode | null;
     cancel(): void;
-    busy(): string | null;
-    startLoadPreset(nn: number): void;
-    presetReady(nn: number): boolean;
-    adjustPreset(preset: WavePreset): void;
-    adjustZone(zone: WaveZone): void;
-    numValue(aValue: any, defValue: number): number;
-    findZone(audioContext: AudioContext, preset: WavePreset, pitch: number): WaveZone | null;
-    findEnvelope(audioContext: AudioContext, out: AudioNode): WaveEnvelope;
-    setupEnvelope(audioContext: AudioContext, envelope: WaveEnvelope, zone: WaveZone, volume: number, when: number, sampleDuration: number, noteDuration: number): void;
-    noZeroVolume(n: number): number;
-    queueWaveTable(out: AudioNode, preset: WavePreset, when: number, pitch: number, slides: MZXBX_SlideItem[]): WaveEnvelope | null;
-    cancelQueue(): void;
-    instrumentInfo(n: number): PresetInstrument;
 }
-declare function testPluginWAF(): MZXBX_AudioPerformerPlugin;
-declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
-declare function MZXBX_appendScriptURL(url: string): boolean;
+declare function testCreateEmpty(): MZXBX_AudioPerformerPlugin;
 declare type MZXBX_Metre = {
     count: number;
     part: number;

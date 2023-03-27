@@ -128,17 +128,47 @@ WAFMIDIPresetURLs[125] = "1240_Aspirin_sf2_file";
 WAFMIDIPresetURLs[126] = "1250_Aspirin_sf2_file";
 WAFMIDIPresetURLs[127] = "1260_Aspirin_sf2_file";
 WAFMIDIPresetURLs[128] = "1270_Aspirin_sf2_file";
-class PublicWAFMIDITonePerformerPlayer {
+class PerformerPluginWAF {
     constructor() {
+        this.midiProgram = -1;
         this.instrumentKeyArray = [];
         this.instrumentNamesArray = [];
         this.envelopes = [];
         this.afterTime = 0.05;
         this.nearZero = 0.000001;
     }
-    setup(context) {
-        if (!(this.audioContext)) {
+    launch(context, parameters) {
+        if (this.out) {
+        }
+        else {
             this.audioContext = context;
+            this.out = this.audioContext.createGain();
+        }
+        let nn = parseInt(parameters);
+        if (this.midiProgram == nn) {
+        }
+        else {
+            this.midiProgram = nn;
+            this.startLoadPreset(this.midiProgram);
+        }
+    }
+    schedule(when, pitch, slides) {
+        let info = this.instrumentInfo(this.midiProgram);
+        let preset = window[info.variable];
+        let rr = this.queueWaveTable(this.out, preset, when, pitch, slides);
+    }
+    output() {
+        return this.out;
+    }
+    cancel() {
+        this.cancelQueue();
+    }
+    busy() {
+        if (this.presetReady(this.midiProgram)) {
+            return null;
+        }
+        else {
+            return 'program ' + this.midiProgram + ' isn\'t ready';
         }
     }
     startLoadPreset(nn) {
@@ -348,7 +378,7 @@ class PublicWAFMIDITonePerformerPlayer {
     }
     ;
     queueWaveTable(out, preset, when, pitch, slides) {
-        let volume = 0.75;
+        let volume = 0.33;
         var zone = this.findZone(this.audioContext, preset, pitch);
         if (zone) {
             if (!(zone.buffer)) {
@@ -435,46 +465,6 @@ class PublicWAFMIDITonePerformerPlayer {
         };
     }
     ;
-}
-class PerformerPluginWAF {
-    constructor() {
-        this.midiProgram = -1;
-    }
-    launch(context, parameters) {
-        if (this.player) {
-        }
-        else {
-            this.out = context.createGain();
-            this.player = new PublicWAFMIDITonePerformerPlayer();
-            this.player.setup(context);
-        }
-        let nn = parseInt(parameters);
-        if (this.midiProgram == nn) {
-        }
-        else {
-            this.midiProgram = nn;
-            this.player.startLoadPreset(this.midiProgram);
-        }
-    }
-    schedule(when, pitch, slides) {
-        let info = this.player.instrumentInfo(this.midiProgram);
-        let preset = window[info.variable];
-        let rr = this.player.queueWaveTable(this.out, preset, when, pitch, slides);
-    }
-    output() {
-        return this.out;
-    }
-    cancel() {
-        this.player.cancelQueue();
-    }
-    busy() {
-        if (this.player.presetReady(this.midiProgram)) {
-            return null;
-        }
-        else {
-            return 'program ' + this.midiProgram + ' isn\'t ready';
-        }
-    }
 }
 function testPluginWAF() {
     return new PerformerPluginWAF();

@@ -7,5 +7,6 @@ let pluginListKindUrlName :{ kind: string, url: string, functionName: string }[]
 	, { kind: 'sinewave_performer_1_test', functionName: 'testPluginSingleWave', url: './plugins/performers/testsinewave.js' }
     , { kind: 'waf_performer_1_test', functionName: 'testPluginWAF', url: './plugins/performers/testwaf.js' }
     , { kind: 'drums_performer_1_test', functionName: 'testPluginDrums', url: './plugins/performers/drumswaf.js' }
+	, { kind: 'emptySilent', functionName: 'testCreateEmpty', url: './plugins/performers/testempty.js' }
 ];
 console.log(pluginListKindUrlName);

@@ -354,15 +354,16 @@ class SchedulePlayer implements MZXBX_Player {
 					for (let nn = 0; nn < cuSerie.items.length; nn++) {
 						let it: MZXBX_PlayItem = cuSerie.items[nn];
 						if (serieStart + it.skip >= fromPosition && serieStart + it.skip < toPosition) {
+							console.log((ii+it.skip),it.channelId,it.pitch,(whenAudio + serieStart + it.skip - fromPosition));
 							this.sendPerformerItem(it, whenAudio + serieStart + it.skip - fromPosition);
 						}
 					}
-					for (let nn = 0; nn < cuSerie.states.length; nn++) {
+					/*for (let nn = 0; nn < cuSerie.states.length; nn++) {
 						let state: MZXBX_FilterState = cuSerie.states[nn];
 						if (serieStart + state.skip >= fromPosition && serieStart + state.skip < toPosition) {
 							this.sendFilterItem(state, whenAudio + serieStart + state.skip - fromPosition);
 						}
-					}
+					}*/
 				}
 				serieStart = serieStart + cuSerie.duration;
 			}

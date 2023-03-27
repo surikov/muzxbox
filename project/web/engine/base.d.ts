@@ -283,6 +283,8 @@ declare class PluginLoader {
         functionName: string;
     } | null;
 }
+declare let drumNames: string[];
+declare let insNames: string[];
 declare type XYp = {
     x: number;
     y: number;

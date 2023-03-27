@@ -22,6 +22,9 @@ call tsc
 cd ..\testdrumsperformer
 cd
 call tsc
+cd ..\emptyperformer
+cd
+call tsc
 cd ..\..\
 cd
 pause

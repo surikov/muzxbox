@@ -83,17 +83,46 @@ type WaveEnvelope = {
 	, pitch: number
 	, preset: WavePreset
 };
-class PublicWAFMIDIDrummer {
+
+class PerformerPluginDrums implements MZXBX_AudioPerformerPlugin {
+	out: GainNode;
+	midiDrum: number = -1;
 	audioContext: AudioContext;
 	instrumentKeyArray: string[] = [];
 	instrumentNamesArray: string[] = [];
 	envelopes: WaveEnvelope[] = [];
 	afterTime = 0.05;
 	nearZero = 0.000001;
-	setup(context: AudioContext): void {
-		if (!(this.audioContext)) {
+	launch(context: AudioContext, parameters: string): void {
+		if (!(this.out)) {
 			this.audioContext = context;
+			this.out = this.audioContext.createGain();
 		}
+		let nn: number = parseInt(parameters);
+		if (this.midiDrum == nn) {
+			//
+		} else {
+			this.midiDrum = nn;
+			this.startLoadPreset(this.midiDrum);
+		}
+	}
+	busy(): string | null {
+		if (this.presetReady(this.midiDrum)) {
+			return null;
+		} else {
+			return 'wave ' + this.midiDrum + ' isn\'t ready';
+		}
+	}
+	schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void {
+		let info: PresetDrum = this.instrumentInfo(this.midiDrum);
+		let preset: WavePreset = window[info.variable] as WavePreset;
+		let rr = this.queueWaveTable(this.out, preset, when, info.pitch, slides);
+	}
+	output(): AudioNode | null {
+		return this.out;
+	}
+	cancel(): void {
+		this.cancelQueue();
 	}
 	startLoadPreset(nn: number) {
 		let info: PresetDrum = this.instrumentInfo(nn);
@@ -292,8 +321,6 @@ class PublicWAFMIDIDrummer {
 		}
 	};
 	queueWaveTable(out: AudioNode, preset: WavePreset, when: number, pitch: number, slides: MZXBX_SlideItem[]): WaveEnvelope | null {
-		//this.resumeContext(audioContext);
-		//volume = this.limitVolume(volume);
 		let volume = 0.75;
 		var zone: WaveZone | null = this.findZone(this.audioContext, preset, pitch);
 		if (zone) {
@@ -325,9 +352,7 @@ class PublicWAFMIDIDrummer {
 			this.setupEnvelope(this.audioContext, envelope, zone, volume, startWhen, waveDuration, duration);
 			envelope.audioBufferSourceNode = this.audioContext.createBufferSource();
 			envelope.audioBufferSourceNode.playbackRate.setValueAtTime(playbackRate, 0);
-			//if (slides) {
 			if (slides.length > 1) {
-				//envelope.audioBufferSourceNode.playbackRate.setValueAtTime(playbackRate, when);
 				for (var i = 0; i < slides.length; i++) {
 					var nextPitch = pitch + slides[i].delta;
 					var newPlaybackRate = 1.0 * Math.pow(2, (100.0 * nextPitch - baseDetune) / 1200.0);
@@ -335,7 +360,6 @@ class PublicWAFMIDIDrummer {
 					envelope.audioBufferSourceNode.playbackRate.linearRampToValueAtTime(newPlaybackRate, newWhen);
 				}
 			}
-			//}
 			envelope.audioBufferSourceNode.buffer = zone.buffer;
 			if (loop) {
 				envelope.audioBufferSourceNode.loop = true;
@@ -380,50 +404,6 @@ class PublicWAFMIDIDrummer {
 			pitch: n
 		};
 	};
-}
-class PerformerPluginDrums implements MZXBX_AudioPerformerPlugin {
-	out: GainNode;
-	player: PublicWAFMIDIDrummer;
-	midiDrum: number = -1;
-	//velocityRatio = 0.75;
-	launch(context: AudioContext, parameters: string): void {
-		if (!(this.player)) {
-			//return this.player.presetReady(this.midiDrum);
-			//} else {
-			this.out = context.createGain();
-			this.player = new PublicWAFMIDIDrummer();
-			this.player.setup(context);
-
-
-			//return this.player.presetReady(this.midiDrum);
-		}
-		let nn: number = parseInt(parameters);
-		if (this.midiDrum == nn) {
-			//
-		} else {
-			this.midiDrum = nn;
-			this.player.startLoadPreset(this.midiDrum);
-		}
-	}
-	busy(): string |null{
-		if( this.player.presetReady(this.midiDrum)){
-			return null;
-		}else{
-			return 'wave '+this.midiDrum+' isn\'t ready';
-		}
-	}
-	schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void {
-		let info: PresetDrum = this.player.instrumentInfo(this.midiDrum);
-		let preset: WavePreset = window[info.variable] as WavePreset;
-		let rr = this.player.queueWaveTable(this.out, preset, when, info.pitch, slides);
-		//console.log(rr);
-	}
-	output(): AudioNode | null {
-		return this.out;
-	}
-	cancel(): void {
-		this.player.cancelQueue();
-	}
 }
 function testPluginDrums(): MZXBX_AudioPerformerPlugin {
 	return new PerformerPluginDrums();
