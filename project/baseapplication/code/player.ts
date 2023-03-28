@@ -279,12 +279,16 @@ class SchedulePlayer implements MZXBX_Player {
 							if (performer.plugin) {
 								let plugin: MZXBX_AudioPerformerPlugin = performer.plugin;
 								return plugin;
+							}else{
+								console.error('Empty performer plugin for',channelId);
 							}
 						}
 					}
 				}
 			}
+			console.error('Empty schedule');
 		}
+		console.error('No performer for',channelId);
 		return null;
 	}
 	sendPerformerItem(it: MZXBX_PlayItem, whenAudio: number) {
@@ -307,6 +311,7 @@ class SchedulePlayer implements MZXBX_Player {
 		}*/
 		let plugin: MZXBX_AudioPerformerPlugin | null = this.findPerformerPlugin(it.channelId);
 		if (plugin) {
+			//console.log(plugin);
 			plugin.schedule(whenAudio, it.pitch, it.slides);
 		}
 	}
@@ -354,16 +359,16 @@ class SchedulePlayer implements MZXBX_Player {
 					for (let nn = 0; nn < cuSerie.items.length; nn++) {
 						let it: MZXBX_PlayItem = cuSerie.items[nn];
 						if (serieStart + it.skip >= fromPosition && serieStart + it.skip < toPosition) {
-							console.log((ii+it.skip),it.channelId,it.pitch,(whenAudio + serieStart + it.skip - fromPosition));
+							//console.log((ii+it.skip),it.channelId,it.pitch,(whenAudio + serieStart + it.skip - fromPosition));
 							this.sendPerformerItem(it, whenAudio + serieStart + it.skip - fromPosition);
 						}
 					}
-					/*for (let nn = 0; nn < cuSerie.states.length; nn++) {
+					for (let nn = 0; nn < cuSerie.states.length; nn++) {
 						let state: MZXBX_FilterState = cuSerie.states[nn];
 						if (serieStart + state.skip >= fromPosition && serieStart + state.skip < toPosition) {
 							this.sendFilterItem(state, whenAudio + serieStart + state.skip - fromPosition);
 						}
-					}*/
+					}
 				}
 				serieStart = serieStart + cuSerie.duration;
 			}

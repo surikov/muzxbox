@@ -468,11 +468,16 @@ class SchedulePlayer {
                                 let plugin = performer.plugin;
                                 return plugin;
                             }
+                            else {
+                                console.error('Empty performer plugin for', channelId);
+                            }
                         }
                     }
                 }
             }
+            console.error('Empty schedule');
         }
+        console.error('No performer for', channelId);
         return null;
     }
     sendPerformerItem(it, whenAudio) {
@@ -512,8 +517,13 @@ class SchedulePlayer {
                     for (let nn = 0; nn < cuSerie.items.length; nn++) {
                         let it = cuSerie.items[nn];
                         if (serieStart + it.skip >= fromPosition && serieStart + it.skip < toPosition) {
-                            console.log((ii + it.skip), it.channelId, it.pitch, (whenAudio + serieStart + it.skip - fromPosition));
                             this.sendPerformerItem(it, whenAudio + serieStart + it.skip - fromPosition);
+                        }
+                    }
+                    for (let nn = 0; nn < cuSerie.states.length; nn++) {
+                        let state = cuSerie.states[nn];
+                        if (serieStart + state.skip >= fromPosition && serieStart + state.skip < toPosition) {
+                            this.sendFilterItem(state, whenAudio + serieStart + state.skip - fromPosition);
                         }
                     }
                 }
@@ -1771,14 +1781,17 @@ class MidiParser {
                 for (let nn = 0; nn < chord.notes.length; nn++) {
                     let note = chord.notes[nn];
                     let timeIndex = Math.floor(chord.when / 1000.0);
-                    let channelId = 'track' + mt;
-                    let tID = 'track' + mt + 'subVolume';
+                    let channelId = 'voice' + mt;
+                    let tID = 'voice' + mt + 'subVolume';
                     if (miditrack.channelNum == 9) {
-                        channelId = 'track' + mt + '.' + note.points[0].pitch;
-                        tID = 'track' + mt + '.' + note.points[0].pitch + 'subVolume';
+                        channelId = 'drum' + mt + '.' + note.points[0].pitch;
+                        tID = 'drum' + mt + '.' + note.points[0].pitch + 'subVolume';
                     }
+                    let timeSkip = chord.when / 1000 - timeIndex;
+                    if (timeSkip < 0)
+                        timeSkip = 0;
                     let item = {
-                        skip: (Math.round(chord.when) % 1000.0) / 1000.0,
+                        skip: timeSkip,
                         channelId: channelId,
                         pitch: note.points[0].pitch,
                         slides: []
@@ -1809,7 +1822,6 @@ class MidiParser {
                             else {
                                 lastVol.value = volVal;
                                 let newVol = '' + volVal + '%';
-                                console.log(tID, newVol, (timeIndex + '.' + item.skip));
                                 for (let ii = 0; ii <= timeIndex; ii++) {
                                     if (!(schedule.series[ii])) {
                                         schedule.series[ii] = { duration: 1, items: [], states: [] };
@@ -1843,15 +1855,15 @@ class MidiParser {
                             if (drumNum < 35 || drumNum > 81) {
                                 performerKind = 'emptySilent';
                             }
-                            let volumeID = 'track' + mt + '.' + drumNum + 'volume';
-                            let tID = 'track' + mt + '.' + drumNum + 'subVolume';
+                            let volumeID = 'drum' + mt + '.' + drumNum + 'volume';
+                            let tID = 'drum' + mt + '.' + drumNum + 'subVolume';
                             let comment = miditrack.title + ' [' + drumNum + ': ' + drumNames[drumNum] + ': drums]';
                             schedule.channels.push({
                                 id: channelId, comment: comment, filters: [
                                     { id: volumeID, kind: 'volume_filter_1_test', properties: '100%' },
                                     { id: tID, kind: 'volume_filter_1_test', properties: '100%' }
                                 ],
-                                performer: { id: 'track' + mt + '.' + drumNum + 'performer', kind: performerKind, properties: '' + drumNum }
+                                performer: { id: 'drum' + mt + '.' + drumNum + 'performer', kind: performerKind, properties: '' + drumNum }
                             });
                             for (let vv = 0; vv < miditrack.trackVolumes.length; vv++) {
                                 let setIndex = Math.floor(miditrack.trackVolumes[vv].ms / 1000.0);
@@ -1872,15 +1884,15 @@ class MidiParser {
                             if (midinum < 1 || midinum > 128) {
                                 performerKind = 'emptySilent';
                             }
-                            let volumeID = 'track' + mt + 'volume';
-                            let tID = 'track' + mt + 'subVolume';
+                            let volumeID = 'voice' + mt + 'volume';
+                            let tID = 'voice' + mt + 'subVolume';
                             let comment = miditrack.title + ' [' + midinum + ': ' + insNames[midinum - 1] + ']';
                             schedule.channels.push({
                                 id: channelId, comment: comment, filters: [
                                     { id: volumeID, kind: 'volume_filter_1_test', properties: '100%' },
                                     { id: tID, kind: 'volume_filter_1_test', properties: '100%' }
                                 ],
-                                performer: { id: 'track' + mt + 'performer', kind: performerKind, properties: '' + midinum }
+                                performer: { id: 'voice' + mt + 'performer', kind: performerKind, properties: '' + midinum }
                             });
                             for (let vv = 0; vv < miditrack.trackVolumes.length; vv++) {
                                 let setIndex = Math.floor(miditrack.trackVolumes[vv].ms / 1000.0);

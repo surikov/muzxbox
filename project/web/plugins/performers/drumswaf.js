@@ -47,18 +47,46 @@ WAFMIDIDrumURLs[78] = "78_0_SBLive_sf2";
 WAFMIDIDrumURLs[79] = "79_0_SBLive_sf2";
 WAFMIDIDrumURLs[80] = "80_0_SBLive_sf2";
 WAFMIDIDrumURLs[81] = "81_0_SBLive_sf2";
-class PublicWAFMIDIDrummer {
+class PerformerPluginDrums {
     constructor() {
+        this.midiDrum = -1;
         this.instrumentKeyArray = [];
         this.instrumentNamesArray = [];
         this.envelopes = [];
         this.afterTime = 0.05;
         this.nearZero = 0.000001;
     }
-    setup(context) {
-        if (!(this.audioContext)) {
+    launch(context, parameters) {
+        if (!(this.out)) {
             this.audioContext = context;
+            this.out = this.audioContext.createGain();
         }
+        let nn = parseInt(parameters);
+        if (this.midiDrum == nn) {
+        }
+        else {
+            this.midiDrum = nn;
+            this.startLoadPreset(this.midiDrum);
+        }
+    }
+    busy() {
+        if (this.presetReady(this.midiDrum)) {
+            return null;
+        }
+        else {
+            return 'wave ' + this.midiDrum + ' isn\'t ready';
+        }
+    }
+    schedule(when, pitch, slides) {
+        let info = this.instrumentInfo(this.midiDrum);
+        let preset = window[info.variable];
+        let rr = this.queueWaveTable(this.out, preset, when, info.pitch, slides);
+    }
+    output() {
+        return this.out;
+    }
+    cancel() {
+        this.cancelQueue();
     }
     startLoadPreset(nn) {
         let info = this.instrumentInfo(nn);
@@ -356,44 +384,6 @@ class PublicWAFMIDIDrummer {
         };
     }
     ;
-}
-class PerformerPluginDrums {
-    constructor() {
-        this.midiDrum = -1;
-    }
-    launch(context, parameters) {
-        if (!(this.player)) {
-            this.out = context.createGain();
-            this.player = new PublicWAFMIDIDrummer();
-            this.player.setup(context);
-        }
-        let nn = parseInt(parameters);
-        if (this.midiDrum == nn) {
-        }
-        else {
-            this.midiDrum = nn;
-            this.player.startLoadPreset(this.midiDrum);
-        }
-    }
-    busy() {
-        if (this.player.presetReady(this.midiDrum)) {
-            return null;
-        }
-        else {
-            return 'wave ' + this.midiDrum + ' isn\'t ready';
-        }
-    }
-    schedule(when, pitch, slides) {
-        let info = this.player.instrumentInfo(this.midiDrum);
-        let preset = window[info.variable];
-        let rr = this.player.queueWaveTable(this.out, preset, when, info.pitch, slides);
-    }
-    output() {
-        return this.out;
-    }
-    cancel() {
-        this.player.cancelQueue();
-    }
 }
 function testPluginDrums() {
     return new PerformerPluginDrums();

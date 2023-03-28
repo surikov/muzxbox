@@ -1,51 +1,51 @@
 let drumNames: string[] = [];
-			drumNames[35] = "Bass Drum 2";
-			drumNames[36] = "Bass Drum 1";
-			drumNames[37] = "Side Stick/Rimshot";
-			drumNames[38] = "Snare Drum 1";
-			drumNames[39] = "Hand Clap";
-			drumNames[40] = "Snare Drum 2";
-			drumNames[41] = "Low Tom 2";
-			drumNames[42] = "Closed Hi-hat";
-			drumNames[43] = "Low Tom 1";
-			drumNames[44] = "Pedal Hi-hat";
-			drumNames[45] = "Mid Tom 2";
-			drumNames[46] = "Open Hi-hat";
-			drumNames[47] = "Mid Tom 1";
-			drumNames[48] = "High Tom 2";
-			drumNames[49] = "Crash Cymbal 1";
-			drumNames[50] = "High Tom 1";
-			drumNames[51] = "Ride Cymbal 1";
-			drumNames[52] = "Chinese Cymbal";
-			drumNames[53] = "Ride Bell";
-			drumNames[54] = "Tambourine";
-			drumNames[55] = "Splash Cymbal";
-			drumNames[56] = "Cowbell";
-			drumNames[57] = "Crash Cymbal 2";
-			drumNames[58] = "Vibra Slap";
-			drumNames[59] = "Ride Cymbal 2";
-			drumNames[60] = "High Bongo";
-			drumNames[61] = "Low Bongo";
-			drumNames[62] = "Mute High Conga";
-			drumNames[63] = "Open High Conga";
-			drumNames[64] = "Low Conga";
-			drumNames[65] = "High Timbale";
-			drumNames[66] = "Low Timbale";
-			drumNames[67] = "High Agogo";
-			drumNames[68] = "Low Agogo";
-			drumNames[69] = "Cabasa";
-			drumNames[70] = "Maracas";
-			drumNames[71] = "Short Whistle";
-			drumNames[72] = "Long Whistle";
-			drumNames[73] = "Short Guiro";
-			drumNames[74] = "Long Guiro";
-			drumNames[75] = "Claves";
-			drumNames[76] = "High Wood Block";
-			drumNames[77] = "Low Wood Block";
-			drumNames[78] = "Mute Cuica";
-			drumNames[79] = "Open Cuica";
-			drumNames[80] = "Mute Triangle";
-			drumNames[81] = "Open Triangle";
+drumNames[35] = "Bass Drum 2";
+drumNames[36] = "Bass Drum 1";
+drumNames[37] = "Side Stick/Rimshot";
+drumNames[38] = "Snare Drum 1";
+drumNames[39] = "Hand Clap";
+drumNames[40] = "Snare Drum 2";
+drumNames[41] = "Low Tom 2";
+drumNames[42] = "Closed Hi-hat";
+drumNames[43] = "Low Tom 1";
+drumNames[44] = "Pedal Hi-hat";
+drumNames[45] = "Mid Tom 2";
+drumNames[46] = "Open Hi-hat";
+drumNames[47] = "Mid Tom 1";
+drumNames[48] = "High Tom 2";
+drumNames[49] = "Crash Cymbal 1";
+drumNames[50] = "High Tom 1";
+drumNames[51] = "Ride Cymbal 1";
+drumNames[52] = "Chinese Cymbal";
+drumNames[53] = "Ride Bell";
+drumNames[54] = "Tambourine";
+drumNames[55] = "Splash Cymbal";
+drumNames[56] = "Cowbell";
+drumNames[57] = "Crash Cymbal 2";
+drumNames[58] = "Vibra Slap";
+drumNames[59] = "Ride Cymbal 2";
+drumNames[60] = "High Bongo";
+drumNames[61] = "Low Bongo";
+drumNames[62] = "Mute High Conga";
+drumNames[63] = "Open High Conga";
+drumNames[64] = "Low Conga";
+drumNames[65] = "High Timbale";
+drumNames[66] = "Low Timbale";
+drumNames[67] = "High Agogo";
+drumNames[68] = "Low Agogo";
+drumNames[69] = "Cabasa";
+drumNames[70] = "Maracas";
+drumNames[71] = "Short Whistle";
+drumNames[72] = "Long Whistle";
+drumNames[73] = "Short Guiro";
+drumNames[74] = "Long Guiro";
+drumNames[75] = "Claves";
+drumNames[76] = "High Wood Block";
+drumNames[77] = "Low Wood Block";
+drumNames[78] = "Mute Cuica";
+drumNames[79] = "Open Cuica";
+drumNames[80] = "Mute Triangle";
+drumNames[81] = "Open Triangle";
 let insNames: string[] = [];
 insNames[0] = "Acoustic Grand Piano: Piano";
 insNames[1] = "Bright Acoustic Piano: Piano";
@@ -1297,14 +1297,16 @@ class MidiParser {
 				for (let nn = 0; nn < chord.notes.length; nn++) {
 					let note: MIDISongNote = chord.notes[nn];
 					let timeIndex = Math.floor(chord.when / 1000.0);
-					let channelId: string = 'track' + mt;
-					let tID = 'track' + mt + 'subVolume';
+					let channelId: string = 'voice' + mt;
+					let tID = 'voice' + mt + 'subVolume';
 					if (miditrack.channelNum == 9) {
-						channelId = 'track' + mt + '.' + note.points[0].pitch;
-						tID = 'track' + mt + '.' + note.points[0].pitch + 'subVolume';
+						channelId = 'drum' + mt + '.' + note.points[0].pitch;
+						tID = 'drum' + mt + '.' + note.points[0].pitch + 'subVolume';
 					}
+					let timeSkip = chord.when/1000 - timeIndex ;
+					if (timeSkip < 0) timeSkip = 0;
 					let item: MZXBX_PlayItem = {
-						skip: (Math.round(chord.when) % 1000.0) / 1000.0
+						skip: timeSkip//(Math.round(chord.when) % 1000.0) / 1000.0
 						, channelId: channelId//channel.id
 						, pitch: note.points[0].pitch
 						, slides: []
@@ -1338,7 +1340,7 @@ class MidiParser {
 							} else {
 								lastVol.value = volVal;
 								let newVol = '' + volVal + '%';
-								console.log(tID, newVol, (timeIndex+'.'+item.skip));
+								//console.log(tID, newVol, (timeIndex + '.' + item.skip));
 
 								for (let ii = 0; ii <= timeIndex; ii++) {
 									if (!(schedule.series[ii])) {
@@ -1375,19 +1377,19 @@ class MidiParser {
 					if (!exsts) {
 						if (miditrack.channelNum == 9) {
 							let drumNum = note.points[0].pitch;
-							let performerKind='drums_performer_1_test';
+							let performerKind = 'drums_performer_1_test';
 							if (drumNum < 35 || drumNum > 81) {
-								performerKind='emptySilent';
+								performerKind = 'emptySilent';
 							}
-							let volumeID = 'track' + mt + '.' + drumNum + 'volume';
-							let tID = 'track' + mt + '.' + drumNum + 'subVolume';
-							let comment = miditrack.title+ ' ['+drumNum+': '+drumNames[drumNum]+': drums]';
+							let volumeID = 'drum' + mt + '.' + drumNum + 'volume';
+							let tID = 'drum' + mt + '.' + drumNum + 'subVolume';
+							let comment = miditrack.title + ' [' + drumNum + ': ' + drumNames[drumNum] + ': drums]';
 							schedule.channels.push({
 								id: channelId, comment: comment, filters: [
 									{ id: volumeID, kind: 'volume_filter_1_test', properties: '100%' }
 									, { id: tID, kind: 'volume_filter_1_test', properties: '100%' }
 								]
-								, performer: { id: 'track' + mt + '.' + drumNum + 'performer', kind: performerKind, properties: '' + drumNum }
+								, performer: { id: 'drum' + mt + '.' + drumNum + 'performer', kind: performerKind, properties: '' + drumNum }
 							});
 							for (let vv = 0; vv < miditrack.trackVolumes.length; vv++) {
 								let setIndex = Math.floor(miditrack.trackVolumes[vv].ms / 1000.0);
@@ -1403,19 +1405,19 @@ class MidiParser {
 								});
 							}
 						} else {
-							let performerKind='waf_performer_1_test';
+							let performerKind = 'waf_performer_1_test';
 							if (midinum < 1 || midinum > 128) {
-								performerKind='emptySilent';
+								performerKind = 'emptySilent';
 							}
-							let volumeID = 'track' + mt + 'volume';
-							let tID = 'track' + mt + 'subVolume';
-							let comment = miditrack.title+ ' ['+midinum+': '+insNames[midinum-1]+']';
+							let volumeID = 'voice' + mt + 'volume';
+							let tID = 'voice' + mt + 'subVolume';
+							let comment = miditrack.title + ' [' + midinum + ': ' + insNames[midinum - 1] + ']';
 							schedule.channels.push({
 								id: channelId, comment: comment, filters: [
 									{ id: volumeID, kind: 'volume_filter_1_test', properties: '100%' }
 									, { id: tID, kind: 'volume_filter_1_test', properties: '100%' }
 								]
-								, performer: { id: 'track' + mt + 'performer', kind: performerKind, properties: '' + midinum }
+								, performer: { id: 'voice' + mt + 'performer', kind: performerKind, properties: '' + midinum }
 							});
 							for (let vv = 0; vv < miditrack.trackVolumes.length; vv++) {
 								let setIndex = Math.floor(miditrack.trackVolumes[vv].ms / 1000.0);

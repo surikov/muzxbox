@@ -36,14 +36,20 @@ declare type WaveEnvelope = {
     pitch: number;
     preset: WavePreset;
 };
-declare class PublicWAFMIDIDrummer {
+declare class PerformerPluginDrums implements MZXBX_AudioPerformerPlugin {
+    out: GainNode;
+    midiDrum: number;
     audioContext: AudioContext;
     instrumentKeyArray: string[];
     instrumentNamesArray: string[];
     envelopes: WaveEnvelope[];
     afterTime: number;
     nearZero: number;
-    setup(context: AudioContext): void;
+    launch(context: AudioContext, parameters: string): void;
+    busy(): string | null;
+    schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void;
+    output(): AudioNode | null;
+    cancel(): void;
     startLoadPreset(nn: number): void;
     presetReady(nn: number): boolean;
     adjustPreset(preset: WavePreset): void;
@@ -56,16 +62,6 @@ declare class PublicWAFMIDIDrummer {
     queueWaveTable(out: AudioNode, preset: WavePreset, when: number, pitch: number, slides: MZXBX_SlideItem[]): WaveEnvelope | null;
     cancelQueue(): void;
     instrumentInfo(n: number): PresetDrum;
-}
-declare class PerformerPluginDrums implements MZXBX_AudioPerformerPlugin {
-    out: GainNode;
-    player: PublicWAFMIDIDrummer;
-    midiDrum: number;
-    launch(context: AudioContext, parameters: string): void;
-    busy(): string | null;
-    schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void;
-    output(): AudioNode | null;
-    cancel(): void;
 }
 declare function testPluginDrums(): MZXBX_AudioPerformerPlugin;
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
