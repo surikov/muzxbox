@@ -1,4 +1,7 @@
-declare var WAFMIDIPresetURLs: string[];
+declare var WAFMIDIPresetURLs: {
+    name: string;
+    volume: number;
+}[];
 declare type PresetInstrument = {
     variable: string;
     url: string;
@@ -21,6 +24,7 @@ declare type WaveZone = {
 };
 declare type WavePreset = {
     zones: WaveZone[];
+    volume: number;
 };
 declare type WaveAHDSR = {
     duration: number;

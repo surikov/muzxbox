@@ -1,51 +1,51 @@
-var WAFMIDIDrumURLs: string[] = [];
-WAFMIDIDrumURLs[35] = "35_0_Chaos_sf2_file";
-WAFMIDIDrumURLs[36] = "36_0_SBLive_sf2";
-WAFMIDIDrumURLs[37] = "37_0_SBLive_sf2";
-WAFMIDIDrumURLs[38] = "38_0_SBLive_sf2";
-WAFMIDIDrumURLs[39] = "39_0_SBLive_sf2";
-WAFMIDIDrumURLs[40] = "40_0_SBLive_sf2";
-WAFMIDIDrumURLs[41] = "41_0_SBLive_sf2";
-WAFMIDIDrumURLs[42] = "42_0_SBLive_sf2";
-WAFMIDIDrumURLs[43] = "43_0_SBLive_sf2";
-WAFMIDIDrumURLs[44] = "44_0_SBLive_sf2";
-WAFMIDIDrumURLs[45] = "45_0_SBLive_sf2";
-WAFMIDIDrumURLs[46] = "46_0_SBLive_sf2";
-WAFMIDIDrumURLs[47] = "47_0_SBLive_sf2";
-WAFMIDIDrumURLs[48] = "48_0_SBLive_sf2";
-WAFMIDIDrumURLs[49] = "49_0_SBLive_sf2";
-WAFMIDIDrumURLs[50] = "50_0_SBLive_sf2";
-WAFMIDIDrumURLs[51] = "51_0_SBLive_sf2";
-WAFMIDIDrumURLs[52] = "52_0_SBLive_sf2";
-WAFMIDIDrumURLs[53] = "53_0_SBLive_sf2";
-WAFMIDIDrumURLs[54] = "54_0_SBLive_sf2";
-WAFMIDIDrumURLs[55] = "55_0_SBLive_sf2";
-WAFMIDIDrumURLs[56] = "56_0_SBLive_sf2";
-WAFMIDIDrumURLs[57] = "57_0_SBLive_sf2";
-WAFMIDIDrumURLs[58] = "58_0_SBLive_sf2";
-WAFMIDIDrumURLs[59] = "59_0_SBLive_sf2";
-WAFMIDIDrumURLs[60] = "60_0_SBLive_sf2";
-WAFMIDIDrumURLs[61] = "61_0_SBLive_sf2";
-WAFMIDIDrumURLs[62] = "62_0_SBLive_sf2";
-WAFMIDIDrumURLs[63] = "63_0_SBLive_sf2";
-WAFMIDIDrumURLs[64] = "64_0_SBLive_sf2";
-WAFMIDIDrumURLs[65] = "65_0_SBLive_sf2";
-WAFMIDIDrumURLs[66] = "66_0_SBLive_sf2";
-WAFMIDIDrumURLs[67] = "67_0_SBLive_sf2";
-WAFMIDIDrumURLs[68] = "68_0_SBLive_sf2";
-WAFMIDIDrumURLs[69] = "69_0_SBLive_sf2";
-WAFMIDIDrumURLs[70] = "70_0_SBLive_sf2";
-WAFMIDIDrumURLs[71] = "71_0_SBLive_sf2";
-WAFMIDIDrumURLs[72] = "72_0_SBLive_sf2";
-WAFMIDIDrumURLs[73] = "73_0_SBLive_sf2";
-WAFMIDIDrumURLs[74] = "74_0_SBLive_sf2";
-WAFMIDIDrumURLs[75] = "75_0_SBLive_sf2";
-WAFMIDIDrumURLs[76] = "76_0_SBLive_sf2";
-WAFMIDIDrumURLs[77] = "77_0_SBLive_sf2";
-WAFMIDIDrumURLs[78] = "78_0_SBLive_sf2";
-WAFMIDIDrumURLs[79] = "79_0_SBLive_sf2";
-WAFMIDIDrumURLs[80] = "80_0_SBLive_sf2";
-WAFMIDIDrumURLs[81] = "81_0_SBLive_sf2";
+var WAFMIDIDrumURLs: { name: string, volume: number }[] = [];
+WAFMIDIDrumURLs[35] = { name: "35_0_Chaos_sf2_file", volume: 0.99 };
+WAFMIDIDrumURLs[36] = { name: "36_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[37] = { name: "37_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[38] = { name: "38_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[39] = { name: "39_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[40] = { name: "40_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[41] = { name: "41_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[42] = { name: "42_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[43] = { name: "43_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[44] = { name: "44_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[45] = { name: "45_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[46] = { name: "46_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[47] = { name: "47_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[48] = { name: "48_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[49] = { name: "49_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[50] = { name: "50_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[51] = { name: "51_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[52] = { name: "52_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[53] = { name: "53_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[54] = { name: "54_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[55] = { name: "55_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[56] = { name: "56_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[57] = { name: "57_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[58] = { name: "58_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[59] = { name: "59_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[60] = { name: "60_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[61] = { name: "61_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[62] = { name: "62_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[63] = { name: "63_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[64] = { name: "64_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[65] = { name: "65_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[66] = { name: "66_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[67] = { name: "67_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[68] = { name: "68_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[69] = { name: "69_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[70] = { name: "70_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[71] = { name: "71_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[72] = { name: "72_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[73] = { name: "73_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[74] = { name: "74_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[75] = { name: "75_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[76] = { name: "76_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[77] = { name: "77_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[78] = { name: "78_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[79] = { name: "79_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[80] = { name: "80_0_SBLive_sf2", volume: 0.99 };
+WAFMIDIDrumURLs[81] = { name: "81_0_SBLive_sf2", volume: 0.99 };
 type PresetDrum = {
 	variable: string
 	, url: string
@@ -69,6 +69,7 @@ type WaveZone = {
 };
 type WavePreset = {
 	zones: WaveZone[];
+	volume: number;
 };
 type WaveAHDSR = {
 	duration: number
@@ -130,6 +131,10 @@ class PerformerPluginDrums implements MZXBX_AudioPerformerPlugin {
 		if (MZXBX_appendScriptURL(info.url)) {
 			MZXBX_waitForCondition(250, () => { return (window[info.variable]); }, () => {
 				let preset: WavePreset = window[info.variable] as WavePreset;
+				preset.volume = 0.0;
+				if (WAFMIDIDrumURLs[nn]) {
+					preset.volume = WAFMIDIDrumURLs[nn].volume;
+				}
 				me.adjustPreset(preset);
 			});
 		}
@@ -321,7 +326,6 @@ class PerformerPluginDrums implements MZXBX_AudioPerformerPlugin {
 		}
 	};
 	queueWaveTable(out: AudioNode, preset: WavePreset, when: number, pitch: number, slides: MZXBX_SlideItem[]): WaveEnvelope | null {
-		let volume = 0.75;
 		var zone: WaveZone | null = this.findZone(this.audioContext, preset, pitch);
 		if (zone) {
 			if (!(zone.buffer)) {
@@ -349,7 +353,7 @@ class PerformerPluginDrums implements MZXBX_AudioPerformerPlugin {
 				}
 			}
 			var envelope: WaveEnvelope = this.findEnvelope(this.audioContext, out);
-			this.setupEnvelope(this.audioContext, envelope, zone, volume, startWhen, waveDuration, duration);
+			this.setupEnvelope(this.audioContext, envelope, zone, preset.volume, startWhen, waveDuration, duration);
 			envelope.audioBufferSourceNode = this.audioContext.createBufferSource();
 			envelope.audioBufferSourceNode.playbackRate.setValueAtTime(playbackRate, 0);
 			if (slides.length > 1) {
@@ -394,7 +398,10 @@ class PerformerPluginDrums implements MZXBX_AudioPerformerPlugin {
 		}
 	}
 	instrumentInfo(n: number): PresetDrum {
-		var key: string = WAFMIDIDrumURLs[n];
+		var key: string = '';
+		if (WAFMIDIDrumURLs[n]) {
+			key = WAFMIDIDrumURLs[n].name;
+		}
 		if (!(key)) {
 			console.log('not found drum definition for', n);
 		}

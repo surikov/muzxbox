@@ -1,4 +1,7 @@
-declare var WAFMIDIDrumURLs: string[];
+declare var WAFMIDIDrumURLs: {
+    name: string;
+    volume: number;
+}[];
 declare type PresetDrum = {
     variable: string;
     url: string;
@@ -22,6 +25,7 @@ declare type WaveZone = {
 };
 declare type WavePreset = {
     zones: WaveZone[];
+    volume: number;
 };
 declare type WaveAHDSR = {
     duration: number;
