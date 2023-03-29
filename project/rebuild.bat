@@ -7,6 +7,9 @@ call tsc
 cd ..\testecho1
 cd
 call tsc
+cd ..\test_compress
+cd
+call tsc
 cd ..\testsinewavetone
 cd
 call tsc
