@@ -233,59 +233,14 @@ class PerformerPluginDrums {
         return envelope;
     }
     ;
-    setupEnvelope(audioContext, envelope, zone, volume, when, sampleDuration, noteDuration) {
+    setupEnvelope(audioContext, envelope, zone, involume, when, sampleDuration, duration) {
         envelope.gain.setValueAtTime(this.noZeroVolume(0), audioContext.currentTime);
-        var lastTime = 0;
-        var lastVolume = 0;
-        var duration = noteDuration;
-        var zoneahdsr = zone.ahdsr;
         if (sampleDuration < duration + this.afterTime) {
             duration = sampleDuration - this.afterTime;
         }
-        if (zoneahdsr) {
-            if (!(zoneahdsr.length > 0)) {
-                zoneahdsr = [{
-                        duration: 0,
-                        volume: 1
-                    }, {
-                        duration: 0.5,
-                        volume: 1
-                    }, {
-                        duration: 1.5,
-                        volume: 0.5
-                    }, {
-                        duration: 3,
-                        volume: 0
-                    }
-                ];
-            }
-        }
-        else {
-            zoneahdsr = [{
-                    duration: 0,
-                    volume: 1
-                }, {
-                    duration: duration,
-                    volume: 1
-                }
-            ];
-        }
-        var ahdsr = zoneahdsr;
         envelope.gain.cancelScheduledValues(when);
-        envelope.gain.setValueAtTime(this.noZeroVolume(ahdsr[0].volume * volume), when);
-        for (var i = 0; i < ahdsr.length; i++) {
-            if (ahdsr[i].duration > 0) {
-                if (ahdsr[i].duration + lastTime > duration) {
-                    var r = 1 - (ahdsr[i].duration + lastTime - duration) / ahdsr[i].duration;
-                    var n = lastVolume - r * (lastVolume - ahdsr[i].volume);
-                    envelope.gain.linearRampToValueAtTime(this.noZeroVolume(volume * n), when + duration);
-                    break;
-                }
-                lastTime = lastTime + ahdsr[i].duration;
-                lastVolume = ahdsr[i].volume;
-                envelope.gain.linearRampToValueAtTime(this.noZeroVolume(volume * lastVolume), when + lastTime);
-            }
-        }
+        envelope.gain.setValueAtTime(this.noZeroVolume(involume), when);
+        envelope.gain.setValueAtTime(this.noZeroVolume(involume), when + duration);
         envelope.gain.linearRampToValueAtTime(this.noZeroVolume(0), when + duration + this.afterTime);
     }
     ;

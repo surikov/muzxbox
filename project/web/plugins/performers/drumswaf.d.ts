@@ -61,7 +61,7 @@ declare class PerformerPluginDrums implements MZXBX_AudioPerformerPlugin {
     numValue(aValue: any, defValue: number): number;
     findZone(audioContext: AudioContext, preset: WavePreset, pitch: number): WaveZone | null;
     findEnvelope(audioContext: AudioContext, out: AudioNode): WaveEnvelope;
-    setupEnvelope(audioContext: AudioContext, envelope: WaveEnvelope, zone: WaveZone, volume: number, when: number, sampleDuration: number, noteDuration: number): void;
+    setupEnvelope(audioContext: AudioContext, envelope: WaveEnvelope, zone: WaveZone, involume: number, when: number, sampleDuration: number, duration: number): void;
     noZeroVolume(n: number): number;
     queueWaveTable(out: AudioNode, preset: WavePreset, when: number, pitch: number, slides: MZXBX_SlideItem[]): WaveEnvelope | null;
     cancelQueue(): void;

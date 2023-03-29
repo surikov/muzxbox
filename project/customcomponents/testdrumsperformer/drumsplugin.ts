@@ -264,16 +264,17 @@ class PerformerPluginDrums implements MZXBX_AudioPerformerPlugin {
 		}
 		return envelope;
 	};
-	setupEnvelope(audioContext: AudioContext, envelope: WaveEnvelope, zone: WaveZone, volume: number, when: number, sampleDuration: number, noteDuration: number) {
+	setupEnvelope(audioContext: AudioContext, envelope: WaveEnvelope, zone: WaveZone, involume: number, when: number, sampleDuration: number, duration: number) {
 		((envelope as any) as GainNode).gain.setValueAtTime(this.noZeroVolume(0), audioContext.currentTime);
-		var lastTime = 0;
-		var lastVolume = 0;
-		var duration = noteDuration;
-		var zoneahdsr: undefined | boolean | WaveAHDSR[] = zone.ahdsr;
+		//var lastTime = 0;
+		//var lastVolume = 0;
+		//var duration = noteDuration;
+		//var zoneahdsr: undefined | boolean | WaveAHDSR[] = zone.ahdsr;
+
 		if (sampleDuration < duration + this.afterTime) {
 			duration = sampleDuration - this.afterTime;
 		}
-		if (zoneahdsr) {
+		/*if (zoneahdsr) {
 			if (!((zoneahdsr as any).length > 0)) {
 				zoneahdsr = [{
 					duration: 0,
@@ -299,23 +300,33 @@ class PerformerPluginDrums implements MZXBX_AudioPerformerPlugin {
 				volume: 1
 			}
 			];
+		}*/
+		//var ahdsr: WaveAHDSR[] = zoneahdsr as WaveAHDSR[];
+		/*var ahdsr:WaveAHDSR[] = [{
+			duration: 0,
+			volume: 1
+		}, {
+			duration: duration,
+			volume: 1
 		}
-		var ahdsr: WaveAHDSR[] = zoneahdsr as WaveAHDSR[];
+		];*/
 		((envelope as any) as GainNode).gain.cancelScheduledValues(when);
-		((envelope as any) as GainNode).gain.setValueAtTime(this.noZeroVolume(ahdsr[0].volume * volume), when);
-		for (var i = 0; i < ahdsr.length; i++) {
+		//((envelope as any) as GainNode).gain.setValueAtTime(this.noZeroVolume(ahdsr[0].volume * involume), when);
+		((envelope as any) as GainNode).gain.setValueAtTime(this.noZeroVolume(involume), when);
+		/*for (var i = 0; i < ahdsr.length; i++) {
 			if (ahdsr[i].duration > 0) {
 				if (ahdsr[i].duration + lastTime > duration) {
 					var r = 1 - (ahdsr[i].duration + lastTime - duration) / ahdsr[i].duration;
 					var n = lastVolume - r * (lastVolume - ahdsr[i].volume);
-					((envelope as any) as GainNode).gain.linearRampToValueAtTime(this.noZeroVolume(volume * n), when + duration);
+					((envelope as any) as GainNode).gain.linearRampToValueAtTime(this.noZeroVolume(involume * n), when + duration);
 					break;
 				}
 				lastTime = lastTime + ahdsr[i].duration;
 				lastVolume = ahdsr[i].volume;
-				((envelope as any) as GainNode).gain.linearRampToValueAtTime(this.noZeroVolume(volume * lastVolume), when + lastTime);
+				((envelope as any) as GainNode).gain.linearRampToValueAtTime(this.noZeroVolume(involume * lastVolume), when + lastTime);
 			}
-		}
+		}*/
+		((envelope as any) as GainNode).gain.setValueAtTime(this.noZeroVolume(involume), when + duration);
 		((envelope as any) as GainNode).gain.linearRampToValueAtTime(this.noZeroVolume(0), when + duration + this.afterTime);
 	};
 	noZeroVolume(n: number): number {
