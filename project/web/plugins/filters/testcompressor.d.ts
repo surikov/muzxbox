@@ -1,8 +1,6 @@
 declare class SimpleCompressorPlugin implements MZXBX_AudioFilterPlugin {
     inpt: GainNode;
     outpt: GainNode;
-    fx: GainNode;
-    pass: GainNode;
     compressor: DynamicsCompressorNode;
     schedule(when: number, parameters: string): void;
     launch(context: AudioContext, parameters: string): void;

@@ -207,9 +207,14 @@ declare class MuzXbox {
     audioContext: AudioContext;
     player: SchedulePlayer;
     setupDone: boolean;
+    currentDuration: number;
+    songslide: HTMLInputElement | null;
     constructor();
     initAfterLoad(): void;
     initFromUI(): void;
+    updatePosition(pp: number): void;
+    updateSongSlider(): void;
+    setSongSlider(): void;
     initAudioContext(): void;
     resumeContext(audioContext: AudioContext): void;
     startTest(): void;

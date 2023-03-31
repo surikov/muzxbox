@@ -136,6 +136,8 @@ console.log("MuzXbox v1.0.2");
 class MuzXbox {
     constructor() {
         this.uiStarted = false;
+        this.currentDuration = 0;
+        this.songslide = null;
         this.initAfterLoad();
     }
     initAfterLoad() {
@@ -164,6 +166,41 @@ class MuzXbox {
                     fileReader.readAsArrayBuffer(file);
                 };
                 filesinput.addEventListener('change', listener, false);
+            }
+            this.songslide = document.getElementById('songslide');
+            if (this.songslide) {
+                let me = this;
+                this.updateSongSlider();
+                this.songslide.onchange = function (changeEvent) {
+                    if (me.songslide) {
+                        console.log('changeEvent', changeEvent, me.songslide.value);
+                        me.updatePosition(parseFloat(me.songslide.value));
+                    }
+                };
+            }
+        }
+    }
+    updatePosition(pp) {
+        if (this.player) {
+            if (this.player.onAir) {
+                this.player.position = (pp * this.currentDuration) / 100;
+            }
+        }
+    }
+    updateSongSlider() {
+        let me = this;
+        setTimeout(function () {
+            me.setSongSlider();
+            me.updateSongSlider();
+        }, 999);
+    }
+    setSongSlider() {
+        if (this.player) {
+            if (this.player.onAir) {
+                if (this.songslide) {
+                    let newValue = Math.floor(100 * this.player.position / this.currentDuration);
+                    this.songslide.value = '' + newValue;
+                }
             }
         }
     }
@@ -208,11 +245,11 @@ class MuzXbox {
         else {
             MZXBX_waitForCondition(500, () => this.setupDone, () => {
                 console.log('loaded', this.player.filters, this.player.performers);
-                let duration = 0;
+                this.currentDuration = 0;
                 for (let ii = 0; ii < testSchedule.series.length; ii++) {
-                    duration = duration + testSchedule.series[ii].duration;
+                    this.currentDuration = this.currentDuration + testSchedule.series[ii].duration;
                 }
-                this.player.startLoop(0, 0, duration);
+                this.player.startLoop(0, 0, this.currentDuration);
             });
         }
     }
@@ -1770,10 +1807,7 @@ class MidiParser {
         let schedule = {
             series: [],
             channels: [],
-            filters: [
-                { id: 'compressor1', kind: 'dynamic_compression', properties: '' },
-                { id: 'masterEcho111', kind: 'echo_filter_1_test', properties: '0.3' }
-            ]
+            filters: []
         };
         let volumeCashe = new LastKeyVal();
         for (let mt = 0; mt < midiSongData.miditracks.length; mt++) {

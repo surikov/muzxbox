@@ -1,8 +1,8 @@
 class SimpleCompressorPlugin implements MZXBX_AudioFilterPlugin {
 	inpt: GainNode;
 	outpt: GainNode;
-	fx: GainNode;
-	pass: GainNode;
+	//fx: GainNode;
+	//pass: GainNode;
 	compressor: DynamicsCompressorNode;
 	schedule(when: number, parameters: string) {
 		console.log('not implemented yet');
@@ -13,12 +13,13 @@ class SimpleCompressorPlugin implements MZXBX_AudioFilterPlugin {
 			this.outpt = context.createGain();
 			this.compressor = context.createDynamicsCompressor();
 			this.inpt.connect(this.compressor);
-			this.fx = context.createGain();
-			this.compressor.connect(this.fx);
-			this.fx.connect(this.outpt);
-			this.pass = context.createGain();
-			this.inpt.connect(this.pass);
-			this.pass.connect(this.outpt);
+			this.compressor.connect(this.outpt);
+			//this.fx = context.createGain();
+			//this.compressor.connect(this.outpt);
+			//this.fx.connect(this.outpt);
+			//this.pass = context.createGain();
+			//this.inpt.connect(this.pass);
+			//this.pass.connect(this.outpt);
 
 			var threshold = -35;
 			var knee = 35;
@@ -32,8 +33,8 @@ class SimpleCompressorPlugin implements MZXBX_AudioFilterPlugin {
 			this.compressor.attack.setValueAtTime(attack, 0.0001);//0,1
 			this.compressor.release.setValueAtTime(release, 0.0001);//0,1
 
-			this.pass.gain.setTargetAtTime(0.8, 0, 0.0001);
-			this.fx.gain.setTargetAtTime(0.2, 0, 0.0001);
+			//this.pass.gain.setTargetAtTime(0.8, 0, 0.0001);
+			//this.fx.gain.setTargetAtTime(0.2, 0, 0.0001);
 		}
 	}
 	busy(): string | null {

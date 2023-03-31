@@ -1271,8 +1271,8 @@ class MidiParser {
 			series: []
 			, channels: []
 			, filters: [
-				{ id: 'compressor1', kind: 'dynamic_compression', properties: '' }
-				,{ id: 'masterEcho111', kind: 'echo_filter_1_test', properties: '0.3' }
+				//{ id: 'compressor1', kind: 'dynamic_compression', properties: '' }
+				//,{ id: 'masterEcho111', kind: 'echo_filter_1_test', properties: '0.3' }
 			]
 		};
 		let volumeCashe = new LastKeyVal();

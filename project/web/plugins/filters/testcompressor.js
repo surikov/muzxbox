@@ -9,12 +9,7 @@ class SimpleCompressorPlugin {
             this.outpt = context.createGain();
             this.compressor = context.createDynamicsCompressor();
             this.inpt.connect(this.compressor);
-            this.fx = context.createGain();
-            this.compressor.connect(this.fx);
-            this.fx.connect(this.outpt);
-            this.pass = context.createGain();
-            this.inpt.connect(this.pass);
-            this.pass.connect(this.outpt);
+            this.compressor.connect(this.outpt);
             var threshold = -35;
             var knee = 35;
             var ratio = 8;
@@ -25,8 +20,6 @@ class SimpleCompressorPlugin {
             this.compressor.ratio.setValueAtTime(ratio, 0.0001);
             this.compressor.attack.setValueAtTime(attack, 0.0001);
             this.compressor.release.setValueAtTime(release, 0.0001);
-            this.pass.gain.setTargetAtTime(0.8, 0, 0.0001);
-            this.fx.gain.setTargetAtTime(0.2, 0, 0.0001);
         }
     }
     busy() {
