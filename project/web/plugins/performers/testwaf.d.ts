@@ -1,10 +1,12 @@
 declare var WAFMIDIPresetURLs: {
     name: string;
     volume: number;
+    octaveShift: number;
 }[];
 declare type PresetInstrument = {
     variable: string;
     url: string;
+    octaveShift: number;
 };
 declare type WaveZone = {
     keyRangeLow: number;

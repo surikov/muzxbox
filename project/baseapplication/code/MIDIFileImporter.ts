@@ -1237,6 +1237,7 @@ class MidiParser {
 						newpoint.midipoint = midinote;
 						newnote.points.push(newpoint);
 					}
+					newnote.points[newnote.points.length-1].durationms=newnote.points[newnote.points.length-1].durationms+66;
 				}
 				let chanTrack = this.findOrCreateTrack(miditrack, i, newchord.channel, tracksChannels);
 				chanTrack.track.songchords.push(newchord);
