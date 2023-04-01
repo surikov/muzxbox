@@ -1211,6 +1211,7 @@ class MidiParser {
         this.midiEventType = 0;
         this.midiEventChannel = 0;
         this.midiEventParam1 = 0;
+        this.controller_coarseVolume = 0x07;
         this.header = new MIDIFileHeader(arrayBuffer);
         this.parseTracks(arrayBuffer);
     }
@@ -1473,8 +1474,11 @@ class MidiParser {
                             }
                             else {
                                 if (evnt.subtype == this.EVENT_MIDI_PITCH_BEND) {
-                                    var pitch = evnt.param1 ? evnt.param1 : 0;
                                     var slide = ((evnt.param2 ? evnt.param2 : 0) - 64) / 6;
+                                    var b14 = evnt.param2 ? evnt.param2 : 0;
+                                    b14 <<= 7;
+                                    b14 |= evnt.param1 ? evnt.param1 : 0;
+                                    b14 = (b14 - 0x2000) / 1000;
                                     var when = evnt.playTimeMs ? evnt.playTimeMs : 0;
                                     var chord = this.findChordBefore(when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
                                     if (chord) {
@@ -1486,7 +1490,7 @@ class MidiParser {
                                                     duration = duration + note.points[k].pointDuration;
                                                 }
                                                 note.points[note.points.length - 1].pointDuration = when - chord.when - duration;
-                                                var firstpitch = note.points[0].pitch + slide;
+                                                var firstpitch = note.points[0].pitch + b14;
                                                 var point = {
                                                     pointDuration: -1,
                                                     pitch: firstpitch
@@ -1497,12 +1501,15 @@ class MidiParser {
                                     }
                                 }
                                 else {
-                                    if (evnt.subtype == this.EVENT_MIDI_CONTROLLER && evnt.param1 == 7) {
+                                    if (evnt.subtype == this.EVENT_MIDI_CONTROLLER && evnt.param1 == this.controller_coarseVolume) {
                                         var v = evnt.param2 ? evnt.param2 / 127 : 0;
                                         let point = { ms: evnt.playTimeMs, value: v, channel: evnt.midiChannel ? evnt.midiChannel : 0, track: t };
                                         singleParsedTrack.trackVolumePoints.push(point);
                                     }
                                     else {
+                                        if (evnt.subtype == this.EVENT_MIDI_CONTROLLER && (evnt.param1 == 100 || evnt.param1 == 101)) {
+                                            console.log('EVENT_MIDI_CONTROLLER', evnt.param1, evnt.param2, evnt);
+                                        }
                                     }
                                 }
                             }

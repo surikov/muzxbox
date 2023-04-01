@@ -529,6 +529,7 @@ declare class MidiParser {
     midiEventType: number;
     midiEventChannel: number;
     midiEventParam1: number;
+    controller_coarseVolume: number;
     constructor(arrayBuffer: ArrayBuffer);
     parseTracks(arrayBuffer: ArrayBuffer): void;
     toText(arr: number[]): string;
