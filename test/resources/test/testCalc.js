@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.62 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.64 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -396,7 +396,7 @@ function dumpRowWaitColor(rows, color, shiftX) {
         });
         prehh = hh;
     }
-    console.log(arr);
+    //console.log(arr);
 }
 function dumpRowFillsColor(inrows, color, shiftX) {
     var oldReduceRatio = reduceRatio;
@@ -506,6 +506,7 @@ function fillCells() {
     msgp.innerText = '' + reduceRatio;
     msgp = document.getElementById('calcLen');
     msgp.innerText = '' + calcLen;
+    //calcRatios(slicedrows);
 }
 function clickHop() {
     skipRowsCount = Math.round(Math.random() * (datarows.length - reduceRatio * rowsVisibleCount));
@@ -633,8 +634,85 @@ function dumpStatAll() {
         dumpStatIne(idx, sz);
     }
 }
+function stat3rows(rr, slicedrows, result) {
+    //let result:Stat123={dx1:dx1,dx2:dx2,count000:0,count001:0,count010:0,count011:0,count100:0,count101:0,count110:0,count111:0};
+    for (var bb = 0; bb < rowLen; bb++) {
+        if ((!ballExists(bb + 1, slicedrows[rr])) && (!ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (!ballExists(bb + 1 + result.dx2, slicedrows[rr + 2])))
+            result.count000++;
+        if ((!ballExists(bb + 1, slicedrows[rr])) && (!ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (ballExists(bb + 1 + result.dx2, slicedrows[rr + 2])))
+            result.count001++;
+        if ((!ballExists(bb + 1, slicedrows[rr])) && (ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (!ballExists(bb + 1 + result.dx2, slicedrows[rr + 2])))
+            result.count010++;
+        if ((!ballExists(bb + 1, slicedrows[rr])) && (ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (ballExists(bb + 1 + result.dx2, slicedrows[rr + 2])))
+            result.count011++;
+        if ((ballExists(bb + 1, slicedrows[rr])) && (!ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (!ballExists(bb + 1 + result.dx2, slicedrows[rr + 2])))
+            result.count100++;
+        if ((ballExists(bb + 1, slicedrows[rr])) && (!ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (ballExists(bb + 1 + result.dx2, slicedrows[rr + 2])))
+            result.count101++;
+        if ((ballExists(bb + 1, slicedrows[rr])) && (ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (!ballExists(bb + 1 + result.dx2, slicedrows[rr + 2])))
+            result.count110++;
+        if ((ballExists(bb + 1, slicedrows[rr])) && (ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (ballExists(bb + 1 + result.dx2, slicedrows[rr + 2])))
+            result.count111++;
+    }
+}
+function stat3lenRows(dx1, dx2, slicedrows) {
+    var rowStat = { dx1: dx1, dx2: dx2, count000: 0, count001: 0, count010: 0, count011: 0, count100: 0, count101: 0, count110: 0, count111: 0, deep: rowLen };
+    //let dx1=3;
+    //let dx2=1;
+    for (var rr = 1; rr < rowLen; rr++) {
+        //let rowStat:Stat123={dx1:0,dx2:0,count000:0,count001:0,count010:0,count011:0,count100:0,count101:0,count110:0,count111:0};
+        stat3rows(rr, slicedrows, rowStat);
+    }
+    return rowStat;
+}
+function statRes1(ball, allstat3, slicedrows) {
+    var avg = 0;
+    for (var dx1 = 0; dx1 < rowLen; dx1++) {
+        for (var dx2 = 0; dx2 < rowLen; dx2++) {
+            if ((ballExists(ball + dx1, slicedrows[1])) && (ballExists(ball + dx2, slicedrows[2]))) {
+                //console.log(ball,dx1,dx2,'11');
+                avg = avg + allstat3[dx1 * rowLen + dx2].ratioX11;
+            }
+            else {
+                if ((ballExists(ball + dx1, slicedrows[1])) && (!ballExists(ball + dx2, slicedrows[2]))) {
+                    //console.log(ball,dx1,dx2,'10');
+                    avg = avg + allstat3[dx1 * rowLen + dx2].ratioX10;
+                }
+                else {
+                    if ((!ballExists(ball + dx1, slicedrows[1])) && (!ballExists(ball + dx2, slicedrows[2]))) {
+                        avg = avg + allstat3[dx1 * rowLen + dx2].ratioX00;
+                        //console.log(ball,dx1,dx2,'00');
+                    }
+                    else {
+                        //console.log(ball,dx1,dx2,'01');
+                        avg = avg + allstat3[dx1 * rowLen + dx2].ratioX11;
+                    }
+                }
+            }
+        }
+    }
+    avg = avg / (rowLen * rowLen);
+    console.log(ball, avg);
+}
+function calcRatios(slicedrows) {
+    var allstat3 = [];
+    for (var dx1 = 0; dx1 < rowLen; dx1++) {
+        for (var dx2 = 0; dx2 < rowLen; dx2++) {
+            var rowStat = stat3lenRows(dx1, dx2, slicedrows);
+            rowStat.ratioX00 = Math.round(100 * rowStat.count100 / (rowStat.count100 + rowStat.count000));
+            rowStat.ratioX01 = Math.round(100 * rowStat.count101 / (rowStat.count101 + rowStat.count001));
+            rowStat.ratioX10 = Math.round(100 * rowStat.count110 / (rowStat.count110 + rowStat.count010));
+            rowStat.ratioX11 = Math.round(100 * rowStat.count111 / (rowStat.count111 + rowStat.count011));
+            allstat3.push(rowStat);
+        }
+    }
+    console.log(slicedrows[0], allstat3);
+    for (var ball = 1; ball <= rowLen; ball++) {
+        statRes1(ball, allstat3, slicedrows);
+    }
+}
 function dumpStatIne(idx, sz) {
-    console.log('dumpStatAll', idx, sz);
+    console.log('dumpStatIne', idx, sz);
     var count0 = 0;
     var count1 = 0;
     var count2 = 0;
@@ -684,7 +762,34 @@ function dumpStatIne(idx, sz) {
     console.log(6, count6, Math.round(100 * count6 / datarows.length), '%');
     console.log(7, count7, Math.round(100 * count7 / datarows.length), '%');
 }
+function anotherStat() {
+    var stat = [];
+    for (var ball = 1; ball <= rowLen; ball++) {
+        var cuco = 1;
+        for (var rr = 1; rr < datarows.length; rr++) {
+            if (ballExists(ball, datarows[rr])) {
+                stat[cuco] = stat[cuco] ? stat[cuco] : { count: 0, part: 0, other: 0 };
+                stat[cuco].count++;
+                cuco = 1;
+            }
+            else {
+                cuco++;
+            }
+        }
+    }
+    for (var ii = 0; ii < stat.length; ii++) {
+        stat[ii] = stat[ii] ? stat[ii] : { count: 0, part: 0, other: 0 };
+    }
+    for (var ii = 1; ii < stat.length - 1; ii++) {
+        for (var kk = ii + 1; kk < stat.length; kk++) {
+            stat[ii].other = stat[ii].other + stat[kk].count;
+        }
+        stat[ii].part = Math.round(1000 * stat[ii].count / stat[ii].other) / 10;
+    }
+    console.log(stat);
+}
 /////////////////
 init();
 fillCells();
 dumpStatAll();
+anotherStat();
