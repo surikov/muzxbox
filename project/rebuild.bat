@@ -25,6 +25,9 @@ call tsc
 cd ..\testdrumsperformer
 cd
 call tsc
+cd ..\testvox
+cd
+call tsc
 cd ..\emptyperformer
 cd
 call tsc

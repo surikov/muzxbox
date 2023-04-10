@@ -1,5 +1,29 @@
-declare let no_way_audio_base64: string;
-declare let testSchedule: MZXBX_Schedule;
+declare type VoxEnvelope = {
+    audioBufferSourceNode: AudioBufferSourceNode;
+    when: number;
+    duration: number;
+    out: GainNode;
+};
+declare class PerformerVoxPlugin implements MZXBX_AudioPerformerPlugin {
+    out: GainNode;
+    parameters: string;
+    audioContext: AudioContext;
+    waveready: boolean;
+    afterTime: number;
+    nearZero: number;
+    audioBuffer: null | AudioBuffer;
+    envelopes: VoxEnvelope[];
+    launch(context: AudioContext, parameters: string): void;
+    busy(): string | null;
+    schedule(when: number, pitch: number, slides: MZXBX_SlideItem[]): void;
+    output(): AudioNode | null;
+    cancel(): void;
+    noZeroVolume(n: number): number;
+    findEnvelope(audioContext: AudioContext, out: AudioNode): VoxEnvelope;
+}
+declare function testPluginVoxPerf(): MZXBX_AudioPerformerPlugin;
+declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
+declare function MZXBX_appendScriptURL(url: string): boolean;
 declare type MZXBX_Metre = {
     count: number;
     part: number;

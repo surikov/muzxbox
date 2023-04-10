@@ -8,5 +8,6 @@ let pluginListKindUrlName :{ kind: string, url: string, functionName: string }[]
     , { kind: 'waf_performer_1_test', functionName: 'testPluginWAF', url: './plugins/performers/testwaf.js' }
     , { kind: 'drums_performer_1_test', functionName: 'testPluginDrums', url: './plugins/performers/drumswaf.js' }
 	, { kind: 'emptySilent', functionName: 'testCreateEmpty', url: './plugins/performers/testempty.js' }
+	, { kind: 'vox2', functionName: 'testPluginVoxPerf', url: './plugins/performers/vox.js' }
 ];
 console.log(pluginListKindUrlName);

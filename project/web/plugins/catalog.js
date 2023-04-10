@@ -8,7 +8,8 @@ let pluginListKindUrlName = [
     { kind: 'sinewave_performer_1_test', functionName: 'testPluginSingleWave', url: './plugins/performers/testsinewave.js' },
     { kind: 'waf_performer_1_test', functionName: 'testPluginWAF', url: './plugins/performers/testwaf.js' },
     { kind: 'drums_performer_1_test', functionName: 'testPluginDrums', url: './plugins/performers/drumswaf.js' },
-    { kind: 'emptySilent', functionName: 'testCreateEmpty', url: './plugins/performers/testempty.js' }
+    { kind: 'emptySilent', functionName: 'testCreateEmpty', url: './plugins/performers/testempty.js' },
+    { kind: 'vox2', functionName: 'testPluginVoxPerf', url: './plugins/performers/vox.js' }
 ];
 console.log(pluginListKindUrlName);
 //# sourceMappingURL=catalog.js.map
