@@ -1212,6 +1212,10 @@ class MidiParser {
         this.midiEventChannel = 0;
         this.midiEventParam1 = 0;
         this.controller_coarseVolume = 0x07;
+        this.controller_coarseDataEntrySlider = 0x06;
+        this.controller_fineDataEntrySlider = 0x26;
+        this.controller_coarseRPN = 0x65;
+        this.controller_fineRPN = 0x64;
         this.header = new MIDIFileHeader(arrayBuffer);
         this.parseTracks(arrayBuffer);
     }
@@ -1474,6 +1478,13 @@ class MidiParser {
                             }
                             else {
                                 if (evnt.subtype == this.EVENT_MIDI_PITCH_BEND) {
+                                    var nn1 = evnt.param1 ? evnt.param1 : 0;
+                                    var nn2 = evnt.param2 ? evnt.param2 : 0;
+                                    nn1 = nn1 & 0b01111111;
+                                    nn2 = nn2 & 0b01111111;
+                                    nn2 = nn2 << 7;
+                                    var nn14 = nn2 | nn1;
+                                    nn14 = (nn14 - 0x2000) / 1000;
                                     var slide = ((evnt.param2 ? evnt.param2 : 0) - 64) / 6;
                                     var b14 = evnt.param2 ? evnt.param2 : 0;
                                     b14 <<= 7;
@@ -1490,7 +1501,7 @@ class MidiParser {
                                                     duration = duration + note.points[k].pointDuration;
                                                 }
                                                 note.points[note.points.length - 1].pointDuration = when - chord.when - duration;
-                                                var firstpitch = note.points[0].pitch + b14;
+                                                var firstpitch = note.points[0].pitch + nn14;
                                                 var point = {
                                                     pointDuration: -1,
                                                     pitch: firstpitch
@@ -1507,7 +1518,11 @@ class MidiParser {
                                         singleParsedTrack.trackVolumePoints.push(point);
                                     }
                                     else {
-                                        if (evnt.subtype == this.EVENT_MIDI_CONTROLLER && (evnt.param1 == 100 || evnt.param1 == 101)) {
+                                        if (evnt.subtype == this.EVENT_MIDI_CONTROLLER
+                                            && (evnt.param1 == this.controller_coarseDataEntrySlider
+                                                || evnt.param1 == this.controller_fineDataEntrySlider
+                                                || evnt.param1 == this.controller_coarseRPN
+                                                || evnt.param1 == this.controller_fineRPN)) {
                                             console.log('EVENT_MIDI_CONTROLLER', evnt.param1, evnt.param2, evnt);
                                         }
                                     }

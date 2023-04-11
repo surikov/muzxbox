@@ -530,6 +530,10 @@ declare class MidiParser {
     midiEventChannel: number;
     midiEventParam1: number;
     controller_coarseVolume: number;
+    controller_coarseDataEntrySlider: number;
+    controller_fineDataEntrySlider: number;
+    controller_coarseRPN: number;
+    controller_fineRPN: number;
     constructor(arrayBuffer: ArrayBuffer);
     parseTracks(arrayBuffer: ArrayBuffer): void;
     toText(arr: number[]): string;

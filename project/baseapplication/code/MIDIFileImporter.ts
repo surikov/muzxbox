@@ -654,8 +654,14 @@ class MidiParser {
 	EVENT_MIDI_PITCH_BEND: number = 0xe;
 	midiEventType: number = 0;
 	midiEventChannel: number = 0;
-    midiEventParam1: number = 0;
-    controller_coarseVolume: number = 0x07;
+	midiEventParam1: number = 0;
+	controller_coarseVolume: number = 0x07;
+
+	controller_coarseDataEntrySlider: number = 0x06;
+	controller_fineDataEntrySlider: number = 0x26;
+	controller_coarseRPN: number = 0x65;
+	controller_fineRPN: number = 0x64;
+
 	constructor(arrayBuffer: ArrayBuffer) {
 		this.header = new MIDIFileHeader(arrayBuffer);
 		this.parseTracks(arrayBuffer);
@@ -919,7 +925,7 @@ class MidiParser {
 							} else {
 								/*if (evnt.subtype == this.EVENT_MIDI_PITCH_BEND) {
 									var pitch = evnt.param1 ? evnt.param1 : 0;
-                                    var slide = ((evnt.param2 ? evnt.param2 : 0) - 64) / 6;
+									var slide = ((evnt.param2 ? evnt.param2 : 0) - 64) / 6;
 									var when = evnt.playTimeMs ? evnt.playTimeMs : 0;
 									var chord: TrackChord | null = this.findChordBefore(when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
 									if (chord) {
@@ -939,35 +945,46 @@ class MidiParser {
 												note.points.push(point);
 											}
 										}
-                                    }*/
-                                    if (evnt.subtype == this.EVENT_MIDI_PITCH_BEND) {
-                                        //var pitch = evnt.param1 ? evnt.param1 : 0;
-                                        var slide = ((evnt.param2 ? evnt.param2 : 0) - 64) / 6;
-                                        var b14 = evnt.param2 ? evnt.param2 : 0;
-                                        b14 <<= 7;
-                                        b14 |= evnt.param1 ? evnt.param1 : 0;
-                                        b14=(b14-0x2000)/1000;
-                                        //console.log('EVENT_MIDI_PITCH_BEND',evnt.param1,evnt.param2,':',b14,'/',slide,evnt);
-                                        var when = evnt.playTimeMs ? evnt.playTimeMs : 0;
-                                        var chord: TrackChord | null = this.findChordBefore(when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
-                                        if (chord) {
-                                            for (var i = 0; i < chord.notes.length; i++) {
-                                                var note: TrackNote = chord.notes[i];
-                                                if (!(note.closed)) {
-                                                    var duration = 0;
-                                                    for (var k = 0; k < note.points.length - 1; k++) {
-                                                        duration = duration + note.points[k].pointDuration;
-                                                    }
-                                                    note.points[note.points.length - 1].pointDuration = when - chord.when - duration;
-                                                    var firstpitch: number = note.points[0].pitch + b14;
-                                                    var point: NotePitch = {
-                                                        pointDuration: -1
-                                                        , pitch: firstpitch
-                                                    };
-                                                    note.points.push(point);
-                                                }
-                                            }
-                                        }
+									}*/
+								if (evnt.subtype == this.EVENT_MIDI_PITCH_BEND) {
+									//var pitch = evnt.param1 ? evnt.param1 : 0;
+									var nn1: number = evnt.param1 ? evnt.param1 : 0;
+									var nn2: number = evnt.param2 ? evnt.param2 : 0;
+									nn1 = nn1 & 0b01111111;
+									nn2 = nn2 & 0b01111111;
+									nn2 = nn2 << 7;
+									var nn14: number = nn2 | nn1;
+									nn14 = (nn14 - 0x2000) / 1000;
+
+
+									var slide = ((evnt.param2 ? evnt.param2 : 0) - 64) / 6;
+									var b14 = evnt.param2 ? evnt.param2 : 0;
+									b14 <<= 7;
+									b14 |= evnt.param1 ? evnt.param1 : 0;
+									b14 = (b14 - 0x2000) / 1000;
+
+									//console.log('EVENT_MIDI_PITCH_BEND', evnt.param1, evnt.param2, ':', nn14, b14, '/', slide, evnt);
+									var when = evnt.playTimeMs ? evnt.playTimeMs : 0;
+									var chord: TrackChord | null = this.findChordBefore(when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
+									if (chord) {
+										for (var i = 0; i < chord.notes.length; i++) {
+											var note: TrackNote = chord.notes[i];
+											if (!(note.closed)) {
+												var duration = 0;
+												for (var k = 0; k < note.points.length - 1; k++) {
+													duration = duration + note.points[k].pointDuration;
+												}
+												note.points[note.points.length - 1].pointDuration = when - chord.when - duration;
+												var firstpitch: number = note.points[0].pitch + nn14;
+												//var firstpitch: number = note.points[0].pitch + b14;
+												var point: NotePitch = {
+													pointDuration: -1
+													, pitch: firstpitch
+												};
+												note.points.push(point);
+											}
+										}
+									}
 								} else {
 									if (evnt.subtype == this.EVENT_MIDI_CONTROLLER && evnt.param1 == this.controller_coarseVolume) {
 										var v = evnt.param2 ? evnt.param2 / 127 : 0;
@@ -977,11 +994,17 @@ class MidiParser {
 										//    console.log('trackVolumePoints',singleParsedTrack.title, point);
 										//}
 									} else {
-										if (evnt.subtype == this.EVENT_MIDI_CONTROLLER&& (evnt.param1 == 100 || evnt.param1 == 101)){
-                                            console.log('EVENT_MIDI_CONTROLLER',evnt.param1,evnt.param2,evnt);
-                                        }
-                                    }
-                                    
+										if (evnt.subtype == this.EVENT_MIDI_CONTROLLER
+											&& (evnt.param1 == this.controller_coarseDataEntrySlider
+												|| evnt.param1 == this.controller_fineDataEntrySlider
+												|| evnt.param1 == this.controller_coarseRPN
+												|| evnt.param1 == this.controller_fineRPN
+											)
+										) {
+											console.log('EVENT_MIDI_CONTROLLER', evnt.param1, evnt.param2, evnt);
+										}
+									}
+
 								}
 							}
 						}
@@ -1270,7 +1293,7 @@ class MidiParser {
 						newpoint.midipoint = midinote;
 						newnote.points.push(newpoint);
 					}
-					newnote.points[newnote.points.length-1].durationms=newnote.points[newnote.points.length-1].durationms+66;
+					newnote.points[newnote.points.length - 1].durationms = newnote.points[newnote.points.length - 1].durationms + 66;
 				}
 				let chanTrack = this.findOrCreateTrack(miditrack, i, newchord.channel, tracksChannels);
 				chanTrack.track.songchords.push(newchord);
@@ -1340,7 +1363,7 @@ class MidiParser {
 						channelId = 'drum' + mt + '.' + note.points[0].pitch;
 						tID = 'drum' + mt + '.' + note.points[0].pitch + 'subVolume';
 					}
-					let timeSkip = chord.when/1000 - timeIndex ;
+					let timeSkip = chord.when / 1000 - timeIndex;
 					if (timeSkip < 0) timeSkip = 0;
 					let item: MZXBX_PlayItem = {
 						skip: timeSkip//(Math.round(chord.when) % 1000.0) / 1000.0
