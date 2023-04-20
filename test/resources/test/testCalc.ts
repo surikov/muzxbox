@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.64 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.65 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -320,7 +320,7 @@ function calcRowFills(log:boolean,rowNum: number, rows: BallsRow[], counts: numb
         }
 		
         one.logr = one.summ;
-		if(log){one.logr = one.summ*one.summ;}
+		//if(log){one.logr = one.summ*one.summ;}
     }
     return resu;
 }
@@ -451,10 +451,10 @@ function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
     }
     //let hr = mx * mx * mx / (topShift / cellSize);
     let hr = (mx - min) / (topShift / cellSize - 2);
-    let prehh=(arr[rowLen-1].avg - min) / hr;
+    let prehh=(mx-min-(arr[rowLen-1].avg - min)) / hr;
     for (let bb = 0; bb < rowLen; bb++) {
         //------------let hh = arr[bb].avg * arr[bb].avg * arr[bb].avg / hr;
-        let hh = (arr[bb].avg - min) / hr;
+        let hh = (mx-min-(arr[bb].avg - min)) / hr;
         markLines.push({
             fromX: bb + shiftX-1
             , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
@@ -527,7 +527,7 @@ function fillCells() {
     let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount + calcLen);
     dumpTriads(levelA, slicedrows);
     dumpInfo(skipRowsCount);
-    drawLines();
+    //drawLines();
     drawStat3(levelA, slicedrows);
     var msgp: HTMLElement = (document.getElementById('stepsize') as any) as HTMLElement;
     msgp.innerText = '' + reduceRatio;

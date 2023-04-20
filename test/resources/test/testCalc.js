@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.64 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.65 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -285,9 +285,7 @@ function calcRowFills(log, rowNum, rows, counts) {
             }
         }
         one.logr = one.summ;
-        if (log) {
-            one.logr = one.summ * one.summ;
-        }
+        //if(log){one.logr = one.summ*one.summ;}
     }
     return resu;
 }
@@ -429,10 +427,10 @@ function dumpRowFillsColor(inrows, color, shiftX) {
     }
     //let hr = mx * mx * mx / (topShift / cellSize);
     var hr = (mx - min) / (topShift / cellSize - 2);
-    var prehh = (arr[rowLen - 1].avg - min) / hr;
+    var prehh = (mx - min - (arr[rowLen - 1].avg - min)) / hr;
     for (var bb = 0; bb < rowLen; bb++) {
         //------------let hh = arr[bb].avg * arr[bb].avg * arr[bb].avg / hr;
-        var hh = (arr[bb].avg - min) / hr;
+        var hh = (mx - min - (arr[bb].avg - min)) / hr;
         markLines.push({
             fromX: bb + shiftX - 1,
             fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
@@ -500,7 +498,7 @@ function fillCells() {
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount + calcLen);
     dumpTriads(levelA, slicedrows);
     dumpInfo(skipRowsCount);
-    drawLines();
+    //drawLines();
     drawStat3(levelA, slicedrows);
     var msgp = document.getElementById('stepsize');
     msgp.innerText = '' + reduceRatio;
