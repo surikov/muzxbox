@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.65 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.66 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -266,7 +266,7 @@ function drawStat3(svg: SVGElement, rows: BallsRow[]) {
             addSmallText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
             addSmallText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
         }
-		composeLine(levelA
+		/*composeLine(levelA
             , colNum * cellSize - cellSize 
             , 0
             , colNum * cellSize - cellSize 
@@ -277,7 +277,7 @@ function drawStat3(svg: SVGElement, rows: BallsRow[]) {
             , 0
             , colNum * cellSize - cellSize + rowLen*cellSize
             , topShift
-            , cellSize / 20, '#0000ff66');
+            , cellSize / 20, '#0000ff66');*/
     }
 }
 function triadExists(ball: number, rowNum: number, dx1: number, dx2: number, rows: BallsRow[]): boolean {
@@ -510,13 +510,13 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
                 , ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize
                 , topShift + 0 * cellSize + rr * cellSize
                 , cellSize
-                , cellSize - 0.1
+                , cellSize //- 0.1
                 , color);
             addRect(svg
                 , ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize
                 , topShift + 0 * cellSize + rr * cellSize
                 , cellSize
-                , cellSize - 0.1
+                , cellSize //- 0.1
                 , color);
         }
     }

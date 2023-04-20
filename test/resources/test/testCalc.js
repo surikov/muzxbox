@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.65 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.66 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -242,8 +242,18 @@ function drawStat3(svg, rows) {
             addSmallText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
             addSmallText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
         }
-        composeLine(levelA, colNum * cellSize - cellSize, 0, colNum * cellSize - cellSize, topShift, cellSize / 20, '#0000ff66');
-        composeLine(levelA, colNum * cellSize - cellSize + rowLen * cellSize, 0, colNum * cellSize - cellSize + rowLen * cellSize, topShift, cellSize / 20, '#0000ff66');
+        /*composeLine(levelA
+            , colNum * cellSize - cellSize
+            , 0
+            , colNum * cellSize - cellSize
+            , topShift
+            , cellSize / 20, '#0000ff66');
+        composeLine(levelA
+            , colNum * cellSize - cellSize + rowLen*cellSize
+            , 0
+            , colNum * cellSize - cellSize + rowLen*cellSize
+            , topShift
+            , cellSize / 20, '#0000ff66');*/
     }
 }
 function triadExists(ball, rowNum, dx1, dx2, rows) {
@@ -488,8 +498,10 @@ function dumpTriads(svg, rows) {
         for (var ii = 0; ii < rowLen; ii++) {
             var idx = ratioPre * (calcs[ii].logr - minCnt) / df;
             var color = 'rgba(0,0,255,' + idx + ')';
-            addRect(svg, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize - 0.1, color);
-            addRect(svg, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize - 0.1, color);
+            addRect(svg, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
+            , color);
+            addRect(svg, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
+            , color);
         }
     }
 }
