@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.66 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.67 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -242,18 +242,8 @@ function drawStat3(svg, rows) {
             addSmallText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
             addSmallText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
         }
-        /*composeLine(levelA
-            , colNum * cellSize - cellSize
-            , 0
-            , colNum * cellSize - cellSize
-            , topShift
-            , cellSize / 20, '#0000ff66');
-        composeLine(levelA
-            , colNum * cellSize - cellSize + rowLen*cellSize
-            , 0
-            , colNum * cellSize - cellSize + rowLen*cellSize
-            , topShift
-            , cellSize / 20, '#0000ff66');*/
+        composeLine(levelA, colNum * cellSize - cellSize, 0, colNum * cellSize - cellSize, topShift - cellSize, cellSize / 20, '#0000ff66');
+        composeLine(levelA, colNum * cellSize - cellSize + rowLen * cellSize, 0, colNum * cellSize - cellSize + rowLen * cellSize, topShift - cellSize, cellSize / 20, '#0000ff66');
     }
 }
 function triadExists(ball, rowNum, dx1, dx2, rows) {

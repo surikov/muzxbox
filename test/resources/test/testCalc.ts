@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.66 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.67 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -266,18 +266,18 @@ function drawStat3(svg: SVGElement, rows: BallsRow[]) {
             addSmallText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
             addSmallText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
         }
-		/*composeLine(levelA
+		composeLine(levelA
             , colNum * cellSize - cellSize 
             , 0
             , colNum * cellSize - cellSize 
-            , topShift
+            , topShift-cellSize
             , cellSize / 20, '#0000ff66');
 		composeLine(levelA
             , colNum * cellSize - cellSize + rowLen*cellSize
             , 0
             , colNum * cellSize - cellSize + rowLen*cellSize
-            , topShift
-            , cellSize / 20, '#0000ff66');*/
+            , topShift-cellSize
+            , cellSize / 20, '#0000ff66');
     }
 }
 function triadExists(ball: number, rowNum: number, dx1: number, dx2: number, rows: BallsRow[]): boolean {
