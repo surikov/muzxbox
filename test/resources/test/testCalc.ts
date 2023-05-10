@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.67 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.68 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -406,16 +406,28 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
     let prehh=(mx-min-(arr[rowLen-1].summ - min)) / hr;
     for (let bb = 0; bb < rowLen; bb++) {
         let hh = (mx-min-(arr[bb].summ - min)) / hr;
-        markLines.push({ fromX: bb + shiftX-1
+        /*markLines.push({ fromX: bb + shiftX-1
             , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
             , toX: bb + shiftX
             , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
             , color: color,manual:false
+        });*/
+		markLines.push({ fromX: bb + shiftX-1
+            , fromY:  skipRowsCount + 0 + prehh 
+            , toX: bb + shiftX
+            , toY:skipRowsCount + hh - 0 
+            , color: color,manual:false
         });
-        markLines.push({ fromX: bb + shiftX-1+ rowLen
+        /*markLines.push({ fromX: bb + shiftX-1+ rowLen
             , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
             , toX: bb + shiftX+ rowLen
             , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color,manual:false
+        });*/
+		markLines.push({ fromX: bb + shiftX-1+ rowLen
+            , fromY: skipRowsCount + 0 + prehh 
+            , toX: bb + shiftX+ rowLen
+            , toY: skipRowsCount + hh - 0 
             , color: color,manual:false
         });
         prehh=hh;
@@ -455,18 +467,32 @@ function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
     for (let bb = 0; bb < rowLen; bb++) {
         //------------let hh = arr[bb].avg * arr[bb].avg * arr[bb].avg / hr;
         let hh = (mx-min-(arr[bb].avg - min)) / hr;
-        markLines.push({
+        /*markLines.push({
             fromX: bb + shiftX-1
             , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
             , toX: bb + shiftX
             , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
             , color: color,manual:false
+        });*/
+		markLines.push({
+            fromX: bb + shiftX-1
+            , fromY:  skipRowsCount + 0 + prehh 
+            , toX: bb + shiftX
+            , toY:  skipRowsCount + hh - 0 
+            , color: color,manual:false
         });
-        markLines.push({
+        /*markLines.push({
             fromX: bb + shiftX-1+ rowLen
             , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
             , toX: bb + shiftX+ rowLen
             , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color,manual:false
+        });*/
+		markLines.push({
+            fromX: bb + shiftX-1+ rowLen
+            , fromY:skipRowsCount + 0 + prehh 
+            , toX: bb + shiftX+ rowLen
+            , toY: skipRowsCount + hh - 0 
             , color: color,manual:false
         });
         prehh=hh;

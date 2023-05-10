@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.67 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.68 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -380,16 +380,28 @@ function dumpRowWaitColor(rows, color, shiftX) {
     var prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
     for (var bb = 0; bb < rowLen; bb++) {
         var hh = (mx - min - (arr[bb].summ - min)) / hr;
+        /*markLines.push({ fromX: bb + shiftX-1
+            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
+            , toX: bb + shiftX
+            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color,manual:false
+        });*/
         markLines.push({ fromX: bb + shiftX - 1,
-            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
+            fromY: skipRowsCount + 0 + prehh,
             toX: bb + shiftX,
-            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2,
+            toY: skipRowsCount + hh - 0,
             color: color, manual: false
         });
+        /*markLines.push({ fromX: bb + shiftX-1+ rowLen
+            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
+            , toX: bb + shiftX+ rowLen
+            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color,manual:false
+        });*/
         markLines.push({ fromX: bb + shiftX - 1 + rowLen,
-            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
+            fromY: skipRowsCount + 0 + prehh,
             toX: bb + shiftX + rowLen,
-            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2,
+            toY: skipRowsCount + hh - 0,
             color: color, manual: false
         });
         prehh = hh;
@@ -431,18 +443,32 @@ function dumpRowFillsColor(inrows, color, shiftX) {
     for (var bb = 0; bb < rowLen; bb++) {
         //------------let hh = arr[bb].avg * arr[bb].avg * arr[bb].avg / hr;
         var hh = (mx - min - (arr[bb].avg - min)) / hr;
+        /*markLines.push({
+            fromX: bb + shiftX-1
+            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
+            , toX: bb + shiftX
+            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color,manual:false
+        });*/
         markLines.push({
             fromX: bb + shiftX - 1,
-            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
+            fromY: skipRowsCount + 0 + prehh,
             toX: bb + shiftX,
-            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2,
+            toY: skipRowsCount + hh - 0,
             color: color, manual: false
         });
+        /*markLines.push({
+            fromX: bb + shiftX-1+ rowLen
+            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
+            , toX: bb + shiftX+ rowLen
+            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color,manual:false
+        });*/
         markLines.push({
             fromX: bb + shiftX - 1 + rowLen,
-            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
+            fromY: skipRowsCount + 0 + prehh,
             toX: bb + shiftX + rowLen,
-            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2,
+            toY: skipRowsCount + hh - 0,
             color: color, manual: false
         });
         prehh = hh;
