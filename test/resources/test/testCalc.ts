@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.64 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.69 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -270,13 +270,13 @@ function drawStat3(svg: SVGElement, rows: BallsRow[]) {
             , colNum * cellSize - cellSize 
             , 0
             , colNum * cellSize - cellSize 
-            , topShift
+            , topShift-cellSize
             , cellSize / 20, '#0000ff66');
 		composeLine(levelA
             , colNum * cellSize - cellSize + rowLen*cellSize
             , 0
             , colNum * cellSize - cellSize + rowLen*cellSize
-            , topShift
+            , topShift-cellSize
             , cellSize / 20, '#0000ff66');
     }
 }
@@ -320,7 +320,7 @@ function calcRowFills(log:boolean,rowNum: number, rows: BallsRow[], counts: numb
         }
 		
         one.logr = one.summ;
-		if(log){one.logr = one.summ*one.summ;}
+		//if(log){one.logr = one.summ*one.summ;}
     }
     return resu;
 }
@@ -406,16 +406,28 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
     let prehh=(mx-min-(arr[rowLen-1].summ - min)) / hr;
     for (let bb = 0; bb < rowLen; bb++) {
         let hh = (mx-min-(arr[bb].summ - min)) / hr;
-        markLines.push({ fromX: bb + shiftX-1
+        /*markLines.push({ fromX: bb + shiftX-1
             , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
             , toX: bb + shiftX
             , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
             , color: color,manual:false
+        });*/
+		markLines.push({ fromX: bb + shiftX-1
+            , fromY:  skipRowsCount + 0 + prehh 
+            , toX: bb + shiftX
+            , toY:skipRowsCount + hh - 0 
+            , color: color,manual:false
         });
-        markLines.push({ fromX: bb + shiftX-1+ rowLen
+        /*markLines.push({ fromX: bb + shiftX-1+ rowLen
             , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
             , toX: bb + shiftX+ rowLen
             , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color,manual:false
+        });*/
+		markLines.push({ fromX: bb + shiftX-1+ rowLen
+            , fromY: skipRowsCount + 0 + prehh 
+            , toX: bb + shiftX+ rowLen
+            , toY: skipRowsCount + hh - 0 
             , color: color,manual:false
         });
         prehh=hh;
@@ -451,22 +463,36 @@ function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
     }
     //let hr = mx * mx * mx / (topShift / cellSize);
     let hr = (mx - min) / (topShift / cellSize - 2);
-    let prehh=(arr[rowLen-1].avg - min) / hr;
+    let prehh=(mx-min-(arr[rowLen-1].avg - min)) / hr;
     for (let bb = 0; bb < rowLen; bb++) {
         //------------let hh = arr[bb].avg * arr[bb].avg * arr[bb].avg / hr;
-        let hh = (arr[bb].avg - min) / hr;
-        markLines.push({
+        let hh = (mx-min-(arr[bb].avg - min)) / hr;
+        /*markLines.push({
             fromX: bb + shiftX-1
             , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
             , toX: bb + shiftX
             , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
             , color: color,manual:false
+        });*/
+		markLines.push({
+            fromX: bb + shiftX-1
+            , fromY:  skipRowsCount + 0 + prehh 
+            , toX: bb + shiftX
+            , toY:  skipRowsCount + hh - 0 
+            , color: color,manual:false
         });
-        markLines.push({
+        /*markLines.push({
             fromX: bb + shiftX-1+ rowLen
             , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
             , toX: bb + shiftX+ rowLen
             , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color,manual:false
+        });*/
+		markLines.push({
+            fromX: bb + shiftX-1+ rowLen
+            , fromY:skipRowsCount + 0 + prehh 
+            , toX: bb + shiftX+ rowLen
+            , toY: skipRowsCount + hh - 0 
             , color: color,manual:false
         });
         prehh=hh;
@@ -510,13 +536,13 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
                 , ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize
                 , topShift + 0 * cellSize + rr * cellSize
                 , cellSize
-                , cellSize - 0.1
+                , cellSize //- 0.1
                 , color);
             addRect(svg
                 , ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize
                 , topShift + 0 * cellSize + rr * cellSize
                 , cellSize
-                , cellSize - 0.1
+                , cellSize //- 0.1
                 , color);
         }
     }
@@ -527,7 +553,7 @@ function fillCells() {
     let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount + calcLen);
     dumpTriads(levelA, slicedrows);
     dumpInfo(skipRowsCount);
-    drawLines();
+    //drawLines();
     drawStat3(levelA, slicedrows);
     var msgp: HTMLElement = (document.getElementById('stepsize') as any) as HTMLElement;
     msgp.innerText = '' + reduceRatio;

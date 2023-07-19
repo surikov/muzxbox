@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.64 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.69 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -242,8 +242,8 @@ function drawStat3(svg, rows) {
             addSmallText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
             addSmallText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
         }
-        composeLine(levelA, colNum * cellSize - cellSize, 0, colNum * cellSize - cellSize, topShift, cellSize / 20, '#0000ff66');
-        composeLine(levelA, colNum * cellSize - cellSize + rowLen * cellSize, 0, colNum * cellSize - cellSize + rowLen * cellSize, topShift, cellSize / 20, '#0000ff66');
+        composeLine(levelA, colNum * cellSize - cellSize, 0, colNum * cellSize - cellSize, topShift - cellSize, cellSize / 20, '#0000ff66');
+        composeLine(levelA, colNum * cellSize - cellSize + rowLen * cellSize, 0, colNum * cellSize - cellSize + rowLen * cellSize, topShift - cellSize, cellSize / 20, '#0000ff66');
     }
 }
 function triadExists(ball, rowNum, dx1, dx2, rows) {
@@ -285,9 +285,7 @@ function calcRowFills(log, rowNum, rows, counts) {
             }
         }
         one.logr = one.summ;
-        if (log) {
-            one.logr = one.summ * one.summ;
-        }
+        //if(log){one.logr = one.summ*one.summ;}
     }
     return resu;
 }
@@ -382,16 +380,28 @@ function dumpRowWaitColor(rows, color, shiftX) {
     var prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
     for (var bb = 0; bb < rowLen; bb++) {
         var hh = (mx - min - (arr[bb].summ - min)) / hr;
+        /*markLines.push({ fromX: bb + shiftX-1
+            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
+            , toX: bb + shiftX
+            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color,manual:false
+        });*/
         markLines.push({ fromX: bb + shiftX - 1,
-            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
+            fromY: skipRowsCount + 0 + prehh,
             toX: bb + shiftX,
-            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2,
+            toY: skipRowsCount + hh - 0,
             color: color, manual: false
         });
+        /*markLines.push({ fromX: bb + shiftX-1+ rowLen
+            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
+            , toX: bb + shiftX+ rowLen
+            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color,manual:false
+        });*/
         markLines.push({ fromX: bb + shiftX - 1 + rowLen,
-            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
+            fromY: skipRowsCount + 0 + prehh,
             toX: bb + shiftX + rowLen,
-            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2,
+            toY: skipRowsCount + hh - 0,
             color: color, manual: false
         });
         prehh = hh;
@@ -429,22 +439,36 @@ function dumpRowFillsColor(inrows, color, shiftX) {
     }
     //let hr = mx * mx * mx / (topShift / cellSize);
     var hr = (mx - min) / (topShift / cellSize - 2);
-    var prehh = (arr[rowLen - 1].avg - min) / hr;
+    var prehh = (mx - min - (arr[rowLen - 1].avg - min)) / hr;
     for (var bb = 0; bb < rowLen; bb++) {
         //------------let hh = arr[bb].avg * arr[bb].avg * arr[bb].avg / hr;
-        var hh = (arr[bb].avg - min) / hr;
+        var hh = (mx - min - (arr[bb].avg - min)) / hr;
+        /*markLines.push({
+            fromX: bb + shiftX-1
+            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
+            , toX: bb + shiftX
+            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color,manual:false
+        });*/
         markLines.push({
             fromX: bb + shiftX - 1,
-            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
+            fromY: skipRowsCount + 0 + prehh,
             toX: bb + shiftX,
-            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2,
+            toY: skipRowsCount + hh - 0,
             color: color, manual: false
         });
+        /*markLines.push({
+            fromX: bb + shiftX-1+ rowLen
+            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
+            , toX: bb + shiftX+ rowLen
+            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
+            , color: color,manual:false
+        });*/
         markLines.push({
             fromX: bb + shiftX - 1 + rowLen,
-            fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2,
+            fromY: skipRowsCount + 0 + prehh,
             toX: bb + shiftX + rowLen,
-            toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2,
+            toY: skipRowsCount + hh - 0,
             color: color, manual: false
         });
         prehh = hh;
@@ -490,8 +514,10 @@ function dumpTriads(svg, rows) {
         for (var ii = 0; ii < rowLen; ii++) {
             var idx = ratioPre * (calcs[ii].logr - minCnt) / df;
             var color = 'rgba(0,0,255,' + idx + ')';
-            addRect(svg, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize - 0.1, color);
-            addRect(svg, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize - 0.1, color);
+            addRect(svg, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
+            , color);
+            addRect(svg, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
+            , color);
         }
     }
 }
@@ -500,7 +526,7 @@ function fillCells() {
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount + calcLen);
     dumpTriads(levelA, slicedrows);
     dumpInfo(skipRowsCount);
-    drawLines();
+    //drawLines();
     drawStat3(levelA, slicedrows);
     var msgp = document.getElementById('stepsize');
     msgp.innerText = '' + reduceRatio;
