@@ -1,0 +1,31 @@
+{
+	"compilerOptions": {
+		"target": "es2015"
+        ,"outFile": "../../../../web/test/testschedule.js"
+        //,"outDir":"../js"
+		,"strictNullChecks": true
+		,"alwaysStrict": true
+		,"esModuleInterop": true
+		,"noResolve": false
+        ,"noImplicitAny": false
+        ,"removeComments": true
+        ,"preserveConstEnums": true
+        ,"sourceMap": true
+        ,"experimentalDecorators": true
+        ,"isolatedModules": false
+		,"module": "AMD"
+        ,"lib": [
+            "dom"
+            ,"es2015"
+            ,"es5"
+        ]
+        ,"declaration": true
+		,"types": [ ]
+	}
+	,"files": [
+		
+		
+		"testschedule.ts"
+        ,"../../publictypes/musicenginetypes.ts"
+	]
+}
