@@ -15,14 +15,14 @@
 		}
 		.divRec1 {
 			background-color: var(--divColor);
-			width:var(--tapSize1);
+			width:calc(2*var(--tapSize1));
 			height:var(--tapSize1);
 		}
 	</style>
 </head>
 
 <body>
-	<p>v1.02</p>
+	<p>v1.04</p>
 	<svg id="tileLevelSVG" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 
 		<rect id="rectangle1" class="svgRec1" width="100" height="100" />
@@ -48,7 +48,7 @@
 	rect.setAttributeNS(null, 'width', '' + baseSize + 'cm');
 	tileLevelSVG.appendChild(rect);
 	let tbb = rect.getBBox();
-	let tapSize = tbb.width;
+	let tapSize = Math.round(tbb.width);
 	tileLevelSVG.removeChild(rect);
 
 	rectangle1.setAttribute('width', tapSize+'px');
@@ -58,11 +58,12 @@
 	console.log('', window.screen);
 
 	document.documentElement.style.setProperty('--divColor', '#996633');
-	document.documentElement.style.setProperty('--tapSize1', ''+(3*tapSize)+'px');
+	document.documentElement.style.setProperty('--tapSize1', '99px');
 
 	info.innerHTML = 'tapSize ' + tapSize + '<br/>'
 		+ 'avail ' + window.screen.availWidth + 'x' + window.screen.availHeight + '<br/>'
-		+ 'devicePixelRatio ' + window.devicePixelRatio
+		+ 'devicePixelRatio ' + window.devicePixelRatio + '<br/>'
+		+ 'phis ' + (window.screen.availWidth/tapSize) + 'x' + (window.screen.availHeight/tapSize) + '<br/>'
 		;
 </script>
 
