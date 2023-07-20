@@ -9,8 +9,8 @@
 
 		.divRec1 {
 			background-color: #669900;
-			width: 100px;
-			height: 100px;
+			width: 1cm;
+			height: 1cm;
 		}
 	</style>
 </head>
@@ -32,6 +32,7 @@
 	console.log('color & size v1.01');
 
 	let tileLevelSVG = document.getElementById("tileLevelSVG");
+	let rectangle1 = document.getElementById("rectangle1");
 	let info = document.getElementById("info");
 	let baseSize = 1;
 	let svgns = "http://www.w3.org/2000/svg";
@@ -42,6 +43,9 @@
 	let tbb = rect.getBBox();
 	let tapSize = tbb.width;
 	tileLevelSVG.removeChild(rect);
+
+	rectangle1.setAttribute('width', tapSize+'px');
+	rectangle1.setAttribute('height', tapSize+'px');
 
 	console.log('tapSize', tapSize);
 	console.log('', window.screen);
