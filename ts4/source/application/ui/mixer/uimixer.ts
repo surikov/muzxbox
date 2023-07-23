@@ -1,0 +1,8 @@
+class MixerUI{
+    setupMixerUI(){
+
+    }
+    resetMixeUI(){
+        
+    }
+}

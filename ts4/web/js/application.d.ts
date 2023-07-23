@@ -16,6 +16,26 @@ declare class TreeValue {
     dump(pad: string, symbol: string): void;
 }
 declare function startApplication(): void;
+declare function createTileLevel(): TileLevelBase;
+declare class UIRenderer {
+    toolbar: UIToolbar;
+    mixer: MixerUI;
+    tileRenderer: TileLevelBase;
+    tileLevelSVG: SVGElement;
+    setupUI(): void;
+    testAddRectangles(anchor: TileAnchor, count: number, size: number, showZoom: number, hideZoom: number): void;
+    resetUI(): void;
+    constentWidth(): number;
+    constentHeight(): number;
+}
+declare class UIToolbar {
+    setupToolbar(): void;
+    resetToolbar(): void;
+}
+declare class MixerUI {
+    setupMixerUI(): void;
+    resetMixeUI(): void;
+}
 declare type TileZoom = {
     x: number;
     y: number;

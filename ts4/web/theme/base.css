@@ -10,13 +10,14 @@
 
     --color-default: var(--aux-color);
 
-    --color-red: #990000;
-	--color-green: #009900;
-	--color-blue: #000099;
-	--color-cyan: #009999;
-	--color-magenta: #990099;
-	--color-yellow: #999900;
-    --color-korn: #666666;
+    --color-paper: #cccccc;
+    --color-textline: #333333;
+    --color-debug: #800;
+	--color-green: #080;
+	--color-blue: #008;
+	--color-cyan: #088;
+	--color-magenta: #808;
+	--color-yellow: #880;
     
 }
 
@@ -42,7 +43,7 @@ body {
 #tileLevelSVG {
 	width: 100%;
 	height: 100%;
-	background-color: var(--background-color);
+	background-color: var(--color-paper);
 	user-select: none;
 	touch-action: manipulation;
 	background-image2: url("img/beatbuilder.png");
@@ -51,9 +52,9 @@ body {
 }
 
 .debug {
-	fill: #ff0000;
+	fill: var(--color-debug);
 	fill-opacity: 25%;
-	stroke: #ff0000;
+	stroke: var(--color-debug);
 	stroke-opacity: 75%;
 }
 

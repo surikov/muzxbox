@@ -139,6 +139,59 @@ class TreeValue {
 console.log('startup v1.01');
 function startApplication() {
     console.log('startApplication v1.6.01');
+    let ui = new UIRenderer();
+    ui.setupUI();
+    ui.resetUI();
+}
+class UIRenderer {
+    setupUI() {
+        this.tileRenderer = createTileLevel();
+        this.tileLevelSVG = document.getElementById("tileLevelSVG");
+        let layers = [];
+        let debugGroup = document.getElementById("debugLayer");
+        let debugAnchor = { xx: 0, yy: 0, ww: 1000, hh: 1000, showZoom: 1, hideZoom: 16 + 1, content: [] };
+        this.testAddRectangles(debugAnchor, Math.pow(2, 4), 8, 8, 16 + 1);
+        this.testAddRectangles(debugAnchor, Math.pow(2, 5), 4, 4, 8);
+        this.testAddRectangles(debugAnchor, Math.pow(2, 6), 2, 2, 4);
+        this.testAddRectangles(debugAnchor, Math.pow(2, 7), 1, 1, 2);
+        let debugLayer = {
+            g: debugGroup, anchors: [debugAnchor], mode: LevelModes.normal
+        };
+        layers.push(debugLayer);
+        this.mixer = new MixerUI();
+        this.tileRenderer.initRun(this.tileLevelSVG, true, this.constentWidth(), this.constentWidth(), 1, 4, 16, layers);
+    }
+    testAddRectangles(anchor, count, size, showZoom, hideZoom) {
+        for (let x = 0; x < count; x++) {
+            for (let y = 0; y < count; y++) {
+                let aa = { xx: x * size, yy: y * size, ww: size, hh: size, showZoom: showZoom, hideZoom: hideZoom, content: [] };
+                let rr = { x: x * size, y: y * size, w: size, h: size, rx: size * 0.5, ry: size * 0.5, css: 'debug' };
+                aa.content.push(rr);
+                anchor.content.push(aa);
+            }
+        }
+    }
+    resetUI() {
+        this.mixer.resetMixeUI();
+    }
+    constentWidth() {
+        return 1000;
+    }
+    constentHeight() {
+        return 1000;
+    }
+}
+class UIToolbar {
+    setupToolbar() {
+    }
+    resetToolbar() {
+    }
+}
+class MixerUI {
+    setupMixerUI() {
+    }
+    resetMixeUI() {
+    }
 }
 console.log('Tile Level API');
 var LevelModes;
