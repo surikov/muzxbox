@@ -1,0 +1,70 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
+	<style>
+		:root {
+			--tapSize: 77px;
+			--divColor: #669900;
+			--tapSize1: 1cm;
+		}
+		.svgRec1 {
+			fill: #cc00ff;
+		}
+		.divRec1 {
+			background-color: var(--divColor);
+			width:calc(2*var(--tapSize1));
+			height:var(--tapSize1);
+		}
+	</style>
+</head>
+
+<body>
+	<p>v1.04</p>
+	<svg id="tileLevelSVG" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+
+		<rect id="rectangle1" class="svgRec1" width="100" height="100" />
+
+	</svg>
+	<div class="divRec1 width1tap height1tap">
+		test
+	</div>
+	<p id="info">
+
+	</p>
+</body>
+<script>
+	console.log('color & size v1.01');
+
+	let tileLevelSVG = document.getElementById("tileLevelSVG");
+	let rectangle1 = document.getElementById("rectangle1");
+	let info = document.getElementById("info");
+	let baseSize = 1;
+	let svgns = "http://www.w3.org/2000/svg";
+	let rect = document.createElementNS(svgns, 'rect');
+	rect.setAttributeNS(null, 'height', '' + baseSize + 'cm');
+	rect.setAttributeNS(null, 'width', '' + baseSize + 'cm');
+	tileLevelSVG.appendChild(rect);
+	let tbb = rect.getBBox();
+	let tapSize = Math.round(tbb.width);
+	tileLevelSVG.removeChild(rect);
+
+	rectangle1.setAttribute('width', tapSize+'px');
+	rectangle1.setAttribute('height', tapSize+'px');
+
+	console.log('tapSize', tapSize);
+	console.log('', window.screen);
+
+	document.documentElement.style.setProperty('--divColor', '#996633');
+	document.documentElement.style.setProperty('--tapSize1', '99px');
+
+	info.innerHTML = 'tapSize ' + tapSize + '<br/>'
+		+ 'avail ' + window.screen.availWidth + 'x' + window.screen.availHeight + '<br/>'
+		+ 'devicePixelRatio ' + window.devicePixelRatio + '<br/>'
+		+ 'phis ' + (window.screen.availWidth/tapSize) + 'x' + (window.screen.availHeight/tapSize) + '<br/>'
+		;
+</script>
+
+</html>
