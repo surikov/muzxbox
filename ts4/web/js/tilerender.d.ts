@@ -42,10 +42,14 @@ declare class TileLevelRealTime implements TileLevelBase {
     lastMoveDy: number;
     mouseDownMode: boolean;
     currentDragItem: null | TileItem;
-    allTilesOK: boolean;
-    translateZ: number;
-    translateX: number;
-    translateY: number;
+    get allTilesOK(): boolean;
+    set allTilesOK(bb: boolean);
+    get translateZ(): number;
+    set translateZ(z: number);
+    get translateX(): number;
+    set translateX(x: number);
+    get translateY(): number;
+    set translateY(y: number);
     getStartMouseScreen(): TilePoint;
     getCurrentPointPosition(): TileZoom;
     screen2view(screen: TilePoint): TilePoint;
@@ -132,9 +136,9 @@ declare function vectorNormSquared(xy: TilePoint): number;
 declare function tileLine(svgns: string, tapSize: number, g: SVGElement, x1: number, y1: number, x2: number, y2: number, cssClass: string | undefined): TileSVGElement;
 declare function tilePath(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, z: number, data: string, cssClass: string): TileSVGElement;
 declare function tilePolygon(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, z: number | undefined, dots: number[], cssClass: string | undefined): TileSVGElement;
-declare function tileRectangle(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, w: number, h: number, rx: number | undefined, ry: number | undefined, cssClass: string): TileSVGElement;
+declare function tileRectangle(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, w: number, h: number, rx: number | undefined, ry: number | undefined, cssClass: string, cssStyle: string): TileSVGElement;
 declare function tileImage(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, w: number, h: number, href: string | undefined, preserveAspectRatio: string | undefined, cssClass: string): TileSVGElement;
-declare function tileText(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, html: string, maxWidth: string, cssClass: string): TileSVGElement;
+declare function tileText(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, html: string, maxWidth: string, cssClass: string, cssStyle: string): TileSVGElement;
 declare type TileZoom = {
     x: number;
     y: number;
@@ -147,6 +151,7 @@ declare type TilePoint = {
 declare type TileBaseDefinition = {
     id?: string;
     css?: string;
+    style?: string;
     activation?: (x: number, y: number) => void | undefined;
     draggable?: boolean;
 };

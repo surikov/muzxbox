@@ -149,27 +149,37 @@ class UIRenderer {
         this.tileLevelSVG = document.getElementById("tileLevelSVG");
         let layers = [];
         let debugGroup = document.getElementById("debugLayer");
-        let debugAnchor = { xx: 0, yy: 0, ww: 1000, hh: 1000, showZoom: 1, hideZoom: 16 + 1, content: [] };
-        this.testAddRectangles(debugAnchor, Math.pow(2, 4), 8, 8, 16 + 1);
-        this.testAddRectangles(debugAnchor, Math.pow(2, 5), 4, 4, 8);
-        this.testAddRectangles(debugAnchor, Math.pow(2, 6), 2, 2, 4);
-        this.testAddRectangles(debugAnchor, Math.pow(2, 7), 1, 1, 2);
+        let debugRectangle = { x: 0, y: 0, w: 1000, h: 1000, rx: 100, ry: 100, css: 'debug' };
+        let debugAnchor = { xx: 0, yy: 0, ww: 1000, hh: 1000, showZoom: 1, hideZoom: 256, content: [] };
+        debugAnchor.content.push(debugRectangle);
+        this.testAddRectangles(debugAnchor, 0, 0, 64, 1, 32, 256);
+        console.log('debugAnchor', debugAnchor);
         let debugLayer = {
             g: debugGroup, anchors: [debugAnchor], mode: LevelModes.normal
         };
         layers.push(debugLayer);
         this.mixer = new MixerUI();
-        this.tileRenderer.initRun(this.tileLevelSVG, true, this.constentWidth(), this.constentWidth(), 1, 4, 16, layers);
+        this.tileRenderer.initRun(this.tileLevelSVG, false, this.constentWidth(), this.constentWidth(), 1, 4, 256 - 1, layers);
+        this.tileRenderer.setAfterZoomCallback(() => { console.log(this.tileRenderer.getCurrentPointPosition()); });
     }
-    testAddRectangles(anchor, count, size, showZoom, hideZoom) {
-        for (let x = 0; x < count; x++) {
-            for (let y = 0; y < count; y++) {
-                let aa = { xx: x * size, yy: y * size, ww: size, hh: size, showZoom: showZoom, hideZoom: hideZoom, content: [] };
-                let rr = { x: x * size, y: y * size, w: size, h: size, rx: size * 0.5, ry: size * 0.5, css: 'debug' };
-                aa.content.push(rr);
-                anchor.content.push(aa);
+    testAddRectangles(anchor, xx, yy, size, stopZoom, currentZoom, maxZoom) {
+        let lenX = 3;
+        let lenY = 2;
+        for (let ix = 0; ix < lenX; ix++) {
+            for (let iy = 0; iy < lenY; iy++) {
+                let rectangle1 = { x: xx + ix * size, y: yy + iy * size, w: size, h: size, rx: size * 0.5, ry: size * 0.5, css: 'debug' };
+                let anchor1 = { xx: xx + ix * size, yy: yy + iy * size, ww: size, hh: size, showZoom: currentZoom, hideZoom: currentZoom * 2, content: [rectangle1] };
+                anchor.content.push(anchor1);
+                if (currentZoom / 2 >= stopZoom) {
+                    let sub1 = { xx: xx + ix * size, yy: yy + iy * size, ww: size, hh: size, showZoom: stopZoom, hideZoom: maxZoom, content: [] };
+                    anchor.content.push(sub1);
+                    this.testAddRectangles(sub1, xx + ix * size, yy + iy * size, size / 2, stopZoom, currentZoom / 2, maxZoom);
+                }
             }
         }
+        let label = { x: xx, y: yy + currentZoom, text: '' + xx + ':' + yy + '/' + currentZoom, style: 'font-size: ' + currentZoom + 'cm;' };
+        let anchor1 = { xx: xx + 0 * size, yy: yy + 0 * size, ww: size, hh: size, showZoom: currentZoom, hideZoom: currentZoom * 2, content: [label] };
+        anchor.content.push(anchor1);
     }
     resetUI() {
         this.mixer.resetMixeUI();

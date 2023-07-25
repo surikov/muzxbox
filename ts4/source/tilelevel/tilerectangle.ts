@@ -2,7 +2,9 @@ function tileRectangle(svgns: string, tapSize: number, g: SVGElement
     , x: number, y: number, w: number, h: number
     , rx: number | undefined, ry: number | undefined
     //, image: string | undefined
-    , cssClass: string): TileSVGElement {
+    , cssClass: string
+	,cssStyle:string
+	): TileSVGElement {
     let rect: TileSVGElement = document.createElementNS(svgns, 'rect') as TileSVGElement;
     rect.setAttributeNS(null, 'x', '' + x);
     rect.setAttributeNS(null, 'y', '' + y);
@@ -19,6 +21,10 @@ function tileRectangle(svgns: string, tapSize: number, g: SVGElement
     }*/
 	if (cssClass) {
 		rect.setAttributeNS(null, 'class', cssClass);
+	}else{
+		if (cssStyle) {
+			rect.setAttributeNS(null, 'style', cssStyle);
+		}
 	}
     //if(image){
         //image='theme/img/audio.png';

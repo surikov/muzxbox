@@ -42,6 +42,7 @@ type TileLayerOverlay = {
 type TileBaseDefinition = {
     id?: string// = 'id'+Math.floor(Math.random()*1000000000)
     , css?: string// string
+	, style?: string
     //,tempX?:number
     //,tempY?:number
     //, dragX?: boolean// string

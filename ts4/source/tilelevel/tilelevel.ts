@@ -840,7 +840,9 @@ class TileLevelRealTime implements TileLevelBase {
                 , dd.w * this.tapSize, dd.h * this.tapSize
                 , (dd.rx ? dd.rx : 0) * this.tapSize, (dd.ry ? dd.ry : 0) * this.tapSize
                 //, dd.image
-                , (dd.css ? dd.css : ''));
+                , (dd.css ? dd.css : '')
+				, (dd.style ? dd.style : '')
+				);
         }
         if (isTileImage(dd)) {
             element = tileImage(this.svgns, this.tapSize, gg, dd.x * this.tapSize, dd.y * this.tapSize
@@ -852,7 +854,7 @@ class TileLevelRealTime implements TileLevelBase {
         if (isTileText(dd)) {
             element = tileText(this.svgns, this.tapSize, gg, dd.x * this.tapSize, dd.y * this.tapSize, dd.text
                 , dd.maxWidth ? dd.maxWidth : ''
-                , dd.css ? dd.css : '');
+                , dd.css ? dd.css : '', dd.style ? dd.style : '');
         }
         if (isTilePath(dd)) {
             element = tilePath(this.svgns, this.tapSize, gg, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, (dd.scale ? dd.scale : 0), dd.points, dd.css ? dd.css : '');

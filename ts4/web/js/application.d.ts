@@ -23,7 +23,7 @@ declare class UIRenderer {
     tileRenderer: TileLevelBase;
     tileLevelSVG: SVGElement;
     setupUI(): void;
-    testAddRectangles(anchor: TileAnchor, count: number, size: number, showZoom: number, hideZoom: number): void;
+    testAddRectangles(anchor: TileAnchor, xx: number, yy: number, size: number, stopZoom: number, currentZoom: number, maxZoom: number): void;
     resetUI(): void;
     constentWidth(): number;
     constentHeight(): number;
@@ -48,6 +48,7 @@ declare type TilePoint = {
 declare type TileBaseDefinition = {
     id?: string;
     css?: string;
+    style?: string;
     activation?: (x: number, y: number) => void | undefined;
     draggable?: boolean;
 };

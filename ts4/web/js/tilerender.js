@@ -790,13 +790,13 @@ class TileLevelRealTime {
     addElement(gg, dd, layerMode) {
         let element = null;
         if (isTileRectangle(dd)) {
-            element = tileRectangle(this.svgns, this.tapSize, gg, dd.x * this.tapSize, dd.y * this.tapSize, dd.w * this.tapSize, dd.h * this.tapSize, (dd.rx ? dd.rx : 0) * this.tapSize, (dd.ry ? dd.ry : 0) * this.tapSize, (dd.css ? dd.css : ''));
+            element = tileRectangle(this.svgns, this.tapSize, gg, dd.x * this.tapSize, dd.y * this.tapSize, dd.w * this.tapSize, dd.h * this.tapSize, (dd.rx ? dd.rx : 0) * this.tapSize, (dd.ry ? dd.ry : 0) * this.tapSize, (dd.css ? dd.css : ''), (dd.style ? dd.style : ''));
         }
         if (isTileImage(dd)) {
             element = tileImage(this.svgns, this.tapSize, gg, dd.x * this.tapSize, dd.y * this.tapSize, dd.w * this.tapSize, dd.h * this.tapSize, dd.href, dd.preserveAspectRatio, (dd.css ? dd.css : ''));
         }
         if (isTileText(dd)) {
-            element = tileText(this.svgns, this.tapSize, gg, dd.x * this.tapSize, dd.y * this.tapSize, dd.text, dd.maxWidth ? dd.maxWidth : '', dd.css ? dd.css : '');
+            element = tileText(this.svgns, this.tapSize, gg, dd.x * this.tapSize, dd.y * this.tapSize, dd.text, dd.maxWidth ? dd.maxWidth : '', dd.css ? dd.css : '', dd.style ? dd.style : '');
         }
         if (isTilePath(dd)) {
             element = tilePath(this.svgns, this.tapSize, gg, (dd.x ? dd.x : 0) * this.tapSize, (dd.y ? dd.y : 0) * this.tapSize, (dd.scale ? dd.scale : 0), dd.points, dd.css ? dd.css : '');
@@ -1106,7 +1106,7 @@ function tilePolygon(svgns, tapSize, g, x, y, z, dots, cssClass) {
     g.appendChild(polygon);
     return polygon;
 }
-function tileRectangle(svgns, tapSize, g, x, y, w, h, rx, ry, cssClass) {
+function tileRectangle(svgns, tapSize, g, x, y, w, h, rx, ry, cssClass, cssStyle) {
     let rect = document.createElementNS(svgns, 'rect');
     rect.setAttributeNS(null, 'x', '' + x);
     rect.setAttributeNS(null, 'y', '' + y);
@@ -1120,6 +1120,11 @@ function tileRectangle(svgns, tapSize, g, x, y, w, h, rx, ry, cssClass) {
     }
     if (cssClass) {
         rect.setAttributeNS(null, 'class', cssClass);
+    }
+    else {
+        if (cssStyle) {
+            rect.setAttributeNS(null, 'style', cssStyle);
+        }
     }
     g.appendChild(rect);
     return rect;
@@ -1145,12 +1150,17 @@ function tileImage(svgns, tapSize, g, x, y, w, h, href, preserveAspectRatio, css
     g.appendChild(img);
     return img;
 }
-function tileText(svgns, tapSize, g, x, y, html, maxWidth, cssClass) {
+function tileText(svgns, tapSize, g, x, y, html, maxWidth, cssClass, cssStyle) {
     let txt = document.createElementNS(svgns, 'text');
     txt.setAttributeNS(null, 'x', '' + x);
     txt.setAttributeNS(null, 'y', '' + y);
     if (cssClass) {
         txt.setAttributeNS(null, 'class', cssClass);
+    }
+    else {
+        if (cssStyle) {
+            txt.setAttributeNS(null, 'style', cssStyle);
+        }
     }
     if (maxWidth) {
     }
