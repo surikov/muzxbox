@@ -23,7 +23,7 @@ declare class UIRenderer {
     tileRenderer: TileLevelBase;
     tileLevelSVG: SVGElement;
     setupUI(): void;
-    testAddRectangles(anchor: TileAnchor, xx: number, yy: number, size: number, stopZoom: number, currentZoom: number, maxZoom: number): void;
+    testAddRectangles(anchor: TileAnchor, xx: number, yy: number, size: number, stopMinZoom: number, startMaxZoom: number, maxZoom: number): void;
     resetUI(): void;
     constentWidth(): number;
     constentHeight(): number;

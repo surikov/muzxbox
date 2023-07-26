@@ -10,13 +10,15 @@ class UIRenderer {
 		let layers: TileLayerDefinition[] = [];
 		let debugGroup = (document.getElementById("debugLayer") as any) as SVGElement;
 		let debugRectangle: TileRectangle = { x: 0, y: 0, w: 1000, h: 1000, rx: 100, ry: 100, css: 'debug' };
-		let debugAnchor: TileAnchor = { xx: 0, yy: 0, ww: 1000, hh: 1000, showZoom: 1, hideZoom: 256, content: [] };
-		debugAnchor.content.push(debugRectangle);
-		this.testAddRectangles(debugAnchor, 0, 0, 64, 1, 32, 256);
-		console.log('debugAnchor', debugAnchor);
+		let debugAnchor1: TileAnchor = { xx: 0, yy: 0, ww: 1000, hh: 1000, showZoom: 16, hideZoom: 256, content: [] };
+		let debugAnchor2: TileAnchor = { xx: 0, yy: 0, ww: 1000, hh: 1000, showZoom: 1, hideZoom: 16, content: [] };
+		debugAnchor1.content.push(debugRectangle);
+		this.testAddRectangles(debugAnchor1, 0, 0, 512, 16, 128, 128);
+		this.testAddRectangles(debugAnchor2, 0, 0, 128, 1, 8, 8);
+		//console.log('debugAnchor', debugAnchor);
 
 		let debugLayer: TileLayerDefinition = {
-			g: debugGroup, anchors: [debugAnchor], mode: LevelModes.normal
+			g: debugGroup, anchors: [debugAnchor1, debugAnchor2], mode: LevelModes.normal
 		};
 		layers.push(debugLayer);
 		this.mixer = new MixerUI();
@@ -28,59 +30,29 @@ class UIRenderer {
 			, layers);
 		this.tileRenderer.setAfterZoomCallback(() => { console.log(this.tileRenderer.getCurrentPointPosition()) });
 	}
-	testAddRectangles(anchor: TileAnchor, xx: number, yy: number, size: number, stopZoom: number, currentZoom: number, maxZoom: number) {
-		let lenX=3;
-		let lenY=2;
-		for (let ix = 0; ix < lenX; ix++) {
-			for (let iy = 0; iy < lenY; iy++) {
-				let rectangle1: TileRectangle = { x: xx + ix * size, y: yy + iy * size, w: size, h: size, rx: size * 0.5, ry: size * 0.5, css: 'debug' };
-				let anchor1: TileAnchor = { xx: xx + ix * size, yy: yy + iy * size, ww: size, hh: size, showZoom: currentZoom, hideZoom: currentZoom * 2, content: [rectangle1] };
-				anchor.content.push(anchor1);
+	testAddRectangles(anchor: TileAnchor, xx: number, yy: number, size: number, stopMinZoom: number, startMaxZoom: number, maxZoom: number) {
+		let rr = 2;
+		for (let ix = 0; ix < rr; ix++) {
+			for (let iy = 0; iy < rr; iy++) {
+				//let rectangle: TileRectangle = { x: xx + ix * size, y: yy + iy * size, w: size, h: size, rx: size * 0.5, ry: size * 0.5, css: 'debug' };
+				//let reAnchor: TileAnchor = { xx: xx + ix * size, yy: yy + iy * size, ww: size, hh: size, showZoom: startMaxZoom, hideZoom: startMaxZoom * 2, content: [rectangle] };
+				//anchor.content.push(reAnchor);
 
-				if (currentZoom / 2 >= stopZoom) {
-					let sub1: TileAnchor = { xx: xx + ix * size, yy: yy + iy * size, ww: size, hh: size, showZoom: stopZoom, hideZoom: maxZoom, content: [] };
-					anchor.content.push(sub1);
-					this.testAddRectangles(sub1, xx + ix * size, yy + iy * size, size / 2, stopZoom, currentZoom / 2, maxZoom);
+				if (startMaxZoom / 2 >= stopMinZoom) {
+					let subAnchot: TileAnchor = { xx: xx + ix * size, yy: yy + iy * size, ww: size, hh: size, showZoom: stopMinZoom, hideZoom: maxZoom, content: [] };
+					anchor.content.push(subAnchot);
+					this.testAddRectangles(subAnchot, xx + ix * size, yy + iy * size, size / 2, stopMinZoom, startMaxZoom / 2, maxZoom);
+
 				}
 			}
 		}
+		let rectangle: TileRectangle = { x: xx, y: yy, w: size / 2, h: size / 2, rx: size * 0.25, ry: size * 0.25, css: 'debug' };
+		let reAnchor: TileAnchor = { xx: xx, yy: yy, ww: size, hh: size, showZoom: startMaxZoom, hideZoom: startMaxZoom * 2, content: [rectangle] };
+		anchor.content.push(reAnchor);
 
-		/*let rectangle1: TileRectangle = { x: xx, y: yy, w: size, h: size, rx: size * 0.5, ry: size * 0.5, css: 'debug' };
-		let anchor1: TileAnchor = { xx: xx, yy: yy, ww: size, hh: size, showZoom: currentZoom, hideZoom: currentZoom * 2, content: [rectangle1] };
-		anchor.content.push(anchor1);
-
-		let rectangle2: TileRectangle = { x: xx + size, y: yy, w: size, h: size, rx: size * 0.5, ry: size * 0.5, css: 'debug' };
-		let anchor2: TileAnchor = { xx: xx + size, yy: yy, ww: size, hh: size, showZoom: currentZoom, hideZoom: currentZoom * 2, content: [rectangle2] };
-		anchor.content.push(anchor2);
-
-		let rectangle3: TileRectangle = { x: xx, y: yy + size, w: size, h: size, rx: size * 0.5, ry: size * 0.5, css: 'debug' };
-		let anchor3: TileAnchor = { xx: xx, yy: yy + size, ww: size, hh: size, showZoom: currentZoom, hideZoom: currentZoom * 2, content: [rectangle3] };
-		anchor.content.push(anchor3);
-
-		let rectangle4: TileRectangle = { x: xx + size, y: yy + size, w: size, h: size, rx: size * 0.5, ry: size * 0.5, css: 'debug' };
-		let anchor4: TileAnchor = { xx: xx + size, yy: yy + size, ww: size, hh: size, showZoom: currentZoom, hideZoom: currentZoom * 2, content: [rectangle4] };
-		anchor.content.push(anchor4);*/
-
-		let label: TileText = { x: xx, y: yy + currentZoom, text: '' + xx + ':' + yy + '/' + currentZoom, style: 'font-size: ' + currentZoom + 'cm;' };
-		let anchor1: TileAnchor = { xx: xx + 0 * size, yy: yy + 0 * size, ww: size, hh: size, showZoom: currentZoom, hideZoom: currentZoom * 2, content: [label] };
-		anchor.content.push(anchor1);
-
-		//if (currentZoom / 2 >= stopZoom) {
-
-			/*let sub1: TileAnchor = { xx: xx, yy: yy, ww: size, hh: size, showZoom: stopZoom, hideZoom: maxZoom, content: [] };
-			let sub2: TileAnchor = { xx: xx + size, yy: yy, ww: size, hh: size, showZoom: stopZoom, hideZoom: maxZoom, content: [] };
-			let sub3: TileAnchor = { xx: xx, yy: yy + size, ww: size, hh: size, showZoom: stopZoom, hideZoom: maxZoom, content: [] };
-			let sub4: TileAnchor = { xx: xx + size, yy: yy + size, ww: size, hh: size, showZoom: stopZoom, hideZoom: maxZoom, content: [] };
-			anchor.content.push(sub1);
-			anchor.content.push(sub2);
-			anchor.content.push(sub3);
-			anchor.content.push(sub4);
-			this.testAddRectangles(sub1, xx, yy, size / 2, stopZoom, currentZoom / 2, maxZoom);
-			this.testAddRectangles(sub2, xx + size, yy, size / 2, stopZoom, currentZoom / 2, maxZoom);
-			this.testAddRectangles(sub3, xx, yy + size, size / 2, stopZoom, currentZoom / 2, maxZoom);
-			this.testAddRectangles(sub4, xx + size, yy + size, size / 2, stopZoom, currentZoom / 2, maxZoom);*/
-		//}
-
+		let label: TileText = { x: xx, y: yy + startMaxZoom, text: '' + xx + ':' + yy + '/' + startMaxZoom, style: 'font-size: ' + startMaxZoom + 'cm;' };
+		let txAnchor: TileAnchor = { xx: xx, yy: yy, ww: size, hh: size, showZoom: startMaxZoom, hideZoom: startMaxZoom * 2, content: [label] };
+		anchor.content.push(txAnchor);
 	}
 	resetUI() {
 		this.mixer.resetMixeUI();
