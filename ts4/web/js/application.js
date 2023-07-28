@@ -149,46 +149,40 @@ class UIRenderer {
         this.tileLevelSVG = document.getElementById("tileLevelSVG");
         let layers = [];
         let debugGroup = document.getElementById("debugLayer");
-        let debugRectangle = { x: 0, y: 0, w: 1000, h: 1000, rx: 100, ry: 100, css: 'debug' };
-        let debugAnchor1 = { xx: 0, yy: 0, ww: 1000, hh: 1000, showZoom: 16, hideZoom: 256, content: [] };
-        let debugAnchor2 = { xx: 0, yy: 0, ww: 1000, hh: 1000, showZoom: 1, hideZoom: 16, content: [] };
-        debugAnchor1.content.push(debugRectangle);
-        this.testAddRectangles(debugAnchor1, 0, 0, 512, 16, 128, 128);
-        this.testAddRectangles(debugAnchor2, 0, 0, 128, 1, 8, 8);
+        let debugAnchor = { xx: 0, yy: 0, ww: this.constentWidth(), hh: this.constentHeight(), showZoom: 0.25, hideZoom: 1024, content: [] };
+        this.createTestMixerTracks(debugAnchor, 1, 1, 2, 256);
         let debugLayer = {
-            g: debugGroup, anchors: [debugAnchor1, debugAnchor2], mode: LevelModes.normal
+            g: debugGroup, anchors: [debugAnchor], mode: LevelModes.normal
         };
         layers.push(debugLayer);
         this.mixer = new MixerUI();
-        this.tileRenderer.initRun(this.tileLevelSVG, false, this.constentWidth(), this.constentWidth(), 1, 4, 256 - 1, layers);
+        this.tileRenderer.initRun(this.tileLevelSVG, false, this.constentWidth(), this.constentHeight(), 0.25, 4, 1024 - 1, layers);
         this.tileRenderer.setAfterZoomCallback(() => { console.log(this.tileRenderer.getCurrentPointPosition()); });
     }
-    testAddRectangles(anchor, xx, yy, size, stopMinZoom, startMaxZoom, maxZoom) {
-        let rr = 2;
-        for (let ix = 0; ix < rr; ix++) {
-            for (let iy = 0; iy < rr; iy++) {
-                if (startMaxZoom / 2 >= stopMinZoom) {
-                    let subAnchot = { xx: xx + ix * size, yy: yy + iy * size, ww: size, hh: size, showZoom: stopMinZoom, hideZoom: maxZoom, content: [] };
-                    anchor.content.push(subAnchot);
-                    this.testAddRectangles(subAnchot, xx + ix * size, yy + iy * size, size / 2, stopMinZoom, startMaxZoom / 2, maxZoom);
-                }
+    createTestMixerTracks(anchor, minZoom, showZoom, hideZoom, maxZoom) {
+        let debugRectangle = { x: 0, y: 0, w: this.constentWidth(), h: this.constentHeight(), rx: this.constentWidth() / 8, ry: this.constentHeight() / 8, css: 'debug' };
+        anchor.content.push(debugRectangle);
+        for (let tt = 0; tt < 16; tt++) {
+            let trackRectangle = { x: 0, y: 12 * 10 * tt, w: this.constentWidth(), h: 12 * 10 - 5, rx: 22, ry: 22, css: 'debug' };
+            anchor.content.push(trackRectangle);
+            for (let mm = 0; mm < 200; mm++) {
+                let measureRectangle = { x: mm * 32, y: 12 * 10 * tt, w: 32 - 1, h: 12 * 10 - 2, rx: 5, ry: 5, css: 'debug' };
+                anchor.content.push(measureRectangle);
+            }
+            for (let oo = 0; oo < 12; oo++) {
+                let oktaRectangle = { x: 0, y: 12 * 10 * tt + oo * 12, w: this.constentWidth(), h: 12 - 1, rx: 3, ry: 3, css: 'debug' };
+                anchor.content.push(oktaRectangle);
             }
         }
-        let rectangle = { x: xx, y: yy, w: size / 2, h: size / 2, rx: size * 0.25, ry: size * 0.25, css: 'debug' };
-        let reAnchor = { xx: xx, yy: yy, ww: size, hh: size, showZoom: startMaxZoom, hideZoom: startMaxZoom * 2, content: [rectangle] };
-        anchor.content.push(reAnchor);
-        let label = { x: xx, y: yy + startMaxZoom, text: '' + xx + ':' + yy + '/' + startMaxZoom, style: 'font-size: ' + startMaxZoom + 'cm;' };
-        let txAnchor = { xx: xx, yy: yy, ww: size, hh: size, showZoom: startMaxZoom, hideZoom: startMaxZoom * 2, content: [label] };
-        anchor.content.push(txAnchor);
     }
     resetUI() {
         this.mixer.resetMixeUI();
     }
     constentWidth() {
-        return 1000;
+        return 32 * 200;
     }
     constentHeight() {
-        return 1000;
+        return 12 * 10 * 16;
     }
 }
 class UIToolbar {

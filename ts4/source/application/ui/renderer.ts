@@ -9,28 +9,48 @@ class UIRenderer {
 		this.tileLevelSVG = (document.getElementById("tileLevelSVG") as any) as SVGElement;
 		let layers: TileLayerDefinition[] = [];
 		let debugGroup = (document.getElementById("debugLayer") as any) as SVGElement;
-		let debugRectangle: TileRectangle = { x: 0, y: 0, w: 1000, h: 1000, rx: 100, ry: 100, css: 'debug' };
-		let debugAnchor1: TileAnchor = { xx: 0, yy: 0, ww: 1000, hh: 1000, showZoom: 16, hideZoom: 256, content: [] };
-		let debugAnchor2: TileAnchor = { xx: 0, yy: 0, ww: 1000, hh: 1000, showZoom: 1, hideZoom: 16, content: [] };
-		debugAnchor1.content.push(debugRectangle);
-		this.testAddRectangles(debugAnchor1, 0, 0, 512, 16, 128, 128);
-		this.testAddRectangles(debugAnchor2, 0, 0, 128, 1, 8, 8);
-		//console.log('debugAnchor', debugAnchor);
 
+		//let debugAnchor1: TileAnchor = { xx: 0, yy: 0, ww: 1000, hh: 1000, showZoom: 16, hideZoom: 256, content: [] };
+		//let debugAnchor2: TileAnchor = { xx: 0, yy: 0, ww: 1000, hh: 1000, showZoom: 1, hideZoom: 16, content: [] };
+		let debugAnchor: TileAnchor = { xx: 0, yy: 0, ww: this.constentWidth(), hh: this.constentHeight(), showZoom: 0.25, hideZoom: 1024, content: [] };
+		//let debugRectangle: TileRectangle = { x: 0, y: 0, w: this.constentWidth(), h: this.constentHeight(), rx: this.constentWidth() / 8, ry: this.constentWidth() / 8, css: 'debug' };
+		//debugAnchor.content.push(debugRectangle);
+		//let zoom1_2Anchor: TileAnchor = { xx: 0, yy: 0, ww: this.constentWidth(), hh: this.constentHeight(), showZoom: 1, hideZoom: 2, content: [] };
+		//debugAnchor.content.push(zoom1_2Anchor);
+		//this.testAddRectangles(debugAnchor1, 0, 0, 512, 16, 128, 128);
+		//this.testAddRectangles(debugAnchor2, 0, 0, 128, 1, 8, 8);
+		//console.log('debugAnchor', debugAnchor);
+		this.createTestMixerTracks(debugAnchor, 1, 1, 2, 256);
 		let debugLayer: TileLayerDefinition = {
-			g: debugGroup, anchors: [debugAnchor1, debugAnchor2], mode: LevelModes.normal
+			g: debugGroup, anchors: [debugAnchor], mode: LevelModes.normal
 		};
 		layers.push(debugLayer);
 		this.mixer = new MixerUI();
 		this.tileRenderer.initRun(this.tileLevelSVG
 			, false
 			, this.constentWidth()
-			, this.constentWidth()
-			, 1, 4, 256 - 1
+			, this.constentHeight()
+			, 0.25, 4, 1024 - 1
 			, layers);
 		this.tileRenderer.setAfterZoomCallback(() => { console.log(this.tileRenderer.getCurrentPointPosition()) });
 	}
-	testAddRectangles(anchor: TileAnchor, xx: number, yy: number, size: number, stopMinZoom: number, startMaxZoom: number, maxZoom: number) {
+	createTestMixerTracks(anchor: TileAnchor, minZoom: number, showZoom: number, hideZoom: number, maxZoom: number) {
+		let debugRectangle: TileRectangle = { x: 0, y: 0, w: this.constentWidth(), h: this.constentHeight(), rx: this.constentWidth() / 8, ry: this.constentHeight() / 8, css: 'debug' };
+		anchor.content.push(debugRectangle);
+		for (let tt = 0; tt < 16; tt++) {
+			let trackRectangle: TileRectangle = { x: 0, y: 12 * 10 * tt, w: this.constentWidth(), h: 12 * 10 - 5, rx: 22, ry: 22, css: 'debug' };
+			anchor.content.push(trackRectangle);
+			for (let mm = 0; mm < 200; mm++) {
+				let measureRectangle: TileRectangle = { x: mm * 32, y: 12 * 10 * tt, w: 32 - 1, h: 12 * 10 - 2, rx: 5, ry: 5, css: 'debug' };
+				anchor.content.push(measureRectangle);
+			}
+			for (let oo = 0; oo < 12; oo++) {
+				let oktaRectangle: TileRectangle = { x: 0, y: 12 * 10 * tt+oo*12, w: this.constentWidth(), h: 12  - 1, rx: 3, ry:3, css: 'debug' };
+				anchor.content.push(oktaRectangle);
+			}
+		}
+	}
+	/*testAddRectangles(anchor: TileAnchor, xx: number, yy: number, size: number, stopMinZoom: number, startMaxZoom: number, maxZoom: number) {
 		let rr = 2;
 		for (let ix = 0; ix < rr; ix++) {
 			for (let iy = 0; iy < rr; iy++) {
@@ -53,14 +73,14 @@ class UIRenderer {
 		let label: TileText = { x: xx, y: yy + startMaxZoom, text: '' + xx + ':' + yy + '/' + startMaxZoom, style: 'font-size: ' + startMaxZoom + 'cm;' };
 		let txAnchor: TileAnchor = { xx: xx, yy: yy, ww: size, hh: size, showZoom: startMaxZoom, hideZoom: startMaxZoom * 2, content: [label] };
 		anchor.content.push(txAnchor);
-	}
+	}*/
 	resetUI() {
 		this.mixer.resetMixeUI();
 	}
 	constentWidth() {
-		return 1000;
+		return 32 * 200;
 	}
 	constentHeight() {
-		return 1000;
+		return 12 * 10 * 16;
 	}
 }
