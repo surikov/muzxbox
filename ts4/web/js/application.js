@@ -148,32 +148,12 @@ class UIRenderer {
         this.tileRenderer = createTileLevel();
         this.tileLevelSVG = document.getElementById("tileLevelSVG");
         let layers = [];
-        let debugGroup = document.getElementById("debugLayer");
-        let debugAnchor = { xx: 0, yy: 0, ww: this.constentWidth(), hh: this.constentHeight(), showZoom: 0.25, hideZoom: 1024, content: [] };
-        this.createTestMixerTracks(debugAnchor, 1, 1, 2, 256);
-        let debugLayer = {
-            g: debugGroup, anchors: [debugAnchor], mode: LevelModes.normal
-        };
-        layers.push(debugLayer);
+        let debug = new DebugLayer();
+        layers = layers.concat(debug.buildDebugLayers());
+        console.log(layers.length, layers);
         this.mixer = new MixerUI();
-        this.tileRenderer.initRun(this.tileLevelSVG, false, this.constentWidth(), this.constentHeight(), 0.25, 4, 1024 - 1, layers);
+        this.tileRenderer.initRun(this.tileLevelSVG, false, this.constentWidth(), this.constentHeight(), 0.25, 4, 256 - 1, layers);
         this.tileRenderer.setAfterZoomCallback(() => { console.log(this.tileRenderer.getCurrentPointPosition()); });
-    }
-    createTestMixerTracks(anchor, minZoom, showZoom, hideZoom, maxZoom) {
-        let debugRectangle = { x: 0, y: 0, w: this.constentWidth(), h: this.constentHeight(), rx: this.constentWidth() / 8, ry: this.constentHeight() / 8, css: 'debug' };
-        anchor.content.push(debugRectangle);
-        for (let tt = 0; tt < 16; tt++) {
-            let trackRectangle = { x: 0, y: 12 * 10 * tt, w: this.constentWidth(), h: 12 * 10 - 5, rx: 22, ry: 22, css: 'debug' };
-            anchor.content.push(trackRectangle);
-            for (let mm = 0; mm < 200; mm++) {
-                let measureRectangle = { x: mm * 32, y: 12 * 10 * tt, w: 32 - 1, h: 12 * 10 - 2, rx: 5, ry: 5, css: 'debug' };
-                anchor.content.push(measureRectangle);
-            }
-            for (let oo = 0; oo < 12; oo++) {
-                let oktaRectangle = { x: 0, y: 12 * 10 * tt + oo * 12, w: this.constentWidth(), h: 12 - 1, rx: 3, ry: 3, css: 'debug' };
-                anchor.content.push(oktaRectangle);
-            }
-        }
     }
     resetUI() {
         this.mixer.resetMixeUI();
@@ -195,6 +175,140 @@ class MixerUI {
     setupMixerUI() {
     }
     resetMixeUI() {
+    }
+}
+class DebugLayer {
+    buildDebugLayers() {
+        let mix = testMixerData;
+        return [];
+    }
+}
+let testMixerData = {
+    title: 'test data for debug',
+    timeline: [
+        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
+        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
+        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
+        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 7, part: 8 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 2, part: 2 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 5, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 3, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }
+    ],
+    notePathHeight: 0.25,
+    widthDurationRatio: 50,
+    tracks: [
+        { title: 'Test track 1' },
+        { title: 'Test track 2' },
+        { title: 'Test track 3' },
+        { title: 'Test track 4' },
+        { title: 'Test track 5' },
+        { title: 'Test track 6' },
+        { title: 'Test track 7' },
+        { title: 'Test track 8' },
+        { title: 'Test track 9' },
+        { title: 'Test track 10' },
+        { title: 'Test track 11' },
+        { title: 'Test track 12' },
+        { title: 'Test track 13' },
+        { title: 'Test track 14' },
+        { title: 'Test track 15' },
+        { title: 'Test track 16' }
+    ]
+};
+class MusicMetreMath {
+    constructor(from) {
+        this.count = from.count;
+        this.part = from.part;
+    }
+    metre() {
+        return {
+            count: this.count,
+            part: this.part
+        };
+    }
+    simplyfy() {
+        let cc = this.count;
+        let pp = this.part;
+        if (cc > 0 && pp > 0) {
+            while (cc % 2 == 0 && pp % 2 == 0) {
+                cc = cc / 2;
+                pp = pp / 2;
+            }
+        }
+        return new MusicMetreMath({ count: cc, part: pp });
+    }
+    strip(toPart) {
+        let cc = this.count;
+        let pp = this.part;
+        let rr = pp / toPart;
+        cc = Math.round(cc / rr);
+        pp = toPart;
+        return new MusicMetreMath({
+            count: cc,
+            part: pp
+        });
+    }
+    equals(metre) {
+        let countMe = this.count * metre.part;
+        let countTo = metre.count * this.part;
+        if (countMe == countTo) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    less(metre) {
+        let countMe = this.count * metre.part;
+        let countTo = metre.count * this.part;
+        if (countMe < countTo) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    more(metre) {
+        let countMe = this.count * metre.part;
+        let countTo = metre.count * this.part;
+        if (countMe > countTo) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    plus(metre) {
+        let countMe = this.count * metre.part;
+        let countTo = metre.count * this.part;
+        let rr = {
+            count: countMe + countTo,
+            part: metre.part * this.part
+        };
+        return new MusicMetreMath(rr).simplyfy();
+    }
+    minus(metre) {
+        let countMe = this.count * metre.part;
+        let countTo = metre.count * this.part;
+        let rr = { count: countMe - countTo, part: metre.part * this.part };
+        return new MusicMetreMath(rr).simplyfy();
+    }
+    duration(tempo) {
+        let wholeNoteSeconds = (4 * 60) / tempo;
+        let meterSeconds = (wholeNoteSeconds * this.count) / this.part;
+        return meterSeconds;
+    }
+    width(tempo, ration) {
+        return this.duration(tempo) * ration;
     }
 }
 console.log('Tile Level API');

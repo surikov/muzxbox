@@ -23,7 +23,6 @@ declare class UIRenderer {
     tileRenderer: TileLevelBase;
     tileLevelSVG: SVGElement;
     setupUI(): void;
-    createTestMixerTracks(anchor: TileAnchor, minZoom: number, showZoom: number, hideZoom: number, maxZoom: number): void;
     resetUI(): void;
     constentWidth(): number;
     constentHeight(): number;
@@ -35,6 +34,43 @@ declare class UIToolbar {
 declare class MixerUI {
     setupMixerUI(): void;
     resetMixeUI(): void;
+}
+declare class DebugLayer {
+    buildDebugLayers(): TileLayerDefinition[];
+}
+declare type MusicMetre = {
+    count: number;
+    part: number;
+};
+declare type TimeBar = {
+    tempo: number;
+    metre: MusicMetre;
+};
+declare type MusicTrack = {
+    title: string;
+};
+declare type MixerData = {
+    title: string;
+    timeline: TimeBar[];
+    notePathHeight: number;
+    widthDurationRatio: number;
+    tracks: MusicTrack[];
+};
+declare let testMixerData: MixerData;
+declare class MusicMetreMath {
+    count: number;
+    part: number;
+    constructor(from: MusicMetre);
+    metre(): MusicMetre;
+    simplyfy(): MusicMetreMath;
+    strip(toPart: number): MusicMetreMath;
+    equals(metre: MusicMetre): boolean;
+    less(metre: MusicMetre): boolean;
+    more(metre: MusicMetre): boolean;
+    plus(metre: MusicMetre): MusicMetreMath;
+    minus(metre: MusicMetre): MusicMetreMath;
+    duration(tempo: number): number;
+    width(tempo: number, ration: number): number;
 }
 declare type TileZoom = {
     x: number;
