@@ -3,5 +3,5 @@ function startApplication(){
     console.log('startApplication v1.6.01');
     let ui=new UIRenderer();
     ui.setupUI();
-    ui.resetUI();
+    ui.resetUI(testMixerData);
 }

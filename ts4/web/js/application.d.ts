@@ -20,23 +20,41 @@ declare function createTileLevel(): TileLevelBase;
 declare class UIRenderer {
     toolbar: UIToolbar;
     mixer: MixerUI;
+    debug: DebugLayer;
     tileRenderer: TileLevelBase;
     tileLevelSVG: SVGElement;
     setupUI(): void;
-    resetUI(): void;
-    constentWidth(): number;
-    constentHeight(): number;
+    resetUI(data: MixerData): void;
 }
 declare class UIToolbar {
     setupToolbar(): void;
     resetToolbar(): void;
 }
+declare class BarOctave {
+}
+declare class MixerTrack {
+    trackRectangle: TileRectangle;
+    trackAnchor: TileAnchor;
+    constructor(top: number, toAnchor: TileAnchor, data: MixerData);
+}
+declare class TrackBar {
+}
 declare class MixerUI {
-    setupMixerUI(): void;
-    resetMixeUI(): void;
+    mixerGroup: SVGElement;
+    testRectangle: TileRectangle;
+    mixerAnchor: TileAnchor;
+    mixerLayer: TileLayerDefinition;
+    tracks: MixerTrack[];
+    resetMixeUI(data: MixerData): void;
+    buildDebugLayers(): TileLayerDefinition[];
 }
 declare class DebugLayer {
+    debugRectangle: TileRectangle;
+    debugAnchor: TileAnchor;
+    debugGroup: SVGElement;
+    debugLayer: TileLayerDefinition;
     buildDebugLayers(): TileLayerDefinition[];
+    resetDebugLayer(data: MixerData): void;
 }
 declare type MusicMetre = {
     count: number;
@@ -70,7 +88,13 @@ declare class MusicMetreMath {
     plus(metre: MusicMetre): MusicMetreMath;
     minus(metre: MusicMetre): MusicMetreMath;
     duration(tempo: number): number;
-    width(tempo: number, ration: number): number;
+    width(tempo: number, ratio: number): number;
+}
+declare class MixerDataMath {
+    data: MixerData;
+    constructor(data: MixerData);
+    wholeWidth(): number;
+    wholeHeight(): number;
 }
 declare type TileZoom = {
     x: number;

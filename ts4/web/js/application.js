@@ -141,28 +141,27 @@ function startApplication() {
     console.log('startApplication v1.6.01');
     let ui = new UIRenderer();
     ui.setupUI();
-    ui.resetUI();
+    ui.resetUI(testMixerData);
 }
 class UIRenderer {
     setupUI() {
         this.tileRenderer = createTileLevel();
         this.tileLevelSVG = document.getElementById("tileLevelSVG");
         let layers = [];
-        let debug = new DebugLayer();
-        layers = layers.concat(debug.buildDebugLayers());
-        console.log(layers.length, layers);
+        this.debug = new DebugLayer();
+        layers = layers.concat(this.debug.buildDebugLayers());
         this.mixer = new MixerUI();
-        this.tileRenderer.initRun(this.tileLevelSVG, false, this.constentWidth(), this.constentHeight(), 0.25, 4, 256 - 1, layers);
+        layers = layers.concat(this.mixer.buildDebugLayers());
+        console.log(layers.length, layers);
+        this.tileRenderer.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
         this.tileRenderer.setAfterZoomCallback(() => { console.log(this.tileRenderer.getCurrentPointPosition()); });
     }
-    resetUI() {
-        this.mixer.resetMixeUI();
-    }
-    constentWidth() {
-        return 32 * 200;
-    }
-    constentHeight() {
-        return 12 * 10 * 16;
+    resetUI(data) {
+        let mixm = new MixerDataMath(data);
+        this.tileRenderer.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
+        this.mixer.resetMixeUI(data);
+        this.debug.resetDebugLayer(data);
+        this.tileRenderer.resetModel();
     }
 }
 class UIToolbar {
@@ -171,16 +170,59 @@ class UIToolbar {
     resetToolbar() {
     }
 }
-class MixerUI {
-    setupMixerUI() {
+class BarOctave {
+}
+class MixerTrack {
+    constructor(top, toAnchor, data) {
+        let mixm = new MixerDataMath(data);
+        this.trackRectangle = { x: 0, y: top, w: mixm.wholeWidth(), h: data.notePathHeight * 100, rx: 11, ry: 11, css: 'debug' };
+        this.trackAnchor = { xx: 0, yy: top, ww: mixm.wholeWidth(), hh: data.notePathHeight * 100, showZoom: 0.25, hideZoom: 256, content: [this.trackRectangle] };
+        toAnchor.content.push(this.trackAnchor);
+        console.log(top);
     }
-    resetMixeUI() {
+}
+class TrackBar {
+}
+class MixerUI {
+    resetMixeUI(data) {
+        let mixm = new MixerDataMath(data);
+        let ww = mixm.wholeWidth();
+        let hh = mixm.wholeHeight();
+        this.testRectangle.w = ww;
+        this.testRectangle.h = hh;
+        this.mixerAnchor.ww = ww;
+        this.mixerAnchor.hh = hh;
+        this.tracks = [];
+        for (let tt = 0; tt < data.tracks.length; tt++) {
+            let yy = tt * 100 * data.notePathHeight;
+            let tm = new MixerTrack(yy, this.mixerAnchor, data);
+            this.tracks.push(tm);
+        }
+    }
+    buildDebugLayers() {
+        this.mixerGroup = document.getElementById("mixerLayer");
+        this.testRectangle = { x: 0, y: 0, w: 1, h: 1, rx: 50, ry: 50, css: 'debug' };
+        this.mixerAnchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: 0.25, hideZoom: 256, content: [this.testRectangle] };
+        this.mixerLayer = { g: this.mixerGroup, anchors: [this.mixerAnchor], mode: LevelModes.normal };
+        return [this.mixerLayer];
     }
 }
 class DebugLayer {
     buildDebugLayers() {
-        let mix = testMixerData;
-        return [];
+        this.debugRectangle = { x: 0, y: 0, w: 1, h: 1, rx: 10, ry: 10, css: 'debug' };
+        this.debugGroup = document.getElementById("debugLayer");
+        this.debugAnchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: 0.25, hideZoom: 256, content: [this.debugRectangle] };
+        this.debugLayer = { g: this.debugGroup, anchors: [this.debugAnchor], mode: LevelModes.normal };
+        return [this.debugLayer];
+    }
+    resetDebugLayer(data) {
+        let mixm = new MixerDataMath(data);
+        let ww = mixm.wholeWidth();
+        let hh = mixm.wholeHeight();
+        this.debugRectangle.w = ww;
+        this.debugRectangle.h = hh;
+        this.debugAnchor.ww = ww;
+        this.debugAnchor.hh = hh;
     }
 }
 let testMixerData = {
@@ -307,8 +349,23 @@ class MusicMetreMath {
         let meterSeconds = (wholeNoteSeconds * this.count) / this.part;
         return meterSeconds;
     }
-    width(tempo, ration) {
-        return this.duration(tempo) * ration;
+    width(tempo, ratio) {
+        return this.duration(tempo) * ratio;
+    }
+}
+class MixerDataMath {
+    constructor(data) {
+        this.data = data;
+    }
+    wholeWidth() {
+        let ww = 0;
+        for (let ii = 0; ii < this.data.timeline.length; ii++) {
+            ww = ww + new MusicMetreMath(this.data.timeline[ii].metre).width(this.data.timeline[ii].tempo, this.data.widthDurationRatio);
+        }
+        return ww;
+    }
+    wholeHeight() {
+        return this.data.tracks.length * this.data.notePathHeight * 100;
     }
 }
 console.log('Tile Level API');

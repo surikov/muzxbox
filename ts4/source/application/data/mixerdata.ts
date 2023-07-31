@@ -1,19 +1,19 @@
 type MusicMetre = {
-    count: number
-    , part: number
+	count: number
+	, part: number
 };
 type TimeBar = {
-    tempo: number
-    , metre: MusicMetre
+	tempo: number
+	, metre: MusicMetre
 };
 type MusicTrack = {
-    title: string
+	title: string
 };
 type MixerData = {
-    title: string
-    , timeline: TimeBar[]
-    , notePathHeight: number
-    , widthDurationRatio: number
-    ,tracks:MusicTrack[]
+	title: string
+	, timeline: TimeBar[]
+	, notePathHeight: number
+	, widthDurationRatio: number
+	, tracks: MusicTrack[]
 };
 

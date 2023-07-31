@@ -80,7 +80,7 @@ class MusicMetreMath {
         let meterSeconds = (wholeNoteSeconds * this.count) / this.part;
         return meterSeconds;
     }
-    width(tempo: number, ration: number): number {
-        return this.duration(tempo) * ration;
+    width(tempo: number, ratio: number): number {
+        return this.duration(tempo) * ratio;
     }
 }
