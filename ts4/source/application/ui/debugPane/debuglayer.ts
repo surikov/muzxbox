@@ -6,8 +6,10 @@ class DebugLayer {
 	buildDebugLayers(): TileLayerDefinition[] {
 		this.debugRectangle = { x: 0, y: 0, w: 1, h: 1, rx: 10, ry: 10, css: 'debug' };
 		this.debugGroup = (document.getElementById("debugLayer") as any) as SVGElement;
-		this.debugAnchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: 0.25, hideZoom: 256, content: [this.debugRectangle] };
-		this.debugLayer = { g: this.debugGroup, anchors: [this.debugAnchor], mode: LevelModes.normal };
+		this.debugAnchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [this.debugRectangle] };
+		this.debugLayer = { g: this.debugGroup, anchors: [
+		//	this.debugAnchor
+		], mode: LevelModes.normal };
 		return [this.debugLayer];
 	}
 	resetDebugLayer(data: MixerData) {

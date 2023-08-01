@@ -143,6 +143,19 @@ function startApplication() {
     ui.setupUI();
     ui.resetUI(testMixerData);
 }
+let zoomPrefixLevelsCSS = [
+    { prefix: '025', zoom: 0.25 },
+    { prefix: '05', zoom: 0.5 },
+    { prefix: '1', zoom: 1 },
+    { prefix: '2', zoom: 2 },
+    { prefix: '4', zoom: 4 },
+    { prefix: '8', zoom: 8 },
+    { prefix: '16', zoom: 16 },
+    { prefix: '32', zoom: 32 },
+    { prefix: '64', zoom: 64 },
+    { prefix: '128', zoom: 128 },
+    { prefix: '256', zoom: 256 }
+];
 class UIRenderer {
     setupUI() {
         this.tileRenderer = createTileLevel();
@@ -174,24 +187,39 @@ class BarOctave {
 }
 class MixerTrack {
     constructor(top, toAnchor, data) {
-        let mixm = new MixerDataMath(data);
-        this.trackRectangle = { x: 0, y: top, w: mixm.wholeWidth(), h: data.notePathHeight * 100, rx: 11, ry: 11, css: 'debug' };
-        this.trackAnchor = { xx: 0, yy: top, ww: mixm.wholeWidth(), hh: data.notePathHeight * 100, showZoom: 0.25, hideZoom: 256, content: [this.trackRectangle] };
-        toAnchor.content.push(this.trackAnchor);
-        console.log(top);
+        let ww = new MixerDataMath(data).wholeWidth();
+        this.trackRectangle = { x: 0, y: top, w: ww, h: data.notePathHeight * 100 - 3, rx: 3, ry: 3, css: 'debug' };
+        this.trackAnchor = { xx: 0, yy: top, ww: ww, hh: data.notePathHeight * 100, showZoom: 0.25, hideZoom: 64, content: [this.trackRectangle] };
+        this.bars = [];
+        let left = 0;
+        for (let ss = 0; ss < data.timeline.length; ss++) {
+            let width = new MusicMetreMath(data.timeline[ss].metre).width(data.timeline[ss].tempo, data.widthDurationRatio);
+            let bar = new TrackBar(left, top, width, this.trackAnchor, data);
+            this.bars.push(bar);
+            left = left + width;
+        }
     }
 }
 class TrackBar {
+    constructor(left, top, ww, toAnchor, data) {
+        this.barRectangle = { x: left, y: top, w: ww - 1, h: data.notePathHeight * 100 - 1, rx: 1, ry: 1, css: 'debug' };
+        this.barAnchor = { xx: left, yy: top, ww: ww, hh: data.notePathHeight * 100, showZoom: 0.25, hideZoom: 32, content: [this.barRectangle] };
+        toAnchor.content.push(this.barAnchor);
+    }
 }
 class MixerUI {
     resetMixeUI(data) {
         let mixm = new MixerDataMath(data);
         let ww = mixm.wholeWidth();
         let hh = mixm.wholeHeight();
-        this.testRectangle.w = ww;
-        this.testRectangle.h = hh;
         this.mixerAnchor.ww = ww;
         this.mixerAnchor.hh = hh;
+        for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
+            this.bgRectangles[zz].w = ww;
+            this.bgRectangles[zz].h = hh;
+            this.layerAnchors[zz].ww = ww;
+            this.layerAnchors[zz].hh = hh;
+        }
         this.tracks = [];
         for (let tt = 0; tt < data.tracks.length; tt++) {
             let yy = tt * 100 * data.notePathHeight;
@@ -201,9 +229,18 @@ class MixerUI {
     }
     buildDebugLayers() {
         this.mixerGroup = document.getElementById("mixerLayer");
-        this.testRectangle = { x: 0, y: 0, w: 1, h: 1, rx: 50, ry: 50, css: 'debug' };
-        this.mixerAnchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: 0.25, hideZoom: 256, content: [this.testRectangle] };
+        this.mixerAnchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [] };
         this.mixerLayer = { g: this.mixerGroup, anchors: [this.mixerAnchor], mode: LevelModes.normal };
+        this.layerAnchors = [];
+        this.bgRectangles = [];
+        for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
+            let rectangle = { x: 0, y: 0, w: 1, h: 1, rx: 50, ry: 50, css: 'mixFieldBg' + zoomPrefixLevelsCSS[zz].prefix };
+            let anchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: zoomPrefixLevelsCSS[zz].zoom, hideZoom: zoomPrefixLevelsCSS[zz + 1].zoom, content: [rectangle] };
+            this.mixerLayer.anchors.push(anchor);
+            this.layerAnchors.push(anchor);
+            this.bgRectangles.push(rectangle);
+        }
+        console.log(this.mixerLayer);
         return [this.mixerLayer];
     }
 }
@@ -211,8 +248,8 @@ class DebugLayer {
     buildDebugLayers() {
         this.debugRectangle = { x: 0, y: 0, w: 1, h: 1, rx: 10, ry: 10, css: 'debug' };
         this.debugGroup = document.getElementById("debugLayer");
-        this.debugAnchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: 0.25, hideZoom: 256, content: [this.debugRectangle] };
-        this.debugLayer = { g: this.debugGroup, anchors: [this.debugAnchor], mode: LevelModes.normal };
+        this.debugAnchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [this.debugRectangle] };
+        this.debugLayer = { g: this.debugGroup, anchors: [], mode: LevelModes.normal };
         return [this.debugLayer];
     }
     resetDebugLayer(data) {
@@ -228,6 +265,22 @@ class DebugLayer {
 let testMixerData = {
     title: 'test data for debug',
     timeline: [
+        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
+        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
+        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
+        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 7, part: 8 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 2, part: 2 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 5, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 3, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
         { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
         { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
         { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },

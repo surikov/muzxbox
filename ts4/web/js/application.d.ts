@@ -17,6 +17,10 @@ declare class TreeValue {
 }
 declare function startApplication(): void;
 declare function createTileLevel(): TileLevelBase;
+declare let zoomPrefixLevelsCSS: {
+    prefix: string;
+    zoom: number;
+}[];
 declare class UIRenderer {
     toolbar: UIToolbar;
     mixer: MixerUI;
@@ -35,14 +39,19 @@ declare class BarOctave {
 declare class MixerTrack {
     trackRectangle: TileRectangle;
     trackAnchor: TileAnchor;
+    bars: TrackBar[];
     constructor(top: number, toAnchor: TileAnchor, data: MixerData);
 }
 declare class TrackBar {
+    barRectangle: TileRectangle;
+    barAnchor: TileAnchor;
+    constructor(left: number, top: number, ww: number, toAnchor: TileAnchor, data: MixerData);
 }
 declare class MixerUI {
     mixerGroup: SVGElement;
-    testRectangle: TileRectangle;
     mixerAnchor: TileAnchor;
+    layerAnchors: TileAnchor[];
+    bgRectangles: TileRectangle[];
     mixerLayer: TileLayerDefinition;
     tracks: MixerTrack[];
     resetMixeUI(data: MixerData): void;
