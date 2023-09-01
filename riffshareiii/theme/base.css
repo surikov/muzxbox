@@ -1,0 +1,74 @@
+::-webkit-scrollbar2 {
+	display: none;
+}
+:root {
+    --background-color: #6688aa;
+    --panel-color: #ccdddd;
+    --line-color: #111133;
+    --focus-color: #ff4455;
+	--interaction-color: #9f5ba5;
+	--label-color: #eee133;
+
+	--tapSize: 50px;
+
+    --color-default: var(--aux-color);
+
+    --color-paper: #def;
+    --color-textline: #332244;
+    --color-debug: #800;
+	--color-green: #080;
+	--color-blue: #008;
+	--color-cyan: #088;
+	--color-magenta: #808;
+	--color-yellow: #880;
+    
+}
+
+#filesinput {
+	display: none;
+}
+
+html {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+}
+
+body {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+	touch-action: manipulation;
+}
+
+#tileLevelSVG {
+	width: 100%;
+	height: 100%;
+	background-color: var(--background-color);
+	user-select: none;
+	touch-action: manipulation;
+	background-size: cover;
+	stroke-linecap: round;
+}
+
+.debug {
+	fill: var(--color-debug);
+	fill-opacity: 25%;
+	stroke: var(--color-debug);
+	stroke-opacity: 75%;
+	stroke-width: 0.0256%;
+}
+
+.mixFieldBg025 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(0.25*var(--tapSize)); }
+.mixFieldBg05 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(0.5*var(--tapSize)); }
+.mixFieldBg1 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(1*var(--tapSize)); }
+.mixFieldBg2 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(2*var(--tapSize)); }
+.mixFieldBg4 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(4*var(--tapSize)); }
+.mixFieldBg8 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(8*var(--tapSize)); }
+.mixFieldBg16 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(16*var(--tapSize)); }
+.mixFieldBg32 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(32*var(--tapSize)); }
+.mixFieldBg64 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(64*var(--tapSize)); }
+.mixFieldBg128 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(128*var(--tapSize)); }
+.mixFieldBg256 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(256*var(--tapSize)); }

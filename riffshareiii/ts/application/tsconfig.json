@@ -1,0 +1,40 @@
+{
+	"compilerOptions": {
+		"target": "es2015",
+		"outFile": "../../js/application.js",
+		"strictNullChecks": true,
+		"alwaysStrict": true,
+		"esModuleInterop": true,
+		"noResolve": false,
+		"noImplicitAny": false,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"sourceMap": true,
+		"experimentalDecorators": true,
+		"isolatedModules": false,
+		"module": "AMD",
+		"lib": [
+			"dom",
+			"es2015",
+			"es5"
+		],
+		"declaration": true,
+		"types": []
+	},
+	"files": [
+        "treevalue/treevalue.ts"
+        ,"startup.ts"
+        ,"ui/renderer.ts"
+        ,"ui/toolbar/toolbarpanel.ts"
+        ,"ui/mixer/baroctave.ts"
+		,"ui/mixer/mixertrack.ts"
+		,"ui/mixer/trackbar.ts"
+		,"ui/mixer/uimixer.ts"
+        ,"ui/debugPane/debuglayer.ts"
+        ,"data/mixerdata.ts"
+        ,"data/testproject.ts"
+        ,"data/musicmetremath.ts"
+		,"data/mixerdatamath.ts"
+        ,"../tilelevel/apitilelevel.ts"
+	]
+}
