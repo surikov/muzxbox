@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.69 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.70 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -22,7 +22,7 @@ let rowsAvgCount = 5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let reduceRatio = 1;
 let highLightMode = 1;
-var calcLen = 21;
+var calcLen = 51;
 
 
 

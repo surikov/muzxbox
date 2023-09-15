@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.69 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.70 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -14,7 +14,7 @@ var rowsAvgCount = 5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 var reduceRatio = 1;
 var highLightMode = 1;
-var calcLen = 21;
+var calcLen = 51;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
     var msgp = document.getElementById('msgp');
