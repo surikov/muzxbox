@@ -142,6 +142,7 @@ function startApplication() {
     let ui = new UIRenderer();
     ui.setupUI();
     ui.resetUI(testEmptyMixerData);
+    testNumMathUtil();
 }
 let zoomPrefixLevelsCSS = [
     { prefix: '025', zoom: 0.25 },
@@ -465,6 +466,9 @@ class MixerDataMath {
     wholeHeight() {
         return this.data.pitchedTracks.length * this.data.notePathHeight * 100;
     }
+}
+function testNumMathUtil() {
+    console.log('testNumMathUtil');
 }
 console.log('Tile Level API');
 var LevelModes;

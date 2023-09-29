@@ -34,7 +34,8 @@
         ,"data/mixerdata.ts"
         ,"data/testproject.ts"
         ,"data/musicmetremath.ts"
-		,"data/mixerdatamath.ts"
+        ,"data/mixerdatamath.ts"
+        ,"data/numathutil.ts"
         ,"../tilelevel/apitilelevel.ts"
 	]
 }

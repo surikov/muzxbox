@@ -121,6 +121,7 @@ declare class MixerDataMath {
     wholeWidth(): number;
     wholeHeight(): number;
 }
+declare function testNumMathUtil(): void;
 declare type TileZoom = {
     x: number;
     y: number;

@@ -4,4 +4,5 @@ function startApplication(){
     let ui=new UIRenderer();
     ui.setupUI();
     ui.resetUI(testEmptyMixerData);
+    testNumMathUtil();
 }
