@@ -34,7 +34,13 @@ class UIRenderer implements RenderedPart {
 		let layers: TileLayerDefinition[] = [];
 		this.debug = new DebugLayerUI();
 		this.debug.setupUI();
-		layers = layers.concat(this.debug.allLayers());
+		this.toolbar = new UIToolbar();
+		this.toolbar.setupToolbar();
+		layers = layers.concat(
+			this.debug.allLayers()
+			,this.toolbar.toolBarLayers()
+		);
+		
 		//this.mixer = new MixerUI();
 		//layers = layers.concat(this.mixer.buildDebugLayers());
 
@@ -47,7 +53,9 @@ class UIRenderer implements RenderedPart {
 			, 1
 			, 0.25, 4, 256 - 1
 			, layers);
-		this.tileRenderer.setAfterZoomCallback(() => { console.log(this.tileRenderer.getCurrentPointPosition()) });
+		this.tileRenderer.setAfterZoomCallback(() => { 
+			console.log('tileRenderer.initRun',this.tileRenderer.getCurrentPointPosition()) ;
+		});
 	}
 
 	resetUI(data: MixerData) {
@@ -56,7 +64,7 @@ class UIRenderer implements RenderedPart {
 
 		//this.mixer.resetMixeUI(data);
 		this.debug.resetUI(data);
-
+		this.toolbar.resetToolbar();
 		this.tileRenderer.resetModel();
 	}
 	deleteUI() {

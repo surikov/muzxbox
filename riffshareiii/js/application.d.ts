@@ -39,6 +39,11 @@ declare class UIRenderer implements RenderedPart {
     deleteUI(): void;
 }
 declare class UIToolbar {
+    toolBarRectangle: TileRectangle;
+    toolBarAnchor: TileAnchor;
+    toolBarGroup: SVGElement;
+    toolBarLayer: TileLayerDefinition;
+    toolBarLayers(): TileLayerDefinition[];
     setupToolbar(): void;
     resetToolbar(): void;
 }
@@ -121,6 +126,17 @@ declare class MixerDataMath {
     wholeWidth(): number;
     wholeHeight(): number;
 }
+declare let biChar32: String[];
+declare type PackedChannel = {
+    wafIndex: number;
+};
+declare type PackedBar = {
+    tone: number;
+    mode: number;
+};
+declare type PackedProject = {
+    bars: PackedBar[];
+};
 declare function testNumMathUtil(): void;
 declare type TileZoom = {
     x: number;

@@ -164,22 +164,40 @@ class UIRenderer {
         let layers = [];
         this.debug = new DebugLayerUI();
         this.debug.setupUI();
-        layers = layers.concat(this.debug.allLayers());
+        this.toolbar = new UIToolbar();
+        this.toolbar.setupToolbar();
+        layers = layers.concat(this.debug.allLayers(), this.toolbar.toolBarLayers());
         console.log(layers.length, layers);
         this.tileRenderer.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
-        this.tileRenderer.setAfterZoomCallback(() => { console.log(this.tileRenderer.getCurrentPointPosition()); });
+        this.tileRenderer.setAfterZoomCallback(() => {
+            console.log('tileRenderer.initRun', this.tileRenderer.getCurrentPointPosition());
+        });
     }
     resetUI(data) {
         let mixm = new MixerDataMath(data);
         this.tileRenderer.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
         this.debug.resetUI(data);
+        this.toolbar.resetToolbar();
         this.tileRenderer.resetModel();
     }
     deleteUI() {
     }
 }
 class UIToolbar {
+    toolBarLayers() {
+        return [this.toolBarLayer];
+    }
     setupToolbar() {
+        this.toolBarGroup = document.getElementById("toolBarPanelGroup");
+        this.toolBarRectangle = { x: 0, y: 0, w: 111, h: 111, rx: 10, ry: 10, css: 'debug' };
+        this.toolBarAnchor = { xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+                this.toolBarRectangle
+            ] };
+        this.toolBarLayer = {
+            g: this.toolBarGroup, anchors: [
+                this.toolBarAnchor
+            ], mode: LevelModes.normal
+        };
     }
     resetToolbar() {
     }
@@ -467,6 +485,39 @@ class MixerDataMath {
         return this.data.pitchedTracks.length * this.data.notePathHeight * 100;
     }
 }
+let biChar32 = [];
+biChar32[0] = '0';
+biChar32[1] = '1';
+biChar32[2] = '2';
+biChar32[3] = '3';
+biChar32[4] = '4';
+biChar32[5] = '5';
+biChar32[6] = '6';
+biChar32[7] = '7';
+biChar32[8] = '8';
+biChar32[9] = '9';
+biChar32[10] = 'a';
+biChar32[11] = 'b';
+biChar32[12] = 'c';
+biChar32[13] = 'd';
+biChar32[14] = 'e';
+biChar32[15] = 'f';
+biChar32[16] = 'g';
+biChar32[17] = 'h';
+biChar32[18] = 'i';
+biChar32[19] = 'j';
+biChar32[20] = 'k';
+biChar32[21] = 'l';
+biChar32[22] = 'm';
+biChar32[23] = 'n';
+biChar32[24] = '0';
+biChar32[25] = 'p';
+biChar32[26] = 'q';
+biChar32[27] = 'r';
+biChar32[28] = 's';
+biChar32[29] = 't';
+biChar32[30] = 'u';
+biChar32[31] = 'v';
 function testNumMathUtil() {
     console.log('testNumMathUtil');
 }
