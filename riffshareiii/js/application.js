@@ -170,15 +170,22 @@ class UIRenderer {
         console.log(layers.length, layers);
         this.tileRenderer.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
         this.tileRenderer.setAfterZoomCallback(() => {
-            console.log('tileRenderer.initRun', this.tileRenderer.getCurrentPointPosition());
+            console.log('afterZoomCallback', this.tileRenderer.getCurrentPointPosition());
+        });
+        this.tileRenderer.setAfterResizeCallback(() => {
+            let vw = this.tileLevelSVG.clientWidth / this.tileRenderer.tapPxSize();
+            let vh = this.tileLevelSVG.clientHeight / this.tileRenderer.tapPxSize();
+            this.onReSizeView(vw, vh);
         });
     }
     resetUI(data) {
         let mixm = new MixerDataMath(data);
         this.tileRenderer.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
         this.debug.resetUI(data);
-        this.toolbar.resetToolbar();
         this.tileRenderer.resetModel();
+    }
+    onReSizeView(vw, vh) {
+        console.log('onReSizeView', vw, vh);
     }
     deleteUI() {
     }
@@ -189,17 +196,18 @@ class UIToolbar {
     }
     setupToolbar() {
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
-        this.toolBarRectangle = { x: 0, y: 0, w: 111, h: 111, rx: 10, ry: 10, css: 'debug' };
+        this.toolBarRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'debug' };
         this.toolBarAnchor = { xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
                 this.toolBarRectangle
             ] };
         this.toolBarLayer = {
             g: this.toolBarGroup, anchors: [
                 this.toolBarAnchor
-            ], mode: LevelModes.normal
+            ], mode: LevelModes.overlay
         };
     }
-    resetToolbar() {
+    resizeToolbar(viewWIdth, viewHeight, innerWidth, innerHeight) {
+        console.log('resizeToolbar', viewWIdth, viewHeight, innerWidth, innerHeight);
     }
 }
 class BarOctave {

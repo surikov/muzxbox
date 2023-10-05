@@ -7,7 +7,7 @@ type RenderedPart = {
 };
 type RenderedLayers = RenderedPart & {
 	allLayers: () => TileLayerDefinition[];
-} ;
+};
 let zoomPrefixLevelsCSS: { prefix: string, zoom: number }[] = [
 	{ prefix: '025', zoom: 0.25 }//0
 	, { prefix: '05', zoom: 0.5 }//1
@@ -38,9 +38,9 @@ class UIRenderer implements RenderedPart {
 		this.toolbar.setupToolbar();
 		layers = layers.concat(
 			this.debug.allLayers()
-			,this.toolbar.toolBarLayers()
+			, this.toolbar.toolBarLayers()
 		);
-		
+
 		//this.mixer = new MixerUI();
 		//layers = layers.concat(this.mixer.buildDebugLayers());
 
@@ -53,8 +53,14 @@ class UIRenderer implements RenderedPart {
 			, 1
 			, 0.25, 4, 256 - 1
 			, layers);
-		this.tileRenderer.setAfterZoomCallback(() => { 
-			console.log('tileRenderer.initRun',this.tileRenderer.getCurrentPointPosition()) ;
+		this.tileRenderer.setAfterZoomCallback(() => {
+			console.log('afterZoomCallback', this.tileRenderer.getCurrentPointPosition());
+		});
+		this.tileRenderer.setAfterResizeCallback(() => {
+			//console.log('afterResizeCallback',this.tileRenderer.getCurrentPointPosition()) ;
+			let vw = this.tileLevelSVG.clientWidth/this.tileRenderer.tapPxSize();
+			let vh = this.tileLevelSVG.clientHeight/this.tileRenderer.tapPxSize();
+			this.onReSizeView(vw, vh);
 		});
 	}
 
@@ -64,8 +70,12 @@ class UIRenderer implements RenderedPart {
 
 		//this.mixer.resetMixeUI(data);
 		this.debug.resetUI(data);
-		this.toolbar.resetToolbar();
+		//this.toolbar.resizeToolbar();
 		this.tileRenderer.resetModel();
+	}
+	onReSizeView(vw: number, vh: number) {
+
+		console.log('onReSizeView', vw, vh);
 	}
 	deleteUI() {
 

@@ -36,6 +36,7 @@ declare class UIRenderer implements RenderedPart {
     tileLevelSVG: SVGElement;
     setupUI(): void;
     resetUI(data: MixerData): void;
+    onReSizeView(vw: number, vh: number): void;
     deleteUI(): void;
 }
 declare class UIToolbar {
@@ -45,7 +46,7 @@ declare class UIToolbar {
     toolBarLayer: TileLayerDefinition;
     toolBarLayers(): TileLayerDefinition[];
     setupToolbar(): void;
-    resetToolbar(): void;
+    resizeToolbar(viewWIdth: number, viewHeight: number, innerWidth: number, innerHeight: number): void;
 }
 declare class BarOctave {
 }
