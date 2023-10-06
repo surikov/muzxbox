@@ -1,4 +1,4 @@
-class DebugLayerUI implements RenderedLayers {
+class DebugLayerUI{//} implements RenderedLayers {
 	debugRectangle: TileRectangle;
 	debugAnchor: TileAnchor;
 	debugGroup: SVGElement;
@@ -29,7 +29,7 @@ class DebugLayerUI implements RenderedLayers {
 			], mode: LevelModes.normal
 		};
 	}
-	resetUI(data: MixerData) {
+	resetDebugView(data: MixerData) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		let ww = mixm.wholeWidth();
 		let hh = mixm.wholeHeight();
@@ -39,7 +39,7 @@ class DebugLayerUI implements RenderedLayers {
 		this.debugAnchor.hh = hh;
 		console.log('debugLayer',this.debugLayer);
 	}
-	deleteUI() {
+	deleteDebbugView() {
 
 	}
 }

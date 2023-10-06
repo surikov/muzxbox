@@ -1,5 +1,5 @@
 declare function createTileLevel(): TileLevelBase;
-
+/*
 type RenderedPart = {
 	setupUI: () => void;
 	resetUI: (data: MixerData) => void;
@@ -8,6 +8,7 @@ type RenderedPart = {
 type RenderedLayers = RenderedPart & {
 	allLayers: () => TileLayerDefinition[];
 };
+*/
 let zoomPrefixLevelsCSS: { prefix: string, zoom: number }[] = [
 	{ prefix: '025', zoom: 0.25 }//0
 	, { prefix: '05', zoom: 0.5 }//1
@@ -21,21 +22,21 @@ let zoomPrefixLevelsCSS: { prefix: string, zoom: number }[] = [
 	, { prefix: '128', zoom: 128 }//9
 	, { prefix: '256', zoom: 256 }//10
 ];
-class UIRenderer implements RenderedPart {
+class UIRenderer{//} implements RenderedPart {
 	toolbar: UIToolbar;
 	//mixer: MixerUI;
-	debug: RenderedLayers;
+	debug: DebugLayerUI;
 	tileRenderer: TileLevelBase;
 	tileLevelSVG: SVGElement;
 
-	setupUI() {
+	createUI() {
 		this.tileRenderer = createTileLevel();
 		this.tileLevelSVG = (document.getElementById("tileLevelSVG") as any) as SVGElement;
 		let layers: TileLayerDefinition[] = [];
 		this.debug = new DebugLayerUI();
 		this.debug.setupUI();
 		this.toolbar = new UIToolbar();
-		this.toolbar.setupToolbar();
+		this.toolbar.createToolbar();
 		layers = layers.concat(
 			this.debug.allLayers()
 			, this.toolbar.toolBarLayers()
@@ -58,24 +59,24 @@ class UIRenderer implements RenderedPart {
 		});
 		this.tileRenderer.setAfterResizeCallback(() => {
 			//console.log('afterResizeCallback',this.tileRenderer.getCurrentPointPosition()) ;
-			let vw = this.tileLevelSVG.clientWidth/this.tileRenderer.tapPxSize();
-			let vh = this.tileLevelSVG.clientHeight/this.tileRenderer.tapPxSize();
-			this.onReSizeView(vw, vh);
+			
+			this.onReSizeView();
 		});
 	}
 
-	resetUI(data: MixerData) {
+	fillUI(data: MixerData) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		this.tileRenderer.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
 
 		//this.mixer.resetMixeUI(data);
-		this.debug.resetUI(data);
-		//this.toolbar.resizeToolbar();
+		this.debug.resetDebugView(data);
+		this.toolbar.fillToolbar(data);
 		this.tileRenderer.resetModel();
 	}
-	onReSizeView(vw: number, vh: number) {
-
-		console.log('onReSizeView', vw, vh);
+	onReSizeView() {
+		let vw = this.tileLevelSVG.clientWidth/this.tileRenderer.tapPxSize();
+		let vh = this.tileLevelSVG.clientHeight/this.tileRenderer.tapPxSize();
+		console.log('onReSizeView', vw, vh,);
 	}
 	deleteUI() {
 

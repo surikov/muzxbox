@@ -1,4 +1,4 @@
-class UIToolbar{
+class UIToolbar {
 	toolBarRectangle: TileRectangle;
 	toolBarAnchor: TileAnchor;
 	toolBarGroup: SVGElement;
@@ -6,19 +6,25 @@ class UIToolbar{
 	toolBarLayers(): TileLayerDefinition[] {
 		return [this.toolBarLayer];
 	}
-    setupToolbar(){
+	createToolbar() {
 		this.toolBarGroup = (document.getElementById("toolBarPanelGroup") as any) as SVGElement;
 		this.toolBarRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'debug' };
-		this.toolBarAnchor = { xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-			this.toolBarRectangle
-		] };
+		this.toolBarAnchor = {
+			xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+				this.toolBarRectangle
+			]
+		};
 		this.toolBarLayer = {
 			g: this.toolBarGroup, anchors: [
-					this.toolBarAnchor
+				this.toolBarAnchor
 			], mode: LevelModes.overlay
 		};
-    }
-    resizeToolbar(viewWIdth:number,viewHeight:number,innerWidth:number,innerHeight:number){
-        console.log('resizeToolbar',viewWIdth,viewHeight,innerWidth,innerHeight) ;
-    }
+	}
+	fillToolbar(data: MixerData) {
+		console.log('fillToolbar', data);
+		
+	}
+	resizeToolbar(viewWIdth: number, viewHeight: number, innerWidth: number, innerHeight: number) {
+		console.log('resizeToolbar', viewWIdth, viewHeight, innerWidth, innerHeight);
+	}
 }

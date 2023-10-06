@@ -17,26 +17,18 @@ declare class TreeValue {
 }
 declare function startApplication(): void;
 declare function createTileLevel(): TileLevelBase;
-declare type RenderedPart = {
-    setupUI: () => void;
-    resetUI: (data: MixerData) => void;
-    deleteUI: () => void;
-};
-declare type RenderedLayers = RenderedPart & {
-    allLayers: () => TileLayerDefinition[];
-};
 declare let zoomPrefixLevelsCSS: {
     prefix: string;
     zoom: number;
 }[];
-declare class UIRenderer implements RenderedPart {
+declare class UIRenderer {
     toolbar: UIToolbar;
-    debug: RenderedLayers;
+    debug: DebugLayerUI;
     tileRenderer: TileLevelBase;
     tileLevelSVG: SVGElement;
-    setupUI(): void;
-    resetUI(data: MixerData): void;
-    onReSizeView(vw: number, vh: number): void;
+    createUI(): void;
+    fillUI(data: MixerData): void;
+    onReSizeView(): void;
     deleteUI(): void;
 }
 declare class UIToolbar {
@@ -45,7 +37,8 @@ declare class UIToolbar {
     toolBarGroup: SVGElement;
     toolBarLayer: TileLayerDefinition;
     toolBarLayers(): TileLayerDefinition[];
-    setupToolbar(): void;
+    createToolbar(): void;
+    fillToolbar(data: MixerData): void;
     resizeToolbar(viewWIdth: number, viewHeight: number, innerWidth: number, innerHeight: number): void;
 }
 declare class BarOctave {
@@ -73,15 +66,15 @@ declare class MixerUI {
     resetMixeUI(data: MixerData): void;
     buildDebugLayers(): TileLayerDefinition[];
 }
-declare class DebugLayerUI implements RenderedLayers {
+declare class DebugLayerUI {
     debugRectangle: TileRectangle;
     debugAnchor: TileAnchor;
     debugGroup: SVGElement;
     debugLayer: TileLayerDefinition;
     allLayers(): TileLayerDefinition[];
     setupUI(): void;
-    resetUI(data: MixerData): void;
-    deleteUI(): void;
+    resetDebugView(data: MixerData): void;
+    deleteDebbugView(): void;
 }
 declare type MusicMetre = {
     count: number;

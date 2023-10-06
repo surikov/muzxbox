@@ -140,9 +140,10 @@ console.log('startup v1.01');
 function startApplication() {
     console.log('startApplication v1.6.01');
     let ui = new UIRenderer();
-    ui.setupUI();
-    ui.resetUI(testEmptyMixerData);
+    ui.createUI();
+    ui.fillUI(testEmptyMixerData);
     testNumMathUtil();
+    console.log('done startApplication');
 }
 let zoomPrefixLevelsCSS = [
     { prefix: '025', zoom: 0.25 },
@@ -158,14 +159,14 @@ let zoomPrefixLevelsCSS = [
     { prefix: '256', zoom: 256 }
 ];
 class UIRenderer {
-    setupUI() {
+    createUI() {
         this.tileRenderer = createTileLevel();
         this.tileLevelSVG = document.getElementById("tileLevelSVG");
         let layers = [];
         this.debug = new DebugLayerUI();
         this.debug.setupUI();
         this.toolbar = new UIToolbar();
-        this.toolbar.setupToolbar();
+        this.toolbar.createToolbar();
         layers = layers.concat(this.debug.allLayers(), this.toolbar.toolBarLayers());
         console.log(layers.length, layers);
         this.tileRenderer.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
@@ -173,18 +174,19 @@ class UIRenderer {
             console.log('afterZoomCallback', this.tileRenderer.getCurrentPointPosition());
         });
         this.tileRenderer.setAfterResizeCallback(() => {
-            let vw = this.tileLevelSVG.clientWidth / this.tileRenderer.tapPxSize();
-            let vh = this.tileLevelSVG.clientHeight / this.tileRenderer.tapPxSize();
-            this.onReSizeView(vw, vh);
+            this.onReSizeView();
         });
     }
-    resetUI(data) {
+    fillUI(data) {
         let mixm = new MixerDataMath(data);
         this.tileRenderer.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
-        this.debug.resetUI(data);
+        this.debug.resetDebugView(data);
+        this.toolbar.fillToolbar(data);
         this.tileRenderer.resetModel();
     }
-    onReSizeView(vw, vh) {
+    onReSizeView() {
+        let vw = this.tileLevelSVG.clientWidth / this.tileRenderer.tapPxSize();
+        let vh = this.tileLevelSVG.clientHeight / this.tileRenderer.tapPxSize();
         console.log('onReSizeView', vw, vh);
     }
     deleteUI() {
@@ -194,17 +196,22 @@ class UIToolbar {
     toolBarLayers() {
         return [this.toolBarLayer];
     }
-    setupToolbar() {
+    createToolbar() {
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
         this.toolBarRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'debug' };
-        this.toolBarAnchor = { xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+        this.toolBarAnchor = {
+            xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
                 this.toolBarRectangle
-            ] };
+            ]
+        };
         this.toolBarLayer = {
             g: this.toolBarGroup, anchors: [
                 this.toolBarAnchor
             ], mode: LevelModes.overlay
         };
+    }
+    fillToolbar(data) {
+        console.log('fillToolbar', data);
     }
     resizeToolbar(viewWIdth, viewHeight, innerWidth, innerHeight) {
         console.log('resizeToolbar', viewWIdth, viewHeight, innerWidth, innerHeight);
@@ -308,7 +315,7 @@ class DebugLayerUI {
             ], mode: LevelModes.normal
         };
     }
-    resetUI(data) {
+    resetDebugView(data) {
         let mixm = new MixerDataMath(data);
         let ww = mixm.wholeWidth();
         let hh = mixm.wholeHeight();
@@ -318,7 +325,7 @@ class DebugLayerUI {
         this.debugAnchor.hh = hh;
         console.log('debugLayer', this.debugLayer);
     }
-    deleteUI() {
+    deleteDebbugView() {
     }
 }
 let testBigMixerData = {
