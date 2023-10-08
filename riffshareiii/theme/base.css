@@ -72,3 +72,7 @@ body {
 .mixFieldBg64 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(64*var(--tapSize)); }
 .mixFieldBg128 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(128*var(--tapSize)); }
 .mixFieldBg256 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(256*var(--tapSize)); }
+
+.toolBarPanel {
+	fill: var(--panel-color);
+}

@@ -24,7 +24,7 @@ declare let zoomPrefixLevelsCSS: {
 declare class UIRenderer {
     toolbar: UIToolbar;
     debug: DebugLayerUI;
-    tileRenderer: TileLevelBase;
+    tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
     createUI(): void;
     fillUI(data: MixerData): void;
@@ -38,8 +38,8 @@ declare class UIToolbar {
     toolBarLayer: TileLayerDefinition;
     toolBarLayers(): TileLayerDefinition[];
     createToolbar(): void;
-    fillToolbar(data: MixerData): void;
-    resizeToolbar(viewWIdth: number, viewHeight: number, innerWidth: number, innerHeight: number): void;
+    fillToolbar(data: MixerData, viewWIdth: number, viewHeight: number): void;
+    resizeToolbar(tiler: TileLevelBase, viewWIdth: number, viewHeight: number): void;
 }
 declare class BarOctave {
 }
