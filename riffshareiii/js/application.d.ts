@@ -36,10 +36,27 @@ declare class UIToolbar {
     toolBarAnchor: TileAnchor;
     toolBarGroup: SVGElement;
     toolBarLayer: TileLayerDefinition;
+    playPauseButton: ToolBarButton;
+    menuButton: ToolBarButton;
+    headButton: ToolBarButton;
     toolBarLayers(): TileLayerDefinition[];
     createToolbar(): void;
-    fillToolbar(data: MixerData, viewWIdth: number, viewHeight: number): void;
-    resizeToolbar(tiler: TileLevelBase, viewWIdth: number, viewHeight: number): void;
+    fillToolbar(viewWIdth: number, viewHeight: number): void;
+    resizeToolbar(viewWIdth: number, viewHeight: number): void;
+    reRenderToolbar(tiler: TileLevelBase): void;
+}
+declare class ToolBarButton {
+    anchor: TileAnchor;
+    bg: TileRectangle;
+    spot: TileRectangle;
+    label: TileText;
+    stick: number;
+    position: number;
+    labelText: string;
+    action: () => void;
+    constructor(labelText: string, stick: number, position: number, action: () => void);
+    build(labelText: string, stick: number, position: number, action: () => void): void;
+    resize(viewWIdth: number, viewHeight: number): void;
 }
 declare class BarOctave {
 }

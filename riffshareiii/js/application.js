@@ -182,15 +182,16 @@ class UIRenderer {
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.tiler.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
         this.debug.resetDebugView(data);
-        this.toolbar.fillToolbar(data, vw, vh);
-        this.toolbar.resizeToolbar(this.tiler, vw, vh);
+        this.toolbar.fillToolbar(vw, vh);
+        this.toolbar.resizeToolbar(vw, vh);
         this.tiler.resetModel();
     }
     onReSizeView() {
         console.log('onReSizeView');
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
-        this.toolbar.resizeToolbar(this.tiler, vw, vh);
+        this.toolbar.resizeToolbar(vw, vh);
+        this.toolbar.reRenderToolbar(this.tiler);
     }
     deleteUI() {
     }
@@ -200,11 +201,17 @@ class UIToolbar {
         return [this.toolBarLayer];
     }
     createToolbar() {
+        this.playPauseButton = new ToolBarButton('⏵', 0, 0, () => { console.log('playPauseButton'); });
+        this.menuButton = new ToolBarButton('←', 1, 0, () => { console.log('menuButton'); });
+        this.headButton = new ToolBarButton('→', -1, 0, () => { console.log('headButton'); });
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
         this.toolBarRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'toolBarPanel' };
         this.toolBarAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-                this.toolBarRectangle
+                this.toolBarRectangle,
+                this.playPauseButton.anchor,
+                this.menuButton.anchor,
+                this.headButton.anchor
             ]
         };
         this.toolBarLayer = {
@@ -213,10 +220,10 @@ class UIToolbar {
             ], mode: LevelModes.overlay
         };
     }
-    fillToolbar(data, viewWIdth, viewHeight) {
-        console.log('fillToolbar', data, viewWIdth, viewHeight);
+    fillToolbar(viewWIdth, viewHeight) {
+        console.log('fillToolbar', viewWIdth, viewHeight);
     }
-    resizeToolbar(tiler, viewWIdth, viewHeight) {
+    resizeToolbar(viewWIdth, viewHeight) {
         console.log('resizeToolbar', viewWIdth, viewHeight);
         this.toolBarRectangle.x = 0;
         this.toolBarRectangle.y = viewHeight - 1;
@@ -226,7 +233,56 @@ class UIToolbar {
         this.toolBarAnchor.yy = 0;
         this.toolBarAnchor.ww = viewWIdth;
         this.toolBarAnchor.hh = viewHeight;
+        this.playPauseButton.resize(viewWIdth, viewHeight);
+        this.menuButton.resize(viewWIdth, viewHeight);
+        this.headButton.resize(viewWIdth, viewHeight);
+    }
+    reRenderToolbar(tiler) {
         tiler.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
+    }
+}
+class ToolBarButton {
+    constructor(labelText, stick, position, action) {
+        this.build(labelText, stick, position, action);
+    }
+    build(labelText, stick, position, action) {
+        this.stick = stick;
+        this.position = position;
+        this.action = action;
+        this.labelText = labelText;
+        this.bg = { x: 0, y: 0, w: 5, h: 5, rx: 0.4, ry: 0.4, css: 'toolBarButtonCircle' };
+        this.spot = {
+            x: 0, y: 0, w: 1, h: 1, css: 'transparentSpot', activation: (x, y) => {
+                this.action();
+            }
+        };
+        this.label = { x: 0, y: 0, text: this.labelText, css: 'toolBarButtonLabel' };
+        this.anchor = {
+            xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+                this.bg,
+                this.label,
+                this.spot
+            ]
+        };
+    }
+    resize(viewWIdth, viewHeight) {
+        let x0 = viewWIdth / 2 - 0.5 + this.position;
+        if (this.stick > 0) {
+            x0 = viewWIdth - 1 - this.position;
+        }
+        else {
+            if (this.stick < 0) {
+                x0 = 0 + this.position;
+            }
+        }
+        this.bg.x = x0 + 0.1;
+        this.bg.y = viewHeight - 0.9;
+        this.bg.w = 0.8;
+        this.bg.h = 0.8;
+        this.label.x = x0 + 0.5;
+        this.label.y = viewHeight - 0.5 + 0.05;
+        this.spot.x = x0;
+        this.spot.y = viewHeight - 1;
     }
 }
 class BarOctave {

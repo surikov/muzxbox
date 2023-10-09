@@ -72,16 +72,18 @@ class UIRenderer{//} implements RenderedPart {
 
 		//this.mixer.resetMixeUI(data);
 		this.debug.resetDebugView(data);
-        this.toolbar.fillToolbar(data,vw,vh);
-        this.toolbar.resizeToolbar(this.tiler,vw,vh);
+
+        this.toolbar.fillToolbar(vw,vh);
+        this.toolbar.resizeToolbar(vw,vh);
+		
 		this.tiler.resetModel();
 	}
 	onReSizeView() {
         console.log('onReSizeView');
 		let vw = this.tileLevelSVG.clientWidth/this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight/this.tiler.tapPxSize();
-        this.toolbar.resizeToolbar(this.tiler,vw,vh);
-		
+        this.toolbar.resizeToolbar(vw,vh);
+		this.toolbar.reRenderToolbar(this.tiler);
 	}
 	deleteUI() {
 
