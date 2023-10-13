@@ -22,8 +22,9 @@ let zoomPrefixLevelsCSS: { prefix: string, zoom: number }[] = [
 	, { prefix: '128', zoom: 128 }//9
 	, { prefix: '256', zoom: 256 }//10
 ];
-class UIRenderer{//} implements RenderedPart {
+class UIRenderer {//} implements RenderedPart {
 	toolbar: UIToolbar;
+	menu: RightMenuPanel;
 	//mixer: MixerUI;
 	debug: DebugLayerUI;
 	tiler: TileLevelBase;
@@ -36,10 +37,27 @@ class UIRenderer{//} implements RenderedPart {
 		this.debug = new DebugLayerUI();
 		this.debug.setupUI();
 		this.toolbar = new UIToolbar();
-		this.toolbar.createToolbar();
+		//this.toolbar.createToolbar(()=>{
+		//	this.toolbar.reRenderToolbar(this.tiler);
+		//});
+		this.menu = new RightMenuPanel();
+		let me = this;
+		let actionShowMenu: () => void = function () {
+			let vw = me.tileLevelSVG.clientWidth / me.tiler.tapPxSize();
+			let vh = me.tileLevelSVG.clientHeight / me.tiler.tapPxSize();
+			me.menu.showState=true;
+			me.menu.resizeMenu(vw, vh);
+			me.tiler.resetAnchor(me.menu.menuGroup, me.menu.menuAnchor, LevelModes.overlay);
+		};
 		layers = layers.concat(
 			this.debug.allLayers()
-			, this.toolbar.toolBarLayers()
+			//, this.toolbar.toolBarLayers()
+			, this.toolbar.createToolbar(() => {
+				this.toolbar.reRenderToolbar(this.tiler);
+			}, actionShowMenu)
+			, this.menu.createMenu(() => {
+				this.menu.reRenderMenu(this.tiler);
+			})
 		);
 
 		//this.mixer = new MixerUI();
@@ -59,31 +77,36 @@ class UIRenderer{//} implements RenderedPart {
 		});
 		this.tiler.setAfterResizeCallback(() => {
 			//console.log('afterResizeCallback',this.tileRenderer.getCurrentPointPosition()) ;
-			
+
 			this.onReSizeView();
 		});
 	}
 
 	fillUI(data: MixerData) {
-        let mixm: MixerDataMath = new MixerDataMath(data);
-        let vw = this.tileLevelSVG.clientWidth/this.tiler.tapPxSize();
-		let vh = this.tileLevelSVG.clientHeight/this.tiler.tapPxSize();
+		let mixm: MixerDataMath = new MixerDataMath(data);
+		let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
+		let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
 		this.tiler.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
 
 		//this.mixer.resetMixeUI(data);
 		this.debug.resetDebugView(data);
 
-        this.toolbar.fillToolbar(vw,vh);
-        this.toolbar.resizeToolbar(vw,vh);
-		
+		//this.toolbar.fillToolbar(vw, vh);
+		this.toolbar.resizeToolbar(vw, vh);
+
+		this.menu.fillMenu(vw, vh);
+		this.menu.resizeMenu(vw, vh);
+
 		this.tiler.resetModel();
 	}
 	onReSizeView() {
-        console.log('onReSizeView');
-		let vw = this.tileLevelSVG.clientWidth/this.tiler.tapPxSize();
-        let vh = this.tileLevelSVG.clientHeight/this.tiler.tapPxSize();
-        this.toolbar.resizeToolbar(vw,vh);
+		console.log('onReSizeView');
+		let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
+		let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
+		this.toolbar.resizeToolbar(vw, vh);
 		this.toolbar.reRenderToolbar(this.tiler);
+		this.menu.resizeMenu(vw, vh);
+		this.menu.reRenderMenu(this.tiler);
 	}
 	deleteUI() {
 

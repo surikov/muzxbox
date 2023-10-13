@@ -74,22 +74,23 @@ body {
 .mixFieldBg256 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(256*var(--tapSize)); }
 
 .toolBarPanel {
-	fill: var(--panel-color);
+	fill: var(--background-color);
 }
 .transparentSpot {
 	fill: #999;
 	fill-opacity: 0.05%;
+	cursor: pointer;
 }
 .toolBarButtonCircle {
-	stroke: var(--interaction-color);
-	stroke-width: 0.025cm;
-	fill: none;
+	fill: var(--interaction-color);
 }
 .toolBarButtonLabel {
-	fill: var(--interaction-color);
+	fill: var(--label-color);
 	text-anchor: middle;
 	alignment-baseline:middle;
 	font-size: 0.66cm;
-	pointer-events: none;
+	pointer-events2: none;
 }
-
+.rightMenuPanel {
+	fill: var(--panel-color);
+}

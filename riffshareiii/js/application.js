@@ -166,8 +166,20 @@ class UIRenderer {
         this.debug = new DebugLayerUI();
         this.debug.setupUI();
         this.toolbar = new UIToolbar();
-        this.toolbar.createToolbar();
-        layers = layers.concat(this.debug.allLayers(), this.toolbar.toolBarLayers());
+        this.menu = new RightMenuPanel();
+        let me = this;
+        let actionShowMenu = function () {
+            let vw = me.tileLevelSVG.clientWidth / me.tiler.tapPxSize();
+            let vh = me.tileLevelSVG.clientHeight / me.tiler.tapPxSize();
+            me.menu.showState = true;
+            me.menu.resizeMenu(vw, vh);
+            me.tiler.resetAnchor(me.menu.menuGroup, me.menu.menuAnchor, LevelModes.overlay);
+        };
+        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(() => {
+            this.toolbar.reRenderToolbar(this.tiler);
+        }, actionShowMenu), this.menu.createMenu(() => {
+            this.menu.reRenderMenu(this.tiler);
+        }));
         console.log(layers.length, layers);
         this.tiler.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
         this.tiler.setAfterZoomCallback(() => {
@@ -182,8 +194,9 @@ class UIRenderer {
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.tiler.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
         this.debug.resetDebugView(data);
-        this.toolbar.fillToolbar(vw, vh);
         this.toolbar.resizeToolbar(vw, vh);
+        this.menu.fillMenu(vw, vh);
+        this.menu.resizeMenu(vw, vh);
         this.tiler.resetModel();
     }
     onReSizeView() {
@@ -192,24 +205,37 @@ class UIRenderer {
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.toolbar.resizeToolbar(vw, vh);
         this.toolbar.reRenderToolbar(this.tiler);
+        this.menu.resizeMenu(vw, vh);
+        this.menu.reRenderMenu(this.tiler);
     }
     deleteUI() {
     }
 }
 class UIToolbar {
-    toolBarLayers() {
-        return [this.toolBarLayer];
-    }
-    createToolbar() {
-        this.playPauseButton = new ToolBarButton('⏵', 0, 0, () => { console.log('playPauseButton'); });
-        this.menuButton = new ToolBarButton('←', 1, 0, () => { console.log('menuButton'); });
-        this.headButton = new ToolBarButton('→', -1, 0, () => { console.log('headButton'); });
+    createToolbar(requestReRenderToolbar, actionShowMenu) {
+        this.infoButton = new ToolBarButton(['?'], 0, -0.5, (nn) => {
+            console.log('infoButton', nn);
+        });
+        this.playPauseButton = new ToolBarButton(['⏵', '⏸'], 0, +0.5, (nn) => {
+            console.log('playPauseButton', nn);
+            requestReRenderToolbar();
+        });
+        this.menuButton = new ToolBarButton(['≡', '❯'], 1, 0, (nn) => {
+            console.log('menuButton', nn);
+            requestReRenderToolbar();
+            actionShowMenu();
+        });
+        this.headButton = new ToolBarButton(['◧', '☐'], -1, 0, (nn) => {
+            console.log('headButton', nn);
+            requestReRenderToolbar();
+        });
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
         this.toolBarRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'toolBarPanel' };
         this.toolBarAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
                 this.toolBarRectangle,
                 this.playPauseButton.anchor,
+                this.infoButton.anchor,
                 this.menuButton.anchor,
                 this.headButton.anchor
             ]
@@ -219,9 +245,7 @@ class UIToolbar {
                 this.toolBarAnchor
             ], mode: LevelModes.overlay
         };
-    }
-    fillToolbar(viewWIdth, viewHeight) {
-        console.log('fillToolbar', viewWIdth, viewHeight);
+        return [this.toolBarLayer];
     }
     resizeToolbar(viewWIdth, viewHeight) {
         console.log('resizeToolbar', viewWIdth, viewHeight);
@@ -234,6 +258,7 @@ class UIToolbar {
         this.toolBarAnchor.ww = viewWIdth;
         this.toolBarAnchor.hh = viewHeight;
         this.playPauseButton.resize(viewWIdth, viewHeight);
+        this.infoButton.resize(viewWIdth, viewHeight);
         this.menuButton.resize(viewWIdth, viewHeight);
         this.headButton.resize(viewWIdth, viewHeight);
     }
@@ -242,21 +267,30 @@ class UIToolbar {
     }
 }
 class ToolBarButton {
-    constructor(labelText, stick, position, action) {
-        this.build(labelText, stick, position, action);
+    constructor(labels, stick, position, action) {
+        this.selection = 0;
+        this.labels = labels;
+        this.build(stick, position, action);
     }
-    build(labelText, stick, position, action) {
+    build(stick, position, action) {
         this.stick = stick;
         this.position = position;
         this.action = action;
-        this.labelText = labelText;
         this.bg = { x: 0, y: 0, w: 5, h: 5, rx: 0.4, ry: 0.4, css: 'toolBarButtonCircle' };
         this.spot = {
             x: 0, y: 0, w: 1, h: 1, css: 'transparentSpot', activation: (x, y) => {
-                this.action();
+                this.selection++;
+                if (this.selection > this.labels.length - 1) {
+                    this.selection = 0;
+                }
+                this.label.text = this.labels[this.selection];
+                this.action(this.selection);
             }
         };
-        this.label = { x: 0, y: 0, text: this.labelText, css: 'toolBarButtonLabel' };
+        this.label = {
+            x: 0, y: 0, text: this.labels[this.selection],
+            css: 'toolBarButtonLabel'
+        };
         this.anchor = {
             xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
                 this.bg,
@@ -283,6 +317,51 @@ class ToolBarButton {
         this.label.y = viewHeight - 0.5 + 0.05;
         this.spot.x = x0;
         this.spot.y = viewHeight - 1;
+    }
+}
+class RightMenuPanel {
+    constructor() {
+        this.showState = false;
+    }
+    createMenu(requestReRenderToolbar) {
+        this.requestReRenderToolbar = requestReRenderToolbar;
+        this.menuGroup = document.getElementById("menuPanelGroup");
+        this.menuRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'debug' };
+        this.menuAnchor = {
+            xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+                this.menuRectangle
+            ]
+        };
+        this.menuLayer = {
+            g: this.menuGroup, anchors: [
+                this.menuAnchor
+            ], mode: LevelModes.overlay
+        };
+        return [this.menuLayer];
+    }
+    fillMenu(viewWIdth, viewHeight) {
+        console.log('fillMenu', viewWIdth, viewHeight);
+    }
+    resizeMenu(viewWIdth, viewHeight) {
+        console.log('resizeMenu', viewWIdth, viewHeight);
+        let ww = 9;
+        if (ww > viewWIdth - 1)
+            ww = viewWIdth - 1;
+        let xx = viewWIdth - ww;
+        if (!this.showState) {
+            xx = viewWIdth;
+        }
+        this.menuRectangle.x = xx;
+        this.menuRectangle.y = 0;
+        this.menuRectangle.w = ww;
+        this.menuRectangle.h = viewHeight;
+        this.menuAnchor.xx = 0;
+        this.menuAnchor.yy = 0;
+        this.menuAnchor.ww = viewWIdth;
+        this.menuAnchor.hh = viewHeight;
+    }
+    reRenderMenu(tiler) {
+        tiler.resetAnchor(this.menuGroup, this.menuAnchor, LevelModes.overlay);
     }
 }
 class BarOctave {
@@ -363,20 +442,7 @@ class DebugLayerUI {
     setupUI() {
         this.debugRectangle = { x: 0, y: 0, w: 1, h: 1, rx: 10, ry: 10, css: 'debug' };
         this.debugGroup = document.getElementById("debugLayer");
-        this.debugAnchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-                this.debugRectangle,
-                { x: 0.25, y: 0, w: 0.25, h: 0.25, css: 'debug' },
-                { x: 0.5, y: 0, w: 0.5, h: 0.5, css: 'debug' },
-                { x: 1, y: 0, w: 1, h: 1, css: 'debug' },
-                { x: 2, y: 0, w: 2, h: 2, css: 'debug' },
-                { x: 4, y: 0, w: 4, h: 4, css: 'debug' },
-                { x: 8, y: 0, w: 8, h: 8, css: 'debug' },
-                { x: 16, y: 0, w: 16, h: 16, css: 'debug' },
-                { x: 32, y: 0, w: 32, h: 32, css: 'debug' },
-                { x: 64, y: 0, w: 64, h: 64, css: 'debug' },
-                { x: 128, y: 0, w: 128, h: 128, css: 'debug' },
-                { x: 256, y: 0, w: 256, h: 256, css: 'debug' }
-            ] };
+        this.debugAnchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [] };
         this.debugLayer = {
             g: this.debugGroup, anchors: [
                 this.debugAnchor

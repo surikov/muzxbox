@@ -23,6 +23,7 @@ declare let zoomPrefixLevelsCSS: {
 }[];
 declare class UIRenderer {
     toolbar: UIToolbar;
+    menu: RightMenuPanel;
     debug: DebugLayerUI;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
@@ -37,11 +38,10 @@ declare class UIToolbar {
     toolBarGroup: SVGElement;
     toolBarLayer: TileLayerDefinition;
     playPauseButton: ToolBarButton;
+    infoButton: ToolBarButton;
     menuButton: ToolBarButton;
     headButton: ToolBarButton;
-    toolBarLayers(): TileLayerDefinition[];
-    createToolbar(): void;
-    fillToolbar(viewWIdth: number, viewHeight: number): void;
+    createToolbar(requestReRenderToolbar: () => void, actionShowMenu: () => void): TileLayerDefinition[];
     resizeToolbar(viewWIdth: number, viewHeight: number): void;
     reRenderToolbar(tiler: TileLevelBase): void;
 }
@@ -52,11 +52,24 @@ declare class ToolBarButton {
     label: TileText;
     stick: number;
     position: number;
-    labelText: string;
-    action: () => void;
-    constructor(labelText: string, stick: number, position: number, action: () => void);
-    build(labelText: string, stick: number, position: number, action: () => void): void;
+    labels: string[];
+    action: (selection: number) => void;
+    selection: number;
+    constructor(labels: string[], stick: number, position: number, action: (nn: number) => void);
+    build(stick: number, position: number, action: (selection: number) => void): void;
     resize(viewWIdth: number, viewHeight: number): void;
+}
+declare class RightMenuPanel {
+    menuRectangle: TileRectangle;
+    menuAnchor: TileAnchor;
+    menuGroup: SVGElement;
+    menuLayer: TileLayerDefinition;
+    showState: boolean;
+    requestReRenderToolbar: () => void;
+    createMenu(requestReRenderToolbar: () => void): TileLayerDefinition[];
+    fillMenu(viewWIdth: number, viewHeight: number): void;
+    resizeMenu(viewWIdth: number, viewHeight: number): void;
+    reRenderMenu(tiler: TileLevelBase): void;
 }
 declare class BarOctave {
 }

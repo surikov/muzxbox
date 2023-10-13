@@ -4,21 +4,36 @@ class UIToolbar {
 	toolBarGroup: SVGElement;
 	toolBarLayer: TileLayerDefinition;
 	playPauseButton: ToolBarButton;
+	infoButton: ToolBarButton;
 	menuButton: ToolBarButton;
 	headButton: ToolBarButton;
-	toolBarLayers(): TileLayerDefinition[] {
-		return [this.toolBarLayer];
-	}
-	createToolbar() {
-		this.playPauseButton = new ToolBarButton('⏵', 0, 0, () => { console.log('playPauseButton'); });
-		this.menuButton = new ToolBarButton('←', 1, 0, () => { console.log('menuButton'); });
-		this.headButton = new ToolBarButton('→', -1, 0, () => { console.log('headButton'); });
+	//toolBarLayers(): TileLayerDefinition[] {
+	//	return [this.toolBarLayer];
+	//}
+	createToolbar(requestReRenderToolbar: () => void,actionShowMenu: () => void):TileLayerDefinition[] {
+		this.infoButton = new ToolBarButton(['?'], 0, -0.5, (nn:number) => {
+			console.log('infoButton',nn);
+		});
+		this.playPauseButton = new ToolBarButton(['⏵','⏸'], 0, +0.5, (nn:number) => {
+			console.log('playPauseButton',nn);
+			requestReRenderToolbar();
+		});
+		this.menuButton = new ToolBarButton(['≡','❯'], 1, 0, (nn:number) => {
+			console.log('menuButton',nn);
+			requestReRenderToolbar();
+			actionShowMenu();
+		});
+		this.headButton = new ToolBarButton(['◧','☐'], -1, 0, (nn:number) => {
+			console.log('headButton',nn);
+			requestReRenderToolbar();
+		});
 		this.toolBarGroup = (document.getElementById("toolBarPanelGroup") as any) as SVGElement;
 		this.toolBarRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'toolBarPanel' };
 		this.toolBarAnchor = {
 			xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
 				this.toolBarRectangle
 				, this.playPauseButton.anchor
+				, this.infoButton.anchor
 				, this.menuButton.anchor
 				, this.headButton.anchor
 			]
@@ -28,11 +43,12 @@ class UIToolbar {
 				this.toolBarAnchor
 			], mode: LevelModes.overlay
 		};
+		return [this.toolBarLayer];
 	}
-	fillToolbar(viewWIdth: number, viewHeight: number) {
-		console.log('fillToolbar', viewWIdth, viewHeight);
+	//fillToolbar(viewWIdth: number, viewHeight: number) {
+	//	console.log('fillToolbar', viewWIdth, viewHeight);
 
-	}
+	//}
 	resizeToolbar(viewWIdth: number, viewHeight: number) {
 		console.log('resizeToolbar', viewWIdth, viewHeight);
 		this.toolBarRectangle.x = 0;
@@ -44,6 +60,7 @@ class UIToolbar {
 		this.toolBarAnchor.ww = viewWIdth;
 		this.toolBarAnchor.hh = viewHeight;
 		this.playPauseButton.resize(viewWIdth, viewHeight);
+		this.infoButton.resize(viewWIdth, viewHeight);
 		this.menuButton.resize(viewWIdth, viewHeight);
 		this.headButton.resize(viewWIdth, viewHeight);
 	}
@@ -58,23 +75,33 @@ class ToolBarButton {
 	label: TileText;
 	stick: number;
 	position: number;
-	labelText: string;
-	action: () => void;
-	constructor(labelText: string, stick: number, position: number, action: () => void) {
-		this.build(labelText, stick, position, action);
+	labels: string[];
+	action: (selection: number) => void;
+	selection: number = 0;
+	constructor(labels: string[], stick: number, position: number, action: (nn:number) => void) {
+		this.labels = labels;
+		this.build(stick, position, action);
 	}
-	build(labelText: string, stick: number, position: number, action: () => void) {
+	build(stick: number, position: number, action: (selection: number) => void) {
 		this.stick = stick;
 		this.position = position;
 		this.action = action;
-		this.labelText = labelText;
+		//this.labelText = labelText;
 		this.bg = { x: 0, y: 0, w: 5, h: 5, rx: 0.4, ry: 0.4, css: 'toolBarButtonCircle' };
 		this.spot = {
 			x: 0, y: 0, w: 1, h: 1, css: 'transparentSpot', activation: (x: number, y: number) => {
-				this.action();
+				this.selection++;
+				if (this.selection > this.labels.length - 1) {
+					this.selection = 0;
+				}
+				this.label.text = this.labels[this.selection];
+				this.action(this.selection);
 			}
 		};
-		this.label = { x: 0, y: 0, text: this.labelText, css: 'toolBarButtonLabel' }
+		this.label = {
+			x: 0, y: 0, text: this.labels[this.selection]//this.labelText
+			, css: 'toolBarButtonLabel'
+		}
 		this.anchor = {
 			xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
 				this.bg
@@ -101,4 +128,8 @@ class ToolBarButton {
 		this.spot.x = x0;
 		this.spot.y = viewHeight - 1;
 	}
+	//icon(labelText:string){
+	//this.labelText = labelText;
+	//	this.label.text=labelText;
+	//}
 }
