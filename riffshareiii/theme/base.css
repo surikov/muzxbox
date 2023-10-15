@@ -20,7 +20,16 @@
 	--color-blue: #008;
 	--color-cyan: #088;
 	--color-magenta: #808;
-	--color-yellow: #880;
+    --color-yellow: #880;
+    
+    --color-background: #373e48ff;
+    --color-shadow: #00000066;
+    --color-toolbar: #6f7c91ff;
+    --color-panel: #535d6cff;
+    --color-focus: #d40055ff;
+    --color-interactive: #cc6600ff;
+    --color-subtext: #87aadeff;
+    --color-text: #ffffffff;
     
 }
 
@@ -40,13 +49,14 @@ body {
 	height: 100%;
 	margin: 0px;
 	padding: 0px;
-	touch-action: manipulation;
+    touch-action: manipulation;
+    background-color: #ff00ff;
 }
 
 #tileLevelSVG {
 	width: 100%;
 	height: 100%;
-	background-color: var(--background-color);
+	background-color: var(--color-background);
 	user-select: none;
 	touch-action: manipulation;
 	background-size: cover;
@@ -73,8 +83,11 @@ body {
 .mixFieldBg128 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(128*var(--tapSize)); }
 .mixFieldBg256 { fill: var(--panel-color); stroke: var(--line-color); stroke-linejoin: round; stroke-width: calc(256*var(--tapSize)); }
 
+.fillShadow {
+	fill: var(--color-shadow);
+}
 .toolBarPanel {
-	fill: var(--background-color);
+	fill: var(--color-toolbar);
 }
 .transparentSpot {
 	fill: #999;
@@ -82,15 +95,15 @@ body {
 	cursor: pointer;
 }
 .toolBarButtonCircle {
-	fill: var(--interaction-color);
+	fill: var(--color-interactive);
 }
 .toolBarButtonLabel {
-	fill: var(--label-color);
+	fill: var(--color-text);
 	text-anchor: middle;
-	alignment-baseline:middle;
+	alignment-baseline: middle;
 	font-size: 0.66cm;
 	pointer-events2: none;
 }
 .rightMenuPanel {
-	fill: var(--panel-color);
+	fill: var(--color-panel);
 }

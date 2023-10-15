@@ -27,6 +27,7 @@ declare class UIRenderer {
     debug: DebugLayerUI;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
+    resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void;
     createUI(): void;
     fillUI(data: MixerData): void;
     onReSizeView(): void;
@@ -34,6 +35,7 @@ declare class UIRenderer {
 }
 declare class UIToolbar {
     toolBarRectangle: TileRectangle;
+    toolBarShadow: TileRectangle;
     toolBarAnchor: TileAnchor;
     toolBarGroup: SVGElement;
     toolBarLayer: TileLayerDefinition;
@@ -41,9 +43,8 @@ declare class UIToolbar {
     infoButton: ToolBarButton;
     menuButton: ToolBarButton;
     headButton: ToolBarButton;
-    createToolbar(requestReRenderToolbar: () => void, actionShowMenu: () => void): TileLayerDefinition[];
+    createToolbar(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void, actionShowMenu: () => void): TileLayerDefinition[];
     resizeToolbar(viewWIdth: number, viewHeight: number): void;
-    reRenderToolbar(tiler: TileLevelBase): void;
 }
 declare class ToolBarButton {
     anchor: TileAnchor;
@@ -61,15 +62,17 @@ declare class ToolBarButton {
 }
 declare class RightMenuPanel {
     menuRectangle: TileRectangle;
+    menuShadow: TileRectangle;
     menuAnchor: TileAnchor;
     menuGroup: SVGElement;
     menuLayer: TileLayerDefinition;
+    menuCloseButton: ToolBarButton;
     showState: boolean;
-    requestReRenderToolbar: () => void;
-    createMenu(requestReRenderToolbar: () => void): TileLayerDefinition[];
+    lastWidth: number;
+    lastHeight: number;
+    createMenu(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void): TileLayerDefinition[];
     fillMenu(viewWIdth: number, viewHeight: number): void;
     resizeMenu(viewWIdth: number, viewHeight: number): void;
-    reRenderMenu(tiler: TileLevelBase): void;
 }
 declare class BarOctave {
 }

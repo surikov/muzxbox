@@ -159,6 +159,11 @@ let zoomPrefixLevelsCSS = [
     { prefix: '256', zoom: 256 }
 ];
 class UIRenderer {
+    constructor() {
+        this.resetAnchor = (parentSVGGroup, anchor, layerMode) => {
+            this.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
+        };
+    }
     createUI() {
         this.tiler = createTileLevel();
         this.tileLevelSVG = document.getElementById("tileLevelSVG");
@@ -175,11 +180,7 @@ class UIRenderer {
             me.menu.resizeMenu(vw, vh);
             me.tiler.resetAnchor(me.menu.menuGroup, me.menu.menuAnchor, LevelModes.overlay);
         };
-        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(() => {
-            this.toolbar.reRenderToolbar(this.tiler);
-        }, actionShowMenu), this.menu.createMenu(() => {
-            this.menu.reRenderMenu(this.tiler);
-        }));
+        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(this.resetAnchor, actionShowMenu), this.menu.createMenu(this.resetAnchor));
         console.log(layers.length, layers);
         this.tiler.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
         this.tiler.setAfterZoomCallback(() => {
@@ -204,35 +205,37 @@ class UIRenderer {
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.toolbar.resizeToolbar(vw, vh);
-        this.toolbar.reRenderToolbar(this.tiler);
+        this.tiler.resetAnchor(this.toolbar.toolBarGroup, this.toolbar.toolBarAnchor, LevelModes.overlay);
         this.menu.resizeMenu(vw, vh);
-        this.menu.reRenderMenu(this.tiler);
+        this.tiler.resetAnchor(this.menu.menuGroup, this.menu.menuAnchor, LevelModes.overlay);
     }
     deleteUI() {
     }
 }
 class UIToolbar {
-    createToolbar(requestReRenderToolbar, actionShowMenu) {
+    createToolbar(resetAnchor, actionShowMenu) {
         this.infoButton = new ToolBarButton(['?'], 0, -0.5, (nn) => {
             console.log('infoButton', nn);
         });
         this.playPauseButton = new ToolBarButton(['⏵', '⏸'], 0, +0.5, (nn) => {
             console.log('playPauseButton', nn);
-            requestReRenderToolbar();
+            resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
         });
-        this.menuButton = new ToolBarButton(['≡', '❯'], 1, 0, (nn) => {
+        this.menuButton = new ToolBarButton(['≡'], 1, 0, (nn) => {
             console.log('menuButton', nn);
-            requestReRenderToolbar();
+            resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
             actionShowMenu();
         });
         this.headButton = new ToolBarButton(['◧', '☐'], -1, 0, (nn) => {
             console.log('headButton', nn);
-            requestReRenderToolbar();
+            resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
         });
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
         this.toolBarRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'toolBarPanel' };
+        this.toolBarShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
         this.toolBarAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+                this.toolBarShadow,
                 this.toolBarRectangle,
                 this.playPauseButton.anchor,
                 this.infoButton.anchor,
@@ -249,6 +252,11 @@ class UIToolbar {
     }
     resizeToolbar(viewWIdth, viewHeight) {
         console.log('resizeToolbar', viewWIdth, viewHeight);
+        let shn = 0.05;
+        this.toolBarShadow.x = -shn;
+        this.toolBarShadow.y = viewHeight - 1 - shn;
+        this.toolBarShadow.w = viewWIdth + shn + shn;
+        this.toolBarShadow.h = 1 + shn + shn;
         this.toolBarRectangle.x = 0;
         this.toolBarRectangle.y = viewHeight - 1;
         this.toolBarRectangle.w = viewWIdth;
@@ -261,9 +269,6 @@ class UIToolbar {
         this.infoButton.resize(viewWIdth, viewHeight);
         this.menuButton.resize(viewWIdth, viewHeight);
         this.headButton.resize(viewWIdth, viewHeight);
-    }
-    reRenderToolbar(tiler) {
-        tiler.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
     }
 }
 class ToolBarButton {
@@ -322,14 +327,22 @@ class ToolBarButton {
 class RightMenuPanel {
     constructor() {
         this.showState = false;
+        this.lastWidth = 0;
+        this.lastHeight = 0;
     }
-    createMenu(requestReRenderToolbar) {
-        this.requestReRenderToolbar = requestReRenderToolbar;
+    createMenu(resetAnchor) {
         this.menuGroup = document.getElementById("menuPanelGroup");
-        this.menuRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'debug' };
+        this.menuRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'rightMenuPanel' };
+        this.menuShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
+        this.menuCloseButton = new ToolBarButton(['❯'], 1, 11, (nn) => {
+            console.log('menuCloseButton', nn);
+            this.showState = false;
+            this.resizeMenu(this.lastWidth, this.lastHeight);
+            resetAnchor(this.menuGroup, this.menuAnchor, LevelModes.overlay);
+        });
         this.menuAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-                this.menuRectangle
+                this.menuShadow, this.menuRectangle, this.menuCloseButton.anchor
             ]
         };
         this.menuLayer = {
@@ -344,13 +357,27 @@ class RightMenuPanel {
     }
     resizeMenu(viewWIdth, viewHeight) {
         console.log('resizeMenu', viewWIdth, viewHeight);
-        let ww = 9;
-        if (ww > viewWIdth - 1)
-            ww = viewWIdth - 1;
+        this.lastWidth = viewWIdth;
+        this.lastHeight = viewHeight;
+        let ww = viewWIdth - 1;
+        if (ww > 9)
+            ww = 9;
+        if (ww < 2) {
+            ww = 2;
+        }
         let xx = viewWIdth - ww;
         if (!this.showState) {
-            xx = viewWIdth;
+            xx = viewWIdth + 1;
+            this.menuCloseButton.position = -11;
         }
+        else {
+            this.menuCloseButton.position = 0;
+        }
+        let shn = 0.05;
+        this.menuShadow.x = xx - shn;
+        this.menuShadow.y = -shn;
+        this.menuShadow.w = ww + shn + shn;
+        this.menuShadow.h = viewHeight + shn + shn;
         this.menuRectangle.x = xx;
         this.menuRectangle.y = 0;
         this.menuRectangle.w = ww;
@@ -359,9 +386,7 @@ class RightMenuPanel {
         this.menuAnchor.yy = 0;
         this.menuAnchor.ww = viewWIdth;
         this.menuAnchor.hh = viewHeight;
-    }
-    reRenderMenu(tiler) {
-        tiler.resetAnchor(this.menuGroup, this.menuAnchor, LevelModes.overlay);
+        this.menuCloseButton.resize(viewWIdth, viewHeight);
     }
 }
 class BarOctave {

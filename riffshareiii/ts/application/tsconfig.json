@@ -26,6 +26,7 @@
         ,"startup.ts"
         ,"ui/renderer.ts"
         ,"ui/toolbar/toolbarpanel.ts"
+        ,"ui/toolbar/toolbutton.ts"
 		,"ui/rightmenu/menupanel.ts"
         ,"ui/mixer/baroctave.ts"
 		,"ui/mixer/mixertrack.ts"
