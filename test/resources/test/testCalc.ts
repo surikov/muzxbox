@@ -304,10 +304,10 @@ function calcRowPatterns(rowNum: number, rows: BallsRow[]): number[] {
 	}
 	return cnts;
 }
-function calcRowFills(log: boolean, rowNum: number, rows: BallsRow[], counts: number[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
-	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
+function calcRowFills( rowNum: number, rows: BallsRow[], counts: number[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] {
+	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = [];
 	for (let nn = 0; nn < rowLen; nn++) {
-		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
+		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number } = { ball: nn + 1, fills: [], summ: 0 };
 		resu.push(one);
 		for (let dx1 = 0; dx1 < rowLen; dx1++) {
 			for (let dx2 = 0; dx2 < rowLen; dx2++) {
@@ -319,8 +319,9 @@ function calcRowFills(log: boolean, rowNum: number, rows: BallsRow[], counts: nu
 			}
 		}
 
-		one.logr = one.summ;
+		//one.logr = one.summ;
 		//if(log){one.logr = one.summ*one.summ;}
+		//console.log(rowNum,nn,one);
 	}
 	return resu;
 }
@@ -438,44 +439,20 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 }
 function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
 	let oldReduceRatio = reduceRatio;
-	let arr: { ball: number, avg: number, sums: number[] }[] = [];
-	for (let bb = 0; bb < rowLen; bb++) {
-		arr.push({ ball: bb + 1, avg: 0, sums: [] });
-	}
-	for (let thd = 1; thd <= 1; thd++) {
-		reduceRatio = thd;
-		let rows: BallsRow[] = sliceRows(inrows, 0, 100);
-		let precounts = calcRowPatterns(0 + 1, rows);
-		let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[];
-		calcs = calcRowFills(false, 0, rows, precounts);
-		for (let bb = 0; bb < rowLen; bb++) {
-			arr[bb].sums.push(calcs[bb].logr);
-		}
-	}
+	let rows: BallsRow[] = sliceRows(inrows, 0, 100);
+	let precounts: number[] = calcRowPatterns(0 + 1, rows);
+	let ballFills: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = calcRowFills( 0, rows, precounts);
+	console.log('ballFills',ballFills);
 	let mx = 0;
-	let min = 98765;
+	let min = 987654321;
 	for (let bb = 0; bb < rowLen; bb++) {
-		arr[bb].avg = 0;
-		for (let ii = 0; ii < arr[bb].sums.length; ii++) {
-			arr[bb].avg = arr[bb].avg + arr[bb].sums[ii];
-		}
-		arr[bb].avg = arr[bb].avg / arr[bb].sums.length;
-		if (mx < arr[bb].avg) mx = arr[bb].avg;
-		if (min > arr[bb].avg) min = arr[bb].avg;
+		if (mx < ballFills[bb].summ) { mx = ballFills[bb].summ; }
+		if (min > ballFills[bb].summ) { min = ballFills[bb].summ; }
 	}
-	//let hr = mx * mx * mx / (topShift / cellSize);
 	let hr = (mx - min) / (topShift / cellSize - 2);
-	let prehh = (mx - min - (arr[rowLen - 1].avg - min)) / hr;
+	let prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
 	for (let bb = 0; bb < rowLen; bb++) {
-		//------------let hh = arr[bb].avg * arr[bb].avg * arr[bb].avg / hr;
-		let hh = (mx - min - (arr[bb].avg - min)) / hr;
-		/*markLines.push({
-			fromX: bb + shiftX-1
-			, fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
-			, toX: bb + shiftX
-			, toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
-			, color: color,manual:false
-		});*/
+		let hh = (mx - min - (ballFills[bb].summ - min)) / hr;
 		markLines.push({
 			fromX: bb + shiftX - 1
 			, fromY: skipRowsCount + 0 + prehh
@@ -483,13 +460,6 @@ function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
 			, toY: skipRowsCount + hh - 0
 			, color: color, manual: false
 		});
-		/*markLines.push({
-			fromX: bb + shiftX-1+ rowLen
-			, fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
-			, toX: bb + shiftX+ rowLen
-			, toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
-			, color: color,manual:false
-		});*/
 		markLines.push({
 			fromX: bb + shiftX - 1 + rowLen
 			, fromY: skipRowsCount + 0 + prehh
@@ -500,7 +470,7 @@ function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
 		prehh = hh;
 	}
 	reduceRatio = oldReduceRatio;
-	//console.log(reduceRatio,arr[0]);
+
 }
 function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 	let ratioPre = 0.99;
@@ -513,7 +483,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 	}
 	for (let rr = 0; rr < rowsVisibleCount; rr++) {
 		if (rr > rows.length - 6) break;
-		let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[];
+		let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[];
 		if (highLightMode == 2) {
 			calcs = calcRowPreFreqs(rr, rows);
 		} else {
@@ -521,18 +491,18 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 				calcs = calcRowHot(rr, rows);
 			} else {
 				let precounts = calcRowPatterns(rr + 1, rows);
-				calcs = calcRowFills(true, rr, rows, precounts);
+				calcs = calcRowFills( rr, rows, precounts);
 			}
 		}
 		let minCnt = 99999;
 		let mxCount = 0;
 		for (let ii = 0; ii < rowLen; ii++) {
-			if (calcs[ii].logr > mxCount) mxCount = calcs[ii].logr;
-			if (calcs[ii].logr < minCnt) minCnt = calcs[ii].logr;
+			if (calcs[ii].summ > mxCount) mxCount = calcs[ii].summ;
+			if (calcs[ii].summ < minCnt) minCnt = calcs[ii].summ;
 		}
 		let df = mxCount - minCnt;
 		for (let ii = 0; ii < rowLen; ii++) {
-			let idx = ratioPre * (calcs[ii].logr - minCnt) / df;
+			let idx = ratioPre * (calcs[ii].summ - minCnt) / df;
 			let color = 'rgba(0,0,255,' + idx + ')';
 			addRect(svg
 				, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize

@@ -270,10 +270,10 @@ function calcRowPatterns(rowNum, rows) {
     }
     return cnts;
 }
-function calcRowFills(log, rowNum, rows, counts) {
+function calcRowFills(rowNum, rows, counts) {
     var resu = [];
     for (var nn = 0; nn < rowLen; nn++) {
-        var one = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
+        var one = { ball: nn + 1, fills: [], summ: 0 };
         resu.push(one);
         for (var dx1 = 0; dx1 < rowLen; dx1++) {
             for (var dx2 = 0; dx2 < rowLen; dx2++) {
@@ -284,8 +284,9 @@ function calcRowFills(log, rowNum, rows, counts) {
                 }
             }
         }
-        one.logr = one.summ;
+        //one.logr = one.summ;
         //if(log){one.logr = one.summ*one.summ;}
+        //console.log(rowNum,nn,one);
     }
     return resu;
 }
@@ -412,46 +413,24 @@ function dumpRowWaitColor(rows, color, shiftX) {
 }
 function dumpRowFillsColor(inrows, color, shiftX) {
     var oldReduceRatio = reduceRatio;
-    var arr = [];
-    for (var bb = 0; bb < rowLen; bb++) {
-        arr.push({ ball: bb + 1, avg: 0, sums: [] });
-    }
-    for (var thd = 1; thd <= 1; thd++) {
-        reduceRatio = thd;
-        var rows = sliceRows(inrows, 0, 100);
-        var precounts = calcRowPatterns(0 + 1, rows);
-        var calcs = void 0;
-        calcs = calcRowFills(false, 0, rows, precounts);
-        for (var bb = 0; bb < rowLen; bb++) {
-            arr[bb].sums.push(calcs[bb].logr);
-        }
-    }
+    var rows = sliceRows(inrows, 0, 100);
+    var precounts = calcRowPatterns(0 + 1, rows);
+    var ballFills = calcRowFills(0, rows, precounts);
+    console.log('ballFills', ballFills);
     var mx = 0;
-    var min = 98765;
+    var min = 987654321;
     for (var bb = 0; bb < rowLen; bb++) {
-        arr[bb].avg = 0;
-        for (var ii = 0; ii < arr[bb].sums.length; ii++) {
-            arr[bb].avg = arr[bb].avg + arr[bb].sums[ii];
+        if (mx < ballFills[bb].summ) {
+            mx = ballFills[bb].summ;
         }
-        arr[bb].avg = arr[bb].avg / arr[bb].sums.length;
-        if (mx < arr[bb].avg)
-            mx = arr[bb].avg;
-        if (min > arr[bb].avg)
-            min = arr[bb].avg;
+        if (min > ballFills[bb].summ) {
+            min = ballFills[bb].summ;
+        }
     }
-    //let hr = mx * mx * mx / (topShift / cellSize);
     var hr = (mx - min) / (topShift / cellSize - 2);
-    var prehh = (mx - min - (arr[rowLen - 1].avg - min)) / hr;
+    var prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
     for (var bb = 0; bb < rowLen; bb++) {
-        //------------let hh = arr[bb].avg * arr[bb].avg * arr[bb].avg / hr;
-        var hh = (mx - min - (arr[bb].avg - min)) / hr;
-        /*markLines.push({
-            fromX: bb + shiftX-1
-            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
-            , toX: bb + shiftX
-            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
-            , color: color,manual:false
-        });*/
+        var hh = (mx - min - (ballFills[bb].summ - min)) / hr;
         markLines.push({
             fromX: bb + shiftX - 1,
             fromY: skipRowsCount + 0 + prehh,
@@ -459,13 +438,6 @@ function dumpRowFillsColor(inrows, color, shiftX) {
             toY: skipRowsCount + hh - 0,
             color: color, manual: false
         });
-        /*markLines.push({
-            fromX: bb + shiftX-1+ rowLen
-            , fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
-            , toX: bb + shiftX+ rowLen
-            , toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
-            , color: color,manual:false
-        });*/
         markLines.push({
             fromX: bb + shiftX - 1 + rowLen,
             fromY: skipRowsCount + 0 + prehh,
@@ -476,7 +448,6 @@ function dumpRowFillsColor(inrows, color, shiftX) {
         prehh = hh;
     }
     reduceRatio = oldReduceRatio;
-    //console.log(reduceRatio,arr[0]);
 }
 function dumpTriads(svg, rows) {
     var ratioPre = 0.99;
@@ -501,20 +472,20 @@ function dumpTriads(svg, rows) {
             }
             else {
                 var precounts = calcRowPatterns(rr + 1, rows);
-                calcs = calcRowFills(true, rr, rows, precounts);
+                calcs = calcRowFills(rr, rows, precounts);
             }
         }
         var minCnt = 99999;
         var mxCount = 0;
         for (var ii = 0; ii < rowLen; ii++) {
-            if (calcs[ii].logr > mxCount)
-                mxCount = calcs[ii].logr;
-            if (calcs[ii].logr < minCnt)
-                minCnt = calcs[ii].logr;
+            if (calcs[ii].summ > mxCount)
+                mxCount = calcs[ii].summ;
+            if (calcs[ii].summ < minCnt)
+                minCnt = calcs[ii].summ;
         }
         var df = mxCount - minCnt;
         for (var ii = 0; ii < rowLen; ii++) {
-            var idx = ratioPre * (calcs[ii].logr - minCnt) / df;
+            var idx = ratioPre * (calcs[ii].summ - minCnt) / df;
             var color = 'rgba(0,0,255,' + idx + ')';
             addRect(svg, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
             , color);
