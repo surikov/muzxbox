@@ -118,7 +118,12 @@ function addLine(svg, x1, y1, x2, y2, strokeWidth, color) {
     svg.append(newLine);
 }
 function composeLine(svg, x1, y1, x2, y2, strokeWidth, color) {
-    addLine(svg, x1, y1, x2, y2, strokeWidth / 2, color);
+    if (isNaN(x1) || isNaN(x2) || isNaN(y1) || isNaN(y2)) {
+        console.log('composeLine', x1, x2, y1, y2);
+    }
+    else {
+        addLine(svg, x1, y1, x2, y2, strokeWidth / 2, color);
+    }
 }
 function addCircle(svg, x, y, r, strokecolor, fillcolor) {
     var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -210,6 +215,7 @@ function clickFog(vnt) {
     drawLines();
 }
 function drawLines() {
+    //console.log('drawLines',markLines);
     clearSVGgroup(linesLevel);
     for (var i = 0; i < markLines.length; i++) {
         composeLine(linesLevel, markLines[i].fromX * cellSize + 0.5 * cellSize, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize, markLines[i].toX * cellSize + 0.5 * cellSize, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize, cellSize / 0.99, markLines[i].color); //'#00ff0066');

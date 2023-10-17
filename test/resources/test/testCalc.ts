@@ -131,7 +131,11 @@ function addLine(svg: SVGElement, x1: number, y1: number, x2: number, y2: number
 	svg.append(newLine);
 }
 function composeLine(svg: SVGElement, x1: number, y1: number, x2: number, y2: number, strokeWidth: number, color: string) {
-	addLine(svg, x1, y1, x2, y2, strokeWidth / 2, color);
+	if(isNaN(x1) || isNaN(x2) || isNaN(y1) || isNaN(y2)){
+		console.log('composeLine',x1,x2,y1,y2);
+	}else{
+		addLine(svg, x1, y1, x2, y2, strokeWidth / 2, color);
+	}
 }
 function addCircle(svg: SVGElement, x: number, y: number, r: number, strokecolor: string, fillcolor: string) {
 	var rect: SVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -223,6 +227,7 @@ function clickFog(vnt) {
 	drawLines();
 }
 function drawLines() {
+	//console.log('drawLines',markLines);
 	clearSVGgroup(linesLevel);
 	for (let i = 0; i < markLines.length; i++) {
 		composeLine(linesLevel
