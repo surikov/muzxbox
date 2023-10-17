@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.71 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.72 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -442,7 +442,7 @@ function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
 	let rows: BallsRow[] = sliceRows(inrows, 0, 100);
 	let precounts: number[] = calcRowPatterns(0 + 1, rows);
 	let ballFills: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = calcRowFills( 0, rows, precounts);
-	console.log('ballFills',ballFills);
+	//console.log('ballFills',ballFills);
 	let mx = 0;
 	let min = 987654321;
 	for (let bb = 0; bb < rowLen; bb++) {
@@ -743,7 +743,7 @@ function calcRatios(slicedrows: BallsRow[]) {
 	}
 }
 function dumpStatIne(idx, sz) {
-	console.log('dumpStatIne', idx, sz);
+	//console.log('dumpStatIne', idx, sz);
 	let count0 = 0;
 	let count1 = 0;
 	let count2 = 0;
@@ -752,7 +752,9 @@ function dumpStatIne(idx, sz) {
 	let count5 = 0;
 	let count6 = 0;
 	let count7 = 0;
-
+	
+	let stat:{balls:string,counts:string[]}={balls:''+(1+ idx)+'-'+( idx+ sz),counts:[]};
+	
 	for (let rr = 1; rr < datarows.length; rr++) {
 		let count = 0;
 		for (let bb = 0; bb < sz; bb++) {
@@ -769,14 +771,16 @@ function dumpStatIne(idx, sz) {
 		if (count == 6) { count6++; }
 		if (count == 7) { count7++; }
 	}
-	console.log(0, count0, Math.round(100 * count0 / datarows.length) + '%');
-	console.log(1, count1, Math.round(100 * count1 / datarows.length) + '%');
-	console.log(2, count2, Math.round(100 * count2 / datarows.length) + '%');
-	console.log(3, count3, Math.round(100 * count3 / datarows.length) + '%');
-	console.log(4, count4, Math.round(100 * count4 / datarows.length) + '%');
-	console.log(5, count5, Math.round(100 * count5 / datarows.length) + '%');
-	console.log(6, count6, Math.round(100 * count6 / datarows.length) + '%');
-	console.log(7, count7, Math.round(100 * count7 / datarows.length) + '%');
+	stat.counts[0]=''+count0+': '+ Math.round(100 * count0 / datarows.length) + '%';
+	stat.counts[1]=''+count1+': '+  Math.round(100 * count1 / datarows.length) + '%';
+	stat.counts[2]=''+count2+': '+  Math.round(100 * count2 / datarows.length) + '%';
+	stat.counts[3]=''+count3+': '+  Math.round(100 * count3 / datarows.length) + '%';
+	stat.counts[4]=''+count4+': '+  Math.round(100 * count4 / datarows.length) + '%';
+	stat.counts[5]=''+count5+': '+  Math.round(100 * count5 / datarows.length) + '%';
+	stat.counts[6]=''+count6+': '+  Math.round(100 * count6 / datarows.length) + '%';
+	stat.counts[7]=''+count7+': '+  Math.round(100 * count7 / datarows.length) + '%';
+	//console.log('dumpStatIne '+(1+ idx)+'-'+(1+ idx+ sz));
+	console.log('dumpStatIne',idx, sz,stat);
 }
 /*
 function anotherStat(){
@@ -805,8 +809,8 @@ function anotherStat(){
 	
 	console.log(stat);
 }*/
-function dumpLongness() {
-	console.log('longness');
+function dumpLongness(shift:number) {
+	//console.log('longness');
 	let longness: number[] = [];
 	for (var ball = 1; ball <= rowLen; ball++) {
 		let nn = 0;
@@ -816,7 +820,7 @@ function dumpLongness() {
 		nn++;
 		let cuLen = 0;
 		while (nn < datarows.length) {
-			if (ballExists(ball, datarows[nn])) {
+			if (ballExists(ball+shift, datarows[nn])) {
 				longness[cuLen] = longness[cuLen] ? longness[cuLen] : 0;
 				longness[cuLen]++;
 				cuLen = 0;
@@ -832,10 +836,12 @@ function dumpLongness() {
 		longness[ii] = longness[ii] ? longness[ii] : 0;
 		sum = sum + longness[ii];
 	}
+	let stat:string[]=[];
 	for (let ii = 0; ii < longness.length; ii++) {
-
-		console.log(ii, longness[ii], Math.round(100 * longness[ii] / sum) + '%');
+		stat[ii]=''+longness[ii]+': '+ Math.round(100 * longness[ii] / sum) + '%';
+		//console.log(ii, longness[ii], Math.round(100 * longness[ii] / sum) + '%');
 	}
+	console.log('dumpLongness',shift,stat);
 }
 /////////////////
 init();
@@ -843,5 +849,9 @@ init();
 fillCells();
 dumpStatAll();
 //anotherStat();
-dumpLongness();
+//dumpLongness(-2);
+//dumpLongness(-1);
+dumpLongness(0);
+//dumpLongness(1);
+//dumpLongness(2);
 

@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.71 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.72 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -416,7 +416,7 @@ function dumpRowFillsColor(inrows, color, shiftX) {
     var rows = sliceRows(inrows, 0, 100);
     var precounts = calcRowPatterns(0 + 1, rows);
     var ballFills = calcRowFills(0, rows, precounts);
-    console.log('ballFills', ballFills);
+    //console.log('ballFills',ballFills);
     var mx = 0;
     var min = 987654321;
     for (var bb = 0; bb < rowLen; bb++) {
@@ -712,7 +712,7 @@ function calcRatios(slicedrows) {
     }
 }
 function dumpStatIne(idx, sz) {
-    console.log('dumpStatIne', idx, sz);
+    //console.log('dumpStatIne', idx, sz);
     var count0 = 0;
     var count1 = 0;
     var count2 = 0;
@@ -721,6 +721,7 @@ function dumpStatIne(idx, sz) {
     var count5 = 0;
     var count6 = 0;
     var count7 = 0;
+    var stat = { balls: '' + (1 + idx) + '-' + (idx + sz), counts: [] };
     for (var rr = 1; rr < datarows.length; rr++) {
         var count = 0;
         for (var bb = 0; bb < sz; bb++) {
@@ -753,14 +754,16 @@ function dumpStatIne(idx, sz) {
             count7++;
         }
     }
-    console.log(0, count0, Math.round(100 * count0 / datarows.length) + '%');
-    console.log(1, count1, Math.round(100 * count1 / datarows.length) + '%');
-    console.log(2, count2, Math.round(100 * count2 / datarows.length) + '%');
-    console.log(3, count3, Math.round(100 * count3 / datarows.length) + '%');
-    console.log(4, count4, Math.round(100 * count4 / datarows.length) + '%');
-    console.log(5, count5, Math.round(100 * count5 / datarows.length) + '%');
-    console.log(6, count6, Math.round(100 * count6 / datarows.length) + '%');
-    console.log(7, count7, Math.round(100 * count7 / datarows.length) + '%');
+    stat.counts[0] = '' + count0 + ': ' + Math.round(100 * count0 / datarows.length) + '%';
+    stat.counts[1] = '' + count1 + ': ' + Math.round(100 * count1 / datarows.length) + '%';
+    stat.counts[2] = '' + count2 + ': ' + Math.round(100 * count2 / datarows.length) + '%';
+    stat.counts[3] = '' + count3 + ': ' + Math.round(100 * count3 / datarows.length) + '%';
+    stat.counts[4] = '' + count4 + ': ' + Math.round(100 * count4 / datarows.length) + '%';
+    stat.counts[5] = '' + count5 + ': ' + Math.round(100 * count5 / datarows.length) + '%';
+    stat.counts[6] = '' + count6 + ': ' + Math.round(100 * count6 / datarows.length) + '%';
+    stat.counts[7] = '' + count7 + ': ' + Math.round(100 * count7 / datarows.length) + '%';
+    //console.log('dumpStatIne '+(1+ idx)+'-'+(1+ idx+ sz));
+    console.log('dumpStatIne', idx, sz, stat);
 }
 /*
 function anotherStat(){
@@ -789,8 +792,8 @@ function anotherStat(){
     
     console.log(stat);
 }*/
-function dumpLongness() {
-    console.log('longness');
+function dumpLongness(shift) {
+    //console.log('longness');
     var longness = [];
     for (var ball = 1; ball <= rowLen; ball++) {
         var nn = 0;
@@ -800,7 +803,7 @@ function dumpLongness() {
         nn++;
         var cuLen = 0;
         while (nn < datarows.length) {
-            if (ballExists(ball, datarows[nn])) {
+            if (ballExists(ball + shift, datarows[nn])) {
                 longness[cuLen] = longness[cuLen] ? longness[cuLen] : 0;
                 longness[cuLen]++;
                 cuLen = 0;
@@ -817,13 +820,20 @@ function dumpLongness() {
         longness[ii] = longness[ii] ? longness[ii] : 0;
         sum = sum + longness[ii];
     }
+    var stat = [];
     for (var ii = 0; ii < longness.length; ii++) {
-        console.log(ii, longness[ii], Math.round(100 * longness[ii] / sum) + '%');
+        stat[ii] = '' + longness[ii] + ': ' + Math.round(100 * longness[ii] / sum) + '%';
+        //console.log(ii, longness[ii], Math.round(100 * longness[ii] / sum) + '%');
     }
+    console.log('dumpLongness', shift, stat);
 }
 /////////////////
 init();
 fillCells();
 dumpStatAll();
 //anotherStat();
-dumpLongness();
+//dumpLongness(-2);
+//dumpLongness(-1);
+dumpLongness(0);
+//dumpLongness(1);
+//dumpLongness(2);
