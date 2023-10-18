@@ -2,6 +2,9 @@ class MenuItem{
 	anchor: TileAnchor;
 	label: TileText;
 	bg: TileRectangle;
+
+	
+
 	constructor(){
         this.build();
 	}
