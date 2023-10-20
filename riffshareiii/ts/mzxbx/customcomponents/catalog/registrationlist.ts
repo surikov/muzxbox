@@ -12,4 +12,4 @@ let pluginListKindUrlName :{ kind: string, url: string, functionName: string }[]
     , { kind: 'cachedWave', functionName: 'createPluginCachedVoxPerf', url: './plugins/performers/cachedvox.js' }
     , { kind: 'equalizer10b', functionName: 'equalizer10bands', url: './plugins/filters/equalizer10band.js' }
 ];
-console.log('pluginListKindUrlName',pluginListKindUrlName);
+//console.log('pluginListKindUrlName',pluginListKindUrlName);

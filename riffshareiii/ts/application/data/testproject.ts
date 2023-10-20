@@ -98,4 +98,4 @@ let testEmptyMixerData: MixerData = {
         , { title: 'Test drums 10' }
     ]*/
 };
-console.log('testMixerData',testBigMixerData);
+//console.log('testMixerData',testBigMixerData);

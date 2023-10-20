@@ -37,7 +37,7 @@ class DebugLayerUI{//} implements RenderedLayers {
 		this.debugRectangle.h = hh;
 		this.debugAnchor.ww = ww;
 		this.debugAnchor.hh = hh;
-		console.log('debugLayer',this.debugLayer);
+		//console.log('debugLayer',this.debugLayer);
 	}
 	deleteDebbugView() {
 

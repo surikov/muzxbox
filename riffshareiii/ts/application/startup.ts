@@ -5,5 +5,5 @@ function startApplication(){
     ui.createUI();
     ui.fillUI(testEmptyMixerData);
     testNumMathUtil();
-	console.log('done startApplication');
+	//console.log('done startApplication');
 }

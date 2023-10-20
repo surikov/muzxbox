@@ -61,18 +61,45 @@ declare class ToolBarButton {
     resize(viewWIdth: number, viewHeight: number): void;
 }
 declare class RightMenuPanel {
-    menuRectangle: TileRectangle;
-    menuShadow: TileRectangle;
-    menuAnchor: TileAnchor;
-    menuGroup: SVGElement;
-    menuLayer: TileLayerDefinition;
     menuCloseButton: ToolBarButton;
     showState: boolean;
     lastWidth: number;
     lastHeight: number;
+    backgroundRectangle: TileRectangle;
+    listingShadow: TileRectangle;
+    backgroundAnchor: TileAnchor;
+    menuPanelBackground: SVGElement;
+    menuPanelContent: SVGElement;
+    menuPanelInteraction: SVGElement;
+    bgLayer: TileLayerDefinition;
+    contentLayer: TileLayerDefinition;
+    interLayer: TileLayerDefinition;
+    interAnchor: TileAnchor;
+    dragHandler: TileRectangle;
+    contentAnchor: TileAnchor;
+    items: RightMenuItem[];
+    scrollY: number;
+    shiftX: number;
+    lastZ: number;
+    itemsWidth: number;
+    resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void;
+    resetAnchors(): void;
     createMenu(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void): TileLayerDefinition[];
+    scrollListing(dx: number, dy: number): void;
     fillMenu(viewWIdth: number, viewHeight: number): void;
+    rerenderContent(): void;
     resizeMenu(viewWIdth: number, viewHeight: number): void;
+}
+declare class RightMenuItem {
+    anchor: TileAnchor;
+    label: TileText;
+    bg: TileRectangle;
+    subline: TileRectangle;
+    labelText: string;
+    big: boolean;
+    constructor();
+    calculateHeight(): number;
+    buildTile(itemTop: number, itemWidth: number): TileItem;
 }
 declare class BarOctave {
 }

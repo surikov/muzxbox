@@ -143,7 +143,6 @@ function startApplication() {
     ui.createUI();
     ui.fillUI(testEmptyMixerData);
     testNumMathUtil();
-    console.log('done startApplication');
 }
 let zoomPrefixLevelsCSS = [
     { prefix: '025', zoom: 0.25 },
@@ -178,12 +177,14 @@ class UIRenderer {
             let vh = me.tileLevelSVG.clientHeight / me.tiler.tapPxSize();
             me.menu.showState = true;
             me.menu.resizeMenu(vw, vh);
-            me.tiler.resetAnchor(me.menu.menuGroup, me.menu.menuAnchor, LevelModes.overlay);
+            me.menu.resetAnchors();
         };
         layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(this.resetAnchor, actionShowMenu), this.menu.createMenu(this.resetAnchor));
-        console.log(layers.length, layers);
         this.tiler.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
         this.tiler.setAfterZoomCallback(() => {
+            if (this.menu) {
+                this.menu.lastZ = this.tiler.getCurrentPointPosition().z;
+            }
         });
         this.tiler.setAfterResizeCallback(() => {
             this.onReSizeView();
@@ -201,13 +202,12 @@ class UIRenderer {
         this.tiler.resetModel();
     }
     onReSizeView() {
-        console.log('onReSizeView');
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.toolbar.resizeToolbar(vw, vh);
         this.tiler.resetAnchor(this.toolbar.toolBarGroup, this.toolbar.toolBarAnchor, LevelModes.overlay);
         this.menu.resizeMenu(vw, vh);
-        this.tiler.resetAnchor(this.menu.menuGroup, this.menu.menuAnchor, LevelModes.overlay);
+        this.menu.resetAnchors();
     }
     deleteUI() {
     }
@@ -251,16 +251,15 @@ class UIToolbar {
         return [this.toolBarLayer];
     }
     resizeToolbar(viewWIdth, viewHeight) {
-        console.log('resizeToolbar', viewWIdth, viewHeight);
         let shn = 0.05;
         this.toolBarShadow.x = -shn;
         this.toolBarShadow.y = viewHeight - 1 - shn;
         this.toolBarShadow.w = viewWIdth + shn + shn;
         this.toolBarShadow.h = 1 + shn + shn;
-        this.toolBarRectangle.x = 0;
+        this.toolBarRectangle.x = -1;
         this.toolBarRectangle.y = viewHeight - 1;
-        this.toolBarRectangle.w = viewWIdth;
-        this.toolBarRectangle.h = 1;
+        this.toolBarRectangle.w = viewWIdth + 2;
+        this.toolBarRectangle.h = 2;
         this.toolBarAnchor.xx = 0;
         this.toolBarAnchor.yy = 0;
         this.toolBarAnchor.ww = viewWIdth;
@@ -329,64 +328,163 @@ class RightMenuPanel {
         this.showState = false;
         this.lastWidth = 0;
         this.lastHeight = 0;
+        this.items = [];
+        this.scrollY = 0;
+        this.shiftX = 0;
+        this.lastZ = 1;
+        this.itemsWidth = 0;
+    }
+    resetAnchors() {
+        this.resetAnchor(this.menuPanelBackground, this.backgroundAnchor, LevelModes.overlay);
+        this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
+        this.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
     }
     createMenu(resetAnchor) {
-        this.menuGroup = document.getElementById("menuPanelGroup");
-        this.menuRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'rightMenuPanel' };
-        this.menuShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
+        this.resetAnchor = resetAnchor;
+        this.menuPanelBackground = document.getElementById("menuPanelBackground");
+        this.menuPanelContent = document.getElementById("menuPanelContent");
+        this.menuPanelInteraction = document.getElementById("menuPanelInteraction");
+        this.backgroundRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'rightMenuPanel' };
+        this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
+        this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
         this.menuCloseButton = new ToolBarButton(['❯'], 1, 11, (nn) => {
             console.log('menuCloseButton', nn);
             this.showState = false;
             this.resizeMenu(this.lastWidth, this.lastHeight);
-            resetAnchor(this.menuGroup, this.menuAnchor, LevelModes.overlay);
+            this.resetAnchors();
         });
-        this.menuAnchor = {
+        this.backgroundAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-                this.menuShadow, this.menuRectangle, this.menuCloseButton.anchor
-            ]
+                this.listingShadow,
+                this.backgroundRectangle
+            ], id: 'rightMenuBackgroundAnchor'
         };
-        this.menuLayer = {
-            g: this.menuGroup, anchors: [
-                this.menuAnchor
-            ], mode: LevelModes.overlay
+        this.contentAnchor = {
+            xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [], id: 'rightMenuContentAnchor'
         };
-        return [this.menuLayer];
+        this.interAnchor = {
+            xx: 0, yy: 111, ww: 111, hh: 0, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+                this.dragHandler, this.menuCloseButton.anchor
+            ], id: 'rightMenuInteractionAnchor'
+        };
+        this.bgLayer = { g: this.menuPanelBackground, anchors: [this.backgroundAnchor], mode: LevelModes.overlay };
+        this.contentLayer = { g: this.menuPanelContent, anchors: [this.contentAnchor], mode: LevelModes.overlay };
+        this.interLayer = { g: this.menuPanelInteraction, anchors: [this.interAnchor], mode: LevelModes.overlay };
+        return [this.bgLayer,
+            this.contentLayer,
+            this.interLayer];
+    }
+    scrollListing(dx, dy) {
+        let yy = this.scrollY + dy / this.lastZ;
+        let itemsH = 0;
+        for (let ii = 0; ii < this.items.length; ii++) {
+            itemsH = itemsH + this.items[ii].calculateHeight();
+        }
+        if (yy < -0 + this.lastHeight - itemsH)
+            yy = -0 + this.lastHeight - itemsH;
+        if (yy > 0)
+            yy = 0;
+        this.scrollY = yy;
+        this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
+        this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
     fillMenu(viewWIdth, viewHeight) {
-        console.log('fillMenu', viewWIdth, viewHeight);
+        for (let ii = 0; ii < 44; ii++) {
+            let it = new RightMenuItem();
+            it.labelText = "item " + ii;
+            this.items.push(it);
+        }
+        this.items[12].big = true;
+        this.items[22].big = true;
+        this.items[23].big = true;
+        this.items[24].big = true;
+        this.items[7].big = true;
+    }
+    rerenderContent() {
+        this.contentAnchor.content = [];
+        let position = 0;
+        for (let ii = 0; ii < this.items.length; ii++) {
+            let tile = this.items[ii].buildTile(position, this.itemsWidth);
+            this.contentAnchor.content.push(tile);
+            position = position + this.items[ii].calculateHeight();
+        }
+        this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
     resizeMenu(viewWIdth, viewHeight) {
-        console.log('resizeMenu', viewWIdth, viewHeight);
         this.lastWidth = viewWIdth;
         this.lastHeight = viewHeight;
-        let ww = viewWIdth - 1;
-        if (ww > 9)
-            ww = 9;
-        if (ww < 2) {
-            ww = 2;
+        this.itemsWidth = viewWIdth - 1;
+        if (this.itemsWidth > 9)
+            this.itemsWidth = 9;
+        if (this.itemsWidth < 2) {
+            this.itemsWidth = 2;
         }
-        let xx = viewWIdth - ww;
+        this.shiftX = viewWIdth - this.itemsWidth;
         if (!this.showState) {
-            xx = viewWIdth + 1;
+            this.shiftX = viewWIdth + 1;
             this.menuCloseButton.position = -11;
         }
         else {
             this.menuCloseButton.position = 0;
         }
         let shn = 0.05;
-        this.menuShadow.x = xx - shn;
-        this.menuShadow.y = -shn;
-        this.menuShadow.w = ww + shn + shn;
-        this.menuShadow.h = viewHeight + shn + shn;
-        this.menuRectangle.x = xx;
-        this.menuRectangle.y = 0;
-        this.menuRectangle.w = ww;
-        this.menuRectangle.h = viewHeight;
-        this.menuAnchor.xx = 0;
-        this.menuAnchor.yy = 0;
-        this.menuAnchor.ww = viewWIdth;
-        this.menuAnchor.hh = viewHeight;
+        this.listingShadow.x = this.shiftX - shn;
+        this.listingShadow.y = -shn;
+        this.listingShadow.w = this.itemsWidth + shn + shn;
+        this.listingShadow.h = viewHeight + shn + shn;
+        this.backgroundRectangle.x = this.shiftX;
+        this.backgroundRectangle.y = 0;
+        this.backgroundRectangle.w = this.itemsWidth;
+        this.backgroundRectangle.h = viewHeight;
+        this.backgroundAnchor.xx = 0;
+        this.backgroundAnchor.yy = 0;
+        this.backgroundAnchor.ww = viewWIdth;
+        this.backgroundAnchor.hh = viewHeight;
+        this.dragHandler.x = this.shiftX;
+        this.dragHandler.y = 0;
+        this.dragHandler.w = this.itemsWidth;
+        this.dragHandler.h = viewHeight;
+        this.interAnchor.xx = 0;
+        this.interAnchor.yy = 0;
+        this.interAnchor.ww = viewWIdth;
+        this.interAnchor.hh = viewHeight;
+        this.contentAnchor.xx = 0;
+        this.contentAnchor.yy = 0;
+        this.contentAnchor.ww = viewWIdth;
+        this.contentAnchor.hh = viewHeight;
+        this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         this.menuCloseButton.resize(viewWIdth, viewHeight);
+        this.rerenderContent();
+    }
+}
+class RightMenuItem {
+    constructor() {
+        this.labelText = '';
+        this.big = false;
+    }
+    calculateHeight() {
+        if (this.big) {
+            return 3;
+        }
+        else {
+            return 1;
+        }
+    }
+    buildTile(itemTop, itemWidth) {
+        this.subline = { x: 0, y: itemTop, w: itemWidth, h: 0.01, css: 'rightMenuDelimiterLine' };
+        this.bg = { x: 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'toolBarButtonCircle' };
+        this.label = {
+            x: itemWidth / 2, y: itemTop + 0.5, text: this.labelText,
+            css: 'toolBarButtonLabel'
+        };
+        this.anchor = {
+            xx: 0, yy: itemTop, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+                this.bg,
+                this.subline,
+                this.label
+            ]
+        };
+        return this.anchor;
     }
 }
 class BarOctave {
@@ -482,7 +580,6 @@ class DebugLayerUI {
         this.debugRectangle.h = hh;
         this.debugAnchor.ww = ww;
         this.debugAnchor.hh = hh;
-        console.log('debugLayer', this.debugLayer);
     }
     deleteDebbugView() {
     }
@@ -556,7 +653,6 @@ let testEmptyMixerData = {
         { title: 'Second track' }
     ]
 };
-console.log('testMixerData', testBigMixerData);
 class MusicMetreMath {
     constructor(from) {
         this.count = from.count;
@@ -693,7 +789,6 @@ biChar32[29] = 't';
 biChar32[30] = 'u';
 biChar32[31] = 'v';
 function testNumMathUtil() {
-    console.log('testNumMathUtil');
 }
 console.log('Tile Level API');
 var LevelModes;

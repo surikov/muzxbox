@@ -56,7 +56,7 @@ class UIToolbar {
 
     //}
     resizeToolbar(viewWIdth: number, viewHeight: number) {
-        console.log('resizeToolbar', viewWIdth, viewHeight);
+        //console.log('resizeToolbar', viewWIdth, viewHeight);
 
         let shn = 0.05;
         this.toolBarShadow.x = -shn;
@@ -64,10 +64,10 @@ class UIToolbar {
         this.toolBarShadow.w = viewWIdth + shn + shn;
         this.toolBarShadow.h = 1 + shn + shn;
 
-        this.toolBarRectangle.x = 0;
+        this.toolBarRectangle.x = -1;
         this.toolBarRectangle.y = viewHeight - 1;
-        this.toolBarRectangle.w = viewWIdth;
-        this.toolBarRectangle.h = 1;
+        this.toolBarRectangle.w = viewWIdth+2;
+        this.toolBarRectangle.h = 2;
 
         this.toolBarAnchor.xx = 0;
         this.toolBarAnchor.yy = 0;

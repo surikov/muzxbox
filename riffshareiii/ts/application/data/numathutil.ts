@@ -43,6 +43,6 @@ type PackedProject={
     bars:PackedBar[];
 };
 function testNumMathUtil(){
-    console.log('testNumMathUtil');
+    //console.log('testNumMathUtil');
 }
 

@@ -94,6 +94,11 @@ body {
 	fill-opacity: 0.05%;
 	cursor: pointer;
 }
+.transparentScroll {
+	fill: #999;
+	fill-opacity: 0.05%;
+	cursor: ns-resize;
+}
 .toolBarButtonCircle {
 	fill: var(--color-interactive);
 }
@@ -101,9 +106,12 @@ body {
 	fill: var(--color-text);
 	text-anchor: middle;
 	alignment-baseline: middle;
-	font-size: 0.66cm;
+	font-size: 0.5cm;
 	pointer-events2: none;
 }
 .rightMenuPanel {
 	fill: var(--color-panel);
+}
+.rightMenuDelimiterLine {
+	fill: var(--color-background);
 }
