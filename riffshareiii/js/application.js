@@ -391,7 +391,7 @@ class RightMenuPanel {
     fillMenu(viewWIdth, viewHeight) {
         for (let ii = 0; ii < 44; ii++) {
             let it = new RightMenuItem();
-            it.labelText = "item " + ii;
+            it.labelText = "item " + ii + " " + Math.random();
             this.items.push(it);
         }
         this.items[12].big = true;
@@ -471,20 +471,13 @@ class RightMenuItem {
         }
     }
     buildTile(itemTop, itemWidth) {
-        this.subline = { x: 0, y: itemTop, w: itemWidth, h: 0.01, css: 'rightMenuDelimiterLine' };
-        this.bg = { x: 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'toolBarButtonCircle' };
-        this.label = {
-            x: itemWidth / 2, y: itemTop + 0.5, text: this.labelText,
-            css: 'toolBarButtonLabel'
-        };
-        this.anchor = {
+        return {
             xx: 0, yy: itemTop, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-                this.bg,
-                this.subline,
-                this.label
+                { x: 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'toolBarButtonCircle' },
+                { x: 0, y: itemTop, w: itemWidth, h: 0.01, css: 'rightMenuDelimiterLine' },
+                { x: itemWidth / 2, y: itemTop + 0.5, text: this.labelText, css: 'toolBarButtonLabel' }
             ]
         };
-        return this.anchor;
     }
 }
 class BarOctave {

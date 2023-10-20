@@ -91,10 +91,6 @@ declare class RightMenuPanel {
     resizeMenu(viewWIdth: number, viewHeight: number): void;
 }
 declare class RightMenuItem {
-    anchor: TileAnchor;
-    label: TileText;
-    bg: TileRectangle;
-    subline: TileRectangle;
     labelText: string;
     big: boolean;
     constructor();

@@ -101,7 +101,7 @@ class RightMenuPanel {
 		//let items: RightMenuItem[] = [];
 		for (let ii = 0; ii < 44; ii++) {
 			let it: RightMenuItem = new RightMenuItem();
-			it.labelText = "item " + ii;
+			it.labelText = "item " + ii+" "+Math.random();
 			this.items.push(it);
 			//let item: TileText = { x: 0, y: ii, text: "item " + ii };
 			//this.contentAnchor.content.push(item);
