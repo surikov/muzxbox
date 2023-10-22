@@ -86,14 +86,22 @@ declare class RightMenuPanel {
     resetAnchors(): void;
     createMenu(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void): TileLayerDefinition[];
     scrollListing(dx: number, dy: number): void;
+    randomString(nn: number): string;
     fillMenu(viewWIdth: number, viewHeight: number): void;
     rerenderContent(): void;
     resizeMenu(viewWIdth: number, viewHeight: number): void;
 }
 declare class RightMenuItem {
-    labelText: string;
-    big: boolean;
+    label: string;
+    kind: 1 | 2 | 3 | 4;
+    action: {
+        (x: number, y: number): void;
+    };
     constructor();
+    initActionItem(label: string, tap: () => void): this;
+    initDraggableItem(): this;
+    initFolderItem(): this;
+    initPreviewItem(): this;
     calculateHeight(): number;
     buildTile(itemTop: number, itemWidth: number): TileItem;
 }

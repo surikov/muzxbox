@@ -377,28 +377,40 @@ class RightMenuPanel {
     scrollListing(dx, dy) {
         let yy = this.scrollY + dy / this.lastZ;
         let itemsH = 0;
-        for (let ii = 0; ii < this.items.length; ii++) {
+        for (let ii = 0; ii < this.items.length - 1; ii++) {
             itemsH = itemsH + this.items[ii].calculateHeight();
         }
-        if (yy < -0 + this.lastHeight - itemsH)
-            yy = -0 + this.lastHeight - itemsH;
-        if (yy > 0)
+        if (yy < -itemsH) {
+            yy = -itemsH;
+        }
+        if (yy > 0) {
             yy = 0;
+        }
         this.scrollY = yy;
         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
+    randomString(nn) {
+        let words = ['red', 'green', 'blue', 'purple', 'black', 'white', 'yellow', 'grey', 'orange', 'cyan', 'magenta', 'silver', 'olive'];
+        let ss = words[Math.floor(Math.random() * (words.length - 1))];
+        ss = ss[0].toUpperCase() + ss.substring(1);
+        for (let ii = 1; ii < nn; ii++) {
+            ss = ss + ' ' + words[Math.floor(Math.random() * (words.length - 1))];
+        }
+        return ss;
+    }
     fillMenu(viewWIdth, viewHeight) {
-        for (let ii = 0; ii < 44; ii++) {
-            let it = new RightMenuItem();
-            it.labelText = "item " + ii + " " + Math.random();
+        for (let ii = 0; ii < 17; ii++) {
+            let rr = this.randomString(3);
+            let it = new RightMenuItem().initActionItem(rr, () => {
+                console.log("tap " + ii);
+            });
             this.items.push(it);
         }
-        this.items[12].big = true;
-        this.items[22].big = true;
-        this.items[23].big = true;
-        this.items[24].big = true;
-        this.items[7].big = true;
+        this.items[3].initDraggableItem();
+        this.items[4].initPreviewItem();
+        this.items[12].initPreviewItem();
+        this.items[16].initPreviewItem();
     }
     rerenderContent() {
         this.contentAnchor.content = [];
@@ -440,9 +452,9 @@ class RightMenuPanel {
         this.backgroundAnchor.yy = 0;
         this.backgroundAnchor.ww = viewWIdth;
         this.backgroundAnchor.hh = viewHeight;
-        this.dragHandler.x = this.shiftX;
+        this.dragHandler.x = this.shiftX + 1;
         this.dragHandler.y = 0;
-        this.dragHandler.w = this.itemsWidth;
+        this.dragHandler.w = this.itemsWidth - 1;
         this.dragHandler.h = viewHeight;
         this.interAnchor.xx = 0;
         this.interAnchor.yy = 0;
@@ -459,25 +471,66 @@ class RightMenuPanel {
 }
 class RightMenuItem {
     constructor() {
-        this.labelText = '';
-        this.big = false;
+        this.label = '';
+        this.kind = 1;
+    }
+    initActionItem(label, tap) {
+        this.kind = 1;
+        this.label = label;
+        this.action = tap;
+        return this;
+    }
+    initDraggableItem() {
+        this.kind = 2;
+        return this;
+    }
+    initFolderItem() {
+        this.kind = 3;
+        return this;
+    }
+    initPreviewItem() {
+        this.kind = 4;
+        return this;
     }
     calculateHeight() {
-        if (this.big) {
-            return 3;
+        if (this.kind == 4) {
+            return 2;
         }
         else {
             return 1;
         }
     }
     buildTile(itemTop, itemWidth) {
-        return {
-            xx: 0, yy: itemTop, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-                { x: 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'toolBarButtonCircle' },
-                { x: 0, y: itemTop, w: itemWidth, h: 0.01, css: 'rightMenuDelimiterLine' },
-                { x: itemWidth / 2, y: itemTop + 0.5, text: this.labelText, css: 'toolBarButtonLabel' }
-            ]
-        };
+        let anchor = { xx: 0, yy: itemTop, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [] };
+        if (this.kind == 1) {
+            let bg = { x: 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' };
+            anchor.content.push(bg);
+            let delimiter = { x: 0, y: itemTop + 1, w: itemWidth, h: 0.005, css: 'rightMenuDelimiterLine' };
+            anchor.content.push(delimiter);
+            let itemLabel = { x: 0.3, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' };
+            anchor.content.push(itemLabel);
+            let spot = { x: 0, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
+            anchor.content.push(spot);
+        }
+        if (this.kind == 2) {
+            let bg = { x: 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' };
+            anchor.content.push(bg);
+            let delimiter = { x: 0, y: itemTop + 1, w: itemWidth, h: 0.005, css: 'rightMenuDelimiterLine' };
+            anchor.content.push(delimiter);
+            let itemLabel = { x: 0.3, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' };
+            anchor.content.push(itemLabel);
+            let spot = { x: 0, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
+            anchor.content.push(spot);
+        }
+        if (this.kind == 4) {
+            let delimiter = { x: 0, y: itemTop + 2, w: itemWidth, h: 0.005, css: 'rightMenuDelimiterLine' };
+            anchor.content.push(delimiter);
+            let itemLabel = { x: 0.3, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' };
+            anchor.content.push(itemLabel);
+            let spot = { x: 0, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
+            anchor.content.push(spot);
+        }
+        return anchor;
     }
 }
 class BarOctave {
