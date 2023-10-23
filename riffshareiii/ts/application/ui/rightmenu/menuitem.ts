@@ -74,7 +74,8 @@ class RightMenuItem {
             anchor.content.push(spot);
         }
         if (this.kind == 4) {
-            
+            let bg: TileRectangle = { x: 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' };
+            anchor.content.push(bg);
             let delimiter: TileRectangle = { x: 0, y: itemTop + 2, w: itemWidth, h: 0.005, css: 'rightMenuDelimiterLine' };
             anchor.content.push(delimiter);
             let itemLabel: TileText = { x: 0.3, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' };
