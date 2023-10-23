@@ -238,7 +238,7 @@ body {
 }
 .rightMenuSubLabel {
     fill: var(--color-subtext);
-    font-size: 0.33cm;
+    font-size: 0.4cm;
 }
 
 .rightMenuItemDragBG {
