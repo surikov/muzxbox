@@ -236,6 +236,10 @@ body {
     fill: var(--color-text);
     font-size: 0.5cm;
 }
+.rightMenuSubLabel {
+    fill: var(--color-text);
+    font-size: 0.33cm;
+}
 
 .rightMenuItemDragBG {
     stroke: var(--color-text);
