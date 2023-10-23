@@ -454,7 +454,7 @@ class RightMenuPanel {
         this.backgroundAnchor.hh = viewHeight;
         this.dragHandler.x = this.shiftX + 1;
         this.dragHandler.y = 0;
-        this.dragHandler.w = this.itemsWidth - 1;
+        this.dragHandler.w = this.itemsWidth - 2;
         this.dragHandler.h = viewHeight;
         this.interAnchor.xx = 0;
         this.interAnchor.yy = 0;
@@ -519,7 +519,7 @@ class RightMenuItem {
             anchor.content.push(delimiter);
             let itemLabel = { x: 0.3, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' };
             anchor.content.push(itemLabel);
-            let spot = { x: 0, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
+            let spot = { x: 0, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentDragger' };
             anchor.content.push(spot);
         }
         if (this.kind == 4) {
@@ -529,8 +529,14 @@ class RightMenuItem {
             anchor.content.push(delimiter);
             let itemLabel = { x: 0.3, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' };
             anchor.content.push(itemLabel);
-            let spot = { x: 0, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
+            let spot = { x: 0, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentDragger' };
             anchor.content.push(spot);
+            let bg2 = { x: itemWidth - 1 + 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemSubActionBG' };
+            anchor.content.push(bg2);
+            let itemLabel2 = { x: itemWidth - 0.5, y: itemTop + 0.55, text: '⏵', css: 'rightMenuButtonLabel' };
+            anchor.content.push(itemLabel2);
+            let spot2 = { x: itemWidth - 1, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
+            anchor.content.push(spot2);
         }
         return anchor;
     }

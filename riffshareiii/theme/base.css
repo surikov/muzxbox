@@ -198,6 +198,11 @@ body {
     fill-opacity: 0.050%;
     cursor: pointer;
 }
+.transparentDragger {
+    fill: #0f0;
+    fill-opacity: 0.050%;
+    cursor: move;
+}
 
 .transparentScroll {
     fill: #999;
@@ -247,5 +252,13 @@ body {
     fill: none;
     stroke: var(--color-interactive);
     stroke-width: 0.05cm;
+}
+
+.rightMenuButtonLabel {
+    fill: var(--color-interactive);
+    text-anchor: middle;
+    alignment-baseline: middle;
+    font-size: 0.5cm;
+    pointer-events2: none;
 }
 

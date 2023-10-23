@@ -189,7 +189,7 @@ class RightMenuPanel {
 
         this.dragHandler.x = this.shiftX + 1;
         this.dragHandler.y = 0;
-        this.dragHandler.w = this.itemsWidth - 1;
+        this.dragHandler.w = this.itemsWidth - 2;
         this.dragHandler.h = viewHeight;
 
 
