@@ -222,6 +222,7 @@ body {
     alignment-baseline: middle;
     font-size: 0.5cm;
     pointer-events2: none;
+	font-family: "Times New Roman", Times, serif;
 }
 
 .rightMenuPanel {
@@ -264,5 +265,6 @@ body {
     alignment-baseline: middle;
     font-size: 0.5cm;
     pointer-events2: none;
+	font-family: "Times New Roman", Times, serif;
 }
 
