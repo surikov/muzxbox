@@ -217,7 +217,7 @@ class UIToolbar {
         this.infoButton = new ToolBarButton(['?'], 0, -0.5, (nn) => {
             console.log('infoButton', nn);
         });
-        this.playPauseButton = new ToolBarButton(['⏵', '⏸'], 0, +0.5, (nn) => {
+        this.playPauseButton = new ToolBarButton([icon_fi_play, icon_fi_pause], 0, +0.5, (nn) => {
             console.log('playPauseButton', nn);
             resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
         });
@@ -616,6 +616,8 @@ class MixerUI {
         return [this.mixerLayer];
     }
 }
+let icon_fi_play = '&#xf198;';
+let icon_fi_pause = '&#xf191;';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];

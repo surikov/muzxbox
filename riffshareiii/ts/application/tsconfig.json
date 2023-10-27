@@ -33,6 +33,7 @@
 		,"ui/mixer/mixertrack.ts"
 		,"ui/mixer/trackbar.ts"
 		,"ui/mixer/uimixer.ts"
+		,"ui/iconlabels.ts"
         ,"ui/debugPane/debuglayer.ts"
         ,"data/mixerdata.ts"
         ,"data/testproject.ts"

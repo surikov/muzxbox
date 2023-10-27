@@ -130,6 +130,8 @@ declare class MixerUI {
     resetMixeUI(data: MixerData): void;
     buildDebugLayers(): TileLayerDefinition[];
 }
+declare let icon_fi_play: string;
+declare let icon_fi_pause: string;
 declare class DebugLayerUI {
     debugRectangle: TileRectangle;
     debugAnchor: TileAnchor;

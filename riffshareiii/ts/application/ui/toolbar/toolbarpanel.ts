@@ -15,7 +15,7 @@ class UIToolbar {
         this.infoButton = new ToolBarButton(['?'], 0, -0.5, (nn: number) => {
             console.log('infoButton', nn);
         });
-        this.playPauseButton = new ToolBarButton(['⏵', '⏸'], 0, +0.5, (nn: number) => {
+        this.playPauseButton = new ToolBarButton([icon_fi_play, icon_fi_pause], 0, +0.5, (nn: number) => {
             console.log('playPauseButton', nn);
             //requestReRenderToolbar();
             resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
