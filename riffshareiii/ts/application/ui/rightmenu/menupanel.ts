@@ -50,7 +50,7 @@ class RightMenuPanel {
         this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
         //this.testContent = { x: 2, y: 1, w: 3, h: 7, css: 'debug', id: 'testMenuContent' };
         this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
-        this.menuCloseButton = new ToolBarButton(['❯'], 1, 11, (nn: number) => {
+        this.menuCloseButton = new ToolBarButton([icon_moveright], 1, 11, (nn: number) => {
             console.log('menuCloseButton', nn);
             this.showState = false;
             this.resizeMenu(this.lastWidth, this.lastHeight);

@@ -214,19 +214,16 @@ class UIRenderer {
 }
 class UIToolbar {
     createToolbar(resetAnchor, actionShowMenu) {
-        this.infoButton = new ToolBarButton(['?'], 0, -0.5, (nn) => {
-            console.log('infoButton', nn);
-        });
-        this.playPauseButton = new ToolBarButton([icon_fi_play, icon_fi_pause], 0, +0.5, (nn) => {
+        this.playPauseButton = new ToolBarButton([icon_play, icon_pause], 0, 0, (nn) => {
             console.log('playPauseButton', nn);
             resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
         });
-        this.menuButton = new ToolBarButton(['≡'], 1, 0, (nn) => {
+        this.menuButton = new ToolBarButton([icon_openmenu, icon_closemenu], 0, 1, (nn) => {
             console.log('menuButton', nn);
             resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
             actionShowMenu();
         });
-        this.headButton = new ToolBarButton(['◧', '☐'], -1, 0, (nn) => {
+        this.headButton = new ToolBarButton([icon_openleft, icon_closeleft], 0, -1, (nn) => {
             console.log('headButton', nn);
             resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
         });
@@ -238,7 +235,6 @@ class UIToolbar {
                 this.toolBarShadow,
                 this.toolBarRectangle,
                 this.playPauseButton.anchor,
-                this.infoButton.anchor,
                 this.menuButton.anchor,
                 this.headButton.anchor
             ]
@@ -265,7 +261,6 @@ class UIToolbar {
         this.toolBarAnchor.ww = viewWIdth;
         this.toolBarAnchor.hh = viewHeight;
         this.playPauseButton.resize(viewWIdth, viewHeight);
-        this.infoButton.resize(viewWIdth, viewHeight);
         this.menuButton.resize(viewWIdth, viewHeight);
         this.headButton.resize(viewWIdth, viewHeight);
     }
@@ -318,7 +313,7 @@ class ToolBarButton {
         this.bg.w = 0.8;
         this.bg.h = 0.8;
         this.label.x = x0 + 0.5;
-        this.label.y = viewHeight - 0.5 + 0.05;
+        this.label.y = viewHeight - 0.31;
         this.spot.x = x0;
         this.spot.y = viewHeight - 1;
     }
@@ -347,7 +342,7 @@ class RightMenuPanel {
         this.backgroundRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'rightMenuPanel' };
         this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
         this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
-        this.menuCloseButton = new ToolBarButton(['❯'], 1, 11, (nn) => {
+        this.menuCloseButton = new ToolBarButton([icon_moveright], 1, 11, (nn) => {
             console.log('menuCloseButton', nn);
             this.showState = false;
             this.resizeMenu(this.lastWidth, this.lastHeight);
@@ -533,7 +528,7 @@ class RightMenuItem {
             anchor.content.push(spot);
             let bg2 = { x: itemWidth - 1 + 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemSubActionBG' };
             anchor.content.push(bg2);
-            let itemLabel2 = { x: itemWidth - 0.5, y: itemTop + 0.55, text: '⏵', css: 'rightMenuButtonLabel' };
+            let itemLabel2 = { x: itemWidth - 0.5, y: itemTop + 0.65, text: icon_play, css: 'rightMenuButtonLabel' };
             anchor.content.push(itemLabel2);
             let itemLabel3 = { x: 0.3 + 1, y: itemTop + 0.7 + 0.55, text: this.label, css: 'rightMenuSubLabel' };
             anchor.content.push(itemLabel3);
@@ -616,8 +611,18 @@ class MixerUI {
         return [this.mixerLayer];
     }
 }
-let icon_fi_play = '&#xf198;';
-let icon_fi_pause = '&#xf191;';
+let icon_play = '&#xf3aa;';
+let icon_pause = '&#xf3a7;';
+let icon_openmenu = '&#xf19c;';
+let icon_closemenu = '&#xf1ea;';
+let icon_closedbranch = '&#xf2f6;';
+let icon_openedbranch = '&#xf2f2;';
+let icon_openleft = '&#xf244;';
+let icon_closeleft = '&#xf243;';
+let icon_moveup = '&#xf2fc;';
+let icon_movedown = '&#xf2f9;';
+let icon_moveleft = '&#xf2fa;';
+let icon_moveright = '&#xf2fb;';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];

@@ -5,28 +5,28 @@ class UIToolbar {
     toolBarGroup: SVGElement;
     toolBarLayer: TileLayerDefinition;
     playPauseButton: ToolBarButton;
-    infoButton: ToolBarButton;
+    //infoButton: ToolBarButton;
     menuButton: ToolBarButton;
     headButton: ToolBarButton;
     //toolBarLayers(): TileLayerDefinition[] {
     //	return [this.toolBarLayer];
     //}
     createToolbar(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void, actionShowMenu: () => void): TileLayerDefinition[] {
-        this.infoButton = new ToolBarButton(['?'], 0, -0.5, (nn: number) => {
-            console.log('infoButton', nn);
-        });
-        this.playPauseButton = new ToolBarButton([icon_fi_play, icon_fi_pause], 0, +0.5, (nn: number) => {
+        //this.infoButton = new ToolBarButton(['?'], 0, -0.5, (nn: number) => {
+        //    console.log('infoButton', nn);
+        //});
+        this.playPauseButton = new ToolBarButton([icon_play, icon_pause], 0, 0, (nn: number) => {
             console.log('playPauseButton', nn);
             //requestReRenderToolbar();
             resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
         });
-        this.menuButton = new ToolBarButton(['≡'], 1, 0, (nn: number) => {
+        this.menuButton = new ToolBarButton([icon_openmenu,icon_closemenu], 0, 1, (nn: number) => {
             console.log('menuButton', nn);
             //requestReRenderToolbar();
             resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
             actionShowMenu();
         });
-        this.headButton = new ToolBarButton(['◧', '☐'], -1, 0, (nn: number) => {
+        this.headButton = new ToolBarButton([icon_openleft, icon_closeleft], 0, -1, (nn: number) => {
             console.log('headButton', nn);
             //requestReRenderToolbar();
             resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
@@ -39,7 +39,7 @@ class UIToolbar {
                 this.toolBarShadow
                 , this.toolBarRectangle
                 , this.playPauseButton.anchor
-                , this.infoButton.anchor
+                //, this.infoButton.anchor
                 , this.menuButton.anchor
                 , this.headButton.anchor
             ]
@@ -74,7 +74,7 @@ class UIToolbar {
         this.toolBarAnchor.ww = viewWIdth;
         this.toolBarAnchor.hh = viewHeight;
         this.playPauseButton.resize(viewWIdth, viewHeight);
-        this.infoButton.resize(viewWIdth, viewHeight);
+        //this.infoButton.resize(viewWIdth, viewHeight);
         this.menuButton.resize(viewWIdth, viewHeight);
         this.headButton.resize(viewWIdth, viewHeight);
     }

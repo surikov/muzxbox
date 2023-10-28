@@ -219,11 +219,11 @@ body {
 .toolBarButtonLabel {
     fill: var(--color-text);
     text-anchor: middle;
-    alignment-baseline: middle;
+    alignment-baseline222: middle;
     font-size: 0.5cm;
     pointer-events2: none;
 	
-	font-family: "foundation-icons";
+	font-family: "Material-Design-Iconic-Font";
 }
 
 .rightMenuPanel {
@@ -263,9 +263,9 @@ body {
 .rightMenuButtonLabel {
     fill: var(--color-interactive);
     text-anchor: middle;
-    alignment-baseline: middle;
+    alignment-baseline22: middle;
     font-size: 0.5cm;
     pointer-events2: none;
-	font-family: "Times New Roman", Times, serif;
+	font-family: "Material-Design-Iconic-Font";
 }
 

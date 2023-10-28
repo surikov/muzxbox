@@ -55,7 +55,7 @@ class ToolBarButton {
         this.bg.w = 0.8;
         this.bg.h = 0.8;
         this.label.x = x0 + 0.5;
-        this.label.y = viewHeight - 0.5 + 0.05;
+        this.label.y = viewHeight - 0.31;
         this.spot.x = x0;
         this.spot.y = viewHeight - 1;
     }

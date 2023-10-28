@@ -85,7 +85,7 @@ class RightMenuItem {
 
 			let bg2: TileRectangle = { x: itemWidth-1+0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemSubActionBG' };
             anchor.content.push(bg2);
-			let itemLabel2: TileText = { x: itemWidth-0.5, y: itemTop + 0.55, text: '⏵', css: 'rightMenuButtonLabel' };
+			let itemLabel2: TileText = { x: itemWidth-0.5, y: itemTop + 0.65, text:icon_play, css: 'rightMenuButtonLabel' };
             anchor.content.push(itemLabel2);
 			let itemLabel3: TileText = { x: 0.3+1, y: itemTop + 0.7+0.55, text: this.label, css: 'rightMenuSubLabel' };
             anchor.content.push(itemLabel3);

@@ -1,2 +1,12 @@
-let icon_fi_play='&#xf198;';
-let icon_fi_pause='&#xf191;';
+let icon_play='&#xf3aa;';
+let icon_pause='&#xf3a7;';
+let icon_openmenu='&#xf19c;';
+let icon_closemenu='&#xf1ea;';
+let icon_closedbranch='&#xf2f6;';
+let icon_openedbranch='&#xf2f2;';
+let icon_openleft='&#xf244;';
+let icon_closeleft='&#xf243;';
+let icon_moveup='&#xf2fc;';
+let icon_movedown='&#xf2f9;';
+let icon_moveleft='&#xf2fa;';
+let icon_moveright='&#xf2fb;';

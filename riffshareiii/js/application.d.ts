@@ -40,7 +40,6 @@ declare class UIToolbar {
     toolBarGroup: SVGElement;
     toolBarLayer: TileLayerDefinition;
     playPauseButton: ToolBarButton;
-    infoButton: ToolBarButton;
     menuButton: ToolBarButton;
     headButton: ToolBarButton;
     createToolbar(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void, actionShowMenu: () => void): TileLayerDefinition[];
@@ -130,8 +129,18 @@ declare class MixerUI {
     resetMixeUI(data: MixerData): void;
     buildDebugLayers(): TileLayerDefinition[];
 }
-declare let icon_fi_play: string;
-declare let icon_fi_pause: string;
+declare let icon_play: string;
+declare let icon_pause: string;
+declare let icon_openmenu: string;
+declare let icon_closemenu: string;
+declare let icon_closedbranch: string;
+declare let icon_openedbranch: string;
+declare let icon_openleft: string;
+declare let icon_closeleft: string;
+declare let icon_moveup: string;
+declare let icon_movedown: string;
+declare let icon_moveleft: string;
+declare let icon_moveright: string;
 declare class DebugLayerUI {
     debugRectangle: TileRectangle;
     debugAnchor: TileAnchor;
