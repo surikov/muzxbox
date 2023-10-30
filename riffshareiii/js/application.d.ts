@@ -46,21 +46,15 @@ declare class UIToolbar {
     resizeToolbar(viewWIdth: number, viewHeight: number): void;
 }
 declare class ToolBarButton {
-    anchor: TileAnchor;
-    bg: TileRectangle;
-    spot: TileRectangle;
-    label: TileText;
     stick: number;
     position: number;
-    labels: string[];
-    action: (selection: number) => void;
-    selection: number;
+    iconLabelButton: IconLabelButton;
     constructor(labels: string[], stick: number, position: number, action: (nn: number) => void);
-    build(stick: number, position: number, action: (selection: number) => void): void;
     resize(viewWIdth: number, viewHeight: number): void;
 }
 declare class RightMenuPanel {
     menuCloseButton: ToolBarButton;
+    menuUpButton: ToolBarButton;
     showState: boolean;
     lastWidth: number;
     lastHeight: number;
@@ -82,28 +76,46 @@ declare class RightMenuPanel {
     lastZ: number;
     itemsWidth: number;
     resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void;
-    resetAnchors(): void;
+    resetAllAnchors(): void;
     createMenu(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void): TileLayerDefinition[];
     scrollListing(dx: number, dy: number): void;
     randomString(nn: number): string;
-    fillMenu(viewWIdth: number, viewHeight: number): void;
+    fillMenuItems(): void;
+    setFocus(it: MenuInfo, infos: MenuInfo[]): void;
+    setOpenState(state: boolean, it: MenuInfo, infos: MenuInfo[]): void;
+    fillMenuItemChildren(pad: number, infos: MenuInfo[]): void;
     rerenderContent(): void;
     resizeMenu(viewWIdth: number, viewHeight: number): void;
 }
 declare class RightMenuItem {
     label: string;
-    kind: 1 | 2 | 3 | 4;
+    kindAction: 1;
+    kindDraggable: 2;
+    kindPreview: 3;
+    kindClosedFolder: 4;
+    kindOpenedFolder: 5;
+    kind: 1 | 2 | 3 | 4 | 5;
     action: {
         (x: number, y: number): void;
     };
+    pad: number;
+    focused: boolean;
     constructor();
-    initActionItem(label: string, tap: () => void): this;
-    initDraggableItem(): this;
-    initFolderItem(): this;
-    initPreviewItem(): this;
+    initActionItem(pad: number, focused: boolean, label: string, tap: () => void): this;
+    initDraggableItem(pad: number, focused: boolean, tap: () => void): this;
+    initOpenedFolderItem(pad: number, focused: boolean, label: string, tap: () => void): this;
+    initClosedFolderItem(pad: number, focused: boolean, label: string, tap: () => void): this;
+    initPreviewItem(pad: number, focused: boolean, tap: () => void): this;
     calculateHeight(): number;
     buildTile(itemTop: number, itemWidth: number): TileItem;
 }
+declare type MenuInfo = {
+    text: string;
+    focused?: boolean;
+    opened?: boolean;
+    children?: MenuInfo[];
+};
+declare let testMenuData: MenuInfo[];
 declare class BarOctave {
 }
 declare class MixerTrackUI {
@@ -128,6 +140,19 @@ declare class MixerUI {
     pitchedField: MixerTrackUI[];
     resetMixeUI(data: MixerData): void;
     buildDebugLayers(): TileLayerDefinition[];
+}
+declare class IconLabelButton {
+    anchor: TileAnchor;
+    bg: TileRectangle;
+    spot: TileRectangle;
+    label: TileText;
+    left: number;
+    top: number;
+    labels: string[];
+    action: (selection: number) => void;
+    selection: number;
+    constructor(labels: string[], cssBG: string, cssLabel: string, action: (nn: number) => void);
+    resize(left: number, top: number, size: number): void;
 }
 declare let icon_play: string;
 declare let icon_pause: string;

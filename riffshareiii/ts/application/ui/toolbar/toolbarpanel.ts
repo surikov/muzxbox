@@ -11,7 +11,8 @@ class UIToolbar {
     //toolBarLayers(): TileLayerDefinition[] {
     //	return [this.toolBarLayer];
     //}
-    createToolbar(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void, actionShowMenu: () => void): TileLayerDefinition[] {
+    createToolbar(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void
+        , actionShowMenu: () => void): TileLayerDefinition[] {
         //this.infoButton = new ToolBarButton(['?'], 0, -0.5, (nn: number) => {
         //    console.log('infoButton', nn);
         //});
@@ -20,7 +21,7 @@ class UIToolbar {
             //requestReRenderToolbar();
             resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
         });
-        this.menuButton = new ToolBarButton([icon_openmenu,icon_closemenu], 0, 1, (nn: number) => {
+        this.menuButton = new ToolBarButton([icon_openmenu], 0, 1, (nn: number) => {
             console.log('menuButton', nn);
             //requestReRenderToolbar();
             resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
@@ -38,10 +39,10 @@ class UIToolbar {
             xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
                 this.toolBarShadow
                 , this.toolBarRectangle
-                , this.playPauseButton.anchor
+                , this.playPauseButton.iconLabelButton.anchor
                 //, this.infoButton.anchor
-                , this.menuButton.anchor
-                , this.headButton.anchor
+                , this.menuButton.iconLabelButton.anchor
+                , this.headButton.iconLabelButton.anchor
             ]
         };
         this.toolBarLayer = {
@@ -66,7 +67,7 @@ class UIToolbar {
 
         this.toolBarRectangle.x = -1;
         this.toolBarRectangle.y = viewHeight - 1;
-        this.toolBarRectangle.w = viewWIdth+2;
+        this.toolBarRectangle.w = viewWIdth + 2;
         this.toolBarRectangle.h = 2;
 
         this.toolBarAnchor.xx = 0;

@@ -49,9 +49,9 @@ class UIRenderer {//} implements RenderedPart {
 		let actionShowMenu: () => void = function () {
 			let vw = me.tileLevelSVG.clientWidth / me.tiler.tapPxSize();
 			let vh = me.tileLevelSVG.clientHeight / me.tiler.tapPxSize();
-			me.menu.showState = true;
+			me.menu.showState = !me.menu.showState;
 			me.menu.resizeMenu(vw, vh);
-			me.menu.resetAnchors();
+            me.menu.resetAllAnchors();
 		};
 		layers = layers.concat(
 			this.debug.allLayers()
@@ -97,7 +97,7 @@ class UIRenderer {//} implements RenderedPart {
 		//this.toolbar.fillToolbar(vw, vh);
 		this.toolbar.resizeToolbar(vw, vh);
 
-		this.menu.fillMenu(vw, vh);
+		this.menu.fillMenuItems();
 		this.menu.resizeMenu(vw, vh);
 		//this.menu.rerenderContent();
 
@@ -110,7 +110,7 @@ class UIRenderer {//} implements RenderedPart {
 		this.toolbar.resizeToolbar(vw, vh);
 		this.tiler.resetAnchor(this.toolbar.toolBarGroup, this.toolbar.toolBarAnchor, LevelModes.overlay);
 		this.menu.resizeMenu(vw, vh);
-		this.menu.resetAnchors();
+		this.menu.resetAllAnchors();
 	}
 	deleteUI() {
 

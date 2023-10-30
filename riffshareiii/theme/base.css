@@ -58,14 +58,14 @@
 	--color-shadow: #00000066;
 
     --color-background: #000609ff;
-    --color-toolbar: #223344ff;
-    --color-panel: #112233ff;
+    --color-toolbar: #334455ff;
+    --color-panel: #113344ff;
 
 	--color-focus: #cc0066ff;
-    --color-interactive: #cc3300ff;
+    --color-interactive: #5566ccff;
 
-	--color-subtext: #99ccccff;
-    --color-text: #ffffffff;
+	--color-subtext: #99ffccff;
+    --color-text: #ddeeffff;
 
 }
 
@@ -191,6 +191,7 @@ body {
 
 .toolBarPanel {
     fill: var(--color-toolbar);
+    pointer-events: none;
 }
 
 .transparentSpot {
@@ -232,15 +233,22 @@ body {
 
 .rightMenuDelimiterLine {
     fill: var(--color-background);
+    pointer-events: none;
+}
+.rightMenuFocusedDelimiter {
+    fill: var(--color-focus);
+    pointer-events: none;
 }
 
 .rightMenuLabel {
     fill: var(--color-text);
     font-size: 0.5cm;
+    pointer-events: none;
 }
 .rightMenuSubLabel {
     fill: var(--color-subtext);
     font-size: 0.4cm;
+    pointer-events: none;
 }
 
 .rightMenuItemDragBG {
@@ -265,7 +273,15 @@ body {
     text-anchor: middle;
     alignment-baseline22: middle;
     font-size: 0.5cm;
-    pointer-events2: none;
+    pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+.rightMenuIconLabel {
+    fill: var(--color-text);
+    text-anchor: middle;
+    alignment-baseline22: middle;
+    font-size: 0.5cm;
+    pointer-events: none;
 	font-family: "Material-Design-Iconic-Font";
 }
 

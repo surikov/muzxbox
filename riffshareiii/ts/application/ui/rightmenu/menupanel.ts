@@ -1,5 +1,6 @@
 class RightMenuPanel {
     menuCloseButton: ToolBarButton;
+    menuUpButton: ToolBarButton;
     showState: boolean = false;
     lastWidth: number = 0;
     lastHeight: number = 0;
@@ -32,7 +33,7 @@ class RightMenuPanel {
 
     resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void;
 
-    resetAnchors() {
+    resetAllAnchors() {
         this.resetAnchor(this.menuPanelBackground, this.backgroundAnchor, LevelModes.overlay);
         this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
         this.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
@@ -47,14 +48,22 @@ class RightMenuPanel {
         this.menuPanelInteraction = (document.getElementById("menuPanelInteraction") as any) as SVGElement;
 
         this.backgroundRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'rightMenuPanel' };
+
+        //this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'debug', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
         this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
-        //this.testContent = { x: 2, y: 1, w: 3, h: 7, css: 'debug', id: 'testMenuContent' };
+
         this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
         this.menuCloseButton = new ToolBarButton([icon_moveright], 1, 11, (nn: number) => {
             console.log('menuCloseButton', nn);
             this.showState = false;
             this.resizeMenu(this.lastWidth, this.lastHeight);
-            this.resetAnchors();
+            this.resetAllAnchors();
+        });
+        this.menuUpButton = new ToolBarButton([icon_moveright], 1, 11, (nn: number) => {
+            console.log('menuCloseButton', nn);
+            this.showState = false;
+            this.resizeMenu(this.lastWidth, this.lastHeight);
+            this.resetAllAnchors();
         });
         this.backgroundAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
@@ -70,15 +79,17 @@ class RightMenuPanel {
         };
         this.interAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-                this.dragHandler, this.menuCloseButton.anchor
+                this.dragHandler, this.menuCloseButton.iconLabelButton.anchor
             ], id: 'rightMenuInteractionAnchor'
         };
         this.bgLayer = { g: this.menuPanelBackground, anchors: [this.backgroundAnchor], mode: LevelModes.overlay };
         this.contentLayer = { g: this.menuPanelContent, anchors: [this.contentAnchor], mode: LevelModes.overlay };
         this.interLayer = { g: this.menuPanelInteraction, anchors: [this.interAnchor], mode: LevelModes.overlay };
         return [this.bgLayer
+            , this.interLayer
             , this.contentLayer
-            , this.interLayer];
+
+        ];
     }
     scrollListing(dx: number, dy: number) {
         //console.log('scrollListing', dx, dy,this.lastZ);
@@ -91,8 +102,8 @@ class RightMenuPanel {
 
         //if (yy < -0.5 + this.lastHeight - itemsH) yy = -0.5 + this.lastHeight - itemsH;
 
-        if (yy <  -itemsH) {
-            yy =  -itemsH;
+        if (yy < -itemsH) {
+            yy = -itemsH;
         }
         if (yy > 0) {
             yy = 0;
@@ -111,45 +122,92 @@ class RightMenuPanel {
         }
         return ss;
     }
-    fillMenu(viewWIdth: number, viewHeight: number) {
-
-        //this.itemsCount = 44;
-        //let items: RightMenuItem[] = [];
-        for (let ii = 0; ii < 17; ii++) {
+    fillMenuItems() {//viewWIdth: number, viewHeight: number) {
+        this.items = [];
+        /*
+        for (let ii = 0; ii < 19; ii++) {
             let rr = this.randomString(3);
-            let it: RightMenuItem = new RightMenuItem().initActionItem(rr, () => {
+            let it: RightMenuItem = new RightMenuItem().initActionItem(0,rr, () => {
                 console.log("tap " + ii);
             });
-            //it.labelText = "item " + ii+" "+Math.random();
             this.items.push(it);
-            //let item: TileText = { x: 0, y: ii, text: "item " + ii };
-            //this.contentAnchor.content.push(item);
         }
-        this.items[3].initDraggableItem();
-        this.items[4].initPreviewItem();
-        this.items[12].initPreviewItem();
-        this.items[16].initPreviewItem();
-
-        /*
-		this.items[12].big = true;
-		this.items[22].big = true;
-		this.items[23].big = true;
-		this.items[24].big = true;
-		this.items[7].big = true;
+        this.items[3].initDraggableItem(0);
+        this.items[4].initPreviewItem(0);
+        this.items[12].initPreviewItem(0);
+        this.items[16].initPreviewItem(0);
+        this.items[2].initClosedFolderItem(0,'closed');
+        this.items[7].initOpenedFolderItem(0);
+        for (let ii = 8; ii < this.items.length; ii++) {
+            this.items[ii].pad=0.5;
+        }
 */
-
-
-        //console.log('fillMenu', viewWIdth, viewHeight, this.contentAnchor);
-
+        this.fillMenuItemChildren(0, testMenuData);
+    }
+    setFocus(it: MenuInfo, infos: MenuInfo[]) {
+        for (let ii = 0; ii < infos.length; ii++) {
+            infos[ii].focused = false;
+        }
+        it.focused = true;
+    }
+    setOpenState(state:boolean,it: MenuInfo, infos: MenuInfo[]) {
+        for (let ii = 0; ii < infos.length; ii++) {
+            infos[ii].opened = false;
+            infos[ii].focused = false;
+        }
+        it.focused = true;
+        it.opened = state;
+    }
+    fillMenuItemChildren(pad: number, infos: MenuInfo[]): void {
+        let me = this;
+        for (let ii = 0; ii < infos.length; ii++) {
+            let it = infos[ii];
+            let focused = (it.focused) ? true : false;
+            let opened = (it.opened) ? true : false;
+            let children = it.children;
+            if (children) {
+                if (opened) {
+                    this.items.push(new RightMenuItem().initOpenedFolderItem(pad, focused, it.text, () => {
+                        console.log("close " + ii);
+                        //it.opened = false;
+                        me.setOpenState(false,it, infos);
+                        me.rerenderContent();
+                    }));
+                    this.fillMenuItemChildren(pad + 0.5, children);
+                } else {
+                    this.items.push(new RightMenuItem().initClosedFolderItem(pad, focused, it.text, () => {
+                        console.log("open " + ii);
+                        //it.opened = true;
+                        me.setOpenState(true,it, infos);
+                        me.rerenderContent();
+                        //me.fillMenu();
+                        //me.resetAnchor(me.menuPanelContent, me.contentAnchor, LevelModes.overlay);
+                    }));
+                }
+                /*this.items.push(new RightMenuItem().initClosedFolderItem(pad, focused,infos[ii].text, () => {
+                    console.log("close " + ii);
+                }));
+                this.fillMenuChildren(pad + 0.5, children);*/
+            } else {
+                this.items.push(new RightMenuItem().initActionItem(pad, focused, it.text, () => {
+                    console.log("tap " + ii);
+                    me.setFocus(it, infos);
+                    me.rerenderContent();
+                }));
+            }
+        }
     }
     rerenderContent() {
         this.contentAnchor.content = [];
+        this.fillMenuItems();
+
         let position: number = 0;
         for (let ii = 0; ii < this.items.length; ii++) {
             let tile = this.items[ii].buildTile(position, this.itemsWidth);
             this.contentAnchor.content.push(tile);
             position = position + this.items[ii].calculateHeight();
         }
+
         this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
     resizeMenu(viewWIdth: number, viewHeight: number) {
@@ -187,9 +245,9 @@ class RightMenuPanel {
         this.backgroundAnchor.hh = viewHeight;
 
 
-        this.dragHandler.x = this.shiftX + 1;
+        this.dragHandler.x = this.shiftX;
         this.dragHandler.y = 0;
-        this.dragHandler.w = this.itemsWidth - 2;
+        this.dragHandler.w = this.itemsWidth;
         this.dragHandler.h = viewHeight;
 
 

@@ -6,94 +6,105 @@ class RightMenuItem {
 
     label: string = '';
     //isbig: boolean = false;
-    kind: 1 | 2 | 3 | 4 = 1;
+    kindAction: 1 = 1;
+    kindDraggable: 2 = 2;
+    kindPreview: 3 = 3;
+    kindClosedFolder: 4 = 4;
+    kindOpenedFolder: 5 = 5;
+    kind: 1 | 2 | 3 | 4 | 5 = this.kindAction;
     action: { (x: number, y: number): void };
+    pad: number = 0;
+    focused: boolean = false;
 
     constructor() {
         //this.build();
     }
-    initActionItem(label: string, tap: () => void) {
-        this.kind = 1;
+    initActionItem(pad: number, focused: boolean, label: string, tap: () => void) {
+        this.pad = pad;
+        this.focused = focused;
+        this.kind = this.kindAction;
         this.label = label;
         this.action = tap;
         return this;
     }
-    initDraggableItem() {
-        this.kind = 2;
-
+    initDraggableItem(pad: number, focused: boolean, tap: () => void) {
+        this.kind = this.kindDraggable;
+        this.focused = focused;
+        this.pad = pad;
+        this.action = tap;
         return this;
     }
-    initFolderItem() {
-        this.kind = 3;
+    initOpenedFolderItem(pad: number, focused: boolean, label: string, tap: () => void) {
+        this.pad = pad;
+        this.label = label;
+        this.focused = focused;
+        this.kind = this.kindOpenedFolder;
+        this.action = tap;
         return this;
     }
-    initPreviewItem() {
-        this.kind = 4;
+    initClosedFolderItem(pad: number, focused: boolean, label: string,  tap: () => void) {
+        this.pad = pad;
+        this.label = label;
+        this.focused = focused;
+        this.kind = this.kindClosedFolder;
+        this.action = tap;
+        return this;
+    }
+    initPreviewItem(pad: number, focused: boolean,  tap: () => void) {
+        this.focused = focused;
+        this.pad = pad;
+        this.kind = this.kindPreview;
+        this.action = tap;
         return this;
     }
 
 
     calculateHeight(): number {
-        if (this.kind == 4) {
+        if (this.kind == this.kindPreview) {
             return 2;
         } else {
             return 1;
         }
     }
     buildTile(itemTop: number, itemWidth: number): TileItem {
-		/*this.subline={x: 0, y: itemTop, w: itemWidth, h: 0.01, css: 'rightMenuDelimiterLine'};
-		this.bg = { x: 0.1, y: itemTop+0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'toolBarButtonCircle' };
-		this.label = {
-			x: itemWidth/2, y: itemTop+0.5, text: this.labelText
-			, css: 'toolBarButtonLabel'
-		}*/
-        //if(this.big)this.bg.h=2.95;
-
-
-
-
         let anchor: TileAnchor = { xx: 0, yy: itemTop, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [] };
-        if (this.kind == 1) {
-            let bg: TileRectangle = { x: 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' };
-            anchor.content.push(bg);
-            let delimiter: TileRectangle = { x: 0, y: itemTop + 1, w: itemWidth, h: 0.005, css: 'rightMenuDelimiterLine' };
-            anchor.content.push(delimiter);
-            let itemLabel: TileText = { x: 0.3, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' };
-            anchor.content.push(itemLabel);
-            let spot: TileRectangle = { x: 0, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
-            anchor.content.push(spot);
+        if (this.focused) {
+            anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.05, css: 'rightMenuFocusedDelimiter' });
+        } else{
+            anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.005, css: 'rightMenuDelimiterLine' });
         }
-        if (this.kind == 2) {
-            let bg: TileRectangle = { x: 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' };
-            anchor.content.push(bg);
-            let delimiter: TileRectangle = { x: 0, y: itemTop + 1, w: itemWidth, h: 0.005, css: 'rightMenuDelimiterLine' };
-            anchor.content.push(delimiter);
-            let itemLabel: TileText = { x: 0.3, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' };
-            anchor.content.push(itemLabel);
-            let spot: TileRectangle = { x: 0, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentDragger' };
-            anchor.content.push(spot);
+        
+        let spot: TileRectangle = { x: this.pad, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
+        if (this.kind == this.kindAction) {
+            anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
         }
-        if (this.kind == 4) {
-            let bg: TileRectangle = { x: 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' };
-            anchor.content.push(bg);
-            let delimiter: TileRectangle = { x: 0, y: itemTop + 2, w: itemWidth, h: 0.005, css: 'rightMenuDelimiterLine' };
-            anchor.content.push(delimiter);
-            let itemLabel: TileText = { x: 0.3, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' };
-            anchor.content.push(itemLabel);
-            let spot: TileRectangle = { x: 0, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentDragger' };
-            anchor.content.push(spot);
-
-			let bg2: TileRectangle = { x: itemWidth-1+0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemSubActionBG' };
-            anchor.content.push(bg2);
-			let itemLabel2: TileText = { x: itemWidth-0.5, y: itemTop + 0.65, text:icon_play, css: 'rightMenuButtonLabel' };
-            anchor.content.push(itemLabel2);
-			let itemLabel3: TileText = { x: 0.3+1, y: itemTop + 0.7+0.55, text: this.label, css: 'rightMenuSubLabel' };
-            anchor.content.push(itemLabel3);
-			let itemLabel4: TileText = { x: 0.3+1, y: itemTop + 0.7+0.55+0.55, text: this.label, css: 'rightMenuSubLabel' };
-            anchor.content.push(itemLabel4);
-			let spot2: TileRectangle = { x: itemWidth-1, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
-            anchor.content.push(spot2);
+        if (this.kind == this.kindDraggable) {
+            spot.draggable = true;
+            anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
         }
+        if (this.kind == this.kindOpenedFolder) {
+            anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
+            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_movedown, css: 'rightMenuIconLabel' });
+            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+        }
+        if (this.kind == this.kindClosedFolder) {
+            anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
+            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_moveright, css: 'rightMenuIconLabel' });
+            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+        }
+        if (this.kind == this.kindPreview) {
+            spot.draggable = true;
+            anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: itemWidth - 1 + 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemSubActionBG' });
+            anchor.content.push({ x: itemWidth - 0.5, y: itemTop + 0.7, text: icon_play, css: 'rightMenuButtonLabel' });
+            anchor.content.push({ x: itemWidth - 1, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' });
+            anchor.content.push({ x: 0.3 + 1 + this.pad, y: itemTop + 0.7 + 0.55, text: this.label, css: 'rightMenuSubLabel' });
+            anchor.content.push({ x: 0.3 + 1 + this.pad, y: itemTop + 0.7 + 0.55 + 0.55, text: this.label, css: 'rightMenuSubLabel' });
+        }
+        anchor.content.push(spot);
         return anchor;
     }
 }

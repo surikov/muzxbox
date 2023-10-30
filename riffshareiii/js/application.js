@@ -175,9 +175,9 @@ class UIRenderer {
         let actionShowMenu = function () {
             let vw = me.tileLevelSVG.clientWidth / me.tiler.tapPxSize();
             let vh = me.tileLevelSVG.clientHeight / me.tiler.tapPxSize();
-            me.menu.showState = true;
+            me.menu.showState = !me.menu.showState;
             me.menu.resizeMenu(vw, vh);
-            me.menu.resetAnchors();
+            me.menu.resetAllAnchors();
         };
         layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(this.resetAnchor, actionShowMenu), this.menu.createMenu(this.resetAnchor));
         this.tiler.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
@@ -197,7 +197,7 @@ class UIRenderer {
         this.tiler.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
         this.debug.resetDebugView(data);
         this.toolbar.resizeToolbar(vw, vh);
-        this.menu.fillMenu(vw, vh);
+        this.menu.fillMenuItems();
         this.menu.resizeMenu(vw, vh);
         this.tiler.resetModel();
     }
@@ -207,7 +207,7 @@ class UIRenderer {
         this.toolbar.resizeToolbar(vw, vh);
         this.tiler.resetAnchor(this.toolbar.toolBarGroup, this.toolbar.toolBarAnchor, LevelModes.overlay);
         this.menu.resizeMenu(vw, vh);
-        this.menu.resetAnchors();
+        this.menu.resetAllAnchors();
     }
     deleteUI() {
     }
@@ -218,7 +218,7 @@ class UIToolbar {
             console.log('playPauseButton', nn);
             resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
         });
-        this.menuButton = new ToolBarButton([icon_openmenu, icon_closemenu], 0, 1, (nn) => {
+        this.menuButton = new ToolBarButton([icon_openmenu], 0, 1, (nn) => {
             console.log('menuButton', nn);
             resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
             actionShowMenu();
@@ -234,9 +234,9 @@ class UIToolbar {
             xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
                 this.toolBarShadow,
                 this.toolBarRectangle,
-                this.playPauseButton.anchor,
-                this.menuButton.anchor,
-                this.headButton.anchor
+                this.playPauseButton.iconLabelButton.anchor,
+                this.menuButton.iconLabelButton.anchor,
+                this.headButton.iconLabelButton.anchor
             ]
         };
         this.toolBarLayer = {
@@ -267,36 +267,9 @@ class UIToolbar {
 }
 class ToolBarButton {
     constructor(labels, stick, position, action) {
-        this.selection = 0;
-        this.labels = labels;
-        this.build(stick, position, action);
-    }
-    build(stick, position, action) {
+        this.iconLabelButton = new IconLabelButton(labels, 'toolBarButtonCircle', 'toolBarButtonLabel', action);
         this.stick = stick;
         this.position = position;
-        this.action = action;
-        this.bg = { x: 0, y: 0, w: 5, h: 5, rx: 0.4, ry: 0.4, css: 'toolBarButtonCircle' };
-        this.spot = {
-            x: 0, y: 0, w: 1, h: 1, css: 'transparentSpot', activation: (x, y) => {
-                this.selection++;
-                if (this.selection > this.labels.length - 1) {
-                    this.selection = 0;
-                }
-                this.label.text = this.labels[this.selection];
-                this.action(this.selection);
-            }
-        };
-        this.label = {
-            x: 0, y: 0, text: this.labels[this.selection],
-            css: 'toolBarButtonLabel'
-        };
-        this.anchor = {
-            xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-                this.bg,
-                this.label,
-                this.spot
-            ]
-        };
     }
     resize(viewWIdth, viewHeight) {
         let x0 = viewWIdth / 2 - 0.5 + this.position;
@@ -308,14 +281,7 @@ class ToolBarButton {
                 x0 = 0 + this.position;
             }
         }
-        this.bg.x = x0 + 0.1;
-        this.bg.y = viewHeight - 0.9;
-        this.bg.w = 0.8;
-        this.bg.h = 0.8;
-        this.label.x = x0 + 0.5;
-        this.label.y = viewHeight - 0.31;
-        this.spot.x = x0;
-        this.spot.y = viewHeight - 1;
+        this.iconLabelButton.resize(x0, viewHeight - 1, 1);
     }
 }
 class RightMenuPanel {
@@ -329,7 +295,7 @@ class RightMenuPanel {
         this.lastZ = 1;
         this.itemsWidth = 0;
     }
-    resetAnchors() {
+    resetAllAnchors() {
         this.resetAnchor(this.menuPanelBackground, this.backgroundAnchor, LevelModes.overlay);
         this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
         this.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
@@ -346,7 +312,13 @@ class RightMenuPanel {
             console.log('menuCloseButton', nn);
             this.showState = false;
             this.resizeMenu(this.lastWidth, this.lastHeight);
-            this.resetAnchors();
+            this.resetAllAnchors();
+        });
+        this.menuUpButton = new ToolBarButton([icon_moveright], 1, 11, (nn) => {
+            console.log('menuCloseButton', nn);
+            this.showState = false;
+            this.resizeMenu(this.lastWidth, this.lastHeight);
+            this.resetAllAnchors();
         });
         this.backgroundAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
@@ -359,15 +331,16 @@ class RightMenuPanel {
         };
         this.interAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-                this.dragHandler, this.menuCloseButton.anchor
+                this.dragHandler, this.menuCloseButton.iconLabelButton.anchor
             ], id: 'rightMenuInteractionAnchor'
         };
         this.bgLayer = { g: this.menuPanelBackground, anchors: [this.backgroundAnchor], mode: LevelModes.overlay };
         this.contentLayer = { g: this.menuPanelContent, anchors: [this.contentAnchor], mode: LevelModes.overlay };
         this.interLayer = { g: this.menuPanelInteraction, anchors: [this.interAnchor], mode: LevelModes.overlay };
         return [this.bgLayer,
-            this.contentLayer,
-            this.interLayer];
+            this.interLayer,
+            this.contentLayer
+        ];
     }
     scrollListing(dx, dy) {
         let yy = this.scrollY + dy / this.lastZ;
@@ -394,21 +367,60 @@ class RightMenuPanel {
         }
         return ss;
     }
-    fillMenu(viewWIdth, viewHeight) {
-        for (let ii = 0; ii < 17; ii++) {
-            let rr = this.randomString(3);
-            let it = new RightMenuItem().initActionItem(rr, () => {
-                console.log("tap " + ii);
-            });
-            this.items.push(it);
+    fillMenuItems() {
+        this.items = [];
+        this.fillMenuItemChildren(0, testMenuData);
+    }
+    setFocus(it, infos) {
+        for (let ii = 0; ii < infos.length; ii++) {
+            infos[ii].focused = false;
         }
-        this.items[3].initDraggableItem();
-        this.items[4].initPreviewItem();
-        this.items[12].initPreviewItem();
-        this.items[16].initPreviewItem();
+        it.focused = true;
+    }
+    setOpenState(state, it, infos) {
+        for (let ii = 0; ii < infos.length; ii++) {
+            infos[ii].opened = false;
+            infos[ii].focused = false;
+        }
+        it.focused = true;
+        it.opened = state;
+    }
+    fillMenuItemChildren(pad, infos) {
+        let me = this;
+        for (let ii = 0; ii < infos.length; ii++) {
+            let it = infos[ii];
+            let focused = (it.focused) ? true : false;
+            let opened = (it.opened) ? true : false;
+            let children = it.children;
+            if (children) {
+                if (opened) {
+                    this.items.push(new RightMenuItem().initOpenedFolderItem(pad, focused, it.text, () => {
+                        console.log("close " + ii);
+                        me.setOpenState(false, it, infos);
+                        me.rerenderContent();
+                    }));
+                    this.fillMenuItemChildren(pad + 0.5, children);
+                }
+                else {
+                    this.items.push(new RightMenuItem().initClosedFolderItem(pad, focused, it.text, () => {
+                        console.log("open " + ii);
+                        me.setOpenState(true, it, infos);
+                        me.rerenderContent();
+                    }));
+                }
+            }
+            else {
+                this.items.push(new RightMenuItem().initActionItem(pad, focused, it.text, () => {
+                    console.log("tap " + ii);
+                    me.setFocus(it, infos);
+                    me.rerenderContent();
+                }));
+            }
+        }
     }
     rerenderContent() {
         this.contentAnchor.content = [];
+        this.fillMenuItems();
         let position = 0;
         for (let ii = 0; ii < this.items.length; ii++) {
             let tile = this.items[ii].buildTile(position, this.itemsWidth);
@@ -447,9 +459,9 @@ class RightMenuPanel {
         this.backgroundAnchor.yy = 0;
         this.backgroundAnchor.ww = viewWIdth;
         this.backgroundAnchor.hh = viewHeight;
-        this.dragHandler.x = this.shiftX + 1;
+        this.dragHandler.x = this.shiftX;
         this.dragHandler.y = 0;
-        this.dragHandler.w = this.itemsWidth - 2;
+        this.dragHandler.w = this.itemsWidth;
         this.dragHandler.h = viewHeight;
         this.interAnchor.xx = 0;
         this.interAnchor.yy = 0;
@@ -467,28 +479,55 @@ class RightMenuPanel {
 class RightMenuItem {
     constructor() {
         this.label = '';
-        this.kind = 1;
+        this.kindAction = 1;
+        this.kindDraggable = 2;
+        this.kindPreview = 3;
+        this.kindClosedFolder = 4;
+        this.kindOpenedFolder = 5;
+        this.kind = this.kindAction;
+        this.pad = 0;
+        this.focused = false;
     }
-    initActionItem(label, tap) {
-        this.kind = 1;
+    initActionItem(pad, focused, label, tap) {
+        this.pad = pad;
+        this.focused = focused;
+        this.kind = this.kindAction;
         this.label = label;
         this.action = tap;
         return this;
     }
-    initDraggableItem() {
-        this.kind = 2;
+    initDraggableItem(pad, focused, tap) {
+        this.kind = this.kindDraggable;
+        this.focused = focused;
+        this.pad = pad;
+        this.action = tap;
         return this;
     }
-    initFolderItem() {
-        this.kind = 3;
+    initOpenedFolderItem(pad, focused, label, tap) {
+        this.pad = pad;
+        this.label = label;
+        this.focused = focused;
+        this.kind = this.kindOpenedFolder;
+        this.action = tap;
         return this;
     }
-    initPreviewItem() {
-        this.kind = 4;
+    initClosedFolderItem(pad, focused, label, tap) {
+        this.pad = pad;
+        this.label = label;
+        this.focused = focused;
+        this.kind = this.kindClosedFolder;
+        this.action = tap;
+        return this;
+    }
+    initPreviewItem(pad, focused, tap) {
+        this.focused = focused;
+        this.pad = pad;
+        this.kind = this.kindPreview;
+        this.action = tap;
         return this;
     }
     calculateHeight() {
-        if (this.kind == 4) {
+        if (this.kind == this.kindPreview) {
             return 2;
         }
         else {
@@ -497,49 +536,191 @@ class RightMenuItem {
     }
     buildTile(itemTop, itemWidth) {
         let anchor = { xx: 0, yy: itemTop, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [] };
-        if (this.kind == 1) {
-            let bg = { x: 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' };
-            anchor.content.push(bg);
-            let delimiter = { x: 0, y: itemTop + 1, w: itemWidth, h: 0.005, css: 'rightMenuDelimiterLine' };
-            anchor.content.push(delimiter);
-            let itemLabel = { x: 0.3, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' };
-            anchor.content.push(itemLabel);
-            let spot = { x: 0, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
-            anchor.content.push(spot);
+        if (this.focused) {
+            anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.05, css: 'rightMenuFocusedDelimiter' });
         }
-        if (this.kind == 2) {
-            let bg = { x: 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' };
-            anchor.content.push(bg);
-            let delimiter = { x: 0, y: itemTop + 1, w: itemWidth, h: 0.005, css: 'rightMenuDelimiterLine' };
-            anchor.content.push(delimiter);
-            let itemLabel = { x: 0.3, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' };
-            anchor.content.push(itemLabel);
-            let spot = { x: 0, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentDragger' };
-            anchor.content.push(spot);
+        else {
+            anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.005, css: 'rightMenuDelimiterLine' });
         }
-        if (this.kind == 4) {
-            let bg = { x: 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' };
-            anchor.content.push(bg);
-            let delimiter = { x: 0, y: itemTop + 2, w: itemWidth, h: 0.005, css: 'rightMenuDelimiterLine' };
-            anchor.content.push(delimiter);
-            let itemLabel = { x: 0.3, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' };
-            anchor.content.push(itemLabel);
-            let spot = { x: 0, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentDragger' };
-            anchor.content.push(spot);
-            let bg2 = { x: itemWidth - 1 + 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemSubActionBG' };
-            anchor.content.push(bg2);
-            let itemLabel2 = { x: itemWidth - 0.5, y: itemTop + 0.65, text: icon_play, css: 'rightMenuButtonLabel' };
-            anchor.content.push(itemLabel2);
-            let itemLabel3 = { x: 0.3 + 1, y: itemTop + 0.7 + 0.55, text: this.label, css: 'rightMenuSubLabel' };
-            anchor.content.push(itemLabel3);
-            let itemLabel4 = { x: 0.3 + 1, y: itemTop + 0.7 + 0.55 + 0.55, text: this.label, css: 'rightMenuSubLabel' };
-            anchor.content.push(itemLabel4);
-            let spot2 = { x: itemWidth - 1, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
-            anchor.content.push(spot2);
+        let spot = { x: this.pad, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
+        if (this.kind == this.kindAction) {
+            anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
         }
+        if (this.kind == this.kindDraggable) {
+            spot.draggable = true;
+            anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+        }
+        if (this.kind == this.kindOpenedFolder) {
+            anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
+            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_movedown, css: 'rightMenuIconLabel' });
+            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+        }
+        if (this.kind == this.kindClosedFolder) {
+            anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
+            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_moveright, css: 'rightMenuIconLabel' });
+            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+        }
+        if (this.kind == this.kindPreview) {
+            spot.draggable = true;
+            anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: itemWidth - 1 + 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemSubActionBG' });
+            anchor.content.push({ x: itemWidth - 0.5, y: itemTop + 0.7, text: icon_play, css: 'rightMenuButtonLabel' });
+            anchor.content.push({ x: itemWidth - 1, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' });
+            anchor.content.push({ x: 0.3 + 1 + this.pad, y: itemTop + 0.7 + 0.55, text: this.label, css: 'rightMenuSubLabel' });
+            anchor.content.push({ x: 0.3 + 1 + this.pad, y: itemTop + 0.7 + 0.55 + 0.55, text: this.label, css: 'rightMenuSubLabel' });
+        }
+        anchor.content.push(spot);
         return anchor;
     }
 }
+let testMenuData = [
+    { text: 'One' },
+    {
+        text: 'Two', children: [{ text: 'One' },
+            { text: 'Two' },
+            { text: 'Orange', focused: true },
+            { text: 'Blue' },
+            { text: 'Green' },
+            {
+                text: 'Brown', children: [{ text: 'One' },
+                    { text: 'Two' },
+                    { text: 'Orange' },
+                    {
+                        text: 'Blue', children: [{ text: 'One' },
+                            { text: 'Two' },
+                            { text: 'Orange' },
+                            { text: 'Blue' },
+                            { text: 'Green' },
+                            {
+                                text: 'Brown', children: [{ text: 'One' },
+                                    { text: 'Two' },
+                                    {
+                                        text: 'Orange', children: [{ text: 'One' },
+                                            { text: 'Two' },
+                                            { text: 'Orange' },
+                                            { text: 'Blue' },
+                                            { text: 'Green' },
+                                            {
+                                                text: 'Brown', children: [{ text: 'One' },
+                                                    { text: 'Two' },
+                                                    { text: 'Orange' },
+                                                    { text: 'Blue' },
+                                                    { text: 'Green' },
+                                                    { text: 'Brown' },
+                                                    { text: 'eleven' }]
+                                            },
+                                            {
+                                                text: 'eleven', children: [{ text: 'One' },
+                                                    { text: 'Two' },
+                                                    { text: 'Orange' },
+                                                    { text: 'Blue' },
+                                                    { text: 'Green' },
+                                                    { text: 'Brown' },
+                                                    { text: 'eleven' }]
+                                            }]
+                                    },
+                                    { text: 'Blue' },
+                                    { text: 'Green' },
+                                    { text: 'Brown' },
+                                    { text: 'eleven' }]
+                            },
+                            {
+                                text: 'eleven', children: [{ text: 'One' },
+                                    { text: 'Two' },
+                                    { text: 'Orange' },
+                                    { text: 'Blue' },
+                                    { text: 'Green' },
+                                    { text: 'Brown' },
+                                    { text: 'eleven' }]
+                            }]
+                    },
+                    { text: 'Green' },
+                    { text: 'Brown' },
+                    { text: 'eleven' }]
+            },
+            {
+                text: 'eleven', children: [{ text: 'One' },
+                    { text: 'Two' },
+                    { text: 'Orange' },
+                    { text: 'Blue' },
+                    { text: 'Green' },
+                    { text: 'Brown' },
+                    { text: 'eleven' }]
+            }]
+    },
+    { text: 'Orange' },
+    { text: 'Blue' },
+    {
+        text: 'Green', focused: true, children: [{ text: 'One' },
+            { text: 'Two' },
+            { text: 'Orange' },
+            { text: 'Blue' },
+            { text: 'Green' },
+            { text: 'Brown' },
+            { text: 'eleven' }]
+    },
+    {
+        text: 'Brown', children: [{ text: 'One' },
+            { text: 'Two' },
+            {
+                text: 'Orange', children: [{ text: 'One' },
+                    { text: 'Two' },
+                    { text: 'Orange' },
+                    { text: 'Blue' },
+                    { text: 'Green' },
+                    {
+                        text: 'Brown', children: [{ text: 'One' },
+                            { text: 'Two' },
+                            { text: 'Orange' },
+                            { text: 'Blue' },
+                            { text: 'Green' },
+                            { text: 'Brown' },
+                            { text: 'eleven' }]
+                    },
+                    {
+                        text: 'eleven', children: [{ text: 'One' },
+                            { text: 'Two' },
+                            { text: 'Orange' },
+                            { text: 'Blue' },
+                            { text: 'Green' },
+                            { text: 'Brown' },
+                            { text: 'eleven' }]
+                    }]
+            },
+            {
+                text: 'Blue', children: [{ text: 'One' },
+                    { text: 'Two' },
+                    { text: 'Orange' },
+                    { text: 'Blue' },
+                    { text: 'Green' },
+                    {
+                        text: 'Brown', children: [{ text: 'One' },
+                            { text: 'Two' },
+                            { text: 'Orange' },
+                            { text: 'Blue' },
+                            { text: 'Green' },
+                            { text: 'Brown' },
+                            { text: 'eleven' }]
+                    },
+                    {
+                        text: 'eleven', children: [{ text: 'One' },
+                            { text: 'Two' },
+                            { text: 'Orange' },
+                            { text: 'Blue' },
+                            { text: 'Green' },
+                            { text: 'Brown' },
+                            { text: 'eleven' }]
+                    }]
+            },
+            { text: 'Green' },
+            { text: 'Brown' },
+            { text: 'eleven' }]
+    },
+    { text: 'eleven' }
+];
 class BarOctave {
 }
 class MixerTrackUI {
@@ -609,6 +790,46 @@ class MixerUI {
         }
         console.log(this.mixerLayer);
         return [this.mixerLayer];
+    }
+}
+class IconLabelButton {
+    constructor(labels, cssBG, cssLabel, action) {
+        this.left = 0;
+        this.top = 0;
+        this.selection = 0;
+        this.labels = labels;
+        this.action = action;
+        this.bg = { x: 0, y: 0, w: 5, h: 5, rx: 0.4, ry: 0.4, css: cssBG };
+        this.spot = {
+            x: 0, y: 0, w: 1, h: 1, css: 'transparentSpot', activation: (x, y) => {
+                this.selection++;
+                if (this.selection > this.labels.length - 1) {
+                    this.selection = 0;
+                }
+                this.label.text = this.labels[this.selection];
+                this.action(this.selection);
+            }
+        };
+        this.label = { x: 0, y: 0, text: this.labels[this.selection], css: cssLabel };
+        this.anchor = {
+            xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+                this.bg,
+                this.label,
+                this.spot
+            ]
+        };
+    }
+    resize(left, top, size) {
+        this.bg.x = left + 0.1;
+        this.bg.y = top + 0.1;
+        this.bg.w = 0.8 * size;
+        this.bg.h = 0.8 * size;
+        this.bg.rx = 0.4 * size;
+        this.bg.ry = 0.4 * size;
+        this.label.x = left + 0.5;
+        this.label.y = top + 1 - 0.31;
+        this.spot.x = left;
+        this.spot.y = top;
     }
 }
 let icon_play = '&#xf3aa;';
