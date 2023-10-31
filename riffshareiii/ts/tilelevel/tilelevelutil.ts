@@ -72,8 +72,8 @@ function vectorFromTouch(touch: Touch): TilePoint {
     };
 }
 function vectorFindCenter(xy1: TilePoint, xy2: TilePoint): TilePoint {
-    let xy: TilePoint = this.vectorAdd(xy1, xy2);
-    return this.vectorScale(xy, 0.5);
+    let xy: TilePoint = vectorAdd(xy1, xy2);
+    return vectorScale(xy, 0.5);
 };
 function vectorAdd(xy1: TilePoint, xy2: TilePoint): TilePoint {
     return {
@@ -88,12 +88,12 @@ function vectorScale(xy: TilePoint, coef: number): TilePoint {
     };
 };
 function vectorDistance(xy1: TilePoint, xy2: TilePoint): number {
-    let xy: TilePoint = this.vectorSubstract(xy1, xy2);
-    let n: number = this.vectorNorm(xy);
+    let xy: TilePoint = vectorSubstract(xy1, xy2);
+    let n: number = vectorNorm(xy);
     return n;
 }
 function vectorNorm(xy: TilePoint): number {
-    return Math.sqrt(this.vectorNormSquared(xy));
+    return Math.sqrt(vectorNormSquared(xy));
 }
 function vectorSubstract(xy1: TilePoint, xy2: TilePoint): TilePoint {
     return {

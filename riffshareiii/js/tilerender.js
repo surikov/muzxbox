@@ -1038,8 +1038,8 @@ function vectorFromTouch(touch) {
     };
 }
 function vectorFindCenter(xy1, xy2) {
-    let xy = this.vectorAdd(xy1, xy2);
-    return this.vectorScale(xy, 0.5);
+    let xy = vectorAdd(xy1, xy2);
+    return vectorScale(xy, 0.5);
 }
 ;
 function vectorAdd(xy1, xy2) {
@@ -1057,12 +1057,12 @@ function vectorScale(xy, coef) {
 }
 ;
 function vectorDistance(xy1, xy2) {
-    let xy = this.vectorSubstract(xy1, xy2);
-    let n = this.vectorNorm(xy);
+    let xy = vectorSubstract(xy1, xy2);
+    let n = vectorNorm(xy);
     return n;
 }
 function vectorNorm(xy) {
-    return Math.sqrt(this.vectorNormSquared(xy));
+    return Math.sqrt(vectorNormSquared(xy));
 }
 function vectorSubstract(xy1, xy2) {
     return {
