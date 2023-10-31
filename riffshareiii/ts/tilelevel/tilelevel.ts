@@ -199,7 +199,7 @@ class TileLevelRealTime implements TileLevelBase {
 		}.bind(this));
 	}*/
     rakeMouseWheel(e: WheelEvent) {
-
+        console.log('rakeMouseWheel');
         this.slidingLockTo = -1;
         e.preventDefault();
         let wheelVal: number = e.deltaY;
@@ -223,7 +223,7 @@ class TileLevelRealTime implements TileLevelBase {
         return false;
     }
     rakeMouseDown(mouseEvent: MouseEvent) {
-        //console.log('rakeMouseDown',this.currentDragTileSVGElement);
+        console.log('rakeMouseDown');
         this.slidingLockTo = -1;
         mouseEvent.preventDefault();
         this.startMouseScreenX = mouseEvent.offsetX;
@@ -240,6 +240,7 @@ class TileLevelRealTime implements TileLevelBase {
         let dY: number = mouseEvent.offsetY - this.startMouseScreenY;
         this.startMouseScreenX = mouseEvent.offsetX;
         this.startMouseScreenY = mouseEvent.offsetY;
+        //console.log('rakeMouseMove', dX, dY, this.startMouseScreenX, this.startMouseScreenY);
         if (this.mouseDownMode) {
 
             // if (this.interMode == this.ModeDragView) {
@@ -264,7 +265,7 @@ class TileLevelRealTime implements TileLevelBase {
         }
     }
     rakeMouseUp(mouseEvent: MouseEvent) {
-
+        console.log('rakeMouseUp');
         if (this.mouseDownMode) {
             //if (this.interMode == this.ModeDragView) {
             this.mouseDownMode = false;
@@ -292,6 +293,7 @@ class TileLevelRealTime implements TileLevelBase {
         }
     }
     rakeTouchStart(touchEvent: TouchEvent) {
+        console.log('rakeTouchStart', touchEvent.touches, this.twoZoom);
         this.slidingLockTo = -1;
         touchEvent.preventDefault();
         this.startedTouch = true;
@@ -310,7 +312,7 @@ class TileLevelRealTime implements TileLevelBase {
         }
     }
     rakeTouchMove(touchEvent: TouchEvent) {
-        //console.log('rakeTouchMove',this.startedTouch,touchEvent.touches,this.twoZoom,this.currentDragItem);
+        //console.log('rakeTouchMove',touchEvent.touches,this.twoZoom);
         touchEvent.preventDefault();
         if (this.startedTouch) {
             if (touchEvent.touches.length < 2) {
@@ -329,7 +331,7 @@ class TileLevelRealTime implements TileLevelBase {
                                 //console.log(this.translateZ,dX,dY,moveX, moveY);
                             }
                             this.startMouseScreenX = touchEvent.touches[0].clientX;
-                        this.startMouseScreenY = touchEvent.touches[0].clientY;
+                            this.startMouseScreenY = touchEvent.touches[0].clientY;
                         }
                     } else {
                         this.translateX = this.translateX + dX * this.translateZ;
