@@ -162,7 +162,6 @@ class TileLevelRealTime {
         this.lastMoveDy = dy;
     }
     rakeMouseWheel(e) {
-        console.log('rakeMouseWheel');
         this.slidingLockTo = -1;
         e.preventDefault();
         let wheelVal = e.deltaY;
@@ -184,7 +183,6 @@ class TileLevelRealTime {
         return false;
     }
     rakeMouseDown(mouseEvent) {
-        console.log('rakeMouseDown');
         this.slidingLockTo = -1;
         mouseEvent.preventDefault();
         this.startMouseScreenX = mouseEvent.offsetX;
@@ -221,7 +219,6 @@ class TileLevelRealTime {
         }
     }
     rakeMouseUp(mouseEvent) {
-        console.log('rakeMouseUp');
         if (this.mouseDownMode) {
             this.mouseDownMode = false;
             mouseEvent.preventDefault();
@@ -249,7 +246,6 @@ class TileLevelRealTime {
         }
     }
     rakeTouchStart(touchEvent) {
-        console.log('rakeTouchStart', touchEvent.touches, this.twoZoom);
         this.slidingLockTo = -1;
         touchEvent.preventDefault();
         this.startedTouch = true;

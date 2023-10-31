@@ -53,8 +53,7 @@ declare class ToolBarButton {
     resize(viewWIdth: number, viewHeight: number): void;
 }
 declare class RightMenuPanel {
-    menuCloseButton: ToolBarButton;
-    menuUpButton: ToolBarButton;
+    menuCloseButton: IconLabelButton;
     showState: boolean;
     lastWidth: number;
     lastHeight: number;
@@ -64,10 +63,13 @@ declare class RightMenuPanel {
     menuPanelBackground: SVGElement;
     menuPanelContent: SVGElement;
     menuPanelInteraction: SVGElement;
+    menuPanelButtons: SVGElement;
     bgLayer: TileLayerDefinition;
     contentLayer: TileLayerDefinition;
     interLayer: TileLayerDefinition;
+    buttonsLayer: TileLayerDefinition;
     interAnchor: TileAnchor;
+    buttonsAnchor: TileAnchor;
     dragHandler: TileRectangle;
     contentAnchor: TileAnchor;
     items: RightMenuItem[];
@@ -85,7 +87,7 @@ declare class RightMenuPanel {
     setOpenState(state: boolean, it: MenuInfo, infos: MenuInfo[]): void;
     fillMenuItemChildren(pad: number, infos: MenuInfo[]): void;
     rerenderContent(): void;
-    resizeMenu(viewWIdth: number, viewHeight: number): void;
+    resizeMenu(viewWidth: number, viewHeight: number): void;
 }
 declare class RightMenuItem {
     label: string;

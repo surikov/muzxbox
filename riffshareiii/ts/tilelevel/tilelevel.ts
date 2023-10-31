@@ -199,7 +199,7 @@ class TileLevelRealTime implements TileLevelBase {
 		}.bind(this));
 	}*/
     rakeMouseWheel(e: WheelEvent) {
-        console.log('rakeMouseWheel');
+        //console.log('rakeMouseWheel');
         this.slidingLockTo = -1;
         e.preventDefault();
         let wheelVal: number = e.deltaY;
@@ -223,7 +223,7 @@ class TileLevelRealTime implements TileLevelBase {
         return false;
     }
     rakeMouseDown(mouseEvent: MouseEvent) {
-        console.log('rakeMouseDown');
+        //console.log('rakeMouseDown');
         this.slidingLockTo = -1;
         mouseEvent.preventDefault();
         this.startMouseScreenX = mouseEvent.offsetX;
@@ -265,7 +265,7 @@ class TileLevelRealTime implements TileLevelBase {
         }
     }
     rakeMouseUp(mouseEvent: MouseEvent) {
-        console.log('rakeMouseUp');
+        //console.log('rakeMouseUp');
         if (this.mouseDownMode) {
             //if (this.interMode == this.ModeDragView) {
             this.mouseDownMode = false;
@@ -293,7 +293,7 @@ class TileLevelRealTime implements TileLevelBase {
         }
     }
     rakeTouchStart(touchEvent: TouchEvent) {
-        console.log('rakeTouchStart', touchEvent.touches, this.twoZoom);
+        //console.log('rakeTouchStart', touchEvent.touches, this.twoZoom);
         this.slidingLockTo = -1;
         touchEvent.preventDefault();
         this.startedTouch = true;

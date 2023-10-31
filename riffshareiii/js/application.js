@@ -299,22 +299,18 @@ class RightMenuPanel {
         this.resetAnchor(this.menuPanelBackground, this.backgroundAnchor, LevelModes.overlay);
         this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
         this.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
+        this.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
     }
     createMenu(resetAnchor) {
         this.resetAnchor = resetAnchor;
         this.menuPanelBackground = document.getElementById("menuPanelBackground");
         this.menuPanelContent = document.getElementById("menuPanelContent");
         this.menuPanelInteraction = document.getElementById("menuPanelInteraction");
+        this.menuPanelButtons = document.getElementById("menuPanelButtons");
         this.backgroundRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'rightMenuPanel' };
         this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
         this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
-        this.menuCloseButton = new ToolBarButton([icon_moveright], 1, 11, (nn) => {
-            console.log('menuCloseButton', nn);
-            this.showState = false;
-            this.resizeMenu(this.lastWidth, this.lastHeight);
-            this.resetAllAnchors();
-        });
-        this.menuUpButton = new ToolBarButton([icon_moveright], 1, 11, (nn) => {
+        this.menuCloseButton = new IconLabelButton([icon_moveright], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
             console.log('menuCloseButton', nn);
             this.showState = false;
             this.resizeMenu(this.lastWidth, this.lastHeight);
@@ -331,15 +327,22 @@ class RightMenuPanel {
         };
         this.interAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-                this.dragHandler, this.menuCloseButton.iconLabelButton.anchor
+                this.dragHandler
             ], id: 'rightMenuInteractionAnchor'
+        };
+        this.buttonsAnchor = {
+            xx: 0, yy: 111, ww: 111, hh: 0, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+                this.menuCloseButton.anchor
+            ]
         };
         this.bgLayer = { g: this.menuPanelBackground, anchors: [this.backgroundAnchor], mode: LevelModes.overlay };
         this.contentLayer = { g: this.menuPanelContent, anchors: [this.contentAnchor], mode: LevelModes.overlay };
         this.interLayer = { g: this.menuPanelInteraction, anchors: [this.interAnchor], mode: LevelModes.overlay };
+        this.buttonsLayer = { g: this.menuPanelButtons, anchors: [this.buttonsAnchor], mode: LevelModes.overlay };
         return [this.bgLayer,
             this.interLayer,
-            this.contentLayer
+            this.contentLayer,
+            this.buttonsLayer
         ];
     }
     scrollListing(dx, dy) {
@@ -429,22 +432,20 @@ class RightMenuPanel {
         }
         this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
-    resizeMenu(viewWIdth, viewHeight) {
-        this.lastWidth = viewWIdth;
+    resizeMenu(viewWidth, viewHeight) {
+        this.lastWidth = viewWidth;
         this.lastHeight = viewHeight;
-        this.itemsWidth = viewWIdth - 1;
+        this.itemsWidth = viewWidth - 1;
         if (this.itemsWidth > 9)
             this.itemsWidth = 9;
         if (this.itemsWidth < 2) {
             this.itemsWidth = 2;
         }
-        this.shiftX = viewWIdth - this.itemsWidth;
+        this.shiftX = viewWidth - this.itemsWidth;
         if (!this.showState) {
-            this.shiftX = viewWIdth + 1;
-            this.menuCloseButton.position = -11;
+            this.shiftX = viewWidth + 1;
         }
         else {
-            this.menuCloseButton.position = 0;
         }
         let shn = 0.05;
         this.listingShadow.x = this.shiftX - shn;
@@ -457,7 +458,7 @@ class RightMenuPanel {
         this.backgroundRectangle.h = viewHeight;
         this.backgroundAnchor.xx = 0;
         this.backgroundAnchor.yy = 0;
-        this.backgroundAnchor.ww = viewWIdth;
+        this.backgroundAnchor.ww = viewWidth;
         this.backgroundAnchor.hh = viewHeight;
         this.dragHandler.x = this.shiftX;
         this.dragHandler.y = 0;
@@ -465,14 +466,18 @@ class RightMenuPanel {
         this.dragHandler.h = viewHeight;
         this.interAnchor.xx = 0;
         this.interAnchor.yy = 0;
-        this.interAnchor.ww = viewWIdth;
+        this.interAnchor.ww = viewWidth;
         this.interAnchor.hh = viewHeight;
+        this.buttonsAnchor.xx = 0;
+        this.buttonsAnchor.yy = 0;
+        this.buttonsAnchor.ww = viewWidth;
+        this.buttonsAnchor.hh = viewHeight;
         this.contentAnchor.xx = 0;
         this.contentAnchor.yy = 0;
-        this.contentAnchor.ww = viewWIdth;
+        this.contentAnchor.ww = viewWidth;
         this.contentAnchor.hh = viewHeight;
         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
-        this.menuCloseButton.resize(viewWIdth, viewHeight);
+        this.menuCloseButton.resize(this.shiftX + this.itemsWidth - 1, viewHeight - 1, 1);
         this.rerenderContent();
     }
 }

@@ -287,3 +287,19 @@ body {
 	font-family: "Material-Design-Iconic-Font";
 }
 
+
+.menuButtonCircle {
+    fill: var(--color-interactive);
+	stroke: var(--color-text);
+    stroke-width: 0.01cm;
+}
+
+.menuButtonLabel {
+    fill: var(--color-text);
+    text-anchor: middle;
+    alignment-baseline222: middle;
+    font-size: 0.5cm;
+    pointer-events2: none;
+	
+	font-family: "Material-Design-Iconic-Font";
+}

@@ -1,6 +1,6 @@
 class RightMenuPanel {
-    menuCloseButton: ToolBarButton;
-    menuUpButton: ToolBarButton;
+    menuCloseButton: IconLabelButton;
+    //menuUpButton: ToolBarButton;
     showState: boolean = false;
     lastWidth: number = 0;
     lastHeight: number = 0;
@@ -12,12 +12,15 @@ class RightMenuPanel {
     menuPanelBackground: SVGElement;
     menuPanelContent: SVGElement;
     menuPanelInteraction: SVGElement;
+    menuPanelButtons: SVGElement;
 
     bgLayer: TileLayerDefinition;
     contentLayer: TileLayerDefinition;
     interLayer: TileLayerDefinition;
+    buttonsLayer: TileLayerDefinition;
 
     interAnchor: TileAnchor;
+    buttonsAnchor: TileAnchor;
     dragHandler: TileRectangle;
 
     contentAnchor: TileAnchor;
@@ -37,6 +40,7 @@ class RightMenuPanel {
         this.resetAnchor(this.menuPanelBackground, this.backgroundAnchor, LevelModes.overlay);
         this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
         this.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
+        this.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
     }
 
     createMenu(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void): TileLayerDefinition[] {
@@ -46,6 +50,7 @@ class RightMenuPanel {
         this.menuPanelBackground = (document.getElementById("menuPanelBackground") as any) as SVGElement;
         this.menuPanelContent = (document.getElementById("menuPanelContent") as any) as SVGElement;
         this.menuPanelInteraction = (document.getElementById("menuPanelInteraction") as any) as SVGElement;
+        this.menuPanelButtons = (document.getElementById("menuPanelButtons") as any) as SVGElement;
 
         this.backgroundRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'rightMenuPanel' };
 
@@ -53,18 +58,18 @@ class RightMenuPanel {
         this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
 
         this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
-        this.menuCloseButton = new ToolBarButton([icon_moveright], 1, 11, (nn: number) => {
+        this.menuCloseButton = new IconLabelButton([icon_moveright], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
             console.log('menuCloseButton', nn);
             this.showState = false;
             this.resizeMenu(this.lastWidth, this.lastHeight);
             this.resetAllAnchors();
         });
-        this.menuUpButton = new ToolBarButton([icon_moveright], 1, 11, (nn: number) => {
+        /*this.menuUpButton = new ToolBarButton([icon_moveright], 1, 11, (nn: number) => {
             console.log('menuCloseButton', nn);
             this.showState = false;
             this.resizeMenu(this.lastWidth, this.lastHeight);
             this.resetAllAnchors();
-        });
+        });*/
         this.backgroundAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
                 this.listingShadow
@@ -79,16 +84,23 @@ class RightMenuPanel {
         };
         this.interAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-                this.dragHandler, this.menuCloseButton.iconLabelButton.anchor
+                this.dragHandler
             ], id: 'rightMenuInteractionAnchor'
+        };
+        this.buttonsAnchor = {
+            xx: 0, yy: 111, ww: 111, hh: 0, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+                this.menuCloseButton.anchor
+            ]
         };
         this.bgLayer = { g: this.menuPanelBackground, anchors: [this.backgroundAnchor], mode: LevelModes.overlay };
         this.contentLayer = { g: this.menuPanelContent, anchors: [this.contentAnchor], mode: LevelModes.overlay };
         this.interLayer = { g: this.menuPanelInteraction, anchors: [this.interAnchor], mode: LevelModes.overlay };
+        this.buttonsLayer = { g: this.menuPanelButtons, anchors: [this.buttonsAnchor], mode: LevelModes.overlay };
+        //console.log(this.buttonsLayer);
         return [this.bgLayer
             , this.interLayer
             , this.contentLayer
-
+            , this.buttonsLayer
         ];
     }
     scrollListing(dx: number, dy: number) {
@@ -150,7 +162,7 @@ class RightMenuPanel {
         }
         it.focused = true;
     }
-    setOpenState(state:boolean,it: MenuInfo, infos: MenuInfo[]) {
+    setOpenState(state: boolean, it: MenuInfo, infos: MenuInfo[]) {
         for (let ii = 0; ii < infos.length; ii++) {
             infos[ii].opened = false;
             infos[ii].focused = false;
@@ -170,7 +182,7 @@ class RightMenuPanel {
                     this.items.push(new RightMenuItem().initOpenedFolderItem(pad, focused, it.text, () => {
                         console.log("close " + ii);
                         //it.opened = false;
-                        me.setOpenState(false,it, infos);
+                        me.setOpenState(false, it, infos);
                         me.rerenderContent();
                     }));
                     this.fillMenuItemChildren(pad + 0.5, children);
@@ -178,7 +190,7 @@ class RightMenuPanel {
                     this.items.push(new RightMenuItem().initClosedFolderItem(pad, focused, it.text, () => {
                         console.log("open " + ii);
                         //it.opened = true;
-                        me.setOpenState(true,it, infos);
+                        me.setOpenState(true, it, infos);
                         me.rerenderContent();
                         //me.fillMenu();
                         //me.resetAnchor(me.menuPanelContent, me.contentAnchor, LevelModes.overlay);
@@ -210,21 +222,21 @@ class RightMenuPanel {
 
         this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
-    resizeMenu(viewWIdth: number, viewHeight: number) {
+    resizeMenu(viewWidth: number, viewHeight: number) {
         //console.log('resizeMenu', viewWIdth, viewHeight, this.showState);
-        this.lastWidth = viewWIdth;
+        this.lastWidth = viewWidth;
         this.lastHeight = viewHeight;
-        this.itemsWidth = viewWIdth - 1;
+        this.itemsWidth = viewWidth - 1;
         if (this.itemsWidth > 9) this.itemsWidth = 9;
         if (this.itemsWidth < 2) {
             this.itemsWidth = 2;
         }
-        this.shiftX = viewWIdth - this.itemsWidth;
+        this.shiftX = viewWidth - this.itemsWidth;
         if (!this.showState) {
-            this.shiftX = viewWIdth + 1;
-            this.menuCloseButton.position = -11;
+            this.shiftX = viewWidth + 1;
+            //this.menuCloseButton.position = -11;
         } else {
-            this.menuCloseButton.position = 0;
+            //this.menuCloseButton.position = 0;
         }
 
         let shn = 0.05;
@@ -241,7 +253,7 @@ class RightMenuPanel {
 
         this.backgroundAnchor.xx = 0;
         this.backgroundAnchor.yy = 0;
-        this.backgroundAnchor.ww = viewWIdth;
+        this.backgroundAnchor.ww = viewWidth;
         this.backgroundAnchor.hh = viewHeight;
 
 
@@ -253,17 +265,22 @@ class RightMenuPanel {
 
         this.interAnchor.xx = 0;
         this.interAnchor.yy = 0;
-        this.interAnchor.ww = viewWIdth;
+        this.interAnchor.ww = viewWidth;
         this.interAnchor.hh = viewHeight;
+
+        this.buttonsAnchor.xx = 0;
+        this.buttonsAnchor.yy = 0;
+        this.buttonsAnchor.ww = viewWidth;
+        this.buttonsAnchor.hh = viewHeight;
 
         this.contentAnchor.xx = 0;
         this.contentAnchor.yy = 0;
-        this.contentAnchor.ww = viewWIdth;
+        this.contentAnchor.ww = viewWidth;
         this.contentAnchor.hh = viewHeight;
 
         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
 
-        this.menuCloseButton.resize(viewWIdth, viewHeight);
+        this.menuCloseButton.resize(this.shiftX+this.itemsWidth-1, viewHeight-1,1);
 
         //console.log(this.dragHandler);
         this.rerenderContent();
