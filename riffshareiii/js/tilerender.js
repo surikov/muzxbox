@@ -265,7 +265,6 @@ class TileLevelRealTime {
         }
     }
     rakeTouchMove(touchEvent) {
-        console.log('rakeTouchMove');
         touchEvent.preventDefault();
         if (this.startedTouch) {
             if (touchEvent.touches.length < 2) {
@@ -274,13 +273,26 @@ class TileLevelRealTime {
                 else {
                     let dX = touchEvent.touches[0].clientX - this.startMouseScreenX;
                     let dY = touchEvent.touches[0].clientY - this.startMouseScreenY;
-                    this.translateX = this.translateX + dX * this.translateZ;
-                    this.translateY = this.translateY + dY * this.translateZ;
-                    this.startMouseScreenX = touchEvent.touches[0].clientX;
-                    this.startMouseScreenY = touchEvent.touches[0].clientY;
-                    this.applyZoomPosition();
-                    this.adjustContentPosition();
-                    this.onMove(dX, dY);
+                    if (this.currentDragItem) {
+                        if (dX != 0 || dY != 0) {
+                            let moveX = this.translateZ * dX / this.tapSize;
+                            let moveY = this.translateZ * dY / this.tapSize;
+                            if (this.currentDragItem.activation) {
+                                this.currentDragItem.activation(moveX, moveY);
+                            }
+                            this.startMouseScreenX = touchEvent.touches[0].clientX;
+                            this.startMouseScreenY = touchEvent.touches[0].clientY;
+                        }
+                    }
+                    else {
+                        this.translateX = this.translateX + dX * this.translateZ;
+                        this.translateY = this.translateY + dY * this.translateZ;
+                        this.startMouseScreenX = touchEvent.touches[0].clientX;
+                        this.startMouseScreenY = touchEvent.touches[0].clientY;
+                        this.applyZoomPosition();
+                        this.adjustContentPosition();
+                        this.onMove(dX, dY);
+                    }
                     return;
                 }
             }
@@ -320,22 +332,29 @@ class TileLevelRealTime {
     }
     rakeTouchEnd(touchEvent) {
         touchEvent.preventDefault();
-        this.currentDragItem = null;
         this.allTilesOK = false;
         if (!this.twoZoom) {
             if (touchEvent.touches.length < 2) {
                 this.cancelDragZoom();
                 this.waitViewClickAction = false;
                 if (this.startedTouch) {
-                    let diffX = Math.abs(this.clickX - this.startMouseScreenX);
-                    let diffY = Math.abs(this.clickY - this.startMouseScreenY);
-                    if (diffX < this.clickLimit && diffY < this.clickLimit) {
-                        this.waitViewClickAction = true;
-                        this.slideToContentPosition();
+                    if (this.currentDragItem) {
+                        if (this.currentDragItem.activation) {
+                            this.currentDragItem.activation(0, 0);
+                        }
+                        this.currentDragItem = null;
                     }
                     else {
-                        this.waitViewClickAction = false;
-                        this.slideToContentPosition();
+                        let diffX = Math.abs(this.clickX - this.startMouseScreenX);
+                        let diffY = Math.abs(this.clickY - this.startMouseScreenY);
+                        if (diffX < this.clickLimit && diffY < this.clickLimit) {
+                            this.waitViewClickAction = true;
+                            this.slideToContentPosition();
+                        }
+                        else {
+                            this.waitViewClickAction = false;
+                            this.slideToContentPosition();
+                        }
                     }
                 }
                 else {

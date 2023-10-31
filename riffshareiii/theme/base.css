@@ -47,7 +47,7 @@
 
     --color-paper: #def;
     --color-textline: #332244;
-    --color-debug: #800;
+    
     --color-green: #080;
     --color-blue: #008;
     --color-cyan: #088;
@@ -55,6 +55,8 @@
     --color-yellow: #880;
 	*/
 
+    --color-debug: #800;
+    
 	--color-shadow: #00000066;
 
     --color-background: #000609ff;

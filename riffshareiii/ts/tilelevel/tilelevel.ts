@@ -187,6 +187,7 @@ class TileLevelRealTime implements TileLevelBase {
         }.bind(this));
     }
     onMove(dx: number, dy: number) {
+        //console.log('onMove',dx,dy);
         this.lastMoveDx = dx;
         this.lastMoveDy = dy;
         //this.lastMoveDt = Date.now();
@@ -250,6 +251,7 @@ class TileLevelRealTime implements TileLevelBase {
                     let moveY = this.translateZ * dY / this.tapSize;
                     if (this.currentDragItem.activation) {
                         this.currentDragItem.activation(moveX, moveY);
+                        //console.log(this.translateZ,dX,dY,moveX, moveY);
                     }
                 }
             } else {
@@ -308,7 +310,7 @@ class TileLevelRealTime implements TileLevelBase {
         }
     }
     rakeTouchMove(touchEvent: TouchEvent) {
-        console.log('rakeTouchMove');
+        //console.log('rakeTouchMove',this.startedTouch,touchEvent.touches,this.twoZoom,this.currentDragItem);
         touchEvent.preventDefault();
         if (this.startedTouch) {
             if (touchEvent.touches.length < 2) {
@@ -317,13 +319,27 @@ class TileLevelRealTime implements TileLevelBase {
                 } else {
                     let dX: number = touchEvent.touches[0].clientX - this.startMouseScreenX;
                     let dY: number = touchEvent.touches[0].clientY - this.startMouseScreenY;
-                    this.translateX = this.translateX + dX * this.translateZ;
-                    this.translateY = this.translateY + dY * this.translateZ;
-                    this.startMouseScreenX = touchEvent.touches[0].clientX;
-                    this.startMouseScreenY = touchEvent.touches[0].clientY;
-                    this.applyZoomPosition();
-                    this.adjustContentPosition();
-                    this.onMove(dX, dY);
+                    if (this.currentDragItem) {
+                        if (dX != 0 || dY != 0) {
+                            //console.log('rakeMouseMove', dX, dY, this.startMouseScreenX, this.startMouseScreenY);
+                            let moveX = this.translateZ * dX / this.tapSize;
+                            let moveY = this.translateZ * dY / this.tapSize;
+                            if (this.currentDragItem.activation) {
+                                this.currentDragItem.activation(moveX, moveY);
+                                //console.log(this.translateZ,dX,dY,moveX, moveY);
+                            }
+                            this.startMouseScreenX = touchEvent.touches[0].clientX;
+                        this.startMouseScreenY = touchEvent.touches[0].clientY;
+                        }
+                    } else {
+                        this.translateX = this.translateX + dX * this.translateZ;
+                        this.translateY = this.translateY + dY * this.translateZ;
+                        this.startMouseScreenX = touchEvent.touches[0].clientX;
+                        this.startMouseScreenY = touchEvent.touches[0].clientY;
+                        this.applyZoomPosition();
+                        this.adjustContentPosition();
+                        this.onMove(dX, dY);
+                    }
                     return;
                 }
             } else {
@@ -362,21 +378,28 @@ class TileLevelRealTime implements TileLevelBase {
     }
     rakeTouchEnd(touchEvent: TouchEvent) {
         touchEvent.preventDefault();
-        this.currentDragItem = null;
+        //this.currentDragItem = null;
         this.allTilesOK = false;
         if (!this.twoZoom) {
             if (touchEvent.touches.length < 2) {
                 this.cancelDragZoom();
                 this.waitViewClickAction = false;
                 if (this.startedTouch) {
-                    let diffX = Math.abs(this.clickX - this.startMouseScreenX);
-                    let diffY = Math.abs(this.clickY - this.startMouseScreenY);
-                    if (diffX < this.clickLimit && diffY < this.clickLimit) {
-                        this.waitViewClickAction = true;
-                        this.slideToContentPosition();
+                    if (this.currentDragItem) {
+                        if (this.currentDragItem.activation) {
+                            this.currentDragItem.activation(0, 0);
+                        }
+                        this.currentDragItem = null;
                     } else {
-                        this.waitViewClickAction = false;
-                        this.slideToContentPosition();
+                        let diffX = Math.abs(this.clickX - this.startMouseScreenX);
+                        let diffY = Math.abs(this.clickY - this.startMouseScreenY);
+                        if (diffX < this.clickLimit && diffY < this.clickLimit) {
+                            this.waitViewClickAction = true;
+                            this.slideToContentPosition();
+                        } else {
+                            this.waitViewClickAction = false;
+                            this.slideToContentPosition();
+                        }
                     }
                 } else {
                     //console.log('touch ended already');
@@ -719,15 +742,15 @@ class TileLevelRealTime implements TileLevelBase {
                     let a: TileAnchor = arr[i];
                     this.addGroupTile(svggroup,
                         a, this.model[k].mode
-                        );
+                    );
                 }
             }
         }
         this.allTilesOK = true;
     }
-    addGroupTile(parentSVGElement: SVGElement, anchor: TileAnchor,layerMode:LevelModes
+    addGroupTile(parentSVGElement: SVGElement, anchor: TileAnchor, layerMode: LevelModes
         //, layer: TileLayerDefinition
-        ) {
+    ) {
         //if(anchor.id=='listingAnchor'){console.log('addGroupTile',anchor.translation);}
         let x: number = -this.translateX;
         let y: number = -this.translateY;
@@ -832,8 +855,8 @@ class TileLevelRealTime implements TileLevelBase {
     }
     addElement(gg: SVGElement, dd: TileItem
         //, layer: TileLayerDefinition
-        ,layerMode:LevelModes
-        ) {
+        , layerMode: LevelModes
+    ) {
         let element: TileSVGElement | null = null;
         if (isTileRectangle(dd)) {
             element = tileRectangle(this.svgns, this.tapSize, gg, dd.x * this.tapSize, dd.y * this.tapSize
@@ -841,8 +864,8 @@ class TileLevelRealTime implements TileLevelBase {
                 , (dd.rx ? dd.rx : 0) * this.tapSize, (dd.ry ? dd.ry : 0) * this.tapSize
                 //, dd.image
                 , (dd.css ? dd.css : '')
-				, (dd.style ? dd.style : '')
-				);
+                , (dd.style ? dd.style : '')
+            );
         }
         if (isTileImage(dd)) {
             element = tileImage(this.svgns, this.tapSize, gg, dd.x * this.tapSize, dd.y * this.tapSize
@@ -945,8 +968,8 @@ class TileLevelRealTime implements TileLevelBase {
     }
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor
         //, layer: TileLayerDefinition
-        ,layerMode:LevelModes
-        ) {
+        , layerMode: LevelModes
+    ) {
         var gid: string = anchor.id ? anchor.id : '';
         let existedSVGchild: SVGElement | null = this.groupChildWithID(parentSVGGroup, gid);
         if (existedSVGchild) {
@@ -958,8 +981,8 @@ class TileLevelRealTime implements TileLevelBase {
     }
     delayedResetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor
         //, layer: TileLayerDefinition
-        ,layerMode:LevelModes
-        ) {
+        , layerMode: LevelModes
+    ) {
         //let gg = (document.getElementById('' + parentAnchor.id) as any) as SVGElement;
         //if (gg) {
         //let parentSVGGroup: SVGElement = (gg as any) as SVGElement;
