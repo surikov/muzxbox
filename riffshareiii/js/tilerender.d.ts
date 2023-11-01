@@ -42,6 +42,7 @@ declare class TileLevelRealTime implements TileLevelBase {
     lastMoveDy: number;
     mouseDownMode: boolean;
     currentDragItem: null | TileItem;
+    interactor: TileInteraction;
     allTilesOK: boolean;
     translateZ: number;
     translateX: number;
@@ -56,16 +57,6 @@ declare class TileLevelRealTime implements TileLevelBase {
     setupTapSize(baseSize: number): void;
     onAfterResize(): void;
     onMove(dx: number, dy: number): void;
-    rakeMouseWheel(e: WheelEvent): boolean;
-    rakeMouseDown(mouseEvent: MouseEvent): void;
-    rakeMouseMove(mouseEvent: MouseEvent): void;
-    rakeMouseUp(mouseEvent: MouseEvent): void;
-    rakeTouchStart(touchEvent: TouchEvent): void;
-    rakeTouchMove(touchEvent: TouchEvent): void;
-    rakeTouchEnd(touchEvent: TouchEvent): void;
-    startDragNDrop(): void;
-    startDragZoom(): void;
-    cancelDragZoom(): void;
     applyZoomPosition(): void;
     checkAfterZoom(): void;
     slideToContentPosition(): void;
@@ -91,7 +82,6 @@ declare class TileLevelRealTime implements TileLevelBase {
     addElement(gg: SVGElement, dd: TileItem, layerMode: LevelModes): void;
     clearAllDetails(): void;
     clearGroupDetails(group: SVGElement): void;
-    autoID(definition: (TileAnchor | TileRectangle | TileText | TilePath | TileLine | TilePolygon)[]): void;
     setModel(layers: TileLayerDefinition[]): void;
     resetModel(): void;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
@@ -129,6 +119,20 @@ declare function vectorDistance(xy1: TilePoint, xy2: TilePoint): number;
 declare function vectorNorm(xy: TilePoint): number;
 declare function vectorSubstract(xy1: TilePoint, xy2: TilePoint): TilePoint;
 declare function vectorNormSquared(xy: TilePoint): number;
+declare class TileInteraction {
+    tiler: TileLevelRealTime;
+    constructor(parenttiler: TileLevelRealTime);
+    rakeMouseWheel(e: WheelEvent): boolean;
+    rakeMouseDown(mouseEvent: MouseEvent): void;
+    rakeMouseMove(mouseEvent: MouseEvent): void;
+    rakeMouseUp(mouseEvent: MouseEvent): void;
+    rakeTouchStart(touchEvent: TouchEvent): void;
+    rakeTouchMove(touchEvent: TouchEvent): void;
+    rakeTouchEnd(touchEvent: TouchEvent): void;
+    startDragNDrop(): void;
+    startDragZoom(): void;
+    cancelDragZoom(): void;
+}
 declare function tileLine(svgns: string, tapSize: number, g: SVGElement, x1: number, y1: number, x2: number, y2: number, cssClass: string | undefined): TileSVGElement;
 declare function tilePath(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, z: number, data: string, cssClass: string): TileSVGElement;
 declare function tilePolygon(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, z: number | undefined, dots: number[], cssClass: string | undefined): TileSVGElement;

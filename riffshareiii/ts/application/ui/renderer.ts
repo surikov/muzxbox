@@ -70,16 +70,16 @@ class UIRenderer {//} implements RenderedPart {
 			, false
 			, 1
 			, 1
-			, 0.25, 4, 256 - 1
+			, 0.25, 0.26, 256 - 1
 			, layers);
 		this.tiler.setAfterZoomCallback(() => {
-			//console.log('afterZoomCallback', this.tileRenderer.getCurrentPointPosition());
+			//console.log('afterZoomCallback', this.tiler.getCurrentPointPosition());
 			if(this.menu){
 				this.menu.lastZ=this.tiler.getCurrentPointPosition().z;
 			}
 		});
 		this.tiler.setAfterResizeCallback(() => {
-			//console.log('afterResizeCallback',this.tileRenderer.getCurrentPointPosition()) ;
+			//console.log('afterResizeCallback',this.tiler.getCurrentPointPosition()) ;
 
 			this.onReSizeView();
 		});

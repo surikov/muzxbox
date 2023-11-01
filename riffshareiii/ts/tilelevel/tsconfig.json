@@ -25,7 +25,7 @@
         "./TileLevel.ts",
         "./shortnames.ts",
         "./tilelevelutil.ts",
-		
+		"./tileinteraction.ts",
         "./tileline.ts"
 		,"./tilepath.ts"
         ,"./tilepolygon.ts"

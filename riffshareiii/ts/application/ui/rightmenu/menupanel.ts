@@ -37,6 +37,7 @@ class RightMenuPanel {
     resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void;
 
     resetAllAnchors() {
+        
         this.resetAnchor(this.menuPanelBackground, this.backgroundAnchor, LevelModes.overlay);
         this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
         this.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
@@ -44,7 +45,8 @@ class RightMenuPanel {
     }
 
     createMenu(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void): TileLayerDefinition[] {
-
+console.log('createMenu');
+       
         this.resetAnchor = resetAnchor;
 
         this.menuPanelBackground = (document.getElementById("menuPanelBackground") as any) as SVGElement;
@@ -104,7 +106,7 @@ class RightMenuPanel {
         ];
     }
     scrollListing(dx: number, dy: number) {
-        //console.log('scrollListing', dx, dy,this.lastZ);
+        console.log('scrollListing', dx, dy,this.lastZ);
         let yy = this.scrollY + dy / this.lastZ;
 
         let itemsH = 0;//1 * this.items.length;
@@ -210,6 +212,7 @@ class RightMenuPanel {
         }
     }
     rerenderContent() {
+        console.log('rerenderContent');
         this.contentAnchor.content = [];
         this.fillMenuItems();
 
@@ -223,7 +226,7 @@ class RightMenuPanel {
         this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
     resizeMenu(viewWidth: number, viewHeight: number) {
-        //console.log('resizeMenu', viewWIdth, viewHeight, this.showState);
+        console.log('resizeMenu', viewWidth, viewHeight, this.showState);
         this.lastWidth = viewWidth;
         this.lastHeight = viewHeight;
         this.itemsWidth = viewWidth - 1;

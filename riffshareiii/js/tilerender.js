@@ -42,6 +42,7 @@ class TileLevelRealTime {
         this.lastMoveDy = 0;
         this.mouseDownMode = false;
         this.currentDragItem = null;
+        this.interactor = new TileInteraction(this);
     }
     get allTilesOK() {
         return this._allTilesOK;
@@ -116,13 +117,13 @@ class TileLevelRealTime {
         this.mx = maxZoom;
         this.mn = minZoom;
         this.translateZ = curZoom;
-        this.svg.addEventListener("wheel", this.rakeMouseWheel.bind(this), { capture: false, passive: false });
-        this.svg.addEventListener("touchstart", this.rakeTouchStart.bind(this), { capture: true, passive: false });
-        this.svg.addEventListener("touchmove", this.rakeTouchMove.bind(this), { capture: true, passive: false });
-        this.svg.addEventListener("touchend", this.rakeTouchEnd.bind(this), { capture: true, passive: false });
-        this.svg.addEventListener('mousedown', this.rakeMouseDown.bind(this), { capture: false, passive: false });
-        this.svg.addEventListener('mousemove', this.rakeMouseMove.bind(this), { capture: false, passive: false });
-        this.svg.addEventListener('mouseup', this.rakeMouseUp.bind(this), { capture: false, passive: false });
+        this.svg.addEventListener("wheel", this.interactor.rakeMouseWheel.bind(this.interactor), { capture: false, passive: false });
+        this.svg.addEventListener("touchstart", this.interactor.rakeTouchStart.bind(this.interactor), { capture: true, passive: false });
+        this.svg.addEventListener("touchmove", this.interactor.rakeTouchMove.bind(this.interactor), { capture: true, passive: false });
+        this.svg.addEventListener("touchend", this.interactor.rakeTouchEnd.bind(this.interactor), { capture: true, passive: false });
+        this.svg.addEventListener('mousedown', this.interactor.rakeMouseDown.bind(this.interactor), { capture: false, passive: false });
+        this.svg.addEventListener('mousemove', this.interactor.rakeMouseMove.bind(this.interactor), { capture: false, passive: false });
+        this.svg.addEventListener('mouseup', this.interactor.rakeMouseUp.bind(this.interactor), { capture: false, passive: false });
         window.addEventListener('resize', this.onAfterResize.bind(this));
         this.setModel(layers);
         this.startLoop();
@@ -161,224 +162,6 @@ class TileLevelRealTime {
         this.lastMoveDx = dx;
         this.lastMoveDy = dy;
     }
-    rakeMouseWheel(e) {
-        this.slidingLockTo = -1;
-        e.preventDefault();
-        let wheelVal = e.deltaY;
-        let min = Math.min(1, wheelVal);
-        let delta = Math.max(-1, min);
-        let zoom = this.translateZ + delta * (this.translateZ) * 0.05;
-        if (zoom < this.minZoom()) {
-            zoom = this.minZoom();
-        }
-        if (zoom > this.maxZoom()) {
-            zoom = this.maxZoom();
-        }
-        this.translateX = this.translateX - (this.translateZ - zoom) * e.offsetX;
-        this.translateY = this.translateY - (this.translateZ - zoom) * e.offsetY;
-        this.translateZ = zoom;
-        this.applyZoomPosition();
-        this.adjustContentPosition();
-        this.allTilesOK = false;
-        return false;
-    }
-    rakeMouseDown(mouseEvent) {
-        this.slidingLockTo = -1;
-        mouseEvent.preventDefault();
-        this.startMouseScreenX = mouseEvent.offsetX;
-        this.startMouseScreenY = mouseEvent.offsetY;
-        this.mouseDownMode = true;
-        this.clickX = this.startMouseScreenX;
-        this.clickY = this.startMouseScreenY;
-        this.waitViewClickAction = false;
-        this.startDragZoom();
-    }
-    rakeMouseMove(mouseEvent) {
-        let dX = mouseEvent.offsetX - this.startMouseScreenX;
-        let dY = mouseEvent.offsetY - this.startMouseScreenY;
-        this.startMouseScreenX = mouseEvent.offsetX;
-        this.startMouseScreenY = mouseEvent.offsetY;
-        if (this.mouseDownMode) {
-            mouseEvent.preventDefault();
-            if (this.currentDragItem) {
-                if (dX != 0 || dY != 0) {
-                    let moveX = this.translateZ * dX / this.tapSize;
-                    let moveY = this.translateZ * dY / this.tapSize;
-                    if (this.currentDragItem.activation) {
-                        this.currentDragItem.activation(moveX, moveY);
-                    }
-                }
-            }
-            else {
-                this.translateX = this.translateX + dX * this.translateZ;
-                this.translateY = this.translateY + dY * this.translateZ;
-                this.applyZoomPosition();
-                this.adjustContentPosition();
-                this.onMove(dX, dY);
-            }
-        }
-    }
-    rakeMouseUp(mouseEvent) {
-        if (this.mouseDownMode) {
-            this.mouseDownMode = false;
-            mouseEvent.preventDefault();
-            this.cancelDragZoom();
-            this.waitViewClickAction = false;
-            if (this.currentDragItem) {
-                if (this.currentDragItem.activation) {
-                    this.currentDragItem.activation(0, 0);
-                }
-                this.currentDragItem = null;
-            }
-            else {
-                let diffX = Math.abs(this.clickX - this.startMouseScreenX);
-                let diffY = Math.abs(this.clickY - this.startMouseScreenY);
-                if (diffX < this.clickLimit && diffY < this.clickLimit) {
-                    this.waitViewClickAction = true;
-                    this.slideToContentPosition();
-                    this.allTilesOK = false;
-                }
-                else {
-                    this.slideToContentPosition();
-                    this.allTilesOK = false;
-                }
-            }
-        }
-    }
-    rakeTouchStart(touchEvent) {
-        this.slidingLockTo = -1;
-        touchEvent.preventDefault();
-        this.startedTouch = true;
-        this.waitViewClickAction = false;
-        if (touchEvent.touches.length < 2) {
-            this.twoZoom = false;
-            this.startMouseScreenX = touchEvent.touches[0].clientX;
-            this.startMouseScreenY = touchEvent.touches[0].clientY;
-            this.clickX = this.startMouseScreenX;
-            this.clickY = this.startMouseScreenY;
-            this.twodistance = 0;
-            this.startDragZoom();
-            return;
-        }
-        else {
-            this.startTouchZoom(touchEvent);
-        }
-    }
-    rakeTouchMove(touchEvent) {
-        touchEvent.preventDefault();
-        if (this.startedTouch) {
-            if (touchEvent.touches.length < 2) {
-                if (this.twoZoom) {
-                }
-                else {
-                    let dX = touchEvent.touches[0].clientX - this.startMouseScreenX;
-                    let dY = touchEvent.touches[0].clientY - this.startMouseScreenY;
-                    if (this.currentDragItem) {
-                        if (dX != 0 || dY != 0) {
-                            let moveX = this.translateZ * dX / this.tapSize;
-                            let moveY = this.translateZ * dY / this.tapSize;
-                            if (this.currentDragItem.activation) {
-                                this.currentDragItem.activation(moveX, moveY);
-                            }
-                            this.startMouseScreenX = touchEvent.touches[0].clientX;
-                            this.startMouseScreenY = touchEvent.touches[0].clientY;
-                        }
-                    }
-                    else {
-                        this.translateX = this.translateX + dX * this.translateZ;
-                        this.translateY = this.translateY + dY * this.translateZ;
-                        this.startMouseScreenX = touchEvent.touches[0].clientX;
-                        this.startMouseScreenY = touchEvent.touches[0].clientY;
-                        this.applyZoomPosition();
-                        this.adjustContentPosition();
-                        this.onMove(dX, dY);
-                    }
-                    return;
-                }
-            }
-            else {
-                if (!this.twoZoom) {
-                    this.startTouchZoom(touchEvent);
-                }
-                else {
-                    let p1 = vectorFromTouch(touchEvent.touches[0]);
-                    let p2 = vectorFromTouch(touchEvent.touches[1]);
-                    let d = vectorDistance(p1, p2);
-                    if (d <= 0) {
-                        d = 1;
-                    }
-                    let ratio = d / this.twodistance;
-                    this.twodistance = d;
-                    let zoom = this.translateZ / ratio;
-                    if (zoom < this.minZoom()) {
-                        zoom = this.minZoom();
-                    }
-                    if (zoom > this.maxZoom()) {
-                        zoom = this.maxZoom();
-                    }
-                    if (this.viewWidth * this.translateZ < this.innerWidth) {
-                        this.translateX = this.translateX - (this.translateZ - zoom) * (this.twocenter.x);
-                    }
-                    if (this.viewHeight * this.translateZ < this.innerHeight) {
-                        this.translateY = this.translateY - (this.translateZ - zoom) * (this.twocenter.y);
-                    }
-                    this.translateZ = zoom;
-                    this.dragZoom = 1.0;
-                    this.applyZoomPosition();
-                    this.adjustContentPosition();
-                }
-            }
-        }
-    }
-    rakeTouchEnd(touchEvent) {
-        touchEvent.preventDefault();
-        this.allTilesOK = false;
-        if (!this.twoZoom) {
-            if (touchEvent.touches.length < 2) {
-                this.cancelDragZoom();
-                this.waitViewClickAction = false;
-                if (this.startedTouch) {
-                    if (this.currentDragItem) {
-                        if (this.currentDragItem.activation) {
-                            this.currentDragItem.activation(0, 0);
-                        }
-                        this.currentDragItem = null;
-                    }
-                    else {
-                        let diffX = Math.abs(this.clickX - this.startMouseScreenX);
-                        let diffY = Math.abs(this.clickY - this.startMouseScreenY);
-                        if (diffX < this.clickLimit && diffY < this.clickLimit) {
-                            this.waitViewClickAction = true;
-                            this.slideToContentPosition();
-                        }
-                        else {
-                            this.waitViewClickAction = false;
-                            this.slideToContentPosition();
-                        }
-                    }
-                }
-                else {
-                }
-                return;
-            }
-        }
-        this.twoZoom = false;
-        this.startedTouch = false;
-        this.cancelDragZoom();
-        this.slideToContentPosition();
-    }
-    startDragNDrop() {
-    }
-    startDragZoom() {
-        this.dragZoom = 1.002;
-        this.applyZoomPosition();
-    }
-    ;
-    cancelDragZoom() {
-        this.dragZoom = 1.0;
-        this.applyZoomPosition();
-    }
-    ;
     applyZoomPosition() {
         let rx = -this.translateX - this.dragZoom * this.translateZ * (this.viewWidth - this.viewWidth / this.dragZoom) * (this.clickX / this.viewWidth);
         let ry = -this.translateY - this.dragZoom * this.translateZ * (this.viewHeight - this.viewHeight / this.dragZoom) * (this.clickY / this.viewHeight);
@@ -708,6 +491,11 @@ class TileLevelRealTime {
         this.allTilesOK = true;
     }
     addGroupTile(parentSVGElement, anchor, layerMode) {
+        if (anchor.id) {
+        }
+        else {
+            anchor.id = rid();
+        }
         let x = -this.translateX;
         let y = -this.translateY;
         let w = this.svg.clientWidth * this.translateZ;
@@ -729,6 +517,8 @@ class TileLevelRealTime {
         if (layerMode == LevelModes.overlay) {
             x = 0;
             y = 0;
+            w = this.viewHeight;
+            h = this.viewHeight;
         }
         else {
             if (layerMode == LevelModes.left) {
@@ -807,6 +597,11 @@ class TileLevelRealTime {
         return null;
     }
     addElement(gg, dd, layerMode) {
+        if (dd.id) {
+        }
+        else {
+            dd.id = rid();
+        }
         let element = null;
         if (isTileRectangle(dd)) {
             element = tileRectangle(this.svgns, this.tapSize, gg, dd.x * this.tapSize, dd.y * this.tapSize, dd.w * this.tapSize, dd.h * this.tapSize, (dd.rx ? dd.rx : 0) * this.tapSize, (dd.ry ? dd.ry : 0) * this.tapSize, (dd.css ? dd.css : ''), (dd.style ? dd.style : ''));
@@ -874,32 +669,11 @@ class TileLevelRealTime {
             group.removeChild(group.children[0]);
         }
     }
-    autoID(definition) {
-        if (definition) {
-            if (definition.length) {
-                for (let i = 0; i < definition.length; i++) {
-                    if (!(definition[i].id)) {
-                        definition[i].id = rid();
-                    }
-                    if (isTileGroup(definition[i])) {
-                        let group = definition[i];
-                        this.autoID(group.content);
-                    }
-                }
-            }
-        }
-    }
     setModel(layers) {
-        for (let i = 0; i < layers.length; i++) {
-            this.autoID(layers[i].anchors);
-        }
         this.model = layers;
         this.resetModel();
     }
     resetModel() {
-        for (let i = 0; i < this.model.length; i++) {
-            this.autoID(this.model[i].anchors);
-        }
         this.clearAllDetails();
         this.applyZoomPosition();
         this.adjustContentPosition();
@@ -1068,6 +842,229 @@ function vectorSubstract(xy1, xy2) {
 }
 function vectorNormSquared(xy) {
     return xy.x * xy.x + xy.y * xy.y;
+}
+class TileInteraction {
+    constructor(parenttiler) {
+        this.tiler = parenttiler;
+    }
+    rakeMouseWheel(e) {
+        this.tiler.slidingLockTo = -1;
+        e.preventDefault();
+        let wheelVal = e.deltaY;
+        let min = Math.min(1, wheelVal);
+        let delta = Math.max(-1, min);
+        let zoom = this.tiler.translateZ + delta * (this.tiler.translateZ) * 0.05;
+        if (zoom < this.tiler.minZoom()) {
+            zoom = this.tiler.minZoom();
+        }
+        if (zoom > this.tiler.maxZoom()) {
+            zoom = this.tiler.maxZoom();
+        }
+        this.tiler.translateX = this.tiler.translateX - (this.tiler.translateZ - zoom) * e.offsetX;
+        this.tiler.translateY = this.tiler.translateY - (this.tiler.translateZ - zoom) * e.offsetY;
+        this.tiler.translateZ = zoom;
+        this.tiler.applyZoomPosition();
+        this.tiler.adjustContentPosition();
+        this.tiler.allTilesOK = false;
+        return false;
+    }
+    rakeMouseDown(mouseEvent) {
+        this.tiler.slidingLockTo = -1;
+        mouseEvent.preventDefault();
+        this.tiler.startMouseScreenX = mouseEvent.offsetX;
+        this.tiler.startMouseScreenY = mouseEvent.offsetY;
+        this.tiler.mouseDownMode = true;
+        this.tiler.clickX = this.tiler.startMouseScreenX;
+        this.tiler.clickY = this.tiler.startMouseScreenY;
+        this.tiler.waitViewClickAction = false;
+        this.startDragZoom();
+    }
+    rakeMouseMove(mouseEvent) {
+        let dX = mouseEvent.offsetX - this.tiler.startMouseScreenX;
+        let dY = mouseEvent.offsetY - this.tiler.startMouseScreenY;
+        this.tiler.startMouseScreenX = mouseEvent.offsetX;
+        this.tiler.startMouseScreenY = mouseEvent.offsetY;
+        if (this.tiler.mouseDownMode) {
+            mouseEvent.preventDefault();
+            if (this.tiler.currentDragItem) {
+                if (dX != 0 || dY != 0) {
+                    let moveX = this.tiler.translateZ * dX / this.tiler.tapSize;
+                    let moveY = this.tiler.translateZ * dY / this.tiler.tapSize;
+                    if (this.tiler.currentDragItem.activation) {
+                        this.tiler.currentDragItem.activation(moveX, moveY);
+                    }
+                }
+            }
+            else {
+                this.tiler.translateX = this.tiler.translateX + dX * this.tiler.translateZ;
+                this.tiler.translateY = this.tiler.translateY + dY * this.tiler.translateZ;
+                this.tiler.applyZoomPosition();
+                this.tiler.adjustContentPosition();
+                this.tiler.onMove(dX, dY);
+            }
+        }
+    }
+    rakeMouseUp(mouseEvent) {
+        if (this.tiler.mouseDownMode) {
+            this.tiler.mouseDownMode = false;
+            mouseEvent.preventDefault();
+            this.cancelDragZoom();
+            this.tiler.waitViewClickAction = false;
+            if (this.tiler.currentDragItem) {
+                if (this.tiler.currentDragItem.activation) {
+                    this.tiler.currentDragItem.activation(0, 0);
+                }
+                this.tiler.currentDragItem = null;
+            }
+            else {
+                let diffX = Math.abs(this.tiler.clickX - this.tiler.startMouseScreenX);
+                let diffY = Math.abs(this.tiler.clickY - this.tiler.startMouseScreenY);
+                if (diffX < this.tiler.clickLimit && diffY < this.tiler.clickLimit) {
+                    this.tiler.waitViewClickAction = true;
+                    this.tiler.slideToContentPosition();
+                    this.tiler.allTilesOK = false;
+                }
+                else {
+                    this.tiler.slideToContentPosition();
+                    this.tiler.allTilesOK = false;
+                }
+            }
+        }
+    }
+    rakeTouchStart(touchEvent) {
+        this.tiler.slidingLockTo = -1;
+        touchEvent.preventDefault();
+        this.tiler.startedTouch = true;
+        this.tiler.waitViewClickAction = false;
+        if (touchEvent.touches.length < 2) {
+            this.tiler.twoZoom = false;
+            this.tiler.startMouseScreenX = touchEvent.touches[0].clientX;
+            this.tiler.startMouseScreenY = touchEvent.touches[0].clientY;
+            this.tiler.clickX = this.tiler.startMouseScreenX;
+            this.tiler.clickY = this.tiler.startMouseScreenY;
+            this.tiler.twodistance = 0;
+            this.startDragZoom();
+            return;
+        }
+        else {
+            this.tiler.startTouchZoom(touchEvent);
+        }
+    }
+    rakeTouchMove(touchEvent) {
+        touchEvent.preventDefault();
+        if (this.tiler.startedTouch) {
+            if (touchEvent.touches.length < 2) {
+                if (this.tiler.twoZoom) {
+                }
+                else {
+                    let dX = touchEvent.touches[0].clientX - this.tiler.startMouseScreenX;
+                    let dY = touchEvent.touches[0].clientY - this.tiler.startMouseScreenY;
+                    if (this.tiler.currentDragItem) {
+                        if (dX != 0 || dY != 0) {
+                            let moveX = this.tiler.translateZ * dX / this.tiler.tapSize;
+                            let moveY = this.tiler.translateZ * dY / this.tiler.tapSize;
+                            if (this.tiler.currentDragItem.activation) {
+                                this.tiler.currentDragItem.activation(moveX, moveY);
+                            }
+                            this.tiler.startMouseScreenX = touchEvent.touches[0].clientX;
+                            this.tiler.startMouseScreenY = touchEvent.touches[0].clientY;
+                        }
+                    }
+                    else {
+                        this.tiler.translateX = this.tiler.translateX + dX * this.tiler.translateZ;
+                        this.tiler.translateY = this.tiler.translateY + dY * this.tiler.translateZ;
+                        this.tiler.startMouseScreenX = touchEvent.touches[0].clientX;
+                        this.tiler.startMouseScreenY = touchEvent.touches[0].clientY;
+                        this.tiler.applyZoomPosition();
+                        this.tiler.adjustContentPosition();
+                        this.tiler.onMove(dX, dY);
+                    }
+                    return;
+                }
+            }
+            else {
+                if (!this.tiler.twoZoom) {
+                    this.tiler.startTouchZoom(touchEvent);
+                }
+                else {
+                    let p1 = vectorFromTouch(touchEvent.touches[0]);
+                    let p2 = vectorFromTouch(touchEvent.touches[1]);
+                    let d = vectorDistance(p1, p2);
+                    if (d <= 0) {
+                        d = 1;
+                    }
+                    let ratio = d / this.tiler.twodistance;
+                    this.tiler.twodistance = d;
+                    let zoom = this.tiler.translateZ / ratio;
+                    if (zoom < this.tiler.minZoom()) {
+                        zoom = this.tiler.minZoom();
+                    }
+                    if (zoom > this.tiler.maxZoom()) {
+                        zoom = this.tiler.maxZoom();
+                    }
+                    if (this.tiler.viewWidth * this.tiler.translateZ < this.tiler.innerWidth) {
+                        this.tiler.translateX = this.tiler.translateX - (this.tiler.translateZ - zoom) * (this.tiler.twocenter.x);
+                    }
+                    if (this.tiler.viewHeight * this.tiler.translateZ < this.tiler.innerHeight) {
+                        this.tiler.translateY = this.tiler.translateY - (this.tiler.translateZ - zoom) * (this.tiler.twocenter.y);
+                    }
+                    this.tiler.translateZ = zoom;
+                    this.tiler.dragZoom = 1.0;
+                    this.tiler.applyZoomPosition();
+                    this.tiler.adjustContentPosition();
+                }
+            }
+        }
+    }
+    rakeTouchEnd(touchEvent) {
+        touchEvent.preventDefault();
+        this.tiler.allTilesOK = false;
+        if (!this.tiler.twoZoom) {
+            if (touchEvent.touches.length < 2) {
+                this.cancelDragZoom();
+                this.tiler.waitViewClickAction = false;
+                if (this.tiler.startedTouch) {
+                    if (this.tiler.currentDragItem) {
+                        if (this.tiler.currentDragItem.activation) {
+                            this.tiler.currentDragItem.activation(0, 0);
+                        }
+                        this.tiler.currentDragItem = null;
+                    }
+                    else {
+                        let diffX = Math.abs(this.tiler.clickX - this.tiler.startMouseScreenX);
+                        let diffY = Math.abs(this.tiler.clickY - this.tiler.startMouseScreenY);
+                        if (diffX < this.tiler.clickLimit && diffY < this.tiler.clickLimit) {
+                            this.tiler.waitViewClickAction = true;
+                            this.tiler.slideToContentPosition();
+                        }
+                        else {
+                            this.tiler.waitViewClickAction = false;
+                            this.tiler.slideToContentPosition();
+                        }
+                    }
+                }
+                else {
+                }
+                return;
+            }
+        }
+        this.tiler.twoZoom = false;
+        this.tiler.startedTouch = false;
+        this.cancelDragZoom();
+        this.tiler.slideToContentPosition();
+    }
+    startDragNDrop() {
+    }
+    startDragZoom() {
+        this.tiler.dragZoom = 1.002;
+        this.tiler.applyZoomPosition();
+    }
+    ;
+    cancelDragZoom() {
+        this.tiler.dragZoom = 1.0;
+        this.tiler.applyZoomPosition();
+    }
+    ;
 }
 function tileLine(svgns, tapSize, g, x1, y1, x2, y2, cssClass) {
     let line = document.createElementNS(svgns, 'line');

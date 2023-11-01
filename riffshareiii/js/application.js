@@ -180,7 +180,7 @@ class UIRenderer {
             me.menu.resetAllAnchors();
         };
         layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(this.resetAnchor, actionShowMenu), this.menu.createMenu(this.resetAnchor));
-        this.tiler.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
+        this.tiler.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 0.26, 256 - 1, layers);
         this.tiler.setAfterZoomCallback(() => {
             if (this.menu) {
                 this.menu.lastZ = this.tiler.getCurrentPointPosition().z;
@@ -302,6 +302,7 @@ class RightMenuPanel {
         this.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
     }
     createMenu(resetAnchor) {
+        console.log('createMenu');
         this.resetAnchor = resetAnchor;
         this.menuPanelBackground = document.getElementById("menuPanelBackground");
         this.menuPanelContent = document.getElementById("menuPanelContent");
@@ -346,6 +347,7 @@ class RightMenuPanel {
         ];
     }
     scrollListing(dx, dy) {
+        console.log('scrollListing', dx, dy, this.lastZ);
         let yy = this.scrollY + dy / this.lastZ;
         let itemsH = 0;
         for (let ii = 0; ii < this.items.length - 1; ii++) {
@@ -422,6 +424,7 @@ class RightMenuPanel {
         }
     }
     rerenderContent() {
+        console.log('rerenderContent');
         this.contentAnchor.content = [];
         this.fillMenuItems();
         let position = 0;
@@ -433,6 +436,7 @@ class RightMenuPanel {
         this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
     resizeMenu(viewWidth, viewHeight) {
+        console.log('resizeMenu', viewWidth, viewHeight, this.showState);
         this.lastWidth = viewWidth;
         this.lastHeight = viewHeight;
         this.itemsWidth = viewWidth - 1;

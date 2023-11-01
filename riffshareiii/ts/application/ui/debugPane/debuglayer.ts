@@ -2,7 +2,8 @@ class DebugLayerUI{//} implements RenderedLayers {
 	debugRectangle: TileRectangle;
 	debugAnchor: TileAnchor;
 	debugGroup: SVGElement;
-	debugLayer: TileLayerDefinition;
+    debugLayer: TileLayerDefinition;
+    
 	allLayers(): TileLayerDefinition[] {
 		return [this.debugLayer];
 	}
