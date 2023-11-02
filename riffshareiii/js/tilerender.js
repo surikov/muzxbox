@@ -541,7 +541,7 @@ class TileLevelRealTime {
             }
         }
         if (anchor.showZoom <= this.translateZ && anchor.hideZoom > this.translateZ) {
-            if (this.collision(anchor.xx * this.tapSize, anchor.yy * this.tapSize, anchor.ww * this.tapSize, anchor.hh * this.tapSize, x, y, w, h)) {
+            if (LevelModes.overlay || this.collision(anchor.xx * this.tapSize, anchor.yy * this.tapSize, anchor.ww * this.tapSize, anchor.hh * this.tapSize, x, y, w, h)) {
                 var gid = anchor.id ? anchor.id : '';
                 let existedSVGchild = this.groupChildWithID(parentSVGElement, gid);
                 if (existedSVGchild) {

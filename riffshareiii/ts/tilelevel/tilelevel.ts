@@ -537,7 +537,7 @@ class TileLevelRealTime implements TileLevelBase {
         } else {
             anchor.id = rid()
         }
-        
+
         let x: number = -this.translateX;
         let y: number = -this.translateY;
         let w: number = this.svg.clientWidth * this.translateZ;
@@ -583,12 +583,16 @@ class TileLevelRealTime implements TileLevelBase {
         }*/
         if (anchor.showZoom <= this.translateZ && anchor.hideZoom > this.translateZ) {
             /*if (parentSVGElement.id == 'rightMenuContentAnchor') {
-                console.log('collision', x, y, w, h, anchor.xx * this.tapSize
+                console.log('collision', x, y, w, h
+                    , ':'
+                    , anchor.xx * this.tapSize
                     , anchor.yy * this.tapSize
                     , anchor.ww * this.tapSize
-                    , anchor.hh * this.tapSize);
+                    , anchor.hh * this.tapSize
+                    
+                    );
             }*/
-            if (this.collision(anchor.xx * this.tapSize
+            if (LevelModes.overlay || this.collision(anchor.xx * this.tapSize
                 , anchor.yy * this.tapSize
                 , anchor.ww * this.tapSize
                 , anchor.hh * this.tapSize //

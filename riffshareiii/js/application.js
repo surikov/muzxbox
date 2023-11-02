@@ -180,7 +180,7 @@ class UIRenderer {
             me.menu.resetAllAnchors();
         };
         layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(this.resetAnchor, actionShowMenu), this.menu.createMenu(this.resetAnchor));
-        this.tiler.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 0.26, 256 - 1, layers);
+        this.tiler.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
         this.tiler.setAfterZoomCallback(() => {
             if (this.menu) {
                 this.menu.lastZ = this.tiler.getCurrentPointPosition().z;
@@ -302,7 +302,6 @@ class RightMenuPanel {
         this.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
     }
     createMenu(resetAnchor) {
-        console.log('createMenu');
         this.resetAnchor = resetAnchor;
         this.menuPanelBackground = document.getElementById("menuPanelBackground");
         this.menuPanelContent = document.getElementById("menuPanelContent");
@@ -347,7 +346,6 @@ class RightMenuPanel {
         ];
     }
     scrollListing(dx, dy) {
-        console.log('scrollListing', dx, dy, this.lastZ);
         let yy = this.scrollY + dy / this.lastZ;
         let itemsH = 0;
         for (let ii = 0; ii < this.items.length - 1; ii++) {
@@ -399,36 +397,45 @@ class RightMenuPanel {
             let children = it.children;
             if (children) {
                 if (opened) {
-                    this.items.push(new RightMenuItem().initOpenedFolderItem(pad, focused, it.text, () => {
+                    this.items.push(new RightMenuItem(it).initOpenedFolderItem(pad, focused, it.text, () => {
                         console.log("close " + ii);
                         me.setOpenState(false, it, infos);
-                        me.rerenderContent();
+                        me.rerenderContent(null);
                     }));
                     this.fillMenuItemChildren(pad + 0.5, children);
                 }
                 else {
-                    this.items.push(new RightMenuItem().initClosedFolderItem(pad, focused, it.text, () => {
+                    let si = new RightMenuItem(it);
+                    let order = this.items.length;
+                    this.items.push(si.initClosedFolderItem(pad, focused, it.text, () => {
                         console.log("open " + ii);
                         me.setOpenState(true, it, infos);
-                        me.rerenderContent();
+                        me.rerenderContent(si);
                     }));
                 }
             }
             else {
-                this.items.push(new RightMenuItem().initActionItem(pad, focused, it.text, () => {
+                this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                     console.log("tap " + ii);
                     me.setFocus(it, infos);
-                    me.rerenderContent();
+                    me.rerenderContent(null);
                 }));
             }
         }
     }
-    rerenderContent() {
-        console.log('rerenderContent');
+    rerenderContent(folder) {
         this.contentAnchor.content = [];
         this.fillMenuItems();
         let position = 0;
         for (let ii = 0; ii < this.items.length; ii++) {
+            if (folder) {
+                if (folder.info == this.items[ii].info) {
+                    if (-position > this.scrollY) {
+                        this.scrollY = -position;
+                        this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
+                    }
+                }
+            }
             let tile = this.items[ii].buildTile(position, this.itemsWidth);
             this.contentAnchor.content.push(tile);
             position = position + this.items[ii].calculateHeight();
@@ -436,7 +443,6 @@ class RightMenuPanel {
         this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
     resizeMenu(viewWidth, viewHeight) {
-        console.log('resizeMenu', viewWidth, viewHeight, this.showState);
         this.lastWidth = viewWidth;
         this.lastHeight = viewHeight;
         this.itemsWidth = viewWidth - 1;
@@ -482,11 +488,11 @@ class RightMenuPanel {
         this.contentAnchor.hh = viewHeight;
         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         this.menuCloseButton.resize(this.shiftX + this.itemsWidth - 1, viewHeight - 1, 1);
-        this.rerenderContent();
+        this.rerenderContent(null);
     }
 }
 class RightMenuItem {
-    constructor() {
+    constructor(info) {
         this.label = '';
         this.kindAction = 1;
         this.kindDraggable = 2;
@@ -496,6 +502,12 @@ class RightMenuItem {
         this.kind = this.kindAction;
         this.pad = 0;
         this.focused = false;
+        this.info = info;
+        if (this.info.sid) {
+        }
+        else {
+            this.info.sid = Math.random();
+        }
     }
     initActionItem(pad, focused, label, tap) {
         this.pad = pad;
@@ -544,6 +556,7 @@ class RightMenuItem {
         }
     }
     buildTile(itemTop, itemWidth) {
+        this.top = itemTop;
         let anchor = { xx: 0, yy: itemTop, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [] };
         if (this.focused) {
             anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.05, css: 'rightMenuFocusedDelimiter' });

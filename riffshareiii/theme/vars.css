@@ -1,0 +1,40 @@
+
+:root {
+	/*
+    --background-color: #6688aa;
+    --panel-color: #ccdddd;
+    --line-color: #111133;
+    --focus-color: #ff4455;
+    --interaction-color: #9f5ba5;
+    --label-color: #eee133;
+
+    --tapSize: 50px;
+
+    --color-default: var(--aux-color);
+
+    --color-paper: #def;
+    --color-textline: #332244;
+    
+    --color-green: #080;
+    --color-blue: #008;
+    --color-cyan: #088;
+    --color-magenta: #808;
+    --color-yellow: #880;
+	*/
+
+    --color-debug: #800;
+    
+	--color-shadow: #00000066;
+
+    --color-background: #000609ff;
+    --color-toolbar: #334455ff;
+    --color-panel: #113344ff;
+
+	--color-focus: #cc0066ff;
+    --color-interactive: #5566ccff;
+
+	--color-subtext: #99ffccff;
+    --color-text: #ddeeffff;
+
+}
+

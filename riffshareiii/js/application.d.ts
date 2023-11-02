@@ -86,7 +86,7 @@ declare class RightMenuPanel {
     setFocus(it: MenuInfo, infos: MenuInfo[]): void;
     setOpenState(state: boolean, it: MenuInfo, infos: MenuInfo[]): void;
     fillMenuItemChildren(pad: number, infos: MenuInfo[]): void;
-    rerenderContent(): void;
+    rerenderContent(folder: RightMenuItem | null): void;
     resizeMenu(viewWidth: number, viewHeight: number): void;
 }
 declare class RightMenuItem {
@@ -102,7 +102,9 @@ declare class RightMenuItem {
     };
     pad: number;
     focused: boolean;
-    constructor();
+    top: number;
+    info: MenuInfo;
+    constructor(info: MenuInfo);
     initActionItem(pad: number, focused: boolean, label: string, tap: () => void): this;
     initDraggableItem(pad: number, focused: boolean, tap: () => void): this;
     initOpenedFolderItem(pad: number, focused: boolean, label: string, tap: () => void): this;
@@ -116,6 +118,7 @@ declare type MenuInfo = {
     focused?: boolean;
     opened?: boolean;
     children?: MenuInfo[];
+    sid?: number;
 };
 declare let testMenuData: MenuInfo[];
 declare class BarOctave {

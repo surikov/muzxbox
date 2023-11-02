@@ -3,6 +3,7 @@ type MenuInfo = {
     focused?: boolean;
     opened?:boolean;
     children?: MenuInfo[];
+    sid?:number;
 };
 let testMenuData: MenuInfo[] = [
     { text: 'One' }

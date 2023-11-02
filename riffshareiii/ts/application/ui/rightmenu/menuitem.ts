@@ -15,9 +15,17 @@ class RightMenuItem {
     action: { (x: number, y: number): void };
     pad: number = 0;
     focused: boolean = false;
+    //scroll:number=0;
+    top: number;
+    info: MenuInfo;
 
-    constructor() {
-        //this.build();
+    constructor(info: MenuInfo) {
+        this.info = info;
+        if (this.info.sid) {
+            //
+        } else {
+            this.info.sid = Math.random();
+        }
     }
     initActionItem(pad: number, focused: boolean, label: string, tap: () => void) {
         this.pad = pad;
@@ -42,7 +50,7 @@ class RightMenuItem {
         this.action = tap;
         return this;
     }
-    initClosedFolderItem(pad: number, focused: boolean, label: string,  tap: () => void) {
+    initClosedFolderItem(pad: number, focused: boolean, label: string, tap: () => void) {
         this.pad = pad;
         this.label = label;
         this.focused = focused;
@@ -50,7 +58,7 @@ class RightMenuItem {
         this.action = tap;
         return this;
     }
-    initPreviewItem(pad: number, focused: boolean,  tap: () => void) {
+    initPreviewItem(pad: number, focused: boolean, tap: () => void) {
         this.focused = focused;
         this.pad = pad;
         this.kind = this.kindPreview;
@@ -67,13 +75,14 @@ class RightMenuItem {
         }
     }
     buildTile(itemTop: number, itemWidth: number): TileItem {
+        this.top = itemTop;
         let anchor: TileAnchor = { xx: 0, yy: itemTop, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [] };
         if (this.focused) {
             anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.05, css: 'rightMenuFocusedDelimiter' });
-        } else{
+        } else {
             anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.005, css: 'rightMenuDelimiterLine' });
         }
-        
+
         let spot: TileRectangle = { x: this.pad, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
         if (this.kind == this.kindAction) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });

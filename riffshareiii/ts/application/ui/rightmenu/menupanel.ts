@@ -37,7 +37,7 @@ class RightMenuPanel {
     resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void;
 
     resetAllAnchors() {
-        
+
         this.resetAnchor(this.menuPanelBackground, this.backgroundAnchor, LevelModes.overlay);
         this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
         this.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
@@ -45,8 +45,8 @@ class RightMenuPanel {
     }
 
     createMenu(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void): TileLayerDefinition[] {
-console.log('createMenu');
-       
+        //console.log('createMenu');
+
         this.resetAnchor = resetAnchor;
 
         this.menuPanelBackground = (document.getElementById("menuPanelBackground") as any) as SVGElement;
@@ -106,7 +106,7 @@ console.log('createMenu');
         ];
     }
     scrollListing(dx: number, dy: number) {
-        console.log('scrollListing', dx, dy,this.lastZ);
+        //console.log('scrollListing', dx, dy,this.lastZ);
         let yy = this.scrollY + dy / this.lastZ;
 
         let itemsH = 0;//1 * this.items.length;
@@ -181,52 +181,60 @@ console.log('createMenu');
             let children = it.children;
             if (children) {
                 if (opened) {
-                    this.items.push(new RightMenuItem().initOpenedFolderItem(pad, focused, it.text, () => {
+                    this.items.push(new RightMenuItem(it).initOpenedFolderItem(pad, focused, it.text, () => {
                         console.log("close " + ii);
-                        //it.opened = false;
                         me.setOpenState(false, it, infos);
-                        me.rerenderContent();
+                        me.rerenderContent(null);
                     }));
                     this.fillMenuItemChildren(pad + 0.5, children);
                 } else {
-                    this.items.push(new RightMenuItem().initClosedFolderItem(pad, focused, it.text, () => {
+                    let si: RightMenuItem = new RightMenuItem(it);
+                    let order = this.items.length;
+                    this.items.push(si.initClosedFolderItem(pad, focused, it.text, () => {
                         console.log("open " + ii);
-                        //it.opened = true;
                         me.setOpenState(true, it, infos);
-                        me.rerenderContent();
-                        //me.fillMenu();
-                        //me.resetAnchor(me.menuPanelContent, me.contentAnchor, LevelModes.overlay);
+                        me.rerenderContent(si);
                     }));
                 }
-                /*this.items.push(new RightMenuItem().initClosedFolderItem(pad, focused,infos[ii].text, () => {
-                    console.log("close " + ii);
-                }));
-                this.fillMenuChildren(pad + 0.5, children);*/
             } else {
-                this.items.push(new RightMenuItem().initActionItem(pad, focused, it.text, () => {
+                this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                     console.log("tap " + ii);
                     me.setFocus(it, infos);
-                    me.rerenderContent();
+                    me.rerenderContent(null);
                 }));
             }
         }
     }
-    rerenderContent() {
-        console.log('rerenderContent');
+    rerenderContent(folder: RightMenuItem | null) {
+        /*if (folder == null) {
+            //
+        } else {
+            console.log('rerenderContent', folder.top, folder.info, this.scrollY);
+        }*/
         this.contentAnchor.content = [];
         this.fillMenuItems();
 
         let position: number = 0;
         for (let ii = 0; ii < this.items.length; ii++) {
+            if (folder) {
+                if (folder.info == this.items[ii].info) {
+                    //console.log('scroll', folder.top, 'to', position, ':', this.scrollY);
+                    if (-position > this.scrollY) {
+                        this.scrollY = -position;
+                        this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
+                    }
+                }
+            }
             let tile = this.items[ii].buildTile(position, this.itemsWidth);
             this.contentAnchor.content.push(tile);
             position = position + this.items[ii].calculateHeight();
         }
 
         this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
+        //this.scrollListing(0,this.scrollY);
     }
     resizeMenu(viewWidth: number, viewHeight: number) {
-        console.log('resizeMenu', viewWidth, viewHeight, this.showState);
+        //console.log('resizeMenu', viewWidth, viewHeight, this.showState);
         this.lastWidth = viewWidth;
         this.lastHeight = viewHeight;
         this.itemsWidth = viewWidth - 1;
@@ -283,10 +291,10 @@ console.log('createMenu');
 
         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
 
-        this.menuCloseButton.resize(this.shiftX+this.itemsWidth-1, viewHeight-1,1);
+        this.menuCloseButton.resize(this.shiftX + this.itemsWidth - 1, viewHeight - 1, 1);
 
         //console.log(this.dragHandler);
-        this.rerenderContent();
+        this.rerenderContent(null);
     }
 
 }

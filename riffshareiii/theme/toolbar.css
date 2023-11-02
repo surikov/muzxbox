@@ -1,0 +1,38 @@
+
+.toolBarPanel {
+    fill: var(--color-toolbar);
+    pointer-events: none;
+}
+
+.transparentSpot {
+    fill: #0f0;
+    fill-opacity: 0.050%;
+    cursor: pointer;
+}
+.transparentDragger {
+    fill: #0f0;
+    fill-opacity: 0.050%;
+    cursor: move;
+}
+
+.transparentScroll {
+    fill: #999;
+    fill-opacity: 0.05%;
+    cursor: ns-resize;
+}
+
+.toolBarButtonCircle {
+    fill: var(--color-interactive);
+	stroke: var(--color-text);
+    stroke-width: 0.01cm;
+}
+
+.toolBarButtonLabel {
+    fill: var(--color-text);
+    text-anchor: middle;
+    alignment-baseline222: middle;
+    font-size: 0.5cm;
+    pointer-events2: none;
+	
+	font-family: "Material-Design-Iconic-Font";
+}
