@@ -1,0 +1,19 @@
+
+:root {
+	
+    --color-debug: #800;
+    
+	--color-shadow: #00000066;
+
+    --color-background: #660000ff;
+    --color-toolbar: #334455ff;
+    --color-panel: #113344ff;
+
+	--color-focus: #cc0066ff;
+    --color-interactive: #5566ccff;
+
+	--color-subtext: #99ffccff;
+    --color-text: #ddeeffff;
+
+}
+

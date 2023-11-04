@@ -7,3 +7,12 @@ function startApplication(){
     testNumMathUtil();
 	//console.log('done startApplication');
 }
+function startLoadCSSfile(cssurl:string){
+    var head = document.getElementsByTagName('head')[0];
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = cssurl;
+    link.media = 'all';
+    head.appendChild(link);
+}

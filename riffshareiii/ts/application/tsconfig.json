@@ -25,6 +25,7 @@
         "treevalue/treevalue.ts"
         ,"startup.ts"
         ,"ui/renderer.ts"
+        ,"ui/localedictionary.ts"
         ,"ui/toolbar/toolbarpanel.ts"
         ,"ui/toolbar/toolbutton.ts"
 		,"ui/rightmenu/menupanel.ts"

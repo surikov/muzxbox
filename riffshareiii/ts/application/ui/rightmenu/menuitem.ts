@@ -24,7 +24,7 @@ class RightMenuItem {
         if (this.info.sid) {
             //
         } else {
-            this.info.sid = Math.random();
+            this.info.sid = 'random' + Math.random();
         }
     }
     initActionItem(pad: number, focused: boolean, label: string, tap: () => void) {
@@ -78,35 +78,33 @@ class RightMenuItem {
         this.top = itemTop;
         let anchor: TileAnchor = { xx: 0, yy: itemTop, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [] };
         if (this.focused) {
-            anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.05, css: 'rightMenuFocusedDelimiter' });
-        } else {
-            anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.005, css: 'rightMenuDelimiterLine' });
-        }
-
+            anchor.content.push({ x: itemWidth-0.1, y: itemTop+0.02 , w: 0.1, h: this.calculateHeight()-0.02, css: 'rightMenuFocusedDelimiter' });
+        } 
+        anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.02, css: 'rightMenuDelimiterLine' });
         let spot: TileRectangle = { x: this.pad, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
         if (this.kind == this.kindAction) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: LO(this.label), css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindDraggable) {
             spot.draggable = true;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: LO(this.label), css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindOpenedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_movedown, css: 'rightMenuIconLabel' });
-            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: LO(this.label), css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindClosedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_moveright, css: 'rightMenuIconLabel' });
-            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: LO(this.label), css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindPreview) {
             spot.draggable = true;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: LO(this.label), css: 'rightMenuLabel' });
             anchor.content.push({ x: itemWidth - 1 + 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemSubActionBG' });
             anchor.content.push({ x: itemWidth - 0.5, y: itemTop + 0.7, text: icon_play, css: 'rightMenuButtonLabel' });
             anchor.content.push({ x: itemWidth - 1, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' });

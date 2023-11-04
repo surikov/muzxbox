@@ -16,6 +16,7 @@ declare class TreeValue {
     dump(pad: string, symbol: string): void;
 }
 declare function startApplication(): void;
+declare function startLoadCSSfile(cssurl: string): void;
 declare function createTileLevel(): TileLevelBase;
 declare let zoomPrefixLevelsCSS: {
     prefix: string;
@@ -28,11 +29,24 @@ declare class UIRenderer {
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
     resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void;
+    changeTapSIze(ratio: number): void;
     createUI(): void;
     fillUI(data: MixerData): void;
     onReSizeView(): void;
     deleteUI(): void;
 }
+declare let labelLocaleDictionary: string;
+declare let localNameLocal: string;
+declare let localMenuItemSettings: string;
+declare let localeDictionary: {
+    id: string;
+    data: {
+        locale: string;
+        text: string;
+    }[];
+}[];
+declare function setLocaleID(loname: string): void;
+declare function LO(id: string): string;
 declare class UIToolbar {
     toolBarRectangle: TileRectangle;
     toolBarShadow: TileRectangle;
@@ -54,6 +68,7 @@ declare class ToolBarButton {
 }
 declare class RightMenuPanel {
     menuCloseButton: IconLabelButton;
+    menuUpButton: IconLabelButton;
     showState: boolean;
     lastWidth: number;
     lastHeight: number;
@@ -77,15 +92,19 @@ declare class RightMenuPanel {
     shiftX: number;
     lastZ: number;
     itemsWidth: number;
+    changeTapSIze: (ratio: number) => void;
     resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void;
     resetAllAnchors(): void;
-    createMenu(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void): TileLayerDefinition[];
+    createMenu(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void, changeTapSIze: (ratio: number) => void): TileLayerDefinition[];
     scrollListing(dx: number, dy: number): void;
     randomString(nn: number): string;
     fillMenuItems(): void;
     setFocus(it: MenuInfo, infos: MenuInfo[]): void;
     setOpenState(state: boolean, it: MenuInfo, infos: MenuInfo[]): void;
     fillMenuItemChildren(pad: number, infos: MenuInfo[]): void;
+    setThemeLocale(loc: string): void;
+    setThemeColor(cssPath: string): void;
+    setThemeSize(ratio: number, cssPath: string): void;
     rerenderContent(folder: RightMenuItem | null): void;
     resizeMenu(viewWidth: number, viewHeight: number): void;
 }
@@ -118,8 +137,17 @@ declare type MenuInfo = {
     focused?: boolean;
     opened?: boolean;
     children?: MenuInfo[];
-    sid?: number;
+    sid?: string;
 };
+declare let commandThemeSizeSmall: string;
+declare let commandThemeSizeBig: string;
+declare let commandThemeSizeHuge: string;
+declare let commandThemeColorRed: string;
+declare let commandThemeColorGreen: string;
+declare let commandThemeColorBlue: string;
+declare let commandLocaleEN: string;
+declare let commandLocaleRU: string;
+declare let commandLocaleZH: string;
 declare let testMenuData: MenuInfo[];
 declare class BarOctave {
 }
@@ -337,6 +365,7 @@ declare type TileSVGElement = SVGElement & {
 declare type TileLevelBase = {
     dump: () => void;
     tapPxSize: () => number;
+    setupTapSize: (ratioCm: number) => void;
     resetModel: () => void;
     getCurrentPointPosition(): TileZoom;
     getStartMouseScreen(): TilePoint;

@@ -239,6 +239,7 @@ declare type TileSVGElement = SVGElement & {
 declare type TileLevelBase = {
     dump: () => void;
     tapPxSize: () => number;
+    setupTapSize: (ratioCm: number) => void;
     resetModel: () => void;
     getCurrentPointPosition(): TileZoom;
     getStartMouseScreen(): TilePoint;

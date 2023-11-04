@@ -42,7 +42,7 @@ type TileLayerOverlay = {
 type TileBaseDefinition = {
     id?: string// = 'id'+Math.floor(Math.random()*1000000000)
     , css?: string// string
-	, style?: string
+    , style?: string
     //,tempX?:number
     //,tempY?:number
     //, dragX?: boolean// string
@@ -105,7 +105,7 @@ type TileRectangle = {
     , h: number
     , rx?: number
     , ry?: number
-    
+
     //,image?:string
 } & TileBaseDefinition;
 /*function TRectangle(x: number, y: number, w: number, h: number, rx?: number, ry?: number, id?: string, css?: string, dragX?: boolean, dragY?: boolean, action?: (x: number, y: number) => void | undefined): TileRectangle {
@@ -116,7 +116,7 @@ type TileText = {
     x: number
     , y: number
     , text: string
-    ,maxWidth?:string
+    , maxWidth?: string
 } & TileBaseDefinition;
 function TText(x: number, y: number, css: string, text: string): TileText {
     return { x: x, y: y, text: text, css: css, };
@@ -160,25 +160,26 @@ type TileSVGElement = SVGElement & {
 type TileLevelBase = {
     dump: () => void;
     tapPxSize: () => number;
+    setupTapSize: (ratioCm: number) => void;
     resetModel: () => void;
     getCurrentPointPosition(): TileZoom;
     getStartMouseScreen(): TilePoint;
     screen2view(screen: TilePoint): TilePoint;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor
         //, layer: TileLayerDefinition
-        ,layerMode:LevelModes
-        ): void;
+        , layerMode: LevelModes
+    ): void;
     delayedResetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor
         //, layer: TileLayerDefinition
-        ,layerMode:LevelModes
-        ): void;
+        , layerMode: LevelModes
+    ): void;
     setAfterResizeCallback(f: () => void): void;
     setAfterZoomCallback(f: () => void): void;
     //resetAnchor: (//fromSVGGroup: SVGElement,
     //    anchor: TileAnchor, layer: TileLayerDefinition) => void;
     resetInnerSize(inWidth: number, inHeight: number): void;
     initRun(svgObject: SVGElement
-        ,stickLeft:boolean
+        , stickLeft: boolean
         , inWidth: number, inHeight: number
         , minZoom: number, curZoom: number, maxZoom: number
         , layers: TileLayerDefinition[]): void;

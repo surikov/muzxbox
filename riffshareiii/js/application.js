@@ -144,6 +144,15 @@ function startApplication() {
     ui.fillUI(testEmptyMixerData);
     testNumMathUtil();
 }
+function startLoadCSSfile(cssurl) {
+    var head = document.getElementsByTagName('head')[0];
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = cssurl;
+    link.media = 'all';
+    head.appendChild(link);
+}
 let zoomPrefixLevelsCSS = [
     { prefix: '025', zoom: 0.25 },
     { prefix: '05', zoom: 0.5 },
@@ -163,6 +172,12 @@ class UIRenderer {
             this.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
         };
     }
+    changeTapSIze(ratio) {
+        console.log('changeTapSIze', ratio, this);
+        this.tiler.setupTapSize(ratio);
+        this.onReSizeView();
+        this.tiler.resetModel();
+    }
     createUI() {
         this.tiler = createTileLevel();
         this.tileLevelSVG = document.getElementById("tileLevelSVG");
@@ -179,8 +194,9 @@ class UIRenderer {
             me.menu.resizeMenu(vw, vh);
             me.menu.resetAllAnchors();
         };
-        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(this.resetAnchor, actionShowMenu), this.menu.createMenu(this.resetAnchor));
+        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(this.resetAnchor, actionShowMenu), this.menu.createMenu(this.resetAnchor.bind(this), this.changeTapSIze.bind(this)));
         this.tiler.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
+        console.log('tap size', this.tiler.tapPxSize());
         this.tiler.setAfterZoomCallback(() => {
             if (this.menu) {
                 this.menu.lastZ = this.tiler.getCurrentPointPosition().z;
@@ -211,6 +227,41 @@ class UIRenderer {
     }
     deleteUI() {
     }
+}
+let labelLocaleDictionary = 'en';
+let localNameLocal = 'localNameLocal';
+let localMenuItemSettings = 'localMenuItemSettings';
+let localeDictionary = [
+    {
+        id: localNameLocal, data: [
+            { locale: 'en', text: 'English' },
+            { locale: 'ru', text: 'Русский' },
+            { locale: 'zh', text: '汉语口语' }
+        ]
+    }, {
+        id: localMenuItemSettings, data: [
+            { locale: 'en', text: 'Settings' },
+            { locale: 'ru', text: 'Настройки' },
+            { locale: 'zh', text: '设置' }
+        ]
+    }
+];
+function setLocaleID(loname) {
+    labelLocaleDictionary = loname;
+}
+function LO(id) {
+    for (let ii = 0; ii < localeDictionary.length; ii++) {
+        let row = localeDictionary[ii];
+        if (id == row.id) {
+            for (let kk = 0; kk < row.data.length; kk++) {
+                if (row.data[kk].locale == labelLocaleDictionary) {
+                    return row.data[kk].text;
+                }
+            }
+            return labelLocaleDictionary + '?' + id;
+        }
+    }
+    return labelLocaleDictionary + ':' + id;
 }
 class UIToolbar {
     createToolbar(resetAnchor, actionShowMenu) {
@@ -301,8 +352,9 @@ class RightMenuPanel {
         this.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
         this.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
     }
-    createMenu(resetAnchor) {
+    createMenu(resetAnchor, changeTapSIze) {
         this.resetAnchor = resetAnchor;
+        this.changeTapSIze = changeTapSIze;
         this.menuPanelBackground = document.getElementById("menuPanelBackground");
         this.menuPanelContent = document.getElementById("menuPanelContent");
         this.menuPanelInteraction = document.getElementById("menuPanelInteraction");
@@ -315,6 +367,11 @@ class RightMenuPanel {
             this.showState = false;
             this.resizeMenu(this.lastWidth, this.lastHeight);
             this.resetAllAnchors();
+        });
+        this.menuUpButton = new IconLabelButton([icon_moveup], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
+            console.log('up', nn);
+            this.scrollY = 0;
+            this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         });
         this.backgroundAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
@@ -332,7 +389,7 @@ class RightMenuPanel {
         };
         this.buttonsAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-                this.menuCloseButton.anchor
+                this.menuCloseButton.anchor, this.menuUpButton.anchor
             ]
         };
         this.bgLayer = { g: this.menuPanelBackground, anchors: [this.backgroundAnchor], mode: LevelModes.overlay };
@@ -415,13 +472,104 @@ class RightMenuPanel {
                 }
             }
             else {
-                this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
-                    console.log("tap " + ii);
-                    me.setFocus(it, infos);
-                    me.rerenderContent(null);
-                }));
+                switch (it.sid) {
+                    case commandThemeSizeSmall: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeSize(1, 'theme/sizesmall.css');
+                        }));
+                        break;
+                    }
+                    case commandThemeSizeBig: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeSize(1.5, 'theme/sizebig.css');
+                        }));
+                        break;
+                    }
+                    case commandThemeSizeHuge: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeSize(4, 'theme/sizehuge.css');
+                        }));
+                        break;
+                    }
+                    case commandThemeColorRed: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeColor('theme/colordarkred.css');
+                        }));
+                        break;
+                    }
+                    case commandThemeColorGreen: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeColor('theme/colordarkgreen.css');
+                        }));
+                        break;
+                    }
+                    case commandThemeColorBlue: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeColor('theme/colordarkblue.css');
+                        }));
+                        break;
+                    }
+                    case commandLocaleRU: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeLocale('ru');
+                        }));
+                        break;
+                    }
+                    case commandLocaleEN: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeLocale('en');
+                        }));
+                        break;
+                    }
+                    case commandLocaleZH: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeLocale('zh');
+                        }));
+                        break;
+                    }
+                    default: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            console.log("tap " + ii);
+                            me.setFocus(it, infos);
+                            me.rerenderContent(null);
+                        }));
+                        break;
+                    }
+                }
             }
         }
+    }
+    setThemeLocale(loc) {
+        console.log("setThemeLocale " + loc);
+        setLocaleID(loc);
+        if (loc == 'zh') {
+            startLoadCSSfile('theme/font2.css');
+        }
+        else {
+            startLoadCSSfile('theme/font1.css');
+        }
+        this.resizeMenu(this.lastWidth, this.lastHeight);
+        this.resetAllAnchors();
+    }
+    setThemeColor(cssPath) {
+        console.log("cssPath " + cssPath);
+        startLoadCSSfile(cssPath);
+        this.resizeMenu(this.lastWidth, this.lastHeight);
+        this.resetAllAnchors();
+    }
+    setThemeSize(ratio, cssPath) {
+        console.log("cssPath " + cssPath);
+        startLoadCSSfile(cssPath);
+        this.changeTapSIze(ratio);
     }
     rerenderContent(folder) {
         this.contentAnchor.content = [];
@@ -431,7 +579,7 @@ class RightMenuPanel {
             if (folder) {
                 if (folder.info == this.items[ii].info) {
                     if (-position > this.scrollY) {
-                        this.scrollY = -position;
+                        this.scrollY = -position + 0.5;
                         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
                     }
                 }
@@ -488,6 +636,7 @@ class RightMenuPanel {
         this.contentAnchor.hh = viewHeight;
         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         this.menuCloseButton.resize(this.shiftX + this.itemsWidth - 1, viewHeight - 1, 1);
+        this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
         this.rerenderContent(null);
     }
 }
@@ -506,7 +655,7 @@ class RightMenuItem {
         if (this.info.sid) {
         }
         else {
-            this.info.sid = Math.random();
+            this.info.sid = 'random' + Math.random();
         }
     }
     initActionItem(pad, focused, label, tap) {
@@ -559,35 +708,33 @@ class RightMenuItem {
         this.top = itemTop;
         let anchor = { xx: 0, yy: itemTop, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [] };
         if (this.focused) {
-            anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.05, css: 'rightMenuFocusedDelimiter' });
+            anchor.content.push({ x: itemWidth - 0.1, y: itemTop + 0.02, w: 0.1, h: this.calculateHeight() - 0.02, css: 'rightMenuFocusedDelimiter' });
         }
-        else {
-            anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.005, css: 'rightMenuDelimiterLine' });
-        }
+        anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.02, css: 'rightMenuDelimiterLine' });
         let spot = { x: this.pad, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
         if (this.kind == this.kindAction) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: LO(this.label), css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindDraggable) {
             spot.draggable = true;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: LO(this.label), css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindOpenedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_movedown, css: 'rightMenuIconLabel' });
-            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: LO(this.label), css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindClosedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_moveright, css: 'rightMenuIconLabel' });
-            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: LO(this.label), css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindPreview) {
             spot.draggable = true;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: LO(this.label), css: 'rightMenuLabel' });
             anchor.content.push({ x: itemWidth - 1 + 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemSubActionBG' });
             anchor.content.push({ x: itemWidth - 0.5, y: itemTop + 0.7, text: icon_play, css: 'rightMenuButtonLabel' });
             anchor.content.push({ x: itemWidth - 1, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' });
@@ -598,6 +745,15 @@ class RightMenuItem {
         return anchor;
     }
 }
+let commandThemeSizeSmall = 'commandThemeSizeSmall';
+let commandThemeSizeBig = 'commandThemeSizeBig';
+let commandThemeSizeHuge = 'commandThemeSizeHuge';
+let commandThemeColorRed = 'commandThemeColorRed';
+let commandThemeColorGreen = 'commandThemeColorGreen';
+let commandThemeColorBlue = 'commandThemeColorBlue';
+let commandLocaleEN = 'commandLocaleEN';
+let commandLocaleRU = 'commandLocaleRU';
+let commandLocaleZH = 'commandLocaleZH';
 let testMenuData = [
     { text: 'One' },
     {
@@ -741,7 +897,30 @@ let testMenuData = [
             { text: 'Brown' },
             { text: 'eleven' }]
     },
-    { text: 'eleven' }
+    { text: 'eleven' },
+    {
+        text: localMenuItemSettings, children: [
+            {
+                text: 'Size', children: [
+                    { text: 'Small', sid: commandThemeSizeSmall },
+                    { text: 'Big', sid: commandThemeSizeBig },
+                    { text: 'Huge', sid: commandThemeSizeHuge }
+                ]
+            },
+            {
+                text: 'Locale', children: [{ text: 'Russian', sid: commandLocaleRU },
+                    { text: 'English', sid: commandLocaleEN },
+                    { text: '中文界面语言', sid: commandLocaleZH }]
+            },
+            {
+                text: 'Colors', children: [
+                    { text: 'Red', sid: commandThemeColorRed },
+                    { text: 'Green', sid: commandThemeColorGreen },
+                    { text: 'Blue', sid: commandThemeColorBlue }
+                ]
+            }
+        ]
+    }
 ];
 class BarOctave {
 }

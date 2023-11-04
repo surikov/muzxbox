@@ -145,6 +145,7 @@ class TileLevelRealTime {
         this.tapSize = tbb.width;
         this.svg.removeChild(rect);
         this.clickLimit = this.tapSize / 6;
+        console.log('setupTapSize', baseSize, this.tapSize);
     }
     onAfterResize() {
         this.onResizeDo.start(333, function () {

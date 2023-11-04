@@ -1,6 +1,6 @@
 class RightMenuPanel {
     menuCloseButton: IconLabelButton;
-    //menuUpButton: ToolBarButton;
+    menuUpButton: IconLabelButton;
     showState: boolean = false;
     lastWidth: number = 0;
     lastHeight: number = 0;
@@ -32,7 +32,7 @@ class RightMenuPanel {
     lastZ: number = 1;
 
     itemsWidth: number = 0;
-
+    changeTapSIze: (ratio: number) => void;
 
     resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void;
 
@@ -44,10 +44,14 @@ class RightMenuPanel {
         this.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
     }
 
-    createMenu(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void): TileLayerDefinition[] {
+    createMenu(resetAnchor: (
+        parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void
+        , changeTapSIze: (ratio: number) => void
+    ): TileLayerDefinition[] {
         //console.log('createMenu');
 
         this.resetAnchor = resetAnchor;
+        this.changeTapSIze = changeTapSIze;
 
         this.menuPanelBackground = (document.getElementById("menuPanelBackground") as any) as SVGElement;
         this.menuPanelContent = (document.getElementById("menuPanelContent") as any) as SVGElement;
@@ -65,6 +69,11 @@ class RightMenuPanel {
             this.showState = false;
             this.resizeMenu(this.lastWidth, this.lastHeight);
             this.resetAllAnchors();
+        });
+        this.menuUpButton = new IconLabelButton([icon_moveup], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
+            console.log('up', nn);
+            this.scrollY = 0;
+            this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         });
         /*this.menuUpButton = new ToolBarButton([icon_moveright], 1, 11, (nn: number) => {
             console.log('menuCloseButton', nn);
@@ -91,7 +100,7 @@ class RightMenuPanel {
         };
         this.buttonsAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-                this.menuCloseButton.anchor
+                this.menuCloseButton.anchor, this.menuUpButton.anchor
             ]
         };
         this.bgLayer = { g: this.menuPanelBackground, anchors: [this.backgroundAnchor], mode: LevelModes.overlay };
@@ -197,13 +206,105 @@ class RightMenuPanel {
                     }));
                 }
             } else {
-                this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
-                    console.log("tap " + ii);
-                    me.setFocus(it, infos);
-                    me.rerenderContent(null);
-                }));
+                switch (it.sid) {
+                    case commandThemeSizeSmall: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeSize(1, 'theme/sizesmall.css');
+                        }));
+                        break;
+                    }
+                    case commandThemeSizeBig: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeSize(1.5, 'theme/sizebig.css');
+                        }));
+                        break;
+                    }
+                    case commandThemeSizeHuge: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeSize(4, 'theme/sizehuge.css');
+                        }));
+                        break;
+                    }
+                    case commandThemeColorRed: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeColor('theme/colordarkred.css');
+                        }));
+                        break;
+                    }
+                    case commandThemeColorGreen: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeColor('theme/colordarkgreen.css');
+                        }));
+                        break;
+                    }
+                    case commandThemeColorBlue: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeColor('theme/colordarkblue.css');
+                        }));
+                        break;
+                    }
+                    case commandLocaleRU: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeLocale('ru');
+                        }));
+                        break;
+                    }
+                    case commandLocaleEN: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeLocale('en');
+                        }));
+                        break;
+                    }
+                    case commandLocaleZH: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            me.setThemeLocale('zh');
+                        }));
+                        break;
+                    }
+                    default: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            console.log("tap " + ii);
+                            me.setFocus(it, infos);
+                            me.rerenderContent(null);
+                        }));
+                        break;
+                    }
+                }
+
+
             }
         }
+    }
+    setThemeLocale(loc: string) {
+        console.log("setThemeLocale " + loc);
+        setLocaleID(loc);
+        if(loc=='zh'){
+            startLoadCSSfile('theme/font2.css');
+        }else{
+            startLoadCSSfile('theme/font1.css');
+        }
+        this.resizeMenu(this.lastWidth, this.lastHeight);
+        this.resetAllAnchors();
+    }
+    setThemeColor(cssPath: string) {
+        console.log("cssPath " + cssPath);
+        startLoadCSSfile(cssPath);
+        this.resizeMenu(this.lastWidth, this.lastHeight);
+        this.resetAllAnchors();
+    }
+    setThemeSize(ratio: number, cssPath: string) {
+        console.log("cssPath " + cssPath);
+        startLoadCSSfile(cssPath);
+        this.changeTapSIze(ratio);
     }
     rerenderContent(folder: RightMenuItem | null) {
         /*if (folder == null) {
@@ -220,7 +321,7 @@ class RightMenuPanel {
                 if (folder.info == this.items[ii].info) {
                     //console.log('scroll', folder.top, 'to', position, ':', this.scrollY);
                     if (-position > this.scrollY) {
-                        this.scrollY = -position;
+                        this.scrollY = -position + 0.5;
                         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
                     }
                 }
@@ -292,6 +393,7 @@ class RightMenuPanel {
         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
 
         this.menuCloseButton.resize(this.shiftX + this.itemsWidth - 1, viewHeight - 1, 1);
+        this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
 
         //console.log(this.dragHandler);
         this.rerenderContent(null);
