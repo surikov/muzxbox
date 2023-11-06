@@ -11,7 +11,7 @@ class DebugLayerUI{//} implements RenderedLayers {
 		this.debugRectangle = { x: 0, y: 0, w: 1, h: 1, rx: 10, ry: 10, css: 'debug' };
 		this.debugGroup = (document.getElementById("debugLayer") as any) as SVGElement;
 		this.debugAnchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-			this.debugRectangle
+			/*this.debugRectangle
 			,{ x: 0.25, y: 0, w: 0.25, h:0.25, css: 'debug' }
 			,{ x: 0.5, y: 0, w: 0.5, h: 0.5, css: 'debug' }
 			,{ x: 1, y: 0, w: 1, h: 1, css: 'debug' }
@@ -22,7 +22,7 @@ class DebugLayerUI{//} implements RenderedLayers {
 			,{ x: 32, y: 0, w: 32, h: 32, css: 'debug' }
 			,{ x: 64, y: 0, w: 64, h: 64, css: 'debug' }
 			,{ x: 128, y: 0, w: 128, h: 128, css: 'debug' }
-			,{ x: 256, y: 0, w: 256, h: 256, css: 'debug' }
+			,{ x: 256, y: 0, w: 256, h: 256, css: 'debug' }*/
 		] };
 		this.debugLayer = {
 			g: this.debugGroup, anchors: [

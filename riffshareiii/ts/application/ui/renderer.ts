@@ -25,7 +25,7 @@ let zoomPrefixLevelsCSS: { prefix: string, zoom: number }[] = [
 class UIRenderer {//} implements RenderedPart {
     toolbar: UIToolbar;
     menu: RightMenuPanel;
-    //mixer: MixerUI;
+    mixer: MixerUI;
     debug: DebugLayerUI;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
@@ -51,6 +51,7 @@ class UIRenderer {//} implements RenderedPart {
         //	this.toolbar.reRenderToolbar(this.tiler);
         //});
         this.menu = new RightMenuPanel();
+        this.mixer = new MixerUI();
         let me = this;
         let actionShowMenu: () => void = function () {
             let vw = me.tileLevelSVG.clientWidth / me.tiler.tapPxSize();
@@ -64,6 +65,7 @@ class UIRenderer {//} implements RenderedPart {
             //, this.toolbar.toolBarLayers()
             , this.toolbar.createToolbar(this.resetAnchor, actionShowMenu)
             , this.menu.createMenu(this.resetAnchor.bind(this), this.changeTapSIze.bind(this))
+            , this.mixer.buildMixerLayers()
         );
 
         //this.mixer = new MixerUI();
@@ -98,7 +100,7 @@ class UIRenderer {//} implements RenderedPart {
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.tiler.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
 
-        //this.mixer.resetMixeUI(data);
+        this.mixer.resetMixeUI(data);
         this.debug.resetDebugView(data);
 
         //this.toolbar.fillToolbar(vw, vh);

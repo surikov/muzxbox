@@ -186,6 +186,7 @@ class UIRenderer {
         this.debug.setupUI();
         this.toolbar = new UIToolbar();
         this.menu = new RightMenuPanel();
+        this.mixer = new MixerUI();
         let me = this;
         let actionShowMenu = function () {
             let vw = me.tileLevelSVG.clientWidth / me.tiler.tapPxSize();
@@ -194,7 +195,7 @@ class UIRenderer {
             me.menu.resizeMenu(vw, vh);
             me.menu.resetAllAnchors();
         };
-        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(this.resetAnchor, actionShowMenu), this.menu.createMenu(this.resetAnchor.bind(this), this.changeTapSIze.bind(this)));
+        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(this.resetAnchor, actionShowMenu), this.menu.createMenu(this.resetAnchor.bind(this), this.changeTapSIze.bind(this)), this.mixer.buildMixerLayers());
         this.tiler.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
         console.log('tap size', this.tiler.tapPxSize());
         this.tiler.setAfterZoomCallback(() => {
@@ -211,6 +212,7 @@ class UIRenderer {
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.tiler.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
+        this.mixer.resetMixeUI(data);
         this.debug.resetDebugView(data);
         this.toolbar.resizeToolbar(vw, vh);
         this.menu.fillMenuItems();
@@ -951,46 +953,44 @@ class TrackBarUI {
     }
 }
 class MixerUI {
+    constructor() {
+        this.svgs = [];
+        this.zoomLayers = [];
+        this.zoomAnchors = [];
+        this.levels = [];
+    }
     resetMixeUI(data) {
         let mixm = new MixerDataMath(data);
         let ww = mixm.wholeWidth();
         let hh = mixm.wholeHeight();
-        this.mixerAnchor.ww = ww;
-        this.mixerAnchor.hh = hh;
-        for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
-            this.bgRectangles[zz].w = ww;
-            this.bgRectangles[zz].h = hh;
-            this.layerAnchors[zz].ww = ww;
-            this.layerAnchors[zz].hh = hh;
-        }
-        this.pitchedField = [];
-        for (let tt = 0; tt < data.pitchedTracks.length; tt++) {
-            let pitchedTrackData = data.pitchedTracks[tt];
-            let yy = tt * 100 * data.notePathHeight;
-            let tm = new MixerTrackUI(yy, this.mixerAnchor, data);
-            if (tt) {
-                tm.resetMainPitchedTrackUI(pitchedTrackData);
-            }
-            else {
-            }
-            this.pitchedField.push(tm);
+        for (let ii = 0; ii < this.zoomAnchors.length; ii++) {
+            this.zoomAnchors[ii].ww = ww;
+            this.zoomAnchors[ii].hh = hh;
+            this.levels[ii].build(ww, hh);
         }
     }
-    buildDebugLayers() {
-        this.mixerGroup = document.getElementById("mixerLayer");
-        this.mixerAnchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [] };
-        this.mixerLayer = { g: this.mixerGroup, anchors: [this.mixerAnchor], mode: LevelModes.normal };
-        this.layerAnchors = [];
-        this.bgRectangles = [];
-        for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
-            let rectangle = { x: 0, y: 0, w: 1, h: 1, rx: 50, ry: 50, css: 'mixFieldBg' + zoomPrefixLevelsCSS[zz].prefix };
-            let anchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: zoomPrefixLevelsCSS[zz].zoom, hideZoom: zoomPrefixLevelsCSS[zz + 1].zoom, content: [rectangle] };
-            this.mixerLayer.anchors.push(anchor);
-            this.layerAnchors.push(anchor);
-            this.bgRectangles.push(rectangle);
+    buildMixerLayers() {
+        for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
+            this.svgs.push(document.getElementById("tracksLayerZoom" + zoomPrefixLevelsCSS[ii].prefix));
+            this.zoomAnchors.push({ showZoom: zoomPrefixLevelsCSS[ii].zoom, hideZoom: zoomPrefixLevelsCSS[ii + 1].zoom, xx: 0, yy: 0, ww: 1, hh: 1, content: [] });
+            this.zoomLayers.push({ g: this.svgs[ii], anchors: [this.zoomAnchors[ii]], mode: LevelModes.normal });
+            this.levels.push(new MixerLevel(zoomPrefixLevelsCSS[ii].prefix, zoomPrefixLevelsCSS[ii].zoom, zoomPrefixLevelsCSS[ii + 1].zoom, this.zoomAnchors[ii]));
         }
-        console.log(this.mixerLayer);
-        return [this.mixerLayer];
+        return this.zoomLayers;
+    }
+}
+class MixerLevel {
+    constructor(prefix, minZoom, maxZoom, anchor) {
+        this.minZoom = minZoom;
+        this.maxZoom = maxZoom;
+        this.anchor = anchor;
+        this.prefix = prefix;
+        this.bg = { x: 0, y: 0, w: 5, h: 5, rx: 0.4, ry: 0.4, css: 'mixFieldBg' + this.prefix };
+        this.anchor.content = [this.bg];
+    }
+    build(ww, hh) {
+        this.bg.w = ww;
+        this.bg.h = hh;
     }
 }
 class IconLabelButton {
@@ -1052,20 +1052,7 @@ class DebugLayerUI {
     setupUI() {
         this.debugRectangle = { x: 0, y: 0, w: 1, h: 1, rx: 10, ry: 10, css: 'debug' };
         this.debugGroup = document.getElementById("debugLayer");
-        this.debugAnchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
-                this.debugRectangle,
-                { x: 0.25, y: 0, w: 0.25, h: 0.25, css: 'debug' },
-                { x: 0.5, y: 0, w: 0.5, h: 0.5, css: 'debug' },
-                { x: 1, y: 0, w: 1, h: 1, css: 'debug' },
-                { x: 2, y: 0, w: 2, h: 2, css: 'debug' },
-                { x: 4, y: 0, w: 4, h: 4, css: 'debug' },
-                { x: 8, y: 0, w: 8, h: 8, css: 'debug' },
-                { x: 16, y: 0, w: 16, h: 16, css: 'debug' },
-                { x: 32, y: 0, w: 32, h: 32, css: 'debug' },
-                { x: 64, y: 0, w: 64, h: 64, css: 'debug' },
-                { x: 128, y: 0, w: 128, h: 128, css: 'debug' },
-                { x: 256, y: 0, w: 256, h: 256, css: 'debug' }
-            ] };
+        this.debugAnchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [] };
         this.debugLayer = {
             g: this.debugGroup, anchors: [
                 this.debugAnchor

@@ -25,6 +25,7 @@ declare let zoomPrefixLevelsCSS: {
 declare class UIRenderer {
     toolbar: UIToolbar;
     menu: RightMenuPanel;
+    mixer: MixerUI;
     debug: DebugLayerUI;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
@@ -165,14 +166,21 @@ declare class TrackBarUI {
     constructor(left: number, top: number, ww: number, toAnchor: TileAnchor, data: MixerData);
 }
 declare class MixerUI {
-    mixerGroup: SVGElement;
-    mixerAnchor: TileAnchor;
-    layerAnchors: TileAnchor[];
-    bgRectangles: TileRectangle[];
-    mixerLayer: TileLayerDefinition;
-    pitchedField: MixerTrackUI[];
+    svgs: SVGElement[];
+    zoomLayers: TileLayerDefinition[];
+    zoomAnchors: TileAnchor[];
+    levels: MixerLevel[];
     resetMixeUI(data: MixerData): void;
-    buildDebugLayers(): TileLayerDefinition[];
+    buildMixerLayers(): TileLayerDefinition[];
+}
+declare class MixerLevel {
+    minZoom: number;
+    maxZoom: number;
+    anchor: TileAnchor;
+    bg: TileRectangle;
+    prefix: string;
+    constructor(prefix: string, minZoom: number, maxZoom: number, anchor: TileAnchor);
+    build(ww: number, hh: number): void;
 }
 declare class IconLabelButton {
     anchor: TileAnchor;
