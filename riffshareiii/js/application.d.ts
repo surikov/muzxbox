@@ -17,6 +17,13 @@ declare class TreeValue {
 }
 declare function startApplication(): void;
 declare function startLoadCSSfile(cssurl: string): void;
+declare class CommandDispatcher {
+    renderer: UIRenderer;
+    registerUI(renderer: UIRenderer): void;
+    showRightMenu(): void;
+    resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
+    changeTapSIze(ratio: number): void;
+}
 declare function createTileLevel(): TileLevelBase;
 declare let zoomPrefixLevelsCSS: {
     prefix: string;
@@ -29,7 +36,8 @@ declare class UIRenderer {
     debug: DebugLayerUI;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
-    resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void;
+    commands: CommandDispatcher;
+    constructor(commands: CommandDispatcher);
     changeTapSIze(ratio: number): void;
     createUI(): void;
     fillUI(data: MixerData): void;
@@ -57,7 +65,9 @@ declare class UIToolbar {
     playPauseButton: ToolBarButton;
     menuButton: ToolBarButton;
     headButton: ToolBarButton;
-    createToolbar(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void, actionShowMenu: () => void): TileLayerDefinition[];
+    commands: CommandDispatcher;
+    constructor(commands: CommandDispatcher);
+    createToolbar(): TileLayerDefinition[];
     resizeToolbar(viewWIdth: number, viewHeight: number): void;
 }
 declare class ToolBarButton {
@@ -93,10 +103,10 @@ declare class RightMenuPanel {
     shiftX: number;
     lastZ: number;
     itemsWidth: number;
-    changeTapSIze: (ratio: number) => void;
-    resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void;
+    commands: CommandDispatcher;
+    constructor(commands: CommandDispatcher);
     resetAllAnchors(): void;
-    createMenu(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void, changeTapSIze: (ratio: number) => void): TileLayerDefinition[];
+    createMenu(): TileLayerDefinition[];
     scrollListing(dx: number, dy: number): void;
     randomString(nn: number): string;
     fillMenuItems(): void;
@@ -151,35 +161,35 @@ declare let commandLocaleRU: string;
 declare let commandLocaleZH: string;
 declare let testMenuData: MenuInfo[];
 declare class BarOctave {
+    constructor(left: number, top: number, width: number, height: number, anchor: TileAnchor, prefix: string, minZoom: number, maxZoom: number, data: MixerData);
 }
-declare class MixerTrackUI {
-    trackRectangle: TileRectangle;
-    trackAnchor: TileAnchor;
-    bars: TrackBarUI[];
+declare class OctaveContent {
     constructor(aa: number, top: number, toAnchor: TileAnchor, data: MixerData);
     resetMainPitchedTrackUI(pitchedTrackData: PitchedTrack): void;
     resetOtherPitchedTrackUI(pitchedTrackData: PitchedTrack): void;
 }
-declare class TrackBarUI {
+declare class MixerBar {
     barRectangle: TileRectangle;
     barAnchor: TileAnchor;
-    constructor(left: number, top: number, ww: number, hh: number, minZoom: number, maxZoom: number, toAnchor: TileAnchor);
+    prefix: string;
+    octaves: BarOctave[];
+    constructor(prefix: string, left: number, top: number, ww: number, hh: number, minZoom: number, maxZoom: number, toAnchor: TileAnchor, data: MixerData);
 }
 declare class MixerUI {
     svgs: SVGElement[];
     zoomLayers: TileLayerDefinition[];
     zoomAnchors: TileAnchor[];
-    levels: MixerLevel[];
+    levels: MixerZoomLevel[];
     fillMixeUI(data: MixerData): void;
     buildMixerLayers(): TileLayerDefinition[];
 }
-declare class MixerLevel {
+declare class MixerZoomLevel {
     minZoom: number;
     maxZoom: number;
     anchor: TileAnchor;
     bg: TileRectangle;
     prefix: string;
-    bars: TrackBarUI[];
+    bars: MixerBar[];
     constructor(prefix: string, minZoom: number, maxZoom: number, anchor: TileAnchor);
     buildLevel(ww: number, hh: number): void;
     fillBars(data: MixerData, hh: number): void;

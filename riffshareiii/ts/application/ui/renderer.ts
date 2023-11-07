@@ -29,10 +29,15 @@ class UIRenderer {//} implements RenderedPart {
     debug: DebugLayerUI;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
-    resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void
+    commands: CommandDispatcher;
+    constructor(commands: CommandDispatcher) {
+        this.commands = commands;
+        this.commands.registerUI(this);
+    }
+   /* resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void
         = (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void => {
             this.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
-        };
+        };*/
     changeTapSIze(ratio: number) {
         console.log('changeTapSIze', ratio, this);
         this.tiler.setupTapSize(ratio);
@@ -46,25 +51,25 @@ class UIRenderer {//} implements RenderedPart {
         let layers: TileLayerDefinition[] = [];
         this.debug = new DebugLayerUI();
         this.debug.setupUI();
-        this.toolbar = new UIToolbar();
+        this.toolbar = new UIToolbar(this.commands);
         //this.toolbar.createToolbar(()=>{
         //	this.toolbar.reRenderToolbar(this.tiler);
         //});
-        this.menu = new RightMenuPanel();
+        this.menu = new RightMenuPanel(this.commands);
         this.mixer = new MixerUI();
         let me = this;
-        let actionShowMenu: () => void = function () {
+        /*let actionShowMenu: () => void = function () {
             let vw = me.tileLevelSVG.clientWidth / me.tiler.tapPxSize();
             let vh = me.tileLevelSVG.clientHeight / me.tiler.tapPxSize();
             me.menu.showState = !me.menu.showState;
             me.menu.resizeMenu(vw, vh);
             me.menu.resetAllAnchors();
-        };
+        };*/
         layers = layers.concat(
             this.debug.allLayers()
             //, this.toolbar.toolBarLayers()
-            , this.toolbar.createToolbar(this.resetAnchor, actionShowMenu)
-            , this.menu.createMenu(this.resetAnchor.bind(this), this.changeTapSIze.bind(this))
+            , this.toolbar.createToolbar()//this.resetAnchor, actionShowMenu)
+            , this.menu.createMenu()//this.resetAnchor.bind(this), this.changeTapSIze.bind(this))
             , this.mixer.buildMixerLayers()
         );
 

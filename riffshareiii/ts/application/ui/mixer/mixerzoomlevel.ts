@@ -1,10 +1,10 @@
-class MixerLevel {
+class MixerZoomLevel {
     minZoom: number;
     maxZoom: number;
     anchor: TileAnchor;
     bg: TileRectangle;
     prefix: string;
-    bars: TrackBarUI[];
+    bars: MixerBar[];
     constructor(prefix: string, minZoom: number, maxZoom: number, anchor: TileAnchor) {
         this.minZoom = minZoom;
         this.maxZoom = maxZoom;
@@ -25,7 +25,7 @@ class MixerLevel {
         for (let ii = 0; ii < data.timeline.length; ii++) {
             let timebar = data.timeline[ii];
             width = new MusicMetreMath(timebar.metre).width(timebar.tempo, data.widthDurationRatio);
-            this.bars.push(new TrackBarUI(left, 0, width, hh, this.minZoom, this.maxZoom, this.anchor));
+            this.bars.push(new MixerBar(this.prefix, left, 0, width, hh, this.minZoom, this.maxZoom, this.anchor, data));
             left = left + width;
         }
     }

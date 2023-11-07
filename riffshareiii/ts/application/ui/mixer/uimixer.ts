@@ -2,7 +2,7 @@ class MixerUI {
     svgs: SVGElement[] = [];
     zoomLayers: TileLayerDefinition[] = [];
     zoomAnchors: TileAnchor[] = [];
-    levels: MixerLevel[] = [];
+    levels: MixerZoomLevel[] = [];
     fillMixeUI(data: MixerData) {
         let mixm: MixerDataMath = new MixerDataMath(data);
         let ww = mixm.wholeWidth();
@@ -19,7 +19,7 @@ class MixerUI {
             this.svgs.push((document.getElementById("tracksLayerZoom" + zoomPrefixLevelsCSS[ii].prefix) as any) as SVGElement);
             this.zoomAnchors.push({ showZoom: zoomPrefixLevelsCSS[ii].zoom, hideZoom: zoomPrefixLevelsCSS[ii + 1].zoom, xx: 0, yy: 0, ww: 1, hh: 1, content: [] });
             this.zoomLayers.push({ g: this.svgs[ii], anchors: [this.zoomAnchors[ii]], mode: LevelModes.normal });
-            this.levels.push(new MixerLevel(zoomPrefixLevelsCSS[ii].prefix
+            this.levels.push(new MixerZoomLevel(zoomPrefixLevelsCSS[ii].prefix
                 , zoomPrefixLevelsCSS[ii].zoom, zoomPrefixLevelsCSS[ii + 1].zoom
                 , this.zoomAnchors[ii]));
         }

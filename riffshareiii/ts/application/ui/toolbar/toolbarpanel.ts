@@ -11,26 +11,30 @@ class UIToolbar {
     //toolBarLayers(): TileLayerDefinition[] {
     //	return [this.toolBarLayer];
     //}
-    createToolbar(resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void
-        , actionShowMenu: () => void): TileLayerDefinition[] {
+    commands: CommandDispatcher;
+    constructor(commands: CommandDispatcher) {
+        this.commands = commands;
+    }
+    createToolbar(){//resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void
+        //, actionShowMenu: () => void): TileLayerDefinition[] {
         //this.infoButton = new ToolBarButton(['?'], 0, -0.5, (nn: number) => {
         //    console.log('infoButton', nn);
         //});
         this.playPauseButton = new ToolBarButton([icon_play, icon_pause], 0, 0, (nn: number) => {
             console.log('playPauseButton', nn);
             //requestReRenderToolbar();
-            resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
+            this.commands.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
         });
         this.menuButton = new ToolBarButton([icon_openmenu], 0, 1, (nn: number) => {
             console.log('menuButton', nn);
             //requestReRenderToolbar();
-            resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
-            actionShowMenu();
+            this.commands.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
+            this.commands.showRightMenu();
         });
         this.headButton = new ToolBarButton([icon_openleft, icon_closeleft], 0, -1, (nn: number) => {
             console.log('headButton', nn);
             //requestReRenderToolbar();
-            resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
+            this.commands.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
         });
         this.toolBarGroup = (document.getElementById("toolBarPanelGroup") as any) as SVGElement;
         this.toolBarRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'toolBarPanel' };

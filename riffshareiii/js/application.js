@@ -136,10 +136,11 @@ class TreeValue {
     }
     ;
 }
-console.log('startup v1.01');
+console.log('startup v1.02');
 function startApplication() {
     console.log('startApplication v1.6.01');
-    let ui = new UIRenderer();
+    let commands = new CommandDispatcher();
+    let ui = new UIRenderer(commands);
     ui.createUI();
     ui.fillUI(testBigMixerData);
     testNumMathUtil();
@@ -152,6 +153,29 @@ function startLoadCSSfile(cssurl) {
     link.href = cssurl;
     link.media = 'all';
     head.appendChild(link);
+}
+class CommandDispatcher {
+    registerUI(renderer) {
+        this.renderer = renderer;
+    }
+    showRightMenu() {
+        let vw = this.renderer.tileLevelSVG.clientWidth / this.renderer.tiler.tapPxSize();
+        let vh = this.renderer.tileLevelSVG.clientHeight / this.renderer.tiler.tapPxSize();
+        this.renderer.menu.showState = !this.renderer.menu.showState;
+        this.renderer.menu.resizeMenu(vw, vh);
+        this.renderer.menu.resetAllAnchors();
+    }
+    ;
+    resetAnchor(parentSVGGroup, anchor, layerMode) {
+        this.renderer.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
+    }
+    ;
+    changeTapSIze(ratio) {
+        console.log('changeTapSIze', ratio, this);
+        this.renderer.tiler.setupTapSize(ratio);
+        this.renderer.onReSizeView();
+        this.renderer.tiler.resetModel();
+    }
 }
 let zoomPrefixLevelsCSS = [
     { prefix: '025', zoom: 0.25 },
@@ -167,10 +191,9 @@ let zoomPrefixLevelsCSS = [
     { prefix: '256', zoom: 256 }
 ];
 class UIRenderer {
-    constructor() {
-        this.resetAnchor = (parentSVGGroup, anchor, layerMode) => {
-            this.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
-        };
+    constructor(commands) {
+        this.commands = commands;
+        this.commands.registerUI(this);
     }
     changeTapSIze(ratio) {
         console.log('changeTapSIze', ratio, this);
@@ -184,18 +207,11 @@ class UIRenderer {
         let layers = [];
         this.debug = new DebugLayerUI();
         this.debug.setupUI();
-        this.toolbar = new UIToolbar();
-        this.menu = new RightMenuPanel();
+        this.toolbar = new UIToolbar(this.commands);
+        this.menu = new RightMenuPanel(this.commands);
         this.mixer = new MixerUI();
         let me = this;
-        let actionShowMenu = function () {
-            let vw = me.tileLevelSVG.clientWidth / me.tiler.tapPxSize();
-            let vh = me.tileLevelSVG.clientHeight / me.tiler.tapPxSize();
-            me.menu.showState = !me.menu.showState;
-            me.menu.resizeMenu(vw, vh);
-            me.menu.resetAllAnchors();
-        };
-        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(this.resetAnchor, actionShowMenu), this.menu.createMenu(this.resetAnchor.bind(this), this.changeTapSIze.bind(this)), this.mixer.buildMixerLayers());
+        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.buildMixerLayers());
         this.tiler.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
         console.log('tap size', this.tiler.tapPxSize());
         this.tiler.setAfterZoomCallback(() => {
@@ -266,19 +282,22 @@ function LO(id) {
     return labelLocaleDictionary + ':' + id;
 }
 class UIToolbar {
-    createToolbar(resetAnchor, actionShowMenu) {
+    constructor(commands) {
+        this.commands = commands;
+    }
+    createToolbar() {
         this.playPauseButton = new ToolBarButton([icon_play, icon_pause], 0, 0, (nn) => {
             console.log('playPauseButton', nn);
-            resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
+            this.commands.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
         });
         this.menuButton = new ToolBarButton([icon_openmenu], 0, 1, (nn) => {
             console.log('menuButton', nn);
-            resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
-            actionShowMenu();
+            this.commands.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
+            this.commands.showRightMenu();
         });
         this.headButton = new ToolBarButton([icon_openleft, icon_closeleft], 0, -1, (nn) => {
             console.log('headButton', nn);
-            resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
+            this.commands.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
         });
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
         this.toolBarRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'toolBarPanel' };
@@ -338,7 +357,7 @@ class ToolBarButton {
     }
 }
 class RightMenuPanel {
-    constructor() {
+    constructor(commands) {
         this.showState = false;
         this.lastWidth = 0;
         this.lastHeight = 0;
@@ -347,16 +366,15 @@ class RightMenuPanel {
         this.shiftX = 0;
         this.lastZ = 1;
         this.itemsWidth = 0;
+        this.commands = commands;
     }
     resetAllAnchors() {
-        this.resetAnchor(this.menuPanelBackground, this.backgroundAnchor, LevelModes.overlay);
-        this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
-        this.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
-        this.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
+        this.commands.resetAnchor(this.menuPanelBackground, this.backgroundAnchor, LevelModes.overlay);
+        this.commands.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
+        this.commands.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
+        this.commands.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
     }
-    createMenu(resetAnchor, changeTapSIze) {
-        this.resetAnchor = resetAnchor;
-        this.changeTapSIze = changeTapSIze;
+    createMenu() {
         this.menuPanelBackground = document.getElementById("menuPanelBackground");
         this.menuPanelContent = document.getElementById("menuPanelContent");
         this.menuPanelInteraction = document.getElementById("menuPanelInteraction");
@@ -418,7 +436,7 @@ class RightMenuPanel {
         }
         this.scrollY = yy;
         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
-        this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
+        this.commands.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
     randomString(nn) {
         let words = ['red', 'green', 'blue', 'purple', 'black', 'white', 'yellow', 'grey', 'orange', 'cyan', 'magenta', 'silver', 'olive'];
@@ -571,7 +589,7 @@ class RightMenuPanel {
     setThemeSize(ratio, cssPath) {
         console.log("cssPath " + cssPath);
         startLoadCSSfile(cssPath);
-        this.changeTapSIze(ratio);
+        this.commands.changeTapSIze(ratio);
     }
     rerenderContent(folder) {
         this.contentAnchor.content = [];
@@ -590,7 +608,7 @@ class RightMenuPanel {
             this.contentAnchor.content.push(tile);
             position = position + this.items[ii].calculateHeight();
         }
-        this.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
+        this.commands.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
     resizeMenu(viewWidth, viewHeight) {
         this.lastWidth = viewWidth;
@@ -925,29 +943,32 @@ let testMenuData = [
     }
 ];
 class BarOctave {
+    constructor(left, top, width, height, anchor, prefix, minZoom, maxZoom, data) {
+        let mixm = new MixerDataMath(data);
+        let oRectangle = { x: left, y: top, w: width, h: height, rx: 1, ry: 1, css: 'mixFieldBg' + prefix };
+        let oAnchor = { xx: left, yy: top, ww: width, hh: height, showZoom: minZoom, hideZoom: maxZoom, content: [oRectangle] };
+        anchor.content.push(oAnchor);
+    }
 }
-class MixerTrackUI {
+class OctaveContent {
     constructor(aa, top, toAnchor, data) {
-        let ww = new MixerDataMath(data).wholeWidth();
-        this.trackRectangle = { x: 0, y: top, w: ww, h: data.notePathHeight * 100 - 3, rx: 3, ry: 3, css: 'debug' };
-        this.trackAnchor = { xx: 0, yy: top, ww: ww, hh: data.notePathHeight * 100, showZoom: 0.25, hideZoom: 64, content: [this.trackRectangle] };
-        this.bars = [];
-        let left = 0;
-        for (let ss = 0; ss < data.timeline.length; ss++) {
-            let width = new MusicMetreMath(data.timeline[ss].metre).width(data.timeline[ss].tempo, data.widthDurationRatio);
-            left = left + width;
-        }
     }
     resetMainPitchedTrackUI(pitchedTrackData) {
     }
     resetOtherPitchedTrackUI(pitchedTrackData) {
     }
 }
-class TrackBarUI {
-    constructor(left, top, ww, hh, minZoom, maxZoom, toAnchor) {
-        this.barRectangle = { x: left, y: top, w: ww / 2, h: hh, rx: 1, ry: 1, css: 'debug' };
+class MixerBar {
+    constructor(prefix, left, top, ww, hh, minZoom, maxZoom, toAnchor, data) {
+        this.prefix = '';
+        this.prefix = prefix;
+        this.barRectangle = { x: left, y: top, w: ww, h: hh, rx: 1, ry: 1, css: 'mixFieldBg' + this.prefix };
         this.barAnchor = { xx: left, yy: top, ww: ww, hh: hh, showZoom: minZoom, hideZoom: maxZoom, content: [this.barRectangle] };
         toAnchor.content.push(this.barAnchor);
+        this.octaves = [];
+        for (let oo = 0; oo < 10; oo++) {
+            this.octaves.push(new BarOctave(left, oo * 12 * data.notePathHeight, ww, 12 * data.notePathHeight, this.barAnchor, prefix, minZoom, maxZoom, data));
+        }
     }
 }
 class MixerUI {
@@ -973,12 +994,12 @@ class MixerUI {
             this.svgs.push(document.getElementById("tracksLayerZoom" + zoomPrefixLevelsCSS[ii].prefix));
             this.zoomAnchors.push({ showZoom: zoomPrefixLevelsCSS[ii].zoom, hideZoom: zoomPrefixLevelsCSS[ii + 1].zoom, xx: 0, yy: 0, ww: 1, hh: 1, content: [] });
             this.zoomLayers.push({ g: this.svgs[ii], anchors: [this.zoomAnchors[ii]], mode: LevelModes.normal });
-            this.levels.push(new MixerLevel(zoomPrefixLevelsCSS[ii].prefix, zoomPrefixLevelsCSS[ii].zoom, zoomPrefixLevelsCSS[ii + 1].zoom, this.zoomAnchors[ii]));
+            this.levels.push(new MixerZoomLevel(zoomPrefixLevelsCSS[ii].prefix, zoomPrefixLevelsCSS[ii].zoom, zoomPrefixLevelsCSS[ii + 1].zoom, this.zoomAnchors[ii]));
         }
         return this.zoomLayers;
     }
 }
-class MixerLevel {
+class MixerZoomLevel {
     constructor(prefix, minZoom, maxZoom, anchor) {
         this.minZoom = minZoom;
         this.maxZoom = maxZoom;
@@ -998,7 +1019,7 @@ class MixerLevel {
         for (let ii = 0; ii < data.timeline.length; ii++) {
             let timebar = data.timeline[ii];
             width = new MusicMetreMath(timebar.metre).width(timebar.tempo, data.widthDurationRatio);
-            this.bars.push(new TrackBarUI(left, 0, width, hh, this.minZoom, this.maxZoom, this.anchor));
+            this.bars.push(new MixerBar(this.prefix, left, 0, width, hh, this.minZoom, this.maxZoom, this.anchor, data));
             left = left + width;
         }
     }
@@ -1249,7 +1270,7 @@ class MixerDataMath {
         return ww;
     }
     wholeHeight() {
-        return this.data.pitchedTracks.length * this.data.notePathHeight * 100;
+        return this.data.notePathHeight * 10 * 12;
     }
 }
 let biChar32 = [];

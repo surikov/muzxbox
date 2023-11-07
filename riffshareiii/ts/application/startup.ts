@@ -1,7 +1,8 @@
-console.log('startup v1.01');
+console.log('startup v1.02');
 function startApplication(){
     console.log('startApplication v1.6.01');
-    let ui=new UIRenderer();
+    let commands=new CommandDispatcher();
+    let ui=new UIRenderer(commands);
     ui.createUI();
     ui.fillUI(testBigMixerData);//testEmptyMixerData);
     testNumMathUtil();
