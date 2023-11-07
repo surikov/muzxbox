@@ -156,21 +156,21 @@ declare class MixerTrackUI {
     trackRectangle: TileRectangle;
     trackAnchor: TileAnchor;
     bars: TrackBarUI[];
-    constructor(top: number, toAnchor: TileAnchor, data: MixerData);
+    constructor(aa: number, top: number, toAnchor: TileAnchor, data: MixerData);
     resetMainPitchedTrackUI(pitchedTrackData: PitchedTrack): void;
     resetOtherPitchedTrackUI(pitchedTrackData: PitchedTrack): void;
 }
 declare class TrackBarUI {
     barRectangle: TileRectangle;
     barAnchor: TileAnchor;
-    constructor(left: number, top: number, ww: number, toAnchor: TileAnchor, data: MixerData);
+    constructor(left: number, top: number, ww: number, hh: number, minZoom: number, maxZoom: number, toAnchor: TileAnchor);
 }
 declare class MixerUI {
     svgs: SVGElement[];
     zoomLayers: TileLayerDefinition[];
     zoomAnchors: TileAnchor[];
     levels: MixerLevel[];
-    resetMixeUI(data: MixerData): void;
+    fillMixeUI(data: MixerData): void;
     buildMixerLayers(): TileLayerDefinition[];
 }
 declare class MixerLevel {
@@ -179,8 +179,10 @@ declare class MixerLevel {
     anchor: TileAnchor;
     bg: TileRectangle;
     prefix: string;
+    bars: TrackBarUI[];
     constructor(prefix: string, minZoom: number, maxZoom: number, anchor: TileAnchor);
-    build(ww: number, hh: number): void;
+    buildLevel(ww: number, hh: number): void;
+    fillBars(data: MixerData, hh: number): void;
 }
 declare class IconLabelButton {
     anchor: TileAnchor;

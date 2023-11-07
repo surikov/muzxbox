@@ -100,7 +100,7 @@ class UIRenderer {//} implements RenderedPart {
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.tiler.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
 
-        this.mixer.resetMixeUI(data);
+        this.mixer.fillMixeUI(data);
         this.debug.resetDebugView(data);
 
         //this.toolbar.fillToolbar(vw, vh);

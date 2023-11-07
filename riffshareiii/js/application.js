@@ -141,7 +141,7 @@ function startApplication() {
     console.log('startApplication v1.6.01');
     let ui = new UIRenderer();
     ui.createUI();
-    ui.fillUI(testEmptyMixerData);
+    ui.fillUI(testBigMixerData);
     testNumMathUtil();
 }
 function startLoadCSSfile(cssurl) {
@@ -212,7 +212,7 @@ class UIRenderer {
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.tiler.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
-        this.mixer.resetMixeUI(data);
+        this.mixer.fillMixeUI(data);
         this.debug.resetDebugView(data);
         this.toolbar.resizeToolbar(vw, vh);
         this.menu.fillMenuItems();
@@ -927,7 +927,7 @@ let testMenuData = [
 class BarOctave {
 }
 class MixerTrackUI {
-    constructor(top, toAnchor, data) {
+    constructor(aa, top, toAnchor, data) {
         let ww = new MixerDataMath(data).wholeWidth();
         this.trackRectangle = { x: 0, y: top, w: ww, h: data.notePathHeight * 100 - 3, rx: 3, ry: 3, css: 'debug' };
         this.trackAnchor = { xx: 0, yy: top, ww: ww, hh: data.notePathHeight * 100, showZoom: 0.25, hideZoom: 64, content: [this.trackRectangle] };
@@ -935,8 +935,6 @@ class MixerTrackUI {
         let left = 0;
         for (let ss = 0; ss < data.timeline.length; ss++) {
             let width = new MusicMetreMath(data.timeline[ss].metre).width(data.timeline[ss].tempo, data.widthDurationRatio);
-            let bar = new TrackBarUI(left, top, width, this.trackAnchor, data);
-            this.bars.push(bar);
             left = left + width;
         }
     }
@@ -946,9 +944,9 @@ class MixerTrackUI {
     }
 }
 class TrackBarUI {
-    constructor(left, top, ww, toAnchor, data) {
-        this.barRectangle = { x: left, y: top, w: ww - 1, h: data.notePathHeight * 100 - 1, rx: 1, ry: 1, css: 'debug' };
-        this.barAnchor = { xx: left, yy: top, ww: ww, hh: data.notePathHeight * 100, showZoom: 0.25, hideZoom: 32, content: [this.barRectangle] };
+    constructor(left, top, ww, hh, minZoom, maxZoom, toAnchor) {
+        this.barRectangle = { x: left, y: top, w: ww / 2, h: hh, rx: 1, ry: 1, css: 'debug' };
+        this.barAnchor = { xx: left, yy: top, ww: ww, hh: hh, showZoom: minZoom, hideZoom: maxZoom, content: [this.barRectangle] };
         toAnchor.content.push(this.barAnchor);
     }
 }
@@ -959,14 +957,15 @@ class MixerUI {
         this.zoomAnchors = [];
         this.levels = [];
     }
-    resetMixeUI(data) {
+    fillMixeUI(data) {
         let mixm = new MixerDataMath(data);
         let ww = mixm.wholeWidth();
         let hh = mixm.wholeHeight();
         for (let ii = 0; ii < this.zoomAnchors.length; ii++) {
             this.zoomAnchors[ii].ww = ww;
             this.zoomAnchors[ii].hh = hh;
-            this.levels[ii].build(ww, hh);
+            this.levels[ii].buildLevel(ww, hh);
+            this.levels[ii].fillBars(data, hh);
         }
     }
     buildMixerLayers() {
@@ -987,10 +986,21 @@ class MixerLevel {
         this.prefix = prefix;
         this.bg = { x: 0, y: 0, w: 5, h: 5, rx: 0.4, ry: 0.4, css: 'mixFieldBg' + this.prefix };
         this.anchor.content = [this.bg];
+        this.bars = [];
     }
-    build(ww, hh) {
+    buildLevel(ww, hh) {
         this.bg.w = ww;
         this.bg.h = hh;
+    }
+    fillBars(data, hh) {
+        let left = 0;
+        let width = 0;
+        for (let ii = 0; ii < data.timeline.length; ii++) {
+            let timebar = data.timeline[ii];
+            width = new MusicMetreMath(timebar.metre).width(timebar.tempo, data.widthDurationRatio);
+            this.bars.push(new TrackBarUI(left, 0, width, hh, this.minZoom, this.maxZoom, this.anchor));
+            left = left + width;
+        }
     }
 }
 class IconLabelButton {

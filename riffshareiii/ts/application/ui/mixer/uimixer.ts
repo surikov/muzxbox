@@ -3,14 +3,15 @@ class MixerUI {
     zoomLayers: TileLayerDefinition[] = [];
     zoomAnchors: TileAnchor[] = [];
     levels: MixerLevel[] = [];
-    resetMixeUI(data: MixerData) {
+    fillMixeUI(data: MixerData) {
         let mixm: MixerDataMath = new MixerDataMath(data);
         let ww = mixm.wholeWidth();
         let hh = mixm.wholeHeight();
         for (let ii = 0; ii < this.zoomAnchors.length; ii++) {
             this.zoomAnchors[ii].ww = ww;
             this.zoomAnchors[ii].hh = hh;
-            this.levels[ii].build(ww, hh);
+            this.levels[ii].buildLevel(ww, hh);
+            this.levels[ii].fillBars(data, hh);
         }
     }
     buildMixerLayers(): TileLayerDefinition[] {

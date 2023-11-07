@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.72 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.73 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -309,7 +309,7 @@ function calcRowPatterns(rowNum: number, rows: BallsRow[]): number[] {
 	}
 	return cnts;
 }
-function calcRowFills( rowNum: number, rows: BallsRow[], counts: number[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] {
+function calcEmptyColumnDuration( rowNum: number, rows: BallsRow[], counts: number[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] {
 	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = [];
 	for (let nn = 0; nn < rowLen; nn++) {
 		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number } = { ball: nn + 1, fills: [], summ: 0 };
@@ -330,6 +330,7 @@ function calcRowFills( rowNum: number, rows: BallsRow[], counts: number[]): { ba
 	}
 	return resu;
 }
+/*
 function calcRowPreFreqs(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
 	let w0 = 0;
 	let w1 = 100;
@@ -358,8 +359,8 @@ function calcRowPreFreqs(rowNum: number, rows: BallsRow[]): { ball: number, fill
 		}
 	}
 	return resu;
-}
-function calcRowHot(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
+}*/
+function calcRowPatternsCOunt(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
 	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
 	for (let nn = 0; nn < rowLen; nn++) {
 		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
@@ -375,6 +376,7 @@ function calcRowHot(rowNum: number, rows: BallsRow[]): { ball: number, fills: { 
 	return resu;
 }
 function dumpRowFills(inrows: BallsRow[]) {
+	console.log('dumpRowFills',inrows);
 	/*if (reduceRatio == 1) {
 		dumpRowFillsColor(sliceRows(inrows, 2, 100+2), '#cccc0066',0.1);
 		dumpRowFillsColor(sliceRows(inrows, 1, 100 + 1), '#66cc0099', -0.1);
@@ -442,11 +444,11 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 	}
 	//console.log(arr);
 }
-function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
-	let oldReduceRatio = reduceRatio;
-	let rows: BallsRow[] = sliceRows(inrows, 0, 100);
+function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
+	//let oldReduceRatio = reduceRatio;
+	//let rows: BallsRow[] = sliceRows(inrows, 0, 100);
 	let precounts: number[] = calcRowPatterns(0 + 1, rows);
-	let ballFills: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = calcRowFills( 0, rows, precounts);
+	let ballFills: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = calcEmptyColumnDuration( 0, rows, precounts);
 	//console.log('ballFills',ballFills);
 	let mx = 0;
 	let min = 987654321;
@@ -474,7 +476,7 @@ function dumpRowFillsColor(inrows: BallsRow[], color: string, shiftX: number) {
 		});
 		prehh = hh;
 	}
-	reduceRatio = oldReduceRatio;
+	//reduceRatio = oldReduceRatio;
 
 }
 function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
@@ -486,19 +488,21 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			ratioPre = 0.66;
 		}
 	}
+	console.log('dumpTriads',highLightMode);
 	for (let rr = 0; rr < rowsVisibleCount; rr++) {
 		if (rr > rows.length - 6) break;
 		let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[];
-		if (highLightMode == 2) {
-			calcs = calcRowPreFreqs(rr, rows);
-		} else {
+		//console.log(highLightMode);
+		//if (highLightMode == 2) {
+		//	calcs = calcRowPreFreqs(rr, rows);
+		//} else {
 			if (highLightMode == 1) {
-				calcs = calcRowHot(rr, rows);
+				calcs = calcRowPatternsCOunt(rr, rows);
 			} else {
 				let precounts = calcRowPatterns(rr + 1, rows);
-				calcs = calcRowFills( rr, rows, precounts);
+				calcs = calcEmptyColumnDuration( rr, rows, precounts);
 			}
-		}
+		//}
 		let minCnt = 99999;
 		let mxCount = 0;
 		for (let ii = 0; ii < rowLen; ii++) {
@@ -655,14 +659,15 @@ function addTails() {
 	dumpRowFills(slicedrows);
 	fillCells();
 }
+/*
 function dumpStatAll() {
 	let idx = Math.floor(Math.random() * rowLen);
 	for (let sz = 1; sz <= 22; sz++) {
 		dumpStatIne(idx, sz);
 	}
 	//dumpLongness();
-}
-
+}*/
+/*
 type Stat123 = {
 	dx1: number
 	, dx2: number
@@ -692,7 +697,8 @@ function stat3rows(rr: number, slicedrows: BallsRow[], result: Stat123): void {
 		if ((ballExists(bb + 1, slicedrows[rr])) && (ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (!ballExists(bb + 1 + result.dx2, slicedrows[rr + 2]))) result.count110++;
 		if ((ballExists(bb + 1, slicedrows[rr])) && (ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (ballExists(bb + 1 + result.dx2, slicedrows[rr + 2]))) result.count111++;
 	}
-}
+}*/
+/*
 function stat3lenRows(dx1: number, dx2: number, slicedrows: BallsRow[]): Stat123 {
 	let rowStat: Stat123 = { dx1: dx1, dx2: dx2, count000: 0, count001: 0, count010: 0, count011: 0, count100: 0, count101: 0, count110: 0, count111: 0, deep: rowLen };
 	//let dx1=3;
@@ -703,7 +709,8 @@ function stat3lenRows(dx1: number, dx2: number, slicedrows: BallsRow[]): Stat123
 	}
 
 	return rowStat;
-}
+}*/
+/*
 function statRes1(ball: number, allstat3: Stat123[], slicedrows: BallsRow[]) {
 	let avg = 0;
 	for (let dx1 = 0; dx1 < rowLen; dx1++) {
@@ -729,7 +736,8 @@ function statRes1(ball: number, allstat3: Stat123[], slicedrows: BallsRow[]) {
 	}
 	avg = avg / (rowLen * rowLen);
 	console.log(ball, avg);
-}
+}*/
+/*
 function calcRatios(slicedrows: BallsRow[]) {
 	let allstat3: Stat123[] = [];
 	for (let dx1 = 0; dx1 < rowLen; dx1++) {
@@ -746,7 +754,7 @@ function calcRatios(slicedrows: BallsRow[]) {
 	for (let ball = 1; ball <= rowLen; ball++) {
 		statRes1(ball, allstat3, slicedrows);
 	}
-}
+}*/
 function dumpStatIne(idx, sz) {
 	//console.log('dumpStatIne', idx, sz);
 	let count0 = 0;
@@ -814,6 +822,7 @@ function anotherStat(){
 	
 	console.log(stat);
 }*/
+/*
 function dumpLongness(shift:number) {
 	//console.log('longness');
 	let longness: number[] = [];
@@ -847,16 +856,16 @@ function dumpLongness(shift:number) {
 		//console.log(ii, longness[ii], Math.round(100 * longness[ii] / sum) + '%');
 	}
 	console.log('dumpLongness',shift,stat);
-}
+}*/
 /////////////////
 init();
 
 fillCells();
-dumpStatAll();
+//dumpStatAll();
 //anotherStat();
 //dumpLongness(-2);
 //dumpLongness(-1);
-dumpLongness(0);
+//dumpLongness(0);
 //dumpLongness(1);
 //dumpLongness(2);
 

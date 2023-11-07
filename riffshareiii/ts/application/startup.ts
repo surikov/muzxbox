@@ -3,7 +3,7 @@ function startApplication(){
     console.log('startApplication v1.6.01');
     let ui=new UIRenderer();
     ui.createUI();
-    ui.fillUI(testEmptyMixerData);
+    ui.fillUI(testBigMixerData);//testEmptyMixerData);
     testNumMathUtil();
 	//console.log('done startApplication');
 }
