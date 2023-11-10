@@ -14,8 +14,10 @@ let commandThemeColorBlue = 'commandThemeColorBlue';
 let commandLocaleEN = 'commandLocaleEN';
 let commandLocaleRU = 'commandLocaleRU';
 let commandLocaleZH = 'commandLocaleZH';
+let commandImportFromMIDI = 'commandImportFromMIDI';
 let testMenuData: MenuInfo[] = [
-    { text: 'One' }
+    { text: 'test import' ,sid:commandImportFromMIDI}
+    ,{ text: 'One' }
     , {
         text: 'Two', children: [{ text: 'One' }
             , { text: 'Two' }

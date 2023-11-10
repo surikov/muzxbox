@@ -273,11 +273,19 @@ class RightMenuPanel {
                         }));
                         break;
                     }
+                    case commandImportFromMIDI: {
+                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
+                            me.setFocus(it, infos);
+                            console.log('import');
+                            me.commands.promptImportFromMIDI();
+                        }));
+                        break;
+                    }
                     default: {
                         this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                             console.log("tap " + ii);
                             me.setFocus(it, infos);
-                            me.rerenderContent(null);
+                            
                         }));
                         break;
                     }

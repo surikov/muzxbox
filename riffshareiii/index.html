@@ -1,20 +1,23 @@
+<!--
 <!DOCTYPE html>
+-->
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport"
-		content="initial-scale=1.0, width=device-width, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
-	
-	<script type='text/javascript' src='./js/mzxbx.js'></script>
-	<script type='text/javascript' src='./js/application.js'></script>
-	<script type='text/javascript' src='./web/plugins/catalog.js'></script>
-	<script type='text/javascript' src='./js/tilerender.js'></script>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="initial-scale=1.0, width=device-width, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
+<!--
+    <script type='text/javascript' src='./js/mzxbx.js'></script>
+-->
+    <script type='text/javascript' src='./js/application.js'></script>
+    <script type='text/javascript' src='./web/plugins/catalog.js'></script>
+    <script type='text/javascript' src='./js/tilerender.js'></script>
 
     <link rel="stylesheet" type="text/css" href="theme/colordarkblue.css">
     <link rel="stylesheet" type="text/css" href="theme/sizesmall.css">
     <link rel="stylesheet" type="text/css" href="theme/font1.css">
-	<link rel="stylesheet" href="theme/material-design-iconic-font/css/material-design-iconic-font.css">
+    <link rel="stylesheet" href="theme/material-design-iconic-font/css/material-design-iconic-font.css">
     <link rel="stylesheet" type="text/css" href="theme/base.css">
     <link rel="stylesheet" type="text/css" href="theme/menu.css">
     <link rel="stylesheet" type="text/css" href="theme/toolbar.css">
@@ -22,37 +25,42 @@
 </head>
 
 <body>
-	<svg id="tileLevelSVG" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+    <div id='pagediv'>
+        <input type="file" id="file_midi_input" accept="audio/midi, audio/x-midi" />
+        <svg id="tileLevelSVG" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 
-		<g id='backgroundLayer' />
-		
-        <!--<g id='mixerLayer' />-->
-        <g id='tracksLayerZoom025' />
-        <g id='tracksLayerZoom05' />
-        <g id='tracksLayerZoom1' />
-        <g id='tracksLayerZoom2' />
-        <g id='tracksLayerZoom4' />
-        <g id='tracksLayerZoom8' />
-        <g id='tracksLayerZoom16' />
-        <g id='tracksLayerZoom32' />
-        <g id='tracksLayerZoom64' />
-        <g id='tracksLayerZoom128' />
-        
-        <g id='debugLayer' />
-        
-        <g id='toolBarPanelGroup' />
-        
-		<g id='menuPanelBackground' />
-        <g id='menuPanelInteraction' />
-		<g id='menuPanelContent' />
-        <g id='menuPanelButtons' />
-		
+            <g id='backgroundLayer' />
 
-	</svg>
+            <!--<g id='mixerLayer' />-->
+            <g id='tracksLayerZoom025' />
+            <g id='tracksLayerZoom05' />
+            <g id='tracksLayerZoom1' />
+            <g id='tracksLayerZoom2' />
+            <g id='tracksLayerZoom4' />
+            <g id='tracksLayerZoom8' />
+            <g id='tracksLayerZoom16' />
+            <g id='tracksLayerZoom32' />
+            <g id='tracksLayerZoom64' />
+            <g id='tracksLayerZoom128' />
+
+            <g id='debugLayer' />
+
+            <g id='toolBarPanelGroup' />
+
+            <g id='menuPanelBackground' />
+            <g id='menuPanelInteraction' />
+            <g id='menuPanelContent' />
+            <g id='menuPanelButtons' />
+
+
+        </svg>
+        <script>
+            console.log('start page v1.01');
+            startApplication();
+        </script>
+    </div>
 </body>
-<script>
-	console.log('start page v1.01');
-	startApplication();
-</script>
+
 
 </html>
