@@ -11,9 +11,9 @@ class UIToolbar {
     //toolBarLayers(): TileLayerDefinition[] {
     //	return [this.toolBarLayer];
     //}
-    commands: CommandDispatcher;
-    constructor(commands: CommandDispatcher) {
-        this.commands = commands;
+    //commands: CommandDispatcher;
+    constructor(){//commands: CommandDispatcher) {
+        //this.commands = commands;
     }
     createToolbar(){//resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void
         //, actionShowMenu: () => void): TileLayerDefinition[] {
@@ -23,18 +23,18 @@ class UIToolbar {
         this.playPauseButton = new ToolBarButton([icon_play, icon_pause], 0, 0, (nn: number) => {
             console.log('playPauseButton', nn);
             //requestReRenderToolbar();
-            this.commands.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
+            commandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
         });
         this.menuButton = new ToolBarButton([icon_openmenu], 0, 1, (nn: number) => {
             console.log('menuButton', nn);
             //requestReRenderToolbar();
-            this.commands.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
-            this.commands.showRightMenu();
+            commandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
+            commandDispatcher.showRightMenu();
         });
         this.headButton = new ToolBarButton([icon_openleft, icon_closeleft], 0, -1, (nn: number) => {
             console.log('headButton', nn);
             //requestReRenderToolbar();
-            this.commands.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
+            commandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
         });
         this.toolBarGroup = (document.getElementById("toolBarPanelGroup") as any) as SVGElement;
         this.toolBarRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'toolBarPanel' };

@@ -1,4 +1,4 @@
-declare function createTileLevel(): TileLevelBase;
+
 /*
 type RenderedPart = {
 	setupUI: () => void;
@@ -29,10 +29,10 @@ class UIRenderer {//} implements RenderedPart {
     debug: DebugLayerUI;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
-    commands: CommandDispatcher;
-    constructor(commands: CommandDispatcher) {
-        this.commands = commands;
-        this.commands.registerUI(this);
+    //commands: CommandDispatcher;
+    constructor() {
+        //this.commands = commands;
+        commandDispatcher.registerUI(this);
     }
    /* resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void
         = (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void => {
@@ -51,11 +51,11 @@ class UIRenderer {//} implements RenderedPart {
         let layers: TileLayerDefinition[] = [];
         this.debug = new DebugLayerUI();
         this.debug.setupUI();
-        this.toolbar = new UIToolbar(this.commands);
+        this.toolbar = new UIToolbar();
         //this.toolbar.createToolbar(()=>{
         //	this.toolbar.reRenderToolbar(this.tiler);
         //});
-        this.menu = new RightMenuPanel(this.commands);
+        this.menu = new RightMenuPanel();
         this.mixer = new MixerUI();
         let me = this;
         /*let actionShowMenu: () => void = function () {

@@ -25,7 +25,6 @@
         "treevalue/treevalue.ts"
         ,"startup.ts"
         ,"commanddispatcher.ts"
-        ,"midi/MIDIFileImporter.ts"
         ,"ui/renderer.ts"
         ,"ui/localedictionary.ts"
         ,"ui/toolbar/toolbarpanel.ts"
@@ -47,5 +46,7 @@
         ,"data/mixerdatamath.ts"
         ,"data/numathutil.ts"
         ,"../tilelevel/apitilelevel.ts"
+        ,"../mzxbx/publictypes/musicenginetypes.ts"
+		,"../mzxbx/publictypes/musicenginedeclarations.ts"
 	]
 }

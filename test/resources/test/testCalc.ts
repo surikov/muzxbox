@@ -376,7 +376,7 @@ function calcRowPatternsCOunt(rowNum: number, rows: BallsRow[]): { ball: number,
 	return resu;
 }
 function dumpRowFills(inrows: BallsRow[]) {
-	console.log('dumpRowFills',inrows);
+	//console.log('dumpRowFills',inrows);
 	/*if (reduceRatio == 1) {
 		dumpRowFillsColor(sliceRows(inrows, 2, 100+2), '#cccc0066',0.1);
 		dumpRowFillsColor(sliceRows(inrows, 1, 100 + 1), '#66cc0099', -0.1);
@@ -488,7 +488,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			ratioPre = 0.66;
 		}
 	}
-	console.log('dumpTriads',highLightMode);
+	//console.log('dumpTriads',highLightMode);
 	for (let rr = 0; rr < rowsVisibleCount; rr++) {
 		if (rr > rows.length - 6) break;
 		let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[];
@@ -553,7 +553,7 @@ function toggleFirst() {
 	fillCells();
 }
 function clickGoSkip(nn: number) {
-	console.log('clickGoSkip', nn, nn * reduceRatio, skipRowsCount, datarows.length);
+	//console.log('clickGoSkip', nn, nn * reduceRatio, skipRowsCount, datarows.length);
 	if (skipRowsCount + nn * reduceRatio >= 0) {
 		if (skipRowsCount + nn * reduceRatio < datarows.length - rowsVisibleCount * reduceRatio) {
 			skipRowsCount = skipRowsCount + nn * reduceRatio;
@@ -755,6 +755,7 @@ function calcRatios(slicedrows: BallsRow[]) {
 		statRes1(ball, allstat3, slicedrows);
 	}
 }*/
+/*
 function dumpStatIne(idx, sz) {
 	//console.log('dumpStatIne', idx, sz);
 	let count0 = 0;
@@ -794,7 +795,7 @@ function dumpStatIne(idx, sz) {
 	stat.counts[7]=''+count7+': '+  Math.round(100 * count7 / datarows.length) + '%';
 	//console.log('dumpStatIne '+(1+ idx)+'-'+(1+ idx+ sz));
 	console.log('dumpStatIne',idx, sz,stat);
-}
+}*/
 /*
 function anotherStat(){
 	var stat:{count:number,part:number,other:number}[]=[];
@@ -825,15 +826,16 @@ function anotherStat(){
 /*
 function dumpLongness(shift:number) {
 	//console.log('longness');
+	var maxLen=333;//datarows.length;
 	let longness: number[] = [];
 	for (var ball = 1; ball <= rowLen; ball++) {
 		let nn = 0;
-		while (nn < datarows.length && (!ballExists(ball, datarows[nn]))) {
+		while (nn < maxLen && (!ballExists(ball, datarows[nn]))) {
 			nn++;
 		}
 		nn++;
 		let cuLen = 0;
-		while (nn < datarows.length) {
+		while (nn < maxLen) {
 			if (ballExists(ball+shift, datarows[nn])) {
 				longness[cuLen] = longness[cuLen] ? longness[cuLen] : 0;
 				longness[cuLen]++;

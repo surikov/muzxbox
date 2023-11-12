@@ -7,9 +7,9 @@
     <meta charset="utf-8">
     <meta name="viewport"
         content="initial-scale=1.0, width=device-width, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
-<!--
+
     <script type='text/javascript' src='./js/mzxbx.js'></script>
--->
+
     <script type='text/javascript' src='./js/application.js'></script>
     <script type='text/javascript' src='./web/plugins/catalog.js'></script>
     <script type='text/javascript' src='./js/tilerender.js'></script>
@@ -27,6 +27,13 @@
 <body>
     <div id='pagediv'>
         <input type="file" id="file_midi_input" accept="audio/midi, audio/x-midi" />
+        <div id='warningDialog'>
+            <div>
+                <div id='warningIcon'>&#xf1f5;</div>
+                <div id='warningTitle'>Test 123</div>
+                <div id='warningText'>Qwerty asdfg 123</div>
+            </div>
+        </div>
         <svg id="tileLevelSVG" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 

@@ -508,6 +508,7 @@ declare class MIDIFileTrack {
     chords: TrackChord[];
     constructor(buffer: ArrayBuffer, start: number);
 }
+declare function utf8ArrayToString(aBytes: any): string;
 declare class MidiParser {
     header: MIDIFileHeader;
     parsedTracks: MIDIFileTrack[];

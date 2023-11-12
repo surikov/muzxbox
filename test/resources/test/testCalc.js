@@ -342,7 +342,7 @@ function calcRowPatternsCOunt(rowNum, rows) {
     return resu;
 }
 function dumpRowFills(inrows) {
-    console.log('dumpRowFills', inrows);
+    //console.log('dumpRowFills',inrows);
     /*if (reduceRatio == 1) {
         dumpRowFillsColor(sliceRows(inrows, 2, 100+2), '#cccc0066',0.1);
         dumpRowFillsColor(sliceRows(inrows, 1, 100 + 1), '#66cc0099', -0.1);
@@ -461,7 +461,7 @@ function dumpTriads(svg, rows) {
             ratioPre = 0.66;
         }
     }
-    console.log('dumpTriads', highLightMode);
+    //console.log('dumpTriads',highLightMode);
     for (var rr = 0; rr < rowsVisibleCount; rr++) {
         if (rr > rows.length - 6)
             break;
@@ -521,7 +521,7 @@ function toggleFirst() {
     fillCells();
 }
 function clickGoSkip(nn) {
-    console.log('clickGoSkip', nn, nn * reduceRatio, skipRowsCount, datarows.length);
+    //console.log('clickGoSkip', nn, nn * reduceRatio, skipRowsCount, datarows.length);
     if (skipRowsCount + nn * reduceRatio >= 0) {
         if (skipRowsCount + nn * reduceRatio < datarows.length - rowsVisibleCount * reduceRatio) {
             skipRowsCount = skipRowsCount + nn * reduceRatio;
@@ -726,60 +726,47 @@ function calcRatios(slicedrows: BallsRow[]) {
         statRes1(ball, allstat3, slicedrows);
     }
 }*/
+/*
 function dumpStatIne(idx, sz) {
     //console.log('dumpStatIne', idx, sz);
-    var count0 = 0;
-    var count1 = 0;
-    var count2 = 0;
-    var count3 = 0;
-    var count4 = 0;
-    var count5 = 0;
-    var count6 = 0;
-    var count7 = 0;
-    var stat = { balls: '' + (1 + idx) + '-' + (idx + sz), counts: [] };
-    for (var rr = 1; rr < datarows.length; rr++) {
-        var count = 0;
-        for (var bb = 0; bb < sz; bb++) {
+    let count0 = 0;
+    let count1 = 0;
+    let count2 = 0;
+    let count3 = 0;
+    let count4 = 0;
+    let count5 = 0;
+    let count6 = 0;
+    let count7 = 0;
+    
+    let stat:{balls:string,counts:string[]}={balls:''+(1+ idx)+'-'+( idx+ sz),counts:[]};
+    
+    for (let rr = 1; rr < datarows.length; rr++) {
+        let count = 0;
+        for (let bb = 0; bb < sz; bb++) {
             if (ballExists(bb + 1 + idx, datarows[rr])) {
                 count++;
             }
         }
-        if (count == 0) {
-            count0++;
-        }
-        if (count == 1) {
-            count1++;
-        }
-        if (count == 2) {
-            count2++;
-        }
-        if (count == 3) {
-            count3++;
-        }
-        if (count == 4) {
-            count4++;
-        }
-        if (count == 5) {
-            count5++;
-        }
-        if (count == 6) {
-            count6++;
-        }
-        if (count == 7) {
-            count7++;
-        }
+        if (count == 0) { count0++; }
+        if (count == 1) { count1++; }
+        if (count == 2) { count2++; }
+        if (count == 3) { count3++; }
+        if (count == 4) { count4++; }
+        if (count == 5) { count5++; }
+        if (count == 6) { count6++; }
+        if (count == 7) { count7++; }
     }
-    stat.counts[0] = '' + count0 + ': ' + Math.round(100 * count0 / datarows.length) + '%';
-    stat.counts[1] = '' + count1 + ': ' + Math.round(100 * count1 / datarows.length) + '%';
-    stat.counts[2] = '' + count2 + ': ' + Math.round(100 * count2 / datarows.length) + '%';
-    stat.counts[3] = '' + count3 + ': ' + Math.round(100 * count3 / datarows.length) + '%';
-    stat.counts[4] = '' + count4 + ': ' + Math.round(100 * count4 / datarows.length) + '%';
-    stat.counts[5] = '' + count5 + ': ' + Math.round(100 * count5 / datarows.length) + '%';
-    stat.counts[6] = '' + count6 + ': ' + Math.round(100 * count6 / datarows.length) + '%';
-    stat.counts[7] = '' + count7 + ': ' + Math.round(100 * count7 / datarows.length) + '%';
+    stat.counts[0]=''+count0+': '+ Math.round(100 * count0 / datarows.length) + '%';
+    stat.counts[1]=''+count1+': '+  Math.round(100 * count1 / datarows.length) + '%';
+    stat.counts[2]=''+count2+': '+  Math.round(100 * count2 / datarows.length) + '%';
+    stat.counts[3]=''+count3+': '+  Math.round(100 * count3 / datarows.length) + '%';
+    stat.counts[4]=''+count4+': '+  Math.round(100 * count4 / datarows.length) + '%';
+    stat.counts[5]=''+count5+': '+  Math.round(100 * count5 / datarows.length) + '%';
+    stat.counts[6]=''+count6+': '+  Math.round(100 * count6 / datarows.length) + '%';
+    stat.counts[7]=''+count7+': '+  Math.round(100 * count7 / datarows.length) + '%';
     //console.log('dumpStatIne '+(1+ idx)+'-'+(1+ idx+ sz));
-    console.log('dumpStatIne', idx, sz, stat);
-}
+    console.log('dumpStatIne',idx, sz,stat);
+}*/
 /*
 function anotherStat(){
     var stat:{count:number,part:number,other:number}[]=[];
@@ -810,15 +797,16 @@ function anotherStat(){
 /*
 function dumpLongness(shift:number) {
     //console.log('longness');
+    var maxLen=333;//datarows.length;
     let longness: number[] = [];
     for (var ball = 1; ball <= rowLen; ball++) {
         let nn = 0;
-        while (nn < datarows.length && (!ballExists(ball, datarows[nn]))) {
+        while (nn < maxLen && (!ballExists(ball, datarows[nn]))) {
             nn++;
         }
         nn++;
         let cuLen = 0;
-        while (nn < datarows.length) {
+        while (nn < maxLen) {
             if (ballExists(ball+shift, datarows[nn])) {
                 longness[cuLen] = longness[cuLen] ? longness[cuLen] : 0;
                 longness[cuLen]++;

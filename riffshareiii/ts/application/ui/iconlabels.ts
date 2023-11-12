@@ -10,3 +10,4 @@ let icon_moveup='&#xf2fc;';
 let icon_movedown='&#xf2f9;';
 let icon_moveleft='&#xf2fa;';
 let icon_moveright='&#xf2fb;';
+let icon_warningPlay='&#xf2f5;'

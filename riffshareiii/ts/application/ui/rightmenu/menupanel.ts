@@ -35,16 +35,16 @@ class RightMenuPanel {
     //changeTapSIze: (ratio: number) => void;
 
     //resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void;
-    commands: CommandDispatcher;
-    constructor(commands: CommandDispatcher) {
-        this.commands = commands;
+    //commands: CommandDispatcher;
+    constructor() {
+        //this.commands = commands;
     }
     resetAllAnchors() {
 
-        this.commands.resetAnchor(this.menuPanelBackground, this.backgroundAnchor, LevelModes.overlay);
-        this.commands.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
-        this.commands.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
-        this.commands.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
+        commandDispatcher.resetAnchor(this.menuPanelBackground, this.backgroundAnchor, LevelModes.overlay);
+        commandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
+        commandDispatcher.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
+        commandDispatcher.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
     }
 
     createMenu(//resetAnchor: (
@@ -137,7 +137,7 @@ class RightMenuPanel {
 
         this.scrollY = yy;
         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
-        this.commands.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
+        commandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
     randomString(nn: number) {
         let words: string[] = ['red', 'green', 'blue', 'purple', 'black', 'white', 'yellow', 'grey', 'orange', 'cyan', 'magenta', 'silver', 'olive'];
@@ -277,7 +277,7 @@ class RightMenuPanel {
                         this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                             me.setFocus(it, infos);
                             console.log('import');
-                            me.commands.promptImportFromMIDI();
+                            commandDispatcher.promptImportFromMIDI();
                         }));
                         break;
                     }
@@ -315,7 +315,7 @@ class RightMenuPanel {
     setThemeSize(ratio: number, cssPath: string) {
         console.log("cssPath " + cssPath);
         startLoadCSSfile(cssPath);
-        this.commands.changeTapSIze(ratio);
+        commandDispatcher.changeTapSIze(ratio);
     }
     rerenderContent(folder: RightMenuItem | null) {
         /*if (folder == null) {
@@ -342,7 +342,7 @@ class RightMenuPanel {
             position = position + this.items[ii].calculateHeight();
         }
 
-        this.commands.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
+        commandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
         //this.scrollListing(0,this.scrollY);
     }
     resizeMenu(viewWidth: number, viewHeight: number) {
