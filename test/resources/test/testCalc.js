@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.73 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.74 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -229,11 +229,21 @@ function drawStat3(svg, rows) {
             addSmallText(svg, 2 * rowLen * cellSize + 2, topShift + (1 + rowNum) * cellSize - 2, rows[rowNum].key);
             for (var colNum = 1; colNum <= rowLen; colNum++) {
                 if (ballExists(colNum, rows[rowNum])) {
-                    if (rowNum > 0 || showFirstRow) {
-                        addCircle(svg, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 5 - 0.5, '#ff0000ff', '#ff0000ff');
+                    var topy = topShift + 0.5 * cellSize + rowNum * cellSize;
+                    var szz = cellSize / 5 - 0.5;
+                    var clr = '#ff0000ff';
+                    if (rowNum == 0) {
+                        topy = topy - 1.5 * cellSize;
+                        szz = cellSize / 3 - 0.5;
+                        clr = '#00ff00ff';
                     }
                     if (rowNum > 0 || showFirstRow) {
-                        addCircle(svg, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize, topShift + 0.5 * cellSize + rowNum * cellSize, cellSize / 5 - 0.5, '#ff0000ff', '#ff0000ff');
+                        addCircle(svg, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize, topy //topShift + 0.5 * cellSize + rowNum * cellSize
+                        , szz, clr, clr);
+                    }
+                    if (rowNum > 0 || showFirstRow) {
+                        addCircle(svg, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize, topy //topShift + 0.5 * cellSize + rowNum * cellSize
+                        , szz, clr, clr);
                     }
                 }
             }
@@ -509,6 +519,7 @@ function fillCells() {
     msgp = document.getElementById('calcLen');
     msgp.innerText = '' + calcLen;
     //calcRatios(slicedrows);
+    //console.log('fillCells');
 }
 function clickHop() {
     skipRowsCount = Math.round(Math.random() * (datarows.length - reduceRatio * rowsVisibleCount));
