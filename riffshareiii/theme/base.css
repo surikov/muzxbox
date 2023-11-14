@@ -110,7 +110,7 @@ body,
 .fillShadow {
     fill: var(--color-shadow);
 }
-
+/*
 #warningDialog {
     background-color: color-mix(in lab, transparent 20%, var(--color-background));
     z-index: 2;
@@ -141,5 +141,28 @@ body,
 #warningText {
     font-size: calc(0.33*var(--tapSize));
     color: var(--color-subtext);
+    pointer-events: none;
+}
+*/
+.warningBG{
+	fill: color-mix(in lab, transparent 10%, var(--color-background));
+}
+.warningIcon {
+    font-size: calc(4*var(--tapSize));
+    fill: var(--color-toolbar);
+	text-anchor: middle;
+    font-family: 'Material-Design-Iconic-Font';
+    pointer-events: none;
+}
+.warningTitle {
+    font-size: calc(0.75*var(--tapSize));
+    fill: var(--color-text);
+	text-anchor: middle;
+    pointer-events: none;
+}
+.warningDescription {
+    font-size: calc(0.33*var(--tapSize));
+    fill: var(--color-subtext);
+	text-anchor: middle;
     pointer-events: none;
 }

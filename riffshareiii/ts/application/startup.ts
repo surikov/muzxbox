@@ -9,11 +9,11 @@ function startApplication() {
     ui.fillUI(testBigMixerData);//testEmptyMixerData);
     //testNumMathUtil();
     //console.log('done startApplication');
-    setupZoomDialog();
+    /*setupZoomDialog();
     showDialog(icon_warningPlay, '', '', () => {
         initWebAudioFromUI();
         
-    });
+    });*/
 }
 function initWebAudioFromUI() {
     console.log('initWebAudioFromUI');
@@ -28,6 +28,7 @@ function startLoadCSSfile(cssurl: string) {
     link.media = 'all';
     head.appendChild(link);
 }
+/*
 function setupZoomDialog() {
     let dialogdiv = document.getElementById('warningDialog');
     if (dialogdiv) {
@@ -87,3 +88,4 @@ function showDialog(icon: string, title: string, text: string, cancel: null | ((
         };
     }
 }
+*/

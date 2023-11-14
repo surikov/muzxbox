@@ -40,6 +40,7 @@
         ,"ui/buttons/iconlabelbutton.ts"
 		,"ui/iconlabels.ts"
         ,"ui/debugPane/debuglayer.ts"
+		,"ui/dialogs/warningui.ts"
         ,"data/mixerdata.ts"
         ,"data/testproject.ts"
         ,"data/musicmetremath.ts"

@@ -142,13 +142,10 @@ function startApplication() {
     let ui = new UIRenderer();
     ui.createUI();
     ui.fillUI(testBigMixerData);
-    setupZoomDialog();
-    showDialog(icon_warningPlay, '', '', () => {
-        initWebAudioFromUI();
-    });
 }
 function initWebAudioFromUI() {
     console.log('initWebAudioFromUI');
+    commandDispatcher.initAudioFromUI();
 }
 function startLoadCSSfile(cssurl) {
     var head = document.getElementsByTagName('head')[0];
@@ -158,57 +155,6 @@ function startLoadCSSfile(cssurl) {
     link.href = cssurl;
     link.media = 'all';
     head.appendChild(link);
-}
-function setupZoomDialog() {
-    let dialogdiv = document.getElementById('warningDialog');
-    if (dialogdiv) {
-        dialogdiv.addEventListener("wheel", function touchHandler(e) {
-            if (e.ctrlKey) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-    }
-}
-function setZoom100() {
-    try {
-        var scale = 'scale(1)';
-        document.body.style.zoom = 1.0;
-        document.body.style.webkitTransform = scale;
-        document.body.style.msTransform = scale;
-        document.body.style.transform = scale;
-        document.body.style.zoom = '100%';
-    }
-    catch (xx) {
-        console.log(xx);
-    }
-}
-function showDialog(icon, title, text, cancel) {
-    let dialogdiv = document.getElementById('warningDialog');
-    if (dialogdiv) {
-        let icondiv = document.getElementById('warningIcon');
-        if (icondiv) {
-            icondiv.innerHTML = icon;
-        }
-        let titlediv = document.getElementById('warningTitle');
-        if (titlediv) {
-            titlediv.innerHTML = title;
-        }
-        let textdiv = document.getElementById('warningText');
-        if (textdiv) {
-            textdiv.innerHTML = text;
-        }
-        dialogdiv.style.display = 'flex';
-        dialogdiv.onclick = () => {
-            setZoom100();
-            let dialogdiv = document.getElementById('warningDialog');
-            if (dialogdiv) {
-                dialogdiv.style.display = 'none';
-            }
-            if (cancel) {
-                cancel();
-            }
-        };
-    }
 }
 class CommandDispatcher {
     initAudioFromUI() {
@@ -286,11 +232,13 @@ class UIRenderer {
         let layers = [];
         this.debug = new DebugLayerUI();
         this.debug.setupUI();
+        this.warning = new WarningUI();
+        this.warning.initDialogUI();
         this.toolbar = new UIToolbar();
         this.menu = new RightMenuPanel();
         this.mixer = new MixerUI();
         let me = this;
-        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.buildMixerLayers());
+        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.buildMixerLayers(), this.warning.allLayers());
         this.tiler.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
         console.log('tap size', this.tiler.tapPxSize());
         this.tiler.setAfterZoomCallback(() => {
@@ -312,6 +260,8 @@ class UIRenderer {
         this.toolbar.resizeToolbar(vw, vh);
         this.menu.fillMenuItems();
         this.menu.resizeMenu(vw, vh);
+        this.warning.resetDialogView(data);
+        this.warning.resizeDialog(vw, vh);
         this.tiler.resetModel();
     }
     onReSizeView() {
@@ -321,6 +271,7 @@ class UIRenderer {
         this.tiler.resetAnchor(this.toolbar.toolBarGroup, this.toolbar.toolBarAnchor, LevelModes.overlay);
         this.menu.resizeMenu(vw, vh);
         this.menu.resetAllAnchors();
+        this.warning.resizeDialog(vw, vh);
     }
     deleteUI() {
     }
@@ -1187,6 +1138,52 @@ class DebugLayerUI {
         this.debugAnchor.hh = hh;
     }
     deleteDebbugView() {
+    }
+}
+class WarningUI {
+    constructor() {
+        this.cancel = function () {
+            this.hide();
+        };
+    }
+    initDialogUI() {
+        this.warningIcon = { x: 0, y: 0, text: icon_warningPlay, css: 'warningIcon' };
+        this.warningTitle = { x: 0, y: 0, text: 'Title', css: 'warningTitle' };
+        this.warningDescription = { x: 0, y: 0, text: 'Some optional text information.', css: 'warningDescription' };
+        this.warningGroup = document.getElementById("warningDialogGroup");
+        this.warningRectangle = { x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: this.cancel.bind(this) };
+        this.warningAnchor = {
+            id: 'warningAnchor', xx: 0, yy: 0, ww: 1, hh: 1, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom,
+            content: [this.warningRectangle, this.warningIcon, this.warningTitle, this.warningDescription]
+        };
+        this.warningLayer = { g: this.warningGroup, anchors: [this.warningAnchor], mode: LevelModes.overlay };
+    }
+    resetDialogView(data) {
+        console.log('resetDialogView');
+    }
+    resizeDialog(ww, hh) {
+        console.log('resizeDialog');
+        this.warningRectangle.w = ww;
+        this.warningRectangle.h = hh;
+        this.warningAnchor.ww = ww;
+        this.warningAnchor.hh = hh;
+        this.warningIcon.x = ww / 2;
+        this.warningIcon.y = hh / 3;
+        this.warningTitle.x = ww / 2;
+        this.warningTitle.y = hh / 3 + 1.5;
+        this.warningDescription.x = ww / 2;
+        this.warningDescription.y = hh / 3 + 2;
+    }
+    allLayers() {
+        return [this.warningLayer];
+    }
+    show() {
+        console.log('WarningUI show');
+        document.getElementById("warningAnchor").style.visibility = "visible";
+    }
+    hide() {
+        console.log('WarningUI hide');
+        document.getElementById("warningAnchor").style.visibility = "hidden";
     }
 }
 let testBigMixerData = {

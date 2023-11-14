@@ -20,9 +20,6 @@ declare function createTileLevel(): TileLevelBase;
 declare function startApplication(): void;
 declare function initWebAudioFromUI(): void;
 declare function startLoadCSSfile(cssurl: string): void;
-declare function setupZoomDialog(): void;
-declare function setZoom100(): void;
-declare function showDialog(icon: string, title: string, text: string, cancel: null | (() => void)): void;
 declare class CommandDispatcher {
     renderer: UIRenderer;
     audioContext: AudioContext;
@@ -43,6 +40,7 @@ declare class UIRenderer {
     menu: RightMenuPanel;
     mixer: MixerUI;
     debug: DebugLayerUI;
+    warning: WarningUI;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
     constructor();
@@ -236,6 +234,22 @@ declare class DebugLayerUI {
     setupUI(): void;
     resetDebugView(data: MixerData): void;
     deleteDebbugView(): void;
+}
+declare class WarningUI {
+    warningRectangle: TileRectangle;
+    warningAnchor: TileAnchor;
+    warningGroup: SVGElement;
+    warningLayer: TileLayerDefinition;
+    warningIcon: TileText;
+    warningTitle: TileText;
+    warningDescription: TileText;
+    cancel: () => void;
+    initDialogUI(): void;
+    resetDialogView(data: MixerData): void;
+    resizeDialog(ww: number, hh: number): void;
+    allLayers(): TileLayerDefinition[];
+    show(): void;
+    hide(): void;
 }
 declare type MusicMetre = {
     count: number;
