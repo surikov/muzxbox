@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.75 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.76 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -214,7 +214,7 @@ function clickFog(vnt) {
 		}
 	} else {
 		markLines.push({
-			fromX: xx, fromY: yy, toX: markX, toY: markY, color: '#ff000066', manual: true
+			fromX: xx, fromY: yy, toX: markX, toY: markY, color: '#ff0000ff', manual: true
 		});
 		markX = -1;
 		markY = -1;
@@ -229,13 +229,29 @@ function clickFog(vnt) {
 function drawLines() {
 	//console.log('drawLines',markLines);
 	clearSVGgroup(linesLevel);
+	let strokeWidth=cellSize / 0.99;
 	for (let i = 0; i < markLines.length; i++) {
-		composeLine(linesLevel
-			, markLines[i].fromX * cellSize + 0.5 * cellSize
-			, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize
-			, markLines[i].toX * cellSize + 0.5 * cellSize
-			, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize
-			, cellSize / 0.99, markLines[i].color);//'#00ff0066');
+		if(!markLines[i].manual){
+			composeLine(linesLevel
+				, markLines[i].fromX * cellSize + 0.5 * cellSize
+				, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize
+				, markLines[i].toX * cellSize + 0.5 * cellSize
+				, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize
+				,strokeWidth //, cellSize / 0.99
+				, markLines[i].color);//'#00ff0066');
+		}
+	}
+	strokeWidth=cellSize / 2.99;
+	for (let i = 0; i < markLines.length; i++) {
+		if(markLines[i].manual){
+			composeLine(linesLevel
+				, markLines[i].fromX * cellSize + 0.5 * cellSize
+				, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize
+				, markLines[i].toX * cellSize + 0.5 * cellSize
+				, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize
+				,strokeWidth //, cellSize / 0.99
+				, markLines[i].color);//'#00ff0066');
+		}
 	}
 }
 function drawStat3(svg: SVGElement, rows: BallsRow[]) {
@@ -546,8 +562,10 @@ function fillCells() {
 	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount + calcLen);
 	dumpTriads(levelA, slicedrows);
 	dumpInfo(skipRowsCount);
-	drawLines();
+	
 	drawStat3(levelA, slicedrows);
+	drawLines();
+	
 	var msgp: HTMLElement = (document.getElementById('stepsize') as any) as HTMLElement;
 	msgp.innerText = '' + reduceRatio;
 	msgp = (document.getElementById('calcLen') as any) as HTMLElement;
