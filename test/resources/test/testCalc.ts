@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.74 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.75 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -422,6 +422,8 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 	let prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
 	for (let bb = 0; bb < rowLen; bb++) {
 		let hh = (mx - min - (arr[bb].summ - min)) / hr;
+		let fromY=Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
+		let toY=Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
 		/*markLines.push({ fromX: bb + shiftX-1
 			, fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
 			, toX: bb + shiftX
@@ -430,9 +432,9 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 		});*/
 		markLines.push({
 			fromX: bb + shiftX - 1
-			, fromY: skipRowsCount + 0 + prehh
+			, fromY: fromY //skipRowsCount + 0 + prehh
 			, toX: bb + shiftX
-			, toY: skipRowsCount + hh - 0
+			, toY: toY //skipRowsCount + hh - 0
 			, color: color, manual: false
 		});
 		/*markLines.push({ fromX: bb + shiftX-1+ rowLen
@@ -443,9 +445,9 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 		});*/
 		markLines.push({
 			fromX: bb + shiftX - 1 + rowLen
-			, fromY: skipRowsCount + 0 + prehh
+			, fromY: fromY //skipRowsCount + 0 + prehh
 			, toX: bb + shiftX + rowLen
-			, toY: skipRowsCount + hh - 0
+			, toY: toY //skipRowsCount + hh - 0
 			, color: color, manual: false
 		});
 		prehh = hh;
@@ -468,18 +470,20 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	let prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
 	for (let bb = 0; bb < rowLen; bb++) {
 		let hh = (mx - min - (ballFills[bb].summ - min)) / hr;
+		let fromY=Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
+		let toY=Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
 		markLines.push({
 			fromX: bb + shiftX - 1
-			, fromY: skipRowsCount + 0 + prehh
+			, fromY: fromY //skipRowsCount + 0 + prehh
 			, toX: bb + shiftX
-			, toY: skipRowsCount + hh - 0
+			, toY: toY //skipRowsCount + hh - 0
 			, color: color, manual: false
 		});
 		markLines.push({
 			fromX: bb + shiftX - 1 + rowLen
-			, fromY: skipRowsCount + 0 + prehh
+			, fromY: fromY //skipRowsCount + 0 + prehh
 			, toX: bb + shiftX + rowLen
-			, toY: skipRowsCount + hh - 0
+			, toY: toY //skipRowsCount + hh - 0
 			, color: color, manual: false
 		});
 		prehh = hh;
@@ -488,14 +492,14 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 
 }
 function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
-	let ratioPre = 0.99;
-	if (highLightMode == 1) {
+	let ratioPre = 0.66;//0.99;
+	/*if (highLightMode == 1) {
 		ratioPre = 0.66;
 	} else {
 		if (highLightMode == 2) {
 			ratioPre = 0.66;
 		}
-	}
+	}*/
 	//console.log('dumpTriads',highLightMode);
 	for (let rr = 0; rr < rowsVisibleCount; rr++) {
 		if (rr > rows.length - 6) break;
@@ -542,7 +546,7 @@ function fillCells() {
 	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount + calcLen);
 	dumpTriads(levelA, slicedrows);
 	dumpInfo(skipRowsCount);
-	//drawLines();
+	drawLines();
 	drawStat3(levelA, slicedrows);
 	var msgp: HTMLElement = (document.getElementById('stepsize') as any) as HTMLElement;
 	msgp.innerText = '' + reduceRatio;
@@ -871,7 +875,8 @@ function dumpLongness(shift:number) {
 /////////////////
 init();
 
-fillCells();
+//fillCells();
+addTails();
 //dumpStatAll();
 //anotherStat();
 //dumpLongness(-2);
