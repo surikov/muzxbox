@@ -14,7 +14,7 @@
 
 .rightMenuLabel {
     fill: var(--color-text);
-    font-size: var(--label-05cm);
+    font-size: var(--label-04cm);
     pointer-events: none;
 }
 .rightMenuSubLabel {
