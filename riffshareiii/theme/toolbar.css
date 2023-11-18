@@ -31,7 +31,7 @@
     fill: var(--color-text);
     text-anchor: middle;
     alignment-baseline222: middle;
-    font-size: var(--size-05cm);
+    font-size: var(--icon-05cm);
     pointer-events2: none;
 	
 	font-family: "Material-Design-Iconic-Font";

@@ -32,6 +32,7 @@ class IconLabelButton {
         };
     }
     resize(left: number, top: number, size: number) {
+        //console.log('resize button',this.label.text);
         this.bg.x = left + 0.1;
         this.bg.y = top + 0.1;
         this.bg.w = 0.8 * size;
@@ -39,7 +40,7 @@ class IconLabelButton {
         this.bg.rx = 0.4 * size;
         this.bg.ry = 0.4 * size;
         this.label.x = left + 0.5;
-        this.label.y = top + 1 - 0.31;
+        this.label.y = top + 0.69;// * localeFontRatio;//*commandDispatcher.tapSizeRatio;
         this.spot.x = left;
         this.spot.y = top;
     }

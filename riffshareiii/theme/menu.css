@@ -14,12 +14,12 @@
 
 .rightMenuLabel {
     fill: var(--color-text);
-    font-size: var(--size-05cm);
+    font-size: var(--label-05cm);
     pointer-events: none;
 }
 .rightMenuSubLabel {
     fill: var(--color-subtext);
-    font-size: var(--size-04cm);
+    font-size: var(--label-04cm);
     pointer-events: none;
 }
 
@@ -44,7 +44,7 @@
     fill: var(--color-interactive);
     text-anchor: middle;
     alignment-baseline22: middle;
-    font-size: var(--size-05cm);
+    font-size: var(--label-05cm);
     pointer-events: none;
 	font-family: "Material-Design-Iconic-Font";
 }
@@ -52,7 +52,7 @@
     fill: var(--color-text);
     text-anchor: middle;
     alignment-baseline22: middle;
-    font-size: var(--size-05cm);
+    font-size: var(--icon-05cm);
     pointer-events: none;
 	font-family: "Material-Design-Iconic-Font";
 }
@@ -67,9 +67,7 @@
 .menuButtonLabel {
     fill: var(--color-text);
     text-anchor: middle;
-    alignment-baseline222: middle;
-    font-size: var(--size-05cm);
-    pointer-events2: none;
-	
+    font-size: var(--icon-05cm);
+    pointer-events:none;
 	font-family: "Material-Design-Iconic-Font";
 }

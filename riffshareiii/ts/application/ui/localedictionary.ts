@@ -1,7 +1,8 @@
 let labelLocaleDictionary = 'en';
-let localNameLocal='localNameLocal';
+let localNameLocal = 'localNameLocal';
+let localeFontRatio = 1;
 
-let localMenuItemSettings='localMenuItemSettings';
+let localMenuItemSettings = 'localMenuItemSettings';
 
 let localeDictionary: { id: string, data: { locale: string, text: string }[] }[] = [
     {
@@ -9,15 +10,16 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
             { locale: 'en', text: 'English' }
             , { locale: 'ru', text: 'Русский' }
             , { locale: 'zh', text: '汉语口语' }]
-    },{
+    }, {
         id: localMenuItemSettings, data: [
             { locale: 'en', text: 'Settings' }
             , { locale: 'ru', text: 'Настройки' }
             , { locale: 'zh', text: '设置' }]
     }
 ];
-function setLocaleID(loname: string) {
+function setLocaleID(loname: string, ratio: number) {
     labelLocaleDictionary = loname;
+    localeFontRatio = ratio;
 }
 function LO(id: string): string {
     for (let ii = 0; ii < localeDictionary.length; ii++) {

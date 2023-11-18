@@ -157,6 +157,9 @@ function startLoadCSSfile(cssurl) {
     head.appendChild(link);
 }
 class CommandDispatcher {
+    constructor() {
+        this.tapSizeRatio = 1;
+    }
     initAudioFromUI() {
         var AudioContext = window.AudioContext;
         this.audioContext = new AudioContext();
@@ -176,8 +179,9 @@ class CommandDispatcher {
         this.renderer.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
     }
     ;
-    changeTapSIze(ratio) {
-        console.log('changeTapSIze', ratio, this);
+    changeTapSize(ratio) {
+        console.log('changeTapSize', ratio, this);
+        this.tapSizeRatio = ratio;
         this.renderer.tiler.setupTapSize(ratio);
         this.renderer.onReSizeView();
         this.renderer.tiler.resetModel();
@@ -278,6 +282,7 @@ class UIRenderer {
 }
 let labelLocaleDictionary = 'en';
 let localNameLocal = 'localNameLocal';
+let localeFontRatio = 1;
 let localMenuItemSettings = 'localMenuItemSettings';
 let localeDictionary = [
     {
@@ -294,8 +299,9 @@ let localeDictionary = [
         ]
     }
 ];
-function setLocaleID(loname) {
+function setLocaleID(loname, ratio) {
     labelLocaleDictionary = loname;
+    localeFontRatio = ratio;
 }
 function LO(id) {
     for (let ii = 0; ii < localeDictionary.length; ii++) {
@@ -566,21 +572,21 @@ class RightMenuPanel {
                     case commandLocaleRU: {
                         this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                             me.setFocus(it, infos);
-                            me.setThemeLocale('ru');
+                            me.setThemeLocale('ru', 1);
                         }));
                         break;
                     }
                     case commandLocaleEN: {
                         this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                             me.setFocus(it, infos);
-                            me.setThemeLocale('en');
+                            me.setThemeLocale('en', 1);
                         }));
                         break;
                     }
                     case commandLocaleZH: {
                         this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                             me.setFocus(it, infos);
-                            me.setThemeLocale('zh');
+                            me.setThemeLocale('zh', 1.5);
                         }));
                         break;
                     }
@@ -603,14 +609,14 @@ class RightMenuPanel {
             }
         }
     }
-    setThemeLocale(loc) {
+    setThemeLocale(loc, ratio) {
         console.log("setThemeLocale " + loc);
-        setLocaleID(loc);
+        setLocaleID(loc, ratio);
         if (loc == 'zh') {
-            startLoadCSSfile('theme/font2.css');
+            startLoadCSSfile('theme/font2big.css');
         }
         else {
-            startLoadCSSfile('theme/font1.css');
+            startLoadCSSfile('theme/font1small.css');
         }
         this.resizeMenu(this.lastWidth, this.lastHeight);
         this.resetAllAnchors();
@@ -624,7 +630,7 @@ class RightMenuPanel {
     setThemeSize(ratio, cssPath) {
         console.log("cssPath " + cssPath);
         startLoadCSSfile(cssPath);
-        commandDispatcher.changeTapSIze(ratio);
+        commandDispatcher.changeTapSize(ratio);
     }
     rerenderContent(folder) {
         this.contentAnchor.content = [];
@@ -1096,7 +1102,7 @@ class IconLabelButton {
         this.bg.rx = 0.4 * size;
         this.bg.ry = 0.4 * size;
         this.label.x = left + 0.5;
-        this.label.y = top + 1 - 0.31;
+        this.label.y = top + 0.69;
         this.spot.x = left;
         this.spot.y = top;
     }

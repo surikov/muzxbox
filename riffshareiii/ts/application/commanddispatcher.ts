@@ -1,6 +1,7 @@
 class CommandDispatcher {
     renderer: UIRenderer;
     audioContext:AudioContext;
+    tapSizeRatio:number=1;
     initAudioFromUI(){
         var AudioContext = window.AudioContext;// || window.webkitAudioContext;
         this.audioContext = new AudioContext();
@@ -18,8 +19,9 @@ class CommandDispatcher {
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) {
         this.renderer.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
     };
-    changeTapSIze(ratio: number) {
-        console.log('changeTapSIze', ratio, this);
+    changeTapSize(ratio: number) {
+        console.log('changeTapSize', ratio, this);
+        this.tapSizeRatio=ratio;
         this.renderer.tiler.setupTapSize(ratio);
         this.renderer.onReSizeView();
         this.renderer.tiler.resetModel();

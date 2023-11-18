@@ -23,11 +23,12 @@ declare function startLoadCSSfile(cssurl: string): void;
 declare class CommandDispatcher {
     renderer: UIRenderer;
     audioContext: AudioContext;
+    tapSizeRatio: number;
     initAudioFromUI(): void;
     registerUI(renderer: UIRenderer): void;
     showRightMenu(): void;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
-    changeTapSIze(ratio: number): void;
+    changeTapSize(ratio: number): void;
     promptImportFromMIDI(): void;
 }
 declare let commandDispatcher: CommandDispatcher;
@@ -52,6 +53,7 @@ declare class UIRenderer {
 }
 declare let labelLocaleDictionary: string;
 declare let localNameLocal: string;
+declare let localeFontRatio: number;
 declare let localMenuItemSettings: string;
 declare let localeDictionary: {
     id: string;
@@ -60,7 +62,7 @@ declare let localeDictionary: {
         text: string;
     }[];
 }[];
-declare function setLocaleID(loname: string): void;
+declare function setLocaleID(loname: string, ratio: number): void;
 declare function LO(id: string): string;
 declare class UIToolbar {
     toolBarRectangle: TileRectangle;
@@ -117,7 +119,7 @@ declare class RightMenuPanel {
     setFocus(it: MenuInfo, infos: MenuInfo[]): void;
     setOpenState(state: boolean, it: MenuInfo, infos: MenuInfo[]): void;
     fillMenuItemChildren(pad: number, infos: MenuInfo[]): void;
-    setThemeLocale(loc: string): void;
+    setThemeLocale(loc: string, ratio: number): void;
     setThemeColor(cssPath: string): void;
     setThemeSize(ratio: number, cssPath: string): void;
     rerenderContent(folder: RightMenuItem | null): void;

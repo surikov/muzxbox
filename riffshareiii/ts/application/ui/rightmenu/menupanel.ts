@@ -255,21 +255,21 @@ class RightMenuPanel {
                     case commandLocaleRU: {
                         this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                             me.setFocus(it, infos);
-                            me.setThemeLocale('ru');
+                            me.setThemeLocale('ru',1);
                         }));
                         break;
                     }
                     case commandLocaleEN: {
                         this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                             me.setFocus(it, infos);
-                            me.setThemeLocale('en');
+                            me.setThemeLocale('en',1);
                         }));
                         break;
                     }
                     case commandLocaleZH: {
                         this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                             me.setFocus(it, infos);
-                            me.setThemeLocale('zh');
+                            me.setThemeLocale('zh',1.5);
                         }));
                         break;
                     }
@@ -295,13 +295,13 @@ class RightMenuPanel {
             }
         }
     }
-    setThemeLocale(loc: string) {
+    setThemeLocale(loc: string,ratio:number) {
         console.log("setThemeLocale " + loc);
-        setLocaleID(loc);
+        setLocaleID(loc,ratio);
         if(loc=='zh'){
-            startLoadCSSfile('theme/font2.css');
+            startLoadCSSfile('theme/font2big.css');
         }else{
-            startLoadCSSfile('theme/font1.css');
+            startLoadCSSfile('theme/font1small.css');
         }
         this.resizeMenu(this.lastWidth, this.lastHeight);
         this.resetAllAnchors();
@@ -315,7 +315,7 @@ class RightMenuPanel {
     setThemeSize(ratio: number, cssPath: string) {
         console.log("cssPath " + cssPath);
         startLoadCSSfile(cssPath);
-        commandDispatcher.changeTapSIze(ratio);
+        commandDispatcher.changeTapSize(ratio);
     }
     rerenderContent(folder: RightMenuItem | null) {
         /*if (folder == null) {
