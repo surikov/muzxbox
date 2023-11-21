@@ -1305,10 +1305,17 @@ class MidiParser {
         this.midiEventChannel = 0;
         this.midiEventParam1 = 0;
         this.controller_coarseVolume = 0x07;
+        this.controller_BankSelectMSB = 0x00;
+        this.controller_ModulationWheel = 0x01;
         this.controller_coarseDataEntrySlider = 0x06;
         this.controller_fineDataEntrySlider = 0x26;
-        this.controller_coarseRPN = 0x65;
+        this.controller_ReverbLevel = 0x5B;
+        this.controller_TremoloDepth = 0x5C;
+        this.controller_ChorusLevel = 0x5D;
+        this.controller_NRPNParameterLSB = 0x62;
+        this.controller_NRPNParameterMSB = 0x63;
         this.controller_fineRPN = 0x64;
+        this.controller_coarseRPN = 0x65;
         this.header = new MIDIFileHeader(arrayBuffer);
         this.parseTracks(arrayBuffer);
     }
@@ -1625,12 +1632,10 @@ class MidiParser {
                                                 let idx = evnt.midiChannel ? evnt.midiChannel : 0;
                                                 if (expectedPitchBendRangeMessageNumber == 3) {
                                                     pitchBendRange[idx] = evnt.param2;
-                                                    console.log('pitchBendRange', pitchBendRange);
                                                 }
                                                 if (expectedPitchBendRangeMessageNumber == 4) {
                                                     let pp = evnt.param2 ? evnt.param2 : 0;
                                                     pitchBendRange[idx] = pitchBendRange[idx] + pp / 100;
-                                                    console.log('pitchBendRange', pitchBendRange);
                                                 }
                                                 expectedPitchBendRangeMessageNumber++;
                                                 if (expectedPitchBendRangeMessageNumber == 5) {
@@ -1638,7 +1643,17 @@ class MidiParser {
                                                 }
                                             }
                                             else {
-                                                console.log('unknown controller', evnt.playTimeMs, 'ms, channel', evnt.midiChannel, ':', evnt.param1, evnt.param2);
+                                                if (evnt.param1 == this.controller_BankSelectMSB
+                                                    || evnt.param1 == this.controller_ModulationWheel
+                                                    || evnt.param1 == this.controller_ReverbLevel
+                                                    || evnt.param1 == this.controller_TremoloDepth
+                                                    || evnt.param1 == this.controller_ChorusLevel
+                                                    || evnt.param1 == this.controller_NRPNParameterLSB
+                                                    || evnt.param1 == this.controller_NRPNParameterMSB) {
+                                                }
+                                                else {
+                                                    console.log('unknown controller', evnt.playTimeMs, 'ms, channel', evnt.midiChannel, ':', evnt.param1, evnt.param2);
+                                                }
                                             }
                                         }
                                     }

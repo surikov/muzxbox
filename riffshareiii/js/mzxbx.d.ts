@@ -544,10 +544,17 @@ declare class MidiParser {
     midiEventChannel: number;
     midiEventParam1: number;
     controller_coarseVolume: number;
+    controller_BankSelectMSB: number;
+    controller_ModulationWheel: number;
     controller_coarseDataEntrySlider: number;
     controller_fineDataEntrySlider: number;
-    controller_coarseRPN: number;
+    controller_ReverbLevel: number;
+    controller_TremoloDepth: number;
+    controller_ChorusLevel: number;
+    controller_NRPNParameterLSB: number;
+    controller_NRPNParameterMSB: number;
     controller_fineRPN: number;
+    controller_coarseRPN: number;
     constructor(arrayBuffer: ArrayBuffer);
     parseTracks(arrayBuffer: ArrayBuffer): void;
     toText(arr: number[]): string;
