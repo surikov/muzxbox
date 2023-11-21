@@ -579,3 +579,4 @@ declare class MidiParser {
     };
     dump(): MZXBX_Schedule;
 }
+declare function newMIDIparser(arrayBuffer: ArrayBuffer): MidiParser;

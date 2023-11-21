@@ -1638,7 +1638,7 @@ class MidiParser {
                                                 }
                                             }
                                             else {
-                                                console.log('controller', evnt.playTimeMs, 'ms, channel', evnt.midiChannel, ':', evnt.param1, evnt.param2);
+                                                console.log('unknown controller', evnt.playTimeMs, 'ms, channel', evnt.midiChannel, ':', evnt.param1, evnt.param2);
                                             }
                                         }
                                     }
@@ -1716,7 +1716,6 @@ class MidiParser {
                 }
                 if (expectedPitchBendRangeMessageNumberOld == expectedPitchBendRangeMessageNumber) {
                     if (expectedPitchBendRangeMessageNumberOld >= 2 && expectedPitchBendRangeMessageNumberOld <= 3) {
-                        throw Error('Pitch-bend RANGE (SENSITIVITY) messages ended prematurely. MIDI file might be corrupt.');
                     }
                     if (expectedPitchBendRangeMessageNumberOld == 4) {
                         expectedPitchBendRangeMessageNumber = 1;
@@ -2098,5 +2097,8 @@ class MidiParser {
         }
         return schedule;
     }
+}
+function newMIDIparser(arrayBuffer) {
+    return new MidiParser(arrayBuffer);
 }
 //# sourceMappingURL=mzxbx.js.map

@@ -190,19 +190,24 @@ class CommandDispatcher {
         console.log('promptImportFromMIDI');
         let filesinput = document.getElementById('file_midi_input');
         if (filesinput) {
-            console.log('choose');
             let listener = function (ievent) {
+                console.log('change', ievent);
                 var file = ievent.target.files[0];
                 var fileReader = new FileReader();
                 fileReader.onload = function (progressEvent) {
                     if (progressEvent != null) {
                         var arrayBuffer = progressEvent.target.result;
+                        console.log('arrayBuffer', arrayBuffer);
+                        var midiParser = newMIDIparser(arrayBuffer);
+                        let testSchedule = midiParser.dump();
+                        console.log('MZXBX_Schedule', testSchedule);
                     }
                 };
                 fileReader.readAsArrayBuffer(file);
             };
             filesinput.addEventListener('change', listener, false);
             filesinput.click();
+            console.log('setup', filesinput);
         }
     }
 }

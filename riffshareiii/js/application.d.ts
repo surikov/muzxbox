@@ -20,6 +20,7 @@ declare function createTileLevel(): TileLevelBase;
 declare function startApplication(): void;
 declare function initWebAudioFromUI(): void;
 declare function startLoadCSSfile(cssurl: string): void;
+declare function newMIDIparser(arrayBuffer: ArrayBuffer): any;
 declare class CommandDispatcher {
     renderer: UIRenderer;
     audioContext: AudioContext;

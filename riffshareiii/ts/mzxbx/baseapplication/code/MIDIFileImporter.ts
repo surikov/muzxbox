@@ -927,7 +927,12 @@ class MidiParser {
 
     parseNotes() {
         this.dumpResolutionChanges();
-        var expectedPitchBendRangeMessageNumber = 1; // counts which pitch-bend range message can be expected next: number 1 (can be sent any time, except after pitch-bend range messages number 1 or 2), number 2 (required after number 1), number 3 (required after number 2), or number 4 (optional)
+		// counts which pitch-bend range message can be expected next
+		//: number 1 (can be sent any time, except after pitch-bend range messages number 1 or 2)
+		//, number 2 (required after number 1)
+		//, number 3 (required after number 2)
+		//, or number 4 (optional)
+        var expectedPitchBendRangeMessageNumber = 1; 
         var expectedPitchBendRangeChannel: number | undefined | null = null;
         var pitchBendRange = Array(16).fill(2); // Default pitch-bend range is 2 semitones.
         for (let t = 0; t < this.parsedTracks.length; t++) {
@@ -1123,7 +1128,7 @@ class MidiParser {
                                                     expectedPitchBendRangeMessageNumber = 1;
                                                 }
                                             } else {
-                                                console.log('controller', evnt.playTimeMs, 'ms, channel', evnt.midiChannel, ':', evnt.param1, evnt.param2);
+                                                console.log('unknown controller', evnt.playTimeMs, 'ms, channel', evnt.midiChannel, ':', evnt.param1, evnt.param2);
                                             }
                                         }
                                     }
@@ -1200,7 +1205,7 @@ class MidiParser {
                 }
                 if (expectedPitchBendRangeMessageNumberOld == expectedPitchBendRangeMessageNumber) { // If the current message wasn't an expected pitch-bend range message
                     if (expectedPitchBendRangeMessageNumberOld >= 2 && expectedPitchBendRangeMessageNumberOld <= 3) {
-                        throw Error('Pitch-bend RANGE (SENSITIVITY) messages ended prematurely. MIDI file might be corrupt.');
+                        //throw Error('Pitch-bend RANGE (SENSITIVITY) messages ended prematurely. MIDI file might be corrupt.');
                     }
                     if (expectedPitchBendRangeMessageNumberOld == 4) { // The fourth message is optional, so since it wasn't sent, the setting of the pitch-bend range is done, and we might expect the first pitch-bend range message some time in the future
                         expectedPitchBendRangeMessageNumber = 1;
@@ -1635,4 +1640,6 @@ class MidiParser {
     }
 }
 
-
+function newMIDIparser(arrayBuffer: ArrayBuffer){
+	return new MidiParser(arrayBuffer);
+}

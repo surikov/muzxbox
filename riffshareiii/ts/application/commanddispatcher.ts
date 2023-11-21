@@ -1,3 +1,4 @@
+declare function newMIDIparser(arrayBuffer: ArrayBuffer): any;
 class CommandDispatcher {
     renderer: UIRenderer;
     audioContext:AudioContext;
@@ -30,23 +31,25 @@ class CommandDispatcher {
         console.log('promptImportFromMIDI');
         let filesinput: HTMLElement | null = document.getElementById('file_midi_input');
         if (filesinput) {
-            console.log('choose');
+            
             let listener: (this: HTMLElement, event: HTMLElementEventMap['change']) => any = function (this: HTMLElement, ievent: HTMLElementEventMap['change']) {
-                var file = (ievent as any).target.files[0];
+                console.log('change',ievent);
+				var file = (ievent as any).target.files[0];
                 var fileReader = new FileReader();
                 fileReader.onload = function (progressEvent: any) {
                     if (progressEvent != null) {
                         var arrayBuffer = progressEvent.target.result;
-                        //console.log(arrayBuffer);
-                        //var midiParser = new MidiParser(arrayBuffer);
-                        //let testSchedule = midiParser.dump();
-                        //console.log('MZXBX_Schedule', testSchedule);
+                        console.log('arrayBuffer',arrayBuffer);
+                        var midiParser = newMIDIparser(arrayBuffer);
+                        let testSchedule = midiParser.dump();
+                        console.log('MZXBX_Schedule', testSchedule);
                     }
                 };
                 fileReader.readAsArrayBuffer(file);
             };
             filesinput.addEventListener('change', listener, false);
             filesinput.click();
+			console.log('setup',filesinput);
         }
     }
 }
