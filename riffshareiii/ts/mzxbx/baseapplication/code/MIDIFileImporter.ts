@@ -743,6 +743,8 @@ class MidiParser {
 			}
 			txt = rr;
 		}
+		let at=txt;
+		
 		/*
 				var rr: string = '';
 				for (var ii = 0; ii < arr.length; ii++) {
@@ -752,7 +754,24 @@ class MidiParser {
 				let bytes = new Uint8Array(arr);
 				txt = win1251decoder.decode(bytes);
 				*/
+				txt=txt.replace("\\n"," ");
+				txt=txt.replace("\\r"," ");
+				txt=txt.replace("\\t"," ");
+				txt=txt.replace("\n"," ");
+				txt=txt.replace("\r"," ");
+				txt=txt.replace("\t"," ");
+				txt=txt.replace("  "," ");
+				txt=txt.replace("  "," ");
+				txt=txt.replace("  "," ");
+				txt=txt.replace("  "," ");
+				txt=txt.replace("  "," ");
+				txt=txt.replace("  "," ");
+				txt=txt.replace("  "," ");
+				txt=txt.replace("  "," ");
+				txt=txt.replace("  "," ");
+				txt=txt.trim();
 		//console.log('toText',  txt);
+		//console.log('toText',  at,txt);
 		return txt;
 	}
 	findChordBefore(when: number, track: MIDIFileTrack, channel: number): TrackChord | null {

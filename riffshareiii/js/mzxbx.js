@@ -1355,6 +1355,23 @@ class MidiParser {
             }
             txt = rr;
         }
+        let at = txt;
+        txt = txt.replace("\\n", " ");
+        txt = txt.replace("\\r", " ");
+        txt = txt.replace("\\t", " ");
+        txt = txt.replace("\n", " ");
+        txt = txt.replace("\r", " ");
+        txt = txt.replace("\t", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.trim();
         return txt;
     }
     findChordBefore(when, track, channel) {
