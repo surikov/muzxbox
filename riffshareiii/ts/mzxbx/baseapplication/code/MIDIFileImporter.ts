@@ -608,8 +608,8 @@ class MIDIFileTrack {
 	trackLength: number;
 	trackContent: DataView;
 	trackevents: MIDIEvent[];
-	title: string;
-	instrument: string;
+	trackTitle: string;
+	instrumentName: string;
 	programChannel: { program: number, channel: number }[];
 	trackVolumePoints: { ms: number, value: number, channel: number }[];
 	chords: TrackChord[] = [];
@@ -684,13 +684,19 @@ class MidiParser {
 	midiEventType: number = 0;
 	midiEventChannel: number = 0;
 	midiEventParam1: number = 0;
-	controller_coarseVolume: number = 0x07;
+	
 
 	controller_BankSelectMSB = 0x00;
 	controller_ModulationWheel = 0x01;
 	controller_coarseDataEntrySlider: number = 0x06;
+	controller_coarseVolume: number = 0x07;
+	controller_ballance: number = 0x08;
+	controller_pan: number = 0x0A;
+	controller_expression: number = 0x0B;
+	controller_BankSelectLSBGS: number = 0x20;
 	controller_fineDataEntrySlider: number = 0x26;
 	controller_ReverbLevel = 0x5B;
+	controller_HoldPedal1 = 0x40;
 	controller_TremoloDepth = 0x5C;
 	controller_ChorusLevel = 0x5D;
 	controller_NRPNParameterLSB: number = 0x62;
@@ -698,6 +704,8 @@ class MidiParser {
 
 	controller_fineRPN: number = 0x64;
 	controller_coarseRPN: number = 0x65;
+
+	controller_ResetAllControllers: number = 0x79;
 
 
 	constructor(arrayBuffer: ArrayBuffer) {
@@ -722,7 +730,7 @@ class MidiParser {
 		this.simplifyAllPaths();
 	}
 	toText(arr: number[]): string {
-		let txt = '?';
+		let txt = '';
 		try {
 			let win1251decoder = new TextDecoder("windows-1251");
 			let bytes = new Uint8Array(arr);
@@ -743,7 +751,8 @@ class MidiParser {
 				let win1251decoder = new TextDecoder("windows-1251");
 				let bytes = new Uint8Array(arr);
 				txt = win1251decoder.decode(bytes);
-				console.log('toText', rr, arr, txt);*/
+				*/
+		//console.log('toText',  txt);
 		return txt;
 	}
 	findChordBefore(when: number, track: MIDIFileTrack, channel: number): TrackChord | null {
@@ -1138,14 +1147,25 @@ class MidiParser {
 												}
 											} else {
 												if (evnt.param1 == this.controller_BankSelectMSB
-													||evnt.param1 == this.controller_ModulationWheel
-													||evnt.param1 == this.controller_ReverbLevel
-													||evnt.param1 == this.controller_TremoloDepth
-													||evnt.param1 == this.controller_ChorusLevel
-													||evnt.param1 == this.controller_NRPNParameterLSB
-													||evnt.param1 == this.controller_NRPNParameterMSB
-													) {
-//skip controller
+													|| evnt.param1 == this.controller_ModulationWheel
+													|| evnt.param1 == this.controller_ReverbLevel
+													|| evnt.param1 == this.controller_TremoloDepth
+													|| evnt.param1 == this.controller_ChorusLevel
+													|| evnt.param1 == this.controller_NRPNParameterLSB
+													|| evnt.param1 == this.controller_NRPNParameterMSB
+													|| evnt.param1 == this.controller_fineRPN
+													|| evnt.param1 == this.controller_coarseRPN
+													|| evnt.param1 == this.controller_coarseDataEntrySlider
+													|| evnt.param1 == this.controller_ballance
+													|| evnt.param1 == this.controller_pan
+													|| evnt.param1 == this.controller_expression
+													|| evnt.param1 == this.controller_BankSelectLSBGS
+													|| evnt.param1 == this.controller_HoldPedal1
+													|| evnt.param1 == this.controller_ResetAllControllers
+													|| (evnt.param1 >= 32 && evnt.param1 <= 63) //LSB for Control 0-31
+													|| (evnt.param1 >= 70 && evnt.param1 <= 79) //Sound Controller 1-10
+												) {
+													//skip controller
 												} else {
 													console.log('unknown controller', evnt.playTimeMs, 'ms, channel', evnt.midiChannel, ':', evnt.param1, evnt.param2);
 												}
@@ -1159,19 +1179,24 @@ class MidiParser {
 					//}
 				} else {
 					if (evnt.subtype == this.EVENT_META_TEXT) {
-						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text ? evnt.text : "?" });
+						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: '['+(evnt.text ? evnt.text : "" )+']'});
 					}
 					if (evnt.subtype == this.EVENT_META_COPYRIGHT_NOTICE) {
-						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text ? evnt.text : "?" });
+						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: 'Copyright: '+(evnt.text ? evnt.text : "") });
 					}
 					if (evnt.subtype == this.EVENT_META_TRACK_NAME) {
-						singleParsedTrack.title = this.toText(evnt.data ? evnt.data : []);
+						//singleParsedTrack.title = this.toText(evnt.data ? evnt.data : []);
+						singleParsedTrack.trackTitle = evnt.text ? evnt.text : '';
 					}
 					if (evnt.subtype == this.EVENT_META_INSTRUMENT_NAME) {
-						singleParsedTrack.instrument = this.toText(evnt.data ? evnt.data : []);
+						//singleParsedTrack.instrument = this.toText(evnt.data ? evnt.data : []);
+						singleParsedTrack.instrumentName = evnt.text ? evnt.text : '';
 					}
 					if (evnt.subtype == this.EVENT_META_LYRICS) {
-						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: evnt.text ? evnt.text : "?" });
+						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: '('+(evnt.text ? evnt.text : "")+')' });
+					}
+					if (evnt.subtype == this.EVENT_META_CUE_POINT) {
+						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: 'CUE: '+(evnt.text ? evnt.text : "") });
 					}
 					if (evnt.subtype == this.EVENT_META_KEY_SIGNATURE) {
 
@@ -1387,7 +1412,7 @@ class MidiParser {
 		let it: { trackNum: number, channelNum: number, track: MIDISongTrack } = {
 			trackNum: trackNum, channelNum: channelNum, track: {
 				order: 0
-				, title: parsedtrack.title
+				, title: parsedtrack.trackTitle+((parsedtrack.instrumentName)?(' - '+parsedtrack.instrumentName):'')
 				//, instrument: '0'
 				, channelNum: channelNum
 				, trackVolumes: []//parsedtrack.trackVolumePoints

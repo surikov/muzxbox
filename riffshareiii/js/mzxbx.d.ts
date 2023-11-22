@@ -494,8 +494,8 @@ declare class MIDIFileTrack {
     trackLength: number;
     trackContent: DataView;
     trackevents: MIDIEvent[];
-    title: string;
-    instrument: string;
+    trackTitle: string;
+    instrumentName: string;
     programChannel: {
         program: number;
         channel: number;
@@ -543,18 +543,24 @@ declare class MidiParser {
     midiEventType: number;
     midiEventChannel: number;
     midiEventParam1: number;
-    controller_coarseVolume: number;
     controller_BankSelectMSB: number;
     controller_ModulationWheel: number;
     controller_coarseDataEntrySlider: number;
+    controller_coarseVolume: number;
+    controller_ballance: number;
+    controller_pan: number;
+    controller_expression: number;
+    controller_BankSelectLSBGS: number;
     controller_fineDataEntrySlider: number;
     controller_ReverbLevel: number;
+    controller_HoldPedal1: number;
     controller_TremoloDepth: number;
     controller_ChorusLevel: number;
     controller_NRPNParameterLSB: number;
     controller_NRPNParameterMSB: number;
     controller_fineRPN: number;
     controller_coarseRPN: number;
+    controller_ResetAllControllers: number;
     constructor(arrayBuffer: ArrayBuffer);
     parseTracks(arrayBuffer: ArrayBuffer): void;
     toText(arr: number[]): string;
