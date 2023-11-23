@@ -1362,6 +1362,8 @@ class MidiParser {
         txt = txt.replace("\n", " ");
         txt = txt.replace("\r", " ");
         txt = txt.replace("\t", " ");
+        txt = txt.replace("\\", " ");
+        txt = txt.replace("/", " ");
         txt = txt.replace("  ", " ");
         txt = txt.replace("  ", " ");
         txt = txt.replace("  ", " ");
@@ -1371,7 +1373,6 @@ class MidiParser {
         txt = txt.replace("  ", " ");
         txt = txt.replace("  ", " ");
         txt = txt.replace("  ", " ");
-        txt = txt.trim();
         return txt;
     }
     findChordBefore(when, track, channel) {
@@ -1698,7 +1699,7 @@ class MidiParser {
                 }
                 else {
                     if (evnt.subtype == this.EVENT_META_TEXT) {
-                        this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: '[' + (evnt.text ? evnt.text : "") + ']' });
+                        this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
                     }
                     if (evnt.subtype == this.EVENT_META_COPYRIGHT_NOTICE) {
                         this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: 'Copyright: ' + (evnt.text ? evnt.text : "") });
@@ -1710,7 +1711,7 @@ class MidiParser {
                         singleParsedTrack.instrumentName = evnt.text ? evnt.text : '';
                     }
                     if (evnt.subtype == this.EVENT_META_LYRICS) {
-                        this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: '(' + (evnt.text ? evnt.text : "") + ')' });
+                        this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
                     }
                     if (evnt.subtype == this.EVENT_META_CUE_POINT) {
                         this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: 'CUE: ' + (evnt.text ? evnt.text : "") });
