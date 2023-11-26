@@ -193,13 +193,17 @@ class CommandDispatcher {
             let listener = function (ievent) {
                 console.log('change', ievent);
                 var file = ievent.target.files[0];
+                console.log('file', file);
+                let title = file.name;
+                let comment = '' + file.size / 1000 + 'kb, ' + file.lastModifiedDate;
                 var fileReader = new FileReader();
                 fileReader.onload = function (progressEvent) {
+                    console.log('progressEvent', progressEvent);
                     if (progressEvent != null) {
                         var arrayBuffer = progressEvent.target.result;
                         console.log('arrayBuffer', arrayBuffer);
                         var midiParser = newMIDIparser(arrayBuffer);
-                        let testSchedule = midiParser.dump();
+                        let testSchedule = midiParser.convertProject(title, comment);
                         console.log('MZXBX_Schedule', testSchedule);
                     }
                 };

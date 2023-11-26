@@ -69,9 +69,9 @@ class MZXBX_MetreMath {
         let rr = { count: countMe - countTo, part: metre.part * this.part };
         return new MZXBX_MetreMath().set(rr).simplyfy();
     }
-    duration(metre, tempo) {
+    duration(tempo) {
         let wholeNoteSeconds = (4 * 60) / tempo;
-        let meterSeconds = (wholeNoteSeconds * metre.count) / metre.part;
+        let meterSeconds = (wholeNoteSeconds * this.count) / this.part;
         return meterSeconds;
     }
 }
@@ -2149,6 +2149,109 @@ class MidiParser {
             }
         }
         return schedule;
+    }
+    convertProject(title, comment) {
+        console.log('MidiParser.convertProject', this);
+        let midiSongData = {
+            parser: '1.12',
+            duration: 0,
+            bpm: this.header.tempoBPM,
+            changes: this.header.changes,
+            lyrics: this.header.lyrics,
+            key: this.header.keyFlatSharp,
+            mode: this.header.keyMajMin,
+            meter: { count: this.header.meterCount, division: this.header.meterDivision },
+            meters: this.header.meters,
+            signs: this.header.signs,
+            miditracks: [],
+            speedMode: 0,
+            lineMode: 0
+        };
+        let tracksChannels = [];
+        for (let i = 0; i < this.parsedTracks.length; i++) {
+            let parsedtrack = this.parsedTracks[i];
+            for (let k = 0; k < parsedtrack.programChannel.length; k++) {
+                this.findOrCreateTrack(parsedtrack, i, parsedtrack.programChannel[k].channel, tracksChannels);
+            }
+        }
+        var maxWhen = 0;
+        for (var i = 0; i < this.parsedTracks.length; i++) {
+            var miditrack = this.parsedTracks[i];
+            for (var ch = 0; ch < miditrack.chords.length; ch++) {
+                var midichord = miditrack.chords[ch];
+                var newchord = { when: midichord.when, notes: [], channel: midichord.channel };
+                if (maxWhen < midichord.when) {
+                    maxWhen = midichord.when;
+                }
+                for (var n = 0; n < midichord.notes.length; n++) {
+                    var midinote = midichord.notes[n];
+                    var newnote = { points: [] };
+                    newchord.notes.push(newnote);
+                    for (var v = 0; v < midinote.points.length; v++) {
+                        var midipoint = midinote.points[v];
+                        var newpoint = { pitch: midipoint.pitch, durationms: midipoint.pointDuration };
+                        newpoint.midipoint = midinote;
+                        newnote.points.push(newpoint);
+                    }
+                    newnote.points[newnote.points.length - 1].durationms = newnote.points[newnote.points.length - 1].durationms + 66;
+                }
+                let chanTrack = this.findOrCreateTrack(miditrack, i, newchord.channel, tracksChannels);
+                chanTrack.track.songchords.push(newchord);
+            }
+        }
+        for (let tt = 0; tt < tracksChannels.length; tt++) {
+            let trackChan = tracksChannels[tt];
+            if (trackChan.track.songchords.length > 0) {
+                midiSongData.miditracks.push(tracksChannels[tt].track);
+                if (midiSongData.duration < maxWhen) {
+                    midiSongData.duration = 54321 + maxWhen;
+                }
+                for (let i = 0; i < this.parsedTracks.length; i++) {
+                    let miditrack = this.parsedTracks[i];
+                    for (let kk = 0; kk < miditrack.programChannel.length; kk++) {
+                        if (miditrack.programChannel[kk].channel == trackChan.channelNum) {
+                            trackChan.track.program = miditrack.programChannel[kk].program;
+                        }
+                    }
+                }
+            }
+        }
+        console.log('MIDISongData', midiSongData);
+        let txt = '';
+        for (let ii = 0; ii < midiSongData.lyrics.length; ii++) {
+            txt = txt + midiSongData.lyrics[ii].txt;
+        }
+        console.log(txt);
+        let project = {
+            title: title + ' ' + comment,
+            timeline: [],
+            tracks: [],
+            percussions: [],
+            filters: [],
+            comments: []
+        };
+        let currentTimeMs = 0;
+        let mm = new MZXBX_MetreMath();
+        while (currentTimeMs < midiSongData.duration) {
+            let nextMeasure = { tempo: 120, metre: { count: 4, part: 4 } };
+            for (let tt = 0; tt < midiSongData.changes.length; tt++) {
+                if (midiSongData.changes[tt].ms > currentTimeMs) {
+                    break;
+                }
+                nextMeasure.tempo = midiSongData.changes[tt].bpm;
+            }
+            for (let mm = 0; mm < midiSongData.meters.length; mm++) {
+                if (midiSongData.meters[mm].ms > currentTimeMs) {
+                    break;
+                }
+                nextMeasure.metre.count = midiSongData.meters[mm].count;
+                nextMeasure.metre.part = midiSongData.meters[mm].division;
+            }
+            project.timeline.push(nextMeasure);
+            let measureDurationS = mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
+            currentTimeMs = currentTimeMs + measureDurationS * 1000;
+        }
+        return project;
     }
 }
 function newMIDIparser(arrayBuffer) {

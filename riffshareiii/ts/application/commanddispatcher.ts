@@ -34,14 +34,18 @@ class CommandDispatcher {
             
             let listener: (this: HTMLElement, event: HTMLElementEventMap['change']) => any = function (this: HTMLElement, ievent: HTMLElementEventMap['change']) {
                 console.log('change',ievent);
-				var file = (ievent as any).target.files[0];
+                var file = (ievent as any).target.files[0];
+                console.log('file',file);
+                let title:string=file.name;
+                let comment:string=''+file.size/1000+'kb, '+file.lastModifiedDate;
                 var fileReader = new FileReader();
                 fileReader.onload = function (progressEvent: any) {
+                    console.log('progressEvent',progressEvent);
                     if (progressEvent != null) {
                         var arrayBuffer = progressEvent.target.result;
                         console.log('arrayBuffer',arrayBuffer);
                         var midiParser = newMIDIparser(arrayBuffer);
-                        let testSchedule = midiParser.dump();
+                        let testSchedule = midiParser.convertProject(title,comment);
                         console.log('MZXBX_Schedule', testSchedule);
                     }
                 };

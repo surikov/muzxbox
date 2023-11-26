@@ -67,9 +67,14 @@ class MZXBX_MetreMath implements MZXBX_MetreMathType {
 		let rr = { count: countMe - countTo, part: metre.part * this.part };
 		return new MZXBX_MetreMath().set(rr).simplyfy();
 	}
-	duration(metre: MZXBX_Metre, tempo: number): number {
+	/*duration(metre: MZXBX_Metre, tempo: number): number {
 		let wholeNoteSeconds = (4 * 60) / tempo;
 		let meterSeconds = (wholeNoteSeconds * metre.count) / metre.part;
+		return meterSeconds;
+    }*/
+    duration(tempo: number): number {
+		let wholeNoteSeconds = (4 * 60) / tempo;
+		let meterSeconds = (wholeNoteSeconds * this.count) / this.part;
 		return meterSeconds;
 	}
 }

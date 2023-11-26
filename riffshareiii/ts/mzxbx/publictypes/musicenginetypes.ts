@@ -21,7 +21,8 @@ interface MZXBX_MetreMathType {
 	more(metre: MZXBX_Metre): boolean;
 	plus(metre: MZXBX_Metre): MZXBX_MetreMathType;
 	minus(metre: MZXBX_Metre): MZXBX_MetreMathType;
-	duration(metre: MZXBX_Metre, tempo: number): number;
+    //duration(metre: MZXBX_Metre, tempo: number): number;
+    duration( tempo: number): number;
 }
 type MZXBX_HalfTone = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 type MZXBX_Octave = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -114,7 +115,7 @@ type MZXBX_PercussionMeasure = {
 type MZXBX_SongMeasure = {
 	tempo: number;
 	metre: MZXBX_Metre;
-	scale: MZXBX_Scale;
+	scale?: MZXBX_Scale;
 };
 type MZXBX_PercussionTrack = {
 	title: string;
@@ -128,11 +129,16 @@ type MZXBX_MusicTrack = {
 	filters: MZXBX_AudioFilter[];
 	performer: MZXBX_AudioPerformer;
 };
+type MZXBX_CommentMeasure={
+    skip:MZXBX_Metre;
+    text:string[];
+};
 type MZXBX_Project = {
 	title: string;
 	timeline: MZXBX_SongMeasure[];
 	tracks: MZXBX_MusicTrack[];
-	percussions: MZXBX_PercussionTrack[];
+    percussions: MZXBX_PercussionTrack[];
+    comments: MZXBX_CommentMeasure[];
 	filters: MZXBX_AudioFilter[];
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
