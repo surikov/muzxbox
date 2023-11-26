@@ -5,6 +5,12 @@ class MZXBX_MetreMath {
         this.part = from.part;
         return this;
     }
+    calculate(duration, tempo) {
+        let part32 = new MZXBX_MetreMath().set({ count: 1, part: 16 }).duration(tempo);
+        this.count = Math.round(duration / part32);
+        this.part = 32;
+        return this.simplyfy();
+    }
     metre() {
         return { count: this.count, part: this.part };
     }
@@ -2251,8 +2257,34 @@ class MidiParser {
             let measureDurationS = mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
             currentTimeMs = currentTimeMs + measureDurationS * 1000;
         }
+        for (let ii = 0; ii < project.timeline.length; ii++) {
+            project.comments.push({ texts: [] });
+        }
+        for (let ii = 0; ii < midiSongData.lyrics.length; ii++) {
+            let textpoint = midiSongData.lyrics[ii];
+            let pnt = findMeasureSkipByTime(textpoint.ms / 1000, project.timeline);
+            if (pnt) {
+                project.comments[pnt.idx].texts.push({ skip: { count: pnt.skip.count, part: pnt.skip.part }, text: textpoint.txt });
+            }
+        }
         return project;
     }
+}
+function findMeasureSkipByTime(time, measures) {
+    let curTime = 0;
+    let mm = new MZXBX_MetreMath();
+    for (let ii = 0; ii < measures.length; ii++) {
+        let cumea = measures[ii];
+        let measureDurationS = mm.set(cumea.metre).duration(cumea.tempo);
+        if (curTime + measureDurationS > time) {
+            return {
+                idx: ii,
+                skip: mm.calculate(time - curTime, cumea.tempo)
+            };
+        }
+        curTime = curTime + measureDurationS;
+    }
+    return null;
 }
 function newMIDIparser(arrayBuffer) {
     return new MidiParser(arrayBuffer);

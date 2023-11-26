@@ -23,6 +23,7 @@ interface MZXBX_MetreMathType {
 	minus(metre: MZXBX_Metre): MZXBX_MetreMathType;
     //duration(metre: MZXBX_Metre, tempo: number): number;
     duration( tempo: number): number;
+    calculate(duration: number,tempo:number): MZXBX_MetreMath ;
 }
 type MZXBX_HalfTone = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 type MZXBX_Octave = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -129,9 +130,12 @@ type MZXBX_MusicTrack = {
 	filters: MZXBX_AudioFilter[];
 	performer: MZXBX_AudioPerformer;
 };
-type MZXBX_CommentMeasure={
+type MZXBX_CommentText={
     skip:MZXBX_Metre;
-    text:string[];
+    text:string;
+};
+type MZXBX_CommentMeasure={
+    texts:MZXBX_CommentText[];
 };
 type MZXBX_Project = {
 	title: string;

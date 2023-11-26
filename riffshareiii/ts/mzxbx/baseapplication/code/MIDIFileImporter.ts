@@ -1844,13 +1844,42 @@ class MidiParser {
             //console.log(currentTimeMs, measureDurationS,nextMeasure.tempo,nextMeasure.metre.count,nextMeasure.metre.part);
             currentTimeMs = currentTimeMs + measureDurationS * 1000;
         }
-        
+        for (let ii = 0; ii < project.timeline.length; ii++) {
+            project.comments.push({ texts: [] });
+        }
+        for (let ii = 0; ii < midiSongData.lyrics.length; ii++) {
+            let textpoint = midiSongData.lyrics[ii];
+            //let measure=MZXBX_SongMeasure
+            let pnt = findMeasureSkipByTime(textpoint.ms / 1000, project.timeline);
+            if (pnt) {
+                //console.log(textpoint.ms, pnt.idx, pnt.skip.count, pnt.skip.part, textpoint.txt);
+                project.comments[pnt.idx].texts.push({skip:{count:pnt.skip.count,part:pnt.skip.part},text:textpoint.txt});
+            }
+        }
+
         return project;
     }
     /*createNextMeasure(currentTimeMs:number,midiSongData:MIDISongData): MZXBX_SongMeasure {
         let nextMeasure: MZXBX_SongMeasure = { tempo: 120, metre: { count: 4, part: 4 } };
         return nextMeasure;
     }*/
+}
+function findMeasureSkipByTime(time: number, measures: MZXBX_SongMeasure[]): null | { idx: number, skip: MZXBX_Metre } {
+    let curTime = 0;
+    let mm = new MZXBX_MetreMath();
+    for (let ii = 0; ii < measures.length; ii++) {
+        let cumea = measures[ii];
+        let measureDurationS = mm.set(cumea.metre).duration(cumea.tempo);
+        if (curTime + measureDurationS > time) {
+            //console.log(time - curTime);
+            return {
+                idx: ii
+                , skip: mm.calculate(time - curTime, cumea.tempo)
+            };
+        }
+        curTime = curTime + measureDurationS;
+    }
+    return null;
 }
 
 function newMIDIparser(arrayBuffer: ArrayBuffer) {

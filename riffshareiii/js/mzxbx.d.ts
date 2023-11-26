@@ -2,6 +2,7 @@ declare class MZXBX_MetreMath implements MZXBX_MetreMathType {
     count: number;
     part: number;
     set(from: MZXBX_Metre): MZXBX_MetreMath;
+    calculate(duration: number, tempo: number): MZXBX_MetreMath;
     metre(): MZXBX_Metre;
     simplyfy(): MZXBX_MetreMath;
     strip(toPart: number): MZXBX_MetreMath;
@@ -47,6 +48,7 @@ interface MZXBX_MetreMathType {
     plus(metre: MZXBX_Metre): MZXBX_MetreMathType;
     minus(metre: MZXBX_Metre): MZXBX_MetreMathType;
     duration(tempo: number): number;
+    calculate(duration: number, tempo: number): MZXBX_MetreMath;
 }
 declare type MZXBX_HalfTone = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 declare type MZXBX_Octave = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -136,9 +138,12 @@ declare type MZXBX_MusicTrack = {
     filters: MZXBX_AudioFilter[];
     performer: MZXBX_AudioPerformer;
 };
-declare type MZXBX_CommentMeasure = {
+declare type MZXBX_CommentText = {
     skip: MZXBX_Metre;
-    text: string[];
+    text: string;
+};
+declare type MZXBX_CommentMeasure = {
+    texts: MZXBX_CommentText[];
 };
 declare type MZXBX_Project = {
     title: string;
@@ -598,4 +603,8 @@ declare class MidiParser {
     dump(): MZXBX_Schedule;
     convertProject(title: string, comment: string): MZXBX_Project;
 }
+declare function findMeasureSkipByTime(time: number, measures: MZXBX_SongMeasure[]): null | {
+    idx: number;
+    skip: MZXBX_Metre;
+};
 declare function newMIDIparser(arrayBuffer: ArrayBuffer): MidiParser;
