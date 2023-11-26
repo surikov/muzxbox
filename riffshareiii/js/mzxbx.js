@@ -2267,7 +2267,40 @@ class MidiParser {
                 project.comments[pnt.idx].texts.push({ skip: { count: pnt.skip.count, part: pnt.skip.part }, text: textpoint.txt });
             }
         }
+        for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
+            let midiTrack = midiSongData.miditracks[ii];
+            if (midiTrack.channelNum == 9) {
+                project.percussions.push(this.createProjectDrums(project.timeline, midiTrack));
+            }
+            else {
+                project.tracks.push(this.createProjectTrack(project.timeline, midiTrack));
+            }
+        }
         return project;
+    }
+    createProjectTrack(timeline, midiTrack) {
+        let projectTrack = {
+            title: midiTrack.title,
+            measures: [],
+            filters: [],
+            performer: { id: '', data: '' }
+        };
+        for (let ii = 0; ii < timeline.length; ii++) {
+            projectTrack.measures.push({ chords: [] });
+        }
+        return projectTrack;
+    }
+    createProjectDrums(timeline, midiTrack) {
+        let projectDrums = {
+            title: midiTrack.title,
+            measures: [],
+            filters: [],
+            sampler: { id: '', data: '' }
+        };
+        for (let ii = 0; ii < timeline.length; ii++) {
+            projectDrums.measures.push({ skips: [] });
+        }
+        return projectDrums;
     }
 }
 function findMeasureSkipByTime(time, measures) {

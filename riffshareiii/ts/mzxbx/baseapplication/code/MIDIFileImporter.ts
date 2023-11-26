@@ -1853,11 +1853,42 @@ class MidiParser {
             let pnt = findMeasureSkipByTime(textpoint.ms / 1000, project.timeline);
             if (pnt) {
                 //console.log(textpoint.ms, pnt.idx, pnt.skip.count, pnt.skip.part, textpoint.txt);
-                project.comments[pnt.idx].texts.push({skip:{count:pnt.skip.count,part:pnt.skip.part},text:textpoint.txt});
+                project.comments[pnt.idx].texts.push({ skip: { count: pnt.skip.count, part: pnt.skip.part }, text: textpoint.txt });
             }
         }
-
+        for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
+            let midiTrack: MIDISongTrack = midiSongData.miditracks[ii];
+            if (midiTrack.channelNum == 9) {
+                project.percussions.push(this.createProjectDrums(project.timeline, midiTrack));
+            } else {
+                project.tracks.push(this.createProjectTrack(project.timeline, midiTrack));
+            }
+        }
         return project;
+    }
+    createProjectTrack(timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_MusicTrack {
+        let projectTrack: MZXBX_MusicTrack = {
+            title: midiTrack.title
+            , measures: []
+            , filters: []
+            , performer: { id: '', data: '' }
+        };
+        for (let ii = 0; ii < timeline.length; ii++) {
+            projectTrack.measures.push({ chords: [] });
+        }
+        return projectTrack;
+    }
+    createProjectDrums(timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_PercussionTrack {
+        let projectDrums: MZXBX_PercussionTrack = {
+            title: midiTrack.title
+            , measures: []
+            , filters: []
+            , sampler: { id: '', data: '' }
+        };
+        for (let ii = 0; ii < timeline.length; ii++) {
+            projectDrums.measures.push({ skips: [] });
+        }
+        return projectDrums;
     }
     /*createNextMeasure(currentTimeMs:number,midiSongData:MIDISongData): MZXBX_SongMeasure {
         let nextMeasure: MZXBX_SongMeasure = { tempo: 120, metre: { count: 4, part: 4 } };
