@@ -602,8 +602,9 @@ declare class MidiParser {
     };
     dump(): MZXBX_Schedule;
     convertProject(title: string, comment: string): MZXBX_Project;
+    collectDrums(midiTrack: MIDISongTrack): number[];
     createProjectTrack(timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_MusicTrack;
-    createProjectDrums(timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_PercussionTrack;
+    createProjectDrums(drum: number, timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_PercussionTrack;
 }
 declare function findMeasureSkipByTime(time: number, measures: MZXBX_SongMeasure[]): null | {
     idx: number;

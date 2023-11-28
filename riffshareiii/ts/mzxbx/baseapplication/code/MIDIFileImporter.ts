@@ -1859,12 +1859,31 @@ class MidiParser {
         for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
             let midiTrack: MIDISongTrack = midiSongData.miditracks[ii];
             if (midiTrack.channelNum == 9) {
-                project.percussions.push(this.createProjectDrums(project.timeline, midiTrack));
+                let drums = this.collectDrums(midiTrack);
+                for (let dd = 0; dd < drums.length; dd++) {
+                    project.percussions.push(this.createProjectDrums(drums[dd],project.timeline, midiTrack));
+                }
             } else {
                 project.tracks.push(this.createProjectTrack(project.timeline, midiTrack));
             }
         }
         return project;
+    }
+    collectDrums(midiTrack: MIDISongTrack): number[] {
+        let drums: number[] = [];
+        for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
+            let chord = midiTrack.songchords[ii];
+            for (let kk = 0; kk < chord.notes.length; kk++) {
+                let note = chord.notes[kk];
+                for (let pp = 0; pp < note.points.length; pp++) {
+                    let pitch = note.points[pp].pitch;
+                    if (drums.indexOf(pitch) < 0) {
+                        drums.push(pitch);
+                    }
+                }
+            }
+        }
+        return drums;
     }
     createProjectTrack(timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_MusicTrack {
         let projectTrack: MZXBX_MusicTrack = {
@@ -1878,9 +1897,9 @@ class MidiParser {
         }
         return projectTrack;
     }
-    createProjectDrums(timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_PercussionTrack {
+    createProjectDrums(drum: number, timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_PercussionTrack {
         let projectDrums: MZXBX_PercussionTrack = {
-            title: midiTrack.title
+            title: '[' + drum + ']' + midiTrack.title
             , measures: []
             , filters: []
             , sampler: { id: '', data: '' }

@@ -2270,13 +2270,32 @@ class MidiParser {
         for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
             let midiTrack = midiSongData.miditracks[ii];
             if (midiTrack.channelNum == 9) {
-                project.percussions.push(this.createProjectDrums(project.timeline, midiTrack));
+                let drums = this.collectDrums(midiTrack);
+                for (let dd = 0; dd < drums.length; dd++) {
+                    project.percussions.push(this.createProjectDrums(drums[dd], project.timeline, midiTrack));
+                }
             }
             else {
                 project.tracks.push(this.createProjectTrack(project.timeline, midiTrack));
             }
         }
         return project;
+    }
+    collectDrums(midiTrack) {
+        let drums = [];
+        for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
+            let chord = midiTrack.songchords[ii];
+            for (let kk = 0; kk < chord.notes.length; kk++) {
+                let note = chord.notes[kk];
+                for (let pp = 0; pp < note.points.length; pp++) {
+                    let pitch = note.points[pp].pitch;
+                    if (drums.indexOf(pitch) < 0) {
+                        drums.push(pitch);
+                    }
+                }
+            }
+        }
+        return drums;
     }
     createProjectTrack(timeline, midiTrack) {
         let projectTrack = {
@@ -2290,9 +2309,9 @@ class MidiParser {
         }
         return projectTrack;
     }
-    createProjectDrums(timeline, midiTrack) {
+    createProjectDrums(drum, timeline, midiTrack) {
         let projectDrums = {
-            title: midiTrack.title,
+            title: '[' + drum + ']' + midiTrack.title,
             measures: [],
             filters: [],
             sampler: { id: '', data: '' }
