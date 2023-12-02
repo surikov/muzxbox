@@ -21,9 +21,7 @@ declare class MZXBX_ScaleMath implements MZXBX_ScaleMathType {
     step5: MZXBX_StepSkip;
     step6: MZXBX_StepSkip;
     step7: MZXBX_StepSkip;
-    set(scale: MZXBX_Scale): MZXBX_ScaleMath;
     scale(): MZXBX_Scale;
-    pitch(note: MZXBX_Note): number;
 }
 declare type MZXBX_CachedWave = {
     path: string;
@@ -48,7 +46,7 @@ interface MZXBX_MetreMathType {
     plus(metre: MZXBX_Metre): MZXBX_MetreMathType;
     minus(metre: MZXBX_Metre): MZXBX_MetreMathType;
     duration(tempo: number): number;
-    calculate(duration: number, tempo: number): MZXBX_MetreMath;
+    calculate(duration: number, tempo: number): MZXBX_MetreMathType;
 }
 declare type MZXBX_HalfTone = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 declare type MZXBX_Octave = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -69,10 +67,11 @@ declare type MZXBX_Slide = {
     delta: number;
 };
 declare type MZXBX_Note = {
-    step: MZXBX_Step;
-    shift: MZXBX_StepShift;
-    octave: MZXBX_Octave;
-    sides: MZXBX_Slide[];
+    step?: MZXBX_Step;
+    shift?: MZXBX_StepShift;
+    octave?: MZXBX_Octave;
+    pitch: number;
+    slides: MZXBX_Slide[];
 };
 interface MZXBX_ScaleMathType {
     basePitch: MZXBX_HalfTone;
@@ -82,9 +81,7 @@ interface MZXBX_ScaleMathType {
     step5: MZXBX_StepSkip;
     step6: MZXBX_StepSkip;
     step7: MZXBX_StepSkip;
-    set(scale: MZXBX_Scale): MZXBX_ScaleMathType;
     scale(): MZXBX_Scale;
-    pitch(musicNote: MZXBX_Note): number;
 }
 declare type MZXBX_PluginBase = {
     setup: (audioContext: AudioContext) => boolean;

@@ -66,8 +66,6 @@ declare let localeDictionary: {
 declare function setLocaleID(loname: string, ratio: number): void;
 declare function LO(id: string): string;
 declare class UIToolbar {
-    toolBarRectangle: TileRectangle;
-    toolBarShadow: TileRectangle;
     toolBarAnchor: TileAnchor;
     toolBarGroup: SVGElement;
     toolBarLayer: TileLayerDefinition;
@@ -444,7 +442,8 @@ interface MZXBX_MetreMathType {
     more(metre: MZXBX_Metre): boolean;
     plus(metre: MZXBX_Metre): MZXBX_MetreMathType;
     minus(metre: MZXBX_Metre): MZXBX_MetreMathType;
-    duration(metre: MZXBX_Metre, tempo: number): number;
+    duration(tempo: number): number;
+    calculate(duration: number, tempo: number): MZXBX_MetreMathType;
 }
 declare type MZXBX_HalfTone = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 declare type MZXBX_Octave = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -520,7 +519,7 @@ declare type MZXBX_PercussionMeasure = {
 declare type MZXBX_SongMeasure = {
     tempo: number;
     metre: MZXBX_Metre;
-    scale: MZXBX_Scale;
+    scale?: MZXBX_Scale;
 };
 declare type MZXBX_PercussionTrack = {
     title: string;
@@ -534,11 +533,19 @@ declare type MZXBX_MusicTrack = {
     filters: MZXBX_AudioFilter[];
     performer: MZXBX_AudioPerformer;
 };
+declare type MZXBX_CommentText = {
+    skip: MZXBX_Metre;
+    text: string;
+};
+declare type MZXBX_CommentMeasure = {
+    texts: MZXBX_CommentText[];
+};
 declare type MZXBX_Project = {
     title: string;
     timeline: MZXBX_SongMeasure[];
     tracks: MZXBX_MusicTrack[];
     percussions: MZXBX_PercussionTrack[];
+    comments: MZXBX_CommentMeasure[];
     filters: MZXBX_AudioFilter[];
 };
 declare type MZXBX_FilterHolder = {

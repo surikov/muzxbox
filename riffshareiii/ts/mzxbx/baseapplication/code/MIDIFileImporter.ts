@@ -1861,7 +1861,7 @@ class MidiParser {
             if (midiTrack.channelNum == 9) {
                 let drums = this.collectDrums(midiTrack);
                 for (let dd = 0; dd < drums.length; dd++) {
-                    project.percussions.push(this.createProjectDrums(drums[dd],project.timeline, midiTrack));
+                    project.percussions.push(this.createProjectDrums(drums[dd], project.timeline, midiTrack));
                 }
             } else {
                 project.tracks.push(this.createProjectTrack(project.timeline, midiTrack));
@@ -1887,25 +1887,85 @@ class MidiParser {
     }
     createProjectTrack(timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_MusicTrack {
         let projectTrack: MZXBX_MusicTrack = {
-            title: midiTrack.title
+            title: midiTrack.title + ' [' + midiTrack.program + '] ' + insNames[midiTrack.program]
             , measures: []
             , filters: []
             , performer: { id: '', data: '' }
         };
+        let currentTimeMs = 0;
+        let mm = new MZXBX_MetreMath();
         for (let ii = 0; ii < timeline.length; ii++) {
-            projectTrack.measures.push({ chords: [] });
+            //projectTrack.measures.push({ chords: [] });
+            let projectMeasure: MZXBX_TrackMeasure = { chords: [] };
+            projectTrack.measures.push(projectMeasure);
+            let nextMeasure = timeline[ii];
+            let measureDurationS = mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
+            for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
+                let midiChord = midiTrack.songchords[ii];
+                if (midiChord.when >= currentTimeMs && midiChord.when < currentTimeMs + measureDurationS * 1000) {
+                    let trackChord: MZXBX_Chord | null = null;
+                    let skip = mm.calculate((midiChord.when - currentTimeMs) / 1000, nextMeasure.tempo);
+                    for (let cc = 0; cc < projectMeasure.chords.length; cc++) {
+                        if (mm.set(projectMeasure.chords[cc].skip).equals(skip)) {
+                            trackChord = projectMeasure.chords[cc];
+                        }
+                    }
+                    if (trackChord == null) {
+                        trackChord = { skip: skip, notes: [] };
+                        projectMeasure.chords.push(trackChord);
+                    }
+                    if (trackChord) {
+                        for (let nn = 0; nn < midiChord.notes.length; nn++) {
+                            let midiNote: MIDISongNote = midiChord.notes[nn];
+                            let startPitch = midiNote.points[0].pitch;
+                            let startDuration = mm.calculate(midiNote.points[0].durationms / 1000, nextMeasure.tempo);
+                            let curSlide: MZXBX_Slide = { duration: startDuration, delta: 0 };
+                            let trackNote: MZXBX_Note = { pitch: startPitch, slides: [curSlide] };
+                            for (let pp = 1; pp < midiNote.points.length; pp++) {
+                                let midiPoint = midiNote.points[pp];
+                                curSlide.delta = startPitch - midiPoint.pitch;
+                                curSlide = { duration: mm.calculate(midiPoint.durationms / 1000, nextMeasure.tempo), delta: 0 };
+                                trackNote.slides.push(curSlide);
+                            }
+                            trackChord.notes.push(trackNote);
+                        }
+                    }
+                }
+            }
+            currentTimeMs = currentTimeMs + measureDurationS * 1000;
         }
         return projectTrack;
     }
     createProjectDrums(drum: number, timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_PercussionTrack {
         let projectDrums: MZXBX_PercussionTrack = {
-            title: '[' + drum + ']' + midiTrack.title
+            title: midiTrack.title + ' [' + drum + '] ' + drumNames[drum]
             , measures: []
             , filters: []
             , sampler: { id: '', data: '' }
         };
-        for (let ii = 0; ii < timeline.length; ii++) {
-            projectDrums.measures.push({ skips: [] });
+        let currentTimeMs = 0;
+        let mm = new MZXBX_MetreMath();
+        for (let tt = 0; tt < timeline.length; tt++) {
+            let projectMeasure: MZXBX_PercussionMeasure = { skips: [] };
+            projectDrums.measures.push(projectMeasure);
+            let nextMeasure = timeline[tt];
+            let measureDurationS = mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
+            for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
+                let chord = midiTrack.songchords[ii];
+                for (let kk = 0; kk < chord.notes.length; kk++) {
+                    let note = chord.notes[kk];
+                    for (let pp = 0; pp < note.points.length; pp++) {
+                        let pitch = note.points[pp].pitch;
+                        if (pitch == drum) {
+                            if (chord.when >= currentTimeMs && chord.when < currentTimeMs + measureDurationS * 1000) {
+                                let skip = mm.calculate((chord.when - currentTimeMs) / 1000, nextMeasure.tempo);
+                                projectMeasure.skips.push(skip);
+                            }
+                        }
+                    }
+                }
+            }
+            currentTimeMs = currentTimeMs + measureDurationS * 1000;
         }
         return projectDrums;
     }

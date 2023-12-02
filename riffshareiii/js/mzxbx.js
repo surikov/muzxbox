@@ -82,16 +82,6 @@ class MZXBX_MetreMath {
     }
 }
 class MZXBX_ScaleMath {
-    set(scale) {
-        this.basePitch = scale.basePitch;
-        this.step2 = scale.step2;
-        this.step3 = scale.step3;
-        this.step4 = scale.step4;
-        this.step5 = scale.step5;
-        this.step6 = scale.step6;
-        this.step7 = scale.step7;
-        return this;
-    }
     scale() {
         return {
             basePitch: this.basePitch,
@@ -102,40 +92,6 @@ class MZXBX_ScaleMath {
             step6: this.step6,
             step7: this.step7
         };
-    }
-    pitch(note) {
-        let pp = this.basePitch + 12 * note.octave;
-        switch (note.step) {
-            case 1: {
-                break;
-            }
-            case 2: {
-                pp = pp + this.step2;
-                break;
-            }
-            case 3: {
-                pp = pp + this.step2 + this.step3;
-                break;
-            }
-            case 4: {
-                pp = pp + this.step2 + this.step3 + this.step4;
-                break;
-            }
-            case 5: {
-                pp = pp + this.step2 + this.step3 + this.step4 + this.step5;
-                break;
-            }
-            case 6: {
-                pp = pp + this.step2 + this.step3 + this.step4 + this.step5 + this.step6;
-                break;
-            }
-            case 7: {
-                pp = pp + this.step2 + this.step3 + this.step4 + this.step5 + this.step6 + this.step7;
-                break;
-            }
-        }
-        pp = pp + note.shift;
-        return 0;
     }
 }
 console.log("MuzXbox v1.0.2");
@@ -2299,25 +2255,84 @@ class MidiParser {
     }
     createProjectTrack(timeline, midiTrack) {
         let projectTrack = {
-            title: midiTrack.title,
+            title: midiTrack.title + ' [' + midiTrack.program + '] ' + insNames[midiTrack.program],
             measures: [],
             filters: [],
             performer: { id: '', data: '' }
         };
+        let currentTimeMs = 0;
+        let mm = new MZXBX_MetreMath();
         for (let ii = 0; ii < timeline.length; ii++) {
-            projectTrack.measures.push({ chords: [] });
+            let projectMeasure = { chords: [] };
+            projectTrack.measures.push(projectMeasure);
+            let nextMeasure = timeline[ii];
+            let measureDurationS = mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
+            for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
+                let midiChord = midiTrack.songchords[ii];
+                if (midiChord.when >= currentTimeMs && midiChord.when < currentTimeMs + measureDurationS * 1000) {
+                    let trackChord = null;
+                    let skip = mm.calculate((midiChord.when - currentTimeMs) / 1000, nextMeasure.tempo);
+                    for (let cc = 0; cc < projectMeasure.chords.length; cc++) {
+                        if (mm.set(projectMeasure.chords[cc].skip).equals(skip)) {
+                            trackChord = projectMeasure.chords[cc];
+                        }
+                    }
+                    if (trackChord == null) {
+                        trackChord = { skip: skip, notes: [] };
+                        projectMeasure.chords.push(trackChord);
+                    }
+                    if (trackChord) {
+                        for (let nn = 0; nn < midiChord.notes.length; nn++) {
+                            let midiNote = midiChord.notes[nn];
+                            let startPitch = midiNote.points[0].pitch;
+                            let startDuration = mm.calculate(midiNote.points[0].durationms / 1000, nextMeasure.tempo);
+                            let curSlide = { duration: startDuration, delta: 0 };
+                            let trackNote = { pitch: startPitch, slides: [curSlide] };
+                            for (let pp = 1; pp < midiNote.points.length; pp++) {
+                                let midiPoint = midiNote.points[pp];
+                                curSlide.delta = startPitch - midiPoint.pitch;
+                                curSlide = { duration: mm.calculate(midiPoint.durationms / 1000, nextMeasure.tempo), delta: 0 };
+                                trackNote.slides.push(curSlide);
+                            }
+                            trackChord.notes.push(trackNote);
+                        }
+                    }
+                }
+            }
+            currentTimeMs = currentTimeMs + measureDurationS * 1000;
         }
         return projectTrack;
     }
     createProjectDrums(drum, timeline, midiTrack) {
         let projectDrums = {
-            title: '[' + drum + ']' + midiTrack.title,
+            title: midiTrack.title + ' [' + drum + '] ' + drumNames[drum],
             measures: [],
             filters: [],
             sampler: { id: '', data: '' }
         };
-        for (let ii = 0; ii < timeline.length; ii++) {
-            projectDrums.measures.push({ skips: [] });
+        let currentTimeMs = 0;
+        let mm = new MZXBX_MetreMath();
+        for (let tt = 0; tt < timeline.length; tt++) {
+            let projectMeasure = { skips: [] };
+            projectDrums.measures.push(projectMeasure);
+            let nextMeasure = timeline[tt];
+            let measureDurationS = mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
+            for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
+                let chord = midiTrack.songchords[ii];
+                for (let kk = 0; kk < chord.notes.length; kk++) {
+                    let note = chord.notes[kk];
+                    for (let pp = 0; pp < note.points.length; pp++) {
+                        let pitch = note.points[pp].pitch;
+                        if (pitch == drum) {
+                            if (chord.when >= currentTimeMs && chord.when < currentTimeMs + measureDurationS * 1000) {
+                                let skip = mm.calculate((chord.when - currentTimeMs) / 1000, nextMeasure.tempo);
+                                projectMeasure.skips.push(skip);
+                            }
+                        }
+                    }
+                }
+            }
+            currentTimeMs = currentTimeMs + measureDurationS * 1000;
         }
         return projectDrums;
     }

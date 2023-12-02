@@ -23,7 +23,7 @@ interface MZXBX_MetreMathType {
 	minus(metre: MZXBX_Metre): MZXBX_MetreMathType;
     //duration(metre: MZXBX_Metre, tempo: number): number;
     duration( tempo: number): number;
-    calculate(duration: number,tempo:number): MZXBX_MetreMath ;
+    calculate(duration: number,tempo:number): MZXBX_MetreMathType ;
 }
 type MZXBX_HalfTone = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 type MZXBX_Octave = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -44,10 +44,11 @@ type MZXBX_Slide = {
 	delta: number;
 };
 type MZXBX_Note = {
-	step: MZXBX_Step;
-	shift: MZXBX_StepShift;
-	octave: MZXBX_Octave;
-	sides: MZXBX_Slide[];
+	step?: MZXBX_Step;
+	shift?: MZXBX_StepShift;
+    octave?: MZXBX_Octave;
+    pitch:number;
+	slides: MZXBX_Slide[];
 };
 interface MZXBX_ScaleMathType {
 	basePitch: MZXBX_HalfTone;
@@ -57,9 +58,9 @@ interface MZXBX_ScaleMathType {
 	step5: MZXBX_StepSkip;
 	step6: MZXBX_StepSkip;
 	step7: MZXBX_StepSkip;
-	set(scale: MZXBX_Scale): MZXBX_ScaleMathType;
+	//set(scale: MZXBX_Scale): MZXBX_ScaleMathType;
 	scale(): MZXBX_Scale;
-	pitch(musicNote: MZXBX_Note): number;
+	//pitch(musicNote: MZXBX_Note): number;
 }
 type MZXBX_PluginBase = {
 	setup: (audioContext: AudioContext) => boolean;

@@ -6,7 +6,7 @@ class MZXBX_ScaleMath implements MZXBX_ScaleMathType {
 	step5: MZXBX_StepSkip
 	step6: MZXBX_StepSkip
 	step7: MZXBX_StepSkip
-	set(scale: MZXBX_Scale): MZXBX_ScaleMath {
+	/*set(scale: MZXBX_Scale): MZXBX_ScaleMath {
 		this.basePitch = scale.basePitch
 		this.step2 = scale.step2
 		this.step3 = scale.step3
@@ -15,7 +15,7 @@ class MZXBX_ScaleMath implements MZXBX_ScaleMathType {
 		this.step6 = scale.step6
 		this.step7 = scale.step7
 		return this
-	}
+	}*/
 	scale(): MZXBX_Scale {
 		return {
 			basePitch: this.basePitch,
@@ -27,7 +27,7 @@ class MZXBX_ScaleMath implements MZXBX_ScaleMathType {
 			step7: this.step7
 		}
 	}
-	pitch(note: MZXBX_Note): number {
+	/*pitch(note: MZXBX_Note): number {
 		let pp = this.basePitch + 12 * note.octave
 		switch (note.step) {
 			case 1: {
@@ -60,5 +60,5 @@ class MZXBX_ScaleMath implements MZXBX_ScaleMathType {
 		}
 		pp = pp + note.shift
 		return 0
-	}
+	}*/
 }
