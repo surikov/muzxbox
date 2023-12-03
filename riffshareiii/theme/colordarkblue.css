@@ -37,4 +37,6 @@
     --color-text: #ddeeffff;
 
 }
-
+#pagediv {
+    background-image: url("bg/burevestnik.jpg");
+}

@@ -4,6 +4,7 @@
     stroke: var(--color-toolbar);
     stroke-linejoin: round;
     stroke-width: calc(0.01*var(--tapSize));
+    fill-opacity:0;
 }
 
 .mixFieldBg05 {
@@ -11,6 +12,7 @@
     stroke: var(--color-toolbar);
     stroke-linejoin: round;
     stroke-width: calc(0.02*var(--tapSize));
+    fill-opacity:0;
 }
 
 .mixFieldBg1 {
@@ -18,6 +20,7 @@
     stroke: var(--color-toolbar);
     stroke-linejoin: round;
     stroke-width: calc(0.04*var(--tapSize));
+    fill-opacity:0;
 }
 
 .mixFieldBg2 {
@@ -25,6 +28,7 @@
     stroke: var(--color-toolbar);
     stroke-linejoin: round;
     stroke-width: calc(0.08*var(--tapSize));
+    fill-opacity:0;
 }
 
 .mixFieldBg4 {
@@ -32,6 +36,7 @@
     stroke: var(--color-toolbar);
     stroke-linejoin: round;
     stroke-width: calc(0.16*var(--tapSize));
+    fill-opacity:0;
 }
 
 .mixFieldBg8 {
@@ -39,6 +44,7 @@
     stroke: var(--color-toolbar);
     stroke-linejoin: round;
     stroke-width: calc(0.32*var(--tapSize));
+    fill-opacity:0;
 }
 
 .mixFieldBg16 {
@@ -46,6 +52,7 @@
     stroke: var(--color-toolbar);
     stroke-linejoin: round;
     stroke-width: calc(0.64*var(--tapSize));
+    fill-opacity:0;
 }
 
 .mixFieldBg32 {
@@ -53,6 +60,7 @@
     stroke: var(--color-toolbar);
     stroke-linejoin: round;
     stroke-width: calc(1.28*var(--tapSize));
+    fill-opacity:0;
 }
 
 .mixFieldBg64 {
@@ -60,6 +68,7 @@
     stroke: var(--color-toolbar);
     stroke-linejoin: round;
     stroke-width: calc(2.56*var(--tapSize));
+    fill-opacity:0;
 }
 
 .mixFieldBg128 {
@@ -67,6 +76,7 @@
     stroke: var(--color-toolbar);
     stroke-linejoin: round;
     stroke-width: calc(5.12*var(--tapSize));
+    fill-opacity:0;
 }
 
 .mixFieldBg256 {
@@ -74,4 +84,5 @@
     stroke: var(--color-toolbar);
     stroke-linejoin: round;
     stroke-width: calc(10.24*var(--tapSize));
+    fill-opacity:0;
 }
