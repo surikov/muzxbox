@@ -94,6 +94,7 @@ body {
     background-image: url("bg/burevestnik.jpg");
     background-repeat: no-repeat;
     background-size: cover;
+    background-position:center;
 }
 
 #tileLevelSVG {
