@@ -766,7 +766,7 @@ class RightMenuItem {
         this.top = itemTop;
         let anchor = { xx: 0, yy: itemTop, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [] };
         if (this.focused) {
-            anchor.content.push({ x: itemWidth - 0.1, y: itemTop + 0.02, w: 0.1, h: this.calculateHeight() - 0.02, css: 'rightMenuFocusedDelimiter' });
+            anchor.content.push({ x: itemWidth - 0.2, y: itemTop + 0.02, w: 0.2, h: this.calculateHeight() - 0.02, css: 'rightMenuFocusedDelimiter' });
         }
         anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.02, css: 'rightMenuDelimiterLine' });
         let spot = { x: this.pad, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };

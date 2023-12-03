@@ -464,10 +464,11 @@ declare type MZXBX_Slide = {
     delta: number;
 };
 declare type MZXBX_Note = {
-    step: MZXBX_Step;
-    shift: MZXBX_StepShift;
-    octave: MZXBX_Octave;
-    sides: MZXBX_Slide[];
+    step?: MZXBX_Step;
+    shift?: MZXBX_StepShift;
+    octave?: MZXBX_Octave;
+    pitch: number;
+    slides: MZXBX_Slide[];
 };
 interface MZXBX_ScaleMathType {
     basePitch: MZXBX_HalfTone;
@@ -477,9 +478,7 @@ interface MZXBX_ScaleMathType {
     step5: MZXBX_StepSkip;
     step6: MZXBX_StepSkip;
     step7: MZXBX_StepSkip;
-    set(scale: MZXBX_Scale): MZXBX_ScaleMathType;
     scale(): MZXBX_Scale;
-    pitch(musicNote: MZXBX_Note): number;
 }
 declare type MZXBX_PluginBase = {
     setup: (audioContext: AudioContext) => boolean;
