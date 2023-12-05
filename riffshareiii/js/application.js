@@ -141,7 +141,7 @@ function startApplication() {
     console.log('startApplication v1.6.01');
     let ui = new UIRenderer();
     ui.createUI();
-    ui.fillUI(testBigMixerData);
+    ui.fillUI(mzxbxProjectForTesting);
 }
 function initWebAudioFromUI() {
     console.log('initWebAudioFromUI');
@@ -159,6 +159,7 @@ function startLoadCSSfile(cssurl) {
 class CommandDispatcher {
     constructor() {
         this.tapSizeRatio = 1;
+        this.listener = null;
     }
     initAudioFromUI() {
         var AudioContext = window.AudioContext;
@@ -186,32 +187,33 @@ class CommandDispatcher {
         this.renderer.onReSizeView();
         this.renderer.tiler.resetModel();
     }
+    resetProject(data) {
+        console.log('resetProject', data);
+    }
     promptImportFromMIDI() {
         console.log('promptImportFromMIDI');
+        let me = this;
         let filesinput = document.getElementById('file_midi_input');
         if (filesinput) {
-            let listener = function (ievent) {
-                console.log('change', ievent);
-                var file = ievent.target.files[0];
-                console.log('file', file);
-                let title = file.name;
-                let comment = '' + file.size / 1000 + 'kb, ' + file.lastModifiedDate;
-                var fileReader = new FileReader();
-                fileReader.onload = function (progressEvent) {
-                    console.log('progressEvent', progressEvent);
-                    if (progressEvent != null) {
-                        var arrayBuffer = progressEvent.target.result;
-                        console.log('arrayBuffer', arrayBuffer);
-                        var midiParser = newMIDIparser(arrayBuffer);
-                        let testSchedule = midiParser.convertProject(title, comment);
-                        console.log('MZXBX_Schedule', testSchedule);
-                    }
+            if (!(this.listener)) {
+                this.listener = function (ievent) {
+                    var file = ievent.target.files[0];
+                    let title = file.name;
+                    let comment = '' + file.size / 1000 + 'kb, ' + file.lastModifiedDate;
+                    var fileReader = new FileReader();
+                    fileReader.onload = function (progressEvent) {
+                        if (progressEvent != null) {
+                            var arrayBuffer = progressEvent.target.result;
+                            var midiParser = newMIDIparser(arrayBuffer);
+                            let testSchedule = midiParser.convertProject(title, comment);
+                            me.resetProject(testSchedule);
+                        }
+                    };
+                    fileReader.readAsArrayBuffer(file);
                 };
-                fileReader.readAsArrayBuffer(file);
-            };
-            filesinput.addEventListener('change', listener, false);
+                filesinput.addEventListener('change', this.listener, false);
+            }
             filesinput.click();
-            console.log('setup', filesinput);
         }
     }
 }
@@ -993,10 +995,6 @@ class BarOctave {
 class OctaveContent {
     constructor(aa, top, toAnchor, data) {
     }
-    resetMainPitchedTrackUI(pitchedTrackData) {
-    }
-    resetOtherPitchedTrackUI(pitchedTrackData) {
-    }
 }
 class MixerBar {
     constructor(prefix, left, top, ww, hh, minZoom, maxZoom, toAnchor, data) {
@@ -1007,7 +1005,7 @@ class MixerBar {
         toAnchor.content.push(this.barAnchor);
         this.octaves = [];
         for (let oo = 0; oo < 10; oo++) {
-            this.octaves.push(new BarOctave(left, oo * 12 * data.notePathHeight, ww, 12 * data.notePathHeight, this.barAnchor, prefix, minZoom, maxZoom, data));
+            this.octaves.push(new BarOctave(left, oo * 12 * data.theme.notePathHeight, ww, 12 * data.theme.notePathHeight, this.barAnchor, prefix, minZoom, maxZoom, data));
         }
     }
 }
@@ -1058,7 +1056,7 @@ class MixerZoomLevel {
         let width = 0;
         for (let ii = 0; ii < data.timeline.length; ii++) {
             let timebar = data.timeline[ii];
-            width = new MusicMetreMath(timebar.metre).width(timebar.tempo, data.widthDurationRatio);
+            width = MZMM().set(timebar.metre).duration(timebar.tempo) * data.theme.widthDurationRatio;
             this.bars.push(new MixerBar(this.prefix, left, 0, width, hh, this.minZoom, this.maxZoom, this.anchor, data));
             left = left + width;
         }
@@ -1189,6 +1187,16 @@ class WarningUI {
         document.getElementById("warningAnchor").style.visibility = "hidden";
     }
 }
+let mzxbxProjectForTesting = {
+    title: 'test data for debug',
+    timeline: [],
+    tracks: [],
+    percussions: [],
+    comments: [],
+    filters: [],
+    theme: { notePathHeight: 0.25,
+        widthDurationRatio: 50 }
+};
 let testBigMixerData = {
     title: 'test data for debug',
     timeline: [
@@ -1258,106 +1266,20 @@ let testEmptyMixerData = {
         { title: 'Second track' }
     ]
 };
-class MusicMetreMath {
-    constructor(from) {
-        this.count = from.count;
-        this.part = from.part;
-    }
-    metre() {
-        return {
-            count: this.count,
-            part: this.part
-        };
-    }
-    simplyfy() {
-        let cc = this.count;
-        let pp = this.part;
-        if (cc > 0 && pp > 0) {
-            while (cc % 2 == 0 && pp % 2 == 0) {
-                cc = cc / 2;
-                pp = pp / 2;
-            }
-        }
-        return new MusicMetreMath({ count: cc, part: pp });
-    }
-    strip(toPart) {
-        let cc = this.count;
-        let pp = this.part;
-        let rr = pp / toPart;
-        cc = Math.round(cc / rr);
-        pp = toPart;
-        return new MusicMetreMath({
-            count: cc,
-            part: pp
-        });
-    }
-    equals(metre) {
-        let countMe = this.count * metre.part;
-        let countTo = metre.count * this.part;
-        if (countMe == countTo) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    less(metre) {
-        let countMe = this.count * metre.part;
-        let countTo = metre.count * this.part;
-        if (countMe < countTo) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    more(metre) {
-        let countMe = this.count * metre.part;
-        let countTo = metre.count * this.part;
-        if (countMe > countTo) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    plus(metre) {
-        let countMe = this.count * metre.part;
-        let countTo = metre.count * this.part;
-        let rr = {
-            count: countMe + countTo,
-            part: metre.part * this.part
-        };
-        return new MusicMetreMath(rr).simplyfy();
-    }
-    minus(metre) {
-        let countMe = this.count * metre.part;
-        let countTo = metre.count * this.part;
-        let rr = { count: countMe - countTo, part: metre.part * this.part };
-        return new MusicMetreMath(rr).simplyfy();
-    }
-    duration(tempo) {
-        let wholeNoteSeconds = (4 * 60) / tempo;
-        let meterSeconds = (wholeNoteSeconds * this.count) / this.part;
-        return meterSeconds;
-    }
-    width(tempo, ratio) {
-        return this.duration(tempo) * ratio;
-    }
-}
 class MixerDataMath {
     constructor(data) {
         this.data = data;
     }
     wholeWidth() {
+        let mm = MZMM();
         let ww = 0;
         for (let ii = 0; ii < this.data.timeline.length; ii++) {
-            ww = ww + new MusicMetreMath(this.data.timeline[ii].metre).width(this.data.timeline[ii].tempo, this.data.widthDurationRatio);
+            ww = ww + mm.set(this.data.timeline[ii].metre).duration(this.data.timeline[ii].tempo) * this.data.theme.widthDurationRatio;
         }
         return ww;
     }
     wholeHeight() {
-        return this.data.notePathHeight * 10 * 12;
+        return this.data.theme.notePathHeight * 10 * 12;
     }
 }
 let biChar32 = [];

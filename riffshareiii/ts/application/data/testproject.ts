@@ -1,4 +1,14 @@
-let testBigMixerData: MixerData = {
+let mzxbxProjectForTesting:MZXBX_Project={
+	title: 'test data for debug'
+	, timeline: []
+	,tracks:[]
+	,percussions:[]
+	,comments:[]
+	,filters:[],
+	theme:{notePathHeight: 0.25
+		, widthDurationRatio: 50}
+};
+let testBigMixerData = {
     title: 'test data for debug'
     , timeline: [
         {tempo:120,metre:{count:4,part:4}},{tempo:120,metre:{count:4,part:4}},{tempo:120,metre:{count:4,part:4}},{tempo:120,metre:{count:4,part:4}}
@@ -74,7 +84,7 @@ let testBigMixerData: MixerData = {
         , { title: 'Test drums 10' }
     ]*/
 };
-let testEmptyMixerData: MixerData = {
+let testEmptyMixerData = {
     title: 'small data for debug'
     , timeline: [
         {tempo:120,metre:{count:4,part:4}}        

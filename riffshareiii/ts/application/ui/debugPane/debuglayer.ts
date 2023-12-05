@@ -30,7 +30,7 @@ class DebugLayerUI{//} implements RenderedLayers {
 			], mode: LevelModes.normal
 		};
 	}
-	resetDebugView(data: MixerData) {
+	resetDebugView(data: MZXBX_Project) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		let ww = mixm.wholeWidth();
 		let hh = mixm.wholeHeight();

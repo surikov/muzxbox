@@ -103,7 +103,7 @@ class UIRenderer {//} implements RenderedPart {
 		});
 	}
 
-	fillUI(data: MixerData) {
+	fillUI(data: MZXBX_Project) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
 		let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();

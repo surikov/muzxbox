@@ -6,7 +6,7 @@ function startApplication() {
     //let commands = new CommandDispatcher();
     let ui = new UIRenderer();
     ui.createUI();
-    ui.fillUI(testBigMixerData);//testEmptyMixerData);
+    ui.fillUI(mzxbxProjectForTesting);//testBigMixerData);//testEmptyMixerData);
     //testNumMathUtil();
     //console.log('done startApplication');
     /*setupZoomDialog();

@@ -21,7 +21,7 @@ class WarningUI {
 		};
 		this.warningLayer = { g: this.warningGroup, anchors: [this.warningAnchor], mode: LevelModes.overlay };
 	}
-	resetDialogView(data: MixerData) {
+	resetDialogView(data: MZXBX_Project) {
 		console.log('resetDialogView');
 		//this.resizeDialog();
 	}

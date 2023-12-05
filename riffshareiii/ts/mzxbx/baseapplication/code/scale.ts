@@ -1,4 +1,4 @@
-class MZXBX_ScaleMath implements MZXBX_ScaleMathType {
+class MZXBX_ScaleMath /* implements MZXBX_ScaleMathType */ {
 	basePitch: MZXBX_HalfTone
 	step2: MZXBX_StepSkip
 	step3: MZXBX_StepSkip

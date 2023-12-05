@@ -6,7 +6,7 @@ class MZXBX_MetreMath {
         return this;
     }
     calculate(duration, tempo) {
-        let part32 = new MZXBX_MetreMath().set({ count: 1, part: 16 }).duration(tempo);
+        let part32 = new MZXBX_MetreMath().set({ count: 1, part: 32 }).duration(tempo);
         this.count = Math.round(duration / part32);
         this.part = 32;
         return this.simplyfy();
@@ -80,6 +80,9 @@ class MZXBX_MetreMath {
         let meterSeconds = (wholeNoteSeconds * this.count) / this.part;
         return meterSeconds;
     }
+}
+function MZMM() {
+    return new MZXBX_MetreMath();
 }
 class MZXBX_ScaleMath {
     scale() {
@@ -2113,7 +2116,6 @@ class MidiParser {
         return schedule;
     }
     convertProject(title, comment) {
-        console.log('MidiParser.convertProject', this);
         let midiSongData = {
             parser: '1.12',
             duration: 0,
@@ -2178,19 +2180,17 @@ class MidiParser {
                 }
             }
         }
-        console.log('MIDISongData', midiSongData);
-        let txt = '';
-        for (let ii = 0; ii < midiSongData.lyrics.length; ii++) {
-            txt = txt + midiSongData.lyrics[ii].txt;
-        }
-        console.log(txt);
         let project = {
             title: title + ' ' + comment,
             timeline: [],
             tracks: [],
             percussions: [],
             filters: [],
-            comments: []
+            comments: [],
+            theme: {
+                widthDurationRatio: 50,
+                notePathHeight: 0.25
+            }
         };
         let currentTimeMs = 0;
         let mm = new MZXBX_MetreMath();

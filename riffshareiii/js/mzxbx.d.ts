@@ -13,7 +13,8 @@ declare class MZXBX_MetreMath implements MZXBX_MetreMathType {
     minus(metre: MZXBX_Metre): MZXBX_MetreMath;
     duration(tempo: number): number;
 }
-declare class MZXBX_ScaleMath implements MZXBX_ScaleMathType {
+declare function MZMM(): MZXBX_MetreMathType;
+declare class MZXBX_ScaleMath {
     basePitch: MZXBX_HalfTone;
     step2: MZXBX_StepSkip;
     step3: MZXBX_StepSkip;
@@ -73,16 +74,6 @@ declare type MZXBX_Note = {
     pitch: number;
     slides: MZXBX_Slide[];
 };
-interface MZXBX_ScaleMathType {
-    basePitch: MZXBX_HalfTone;
-    step2: MZXBX_StepSkip;
-    step3: MZXBX_StepSkip;
-    step4: MZXBX_StepSkip;
-    step5: MZXBX_StepSkip;
-    step6: MZXBX_StepSkip;
-    step7: MZXBX_StepSkip;
-    scale(): MZXBX_Scale;
-}
 declare type MZXBX_PluginBase = {
     setup: (audioContext: AudioContext) => boolean;
 };
@@ -142,6 +133,10 @@ declare type MZXBX_CommentText = {
 declare type MZXBX_CommentMeasure = {
     texts: MZXBX_CommentText[];
 };
+declare type MZXBX_Theme = {
+    widthDurationRatio: number;
+    notePathHeight: number;
+};
 declare type MZXBX_Project = {
     title: string;
     timeline: MZXBX_SongMeasure[];
@@ -149,6 +144,7 @@ declare type MZXBX_Project = {
     percussions: MZXBX_PercussionTrack[];
     comments: MZXBX_CommentMeasure[];
     filters: MZXBX_AudioFilter[];
+    theme: MZXBX_Theme;
 };
 declare type MZXBX_FilterHolder = {
     plugin: MZXBX_AudioFilterPlugin | null;

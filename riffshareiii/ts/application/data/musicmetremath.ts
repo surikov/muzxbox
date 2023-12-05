@@ -1,3 +1,4 @@
+/*
 class MusicMetreMath {
     count: number;
     part: number;
@@ -84,3 +85,4 @@ class MusicMetreMath {
         return this.duration(tempo) * ratio;
     }
 }
+*/

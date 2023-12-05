@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.76 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.77 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -22,7 +22,7 @@ let rowsAvgCount = 5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let reduceRatio = 1;
 let highLightMode = 1;
-var calcLen = 51;
+var calcLen = 23;
 
 
 
@@ -333,7 +333,7 @@ function calcRowPatterns(rowNum: number, rows: BallsRow[]): number[] {
 	}
 	return cnts;
 }
-function calcEmptyColumnDuration( rowNum: number, rows: BallsRow[], counts: number[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] {
+function calculateBallTriadChain( rowNum: number, rows: BallsRow[], counts: number[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] {
 	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = [];
 	for (let nn = 0; nn < rowLen; nn++) {
 		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number } = { ball: nn + 1, fills: [], summ: 0 };
@@ -351,6 +351,20 @@ function calcEmptyColumnDuration( rowNum: number, rows: BallsRow[], counts: numb
 		//one.logr = one.summ;
 		//if(log){one.logr = one.summ*one.summ;}
 		//console.log(rowNum,nn,one);
+	}
+	return resu;
+}
+function calculateBallFrequency(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
+	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
+	for (let nn = 0; nn < rowLen; nn++) {
+		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
+		resu.push(one);
+		for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
+			if (ballExists(nn + 1, rows[rr])) {
+				one.summ++;
+			}
+		}
+		one.logr = one.summ;
 	}
 	return resu;
 }
@@ -384,7 +398,7 @@ function calcRowPreFreqs(rowNum: number, rows: BallsRow[]): { ball: number, fill
 	}
 	return resu;
 }*/
-function calcRowPatternsCOunt(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
+function calculateEmptyColumnDuration(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
 	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
 	for (let nn = 0; nn < rowLen; nn++) {
 		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
@@ -474,7 +488,7 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	//let oldReduceRatio = reduceRatio;
 	//let rows: BallsRow[] = sliceRows(inrows, 0, 100);
 	let precounts: number[] = calcRowPatterns(0 + 1, rows);
-	let ballFills: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = calcEmptyColumnDuration( 0, rows, precounts);
+	let ballFills: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = calculateBallTriadChain( 0, rows, precounts);
 	//console.log('ballFills',ballFills);
 	let mx = 0;
 	let min = 987654321;
@@ -516,7 +530,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			ratioPre = 0.66;
 		}
 	}*/
-	//console.log('dumpTriads',highLightMode);
+	console.log('dumpTriads',highLightMode);
 	for (let rr = 0; rr < rowsVisibleCount; rr++) {
 		if (rr > rows.length - 6) break;
 		let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[];
@@ -525,10 +539,12 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		//	calcs = calcRowPreFreqs(rr, rows);
 		//} else {
 			if (highLightMode == 1) {
-				calcs = calcRowPatternsCOunt(rr, rows);
+				//calcs = calculateEmptyColumnDuration(rr, rows);
+				calcs = calculateBallFrequency(rr, rows);
+				
 			} else {
 				let precounts = calcRowPatterns(rr + 1, rows);
-				calcs = calcEmptyColumnDuration( rr, rows, precounts);
+				calcs = calculateBallTriadChain( rr, rows, precounts);
 			}
 		//}
 		let minCnt = 99999;

@@ -25,11 +25,13 @@ declare class CommandDispatcher {
     renderer: UIRenderer;
     audioContext: AudioContext;
     tapSizeRatio: number;
+    listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
     initAudioFromUI(): void;
     registerUI(renderer: UIRenderer): void;
     showRightMenu(): void;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     changeTapSize(ratio: number): void;
+    resetProject(data: MZXBX_Schedule): void;
     promptImportFromMIDI(): void;
 }
 declare let commandDispatcher: CommandDispatcher;
@@ -48,7 +50,7 @@ declare class UIRenderer {
     constructor();
     changeTapSIze(ratio: number): void;
     createUI(): void;
-    fillUI(data: MixerData): void;
+    fillUI(data: MZXBX_Project): void;
     onReSizeView(): void;
     deleteUI(): void;
 }
@@ -167,26 +169,24 @@ declare let commandLocaleZH: string;
 declare let commandImportFromMIDI: string;
 declare let testMenuData: MenuInfo[];
 declare class BarOctave {
-    constructor(left: number, top: number, width: number, height: number, anchor: TileAnchor, prefix: string, minZoom: number, maxZoom: number, data: MixerData);
+    constructor(left: number, top: number, width: number, height: number, anchor: TileAnchor, prefix: string, minZoom: number, maxZoom: number, data: MZXBX_Project);
 }
 declare class OctaveContent {
-    constructor(aa: number, top: number, toAnchor: TileAnchor, data: MixerData);
-    resetMainPitchedTrackUI(pitchedTrackData: PitchedTrack): void;
-    resetOtherPitchedTrackUI(pitchedTrackData: PitchedTrack): void;
+    constructor(aa: number, top: number, toAnchor: TileAnchor, data: MZXBX_Project);
 }
 declare class MixerBar {
     barRectangle: TileRectangle;
     barAnchor: TileAnchor;
     prefix: string;
     octaves: BarOctave[];
-    constructor(prefix: string, left: number, top: number, ww: number, hh: number, minZoom: number, maxZoom: number, toAnchor: TileAnchor, data: MixerData);
+    constructor(prefix: string, left: number, top: number, ww: number, hh: number, minZoom: number, maxZoom: number, toAnchor: TileAnchor, data: MZXBX_Project);
 }
 declare class MixerUI {
     svgs: SVGElement[];
     zoomLayers: TileLayerDefinition[];
     zoomAnchors: TileAnchor[];
     levels: MixerZoomLevel[];
-    fillMixeUI(data: MixerData): void;
+    fillMixeUI(data: MZXBX_Project): void;
     buildMixerLayers(): TileLayerDefinition[];
 }
 declare class MixerZoomLevel {
@@ -198,7 +198,7 @@ declare class MixerZoomLevel {
     bars: MixerBar[];
     constructor(prefix: string, minZoom: number, maxZoom: number, anchor: TileAnchor);
     buildLevel(ww: number, hh: number): void;
-    fillBars(data: MixerData, hh: number): void;
+    fillBars(data: MZXBX_Project, hh: number): void;
 }
 declare class IconLabelButton {
     anchor: TileAnchor;
@@ -233,7 +233,7 @@ declare class DebugLayerUI {
     debugLayer: TileLayerDefinition;
     allLayers(): TileLayerDefinition[];
     setupUI(): void;
-    resetDebugView(data: MixerData): void;
+    resetDebugView(data: MZXBX_Project): void;
     deleteDebbugView(): void;
 }
 declare class WarningUI {
@@ -246,53 +246,46 @@ declare class WarningUI {
     warningDescription: TileText;
     cancel: () => void;
     initDialogUI(): void;
-    resetDialogView(data: MixerData): void;
+    resetDialogView(data: MZXBX_Project): void;
     resizeDialog(ww: number, hh: number): void;
     allLayers(): TileLayerDefinition[];
     show(): void;
     hide(): void;
 }
-declare type MusicMetre = {
-    count: number;
-    part: number;
-};
-declare type TimeBar = {
-    tempo: number;
-    metre: MusicMetre;
-};
-declare type PitchedTrack = {
+declare let mzxbxProjectForTesting: MZXBX_Project;
+declare let testBigMixerData: {
     title: string;
-};
-declare type DrumsTrack = {
-    title: string;
-};
-declare type MixerData = {
-    title: string;
-    timeline: TimeBar[];
+    timeline: {
+        tempo: number;
+        metre: {
+            count: number;
+            part: number;
+        };
+    }[];
     notePathHeight: number;
     widthDurationRatio: number;
-    pitchedTracks: PitchedTrack[];
+    pitchedTracks: {
+        title: string;
+    }[];
 };
-declare let testBigMixerData: MixerData;
-declare let testEmptyMixerData: MixerData;
-declare class MusicMetreMath {
-    count: number;
-    part: number;
-    constructor(from: MusicMetre);
-    metre(): MusicMetre;
-    simplyfy(): MusicMetreMath;
-    strip(toPart: number): MusicMetreMath;
-    equals(metre: MusicMetre): boolean;
-    less(metre: MusicMetre): boolean;
-    more(metre: MusicMetre): boolean;
-    plus(metre: MusicMetre): MusicMetreMath;
-    minus(metre: MusicMetre): MusicMetreMath;
-    duration(tempo: number): number;
-    width(tempo: number, ratio: number): number;
-}
+declare let testEmptyMixerData: {
+    title: string;
+    timeline: {
+        tempo: number;
+        metre: {
+            count: number;
+            part: number;
+        };
+    }[];
+    notePathHeight: number;
+    widthDurationRatio: number;
+    pitchedTracks: {
+        title: string;
+    }[];
+};
 declare class MixerDataMath {
-    data: MixerData;
-    constructor(data: MixerData);
+    data: MZXBX_Project;
+    constructor(data: MZXBX_Project);
     wholeWidth(): number;
     wholeHeight(): number;
 }
@@ -470,16 +463,6 @@ declare type MZXBX_Note = {
     pitch: number;
     slides: MZXBX_Slide[];
 };
-interface MZXBX_ScaleMathType {
-    basePitch: MZXBX_HalfTone;
-    step2: MZXBX_StepSkip;
-    step3: MZXBX_StepSkip;
-    step4: MZXBX_StepSkip;
-    step5: MZXBX_StepSkip;
-    step6: MZXBX_StepSkip;
-    step7: MZXBX_StepSkip;
-    scale(): MZXBX_Scale;
-}
 declare type MZXBX_PluginBase = {
     setup: (audioContext: AudioContext) => boolean;
 };
@@ -539,6 +522,10 @@ declare type MZXBX_CommentText = {
 declare type MZXBX_CommentMeasure = {
     texts: MZXBX_CommentText[];
 };
+declare type MZXBX_Theme = {
+    widthDurationRatio: number;
+    notePathHeight: number;
+};
 declare type MZXBX_Project = {
     title: string;
     timeline: MZXBX_SongMeasure[];
@@ -546,6 +533,7 @@ declare type MZXBX_Project = {
     percussions: MZXBX_PercussionTrack[];
     comments: MZXBX_CommentMeasure[];
     filters: MZXBX_AudioFilter[];
+    theme: MZXBX_Theme;
 };
 declare type MZXBX_FilterHolder = {
     plugin: MZXBX_AudioFilterPlugin | null;
@@ -630,3 +618,4 @@ declare type MZXBX_import = {
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
 declare function MZXBX_appendScriptURL(url: string): boolean;
+declare function MZMM(): MZXBX_MetreMathType;

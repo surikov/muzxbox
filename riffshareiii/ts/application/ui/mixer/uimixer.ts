@@ -3,7 +3,7 @@ class MixerUI {
     zoomLayers: TileLayerDefinition[] = [];
     zoomAnchors: TileAnchor[] = [];
     levels: MixerZoomLevel[] = [];
-    fillMixeUI(data: MixerData) {
+    fillMixeUI(data: MZXBX_Project) {
         let mixm: MixerDataMath = new MixerDataMath(data);
         let ww = mixm.wholeWidth();
         let hh = mixm.wholeHeight();

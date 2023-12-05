@@ -2,7 +2,7 @@ class OctaveContent {
 	//trackRectangle: TileRectangle;
 	//trackAnchor: TileAnchor;
 	//bars: TrackBarUI[];
-	constructor(aa:number,top: number, toAnchor: TileAnchor, data: MixerData) {
+	constructor(aa:number,top: number, toAnchor: TileAnchor, data: MZXBX_Project) {
 		/*let ww = new MixerDataMath(data).wholeWidth();
 		this.trackRectangle = { x: 0, y: top, w: ww, h: data.notePathHeight * 100-3, rx: 3, ry: 3, css: 'debug' };
 		this.trackAnchor = { xx: 0, yy: top, ww: ww, hh: data.notePathHeight * 100, showZoom: 0.25, hideZoom: 64, content: [this.trackRectangle] };
@@ -15,10 +15,10 @@ class OctaveContent {
 			left = left + width;
 		}*/
 	}
-	resetMainPitchedTrackUI(pitchedTrackData:PitchedTrack) {
+	/*resetMainPitchedTrackUI(pitchedTrackData:PitchedTrack) {
 
 	}
 	resetOtherPitchedTrackUI(pitchedTrackData:PitchedTrack) {
 
-	}
+	}*/
 }

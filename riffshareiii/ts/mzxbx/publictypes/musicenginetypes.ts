@@ -50,6 +50,7 @@ type MZXBX_Note = {
     pitch:number;
 	slides: MZXBX_Slide[];
 };
+/*
 interface MZXBX_ScaleMathType {
 	basePitch: MZXBX_HalfTone;
 	step2: MZXBX_StepSkip;
@@ -61,7 +62,7 @@ interface MZXBX_ScaleMathType {
 	//set(scale: MZXBX_Scale): MZXBX_ScaleMathType;
 	scale(): MZXBX_Scale;
 	//pitch(musicNote: MZXBX_Note): number;
-}
+}*/
 type MZXBX_PluginBase = {
 	setup: (audioContext: AudioContext) => boolean;
 };
@@ -138,6 +139,10 @@ type MZXBX_CommentText={
 type MZXBX_CommentMeasure={
     texts:MZXBX_CommentText[];
 };
+type MZXBX_Theme={
+	widthDurationRatio:number
+	,notePathHeight:number
+};
 type MZXBX_Project = {
 	title: string;
 	timeline: MZXBX_SongMeasure[];
@@ -145,6 +150,7 @@ type MZXBX_Project = {
     percussions: MZXBX_PercussionTrack[];
     comments: MZXBX_CommentMeasure[];
 	filters: MZXBX_AudioFilter[];
+	theme:MZXBX_Theme;
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 type MZXBX_FilterHolder = {
