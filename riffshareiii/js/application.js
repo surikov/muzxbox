@@ -1189,13 +1189,25 @@ class WarningUI {
 }
 let mzxbxProjectForTesting = {
     title: 'test data for debug',
-    timeline: [],
-    tracks: [],
-    percussions: [],
-    comments: [],
+    timeline: [
+        { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 200, metre: { count: 3, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } }
+    ],
+    tracks: [
+        { title: "Track one", measures: [], filters: [], performer: { id: '', data: '' } },
+        { title: "Second track", measures: [], filters: [], performer: { id: '', data: '' } }
+    ],
+    percussions: [
+        { title: "Snare", measures: [], filters: [], sampler: { id: '', data: '' } }
+    ],
+    comments: [{ texts: [] }, { texts: [] }, { texts: [] }, { texts: [] }],
     filters: [],
-    theme: { notePathHeight: 0.25,
-        widthDurationRatio: 50 }
+    theme: {
+        notePathHeight: 0.25,
+        widthDurationRatio: 50
+    }
 };
 let testBigMixerData = {
     title: 'test data for debug',
