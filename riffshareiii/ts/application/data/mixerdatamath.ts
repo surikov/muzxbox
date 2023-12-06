@@ -1,5 +1,6 @@
 class MixerDataMath {
 	data: MZXBX_Project;
+	octaveCount=10;
 	constructor(data: MZXBX_Project) {
 		this.data = data;
 	}

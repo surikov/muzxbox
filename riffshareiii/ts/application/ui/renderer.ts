@@ -73,7 +73,7 @@ class UIRenderer {//} implements RenderedPart {
 			//, this.toolbar.toolBarLayers()
 			, this.toolbar.createToolbar()//this.resetAnchor, actionShowMenu)
 			, this.menu.createMenu()//this.resetAnchor.bind(this), this.changeTapSIze.bind(this))
-			, this.mixer.buildMixerLayers()
+			, this.mixer.createMixerLayers()
 			, this.warning.allLayers()
 		);
 
@@ -109,7 +109,7 @@ class UIRenderer {//} implements RenderedPart {
 		let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
 		this.tiler.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
 
-		this.mixer.fillMixeUI(data);
+		this.mixer.reFillMixerUI(data);
 		this.debug.resetDebugView(data);
 
 		//this.toolbar.fillToolbar(vw, vh);

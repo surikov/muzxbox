@@ -175,30 +175,28 @@ declare class OctaveContent {
     constructor(aa: number, top: number, toAnchor: TileAnchor, data: MZXBX_Project);
 }
 declare class MixerBar {
-    barRectangle: TileRectangle;
-    barAnchor: TileAnchor;
+    minZoom: number;
+    maxZoom: number;
     prefix: string;
     octaves: BarOctave[];
+    anchor: TileAnchor;
     constructor(prefix: string, left: number, top: number, ww: number, hh: number, minZoom: number, maxZoom: number, toAnchor: TileAnchor, data: MZXBX_Project);
 }
 declare class MixerUI {
     svgs: SVGElement[];
     zoomLayers: TileLayerDefinition[];
-    zoomAnchors: TileAnchor[];
     levels: MixerZoomLevel[];
-    fillMixeUI(data: MZXBX_Project): void;
-    buildMixerLayers(): TileLayerDefinition[];
+    reFillMixerUI(data: MZXBX_Project): void;
+    createMixerLayers(): TileLayerDefinition[];
 }
 declare class MixerZoomLevel {
     minZoom: number;
     maxZoom: number;
-    anchor: TileAnchor;
-    bg: TileRectangle;
+    zoomAnchor: TileAnchor;
     prefix: string;
     bars: MixerBar[];
     constructor(prefix: string, minZoom: number, maxZoom: number, anchor: TileAnchor);
-    buildLevel(ww: number, hh: number): void;
-    fillBars(data: MZXBX_Project, hh: number): void;
+    resetBars(data: MZXBX_Project, ww: number, hh: number): void;
 }
 declare class IconLabelButton {
     anchor: TileAnchor;
@@ -285,6 +283,7 @@ declare let testEmptyMixerData: {
 };
 declare class MixerDataMath {
     data: MZXBX_Project;
+    octaveCount: number;
     constructor(data: MZXBX_Project);
     wholeWidth(): number;
     wholeHeight(): number;

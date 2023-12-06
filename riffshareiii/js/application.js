@@ -253,7 +253,7 @@ class UIRenderer {
         this.menu = new RightMenuPanel();
         this.mixer = new MixerUI();
         let me = this;
-        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.buildMixerLayers(), this.warning.allLayers());
+        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.createMixerLayers(), this.warning.allLayers());
         this.tiler.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
         console.log('tap size', this.tiler.tapPxSize());
         this.tiler.setAfterZoomCallback(() => {
@@ -270,7 +270,7 @@ class UIRenderer {
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.tiler.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
-        this.mixer.fillMixeUI(data);
+        this.mixer.reFillMixerUI(data);
         this.debug.resetDebugView(data);
         this.toolbar.resizeToolbar(vw, vh);
         this.menu.fillMenuItems();
@@ -990,6 +990,7 @@ class BarOctave {
         let oRectangle = { x: left, y: top, w: width, h: height, rx: 1, ry: 1, css: 'mixFieldBg' + prefix };
         let oAnchor = { xx: left, yy: top, ww: width, hh: height, showZoom: minZoom, hideZoom: maxZoom, content: [oRectangle] };
         anchor.content.push(oAnchor);
+        console.log(left, top, prefix, minZoom, maxZoom);
     }
 }
 class OctaveContent {
@@ -999,13 +1000,18 @@ class OctaveContent {
 class MixerBar {
     constructor(prefix, left, top, ww, hh, minZoom, maxZoom, toAnchor, data) {
         this.prefix = '';
+        this.minZoom = minZoom;
+        this.maxZoom = maxZoom;
+        let mixm = new MixerDataMath(data);
         this.prefix = prefix;
-        this.barRectangle = { x: left, y: top, w: ww, h: hh, rx: 1, ry: 1, css: 'mixFieldBg' + this.prefix };
-        this.barAnchor = { xx: left, yy: top, ww: ww, hh: hh, showZoom: minZoom, hideZoom: maxZoom, content: [this.barRectangle] };
-        toAnchor.content.push(this.barAnchor);
+        this.anchor = toAnchor;
         this.octaves = [];
-        for (let oo = 0; oo < 10; oo++) {
-            this.octaves.push(new BarOctave(left, oo * 12 * data.theme.notePathHeight, ww, 12 * data.theme.notePathHeight, this.barAnchor, prefix, minZoom, maxZoom, data));
+        let h12 = 12 * data.theme.notePathHeight;
+        for (let oo = 0; oo < mixm.octaveCount; oo++) {
+            let an = { showZoom: this.minZoom, hideZoom: this.maxZoom, xx: left, yy: oo * h12, ww: ww, hh: h12, content: [] };
+            this.anchor.content.push(an);
+            let bo = new BarOctave(left, oo * h12, ww, h12, an, prefix, minZoom, maxZoom, data);
+            this.octaves.push(bo);
         }
     }
 }
@@ -1013,26 +1019,24 @@ class MixerUI {
     constructor() {
         this.svgs = [];
         this.zoomLayers = [];
-        this.zoomAnchors = [];
         this.levels = [];
     }
-    fillMixeUI(data) {
+    reFillMixerUI(data) {
         let mixm = new MixerDataMath(data);
         let ww = mixm.wholeWidth();
         let hh = mixm.wholeHeight();
-        for (let ii = 0; ii < this.zoomAnchors.length; ii++) {
-            this.zoomAnchors[ii].ww = ww;
-            this.zoomAnchors[ii].hh = hh;
-            this.levels[ii].buildLevel(ww, hh);
-            this.levels[ii].fillBars(data, hh);
+        for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
+            this.zoomLayers[ii].anchors[0].ww = ww;
+            this.zoomLayers[ii].anchors[0].hh = hh;
+            this.levels[ii].resetBars(data, ww, hh);
         }
     }
-    buildMixerLayers() {
+    createMixerLayers() {
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             this.svgs.push(document.getElementById("tracksLayerZoom" + zoomPrefixLevelsCSS[ii].prefix));
-            this.zoomAnchors.push({ showZoom: zoomPrefixLevelsCSS[ii].zoom, hideZoom: zoomPrefixLevelsCSS[ii + 1].zoom, xx: 0, yy: 0, ww: 1, hh: 1, content: [] });
-            this.zoomLayers.push({ g: this.svgs[ii], anchors: [this.zoomAnchors[ii]], mode: LevelModes.normal });
-            this.levels.push(new MixerZoomLevel(zoomPrefixLevelsCSS[ii].prefix, zoomPrefixLevelsCSS[ii].zoom, zoomPrefixLevelsCSS[ii + 1].zoom, this.zoomAnchors[ii]));
+            let an = { showZoom: zoomPrefixLevelsCSS[ii].zoom, hideZoom: zoomPrefixLevelsCSS[ii + 1].zoom, xx: 0, yy: 0, ww: 1, hh: 1, content: [] };
+            this.zoomLayers.push({ g: this.svgs[ii], anchors: [an], mode: LevelModes.normal });
+            this.levels.push(new MixerZoomLevel(zoomPrefixLevelsCSS[ii].prefix, zoomPrefixLevelsCSS[ii].zoom, zoomPrefixLevelsCSS[ii + 1].zoom, an));
         }
         return this.zoomLayers;
     }
@@ -1041,23 +1045,21 @@ class MixerZoomLevel {
     constructor(prefix, minZoom, maxZoom, anchor) {
         this.minZoom = minZoom;
         this.maxZoom = maxZoom;
-        this.anchor = anchor;
+        this.zoomAnchor = anchor;
         this.prefix = prefix;
-        this.bg = { x: 0, y: 0, w: 5, h: 5, rx: 0.4, ry: 0.4, css: 'mixFieldBg' + this.prefix };
-        this.anchor.content = [this.bg];
+        this.zoomAnchor.content = [];
+    }
+    resetBars(data, ww, hh) {
+        this.zoomAnchor.content = [];
         this.bars = [];
-    }
-    buildLevel(ww, hh) {
-        this.bg.w = ww;
-        this.bg.h = hh;
-    }
-    fillBars(data, hh) {
         let left = 0;
         let width = 0;
         for (let ii = 0; ii < data.timeline.length; ii++) {
             let timebar = data.timeline[ii];
             width = MZMM().set(timebar.metre).duration(timebar.tempo) * data.theme.widthDurationRatio;
-            this.bars.push(new MixerBar(this.prefix, left, 0, width, hh, this.minZoom, this.maxZoom, this.anchor, data));
+            let an = { showZoom: this.minZoom, hideZoom: this.maxZoom, xx: left, yy: 0, ww: width, hh: hh, content: [] };
+            this.zoomAnchor.content.push(an);
+            this.bars.push(new MixerBar(this.prefix, left, 0, width, hh, this.minZoom, this.maxZoom, an, data));
             left = left + width;
         }
     }
@@ -1191,9 +1193,7 @@ let mzxbxProjectForTesting = {
     title: 'test data for debug',
     timeline: [
         { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 200, metre: { count: 3, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } }
+        { tempo: 120, metre: { count: 4, part: 4 } }
     ],
     tracks: [
         { title: "Track one", measures: [], filters: [], performer: { id: '', data: '' } },
@@ -1205,8 +1205,8 @@ let mzxbxProjectForTesting = {
     comments: [{ texts: [] }, { texts: [] }, { texts: [] }, { texts: [] }],
     filters: [],
     theme: {
-        notePathHeight: 0.25,
-        widthDurationRatio: 50
+        notePathHeight: 1.5,
+        widthDurationRatio: 7
     }
 };
 let testBigMixerData = {
@@ -1280,6 +1280,7 @@ let testEmptyMixerData = {
 };
 class MixerDataMath {
     constructor(data) {
+        this.octaveCount = 10;
         this.data = data;
     }
     wholeWidth() {
