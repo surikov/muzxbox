@@ -985,12 +985,11 @@ let testMenuData = [
     }
 ];
 class BarOctave {
-    constructor(left, top, width, height, anchor, prefix, minZoom, maxZoom, data) {
-        let mixm = new MixerDataMath(data);
-        let oRectangle = { x: left, y: top, w: width, h: height, rx: 1, ry: 1, css: 'mixFieldBg' + prefix };
-        let oAnchor = { xx: left, yy: top, ww: width, hh: height, showZoom: minZoom, hideZoom: maxZoom, content: [oRectangle] };
-        anchor.content.push(oAnchor);
-        console.log(left, top, prefix, minZoom, maxZoom);
+    constructor(left, top, width, height, anchor, zoomLevel) {
+        this.barRightBorder = { x: left + width, y: top, w: 1, h: height - 1.5, css: 'mixPanelFill' };
+        this.octaveBottomBorder = { x: left, y: top + height, w: width - 1.5, h: 1, css: 'mixToolbarFill' };
+        anchor.content.push(this.barRightBorder);
+        anchor.content.push(this.octaveBottomBorder);
     }
 }
 class OctaveContent {
@@ -998,19 +997,16 @@ class OctaveContent {
     }
 }
 class MixerBar {
-    constructor(prefix, left, top, ww, hh, minZoom, maxZoom, toAnchor, data) {
-        this.prefix = '';
-        this.minZoom = minZoom;
-        this.maxZoom = maxZoom;
+    constructor(left, top, ww, hh, zoomLevel, toAnchor, data) {
+        this.zoomLevel = zoomLevel;
         let mixm = new MixerDataMath(data);
-        this.prefix = prefix;
         this.anchor = toAnchor;
         this.octaves = [];
         let h12 = 12 * data.theme.notePathHeight;
-        for (let oo = 0; oo < mixm.octaveCount; oo++) {
-            let an = { showZoom: this.minZoom, hideZoom: this.maxZoom, xx: left, yy: oo * h12, ww: ww, hh: h12, content: [] };
-            this.anchor.content.push(an);
-            let bo = new BarOctave(left, oo * h12, ww, h12, an, prefix, minZoom, maxZoom, data);
+        for (let oo = 0; oo < data.theme.octaveCount; oo++) {
+            let barOctaveAnchor = { showZoom: zoomPrefixLevelsCSS[this.zoomLevel].zoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].zoom, xx: left, yy: oo * h12, ww: ww, hh: h12, content: [] };
+            this.anchor.content.push(barOctaveAnchor);
+            let bo = new BarOctave(left, oo * h12, ww, h12, barOctaveAnchor, this.zoomLevel);
             this.octaves.push(bo);
         }
     }
@@ -1036,17 +1032,15 @@ class MixerUI {
             this.svgs.push(document.getElementById("tracksLayerZoom" + zoomPrefixLevelsCSS[ii].prefix));
             let an = { showZoom: zoomPrefixLevelsCSS[ii].zoom, hideZoom: zoomPrefixLevelsCSS[ii + 1].zoom, xx: 0, yy: 0, ww: 1, hh: 1, content: [] };
             this.zoomLayers.push({ g: this.svgs[ii], anchors: [an], mode: LevelModes.normal });
-            this.levels.push(new MixerZoomLevel(zoomPrefixLevelsCSS[ii].prefix, zoomPrefixLevelsCSS[ii].zoom, zoomPrefixLevelsCSS[ii + 1].zoom, an));
+            this.levels.push(new MixerZoomLevel(ii, an));
         }
         return this.zoomLayers;
     }
 }
 class MixerZoomLevel {
-    constructor(prefix, minZoom, maxZoom, anchor) {
-        this.minZoom = minZoom;
-        this.maxZoom = maxZoom;
+    constructor(zoomLevel, anchor) {
+        this.zoomLevel = zoomLevel;
         this.zoomAnchor = anchor;
-        this.prefix = prefix;
         this.zoomAnchor.content = [];
     }
     resetBars(data, ww, hh) {
@@ -1057,9 +1051,9 @@ class MixerZoomLevel {
         for (let ii = 0; ii < data.timeline.length; ii++) {
             let timebar = data.timeline[ii];
             width = MZMM().set(timebar.metre).duration(timebar.tempo) * data.theme.widthDurationRatio;
-            let an = { showZoom: this.minZoom, hideZoom: this.maxZoom, xx: left, yy: 0, ww: width, hh: hh, content: [] };
+            let an = { showZoom: zoomPrefixLevelsCSS[this.zoomLevel].zoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].zoom, xx: left, yy: 0, ww: width, hh: hh, content: [] };
             this.zoomAnchor.content.push(an);
-            this.bars.push(new MixerBar(this.prefix, left, 0, width, hh, this.minZoom, this.maxZoom, an, data));
+            this.bars.push(new MixerBar(left, 0, width, hh, this.zoomLevel, an, data));
             left = left + width;
         }
     }
@@ -1193,7 +1187,15 @@ let mzxbxProjectForTesting = {
     title: 'test data for debug',
     timeline: [
         { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 4, part: 4 } }
+        { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 200, metre: { count: 3, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } },
+        { tempo: 200, metre: { count: 3, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } },
+        { tempo: 200, metre: { count: 3, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } },
+        { tempo: 200, metre: { count: 3, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } }
     ],
     tracks: [
         { title: "Track one", measures: [], filters: [], performer: { id: '', data: '' } },
@@ -1206,7 +1208,8 @@ let mzxbxProjectForTesting = {
     filters: [],
     theme: {
         notePathHeight: 1.5,
-        widthDurationRatio: 7
+        widthDurationRatio: 17,
+        octaveCount: 10
     }
 };
 let testBigMixerData = {
@@ -1280,7 +1283,6 @@ let testEmptyMixerData = {
 };
 class MixerDataMath {
     constructor(data) {
-        this.octaveCount = 10;
         this.data = data;
     }
     wholeWidth() {

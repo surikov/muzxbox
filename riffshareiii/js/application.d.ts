@@ -169,18 +169,18 @@ declare let commandLocaleZH: string;
 declare let commandImportFromMIDI: string;
 declare let testMenuData: MenuInfo[];
 declare class BarOctave {
-    constructor(left: number, top: number, width: number, height: number, anchor: TileAnchor, prefix: string, minZoom: number, maxZoom: number, data: MZXBX_Project);
+    barRightBorder: TileRectangle;
+    octaveBottomBorder: TileRectangle;
+    constructor(left: number, top: number, width: number, height: number, anchor: TileAnchor, zoomLevel: number);
 }
 declare class OctaveContent {
     constructor(aa: number, top: number, toAnchor: TileAnchor, data: MZXBX_Project);
 }
 declare class MixerBar {
-    minZoom: number;
-    maxZoom: number;
-    prefix: string;
     octaves: BarOctave[];
     anchor: TileAnchor;
-    constructor(prefix: string, left: number, top: number, ww: number, hh: number, minZoom: number, maxZoom: number, toAnchor: TileAnchor, data: MZXBX_Project);
+    zoomLevel: number;
+    constructor(left: number, top: number, ww: number, hh: number, zoomLevel: number, toAnchor: TileAnchor, data: MZXBX_Project);
 }
 declare class MixerUI {
     svgs: SVGElement[];
@@ -190,12 +190,10 @@ declare class MixerUI {
     createMixerLayers(): TileLayerDefinition[];
 }
 declare class MixerZoomLevel {
-    minZoom: number;
-    maxZoom: number;
     zoomAnchor: TileAnchor;
-    prefix: string;
     bars: MixerBar[];
-    constructor(prefix: string, minZoom: number, maxZoom: number, anchor: TileAnchor);
+    zoomLevel: number;
+    constructor(zoomLevel: number, anchor: TileAnchor);
     resetBars(data: MZXBX_Project, ww: number, hh: number): void;
 }
 declare class IconLabelButton {
@@ -283,7 +281,6 @@ declare let testEmptyMixerData: {
 };
 declare class MixerDataMath {
     data: MZXBX_Project;
-    octaveCount: number;
     constructor(data: MZXBX_Project);
     wholeWidth(): number;
     wholeHeight(): number;
@@ -524,6 +521,7 @@ declare type MZXBX_CommentMeasure = {
 declare type MZXBX_Theme = {
     widthDurationRatio: number;
     notePathHeight: number;
+    octaveCount: number;
 };
 declare type MZXBX_Project = {
     title: string;

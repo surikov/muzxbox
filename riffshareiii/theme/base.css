@@ -109,7 +109,7 @@ body {
     margin: 0px;
     padding: 0px;
     background-color2: #00ffff;
-    background: color-mix(in lab, transparent 20%, var(--color-background))
+    background: color-mix(in lab, transparent 10%, var(--color-background))
 }
 
 html,
@@ -158,4 +158,25 @@ body,
     fill: var(--color-subtext);
     text-anchor: middle;
     pointer-events: none;
+}
+
+.mixPanelFill{
+	fill: var(--color-panel);
+    stroke: none;
+}
+.mixToolbarFill{
+	fill: var(--color-toolbar);
+    stroke: none;
+}
+.mixTextFill{
+	fill: var(--color-text);
+    stroke: none;
+}
+.mixSubtextFill{
+	fill: var(--color-subtext);
+    stroke: none;
+}
+.mixFocusFill{
+	fill: var(--color-focus);
+    stroke: none;
 }

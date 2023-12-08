@@ -1,16 +1,20 @@
 class MixerZoomLevel {
-	minZoom: number;
-	maxZoom: number;
+	//minZoom: number;
+	//maxZoom: number;
 	zoomAnchor: TileAnchor;
 	//bg: TileRectangle;
-	prefix: string;
+	//prefix: string;
 	bars: MixerBar[];
 	//barAnchors: TileAnchor[] = [];
-	constructor(prefix: string, minZoom: number, maxZoom: number, anchor: TileAnchor) {
-		this.minZoom = minZoom;
-		this.maxZoom = maxZoom;
+	zoomLevel:number;
+	constructor(//prefix: string, minZoom: number, maxZoom: number
+		zoomLevel:number
+		, anchor: TileAnchor) {
+		//this.minZoom = minZoom;
+		//this.maxZoom = maxZoom;
+		this.zoomLevel=zoomLevel;
 		this.zoomAnchor = anchor;
-		this.prefix = prefix;
+		//this.prefix = prefix;
 		//this.bg = { x: 0, y: 0, w: 5, h: 5, rx: 0.4, ry: 0.4, css: 'debug' };
 		this.zoomAnchor.content = [];//this.bg];
 
@@ -33,10 +37,15 @@ class MixerZoomLevel {
 		for (let ii = 0; ii < data.timeline.length; ii++) {
 			let timebar = data.timeline[ii];
 			width = MZMM().set(timebar.metre).duration(timebar.tempo) * data.theme.widthDurationRatio;
-			let an: TileAnchor = { showZoom: this.minZoom, hideZoom: this.maxZoom, xx: left, yy: 0, ww: width, hh: hh, content: [] };
+			let an: TileAnchor = { showZoom: zoomPrefixLevelsCSS[this.zoomLevel].zoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevel+1].zoom, xx: left, yy: 0, ww: width, hh: hh, content: [] };
 			//this.barAnchors.push(an);
 			this.zoomAnchor.content.push(an);
-			this.bars.push(new MixerBar(this.prefix, left, 0, width, hh, this.minZoom, this.maxZoom, an, data));
+			this.bars.push(new MixerBar(//this.prefix, 
+				left, 0, width, hh
+				//, this.minZoom, this.maxZoom
+				,this.zoomLevel
+				, an, data
+				));
 			left = left + width;
 		}
 

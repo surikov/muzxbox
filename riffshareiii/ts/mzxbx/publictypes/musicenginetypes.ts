@@ -142,6 +142,7 @@ type MZXBX_CommentMeasure={
 type MZXBX_Theme={
 	widthDurationRatio:number
 	,notePathHeight:number
+	,octaveCount:number
 };
 type MZXBX_Project = {
 	title: string;

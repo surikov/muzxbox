@@ -3,9 +3,6 @@ let mzxbxProjectForTesting: MZXBX_Project = {
 	, timeline: [
 		{ tempo: 120, metre: { count: 4, part: 4 } }
 		, { tempo: 120, metre: { count: 4, part: 4 } }
-/*
-		, { tempo: 200, metre: { count: 3, part: 4 } }
-		, { tempo: 180, metre: { count: 4, part: 4 } }
 
 		, { tempo: 200, metre: { count: 3, part: 4 } }
 		, { tempo: 180, metre: { count: 4, part: 4 } }
@@ -14,7 +11,10 @@ let mzxbxProjectForTesting: MZXBX_Project = {
 		, { tempo: 180, metre: { count: 4, part: 4 } }
 
 		, { tempo: 200, metre: { count: 3, part: 4 } }
-		, { tempo: 180, metre: { count: 4, part: 4 } }*/
+		, { tempo: 180, metre: { count: 4, part: 4 } }
+
+		, { tempo: 200, metre: { count: 3, part: 4 } }
+		, { tempo: 180, metre: { count: 4, part: 4 } }
 	]
 	, tracks: [
 		{ title: "Track one", measures: [], filters: [], performer: { id: '', data: '' } }
@@ -27,7 +27,8 @@ let mzxbxProjectForTesting: MZXBX_Project = {
 	, filters: []
 	, theme: {
 		notePathHeight: 1.5
-		, widthDurationRatio: 7
+		, widthDurationRatio: 17
+		,octaveCount:10
 	}
 };
 let testBigMixerData = {
