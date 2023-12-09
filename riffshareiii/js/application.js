@@ -219,17 +219,16 @@ class CommandDispatcher {
 }
 let commandDispatcher = new CommandDispatcher();
 let zoomPrefixLevelsCSS = [
-    { prefix: '025', zoom: 0.25 },
-    { prefix: '05', zoom: 0.5 },
-    { prefix: '1', zoom: 1 },
-    { prefix: '2', zoom: 2 },
-    { prefix: '4', zoom: 4 },
-    { prefix: '8', zoom: 8 },
-    { prefix: '16', zoom: 16 },
-    { prefix: '32', zoom: 32 },
-    { prefix: '64', zoom: 64 },
-    { prefix: '128', zoom: 128 },
-    { prefix: '256', zoom: 256 }
+    { prefix: '025', zoom: 0.25, svg: 'tracksLayerZoom025' },
+    { prefix: '05', zoom: 0.5, svg: 'tracksLayerZoom05' },
+    { prefix: '1', zoom: 1, svg: 'tracksLayerZoom1' },
+    { prefix: '2', zoom: 2, svg: 'tracksLayerZoom2' },
+    { prefix: '4', zoom: 4, svg: 'tracksLayerZoom4' },
+    { prefix: '8', zoom: 8, svg: 'tracksLayerZoom8' },
+    { prefix: '16', zoom: 16, svg: 'tracksLayerZoom16' },
+    { prefix: '32', zoom: 32, svg: 'tracksLayerZoom32' },
+    { prefix: '64', zoom: 64, svg: 'tracksLayerZoom64' },
+    { prefix: '128', zoom: 128, svg: 'tracksLayerZoom128' }
 ];
 class UIRenderer {
     constructor() {
@@ -254,9 +253,10 @@ class UIRenderer {
         this.mixer = new MixerUI();
         let me = this;
         layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.createMixerLayers(), this.warning.allLayers());
-        this.tiler.initRun(this.tileLevelSVG, false, 1, 1, 0.25, 4, 256 - 1, layers);
+        this.tiler.initRun(this.tileLevelSVG, false, 1, 1, zoomPrefixLevelsCSS[0].zoom, zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].zoom, zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom - 1, layers);
         console.log('tap size', this.tiler.tapPxSize());
         this.tiler.setAfterZoomCallback(() => {
+            console.log('afterZoomCallback', this.tiler.getCurrentPointPosition());
             if (this.menu) {
                 this.menu.lastZ = this.tiler.getCurrentPointPosition().z;
             }
@@ -347,7 +347,10 @@ class UIToolbar {
         });
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
         this.toolBarAnchor = {
-            xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+            xx: 0, yy: 0, ww: 111, hh: 111,
+            showZoom: zoomPrefixLevelsCSS[0].zoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            content: [
                 this.playPauseButton.iconLabelButton.anchor,
                 this.menuButton.iconLabelButton.anchor,
                 this.headButton.iconLabelButton.anchor
@@ -427,21 +430,33 @@ class RightMenuPanel {
             this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         });
         this.backgroundAnchor = {
-            xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+            xx: 0, yy: 0, ww: 111, hh: 111,
+            showZoom: zoomPrefixLevelsCSS[0].zoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            content: [
                 this.listingShadow,
                 this.backgroundRectangle
             ], id: 'rightMenuBackgroundAnchor'
         };
         this.contentAnchor = {
-            xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [], id: 'rightMenuContentAnchor'
+            xx: 0, yy: 0, ww: 111, hh: 111,
+            showZoom: zoomPrefixLevelsCSS[0].zoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            content: [], id: 'rightMenuContentAnchor'
         };
         this.interAnchor = {
-            xx: 0, yy: 111, ww: 111, hh: 0, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+            xx: 0, yy: 111, ww: 111, hh: 0,
+            showZoom: zoomPrefixLevelsCSS[0].zoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            content: [
                 this.dragHandler
             ], id: 'rightMenuInteractionAnchor'
         };
         this.buttonsAnchor = {
-            xx: 0, yy: 111, ww: 111, hh: 0, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+            xx: 0, yy: 111, ww: 111, hh: 0,
+            showZoom: zoomPrefixLevelsCSS[0].zoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            content: [
                 this.menuCloseButton.anchor, this.menuUpButton.anchor
             ]
         };
@@ -766,7 +781,10 @@ class RightMenuItem {
     }
     buildTile(itemTop, itemWidth) {
         this.top = itemTop;
-        let anchor = { xx: 0, yy: itemTop, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [] };
+        let anchor = { xx: 0, yy: itemTop, ww: 111, hh: 111,
+            showZoom: zoomPrefixLevelsCSS[0].zoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            content: [] };
         if (this.focused) {
             anchor.content.push({ x: itemWidth - 0.2, y: itemTop + 0.02, w: 0.2, h: this.calculateHeight() - 0.02, css: 'rightMenuFocusedDelimiter' });
         }
@@ -986,8 +1004,20 @@ let testMenuData = [
 ];
 class BarOctave {
     constructor(left, top, width, height, anchor, zoomLevel) {
-        this.barRightBorder = { x: left + width, y: top, w: 1, h: height - 1.5, css: 'mixPanelFill' };
-        this.octaveBottomBorder = { x: left, y: top + height, w: width - 1.5, h: 1, css: 'mixToolbarFill' };
+        this.barRightBorder = {
+            x: left + width,
+            y: top,
+            w: zoomPrefixLevelsCSS[zoomLevel].zoom / 8.0,
+            h: height - 1.5,
+            css: 'mixPanelFill'
+        };
+        this.octaveBottomBorder = {
+            x: left,
+            y: top + height,
+            w: width - 1.5,
+            h: zoomPrefixLevelsCSS[zoomLevel].zoom / 8.0,
+            css: 'mixToolbarFill'
+        };
         anchor.content.push(this.barRightBorder);
         anchor.content.push(this.octaveBottomBorder);
     }
@@ -1029,10 +1059,14 @@ class MixerUI {
     }
     createMixerLayers() {
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
-            this.svgs.push(document.getElementById("tracksLayerZoom" + zoomPrefixLevelsCSS[ii].prefix));
-            let an = { showZoom: zoomPrefixLevelsCSS[ii].zoom, hideZoom: zoomPrefixLevelsCSS[ii + 1].zoom, xx: 0, yy: 0, ww: 1, hh: 1, content: [] };
-            this.zoomLayers.push({ g: this.svgs[ii], anchors: [an], mode: LevelModes.normal });
-            this.levels.push(new MixerZoomLevel(ii, an));
+            this.svgs.push(document.getElementById(zoomPrefixLevelsCSS[ii].svg));
+            let mixerLevelAnchor = {
+                showZoom: zoomPrefixLevelsCSS[ii].zoom,
+                hideZoom: zoomPrefixLevelsCSS[ii + 1].zoom,
+                xx: 0, yy: 0, ww: 1, hh: 1, content: []
+            };
+            this.zoomLayers.push({ g: this.svgs[ii], anchors: [mixerLevelAnchor], mode: LevelModes.normal });
+            this.levels.push(new MixerZoomLevel(ii, mixerLevelAnchor));
         }
         return this.zoomLayers;
     }
@@ -1078,7 +1112,10 @@ class IconLabelButton {
         };
         this.label = { x: 0, y: 0, text: this.labels[this.selection], css: cssLabel };
         this.anchor = {
-            xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+            xx: 0, yy: 0, ww: 111, hh: 111,
+            showZoom: zoomPrefixLevelsCSS[0].zoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            content: [
                 this.bg,
                 this.label,
                 this.spot
@@ -1118,7 +1155,12 @@ class DebugLayerUI {
     setupUI() {
         this.debugRectangle = { x: 0, y: 0, w: 1, h: 1, rx: 10, ry: 10, css: 'debug' };
         this.debugGroup = document.getElementById("debugLayer");
-        this.debugAnchor = { xx: 0, yy: 0, ww: 1, hh: 1, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [] };
+        this.debugAnchor = {
+            xx: 0, yy: 0, ww: 1, hh: 1,
+            showZoom: zoomPrefixLevelsCSS[0].zoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            content: []
+        };
         this.debugLayer = {
             g: this.debugGroup, anchors: [
                 this.debugAnchor
@@ -1150,7 +1192,9 @@ class WarningUI {
         this.warningGroup = document.getElementById("warningDialogGroup");
         this.warningRectangle = { x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: this.cancel.bind(this) };
         this.warningAnchor = {
-            id: 'warningAnchor', xx: 0, yy: 0, ww: 1, hh: 1, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom,
+            id: 'warningAnchor', xx: 0, yy: 0, ww: 1, hh: 1,
+            showZoom: zoomPrefixLevelsCSS[0].zoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom + 1,
             content: [this.warningRectangle, this.warningIcon, this.warningTitle, this.warningDescription]
         };
         this.warningLayer = { g: this.warningGroup, anchors: [this.warningAnchor], mode: LevelModes.overlay };

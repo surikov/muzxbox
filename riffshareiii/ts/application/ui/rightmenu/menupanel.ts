@@ -85,24 +85,36 @@ class RightMenuPanel {
             this.resetAllAnchors();
         });*/
         this.backgroundAnchor = {
-            xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+            xx: 0, yy: 0, ww: 111, hh: 111
+            , showZoom: zoomPrefixLevelsCSS[0].zoom
+            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].zoom
+            , content: [
                 this.listingShadow
                 , this.backgroundRectangle
 
             ], id: 'rightMenuBackgroundAnchor'
         };
         this.contentAnchor = {
-            xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+            xx: 0, yy: 0, ww: 111, hh: 111
+            , showZoom: zoomPrefixLevelsCSS[0].zoom
+            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].zoom
+            , content: [
                 //this.testContent
             ], id: 'rightMenuContentAnchor'
         };
         this.interAnchor = {
-            xx: 0, yy: 111, ww: 111, hh: 0, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+            xx: 0, yy: 111, ww: 111, hh: 0
+            , showZoom: zoomPrefixLevelsCSS[0].zoom
+            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].zoom
+            , content: [
                 this.dragHandler
             ], id: 'rightMenuInteractionAnchor'
         };
         this.buttonsAnchor = {
-            xx: 0, yy: 111, ww: 111, hh: 0, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+            xx: 0, yy: 111, ww: 111, hh: 0
+            , showZoom: zoomPrefixLevelsCSS[0].zoom
+            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].zoom
+            , content: [
                 this.menuCloseButton.anchor, this.menuUpButton.anchor
             ]
         };

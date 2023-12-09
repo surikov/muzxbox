@@ -234,7 +234,12 @@ class TileLevelRealTime {
                         }
                     }
                 }
-                layer.g.setAttribute('transform', 'translate(' + (tx + cX + sX) + ',' + (ty + cY + sY) + ') scale(' + tz + ',' + tz + ')');
+                if (layer.g) {
+                    layer.g.setAttribute('transform', 'translate(' + (tx + cX + sX) + ',' + (ty + cY + sY) + ') scale(' + tz + ',' + tz + ')');
+                }
+                else {
+                    console.log('empty group', layer);
+                }
             }
         }
         this.checkAfterZoom();
@@ -388,7 +393,12 @@ class TileLevelRealTime {
         if (this.model) {
             for (let k = 0; k < this.model.length; k++) {
                 let group = this.model[k].g;
-                this.clearUselessGroups(group, this.model[k]);
+                if (group) {
+                    this.clearUselessGroups(group, this.model[k]);
+                }
+                else {
+                    console.log('clearUselessDetails', k, this.model);
+                }
             }
         }
     }
@@ -435,19 +445,23 @@ class TileLevelRealTime {
                 }
             }
         }
-        if (group)
+        if (group) {
             this.msEdgeHook(group);
-        for (let i = 0; i < group.children.length; i++) {
-            let child = group.children[i];
-            if (this.outOfWatch(child, x, y, w, h) || child.minZoom > this.translateZ || child.maxZoom <= this.translateZ) {
-                group.removeChild(child);
-                i--;
-            }
-            else {
-                if (child.localName == 'g') {
-                    this.clearUselessGroups(child, layer);
+            for (let i = 0; i < group.children.length; i++) {
+                let child = group.children[i];
+                if (this.outOfWatch(child, x, y, w, h) || child.minZoom > this.translateZ || child.maxZoom <= this.translateZ) {
+                    group.removeChild(child);
+                    i--;
+                }
+                else {
+                    if (child.localName == 'g') {
+                        this.clearUselessGroups(child, layer);
+                    }
                 }
             }
+        }
+        else {
+            console.log('clearUselessGroups empty', group, layer);
         }
     }
     msEdgeHook(g) {
@@ -664,10 +678,14 @@ class TileLevelRealTime {
         }
     }
     clearGroupDetails(group) {
-        if (group)
+        if (group) {
             this.msEdgeHook(group);
-        while (group.children.length) {
-            group.removeChild(group.children[0]);
+            while (group.children.length) {
+                group.removeChild(group.children[0]);
+            }
+        }
+        else {
+            console.log('clearGroupDetails', group);
         }
     }
     setModel(layers) {

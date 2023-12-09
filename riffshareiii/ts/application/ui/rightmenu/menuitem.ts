@@ -76,7 +76,10 @@ class RightMenuItem {
     }
     buildTile(itemTop: number, itemWidth: number): TileItem {
         this.top = itemTop;
-        let anchor: TileAnchor = { xx: 0, yy: itemTop, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [] };
+        let anchor: TileAnchor = { xx: 0, yy: itemTop, ww: 111, hh: 111
+            , showZoom: zoomPrefixLevelsCSS[0].zoom
+            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].zoom
+            , content: [] };
         if (this.focused) {
             anchor.content.push({ x: itemWidth-0.2, y: itemTop+0.02 , w: 0.2, h: this.calculateHeight()-0.02, css: 'rightMenuFocusedDelimiter' });
         } 

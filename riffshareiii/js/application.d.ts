@@ -38,6 +38,7 @@ declare let commandDispatcher: CommandDispatcher;
 declare let zoomPrefixLevelsCSS: {
     prefix: string;
     zoom: number;
+    svg: string;
 }[];
 declare class UIRenderer {
     toolbar: UIToolbar;

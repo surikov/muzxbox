@@ -40,7 +40,10 @@ class UIToolbar {
         //this.toolBarRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'toolBarPanel' };
         //this.toolBarShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
         this.toolBarAnchor = {
-            xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+            xx: 0, yy: 0, ww: 111, hh: 111
+            , showZoom: zoomPrefixLevelsCSS[0].zoom
+            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].zoom
+            , content: [
                 //this.toolBarShadow
                 //, this.toolBarRectangle
                 this.playPauseButton.iconLabelButton.anchor

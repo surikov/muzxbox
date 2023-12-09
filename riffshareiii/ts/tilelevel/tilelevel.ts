@@ -175,7 +175,7 @@ class TileLevelRealTime implements TileLevelBase {
         this.tapSize = tbb.width;
         this.svg.removeChild(rect);
         this.clickLimit = this.tapSize / 6;
-        console.log('setupTapSize',baseSize,this.tapSize);
+        console.log('setupTapSize', baseSize, this.tapSize);
     }
     onAfterResize() {
         this.onResizeDo.start(333, function () {
@@ -274,7 +274,11 @@ class TileLevelRealTime implements TileLevelBase {
                         }
                     }
                 }
-                layer.g.setAttribute('transform', 'translate(' + (tx + cX + sX) + ',' + (ty + cY + sY) + ') scale(' + tz + ',' + tz + ')');
+                if (layer.g) {
+                    layer.g.setAttribute('transform', 'translate(' + (tx + cX + sX) + ',' + (ty + cY + sY) + ') scale(' + tz + ',' + tz + ')');
+                } else {
+                    console.log('empty group', layer);
+                }
             }
         }
         this.checkAfterZoom();
@@ -423,7 +427,11 @@ class TileLevelRealTime implements TileLevelBase {
         if (this.model) {
             for (let k = 0; k < this.model.length; k++) {
                 let group: SVGElement = this.model[k].g;
-                this.clearUselessGroups(group, this.model[k]);
+                if (group) {
+                    this.clearUselessGroups(group, this.model[k]);
+                } else {
+                    console.log('clearUselessDetails', k, this.model);
+                }
             }
         }
     }
@@ -473,17 +481,21 @@ class TileLevelRealTime implements TileLevelBase {
                 }
             }
         }
-        if (group) this.msEdgeHook(group);
-        for (let i: number = 0; i < group.children.length; i++) {
-            let child: TileSVGElement = group.children[i] as TileSVGElement;
-            if (this.outOfWatch(child, x, y, w, h) || child.minZoom > this.translateZ || child.maxZoom <= this.translateZ) {
-                group.removeChild(child);
-                i--;
-            } else {
-                if (child.localName == 'g') {
-                    this.clearUselessGroups(child, layer);
+        if (group) {
+            this.msEdgeHook(group);
+            for (let i: number = 0; i < group.children.length; i++) {
+                let child: TileSVGElement = group.children[i] as TileSVGElement;
+                if (this.outOfWatch(child, x, y, w, h) || child.minZoom > this.translateZ || child.maxZoom <= this.translateZ) {
+                    group.removeChild(child);
+                    i--;
+                } else {
+                    if (child.localName == 'g') {
+                        this.clearUselessGroups(child, layer);
+                    }
                 }
             }
+        } else {
+            console.log('clearUselessGroups empty', group, layer);
         }
     }
 
@@ -742,9 +754,13 @@ class TileLevelRealTime implements TileLevelBase {
         }
     }
     clearGroupDetails(group: SVGElement) {
-        if (group) this.msEdgeHook(group);
-        while (group.children.length) {
-            group.removeChild(group.children[0]);
+        if (group) {
+            this.msEdgeHook(group);
+            while (group.children.length) {
+                group.removeChild(group.children[0]);
+            }
+        } else {
+            console.log('clearGroupDetails', group);
         }
     }
     /*autoID(definition: (TileAnchor | TileRectangle | TileText | TilePath | TileLine | TilePolygon)[]) {
