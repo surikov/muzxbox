@@ -28,8 +28,9 @@ class CommandDispatcher {
 		this.renderer.onReSizeView();
 		this.renderer.tiler.resetModel();
 	}
-	resetProject(data: MZXBX_Schedule) {
-		console.log('resetProject', data);
+	resetProject(data: MZXBX_Project) {
+        console.log('resetProject', data);
+        this.renderer.fillWholeUI(data);
 	}
 	promptImportFromMIDI() {
 		console.log('promptImportFromMIDI');
@@ -51,8 +52,9 @@ class CommandDispatcher {
 							var arrayBuffer = progressEvent.target.result;
 							//console.log('arrayBuffer',arrayBuffer);
 							var midiParser = newMIDIparser(arrayBuffer);
-							let testSchedule: MZXBX_Schedule = midiParser.convertProject(title, comment);
-							me.resetProject(testSchedule);
+                            let result: MZXBX_Project = midiParser.convertProject(title, comment);
+                            //console.log('result',result);
+							me.resetProject(result);
 						}
 					};
 					fileReader.readAsArrayBuffer(file);

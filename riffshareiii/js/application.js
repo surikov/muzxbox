@@ -141,7 +141,7 @@ function startApplication() {
     console.log('startApplication v1.6.01');
     let ui = new UIRenderer();
     ui.createUI();
-    ui.fillUI(mzxbxProjectForTesting);
+    ui.fillWholeUI(mzxbxProjectForTesting);
 }
 function initWebAudioFromUI() {
     console.log('initWebAudioFromUI');
@@ -189,6 +189,7 @@ class CommandDispatcher {
     }
     resetProject(data) {
         console.log('resetProject', data);
+        this.renderer.fillWholeUI(data);
     }
     promptImportFromMIDI() {
         console.log('promptImportFromMIDI');
@@ -205,8 +206,9 @@ class CommandDispatcher {
                         if (progressEvent != null) {
                             var arrayBuffer = progressEvent.target.result;
                             var midiParser = newMIDIparser(arrayBuffer);
-                            let testSchedule = midiParser.convertProject(title, comment);
-                            me.resetProject(testSchedule);
+                            let result = midiParser.convertProject(title, comment);
+                            console.log('result', result);
+                            me.resetProject(result);
                         }
                     };
                     fileReader.readAsArrayBuffer(file);
@@ -219,16 +221,16 @@ class CommandDispatcher {
 }
 let commandDispatcher = new CommandDispatcher();
 let zoomPrefixLevelsCSS = [
-    { prefix: '025', zoom: 0.25, svg: 'tracksLayerZoom025' },
-    { prefix: '05', zoom: 0.5, svg: 'tracksLayerZoom05' },
-    { prefix: '1', zoom: 1, svg: 'tracksLayerZoom1' },
-    { prefix: '2', zoom: 2, svg: 'tracksLayerZoom2' },
-    { prefix: '4', zoom: 4, svg: 'tracksLayerZoom4' },
-    { prefix: '8', zoom: 8, svg: 'tracksLayerZoom8' },
-    { prefix: '16', zoom: 16, svg: 'tracksLayerZoom16' },
-    { prefix: '32', zoom: 32, svg: 'tracksLayerZoom32' },
-    { prefix: '64', zoom: 64, svg: 'tracksLayerZoom64' },
-    { prefix: '128', zoom: 128, svg: 'tracksLayerZoom128' }
+    { prefix: '025', zoom: 0.25 },
+    { prefix: '05', zoom: 0.5 },
+    { prefix: '1', zoom: 1 },
+    { prefix: '2', zoom: 2 },
+    { prefix: '4', zoom: 4 },
+    { prefix: '8', zoom: 8 },
+    { prefix: '16', zoom: 16 },
+    { prefix: '32', zoom: 32 },
+    { prefix: '64', zoom: 64 },
+    { prefix: '128', zoom: 128 }
 ];
 class UIRenderer {
     constructor() {
@@ -254,9 +256,7 @@ class UIRenderer {
         let me = this;
         layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.createMixerLayers(), this.warning.allLayers());
         this.tiler.initRun(this.tileLevelSVG, false, 1, 1, zoomPrefixLevelsCSS[0].zoom, zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].zoom, zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom - 1, layers);
-        console.log('tap size', this.tiler.tapPxSize());
         this.tiler.setAfterZoomCallback(() => {
-            console.log('afterZoomCallback', this.tiler.getCurrentPointPosition());
             if (this.menu) {
                 this.menu.lastZ = this.tiler.getCurrentPointPosition().z;
             }
@@ -265,7 +265,7 @@ class UIRenderer {
             this.onReSizeView();
         });
     }
-    fillUI(data) {
+    fillWholeUI(data) {
         let mixm = new MixerDataMath(data);
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
@@ -278,6 +278,7 @@ class UIRenderer {
         this.warning.resetDialogView(data);
         this.warning.resizeDialog(vw, vh);
         this.tiler.resetModel();
+        console.log('fillWholeUI', this.tiler);
     }
     onReSizeView() {
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
@@ -1034,7 +1035,12 @@ class MixerBar {
         this.octaves = [];
         let h12 = 12 * data.theme.notePathHeight;
         for (let oo = 0; oo < data.theme.octaveCount; oo++) {
-            let barOctaveAnchor = { showZoom: zoomPrefixLevelsCSS[this.zoomLevel].zoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].zoom, xx: left, yy: oo * h12, ww: ww, hh: h12, content: [] };
+            let barOctaveAnchor = {
+                showZoom: zoomPrefixLevelsCSS[this.zoomLevel].zoom,
+                hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].zoom,
+                xx: left, yy: oo * h12, ww: ww, hh: h12, content: [],
+                id: 'octave' + (oo + Math.random())
+            };
             this.anchor.content.push(barOctaveAnchor);
             let bo = new BarOctave(left, oo * h12, ww, h12, barOctaveAnchor, this.zoomLevel);
             this.octaves.push(bo);
@@ -1043,8 +1049,6 @@ class MixerBar {
 }
 class MixerUI {
     constructor() {
-        this.svgs = [];
-        this.zoomLayers = [];
         this.levels = [];
     }
     reFillMixerUI(data) {
@@ -1052,23 +1056,25 @@ class MixerUI {
         let ww = mixm.wholeWidth();
         let hh = mixm.wholeHeight();
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
-            this.zoomLayers[ii].anchors[0].ww = ww;
-            this.zoomLayers[ii].anchors[0].hh = hh;
+            this.zoomLayer.anchors[ii].ww = ww;
+            this.zoomLayer.anchors[ii].hh = hh;
             this.levels[ii].resetBars(data, ww, hh);
         }
     }
     createMixerLayers() {
+        let svg = document.getElementById('tracksLayerZoom');
+        this.zoomLayer = { g: svg, anchors: [], mode: LevelModes.normal };
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
-            this.svgs.push(document.getElementById(zoomPrefixLevelsCSS[ii].svg));
             let mixerLevelAnchor = {
                 showZoom: zoomPrefixLevelsCSS[ii].zoom,
                 hideZoom: zoomPrefixLevelsCSS[ii + 1].zoom,
-                xx: 0, yy: 0, ww: 1, hh: 1, content: []
+                xx: 0, yy: 0, ww: 1, hh: 1, content: [],
+                id: 'mix' + (ii + Math.random())
             };
-            this.zoomLayers.push({ g: this.svgs[ii], anchors: [mixerLevelAnchor], mode: LevelModes.normal });
+            this.zoomLayer.anchors.push(mixerLevelAnchor);
             this.levels.push(new MixerZoomLevel(ii, mixerLevelAnchor));
         }
-        return this.zoomLayers;
+        return [this.zoomLayer];
     }
 }
 class MixerZoomLevel {
@@ -1085,9 +1091,14 @@ class MixerZoomLevel {
         for (let ii = 0; ii < data.timeline.length; ii++) {
             let timebar = data.timeline[ii];
             width = MZMM().set(timebar.metre).duration(timebar.tempo) * data.theme.widthDurationRatio;
-            let an = { showZoom: zoomPrefixLevelsCSS[this.zoomLevel].zoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].zoom, xx: left, yy: 0, ww: width, hh: hh, content: [] };
-            this.zoomAnchor.content.push(an);
-            this.bars.push(new MixerBar(left, 0, width, hh, this.zoomLevel, an, data));
+            let barAnchor = {
+                showZoom: zoomPrefixLevelsCSS[this.zoomLevel].zoom,
+                hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].zoom,
+                xx: left, yy: 0, ww: width, hh: hh, content: [],
+                id: 'measure' + (ii + Math.random())
+            };
+            this.zoomAnchor.content.push(barAnchor);
+            this.bars.push(new MixerBar(left, 0, width, hh, this.zoomLevel, barAnchor, data));
             left = left + width;
         }
     }

@@ -9,17 +9,18 @@ type RenderedLayers = RenderedPart & {
 	allLayers: () => TileLayerDefinition[];
 };
 */
-let zoomPrefixLevelsCSS: { prefix: string, zoom: number, svg: string }[] = [
-    { prefix: '025', zoom: 0.25, svg: 'tracksLayerZoom025' }//0
-    , { prefix: '05', zoom: 0.5, svg: 'tracksLayerZoom05' }//1
-    , { prefix: '1', zoom: 1, svg: 'tracksLayerZoom1' }//2
-    , { prefix: '2', zoom: 2, svg: 'tracksLayerZoom2' }//3
-    , { prefix: '4', zoom: 4, svg: 'tracksLayerZoom4' }//4
-    , { prefix: '8', zoom: 8, svg: 'tracksLayerZoom8' }//5
-    , { prefix: '16', zoom: 16, svg: 'tracksLayerZoom16' }//6
-    , { prefix: '32', zoom: 32, svg: 'tracksLayerZoom32' }//7
-    , { prefix: '64', zoom: 64, svg: 'tracksLayerZoom64' }//8
-    , { prefix: '128', zoom: 128, svg: 'tracksLayerZoom128' }//9
+let zoomPrefixLevelsCSS: { prefix: string, zoom: number//, svg: string 
+}[] = [
+    { prefix: '025', zoom: 0.25 }//0
+    , { prefix: '05', zoom: 0.5 }//1
+    , { prefix: '1', zoom: 1 }//2
+    , { prefix: '2', zoom: 2 }//3
+    , { prefix: '4', zoom: 4 }//4
+    , { prefix: '8', zoom: 8}//5
+    , { prefix: '16', zoom: 16 }//6
+    , { prefix: '32', zoom: 32 }//7
+    , { prefix: '64', zoom: 64 }//8
+    , { prefix: '128', zoom: 128}//9
     //, { prefix: '256', zoom: 256,svg:'tracksLayerZoom025' }//10
 ];
 class UIRenderer {//} implements RenderedPart {
@@ -91,9 +92,9 @@ class UIRenderer {//} implements RenderedPart {
             , zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].zoom
             , zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom-1
             , layers);
-        console.log('tap size', this.tiler.tapPxSize());
+        //console.log('tap size', this.tiler.tapPxSize());
         this.tiler.setAfterZoomCallback(() => {
-            console.log('afterZoomCallback', this.tiler.getCurrentPointPosition());
+            //console.log('afterZoomCallback', this.tiler.getCurrentPointPosition());
             if (this.menu) {
                 this.menu.lastZ = this.tiler.getCurrentPointPosition().z;
             }
@@ -105,7 +106,7 @@ class UIRenderer {//} implements RenderedPart {
         });
     }
 
-    fillUI(data: MZXBX_Project) {
+    fillWholeUI(data: MZXBX_Project) {
         let mixm: MixerDataMath = new MixerDataMath(data);
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
@@ -123,6 +124,7 @@ class UIRenderer {//} implements RenderedPart {
         this.warning.resetDialogView(data);
         this.warning.resizeDialog(vw, vh);
         this.tiler.resetModel();
+        console.log('fillWholeUI',this.tiler);
     }
     onReSizeView() {
         //console.log('onReSizeView');

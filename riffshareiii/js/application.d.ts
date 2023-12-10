@@ -31,14 +31,13 @@ declare class CommandDispatcher {
     showRightMenu(): void;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     changeTapSize(ratio: number): void;
-    resetProject(data: MZXBX_Schedule): void;
+    resetProject(data: MZXBX_Project): void;
     promptImportFromMIDI(): void;
 }
 declare let commandDispatcher: CommandDispatcher;
 declare let zoomPrefixLevelsCSS: {
     prefix: string;
     zoom: number;
-    svg: string;
 }[];
 declare class UIRenderer {
     toolbar: UIToolbar;
@@ -51,7 +50,7 @@ declare class UIRenderer {
     constructor();
     changeTapSIze(ratio: number): void;
     createUI(): void;
-    fillUI(data: MZXBX_Project): void;
+    fillWholeUI(data: MZXBX_Project): void;
     onReSizeView(): void;
     deleteUI(): void;
 }
@@ -184,8 +183,7 @@ declare class MixerBar {
     constructor(left: number, top: number, ww: number, hh: number, zoomLevel: number, toAnchor: TileAnchor, data: MZXBX_Project);
 }
 declare class MixerUI {
-    svgs: SVGElement[];
-    zoomLayers: TileLayerDefinition[];
+    zoomLayer: TileLayerDefinition;
     levels: MixerZoomLevel[];
     reFillMixerUI(data: MZXBX_Project): void;
     createMixerLayers(): TileLayerDefinition[];
