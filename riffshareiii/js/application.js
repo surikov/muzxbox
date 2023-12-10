@@ -207,7 +207,6 @@ class CommandDispatcher {
                             var arrayBuffer = progressEvent.target.result;
                             var midiParser = newMIDIparser(arrayBuffer);
                             let result = midiParser.convertProject(title, comment);
-                            console.log('result', result);
                             me.resetProject(result);
                         }
                     };
@@ -1058,7 +1057,7 @@ class MixerUI {
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             this.zoomLayer.anchors[ii].ww = ww;
             this.zoomLayer.anchors[ii].hh = hh;
-            this.levels[ii].resetBars(data, ww, hh);
+            this.levels[ii].reCreateBars(data, ww, hh);
         }
     }
     createMixerLayers() {
@@ -1083,7 +1082,7 @@ class MixerZoomLevel {
         this.zoomAnchor = anchor;
         this.zoomAnchor.content = [];
     }
-    resetBars(data, ww, hh) {
+    reCreateBars(data, ww, hh) {
         this.zoomAnchor.content = [];
         this.bars = [];
         let left = 0;
@@ -1097,8 +1096,10 @@ class MixerZoomLevel {
                 xx: left, yy: 0, ww: width, hh: hh, content: [],
                 id: 'measure' + (ii + Math.random())
             };
+            console.log(ii, barAnchor);
             this.zoomAnchor.content.push(barAnchor);
-            this.bars.push(new MixerBar(left, 0, width, hh, this.zoomLevel, barAnchor, data));
+            let mixBar = new MixerBar(left, 0, width, hh, this.zoomLevel, barAnchor, data);
+            this.bars.push(mixBar);
             left = left + width;
         }
     }
@@ -1262,7 +1263,7 @@ let mzxbxProjectForTesting = {
     comments: [{ texts: [] }, { texts: [] }, { texts: [] }, { texts: [] }],
     filters: [],
     theme: {
-        notePathHeight: 1.5,
+        notePathHeight: 0.5,
         widthDurationRatio: 17,
         octaveCount: 10
     }
@@ -1304,7 +1305,7 @@ let testBigMixerData = {
         { tempo: 120, metre: { count: 3, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }
     ],
     notePathHeight: 0.25,
-    widthDurationRatio: 50,
+    widthDurationRatio: 15,
     pitchedTracks: [
         { title: 'Test track 1' },
         { title: 'Test track 2' },
@@ -1330,7 +1331,7 @@ let testEmptyMixerData = {
         { tempo: 120, metre: { count: 4, part: 4 } }
     ],
     notePathHeight: 0.25,
-    widthDurationRatio: 50,
+    widthDurationRatio: 11,
     pitchedTracks: [
         { title: 'A track1' },
         { title: 'Second track' }

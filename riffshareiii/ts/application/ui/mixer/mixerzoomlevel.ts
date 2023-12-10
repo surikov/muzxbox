@@ -2,14 +2,13 @@ class MixerZoomLevel {
     zoomAnchor: TileAnchor;
     bars: MixerBar[];
     zoomLevel: number;
-    constructor(
-        zoomLevel: number
-        , anchor: TileAnchor) {
+    constructor(zoomLevel: number, anchor: TileAnchor) {
         this.zoomLevel = zoomLevel;
         this.zoomAnchor = anchor;
         this.zoomAnchor.content = [];
     }
-    resetBars(data: MZXBX_Project, ww: number, hh: number) {
+    reCreateBars(data: MZXBX_Project, ww: number, hh: number) {
+        //console.log('resetBars', ww, hh);
         this.zoomAnchor.content = [];
         this.bars = [];
         let left = 0;
@@ -23,12 +22,10 @@ class MixerZoomLevel {
                 , xx: left, yy: 0, ww: width, hh: hh, content: []
                 , id: 'measure' + (ii + Math.random())
             };
+            console.log(ii,barAnchor)
             this.zoomAnchor.content.push(barAnchor);
-            this.bars.push(new MixerBar(
-                left, 0, width, hh
-                , this.zoomLevel
-                , barAnchor, data
-            ));
+            let mixBar=new MixerBar(left, 0, width, hh, this.zoomLevel, barAnchor, data);
+            this.bars.push(mixBar);
             left = left + width;
         }
 

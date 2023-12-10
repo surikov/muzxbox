@@ -12,6 +12,7 @@ declare class MZXBX_MetreMath implements MZXBX_MetreMathType {
     plus(metre: MZXBX_Metre): MZXBX_MetreMath;
     minus(metre: MZXBX_Metre): MZXBX_MetreMath;
     duration(tempo: number): number;
+    width(tempo: number, ratio: number): number;
 }
 declare function MZMM(): MZXBX_MetreMathType;
 declare class MZXBX_ScaleMath {
@@ -136,6 +137,7 @@ declare type MZXBX_CommentMeasure = {
 declare type MZXBX_Theme = {
     widthDurationRatio: number;
     notePathHeight: number;
+    octaveCount: number;
 };
 declare type MZXBX_Project = {
     title: string;

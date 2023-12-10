@@ -1824,8 +1824,9 @@ class MidiParser {
 			, filters: []
 			, comments: []
 			, theme: {
-				widthDurationRatio: 50
-				, notePathHeight: 0.25
+				widthDurationRatio: 10
+                , notePathHeight: 0.25
+                ,octaveCount:10
 			}
 		};
 		let currentTimeMs = 0;

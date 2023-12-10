@@ -113,6 +113,7 @@ class UIRenderer {//} implements RenderedPart {
         this.tiler.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
 
         this.mixer.reFillMixerUI(data);
+        
         this.debug.resetDebugView(data);
 
         //this.toolbar.fillToolbar(vw, vh);

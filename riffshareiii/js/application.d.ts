@@ -193,7 +193,7 @@ declare class MixerZoomLevel {
     bars: MixerBar[];
     zoomLevel: number;
     constructor(zoomLevel: number, anchor: TileAnchor);
-    resetBars(data: MZXBX_Project, ww: number, hh: number): void;
+    reCreateBars(data: MZXBX_Project, ww: number, hh: number): void;
 }
 declare class IconLabelButton {
     anchor: TileAnchor;

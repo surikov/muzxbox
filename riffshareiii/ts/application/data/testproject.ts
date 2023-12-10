@@ -26,7 +26,7 @@ let mzxbxProjectForTesting: MZXBX_Project = {
 	, comments: [{ texts: [] }, { texts: [] }, { texts: [] }, { texts: [] }]
 	, filters: []
 	, theme: {
-		notePathHeight: 1.5
+		notePathHeight: 0.5
 		, widthDurationRatio: 17
 		,octaveCount:10
 	}
@@ -75,7 +75,7 @@ let testBigMixerData = {
 		, { tempo: 120, metre: { count: 3, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }
 	]
 	, notePathHeight: 0.25
-	, widthDurationRatio: 50
+	, widthDurationRatio: 15
 	, pitchedTracks: [
 		{ title: 'Test track 1' }
 		, { title: 'Test track 2' }
@@ -113,7 +113,7 @@ let testEmptyMixerData = {
 		{ tempo: 120, metre: { count: 4, part: 4 } }
 	]
 	, notePathHeight: 0.25
-	, widthDurationRatio: 50
+	, widthDurationRatio: 11
 	, pitchedTracks: [
 		{ title: 'A track1' }
 		, { title: 'Second track' }

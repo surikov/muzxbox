@@ -80,6 +80,9 @@ class MZXBX_MetreMath {
         let meterSeconds = (wholeNoteSeconds * this.count) / this.part;
         return meterSeconds;
     }
+    width(tempo, ratio) {
+        return this.duration(tempo) * ratio;
+    }
 }
 function MZMM() {
     return new MZXBX_MetreMath();
@@ -2188,8 +2191,9 @@ class MidiParser {
             filters: [],
             comments: [],
             theme: {
-                widthDurationRatio: 50,
-                notePathHeight: 0.25
+                widthDurationRatio: 10,
+                notePathHeight: 0.25,
+                octaveCount: 10
             }
         };
         let currentTimeMs = 0;

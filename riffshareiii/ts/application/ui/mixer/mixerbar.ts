@@ -8,6 +8,7 @@ class MixerBar {
         , toAnchor: TileAnchor
         , data: MZXBX_Project
     ) {
+        //console.log('MixerBar',zoomLevel,left,ww,data.theme.octaveCount);
         this.zoomLevel = zoomLevel;
         let mixm: MixerDataMath = new MixerDataMath(data);
         this.anchor = toAnchor;
