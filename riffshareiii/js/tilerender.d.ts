@@ -43,10 +43,14 @@ declare class TileLevelRealTime implements TileLevelBase {
     mouseDownMode: boolean;
     currentDragItem: null | TileItem;
     interactor: TileInteraction;
-    allTilesOK: boolean;
-    translateZ: number;
-    translateX: number;
-    translateY: number;
+    get allTilesOK(): boolean;
+    set allTilesOK(bb: boolean);
+    get translateZ(): number;
+    set translateZ(z: number);
+    get translateX(): number;
+    set translateX(x: number);
+    get translateY(): number;
+    set translateY(y: number);
     getStartMouseScreen(): TilePoint;
     getCurrentPointPosition(): TileZoom;
     screen2view(screen: TilePoint): TilePoint;

@@ -397,7 +397,7 @@ class TileLevelRealTime {
                     this.clearUselessGroups(group, this.model[k]);
                 }
                 else {
-                    console.log('clearUselessDetails', k, this.model);
+                    console.error('clearUselessDetails', k, this.model);
                 }
             }
         }
@@ -461,7 +461,7 @@ class TileLevelRealTime {
             }
         }
         else {
-            console.log('clearUselessGroups empty', group, layer);
+            console.error('clearUselessGroups empty', group, layer);
         }
     }
     msEdgeHook(g) {
@@ -556,7 +556,8 @@ class TileLevelRealTime {
             }
         }
         if (anchor.showZoom <= this.translateZ && anchor.hideZoom > this.translateZ) {
-            if (LevelModes.overlay || this.collision(anchor.xx * this.tapSize, anchor.yy * this.tapSize, anchor.ww * this.tapSize, anchor.hh * this.tapSize, x, y, w, h)) {
+            let collide = this.collision(anchor.xx * this.tapSize, anchor.yy * this.tapSize, anchor.ww * this.tapSize, anchor.hh * this.tapSize, x, y, w, h);
+            if (layerMode == LevelModes.overlay || collide) {
                 var gid = anchor.id ? anchor.id : '';
                 let existedSVGchild = this.groupChildWithID(parentSVGElement, gid);
                 if (existedSVGchild) {

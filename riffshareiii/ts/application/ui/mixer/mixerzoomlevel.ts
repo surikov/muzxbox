@@ -22,7 +22,7 @@ class MixerZoomLevel {
                 , xx: left, yy: 0, ww: width, hh: hh, content: []
                 , id: 'measure' + (ii + Math.random())
             };
-            console.log(ii,barAnchor)
+            //console.log(ii,barAnchor)
             this.zoomAnchor.content.push(barAnchor);
             let mixBar=new MixerBar(left, 0, width, hh, this.zoomLevel, barAnchor, data);
             this.bars.push(mixBar);
