@@ -191,7 +191,8 @@ declare class MixerUI {
 declare class MixerZoomLevel {
     zoomAnchor: TileAnchor;
     bars: MixerBar[];
-    zoomLevel: number;
+    zoomLevelIndex: number;
+    title: TileText;
     constructor(zoomLevel: number, anchor: TileAnchor);
     reCreateBars(data: MZXBX_Project, ww: number, hh: number): void;
 }
@@ -244,8 +245,8 @@ declare class WarningUI {
     resetDialogView(data: MZXBX_Project): void;
     resizeDialog(ww: number, hh: number): void;
     allLayers(): TileLayerDefinition[];
-    show(): void;
-    hide(): void;
+    showWarning(): void;
+    hideWarning(): void;
 }
 declare let mzxbxProjectForTesting: MZXBX_Project;
 declare let testBigMixerData: {
@@ -280,9 +281,12 @@ declare let testEmptyMixerData: {
 };
 declare class MixerDataMath {
     data: MZXBX_Project;
+    titleHeight: number;
     constructor(data: MZXBX_Project);
-    wholeWidth(): number;
-    wholeHeight(): number;
+    mixerWidth(): number;
+    mixerHeight(): number;
+    gridTop(): number;
+    gridHeight(): number;
 }
 declare let biChar32: String[];
 declare type PackedChannel = {

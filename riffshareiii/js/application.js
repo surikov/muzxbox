@@ -268,13 +268,12 @@ class UIRenderer {
         let mixm = new MixerDataMath(data);
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
-        this.tiler.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
+        this.tiler.resetInnerSize(mixm.mixerWidth(), mixm.mixerHeight());
         this.mixer.reFillMixerUI(data);
         this.debug.resetDebugView(data);
         this.toolbar.resizeToolbar(vw, vh);
         this.menu.fillMenuItems();
         this.menu.resizeMenu(vw, vh);
-        this.warning.resetDialogView(data);
         this.warning.resizeDialog(vw, vh);
         this.tiler.resetModel();
         console.log('fillWholeUI', this.tiler);
@@ -1052,8 +1051,8 @@ class MixerUI {
     }
     reFillMixerUI(data) {
         let mixm = new MixerDataMath(data);
-        let ww = mixm.wholeWidth();
-        let hh = mixm.wholeHeight();
+        let ww = mixm.mixerWidth();
+        let hh = mixm.mixerHeight();
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             this.zoomLayer.anchors[ii].ww = ww;
             this.zoomLayer.anchors[ii].hh = hh;
@@ -1078,12 +1077,13 @@ class MixerUI {
 }
 class MixerZoomLevel {
     constructor(zoomLevel, anchor) {
-        this.zoomLevel = zoomLevel;
+        this.zoomLevelIndex = zoomLevel;
         this.zoomAnchor = anchor;
         this.zoomAnchor.content = [];
+        this.title = { x: 0, y: 10, text: 'test', css: 'mixTextFill warningIcon' };
     }
     reCreateBars(data, ww, hh) {
-        this.zoomAnchor.content = [];
+        this.zoomAnchor.content = [this.title];
         this.bars = [];
         let left = 0;
         let width = 0;
@@ -1091,13 +1091,13 @@ class MixerZoomLevel {
             let timebar = data.timeline[ii];
             width = MZMM().set(timebar.metre).duration(timebar.tempo) * data.theme.widthDurationRatio;
             let barAnchor = {
-                showZoom: zoomPrefixLevelsCSS[this.zoomLevel].zoom,
-                hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].zoom,
+                showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].zoom,
+                hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].zoom,
                 xx: left, yy: 0, ww: width, hh: hh, content: [],
                 id: 'measure' + (ii + Math.random())
             };
             this.zoomAnchor.content.push(barAnchor);
-            let mixBar = new MixerBar(left, 0, width, hh, this.zoomLevel, barAnchor, data);
+            let mixBar = new MixerBar(left, 0, width, hh, this.zoomLevelIndex, barAnchor, data);
             this.bars.push(mixBar);
             left = left + width;
         }
@@ -1180,8 +1180,8 @@ class DebugLayerUI {
     }
     resetDebugView(data) {
         let mixm = new MixerDataMath(data);
-        let ww = mixm.wholeWidth();
-        let hh = mixm.wholeHeight();
+        let ww = mixm.mixerWidth();
+        let hh = mixm.mixerHeight();
         this.debugRectangle.w = ww;
         this.debugRectangle.h = hh;
         this.debugAnchor.ww = ww;
@@ -1193,7 +1193,7 @@ class DebugLayerUI {
 class WarningUI {
     constructor() {
         this.cancel = function () {
-            this.hide();
+            this.hideWarning();
         };
     }
     initDialogUI() {
@@ -1229,13 +1229,13 @@ class WarningUI {
     allLayers() {
         return [this.warningLayer];
     }
-    show() {
+    showWarning() {
         console.log('WarningUI show');
-        document.getElementById("warningAnchor").style.visibility = "visible";
+        document.getElementById("warningDialogGroup").style.visibility = "visible";
     }
-    hide() {
+    hideWarning() {
         console.log('WarningUI hide');
-        document.getElementById("warningAnchor").style.visibility = "hidden";
+        document.getElementById("warningDialogGroup").style.visibility = "hidden";
     }
 }
 let mzxbxProjectForTesting = {
@@ -1338,9 +1338,10 @@ let testEmptyMixerData = {
 };
 class MixerDataMath {
     constructor(data) {
+        this.titleHeight = 50;
         this.data = data;
     }
-    wholeWidth() {
+    mixerWidth() {
         let mm = MZMM();
         let ww = 0;
         for (let ii = 0; ii < this.data.timeline.length; ii++) {
@@ -1348,7 +1349,13 @@ class MixerDataMath {
         }
         return ww;
     }
-    wholeHeight() {
+    mixerHeight() {
+        return this.titleHeight + this.gridHeight();
+    }
+    gridTop() {
+        return this.titleHeight;
+    }
+    gridHeight() {
         return this.data.theme.notePathHeight * 10 * 12;
     }
 }

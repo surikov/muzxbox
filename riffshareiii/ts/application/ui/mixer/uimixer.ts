@@ -4,10 +4,11 @@ class MixerUI {
     //zoomLayers: TileLayerDefinition[] = [];
     zoomLayer: TileLayerDefinition;
     levels: MixerZoomLevel[] = [];
+	
     reFillMixerUI(data: MZXBX_Project) {
         let mixm: MixerDataMath = new MixerDataMath(data);
-        let ww = mixm.wholeWidth();
-        let hh = mixm.wholeHeight();
+        let ww = mixm.mixerWidth();
+        let hh = mixm.mixerHeight();
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             //this.zoomLayers[ii].anchors[0].ww = ww;
             //this.zoomLayers[ii].anchors[0].hh = hh;

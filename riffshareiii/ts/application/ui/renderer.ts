@@ -110,7 +110,7 @@ class UIRenderer {//} implements RenderedPart {
         let mixm: MixerDataMath = new MixerDataMath(data);
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
-        this.tiler.resetInnerSize(mixm.wholeWidth(), mixm.wholeHeight());
+        this.tiler.resetInnerSize(mixm.mixerWidth(), mixm.mixerHeight());
 
         this.mixer.reFillMixerUI(data);
         
@@ -122,7 +122,7 @@ class UIRenderer {//} implements RenderedPart {
         this.menu.fillMenuItems();
         this.menu.resizeMenu(vw, vh);
         //this.menu.rerenderContent();
-        this.warning.resetDialogView(data);
+        //this.warning.resetDialogView(data);
         this.warning.resizeDialog(vw, vh);
         this.tiler.resetModel();
         console.log('fillWholeUI',this.tiler);

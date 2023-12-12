@@ -37,8 +37,8 @@ class DebugLayerUI {//} implements RenderedLayers {
     }
     resetDebugView(data: MZXBX_Project) {
         let mixm: MixerDataMath = new MixerDataMath(data);
-        let ww = mixm.wholeWidth();
-        let hh = mixm.wholeHeight();
+        let ww = mixm.mixerWidth();
+        let hh = mixm.mixerHeight();
         this.debugRectangle.w = ww;
         this.debugRectangle.h = hh;
         this.debugAnchor.ww = ww;

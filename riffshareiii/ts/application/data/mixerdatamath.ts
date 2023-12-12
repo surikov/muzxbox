@@ -1,10 +1,11 @@
 class MixerDataMath {
 	data: MZXBX_Project;
-	
+	titleHeight: number = 50;
+
 	constructor(data: MZXBX_Project) {
 		this.data = data;
 	}
-	wholeWidth(): number {
+	mixerWidth(): number {
 		let mm: MZXBX_MetreMathType = MZMM();
 		let ww = 0;
 		for (let ii = 0; ii < this.data.timeline.length; ii++) {
@@ -13,7 +14,14 @@ class MixerDataMath {
 		}
 		return ww;
 	}
-	wholeHeight(): number {
+	mixerHeight(): number {
+		return this.titleHeight + this.gridHeight();
+	}
+	gridTop(): number {
+		return this.titleHeight;
+	}
+
+	gridHeight(): number {
 		return this.data.theme.notePathHeight * 10 * 12;
 	}
 }

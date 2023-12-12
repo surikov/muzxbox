@@ -7,7 +7,7 @@ class WarningUI {
 	warningTitle: TileText;
 	warningDescription: TileText;
 	cancel: () => void = function () {
-		this.hide();
+		this.hideWarning();
 	};
 	initDialogUI() {
 		this.warningIcon = { x: 0, y: 0, text: icon_warningPlay, css: 'warningIcon' };
@@ -44,12 +44,12 @@ class WarningUI {
 	allLayers(): TileLayerDefinition[] {
 		return [this.warningLayer];
 	}
-	show() {
+	showWarning() {
 		console.log('WarningUI show');
-		(document.getElementById("warningAnchor") as any).style.visibility = "visible";
+		(document.getElementById("warningDialogGroup") as any).style.visibility = "visible";
 	}
-	hide() {
+	hideWarning() {
 		console.log('WarningUI hide');
-		(document.getElementById("warningAnchor") as any).style.visibility = "hidden";
+		(document.getElementById("warningDialogGroup") as any).style.visibility = "hidden";
 	}
 }
