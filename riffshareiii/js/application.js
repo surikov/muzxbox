@@ -1002,7 +1002,7 @@ let testMenuData = [
     }
 ];
 class BarOctave {
-    constructor(left, top, width, height, anchor, zoomLevel) {
+    constructor(barIdx, octaveIdx, left, top, width, height, anchor, zoomLevel, data) {
         this.barRightBorder = {
             x: left + width,
             y: top,
@@ -1019,6 +1019,34 @@ class BarOctave {
         };
         anchor.content.push(this.barRightBorder);
         anchor.content.push(this.octaveBottomBorder);
+        if (zoomLevel == 4) {
+            this.addNotes(barIdx, octaveIdx, left, top, width, height, anchor, zoomLevel, data);
+        }
+    }
+    addNotes(barIdx, octaveIdx, left, top, width, height, anchor, zoomLevel, data) {
+        for (let ii = 0; ii < data.tracks.length; ii++) {
+            let track = data.tracks[ii];
+            if (ii == 0) {
+                let txt = { x: left, y: top + height, text: '' + barIdx + ':' + octaveIdx, css: 'testMeasureLabel' };
+                anchor.content.push(txt);
+                let measure = track.measures[barIdx];
+                for (let cc = 0; cc < measure.chords.length; cc++) {
+                    let chord = measure.chords[cc];
+                    for (let nn = 0; nn < chord.notes.length; nn++) {
+                        let note = chord.notes[nn];
+                        let from = octaveIdx * 12;
+                        let to = (octaveIdx + 1) * 12;
+                        if (note.pitch >= from && note.pitch < to) {
+                            let x = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * data.theme.widthDurationRatio;
+                            let y = top + height - (note.pitch - from) * data.theme.notePathHeight;
+                            let dot = { x: x, y: y, w: data.theme.notePathHeight, h: data.theme.notePathHeight, css: 'mixTextFill' };
+                            console.log(zoomLevel, 'note', chord.skip, note, dot);
+                            anchor.content.push(dot);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 class OctaveContent {
@@ -1026,7 +1054,7 @@ class OctaveContent {
     }
 }
 class MixerBar {
-    constructor(left, top, ww, hh, zoomLevel, toAnchor, data) {
+    constructor(barIdx, left, ww, zoomLevel, toAnchor, data) {
         this.zoomLevel = zoomLevel;
         let mixm = new MixerDataMath(data);
         this.anchor = toAnchor;
@@ -1036,11 +1064,14 @@ class MixerBar {
             let barOctaveAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevel].zoom,
                 hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].zoom,
-                xx: left, yy: oo * h12, ww: ww, hh: h12, content: [],
+                xx: left,
+                yy: mixm.gridTop() + oo * h12,
+                ww: ww,
+                hh: h12, content: [],
                 id: 'octave' + (oo + Math.random())
             };
             this.anchor.content.push(barOctaveAnchor);
-            let bo = new BarOctave(left, oo * h12, ww, h12, barOctaveAnchor, this.zoomLevel);
+            let bo = new BarOctave(barIdx, (data.theme.octaveCount - oo - 1), left, mixm.gridTop() + oo * h12, ww, h12, barOctaveAnchor, this.zoomLevel, data);
             this.octaves.push(bo);
         }
     }
@@ -1056,7 +1087,7 @@ class MixerUI {
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             this.zoomLayer.anchors[ii].ww = ww;
             this.zoomLayer.anchors[ii].hh = hh;
-            this.levels[ii].reCreateBars(data, ww, hh);
+            this.levels[ii].reCreateBars(data);
         }
     }
     createMixerLayers() {
@@ -1080,24 +1111,32 @@ class MixerZoomLevel {
         this.zoomLevelIndex = zoomLevel;
         this.zoomAnchor = anchor;
         this.zoomAnchor.content = [];
-        this.title = { x: 0, y: 10, text: 'test', css: 'mixTextFill warningIcon' };
+        this.title = { x: 0, y: 1, text: 'Text label for testing of middle size project title', css: 'projectTitle' };
     }
-    reCreateBars(data, ww, hh) {
+    reCreateBars(data) {
+        let mixm = new MixerDataMath(data);
         this.zoomAnchor.content = [this.title];
+        this.title.y = mixm.gridTop();
+        this.title.text = data.title;
         this.bars = [];
-        let left = 0;
+        let left = mixm.LeftPad;
         let width = 0;
+        let h12 = 12 * data.theme.notePathHeight * data.theme.octaveCount;
         for (let ii = 0; ii < data.timeline.length; ii++) {
             let timebar = data.timeline[ii];
             width = MZMM().set(timebar.metre).duration(timebar.tempo) * data.theme.widthDurationRatio;
             let barAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].zoom,
                 hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].zoom,
-                xx: left, yy: 0, ww: width, hh: hh, content: [],
+                xx: left,
+                yy: mixm.gridTop(),
+                ww: width,
+                hh: h12,
+                content: [],
                 id: 'measure' + (ii + Math.random())
             };
             this.zoomAnchor.content.push(barAnchor);
-            let mixBar = new MixerBar(left, 0, width, hh, this.zoomLevelIndex, barAnchor, data);
+            let mixBar = new MixerBar(ii, left, width, this.zoomLevelIndex, barAnchor, data);
             this.bars.push(mixBar);
             left = left + width;
         }
@@ -1253,8 +1292,30 @@ let mzxbxProjectForTesting = {
         { tempo: 180, metre: { count: 4, part: 4 } }
     ],
     tracks: [
-        { title: "Track one", measures: [], filters: [], performer: { id: '', data: '' } },
-        { title: "Second track", measures: [], filters: [], performer: { id: '', data: '' } }
+        {
+            title: "Track one", measures: [
+                {
+                    chords: [
+                        { skip: { count: 0, part: 1 }, notes: [{ pitch: 25, slides: [] }] },
+                        { skip: { count: 1, part: 16 }, notes: [{ pitch: 26, slides: [] }] },
+                        { skip: { count: 1, part: 8 }, notes: [{ pitch: 27, slides: [] }] },
+                        { skip: { count: 3, part: 16 }, notes: [{ pitch: 28, slides: [] }] },
+                        { skip: { count: 1, part: 4 }, notes: [{ pitch: 29, slides: [] }] },
+                        { skip: { count: 5, part: 16 }, notes: [{ pitch: 30, slides: [] }] },
+                        { skip: { count: 3, part: 8 }, notes: [{ pitch: 31, slides: [] }] },
+                        { skip: { count: 7, part: 16 }, notes: [{ pitch: 32, slides: [] }] },
+                        { skip: { count: 1, part: 2 }, notes: [{ pitch: 33, slides: [] }] }
+                    ]
+                }, { chords: [
+                        { skip: { count: 0, part: 2 }, notes: [{ pitch: 31, slides: [] }] }
+                    ] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+            ], filters: [], performer: { id: '', data: '' }
+        },
+        {
+            title: "Second track", measures: [
+                { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+            ], filters: [], performer: { id: '', data: '' }
+        }
     ],
     percussions: [
         { title: "Snare", measures: [], filters: [], sampler: { id: '', data: '' } }
@@ -1338,7 +1399,10 @@ let testEmptyMixerData = {
 };
 class MixerDataMath {
     constructor(data) {
-        this.titleHeight = 50;
+        this.titleHeight = 33;
+        this.LeftPad = 3;
+        this.rightPad = 10;
+        this.bottomPad = 11;
         this.data = data;
     }
     mixerWidth() {
@@ -1347,10 +1411,10 @@ class MixerDataMath {
         for (let ii = 0; ii < this.data.timeline.length; ii++) {
             ww = ww + mm.set(this.data.timeline[ii].metre).duration(this.data.timeline[ii].tempo) * this.data.theme.widthDurationRatio;
         }
-        return ww;
+        return this.LeftPad + ww + this.rightPad;
     }
     mixerHeight() {
-        return this.titleHeight + this.gridHeight();
+        return this.titleHeight + this.gridHeight() + this.bottomPad;
     }
     gridTop() {
         return this.titleHeight;

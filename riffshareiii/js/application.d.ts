@@ -171,7 +171,8 @@ declare let testMenuData: MenuInfo[];
 declare class BarOctave {
     barRightBorder: TileRectangle;
     octaveBottomBorder: TileRectangle;
-    constructor(left: number, top: number, width: number, height: number, anchor: TileAnchor, zoomLevel: number);
+    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, anchor: TileAnchor, zoomLevel: number, data: MZXBX_Project);
+    addNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, anchor: TileAnchor, zoomLevel: number, data: MZXBX_Project): void;
 }
 declare class OctaveContent {
     constructor(aa: number, top: number, toAnchor: TileAnchor, data: MZXBX_Project);
@@ -180,7 +181,7 @@ declare class MixerBar {
     octaves: BarOctave[];
     anchor: TileAnchor;
     zoomLevel: number;
-    constructor(left: number, top: number, ww: number, hh: number, zoomLevel: number, toAnchor: TileAnchor, data: MZXBX_Project);
+    constructor(barIdx: number, left: number, ww: number, zoomLevel: number, toAnchor: TileAnchor, data: MZXBX_Project);
 }
 declare class MixerUI {
     zoomLayer: TileLayerDefinition;
@@ -194,7 +195,7 @@ declare class MixerZoomLevel {
     zoomLevelIndex: number;
     title: TileText;
     constructor(zoomLevel: number, anchor: TileAnchor);
-    reCreateBars(data: MZXBX_Project, ww: number, hh: number): void;
+    reCreateBars(data: MZXBX_Project): void;
 }
 declare class IconLabelButton {
     anchor: TileAnchor;
@@ -282,6 +283,9 @@ declare let testEmptyMixerData: {
 declare class MixerDataMath {
     data: MZXBX_Project;
     titleHeight: number;
+    LeftPad: number;
+    rightPad: number;
+    bottomPad: number;
     constructor(data: MZXBX_Project);
     mixerWidth(): number;
     mixerHeight(): number;

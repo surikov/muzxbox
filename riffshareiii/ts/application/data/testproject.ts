@@ -17,8 +17,30 @@ let mzxbxProjectForTesting: MZXBX_Project = {
 		, { tempo: 180, metre: { count: 4, part: 4 } }
 	]
 	, tracks: [
-		{ title: "Track one", measures: [], filters: [], performer: { id: '', data: '' } }
-		, { title: "Second track", measures: [], filters: [], performer: { id: '', data: '' } }
+		{
+			title: "Track one", measures: [
+				{
+					chords: [
+						{ skip: { count: 0, part: 1 }, notes: [{ pitch: 25, slides: [] }] }
+						,{ skip: { count: 1, part: 16 }, notes: [{ pitch: 26, slides: [] }] }
+						,{ skip: { count: 1, part: 8 }, notes: [{ pitch: 27, slides: [] }] }
+						,{ skip: { count: 3, part: 16 }, notes: [{ pitch: 28, slides: [] }] }
+						,{ skip: { count: 1, part: 4 }, notes: [{ pitch: 29, slides: [] }] }
+						,{ skip: { count: 5, part: 16 }, notes: [{ pitch: 30, slides: [] }] }
+						,{ skip: { count: 3, part: 8 }, notes: [{ pitch: 31, slides: [] }] }
+						,{ skip: { count: 7, part: 16 }, notes: [{ pitch: 32, slides: [] }] }
+						,{ skip: { count: 1, part: 2 }, notes: [{ pitch: 33, slides: [] }] }
+					]
+				}, { chords: [
+					{ skip: { count: 0, part: 2 }, notes: [{ pitch: 31, slides: [] }] }
+				] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+			], filters: [], performer: { id: '', data: '' }
+		}
+		, {
+			title: "Second track", measures: [
+				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+			], filters: [], performer: { id: '', data: '' }
+		}
 	]
 	, percussions: [
 		{ title: "Snare", measures: [], filters: [], sampler: { id: '', data: '' } }
@@ -28,7 +50,7 @@ let mzxbxProjectForTesting: MZXBX_Project = {
 	, theme: {
 		notePathHeight: 0.5
 		, widthDurationRatio: 17
-		,octaveCount:10
+		, octaveCount: 10
 	}
 };
 let testBigMixerData = {

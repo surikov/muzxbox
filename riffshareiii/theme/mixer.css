@@ -87,4 +87,11 @@
     fill-opacity:0;
 }
 
-
+.projectTitle {
+    fill: var(--color-subtext);
+	font-size: var(--label-4cm);
+}
+.testMeasureLabel {
+    fill: var(--color-subtext);
+	font-size: var(--label-1cm);
+}

@@ -1,6 +1,9 @@
 class MixerDataMath {
 	data: MZXBX_Project;
-	titleHeight: number = 50;
+	titleHeight: number = 33;
+	LeftPad: number = 3;
+	rightPad: number = 10;
+	bottomPad = 11;
 
 	constructor(data: MZXBX_Project) {
 		this.data = data;
@@ -12,10 +15,10 @@ class MixerDataMath {
 			//ww = ww + new MusicMetreMath(this.data.timeline[ii].metre).width(this.data.timeline[ii].tempo, this.data.theme.widthDurationRatio);
 			ww = ww + mm.set(this.data.timeline[ii].metre).duration(this.data.timeline[ii].tempo) * this.data.theme.widthDurationRatio;
 		}
-		return ww;
+		return this.LeftPad + ww + this.rightPad;
 	}
 	mixerHeight(): number {
-		return this.titleHeight + this.gridHeight();
+		return this.titleHeight + this.gridHeight() + this.bottomPad;
 	}
 	gridTop(): number {
 		return this.titleHeight;

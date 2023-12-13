@@ -14,7 +14,7 @@ class MixerUI {
             //this.zoomLayers[ii].anchors[0].hh = hh;
             this.zoomLayer.anchors[ii].ww = ww;
             this.zoomLayer.anchors[ii].hh = hh;
-            this.levels[ii].reCreateBars(data, ww, hh);
+            this.levels[ii].reCreateBars(data);
         }
     }
     createMixerLayers(): TileLayerDefinition[] {
