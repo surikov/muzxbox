@@ -116,7 +116,7 @@ declare class RightMenuPanel {
     createMenu(): TileLayerDefinition[];
     scrollListing(dx: number, dy: number): void;
     randomString(nn: number): string;
-    fillMenuItems(): void;
+    fillMenuItems(data: MZXBX_Project): void;
     setFocus(it: MenuInfo, infos: MenuInfo[]): void;
     setOpenState(state: boolean, it: MenuInfo, infos: MenuInfo[]): void;
     fillMenuItemChildren(pad: number, infos: MenuInfo[]): void;
@@ -193,7 +193,8 @@ declare class MixerZoomLevel {
     zoomAnchor: TileAnchor;
     bars: MixerBar[];
     zoomLevelIndex: number;
-    title: TileText;
+    projectTitle: TileText;
+    trackTitle: TileText;
     constructor(zoomLevel: number, anchor: TileAnchor);
     reCreateBars(data: MZXBX_Project): void;
 }

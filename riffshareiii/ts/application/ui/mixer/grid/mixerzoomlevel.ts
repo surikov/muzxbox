@@ -2,19 +2,26 @@ class MixerZoomLevel {
 	zoomAnchor: TileAnchor;
 	bars: MixerBar[];
 	zoomLevelIndex: number;
-	title: TileText;
+	projectTitle: TileText;
+	trackTitle: TileText;
 	constructor(zoomLevel: number, anchor: TileAnchor) {
 		this.zoomLevelIndex = zoomLevel;
 		this.zoomAnchor = anchor;
 		this.zoomAnchor.content = [];
-		this.title = { x: 0, y: 1, text: 'Text label for testing of middle size project title', css: 'projectTitle' };
+		this.projectTitle = { x: 0, y: 1, text: 'Text label for testing of middle size project title', css: 'projectTitle' };
+		this.trackTitle = { x: 0, y: 1, text: 'Text label for testing of middle size project title', css: 'trackTitle' };
 	}
 	reCreateBars(data: MZXBX_Project) {
 		//console.log('resetBars', ww, hh);
 		let mixm: MixerDataMath = new MixerDataMath(data);
-		this.zoomAnchor.content = [this.title];
-		this.title.y = mixm.gridTop();
-		this.title.text = data.title;
+		this.zoomAnchor.content = [this.projectTitle,this.trackTitle];
+
+		this.trackTitle.y = mixm.gridTop();
+		this.trackTitle.text = data.tracks[0].title;
+
+		this.projectTitle.y = mixm.gridTop()*0.9;
+		this.projectTitle.text = data.title;
+
 		this.bars = [];
 		let left = mixm.LeftPad;
 		let width = 0;

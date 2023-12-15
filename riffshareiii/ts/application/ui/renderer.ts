@@ -119,13 +119,13 @@ class UIRenderer {//} implements RenderedPart {
         //this.toolbar.fillToolbar(vw, vh);
         this.toolbar.resizeToolbar(vw, vh);
 
-        this.menu.fillMenuItems();
+        this.menu.fillMenuItems(data);
         this.menu.resizeMenu(vw, vh);
         //this.menu.rerenderContent();
         //this.warning.resetDialogView(data);
         this.warning.resizeDialog(vw, vh);
         this.tiler.resetModel();
-        console.log('fillWholeUI',this.tiler);
+        //console.log('fillWholeUI',this.tiler);
     }
     onReSizeView() {
         //console.log('onReSizeView');

@@ -272,11 +272,10 @@ class UIRenderer {
         this.mixer.reFillMixerUI(data);
         this.debug.resetDebugView(data);
         this.toolbar.resizeToolbar(vw, vh);
-        this.menu.fillMenuItems();
+        this.menu.fillMenuItems(data);
         this.menu.resizeMenu(vw, vh);
         this.warning.resizeDialog(vw, vh);
         this.tiler.resetModel();
-        console.log('fillWholeUI', this.tiler);
     }
     onReSizeView() {
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
@@ -494,7 +493,7 @@ class RightMenuPanel {
         }
         return ss;
     }
-    fillMenuItems() {
+    fillMenuItems(data) {
         this.items = [];
         this.fillMenuItemChildren(0, testMenuData);
     }
@@ -1019,7 +1018,7 @@ class BarOctave {
         };
         anchor.content.push(this.barRightBorder);
         anchor.content.push(this.octaveBottomBorder);
-        if (zoomLevel == 4) {
+        if (zoomLevel <= 16) {
             this.addNotes(barIdx, octaveIdx, left, top, width, height, anchor, zoomLevel, data);
         }
     }
@@ -1027,8 +1026,6 @@ class BarOctave {
         for (let ii = 0; ii < data.tracks.length; ii++) {
             let track = data.tracks[ii];
             if (ii == 0) {
-                let txt = { x: left, y: top + height, text: '' + barIdx + ':' + octaveIdx, css: 'testMeasureLabel' };
-                anchor.content.push(txt);
                 let measure = track.measures[barIdx];
                 for (let cc = 0; cc < measure.chords.length; cc++) {
                     let chord = measure.chords[cc];
@@ -1040,7 +1037,6 @@ class BarOctave {
                             let x = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * data.theme.widthDurationRatio;
                             let y = top + height - (note.pitch - from) * data.theme.notePathHeight;
                             let dot = { x: x, y: y, w: data.theme.notePathHeight, h: data.theme.notePathHeight, css: 'mixTextFill' };
-                            console.log(zoomLevel, 'note', chord.skip, note, dot);
                             anchor.content.push(dot);
                         }
                     }
@@ -1111,13 +1107,16 @@ class MixerZoomLevel {
         this.zoomLevelIndex = zoomLevel;
         this.zoomAnchor = anchor;
         this.zoomAnchor.content = [];
-        this.title = { x: 0, y: 1, text: 'Text label for testing of middle size project title', css: 'projectTitle' };
+        this.projectTitle = { x: 0, y: 1, text: 'Text label for testing of middle size project title', css: 'projectTitle' };
+        this.trackTitle = { x: 0, y: 1, text: 'Text label for testing of middle size project title', css: 'trackTitle' };
     }
     reCreateBars(data) {
         let mixm = new MixerDataMath(data);
-        this.zoomAnchor.content = [this.title];
-        this.title.y = mixm.gridTop();
-        this.title.text = data.title;
+        this.zoomAnchor.content = [this.projectTitle, this.trackTitle];
+        this.trackTitle.y = mixm.gridTop();
+        this.trackTitle.text = data.tracks[0].title;
+        this.projectTitle.y = mixm.gridTop() * 0.9;
+        this.projectTitle.text = data.title;
         this.bars = [];
         let left = mixm.LeftPad;
         let width = 0;

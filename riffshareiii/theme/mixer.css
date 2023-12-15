@@ -91,6 +91,10 @@
     fill: var(--color-subtext);
 	font-size: var(--label-4cm);
 }
+.trackTitle {
+    fill: var(--color-subtext);
+	font-size: var(--label-1cm);
+}
 .testMeasureLabel {
     fill: var(--color-subtext);
 	font-size: var(--label-1cm);

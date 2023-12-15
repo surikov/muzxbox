@@ -26,7 +26,7 @@ class BarOctave {
 		//console.log(left,top,prefix,minZoom,maxZoom);
 		anchor.content.push(this.barRightBorder);
 		anchor.content.push(this.octaveBottomBorder);
-		if (zoomLevel == 4) {
+		if (zoomLevel <= 16) {
 			this.addNotes(barIdx, octaveIdx, left, top, width, height, anchor, zoomLevel, data);
 		}
 	}
@@ -35,8 +35,8 @@ class BarOctave {
 		for (let ii = 0; ii < data.tracks.length; ii++) {
 			let track = data.tracks[ii];
 			if (ii == 0) {
-				let txt: TileText = { x: left, y: top + height, text: '' + barIdx + ':' + octaveIdx, css: 'testMeasureLabel' };
-				anchor.content.push(txt);
+				//let txt: TileText = { x: left, y: top + height, text: '' + barIdx + ':' + octaveIdx, css: 'testMeasureLabel' };
+				//anchor.content.push(txt);
 				let measure: MZXBX_TrackMeasure = track.measures[barIdx];
 				//console.log(barIdx,octaveIdx,'measure',measure);
 				for (let cc = 0; cc < measure.chords.length; cc++) {
@@ -51,7 +51,7 @@ class BarOctave {
 							let x = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * data.theme.widthDurationRatio;
 							let y = top + height - (note.pitch - from) * data.theme.notePathHeight;
 							let dot: TileRectangle = { x: x, y: y, w: data.theme.notePathHeight, h: data.theme.notePathHeight, css: 'mixTextFill' };
-							console.log(zoomLevel, 'note', chord.skip, note, dot);
+							//console.log(zoomLevel, 'note', chord.skip, note, dot);
 							anchor.content.push(dot);
 						}
 					}
