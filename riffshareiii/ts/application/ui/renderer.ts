@@ -9,26 +9,28 @@ type RenderedLayers = RenderedPart & {
 	allLayers: () => TileLayerDefinition[];
 };
 */
-let zoomPrefixLevelsCSS: { prefix: string, zoom: number//, svg: string 
+let zoomPrefixLevelsCSS: {
+    prefix: string, zoom: number//, svg: string 
 }[] = [
-    { prefix: '025', zoom: 0.25 }//0
-    , { prefix: '05', zoom: 0.5 }//1
-    , { prefix: '1', zoom: 1 }//2
-    , { prefix: '2', zoom: 2 }//3
-    , { prefix: '4', zoom: 4 }//4
-    , { prefix: '8', zoom: 8}//5
-    , { prefix: '16', zoom: 16 }//6
-    , { prefix: '32', zoom: 32 }//7
-    , { prefix: '64', zoom: 64 }//8
-    , { prefix: '128', zoom: 128}//9
-    //, { prefix: '256', zoom: 256,svg:'tracksLayerZoom025' }//10
-];
+        { prefix: '025', zoom: 0.25 }//0
+        , { prefix: '05', zoom: 0.5 }//1
+        , { prefix: '1', zoom: 1 }//2
+        , { prefix: '2', zoom: 2 }//3
+        , { prefix: '4', zoom: 4 }//4
+        , { prefix: '8', zoom: 8 }//5
+        , { prefix: '16', zoom: 16 }//6
+        , { prefix: '32', zoom: 32 }//7
+        , { prefix: '64', zoom: 64 }//8
+        , { prefix: '128', zoom: 128 }//9
+        //, { prefix: '256', zoom: 256,svg:'tracksLayerZoom025' }//10
+    ];
 class UIRenderer {//} implements RenderedPart {
     toolbar: UIToolbar;
     menu: RightMenuPanel;
     mixer: MixerUI;
     debug: DebugLayerUI;
     warning: WarningUI;
+    timeselectbar: TimeSelectBar;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
     //commands: CommandDispatcher;
@@ -56,6 +58,7 @@ class UIRenderer {//} implements RenderedPart {
         this.warning = new WarningUI();
         this.warning.initDialogUI();
         this.toolbar = new UIToolbar();
+        this.timeselectbar = new TimeSelectBar();
         //this.toolbar.createToolbar(()=>{
         //	this.toolbar.reRenderToolbar(this.tiler);
         //});
@@ -76,6 +79,7 @@ class UIRenderer {//} implements RenderedPart {
             , this.menu.createMenu()//this.resetAnchor.bind(this), this.changeTapSIze.bind(this))
             , this.mixer.createMixerLayers()
             , this.warning.allLayers()
+            , this.timeselectbar.createTimeScale()
         );
 
         //this.mixer = new MixerUI();
@@ -90,7 +94,7 @@ class UIRenderer {//} implements RenderedPart {
             , 1
             , zoomPrefixLevelsCSS[0].zoom
             , zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].zoom
-            , zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom-1
+            , zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom - 1
             , layers);
         //console.log('tap size', this.tiler.tapPxSize());
         this.tiler.setAfterZoomCallback(() => {
@@ -113,17 +117,22 @@ class UIRenderer {//} implements RenderedPart {
         this.tiler.resetInnerSize(mixm.mixerWidth(), mixm.mixerHeight());
 
         this.mixer.reFillMixerUI(data);
-        
+
         this.debug.resetDebugView(data);
 
         //this.toolbar.fillToolbar(vw, vh);
         this.toolbar.resizeToolbar(vw, vh);
 
-        this.menu.fillMenuItems(data);
+        this.menu.fillMenuItems();
         this.menu.resizeMenu(vw, vh);
         //this.menu.rerenderContent();
         //this.warning.resetDialogView(data);
         this.warning.resizeDialog(vw, vh);
+
+        
+        this.timeselectbar.fillTimeBar(data);
+        this.timeselectbar.resizeTimeScale(vw, vh);
+
         this.tiler.resetModel();
         //console.log('fillWholeUI',this.tiler);
     }

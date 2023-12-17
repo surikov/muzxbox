@@ -1,6 +1,6 @@
 
 .toolBarPanel {
-    fill: var(--color-toolbar);
+    fill: var(--color-lines);
     pointer-events: none;
 }
 

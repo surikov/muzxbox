@@ -15,7 +15,7 @@ class UIToolbar {
     constructor(){//commands: CommandDispatcher) {
         //this.commands = commands;
     }
-    createToolbar(){//resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void
+    createToolbar():TileLayerDefinition[]{//resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void
         //, actionShowMenu: () => void): TileLayerDefinition[] {
         //this.infoButton = new ToolBarButton(['?'], 0, -0.5, (nn: number) => {
         //    console.log('infoButton', nn);

@@ -1,7 +1,7 @@
 
 .mixFieldBg025 {
     fill: var(--color-panel);
-    stroke: var(--color-toolbar);
+    stroke: var(--color-lines);
     stroke-linejoin: round;
     stroke-width: calc(0.01*var(--tapSize));
     fill-opacity:0;
@@ -9,7 +9,7 @@
 
 .mixFieldBg05 {
     fill: var(--color-panel);
-    stroke: var(--color-toolbar);
+    stroke: var(--color-lines);
     stroke-linejoin: round;
     stroke-width: calc(0.02*var(--tapSize));
     fill-opacity:0;
@@ -17,7 +17,7 @@
 
 .mixFieldBg1 {
     fill: var(--color-panel);
-    stroke: var(--color-toolbar);
+    stroke: var(--color-lines);
     stroke-linejoin: round;
     stroke-width: calc(0.04*var(--tapSize));
     fill-opacity:0;
@@ -25,7 +25,7 @@
 
 .mixFieldBg2 {
     fill: var(--color-panel);
-    stroke: var(--color-toolbar);
+    stroke: var(--color-lines);
     stroke-linejoin: round;
     stroke-width: calc(0.08*var(--tapSize));
     fill-opacity:0;
@@ -33,7 +33,7 @@
 
 .mixFieldBg4 {
     fill: var(--color-panel);
-    stroke: var(--color-toolbar);
+    stroke: var(--color-lines);
     stroke-linejoin: round;
     stroke-width: calc(0.16*var(--tapSize));
     fill-opacity:0;
@@ -41,7 +41,7 @@
 
 .mixFieldBg8 {
     fill: var(--color-panel);
-    stroke: var(--color-toolbar);
+    stroke: var(--color-lines);
     stroke-linejoin: round;
     stroke-width: calc(0.32*var(--tapSize));
     fill-opacity:0;
@@ -49,7 +49,7 @@
 
 .mixFieldBg16 {
     fill: var(--color-panel);
-    stroke: var(--color-toolbar);
+    stroke: var(--color-lines);
     stroke-linejoin: round;
     stroke-width: calc(0.64*var(--tapSize));
     fill-opacity:0;
@@ -57,7 +57,7 @@
 
 .mixFieldBg32 {
     fill: var(--color-panel);
-    stroke: var(--color-toolbar);
+    stroke: var(--color-lines);
     stroke-linejoin: round;
     stroke-width: calc(1.28*var(--tapSize));
     fill-opacity:0;
@@ -65,7 +65,7 @@
 
 .mixFieldBg64 {
     fill: var(--color-panel);
-    stroke: var(--color-toolbar);
+    stroke: var(--color-lines);
     stroke-linejoin: round;
     stroke-width: calc(2.56*var(--tapSize));
     fill-opacity:0;
@@ -73,7 +73,7 @@
 
 .mixFieldBg128 {
     fill: var(--color-panel);
-    stroke: var(--color-toolbar);
+    stroke: var(--color-lines);
     stroke-linejoin: round;
     stroke-width: calc(5.12*var(--tapSize));
     fill-opacity:0;
@@ -81,7 +81,7 @@
 
 .mixFieldBg256 {
     fill: var(--color-panel);
-    stroke: var(--color-toolbar);
+    stroke: var(--color-lines);
     stroke-linejoin: round;
     stroke-width: calc(10.24*var(--tapSize));
     fill-opacity:0;
@@ -95,7 +95,4 @@
     fill: var(--color-subtext);
 	font-size: var(--label-1cm);
 }
-.testMeasureLabel {
-    fill: var(--color-subtext);
-	font-size: var(--label-1cm);
-}
+

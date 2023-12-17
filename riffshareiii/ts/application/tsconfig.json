@@ -27,6 +27,7 @@
         ,"commanddispatcher.ts"
         ,"ui/renderer.ts"
         ,"ui/localedictionary.ts"
+        ,"ui/timeselect/timeselectbar.ts"
         ,"ui/toolbar/toolbarpanel.ts"
         ,"ui/toolbar/toolbutton.ts"
 		,"ui/rightmenu/menupanel.ts"

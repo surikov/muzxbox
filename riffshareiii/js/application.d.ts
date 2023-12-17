@@ -45,6 +45,7 @@ declare class UIRenderer {
     mixer: MixerUI;
     debug: DebugLayerUI;
     warning: WarningUI;
+    timeselectbar: TimeSelectBar;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
     constructor();
@@ -67,6 +68,16 @@ declare let localeDictionary: {
 }[];
 declare function setLocaleID(loname: string, ratio: number): void;
 declare function LO(id: string): string;
+declare class TimeSelectBar {
+    selectionBarLayer: TileLayerDefinition;
+    selectionBarSVGGroup: SVGElement;
+    selectBarAnchor: TileAnchor;
+    zoomAnchors: TileAnchor[];
+    constructor();
+    createTimeScale(): TileLayerDefinition[];
+    resizeTimeScale(viewWIdth: number, viewHeight: number): void;
+    fillTimeBar(data: MZXBX_Project): void;
+}
 declare class UIToolbar {
     toolBarAnchor: TileAnchor;
     toolBarGroup: SVGElement;
@@ -116,7 +127,7 @@ declare class RightMenuPanel {
     createMenu(): TileLayerDefinition[];
     scrollListing(dx: number, dy: number): void;
     randomString(nn: number): string;
-    fillMenuItems(data: MZXBX_Project): void;
+    fillMenuItems(): void;
     setFocus(it: MenuInfo, infos: MenuInfo[]): void;
     setOpenState(state: boolean, it: MenuInfo, infos: MenuInfo[]): void;
     fillMenuItemChildren(pad: number, infos: MenuInfo[]): void;

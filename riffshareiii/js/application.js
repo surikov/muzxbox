@@ -250,10 +250,11 @@ class UIRenderer {
         this.warning = new WarningUI();
         this.warning.initDialogUI();
         this.toolbar = new UIToolbar();
+        this.timeselectbar = new TimeSelectBar();
         this.menu = new RightMenuPanel();
         this.mixer = new MixerUI();
         let me = this;
-        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.createMixerLayers(), this.warning.allLayers());
+        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.createMixerLayers(), this.warning.allLayers(), this.timeselectbar.createTimeScale());
         this.tiler.initRun(this.tileLevelSVG, false, 1, 1, zoomPrefixLevelsCSS[0].zoom, zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].zoom, zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom - 1, layers);
         this.tiler.setAfterZoomCallback(() => {
             if (this.menu) {
@@ -272,9 +273,11 @@ class UIRenderer {
         this.mixer.reFillMixerUI(data);
         this.debug.resetDebugView(data);
         this.toolbar.resizeToolbar(vw, vh);
-        this.menu.fillMenuItems(data);
+        this.menu.fillMenuItems();
         this.menu.resizeMenu(vw, vh);
         this.warning.resizeDialog(vw, vh);
+        this.timeselectbar.fillTimeBar(data);
+        this.timeselectbar.resizeTimeScale(vw, vh);
         this.tiler.resetModel();
     }
     onReSizeView() {
@@ -325,6 +328,138 @@ function LO(id) {
         }
     }
     return labelLocaleDictionary + ':' + id;
+}
+class TimeSelectBar {
+    constructor() {
+    }
+    createTimeScale() {
+        this.selectionBarSVGGroup = document.getElementById("timeselectbar");
+        this.selectBarAnchor = {
+            xx: 0, yy: 0, ww: 1, hh: 1,
+            showZoom: zoomPrefixLevelsCSS[0].zoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            content: []
+        };
+        this.selectionBarLayer = {
+            g: this.selectionBarSVGGroup, anchors: [
+                this.selectBarAnchor
+            ], mode: LevelModes.top
+        };
+        return [this.selectionBarLayer];
+    }
+    resizeTimeScale(viewWIdth, viewHeight) {
+        console.log('resizeTimeScale', viewWIdth, viewHeight);
+    }
+    fillTimeBar(data) {
+        console.log('fillTimeBar', data.timeline);
+        let mixm = new MixerDataMath(data);
+        this.selectBarAnchor.ww = mixm.mixerWidth();
+        this.selectBarAnchor.hh = mixm.mixerHeight();
+        this.zoomAnchors = [];
+        for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
+            let selectLevelAnchor = {
+                showZoom: zoomPrefixLevelsCSS[ii].zoom,
+                hideZoom: zoomPrefixLevelsCSS[ii + 1].zoom,
+                xx: 0, yy: 0, ww: mixm.mixerWidth(), hh: mixm.mixerHeight(), content: [],
+                id: 'time' + (ii + Math.random())
+            };
+            this.zoomAnchors.push(selectLevelAnchor);
+            if (ii < 7) {
+                let mm = MZMM();
+                let ww = 0;
+                let cuTmp = 0;
+                let cuCnt = 0;
+                let cuPrt = 0;
+                for (let kk = 0; kk < data.timeline.length - 1; kk++) {
+                    let curBar = data.timeline[kk];
+                    let curMeasureMeter = mm.set(curBar.metre);
+                    let len = curMeasureMeter.duration(curBar.tempo) * data.theme.widthDurationRatio;
+                    if ((ii == 7 && kk % 8 == 0)
+                        || (ii == 6 && kk % 4 == 0)
+                        || (ii == 5 && kk % 2 == 0)
+                        || (ii < 5)) {
+                        if (ii < 4) {
+                            let s2 = { count: 1, part: 2 };
+                            let ticks = MZMM().set(s2);
+                            while (ticks.less(curMeasureMeter)) {
+                                let mark2 = {
+                                    x: mixm.LeftPad + ww + ticks.duration(curBar.tempo) * data.theme.widthDurationRatio,
+                                    y: 0,
+                                    w: zoomPrefixLevelsCSS[ii].zoom * 0.1,
+                                    h: zoomPrefixLevelsCSS[ii].zoom * 2,
+                                    css: 'timeMeasureMark'
+                                };
+                                selectLevelAnchor.content.push(mark2);
+                                ticks = ticks.plus(s2);
+                            }
+                        }
+                        if (ii < 3) {
+                            let s4 = { count: 1, part: 4 };
+                            let ticks = MZMM().set(s4);
+                            while (ticks.less(curMeasureMeter)) {
+                                let mark4 = {
+                                    x: mixm.LeftPad + ww + ticks.duration(curBar.tempo) * data.theme.widthDurationRatio,
+                                    y: 0,
+                                    w: zoomPrefixLevelsCSS[ii].zoom * 0.1,
+                                    h: zoomPrefixLevelsCSS[ii].zoom * 1,
+                                    css: 'timeMeasureMark'
+                                };
+                                selectLevelAnchor.content.push(mark4);
+                                ticks = ticks.plus(s4);
+                            }
+                        }
+                        if (ii < 2) {
+                            let s16 = { count: 1, part: 16 };
+                            let ticks = MZMM().set(s16);
+                            while (ticks.less(curMeasureMeter)) {
+                                let mark16 = {
+                                    x: mixm.LeftPad + ww + ticks.duration(curBar.tempo) * data.theme.widthDurationRatio,
+                                    y: 0,
+                                    w: zoomPrefixLevelsCSS[ii].zoom * 0.05,
+                                    h: zoomPrefixLevelsCSS[ii].zoom * 1,
+                                    css: 'timeMeasureMark'
+                                };
+                                selectLevelAnchor.content.push(mark16);
+                                ticks = ticks.plus(s16);
+                            }
+                        }
+                        let tt = {
+                            x: mixm.LeftPad + ww, y: 0,
+                            w: zoomPrefixLevelsCSS[ii].zoom * 0.25, h: zoomPrefixLevelsCSS[ii].zoom * 2,
+                            css: 'timeMeasureMark'
+                        };
+                        selectLevelAnchor.content.push(tt);
+                        let nm = {
+                            x: mixm.LeftPad + ww, y: zoomPrefixLevelsCSS[ii].zoom * 2, text: '' + (1 + kk),
+                            css: 'timeBarNum' + zoomPrefixLevelsCSS[ii].prefix
+                        };
+                        selectLevelAnchor.content.push(nm);
+                        if (cuTmp != curBar.tempo || cuCnt != curBar.metre.count || cuPrt != curBar.metre.part) {
+                            cuTmp = curBar.tempo;
+                            cuCnt = curBar.metre.count;
+                            cuPrt = curBar.metre.part;
+                            let bpm = {
+                                x: mixm.LeftPad + ww + len,
+                                y: zoomPrefixLevelsCSS[ii].zoom * 2,
+                                text: '' + Math.round(cuTmp),
+                                css: 'timeBarInfo' + zoomPrefixLevelsCSS[ii].prefix
+                            };
+                            selectLevelAnchor.content.push(bpm);
+                            let mtr = {
+                                x: mixm.LeftPad + ww + len,
+                                y: zoomPrefixLevelsCSS[ii].zoom * 2 / 2,
+                                text: '' + cuCnt + '/' + cuPrt,
+                                css: 'timeBarInfo' + zoomPrefixLevelsCSS[ii].prefix
+                            };
+                            selectLevelAnchor.content.push(mtr);
+                        }
+                    }
+                    ww = ww + len;
+                }
+            }
+        }
+        this.selectBarAnchor.content = this.zoomAnchors;
+    }
 }
 class UIToolbar {
     constructor() {
@@ -493,7 +628,7 @@ class RightMenuPanel {
         }
         return ss;
     }
-    fillMenuItems(data) {
+    fillMenuItems() {
         this.items = [];
         this.fillMenuItemChildren(0, testMenuData);
     }

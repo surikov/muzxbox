@@ -138,7 +138,7 @@ body,
 .warningIcon {
     font-size222: calc(4*var(--tapSize));
     font-size: var(--icon-4cm);
-    fill: var(--color-toolbar);
+    fill: var(--color-lines);
     text-anchor: middle;
     font-family: 'Material-Design-Iconic-Font';
     pointer-events: none;
@@ -165,7 +165,7 @@ body,
     stroke: none;
 }
 .mixToolbarFill{
-	fill: var(--color-toolbar);
+	fill: var(--color-lines);
     stroke: none;
 }
 .mixTextFill{

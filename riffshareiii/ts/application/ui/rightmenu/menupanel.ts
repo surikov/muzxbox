@@ -70,7 +70,7 @@ class RightMenuPanel {
         this.menuCloseButton = new IconLabelButton([icon_moveright], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
             console.log('menuCloseButton', nn);
             this.showState = false;
-            this.resizeMenu(data,this.lastWidth, this.lastHeight);
+            this.resizeMenu(this.lastWidth, this.lastHeight);
             this.resetAllAnchors();
         });
         this.menuUpButton = new IconLabelButton([icon_moveup], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
@@ -160,7 +160,7 @@ class RightMenuPanel {
         }
         return ss;
     }
-    fillMenuItems(data: MZXBX_Project) {//viewWIdth: number, viewHeight: number) {
+    fillMenuItems() {//viewWIdth: number, viewHeight: number) {
         this.items = [];
         /*
         for (let ii = 0; ii < 19; ii++) {
@@ -180,7 +180,7 @@ class RightMenuPanel {
             this.items[ii].pad=0.5;
         }
 */
-        this.fillMenuItemChildren(data,0, testMenuData);
+        this.fillMenuItemChildren(0, testMenuData);
     }
     setFocus(it: MenuInfo, infos: MenuInfo[]) {
         for (let ii = 0; ii < infos.length; ii++) {
@@ -196,7 +196,7 @@ class RightMenuPanel {
         it.focused = true;
         it.opened = state;
     }
-    fillMenuItemChildren(data: MZXBX_Project,pad: number, infos: MenuInfo[]): void {
+    fillMenuItemChildren(pad: number, infos: MenuInfo[]): void {
         let me = this;
         for (let ii = 0; ii < infos.length; ii++) {
             let it = infos[ii];
@@ -208,16 +208,16 @@ class RightMenuPanel {
                     this.items.push(new RightMenuItem(it).initOpenedFolderItem(pad, focused, it.text, () => {
                         console.log("close " + ii);
                         me.setOpenState(false, it, infos);
-                        me.rerenderContent(data,null);
+                        me.rerenderContent(null);
                     }));
-                    this.fillMenuItemChildren(data,pad + 0.5, children);
+                    this.fillMenuItemChildren(pad + 0.5, children);
                 } else {
                     let si: RightMenuItem = new RightMenuItem(it);
                     let order = this.items.length;
                     this.items.push(si.initClosedFolderItem(pad, focused, it.text, () => {
                         console.log("open " + ii);
                         me.setOpenState(true, it, infos);
-                        me.rerenderContent(data,si);
+                        me.rerenderContent(si);
                     }));
                 }
             } else {
@@ -246,42 +246,42 @@ class RightMenuPanel {
                     case commandThemeColorRed: {
                         this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                             me.setFocus(it, infos);
-                            me.setThemeColor(data,'theme/colordarkred.css');
+                            me.setThemeColor('theme/colordarkred.css');
                         }));
                         break;
                     }
                     case commandThemeColorGreen: {
                         this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                             me.setFocus(it, infos);
-                            me.setThemeColor(data,'theme/colordarkgreen.css');
+                            me.setThemeColor('theme/colordarkgreen.css');
                         }));
                         break;
                     }
                     case commandThemeColorBlue: {
                         this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                             me.setFocus(it, infos);
-                            me.setThemeColor(data,'theme/colordarkblue.css');
+                            me.setThemeColor('theme/colordarkblue.css');
                         }));
                         break;
                     }
                     case commandLocaleRU: {
                         this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                             me.setFocus(it, infos);
-                            me.setThemeLocale(data,'ru',1);
+                            me.setThemeLocale('ru',1);
                         }));
                         break;
                     }
                     case commandLocaleEN: {
                         this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                             me.setFocus(it, infos);
-                            me.setThemeLocale(data,'en',1);
+                            me.setThemeLocale('en',1);
                         }));
                         break;
                     }
                     case commandLocaleZH: {
                         this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                             me.setFocus(it, infos);
-                            me.setThemeLocale(data,'zh',1.5);
+                            me.setThemeLocale('zh',1.5);
                         }));
                         break;
                     }
@@ -307,7 +307,7 @@ class RightMenuPanel {
             }
         }
     }
-    setThemeLocale(data: MZXBX_Project,loc: string,ratio:number) {
+    setThemeLocale(loc: string,ratio:number) {
         console.log("setThemeLocale " + loc);
         setLocaleID(loc,ratio);
         if(loc=='zh'){
@@ -315,13 +315,13 @@ class RightMenuPanel {
         }else{
             startLoadCSSfile('theme/font1small.css');
         }
-        this.resizeMenu(data,this.lastWidth, this.lastHeight);
+        this.resizeMenu(this.lastWidth, this.lastHeight);
         this.resetAllAnchors();
     }
-    setThemeColor(data: MZXBX_Project,cssPath: string) {
+    setThemeColor(cssPath: string) {
         console.log("cssPath " + cssPath);
         startLoadCSSfile(cssPath);
-        this.resizeMenu(data,this.lastWidth, this.lastHeight);
+        this.resizeMenu(this.lastWidth, this.lastHeight);
         this.resetAllAnchors();
     }
     setThemeSize(ratio: number, cssPath: string) {
@@ -329,14 +329,14 @@ class RightMenuPanel {
         startLoadCSSfile(cssPath);
         commandDispatcher.changeTapSize(ratio);
     }
-    rerenderContent(data: MZXBX_Project,folder: RightMenuItem | null) {
+    rerenderContent(folder: RightMenuItem | null) {
         /*if (folder == null) {
             //
         } else {
             console.log('rerenderContent', folder.top, folder.info, this.scrollY);
         }*/
         this.contentAnchor.content = [];
-        this.fillMenuItems(data);
+        this.fillMenuItems();
 
         let position: number = 0;
         for (let ii = 0; ii < this.items.length; ii++) {
@@ -419,7 +419,7 @@ class RightMenuPanel {
         this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
 
         //console.log(this.dragHandler);
-        this.rerenderContent(data,null);
+        this.rerenderContent(null);
     }
 
 }
