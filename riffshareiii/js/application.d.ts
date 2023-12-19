@@ -76,6 +76,14 @@ declare class TimeSelectBar {
     constructor();
     createTimeScale(): TileLayerDefinition[];
     resizeTimeScale(viewWIdth: number, viewHeight: number): void;
+    addMarks8plus(): void;
+    addMarks7(barnum: number, barLeft: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor): void;
+    addMarks6(barnum: number, barLeft: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor): void;
+    addMarks5(barnum: number, barLeft: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor): void;
+    addMarks4(duRatio: number, barnum: number, barLeft: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor): void;
+    addMarks3minus(duRatio: number, zoomidx: number, barnum: number, barLeft: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor): void;
+    createBarMark(barLeft: number, width: number, height: number, measureAnchor: TileAnchor): void;
+    createBarNumber(barLeft: number, top: number, barnum: number, zz: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor): void;
     fillTimeBar(data: MZXBX_Project): void;
 }
 declare class UIToolbar {
@@ -179,6 +187,8 @@ declare let commandLocaleRU: string;
 declare let commandLocaleZH: string;
 declare let commandImportFromMIDI: string;
 declare let testMenuData: MenuInfo[];
+declare class LeftBar {
+}
 declare class BarOctave {
     barRightBorder: TileRectangle;
     octaveBottomBorder: TileRectangle;

@@ -348,7 +348,64 @@ class TimeSelectBar {
         return [this.selectionBarLayer];
     }
     resizeTimeScale(viewWIdth, viewHeight) {
-        console.log('resizeTimeScale', viewWIdth, viewHeight);
+    }
+    addMarks8plus() {
+    }
+    addMarks7(barnum, barLeft, curBar, measureAnchor) {
+        if (barnum % 8 == 0) {
+            this.createBarMark(barLeft, zoomPrefixLevelsCSS[7].zoom * 0.25, zoomPrefixLevelsCSS[7].zoom * 2, measureAnchor);
+            this.createBarNumber(barLeft, zoomPrefixLevelsCSS[7].zoom * 2, barnum, 7, curBar, measureAnchor);
+        }
+    }
+    addMarks6(barnum, barLeft, curBar, measureAnchor) {
+        if (barnum % 4 == 0) {
+            this.createBarMark(barLeft, zoomPrefixLevelsCSS[6].zoom * 0.25, zoomPrefixLevelsCSS[6].zoom * 2, measureAnchor);
+            this.createBarNumber(barLeft, zoomPrefixLevelsCSS[6].zoom * 2, barnum, 6, curBar, measureAnchor);
+        }
+    }
+    addMarks5(barnum, barLeft, curBar, measureAnchor) {
+        if (barnum % 2 == 0) {
+            this.createBarMark(barLeft, zoomPrefixLevelsCSS[5].zoom * 0.25, zoomPrefixLevelsCSS[5].zoom * 2, measureAnchor);
+            this.createBarNumber(barLeft, zoomPrefixLevelsCSS[5].zoom * 2, barnum, 5, curBar, measureAnchor);
+        }
+    }
+    addMarks4(duRatio, barnum, barLeft, curBar, measureAnchor) {
+        this.createBarMark(barLeft, zoomPrefixLevelsCSS[4].zoom * 0.25, zoomPrefixLevelsCSS[4].zoom * 2, measureAnchor);
+        this.createBarNumber(barLeft, zoomPrefixLevelsCSS[4].zoom * 2, barnum, 4, curBar, measureAnchor);
+        this.createBarMark(barLeft + MZMM().set({ count: 1, part: 2 }).duration(curBar.tempo) * duRatio, zoomPrefixLevelsCSS[4].zoom * 0.1, zoomPrefixLevelsCSS[4].zoom * 2, measureAnchor);
+    }
+    addMarks3minus(duRatio, zoomidx, barnum, barLeft, curBar, measureAnchor) {
+        this.createBarMark(barLeft, zoomPrefixLevelsCSS[zoomidx].zoom * 0.25, zoomPrefixLevelsCSS[zoomidx].zoom * 2, measureAnchor);
+        this.createBarNumber(barLeft, zoomPrefixLevelsCSS[zoomidx].zoom * 2, barnum, zoomidx, curBar, measureAnchor);
+        let st16 = MZMM().set({ count: 1, part: 16 });
+        let cntr8 = st16;
+        while (cntr8.less(curBar.metre)) {
+            this.createBarMark(barLeft + cntr8.duration(curBar.tempo) * duRatio, zoomPrefixLevelsCSS[zoomidx].zoom * 0.1, zoomPrefixLevelsCSS[zoomidx].zoom * 1, measureAnchor);
+            cntr8 = cntr8.plus(st16);
+        }
+        this.createBarMark(barLeft + MZMM().set({ count: 1, part: 2 }).duration(curBar.tempo) * duRatio, zoomPrefixLevelsCSS[zoomidx].zoom * 0.1, zoomPrefixLevelsCSS[zoomidx].zoom * 2, measureAnchor);
+    }
+    createBarMark(barLeft, width, height, measureAnchor) {
+        let mark = { x: barLeft, y: 0, w: width, h: height, css: 'timeMeasureMark' };
+        measureAnchor.content.push(mark);
+    }
+    createBarNumber(barLeft, top, barnum, zz, curBar, measureAnchor) {
+        let nm = { x: barLeft, y: top, text: '' + (1 + barnum), css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix };
+        measureAnchor.content.push(nm);
+        let bpm = {
+            x: barLeft,
+            y: top * 2 / 3,
+            text: '' + Math.round(curBar.tempo),
+            css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
+        };
+        measureAnchor.content.push(bpm);
+        let mtr = {
+            x: barLeft,
+            y: top,
+            text: '' + curBar.metre.count + '/' + curBar.metre.part,
+            css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
+        };
+        measureAnchor.content.push(mtr);
     }
     fillTimeBar(data) {
         console.log('fillTimeBar', data.timeline);
@@ -356,106 +413,46 @@ class TimeSelectBar {
         this.selectBarAnchor.ww = mixm.mixerWidth();
         this.selectBarAnchor.hh = mixm.mixerHeight();
         this.zoomAnchors = [];
-        for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
+        for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
             let selectLevelAnchor = {
-                showZoom: zoomPrefixLevelsCSS[ii].zoom,
-                hideZoom: zoomPrefixLevelsCSS[ii + 1].zoom,
+                showZoom: zoomPrefixLevelsCSS[zz].zoom,
+                hideZoom: zoomPrefixLevelsCSS[zz + 1].zoom,
                 xx: 0, yy: 0, ww: mixm.mixerWidth(), hh: mixm.mixerHeight(), content: [],
-                id: 'time' + (ii + Math.random())
+                id: 'time' + (zz + Math.random())
             };
             this.zoomAnchors.push(selectLevelAnchor);
-            if (ii < 7) {
-                let mm = MZMM();
-                let ww = 0;
-                let cuTmp = 0;
-                let cuCnt = 0;
-                let cuPrt = 0;
-                for (let kk = 0; kk < data.timeline.length - 1; kk++) {
-                    let curBar = data.timeline[kk];
-                    let curMeasureMeter = mm.set(curBar.metre);
-                    let len = curMeasureMeter.duration(curBar.tempo) * data.theme.widthDurationRatio;
-                    if ((ii == 7 && kk % 8 == 0)
-                        || (ii == 6 && kk % 4 == 0)
-                        || (ii == 5 && kk % 2 == 0)
-                        || (ii < 5)) {
-                        if (ii < 4) {
-                            let s2 = { count: 1, part: 2 };
-                            let ticks = MZMM().set(s2);
-                            while (ticks.less(curMeasureMeter)) {
-                                let mark2 = {
-                                    x: mixm.LeftPad + ww + ticks.duration(curBar.tempo) * data.theme.widthDurationRatio,
-                                    y: 0,
-                                    w: zoomPrefixLevelsCSS[ii].zoom * 0.1,
-                                    h: zoomPrefixLevelsCSS[ii].zoom * 2,
-                                    css: 'timeMeasureMark'
-                                };
-                                selectLevelAnchor.content.push(mark2);
-                                ticks = ticks.plus(s2);
-                            }
-                        }
-                        if (ii < 3) {
-                            let s4 = { count: 1, part: 4 };
-                            let ticks = MZMM().set(s4);
-                            while (ticks.less(curMeasureMeter)) {
-                                let mark4 = {
-                                    x: mixm.LeftPad + ww + ticks.duration(curBar.tempo) * data.theme.widthDurationRatio,
-                                    y: 0,
-                                    w: zoomPrefixLevelsCSS[ii].zoom * 0.1,
-                                    h: zoomPrefixLevelsCSS[ii].zoom * 1,
-                                    css: 'timeMeasureMark'
-                                };
-                                selectLevelAnchor.content.push(mark4);
-                                ticks = ticks.plus(s4);
-                            }
-                        }
-                        if (ii < 2) {
-                            let s16 = { count: 1, part: 16 };
-                            let ticks = MZMM().set(s16);
-                            while (ticks.less(curMeasureMeter)) {
-                                let mark16 = {
-                                    x: mixm.LeftPad + ww + ticks.duration(curBar.tempo) * data.theme.widthDurationRatio,
-                                    y: 0,
-                                    w: zoomPrefixLevelsCSS[ii].zoom * 0.05,
-                                    h: zoomPrefixLevelsCSS[ii].zoom * 1,
-                                    css: 'timeMeasureMark'
-                                };
-                                selectLevelAnchor.content.push(mark16);
-                                ticks = ticks.plus(s16);
-                            }
-                        }
-                        let tt = {
-                            x: mixm.LeftPad + ww, y: 0,
-                            w: zoomPrefixLevelsCSS[ii].zoom * 0.25, h: zoomPrefixLevelsCSS[ii].zoom * 2,
-                            css: 'timeMeasureMark'
-                        };
-                        selectLevelAnchor.content.push(tt);
-                        let nm = {
-                            x: mixm.LeftPad + ww, y: zoomPrefixLevelsCSS[ii].zoom * 2, text: '' + (1 + kk),
-                            css: 'timeBarNum' + zoomPrefixLevelsCSS[ii].prefix
-                        };
-                        selectLevelAnchor.content.push(nm);
-                        if (cuTmp != curBar.tempo || cuCnt != curBar.metre.count || cuPrt != curBar.metre.part) {
-                            cuTmp = curBar.tempo;
-                            cuCnt = curBar.metre.count;
-                            cuPrt = curBar.metre.part;
-                            let bpm = {
-                                x: mixm.LeftPad + ww + len,
-                                y: zoomPrefixLevelsCSS[ii].zoom * 2,
-                                text: '' + Math.round(cuTmp),
-                                css: 'timeBarInfo' + zoomPrefixLevelsCSS[ii].prefix
-                            };
-                            selectLevelAnchor.content.push(bpm);
-                            let mtr = {
-                                x: mixm.LeftPad + ww + len,
-                                y: zoomPrefixLevelsCSS[ii].zoom * 2 / 2,
-                                text: '' + cuCnt + '/' + cuPrt,
-                                css: 'timeBarInfo' + zoomPrefixLevelsCSS[ii].prefix
-                            };
-                            selectLevelAnchor.content.push(mtr);
-                        }
-                    }
-                    ww = ww + len;
+            let mm = MZMM();
+            let barLeft = mixm.LeftPad;
+            for (let kk = 0; kk < data.timeline.length; kk++) {
+                let curBar = data.timeline[kk];
+                let curMeasureMeter = mm.set(curBar.metre);
+                let barWidth = curMeasureMeter.duration(curBar.tempo) * data.theme.widthDurationRatio;
+                let measureAnchor = {
+                    showZoom: zoomPrefixLevelsCSS[zz].zoom,
+                    hideZoom: zoomPrefixLevelsCSS[zz + 1].zoom,
+                    xx: barLeft, yy: 0, ww: barWidth, hh: 1234, content: [],
+                    id: 'measure' + (kk + Math.random())
+                };
+                selectLevelAnchor.content.push(measureAnchor);
+                if (zz >= 8) {
+                    this.addMarks8plus();
                 }
+                if (zz == 7) {
+                    this.addMarks7(kk, barLeft, curBar, measureAnchor);
+                }
+                if (zz == 6) {
+                    this.addMarks6(kk, barLeft, curBar, measureAnchor);
+                }
+                if (zz == 5) {
+                    this.addMarks5(kk, barLeft, curBar, measureAnchor);
+                }
+                if (zz == 4) {
+                    this.addMarks4(data.theme.widthDurationRatio, kk, barLeft, curBar, measureAnchor);
+                }
+                if (zz <= 3) {
+                    this.addMarks3minus(data.theme.widthDurationRatio, zz, kk, barLeft, curBar, measureAnchor);
+                }
+                barLeft = barLeft + barWidth;
             }
         }
         this.selectBarAnchor.content = this.zoomAnchors;
@@ -1135,6 +1132,8 @@ let testMenuData = [
         ]
     }
 ];
+class LeftBar {
+}
 class BarOctave {
     constructor(barIdx, octaveIdx, left, top, width, height, anchor, zoomLevel, data) {
         this.barRightBorder = {

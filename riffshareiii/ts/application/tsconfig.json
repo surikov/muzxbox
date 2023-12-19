@@ -33,6 +33,7 @@
 		,"ui/rightmenu/menupanel.ts"
         ,"ui/rightmenu/menuitem.ts"
         ,"ui/rightmenu/menudata.ts"
+		,"ui/leftmenu/leftpanel.ts"
         ,"ui/mixer/grid/baroctave.ts"
 		,"ui/mixer/grid/octavecontent.ts"
 		,"ui/mixer/grid/mixerbar.ts"
