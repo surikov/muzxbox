@@ -251,10 +251,11 @@ class UIRenderer {
         this.warning.initDialogUI();
         this.toolbar = new UIToolbar();
         this.timeselectbar = new TimeSelectBar();
+        this.leftBar = new LeftBar();
         this.menu = new RightMenuPanel();
         this.mixer = new MixerUI();
         let me = this;
-        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.createMixerLayers(), this.warning.allLayers(), this.timeselectbar.createTimeScale());
+        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.createMixerLayers(), this.warning.allLayers(), this.timeselectbar.createTimeScale(), this.leftBar.createLeftPanel());
         this.tiler.initRun(this.tileLevelSVG, false, 1, 1, zoomPrefixLevelsCSS[0].zoom, zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].zoom, zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom - 1, layers);
         this.tiler.setAfterZoomCallback(() => {
             if (this.menu) {
@@ -1133,6 +1134,26 @@ let testMenuData = [
     }
 ];
 class LeftBar {
+    constructor() {
+    }
+    createLeftPanel() {
+        this.leftLayerZoom = document.getElementById("leftLayerZoom");
+        this.backgroundRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'debug' };
+        this.leftBarAnchor = {
+            xx: 0, yy: 0, ww: 1, hh: 1,
+            showZoom: zoomPrefixLevelsCSS[0].zoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            content: [
+                this.backgroundRectangle
+            ]
+        };
+        this.selectionBarLayer = {
+            g: this.leftLayerZoom, anchors: [
+                this.leftBarAnchor
+            ], mode: LevelModes.left
+        };
+        return [this.selectionBarLayer];
+    }
 }
 class BarOctave {
     constructor(barIdx, octaveIdx, left, top, width, height, anchor, zoomLevel, data) {

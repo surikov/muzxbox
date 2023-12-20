@@ -46,6 +46,7 @@ declare class UIRenderer {
     debug: DebugLayerUI;
     warning: WarningUI;
     timeselectbar: TimeSelectBar;
+    leftBar: LeftBar;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
     constructor();
@@ -188,6 +189,12 @@ declare let commandLocaleZH: string;
 declare let commandImportFromMIDI: string;
 declare let testMenuData: MenuInfo[];
 declare class LeftBar {
+    selectionBarLayer: TileLayerDefinition;
+    leftLayerZoom: SVGElement;
+    leftBarAnchor: TileAnchor;
+    backgroundRectangle: TileRectangle;
+    constructor();
+    createLeftPanel(): TileLayerDefinition[];
 }
 declare class BarOctave {
     barRightBorder: TileRectangle;
