@@ -280,8 +280,14 @@ class UIRenderer {
         this.timeselectbar.fillTimeBar(data);
         this.timeselectbar.resizeTimeScale(vw, vh);
         this.tiler.resetModel();
+        this.leftBar.resizeHeaders(mixm.mixerHeight(), vw, vh, this.tiler.getCurrentPointPosition().z);
     }
     onReSizeView() {
+        let mixH = 1;
+        if (this.lastUsedData) {
+            let mixm = new MixerDataMath(this.lastUsedData);
+            mixH = mixm.mixerHeight();
+        }
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.toolbar.resizeToolbar(vw, vh);
@@ -289,6 +295,7 @@ class UIRenderer {
         this.menu.resizeMenu(vw, vh);
         this.menu.resetAllAnchors();
         this.warning.resizeDialog(vw, vh);
+        this.leftBar.resizeHeaders(mixH, vw, vh, this.tiler.getCurrentPointPosition().z);
     }
     deleteUI() {
     }
@@ -1138,7 +1145,7 @@ class LeftBar {
     }
     createLeftPanel() {
         this.leftLayerZoom = document.getElementById("leftLayerZoom");
-        this.backgroundRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'debug' };
+        this.backgroundRectangle = { x: 0, y: 0, w: 25, h: 5, css: 'debug' };
         this.leftBarAnchor = {
             xx: 0, yy: 0, ww: 1, hh: 1,
             showZoom: zoomPrefixLevelsCSS[0].zoom,
@@ -1153,6 +1160,17 @@ class LeftBar {
             ], mode: LevelModes.left
         };
         return [this.selectionBarLayer];
+    }
+    resizeHeaders(mixerH, viewWidth, viewHeight, tz) {
+        console.log('resizeHeaders', viewWidth, viewHeight, tz, mixerH);
+        let rh = viewHeight * 127;
+        let ry = -(rh - mixerH) / 2;
+        this.backgroundRectangle.y = ry;
+        this.backgroundRectangle.h = rh;
+        this.leftBarAnchor.yy = ry;
+        this.leftBarAnchor.hh = rh;
+        console.log(this.backgroundRectangle);
+        console.log(this.leftBarAnchor);
     }
 }
 class BarOctave {

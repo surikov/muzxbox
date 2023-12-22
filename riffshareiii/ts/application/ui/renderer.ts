@@ -35,6 +35,7 @@ class UIRenderer {//} implements RenderedPart {
 	tiler: TileLevelBase;
 	tileLevelSVG: SVGElement;
 	//commands: CommandDispatcher;
+	lastUsedData: MZXBX_Project;
 	constructor() {
 		//this.commands = commands;
 		commandDispatcher.registerUI(this);
@@ -138,9 +139,15 @@ class UIRenderer {//} implements RenderedPart {
 
 		this.tiler.resetModel();
 		//console.log('fillWholeUI',this.tiler);
+		this.leftBar.resizeHeaders(mixm.mixerHeight(), vw, vh, this.tiler.getCurrentPointPosition().z);
 	}
 	onReSizeView() {
 		//console.log('onReSizeView');
+		let mixH = 1;
+		if (this.lastUsedData) {
+			let mixm: MixerDataMath = new MixerDataMath(this.lastUsedData);
+			mixH = mixm.mixerHeight();
+		}
 		let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
 		let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
 		this.toolbar.resizeToolbar(vw, vh);
@@ -148,6 +155,7 @@ class UIRenderer {//} implements RenderedPart {
 		this.menu.resizeMenu(vw, vh);
 		this.menu.resetAllAnchors();
 		this.warning.resizeDialog(vw, vh);
+		this.leftBar.resizeHeaders(mixH, vw, vh, this.tiler.getCurrentPointPosition().z);
 	}
 	deleteUI() {
 

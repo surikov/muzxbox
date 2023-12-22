@@ -49,6 +49,7 @@ declare class UIRenderer {
     leftBar: LeftBar;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
+    lastUsedData: MZXBX_Project;
     constructor();
     changeTapSIze(ratio: number): void;
     createUI(): void;
@@ -195,6 +196,7 @@ declare class LeftBar {
     backgroundRectangle: TileRectangle;
     constructor();
     createLeftPanel(): TileLayerDefinition[];
+    resizeHeaders(mixerH: number, viewWidth: number, viewHeight: number, tz: number): void;
 }
 declare class BarOctave {
     barRightBorder: TileRectangle;

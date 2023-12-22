@@ -131,9 +131,9 @@ function addLine(svg: SVGElement, x1: number, y1: number, x2: number, y2: number
 	svg.append(newLine);
 }
 function composeLine(svg: SVGElement, x1: number, y1: number, x2: number, y2: number, strokeWidth: number, color: string) {
-	if(isNaN(x1) || isNaN(x2) || isNaN(y1) || isNaN(y2)){
-		console.log('composeLine',x1,x2,y1,y2);
-	}else{
+	if (isNaN(x1) || isNaN(x2) || isNaN(y1) || isNaN(y2)) {
+		console.log('composeLine', x1, x2, y1, y2);
+	} else {
 		addLine(svg, x1, y1, x2, y2, strokeWidth / 2, color);
 	}
 }
@@ -229,27 +229,27 @@ function clickFog(vnt) {
 function drawLines() {
 	//console.log('drawLines',markLines);
 	clearSVGgroup(linesLevel);
-	let strokeWidth=cellSize / 0.99;
+	let strokeWidth = cellSize / 0.99;
 	for (let i = 0; i < markLines.length; i++) {
-		if(!markLines[i].manual){
+		if (!markLines[i].manual) {
 			composeLine(linesLevel
 				, markLines[i].fromX * cellSize + 0.5 * cellSize
 				, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize
 				, markLines[i].toX * cellSize + 0.5 * cellSize
 				, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize
-				,strokeWidth //, cellSize / 0.99
+				, strokeWidth //, cellSize / 0.99
 				, markLines[i].color);//'#00ff0066');
 		}
 	}
-	strokeWidth=cellSize / 2.99;
+	strokeWidth = cellSize / 2.99;
 	for (let i = 0; i < markLines.length; i++) {
-		if(markLines[i].manual){
+		if (markLines[i].manual) {
 			composeLine(linesLevel
 				, markLines[i].fromX * cellSize + 0.5 * cellSize
 				, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize
 				, markLines[i].toX * cellSize + 0.5 * cellSize
 				, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize
-				,strokeWidth //, cellSize / 0.99
+				, strokeWidth //, cellSize / 0.99
 				, markLines[i].color);//'#00ff0066');
 		}
 	}
@@ -262,19 +262,19 @@ function drawStat3(svg: SVGElement, rows: BallsRow[]) {
 			addSmallText(svg, 2 * rowLen * cellSize + 2, topShift + (1 + rowNum) * cellSize - 2, rows[rowNum].key);
 			for (let colNum = 1; colNum <= rowLen; colNum++) {
 				if (ballExists(colNum, rows[rowNum])) {
-					let topy=topShift + 0.5 * cellSize + rowNum * cellSize;
-					let szz=cellSize / 5 - 0.5;
-					let clr='#ff0000ff';
-					if(rowNum == 0){
-						topy=topy-1.5*cellSize;
-						szz=cellSize / 3 - 0.5
-						clr='#00ff00ff';
+					let topy = topShift + 0.5 * cellSize + rowNum * cellSize;
+					let szz = cellSize / 5 - 0.5;
+					let clr = '#ff0000ff';
+					if (rowNum == 0) {
+						topy = topy - 1.5 * cellSize;
+						szz = cellSize / 3 - 0.5
+						clr = '#00ff00ff';
 					}
 					if (rowNum > 0 || showFirstRow) {
 						addCircle(svg
 							, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize
 							, topy//topShift + 0.5 * cellSize + rowNum * cellSize
-							,szz, clr, clr);
+							, szz, clr, clr);
 					}
 					if (rowNum > 0 || showFirstRow) {
 						addCircle(svg
@@ -333,7 +333,7 @@ function calcRowPatterns(rowNum: number, rows: BallsRow[]): number[] {
 	}
 	return cnts;
 }
-function calculateBallTriadChain( rowNum: number, rows: BallsRow[], counts: number[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] {
+function calculateBallTriadChain(rowNum: number, rows: BallsRow[], counts: number[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] {
 	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = [];
 	for (let nn = 0; nn < rowLen; nn++) {
 		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number } = { ball: nn + 1, fills: [], summ: 0 };
@@ -452,8 +452,8 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 	let prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
 	for (let bb = 0; bb < rowLen; bb++) {
 		let hh = (mx - min - (arr[bb].summ - min)) / hr;
-		let fromY=Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
-		let toY=Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
+		let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
+		let toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
 		/*markLines.push({ fromX: bb + shiftX-1
 			, fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
 			, toX: bb + shiftX
@@ -488,7 +488,7 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	//let oldReduceRatio = reduceRatio;
 	//let rows: BallsRow[] = sliceRows(inrows, 0, 100);
 	let precounts: number[] = calcRowPatterns(0 + 1, rows);
-	let ballFills: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = calculateBallTriadChain( 0, rows, precounts);
+	let ballFills: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = calculateBallTriadChain(0, rows, precounts);
 	//console.log('ballFills',ballFills);
 	let mx = 0;
 	let min = 987654321;
@@ -500,8 +500,8 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	let prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
 	for (let bb = 0; bb < rowLen; bb++) {
 		let hh = (mx - min - (ballFills[bb].summ - min)) / hr;
-		let fromY=Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
-		let toY=Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
+		let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
+		let toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
 		markLines.push({
 			fromX: bb + shiftX - 1
 			, fromY: fromY //skipRowsCount + 0 + prehh
@@ -530,7 +530,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			ratioPre = 0.66;
 		}
 	}*/
-	console.log('dumpTriads',highLightMode);
+	console.log('dumpTriads', highLightMode);
 	for (let rr = 0; rr < rowsVisibleCount; rr++) {
 		if (rr > rows.length - 6) break;
 		let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[];
@@ -538,14 +538,14 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		//if (highLightMode == 2) {
 		//	calcs = calcRowPreFreqs(rr, rows);
 		//} else {
-			if (highLightMode == 1) {
-				//calcs = calculateEmptyColumnDuration(rr, rows);
-				calcs = calculateBallFrequency(rr, rows);
-				
-			} else {
-				let precounts = calcRowPatterns(rr + 1, rows);
-				calcs = calculateBallTriadChain( rr, rows, precounts);
-			}
+		if (highLightMode == 1) {
+			//calcs = calculateEmptyColumnDuration(rr, rows);
+			calcs = calculateBallFrequency(rr, rows);
+
+		} else {
+			let precounts = calcRowPatterns(rr + 1, rows);
+			calcs = calculateBallTriadChain(rr, rows, precounts);
+		}
 		//}
 		let minCnt = 99999;
 		let mxCount = 0;
@@ -578,10 +578,10 @@ function fillCells() {
 	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount + calcLen);
 	dumpTriads(levelA, slicedrows);
 	dumpInfo(skipRowsCount);
-	
+
 	drawStat3(levelA, slicedrows);
 	drawLines();
-	
+
 	var msgp: HTMLElement = (document.getElementById('stepsize') as any) as HTMLElement;
 	msgp.innerText = '' + reduceRatio;
 	msgp = (document.getElementById('calcLen') as any) as HTMLElement;
@@ -705,6 +705,68 @@ function addTails() {
 	}*/
 	dumpRowFills(slicedrows);
 	fillCells();
+}
+type TriadShiftInfo = {
+	shift: number;
+	balls: string[];
+};
+/*
+function dumpTraidBallCount(ball: number, shift1: number, shift2: number, rowNum: number, rows: BallsRow[]): number {
+	if ((ballExists(ball + shift1, rows[rowNum + 1])) && (ballExists(ball + shift1 + shift2, rows[rowNum + 2]))) return 3;//'OO';
+	if ((ballExists(ball + shift1, rows[rowNum + 1])) && (!ballExists(ball + shift1 + shift2, rows[rowNum + 2]))) return 2;//'O_';
+	if ((!ballExists(ball + shift1, rows[rowNum + 1])) && (ballExists(ball + shift1 + shift2, rows[rowNum + 2]))) return 1;//'_O';
+	if ((!ballExists(ball + shift1, rows[rowNum + 1])) && (!ballExists(ball + shift1 + shift2, rows[rowNum + 2]))) return 0;//'__';
+	return 123;//'???';
+}
+*/
+//function dumpTriadStatRow(rowNum: number, ball: number, rows: BallsRow[]) {
+//console.log(shift, rows[rowNum]);
+/*for (let s1 = 0; s1 < rowLen; s1++) {
+	for (let s2 = 0; s2 < rowLen; s2++) {
+		let rr = dumpTraidBallCount(ball, s1, s2, rowNum, rows);
+		console.log(ball, s1, s2, rr);
+	}
+}*/
+//	let row = rows[rowNum];
+//}
+function triad_exists(ball: number, shift1: number, shift2: number, r0: boolean, r1: boolean, r2: boolean, rowNum: number, rows: BallsRow[]): boolean {
+	return r0 == ballExists(ball, rows[rowNum])
+		&& r1 == (ballExists(ball + shift1, rows[rowNum + 1]))
+		&& r2 == (ballExists(ball + shift1 + shift2, rows[rowNum + 2]))
+		;
+}
+function dumpTriadStatAll(dx1: number, dx2: number, r0: boolean, r1: boolean, r2: boolean, rows: BallsRow[]): number {
+	let count: number = 0;
+	for (let bb = 1; bb <= rowLen; bb++) {
+		for (let nn = 5; nn <= rows.length - 3; nn++) {
+			if (triad_exists(bb, dx1, dx2, r0, r1, r2, nn, rows)) {
+				count++;
+			}
+		}
+	}
+	//console.log(dx1, dx2, r0, r1, r2, count);
+	return count;
+}
+function dumpTriad8var(dx1: number, dx2: number, rows: BallsRow[]) {
+	let count000 = dumpTriadStatAll(dx1, dx2, true, true, true, rows);
+	let count00X = dumpTriadStatAll(dx1, dx2, true, true, false, rows);
+	let count0X0 = dumpTriadStatAll(dx1, dx2, true, false, true, rows);
+	let count0XX = dumpTriadStatAll(dx1, dx2, true, false, false, rows);
+	let countX00 = dumpTriadStatAll(dx1, dx2, false, true, true, rows);
+	let countX0X = dumpTriadStatAll(dx1, dx2, false, true, false, rows);
+	let countXX0 = dumpTriadStatAll(dx1, dx2, false, false, true, rows);
+	let countXXX = dumpTriadStatAll(dx1, dx2, false, false, false, rows);
+	let countA = count000 + count00X + count0X0 + count0XX + countX00 + countX0X + countXX0 + countXXX;
+	console.log(dx1, dx2
+		, Math.round(10000 * count000 / countA) / 100
+		, Math.round(10000 * count00X / countA) / 100
+		, Math.round(10000 * count0X0 / countA) / 100
+		, Math.round(10000 * count0XX / countA) / 100
+		, Math.round(10000 * countX00 / countA) / 100
+		, Math.round(10000 * countX0X / countA) / 100
+		, Math.round(10000 * countXX0 / countA) / 100
+		, Math.round(10000 * countXXX / countA) / 100
+	);
 }
 /*
 function dumpStatAll() {
@@ -918,4 +980,67 @@ addTails();
 //dumpLongness(0);
 //dumpLongness(1);
 //dumpLongness(2);
+/*
+dumpTriad8var(9, 0, datarows);
+dumpTriad8var(1, 2, datarows);
+dumpTriad8var(4, 5, datarows);
+dumpTriad8var(1, 8, datarows);
+dumpTriad8var(1, 0, datarows);
+*/
+let pro2 = 0.25;
+let pro1 = 1.5;
+let pro0 = 10.0;
+
+let rowNum = 2;
+let ballNum = 12;
+let count0 = 0;
+let count1 = 0;
+let count2 = 0;
+for (let dx1 = 0; dx1 < rowLen; dx1++) {
+	for (let dx2 = 0; dx2 < rowLen; dx2++) {
+		console.log(dx1, dx2,ballExists(ballNum + dx1, datarows[rowNum + 1]), ballExists(ballNum + dx2, datarows[rowNum + 2]))
+		if (ballExists(ballNum + dx1, datarows[rowNum + 1]) && ballExists(ballNum + dx2, datarows[rowNum + 2])) {
+			count2++;
+		} else {
+			if ((!ballExists(ballNum + dx1, datarows[rowNum + 1])) && (!ballExists(ballNum + dx2, datarows[rowNum + 2]))) {
+				count0++;
+			} else {
+				count1++;
+			}
+		}
+	}
+}
+
+console.log(ballNum, rowNum, count0,count1,count2,datarows[rowNum + 1]);
+
+
+
+/*
+dumpTriadStatAll(0, 0, true, true, true, datarows);
+dumpTriadStatAll(0, 0, true, true, false, datarows);
+dumpTriadStatAll(0, 0, true, false, true, datarows);
+dumpTriadStatAll(0, 0, true, false, false, datarows);
+dumpTriadStatAll(0, 0, false, true, true, datarows);
+dumpTriadStatAll(0, 0, false, true, false, datarows);
+dumpTriadStatAll(0, 0, false, false, true, datarows);
+dumpTriadStatAll(0, 0, false, false, false, datarows);
+
+dumpTriadStatAll(1, 0, true, true, true, datarows);
+dumpTriadStatAll(1, 0, true, true, false, datarows);
+dumpTriadStatAll(1, 0, true, false, true, datarows);
+dumpTriadStatAll(1, 0, true, false, false, datarows);
+dumpTriadStatAll(1, 0, false, true, true, datarows);
+dumpTriadStatAll(1, 0, false, true, false, datarows);
+dumpTriadStatAll(1, 0, false, false, true, datarows);
+dumpTriadStatAll(1, 0, false, false, false, datarows);
+
+dumpTriadStatAll(0, 1, true, true, true, datarows);
+dumpTriadStatAll(0, 1, true, true, false, datarows);
+dumpTriadStatAll(0, 1, true, false, true, datarows);
+dumpTriadStatAll(0, 1, true, false, false, datarows);
+dumpTriadStatAll(0, 1, false, true, true, datarows);
+dumpTriadStatAll(0, 1, false, true, false, datarows);
+dumpTriadStatAll(0, 1, false, false, true, datarows);
+dumpTriadStatAll(0, 1, false, false, false, datarows);
+*/
 
