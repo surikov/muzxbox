@@ -10,7 +10,7 @@ class BarOctave {
 		this.barRightBorder = {
 			x: left + width
 			, y: top
-			, w: zoomPrefixLevelsCSS[zoomLevel].zoom / 8.0
+			, w: zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0
 			, h: height - 1.5
 			, css: 'mixPanelFill'
 		};
@@ -18,7 +18,7 @@ class BarOctave {
 			x: left
 			, y: top + height
 			, w: width - 1.5
-			, h: zoomPrefixLevelsCSS[zoomLevel].zoom / 8.0
+			, h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0
 			, css: 'mixToolbarFill'
 		};
 		//let oAnchor = { xx: left, yy: top, ww: width, hh: height, showZoom: minZoom, hideZoom: maxZoom, content: [oRectangle] };

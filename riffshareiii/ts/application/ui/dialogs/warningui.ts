@@ -17,8 +17,8 @@ class WarningUI {
 		this.warningRectangle = { x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: this.cancel.bind(this) };
 		this.warningAnchor = {
             id: 'warningAnchor', xx: 0, yy: 0, ww: 1, hh: 1
-            , showZoom: zoomPrefixLevelsCSS[0].zoom
-            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].zoom+1
+            , showZoom: zoomPrefixLevelsCSS[0].minZoom
+            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom+1
 			, content: [this.warningRectangle, this.warningIcon, this.warningTitle, this.warningDescription]
 		};
 		this.warningLayer = { g: this.warningGroup, anchors: [this.warningAnchor], mode: LevelModes.overlay };

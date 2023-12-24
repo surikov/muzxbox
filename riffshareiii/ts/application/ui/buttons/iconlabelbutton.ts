@@ -25,8 +25,8 @@ class IconLabelButton {
         this.label = { x: 0, y: 0, text: this.labels[this.selection], css: cssLabel }
         this.anchor = {
             xx: 0, yy: 0, ww: 111, hh: 111
-            , showZoom: zoomPrefixLevelsCSS[0].zoom
-            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].zoom
+            , showZoom: zoomPrefixLevelsCSS[0].minZoom
+            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom
             , content: [
                 this.bg
                 , this.label

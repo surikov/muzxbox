@@ -176,6 +176,13 @@ class CommandDispatcher {
         this.renderer.menu.resetAllAnchors();
     }
     ;
+    toggleLeftMenu() {
+        console.log('toggleLeftMenu');
+        this.renderer.leftBar.leftHide = !this.renderer.leftBar.leftHide;
+        let vw = this.renderer.tileLevelSVG.clientWidth / this.renderer.tiler.tapPxSize();
+        let vh = this.renderer.tileLevelSVG.clientHeight / this.renderer.tiler.tapPxSize();
+        this.renderer.leftBar.reShowLeftPanel(vw, vh);
+    }
     resetAnchor(parentSVGGroup, anchor, layerMode) {
         this.renderer.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
     }
@@ -220,16 +227,16 @@ class CommandDispatcher {
 }
 let commandDispatcher = new CommandDispatcher();
 let zoomPrefixLevelsCSS = [
-    { prefix: '025', zoom: 0.25 },
-    { prefix: '05', zoom: 0.5 },
-    { prefix: '1', zoom: 1 },
-    { prefix: '2', zoom: 2 },
-    { prefix: '4', zoom: 4 },
-    { prefix: '8', zoom: 8 },
-    { prefix: '16', zoom: 16 },
-    { prefix: '32', zoom: 32 },
-    { prefix: '64', zoom: 64 },
-    { prefix: '128', zoom: 128 }
+    { prefix: '025', minZoom: 0.25 },
+    { prefix: '05', minZoom: 0.5 },
+    { prefix: '1', minZoom: 1 },
+    { prefix: '2', minZoom: 2 },
+    { prefix: '4', minZoom: 4 },
+    { prefix: '8', minZoom: 8 },
+    { prefix: '16', minZoom: 16 },
+    { prefix: '32', minZoom: 32 },
+    { prefix: '64', minZoom: 64 },
+    { prefix: '128', minZoom: 128 }
 ];
 class UIRenderer {
     constructor() {
@@ -256,7 +263,7 @@ class UIRenderer {
         this.mixer = new MixerUI();
         let me = this;
         layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.createMixerLayers(), this.warning.allLayers(), this.timeselectbar.createTimeScale(), this.leftBar.createLeftPanel());
-        this.tiler.initRun(this.tileLevelSVG, false, 1, 1, zoomPrefixLevelsCSS[0].zoom, zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].zoom, zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom - 1, layers);
+        this.tiler.initRun(this.tileLevelSVG, false, 1, 1, zoomPrefixLevelsCSS[0].minZoom, zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].minZoom, zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom - 1, layers);
         this.tiler.setAfterZoomCallback(() => {
             if (this.menu) {
                 this.menu.lastZ = this.tiler.getCurrentPointPosition().z;
@@ -279,8 +286,9 @@ class UIRenderer {
         this.warning.resizeDialog(vw, vh);
         this.timeselectbar.fillTimeBar(data);
         this.timeselectbar.resizeTimeScale(vw, vh);
-        this.tiler.resetModel();
         this.leftBar.resizeHeaders(mixm.mixerHeight(), vw, vh, this.tiler.getCurrentPointPosition().z);
+        this.leftBar.fillTrackHeaders(data);
+        this.tiler.resetModel();
     }
     onReSizeView() {
         let mixH = 1;
@@ -344,8 +352,8 @@ class TimeSelectBar {
         this.selectionBarSVGGroup = document.getElementById("timeselectbar");
         this.selectBarAnchor = {
             xx: 0, yy: 0, ww: 1, hh: 1,
-            showZoom: zoomPrefixLevelsCSS[0].zoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            showZoom: zoomPrefixLevelsCSS[0].minZoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: []
         };
         this.selectionBarLayer = {
@@ -361,37 +369,37 @@ class TimeSelectBar {
     }
     addMarks7(barnum, barLeft, curBar, measureAnchor) {
         if (barnum % 8 == 0) {
-            this.createBarMark(barLeft, zoomPrefixLevelsCSS[7].zoom * 0.25, zoomPrefixLevelsCSS[7].zoom * 2, measureAnchor);
-            this.createBarNumber(barLeft, zoomPrefixLevelsCSS[7].zoom * 2, barnum, 7, curBar, measureAnchor);
+            this.createBarMark(barLeft, zoomPrefixLevelsCSS[7].minZoom * 0.25, zoomPrefixLevelsCSS[7].minZoom * 2, measureAnchor);
+            this.createBarNumber(barLeft, zoomPrefixLevelsCSS[7].minZoom * 2, barnum, 7, curBar, measureAnchor);
         }
     }
     addMarks6(barnum, barLeft, curBar, measureAnchor) {
         if (barnum % 4 == 0) {
-            this.createBarMark(barLeft, zoomPrefixLevelsCSS[6].zoom * 0.25, zoomPrefixLevelsCSS[6].zoom * 2, measureAnchor);
-            this.createBarNumber(barLeft, zoomPrefixLevelsCSS[6].zoom * 2, barnum, 6, curBar, measureAnchor);
+            this.createBarMark(barLeft, zoomPrefixLevelsCSS[6].minZoom * 0.25, zoomPrefixLevelsCSS[6].minZoom * 2, measureAnchor);
+            this.createBarNumber(barLeft, zoomPrefixLevelsCSS[6].minZoom * 2, barnum, 6, curBar, measureAnchor);
         }
     }
     addMarks5(barnum, barLeft, curBar, measureAnchor) {
         if (barnum % 2 == 0) {
-            this.createBarMark(barLeft, zoomPrefixLevelsCSS[5].zoom * 0.25, zoomPrefixLevelsCSS[5].zoom * 2, measureAnchor);
-            this.createBarNumber(barLeft, zoomPrefixLevelsCSS[5].zoom * 2, barnum, 5, curBar, measureAnchor);
+            this.createBarMark(barLeft, zoomPrefixLevelsCSS[5].minZoom * 0.25, zoomPrefixLevelsCSS[5].minZoom * 2, measureAnchor);
+            this.createBarNumber(barLeft, zoomPrefixLevelsCSS[5].minZoom * 2, barnum, 5, curBar, measureAnchor);
         }
     }
     addMarks4(duRatio, barnum, barLeft, curBar, measureAnchor) {
-        this.createBarMark(barLeft, zoomPrefixLevelsCSS[4].zoom * 0.25, zoomPrefixLevelsCSS[4].zoom * 2, measureAnchor);
-        this.createBarNumber(barLeft, zoomPrefixLevelsCSS[4].zoom * 2, barnum, 4, curBar, measureAnchor);
-        this.createBarMark(barLeft + MZMM().set({ count: 1, part: 2 }).duration(curBar.tempo) * duRatio, zoomPrefixLevelsCSS[4].zoom * 0.1, zoomPrefixLevelsCSS[4].zoom * 2, measureAnchor);
+        this.createBarMark(barLeft, zoomPrefixLevelsCSS[4].minZoom * 0.25, zoomPrefixLevelsCSS[4].minZoom * 2, measureAnchor);
+        this.createBarNumber(barLeft, zoomPrefixLevelsCSS[4].minZoom * 2, barnum, 4, curBar, measureAnchor);
+        this.createBarMark(barLeft + MZMM().set({ count: 1, part: 2 }).duration(curBar.tempo) * duRatio, zoomPrefixLevelsCSS[4].minZoom * 0.1, zoomPrefixLevelsCSS[4].minZoom * 2, measureAnchor);
     }
     addMarks3minus(duRatio, zoomidx, barnum, barLeft, curBar, measureAnchor) {
-        this.createBarMark(barLeft, zoomPrefixLevelsCSS[zoomidx].zoom * 0.25, zoomPrefixLevelsCSS[zoomidx].zoom * 2, measureAnchor);
-        this.createBarNumber(barLeft, zoomPrefixLevelsCSS[zoomidx].zoom * 2, barnum, zoomidx, curBar, measureAnchor);
+        this.createBarMark(barLeft, zoomPrefixLevelsCSS[zoomidx].minZoom * 0.25, zoomPrefixLevelsCSS[zoomidx].minZoom * 2, measureAnchor);
+        this.createBarNumber(barLeft, zoomPrefixLevelsCSS[zoomidx].minZoom * 2, barnum, zoomidx, curBar, measureAnchor);
         let st16 = MZMM().set({ count: 1, part: 16 });
         let cntr8 = st16;
         while (cntr8.less(curBar.metre)) {
-            this.createBarMark(barLeft + cntr8.duration(curBar.tempo) * duRatio, zoomPrefixLevelsCSS[zoomidx].zoom * 0.1, zoomPrefixLevelsCSS[zoomidx].zoom * 1, measureAnchor);
+            this.createBarMark(barLeft + cntr8.duration(curBar.tempo) * duRatio, zoomPrefixLevelsCSS[zoomidx].minZoom * 0.1, zoomPrefixLevelsCSS[zoomidx].minZoom * 1, measureAnchor);
             cntr8 = cntr8.plus(st16);
         }
-        this.createBarMark(barLeft + MZMM().set({ count: 1, part: 2 }).duration(curBar.tempo) * duRatio, zoomPrefixLevelsCSS[zoomidx].zoom * 0.1, zoomPrefixLevelsCSS[zoomidx].zoom * 2, measureAnchor);
+        this.createBarMark(barLeft + MZMM().set({ count: 1, part: 2 }).duration(curBar.tempo) * duRatio, zoomPrefixLevelsCSS[zoomidx].minZoom * 0.1, zoomPrefixLevelsCSS[zoomidx].minZoom * 2, measureAnchor);
     }
     createBarMark(barLeft, width, height, measureAnchor) {
         let mark = { x: barLeft, y: 0, w: width, h: height, css: 'timeMeasureMark' };
@@ -416,15 +424,14 @@ class TimeSelectBar {
         measureAnchor.content.push(mtr);
     }
     fillTimeBar(data) {
-        console.log('fillTimeBar', data.timeline);
         let mixm = new MixerDataMath(data);
         this.selectBarAnchor.ww = mixm.mixerWidth();
         this.selectBarAnchor.hh = mixm.mixerHeight();
         this.zoomAnchors = [];
         for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
             let selectLevelAnchor = {
-                showZoom: zoomPrefixLevelsCSS[zz].zoom,
-                hideZoom: zoomPrefixLevelsCSS[zz + 1].zoom,
+                showZoom: zoomPrefixLevelsCSS[zz].minZoom,
+                hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
                 xx: 0, yy: 0, ww: mixm.mixerWidth(), hh: mixm.mixerHeight(), content: [],
                 id: 'time' + (zz + Math.random())
             };
@@ -436,8 +443,8 @@ class TimeSelectBar {
                 let curMeasureMeter = mm.set(curBar.metre);
                 let barWidth = curMeasureMeter.duration(curBar.tempo) * data.theme.widthDurationRatio;
                 let measureAnchor = {
-                    showZoom: zoomPrefixLevelsCSS[zz].zoom,
-                    hideZoom: zoomPrefixLevelsCSS[zz + 1].zoom,
+                    showZoom: zoomPrefixLevelsCSS[zz].minZoom,
+                    hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
                     xx: barLeft, yy: 0, ww: barWidth, hh: 1234, content: [],
                     id: 'measure' + (kk + Math.random())
                 };
@@ -482,12 +489,13 @@ class UIToolbar {
         this.headButton = new ToolBarButton([icon_openleft, icon_closeleft], 0, -1, (nn) => {
             console.log('headButton', nn);
             commandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
+            commandDispatcher.toggleLeftMenu();
         });
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
         this.toolBarAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111,
-            showZoom: zoomPrefixLevelsCSS[0].zoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            showZoom: zoomPrefixLevelsCSS[0].minZoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
                 this.playPauseButton.iconLabelButton.anchor,
                 this.menuButton.iconLabelButton.anchor,
@@ -569,8 +577,8 @@ class RightMenuPanel {
         });
         this.backgroundAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111,
-            showZoom: zoomPrefixLevelsCSS[0].zoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            showZoom: zoomPrefixLevelsCSS[0].minZoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
                 this.listingShadow,
                 this.backgroundRectangle
@@ -578,22 +586,22 @@ class RightMenuPanel {
         };
         this.contentAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111,
-            showZoom: zoomPrefixLevelsCSS[0].zoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            showZoom: zoomPrefixLevelsCSS[0].minZoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [], id: 'rightMenuContentAnchor'
         };
         this.interAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0,
-            showZoom: zoomPrefixLevelsCSS[0].zoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            showZoom: zoomPrefixLevelsCSS[0].minZoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
                 this.dragHandler
             ], id: 'rightMenuInteractionAnchor'
         };
         this.buttonsAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0,
-            showZoom: zoomPrefixLevelsCSS[0].zoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            showZoom: zoomPrefixLevelsCSS[0].minZoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
                 this.menuCloseButton.anchor, this.menuUpButton.anchor
             ]
@@ -920,8 +928,8 @@ class RightMenuItem {
     buildTile(itemTop, itemWidth) {
         this.top = itemTop;
         let anchor = { xx: 0, yy: itemTop, ww: 111, hh: 111,
-            showZoom: zoomPrefixLevelsCSS[0].zoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            showZoom: zoomPrefixLevelsCSS[0].minZoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [] };
         if (this.focused) {
             anchor.content.push({ x: itemWidth - 0.2, y: itemTop + 0.02, w: 0.2, h: this.calculateHeight() - 0.02, css: 'rightMenuFocusedDelimiter' });
@@ -1142,18 +1150,47 @@ let testMenuData = [
 ];
 class LeftBar {
     constructor() {
+        this.backgrounds = [];
+        this.zoomAnchors = [];
+        this.projectTitles = [];
+        this.leftHide = true;
+    }
+    reShowLeftPanel(viewWidth, viewHeight) {
+        console.log(this.leftHide, viewWidth, viewHeight, this.leftBarAnchor);
+        if (this.leftHide) {
+            this.leftBarAnchor.translation = { x: 0, y: -this.leftBarAnchor.hh };
+        }
+        else {
+            this.leftBarAnchor.translation = { x: 0, y: 0 };
+        }
     }
     createLeftPanel() {
         this.leftLayerZoom = document.getElementById("leftLayerZoom");
-        this.backgroundRectangle = { x: 0, y: 0, w: 25, h: 5, css: 'debug' };
         this.leftBarAnchor = {
             xx: 0, yy: 0, ww: 1, hh: 1,
-            showZoom: zoomPrefixLevelsCSS[0].zoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
-            content: [
-                this.backgroundRectangle
-            ]
+            showZoom: zoomPrefixLevelsCSS[0].minZoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            content: [],
+            id: 'leftBarAnchor'
         };
+        for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
+            let bg = { x: 0, y: 0, w: 5 * zoomPrefixLevelsCSS[zz].minZoom, h: 55, css: 'leftPanelBG', id: 'hdbg' + (zz + Math.random()) };
+            this.backgrounds.push(bg);
+            let protitle = {
+                x: 0, y: 22, text: 'jdfnvsn dyd y dtyj dtyjftyjr vf',
+                css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
+            };
+            this.projectTitles.push(protitle);
+            let anchor = {
+                xx: 0, yy: 0, ww: 1, hh: 1,
+                showZoom: zoomPrefixLevelsCSS[zz].minZoom,
+                hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
+                content: [bg, protitle],
+                id: 'head' + (zz + Math.random())
+            };
+            this.zoomAnchors.push(anchor);
+            this.leftBarAnchor.content.push(anchor);
+        }
         this.selectionBarLayer = {
             g: this.leftLayerZoom, anchors: [
                 this.leftBarAnchor
@@ -1162,15 +1199,24 @@ class LeftBar {
         return [this.selectionBarLayer];
     }
     resizeHeaders(mixerH, viewWidth, viewHeight, tz) {
-        console.log('resizeHeaders', viewWidth, viewHeight, tz, mixerH);
-        let rh = viewHeight * 127;
+        let rh = viewHeight * zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom - 1;
         let ry = -(rh - mixerH) / 2;
-        this.backgroundRectangle.y = ry;
-        this.backgroundRectangle.h = rh;
         this.leftBarAnchor.yy = ry;
         this.leftBarAnchor.hh = rh;
-        console.log(this.backgroundRectangle);
-        console.log(this.leftBarAnchor);
+        for (let ii = 0; ii < this.zoomAnchors.length; ii++) {
+            this.zoomAnchors[ii].yy = ry;
+            this.zoomAnchors[ii].hh = rh;
+            this.backgrounds[ii].y = ry;
+            this.backgrounds[ii].h = rh;
+        }
+        this.reShowLeftPanel(viewWidth, viewHeight);
+    }
+    fillTrackHeaders(data) {
+        let mixm = new MixerDataMath(data);
+        for (let ii = 0; ii < this.projectTitles.length; ii++) {
+            this.projectTitles[ii].y = mixm.gridTop();
+            this.projectTitles[ii].text = data.title;
+        }
     }
 }
 class BarOctave {
@@ -1178,7 +1224,7 @@ class BarOctave {
         this.barRightBorder = {
             x: left + width,
             y: top,
-            w: zoomPrefixLevelsCSS[zoomLevel].zoom / 8.0,
+            w: zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0,
             h: height - 1.5,
             css: 'mixPanelFill'
         };
@@ -1186,7 +1232,7 @@ class BarOctave {
             x: left,
             y: top + height,
             w: width - 1.5,
-            h: zoomPrefixLevelsCSS[zoomLevel].zoom / 8.0,
+            h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0,
             css: 'mixToolbarFill'
         };
         anchor.content.push(this.barRightBorder);
@@ -1231,8 +1277,8 @@ class MixerBar {
         let h12 = 12 * data.theme.notePathHeight;
         for (let oo = 0; oo < data.theme.octaveCount; oo++) {
             let barOctaveAnchor = {
-                showZoom: zoomPrefixLevelsCSS[this.zoomLevel].zoom,
-                hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].zoom,
+                showZoom: zoomPrefixLevelsCSS[this.zoomLevel].minZoom,
+                hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].minZoom,
                 xx: left,
                 yy: mixm.gridTop() + oo * h12,
                 ww: ww,
@@ -1264,8 +1310,8 @@ class MixerUI {
         this.zoomLayer = { g: svg, anchors: [], mode: LevelModes.normal };
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             let mixerLevelAnchor = {
-                showZoom: zoomPrefixLevelsCSS[ii].zoom,
-                hideZoom: zoomPrefixLevelsCSS[ii + 1].zoom,
+                showZoom: zoomPrefixLevelsCSS[ii].minZoom,
+                hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
                 xx: 0, yy: 0, ww: 1, hh: 1, content: [],
                 id: 'mix' + (ii + Math.random())
             };
@@ -1280,16 +1326,10 @@ class MixerZoomLevel {
         this.zoomLevelIndex = zoomLevel;
         this.zoomAnchor = anchor;
         this.zoomAnchor.content = [];
-        this.projectTitle = { x: 0, y: 1, text: 'Text label for testing of middle size project title', css: 'projectTitle' };
-        this.trackTitle = { x: 0, y: 1, text: 'Text label for testing of middle size project title', css: 'trackTitle' };
     }
     reCreateBars(data) {
         let mixm = new MixerDataMath(data);
-        this.zoomAnchor.content = [this.projectTitle, this.trackTitle];
-        this.trackTitle.y = mixm.gridTop();
-        this.trackTitle.text = data.tracks[0].title;
-        this.projectTitle.y = mixm.gridTop() * 0.9;
-        this.projectTitle.text = data.title;
+        this.zoomAnchor.content = [];
         this.bars = [];
         let left = mixm.LeftPad;
         let width = 0;
@@ -1298,8 +1338,8 @@ class MixerZoomLevel {
             let timebar = data.timeline[ii];
             width = MZMM().set(timebar.metre).duration(timebar.tempo) * data.theme.widthDurationRatio;
             let barAnchor = {
-                showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].zoom,
-                hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].zoom,
+                showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom,
+                hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
                 xx: left,
                 yy: mixm.gridTop(),
                 ww: width,
@@ -1335,8 +1375,8 @@ class IconLabelButton {
         this.label = { x: 0, y: 0, text: this.labels[this.selection], css: cssLabel };
         this.anchor = {
             xx: 0, yy: 0, ww: 111, hh: 111,
-            showZoom: zoomPrefixLevelsCSS[0].zoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            showZoom: zoomPrefixLevelsCSS[0].minZoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
                 this.bg,
                 this.label,
@@ -1379,8 +1419,8 @@ class DebugLayerUI {
         this.debugGroup = document.getElementById("debugLayer");
         this.debugAnchor = {
             xx: 0, yy: 0, ww: 1, hh: 1,
-            showZoom: zoomPrefixLevelsCSS[0].zoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom,
+            showZoom: zoomPrefixLevelsCSS[0].minZoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: []
         };
         this.debugLayer = {
@@ -1415,8 +1455,8 @@ class WarningUI {
         this.warningRectangle = { x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: this.cancel.bind(this) };
         this.warningAnchor = {
             id: 'warningAnchor', xx: 0, yy: 0, ww: 1, hh: 1,
-            showZoom: zoomPrefixLevelsCSS[0].zoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom + 1,
+            showZoom: zoomPrefixLevelsCSS[0].minZoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1,
             content: [this.warningRectangle, this.warningIcon, this.warningTitle, this.warningDescription]
         };
         this.warningLayer = { g: this.warningGroup, anchors: [this.warningAnchor], mode: LevelModes.overlay };

@@ -29,6 +29,7 @@ declare class CommandDispatcher {
     initAudioFromUI(): void;
     registerUI(renderer: UIRenderer): void;
     showRightMenu(): void;
+    toggleLeftMenu(): void;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     changeTapSize(ratio: number): void;
     resetProject(data: MZXBX_Project): void;
@@ -37,7 +38,7 @@ declare class CommandDispatcher {
 declare let commandDispatcher: CommandDispatcher;
 declare let zoomPrefixLevelsCSS: {
     prefix: string;
-    zoom: number;
+    minZoom: number;
 }[];
 declare class UIRenderer {
     toolbar: UIToolbar;
@@ -193,10 +194,15 @@ declare class LeftBar {
     selectionBarLayer: TileLayerDefinition;
     leftLayerZoom: SVGElement;
     leftBarAnchor: TileAnchor;
-    backgroundRectangle: TileRectangle;
+    backgrounds: TileRectangle[];
+    zoomAnchors: TileAnchor[];
+    projectTitles: TileText[];
+    leftHide: boolean;
     constructor();
+    reShowLeftPanel(viewWidth: number, viewHeight: number): void;
     createLeftPanel(): TileLayerDefinition[];
     resizeHeaders(mixerH: number, viewWidth: number, viewHeight: number, tz: number): void;
+    fillTrackHeaders(data: MZXBX_Project): void;
 }
 declare class BarOctave {
     barRightBorder: TileRectangle;
@@ -223,8 +229,6 @@ declare class MixerZoomLevel {
     zoomAnchor: TileAnchor;
     bars: MixerBar[];
     zoomLevelIndex: number;
-    projectTitle: TileText;
-    trackTitle: TileText;
     constructor(zoomLevel: number, anchor: TileAnchor);
     reCreateBars(data: MZXBX_Project): void;
 }

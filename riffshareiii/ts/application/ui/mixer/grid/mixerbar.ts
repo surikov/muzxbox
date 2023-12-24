@@ -16,8 +16,8 @@ class MixerBar {
 		let h12 = 12 * data.theme.notePathHeight;
 		for (let oo = 0; oo < data.theme.octaveCount; oo++) {
 			let barOctaveAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[this.zoomLevel].zoom
-				, hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].zoom
+				showZoom: zoomPrefixLevelsCSS[this.zoomLevel].minZoom
+				, hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].minZoom
 				, xx: left
 				, yy: mixm.gridTop() + oo * h12
 				, ww: ww

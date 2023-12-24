@@ -2,25 +2,25 @@ class MixerZoomLevel {
 	zoomAnchor: TileAnchor;
 	bars: MixerBar[];
 	zoomLevelIndex: number;
-	projectTitle: TileText;
-	trackTitle: TileText;
+	//projectTitle: TileText;
+	//trackTitle: TileText;
 	constructor(zoomLevel: number, anchor: TileAnchor) {
 		this.zoomLevelIndex = zoomLevel;
 		this.zoomAnchor = anchor;
 		this.zoomAnchor.content = [];
-		this.projectTitle = { x: 0, y: 1, text: 'Text label for testing of middle size project title', css: 'projectTitle' };
-		this.trackTitle = { x: 0, y: 1, text: 'Text label for testing of middle size project title', css: 'trackTitle' };
+		//this.projectTitle = { x: 0, y: 1, text: 'Text label for testing of middle size project title', css: 'projectTitle' };
+		//this.trackTitle = { x: 0, y: 1, text: 'Text label for testing of middle size project title', css: 'trackTitle' };
 	}
 	reCreateBars(data: MZXBX_Project) {
 		//console.log('resetBars', ww, hh);
 		let mixm: MixerDataMath = new MixerDataMath(data);
-		this.zoomAnchor.content = [this.projectTitle,this.trackTitle];
+		this.zoomAnchor.content = [];//this.projectTitle,this.trackTitle];
 
-		this.trackTitle.y = mixm.gridTop();
-		this.trackTitle.text = data.tracks[0].title;
+		//this.trackTitle.y = mixm.gridTop();
+		//this.trackTitle.text = data.tracks[0].title;
 
-		this.projectTitle.y = mixm.gridTop()*0.9;
-		this.projectTitle.text = data.title;
+		//this.projectTitle.y = mixm.gridTop()*0.9;
+		//this.projectTitle.text = data.title;
 
 		this.bars = [];
 		let left = mixm.LeftPad;
@@ -30,8 +30,8 @@ class MixerZoomLevel {
 			let timebar = data.timeline[ii];
 			width = MZMM().set(timebar.metre).duration(timebar.tempo) * data.theme.widthDurationRatio;
 			let barAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].zoom
-				, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].zoom
+				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom
+				, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
 				, xx: left
 				, yy: mixm.gridTop()
 				, ww: width

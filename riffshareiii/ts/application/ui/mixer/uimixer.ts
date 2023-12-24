@@ -23,8 +23,8 @@ class MixerUI {
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             //this.svgs.push((document.getElementById(zoomPrefixLevelsCSS[ii].svg) as any) as SVGElement);
             let mixerLevelAnchor: TileAnchor = {
-                showZoom: zoomPrefixLevelsCSS[ii].zoom
-                , hideZoom: zoomPrefixLevelsCSS[ii + 1].zoom
+                showZoom: zoomPrefixLevelsCSS[ii].minZoom
+                , hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom
                 , xx: 0, yy: 0, ww: 1, hh: 1, content: []
                 , id: 'mix' + (ii + Math.random())
             };

@@ -10,18 +10,18 @@ type RenderedLayers = RenderedPart & {
 };
 */
 let zoomPrefixLevelsCSS: {
-	prefix: string, zoom: number//, svg: string 
+	prefix: string, minZoom: number//, svg: string 
 }[] = [
-		{ prefix: '025', zoom: 0.25 }//0
-		, { prefix: '05', zoom: 0.5 }//1
-		, { prefix: '1', zoom: 1 }//2
-		, { prefix: '2', zoom: 2 }//3
-		, { prefix: '4', zoom: 4 }//4
-		, { prefix: '8', zoom: 8 }//5
-		, { prefix: '16', zoom: 16 }//6
-		, { prefix: '32', zoom: 32 }//7
-		, { prefix: '64', zoom: 64 }//8
-		, { prefix: '128', zoom: 128 }//9
+		{ prefix: '025', minZoom: 0.25 }//0
+		, { prefix: '05', minZoom: 0.5 }//1
+		, { prefix: '1', minZoom: 1 }//2
+		, { prefix: '2', minZoom: 2 }//3
+		, { prefix: '4', minZoom: 4 }//4
+		, { prefix: '8', minZoom: 8 }//5
+		, { prefix: '16', minZoom: 16 }//6
+		, { prefix: '32', minZoom: 32 }//7
+		, { prefix: '64', minZoom: 64 }//8
+		, { prefix: '128', minZoom: 128 }//9
 		//, { prefix: '256', zoom: 256,svg:'tracksLayerZoom025' }//10
 	];
 class UIRenderer {//} implements RenderedPart {
@@ -96,9 +96,9 @@ class UIRenderer {//} implements RenderedPart {
 			, false
 			, 1
 			, 1
-			, zoomPrefixLevelsCSS[0].zoom
-			, zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].zoom
-			, zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].zoom - 1
+			, zoomPrefixLevelsCSS[0].minZoom
+			, zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].minZoom
+			, zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom - 1
 			, layers);
 		//console.log('tap size', this.tiler.tapPxSize());
 		this.tiler.setAfterZoomCallback(() => {
@@ -135,11 +135,15 @@ class UIRenderer {//} implements RenderedPart {
 
 
 		this.timeselectbar.fillTimeBar(data);
-		this.timeselectbar.resizeTimeScale(vw, vh);
+        this.timeselectbar.resizeTimeScale(vw, vh);
+        
+        this.leftBar.resizeHeaders(mixm.mixerHeight(), vw, vh, this.tiler.getCurrentPointPosition().z);
+        this.leftBar.fillTrackHeaders(data);
 
-		this.tiler.resetModel();
+        this.tiler.resetModel();
+        
 		//console.log('fillWholeUI',this.tiler);
-		this.leftBar.resizeHeaders(mixm.mixerHeight(), vw, vh, this.tiler.getCurrentPointPosition().z);
+		
 	}
 	onReSizeView() {
 		//console.log('onReSizeView');

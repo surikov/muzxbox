@@ -180,3 +180,6 @@ body,
 	fill: var(--color-focus);
     stroke: none;
 }
+.leftPanelBG{
+    fill: color-mix(in lab, transparent 15%, var(--color-panel))
+}
