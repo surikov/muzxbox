@@ -177,7 +177,6 @@ class CommandDispatcher {
     }
     ;
     toggleLeftMenu() {
-        console.log('toggleLeftMenu');
         this.renderer.leftBar.leftHide = !this.renderer.leftBar.leftHide;
         let vw = this.renderer.tileLevelSVG.clientWidth / this.renderer.tiler.tapPxSize();
         let vh = this.renderer.tileLevelSVG.clientHeight / this.renderer.tiler.tapPxSize();
@@ -263,7 +262,7 @@ class UIRenderer {
         this.mixer = new MixerUI();
         let me = this;
         layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.createMixerLayers(), this.warning.allLayers(), this.timeselectbar.createTimeScale(), this.leftBar.createLeftPanel());
-        this.tiler.initRun(this.tileLevelSVG, false, 1, 1, zoomPrefixLevelsCSS[0].minZoom, zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].minZoom, zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom - 1, layers);
+        this.tiler.initRun(this.tileLevelSVG, true, 1, 1, zoomPrefixLevelsCSS[0].minZoom, zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].minZoom, zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom - 1, layers);
         this.tiler.setAfterZoomCallback(() => {
             if (this.menu) {
                 this.menu.lastZ = this.tiler.getCurrentPointPosition().z;
@@ -481,13 +480,12 @@ class UIToolbar {
             console.log('playPauseButton', nn);
             commandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
         });
-        this.menuButton = new ToolBarButton([icon_openmenu], 0, 1, (nn) => {
+        this.menuButton = new ToolBarButton([icon_ver_menu], 0, 1, (nn) => {
             console.log('menuButton', nn);
             commandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
             commandDispatcher.showRightMenu();
         });
         this.headButton = new ToolBarButton([icon_openleft, icon_closeleft], 0, -1, (nn) => {
-            console.log('headButton', nn);
             commandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
             commandDispatcher.toggleLeftMenu();
         });
@@ -510,7 +508,6 @@ class UIToolbar {
         return [this.toolBarLayer];
     }
     resizeToolbar(viewWIdth, viewHeight) {
-        let shn = 0.05;
         this.toolBarAnchor.xx = 0;
         this.toolBarAnchor.yy = 0;
         this.toolBarAnchor.ww = viewWIdth;
@@ -1152,62 +1149,81 @@ class LeftBar {
     constructor() {
         this.backgrounds = [];
         this.zoomAnchors = [];
+        this.titlesAnchors = [];
         this.projectTitles = [];
+        this.editProjectTitles = [];
         this.leftHide = true;
+        this.panelWidth = 5;
     }
     reShowLeftPanel(viewWidth, viewHeight) {
-        console.log(this.leftHide, viewWidth, viewHeight, this.leftBarAnchor);
         if (this.leftHide) {
-            this.leftBarAnchor.translation = { x: 0, y: -this.leftBarAnchor.hh };
+            this.leftBarContentAnchor.translation = { x: 0, y: -this.leftBarContentAnchor.hh };
+            this.titlesLeftBar.translation = { x: 0, y: 0 };
         }
         else {
-            this.leftBarAnchor.translation = { x: 0, y: 0 };
+            this.leftBarContentAnchor.translation = { x: 0, y: 0 };
+            this.titlesLeftBar.translation = { x: 0, y: -this.leftBarContentAnchor.hh };
         }
     }
     createLeftPanel() {
         this.leftLayerZoom = document.getElementById("leftLayerZoom");
-        this.leftBarAnchor = {
+        this.leftBarContentAnchor = {
             xx: 0, yy: 0, ww: 1, hh: 1,
             showZoom: zoomPrefixLevelsCSS[0].minZoom,
             hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [],
-            id: 'leftBarAnchor'
+            id: 'leftBarContentAnchor'
+        };
+        this.titlesLeftBar = {
+            xx: 0, yy: 0, ww: 1, hh: 1,
+            showZoom: zoomPrefixLevelsCSS[0].minZoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            content: [],
+            id: 'titlesLeftBar'
         };
         for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
-            let bg = { x: 0, y: 0, w: 5 * zoomPrefixLevelsCSS[zz].minZoom, h: 55, css: 'leftPanelBG', id: 'hdbg' + (zz + Math.random()) };
+            let bg = { x: 0, y: 0, w: this.panelWidth * zoomPrefixLevelsCSS[zz].minZoom, h: 55, css: 'leftPanelBG', id: 'hdbg' + (zz + Math.random()) };
             this.backgrounds.push(bg);
-            let protitle = {
-                x: 0, y: 22, text: 'jdfnvsn dyd y dtyj dtyjftyjr vf',
-                css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
-            };
-            this.projectTitles.push(protitle);
-            let anchor = {
+            let edittitle = { x: this.panelWidth * zoomPrefixLevelsCSS[zz].minZoom, y: 22, text: 'Debug title string', css: 'leftBarProjectTitle' + zoomPrefixLevelsCSS[zz].prefix };
+            this.editProjectTitles.push(edittitle);
+            let zoomAnchor = {
                 xx: 0, yy: 0, ww: 1, hh: 1,
                 showZoom: zoomPrefixLevelsCSS[zz].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
-                content: [bg, protitle],
+                content: [bg, edittitle],
                 id: 'head' + (zz + Math.random())
             };
-            this.zoomAnchors.push(anchor);
-            this.leftBarAnchor.content.push(anchor);
+            this.zoomAnchors.push(zoomAnchor);
+            this.leftBarContentAnchor.content.push(zoomAnchor);
+            let protitle = { x: 0, y: 22, text: 'Debug title string', css: 'leftReadProjectTitle' + zoomPrefixLevelsCSS[zz].prefix };
+            this.projectTitles.push(protitle);
+            let titleAnchor = {
+                xx: 0, yy: 0, ww: 1, hh: 1,
+                showZoom: zoomPrefixLevelsCSS[zz].minZoom,
+                hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
+                content: [protitle],
+                id: 'title' + (zz + Math.random())
+            };
+            this.titlesAnchors.push(titleAnchor);
+            this.titlesLeftBar.content.push(titleAnchor);
         }
-        this.selectionBarLayer = {
-            g: this.leftLayerZoom, anchors: [
-                this.leftBarAnchor
-            ], mode: LevelModes.left
-        };
+        this.selectionBarLayer = { g: this.leftLayerZoom, anchors: [this.leftBarContentAnchor, this.titlesLeftBar], mode: LevelModes.left };
         return [this.selectionBarLayer];
     }
     resizeHeaders(mixerH, viewWidth, viewHeight, tz) {
         let rh = viewHeight * zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom - 1;
         let ry = -(rh - mixerH) / 2;
-        this.leftBarAnchor.yy = ry;
-        this.leftBarAnchor.hh = rh;
+        this.leftBarContentAnchor.yy = ry;
+        this.leftBarContentAnchor.hh = rh;
+        this.titlesLeftBar.yy = ry;
+        this.titlesLeftBar.hh = rh;
         for (let ii = 0; ii < this.zoomAnchors.length; ii++) {
             this.zoomAnchors[ii].yy = ry;
             this.zoomAnchors[ii].hh = rh;
             this.backgrounds[ii].y = ry;
             this.backgrounds[ii].h = rh;
+            this.titlesAnchors[ii].yy = ry;
+            this.titlesAnchors[ii].hh = rh;
         }
         this.reShowLeftPanel(viewWidth, viewHeight);
     }
@@ -1216,6 +1232,8 @@ class LeftBar {
         for (let ii = 0; ii < this.projectTitles.length; ii++) {
             this.projectTitles[ii].y = mixm.gridTop();
             this.projectTitles[ii].text = data.title;
+            this.editProjectTitles[ii].y = mixm.gridTop();
+            this.editProjectTitles[ii].text = data.title;
         }
     }
 }
@@ -1399,7 +1417,8 @@ class IconLabelButton {
 }
 let icon_play = '&#xf3aa;';
 let icon_pause = '&#xf3a7;';
-let icon_openmenu = '&#xf19c;';
+let icon_hor_menu = '&#xf19c;';
+let icon_ver_menu = '&#xf19b;';
 let icon_closemenu = '&#xf1ea;';
 let icon_closedbranch = '&#xf2f6;';
 let icon_openedbranch = '&#xf2f2;';
@@ -1410,6 +1429,7 @@ let icon_movedown = '&#xf2f9;';
 let icon_moveleft = '&#xf2fa;';
 let icon_moveright = '&#xf2fb;';
 let icon_warningPlay = '&#xf2f5;';
+let icon_gear = '&#xf1c6;';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];

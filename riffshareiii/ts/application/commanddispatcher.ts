@@ -19,7 +19,7 @@ class CommandDispatcher {
         this.renderer.menu.resetAllAnchors();
     };
     toggleLeftMenu() {
-        console.log('toggleLeftMenu');
+        //console.log('toggleLeftMenu');
         this.renderer.leftBar.leftHide=!this.renderer.leftBar.leftHide;
         let vw = this.renderer.tileLevelSVG.clientWidth / this.renderer.tiler.tapPxSize();
         let vh = this.renderer.tileLevelSVG.clientHeight / this.renderer.tiler.tapPxSize();

@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.77 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.78 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -172,7 +172,6 @@ function init() {
 	dataBalls = window[dataName];
 	console.log(dataBalls);
 	datarows = readParseStat(dataBalls);
-	//randomizedatarows();
 	console.log('datarows', datarows);
 }
 function randomizedatarows() {
@@ -227,7 +226,8 @@ function clickFog(vnt) {
 	drawLines();
 }
 function drawLines() {
-	//console.log('drawLines',markLines);
+
+
 	clearSVGgroup(linesLevel);
 	let strokeWidth = cellSize / 0.99;
 	for (let i = 0; i < markLines.length; i++) {
@@ -347,10 +347,6 @@ function calculateBallTriadChain(rowNum: number, rows: BallsRow[], counts: numbe
 				}
 			}
 		}
-
-		//one.logr = one.summ;
-		//if(log){one.logr = one.summ*one.summ;}
-		//console.log(rowNum,nn,one);
 	}
 	return resu;
 }
@@ -369,35 +365,6 @@ function calculateBallFrequency(rowNum: number, rows: BallsRow[]): { ball: numbe
 	return resu;
 }
 /*
-function calcRowPreFreqs(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
-	let w0 = 0;
-	let w1 = 100;
-	let w2 = 75;
-	let w3 = 50;
-	let w4 = 30;
-	let w5 = 10;
-	let sums = [
-		w4, w3, w2, w1, w1, w1, w2, w3, w4//
-		, w5, w4, w3, w2, w1, w2, w3, w4, w5//
-		, w5, w4, w4, w3, w3, w3, w4, w4, w5//
-		, w0, w5, w4, w4, w4, w4, w4, w5, w0//
-		, w0, w0, w5, w5, w5, w5, w5, w0, w0//
-	];
-	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
-	for (let nn = 0; nn < rowLen; nn++) {
-		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
-		resu.push(one);
-		if (rows.length > rowNum + 1 + calcLen) {
-			for (let ax = -4; ax <= 4; ax++) {
-				for (let ay = 0; ay < 5; ay++) {
-					let rr = sums[ax + 4 + 9 * ay];
-					if (ballExists(nn + ax + 1, rows[rowNum + ay + 1])) { one.logr = one.logr + rr; }
-				}
-			}
-		}
-	}
-	return resu;
-}*/
 function calculateEmptyColumnDuration(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
 	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
 	for (let nn = 0; nn < rowLen; nn++) {
@@ -412,13 +379,48 @@ function calculateEmptyColumnDuration(rowNum: number, rows: BallsRow[]): { ball:
 		one.logr = one.summ;
 	}
 	return resu;
+}*/
+function calcEmptyLineDuration(shift: number, ball: number, from: number, rows: BallsRow[]) {
+	let row = from;
+	let count = 0;
+	let balColumn = ball;
+	while ((!ballExists(balColumn, rows[row])) && row + 2 < rows.length) {
+		count++;
+		balColumn = balColumn + shift;
+		row++;
+	}
+	return count;
+}
+function countInfo(inrows: BallsRow[]) {
+	console.log('countInfo', inrows[0]);
+	for (let ii = 0; ii < rowLen; ii++) {
+		let cc = 0;
+		for (let shift = 5; shift <= 5; shift++) {
+			cc = cc + calcEmptyLineDuration(shift, ii + 1, 1, inrows);
+		}
+		let fl = '   ';
+		if (ballExists(ii + 1, inrows[0])) {
+			fl = ' * ';
+		}
+		console.log(ii + 1, fl, cc);
+	}
+	/*for (let shift = -3; shift <= 3; shift++) {
+		console.log(shift,':'
+			,calcEmptyLineDuration(shift, 1, 1, inrows)
+			, calcEmptyLineDuration(shift, 2, 1, inrows)
+			, calcEmptyLineDuration(shift, 3, 1, inrows)
+			, calcEmptyLineDuration(shift, 4, 1, inrows)
+			, calcEmptyLineDuration(shift, 5, 1, inrows)
+			, calcEmptyLineDuration(shift, 5, 1, inrows)
+			, calcEmptyLineDuration(shift, 7, 1, inrows)
+			, calcEmptyLineDuration(shift, 8, 1, inrows)
+			, calcEmptyLineDuration(shift, 9, 1, inrows)
+			, calcEmptyLineDuration(shift, 10, 1, inrows)
+			);
+	}*/
 }
 function dumpRowFills(inrows: BallsRow[]) {
-	//console.log('dumpRowFills',inrows);
-	/*if (reduceRatio == 1) {
-		dumpRowFillsColor(sliceRows(inrows, 2, 100+2), '#cccc0066',0.1);
-		dumpRowFillsColor(sliceRows(inrows, 1, 100 + 1), '#66cc0099', -0.1);
-	}*/
+	countInfo(inrows);
 	if (highLightMode == 1) {
 		dumpRowFillsColor(inrows, '#009900cc', 0);
 		dumpRowWaitColor(inrows, '#00000033', 0);
@@ -428,11 +430,9 @@ function dumpRowFills(inrows: BallsRow[]) {
 	}
 }
 function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
-	//let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
 	let arr: { ball: number, summ: number }[] = [];
 	var rowNum = 0;
 	for (let nn = 0; nn < rowLen; nn++) {
-		//let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
 		let one: { ball: number, summ: number } = { ball: nn + 1, summ: 0 };
 		arr.push(one);
 		for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
@@ -454,12 +454,6 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 		let hh = (mx - min - (arr[bb].summ - min)) / hr;
 		let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
 		let toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
-		/*markLines.push({ fromX: bb + shiftX-1
-			, fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
-			, toX: bb + shiftX
-			, toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
-			, color: color,manual:false
-		});*/
 		markLines.push({
 			fromX: bb + shiftX - 1
 			, fromY: fromY //skipRowsCount + 0 + prehh
@@ -467,12 +461,6 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 			, toY: toY //skipRowsCount + hh - 0
 			, color: color, manual: false
 		});
-		/*markLines.push({ fromX: bb + shiftX-1+ rowLen
-			, fromY: Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2
-			, toX: bb + shiftX+ rowLen
-			, toY: Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2
-			, color: color,manual:false
-		});*/
 		markLines.push({
 			fromX: bb + shiftX - 1 + rowLen
 			, fromY: fromY //skipRowsCount + 0 + prehh
@@ -482,14 +470,10 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 		});
 		prehh = hh;
 	}
-	//console.log(arr);
 }
 function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
-	//let oldReduceRatio = reduceRatio;
-	//let rows: BallsRow[] = sliceRows(inrows, 0, 100);
 	let precounts: number[] = calcRowPatterns(0 + 1, rows);
 	let ballFills: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = calculateBallTriadChain(0, rows, precounts);
-	//console.log('ballFills',ballFills);
 	let mx = 0;
 	let min = 987654321;
 	for (let bb = 0; bb < rowLen; bb++) {
@@ -518,35 +502,19 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 		});
 		prehh = hh;
 	}
-	//reduceRatio = oldReduceRatio;
-
 }
 function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 	let ratioPre = 0.66;//0.99;
-	/*if (highLightMode == 1) {
-		ratioPre = 0.66;
-	} else {
-		if (highLightMode == 2) {
-			ratioPre = 0.66;
-		}
-	}*/
-	console.log('dumpTriads', highLightMode);
+	//console.log('dumpTriads mode', highLightMode);
 	for (let rr = 0; rr < rowsVisibleCount; rr++) {
 		if (rr > rows.length - 6) break;
 		let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[];
-		//console.log(highLightMode);
-		//if (highLightMode == 2) {
-		//	calcs = calcRowPreFreqs(rr, rows);
-		//} else {
 		if (highLightMode == 1) {
-			//calcs = calculateEmptyColumnDuration(rr, rows);
 			calcs = calculateBallFrequency(rr, rows);
-
 		} else {
 			let precounts = calcRowPatterns(rr + 1, rows);
 			calcs = calculateBallTriadChain(rr, rows, precounts);
 		}
-		//}
 		let minCnt = 99999;
 		let mxCount = 0;
 		for (let ii = 0; ii < rowLen; ii++) {
@@ -571,7 +539,6 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 				, color);
 		}
 	}
-
 }
 function fillCells() {
 	clearSVGgroup(levelA);
@@ -580,19 +547,15 @@ function fillCells() {
 	dumpInfo(skipRowsCount);
 
 	drawStat3(levelA, slicedrows);
-	drawLines();
+	//drawLines();
 
 	var msgp: HTMLElement = (document.getElementById('stepsize') as any) as HTMLElement;
 	msgp.innerText = '' + reduceRatio;
 	msgp = (document.getElementById('calcLen') as any) as HTMLElement;
 	msgp.innerText = '' + calcLen;
-	//calcRatios(slicedrows);
-	//console.log('fillCells');
 }
 function clickHop() {
 	skipRowsCount = Math.round(Math.random() * (datarows.length - reduceRatio * rowsVisibleCount));
-	//showFirstRow=false;
-	//fillCells();
 	addTails();
 }
 function toggleFirst() {
@@ -600,7 +563,6 @@ function toggleFirst() {
 	fillCells();
 }
 function clickGoSkip(nn: number) {
-	//console.log('clickGoSkip', nn, nn * reduceRatio, skipRowsCount, datarows.length);
 	if (skipRowsCount + nn * reduceRatio >= 0) {
 		if (skipRowsCount + nn * reduceRatio < datarows.length - rowsVisibleCount * reduceRatio) {
 			skipRowsCount = skipRowsCount + nn * reduceRatio;
@@ -608,7 +570,6 @@ function clickGoSkip(nn: number) {
 				markLines[i].fromY = markLines[i].fromY + nn * (reduceRatio - 1);
 				markLines[i].toY = markLines[i].toY + nn * (reduceRatio - 1);
 			}
-			//fillCells();
 			addTails();
 		}
 	}
@@ -618,35 +579,25 @@ function toggleRatioPre() {
 		highLightMode = 1;
 	} else {
 		highLightMode = 0;
-		//if (highLightMode == 1) {
-		//    highLightMode = 2;
-		//} else {
-		//    highLightMode = 0;
-		//}
 	}
-	//fillCells();
 	addTails();
 }
 function moreReduceRatio() {
 	reduceRatio = reduceRatio + 1;
 	addTails();
-	//fillCells();
 }
 function lessReduceRatio() {
 	reduceRatio = reduceRatio - 1;
 	if (reduceRatio < 1) reduceRatio = 1;
-	//fillCells();
 	addTails();
 }
 function moreCalcLen() {
 	calcLen = calcLen + 1;
-	//fillCells();
 	addTails();
 }
 function lessCalcLen() {
 	calcLen = calcLen - 1;
 	if (calcLen < 3) calcLen = 3;
-	//fillCells();
 	addTails();
 }
 
@@ -670,377 +621,13 @@ function sobstvennoe(balls: number[]): number {
 	return r0;
 }
 function addTails() {
-	//markLines = [];
 	clearNonManual();
 	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
-	/*let firsts: number[] = [];
-	for (let ii = 1; ii < slicedrows.length - 1 - 1 - 1; ii++) {
-		if (slicedrows[ii + 1]) {
-			firsts.splice(0, 0, 100 + slicedrows[ii].balls[0]);
-			markLines.push({
-				fromX: slicedrows[ii].balls[0] - 1
-				, fromY: Math.round(topShift / cellSize) + skipRowsCount + ii
-				, toX: slicedrows[ii + 1].balls[0] - 1
-				, toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
-			});
-			markLines.push({
-				fromX: slicedrows[ii].balls[ballsInRow - 1] - 1
-				, fromY: Math.round(topShift / cellSize) + skipRowsCount + ii
-				, toX: slicedrows[ii + 1].balls[ballsInRow - 1] - 1
-				, toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
-			});
-			markLines.push({
-				fromX: slicedrows[ii].balls[0] - 1 + rowLen
-				, fromY: Math.round(topShift / cellSize) + skipRowsCount + ii
-				, toX: slicedrows[ii + 1].balls[0] - 1 + rowLen
-				, toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
-			});
-			markLines.push({
-				fromX: slicedrows[ii].balls[ballsInRow - 1] - 1 + rowLen
-				, fromY: Math.round(topShift / cellSize) + skipRowsCount + ii
-				, toX: slicedrows[ii + 1].balls[ballsInRow - 1] - 1 + rowLen
-				, toY: Math.round(topShift / cellSize) + skipRowsCount + ii + 1
-			});
-		}
-	}*/
 	dumpRowFills(slicedrows);
 	fillCells();
 }
-type TriadShiftInfo = {
-	shift: number;
-	balls: string[];
-};
-/*
-function dumpTraidBallCount(ball: number, shift1: number, shift2: number, rowNum: number, rows: BallsRow[]): number {
-	if ((ballExists(ball + shift1, rows[rowNum + 1])) && (ballExists(ball + shift1 + shift2, rows[rowNum + 2]))) return 3;//'OO';
-	if ((ballExists(ball + shift1, rows[rowNum + 1])) && (!ballExists(ball + shift1 + shift2, rows[rowNum + 2]))) return 2;//'O_';
-	if ((!ballExists(ball + shift1, rows[rowNum + 1])) && (ballExists(ball + shift1 + shift2, rows[rowNum + 2]))) return 1;//'_O';
-	if ((!ballExists(ball + shift1, rows[rowNum + 1])) && (!ballExists(ball + shift1 + shift2, rows[rowNum + 2]))) return 0;//'__';
-	return 123;//'???';
-}
-*/
-//function dumpTriadStatRow(rowNum: number, ball: number, rows: BallsRow[]) {
-//console.log(shift, rows[rowNum]);
-/*for (let s1 = 0; s1 < rowLen; s1++) {
-	for (let s2 = 0; s2 < rowLen; s2++) {
-		let rr = dumpTraidBallCount(ball, s1, s2, rowNum, rows);
-		console.log(ball, s1, s2, rr);
-	}
-}*/
-//	let row = rows[rowNum];
-//}
-function triad_exists(ball: number, shift1: number, shift2: number, r0: boolean, r1: boolean, r2: boolean, rowNum: number, rows: BallsRow[]): boolean {
-	return r0 == ballExists(ball, rows[rowNum])
-		&& r1 == (ballExists(ball + shift1, rows[rowNum + 1]))
-		&& r2 == (ballExists(ball + shift1 + shift2, rows[rowNum + 2]))
-		;
-}
-function dumpTriadStatAll(dx1: number, dx2: number, r0: boolean, r1: boolean, r2: boolean, rows: BallsRow[]): number {
-	let count: number = 0;
-	for (let bb = 1; bb <= rowLen; bb++) {
-		for (let nn = 5; nn <= rows.length - 3; nn++) {
-			if (triad_exists(bb, dx1, dx2, r0, r1, r2, nn, rows)) {
-				count++;
-			}
-		}
-	}
-	//console.log(dx1, dx2, r0, r1, r2, count);
-	return count;
-}
-function dumpTriad8var(dx1: number, dx2: number, rows: BallsRow[]) {
-	let count000 = dumpTriadStatAll(dx1, dx2, true, true, true, rows);
-	let count00X = dumpTriadStatAll(dx1, dx2, true, true, false, rows);
-	let count0X0 = dumpTriadStatAll(dx1, dx2, true, false, true, rows);
-	let count0XX = dumpTriadStatAll(dx1, dx2, true, false, false, rows);
-	let countX00 = dumpTriadStatAll(dx1, dx2, false, true, true, rows);
-	let countX0X = dumpTriadStatAll(dx1, dx2, false, true, false, rows);
-	let countXX0 = dumpTriadStatAll(dx1, dx2, false, false, true, rows);
-	let countXXX = dumpTriadStatAll(dx1, dx2, false, false, false, rows);
-	let countA = count000 + count00X + count0X0 + count0XX + countX00 + countX0X + countXX0 + countXXX;
-	console.log(dx1, dx2
-		, Math.round(10000 * count000 / countA) / 100
-		, Math.round(10000 * count00X / countA) / 100
-		, Math.round(10000 * count0X0 / countA) / 100
-		, Math.round(10000 * count0XX / countA) / 100
-		, Math.round(10000 * countX00 / countA) / 100
-		, Math.round(10000 * countX0X / countA) / 100
-		, Math.round(10000 * countXX0 / countA) / 100
-		, Math.round(10000 * countXXX / countA) / 100
-	);
-}
-/*
-function dumpStatAll() {
-	let idx = Math.floor(Math.random() * rowLen);
-	for (let sz = 1; sz <= 22; sz++) {
-		dumpStatIne(idx, sz);
-	}
-	//dumpLongness();
-}*/
-/*
-type Stat123 = {
-	dx1: number
-	, dx2: number
-	, count000: number
-	, count100: number
-	, ratioX00?: number
-	, count001: number
-	, count101: number
-	, ratioX01?: number
-	, count010: number
-	, count110: number
-	, ratioX10?: number
-	, count011: number
-	, count111: number
-	, ratioX11?: number
-	, deep?: number
-};
-function stat3rows(rr: number, slicedrows: BallsRow[], result: Stat123): void {
-	//let result:Stat123={dx1:dx1,dx2:dx2,count000:0,count001:0,count010:0,count011:0,count100:0,count101:0,count110:0,count111:0};
-	for (let bb = 0; bb < rowLen; bb++) {
-		if ((!ballExists(bb + 1, slicedrows[rr])) && (!ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (!ballExists(bb + 1 + result.dx2, slicedrows[rr + 2]))) result.count000++;
-		if ((!ballExists(bb + 1, slicedrows[rr])) && (!ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (ballExists(bb + 1 + result.dx2, slicedrows[rr + 2]))) result.count001++;
-		if ((!ballExists(bb + 1, slicedrows[rr])) && (ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (!ballExists(bb + 1 + result.dx2, slicedrows[rr + 2]))) result.count010++;
-		if ((!ballExists(bb + 1, slicedrows[rr])) && (ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (ballExists(bb + 1 + result.dx2, slicedrows[rr + 2]))) result.count011++;
-		if ((ballExists(bb + 1, slicedrows[rr])) && (!ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (!ballExists(bb + 1 + result.dx2, slicedrows[rr + 2]))) result.count100++;
-		if ((ballExists(bb + 1, slicedrows[rr])) && (!ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (ballExists(bb + 1 + result.dx2, slicedrows[rr + 2]))) result.count101++;
-		if ((ballExists(bb + 1, slicedrows[rr])) && (ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (!ballExists(bb + 1 + result.dx2, slicedrows[rr + 2]))) result.count110++;
-		if ((ballExists(bb + 1, slicedrows[rr])) && (ballExists(bb + 1 + result.dx1, slicedrows[rr + 1])) && (ballExists(bb + 1 + result.dx2, slicedrows[rr + 2]))) result.count111++;
-	}
-}*/
-/*
-function stat3lenRows(dx1: number, dx2: number, slicedrows: BallsRow[]): Stat123 {
-	let rowStat: Stat123 = { dx1: dx1, dx2: dx2, count000: 0, count001: 0, count010: 0, count011: 0, count100: 0, count101: 0, count110: 0, count111: 0, deep: rowLen };
-	//let dx1=3;
-	//let dx2=1;
-	for (let rr = 1; rr < rowLen; rr++) {
-		//let rowStat:Stat123={dx1:0,dx2:0,count000:0,count001:0,count010:0,count011:0,count100:0,count101:0,count110:0,count111:0};
-		stat3rows(rr, slicedrows, rowStat);
-	}
 
-	return rowStat;
-}*/
-/*
-function statRes1(ball: number, allstat3: Stat123[], slicedrows: BallsRow[]) {
-	let avg = 0;
-	for (let dx1 = 0; dx1 < rowLen; dx1++) {
-		for (let dx2 = 0; dx2 < rowLen; dx2++) {
-			if ((ballExists(ball + dx1, slicedrows[1])) && (ballExists(ball + dx2, slicedrows[2]))) {
-				//console.log(ball,dx1,dx2,'11');
-				avg = avg + allstat3[dx1 * rowLen + dx2].ratioX11;
-			} else {
-				if ((ballExists(ball + dx1, slicedrows[1])) && (!ballExists(ball + dx2, slicedrows[2]))) {
-					//console.log(ball,dx1,dx2,'10');
-					avg = avg + allstat3[dx1 * rowLen + dx2].ratioX10;
-				} else {
-					if ((!ballExists(ball + dx1, slicedrows[1])) && (!ballExists(ball + dx2, slicedrows[2]))) {
-						avg = avg + allstat3[dx1 * rowLen + dx2].ratioX00;
-						//console.log(ball,dx1,dx2,'00');
-					} else {
-						//console.log(ball,dx1,dx2,'01');
-						avg = avg + allstat3[dx1 * rowLen + dx2].ratioX11;
-					}
-				}
-			}
-		}
-	}
-	avg = avg / (rowLen * rowLen);
-	console.log(ball, avg);
-}*/
-/*
-function calcRatios(slicedrows: BallsRow[]) {
-	let allstat3: Stat123[] = [];
-	for (let dx1 = 0; dx1 < rowLen; dx1++) {
-		for (let dx2 = 0; dx2 < rowLen; dx2++) {
-			let rowStat: Stat123 = stat3lenRows(dx1, dx2, slicedrows);
-			rowStat.ratioX00 = Math.round(100 * rowStat.count100 / (rowStat.count100 + rowStat.count000));
-			rowStat.ratioX01 = Math.round(100 * rowStat.count101 / (rowStat.count101 + rowStat.count001));
-			rowStat.ratioX10 = Math.round(100 * rowStat.count110 / (rowStat.count110 + rowStat.count010));
-			rowStat.ratioX11 = Math.round(100 * rowStat.count111 / (rowStat.count111 + rowStat.count011));
-			allstat3.push(rowStat);
-		}
-	}
-	console.log(slicedrows[0], allstat3);
-	for (let ball = 1; ball <= rowLen; ball++) {
-		statRes1(ball, allstat3, slicedrows);
-	}
-}*/
-/*
-function dumpStatIne(idx, sz) {
-	//console.log('dumpStatIne', idx, sz);
-	let count0 = 0;
-	let count1 = 0;
-	let count2 = 0;
-	let count3 = 0;
-	let count4 = 0;
-	let count5 = 0;
-	let count6 = 0;
-	let count7 = 0;
-	
-	let stat:{balls:string,counts:string[]}={balls:''+(1+ idx)+'-'+( idx+ sz),counts:[]};
-	
-	for (let rr = 1; rr < datarows.length; rr++) {
-		let count = 0;
-		for (let bb = 0; bb < sz; bb++) {
-			if (ballExists(bb + 1 + idx, datarows[rr])) {
-				count++;
-			}
-		}
-		if (count == 0) { count0++; }
-		if (count == 1) { count1++; }
-		if (count == 2) { count2++; }
-		if (count == 3) { count3++; }
-		if (count == 4) { count4++; }
-		if (count == 5) { count5++; }
-		if (count == 6) { count6++; }
-		if (count == 7) { count7++; }
-	}
-	stat.counts[0]=''+count0+': '+ Math.round(100 * count0 / datarows.length) + '%';
-	stat.counts[1]=''+count1+': '+  Math.round(100 * count1 / datarows.length) + '%';
-	stat.counts[2]=''+count2+': '+  Math.round(100 * count2 / datarows.length) + '%';
-	stat.counts[3]=''+count3+': '+  Math.round(100 * count3 / datarows.length) + '%';
-	stat.counts[4]=''+count4+': '+  Math.round(100 * count4 / datarows.length) + '%';
-	stat.counts[5]=''+count5+': '+  Math.round(100 * count5 / datarows.length) + '%';
-	stat.counts[6]=''+count6+': '+  Math.round(100 * count6 / datarows.length) + '%';
-	stat.counts[7]=''+count7+': '+  Math.round(100 * count7 / datarows.length) + '%';
-	//console.log('dumpStatIne '+(1+ idx)+'-'+(1+ idx+ sz));
-	console.log('dumpStatIne',idx, sz,stat);
-}*/
-/*
-function anotherStat(){
-	var stat:{count:number,part:number,other:number}[]=[];
-	for(var ball=1;ball<=rowLen;ball++){
-		var cuco=1;
-		for (let rr = 1; rr < datarows.length; rr++) {
-			if (ballExists(ball, datarows[rr])) {
-				stat[cuco]=stat[cuco]?stat[cuco]:{count:0,part:0,other:0};
-				stat[cuco].count++;
-				cuco=1;
-			}else{
-				cuco++;
-			}
-		}
-	}
-	for(var ii=0;ii<stat.length;ii++){
-		stat[ii]=stat[ii]?stat[ii]:{count:0,part:0,other:0};
-	}
-	for(var ii=1;ii<stat.length-1;ii++){
-		for(var kk=ii+1;kk<stat.length;kk++){
-			stat[ii].other=stat[ii].other+stat[kk].count;
-		}
-		stat[ii].part=Math.round(1000*stat[ii].count/stat[ii].other)/10;
-	}
-	
-	console.log(stat);
-}*/
-/*
-function dumpLongness(shift:number) {
-	//console.log('longness');
-	var maxLen=333;//datarows.length;
-	let longness: number[] = [];
-	for (var ball = 1; ball <= rowLen; ball++) {
-		let nn = 0;
-		while (nn < maxLen && (!ballExists(ball, datarows[nn]))) {
-			nn++;
-		}
-		nn++;
-		let cuLen = 0;
-		while (nn < maxLen) {
-			if (ballExists(ball+shift, datarows[nn])) {
-				longness[cuLen] = longness[cuLen] ? longness[cuLen] : 0;
-				longness[cuLen]++;
-				cuLen = 0;
-			} else {
-				cuLen++;
-			}
-			nn++;
-		}
-	}
-	//console.log(longness);
-	let sum = 0;
-	for (let ii = 0; ii < longness.length; ii++) {
-		longness[ii] = longness[ii] ? longness[ii] : 0;
-		sum = sum + longness[ii];
-	}
-	let stat:string[]=[];
-	for (let ii = 0; ii < longness.length; ii++) {
-		stat[ii]=''+longness[ii]+': '+ Math.round(100 * longness[ii] / sum) + '%';
-		//console.log(ii, longness[ii], Math.round(100 * longness[ii] / sum) + '%');
-	}
-	console.log('dumpLongness',shift,stat);
-}*/
-/////////////////
+
 init();
-
-//fillCells();
 addTails();
-//dumpStatAll();
-//anotherStat();
-//dumpLongness(-2);
-//dumpLongness(-1);
-//dumpLongness(0);
-//dumpLongness(1);
-//dumpLongness(2);
-/*
-dumpTriad8var(9, 0, datarows);
-dumpTriad8var(1, 2, datarows);
-dumpTriad8var(4, 5, datarows);
-dumpTriad8var(1, 8, datarows);
-dumpTriad8var(1, 0, datarows);
-*/
-let pro2 = 0.25;
-let pro1 = 1.5;
-let pro0 = 10.0;
-
-let rowNum = 2;
-let ballNum = 12;
-let count0 = 0;
-let count1 = 0;
-let count2 = 0;
-for (let dx1 = 0; dx1 < rowLen; dx1++) {
-	for (let dx2 = 0; dx2 < rowLen; dx2++) {
-		console.log(dx1, dx2,ballExists(ballNum + dx1, datarows[rowNum + 1]), ballExists(ballNum + dx2, datarows[rowNum + 2]))
-		if (ballExists(ballNum + dx1, datarows[rowNum + 1]) && ballExists(ballNum + dx2, datarows[rowNum + 2])) {
-			count2++;
-		} else {
-			if ((!ballExists(ballNum + dx1, datarows[rowNum + 1])) && (!ballExists(ballNum + dx2, datarows[rowNum + 2]))) {
-				count0++;
-			} else {
-				count1++;
-			}
-		}
-	}
-}
-
-console.log(ballNum, rowNum, count0,count1,count2,datarows[rowNum + 1]);
-
-
-
-/*
-dumpTriadStatAll(0, 0, true, true, true, datarows);
-dumpTriadStatAll(0, 0, true, true, false, datarows);
-dumpTriadStatAll(0, 0, true, false, true, datarows);
-dumpTriadStatAll(0, 0, true, false, false, datarows);
-dumpTriadStatAll(0, 0, false, true, true, datarows);
-dumpTriadStatAll(0, 0, false, true, false, datarows);
-dumpTriadStatAll(0, 0, false, false, true, datarows);
-dumpTriadStatAll(0, 0, false, false, false, datarows);
-
-dumpTriadStatAll(1, 0, true, true, true, datarows);
-dumpTriadStatAll(1, 0, true, true, false, datarows);
-dumpTriadStatAll(1, 0, true, false, true, datarows);
-dumpTriadStatAll(1, 0, true, false, false, datarows);
-dumpTriadStatAll(1, 0, false, true, true, datarows);
-dumpTriadStatAll(1, 0, false, true, false, datarows);
-dumpTriadStatAll(1, 0, false, false, true, datarows);
-dumpTriadStatAll(1, 0, false, false, false, datarows);
-
-dumpTriadStatAll(0, 1, true, true, true, datarows);
-dumpTriadStatAll(0, 1, true, true, false, datarows);
-dumpTriadStatAll(0, 1, true, false, true, datarows);
-dumpTriadStatAll(0, 1, true, false, false, datarows);
-dumpTriadStatAll(0, 1, false, true, true, datarows);
-dumpTriadStatAll(0, 1, false, true, false, datarows);
-dumpTriadStatAll(0, 1, false, false, true, datarows);
-dumpTriadStatAll(0, 1, false, false, false, datarows);
-*/
 

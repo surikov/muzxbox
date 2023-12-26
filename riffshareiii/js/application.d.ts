@@ -193,11 +193,15 @@ declare let testMenuData: MenuInfo[];
 declare class LeftBar {
     selectionBarLayer: TileLayerDefinition;
     leftLayerZoom: SVGElement;
-    leftBarAnchor: TileAnchor;
+    leftBarContentAnchor: TileAnchor;
+    titlesLeftBar: TileAnchor;
     backgrounds: TileRectangle[];
     zoomAnchors: TileAnchor[];
+    titlesAnchors: TileAnchor[];
     projectTitles: TileText[];
+    editProjectTitles: TileText[];
     leftHide: boolean;
+    panelWidth: number;
     constructor();
     reShowLeftPanel(viewWidth: number, viewHeight: number): void;
     createLeftPanel(): TileLayerDefinition[];
@@ -247,7 +251,8 @@ declare class IconLabelButton {
 }
 declare let icon_play: string;
 declare let icon_pause: string;
-declare let icon_openmenu: string;
+declare let icon_hor_menu: string;
+declare let icon_ver_menu: string;
 declare let icon_closemenu: string;
 declare let icon_closedbranch: string;
 declare let icon_openedbranch: string;
@@ -258,6 +263,7 @@ declare let icon_movedown: string;
 declare let icon_moveleft: string;
 declare let icon_moveright: string;
 declare let icon_warningPlay: string;
+declare let icon_gear: string;
 declare class DebugLayerUI {
     debugRectangle: TileRectangle;
     debugAnchor: TileAnchor;
