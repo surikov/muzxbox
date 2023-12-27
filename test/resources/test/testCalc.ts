@@ -22,8 +22,8 @@ let rowsAvgCount = 5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let reduceRatio = 1;
 let highLightMode = 1;
-var calcLen = 23;
-
+var calcLen = 50;
+let diffWide=0;
 
 
 let markLines: { fromX: number, fromY: number, toX: number, toY: number, color: string, manual: boolean }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
@@ -132,7 +132,7 @@ function addLine(svg: SVGElement, x1: number, y1: number, x2: number, y2: number
 }
 function composeLine(svg: SVGElement, x1: number, y1: number, x2: number, y2: number, strokeWidth: number, color: string) {
 	if (isNaN(x1) || isNaN(x2) || isNaN(y1) || isNaN(y2)) {
-		console.log('composeLine', x1, x2, y1, y2);
+		console.log('wrong composeLine', x1, x2, y1, y2);
 	} else {
 		addLine(svg, x1, y1, x2, y2, strokeWidth / 2, color);
 	}
@@ -392,18 +392,44 @@ function calcEmptyLineDuration(shift: number, ball: number, from: number, rows: 
 	return count;
 }
 function countInfo(inrows: BallsRow[]) {
-	console.log('countInfo', inrows[0]);
+	let diff: number = 7;
+	console.log('countInfo', diff, inrows[0]);
+
+	let smm: { ball: number, sm: number, xst: string, sh: number }[] = [];
 	for (let ii = 0; ii < rowLen; ii++) {
 		let cc = 0;
-		for (let shift = 5; shift <= 5; shift++) {
+		for (let shift = -diff; shift <= diff; shift++) {
 			cc = cc + calcEmptyLineDuration(shift, ii + 1, 1, inrows);
 		}
 		let fl = '   ';
 		if (ballExists(ii + 1, inrows[0])) {
 			fl = ' * ';
 		}
-		console.log(ii + 1, fl, cc);
+		//console.log(ii + 1, fl, cc);
+		//smm.push({ ball: ii + 1, sm: Math.round(cc/(ss+ss+1)), xst: fl ,sh:ss});
+		smm.push({ ball: ii + 1, sm: cc, xst: fl, sh: diff });
 	}
+
+	for (let kk = 0; kk < smm.length; kk++) {
+		let len = Math.round(5 * smm[kk].sm / (diff + diff + 1));
+		let fl = '  ';
+		if (showFirstRow) {
+			if (ballExists(smm[kk].ball, inrows[0])) {
+				fl = '* ';
+			}
+		}
+		for (let nn = 0; nn < len; nn++) {
+			fl = fl + '-';
+		}
+		fl = fl + ' ' + len + ':' + smm[kk].ball;
+		console.log(fl);
+	}
+
+	smm.sort((a, b) => {
+		return a.sm - b.sm;
+	});
+	console.log(smm);
+
 	/*for (let shift = -3; shift <= 3; shift++) {
 		console.log(shift,':'
 			,calcEmptyLineDuration(shift, 1, 1, inrows)
@@ -420,7 +446,7 @@ function countInfo(inrows: BallsRow[]) {
 	}*/
 }
 function dumpRowFills(inrows: BallsRow[]) {
-	countInfo(inrows);
+	
 	if (highLightMode == 1) {
 		dumpRowFillsColor(inrows, '#009900cc', 0);
 		dumpRowWaitColor(inrows, '#00000033', 0);
@@ -429,17 +455,22 @@ function dumpRowFills(inrows: BallsRow[]) {
 		dumpRowFillsColor(inrows, '#00000033', 0);
 	}
 }
+
 function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 	let arr: { ball: number, summ: number }[] = [];
-	var rowNum = 0;
+	//var rowNum = 0;
+	//let diff=0;
 	for (let nn = 0; nn < rowLen; nn++) {
 		let one: { ball: number, summ: number } = { ball: nn + 1, summ: 0 };
 		arr.push(one);
-		for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
+		/*for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
 			if (ballExists(nn + 1, rows[rr])) {
 				break;
 			}
 			one.summ++;
+		}*/
+		for (let shift = -diffWide; shift <= diffWide; shift++) {
+			one.summ = one.summ + calcEmptyLineDuration(shift, nn + 1, 1, rows);
 		}
 	}
 	let mx = 0;
@@ -470,6 +501,7 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 		});
 		prehh = hh;
 	}
+	//console.log(arr);
 }
 function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	let precounts: number[] = calcRowPatterns(0 + 1, rows);
@@ -547,12 +579,18 @@ function fillCells() {
 	dumpInfo(skipRowsCount);
 
 	drawStat3(levelA, slicedrows);
+
+
 	//drawLines();
+	//countInfo(slicedrows);
 
 	var msgp: HTMLElement = (document.getElementById('stepsize') as any) as HTMLElement;
 	msgp.innerText = '' + reduceRatio;
 	msgp = (document.getElementById('calcLen') as any) as HTMLElement;
 	msgp.innerText = '' + calcLen;
+	msgp = (document.getElementById('calcWide') as any) as HTMLElement;
+	msgp.innerText = '' + diffWide;
+
 }
 function clickHop() {
 	skipRowsCount = Math.round(Math.random() * (datarows.length - reduceRatio * rowsVisibleCount));
@@ -598,6 +636,17 @@ function moreCalcLen() {
 function lessCalcLen() {
 	calcLen = calcLen - 1;
 	if (calcLen < 3) calcLen = 3;
+	addTails();
+}
+
+
+function moreWide() {
+	diffWide = diffWide + 1;
+	addTails();
+}
+function lessWide() {
+	diffWide = diffWide - 1;
+	if (diffWide < 0) diffWide = 0;
 	addTails();
 }
 

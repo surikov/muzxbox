@@ -14,7 +14,8 @@ var rowsAvgCount = 5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 var reduceRatio = 1;
 var highLightMode = 1;
-var calcLen = 23;
+var calcLen = 50;
+var diffWide = 0;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
     var msgp = document.getElementById('msgp');
@@ -119,7 +120,7 @@ function addLine(svg, x1, y1, x2, y2, strokeWidth, color) {
 }
 function composeLine(svg, x1, y1, x2, y2, strokeWidth, color) {
     if (isNaN(x1) || isNaN(x2) || isNaN(y1) || isNaN(y2)) {
-        console.log('composeLine', x1, x2, y1, y2);
+        console.log('wrong composeLine', x1, x2, y1, y2);
     }
     else {
         addLine(svg, x1, y1, x2, y2, strokeWidth / 2, color);
@@ -354,18 +355,40 @@ function calcEmptyLineDuration(shift, ball, from, rows) {
     return count;
 }
 function countInfo(inrows) {
-    console.log('countInfo', inrows[0]);
+    var diff = 7;
+    console.log('countInfo', diff, inrows[0]);
+    var smm = [];
     for (var ii = 0; ii < rowLen; ii++) {
         var cc = 0;
-        for (var shift = 5; shift <= 5; shift++) {
+        for (var shift = -diff; shift <= diff; shift++) {
             cc = cc + calcEmptyLineDuration(shift, ii + 1, 1, inrows);
         }
         var fl = '   ';
         if (ballExists(ii + 1, inrows[0])) {
             fl = ' * ';
         }
-        console.log(ii + 1, fl, cc);
+        //console.log(ii + 1, fl, cc);
+        //smm.push({ ball: ii + 1, sm: Math.round(cc/(ss+ss+1)), xst: fl ,sh:ss});
+        smm.push({ ball: ii + 1, sm: cc, xst: fl, sh: diff });
     }
+    for (var kk = 0; kk < smm.length; kk++) {
+        var len = Math.round(5 * smm[kk].sm / (diff + diff + 1));
+        var fl = '  ';
+        if (showFirstRow) {
+            if (ballExists(smm[kk].ball, inrows[0])) {
+                fl = '* ';
+            }
+        }
+        for (var nn = 0; nn < len; nn++) {
+            fl = fl + '-';
+        }
+        fl = fl + ' ' + len + ':' + smm[kk].ball;
+        console.log(fl);
+    }
+    smm.sort(function (a, b) {
+        return a.sm - b.sm;
+    });
+    console.log(smm);
     /*for (let shift = -3; shift <= 3; shift++) {
         console.log(shift,':'
             ,calcEmptyLineDuration(shift, 1, 1, inrows)
@@ -382,7 +405,6 @@ function countInfo(inrows) {
     }*/
 }
 function dumpRowFills(inrows) {
-    countInfo(inrows);
     if (highLightMode == 1) {
         dumpRowFillsColor(inrows, '#009900cc', 0);
         dumpRowWaitColor(inrows, '#00000033', 0);
@@ -394,15 +416,19 @@ function dumpRowFills(inrows) {
 }
 function dumpRowWaitColor(rows, color, shiftX) {
     var arr = [];
-    var rowNum = 0;
+    //var rowNum = 0;
+    //let diff=0;
     for (var nn = 0; nn < rowLen; nn++) {
         var one = { ball: nn + 1, summ: 0 };
         arr.push(one);
-        for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
+        /*for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
             if (ballExists(nn + 1, rows[rr])) {
                 break;
             }
             one.summ++;
+        }*/
+        for (var shift = -diffWide; shift <= diffWide; shift++) {
+            one.summ = one.summ + calcEmptyLineDuration(shift, nn + 1, 1, rows);
         }
     }
     var mx = 0;
@@ -439,6 +465,7 @@ function dumpRowWaitColor(rows, color, shiftX) {
         });
         prehh = hh;
     }
+    //console.log(arr);
 }
 function dumpRowFillsColor(rows, color, shiftX) {
     var precounts = calcRowPatterns(0 + 1, rows);
@@ -520,10 +547,13 @@ function fillCells() {
     dumpInfo(skipRowsCount);
     drawStat3(levelA, slicedrows);
     //drawLines();
+    //countInfo(slicedrows);
     var msgp = document.getElementById('stepsize');
     msgp.innerText = '' + reduceRatio;
     msgp = document.getElementById('calcLen');
     msgp.innerText = '' + calcLen;
+    msgp = document.getElementById('calcWide');
+    msgp.innerText = '' + diffWide;
 }
 function clickHop() {
     skipRowsCount = Math.round(Math.random() * (datarows.length - reduceRatio * rowsVisibleCount));
@@ -572,6 +602,16 @@ function lessCalcLen() {
     calcLen = calcLen - 1;
     if (calcLen < 3)
         calcLen = 3;
+    addTails();
+}
+function moreWide() {
+    diffWide = diffWide + 1;
+    addTails();
+}
+function lessWide() {
+    diffWide = diffWide - 1;
+    if (diffWide < 0)
+        diffWide = 0;
     addTails();
 }
 function sobstvennoe(balls) {
