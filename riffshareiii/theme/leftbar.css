@@ -1,83 +1,218 @@
 .leftBarProjectTitle025 {
-    fill: var(--color-text);
-    font-size: calc(1.5*0.25*var(--tapSize));
-    text-anchor22: start;
+	fill: var(--color-text);
+	font-size: calc(1.5*0.25*var(--tapSize));
+	text-anchor22: start;
 }
+
 .leftBarProjectTitle05 {
-    fill: var(--color-text);
-    font-size: calc(1.5*0.5*var(--tapSize));
+	fill: var(--color-text);
+	font-size: calc(1.5*0.5*var(--tapSize));
 }
+
 .leftBarProjectTitle1 {
-    fill: var(--color-text);
-    font-size: calc(1.5*1*var(--tapSize));
+	fill: var(--color-text);
+	font-size: calc(1.5*1*var(--tapSize));
 }
+
 .leftBarProjectTitle2 {
-    fill: var(--color-text);
-    font-size: calc(1.5*2*var(--tapSize));
+	fill: var(--color-text);
+	font-size: calc(1.5*2*var(--tapSize));
 }
+
 .leftBarProjectTitle4 {
-    fill: var(--color-text);
-    font-size: calc(1.5*4*var(--tapSize));
+	fill: var(--color-text);
+	font-size: calc(1.5*4*var(--tapSize));
 }
+
 .leftBarProjectTitle8 {
-    fill: var(--color-text);
-    font-size: calc(1.5*8*var(--tapSize));
+	fill: var(--color-text);
+	font-size: calc(1.5*8*var(--tapSize));
 }
+
 .leftBarProjectTitle16 {
-    fill: var(--color-text);
-    font-size: calc(1.5*16*var(--tapSize));
+	fill: var(--color-text);
+	font-size: calc(1.5*16*var(--tapSize));
 }
+
 .leftBarProjectTitle32 {
-    fill: var(--color-text);
-    font-size: calc(1.5*32*var(--tapSize));
+	fill: var(--color-text);
+	font-size: calc(1.5*32*var(--tapSize));
 }
+
 .leftBarProjectTitle64 {
-    fill: var(--color-text);
-    font-size: calc(1.5*64*var(--tapSize));
+	fill: var(--color-text);
+	font-size: calc(1.5*64*var(--tapSize));
 }
+
 .leftBarProjectTitle128 {
-    fill: var(--color-text);
-    font-size: calc(1.5*128*var(--tapSize));
+	fill: var(--color-text);
+	font-size: calc(1.5*128*var(--tapSize));
 }
 
 .leftReadProjectTitle025 {
-    fill: var(--color-lines);
-    font-size: calc(1.5*0.25*var(--tapSize));
-    text-anchor22: start;
+	fill: var(--color-lines);
+	font-size: calc(1.5*0.25*var(--tapSize));
+	text-anchor22: start;
 }
+
 .leftReadProjectTitle05 {
-    fill: var(--color-lines);
-    font-size: calc(1.5*0.5*var(--tapSize));
+	fill: var(--color-lines);
+	font-size: calc(1.5*0.5*var(--tapSize));
 }
+
 .leftReadProjectTitle1 {
-    fill: var(--color-lines);
-    font-size: calc(1.5*1*var(--tapSize));
+	fill: var(--color-lines);
+	font-size: calc(1.5*1*var(--tapSize));
 }
+
 .leftReadProjectTitle2 {
-    fill: var(--color-lines);
-    font-size: calc(1.5*2*var(--tapSize));
+	fill: var(--color-lines);
+	font-size: calc(1.5*2*var(--tapSize));
 }
+
 .leftReadProjectTitle4 {
-    fill: var(--color-lines);
-    font-size: calc(1.5*4*var(--tapSize));
+	fill: var(--color-lines);
+	font-size: calc(1.5*4*var(--tapSize));
 }
+
 .leftReadProjectTitle8 {
-    fill: var(--color-lines);
-    font-size: calc(1.5*8*var(--tapSize));
+	fill: var(--color-lines);
+	font-size: calc(1.5*8*var(--tapSize));
 }
+
 .leftReadProjectTitle16 {
-    fill: var(--color-lines);
-    font-size: calc(1.5*16*var(--tapSize));
+	fill: var(--color-lines);
+	font-size: calc(1.5*16*var(--tapSize));
 }
+
 .leftReadProjectTitle32 {
-    fill: var(--color-lines);
-    font-size: calc(1.5*32*var(--tapSize));
+	fill: var(--color-lines);
+	font-size: calc(1.5*32*var(--tapSize));
 }
+
 .leftReadProjectTitle64 {
-    fill: var(--color-lines);
-    font-size: calc(1.5*64*var(--tapSize));
+	fill: var(--color-lines);
+	font-size: calc(1.5*64*var(--tapSize));
 }
+
 .leftReadProjectTitle128 {
-    fill: var(--color-lines);
-    font-size: calc(1.5*128*var(--tapSize));
+	fill: var(--color-lines);
+	font-size: calc(1.5*128*var(--tapSize));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.leftFirstTitle025 {
+	fill: var(--color-text);
+	font-size: calc(1*0.25*var(--tapSize));
+}
+
+.leftFirstTitle05 {
+	fill: var(--color-text);
+	font-size: calc(1*0.5*var(--tapSize));
+}
+
+.leftFirstTitle1 {
+	fill: var(--color-text);
+	font-size: calc(1*1*var(--tapSize));
+}
+
+.leftFirstTitle2 {
+	fill: var(--color-text);
+	font-size: calc(1*2*var(--tapSize));
+}
+
+.leftFirstTitle4 {
+	fill: var(--color-text);
+	font-size: calc(1*4*var(--tapSize));
+}
+
+.leftFirstTitle8 {
+	fill: var(--color-text);
+	font-size: calc(1*8*var(--tapSize));
+}
+
+.leftFirstTitle16 {
+	fill: var(--color-text);
+	font-size: calc(1*16*var(--tapSize));
+}
+
+.leftFirstTitle32 {
+	fill: var(--color-text);
+	font-size: calc(1*32*var(--tapSize));
+}
+
+.leftFirstTitle64 {
+	fill: var(--color-text);
+	font-size: calc(1*64*var(--tapSize));
+}
+
+.leftFirstTitle128 {
+	fill: var(--color-text);
+	font-size: calc(1*128*var(--tapSize));
+}
+
+.leftReadFirstTitle025 {
+	fill: var(--color-lines);
+	font-size: calc(1*0.25*var(--tapSize));
+	text-anchor22: start;
+}
+
+.leftReadFirstTitle05 {
+	fill: var(--color-lines);
+	font-size: calc(1*0.5*var(--tapSize));
+}
+
+.leftReadFirstTitle1 {
+	fill: var(--color-lines);
+	font-size: calc(1*1*var(--tapSize));
+}
+
+.leftReadFirstTitle2 {
+	fill: var(--color-lines);
+	font-size: calc(1*2*var(--tapSize));
+}
+
+.leftReadFirstTitle4 {
+	fill: var(--color-lines);
+	font-size: calc(1*4*var(--tapSize));
+}
+
+.leftReadFirstTitle8 {
+	fill: var(--color-lines);
+	font-size: calc(1*8*var(--tapSize));
+}
+
+.leftReadFirstTitle16 {
+	fill: var(--color-lines);
+	font-size: calc(1*16*var(--tapSize));
+}
+
+.leftReadFirstTitle32 {
+	fill: var(--color-lines);
+	font-size: calc(1*32*var(--tapSize));
+}
+
+.leftReadFirstTitle64 {
+	fill: var(--color-lines);
+	font-size: calc(1*64*var(--tapSize));
+}
+
+.leftReadFirstTitle128 {
+	fill: var(--color-lines);
+	font-size: calc(1*128*var(--tapSize));
 }
