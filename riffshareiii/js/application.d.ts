@@ -193,11 +193,10 @@ declare let testMenuData: MenuInfo[];
 declare class LeftBar {
     selectionBarLayer: TileLayerDefinition;
     leftLayerZoom: SVGElement;
-    openedLeftBar: TileAnchor;
-    closedLeftBar: TileAnchor;
-    openedLeftPanel: TileAnchor;
-    closedLeftPanel: TileAnchor;
-    backgroundLinks: TileRectangle[];
+    openedLeftRightBar: TileAnchor;
+    closedLeftRightBar: TileAnchor;
+    openedGridTop: TileAnchor;
+    closedGridTop: TileAnchor;
     leftHide: boolean;
     panelWidth: number;
     constructor();
