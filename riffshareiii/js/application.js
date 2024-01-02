@@ -176,11 +176,21 @@ class CommandDispatcher {
         this.renderer.menu.resetAllAnchors();
     }
     ;
-    toggleLeftMenu() {
-        this.renderer.leftBar.leftHide = !this.renderer.leftBar.leftHide;
-        let vw = this.renderer.tileLevelSVG.clientWidth / this.renderer.tiler.tapPxSize();
-        let vh = this.renderer.tileLevelSVG.clientHeight / this.renderer.tiler.tapPxSize();
-        this.renderer.leftBar.reShowLeftPanel(vw, vh);
+    setThemeLocale(loc, ratio) {
+        console.log("setThemeLocale " + loc);
+        setLocaleID(loc, ratio);
+        if (loc == 'zh') {
+            startLoadCSSfile('theme/font2big.css');
+        }
+        else {
+            startLoadCSSfile('theme/font1small.css');
+        }
+        this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
+    }
+    setThemeColor(cssPath) {
+        console.log("cssPath " + cssPath);
+        startLoadCSSfile(cssPath);
+        this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
     }
     resetAnchor(parentSVGGroup, anchor, layerMode) {
         this.renderer.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
@@ -257,11 +267,10 @@ class UIRenderer {
         this.warning.initDialogUI();
         this.toolbar = new UIToolbar();
         this.timeselectbar = new TimeSelectBar();
-        this.leftBar = new LeftBar();
         this.menu = new RightMenuPanel();
         this.mixer = new MixerUI();
         let me = this;
-        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.createMixerLayers(), this.warning.allLayers(), this.timeselectbar.createTimeScale(), this.leftBar.createLeftPanel());
+        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.createMixerLayers(), this.warning.allLayers(), this.timeselectbar.createTimeScale());
         this.tiler.initRun(this.tileLevelSVG, true, 1, 1, zoomPrefixLevelsCSS[0].minZoom, zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].minZoom, zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom - 1, layers);
         this.tiler.setAfterZoomCallback(() => {
             if (this.menu) {
@@ -280,13 +289,11 @@ class UIRenderer {
         this.mixer.reFillMixerUI(data);
         this.debug.resetDebugView(data);
         this.toolbar.resizeToolbar(vw, vh);
-        this.menu.fillMenuItems();
+        this.menu.readCurrentSongData(data);
         this.menu.resizeMenu(vw, vh);
         this.warning.resizeDialog(vw, vh);
         this.timeselectbar.fillTimeBar(data);
         this.timeselectbar.resizeTimeScale(vw, vh);
-        this.leftBar.resizeHeaders(mixm.mixerHeight(), vw, vh, this.tiler.getCurrentPointPosition().z);
-        this.leftBar.fillTrackHeaders(data);
         this.tiler.resetModel();
     }
     onReSizeView() {
@@ -302,7 +309,6 @@ class UIRenderer {
         this.menu.resizeMenu(vw, vh);
         this.menu.resetAllAnchors();
         this.warning.resizeDialog(vw, vh);
-        this.leftBar.resizeHeaders(mixH, vw, vh, this.tiler.getCurrentPointPosition().z);
     }
     deleteUI() {
     }
@@ -311,6 +317,9 @@ let labelLocaleDictionary = 'en';
 let localNameLocal = 'localNameLocal';
 let localeFontRatio = 1;
 let localMenuItemSettings = 'localMenuItemSettings';
+let localMenuTracksFolder = 'localMenuTracksFolder';
+let localMenuImportMIDI = 'localMenuImportMIDI';
+let localMenuPercussionFolder = 'localMenuPercussionFolder';
 let localeDictionary = [
     {
         id: localNameLocal, data: [
@@ -323,6 +332,25 @@ let localeDictionary = [
             { locale: 'en', text: 'Settings' },
             { locale: 'ru', text: 'Настройки' },
             { locale: 'zh', text: '设置' }
+        ]
+    }, {
+        id: localMenuTracksFolder, data: [
+            { locale: 'en', text: 'Tracks' },
+            { locale: 'ru', text: 'Треки' },
+            { locale: 'zh', text: '?' }
+        ]
+    }, {
+        id: localMenuImportMIDI, data: [
+            { locale: 'en', text: 'Import from MIDI-file' },
+            { locale: 'ru', text: 'Импорт из файлв MIDI' },
+            { locale: 'zh', text: '?' }
+        ]
+    },
+    {
+        id: localMenuPercussionFolder, data: [
+            { locale: 'en', text: 'Sampler' },
+            { locale: 'ru', text: 'Сэмплер' },
+            { locale: 'zh', text: '?' }
         ]
     }
 ];
@@ -476,18 +504,9 @@ class UIToolbar {
     constructor() {
     }
     createToolbar() {
-        this.playPauseButton = new ToolBarButton([icon_play, icon_pause], 0, 0, (nn) => {
-            console.log('playPauseButton', nn);
-            commandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
-        });
-        this.menuButton = new ToolBarButton([icon_ver_menu], 0, 1, (nn) => {
-            console.log('menuButton', nn);
+        this.menuButton = new ToolBarButton([icon_ver_menu], 1, 0, (nn) => {
             commandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
             commandDispatcher.showRightMenu();
-        });
-        this.headButton = new ToolBarButton([icon_openleft, icon_closeleft], 0, -1, (nn) => {
-            commandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
-            commandDispatcher.toggleLeftMenu();
         });
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
         this.toolBarAnchor = {
@@ -495,9 +514,7 @@ class UIToolbar {
             showZoom: zoomPrefixLevelsCSS[0].minZoom,
             hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
-                this.playPauseButton.iconLabelButton.anchor,
-                this.menuButton.iconLabelButton.anchor,
-                this.headButton.iconLabelButton.anchor
+                this.menuButton.iconLabelButton.anchor
             ]
         };
         this.toolBarLayer = {
@@ -512,9 +529,7 @@ class UIToolbar {
         this.toolBarAnchor.yy = 0;
         this.toolBarAnchor.ww = viewWIdth;
         this.toolBarAnchor.hh = viewHeight;
-        this.playPauseButton.resize(viewWIdth, viewHeight);
         this.menuButton.resize(viewWIdth, viewHeight);
-        this.headButton.resize(viewWIdth, viewHeight);
     }
 }
 class ToolBarButton {
@@ -562,13 +577,11 @@ class RightMenuPanel {
         this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
         this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
         this.menuCloseButton = new IconLabelButton([icon_moveright], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
-            console.log('menuCloseButton', nn);
             this.showState = false;
             this.resizeMenu(this.lastWidth, this.lastHeight);
             this.resetAllAnchors();
         });
         this.menuUpButton = new IconLabelButton([icon_moveup], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
-            console.log('up', nn);
             this.scrollY = 0;
             this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         });
@@ -629,24 +642,16 @@ class RightMenuPanel {
         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         commandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
-    randomString(nn) {
-        let words = ['red', 'green', 'blue', 'purple', 'black', 'white', 'yellow', 'grey', 'orange', 'cyan', 'magenta', 'silver', 'olive'];
-        let ss = words[Math.floor(Math.random() * (words.length - 1))];
-        ss = ss[0].toUpperCase() + ss.substring(1);
-        for (let ii = 1; ii < nn; ii++) {
-            ss = ss + ' ' + words[Math.floor(Math.random() * (words.length - 1))];
-        }
-        return ss;
-    }
     fillMenuItems() {
         this.items = [];
-        this.fillMenuItemChildren(0, testMenuData);
+        this.fillMenuItemChildren(0, composeBaseMenu());
     }
     setFocus(it, infos) {
         for (let ii = 0; ii < infos.length; ii++) {
             infos[ii].focused = false;
         }
         it.focused = true;
+        this.rerenderMenuContent(null);
     }
     setOpenState(state, it, infos) {
         for (let ii = 0; ii < infos.length; ii++) {
@@ -663,133 +668,83 @@ class RightMenuPanel {
             let focused = (it.focused) ? true : false;
             let opened = (it.opened) ? true : false;
             let children = it.children;
+            let itemLabel = '';
+            if (it.noLocalization) {
+                itemLabel = it.text;
+            }
+            else {
+                itemLabel = LO(it.text);
+            }
             if (children) {
                 if (opened) {
-                    this.items.push(new RightMenuItem(it).initOpenedFolderItem(pad, focused, it.text, () => {
-                        console.log("close " + ii);
+                    this.items.push(new RightMenuItem(it).initOpenedFolderItem(pad, focused, itemLabel, () => {
                         me.setOpenState(false, it, infos);
-                        me.rerenderContent(null);
+                        me.rerenderMenuContent(null);
                     }));
                     this.fillMenuItemChildren(pad + 0.5, children);
                 }
                 else {
                     let si = new RightMenuItem(it);
-                    let order = this.items.length;
-                    this.items.push(si.initClosedFolderItem(pad, focused, it.text, () => {
-                        console.log("open " + ii);
+                    this.items.push(si.initClosedFolderItem(pad, focused, itemLabel, () => {
                         me.setOpenState(true, it, infos);
-                        me.rerenderContent(si);
+                        me.rerenderMenuContent(si);
                     }));
                 }
             }
             else {
-                switch (it.sid) {
-                    case commandThemeSizeSmall: {
-                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
-                            me.setFocus(it, infos);
-                            me.setThemeSize(1, 'theme/sizesmall.css');
-                        }));
-                        break;
-                    }
-                    case commandThemeSizeBig: {
-                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
-                            me.setFocus(it, infos);
-                            me.setThemeSize(1.5, 'theme/sizebig.css');
-                        }));
-                        break;
-                    }
-                    case commandThemeSizeHuge: {
-                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
-                            me.setFocus(it, infos);
-                            me.setThemeSize(4, 'theme/sizehuge.css');
-                        }));
-                        break;
-                    }
-                    case commandThemeColorRed: {
-                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
-                            me.setFocus(it, infos);
-                            me.setThemeColor('theme/colordarkred.css');
-                        }));
-                        break;
-                    }
-                    case commandThemeColorGreen: {
-                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
-                            me.setFocus(it, infos);
-                            me.setThemeColor('theme/colordarkgreen.css');
-                        }));
-                        break;
-                    }
-                    case commandThemeColorBlue: {
-                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
-                            me.setFocus(it, infos);
-                            me.setThemeColor('theme/colordarkblue.css');
-                        }));
-                        break;
-                    }
-                    case commandLocaleRU: {
-                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
-                            me.setFocus(it, infos);
-                            me.setThemeLocale('ru', 1);
-                        }));
-                        break;
-                    }
-                    case commandLocaleEN: {
-                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
-                            me.setFocus(it, infos);
-                            me.setThemeLocale('en', 1);
-                        }));
-                        break;
-                    }
-                    case commandLocaleZH: {
-                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
-                            me.setFocus(it, infos);
-                            me.setThemeLocale('zh', 1.5);
-                        }));
-                        break;
-                    }
-                    case commandImportFromMIDI: {
-                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
-                            me.setFocus(it, infos);
-                            console.log('import');
-                            commandDispatcher.promptImportFromMIDI();
-                        }));
-                        break;
-                    }
-                    default: {
-                        this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
-                            console.log("tap " + ii);
-                            me.setFocus(it, infos);
-                        }));
-                        break;
-                    }
+                if (it.onSubClick) {
+                    this.items.push(new RightMenuItem(it).initActionItem2(pad, focused, itemLabel, () => {
+                        if (it.onClick) {
+                            it.onClick();
+                        }
+                        me.setFocus(it, infos);
+                        me.resetAllAnchors();
+                    }, () => {
+                        if (it.onSubClick) {
+                            it.onSubClick();
+                        }
+                        me.setFocus(it, infos);
+                        me.resetAllAnchors();
+                    }));
+                }
+                else {
+                    this.items.push(new RightMenuItem(it).initActionItem(pad, focused, itemLabel, () => {
+                        if (it.onClick) {
+                            it.onClick();
+                        }
+                        me.setFocus(it, infos);
+                        me.resetAllAnchors();
+                    }));
                 }
             }
         }
     }
-    setThemeLocale(loc, ratio) {
-        console.log("setThemeLocale " + loc);
-        setLocaleID(loc, ratio);
-        if (loc == 'zh') {
-            startLoadCSSfile('theme/font2big.css');
+    readCurrentSongData(project) {
+        console.log('readCurrentSongData');
+        menuPointTracks.children = [];
+        for (let tt = 0; tt < project.tracks.length; tt++) {
+            let track = project.tracks[tt];
+            let item = {
+                text: track.title,
+                noLocalization: true,
+                onClick: () => { console.log('click track', track); },
+                onSubClick: () => { console.log('sub track', track); }
+            };
+            menuPointTracks.children.push(item);
         }
-        else {
-            startLoadCSSfile('theme/font1small.css');
+        menuPointPercussion.children = [];
+        for (let tt = 0; tt < project.percussions.length; tt++) {
+            let drum = project.percussions[tt];
+            let item = {
+                text: drum.title,
+                noLocalization: true,
+                onClick: () => { console.log('click drum', drum); },
+                onSubClick: () => { console.log('sub drum', drum); }
+            };
+            menuPointPercussion.children.push(item);
         }
-        this.resizeMenu(this.lastWidth, this.lastHeight);
-        this.resetAllAnchors();
     }
-    setThemeColor(cssPath) {
-        console.log("cssPath " + cssPath);
-        startLoadCSSfile(cssPath);
-        this.resizeMenu(this.lastWidth, this.lastHeight);
-        this.resetAllAnchors();
-    }
-    setThemeSize(ratio, cssPath) {
-        console.log("cssPath " + cssPath);
-        startLoadCSSfile(cssPath);
-        commandDispatcher.changeTapSize(ratio);
-    }
-    rerenderContent(folder) {
+    rerenderMenuContent(folder) {
         this.contentAnchor.content = [];
         this.fillMenuItems();
         let position = 0;
@@ -855,7 +810,7 @@ class RightMenuPanel {
         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         this.menuCloseButton.resize(this.shiftX + this.itemsWidth - 1, viewHeight - 1, 1);
         this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
-        this.rerenderContent(null);
+        this.rerenderMenuContent(null);
     }
 }
 class RightMenuItem {
@@ -866,6 +821,7 @@ class RightMenuItem {
         this.kindPreview = 3;
         this.kindClosedFolder = 4;
         this.kindOpenedFolder = 5;
+        this.kindAction2 = 6;
         this.kind = this.kindAction;
         this.pad = 0;
         this.focused = false;
@@ -882,6 +838,15 @@ class RightMenuItem {
         this.kind = this.kindAction;
         this.label = label;
         this.action = tap;
+        return this;
+    }
+    initActionItem2(pad, focused, label, tap, tap2) {
+        this.pad = pad;
+        this.focused = focused;
+        this.kind = this.kindAction2;
+        this.label = label;
+        this.action = tap;
+        this.action2 = tap2;
         return this;
     }
     initDraggableItem(pad, focused, tap) {
@@ -933,29 +898,36 @@ class RightMenuItem {
         }
         anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.02, css: 'rightMenuDelimiterLine' });
         let spot = { x: this.pad, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
+        let spot2 = null;
         if (this.kind == this.kindAction) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: LO(this.label), css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+        }
+        if (this.kind == this.kindAction2) {
+            anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: itemWidth - 0.9, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
+            spot2 = { x: itemWidth - 0.9, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
         }
         if (this.kind == this.kindDraggable) {
             spot.draggable = true;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: LO(this.label), css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindOpenedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_movedown, css: 'rightMenuIconLabel' });
-            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: LO(this.label), css: 'rightMenuLabel' });
+            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindClosedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_moveright, css: 'rightMenuIconLabel' });
-            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: LO(this.label), css: 'rightMenuLabel' });
+            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindPreview) {
             spot.draggable = true;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: LO(this.label), css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
             anchor.content.push({ x: itemWidth - 1 + 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemSubActionBG' });
             anchor.content.push({ x: itemWidth - 0.5, y: itemTop + 0.7, text: icon_play, css: 'rightMenuButtonLabel' });
             anchor.content.push({ x: itemWidth - 1, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' });
@@ -963,233 +935,100 @@ class RightMenuItem {
             anchor.content.push({ x: 0.3 + 1 + this.pad, y: itemTop + 0.7 + 0.55 + 0.55, text: this.label, css: 'rightMenuSubLabel' });
         }
         anchor.content.push(spot);
+        if (spot2) {
+            anchor.content.push(spot2);
+        }
         return anchor;
     }
 }
-let commandThemeSizeSmall = 'commandThemeSizeSmall';
-let commandThemeSizeBig = 'commandThemeSizeBig';
-let commandThemeSizeHuge = 'commandThemeSizeHuge';
-let commandThemeColorRed = 'commandThemeColorRed';
-let commandThemeColorGreen = 'commandThemeColorGreen';
-let commandThemeColorBlue = 'commandThemeColorBlue';
-let commandLocaleEN = 'commandLocaleEN';
-let commandLocaleRU = 'commandLocaleRU';
-let commandLocaleZH = 'commandLocaleZH';
-let commandImportFromMIDI = 'commandImportFromMIDI';
-let testMenuData = [
-    { text: 'test import', sid: commandImportFromMIDI },
-    { text: 'One' },
-    {
-        text: 'Two', children: [{ text: 'One' },
-            { text: 'Two' },
-            { text: 'Orange', focused: true },
-            { text: 'Blue' },
-            { text: 'Green' },
+let menuItemsData = null;
+let menuPointTracks = {
+    text: localMenuTracksFolder
+};
+let menuPointPercussion = {
+    text: localMenuPercussionFolder
+};
+function composeBaseMenu() {
+    if (menuItemsData) {
+        return menuItemsData;
+    }
+    else {
+        menuItemsData = [
             {
-                text: 'Brown', children: [{ text: 'One' },
-                    { text: 'Two' },
-                    { text: 'Orange' },
+                text: localMenuImportMIDI, onClick: () => {
+                    commandDispatcher.promptImportFromMIDI();
+                }
+            }, menuPointTracks,
+            menuPointPercussion,
+            {
+                text: localMenuItemSettings, children: [
                     {
-                        text: 'Blue', children: [{ text: 'One' },
-                            { text: 'Two' },
-                            { text: 'Orange' },
-                            { text: 'Blue' },
-                            { text: 'Green' },
+                        text: 'Size', children: [
                             {
-                                text: 'Brown', children: [{ text: 'One' },
-                                    { text: 'Two' },
-                                    {
-                                        text: 'Orange', children: [{ text: 'One' },
-                                            { text: 'Two' },
-                                            { text: 'Orange' },
-                                            { text: 'Blue' },
-                                            { text: 'Green' },
-                                            {
-                                                text: 'Brown', children: [{ text: 'One' },
-                                                    { text: 'Two' },
-                                                    { text: 'Orange' },
-                                                    { text: 'Blue' },
-                                                    { text: 'Green' },
-                                                    { text: 'Brown' },
-                                                    { text: 'eleven' }]
-                                            },
-                                            {
-                                                text: 'eleven', children: [{ text: 'One' },
-                                                    { text: 'Two' },
-                                                    { text: 'Orange' },
-                                                    { text: 'Blue' },
-                                                    { text: 'Green' },
-                                                    { text: 'Brown' },
-                                                    { text: 'eleven' }]
-                                            }]
-                                    },
-                                    { text: 'Blue' },
-                                    { text: 'Green' },
-                                    { text: 'Brown' },
-                                    { text: 'eleven' }]
-                            },
+                                text: 'Small', onClick: () => {
+                                    startLoadCSSfile('theme/sizesmall.css');
+                                    commandDispatcher.changeTapSize(1);
+                                }
+                            }, {
+                                text: 'Big', onClick: () => {
+                                    startLoadCSSfile('theme/sizebig.css');
+                                    commandDispatcher.changeTapSize(1.5);
+                                }
+                            }, {
+                                text: 'Huge', onClick: () => {
+                                    startLoadCSSfile('theme/sizehuge.css');
+                                    commandDispatcher.changeTapSize(4);
+                                }
+                            }
+                        ]
+                    }, {
+                        text: 'Locale', children: [
                             {
-                                text: 'eleven', children: [{ text: 'One' },
-                                    { text: 'Two' },
-                                    { text: 'Orange' },
-                                    { text: 'Blue' },
-                                    { text: 'Green' },
-                                    { text: 'Brown' },
-                                    { text: 'eleven' }]
-                            }]
-                    },
-                    { text: 'Green' },
-                    { text: 'Brown' },
-                    { text: 'eleven' }]
-            },
-            {
-                text: 'eleven', children: [{ text: 'One' },
-                    { text: 'Two' },
-                    { text: 'Orange' },
-                    { text: 'Blue' },
-                    { text: 'Green' },
-                    { text: 'Brown' },
-                    { text: 'eleven' }]
-            }]
-    },
-    { text: 'Orange' },
-    { text: 'Blue' },
-    {
-        text: 'Green', focused: true, children: [{ text: 'One' },
-            { text: 'Two' },
-            { text: 'Orange' },
-            { text: 'Blue' },
-            { text: 'Green' },
-            { text: 'Brown' },
-            { text: 'eleven' }]
-    },
-    {
-        text: 'Brown', children: [{ text: 'One' },
-            { text: 'Two' },
-            {
-                text: 'Orange', children: [{ text: 'One' },
-                    { text: 'Two' },
-                    { text: 'Orange' },
-                    { text: 'Blue' },
-                    { text: 'Green' },
-                    {
-                        text: 'Brown', children: [{ text: 'One' },
-                            { text: 'Two' },
-                            { text: 'Orange' },
-                            { text: 'Blue' },
-                            { text: 'Green' },
-                            { text: 'Brown' },
-                            { text: 'eleven' }]
-                    },
-                    {
-                        text: 'eleven', children: [{ text: 'One' },
-                            { text: 'Two' },
-                            { text: 'Orange' },
-                            { text: 'Blue' },
-                            { text: 'Green' },
-                            { text: 'Brown' },
-                            { text: 'eleven' }]
-                    }]
-            },
-            {
-                text: 'Blue', children: [{ text: 'One' },
-                    { text: 'Two' },
-                    { text: 'Orange' },
-                    { text: 'Blue' },
-                    { text: 'Green' },
-                    {
-                        text: 'Brown', children: [{ text: 'One' },
-                            { text: 'Two' },
-                            { text: 'Orange' },
-                            { text: 'Blue' },
-                            { text: 'Green' },
-                            { text: 'Brown' },
-                            { text: 'eleven' }]
-                    },
-                    {
-                        text: 'eleven', children: [{ text: 'One' },
-                            { text: 'Two' },
-                            { text: 'Orange' },
-                            { text: 'Blue' },
-                            { text: 'Green' },
-                            { text: 'Brown' },
-                            { text: 'eleven' }]
-                    }]
-            },
-            { text: 'Green' },
-            { text: 'Brown' },
-            { text: 'eleven' }]
-    },
-    { text: 'eleven' },
-    {
-        text: localMenuItemSettings, children: [
-            {
-                text: 'Size', children: [
-                    { text: 'Small', sid: commandThemeSizeSmall },
-                    { text: 'Big', sid: commandThemeSizeBig },
-                    { text: 'Huge', sid: commandThemeSizeHuge }
-                ]
-            },
-            {
-                text: 'Locale', children: [{ text: 'Russian', sid: commandLocaleRU },
-                    { text: 'English', sid: commandLocaleEN },
-                    { text: '中文界面语言', sid: commandLocaleZH }]
-            },
-            {
-                text: 'Colors', children: [
-                    { text: 'Red', sid: commandThemeColorRed },
-                    { text: 'Green', sid: commandThemeColorGreen },
-                    { text: 'Blue', sid: commandThemeColorBlue }
+                                text: 'Russian', onClick: () => {
+                                    commandDispatcher.setThemeLocale('ru', 1);
+                                }
+                            }, {
+                                text: 'English', onClick: () => {
+                                    commandDispatcher.setThemeLocale('en', 1);
+                                }
+                            }, {
+                                text: '中文界面语言', onClick: () => {
+                                    commandDispatcher.setThemeLocale('zh', 1.5);
+                                }
+                            }
+                        ]
+                    }, {
+                        text: 'Colors', children: [
+                            {
+                                text: 'Red', onClick: () => {
+                                    commandDispatcher.setThemeColor('theme/colordarkred.css');
+                                }
+                            }, {
+                                text: 'Green', onClick: () => {
+                                    commandDispatcher.setThemeColor('theme/colordarkgreen.css');
+                                }
+                            }, {
+                                text: 'Blue', onClick: () => {
+                                    commandDispatcher.setThemeColor('theme/colordarkblue.css');
+                                }
+                            }
+                        ]
+                    }
                 ]
             }
-        ]
+        ];
+        return menuItemsData;
     }
-];
-class LeftBar {
+}
+class LeftPanel {
     constructor() {
-        this.leftHide = true;
-        this.panelWidth = 5;
-    }
-    reShowLeftPanel(viewWidth, viewHeight) {
-        if (this.leftHide) {
-            this.openedLeftRightBar.translation = { x: 0, y: 1234567890 };
-            this.closedLeftRightBar.translation = { x: 0, y: 0 };
-        }
-        else {
-            this.openedLeftRightBar.translation = { x: 0, y: 0 };
-            this.closedLeftRightBar.translation = { x: 0, y: 1234567890 };
-        }
     }
     createLeftPanel() {
-        console.log('createLeftPanel');
-        this.leftLayerZoom = document.getElementById("leftLayerZoom");
-        this.openedGridTop = { xx: 0, yy: -1234567890 / 2, ww: 1, hh: 1234567890, showZoom: zoomPrefixLevelsCSS[0].minZoom, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom, content: [] };
-        this.openedLeftRightBar = { xx: 0, yy: -1234567890 / 2, ww: 1, hh: 1234567890, showZoom: zoomPrefixLevelsCSS[0].minZoom, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom, content: [this.openedGridTop] };
-        this.closedGridTop = { xx: 0, yy: -1234567890 / 2, ww: 1, hh: 1234567890, showZoom: zoomPrefixLevelsCSS[0].minZoom, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom, content: [], id: 'closedLeftPanel' + Math.random() };
-        this.closedLeftRightBar = { xx: 0, yy: -1234567890 / 2, ww: 1, hh: 1234567890, showZoom: zoomPrefixLevelsCSS[0].minZoom, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom, content: [this.closedGridTop], id: 'closedLeftBar' + Math.random() };
-        for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
-            let bg = { x: 0, y: -12345, w: this.panelWidth * zoomPrefixLevelsCSS[zz].minZoom, h: 1234567890, css: 'leftPanelBG', id: 'hdbg' + (zz + Math.random()) };
-            let edittitle = { x: this.panelWidth * zoomPrefixLevelsCSS[zz].minZoom, y: -2 * zoomPrefixLevelsCSS[zz].minZoom, text: 'Debug track title string', css: 'leftBarProjectTitle' + zoomPrefixLevelsCSS[zz].prefix };
-            let editfirst = { x: this.panelWidth * zoomPrefixLevelsCSS[zz].minZoom, y: 0, text: 'Debug track title string', css: 'leftFirstTitle' + zoomPrefixLevelsCSS[zz].prefix };
-            let openedBarZoom = { xx: 0, yy: -1234567890 / 2, ww: 1, hh: 1234567890, showZoom: zoomPrefixLevelsCSS[zz].minZoom, hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom, content: [bg, edittitle, editfirst] };
-            this.openedGridTop.content.push(openedBarZoom);
-            let protitle = { x: 0, y: -2 * zoomPrefixLevelsCSS[zz].minZoom, text: 'Debug title string', css: 'leftReadProjectTitle' + zoomPrefixLevelsCSS[zz].prefix, id: 'projTitle' + zz + Math.random() };
-            let profirst = { x: 0, y: 0, text: 'Debug title string', css: 'leftReadFirstTitle' + zoomPrefixLevelsCSS[zz].prefix, id: 'firstTitle' + zz + Math.random() };
-            let closedBarZoom = { xx: 0, yy: -1234567890 / 2, ww: 1, hh: 1234567890, showZoom: zoomPrefixLevelsCSS[zz].minZoom, hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom, content: [protitle, profirst], id: 'closedBarZoom' + zz + Math.random() };
-            this.closedGridTop.content.push(closedBarZoom);
-        }
-        this.selectionBarLayer = { g: this.leftLayerZoom, anchors: [this.openedLeftRightBar, this.closedLeftRightBar], mode: LevelModes.left };
-        return [this.selectionBarLayer];
+        let leftsidebar = document.getElementById("leftsidebar");
+        let main = { g: leftsidebar, anchors: [], mode: LevelModes.left };
+        return [main];
     }
-    resizeHeaders(mixerH, viewWidth, viewHeight, tz) {
-        console.log('resizeHeaders');
-        this.reShowLeftPanel(viewWidth, viewHeight);
-    }
-    fillTrackHeaders(data) {
-        console.log('fillTrackHeaders');
-        let mixm = new MixerDataMath(data);
-        this.openedGridTop.translation = { x: 0, y: mixm.gridTop() };
-        this.closedGridTop.translation = { x: 0, y: mixm.gridTop() };
+    fillLeftPanel() {
     }
 }
 class BarOctave {
@@ -1437,10 +1276,8 @@ class WarningUI {
         this.warningLayer = { g: this.warningGroup, anchors: [this.warningAnchor], mode: LevelModes.overlay };
     }
     resetDialogView(data) {
-        console.log('resetDialogView');
     }
     resizeDialog(ww, hh) {
-        console.log('resizeDialog');
         this.warningRectangle.w = ww;
         this.warningRectangle.h = hh;
         this.warningAnchor.ww = ww;
@@ -1456,11 +1293,9 @@ class WarningUI {
         return [this.warningLayer];
     }
     showWarning() {
-        console.log('WarningUI show');
         document.getElementById("warningDialogGroup").style.visibility = "visible";
     }
     hideWarning() {
-        console.log('WarningUI hide');
         document.getElementById("warningDialogGroup").style.visibility = "hidden";
     }
 }

@@ -18,15 +18,31 @@ class CommandDispatcher {
         this.renderer.menu.resizeMenu(vw, vh);
         this.renderer.menu.resetAllAnchors();
     };
-    toggleLeftMenu() {
+    /*toggleLeftMenu() {
         //console.log('toggleLeftMenu');
         this.renderer.leftBar.leftHide=!this.renderer.leftBar.leftHide;
         let vw = this.renderer.tileLevelSVG.clientWidth / this.renderer.tiler.tapPxSize();
         let vh = this.renderer.tileLevelSVG.clientHeight / this.renderer.tiler.tapPxSize();
         this.renderer.leftBar.reShowLeftPanel(vw, vh);
         //this.renderer.leftBar.resetAllAnchors();
+    }*/
+    setThemeLocale(loc: string, ratio: number) {
+        console.log("setThemeLocale " + loc);
+        setLocaleID(loc, ratio);
+        if (loc == 'zh') {
+            startLoadCSSfile('theme/font2big.css');
+        } else {
+            startLoadCSSfile('theme/font1small.css');
+        }
+        this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
+        //this.renderer.menu.resetAllAnchors();
     }
-
+    setThemeColor(cssPath: string) {
+        console.log("cssPath " + cssPath);
+        startLoadCSSfile(cssPath);
+        this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
+        //this.renderer.menu.resetAllAnchors();
+    }
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) {
         this.renderer.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
     };
@@ -39,6 +55,7 @@ class CommandDispatcher {
     }
     resetProject(data: MZXBX_Project) {
         console.log('resetProject', data);
+        //this.renderer.menu.readCurrentSongData(data);
         this.renderer.fillWholeUI(data);
     }
     promptImportFromMIDI() {

@@ -31,7 +31,7 @@ class UIRenderer {//} implements RenderedPart {
 	debug: DebugLayerUI;
 	warning: WarningUI;
 	timeselectbar: TimeSelectBar;
-	leftBar: LeftBar;
+	//leftBar: LeftBar;
 	tiler: TileLevelBase;
 	tileLevelSVG: SVGElement;
 	//commands: CommandDispatcher;
@@ -61,7 +61,7 @@ class UIRenderer {//} implements RenderedPart {
 		this.warning.initDialogUI();
 		this.toolbar = new UIToolbar();
 		this.timeselectbar = new TimeSelectBar();
-		this.leftBar = new LeftBar();
+		//this.leftBar = new LeftBar();
 		//this.toolbar.createToolbar(()=>{
 		//	this.toolbar.reRenderToolbar(this.tiler);
 		//});
@@ -83,7 +83,7 @@ class UIRenderer {//} implements RenderedPart {
 			, this.mixer.createMixerLayers()
 			, this.warning.allLayers()
 			, this.timeselectbar.createTimeScale()
-			, this.leftBar.createLeftPanel()
+			//, this.leftBar.createLeftPanel()
 		);
 
 		//this.mixer = new MixerUI();
@@ -127,7 +127,8 @@ class UIRenderer {//} implements RenderedPart {
 		//this.toolbar.fillToolbar(vw, vh);
 		this.toolbar.resizeToolbar(vw, vh);
 
-		this.menu.fillMenuItems();
+        //this.menu.fillMenuItems();
+        this.menu.readCurrentSongData(data);
 		this.menu.resizeMenu(vw, vh);
 		//this.menu.rerenderContent();
 		//this.warning.resetDialogView(data);
@@ -137,8 +138,8 @@ class UIRenderer {//} implements RenderedPart {
 		this.timeselectbar.fillTimeBar(data);
         this.timeselectbar.resizeTimeScale(vw, vh);
         
-        this.leftBar.resizeHeaders(mixm.mixerHeight(), vw, vh, this.tiler.getCurrentPointPosition().z);
-        this.leftBar.fillTrackHeaders(data);
+        //this.leftBar.resizeHeaders(mixm.mixerHeight(), vw, vh, this.tiler.getCurrentPointPosition().z);
+        //this.leftBar.fillTrackHeaders(data);
 
         this.tiler.resetModel();
         
@@ -159,7 +160,7 @@ class UIRenderer {//} implements RenderedPart {
 		this.menu.resizeMenu(vw, vh);
 		this.menu.resetAllAnchors();
 		this.warning.resizeDialog(vw, vh);
-		this.leftBar.resizeHeaders(mixH, vw, vh, this.tiler.getCurrentPointPosition().z);
+		//this.leftBar.resizeHeaders(mixH, vw, vh, this.tiler.getCurrentPointPosition().z);
 	}
 	deleteUI() {
 

@@ -3,6 +3,9 @@ let localNameLocal = 'localNameLocal';
 let localeFontRatio = 1;
 
 let localMenuItemSettings = 'localMenuItemSettings';
+let localMenuTracksFolder = 'localMenuTracksFolder';
+let localMenuImportMIDI = 'localMenuImportMIDI';
+let localMenuPercussionFolder='localMenuPercussionFolder';
 
 let localeDictionary: { id: string, data: { locale: string, text: string }[] }[] = [
     {
@@ -15,6 +18,22 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
             { locale: 'en', text: 'Settings' }
             , { locale: 'ru', text: 'Настройки' }
             , { locale: 'zh', text: '设置' }]
+    }, {
+        id: localMenuTracksFolder, data: [
+            { locale: 'en', text: 'Tracks' }
+            , { locale: 'ru', text: 'Треки' }
+            , { locale: 'zh', text: '?' }]
+    }, {
+        id: localMenuImportMIDI, data: [
+            { locale: 'en', text: 'Import from MIDI-file' }
+            , { locale: 'ru', text: 'Импорт из файлв MIDI' }
+            , { locale: 'zh', text: '?' }]
+    }
+    , {
+        id: localMenuPercussionFolder, data: [
+            { locale: 'en', text: 'Sampler' }
+            , { locale: 'ru', text: 'Сэмплер' }
+            , { locale: 'zh', text: '?' }]
     }
 ];
 function setLocaleID(loname: string, ratio: number) {

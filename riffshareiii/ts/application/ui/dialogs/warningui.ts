@@ -24,11 +24,11 @@ class WarningUI {
 		this.warningLayer = { g: this.warningGroup, anchors: [this.warningAnchor], mode: LevelModes.overlay };
 	}
 	resetDialogView(data: MZXBX_Project) {
-		console.log('resetDialogView');
+		//console.log('resetDialogView');
 		//this.resizeDialog();
 	}
 	resizeDialog(ww: number, hh: number) {
-		console.log('resizeDialog');
+		//console.log('resizeDialog');
 		this.warningRectangle.w = ww;
 		this.warningRectangle.h = hh;
 		this.warningAnchor.ww = ww;
@@ -45,11 +45,11 @@ class WarningUI {
 		return [this.warningLayer];
 	}
 	showWarning() {
-		console.log('WarningUI show');
+		//console.log('WarningUI show');
 		(document.getElementById("warningDialogGroup") as any).style.visibility = "visible";
 	}
 	hideWarning() {
-		console.log('WarningUI hide');
+		//console.log('WarningUI hide');
 		(document.getElementById("warningDialogGroup") as any).style.visibility = "hidden";
 	}
 }

@@ -29,7 +29,8 @@ declare class CommandDispatcher {
     initAudioFromUI(): void;
     registerUI(renderer: UIRenderer): void;
     showRightMenu(): void;
-    toggleLeftMenu(): void;
+    setThemeLocale(loc: string, ratio: number): void;
+    setThemeColor(cssPath: string): void;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     changeTapSize(ratio: number): void;
     resetProject(data: MZXBX_Project): void;
@@ -47,7 +48,6 @@ declare class UIRenderer {
     debug: DebugLayerUI;
     warning: WarningUI;
     timeselectbar: TimeSelectBar;
-    leftBar: LeftBar;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
     lastUsedData: MZXBX_Project;
@@ -62,6 +62,9 @@ declare let labelLocaleDictionary: string;
 declare let localNameLocal: string;
 declare let localeFontRatio: number;
 declare let localMenuItemSettings: string;
+declare let localMenuTracksFolder: string;
+declare let localMenuImportMIDI: string;
+declare let localMenuPercussionFolder: string;
 declare let localeDictionary: {
     id: string;
     data: {
@@ -93,9 +96,7 @@ declare class UIToolbar {
     toolBarAnchor: TileAnchor;
     toolBarGroup: SVGElement;
     toolBarLayer: TileLayerDefinition;
-    playPauseButton: ToolBarButton;
     menuButton: ToolBarButton;
-    headButton: ToolBarButton;
     constructor();
     createToolbar(): TileLayerDefinition[];
     resizeToolbar(viewWIdth: number, viewHeight: number): void;
@@ -137,15 +138,12 @@ declare class RightMenuPanel {
     resetAllAnchors(): void;
     createMenu(): TileLayerDefinition[];
     scrollListing(dx: number, dy: number): void;
-    randomString(nn: number): string;
     fillMenuItems(): void;
     setFocus(it: MenuInfo, infos: MenuInfo[]): void;
     setOpenState(state: boolean, it: MenuInfo, infos: MenuInfo[]): void;
     fillMenuItemChildren(pad: number, infos: MenuInfo[]): void;
-    setThemeLocale(loc: string, ratio: number): void;
-    setThemeColor(cssPath: string): void;
-    setThemeSize(ratio: number, cssPath: string): void;
-    rerenderContent(folder: RightMenuItem | null): void;
+    readCurrentSongData(project: MZXBX_Project): void;
+    rerenderMenuContent(folder: RightMenuItem | null): void;
     resizeMenu(viewWidth: number, viewHeight: number): void;
 }
 declare class RightMenuItem {
@@ -155,9 +153,13 @@ declare class RightMenuItem {
     kindPreview: 3;
     kindClosedFolder: 4;
     kindOpenedFolder: 5;
-    kind: 1 | 2 | 3 | 4 | 5;
+    kindAction2: 6;
+    kind: 1 | 2 | 3 | 4 | 5 | 6;
     action: {
         (x: number, y: number): void;
+    };
+    action2: {
+        (): void;
     };
     pad: number;
     focused: boolean;
@@ -165,6 +167,7 @@ declare class RightMenuItem {
     info: MenuInfo;
     constructor(info: MenuInfo);
     initActionItem(pad: number, focused: boolean, label: string, tap: () => void): this;
+    initActionItem2(pad: number, focused: boolean, label: string, tap: () => void, tap2: () => void): this;
     initDraggableItem(pad: number, focused: boolean, tap: () => void): this;
     initOpenedFolderItem(pad: number, focused: boolean, label: string, tap: () => void): this;
     initClosedFolderItem(pad: number, focused: boolean, label: string, tap: () => void): this;
@@ -174,36 +177,22 @@ declare class RightMenuItem {
 }
 declare type MenuInfo = {
     text: string;
+    noLocalization?: boolean;
     focused?: boolean;
     opened?: boolean;
     children?: MenuInfo[];
     sid?: string;
+    onClick?: () => void;
+    onSubClick?: () => void;
 };
-declare let commandThemeSizeSmall: string;
-declare let commandThemeSizeBig: string;
-declare let commandThemeSizeHuge: string;
-declare let commandThemeColorRed: string;
-declare let commandThemeColorGreen: string;
-declare let commandThemeColorBlue: string;
-declare let commandLocaleEN: string;
-declare let commandLocaleRU: string;
-declare let commandLocaleZH: string;
-declare let commandImportFromMIDI: string;
-declare let testMenuData: MenuInfo[];
-declare class LeftBar {
-    selectionBarLayer: TileLayerDefinition;
-    leftLayerZoom: SVGElement;
-    openedLeftRightBar: TileAnchor;
-    closedLeftRightBar: TileAnchor;
-    openedGridTop: TileAnchor;
-    closedGridTop: TileAnchor;
-    leftHide: boolean;
-    panelWidth: number;
+declare let menuItemsData: MenuInfo[] | null;
+declare let menuPointTracks: MenuInfo;
+declare let menuPointPercussion: MenuInfo;
+declare function composeBaseMenu(): MenuInfo[];
+declare class LeftPanel {
     constructor();
-    reShowLeftPanel(viewWidth: number, viewHeight: number): void;
     createLeftPanel(): TileLayerDefinition[];
-    resizeHeaders(mixerH: number, viewWidth: number, viewHeight: number, tz: number): void;
-    fillTrackHeaders(data: MZXBX_Project): void;
+    fillLeftPanel(): void;
 }
 declare class BarOctave {
     barRightBorder: TileRectangle;

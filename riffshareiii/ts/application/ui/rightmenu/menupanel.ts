@@ -48,7 +48,7 @@ class RightMenuPanel {
     }
 
     createMenu( //resetAnchor: (
-       // parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void
+        // parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void
         //, changeTapSIze: (ratio: number) => void
     ): TileLayerDefinition[] {
         //console.log('createMenu');
@@ -68,13 +68,13 @@ class RightMenuPanel {
 
         this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
         this.menuCloseButton = new IconLabelButton([icon_moveright], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
-            console.log('menuCloseButton', nn);
+            //console.log('menuCloseButton', nn);
             this.showState = false;
             this.resizeMenu(this.lastWidth, this.lastHeight);
             this.resetAllAnchors();
         });
         this.menuUpButton = new IconLabelButton([icon_moveup], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
-            console.log('up', nn);
+            //console.log('up', nn);
             this.scrollY = 0;
             this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         });
@@ -87,7 +87,7 @@ class RightMenuPanel {
         this.backgroundAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111
             , showZoom: zoomPrefixLevelsCSS[0].minZoom
-            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom
+            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
             , content: [
                 this.listingShadow
                 , this.backgroundRectangle
@@ -97,7 +97,7 @@ class RightMenuPanel {
         this.contentAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111
             , showZoom: zoomPrefixLevelsCSS[0].minZoom
-            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom
+            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
             , content: [
                 //this.testContent
             ], id: 'rightMenuContentAnchor'
@@ -105,7 +105,7 @@ class RightMenuPanel {
         this.interAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0
             , showZoom: zoomPrefixLevelsCSS[0].minZoom
-            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom
+            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
             , content: [
                 this.dragHandler
             ], id: 'rightMenuInteractionAnchor'
@@ -113,7 +113,7 @@ class RightMenuPanel {
         this.buttonsAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0
             , showZoom: zoomPrefixLevelsCSS[0].minZoom
-            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom
+            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
             , content: [
                 this.menuCloseButton.anchor, this.menuUpButton.anchor
             ]
@@ -151,7 +151,7 @@ class RightMenuPanel {
         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         commandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
-    randomString(nn: number) {
+    /*randomString(nn: number) {
         let words: string[] = ['red', 'green', 'blue', 'purple', 'black', 'white', 'yellow', 'grey', 'orange', 'cyan', 'magenta', 'silver', 'olive'];
         let ss = words[Math.floor(Math.random() * (words.length - 1))];
         ss = ss[0].toUpperCase() + ss.substring(1);
@@ -159,8 +159,9 @@ class RightMenuPanel {
             ss = ss + ' ' + words[Math.floor(Math.random() * (words.length - 1))];
         }
         return ss;
-    }
+    }*/
     fillMenuItems() {//viewWIdth: number, viewHeight: number) {
+        //console.log('fillMenuItems');
         this.items = [];
         /*
         for (let ii = 0; ii < 19; ii++) {
@@ -180,13 +181,15 @@ class RightMenuPanel {
             this.items[ii].pad=0.5;
         }
 */
-        this.fillMenuItemChildren(0, testMenuData);
+        this.fillMenuItemChildren(0, composeBaseMenu());
     }
     setFocus(it: MenuInfo, infos: MenuInfo[]) {
         for (let ii = 0; ii < infos.length; ii++) {
             infos[ii].focused = false;
         }
         it.focused = true;
+        this.rerenderMenuContent(null);
+        //console.log('setFocus', it,infos);
     }
     setOpenState(state: boolean, it: MenuInfo, infos: MenuInfo[]) {
         for (let ii = 0; ii < infos.length; ii++) {
@@ -196,32 +199,67 @@ class RightMenuPanel {
         it.focused = true;
         it.opened = state;
     }
+    /*resetSongDtaMenuItems(infos: MenuInfo[]) {
+
+    }*/
     fillMenuItemChildren(pad: number, infos: MenuInfo[]): void {
+        //console.log('fillMenuItemChildren', pad, infos);
         let me = this;
         for (let ii = 0; ii < infos.length; ii++) {
             let it = infos[ii];
             let focused = (it.focused) ? true : false;
             let opened = (it.opened) ? true : false;
             let children = it.children;
+            let itemLabel = '';
+            if (it.noLocalization) {
+                itemLabel = it.text;
+            } else {
+                itemLabel = LO(it.text);
+            }
             if (children) {
                 if (opened) {
-                    this.items.push(new RightMenuItem(it).initOpenedFolderItem(pad, focused, it.text, () => {
-                        console.log("close " + ii);
+                    this.items.push(new RightMenuItem(it).initOpenedFolderItem(pad, focused, itemLabel, () => {
+                        //console.log("close " + ii);
                         me.setOpenState(false, it, infos);
-                        me.rerenderContent(null);
+                        me.rerenderMenuContent(null);
                     }));
                     this.fillMenuItemChildren(pad + 0.5, children);
                 } else {
                     let si: RightMenuItem = new RightMenuItem(it);
-                    let order = this.items.length;
-                    this.items.push(si.initClosedFolderItem(pad, focused, it.text, () => {
-                        console.log("open " + ii);
+                    //let order = this.items.length;
+                    this.items.push(si.initClosedFolderItem(pad, focused, itemLabel, () => {
+                        //console.log("open " + ii);
                         me.setOpenState(true, it, infos);
-                        me.rerenderContent(si);
+                        me.rerenderMenuContent(si);
                     }));
                 }
             } else {
+                if (it.onSubClick) {
+                    this.items.push(new RightMenuItem(it).initActionItem2(pad, focused, itemLabel, () => {
+                        if (it.onClick) {
+                            it.onClick();
+                        }
+                        me.setFocus(it, infos);
+                        me.resetAllAnchors();
+                    }, () => {
+                        if (it.onSubClick) {
+                            it.onSubClick();
+                        }
+                        me.setFocus(it, infos);
+                        me.resetAllAnchors();
+                    }));
+                } else {
+                    this.items.push(new RightMenuItem(it).initActionItem(pad, focused, itemLabel, () => {
+                        if (it.onClick) {
+                            it.onClick();
+                        }
+                        me.setFocus(it, infos);
+                        me.resetAllAnchors();
+                    }));
+                }
+                /*
                 switch (it.sid) {
+                    
                     case commandThemeSizeSmall: {
                         this.items.push(new RightMenuItem(it).initActionItem(pad, focused, it.text, () => {
                             me.setFocus(it, infos);
@@ -302,34 +340,60 @@ class RightMenuPanel {
                         break;
                     }
                 }
-
+*/
 
             }
         }
     }
-    setThemeLocale(loc: string,ratio:number) {
+    /*setThemeLocale(loc: string, ratio: number) {
         console.log("setThemeLocale " + loc);
-        setLocaleID(loc,ratio);
-        if(loc=='zh'){
+        setLocaleID(loc, ratio);
+        if (loc == 'zh') {
             startLoadCSSfile('theme/font2big.css');
-        }else{
+        } else {
             startLoadCSSfile('theme/font1small.css');
         }
         this.resizeMenu(this.lastWidth, this.lastHeight);
         this.resetAllAnchors();
-    }
-    setThemeColor(cssPath: string) {
+    }*/
+    /*setThemeColor(cssPath: string) {
         console.log("cssPath " + cssPath);
         startLoadCSSfile(cssPath);
         this.resizeMenu(this.lastWidth, this.lastHeight);
         this.resetAllAnchors();
-    }
-    setThemeSize(ratio: number, cssPath: string) {
+    }*/
+    /*setThemeSize(ratio: number, cssPath: string) {
         console.log("cssPath " + cssPath);
         startLoadCSSfile(cssPath);
         commandDispatcher.changeTapSize(ratio);
+    }*/
+    readCurrentSongData(project: MZXBX_Project) {
+        console.log('readCurrentSongData');
+        menuPointTracks.children = [];
+        for (let tt = 0; tt < project.tracks.length; tt++) {
+            let track = project.tracks[tt];
+            let item: MenuInfo = {
+                text: track.title
+                , noLocalization: true
+                , onClick: () => { console.log('click track', track); }
+                , onSubClick: () => { console.log('sub track', track); }
+            };
+            menuPointTracks.children.push(item);
+        }
+        menuPointPercussion.children = [];
+        for (let tt = 0; tt < project.percussions.length; tt++) {
+            let drum = project.percussions[tt];
+            let item: MenuInfo = {
+                text: drum.title
+                , noLocalization: true
+                , onClick: () => { console.log('click drum', drum); }
+                , onSubClick: () => { console.log('sub drum', drum); }
+            };
+            menuPointPercussion.children.push(item);
+        }
     }
-    rerenderContent(folder: RightMenuItem | null) {
+    rerenderMenuContent(folder: RightMenuItem | null) {
+        //console.log('rerenderMenuContent');
         /*if (folder == null) {
             //
         } else {
@@ -358,6 +422,7 @@ class RightMenuPanel {
         //this.scrollListing(0,this.scrollY);
     }
     resizeMenu(viewWidth: number, viewHeight: number) {
+        //console.log('resizeMenu');
         //console.log('resizeMenu', viewWidth, viewHeight, this.showState);
         this.lastWidth = viewWidth;
         this.lastHeight = viewHeight;
@@ -419,7 +484,7 @@ class RightMenuPanel {
         this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
 
         //console.log(this.dragHandler);
-        this.rerenderContent(null);
+        this.rerenderMenuContent(null);
     }
 
 }
