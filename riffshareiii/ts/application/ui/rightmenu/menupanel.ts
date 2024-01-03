@@ -1,7 +1,7 @@
 class RightMenuPanel {
     menuCloseButton: IconLabelButton;
     menuUpButton: IconLabelButton;
-    showState: boolean = false;
+    showState: boolean = true;
     lastWidth: number = 0;
     lastHeight: number = 0;
 
@@ -218,44 +218,60 @@ class RightMenuPanel {
             }
             if (children) {
                 if (opened) {
-                    this.items.push(new RightMenuItem(it).initOpenedFolderItem(pad, focused, itemLabel, () => {
+                    this.items.push(new RightMenuItem(it, pad).initOpenedFolderItem());/*pad, focused, itemLabel, () => {
                         //console.log("close " + ii);
                         me.setOpenState(false, it, infos);
                         me.rerenderMenuContent(null);
-                    }));
+                    }));*/
                     this.fillMenuItemChildren(pad + 0.5, children);
                 } else {
-                    let si: RightMenuItem = new RightMenuItem(it);
-                    //let order = this.items.length;
-                    this.items.push(si.initClosedFolderItem(pad, focused, itemLabel, () => {
+                    let si: RightMenuItem = new RightMenuItem(it, pad, () => {
                         //console.log("open " + ii);
                         me.setOpenState(true, it, infos);
                         me.rerenderMenuContent(si);
-                    }));
+                    }).initClosedFolderItem();
+                    this.items.push(si);
+                    //let order = this.items.length;
+                    /*this.items.push(si.initClosedFolderItem(pad, focused, itemLabel, () => {
+                        //console.log("open " + ii);
+                        me.setOpenState(true, it, infos);
+                        me.rerenderMenuContent(si);
+                    }));*/
                 }
             } else {
                 if (it.onSubClick) {
-                    this.items.push(new RightMenuItem(it).initActionItem2(pad, focused, itemLabel, () => {
+                    let rightMenuItem = new RightMenuItem(it, pad, () => {
                         if (it.onClick) {
                             it.onClick();
                         }
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
                     }, () => {
+                        if (it.states) {
+                            let sel = it.selection ? it.selection : 0;
+                            if (it.states.length - 1 > sel) {
+                                sel++;
+                            } else {
+                                sel = 0;
+                            }
+                            it.selection = sel;
+                        }
                         if (it.onSubClick) {
                             it.onSubClick();
                         }
-                        me.setFocus(it, infos);
-                        me.resetAllAnchors();
-                    }));
+                        //me.setFocus(it, infos);
+                        //me.resetAllAnchors();
+                        me.rerenderMenuContent(rightMenuItem);
+                    });
+                    this.items.push(rightMenuItem.initActionItem2());
                 } else {
-                    this.items.push(new RightMenuItem(it).initActionItem(pad, focused, itemLabel, () => {
+                    this.items.push(new RightMenuItem(it, pad, () => {
                         if (it.onClick) {
                             it.onClick();
                         }
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
-                    }));
+                    }).initActionItem());
                 }
                 /*
                 switch (it.sid) {
@@ -345,28 +361,6 @@ class RightMenuPanel {
             }
         }
     }
-    /*setThemeLocale(loc: string, ratio: number) {
-        console.log("setThemeLocale " + loc);
-        setLocaleID(loc, ratio);
-        if (loc == 'zh') {
-            startLoadCSSfile('theme/font2big.css');
-        } else {
-            startLoadCSSfile('theme/font1small.css');
-        }
-        this.resizeMenu(this.lastWidth, this.lastHeight);
-        this.resetAllAnchors();
-    }*/
-    /*setThemeColor(cssPath: string) {
-        console.log("cssPath " + cssPath);
-        startLoadCSSfile(cssPath);
-        this.resizeMenu(this.lastWidth, this.lastHeight);
-        this.resetAllAnchors();
-    }*/
-    /*setThemeSize(ratio: number, cssPath: string) {
-        console.log("cssPath " + cssPath);
-        startLoadCSSfile(cssPath);
-        commandDispatcher.changeTapSize(ratio);
-    }*/
     readCurrentSongData(project: MZXBX_Project) {
         console.log('readCurrentSongData');
         menuPointTracks.children = [];
@@ -375,9 +369,30 @@ class RightMenuPanel {
             let item: MenuInfo = {
                 text: track.title
                 , noLocalization: true
-                , onClick: () => { console.log('click track', track); }
-                , onSubClick: () => { console.log('sub track', track); }
+                , onClick: () => {
+                    //console.log('click track', track);
+                    commandDispatcher.moveTrackTop(tt);
+                }
+                , onSubClick: () => {
+                    //console.log('sub track', track, item);
+                    let state = item.selection ? item.selection : 0;
+                    commandDispatcher.setTrackSoloState(state);
+                }
+                , states: [icon_sound_low, icon_hide, icon_sound_loud]
+                , selection: 0
             };
+            /*item.onSubClick = () => {
+                if (item.states) {
+                    let sel = item.selection ? item.selection : 0;
+                    if (item.states.length - 1 > sel) {
+                        sel++;
+                    } else {
+                        sel = 0;
+                    }
+                    item.selection = sel;
+                }
+                console.log('sub track', track,item);
+            };*/
             menuPointTracks.children.push(item);
         }
         menuPointPercussion.children = [];
@@ -386,9 +401,30 @@ class RightMenuPanel {
             let item: MenuInfo = {
                 text: drum.title
                 , noLocalization: true
-                , onClick: () => { console.log('click drum', drum); }
-                , onSubClick: () => { console.log('sub drum', drum); }
+                , onClick: () => {
+                    //console.log('click drum', drum);
+                    commandDispatcher.moveDrumTop(tt);
+                }
+                , onSubClick: () => {
+                    //console.log('sub drum', drum, item);
+                    let state = item.selection ? item.selection : 0;
+                    commandDispatcher.setDrumSoloState(state);
+                }
+                , states: [icon_sound_low, icon_hide, icon_sound_loud]
+                , selection: 0
             };
+            /*item.onSubClick = () => {
+                if (item.states) {
+                    let sel = item.selection ? item.selection : 0;
+                    if (item.states.length - 1 > sel) {
+                        sel++;
+                    } else {
+                        sel = 0;
+                    }
+                    item.selection = sel;
+                }
+                console.log('sub drum', drum,item);
+            };*/
             menuPointPercussion.children.push(item);
         }
     }

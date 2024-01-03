@@ -95,4 +95,8 @@
     fill: var(--color-subtext);
 	font-size: var(--label-1cm);
 }
-
+.noteLine{
+    stroke: var(--color-text);
+    stroke-linejoin: round;
+    stroke-width: calc(0.25*var(--tapSize));
+}

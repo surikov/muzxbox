@@ -114,28 +114,28 @@ class UIRenderer {//} implements RenderedPart {
 		});
 	}
 
-	fillWholeUI(data: MZXBX_Project) {
-		let mixm: MixerDataMath = new MixerDataMath(data);
+	fillWholeUI() {
+		let mixm: MixerDataMath = new MixerDataMath(commandDispatcher.workData);
 		let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
 		let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
 		this.tiler.resetInnerSize(mixm.mixerWidth(), mixm.mixerHeight());
 
-		this.mixer.reFillMixerUI(data);
+		this.mixer.reFillMixerUI(commandDispatcher.workData);
 
-		this.debug.resetDebugView(data);
+		this.debug.resetDebugView(commandDispatcher.workData);
 
 		//this.toolbar.fillToolbar(vw, vh);
 		this.toolbar.resizeToolbar(vw, vh);
 
         //this.menu.fillMenuItems();
-        this.menu.readCurrentSongData(data);
+        this.menu.readCurrentSongData(commandDispatcher.workData);
 		this.menu.resizeMenu(vw, vh);
 		//this.menu.rerenderContent();
 		//this.warning.resetDialogView(data);
 		this.warning.resizeDialog(vw, vh);
 
 
-		this.timeselectbar.fillTimeBar(data);
+		this.timeselectbar.fillTimeBar(commandDispatcher.workData);
         this.timeselectbar.resizeTimeScale(vw, vh);
         
         //this.leftBar.resizeHeaders(mixm.mixerHeight(), vw, vh, this.tiler.getCurrentPointPosition().z);

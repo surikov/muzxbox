@@ -25,15 +25,21 @@ declare class CommandDispatcher {
     renderer: UIRenderer;
     audioContext: AudioContext;
     tapSizeRatio: number;
+    workData: MZXBX_Project;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
     initAudioFromUI(): void;
+    registerWorkProject(data: MZXBX_Project): void;
     registerUI(renderer: UIRenderer): void;
     showRightMenu(): void;
     setThemeLocale(loc: string, ratio: number): void;
     setThemeColor(cssPath: string): void;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     changeTapSize(ratio: number): void;
-    resetProject(data: MZXBX_Project): void;
+    resetProject(): void;
+    moveTrackTop(trackNum: number): void;
+    moveDrumTop(drumNum: number): void;
+    setTrackSoloState(state: number): void;
+    setDrumSoloState(state: number): void;
     promptImportFromMIDI(): void;
 }
 declare let commandDispatcher: CommandDispatcher;
@@ -54,7 +60,7 @@ declare class UIRenderer {
     constructor();
     changeTapSIze(ratio: number): void;
     createUI(): void;
-    fillWholeUI(data: MZXBX_Project): void;
+    fillWholeUI(): void;
     onReSizeView(): void;
     deleteUI(): void;
 }
@@ -147,7 +153,6 @@ declare class RightMenuPanel {
     resizeMenu(viewWidth: number, viewHeight: number): void;
 }
 declare class RightMenuItem {
-    label: string;
     kindAction: 1;
     kindDraggable: 2;
     kindPreview: 3;
@@ -155,23 +160,22 @@ declare class RightMenuItem {
     kindOpenedFolder: 5;
     kindAction2: 6;
     kind: 1 | 2 | 3 | 4 | 5 | 6;
-    action: {
-        (x: number, y: number): void;
+    action?: {
+        (): void;
     };
-    action2: {
+    action2?: {
         (): void;
     };
     pad: number;
-    focused: boolean;
     top: number;
     info: MenuInfo;
-    constructor(info: MenuInfo);
-    initActionItem(pad: number, focused: boolean, label: string, tap: () => void): this;
-    initActionItem2(pad: number, focused: boolean, label: string, tap: () => void, tap2: () => void): this;
-    initDraggableItem(pad: number, focused: boolean, tap: () => void): this;
-    initOpenedFolderItem(pad: number, focused: boolean, label: string, tap: () => void): this;
-    initClosedFolderItem(pad: number, focused: boolean, label: string, tap: () => void): this;
-    initPreviewItem(pad: number, focused: boolean, tap: () => void): this;
+    constructor(info: MenuInfo, pad: number, tap?: () => void, tap2?: () => void);
+    initActionItem(): RightMenuItem;
+    initActionItem2(): RightMenuItem;
+    initDraggableItem(): RightMenuItem;
+    initOpenedFolderItem(): RightMenuItem;
+    initClosedFolderItem(): RightMenuItem;
+    initPreviewItem(): RightMenuItem;
     calculateHeight(): number;
     buildTile(itemTop: number, itemWidth: number): TileItem;
 }
@@ -184,6 +188,8 @@ declare type MenuInfo = {
     sid?: string;
     onClick?: () => void;
     onSubClick?: () => void;
+    states?: string[];
+    selection?: number;
 };
 declare let menuItemsData: MenuInfo[] | null;
 declare let menuPointTracks: MenuInfo;
@@ -250,6 +256,12 @@ declare let icon_moveleft: string;
 declare let icon_moveright: string;
 declare let icon_warningPlay: string;
 declare let icon_gear: string;
+declare let icon_sound_low: string;
+declare let icon_sound_middle: string;
+declare let icon_sound_loud: string;
+declare let icon_sound_none: string;
+declare let icon_sound_surround: string;
+declare let icon_hide: string;
 declare class DebugLayerUI {
     debugRectangle: TileRectangle;
     debugAnchor: TileAnchor;
@@ -276,7 +288,7 @@ declare class WarningUI {
     showWarning(): void;
     hideWarning(): void;
 }
-declare let mzxbxProjectForTesting: MZXBX_Project;
+declare let mzxbxProjectForTesting2: MZXBX_Project;
 declare let testBigMixerData: {
     title: string;
     timeline: {

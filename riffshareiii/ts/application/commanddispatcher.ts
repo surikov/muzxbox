@@ -3,10 +3,15 @@ class CommandDispatcher {
     renderer: UIRenderer;
     audioContext: AudioContext;
     tapSizeRatio: number = 1;
+    workData: MZXBX_Project;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any) = null;
     initAudioFromUI() {
+        console.log('initAudioFromUI');
         var AudioContext = window.AudioContext;// || window.webkitAudioContext;
         this.audioContext = new AudioContext();
+    }
+    registerWorkProject(data: MZXBX_Project) {
+        this.workData = data;
     }
     registerUI(renderer: UIRenderer) {
         this.renderer = renderer;
@@ -53,10 +58,32 @@ class CommandDispatcher {
         this.renderer.onReSizeView();
         this.renderer.tiler.resetModel();
     }
-    resetProject(data: MZXBX_Project) {
-        console.log('resetProject', data);
+    resetProject() {//data: MZXBX_Project) {
+        //console.log('resetProject', data);
         //this.renderer.menu.readCurrentSongData(data);
-        this.renderer.fillWholeUI(data);
+        //this.registerWorkProject(data);
+        this.renderer.fillWholeUI();//this.workData);
+    }
+    moveTrackTop(trackNum: number) {
+        //console.log('moveTrackTop', trackNum);
+        let it = this.workData.tracks[trackNum];
+        this.workData.tracks.splice(trackNum, 1);
+        this.workData.tracks.unshift(it);
+        commandDispatcher.resetProject();
+    }
+    moveDrumTop(drumNum: number) {
+        //console.log('moveDrumTop', drumNum);
+        //console.log('moveTrackTop', trackNum);
+        let it = this.workData.percussions[drumNum];
+        this.workData.percussions.splice(drumNum, 1);
+        this.workData.percussions.unshift(it);
+        commandDispatcher.resetProject();
+    }
+    setTrackSoloState(state: number) {
+        console.log('setTrackSoloState', state);
+    }
+    setDrumSoloState(state: number) {
+        console.log('setDrumSoloState', state);
     }
     promptImportFromMIDI() {
         console.log('promptImportFromMIDI');
@@ -80,7 +107,8 @@ class CommandDispatcher {
                             var midiParser = newMIDIparser(arrayBuffer);
                             let result: MZXBX_Project = midiParser.convertProject(title, comment);
                             //console.log('result',result);
-                            me.resetProject(result);
+                            me.registerWorkProject(result);
+                            me.resetProject();
                         }
                     };
                     fileReader.readAsArrayBuffer(file);

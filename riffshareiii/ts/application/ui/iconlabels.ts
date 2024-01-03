@@ -12,4 +12,11 @@ let icon_movedown='&#xf2f9;';
 let icon_moveleft='&#xf2fa;';
 let icon_moveright='&#xf2fb;';
 let icon_warningPlay='&#xf2f5;'
-let icon_gear='&#xf1c6;'
+let icon_gear='&#xf1c6;';
+
+let icon_sound_low='&#xf3ba;';
+let icon_sound_middle='&#xf3b9;';
+let icon_sound_loud='&#xf3bc;';
+let icon_sound_none='&#xf3bb;';
+let icon_sound_surround='&#xf3b7;';
+let icon_hide='&#xf15b;';

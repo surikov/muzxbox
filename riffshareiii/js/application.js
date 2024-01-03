@@ -141,7 +141,8 @@ function startApplication() {
     console.log('startApplication v1.6.01');
     let ui = new UIRenderer();
     ui.createUI();
-    ui.fillWholeUI(mzxbxProjectForTesting);
+    commandDispatcher.registerWorkProject(mzxbxProjectForTesting2);
+    commandDispatcher.resetProject();
 }
 function initWebAudioFromUI() {
     console.log('initWebAudioFromUI');
@@ -162,8 +163,12 @@ class CommandDispatcher {
         this.listener = null;
     }
     initAudioFromUI() {
+        console.log('initAudioFromUI');
         var AudioContext = window.AudioContext;
         this.audioContext = new AudioContext();
+    }
+    registerWorkProject(data) {
+        this.workData = data;
     }
     registerUI(renderer) {
         this.renderer = renderer;
@@ -203,9 +208,26 @@ class CommandDispatcher {
         this.renderer.onReSizeView();
         this.renderer.tiler.resetModel();
     }
-    resetProject(data) {
-        console.log('resetProject', data);
-        this.renderer.fillWholeUI(data);
+    resetProject() {
+        this.renderer.fillWholeUI();
+    }
+    moveTrackTop(trackNum) {
+        let it = this.workData.tracks[trackNum];
+        this.workData.tracks.splice(trackNum, 1);
+        this.workData.tracks.unshift(it);
+        commandDispatcher.resetProject();
+    }
+    moveDrumTop(drumNum) {
+        let it = this.workData.percussions[drumNum];
+        this.workData.percussions.splice(drumNum, 1);
+        this.workData.percussions.unshift(it);
+        commandDispatcher.resetProject();
+    }
+    setTrackSoloState(state) {
+        console.log('setTrackSoloState', state);
+    }
+    setDrumSoloState(state) {
+        console.log('setDrumSoloState', state);
     }
     promptImportFromMIDI() {
         console.log('promptImportFromMIDI');
@@ -223,7 +245,8 @@ class CommandDispatcher {
                             var arrayBuffer = progressEvent.target.result;
                             var midiParser = newMIDIparser(arrayBuffer);
                             let result = midiParser.convertProject(title, comment);
-                            me.resetProject(result);
+                            me.registerWorkProject(result);
+                            me.resetProject();
                         }
                     };
                     fileReader.readAsArrayBuffer(file);
@@ -281,18 +304,18 @@ class UIRenderer {
             this.onReSizeView();
         });
     }
-    fillWholeUI(data) {
-        let mixm = new MixerDataMath(data);
+    fillWholeUI() {
+        let mixm = new MixerDataMath(commandDispatcher.workData);
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.tiler.resetInnerSize(mixm.mixerWidth(), mixm.mixerHeight());
-        this.mixer.reFillMixerUI(data);
-        this.debug.resetDebugView(data);
+        this.mixer.reFillMixerUI(commandDispatcher.workData);
+        this.debug.resetDebugView(commandDispatcher.workData);
         this.toolbar.resizeToolbar(vw, vh);
-        this.menu.readCurrentSongData(data);
+        this.menu.readCurrentSongData(commandDispatcher.workData);
         this.menu.resizeMenu(vw, vh);
         this.warning.resizeDialog(vw, vh);
-        this.timeselectbar.fillTimeBar(data);
+        this.timeselectbar.fillTimeBar(commandDispatcher.workData);
         this.timeselectbar.resizeTimeScale(vw, vh);
         this.tiler.resetModel();
     }
@@ -553,7 +576,7 @@ class ToolBarButton {
 }
 class RightMenuPanel {
     constructor() {
-        this.showState = false;
+        this.showState = true;
         this.lastWidth = 0;
         this.lastHeight = 0;
         this.items = [];
@@ -677,44 +700,51 @@ class RightMenuPanel {
             }
             if (children) {
                 if (opened) {
-                    this.items.push(new RightMenuItem(it).initOpenedFolderItem(pad, focused, itemLabel, () => {
-                        me.setOpenState(false, it, infos);
-                        me.rerenderMenuContent(null);
-                    }));
+                    this.items.push(new RightMenuItem(it, pad).initOpenedFolderItem());
                     this.fillMenuItemChildren(pad + 0.5, children);
                 }
                 else {
-                    let si = new RightMenuItem(it);
-                    this.items.push(si.initClosedFolderItem(pad, focused, itemLabel, () => {
+                    let si = new RightMenuItem(it, pad, () => {
                         me.setOpenState(true, it, infos);
                         me.rerenderMenuContent(si);
-                    }));
+                    }).initClosedFolderItem();
+                    this.items.push(si);
                 }
             }
             else {
                 if (it.onSubClick) {
-                    this.items.push(new RightMenuItem(it).initActionItem2(pad, focused, itemLabel, () => {
+                    let rightMenuItem = new RightMenuItem(it, pad, () => {
                         if (it.onClick) {
                             it.onClick();
                         }
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
                     }, () => {
+                        if (it.states) {
+                            let sel = it.selection ? it.selection : 0;
+                            if (it.states.length - 1 > sel) {
+                                sel++;
+                            }
+                            else {
+                                sel = 0;
+                            }
+                            it.selection = sel;
+                        }
                         if (it.onSubClick) {
                             it.onSubClick();
                         }
-                        me.setFocus(it, infos);
-                        me.resetAllAnchors();
-                    }));
+                        me.rerenderMenuContent(rightMenuItem);
+                    });
+                    this.items.push(rightMenuItem.initActionItem2());
                 }
                 else {
-                    this.items.push(new RightMenuItem(it).initActionItem(pad, focused, itemLabel, () => {
+                    this.items.push(new RightMenuItem(it, pad, () => {
                         if (it.onClick) {
                             it.onClick();
                         }
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
-                    }));
+                    }).initActionItem());
                 }
             }
         }
@@ -727,8 +757,15 @@ class RightMenuPanel {
             let item = {
                 text: track.title,
                 noLocalization: true,
-                onClick: () => { console.log('click track', track); },
-                onSubClick: () => { console.log('sub track', track); }
+                onClick: () => {
+                    commandDispatcher.moveTrackTop(tt);
+                },
+                onSubClick: () => {
+                    let state = item.selection ? item.selection : 0;
+                    commandDispatcher.setTrackSoloState(state);
+                },
+                states: [icon_sound_low, icon_hide, icon_sound_loud],
+                selection: 0
             };
             menuPointTracks.children.push(item);
         }
@@ -738,8 +775,15 @@ class RightMenuPanel {
             let item = {
                 text: drum.title,
                 noLocalization: true,
-                onClick: () => { console.log('click drum', drum); },
-                onSubClick: () => { console.log('sub drum', drum); }
+                onClick: () => {
+                    commandDispatcher.moveDrumTop(tt);
+                },
+                onSubClick: () => {
+                    let state = item.selection ? item.selection : 0;
+                    commandDispatcher.setDrumSoloState(state);
+                },
+                states: [icon_sound_low, icon_hide, icon_sound_loud],
+                selection: 0
             };
             menuPointPercussion.children.push(item);
         }
@@ -814,8 +858,7 @@ class RightMenuPanel {
     }
 }
 class RightMenuItem {
-    constructor(info) {
-        this.label = '';
+    constructor(info, pad, tap, tap2) {
         this.kindAction = 1;
         this.kindDraggable = 2;
         this.kindPreview = 3;
@@ -824,59 +867,38 @@ class RightMenuItem {
         this.kindAction2 = 6;
         this.kind = this.kindAction;
         this.pad = 0;
-        this.focused = false;
         this.info = info;
+        this.pad = pad;
+        this.action = tap;
+        this.action2 = tap2;
         if (this.info.sid) {
         }
         else {
             this.info.sid = 'random' + Math.random();
         }
     }
-    initActionItem(pad, focused, label, tap) {
-        this.pad = pad;
-        this.focused = focused;
+    initActionItem() {
         this.kind = this.kindAction;
-        this.label = label;
-        this.action = tap;
         return this;
     }
-    initActionItem2(pad, focused, label, tap, tap2) {
-        this.pad = pad;
-        this.focused = focused;
+    initActionItem2() {
         this.kind = this.kindAction2;
-        this.label = label;
-        this.action = tap;
-        this.action2 = tap2;
         return this;
     }
-    initDraggableItem(pad, focused, tap) {
+    initDraggableItem() {
         this.kind = this.kindDraggable;
-        this.focused = focused;
-        this.pad = pad;
-        this.action = tap;
         return this;
     }
-    initOpenedFolderItem(pad, focused, label, tap) {
-        this.pad = pad;
-        this.label = label;
-        this.focused = focused;
+    initOpenedFolderItem() {
         this.kind = this.kindOpenedFolder;
-        this.action = tap;
         return this;
     }
-    initClosedFolderItem(pad, focused, label, tap) {
-        this.pad = pad;
-        this.label = label;
-        this.focused = focused;
+    initClosedFolderItem() {
         this.kind = this.kindClosedFolder;
-        this.action = tap;
         return this;
     }
-    initPreviewItem(pad, focused, tap) {
-        this.focused = focused;
-        this.pad = pad;
+    initPreviewItem() {
         this.kind = this.kindPreview;
-        this.action = tap;
         return this;
     }
     calculateHeight() {
@@ -888,12 +910,21 @@ class RightMenuItem {
         }
     }
     buildTile(itemTop, itemWidth) {
+        let label = '?';
+        if (this.info.noLocalization) {
+            label = this.info.text;
+        }
+        else {
+            label = LO(this.info.text);
+        }
         this.top = itemTop;
-        let anchor = { xx: 0, yy: itemTop, ww: 111, hh: 111,
+        let anchor = {
+            xx: 0, yy: itemTop, ww: 111, hh: 111,
             showZoom: zoomPrefixLevelsCSS[0].minZoom,
             hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
-            content: [] };
-        if (this.focused) {
+            content: []
+        };
+        if (this.info.focused) {
             anchor.content.push({ x: itemWidth - 0.2, y: itemTop + 0.02, w: 0.2, h: this.calculateHeight() - 0.02, css: 'rightMenuFocusedDelimiter' });
         }
         anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.02, css: 'rightMenuDelimiterLine' });
@@ -901,38 +932,46 @@ class RightMenuItem {
         let spot2 = null;
         if (this.kind == this.kindAction) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindAction2) {
+            let icon = '?';
+            let sel = this.info.selection ? this.info.selection : 0;
+            if (this.info.states) {
+                if (this.info.states.length > sel) {
+                    icon = this.info.states[sel];
+                }
+            }
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
-            anchor.content.push({ x: itemWidth - 0.9, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: itemWidth - 1.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
+            anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: icon, css: 'rightMenuIconLabel' });
             spot2 = { x: itemWidth - 0.9, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
         }
         if (this.kind == this.kindDraggable) {
             spot.draggable = true;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindOpenedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_movedown, css: 'rightMenuIconLabel' });
-            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindClosedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_moveright, css: 'rightMenuIconLabel' });
-            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindPreview) {
             spot.draggable = true;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: this.label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
             anchor.content.push({ x: itemWidth - 1 + 0.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemSubActionBG' });
             anchor.content.push({ x: itemWidth - 0.5, y: itemTop + 0.7, text: icon_play, css: 'rightMenuButtonLabel' });
             anchor.content.push({ x: itemWidth - 1, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' });
-            anchor.content.push({ x: 0.3 + 1 + this.pad, y: itemTop + 0.7 + 0.55, text: this.label, css: 'rightMenuSubLabel' });
-            anchor.content.push({ x: 0.3 + 1 + this.pad, y: itemTop + 0.7 + 0.55 + 0.55, text: this.label, css: 'rightMenuSubLabel' });
+            anchor.content.push({ x: 0.3 + 1 + this.pad, y: itemTop + 0.7 + 0.55, text: label, css: 'rightMenuSubLabel' });
+            anchor.content.push({ x: 0.3 + 1 + this.pad, y: itemTop + 0.7 + 0.55 + 0.55, text: label, css: 'rightMenuSubLabel' });
         }
         anchor.content.push(spot);
         if (spot2) {
@@ -1065,10 +1104,18 @@ class BarOctave {
                         let from = octaveIdx * 12;
                         let to = (octaveIdx + 1) * 12;
                         if (note.pitch >= from && note.pitch < to) {
-                            let x = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * data.theme.widthDurationRatio;
-                            let y = top + height - (note.pitch - from) * data.theme.notePathHeight;
-                            let dot = { x: x, y: y, w: data.theme.notePathHeight, h: data.theme.notePathHeight, css: 'mixTextFill' };
-                            anchor.content.push(dot);
+                            let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * data.theme.widthDurationRatio;
+                            let y1 = top + height - (note.pitch - from) * data.theme.notePathHeight;
+                            for (let ss = 0; ss < note.slides.length; ss++) {
+                                let x2 = x1 + MZMM().set(note.slides[ss].duration)
+                                    .duration(data.timeline[barIdx].tempo)
+                                    * data.theme.widthDurationRatio;
+                                let y2 = y1 + note.slides[ss].delta * data.theme.notePathHeight;
+                                let line = { x1: x1, y1: y1, x2: x2, y2: y2, css: 'noteLine' };
+                                anchor.content.push(line);
+                                x1 = x2;
+                                y1 = y2;
+                            }
                         }
                     }
                 }
@@ -1224,6 +1271,12 @@ let icon_moveleft = '&#xf2fa;';
 let icon_moveright = '&#xf2fb;';
 let icon_warningPlay = '&#xf2f5;';
 let icon_gear = '&#xf1c6;';
+let icon_sound_low = '&#xf3ba;';
+let icon_sound_middle = '&#xf3b9;';
+let icon_sound_loud = '&#xf3bc;';
+let icon_sound_none = '&#xf3bb;';
+let icon_sound_surround = '&#xf3b7;';
+let icon_hide = '&#xf15b;';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];
@@ -1299,7 +1352,7 @@ class WarningUI {
         document.getElementById("warningDialogGroup").style.visibility = "hidden";
     }
 }
-let mzxbxProjectForTesting = {
+let mzxbxProjectForTesting2 = {
     title: 'test data for debug',
     timeline: [
         { tempo: 120, metre: { count: 4, part: 4 } },
@@ -1337,10 +1390,17 @@ let mzxbxProjectForTesting = {
             title: "Second track", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ], filters: [], performer: { id: '', data: '' }
+        },
+        {
+            title: "Third track", measures: [
+                { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+            ], filters: [], performer: { id: '', data: '' }
         }
     ],
     percussions: [
-        { title: "Snare", measures: [], filters: [], sampler: { id: '', data: '' } }
+        { title: "Snare", measures: [], filters: [], sampler: { id: '', data: '' } },
+        { title: "Snare2", measures: [], filters: [], sampler: { id: '', data: '' } },
+        { title: "Snare3", measures: [], filters: [], sampler: { id: '', data: '' } }
     ],
     comments: [{ texts: [] }, { texts: [] }, { texts: [] }, { texts: [] }],
     filters: [],

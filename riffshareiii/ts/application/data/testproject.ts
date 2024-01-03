@@ -1,4 +1,4 @@
-let mzxbxProjectForTesting: MZXBX_Project = {
+let mzxbxProjectForTesting2: MZXBX_Project = {
 	title: 'test data for debug'
 	, timeline: [
 		{ tempo: 120, metre: { count: 4, part: 4 } }
@@ -40,10 +40,17 @@ let mzxbxProjectForTesting: MZXBX_Project = {
 			title: "Second track", measures: [
 				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			], filters: [], performer: { id: '', data: '' }
+        }
+        , {
+			title: "Third track", measures: [
+				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+			], filters: [], performer: { id: '', data: '' }
 		}
 	]
 	, percussions: [
-		{ title: "Snare", measures: [], filters: [], sampler: { id: '', data: '' } }
+        { title: "Snare", measures: [], filters: [], sampler: { id: '', data: '' } }
+        ,{ title: "Snare2", measures: [], filters: [], sampler: { id: '', data: '' } }
+        ,{ title: "Snare3", measures: [], filters: [], sampler: { id: '', data: '' } }
 	]
 	, comments: [{ texts: [] }, { texts: [] }, { texts: [] }, { texts: [] }]
 	, filters: []

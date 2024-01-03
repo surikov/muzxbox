@@ -7,6 +7,8 @@ type MenuInfo = {
     sid?: string;
     onClick?: () => void;
     onSubClick?: () => void;
+    states?:string[];
+    selection?:number;
 };
 /*
 let commandThemeSizeSmall = 'commandThemeSizeSmall';
