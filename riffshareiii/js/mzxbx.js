@@ -6,9 +6,9 @@ class MZXBX_MetreMath {
         return this;
     }
     calculate(duration, tempo) {
-        let part32 = new MZXBX_MetreMath().set({ count: 1, part: 32 }).duration(tempo);
-        this.count = Math.round(duration / part32);
-        this.part = 32;
+        this.part = 256.0;
+        let tempPart = new MZXBX_MetreMath().set({ count: 1, part: this.part }).duration(tempo);
+        this.count = Math.round(duration / tempPart);
         return this.simplyfy();
     }
     metre() {
@@ -29,9 +29,9 @@ class MZXBX_MetreMath {
         let cc = this.count;
         let pp = this.part;
         let rr = pp / toPart;
-        cc = Math.ceil(cc / rr);
+        cc = Math.floor(cc / rr);
         pp = toPart;
-        return new MZXBX_MetreMath().set({ count: cc, part: pp });
+        return new MZXBX_MetreMath().set({ count: cc, part: pp }).simplyfy();
     }
     equals(metre) {
         let countMe = this.count * metre.part;
@@ -2119,6 +2119,7 @@ class MidiParser {
         return schedule;
     }
     convertProject(title, comment) {
+        console.log('MidiParser.convertProject', this);
         let midiSongData = {
             parser: '1.12',
             duration: 0,
@@ -2183,6 +2184,7 @@ class MidiParser {
                 }
             }
         }
+        console.log('midiSongData', midiSongData);
         let project = {
             title: title + ' ' + comment,
             timeline: [],
@@ -2239,6 +2241,7 @@ class MidiParser {
                 project.tracks.push(this.createProjectTrack(project.timeline, midiTrack));
             }
         }
+        console.log('project', project);
         return project;
     }
     collectDrums(midiTrack) {
@@ -2273,9 +2276,9 @@ class MidiParser {
             let measureDurationS = mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
             for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
                 let midiChord = midiTrack.songchords[ii];
-                if (midiChord.when >= currentTimeMs && midiChord.when < currentTimeMs + measureDurationS * 1000) {
+                if (midiChord.when >= currentTimeMs && midiChord.when < currentTimeMs + measureDurationS * 1000.0) {
                     let trackChord = null;
-                    let skip = mm.calculate((midiChord.when - currentTimeMs) / 1000, nextMeasure.tempo);
+                    let skip = mm.calculate((midiChord.when - currentTimeMs) / 1000.0, nextMeasure.tempo);
                     for (let cc = 0; cc < projectMeasure.chords.length; cc++) {
                         if (mm.set(projectMeasure.chords[cc].skip).equals(skip)) {
                             trackChord = projectMeasure.chords[cc];
@@ -2289,13 +2292,17 @@ class MidiParser {
                         for (let nn = 0; nn < midiChord.notes.length; nn++) {
                             let midiNote = midiChord.notes[nn];
                             let startPitch = midiNote.points[0].pitch;
-                            let startDuration = mm.calculate(midiNote.points[0].durationms / 1000, nextMeasure.tempo);
-                            let curSlide = { duration: startDuration, delta: 0 };
+                            let startDuration = mm.calculate(midiNote.points[0].durationms / 1000.0, nextMeasure.tempo);
+                            let curSlide = { duration: startDuration.strip(16), delta: 0 };
                             let trackNote = { pitch: startPitch, slides: [curSlide] };
                             for (let pp = 1; pp < midiNote.points.length; pp++) {
                                 let midiPoint = midiNote.points[pp];
                                 curSlide.delta = startPitch - midiPoint.pitch;
-                                curSlide = { duration: mm.calculate(midiPoint.durationms / 1000, nextMeasure.tempo), delta: 0 };
+                                let xduration = mm.calculate(midiPoint.durationms / 1000.0, nextMeasure.tempo);
+                                curSlide = {
+                                    duration: xduration.strip(16),
+                                    delta: 0
+                                };
                                 trackNote.slides.push(curSlide);
                             }
                             trackChord.notes.push(trackNote);
@@ -2303,7 +2310,7 @@ class MidiParser {
                     }
                 }
             }
-            currentTimeMs = currentTimeMs + measureDurationS * 1000;
+            currentTimeMs = currentTimeMs + measureDurationS * 1000.0;
         }
         return projectTrack;
     }

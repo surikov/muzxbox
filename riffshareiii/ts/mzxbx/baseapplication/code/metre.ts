@@ -7,10 +7,11 @@ class MZXBX_MetreMath implements MZXBX_MetreMathType {
 		return this;
 	}
 	calculate(duration: number, tempo: number): MZXBX_MetreMath {
-		let part32 = new MZXBX_MetreMath().set({ count: 1, part: 32 }).duration(tempo);
-		this.count = Math.round(duration / part32);
-		this.part = 32;
-		return this.simplyfy();
+        this.part = 256.0;
+		let tempPart = new MZXBX_MetreMath().set({ count: 1, part: this.part }).duration(tempo);
+		this.count = Math.round(duration / tempPart);
+        return this.simplyfy();
+        //return this;
 	}
 	metre(): MZXBX_Metre {
 		return { count: this.count, part: this.part };
@@ -30,9 +31,9 @@ class MZXBX_MetreMath implements MZXBX_MetreMathType {
 		let cc = this.count;
 		let pp = this.part;
 		let rr = pp / toPart;
-		cc = Math.ceil(cc / rr);
+		cc = Math.floor(cc / rr);
 		pp = toPart;
-		return new MZXBX_MetreMath().set({ count: cc, part: pp });
+		return new MZXBX_MetreMath().set({ count: cc, part: pp }).simplyfy();
 	}
 	equals(metre: MZXBX_Metre): boolean {
 		let countMe = this.count * metre.part;

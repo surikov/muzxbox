@@ -51,8 +51,8 @@ class BarOctave {
                             let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * data.theme.widthDurationRatio;
                             let y1 = top + height - (note.pitch - from) * data.theme.notePathHeight;
                             //let dot: TileRectangle = { x: x, y: y, w: data.theme.notePathHeight, h: data.theme.notePathHeight, css: 'mixTextFill' };
-                            //if ((note.slides) && note.slides.length >= 0 && note.slides[0]) {
-                            //    console.log(barIdx, chord.skip, note.slides[0].duration);
+                            //if (anchor.showZoom == 0.25 && barIdx < 5 && (note.slides) && note.slides.length >= 0 && note.slides[0]) {
+                            //    console.log(barIdx, nn, chord.skip, note.slides[0].duration);
                             //}
                             for (let ss = 0; ss < note.slides.length; ss++) {
                                 let x2 = x1 + MZMM().set(note.slides[ss].duration)
