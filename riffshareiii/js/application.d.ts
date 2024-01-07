@@ -43,9 +43,19 @@ declare class CommandDispatcher {
     promptImportFromMIDI(): void;
 }
 declare let commandDispatcher: CommandDispatcher;
+declare type GridTimeTemplate14 = {
+    ratio: number;
+    duration: MZXBX_Metre;
+    label?: boolean;
+};
+declare let gridLinesBrief: GridTimeTemplate14[];
+declare let gridLinesAccurate: GridTimeTemplate14[];
+declare let gridLinesDtailed: GridTimeTemplate14[];
+declare let gridLinesExplicit: GridTimeTemplate14[];
 declare let zoomPrefixLevelsCSS: {
     prefix: string;
     minZoom: number;
+    gridLines: GridTimeTemplate14[];
 }[];
 declare class UIRenderer {
     toolbar: UIToolbar;
@@ -88,12 +98,7 @@ declare class TimeSelectBar {
     constructor();
     createTimeScale(): TileLayerDefinition[];
     resizeTimeScale(viewWIdth: number, viewHeight: number): void;
-    addMarks8plus(): void;
-    addMarks7(barnum: number, barLeft: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor): void;
-    addMarks6(barnum: number, barLeft: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor): void;
-    addMarks5(barnum: number, barLeft: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor): void;
-    addMarks4(duRatio: number, barnum: number, barLeft: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor): void;
-    addMarks3minus(duRatio: number, zoomidx: number, barnum: number, barLeft: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor): void;
+    addGridMarks(data: MZXBX_Project, barnum: number, barLeft: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor, zIndex: number): void;
     createBarMark(barLeft: number, width: number, height: number, measureAnchor: TileAnchor): void;
     createBarNumber(barLeft: number, top: number, barnum: number, zz: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor): void;
     fillTimeBar(data: MZXBX_Project): void;
@@ -325,6 +330,9 @@ declare class MixerDataMath {
     LeftPad: number;
     rightPad: number;
     bottomPad: number;
+    notePathHeight: number;
+    widthDurationRatio: number;
+    octaveCount: number;
     constructor(data: MZXBX_Project);
     mixerWidth(): number;
     mixerHeight(): number;
@@ -564,11 +572,6 @@ declare type MZXBX_CommentText = {
 declare type MZXBX_CommentMeasure = {
     texts: MZXBX_CommentText[];
 };
-declare type MZXBX_Theme = {
-    widthDurationRatio: number;
-    notePathHeight: number;
-    octaveCount: number;
-};
 declare type MZXBX_Project = {
     title: string;
     timeline: MZXBX_SongMeasure[];
@@ -576,7 +579,6 @@ declare type MZXBX_Project = {
     percussions: MZXBX_PercussionTrack[];
     comments: MZXBX_CommentMeasure[];
     filters: MZXBX_AudioFilter[];
-    theme: MZXBX_Theme;
 };
 declare type MZXBX_FilterHolder = {
     plugin: MZXBX_AudioFilterPlugin | null;

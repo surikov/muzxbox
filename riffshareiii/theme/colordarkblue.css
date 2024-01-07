@@ -24,9 +24,9 @@
 
     --color-debug: #800;
     
-	--color-shadow: #00000066;
+	--color-shadow: #00ffff66;
 
-    --color-background: #001111ff;
+    --color-background: #002222ff;
     --color-lines: #556677ff;
     --color-panel: #224466ff;
 
@@ -38,5 +38,5 @@
 
 }
 #pagediv {
-    background-image: url("bg/burevestnik.jpg");
+    background-image2: url("bg/burevestnik.jpg");
 }

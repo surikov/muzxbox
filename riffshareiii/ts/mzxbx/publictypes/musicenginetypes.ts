@@ -139,11 +139,12 @@ type MZXBX_CommentText={
 type MZXBX_CommentMeasure={
     texts:MZXBX_CommentText[];
 };
+/*
 type MZXBX_Theme={
 	widthDurationRatio:number
 	,notePathHeight:number
 	,octaveCount:number
-};
+};*/
 type MZXBX_Project = {
 	title: string;
 	timeline: MZXBX_SongMeasure[];
@@ -151,7 +152,7 @@ type MZXBX_Project = {
     percussions: MZXBX_PercussionTrack[];
     comments: MZXBX_CommentMeasure[];
 	filters: MZXBX_AudioFilter[];
-	theme:MZXBX_Theme;
+	//theme:MZXBX_Theme;
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 type MZXBX_FilterHolder = {

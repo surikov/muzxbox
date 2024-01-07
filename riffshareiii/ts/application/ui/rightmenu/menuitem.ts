@@ -124,7 +124,7 @@ class RightMenuItem {
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
             anchor.content.push({ x: itemWidth - 1.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: icon, css: 'rightMenuIconLabel' });
-            spot2 = { x: itemWidth - 0.9, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
+            spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
         }
         if (this.kind == this.kindDraggable) {
             spot.draggable = true;

@@ -1824,11 +1824,11 @@ class MidiParser {
             , percussions: []
             , filters: []
             , comments: []
-            , theme: {
+            /*, theme: {
                 widthDurationRatio: 10
                 , notePathHeight: 0.25
                 , octaveCount: 10
-            }
+            }*/
         };
         let currentTimeMs = 0;
         let mm = new MZXBX_MetreMath();

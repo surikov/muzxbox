@@ -25,10 +25,10 @@ class MixerZoomLevel {
 		this.bars = [];
 		let left = mixm.LeftPad;
 		let width = 0;
-		let   h12 = 12 * data.theme.notePathHeight*data.theme.octaveCount;
+		let   h12 = 12 * mixm.notePathHeight*mixm.octaveCount;
 		for (let ii = 0; ii < data.timeline.length; ii++) {
 			let timebar = data.timeline[ii];
-			width = MZMM().set(timebar.metre).duration(timebar.tempo) * data.theme.widthDurationRatio;
+			width = MZMM().set(timebar.metre).duration(timebar.tempo) * mixm.widthDurationRatio;
 			let barAnchor: TileAnchor = {
 				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom
 				, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom

@@ -134,11 +134,6 @@ declare type MZXBX_CommentText = {
 declare type MZXBX_CommentMeasure = {
     texts: MZXBX_CommentText[];
 };
-declare type MZXBX_Theme = {
-    widthDurationRatio: number;
-    notePathHeight: number;
-    octaveCount: number;
-};
 declare type MZXBX_Project = {
     title: string;
     timeline: MZXBX_SongMeasure[];
@@ -146,7 +141,6 @@ declare type MZXBX_Project = {
     percussions: MZXBX_PercussionTrack[];
     comments: MZXBX_CommentMeasure[];
     filters: MZXBX_AudioFilter[];
-    theme: MZXBX_Theme;
 };
 declare type MZXBX_FilterHolder = {
     plugin: MZXBX_AudioFilterPlugin | null;

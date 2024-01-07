@@ -31,7 +31,7 @@ class BarOctave {
         }
     }
     addNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, anchor: TileAnchor, zoomLevel: number, data: MZXBX_Project) {
-        //let mixm: MixerDataMath = new MixerDataMath(data);
+        let mixm: MixerDataMath = new MixerDataMath(data);
         for (let ii = 0; ii < data.tracks.length; ii++) {
             let track = data.tracks[ii];
             if (ii == 0) {
@@ -48,8 +48,8 @@ class BarOctave {
                         let to = (octaveIdx + 1) * 12;
                         //console.log(nn,'note',note);
                         if (note.pitch >= from && note.pitch < to) {
-                            let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * data.theme.widthDurationRatio;
-                            let y1 = top + height - (note.pitch - from) * data.theme.notePathHeight;
+                            let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
+                            let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
                             //let dot: TileRectangle = { x: x, y: y, w: data.theme.notePathHeight, h: data.theme.notePathHeight, css: 'mixTextFill' };
                             //if (anchor.showZoom == 0.25 && barIdx < 5 && (note.slides) && note.slides.length >= 0 && note.slides[0]) {
                             //    console.log(barIdx, nn, chord.skip, note.slides[0].duration);
@@ -57,8 +57,8 @@ class BarOctave {
                             for (let ss = 0; ss < note.slides.length; ss++) {
                                 let x2 = x1 + MZMM().set(note.slides[ss].duration)
                                     .duration(data.timeline[barIdx].tempo)
-                                    * data.theme.widthDurationRatio;
-                                let y2 = y1 + note.slides[ss].delta * data.theme.notePathHeight;
+                                    * mixm.widthDurationRatio;
+                                let y2 = y1 + note.slides[ss].delta * mixm.notePathHeight;
                                 let line: TileLine = { x1: x1, y1: y1, x2: x2, y2: y2, css: 'noteLine' };
                                 anchor.content.push(line);
                                 //console.log(line);

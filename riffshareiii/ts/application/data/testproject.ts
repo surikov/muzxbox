@@ -54,11 +54,11 @@ let mzxbxProjectForTesting2: MZXBX_Project = {
 	]
 	, comments: [{ texts: [] }, { texts: [] }, { texts: [] }, { texts: [] }]
 	, filters: []
-	, theme: {
+	/*, theme: {
 		notePathHeight: 0.5
 		, widthDurationRatio: 17
 		, octaveCount: 10
-	}
+	}*/
 };
 let testBigMixerData = {
 	title: 'test data for debug'

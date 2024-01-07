@@ -98,5 +98,5 @@
 .noteLine{
     stroke: var(--color-text);
     stroke-linejoin: round;
-    stroke-width: calc(0.25*var(--tapSize));
+    stroke-width: calc(0.5*var(--tapSize));
 }

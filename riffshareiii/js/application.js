@@ -258,17 +258,54 @@ class CommandDispatcher {
     }
 }
 let commandDispatcher = new CommandDispatcher();
+let gridLinesBrief = [
+    { ratio: 0.4, duration: { count: 1, part: 2 } }
+];
+let gridLinesAccurate = [
+    { ratio: 0.2, duration: { count: 1, part: 8 } },
+    { ratio: 0.2, duration: { count: 1, part: 8 } },
+    { ratio: 0.2, duration: { count: 1, part: 8 } },
+    { ratio: 0.4, duration: { count: 1, part: 8 }, label: true }
+];
+let gridLinesDtailed = [
+    { ratio: 0.1, duration: { count: 1, part: 16 } },
+    { ratio: 0.1, duration: { count: 1, part: 16 } },
+    { ratio: 0.1, duration: { count: 1, part: 16 } },
+    { ratio: 0.2, duration: { count: 1, part: 16 }, label: true },
+    { ratio: 0.1, duration: { count: 1, part: 16 } },
+    { ratio: 0.1, duration: { count: 1, part: 16 } },
+    { ratio: 0.1, duration: { count: 1, part: 16 } },
+    { ratio: 0.4, duration: { count: 1, part: 16 }, label: true }
+];
+let gridLinesExplicit = [
+    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.1, duration: { count: 1, part: 32 }, label: true },
+    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.2, duration: { count: 1, part: 32 }, label: true },
+    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.1, duration: { count: 1, part: 32 }, label: true },
+    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.4, duration: { count: 1, part: 32 }, label: true }
+];
 let zoomPrefixLevelsCSS = [
-    { prefix: '025', minZoom: 0.25 },
-    { prefix: '05', minZoom: 0.5 },
-    { prefix: '1', minZoom: 1 },
-    { prefix: '2', minZoom: 2 },
-    { prefix: '4', minZoom: 4 },
-    { prefix: '8', minZoom: 8 },
-    { prefix: '16', minZoom: 16 },
-    { prefix: '32', minZoom: 32 },
-    { prefix: '64', minZoom: 64 },
-    { prefix: '128', minZoom: 128 }
+    { prefix: '025', minZoom: 0.25, gridLines: gridLinesExplicit },
+    { prefix: '05', minZoom: 0.5, gridLines: gridLinesDtailed },
+    { prefix: '1', minZoom: 1, gridLines: gridLinesAccurate },
+    { prefix: '2', minZoom: 2, gridLines: gridLinesBrief },
+    { prefix: '4', minZoom: 4, gridLines: [] },
+    { prefix: '8', minZoom: 8, gridLines: [] },
+    { prefix: '16', minZoom: 16, gridLines: [] },
+    { prefix: '32', minZoom: 32, gridLines: [] },
+    { prefix: '64', minZoom: 64, gridLines: [] },
+    { prefix: '128', minZoom: 128, gridLines: [] }
 ];
 class UIRenderer {
     constructor() {
@@ -415,41 +452,41 @@ class TimeSelectBar {
     }
     resizeTimeScale(viewWIdth, viewHeight) {
     }
-    addMarks8plus() {
-    }
-    addMarks7(barnum, barLeft, curBar, measureAnchor) {
-        if (barnum % 8 == 0) {
-            this.createBarMark(barLeft, zoomPrefixLevelsCSS[7].minZoom * 0.25, zoomPrefixLevelsCSS[7].minZoom * 2, measureAnchor);
-            this.createBarNumber(barLeft, zoomPrefixLevelsCSS[7].minZoom * 2, barnum, 7, curBar, measureAnchor);
+    addGridMarks(data, barnum, barLeft, curBar, measureAnchor, zIndex) {
+        let zoomInfo = zoomPrefixLevelsCSS[zIndex];
+        if (zoomInfo.gridLines.length > 0) {
+            let mixm = new MixerDataMath(data);
+            let lineCount = 0;
+            let skip = MZMM().set({ count: 0, part: 1 });
+            while (true) {
+                let line = zoomInfo.gridLines[lineCount];
+                skip = skip.plus(line.duration).simplyfy();
+                if (!skip.less(curBar.metre)) {
+                    break;
+                }
+                let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
+                let mark = {
+                    x: xx, y: 0,
+                    w: line.ratio * zoomInfo.minZoom,
+                    h: line.ratio * 4 * zoomInfo.minZoom,
+                    css: 'timeMeasureMark'
+                };
+                measureAnchor.content.push(mark);
+                if (line.label) {
+                    let mtr = {
+                        x: xx,
+                        y: line.ratio * 4 * zoomInfo.minZoom,
+                        text: '' + skip.count + '/' + skip.part,
+                        css: 'timeBarInfo' + zoomPrefixLevelsCSS[zIndex].prefix
+                    };
+                    measureAnchor.content.push(mtr);
+                }
+                lineCount++;
+                if (lineCount >= zoomInfo.gridLines.length) {
+                    lineCount = 0;
+                }
+            }
         }
-    }
-    addMarks6(barnum, barLeft, curBar, measureAnchor) {
-        if (barnum % 4 == 0) {
-            this.createBarMark(barLeft, zoomPrefixLevelsCSS[6].minZoom * 0.25, zoomPrefixLevelsCSS[6].minZoom * 2, measureAnchor);
-            this.createBarNumber(barLeft, zoomPrefixLevelsCSS[6].minZoom * 2, barnum, 6, curBar, measureAnchor);
-        }
-    }
-    addMarks5(barnum, barLeft, curBar, measureAnchor) {
-        if (barnum % 2 == 0) {
-            this.createBarMark(barLeft, zoomPrefixLevelsCSS[5].minZoom * 0.25, zoomPrefixLevelsCSS[5].minZoom * 2, measureAnchor);
-            this.createBarNumber(barLeft, zoomPrefixLevelsCSS[5].minZoom * 2, barnum, 5, curBar, measureAnchor);
-        }
-    }
-    addMarks4(duRatio, barnum, barLeft, curBar, measureAnchor) {
-        this.createBarMark(barLeft, zoomPrefixLevelsCSS[4].minZoom * 0.25, zoomPrefixLevelsCSS[4].minZoom * 2, measureAnchor);
-        this.createBarNumber(barLeft, zoomPrefixLevelsCSS[4].minZoom * 2, barnum, 4, curBar, measureAnchor);
-        this.createBarMark(barLeft + MZMM().set({ count: 1, part: 2 }).duration(curBar.tempo) * duRatio, zoomPrefixLevelsCSS[4].minZoom * 0.1, zoomPrefixLevelsCSS[4].minZoom * 2, measureAnchor);
-    }
-    addMarks3minus(duRatio, zoomidx, barnum, barLeft, curBar, measureAnchor) {
-        this.createBarMark(barLeft, zoomPrefixLevelsCSS[zoomidx].minZoom * 0.25, zoomPrefixLevelsCSS[zoomidx].minZoom * 2, measureAnchor);
-        this.createBarNumber(barLeft, zoomPrefixLevelsCSS[zoomidx].minZoom * 2, barnum, zoomidx, curBar, measureAnchor);
-        let st16 = MZMM().set({ count: 1, part: 16 });
-        let cntr8 = st16;
-        while (cntr8.less(curBar.metre)) {
-            this.createBarMark(barLeft + cntr8.duration(curBar.tempo) * duRatio, zoomPrefixLevelsCSS[zoomidx].minZoom * 0.1, zoomPrefixLevelsCSS[zoomidx].minZoom * 1, measureAnchor);
-            cntr8 = cntr8.plus(st16);
-        }
-        this.createBarMark(barLeft + MZMM().set({ count: 1, part: 2 }).duration(curBar.tempo) * duRatio, zoomPrefixLevelsCSS[zoomidx].minZoom * 0.1, zoomPrefixLevelsCSS[zoomidx].minZoom * 2, measureAnchor);
     }
     createBarMark(barLeft, width, height, measureAnchor) {
         let mark = { x: barLeft, y: 0, w: width, h: height, css: 'timeMeasureMark' };
@@ -491,7 +528,7 @@ class TimeSelectBar {
             for (let kk = 0; kk < data.timeline.length; kk++) {
                 let curBar = data.timeline[kk];
                 let curMeasureMeter = mm.set(curBar.metre);
-                let barWidth = curMeasureMeter.duration(curBar.tempo) * data.theme.widthDurationRatio;
+                let barWidth = curMeasureMeter.duration(curBar.tempo) * mixm.widthDurationRatio;
                 let measureAnchor = {
                     showZoom: zoomPrefixLevelsCSS[zz].minZoom,
                     hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
@@ -499,23 +536,10 @@ class TimeSelectBar {
                     id: 'measure' + (kk + Math.random())
                 };
                 selectLevelAnchor.content.push(measureAnchor);
-                if (zz >= 8) {
-                    this.addMarks8plus();
-                }
-                if (zz == 7) {
-                    this.addMarks7(kk, barLeft, curBar, measureAnchor);
-                }
-                if (zz == 6) {
-                    this.addMarks6(kk, barLeft, curBar, measureAnchor);
-                }
-                if (zz == 5) {
-                    this.addMarks5(kk, barLeft, curBar, measureAnchor);
-                }
-                if (zz == 4) {
-                    this.addMarks4(data.theme.widthDurationRatio, kk, barLeft, curBar, measureAnchor);
-                }
-                if (zz <= 3) {
-                    this.addMarks3minus(data.theme.widthDurationRatio, zz, kk, barLeft, curBar, measureAnchor);
+                this.addGridMarks(data, kk, barLeft, curBar, measureAnchor, zz);
+                if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
+                    this.createBarMark(barLeft, zoomPrefixLevelsCSS[zz].minZoom * 0.5, zoomPrefixLevelsCSS[zz].minZoom * 2, measureAnchor);
+                    this.createBarNumber(barLeft, zoomPrefixLevelsCSS[zz].minZoom * 2, kk, zz, curBar, measureAnchor);
                 }
                 barLeft = barLeft + barWidth;
             }
@@ -946,7 +970,7 @@ class RightMenuItem {
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
             anchor.content.push({ x: itemWidth - 1.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: icon, css: 'rightMenuIconLabel' });
-            spot2 = { x: itemWidth - 0.9, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
+            spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
         }
         if (this.kind == this.kindDraggable) {
             spot.draggable = true;
@@ -1093,6 +1117,7 @@ class BarOctave {
         }
     }
     addNotes(barIdx, octaveIdx, left, top, width, height, anchor, zoomLevel, data) {
+        let mixm = new MixerDataMath(data);
         for (let ii = 0; ii < data.tracks.length; ii++) {
             let track = data.tracks[ii];
             if (ii == 0) {
@@ -1104,13 +1129,13 @@ class BarOctave {
                         let from = octaveIdx * 12;
                         let to = (octaveIdx + 1) * 12;
                         if (note.pitch >= from && note.pitch < to) {
-                            let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * data.theme.widthDurationRatio;
-                            let y1 = top + height - (note.pitch - from) * data.theme.notePathHeight;
+                            let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
+                            let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
                             for (let ss = 0; ss < note.slides.length; ss++) {
                                 let x2 = x1 + MZMM().set(note.slides[ss].duration)
                                     .duration(data.timeline[barIdx].tempo)
-                                    * data.theme.widthDurationRatio;
-                                let y2 = y1 + note.slides[ss].delta * data.theme.notePathHeight;
+                                    * mixm.widthDurationRatio;
+                                let y2 = y1 + note.slides[ss].delta * mixm.notePathHeight;
                                 let line = { x1: x1, y1: y1, x2: x2, y2: y2, css: 'noteLine' };
                                 anchor.content.push(line);
                                 x1 = x2;
@@ -1133,8 +1158,8 @@ class MixerBar {
         let mixm = new MixerDataMath(data);
         this.anchor = toAnchor;
         this.octaves = [];
-        let h12 = 12 * data.theme.notePathHeight;
-        for (let oo = 0; oo < data.theme.octaveCount; oo++) {
+        let h12 = 12 * mixm.notePathHeight;
+        for (let oo = 0; oo < mixm.octaveCount; oo++) {
             let barOctaveAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevel].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].minZoom,
@@ -1145,7 +1170,7 @@ class MixerBar {
                 id: 'octave' + (oo + Math.random())
             };
             this.anchor.content.push(barOctaveAnchor);
-            let bo = new BarOctave(barIdx, (data.theme.octaveCount - oo - 1), left, mixm.gridTop() + oo * h12, ww, h12, barOctaveAnchor, this.zoomLevel, data);
+            let bo = new BarOctave(barIdx, (mixm.octaveCount - oo - 1), left, mixm.gridTop() + oo * h12, ww, h12, barOctaveAnchor, this.zoomLevel, data);
             this.octaves.push(bo);
         }
     }
@@ -1192,10 +1217,10 @@ class MixerZoomLevel {
         this.bars = [];
         let left = mixm.LeftPad;
         let width = 0;
-        let h12 = 12 * data.theme.notePathHeight * data.theme.octaveCount;
+        let h12 = 12 * mixm.notePathHeight * mixm.octaveCount;
         for (let ii = 0; ii < data.timeline.length; ii++) {
             let timebar = data.timeline[ii];
-            width = MZMM().set(timebar.metre).duration(timebar.tempo) * data.theme.widthDurationRatio;
+            width = MZMM().set(timebar.metre).duration(timebar.tempo) * mixm.widthDurationRatio;
             let barAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
@@ -1403,12 +1428,7 @@ let mzxbxProjectForTesting2 = {
         { title: "Snare3", measures: [], filters: [], sampler: { id: '', data: '' } }
     ],
     comments: [{ texts: [] }, { texts: [] }, { texts: [] }, { texts: [] }],
-    filters: [],
-    theme: {
-        notePathHeight: 0.5,
-        widthDurationRatio: 17,
-        octaveCount: 10
-    }
+    filters: []
 };
 let testBigMixerData = {
     title: 'test data for debug',
@@ -1485,13 +1505,16 @@ class MixerDataMath {
         this.LeftPad = 3;
         this.rightPad = 10;
         this.bottomPad = 11;
+        this.notePathHeight = 1;
+        this.widthDurationRatio = 17;
+        this.octaveCount = 10;
         this.data = data;
     }
     mixerWidth() {
         let mm = MZMM();
         let ww = 0;
         for (let ii = 0; ii < this.data.timeline.length; ii++) {
-            ww = ww + mm.set(this.data.timeline[ii].metre).duration(this.data.timeline[ii].tempo) * this.data.theme.widthDurationRatio;
+            ww = ww + mm.set(this.data.timeline[ii].metre).duration(this.data.timeline[ii].tempo) * this.widthDurationRatio;
         }
         return this.LeftPad + ww + this.rightPad;
     }
@@ -1502,7 +1525,7 @@ class MixerDataMath {
         return this.titleHeight;
     }
     gridHeight() {
-        return this.data.theme.notePathHeight * 10 * 12;
+        return this.notePathHeight * 10 * 12;
     }
 }
 let biChar32 = [];

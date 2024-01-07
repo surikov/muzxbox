@@ -2191,12 +2191,7 @@ class MidiParser {
             tracks: [],
             percussions: [],
             filters: [],
-            comments: [],
-            theme: {
-                widthDurationRatio: 10,
-                notePathHeight: 0.25,
-                octaveCount: 10
-            }
+            comments: []
         };
         let currentTimeMs = 0;
         let mm = new MZXBX_MetreMath();
