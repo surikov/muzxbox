@@ -1120,7 +1120,7 @@ class BarOctave {
             css: 'mixToolbarFill'
         };
         anchor.content.push(this.octaveBottomBorder);
-        if (zoomLevel < 4) {
+        if (zoomLevel < 3) {
             for (let kk = 1; kk < 12; kk++) {
                 anchor.content.push({
                     x: left,
@@ -1181,7 +1181,20 @@ class BarOctave {
                                     .duration(data.timeline[barIdx].tempo)
                                     * mixm.widthDurationRatio;
                                 let y2 = y1 + note.slides[ss].delta * mixm.notePathHeight;
-                                let line = { x1: x1, y1: y1, x2: x2, y2: y2, css: 'noteLine' };
+                                let rx2 = x2 - mixm.notePathHeight;
+                                if (rx2 < 0.001) {
+                                    rx2 = 0.001;
+                                }
+                                if (anchor.ww < rx2 - anchor.xx) {
+                                    anchor.ww = rx2 - anchor.xx;
+                                }
+                                let line = {
+                                    x1: x1 + mixm.notePathHeight / 2,
+                                    y1: y1 - mixm.notePathHeight / 2,
+                                    x2: rx2,
+                                    y2: y2 - mixm.notePathHeight / 2,
+                                    css: 'mixNoteLine'
+                                };
                                 anchor.content.push(line);
                                 x1 = x2;
                                 y1 = y2;
