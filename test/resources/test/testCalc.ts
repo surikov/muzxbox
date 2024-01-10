@@ -22,7 +22,7 @@ let rowsAvgCount = 5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let reduceRatio = 1;
 let highLightMode = 1;
-var calcLen = 100;
+var calcLen = 22;
 let diffWide=2;
 
 
