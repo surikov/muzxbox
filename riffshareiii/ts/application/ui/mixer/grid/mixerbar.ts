@@ -1,17 +1,17 @@
 class MixerBar {
 	octaves: BarOctave[];
-	anchor: TileAnchor;
+	barAnchor: TileAnchor;
 	zoomLevel: number;
 	constructor(
 		barIdx: number, left: number, ww: number
 		, zoomLevel: number
-		, toAnchor: TileAnchor
+		, barAnchor: TileAnchor
 		, data: MZXBX_Project
 	) {
 		//console.log('MixerBar',zoomLevel,left,ww,data.theme.octaveCount);
 		this.zoomLevel = zoomLevel;
 		let mixm: MixerDataMath = new MixerDataMath(data);
-		this.anchor = toAnchor;
+		this.barAnchor = barAnchor;
 		this.octaves = [];
 		let h12 = 12 * mixm.notePathHeight;
 		for (let oo = 0; oo < mixm.octaveCount; oo++) {
@@ -24,7 +24,7 @@ class MixerBar {
 				, hh: h12, content: []
 				, id: 'octave' + (oo + Math.random())
 			};
-			this.anchor.content.push(barOctaveAnchor);
+			this.barAnchor.content.push(barOctaveAnchor);
 			let bo: BarOctave = new BarOctave(barIdx, (mixm.octaveCount - oo - 1), left, mixm.gridTop() + oo * h12, ww, h12, barOctaveAnchor, this.zoomLevel, data);
 			this.octaves.push(bo);
 		}

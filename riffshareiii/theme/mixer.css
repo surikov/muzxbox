@@ -100,3 +100,8 @@
     stroke-linejoin: round;
     stroke-width: calc(0.95*var(--tapSize));
 }
+.mixNoteSub{
+    stroke: var(--color-lines);
+    stroke-linejoin: round;
+    stroke-width: calc(0.95*var(--tapSize));
+}

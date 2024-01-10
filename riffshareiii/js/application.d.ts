@@ -208,19 +208,19 @@ declare class LeftPanel {
 declare class BarOctave {
     barRightBorder: TileRectangle;
     octaveBottomBorder: TileRectangle;
-    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, anchor: TileAnchor, zoomLevel: number, data: MZXBX_Project);
-    addLines(anchor: TileAnchor, zoomLevel: number, left: number, top: number, width: number, height: number, data: MZXBX_Project, barIdx: number): void;
+    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project);
+    addLines(barOctaveAnchor: TileAnchor, zoomLevel: number, left: number, top: number, width: number, height: number, data: MZXBX_Project, barIdx: number): void;
     addOctaveGridSteps(barIdx: number, data: MZXBX_Project, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
-    addNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, anchor: TileAnchor, zoomLevel: number, data: MZXBX_Project): void;
+    addNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project): void;
 }
 declare class OctaveContent {
     constructor(aa: number, top: number, toAnchor: TileAnchor, data: MZXBX_Project);
 }
 declare class MixerBar {
     octaves: BarOctave[];
-    anchor: TileAnchor;
+    barAnchor: TileAnchor;
     zoomLevel: number;
-    constructor(barIdx: number, left: number, ww: number, zoomLevel: number, toAnchor: TileAnchor, data: MZXBX_Project);
+    constructor(barIdx: number, left: number, ww: number, zoomLevel: number, barAnchor: TileAnchor, data: MZXBX_Project);
 }
 declare class MixerUI {
     zoomLayer: TileLayerDefinition;

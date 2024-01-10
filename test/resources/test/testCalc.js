@@ -14,7 +14,7 @@ var rowsAvgCount = 5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 var reduceRatio = 1;
 var highLightMode = 1;
-var calcLen = 22;
+var calcLen = 55;
 var diffWide = 2;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {

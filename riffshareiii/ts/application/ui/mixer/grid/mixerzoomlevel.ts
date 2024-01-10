@@ -25,7 +25,7 @@ class MixerZoomLevel {
 		this.bars = [];
 		let left = mixm.LeftPad;
 		let width = 0;
-		let   h12 = 12 * mixm.notePathHeight*mixm.octaveCount;
+		let h12 = 12 * mixm.notePathHeight * mixm.octaveCount;
 		for (let ii = 0; ii < data.timeline.length; ii++) {
 			let timebar = data.timeline[ii];
 			width = MZMM().set(timebar.metre).duration(timebar.tempo) * mixm.widthDurationRatio;
@@ -41,7 +41,7 @@ class MixerZoomLevel {
 			};
 			//console.log(ii,barAnchor)
 			this.zoomAnchor.content.push(barAnchor);
-			let mixBar = new MixerBar(ii,left,  width, this.zoomLevelIndex, barAnchor, data);
+			let mixBar = new MixerBar(ii, left, width, this.zoomLevelIndex, barAnchor, data);
 			this.bars.push(mixBar);
 			left = left + width;
 		}

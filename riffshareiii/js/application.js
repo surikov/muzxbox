@@ -1095,14 +1095,16 @@ class LeftPanel {
     }
 }
 class BarOctave {
-    constructor(barIdx, octaveIdx, left, top, width, height, anchor, zoomLevel, data) {
+    constructor(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel, data) {
         if (zoomLevel < 5) {
-            this.addLines(anchor, zoomLevel, left, top, width, height, data, barIdx);
+            this.addLines(barOctaveAnchor, zoomLevel, left, top, width, height, data, barIdx);
         }
-        this.addNotes(barIdx, octaveIdx, left, top, width, height, anchor, zoomLevel, data);
+        if (zoomLevel < 7) {
+            this.addNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel, data);
+        }
     }
-    addLines(anchor, zoomLevel, left, top, width, height, data, barIdx) {
-        this.addOctaveGridSteps(barIdx, data, left, anchor, zoomLevel);
+    addLines(barOctaveAnchor, zoomLevel, left, top, width, height, data, barIdx) {
+        this.addOctaveGridSteps(barIdx, data, left, barOctaveAnchor, zoomLevel);
         let mixm = new MixerDataMath(data);
         this.barRightBorder = {
             x: left + width,
@@ -1111,7 +1113,7 @@ class BarOctave {
             h: height,
             css: 'mixPanelFill'
         };
-        anchor.content.push(this.barRightBorder);
+        barOctaveAnchor.content.push(this.barRightBorder);
         this.octaveBottomBorder = {
             x: left,
             y: top + height,
@@ -1119,10 +1121,10 @@ class BarOctave {
             h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 16.0,
             css: 'mixToolbarFill'
         };
-        anchor.content.push(this.octaveBottomBorder);
+        barOctaveAnchor.content.push(this.octaveBottomBorder);
         if (zoomLevel < 3) {
             for (let kk = 1; kk < 12; kk++) {
-                anchor.content.push({
+                barOctaveAnchor.content.push({
                     x: left,
                     y: top + height - kk * mixm.notePathHeight,
                     w: width,
@@ -1161,8 +1163,49 @@ class BarOctave {
             }
         }
     }
-    addNotes(barIdx, octaveIdx, left, top, width, height, anchor, zoomLevel, data) {
+    addNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel, data) {
         let mixm = new MixerDataMath(data);
+        for (let ii = 0; ii < data.tracks.length; ii++) {
+            let track = data.tracks[ii];
+            if (ii > 0) {
+                let measure = track.measures[barIdx];
+                for (let cc = 0; cc < measure.chords.length; cc++) {
+                    let chord = measure.chords[cc];
+                    for (let nn = 0; nn < chord.notes.length; nn++) {
+                        let note = chord.notes[nn];
+                        let from = octaveIdx * 12;
+                        let to = (octaveIdx + 1) * 12;
+                        if (note.pitch >= from && note.pitch < to) {
+                            let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
+                            let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
+                            for (let ss = 0; ss < note.slides.length; ss++) {
+                                let x2 = x1 + MZMM().set(note.slides[ss].duration)
+                                    .duration(data.timeline[barIdx].tempo)
+                                    * mixm.widthDurationRatio;
+                                let y2 = y1 + note.slides[ss].delta * mixm.notePathHeight;
+                                let rx2 = x2 - mixm.notePathHeight;
+                                if (rx2 < 0.001) {
+                                    rx2 = 0.001;
+                                }
+                                if (barOctaveAnchor.ww < rx2 - barOctaveAnchor.xx) {
+                                    barOctaveAnchor.ww = rx2 - barOctaveAnchor.xx;
+                                }
+                                let line = {
+                                    x1: x1 + mixm.notePathHeight / 2,
+                                    y1: y1 - mixm.notePathHeight / 2,
+                                    x2: rx2,
+                                    y2: y2 - mixm.notePathHeight / 2,
+                                    css: 'mixNoteSub'
+                                };
+                                barOctaveAnchor.content.push(line);
+                                x1 = x2;
+                                y1 = y2;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         for (let ii = 0; ii < data.tracks.length; ii++) {
             let track = data.tracks[ii];
             if (ii == 0) {
@@ -1185,8 +1228,8 @@ class BarOctave {
                                 if (rx2 < 0.001) {
                                     rx2 = 0.001;
                                 }
-                                if (anchor.ww < rx2 - anchor.xx) {
-                                    anchor.ww = rx2 - anchor.xx;
+                                if (barOctaveAnchor.ww < rx2 - barOctaveAnchor.xx) {
+                                    barOctaveAnchor.ww = rx2 - barOctaveAnchor.xx;
                                 }
                                 let line = {
                                     x1: x1 + mixm.notePathHeight / 2,
@@ -1195,7 +1238,7 @@ class BarOctave {
                                     y2: y2 - mixm.notePathHeight / 2,
                                     css: 'mixNoteLine'
                                 };
-                                anchor.content.push(line);
+                                barOctaveAnchor.content.push(line);
                                 x1 = x2;
                                 y1 = y2;
                             }
@@ -1211,10 +1254,10 @@ class OctaveContent {
     }
 }
 class MixerBar {
-    constructor(barIdx, left, ww, zoomLevel, toAnchor, data) {
+    constructor(barIdx, left, ww, zoomLevel, barAnchor, data) {
         this.zoomLevel = zoomLevel;
         let mixm = new MixerDataMath(data);
-        this.anchor = toAnchor;
+        this.barAnchor = barAnchor;
         this.octaves = [];
         let h12 = 12 * mixm.notePathHeight;
         for (let oo = 0; oo < mixm.octaveCount; oo++) {
@@ -1227,7 +1270,7 @@ class MixerBar {
                 hh: h12, content: [],
                 id: 'octave' + (oo + Math.random())
             };
-            this.anchor.content.push(barOctaveAnchor);
+            this.barAnchor.content.push(barOctaveAnchor);
             let bo = new BarOctave(barIdx, (mixm.octaveCount - oo - 1), left, mixm.gridTop() + oo * h12, ww, h12, barOctaveAnchor, this.zoomLevel, data);
             this.octaves.push(bo);
         }

@@ -1,23 +1,23 @@
 class BarOctave {
 	barRightBorder: TileRectangle;
 	octaveBottomBorder: TileRectangle;
-	constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, anchor: TileAnchor
+	constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor
 		//, prefix: string, minZoom: number, maxZoom: number, data: MZXBX_Project
 		, zoomLevel: number, data: MZXBX_Project
 	) {
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		//let oRectangle = { x: left, y: top, w: width, h: height, rx: 1, ry: 1, css: 'mixFieldBg' + prefix };
 		if (zoomLevel < 5) {
-			this.addLines(anchor, zoomLevel, left, top, width, height, data, barIdx);
+			this.addLines(barOctaveAnchor, zoomLevel, left, top, width, height, data, barIdx);
 		}
-		//if (zoomLevel <= 16) {
-		this.addNotes(barIdx, octaveIdx, left, top, width, height, anchor, zoomLevel, data);
-		//}
+		if (zoomLevel < 7) {
+			this.addNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel, data);
+		}
 	}
-	addLines(anchor: TileAnchor, zoomLevel: number, left: number, top: number, width: number, height: number
+	addLines(barOctaveAnchor: TileAnchor, zoomLevel: number, left: number, top: number, width: number, height: number
 		, data: MZXBX_Project, barIdx: number) {
 		this.addOctaveGridSteps(barIdx, data, left
-			, anchor, zoomLevel);
+			, barOctaveAnchor, zoomLevel);
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		this.barRightBorder = {
 			x: left + width
@@ -26,7 +26,7 @@ class BarOctave {
 			, h: height
 			, css: 'mixPanelFill'
 		};
-		anchor.content.push(this.barRightBorder);
+		barOctaveAnchor.content.push(this.barRightBorder);
 		this.octaveBottomBorder = {
 			x: left
 			, y: top + height
@@ -39,10 +39,10 @@ class BarOctave {
 		//anchor.content.push(oAnchor);
 		//console.log(left,top,prefix,minZoom,maxZoom);
 
-		anchor.content.push(this.octaveBottomBorder);
+		barOctaveAnchor.content.push(this.octaveBottomBorder);
 		if (zoomLevel < 3) {
 			for (let kk = 1; kk < 12; kk++) {
-				anchor.content.push({
+				barOctaveAnchor.content.push({
 					x: left
 					, y: top + height - kk * mixm.notePathHeight
 					, w: width
@@ -83,30 +83,21 @@ class BarOctave {
 		}
 	}
 	addNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number
-		, anchor: TileAnchor, zoomLevel: number, data: MZXBX_Project) {
+		, barOctaveAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		for (let ii = 0; ii < data.tracks.length; ii++) {
 			let track = data.tracks[ii];
-			if (ii == 0) {
-				//let txt: TileText = { x: left, y: top + height, text: '' + barIdx + ':' + octaveIdx, css: 'testMeasureLabel' };
-				//anchor.content.push(txt);
+			if (ii > 0) {
 				let measure: MZXBX_TrackMeasure = track.measures[barIdx];
-				//console.log(barIdx,octaveIdx,'measure',measure);
 				for (let cc = 0; cc < measure.chords.length; cc++) {
 					let chord: MZXBX_Chord = measure.chords[cc];
-					//console.log(cc,'chord',chord);
 					for (let nn = 0; nn < chord.notes.length; nn++) {
 						let note: MZXBX_Note = chord.notes[nn];
 						let from = octaveIdx * 12;
 						let to = (octaveIdx + 1) * 12;
-						//console.log(nn,'note',note);
 						if (note.pitch >= from && note.pitch < to) {
 							let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
 							let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
-							//let dot: TileRectangle = { x: x, y: y, w: data.theme.notePathHeight, h: data.theme.notePathHeight, css: 'mixTextFill' };
-							//if (anchor.showZoom == 0.25 && barIdx < 5 && (note.slides) && note.slides.length >= 0 && note.slides[0]) {
-							//    console.log(barIdx, nn, chord.skip, note.slides[0].duration);
-							//}
 							for (let ss = 0; ss < note.slides.length; ss++) {
 								let x2 = x1 + MZMM().set(note.slides[ss].duration)
 									.duration(data.timeline[barIdx].tempo)
@@ -116,8 +107,49 @@ class BarOctave {
 								if (rx2 < 0.001) {
 									rx2 = 0.001;
 								}
-								if (anchor.ww < rx2 - anchor.xx) {
-									anchor.ww = rx2 - anchor.xx
+								if (barOctaveAnchor.ww < rx2 - barOctaveAnchor.xx) {
+									barOctaveAnchor.ww = rx2 - barOctaveAnchor.xx
+								}
+								let line: TileLine = {
+									x1: x1 + mixm.notePathHeight / 2
+									, y1: y1 - mixm.notePathHeight / 2
+									, x2: rx2
+									, y2: y2 - mixm.notePathHeight / 2
+									, css: 'mixNoteSub'
+								};
+								barOctaveAnchor.content.push(line);
+								x1 = x2;
+								y1 = y2;
+							}
+						}
+					}
+				}
+			}
+		}
+		for (let ii = 0; ii < data.tracks.length; ii++) {
+			let track = data.tracks[ii];
+			if (ii == 0) {
+				let measure: MZXBX_TrackMeasure = track.measures[barIdx];
+				for (let cc = 0; cc < measure.chords.length; cc++) {
+					let chord: MZXBX_Chord = measure.chords[cc];
+					for (let nn = 0; nn < chord.notes.length; nn++) {
+						let note: MZXBX_Note = chord.notes[nn];
+						let from = octaveIdx * 12;
+						let to = (octaveIdx + 1) * 12;
+						if (note.pitch >= from && note.pitch < to) {
+							let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
+							let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
+							for (let ss = 0; ss < note.slides.length; ss++) {
+								let x2 = x1 + MZMM().set(note.slides[ss].duration)
+									.duration(data.timeline[barIdx].tempo)
+									* mixm.widthDurationRatio;
+								let y2 = y1 + note.slides[ss].delta * mixm.notePathHeight;
+								let rx2 = x2 - mixm.notePathHeight;
+								if (rx2 < 0.001) {
+									rx2 = 0.001;
+								}
+								if (barOctaveAnchor.ww < rx2 - barOctaveAnchor.xx) {
+									barOctaveAnchor.ww = rx2 - barOctaveAnchor.xx
 								}
 								let line: TileLine = {
 									x1: x1 + mixm.notePathHeight / 2
@@ -126,8 +158,7 @@ class BarOctave {
 									, y2: y2 - mixm.notePathHeight / 2
 									, css: 'mixNoteLine'
 								};
-								anchor.content.push(line);
-								//console.log(line);
+								barOctaveAnchor.content.push(line);
 								x1 = x2;
 								y1 = y2;
 							}

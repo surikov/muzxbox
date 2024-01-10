@@ -2264,16 +2264,20 @@ class MidiParser {
         };
         let currentTimeMs = 0;
         let mm = new MZXBX_MetreMath();
-        for (let ii = 0; ii < timeline.length; ii++) {
+        for (let tt = 0; tt < timeline.length; tt++) {
             let projectMeasure = { chords: [] };
             projectTrack.measures.push(projectMeasure);
-            let nextMeasure = timeline[ii];
-            let measureDurationS = mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
+            let nextMeasure = timeline[tt];
+            let measureDurationMs = Math.round(1000.0 * mm.set(nextMeasure.metre).duration(nextMeasure.tempo));
+            console.log((1 + tt), currentTimeMs, measureDurationMs);
             for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
                 let midiChord = midiTrack.songchords[ii];
-                if (midiChord.when >= currentTimeMs && midiChord.when < currentTimeMs + measureDurationS * 1000.0) {
+                let midiChordWhen = Math.round(midiChord.when);
+                if (midiChordWhen >= currentTimeMs && midiChordWhen < currentTimeMs + measureDurationMs) {
                     let trackChord = null;
-                    let skip = mm.calculate((midiChord.when - currentTimeMs) / 1000.0, nextMeasure.tempo);
+                    let skip = mm.calculate((midiChordWhen - currentTimeMs) / 1000.0, nextMeasure.tempo).strip(16);
+                    let ahead = skip.duration(nextMeasure.tempo) * 1000 - (midiChordWhen - currentTimeMs);
+                    console.log(tt, skip, midiChordWhen, ahead);
                     for (let cc = 0; cc < projectMeasure.chords.length; cc++) {
                         if (mm.set(projectMeasure.chords[cc].skip).equals(skip)) {
                             trackChord = projectMeasure.chords[cc];
@@ -2305,7 +2309,7 @@ class MidiParser {
                     }
                 }
             }
-            currentTimeMs = currentTimeMs + measureDurationS * 1000.0;
+            currentTimeMs = currentTimeMs + measureDurationMs;
         }
         return projectTrack;
     }
