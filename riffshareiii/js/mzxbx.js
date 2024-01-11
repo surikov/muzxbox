@@ -2262,22 +2262,23 @@ class MidiParser {
             filters: [],
             performer: { id: '', data: '' }
         };
-        let currentTimeMs = 0;
+        let currentMeasureStart = 0;
         let mm = new MZXBX_MetreMath();
+        let calcDiff = 0;
         for (let tt = 0; tt < timeline.length; tt++) {
             let projectMeasure = { chords: [] };
             projectTrack.measures.push(projectMeasure);
             let nextMeasure = timeline[tt];
-            let measureDurationMs = Math.round(1000.0 * mm.set(nextMeasure.metre).duration(nextMeasure.tempo));
-            console.log((1 + tt), currentTimeMs, measureDurationMs);
+            let measureDurationMs = 1000.0 * mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
+            console.log(('measure' + (1 + tt) + '------'), currentMeasureStart, '+', measureDurationMs);
             for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
                 let midiChord = midiTrack.songchords[ii];
-                let midiChordWhen = Math.round(midiChord.when);
-                if (midiChordWhen >= currentTimeMs && midiChordWhen < currentTimeMs + measureDurationMs) {
+                if (midiChord.when >= currentMeasureStart && midiChord.when < currentMeasureStart + measureDurationMs) {
                     let trackChord = null;
-                    let skip = mm.calculate((midiChordWhen - currentTimeMs) / 1000.0, nextMeasure.tempo).strip(16);
-                    let ahead = skip.duration(nextMeasure.tempo) * 1000 - (midiChordWhen - currentTimeMs);
-                    console.log(tt, skip, midiChordWhen, ahead);
+                    let skip = mm.calculate((midiChord.when - currentMeasureStart) / 1000.0, nextMeasure.tempo);
+                    let recalMs = skip.duration(nextMeasure.tempo) * 1000 + currentMeasureStart;
+                    calcDiff = recalMs - midiChord.when;
+                    console.log(midiChord.when, recalMs, calcDiff);
                     for (let cc = 0; cc < projectMeasure.chords.length; cc++) {
                         if (mm.set(projectMeasure.chords[cc].skip).equals(skip)) {
                             trackChord = projectMeasure.chords[cc];
@@ -2292,14 +2293,15 @@ class MidiParser {
                             let midiNote = midiChord.notes[nn];
                             let startPitch = midiNote.points[0].pitch;
                             let startDuration = mm.calculate(midiNote.points[0].durationms / 1000.0, nextMeasure.tempo);
-                            let curSlide = { duration: startDuration.strip(16), delta: 0 };
+                            let curSlide = { duration: startDuration,
+                                delta: 0 };
                             let trackNote = { pitch: startPitch, slides: [curSlide] };
                             for (let pp = 1; pp < midiNote.points.length; pp++) {
                                 let midiPoint = midiNote.points[pp];
                                 curSlide.delta = startPitch - midiPoint.pitch;
                                 let xduration = mm.calculate(midiPoint.durationms / 1000.0, nextMeasure.tempo);
                                 curSlide = {
-                                    duration: xduration.strip(16),
+                                    duration: xduration,
                                     delta: 0
                                 };
                                 trackNote.slides.push(curSlide);
@@ -2309,7 +2311,7 @@ class MidiParser {
                     }
                 }
             }
-            currentTimeMs = currentTimeMs + measureDurationMs;
+            currentMeasureStart = currentMeasureStart + measureDurationMs;
         }
         return projectTrack;
     }
