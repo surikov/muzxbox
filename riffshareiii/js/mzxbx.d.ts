@@ -592,6 +592,7 @@ declare class MidiParser {
     dump(): MZXBX_Schedule;
     convertProject(title: string, comment: string): MZXBX_Project;
     collectDrums(midiTrack: MIDISongTrack): number[];
+    numratio(nn: number): number;
     createProjectTrack(timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_MusicTrack;
     createProjectDrums(drum: number, timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_PercussionTrack;
 }

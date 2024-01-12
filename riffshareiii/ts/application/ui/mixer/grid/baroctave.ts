@@ -99,19 +99,22 @@ class BarOctave {
 							let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
 							let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
 							for (let ss = 0; ss < note.slides.length; ss++) {
-								let x2 = x1 + MZMM().set(note.slides[ss].duration)
-									.duration(data.timeline[barIdx].tempo)
+								let x2 = x1
+									+ MZMM()
+										.set(note.slides[ss].duration)
+										.duration(data.timeline[barIdx].tempo)
 									* mixm.widthDurationRatio;
 								let y2 = y1 + note.slides[ss].delta * mixm.notePathHeight;
-								let rx2 = x2 - mixm.notePathHeight;
-								if (rx2 < 0.001) {
-									rx2 = 0.001;
+								let rx1 = x1 + mixm.notePathHeight / 2;
+								let rx2 = x2 - mixm.notePathHeight / 2;
+								if (rx2 - rx1 < 0.00001) {
+									rx2 = rx1 + 0.00001;
 								}
 								if (barOctaveAnchor.ww < rx2 - barOctaveAnchor.xx) {
 									barOctaveAnchor.ww = rx2 - barOctaveAnchor.xx
 								}
 								let line: TileLine = {
-									x1: x1 + mixm.notePathHeight / 2
+									x1: rx1
 									, y1: y1 - mixm.notePathHeight / 2
 									, x2: rx2
 									, y2: y2 - mixm.notePathHeight / 2
@@ -144,15 +147,13 @@ class BarOctave {
 									.duration(data.timeline[barIdx].tempo)
 									* mixm.widthDurationRatio;
 								let y2 = y1 + note.slides[ss].delta * mixm.notePathHeight;
-								let rx2 = x2 - mixm.notePathHeight;
-								if (rx2 < 0.001) {
-									rx2 = 0.001;
-								}
-								if (barOctaveAnchor.ww < rx2 - barOctaveAnchor.xx) {
-									barOctaveAnchor.ww = rx2 - barOctaveAnchor.xx
+								let rx1 = x1 + mixm.notePathHeight / 2;
+								let rx2 = x2 - mixm.notePathHeight / 2;
+								if (rx2 - rx1 < 0.00001) {
+									rx2 = rx1 + 0.00001;
 								}
 								let line: TileLine = {
-									x1: x1 + mixm.notePathHeight / 2
+									x1: rx1
 									, y1: y1 - mixm.notePathHeight / 2
 									, x2: rx2
 									, y2: y2 - mixm.notePathHeight / 2
