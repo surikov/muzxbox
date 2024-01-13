@@ -2193,12 +2193,13 @@ class MidiParser {
             filters: [],
             comments: []
         };
+        let measureNN = 1;
         let currentTimeMs = 0;
         let mm = new MZXBX_MetreMath();
         while (currentTimeMs < midiSongData.duration) {
             let nextMeasure = { tempo: 120, metre: { count: 4, part: 4 } };
             for (let tt = 0; tt < midiSongData.changes.length; tt++) {
-                if (midiSongData.changes[tt].ms > currentTimeMs) {
+                if (midiSongData.changes[tt].ms > currentTimeMs + 123) {
                     break;
                 }
                 nextMeasure.tempo = midiSongData.changes[tt].bpm;
@@ -2213,6 +2214,7 @@ class MidiParser {
             project.timeline.push(nextMeasure);
             let measureDurationS = mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
             currentTimeMs = currentTimeMs + measureDurationS * 1000;
+            measureNN++;
         }
         for (let ii = 0; ii < project.timeline.length; ii++) {
             project.comments.push({ texts: [] });
@@ -2274,7 +2276,6 @@ class MidiParser {
             projectTrack.measures.push(projectMeasure);
             let nextMeasure = timeline[tt];
             let measureDurationMs = 1000.0 * mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
-            console.log(('measure' + (1 + tt) + '------'), currentMeasureStart, '+', measureDurationMs);
             for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
                 let midiChord = midiTrack.songchords[ii];
                 if (this.numratio(midiChord.when) >= this.numratio(currentMeasureStart) && this.numratio(midiChord.when) < this.numratio(currentMeasureStart + measureDurationMs)) {
@@ -2292,7 +2293,6 @@ class MidiParser {
                     }
                     let recalMs = skip.duration(nextMeasure.tempo) * 1000 + currentMeasureStart;
                     calcDiff = midiChord.when - recalMs;
-                    console.log(this.numratio(midiChord.when), '-', this.numratio(recalMs), '=', calcDiff, ':', midiChord.notes);
                     for (let cc = 0; cc < projectMeasure.chords.length; cc++) {
                         if (mm.set(projectMeasure.chords[cc].skip).equals(skip)) {
                             trackChord = projectMeasure.chords[cc];

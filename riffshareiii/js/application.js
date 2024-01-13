@@ -1151,7 +1151,7 @@ class BarOctave {
                 let mark = {
                     x: xx,
                     y: mixm.gridTop(),
-                    w: line.ratio * zoomInfo.minZoom / 2,
+                    w: line.ratio * zoomInfo.minZoom / 8,
                     h: mixm.gridHeight(),
                     css: 'timeMeasureMark'
                 };
