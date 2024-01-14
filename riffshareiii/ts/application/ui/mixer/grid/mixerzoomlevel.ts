@@ -41,7 +41,13 @@ class MixerZoomLevel {
 			};
 			//console.log(ii,barAnchor)
 			this.zoomAnchor.content.push(barAnchor);
-			let mixBar = new MixerBar(ii, left, width, this.zoomLevelIndex, barAnchor, data);
+            let mixBar = new MixerBar(ii, left, width, this.zoomLevelIndex, barAnchor, data);
+            /*console.log(this.zoomAnchor.ww,mixBar.singleBarAnchor.ww);
+            if(this.zoomAnchor.ww<mixBar.singleBarAnchor.ww){
+                    
+                
+                this.zoomAnchor.ww=mixBar.singleBarAnchor.ww;
+            }*/
 			this.bars.push(mixBar);
 			left = left + width;
 		}

@@ -25,29 +25,29 @@ let gridLinesAccurate: GridTimeTemplate14[] = [
 ];
 let gridLinesDtailed: GridTimeTemplate14[] = [
     { ratio: 0.1, duration: { count: 1, part: 16 } }
-    , { ratio: 0.1, duration: { count: 1, part: 16 } }
+    , { ratio: 0.1, duration: { count: 1, part: 16 }, label: true }
     , { ratio: 0.1, duration: { count: 1, part: 16 } }
     , { ratio: 0.2, duration: { count: 1, part: 16 }, label: true }
     , { ratio: 0.1, duration: { count: 1, part: 16 } }
-    , { ratio: 0.1, duration: { count: 1, part: 16 } }
+    , { ratio: 0.1, duration: { count: 1, part: 16 }, label: true }
     , { ratio: 0.1, duration: { count: 1, part: 16 } }
     , { ratio: 0.4, duration: { count: 1, part: 16 }, label: true }
 ];
 let gridLinesExplicit: GridTimeTemplate14[] = [
     { ratio: 0.1, duration: { count: 1, part: 32 } }
-    , { ratio: 0.1, duration: { count: 1, part: 32 } }
+    , { ratio: 0.1, duration: { count: 1, part: 32 }, label: true }
     , { ratio: 0.1, duration: { count: 1, part: 32 } }
     , { ratio: 0.1, duration: { count: 1, part: 32 }, label: true }
     , { ratio: 0.1, duration: { count: 1, part: 32 } }
-    , { ratio: 0.1, duration: { count: 1, part: 32 } }
+    , { ratio: 0.1, duration: { count: 1, part: 32 }, label: true }
     , { ratio: 0.1, duration: { count: 1, part: 32 } }
     , { ratio: 0.2, duration: { count: 1, part: 32 }, label: true }
     , { ratio: 0.1, duration: { count: 1, part: 32 } }
-    , { ratio: 0.1, duration: { count: 1, part: 32 } }
+    , { ratio: 0.1, duration: { count: 1, part: 32 }, label: true }
     , { ratio: 0.1, duration: { count: 1, part: 32 } }
     , { ratio: 0.1, duration: { count: 1, part: 32 }, label: true }
     , { ratio: 0.1, duration: { count: 1, part: 32 } }
-    , { ratio: 0.1, duration: { count: 1, part: 32 } }
+    , { ratio: 0.1, duration: { count: 1, part: 32 } , label: true}
     , { ratio: 0.1, duration: { count: 1, part: 32 } }
     , { ratio: 0.4, duration: { count: 1, part: 32 }, label: true }
 ];

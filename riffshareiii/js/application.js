@@ -269,29 +269,29 @@ let gridLinesAccurate = [
 ];
 let gridLinesDtailed = [
     { ratio: 0.1, duration: { count: 1, part: 16 } },
-    { ratio: 0.1, duration: { count: 1, part: 16 } },
+    { ratio: 0.1, duration: { count: 1, part: 16 }, label: true },
     { ratio: 0.1, duration: { count: 1, part: 16 } },
     { ratio: 0.2, duration: { count: 1, part: 16 }, label: true },
     { ratio: 0.1, duration: { count: 1, part: 16 } },
-    { ratio: 0.1, duration: { count: 1, part: 16 } },
+    { ratio: 0.1, duration: { count: 1, part: 16 }, label: true },
     { ratio: 0.1, duration: { count: 1, part: 16 } },
     { ratio: 0.4, duration: { count: 1, part: 16 }, label: true }
 ];
 let gridLinesExplicit = [
     { ratio: 0.1, duration: { count: 1, part: 32 } },
-    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.1, duration: { count: 1, part: 32 }, label: true },
     { ratio: 0.1, duration: { count: 1, part: 32 } },
     { ratio: 0.1, duration: { count: 1, part: 32 }, label: true },
     { ratio: 0.1, duration: { count: 1, part: 32 } },
-    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.1, duration: { count: 1, part: 32 }, label: true },
     { ratio: 0.1, duration: { count: 1, part: 32 } },
     { ratio: 0.2, duration: { count: 1, part: 32 }, label: true },
     { ratio: 0.1, duration: { count: 1, part: 32 } },
-    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.1, duration: { count: 1, part: 32 }, label: true },
     { ratio: 0.1, duration: { count: 1, part: 32 } },
     { ratio: 0.1, duration: { count: 1, part: 32 }, label: true },
     { ratio: 0.1, duration: { count: 1, part: 32 } },
-    { ratio: 0.1, duration: { count: 1, part: 32 } },
+    { ratio: 0.1, duration: { count: 1, part: 32 }, label: true },
     { ratio: 0.1, duration: { count: 1, part: 32 } },
     { ratio: 0.4, duration: { count: 1, part: 32 }, label: true }
 ];
@@ -475,7 +475,7 @@ class TimeSelectBar {
                 if (line.label) {
                     let mtr = {
                         x: xx,
-                        y: line.ratio * 4 * zoomInfo.minZoom,
+                        y: 1 * zoomInfo.minZoom,
                         text: '' + skip.count + '/' + skip.part,
                         css: 'timeBarInfo' + zoomPrefixLevelsCSS[zIndex].prefix
                     };
@@ -492,23 +492,21 @@ class TimeSelectBar {
         let mark = { x: barLeft, y: 0, w: width, h: height, css: 'timeMeasureMark' };
         measureAnchor.content.push(mark);
     }
-    createBarNumber(barLeft, top, barnum, zz, curBar, measureAnchor) {
-        let nm = { x: barLeft, y: top, text: '' + (1 + barnum), css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix };
+    createBarNumber(barLeft, barnum, zz, curBar, measureAnchor) {
+        let nm = {
+            x: barLeft,
+            y: zoomPrefixLevelsCSS[zz].minZoom * 2,
+            text: '' + (1 + barnum) + ':' + curBar.metre.count + '/' + curBar.metre.part,
+            css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
+        };
         measureAnchor.content.push(nm);
         let bpm = {
             x: barLeft,
-            y: top * 2 / 3,
+            y: zoomPrefixLevelsCSS[zz].minZoom * 3,
             text: '' + Math.round(curBar.tempo),
             css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(bpm);
-        let mtr = {
-            x: barLeft,
-            y: top,
-            text: '' + curBar.metre.count + '/' + curBar.metre.part,
-            css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
-        };
-        measureAnchor.content.push(mtr);
     }
     fillTimeBar(data) {
         let mixm = new MixerDataMath(data);
@@ -538,8 +536,8 @@ class TimeSelectBar {
                 selectLevelAnchor.content.push(measureAnchor);
                 this.addGridMarks(data, kk, barLeft, curBar, measureAnchor, zz);
                 if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
-                    this.createBarMark(barLeft, zoomPrefixLevelsCSS[zz].minZoom * 0.5, zoomPrefixLevelsCSS[zz].minZoom * 2, measureAnchor);
-                    this.createBarNumber(barLeft, zoomPrefixLevelsCSS[zz].minZoom * 2, kk, zz, curBar, measureAnchor);
+                    this.createBarMark(barLeft, zoomPrefixLevelsCSS[zz].minZoom * 0.5, zoomPrefixLevelsCSS[zz].minZoom * 3, measureAnchor);
+                    this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor);
                 }
                 barLeft = barLeft + barWidth;
             }
@@ -1232,6 +1230,9 @@ class BarOctave {
                                 if (rx2 - rx1 < 0.00001) {
                                     rx2 = rx1 + 0.00001;
                                 }
+                                if (barOctaveAnchor.ww < rx2 - barOctaveAnchor.xx) {
+                                    barOctaveAnchor.ww = rx2 - barOctaveAnchor.xx;
+                                }
                                 let line = {
                                     x1: rx1,
                                     y1: y1 - mixm.notePathHeight / 2,
@@ -1240,6 +1241,15 @@ class BarOctave {
                                     css: 'mixNoteLine'
                                 };
                                 barOctaveAnchor.content.push(line);
+                                if (zoomLevel == 0) {
+                                    let txt = '' + (barIdx + 1)
+                                        + ':' + chord.skip.count + '/' + chord.skip.part
+                                        + '(' + note.pitch
+                                        + '-' + note.slides[0].duration.count + '/' + note.slides[0].duration.part
+                                        + ')';
+                                    let info = { x: x1, y: y1 + 0.25, text: txt, css: 'timeBarNum025' };
+                                    barOctaveAnchor.content.push(info);
+                                }
                                 x1 = x2;
                                 y1 = y2;
                             }
@@ -1255,14 +1265,14 @@ class OctaveContent {
     }
 }
 class MixerBar {
-    constructor(barIdx, left, ww, zoomLevel, barAnchor, data) {
+    constructor(barIdx, left, ww, zoomLevel, zoomBarAnchor, data) {
         this.zoomLevel = zoomLevel;
         let mixm = new MixerDataMath(data);
-        this.barAnchor = barAnchor;
+        this.singleBarAnchor = zoomBarAnchor;
         this.octaves = [];
         let h12 = 12 * mixm.notePathHeight;
         for (let oo = 0; oo < mixm.octaveCount; oo++) {
-            let barOctaveAnchor = {
+            let singleOctaveAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevel].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].minZoom,
                 xx: left,
@@ -1271,8 +1281,11 @@ class MixerBar {
                 hh: h12, content: [],
                 id: 'octave' + (oo + Math.random())
             };
-            this.barAnchor.content.push(barOctaveAnchor);
-            let bo = new BarOctave(barIdx, (mixm.octaveCount - oo - 1), left, mixm.gridTop() + oo * h12, ww, h12, barOctaveAnchor, this.zoomLevel, data);
+            this.singleBarAnchor.content.push(singleOctaveAnchor);
+            let bo = new BarOctave(barIdx, (mixm.octaveCount - oo - 1), left, mixm.gridTop() + oo * h12, ww, h12, singleOctaveAnchor, this.zoomLevel, data);
+            if (this.singleBarAnchor.ww < singleOctaveAnchor.ww) {
+                this.singleBarAnchor.ww = singleOctaveAnchor.ww;
+            }
             this.octaves.push(bo);
         }
     }
@@ -1608,7 +1621,7 @@ class MixerDataMath {
         this.rightPad = 10;
         this.bottomPad = 11;
         this.notePathHeight = 1;
-        this.widthDurationRatio = 17;
+        this.widthDurationRatio = 27;
         this.octaveCount = 10;
         this.data = data;
     }

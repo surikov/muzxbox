@@ -5,7 +5,7 @@ class MixerDataMath {
     rightPad: number = 10;
     bottomPad = 11;
     notePathHeight = 1;
-    widthDurationRatio = 17;
+    widthDurationRatio = 27;
     octaveCount = 10;
 
     constructor(data: MZXBX_Project) {

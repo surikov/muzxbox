@@ -28,7 +28,8 @@ class TimeSelectBar {
     resizeTimeScale(viewWIdth: number, viewHeight: number) {
 
     }
-    addGridMarks(data: MZXBX_Project, barnum: number, barLeft: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor, zIndex: number) {
+    addGridMarks(data: MZXBX_Project, barnum: number, barLeft: number, curBar: MZXBX_SongMeasure
+        , measureAnchor: TileAnchor, zIndex: number) {
         let zoomInfo = zoomPrefixLevelsCSS[zIndex];
         if (zoomInfo.gridLines.length > 0) {
             let mixm: MixerDataMath = new MixerDataMath(data);
@@ -51,7 +52,7 @@ class TimeSelectBar {
                 if (line.label) {
                     let mtr: TileText = {
                         x: xx
-                        , y: line.ratio * 4 * zoomInfo.minZoom
+                        , y: 1 * zoomInfo.minZoom
                         , text: '' + skip.count + '/' + skip.part
                         , css: 'timeBarInfo' + zoomPrefixLevelsCSS[zIndex].prefix
                     };
@@ -69,26 +70,32 @@ class TimeSelectBar {
         let mark: TileRectangle = { x: barLeft, y: 0, w: width, h: height, css: 'timeMeasureMark' };
         measureAnchor.content.push(mark);
     }
-    createBarNumber(barLeft: number, top: number, barnum: number, zz: number
+    createBarNumber(barLeft: number//, top: number
+        , barnum: number, zz: number
         , curBar: MZXBX_SongMeasure
         , measureAnchor: TileAnchor
     ) {
-        let nm: TileText = { x: barLeft, y: top, text: '' + (1 + barnum), css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix };
+        let nm: TileText = {
+            x: barLeft
+            , y: zoomPrefixLevelsCSS[zz].minZoom * 2
+            , text: '' + (1 + barnum)+':' + curBar.metre.count + '/' + curBar.metre.part
+            , css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
+        };
         measureAnchor.content.push(nm);
         let bpm: TileText = {
             x: barLeft
-            , y: top * 2 / 3
+            , y: zoomPrefixLevelsCSS[zz].minZoom * 3
             , text: '' + Math.round(curBar.tempo)
             , css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(bpm);
-        let mtr: TileText = {
+        /*let mtr: TileText = {
             x: barLeft
-            , y: top
+            , y:zoomPrefixLevelsCSS[zz].minZoom * 2
             , text: '' + curBar.metre.count + '/' + curBar.metre.part
             , css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
         };
-        measureAnchor.content.push(mtr);
+        measureAnchor.content.push(mtr);*/
     }
 
     fillTimeBar(data: MZXBX_Project) {
@@ -122,10 +129,12 @@ class TimeSelectBar {
 
                 this.addGridMarks(data, kk, barLeft, curBar, measureAnchor, zz);
                 if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
-                    this.createBarMark(barLeft, zoomPrefixLevelsCSS[zz].minZoom * 0.5
-                        , zoomPrefixLevelsCSS[zz].minZoom * 2, measureAnchor);
+                    this.createBarMark(barLeft
+                        , zoomPrefixLevelsCSS[zz].minZoom * 0.5
+                        , zoomPrefixLevelsCSS[zz].minZoom * 3
+                        , measureAnchor);
                     this.createBarNumber(barLeft
-                        , zoomPrefixLevelsCSS[zz].minZoom * 2
+                        //, zoomPrefixLevelsCSS[zz].minZoom * 3
                         , kk, zz, curBar, measureAnchor);
                 }
                 barLeft = barLeft + barWidth;

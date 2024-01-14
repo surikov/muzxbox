@@ -1494,7 +1494,8 @@ class MidiParser {
                         newpoint.midipoint = midinote;
                         newnote.points.push(newpoint);
                     }
-                    newnote.points[newnote.points.length - 1].durationms = newnote.points[newnote.points.length - 1].durationms + 66;
+                    newnote.points[newnote.points.length - 1].durationms
+                        = newnote.points[newnote.points.length - 1].durationms + 66;
                 }
                 let chanTrack = this.findOrCreateTrack(miditrack, i, newchord.channel, tracksChannels);
                 chanTrack.track.songchords.push(newchord);
@@ -1832,26 +1833,33 @@ class MidiParser {
         };
         let measureNN = 1;
         let currentTimeMs = 0;
-        let mm = new MZXBX_MetreMath();
+        let mmath = new MZXBX_MetreMath();
         while (currentTimeMs < midiSongData.duration) {
             let nextMeasure: MZXBX_SongMeasure = { tempo: 120, metre: { count: 4, part: 4 } };
+            let ch = midiSongData.changes[0];
             for (let tt = 0; tt < midiSongData.changes.length; tt++) {
-                if (midiSongData.changes[tt].ms > currentTimeMs + 123) {
+                let nextDurationMs = 1000 * mmath.set(nextMeasure.metre).duration(nextMeasure.tempo);
+                if (midiSongData.changes[tt].ms > currentTimeMs + nextDurationMs * 0.6) {
                     //console.log(midiSongData.changes[tt]);
                     break;
                 }
-                nextMeasure.tempo = midiSongData.changes[tt].bpm;
+                ch = midiSongData.changes[tt];
+                nextMeasure.tempo = ch.bpm;
             }
+            let mme = midiSongData.meters[0];
             for (let mm = 0; mm < midiSongData.meters.length; mm++) {
-                if (midiSongData.meters[mm].ms > currentTimeMs) {
+                let nextDurationMs = 1000 * mmath.set(nextMeasure.metre).duration(nextMeasure.tempo);
+                if (midiSongData.meters[mm].ms > currentTimeMs + nextDurationMs * 0.6) {
                     break;
                 }
-                nextMeasure.metre.count = midiSongData.meters[mm].count;
-                nextMeasure.metre.part = midiSongData.meters[mm].division;
+                mme = midiSongData.meters[mm];
+                nextMeasure.metre.count = mme.count;
+                nextMeasure.metre.part = mme.division;
             }
             project.timeline.push(nextMeasure);
-            let measureDurationS = mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
-            //console.log(measureNN, currentTimeMs, 1000 * measureDurationS, nextMeasure.tempo, nextMeasure.metre.count, nextMeasure.metre.part);
+            let measureDurationS = mmath.set(nextMeasure.metre).duration(nextMeasure.tempo);
+            console.log(measureNN, currentTimeMs, 1000 * measureDurationS, 'bpm' + nextMeasure.tempo + ':' + nextMeasure.metre.count + '/' + nextMeasure.metre.part
+                , ch.ms, mme.ms);
             currentTimeMs = currentTimeMs + measureDurationS * 1000;
             measureNN++;
         }
@@ -1898,8 +1906,17 @@ class MidiParser {
         return drums;
     }
     numratio(nn: number): number {
-        let rr = 10000;
+        let rr = 1;//0000;
         return Math.round(nn * rr);
+    }
+    stripDuration(what: MZXBX_MetreMath): MZXBX_MetreMath {
+        /*if (what.less({ count: 1, part: 16 })) {
+            what = what.strip(32);
+        } else {
+            what = what.strip(16);
+        }*/
+        //what = what.strip(32);
+        return what;
     }
     createProjectTrack(timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_MusicTrack {
         let projectTrack: MZXBX_MusicTrack = {
@@ -1910,32 +1927,22 @@ class MidiParser {
         };
         let currentMeasureStart = 0;
         let mm = new MZXBX_MetreMath();
-        let calcDiff = 0;
         for (let tt = 0; tt < timeline.length; tt++) {
-            //projectTrack.measures.push({ chords: [] });
             let projectMeasure: MZXBX_TrackMeasure = { chords: [] };
             projectTrack.measures.push(projectMeasure);
             let nextMeasure = timeline[tt];
             let measureDurationMs = 1000.0 * mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
-            //console.log(('measure' + (1 + tt) + '------'), currentMeasureStart, '+', measureDurationMs);
             for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
                 let midiChord = midiTrack.songchords[ii];
-                //let midiChordWhen = Math.round(midiChord.when);
-                if (this.numratio(midiChord.when) >= this.numratio(currentMeasureStart) && this.numratio(midiChord.when) < this.numratio(currentMeasureStart + measureDurationMs)) {
+                if (
+                    this.numratio(midiChord.when) >= this.numratio(currentMeasureStart) - 33
+                    && this.numratio(midiChord.when) < this.numratio(currentMeasureStart + measureDurationMs) - 33
+                ) {
                     let trackChord: MZXBX_Chord | null = null;
-                    let skip = mm.calculate((midiChord.when - currentMeasureStart) / 1000.0, nextMeasure.tempo);
-                    if (midiChord.notes.length) {
-                        if (midiChord.notes[0].points.length) {
-                            if (midiChord.notes[0].points[0].durationms < 100) {
-                                skip = skip.strip(32);
-                            } else {
-                                skip = skip.strip(16);
-                            }
-                        }
+                    let skip = mm.calculate((midiChord.when - currentMeasureStart) / 1000.0, nextMeasure.tempo).strip(32);
+                    if (skip.count < 0) {
+                        skip.count = 0;
                     }
-                    let recalMs = skip.duration(nextMeasure.tempo) * 1000 + currentMeasureStart;
-                    calcDiff = midiChord.when - recalMs;
-                    //console.log(this.numratio(midiChord.when), '-', this.numratio(recalMs), '=', calcDiff, ':', midiChord.notes);
                     for (let cc = 0; cc < projectMeasure.chords.length; cc++) {
                         if (mm.set(projectMeasure.chords[cc].skip).equals(skip)) {
                             trackChord = projectMeasure.chords[cc];
@@ -1949,30 +1956,20 @@ class MidiParser {
                         for (let nn = 0; nn < midiChord.notes.length; nn++) {
                             let midiNote: MIDISongNote = midiChord.notes[nn];
                             let startPitch = midiNote.points[0].pitch;
-                            let startDuration = mm.calculate(midiNote.points[0].durationms / 1000.0, nextMeasure.tempo);
-                            if (midiChord.notes.length) {
-                                if (midiChord.notes[0].points.length) {
-                                    if (midiChord.notes[0].points[0].durationms < 100) {
-                                        startDuration = startDuration.strip(32);
-                                    } else {
-                                        startDuration = startDuration.strip(16);
-                                    }
-                                }
-                            }
+                            let startDuration = mm.calculate((midiNote.points[0].durationms - 66) / 1000.0, nextMeasure.tempo).strip(32);
                             let curSlide: MZXBX_Slide = {
-                                duration: startDuration//.strip(16)
+                                duration: this.stripDuration(startDuration)
                                 , delta: 0
                             };
                             let trackNote: MZXBX_Note = { pitch: startPitch, slides: [curSlide] };
                             for (let pp = 1; pp < midiNote.points.length; pp++) {
                                 let midiPoint = midiNote.points[pp];
                                 curSlide.delta = startPitch - midiPoint.pitch;
-                                let xduration = mm.calculate(midiPoint.durationms / 1000.0, nextMeasure.tempo);
+                                let xduration = mm.calculate((midiPoint.durationms - 66) / 1000.0, nextMeasure.tempo);
                                 curSlide = {
-                                    duration: xduration//.strip(16)
+                                    duration: this.stripDuration(xduration)
                                     , delta: 0
                                 };
-                                //console.log(curSlide);
                                 trackNote.slides.push(curSlide);
                             }
                             trackChord.notes.push(trackNote);

@@ -100,7 +100,7 @@ declare class TimeSelectBar {
     resizeTimeScale(viewWIdth: number, viewHeight: number): void;
     addGridMarks(data: MZXBX_Project, barnum: number, barLeft: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor, zIndex: number): void;
     createBarMark(barLeft: number, width: number, height: number, measureAnchor: TileAnchor): void;
-    createBarNumber(barLeft: number, top: number, barnum: number, zz: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor): void;
+    createBarNumber(barLeft: number, barnum: number, zz: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor): void;
     fillTimeBar(data: MZXBX_Project): void;
 }
 declare class UIToolbar {
@@ -218,9 +218,9 @@ declare class OctaveContent {
 }
 declare class MixerBar {
     octaves: BarOctave[];
-    barAnchor: TileAnchor;
+    singleBarAnchor: TileAnchor;
     zoomLevel: number;
-    constructor(barIdx: number, left: number, ww: number, zoomLevel: number, barAnchor: TileAnchor, data: MZXBX_Project);
+    constructor(barIdx: number, left: number, ww: number, zoomLevel: number, zoomBarAnchor: TileAnchor, data: MZXBX_Project);
 }
 declare class MixerUI {
     zoomLayer: TileLayerDefinition;
