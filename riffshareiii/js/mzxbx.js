@@ -2191,6 +2191,7 @@ class MidiParser {
         let curMeter = { count: midiSongData.meter.count, part: midiSongData.meter.division };
         let msrCntr = 0;
         let timeline = [];
+        console.log('changes', midiSongData.changes);
         while (curPositionMs < midiSongData.duration) {
             for (let mi = 0; mi < midiSongData.meters.length; mi++) {
                 if (midiSongData.meters[mi].ms > curPositionMs + 234) {
@@ -2203,22 +2204,36 @@ class MidiParser {
             let wholeBarDurationMs = 0;
             if (midiSongData.changes.length > 1) {
                 let lastChange = midiSongData.changes[0];
-                for (let ii = 1; ii < midiSongData.changes.length; ii++) {
-                    if (midiSongData.changes[ii].ms >= curPositionMs) {
+                let kk = 0;
+                for (kk = 1; kk < midiSongData.changes.length; kk++) {
+                    if (midiSongData.changes[kk].ms >= curPositionMs) {
                         break;
                     }
-                    lastChange = midiSongData.changes[ii];
+                    lastChange = midiSongData.changes[kk];
                 }
                 curTempo = lastChange.bpm;
-                let duration = 1000 * metreMath.set(curMeter).duration(lastChange.bpm);
-                let segment = 0;
-                console.log('last', lastChange.ms, lastChange.bpm);
-                for (let ii = 1; ii < midiSongData.changes.length; ii++) {
-                    if (midiSongData.changes[ii].ms > curPositionMs && midiSongData.changes[ii].ms < curPositionMs + duration) {
-                        console.log('middle', midiSongData.changes[ii].ms, midiSongData.changes[ii].bpm);
+                let wholeSkip = 0;
+                let lastSkip = 1 - wholeSkip;
+                let lastMs = 1000 * metreMath.set(curMeter).duration(lastChange.bpm) * lastSkip;
+                console.log('   search', kk, curTempo, curPositionMs, wholeBarDurationMs, lastMs, (curPositionMs + wholeBarDurationMs), (curPositionMs + wholeBarDurationMs + lastMs));
+                for (let ii = kk; ii < midiSongData.changes.length; ii++) {
+                    let nextChange = midiSongData.changes[ii];
+                    if (midiSongData.changes[ii].ms > curPositionMs + wholeBarDurationMs && midiSongData.changes[ii].ms <= curPositionMs + wholeBarDurationMs + lastMs) {
+                        console.log('   split', midiSongData.changes[ii].ms);
+                        let newLastMs = midiSongData.changes[ii].ms - curPositionMs - wholeBarDurationMs;
+                        let newLastSkip = newLastMs / 1000 * metreMath.set(curMeter).duration(lastChange.bpm) * lastSkip;
+                        wholeSkip = wholeSkip + newLastSkip;
+                        wholeBarDurationMs = wholeBarDurationMs + newLastMs;
+                        lastChange = nextChange;
+                        lastSkip = 1 - wholeSkip;
+                        lastMs = 1000 * metreMath.set(curMeter).duration(lastChange.bpm) * lastSkip;
+                        curTempo = lastChange.bpm;
+                    }
+                    else {
+                        wholeBarDurationMs = wholeBarDurationMs + lastMs;
+                        break;
                     }
                 }
-                wholeBarDurationMs = 1000 * metreMath.set(curMeter).duration(lastChange.bpm);
             }
             else {
                 wholeBarDurationMs = 1000 * metreMath.set(curMeter).duration(midiSongData.bpm);
@@ -2230,7 +2245,7 @@ class MidiParser {
             nextMeasure.startMs = Math.round(curPositionMs);
             nextMeasure.durationMs = Math.round(wholeBarDurationMs);
             timeline.push(nextMeasure);
-            console.log(msrCntr, nextMeasure);
+            console.log(msrCntr, nextMeasure.tempo, '' + nextMeasure.metre.count + '/' + nextMeasure.metre.part, Math.round(curPositionMs), Math.round(wholeBarDurationMs));
             curPositionMs = curPositionMs + wholeBarDurationMs;
             msrCntr++;
         }
