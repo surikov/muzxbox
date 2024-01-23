@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.78 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.79 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -22,8 +22,8 @@ let rowsAvgCount = 5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let reduceRatio = 1;
 let highLightMode = 1;
-var calcLen = 55;
-let diffWide=2;
+var calcLen = 32;
+let diffWide=1;
 
 
 let markLines: { fromX: number, fromY: number, toX: number, toY: number, color: string, manual: boolean }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
