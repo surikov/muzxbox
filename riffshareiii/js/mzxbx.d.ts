@@ -300,6 +300,10 @@ declare class PluginLoader {
         functionName: string;
     } | null;
 }
+declare type ImportMeasure = MZXBX_SongMeasure & {
+    startMs: number;
+    durationMs: number;
+};
 declare let drumNames: string[];
 declare let insNames: string[];
 declare type XYp = {
@@ -590,6 +594,22 @@ declare class MidiParser {
         track: MIDISongTrack;
     };
     dump(): MZXBX_Schedule;
+    findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): MZXBX_Metre;
+    findLastChange(midiSongData: MIDISongData, beforeMs: number): {
+        track: number;
+        ms: number;
+        resolution: number;
+        bpm: number;
+    };
+    findNextChange(midiSongData: MIDISongData, afterMs: number): {
+        track: number;
+        ms: number;
+        resolution: number;
+        bpm: number;
+    };
+    calcMeasureDuration(midiSongData: MIDISongData, meter: MZXBX_Metre, bpm: number, part: number, startMs: number): number;
+    createMeasure(midiSongData: MIDISongData, fromMs: number, barIdx: number): ImportMeasure;
+    createTimeLine(midiSongData: MIDISongData): MZXBX_SongMeasure[];
     convertProject(title: string, comment: string): MZXBX_Project;
     collectDrums(midiTrack: MIDISongTrack): number[];
     numratio(nn: number): number;
