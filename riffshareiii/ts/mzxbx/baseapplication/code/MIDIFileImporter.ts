@@ -632,7 +632,7 @@ function utf8ArrayToString(aBytes) {
 	for (var nPart, nLen = aBytes.length, nIdx = 0; nIdx < nLen; nIdx++) {
 		nPart = aBytes[nIdx];
 
-		sView += String.fromCharCode(
+		sView =sView+ String.fromCharCode(
 			nPart > 251 && nPart < 254 && nIdx + 5 < nLen ? /* six bytes */
 				/* (nPart - 252 << 30) may be not so safe in ECMAScript! So...: */
 				(nPart - 252) * 1073741824 + (aBytes[++nIdx] - 128 << 24) + (aBytes[++nIdx] - 128 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
@@ -1266,6 +1266,7 @@ class MidiParser {
 						else if (dvsn == 3) this.header.meterDivision = 8
 						else if (dvsn == 4) this.header.meterDivision = 16
 						else if (dvsn == 5) this.header.meterDivision = 32
+						else if (dvsn == 0) this.header.meterDivision = 1
 						this.header.meters.push({
 							track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0
 							, count: this.header.meterCount, division: this.header.meterDivision
@@ -1708,22 +1709,30 @@ class MidiParser {
 		//console.log('schedule', schedule);
 		return schedule;//midiSongData;
 	}
-	findLastMeter(midiSongData: MIDISongData, beforeMs: number,barIdx:number): MZXBX_Metre {
+	findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): MZXBX_Metre {
 		let metre: MZXBX_Metre = {
 			count: midiSongData.meter.count
 			, part: midiSongData.meter.division
 		};
+		//let preBPM = this.findLastChange(midiSongData, beforeMs).bpm;
+		let midimeter: { track: number, ms: number, count: number, division: number } = { track: 0, ms: 0, count: 4, division: 4 };
 		for (let mi = 0; mi < midiSongData.meters.length; mi++) {
-			if (midiSongData.meters[mi].ms > beforeMs + 2+barIdx*3) {
+			//if (midiSongData.meters[mi].ms > beforeMs + 1){//barIdx * 3) {
+			if (midiSongData.meters[mi].ms > beforeMs + 1 + barIdx * 3) {
+				//console.log();
 				break;
 			}
-			metre.count = midiSongData.meters[mi].count;
-			metre.part = midiSongData.meters[mi].division;
+			midimeter = midiSongData.meters[mi];
+			//metre.count = midiSongData.meters[mi].count;
+			//metre.part = midiSongData.meters[mi].division;
 		}
+		metre.count = midimeter.count;
+		metre.part = midimeter.division;
+		//console.log(midimeter);
 		return metre;
 	}
 	findLastChange(midiSongData: MIDISongData, beforeMs: number): { track: number, ms: number, resolution: number, bpm: number } {
-		let nextChange: { track: number, ms: number, resolution: number, bpm: number } = midiSongData.changes[0];
+		let nextChange: { track: number, ms: number, resolution: number, bpm: number } = { track: 0, ms: 0, resolution: 0, bpm: 120 };
 		for (let ii = 1; ii < midiSongData.changes.length; ii++) {
 			if (midiSongData.changes[ii].ms > beforeMs + 1) {
 				break;
@@ -1733,7 +1742,7 @@ class MidiParser {
 		return nextChange;
 	}
 	findNextChange(midiSongData: MIDISongData, afterMs: number): { track: number, ms: number, resolution: number, bpm: number } {
-		let nextChange: { track: number, ms: number, resolution: number, bpm: number } = midiSongData.changes[0];
+		let nextChange: { track: number, ms: number, resolution: number, bpm: number } = { track: 0, ms: 0, resolution: 0, bpm: 120 };
 		for (let ii = 1; ii < midiSongData.changes.length; ii++) {
 			if (midiSongData.changes[ii].ms > afterMs) {
 				nextChange = midiSongData.changes[ii];
@@ -1758,9 +1767,9 @@ class MidiParser {
 			return partDurationMs;
 		}
 	}
-	createMeasure(midiSongData: MIDISongData, fromMs: number,barIdx:number): ImportMeasure {
+	createMeasure(midiSongData: MIDISongData, fromMs: number, barIdx: number): ImportMeasure {
 		let change = this.findLastChange(midiSongData, fromMs);
-		let meter: MZXBX_Metre = this.findLastMeter(midiSongData, fromMs,barIdx);
+		let meter: MZXBX_Metre = this.findLastMeter(midiSongData, fromMs, barIdx);
 		let duration = this.calcMeasureDuration(midiSongData, meter, change.bpm, 1, fromMs);
 		let measure: ImportMeasure = {
 			tempo: change.bpm
@@ -1768,16 +1777,35 @@ class MidiParser {
 			, startMs: fromMs
 			, durationMs: duration
 		};
+		//console.log(barIdx, measure);
 		return measure;
 	}
 
 	createTimeLine(midiSongData: MIDISongData): MZXBX_SongMeasure[] {
+		let count = 0;
+		let part = 0;
+		let bpm = 0;
+
 		let timeline: MZXBX_SongMeasure[] = [];
 		let fromMs = 0;
 		while (fromMs < midiSongData.duration) {
-			let measure: ImportMeasure = this.createMeasure(midiSongData, fromMs,timeline.length);
+			let measure: ImportMeasure = this.createMeasure(midiSongData, fromMs, timeline.length);
 			fromMs = fromMs + measure.durationMs;
-			//console.log(timeline.length, measure);
+			/*
+						let ms2 = 0;
+						let metreMath = new MZXBX_MetreMath();
+						for (let ii = 0; ii < timeline.length; ii++) {
+							ms2 = ms2 + 1000 * metreMath.set({ count: timeline[ii].metre.count, part: timeline[ii].metre.part }).duration(timeline[ii].tempo);
+						}*/
+
+			if (count != measure.metre.count || part != measure.metre.part || bpm != measure.tempo) {
+				console.log(timeline.length, measure.startMs, measure.tempo, '' + measure.metre.count + '/' + measure.metre.part);
+				count = measure.metre.count;
+				part = measure.metre.part;
+				bpm = measure.tempo;
+			} else {
+				console.log(timeline.length, measure.startMs);
+			}
 			timeline.push(measure);
 		}
 		return timeline;
@@ -1853,99 +1881,13 @@ class MidiParser {
 		//let metreMath = new MZXBX_MetreMath();
 
 
-		let newtimeline: MZXBX_SongMeasure[]=this.createTimeLine(midiSongData);
-		console.log('changes', midiSongData.changes);
-		console.log('meters', midiSongData.meters);
-/*
-		let curPositionMs = 0;
-		let curMeter = { count: midiSongData.meter.count, part: midiSongData.meter.division };
-		let curMeterStart = 0;
-		let curMeterIdx = 0;
-		let msrCntr = 0;
-		let timeline: MZXBX_SongMeasure[] = [];
-		console.log('changes', midiSongData.changes);
-		console.log('meters', midiSongData.meters);
-		while (curPositionMs < midiSongData.duration) {
-			for (let mi = 0; mi < midiSongData.meters.length; mi++) {
-				if (midiSongData.meters[mi].ms > curPositionMs + 1) {
-					break;
-				}
-				curMeter.count = midiSongData.meters[mi].count;
-				curMeter.part = midiSongData.meters[mi].division;
-				curMeterStart = midiSongData.meters[mi].ms;
-				curMeterIdx = mi;
-			}
-			let curTempo = 120;
-			let wholeBarDurationMs = 0;
-			if (midiSongData.changes.length > 1) {
-				let lastChange: { track: number, ms: number, resolution: number, bpm: number } = midiSongData.changes[0];
-				let kk = 0;
-				for (kk = 1; kk < midiSongData.changes.length; kk++) {
-					if (midiSongData.changes[kk].ms > curPositionMs + 1) {
-						break
-					}
-					lastChange = midiSongData.changes[kk];
-				}
-				curTempo = lastChange.bpm;
-				let wholeSkip = 0;
-				let lastSkip = 1 - wholeSkip;
-				let currentDurationMs = 1000 * metreMath.set(curMeter).duration(lastChange.bpm) * lastSkip;
-				//console.log('	lastChange ms', lastChange.ms, 'bpm', lastChange.bpm, 'curPositionMs', curPositionMs, '+', currentDurationMs, '=', (curPositionMs + currentDurationMs));
-				//console.log('	search', (curPositionMs + wholeBarDurationMs), '+', (wholeBarDurationMs + currentDurationMs), '=', (curPositionMs + wholeBarDurationMs + currentDurationMs));
-				if (kk < midiSongData.changes.length) {
-					for (let ii = kk; ii < midiSongData.changes.length; ii++) {
-						let nextChange = midiSongData.changes[ii];
-						if (nextChange.ms >= curPositionMs + wholeBarDurationMs
-							&& nextChange.ms <= curPositionMs + wholeBarDurationMs + currentDurationMs
-						) {
-							//console.log('	split', nextChange.ms, nextChange.bpm);
-
-							let newLastMs = nextChange.ms - curPositionMs - wholeBarDurationMs;
-							let newLastSkip = lastSkip * newLastMs / currentDurationMs;
-
-							wholeSkip = wholeSkip + newLastSkip;
-
-							wholeBarDurationMs = wholeBarDurationMs + newLastMs;
-
-							curTempo = nextChange.bpm;
-							lastChange = nextChange;
-							lastSkip = 1 - wholeSkip;
-							currentDurationMs = 1000 * metreMath.set(curMeter).duration(lastChange.bpm) * lastSkip;
-
-							//console.log('		to', 'wholeBarDurationMs', wholeBarDurationMs, 'currentDurationMs', Math.round(currentDurationMs), 'curTempo', curTempo);
-						} else {
-							//console.log('	end', 'wholeBarDurationMs', wholeBarDurationMs, 'currentDurationMs', currentDurationMs, 'curTempo', curTempo);
-							wholeBarDurationMs = wholeBarDurationMs + currentDurationMs;
-
-							break;
-						}
-						//}
-					}
-				} else {
-					//console.log('	finish', 'wholeBarDurationMs', wholeBarDurationMs, 'currentDurationMs', currentDurationMs, 'curTempo', curTempo);
-					wholeBarDurationMs = wholeBarDurationMs + currentDurationMs;
-				}
-			} else {
-				wholeBarDurationMs = 1000 * metreMath.set(curMeter).duration(midiSongData.bpm);
-			}
-			if (wholeBarDurationMs < 1) {
-				wholeBarDurationMs = 1000 * metreMath.set(curMeter).duration(1234);
-			}
-
-			let nextMeasure: MZXBX_SongMeasure = { tempo: Math.round(curTempo), metre: { count: curMeter.count, part: curMeter.part } };
-			(nextMeasure as any).startMs = Math.round(curPositionMs);
-			(nextMeasure as any).durationMs = Math.round(wholeBarDurationMs);
-			timeline.push(nextMeasure);
-			//console.log(msrCntr, nextMeasure.tempo, '' + nextMeasure.metre.count + '/' + nextMeasure.metre.part, curPositionMs, '+', wholeBarDurationMs);
-			curPositionMs = curPositionMs + wholeBarDurationMs;
-			msrCntr++;
-		}
+		let newtimeline: MZXBX_SongMeasure[] = this.createTimeLine(midiSongData);
 
 		console.log('midiSongData', midiSongData
 			//, 1000 * metreMath.set(curMeter).duration(132)
 			//, 1000 * metreMath.set(curMeter).duration(134)
 		);
-		*/
+
 		let project: MZXBX_Project = {
 			title: title + ' ' + comment
 			, timeline: newtimeline

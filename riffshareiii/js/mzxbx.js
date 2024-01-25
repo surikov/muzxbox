@@ -1225,7 +1225,7 @@ function utf8ArrayToString(aBytes) {
     var sView = "";
     for (var nPart, nLen = aBytes.length, nIdx = 0; nIdx < nLen; nIdx++) {
         nPart = aBytes[nIdx];
-        sView += String.fromCharCode(nPart > 251 && nPart < 254 && nIdx + 5 < nLen ?
+        sView = sView + String.fromCharCode(nPart > 251 && nPart < 254 && nIdx + 5 < nLen ?
             (nPart - 252) * 1073741824 + (aBytes[++nIdx] - 128 << 24) + (aBytes[++nIdx] - 128 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
             : nPart > 247 && nPart < 252 && nIdx + 4 < nLen ?
                 (nPart - 248 << 24) + (aBytes[++nIdx] - 128 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
@@ -1730,6 +1730,8 @@ class MidiParser {
                             this.header.meterDivision = 16;
                         else if (dvsn == 5)
                             this.header.meterDivision = 32;
+                        else if (dvsn == 0)
+                            this.header.meterDivision = 1;
                         this.header.meters.push({
                             track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0,
                             count: this.header.meterCount, division: this.header.meterDivision
@@ -2125,17 +2127,19 @@ class MidiParser {
             count: midiSongData.meter.count,
             part: midiSongData.meter.division
         };
+        let midimeter = { track: 0, ms: 0, count: 4, division: 4 };
         for (let mi = 0; mi < midiSongData.meters.length; mi++) {
-            if (midiSongData.meters[mi].ms > beforeMs + 2 + barIdx * 3) {
+            if (midiSongData.meters[mi].ms > beforeMs + 1 + barIdx * 3) {
                 break;
             }
-            metre.count = midiSongData.meters[mi].count;
-            metre.part = midiSongData.meters[mi].division;
+            midimeter = midiSongData.meters[mi];
         }
+        metre.count = midimeter.count;
+        metre.part = midimeter.division;
         return metre;
     }
     findLastChange(midiSongData, beforeMs) {
-        let nextChange = midiSongData.changes[0];
+        let nextChange = { track: 0, ms: 0, resolution: 0, bpm: 120 };
         for (let ii = 1; ii < midiSongData.changes.length; ii++) {
             if (midiSongData.changes[ii].ms > beforeMs + 1) {
                 break;
@@ -2145,7 +2149,7 @@ class MidiParser {
         return nextChange;
     }
     findNextChange(midiSongData, afterMs) {
-        let nextChange = midiSongData.changes[0];
+        let nextChange = { track: 0, ms: 0, resolution: 0, bpm: 120 };
         for (let ii = 1; ii < midiSongData.changes.length; ii++) {
             if (midiSongData.changes[ii].ms > afterMs) {
                 nextChange = midiSongData.changes[ii];
@@ -2184,11 +2188,23 @@ class MidiParser {
         return measure;
     }
     createTimeLine(midiSongData) {
+        let count = 0;
+        let part = 0;
+        let bpm = 0;
         let timeline = [];
         let fromMs = 0;
         while (fromMs < midiSongData.duration) {
             let measure = this.createMeasure(midiSongData, fromMs, timeline.length);
             fromMs = fromMs + measure.durationMs;
+            if (count != measure.metre.count || part != measure.metre.part || bpm != measure.tempo) {
+                console.log(timeline.length, measure.startMs, measure.tempo, '' + measure.metre.count + '/' + measure.metre.part);
+                count = measure.metre.count;
+                part = measure.metre.part;
+                bpm = measure.tempo;
+            }
+            else {
+                console.log(timeline.length, measure.startMs);
+            }
             timeline.push(measure);
         }
         return timeline;
@@ -2260,8 +2276,7 @@ class MidiParser {
             }
         }
         let newtimeline = this.createTimeLine(midiSongData);
-        console.log('changes', midiSongData.changes);
-        console.log('meters', midiSongData.meters);
+        console.log('midiSongData', midiSongData);
         let project = {
             title: title + ' ' + comment,
             timeline: newtimeline,
