@@ -24,11 +24,11 @@
 
     --color-debug: #800;
     
-	--color-shadow: #00ffff66;
+	--color-shadow: #00000066;
 
-    --color-background: #002222ff;
+    --color-background: #000000ff;
     --color-lines: #556677ff;
-    --color-panel: #224466ff;
+    --color-panel: #114466ff;
 
 	--color-focus: #009933ff;
     --color-interactive: #cc6633ff;

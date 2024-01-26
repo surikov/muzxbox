@@ -160,12 +160,14 @@ body,
     pointer-events: none;
 }
 
-.mixPanelFill{
+.barRightBorder{
 	fill: var(--color-panel);
+	fill-opacity:50%;
     stroke: none;
 }
-.mixToolbarFill{
-	fill: var(--color-lines);
+.octaveBottomBorder{
+	fill: var(--color-panel);
+	fill-opacity:50%;
     stroke: none;
 }
 .mixTextFill{

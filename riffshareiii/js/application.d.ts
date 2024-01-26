@@ -211,7 +211,10 @@ declare class BarOctave {
     constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project);
     addLines(barOctaveAnchor: TileAnchor, zoomLevel: number, left: number, top: number, width: number, height: number, data: MZXBX_Project, barIdx: number): void;
     addOctaveGridSteps(barIdx: number, data: MZXBX_Project, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
-    addNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project): void;
+    addUpperNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project, zoomLevel: number): void;
+    addOtherNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project): void;
+    addTrackNotes(track: MZXBX_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project, css: string, addMoreInfo: boolean): void;
+    addNotes222(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project): void;
 }
 declare class OctaveContent {
     constructor(aa: number, top: number, toAnchor: TileAnchor, data: MZXBX_Project);

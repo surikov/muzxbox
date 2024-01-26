@@ -238,7 +238,27 @@ class CommandDispatcher {
                 this.listener = function (ievent) {
                     var file = ievent.target.files[0];
                     let title = file.name;
-                    let comment = '' + file.size / 1000 + 'kb, ' + file.lastModifiedDate;
+                    let dat = '' + file.lastModifiedDate;
+                    try {
+                        let last = file.lastModifiedDate;
+                        dat = '' + last.getFullYear();
+                        if (last.getMonth() < 10) {
+                            dat = dat + '-' + last.getMonth();
+                        }
+                        else {
+                            dat = dat + '-0' + last.getMonth();
+                        }
+                        if (last.getDate() < 10) {
+                            dat = dat + '-' + last.getDate();
+                        }
+                        else {
+                            dat = dat + '-0' + last.getDate();
+                        }
+                    }
+                    catch (xx) {
+                        console.log(xx);
+                    }
+                    let comment = ', ' + file.size / 1000 + 'kb, ' + dat;
                     var fileReader = new FileReader();
                     fileReader.onload = function (progressEvent) {
                         if (progressEvent != null) {
@@ -1094,11 +1114,14 @@ class LeftPanel {
 }
 class BarOctave {
     constructor(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel, data) {
-        if (zoomLevel < 5) {
-            this.addLines(barOctaveAnchor, zoomLevel, left, top, width, height, data, barIdx);
-        }
-        if (zoomLevel < 7) {
-            this.addNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel, data);
+        if (zoomLevel < 8) {
+            this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, zoomLevel);
+            if (zoomLevel < 7) {
+                this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data);
+                if (zoomLevel < 5) {
+                    this.addLines(barOctaveAnchor, zoomLevel, left, top, width, height, data, barIdx);
+                }
+            }
         }
     }
     addLines(barOctaveAnchor, zoomLevel, left, top, width, height, data, barIdx) {
@@ -1109,7 +1132,7 @@ class BarOctave {
             y: top,
             w: zoomPrefixLevelsCSS[zoomLevel].minZoom * 0.25,
             h: height,
-            css: 'mixPanelFill'
+            css: 'barRightBorder'
         };
         barOctaveAnchor.content.push(this.barRightBorder);
         this.octaveBottomBorder = {
@@ -1117,7 +1140,7 @@ class BarOctave {
             y: top + height,
             w: width,
             h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 16.0,
-            css: 'mixToolbarFill'
+            css: 'octaveBottomBorder'
         };
         barOctaveAnchor.content.push(this.octaveBottomBorder);
         if (zoomLevel < 3) {
@@ -1127,7 +1150,7 @@ class BarOctave {
                     y: top + height - kk * mixm.notePathHeight,
                     w: width,
                     h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 64.0,
-                    css: 'mixToolbarFill'
+                    css: 'octaveBottomBorder'
                 });
             }
         }
@@ -1161,103 +1184,76 @@ class BarOctave {
             }
         }
     }
-    addNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel, data) {
+    addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, zoomLevel) {
+        if (data.tracks.length) {
+            if (zoomLevel == 0) {
+                this.addTrackNotes(data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, 'mixNoteLine', true);
+            }
+            else {
+                this.addTrackNotes(data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, 'mixNoteLine', false);
+            }
+        }
+    }
+    addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data) {
+        for (let ii = 1; ii < data.tracks.length; ii++) {
+            let track = data.tracks[ii];
+            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, 'mixNoteSub', false);
+        }
+    }
+    addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, css, addMoreInfo) {
         let mixm = new MixerDataMath(data);
-        for (let ii = 0; ii < data.tracks.length; ii++) {
-            let track = data.tracks[ii];
-            if (ii > 0) {
-                let measure = track.measures[barIdx];
-                for (let cc = 0; cc < measure.chords.length; cc++) {
-                    let chord = measure.chords[cc];
-                    for (let nn = 0; nn < chord.notes.length; nn++) {
-                        let note = chord.notes[nn];
-                        let from = octaveIdx * 12;
-                        let to = (octaveIdx + 1) * 12;
-                        if (note.pitch >= from && note.pitch < to) {
-                            let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
-                            let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
-                            for (let ss = 0; ss < note.slides.length; ss++) {
-                                let x2 = x1
-                                    + MZMM()
-                                        .set(note.slides[ss].duration)
-                                        .duration(data.timeline[barIdx].tempo)
-                                        * mixm.widthDurationRatio;
-                                let y2 = y1 + note.slides[ss].delta * mixm.notePathHeight;
-                                let rx1 = x1 + mixm.notePathHeight / 2;
-                                let rx2 = x2 - mixm.notePathHeight / 2;
-                                if (rx2 - rx1 < 0.00001) {
-                                    rx2 = rx1 + 0.00001;
-                                }
-                                if (barOctaveAnchor.ww < rx2 - barOctaveAnchor.xx) {
-                                    barOctaveAnchor.ww = rx2 - barOctaveAnchor.xx;
-                                }
-                                let line = {
-                                    x1: rx1,
-                                    y1: y1 - mixm.notePathHeight / 2,
-                                    x2: rx2,
-                                    y2: y2 - mixm.notePathHeight / 2,
-                                    css: 'mixNoteSub'
-                                };
-                                barOctaveAnchor.content.push(line);
-                                x1 = x2;
-                                y1 = y2;
-                            }
+        let measure = track.measures[barIdx];
+        for (let cc = 0; cc < measure.chords.length; cc++) {
+            let chord = measure.chords[cc];
+            for (let nn = 0; nn < chord.notes.length; nn++) {
+                let note = chord.notes[nn];
+                let from = octaveIdx * 12;
+                let to = (octaveIdx + 1) * 12;
+                if (note.pitch >= from && note.pitch < to) {
+                    let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
+                    let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
+                    for (let ss = 0; ss < note.slides.length; ss++) {
+                        let x2 = x1
+                            + MZMM()
+                                .set(note.slides[ss].duration)
+                                .duration(data.timeline[barIdx].tempo)
+                                * mixm.widthDurationRatio;
+                        let y2 = y1 + note.slides[ss].delta * mixm.notePathHeight;
+                        let rx1 = x1 + mixm.notePathHeight / 2;
+                        let rx2 = x2 - mixm.notePathHeight / 2;
+                        if (rx2 - rx1 < 0.00001) {
+                            rx2 = rx1 + 0.00001;
                         }
+                        if (barOctaveAnchor.ww < rx2 - barOctaveAnchor.xx) {
+                            barOctaveAnchor.ww = rx2 - barOctaveAnchor.xx;
+                        }
+                        let line = {
+                            x1: rx1,
+                            y1: y1 - mixm.notePathHeight / 2,
+                            x2: rx2,
+                            y2: y2 - mixm.notePathHeight / 2,
+                            css: css
+                        };
+                        barOctaveAnchor.content.push(line);
+                        if (addMoreInfo) {
+                            let txt = '' + (barIdx + 1)
+                                + ':' + chord.skip.count + '/' + chord.skip.part
+                                + '(' + note.pitch
+                                + '-' + note.slides[0].duration.count + '/' + note.slides[0].duration.part
+                                + ')';
+                            let info = { x: x1, y: y1 + 0.25, text: txt, css: 'timeBarNum025' };
+                            barOctaveAnchor.content.push(info);
+                        }
+                        x1 = x2;
+                        y1 = y2;
                     }
                 }
             }
         }
-        for (let ii = 0; ii < data.tracks.length; ii++) {
-            let track = data.tracks[ii];
-            if (ii == 0) {
-                let measure = track.measures[barIdx];
-                for (let cc = 0; cc < measure.chords.length; cc++) {
-                    let chord = measure.chords[cc];
-                    for (let nn = 0; nn < chord.notes.length; nn++) {
-                        let note = chord.notes[nn];
-                        let from = octaveIdx * 12;
-                        let to = (octaveIdx + 1) * 12;
-                        if (note.pitch >= from && note.pitch < to) {
-                            let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
-                            let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
-                            for (let ss = 0; ss < note.slides.length; ss++) {
-                                let x2 = x1 + MZMM().set(note.slides[ss].duration)
-                                    .duration(data.timeline[barIdx].tempo)
-                                    * mixm.widthDurationRatio;
-                                let y2 = y1 + note.slides[ss].delta * mixm.notePathHeight;
-                                let rx1 = x1 + mixm.notePathHeight / 2;
-                                let rx2 = x2 - mixm.notePathHeight / 2;
-                                if (rx2 - rx1 < 0.00001) {
-                                    rx2 = rx1 + 0.00001;
-                                }
-                                if (barOctaveAnchor.ww < rx2 - barOctaveAnchor.xx) {
-                                    barOctaveAnchor.ww = rx2 - barOctaveAnchor.xx;
-                                }
-                                let line = {
-                                    x1: rx1,
-                                    y1: y1 - mixm.notePathHeight / 2,
-                                    x2: rx2,
-                                    y2: y2 - mixm.notePathHeight / 2,
-                                    css: 'mixNoteLine'
-                                };
-                                barOctaveAnchor.content.push(line);
-                                if (zoomLevel == 0) {
-                                    let txt = '' + (barIdx + 1)
-                                        + ':' + chord.skip.count + '/' + chord.skip.part
-                                        + '(' + note.pitch
-                                        + '-' + note.slides[0].duration.count + '/' + note.slides[0].duration.part
-                                        + ')';
-                                    let info = { x: x1, y: y1 + 0.25, text: txt, css: 'timeBarNum025' };
-                                    barOctaveAnchor.content.push(info);
-                                }
-                                x1 = x2;
-                                y1 = y2;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    }
+    addNotes222(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel, data) {
+        this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, zoomLevel);
+        this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data);
     }
 }
 class OctaveContent {

@@ -99,9 +99,43 @@
     stroke: var(--color-text);
     stroke-linejoin: round;
     stroke-width: calc(0.95*var(--tapSize));
+	stroke-opacity: 90%;
 }
 .mixNoteSub{
-    stroke: var(--color-lines);
+    stroke: var(--color-text);
     stroke-linejoin: round;
     stroke-width: calc(0.95*var(--tapSize));
+	stroke-opacity: 15%;
+}
+.mixFiller1{
+    fill: var(--color-text);
+	fill-opacity: 5%;
+}
+.mixFiller2{
+    fill: var(--color-text);
+	fill-opacity: 15%;
+}
+.mixFiller3{
+    fill: var(--color-text);
+	fill-opacity: 25%;
+}
+.mixFiller4{
+    fill: var(--color-text);
+	fill-opacity: 35%;
+}
+.mixFiller5{
+    fill: var(--color-text);
+	fill-opacity: 45%;
+}
+.mixFiller6{
+    fill: var(--color-text);
+	fill-opacity: 55%;
+}
+.mixFiller7{
+    fill: var(--color-text);
+	fill-opacity: 65%;
+}
+.mixFiller8{
+    fill: var(--color-text);
+	fill-opacity: 75%;
 }

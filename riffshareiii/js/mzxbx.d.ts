@@ -611,6 +611,7 @@ declare class MidiParser {
     createMeasure(midiSongData: MIDISongData, fromMs: number, barIdx: number): ImportMeasure;
     createTimeLine(midiSongData: MIDISongData): MZXBX_SongMeasure[];
     convertProject(title: string, comment: string): MZXBX_Project;
+    addLyricsPoints(commentPoint: MZXBX_CommentMeasure, skip: MZXBX_Metre, txt: string): void;
     collectDrums(midiTrack: MIDISongTrack): number[];
     numratio(nn: number): number;
     stripDuration(what: MZXBX_MetreMath): MZXBX_MetreMath;

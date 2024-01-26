@@ -2197,13 +2197,11 @@ class MidiParser {
             let measure = this.createMeasure(midiSongData, fromMs, timeline.length);
             fromMs = fromMs + measure.durationMs;
             if (count != measure.metre.count || part != measure.metre.part || bpm != measure.tempo) {
-                console.log(timeline.length, measure.startMs, measure.tempo, '' + measure.metre.count + '/' + measure.metre.part);
                 count = measure.metre.count;
                 part = measure.metre.part;
                 bpm = measure.tempo;
             }
             else {
-                console.log(timeline.length, measure.startMs);
             }
             timeline.push(measure);
         }
@@ -2292,7 +2290,7 @@ class MidiParser {
             let textpoint = midiSongData.lyrics[ii];
             let pnt = findMeasureSkipByTime(textpoint.ms / 1000, project.timeline);
             if (pnt) {
-                project.comments[pnt.idx].texts.push({ skip: { count: pnt.skip.count, part: pnt.skip.part }, text: textpoint.txt });
+                this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt);
             }
         }
         for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
@@ -2309,6 +2307,22 @@ class MidiParser {
         }
         console.log('project', project);
         return project;
+    }
+    addLyricsPoints(commentPoint, skip, txt) {
+        txt = txt.replace(/(\r)/g, '~');
+        txt = txt.replace(/\\r/g, '~');
+        txt = txt.replace(/(\n)/g, '~');
+        txt = txt.replace(/\\n/g, '~');
+        txt = txt.replace(/(~~)/g, '~');
+        txt = txt.replace(/(~~)/g, '~');
+        txt = txt.replace(/(~~)/g, '~');
+        txt = txt.replace(/(~~)/g, '~');
+        let strings = txt.split('~');
+        if (strings.length) {
+            for (let ii = 0; ii < strings.length; ii++) {
+                commentPoint.texts.push({ skip: skip, text: strings[ii].trim() });
+            }
+        }
     }
     collectDrums(midiTrack) {
         let drums = [];
