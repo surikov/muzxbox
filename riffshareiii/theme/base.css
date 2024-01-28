@@ -161,12 +161,12 @@ body,
 }
 
 .barRightBorder{
-	fill: var(--color-panel);
+	fill: var(--color-lines);
 	fill-opacity:50%;
     stroke: none;
 }
 .octaveBottomBorder{
-	fill: var(--color-panel);
+	fill: var(--color-lines);
 	fill-opacity:50%;
     stroke: none;
 }

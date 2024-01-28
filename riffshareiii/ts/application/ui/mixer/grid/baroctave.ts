@@ -51,7 +51,7 @@ class BarOctave {
 					x: left
 					, y: top + height - kk * mixm.notePathHeight
 					, w: width
-					, h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 64.0
+					, h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 32.0
 					, css: 'octaveBottomBorder'
 				});
 			}
@@ -171,108 +171,6 @@ class BarOctave {
 			}
 		}
 	}
-	addNotes222(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number
-		, barOctaveAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project
-	) {
-
-		this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, zoomLevel);
-		this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data);
-		/*let mixm: MixerDataMath = new MixerDataMath(data);
-		for (let ii = 0; ii < data.tracks.length; ii++) {
-			let track = data.tracks[ii];
-			if (ii > 0) {
-				let measure: MZXBX_TrackMeasure = track.measures[barIdx];
-				for (let cc = 0; cc < measure.chords.length; cc++) {
-					let chord: MZXBX_Chord = measure.chords[cc];
-					for (let nn = 0; nn < chord.notes.length; nn++) {
-						let note: MZXBX_Note = chord.notes[nn];
-						let from = octaveIdx * 12;
-						let to = (octaveIdx + 1) * 12;
-						if (note.pitch >= from && note.pitch < to) {
-							let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
-							let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
-							for (let ss = 0; ss < note.slides.length; ss++) {
-								let x2 = x1
-									+ MZMM()
-										.set(note.slides[ss].duration)
-										.duration(data.timeline[barIdx].tempo)
-									* mixm.widthDurationRatio;
-								let y2 = y1 + note.slides[ss].delta * mixm.notePathHeight;
-								let rx1 = x1 + mixm.notePathHeight / 2;
-								let rx2 = x2 - mixm.notePathHeight / 2;
-								if (rx2 - rx1 < 0.00001) {
-									rx2 = rx1 + 0.00001;
-								}
-								if (barOctaveAnchor.ww < rx2 - barOctaveAnchor.xx) {
-									barOctaveAnchor.ww = rx2 - barOctaveAnchor.xx
-								}
-								let line: TileLine = {
-									x1: rx1
-									, y1: y1 - mixm.notePathHeight / 2
-									, x2: rx2
-									, y2: y2 - mixm.notePathHeight / 2
-									, css: 'mixNoteSub'
-								};
-								barOctaveAnchor.content.push(line);
-
-								x1 = x2;
-								y1 = y2;
-							}
-						}
-					}
-				}
-			}
-		}
-		for (let ii = 0; ii < data.tracks.length; ii++) {
-			let track = data.tracks[ii];
-			if (ii == 0) {
-				let measure: MZXBX_TrackMeasure = track.measures[barIdx];
-				for (let cc = 0; cc < measure.chords.length; cc++) {
-					let chord: MZXBX_Chord = measure.chords[cc];
-					for (let nn = 0; nn < chord.notes.length; nn++) {
-						let note: MZXBX_Note = chord.notes[nn];
-						let from = octaveIdx * 12;
-						let to = (octaveIdx + 1) * 12;
-						if (note.pitch >= from && note.pitch < to) {
-							let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
-							let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
-							for (let ss = 0; ss < note.slides.length; ss++) {
-								let x2 = x1 + MZMM().set(note.slides[ss].duration)
-									.duration(data.timeline[barIdx].tempo)
-									* mixm.widthDurationRatio;
-								let y2 = y1 + note.slides[ss].delta * mixm.notePathHeight;
-								let rx1 = x1 + mixm.notePathHeight / 2;
-								let rx2 = x2 - mixm.notePathHeight / 2;
-								if (rx2 - rx1 < 0.00001) {
-									rx2 = rx1 + 0.00001;
-								}
-								if (barOctaveAnchor.ww < rx2 - barOctaveAnchor.xx) {
-									barOctaveAnchor.ww = rx2 - barOctaveAnchor.xx
-								}
-								let line: TileLine = {
-									x1: rx1
-									, y1: y1 - mixm.notePathHeight / 2
-									, x2: rx2
-									, y2: y2 - mixm.notePathHeight / 2
-									, css: 'mixNoteLine'
-								};
-								barOctaveAnchor.content.push(line);
-								if (zoomLevel == 0) {
-									let txt = '' + (barIdx + 1)
-										+ ':' + chord.skip.count + '/' + chord.skip.part
-										+ '(' + note.pitch 
-										+ '-'+note.slides[0].duration.count+'/'+note.slides[0].duration.part
-										+')';
-									let info: TileText = { x: x1, y: y1 + 0.25, text: txt, css: 'timeBarNum025' };
-									barOctaveAnchor.content.push(info);
-								}
-								x1 = x2;
-								y1 = y2;
-							}
-						}
-					}
-				}
-			}
-		}*/
-	}
+	
+	
 }

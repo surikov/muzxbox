@@ -1149,7 +1149,7 @@ class BarOctave {
                     x: left,
                     y: top + height - kk * mixm.notePathHeight,
                     w: width,
-                    h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 64.0,
+                    h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 32.0,
                     css: 'octaveBottomBorder'
                 });
             }
@@ -1251,10 +1251,6 @@ class BarOctave {
             }
         }
     }
-    addNotes222(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel, data) {
-        this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, zoomLevel);
-        this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data);
-    }
 }
 class OctaveContent {
     constructor(aa, top, toAnchor, data) {
@@ -1299,6 +1295,11 @@ class MixerUI {
             this.zoomLayer.anchors[ii].hh = hh;
             this.levels[ii].reCreateBars(data);
         }
+        this.fillerAnchor.xx = mixm.LeftPad;
+        this.fillerAnchor.yy = mixm.gridTop();
+        this.fillerAnchor.ww = mixm.mixerWidth() - mixm.LeftPad - mixm.rightPad;
+        this.fillerAnchor.hh = mixm.gridHeight();
+        this.reFillTracksRatio(data);
     }
     createMixerLayers() {
         let svg = document.getElementById('tracksLayerZoom');
@@ -1313,7 +1314,51 @@ class MixerUI {
             this.zoomLayer.anchors.push(mixerLevelAnchor);
             this.levels.push(new MixerZoomLevel(ii, mixerLevelAnchor));
         }
+        this.fillerAnchor = {
+            showZoom: zoomPrefixLevelsCSS[6].minZoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1,
+            xx: 0, yy: 0, ww: 1, hh: 1, content: []
+        };
+        this.zoomLayer.anchors.push(this.fillerAnchor);
         return [this.zoomLayer];
+    }
+    reFillTracksRatio(data) {
+        let mixm = new MixerDataMath(data);
+        let mxNotes = 0;
+        for (let bb = 0; bb < data.timeline.length; bb++) {
+            let notecount = 0;
+            for (let tt = 0; tt < data.tracks.length; tt++) {
+                let bar = data.tracks[tt].measures[bb];
+                for (let cc = 0; cc < bar.chords.length; cc++) {
+                    notecount = notecount + bar.chords[cc].notes.length;
+                }
+            }
+            if (mxNotes < notecount) {
+                mxNotes = notecount;
+            }
+        }
+        this.fillerAnchor.content = [];
+        let barX = 0;
+        for (let bb = 0; bb < data.timeline.length; bb++) {
+            let notecount = 0;
+            for (let tt = 0; tt < data.tracks.length; tt++) {
+                let bar = data.tracks[tt].measures[bb];
+                for (let cc = 0; cc < bar.chords.length; cc++) {
+                    notecount = notecount + bar.chords[cc].notes.length;
+                }
+            }
+            let css = 'mixFiller' + (1 + Math.round(7 * notecount / mxNotes));
+            let barwidth = MZMM().set(data.timeline[bb].metre).duration(data.timeline[bb].tempo) * mixm.widthDurationRatio;
+            let fillRectangle = {
+                x: mixm.LeftPad + barX,
+                y: mixm.gridTop(),
+                w: barwidth,
+                h: mixm.gridHeight(),
+                css: css
+            };
+            this.fillerAnchor.content.push(fillRectangle);
+            barX = barX + barwidth;
+        }
     }
 }
 class MixerZoomLevel {

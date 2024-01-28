@@ -214,7 +214,6 @@ declare class BarOctave {
     addUpperNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project, zoomLevel: number): void;
     addOtherNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project): void;
     addTrackNotes(track: MZXBX_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project, css: string, addMoreInfo: boolean): void;
-    addNotes222(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project): void;
 }
 declare class OctaveContent {
     constructor(aa: number, top: number, toAnchor: TileAnchor, data: MZXBX_Project);
@@ -228,8 +227,10 @@ declare class MixerBar {
 declare class MixerUI {
     zoomLayer: TileLayerDefinition;
     levels: MixerZoomLevel[];
+    fillerAnchor: TileAnchor;
     reFillMixerUI(data: MZXBX_Project): void;
     createMixerLayers(): TileLayerDefinition[];
+    reFillTracksRatio(data: MZXBX_Project): void;
 }
 declare class MixerZoomLevel {
     zoomAnchor: TileAnchor;

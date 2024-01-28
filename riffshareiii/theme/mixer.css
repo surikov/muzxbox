@@ -1,4 +1,5 @@
 
+/*
 .mixFieldBg025 {
     fill: var(--color-panel);
     stroke: var(--color-lines);
@@ -86,7 +87,7 @@
     stroke-width: calc(10.24*var(--tapSize));
     fill-opacity:0;
 }
-
+*/
 .projectTitle {
     fill: var(--color-subtext);
 	font-size: var(--label-4cm);
@@ -107,35 +108,37 @@
     stroke-width: calc(0.95*var(--tapSize));
 	stroke-opacity: 15%;
 }
+
+
 .mixFiller1{
     fill: var(--color-text);
 	fill-opacity: 5%;
 }
 .mixFiller2{
     fill: var(--color-text);
-	fill-opacity: 15%;
+	fill-opacity: 10%;
 }
 .mixFiller3{
     fill: var(--color-text);
-	fill-opacity: 25%;
+	fill-opacity: 15%;
 }
 .mixFiller4{
     fill: var(--color-text);
-	fill-opacity: 35%;
+	fill-opacity: 20%;
 }
 .mixFiller5{
     fill: var(--color-text);
-	fill-opacity: 45%;
+	fill-opacity: 25%;
 }
 .mixFiller6{
     fill: var(--color-text);
-	fill-opacity: 55%;
+	fill-opacity: 30%;
 }
 .mixFiller7{
     fill: var(--color-text);
-	fill-opacity: 65%;
+	fill-opacity: 35%;
 }
 .mixFiller8{
     fill: var(--color-text);
-	fill-opacity: 75%;
+	fill-opacity: 40%;
 }
