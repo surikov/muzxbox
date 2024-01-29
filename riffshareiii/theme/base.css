@@ -162,12 +162,12 @@ body,
 
 .barRightBorder{
 	fill: var(--color-lines);
-	fill-opacity:50%;
+	fill-opacity:25%;
     stroke: none;
 }
 .octaveBottomBorder{
 	fill: var(--color-lines);
-	fill-opacity:50%;
+	fill-opacity:25%;
     stroke: none;
 }
 .mixTextFill{
