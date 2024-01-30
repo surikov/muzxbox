@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.79 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.80 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -407,6 +407,8 @@ function countInfo(inrows) {
 function dumpRowFills(inrows) {
     if (highLightMode == 1) {
         dumpRowFillsColor(inrows, '#009900cc', 0);
+        //let slicedrows: BallsRow[] = sliceRows(inrows, 1*reduceRatio, inrows.length-1*reduceRatio);
+        //dumpRowFillsColor(slicedrows, '#00990033', 0);
         dumpRowWaitColor(inrows, '#00000033', 0);
     }
     else {

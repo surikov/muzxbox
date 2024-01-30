@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.79 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.80 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -449,6 +449,9 @@ function dumpRowFills(inrows: BallsRow[]) {
 	
 	if (highLightMode == 1) {
 		dumpRowFillsColor(inrows, '#009900cc', 0);
+		//let slicedrows: BallsRow[] = sliceRows(inrows, 1*reduceRatio, inrows.length-1*reduceRatio);
+		//dumpRowFillsColor(slicedrows, '#00990033', 0);
+		
 		dumpRowWaitColor(inrows, '#00000033', 0);
 	} else {
 		dumpRowWaitColor(inrows, '#009900cc', 0);
