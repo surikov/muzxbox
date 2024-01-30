@@ -21,6 +21,7 @@ declare function startApplication(): void;
 declare function initWebAudioFromUI(): void;
 declare function startLoadCSSfile(cssurl: string): void;
 declare function newMIDIparser(arrayBuffer: ArrayBuffer): any;
+declare function newGPparser(arrayBuffer: ArrayBuffer): any;
 declare class CommandDispatcher {
     renderer: UIRenderer;
     audioContext: AudioContext;
@@ -41,6 +42,7 @@ declare class CommandDispatcher {
     setTrackSoloState(state: number): void;
     setDrumSoloState(state: number): void;
     promptImportFromMIDI(): void;
+    promptTestImport(): void;
 }
 declare let commandDispatcher: CommandDispatcher;
 declare type GridTimeTemplate14 = {

@@ -37,6 +37,10 @@ function composeBaseMenu(): MenuInfo[] {
                 text: localMenuImportMIDI, onClick: () => {
                     commandDispatcher.promptImportFromMIDI();
                 }
+            },{
+                text: "TestImport", onClick: () => {
+                    commandDispatcher.promptTestImport();
+                }
             }, menuPointTracks
             , menuPointPercussion
             , {

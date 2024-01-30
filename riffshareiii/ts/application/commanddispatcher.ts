@@ -1,4 +1,5 @@
 declare function newMIDIparser(arrayBuffer: ArrayBuffer): any;
+declare function newGPparser(arrayBuffer: ArrayBuffer): any;
 class CommandDispatcher {
 	renderer: UIRenderer;
 	audioContext: AudioContext;
@@ -134,6 +135,31 @@ class CommandDispatcher {
 			}
 			filesinput.click();
 			//console.log('setup', filesinput);
+		}
+	}
+	promptTestImport() {
+		console.log('promptTestImport');
+		let me = this;
+		let filesinput: HTMLElement | null = document.getElementById('file_test_input');
+		if (filesinput) {
+			if (!(this.listener)) {
+				this.listener = function (this: HTMLElement, ievent: HTMLElementEventMap['change']) {
+					var file = (ievent as any).target.files[0];
+					var fileReader = new FileReader();
+					fileReader.onload = function (progressEvent: any) {
+						if (progressEvent != null) {
+							var arrayBuffer = progressEvent.target.result;
+							var pp = newGPparser(arrayBuffer);
+							let result: MZXBX_Project = pp.convertProject();
+							me.registerWorkProject(result);
+							me.resetProject();
+						}
+					};
+					fileReader.readAsArrayBuffer(file);
+				};
+				filesinput.addEventListener('change', this.listener, false);
+			}
+			filesinput.click();
 		}
 	}
 }

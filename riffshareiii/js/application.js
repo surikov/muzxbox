@@ -276,6 +276,31 @@ class CommandDispatcher {
             filesinput.click();
         }
     }
+    promptTestImport() {
+        console.log('promptTestImport');
+        let me = this;
+        let filesinput = document.getElementById('file_test_input');
+        if (filesinput) {
+            if (!(this.listener)) {
+                this.listener = function (ievent) {
+                    var file = ievent.target.files[0];
+                    var fileReader = new FileReader();
+                    fileReader.onload = function (progressEvent) {
+                        if (progressEvent != null) {
+                            var arrayBuffer = progressEvent.target.result;
+                            var pp = newGPparser(arrayBuffer);
+                            let result = pp.convertProject();
+                            me.registerWorkProject(result);
+                            me.resetProject();
+                        }
+                    };
+                    fileReader.readAsArrayBuffer(file);
+                };
+                filesinput.addEventListener('change', this.listener, false);
+            }
+            filesinput.click();
+        }
+    }
 }
 let commandDispatcher = new CommandDispatcher();
 let gridLinesBrief = [
@@ -1038,6 +1063,10 @@ function composeBaseMenu() {
             {
                 text: localMenuImportMIDI, onClick: () => {
                     commandDispatcher.promptImportFromMIDI();
+                }
+            }, {
+                text: "TestImport", onClick: () => {
+                    commandDispatcher.promptTestImport();
                 }
             }, menuPointTracks,
             menuPointPercussion,

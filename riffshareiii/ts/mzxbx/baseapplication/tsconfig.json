@@ -31,5 +31,6 @@
         ,"./code/ticker.ts"
         ,"./code/loader.ts"
         ,"./code/MIDIFileImporter.ts"
+		,"./code/GPImporter.ts"
     ]
 }
