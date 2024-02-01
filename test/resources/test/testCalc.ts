@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.81 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.82 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -491,13 +491,13 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 	let hr = (mx - min) / (topShift / cellSize - 2);
 	let prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
 
-	let lbl = 's';
+	let lbl = 'grey ';
 	let first = arr.map((x) => x);
 	first.sort((aa, bb) => { return bb.summ - aa.summ; });
 	if (showFirstRow) {
 		for (let kk = 0; kk < first.length; kk++) {
 			//lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
-			lbl = lbl + ', ' + first[kk].ball;
+			lbl = lbl + ' ' + first[kk].ball;
 			if (ballExists(first[kk].ball, rows[0])) {
 				break;
 			}
@@ -541,12 +541,12 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	let hr = (mx - min) / (topShift / cellSize - 2);
 	let prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
 	//console.log(ballFills);
-	let lbl = 'g';
+	let lbl = 'green';
 	let first = ballFills.map((x) => x);
 	first.sort((aa, bb) => { return bb.summ - aa.summ; });
 	if (showFirstRow) {
 		for (let kk = 0; kk < first.length; kk++) {
-			lbl = lbl + ', ' + first[kk].ball;
+			lbl = lbl + ' ' + first[kk].ball;
 			//lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
 			if (ballExists(first[kk].ball, rows[0])) {
 				break;
@@ -600,11 +600,11 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			let first = calcs.map((x) => x);
 			let lbl = "";
 			first.sort((aa, bb) => { return aa.summ - bb.summ; });
-			lbl = 'w';
+			lbl = 'white';
 			if (showFirstRow) {
 				for (let kk = 0; kk < first.length; kk++) {
 					//lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
-					lbl = lbl + ', ' + first[kk].ball;
+					lbl = lbl + ' ' + first[kk].ball;
 					if (ballExists(first[kk].ball, rows[0])) {
 						break;
 					}
@@ -614,11 +614,11 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			//console.log(lbl);
 			dumpInfo2('statwhite', lbl);
 			first.sort((aa, bb) => { return bb.summ - aa.summ; });
-			lbl = 'b';
+			lbl = 'blue ';
 			if (showFirstRow) {
 				for (let kk = 0; kk < first.length; kk++) {
 					//lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
-					lbl = lbl + ', ' + first[kk].ball;
+					lbl = lbl + ' ' + first[kk].ball;
 					if (ballExists(first[kk].ball, rows[0])) {
 						break;
 					}
