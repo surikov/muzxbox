@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.80 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.81 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -443,6 +443,16 @@ function dumpRowWaitColor(rows, color, shiftX) {
     }
     var hr = (mx - min) / (topShift / cellSize - 2);
     var prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
+    var lbl = 'grey';
+    var first = arr.map(function (x) { return x; });
+    first.sort(function (aa, bb) { return bb.summ - aa.summ; });
+    for (var kk = 0; kk < first.length; kk++) {
+        lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+        if (ballExists(first[kk].ball, rows[0])) {
+            break;
+        }
+    }
+    console.log(lbl);
     for (var bb = 0; bb < rowLen; bb++) {
         var hh = (mx - min - (arr[bb].summ - min)) / hr;
         var fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
@@ -484,6 +494,17 @@ function dumpRowFillsColor(rows, color, shiftX) {
     }
     var hr = (mx - min) / (topShift / cellSize - 2);
     var prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
+    //console.log(ballFills);
+    var lbl = 'green';
+    var first = ballFills.map(function (x) { return x; });
+    first.sort(function (aa, bb) { return bb.summ - aa.summ; });
+    for (var kk = 0; kk < first.length; kk++) {
+        lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+        if (ballExists(first[kk].ball, rows[0])) {
+            break;
+        }
+    }
+    console.log(lbl);
     for (var bb = 0; bb < rowLen; bb++) {
         var hh = (mx - min - (ballFills[bb].summ - min)) / hr;
         var fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
@@ -532,6 +553,28 @@ function dumpTriads(svg, rows) {
                 minCnt = calcs[ii].summ;
         }
         var df = mxCount - minCnt;
+        if (rr == 0) {
+            var first = calcs.map(function (x) { return x; });
+            var lbl = "";
+            first.sort(function (aa, bb) { return aa.summ - bb.summ; });
+            lbl = 'white';
+            for (var kk = 0; kk < first.length; kk++) {
+                lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+                if (ballExists(first[kk].ball, rows[0])) {
+                    break;
+                }
+            }
+            console.log(lbl);
+            first.sort(function (aa, bb) { return bb.summ - aa.summ; });
+            lbl = 'blue';
+            for (var kk = 0; kk < first.length; kk++) {
+                lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+                if (ballExists(first[kk].ball, rows[0])) {
+                    break;
+                }
+            }
+            console.log(lbl);
+        }
         for (var ii = 0; ii < rowLen; ii++) {
             var idx = ratioPre * (calcs[ii].summ - minCnt) / df;
             var color = 'rgba(0,0,255,' + idx + ')';

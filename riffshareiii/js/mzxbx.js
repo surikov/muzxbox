@@ -2458,1467 +2458,63 @@ function findMeasureSkipByTime(time, measures) {
 function newMIDIparser(arrayBuffer) {
     return new MidiParser(arrayBuffer);
 }
-class XmlWriter {
-    constructor(indention, xmlHeader) {
-        this._result = [];
-        this._indention = indention;
-        this._xmlHeader = xmlHeader;
-        this._currentIndention = '';
-        this._isStartOfLine = true;
+class GPImporter {
+    load(arrayBuffer) {
+        console.log('load', arrayBuffer);
+        let gp3To5Importer = new Gp3To5Importer();
+        let uint8Array = new Uint8Array(arrayBuffer);
+        console.log('uint8Array', uint8Array);
+        let data = ByteBuffer.fromBuffer(uint8Array);
+        let settings = new Settings();
+        gp3To5Importer.init(data, settings);
+        console.log('gp3To5Importer', gp3To5Importer);
+        let score = gp3To5Importer.readScore();
+        console.log("score", score);
     }
-    static write(xml, indention, xmlHeader) {
-        const writer = new XmlWriter(indention, xmlHeader);
-        writer.writeNode(xml);
-        return writer.toString();
-    }
-    writeNode(xml) {
-        switch (xml.nodeType) {
-            case XmlNodeType.None:
-                break;
-            case XmlNodeType.Element:
-                if (this._result.length > 0) {
-                    this.writeLine();
-                }
-                this.write(`<${xml.localName}`);
-                for (const [name, value] of xml.attributes) {
-                    this.write(` ${name}="`);
-                    this.writeAttributeValue(value);
-                    this.write('"');
-                }
-                if (xml.childNodes.length === 0) {
-                    this.write('/>');
-                }
-                else {
-                    this.write('>');
-                    if (xml.childNodes.length === 1 && !xml.firstElement) {
-                        this.writeNode(xml.childNodes[0]);
-                    }
-                    else {
-                        this.indent();
-                        for (const child of xml.childNodes) {
-                            if (child.nodeType === XmlNodeType.Element) {
-                                this.writeNode(child);
-                            }
-                        }
-                        this.unindend();
-                        this.writeLine();
-                    }
-                    this.write(`</${xml.localName}>`);
-                }
-                break;
-            case XmlNodeType.Text:
-                if (xml.value) {
-                    this.write(xml.value);
-                }
-                break;
-            case XmlNodeType.CDATA:
-                if (xml.value !== null) {
-                    this.write(`<![CDATA[${xml.value}]]>`);
-                }
-                break;
-            case XmlNodeType.Document:
-                if (this._xmlHeader) {
-                    this.write('<?xml version="1.0" encoding="utf-8"?>');
-                }
-                for (const child of xml.childNodes) {
-                    this.writeNode(child);
-                }
-                break;
-            case XmlNodeType.DocumentType:
-                this.write(`<!DOCTYPE ${xml.value}>`);
-                break;
-        }
-    }
-    unindend() {
-        this._currentIndention = this._currentIndention.substr(0, this._currentIndention.length - this._indention.length);
-    }
-    indent() {
-        this._currentIndention += this._indention;
-    }
-    writeAttributeValue(value) {
-        for (let i = 0; i < value.length; i++) {
-            const c = value.charAt(i);
-            switch (c) {
-                case '<':
-                    this._result.push('&lt;');
-                    break;
-                case '>':
-                    this._result.push('&gt;');
-                    break;
-                case '&':
-                    this._result.push('&amp;');
-                    break;
-                case "'":
-                    this._result.push('&apos;');
-                    break;
-                case '"':
-                    this._result.push('&quot;');
-                    break;
-                default:
-                    this._result.push(c);
-                    break;
-            }
-        }
-    }
-    write(s) {
-        if (this._isStartOfLine) {
-            this._result.push(this._currentIndention);
-        }
-        this._result.push(s);
-        this._isStartOfLine = false;
-    }
-    writeLine(s = null) {
-        if (s) {
-            this.write(s);
-        }
-        if (this._indention.length > 0 && !this._isStartOfLine) {
-            this._result.push('\n');
-            this._isStartOfLine = true;
-        }
-    }
-    toString() {
-        return this._result.join('');
+    convertProject(title, comment) {
+        console.log('GPImporter.convertProject', this);
+        let project = {
+            title: title + ' ' + comment,
+            timeline: [],
+            tracks: [],
+            percussions: [],
+            filters: [],
+            comments: []
+        };
+        return project;
     }
 }
-var AlphaTabErrorType;
-(function (AlphaTabErrorType) {
-    AlphaTabErrorType[AlphaTabErrorType["General"] = 0] = "General";
-    AlphaTabErrorType[AlphaTabErrorType["Format"] = 1] = "Format";
-    AlphaTabErrorType[AlphaTabErrorType["AlphaTex"] = 2] = "AlphaTex";
-})(AlphaTabErrorType || (AlphaTabErrorType = {}));
-class AlphaTabError extends Error {
-    constructor(type, message = "", inner) {
-        super(message !== null && message !== void 0 ? message : "", { cause: inner });
-        this.type = type;
-        this.inner = inner !== null && inner !== void 0 ? inner : null;
-        Object.setPrototypeOf(this, AlphaTabError.prototype);
-    }
+function newGPparser(arrayBuffer) {
+    console.log("newGPparser");
+    let pp = new GPImporter();
+    pp.load(arrayBuffer);
+    return pp;
 }
-class XmlError extends AlphaTabError {
-    constructor(message, xml, pos) {
-        super(AlphaTabErrorType.Format, message);
-        this.pos = 0;
-        this.xml = xml;
-        this.pos = pos;
-        Object.setPrototypeOf(this, XmlError.prototype);
-    }
-}
-var XmlState;
-(function (XmlState) {
-    XmlState[XmlState["IgnoreSpaces"] = 0] = "IgnoreSpaces";
-    XmlState[XmlState["Begin"] = 1] = "Begin";
-    XmlState[XmlState["BeginNode"] = 2] = "BeginNode";
-    XmlState[XmlState["TagName"] = 3] = "TagName";
-    XmlState[XmlState["Body"] = 4] = "Body";
-    XmlState[XmlState["AttribName"] = 5] = "AttribName";
-    XmlState[XmlState["Equals"] = 6] = "Equals";
-    XmlState[XmlState["AttvalBegin"] = 7] = "AttvalBegin";
-    XmlState[XmlState["AttribVal"] = 8] = "AttribVal";
-    XmlState[XmlState["Childs"] = 9] = "Childs";
-    XmlState[XmlState["Close"] = 10] = "Close";
-    XmlState[XmlState["WaitEnd"] = 11] = "WaitEnd";
-    XmlState[XmlState["WaitEndRet"] = 12] = "WaitEndRet";
-    XmlState[XmlState["Pcdata"] = 13] = "Pcdata";
-    XmlState[XmlState["Header"] = 14] = "Header";
-    XmlState[XmlState["Comment"] = 15] = "Comment";
-    XmlState[XmlState["Doctype"] = 16] = "Doctype";
-    XmlState[XmlState["Cdata"] = 17] = "Cdata";
-    XmlState[XmlState["Escape"] = 18] = "Escape";
-})(XmlState || (XmlState = {}));
-class XmlParser {
-    static parse(str, p, parent) {
-        var _a;
-        let c = str.charCodeAt(p);
-        let state = XmlState.Begin;
-        let next = XmlState.Begin;
-        let start = 0;
-        let buf = '';
-        let escapeNext = XmlState.Begin;
-        let xml = null;
-        let aname = null;
-        let nbrackets = 0;
-        let attrValQuote = 0;
-        while (p < str.length) {
-            c = str.charCodeAt(p);
-            switch (state) {
-                case XmlState.IgnoreSpaces:
-                    switch (c) {
-                        case XmlParser.CharCodeLF:
-                        case XmlParser.CharCodeCR:
-                        case XmlParser.CharCodeTab:
-                        case XmlParser.CharCodeSpace:
-                            break;
-                        default:
-                            state = next;
-                            continue;
-                    }
-                    break;
-                case XmlState.Begin:
-                    switch (c) {
-                        case XmlParser.CharCodeLowerThan:
-                            state = XmlState.IgnoreSpaces;
-                            next = XmlState.BeginNode;
-                            break;
-                        default:
-                            start = p;
-                            state = XmlState.Pcdata;
-                            continue;
-                    }
-                    break;
-                case XmlState.Pcdata:
-                    if (c === XmlParser.CharCodeLowerThan) {
-                        buf += str.substr(start, p - start);
-                        let child = new XmlNode();
-                        child.nodeType = XmlNodeType.Text;
-                        child.value = buf;
-                        buf = '';
-                        parent.addChild(child);
-                        state = XmlState.IgnoreSpaces;
-                        next = XmlState.BeginNode;
-                    }
-                    else if (c === XmlParser.CharCodeAmp) {
-                        buf += str.substr(start, p - start);
-                        state = XmlState.Escape;
-                        escapeNext = XmlState.Pcdata;
-                        start = p + 1;
-                    }
-                    break;
-                case XmlState.Cdata:
-                    if (c === XmlParser.CharCodeBrackedClose &&
-                        str.charCodeAt(p + 1) === XmlParser.CharCodeBrackedClose &&
-                        str.charCodeAt(p + 2) === XmlParser.CharCodeGreaterThan) {
-                        let child = new XmlNode();
-                        child.nodeType = XmlNodeType.CDATA;
-                        child.value = str.substr(start, p - start);
-                        parent.addChild(child);
-                        p += 2;
-                        state = XmlState.Begin;
-                    }
-                    break;
-                case XmlState.BeginNode:
-                    switch (c) {
-                        case XmlParser.CharCodeExclamation:
-                            if (str.charCodeAt(p + 1) === XmlParser.CharCodeBrackedOpen) {
-                                p += 2;
-                                if (str.substr(p, 6).toUpperCase() !== 'CDATA[') {
-                                    throw new XmlError('Expected <![CDATA[', str, p);
-                                }
-                                p += 5;
-                                state = XmlState.Cdata;
-                                start = p + 1;
-                            }
-                            else if (str.charCodeAt(p + 1) === XmlParser.CharCodeUpperD ||
-                                str.charCodeAt(p + 1) === XmlParser.CharCodeLowerD) {
-                                if (str.substr(p + 2, 6).toUpperCase() !== 'OCTYPE') {
-                                    throw new XmlError('Expected <!DOCTYPE', str, p);
-                                }
-                                p += 8;
-                                state = XmlState.Doctype;
-                                start = p + 1;
-                            }
-                            else if (str.charCodeAt(p + 1) !== XmlParser.CharCodeMinus ||
-                                str.charCodeAt(p + 2) !== XmlParser.CharCodeMinus) {
-                                throw new XmlError('Expected <!--', str, p);
-                            }
-                            else {
-                                p += 2;
-                                state = XmlState.Comment;
-                                start = p + 1;
-                            }
-                            break;
-                        case XmlParser.CharCodeQuestion:
-                            state = XmlState.Header;
-                            start = p;
-                            break;
-                        case XmlParser.CharCodeSlash:
-                            if (!parent) {
-                                throw new XmlError('Expected node name', str, p);
-                            }
-                            start = p + 1;
-                            state = XmlState.IgnoreSpaces;
-                            next = XmlState.Close;
-                            break;
-                        default:
-                            state = XmlState.TagName;
-                            start = p;
-                            continue;
-                    }
-                    break;
-                case XmlState.TagName:
-                    if (!XmlParser.isValidChar(c)) {
-                        if (p === start) {
-                            throw new XmlError('Expected node name', str, p);
-                        }
-                        xml = new XmlNode();
-                        xml.nodeType = XmlNodeType.Element;
-                        xml.localName = str.substr(start, p - start);
-                        parent.addChild(xml);
-                        state = XmlState.IgnoreSpaces;
-                        next = XmlState.Body;
-                        continue;
-                    }
-                    break;
-                case XmlState.Body:
-                    switch (c) {
-                        case XmlParser.CharCodeSlash:
-                            state = XmlState.WaitEnd;
-                            break;
-                        case XmlParser.CharCodeGreaterThan:
-                            state = XmlState.Childs;
-                            break;
-                        default:
-                            state = XmlState.AttribName;
-                            start = p;
-                            continue;
-                    }
-                    break;
-                case XmlState.AttribName:
-                    if (!XmlParser.isValidChar(c)) {
-                        if (start === p) {
-                            throw new XmlError('Expected attribute name', str, p);
-                        }
-                        let tmp = str.substr(start, p - start);
-                        aname = tmp;
-                        if (xml.attributes.has(aname)) {
-                            throw new XmlError(`Duplicate attribute [${aname}]`, str, p);
-                        }
-                        state = XmlState.IgnoreSpaces;
-                        next = XmlState.Equals;
-                        continue;
-                    }
-                    break;
-                case XmlState.Equals:
-                    switch (c) {
-                        case XmlParser.CharCodeEquals:
-                            state = XmlState.IgnoreSpaces;
-                            next = XmlState.AttvalBegin;
-                            break;
-                        default:
-                            throw new XmlError('Expected =', str, p);
-                    }
-                    break;
-                case XmlState.AttvalBegin:
-                    switch (c) {
-                        case XmlParser.CharCodeDoubleQuote:
-                        case XmlParser.CharCodeSingleQuote:
-                            buf = '';
-                            state = XmlState.AttribVal;
-                            start = p + 1;
-                            attrValQuote = c;
-                            break;
-                    }
-                    break;
-                case XmlState.AttribVal:
-                    switch (c) {
-                        case XmlParser.CharCodeAmp:
-                            buf += str.substr(start, p - start);
-                            state = XmlState.Escape;
-                            escapeNext = XmlState.AttribVal;
-                            start = p + 1;
-                            break;
-                        default:
-                            if (c === attrValQuote) {
-                                buf += str.substr(start, p - start);
-                                let value = buf;
-                                buf = '';
-                                xml.attributes.set(aname, value);
-                                state = XmlState.IgnoreSpaces;
-                                next = XmlState.Body;
-                            }
-                            break;
-                    }
-                    break;
-                case XmlState.Childs:
-                    p = XmlParser.parse(str, p, xml);
-                    start = p;
-                    state = XmlState.Begin;
-                    break;
-                case XmlState.WaitEnd:
-                    switch (c) {
-                        case XmlParser.CharCodeGreaterThan:
-                            state = XmlState.Begin;
-                            break;
-                        default:
-                            throw new XmlError('Expected >', str, p);
-                    }
-                    break;
-                case XmlState.WaitEndRet:
-                    switch (c) {
-                        case XmlParser.CharCodeGreaterThan:
-                            return p;
-                        default:
-                            throw new XmlError('Expected >', str, p);
-                    }
-                case XmlState.Close:
-                    if (!XmlParser.isValidChar(c)) {
-                        if (start === p) {
-                            throw new XmlError('Expected node name', str, p);
-                        }
-                        let v = str.substr(start, p - start);
-                        if (v !== parent.localName) {
-                            throw new XmlError('Expected </' + parent.localName + '>', str, p);
-                        }
-                        state = XmlState.IgnoreSpaces;
-                        next = XmlState.WaitEndRet;
-                        continue;
-                    }
-                    break;
-                case XmlState.Comment:
-                    if (c === XmlParser.CharCodeMinus &&
-                        str.charCodeAt(p + 1) === XmlParser.CharCodeMinus &&
-                        str.charCodeAt(p + 2) === XmlParser.CharCodeGreaterThan) {
-                        p += 2;
-                        state = XmlState.Begin;
-                    }
-                    break;
-                case XmlState.Doctype:
-                    if (c === XmlParser.CharCodeBrackedOpen) {
-                        nbrackets++;
-                    }
-                    else if (c === XmlParser.CharCodeBrackedClose) {
-                        nbrackets--;
-                    }
-                    else if (c === XmlParser.CharCodeGreaterThan && nbrackets === 0) {
-                        let node = new XmlNode();
-                        node.nodeType = XmlNodeType.DocumentType;
-                        node.value = str.substr(start, p - start);
-                        parent.addChild(node);
-                        state = XmlState.Begin;
-                    }
-                    break;
-                case XmlState.Header:
-                    if (c === XmlParser.CharCodeQuestion && str.charCodeAt(p + 1) === XmlParser.CharCodeGreaterThan) {
-                        p++;
-                        state = XmlState.Begin;
-                    }
-                    break;
-                case XmlState.Escape:
-                    if (c === XmlParser.CharCodeSemi) {
-                        let s = str.substr(start, p - start);
-                        if (s.charCodeAt(0) === XmlParser.CharCodeSharp) {
-                            let code = s.charCodeAt(1) === XmlParser.CharCodeLowerX
-                                ? parseInt('0' + s.substr(1, s.length - 1))
-                                : parseInt(s.substr(1, s.length - 1));
-                            buf += String.fromCharCode(code);
-                        }
-                        else if (XmlParser.Escapes.has(s)) {
-                            buf += XmlParser.Escapes.get(s);
-                        }
-                        else {
-                            buf += (_a = ('&' + s + ';')) === null || _a === void 0 ? void 0 : _a.toString();
-                        }
-                        start = p + 1;
-                        state = escapeNext;
-                    }
-                    else if (!XmlParser.isValidChar(c) && c !== XmlParser.CharCodeSharp) {
-                        buf += '&';
-                        buf += str.substr(start, p - start);
-                        p--;
-                        start = p + 1;
-                        state = escapeNext;
-                    }
-                    break;
-            }
-            p++;
-        }
-        if (state === XmlState.Begin) {
-            start = p;
-            state = XmlState.Pcdata;
-        }
-        if (state === XmlState.Pcdata) {
-            if (p !== start) {
-                buf += str.substr(start, p - start);
-                let node = new XmlNode();
-                node.nodeType = XmlNodeType.Text;
-                node.value = buf;
-                parent.addChild(node);
-            }
-            return p;
-        }
-        if (state === XmlState.Escape && escapeNext === XmlState.Pcdata) {
-            buf += '&';
-            buf += str.substr(start, p - start);
-            let node = new XmlNode();
-            node.nodeType = XmlNodeType.Text;
-            node.value = buf;
-            parent.addChild(node);
-            return p;
-        }
-        throw new XmlError('Unexpected end', str, p);
-    }
-    static isValidChar(c) {
-        return ((c >= XmlParser.CharCodeLowerA && c <= XmlParser.CharCodeLowerZ) ||
-            (c >= XmlParser.CharCodeUpperA && c <= XmlParser.CharCodeUpperZ) ||
-            (c >= XmlParser.CharCode0 && c <= XmlParser.CharCode9) ||
-            c === XmlParser.CharCodeColon ||
-            c === XmlParser.CharCodeDot ||
-            c === XmlParser.CharCodeUnderscore ||
-            c === XmlParser.CharCodeMinus);
-    }
-}
-XmlParser.CharCodeLF = 10;
-XmlParser.CharCodeTab = 9;
-XmlParser.CharCodeCR = 13;
-XmlParser.CharCodeSpace = 32;
-XmlParser.CharCodeLowerThan = 60;
-XmlParser.CharCodeAmp = 38;
-XmlParser.CharCodeBrackedClose = 93;
-XmlParser.CharCodeBrackedOpen = 91;
-XmlParser.CharCodeGreaterThan = 62;
-XmlParser.CharCodeExclamation = 33;
-XmlParser.CharCodeUpperD = 68;
-XmlParser.CharCodeLowerD = 100;
-XmlParser.CharCodeMinus = 45;
-XmlParser.CharCodeQuestion = 63;
-XmlParser.CharCodeSlash = 47;
-XmlParser.CharCodeEquals = 61;
-XmlParser.CharCodeDoubleQuote = 34;
-XmlParser.CharCodeSingleQuote = 39;
-XmlParser.CharCodeSharp = 35;
-XmlParser.CharCodeLowerX = 120;
-XmlParser.CharCodeLowerA = 97;
-XmlParser.CharCodeLowerZ = 122;
-XmlParser.CharCodeUpperA = 65;
-XmlParser.CharCodeUpperZ = 90;
-XmlParser.CharCode0 = 48;
-XmlParser.CharCode9 = 57;
-XmlParser.CharCodeColon = 58;
-XmlParser.CharCodeDot = 46;
-XmlParser.CharCodeUnderscore = 95;
-XmlParser.CharCodeSemi = 59;
-XmlParser.Escapes = new Map([
-    ['lt', '<'],
-    ['gt', '>'],
-    ['amp', '&'],
-    ['quot', '"'],
-    ['apos', "'"]
-]);
-var XmlNodeType;
-(function (XmlNodeType) {
-    XmlNodeType[XmlNodeType["None"] = 0] = "None";
-    XmlNodeType[XmlNodeType["Element"] = 1] = "Element";
-    XmlNodeType[XmlNodeType["Text"] = 2] = "Text";
-    XmlNodeType[XmlNodeType["CDATA"] = 3] = "CDATA";
-    XmlNodeType[XmlNodeType["Document"] = 4] = "Document";
-    XmlNodeType[XmlNodeType["DocumentType"] = 5] = "DocumentType";
-})(XmlNodeType || (XmlNodeType = {}));
-class XmlNode {
+class ImporterSettings {
     constructor() {
-        this.nodeType = XmlNodeType.None;
-        this.localName = null;
-        this.value = null;
-        this.childNodes = [];
-        this.attributes = new Map();
-        this.firstChild = null;
-        this.firstElement = null;
-    }
-    addChild(node) {
-        this.childNodes.push(node);
-        this.firstChild = node;
-        if (node.nodeType === XmlNodeType.Element || node.nodeType === XmlNodeType.CDATA) {
-            this.firstElement = node;
-        }
-    }
-    getAttribute(name) {
-        if (this.attributes.has(name)) {
-            return this.attributes.get(name);
-        }
-        return '';
-    }
-    getElementsByTagName(name, recursive = false) {
-        let tags = [];
-        this.searchElementsByTagName(this.childNodes, tags, name, recursive);
-        return tags;
-    }
-    searchElementsByTagName(all, result, name, recursive = false) {
-        for (let c of all) {
-            if (c && c.nodeType === XmlNodeType.Element && c.localName === name) {
-                result.push(c);
-            }
-            if (recursive) {
-                this.searchElementsByTagName(c.childNodes, result, name, true);
-            }
-        }
-    }
-    findChildElement(name) {
-        for (let c of this.childNodes) {
-            if (c && c.nodeType === XmlNodeType.Element && c.localName === name) {
-                return c;
-            }
-        }
-        return null;
-    }
-    addElement(name) {
-        const newNode = new XmlNode();
-        newNode.nodeType = XmlNodeType.Element;
-        newNode.localName = name;
-        this.addChild(newNode);
-        return newNode;
-    }
-    get innerText() {
-        var _a, _b;
-        if (this.nodeType === XmlNodeType.Element || this.nodeType === XmlNodeType.Document) {
-            if (this.firstElement && this.firstElement.nodeType === XmlNodeType.CDATA) {
-                return this.firstElement.innerText;
-            }
-            let txt = '';
-            for (let c of this.childNodes) {
-                txt += (_a = c.innerText) === null || _a === void 0 ? void 0 : _a.toString();
-            }
-            let s = txt;
-            return s.trim();
-        }
-        return (_b = this.value) !== null && _b !== void 0 ? _b : '';
-    }
-    set innerText(value) {
-        const textNode = new XmlNode();
-        textNode.nodeType = XmlNodeType.Text;
-        textNode.value = value;
-        this.childNodes = [textNode];
-    }
-    setCData(s) {
-        const textNode = new XmlNode();
-        textNode.nodeType = XmlNodeType.CDATA;
-        textNode.value = s;
-        this.childNodes = [textNode];
+        this.encoding = 'utf-8';
+        this.mergePartGroupsInMusicXml = false;
+        this.beatTextAsLyrics = false;
     }
 }
-class XmlDocument extends XmlNode {
-    constructor() {
-        super();
-        this.nodeType = XmlNodeType.Document;
-    }
-    parse(xml) {
-        XmlParser.parse(xml, 0, this);
-    }
-    toString() {
-        return this.toFormattedString();
-    }
-    toFormattedString(indention = '', xmlHeader = false) {
-        return XmlWriter.write(this, indention, xmlHeader);
-    }
-}
-class PlaybackInformation {
-    constructor() {
-        this.volume = 15;
-        this.balance = 8;
-        this.port = 1;
-        this.program = 0;
-        this.primaryChannel = 0;
-        this.secondaryChannel = 0;
-        this.isMute = false;
-        this.isSolo = false;
-    }
-}
-class Tuning {
-    constructor(name = '', tuning = null, isStandard = false) {
-        this.isStandard = isStandard;
-        this.name = name;
-        this.tunings = tuning !== null && tuning !== void 0 ? tuning : [];
-    }
-    static getTextForTuning(tuning, includeOctave) {
-        let parts = Tuning.getTextPartsForTuning(tuning);
-        return includeOctave ? parts.join('') : parts[0];
-    }
-    static getTextPartsForTuning(tuning, octaveShift = -1) {
-        let octave = (tuning / 12) | 0;
-        let note = tuning % 12;
-        let notes = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-        return [notes[note], (octave + octaveShift).toString()];
-    }
-    static getDefaultTuningFor(stringCount) {
-        if (Tuning._defaultTunings.has(stringCount)) {
-            return Tuning._defaultTunings.get(stringCount);
-        }
-        return null;
-    }
-    static getPresetsFor(stringCount) {
-        switch (stringCount) {
-            case 7:
-                return Tuning._sevenStrings;
-            case 6:
-                return Tuning._sixStrings;
-            case 5:
-                return Tuning._fiveStrings;
-            case 4:
-                return Tuning._fourStrings;
-        }
-        return [];
-    }
-    static initialize() {
-        Tuning._defaultTunings.set(7, new Tuning('Guitar 7 strings', [64, 59, 55, 50, 45, 40, 35], true));
-        Tuning._sevenStrings.push(Tuning._defaultTunings.get(7));
-        Tuning._defaultTunings.set(6, new Tuning('Guitar Standard Tuning', [64, 59, 55, 50, 45, 40], true));
-        Tuning._sixStrings.push(Tuning._defaultTunings.get(6));
-        Tuning._sixStrings.push(new Tuning('Guitar Tune down ½ step', [63, 58, 54, 49, 44, 39], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Tune down 1 step', [62, 57, 53, 48, 43, 38], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Tune down 2 step', [60, 55, 51, 46, 41, 36], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Dropped D Tuning', [64, 59, 55, 50, 45, 38], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Dropped D Tuning variant', [64, 57, 55, 50, 45, 38], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Double Dropped D Tuning', [62, 59, 55, 50, 45, 38], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Dropped E Tuning', [66, 61, 57, 52, 47, 40], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Dropped C Tuning', [62, 57, 53, 48, 43, 36], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open C Tuning', [64, 60, 55, 48, 43, 36], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open Cm Tuning', [63, 60, 55, 48, 43, 36], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open C6 Tuning', [64, 57, 55, 48, 43, 36], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open Cmaj7 Tuning', [64, 59, 55, 52, 43, 36], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open D Tuning', [62, 57, 54, 50, 45, 38], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open Dm Tuning', [62, 57, 53, 50, 45, 38], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open D5 Tuning', [62, 57, 50, 50, 45, 38], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open D6 Tuning', [62, 59, 54, 50, 45, 38], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open Dsus4 Tuning', [62, 57, 55, 50, 45, 38], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open E Tuning', [64, 59, 56, 52, 47, 40], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open Em Tuning', [64, 59, 55, 52, 47, 40], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open Esus11 Tuning', [64, 59, 55, 52, 45, 40], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open F Tuning', [65, 60, 53, 48, 45, 41], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open G Tuning', [62, 59, 55, 50, 43, 38], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open Gm Tuning', [62, 58, 55, 50, 43, 38], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open G6 Tuning', [64, 59, 55, 50, 43, 38], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open Gsus4 Tuning', [62, 60, 55, 50, 43, 38], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open A Tuning', [64, 61, 57, 52, 45, 40], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Open Am Tuning', [64, 60, 57, 52, 45, 40], false));
-        Tuning._sixStrings.push(new Tuning('Guitar Nashville Tuning', [64, 59, 67, 62, 57, 52], false));
-        Tuning._sixStrings.push(new Tuning('Bass 6 Strings Tuning', [48, 43, 38, 33, 28, 23], false));
-        Tuning._sixStrings.push(new Tuning('Lute or Vihuela Tuning', [64, 59, 54, 50, 45, 40], false));
-        Tuning._defaultTunings.set(5, new Tuning('Bass 5 Strings Tuning', [43, 38, 33, 28, 23], true));
-        Tuning._fiveStrings.push(Tuning._defaultTunings.get(5));
-        Tuning._fiveStrings.push(new Tuning('Banjo Dropped C Tuning', [62, 59, 55, 48, 67], false));
-        Tuning._fiveStrings.push(new Tuning('Banjo Open D Tuning', [62, 57, 54, 50, 69], false));
-        Tuning._fiveStrings.push(new Tuning('Banjo Open G Tuning', [62, 59, 55, 50, 67], false));
-        Tuning._fiveStrings.push(new Tuning('Banjo G Minor Tuning', [62, 58, 55, 50, 67], false));
-        Tuning._fiveStrings.push(new Tuning('Banjo G Modal Tuning', [62, 57, 55, 50, 67], false));
-        Tuning._defaultTunings.set(4, new Tuning('Bass Standard Tuning', [43, 38, 33, 28], true));
-        Tuning._fourStrings.push(Tuning._defaultTunings.get(4));
-        Tuning._fourStrings.push(new Tuning('Bass Tune down ½ step', [42, 37, 32, 27], false));
-        Tuning._fourStrings.push(new Tuning('Bass Tune down 1 step', [41, 36, 31, 26], false));
-        Tuning._fourStrings.push(new Tuning('Bass Tune down 2 step', [39, 34, 29, 24], false));
-        Tuning._fourStrings.push(new Tuning('Bass Dropped D Tuning', [43, 38, 33, 26], false));
-        Tuning._fourStrings.push(new Tuning('Ukulele C Tuning', [45, 40, 36, 43], false));
-        Tuning._fourStrings.push(new Tuning('Ukulele G Tuning', [52, 47, 43, 38], false));
-        Tuning._fourStrings.push(new Tuning('Mandolin Standard Tuning', [64, 57, 50, 43], false));
-        Tuning._fourStrings.push(new Tuning('Mandolin or Violin Tuning', [76, 69, 62, 55], false));
-        Tuning._fourStrings.push(new Tuning('Viola Tuning', [69, 62, 55, 48], false));
-        Tuning._fourStrings.push(new Tuning('Cello Tuning', [57, 50, 43, 36], false));
-    }
-    static findTuning(strings) {
-        let tunings = Tuning.getPresetsFor(strings.length);
-        for (let t = 0, tc = tunings.length; t < tc; t++) {
-            let tuning = tunings[t];
-            let equals = true;
-            for (let i = 0, j = strings.length; i < j; i++) {
-                if (strings[i] !== tuning.tunings[i]) {
-                    equals = false;
-                    break;
-                }
-            }
-            if (equals) {
-                return tuning;
-            }
-        }
-        return null;
-    }
-    finish() {
-        const knownTuning = Tuning.findTuning(this.tunings);
-        if (knownTuning) {
-            this.name = knownTuning.name;
-            this.isStandard = knownTuning.isStandard;
-        }
-        this.name = this.name.trim();
-    }
-}
-Tuning._sevenStrings = [];
-Tuning._sixStrings = [];
-Tuning._fiveStrings = [];
-Tuning._fourStrings = [];
-Tuning._defaultTunings = new Map();
-Tuning.defaultAccidentals = ['', '#', '', '#', '', '', '#', '', '#', '', '#', ''];
-Tuning.defaultSteps = ['C', 'C', 'D', 'D', 'E', 'F', 'F', 'G', 'G', 'A', 'A', 'B'];
-class BendPointCloner {
-    static clone(original) {
-        const clone = new BendPoint();
-        clone.offset = original.offset;
-        clone.value = original.value;
-        return clone;
-    }
-}
-class NoteCloner {
-    static clone(original) {
-        const clone = new Note();
-        clone.index = original.index;
-        clone.accentuated = original.accentuated;
-        clone.bendType = original.bendType;
-        clone.bendStyle = original.bendStyle;
-        clone.isContinuedBend = original.isContinuedBend;
-        if (original.bendPoints) {
-            clone.bendPoints = [];
-            for (const i of original.bendPoints) {
-                clone.addBendPoint(BendPointCloner.clone(i));
-            }
-        }
-        clone.fret = original.fret;
-        clone.string = original.string;
-        clone.octave = original.octave;
-        clone.tone = original.tone;
-        clone.percussionArticulation = original.percussionArticulation;
-        clone.isVisible = original.isVisible;
-        clone.isLeftHandTapped = original.isLeftHandTapped;
-        clone.isHammerPullOrigin = original.isHammerPullOrigin;
-        clone.isSlurDestination = original.isSlurDestination;
-        clone.harmonicType = original.harmonicType;
-        clone.harmonicValue = original.harmonicValue;
-        clone.isGhost = original.isGhost;
-        clone.isLetRing = original.isLetRing;
-        clone.isPalmMute = original.isPalmMute;
-        clone.isDead = original.isDead;
-        clone.isStaccato = original.isStaccato;
-        clone.slideInType = original.slideInType;
-        clone.slideOutType = original.slideOutType;
-        clone.vibrato = original.vibrato;
-        clone.isTieDestination = original.isTieDestination;
-        clone.leftHandFinger = original.leftHandFinger;
-        clone.rightHandFinger = original.rightHandFinger;
-        clone.isFingering = original.isFingering;
-        clone.trillValue = original.trillValue;
-        clone.trillSpeed = original.trillSpeed;
-        clone.durationPercent = original.durationPercent;
-        clone.accidentalMode = original.accidentalMode;
-        clone.dynamics = original.dynamics;
-        return clone;
-    }
-}
-class AutomationCloner {
-    static clone(original) {
-        const clone = new Automation();
-        clone.isLinear = original.isLinear;
-        clone.type = original.type;
-        clone.value = original.value;
-        clone.ratioPosition = original.ratioPosition;
-        clone.text = original.text;
-        return clone;
-    }
-}
-class BeatCloner {
-    static clone(original) {
-        const clone = new Beat();
-        clone.index = original.index;
-        clone.notes = [];
-        for (const i of original.notes) {
-            clone.addNote(NoteCloner.clone(i));
-        }
-        clone.isEmpty = original.isEmpty;
-        clone.whammyStyle = original.whammyStyle;
-        clone.ottava = original.ottava;
-        clone.isLegatoOrigin = original.isLegatoOrigin;
-        clone.duration = original.duration;
-        clone.isLetRing = original.isLetRing;
-        clone.isPalmMute = original.isPalmMute;
-        clone.automations = [];
-        for (const i of original.automations) {
-            clone.automations.push(AutomationCloner.clone(i));
-        }
-        clone.dots = original.dots;
-        clone.fadeIn = original.fadeIn;
-        clone.lyrics = original.lyrics ? original.lyrics.slice() : null;
-        clone.hasRasgueado = original.hasRasgueado;
-        clone.pop = original.pop;
-        clone.slap = original.slap;
-        clone.tap = original.tap;
-        clone.text = original.text;
-        clone.brushType = original.brushType;
-        clone.brushDuration = original.brushDuration;
-        clone.tupletDenominator = original.tupletDenominator;
-        clone.tupletNumerator = original.tupletNumerator;
-        clone.isContinuedWhammy = original.isContinuedWhammy;
-        clone.whammyBarType = original.whammyBarType;
-        if (original.whammyBarPoints) {
-            clone.whammyBarPoints = [];
-            for (const i of original.whammyBarPoints) {
-                clone.addWhammyBarPoint(BendPointCloner.clone(i));
-            }
-        }
-        clone.vibrato = original.vibrato;
-        clone.chordId = original.chordId;
-        clone.graceType = original.graceType;
-        clone.pickStroke = original.pickStroke;
-        clone.tremoloSpeed = original.tremoloSpeed;
-        clone.crescendo = original.crescendo;
-        clone.displayStart = original.displayStart;
-        clone.playbackStart = original.playbackStart;
-        clone.displayDuration = original.displayDuration;
-        clone.playbackDuration = original.playbackDuration;
-        clone.dynamics = original.dynamics;
-        clone.invertBeamDirection = original.invertBeamDirection;
-        clone.preferredBeamDirection = original.preferredBeamDirection;
-        clone.isEffectSlurOrigin = original.isEffectSlurOrigin;
-        clone.beamingMode = original.beamingMode;
-        return clone;
-    }
-}
-var BeatBeamingMode;
-(function (BeatBeamingMode) {
-    BeatBeamingMode[BeatBeamingMode["Auto"] = 0] = "Auto";
-    BeatBeamingMode[BeatBeamingMode["ForceSplitToNext"] = 1] = "ForceSplitToNext";
-    BeatBeamingMode[BeatBeamingMode["ForceMergeWithNext"] = 2] = "ForceMergeWithNext";
-})(BeatBeamingMode || (BeatBeamingMode = {}));
-var BeamDirection;
-(function (BeamDirection) {
-    BeamDirection[BeamDirection["Up"] = 0] = "Up";
-    BeamDirection[BeamDirection["Down"] = 1] = "Down";
-})(BeamDirection || (BeamDirection = {}));
-var CrescendoType;
-(function (CrescendoType) {
-    CrescendoType[CrescendoType["None"] = 0] = "None";
-    CrescendoType[CrescendoType["Crescendo"] = 1] = "Crescendo";
-    CrescendoType[CrescendoType["Decrescendo"] = 2] = "Decrescendo";
-})(CrescendoType || (CrescendoType = {}));
-class Chord {
-    constructor() {
-        this.name = '';
-        this.firstFret = 1;
-        this.strings = [];
-        this.barreFrets = [];
-        this.showName = true;
-        this.showDiagram = true;
-        this.showFingering = true;
-    }
-    get uniqueId() {
-        const properties = [
-            this.name,
-            this.firstFret.toString(),
-            this.strings.join(','),
-            this.barreFrets.join(','),
-            this.showDiagram.toString(),
-            this.showFingering.toString(),
-            this.showName.toString()
-        ];
-        return properties.join('|');
-    }
-}
-var WhammyType;
-(function (WhammyType) {
-    WhammyType[WhammyType["None"] = 0] = "None";
-    WhammyType[WhammyType["Custom"] = 1] = "Custom";
-    WhammyType[WhammyType["Dive"] = 2] = "Dive";
-    WhammyType[WhammyType["Dip"] = 3] = "Dip";
-    WhammyType[WhammyType["Hold"] = 4] = "Hold";
-    WhammyType[WhammyType["Predive"] = 5] = "Predive";
-    WhammyType[WhammyType["PrediveDive"] = 6] = "PrediveDive";
-})(WhammyType || (WhammyType = {}));
-class TupletGroup {
-    constructor(voice) {
-        this._isEqualLengthTuplet = true;
-        this.totalDuration = 0;
-        this.beats = [];
-        this.isFull = false;
-        this.voice = voice;
-    }
-    check(beat) {
-        if (this.beats.length === 0) {
-            this.beats.push(beat);
-            this.totalDuration += beat.playbackDuration;
-            return true;
-        }
-        if (beat.graceType !== GraceType.None) {
-            return true;
-        }
-        if (beat.voice !== this.voice ||
-            this.isFull ||
-            beat.tupletNumerator !== this.beats[0].tupletNumerator ||
-            beat.tupletDenominator !== this.beats[0].tupletDenominator) {
-            return false;
-        }
-        if (beat.playbackDuration !== this.beats[0].playbackDuration) {
-            this._isEqualLengthTuplet = false;
-        }
-        this.beats.push(beat);
-        this.totalDuration += beat.playbackDuration;
-        if (this._isEqualLengthTuplet) {
-            if (this.beats.length === this.beats[0].tupletNumerator) {
-                this.isFull = true;
-            }
-        }
-        else {
-            let factor = (this.beats[0].tupletNumerator / this.beats[0].tupletDenominator) | 0;
-            for (let potentialMatch of TupletGroup.AllTicks) {
-                if (this.totalDuration === potentialMatch * factor) {
-                    this.isFull = true;
-                    break;
-                }
-            }
-        }
-        return true;
-    }
-}
-TupletGroup.HalfTicks = 1920;
-TupletGroup.QuarterTicks = 960;
-TupletGroup.EighthTicks = 480;
-TupletGroup.SixteenthTicks = 240;
-TupletGroup.ThirtySecondTicks = 120;
-TupletGroup.SixtyFourthTicks = 60;
-TupletGroup.OneHundredTwentyEighthTicks = 30;
-TupletGroup.TwoHundredFiftySixthTicks = 15;
-TupletGroup.AllTicks = [
-    TupletGroup.HalfTicks,
-    TupletGroup.QuarterTicks,
-    TupletGroup.EighthTicks,
-    TupletGroup.SixteenthTicks,
-    TupletGroup.ThirtySecondTicks,
-    TupletGroup.SixtyFourthTicks,
-    TupletGroup.OneHundredTwentyEighthTicks,
-    TupletGroup.TwoHundredFiftySixthTicks
-];
-var BrushType;
-(function (BrushType) {
-    BrushType[BrushType["None"] = 0] = "None";
-    BrushType[BrushType["BrushUp"] = 1] = "BrushUp";
-    BrushType[BrushType["BrushDown"] = 2] = "BrushDown";
-    BrushType[BrushType["ArpeggioUp"] = 3] = "ArpeggioUp";
-    BrushType[BrushType["ArpeggioDown"] = 4] = "ArpeggioDown";
-})(BrushType || (BrushType = {}));
-var PickStroke;
-(function (PickStroke) {
-    PickStroke[PickStroke["None"] = 0] = "None";
-    PickStroke[PickStroke["Up"] = 1] = "Up";
-    PickStroke[PickStroke["Down"] = 2] = "Down";
-})(PickStroke || (PickStroke = {}));
-class GeneralMidi {
-    static getValue(name) {
-        if (!GeneralMidi._values) {
-            GeneralMidi._values = new Map();
-        }
-        name = name.toLowerCase();
-        return GeneralMidi._values.has(name) ? GeneralMidi._values.get(name) : 0;
-    }
-    static isPiano(program) {
-        return program <= 7 || program >= 16 && program <= 23;
-    }
-    static isGuitar(program) {
-        return program >= 24 && program <= 39 || program === 105 || program === 43;
-    }
-}
-GeneralMidi._values = new Map([
-    ['acousticgrandpiano', 0], ['brightacousticpiano', 1], ['electricgrandpiano', 2],
-    ['honkytonkpiano', 3], ['electricpiano1', 4], ['electricpiano2', 5], ['harpsichord', 6],
-    ['clavinet', 7], ['celesta', 8], ['glockenspiel', 9], ['musicbox', 10], ['vibraphone', 11],
-    ['marimba', 12], ['xylophone', 13], ['tubularbells', 14], ['dulcimer', 15],
-    ['drawbarorgan', 16], ['percussiveorgan', 17], ['rockorgan', 18], ['churchorgan', 19],
-    ['reedorgan', 20], ['accordion', 21], ['harmonica', 22], ['tangoaccordion', 23],
-    ['acousticguitarnylon', 24], ['acousticguitarsteel', 25], ['electricguitarjazz', 26],
-    ['electricguitarclean', 27], ['electricguitarmuted', 28], ['overdrivenguitar', 29],
-    ['distortionguitar', 30], ['guitarharmonics', 31], ['acousticbass', 32],
-    ['electricbassfinger', 33], ['electricbasspick', 34], ['fretlessbass', 35],
-    ['slapbass1', 36], ['slapbass2', 37], ['synthbass1', 38], ['synthbass2', 39],
-    ['violin', 40], ['viola', 41], ['cello', 42], ['contrabass', 43], ['tremolostrings', 44],
-    ['pizzicatostrings', 45], ['orchestralharp', 46], ['timpani', 47], ['stringensemble1', 48],
-    ['stringensemble2', 49], ['synthstrings1', 50], ['synthstrings2', 51], ['choiraahs', 52],
-    ['voiceoohs', 53], ['synthvoice', 54], ['orchestrahit', 55], ['trumpet', 56],
-    ['trombone', 57], ['tuba', 58], ['mutedtrumpet', 59], ['frenchhorn', 60],
-    ['brasssection', 61], ['synthbrass1', 62], ['synthbrass2', 63], ['sopranosax', 64],
-    ['altosax', 65], ['tenorsax', 66], ['baritonesax', 67], ['oboe', 68], ['englishhorn', 69],
-    ['bassoon', 70], ['clarinet', 71], ['piccolo', 72], ['flute', 73], ['recorder', 74],
-    ['panflute', 75], ['blownbottle', 76], ['shakuhachi', 77], ['whistle', 78], ['ocarina', 79],
-    ['lead1square', 80], ['lead2sawtooth', 81], ['lead3calliope', 82], ['lead4chiff', 83],
-    ['lead5charang', 84], ['lead6voice', 85], ['lead7fifths', 86], ['lead8bassandlead', 87],
-    ['pad1newage', 88], ['pad2warm', 89], ['pad3polysynth', 90], ['pad4choir', 91],
-    ['pad5bowed', 92], ['pad6metallic', 93], ['pad7halo', 94], ['pad8sweep', 95],
-    ['fx1rain', 96], ['fx2soundtrack', 97], ['fx3crystal', 98], ['fx4atmosphere', 99],
-    ['fx5brightness', 100], ['fx6goblins', 101], ['fx7echoes', 102], ['fx8scifi', 103],
-    ['sitar', 104], ['banjo', 105], ['shamisen', 106], ['koto', 107], ['kalimba', 108],
-    ['bagpipe', 109], ['fiddle', 110], ['shanai', 111], ['tinklebell', 112], ['agogo', 113],
-    ['steeldrums', 114], ['woodblock', 115], ['taikodrum', 116], ['melodictom', 117],
-    ['synthdrum', 118], ['reversecymbal', 119], ['guitarfretnoise', 120], ['breathnoise', 121],
-    ['seashore', 122], ['birdtweet', 123], ['telephonering', 124], ['helicopter', 125],
-    ['applause', 126], ['gunshot', 127]
-]);
-var TabRhythmMode;
-(function (TabRhythmMode) {
-    TabRhythmMode[TabRhythmMode["Hidden"] = 0] = "Hidden";
-    TabRhythmMode[TabRhythmMode["ShowWithBeams"] = 1] = "ShowWithBeams";
-    TabRhythmMode[TabRhythmMode["ShowWithBars"] = 2] = "ShowWithBars";
-})(TabRhythmMode || (TabRhythmMode = {}));
-var NotationElement;
-(function (NotationElement) {
-    NotationElement[NotationElement["ScoreTitle"] = 0] = "ScoreTitle";
-    NotationElement[NotationElement["ScoreSubTitle"] = 1] = "ScoreSubTitle";
-    NotationElement[NotationElement["ScoreArtist"] = 2] = "ScoreArtist";
-    NotationElement[NotationElement["ScoreAlbum"] = 3] = "ScoreAlbum";
-    NotationElement[NotationElement["ScoreWords"] = 4] = "ScoreWords";
-    NotationElement[NotationElement["ScoreMusic"] = 5] = "ScoreMusic";
-    NotationElement[NotationElement["ScoreWordsAndMusic"] = 6] = "ScoreWordsAndMusic";
-    NotationElement[NotationElement["ScoreCopyright"] = 7] = "ScoreCopyright";
-    NotationElement[NotationElement["GuitarTuning"] = 8] = "GuitarTuning";
-    NotationElement[NotationElement["TrackNames"] = 9] = "TrackNames";
-    NotationElement[NotationElement["ChordDiagrams"] = 10] = "ChordDiagrams";
-    NotationElement[NotationElement["ParenthesisOnTiedBends"] = 11] = "ParenthesisOnTiedBends";
-    NotationElement[NotationElement["TabNotesOnTiedBends"] = 12] = "TabNotesOnTiedBends";
-    NotationElement[NotationElement["ZerosOnDiveWhammys"] = 13] = "ZerosOnDiveWhammys";
-    NotationElement[NotationElement["EffectAlternateEndings"] = 14] = "EffectAlternateEndings";
-    NotationElement[NotationElement["EffectCapo"] = 15] = "EffectCapo";
-    NotationElement[NotationElement["EffectChordNames"] = 16] = "EffectChordNames";
-    NotationElement[NotationElement["EffectCrescendo"] = 17] = "EffectCrescendo";
-    NotationElement[NotationElement["EffectDynamics"] = 18] = "EffectDynamics";
-    NotationElement[NotationElement["EffectFadeIn"] = 19] = "EffectFadeIn";
-    NotationElement[NotationElement["EffectFermata"] = 20] = "EffectFermata";
-    NotationElement[NotationElement["EffectFingering"] = 21] = "EffectFingering";
-    NotationElement[NotationElement["EffectHarmonics"] = 22] = "EffectHarmonics";
-    NotationElement[NotationElement["EffectLetRing"] = 23] = "EffectLetRing";
-    NotationElement[NotationElement["EffectLyrics"] = 24] = "EffectLyrics";
-    NotationElement[NotationElement["EffectMarker"] = 25] = "EffectMarker";
-    NotationElement[NotationElement["EffectOttavia"] = 26] = "EffectOttavia";
-    NotationElement[NotationElement["EffectPalmMute"] = 27] = "EffectPalmMute";
-    NotationElement[NotationElement["EffectPickSlide"] = 28] = "EffectPickSlide";
-    NotationElement[NotationElement["EffectPickStroke"] = 29] = "EffectPickStroke";
-    NotationElement[NotationElement["EffectSlightBeatVibrato"] = 30] = "EffectSlightBeatVibrato";
-    NotationElement[NotationElement["EffectSlightNoteVibrato"] = 31] = "EffectSlightNoteVibrato";
-    NotationElement[NotationElement["EffectTap"] = 32] = "EffectTap";
-    NotationElement[NotationElement["EffectTempo"] = 33] = "EffectTempo";
-    NotationElement[NotationElement["EffectText"] = 34] = "EffectText";
-    NotationElement[NotationElement["EffectTrill"] = 35] = "EffectTrill";
-    NotationElement[NotationElement["EffectTripletFeel"] = 36] = "EffectTripletFeel";
-    NotationElement[NotationElement["EffectWhammyBar"] = 37] = "EffectWhammyBar";
-    NotationElement[NotationElement["EffectWideBeatVibrato"] = 38] = "EffectWideBeatVibrato";
-    NotationElement[NotationElement["EffectWideNoteVibrato"] = 39] = "EffectWideNoteVibrato";
-    NotationElement[NotationElement["EffectLeftHandTap"] = 40] = "EffectLeftHandTap";
-})(NotationElement || (NotationElement = {}));
-var FingeringMode;
-(function (FingeringMode) {
-    FingeringMode[FingeringMode["ScoreDefault"] = 0] = "ScoreDefault";
-    FingeringMode[FingeringMode["ScoreForcePiano"] = 1] = "ScoreForcePiano";
-    FingeringMode[FingeringMode["SingleNoteEffectBand"] = 2] = "SingleNoteEffectBand";
-    FingeringMode[FingeringMode["SingleNoteEffectBandForcePiano"] = 3] = "SingleNoteEffectBandForcePiano";
-})(FingeringMode || (FingeringMode = {}));
-class NotationSettings {
-    constructor() {
-        this.notationMode = NotationMode.GuitarPro;
-        this.fingeringMode = FingeringMode.ScoreDefault;
-        this.elements = new Map();
-        this.rhythmMode = TabRhythmMode.Hidden;
-        this.rhythmHeight = 15;
-        this.transpositionPitches = [];
-        this.displayTranspositionPitches = [];
-        this.smallGraceTabNotes = true;
-        this.extendBendArrowsOnTiedNotes = true;
-        this.extendLineEffectsToBeatEnd = false;
-        this.slurHeight = 5.0;
-    }
-    isNotationElementVisible(element) {
-        if (this.elements.has(element)) {
-            return this.elements.get(element);
-        }
-        if (NotationSettings.defaultElements.has(element)) {
-            return NotationSettings.defaultElements.get(element);
-        }
-        return true;
-    }
-}
-NotationSettings.defaultElements = new Map([
-    [NotationElement.ZerosOnDiveWhammys, false]
-]);
-var NotationMode;
-(function (NotationMode) {
-    NotationMode[NotationMode["GuitarPro"] = 0] = "GuitarPro";
-    NotationMode[NotationMode["SongBook"] = 1] = "SongBook";
-})(NotationMode || (NotationMode = {}));
-class Lazy {
-    constructor(factory) {
-        this._value = undefined;
-        this._factory = factory;
-    }
-    get value() {
-        if (this._value === undefined) {
-            this._value = this._factory();
-        }
-        return this._value;
-    }
-}
-class TuningParseResult {
-    constructor() {
-        this.note = null;
-        this.noteValue = 0;
-        this.octave = 0;
-    }
-    get realValue() {
-        return this.octave * 12 + this.noteValue;
-    }
-}
-class ModelUtils {
-    static getIndex(duration) {
-        let index = 0;
-        let value = duration;
-        if (value < 0) {
-            return index;
-        }
-        return Math.log2(duration) | 0;
-    }
-    static keySignatureIsFlat(ks) {
-        return ks < 0;
-    }
-    static keySignatureIsNatural(ks) {
-        return ks === 0;
-    }
-    static keySignatureIsSharp(ks) {
-        return ks > 0;
-    }
-    static applyPitchOffsets(settings, score) {
-        for (let i = 0; i < score.tracks.length; i++) {
-            if (i < settings.notation.displayTranspositionPitches.length) {
-                for (let staff of score.tracks[i].staves) {
-                    staff.displayTranspositionPitch = -settings.notation.displayTranspositionPitches[i];
-                }
-            }
-            if (i < settings.notation.transpositionPitches.length) {
-                for (let staff of score.tracks[i].staves) {
-                    staff.transpositionPitch = -settings.notation.transpositionPitches[i];
-                }
-            }
-        }
-    }
-    static fingerToString(settings, beat, finger, leftHand) {
-        if (settings.notation.fingeringMode === FingeringMode.ScoreForcePiano ||
-            settings.notation.fingeringMode === FingeringMode.SingleNoteEffectBandForcePiano ||
-            GeneralMidi.isPiano(beat.voice.bar.staff.track.playbackInfo.program)) {
-            switch (finger) {
-                case Fingers.Unknown:
-                case Fingers.NoOrDead:
-                    return null;
-                case Fingers.Thumb:
-                    return '1';
-                case Fingers.IndexFinger:
-                    return '2';
-                case Fingers.MiddleFinger:
-                    return '3';
-                case Fingers.AnnularFinger:
-                    return '4';
-                case Fingers.LittleFinger:
-                    return '5';
-                default:
-                    return null;
-            }
-        }
-        if (leftHand) {
-            switch (finger) {
-                case Fingers.Unknown:
-                case Fingers.NoOrDead:
-                    return '0';
-                case Fingers.Thumb:
-                    return 'T';
-                case Fingers.IndexFinger:
-                    return '1';
-                case Fingers.MiddleFinger:
-                    return '2';
-                case Fingers.AnnularFinger:
-                    return '3';
-                case Fingers.LittleFinger:
-                    return '4';
-                default:
-                    return null;
-            }
-        }
-        switch (finger) {
-            case Fingers.Unknown:
-            case Fingers.NoOrDead:
-                return null;
-            case Fingers.Thumb:
-                return 'p';
-            case Fingers.IndexFinger:
-                return 'i';
-            case Fingers.MiddleFinger:
-                return 'm';
-            case Fingers.AnnularFinger:
-                return 'a';
-            case Fingers.LittleFinger:
-                return 'c';
-            default:
-                return null;
-        }
-    }
-    static isTuning(name) {
-        return !!ModelUtils.parseTuning(name);
-    }
-    static parseTuning(name) {
-        let note = '';
-        let octave = '';
-        for (let i = 0; i < name.length; i++) {
-            let c = name.charCodeAt(i);
-            if (c >= 0x30 && c <= 0x39) {
-                if (!note) {
-                    return null;
-                }
-                octave += String.fromCharCode(c);
-            }
-            else if ((c >= 0x41 && c <= 0x5a) || (c >= 0x61 && c <= 0x7a) || c === 0x23) {
-                note += String.fromCharCode(c);
-            }
-            else {
-                return null;
-            }
-        }
-        if (!octave || !note) {
-            return null;
-        }
-        let result = new TuningParseResult();
-        result.octave = parseInt(octave) + 1;
-        result.note = note.toLowerCase();
-        result.noteValue = ModelUtils.getToneForText(result.note);
-        return result;
-    }
-    static getTuningForText(str) {
-        let result = ModelUtils.parseTuning(str);
-        if (!result) {
-            return -1;
-        }
-        return result.realValue;
-    }
-    static getToneForText(note) {
-        switch (note.toLowerCase()) {
-            case 'c':
-                return 0;
-            case 'c#':
-            case 'db':
-                return 1;
-            case 'd':
-                return 2;
-            case 'd#':
-            case 'eb':
-                return 3;
-            case 'e':
-                return 4;
-            case 'f':
-                return 5;
-            case 'f#':
-            case 'gb':
-                return 6;
-            case 'g':
-                return 7;
-            case 'g#':
-            case 'ab':
-                return 8;
-            case 'a':
-                return 9;
-            case 'a#':
-            case 'bb':
-                return 10;
-            case 'b':
-                return 11;
-            default:
-                return 0;
-        }
-    }
-    static newGuid() {
-        return (Math.floor((1 + Math.random()) * 0x10000)
-            .toString(16)
-            .substring(1) +
-            Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1) +
-            '-' +
-            Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1) +
-            '-' +
-            Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1) +
-            '-' +
-            Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1) +
-            '-' +
-            Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1) +
-            Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1) +
-            Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1));
-    }
-    static isAlmostEqualTo(a, b) {
-        return Math.abs(a - b) < 0.00001;
-    }
-    static toHexString(n, digits = 0) {
-        let s = '';
-        let hexChars = '0123456789ABCDEF';
-        do {
-            s = String.fromCharCode(hexChars.charCodeAt(n & 15)) + s;
-            n = n >> 4;
-        } while (n > 0);
-        while (s.length < digits) {
-            s = '0' + s;
-        }
-        return s;
-    }
-}
-var DynamicValue;
-(function (DynamicValue) {
-    DynamicValue[DynamicValue["PPP"] = 0] = "PPP";
-    DynamicValue[DynamicValue["PP"] = 1] = "PP";
-    DynamicValue[DynamicValue["P"] = 2] = "P";
-    DynamicValue[DynamicValue["MP"] = 3] = "MP";
-    DynamicValue[DynamicValue["MF"] = 4] = "MF";
-    DynamicValue[DynamicValue["F"] = 5] = "F";
-    DynamicValue[DynamicValue["FF"] = 6] = "FF";
-    DynamicValue[DynamicValue["FFF"] = 7] = "FFF";
-})(DynamicValue || (DynamicValue = {}));
-var NoteAccidentalMode;
-(function (NoteAccidentalMode) {
-    NoteAccidentalMode[NoteAccidentalMode["Default"] = 0] = "Default";
-    NoteAccidentalMode[NoteAccidentalMode["ForceNone"] = 1] = "ForceNone";
-    NoteAccidentalMode[NoteAccidentalMode["ForceNatural"] = 2] = "ForceNatural";
-    NoteAccidentalMode[NoteAccidentalMode["ForceSharp"] = 3] = "ForceSharp";
-    NoteAccidentalMode[NoteAccidentalMode["ForceDoubleSharp"] = 4] = "ForceDoubleSharp";
-    NoteAccidentalMode[NoteAccidentalMode["ForceFlat"] = 5] = "ForceFlat";
-    NoteAccidentalMode[NoteAccidentalMode["ForceDoubleFlat"] = 6] = "ForceDoubleFlat";
-})(NoteAccidentalMode || (NoteAccidentalMode = {}));
-var Fingers;
-(function (Fingers) {
-    Fingers[Fingers["Unknown"] = -2] = "Unknown";
-    Fingers[Fingers["NoOrDead"] = -1] = "NoOrDead";
-    Fingers[Fingers["Thumb"] = 0] = "Thumb";
-    Fingers[Fingers["IndexFinger"] = 1] = "IndexFinger";
-    Fingers[Fingers["MiddleFinger"] = 2] = "MiddleFinger";
-    Fingers[Fingers["AnnularFinger"] = 3] = "AnnularFinger";
-    Fingers[Fingers["LittleFinger"] = 4] = "LittleFinger";
-})(Fingers || (Fingers = {}));
-var VibratoType;
-(function (VibratoType) {
-    VibratoType[VibratoType["None"] = 0] = "None";
-    VibratoType[VibratoType["Slight"] = 1] = "Slight";
-    VibratoType[VibratoType["Wide"] = 2] = "Wide";
-})(VibratoType || (VibratoType = {}));
-var SlideOutType;
-(function (SlideOutType) {
-    SlideOutType[SlideOutType["None"] = 0] = "None";
-    SlideOutType[SlideOutType["Shift"] = 1] = "Shift";
-    SlideOutType[SlideOutType["Legato"] = 2] = "Legato";
-    SlideOutType[SlideOutType["OutUp"] = 3] = "OutUp";
-    SlideOutType[SlideOutType["OutDown"] = 4] = "OutDown";
-    SlideOutType[SlideOutType["PickSlideDown"] = 5] = "PickSlideDown";
-    SlideOutType[SlideOutType["PickSlideUp"] = 6] = "PickSlideUp";
-})(SlideOutType || (SlideOutType = {}));
-var SlideInType;
-(function (SlideInType) {
-    SlideInType[SlideInType["None"] = 0] = "None";
-    SlideInType[SlideInType["IntoFromBelow"] = 1] = "IntoFromBelow";
-    SlideInType[SlideInType["IntoFromAbove"] = 2] = "IntoFromAbove";
-})(SlideInType || (SlideInType = {}));
-var HarmonicType;
-(function (HarmonicType) {
-    HarmonicType[HarmonicType["None"] = 0] = "None";
-    HarmonicType[HarmonicType["Natural"] = 1] = "Natural";
-    HarmonicType[HarmonicType["Artificial"] = 2] = "Artificial";
-    HarmonicType[HarmonicType["Pinch"] = 3] = "Pinch";
-    HarmonicType[HarmonicType["Tap"] = 4] = "Tap";
-    HarmonicType[HarmonicType["Semi"] = 5] = "Semi";
-    HarmonicType[HarmonicType["Feedback"] = 6] = "Feedback";
-})(HarmonicType || (HarmonicType = {}));
+var TextAlign;
+(function (TextAlign) {
+    TextAlign[TextAlign["Left"] = 0] = "Left";
+    TextAlign[TextAlign["Center"] = 1] = "Center";
+    TextAlign[TextAlign["Right"] = 2] = "Right";
+})(TextAlign || (TextAlign = {}));
 var TextBaseline;
 (function (TextBaseline) {
     TextBaseline[TextBaseline["Top"] = 0] = "Top";
     TextBaseline[TextBaseline["Middle"] = 1] = "Middle";
     TextBaseline[TextBaseline["Bottom"] = 2] = "Bottom";
 })(TextBaseline || (TextBaseline = {}));
+class ScoreImporter {
+    init(data, settings) {
+        this.data = data;
+        this.settings = settings;
+    }
+}
 var MusicFontSymbol;
 (function (MusicFontSymbol) {
     MusicFontSymbol[MusicFontSymbol["None"] = -1] = "None";
@@ -4041,4470 +2637,6 @@ var MusicFontSymbol;
     MusicFontSymbol[MusicFontSymbol["OctaveBaselineM"] = 60565] = "OctaveBaselineM";
     MusicFontSymbol[MusicFontSymbol["OctaveBaselineB"] = 60563] = "OctaveBaselineB";
 })(MusicFontSymbol || (MusicFontSymbol = {}));
-class InstrumentArticulation {
-    constructor(elementType = "", staffLine = 0, outputMidiNumber = 0, noteHeadDefault = MusicFontSymbol.None, noteHeadHalf = MusicFontSymbol.None, noteHeadWhole = MusicFontSymbol.None, techniqueSymbol = MusicFontSymbol.None, techniqueSymbolPlacement = TextBaseline.Middle) {
-        this.elementType = elementType;
-        this.outputMidiNumber = outputMidiNumber;
-        this.staffLine = staffLine;
-        this.noteHeadDefault = noteHeadDefault;
-        this.noteHeadHalf = noteHeadHalf !== MusicFontSymbol.None ? noteHeadHalf : noteHeadDefault;
-        this.noteHeadWhole = noteHeadWhole !== MusicFontSymbol.None ? noteHeadWhole : noteHeadDefault;
-        this.techniqueSymbol = techniqueSymbol;
-        this.techniqueSymbolPlacement = techniqueSymbolPlacement;
-    }
-    getSymbol(duration) {
-        switch (duration) {
-            case Duration.Whole:
-                return this.noteHeadWhole;
-            case Duration.Half:
-                return this.noteHeadHalf;
-            default:
-                return this.noteHeadDefault;
-        }
-    }
-}
-class PercussionMapper {
-    static articulationFromElementVariation(element, variation) {
-        if (element < PercussionMapper.gp6ElementAndVariationToArticulation.length) {
-            if (variation >= PercussionMapper.gp6ElementAndVariationToArticulation.length) {
-                variation = 0;
-            }
-            return PercussionMapper.gp6ElementAndVariationToArticulation[element][variation];
-        }
-        return 38;
-    }
-    static getArticulation(n) {
-        const articulationIndex = n.percussionArticulation;
-        const trackArticulations = n.beat.voice.bar.staff.track.percussionArticulations;
-        if (articulationIndex < trackArticulations.length) {
-            return trackArticulations[articulationIndex];
-        }
-        return PercussionMapper.getArticulationByValue(articulationIndex);
-        ;
-    }
-    static getElementAndVariation(n) {
-        const articulation = PercussionMapper.getArticulation(n);
-        if (!articulation) {
-            return [-1, -1];
-        }
-        for (let element = 0; element < PercussionMapper.gp6ElementAndVariationToArticulation.length; element++) {
-            const variations = PercussionMapper.gp6ElementAndVariationToArticulation[element];
-            for (let variation = 0; variation < variations.length; variation++) {
-                const gp6Articulation = PercussionMapper.getArticulationByValue(variations[variation]);
-                if ((gp6Articulation === null || gp6Articulation === void 0 ? void 0 : gp6Articulation.outputMidiNumber) === articulation.outputMidiNumber) {
-                    return [element, variation];
-                }
-            }
-        }
-        return [-1, -1];
-    }
-    static getArticulationByValue(midiNumber) {
-        if (PercussionMapper.instrumentArticulations.has(midiNumber)) {
-            return PercussionMapper.instrumentArticulations.get(midiNumber);
-        }
-        return null;
-    }
-}
-PercussionMapper.gp6ElementAndVariationToArticulation = [
-    [35, 35, 35],
-    [38, 91, 37],
-    [99, 100, 99],
-    [56, 100, 56],
-    [102, 103, 102],
-    [43, 43, 43],
-    [45, 45, 45],
-    [47, 47, 47],
-    [48, 48, 48],
-    [50, 50, 50],
-    [42, 92, 46],
-    [44, 44, 44],
-    [57, 98, 57],
-    [49, 97, 49],
-    [55, 95, 55],
-    [51, 93, 127],
-    [52, 96, 52],
-];
-PercussionMapper.instrumentArticulations = new Map([
-    [38, new InstrumentArticulation("snare", 3, 38, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [37, new InstrumentArticulation("snare", 3, 37, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
-    [91, new InstrumentArticulation("snare", 3, 38, MusicFontSymbol.NoteheadDiamondWhite, MusicFontSymbol.NoteheadDiamondWhite, MusicFontSymbol.NoteheadDiamondWhite)],
-    [42, new InstrumentArticulation("hiHat", -1, 42, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
-    [92, new InstrumentArticulation("hiHat", -1, 46, MusicFontSymbol.NoteheadCircleSlash, MusicFontSymbol.NoteheadCircleSlash, MusicFontSymbol.NoteheadCircleSlash)],
-    [46, new InstrumentArticulation("hiHat", -1, 46, MusicFontSymbol.NoteheadCircleX, MusicFontSymbol.NoteheadCircleX, MusicFontSymbol.NoteheadCircleX)],
-    [44, new InstrumentArticulation("hiHat", 9, 44, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
-    [35, new InstrumentArticulation("kickDrum", 8, 35, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [36, new InstrumentArticulation("kickDrum", 7, 36, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [50, new InstrumentArticulation("tom", 1, 50, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [48, new InstrumentArticulation("tom", 2, 48, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [47, new InstrumentArticulation("tom", 4, 47, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [45, new InstrumentArticulation("tom", 5, 45, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [43, new InstrumentArticulation("tom", 6, 43, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [93, new InstrumentArticulation("ride", 0, 51, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.PictEdgeOfCymbal, TextBaseline.Bottom)],
-    [51, new InstrumentArticulation("ride", 0, 51, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
-    [53, new InstrumentArticulation("ride", 0, 53, MusicFontSymbol.NoteheadDiamondWhite, MusicFontSymbol.NoteheadDiamondWhite, MusicFontSymbol.NoteheadDiamondWhite)],
-    [94, new InstrumentArticulation("ride", 0, 51, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.ArticStaccatoAbove, TextBaseline.Top)],
-    [55, new InstrumentArticulation("splash", -2, 55, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
-    [95, new InstrumentArticulation("splash", -2, 55, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.ArticStaccatoAbove, TextBaseline.Bottom)],
-    [52, new InstrumentArticulation("china", -3, 52, MusicFontSymbol.NoteheadHeavyXHat, MusicFontSymbol.NoteheadHeavyXHat, MusicFontSymbol.NoteheadHeavyXHat)],
-    [96, new InstrumentArticulation("china", -3, 52, MusicFontSymbol.NoteheadHeavyXHat, MusicFontSymbol.NoteheadHeavyXHat, MusicFontSymbol.NoteheadHeavyXHat)],
-    [49, new InstrumentArticulation("crash", -2, 49, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX)],
-    [97, new InstrumentArticulation("crash", -2, 49, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.ArticStaccatoAbove, TextBaseline.Bottom)],
-    [57, new InstrumentArticulation("crash", -1, 57, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX)],
-    [98, new InstrumentArticulation("crash", -1, 57, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.ArticStaccatoAbove, TextBaseline.Bottom)],
-    [99, new InstrumentArticulation("cowbell", 1, 56, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpHalf, MusicFontSymbol.NoteheadTriangleUpWhole)],
-    [100, new InstrumentArticulation("cowbell", 1, 56, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXHalf, MusicFontSymbol.NoteheadXWhole)],
-    [56, new InstrumentArticulation("cowbell", 0, 56, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpHalf, MusicFontSymbol.NoteheadTriangleUpWhole)],
-    [101, new InstrumentArticulation("cowbell", 0, 56, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXHalf, MusicFontSymbol.NoteheadXWhole)],
-    [102, new InstrumentArticulation("cowbell", -1, 56, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpHalf, MusicFontSymbol.NoteheadTriangleUpWhole)],
-    [103, new InstrumentArticulation("cowbell", -1, 56, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXHalf, MusicFontSymbol.NoteheadXWhole)],
-    [77, new InstrumentArticulation("woodblock", -9, 77, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack)],
-    [76, new InstrumentArticulation("woodblock", -10, 76, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack)],
-    [60, new InstrumentArticulation("bongo", -4, 60, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [104, new InstrumentArticulation("bongo", -5, 60, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.NoteheadParenthesis, TextBaseline.Middle)],
-    [105, new InstrumentArticulation("bongo", -6, 60, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
-    [61, new InstrumentArticulation("bongo", -7, 61, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [106, new InstrumentArticulation("bongo", -8, 61, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.NoteheadParenthesis, TextBaseline.Middle)],
-    [107, new InstrumentArticulation("bongo", -16, 61, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
-    [66, new InstrumentArticulation("timbale", 10, 66, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [65, new InstrumentArticulation("timbale", 9, 65, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [68, new InstrumentArticulation("agogo", 12, 68, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [67, new InstrumentArticulation("agogo", 11, 67, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [64, new InstrumentArticulation("conga", 17, 64, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [108, new InstrumentArticulation("conga", 16, 64, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
-    [109, new InstrumentArticulation("conga", 15, 64, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.NoteheadParenthesis, TextBaseline.Middle)],
-    [63, new InstrumentArticulation("conga", 14, 63, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [110, new InstrumentArticulation("conga", 13, 63, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
-    [62, new InstrumentArticulation("conga", 19, 62, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.NoteheadParenthesis, TextBaseline.Middle)],
-    [72, new InstrumentArticulation("whistle", -11, 72, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [71, new InstrumentArticulation("whistle", -17, 71, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [73, new InstrumentArticulation("guiro", 38, 73, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [74, new InstrumentArticulation("guiro", 37, 74, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [86, new InstrumentArticulation("surdo", 36, 86, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [87, new InstrumentArticulation("surdo", 35, 87, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadParenthesis, TextBaseline.Middle)],
-    [54, new InstrumentArticulation("tambourine", 3, 54, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack)],
-    [111, new InstrumentArticulation("tambourine", 2, 54, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.StringsUpBow, TextBaseline.Bottom)],
-    [112, new InstrumentArticulation("tambourine", 1, 54, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.StringsDownBow, TextBaseline.Bottom)],
-    [113, new InstrumentArticulation("tambourine", -7, 54, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
-    [79, new InstrumentArticulation("cuica", 30, 79, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [78, new InstrumentArticulation("cuica", 29, 78, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
-    [58, new InstrumentArticulation("vibraslap", 28, 58, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [81, new InstrumentArticulation("triangle", 27, 81, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [80, new InstrumentArticulation("triangle", 26, 80, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadParenthesis, TextBaseline.Middle)],
-    [114, new InstrumentArticulation("grancassa", 25, 43, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [115, new InstrumentArticulation("piatti", 18, 49, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [116, new InstrumentArticulation("piatti", 24, 49, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
-    [69, new InstrumentArticulation("cabasa", 23, 69, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [117, new InstrumentArticulation("cabasa", 22, 69, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.StringsUpBow, TextBaseline.Bottom)],
-    [85, new InstrumentArticulation("castanets", 21, 85, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [75, new InstrumentArticulation("claves", 20, 75, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [70, new InstrumentArticulation("maraca", -12, 70, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [118, new InstrumentArticulation("maraca", -13, 70, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.StringsUpBow, TextBaseline.Bottom)],
-    [119, new InstrumentArticulation("maraca", -14, 70, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [120, new InstrumentArticulation("maraca", -15, 70, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.StringsUpBow, TextBaseline.Bottom)],
-    [82, new InstrumentArticulation("shaker", -23, 54, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [122, new InstrumentArticulation("shaker", -24, 54, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.StringsUpBow, TextBaseline.Bottom)],
-    [84, new InstrumentArticulation("bellTree", -18, 53, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [123, new InstrumentArticulation("bellTree", -19, 53, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.StringsUpBow, TextBaseline.Bottom)],
-    [83, new InstrumentArticulation("jingleBell", -20, 53, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [124, new InstrumentArticulation("unpitched", -21, 62, MusicFontSymbol.NoteheadNull, MusicFontSymbol.NoteheadNull, MusicFontSymbol.NoteheadNull, MusicFontSymbol.GuitarGolpe, TextBaseline.Top)],
-    [125, new InstrumentArticulation("unpitched", -22, 62, MusicFontSymbol.NoteheadNull, MusicFontSymbol.NoteheadNull, MusicFontSymbol.NoteheadNull, MusicFontSymbol.GuitarGolpe, TextBaseline.Bottom)],
-    [39, new InstrumentArticulation("handClap", 3, 39, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [40, new InstrumentArticulation("snare", 3, 40, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [31, new InstrumentArticulation("snare", 3, 40, MusicFontSymbol.NoteheadSlashedBlack2, MusicFontSymbol.NoteheadSlashedBlack2, MusicFontSymbol.NoteheadSlashedBlack2)],
-    [41, new InstrumentArticulation("tom", 5, 41, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
-    [59, new InstrumentArticulation("ride", 2, 59, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.PictEdgeOfCymbal, TextBaseline.Bottom)],
-    [126, new InstrumentArticulation("ride", 2, 59, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
-    [127, new InstrumentArticulation("ride", 2, 59, MusicFontSymbol.NoteheadDiamondWhite, MusicFontSymbol.NoteheadDiamondWhite, MusicFontSymbol.NoteheadDiamondWhite)],
-    [29, new InstrumentArticulation("ride", 2, 59, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.ArticStaccatoAbove, TextBaseline.Top)],
-    [30, new InstrumentArticulation("crash", -3, 49, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
-    [33, new InstrumentArticulation("snare", 3, 37, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
-    [34, new InstrumentArticulation("snare", 3, 38, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadBlack)]
-]);
-var BendType;
-(function (BendType) {
-    BendType[BendType["None"] = 0] = "None";
-    BendType[BendType["Custom"] = 1] = "Custom";
-    BendType[BendType["Bend"] = 2] = "Bend";
-    BendType[BendType["Release"] = 3] = "Release";
-    BendType[BendType["BendRelease"] = 4] = "BendRelease";
-    BendType[BendType["Hold"] = 5] = "Hold";
-    BendType[BendType["Prebend"] = 6] = "Prebend";
-    BendType[BendType["PrebendBend"] = 7] = "PrebendBend";
-    BendType[BendType["PrebendRelease"] = 8] = "PrebendRelease";
-})(BendType || (BendType = {}));
-var AccentuationType;
-(function (AccentuationType) {
-    AccentuationType[AccentuationType["None"] = 0] = "None";
-    AccentuationType[AccentuationType["Normal"] = 1] = "Normal";
-    AccentuationType[AccentuationType["Heavy"] = 2] = "Heavy";
-})(AccentuationType || (AccentuationType = {}));
-var BendStyle;
-(function (BendStyle) {
-    BendStyle[BendStyle["Default"] = 0] = "Default";
-    BendStyle[BendStyle["Gradual"] = 1] = "Gradual";
-    BendStyle[BendStyle["Fast"] = 2] = "Fast";
-})(BendStyle || (BendStyle = {}));
-class NoteIdBag {
-    constructor() {
-        this.tieDestinationNoteId = -1;
-        this.tieOriginNoteId = -1;
-        this.slurDestinationNoteId = -1;
-        this.slurOriginNoteId = -1;
-        this.hammerPullDestinationNoteId = -1;
-        this.hammerPullOriginNoteId = -1;
-    }
-}
-class ImporterSettings {
-    constructor() {
-        this.encoding = 'utf-8';
-        this.mergePartGroupsInMusicXml = false;
-        this.beatTextAsLyrics = false;
-    }
-}
-class Settings {
-    constructor() {
-        this.notation = new NotationSettings();
-        this.importer = new ImporterSettings();
-    }
-}
-var Duration;
-(function (Duration) {
-    Duration[Duration["QuadrupleWhole"] = -4] = "QuadrupleWhole";
-    Duration[Duration["DoubleWhole"] = -2] = "DoubleWhole";
-    Duration[Duration["Whole"] = 1] = "Whole";
-    Duration[Duration["Half"] = 2] = "Half";
-    Duration[Duration["Quarter"] = 4] = "Quarter";
-    Duration[Duration["Eighth"] = 8] = "Eighth";
-    Duration[Duration["Sixteenth"] = 16] = "Sixteenth";
-    Duration[Duration["ThirtySecond"] = 32] = "ThirtySecond";
-    Duration[Duration["SixtyFourth"] = 64] = "SixtyFourth";
-    Duration[Duration["OneHundredTwentyEighth"] = 128] = "OneHundredTwentyEighth";
-    Duration[Duration["TwoHundredFiftySixth"] = 256] = "TwoHundredFiftySixth";
-})(Duration || (Duration = {}));
-var KeySignature;
-(function (KeySignature) {
-    KeySignature[KeySignature["Cb"] = -7] = "Cb";
-    KeySignature[KeySignature["Gb"] = -6] = "Gb";
-    KeySignature[KeySignature["Db"] = -5] = "Db";
-    KeySignature[KeySignature["Ab"] = -4] = "Ab";
-    KeySignature[KeySignature["Eb"] = -3] = "Eb";
-    KeySignature[KeySignature["Bb"] = -2] = "Bb";
-    KeySignature[KeySignature["F"] = -1] = "F";
-    KeySignature[KeySignature["C"] = 0] = "C";
-    KeySignature[KeySignature["G"] = 1] = "G";
-    KeySignature[KeySignature["D"] = 2] = "D";
-    KeySignature[KeySignature["A"] = 3] = "A";
-    KeySignature[KeySignature["E"] = 4] = "E";
-    KeySignature[KeySignature["B"] = 5] = "B";
-    KeySignature[KeySignature["FSharp"] = 6] = "FSharp";
-    KeySignature[KeySignature["CSharp"] = 7] = "CSharp";
-})(KeySignature || (KeySignature = {}));
-var KeySignatureType;
-(function (KeySignatureType) {
-    KeySignatureType[KeySignatureType["Major"] = 0] = "Major";
-    KeySignatureType[KeySignatureType["Minor"] = 1] = "Minor";
-})(KeySignatureType || (KeySignatureType = {}));
-var TripletFeel;
-(function (TripletFeel) {
-    TripletFeel[TripletFeel["NoTripletFeel"] = 0] = "NoTripletFeel";
-    TripletFeel[TripletFeel["Triplet16th"] = 1] = "Triplet16th";
-    TripletFeel[TripletFeel["Triplet8th"] = 2] = "Triplet8th";
-    TripletFeel[TripletFeel["Dotted16th"] = 3] = "Dotted16th";
-    TripletFeel[TripletFeel["Dotted8th"] = 4] = "Dotted8th";
-    TripletFeel[TripletFeel["Scottish16th"] = 5] = "Scottish16th";
-    TripletFeel[TripletFeel["Scottish8th"] = 6] = "Scottish8th";
-})(TripletFeel || (TripletFeel = {}));
-class Section {
-    constructor() {
-        this.marker = '';
-        this.text = '';
-    }
-}
-class Automation {
-    constructor() {
-        this.isLinear = false;
-        this.type = AutomationType.Tempo;
-        this.value = 0;
-        this.ratioPosition = 0;
-        this.text = '';
-    }
-    static buildTempoAutomation(isLinear, ratioPosition, value, reference) {
-        if (reference < 1 || reference > 5) {
-            reference = 2;
-        }
-        let references = new Float32Array([1, 0.5, 1.0, 1.5, 2.0, 3.0]);
-        let automation = new Automation();
-        automation.type = AutomationType.Tempo;
-        automation.isLinear = isLinear;
-        automation.ratioPosition = ratioPosition;
-        automation.value = value * references[reference];
-        return automation;
-    }
-    static buildInstrumentAutomation(isLinear, ratioPosition, value) {
-        let automation = new Automation();
-        automation.type = AutomationType.Instrument;
-        automation.isLinear = isLinear;
-        automation.ratioPosition = ratioPosition;
-        automation.value = value;
-        return automation;
-    }
-}
-var AutomationType;
-(function (AutomationType) {
-    AutomationType[AutomationType["Tempo"] = 0] = "Tempo";
-    AutomationType[AutomationType["Volume"] = 1] = "Volume";
-    AutomationType[AutomationType["Instrument"] = 2] = "Instrument";
-    AutomationType[AutomationType["Balance"] = 3] = "Balance";
-})(AutomationType || (AutomationType = {}));
-var FermataType;
-(function (FermataType) {
-    FermataType[FermataType["Short"] = 0] = "Short";
-    FermataType[FermataType["Medium"] = 1] = "Medium";
-    FermataType[FermataType["Long"] = 2] = "Long";
-})(FermataType || (FermataType = {}));
-class Fermata {
-    constructor() {
-        this.type = FermataType.Short;
-        this.length = 0;
-    }
-}
-class MidiUtils {
-    static ticksToMillis(ticks, tempo) {
-        return (ticks * (60000.0 / (tempo * MidiUtils.QuarterTime))) | 0;
-    }
-    static millisToTicks(millis, tempo) {
-        return (millis / (60000.0 / (tempo * MidiUtils.QuarterTime))) | 0;
-    }
-    static toTicks(duration) {
-        return MidiUtils.valueToTicks(duration);
-    }
-    static valueToTicks(duration) {
-        let denomninator = duration;
-        if (denomninator < 0) {
-            denomninator = 1 / -denomninator;
-        }
-        return (MidiUtils.QuarterTime * (4.0 / denomninator)) | 0;
-    }
-    static applyDot(ticks, doubleDotted) {
-        if (doubleDotted) {
-            return ticks + ((ticks / 4) | 0) * 3;
-        }
-        return ticks + ((ticks / 2) | 0);
-    }
-    static applyTuplet(ticks, numerator, denominator) {
-        return ((ticks * denominator) / numerator) | 0;
-    }
-    static removeTuplet(ticks, numerator, denominator) {
-        return ((ticks * numerator) / denominator) | 0;
-    }
-    static dynamicToVelocity(dynamicsSteps) {
-        return MidiUtils.MinVelocity + dynamicsSteps * MidiUtils.VelocityIncrement;
-    }
-}
-MidiUtils.QuarterTime = 960;
-MidiUtils.MinVelocity = 15;
-MidiUtils.VelocityIncrement = 16;
-class MasterBar {
-    constructor() {
-        this.alternateEndings = 0;
-        this.nextMasterBar = null;
-        this.previousMasterBar = null;
-        this.index = 0;
-        this.keySignature = KeySignature.C;
-        this.keySignatureType = KeySignatureType.Major;
-        this.isDoubleBar = false;
-        this.isRepeatStart = false;
-        this.repeatCount = 0;
-        this.timeSignatureNumerator = 4;
-        this.timeSignatureDenominator = 4;
-        this.timeSignatureCommon = false;
-        this.tripletFeel = TripletFeel.NoTripletFeel;
-        this.section = null;
-        this.tempoAutomation = null;
-        this.fermata = null;
-        this.start = 0;
-        this.isAnacrusis = false;
-        this.displayScale = 1;
-        this.displayWidth = -1;
-    }
-    get isRepeatEnd() {
-        return this.repeatCount > 0;
-    }
-    get isSectionStart() {
-        return !!this.section;
-    }
-    calculateDuration(respectAnacrusis = true) {
-        if (this.isAnacrusis && respectAnacrusis) {
-            let duration = 0;
-            for (let track of this.score.tracks) {
-                for (let staff of track.staves) {
-                    let barDuration = this.index < staff.bars.length ? staff.bars[this.index].calculateDuration() : 0;
-                    if (barDuration > duration) {
-                        duration = barDuration;
-                    }
-                }
-            }
-            return duration;
-        }
-        return this.timeSignatureNumerator * MidiUtils.valueToTicks(this.timeSignatureDenominator);
-    }
-    addFermata(offset, fermata) {
-        let fermataMap = this.fermata;
-        if (fermataMap === null) {
-            fermataMap = new Map();
-            this.fermata = fermataMap;
-        }
-        fermataMap.set(offset, fermata);
-    }
-    getFermata(beat) {
-        const fermataMap = this.fermata;
-        if (fermataMap === null) {
-            return null;
-        }
-        if (fermataMap.has(beat.playbackStart)) {
-            return fermataMap.get(beat.playbackStart);
-        }
-        return null;
-    }
-}
-MasterBar.MaxAlternateEndings = 8;
-var Clef;
-(function (Clef) {
-    Clef[Clef["Neutral"] = 0] = "Neutral";
-    Clef[Clef["C3"] = 1] = "C3";
-    Clef[Clef["C4"] = 2] = "C4";
-    Clef[Clef["F4"] = 3] = "F4";
-    Clef[Clef["G2"] = 4] = "G2";
-})(Clef || (Clef = {}));
-var Ottavia;
-(function (Ottavia) {
-    Ottavia[Ottavia["_15ma"] = 0] = "_15ma";
-    Ottavia[Ottavia["_8va"] = 1] = "_8va";
-    Ottavia[Ottavia["Regular"] = 2] = "Regular";
-    Ottavia[Ottavia["_8vb"] = 3] = "_8vb";
-    Ottavia[Ottavia["_15mb"] = 4] = "_15mb";
-})(Ottavia || (Ottavia = {}));
-var SimileMark;
-(function (SimileMark) {
-    SimileMark[SimileMark["None"] = 0] = "None";
-    SimileMark[SimileMark["Simple"] = 1] = "Simple";
-    SimileMark[SimileMark["FirstOfDouble"] = 2] = "FirstOfDouble";
-    SimileMark[SimileMark["SecondOfDouble"] = 3] = "SecondOfDouble";
-})(SimileMark || (SimileMark = {}));
-class Bar {
-    constructor() {
-        this.id = Bar._globalBarId++;
-        this.index = 0;
-        this.nextBar = null;
-        this.previousBar = null;
-        this.clef = Clef.G2;
-        this.clefOttava = Ottavia.Regular;
-        this.voices = [];
-        this.simileMark = SimileMark.None;
-        this.isMultiVoice = false;
-        this.displayScale = 1;
-        this.displayWidth = -1;
-    }
-    get masterBar() {
-        return this.staff.track.score.masterBars[this.index];
-    }
-    get isEmpty() {
-        for (let i = 0, j = this.voices.length; i < j; i++) {
-            if (!this.voices[i].isEmpty) {
-                return false;
-            }
-        }
-        return true;
-    }
-    addVoice(voice) {
-        voice.bar = this;
-        voice.index = this.voices.length;
-        this.voices.push(voice);
-    }
-    finish(settings, sharedDataBag = null) {
-        this.isMultiVoice = false;
-        for (let i = 0, j = this.voices.length; i < j; i++) {
-            let voice = this.voices[i];
-            voice.finish(settings, sharedDataBag);
-            if (i > 0 && !voice.isEmpty) {
-                this.isMultiVoice = true;
-            }
-        }
-    }
-    calculateDuration() {
-        let duration = 0;
-        for (let voice of this.voices) {
-            let voiceDuration = voice.calculateDuration();
-            if (voiceDuration > duration) {
-                duration = voiceDuration;
-            }
-        }
-        return duration;
-    }
-}
-Bar._globalBarId = 0;
-class GraceGroup {
-    constructor() {
-        this.beats = [];
-        this.id = 'empty';
-        this.isComplete = false;
-    }
-    addBeat(beat) {
-        beat.graceIndex = this.beats.length;
-        beat.graceGroup = this;
-        this.beats.push(beat);
-    }
-    finish() {
-        if (this.beats.length > 0) {
-            this.id = this.beats[0].absoluteDisplayStart + '_' + this.beats[0].voice.index;
-        }
-    }
-}
-var GraceType;
-(function (GraceType) {
-    GraceType[GraceType["None"] = 0] = "None";
-    GraceType[GraceType["OnBeat"] = 1] = "OnBeat";
-    GraceType[GraceType["BeforeBeat"] = 2] = "BeforeBeat";
-    GraceType[GraceType["BendGrace"] = 3] = "BendGrace";
-})(GraceType || (GraceType = {}));
-class Voice {
-    constructor() {
-        this.id = Voice._globalBarId++;
-        this.index = 0;
-        this.beats = [];
-        this.isEmpty = true;
-    }
-    insertBeat(after, newBeat) {
-        newBeat.nextBeat = after.nextBeat;
-        if (newBeat.nextBeat) {
-            newBeat.nextBeat.previousBeat = newBeat;
-        }
-        newBeat.previousBeat = after;
-        newBeat.voice = this;
-        after.nextBeat = newBeat;
-        this.beats.splice(after.index + 1, 0, newBeat);
-    }
-    addBeat(beat) {
-        beat.voice = this;
-        beat.index = this.beats.length;
-        this.beats.push(beat);
-        if (!beat.isEmpty) {
-            this.isEmpty = false;
-        }
-    }
-    chain(beat, sharedDataBag = null) {
-        if (!this.bar) {
-            return;
-        }
-        if (beat.index < this.beats.length - 1) {
-            beat.nextBeat = this.beats[beat.index + 1];
-            beat.nextBeat.previousBeat = beat;
-        }
-        else if (beat.isLastOfVoice && beat.voice.bar.nextBar) {
-            let nextVoice = this.bar.nextBar.voices[this.index];
-            if (nextVoice.beats.length > 0) {
-                beat.nextBeat = nextVoice.beats[0];
-                beat.nextBeat.previousBeat = beat;
-            }
-            else {
-                beat.nextBeat.previousBeat = beat;
-            }
-        }
-        beat.chain(sharedDataBag);
-    }
-    addGraceBeat(beat) {
-        if (this.beats.length === 0) {
-            this.addBeat(beat);
-            return;
-        }
-        let lastBeat = this.beats[this.beats.length - 1];
-        this.beats.splice(this.beats.length - 1, 1);
-        this.addBeat(beat);
-        this.addBeat(lastBeat);
-        this.isEmpty = false;
-    }
-    getBeatAtPlaybackStart(playbackStart) {
-        if (this._beatLookup.has(playbackStart)) {
-            return this._beatLookup.get(playbackStart);
-        }
-        return null;
-    }
-    finish(settings, sharedDataBag = null) {
-        this._beatLookup = new Map();
-        let currentGraceGroup = null;
-        for (let index = 0; index < this.beats.length; index++) {
-            let beat = this.beats[index];
-            beat.index = index;
-            this.chain(beat, sharedDataBag);
-            if (beat.graceType === GraceType.None) {
-                beat.graceGroup = currentGraceGroup;
-                if (currentGraceGroup) {
-                    currentGraceGroup.isComplete = true;
-                }
-                currentGraceGroup = null;
-            }
-            else {
-                if (!currentGraceGroup) {
-                    currentGraceGroup = new GraceGroup();
-                }
-                currentGraceGroup.addBeat(beat);
-            }
-        }
-        let currentDisplayTick = 0;
-        let currentPlaybackTick = 0;
-        for (let i = 0; i < this.beats.length; i++) {
-            let beat = this.beats[i];
-            beat.index = i;
-            beat.finish(settings, sharedDataBag);
-            if (beat.graceType === GraceType.None) {
-                if (beat.graceGroup) {
-                    const firstGraceBeat = beat.graceGroup.beats[0];
-                    const lastGraceBeat = beat.graceGroup.beats[beat.graceGroup.beats.length - 1];
-                    if (firstGraceBeat.graceType !== GraceType.BendGrace) {
-                        let stolenDuration = lastGraceBeat.playbackStart + lastGraceBeat.playbackDuration - firstGraceBeat.playbackStart;
-                        switch (firstGraceBeat.graceType) {
-                            case GraceType.BeforeBeat:
-                                if (firstGraceBeat.previousBeat) {
-                                    firstGraceBeat.previousBeat.playbackDuration -= stolenDuration;
-                                    if (firstGraceBeat.previousBeat.voice == this) {
-                                        currentPlaybackTick =
-                                            firstGraceBeat.previousBeat.playbackStart +
-                                                firstGraceBeat.previousBeat.playbackDuration;
-                                    }
-                                    else {
-                                        currentPlaybackTick = -stolenDuration;
-                                    }
-                                }
-                                else {
-                                    currentPlaybackTick = -stolenDuration;
-                                }
-                                for (const graceBeat of beat.graceGroup.beats) {
-                                    this._beatLookup.delete(graceBeat.playbackStart);
-                                    graceBeat.playbackStart = currentPlaybackTick;
-                                    this._beatLookup.set(graceBeat.playbackStart, beat);
-                                    currentPlaybackTick += graceBeat.playbackDuration;
-                                }
-                                break;
-                            case GraceType.OnBeat:
-                                beat.playbackDuration -= stolenDuration;
-                                if (lastGraceBeat.voice === this) {
-                                    currentPlaybackTick = lastGraceBeat.playbackStart + lastGraceBeat.playbackDuration;
-                                }
-                                else {
-                                    currentPlaybackTick = -stolenDuration;
-                                }
-                                break;
-                        }
-                    }
-                }
-                beat.displayStart = currentDisplayTick;
-                beat.playbackStart = currentPlaybackTick;
-                if (beat.fermata) {
-                    this.bar.masterBar.addFermata(beat.playbackStart, beat.fermata);
-                }
-                else {
-                    beat.fermata = this.bar.masterBar.getFermata(beat);
-                }
-                this._beatLookup.set(beat.playbackStart, beat);
-            }
-            else {
-                beat.displayStart = currentDisplayTick;
-                beat.playbackStart = currentPlaybackTick;
-            }
-            beat.finishTuplet();
-            if (beat.graceGroup) {
-                beat.graceGroup.finish();
-            }
-            currentDisplayTick += beat.displayDuration;
-            currentPlaybackTick += beat.playbackDuration;
-        }
-    }
-    calculateDuration() {
-        if (this.isEmpty || this.beats.length === 0) {
-            return 0;
-        }
-        let lastBeat = this.beats[this.beats.length - 1];
-        let firstBeat = this.beats[0];
-        return lastBeat.playbackStart + lastBeat.playbackDuration - firstBeat.playbackStart;
-    }
-}
-Voice._globalBarId = 0;
-class Note {
-    constructor() {
-        this.id = Note.GlobalNoteId++;
-        this.index = 0;
-        this.accentuated = AccentuationType.None;
-        this.bendType = BendType.None;
-        this.bendStyle = BendStyle.Default;
-        this.bendOrigin = null;
-        this.isContinuedBend = false;
-        this.bendPoints = null;
-        this.maxBendPoint = null;
-        this.fret = -1;
-        this.string = -1;
-        this.octave = -1;
-        this.tone = -1;
-        this.percussionArticulation = -1;
-        this.isVisible = true;
-        this.isLeftHandTapped = false;
-        this.isHammerPullOrigin = false;
-        this.hammerPullOrigin = null;
-        this.hammerPullDestination = null;
-        this.isSlurDestination = false;
-        this.slurOrigin = null;
-        this.slurDestination = null;
-        this.harmonicType = HarmonicType.None;
-        this.harmonicValue = 0;
-        this.isGhost = false;
-        this.isLetRing = false;
-        this.letRingDestination = null;
-        this.isPalmMute = false;
-        this.palmMuteDestination = null;
-        this.isDead = false;
-        this.isStaccato = false;
-        this.slideInType = SlideInType.None;
-        this.slideOutType = SlideOutType.None;
-        this.slideTarget = null;
-        this.slideOrigin = null;
-        this.vibrato = VibratoType.None;
-        this.tieOrigin = null;
-        this.tieDestination = null;
-        this.isTieDestination = false;
-        this.leftHandFinger = Fingers.Unknown;
-        this.rightHandFinger = Fingers.Unknown;
-        this.isFingering = false;
-        this.trillValue = -1;
-        this.trillSpeed = Duration.ThirtySecond;
-        this.durationPercent = 1;
-        this.accidentalMode = NoteAccidentalMode.Default;
-        this.dynamics = DynamicValue.F;
-        this.isEffectSlurOrigin = false;
-        this.hasEffectSlur = false;
-        this.effectSlurOrigin = null;
-        this.effectSlurDestination = null;
-        this._noteIdBag = null;
-    }
-    get hasBend() {
-        return this.bendPoints !== null && this.bendType !== BendType.None;
-    }
-    get isStringed() {
-        return this.string >= 0;
-    }
-    get isPiano() {
-        return !this.isStringed && this.octave >= 0 && this.tone >= 0;
-    }
-    get isPercussion() {
-        return !this.isStringed && this.percussionArticulation >= 0;
-    }
-    get element() {
-        return this.isPercussion ? PercussionMapper.getElementAndVariation(this)[0] : -1;
-    }
-    get variation() {
-        return this.isPercussion ? PercussionMapper.getElementAndVariation(this)[1] : -1;
-    }
-    get isHammerPullDestination() {
-        return !!this.hammerPullOrigin;
-    }
-    get isSlurOrigin() {
-        return !!this.slurDestination;
-    }
-    get isHarmonic() {
-        return this.harmonicType !== HarmonicType.None;
-    }
-    get isTieOrigin() {
-        return this.tieDestination !== null;
-    }
-    get trillFret() {
-        return this.trillValue - this.stringTuning;
-    }
-    get isTrill() {
-        return this.trillValue >= 0;
-    }
-    get isEffectSlurDestination() {
-        return !!this.effectSlurOrigin;
-    }
-    get stringTuning() {
-        return this.beat.voice.bar.staff.capo + Note.getStringTuning(this.beat.voice.bar.staff, this.string);
-    }
-    static getStringTuning(staff, noteString) {
-        if (staff.tuning.length > 0) {
-            return staff.tuning[staff.tuning.length - (noteString - 1) - 1];
-        }
-        return 0;
-    }
-    get realValue() {
-        return this.calculateRealValue(true, true);
-    }
-    get realValueWithoutHarmonic() {
-        return this.calculateRealValue(true, false);
-    }
-    calculateRealValue(applyTranspositionPitch, applyHarmonic) {
-        const transpositionPitch = applyTranspositionPitch ? this.beat.voice.bar.staff.transpositionPitch : 0;
-        if (applyHarmonic) {
-            let realValue = this.calculateRealValue(applyTranspositionPitch, false);
-            if (this.isStringed) {
-                if (this.harmonicType === HarmonicType.Natural) {
-                    realValue = this.harmonicPitch + this.stringTuning - transpositionPitch;
-                }
-                else {
-                    realValue += this.harmonicPitch;
-                }
-            }
-            return realValue;
-        }
-        else {
-            if (this.isPercussion) {
-                return this.percussionArticulation;
-            }
-            if (this.isStringed) {
-                return this.fret + this.stringTuning - transpositionPitch;
-            }
-            if (this.isPiano) {
-                return this.octave * 12 + this.tone - transpositionPitch;
-            }
-            return 0;
-        }
-    }
-    get harmonicPitch() {
-        if (this.harmonicType === HarmonicType.None || !this.isStringed) {
-            return 0;
-        }
-        let value = this.harmonicValue;
-        if (ModelUtils.isAlmostEqualTo(value, 2.4)) {
-            return 36;
-        }
-        if (ModelUtils.isAlmostEqualTo(value, 2.7)) {
-            return 34;
-        }
-        if (value < 3) {
-            return 0;
-        }
-        if (value <= 3.5) {
-            return 31;
-        }
-        if (value <= 4) {
-            return 28;
-        }
-        if (value <= 5) {
-            return 24;
-        }
-        if (value <= 6) {
-            return 34;
-        }
-        if (value <= 7) {
-            return 19;
-        }
-        if (value <= 8.5) {
-            return 36;
-        }
-        if (value <= 9) {
-            return 28;
-        }
-        if (value <= 10) {
-            return 34;
-        }
-        if (value <= 11) {
-            return 0;
-        }
-        if (value <= 12) {
-            return 12;
-        }
-        if (value < 14) {
-            return 0;
-        }
-        if (value <= 15) {
-            return 34;
-        }
-        if (value <= 16) {
-            return 28;
-        }
-        if (value <= 17) {
-            return 36;
-        }
-        if (value <= 18) {
-            return 0;
-        }
-        if (value <= 19) {
-            return 19;
-        }
-        if (value <= 21) {
-            return 0;
-        }
-        if (value <= 22) {
-            return 36;
-        }
-        if (value <= 24) {
-            return 24;
-        }
-        return 0;
-    }
-    get initialBendValue() {
-        if (this.hasBend) {
-            return Math.floor(this.bendPoints[0].value / 2);
-        }
-        else if (this.bendOrigin) {
-            return Math.floor(this.bendOrigin.bendPoints[this.bendOrigin.bendPoints.length - 1].value / 2);
-        }
-        else if (this.isTieDestination && this.tieOrigin.bendOrigin) {
-            return Math.floor(this.tieOrigin.bendOrigin.bendPoints[this.tieOrigin.bendOrigin.bendPoints.length - 1].value / 2);
-        }
-        else if (this.beat.hasWhammyBar) {
-            return Math.floor(this.beat.whammyBarPoints[0].value / 2);
-        }
-        else if (this.beat.isContinuedWhammy) {
-            return Math.floor(this.beat.previousBeat.whammyBarPoints[this.beat.previousBeat.whammyBarPoints.length - 1].value / 2);
-        }
-        return 0;
-    }
-    get displayValue() {
-        return this.displayValueWithoutBend + this.initialBendValue;
-    }
-    get displayValueWithoutBend() {
-        let noteValue = this.realValue;
-        if (this.harmonicType !== HarmonicType.Natural && this.harmonicType !== HarmonicType.None) {
-            noteValue -= this.harmonicPitch;
-        }
-        switch (this.beat.ottava) {
-            case Ottavia._15ma:
-                noteValue -= 24;
-                break;
-            case Ottavia._8va:
-                noteValue -= 12;
-                break;
-            case Ottavia.Regular:
-                break;
-            case Ottavia._8vb:
-                noteValue += 12;
-                break;
-            case Ottavia._15mb:
-                noteValue += 24;
-                break;
-        }
-        switch (this.beat.voice.bar.clefOttava) {
-            case Ottavia._15ma:
-                noteValue -= 24;
-                break;
-            case Ottavia._8va:
-                noteValue -= 12;
-                break;
-            case Ottavia.Regular:
-                break;
-            case Ottavia._8vb:
-                noteValue += 12;
-                break;
-            case Ottavia._15mb:
-                noteValue += 24;
-                break;
-        }
-        return noteValue - this.beat.voice.bar.staff.displayTranspositionPitch;
-    }
-    get hasQuarterToneOffset() {
-        if (this.hasBend) {
-            return this.bendPoints[0].value % 2 !== 0;
-        }
-        if (this.bendOrigin) {
-            return this.bendOrigin.bendPoints[this.bendOrigin.bendPoints.length - 1].value % 2 !== 0;
-        }
-        if (this.beat.hasWhammyBar) {
-            return this.beat.whammyBarPoints[0].value % 2 !== 0;
-        }
-        if (this.beat.isContinuedWhammy) {
-            return (this.beat.previousBeat.whammyBarPoints[this.beat.previousBeat.whammyBarPoints.length - 1].value %
-                2 !==
-                0);
-        }
-        return false;
-    }
-    addBendPoint(point) {
-        let points = this.bendPoints;
-        if (points === null) {
-            points = [];
-            this.bendPoints = points;
-        }
-        points.push(point);
-        if (!this.maxBendPoint || point.value > this.maxBendPoint.value) {
-            this.maxBendPoint = point;
-        }
-        if (this.bendType === BendType.None) {
-            this.bendType = BendType.Custom;
-        }
-    }
-    finish(settings, sharedDataBag = null) {
-        let nextNoteOnLine = new Lazy(() => Note.nextNoteOnSameLine(this));
-        let isSongBook = settings && settings.notation.notationMode === NotationMode.SongBook;
-        if (this.isTieDestination) {
-            this.chain(sharedDataBag);
-            if (isSongBook && this.tieOrigin && this.tieOrigin.isLetRing) {
-                this.isLetRing = true;
-            }
-        }
-        if (this.isLetRing) {
-            if (!nextNoteOnLine.value || !nextNoteOnLine.value.isLetRing) {
-                this.letRingDestination = this;
-            }
-            else {
-                this.letRingDestination = nextNoteOnLine.value;
-            }
-            if (isSongBook && this.isTieDestination && !this.tieOrigin.hasBend) {
-                this.isVisible = false;
-            }
-        }
-        if (this.isPalmMute) {
-            if (!nextNoteOnLine.value || !nextNoteOnLine.value.isPalmMute) {
-                this.palmMuteDestination = this;
-            }
-            else {
-                this.palmMuteDestination = nextNoteOnLine.value;
-            }
-        }
-        if (this.isHammerPullOrigin) {
-            let hammerPullDestination = Note.findHammerPullDestination(this);
-            if (!hammerPullDestination) {
-                this.isHammerPullOrigin = false;
-            }
-            else {
-                this.hammerPullDestination = hammerPullDestination;
-                hammerPullDestination.hammerPullOrigin = this;
-            }
-        }
-        switch (this.slideOutType) {
-            case SlideOutType.Shift:
-            case SlideOutType.Legato:
-                this.slideTarget = nextNoteOnLine.value;
-                if (!this.slideTarget) {
-                    this.slideOutType = SlideOutType.None;
-                }
-                else {
-                    this.slideTarget.slideOrigin = this;
-                }
-                break;
-        }
-        let effectSlurDestination = null;
-        if (this.isHammerPullOrigin && this.hammerPullDestination) {
-            effectSlurDestination = this.hammerPullDestination;
-        }
-        else if (this.slideOutType === SlideOutType.Legato && this.slideTarget) {
-            effectSlurDestination = this.slideTarget;
-        }
-        if (effectSlurDestination) {
-            this.hasEffectSlur = true;
-            if (this.effectSlurOrigin && this.beat.pickStroke === PickStroke.None) {
-                this.effectSlurOrigin.effectSlurDestination = effectSlurDestination;
-                this.effectSlurOrigin.effectSlurDestination.effectSlurOrigin = this.effectSlurOrigin;
-                this.effectSlurOrigin = null;
-            }
-            else {
-                this.isEffectSlurOrigin = true;
-                this.effectSlurDestination = effectSlurDestination;
-                this.effectSlurDestination.effectSlurOrigin = this;
-            }
-        }
-        const points = this.bendPoints;
-        if (points != null && points.length > 0 && this.bendType === BendType.Custom) {
-            let isContinuedBend = this.isTieDestination && this.tieOrigin.hasBend;
-            this.isContinuedBend = isContinuedBend;
-            if (points.length === 4) {
-                let origin = points[0];
-                let middle1 = points[1];
-                let middle2 = points[2];
-                let destination = points[3];
-                if (middle1.value === middle2.value) {
-                    if (destination.value > origin.value) {
-                        if (middle1.value > destination.value) {
-                            this.bendType = BendType.BendRelease;
-                        }
-                        else if (!isContinuedBend && origin.value > 0) {
-                            this.bendType = BendType.PrebendBend;
-                            points.splice(2, 1);
-                            points.splice(1, 1);
-                        }
-                        else {
-                            this.bendType = BendType.Bend;
-                            points.splice(2, 1);
-                            points.splice(1, 1);
-                        }
-                    }
-                    else if (destination.value < origin.value) {
-                        if (isContinuedBend) {
-                            this.bendType = BendType.Release;
-                            points.splice(2, 1);
-                            points.splice(1, 1);
-                        }
-                        else {
-                            this.bendType = BendType.PrebendRelease;
-                            points.splice(2, 1);
-                            points.splice(1, 1);
-                        }
-                    }
-                    else {
-                        if (middle1.value > origin.value) {
-                            this.bendType = BendType.BendRelease;
-                        }
-                        else if (origin.value > 0 && !isContinuedBend) {
-                            this.bendType = BendType.Prebend;
-                            points.splice(2, 1);
-                            points.splice(1, 1);
-                        }
-                        else {
-                            this.bendType = BendType.Hold;
-                            points.splice(2, 1);
-                            points.splice(1, 1);
-                        }
-                    }
-                }
-                else {
-                }
-            }
-            else if (points.length === 2) {
-                let origin = points[0];
-                let destination = points[1];
-                if (destination.value > origin.value) {
-                    if (!isContinuedBend && origin.value > 0) {
-                        this.bendType = BendType.PrebendBend;
-                    }
-                    else {
-                        this.bendType = BendType.Bend;
-                    }
-                }
-                else if (destination.value < origin.value) {
-                    if (isContinuedBend) {
-                        this.bendType = BendType.Release;
-                    }
-                    else {
-                        this.bendType = BendType.PrebendRelease;
-                    }
-                }
-                else {
-                    this.bendType = BendType.Hold;
-                }
-            }
-        }
-        else if (points === null || points.length === 0) {
-            this.bendType = BendType.None;
-        }
-        if (this.initialBendValue > 0) {
-            this.accidentalMode = NoteAccidentalMode.Default;
-        }
-    }
-    static nextNoteOnSameLine(note) {
-        let nextBeat = note.beat.nextBeat;
-        while (nextBeat && nextBeat.voice.bar.index <= note.beat.voice.bar.index + Note.MaxOffsetForSameLineSearch) {
-            let noteOnString = nextBeat.getNoteOnString(note.string);
-            if (noteOnString) {
-                return noteOnString;
-            }
-            nextBeat = nextBeat.nextBeat;
-        }
-        return null;
-    }
-    static findHammerPullDestination(note) {
-        let nextBeat = note.beat.nextBeat;
-        while (nextBeat && nextBeat.voice.bar.index <= note.beat.voice.bar.index + Note.MaxOffsetForSameLineSearch) {
-            let noteOnString = nextBeat.getNoteOnString(note.string);
-            if (noteOnString) {
-                return noteOnString;
-            }
-            for (let str = note.string; str > 0; str--) {
-                noteOnString = nextBeat.getNoteOnString(str);
-                if (noteOnString) {
-                    if (noteOnString.isLeftHandTapped) {
-                        return noteOnString;
-                    }
-                    else {
-                        break;
-                    }
-                }
-            }
-            for (let str = note.string; str <= note.beat.voice.bar.staff.tuning.length; str++) {
-                noteOnString = nextBeat.getNoteOnString(str);
-                if (noteOnString) {
-                    if (noteOnString.isLeftHandTapped) {
-                        return noteOnString;
-                    }
-                    else {
-                        break;
-                    }
-                }
-            }
-            nextBeat = nextBeat.nextBeat;
-        }
-        return null;
-    }
-    static findTieOrigin(note) {
-        let previousBeat = note.beat.previousBeat;
-        while (previousBeat &&
-            previousBeat.voice.bar.index >= note.beat.voice.bar.index - Note.MaxOffsetForSameLineSearch) {
-            if (note.isStringed) {
-                let noteOnString = previousBeat.getNoteOnString(note.string);
-                if (noteOnString) {
-                    return noteOnString;
-                }
-            }
-            else {
-                if (note.octave === -1 && note.tone === -1) {
-                    if (note.index < previousBeat.notes.length) {
-                        return previousBeat.notes[note.index];
-                    }
-                }
-                else {
-                    let noteWithValue = previousBeat.getNoteWithRealValue(note.realValue);
-                    if (noteWithValue) {
-                        return noteWithValue;
-                    }
-                }
-            }
-            previousBeat = previousBeat.previousBeat;
-        }
-        return null;
-    }
-    chain(sharedDataBag = null) {
-        var _a;
-        if (sharedDataBag === null) {
-            return;
-        }
-        if (this._noteIdBag !== null) {
-            let noteIdLookup;
-            if (sharedDataBag.has(Note.NoteIdLookupKey)) {
-                noteIdLookup = sharedDataBag.get(Note.NoteIdLookupKey);
-            }
-            else {
-                noteIdLookup = new Map();
-                sharedDataBag.set(Note.NoteIdLookupKey, noteIdLookup);
-            }
-            if (this._noteIdBag.hammerPullDestinationNoteId !== -1 ||
-                this._noteIdBag.tieDestinationNoteId !== -1 ||
-                this._noteIdBag.slurDestinationNoteId !== -1) {
-                noteIdLookup.set(this.id, this);
-            }
-            if (this._noteIdBag.hammerPullOriginNoteId !== -1) {
-                this.hammerPullOrigin = noteIdLookup.get(this._noteIdBag.hammerPullOriginNoteId);
-                this.hammerPullOrigin.hammerPullDestination = this;
-            }
-            if (this._noteIdBag.tieOriginNoteId !== -1) {
-                this.tieOrigin = noteIdLookup.get(this._noteIdBag.tieOriginNoteId);
-                this.tieOrigin.tieDestination = this;
-            }
-            if (this._noteIdBag.slurOriginNoteId !== -1) {
-                this.slurOrigin = noteIdLookup.get(this._noteIdBag.slurOriginNoteId);
-                this.slurOrigin.slurDestination = this;
-            }
-            this._noteIdBag = null;
-        }
-        else {
-            if (!this.isTieDestination && this.tieOrigin === null) {
-                return;
-            }
-            let tieOrigin = (_a = this.tieOrigin) !== null && _a !== void 0 ? _a : Note.findTieOrigin(this);
-            if (!tieOrigin) {
-                this.isTieDestination = false;
-            }
-            else {
-                tieOrigin.tieDestination = this;
-                this.tieOrigin = tieOrigin;
-                this.fret = tieOrigin.fret;
-                this.octave = tieOrigin.octave;
-                this.tone = tieOrigin.tone;
-                if (tieOrigin.hasBend) {
-                    this.bendOrigin = this.tieOrigin;
-                }
-            }
-        }
-    }
-    toJson(o) {
-        if (this.tieDestination !== null) {
-            o.set('tiedestinationnoteid', this.tieDestination.id);
-        }
-        if (this.tieOrigin !== null) {
-            o.set('tieoriginnoteid', this.tieOrigin.id);
-        }
-        if (this.slurDestination !== null) {
-            o.set('slurdestinationnoteid', this.slurDestination.id);
-        }
-        if (this.slurOrigin !== null) {
-            o.set('sluroriginnoteid', this.slurOrigin.id);
-        }
-        if (this.hammerPullOrigin !== null) {
-            o.set('hammerpulloriginnoteid', this.hammerPullOrigin.id);
-        }
-        if (this.hammerPullDestination !== null) {
-            o.set('hammerpulldestinationnoteid', this.hammerPullDestination.id);
-        }
-    }
-    setProperty(property, v) {
-        switch (property) {
-            case "tiedestinationnoteid":
-                if (this._noteIdBag == null) {
-                    this._noteIdBag = new NoteIdBag();
-                }
-                this._noteIdBag.tieDestinationNoteId = v;
-                return true;
-            case "tieoriginnoteid":
-                if (this._noteIdBag == null) {
-                    this._noteIdBag = new NoteIdBag();
-                }
-                this._noteIdBag.tieOriginNoteId = v;
-                return true;
-            case "slurdestinationnoteid":
-                if (this._noteIdBag == null) {
-                    this._noteIdBag = new NoteIdBag();
-                }
-                this._noteIdBag.slurDestinationNoteId = v;
-                return true;
-            case "sluroriginnoteid":
-                if (this._noteIdBag == null) {
-                    this._noteIdBag = new NoteIdBag();
-                }
-                this._noteIdBag.slurOriginNoteId = v;
-                return true;
-            case "hammerpulloriginnoteid":
-                if (this._noteIdBag == null) {
-                    this._noteIdBag = new NoteIdBag();
-                }
-                this._noteIdBag.hammerPullOriginNoteId = v;
-                return true;
-            case "hammerpulldestinationnoteid":
-                if (this._noteIdBag == null) {
-                    this._noteIdBag = new NoteIdBag();
-                }
-                this._noteIdBag.hammerPullDestinationNoteId = v;
-                return true;
-        }
-        return false;
-    }
-}
-Note.GlobalNoteId = 0;
-Note.MaxOffsetForSameLineSearch = 3;
-Note.NoteIdLookupKey = 'NoteIdLookup';
-class Beat {
-    constructor() {
-        this.id = Beat._globalBeatId++;
-        this.index = 0;
-        this.previousBeat = null;
-        this.nextBeat = null;
-        this.notes = [];
-        this.noteStringLookup = new Map();
-        this.noteValueLookup = new Map();
-        this.isEmpty = false;
-        this.whammyStyle = BendStyle.Default;
-        this.ottava = Ottavia.Regular;
-        this.fermata = null;
-        this.isLegatoOrigin = false;
-        this.minNote = null;
-        this.maxNote = null;
-        this.maxStringNote = null;
-        this.minStringNote = null;
-        this.duration = Duration.Quarter;
-        this.isLetRing = false;
-        this.isPalmMute = false;
-        this.automations = [];
-        this.dots = 0;
-        this.fadeIn = false;
-        this.lyrics = null;
-        this.hasRasgueado = false;
-        this.pop = false;
-        this.slap = false;
-        this.tap = false;
-        this.text = null;
-        this.brushType = BrushType.None;
-        this.brushDuration = 0;
-        this.tupletDenominator = -1;
-        this.tupletNumerator = -1;
-        this.tupletGroup = null;
-        this.isContinuedWhammy = false;
-        this.whammyBarType = WhammyType.None;
-        this.whammyBarPoints = null;
-        this.maxWhammyPoint = null;
-        this.minWhammyPoint = null;
-        this.vibrato = VibratoType.None;
-        this.chordId = null;
-        this.graceType = GraceType.None;
-        this.graceGroup = null;
-        this.graceIndex = -1;
-        this.pickStroke = PickStroke.None;
-        this.tremoloSpeed = null;
-        this.crescendo = CrescendoType.None;
-        this.displayStart = 0;
-        this.playbackStart = 0;
-        this.displayDuration = 0;
-        this.playbackDuration = 0;
-        this.dynamics = DynamicValue.F;
-        this.invertBeamDirection = false;
-        this.preferredBeamDirection = null;
-        this.isEffectSlurOrigin = false;
-        this.effectSlurOrigin = null;
-        this.effectSlurDestination = null;
-        this.beamingMode = BeatBeamingMode.Auto;
-    }
-    get isLastOfVoice() {
-        return this.index === this.voice.beats.length - 1;
-    }
-    get isLegatoDestination() {
-        return !!this.previousBeat && this.previousBeat.isLegatoOrigin;
-    }
-    get isRest() {
-        return this.isEmpty || this.notes.length === 0;
-    }
-    get isFullBarRest() {
-        return this.isRest && this.voice.beats.length === 1 && this.duration === Duration.Whole;
-    }
-    get hasTuplet() {
-        return (!(this.tupletDenominator === -1 && this.tupletNumerator === -1) &&
-            !(this.tupletDenominator === 1 && this.tupletNumerator === 1));
-    }
-    get hasWhammyBar() {
-        return this.whammyBarPoints !== null && this.whammyBarType !== WhammyType.None;
-    }
-    get hasChord() {
-        return !!this.chordId;
-    }
-    get chord() {
-        return this.chordId ? this.voice.bar.staff.getChord(this.chordId) : null;
-    }
-    get isTremolo() {
-        return !!this.tremoloSpeed;
-    }
-    get absoluteDisplayStart() {
-        return this.voice.bar.masterBar.start + this.displayStart;
-    }
-    get absolutePlaybackStart() {
-        return this.voice.bar.masterBar.start + this.playbackStart;
-    }
-    get isEffectSlurDestination() {
-        return !!this.effectSlurOrigin;
-    }
-    addWhammyBarPoint(point) {
-        let points = this.whammyBarPoints;
-        if (points === null) {
-            points = [];
-            this.whammyBarPoints = points;
-        }
-        points.push(point);
-        if (!this.maxWhammyPoint || point.value > this.maxWhammyPoint.value) {
-            this.maxWhammyPoint = point;
-        }
-        if (!this.minWhammyPoint || point.value < this.minWhammyPoint.value) {
-            this.minWhammyPoint = point;
-        }
-        if (this.whammyBarType === WhammyType.None) {
-            this.whammyBarType = WhammyType.Custom;
-        }
-    }
-    removeWhammyBarPoint(index) {
-        const points = this.whammyBarPoints;
-        if (points === null || index < 0 || index >= points.length) {
-            return;
-        }
-        points.splice(index, 1);
-        let point = points[index];
-        if (point === this.maxWhammyPoint) {
-            this.maxWhammyPoint = null;
-            for (let currentPoint of points) {
-                if (!this.maxWhammyPoint || currentPoint.value > this.maxWhammyPoint.value) {
-                    this.maxWhammyPoint = currentPoint;
-                }
-            }
-        }
-        if (point === this.minWhammyPoint) {
-            this.minWhammyPoint = null;
-            for (let currentPoint of points) {
-                if (!this.minWhammyPoint || currentPoint.value < this.minWhammyPoint.value) {
-                    this.minWhammyPoint = currentPoint;
-                }
-            }
-        }
-    }
-    addNote(note) {
-        note.beat = this;
-        note.index = this.notes.length;
-        this.notes.push(note);
-        if (note.isStringed) {
-            this.noteStringLookup.set(note.string, note);
-        }
-    }
-    removeNote(note) {
-        let index = this.notes.indexOf(note);
-        if (index >= 0) {
-            this.notes.splice(index, 1);
-            if (note.isStringed) {
-                this.noteStringLookup.delete(note.string);
-            }
-        }
-    }
-    getAutomation(type) {
-        for (let i = 0, j = this.automations.length; i < j; i++) {
-            let automation = this.automations[i];
-            if (automation.type === type) {
-                return automation;
-            }
-        }
-        return null;
-    }
-    getNoteOnString(noteString) {
-        if (this.noteStringLookup.has(noteString)) {
-            return this.noteStringLookup.get(noteString);
-        }
-        return null;
-    }
-    calculateDuration() {
-        if (this.isFullBarRest) {
-            return this.voice.bar.masterBar.calculateDuration();
-        }
-        let ticks = MidiUtils.toTicks(this.duration);
-        if (this.dots === 2) {
-            ticks = MidiUtils.applyDot(ticks, true);
-        }
-        else if (this.dots === 1) {
-            ticks = MidiUtils.applyDot(ticks, false);
-        }
-        if (this.tupletDenominator > 0 && this.tupletNumerator >= 0) {
-            ticks = MidiUtils.applyTuplet(ticks, this.tupletNumerator, this.tupletDenominator);
-        }
-        return ticks;
-    }
-    updateDurations() {
-        let ticks = this.calculateDuration();
-        this.playbackDuration = ticks;
-        switch (this.graceType) {
-            case GraceType.BeforeBeat:
-            case GraceType.OnBeat:
-                switch (this.duration) {
-                    case Duration.Sixteenth:
-                        this.playbackDuration = MidiUtils.toTicks(Duration.SixtyFourth);
-                        break;
-                    case Duration.ThirtySecond:
-                        this.playbackDuration = MidiUtils.toTicks(Duration.OneHundredTwentyEighth);
-                        break;
-                    default:
-                        this.playbackDuration = MidiUtils.toTicks(Duration.ThirtySecond);
-                        break;
-                }
-                this.displayDuration = 0;
-                break;
-            case GraceType.BendGrace:
-                this.playbackDuration /= 2;
-                this.displayDuration = 0;
-                break;
-            default:
-                this.displayDuration = ticks;
-                let previous = this.previousBeat;
-                if (previous && previous.graceType === GraceType.BendGrace) {
-                    this.playbackDuration = previous.playbackDuration;
-                }
-                break;
-        }
-    }
-    finishTuplet() {
-        let previousBeat = this.previousBeat;
-        let currentTupletGroup = previousBeat ? previousBeat.tupletGroup : null;
-        if (this.hasTuplet || (this.graceType !== GraceType.None && currentTupletGroup)) {
-            if (!previousBeat || !currentTupletGroup || !currentTupletGroup.check(this)) {
-                currentTupletGroup = new TupletGroup(this.voice);
-                currentTupletGroup.check(this);
-            }
-            this.tupletGroup = currentTupletGroup;
-        }
-    }
-    finish(settings, sharedDataBag = null) {
-        if (this.getAutomation(AutomationType.Instrument) === null &&
-            this.index === 0 &&
-            this.voice.index === 0 &&
-            this.voice.bar.index === 0 &&
-            this.voice.bar.staff.index === 0) {
-            this.automations.push(Automation.buildInstrumentAutomation(false, 0, this.voice.bar.staff.track.playbackInfo.program));
-        }
-        switch (this.graceType) {
-            case GraceType.OnBeat:
-            case GraceType.BeforeBeat:
-                let numberOfGraceBeats = this.graceGroup.beats.length;
-                if (numberOfGraceBeats === 1) {
-                    this.duration = Duration.Eighth;
-                }
-                else if (numberOfGraceBeats === 2) {
-                    this.duration = Duration.Sixteenth;
-                }
-                else {
-                    this.duration = Duration.ThirtySecond;
-                }
-                break;
-        }
-        let displayMode = !settings ? NotationMode.GuitarPro : settings.notation.notationMode;
-        let isGradual = this.text === 'grad' || this.text === 'grad.';
-        if (isGradual && displayMode === NotationMode.SongBook) {
-            this.text = '';
-        }
-        let needCopyBeatForBend = false;
-        this.minNote = null;
-        this.maxNote = null;
-        this.minStringNote = null;
-        this.maxStringNote = null;
-        let visibleNotes = 0;
-        let isEffectSlurBeat = false;
-        for (let i = 0, j = this.notes.length; i < j; i++) {
-            let note = this.notes[i];
-            note.dynamics = this.dynamics;
-            note.finish(settings, sharedDataBag);
-            if (note.isLetRing) {
-                this.isLetRing = true;
-            }
-            if (note.isPalmMute) {
-                this.isPalmMute = true;
-            }
-            if (displayMode === NotationMode.SongBook && note.hasBend && this.graceType !== GraceType.BendGrace) {
-                if (!note.isTieOrigin) {
-                    switch (note.bendType) {
-                        case BendType.Bend:
-                        case BendType.PrebendRelease:
-                        case BendType.PrebendBend:
-                            needCopyBeatForBend = true;
-                            break;
-                    }
-                }
-                if (isGradual || note.bendStyle === BendStyle.Gradual) {
-                    isGradual = true;
-                    note.bendStyle = BendStyle.Gradual;
-                    needCopyBeatForBend = false;
-                }
-                else {
-                    note.bendStyle = BendStyle.Fast;
-                }
-            }
-            if (note.isVisible) {
-                visibleNotes++;
-                if (!this.minNote || note.realValue < this.minNote.realValue) {
-                    this.minNote = note;
-                }
-                if (!this.maxNote || note.realValue > this.maxNote.realValue) {
-                    this.maxNote = note;
-                }
-                if (!this.minStringNote || note.string < this.minStringNote.string) {
-                    this.minStringNote = note;
-                }
-                if (!this.maxStringNote || note.string > this.maxStringNote.string) {
-                    this.maxStringNote = note;
-                }
-                if (note.hasEffectSlur) {
-                    isEffectSlurBeat = true;
-                }
-            }
-        }
-        if (isEffectSlurBeat) {
-            if (this.effectSlurOrigin) {
-                this.effectSlurOrigin.effectSlurDestination = this.nextBeat;
-                if (this.effectSlurOrigin.effectSlurDestination) {
-                    this.effectSlurOrigin.effectSlurDestination.effectSlurOrigin = this.effectSlurOrigin;
-                }
-                this.effectSlurOrigin = null;
-            }
-            else {
-                this.isEffectSlurOrigin = true;
-                this.effectSlurDestination = this.nextBeat;
-                if (this.effectSlurDestination) {
-                    this.effectSlurDestination.effectSlurOrigin = this;
-                }
-            }
-        }
-        if (this.notes.length > 0 && visibleNotes === 0) {
-            this.isEmpty = true;
-        }
-        if (!this.isRest && (!this.isLetRing || !this.isPalmMute)) {
-            let currentBeat = this.previousBeat;
-            while (currentBeat && currentBeat.isRest) {
-                if (!this.isLetRing) {
-                    currentBeat.isLetRing = false;
-                }
-                if (!this.isPalmMute) {
-                    currentBeat.isPalmMute = false;
-                }
-                currentBeat = currentBeat.previousBeat;
-            }
-        }
-        else if (this.isRest &&
-            this.previousBeat &&
-            settings &&
-            settings.notation.notationMode === NotationMode.GuitarPro) {
-            if (this.previousBeat.isLetRing) {
-                this.isLetRing = true;
-            }
-            if (this.previousBeat.isPalmMute) {
-                this.isPalmMute = true;
-            }
-        }
-        const points = this.whammyBarPoints;
-        if (points !== null && points.length > 0 && this.whammyBarType === WhammyType.Custom) {
-            if (displayMode === NotationMode.SongBook) {
-                this.whammyStyle = isGradual ? BendStyle.Gradual : BendStyle.Fast;
-            }
-            let isContinuedWhammy = !!this.previousBeat && this.previousBeat.hasWhammyBar;
-            this.isContinuedWhammy = isContinuedWhammy;
-            if (points.length === 4) {
-                let origin = points[0];
-                let middle1 = points[1];
-                let middle2 = points[2];
-                let destination = points[3];
-                if (middle1.value === middle2.value) {
-                    if ((origin.value < middle1.value && middle1.value < destination.value) ||
-                        (origin.value > middle1.value && middle1.value > destination.value)) {
-                        if (origin.value !== 0 && !isContinuedWhammy) {
-                            this.whammyBarType = WhammyType.PrediveDive;
-                        }
-                        else {
-                            this.whammyBarType = WhammyType.Dive;
-                        }
-                        points.splice(2, 1);
-                        points.splice(1, 1);
-                    }
-                    else if ((origin.value > middle1.value && middle1.value < destination.value) ||
-                        (origin.value < middle1.value && middle1.value > destination.value)) {
-                        this.whammyBarType = WhammyType.Dip;
-                        if (middle1.offset === middle2.offset || displayMode === NotationMode.SongBook) {
-                            points.splice(2, 1);
-                        }
-                    }
-                    else if (origin.value === middle1.value && middle1.value === destination.value) {
-                        if (origin.value !== 0 && !isContinuedWhammy) {
-                            this.whammyBarType = WhammyType.Predive;
-                        }
-                        else {
-                            this.whammyBarType = WhammyType.Hold;
-                        }
-                        points.splice(2, 1);
-                        points.splice(1, 1);
-                    }
-                }
-            }
-        }
-        this.updateDurations();
-        if (needCopyBeatForBend) {
-            let cloneBeat = BeatCloner.clone(this);
-            cloneBeat.id = Beat._globalBeatId++;
-            cloneBeat.pickStroke = PickStroke.None;
-            for (let i = 0, j = cloneBeat.notes.length; i < j; i++) {
-                let cloneNote = cloneBeat.notes[i];
-                let note = this.notes[i];
-                cloneNote.bendType = BendType.None;
-                cloneNote.maxBendPoint = null;
-                cloneNote.bendPoints = null;
-                cloneNote.bendStyle = BendStyle.Default;
-                cloneNote.id = Note.GlobalNoteId++;
-                if (note.isTieOrigin) {
-                    cloneNote.tieDestination = note.tieDestination;
-                    note.tieDestination.tieOrigin = cloneNote;
-                }
-                if (note.isTieDestination) {
-                    cloneNote.tieOrigin = note.tieOrigin ? note.tieOrigin : null;
-                    note.tieOrigin.tieDestination = cloneNote;
-                }
-                if (note.hasBend && note.isTieOrigin) {
-                    let tieDestination = Note.findTieOrigin(note);
-                    if (tieDestination && tieDestination.hasBend) {
-                        cloneNote.bendType = BendType.Hold;
-                        let lastPoint = note.bendPoints[note.bendPoints.length - 1];
-                        cloneNote.addBendPoint(new BendPoint(0, lastPoint.value));
-                        cloneNote.addBendPoint(new BendPoint(BendPoint.MaxPosition, lastPoint.value));
-                    }
-                }
-                cloneNote.isTieDestination = true;
-            }
-            this.graceType = GraceType.BendGrace;
-            this.graceGroup = new GraceGroup();
-            this.graceGroup.addBeat(this);
-            this.graceGroup.isComplete = true;
-            this.graceGroup.finish();
-            this.updateDurations();
-            this.voice.insertBeat(this, cloneBeat);
-            cloneBeat.graceGroup = new GraceGroup();
-            cloneBeat.graceGroup.addBeat(this);
-            cloneBeat.graceGroup.isComplete = true;
-            cloneBeat.graceGroup.finish();
-        }
-    }
-    isBefore(beat) {
-        return (this.voice.bar.index < beat.voice.bar.index ||
-            (beat.voice.bar.index === this.voice.bar.index && this.index < beat.index));
-    }
-    isAfter(beat) {
-        return (this.voice.bar.index > beat.voice.bar.index ||
-            (beat.voice.bar.index === this.voice.bar.index && this.index > beat.index));
-    }
-    hasNoteOnString(noteString) {
-        return this.noteStringLookup.has(noteString);
-    }
-    getNoteWithRealValue(noteRealValue) {
-        if (this.noteValueLookup.has(noteRealValue)) {
-            return this.noteValueLookup.get(noteRealValue);
-        }
-        return null;
-    }
-    chain(sharedDataBag = null) {
-        for (const n of this.notes) {
-            this.noteValueLookup.set(n.realValue, n);
-            n.chain(sharedDataBag);
-        }
-    }
-}
-Beat._globalBeatId = 0;
-class RepeatGroup {
-    constructor() {
-        this.masterBars = [];
-        this.opening = null;
-        this.closings = [];
-        this.isClosed = false;
-    }
-    get openings() {
-        const opening = this.opening;
-        return opening ? [opening] : [];
-    }
-    get isOpened() { var _a; return ((_a = this.opening) === null || _a === void 0 ? void 0 : _a.isRepeatStart) === true; }
-    addMasterBar(masterBar) {
-        if (this.opening === null) {
-            this.opening = masterBar;
-        }
-        this.masterBars.push(masterBar);
-        masterBar.repeatGroup = this;
-        if (masterBar.isRepeatEnd) {
-            this.closings.push(masterBar);
-            this.isClosed = true;
-        }
-    }
-}
-class GpifRhythm {
-    constructor() {
-        this.id = '';
-        this.dots = 0;
-        this.tupletDenominator = -1;
-        this.tupletNumerator = -1;
-        this.value = Duration.Quarter;
-    }
-}
-class GpifSound {
-    constructor() {
-        this.name = '';
-        this.path = '';
-        this.role = '';
-        this.program = 0;
-    }
-    get uniqueId() {
-        return this.path + ';' + this.name + ';' + this.role;
-    }
-}
-class BendPoint {
-    constructor(offset = 0, value = 0) {
-        this.offset = offset;
-        this.value = value;
-    }
-}
-BendPoint.MaxPosition = 60;
-BendPoint.MaxValue = 12;
-class RenderStylesheet {
-    constructor() {
-        this.hideDynamics = false;
-    }
-}
-var LyricsState;
-(function (LyricsState) {
-    LyricsState[LyricsState["IgnoreSpaces"] = 0] = "IgnoreSpaces";
-    LyricsState[LyricsState["Begin"] = 1] = "Begin";
-    LyricsState[LyricsState["Text"] = 2] = "Text";
-    LyricsState[LyricsState["Comment"] = 3] = "Comment";
-    LyricsState[LyricsState["Dash"] = 4] = "Dash";
-})(LyricsState || (LyricsState = {}));
-class Lyrics {
-    constructor() {
-        this.startBar = 0;
-        this.text = '';
-    }
-    finish(skipEmptyEntries = false) {
-        this.chunks = [];
-        this.parse(this.text, 0, this.chunks, skipEmptyEntries);
-    }
-    parse(str, p, chunks, skipEmptyEntries) {
-        if (!str) {
-            return;
-        }
-        let state = LyricsState.Begin;
-        let next = LyricsState.Begin;
-        let skipSpace = false;
-        let start = 0;
-        while (p < str.length) {
-            let c = str.charCodeAt(p);
-            switch (state) {
-                case LyricsState.IgnoreSpaces:
-                    switch (c) {
-                        case Lyrics.CharCodeLF:
-                        case Lyrics.CharCodeCR:
-                        case Lyrics.CharCodeTab:
-                            break;
-                        case Lyrics.CharCodeSpace:
-                            if (!skipSpace) {
-                                state = next;
-                                continue;
-                            }
-                            break;
-                        default:
-                            skipSpace = false;
-                            state = next;
-                            continue;
-                    }
-                    break;
-                case LyricsState.Begin:
-                    switch (c) {
-                        case Lyrics.CharCodeBrackedOpen:
-                            state = LyricsState.Comment;
-                            break;
-                        default:
-                            start = p;
-                            state = LyricsState.Text;
-                            continue;
-                    }
-                    break;
-                case LyricsState.Comment:
-                    switch (c) {
-                        case Lyrics.CharCodeBrackedClose:
-                            state = LyricsState.Begin;
-                            break;
-                    }
-                    break;
-                case LyricsState.Text:
-                    switch (c) {
-                        case Lyrics.CharCodeDash:
-                            state = LyricsState.Dash;
-                            break;
-                        case Lyrics.CharCodeCR:
-                        case Lyrics.CharCodeLF:
-                        case Lyrics.CharCodeSpace:
-                            let txt = str.substr(start, p - start);
-                            this.addChunk(txt, skipEmptyEntries);
-                            state = LyricsState.IgnoreSpaces;
-                            next = LyricsState.Begin;
-                            break;
-                    }
-                    break;
-                case LyricsState.Dash:
-                    switch (c) {
-                        case Lyrics.CharCodeDash:
-                            break;
-                        default:
-                            let txt = str.substr(start, p - start);
-                            this.addChunk(txt, skipEmptyEntries);
-                            skipSpace = true;
-                            state = LyricsState.IgnoreSpaces;
-                            next = LyricsState.Begin;
-                            continue;
-                    }
-                    break;
-            }
-            p += 1;
-        }
-        if (state === LyricsState.Text) {
-            if (p !== start) {
-                this.addChunk(str.substr(start, p - start), skipEmptyEntries);
-            }
-        }
-    }
-    addChunk(txt, skipEmptyEntries) {
-        txt = this.prepareChunk(txt);
-        if (!skipEmptyEntries || (txt.length > 0 && txt !== '-')) {
-            this.chunks.push(txt);
-        }
-    }
-    prepareChunk(txt) {
-        let chunk = txt.split('+').join(' ');
-        let endLength = chunk.length;
-        while (endLength > 0 && chunk.charAt(endLength - 1) === '_') {
-            endLength--;
-        }
-        return endLength !== chunk.length ? chunk.substr(0, endLength) : chunk;
-    }
-}
-Lyrics.CharCodeLF = 10;
-Lyrics.CharCodeTab = 9;
-Lyrics.CharCodeCR = 13;
-Lyrics.CharCodeSpace = 32;
-Lyrics.CharCodeBrackedClose = 93;
-Lyrics.CharCodeBrackedOpen = 91;
-Lyrics.CharCodeDash = 45;
-class Staff {
-    constructor() {
-        this.index = 0;
-        this.bars = [];
-        this.chords = null;
-        this.capo = 0;
-        this.transpositionPitch = 0;
-        this.displayTranspositionPitch = 0;
-        this.stringTuning = new Tuning('', [], false);
-        this.showTablature = true;
-        this.showStandardNotation = true;
-        this.isPercussion = false;
-        this.standardNotationLineCount = 5;
-    }
-    get tuning() {
-        return this.stringTuning.tunings;
-    }
-    get tuningName() {
-        return this.stringTuning.name;
-    }
-    get isStringed() {
-        return this.stringTuning.tunings.length > 0;
-    }
-    finish(settings, sharedDataBag = null) {
-        this.stringTuning.finish();
-        for (let i = 0, j = this.bars.length; i < j; i++) {
-            this.bars[i].finish(settings, sharedDataBag);
-        }
-    }
-    addChord(chordId, chord) {
-        chord.staff = this;
-        let chordMap = this.chords;
-        if (chordMap === null) {
-            chordMap = new Map();
-            this.chords = chordMap;
-        }
-        chordMap.set(chordId, chord);
-    }
-    hasChord(chordId) {
-        var _a, _b;
-        return (_b = (_a = this.chords) === null || _a === void 0 ? void 0 : _a.has(chordId)) !== null && _b !== void 0 ? _b : false;
-    }
-    getChord(chordId) {
-        var _a, _b;
-        return (_b = (_a = this.chords) === null || _a === void 0 ? void 0 : _a.get(chordId)) !== null && _b !== void 0 ? _b : null;
-    }
-    addBar(bar) {
-        let bars = this.bars;
-        bar.staff = this;
-        bar.index = bars.length;
-        if (bars.length > 0) {
-            bar.previousBar = bars[bars.length - 1];
-            bar.previousBar.nextBar = bar;
-        }
-        bars.push(bar);
-    }
-}
-class Track {
-    constructor() {
-        this.index = 0;
-        this.staves = [];
-        this.playbackInfo = new PlaybackInformation();
-        this.name = '';
-        this.shortName = '';
-        this.defaultSystemsLayout = 3;
-        this.systemsLayout = [];
-        this.percussionArticulations = [];
-    }
-    ensureStaveCount(staveCount) {
-        while (this.staves.length < staveCount) {
-            this.addStaff(new Staff());
-        }
-    }
-    addStaff(staff) {
-        staff.index = this.staves.length;
-        staff.track = this;
-        this.staves.push(staff);
-    }
-    finish(settings, sharedDataBag = null) {
-        if (!this.shortName) {
-            this.shortName = this.name;
-            if (this.shortName.length > Track.ShortNameMaxLength) {
-                this.shortName = this.shortName.substr(0, Track.ShortNameMaxLength);
-            }
-        }
-        for (let i = 0, j = this.staves.length; i < j; i++) {
-            this.staves[i].finish(settings, sharedDataBag);
-        }
-    }
-    applyLyrics(lyrics) {
-        for (let lyric of lyrics) {
-            lyric.finish();
-        }
-        let staff = this.staves[0];
-        for (let li = 0; li < lyrics.length; li++) {
-            let lyric = lyrics[li];
-            if (lyric.startBar >= 0 && lyric.startBar < staff.bars.length) {
-                let beat = staff.bars[lyric.startBar].voices[0].beats[0];
-                for (let ci = 0; ci < lyric.chunks.length && beat; ci++) {
-                    while (beat && (beat.isEmpty || beat.isRest)) {
-                        beat = beat.nextBeat;
-                    }
-                    if (beat) {
-                        if (!beat.lyrics) {
-                            beat.lyrics = new Array(lyrics.length);
-                            beat.lyrics.fill("");
-                        }
-                        beat.lyrics[li] = lyric.chunks[ci];
-                        beat = beat.nextBeat;
-                    }
-                }
-            }
-        }
-    }
-}
-Track.ShortNameMaxLength = 10;
-class Score {
-    constructor() {
-        this._currentRepeatGroup = null;
-        this._openedRepeatGroups = [];
-        this._properlyOpenedRepeatGroups = 0;
-        this.album = '';
-        this.artist = '';
-        this.copyright = '';
-        this.instructions = '';
-        this.music = '';
-        this.notices = '';
-        this.subTitle = '';
-        this.title = '';
-        this.words = '';
-        this.tab = '';
-        this.tempo = 120;
-        this.tempoLabel = '';
-        this.masterBars = [];
-        this.tracks = [];
-        this.defaultSystemsLayout = 3;
-        this.systemsLayout = [];
-        this.stylesheet = new RenderStylesheet();
-    }
-    rebuildRepeatGroups() {
-        this._currentRepeatGroup = null;
-        this._openedRepeatGroups = [];
-        this._properlyOpenedRepeatGroups = 0;
-        for (const bar of this.masterBars) {
-            this.addMasterBarToRepeatGroups(bar);
-        }
-    }
-    addMasterBar(bar) {
-        bar.score = this;
-        bar.index = this.masterBars.length;
-        if (this.masterBars.length !== 0) {
-            bar.previousMasterBar = this.masterBars[this.masterBars.length - 1];
-            bar.previousMasterBar.nextMasterBar = bar;
-            bar.start =
-                bar.previousMasterBar.start +
-                    (bar.previousMasterBar.isAnacrusis ? 0 : bar.previousMasterBar.calculateDuration());
-        }
-        this.addMasterBarToRepeatGroups(bar);
-        this.masterBars.push(bar);
-    }
-    addMasterBarToRepeatGroups(bar) {
-        var _a;
-        if (bar.isRepeatStart) {
-            if ((_a = this._currentRepeatGroup) === null || _a === void 0 ? void 0 : _a.isClosed) {
-                this._openedRepeatGroups.pop();
-                this._properlyOpenedRepeatGroups--;
-            }
-            this._currentRepeatGroup = new RepeatGroup();
-            this._openedRepeatGroups.push(this._currentRepeatGroup);
-            this._properlyOpenedRepeatGroups++;
-        }
-        else if (!this._currentRepeatGroup) {
-            this._currentRepeatGroup = new RepeatGroup();
-            this._openedRepeatGroups.push(this._currentRepeatGroup);
-        }
-        this._currentRepeatGroup.addMasterBar(bar);
-        if (bar.isRepeatEnd) {
-            if (this._properlyOpenedRepeatGroups > 1) {
-                this._openedRepeatGroups.pop();
-                this._properlyOpenedRepeatGroups--;
-                this._currentRepeatGroup =
-                    this._openedRepeatGroups.length > 0
-                        ? this._openedRepeatGroups[this._openedRepeatGroups.length - 1]
-                        : null;
-            }
-        }
-    }
-    addTrack(track) {
-        track.score = this;
-        track.index = this.tracks.length;
-        this.tracks.push(track);
-    }
-    finish(settings) {
-        const sharedDataBag = new Map();
-        for (let i = 0, j = this.tracks.length; i < j; i++) {
-            this.tracks[i].finish(settings, sharedDataBag);
-        }
-    }
-}
-class GpifParser {
-    constructor() {
-        this._hasAnacrusis = false;
-        this._skipApplyLyrics = false;
-    }
-    parseXml(xml, settings) {
-        this._masterTrackAutomations = new Map();
-        this._automationsPerTrackIdAndBarIndex = new Map();
-        this._tracksMapping = [];
-        this._tracksById = new Map();
-        this._masterBars = [];
-        this._barsOfMasterBar = [];
-        this._voicesOfBar = new Map();
-        this._barsById = new Map();
-        this._voiceById = new Map();
-        this._beatsOfVoice = new Map();
-        this._beatById = new Map();
-        this._rhythmOfBeat = new Map();
-        this._rhythmById = new Map();
-        this._notesOfBeat = new Map();
-        this._noteById = new Map();
-        this._tappedNotes = new Map();
-        this._lyricsByTrack = new Map();
-        this._soundsByTrack = new Map();
-        this._skipApplyLyrics = false;
-        let dom = new XmlDocument();
-        try {
-            dom.parse(xml);
-        }
-        catch (ee) {
-            throw new Error('Could not parse XML');
-        }
-        this.parseDom(dom);
-        this.buildModel();
-        this.score.finish(settings);
-        if (!this._skipApplyLyrics && this._lyricsByTrack.size > 0) {
-            for (const [t, lyrics] of this._lyricsByTrack) {
-                let track = this._tracksById.get(t);
-                track.applyLyrics(lyrics);
-            }
-        }
-    }
-    parseDom(dom) {
-        let root = dom.firstElement;
-        if (!root) {
-            return;
-        }
-        if (root.localName === 'GPIF') {
-            this.score = new Score();
-            for (let n of root.childNodes) {
-                if (n.nodeType === XmlNodeType.Element) {
-                    switch (n.localName) {
-                        case 'Score':
-                            this.parseScoreNode(n);
-                            break;
-                        case 'MasterTrack':
-                            this.parseMasterTrackNode(n);
-                            break;
-                        case 'Tracks':
-                            this.parseTracksNode(n);
-                            break;
-                        case 'MasterBars':
-                            this.parseMasterBarsNode(n);
-                            break;
-                        case 'Bars':
-                            this.parseBars(n);
-                            break;
-                        case 'Voices':
-                            this.parseVoices(n);
-                            break;
-                        case 'Beats':
-                            this.parseBeats(n);
-                            break;
-                        case 'Notes':
-                            this.parseNotes(n);
-                            break;
-                        case 'Rhythms':
-                            this.parseRhythms(n);
-                            break;
-                    }
-                }
-            }
-        }
-        else {
-            throw new Error('Root node of XML was not GPIF');
-        }
-    }
-    parseScoreNode(element) {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Title':
-                        this.score.title = c.firstChild.innerText;
-                        break;
-                    case 'SubTitle':
-                        this.score.subTitle = c.firstChild.innerText;
-                        break;
-                    case 'Artist':
-                        this.score.artist = c.firstChild.innerText;
-                        break;
-                    case 'Album':
-                        this.score.album = c.firstChild.innerText;
-                        break;
-                    case 'Words':
-                        this.score.words = c.firstChild.innerText;
-                        break;
-                    case 'Music':
-                        this.score.music = c.firstChild.innerText;
-                        break;
-                    case 'WordsAndMusic':
-                        if (c.firstChild && c.firstChild.innerText !== '') {
-                            let wordsAndMusic = c.firstChild.innerText;
-                            if (wordsAndMusic && !this.score.words) {
-                                this.score.words = wordsAndMusic;
-                            }
-                            if (wordsAndMusic && !this.score.music) {
-                                this.score.music = wordsAndMusic;
-                            }
-                        }
-                        break;
-                    case 'Copyright':
-                        this.score.copyright = c.firstChild.innerText;
-                        break;
-                    case 'Tabber':
-                        this.score.tab = c.firstChild.innerText;
-                        break;
-                    case 'Instructions':
-                        this.score.instructions = c.firstChild.innerText;
-                        break;
-                    case 'Notices':
-                        this.score.notices = c.firstChild.innerText;
-                        break;
-                    case 'ScoreSystemsDefaultLayout':
-                        this.score.defaultSystemsLayout = parseInt(c.innerText);
-                        break;
-                    case 'ScoreSystemsLayout':
-                        this.score.systemsLayout = c.innerText.split(' ').map(i => parseInt(i));
-                        break;
-                }
-            }
-        }
-    }
-    parseMasterTrackNode(node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Automations':
-                        this.parseAutomations(c, this._masterTrackAutomations, null);
-                        break;
-                    case 'Tracks':
-                        this._tracksMapping = c.innerText.split(' ');
-                        break;
-                    case 'Anacrusis':
-                        this._hasAnacrusis = true;
-                        break;
-                }
-            }
-        }
-    }
-    parseAutomations(node, automations, sounds) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Automation':
-                        this.parseAutomation(c, automations, sounds);
-                        break;
-                }
-            }
-        }
-    }
-    parseAutomation(node, automations, sounds) {
-        let type = null;
-        let isLinear = false;
-        let barIndex = -1;
-        let ratioPosition = 0;
-        let numberValue = 0;
-        let textValue = null;
-        let reference = 0;
-        let text = null;
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Type':
-                        type = c.innerText;
-                        break;
-                    case 'Linear':
-                        isLinear = c.innerText.toLowerCase() === 'true';
-                        break;
-                    case 'Bar':
-                        barIndex = parseInt(c.innerText);
-                        break;
-                    case 'Position':
-                        ratioPosition = parseFloat(c.innerText);
-                        break;
-                    case 'Value':
-                        if (c.firstElement && c.firstElement.nodeType === XmlNodeType.CDATA) {
-                            textValue = c.innerText;
-                        }
-                        else {
-                            let parts = c.innerText.split(' ');
-                            if (parts.length === 1) {
-                                numberValue = parseFloat(parts[0]);
-                                reference = 1;
-                            }
-                            else {
-                                numberValue = parseFloat(parts[0]);
-                                reference = parseInt(parts[1]);
-                            }
-                        }
-                        break;
-                    case 'Text':
-                        text = c.innerText;
-                        break;
-                }
-            }
-        }
-        if (!type) {
-            return;
-        }
-        let automation = null;
-        switch (type) {
-            case 'Tempo':
-                automation = Automation.buildTempoAutomation(isLinear, ratioPosition, numberValue, reference);
-                break;
-            case 'Sound':
-                if (textValue && sounds && sounds.has(textValue)) {
-                    automation = Automation.buildInstrumentAutomation(isLinear, ratioPosition, sounds.get(textValue).program);
-                }
-                break;
-        }
-        if (automation) {
-            if (text) {
-                automation.text = text;
-            }
-            if (barIndex >= 0) {
-                if (!automations.has(barIndex)) {
-                    automations.set(barIndex, []);
-                }
-                automations.get(barIndex).push(automation);
-            }
-        }
-    }
-    parseTracksNode(node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Track':
-                        this.parseTrack(c);
-                        break;
-                }
-            }
-        }
-    }
-    parseTrack(node) {
-        this._articulationByName = new Map();
-        let track = new Track();
-        track.ensureStaveCount(1);
-        let staff = track.staves[0];
-        staff.showStandardNotation = true;
-        let trackId = node.getAttribute('id');
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Name':
-                        track.name = c.innerText;
-                        break;
-                    case 'Color':
-                        let parts = c.innerText.split(' ');
-                        if (parts.length >= 3) {
-                            let r = parseInt(parts[0]);
-                            let g = parseInt(parts[1]);
-                            let b = parseInt(parts[2]);
-                        }
-                        break;
-                    case 'Instrument':
-                        let instrumentName = c.getAttribute('ref');
-                        if (instrumentName.endsWith('-gs') || instrumentName.endsWith('GrandStaff')) {
-                            track.ensureStaveCount(2);
-                            track.staves[1].showStandardNotation = true;
-                        }
-                        break;
-                    case 'InstrumentSet':
-                        this.parseInstrumentSet(track, c);
-                        break;
-                    case 'NotationPatch':
-                        this.parseNotationPatch(track, c);
-                        break;
-                    case 'ShortName':
-                        track.shortName = c.innerText;
-                        break;
-                    case 'SystemsDefautLayout':
-                        track.defaultSystemsLayout = parseInt(c.innerText);
-                        break;
-                    case 'SystemsLayout':
-                        track.systemsLayout = c.innerText.split(' ').map(i => parseInt(i));
-                        break;
-                    case 'Lyrics':
-                        this.parseLyrics(trackId, c);
-                        break;
-                    case 'Properties':
-                        this.parseTrackProperties(track, c);
-                        break;
-                    case 'GeneralMidi':
-                    case 'MidiConnection':
-                    case 'MIDISettings':
-                        this.parseGeneralMidi(track, c);
-                        break;
-                    case 'Sounds':
-                        this.parseSounds(trackId, track, c);
-                        break;
-                    case 'PlaybackState':
-                        let state = c.innerText;
-                        track.playbackInfo.isSolo = state === 'Solo';
-                        track.playbackInfo.isMute = state === 'Mute';
-                        break;
-                    case 'PartSounding':
-                        this.parsePartSounding(track, c);
-                        break;
-                    case 'Staves':
-                        this.parseStaves(track, c);
-                        break;
-                    case 'Transpose':
-                        this.parseTranspose(track, c);
-                        break;
-                    case 'RSE':
-                        this.parseRSE(track, c);
-                        break;
-                    case 'Automations':
-                        this.parseTrackAutomations(trackId, c);
-                        break;
-                }
-            }
-        }
-        this._tracksById.set(trackId, track);
-    }
-    parseTrackAutomations(trackId, c) {
-        const trackAutomations = new Map();
-        this._automationsPerTrackIdAndBarIndex.set(trackId, trackAutomations);
-        this.parseAutomations(c, trackAutomations, this._soundsByTrack.get(trackId));
-    }
-    parseNotationPatch(track, node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'LineCount':
-                        const lineCount = parseInt(c.innerText);
-                        for (let staff of track.staves) {
-                            staff.standardNotationLineCount = lineCount;
-                        }
-                        break;
-                    case 'Elements':
-                        this.parseElements(track, c);
-                        break;
-                }
-            }
-        }
-    }
-    parseInstrumentSet(track, node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Type':
-                        switch (c.innerText) {
-                            case 'drumKit':
-                                for (let staff of track.staves) {
-                                    staff.isPercussion = true;
-                                }
-                                break;
-                        }
-                        if (c.innerText === 'drumKit') {
-                            for (let staff of track.staves) {
-                                staff.isPercussion = true;
-                            }
-                        }
-                        break;
-                    case 'Elements':
-                        this.parseElements(track, c);
-                        break;
-                    case 'LineCount':
-                        const lineCount = parseInt(c.innerText);
-                        for (let staff of track.staves) {
-                            staff.standardNotationLineCount = lineCount;
-                        }
-                        break;
-                }
-            }
-        }
-    }
-    parseElements(track, node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Element':
-                        this.parseElement(track, c);
-                        break;
-                }
-            }
-        }
-    }
-    parseElement(track, node) {
-        const typeElement = node.findChildElement('Type');
-        const type = typeElement ? typeElement.innerText : "";
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Name':
-                    case 'Articulations':
-                        this.parseArticulations(track, c, type);
-                        break;
-                }
-            }
-        }
-    }
-    parseArticulations(track, node, elementType) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Articulation':
-                        this.parseArticulation(track, c, elementType);
-                        break;
-                }
-            }
-        }
-    }
-    parseArticulation(track, node, elementType) {
-        const articulation = new InstrumentArticulation();
-        articulation.outputMidiNumber = -1;
-        articulation.elementType = elementType;
-        let name = '';
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                const txt = c.innerText;
-                switch (c.localName) {
-                    case 'Name':
-                        name = c.innerText;
-                        break;
-                    case 'OutputMidiNumber':
-                        if (txt.length > 0) {
-                            articulation.outputMidiNumber = parseInt(txt);
-                        }
-                        break;
-                    case 'TechniqueSymbol':
-                        articulation.techniqueSymbol = this.parseTechniqueSymbol(txt);
-                        break;
-                    case 'TechniquePlacement':
-                        switch (txt) {
-                            case 'outside':
-                                articulation.techniqueSymbolPlacement = TextBaseline.Bottom;
-                                break;
-                            case 'inside':
-                                articulation.techniqueSymbolPlacement = TextBaseline.Middle;
-                                break;
-                            case 'above':
-                                articulation.techniqueSymbolPlacement = TextBaseline.Bottom;
-                                break;
-                            case 'below':
-                                articulation.techniqueSymbolPlacement = TextBaseline.Top;
-                                break;
-                        }
-                        break;
-                    case 'Noteheads':
-                        const noteHeadsTxt = txt.split(' ');
-                        if (noteHeadsTxt.length >= 1) {
-                            articulation.noteHeadDefault = this.parseNoteHead(noteHeadsTxt[0]);
-                        }
-                        if (noteHeadsTxt.length >= 2) {
-                            articulation.noteHeadHalf = this.parseNoteHead(noteHeadsTxt[1]);
-                        }
-                        if (noteHeadsTxt.length >= 3) {
-                            articulation.noteHeadWhole = this.parseNoteHead(noteHeadsTxt[2]);
-                        }
-                        if (articulation.noteHeadHalf == MusicFontSymbol.None) {
-                            articulation.noteHeadHalf = articulation.noteHeadDefault;
-                        }
-                        if (articulation.noteHeadWhole == MusicFontSymbol.None) {
-                            articulation.noteHeadWhole = articulation.noteHeadDefault;
-                        }
-                        break;
-                    case 'StaffLine':
-                        if (txt.length > 0) {
-                            articulation.staffLine = parseInt(txt);
-                        }
-                        break;
-                }
-            }
-        }
-        if (articulation.outputMidiNumber !== -1) {
-            track.percussionArticulations.push(articulation);
-            if (name.length > 0) {
-                this._articulationByName.set(name, articulation);
-            }
-        }
-        else if (name.length > 0 && this._articulationByName.has(name)) {
-            this._articulationByName.get(name).staffLine = articulation.staffLine;
-        }
-    }
-    parseTechniqueSymbol(txt) {
-        switch (txt) {
-            case 'pictEdgeOfCymbal':
-                return MusicFontSymbol.PictEdgeOfCymbal;
-            case 'articStaccatoAbove':
-                return MusicFontSymbol.ArticStaccatoAbove;
-            case 'noteheadParenthesis':
-                return MusicFontSymbol.NoteheadParenthesis;
-            case 'stringsUpBow':
-                return MusicFontSymbol.StringsUpBow;
-            case 'stringsDownBow':
-                return MusicFontSymbol.StringsDownBow;
-            case 'guitarGolpe':
-                return MusicFontSymbol.GuitarGolpe;
-            default:
-                return MusicFontSymbol.None;
-        }
-    }
-    parseNoteHead(txt) {
-        switch (txt) {
-            case 'noteheadDoubleWholeSquare':
-                return MusicFontSymbol.NoteheadDoubleWholeSquare;
-            case 'noteheadDoubleWhole':
-                return MusicFontSymbol.NoteheadDoubleWhole;
-            case 'noteheadWhole':
-                return MusicFontSymbol.NoteheadWhole;
-            case 'noteheadHalf':
-                return MusicFontSymbol.NoteheadHalf;
-            case 'noteheadBlack':
-                return MusicFontSymbol.NoteheadBlack;
-            case 'noteheadNull':
-                return MusicFontSymbol.NoteheadNull;
-            case 'noteheadXOrnate':
-                return MusicFontSymbol.NoteheadXOrnate;
-            case 'noteheadTriangleUpWhole':
-                return MusicFontSymbol.NoteheadTriangleUpWhole;
-            case 'noteheadTriangleUpHalf':
-                return MusicFontSymbol.NoteheadTriangleUpHalf;
-            case 'noteheadTriangleUpBlack':
-                return MusicFontSymbol.NoteheadTriangleUpBlack;
-            case 'noteheadDiamondBlackWide':
-                return MusicFontSymbol.NoteheadDiamondBlackWide;
-            case 'noteheadDiamondWhite':
-                return MusicFontSymbol.NoteheadDiamondWhite;
-            case 'noteheadDiamondWhiteWide':
-                return MusicFontSymbol.NoteheadDiamondWhiteWide;
-            case 'noteheadCircleX':
-                return MusicFontSymbol.NoteheadCircleX;
-            case 'noteheadXWhole':
-                return MusicFontSymbol.NoteheadXWhole;
-            case 'noteheadXHalf':
-                return MusicFontSymbol.NoteheadXHalf;
-            case 'noteheadXBlack':
-                return MusicFontSymbol.NoteheadXBlack;
-            case 'noteheadParenthesis':
-                return MusicFontSymbol.NoteheadParenthesis;
-            case 'noteheadSlashedBlack2':
-                return MusicFontSymbol.NoteheadSlashedBlack2;
-            case 'noteheadCircleSlash':
-                return MusicFontSymbol.NoteheadCircleSlash;
-            case 'noteheadHeavyX':
-                return MusicFontSymbol.NoteheadHeavyX;
-            case 'noteheadHeavyXHat':
-                return MusicFontSymbol.NoteheadHeavyXHat;
-            default:
-                return MusicFontSymbol.None;
-        }
-    }
-    parseStaves(track, node) {
-        let staffIndex = 0;
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Staff':
-                        track.ensureStaveCount(staffIndex + 1);
-                        let staff = track.staves[staffIndex];
-                        this.parseStaff(staff, c);
-                        staffIndex++;
-                        break;
-                }
-            }
-        }
-    }
-    parseStaff(staff, node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Properties':
-                        this.parseStaffProperties(staff, c);
-                        break;
-                }
-            }
-        }
-    }
-    parseStaffProperties(staff, node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Property':
-                        this.parseStaffProperty(staff, c);
-                        break;
-                }
-            }
-        }
-    }
-    parseStaffProperty(staff, node) {
-        let propertyName = node.getAttribute('name');
-        switch (propertyName) {
-            case 'Tuning':
-                for (let c of node.childNodes) {
-                    if (c.nodeType === XmlNodeType.Element) {
-                        switch (c.localName) {
-                            case 'Pitches':
-                                let tuningParts = node.findChildElement('Pitches').innerText.split(' ');
-                                let tuning = new Array(tuningParts.length);
-                                for (let i = 0; i < tuning.length; i++) {
-                                    tuning[tuning.length - 1 - i] = parseInt(tuningParts[i]);
-                                }
-                                staff.stringTuning.tunings = tuning;
-                                break;
-                            case 'Label':
-                                staff.stringTuning.name = c.innerText;
-                                break;
-                        }
-                    }
-                }
-                if (!staff.isPercussion) {
-                    staff.showTablature = true;
-                }
-                break;
-            case 'DiagramCollection':
-            case 'ChordCollection':
-                this.parseDiagramCollectionForStaff(staff, node);
-                break;
-            case 'CapoFret':
-                let capo = parseInt(node.findChildElement('Fret').innerText);
-                staff.capo = capo;
-                break;
-        }
-    }
-    parseLyrics(trackId, node) {
-        let tracks = [];
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Line':
-                        tracks.push(this.parseLyricsLine(c));
-                        break;
-                }
-            }
-        }
-        this._lyricsByTrack.set(trackId, tracks);
-    }
-    parseLyricsLine(node) {
-        let lyrics = new Lyrics();
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Offset':
-                        lyrics.startBar = parseInt(c.innerText);
-                        break;
-                    case 'Text':
-                        lyrics.text = c.innerText;
-                        break;
-                }
-            }
-        }
-        return lyrics;
-    }
-    parseDiagramCollectionForTrack(track, node) {
-        let items = node.findChildElement('Items');
-        for (let c of items.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Item':
-                        this.parseDiagramItemForTrack(track, c);
-                        break;
-                }
-            }
-        }
-    }
-    parseDiagramCollectionForStaff(staff, node) {
-        let items = node.findChildElement('Items');
-        for (let c of items.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Item':
-                        this.parseDiagramItemForStaff(staff, c);
-                        break;
-                }
-            }
-        }
-    }
-    parseDiagramItemForTrack(track, node) {
-        let chord = new Chord();
-        let chordId = node.getAttribute('id');
-        for (let staff of track.staves) {
-            staff.addChord(chordId, chord);
-        }
-        this.parseDiagramItemForChord(chord, node);
-    }
-    parseDiagramItemForStaff(staff, node) {
-        let chord = new Chord();
-        let chordId = node.getAttribute('id');
-        staff.addChord(chordId, chord);
-        this.parseDiagramItemForChord(chord, node);
-    }
-    parseDiagramItemForChord(chord, node) {
-        chord.name = node.getAttribute('name');
-        let diagram = node.findChildElement('Diagram');
-        if (!diagram) {
-            chord.showDiagram = false;
-            chord.showFingering = false;
-            return;
-        }
-        let stringCount = parseInt(diagram.getAttribute('stringCount'));
-        let baseFret = parseInt(diagram.getAttribute('baseFret'));
-        chord.firstFret = baseFret + 1;
-        for (let i = 0; i < stringCount; i++) {
-            chord.strings.push(-1);
-        }
-        for (let c of diagram.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Fret':
-                        let guitarString = parseInt(c.getAttribute('string'));
-                        chord.strings[stringCount - guitarString - 1] = baseFret + parseInt(c.getAttribute('fret'));
-                        break;
-                    case 'Fingering':
-                        let existingFingers = new Map();
-                        for (let p of c.childNodes) {
-                            if (p.nodeType === XmlNodeType.Element) {
-                                switch (p.localName) {
-                                    case 'Position':
-                                        let finger = Fingers.Unknown;
-                                        let fret = baseFret + parseInt(p.getAttribute('fret'));
-                                        switch (p.getAttribute('finger')) {
-                                            case 'Index':
-                                                finger = Fingers.IndexFinger;
-                                                break;
-                                            case 'Middle':
-                                                finger = Fingers.MiddleFinger;
-                                                break;
-                                            case 'Rank':
-                                                finger = Fingers.AnnularFinger;
-                                                break;
-                                            case 'Pinky':
-                                                finger = Fingers.LittleFinger;
-                                                break;
-                                            case 'Thumb':
-                                                finger = Fingers.Thumb;
-                                                break;
-                                            case 'None':
-                                                break;
-                                        }
-                                        if (finger !== Fingers.Unknown) {
-                                            if (existingFingers.has(finger)) {
-                                                chord.barreFrets.push(fret);
-                                            }
-                                            else {
-                                                existingFingers.set(finger, true);
-                                            }
-                                        }
-                                        break;
-                                }
-                            }
-                        }
-                        break;
-                    case 'Property':
-                        switch (c.getAttribute('name')) {
-                            case 'ShowName':
-                                chord.showName = c.getAttribute('value') === 'true';
-                                break;
-                            case 'ShowDiagram':
-                                chord.showDiagram = c.getAttribute('value') === 'true';
-                                break;
-                            case 'ShowFingering':
-                                chord.showFingering = c.getAttribute('value') === 'true';
-                                break;
-                        }
-                        break;
-                }
-            }
-        }
-    }
-    parseTrackProperties(track, node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Property':
-                        this.parseTrackProperty(track, c);
-                        break;
-                }
-            }
-        }
-    }
-    parseTrackProperty(track, node) {
-        let propertyName = node.getAttribute('name');
-        switch (propertyName) {
-            case 'Tuning':
-                let tuningParts = node.findChildElement('Pitches').innerText.split(' ');
-                let tuning = new Array(tuningParts.length);
-                for (let i = 0; i < tuning.length; i++) {
-                    tuning[tuning.length - 1 - i] = parseInt(tuningParts[i]);
-                }
-                for (let staff of track.staves) {
-                    staff.stringTuning.tunings = tuning;
-                    staff.showStandardNotation = true;
-                    staff.showTablature = true;
-                }
-                break;
-            case 'DiagramCollection':
-            case 'ChordCollection':
-                this.parseDiagramCollectionForTrack(track, node);
-                break;
-            case 'CapoFret':
-                let capo = parseInt(node.findChildElement('Fret').innerText);
-                for (let staff of track.staves) {
-                    staff.capo = capo;
-                }
-                break;
-        }
-    }
-    parseGeneralMidi(track, node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Program':
-                        track.playbackInfo.program = parseInt(c.innerText);
-                        break;
-                    case 'Port':
-                        track.playbackInfo.port = parseInt(c.innerText);
-                        break;
-                    case 'PrimaryChannel':
-                        track.playbackInfo.primaryChannel = parseInt(c.innerText);
-                        break;
-                    case 'SecondaryChannel':
-                        track.playbackInfo.secondaryChannel = parseInt(c.innerText);
-                        break;
-                }
-            }
-        }
-        let isPercussion = node.getAttribute('table') === 'Percussion';
-        if (isPercussion) {
-            for (let staff of track.staves) {
-                staff.isPercussion = true;
-            }
-        }
-    }
-    parseSounds(trackId, track, node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Sound':
-                        this.parseSound(trackId, track, c);
-                        break;
-                }
-            }
-        }
-    }
-    parseSound(trackId, track, node) {
-        const sound = new GpifSound();
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Name':
-                        sound.name = c.innerText;
-                        break;
-                    case 'Path':
-                        sound.path = c.innerText;
-                        break;
-                    case 'Role':
-                        sound.role = c.innerText;
-                        break;
-                    case 'MIDI':
-                        this.parseSoundMidi(sound, c);
-                        break;
-                }
-            }
-        }
-        if (sound.role === 'Factory' || track.playbackInfo.program === 0) {
-            track.playbackInfo.program = sound.program;
-        }
-        if (!this._soundsByTrack.has(trackId)) {
-            this._soundsByTrack.set(trackId, new Map());
-        }
-        this._soundsByTrack.get(trackId).set(sound.uniqueId, sound);
-    }
-    parseSoundMidi(sound, node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Program':
-                        sound.program = parseInt(c.innerText);
-                        break;
-                }
-            }
-        }
-    }
-    parsePartSounding(track, node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'TranspositionPitch':
-                        for (let staff of track.staves) {
-                            staff.displayTranspositionPitch = parseInt(c.innerText);
-                        }
-                        break;
-                }
-            }
-        }
-    }
-    parseTranspose(track, node) {
-        let octave = 0;
-        let chromatic = 0;
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Chromatic':
-                        chromatic = parseInt(c.innerText);
-                        break;
-                    case 'Octave':
-                        octave = parseInt(c.innerText);
-                        break;
-                }
-            }
-        }
-        for (let staff of track.staves) {
-            staff.displayTranspositionPitch = octave * 12 + chromatic;
-        }
-    }
-    parseRSE(track, node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'ChannelStrip':
-                        this.parseChannelStrip(track, c);
-                        break;
-                }
-            }
-        }
-    }
-    parseChannelStrip(track, node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Parameters':
-                        this.parseChannelStripParameters(track, c);
-                        break;
-                }
-            }
-        }
-    }
-    parseChannelStripParameters(track, node) {
-        if (node.firstChild && node.firstChild.value) {
-            let parameters = node.firstChild.value.split(' ');
-            if (parameters.length >= 12) {
-                track.playbackInfo.balance = Math.floor(parseFloat(parameters[11]) * 16);
-                track.playbackInfo.volume = Math.floor(parseFloat(parameters[12]) * 16);
-            }
-        }
-    }
-    parseMasterBarsNode(node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'MasterBar':
-                        this.parseMasterBar(c);
-                        break;
-                }
-            }
-        }
-    }
-    parseMasterBar(node) {
-        let masterBar = new MasterBar();
-        if (this._masterBars.length === 0 && this._hasAnacrusis) {
-            masterBar.isAnacrusis = true;
-        }
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Time':
-                        let timeParts = c.innerText.split('/');
-                        masterBar.timeSignatureNumerator = parseInt(timeParts[0]);
-                        masterBar.timeSignatureDenominator = parseInt(timeParts[1]);
-                        break;
-                    case 'DoubleBar':
-                        masterBar.isDoubleBar = true;
-                        break;
-                    case 'Section':
-                        masterBar.section = new Section();
-                        masterBar.section.marker = c.findChildElement('Letter').innerText;
-                        masterBar.section.text = c.findChildElement('Text').innerText;
-                        break;
-                    case 'Repeat':
-                        if (c.getAttribute('start').toLowerCase() === 'true') {
-                            masterBar.isRepeatStart = true;
-                        }
-                        if (c.getAttribute('end').toLowerCase() === 'true' && c.getAttribute('count')) {
-                            masterBar.repeatCount = parseInt(c.getAttribute('count'));
-                        }
-                        break;
-                    case 'AlternateEndings':
-                        let alternateEndings = c.innerText.split(' ');
-                        let i = 0;
-                        for (let k = 0; k < alternateEndings.length; k++) {
-                            i = i | (1 << (-1 + parseInt(alternateEndings[k])));
-                        }
-                        masterBar.alternateEndings = i;
-                        break;
-                    case 'Bars':
-                        this._barsOfMasterBar.push(c.innerText.split(' '));
-                        break;
-                    case 'TripletFeel':
-                        switch (c.innerText) {
-                            case 'NoTripletFeel':
-                                masterBar.tripletFeel = TripletFeel.NoTripletFeel;
-                                break;
-                            case 'Triplet8th':
-                                masterBar.tripletFeel = TripletFeel.Triplet8th;
-                                break;
-                            case 'Triplet16th':
-                                masterBar.tripletFeel = TripletFeel.Triplet16th;
-                                break;
-                            case 'Dotted8th':
-                                masterBar.tripletFeel = TripletFeel.Dotted8th;
-                                break;
-                            case 'Dotted16th':
-                                masterBar.tripletFeel = TripletFeel.Dotted16th;
-                                break;
-                            case 'Scottish8th':
-                                masterBar.tripletFeel = TripletFeel.Scottish8th;
-                                break;
-                            case 'Scottish16th':
-                                masterBar.tripletFeel = TripletFeel.Scottish16th;
-                                break;
-                        }
-                        break;
-                    case 'Key':
-                        masterBar.keySignature = parseInt(c.findChildElement('AccidentalCount').innerText);
-                        let mode = c.findChildElement('Mode');
-                        if (mode) {
-                            switch (mode.innerText.toLowerCase()) {
-                                case 'major':
-                                    masterBar.keySignatureType = KeySignatureType.Major;
-                                    break;
-                                case 'minor':
-                                    masterBar.keySignatureType = KeySignatureType.Minor;
-                                    break;
-                            }
-                        }
-                        break;
-                    case 'Fermatas':
-                        this.parseFermatas(masterBar, c);
-                        break;
-                    case "XProperties":
-                        this.parseMasterBarXProperties(c, masterBar);
-                        break;
-                }
-            }
-        }
-        this._masterBars.push(masterBar);
-    }
-    parseFermatas(masterBar, node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Fermata':
-                        this.parseFermata(masterBar, c);
-                        break;
-                }
-            }
-        }
-    }
-    parseFermata(masterBar, node) {
-        let offset = 0;
-        let fermata = new Fermata();
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Type':
-                        switch (c.innerText) {
-                            case 'Short':
-                                fermata.type = FermataType.Short;
-                                break;
-                            case 'Medium':
-                                fermata.type = FermataType.Medium;
-                                break;
-                            case 'Long':
-                                fermata.type = FermataType.Long;
-                                break;
-                        }
-                        break;
-                    case 'Length':
-                        fermata.length = parseFloat(c.innerText);
-                        break;
-                    case 'Offset':
-                        let parts = c.innerText.split('/');
-                        if (parts.length === 2) {
-                            let numerator = parseInt(parts[0]);
-                            let denominator = parseInt(parts[1]);
-                            offset = ((numerator / denominator) * MidiUtils.QuarterTime) | 0;
-                        }
-                        break;
-                }
-            }
-        }
-        masterBar.addFermata(offset, fermata);
-    }
-    parseBars(node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Bar':
-                        this.parseBar(c);
-                        break;
-                }
-            }
-        }
-    }
-    parseBar(node) {
-        let bar = new Bar();
-        let barId = node.getAttribute('id');
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Voices':
-                        this._voicesOfBar.set(barId, c.innerText.split(' '));
-                        break;
-                    case 'Clef':
-                        switch (c.innerText) {
-                            case 'Neutral':
-                                bar.clef = Clef.Neutral;
-                                break;
-                            case 'G2':
-                                bar.clef = Clef.G2;
-                                break;
-                            case 'F4':
-                                bar.clef = Clef.F4;
-                                break;
-                            case 'C4':
-                                bar.clef = Clef.C4;
-                                break;
-                            case 'C3':
-                                bar.clef = Clef.C3;
-                                break;
-                        }
-                        break;
-                    case 'Ottavia':
-                        switch (c.innerText) {
-                            case '8va':
-                                bar.clefOttava = Ottavia._8va;
-                                break;
-                            case '15ma':
-                                bar.clefOttava = Ottavia._15ma;
-                                break;
-                            case '8vb':
-                                bar.clefOttava = Ottavia._8vb;
-                                break;
-                            case '15mb':
-                                bar.clefOttava = Ottavia._15mb;
-                                break;
-                        }
-                        break;
-                    case 'SimileMark':
-                        switch (c.innerText) {
-                            case 'Simple':
-                                bar.simileMark = SimileMark.Simple;
-                                break;
-                            case 'FirstOfDouble':
-                                bar.simileMark = SimileMark.FirstOfDouble;
-                                break;
-                            case 'SecondOfDouble':
-                                bar.simileMark = SimileMark.SecondOfDouble;
-                                break;
-                        }
-                        break;
-                    case "XProperties":
-                        this.parseBarXProperties(c, bar);
-                        break;
-                }
-            }
-        }
-        this._barsById.set(barId, bar);
-    }
-    parseVoices(node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Voice':
-                        this.parseVoice(c);
-                        break;
-                }
-            }
-        }
-    }
-    parseVoice(node) {
-        let voice = new Voice();
-        let voiceId = node.getAttribute('id');
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Beats':
-                        this._beatsOfVoice.set(voiceId, c.innerText.split(' '));
-                        break;
-                }
-            }
-        }
-        this._voiceById.set(voiceId, voice);
-    }
-    parseBeats(node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Beat':
-                        this.parseBeat(c);
-                        break;
-                }
-            }
-        }
-    }
-    parseBeat(node) {
-        let beat = new Beat();
-        let beatId = node.getAttribute('id');
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Notes':
-                        this._notesOfBeat.set(beatId, c.innerText.split(' '));
-                        break;
-                    case 'Rhythm':
-                        this._rhythmOfBeat.set(beatId, c.getAttribute('ref'));
-                        break;
-                    case 'Fadding':
-                        if (c.innerText === 'FadeIn') {
-                            beat.fadeIn = true;
-                        }
-                        break;
-                    case 'Tremolo':
-                        switch (c.innerText) {
-                            case '1/2':
-                                beat.tremoloSpeed = Duration.Eighth;
-                                break;
-                            case '1/4':
-                                beat.tremoloSpeed = Duration.Sixteenth;
-                                break;
-                            case '1/8':
-                                beat.tremoloSpeed = Duration.ThirtySecond;
-                                break;
-                        }
-                        break;
-                    case 'Chord':
-                        beat.chordId = c.innerText;
-                        break;
-                    case 'Hairpin':
-                        switch (c.innerText) {
-                            case 'Crescendo':
-                                beat.crescendo = CrescendoType.Crescendo;
-                                break;
-                            case 'Decrescendo':
-                                beat.crescendo = CrescendoType.Decrescendo;
-                                break;
-                        }
-                        break;
-                    case 'Arpeggio':
-                        if (c.innerText === 'Up') {
-                            beat.brushType = BrushType.ArpeggioUp;
-                        }
-                        else {
-                            beat.brushType = BrushType.ArpeggioDown;
-                        }
-                        break;
-                    case 'Properties':
-                        this.parseBeatProperties(c, beat);
-                        break;
-                    case 'XProperties':
-                        this.parseBeatXProperties(c, beat);
-                        break;
-                    case 'FreeText':
-                        beat.text = c.innerText;
-                        break;
-                    case 'TransposedPitchStemOrientation':
-                        switch (c.innerText) {
-                            case 'Upward':
-                                beat.preferredBeamDirection = BeamDirection.Up;
-                                break;
-                            case 'Downward':
-                                beat.preferredBeamDirection = BeamDirection.Down;
-                                break;
-                        }
-                        break;
-                    case 'Dynamic':
-                        switch (c.innerText) {
-                            case 'PPP':
-                                beat.dynamics = DynamicValue.PPP;
-                                break;
-                            case 'PP':
-                                beat.dynamics = DynamicValue.PP;
-                                break;
-                            case 'P':
-                                beat.dynamics = DynamicValue.P;
-                                break;
-                            case 'MP':
-                                beat.dynamics = DynamicValue.MP;
-                                break;
-                            case 'MF':
-                                beat.dynamics = DynamicValue.MF;
-                                break;
-                            case 'F':
-                                beat.dynamics = DynamicValue.F;
-                                break;
-                            case 'FF':
-                                beat.dynamics = DynamicValue.FF;
-                                break;
-                            case 'FFF':
-                                beat.dynamics = DynamicValue.FFF;
-                                break;
-                        }
-                        break;
-                    case 'GraceNotes':
-                        switch (c.innerText) {
-                            case 'OnBeat':
-                                beat.graceType = GraceType.OnBeat;
-                                break;
-                            case 'BeforeBeat':
-                                beat.graceType = GraceType.BeforeBeat;
-                                break;
-                        }
-                        break;
-                    case 'Legato':
-                        if (c.getAttribute('origin') === 'true') {
-                            beat.isLegatoOrigin = true;
-                        }
-                        break;
-                    case 'Whammy':
-                        let whammyOrigin = new BendPoint(0, 0);
-                        whammyOrigin.value = this.toBendValue(parseFloat(c.getAttribute('originValue')));
-                        whammyOrigin.offset = this.toBendOffset(parseFloat(c.getAttribute('originOffset')));
-                        beat.addWhammyBarPoint(whammyOrigin);
-                        let whammyMiddle1 = new BendPoint(0, 0);
-                        whammyMiddle1.value = this.toBendValue(parseFloat(c.getAttribute('middleValue')));
-                        whammyMiddle1.offset = this.toBendOffset(parseFloat(c.getAttribute('middleOffset1')));
-                        beat.addWhammyBarPoint(whammyMiddle1);
-                        let whammyMiddle2 = new BendPoint(0, 0);
-                        whammyMiddle2.value = this.toBendValue(parseFloat(c.getAttribute('middleValue')));
-                        whammyMiddle2.offset = this.toBendOffset(parseFloat(c.getAttribute('middleOffset2')));
-                        beat.addWhammyBarPoint(whammyMiddle2);
-                        let whammyDestination = new BendPoint(0, 0);
-                        whammyDestination.value = this.toBendValue(parseFloat(c.getAttribute('destinationValue')));
-                        whammyDestination.offset = this.toBendOffset(parseFloat(c.getAttribute('destinationOffset')));
-                        beat.addWhammyBarPoint(whammyDestination);
-                        break;
-                    case 'Ottavia':
-                        switch (c.innerText) {
-                            case '8va':
-                                beat.ottava = Ottavia._8va;
-                                break;
-                            case '8vb':
-                                beat.ottava = Ottavia._8vb;
-                                break;
-                            case '15ma':
-                                beat.ottava = Ottavia._15ma;
-                                break;
-                            case '15mb':
-                                beat.ottava = Ottavia._15mb;
-                                break;
-                        }
-                        break;
-                    case 'Lyrics':
-                        beat.lyrics = this.parseBeatLyrics(c);
-                        this._skipApplyLyrics = true;
-                        break;
-                }
-            }
-        }
-        this._beatById.set(beatId, beat);
-    }
-    parseBeatLyrics(node) {
-        const lines = [];
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Line':
-                        lines.push(c.innerText);
-                        break;
-                }
-            }
-        }
-        return lines;
-    }
-    parseBeatXProperties(node, beat) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'XProperty':
-                        let id = c.getAttribute('id');
-                        let value = 0;
-                        switch (id) {
-                            case '1124204545':
-                                value = parseInt(c.findChildElement('Int').innerText);
-                                beat.invertBeamDirection = value === 1;
-                                break;
-                            case '687935489':
-                                value = parseInt(c.findChildElement('Int').innerText);
-                                beat.brushDuration = value;
-                                break;
-                        }
-                        break;
-                }
-            }
-        }
-    }
-    parseBarXProperties(node, bar) {
-        var _a;
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'XProperty':
-                        const id = c.getAttribute('id');
-                        switch (id) {
-                            case '1124139520':
-                                const childNode = (_a = c.findChildElement('Double')) !== null && _a !== void 0 ? _a : c.findChildElement('Float');
-                                bar.displayScale = parseFloat(childNode.innerText);
-                                break;
-                        }
-                        break;
-                }
-            }
-        }
-    }
-    parseMasterBarXProperties(node, masterBar) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'XProperty':
-                        const id = c.getAttribute('id');
-                        switch (id) {
-                            case '1124073984':
-                                masterBar.displayScale = parseFloat(c.findChildElement('Double').innerText);
-                                break;
-                        }
-                        break;
-                }
-            }
-        }
-    }
-    parseBeatProperties(node, beat) {
-        let isWhammy = false;
-        let whammyOrigin = null;
-        let whammyMiddleValue = null;
-        let whammyMiddleOffset1 = null;
-        let whammyMiddleOffset2 = null;
-        let whammyDestination = null;
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Property':
-                        let name = c.getAttribute('name');
-                        switch (name) {
-                            case 'Brush':
-                                if (c.findChildElement('Direction').innerText === 'Up') {
-                                    beat.brushType = BrushType.BrushUp;
-                                }
-                                else {
-                                    beat.brushType = BrushType.BrushDown;
-                                }
-                                break;
-                            case 'PickStroke':
-                                if (c.findChildElement('Direction').innerText === 'Up') {
-                                    beat.pickStroke = PickStroke.Up;
-                                }
-                                else {
-                                    beat.pickStroke = PickStroke.Down;
-                                }
-                                break;
-                            case 'Slapped':
-                                if (c.findChildElement('Enable')) {
-                                    beat.slap = true;
-                                }
-                                break;
-                            case 'Popped':
-                                if (c.findChildElement('Enable')) {
-                                    beat.pop = true;
-                                }
-                                break;
-                            case 'VibratoWTremBar':
-                                switch (c.findChildElement('Strength').innerText) {
-                                    case 'Wide':
-                                        beat.vibrato = VibratoType.Wide;
-                                        break;
-                                    case 'Slight':
-                                        beat.vibrato = VibratoType.Slight;
-                                        break;
-                                }
-                                break;
-                            case 'WhammyBar':
-                                isWhammy = true;
-                                break;
-                            case 'WhammyBarExtend':
-                                break;
-                            case 'WhammyBarOriginValue':
-                                if (!whammyOrigin) {
-                                    whammyOrigin = new BendPoint(0, 0);
-                                }
-                                whammyOrigin.value = this.toBendValue(parseFloat(c.findChildElement('Float').innerText));
-                                break;
-                            case 'WhammyBarOriginOffset':
-                                if (!whammyOrigin) {
-                                    whammyOrigin = new BendPoint(0, 0);
-                                }
-                                whammyOrigin.offset = this.toBendOffset(parseFloat(c.findChildElement('Float').innerText));
-                                break;
-                            case 'WhammyBarMiddleValue':
-                                whammyMiddleValue = this.toBendValue(parseFloat(c.findChildElement('Float').innerText));
-                                break;
-                            case 'WhammyBarMiddleOffset1':
-                                whammyMiddleOffset1 = this.toBendOffset(parseFloat(c.findChildElement('Float').innerText));
-                                break;
-                            case 'WhammyBarMiddleOffset2':
-                                whammyMiddleOffset2 = this.toBendOffset(parseFloat(c.findChildElement('Float').innerText));
-                                break;
-                            case 'WhammyBarDestinationValue':
-                                if (!whammyDestination) {
-                                    whammyDestination = new BendPoint(BendPoint.MaxPosition, 0);
-                                }
-                                whammyDestination.value = this.toBendValue(parseFloat(c.findChildElement('Float').innerText));
-                                break;
-                            case 'WhammyBarDestinationOffset':
-                                if (!whammyDestination) {
-                                    whammyDestination = new BendPoint(0, 0);
-                                }
-                                whammyDestination.offset = this.toBendOffset(parseFloat(c.findChildElement('Float').innerText));
-                                break;
-                        }
-                        break;
-                }
-            }
-        }
-        if (isWhammy) {
-            if (!whammyOrigin) {
-                whammyOrigin = new BendPoint(0, 0);
-            }
-            if (!whammyDestination) {
-                whammyDestination = new BendPoint(BendPoint.MaxPosition, 0);
-            }
-            beat.addWhammyBarPoint(whammyOrigin);
-            if (whammyMiddleOffset1 && whammyMiddleValue) {
-                beat.addWhammyBarPoint(new BendPoint(whammyMiddleOffset1, whammyMiddleValue));
-            }
-            if (whammyMiddleOffset2 && whammyMiddleValue) {
-                beat.addWhammyBarPoint(new BendPoint(whammyMiddleOffset2, whammyMiddleValue));
-            }
-            if (!whammyMiddleOffset1 && !whammyMiddleOffset2 && whammyMiddleValue) {
-                beat.addWhammyBarPoint(new BendPoint((BendPoint.MaxPosition / 2) | 0, whammyMiddleValue));
-            }
-            beat.addWhammyBarPoint(whammyDestination);
-        }
-    }
-    parseNotes(node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Note':
-                        this.parseNote(c);
-                        break;
-                }
-            }
-        }
-    }
-    parseNote(node) {
-        let note = new Note();
-        let noteId = node.getAttribute('id');
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Properties':
-                        this.parseNoteProperties(c, note, noteId);
-                        break;
-                    case 'AntiAccent':
-                        if (c.innerText.toLowerCase() === 'normal') {
-                            note.isGhost = true;
-                        }
-                        break;
-                    case 'LetRing':
-                        note.isLetRing = true;
-                        break;
-                    case 'Trill':
-                        note.trillValue = parseInt(c.innerText);
-                        note.trillSpeed = Duration.Sixteenth;
-                        break;
-                    case 'Accent':
-                        let accentFlags = parseInt(c.innerText);
-                        if ((accentFlags & 0x01) !== 0) {
-                            note.isStaccato = true;
-                        }
-                        if ((accentFlags & 0x04) !== 0) {
-                            note.accentuated = AccentuationType.Heavy;
-                        }
-                        if ((accentFlags & 0x08) !== 0) {
-                            note.accentuated = AccentuationType.Normal;
-                        }
-                        break;
-                    case 'Tie':
-                        if (c.getAttribute('destination').toLowerCase() === 'true') {
-                            note.isTieDestination = true;
-                        }
-                        break;
-                    case 'Vibrato':
-                        switch (c.innerText) {
-                            case 'Slight':
-                                note.vibrato = VibratoType.Slight;
-                                break;
-                            case 'Wide':
-                                note.vibrato = VibratoType.Wide;
-                                break;
-                        }
-                        break;
-                    case 'LeftFingering':
-                        note.isFingering = true;
-                        switch (c.innerText) {
-                            case 'P':
-                                note.leftHandFinger = Fingers.Thumb;
-                                break;
-                            case 'I':
-                                note.leftHandFinger = Fingers.IndexFinger;
-                                break;
-                            case 'M':
-                                note.leftHandFinger = Fingers.MiddleFinger;
-                                break;
-                            case 'A':
-                                note.leftHandFinger = Fingers.AnnularFinger;
-                                break;
-                            case 'C':
-                                note.leftHandFinger = Fingers.LittleFinger;
-                                break;
-                        }
-                        break;
-                    case 'RightFingering':
-                        note.isFingering = true;
-                        switch (c.innerText) {
-                            case 'P':
-                                note.rightHandFinger = Fingers.Thumb;
-                                break;
-                            case 'I':
-                                note.rightHandFinger = Fingers.IndexFinger;
-                                break;
-                            case 'M':
-                                note.rightHandFinger = Fingers.MiddleFinger;
-                                break;
-                            case 'A':
-                                note.rightHandFinger = Fingers.AnnularFinger;
-                                break;
-                            case 'C':
-                                note.rightHandFinger = Fingers.LittleFinger;
-                                break;
-                        }
-                        break;
-                    case 'InstrumentArticulation':
-                        note.percussionArticulation = parseInt(c.innerText);
-                        break;
-                }
-            }
-        }
-        this._noteById.set(noteId, note);
-    }
-    parseNoteProperties(node, note, noteId) {
-        let isBended = false;
-        let bendOrigin = null;
-        let bendMiddleValue = null;
-        let bendMiddleOffset1 = null;
-        let bendMiddleOffset2 = null;
-        let bendDestination = null;
-        let element = -1;
-        let variation = -1;
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Property':
-                        let name = c.getAttribute('name');
-                        switch (name) {
-                            case 'String':
-                                note.string = parseInt(c.findChildElement('String').innerText) + 1;
-                                break;
-                            case 'Fret':
-                                note.fret = parseInt(c.findChildElement('Fret').innerText);
-                                break;
-                            case 'Element':
-                                element = parseInt(c.findChildElement('Element').innerText);
-                                break;
-                            case 'Variation':
-                                variation = parseInt(c.findChildElement('Variation').innerText);
-                                break;
-                            case 'Tapped':
-                                this._tappedNotes.set(noteId, true);
-                                break;
-                            case 'HarmonicType':
-                                let htype = c.findChildElement('HType');
-                                if (htype) {
-                                    switch (htype.innerText) {
-                                        case 'NoHarmonic':
-                                            note.harmonicType = HarmonicType.None;
-                                            break;
-                                        case 'Natural':
-                                            note.harmonicType = HarmonicType.Natural;
-                                            break;
-                                        case 'Artificial':
-                                            note.harmonicType = HarmonicType.Artificial;
-                                            break;
-                                        case 'Pinch':
-                                            note.harmonicType = HarmonicType.Pinch;
-                                            break;
-                                        case 'Tap':
-                                            note.harmonicType = HarmonicType.Tap;
-                                            break;
-                                        case 'Semi':
-                                            note.harmonicType = HarmonicType.Semi;
-                                            break;
-                                        case 'Feedback':
-                                            note.harmonicType = HarmonicType.Feedback;
-                                            break;
-                                    }
-                                }
-                                break;
-                            case 'HarmonicFret':
-                                let hfret = c.findChildElement('HFret');
-                                if (hfret) {
-                                    note.harmonicValue = parseFloat(hfret.innerText);
-                                }
-                                break;
-                            case 'Muted':
-                                if (c.findChildElement('Enable')) {
-                                    note.isDead = true;
-                                }
-                                break;
-                            case 'PalmMuted':
-                                if (c.findChildElement('Enable')) {
-                                    note.isPalmMute = true;
-                                }
-                                break;
-                            case 'Octave':
-                                note.octave = parseInt(c.findChildElement('Number').innerText);
-                                if (note.tone === -1) {
-                                    note.tone = 0;
-                                }
-                                break;
-                            case 'Tone':
-                                note.tone = parseInt(c.findChildElement('Step').innerText);
-                                break;
-                            case 'ConcertPitch':
-                                this.parseConcertPitch(c, note);
-                                break;
-                            case 'Bended':
-                                isBended = true;
-                                break;
-                            case 'BendOriginValue':
-                                if (!bendOrigin) {
-                                    bendOrigin = new BendPoint(0, 0);
-                                }
-                                bendOrigin.value = this.toBendValue(parseFloat(c.findChildElement('Float').innerText));
-                                break;
-                            case 'BendOriginOffset':
-                                if (!bendOrigin) {
-                                    bendOrigin = new BendPoint(0, 0);
-                                }
-                                bendOrigin.offset = this.toBendOffset(parseFloat(c.findChildElement('Float').innerText));
-                                break;
-                            case 'BendMiddleValue':
-                                bendMiddleValue = this.toBendValue(parseFloat(c.findChildElement('Float').innerText));
-                                break;
-                            case 'BendMiddleOffset1':
-                                bendMiddleOffset1 = this.toBendOffset(parseFloat(c.findChildElement('Float').innerText));
-                                break;
-                            case 'BendMiddleOffset2':
-                                bendMiddleOffset2 = this.toBendOffset(parseFloat(c.findChildElement('Float').innerText));
-                                break;
-                            case 'BendDestinationValue':
-                                if (!bendDestination) {
-                                    bendDestination = new BendPoint(BendPoint.MaxPosition, 0);
-                                }
-                                bendDestination.value = this.toBendValue(parseFloat(c.findChildElement('Float').innerText));
-                                break;
-                            case 'BendDestinationOffset':
-                                if (!bendDestination) {
-                                    bendDestination = new BendPoint(0, 0);
-                                }
-                                bendDestination.offset = this.toBendOffset(parseFloat(c.findChildElement('Float').innerText));
-                                break;
-                            case 'HopoOrigin':
-                                if (c.findChildElement('Enable')) {
-                                    note.isHammerPullOrigin = true;
-                                }
-                                break;
-                            case 'HopoDestination':
-                                break;
-                            case 'LeftHandTapped':
-                                note.isLeftHandTapped = true;
-                                break;
-                            case 'Slide':
-                                let slideFlags = parseInt(c.findChildElement('Flags').innerText);
-                                if ((slideFlags & 1) !== 0) {
-                                    note.slideOutType = SlideOutType.Shift;
-                                }
-                                else if ((slideFlags & 2) !== 0) {
-                                    note.slideOutType = SlideOutType.Legato;
-                                }
-                                else if ((slideFlags & 4) !== 0) {
-                                    note.slideOutType = SlideOutType.OutDown;
-                                }
-                                else if ((slideFlags & 8) !== 0) {
-                                    note.slideOutType = SlideOutType.OutUp;
-                                }
-                                if ((slideFlags & 16) !== 0) {
-                                    note.slideInType = SlideInType.IntoFromBelow;
-                                }
-                                else if ((slideFlags & 32) !== 0) {
-                                    note.slideInType = SlideInType.IntoFromAbove;
-                                }
-                                if ((slideFlags & 64) !== 0) {
-                                    note.slideOutType = SlideOutType.PickSlideDown;
-                                }
-                                else if ((slideFlags & 128) !== 0) {
-                                    note.slideOutType = SlideOutType.PickSlideUp;
-                                }
-                                break;
-                        }
-                        break;
-                }
-            }
-        }
-        if (isBended) {
-            if (!bendOrigin) {
-                bendOrigin = new BendPoint(0, 0);
-            }
-            if (!bendDestination) {
-                bendDestination = new BendPoint(BendPoint.MaxPosition, 0);
-            }
-            note.addBendPoint(bendOrigin);
-            if (bendMiddleOffset1 && bendMiddleValue) {
-                note.addBendPoint(new BendPoint(bendMiddleOffset1, bendMiddleValue));
-            }
-            if (bendMiddleOffset2 && bendMiddleValue) {
-                note.addBendPoint(new BendPoint(bendMiddleOffset2, bendMiddleValue));
-            }
-            if (!bendMiddleOffset1 && !bendMiddleOffset2 && bendMiddleValue) {
-                note.addBendPoint(new BendPoint((BendPoint.MaxPosition / 2) | 0, bendMiddleValue));
-            }
-            note.addBendPoint(bendDestination);
-        }
-        if (element !== -1 && variation !== -1) {
-            note.percussionArticulation = PercussionMapper.articulationFromElementVariation(element, variation);
-        }
-    }
-    parseConcertPitch(node, note) {
-        const pitch = node.findChildElement('Pitch');
-        if (pitch) {
-            for (let c of pitch.childNodes) {
-                if (c.nodeType === XmlNodeType.Element) {
-                    switch (c.localName) {
-                        case 'Accidental':
-                            switch (c.innerText) {
-                                case 'x':
-                                    note.accidentalMode = NoteAccidentalMode.ForceDoubleSharp;
-                                    break;
-                                case '#':
-                                    note.accidentalMode = NoteAccidentalMode.ForceSharp;
-                                    break;
-                                case 'b':
-                                    note.accidentalMode = NoteAccidentalMode.ForceFlat;
-                                    break;
-                                case 'bb':
-                                    note.accidentalMode = NoteAccidentalMode.ForceDoubleFlat;
-                                    break;
-                            }
-                            break;
-                    }
-                }
-            }
-        }
-    }
-    toBendValue(gpxValue) {
-        return (gpxValue * GpifParser.BendPointValueFactor) | 0;
-    }
-    toBendOffset(gpxOffset) {
-        return (gpxOffset * GpifParser.BendPointPositionFactor);
-    }
-    parseRhythms(node) {
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'Rhythm':
-                        this.parseRhythm(c);
-                        break;
-                }
-            }
-        }
-    }
-    parseRhythm(node) {
-        let rhythm = new GpifRhythm();
-        let rhythmId = node.getAttribute('id');
-        rhythm.id = rhythmId;
-        for (let c of node.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'NoteValue':
-                        switch (c.innerText) {
-                            case 'Long':
-                                rhythm.value = Duration.QuadrupleWhole;
-                                break;
-                            case 'DoubleWhole':
-                                rhythm.value = Duration.DoubleWhole;
-                                break;
-                            case 'Whole':
-                                rhythm.value = Duration.Whole;
-                                break;
-                            case 'Half':
-                                rhythm.value = Duration.Half;
-                                break;
-                            case 'Quarter':
-                                rhythm.value = Duration.Quarter;
-                                break;
-                            case 'Eighth':
-                                rhythm.value = Duration.Eighth;
-                                break;
-                            case '16th':
-                                rhythm.value = Duration.Sixteenth;
-                                break;
-                            case '32nd':
-                                rhythm.value = Duration.ThirtySecond;
-                                break;
-                            case '64th':
-                                rhythm.value = Duration.SixtyFourth;
-                                break;
-                            case '128th':
-                                rhythm.value = Duration.OneHundredTwentyEighth;
-                                break;
-                            case '256th':
-                                rhythm.value = Duration.TwoHundredFiftySixth;
-                                break;
-                        }
-                        break;
-                    case 'PrimaryTuplet':
-                        rhythm.tupletNumerator = parseInt(c.getAttribute('num'));
-                        rhythm.tupletDenominator = parseInt(c.getAttribute('den'));
-                        break;
-                    case 'AugmentationDot':
-                        rhythm.dots = parseInt(c.getAttribute('count'));
-                        break;
-                }
-            }
-        }
-        this._rhythmById.set(rhythmId, rhythm);
-    }
-    buildModel() {
-        for (let i = 0, j = this._masterBars.length; i < j; i++) {
-            let masterBar = this._masterBars[i];
-            this.score.addMasterBar(masterBar);
-        }
-        for (let trackId of this._tracksMapping) {
-            if (!trackId) {
-                continue;
-            }
-            let track = this._tracksById.get(trackId);
-            this.score.addTrack(track);
-        }
-        for (let barIds of this._barsOfMasterBar) {
-            let staffIndex = 0;
-            for (let barIndex = 0, trackIndex = 0; barIndex < barIds.length && trackIndex < this.score.tracks.length; barIndex++) {
-                let barId = barIds[barIndex];
-                if (barId !== GpifParser.InvalidId) {
-                    let bar = this._barsById.get(barId);
-                    let track = this.score.tracks[trackIndex];
-                    let staff = track.staves[staffIndex];
-                    staff.addBar(bar);
-                    if (this._voicesOfBar.has(barId)) {
-                        for (let voiceId of this._voicesOfBar.get(barId)) {
-                            if (voiceId !== GpifParser.InvalidId) {
-                                let voice = this._voiceById.get(voiceId);
-                                bar.addVoice(voice);
-                                if (this._beatsOfVoice.has(voiceId)) {
-                                    for (let beatId of this._beatsOfVoice.get(voiceId)) {
-                                        if (beatId !== GpifParser.InvalidId) {
-                                            let beat = BeatCloner.clone(this._beatById.get(beatId));
-                                            voice.addBeat(beat);
-                                            let rhythmId = this._rhythmOfBeat.get(beatId);
-                                            let rhythm = this._rhythmById.get(rhythmId);
-                                            beat.duration = rhythm.value;
-                                            beat.dots = rhythm.dots;
-                                            beat.tupletNumerator = rhythm.tupletNumerator;
-                                            beat.tupletDenominator = rhythm.tupletDenominator;
-                                            if (this._notesOfBeat.has(beatId)) {
-                                                for (let noteId of this._notesOfBeat.get(beatId)) {
-                                                    if (noteId !== GpifParser.InvalidId) {
-                                                        const note = NoteCloner.clone(this._noteById.get(noteId));
-                                                        if (staff.isPercussion) {
-                                                            note.fret = -1;
-                                                            note.string = -1;
-                                                        }
-                                                        else {
-                                                            note.percussionArticulation = -1;
-                                                        }
-                                                        beat.addNote(note);
-                                                        if (this._tappedNotes.has(noteId)) {
-                                                            beat.tap = true;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            else {
-                                let voice = new Voice();
-                                bar.addVoice(voice);
-                                let beat = new Beat();
-                                beat.isEmpty = true;
-                                beat.duration = Duration.Quarter;
-                                voice.addBeat(beat);
-                            }
-                        }
-                    }
-                    if (staffIndex === track.staves.length - 1) {
-                        trackIndex++;
-                        staffIndex = 0;
-                    }
-                    else {
-                        staffIndex++;
-                    }
-                }
-                else {
-                    trackIndex++;
-                }
-            }
-        }
-        for (let trackId of this._tracksMapping) {
-            if (!trackId) {
-                continue;
-            }
-            let track = this._tracksById.get(trackId);
-            let hasPercussion = false;
-            for (const staff of track.staves) {
-                if (staff.isPercussion) {
-                    hasPercussion = true;
-                    break;
-                }
-            }
-            if (!hasPercussion) {
-                track.percussionArticulations = [];
-            }
-            if (this._automationsPerTrackIdAndBarIndex.has(trackId)) {
-                const trackAutomations = this._automationsPerTrackIdAndBarIndex.get(trackId);
-                for (const [barNumber, automations] of trackAutomations) {
-                    if (track.staves.length > 0 && barNumber < track.staves[0].bars.length) {
-                        const bar = track.staves[0].bars[barNumber];
-                        if (bar.voices.length > 0 && bar.voices[0].beats.length > 0) {
-                            const beat = bar.voices[0].beats[0];
-                            for (const a of automations) {
-                                beat.automations.push(a);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        for (const [barNumber, automations] of this._masterTrackAutomations) {
-            let masterBar = this.score.masterBars[barNumber];
-            for (let i = 0, j = automations.length; i < j; i++) {
-                let automation = automations[i];
-                if (automation.type === AutomationType.Tempo) {
-                    if (barNumber === 0) {
-                        this.score.tempo = automation.value | 0;
-                        if (automation.text) {
-                            this.score.tempoLabel = automation.text;
-                        }
-                    }
-                    masterBar.tempoAutomation = automation;
-                }
-            }
-        }
-    }
-}
-GpifParser.InvalidId = '-1';
-GpifParser.BendPointPositionFactor = BendPoint.MaxPosition / 100.0;
-GpifParser.BendPointValueFactor = 1 / 25.0;
-class TypeConversions {
-    static float64ToBytes(v) {
-        TypeConversions._dataView.setFloat64(0, v, true);
-        return this._conversionByteArray;
-    }
-    static bytesToFloat64(bytes) {
-        TypeConversions._conversionByteArray.set(bytes, 0);
-        throw TypeConversions._dataView.getFloat64(0, true);
-    }
-    static uint16ToInt16(v) {
-        TypeConversions._dataView.setUint16(0, v, true);
-        return TypeConversions._dataView.getInt16(0, true);
-    }
-    static int16ToUint32(v) {
-        TypeConversions._dataView.setInt16(0, v, true);
-        return TypeConversions._dataView.getUint32(0, true);
-    }
-    static int32ToUint16(v) {
-        TypeConversions._dataView.setInt32(0, v, true);
-        return TypeConversions._dataView.getUint16(0, true);
-    }
-    static int32ToInt16(v) {
-        TypeConversions._dataView.setInt32(0, v, true);
-        return TypeConversions._dataView.getInt16(0, true);
-    }
-    static int32ToUint32(v) {
-        TypeConversions._dataView.setInt32(0, v, true);
-        return TypeConversions._dataView.getUint32(0, true);
-    }
-    static uint8ToInt8(v) {
-        TypeConversions._dataView.setUint8(0, v);
-        return TypeConversions._dataView.getInt8(0);
-    }
-}
-TypeConversions._conversionBuffer = new ArrayBuffer(8);
-TypeConversions._conversionByteArray = new Uint8Array(TypeConversions._conversionBuffer);
-TypeConversions._dataView = new DataView(TypeConversions._conversionBuffer);
-class ScoreImporter {
-    init(data, settings) {
-        this.data = data;
-        this.settings = settings;
-    }
-}
-class IOHelper {
-    static readInt32BE(input) {
-        let ch1 = input.readByte();
-        let ch2 = input.readByte();
-        let ch3 = input.readByte();
-        let ch4 = input.readByte();
-        return (ch1 << 24) | (ch2 << 16) | (ch3 << 8) | ch4;
-    }
-    static readInt32LE(input) {
-        let ch1 = input.readByte();
-        let ch2 = input.readByte();
-        let ch3 = input.readByte();
-        let ch4 = input.readByte();
-        return (ch4 << 24) | (ch3 << 16) | (ch2 << 8) | ch1;
-    }
-    static readUInt32LE(input) {
-        let ch1 = input.readByte();
-        let ch2 = input.readByte();
-        let ch3 = input.readByte();
-        let ch4 = input.readByte();
-        return (ch4 << 24) | (ch3 << 16) | (ch2 << 8) | ch1;
-    }
-    static decodeUInt32LE(data, index) {
-        let ch1 = data[index];
-        let ch2 = data[index + 1];
-        let ch3 = data[index + 2];
-        let ch4 = data[index + 3];
-        return (ch4 << 24) | (ch3 << 16) | (ch2 << 8) | ch1;
-    }
-    static readUInt16LE(input) {
-        let ch1 = input.readByte();
-        let ch2 = input.readByte();
-        return TypeConversions.int32ToUint16((ch2 << 8) | ch1);
-    }
-    static readInt16LE(input) {
-        let ch1 = input.readByte();
-        let ch2 = input.readByte();
-        return TypeConversions.int32ToInt16((ch2 << 8) | ch1);
-    }
-    static readUInt32BE(input) {
-        let ch1 = input.readByte();
-        let ch2 = input.readByte();
-        let ch3 = input.readByte();
-        let ch4 = input.readByte();
-        return TypeConversions.int32ToUint32((ch1 << 24) | (ch2 << 16) | (ch3 << 8) | ch4);
-    }
-    static readUInt16BE(input) {
-        let ch1 = input.readByte();
-        let ch2 = input.readByte();
-        return TypeConversions.int32ToInt16((ch1 << 8) | ch2);
-    }
-    static readInt16BE(input) {
-        let ch1 = input.readByte();
-        let ch2 = input.readByte();
-        return TypeConversions.int32ToInt16((ch1 << 8) | ch2);
-    }
-    static readByteArray(input, length) {
-        let v = new Uint8Array(length);
-        input.read(v, 0, length);
-        return v;
-    }
-    static read8BitChars(input, length) {
-        let b = new Uint8Array(length);
-        input.read(b, 0, b.length);
-        return IOHelper.toString(b, 'utf-8');
-    }
-    static read8BitString(input) {
-        let s = '';
-        let c = input.readByte();
-        while (c !== 0) {
-            s += String.fromCharCode(c);
-            c = input.readByte();
-        }
-        return s;
-    }
-    static read8BitStringLength(input, length) {
-        let s = '';
-        let z = -1;
-        for (let i = 0; i < length; i++) {
-            let c = input.readByte();
-            if (c === 0 && z === -1) {
-                z = i;
-            }
-            s += String.fromCharCode(c);
-        }
-        let t = s;
-        if (z >= 0) {
-            return t.substr(0, z);
-        }
-        return t;
-    }
-    static readSInt8(input) {
-        let v = input.readByte();
-        return ((v & 255) >> 7) * -256 + (v & 255);
-    }
-    static readInt24(input, index) {
-        let i = input[index] | (input[index + 1] << 8) | (input[index + 2] << 16);
-        if ((i & 0x800000) === 0x800000) {
-            i = i | (0xff << 24);
-        }
-        return i;
-    }
-    static readInt16(input, index) {
-        return TypeConversions.int32ToInt16(input[index] | (input[index + 1] << 8));
-    }
-    static toString(data, encoding) {
-        let detectedEncoding = IOHelper.detectEncoding(data);
-        if (detectedEncoding) {
-            encoding = detectedEncoding;
-        }
-        if (!encoding) {
-            encoding = 'utf-8';
-        }
-        let decoder = new TextDecoder(encoding);
-        return decoder.decode(data.buffer);
-    }
-    static detectEncoding(data) {
-        if (data.length > 2 && data[0] === 0xfe && data[1] === 0xff) {
-            return 'utf-16be';
-        }
-        if (data.length > 2 && data[0] === 0xff && data[1] === 0xfe) {
-            return 'utf-16le';
-        }
-        if (data.length > 4 && data[0] === 0x00 && data[1] === 0x00 && data[2] === 0xfe && data[3] === 0xff) {
-            return 'utf-32be';
-        }
-        if (data.length > 4 && data[0] === 0xff && data[1] === 0xfe && data[2] === 0x00 && data[3] === 0x00) {
-            return 'utf-32le';
-        }
-        return null;
-    }
-    static stringToBytes(str) {
-        let decoder = new TextEncoder();
-        return decoder.encode(str);
-    }
-    static writeInt32BE(o, v) {
-        o.writeByte((v >> 24) & 0xff);
-        o.writeByte((v >> 16) & 0xff);
-        o.writeByte((v >> 8) & 0xff);
-        o.writeByte((v >> 0) & 0xff);
-    }
-    static writeInt32LE(o, v) {
-        o.writeByte((v >> 0) & 0xff);
-        o.writeByte((v >> 8) & 0xff);
-        o.writeByte((v >> 16) & 0xff);
-        o.writeByte((v >> 24) & 0xff);
-    }
-    static writeUInt16LE(o, v) {
-        o.writeByte((v >> 0) & 0xff);
-        o.writeByte((v >> 8) & 0xff);
-    }
-    static writeInt16LE(o, v) {
-        o.writeByte((v >> 0) & 0xff);
-        o.writeByte((v >> 8) & 0xff);
-    }
-    static writeInt16BE(o, v) {
-        o.writeByte((v >> 8) & 0xff);
-        o.writeByte((v >> 0) & 0xff);
-    }
-}
 class Gp3To5Importer extends ScoreImporter {
     constructor() {
         super();
@@ -8570,11 +2702,12 @@ class Gp3To5Importer extends ScoreImporter {
     readVersion() {
         let version = GpBinaryHelpers.gpReadStringByteLength(this.data, 30, this.settings.importer.encoding);
         if (!version.startsWith(Gp3To5Importer.VersionString)) {
-            throw new Error('Unsupported format');
+            throw 'Unsupported format';
         }
         version = version.substr(Gp3To5Importer.VersionString.length + 1);
         let dot = version.indexOf(String.fromCharCode(46));
         this._versionNumber = 100 * parseInt(version.substr(0, dot)) + parseInt(version.substr(dot + 1));
+        console.log(this.name, 'Guitar Pro version ' + version + ' detected');
     }
     readScoreInformation() {
         var _a;
@@ -8684,6 +2817,7 @@ class Gp3To5Importer extends ScoreImporter {
             let section = new Section();
             section.text = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
             section.marker = '';
+            GpBinaryHelpers.gpReadColor(this.data, false);
             newMasterBar.section = section;
         }
         if ((flags & 0x40) !== 0) {
@@ -8758,6 +2892,7 @@ class Gp3To5Importer extends ScoreImporter {
             newTrack.playbackInfo = info;
         }
         mainStaff.capo = IOHelper.readInt32LE(this.data);
+        newTrack.color = GpBinaryHelpers.gpReadColor(this.data, false);
         if (this._versionNumber >= 500) {
             this.data.readByte();
             this.data.readByte();
@@ -9547,6 +3682,19 @@ class GpBinaryHelpers {
         let array = new Float32Array(bytes.buffer);
         return array[0];
     }
+    static gpReadColor(data, readAlpha = false) {
+        let r = data.readByte();
+        let g = data.readByte();
+        let b = data.readByte();
+        let a = 255;
+        if (readAlpha) {
+            a = data.readByte();
+        }
+        else {
+            data.skip(1);
+        }
+        return new Color(r, g, b, a);
+    }
     static gpReadBool(data) {
         return data.readByte() !== 0;
     }
@@ -9591,27 +3739,3361 @@ class MixTableChange {
         this.duration = -1;
     }
 }
-class GPImporter {
-    load(arrayBuffer) {
-        let test = new Gp3To5Importer();
-    }
-    convertProject(title, comment) {
-        console.log('GPImporter.convertProject', this);
-        let project = {
-            title: title + ' ' + comment,
-            timeline: [],
-            tracks: [],
-            percussions: [],
-            filters: [],
-            comments: []
-        };
-        return project;
+class Settings {
+    constructor() {
+        this.notation = new NotationSettings();
+        this.importer = new ImporterSettings();
     }
 }
-function newGPparser(arrayBuffer) {
-    console.log("newGPparser");
-    let pp = new GPImporter();
-    pp.load(arrayBuffer);
-    return pp;
+class Score {
+    constructor() {
+        this._currentRepeatGroup = null;
+        this._openedRepeatGroups = [];
+        this._properlyOpenedRepeatGroups = 0;
+        this.album = '';
+        this.artist = '';
+        this.copyright = '';
+        this.instructions = '';
+        this.music = '';
+        this.notices = '';
+        this.subTitle = '';
+        this.title = '';
+        this.words = '';
+        this.tab = '';
+        this.tempo = 120;
+        this.tempoLabel = '';
+        this.masterBars = [];
+        this.tracks = [];
+        this.defaultSystemsLayout = 3;
+        this.systemsLayout = [];
+    }
+    rebuildRepeatGroups() {
+        this._currentRepeatGroup = null;
+        this._openedRepeatGroups = [];
+        this._properlyOpenedRepeatGroups = 0;
+        for (const bar of this.masterBars) {
+            this.addMasterBarToRepeatGroups(bar);
+        }
+    }
+    addMasterBar(bar) {
+        bar.score = this;
+        bar.index = this.masterBars.length;
+        if (this.masterBars.length !== 0) {
+            bar.previousMasterBar = this.masterBars[this.masterBars.length - 1];
+            bar.previousMasterBar.nextMasterBar = bar;
+            bar.start =
+                bar.previousMasterBar.start +
+                    (bar.previousMasterBar.isAnacrusis ? 0 : bar.previousMasterBar.calculateDuration());
+        }
+        this.addMasterBarToRepeatGroups(bar);
+        this.masterBars.push(bar);
+    }
+    addMasterBarToRepeatGroups(bar) {
+        var _a;
+        if (bar.isRepeatStart) {
+            if ((_a = this._currentRepeatGroup) === null || _a === void 0 ? void 0 : _a.isClosed) {
+                this._openedRepeatGroups.pop();
+                this._properlyOpenedRepeatGroups--;
+            }
+            this._currentRepeatGroup = new RepeatGroup();
+            this._openedRepeatGroups.push(this._currentRepeatGroup);
+            this._properlyOpenedRepeatGroups++;
+        }
+        else if (!this._currentRepeatGroup) {
+            this._currentRepeatGroup = new RepeatGroup();
+            this._openedRepeatGroups.push(this._currentRepeatGroup);
+        }
+        this._currentRepeatGroup.addMasterBar(bar);
+        if (bar.isRepeatEnd) {
+            if (this._properlyOpenedRepeatGroups > 1) {
+                this._openedRepeatGroups.pop();
+                this._properlyOpenedRepeatGroups--;
+                this._currentRepeatGroup =
+                    this._openedRepeatGroups.length > 0
+                        ? this._openedRepeatGroups[this._openedRepeatGroups.length - 1]
+                        : null;
+            }
+        }
+    }
+    addTrack(track) {
+        track.score = this;
+        track.index = this.tracks.length;
+        this.tracks.push(track);
+    }
+    finish(settings) {
+        const sharedDataBag = new Map();
+        for (let i = 0, j = this.tracks.length; i < j; i++) {
+            this.tracks[i].finish(settings, sharedDataBag);
+        }
+    }
 }
+class RepeatGroup {
+    constructor() {
+        this.masterBars = [];
+        this.opening = null;
+        this.closings = [];
+        this.isClosed = false;
+    }
+    get openings() {
+        const opening = this.opening;
+        return opening ? [opening] : [];
+    }
+    get isOpened() { var _a; return ((_a = this.opening) === null || _a === void 0 ? void 0 : _a.isRepeatStart) === true; }
+    addMasterBar(masterBar) {
+        if (this.opening === null) {
+            this.opening = masterBar;
+        }
+        this.masterBars.push(masterBar);
+        masterBar.repeatGroup = this;
+        if (masterBar.isRepeatEnd) {
+            this.closings.push(masterBar);
+            this.isClosed = true;
+        }
+    }
+}
+var AccentuationType;
+(function (AccentuationType) {
+    AccentuationType[AccentuationType["None"] = 0] = "None";
+    AccentuationType[AccentuationType["Normal"] = 1] = "Normal";
+    AccentuationType[AccentuationType["Heavy"] = 2] = "Heavy";
+})(AccentuationType || (AccentuationType = {}));
+var AccidentalType;
+(function (AccidentalType) {
+    AccidentalType[AccidentalType["None"] = 0] = "None";
+    AccidentalType[AccidentalType["Natural"] = 1] = "Natural";
+    AccidentalType[AccidentalType["Sharp"] = 2] = "Sharp";
+    AccidentalType[AccidentalType["Flat"] = 3] = "Flat";
+    AccidentalType[AccidentalType["NaturalQuarterNoteUp"] = 4] = "NaturalQuarterNoteUp";
+    AccidentalType[AccidentalType["SharpQuarterNoteUp"] = 5] = "SharpQuarterNoteUp";
+    AccidentalType[AccidentalType["FlatQuarterNoteUp"] = 6] = "FlatQuarterNoteUp";
+    AccidentalType[AccidentalType["DoubleSharp"] = 7] = "DoubleSharp";
+    AccidentalType[AccidentalType["DoubleFlat"] = 8] = "DoubleFlat";
+})(AccidentalType || (AccidentalType = {}));
+var AutomationType;
+(function (AutomationType) {
+    AutomationType[AutomationType["Tempo"] = 0] = "Tempo";
+    AutomationType[AutomationType["Volume"] = 1] = "Volume";
+    AutomationType[AutomationType["Instrument"] = 2] = "Instrument";
+    AutomationType[AutomationType["Balance"] = 3] = "Balance";
+})(AutomationType || (AutomationType = {}));
+class Automation {
+    constructor() {
+        this.isLinear = false;
+        this.type = AutomationType.Tempo;
+        this.value = 0;
+        this.ratioPosition = 0;
+        this.text = '';
+    }
+    static buildTempoAutomation(isLinear, ratioPosition, value, reference) {
+        if (reference < 1 || reference > 5) {
+            reference = 2;
+        }
+        let references = new Float32Array([1, 0.5, 1.0, 1.5, 2.0, 3.0]);
+        let automation = new Automation();
+        automation.type = AutomationType.Tempo;
+        automation.isLinear = isLinear;
+        automation.ratioPosition = ratioPosition;
+        automation.value = value * references[reference];
+        return automation;
+    }
+    static buildInstrumentAutomation(isLinear, ratioPosition, value) {
+        let automation = new Automation();
+        automation.type = AutomationType.Instrument;
+        automation.isLinear = isLinear;
+        automation.ratioPosition = ratioPosition;
+        automation.value = value;
+        return automation;
+    }
+}
+class Bar {
+    constructor() {
+        this.id = Bar._globalBarId++;
+        this.index = 0;
+        this.nextBar = null;
+        this.previousBar = null;
+        this.clef = Clef.G2;
+        this.clefOttava = Ottavia.Regular;
+        this.voices = [];
+        this.simileMark = SimileMark.None;
+        this.isMultiVoice = false;
+        this.displayScale = 1;
+        this.displayWidth = -1;
+    }
+    get masterBar() {
+        return this.staff.track.score.masterBars[this.index];
+    }
+    get isEmpty() {
+        for (let i = 0, j = this.voices.length; i < j; i++) {
+            if (!this.voices[i].isEmpty) {
+                return false;
+            }
+        }
+        return true;
+    }
+    addVoice(voice) {
+        voice.bar = this;
+        voice.index = this.voices.length;
+        this.voices.push(voice);
+    }
+    finish(settings, sharedDataBag = null) {
+        this.isMultiVoice = false;
+        for (let i = 0, j = this.voices.length; i < j; i++) {
+            let voice = this.voices[i];
+            voice.finish(settings, sharedDataBag);
+            if (i > 0 && !voice.isEmpty) {
+                this.isMultiVoice = true;
+            }
+        }
+    }
+    calculateDuration() {
+        let duration = 0;
+        for (let voice of this.voices) {
+            let voiceDuration = voice.calculateDuration();
+            if (voiceDuration > duration) {
+                duration = voiceDuration;
+            }
+        }
+        return duration;
+    }
+}
+Bar._globalBarId = 0;
+var BeatBeamingMode;
+(function (BeatBeamingMode) {
+    BeatBeamingMode[BeatBeamingMode["Auto"] = 0] = "Auto";
+    BeatBeamingMode[BeatBeamingMode["ForceSplitToNext"] = 1] = "ForceSplitToNext";
+    BeatBeamingMode[BeatBeamingMode["ForceMergeWithNext"] = 2] = "ForceMergeWithNext";
+})(BeatBeamingMode || (BeatBeamingMode = {}));
+class Beat {
+    constructor() {
+        this.id = Beat._globalBeatId++;
+        this.index = 0;
+        this.previousBeat = null;
+        this.nextBeat = null;
+        this.notes = [];
+        this.noteStringLookup = new Map();
+        this.noteValueLookup = new Map();
+        this.isEmpty = false;
+        this.whammyStyle = BendStyle.Default;
+        this.ottava = Ottavia.Regular;
+        this.fermata = null;
+        this.isLegatoOrigin = false;
+        this.minNote = null;
+        this.maxNote = null;
+        this.maxStringNote = null;
+        this.minStringNote = null;
+        this.duration = Duration.Quarter;
+        this.isLetRing = false;
+        this.isPalmMute = false;
+        this.automations = [];
+        this.dots = 0;
+        this.fadeIn = false;
+        this.lyrics = null;
+        this.hasRasgueado = false;
+        this.pop = false;
+        this.slap = false;
+        this.tap = false;
+        this.text = null;
+        this.brushType = BrushType.None;
+        this.brushDuration = 0;
+        this.tupletDenominator = -1;
+        this.tupletNumerator = -1;
+        this.tupletGroup = null;
+        this.isContinuedWhammy = false;
+        this.whammyBarType = WhammyType.None;
+        this.whammyBarPoints = null;
+        this.maxWhammyPoint = null;
+        this.minWhammyPoint = null;
+        this.vibrato = VibratoType.None;
+        this.chordId = null;
+        this.graceType = GraceType.None;
+        this.graceGroup = null;
+        this.graceIndex = -1;
+        this.pickStroke = PickStroke.None;
+        this.tremoloSpeed = null;
+        this.crescendo = CrescendoType.None;
+        this.displayStart = 0;
+        this.playbackStart = 0;
+        this.displayDuration = 0;
+        this.playbackDuration = 0;
+        this.dynamics = DynamicValue.F;
+        this.invertBeamDirection = false;
+        this.preferredBeamDirection = null;
+        this.isEffectSlurOrigin = false;
+        this.effectSlurOrigin = null;
+        this.effectSlurDestination = null;
+        this.beamingMode = BeatBeamingMode.Auto;
+    }
+    get isLastOfVoice() {
+        return this.index === this.voice.beats.length - 1;
+    }
+    get isLegatoDestination() {
+        return !!this.previousBeat && this.previousBeat.isLegatoOrigin;
+    }
+    get isRest() {
+        return this.isEmpty || this.notes.length === 0;
+    }
+    get isFullBarRest() {
+        return this.isRest && this.voice.beats.length === 1 && this.duration === Duration.Whole;
+    }
+    get hasTuplet() {
+        return (!(this.tupletDenominator === -1 && this.tupletNumerator === -1) &&
+            !(this.tupletDenominator === 1 && this.tupletNumerator === 1));
+    }
+    get hasWhammyBar() {
+        return this.whammyBarPoints !== null && this.whammyBarType !== WhammyType.None;
+    }
+    get hasChord() {
+        return !!this.chordId;
+    }
+    get chord() {
+        return this.chordId ? this.voice.bar.staff.getChord(this.chordId) : null;
+    }
+    get isTremolo() {
+        return !!this.tremoloSpeed;
+    }
+    get absoluteDisplayStart() {
+        return this.voice.bar.masterBar.start + this.displayStart;
+    }
+    get absolutePlaybackStart() {
+        return this.voice.bar.masterBar.start + this.playbackStart;
+    }
+    get isEffectSlurDestination() {
+        return !!this.effectSlurOrigin;
+    }
+    addWhammyBarPoint(point) {
+        let points = this.whammyBarPoints;
+        if (points === null) {
+            points = [];
+            this.whammyBarPoints = points;
+        }
+        points.push(point);
+        if (!this.maxWhammyPoint || point.value > this.maxWhammyPoint.value) {
+            this.maxWhammyPoint = point;
+        }
+        if (!this.minWhammyPoint || point.value < this.minWhammyPoint.value) {
+            this.minWhammyPoint = point;
+        }
+        if (this.whammyBarType === WhammyType.None) {
+            this.whammyBarType = WhammyType.Custom;
+        }
+    }
+    removeWhammyBarPoint(index) {
+        const points = this.whammyBarPoints;
+        if (points === null || index < 0 || index >= points.length) {
+            return;
+        }
+        points.splice(index, 1);
+        let point = points[index];
+        if (point === this.maxWhammyPoint) {
+            this.maxWhammyPoint = null;
+            for (let currentPoint of points) {
+                if (!this.maxWhammyPoint || currentPoint.value > this.maxWhammyPoint.value) {
+                    this.maxWhammyPoint = currentPoint;
+                }
+            }
+        }
+        if (point === this.minWhammyPoint) {
+            this.minWhammyPoint = null;
+            for (let currentPoint of points) {
+                if (!this.minWhammyPoint || currentPoint.value < this.minWhammyPoint.value) {
+                    this.minWhammyPoint = currentPoint;
+                }
+            }
+        }
+    }
+    addNote(note) {
+        note.beat = this;
+        note.index = this.notes.length;
+        this.notes.push(note);
+        if (note.isStringed) {
+            this.noteStringLookup.set(note.string, note);
+        }
+    }
+    removeNote(note) {
+        let index = this.notes.indexOf(note);
+        if (index >= 0) {
+            this.notes.splice(index, 1);
+            if (note.isStringed) {
+                this.noteStringLookup.delete(note.string);
+            }
+        }
+    }
+    getAutomation(type) {
+        for (let i = 0, j = this.automations.length; i < j; i++) {
+            let automation = this.automations[i];
+            if (automation.type === type) {
+                return automation;
+            }
+        }
+        return null;
+    }
+    getNoteOnString(noteString) {
+        if (this.noteStringLookup.has(noteString)) {
+            return this.noteStringLookup.get(noteString);
+        }
+        return null;
+    }
+    calculateDuration() {
+        if (this.isFullBarRest) {
+            return this.voice.bar.masterBar.calculateDuration();
+        }
+        let ticks = MidiUtils.toTicks(this.duration);
+        if (this.dots === 2) {
+            ticks = MidiUtils.applyDot(ticks, true);
+        }
+        else if (this.dots === 1) {
+            ticks = MidiUtils.applyDot(ticks, false);
+        }
+        if (this.tupletDenominator > 0 && this.tupletNumerator >= 0) {
+            ticks = MidiUtils.applyTuplet(ticks, this.tupletNumerator, this.tupletDenominator);
+        }
+        return ticks;
+    }
+    updateDurations() {
+        let ticks = this.calculateDuration();
+        this.playbackDuration = ticks;
+        switch (this.graceType) {
+            case GraceType.BeforeBeat:
+            case GraceType.OnBeat:
+                switch (this.duration) {
+                    case Duration.Sixteenth:
+                        this.playbackDuration = MidiUtils.toTicks(Duration.SixtyFourth);
+                        break;
+                    case Duration.ThirtySecond:
+                        this.playbackDuration = MidiUtils.toTicks(Duration.OneHundredTwentyEighth);
+                        break;
+                    default:
+                        this.playbackDuration = MidiUtils.toTicks(Duration.ThirtySecond);
+                        break;
+                }
+                this.displayDuration = 0;
+                break;
+            case GraceType.BendGrace:
+                this.playbackDuration /= 2;
+                this.displayDuration = 0;
+                break;
+            default:
+                this.displayDuration = ticks;
+                let previous = this.previousBeat;
+                if (previous && previous.graceType === GraceType.BendGrace) {
+                    this.playbackDuration = previous.playbackDuration;
+                }
+                break;
+        }
+    }
+    finishTuplet() {
+        let previousBeat = this.previousBeat;
+        let currentTupletGroup = previousBeat ? previousBeat.tupletGroup : null;
+        if (this.hasTuplet || (this.graceType !== GraceType.None && currentTupletGroup)) {
+            if (!previousBeat || !currentTupletGroup || !currentTupletGroup.check(this)) {
+                currentTupletGroup = new TupletGroup(this.voice);
+                currentTupletGroup.check(this);
+            }
+            this.tupletGroup = currentTupletGroup;
+        }
+    }
+    finish(settings, sharedDataBag = null) {
+        if (this.getAutomation(AutomationType.Instrument) === null &&
+            this.index === 0 &&
+            this.voice.index === 0 &&
+            this.voice.bar.index === 0 &&
+            this.voice.bar.staff.index === 0) {
+            this.automations.push(Automation.buildInstrumentAutomation(false, 0, this.voice.bar.staff.track.playbackInfo.program));
+        }
+        switch (this.graceType) {
+            case GraceType.OnBeat:
+            case GraceType.BeforeBeat:
+                let numberOfGraceBeats = this.graceGroup.beats.length;
+                if (numberOfGraceBeats === 1) {
+                    this.duration = Duration.Eighth;
+                }
+                else if (numberOfGraceBeats === 2) {
+                    this.duration = Duration.Sixteenth;
+                }
+                else {
+                    this.duration = Duration.ThirtySecond;
+                }
+                break;
+        }
+        let displayMode = !settings ? NotationMode.GuitarPro : settings.notation.notationMode;
+        let isGradual = this.text === 'grad' || this.text === 'grad.';
+        if (isGradual && displayMode === NotationMode.SongBook) {
+            this.text = '';
+        }
+        let needCopyBeatForBend = false;
+        this.minNote = null;
+        this.maxNote = null;
+        this.minStringNote = null;
+        this.maxStringNote = null;
+        let visibleNotes = 0;
+        let isEffectSlurBeat = false;
+        for (let i = 0, j = this.notes.length; i < j; i++) {
+            let note = this.notes[i];
+            note.dynamics = this.dynamics;
+            note.finish(settings, sharedDataBag);
+            if (note.isLetRing) {
+                this.isLetRing = true;
+            }
+            if (note.isPalmMute) {
+                this.isPalmMute = true;
+            }
+            if (displayMode === NotationMode.SongBook && note.hasBend && this.graceType !== GraceType.BendGrace) {
+                if (!note.isTieOrigin) {
+                    switch (note.bendType) {
+                        case BendType.Bend:
+                        case BendType.PrebendRelease:
+                        case BendType.PrebendBend:
+                            needCopyBeatForBend = true;
+                            break;
+                    }
+                }
+                if (isGradual || note.bendStyle === BendStyle.Gradual) {
+                    isGradual = true;
+                    note.bendStyle = BendStyle.Gradual;
+                    needCopyBeatForBend = false;
+                }
+                else {
+                    note.bendStyle = BendStyle.Fast;
+                }
+            }
+            if (note.isVisible) {
+                visibleNotes++;
+                if (!this.minNote || note.realValue < this.minNote.realValue) {
+                    this.minNote = note;
+                }
+                if (!this.maxNote || note.realValue > this.maxNote.realValue) {
+                    this.maxNote = note;
+                }
+                if (!this.minStringNote || note.string < this.minStringNote.string) {
+                    this.minStringNote = note;
+                }
+                if (!this.maxStringNote || note.string > this.maxStringNote.string) {
+                    this.maxStringNote = note;
+                }
+                if (note.hasEffectSlur) {
+                    isEffectSlurBeat = true;
+                }
+            }
+        }
+        if (isEffectSlurBeat) {
+            if (this.effectSlurOrigin) {
+                this.effectSlurOrigin.effectSlurDestination = this.nextBeat;
+                if (this.effectSlurOrigin.effectSlurDestination) {
+                    this.effectSlurOrigin.effectSlurDestination.effectSlurOrigin = this.effectSlurOrigin;
+                }
+                this.effectSlurOrigin = null;
+            }
+            else {
+                this.isEffectSlurOrigin = true;
+                this.effectSlurDestination = this.nextBeat;
+                if (this.effectSlurDestination) {
+                    this.effectSlurDestination.effectSlurOrigin = this;
+                }
+            }
+        }
+        if (this.notes.length > 0 && visibleNotes === 0) {
+            this.isEmpty = true;
+        }
+        if (!this.isRest && (!this.isLetRing || !this.isPalmMute)) {
+            let currentBeat = this.previousBeat;
+            while (currentBeat && currentBeat.isRest) {
+                if (!this.isLetRing) {
+                    currentBeat.isLetRing = false;
+                }
+                if (!this.isPalmMute) {
+                    currentBeat.isPalmMute = false;
+                }
+                currentBeat = currentBeat.previousBeat;
+            }
+        }
+        else if (this.isRest &&
+            this.previousBeat &&
+            settings &&
+            settings.notation.notationMode === NotationMode.GuitarPro) {
+            if (this.previousBeat.isLetRing) {
+                this.isLetRing = true;
+            }
+            if (this.previousBeat.isPalmMute) {
+                this.isPalmMute = true;
+            }
+        }
+        const points = this.whammyBarPoints;
+        if (points !== null && points.length > 0 && this.whammyBarType === WhammyType.Custom) {
+            if (displayMode === NotationMode.SongBook) {
+                this.whammyStyle = isGradual ? BendStyle.Gradual : BendStyle.Fast;
+            }
+            let isContinuedWhammy = !!this.previousBeat && this.previousBeat.hasWhammyBar;
+            this.isContinuedWhammy = isContinuedWhammy;
+            if (points.length === 4) {
+                let origin = points[0];
+                let middle1 = points[1];
+                let middle2 = points[2];
+                let destination = points[3];
+                if (middle1.value === middle2.value) {
+                    if ((origin.value < middle1.value && middle1.value < destination.value) ||
+                        (origin.value > middle1.value && middle1.value > destination.value)) {
+                        if (origin.value !== 0 && !isContinuedWhammy) {
+                            this.whammyBarType = WhammyType.PrediveDive;
+                        }
+                        else {
+                            this.whammyBarType = WhammyType.Dive;
+                        }
+                        points.splice(2, 1);
+                        points.splice(1, 1);
+                    }
+                    else if ((origin.value > middle1.value && middle1.value < destination.value) ||
+                        (origin.value < middle1.value && middle1.value > destination.value)) {
+                        this.whammyBarType = WhammyType.Dip;
+                        if (middle1.offset === middle2.offset || displayMode === NotationMode.SongBook) {
+                            points.splice(2, 1);
+                        }
+                    }
+                    else if (origin.value === middle1.value && middle1.value === destination.value) {
+                        if (origin.value !== 0 && !isContinuedWhammy) {
+                            this.whammyBarType = WhammyType.Predive;
+                        }
+                        else {
+                            this.whammyBarType = WhammyType.Hold;
+                        }
+                        points.splice(2, 1);
+                        points.splice(1, 1);
+                    }
+                }
+            }
+        }
+        this.updateDurations();
+        if (needCopyBeatForBend) {
+            let cloneBeat = BeatCloner.clone(this);
+            cloneBeat.id = Beat._globalBeatId++;
+            cloneBeat.pickStroke = PickStroke.None;
+            for (let i = 0, j = cloneBeat.notes.length; i < j; i++) {
+                let cloneNote = cloneBeat.notes[i];
+                let note = this.notes[i];
+                cloneNote.bendType = BendType.None;
+                cloneNote.maxBendPoint = null;
+                cloneNote.bendPoints = null;
+                cloneNote.bendStyle = BendStyle.Default;
+                cloneNote.id = Note.GlobalNoteId++;
+                if (note.isTieOrigin) {
+                    cloneNote.tieDestination = note.tieDestination;
+                    note.tieDestination.tieOrigin = cloneNote;
+                }
+                if (note.isTieDestination) {
+                    cloneNote.tieOrigin = note.tieOrigin ? note.tieOrigin : null;
+                    note.tieOrigin.tieDestination = cloneNote;
+                }
+                if (note.hasBend && note.isTieOrigin) {
+                    let tieDestination = Note.findTieOrigin(note);
+                    if (tieDestination && tieDestination.hasBend) {
+                        cloneNote.bendType = BendType.Hold;
+                        let lastPoint = note.bendPoints[note.bendPoints.length - 1];
+                        cloneNote.addBendPoint(new BendPoint(0, lastPoint.value));
+                        cloneNote.addBendPoint(new BendPoint(BendPoint.MaxPosition, lastPoint.value));
+                    }
+                }
+                cloneNote.isTieDestination = true;
+            }
+            this.graceType = GraceType.BendGrace;
+            this.graceGroup = new GraceGroup();
+            this.graceGroup.addBeat(this);
+            this.graceGroup.isComplete = true;
+            this.graceGroup.finish();
+            this.updateDurations();
+            this.voice.insertBeat(this, cloneBeat);
+            cloneBeat.graceGroup = new GraceGroup();
+            cloneBeat.graceGroup.addBeat(this);
+            cloneBeat.graceGroup.isComplete = true;
+            cloneBeat.graceGroup.finish();
+        }
+    }
+    isBefore(beat) {
+        return (this.voice.bar.index < beat.voice.bar.index ||
+            (beat.voice.bar.index === this.voice.bar.index && this.index < beat.index));
+    }
+    isAfter(beat) {
+        return (this.voice.bar.index > beat.voice.bar.index ||
+            (beat.voice.bar.index === this.voice.bar.index && this.index > beat.index));
+    }
+    hasNoteOnString(noteString) {
+        return this.noteStringLookup.has(noteString);
+    }
+    getNoteWithRealValue(noteRealValue) {
+        if (this.noteValueLookup.has(noteRealValue)) {
+            return this.noteValueLookup.get(noteRealValue);
+        }
+        return null;
+    }
+    chain(sharedDataBag = null) {
+        for (const n of this.notes) {
+            this.noteValueLookup.set(n.realValue, n);
+            n.chain(sharedDataBag);
+        }
+    }
+}
+Beat._globalBeatId = 0;
+class BendPoint {
+    constructor(offset = 0, value = 0) {
+        this.offset = offset;
+        this.value = value;
+    }
+}
+BendPoint.MaxPosition = 60;
+BendPoint.MaxValue = 12;
+var BendStyle;
+(function (BendStyle) {
+    BendStyle[BendStyle["Default"] = 0] = "Default";
+    BendStyle[BendStyle["Gradual"] = 1] = "Gradual";
+    BendStyle[BendStyle["Fast"] = 2] = "Fast";
+})(BendStyle || (BendStyle = {}));
+var BendType;
+(function (BendType) {
+    BendType[BendType["None"] = 0] = "None";
+    BendType[BendType["Custom"] = 1] = "Custom";
+    BendType[BendType["Bend"] = 2] = "Bend";
+    BendType[BendType["Release"] = 3] = "Release";
+    BendType[BendType["BendRelease"] = 4] = "BendRelease";
+    BendType[BendType["Hold"] = 5] = "Hold";
+    BendType[BendType["Prebend"] = 6] = "Prebend";
+    BendType[BendType["PrebendBend"] = 7] = "PrebendBend";
+    BendType[BendType["PrebendRelease"] = 8] = "PrebendRelease";
+})(BendType || (BendType = {}));
+var BrushType;
+(function (BrushType) {
+    BrushType[BrushType["None"] = 0] = "None";
+    BrushType[BrushType["BrushUp"] = 1] = "BrushUp";
+    BrushType[BrushType["BrushDown"] = 2] = "BrushDown";
+    BrushType[BrushType["ArpeggioUp"] = 3] = "ArpeggioUp";
+    BrushType[BrushType["ArpeggioDown"] = 4] = "ArpeggioDown";
+})(BrushType || (BrushType = {}));
+class Chord {
+    constructor() {
+        this.name = '';
+        this.firstFret = 1;
+        this.strings = [];
+        this.barreFrets = [];
+        this.showName = true;
+        this.showDiagram = true;
+        this.showFingering = true;
+    }
+    get uniqueId() {
+        const properties = [
+            this.name,
+            this.firstFret.toString(),
+            this.strings.join(','),
+            this.barreFrets.join(','),
+            this.showDiagram.toString(),
+            this.showFingering.toString(),
+            this.showName.toString()
+        ];
+        return properties.join('|');
+    }
+}
+var Clef;
+(function (Clef) {
+    Clef[Clef["Neutral"] = 0] = "Neutral";
+    Clef[Clef["C3"] = 1] = "C3";
+    Clef[Clef["C4"] = 2] = "C4";
+    Clef[Clef["F4"] = 3] = "F4";
+    Clef[Clef["G2"] = 4] = "G2";
+})(Clef || (Clef = {}));
+var FermataType;
+(function (FermataType) {
+    FermataType[FermataType["Short"] = 0] = "Short";
+    FermataType[FermataType["Medium"] = 1] = "Medium";
+    FermataType[FermataType["Long"] = 2] = "Long";
+})(FermataType || (FermataType = {}));
+class Fermata {
+    constructor() {
+        this.type = FermataType.Short;
+        this.length = 0;
+    }
+}
+var KeySignature;
+(function (KeySignature) {
+    KeySignature[KeySignature["Cb"] = -7] = "Cb";
+    KeySignature[KeySignature["Gb"] = -6] = "Gb";
+    KeySignature[KeySignature["Db"] = -5] = "Db";
+    KeySignature[KeySignature["Ab"] = -4] = "Ab";
+    KeySignature[KeySignature["Eb"] = -3] = "Eb";
+    KeySignature[KeySignature["Bb"] = -2] = "Bb";
+    KeySignature[KeySignature["F"] = -1] = "F";
+    KeySignature[KeySignature["C"] = 0] = "C";
+    KeySignature[KeySignature["G"] = 1] = "G";
+    KeySignature[KeySignature["D"] = 2] = "D";
+    KeySignature[KeySignature["A"] = 3] = "A";
+    KeySignature[KeySignature["E"] = 4] = "E";
+    KeySignature[KeySignature["B"] = 5] = "B";
+    KeySignature[KeySignature["FSharp"] = 6] = "FSharp";
+    KeySignature[KeySignature["CSharp"] = 7] = "CSharp";
+})(KeySignature || (KeySignature = {}));
+var KeySignatureType;
+(function (KeySignatureType) {
+    KeySignatureType[KeySignatureType["Major"] = 0] = "Major";
+    KeySignatureType[KeySignatureType["Minor"] = 1] = "Minor";
+})(KeySignatureType || (KeySignatureType = {}));
+class MasterBar {
+    constructor() {
+        this.alternateEndings = 0;
+        this.nextMasterBar = null;
+        this.previousMasterBar = null;
+        this.index = 0;
+        this.keySignature = KeySignature.C;
+        this.keySignatureType = KeySignatureType.Major;
+        this.isDoubleBar = false;
+        this.isRepeatStart = false;
+        this.repeatCount = 0;
+        this.timeSignatureNumerator = 4;
+        this.timeSignatureDenominator = 4;
+        this.timeSignatureCommon = false;
+        this.tripletFeel = TripletFeel.NoTripletFeel;
+        this.section = null;
+        this.tempoAutomation = null;
+        this.fermata = null;
+        this.start = 0;
+        this.isAnacrusis = false;
+        this.displayScale = 1;
+        this.displayWidth = -1;
+    }
+    get isRepeatEnd() {
+        return this.repeatCount > 0;
+    }
+    get isSectionStart() {
+        return !!this.section;
+    }
+    calculateDuration(respectAnacrusis = true) {
+        if (this.isAnacrusis && respectAnacrusis) {
+            let duration = 0;
+            for (let track of this.score.tracks) {
+                for (let staff of track.staves) {
+                    let barDuration = this.index < staff.bars.length ? staff.bars[this.index].calculateDuration() : 0;
+                    if (barDuration > duration) {
+                        duration = barDuration;
+                    }
+                }
+            }
+            return duration;
+        }
+        return this.timeSignatureNumerator * MidiUtils.valueToTicks(this.timeSignatureDenominator);
+    }
+    addFermata(offset, fermata) {
+        let fermataMap = this.fermata;
+        if (fermataMap === null) {
+            fermataMap = new Map();
+            this.fermata = fermataMap;
+        }
+        fermataMap.set(offset, fermata);
+    }
+    getFermata(beat) {
+        const fermataMap = this.fermata;
+        if (fermataMap === null) {
+            return null;
+        }
+        if (fermataMap.has(beat.playbackStart)) {
+            return fermataMap.get(beat.playbackStart);
+        }
+        return null;
+    }
+}
+MasterBar.MaxAlternateEndings = 8;
+class MidiUtils {
+    static ticksToMillis(ticks, tempo) {
+        return (ticks * (60000.0 / (tempo * MidiUtils.QuarterTime))) | 0;
+    }
+    static millisToTicks(millis, tempo) {
+        return (millis / (60000.0 / (tempo * MidiUtils.QuarterTime))) | 0;
+    }
+    static toTicks(duration) {
+        return MidiUtils.valueToTicks(duration);
+    }
+    static valueToTicks(duration) {
+        let denomninator = duration;
+        if (denomninator < 0) {
+            denomninator = 1 / -denomninator;
+        }
+        return (MidiUtils.QuarterTime * (4.0 / denomninator)) | 0;
+    }
+    static applyDot(ticks, doubleDotted) {
+        if (doubleDotted) {
+            return ticks + ((ticks / 4) | 0) * 3;
+        }
+        return ticks + ((ticks / 2) | 0);
+    }
+    static applyTuplet(ticks, numerator, denominator) {
+        return ((ticks * denominator) / numerator) | 0;
+    }
+    static removeTuplet(ticks, numerator, denominator) {
+        return ((ticks * numerator) / denominator) | 0;
+    }
+    static dynamicToVelocity(dynamicsSteps) {
+        return MidiUtils.MinVelocity + dynamicsSteps * MidiUtils.VelocityIncrement;
+    }
+}
+MidiUtils.QuarterTime = 960;
+MidiUtils.MinVelocity = 15;
+MidiUtils.VelocityIncrement = 16;
+var Duration;
+(function (Duration) {
+    Duration[Duration["QuadrupleWhole"] = -4] = "QuadrupleWhole";
+    Duration[Duration["DoubleWhole"] = -2] = "DoubleWhole";
+    Duration[Duration["Whole"] = 1] = "Whole";
+    Duration[Duration["Half"] = 2] = "Half";
+    Duration[Duration["Quarter"] = 4] = "Quarter";
+    Duration[Duration["Eighth"] = 8] = "Eighth";
+    Duration[Duration["Sixteenth"] = 16] = "Sixteenth";
+    Duration[Duration["ThirtySecond"] = 32] = "ThirtySecond";
+    Duration[Duration["SixtyFourth"] = 64] = "SixtyFourth";
+    Duration[Duration["OneHundredTwentyEighth"] = 128] = "OneHundredTwentyEighth";
+    Duration[Duration["TwoHundredFiftySixth"] = 256] = "TwoHundredFiftySixth";
+})(Duration || (Duration = {}));
+var Ottavia;
+(function (Ottavia) {
+    Ottavia[Ottavia["_15ma"] = 0] = "_15ma";
+    Ottavia[Ottavia["_8va"] = 1] = "_8va";
+    Ottavia[Ottavia["Regular"] = 2] = "Regular";
+    Ottavia[Ottavia["_8vb"] = 3] = "_8vb";
+    Ottavia[Ottavia["_15mb"] = 4] = "_15mb";
+})(Ottavia || (Ottavia = {}));
+class Staff {
+    constructor() {
+        this.index = 0;
+        this.bars = [];
+        this.chords = null;
+        this.capo = 0;
+        this.transpositionPitch = 0;
+        this.displayTranspositionPitch = 0;
+        this.stringTuning = new Tuning('', [], false);
+        this.showTablature = true;
+        this.showStandardNotation = true;
+        this.isPercussion = false;
+        this.standardNotationLineCount = 5;
+    }
+    get tuning() {
+        return this.stringTuning.tunings;
+    }
+    get tuningName() {
+        return this.stringTuning.name;
+    }
+    get isStringed() {
+        return this.stringTuning.tunings.length > 0;
+    }
+    finish(settings, sharedDataBag = null) {
+        this.stringTuning.finish();
+        for (let i = 0, j = this.bars.length; i < j; i++) {
+            this.bars[i].finish(settings, sharedDataBag);
+        }
+    }
+    addChord(chordId, chord) {
+        chord.staff = this;
+        let chordMap = this.chords;
+        if (chordMap === null) {
+            chordMap = new Map();
+            this.chords = chordMap;
+        }
+        chordMap.set(chordId, chord);
+    }
+    hasChord(chordId) {
+        var _a, _b;
+        return (_b = (_a = this.chords) === null || _a === void 0 ? void 0 : _a.has(chordId)) !== null && _b !== void 0 ? _b : false;
+    }
+    getChord(chordId) {
+        var _a, _b;
+        return (_b = (_a = this.chords) === null || _a === void 0 ? void 0 : _a.get(chordId)) !== null && _b !== void 0 ? _b : null;
+    }
+    addBar(bar) {
+        let bars = this.bars;
+        bar.staff = this;
+        bar.index = bars.length;
+        if (bars.length > 0) {
+            bar.previousBar = bars[bars.length - 1];
+            bar.previousBar.nextBar = bar;
+        }
+        bars.push(bar);
+    }
+}
+class Track {
+    constructor() {
+        this.index = 0;
+        this.staves = [];
+        this.playbackInfo = new PlaybackInformation();
+        this.color = new Color(200, 0, 0, 255);
+        this.name = '';
+        this.shortName = '';
+        this.defaultSystemsLayout = 3;
+        this.systemsLayout = [];
+        this.percussionArticulations = [];
+    }
+    ensureStaveCount(staveCount) {
+        while (this.staves.length < staveCount) {
+            this.addStaff(new Staff());
+        }
+    }
+    addStaff(staff) {
+        staff.index = this.staves.length;
+        staff.track = this;
+        this.staves.push(staff);
+    }
+    finish(settings, sharedDataBag = null) {
+        if (!this.shortName) {
+            this.shortName = this.name;
+            if (this.shortName.length > Track.ShortNameMaxLength) {
+                this.shortName = this.shortName.substr(0, Track.ShortNameMaxLength);
+            }
+        }
+        for (let i = 0, j = this.staves.length; i < j; i++) {
+            this.staves[i].finish(settings, sharedDataBag);
+        }
+    }
+    applyLyrics(lyrics) {
+        for (let lyric of lyrics) {
+            lyric.finish();
+        }
+        let staff = this.staves[0];
+        for (let li = 0; li < lyrics.length; li++) {
+            let lyric = lyrics[li];
+            if (lyric.startBar >= 0 && lyric.startBar < staff.bars.length) {
+                let beat = staff.bars[lyric.startBar].voices[0].beats[0];
+                for (let ci = 0; ci < lyric.chunks.length && beat; ci++) {
+                    while (beat && (beat.isEmpty || beat.isRest)) {
+                        beat = beat.nextBeat;
+                    }
+                    if (beat) {
+                        if (!beat.lyrics) {
+                            beat.lyrics = new Array(lyrics.length);
+                            beat.lyrics.fill("");
+                        }
+                        beat.lyrics[li] = lyric.chunks[ci];
+                        beat = beat.nextBeat;
+                    }
+                }
+            }
+        }
+    }
+}
+Track.ShortNameMaxLength = 10;
+class Voice {
+    constructor() {
+        this.id = Voice._globalBarId++;
+        this.index = 0;
+        this.beats = [];
+        this.isEmpty = true;
+    }
+    insertBeat(after, newBeat) {
+        newBeat.nextBeat = after.nextBeat;
+        if (newBeat.nextBeat) {
+            newBeat.nextBeat.previousBeat = newBeat;
+        }
+        newBeat.previousBeat = after;
+        newBeat.voice = this;
+        after.nextBeat = newBeat;
+        this.beats.splice(after.index + 1, 0, newBeat);
+    }
+    addBeat(beat) {
+        beat.voice = this;
+        beat.index = this.beats.length;
+        this.beats.push(beat);
+        if (!beat.isEmpty) {
+            this.isEmpty = false;
+        }
+    }
+    chain(beat, sharedDataBag = null) {
+        if (!this.bar) {
+            return;
+        }
+        if (beat.index < this.beats.length - 1) {
+            beat.nextBeat = this.beats[beat.index + 1];
+            beat.nextBeat.previousBeat = beat;
+        }
+        else if (beat.isLastOfVoice && beat.voice.bar.nextBar) {
+            let nextVoice = this.bar.nextBar.voices[this.index];
+            if (nextVoice.beats.length > 0) {
+                beat.nextBeat = nextVoice.beats[0];
+                beat.nextBeat.previousBeat = beat;
+            }
+            else {
+                beat.nextBeat.previousBeat = beat;
+            }
+        }
+        beat.chain(sharedDataBag);
+    }
+    addGraceBeat(beat) {
+        if (this.beats.length === 0) {
+            this.addBeat(beat);
+            return;
+        }
+        let lastBeat = this.beats[this.beats.length - 1];
+        this.beats.splice(this.beats.length - 1, 1);
+        this.addBeat(beat);
+        this.addBeat(lastBeat);
+        this.isEmpty = false;
+    }
+    getBeatAtPlaybackStart(playbackStart) {
+        if (this._beatLookup.has(playbackStart)) {
+            return this._beatLookup.get(playbackStart);
+        }
+        return null;
+    }
+    finish(settings, sharedDataBag = null) {
+        this._beatLookup = new Map();
+        let currentGraceGroup = null;
+        for (let index = 0; index < this.beats.length; index++) {
+            let beat = this.beats[index];
+            beat.index = index;
+            this.chain(beat, sharedDataBag);
+            if (beat.graceType === GraceType.None) {
+                beat.graceGroup = currentGraceGroup;
+                if (currentGraceGroup) {
+                    currentGraceGroup.isComplete = true;
+                }
+                currentGraceGroup = null;
+            }
+            else {
+                if (!currentGraceGroup) {
+                    currentGraceGroup = new GraceGroup();
+                }
+                currentGraceGroup.addBeat(beat);
+            }
+        }
+        let currentDisplayTick = 0;
+        let currentPlaybackTick = 0;
+        for (let i = 0; i < this.beats.length; i++) {
+            let beat = this.beats[i];
+            beat.index = i;
+            beat.finish(settings, sharedDataBag);
+            if (beat.graceType === GraceType.None) {
+                if (beat.graceGroup) {
+                    const firstGraceBeat = beat.graceGroup.beats[0];
+                    const lastGraceBeat = beat.graceGroup.beats[beat.graceGroup.beats.length - 1];
+                    if (firstGraceBeat.graceType !== GraceType.BendGrace) {
+                        let stolenDuration = lastGraceBeat.playbackStart + lastGraceBeat.playbackDuration - firstGraceBeat.playbackStart;
+                        switch (firstGraceBeat.graceType) {
+                            case GraceType.BeforeBeat:
+                                if (firstGraceBeat.previousBeat) {
+                                    firstGraceBeat.previousBeat.playbackDuration -= stolenDuration;
+                                    if (firstGraceBeat.previousBeat.voice == this) {
+                                        currentPlaybackTick =
+                                            firstGraceBeat.previousBeat.playbackStart +
+                                                firstGraceBeat.previousBeat.playbackDuration;
+                                    }
+                                    else {
+                                        currentPlaybackTick = -stolenDuration;
+                                    }
+                                }
+                                else {
+                                    currentPlaybackTick = -stolenDuration;
+                                }
+                                for (const graceBeat of beat.graceGroup.beats) {
+                                    this._beatLookup.delete(graceBeat.playbackStart);
+                                    graceBeat.playbackStart = currentPlaybackTick;
+                                    this._beatLookup.set(graceBeat.playbackStart, beat);
+                                    currentPlaybackTick += graceBeat.playbackDuration;
+                                }
+                                break;
+                            case GraceType.OnBeat:
+                                beat.playbackDuration -= stolenDuration;
+                                if (lastGraceBeat.voice === this) {
+                                    currentPlaybackTick = lastGraceBeat.playbackStart + lastGraceBeat.playbackDuration;
+                                }
+                                else {
+                                    currentPlaybackTick = -stolenDuration;
+                                }
+                                break;
+                        }
+                    }
+                }
+                beat.displayStart = currentDisplayTick;
+                beat.playbackStart = currentPlaybackTick;
+                if (beat.fermata) {
+                    this.bar.masterBar.addFermata(beat.playbackStart, beat.fermata);
+                }
+                else {
+                    beat.fermata = this.bar.masterBar.getFermata(beat);
+                }
+                this._beatLookup.set(beat.playbackStart, beat);
+            }
+            else {
+                beat.displayStart = currentDisplayTick;
+                beat.playbackStart = currentPlaybackTick;
+            }
+            beat.finishTuplet();
+            if (beat.graceGroup) {
+                beat.graceGroup.finish();
+            }
+            currentDisplayTick += beat.displayDuration;
+            currentPlaybackTick += beat.playbackDuration;
+        }
+    }
+    calculateDuration() {
+        if (this.isEmpty || this.beats.length === 0) {
+            return 0;
+        }
+        let lastBeat = this.beats[this.beats.length - 1];
+        let firstBeat = this.beats[0];
+        return lastBeat.playbackStart + lastBeat.playbackDuration - firstBeat.playbackStart;
+    }
+}
+Voice._globalBarId = 0;
+var SimileMark;
+(function (SimileMark) {
+    SimileMark[SimileMark["None"] = 0] = "None";
+    SimileMark[SimileMark["Simple"] = 1] = "Simple";
+    SimileMark[SimileMark["FirstOfDouble"] = 2] = "FirstOfDouble";
+    SimileMark[SimileMark["SecondOfDouble"] = 3] = "SecondOfDouble";
+})(SimileMark || (SimileMark = {}));
+class NoteIdBag {
+    constructor() {
+        this.tieDestinationNoteId = -1;
+        this.tieOriginNoteId = -1;
+        this.slurDestinationNoteId = -1;
+        this.slurOriginNoteId = -1;
+        this.hammerPullDestinationNoteId = -1;
+        this.hammerPullOriginNoteId = -1;
+    }
+}
+class Note {
+    constructor() {
+        this.id = Note.GlobalNoteId++;
+        this.index = 0;
+        this.accentuated = AccentuationType.None;
+        this.bendType = BendType.None;
+        this.bendStyle = BendStyle.Default;
+        this.bendOrigin = null;
+        this.isContinuedBend = false;
+        this.bendPoints = null;
+        this.maxBendPoint = null;
+        this.fret = -1;
+        this.string = -1;
+        this.octave = -1;
+        this.tone = -1;
+        this.percussionArticulation = -1;
+        this.isVisible = true;
+        this.isLeftHandTapped = false;
+        this.isHammerPullOrigin = false;
+        this.hammerPullOrigin = null;
+        this.hammerPullDestination = null;
+        this.isSlurDestination = false;
+        this.slurOrigin = null;
+        this.slurDestination = null;
+        this.harmonicType = HarmonicType.None;
+        this.harmonicValue = 0;
+        this.isGhost = false;
+        this.isLetRing = false;
+        this.letRingDestination = null;
+        this.isPalmMute = false;
+        this.palmMuteDestination = null;
+        this.isDead = false;
+        this.isStaccato = false;
+        this.slideInType = SlideInType.None;
+        this.slideOutType = SlideOutType.None;
+        this.slideTarget = null;
+        this.slideOrigin = null;
+        this.vibrato = VibratoType.None;
+        this.tieOrigin = null;
+        this.tieDestination = null;
+        this.isTieDestination = false;
+        this.leftHandFinger = Fingers.Unknown;
+        this.rightHandFinger = Fingers.Unknown;
+        this.isFingering = false;
+        this.trillValue = -1;
+        this.trillSpeed = Duration.ThirtySecond;
+        this.durationPercent = 1;
+        this.accidentalMode = NoteAccidentalMode.Default;
+        this.dynamics = DynamicValue.F;
+        this.isEffectSlurOrigin = false;
+        this.hasEffectSlur = false;
+        this.effectSlurOrigin = null;
+        this.effectSlurDestination = null;
+        this._noteIdBag = null;
+    }
+    get hasBend() {
+        return this.bendPoints !== null && this.bendType !== BendType.None;
+    }
+    get isStringed() {
+        return this.string >= 0;
+    }
+    get isPiano() {
+        return !this.isStringed && this.octave >= 0 && this.tone >= 0;
+    }
+    get isPercussion() {
+        return !this.isStringed && this.percussionArticulation >= 0;
+    }
+    get element() {
+        return this.isPercussion ? PercussionMapper.getElementAndVariation(this)[0] : -1;
+    }
+    get variation() {
+        return this.isPercussion ? PercussionMapper.getElementAndVariation(this)[1] : -1;
+    }
+    get isHammerPullDestination() {
+        return !!this.hammerPullOrigin;
+    }
+    get isSlurOrigin() {
+        return !!this.slurDestination;
+    }
+    get isHarmonic() {
+        return this.harmonicType !== HarmonicType.None;
+    }
+    get isTieOrigin() {
+        return this.tieDestination !== null;
+    }
+    get trillFret() {
+        return this.trillValue - this.stringTuning;
+    }
+    get isTrill() {
+        return this.trillValue >= 0;
+    }
+    get isEffectSlurDestination() {
+        return !!this.effectSlurOrigin;
+    }
+    get stringTuning() {
+        return this.beat.voice.bar.staff.capo + Note.getStringTuning(this.beat.voice.bar.staff, this.string);
+    }
+    static getStringTuning(staff, noteString) {
+        if (staff.tuning.length > 0) {
+            return staff.tuning[staff.tuning.length - (noteString - 1) - 1];
+        }
+        return 0;
+    }
+    get realValue() {
+        return this.calculateRealValue(true, true);
+    }
+    get realValueWithoutHarmonic() {
+        return this.calculateRealValue(true, false);
+    }
+    calculateRealValue(applyTranspositionPitch, applyHarmonic) {
+        const transpositionPitch = applyTranspositionPitch ? this.beat.voice.bar.staff.transpositionPitch : 0;
+        if (applyHarmonic) {
+            let realValue = this.calculateRealValue(applyTranspositionPitch, false);
+            if (this.isStringed) {
+                if (this.harmonicType === HarmonicType.Natural) {
+                    realValue = this.harmonicPitch + this.stringTuning - transpositionPitch;
+                }
+                else {
+                    realValue += this.harmonicPitch;
+                }
+            }
+            return realValue;
+        }
+        else {
+            if (this.isPercussion) {
+                return this.percussionArticulation;
+            }
+            if (this.isStringed) {
+                return this.fret + this.stringTuning - transpositionPitch;
+            }
+            if (this.isPiano) {
+                return this.octave * 12 + this.tone - transpositionPitch;
+            }
+            return 0;
+        }
+    }
+    get harmonicPitch() {
+        if (this.harmonicType === HarmonicType.None || !this.isStringed) {
+            return 0;
+        }
+        let value = this.harmonicValue;
+        if (ModelUtils.isAlmostEqualTo(value, 2.4)) {
+            return 36;
+        }
+        if (ModelUtils.isAlmostEqualTo(value, 2.7)) {
+            return 34;
+        }
+        if (value < 3) {
+            return 0;
+        }
+        if (value <= 3.5) {
+            return 31;
+        }
+        if (value <= 4) {
+            return 28;
+        }
+        if (value <= 5) {
+            return 24;
+        }
+        if (value <= 6) {
+            return 34;
+        }
+        if (value <= 7) {
+            return 19;
+        }
+        if (value <= 8.5) {
+            return 36;
+        }
+        if (value <= 9) {
+            return 28;
+        }
+        if (value <= 10) {
+            return 34;
+        }
+        if (value <= 11) {
+            return 0;
+        }
+        if (value <= 12) {
+            return 12;
+        }
+        if (value < 14) {
+            return 0;
+        }
+        if (value <= 15) {
+            return 34;
+        }
+        if (value <= 16) {
+            return 28;
+        }
+        if (value <= 17) {
+            return 36;
+        }
+        if (value <= 18) {
+            return 0;
+        }
+        if (value <= 19) {
+            return 19;
+        }
+        if (value <= 21) {
+            return 0;
+        }
+        if (value <= 22) {
+            return 36;
+        }
+        if (value <= 24) {
+            return 24;
+        }
+        return 0;
+    }
+    get initialBendValue() {
+        if (this.hasBend) {
+            return Math.floor(this.bendPoints[0].value / 2);
+        }
+        else if (this.bendOrigin) {
+            return Math.floor(this.bendOrigin.bendPoints[this.bendOrigin.bendPoints.length - 1].value / 2);
+        }
+        else if (this.isTieDestination && this.tieOrigin.bendOrigin) {
+            return Math.floor(this.tieOrigin.bendOrigin.bendPoints[this.tieOrigin.bendOrigin.bendPoints.length - 1].value / 2);
+        }
+        else if (this.beat.hasWhammyBar) {
+            return Math.floor(this.beat.whammyBarPoints[0].value / 2);
+        }
+        else if (this.beat.isContinuedWhammy) {
+            return Math.floor(this.beat.previousBeat.whammyBarPoints[this.beat.previousBeat.whammyBarPoints.length - 1].value / 2);
+        }
+        return 0;
+    }
+    get displayValue() {
+        return this.displayValueWithoutBend + this.initialBendValue;
+    }
+    get displayValueWithoutBend() {
+        let noteValue = this.realValue;
+        if (this.harmonicType !== HarmonicType.Natural && this.harmonicType !== HarmonicType.None) {
+            noteValue -= this.harmonicPitch;
+        }
+        switch (this.beat.ottava) {
+            case Ottavia._15ma:
+                noteValue -= 24;
+                break;
+            case Ottavia._8va:
+                noteValue -= 12;
+                break;
+            case Ottavia.Regular:
+                break;
+            case Ottavia._8vb:
+                noteValue += 12;
+                break;
+            case Ottavia._15mb:
+                noteValue += 24;
+                break;
+        }
+        switch (this.beat.voice.bar.clefOttava) {
+            case Ottavia._15ma:
+                noteValue -= 24;
+                break;
+            case Ottavia._8va:
+                noteValue -= 12;
+                break;
+            case Ottavia.Regular:
+                break;
+            case Ottavia._8vb:
+                noteValue += 12;
+                break;
+            case Ottavia._15mb:
+                noteValue += 24;
+                break;
+        }
+        return noteValue - this.beat.voice.bar.staff.displayTranspositionPitch;
+    }
+    get hasQuarterToneOffset() {
+        if (this.hasBend) {
+            return this.bendPoints[0].value % 2 !== 0;
+        }
+        if (this.bendOrigin) {
+            return this.bendOrigin.bendPoints[this.bendOrigin.bendPoints.length - 1].value % 2 !== 0;
+        }
+        if (this.beat.hasWhammyBar) {
+            return this.beat.whammyBarPoints[0].value % 2 !== 0;
+        }
+        if (this.beat.isContinuedWhammy) {
+            return (this.beat.previousBeat.whammyBarPoints[this.beat.previousBeat.whammyBarPoints.length - 1].value %
+                2 !==
+                0);
+        }
+        return false;
+    }
+    addBendPoint(point) {
+        let points = this.bendPoints;
+        if (points === null) {
+            points = [];
+            this.bendPoints = points;
+        }
+        points.push(point);
+        if (!this.maxBendPoint || point.value > this.maxBendPoint.value) {
+            this.maxBendPoint = point;
+        }
+        if (this.bendType === BendType.None) {
+            this.bendType = BendType.Custom;
+        }
+    }
+    finish(settings, sharedDataBag = null) {
+        let nextNoteOnLine = new Lazy(() => Note.nextNoteOnSameLine(this));
+        let isSongBook = settings && settings.notation.notationMode === NotationMode.SongBook;
+        if (this.isTieDestination) {
+            this.chain(sharedDataBag);
+            if (isSongBook && this.tieOrigin && this.tieOrigin.isLetRing) {
+                this.isLetRing = true;
+            }
+        }
+        if (this.isLetRing) {
+            if (!nextNoteOnLine.value || !nextNoteOnLine.value.isLetRing) {
+                this.letRingDestination = this;
+            }
+            else {
+                this.letRingDestination = nextNoteOnLine.value;
+            }
+            if (isSongBook && this.isTieDestination && !this.tieOrigin.hasBend) {
+                this.isVisible = false;
+            }
+        }
+        if (this.isPalmMute) {
+            if (!nextNoteOnLine.value || !nextNoteOnLine.value.isPalmMute) {
+                this.palmMuteDestination = this;
+            }
+            else {
+                this.palmMuteDestination = nextNoteOnLine.value;
+            }
+        }
+        if (this.isHammerPullOrigin) {
+            let hammerPullDestination = Note.findHammerPullDestination(this);
+            if (!hammerPullDestination) {
+                this.isHammerPullOrigin = false;
+            }
+            else {
+                this.hammerPullDestination = hammerPullDestination;
+                hammerPullDestination.hammerPullOrigin = this;
+            }
+        }
+        switch (this.slideOutType) {
+            case SlideOutType.Shift:
+            case SlideOutType.Legato:
+                this.slideTarget = nextNoteOnLine.value;
+                if (!this.slideTarget) {
+                    this.slideOutType = SlideOutType.None;
+                }
+                else {
+                    this.slideTarget.slideOrigin = this;
+                }
+                break;
+        }
+        let effectSlurDestination = null;
+        if (this.isHammerPullOrigin && this.hammerPullDestination) {
+            effectSlurDestination = this.hammerPullDestination;
+        }
+        else if (this.slideOutType === SlideOutType.Legato && this.slideTarget) {
+            effectSlurDestination = this.slideTarget;
+        }
+        if (effectSlurDestination) {
+            this.hasEffectSlur = true;
+            if (this.effectSlurOrigin && this.beat.pickStroke === PickStroke.None) {
+                this.effectSlurOrigin.effectSlurDestination = effectSlurDestination;
+                this.effectSlurOrigin.effectSlurDestination.effectSlurOrigin = this.effectSlurOrigin;
+                this.effectSlurOrigin = null;
+            }
+            else {
+                this.isEffectSlurOrigin = true;
+                this.effectSlurDestination = effectSlurDestination;
+                this.effectSlurDestination.effectSlurOrigin = this;
+            }
+        }
+        const points = this.bendPoints;
+        if (points != null && points.length > 0 && this.bendType === BendType.Custom) {
+            let isContinuedBend = this.isTieDestination && this.tieOrigin.hasBend;
+            this.isContinuedBend = isContinuedBend;
+            if (points.length === 4) {
+                let origin = points[0];
+                let middle1 = points[1];
+                let middle2 = points[2];
+                let destination = points[3];
+                if (middle1.value === middle2.value) {
+                    if (destination.value > origin.value) {
+                        if (middle1.value > destination.value) {
+                            this.bendType = BendType.BendRelease;
+                        }
+                        else if (!isContinuedBend && origin.value > 0) {
+                            this.bendType = BendType.PrebendBend;
+                            points.splice(2, 1);
+                            points.splice(1, 1);
+                        }
+                        else {
+                            this.bendType = BendType.Bend;
+                            points.splice(2, 1);
+                            points.splice(1, 1);
+                        }
+                    }
+                    else if (destination.value < origin.value) {
+                        if (isContinuedBend) {
+                            this.bendType = BendType.Release;
+                            points.splice(2, 1);
+                            points.splice(1, 1);
+                        }
+                        else {
+                            this.bendType = BendType.PrebendRelease;
+                            points.splice(2, 1);
+                            points.splice(1, 1);
+                        }
+                    }
+                    else {
+                        if (middle1.value > origin.value) {
+                            this.bendType = BendType.BendRelease;
+                        }
+                        else if (origin.value > 0 && !isContinuedBend) {
+                            this.bendType = BendType.Prebend;
+                            points.splice(2, 1);
+                            points.splice(1, 1);
+                        }
+                        else {
+                            this.bendType = BendType.Hold;
+                            points.splice(2, 1);
+                            points.splice(1, 1);
+                        }
+                    }
+                }
+                else {
+                    console.log('Model', 'Unsupported bend type detected, fallback to custom', null);
+                }
+            }
+            else if (points.length === 2) {
+                let origin = points[0];
+                let destination = points[1];
+                if (destination.value > origin.value) {
+                    if (!isContinuedBend && origin.value > 0) {
+                        this.bendType = BendType.PrebendBend;
+                    }
+                    else {
+                        this.bendType = BendType.Bend;
+                    }
+                }
+                else if (destination.value < origin.value) {
+                    if (isContinuedBend) {
+                        this.bendType = BendType.Release;
+                    }
+                    else {
+                        this.bendType = BendType.PrebendRelease;
+                    }
+                }
+                else {
+                    this.bendType = BendType.Hold;
+                }
+            }
+        }
+        else if (points === null || points.length === 0) {
+            this.bendType = BendType.None;
+        }
+        if (this.initialBendValue > 0) {
+            this.accidentalMode = NoteAccidentalMode.Default;
+        }
+    }
+    static nextNoteOnSameLine(note) {
+        let nextBeat = note.beat.nextBeat;
+        while (nextBeat && nextBeat.voice.bar.index <= note.beat.voice.bar.index + Note.MaxOffsetForSameLineSearch) {
+            let noteOnString = nextBeat.getNoteOnString(note.string);
+            if (noteOnString) {
+                return noteOnString;
+            }
+            nextBeat = nextBeat.nextBeat;
+        }
+        return null;
+    }
+    static findHammerPullDestination(note) {
+        let nextBeat = note.beat.nextBeat;
+        while (nextBeat && nextBeat.voice.bar.index <= note.beat.voice.bar.index + Note.MaxOffsetForSameLineSearch) {
+            let noteOnString = nextBeat.getNoteOnString(note.string);
+            if (noteOnString) {
+                return noteOnString;
+            }
+            for (let str = note.string; str > 0; str--) {
+                noteOnString = nextBeat.getNoteOnString(str);
+                if (noteOnString) {
+                    if (noteOnString.isLeftHandTapped) {
+                        return noteOnString;
+                    }
+                    else {
+                        break;
+                    }
+                }
+            }
+            for (let str = note.string; str <= note.beat.voice.bar.staff.tuning.length; str++) {
+                noteOnString = nextBeat.getNoteOnString(str);
+                if (noteOnString) {
+                    if (noteOnString.isLeftHandTapped) {
+                        return noteOnString;
+                    }
+                    else {
+                        break;
+                    }
+                }
+            }
+            nextBeat = nextBeat.nextBeat;
+        }
+        return null;
+    }
+    static findTieOrigin(note) {
+        let previousBeat = note.beat.previousBeat;
+        while (previousBeat &&
+            previousBeat.voice.bar.index >= note.beat.voice.bar.index - Note.MaxOffsetForSameLineSearch) {
+            if (note.isStringed) {
+                let noteOnString = previousBeat.getNoteOnString(note.string);
+                if (noteOnString) {
+                    return noteOnString;
+                }
+            }
+            else {
+                if (note.octave === -1 && note.tone === -1) {
+                    if (note.index < previousBeat.notes.length) {
+                        return previousBeat.notes[note.index];
+                    }
+                }
+                else {
+                    let noteWithValue = previousBeat.getNoteWithRealValue(note.realValue);
+                    if (noteWithValue) {
+                        return noteWithValue;
+                    }
+                }
+            }
+            previousBeat = previousBeat.previousBeat;
+        }
+        return null;
+    }
+    chain(sharedDataBag = null) {
+        var _a;
+        if (sharedDataBag === null) {
+            return;
+        }
+        if (this._noteIdBag !== null) {
+            let noteIdLookup;
+            if (sharedDataBag.has(Note.NoteIdLookupKey)) {
+                noteIdLookup = sharedDataBag.get(Note.NoteIdLookupKey);
+            }
+            else {
+                noteIdLookup = new Map();
+                sharedDataBag.set(Note.NoteIdLookupKey, noteIdLookup);
+            }
+            if (this._noteIdBag.hammerPullDestinationNoteId !== -1 ||
+                this._noteIdBag.tieDestinationNoteId !== -1 ||
+                this._noteIdBag.slurDestinationNoteId !== -1) {
+                noteIdLookup.set(this.id, this);
+            }
+            if (this._noteIdBag.hammerPullOriginNoteId !== -1) {
+                this.hammerPullOrigin = noteIdLookup.get(this._noteIdBag.hammerPullOriginNoteId);
+                this.hammerPullOrigin.hammerPullDestination = this;
+            }
+            if (this._noteIdBag.tieOriginNoteId !== -1) {
+                this.tieOrigin = noteIdLookup.get(this._noteIdBag.tieOriginNoteId);
+                this.tieOrigin.tieDestination = this;
+            }
+            if (this._noteIdBag.slurOriginNoteId !== -1) {
+                this.slurOrigin = noteIdLookup.get(this._noteIdBag.slurOriginNoteId);
+                this.slurOrigin.slurDestination = this;
+            }
+            this._noteIdBag = null;
+        }
+        else {
+            if (!this.isTieDestination && this.tieOrigin === null) {
+                return;
+            }
+            let tieOrigin = (_a = this.tieOrigin) !== null && _a !== void 0 ? _a : Note.findTieOrigin(this);
+            if (!tieOrigin) {
+                this.isTieDestination = false;
+            }
+            else {
+                tieOrigin.tieDestination = this;
+                this.tieOrigin = tieOrigin;
+                this.fret = tieOrigin.fret;
+                this.octave = tieOrigin.octave;
+                this.tone = tieOrigin.tone;
+                if (tieOrigin.hasBend) {
+                    this.bendOrigin = this.tieOrigin;
+                }
+            }
+        }
+    }
+    toJson(o) {
+        if (this.tieDestination !== null) {
+            o.set('tiedestinationnoteid', this.tieDestination.id);
+        }
+        if (this.tieOrigin !== null) {
+            o.set('tieoriginnoteid', this.tieOrigin.id);
+        }
+        if (this.slurDestination !== null) {
+            o.set('slurdestinationnoteid', this.slurDestination.id);
+        }
+        if (this.slurOrigin !== null) {
+            o.set('sluroriginnoteid', this.slurOrigin.id);
+        }
+        if (this.hammerPullOrigin !== null) {
+            o.set('hammerpulloriginnoteid', this.hammerPullOrigin.id);
+        }
+        if (this.hammerPullDestination !== null) {
+            o.set('hammerpulldestinationnoteid', this.hammerPullDestination.id);
+        }
+    }
+    setProperty(property, v) {
+        switch (property) {
+            case "tiedestinationnoteid":
+                if (this._noteIdBag == null) {
+                    this._noteIdBag = new NoteIdBag();
+                }
+                this._noteIdBag.tieDestinationNoteId = v;
+                return true;
+            case "tieoriginnoteid":
+                if (this._noteIdBag == null) {
+                    this._noteIdBag = new NoteIdBag();
+                }
+                this._noteIdBag.tieOriginNoteId = v;
+                return true;
+            case "slurdestinationnoteid":
+                if (this._noteIdBag == null) {
+                    this._noteIdBag = new NoteIdBag();
+                }
+                this._noteIdBag.slurDestinationNoteId = v;
+                return true;
+            case "sluroriginnoteid":
+                if (this._noteIdBag == null) {
+                    this._noteIdBag = new NoteIdBag();
+                }
+                this._noteIdBag.slurOriginNoteId = v;
+                return true;
+            case "hammerpulloriginnoteid":
+                if (this._noteIdBag == null) {
+                    this._noteIdBag = new NoteIdBag();
+                }
+                this._noteIdBag.hammerPullOriginNoteId = v;
+                return true;
+            case "hammerpulldestinationnoteid":
+                if (this._noteIdBag == null) {
+                    this._noteIdBag = new NoteIdBag();
+                }
+                this._noteIdBag.hammerPullDestinationNoteId = v;
+                return true;
+        }
+        return false;
+    }
+}
+Note.GlobalNoteId = 0;
+Note.MaxOffsetForSameLineSearch = 3;
+Note.NoteIdLookupKey = 'NoteIdLookup';
+var NoteAccidentalMode;
+(function (NoteAccidentalMode) {
+    NoteAccidentalMode[NoteAccidentalMode["Default"] = 0] = "Default";
+    NoteAccidentalMode[NoteAccidentalMode["ForceNone"] = 1] = "ForceNone";
+    NoteAccidentalMode[NoteAccidentalMode["ForceNatural"] = 2] = "ForceNatural";
+    NoteAccidentalMode[NoteAccidentalMode["ForceSharp"] = 3] = "ForceSharp";
+    NoteAccidentalMode[NoteAccidentalMode["ForceDoubleSharp"] = 4] = "ForceDoubleSharp";
+    NoteAccidentalMode[NoteAccidentalMode["ForceFlat"] = 5] = "ForceFlat";
+    NoteAccidentalMode[NoteAccidentalMode["ForceDoubleFlat"] = 6] = "ForceDoubleFlat";
+})(NoteAccidentalMode || (NoteAccidentalMode = {}));
+var HarmonicType;
+(function (HarmonicType) {
+    HarmonicType[HarmonicType["None"] = 0] = "None";
+    HarmonicType[HarmonicType["Natural"] = 1] = "Natural";
+    HarmonicType[HarmonicType["Artificial"] = 2] = "Artificial";
+    HarmonicType[HarmonicType["Pinch"] = 3] = "Pinch";
+    HarmonicType[HarmonicType["Tap"] = 4] = "Tap";
+    HarmonicType[HarmonicType["Semi"] = 5] = "Semi";
+    HarmonicType[HarmonicType["Feedback"] = 6] = "Feedback";
+})(HarmonicType || (HarmonicType = {}));
+var WhammyType;
+(function (WhammyType) {
+    WhammyType[WhammyType["None"] = 0] = "None";
+    WhammyType[WhammyType["Custom"] = 1] = "Custom";
+    WhammyType[WhammyType["Dive"] = 2] = "Dive";
+    WhammyType[WhammyType["Dip"] = 3] = "Dip";
+    WhammyType[WhammyType["Hold"] = 4] = "Hold";
+    WhammyType[WhammyType["Predive"] = 5] = "Predive";
+    WhammyType[WhammyType["PrediveDive"] = 6] = "PrediveDive";
+})(WhammyType || (WhammyType = {}));
+var TripletFeel;
+(function (TripletFeel) {
+    TripletFeel[TripletFeel["NoTripletFeel"] = 0] = "NoTripletFeel";
+    TripletFeel[TripletFeel["Triplet16th"] = 1] = "Triplet16th";
+    TripletFeel[TripletFeel["Triplet8th"] = 2] = "Triplet8th";
+    TripletFeel[TripletFeel["Dotted16th"] = 3] = "Dotted16th";
+    TripletFeel[TripletFeel["Dotted8th"] = 4] = "Dotted8th";
+    TripletFeel[TripletFeel["Scottish16th"] = 5] = "Scottish16th";
+    TripletFeel[TripletFeel["Scottish8th"] = 6] = "Scottish8th";
+})(TripletFeel || (TripletFeel = {}));
+class Tuning {
+    constructor(name = '', tuning = null, isStandard = false) {
+        this.isStandard = isStandard;
+        this.name = name;
+        this.tunings = tuning !== null && tuning !== void 0 ? tuning : [];
+    }
+    static getTextForTuning(tuning, includeOctave) {
+        let parts = Tuning.getTextPartsForTuning(tuning);
+        return includeOctave ? parts.join('') : parts[0];
+    }
+    static getTextPartsForTuning(tuning, octaveShift = -1) {
+        let octave = (tuning / 12) | 0;
+        let note = tuning % 12;
+        let notes = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+        return [notes[note], (octave + octaveShift).toString()];
+    }
+    static getDefaultTuningFor(stringCount) {
+        if (Tuning._defaultTunings.has(stringCount)) {
+            return Tuning._defaultTunings.get(stringCount);
+        }
+        return null;
+    }
+    static getPresetsFor(stringCount) {
+        switch (stringCount) {
+            case 7:
+                return Tuning._sevenStrings;
+            case 6:
+                return Tuning._sixStrings;
+            case 5:
+                return Tuning._fiveStrings;
+            case 4:
+                return Tuning._fourStrings;
+        }
+        return [];
+    }
+    static initialize() {
+        Tuning._defaultTunings.set(7, new Tuning('Guitar 7 strings', [64, 59, 55, 50, 45, 40, 35], true));
+        Tuning._sevenStrings.push(Tuning._defaultTunings.get(7));
+        Tuning._defaultTunings.set(6, new Tuning('Guitar Standard Tuning', [64, 59, 55, 50, 45, 40], true));
+        Tuning._sixStrings.push(Tuning._defaultTunings.get(6));
+        Tuning._sixStrings.push(new Tuning('Guitar Tune down ½ step', [63, 58, 54, 49, 44, 39], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Tune down 1 step', [62, 57, 53, 48, 43, 38], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Tune down 2 step', [60, 55, 51, 46, 41, 36], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Dropped D Tuning', [64, 59, 55, 50, 45, 38], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Dropped D Tuning variant', [64, 57, 55, 50, 45, 38], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Double Dropped D Tuning', [62, 59, 55, 50, 45, 38], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Dropped E Tuning', [66, 61, 57, 52, 47, 40], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Dropped C Tuning', [62, 57, 53, 48, 43, 36], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open C Tuning', [64, 60, 55, 48, 43, 36], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open Cm Tuning', [63, 60, 55, 48, 43, 36], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open C6 Tuning', [64, 57, 55, 48, 43, 36], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open Cmaj7 Tuning', [64, 59, 55, 52, 43, 36], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open D Tuning', [62, 57, 54, 50, 45, 38], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open Dm Tuning', [62, 57, 53, 50, 45, 38], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open D5 Tuning', [62, 57, 50, 50, 45, 38], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open D6 Tuning', [62, 59, 54, 50, 45, 38], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open Dsus4 Tuning', [62, 57, 55, 50, 45, 38], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open E Tuning', [64, 59, 56, 52, 47, 40], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open Em Tuning', [64, 59, 55, 52, 47, 40], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open Esus11 Tuning', [64, 59, 55, 52, 45, 40], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open F Tuning', [65, 60, 53, 48, 45, 41], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open G Tuning', [62, 59, 55, 50, 43, 38], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open Gm Tuning', [62, 58, 55, 50, 43, 38], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open G6 Tuning', [64, 59, 55, 50, 43, 38], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open Gsus4 Tuning', [62, 60, 55, 50, 43, 38], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open A Tuning', [64, 61, 57, 52, 45, 40], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Open Am Tuning', [64, 60, 57, 52, 45, 40], false));
+        Tuning._sixStrings.push(new Tuning('Guitar Nashville Tuning', [64, 59, 67, 62, 57, 52], false));
+        Tuning._sixStrings.push(new Tuning('Bass 6 Strings Tuning', [48, 43, 38, 33, 28, 23], false));
+        Tuning._sixStrings.push(new Tuning('Lute or Vihuela Tuning', [64, 59, 54, 50, 45, 40], false));
+        Tuning._defaultTunings.set(5, new Tuning('Bass 5 Strings Tuning', [43, 38, 33, 28, 23], true));
+        Tuning._fiveStrings.push(Tuning._defaultTunings.get(5));
+        Tuning._fiveStrings.push(new Tuning('Banjo Dropped C Tuning', [62, 59, 55, 48, 67], false));
+        Tuning._fiveStrings.push(new Tuning('Banjo Open D Tuning', [62, 57, 54, 50, 69], false));
+        Tuning._fiveStrings.push(new Tuning('Banjo Open G Tuning', [62, 59, 55, 50, 67], false));
+        Tuning._fiveStrings.push(new Tuning('Banjo G Minor Tuning', [62, 58, 55, 50, 67], false));
+        Tuning._fiveStrings.push(new Tuning('Banjo G Modal Tuning', [62, 57, 55, 50, 67], false));
+        Tuning._defaultTunings.set(4, new Tuning('Bass Standard Tuning', [43, 38, 33, 28], true));
+        Tuning._fourStrings.push(Tuning._defaultTunings.get(4));
+        Tuning._fourStrings.push(new Tuning('Bass Tune down ½ step', [42, 37, 32, 27], false));
+        Tuning._fourStrings.push(new Tuning('Bass Tune down 1 step', [41, 36, 31, 26], false));
+        Tuning._fourStrings.push(new Tuning('Bass Tune down 2 step', [39, 34, 29, 24], false));
+        Tuning._fourStrings.push(new Tuning('Bass Dropped D Tuning', [43, 38, 33, 26], false));
+        Tuning._fourStrings.push(new Tuning('Ukulele C Tuning', [45, 40, 36, 43], false));
+        Tuning._fourStrings.push(new Tuning('Ukulele G Tuning', [52, 47, 43, 38], false));
+        Tuning._fourStrings.push(new Tuning('Mandolin Standard Tuning', [64, 57, 50, 43], false));
+        Tuning._fourStrings.push(new Tuning('Mandolin or Violin Tuning', [76, 69, 62, 55], false));
+        Tuning._fourStrings.push(new Tuning('Viola Tuning', [69, 62, 55, 48], false));
+        Tuning._fourStrings.push(new Tuning('Cello Tuning', [57, 50, 43, 36], false));
+    }
+    static findTuning(strings) {
+        let tunings = Tuning.getPresetsFor(strings.length);
+        for (let t = 0, tc = tunings.length; t < tc; t++) {
+            let tuning = tunings[t];
+            let equals = true;
+            for (let i = 0, j = strings.length; i < j; i++) {
+                if (strings[i] !== tuning.tunings[i]) {
+                    equals = false;
+                    break;
+                }
+            }
+            if (equals) {
+                return tuning;
+            }
+        }
+        return null;
+    }
+    finish() {
+        const knownTuning = Tuning.findTuning(this.tunings);
+        if (knownTuning) {
+            this.name = knownTuning.name;
+            this.isStandard = knownTuning.isStandard;
+        }
+        this.name = this.name.trim();
+    }
+}
+Tuning._sevenStrings = [];
+Tuning._sixStrings = [];
+Tuning._fiveStrings = [];
+Tuning._fourStrings = [];
+Tuning._defaultTunings = new Map();
+Tuning.defaultAccidentals = ['', '#', '', '#', '', '', '#', '', '#', '', '#', ''];
+Tuning.defaultSteps = ['C', 'C', 'D', 'D', 'E', 'F', 'F', 'G', 'G', 'A', 'A', 'B'];
+Tuning.initialize();
+class TupletGroup {
+    constructor(voice) {
+        this._isEqualLengthTuplet = true;
+        this.totalDuration = 0;
+        this.beats = [];
+        this.isFull = false;
+        this.voice = voice;
+    }
+    check(beat) {
+        if (this.beats.length === 0) {
+            this.beats.push(beat);
+            this.totalDuration += beat.playbackDuration;
+            return true;
+        }
+        if (beat.graceType !== GraceType.None) {
+            return true;
+        }
+        if (beat.voice !== this.voice ||
+            this.isFull ||
+            beat.tupletNumerator !== this.beats[0].tupletNumerator ||
+            beat.tupletDenominator !== this.beats[0].tupletDenominator) {
+            return false;
+        }
+        if (beat.playbackDuration !== this.beats[0].playbackDuration) {
+            this._isEqualLengthTuplet = false;
+        }
+        this.beats.push(beat);
+        this.totalDuration += beat.playbackDuration;
+        if (this._isEqualLengthTuplet) {
+            if (this.beats.length === this.beats[0].tupletNumerator) {
+                this.isFull = true;
+            }
+        }
+        else {
+            let factor = (this.beats[0].tupletNumerator / this.beats[0].tupletDenominator) | 0;
+            for (let potentialMatch of TupletGroup.AllTicks) {
+                if (this.totalDuration === potentialMatch * factor) {
+                    this.isFull = true;
+                    break;
+                }
+            }
+        }
+        return true;
+    }
+}
+TupletGroup.HalfTicks = 1920;
+TupletGroup.QuarterTicks = 960;
+TupletGroup.EighthTicks = 480;
+TupletGroup.SixteenthTicks = 240;
+TupletGroup.ThirtySecondTicks = 120;
+TupletGroup.SixtyFourthTicks = 60;
+TupletGroup.OneHundredTwentyEighthTicks = 30;
+TupletGroup.TwoHundredFiftySixthTicks = 15;
+TupletGroup.AllTicks = [
+    TupletGroup.HalfTicks,
+    TupletGroup.QuarterTicks,
+    TupletGroup.EighthTicks,
+    TupletGroup.SixteenthTicks,
+    TupletGroup.ThirtySecondTicks,
+    TupletGroup.SixtyFourthTicks,
+    TupletGroup.OneHundredTwentyEighthTicks,
+    TupletGroup.TwoHundredFiftySixthTicks
+];
+var VibratoType;
+(function (VibratoType) {
+    VibratoType[VibratoType["None"] = 0] = "None";
+    VibratoType[VibratoType["Slight"] = 1] = "Slight";
+    VibratoType[VibratoType["Wide"] = 2] = "Wide";
+})(VibratoType || (VibratoType = {}));
+var SlideOutType;
+(function (SlideOutType) {
+    SlideOutType[SlideOutType["None"] = 0] = "None";
+    SlideOutType[SlideOutType["Shift"] = 1] = "Shift";
+    SlideOutType[SlideOutType["Legato"] = 2] = "Legato";
+    SlideOutType[SlideOutType["OutUp"] = 3] = "OutUp";
+    SlideOutType[SlideOutType["OutDown"] = 4] = "OutDown";
+    SlideOutType[SlideOutType["PickSlideDown"] = 5] = "PickSlideDown";
+    SlideOutType[SlideOutType["PickSlideUp"] = 6] = "PickSlideUp";
+})(SlideOutType || (SlideOutType = {}));
+var SlideInType;
+(function (SlideInType) {
+    SlideInType[SlideInType["None"] = 0] = "None";
+    SlideInType[SlideInType["IntoFromBelow"] = 1] = "IntoFromBelow";
+    SlideInType[SlideInType["IntoFromAbove"] = 2] = "IntoFromAbove";
+})(SlideInType || (SlideInType = {}));
+var PickStroke;
+(function (PickStroke) {
+    PickStroke[PickStroke["None"] = 0] = "None";
+    PickStroke[PickStroke["Up"] = 1] = "Up";
+    PickStroke[PickStroke["Down"] = 2] = "Down";
+})(PickStroke || (PickStroke = {}));
+class GraceGroup {
+    constructor() {
+        this.beats = [];
+        this.id = 'empty';
+        this.isComplete = false;
+    }
+    addBeat(beat) {
+        beat.graceIndex = this.beats.length;
+        beat.graceGroup = this;
+        this.beats.push(beat);
+    }
+    finish() {
+        if (this.beats.length > 0) {
+            this.id = this.beats[0].absoluteDisplayStart + '_' + this.beats[0].voice.index;
+        }
+    }
+}
+var GraceType;
+(function (GraceType) {
+    GraceType[GraceType["None"] = 0] = "None";
+    GraceType[GraceType["OnBeat"] = 1] = "OnBeat";
+    GraceType[GraceType["BeforeBeat"] = 2] = "BeforeBeat";
+    GraceType[GraceType["BendGrace"] = 3] = "BendGrace";
+})(GraceType || (GraceType = {}));
+var Fingers;
+(function (Fingers) {
+    Fingers[Fingers["Unknown"] = -2] = "Unknown";
+    Fingers[Fingers["NoOrDead"] = -1] = "NoOrDead";
+    Fingers[Fingers["Thumb"] = 0] = "Thumb";
+    Fingers[Fingers["IndexFinger"] = 1] = "IndexFinger";
+    Fingers[Fingers["MiddleFinger"] = 2] = "MiddleFinger";
+    Fingers[Fingers["AnnularFinger"] = 3] = "AnnularFinger";
+    Fingers[Fingers["LittleFinger"] = 4] = "LittleFinger";
+})(Fingers || (Fingers = {}));
+var CrescendoType;
+(function (CrescendoType) {
+    CrescendoType[CrescendoType["None"] = 0] = "None";
+    CrescendoType[CrescendoType["Crescendo"] = 1] = "Crescendo";
+    CrescendoType[CrescendoType["Decrescendo"] = 2] = "Decrescendo";
+})(CrescendoType || (CrescendoType = {}));
+var DynamicValue;
+(function (DynamicValue) {
+    DynamicValue[DynamicValue["PPP"] = 0] = "PPP";
+    DynamicValue[DynamicValue["PP"] = 1] = "PP";
+    DynamicValue[DynamicValue["P"] = 2] = "P";
+    DynamicValue[DynamicValue["MP"] = 3] = "MP";
+    DynamicValue[DynamicValue["MF"] = 4] = "MF";
+    DynamicValue[DynamicValue["F"] = 5] = "F";
+    DynamicValue[DynamicValue["FF"] = 6] = "FF";
+    DynamicValue[DynamicValue["FFF"] = 7] = "FFF";
+})(DynamicValue || (DynamicValue = {}));
+var LyricsState;
+(function (LyricsState) {
+    LyricsState[LyricsState["IgnoreSpaces"] = 0] = "IgnoreSpaces";
+    LyricsState[LyricsState["Begin"] = 1] = "Begin";
+    LyricsState[LyricsState["Text"] = 2] = "Text";
+    LyricsState[LyricsState["Comment"] = 3] = "Comment";
+    LyricsState[LyricsState["Dash"] = 4] = "Dash";
+})(LyricsState || (LyricsState = {}));
+class Lyrics {
+    constructor() {
+        this.startBar = 0;
+        this.text = '';
+    }
+    finish(skipEmptyEntries = false) {
+        this.chunks = [];
+        this.parse(this.text, 0, this.chunks, skipEmptyEntries);
+    }
+    parse(str, p, chunks, skipEmptyEntries) {
+        if (!str) {
+            return;
+        }
+        let state = LyricsState.Begin;
+        let next = LyricsState.Begin;
+        let skipSpace = false;
+        let start = 0;
+        while (p < str.length) {
+            let c = str.charCodeAt(p);
+            switch (state) {
+                case LyricsState.IgnoreSpaces:
+                    switch (c) {
+                        case Lyrics.CharCodeLF:
+                        case Lyrics.CharCodeCR:
+                        case Lyrics.CharCodeTab:
+                            break;
+                        case Lyrics.CharCodeSpace:
+                            if (!skipSpace) {
+                                state = next;
+                                continue;
+                            }
+                            break;
+                        default:
+                            skipSpace = false;
+                            state = next;
+                            continue;
+                    }
+                    break;
+                case LyricsState.Begin:
+                    switch (c) {
+                        case Lyrics.CharCodeBrackedOpen:
+                            state = LyricsState.Comment;
+                            break;
+                        default:
+                            start = p;
+                            state = LyricsState.Text;
+                            continue;
+                    }
+                    break;
+                case LyricsState.Comment:
+                    switch (c) {
+                        case Lyrics.CharCodeBrackedClose:
+                            state = LyricsState.Begin;
+                            break;
+                    }
+                    break;
+                case LyricsState.Text:
+                    switch (c) {
+                        case Lyrics.CharCodeDash:
+                            state = LyricsState.Dash;
+                            break;
+                        case Lyrics.CharCodeCR:
+                        case Lyrics.CharCodeLF:
+                        case Lyrics.CharCodeSpace:
+                            let txt = str.substr(start, p - start);
+                            this.addChunk(txt, skipEmptyEntries);
+                            state = LyricsState.IgnoreSpaces;
+                            next = LyricsState.Begin;
+                            break;
+                    }
+                    break;
+                case LyricsState.Dash:
+                    switch (c) {
+                        case Lyrics.CharCodeDash:
+                            break;
+                        default:
+                            let txt = str.substr(start, p - start);
+                            this.addChunk(txt, skipEmptyEntries);
+                            skipSpace = true;
+                            state = LyricsState.IgnoreSpaces;
+                            next = LyricsState.Begin;
+                            continue;
+                    }
+                    break;
+            }
+            p += 1;
+        }
+        if (state === LyricsState.Text) {
+            if (p !== start) {
+                this.addChunk(str.substr(start, p - start), skipEmptyEntries);
+            }
+        }
+    }
+    addChunk(txt, skipEmptyEntries) {
+        txt = this.prepareChunk(txt);
+        if (!skipEmptyEntries || (txt.length > 0 && txt !== '-')) {
+            this.chunks.push(txt);
+        }
+    }
+    prepareChunk(txt) {
+        let chunk = txt.split('+').join(' ');
+        let endLength = chunk.length;
+        while (endLength > 0 && chunk.charAt(endLength - 1) === '_') {
+            endLength--;
+        }
+        return endLength !== chunk.length ? chunk.substr(0, endLength) : chunk;
+    }
+}
+Lyrics.CharCodeLF = 10;
+Lyrics.CharCodeTab = 9;
+Lyrics.CharCodeCR = 13;
+Lyrics.CharCodeSpace = 32;
+Lyrics.CharCodeBrackedClose = 93;
+Lyrics.CharCodeBrackedOpen = 91;
+Lyrics.CharCodeDash = 45;
+class PlaybackInformation {
+    constructor() {
+        this.volume = 15;
+        this.balance = 8;
+        this.port = 1;
+        this.program = 0;
+        this.primaryChannel = 0;
+        this.secondaryChannel = 0;
+        this.isMute = false;
+        this.isSolo = false;
+    }
+}
+class InstrumentArticulation {
+    constructor(elementType = "", staffLine = 0, outputMidiNumber = 0, noteHeadDefault = MusicFontSymbol.None, noteHeadHalf = MusicFontSymbol.None, noteHeadWhole = MusicFontSymbol.None, techniqueSymbol = MusicFontSymbol.None, techniqueSymbolPlacement = TextBaseline.Middle) {
+        this.elementType = elementType;
+        this.outputMidiNumber = outputMidiNumber;
+        this.staffLine = staffLine;
+        this.noteHeadDefault = noteHeadDefault;
+        this.noteHeadHalf = noteHeadHalf !== MusicFontSymbol.None ? noteHeadHalf : noteHeadDefault;
+        this.noteHeadWhole = noteHeadWhole !== MusicFontSymbol.None ? noteHeadWhole : noteHeadDefault;
+        this.techniqueSymbol = techniqueSymbol;
+        this.techniqueSymbolPlacement = techniqueSymbolPlacement;
+    }
+    getSymbol(duration) {
+        switch (duration) {
+            case Duration.Whole:
+                return this.noteHeadWhole;
+            case Duration.Half:
+                return this.noteHeadHalf;
+            default:
+                return this.noteHeadDefault;
+        }
+    }
+}
+class PercussionMapper {
+    static articulationFromElementVariation(element, variation) {
+        if (element < PercussionMapper.gp6ElementAndVariationToArticulation.length) {
+            if (variation >= PercussionMapper.gp6ElementAndVariationToArticulation.length) {
+                variation = 0;
+            }
+            return PercussionMapper.gp6ElementAndVariationToArticulation[element][variation];
+        }
+        return 38;
+    }
+    static getArticulation(n) {
+        const articulationIndex = n.percussionArticulation;
+        const trackArticulations = n.beat.voice.bar.staff.track.percussionArticulations;
+        if (articulationIndex < trackArticulations.length) {
+            return trackArticulations[articulationIndex];
+        }
+        return PercussionMapper.getArticulationByValue(articulationIndex);
+        ;
+    }
+    static getElementAndVariation(n) {
+        const articulation = PercussionMapper.getArticulation(n);
+        if (!articulation) {
+            return [-1, -1];
+        }
+        for (let element = 0; element < PercussionMapper.gp6ElementAndVariationToArticulation.length; element++) {
+            const variations = PercussionMapper.gp6ElementAndVariationToArticulation[element];
+            for (let variation = 0; variation < variations.length; variation++) {
+                const gp6Articulation = PercussionMapper.getArticulationByValue(variations[variation]);
+                if ((gp6Articulation === null || gp6Articulation === void 0 ? void 0 : gp6Articulation.outputMidiNumber) === articulation.outputMidiNumber) {
+                    return [element, variation];
+                }
+            }
+        }
+        return [-1, -1];
+    }
+    static getArticulationByValue(midiNumber) {
+        if (PercussionMapper.instrumentArticulations.has(midiNumber)) {
+            return PercussionMapper.instrumentArticulations.get(midiNumber);
+        }
+        return null;
+    }
+}
+PercussionMapper.gp6ElementAndVariationToArticulation = [
+    [35, 35, 35],
+    [38, 91, 37],
+    [99, 100, 99],
+    [56, 100, 56],
+    [102, 103, 102],
+    [43, 43, 43],
+    [45, 45, 45],
+    [47, 47, 47],
+    [48, 48, 48],
+    [50, 50, 50],
+    [42, 92, 46],
+    [44, 44, 44],
+    [57, 98, 57],
+    [49, 97, 49],
+    [55, 95, 55],
+    [51, 93, 127],
+    [52, 96, 52],
+];
+PercussionMapper.instrumentArticulations = new Map([
+    [38, new InstrumentArticulation("snare", 3, 38, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [37, new InstrumentArticulation("snare", 3, 37, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
+    [91, new InstrumentArticulation("snare", 3, 38, MusicFontSymbol.NoteheadDiamondWhite, MusicFontSymbol.NoteheadDiamondWhite, MusicFontSymbol.NoteheadDiamondWhite)],
+    [42, new InstrumentArticulation("hiHat", -1, 42, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
+    [92, new InstrumentArticulation("hiHat", -1, 46, MusicFontSymbol.NoteheadCircleSlash, MusicFontSymbol.NoteheadCircleSlash, MusicFontSymbol.NoteheadCircleSlash)],
+    [46, new InstrumentArticulation("hiHat", -1, 46, MusicFontSymbol.NoteheadCircleX, MusicFontSymbol.NoteheadCircleX, MusicFontSymbol.NoteheadCircleX)],
+    [44, new InstrumentArticulation("hiHat", 9, 44, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
+    [35, new InstrumentArticulation("kickDrum", 8, 35, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [36, new InstrumentArticulation("kickDrum", 7, 36, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [50, new InstrumentArticulation("tom", 1, 50, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [48, new InstrumentArticulation("tom", 2, 48, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [47, new InstrumentArticulation("tom", 4, 47, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [45, new InstrumentArticulation("tom", 5, 45, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [43, new InstrumentArticulation("tom", 6, 43, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [93, new InstrumentArticulation("ride", 0, 51, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.PictEdgeOfCymbal, TextBaseline.Bottom)],
+    [51, new InstrumentArticulation("ride", 0, 51, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
+    [53, new InstrumentArticulation("ride", 0, 53, MusicFontSymbol.NoteheadDiamondWhite, MusicFontSymbol.NoteheadDiamondWhite, MusicFontSymbol.NoteheadDiamondWhite)],
+    [94, new InstrumentArticulation("ride", 0, 51, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.ArticStaccatoAbove, TextBaseline.Top)],
+    [55, new InstrumentArticulation("splash", -2, 55, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
+    [95, new InstrumentArticulation("splash", -2, 55, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.ArticStaccatoAbove, TextBaseline.Bottom)],
+    [52, new InstrumentArticulation("china", -3, 52, MusicFontSymbol.NoteheadHeavyXHat, MusicFontSymbol.NoteheadHeavyXHat, MusicFontSymbol.NoteheadHeavyXHat)],
+    [96, new InstrumentArticulation("china", -3, 52, MusicFontSymbol.NoteheadHeavyXHat, MusicFontSymbol.NoteheadHeavyXHat, MusicFontSymbol.NoteheadHeavyXHat)],
+    [49, new InstrumentArticulation("crash", -2, 49, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX)],
+    [97, new InstrumentArticulation("crash", -2, 49, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.ArticStaccatoAbove, TextBaseline.Bottom)],
+    [57, new InstrumentArticulation("crash", -1, 57, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX)],
+    [98, new InstrumentArticulation("crash", -1, 57, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.NoteheadHeavyX, MusicFontSymbol.ArticStaccatoAbove, TextBaseline.Bottom)],
+    [99, new InstrumentArticulation("cowbell", 1, 56, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpHalf, MusicFontSymbol.NoteheadTriangleUpWhole)],
+    [100, new InstrumentArticulation("cowbell", 1, 56, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXHalf, MusicFontSymbol.NoteheadXWhole)],
+    [56, new InstrumentArticulation("cowbell", 0, 56, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpHalf, MusicFontSymbol.NoteheadTriangleUpWhole)],
+    [101, new InstrumentArticulation("cowbell", 0, 56, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXHalf, MusicFontSymbol.NoteheadXWhole)],
+    [102, new InstrumentArticulation("cowbell", -1, 56, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpHalf, MusicFontSymbol.NoteheadTriangleUpWhole)],
+    [103, new InstrumentArticulation("cowbell", -1, 56, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXHalf, MusicFontSymbol.NoteheadXWhole)],
+    [77, new InstrumentArticulation("woodblock", -9, 77, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack)],
+    [76, new InstrumentArticulation("woodblock", -10, 76, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack)],
+    [60, new InstrumentArticulation("bongo", -4, 60, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [104, new InstrumentArticulation("bongo", -5, 60, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.NoteheadParenthesis, TextBaseline.Middle)],
+    [105, new InstrumentArticulation("bongo", -6, 60, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
+    [61, new InstrumentArticulation("bongo", -7, 61, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [106, new InstrumentArticulation("bongo", -8, 61, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.NoteheadParenthesis, TextBaseline.Middle)],
+    [107, new InstrumentArticulation("bongo", -16, 61, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
+    [66, new InstrumentArticulation("timbale", 10, 66, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [65, new InstrumentArticulation("timbale", 9, 65, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [68, new InstrumentArticulation("agogo", 12, 68, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [67, new InstrumentArticulation("agogo", 11, 67, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [64, new InstrumentArticulation("conga", 17, 64, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [108, new InstrumentArticulation("conga", 16, 64, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
+    [109, new InstrumentArticulation("conga", 15, 64, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.NoteheadParenthesis, TextBaseline.Middle)],
+    [63, new InstrumentArticulation("conga", 14, 63, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [110, new InstrumentArticulation("conga", 13, 63, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
+    [62, new InstrumentArticulation("conga", 19, 62, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.NoteheadParenthesis, TextBaseline.Middle)],
+    [72, new InstrumentArticulation("whistle", -11, 72, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [71, new InstrumentArticulation("whistle", -17, 71, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [73, new InstrumentArticulation("guiro", 38, 73, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [74, new InstrumentArticulation("guiro", 37, 74, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [86, new InstrumentArticulation("surdo", 36, 86, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [87, new InstrumentArticulation("surdo", 35, 87, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadParenthesis, TextBaseline.Middle)],
+    [54, new InstrumentArticulation("tambourine", 3, 54, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack)],
+    [111, new InstrumentArticulation("tambourine", 2, 54, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.StringsUpBow, TextBaseline.Bottom)],
+    [112, new InstrumentArticulation("tambourine", 1, 54, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.NoteheadTriangleUpBlack, MusicFontSymbol.StringsDownBow, TextBaseline.Bottom)],
+    [113, new InstrumentArticulation("tambourine", -7, 54, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
+    [79, new InstrumentArticulation("cuica", 30, 79, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [78, new InstrumentArticulation("cuica", 29, 78, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
+    [58, new InstrumentArticulation("vibraslap", 28, 58, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [81, new InstrumentArticulation("triangle", 27, 81, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [80, new InstrumentArticulation("triangle", 26, 80, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadParenthesis, TextBaseline.Middle)],
+    [114, new InstrumentArticulation("grancassa", 25, 43, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [115, new InstrumentArticulation("piatti", 18, 49, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [116, new InstrumentArticulation("piatti", 24, 49, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
+    [69, new InstrumentArticulation("cabasa", 23, 69, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [117, new InstrumentArticulation("cabasa", 22, 69, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.StringsUpBow, TextBaseline.Bottom)],
+    [85, new InstrumentArticulation("castanets", 21, 85, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [75, new InstrumentArticulation("claves", 20, 75, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [70, new InstrumentArticulation("maraca", -12, 70, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [118, new InstrumentArticulation("maraca", -13, 70, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.StringsUpBow, TextBaseline.Bottom)],
+    [119, new InstrumentArticulation("maraca", -14, 70, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [120, new InstrumentArticulation("maraca", -15, 70, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.StringsUpBow, TextBaseline.Bottom)],
+    [82, new InstrumentArticulation("shaker", -23, 54, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [122, new InstrumentArticulation("shaker", -24, 54, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.StringsUpBow, TextBaseline.Bottom)],
+    [84, new InstrumentArticulation("bellTree", -18, 53, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [123, new InstrumentArticulation("bellTree", -19, 53, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole, MusicFontSymbol.StringsUpBow, TextBaseline.Bottom)],
+    [83, new InstrumentArticulation("jingleBell", -20, 53, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [124, new InstrumentArticulation("unpitched", -21, 62, MusicFontSymbol.NoteheadNull, MusicFontSymbol.NoteheadNull, MusicFontSymbol.NoteheadNull, MusicFontSymbol.GuitarGolpe, TextBaseline.Top)],
+    [125, new InstrumentArticulation("unpitched", -22, 62, MusicFontSymbol.NoteheadNull, MusicFontSymbol.NoteheadNull, MusicFontSymbol.NoteheadNull, MusicFontSymbol.GuitarGolpe, TextBaseline.Bottom)],
+    [39, new InstrumentArticulation("handClap", 3, 39, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [40, new InstrumentArticulation("snare", 3, 40, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [31, new InstrumentArticulation("snare", 3, 40, MusicFontSymbol.NoteheadSlashedBlack2, MusicFontSymbol.NoteheadSlashedBlack2, MusicFontSymbol.NoteheadSlashedBlack2)],
+    [41, new InstrumentArticulation("tom", 5, 41, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
+    [59, new InstrumentArticulation("ride", 2, 59, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.PictEdgeOfCymbal, TextBaseline.Bottom)],
+    [126, new InstrumentArticulation("ride", 2, 59, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
+    [127, new InstrumentArticulation("ride", 2, 59, MusicFontSymbol.NoteheadDiamondWhite, MusicFontSymbol.NoteheadDiamondWhite, MusicFontSymbol.NoteheadDiamondWhite)],
+    [29, new InstrumentArticulation("ride", 2, 59, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.ArticStaccatoAbove, TextBaseline.Top)],
+    [30, new InstrumentArticulation("crash", -3, 49, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
+    [33, new InstrumentArticulation("snare", 3, 37, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
+    [34, new InstrumentArticulation("snare", 3, 38, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadBlack)]
+]);
+var TabRhythmMode;
+(function (TabRhythmMode) {
+    TabRhythmMode[TabRhythmMode["Hidden"] = 0] = "Hidden";
+    TabRhythmMode[TabRhythmMode["ShowWithBeams"] = 1] = "ShowWithBeams";
+    TabRhythmMode[TabRhythmMode["ShowWithBars"] = 2] = "ShowWithBars";
+})(TabRhythmMode || (TabRhythmMode = {}));
+var FingeringMode;
+(function (FingeringMode) {
+    FingeringMode[FingeringMode["ScoreDefault"] = 0] = "ScoreDefault";
+    FingeringMode[FingeringMode["ScoreForcePiano"] = 1] = "ScoreForcePiano";
+    FingeringMode[FingeringMode["SingleNoteEffectBand"] = 2] = "SingleNoteEffectBand";
+    FingeringMode[FingeringMode["SingleNoteEffectBandForcePiano"] = 3] = "SingleNoteEffectBandForcePiano";
+})(FingeringMode || (FingeringMode = {}));
+var NotationMode;
+(function (NotationMode) {
+    NotationMode[NotationMode["GuitarPro"] = 0] = "GuitarPro";
+    NotationMode[NotationMode["SongBook"] = 1] = "SongBook";
+})(NotationMode || (NotationMode = {}));
+var NotationElement;
+(function (NotationElement) {
+    NotationElement[NotationElement["ScoreTitle"] = 0] = "ScoreTitle";
+    NotationElement[NotationElement["ScoreSubTitle"] = 1] = "ScoreSubTitle";
+    NotationElement[NotationElement["ScoreArtist"] = 2] = "ScoreArtist";
+    NotationElement[NotationElement["ScoreAlbum"] = 3] = "ScoreAlbum";
+    NotationElement[NotationElement["ScoreWords"] = 4] = "ScoreWords";
+    NotationElement[NotationElement["ScoreMusic"] = 5] = "ScoreMusic";
+    NotationElement[NotationElement["ScoreWordsAndMusic"] = 6] = "ScoreWordsAndMusic";
+    NotationElement[NotationElement["ScoreCopyright"] = 7] = "ScoreCopyright";
+    NotationElement[NotationElement["GuitarTuning"] = 8] = "GuitarTuning";
+    NotationElement[NotationElement["TrackNames"] = 9] = "TrackNames";
+    NotationElement[NotationElement["ChordDiagrams"] = 10] = "ChordDiagrams";
+    NotationElement[NotationElement["ParenthesisOnTiedBends"] = 11] = "ParenthesisOnTiedBends";
+    NotationElement[NotationElement["TabNotesOnTiedBends"] = 12] = "TabNotesOnTiedBends";
+    NotationElement[NotationElement["ZerosOnDiveWhammys"] = 13] = "ZerosOnDiveWhammys";
+    NotationElement[NotationElement["EffectAlternateEndings"] = 14] = "EffectAlternateEndings";
+    NotationElement[NotationElement["EffectCapo"] = 15] = "EffectCapo";
+    NotationElement[NotationElement["EffectChordNames"] = 16] = "EffectChordNames";
+    NotationElement[NotationElement["EffectCrescendo"] = 17] = "EffectCrescendo";
+    NotationElement[NotationElement["EffectDynamics"] = 18] = "EffectDynamics";
+    NotationElement[NotationElement["EffectFadeIn"] = 19] = "EffectFadeIn";
+    NotationElement[NotationElement["EffectFermata"] = 20] = "EffectFermata";
+    NotationElement[NotationElement["EffectFingering"] = 21] = "EffectFingering";
+    NotationElement[NotationElement["EffectHarmonics"] = 22] = "EffectHarmonics";
+    NotationElement[NotationElement["EffectLetRing"] = 23] = "EffectLetRing";
+    NotationElement[NotationElement["EffectLyrics"] = 24] = "EffectLyrics";
+    NotationElement[NotationElement["EffectMarker"] = 25] = "EffectMarker";
+    NotationElement[NotationElement["EffectOttavia"] = 26] = "EffectOttavia";
+    NotationElement[NotationElement["EffectPalmMute"] = 27] = "EffectPalmMute";
+    NotationElement[NotationElement["EffectPickSlide"] = 28] = "EffectPickSlide";
+    NotationElement[NotationElement["EffectPickStroke"] = 29] = "EffectPickStroke";
+    NotationElement[NotationElement["EffectSlightBeatVibrato"] = 30] = "EffectSlightBeatVibrato";
+    NotationElement[NotationElement["EffectSlightNoteVibrato"] = 31] = "EffectSlightNoteVibrato";
+    NotationElement[NotationElement["EffectTap"] = 32] = "EffectTap";
+    NotationElement[NotationElement["EffectTempo"] = 33] = "EffectTempo";
+    NotationElement[NotationElement["EffectText"] = 34] = "EffectText";
+    NotationElement[NotationElement["EffectTrill"] = 35] = "EffectTrill";
+    NotationElement[NotationElement["EffectTripletFeel"] = 36] = "EffectTripletFeel";
+    NotationElement[NotationElement["EffectWhammyBar"] = 37] = "EffectWhammyBar";
+    NotationElement[NotationElement["EffectWideBeatVibrato"] = 38] = "EffectWideBeatVibrato";
+    NotationElement[NotationElement["EffectWideNoteVibrato"] = 39] = "EffectWideNoteVibrato";
+    NotationElement[NotationElement["EffectLeftHandTap"] = 40] = "EffectLeftHandTap";
+})(NotationElement || (NotationElement = {}));
+class NotationSettings {
+    constructor() {
+        this.notationMode = NotationMode.GuitarPro;
+        this.fingeringMode = FingeringMode.ScoreDefault;
+        this.elements = new Map();
+        this.rhythmMode = TabRhythmMode.Hidden;
+        this.rhythmHeight = 15;
+        this.transpositionPitches = [];
+        this.displayTranspositionPitches = [];
+        this.smallGraceTabNotes = true;
+        this.extendBendArrowsOnTiedNotes = true;
+        this.extendLineEffectsToBeatEnd = false;
+        this.slurHeight = 5.0;
+    }
+    isNotationElementVisible(element) {
+        if (this.elements.has(element)) {
+            return this.elements.get(element);
+        }
+        if (NotationSettings.defaultElements.has(element)) {
+            return NotationSettings.defaultElements.get(element);
+        }
+        return true;
+    }
+}
+NotationSettings.defaultElements = new Map([
+    [NotationElement.ZerosOnDiveWhammys, false]
+]);
+class Lazy {
+    constructor(factory) {
+        this._value = undefined;
+        this._factory = factory;
+    }
+    get value() {
+        if (this._value === undefined) {
+            this._value = this._factory();
+        }
+        return this._value;
+    }
+}
+class TuningParseResult {
+    constructor() {
+        this.note = null;
+        this.noteValue = 0;
+        this.octave = 0;
+    }
+    get realValue() {
+        return this.octave * 12 + this.noteValue;
+    }
+}
+class ModelUtils {
+    static getIndex(duration) {
+        let index = 0;
+        let value = duration;
+        if (value < 0) {
+            return index;
+        }
+        return Math.log2(duration) | 0;
+    }
+    static keySignatureIsFlat(ks) {
+        return ks < 0;
+    }
+    static keySignatureIsNatural(ks) {
+        return ks === 0;
+    }
+    static keySignatureIsSharp(ks) {
+        return ks > 0;
+    }
+    static applyPitchOffsets(settings, score) {
+        for (let i = 0; i < score.tracks.length; i++) {
+            if (i < settings.notation.displayTranspositionPitches.length) {
+                for (let staff of score.tracks[i].staves) {
+                    staff.displayTranspositionPitch = -settings.notation.displayTranspositionPitches[i];
+                }
+            }
+            if (i < settings.notation.transpositionPitches.length) {
+                for (let staff of score.tracks[i].staves) {
+                    staff.transpositionPitch = -settings.notation.transpositionPitches[i];
+                }
+            }
+        }
+    }
+    static fingerToString(settings, beat, finger, leftHand) {
+        if (settings.notation.fingeringMode === FingeringMode.ScoreForcePiano ||
+            settings.notation.fingeringMode === FingeringMode.SingleNoteEffectBandForcePiano ||
+            GeneralMidi.isPiano(beat.voice.bar.staff.track.playbackInfo.program)) {
+            switch (finger) {
+                case Fingers.Unknown:
+                case Fingers.NoOrDead:
+                    return null;
+                case Fingers.Thumb:
+                    return '1';
+                case Fingers.IndexFinger:
+                    return '2';
+                case Fingers.MiddleFinger:
+                    return '3';
+                case Fingers.AnnularFinger:
+                    return '4';
+                case Fingers.LittleFinger:
+                    return '5';
+                default:
+                    return null;
+            }
+        }
+        if (leftHand) {
+            switch (finger) {
+                case Fingers.Unknown:
+                case Fingers.NoOrDead:
+                    return '0';
+                case Fingers.Thumb:
+                    return 'T';
+                case Fingers.IndexFinger:
+                    return '1';
+                case Fingers.MiddleFinger:
+                    return '2';
+                case Fingers.AnnularFinger:
+                    return '3';
+                case Fingers.LittleFinger:
+                    return '4';
+                default:
+                    return null;
+            }
+        }
+        switch (finger) {
+            case Fingers.Unknown:
+            case Fingers.NoOrDead:
+                return null;
+            case Fingers.Thumb:
+                return 'p';
+            case Fingers.IndexFinger:
+                return 'i';
+            case Fingers.MiddleFinger:
+                return 'm';
+            case Fingers.AnnularFinger:
+                return 'a';
+            case Fingers.LittleFinger:
+                return 'c';
+            default:
+                return null;
+        }
+    }
+    static isTuning(name) {
+        return !!ModelUtils.parseTuning(name);
+    }
+    static parseTuning(name) {
+        let note = '';
+        let octave = '';
+        for (let i = 0; i < name.length; i++) {
+            let c = name.charCodeAt(i);
+            if (c >= 0x30 && c <= 0x39) {
+                if (!note) {
+                    return null;
+                }
+                octave += String.fromCharCode(c);
+            }
+            else if ((c >= 0x41 && c <= 0x5a) || (c >= 0x61 && c <= 0x7a) || c === 0x23) {
+                note += String.fromCharCode(c);
+            }
+            else {
+                return null;
+            }
+        }
+        if (!octave || !note) {
+            return null;
+        }
+        let result = new TuningParseResult();
+        result.octave = parseInt(octave) + 1;
+        result.note = note.toLowerCase();
+        result.noteValue = ModelUtils.getToneForText(result.note);
+        return result;
+    }
+    static getTuningForText(str) {
+        let result = ModelUtils.parseTuning(str);
+        if (!result) {
+            return -1;
+        }
+        return result.realValue;
+    }
+    static getToneForText(note) {
+        switch (note.toLowerCase()) {
+            case 'c':
+                return 0;
+            case 'c#':
+            case 'db':
+                return 1;
+            case 'd':
+                return 2;
+            case 'd#':
+            case 'eb':
+                return 3;
+            case 'e':
+                return 4;
+            case 'f':
+                return 5;
+            case 'f#':
+            case 'gb':
+                return 6;
+            case 'g':
+                return 7;
+            case 'g#':
+            case 'ab':
+                return 8;
+            case 'a':
+                return 9;
+            case 'a#':
+            case 'bb':
+                return 10;
+            case 'b':
+                return 11;
+            default:
+                return 0;
+        }
+    }
+    static newGuid() {
+        return (Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1) +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1) +
+            '-' +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1) +
+            '-' +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1) +
+            '-' +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1) +
+            '-' +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1) +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1) +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1));
+    }
+    static isAlmostEqualTo(a, b) {
+        return Math.abs(a - b) < 0.00001;
+    }
+    static toHexString(n, digits = 0) {
+        let s = '';
+        let hexChars = '0123456789ABCDEF';
+        do {
+            s = String.fromCharCode(hexChars.charCodeAt(n & 15)) + s;
+            n = n >> 4;
+        } while (n > 0);
+        while (s.length < digits) {
+            s = '0' + s;
+        }
+        return s;
+    }
+}
+class Section {
+    constructor() {
+        this.marker = '';
+        this.text = '';
+    }
+}
+class IOHelper {
+    static readInt32BE(input) {
+        let ch1 = input.readByte();
+        let ch2 = input.readByte();
+        let ch3 = input.readByte();
+        let ch4 = input.readByte();
+        return (ch1 << 24) | (ch2 << 16) | (ch3 << 8) | ch4;
+    }
+    static readInt32LE(input) {
+        let ch1 = input.readByte();
+        let ch2 = input.readByte();
+        let ch3 = input.readByte();
+        let ch4 = input.readByte();
+        return (ch4 << 24) | (ch3 << 16) | (ch2 << 8) | ch1;
+    }
+    static readUInt32LE(input) {
+        let ch1 = input.readByte();
+        let ch2 = input.readByte();
+        let ch3 = input.readByte();
+        let ch4 = input.readByte();
+        return (ch4 << 24) | (ch3 << 16) | (ch2 << 8) | ch1;
+    }
+    static decodeUInt32LE(data, index) {
+        let ch1 = data[index];
+        let ch2 = data[index + 1];
+        let ch3 = data[index + 2];
+        let ch4 = data[index + 3];
+        return (ch4 << 24) | (ch3 << 16) | (ch2 << 8) | ch1;
+    }
+    static readUInt16LE(input) {
+        let ch1 = input.readByte();
+        let ch2 = input.readByte();
+        return TypeConversions.int32ToUint16((ch2 << 8) | ch1);
+    }
+    static readInt16LE(input) {
+        let ch1 = input.readByte();
+        let ch2 = input.readByte();
+        return TypeConversions.int32ToInt16((ch2 << 8) | ch1);
+    }
+    static readUInt32BE(input) {
+        let ch1 = input.readByte();
+        let ch2 = input.readByte();
+        let ch3 = input.readByte();
+        let ch4 = input.readByte();
+        return TypeConversions.int32ToUint32((ch1 << 24) | (ch2 << 16) | (ch3 << 8) | ch4);
+    }
+    static readUInt16BE(input) {
+        let ch1 = input.readByte();
+        let ch2 = input.readByte();
+        return TypeConversions.int32ToInt16((ch1 << 8) | ch2);
+    }
+    static readInt16BE(input) {
+        let ch1 = input.readByte();
+        let ch2 = input.readByte();
+        return TypeConversions.int32ToInt16((ch1 << 8) | ch2);
+    }
+    static readByteArray(input, length) {
+        let v = new Uint8Array(length);
+        input.read(v, 0, length);
+        return v;
+    }
+    static read8BitChars(input, length) {
+        let b = new Uint8Array(length);
+        input.read(b, 0, b.length);
+        return IOHelper.toString(b, 'utf-8');
+    }
+    static read8BitString(input) {
+        let s = '';
+        let c = input.readByte();
+        while (c !== 0) {
+            s += String.fromCharCode(c);
+            c = input.readByte();
+        }
+        return s;
+    }
+    static read8BitStringLength(input, length) {
+        let s = '';
+        let z = -1;
+        for (let i = 0; i < length; i++) {
+            let c = input.readByte();
+            if (c === 0 && z === -1) {
+                z = i;
+            }
+            s += String.fromCharCode(c);
+        }
+        let t = s;
+        if (z >= 0) {
+            return t.substr(0, z);
+        }
+        return t;
+    }
+    static readSInt8(input) {
+        let v = input.readByte();
+        return ((v & 255) >> 7) * -256 + (v & 255);
+    }
+    static readInt24(input, index) {
+        let i = input[index] | (input[index + 1] << 8) | (input[index + 2] << 16);
+        if ((i & 0x800000) === 0x800000) {
+            i = i | (0xff << 24);
+        }
+        return i;
+    }
+    static readInt16(input, index) {
+        return TypeConversions.int32ToInt16(input[index] | (input[index + 1] << 8));
+    }
+    static toString(data, encoding) {
+        let detectedEncoding = IOHelper.detectEncoding(data);
+        if (detectedEncoding) {
+            encoding = detectedEncoding;
+        }
+        if (!encoding) {
+            encoding = 'utf-8';
+        }
+        let decoder = new TextDecoder(encoding);
+        return decoder.decode(data.buffer);
+    }
+    static detectEncoding(data) {
+        if (data.length > 2 && data[0] === 0xfe && data[1] === 0xff) {
+            return 'utf-16be';
+        }
+        if (data.length > 2 && data[0] === 0xff && data[1] === 0xfe) {
+            return 'utf-16le';
+        }
+        if (data.length > 4 && data[0] === 0x00 && data[1] === 0x00 && data[2] === 0xfe && data[3] === 0xff) {
+            return 'utf-32be';
+        }
+        if (data.length > 4 && data[0] === 0xff && data[1] === 0xfe && data[2] === 0x00 && data[3] === 0x00) {
+            return 'utf-32le';
+        }
+        return null;
+    }
+    static stringToBytes(str) {
+        let decoder = new TextEncoder();
+        return decoder.encode(str);
+    }
+    static writeInt32BE(o, v) {
+        o.writeByte((v >> 24) & 0xff);
+        o.writeByte((v >> 16) & 0xff);
+        o.writeByte((v >> 8) & 0xff);
+        o.writeByte((v >> 0) & 0xff);
+    }
+    static writeInt32LE(o, v) {
+        o.writeByte((v >> 0) & 0xff);
+        o.writeByte((v >> 8) & 0xff);
+        o.writeByte((v >> 16) & 0xff);
+        o.writeByte((v >> 24) & 0xff);
+    }
+    static writeUInt16LE(o, v) {
+        o.writeByte((v >> 0) & 0xff);
+        o.writeByte((v >> 8) & 0xff);
+    }
+    static writeInt16LE(o, v) {
+        o.writeByte((v >> 0) & 0xff);
+        o.writeByte((v >> 8) & 0xff);
+    }
+    static writeInt16BE(o, v) {
+        o.writeByte((v >> 8) & 0xff);
+        o.writeByte((v >> 0) & 0xff);
+    }
+}
+class ByteBuffer {
+    constructor() {
+        this.length = 0;
+        this.position = 0;
+    }
+    get bytesWritten() {
+        return this.position;
+    }
+    getBuffer() {
+        return this._buffer;
+    }
+    static empty() {
+        return ByteBuffer.withCapacity(0);
+    }
+    static withCapacity(capacity) {
+        let buffer = new ByteBuffer();
+        buffer._buffer = new Uint8Array(capacity);
+        return buffer;
+    }
+    static fromBuffer(data) {
+        let buffer = new ByteBuffer();
+        buffer._buffer = data;
+        buffer.length = data.length;
+        return buffer;
+    }
+    static fromString(contents) {
+        let byteArray = IOHelper.stringToBytes(contents);
+        return ByteBuffer.fromBuffer(byteArray);
+    }
+    reset() {
+        this.position = 0;
+    }
+    skip(offset) {
+        this.position += offset;
+    }
+    readByte() {
+        let n = this.length - this.position;
+        if (n <= 0) {
+            return -1;
+        }
+        return this._buffer[this.position++];
+    }
+    read(buffer, offset, count) {
+        let n = this.length - this.position;
+        if (n > count) {
+            n = count;
+        }
+        if (n <= 0) {
+            return 0;
+        }
+        buffer.set(this._buffer.subarray(this.position, this.position + n), offset);
+        this.position += n;
+        return n;
+    }
+    writeByte(value) {
+        let i = this.position + 1;
+        this.ensureCapacity(i);
+        this._buffer[this.position] = value & 0xFF;
+        if (i > this.length) {
+            this.length = i;
+        }
+        this.position = i;
+    }
+    write(buffer, offset, count) {
+        let i = this.position + count;
+        this.ensureCapacity(i);
+        let count1 = Math.min(count, buffer.length - offset);
+        this._buffer.set(buffer.subarray(offset, offset + count1), this.position);
+        if (i > this.length) {
+            this.length = i;
+        }
+        this.position = i;
+    }
+    ensureCapacity(value) {
+        if (value > this._buffer.length) {
+            let newCapacity = value;
+            if (newCapacity < 256) {
+                newCapacity = 256;
+            }
+            if (newCapacity < this._buffer.length * 2) {
+                newCapacity = this._buffer.length * 2;
+            }
+            let newBuffer = new Uint8Array(newCapacity);
+            if (this.length > 0) {
+                newBuffer.set(this._buffer.subarray(0, 0 + this.length), 0);
+            }
+            this._buffer = newBuffer;
+        }
+    }
+    readAll() {
+        return this.toArray();
+    }
+    toArray() {
+        let copy = new Uint8Array(this.length);
+        copy.set(this._buffer.subarray(0, 0 + this.length), 0);
+        return copy;
+    }
+    copyTo(destination) {
+        destination.write(this._buffer, 0, this.length);
+    }
+}
+class TypeConversions {
+    static float64ToBytes(v) {
+        TypeConversions._dataView.setFloat64(0, v, true);
+        return this._conversionByteArray;
+    }
+    static bytesToFloat64(bytes) {
+        TypeConversions._conversionByteArray.set(bytes, 0);
+        throw TypeConversions._dataView.getFloat64(0, true);
+    }
+    static uint16ToInt16(v) {
+        TypeConversions._dataView.setUint16(0, v, true);
+        return TypeConversions._dataView.getInt16(0, true);
+    }
+    static int16ToUint32(v) {
+        TypeConversions._dataView.setInt16(0, v, true);
+        return TypeConversions._dataView.getUint32(0, true);
+    }
+    static int32ToUint16(v) {
+        TypeConversions._dataView.setInt32(0, v, true);
+        return TypeConversions._dataView.getUint16(0, true);
+    }
+    static int32ToInt16(v) {
+        TypeConversions._dataView.setInt32(0, v, true);
+        return TypeConversions._dataView.getInt16(0, true);
+    }
+    static int32ToUint32(v) {
+        TypeConversions._dataView.setInt32(0, v, true);
+        return TypeConversions._dataView.getUint32(0, true);
+    }
+    static uint8ToInt8(v) {
+        TypeConversions._dataView.setUint8(0, v);
+        return TypeConversions._dataView.getInt8(0);
+    }
+}
+TypeConversions._conversionBuffer = new ArrayBuffer(8);
+TypeConversions._conversionByteArray = new Uint8Array(TypeConversions._conversionBuffer);
+TypeConversions._dataView = new DataView(TypeConversions._conversionBuffer);
+class BeatCloner {
+    static clone(original) {
+        const clone = new Beat();
+        clone.index = original.index;
+        clone.notes = [];
+        for (const i of original.notes) {
+            clone.addNote(NoteCloner.clone(i));
+        }
+        clone.isEmpty = original.isEmpty;
+        clone.whammyStyle = original.whammyStyle;
+        clone.ottava = original.ottava;
+        clone.isLegatoOrigin = original.isLegatoOrigin;
+        clone.duration = original.duration;
+        clone.isLetRing = original.isLetRing;
+        clone.isPalmMute = original.isPalmMute;
+        clone.automations = [];
+        for (const i of original.automations) {
+            clone.automations.push(AutomationCloner.clone(i));
+        }
+        clone.dots = original.dots;
+        clone.fadeIn = original.fadeIn;
+        clone.lyrics = original.lyrics ? original.lyrics.slice() : null;
+        clone.hasRasgueado = original.hasRasgueado;
+        clone.pop = original.pop;
+        clone.slap = original.slap;
+        clone.tap = original.tap;
+        clone.text = original.text;
+        clone.brushType = original.brushType;
+        clone.brushDuration = original.brushDuration;
+        clone.tupletDenominator = original.tupletDenominator;
+        clone.tupletNumerator = original.tupletNumerator;
+        clone.isContinuedWhammy = original.isContinuedWhammy;
+        clone.whammyBarType = original.whammyBarType;
+        if (original.whammyBarPoints) {
+            clone.whammyBarPoints = [];
+            for (const i of original.whammyBarPoints) {
+                clone.addWhammyBarPoint(BendPointCloner.clone(i));
+            }
+        }
+        clone.vibrato = original.vibrato;
+        clone.chordId = original.chordId;
+        clone.graceType = original.graceType;
+        clone.pickStroke = original.pickStroke;
+        clone.tremoloSpeed = original.tremoloSpeed;
+        clone.crescendo = original.crescendo;
+        clone.displayStart = original.displayStart;
+        clone.playbackStart = original.playbackStart;
+        clone.displayDuration = original.displayDuration;
+        clone.playbackDuration = original.playbackDuration;
+        clone.dynamics = original.dynamics;
+        clone.invertBeamDirection = original.invertBeamDirection;
+        clone.preferredBeamDirection = original.preferredBeamDirection;
+        clone.isEffectSlurOrigin = original.isEffectSlurOrigin;
+        clone.beamingMode = original.beamingMode;
+        return clone;
+    }
+}
+class NoteCloner {
+    static clone(original) {
+        const clone = new Note();
+        clone.index = original.index;
+        clone.accentuated = original.accentuated;
+        clone.bendType = original.bendType;
+        clone.bendStyle = original.bendStyle;
+        clone.isContinuedBend = original.isContinuedBend;
+        if (original.bendPoints) {
+            clone.bendPoints = [];
+            for (const i of original.bendPoints) {
+                clone.addBendPoint(BendPointCloner.clone(i));
+            }
+        }
+        clone.fret = original.fret;
+        clone.string = original.string;
+        clone.octave = original.octave;
+        clone.tone = original.tone;
+        clone.percussionArticulation = original.percussionArticulation;
+        clone.isVisible = original.isVisible;
+        clone.isLeftHandTapped = original.isLeftHandTapped;
+        clone.isHammerPullOrigin = original.isHammerPullOrigin;
+        clone.isSlurDestination = original.isSlurDestination;
+        clone.harmonicType = original.harmonicType;
+        clone.harmonicValue = original.harmonicValue;
+        clone.isGhost = original.isGhost;
+        clone.isLetRing = original.isLetRing;
+        clone.isPalmMute = original.isPalmMute;
+        clone.isDead = original.isDead;
+        clone.isStaccato = original.isStaccato;
+        clone.slideInType = original.slideInType;
+        clone.slideOutType = original.slideOutType;
+        clone.vibrato = original.vibrato;
+        clone.isTieDestination = original.isTieDestination;
+        clone.leftHandFinger = original.leftHandFinger;
+        clone.rightHandFinger = original.rightHandFinger;
+        clone.isFingering = original.isFingering;
+        clone.trillValue = original.trillValue;
+        clone.trillSpeed = original.trillSpeed;
+        clone.durationPercent = original.durationPercent;
+        clone.accidentalMode = original.accidentalMode;
+        clone.dynamics = original.dynamics;
+        return clone;
+    }
+}
+class BendPointCloner {
+    static clone(original) {
+        const clone = new BendPoint();
+        clone.offset = original.offset;
+        clone.value = original.value;
+        return clone;
+    }
+}
+class Color {
+    constructor(r, g, b, a = 0xff) {
+        this.raw = 0;
+        this.raw = ((a & 0xff) << 24) | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
+        this.updateRgba();
+    }
+    updateRgba() {
+        if (this.a === 0xff) {
+            this.rgba =
+                '#' +
+                    ModelUtils.toHexString(this.r, 2) +
+                    ModelUtils.toHexString(this.g, 2) +
+                    ModelUtils.toHexString(this.b, 2);
+        }
+        else {
+            this.rgba = `rgba(${this.r},${this.g},${this.b},${this.a / 255.0})`;
+        }
+    }
+    get a() {
+        return (this.raw >> 24) & 0xff;
+    }
+    get r() {
+        return (this.raw >> 16) & 0xff;
+    }
+    get g() {
+        return (this.raw >> 8) & 0xff;
+    }
+    get b() {
+        return this.raw & 0xff;
+    }
+    static random(opacity = 100) {
+        return new Color((Math.random() * 255) | 0, (Math.random() * 255) | 0, (Math.random() * 255) | 0, opacity);
+    }
+    static fromJson(v) {
+        switch (typeof v) {
+            case 'number': {
+                const c = new Color(0, 0, 0, 0);
+                c.raw = v;
+                c.updateRgba();
+                return c;
+            }
+            case 'string': {
+                const json = v;
+                if (json.startsWith('#')) {
+                    if (json.length === 4) {
+                        return new Color(parseInt(json[1], 16) * 17, parseInt(json[2], 16) * 17, parseInt(json[3], 16) * 17);
+                    }
+                    if (json.length === 5) {
+                        return new Color(parseInt(json[1], 16) * 17, parseInt(json[2], 16) * 17, parseInt(json[3], 16) * 17, parseInt(json[4], 16) * 17);
+                    }
+                    if (json.length === 7) {
+                        return new Color(parseInt(json.substring(1, 3), 16), parseInt(json.substring(3, 5), 16), parseInt(json.substring(5, 7), 16));
+                    }
+                    if (json.length === 9) {
+                        return new Color(parseInt(json.substring(1, 3), 16), parseInt(json.substring(3, 5), 16), parseInt(json.substring(5, 7), 16), parseInt(json.substring(7, 9), 16));
+                    }
+                }
+                else if (json.startsWith('rgba') || json.startsWith('rgb')) {
+                    const start = json.indexOf('(');
+                    const end = json.lastIndexOf(')');
+                    if (start === -1 || end === -1) {
+                        throw 'No values specified for rgb/rgba function';
+                    }
+                    const numbers = json.substring(start + 1, end).split(',');
+                    if (numbers.length === 3) {
+                        return new Color(parseInt(numbers[0]), parseInt(numbers[1]), parseInt(numbers[2]));
+                    }
+                    if (numbers.length === 4) {
+                        return new Color(parseInt(numbers[0]), parseInt(numbers[1]), parseInt(numbers[2]), parseFloat(numbers[3]) * 255);
+                    }
+                }
+                return null;
+            }
+        }
+        throw 'Unsupported format for color';
+    }
+    static toJson(obj) {
+        return obj.raw;
+    }
+}
+Color.BlackRgb = '#000000';
+var BeamDirection;
+(function (BeamDirection) {
+    BeamDirection[BeamDirection["Up"] = 0] = "Up";
+    BeamDirection[BeamDirection["Down"] = 1] = "Down";
+})(BeamDirection || (BeamDirection = {}));
+class AutomationCloner {
+    static clone(original) {
+        const clone = new Automation();
+        clone.isLinear = original.isLinear;
+        clone.type = original.type;
+        clone.value = original.value;
+        clone.ratioPosition = original.ratioPosition;
+        clone.text = original.text;
+        return clone;
+    }
+}
+class GeneralMidi {
+    static getValue(name) {
+        if (!GeneralMidi._values) {
+            GeneralMidi._values = new Map();
+        }
+        name = name.toLowerCase().replace(' ', '');
+        return GeneralMidi._values.has(name) ? GeneralMidi._values.get(name) : 0;
+    }
+    static isPiano(program) {
+        return program <= 7 || program >= 16 && program <= 23;
+    }
+    static isGuitar(program) {
+        return program >= 24 && program <= 39 || program === 105 || program === 43;
+    }
+}
+GeneralMidi._values = new Map([
+    ['acousticgrandpiano', 0], ['brightacousticpiano', 1], ['electricgrandpiano', 2],
+    ['honkytonkpiano', 3], ['electricpiano1', 4], ['electricpiano2', 5], ['harpsichord', 6],
+    ['clavinet', 7], ['celesta', 8], ['glockenspiel', 9], ['musicbox', 10], ['vibraphone', 11],
+    ['marimba', 12], ['xylophone', 13], ['tubularbells', 14], ['dulcimer', 15],
+    ['drawbarorgan', 16], ['percussiveorgan', 17], ['rockorgan', 18], ['churchorgan', 19],
+    ['reedorgan', 20], ['accordion', 21], ['harmonica', 22], ['tangoaccordion', 23],
+    ['acousticguitarnylon', 24], ['acousticguitarsteel', 25], ['electricguitarjazz', 26],
+    ['electricguitarclean', 27], ['electricguitarmuted', 28], ['overdrivenguitar', 29],
+    ['distortionguitar', 30], ['guitarharmonics', 31], ['acousticbass', 32],
+    ['electricbassfinger', 33], ['electricbasspick', 34], ['fretlessbass', 35],
+    ['slapbass1', 36], ['slapbass2', 37], ['synthbass1', 38], ['synthbass2', 39],
+    ['violin', 40], ['viola', 41], ['cello', 42], ['contrabass', 43], ['tremolostrings', 44],
+    ['pizzicatostrings', 45], ['orchestralharp', 46], ['timpani', 47], ['stringensemble1', 48],
+    ['stringensemble2', 49], ['synthstrings1', 50], ['synthstrings2', 51], ['choiraahs', 52],
+    ['voiceoohs', 53], ['synthvoice', 54], ['orchestrahit', 55], ['trumpet', 56],
+    ['trombone', 57], ['tuba', 58], ['mutedtrumpet', 59], ['frenchhorn', 60],
+    ['brasssection', 61], ['synthbrass1', 62], ['synthbrass2', 63], ['sopranosax', 64],
+    ['altosax', 65], ['tenorsax', 66], ['baritonesax', 67], ['oboe', 68], ['englishhorn', 69],
+    ['bassoon', 70], ['clarinet', 71], ['piccolo', 72], ['flute', 73], ['recorder', 74],
+    ['panflute', 75], ['blownbottle', 76], ['shakuhachi', 77], ['whistle', 78], ['ocarina', 79],
+    ['lead1square', 80], ['lead2sawtooth', 81], ['lead3calliope', 82], ['lead4chiff', 83],
+    ['lead5charang', 84], ['lead6voice', 85], ['lead7fifths', 86], ['lead8bassandlead', 87],
+    ['pad1newage', 88], ['pad2warm', 89], ['pad3polysynth', 90], ['pad4choir', 91],
+    ['pad5bowed', 92], ['pad6metallic', 93], ['pad7halo', 94], ['pad8sweep', 95],
+    ['fx1rain', 96], ['fx2soundtrack', 97], ['fx3crystal', 98], ['fx4atmosphere', 99],
+    ['fx5brightness', 100], ['fx6goblins', 101], ['fx7echoes', 102], ['fx8scifi', 103],
+    ['sitar', 104], ['banjo', 105], ['shamisen', 106], ['koto', 107], ['kalimba', 108],
+    ['bagpipe', 109], ['fiddle', 110], ['shanai', 111], ['tinklebell', 112], ['agogo', 113],
+    ['steeldrums', 114], ['woodblock', 115], ['taikodrum', 116], ['melodictom', 117],
+    ['synthdrum', 118], ['reversecymbal', 119], ['guitarfretnoise', 120], ['breathnoise', 121],
+    ['seashore', 122], ['birdtweet', 123], ['telephonering', 124], ['helicopter', 125],
+    ['applause', 126], ['gunshot', 127]
+]);
 //# sourceMappingURL=mzxbx.js.map

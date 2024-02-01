@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.80 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.81 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -23,7 +23,7 @@ let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let reduceRatio = 1;
 let highLightMode = 1;
 var calcLen = 32;
-let diffWide=1;
+let diffWide = 1;
 
 
 let markLines: { fromX: number, fromY: number, toX: number, toY: number, color: string, manual: boolean }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
@@ -446,12 +446,12 @@ function countInfo(inrows: BallsRow[]) {
 	}*/
 }
 function dumpRowFills(inrows: BallsRow[]) {
-	
+
 	if (highLightMode == 1) {
 		dumpRowFillsColor(inrows, '#009900cc', 0);
 		//let slicedrows: BallsRow[] = sliceRows(inrows, 1*reduceRatio, inrows.length-1*reduceRatio);
 		//dumpRowFillsColor(slicedrows, '#00990033', 0);
-		
+
 		dumpRowWaitColor(inrows, '#00000033', 0);
 	} else {
 		dumpRowWaitColor(inrows, '#009900cc', 0);
@@ -484,6 +484,19 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 	}
 	let hr = (mx - min) / (topShift / cellSize - 2);
 	let prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
+
+	let lbl = 'grey';
+	let first = arr.map((x) => x);
+	first.sort((aa, bb) => { return bb.summ - aa.summ; });
+	for (let kk = 0; kk < first.length; kk++) {
+		lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+		if (ballExists(first[kk].ball, rows[0])) {
+			break;
+		}
+	}
+	console.log(lbl);
+
+
 	for (let bb = 0; bb < rowLen; bb++) {
 		let hh = (mx - min - (arr[bb].summ - min)) / hr;
 		let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
@@ -517,6 +530,18 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	}
 	let hr = (mx - min) / (topShift / cellSize - 2);
 	let prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
+	//console.log(ballFills);
+	let lbl = 'green';
+	let first = ballFills.map((x) => x);
+	first.sort((aa, bb) => { return bb.summ - aa.summ; });
+	for (let kk = 0; kk < first.length; kk++) {
+		lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+		if (ballExists(first[kk].ball, rows[0])) {
+			break;
+		}
+	}
+	console.log(lbl);
+
 	for (let bb = 0; bb < rowLen; bb++) {
 		let hh = (mx - min - (ballFills[bb].summ - min)) / hr;
 		let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
@@ -557,6 +582,28 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			if (calcs[ii].summ < minCnt) minCnt = calcs[ii].summ;
 		}
 		let df = mxCount - minCnt;
+		if (rr == 0) {
+			let first = calcs.map((x) => x);
+			let lbl = "";
+			first.sort((aa, bb) => { return aa.summ - bb.summ; });
+			lbl = 'white';
+			for (let kk = 0; kk < first.length; kk++) {
+				lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+				if (ballExists(first[kk].ball, rows[0])) {
+					break;
+				}
+			}
+			console.log(lbl);
+			first.sort((aa, bb) => { return bb.summ - aa.summ; });
+			lbl = 'blue';
+			for (let kk = 0; kk < first.length; kk++) {
+				lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+				if (ballExists(first[kk].ball, rows[0])) {
+					break;
+				}
+			}
+			console.log(lbl);
+		}
 		for (let ii = 0; ii < rowLen; ii++) {
 			let idx = ratioPre * (calcs[ii].summ - minCnt) / df;
 			let color = 'rgba(0,0,255,' + idx + ')';

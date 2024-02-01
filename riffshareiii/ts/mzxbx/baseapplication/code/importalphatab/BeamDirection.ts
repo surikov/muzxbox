@@ -1,0 +1,4 @@
+ enum BeamDirection {
+    Up,
+    Down
+}
