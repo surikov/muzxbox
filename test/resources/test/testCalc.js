@@ -354,6 +354,11 @@ function calcEmptyLineDuration(shift, ball, from, rows) {
     }
     return count;
 }
+function dumpInfo2(id, text) {
+    //console.log(id, text);
+    var span = document.getElementById(id);
+    span.innerText = text;
+}
 function countInfo(inrows) {
     var diff = 7;
     console.log('countInfo', diff, inrows[0]);
@@ -443,16 +448,20 @@ function dumpRowWaitColor(rows, color, shiftX) {
     }
     var hr = (mx - min) / (topShift / cellSize - 2);
     var prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
-    var lbl = 'grey';
+    var lbl = 's';
     var first = arr.map(function (x) { return x; });
     first.sort(function (aa, bb) { return bb.summ - aa.summ; });
-    for (var kk = 0; kk < first.length; kk++) {
-        lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
-        if (ballExists(first[kk].ball, rows[0])) {
-            break;
+    if (showFirstRow) {
+        for (var kk = 0; kk < first.length; kk++) {
+            //lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+            lbl = lbl + ', ' + first[kk].ball;
+            if (ballExists(first[kk].ball, rows[0])) {
+                break;
+            }
         }
     }
-    console.log(lbl);
+    //console.log(lbl);
+    dumpInfo2('statgrey', lbl);
     for (var bb = 0; bb < rowLen; bb++) {
         var hh = (mx - min - (arr[bb].summ - min)) / hr;
         var fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
@@ -495,16 +504,20 @@ function dumpRowFillsColor(rows, color, shiftX) {
     var hr = (mx - min) / (topShift / cellSize - 2);
     var prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
     //console.log(ballFills);
-    var lbl = 'green';
+    var lbl = 'g';
     var first = ballFills.map(function (x) { return x; });
     first.sort(function (aa, bb) { return bb.summ - aa.summ; });
-    for (var kk = 0; kk < first.length; kk++) {
-        lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
-        if (ballExists(first[kk].ball, rows[0])) {
-            break;
+    if (showFirstRow) {
+        for (var kk = 0; kk < first.length; kk++) {
+            lbl = lbl + ', ' + first[kk].ball;
+            //lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+            if (ballExists(first[kk].ball, rows[0])) {
+                break;
+            }
         }
     }
-    console.log(lbl);
+    //console.log(lbl);
+    dumpInfo2('statgreen', lbl);
     for (var bb = 0; bb < rowLen; bb++) {
         var hh = (mx - min - (ballFills[bb].summ - min)) / hr;
         var fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
@@ -557,23 +570,31 @@ function dumpTriads(svg, rows) {
             var first = calcs.map(function (x) { return x; });
             var lbl = "";
             first.sort(function (aa, bb) { return aa.summ - bb.summ; });
-            lbl = 'white';
-            for (var kk = 0; kk < first.length; kk++) {
-                lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
-                if (ballExists(first[kk].ball, rows[0])) {
-                    break;
+            lbl = 'w';
+            if (showFirstRow) {
+                for (var kk = 0; kk < first.length; kk++) {
+                    //lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+                    lbl = lbl + ', ' + first[kk].ball;
+                    if (ballExists(first[kk].ball, rows[0])) {
+                        break;
+                    }
                 }
             }
-            console.log(lbl);
+            //console.log(lbl);
+            dumpInfo2('statwhite', lbl);
             first.sort(function (aa, bb) { return bb.summ - aa.summ; });
-            lbl = 'blue';
-            for (var kk = 0; kk < first.length; kk++) {
-                lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
-                if (ballExists(first[kk].ball, rows[0])) {
-                    break;
+            lbl = 'b';
+            if (showFirstRow) {
+                for (var kk = 0; kk < first.length; kk++) {
+                    //lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+                    lbl = lbl + ', ' + first[kk].ball;
+                    if (ballExists(first[kk].ball, rows[0])) {
+                        break;
+                    }
                 }
             }
-            console.log(lbl);
+            //console.log(lbl);
+            dumpInfo2('statblue', lbl);
         }
         for (var ii = 0; ii < rowLen; ii++) {
             var idx = ratioPre * (calcs[ii].summ - minCnt) / df;

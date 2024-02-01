@@ -391,6 +391,12 @@ function calcEmptyLineDuration(shift: number, ball: number, from: number, rows: 
 	}
 	return count;
 }
+function dumpInfo2(id: string, text: string) {
+	//console.log(id, text);
+	var span: HTMLElement = (document.getElementById(id) as any) as HTMLElement;
+	span.innerText = text;
+
+}
 function countInfo(inrows: BallsRow[]) {
 	let diff: number = 7;
 	console.log('countInfo', diff, inrows[0]);
@@ -485,16 +491,20 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 	let hr = (mx - min) / (topShift / cellSize - 2);
 	let prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
 
-	let lbl = 'grey';
+	let lbl = 's';
 	let first = arr.map((x) => x);
 	first.sort((aa, bb) => { return bb.summ - aa.summ; });
-	for (let kk = 0; kk < first.length; kk++) {
-		lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
-		if (ballExists(first[kk].ball, rows[0])) {
-			break;
+	if (showFirstRow) {
+		for (let kk = 0; kk < first.length; kk++) {
+			//lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+			lbl = lbl + ', ' + first[kk].ball;
+			if (ballExists(first[kk].ball, rows[0])) {
+				break;
+			}
 		}
 	}
-	console.log(lbl);
+	//console.log(lbl);
+	dumpInfo2('statgrey', lbl);
 
 
 	for (let bb = 0; bb < rowLen; bb++) {
@@ -531,16 +541,20 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	let hr = (mx - min) / (topShift / cellSize - 2);
 	let prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
 	//console.log(ballFills);
-	let lbl = 'green';
+	let lbl = 'g';
 	let first = ballFills.map((x) => x);
 	first.sort((aa, bb) => { return bb.summ - aa.summ; });
-	for (let kk = 0; kk < first.length; kk++) {
-		lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
-		if (ballExists(first[kk].ball, rows[0])) {
-			break;
+	if (showFirstRow) {
+		for (let kk = 0; kk < first.length; kk++) {
+			lbl = lbl + ', ' + first[kk].ball;
+			//lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+			if (ballExists(first[kk].ball, rows[0])) {
+				break;
+			}
 		}
 	}
-	console.log(lbl);
+	//console.log(lbl);
+	dumpInfo2('statgreen', lbl);
 
 	for (let bb = 0; bb < rowLen; bb++) {
 		let hh = (mx - min - (ballFills[bb].summ - min)) / hr;
@@ -586,23 +600,32 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			let first = calcs.map((x) => x);
 			let lbl = "";
 			first.sort((aa, bb) => { return aa.summ - bb.summ; });
-			lbl = 'white';
-			for (let kk = 0; kk < first.length; kk++) {
-				lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
-				if (ballExists(first[kk].ball, rows[0])) {
-					break;
+			lbl = 'w';
+			if (showFirstRow) {
+				for (let kk = 0; kk < first.length; kk++) {
+					//lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+					lbl = lbl + ', ' + first[kk].ball;
+					if (ballExists(first[kk].ball, rows[0])) {
+						break;
+					}
 				}
 			}
-			console.log(lbl);
+
+			//console.log(lbl);
+			dumpInfo2('statwhite', lbl);
 			first.sort((aa, bb) => { return bb.summ - aa.summ; });
-			lbl = 'blue';
-			for (let kk = 0; kk < first.length; kk++) {
-				lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
-				if (ballExists(first[kk].ball, rows[0])) {
-					break;
+			lbl = 'b';
+			if (showFirstRow) {
+				for (let kk = 0; kk < first.length; kk++) {
+					//lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+					lbl = lbl + ', ' + first[kk].ball;
+					if (ballExists(first[kk].ball, rows[0])) {
+						break;
+					}
 				}
 			}
-			console.log(lbl);
+			//console.log(lbl);
+			dumpInfo2('statblue', lbl);
 		}
 		for (let ii = 0; ii < rowLen; ii++) {
 			let idx = ratioPre * (calcs[ii].summ - minCnt) / df;
