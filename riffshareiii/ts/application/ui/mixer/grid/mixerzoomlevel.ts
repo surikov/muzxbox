@@ -60,6 +60,10 @@ class MixerZoomLevel {
 				this.zoomAnchor.ww=mixBar.singleBarAnchor.ww;
 			}*/
 			this.bars.push(mixBar);
+
+			let titleLabel: TileText = { x: 0, y: mixm.gridTop(), text: data.title, css: 'timeBarNum' +  zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix};
+			this.zoomGridAnchor.content.push(titleLabel);
+
 			left = left + width;
 		}
 

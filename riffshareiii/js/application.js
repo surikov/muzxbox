@@ -1461,6 +1461,8 @@ class MixerZoomLevel {
             this.zoomFirstAnchor.content.push(barFirstAnchor);
             let mixBar = new MixerBar(ii, left, width, this.zoomLevelIndex, barGridAnchor, barTracksAnchor, barFirstAnchor, data);
             this.bars.push(mixBar);
+            let titleLabel = { x: 0, y: mixm.gridTop(), text: data.title, css: 'timeBarNum' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix };
+            this.zoomGridAnchor.content.push(titleLabel);
             left = left + width;
         }
     }
