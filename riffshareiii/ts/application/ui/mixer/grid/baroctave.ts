@@ -13,16 +13,16 @@ class BarOctave {
 			this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, zoomLevel);
 			if (zoomLevel < 7) {
 				this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data);
-				if (zoomLevel < 5) {
+				if (zoomLevel < 6) {
 					this.addLines(barOctaveAnchor, zoomLevel, left, top, width, height, data, barIdx);
 				}
 			}
 		}
 	}
 	addLines(barOctaveAnchor: TileAnchor, zoomLevel: number, left: number, top: number, width: number, height: number
-		, data: MZXBX_Project, barIdx: number) {
-		this.addOctaveGridSteps(barIdx, data, left
-			, barOctaveAnchor, zoomLevel);
+		, data: MZXBX_Project, barIdx: number
+	) {
+		this.addOctaveGridSteps(barIdx, data, left, barOctaveAnchor, zoomLevel);
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		this.barRightBorder = {
 			x: left + width
@@ -32,19 +32,21 @@ class BarOctave {
 			, css: 'barRightBorder'
 		};
 		barOctaveAnchor.content.push(this.barRightBorder);
-		this.octaveBottomBorder = {
-			x: left
-			, y: top + height
-			, w: width
-			, h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 16.0
-			, css: 'octaveBottomBorder'
-		};
+		if (zoomLevel < 4) {
+			this.octaveBottomBorder = {
+				x: left
+				, y: top + height
+				, w: width
+				, h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 16.0
+				, css: 'octaveBottomBorder'
+			};
 
-		//let oAnchor = { xx: left, yy: top, ww: width, hh: height, showZoom: minZoom, hideZoom: maxZoom, content: [oRectangle] };
-		//anchor.content.push(oAnchor);
-		//console.log(left,top,prefix,minZoom,maxZoom);
+			//let oAnchor = { xx: left, yy: top, ww: width, hh: height, showZoom: minZoom, hideZoom: maxZoom, content: [oRectangle] };
+			//anchor.content.push(oAnchor);
+			//console.log(left,top,prefix,minZoom,maxZoom);
 
-		barOctaveAnchor.content.push(this.octaveBottomBorder);
+			barOctaveAnchor.content.push(this.octaveBottomBorder);
+		}
 		if (zoomLevel < 3) {
 			for (let kk = 1; kk < 12; kk++) {
 				barOctaveAnchor.content.push({
@@ -171,6 +173,6 @@ class BarOctave {
 			}
 		}
 	}
-	
-	
+
+
 }

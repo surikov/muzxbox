@@ -1147,7 +1147,7 @@ class BarOctave {
             this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, zoomLevel);
             if (zoomLevel < 7) {
                 this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data);
-                if (zoomLevel < 5) {
+                if (zoomLevel < 6) {
                     this.addLines(barOctaveAnchor, zoomLevel, left, top, width, height, data, barIdx);
                 }
             }
@@ -1164,14 +1164,16 @@ class BarOctave {
             css: 'barRightBorder'
         };
         barOctaveAnchor.content.push(this.barRightBorder);
-        this.octaveBottomBorder = {
-            x: left,
-            y: top + height,
-            w: width,
-            h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 16.0,
-            css: 'octaveBottomBorder'
-        };
-        barOctaveAnchor.content.push(this.octaveBottomBorder);
+        if (zoomLevel < 4) {
+            this.octaveBottomBorder = {
+                x: left,
+                y: top + height,
+                w: width,
+                h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 16.0,
+                css: 'octaveBottomBorder'
+            };
+            barOctaveAnchor.content.push(this.octaveBottomBorder);
+        }
         if (zoomLevel < 3) {
             for (let kk = 1; kk < 12; kk++) {
                 barOctaveAnchor.content.push({
