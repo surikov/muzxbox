@@ -1142,13 +1142,13 @@ class LeftPanel {
     }
 }
 class BarOctave {
-    constructor(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel, data) {
+    constructor(barIdx, octaveIdx, left, top, width, height, barOctaveGridAnchor, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel, data) {
         if (zoomLevel < 8) {
-            this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, zoomLevel);
+            this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, data, zoomLevel);
             if (zoomLevel < 7) {
-                this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data);
+                this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, data);
                 if (zoomLevel < 6) {
-                    this.addLines(barOctaveAnchor, zoomLevel, left, top, width, height, data, barIdx);
+                    this.addLines(barOctaveGridAnchor, zoomLevel, left, top, width, height, data, barIdx);
                 }
             }
         }
@@ -1164,7 +1164,7 @@ class BarOctave {
             css: 'barRightBorder'
         };
         barOctaveAnchor.content.push(this.barRightBorder);
-        if (zoomLevel < 4) {
+        if (zoomLevel < 3) {
             this.octaveBottomBorder = {
                 x: left,
                 y: top + height,
@@ -1288,27 +1288,46 @@ class OctaveContent {
     }
 }
 class MixerBar {
-    constructor(barIdx, left, ww, zoomLevel, zoomBarAnchor, data) {
+    constructor(barIdx, left, ww, zoomLevel, gridZoomBarAnchor, tracksZoomBarAnchor, firstZoomBarAnchor, data) {
         this.zoomLevel = zoomLevel;
         let mixm = new MixerDataMath(data);
-        this.singleBarAnchor = zoomBarAnchor;
+        this.singleBarGridAnchor = gridZoomBarAnchor;
+        this.singleBarTracksAnchor = tracksZoomBarAnchor;
+        this.singleBarFirstAnchor = firstZoomBarAnchor;
         this.octaves = [];
         let h12 = 12 * mixm.notePathHeight;
         for (let oo = 0; oo < mixm.octaveCount; oo++) {
-            let singleOctaveAnchor = {
+            let gridOctaveAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevel].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].minZoom,
                 xx: left,
                 yy: mixm.gridTop() + oo * h12,
                 ww: ww,
                 hh: h12, content: [],
-                id: 'octave' + (oo + Math.random())
+                id: 'octaveGrid' + (oo + Math.random())
             };
-            this.singleBarAnchor.content.push(singleOctaveAnchor);
-            let bo = new BarOctave(barIdx, (mixm.octaveCount - oo - 1), left, mixm.gridTop() + oo * h12, ww, h12, singleOctaveAnchor, this.zoomLevel, data);
-            if (this.singleBarAnchor.ww < singleOctaveAnchor.ww) {
-                this.singleBarAnchor.ww = singleOctaveAnchor.ww;
-            }
+            this.singleBarGridAnchor.content.push(gridOctaveAnchor);
+            let tracksOctaveAnchor = {
+                showZoom: zoomPrefixLevelsCSS[this.zoomLevel].minZoom,
+                hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].minZoom,
+                xx: left,
+                yy: mixm.gridTop() + oo * h12,
+                ww: ww,
+                hh: h12, content: [],
+                id: 'octaveTracks' + (oo + Math.random())
+            };
+            this.singleBarTracksAnchor.content.push(tracksOctaveAnchor);
+            let firstOctaveAnchor = {
+                showZoom: zoomPrefixLevelsCSS[this.zoomLevel].minZoom,
+                hideZoom: zoomPrefixLevelsCSS[this.zoomLevel + 1].minZoom,
+                xx: left,
+                yy: mixm.gridTop() + oo * h12,
+                ww: ww,
+                hh: h12, content: [],
+                id: 'octaveFirst' + (oo + Math.random())
+            };
+            this.singleBarFirstAnchor.content.push(firstOctaveAnchor);
+            let bo = new BarOctave(barIdx, (mixm.octaveCount - oo - 1), left, mixm.gridTop() + oo * h12, ww, h12, gridOctaveAnchor, tracksOctaveAnchor, firstOctaveAnchor, this.zoomLevel, data);
             this.octaves.push(bo);
         }
     }
@@ -1322,8 +1341,12 @@ class MixerUI {
         let ww = mixm.mixerWidth();
         let hh = mixm.mixerHeight();
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
-            this.zoomLayer.anchors[ii].ww = ww;
-            this.zoomLayer.anchors[ii].hh = hh;
+            this.gridLayers.anchors[ii].ww = ww;
+            this.gridLayers.anchors[ii].hh = hh;
+            this.trackLayers.anchors[ii].ww = ww;
+            this.trackLayers.anchors[ii].hh = hh;
+            this.firstLayers.anchors[ii].ww = ww;
+            this.firstLayers.anchors[ii].hh = hh;
             this.levels[ii].reCreateBars(data);
         }
         this.fillerAnchor.xx = mixm.LeftPad;
@@ -1333,25 +1356,40 @@ class MixerUI {
         this.reFillTracksRatio(data);
     }
     createMixerLayers() {
-        let svg = document.getElementById('tracksLayerZoom');
-        this.zoomLayer = { g: svg, anchors: [], mode: LevelModes.normal };
+        let tracksLayerZoom = document.getElementById('tracksLayerZoom');
+        this.trackLayers = { g: tracksLayerZoom, anchors: [], mode: LevelModes.normal };
+        let gridLayerZoom = document.getElementById('gridLayerZoom');
+        this.gridLayers = { g: gridLayerZoom, anchors: [], mode: LevelModes.normal };
+        let firstLayerZoom = document.getElementById('firstLayerZoom');
+        this.firstLayers = { g: firstLayerZoom, anchors: [], mode: LevelModes.normal };
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
-            let mixerLevelAnchor = {
+            let mixerGridAnchor = {
                 showZoom: zoomPrefixLevelsCSS[ii].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
-                xx: 0, yy: 0, ww: 1, hh: 1, content: [],
-                id: 'mix' + (ii + Math.random())
+                xx: 0, yy: 0, ww: 1, hh: 1, content: []
             };
-            this.zoomLayer.anchors.push(mixerLevelAnchor);
-            this.levels.push(new MixerZoomLevel(ii, mixerLevelAnchor));
+            this.gridLayers.anchors.push(mixerGridAnchor);
+            let mixerTrackAnchor = {
+                showZoom: zoomPrefixLevelsCSS[ii].minZoom,
+                hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
+                xx: 0, yy: 0, ww: 1, hh: 1, content: []
+            };
+            this.trackLayers.anchors.push(mixerTrackAnchor);
+            let mixerFirstAnchor = {
+                showZoom: zoomPrefixLevelsCSS[ii].minZoom,
+                hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
+                xx: 0, yy: 0, ww: 1, hh: 1, content: []
+            };
+            this.firstLayers.anchors.push(mixerFirstAnchor);
+            this.levels.push(new MixerZoomLevel(ii, mixerGridAnchor, mixerTrackAnchor, mixerFirstAnchor));
         }
         this.fillerAnchor = {
             showZoom: zoomPrefixLevelsCSS[6].minZoom,
             hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1,
             xx: 0, yy: 0, ww: 1, hh: 1, content: []
         };
-        this.zoomLayer.anchors.push(this.fillerAnchor);
-        return [this.zoomLayer];
+        this.gridLayers.anchors.push(this.fillerAnchor);
+        return [this.gridLayers, this.trackLayers, this.firstLayers];
     }
     reFillTracksRatio(data) {
         let mixm = new MixerDataMath(data);
@@ -1393,14 +1431,15 @@ class MixerUI {
     }
 }
 class MixerZoomLevel {
-    constructor(zoomLevel, anchor) {
+    constructor(zoomLevel, anchorGrid, anchorTracks, anchorFirst) {
         this.zoomLevelIndex = zoomLevel;
-        this.zoomAnchor = anchor;
-        this.zoomAnchor.content = [];
+        this.zoomGridAnchor = anchorGrid;
+        this.zoomTracksAnchor = anchorTracks;
+        this.zoomFirstAnchor = anchorFirst;
     }
     reCreateBars(data) {
         let mixm = new MixerDataMath(data);
-        this.zoomAnchor.content = [];
+        this.zoomGridAnchor.content = [];
         this.bars = [];
         let left = mixm.LeftPad;
         let width = 0;
@@ -1408,18 +1447,19 @@ class MixerZoomLevel {
         for (let ii = 0; ii < data.timeline.length; ii++) {
             let timebar = data.timeline[ii];
             width = MZMM().set(timebar.metre).duration(timebar.tempo) * mixm.widthDurationRatio;
-            let barAnchor = {
-                showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom,
-                hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
-                xx: left,
-                yy: mixm.gridTop(),
-                ww: width,
-                hh: h12,
-                content: [],
-                id: 'measure' + (ii + Math.random())
+            let barGridAnchor = {
+                showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom, xx: left, yy: mixm.gridTop(), ww: width, hh: h12, content: []
             };
-            this.zoomAnchor.content.push(barAnchor);
-            let mixBar = new MixerBar(ii, left, width, this.zoomLevelIndex, barAnchor, data);
+            this.zoomGridAnchor.content.push(barGridAnchor);
+            let barTracksAnchor = {
+                showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom, xx: left, yy: mixm.gridTop(), ww: width, hh: h12, content: []
+            };
+            this.zoomTracksAnchor.content.push(barTracksAnchor);
+            let barFirstAnchor = {
+                showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom, xx: left, yy: mixm.gridTop(), ww: width, hh: h12, content: []
+            };
+            this.zoomFirstAnchor.content.push(barFirstAnchor);
+            let mixBar = new MixerBar(ii, left, width, this.zoomLevelIndex, barGridAnchor, barTracksAnchor, barFirstAnchor, data);
             this.bars.push(mixBar);
             left = left + width;
         }

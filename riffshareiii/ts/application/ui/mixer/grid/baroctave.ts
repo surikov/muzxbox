@@ -1,7 +1,10 @@
 class BarOctave {
 	barRightBorder: TileRectangle;
 	octaveBottomBorder: TileRectangle;
-	constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor
+	constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number
+		, barOctaveGridAnchor: TileAnchor
+		, barOctaveTrackAnchor: TileAnchor
+		, barOctaveFirstAnchor: TileAnchor
 		//, prefix: string, minZoom: number, maxZoom: number, data: MZXBX_Project
 		, zoomLevel: number, data: MZXBX_Project
 	) {
@@ -10,11 +13,11 @@ class BarOctave {
 
 		if (zoomLevel < 8) {
 			//this.addNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel, data);
-			this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, zoomLevel);
+			this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, data, zoomLevel);
 			if (zoomLevel < 7) {
-				this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data);
+				this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, data);
 				if (zoomLevel < 6) {
-					this.addLines(barOctaveAnchor, zoomLevel, left, top, width, height, data, barIdx);
+					this.addLines(barOctaveGridAnchor, zoomLevel, left, top, width, height, data, barIdx);
 				}
 			}
 		}
@@ -32,7 +35,7 @@ class BarOctave {
 			, css: 'barRightBorder'
 		};
 		barOctaveAnchor.content.push(this.barRightBorder);
-		if (zoomLevel < 4) {
+		if (zoomLevel < 3) {
 			this.octaveBottomBorder = {
 				x: left
 				, y: top + height

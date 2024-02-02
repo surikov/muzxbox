@@ -210,7 +210,7 @@ declare class LeftPanel {
 declare class BarOctave {
     barRightBorder: TileRectangle;
     octaveBottomBorder: TileRectangle;
-    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project);
+    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project);
     addLines(barOctaveAnchor: TileAnchor, zoomLevel: number, left: number, top: number, width: number, height: number, data: MZXBX_Project, barIdx: number): void;
     addOctaveGridSteps(barIdx: number, data: MZXBX_Project, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
     addUpperNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project, zoomLevel: number): void;
@@ -222,12 +222,16 @@ declare class OctaveContent {
 }
 declare class MixerBar {
     octaves: BarOctave[];
-    singleBarAnchor: TileAnchor;
+    singleBarGridAnchor: TileAnchor;
+    singleBarTracksAnchor: TileAnchor;
+    singleBarFirstAnchor: TileAnchor;
     zoomLevel: number;
-    constructor(barIdx: number, left: number, ww: number, zoomLevel: number, zoomBarAnchor: TileAnchor, data: MZXBX_Project);
+    constructor(barIdx: number, left: number, ww: number, zoomLevel: number, gridZoomBarAnchor: TileAnchor, tracksZoomBarAnchor: TileAnchor, firstZoomBarAnchor: TileAnchor, data: MZXBX_Project);
 }
 declare class MixerUI {
-    zoomLayer: TileLayerDefinition;
+    gridLayers: TileLayerDefinition;
+    trackLayers: TileLayerDefinition;
+    firstLayers: TileLayerDefinition;
     levels: MixerZoomLevel[];
     fillerAnchor: TileAnchor;
     reFillMixerUI(data: MZXBX_Project): void;
@@ -235,10 +239,12 @@ declare class MixerUI {
     reFillTracksRatio(data: MZXBX_Project): void;
 }
 declare class MixerZoomLevel {
-    zoomAnchor: TileAnchor;
+    zoomGridAnchor: TileAnchor;
+    zoomTracksAnchor: TileAnchor;
+    zoomFirstAnchor: TileAnchor;
     bars: MixerBar[];
     zoomLevelIndex: number;
-    constructor(zoomLevel: number, anchor: TileAnchor);
+    constructor(zoomLevel: number, anchorGrid: TileAnchor, anchorTracks: TileAnchor, anchorFirst: TileAnchor);
     reCreateBars(data: MZXBX_Project): void;
 }
 declare class IconLabelButton {
