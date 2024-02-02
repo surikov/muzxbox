@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.82 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.83 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -494,13 +494,11 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 	let lbl = 'grey ';
 	let first = arr.map((x) => x);
 	first.sort((aa, bb) => { return bb.summ - aa.summ; });
-	if (showFirstRow) {
-		for (let kk = 0; kk < first.length; kk++) {
-			//lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+	for (let kk = 0; kk < first.length; kk++) {
+		if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
+			lbl = lbl + ' ●' + first[kk].ball ;
+		} else {
 			lbl = lbl + ' ' + first[kk].ball;
-			if (ballExists(first[kk].ball, rows[0])) {
-				break;
-			}
 		}
 	}
 	//console.log(lbl);
@@ -544,13 +542,11 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	let lbl = 'green';
 	let first = ballFills.map((x) => x);
 	first.sort((aa, bb) => { return bb.summ - aa.summ; });
-	if (showFirstRow) {
-		for (let kk = 0; kk < first.length; kk++) {
+	for (let kk = 0; kk < first.length; kk++) {
+		if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
+			lbl = lbl + ' ●' + first[kk].ball;
+		} else {
 			lbl = lbl + ' ' + first[kk].ball;
-			//lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
-			if (ballExists(first[kk].ball, rows[0])) {
-				break;
-			}
 		}
 	}
 	//console.log(lbl);
@@ -600,32 +596,18 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			let first = calcs.map((x) => x);
 			let lbl = "";
 			first.sort((aa, bb) => { return aa.summ - bb.summ; });
-			lbl = 'white';
-			if (showFirstRow) {
-				for (let kk = 0; kk < first.length; kk++) {
-					//lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+			lbl = 'blue';
+			for (let kk = 0; kk < first.length; kk++) {
+				if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
+					lbl = lbl + ' ●' + first[kk].ball ;
+				} else {
 					lbl = lbl + ' ' + first[kk].ball;
-					if (ballExists(first[kk].ball, rows[0])) {
-						break;
-					}
 				}
 			}
 
 			//console.log(lbl);
-			dumpInfo2('statwhite', lbl);
-			first.sort((aa, bb) => { return bb.summ - aa.summ; });
-			lbl = 'blue ';
-			if (showFirstRow) {
-				for (let kk = 0; kk < first.length; kk++) {
-					//lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
-					lbl = lbl + ' ' + first[kk].ball;
-					if (ballExists(first[kk].ball, rows[0])) {
-						break;
-					}
-				}
-			}
-			//console.log(lbl);
 			dumpInfo2('statblue', lbl);
+
 		}
 		for (let ii = 0; ii < rowLen; ii++) {
 			let idx = ratioPre * (calcs[ii].summ - minCnt) / df;
@@ -671,7 +653,8 @@ function clickHop() {
 }
 function toggleFirst() {
 	showFirstRow = !showFirstRow;
-	fillCells();
+	//fillCells();
+	addTails();
 }
 function clickGoSkip(nn: number) {
 	if (skipRowsCount + nn * reduceRatio >= 0) {

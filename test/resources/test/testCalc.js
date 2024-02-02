@@ -451,13 +451,12 @@ function dumpRowWaitColor(rows, color, shiftX) {
     var lbl = 'grey ';
     var first = arr.map(function (x) { return x; });
     first.sort(function (aa, bb) { return bb.summ - aa.summ; });
-    if (showFirstRow) {
-        for (var kk = 0; kk < first.length; kk++) {
-            //lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+    for (var kk = 0; kk < first.length; kk++) {
+        if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
+            lbl = lbl + ' ●' + first[kk].ball;
+        }
+        else {
             lbl = lbl + ' ' + first[kk].ball;
-            if (ballExists(first[kk].ball, rows[0])) {
-                break;
-            }
         }
     }
     //console.log(lbl);
@@ -507,13 +506,12 @@ function dumpRowFillsColor(rows, color, shiftX) {
     var lbl = 'green';
     var first = ballFills.map(function (x) { return x; });
     first.sort(function (aa, bb) { return bb.summ - aa.summ; });
-    if (showFirstRow) {
-        for (var kk = 0; kk < first.length; kk++) {
+    for (var kk = 0; kk < first.length; kk++) {
+        if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
+            lbl = lbl + ' ●' + first[kk].ball;
+        }
+        else {
             lbl = lbl + ' ' + first[kk].ball;
-            //lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
-            if (ballExists(first[kk].ball, rows[0])) {
-                break;
-            }
         }
     }
     //console.log(lbl);
@@ -570,27 +568,13 @@ function dumpTriads(svg, rows) {
             var first = calcs.map(function (x) { return x; });
             var lbl = "";
             first.sort(function (aa, bb) { return aa.summ - bb.summ; });
-            lbl = 'white';
-            if (showFirstRow) {
-                for (var kk = 0; kk < first.length; kk++) {
-                    //lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
-                    lbl = lbl + ' ' + first[kk].ball;
-                    if (ballExists(first[kk].ball, rows[0])) {
-                        break;
-                    }
+            lbl = 'blue';
+            for (var kk = 0; kk < first.length; kk++) {
+                if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
+                    lbl = lbl + ' ●' + first[kk].ball;
                 }
-            }
-            //console.log(lbl);
-            dumpInfo2('statwhite', lbl);
-            first.sort(function (aa, bb) { return bb.summ - aa.summ; });
-            lbl = 'blue ';
-            if (showFirstRow) {
-                for (var kk = 0; kk < first.length; kk++) {
-                    //lbl = lbl + ', ' + first[kk].ball + ':' + first[kk].summ;
+                else {
                     lbl = lbl + ' ' + first[kk].ball;
-                    if (ballExists(first[kk].ball, rows[0])) {
-                        break;
-                    }
                 }
             }
             //console.log(lbl);
@@ -627,7 +611,8 @@ function clickHop() {
 }
 function toggleFirst() {
     showFirstRow = !showFirstRow;
-    fillCells();
+    //fillCells();
+    addTails();
 }
 function clickGoSkip(nn) {
     if (skipRowsCount + nn * reduceRatio >= 0) {
