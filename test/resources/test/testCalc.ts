@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.84 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.85 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -494,13 +494,20 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 	let lbl = 'grey ';
 	let first = arr.map((x) => x);
 	first.sort((aa, bb) => { return bb.summ - aa.summ; });
+	let begin=-1;
+	let end=-1;
 	for (let kk = 0; kk < first.length; kk++) {
 		if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
 			lbl = lbl + ' ●' + first[kk].ball ;
+			end=kk;
+			if(begin==-1){
+				begin=kk;
+			}
 		} else {
 			lbl = lbl + ' ' + first[kk].ball;
 		}
 	}
+	lbl=''+begin+':'+end+' '+lbl;
 	//console.log(lbl);
 	dumpInfo2('statgrey', lbl);
 
@@ -542,13 +549,20 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	let lbl = 'green';
 	let first = ballFills.map((x) => x);
 	first.sort((aa, bb) => { return bb.summ - aa.summ; });
+	let begin=-1;
+	let end=-1;
 	for (let kk = 0; kk < first.length; kk++) {
 		if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
 			lbl = lbl + ' ●' + first[kk].ball;
+			end=kk;
+			if(begin==-1){
+				begin=kk;
+			}
 		} else {
 			lbl = lbl + ' ' + first[kk].ball;
 		}
 	}
+	lbl=''+begin+':'+end+' '+lbl;
 	//console.log(lbl);
 	dumpInfo2('statgreen', lbl);
 
@@ -597,14 +611,20 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			let lbl = "";
 			first.sort((aa, bb) => { return aa.summ - bb.summ; });
 			lbl = 'blue';
+			let begin=-1;
+	let end=-1;
 			for (let kk = 0; kk < first.length; kk++) {
 				if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
 					lbl = lbl + ' ●' + first[kk].ball ;
+					end=kk;
+					if(begin==-1){
+						begin=kk;
+					}
 				} else {
 					lbl = lbl + ' ' + first[kk].ball;
 				}
 			}
-
+lbl=''+begin+':'+end+' '+lbl;
 			//console.log(lbl);
 			dumpInfo2('statblue', lbl);
 

@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.84 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.85 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -451,14 +451,21 @@ function dumpRowWaitColor(rows, color, shiftX) {
     var lbl = 'grey ';
     var first = arr.map(function (x) { return x; });
     first.sort(function (aa, bb) { return bb.summ - aa.summ; });
+    var begin = -1;
+    var end = -1;
     for (var kk = 0; kk < first.length; kk++) {
         if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
             lbl = lbl + ' ●' + first[kk].ball;
+            end = kk;
+            if (begin == -1) {
+                begin = kk;
+            }
         }
         else {
             lbl = lbl + ' ' + first[kk].ball;
         }
     }
+    lbl = '' + begin + ':' + end + ' ' + lbl;
     //console.log(lbl);
     dumpInfo2('statgrey', lbl);
     for (var bb = 0; bb < rowLen; bb++) {
@@ -506,14 +513,21 @@ function dumpRowFillsColor(rows, color, shiftX) {
     var lbl = 'green';
     var first = ballFills.map(function (x) { return x; });
     first.sort(function (aa, bb) { return bb.summ - aa.summ; });
+    var begin = -1;
+    var end = -1;
     for (var kk = 0; kk < first.length; kk++) {
         if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
             lbl = lbl + ' ●' + first[kk].ball;
+            end = kk;
+            if (begin == -1) {
+                begin = kk;
+            }
         }
         else {
             lbl = lbl + ' ' + first[kk].ball;
         }
     }
+    lbl = '' + begin + ':' + end + ' ' + lbl;
     //console.log(lbl);
     dumpInfo2('statgreen', lbl);
     for (var bb = 0; bb < rowLen; bb++) {
@@ -569,14 +583,21 @@ function dumpTriads(svg, rows) {
             var lbl = "";
             first.sort(function (aa, bb) { return aa.summ - bb.summ; });
             lbl = 'blue';
+            var begin = -1;
+            var end = -1;
             for (var kk = 0; kk < first.length; kk++) {
                 if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
                     lbl = lbl + ' ●' + first[kk].ball;
+                    end = kk;
+                    if (begin == -1) {
+                        begin = kk;
+                    }
                 }
                 else {
                     lbl = lbl + ' ' + first[kk].ball;
                 }
             }
+            lbl = '' + begin + ':' + end + ' ' + lbl;
             //console.log(lbl);
             dumpInfo2('statblue', lbl);
         }
