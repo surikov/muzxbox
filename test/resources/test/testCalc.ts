@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.85 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.86 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -24,6 +24,8 @@ let reduceRatio = 1;
 let highLightMode = 1;
 var calcLen = 32;
 let diffWide = 1;
+
+let wideRange = false;
 
 
 let markLines: { fromX: number, fromY: number, toX: number, toY: number, color: string, manual: boolean }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
@@ -482,6 +484,7 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 			one.summ = one.summ + calcEmptyLineDuration(shift, nn + 1, 1, rows);
 		}
 	}
+	makeWader(arr);
 	let mx = 0;
 	let min = 98765;
 	for (let bb = 0; bb < rowLen; bb++) {
@@ -494,20 +497,20 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 	let lbl = 'grey ';
 	let first = arr.map((x) => x);
 	first.sort((aa, bb) => { return bb.summ - aa.summ; });
-	let begin=-1;
-	let end=-1;
+	let begin = -1;
+	let end = -1;
 	for (let kk = 0; kk < first.length; kk++) {
 		if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
-			lbl = lbl + ' ●' + first[kk].ball ;
-			end=kk;
-			if(begin==-1){
-				begin=kk;
+			lbl = lbl + ' ●' + first[kk].ball;
+			end = kk;
+			if (begin == -1) {
+				begin = kk;
 			}
 		} else {
 			lbl = lbl + ' ' + first[kk].ball;
 		}
 	}
-	lbl=''+begin+':'+end+' '+lbl;
+	lbl = '' + begin + ':' + end + ' ' + lbl;
 	//console.log(lbl);
 	dumpInfo2('statgrey', lbl);
 
@@ -534,9 +537,30 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 	}
 	//console.log(arr);
 }
+function makeWader(ballFills: { ball: number, summ: number }[]) {
+	if (wideRange) {
+		let mx = 0;
+		let min = 987654321;
+		for (let bb = 0; bb < rowLen; bb++) {
+			if (mx < ballFills[bb].summ) { mx = ballFills[bb].summ; }
+			if (min > ballFills[bb].summ) { min = ballFills[bb].summ; }
+		}
+		let middle = (mx - min) / 2 + min;
+		for (let bb = 0; bb < rowLen; bb++) {
+			ballFills[bb].summ = ballFills[bb].summ - middle;
+			/*if(ballFills[bb].summ>0){
+				ballFills[bb].summ = ballFills[bb].summ * ballFills[bb].summ;
+			}else{
+				ballFills[bb].summ = -ballFills[bb].summ * ballFills[bb].summ;
+			}*/
+			ballFills[bb].summ = ballFills[bb].summ * ballFills[bb].summ * ballFills[bb].summ;
+		}
+	}
+}
 function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	let precounts: number[] = calcRowPatterns(0 + 1, rows);
 	let ballFills: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = calculateBallTriadChain(0, rows, precounts);
+	makeWader(ballFills);
 	let mx = 0;
 	let min = 987654321;
 	for (let bb = 0; bb < rowLen; bb++) {
@@ -549,20 +573,20 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	let lbl = 'green';
 	let first = ballFills.map((x) => x);
 	first.sort((aa, bb) => { return bb.summ - aa.summ; });
-	let begin=-1;
-	let end=-1;
+	let begin = -1;
+	let end = -1;
 	for (let kk = 0; kk < first.length; kk++) {
 		if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
 			lbl = lbl + ' ●' + first[kk].ball;
-			end=kk;
-			if(begin==-1){
-				begin=kk;
+			end = kk;
+			if (begin == -1) {
+				begin = kk;
 			}
 		} else {
 			lbl = lbl + ' ' + first[kk].ball;
 		}
 	}
-	lbl=''+begin+':'+end+' '+lbl;
+	lbl = '' + begin + ':' + end + ' ' + lbl;
 	//console.log(lbl);
 	dumpInfo2('statgreen', lbl);
 
@@ -599,6 +623,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			let precounts = calcRowPatterns(rr + 1, rows);
 			calcs = calculateBallTriadChain(rr, rows, precounts);
 		}
+		makeWader(calcs);
 		let minCnt = 99999;
 		let mxCount = 0;
 		for (let ii = 0; ii < rowLen; ii++) {
@@ -611,20 +636,20 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			let lbl = "";
 			first.sort((aa, bb) => { return aa.summ - bb.summ; });
 			lbl = 'blue';
-			let begin=-1;
-	let end=-1;
+			let begin = -1;
+			let end = -1;
 			for (let kk = 0; kk < first.length; kk++) {
 				if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
-					lbl = lbl + ' ●' + first[kk].ball ;
-					end=kk;
-					if(begin==-1){
-						begin=kk;
+					lbl = lbl + ' ●' + first[kk].ball;
+					end = kk;
+					if (begin == -1) {
+						begin = kk;
 					}
 				} else {
 					lbl = lbl + ' ' + first[kk].ball;
 				}
 			}
-lbl=''+begin+':'+end+' '+lbl;
+			lbl = '' + begin + ':' + end + ' ' + lbl;
 			//console.log(lbl);
 			dumpInfo2('statblue', lbl);
 
@@ -676,6 +701,12 @@ function toggleFirst() {
 	//fillCells();
 	addTails();
 }
+function toggleWide() {
+	wideRange = !wideRange;
+	//fillCells();
+	addTails();
+}
+
 function clickGoSkip(nn: number) {
 	if (skipRowsCount + nn * reduceRatio >= 0) {
 		if (skipRowsCount + nn * reduceRatio < datarows.length - rowsVisibleCount * reduceRatio) {

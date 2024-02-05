@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.85 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.86 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -16,6 +16,7 @@ var reduceRatio = 1;
 var highLightMode = 1;
 var calcLen = 32;
 var diffWide = 1;
+var wideRange = false;
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
     var msgp = document.getElementById('msgp');
@@ -438,6 +439,7 @@ function dumpRowWaitColor(rows, color, shiftX) {
             one.summ = one.summ + calcEmptyLineDuration(shift, nn + 1, 1, rows);
         }
     }
+    makeWader(arr);
     var mx = 0;
     var min = 98765;
     for (var bb = 0; bb < rowLen; bb++) {
@@ -494,9 +496,34 @@ function dumpRowWaitColor(rows, color, shiftX) {
     }
     //console.log(arr);
 }
+function makeWader(ballFills) {
+    if (wideRange) {
+        var mx = 0;
+        var min = 987654321;
+        for (var bb = 0; bb < rowLen; bb++) {
+            if (mx < ballFills[bb].summ) {
+                mx = ballFills[bb].summ;
+            }
+            if (min > ballFills[bb].summ) {
+                min = ballFills[bb].summ;
+            }
+        }
+        var middle = (mx - min) / 2 + min;
+        for (var bb = 0; bb < rowLen; bb++) {
+            ballFills[bb].summ = ballFills[bb].summ - middle;
+            /*if(ballFills[bb].summ>0){
+                ballFills[bb].summ = ballFills[bb].summ * ballFills[bb].summ;
+            }else{
+                ballFills[bb].summ = -ballFills[bb].summ * ballFills[bb].summ;
+            }*/
+            ballFills[bb].summ = ballFills[bb].summ * ballFills[bb].summ * ballFills[bb].summ;
+        }
+    }
+}
 function dumpRowFillsColor(rows, color, shiftX) {
     var precounts = calcRowPatterns(0 + 1, rows);
     var ballFills = calculateBallTriadChain(0, rows, precounts);
+    makeWader(ballFills);
     var mx = 0;
     var min = 987654321;
     for (var bb = 0; bb < rowLen; bb++) {
@@ -569,6 +596,7 @@ function dumpTriads(svg, rows) {
             var precounts = calcRowPatterns(rr + 1, rows);
             calcs = calculateBallTriadChain(rr, rows, precounts);
         }
+        makeWader(calcs);
         var minCnt = 99999;
         var mxCount = 0;
         for (var ii = 0; ii < rowLen; ii++) {
@@ -632,6 +660,11 @@ function clickHop() {
 }
 function toggleFirst() {
     showFirstRow = !showFirstRow;
+    //fillCells();
+    addTails();
+}
+function toggleWide() {
+    wideRange = !wideRange;
     //fillCells();
     addTails();
 }
