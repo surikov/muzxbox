@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.86 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.87 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -468,6 +468,8 @@ function dumpRowFills(inrows: BallsRow[]) {
 }
 
 function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
+	let lbl = 'grey ';
+	//console.log(lbl);
 	let arr: { ball: number, summ: number }[] = [];
 	//var rowNum = 0;
 	//let diff=0;
@@ -494,7 +496,7 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 	let hr = (mx - min) / (topShift / cellSize - 2);
 	let prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
 
-	let lbl = 'grey ';
+	
 	let first = arr.map((x) => x);
 	first.sort((aa, bb) => { return bb.summ - aa.summ; });
 	let begin = -1;
@@ -510,7 +512,7 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 			lbl = lbl + ' ' + first[kk].ball;
 		}
 	}
-	lbl = '' + begin + ':' + end + ' ' + lbl;
+	lbl = '' + begin + ':' + end +'('+(rowLen-end-1)+'): ' + lbl;
 	//console.log(lbl);
 	dumpInfo2('statgrey', lbl);
 
@@ -546,18 +548,24 @@ function makeWader(ballFills: { ball: number, summ: number }[]) {
 			if (min > ballFills[bb].summ) { min = ballFills[bb].summ; }
 		}
 		let middle = (mx - min) / 2 + min;
+
+		let sorted = ballFills.map((x) => x);
+		sorted.sort((aa, bb) => { return bb.summ - aa.summ; });
+		let center = sorted[Math.round((sorted.length - 1) / 2)].summ-min;
+
+		//console.log(min,center, middle, mx, sorted);
+		
 		for (let bb = 0; bb < rowLen; bb++) {
-			ballFills[bb].summ = ballFills[bb].summ - middle;
-			/*if(ballFills[bb].summ>0){
-				ballFills[bb].summ = ballFills[bb].summ * ballFills[bb].summ;
-			}else{
-				ballFills[bb].summ = -ballFills[bb].summ * ballFills[bb].summ;
-			}*/
-			ballFills[bb].summ = ballFills[bb].summ * ballFills[bb].summ * ballFills[bb].summ;
+			ballFills[bb].summ = ballFills[bb].summ - center;
+			let sig=ballFills[bb].summ>0?1:-1;
+			ballFills[bb].summ = sig * ballFills[bb].summ * ballFills[bb].summ;
 		}
+		
 	}
 }
 function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
+	let lbl = 'green';
+	//console.log(lbl);
 	let precounts: number[] = calcRowPatterns(0 + 1, rows);
 	let ballFills: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = calculateBallTriadChain(0, rows, precounts);
 	makeWader(ballFills);
@@ -570,7 +578,7 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	let hr = (mx - min) / (topShift / cellSize - 2);
 	let prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
 	//console.log(ballFills);
-	let lbl = 'green';
+	
 	let first = ballFills.map((x) => x);
 	first.sort((aa, bb) => { return bb.summ - aa.summ; });
 	let begin = -1;
@@ -586,7 +594,7 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 			lbl = lbl + ' ' + first[kk].ball;
 		}
 	}
-	lbl = '' + begin + ':' + end + ' ' + lbl;
+	lbl = '' + begin + ':' + end +'('+(rowLen-end-1)+'): ' + lbl;
 	//console.log(lbl);
 	dumpInfo2('statgreen', lbl);
 
@@ -612,6 +620,8 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	}
 }
 function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
+	
+	//console.log('blue');
 	let ratioPre = 0.66;//0.99;
 	//console.log('dumpTriads mode', highLightMode);
 	for (let rr = 0; rr < rowsVisibleCount; rr++) {
@@ -649,7 +659,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 					lbl = lbl + ' ' + first[kk].ball;
 				}
 			}
-			lbl = '' + begin + ':' + end + ' ' + lbl;
+			lbl = '' + begin + ':' + end  +'('+(rowLen-end-1)+'): ' + lbl;
 			//console.log(lbl);
 			dumpInfo2('statblue', lbl);
 

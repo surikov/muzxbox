@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.86 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.87 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -423,6 +423,8 @@ function dumpRowFills(inrows) {
     }
 }
 function dumpRowWaitColor(rows, color, shiftX) {
+    var lbl = 'grey ';
+    //console.log(lbl);
     var arr = [];
     //var rowNum = 0;
     //let diff=0;
@@ -450,7 +452,6 @@ function dumpRowWaitColor(rows, color, shiftX) {
     }
     var hr = (mx - min) / (topShift / cellSize - 2);
     var prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
-    var lbl = 'grey ';
     var first = arr.map(function (x) { return x; });
     first.sort(function (aa, bb) { return bb.summ - aa.summ; });
     var begin = -1;
@@ -467,7 +468,7 @@ function dumpRowWaitColor(rows, color, shiftX) {
             lbl = lbl + ' ' + first[kk].ball;
         }
     }
-    lbl = '' + begin + ':' + end + ' ' + lbl;
+    lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
     //console.log(lbl);
     dumpInfo2('statgrey', lbl);
     for (var bb = 0; bb < rowLen; bb++) {
@@ -509,18 +510,20 @@ function makeWader(ballFills) {
             }
         }
         var middle = (mx - min) / 2 + min;
+        var sorted = ballFills.map(function (x) { return x; });
+        sorted.sort(function (aa, bb) { return bb.summ - aa.summ; });
+        var center = sorted[Math.round((sorted.length - 1) / 2)].summ - min;
+        //console.log(min,center, middle, mx, sorted);
         for (var bb = 0; bb < rowLen; bb++) {
-            ballFills[bb].summ = ballFills[bb].summ - middle;
-            /*if(ballFills[bb].summ>0){
-                ballFills[bb].summ = ballFills[bb].summ * ballFills[bb].summ;
-            }else{
-                ballFills[bb].summ = -ballFills[bb].summ * ballFills[bb].summ;
-            }*/
-            ballFills[bb].summ = ballFills[bb].summ * ballFills[bb].summ * ballFills[bb].summ;
+            ballFills[bb].summ = ballFills[bb].summ - center;
+            var sig = ballFills[bb].summ > 0 ? 1 : -1;
+            ballFills[bb].summ = sig * ballFills[bb].summ * ballFills[bb].summ;
         }
     }
 }
 function dumpRowFillsColor(rows, color, shiftX) {
+    var lbl = 'green';
+    //console.log(lbl);
     var precounts = calcRowPatterns(0 + 1, rows);
     var ballFills = calculateBallTriadChain(0, rows, precounts);
     makeWader(ballFills);
@@ -537,7 +540,6 @@ function dumpRowFillsColor(rows, color, shiftX) {
     var hr = (mx - min) / (topShift / cellSize - 2);
     var prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
     //console.log(ballFills);
-    var lbl = 'green';
     var first = ballFills.map(function (x) { return x; });
     first.sort(function (aa, bb) { return bb.summ - aa.summ; });
     var begin = -1;
@@ -554,7 +556,7 @@ function dumpRowFillsColor(rows, color, shiftX) {
             lbl = lbl + ' ' + first[kk].ball;
         }
     }
-    lbl = '' + begin + ':' + end + ' ' + lbl;
+    lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
     //console.log(lbl);
     dumpInfo2('statgreen', lbl);
     for (var bb = 0; bb < rowLen; bb++) {
@@ -583,6 +585,7 @@ function dumpRowFillsColor(rows, color, shiftX) {
     }
 }
 function dumpTriads(svg, rows) {
+    //console.log('blue');
     var ratioPre = 0.66; //0.99;
     //console.log('dumpTriads mode', highLightMode);
     for (var rr = 0; rr < rowsVisibleCount; rr++) {
@@ -625,7 +628,7 @@ function dumpTriads(svg, rows) {
                     lbl = lbl + ' ' + first[kk].ball;
                 }
             }
-            lbl = '' + begin + ':' + end + ' ' + lbl;
+            lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
             //console.log(lbl);
             dumpInfo2('statblue', lbl);
         }
