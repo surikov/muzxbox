@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.87 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.88 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -496,7 +496,7 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 	let hr = (mx - min) / (topShift / cellSize - 2);
 	let prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
 
-	
+
 	let first = arr.map((x) => x);
 	first.sort((aa, bb) => { return bb.summ - aa.summ; });
 	let begin = -1;
@@ -512,7 +512,7 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 			lbl = lbl + ' ' + first[kk].ball;
 		}
 	}
-	lbl = '' + begin + ':' + end +'('+(rowLen-end-1)+'): ' + lbl;
+	lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
 	//console.log(lbl);
 	dumpInfo2('statgrey', lbl);
 
@@ -551,16 +551,16 @@ function makeWader(ballFills: { ball: number, summ: number }[]) {
 
 		let sorted = ballFills.map((x) => x);
 		sorted.sort((aa, bb) => { return bb.summ - aa.summ; });
-		let center = sorted[Math.round((sorted.length - 1) / 2)].summ-min;
+		let center = sorted[Math.round((sorted.length - 1) / 2)].summ - min;
 
 		//console.log(min,center, middle, mx, sorted);
-		
+
 		for (let bb = 0; bb < rowLen; bb++) {
 			ballFills[bb].summ = ballFills[bb].summ - center;
-			let sig=ballFills[bb].summ>0?1:-1;
+			let sig = ballFills[bb].summ > 0 ? 1 : -1;
 			ballFills[bb].summ = sig * ballFills[bb].summ * ballFills[bb].summ;
 		}
-		
+
 	}
 }
 function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
@@ -578,7 +578,7 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	let hr = (mx - min) / (topShift / cellSize - 2);
 	let prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
 	//console.log(ballFills);
-	
+
 	let first = ballFills.map((x) => x);
 	first.sort((aa, bb) => { return bb.summ - aa.summ; });
 	let begin = -1;
@@ -594,7 +594,7 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 			lbl = lbl + ' ' + first[kk].ball;
 		}
 	}
-	lbl = '' + begin + ':' + end +'('+(rowLen-end-1)+'): ' + lbl;
+	lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
 	//console.log(lbl);
 	dumpInfo2('statgreen', lbl);
 
@@ -620,7 +620,7 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	}
 }
 function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
-	
+
 	//console.log('blue');
 	let ratioPre = 0.66;//0.99;
 	//console.log('dumpTriads mode', highLightMode);
@@ -641,29 +641,38 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			if (calcs[ii].summ < minCnt) minCnt = calcs[ii].summ;
 		}
 		let df = mxCount - minCnt;
-		if (rr == 0) {
-			let first = calcs.map((x) => x);
-			let lbl = "";
-			first.sort((aa, bb) => { return aa.summ - bb.summ; });
-			lbl = 'blue';
-			let begin = -1;
-			let end = -1;
-			for (let kk = 0; kk < first.length; kk++) {
-				if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
-					lbl = lbl + ' ●' + first[kk].ball;
-					end = kk;
-					if (begin == -1) {
-						begin = kk;
-					}
-				} else {
-					lbl = lbl + ' ' + first[kk].ball;
+
+		let first = calcs.map((x) => x);
+		let lbl = "";
+		first.sort((aa, bb) => { return aa.summ - bb.summ; });
+		lbl = 'blue';
+		let begin = -1;
+		let end = -1;
+		for (let kk = 0; kk < first.length; kk++) {
+			if (ballExists(first[kk].ball, rows[rr]) && showFirstRow) {
+				lbl = lbl + ' ●' + first[kk].ball;
+				end = kk;
+				if (begin == -1) {
+					begin = kk;
 				}
+			} else {
+				lbl = lbl + ' ' + first[kk].ball;
 			}
-			lbl = '' + begin + ':' + end  +'('+(rowLen-end-1)+'): ' + lbl;
+		}
+		lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+		if (rr == 0) {
 			//console.log(lbl);
 			dumpInfo2('statblue', lbl);
 
 		}
+		let rowLab = '' + begin + ':' + end + '(' + (rowLen - end - 1) + ')';
+		addSmallText(svg, 2 * rowLen * cellSize + 2 + cellSize * 10, topShift + (1 + rr) * cellSize - 2, rowLab);
+		//console.log(rows[rr].key,(begin + ':' + end  +'('+(rowLen-end-1)+')'));
+
+
+
+
+
 		for (let ii = 0; ii < rowLen; ii++) {
 			let idx = ratioPre * (calcs[ii].summ - minCnt) / df;
 			let color = 'rgba(0,0,255,' + idx + ')';

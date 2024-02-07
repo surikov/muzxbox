@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.87 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.88 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -609,29 +609,32 @@ function dumpTriads(svg, rows) {
                 minCnt = calcs[ii].summ;
         }
         var df = mxCount - minCnt;
-        if (rr == 0) {
-            var first = calcs.map(function (x) { return x; });
-            var lbl = "";
-            first.sort(function (aa, bb) { return aa.summ - bb.summ; });
-            lbl = 'blue';
-            var begin = -1;
-            var end = -1;
-            for (var kk = 0; kk < first.length; kk++) {
-                if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
-                    lbl = lbl + ' ●' + first[kk].ball;
-                    end = kk;
-                    if (begin == -1) {
-                        begin = kk;
-                    }
-                }
-                else {
-                    lbl = lbl + ' ' + first[kk].ball;
+        var first = calcs.map(function (x) { return x; });
+        var lbl = "";
+        first.sort(function (aa, bb) { return aa.summ - bb.summ; });
+        lbl = 'blue';
+        var begin = -1;
+        var end = -1;
+        for (var kk = 0; kk < first.length; kk++) {
+            if (ballExists(first[kk].ball, rows[rr]) && showFirstRow) {
+                lbl = lbl + ' ●' + first[kk].ball;
+                end = kk;
+                if (begin == -1) {
+                    begin = kk;
                 }
             }
-            lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+            else {
+                lbl = lbl + ' ' + first[kk].ball;
+            }
+        }
+        lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+        if (rr == 0) {
             //console.log(lbl);
             dumpInfo2('statblue', lbl);
         }
+        var rowLab = '' + begin + ':' + end + '(' + (rowLen - end - 1) + ')';
+        addSmallText(svg, 2 * rowLen * cellSize + 2 + cellSize * 10, topShift + (1 + rr) * cellSize - 2, rowLab);
+        //console.log(rows[rr].key,(begin + ':' + end  +'('+(rowLen-end-1)+')'));
         for (var ii = 0; ii < rowLen; ii++) {
             var idx = ratioPre * (calcs[ii].summ - minCnt) / df;
             var color = 'rgba(0,0,255,' + idx + ')';
