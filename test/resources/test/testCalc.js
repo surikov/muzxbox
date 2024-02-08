@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.88 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.89 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -424,78 +424,82 @@ function dumpRowFills(inrows) {
 }
 function dumpRowWaitColor(rows, color, shiftX) {
     var lbl = 'grey ';
-    //console.log(lbl);
-    var arr = [];
-    //var rowNum = 0;
-    //let diff=0;
-    for (var nn = 0; nn < rowLen; nn++) {
-        var one = { ball: nn + 1, summ: 0 };
-        arr.push(one);
-        /*for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
-            if (ballExists(nn + 1, rows[rr])) {
-                break;
-            }
-            one.summ++;
-        }*/
-        for (var shift = -diffWide; shift <= diffWide; shift++) {
-            one.summ = one.summ + calcEmptyLineDuration(shift, nn + 1, 1, rows);
-        }
-    }
-    makeWader(arr);
-    var mx = 0;
-    var min = 98765;
-    for (var bb = 0; bb < rowLen; bb++) {
-        if (mx < arr[bb].summ)
-            mx = arr[bb].summ;
-        if (min > arr[bb].summ)
-            min = arr[bb].summ;
-    }
-    var hr = (mx - min) / (topShift / cellSize - 2);
-    var prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
-    var first = arr.map(function (x) { return x; });
-    first.sort(function (aa, bb) { return bb.summ - aa.summ; });
-    var begin = -1;
-    var end = -1;
-    for (var kk = 0; kk < first.length; kk++) {
-        if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
-            lbl = lbl + ' ●' + first[kk].ball;
-            end = kk;
-            if (begin == -1) {
-                begin = kk;
+    for (var rr = 0; rr < rowsVisibleCount; rr++) {
+        var arr = [];
+        for (var nn = 0; nn < rowLen; nn++) {
+            var one = { ball: nn + 1, summ: 0 };
+            arr.push(one);
+            for (var shift = -diffWide; shift <= diffWide; shift++) {
+                one.summ = one.summ + calcEmptyLineDuration(shift, nn + 1, rr + 1, rows);
             }
         }
-        else {
-            lbl = lbl + ' ' + first[kk].ball;
+        makeWader(arr);
+        var mx = 0;
+        var min = 98765;
+        //console.log(rr,arr);
+        for (var bb = 0; bb < rowLen; bb++) {
+            if (mx < arr[bb].summ)
+                mx = arr[bb].summ;
+            if (min > arr[bb].summ)
+                min = arr[bb].summ;
+        }
+        var hr = (mx - min) / (topShift / cellSize - 2);
+        var prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
+        var first = arr.map(function (x) { return x; });
+        first.sort(function (aa, bb) { return bb.summ - aa.summ; });
+        var begin = -1;
+        var end = -1;
+        for (var kk = 0; kk < first.length; kk++) {
+            if (ballExists(first[kk].ball, rows[rr]) && showFirstRow) {
+                lbl = lbl + ' ●' + first[kk].ball;
+                end = kk;
+                if (begin == -1) {
+                    begin = kk;
+                }
+            }
+            else {
+                lbl = lbl + ' ' + first[kk].ball;
+            }
+        }
+        lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+        if (rr == 0) {
+            //console.log(lbl);
+            dumpInfo2('statgrey', lbl);
+        }
+        var yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
+        var xxx = 2 * rowLen;
+        if (rr % 2)
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen, toY: yyy, color: '#00000011', manual: false });
+        markLines.push({ fromX: xxx, fromY: yyy + 0.5, toX: xxx + begin, toY: yyy + 0.5, color: '#333333ff', manual: false });
+        markLines.push({ fromX: xxx + end, fromY: yyy + 0.5, toX: xxx + rowLen - 1, toY: yyy + 0.5, color: '#333333ff', manual: false });
+        if (rr == 0) {
+            for (var bb = 0; bb < rowLen; bb++) {
+                var hh = (mx - min - (arr[bb].summ - min)) / hr;
+                var fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
+                var toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
+                markLines.push({
+                    fromX: bb + shiftX - 1,
+                    fromY: fromY //skipRowsCount + 0 + prehh
+                    ,
+                    toX: bb + shiftX,
+                    toY: toY //skipRowsCount + hh - 0
+                    ,
+                    color: color, manual: false
+                });
+                markLines.push({
+                    fromX: bb + shiftX - 1 + rowLen,
+                    fromY: fromY //skipRowsCount + 0 + prehh
+                    ,
+                    toX: bb + shiftX + rowLen,
+                    toY: toY //skipRowsCount + hh - 0
+                    ,
+                    color: color, manual: false
+                });
+                prehh = hh;
+            }
+            //console.log(arr);
         }
     }
-    lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
-    //console.log(lbl);
-    dumpInfo2('statgrey', lbl);
-    for (var bb = 0; bb < rowLen; bb++) {
-        var hh = (mx - min - (arr[bb].summ - min)) / hr;
-        var fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
-        var toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
-        markLines.push({
-            fromX: bb + shiftX - 1,
-            fromY: fromY //skipRowsCount + 0 + prehh
-            ,
-            toX: bb + shiftX,
-            toY: toY //skipRowsCount + hh - 0
-            ,
-            color: color, manual: false
-        });
-        markLines.push({
-            fromX: bb + shiftX - 1 + rowLen,
-            fromY: fromY //skipRowsCount + 0 + prehh
-            ,
-            toX: bb + shiftX + rowLen,
-            toY: toY //skipRowsCount + hh - 0
-            ,
-            color: color, manual: false
-        });
-        prehh = hh;
-    }
-    //console.log(arr);
 }
 function makeWader(ballFills) {
     if (wideRange) {
@@ -524,64 +528,76 @@ function makeWader(ballFills) {
 function dumpRowFillsColor(rows, color, shiftX) {
     var lbl = 'green';
     //console.log(lbl);
-    var precounts = calcRowPatterns(0 + 1, rows);
-    var ballFills = calculateBallTriadChain(0, rows, precounts);
-    makeWader(ballFills);
-    var mx = 0;
-    var min = 987654321;
-    for (var bb = 0; bb < rowLen; bb++) {
-        if (mx < ballFills[bb].summ) {
-            mx = ballFills[bb].summ;
-        }
-        if (min > ballFills[bb].summ) {
-            min = ballFills[bb].summ;
-        }
-    }
-    var hr = (mx - min) / (topShift / cellSize - 2);
-    var prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
-    //console.log(ballFills);
-    var first = ballFills.map(function (x) { return x; });
-    first.sort(function (aa, bb) { return bb.summ - aa.summ; });
-    var begin = -1;
-    var end = -1;
-    for (var kk = 0; kk < first.length; kk++) {
-        if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
-            lbl = lbl + ' ●' + first[kk].ball;
-            end = kk;
-            if (begin == -1) {
-                begin = kk;
+    for (var rr = 0; rr < rowsVisibleCount; rr++) {
+        var precounts = calcRowPatterns(rr + 1, rows);
+        var ballFills = calculateBallTriadChain(rr, rows, precounts);
+        makeWader(ballFills);
+        var mx = 0;
+        var min = 987654321;
+        for (var bb = 0; bb < rowLen; bb++) {
+            if (mx < ballFills[bb].summ) {
+                mx = ballFills[bb].summ;
+            }
+            if (min > ballFills[bb].summ) {
+                min = ballFills[bb].summ;
             }
         }
-        else {
-            lbl = lbl + ' ' + first[kk].ball;
+        var hr = (mx - min) / (topShift / cellSize - 2);
+        var prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
+        //console.log(ballFills);
+        var first = ballFills.map(function (x) { return x; });
+        first.sort(function (aa, bb) { return bb.summ - aa.summ; });
+        var begin = -1;
+        var end = -1;
+        for (var kk = 0; kk < first.length; kk++) {
+            if (ballExists(first[kk].ball, rows[rr]) && showFirstRow) {
+                lbl = lbl + ' ●' + first[kk].ball;
+                end = kk;
+                if (begin == -1) {
+                    begin = kk;
+                }
+            }
+            else {
+                lbl = lbl + ' ' + first[kk].ball;
+            }
         }
-    }
-    lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
-    //console.log(lbl);
-    dumpInfo2('statgreen', lbl);
-    for (var bb = 0; bb < rowLen; bb++) {
-        var hh = (mx - min - (ballFills[bb].summ - min)) / hr;
-        var fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
-        var toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
-        markLines.push({
-            fromX: bb + shiftX - 1,
-            fromY: fromY //skipRowsCount + 0 + prehh
-            ,
-            toX: bb + shiftX,
-            toY: toY //skipRowsCount + hh - 0
-            ,
-            color: color, manual: false
-        });
-        markLines.push({
-            fromX: bb + shiftX - 1 + rowLen,
-            fromY: fromY //skipRowsCount + 0 + prehh
-            ,
-            toX: bb + shiftX + rowLen,
-            toY: toY //skipRowsCount + hh - 0
-            ,
-            color: color, manual: false
-        });
-        prehh = hh;
+        lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+        //console.log(lbl);
+        if (rr == 0) {
+            dumpInfo2('statgreen', lbl);
+        }
+        var yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
+        var xxx = 1 * rowLen;
+        if (rr % 2)
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen, toY: yyy, color: '#00000011', manual: false });
+        markLines.push({ fromX: xxx, fromY: yyy + 0.5, toX: xxx + begin, toY: yyy + 0.5, color: '#009900ff', manual: false });
+        markLines.push({ fromX: xxx + end, fromY: yyy + 0.5, toX: xxx + rowLen - 1, toY: yyy + 0.5, color: '#009900ff', manual: false });
+        if (rr == 0) {
+            for (var bb = 0; bb < rowLen; bb++) {
+                var hh = (mx - min - (ballFills[bb].summ - min)) / hr;
+                var fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
+                var toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
+                markLines.push({
+                    fromX: bb + shiftX - 1,
+                    fromY: fromY //skipRowsCount + 0 + prehh
+                    ,
+                    toX: bb + shiftX,
+                    toY: toY //skipRowsCount + hh - 0
+                    ,
+                    color: color, manual: false
+                });
+                markLines.push({
+                    fromX: bb + shiftX - 1 + rowLen,
+                    fromY: fromY //skipRowsCount + 0 + prehh
+                    ,
+                    toX: bb + shiftX + rowLen,
+                    toY: toY //skipRowsCount + hh - 0
+                    ,
+                    color: color, manual: false
+                });
+                prehh = hh;
+            }
+        }
     }
 }
 function dumpTriads(svg, rows) {
@@ -632,9 +648,14 @@ function dumpTriads(svg, rows) {
             //console.log(lbl);
             dumpInfo2('statblue', lbl);
         }
-        var rowLab = '' + begin + ':' + end + '(' + (rowLen - end - 1) + ')';
+        var rowLab = '' + begin + ' -' + (rowLen - end - 1);
         addSmallText(svg, 2 * rowLen * cellSize + 2 + cellSize * 10, topShift + (1 + rr) * cellSize - 2, rowLab);
-        //console.log(rows[rr].key,(begin + ':' + end  +'('+(rowLen-end-1)+')'));
+        var yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
+        var xxx = 0 * rowLen;
+        if (rr % 2)
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen, toY: yyy, color: '#00000011', manual: false });
+        markLines.push({ fromX: xxx, fromY: yyy + 0.5, toX: xxx + begin, toY: yyy + 0.5, color: '#3333ffff', manual: false });
+        markLines.push({ fromX: xxx + end, fromY: yyy + 0.5, toX: xxx + rowLen - 1, toY: yyy + 0.5, color: '#3333ffff', manual: false });
         for (var ii = 0; ii < rowLen; ii++) {
             var idx = ratioPre * (calcs[ii].summ - minCnt) / df;
             var color = 'rgba(0,0,255,' + idx + ')';

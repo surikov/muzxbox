@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.88 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.89 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -469,75 +469,78 @@ function dumpRowFills(inrows: BallsRow[]) {
 
 function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 	let lbl = 'grey ';
-	//console.log(lbl);
-	let arr: { ball: number, summ: number }[] = [];
-	//var rowNum = 0;
-	//let diff=0;
-	for (let nn = 0; nn < rowLen; nn++) {
-		let one: { ball: number, summ: number } = { ball: nn + 1, summ: 0 };
-		arr.push(one);
-		/*for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
-			if (ballExists(nn + 1, rows[rr])) {
-				break;
+	for (let rr = 0; rr < rowsVisibleCount; rr++) {
+		let arr: { ball: number, summ: number }[] = [];
+		for (let nn = 0; nn < rowLen; nn++) {
+			let one: { ball: number, summ: number } = { ball: nn + 1, summ: 0 };
+			arr.push(one);
+			for (let shift = -diffWide; shift <= diffWide; shift++) {
+				one.summ = one.summ + calcEmptyLineDuration(shift, nn + 1, rr+1, rows);
 			}
-			one.summ++;
-		}*/
-		for (let shift = -diffWide; shift <= diffWide; shift++) {
-			one.summ = one.summ + calcEmptyLineDuration(shift, nn + 1, 1, rows);
+		}
+		makeWader(arr);
+		let mx = 0;
+		let min = 98765;
+		//console.log(rr,arr);
+		for (let bb = 0; bb < rowLen; bb++) {
+			if (mx < arr[bb].summ) mx = arr[bb].summ;
+			if (min > arr[bb].summ) min = arr[bb].summ;
+		}
+		let hr = (mx - min) / (topShift / cellSize - 2);
+		let prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
+
+
+		let first = arr.map((x) => x);
+		first.sort((aa, bb) => { return bb.summ - aa.summ; });
+		let begin = -1;
+		let end = -1;
+		for (let kk = 0; kk < first.length; kk++) {
+			if (ballExists(first[kk].ball, rows[rr]) && showFirstRow) {
+				lbl = lbl + ' ●' + first[kk].ball;
+				end = kk;
+				if (begin == -1) {
+					begin = kk;
+				}
+			} else {
+				lbl = lbl + ' ' + first[kk].ball;
+			}
+		}
+		lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+		if (rr == 0) {
+			
+			//console.log(lbl);
+			dumpInfo2('statgrey', lbl);
+		}
+		let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
+		let xxx = 2 * rowLen;
+		if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen, toY: yyy, color: '#00000011', manual: false });
+		markLines.push({ fromX: xxx, fromY: yyy + 0.5, toX: xxx + begin, toY: yyy + 0.5, color: '#333333ff', manual: false });
+		markLines.push({ fromX: xxx + end, fromY: yyy + 0.5, toX: xxx + rowLen - 1, toY: yyy + 0.5, color: '#333333ff', manual: false });
+
+		if (rr == 0) {
+			for (let bb = 0; bb < rowLen; bb++) {
+				let hh = (mx - min - (arr[bb].summ - min)) / hr;
+				let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
+				let toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
+				markLines.push({
+					fromX: bb + shiftX - 1
+					, fromY: fromY //skipRowsCount + 0 + prehh
+					, toX: bb + shiftX
+					, toY: toY //skipRowsCount + hh - 0
+					, color: color, manual: false
+				});
+				markLines.push({
+					fromX: bb + shiftX - 1 + rowLen
+					, fromY: fromY //skipRowsCount + 0 + prehh
+					, toX: bb + shiftX + rowLen
+					, toY: toY //skipRowsCount + hh - 0
+					, color: color, manual: false
+				});
+				prehh = hh;
+			}
+			//console.log(arr);
 		}
 	}
-	makeWader(arr);
-	let mx = 0;
-	let min = 98765;
-	for (let bb = 0; bb < rowLen; bb++) {
-		if (mx < arr[bb].summ) mx = arr[bb].summ;
-		if (min > arr[bb].summ) min = arr[bb].summ;
-	}
-	let hr = (mx - min) / (topShift / cellSize - 2);
-	let prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
-
-
-	let first = arr.map((x) => x);
-	first.sort((aa, bb) => { return bb.summ - aa.summ; });
-	let begin = -1;
-	let end = -1;
-	for (let kk = 0; kk < first.length; kk++) {
-		if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
-			lbl = lbl + ' ●' + first[kk].ball;
-			end = kk;
-			if (begin == -1) {
-				begin = kk;
-			}
-		} else {
-			lbl = lbl + ' ' + first[kk].ball;
-		}
-	}
-	lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
-	//console.log(lbl);
-	dumpInfo2('statgrey', lbl);
-
-
-	for (let bb = 0; bb < rowLen; bb++) {
-		let hh = (mx - min - (arr[bb].summ - min)) / hr;
-		let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
-		let toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
-		markLines.push({
-			fromX: bb + shiftX - 1
-			, fromY: fromY //skipRowsCount + 0 + prehh
-			, toX: bb + shiftX
-			, toY: toY //skipRowsCount + hh - 0
-			, color: color, manual: false
-		});
-		markLines.push({
-			fromX: bb + shiftX - 1 + rowLen
-			, fromY: fromY //skipRowsCount + 0 + prehh
-			, toX: bb + shiftX + rowLen
-			, toY: toY //skipRowsCount + hh - 0
-			, color: color, manual: false
-		});
-		prehh = hh;
-	}
-	//console.log(arr);
 }
 function makeWader(ballFills: { ball: number, summ: number }[]) {
 	if (wideRange) {
@@ -566,57 +569,71 @@ function makeWader(ballFills: { ball: number, summ: number }[]) {
 function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 	let lbl = 'green';
 	//console.log(lbl);
-	let precounts: number[] = calcRowPatterns(0 + 1, rows);
-	let ballFills: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = calculateBallTriadChain(0, rows, precounts);
-	makeWader(ballFills);
-	let mx = 0;
-	let min = 987654321;
-	for (let bb = 0; bb < rowLen; bb++) {
-		if (mx < ballFills[bb].summ) { mx = ballFills[bb].summ; }
-		if (min > ballFills[bb].summ) { min = ballFills[bb].summ; }
-	}
-	let hr = (mx - min) / (topShift / cellSize - 2);
-	let prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
-	//console.log(ballFills);
-
-	let first = ballFills.map((x) => x);
-	first.sort((aa, bb) => { return bb.summ - aa.summ; });
-	let begin = -1;
-	let end = -1;
-	for (let kk = 0; kk < first.length; kk++) {
-		if (ballExists(first[kk].ball, rows[0]) && showFirstRow) {
-			lbl = lbl + ' ●' + first[kk].ball;
-			end = kk;
-			if (begin == -1) {
-				begin = kk;
-			}
-		} else {
-			lbl = lbl + ' ' + first[kk].ball;
+	for (let rr = 0; rr < rowsVisibleCount; rr++) {
+		let precounts: number[] = calcRowPatterns(rr + 1, rows);
+		let ballFills: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = calculateBallTriadChain(rr, rows, precounts);
+		makeWader(ballFills);
+		let mx = 0;
+		let min = 987654321;
+		for (let bb = 0; bb < rowLen; bb++) {
+			if (mx < ballFills[bb].summ) { mx = ballFills[bb].summ; }
+			if (min > ballFills[bb].summ) { min = ballFills[bb].summ; }
 		}
-	}
-	lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
-	//console.log(lbl);
-	dumpInfo2('statgreen', lbl);
+		let hr = (mx - min) / (topShift / cellSize - 2);
+		let prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
+		//console.log(ballFills);
 
-	for (let bb = 0; bb < rowLen; bb++) {
-		let hh = (mx - min - (ballFills[bb].summ - min)) / hr;
-		let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
-		let toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
-		markLines.push({
-			fromX: bb + shiftX - 1
-			, fromY: fromY //skipRowsCount + 0 + prehh
-			, toX: bb + shiftX
-			, toY: toY //skipRowsCount + hh - 0
-			, color: color, manual: false
-		});
-		markLines.push({
-			fromX: bb + shiftX - 1 + rowLen
-			, fromY: fromY //skipRowsCount + 0 + prehh
-			, toX: bb + shiftX + rowLen
-			, toY: toY //skipRowsCount + hh - 0
-			, color: color, manual: false
-		});
-		prehh = hh;
+		let first = ballFills.map((x) => x);
+		first.sort((aa, bb) => { return bb.summ - aa.summ; });
+		let begin = -1;
+		let end = -1;
+		for (let kk = 0; kk < first.length; kk++) {
+			if (ballExists(first[kk].ball, rows[rr]) && showFirstRow) {
+				lbl = lbl + ' ●' + first[kk].ball;
+				end = kk;
+				if (begin == -1) {
+					begin = kk;
+				}
+			} else {
+				lbl = lbl + ' ' + first[kk].ball;
+			}
+		}
+
+		lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+		//console.log(lbl);
+		if (rr == 0) {
+			dumpInfo2('statgreen', lbl);
+		}
+		let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
+		let xxx = 1 * rowLen;
+		if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen, toY: yyy, color: '#00000011', manual: false });
+		markLines.push({ fromX: xxx, fromY: yyy + 0.5, toX: xxx + begin, toY: yyy + 0.5, color: '#009900ff', manual: false });
+		markLines.push({ fromX: xxx + end, fromY: yyy + 0.5, toX: xxx + rowLen - 1, toY: yyy + 0.5, color: '#009900ff', manual: false });
+
+		if (rr == 0) {
+
+			for (let bb = 0; bb < rowLen; bb++) {
+				let hh = (mx - min - (ballFills[bb].summ - min)) / hr;
+				let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
+				let toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
+				markLines.push({
+					fromX: bb + shiftX - 1
+					, fromY: fromY //skipRowsCount + 0 + prehh
+					, toX: bb + shiftX
+					, toY: toY //skipRowsCount + hh - 0
+					, color: color, manual: false
+				});
+				markLines.push({
+					fromX: bb + shiftX - 1 + rowLen
+					, fromY: fromY //skipRowsCount + 0 + prehh
+					, toX: bb + shiftX + rowLen
+					, toY: toY //skipRowsCount + hh - 0
+					, color: color, manual: false
+				});
+				prehh = hh;
+			}
+		}
+
 	}
 }
 function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
@@ -665,9 +682,15 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			dumpInfo2('statblue', lbl);
 
 		}
-		let rowLab = '' + begin + ':' + end + '(' + (rowLen - end - 1) + ')';
-		addSmallText(svg, 2 * rowLen * cellSize + 2 + cellSize * 10, topShift + (1 + rr) * cellSize - 2, rowLab);
-		//console.log(rows[rr].key,(begin + ':' + end  +'('+(rowLen-end-1)+')'));
+		let rowLab = '' + begin + ' -' + (rowLen - end - 1);
+		addSmallText(svg, 2 * rowLen * cellSize + 2 + cellSize * 10
+			, topShift + (1 + rr) * cellSize - 2
+			, rowLab);
+		let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
+		let xxx = 0 * rowLen;
+		if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen, toY: yyy, color: '#00000011', manual: false });
+		markLines.push({ fromX: xxx, fromY: yyy + 0.5, toX: xxx + begin, toY: yyy + 0.5, color: '#3333ffff', manual: false });
+		markLines.push({ fromX: xxx + end, fromY: yyy + 0.5, toX: xxx + rowLen - 1, toY: yyy + 0.5, color: '#3333ffff', manual: false });
 
 
 
