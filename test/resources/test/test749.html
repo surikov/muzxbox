@@ -62,13 +62,18 @@
         <br/>
 		<span id='statgrey'>grey</span>
 	</p>
-	<svg id='svgpane' width="1700" height="2000">
+	<svg id='svgpane' width="1700" height="1600">
 		<rect width="1300" height="5000" rx="20" ry="20" fill="#fff" />
 		<g id='levelA'></g>
 		<g id='linesLevel'></g>
 		<rect id="fogRect" x="0" y="0" width="1300" height="5000" onclick="clickFog(event);"/>
 		<rect id="lineMark" width="1" height="1" x="0" y="0" fill="#ff9900cc" />
 	</svg>
+	<p>
+		<button onclick='clickHop();'>hop</button>
+		<button onclick='clickGoSkip(-1);'>+1</button>
+		<button onclick='clickGoSkip(1);'>-1</button>
+	</p>
 	<script src="a749data.js"></script>
 	<!--<script src="d645data.js"></script>-->
 	<script>

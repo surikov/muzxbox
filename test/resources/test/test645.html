@@ -7,45 +7,48 @@
 			fill: #ff000001;
 
 		}
-		button{
-			width:1.5cm;
-			height:1cm;
+
+		button {
+			width: 1.5cm;
+			height: 1cm;
 		}
-		#statblue{
+
+		#statblue {
 			color: #0033cc;
 			font-size: small;
 		}
-		#statgreen{
+
+		#statgreen {
 			color: #339900;
 			font-size: small;
 		}
-		#statgrey{
+
+		#statgrey {
 			color: #666666;
 			font-size: small;
 		}
-
 	</style>
 </head>
 
 <body>
-<p>
-	<span id='msgp'>test</span>
-	
+	<p>
+		<span id='msgp'>test</span>
+
 		<button onclick='clickHop();'>hop</button>
 		<button onclick='toggleFirst();'>first</button>
 		<button onclick='toggleWide();'>wide</button>
 		<button onclick='clickClearLines();'>clear</button>
-		<br/>
+		<br />
 		<button onclick='clickGoSkip(-100);'>+100</button>
 		<button onclick='clickGoSkip(-5);'>+5</button>
 		<button onclick='clickGoSkip(-1);'>+1</button>
 		<button onclick='clickGoSkip(1);'>-1</button>
 		<button onclick='clickGoSkip(5);'>-5</button>
 		<button onclick='clickGoSkip(100);'>-100</button>
-		
+
 		<button onclick='toggleRatioPre();'>light</button>
 		<button onclick='addTails();'>tail</button>
-		<br/>
+		<br />
 		<button onclick='moreReduceRatio();'>+step</button>
 		<span id='stepsize'>+step</span>
 		<button onclick='lessReduceRatio();'>-step</button>
@@ -55,20 +58,25 @@
 		<button onclick='moreWide();'>+w</button>
 		<span id='calcWide'>wwww</span>
 		<button onclick='lessWide();'>-w</button>
-        <br/>
-        <span id='statblue'>blue</span>
-        <br/>
-        <span id='statgreen'>green</span>
-        <br/>
+		<br />
+		<span id='statblue'>blue</span>
+		<br />
+		<span id='statgreen'>green</span>
+		<br />
 		<span id='statgrey'>grey</span>
 	</p>
-	<svg id='svgpane' width="1700" height="2000">
+	<svg id='svgpane' width="1700" height="1600">
 		<rect width="1300" height="5000" rx="20" ry="20" fill="#ffe" />
 		<g id='levelA'></g>
 		<g id='linesLevel'></g>
-		<rect id="fogRect" x="0" y="0" width="1300" height="5000" onclick="clickFog(event);"/>
+		<rect id="fogRect" x="0" y="0" width="1300" height="5000" onclick="clickFog(event);" />
 		<rect id="lineMark" width="1" height="1" x="0" y="0" fill="#ff9900cc" />
 	</svg>
+	<p>
+		<button onclick='clickHop();'>hop</button>
+		<button onclick='clickGoSkip(-1);'>+1</button>
+		<button onclick='clickGoSkip(1);'>-1</button>
+	</p>
 	<!--<script src="a749data.js"></script>-->
 	<script src="d645data.js"></script>
 	<script>
