@@ -208,8 +208,6 @@ declare class LeftPanel {
     fillLeftPanel(): void;
 }
 declare class BarOctave {
-    barRightBorder: TileRectangle;
-    octaveBottomBorder: TileRectangle;
     constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project);
     addLines(barOctaveAnchor: TileAnchor, zoomLevel: number, left: number, top: number, width: number, height: number, data: MZXBX_Project, barIdx: number): void;
     addOctaveGridSteps(barIdx: number, data: MZXBX_Project, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
@@ -222,9 +220,6 @@ declare class OctaveContent {
 }
 declare class MixerBar {
     octaves: BarOctave[];
-    singleBarGridAnchor: TileAnchor;
-    singleBarTracksAnchor: TileAnchor;
-    singleBarFirstAnchor: TileAnchor;
     zoomLevel: number;
     constructor(barIdx: number, left: number, ww: number, zoomLevel: number, gridZoomBarAnchor: TileAnchor, tracksZoomBarAnchor: TileAnchor, firstZoomBarAnchor: TileAnchor, data: MZXBX_Project);
 }

@@ -142,3 +142,56 @@
     fill: var(--color-text);
 	fill-opacity: 40%;
 }
+
+
+.titleLabel025 {
+    fill: var(--color-lines);
+	fill-opacity: 90%;
+    font-size: calc(1*var(--tapSize));
+    text-anchor22: start;
+}
+.titleLabel05 {
+	fill: var(--color-lines);
+	fill-opacity: 90%;
+    font-size: calc(2*var(--tapSize));
+}
+.titleLabel1 {
+    fill: var(--color-lines);
+	fill-opacity: 90%;
+    font-size: calc(4*var(--tapSize));
+}
+.titleLabel2 {
+    fill: var(--color-lines);
+	fill-opacity: 90%;
+    font-size: calc(8*var(--tapSize));
+}
+.titleLabel4 {
+    fill: var(--color-lines);
+	fill-opacity: 90%;
+    font-size: calc(16*var(--tapSize));
+}
+.titleLabel8 {
+    fill: var(--color-lines);
+	fill-opacity: 90%;
+    font-size: calc(32*var(--tapSize));
+}
+.titleLabel16 {
+	fill: var(--color-lines);
+	fill-opacity: 90%;
+    font-size: calc(64*var(--tapSize));
+}
+.titleLabel32 {
+    fill: var(--color-lines);
+	fill-opacity: 90%;
+    font-size: calc(128*var(--tapSize));
+}
+.titleLabel64 {
+    fill: var(--color-lines);
+	fill-opacity: 90%;
+    font-size: calc(256*var(--tapSize));
+}
+.titleLabel128 {
+    fill: var(--color-lines);
+	fill-opacity: 90%;
+    font-size: calc(512*var(--tapSize));
+}

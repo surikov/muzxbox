@@ -10,4 +10,7 @@ class LeftPanel{
     fillLeftPanel(){
 
     }
+	reFillLeftPanel(data: MZXBX_Project){
+
+	}
 }

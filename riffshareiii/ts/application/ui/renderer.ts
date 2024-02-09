@@ -73,7 +73,7 @@ class UIRenderer {//} implements RenderedPart {
     debug: DebugLayerUI;
     warning: WarningUI;
     timeselectbar: TimeSelectBar;
-    //leftBar: LeftBar;
+    leftPanel: LeftPanel;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
     //commands: CommandDispatcher;
@@ -103,7 +103,7 @@ class UIRenderer {//} implements RenderedPart {
         this.warning.initDialogUI();
         this.toolbar = new UIToolbar();
         this.timeselectbar = new TimeSelectBar();
-        //this.leftBar = new LeftBar();
+        this.leftPanel = new LeftPanel();
         //this.toolbar.createToolbar(()=>{
         //	this.toolbar.reRenderToolbar(this.tiler);
         //});
@@ -125,7 +125,7 @@ class UIRenderer {//} implements RenderedPart {
             , this.mixer.createMixerLayers()
             , this.warning.allLayers()
             , this.timeselectbar.createTimeScale()
-            //, this.leftBar.createLeftPanel()
+            , this.leftPanel.createLeftPanel()
         );
 
         //this.mixer = new MixerUI();
@@ -163,6 +163,7 @@ class UIRenderer {//} implements RenderedPart {
         this.tiler.resetInnerSize(mixm.mixerWidth(), mixm.mixerHeight());
 
         this.mixer.reFillMixerUI(commandDispatcher.workData);
+		this.leftPanel.reFillLeftPanel(commandDispatcher.workData);
 
         this.debug.resetDebugView(commandDispatcher.workData);
 

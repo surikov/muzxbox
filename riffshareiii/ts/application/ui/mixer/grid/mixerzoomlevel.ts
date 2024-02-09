@@ -19,6 +19,8 @@ class MixerZoomLevel {
 		//console.log('resetBars', ww, hh);
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		this.zoomGridAnchor.content = [];//this.projectTitle,this.trackTitle];
+		this.zoomTracksAnchor.content = [];
+		this.zoomFirstAnchor.content = [];
 
 		//this.trackTitle.y = mixm.gridTop();
 		//this.trackTitle.text = data.tracks[0].title;
@@ -35,15 +37,18 @@ class MixerZoomLevel {
 			width = MZMM().set(timebar.metre).duration(timebar.tempo) * mixm.widthDurationRatio;
 
 			let barGridAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom, xx: left, yy: mixm.gridTop(), ww: width, hh: h12, content: []
+				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
+				, xx: left, yy: mixm.gridTop(), ww: width, hh: h12, content: [], id: 'barGrid' + (ii + Math.random())
 			};
 			this.zoomGridAnchor.content.push(barGridAnchor);
 			let barTracksAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom, xx: left, yy: mixm.gridTop(), ww: width, hh: h12, content: []
+				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
+				, xx: left, yy: mixm.gridTop(), ww: width, hh: h12, content: [], id: 'barTrack' + (ii + Math.random())
 			};
 			this.zoomTracksAnchor.content.push(barTracksAnchor);
 			let barFirstAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom, xx: left, yy: mixm.gridTop(), ww: width, hh: h12, content: []
+				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
+				, xx: left, yy: mixm.gridTop(), ww: width, hh: h12, content: [], id: 'barFirst' + (ii + Math.random())
 			};
 			this.zoomFirstAnchor.content.push(barFirstAnchor);
 
@@ -61,7 +66,7 @@ class MixerZoomLevel {
 			}*/
 			this.bars.push(mixBar);
 
-			let titleLabel: TileText = { x: 0, y: mixm.gridTop(), text: data.title, css: 'timeBarNum' +  zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix};
+			let titleLabel: TileText = { x: 0, y: mixm.gridTop(), text: data.title, css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix };
 			this.zoomGridAnchor.content.push(titleLabel);
 
 			left = left + width;

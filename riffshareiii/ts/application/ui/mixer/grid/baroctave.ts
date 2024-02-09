@@ -1,6 +1,6 @@
 class BarOctave {
-	barRightBorder: TileRectangle;
-	octaveBottomBorder: TileRectangle;
+	//barRightBorder: TileRectangle;
+	//octaveBottomBorder: TileRectangle;
 	constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number
 		, barOctaveGridAnchor: TileAnchor
 		, barOctaveTrackAnchor: TileAnchor
@@ -10,7 +10,12 @@ class BarOctave {
 	) {
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		//let oRectangle = { x: left, y: top, w: width, h: height, rx: 1, ry: 1, css: 'mixFieldBg' + prefix };
-
+		/*
+		console.log(zoomLevel, barIdx, octaveIdx
+			, barOctaveGridAnchor.content.length
+			, barOctaveTrackAnchor.content.length
+			, barOctaveFirstAnchor.content.length);
+			*/
 		if (zoomLevel < 8) {
 			//this.addNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel, data);
 			this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, data, zoomLevel);
@@ -27,16 +32,16 @@ class BarOctave {
 	) {
 		this.addOctaveGridSteps(barIdx, data, left, barOctaveAnchor, zoomLevel);
 		let mixm: MixerDataMath = new MixerDataMath(data);
-		this.barRightBorder = {
+		let barRightBorder: TileRectangle = {
 			x: left + width
 			, y: top
 			, w: zoomPrefixLevelsCSS[zoomLevel].minZoom * 0.25 //zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0
 			, h: height
 			, css: 'barRightBorder'
 		};
-		barOctaveAnchor.content.push(this.barRightBorder);
+		barOctaveAnchor.content.push(barRightBorder);
 		if (zoomLevel < 3) {
-			this.octaveBottomBorder = {
+			let octaveBottomBorder: TileRectangle = {
 				x: left
 				, y: top + height
 				, w: width
@@ -48,7 +53,7 @@ class BarOctave {
 			//anchor.content.push(oAnchor);
 			//console.log(left,top,prefix,minZoom,maxZoom);
 
-			barOctaveAnchor.content.push(this.octaveBottomBorder);
+			barOctaveAnchor.content.push(octaveBottomBorder);
 		}
 		if (zoomLevel < 3) {
 			for (let kk = 1; kk < 12; kk++) {
@@ -56,7 +61,7 @@ class BarOctave {
 					x: left
 					, y: top + height - kk * mixm.notePathHeight
 					, w: width
-					, h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 32.0
+					, h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 64.0
 					, css: 'octaveBottomBorder'
 				});
 			}
