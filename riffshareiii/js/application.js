@@ -372,10 +372,11 @@ class UIRenderer {
         this.warning.initDialogUI();
         this.toolbar = new UIToolbar();
         this.timeselectbar = new TimeSelectBar();
+        this.leftPanel = new LeftPanel();
         this.menu = new RightMenuPanel();
         this.mixer = new MixerUI();
         let me = this;
-        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.createMixerLayers(), this.warning.allLayers(), this.timeselectbar.createTimeScale());
+        layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.createMixerLayers(), this.warning.allLayers(), this.timeselectbar.createTimeScale(), this.leftPanel.createLeftPanel());
         this.tiler.initRun(this.tileLevelSVG, true, 1, 1, zoomPrefixLevelsCSS[0].minZoom, zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].minZoom, zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom - 1, layers);
         this.tiler.setAfterZoomCallback(() => {
             if (this.menu) {
@@ -392,6 +393,7 @@ class UIRenderer {
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.tiler.resetInnerSize(mixm.mixerWidth(), mixm.mixerHeight());
         this.mixer.reFillMixerUI(commandDispatcher.workData);
+        this.leftPanel.reFillLeftPanel(commandDispatcher.workData);
         this.debug.resetDebugView(commandDispatcher.workData);
         this.toolbar.resizeToolbar(vw, vh);
         this.menu.readCurrentSongData(commandDispatcher.workData);
@@ -512,7 +514,7 @@ class TimeSelectBar {
                 let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
                 let mark = {
                     x: xx, y: 0,
-                    w: line.ratio * zoomInfo.minZoom,
+                    w: line.ratio * 4 * zoomInfo.minZoom,
                     h: line.ratio * 4 * zoomInfo.minZoom,
                     css: 'timeMeasureMark'
                 };
@@ -581,7 +583,7 @@ class TimeSelectBar {
                 selectLevelAnchor.content.push(measureAnchor);
                 this.addGridMarks(data, kk, barLeft, curBar, measureAnchor, zz);
                 if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
-                    this.createBarMark(barLeft, zoomPrefixLevelsCSS[zz].minZoom * 0.5, zoomPrefixLevelsCSS[zz].minZoom * 3, measureAnchor);
+                    this.createBarMark(barLeft, zoomPrefixLevelsCSS[zz].minZoom * 3, zoomPrefixLevelsCSS[zz].minZoom * 3, measureAnchor);
                     this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor);
                 }
                 barLeft = barLeft + barWidth;
@@ -1140,6 +1142,8 @@ class LeftPanel {
     }
     fillLeftPanel() {
     }
+    reFillLeftPanel(data) {
+    }
 }
 class BarOctave {
     constructor(barIdx, octaveIdx, left, top, width, height, barOctaveGridAnchor, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel, data) {
@@ -1148,13 +1152,13 @@ class BarOctave {
             if (zoomLevel < 7) {
                 this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, data);
                 if (zoomLevel < 6) {
-                    this.addLines(barOctaveGridAnchor, zoomLevel, left, top, width, height, data, barIdx);
+                    this.addLines(barOctaveGridAnchor, zoomLevel, left, top, width, height, data, barIdx, octaveIdx);
                 }
             }
         }
     }
-    addLines(barOctaveAnchor, zoomLevel, left, top, width, height, data, barIdx) {
-        this.addOctaveGridSteps(barIdx, data, left, barOctaveAnchor, zoomLevel);
+    addLines(barOctaveAnchor, zoomLevel, left, top, width, height, data, barIdx, octaveIdx) {
+        this.addOctaveGridSteps(barIdx, data, left, top, height, barOctaveAnchor, zoomLevel);
         let mixm = new MixerDataMath(data);
         let barRightBorder = {
             x: left + width,
@@ -1165,14 +1169,16 @@ class BarOctave {
         };
         barOctaveAnchor.content.push(barRightBorder);
         if (zoomLevel < 3) {
-            let octaveBottomBorder = {
-                x: left,
-                y: top + height,
-                w: width,
-                h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 16.0,
-                css: 'octaveBottomBorder'
-            };
-            barOctaveAnchor.content.push(octaveBottomBorder);
+            if (octaveIdx > 0) {
+                let octaveBottomBorder = {
+                    x: left,
+                    y: top + height,
+                    w: width,
+                    h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0,
+                    css: 'octaveBottomBorder'
+                };
+                barOctaveAnchor.content.push(octaveBottomBorder);
+            }
         }
         if (zoomLevel < 3) {
             for (let kk = 1; kk < 12; kk++) {
@@ -1180,13 +1186,13 @@ class BarOctave {
                     x: left,
                     y: top + height - kk * mixm.notePathHeight,
                     w: width,
-                    h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 64.0,
+                    h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 32.0,
                     css: 'octaveBottomBorder'
                 });
             }
         }
     }
-    addOctaveGridSteps(barIdx, data, barLeft, barOctaveAnchor, zIndex) {
+    addOctaveGridSteps(barIdx, data, barLeft, top, height, barOctaveAnchor, zIndex) {
         let zoomInfo = zoomPrefixLevelsCSS[zIndex];
         if (zoomInfo.gridLines.length > 0) {
             let curBar = data.timeline[barIdx];
@@ -1202,9 +1208,9 @@ class BarOctave {
                 let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
                 let mark = {
                     x: xx,
-                    y: mixm.gridTop(),
-                    w: line.ratio * zoomInfo.minZoom / 8,
-                    h: mixm.gridHeight(),
+                    y: top,
+                    w: line.ratio * zoomInfo.minZoom / 2,
+                    h: height,
                     css: 'timeMeasureMark'
                 };
                 barOctaveAnchor.content.push(mark);

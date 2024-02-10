@@ -66,6 +66,7 @@ declare class UIRenderer {
     debug: DebugLayerUI;
     warning: WarningUI;
     timeselectbar: TimeSelectBar;
+    leftPanel: LeftPanel;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
     lastUsedData: MZXBX_Project;
@@ -206,11 +207,12 @@ declare class LeftPanel {
     constructor();
     createLeftPanel(): TileLayerDefinition[];
     fillLeftPanel(): void;
+    reFillLeftPanel(data: MZXBX_Project): void;
 }
 declare class BarOctave {
     constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project);
-    addLines(barOctaveAnchor: TileAnchor, zoomLevel: number, left: number, top: number, width: number, height: number, data: MZXBX_Project, barIdx: number): void;
-    addOctaveGridSteps(barIdx: number, data: MZXBX_Project, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
+    addLines(barOctaveAnchor: TileAnchor, zoomLevel: number, left: number, top: number, width: number, height: number, data: MZXBX_Project, barIdx: number, octaveIdx: number): void;
+    addOctaveGridSteps(barIdx: number, data: MZXBX_Project, barLeft: number, top: number, height: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
     addUpperNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project, zoomLevel: number): void;
     addOtherNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project): void;
     addTrackNotes(track: MZXBX_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project, css: string, addMoreInfo: boolean): void;

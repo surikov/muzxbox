@@ -44,7 +44,7 @@ class TimeSelectBar {
                 let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
                 let mark: TileRectangle = {
                     x: xx, y: 0
-                    , w: line.ratio * zoomInfo.minZoom
+                    , w: line.ratio * 4*zoomInfo.minZoom
                     , h: line.ratio * 4 * zoomInfo.minZoom
                     , css: 'timeMeasureMark'
                 };
@@ -130,7 +130,7 @@ class TimeSelectBar {
                 this.addGridMarks(data, kk, barLeft, curBar, measureAnchor, zz);
                 if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
                     this.createBarMark(barLeft
-                        , zoomPrefixLevelsCSS[zz].minZoom * 0.5
+                        , zoomPrefixLevelsCSS[zz].minZoom * 3
                         , zoomPrefixLevelsCSS[zz].minZoom * 3
                         , measureAnchor);
                     this.createBarNumber(barLeft
