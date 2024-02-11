@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.90 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.91 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -174,8 +174,31 @@ function init() {
     dataBalls = window[dataName];
     console.log(dataBalls);
     datarows = readParseStat(dataBalls);
-    console.log('datarows', datarows);
+    dumpStatLeft(datarows);
 }
+function dumpStatLeft(datarows: BallsRow[]) {
+    console.log('datarows', datarows);
+    let counts: number[] = [];
+    for (let rr = 0; rr <= rowLen; rr++) {
+        counts[rr] = 0;
+    }
+
+    for (let rr = 0; rr < datarows.length; rr++) {
+        let min = 9999;
+        for (let bb = 0; bb < datarows[rr].balls.length; bb++) {
+            if (min > datarows[rr].balls[bb]) {
+                min = datarows[rr].balls[bb];
+            }
+        }
+        counts[min]++;
+    }
+    let sm=0;
+    for (let rr = 0; rr <= rowLen; rr++) {
+        sm=sm+counts[rr];
+    }
+    console.log('mins',sm,counts);
+}
+
 function randomizedatarows() {
     for (var ii = 0; ii < datarows.length; ii++) {
         var row = datarows[ii];
@@ -495,11 +518,15 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
         let begin = -1;
         let end = -1;
         for (let kk = 0; kk < first.length; kk++) {
-            if (ballExists(first[kk].ball, rows[rr]) && showFirstRow) {
-                lbl = lbl + ' ●' + first[kk].ball;
-                end = kk;
-                if (begin == -1) {
-                    begin = kk;
+            if (ballExists(first[kk].ball, rows[rr])) {
+                if (showFirstRow || rr > 0) {
+                    lbl = lbl + ' ●' + first[kk].ball;
+                    end = kk;
+                    if (begin == -1) {
+                        begin = kk;
+                    }
+                } else {
+                    lbl = lbl + ' ' + first[kk].ball;
                 }
             } else {
                 lbl = lbl + ' ' + first[kk].ball;
@@ -515,9 +542,10 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
         let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
         let xxx = 2 * rowLen / 2;
         if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
-        markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: '#333333ff', manual: false });
-        markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: '#333333ff', manual: false });
-
+        if (showFirstRow || rr > 0) {
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: '#333333ff', manual: false });
+            markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: '#333333ff', manual: false });
+        }
 
         if (rr == 0) {
             for (let bb = 0; bb < rowLen; bb++) {
@@ -590,11 +618,15 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
         let begin = -1;
         let end = -1;
         for (let kk = 0; kk < first.length; kk++) {
-            if (ballExists(first[kk].ball, rows[rr]) && showFirstRow) {
-                lbl = lbl + ' ●' + first[kk].ball;
-                end = kk;
-                if (begin == -1) {
-                    begin = kk;
+            if (ballExists(first[kk].ball, rows[rr])) {
+                if (showFirstRow || rr > 0) {
+                    lbl = lbl + ' ●' + first[kk].ball;
+                    end = kk;
+                    if (begin == -1) {
+                        begin = kk;
+                    }
+                } else {
+                    lbl = lbl + ' ' + first[kk].ball;
                 }
             } else {
                 lbl = lbl + ' ' + first[kk].ball;
@@ -611,9 +643,10 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
         let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
         let xxx = 1 * rowLen / 2;
         if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
-        markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: '#009900ff', manual: false });
-        markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: '#009900ff', manual: false });
-
+        if (showFirstRow || rr > 0) {
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: '#009900ff', manual: false });
+            markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: '#009900ff', manual: false });
+        }
 
 
         if (rr == 0) {
@@ -672,11 +705,15 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
         let begin = -1;
         let end = -1;
         for (let kk = 0; kk < first.length; kk++) {
-            if (ballExists(first[kk].ball, rows[rr]) && showFirstRow) {
-                lbl = lbl + ' ●' + first[kk].ball;
-                end = kk;
-                if (begin == -1) {
-                    begin = kk;
+            if (ballExists(first[kk].ball, rows[rr])) {
+                if (showFirstRow || rr > 0) {
+                    lbl = lbl + ' ●' + first[kk].ball;
+                    end = kk;
+                    if (begin == -1) {
+                        begin = kk;
+                    }
+                } else {
+                    lbl = lbl + ' ' + first[kk].ball;
                 }
             } else {
                 lbl = lbl + ' ' + first[kk].ball;
@@ -695,23 +732,26 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
         let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
         let xxx = 0 * rowLen / 2;
         if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
-        markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: '#3333ffff', manual: false });
-        markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: '#3333ffff', manual: false });
-
-        begin = rowLen+1;
-        end = 0;
-        for (let kk = 0; kk < rows[rr].balls.length; kk++) {
-            if (rows[rr].balls[kk] < begin) begin = rows[rr].balls[kk];
-            if (rows[rr].balls[kk] >end) end = rows[rr].balls[kk];
+        if (showFirstRow || rr > 0) {
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: '#3333ffff', manual: false });
+            markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: '#3333ffff', manual: false });
         }
-        begin--;
-        end--;
-        yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
-        xxx = 3 * rowLen / 2;
-        if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
-        markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: '#ff3333ff', manual: false });
-        markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: '#ff3333ff', manual: false });
-
+        if (showFirstRow || rr > 0) {
+            begin = rowLen + 1;
+            end = 0;
+            for (let kk = 0; kk < rows[rr].balls.length; kk++) {
+                if (rows[rr].balls[kk] < begin) begin = rows[rr].balls[kk];
+                if (rows[rr].balls[kk] > end) end = rows[rr].balls[kk];
+            }
+            begin--;
+            end--;
+            yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
+            xxx = 3 * rowLen / 2;
+            let red = '#ff3333ff';
+            if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: red, manual: false });
+            markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red, manual: false });
+        }
 
 
 
