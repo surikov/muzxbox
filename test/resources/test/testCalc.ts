@@ -192,11 +192,12 @@ function dumpStatLeft(datarows: BallsRow[]) {
         }
         counts[min]++;
     }
-    let sm=0;
+    //let sm=0;
     for (let rr = 0; rr <= rowLen; rr++) {
-        sm=sm+counts[rr];
+        //sm=sm+counts[rr];
+        console.log(rr,counts[rr],(''+(100*counts[rr]/datarows.length)+'%'));
     }
-    console.log('mins',sm,counts);
+    //console.log('mins',sm,counts);
 }
 
 function randomizedatarows() {

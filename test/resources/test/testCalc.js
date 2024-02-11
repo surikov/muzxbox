@@ -178,11 +178,12 @@ function dumpStatLeft(datarows) {
         }
         counts[min]++;
     }
-    var sm = 0;
+    //let sm=0;
     for (var rr = 0; rr <= rowLen; rr++) {
-        sm = sm + counts[rr];
+        //sm=sm+counts[rr];
+        console.log(rr, counts[rr], ('' + (100 * counts[rr] / datarows.length) + '%'));
     }
-    console.log('mins', sm, counts);
+    //console.log('mins',sm,counts);
 }
 function randomizedatarows() {
     for (var ii = 0; ii < datarows.length; ii++) {
