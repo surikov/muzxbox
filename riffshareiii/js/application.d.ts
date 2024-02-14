@@ -299,7 +299,7 @@ declare class WarningUI {
     cancel: () => void;
     initDialogUI(): void;
     resetDialogView(data: MZXBX_Project): void;
-    resizeDialog(ww: number, hh: number): void;
+    resizeDialog(ww: number, hh: number, resetWarningAnchor: () => void): void;
     allLayers(): TileLayerDefinition[];
     showWarning(): void;
     hideWarning(): void;

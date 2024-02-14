@@ -175,7 +175,9 @@ class UIRenderer {//} implements RenderedPart {
         this.menu.resizeMenu(vw, vh);
         //this.menu.rerenderContent();
         //this.warning.resetDialogView(data);
-        this.warning.resizeDialog(vw, vh);
+        this.warning.resizeDialog(vw, vh,()=>{
+			this.tiler.resetAnchor(this.warning.warningGroup,this.warning.warningAnchor , LevelModes.overlay);
+		});
 
 
         this.timeselectbar.fillTimeBar(commandDispatcher.workData);
@@ -202,7 +204,9 @@ class UIRenderer {//} implements RenderedPart {
         this.tiler.resetAnchor(this.toolbar.toolBarGroup, this.toolbar.toolBarAnchor, LevelModes.overlay);
         this.menu.resizeMenu(vw, vh);
         this.menu.resetAllAnchors();
-        this.warning.resizeDialog(vw, vh);
+        this.warning.resizeDialog(vw, vh,()=>{
+			this.tiler.resetAnchor(this.warning.warningGroup,this.warning.warningAnchor , LevelModes.overlay);
+		});
         //this.leftBar.resizeHeaders(mixH, vw, vh, this.tiler.getCurrentPointPosition().z);
     }
     deleteUI() {

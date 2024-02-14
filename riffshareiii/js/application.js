@@ -398,7 +398,9 @@ class UIRenderer {
         this.toolbar.resizeToolbar(vw, vh);
         this.menu.readCurrentSongData(commandDispatcher.workData);
         this.menu.resizeMenu(vw, vh);
-        this.warning.resizeDialog(vw, vh);
+        this.warning.resizeDialog(vw, vh, () => {
+            this.tiler.resetAnchor(this.warning.warningGroup, this.warning.warningAnchor, LevelModes.overlay);
+        });
         this.timeselectbar.fillTimeBar(commandDispatcher.workData);
         this.timeselectbar.resizeTimeScale(vw, vh);
         this.tiler.resetModel();
@@ -415,7 +417,9 @@ class UIRenderer {
         this.tiler.resetAnchor(this.toolbar.toolBarGroup, this.toolbar.toolBarAnchor, LevelModes.overlay);
         this.menu.resizeMenu(vw, vh);
         this.menu.resetAllAnchors();
-        this.warning.resizeDialog(vw, vh);
+        this.warning.resizeDialog(vw, vh, () => {
+            this.tiler.resetAnchor(this.warning.warningGroup, this.warning.warningAnchor, LevelModes.overlay);
+        });
     }
     deleteUI() {
     }
@@ -1589,7 +1593,7 @@ class WarningUI {
     }
     resetDialogView(data) {
     }
-    resizeDialog(ww, hh) {
+    resizeDialog(ww, hh, resetWarningAnchor) {
         this.warningRectangle.w = ww;
         this.warningRectangle.h = hh;
         this.warningAnchor.ww = ww;
@@ -1600,6 +1604,7 @@ class WarningUI {
         this.warningTitle.y = hh / 3 + 1.5;
         this.warningDescription.x = ww / 2;
         this.warningDescription.y = hh / 3 + 2;
+        resetWarningAnchor();
     }
     allLayers() {
         return [this.warningLayer];

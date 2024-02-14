@@ -27,8 +27,8 @@ class WarningUI {
 		//console.log('resetDialogView');
 		//this.resizeDialog();
 	}
-	resizeDialog(ww: number, hh: number) {
-		//console.log('resizeDialog');
+	resizeDialog(ww: number, hh: number,resetWarningAnchor:()=>void) {
+		//console.log('resizeDialog',ww,hh);
 		this.warningRectangle.w = ww;
 		this.warningRectangle.h = hh;
 		this.warningAnchor.ww = ww;
@@ -40,6 +40,7 @@ class WarningUI {
 		this.warningDescription.x = ww / 2;
 		this.warningDescription.y = hh / 3 + 2;
 		//console.log('debugLayer',this.debugLayer);
+		resetWarningAnchor();
 	}
 	allLayers(): TileLayerDefinition[] {
 		return [this.warningLayer];
