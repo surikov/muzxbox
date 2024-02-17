@@ -99,12 +99,14 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     background-position:center;
+    display: flex;
+    flex-direction: column;
 }
 
 #tileLevelSVG {
     width: 100%;
-    height: 100%;
-    min-height: 100%;
+    height555: 100%;
+    min-height777: 100%;
     background-color: var(--color-background);
     user-select: none;
     touch-action: manipulation;
@@ -113,15 +115,13 @@ body {
     margin: 0px;
     padding: 0px;
     background-color2: #00ffff;
-    background2: color-mix(in lab, transparent 10%, var(--color-background))
+    background2: color-mix(in lab, transparent 10%, var(--color-background));
+    flex-basis: 0;
+    flex-shrink: 1;
+    flex-grow: 1;
 }
 
-html,
-body,
-#pagediv,
-#tileLevelSVG {
-    height: 100%;
-}
+
 
 .debug {
     fill: var(--color-debug);
