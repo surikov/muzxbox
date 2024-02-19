@@ -34,7 +34,7 @@
         ,"ui/rightmenu/menuitem.ts"
         ,"ui/rightmenu/menudata.ts"
         ,"ui/leftside/leftpanel.ts"
-		
+		,"ui/mixer/uisampler/samplerrows.ts"
         ,"ui/mixer/grid/baroctave.ts"
 		,"ui/mixer/grid/octavecontent.ts"
 		,"ui/mixer/grid/mixerbar.ts"

@@ -204,10 +204,13 @@ declare let menuPointTracks: MenuInfo;
 declare let menuPointPercussion: MenuInfo;
 declare function composeBaseMenu(): MenuInfo[];
 declare class LeftPanel {
+    leftLayer: TileLayerDefinition;
+    leftZoomAnchors: TileAnchor[];
     constructor();
     createLeftPanel(): TileLayerDefinition[];
-    fillLeftPanel(): void;
     reFillLeftPanel(data: MZXBX_Project): void;
+}
+declare class SamplerRows {
 }
 declare class BarOctave {
     constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project);
@@ -231,6 +234,7 @@ declare class MixerUI {
     firstLayers: TileLayerDefinition;
     levels: MixerZoomLevel[];
     fillerAnchor: TileAnchor;
+    samplerUI: SamplerRows;
     reFillMixerUI(data: MZXBX_Project): void;
     createMixerLayers(): TileLayerDefinition[];
     reFillTracksRatio(data: MZXBX_Project): void;

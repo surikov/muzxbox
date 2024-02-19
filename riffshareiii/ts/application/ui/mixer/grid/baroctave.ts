@@ -40,7 +40,7 @@ class BarOctave {
             , css: 'barRightBorder'
         };
         barOctaveAnchor.content.push(barRightBorder);
-        if (zoomLevel < 3) {
+        if (zoomLevel < 4) {
             if (octaveIdx > 0) {
                 let octaveBottomBorder: TileRectangle = {
                     x: left

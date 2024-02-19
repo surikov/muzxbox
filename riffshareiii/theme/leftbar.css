@@ -4,3 +4,61 @@
 .leftKeyWhite{
 	fill: var(--color-focus);
 }
+
+
+.octaveLabel025 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(2*0.25*var(--tapSize));
+    text-anchor22: start;
+}
+.octaveLabel05 {
+	fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(2*0.5*var(--tapSize));
+}
+.octaveLabel1 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(2*var(--tapSize));
+}
+.octaveLabel2 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(2*2*var(--tapSize));
+}
+.octaveLabel4 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(2*4*var(--tapSize));
+}
+.octaveLabel8 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(2*8*var(--tapSize));
+}
+.octaveLabel16 {
+	fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(2*16*var(--tapSize));
+}
+.octaveLabel32 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(2*32*var(--tapSize));
+}
+.octaveLabel64 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(2*64*var(--tapSize));
+}
+.octaveLabel128 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(2*128*var(--tapSize));
+}
+
+.octaveMark{
+    fill: var(--color-lines);
+	fill-opacity: 25%;
+}

@@ -28,6 +28,6 @@ class MixerDataMath {
     }
 
     gridHeight(): number {
-        return this.notePathHeight * 10 * 12;
+        return this.notePathHeight * this.octaveCount * 12;
     }
 }
