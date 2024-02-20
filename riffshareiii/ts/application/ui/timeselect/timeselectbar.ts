@@ -41,7 +41,9 @@ class TimeSelectBar {
                 if (!skip.less(curBar.metre)) {
                     break;
                 }
-                let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
+                
+                if (line.label) {
+					let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
                 let mark: TileRectangle = {
                     x: xx, y: 0
                     , w: line.ratio * 4*zoomInfo.minZoom
@@ -49,7 +51,6 @@ class TimeSelectBar {
                     , css: 'timeMeasureMark'
                 };
                 measureAnchor.content.push(mark);
-                if (line.label) {
                     let mtr: TileText = {
                         x: xx
                         , y: 1 * zoomInfo.minZoom
@@ -78,7 +79,7 @@ class TimeSelectBar {
         let nm: TileText = {
             x: barLeft
             , y: zoomPrefixLevelsCSS[zz].minZoom * 2
-            , text: '' + (1 + barnum)+':' + curBar.metre.count + '/' + curBar.metre.part
+            , text: '' + (1 + barnum)+': ' + curBar.metre.count + '/' + curBar.metre.part
             , css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(nm);

@@ -515,15 +515,15 @@ class TimeSelectBar {
                 if (!skip.less(curBar.metre)) {
                     break;
                 }
-                let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
-                let mark = {
-                    x: xx, y: 0,
-                    w: line.ratio * 4 * zoomInfo.minZoom,
-                    h: line.ratio * 4 * zoomInfo.minZoom,
-                    css: 'timeMeasureMark'
-                };
-                measureAnchor.content.push(mark);
                 if (line.label) {
+                    let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
+                    let mark = {
+                        x: xx, y: 0,
+                        w: line.ratio * 4 * zoomInfo.minZoom,
+                        h: line.ratio * 4 * zoomInfo.minZoom,
+                        css: 'timeMeasureMark'
+                    };
+                    measureAnchor.content.push(mark);
                     let mtr = {
                         x: xx,
                         y: 1 * zoomInfo.minZoom,
@@ -547,7 +547,7 @@ class TimeSelectBar {
         let nm = {
             x: barLeft,
             y: zoomPrefixLevelsCSS[zz].minZoom * 2,
-            text: '' + (1 + barnum) + ':' + curBar.metre.count + '/' + curBar.metre.part,
+            text: '' + (1 + barnum) + ': ' + curBar.metre.count + '/' + curBar.metre.part,
             css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(nm);
@@ -1158,8 +1158,7 @@ class LeftPanel {
         console.log('reFillLeftPanel');
         let mixm = new MixerDataMath(data);
         for (let zz = 0; zz < this.leftZoomAnchors.length; zz++) {
-            this.leftZoomAnchors[zz].yy = mixm.gridTop();
-            this.leftZoomAnchors[zz].hh = mixm.gridHeight();
+            this.leftZoomAnchors[zz].hh = mixm.mixerHeight();
             this.leftZoomAnchors[zz].content = [];
             for (let oo = 1; oo < mixm.octaveCount; oo++) {
                 if (zz < 4) {
@@ -1181,28 +1180,45 @@ class LeftPanel {
                     if (zz < 2) {
                         let nm = {
                             x: 0,
-                            y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 2 * zoomPrefixLevelsCSS[zz].minZoom + 6 * mixm.notePathHeight,
+                            y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 6 * mixm.notePathHeight,
                             text: '' + (mixm.octaveCount - oo + 0),
-                            css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
+                            css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
                         };
                         this.leftZoomAnchors[zz].content.push(nm);
                         if (zz < 1) {
                             let nm = {
                                 x: 0,
-                                y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 2 * zoomPrefixLevelsCSS[zz].minZoom + 3 * mixm.notePathHeight,
+                                y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 3 * mixm.notePathHeight,
                                 text: '' + (mixm.octaveCount - oo + 0),
-                                css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
+                                css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
                             };
                             this.leftZoomAnchors[zz].content.push(nm);
                             nm = {
                                 x: 0,
-                                y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 2 * zoomPrefixLevelsCSS[zz].minZoom + 9 * mixm.notePathHeight,
+                                y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 9 * mixm.notePathHeight,
                                 text: '' + (mixm.octaveCount - oo + 0),
-                                css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
+                                css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
                             };
                             this.leftZoomAnchors[zz].content.push(nm);
                         }
                     }
+                }
+            }
+            if (data.tracks.length > 0) {
+                let trackLabel = {
+                    text: '' + data.tracks[0].title, x: 0, y: mixm.gridTop(), css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
+                };
+                this.leftZoomAnchors[zz].content.push(trackLabel);
+            }
+            if (zz < 4) {
+                for (let ss = 0; ss < data.percussions.length; ss++) {
+                    let samplerLabel = {
+                        text: '' + data.percussions[ss].title,
+                        x: 0,
+                        y: mixm.titleHeight + mixm.gridHeight() + mixm.sequencerBottomPad + mixm.notePathHeight * ss + mixm.notePathHeight,
+                        css: 'samplerRowLabel' + zoomPrefixLevelsCSS[zz].prefix
+                    };
+                    this.leftZoomAnchors[zz].content.push(samplerLabel);
                 }
             }
         }
@@ -1537,10 +1553,10 @@ class MixerZoomLevel {
             this.zoomFirstAnchor.content.push(barFirstAnchor);
             let mixBar = new MixerBar(ii, left, width, this.zoomLevelIndex, barGridAnchor, barTracksAnchor, barFirstAnchor, data);
             this.bars.push(mixBar);
-            let titleLabel = { x: 0, y: mixm.gridTop(), text: data.title, css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix };
-            this.zoomGridAnchor.content.push(titleLabel);
             left = left + width;
         }
+        let titleLabel = { x: 0, y: mixm.gridTop() - zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom * 2, text: data.title, css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix };
+        this.zoomGridAnchor.content.push(titleLabel);
     }
 }
 class IconLabelButton {
@@ -1810,10 +1826,11 @@ class MixerDataMath {
         this.titleHeight = 33;
         this.LeftPad = 3;
         this.rightPad = 10;
-        this.bottomPad = 11;
+        this.bottomMixerPad = 11;
         this.notePathHeight = 1;
         this.widthDurationRatio = 27;
         this.octaveCount = 10;
+        this.sequencerBottomPad = 2;
         this.data = data;
     }
     mixerWidth() {
@@ -1825,7 +1842,11 @@ class MixerDataMath {
         return this.LeftPad + ww + this.rightPad;
     }
     mixerHeight() {
-        return this.titleHeight + this.gridHeight() + this.bottomPad;
+        return this.titleHeight
+            + this.gridHeight()
+            + this.sequencerBottomPad
+            + this.data.percussions.length * this.notePathHeight
+            + this.bottomMixerPad;
     }
     gridTop() {
         return this.titleHeight;

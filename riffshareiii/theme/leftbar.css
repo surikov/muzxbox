@@ -58,6 +58,86 @@
     font-size: calc(2*128*var(--tapSize));
 }
 
+
+.octaveSubLabel025 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(1*0.25*var(--tapSize));
+    text-anchor22: start;
+}
+.octaveSubLabel05 {
+	fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(1*0.5*var(--tapSize));
+}
+.octaveSubLabel1 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(1*var(--tapSize));
+}
+.octaveSubLabel2 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(1*2*var(--tapSize));
+}
+.octaveSubLabel4 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(1*4*var(--tapSize));
+}
+.octaveSubLabel8 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(1*8*var(--tapSize));
+}
+.octaveSubLabel16 {
+	fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(1*16*var(--tapSize));
+}
+.octaveSubLabel32 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(1*32*var(--tapSize));
+}
+.octaveSubLabel64 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(1*64*var(--tapSize));
+}
+.octaveSubLabel128 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(1*128*var(--tapSize));
+}
+
+
+
+
+.samplerRowLabel025 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(1*0.125*var(--tapSize));
+}
+.samplerRowLabel05 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(2*0.125*var(--tapSize));
+}
+.samplerRowLabel1 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(3*0.125*var(--tapSize));
+}
+.samplerRowLabel2 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(4*0.125*var(--tapSize));
+}
+
+
+
+
 .octaveMark{
     fill: var(--color-lines);
 	fill-opacity: 25%;

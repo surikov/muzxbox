@@ -344,10 +344,11 @@ declare class MixerDataMath {
     titleHeight: number;
     LeftPad: number;
     rightPad: number;
-    bottomPad: number;
+    bottomMixerPad: number;
     notePathHeight: number;
     widthDurationRatio: number;
     octaveCount: number;
+    sequencerBottomPad: number;
     constructor(data: MZXBX_Project);
     mixerWidth(): number;
     mixerHeight(): number;

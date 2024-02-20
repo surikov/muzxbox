@@ -66,12 +66,12 @@ class MixerZoomLevel {
 			}*/
 			this.bars.push(mixBar);
 
-			let titleLabel: TileText = { x: 0, y: mixm.gridTop(), text: data.title, css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix };
-			this.zoomGridAnchor.content.push(titleLabel);
+			
 
 			left = left + width;
 		}
-
+		let titleLabel: TileText = { x: 0, y: mixm.gridTop()-zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom*2, text: data.title, css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix };
+		this.zoomGridAnchor.content.push(titleLabel);
 	}
 
 }

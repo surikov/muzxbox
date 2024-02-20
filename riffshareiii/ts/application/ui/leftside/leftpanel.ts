@@ -2,6 +2,7 @@ class LeftPanel {
 	leftLayer: TileLayerDefinition;
 	//leftPanelAnchor: TileAnchor;
 	leftZoomAnchors: TileAnchor[] = [];
+	//trackTitleLabel: TileText[];
 	constructor() {
 
 	}
@@ -44,8 +45,9 @@ class LeftPanel {
 		console.log('reFillLeftPanel');
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		for (let zz = 0; zz < this.leftZoomAnchors.length; zz++) {
-			this.leftZoomAnchors[zz].yy = mixm.gridTop();
-			this.leftZoomAnchors[zz].hh = mixm.gridHeight();
+			//this.leftZoomAnchors[zz].yy = mixm.gridTop();
+			//this.leftZoomAnchors[zz].hh = mixm.gridHeight();
+			this.leftZoomAnchors[zz].hh = mixm.mixerHeight();
 			this.leftZoomAnchors[zz].content = [];
 			for (let oo = 1; oo < mixm.octaveCount; oo++) {
 				if (zz < 4) {
@@ -67,29 +69,46 @@ class LeftPanel {
 					if (zz < 2) {
 						let nm: TileText = {
 							x: 0
-							, y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 2 * zoomPrefixLevelsCSS[zz].minZoom + 6 * mixm.notePathHeight
+							, y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 6 * mixm.notePathHeight
 							, text: '' + (mixm.octaveCount - oo + 0)
-							, css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
+							, css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
 						};
 						this.leftZoomAnchors[zz].content.push(nm);
 						if (zz < 1) {
 							let nm: TileText = {
 								x: 0
-								, y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 2 * zoomPrefixLevelsCSS[zz].minZoom + 3 * mixm.notePathHeight
+								, y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 3 * mixm.notePathHeight
 								, text: '' + (mixm.octaveCount - oo + 0)
-								, css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
+								, css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
 							};
 							this.leftZoomAnchors[zz].content.push(nm);
 							nm = {
 								x: 0
-								, y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 2 * zoomPrefixLevelsCSS[zz].minZoom + 9 * mixm.notePathHeight
+								, y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 9 * mixm.notePathHeight
 								, text: '' + (mixm.octaveCount - oo + 0)
-								, css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
+								, css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
 							};
 							this.leftZoomAnchors[zz].content.push(nm);
 						}
 					}
 
+				}
+			}
+			if (data.tracks.length > 0) {
+				let trackLabel: TileText = {
+					text: '' + data.tracks[0].title, x: 0, y: mixm.gridTop(), css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
+				};
+				this.leftZoomAnchors[zz].content.push(trackLabel);
+			}
+			if (zz < 4) {
+				for (let ss = 0; ss < data.percussions.length; ss++) {
+					let samplerLabel: TileText = {
+						text: '' + data.percussions[ss].title
+						, x: 0
+						, y: mixm.titleHeight + mixm.gridHeight() + mixm.sequencerBottomPad + mixm.notePathHeight * ss + mixm.notePathHeight
+						, css: 'samplerRowLabel'+ zoomPrefixLevelsCSS[zz].prefix
+					};
+					this.leftZoomAnchors[zz].content.push(samplerLabel);
 				}
 			}
 		}
