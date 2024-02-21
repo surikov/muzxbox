@@ -215,18 +215,19 @@ declare class SamplerRows {
 declare class BarOctave {
     constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project);
     addLines(barOctaveAnchor: TileAnchor, zoomLevel: number, left: number, top: number, width: number, height: number, data: MZXBX_Project, barIdx: number, octaveIdx: number): void;
-    addOctaveGridSteps(barIdx: number, data: MZXBX_Project, barLeft: number, top: number, height: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
+}
+declare class OctaveContent {
+    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, data: MZXBX_Project, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number);
     addUpperNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project, zoomLevel: number): void;
     addOtherNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project): void;
     addTrackNotes(track: MZXBX_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project, css: string, addMoreInfo: boolean): void;
 }
-declare class OctaveContent {
-    constructor(aa: number, top: number, toAnchor: TileAnchor, data: MZXBX_Project);
-}
 declare class MixerBar {
     octaves: BarOctave[];
     zoomLevel: number;
+    samplerRows: SamplerRows;
     constructor(barIdx: number, left: number, ww: number, zoomLevel: number, gridZoomBarAnchor: TileAnchor, tracksZoomBarAnchor: TileAnchor, firstZoomBarAnchor: TileAnchor, data: MZXBX_Project);
+    addOctaveGridSteps(barIdx: number, data: MZXBX_Project, barLeft: number, width: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
 }
 declare class MixerUI {
     gridLayers: TileLayerDefinition;
@@ -351,8 +352,10 @@ declare class MixerDataMath {
     sequencerBottomPad: number;
     constructor(data: MZXBX_Project);
     mixerWidth(): number;
+    timelineWidth(): number;
     mixerHeight(): number;
     gridTop(): number;
+    samplerTop(): number;
     gridHeight(): number;
 }
 declare let biChar32: String[];

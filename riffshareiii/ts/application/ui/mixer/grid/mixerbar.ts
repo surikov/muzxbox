@@ -5,9 +5,12 @@ class MixerBar {
 	//singleBarOtherTracksAnchor: TileAnchor;
 	//singleBarFirstAnchor: TileAnchor;
 	zoomLevel: number;
+	samplerRows: SamplerRows;
 
 	constructor(
-		barIdx: number, left: number, ww: number
+		barIdx: number
+		, left: number
+		, ww: number
 		, zoomLevel: number
 		, gridZoomBarAnchor: TileAnchor
 		, tracksZoomBarAnchor: TileAnchor
@@ -53,7 +56,8 @@ class MixerBar {
 				, id: 'octaveFirst' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
 			};
 			firstZoomBarAnchor.content.push(firstOctaveAnchor);
-			let bo: BarOctave = new BarOctave(
+			//let bo: BarOctave = 
+			new BarOctave(
 				barIdx, (mixm.octaveCount - oo - 1), left, mixm.gridTop() + oo * h12
 				, ww, h12
 				, gridOctaveAnchor
@@ -73,8 +77,66 @@ class MixerBar {
 			
 						}*/
 			//this.octaves.push(bo);
-		}
 
+		}
+		
+		if (zoomLevel < 6) {
+			this.addOctaveGridSteps(barIdx, data, left, ww, gridZoomBarAnchor, zoomLevel);
+		}
+	}
+	addOctaveGridSteps(barIdx: number,
+		data: MZXBX_Project
+		, barLeft: number
+		, width: number
+		//, top: number, height: number
+		, barOctaveAnchor: TileAnchor, zIndex: number) {
+		let zoomInfo = zoomPrefixLevelsCSS[zIndex];
+		//console.log('MixerBar',barIdx,zoomLevel);
+		let curBar = data.timeline[barIdx];
+			let mixm: MixerDataMath = new MixerDataMath(data);
+			let lineCount = 0;
+			let skip: MZXBX_MetreMathType = MZMM().set({ count: 0, part: 1 });
+			//let barLeft = mixm.LeftPad;
+			let top = mixm.gridTop();
+			let height = mixm.gridHeight();
+
+
+
+			let barRightBorder: TileRectangle = {
+				x: barLeft + width
+				, y: top
+				, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25 //zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0
+				, h: height
+				, css: 'barRightBorder'
+			};
+			barOctaveAnchor.content.push(barRightBorder);
+		if (zoomInfo.gridLines.length > 0) {
+			
+
+
+
+
+			while (true) {
+				let line = zoomInfo.gridLines[lineCount];
+				skip = skip.plus(line.duration).simplyfy();
+				if (!skip.less(curBar.metre)) {
+					break;
+				}
+				let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
+				let mark: TileRectangle = {
+					x: xx
+					, y: top//mixm.gridTop()
+					, w: line.ratio * zoomInfo.minZoom / 2
+					, h: height//mixm.gridHeight()
+					, css: 'timeMeasureMark'
+				};
+				barOctaveAnchor.content.push(mark);
+				lineCount++;
+				if (lineCount >= zoomInfo.gridLines.length) {
+					lineCount = 0;
+				}
+			}
+		}
 	}
 
 }

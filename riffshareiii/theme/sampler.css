@@ -1,3 +1,5 @@
-.samperLineTest{
+.samplerRowBorder{
 	fill: var(--color-lines);
+	fill-opacity:25%;
+    stroke: none;
 }

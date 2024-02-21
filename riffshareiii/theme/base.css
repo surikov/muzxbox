@@ -164,16 +164,8 @@ body {
     pointer-events: none;
 }
 
-.barRightBorder{
-	fill: var(--color-lines);
-	fill-opacity:25%;
-    stroke: none;
-}
-.octaveBottomBorder{
-	fill: var(--color-lines);
-	fill-opacity:25%;
-    stroke: none;
-}
+
+
 .mixTextFill{
 	fill: var(--color-text);
     stroke: none;

@@ -1215,7 +1215,7 @@ class LeftPanel {
                     let samplerLabel = {
                         text: '' + data.percussions[ss].title,
                         x: 0,
-                        y: mixm.titleHeight + mixm.gridHeight() + mixm.sequencerBottomPad + mixm.notePathHeight * ss + mixm.notePathHeight,
+                        y: mixm.samplerTop() + mixm.notePathHeight * ss + mixm.notePathHeight,
                         css: 'samplerRowLabel' + zoomPrefixLevelsCSS[zz].prefix
                     };
                     this.leftZoomAnchors[zz].content.push(samplerLabel);
@@ -1228,27 +1228,13 @@ class SamplerRows {
 }
 class BarOctave {
     constructor(barIdx, octaveIdx, left, top, width, height, barOctaveGridAnchor, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel, data) {
-        if (zoomLevel < 8) {
-            this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, data, zoomLevel);
-            if (zoomLevel < 7) {
-                this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, data);
-                if (zoomLevel < 6) {
-                    this.addLines(barOctaveGridAnchor, zoomLevel, left, top, width, height, data, barIdx, octaveIdx);
-                }
-            }
+        new OctaveContent(barIdx, octaveIdx, left, top, width, height, data, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel);
+        if (zoomLevel < 6) {
+            this.addLines(barOctaveGridAnchor, zoomLevel, left, top, width, height, data, barIdx, octaveIdx);
         }
     }
     addLines(barOctaveAnchor, zoomLevel, left, top, width, height, data, barIdx, octaveIdx) {
-        this.addOctaveGridSteps(barIdx, data, left, top, height, barOctaveAnchor, zoomLevel);
         let mixm = new MixerDataMath(data);
-        let barRightBorder = {
-            x: left + width,
-            y: top,
-            w: zoomPrefixLevelsCSS[zoomLevel].minZoom * 0.25,
-            h: height,
-            css: 'barRightBorder'
-        };
-        barOctaveAnchor.content.push(barRightBorder);
         if (zoomLevel < 4) {
             if (octaveIdx > 0) {
                 let octaveBottomBorder = {
@@ -1273,32 +1259,13 @@ class BarOctave {
             }
         }
     }
-    addOctaveGridSteps(barIdx, data, barLeft, top, height, barOctaveAnchor, zIndex) {
-        let zoomInfo = zoomPrefixLevelsCSS[zIndex];
-        if (zoomInfo.gridLines.length > 0) {
-            let curBar = data.timeline[barIdx];
-            let mixm = new MixerDataMath(data);
-            let lineCount = 0;
-            let skip = MZMM().set({ count: 0, part: 1 });
-            while (true) {
-                let line = zoomInfo.gridLines[lineCount];
-                skip = skip.plus(line.duration).simplyfy();
-                if (!skip.less(curBar.metre)) {
-                    break;
-                }
-                let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
-                let mark = {
-                    x: xx,
-                    y: top,
-                    w: line.ratio * zoomInfo.minZoom / 2,
-                    h: height,
-                    css: 'timeMeasureMark'
-                };
-                barOctaveAnchor.content.push(mark);
-                lineCount++;
-                if (lineCount >= zoomInfo.gridLines.length) {
-                    lineCount = 0;
-                }
+}
+class OctaveContent {
+    constructor(barIdx, octaveIdx, left, top, width, height, data, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel) {
+        if (zoomLevel < 8) {
+            this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, data, zoomLevel);
+            if (zoomLevel < 7) {
+                this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, data);
             }
         }
     }
@@ -1370,10 +1337,6 @@ class BarOctave {
         }
     }
 }
-class OctaveContent {
-    constructor(aa, top, toAnchor, data) {
-    }
-}
 class MixerBar {
     constructor(barIdx, left, ww, zoomLevel, gridZoomBarAnchor, tracksZoomBarAnchor, firstZoomBarAnchor, data) {
         let mixm = new MixerDataMath(data);
@@ -1409,12 +1372,54 @@ class MixerBar {
                 id: 'octaveFirst' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
             };
             firstZoomBarAnchor.content.push(firstOctaveAnchor);
-            let bo = new BarOctave(barIdx, (mixm.octaveCount - oo - 1), left, mixm.gridTop() + oo * h12, ww, h12, gridOctaveAnchor, tracksOctaveAnchor, firstOctaveAnchor, zoomLevel, data);
+            new BarOctave(barIdx, (mixm.octaveCount - oo - 1), left, mixm.gridTop() + oo * h12, ww, h12, gridOctaveAnchor, tracksOctaveAnchor, firstOctaveAnchor, zoomLevel, data);
             if (firstZoomBarAnchor.ww < firstOctaveAnchor.ww) {
                 firstZoomBarAnchor.ww = firstOctaveAnchor.ww;
             }
             if (tracksZoomBarAnchor.ww < tracksOctaveAnchor.ww) {
                 tracksZoomBarAnchor.ww = tracksOctaveAnchor.ww;
+            }
+        }
+        if (zoomLevel < 6) {
+            this.addOctaveGridSteps(barIdx, data, left, ww, gridZoomBarAnchor, zoomLevel);
+        }
+    }
+    addOctaveGridSteps(barIdx, data, barLeft, width, barOctaveAnchor, zIndex) {
+        let zoomInfo = zoomPrefixLevelsCSS[zIndex];
+        let curBar = data.timeline[barIdx];
+        let mixm = new MixerDataMath(data);
+        let lineCount = 0;
+        let skip = MZMM().set({ count: 0, part: 1 });
+        let top = mixm.gridTop();
+        let height = mixm.gridHeight();
+        let barRightBorder = {
+            x: barLeft + width,
+            y: top,
+            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
+            h: height,
+            css: 'barRightBorder'
+        };
+        barOctaveAnchor.content.push(barRightBorder);
+        if (zoomInfo.gridLines.length > 0) {
+            while (true) {
+                let line = zoomInfo.gridLines[lineCount];
+                skip = skip.plus(line.duration).simplyfy();
+                if (!skip.less(curBar.metre)) {
+                    break;
+                }
+                let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
+                let mark = {
+                    x: xx,
+                    y: top,
+                    w: line.ratio * zoomInfo.minZoom / 2,
+                    h: height,
+                    css: 'timeMeasureMark'
+                };
+                barOctaveAnchor.content.push(mark);
+                lineCount++;
+                if (lineCount >= zoomInfo.gridLines.length) {
+                    lineCount = 0;
+                }
             }
         }
     }
@@ -1532,23 +1537,22 @@ class MixerZoomLevel {
         this.bars = [];
         let left = mixm.LeftPad;
         let width = 0;
-        let h12 = 12 * mixm.notePathHeight * mixm.octaveCount;
         for (let ii = 0; ii < data.timeline.length; ii++) {
             let timebar = data.timeline[ii];
             width = MZMM().set(timebar.metre).duration(timebar.tempo) * mixm.widthDurationRatio;
             let barGridAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
-                xx: left, yy: mixm.gridTop(), ww: width, hh: h12, content: [], id: 'barGrid' + (ii + Math.random())
+                xx: left, yy: 0, ww: width, hh: mixm.mixerHeight(), content: [], id: 'barGrid' + (ii + Math.random())
             };
             this.zoomGridAnchor.content.push(barGridAnchor);
             let barTracksAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
-                xx: left, yy: mixm.gridTop(), ww: width, hh: h12, content: [], id: 'barTrack' + (ii + Math.random())
+                xx: left, yy: 0, ww: width, hh: mixm.mixerHeight(), content: [], id: 'barTrack' + (ii + Math.random())
             };
             this.zoomTracksAnchor.content.push(barTracksAnchor);
             let barFirstAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
-                xx: left, yy: mixm.gridTop(), ww: width, hh: h12, content: [], id: 'barFirst' + (ii + Math.random())
+                xx: left, yy: 0, ww: width, hh: mixm.mixerHeight(), content: [], id: 'barFirst' + (ii + Math.random())
             };
             this.zoomFirstAnchor.content.push(barFirstAnchor);
             let mixBar = new MixerBar(ii, left, width, this.zoomLevelIndex, barGridAnchor, barTracksAnchor, barFirstAnchor, data);
@@ -1557,6 +1561,17 @@ class MixerZoomLevel {
         }
         let titleLabel = { x: 0, y: mixm.gridTop() - zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom * 2, text: data.title, css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix };
         this.zoomGridAnchor.content.push(titleLabel);
+        if (this.zoomLevelIndex < 4) {
+            for (let ss = 1; ss < data.percussions.length; ss++) {
+                let line = {
+                    x: mixm.LeftPad,
+                    y: mixm.samplerTop() + mixm.notePathHeight * ss,
+                    h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0,
+                    w: mixm.timelineWidth(), css: 'samplerRowBorder'
+                };
+                this.zoomGridAnchor.content.push(line);
+            }
+        }
     }
 }
 class IconLabelButton {
@@ -1834,12 +1849,15 @@ class MixerDataMath {
         this.data = data;
     }
     mixerWidth() {
+        return this.LeftPad + this.timelineWidth() + this.rightPad;
+    }
+    timelineWidth() {
         let mm = MZMM();
         let ww = 0;
         for (let ii = 0; ii < this.data.timeline.length; ii++) {
             ww = ww + mm.set(this.data.timeline[ii].metre).duration(this.data.timeline[ii].tempo) * this.widthDurationRatio;
         }
-        return this.LeftPad + ww + this.rightPad;
+        return ww;
     }
     mixerHeight() {
         return this.titleHeight
@@ -1850,6 +1868,9 @@ class MixerDataMath {
     }
     gridTop() {
         return this.titleHeight;
+    }
+    samplerTop() {
+        return this.gridTop() + this.gridHeight() + this.sequencerBottomPad;
     }
     gridHeight() {
         return this.notePathHeight * this.octaveCount * 12;

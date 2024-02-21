@@ -195,3 +195,15 @@
 	fill-opacity: 50%;
     font-size: calc(512*var(--tapSize));
 }
+
+
+.octaveBottomBorder{
+	fill: var(--color-lines);
+	fill-opacity:25%;
+    stroke: none;
+}
+.barRightBorder{
+	fill: var(--color-lines);
+	fill-opacity:25%;
+    stroke: none;
+}

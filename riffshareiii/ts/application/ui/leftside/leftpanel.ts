@@ -105,7 +105,7 @@ class LeftPanel {
 					let samplerLabel: TileText = {
 						text: '' + data.percussions[ss].title
 						, x: 0
-						, y: mixm.titleHeight + mixm.gridHeight() + mixm.sequencerBottomPad + mixm.notePathHeight * ss + mixm.notePathHeight
+						, y: mixm.samplerTop() + mixm.notePathHeight * ss + mixm.notePathHeight
 						, css: 'samplerRowLabel'+ zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(samplerLabel);

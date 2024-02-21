@@ -13,13 +13,15 @@ class MixerDataMath {
 		this.data = data;
 	}
 	mixerWidth(): number {
+		return this.LeftPad + this.timelineWidth() + this.rightPad;
+	}
+	timelineWidth(): number {
 		let mm: MZXBX_MetreMathType = MZMM();
 		let ww = 0;
 		for (let ii = 0; ii < this.data.timeline.length; ii++) {
-			//ww = ww + new MusicMetreMath(this.data.timeline[ii].metre).width(this.data.timeline[ii].tempo, this.data.theme.widthDurationRatio);
 			ww = ww + mm.set(this.data.timeline[ii].metre).duration(this.data.timeline[ii].tempo) * this.widthDurationRatio;
 		}
-		return this.LeftPad + ww + this.rightPad;
+		return ww;
 	}
 	mixerHeight(): number {
 		return this.titleHeight
@@ -30,6 +32,9 @@ class MixerDataMath {
 	}
 	gridTop(): number {
 		return this.titleHeight;
+	}
+	samplerTop(): number {
+		return this.gridTop() + this.gridHeight() + this.sequencerBottomPad;
 	}
 
 	gridHeight(): number {
