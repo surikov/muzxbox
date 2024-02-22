@@ -214,7 +214,6 @@ declare class SamplerRows {
 }
 declare class BarOctave {
     constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project);
-    addLines(barOctaveAnchor: TileAnchor, zoomLevel: number, left: number, top: number, width: number, height: number, data: MZXBX_Project, barIdx: number, octaveIdx: number): void;
 }
 declare class OctaveContent {
     constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, data: MZXBX_Project, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number);
@@ -248,6 +247,7 @@ declare class MixerZoomLevel {
     zoomLevelIndex: number;
     constructor(zoomLevel: number, anchorGrid: TileAnchor, anchorTracks: TileAnchor, anchorFirst: TileAnchor);
     reCreateBars(data: MZXBX_Project): void;
+    addLines(barOctaveAnchor: TileAnchor, data: MZXBX_Project): void;
 }
 declare class IconLabelButton {
     anchor: TileAnchor;

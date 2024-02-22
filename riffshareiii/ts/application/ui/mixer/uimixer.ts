@@ -29,6 +29,7 @@ class MixerUI {
 		this.fillerAnchor.ww = mixm.mixerWidth() - mixm.LeftPad - mixm.rightPad;
 		this.fillerAnchor.hh = mixm.gridHeight();
 		this.reFillTracksRatio(data);
+		
 	}
 	createMixerLayers(): TileLayerDefinition[] {
 		let tracksLayerZoom: SVGElement = (document.getElementById('tracksLayerZoom') as any) as SVGElement;
@@ -66,6 +67,8 @@ class MixerUI {
 				, mixerTrackAnchor
 				, mixerFirstAnchor
 			));
+
+			//
 		}
 		this.fillerAnchor = {
 			showZoom: zoomPrefixLevelsCSS[6].minZoom
@@ -75,6 +78,7 @@ class MixerUI {
 		this.gridLayers.anchors.push(this.fillerAnchor);
 		return [this.gridLayers,this.trackLayers,this.firstLayers];
 	}
+	
 	reFillTracksRatio(data: MZXBX_Project) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		let mxNotes = 0;
@@ -116,6 +120,7 @@ class MixerUI {
 			this.fillerAnchor.content.push(fillRectangle);
 			barX = barX + barwidth;
 		}
+		
 	}
 
 }

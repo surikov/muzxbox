@@ -1229,35 +1229,6 @@ class SamplerRows {
 class BarOctave {
     constructor(barIdx, octaveIdx, left, top, width, height, barOctaveGridAnchor, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel, data) {
         new OctaveContent(barIdx, octaveIdx, left, top, width, height, data, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel);
-        if (zoomLevel < 6) {
-            this.addLines(barOctaveGridAnchor, zoomLevel, left, top, width, height, data, barIdx, octaveIdx);
-        }
-    }
-    addLines(barOctaveAnchor, zoomLevel, left, top, width, height, data, barIdx, octaveIdx) {
-        let mixm = new MixerDataMath(data);
-        if (zoomLevel < 4) {
-            if (octaveIdx > 0) {
-                let octaveBottomBorder = {
-                    x: left,
-                    y: top + height,
-                    w: width,
-                    h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0,
-                    css: 'octaveBottomBorder'
-                };
-                barOctaveAnchor.content.push(octaveBottomBorder);
-            }
-        }
-        if (zoomLevel < 3) {
-            for (let kk = 1; kk < 12; kk++) {
-                barOctaveAnchor.content.push({
-                    x: left,
-                    y: top + height - kk * mixm.notePathHeight,
-                    w: width,
-                    h: zoomPrefixLevelsCSS[zoomLevel].minZoom / 32.0,
-                    css: 'octaveBottomBorder'
-                });
-            }
-        }
     }
 }
 class OctaveContent {
@@ -1570,6 +1541,33 @@ class MixerZoomLevel {
                     w: mixm.timelineWidth(), css: 'samplerRowBorder'
                 };
                 this.zoomGridAnchor.content.push(line);
+            }
+        }
+        this.addLines(this.zoomGridAnchor, data);
+    }
+    addLines(barOctaveAnchor, data) {
+        let mixm = new MixerDataMath(data);
+        if (this.zoomLevelIndex < 4) {
+            for (let oo = 1; oo < mixm.octaveCount; oo++) {
+                let octaveBottomBorder = {
+                    x: mixm.LeftPad,
+                    y: mixm.gridTop() + oo * 12 * mixm.notePathHeight,
+                    w: mixm.timelineWidth(),
+                    h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0,
+                    css: 'octaveBottomBorder'
+                };
+                barOctaveAnchor.content.push(octaveBottomBorder);
+                if (this.zoomLevelIndex < 3) {
+                    for (let kk = 1; kk < 12; kk++) {
+                        barOctaveAnchor.content.push({
+                            x: mixm.LeftPad,
+                            y: mixm.gridTop() + (oo * 12 + kk) * mixm.notePathHeight,
+                            w: mixm.timelineWidth(),
+                            h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
+                            css: 'octaveBottomBorder'
+                        });
+                    }
+                }
             }
         }
     }

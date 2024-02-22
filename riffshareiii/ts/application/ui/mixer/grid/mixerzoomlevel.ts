@@ -18,7 +18,6 @@ class MixerZoomLevel {
 		this.bars = [];
 		let left = mixm.LeftPad;
 		let width = 0;
-		//let h12 = 12 * mixm.notePathHeight * mixm.octaveCount;
 		for (let ii = 0; ii < data.timeline.length; ii++) {
 			let timebar = data.timeline[ii];
 			width = MZMM().set(timebar.metre).duration(timebar.tempo) * mixm.widthDurationRatio;
@@ -34,7 +33,7 @@ class MixerZoomLevel {
 			};
 			this.zoomTracksAnchor.content.push(barTracksAnchor);
 			let barFirstAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom 
+				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
 				, xx: left, yy: 0, ww: width, hh: mixm.mixerHeight(), content: [], id: 'barFirst' + (ii + Math.random())
 			};
 			this.zoomFirstAnchor.content.push(barFirstAnchor);
@@ -47,7 +46,7 @@ class MixerZoomLevel {
 			this.bars.push(mixBar);
 			left = left + width;
 		}
-		let titleLabel: TileText = { x: 0, y: mixm.gridTop()-zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom*2, text: data.title, css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix };
+		let titleLabel: TileText = { x: 0, y: mixm.gridTop() - zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom * 2, text: data.title, css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix };
 		this.zoomGridAnchor.content.push(titleLabel);
 
 		if (this.zoomLevelIndex < 4) {
@@ -61,6 +60,32 @@ class MixerZoomLevel {
 				this.zoomGridAnchor.content.push(line);
 			}
 		}
+		this.addLines(this.zoomGridAnchor, data);//zoomLevel, left, top, width, height, data, barIdx, octaveIdx);
 	}
-
+	addLines(barOctaveAnchor: TileAnchor, data: MZXBX_Project) {
+		let mixm: MixerDataMath = new MixerDataMath(data);
+		if (this.zoomLevelIndex < 4) {
+			for (let oo = 1; oo < mixm.octaveCount; oo++) {
+				let octaveBottomBorder: TileRectangle = {
+					x: mixm.LeftPad
+					, y: mixm.gridTop() + oo * 12 * mixm.notePathHeight
+					, w: mixm.timelineWidth()
+					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0
+					, css: 'octaveBottomBorder'
+				};
+				barOctaveAnchor.content.push(octaveBottomBorder);
+				if (this.zoomLevelIndex < 3) {
+					for (let kk = 1; kk < 12; kk++) {
+						barOctaveAnchor.content.push({
+							x: mixm.LeftPad
+							, y: mixm.gridTop() + (oo * 12 + kk) * mixm.notePathHeight
+							, w: mixm.timelineWidth()
+							, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
+							, css: 'octaveBottomBorder'
+						});
+					}
+				}
+			}
+		}
+	}
 }
