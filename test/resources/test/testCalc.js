@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.92 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.93 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -161,10 +161,10 @@ function init() {
     dataBalls = window[dataName];
     console.log(dataBalls);
     datarows = readParseStat(dataBalls);
-    dumpStatLeft(datarows);
+    dumpStatLeftRed(datarows);
 }
-function dumpStatLeft(datarows) {
-    console.log('datarows', datarows);
+function dumpStatLeftRed(datarows) {
+    console.log('dumpStatLeftRed', datarows);
     var counts = [];
     for (var rr = 0; rr <= rowLen; rr++) {
         counts[rr] = 0;
@@ -178,10 +178,10 @@ function dumpStatLeft(datarows) {
         }
         counts[min]++;
     }
-    //let sm=0;
+    var sm = 0;
     for (var rr = 0; rr <= rowLen; rr++) {
-        //sm=sm+counts[rr];
-        console.log(rr, counts[rr], ('' + (100 * counts[rr] / datarows.length) + '%'));
+        sm = sm + counts[rr];
+        console.log(rr, counts[rr], ('' + (100 * counts[rr] / datarows.length) + '%'), ('' + (100 * sm / datarows.length) + '%'));
     }
     //console.log('mins',sm,counts);
 }
@@ -435,8 +435,6 @@ function countInfo(inrows) {
 function dumpRowFills(inrows) {
     if (highLightMode == 1) {
         dumpRowFillsColor(inrows, '#009900cc', 0);
-        //let slicedrows: BallsRow[] = sliceRows(inrows, 1*reduceRatio, inrows.length-1*reduceRatio);
-        //dumpRowFillsColor(slicedrows, '#00990033', 0);
         dumpRowWaitColor(inrows, '#00000033', 0);
     }
     else {
@@ -445,7 +443,7 @@ function dumpRowFills(inrows) {
     }
 }
 function dumpRowWaitColor(rows, color, shiftX) {
-    var lbl = 'grey ';
+    var lbl = 'grey';
     for (var rr = 0; rr < rowsVisibleCount; rr++) {
         var arr = [];
         for (var nn = 0; nn < rowLen; nn++) {
@@ -516,6 +514,7 @@ function dumpRowWaitColor(rows, color, shiftX) {
             var grey = '#333333ff';
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: grey, manual: false });
             markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: grey, manual: false });
+            //console.log('grey');
         }
         if (rr == 0) {
             for (var bb = 0; bb < rowLen; bb++) {
@@ -639,6 +638,7 @@ function dumpRowFillsColor(rows, color, shiftX) {
             var green = '#009900ff';
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: green, manual: false });
             markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: green, manual: false });
+            //console.log('green');
         }
         if (rr == 0) {
             for (var bb = 0; bb < rowLen; bb++) {
@@ -777,6 +777,7 @@ function dumpTriads(svg, rows) {
             markLines.push({ fromX: xxx + end2_1 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red2, manual: false });
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: red, manual: false });
             markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red, manual: false });
+            //console.log('red');
         }
         for (var ii = 0; ii < rowLen; ii++) {
             var idx = ratioPre * (calcs[ii].summ - minCnt) / df;

@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.92 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.93 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -174,10 +174,10 @@ function init() {
     dataBalls = window[dataName];
     console.log(dataBalls);
     datarows = readParseStat(dataBalls);
-    dumpStatLeft(datarows);
+    dumpStatLeftRed(datarows);
 }
-function dumpStatLeft(datarows: BallsRow[]) {
-    console.log('datarows', datarows);
+function dumpStatLeftRed(datarows: BallsRow[]) {
+    console.log('dumpStatLeftRed', datarows);
     let counts: number[] = [];
     for (let rr = 0; rr <= rowLen; rr++) {
         counts[rr] = 0;
@@ -192,10 +192,10 @@ function dumpStatLeft(datarows: BallsRow[]) {
         }
         counts[min]++;
     }
-    //let sm=0;
+    let sm=0;
     for (let rr = 0; rr <= rowLen; rr++) {
-        //sm=sm+counts[rr];
-        console.log(rr,counts[rr],(''+(100*counts[rr]/datarows.length)+'%'));
+        sm=sm+counts[rr];
+        console.log(rr, counts[rr], ('' + (100 * counts[rr] / datarows.length) + '%'), ('' + (100 * sm / datarows.length) + '%'));
     }
     //console.log('mins',sm,counts);
 }
@@ -481,8 +481,6 @@ function dumpRowFills(inrows: BallsRow[]) {
 
     if (highLightMode == 1) {
         dumpRowFillsColor(inrows, '#009900cc', 0);
-        //let slicedrows: BallsRow[] = sliceRows(inrows, 1*reduceRatio, inrows.length-1*reduceRatio);
-        //dumpRowFillsColor(slicedrows, '#00990033', 0);
 
         dumpRowWaitColor(inrows, '#00000033', 0);
     } else {
@@ -492,7 +490,7 @@ function dumpRowFills(inrows: BallsRow[]) {
 }
 
 function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
-    let lbl = 'grey ';
+    let lbl = 'grey';
     for (let rr = 0; rr < rowsVisibleCount; rr++) {
         let arr: { ball: number, summ: number }[] = [];
         for (let nn = 0; nn < rowLen; nn++) {
@@ -538,12 +536,12 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
         for (let kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
-                    if(kk<end)end2 = kk;
-                    if (begin2==-1 && kk>begin) {
+                    if (kk < end) end2 = kk;
+                    if (begin2 == -1 && kk > begin) {
                         begin2 = kk;
                     }
                 }
-            } 
+            }
         }
         lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
         if (rr == 0) {
@@ -556,12 +554,13 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
         let xxx = 2 * rowLen / 2;
         //if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
         if (showFirstRow || rr > 0) {
-            let grey2='#33333333';
+            let grey2 = '#33333333';
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: grey2, manual: false });
             markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: grey2, manual: false });
-            let grey='#333333ff';
+            let grey = '#333333ff';
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: grey, manual: false });
             markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: grey, manual: false });
+            //console.log('grey');
         }
 
         if (rr == 0) {
@@ -654,12 +653,12 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
         for (let kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
-                    if(kk<end)end2 = kk;
-                    if (begin2==-1 && kk>begin) {
+                    if (kk < end) end2 = kk;
+                    if (begin2 == -1 && kk > begin) {
                         begin2 = kk;
                     }
                 }
-            } 
+            }
         }
         lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
         //console.log(lbl);
@@ -672,12 +671,13 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
         let xxx = 1 * rowLen / 2;
         //if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
         if (showFirstRow || rr > 0) {
-            let green2='#00990033';
+            let green2 = '#00990033';
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: green2, manual: false });
             markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: green2, manual: false });
-            let green='#009900ff';
+            let green = '#009900ff';
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: green, manual: false });
             markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: green, manual: false });
+            //console.log('green');
         }
 
 
@@ -756,12 +756,12 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
         for (let kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
-                    if(kk<end)end2 = kk;
-                    if (begin2==-1 && kk>begin) {
+                    if (kk < end) end2 = kk;
+                    if (begin2 == -1 && kk > begin) {
                         begin2 = kk;
                     }
                 }
-            } 
+            }
         }
         lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
         if (rr == 0) {
@@ -776,12 +776,12 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
         let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
         let xxx = 0 * rowLen / 2;
         //if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
-        
+
         if (showFirstRow || rr > 0) {
-            let blue2='#3333ff33';
+            let blue2 = '#3333ff33';
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: blue2, manual: false });
             markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue2, manual: false });
-            let blue='#3333ffff';
+            let blue = '#3333ffff';
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: blue, manual: false });
             markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue, manual: false });
         }
@@ -795,7 +795,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
                 if (rows[rr].balls[kk] > end) end = rows[rr].balls[kk];
             }
             for (let kk = 0; kk < rows[rr].balls.length; kk++) {
-                if (rows[rr].balls[kk] < begin2 && rows[rr].balls[kk] > begin ) begin2 = rows[rr].balls[kk];
+                if (rows[rr].balls[kk] < begin2 && rows[rr].balls[kk] > begin) begin2 = rows[rr].balls[kk];
                 if (rows[rr].balls[kk] > end2 && rows[rr].balls[kk] < end) end2 = rows[rr].balls[kk];
             }
             begin--;
@@ -811,6 +811,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
             markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red2, manual: false });
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: red, manual: false });
             markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red, manual: false });
+            //console.log('red');
         }
 
 

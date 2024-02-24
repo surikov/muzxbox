@@ -10,6 +10,7 @@
 .rightMenuFocusedDelimiter {
     fill: var(--color-focus);
     pointer-events: none;
+    animation: focusFlashFill 4s linear infinite;
 }
 
 .rightMenuLabel {
