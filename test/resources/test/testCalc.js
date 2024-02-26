@@ -838,10 +838,12 @@ function dumpColorStat() {
             + roundDown(greenStat[kk].left, 3) + roundDown(greenStat[kk].right, 3);
         var countSmall = countColorStat(kk, 5);
         var countbg = countColorStat(kk, 11);
+        var mark = '    ';
         //if (sum > rowLen * 0.8) {
         if (countSmall > 5 && countbg > 1) {
-            console.log(kk, sum, 'b', roundDown(blueStat[kk].left, 3), roundDown(blueStat[kk].right, 3), 'gn', roundDown(greenStat[kk].left, 3), roundDown(greenStat[kk].right, 3), 'gy', roundDown(greyStat[kk].left, 3), roundDown(greyStat[kk].right, 3), 'r', roundDown(redStat[kk].left, 3), roundDown(redStat[kk].right, 3));
+            mark = ' => ';
         }
+        console.log(kk, ('' + mark + sum), 'b', roundDown(blueStat[kk].left, 3), roundDown(blueStat[kk].right, 3), 'gn', roundDown(greenStat[kk].left, 3), roundDown(greenStat[kk].right, 3), 'gy', roundDown(greyStat[kk].left, 3), roundDown(greyStat[kk].right, 3), 'r', roundDown(redStat[kk].left, 3), roundDown(redStat[kk].right, 3));
     }
 }
 function fillCells() {
