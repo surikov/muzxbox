@@ -17,6 +17,10 @@ var highLightMode = 1;
 var calcLen = 32;
 var diffWide = 1;
 var wideRange = false;
+var greenStat = [];
+var blueStat = [];
+var greyStat = [];
+var redStat = [];
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
     var msgp = document.getElementById('msgp');
@@ -161,7 +165,7 @@ function init() {
     dataBalls = window[dataName];
     console.log(dataBalls);
     datarows = readParseStat(dataBalls);
-    dumpStatLeftRed(datarows);
+    //dumpStatLeftRed(datarows);
 }
 function dumpStatLeftRed(datarows) {
     console.log('dumpStatLeftRed', datarows);
@@ -444,6 +448,7 @@ function dumpRowFills(inrows) {
 }
 function dumpRowWaitColor(rows, color, shiftX) {
     var lbl = 'grey';
+    greyStat = [];
     for (var rr = 0; rr < rowsVisibleCount; rr++) {
         var arr = [];
         for (var nn = 0; nn < rowLen; nn++) {
@@ -515,6 +520,7 @@ function dumpRowWaitColor(rows, color, shiftX) {
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: grey, manual: false });
             markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: grey, manual: false });
             //console.log('grey');
+            greyStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
         }
         if (rr == 0) {
             for (var bb = 0; bb < rowLen; bb++) {
@@ -544,6 +550,7 @@ function dumpRowWaitColor(rows, color, shiftX) {
             //console.log(arr);
         }
     }
+    //console.log('greyStat', greyStat);
 }
 function makeWader(ballFills) {
     if (wideRange) {
@@ -572,6 +579,7 @@ function makeWader(ballFills) {
 function dumpRowFillsColor(rows, color, shiftX) {
     var lbl = 'green';
     //console.log(lbl);
+    greenStat = [];
     for (var rr = 0; rr < rowsVisibleCount; rr++) {
         var precounts = calcRowPatterns(rr + 1, rows);
         var ballFills = calculateBallTriadChain(rr, rows, precounts);
@@ -638,7 +646,8 @@ function dumpRowFillsColor(rows, color, shiftX) {
             var green = '#009900ff';
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: green, manual: false });
             markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: green, manual: false });
-            //console.log('green');
+            //console.log(rr,'green',begin,(rowLen - end - 1));
+            greenStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
         }
         if (rr == 0) {
             for (var bb = 0; bb < rowLen; bb++) {
@@ -667,11 +676,14 @@ function dumpRowFillsColor(rows, color, shiftX) {
             }
         }
     }
+    //console.log('greenStat', greenStat);
 }
 function dumpTriads(svg, rows) {
     //console.log('blue');
     var ratioPre = 0.66; //0.99;
     //console.log('dumpTriads mode', highLightMode);
+    blueStat = [];
+    redStat = [];
     for (var rr = 0; rr < rowsVisibleCount; rr++) {
         if (rr > rows.length - 6)
             break;
@@ -746,6 +758,7 @@ function dumpTriads(svg, rows) {
             var blue = '#3333ffff';
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: blue, manual: false });
             markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue, manual: false });
+            blueStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
         }
         if (showFirstRow || rr > 0) {
             begin = rowLen + 1;
@@ -778,6 +791,7 @@ function dumpTriads(svg, rows) {
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: red, manual: false });
             markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red, manual: false });
             //console.log('red');
+            redStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
         }
         for (var ii = 0; ii < rowLen; ii++) {
             var idx = ratioPre * (calcs[ii].summ - minCnt) / df;
@@ -786,6 +800,47 @@ function dumpTriads(svg, rows) {
             , color);
             addRect(svg, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
             , color);
+        }
+    }
+    //console.log('blueStat', blueStat);
+    //console.log('redStat', redStat);
+    dumpColorStat();
+}
+function roundDown(num, base) {
+    return Math.floor(num / base) * base;
+}
+function countColorStat(kk, sz) {
+    var countS = 0;
+    if (blueStat[kk].left > sz)
+        countS++;
+    if (blueStat[kk].right > sz)
+        countS++;
+    if (greenStat[kk].left > sz)
+        countS++;
+    if (greenStat[kk].right > sz)
+        countS++;
+    if (greyStat[kk].left > sz)
+        countS++;
+    if (greyStat[kk].right > sz)
+        countS++;
+    if (redStat[kk].left > sz)
+        countS++;
+    if (redStat[kk].right > sz)
+        countS++;
+    return countS;
+}
+function dumpColorStat() {
+    console.log('stat');
+    for (var kk = 0; kk < redStat.length; kk++) {
+        var sum = roundDown(redStat[kk].left, 3) + roundDown(redStat[kk].right, 3)
+            + roundDown(blueStat[kk].left, 3) + roundDown(blueStat[kk].right, 3)
+            + roundDown(greyStat[kk].left, 3) + roundDown(greyStat[kk].right, 3)
+            + roundDown(greenStat[kk].left, 3) + roundDown(greenStat[kk].right, 3);
+        var countSmall = countColorStat(kk, 5);
+        var countbg = countColorStat(kk, 11);
+        //if (sum > rowLen * 0.8) {
+        if (countSmall > 5 && countbg > 1) {
+            console.log(kk, sum, 'b', roundDown(blueStat[kk].left, 3), roundDown(blueStat[kk].right, 3), 'gn', roundDown(greenStat[kk].left, 3), roundDown(greenStat[kk].right, 3), 'gy', roundDown(greyStat[kk].left, 3), roundDown(greyStat[kk].right, 3), 'r', roundDown(redStat[kk].left, 3), roundDown(redStat[kk].right, 3));
         }
     }
 }
