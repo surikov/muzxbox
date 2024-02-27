@@ -877,15 +877,19 @@ function dumpColorStat() {
 	for (let kk = 0; kk < redStat.length; kk++) {
 		let sum = 0;
 		if (showFirstRow || kk > 0) {
-			sum = roundDown(redStat[kk].left, 3) + roundDown(redStat[kk].right, 3)
+			/*sum = roundDown(redStat[kk].left, 3) + roundDown(redStat[kk].right, 3)
 				+ roundDown(blueStat[kk].left, 3) + roundDown(blueStat[kk].right, 3)
 				+ roundDown(greyStat[kk].left, 3) + roundDown(greyStat[kk].right, 3)
 				+ roundDown(greenStat[kk].left, 3) + roundDown(greenStat[kk].right, 3)
-				;
+				;*/
+			sum = redStat[kk].left + redStat[kk].right
+				+ blueStat[kk].left + blueStat[kk].right
+				+ greyStat[kk].left + greyStat[kk].right
+				+ greenStat[kk].left + greenStat[kk].right;
 		}
 		let countSmall = countColorStat(kk, 9);
 		let countbg = countColorStat(kk, 15);
-		let mark = '    ';
+		//let mark = '    ';
 		//if (sum > rowLen * 0.8) {
 		if (countSmall > 3 && countbg > 1) {
 			//mark = ' => ';
@@ -899,11 +903,11 @@ function dumpColorStat() {
 		}
 		addSmallText(levelA, 2 * rowLen * cellSize + cellSize * 0.5, cellSize * (rowsVisibleCount + 22.8 + 0.66 * kk + 0), '' + kk + ': ' + sum);
 		let violet = '#ff33ffff';
-		let xxx=2 * rowLen + 2.5;
+		let xxx = 2 * rowLen + 2.5;
 		markLines.push({
 			fromX: xxx
 			, fromY: rowsVisibleCount + 22.8 + 0.66 * kk + skipRowsCount - 0.8
-			, toX: xxx + sum / 3 
+			, toX: xxx + sum / 3
 			, toY: rowsVisibleCount + 22.8 + 0.66 * kk + skipRowsCount - 0.8
 			, color: violet
 			, manual: false

@@ -836,14 +836,19 @@ function dumpColorStat() {
     for (var kk = 0; kk < redStat.length; kk++) {
         var sum = 0;
         if (showFirstRow || kk > 0) {
-            sum = roundDown(redStat[kk].left, 3) + roundDown(redStat[kk].right, 3)
+            /*sum = roundDown(redStat[kk].left, 3) + roundDown(redStat[kk].right, 3)
                 + roundDown(blueStat[kk].left, 3) + roundDown(blueStat[kk].right, 3)
                 + roundDown(greyStat[kk].left, 3) + roundDown(greyStat[kk].right, 3)
-                + roundDown(greenStat[kk].left, 3) + roundDown(greenStat[kk].right, 3);
+                + roundDown(greenStat[kk].left, 3) + roundDown(greenStat[kk].right, 3)
+                ;*/
+            sum = redStat[kk].left + redStat[kk].right
+                + blueStat[kk].left + blueStat[kk].right
+                + greyStat[kk].left + greyStat[kk].right
+                + greenStat[kk].left + greenStat[kk].right;
         }
         var countSmall = countColorStat(kk, 9);
         var countbg = countColorStat(kk, 15);
-        var mark = '    ';
+        //let mark = '    ';
         //if (sum > rowLen * 0.8) {
         if (countSmall > 3 && countbg > 1) {
             //mark = ' => ';
