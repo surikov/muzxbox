@@ -79,7 +79,7 @@ class MixerBar {
 			//this.octaves.push(bo);
 
 		}
-		
+
 		if (zoomLevel < 6) {
 			this.addOctaveGridSteps(barIdx, data, left, ww, gridZoomBarAnchor, zoomLevel);
 		}
@@ -93,25 +93,35 @@ class MixerBar {
 		let zoomInfo = zoomPrefixLevelsCSS[zIndex];
 		//console.log('MixerBar',barIdx,zoomLevel);
 		let curBar = data.timeline[barIdx];
-			let mixm: MixerDataMath = new MixerDataMath(data);
-			let lineCount = 0;
-			let skip: MZXBX_MetreMathType = MZMM().set({ count: 0, part: 1 });
-			//let barLeft = mixm.LeftPad;
-			let top = mixm.gridTop();
-			let height = mixm.gridHeight();
+		let mixm: MixerDataMath = new MixerDataMath(data);
+		let lineCount = 0;
+		let skip: MZXBX_MetreMathType = MZMM().set({ count: 0, part: 1 });
+		//let barLeft = mixm.LeftPad;
+		let top = mixm.gridTop();
+		let height = mixm.gridHeight();
 
 
 
-			let barRightBorder: TileRectangle = {
+		let barRightBorder: TileRectangle = {
+			x: barLeft + width
+			, y: top
+			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25 //zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0
+			, h: height
+			, css: 'barRightBorder'
+		};
+		barOctaveAnchor.content.push(barRightBorder);
+		if (data.percussions.length) {
+			let barSamRightBorder: TileRectangle = {
 				x: barLeft + width
-				, y: top
+				, y: mixm.samplerTop()
 				, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25 //zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0
-				, h: height
+				, h: data.percussions.length*mixm.notePathHeight
 				, css: 'barRightBorder'
 			};
-			barOctaveAnchor.content.push(barRightBorder);
+			barOctaveAnchor.content.push(barSamRightBorder);
+		}
 		if (zoomInfo.gridLines.length > 0) {
-			
+
 
 
 
@@ -131,6 +141,16 @@ class MixerBar {
 					, css: 'timeMeasureMark'
 				};
 				barOctaveAnchor.content.push(mark);
+				if (data.percussions.length) {
+					let sammark: TileRectangle = {
+						x: xx
+						, y: mixm.samplerTop()
+						, w: line.ratio * zoomInfo.minZoom / 2
+						, h: data.percussions.length*mixm.notePathHeight
+						, css: 'timeMeasureMark'
+					};
+					barOctaveAnchor.content.push(sammark);
+				}
 				lineCount++;
 				if (lineCount >= zoomInfo.gridLines.length) {
 					lineCount = 0;

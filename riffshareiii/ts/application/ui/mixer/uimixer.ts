@@ -7,7 +7,7 @@ class MixerUI {
 	firstLayers: TileLayerDefinition;
 	levels: MixerZoomLevel[] = [];
 	fillerAnchor: TileAnchor;
-	samplerUI:SamplerRows;
+	samplerUI: SamplerRows;
 
 	reFillMixerUI(data: MZXBX_Project) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
@@ -29,7 +29,7 @@ class MixerUI {
 		this.fillerAnchor.ww = mixm.mixerWidth() - mixm.LeftPad - mixm.rightPad;
 		this.fillerAnchor.hh = mixm.gridHeight();
 		this.reFillTracksRatio(data);
-		
+
 	}
 	createMixerLayers(): TileLayerDefinition[] {
 		let tracksLayerZoom: SVGElement = (document.getElementById('tracksLayerZoom') as any) as SVGElement;
@@ -76,22 +76,35 @@ class MixerUI {
 			, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 		};
 		this.gridLayers.anchors.push(this.fillerAnchor);
-		return [this.gridLayers,this.trackLayers,this.firstLayers];
+		return [this.gridLayers, this.trackLayers, this.firstLayers];
 	}
-	
+
 	reFillTracksRatio(data: MZXBX_Project) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		let mxNotes = 0;
+		let mxDrums = 0;
 		for (let bb = 0; bb < data.timeline.length; bb++) {
 			let notecount = 0;
+			let drumcount = 0;
 			for (let tt = 0; tt < data.tracks.length; tt++) {
 				let bar = data.tracks[tt].measures[bb];
-				for (let cc = 0; cc < bar.chords.length; cc++) {
-					notecount = notecount + bar.chords[cc].notes.length;
+				if (bar) {
+					for (let cc = 0; cc < bar.chords.length; cc++) {
+						notecount = notecount + bar.chords[cc].notes.length;
+					}
 				}
 			}
 			if (mxNotes < notecount) {
 				mxNotes = notecount;
+			}
+			for (let tt = 0; tt < data.percussions.length; tt++) {
+				let bar = data.percussions[tt].measures[bb];
+				if (bar) {
+					drumcount = drumcount + bar.skips.length;
+				}
+			}
+			if (mxDrums < drumcount) {
+				mxDrums = drumcount;
 			}
 			//console.log(bb, notecount);
 		}
@@ -118,9 +131,29 @@ class MixerUI {
 			};
 			//console.log(bb, notecount, css,fillRectangle);
 			this.fillerAnchor.content.push(fillRectangle);
+
+			if (data.percussions.length) {
+				let drumcount = 0;
+				for (let tt = 0; tt < data.percussions.length; tt++) {
+					let bar = data.percussions[tt].measures[bb];
+					if (bar) {
+						drumcount = drumcount + bar.skips.length;
+					}
+				}
+				let css2 = 'mixFiller' + (1 + Math.round(7 * drumcount / mxDrums));
+				let fillDrumBar: TileRectangle = {
+					x: mixm.LeftPad + barX
+					, y: mixm.samplerTop()
+					, w: barwidth
+					, h: data.percussions.length * mixm.notePathHeight
+					, css: css2
+				};
+				this.fillerAnchor.content.push(fillDrumBar);
+			}
+
 			barX = barX + barwidth;
 		}
-		
+
 	}
 
 }

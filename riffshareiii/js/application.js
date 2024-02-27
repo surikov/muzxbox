@@ -1371,6 +1371,16 @@ class MixerBar {
             css: 'barRightBorder'
         };
         barOctaveAnchor.content.push(barRightBorder);
+        if (data.percussions.length) {
+            let barSamRightBorder = {
+                x: barLeft + width,
+                y: mixm.samplerTop(),
+                w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
+                h: data.percussions.length * mixm.notePathHeight,
+                css: 'barRightBorder'
+            };
+            barOctaveAnchor.content.push(barSamRightBorder);
+        }
         if (zoomInfo.gridLines.length > 0) {
             while (true) {
                 let line = zoomInfo.gridLines[lineCount];
@@ -1387,6 +1397,16 @@ class MixerBar {
                     css: 'timeMeasureMark'
                 };
                 barOctaveAnchor.content.push(mark);
+                if (data.percussions.length) {
+                    let sammark = {
+                        x: xx,
+                        y: mixm.samplerTop(),
+                        w: line.ratio * zoomInfo.minZoom / 2,
+                        h: data.percussions.length * mixm.notePathHeight,
+                        css: 'timeMeasureMark'
+                    };
+                    barOctaveAnchor.content.push(sammark);
+                }
                 lineCount++;
                 if (lineCount >= zoomInfo.gridLines.length) {
                     lineCount = 0;
@@ -1457,16 +1477,29 @@ class MixerUI {
     reFillTracksRatio(data) {
         let mixm = new MixerDataMath(data);
         let mxNotes = 0;
+        let mxDrums = 0;
         for (let bb = 0; bb < data.timeline.length; bb++) {
             let notecount = 0;
+            let drumcount = 0;
             for (let tt = 0; tt < data.tracks.length; tt++) {
                 let bar = data.tracks[tt].measures[bb];
-                for (let cc = 0; cc < bar.chords.length; cc++) {
-                    notecount = notecount + bar.chords[cc].notes.length;
+                if (bar) {
+                    for (let cc = 0; cc < bar.chords.length; cc++) {
+                        notecount = notecount + bar.chords[cc].notes.length;
+                    }
                 }
             }
             if (mxNotes < notecount) {
                 mxNotes = notecount;
+            }
+            for (let tt = 0; tt < data.percussions.length; tt++) {
+                let bar = data.percussions[tt].measures[bb];
+                if (bar) {
+                    drumcount = drumcount + bar.skips.length;
+                }
+            }
+            if (mxDrums < drumcount) {
+                mxDrums = drumcount;
             }
         }
         this.fillerAnchor.content = [];
@@ -1489,6 +1522,24 @@ class MixerUI {
                 css: css
             };
             this.fillerAnchor.content.push(fillRectangle);
+            if (data.percussions.length) {
+                let drumcount = 0;
+                for (let tt = 0; tt < data.percussions.length; tt++) {
+                    let bar = data.percussions[tt].measures[bb];
+                    if (bar) {
+                        drumcount = drumcount + bar.skips.length;
+                    }
+                }
+                let css2 = 'mixFiller' + (1 + Math.round(7 * drumcount / mxDrums));
+                let fillDrumBar = {
+                    x: mixm.LeftPad + barX,
+                    y: mixm.samplerTop(),
+                    w: barwidth,
+                    h: data.percussions.length * mixm.notePathHeight,
+                    css: css2
+                };
+                this.fillerAnchor.content.push(fillDrumBar);
+            }
             barX = barX + barwidth;
         }
     }
