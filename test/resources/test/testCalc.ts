@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.93 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.94 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -28,9 +28,9 @@ let diffWide = 1;
 let wideRange = false;
 
 type StatBeginEnd = {
-	row: number;
-	left: number;
-	right: number;
+    row: number;
+    left: number;
+    right: number;
 };
 let greenStat: StatBeginEnd[] = [];
 let blueStat: StatBeginEnd[] = [];
@@ -39,365 +39,365 @@ let redStat: StatBeginEnd[] = [];
 
 let markLines: { fromX: number, fromY: number, toX: number, toY: number, color: string, manual: boolean }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
-	key: string;
-	balls: number[];
+    key: string;
+    balls: number[];
 };
 function dumpInfo(r: number) {
-	var msgp: HTMLElement = (document.getElementById('msgp') as any) as HTMLElement;
-	msgp.innerText = sversion + ': ' + r;
+    var msgp: HTMLElement = (document.getElementById('msgp') as any) as HTMLElement;
+    msgp.innerText = sversion + ': ' + r;
 }
 function sliceRows(rows: BallsRow[], firstRowNum: number, lastRowNum: number): BallsRow[] {
-	var sliced: BallsRow[] = [];
-	let nn = firstRowNum;
-	for (var i = firstRowNum; i <= lastRowNum; i++) {
-		sliced.push(rows[nn]);
-		nn = nn + reduceRatio;
-	}
-	return sliced;
+    var sliced: BallsRow[] = [];
+    let nn = firstRowNum;
+    for (var i = firstRowNum; i <= lastRowNum; i++) {
+        sliced.push(rows[nn]);
+        nn = nn + reduceRatio;
+    }
+    return sliced;
 }
 function readParseStat(dataBalls: string[]): BallsRow[] {
-	let dlmtr: string = '  ';
-	var rows: BallsRow[] = [{
-		balls: [],
-		key: 'next'
-	}];
-	for (let i = 0; i < ballsInRow; i++) {
-		rows[0].balls.push(0);
-	}
-	for (var i = 0; i < dataBalls.length; i++) {
-		var txt = dataBalls[i].trim();
-		var arr = txt.split(dlmtr);
-		if (arr.length > ballsInRow - 1) {
-			var row: BallsRow = {
-				balls: [],
-				key: ''
-			};
-			for (var k = 0; k < ballsInRow; k++) {
-				var ballnum: number = 1 * ((arr[k] as unknown) as number);
-				row.balls.push(ballnum);
-			}
-			row.balls.sort((a, b) => a - b);
-			row.key = dataBalls[i - 1].trim();
-			row.key = row.key.replace(':00', ':00 #');
-			row.key = row.key.replace(':30', ':30 #');
-			rows.push(row);
-		}
-	}
-	return rows;
+    let dlmtr: string = '  ';
+    var rows: BallsRow[] = [{
+        balls: [],
+        key: 'next'
+    }];
+    for (let i = 0; i < ballsInRow; i++) {
+        rows[0].balls.push(0);
+    }
+    for (var i = 0; i < dataBalls.length; i++) {
+        var txt = dataBalls[i].trim();
+        var arr = txt.split(dlmtr);
+        if (arr.length > ballsInRow - 1) {
+            var row: BallsRow = {
+                balls: [],
+                key: ''
+            };
+            for (var k = 0; k < ballsInRow; k++) {
+                var ballnum: number = 1 * ((arr[k] as unknown) as number);
+                row.balls.push(ballnum);
+            }
+            row.balls.sort((a, b) => a - b);
+            row.key = dataBalls[i - 1].trim();
+            row.key = row.key.replace(':00', ':00 #');
+            row.key = row.key.replace(':30', ':30 #');
+            rows.push(row);
+        }
+    }
+    return rows;
 }
 function ballExists(ball: number, row: BallsRow): boolean {
-	if (row) {
-		while (ball < 1) ball = ball + rowLen;
-		while (ball > rowLen) ball = ball - rowLen;
-		for (var i = 0; i < row.balls.length; i++) {
-			if (row.balls[i] == ball) {
-				return true;
-			}
-		}
-	}
-	return false;
+    if (row) {
+        while (ball < 1) ball = ball + rowLen;
+        while (ball > rowLen) ball = ball - rowLen;
+        for (var i = 0; i < row.balls.length; i++) {
+            if (row.balls[i] == ball) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 function addSmallText(svg: SVGElement, x: number, y: number, txt: string) {
-	var svgNS: string = "http://www.w3.org/2000/svg";
-	var nd: Text = document.createTextNode(txt);
-	var tx: Element = document.createElementNS(svgNS, 'text');
-	tx.setAttributeNS(null, "x", '' + x);
-	tx.setAttributeNS(null, "y", '' + y);
-	tx.setAttributeNS(null, "font-size", "9");
-	tx.setAttribute("fill", '#000000');
-	svg.append(tx);
-	tx.appendChild(nd);
+    var svgNS: string = "http://www.w3.org/2000/svg";
+    var nd: Text = document.createTextNode(txt);
+    var tx: Element = document.createElementNS(svgNS, 'text');
+    tx.setAttributeNS(null, "x", '' + x);
+    tx.setAttributeNS(null, "y", '' + y);
+    tx.setAttributeNS(null, "font-size", "9");
+    tx.setAttribute("fill", '#000000');
+    svg.append(tx);
+    tx.appendChild(nd);
 }
 function addBigText(svg: SVGElement, x: number, y: number, txt: string) {
-	var svgNS: string = "http://www.w3.org/2000/svg";
-	var nd: Text = document.createTextNode(txt);
-	var tx: Element = document.createElementNS(svgNS, 'text');
-	tx.setAttributeNS(null, "x", '' + x);
-	tx.setAttributeNS(null, "y", '' + y);
-	tx.setAttributeNS(null, "font-size", "12");
-	tx.setAttribute("fill", '#000000');
-	svg.append(tx);
-	tx.appendChild(nd);
+    var svgNS: string = "http://www.w3.org/2000/svg";
+    var nd: Text = document.createTextNode(txt);
+    var tx: Element = document.createElementNS(svgNS, 'text');
+    tx.setAttributeNS(null, "x", '' + x);
+    tx.setAttributeNS(null, "y", '' + y);
+    tx.setAttributeNS(null, "font-size", "12");
+    tx.setAttribute("fill", '#000000');
+    svg.append(tx);
+    tx.appendChild(nd);
 }
 function addColoredText(svg: SVGElement, x: number, y: number, txt: string, color: string) {
-	var svgNS: string = "http://www.w3.org/2000/svg";
-	var nd: Text = document.createTextNode(txt);
-	var tx: Element = document.createElementNS(svgNS, 'text');
-	tx.setAttributeNS(null, "x", '' + x);
-	tx.setAttributeNS(null, "y", '' + y);
-	tx.setAttributeNS(null, "font-size", "11");
-	tx.setAttribute("fill", color);
-	svg.append(tx);
-	tx.appendChild(nd);
+    var svgNS: string = "http://www.w3.org/2000/svg";
+    var nd: Text = document.createTextNode(txt);
+    var tx: Element = document.createElementNS(svgNS, 'text');
+    tx.setAttributeNS(null, "x", '' + x);
+    tx.setAttributeNS(null, "y", '' + y);
+    tx.setAttributeNS(null, "font-size", "11");
+    tx.setAttribute("fill", color);
+    svg.append(tx);
+    tx.appendChild(nd);
 }
 function addLine(svg: SVGElement, x1: number, y1: number, x2: number, y2: number, strokeWidth: number, color: string) {
-	var newLine: SVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-	newLine.setAttribute('x1', '' + x1);
-	newLine.setAttribute('y1', '' + y1);
-	newLine.setAttribute('x2', '' + x2);
-	newLine.setAttribute('y2', '' + y2);
-	newLine.setAttribute("stroke", color);
-	newLine.setAttribute("stroke-width", '' + strokeWidth);
-	newLine.setAttribute("stroke-linecap", 'round');
-	svg.append(newLine);
+    var newLine: SVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    newLine.setAttribute('x1', '' + x1);
+    newLine.setAttribute('y1', '' + y1);
+    newLine.setAttribute('x2', '' + x2);
+    newLine.setAttribute('y2', '' + y2);
+    newLine.setAttribute("stroke", color);
+    newLine.setAttribute("stroke-width", '' + strokeWidth);
+    newLine.setAttribute("stroke-linecap", 'round');
+    svg.append(newLine);
 }
 function composeLine(svg: SVGElement, x1: number, y1: number, x2: number, y2: number, strokeWidth: number, color: string) {
-	if (isNaN(x1) || isNaN(x2) || isNaN(y1) || isNaN(y2)) {
-		console.log('wrong composeLine', x1, x2, y1, y2);
-	} else {
-		addLine(svg, x1, y1, x2, y2, strokeWidth / 2, color);
-	}
+    if (isNaN(x1) || isNaN(x2) || isNaN(y1) || isNaN(y2)) {
+        console.log('wrong composeLine', x1, x2, y1, y2);
+    } else {
+        addLine(svg, x1, y1, x2, y2, strokeWidth / 2, color);
+    }
 }
 function addCircle(svg: SVGElement, x: number, y: number, r: number, strokecolor: string, fillcolor: string) {
-	var rect: SVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-	rect.setAttribute('x', '' + (x - r));
-	rect.setAttribute('y', '' + (y - r));
-	rect.setAttribute('width', '' + (r * 2));
-	rect.setAttribute('height', '' + (r * 2));
-	rect.setAttribute('rx', '' + r);
-	rect.setAttribute('ry', '' + r);
-	rect.setAttribute("stroke", strokecolor);
-	rect.setAttribute("stroke-width", '1');
-	rect.setAttribute("fill", fillcolor);
-	svg.append(rect);
+    var rect: SVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', '' + (x - r));
+    rect.setAttribute('y', '' + (y - r));
+    rect.setAttribute('width', '' + (r * 2));
+    rect.setAttribute('height', '' + (r * 2));
+    rect.setAttribute('rx', '' + r);
+    rect.setAttribute('ry', '' + r);
+    rect.setAttribute("stroke", strokecolor);
+    rect.setAttribute("stroke-width", '1');
+    rect.setAttribute("fill", fillcolor);
+    svg.append(rect);
 }
 function addRect(svg: SVGElement, x: number, y: number, w: number, h: number, color: string) {
-	var rect: SVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-	rect.setAttribute('x', '' + x);
-	rect.setAttribute('y', '' + y);
-	rect.setAttribute('width', '' + w);
-	rect.setAttribute('height', '' + h);
-	rect.setAttribute("stroke-width", '0');
-	rect.setAttribute("fill", color);
-	svg.append(rect);
+    var rect: SVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', '' + x);
+    rect.setAttribute('y', '' + y);
+    rect.setAttribute('width', '' + w);
+    rect.setAttribute('height', '' + h);
+    rect.setAttribute("stroke-width", '0');
+    rect.setAttribute("fill", color);
+    svg.append(rect);
 }
 function clearSVGgroup(svgpane: Node) {
-	while (svgpane.firstChild) {
-		svgpane.removeChild(svgpane.firstChild);
-	}
+    while (svgpane.firstChild) {
+        svgpane.removeChild(svgpane.firstChild);
+    }
 }
 function init() {
 
-	levelA = (document.getElementById('levelA') as any) as SVGElement;
-	linesLevel = (document.getElementById('linesLevel') as any) as SVGElement;
-	dataBalls = window[dataName];
-	console.log(dataBalls);
-	datarows = readParseStat(dataBalls);
-	//dumpStatLeftRed(datarows);
+    levelA = (document.getElementById('levelA') as any) as SVGElement;
+    linesLevel = (document.getElementById('linesLevel') as any) as SVGElement;
+    dataBalls = window[dataName];
+    console.log(dataBalls);
+    datarows = readParseStat(dataBalls);
+    //dumpStatLeftRed(datarows);
 }
 function dumpStatLeftRed(datarows: BallsRow[]) {
-	console.log('dumpStatLeftRed', datarows);
-	let counts: number[] = [];
-	for (let rr = 0; rr <= rowLen; rr++) {
-		counts[rr] = 0;
-	}
+    console.log('dumpStatLeftRed', datarows);
+    let counts: number[] = [];
+    for (let rr = 0; rr <= rowLen; rr++) {
+        counts[rr] = 0;
+    }
 
-	for (let rr = 0; rr < datarows.length; rr++) {
-		let min = 9999;
-		for (let bb = 0; bb < datarows[rr].balls.length; bb++) {
-			if (min > datarows[rr].balls[bb]) {
-				min = datarows[rr].balls[bb];
-			}
-		}
-		counts[min]++;
-	}
-	let sm = 0;
-	for (let rr = 0; rr <= rowLen; rr++) {
-		sm = sm + counts[rr];
-		console.log(rr, counts[rr], ('' + (100 * counts[rr] / datarows.length) + '%'), ('' + (100 * sm / datarows.length) + '%'));
-	}
-	//console.log('mins',sm,counts);
+    for (let rr = 0; rr < datarows.length; rr++) {
+        let min = 9999;
+        for (let bb = 0; bb < datarows[rr].balls.length; bb++) {
+            if (min > datarows[rr].balls[bb]) {
+                min = datarows[rr].balls[bb];
+            }
+        }
+        counts[min]++;
+    }
+    let sm = 0;
+    for (let rr = 0; rr <= rowLen; rr++) {
+        sm = sm + counts[rr];
+        console.log(rr, counts[rr], ('' + (100 * counts[rr] / datarows.length) + '%'), ('' + (100 * sm / datarows.length) + '%'));
+    }
+    //console.log('mins',sm,counts);
 }
 
 function randomizedatarows() {
-	for (var ii = 0; ii < datarows.length; ii++) {
-		var row = datarows[ii];
-		for (var bb = 0; bb < ballsInRow; bb++) {
-			row.balls[bb] = Math.floor(Math.random() * rowLen);
-		}
-	}
+    for (var ii = 0; ii < datarows.length; ii++) {
+        var row = datarows[ii];
+        for (var bb = 0; bb < ballsInRow; bb++) {
+            row.balls[bb] = Math.floor(Math.random() * rowLen);
+        }
+    }
 }
 function clickClearLines() {
-	markLines = [];
-	drawLines();
+    markLines = [];
+    drawLines();
 }
 function clearNonManual() {
-	let newarr: { fromX: number, fromY: number, toX: number, toY: number, color: string, manual: boolean }[] = [];
-	for (let ii = 0; ii < markLines.length; ii++) {
-		if (markLines[ii].manual) {
-			newarr.push(markLines[ii]);
-		}
-	}
-	markLines = newarr;
+    let newarr: { fromX: number, fromY: number, toX: number, toY: number, color: string, manual: boolean }[] = [];
+    for (let ii = 0; ii < markLines.length; ii++) {
+        if (markLines[ii].manual) {
+            newarr.push(markLines[ii]);
+        }
+    }
+    markLines = newarr;
 }
 function clickFog(vnt) {
-	let xx = Math.round((vnt.offsetX - 0.5 * cellSize) / cellSize);
-	let yy = skipRowsCount + Math.round((vnt.offsetY - 0.5 * cellSize) / cellSize);
-	if (markX < 0) {
-		let exists: boolean = false;
-		for (let i = 0; i < markLines.length; i++) {
-			if ((xx == markLines[i].fromX && yy == markLines[i].fromY) || (xx == markLines[i].toX && yy == markLines[i].toY)) {
-				markLines.splice(i, 1);
-				exists = true;
-				break;
-			}
-		}
-		if (!exists) {
-			markX = xx;
-			markY = yy;
-		}
-	} else {
-		markLines.push({
-			fromX: xx, fromY: yy, toX: markX, toY: markY, color: '#ff0000ff', manual: true
-		});
-		markX = -1;
-		markY = -1;
-	}
-	let mark = (document.getElementById('lineMark') as any) as any;
-	mark.setAttribute('width', cellSize * 1.5);
-	mark.setAttribute('height', cellSize * 1.5);
-	mark.setAttribute('x', cellSize * markX - 0.25 * cellSize);
-	mark.setAttribute('y', cellSize * (markY - skipRowsCount) - 0.25 * cellSize);
-	drawLines();
+    let xx = Math.round((vnt.offsetX - 0.5 * cellSize) / cellSize);
+    let yy = skipRowsCount + Math.round((vnt.offsetY - 0.5 * cellSize) / cellSize);
+    if (markX < 0) {
+        let exists: boolean = false;
+        for (let i = 0; i < markLines.length; i++) {
+            if ((xx == markLines[i].fromX && yy == markLines[i].fromY) || (xx == markLines[i].toX && yy == markLines[i].toY)) {
+                markLines.splice(i, 1);
+                exists = true;
+                break;
+            }
+        }
+        if (!exists) {
+            markX = xx;
+            markY = yy;
+        }
+    } else {
+        markLines.push({
+            fromX: xx, fromY: yy, toX: markX, toY: markY, color: '#ff0000ff', manual: true
+        });
+        markX = -1;
+        markY = -1;
+    }
+    let mark = (document.getElementById('lineMark') as any) as any;
+    mark.setAttribute('width', cellSize * 1.5);
+    mark.setAttribute('height', cellSize * 1.5);
+    mark.setAttribute('x', cellSize * markX - 0.25 * cellSize);
+    mark.setAttribute('y', cellSize * (markY - skipRowsCount) - 0.25 * cellSize);
+    drawLines();
 }
 function drawLines() {
 
 
-	clearSVGgroup(linesLevel);
-	let strokeWidth = cellSize / 0.99;
-	for (let i = 0; i < markLines.length; i++) {
-		if (!markLines[i].manual) {
-			composeLine(linesLevel
-				, markLines[i].fromX * cellSize + 0.5 * cellSize
-				, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize
-				, markLines[i].toX * cellSize + 0.5 * cellSize
-				, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize
-				, strokeWidth //, cellSize / 0.99
-				, markLines[i].color);//'#00ff0066');
-		}
-	}
-	strokeWidth = cellSize / 2.99;
-	for (let i = 0; i < markLines.length; i++) {
-		if (markLines[i].manual) {
-			composeLine(linesLevel
-				, markLines[i].fromX * cellSize + 0.5 * cellSize
-				, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize
-				, markLines[i].toX * cellSize + 0.5 * cellSize
-				, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize
-				, strokeWidth //, cellSize / 0.99
-				, markLines[i].color);//'#00ff0066');
-		}
-	}
+    clearSVGgroup(linesLevel);
+    let strokeWidth = cellSize / 0.99;
+    for (let i = 0; i < markLines.length; i++) {
+        if (!markLines[i].manual) {
+            composeLine(linesLevel
+                , markLines[i].fromX * cellSize + 0.5 * cellSize
+                , (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize
+                , markLines[i].toX * cellSize + 0.5 * cellSize
+                , (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize
+                , strokeWidth //, cellSize / 0.99
+                , markLines[i].color);//'#00ff0066');
+        }
+    }
+    strokeWidth = cellSize / 2.99;
+    for (let i = 0; i < markLines.length; i++) {
+        if (markLines[i].manual) {
+            composeLine(linesLevel
+                , markLines[i].fromX * cellSize + 0.5 * cellSize
+                , (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize
+                , markLines[i].toX * cellSize + 0.5 * cellSize
+                , (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize
+                , strokeWidth //, cellSize / 0.99
+                , markLines[i].color);//'#00ff0066');
+        }
+    }
 }
 function drawStat3(svg: SVGElement, rows: BallsRow[]) {
-	drawLines();
-	addRect(svg, rowLen * cellSize + cellSize / 2, 0, rowLen * cellSize, cellSize, '#eee');
-	for (let rowNum = 0; rowNum < rowsVisibleCount; rowNum++) {
-		if (rows[rowNum]) {
-			addSmallText(svg, 2 * rowLen * cellSize + 2, topShift + (1 + rowNum) * cellSize - 2, rows[rowNum].key);
-			for (let colNum = 1; colNum <= rowLen; colNum++) {
-				if (ballExists(colNum, rows[rowNum])) {
-					let topy = topShift + 0.5 * cellSize + rowNum * cellSize;
-					let szz = cellSize / 5 - 0.5;
-					let clr = '#ff0000ff';
-					if (rowNum == 0) {
-						topy = topy - 1.5 * cellSize;
-						szz = cellSize / 3 - 0.5
-						clr = '#00ff00ff';
-					}
-					if (rowNum > 0 || showFirstRow) {
-						addCircle(svg
-							, colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize
-							, topy//topShift + 0.5 * cellSize + rowNum * cellSize
-							, szz, clr, clr);
-					}
-					if (rowNum > 0 || showFirstRow) {
-						addCircle(svg
-							, colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize
-							, topy//topShift + 0.5 * cellSize + rowNum * cellSize
-							, szz, clr, clr);
-					}
-				}
-			}
-		}
-	}
+    drawLines();
+    addRect(svg, rowLen * cellSize + cellSize / 2, 0, rowLen * cellSize, cellSize, '#eee');
+    for (let rowNum = 0; rowNum < rowsVisibleCount; rowNum++) {
+        if (rows[rowNum]) {
+            addSmallText(svg, 2 * rowLen * cellSize + 2, topShift + (1 + rowNum) * cellSize - 2, rows[rowNum].key);
+            for (let colNum = 1; colNum <= rowLen; colNum++) {
+                if (ballExists(colNum, rows[rowNum])) {
+                    let topy = topShift + 0.5 * cellSize + rowNum * cellSize;
+                    let szz = cellSize / 5 - 0.5;
+                    let clr = '#ff0000ff';
+                    if (rowNum == 0) {
+                        topy = topy - 1.5 * cellSize;
+                        szz = cellSize / 3 - 0.5
+                        clr = '#00ff00ff';
+                    }
+                    if (rowNum > 0 || showFirstRow) {
+                        addCircle(svg
+                            , colNum * cellSize - 0.5 * cellSize + 0 * rowLen * cellSize
+                            , topy//topShift + 0.5 * cellSize + rowNum * cellSize
+                            , szz, clr, clr);
+                    }
+                    if (rowNum > 0 || showFirstRow) {
+                        addCircle(svg
+                            , colNum * cellSize - 0.5 * cellSize + 1 * rowLen * cellSize
+                            , topy//topShift + 0.5 * cellSize + rowNum * cellSize
+                            , szz, clr, clr);
+                    }
+                }
+            }
+        }
+    }
 
-	for (let colNum = 1; colNum <= rowLen; colNum++) {
-		if (colNum % 10 == 0) {
-			addBigText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
-			addBigText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
-		} else {
-			addSmallText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
-			addSmallText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
-		}
-		composeLine(levelA
-			, colNum * cellSize - cellSize
-			, 0
-			, colNum * cellSize - cellSize
-			, topShift - cellSize
-			, cellSize / 20, '#0000ff66');
-		composeLine(levelA
-			, colNum * cellSize - cellSize + rowLen * cellSize
-			, 0
-			, colNum * cellSize - cellSize + rowLen * cellSize
-			, topShift - cellSize
-			, cellSize / 20, '#0000ff66');
-	}
+    for (let colNum = 1; colNum <= rowLen; colNum++) {
+        if (colNum % 10 == 0) {
+            addBigText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
+            addBigText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
+        } else {
+            addSmallText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
+            addSmallText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
+        }
+        composeLine(levelA
+            , colNum * cellSize - cellSize
+            , 0
+            , colNum * cellSize - cellSize
+            , topShift - cellSize
+            , cellSize / 20, '#0000ff66');
+        composeLine(levelA
+            , colNum * cellSize - cellSize + rowLen * cellSize
+            , 0
+            , colNum * cellSize - cellSize + rowLen * cellSize
+            , topShift - cellSize
+            , cellSize / 20, '#0000ff66');
+    }
 }
 function triadExists(ball: number, rowNum: number, dx1: number, dx2: number, rows: BallsRow[]): boolean {
-	return ballExists(ball, rows[rowNum]) && ballExists(ball + dx1, rows[rowNum + 1]) && ballExists(ball + dx2, rows[rowNum + 2]);
+    return ballExists(ball, rows[rowNum]) && ballExists(ball + dx1, rows[rowNum + 1]) && ballExists(ball + dx2, rows[rowNum + 2]);
 }
 function triadFills(ball: number, rowNum: number, dx1: number, dx2: number, rows: BallsRow[]): boolean {
-	return ballExists(ball + dx1, rows[rowNum + 1]) && ballExists(ball + dx2, rows[rowNum + 2]);
+    return ballExists(ball + dx1, rows[rowNum + 1]) && ballExists(ball + dx2, rows[rowNum + 2]);
 }
 function calcTriads(rowNum: number, dx1: number, dx2: number, rows: BallsRow[]): number {
-	let cnt = 0;
-	for (let ii = 0; ii < rowLen; ii++) {
-		if (triadExists(ii + 1, rowNum, dx1, dx2, rows)) {
-			cnt++;
-		}
-	}
-	return cnt;
+    let cnt = 0;
+    for (let ii = 0; ii < rowLen; ii++) {
+        if (triadExists(ii + 1, rowNum, dx1, dx2, rows)) {
+            cnt++;
+        }
+    }
+    return cnt;
 }
 function calcRowPatterns(rowNum: number, rows: BallsRow[]): number[] {
-	let cnts: number[] = [];
-	for (let dx1 = 0; dx1 < rowLen; dx1++) {
-		for (let dx2 = 0; dx2 < rowLen; dx2++) {
-			cnts.push(calcTriads(rowNum, dx1, dx2, rows));
-		}
-	}
-	return cnts;
+    let cnts: number[] = [];
+    for (let dx1 = 0; dx1 < rowLen; dx1++) {
+        for (let dx2 = 0; dx2 < rowLen; dx2++) {
+            cnts.push(calcTriads(rowNum, dx1, dx2, rows));
+        }
+    }
+    return cnts;
 }
 function calculateBallTriadChain(rowNum: number, rows: BallsRow[], counts: number[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] {
-	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = [];
-	for (let nn = 0; nn < rowLen; nn++) {
-		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number } = { ball: nn + 1, fills: [], summ: 0 };
-		resu.push(one);
-		for (let dx1 = 0; dx1 < rowLen; dx1++) {
-			for (let dx2 = 0; dx2 < rowLen; dx2++) {
-				if (triadFills(one.ball, rowNum, dx1, dx2, rows)) {
-					one.fills.push({ dx1: dx1, dx2: dx2 });
-					let cc = counts[dx1 * rowLen + dx2]
-					one.summ = one.summ + cc;
-				}
-			}
-		}
-	}
-	return resu;
+    let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = [];
+    for (let nn = 0; nn < rowLen; nn++) {
+        let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number } = { ball: nn + 1, fills: [], summ: 0 };
+        resu.push(one);
+        for (let dx1 = 0; dx1 < rowLen; dx1++) {
+            for (let dx2 = 0; dx2 < rowLen; dx2++) {
+                if (triadFills(one.ball, rowNum, dx1, dx2, rows)) {
+                    one.fills.push({ dx1: dx1, dx2: dx2 });
+                    let cc = counts[dx1 * rowLen + dx2]
+                    one.summ = one.summ + cc;
+                }
+            }
+        }
+    }
+    return resu;
 }
 function calculateBallFrequency(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
-	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
-	for (let nn = 0; nn < rowLen; nn++) {
-		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
-		resu.push(one);
-		for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
-			if (ballExists(nn + 1, rows[rr])) {
-				one.summ++;
-			}
-		}
-		one.logr = one.summ;
-	}
-	return resu;
+    let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
+    for (let nn = 0; nn < rowLen; nn++) {
+        let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
+        resu.push(one);
+        for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
+            if (ballExists(nn + 1, rows[rr])) {
+                one.summ++;
+            }
+        }
+        one.logr = one.summ;
+    }
+    return resu;
 }
 /*
 function calculateEmptyColumnDuration(rowNum: number, rows: BallsRow[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
@@ -416,60 +416,60 @@ function calculateEmptyColumnDuration(rowNum: number, rows: BallsRow[]): { ball:
 	return resu;
 }*/
 function calcEmptyLineDuration(shift: number, ball: number, from: number, rows: BallsRow[]) {
-	let row = from;
-	let count = 0;
-	let balColumn = ball;
-	while ((!ballExists(balColumn, rows[row])) && row + 2 < rows.length) {
-		count++;
-		balColumn = balColumn + shift;
-		row++;
-	}
-	return count;
+    let row = from;
+    let count = 0;
+    let balColumn = ball;
+    while ((!ballExists(balColumn, rows[row])) && row + 2 < rows.length) {
+        count++;
+        balColumn = balColumn + shift;
+        row++;
+    }
+    return count;
 }
 function dumpInfo2(id: string, text: string) {
-	//console.log(id, text);
-	var span: HTMLElement = (document.getElementById(id) as any) as HTMLElement;
-	span.innerText = text;
+    //console.log(id, text);
+    var span: HTMLElement = (document.getElementById(id) as any) as HTMLElement;
+    span.innerText = text;
 
 }
 function countInfo(inrows: BallsRow[]) {
-	let diff: number = 7;
-	console.log('countInfo', diff, inrows[0]);
+    let diff: number = 7;
+    console.log('countInfo', diff, inrows[0]);
 
-	let smm: { ball: number, sm: number, xst: string, sh: number }[] = [];
-	for (let ii = 0; ii < rowLen; ii++) {
-		let cc = 0;
-		for (let shift = -diff; shift <= diff; shift++) {
-			cc = cc + calcEmptyLineDuration(shift, ii + 1, 1, inrows);
-		}
-		let fl = '   ';
-		if (ballExists(ii + 1, inrows[0])) {
-			fl = ' * ';
-		}
-		//console.log(ii + 1, fl, cc);
-		//smm.push({ ball: ii + 1, sm: Math.round(cc/(ss+ss+1)), xst: fl ,sh:ss});
-		smm.push({ ball: ii + 1, sm: cc, xst: fl, sh: diff });
-	}
+    let smm: { ball: number, sm: number, xst: string, sh: number }[] = [];
+    for (let ii = 0; ii < rowLen; ii++) {
+        let cc = 0;
+        for (let shift = -diff; shift <= diff; shift++) {
+            cc = cc + calcEmptyLineDuration(shift, ii + 1, 1, inrows);
+        }
+        let fl = '   ';
+        if (ballExists(ii + 1, inrows[0])) {
+            fl = ' * ';
+        }
+        //console.log(ii + 1, fl, cc);
+        //smm.push({ ball: ii + 1, sm: Math.round(cc/(ss+ss+1)), xst: fl ,sh:ss});
+        smm.push({ ball: ii + 1, sm: cc, xst: fl, sh: diff });
+    }
 
-	for (let kk = 0; kk < smm.length; kk++) {
-		let len = Math.round(5 * smm[kk].sm / (diff + diff + 1));
-		let fl = '  ';
-		if (showFirstRow) {
-			if (ballExists(smm[kk].ball, inrows[0])) {
-				fl = '* ';
-			}
-		}
-		for (let nn = 0; nn < len; nn++) {
-			fl = fl + '-';
-		}
-		fl = fl + ' ' + len + ':' + smm[kk].ball;
-		console.log(fl);
-	}
+    for (let kk = 0; kk < smm.length; kk++) {
+        let len = Math.round(5 * smm[kk].sm / (diff + diff + 1));
+        let fl = '  ';
+        if (showFirstRow) {
+            if (ballExists(smm[kk].ball, inrows[0])) {
+                fl = '* ';
+            }
+        }
+        for (let nn = 0; nn < len; nn++) {
+            fl = fl + '-';
+        }
+        fl = fl + ' ' + len + ':' + smm[kk].ball;
+        console.log(fl);
+    }
 
-	smm.sort((a, b) => {
-		return a.sm - b.sm;
-	});
-	console.log(smm);
+    smm.sort((a, b) => {
+        return a.sm - b.sm;
+    });
+    console.log(smm);
 
 	/*for (let shift = -3; shift <= 3; shift++) {
 		console.log(shift,':'
@@ -488,541 +488,529 @@ function countInfo(inrows: BallsRow[]) {
 }
 function dumpRowFills(inrows: BallsRow[]) {
 
-	if (highLightMode == 1) {
-		dumpRowFillsColor(inrows, '#009900cc', 0);
+    if (highLightMode == 1) {
+        dumpRowFillsColor(inrows, '#009900cc', 0);
 
-		dumpRowWaitColor(inrows, '#00000033', 0);
-	} else {
-		dumpRowWaitColor(inrows, '#009900cc', 0);
-		dumpRowFillsColor(inrows, '#00000033', 0);
-	}
+        dumpRowWaitColor(inrows, '#00000033', 0);
+    } else {
+        dumpRowWaitColor(inrows, '#009900cc', 0);
+        dumpRowFillsColor(inrows, '#00000033', 0);
+    }
 }
 
 function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
-	let lbl = 'grey';
-	greyStat = [];
-	for (let rr = 0; rr < rowsVisibleCount; rr++) {
-		let arr: { ball: number, summ: number }[] = [];
-		for (let nn = 0; nn < rowLen; nn++) {
-			let one: { ball: number, summ: number } = { ball: nn + 1, summ: 0 };
-			arr.push(one);
-			for (let shift = -diffWide; shift <= diffWide; shift++) {
-				one.summ = one.summ + calcEmptyLineDuration(shift, nn + 1, rr + 1, rows);
-			}
-		}
-		makeWader(arr);
-		let mx = 0;
-		let min = 98765;
-		//console.log(rr,arr);
-		for (let bb = 0; bb < rowLen; bb++) {
-			if (mx < arr[bb].summ) mx = arr[bb].summ;
-			if (min > arr[bb].summ) min = arr[bb].summ;
-		}
-		let hr = (mx - min) / (topShift / cellSize - 2);
-		let prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
+    let lbl = 'grey';
+    greyStat = [];
+    for (let rr = 0; rr < rowsVisibleCount; rr++) {
+        let arr: { ball: number, summ: number }[] = [];
+        for (let nn = 0; nn < rowLen; nn++) {
+            let one: { ball: number, summ: number } = { ball: nn + 1, summ: 0 };
+            arr.push(one);
+            for (let shift = -diffWide; shift <= diffWide; shift++) {
+                one.summ = one.summ + calcEmptyLineDuration(shift, nn + 1, rr + 1, rows);
+            }
+        }
+        makeWader(arr);
+        let mx = 0;
+        let min = 98765;
+        //console.log(rr,arr);
+        for (let bb = 0; bb < rowLen; bb++) {
+            if (mx < arr[bb].summ) mx = arr[bb].summ;
+            if (min > arr[bb].summ) min = arr[bb].summ;
+        }
+        let hr = (mx - min) / (topShift / cellSize - 2);
+        let prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
 
 
-		let first = arr.map((x) => x);
-		first.sort((aa, bb) => { return bb.summ - aa.summ; });
-		let begin = -1;
-		let end = -1;
-		let begin2 = -1;
-		let end2 = -1;
-		for (let kk = 0; kk < first.length; kk++) {
-			if (ballExists(first[kk].ball, rows[rr])) {
-				if (showFirstRow || rr > 0) {
-					lbl = lbl + ' ●' + first[kk].ball;
-					end = kk;
-					if (begin == -1) {
-						begin = kk;
-					}
-				} else {
-					lbl = lbl + ' ' + first[kk].ball;
-				}
-			} else {
-				lbl = lbl + ' ' + first[kk].ball;
-			}
-		}
-		for (let kk = 0; kk < first.length; kk++) {
-			if (ballExists(first[kk].ball, rows[rr])) {
-				if (showFirstRow || rr > 0) {
-					if (kk < end) end2 = kk;
-					if (begin2 == -1 && kk > begin) {
-						begin2 = kk;
-					}
-				}
-			}
-		}
-		lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
-		if (rr == 0) {
+        let first = arr.map((x) => x);
+        first.sort((aa, bb) => { return bb.summ - aa.summ; });
+        let begin = -1;
+        let end = -1;
+        let begin2 = -1;
+        let end2 = -1;
+        for (let kk = 0; kk < first.length; kk++) {
+            if (ballExists(first[kk].ball, rows[rr])) {
+                if (showFirstRow || rr > 0) {
+                    lbl = lbl + ' ●' + first[kk].ball;
+                    end = kk;
+                    if (begin == -1) {
+                        begin = kk;
+                    }
+                } else {
+                    lbl = lbl + ' ' + first[kk].ball;
+                }
+            } else {
+                lbl = lbl + ' ' + first[kk].ball;
+            }
+        }
+        for (let kk = 0; kk < first.length; kk++) {
+            if (ballExists(first[kk].ball, rows[rr])) {
+                if (showFirstRow || rr > 0) {
+                    if (kk < end) end2 = kk;
+                    if (begin2 == -1 && kk > begin) {
+                        begin2 = kk;
+                    }
+                }
+            }
+        }
+        lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+        if (rr == 0) {
 
-			//console.log(lbl);
-			dumpInfo2('statgrey', lbl);
-		}
+            //console.log(lbl);
+            dumpInfo2('statgrey', lbl);
+        }
 
-		let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
-		let xxx = 2 * rowLen / 2;
-		//if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
-		if (showFirstRow || rr > 0) {
-			let grey2 = '#33333333';
-			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: grey2, manual: false });
-			markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: grey2, manual: false });
-			let grey = '#333333ff';
-			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: grey, manual: false });
-			markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: grey, manual: false });
-			//console.log('grey');
-			greyStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
-		}
+        let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
+        let xxx = 2 * rowLen / 2;
+        //if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
+        if (showFirstRow || rr > 0) {
+            let grey2 = '#33333333';
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: grey2, manual: false });
+            markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: grey2, manual: false });
+            let grey = '#333333ff';
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: grey, manual: false });
+            markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: grey, manual: false });
+            //console.log('grey');
+            greyStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
+        }
 
-		if (rr == 0) {
-			for (let bb = 0; bb < rowLen; bb++) {
-				let hh = (mx - min - (arr[bb].summ - min)) / hr;
-				let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
-				let toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
-				markLines.push({
-					fromX: bb + shiftX - 1
-					, fromY: fromY //skipRowsCount + 0 + prehh
-					, toX: bb + shiftX
-					, toY: toY //skipRowsCount + hh - 0
-					, color: color, manual: false
-				});
-				markLines.push({
-					fromX: bb + shiftX - 1 + rowLen
-					, fromY: fromY //skipRowsCount + 0 + prehh
-					, toX: bb + shiftX + rowLen
-					, toY: toY //skipRowsCount + hh - 0
-					, color: color, manual: false
-				});
-				prehh = hh;
-			}
-			//console.log(arr);
-		}
-	}
-	//console.log('greyStat', greyStat);
+        if (rr == 0) {
+            for (let bb = 0; bb < rowLen; bb++) {
+                let hh = (mx - min - (arr[bb].summ - min)) / hr;
+                let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
+                let toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
+                markLines.push({
+                    fromX: bb + shiftX - 1
+                    , fromY: fromY //skipRowsCount + 0 + prehh
+                    , toX: bb + shiftX
+                    , toY: toY //skipRowsCount + hh - 0
+                    , color: color, manual: false
+                });
+                markLines.push({
+                    fromX: bb + shiftX - 1 + rowLen
+                    , fromY: fromY //skipRowsCount + 0 + prehh
+                    , toX: bb + shiftX + rowLen
+                    , toY: toY //skipRowsCount + hh - 0
+                    , color: color, manual: false
+                });
+                prehh = hh;
+            }
+            //console.log(arr);
+        }
+    }
+    //console.log('greyStat', greyStat);
 }
 function makeWader(ballFills: { ball: number, summ: number }[]) {
-	if (wideRange) {
-		let mx = 0;
-		let min = 987654321;
-		for (let bb = 0; bb < rowLen; bb++) {
-			if (mx < ballFills[bb].summ) { mx = ballFills[bb].summ; }
-			if (min > ballFills[bb].summ) { min = ballFills[bb].summ; }
-		}
-		let middle = (mx - min) / 2 + min;
+    if (wideRange) {
+        let mx = 0;
+        let min = 987654321;
+        for (let bb = 0; bb < rowLen; bb++) {
+            if (mx < ballFills[bb].summ) { mx = ballFills[bb].summ; }
+            if (min > ballFills[bb].summ) { min = ballFills[bb].summ; }
+        }
+        let middle = (mx - min) / 2 + min;
 
-		let sorted = ballFills.map((x) => x);
-		sorted.sort((aa, bb) => { return bb.summ - aa.summ; });
-		let center = sorted[Math.round((sorted.length - 1) / 2)].summ - min;
+        let sorted = ballFills.map((x) => x);
+        sorted.sort((aa, bb) => { return bb.summ - aa.summ; });
+        let center = sorted[Math.round((sorted.length - 1) / 2)].summ - min;
 
-		//console.log(min,center, middle, mx, sorted);
+        //console.log(min,center, middle, mx, sorted);
 
-		for (let bb = 0; bb < rowLen; bb++) {
-			ballFills[bb].summ = ballFills[bb].summ - center;
-			let sig = ballFills[bb].summ > 0 ? 1 : -1;
-			ballFills[bb].summ = sig * ballFills[bb].summ * ballFills[bb].summ;
-		}
+        for (let bb = 0; bb < rowLen; bb++) {
+            ballFills[bb].summ = ballFills[bb].summ - center;
+            let sig = ballFills[bb].summ > 0 ? 1 : -1;
+            ballFills[bb].summ = sig * ballFills[bb].summ * ballFills[bb].summ;
+        }
 
-	}
+    }
 }
 function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
-	let lbl = 'green';
-	//console.log(lbl);
-	greenStat = [];
-	for (let rr = 0; rr < rowsVisibleCount; rr++) {
-		let precounts: number[] = calcRowPatterns(rr + 1, rows);
-		let ballFills: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = calculateBallTriadChain(rr, rows, precounts);
-		makeWader(ballFills);
-		let mx = 0;
-		let min = 987654321;
-		for (let bb = 0; bb < rowLen; bb++) {
-			if (mx < ballFills[bb].summ) { mx = ballFills[bb].summ; }
-			if (min > ballFills[bb].summ) { min = ballFills[bb].summ; }
-		}
-		let hr = (mx - min) / (topShift / cellSize - 2);
-		let prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
-		//console.log(ballFills);
+    let lbl = 'green';
+    //console.log(lbl);
+    greenStat = [];
+    for (let rr = 0; rr < rowsVisibleCount; rr++) {
+        let precounts: number[] = calcRowPatterns(rr + 1, rows);
+        let ballFills: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = calculateBallTriadChain(rr, rows, precounts);
+        makeWader(ballFills);
+        let mx = 0;
+        let min = 987654321;
+        for (let bb = 0; bb < rowLen; bb++) {
+            if (mx < ballFills[bb].summ) { mx = ballFills[bb].summ; }
+            if (min > ballFills[bb].summ) { min = ballFills[bb].summ; }
+        }
+        let hr = (mx - min) / (topShift / cellSize - 2);
+        let prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
+        //console.log(ballFills);
 
-		let first = ballFills.map((x) => x);
-		first.sort((aa, bb) => { return bb.summ - aa.summ; });
-		let begin = -1;
-		let end = -1;
-		let begin2 = -1;
-		let end2 = -1;
-		for (let kk = 0; kk < first.length; kk++) {
-			if (ballExists(first[kk].ball, rows[rr])) {
-				if (showFirstRow || rr > 0) {
-					lbl = lbl + ' ●' + first[kk].ball;
-					end = kk;
-					if (begin == -1) {
-						begin = kk;
-					}
-				} else {
-					lbl = lbl + ' ' + first[kk].ball;
-				}
-			} else {
-				lbl = lbl + ' ' + first[kk].ball;
-			}
-		}
-		for (let kk = 0; kk < first.length; kk++) {
-			if (ballExists(first[kk].ball, rows[rr])) {
-				if (showFirstRow || rr > 0) {
-					if (kk < end) end2 = kk;
-					if (begin2 == -1 && kk > begin) {
-						begin2 = kk;
-					}
-				}
-			}
-		}
-		lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
-		//console.log(lbl);
-		if (rr == 0) {
-			dumpInfo2('statgreen', lbl);
-		}
-
-
-		let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
-		let xxx = 1 * rowLen / 2;
-		//if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
-		if (showFirstRow || rr > 0) {
-			let green2 = '#00990033';
-			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: green2, manual: false });
-			markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: green2, manual: false });
-			let green = '#009900ff';
-			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: green, manual: false });
-			markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: green, manual: false });
-			//console.log(rr,'green',begin,(rowLen - end - 1));
-			greenStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
-		}
+        let first = ballFills.map((x) => x);
+        first.sort((aa, bb) => { return bb.summ - aa.summ; });
+        let begin = -1;
+        let end = -1;
+        let begin2 = -1;
+        let end2 = -1;
+        for (let kk = 0; kk < first.length; kk++) {
+            if (ballExists(first[kk].ball, rows[rr])) {
+                if (showFirstRow || rr > 0) {
+                    lbl = lbl + ' ●' + first[kk].ball;
+                    end = kk;
+                    if (begin == -1) {
+                        begin = kk;
+                    }
+                } else {
+                    lbl = lbl + ' ' + first[kk].ball;
+                }
+            } else {
+                lbl = lbl + ' ' + first[kk].ball;
+            }
+        }
+        for (let kk = 0; kk < first.length; kk++) {
+            if (ballExists(first[kk].ball, rows[rr])) {
+                if (showFirstRow || rr > 0) {
+                    if (kk < end) end2 = kk;
+                    if (begin2 == -1 && kk > begin) {
+                        begin2 = kk;
+                    }
+                }
+            }
+        }
+        lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+        //console.log(lbl);
+        if (rr == 0) {
+            dumpInfo2('statgreen', lbl);
+        }
 
 
-		if (rr == 0) {
+        let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
+        let xxx = 1 * rowLen / 2;
+        //if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
+        if (showFirstRow || rr > 0) {
+            let green2 = '#00990033';
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: green2, manual: false });
+            markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: green2, manual: false });
+            let green = '#009900ff';
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: green, manual: false });
+            markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: green, manual: false });
+            //console.log(rr,'green',begin,(rowLen - end - 1));
+            greenStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
+        }
 
-			for (let bb = 0; bb < rowLen; bb++) {
-				let hh = (mx - min - (ballFills[bb].summ - min)) / hr;
-				let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
-				let toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
-				markLines.push({
-					fromX: bb + shiftX - 1
-					, fromY: fromY //skipRowsCount + 0 + prehh
-					, toX: bb + shiftX
-					, toY: toY //skipRowsCount + hh - 0
-					, color: color, manual: false
-				});
-				markLines.push({
-					fromX: bb + shiftX - 1 + rowLen
-					, fromY: fromY //skipRowsCount + 0 + prehh
-					, toX: bb + shiftX + rowLen
-					, toY: toY //skipRowsCount + hh - 0
-					, color: color, manual: false
-				});
-				prehh = hh;
-			}
-		}
 
-	}
-	//console.log('greenStat', greenStat);
+        if (rr == 0) {
+
+            for (let bb = 0; bb < rowLen; bb++) {
+                let hh = (mx - min - (ballFills[bb].summ - min)) / hr;
+                let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
+                let toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
+                markLines.push({
+                    fromX: bb + shiftX - 1
+                    , fromY: fromY //skipRowsCount + 0 + prehh
+                    , toX: bb + shiftX
+                    , toY: toY //skipRowsCount + hh - 0
+                    , color: color, manual: false
+                });
+                markLines.push({
+                    fromX: bb + shiftX - 1 + rowLen
+                    , fromY: fromY //skipRowsCount + 0 + prehh
+                    , toX: bb + shiftX + rowLen
+                    , toY: toY //skipRowsCount + hh - 0
+                    , color: color, manual: false
+                });
+                prehh = hh;
+            }
+        }
+
+    }
+    //console.log('greenStat', greenStat);
 }
 function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 
-	//console.log('blue');
-	let ratioPre = 0.66;//0.99;
-	//console.log('dumpTriads mode', highLightMode);
-	blueStat = [];
-	redStat = [];
-	for (let rr = 0; rr < rowsVisibleCount; rr++) {
-		if (rr > rows.length - 6) break;
-		let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[];
-		if (highLightMode == 1) {
-			calcs = calculateBallFrequency(rr, rows);
-		} else {
-			let precounts = calcRowPatterns(rr + 1, rows);
-			calcs = calculateBallTriadChain(rr, rows, precounts);
-		}
-		makeWader(calcs);
-		let minCnt = 99999;
-		let mxCount = 0;
-		for (let ii = 0; ii < rowLen; ii++) {
-			if (calcs[ii].summ > mxCount) mxCount = calcs[ii].summ;
-			if (calcs[ii].summ < minCnt) minCnt = calcs[ii].summ;
-		}
-		let df = mxCount - minCnt;
+    //console.log('blue');
+    let ratioPre = 0.66;//0.99;
+    //console.log('dumpTriads mode', highLightMode);
+    blueStat = [];
+    redStat = [];
+    for (let rr = 0; rr < rowsVisibleCount; rr++) {
+        if (rr > rows.length - 6) break;
+        let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[];
+        if (highLightMode == 1) {
+            calcs = calculateBallFrequency(rr, rows);
+        } else {
+            let precounts = calcRowPatterns(rr + 1, rows);
+            calcs = calculateBallTriadChain(rr, rows, precounts);
+        }
+        makeWader(calcs);
+        let minCnt = 99999;
+        let mxCount = 0;
+        for (let ii = 0; ii < rowLen; ii++) {
+            if (calcs[ii].summ > mxCount) mxCount = calcs[ii].summ;
+            if (calcs[ii].summ < minCnt) minCnt = calcs[ii].summ;
+        }
+        let df = mxCount - minCnt;
 
-		let first = calcs.map((x) => x);
-		let lbl = "";
-		first.sort((aa, bb) => { return aa.summ - bb.summ; });
-		lbl = 'blue';
-		let begin = -1;
-		let end = -1;
-		let begin2 = -1;
-		let end2 = -1;
-		for (let kk = 0; kk < first.length; kk++) {
-			if (ballExists(first[kk].ball, rows[rr])) {
-				if (showFirstRow || rr > 0) {
-					lbl = lbl + ' ●' + first[kk].ball;
-					end = kk;
-					if (begin == -1) {
-						begin = kk;
-					}
-				} else {
-					lbl = lbl + ' ' + first[kk].ball;
-				}
-			} else {
-				lbl = lbl + ' ' + first[kk].ball;
-			}
-		}
-		for (let kk = 0; kk < first.length; kk++) {
-			if (ballExists(first[kk].ball, rows[rr])) {
-				if (showFirstRow || rr > 0) {
-					if (kk < end) end2 = kk;
-					if (begin2 == -1 && kk > begin) {
-						begin2 = kk;
-					}
-				}
-			}
-		}
-		lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
-		if (rr == 0) {
-			//console.log(lbl);
-			dumpInfo2('statblue', lbl);
+        let first = calcs.map((x) => x);
+        let lbl = "";
+        first.sort((aa, bb) => { return aa.summ - bb.summ; });
+        lbl = 'blue';
+        let begin = -1;
+        let end = -1;
+        let begin2 = -1;
+        let end2 = -1;
+        for (let kk = 0; kk < first.length; kk++) {
+            if (ballExists(first[kk].ball, rows[rr])) {
+                if (showFirstRow || rr > 0) {
+                    lbl = lbl + ' ●' + first[kk].ball;
+                    end = kk;
+                    if (begin == -1) {
+                        begin = kk;
+                    }
+                } else {
+                    lbl = lbl + ' ' + first[kk].ball;
+                }
+            } else {
+                lbl = lbl + ' ' + first[kk].ball;
+            }
+        }
+        for (let kk = 0; kk < first.length; kk++) {
+            if (ballExists(first[kk].ball, rows[rr])) {
+                if (showFirstRow || rr > 0) {
+                    if (kk < end) end2 = kk;
+                    if (begin2 == -1 && kk > begin) {
+                        begin2 = kk;
+                    }
+                }
+            }
+        }
+        lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+        if (rr == 0) {
+            //console.log(lbl);
+            dumpInfo2('statblue', lbl);
 
-		}
+        }
 		/*let rowLab = '' + begin + ' -' + (rowLen - end - 1);
 		addSmallText(svg, 2 * rowLen * cellSize + 2 + cellSize * 10
 			, topShift + (1 + rr) * cellSize - 2
 			, rowLab);*/
-		let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
-		let xxx = 0 * rowLen / 2;
-		//if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
+        let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
+        let xxx = 0 * rowLen / 2;
+        //if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
 
-		if (showFirstRow || rr > 0) {
-			let blue2 = '#3333ff33';
-			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: blue2, manual: false });
-			markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue2, manual: false });
-			let blue = '#3333ffff';
-			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: blue, manual: false });
-			markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue, manual: false });
-			blueStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
-		}
-		if (showFirstRow || rr > 0) {
-			begin = rowLen + 1;
-			end = 0;
-			let begin2 = rowLen + 1;
-			let end2 = 0;
-			for (let kk = 0; kk < rows[rr].balls.length; kk++) {
-				if (rows[rr].balls[kk] < begin) begin = rows[rr].balls[kk];
-				if (rows[rr].balls[kk] > end) end = rows[rr].balls[kk];
-			}
-			for (let kk = 0; kk < rows[rr].balls.length; kk++) {
-				if (rows[rr].balls[kk] < begin2 && rows[rr].balls[kk] > begin) begin2 = rows[rr].balls[kk];
-				if (rows[rr].balls[kk] > end2 && rows[rr].balls[kk] < end) end2 = rows[rr].balls[kk];
-			}
-			begin--;
-			end--;
-			begin2--;
-			end2--;
-			yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
-			xxx = 3 * rowLen / 2;
-			let red = '#ff3333ff';
-			let red2 = '#ff333333';
-			//if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
-			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: red2, manual: false });
-			markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red2, manual: false });
-			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: red, manual: false });
-			markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red, manual: false });
-			//console.log('red');
-			redStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
-		}
-
-
+        if (showFirstRow || rr > 0) {
+            let blue2 = '#3333ff33';
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: blue2, manual: false });
+            markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue2, manual: false });
+            let blue = '#3333ffff';
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: blue, manual: false });
+            markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue, manual: false });
+            blueStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
+        }
+        if (showFirstRow || rr > 0) {
+            begin = rowLen + 1;
+            end = 0;
+            let begin2 = rowLen + 1;
+            let end2 = 0;
+            for (let kk = 0; kk < rows[rr].balls.length; kk++) {
+                if (rows[rr].balls[kk] < begin) begin = rows[rr].balls[kk];
+                if (rows[rr].balls[kk] > end) end = rows[rr].balls[kk];
+            }
+            for (let kk = 0; kk < rows[rr].balls.length; kk++) {
+                if (rows[rr].balls[kk] < begin2 && rows[rr].balls[kk] > begin) begin2 = rows[rr].balls[kk];
+                if (rows[rr].balls[kk] > end2 && rows[rr].balls[kk] < end) end2 = rows[rr].balls[kk];
+            }
+            begin--;
+            end--;
+            begin2--;
+            end2--;
+            yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
+            xxx = 3 * rowLen / 2;
+            let red = '#ff3333ff';
+            let red2 = '#ff333333';
+            //if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: red2, manual: false });
+            markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red2, manual: false });
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: red, manual: false });
+            markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red, manual: false });
+            //console.log('red');
+            redStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
+        }
 
 
-		for (let ii = 0; ii < rowLen; ii++) {
-			let idx = ratioPre * (calcs[ii].summ - minCnt) / df;
-			let color = 'rgba(0,0,255,' + idx + ')';
-			addRect(svg
-				, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize
-				, topShift + 0 * cellSize + rr * cellSize
-				, cellSize
-				, cellSize //- 0.1
-				, color);
-			addRect(svg
-				, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize
-				, topShift + 0 * cellSize + rr * cellSize
-				, cellSize
-				, cellSize //- 0.1
-				, color);
-		}
-	}
-	//console.log('blueStat', blueStat);
-	//console.log('redStat', redStat);
-	dumpColorStat();
+
+
+        for (let ii = 0; ii < rowLen; ii++) {
+            let idx = ratioPre * (calcs[ii].summ - minCnt) / df;
+            let color = 'rgba(0,0,255,' + idx + ')';
+            addRect(svg
+                , ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize
+                , topShift + 0 * cellSize + rr * cellSize
+                , cellSize
+                , cellSize //- 0.1
+                , color);
+            addRect(svg
+                , ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize
+                , topShift + 0 * cellSize + rr * cellSize
+                , cellSize
+                , cellSize //- 0.1
+                , color);
+        }
+    }
+    //console.log('blueStat', blueStat);
+    //console.log('redStat', redStat);
+    dumpColorStat();
 }
 function roundDown(num: number, base: number): number {
-	return Math.floor(num / base) * base;
+    return Math.floor(num / base) * base;
 }
 function countColorStat(kk: number, sz: number): number {
-	let countS = 0;
-	if (blueStat[kk].left > sz) countS++;
-	if (blueStat[kk].right > sz) countS++;
-	if (greenStat[kk].left > sz) countS++;
-	if (greenStat[kk].right > sz) countS++;
-	if (greyStat[kk].left > sz) countS++;
-	if (greyStat[kk].right > sz) countS++;
-	if (redStat[kk].left > sz) countS++;
-	if (redStat[kk].right > sz) countS++;
-	return countS;
+    let countS = 0;
+    if (blueStat[kk].left > sz) countS++;
+    if (blueStat[kk].right > sz) countS++;
+    if (greenStat[kk].left > sz) countS++;
+    if (greenStat[kk].right > sz) countS++;
+    if (greyStat[kk].left > sz) countS++;
+    if (greyStat[kk].right > sz) countS++;
+    if (redStat[kk].left > sz) countS++;
+    if (redStat[kk].right > sz) countS++;
+    return countS;
 }
 function dumpColorStat() {
-	//console.log('stat');
-	for (let kk = 0; kk < redStat.length; kk++) {
-		let sum = 0;
-		if (showFirstRow || kk > 0) {
-			/*sum = roundDown(redStat[kk].left, 3) + roundDown(redStat[kk].right, 3)
-				+ roundDown(blueStat[kk].left, 3) + roundDown(blueStat[kk].right, 3)
-				+ roundDown(greyStat[kk].left, 3) + roundDown(greyStat[kk].right, 3)
-				+ roundDown(greenStat[kk].left, 3) + roundDown(greenStat[kk].right, 3)
-				;*/
-			sum = redStat[kk].left + redStat[kk].right
-				+ blueStat[kk].left + blueStat[kk].right
-				+ greyStat[kk].left + greyStat[kk].right
-				+ greenStat[kk].left + greenStat[kk].right;
-		}
-		let countSmall = countColorStat(kk, 9);
-		let countbg = countColorStat(kk, 15);
-		//let mark = '    ';
-		//if (sum > rowLen * 0.8) {
-		if (countSmall > 3 && countbg > 1) {
-			//mark = ' => ';
-			//}
-			/*console.log(kk, ('' + mark + sum)
-				, 'b', roundDown(blueStat[kk].left, 3), roundDown(blueStat[kk].right, 3)
-				, 'gn', roundDown(greenStat[kk].left, 3), roundDown(greenStat[kk].right, 3)
-				, 'gy', roundDown(greyStat[kk].left, 3), roundDown(greyStat[kk].right, 3)
-				, 'r', roundDown(redStat[kk].left, 3), roundDown(redStat[kk].right, 3)
-			);*/
-		}
-		addSmallText(levelA, 2 * rowLen * cellSize + cellSize * 0.5, cellSize * (rowsVisibleCount + 22.8 + 0.66 * kk + 0), '' + kk + ': ' + sum);
-		let violet = '#ff33ffff';
-		let xxx = 2 * rowLen + 2.5;
-		markLines.push({
-			fromX: xxx
-			, fromY: rowsVisibleCount + 22.8 + 0.66 * kk + skipRowsCount - 0.8
-			, toX: xxx + sum / 3
-			, toY: rowsVisibleCount + 22.8 + 0.66 * kk + skipRowsCount - 0.8
-			, color: violet
-			, manual: false
-		});
-	}
+    //console.log('stat');
+    let skip = 1;
+    if (showFirstRow) {
+        skip = 0;
+    }
+    for (let kk = 0; kk < redStat.length; kk++) {
+        let sum = 0;
+        //if (showFirstRow || kk > 0) {
+        sum = redStat[kk].left + redStat[kk].right
+            + blueStat[kk].left + blueStat[kk].right
+            + greyStat[kk].left + greyStat[kk].right
+            + greenStat[kk].left + greenStat[kk].right;
+        //}
+        addSmallText(levelA
+            , 2 * rowLen * cellSize + cellSize * 0.5
+            , cellSize * (rowsVisibleCount + 22.8 + 0.66 * (skip + kk) + 0)
+            , '' + (skip + kk) + ': ' + sum);
+        let purple = '#ff33ffff';
+        let xxx = 2 * rowLen + 2.5;
+        markLines.push({
+            fromX: xxx
+            , fromY: rowsVisibleCount + 22.8 + 0.66 * (skip + kk) + skipRowsCount - 0.8
+            , toX: xxx + sum / 3
+            , toY: rowsVisibleCount + 22.8 + 0.66 * (skip + kk) + skipRowsCount - 0.8
+            , color: purple
+            , manual: false
+        });
+    }
 }
 function fillCells() {
-	clearSVGgroup(levelA);
-	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount + calcLen);
-	dumpTriads(levelA, slicedrows);
-	dumpInfo(skipRowsCount);
+    clearSVGgroup(levelA);
+    let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount + calcLen);
+    dumpTriads(levelA, slicedrows);
+    dumpInfo(skipRowsCount);
 
-	drawStat3(levelA, slicedrows);
+    drawStat3(levelA, slicedrows);
 
 
-	//drawLines();
-	//countInfo(slicedrows);
+    //drawLines();
+    //countInfo(slicedrows);
 
-	var msgp: HTMLElement = (document.getElementById('stepsize') as any) as HTMLElement;
-	msgp.innerText = '' + reduceRatio;
-	msgp = (document.getElementById('calcLen') as any) as HTMLElement;
-	msgp.innerText = '' + calcLen;
-	msgp = (document.getElementById('calcWide') as any) as HTMLElement;
-	msgp.innerText = '' + diffWide;
+    var msgp: HTMLElement = (document.getElementById('stepsize') as any) as HTMLElement;
+    msgp.innerText = '' + reduceRatio;
+    msgp = (document.getElementById('calcLen') as any) as HTMLElement;
+    msgp.innerText = '' + calcLen;
+    msgp = (document.getElementById('calcWide') as any) as HTMLElement;
+    msgp.innerText = '' + diffWide;
 
 }
 function clickHop() {
-	skipRowsCount = Math.round(Math.random() * (datarows.length - reduceRatio * rowsVisibleCount));
-	addTails();
+    skipRowsCount = Math.round(Math.random() * (datarows.length - reduceRatio * rowsVisibleCount));
+    addTails();
 }
 function toggleFirst() {
-	showFirstRow = !showFirstRow;
-	//fillCells();
-	addTails();
+    showFirstRow = !showFirstRow;
+    //fillCells();
+    addTails();
 }
 function toggleWide() {
-	wideRange = !wideRange;
-	//fillCells();
-	addTails();
+    wideRange = !wideRange;
+    //fillCells();
+    addTails();
 }
 
 function clickGoSkip(nn: number) {
-	if (skipRowsCount + nn * reduceRatio >= 0) {
-		if (skipRowsCount + nn * reduceRatio < datarows.length - rowsVisibleCount * reduceRatio) {
-			skipRowsCount = skipRowsCount + nn * reduceRatio;
-			for (let i = 0; i < markLines.length; i++) {
-				markLines[i].fromY = markLines[i].fromY + nn * (reduceRatio - 1);
-				markLines[i].toY = markLines[i].toY + nn * (reduceRatio - 1);
-			}
-			addTails();
-		}
-	}
+    if (skipRowsCount + nn * reduceRatio >= 0) {
+        if (skipRowsCount + nn * reduceRatio < datarows.length - rowsVisibleCount * reduceRatio) {
+            skipRowsCount = skipRowsCount + nn * reduceRatio;
+            for (let i = 0; i < markLines.length; i++) {
+                markLines[i].fromY = markLines[i].fromY + nn * (reduceRatio - 1);
+                markLines[i].toY = markLines[i].toY + nn * (reduceRatio - 1);
+            }
+            addTails();
+        }
+    }
 }
 function toggleRatioPre() {
-	if (highLightMode == 0) {
-		highLightMode = 1;
-	} else {
-		highLightMode = 0;
-	}
-	addTails();
+    if (highLightMode == 0) {
+        highLightMode = 1;
+    } else {
+        highLightMode = 0;
+    }
+    addTails();
 }
 function moreReduceRatio() {
-	reduceRatio = reduceRatio + 1;
-	addTails();
+    reduceRatio = reduceRatio + 1;
+    addTails();
 }
 function lessReduceRatio() {
-	reduceRatio = reduceRatio - 1;
-	if (reduceRatio < 1) reduceRatio = 1;
-	addTails();
+    reduceRatio = reduceRatio - 1;
+    if (reduceRatio < 1) reduceRatio = 1;
+    addTails();
 }
 function moreCalcLen() {
-	calcLen = calcLen + 1;
-	addTails();
+    calcLen = calcLen + 1;
+    addTails();
 }
 function lessCalcLen() {
-	calcLen = calcLen - 1;
-	if (calcLen < 3) calcLen = 3;
-	addTails();
+    calcLen = calcLen - 1;
+    if (calcLen < 3) calcLen = 3;
+    addTails();
 }
 
 
 function moreWide() {
-	diffWide = diffWide + 1;
-	addTails();
+    diffWide = diffWide + 1;
+    addTails();
 }
 function lessWide() {
-	diffWide = diffWide - 1;
-	if (diffWide < 0) diffWide = 0;
-	addTails();
+    diffWide = diffWide - 1;
+    if (diffWide < 0) diffWide = 0;
+    addTails();
 }
 
 function sobstvennoe(balls: number[]): number {
-	let pre: number[] = balls;
-	let nxt: number[] = [];
-	while (1 == 1) {
-		nxt = [];
-		for (let bb = 1; bb < pre.length; bb++) {
-			nxt.push(Math.abs(pre[bb - 1] - pre[bb]));
-		}
-		if (nxt.length < 2) break;
-		pre = [];
-		for (let bb = 0; bb < nxt.length; bb++) {
-			pre[bb] = nxt[bb];
-		}
+    let pre: number[] = balls;
+    let nxt: number[] = [];
+    while (1 == 1) {
+        nxt = [];
+        for (let bb = 1; bb < pre.length; bb++) {
+            nxt.push(Math.abs(pre[bb - 1] - pre[bb]));
+        }
+        if (nxt.length < 2) break;
+        pre = [];
+        for (let bb = 0; bb < nxt.length; bb++) {
+            pre[bb] = nxt[bb];
+        }
 
-	}
-	let r0 = nxt[0];
-	if (r0 < 2) r0 = -(pre[1] + pre[0]);
-	return r0;
+    }
+    let r0 = nxt[0];
+    if (r0 < 2) r0 = -(pre[1] + pre[0]);
+    return r0;
 }
 function addTails() {
-	clearNonManual();
-	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
-	dumpRowFills(slicedrows);
-	fillCells();
+    clearNonManual();
+    let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
+    dumpRowFills(slicedrows);
+    fillCells();
 }
 
 

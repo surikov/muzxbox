@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.93 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.94 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -833,42 +833,27 @@ function countColorStat(kk, sz) {
 }
 function dumpColorStat() {
     //console.log('stat');
+    var skip = 1;
+    if (showFirstRow) {
+        skip = 0;
+    }
     for (var kk = 0; kk < redStat.length; kk++) {
         var sum = 0;
-        if (showFirstRow || kk > 0) {
-            /*sum = roundDown(redStat[kk].left, 3) + roundDown(redStat[kk].right, 3)
-                + roundDown(blueStat[kk].left, 3) + roundDown(blueStat[kk].right, 3)
-                + roundDown(greyStat[kk].left, 3) + roundDown(greyStat[kk].right, 3)
-                + roundDown(greenStat[kk].left, 3) + roundDown(greenStat[kk].right, 3)
-                ;*/
-            sum = redStat[kk].left + redStat[kk].right
-                + blueStat[kk].left + blueStat[kk].right
-                + greyStat[kk].left + greyStat[kk].right
-                + greenStat[kk].left + greenStat[kk].right;
-        }
-        var countSmall = countColorStat(kk, 9);
-        var countbg = countColorStat(kk, 15);
-        //let mark = '    ';
-        //if (sum > rowLen * 0.8) {
-        if (countSmall > 3 && countbg > 1) {
-            //mark = ' => ';
-            //}
-            /*console.log(kk, ('' + mark + sum)
-                , 'b', roundDown(blueStat[kk].left, 3), roundDown(blueStat[kk].right, 3)
-                , 'gn', roundDown(greenStat[kk].left, 3), roundDown(greenStat[kk].right, 3)
-                , 'gy', roundDown(greyStat[kk].left, 3), roundDown(greyStat[kk].right, 3)
-                , 'r', roundDown(redStat[kk].left, 3), roundDown(redStat[kk].right, 3)
-            );*/
-        }
-        addSmallText(levelA, 2 * rowLen * cellSize + cellSize * 0.5, cellSize * (rowsVisibleCount + 22.8 + 0.66 * kk + 0), '' + kk + ': ' + sum);
-        var violet = '#ff33ffff';
+        //if (showFirstRow || kk > 0) {
+        sum = redStat[kk].left + redStat[kk].right
+            + blueStat[kk].left + blueStat[kk].right
+            + greyStat[kk].left + greyStat[kk].right
+            + greenStat[kk].left + greenStat[kk].right;
+        //}
+        addSmallText(levelA, 2 * rowLen * cellSize + cellSize * 0.5, cellSize * (rowsVisibleCount + 22.8 + 0.66 * (skip + kk) + 0), '' + (skip + kk) + ': ' + sum);
+        var purple = '#ff33ffff';
         var xxx = 2 * rowLen + 2.5;
         markLines.push({
             fromX: xxx,
-            fromY: rowsVisibleCount + 22.8 + 0.66 * kk + skipRowsCount - 0.8,
+            fromY: rowsVisibleCount + 22.8 + 0.66 * (skip + kk) + skipRowsCount - 0.8,
             toX: xxx + sum / 3,
-            toY: rowsVisibleCount + 22.8 + 0.66 * kk + skipRowsCount - 0.8,
-            color: violet,
+            toY: rowsVisibleCount + 22.8 + 0.66 * (skip + kk) + skipRowsCount - 0.8,
+            color: purple,
             manual: false
         });
     }
