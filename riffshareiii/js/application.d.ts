@@ -210,7 +210,8 @@ declare class LeftPanel {
     createLeftPanel(): TileLayerDefinition[];
     reFillLeftPanel(data: MZXBX_Project): void;
 }
-declare class SamplerRows {
+declare class SamplerBar {
+    constructor(data: MZXBX_Project, barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number);
 }
 declare class BarOctave {
     constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project);
@@ -224,7 +225,6 @@ declare class OctaveContent {
 declare class MixerBar {
     octaves: BarOctave[];
     zoomLevel: number;
-    samplerRows: SamplerRows;
     constructor(barIdx: number, left: number, ww: number, zoomLevel: number, gridZoomBarAnchor: TileAnchor, tracksZoomBarAnchor: TileAnchor, firstZoomBarAnchor: TileAnchor, data: MZXBX_Project);
     addOctaveGridSteps(barIdx: number, data: MZXBX_Project, barLeft: number, width: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
 }
@@ -234,7 +234,6 @@ declare class MixerUI {
     firstLayers: TileLayerDefinition;
     levels: MixerZoomLevel[];
     fillerAnchor: TileAnchor;
-    samplerUI: SamplerRows;
     reFillMixerUI(data: MZXBX_Project): void;
     createMixerLayers(): TileLayerDefinition[];
     reFillTracksRatio(data: MZXBX_Project): void;

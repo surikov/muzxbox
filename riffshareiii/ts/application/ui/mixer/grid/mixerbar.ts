@@ -5,7 +5,7 @@ class MixerBar {
 	//singleBarOtherTracksAnchor: TileAnchor;
 	//singleBarFirstAnchor: TileAnchor;
 	zoomLevel: number;
-	samplerRows: SamplerRows;
+	//samplerRows: SamplerRows;
 
 	constructor(
 		barIdx: number
@@ -78,10 +78,24 @@ class MixerBar {
 						}*/
 			//this.octaves.push(bo);
 
+
+
 		}
 
 		if (zoomLevel < 6) {
 			this.addOctaveGridSteps(barIdx, data, left, ww, gridZoomBarAnchor, zoomLevel);
+		}
+
+		if (zoomLevel < 6) {
+			for (let pp = 0; pp < data.percussions.length; pp++) {
+				let drum: MZXBX_PercussionTrack = data.percussions[pp];
+				if (drum) {
+					let measure: MZXBX_PercussionMeasure = drum.measures[barIdx];
+					if (measure) {
+						new SamplerBar(data, barIdx, pp, zoomLevel, firstZoomBarAnchor, left);
+					}
+				}
+			}
 		}
 	}
 	addOctaveGridSteps(barIdx: number,
@@ -115,7 +129,7 @@ class MixerBar {
 				x: barLeft + width
 				, y: mixm.samplerTop()
 				, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25 //zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0
-				, h: data.percussions.length*mixm.notePathHeight
+				, h: data.percussions.length * mixm.notePathHeight
 				, css: 'barRightBorder'
 			};
 			barOctaveAnchor.content.push(barSamRightBorder);
@@ -146,7 +160,7 @@ class MixerBar {
 						x: xx
 						, y: mixm.samplerTop()
 						, w: line.ratio * zoomInfo.minZoom / 2
-						, h: data.percussions.length*mixm.notePathHeight
+						, h: data.percussions.length * mixm.notePathHeight
 						, css: 'timeMeasureMark'
 					};
 					barOctaveAnchor.content.push(sammark);

@@ -3,3 +3,8 @@
 	fill-opacity:25%;
     stroke: none;
 }
+.samplerDrumDot{
+	fill: var(--color-text);
+	fill-opacity:75%;
+    stroke: none;
+}

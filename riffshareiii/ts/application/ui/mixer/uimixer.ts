@@ -7,7 +7,7 @@ class MixerUI {
 	firstLayers: TileLayerDefinition;
 	levels: MixerZoomLevel[] = [];
 	fillerAnchor: TileAnchor;
-	samplerUI: SamplerRows;
+	//samplerUI: SamplerRows;
 
 	reFillMixerUI(data: MZXBX_Project) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
