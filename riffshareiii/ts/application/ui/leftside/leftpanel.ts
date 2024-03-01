@@ -42,7 +42,7 @@ class LeftPanel {
 		}
 	}*/
 	reFillLeftPanel(data: MZXBX_Project) {
-		console.log('reFillLeftPanel');
+		//console.log('reFillLeftPanel');
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		for (let zz = 0; zz < this.leftZoomAnchors.length; zz++) {
 			//this.leftZoomAnchors[zz].yy = mixm.gridTop();

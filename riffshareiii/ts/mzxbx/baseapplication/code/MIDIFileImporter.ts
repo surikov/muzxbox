@@ -746,17 +746,7 @@ class MidiParser {
 			}
 			txt = rr;
 		}
-		let at = txt;
 
-		/*
-				var rr: string = '';
-				for (var ii = 0; ii < arr.length; ii++) {
-					rr = rr + String.fromCharCode(arr[ii]);
-				}
-				let win1251decoder = new TextDecoder("windows-1251");
-				let bytes = new Uint8Array(arr);
-				txt = win1251decoder.decode(bytes);
-				*/
 		txt = txt.replace("\\n", " ");
 		txt = txt.replace("\\r", " ");
 		txt = txt.replace("\\t", " ");
@@ -774,9 +764,7 @@ class MidiParser {
 		txt = txt.replace("  ", " ");
 		txt = txt.replace("  ", " ");
 		txt = txt.replace("  ", " ");
-		//txt=txt.trim();
-		//console.log('toText',  txt);
-		//console.log('toText',  at,txt);
+
 		return txt;
 	}
 	findChordBefore(when: number, track: MIDIFileTrack, channel: number): TrackChord | null {
@@ -882,11 +870,13 @@ class MidiParser {
 	simplifyAllPaths() {
 		for (var t = 0; t < this.parsedTracks.length; t++) {
 			var track: MIDIFileTrack = this.parsedTracks[t];
+			console.log('simplify',track.trackTitle);
 			for (var ch = 0; ch < track.chords.length; ch++) {
 				var chord: TrackChord = track.chords[ch];
 				for (var n = 0; n < chord.notes.length; n++) {
 					var note: TrackNote = chord.notes[n];
 					if (note.points.length > 5) {
+						console.log('simplify',note.points.length,note);
 						var xx = 0;
 						var pnts: XYp[] = [];
 						for (var p = 0; p < note.points.length; p++) {
@@ -1022,29 +1012,6 @@ class MidiParser {
 									});
 								}
 							} else {
-								/*if (evnt.subtype == this.EVENT_MIDI_PITCH_BEND) {
-									var pitch = evnt.param1 ? evnt.param1 : 0;
-									var slide = ((evnt.param2 ? evnt.param2 : 0) - 64) / 6;
-									var when = evnt.playTimeMs ? evnt.playTimeMs : 0;
-									var chord: TrackChord | null = this.findChordBefore(when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
-									if (chord) {
-										for (var i = 0; i < chord.notes.length; i++) {
-											var note: TrackNote = chord.notes[i];
-											if (!(note.closed)) {
-												var duration = 0;
-												for (var k = 0; k < note.points.length - 1; k++) {
-													duration = duration + note.points[k].pointDuration;
-												}
-												note.points[note.points.length - 1].pointDuration = when - chord.when - duration;
-												var firstpitch: number = note.points[0].pitch + slide;
-												var point: NotePitch = {
-													pointDuration: -1
-													, pitch: firstpitch
-												};
-												note.points.push(point);
-											}
-										}
-									}*/
 								if (evnt.subtype == this.EVENT_MIDI_PITCH_BEND) {
 									//this.addSlide(evnt, song, pitchBendRange[events[i].channel]);
 									var when = evnt.playTimeMs ? evnt.playTimeMs : 0;
@@ -1066,104 +1033,40 @@ class MidiParser {
 													, pitch: firstpitch
 												};
 												note.points.push(point);
+												/*if(note.points.length>1){
+													console.log('bend',note);
+												}*/
 											}
 										}
 									}
 
-									/*
-									//var pitch = evnt.param1 ? evnt.param1 : 0;
-									var nn1: number = evnt.param1 ? evnt.param1 : 0;
-									var nn2: number = evnt.param2 ? evnt.param2 : 0;
-									nn1 = nn1 & 0b01111111;
-									nn2 = nn2 & 0b01111111;
-									nn2 = nn2 << 7;
-									var nn14: number = nn2 | nn1;
-									nn14 = (nn14 - 0x2000) / 1000;
-
-
-									var slide = ((evnt.param2 ? evnt.param2 : 0) - 64) / 6;
-									var b14 = evnt.param2 ? evnt.param2 : 0;
-									b14 <<= 7;
-									b14 |= evnt.param1 ? evnt.param1 : 0;
-									b14 = (b14 - 0x2000) / 1000;
-
-									//console.log('EVENT_MIDI_PITCH_BEND', evnt.param1, evnt.param2, ':', nn14, b14, '/', slide, evnt);
-									var when = evnt.playTimeMs ? evnt.playTimeMs : 0;
-									var chord: TrackChord | null = this.findChordBefore(when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
-									if (chord) {
-										for (var i = 0; i < chord.notes.length; i++) {
-											var note: TrackNote = chord.notes[i];
-											if (!(note.closed)) {
-												var duration = 0;
-												for (var k = 0; k < note.points.length - 1; k++) {
-													duration = duration + note.points[k].pointDuration;
-												}
-												note.points[note.points.length - 1].pointDuration = when - chord.when - duration;
-												var firstpitch: number = note.points[0].pitch + nn14;
-												//var firstpitch: number = note.points[0].pitch + b14;
-												var point: NotePitch = {
-													pointDuration: -1
-													, pitch: firstpitch
-												};
-												note.points.push(point);
-											}
-										}
-									}
-								    
-									*/
 								} else {
 									if (evnt.subtype == this.EVENT_MIDI_CONTROLLER) {
 
-
-										/*
-										if (evnt.subtype == this.EVENT_MIDI_CONTROLLER && evnt.param1 == this.controller_coarseVolume) {
-											var v = evnt.param2 ? evnt.param2 / 127 : 0;
-											let point = { ms: evnt.playTimeMs, value: v, channel: evnt.midiChannel ? evnt.midiChannel : 0, track: t };
-											singleParsedTrack.trackVolumePoints.push(point);
-											//if(point.channel==9){
-											//    console.log('trackVolumePoints',singleParsedTrack.title, point);
-											//}
-										} else {
-											if (evnt.subtype == this.EVENT_MIDI_CONTROLLER
-												&& (evnt.param1 == this.controller_coarseDataEntrySlider
-													|| evnt.param1 == this.controller_fineDataEntrySlider
-													|| evnt.param1 == this.controller_coarseRPN
-													|| evnt.param1 == this.controller_fineRPN
-												)
-											) {
-												console.log('EVENT_MIDI_CONTROLLER', evnt.param1, evnt.param2, evnt);
-											}
-										}
-										*/
 										if (evnt.param1 == this.controller_coarseVolume) {
 											var v = evnt.param2 ? evnt.param2 / 127 : 0;
 											let point = { ms: evnt.playTimeMs, value: v, channel: evnt.midiChannel ? evnt.midiChannel : 0, track: t };
 											singleParsedTrack.trackVolumePoints.push(point);
 										} else {
 											if (
-												/*(expectedPitchBendRangeMessageNumber == 1 && evnt.param1 == 0x65 && evnt.param2 == 0x00) ||
-												(expectedPitchBendRangeMessageNumber == 2 && evnt.param1 == 0x64 && evnt.param2 == 0x00) ||
-												(expectedPitchBendRangeMessageNumber == 3 && evnt.param1 == 0x06) ||
-												(expectedPitchBendRangeMessageNumber == 4 && evnt.param1 == 0x26)*/
+
 												(expectedPitchBendRangeMessageNumber == 1 && evnt.param1 == this.controller_coarseRPN && evnt.param2 == 0x00) ||
 												(expectedPitchBendRangeMessageNumber == 2 && evnt.param1 == this.controller_fineRPN && evnt.param2 == 0x00) ||
 												(expectedPitchBendRangeMessageNumber == 3 && evnt.param1 == this.controller_coarseDataEntrySlider) ||
 												(expectedPitchBendRangeMessageNumber == 4 && evnt.param1 == this.controller_fineDataEntrySlider)
 											) {
 												if (expectedPitchBendRangeMessageNumber > 1 && evnt.midiChannel != expectedPitchBendRangeChannel) {
-													//throw Error('Unexpected channel number in non-first pitch-bend RANGE (SENSITIVITY) message. MIDI file might be corrupt.');
 													console.log('Unexpected channel number in non-first pitch-bend RANGE (SENSITIVITY) message. MIDI file might be corrupt.');
 												}
 												expectedPitchBendRangeChannel = evnt.midiChannel;
 												let idx: number = evnt.midiChannel ? evnt.midiChannel : 0;
 												if (expectedPitchBendRangeMessageNumber == 3) {
 													pitchBendRange[idx] = evnt.param2; // in semitones
-													//console.log('pitchBendRange', pitchBendRange);
 												}
 												if (expectedPitchBendRangeMessageNumber == 4) {
 													let pp = evnt.param2 ? evnt.param2 : 0;
 													pitchBendRange[idx] = pitchBendRange[idx] + pp / 100; // convert cents to semitones, add to semitones set in the previous MIDI message
-													//console.log('pitchBendRange', pitchBendRange);
+
 												}
 												expectedPitchBendRangeMessageNumber++;
 												if (expectedPitchBendRangeMessageNumber == 5) {
@@ -1209,11 +1112,9 @@ class MidiParser {
 						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: 'Copyright: ' + (evnt.text ? evnt.text : "") });
 					}
 					if (evnt.subtype == this.EVENT_META_TRACK_NAME) {
-						//singleParsedTrack.title = this.toText(evnt.data ? evnt.data : []);
 						singleParsedTrack.trackTitle = evnt.text ? evnt.text : '';
 					}
 					if (evnt.subtype == this.EVENT_META_INSTRUMENT_NAME) {
-						//singleParsedTrack.instrument = this.toText(evnt.data ? evnt.data : []);
 						singleParsedTrack.instrumentName = evnt.text ? evnt.text : '';
 					}
 					if (evnt.subtype == this.EVENT_META_LYRICS) {
@@ -1236,8 +1137,6 @@ class MidiParser {
 						this.header.keyFlatSharp = key;//+sharp-flat
 						this.header.keyMajMin = evnt.scale ? evnt.scale : 0;//0-maj, 1 min
 
-						//console.log('EVENT_META_KEY_SIGNATURE',this.header.keyFlatSharp,this.header.keyMajMin);
-
 						var signature = 'C';
 						if (this.header.keyFlatSharp >= 0) {
 							if (this.header.keyMajMin < 1) {
@@ -1258,7 +1157,6 @@ class MidiParser {
 						this.header.tempoBPM = evnt.tempoBPM ? evnt.tempoBPM : 120;
 					}
 					if (evnt.subtype == this.EVENT_META_TIME_SIGNATURE) {
-						//console.log('EVENT_META_TIME_SIGNATURE', evnt.param1, '2"',evnt.param2, 'metronome',evnt.param3, evnt.param4);
 						this.header.meterCount = evnt.param1 ? evnt.param1 : 4;
 						var dvsn: number = evnt.param2 ? evnt.param2 : 2;
 						if (dvsn == 1) this.header.meterDivision = 2
@@ -1451,7 +1349,6 @@ class MidiParser {
 			}
 		}
 		trackChannel.push(it);
-		//console.log('create',it,'from',parsedtrack);
 		return it;
 	}
 	dump(): MZXBX_Schedule {
@@ -1504,13 +1401,6 @@ class MidiParser {
 				let chanTrack = this.findOrCreateTrack(miditrack, i, newchord.channel, tracksChannels);
 				chanTrack.track.songchords.push(newchord);
 			}
-			//for (let i = 0; i < trackChannel.length; i++) {
-			//if (trackChannel[i].trackNum == i) {
-			//trackChannel[i].track.title = miditrack.title ? miditrack.title : '';
-			//trackChannel[i].track.volumes = miditrack.volumes;
-			//trackChannel[i].track.instrument = miditrack.instrument ? miditrack.instrument : ''
-			//}
-			//}
 		}
 		for (let tt = 0; tt < tracksChannels.length; tt++) {
 			let trackChan = tracksChannels[tt];
@@ -1542,22 +1432,7 @@ class MidiParser {
 		for (let mt = 0; mt < midiSongData.miditracks.length; mt++) {
 			let miditrack = midiSongData.miditracks[mt];
 			let midinum = 1 + Math.round(miditrack.program);
-			//if (midinum < 1) midinum = 1;
-			//if (midinum > 128) midinum = 128;
-			//let set: MZXBX_Channel[] = [];
-			/*let channel: MZXBX_Channel = {
-				id: 'channel' + mt// + ': ' + miditrack.title
-				, comment: miditrack.title
-				, filters: []
-				, performer: {
-					id: 'channel' + mt + 'performer'
-					, kind: 'waf_performer_1_test'
-					, properties: ''+midinum
-				}
-			};
-			if(mt==9){
-				channel.performer.kind='drums_performer_1_test';
-			}*/
+
 			for (let ch = 0; ch < miditrack.songchords.length; ch++) {
 				let chord = miditrack.songchords[ch];
 				for (let nn = 0; nn < chord.notes.length; nn++) {
@@ -1579,7 +1454,7 @@ class MidiParser {
 					};
 					item.slides.push({ duration: note.points[0].durationms / 1000, delta: 0 });
 					if (miditrack.channelNum == 9) {
-						//item.slides.push({ duration: note.points[0].durationms / 1000, delta: 0 });
+						//
 					} else {
 						if (note.points.length > 1) {
 							for (let pp = 0; pp < note.points.length - 1; pp++) {
@@ -1592,10 +1467,8 @@ class MidiParser {
 								duration: note.points[note.points.length - 1].durationms / 1000
 								, delta: note.points[note.points.length - 1].pitch - item.pitch
 							});
-							//console.log(note, item);
-						} /*else {
-							item.slides.push({ duration: note.points[0].durationms / 1000, delta: 0 });
-						}*/
+							//console.log('item',item.slides);
+						} 
 					}
 					if (note.points[0].midipoint) {
 						if (note.points[0].midipoint.volume) {
@@ -1621,12 +1494,6 @@ class MidiParser {
 							}
 						}
 					}
-					/*if (note.points.length > 1) {
-						console.log(note);
-
-					} else {
-						item.slides.push({ duration: note.points[0].durationms / 1000, delta: 0 });
-					}*/
 					for (let ii = 0; ii <= timeIndex; ii++) {
 						if (!(schedule.series[ii])) {
 							schedule.series[ii] = { duration: 1, items: [], states: [] };
@@ -1703,10 +1570,7 @@ class MidiParser {
 				}
 			}
 
-			//schedule.channels.push(channel);
 		}
-		//console.log(volumeCashe);
-		//console.log('schedule', schedule);
 		return schedule;//midiSongData;
 	}
 	findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): MZXBX_Metre {
@@ -1714,21 +1578,15 @@ class MidiParser {
 			count: midiSongData.meter.count
 			, part: midiSongData.meter.division
 		};
-		//let preBPM = this.findLastChange(midiSongData, beforeMs).bpm;
 		let midimeter: { track: number, ms: number, count: number, division: number } = { track: 0, ms: 0, count: 4, division: 4 };
 		for (let mi = 0; mi < midiSongData.meters.length; mi++) {
-			//if (midiSongData.meters[mi].ms > beforeMs + 1){//barIdx * 3) {
 			if (midiSongData.meters[mi].ms > beforeMs + 1 + barIdx * 3) {
-				//console.log();
 				break;
 			}
 			midimeter = midiSongData.meters[mi];
-			//metre.count = midiSongData.meters[mi].count;
-			//metre.part = midiSongData.meters[mi].division;
 		}
 		metre.count = midimeter.count;
 		metre.part = midimeter.division;
-		//console.log(midimeter);
 		return metre;
 	}
 	findLastChange(midiSongData: MIDISongData, beforeMs: number): { track: number, ms: number, resolution: number, bpm: number } {
@@ -1791,15 +1649,9 @@ class MidiParser {
 		while (fromMs < midiSongData.duration) {
 			let measure: ImportMeasure = this.createMeasure(midiSongData, fromMs, timeline.length);
 			fromMs = fromMs + measure.durationMs;
-			/*
-						let ms2 = 0;
-						let metreMath = new MZXBX_MetreMath();
-						for (let ii = 0; ii < timeline.length; ii++) {
-							ms2 = ms2 + 1000 * metreMath.set({ count: timeline[ii].metre.count, part: timeline[ii].metre.part }).duration(timeline[ii].tempo);
-						}*/
 
 			if (count != measure.metre.count || part != measure.metre.part || bpm != measure.tempo) {
-				//console.log(timeline.length, measure.startMs, measure.tempo, '' + measure.metre.count + '/' + measure.metre.part);
+
 				count = measure.metre.count;
 				part = measure.metre.part;
 				bpm = measure.tempo;
@@ -1878,15 +1730,9 @@ class MidiParser {
 			}
 		}
 
-		//let metreMath = new MZXBX_MetreMath();
-
-
 		let newtimeline: MZXBX_SongMeasure[] = this.createTimeLine(midiSongData);
 
-		console.log('midiSongData', midiSongData
-			//, 1000 * metreMath.set(curMeter).duration(132)
-			//, 1000 * metreMath.set(curMeter).duration(134)
-		);
+		
 
 		let project: MZXBX_Project = {
 			title: title + ' ' + comment
@@ -1902,11 +1748,8 @@ class MidiParser {
 		}
 		for (let ii = 0; ii < midiSongData.lyrics.length; ii++) {
 			let textpoint = midiSongData.lyrics[ii];
-			//let measure=MZXBX_SongMeasure
 			let pnt = findMeasureSkipByTime(textpoint.ms / 1000, project.timeline);
 			if (pnt) {
-				//console.log(textpoint.ms, pnt.idx, pnt.skip.count, pnt.skip.part, textpoint.txt);
-				//project.comments[pnt.idx].texts.push({ skip: { count: pnt.skip.count, part: pnt.skip.part }, text: textpoint.txt });
 				this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt);
 			}
 		}
@@ -1928,7 +1771,7 @@ class MidiParser {
 	}
 
 	addLyricsPoints(commentPoint: MZXBX_CommentMeasure, skip: MZXBX_Metre, txt: string) {
-		//console.log(txt);
+
 		txt = txt.replace(/(\r)/g, '~');
 		txt = txt.replace(/\\r/g, '~');
 		txt = txt.replace(/(\n)/g, '~');
@@ -1966,12 +1809,6 @@ class MidiParser {
 		return Math.round(nn * rr);
 	}
 	stripDuration(what: MZXBX_MetreMath): MZXBX_MetreMath {
-		/*if (what.less({ count: 1, part: 16 })) {
-			what = what.strip(32);
-		} else {
-			what = what.strip(16);
-		}*/
-		//what = what.strip(32);
 		return what;
 	}
 	createProjectTrack(timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_MusicTrack {
@@ -1981,13 +1818,11 @@ class MidiParser {
 			, filters: []
 			, performer: { id: '', data: '' }
 		};
-		//let currentMeasureStart = 0;
 		let mm = new MZXBX_MetreMath();
 		for (let tt = 0; tt < timeline.length; tt++) {
 			let projectMeasure: MZXBX_TrackMeasure = { chords: [] };
 			projectTrack.measures.push(projectMeasure);
 			let nextMeasure = timeline[tt];
-			//let measureDurationMs = 1000.0 * mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
 			for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
 				let midiChord = midiTrack.songchords[ii];
 				if (
@@ -1995,7 +1830,6 @@ class MidiParser {
 					&& this.numratio(midiChord.when) < (nextMeasure as any).startMs + (nextMeasure as any).durationMs //this.numratio(currentMeasureStart + measureDurationMs) - 33
 				) {
 					let trackChord: MZXBX_Chord | null = null;
-					//let skip = mm.calculate((midiChord.when - currentMeasureStart) / 1000.0, nextMeasure.tempo).strip(32);
 					let skip = mm.calculate((midiChord.when - (nextMeasure as any).startMs) / 1000.0, nextMeasure.tempo).strip(32);
 					if (skip.count < 0) {
 						skip.count = 0;
@@ -2030,11 +1864,13 @@ class MidiParser {
 								trackNote.slides.push(curSlide);
 							}
 							trackChord.notes.push(trackNote);
+							/*if (trackNote.slides.length > 1) {
+								console.log(projectTrack.title, trackNote);
+							}*/
 						}
 					}
 				}
 			}
-			//currentMeasureStart = currentMeasureStart + measureDurationMs;
 		}
 		return projectTrack;
 	}
@@ -2071,10 +1907,6 @@ class MidiParser {
 		}
 		return projectDrums;
 	}
-	/*createNextMeasure(currentTimeMs:number,midiSongData:MIDISongData): MZXBX_SongMeasure {
-		let nextMeasure: MZXBX_SongMeasure = { tempo: 120, metre: { count: 4, part: 4 } };
-		return nextMeasure;
-	}*/
 }
 function findMeasureSkipByTime(time: number, measures: MZXBX_SongMeasure[]): null | { idx: number, skip: MZXBX_Metre } {
 	let curTime = 0;

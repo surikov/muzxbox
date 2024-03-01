@@ -1,5 +1,5 @@
 class OctaveContent {
-	
+
 	constructor(barIdx: number
 		, octaveIdx: number
 		, left: number, top: number, width: number, height: number
@@ -11,11 +11,11 @@ class OctaveContent {
 			this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, data, zoomLevel);
 			if (zoomLevel < 7) {
 				this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, data);
-				
+
 			}
 		}
 	}
-	
+
 	addUpperNotes(barIdx: number, octaveIdx: number
 		, left: number, top: number, width: number, height: number
 		, barOctaveAnchor: TileAnchor, data: MZXBX_Project
@@ -61,13 +61,17 @@ class OctaveContent {
 				if (note.pitch >= from && note.pitch < to) {
 					let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
 					let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
-					for (let ss = 0; ss < note.slides.length; ss++) {
+					let slidearr = note.slides;
+					/*if (slidearr.length > 1) {
+						console.log(track.title, barIdx, slidearr);
+					}*/
+					for (let ss = 0; ss < slidearr.length; ss++) {
 						let x2 = x1
 							+ MZMM()
-								.set(note.slides[ss].duration)
+								.set(slidearr[ss].duration)
 								.duration(data.timeline[barIdx].tempo)
 							* mixm.widthDurationRatio;
-						let y2 = y1 + note.slides[ss].delta * mixm.notePathHeight;
+						let y2 = y1 + slidearr[ss].delta * mixm.notePathHeight;
 						let rx1 = x1 + mixm.notePathHeight / 2;
 						let rx2 = x2 - mixm.notePathHeight / 2;
 						if (rx2 - rx1 < 0.00001) {
@@ -84,11 +88,14 @@ class OctaveContent {
 							, css: css
 						};
 						barOctaveAnchor.content.push(line);
+						/*if (slidearr.length > 1) {
+							console.log(line);
+						}*/
 						if (addMoreInfo) {
 							let txt = '' + (barIdx + 1)
 								+ ':' + chord.skip.count + '/' + chord.skip.part
 								+ '(' + note.pitch
-								+ '-' + note.slides[0].duration.count + '/' + note.slides[0].duration.part
+								+ '-' + slidearr[0].duration.count + '/' + slidearr[0].duration.part
 								+ ')';
 							let info: TileText = { x: x1, y: y1 + 0.25, text: txt, css: 'timeBarNum025' };
 							barOctaveAnchor.content.push(info);

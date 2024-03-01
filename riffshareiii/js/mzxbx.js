@@ -1324,7 +1324,6 @@ class MidiParser {
             }
             txt = rr;
         }
-        let at = txt;
         txt = txt.replace("\\n", " ");
         txt = txt.replace("\\r", " ");
         txt = txt.replace("\\t", " ");
@@ -1449,11 +1448,13 @@ class MidiParser {
     simplifyAllPaths() {
         for (var t = 0; t < this.parsedTracks.length; t++) {
             var track = this.parsedTracks[t];
+            console.log('simplify', track.trackTitle);
             for (var ch = 0; ch < track.chords.length; ch++) {
                 var chord = track.chords[ch];
                 for (var n = 0; n < chord.notes.length; n++) {
                     var note = chord.notes[n];
                     if (note.points.length > 5) {
+                        console.log('simplify', note.points.length, note);
                         var xx = 0;
                         var pnts = [];
                         for (var p = 0; p < note.points.length; p++) {
@@ -2274,7 +2275,6 @@ class MidiParser {
             }
         }
         let newtimeline = this.createTimeLine(midiSongData);
-        console.log('midiSongData', midiSongData);
         let project = {
             title: title + ' ' + comment,
             timeline: newtimeline,

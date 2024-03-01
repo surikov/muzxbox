@@ -362,7 +362,7 @@ class RightMenuPanel {
         }
     }
     readCurrentSongData(project: MZXBX_Project) {
-        console.log('readCurrentSongData');
+        //console.log('readCurrentSongData');
         menuPointTracks.children = [];
         for (let tt = 0; tt < project.tracks.length; tt++) {
             let track = project.tracks[tt];

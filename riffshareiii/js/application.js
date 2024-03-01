@@ -823,7 +823,6 @@ class RightMenuPanel {
         }
     }
     readCurrentSongData(project) {
-        console.log('readCurrentSongData');
         menuPointTracks.children = [];
         for (let tt = 0; tt < project.tracks.length; tt++) {
             let track = project.tracks[tt];
@@ -1155,7 +1154,6 @@ class LeftPanel {
         return [this.leftLayer];
     }
     reFillLeftPanel(data) {
-        console.log('reFillLeftPanel');
         let mixm = new MixerDataMath(data);
         for (let zz = 0; zz < this.leftZoomAnchors.length; zz++) {
             this.leftZoomAnchors[zz].hh = mixm.mixerHeight();
@@ -1289,13 +1287,14 @@ class OctaveContent {
                 if (note.pitch >= from && note.pitch < to) {
                     let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
                     let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
-                    for (let ss = 0; ss < note.slides.length; ss++) {
+                    let slidearr = note.slides;
+                    for (let ss = 0; ss < slidearr.length; ss++) {
                         let x2 = x1
                             + MZMM()
-                                .set(note.slides[ss].duration)
+                                .set(slidearr[ss].duration)
                                 .duration(data.timeline[barIdx].tempo)
                                 * mixm.widthDurationRatio;
-                        let y2 = y1 + note.slides[ss].delta * mixm.notePathHeight;
+                        let y2 = y1 + slidearr[ss].delta * mixm.notePathHeight;
                         let rx1 = x1 + mixm.notePathHeight / 2;
                         let rx2 = x2 - mixm.notePathHeight / 2;
                         if (rx2 - rx1 < 0.00001) {
@@ -1316,7 +1315,7 @@ class OctaveContent {
                             let txt = '' + (barIdx + 1)
                                 + ':' + chord.skip.count + '/' + chord.skip.part
                                 + '(' + note.pitch
-                                + '-' + note.slides[0].duration.count + '/' + note.slides[0].duration.part
+                                + '-' + slidearr[0].duration.count + '/' + slidearr[0].duration.part
                                 + ')';
                             let info = { x: x1, y: y1 + 0.25, text: txt, css: 'timeBarNum025' };
                             barOctaveAnchor.content.push(info);
