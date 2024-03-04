@@ -2261,11 +2261,11 @@ class GPImporter {
         let settings = new Settings();
         gp3To5Importer.init(data, settings);
         console.log('gp3To5Importer', gp3To5Importer);
-        let score = gp3To5Importer.readScore();
-        console.log("score", score);
+        this.score = gp3To5Importer.readScore();
+        console.log("score", this.score);
     }
     convertProject(title, comment) {
-        console.log('GPImporter.convertProject', this);
+        console.log('GPImporter.convertProject', this.score);
         let project = {
             title: title + ' ' + comment,
             timeline: [],

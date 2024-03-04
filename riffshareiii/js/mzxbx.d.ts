@@ -627,6 +627,7 @@ declare function findMeasureSkipByTime(time: number, measures: MZXBX_SongMeasure
 };
 declare function newMIDIparser(arrayBuffer: ArrayBuffer): MidiParser;
 declare class GPImporter {
+    score: Score;
     load(arrayBuffer: ArrayBuffer): void;
     convertProject(title: string, comment: string): MZXBX_Project;
 }

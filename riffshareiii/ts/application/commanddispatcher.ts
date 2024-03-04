@@ -146,11 +146,30 @@ class CommandDispatcher {
 				this.listener = function (this: HTMLElement, ievent: HTMLElementEventMap['change']) {
 					var file = (ievent as any).target.files[0];
 					var fileReader = new FileReader();
+					let title: string = file.name;
+					let dat = '' + file.lastModifiedDate;
+					try {
+						let last: Date = file.lastModifiedDate;
+						dat = '' + last.getFullYear();
+						if (last.getMonth() < 10) {
+							dat = dat + '-' + last.getMonth();
+						} else {
+							dat = dat + '-0' + last.getMonth();
+						}
+						if (last.getDate() < 10) {
+							dat = dat + '-' + last.getDate();
+						} else {
+							dat = dat + '-0' + last.getDate();
+						}
+					} catch (xx) {
+						console.log(xx);
+					}
+					let comment: string = ', ' + file.size / 1000 + 'kb, ' + dat;
 					fileReader.onload = function (progressEvent: any) {
 						if (progressEvent != null) {
 							var arrayBuffer = progressEvent.target.result;
 							var pp = newGPparser(arrayBuffer);
-							let result: MZXBX_Project = pp.convertProject();
+							let result: MZXBX_Project = pp.convertProject(title,comment);
 							me.registerWorkProject(result);
 							me.resetProject();
 						}
