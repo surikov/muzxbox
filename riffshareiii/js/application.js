@@ -1289,29 +1289,31 @@ class OctaveContent {
                     let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
                     let slidearr = note.slides;
                     for (let ss = 0; ss < slidearr.length; ss++) {
-                        let x2 = x1
-                            + MZMM()
-                                .set(slidearr[ss].duration)
-                                .duration(data.timeline[barIdx].tempo)
-                                * mixm.widthDurationRatio;
+                        let x2 = x1 + MZMM().set(slidearr[ss].duration).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
                         let y2 = y1 + slidearr[ss].delta * mixm.notePathHeight;
-                        let rx1 = x1 + mixm.notePathHeight / 2;
-                        let rx2 = x2 - mixm.notePathHeight / 2;
-                        if (rx2 - rx1 < 0.00001) {
-                            rx2 = rx1 + 0.00001;
+                        let r_x1 = x1 + mixm.notePathHeight / 2;
+                        if (ss > 0) {
+                            r_x1 = x1;
                         }
-                        if (barOctaveAnchor.ww < rx2 - barOctaveAnchor.xx) {
-                            barOctaveAnchor.ww = rx2 - barOctaveAnchor.xx;
+                        let r_x2 = x2 - mixm.notePathHeight / 2;
+                        if (ss < slidearr.length - 1) {
+                            r_x2 = x2;
+                        }
+                        if (r_x2 - r_x1 < mixm.notePathHeight / 2) {
+                            r_x2 = r_x1 + 0.000001;
+                        }
+                        if (barOctaveAnchor.ww < r_x2 - barOctaveAnchor.xx) {
+                            barOctaveAnchor.ww = r_x2 - barOctaveAnchor.xx;
                         }
                         let line = {
-                            x1: rx1,
+                            x1: r_x1,
                             y1: y1 - mixm.notePathHeight / 2,
-                            x2: rx2,
+                            x2: r_x2,
                             y2: y2 - mixm.notePathHeight / 2,
                             css: css
                         };
                         barOctaveAnchor.content.push(line);
-                        if (addMoreInfo) {
+                        if (addMoreInfo && ss == 0) {
                             let txt = '' + (barIdx + 1)
                                 + ':' + chord.skip.count + '/' + chord.skip.part
                                 + '(' + note.pitch

@@ -321,14 +321,16 @@ declare type TrackChord = {
 };
 declare type TrackNote = {
     closed: boolean;
-    points: NotePitch[];
+    bendPoints: NotePitch[];
     openEvent?: MIDIEvent;
     closeEvent?: MIDIEvent;
     volume?: number;
+    basePitch: number;
+    baseDuration: number;
 };
 declare type NotePitch = {
     pointDuration: number;
-    pitch: number;
+    basePitchDelta: number;
 };
 declare type MIDIEvent = {
     offset: number;
@@ -369,7 +371,9 @@ declare type MIDISongPoint = {
     midipoint?: TrackNote;
 };
 declare type MIDISongNote = {
-    points: MIDISongPoint[];
+    midiPitch: number;
+    midiDuration: number;
+    slidePoints: MIDISongPoint[];
 };
 declare type MIDISongChord = {
     when: number;
@@ -576,7 +580,7 @@ declare class MidiParser {
     takeOpenedNote(first: number, when: number, track: MIDIFileTrack, channel: number): TrackNote;
     distanceToPoint(line: PP, point: XYp): number;
     douglasPeucker(points: XYp[], tolerance: number): XYp[];
-    simplifyPath(points: XYp[], tolerance: number): XYp[];
+    simplifySinglePath(points: XYp[], tolerance: number): XYp[];
     simplifyAllPaths(): void;
     dumpResolutionChanges(): void;
     lastResolution(ms: number): number;
@@ -593,7 +597,6 @@ declare class MidiParser {
         channelNum: number;
         track: MIDISongTrack;
     };
-    dump(): MZXBX_Schedule;
     findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): MZXBX_Metre;
     findLastChange(midiSongData: MIDISongData, beforeMs: number): {
         track: number;

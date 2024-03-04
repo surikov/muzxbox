@@ -32,8 +32,8 @@ class MuzXbox {
 							var arrayBuffer = progressEvent.target.result;
 							//console.log(arrayBuffer);
 							var midiParser = new MidiParser(arrayBuffer);
-							testSchedule = midiParser.dump();
-							console.log('MZXBX_Schedule', testSchedule);
+							//testSchedule = midiParser.dump();
+							//console.log('MZXBX_Schedule', testSchedule);
 						}
 					};
 					fileReader.readAsArrayBuffer(file);
