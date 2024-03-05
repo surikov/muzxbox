@@ -882,7 +882,17 @@ class MidiParser {
 				var chord: TrackChord = track.chords[ch];
 				for (var n = 0; n < chord.notes.length; n++) {
 					var note: TrackNote = chord.notes[n];
-					if (note.bendPoints.length > 3) {
+					if (note.bendPoints.length > 1) {
+//console.log(chord.channel,note.bendPoints.length,note);
+					}
+					if (note.bendPoints.length > 5) {
+						let tolerance=0.3;
+						if (note.bendPoints.length > 30) {
+							tolerance=0.5;
+						}
+						if (note.bendPoints.length > 50) {
+							tolerance=1;
+						}
 						//console.log('simplify',note.points.length,note);
 						var xx = 0;
 						var pnts: XYp[] = [];
@@ -892,13 +902,17 @@ class MidiParser {
 							xx = xx + note.bendPoints[p].pointDuration;
 						}
 						pnts.push({ x: xx, y: note.bendPoints[note.bendPoints.length - 1].basePitchDelta });
-						var lessPoints: XYp[] = this.simplifySinglePath(pnts, 1.5);
+						var lessPoints: XYp[] = this.simplifySinglePath(pnts, tolerance);
 						note.bendPoints = [];
 						for (var p = 0; p < lessPoints.length - 1; p++) {
 							var xypoint: XYp = lessPoints[p];
 							var xyduration = lessPoints[p + 1].x - xypoint.x;
-							if (xyduration < 0) xyduration = 0;
-							note.bendPoints.push({ pointDuration: xyduration, basePitchDelta: Math.round(xypoint.y) });
+							if (xyduration < 0) {
+								xyduration = 0;
+							}
+							//let yy=xypoint.y;
+							//console.log(note,yy);
+							note.bendPoints.push({ pointDuration: xyduration, basePitchDelta: xypoint.y });
 						}
 						//console.log(lessPoints);
 					} else {
@@ -1048,9 +1062,7 @@ class MidiParser {
 													, basePitchDelta: delta
 												};
 												note.bendPoints.push(point);
-												//if (note.points.length > 1) {
-												//	console.log('bend', note, eventEhen, chord.when, pointsDuration);
-												//}
+												//console.log(note);
 											}
 										}
 									}
@@ -1885,22 +1897,22 @@ class MidiParser {
 							let midiNote: MIDISongNote = midiChord.notes[nn];
 							//console.log(midiNote)
 							//let startPitch = midiNote.points[0].pitch;
-							let startPitch = midiNote.midiPitch;
+							let currentSlidePitch = midiNote.midiPitch;
 							//let startDuration = mm.calculate((midiNote.points[0].durationms - 66) / 1000.0, nextMeasure.tempo).strip(32);
 							let startDuration = mm.calculate(midiNote.midiDuration / 1000.0, nextMeasure.tempo);
 							let curSlide: MZXBX_Slide = {
 								duration: startDuration
 								, delta: 0
 							};
-							let trackNote: MZXBX_Note = { pitch: startPitch, slides: [curSlide] };
+							let trackNote: MZXBX_Note = { pitch: currentSlidePitch, slides: [curSlide] };
 							if (midiNote.slidePoints.length > 0) {
 								trackNote.slides = [];
 								let bendDuration = 0;
 								for (let pp = 0; pp < midiNote.slidePoints.length; pp++) {
 									let midiPoint = midiNote.slidePoints[pp];
 
-									curSlide.delta = startPitch - midiPoint.pitch;
-									startPitch = midiPoint.pitch;
+									curSlide.delta = currentSlidePitch - midiPoint.pitch;
+									currentSlidePitch = midiPoint.pitch;
 									//let xduration = mm.calculate((midiPoint.durationms - 66) / 1000.0, nextMeasure.tempo);
 									let xduration = mm.calculate(midiPoint.durationms / 1000.0, nextMeasure.tempo);
 									curSlide = {
@@ -1909,13 +1921,14 @@ class MidiParser {
 									};
 									bendDuration = bendDuration + midiPoint.durationms;
 									trackNote.slides.push(curSlide);
+									//console.log(midiNote.midiPitch,pp,midiPoint.durationms,xduration);
 								}
 								//console.log(midiNote,bendDuration);
 								let remains = midiNote.midiDuration - bendDuration;
 								if (remains > 0) {
 									curSlide = {
 										duration: mm.calculate(remains / 1000.0, nextMeasure.tempo)
-										, delta: 0
+										, delta: currentSlidePitch-Math.round(currentSlidePitch)
 									};
 									trackNote.slides.push(curSlide);
 								}

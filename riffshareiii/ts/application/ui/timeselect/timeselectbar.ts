@@ -75,6 +75,7 @@ class TimeSelectBar {
         , barnum: number, zz: number
         , curBar: MZXBX_SongMeasure
         , measureAnchor: TileAnchor
+		,barTime:number
     ) {
         let nm: TileText = {
             x: barLeft
@@ -83,10 +84,11 @@ class TimeSelectBar {
             , css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(nm);
+		let timeText=Math.round(barTime*100)/100;
         let bpm: TileText = {
             x: barLeft
             , y: zoomPrefixLevelsCSS[zz].minZoom * 3
-            , text: '' + Math.round(curBar.tempo)
+            , text: '' + Math.round(curBar.tempo)+': '+timeText
             , css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(bpm);
@@ -116,6 +118,7 @@ class TimeSelectBar {
             this.zoomAnchors.push(selectLevelAnchor);
             let mm: MZXBX_MetreMathType = MZMM();
             let barLeft = mixm.LeftPad;
+			let barTime=0;
             for (let kk = 0; kk < data.timeline.length; kk++) {
                 let curBar = data.timeline[kk];
                 let curMeasureMeter = mm.set(curBar.metre);
@@ -136,9 +139,10 @@ class TimeSelectBar {
                         , measureAnchor);
                     this.createBarNumber(barLeft
                         //, zoomPrefixLevelsCSS[zz].minZoom * 3
-                        , kk, zz, curBar, measureAnchor);
+                        , kk, zz, curBar, measureAnchor,barTime);
                 }
                 barLeft = barLeft + barWidth;
+				barTime=barTime+curMeasureMeter.duration(curBar.tempo);
             }
         }
         this.selectBarAnchor.content = this.zoomAnchors;

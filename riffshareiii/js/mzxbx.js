@@ -1449,7 +1449,16 @@ class MidiParser {
                 var chord = track.chords[ch];
                 for (var n = 0; n < chord.notes.length; n++) {
                     var note = chord.notes[n];
-                    if (note.bendPoints.length > 3) {
+                    if (note.bendPoints.length > 1) {
+                    }
+                    if (note.bendPoints.length > 5) {
+                        let tolerance = 0.3;
+                        if (note.bendPoints.length > 30) {
+                            tolerance = 0.5;
+                        }
+                        if (note.bendPoints.length > 50) {
+                            tolerance = 1;
+                        }
                         var xx = 0;
                         var pnts = [];
                         for (var p = 0; p < note.bendPoints.length; p++) {
@@ -1458,14 +1467,15 @@ class MidiParser {
                             xx = xx + note.bendPoints[p].pointDuration;
                         }
                         pnts.push({ x: xx, y: note.bendPoints[note.bendPoints.length - 1].basePitchDelta });
-                        var lessPoints = this.simplifySinglePath(pnts, 1.5);
+                        var lessPoints = this.simplifySinglePath(pnts, tolerance);
                         note.bendPoints = [];
                         for (var p = 0; p < lessPoints.length - 1; p++) {
                             var xypoint = lessPoints[p];
                             var xyduration = lessPoints[p + 1].x - xypoint.x;
-                            if (xyduration < 0)
+                            if (xyduration < 0) {
                                 xyduration = 0;
-                            note.bendPoints.push({ pointDuration: xyduration, basePitchDelta: Math.round(xypoint.y) });
+                            }
+                            note.bendPoints.push({ pointDuration: xyduration, basePitchDelta: xypoint.y });
                         }
                     }
                     else {
@@ -2161,20 +2171,20 @@ class MidiParser {
                     if (trackChord) {
                         for (let nn = 0; nn < midiChord.notes.length; nn++) {
                             let midiNote = midiChord.notes[nn];
-                            let startPitch = midiNote.midiPitch;
+                            let currentSlidePitch = midiNote.midiPitch;
                             let startDuration = mm.calculate(midiNote.midiDuration / 1000.0, nextMeasure.tempo);
                             let curSlide = {
                                 duration: startDuration,
                                 delta: 0
                             };
-                            let trackNote = { pitch: startPitch, slides: [curSlide] };
+                            let trackNote = { pitch: currentSlidePitch, slides: [curSlide] };
                             if (midiNote.slidePoints.length > 0) {
                                 trackNote.slides = [];
                                 let bendDuration = 0;
                                 for (let pp = 0; pp < midiNote.slidePoints.length; pp++) {
                                     let midiPoint = midiNote.slidePoints[pp];
-                                    curSlide.delta = startPitch - midiPoint.pitch;
-                                    startPitch = midiPoint.pitch;
+                                    curSlide.delta = currentSlidePitch - midiPoint.pitch;
+                                    currentSlidePitch = midiPoint.pitch;
                                     let xduration = mm.calculate(midiPoint.durationms / 1000.0, nextMeasure.tempo);
                                     curSlide = {
                                         duration: xduration,
@@ -2187,7 +2197,7 @@ class MidiParser {
                                 if (remains > 0) {
                                     curSlide = {
                                         duration: mm.calculate(remains / 1000.0, nextMeasure.tempo),
-                                        delta: 0
+                                        delta: currentSlidePitch - Math.round(currentSlidePitch)
                                     };
                                     trackNote.slides.push(curSlide);
                                 }

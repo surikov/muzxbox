@@ -103,7 +103,7 @@ declare class TimeSelectBar {
     resizeTimeScale(viewWIdth: number, viewHeight: number): void;
     addGridMarks(data: MZXBX_Project, barnum: number, barLeft: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor, zIndex: number): void;
     createBarMark(barLeft: number, width: number, height: number, measureAnchor: TileAnchor): void;
-    createBarNumber(barLeft: number, barnum: number, zz: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor): void;
+    createBarNumber(barLeft: number, barnum: number, zz: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor, barTime: number): void;
     fillTimeBar(data: MZXBX_Project): void;
 }
 declare class UIToolbar {

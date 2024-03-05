@@ -565,7 +565,7 @@ class TimeSelectBar {
         let mark = { x: barLeft, y: 0, w: width, h: height, css: 'timeMeasureMark' };
         measureAnchor.content.push(mark);
     }
-    createBarNumber(barLeft, barnum, zz, curBar, measureAnchor) {
+    createBarNumber(barLeft, barnum, zz, curBar, measureAnchor, barTime) {
         let nm = {
             x: barLeft,
             y: zoomPrefixLevelsCSS[zz].minZoom * 2,
@@ -573,10 +573,11 @@ class TimeSelectBar {
             css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(nm);
+        let timeText = Math.round(barTime * 100) / 100;
         let bpm = {
             x: barLeft,
             y: zoomPrefixLevelsCSS[zz].minZoom * 3,
-            text: '' + Math.round(curBar.tempo),
+            text: '' + Math.round(curBar.tempo) + ': ' + timeText,
             css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(bpm);
@@ -596,6 +597,7 @@ class TimeSelectBar {
             this.zoomAnchors.push(selectLevelAnchor);
             let mm = MZMM();
             let barLeft = mixm.LeftPad;
+            let barTime = 0;
             for (let kk = 0; kk < data.timeline.length; kk++) {
                 let curBar = data.timeline[kk];
                 let curMeasureMeter = mm.set(curBar.metre);
@@ -610,9 +612,10 @@ class TimeSelectBar {
                 this.addGridMarks(data, kk, barLeft, curBar, measureAnchor, zz);
                 if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
                     this.createBarMark(barLeft, zoomPrefixLevelsCSS[zz].minZoom * 3, zoomPrefixLevelsCSS[zz].minZoom * 3, measureAnchor);
-                    this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor);
+                    this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor, barTime);
                 }
                 barLeft = barLeft + barWidth;
+                barTime = barTime + curMeasureMeter.duration(curBar.tempo);
             }
         }
         this.selectBarAnchor.content = this.zoomAnchors;
