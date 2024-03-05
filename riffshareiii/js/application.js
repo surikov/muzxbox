@@ -566,18 +566,20 @@ class TimeSelectBar {
         measureAnchor.content.push(mark);
     }
     createBarNumber(barLeft, barnum, zz, curBar, measureAnchor, barTime) {
+        let mins = Math.floor(barTime / 60);
+        let secs = Math.floor(barTime % 60);
+        let hunds = Math.round(100 * (barTime - Math.floor(barTime)));
         let nm = {
             x: barLeft,
             y: zoomPrefixLevelsCSS[zz].minZoom * 2,
-            text: '' + (1 + barnum) + ': ' + curBar.metre.count + '/' + curBar.metre.part,
+            text: '' + (1 + barnum) + ': ' + mins + '\'' + (secs > 9 ? '' : '0') + secs + '.' + hunds,
             css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(nm);
-        let timeText = Math.round(barTime * 100) / 100;
         let bpm = {
             x: barLeft,
             y: zoomPrefixLevelsCSS[zz].minZoom * 3,
-            text: '' + Math.round(curBar.tempo) + ': ' + timeText,
+            text: '' + Math.round(curBar.tempo) + ': ' + curBar.metre.count + '/' + curBar.metre.part,
             css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(bpm);

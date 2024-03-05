@@ -21,6 +21,10 @@ var greenStat = [];
 var blueStat = [];
 var greyStat = [];
 var redStat = [];
+var sortedBlue = [];
+var sortedGreen = [];
+var sortedGrey = [];
+var sortedRed = [];
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
     var msgp = document.getElementById('msgp');
@@ -811,26 +815,19 @@ function dumpTriads(svg, rows) {
 function roundDown(num, base) {
     return Math.floor(num / base) * base;
 }
-function countColorStat(kk, sz) {
-    var countS = 0;
-    if (blueStat[kk].left > sz)
-        countS++;
-    if (blueStat[kk].right > sz)
-        countS++;
-    if (greenStat[kk].left > sz)
-        countS++;
-    if (greenStat[kk].right > sz)
-        countS++;
-    if (greyStat[kk].left > sz)
-        countS++;
-    if (greyStat[kk].right > sz)
-        countS++;
-    if (redStat[kk].left > sz)
-        countS++;
-    if (redStat[kk].right > sz)
-        countS++;
+/*
+function countColorStat(kk: number, sz: number): number {
+    let countS = 0;
+    if (blueStat[kk].left > sz) countS++;
+    if (blueStat[kk].right > sz) countS++;
+    if (greenStat[kk].left > sz) countS++;
+    if (greenStat[kk].right > sz) countS++;
+    if (greyStat[kk].left > sz) countS++;
+    if (greyStat[kk].right > sz) countS++;
+    if (redStat[kk].left > sz) countS++;
+    if (redStat[kk].right > sz) countS++;
     return countS;
-}
+}*/
 function dumpColorStat() {
     //console.log('stat');
     var skip = 1;
@@ -963,6 +960,48 @@ function addTails() {
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
     dumpRowFills(slicedrows);
     fillCells();
+}
+function testTest() {
+    var yyy = rowsVisibleCount + 22 + skipRowsCount - 1;
+    //console.log('TESTtEST', markLines, (yyy));
+    var leftBlue = Math.ceil(0 * rowLen / 2);
+    var rightBlue = Math.ceil(1 * rowLen / 2) - 1;
+    var leftGreen = Math.ceil(1 * rowLen / 2);
+    var rightGreen = Math.ceil(2 * rowLen / 2) - 1;
+    var leftGrey = Math.ceil(2 * rowLen / 2);
+    var rightGrey = Math.ceil(3 * rowLen / 2) - 1;
+    var leftRed = Math.ceil(3 * rowLen / 2);
+    var rightRed = Math.ceil(4 * rowLen / 2) - 1;
+    //console.log(leftBlue, rightBlue, leftGreen, rightGreen, leftGrey, rightGrey, leftRed, rightRed);
+    for (var mm = 0; mm < markLines.length; mm++) {
+        var line = markLines[mm];
+        if (line.fromY == yyy && line.toY == yyy) {
+            if (line.fromX == leftBlue || line.toX == leftBlue) {
+                console.log('leftBlue', 2 * Math.abs(line.fromX - line.toX), blueStat[0]);
+            }
+            if (line.fromX == rightBlue || line.toX == rightBlue) {
+                console.log('rightBlue', 2 * Math.abs(line.fromX - line.toX), blueStat[0]);
+            }
+            if (line.fromX == leftGreen || line.toX == leftGreen) {
+                console.log('leftGreen', 2 * Math.abs(line.fromX - line.toX), greenStat[0]);
+            }
+            if (line.fromX == rightGreen || line.toX == rightGreen) {
+                console.log('rightGreen', 2 * Math.abs(line.fromX - line.toX), greenStat[0]);
+            }
+            if (line.fromX == leftGrey || line.toX == leftGrey) {
+                console.log('leftGrey', 2 * Math.abs(line.fromX - line.toX), greyStat[0]);
+            }
+            if (line.fromX == rightGrey || line.toX == rightGrey) {
+                console.log('rightGrey', 2 * Math.abs(line.fromX - line.toX), greyStat[0]);
+            }
+            if (line.fromX == leftRed || line.toX == leftRed) {
+                console.log('leftRed', 2 * Math.abs(line.fromX - line.toX), redStat[0]);
+            }
+            if (line.fromX == rightRed || line.toX == rightRed) {
+                console.log('rightRed', 2 * Math.abs(line.fromX - line.toX), redStat[0]);
+            }
+        }
+    }
 }
 init();
 addTails();
