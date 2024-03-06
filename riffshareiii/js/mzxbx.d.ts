@@ -632,6 +632,9 @@ declare class GPImporter {
     convertProject(title: string, comment: string): MZXBX_Project;
 }
 declare function newGPparser(arrayBuffer: ArrayBuffer): GPImporter;
+declare function score2schedule(title: string, comment: string, score: Score): MZXBX_Project;
+declare function addScoreInsTrack(project: MZXBX_Project, fromTrack: Track): void;
+declare function addScoreDrumsTracks(project: MZXBX_Project, fromTrack: Track): void;
 declare class ImporterSettings {
     encoding: string;
     mergePartGroupsInMusicXml: boolean;

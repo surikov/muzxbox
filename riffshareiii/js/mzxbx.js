@@ -2272,18 +2272,9 @@ class GPImporter {
         gp3To5Importer.init(data, settings);
         console.log('gp3To5Importer', gp3To5Importer);
         this.score = gp3To5Importer.readScore();
-        console.log("score", this.score);
     }
     convertProject(title, comment) {
-        console.log('GPImporter.convertProject', this.score);
-        let project = {
-            title: title + ' ' + comment,
-            timeline: [],
-            tracks: [],
-            percussions: [],
-            filters: [],
-            comments: []
-        };
+        let project = score2schedule(title, comment, this.score);
         return project;
     }
 }
@@ -2292,6 +2283,64 @@ function newGPparser(arrayBuffer) {
     let pp = new GPImporter();
     pp.load(arrayBuffer);
     return pp;
+}
+function score2schedule(title, comment, score) {
+    console.log('score2schedule', score);
+    let project = {
+        title: title + ' ' + comment,
+        timeline: [],
+        tracks: [],
+        percussions: [],
+        filters: [],
+        comments: []
+    };
+    for (let tt = 0; tt < score.tracks.length; tt++) {
+        let track = score.tracks[tt];
+        let pp = false;
+        for (let ss = 0; ss < track.staves.length; ss++) {
+            if (track.staves[ss].isPercussion) {
+                pp = true;
+            }
+        }
+        if (pp) {
+            addScoreDrumsTracks(project, track);
+        }
+        else {
+            addScoreInsTrack(project, track);
+        }
+    }
+    let tempo = 120;
+    for (let bb = 0; bb < score.masterBars.length; bb++) {
+        let maBar = score.masterBars[bb];
+        if (maBar.tempoAutomation) {
+            if (maBar.tempoAutomation.value > 0) {
+                tempo = maBar.tempoAutomation.value;
+            }
+        }
+        let measure = {
+            tempo: tempo,
+            metre: {
+                count: maBar.timeSignatureNumerator,
+                part: maBar.timeSignatureDenominator
+            }
+        };
+        project.timeline.push(measure);
+        for (let tr = 0; tr < project.tracks.length; tr++) {
+            project.tracks[tr].measures.push({ chords: [] });
+        }
+    }
+    return project;
+}
+function addScoreInsTrack(project, fromTrack) {
+    let toTrack = {
+        title: fromTrack.name,
+        measures: [],
+        filters: [],
+        performer: { id: '', data: '' }
+    };
+    project.tracks.push(toTrack);
+}
+function addScoreDrumsTracks(project, fromTrack) {
 }
 class ImporterSettings {
     constructor() {
