@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.94 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.95 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -24,7 +24,7 @@ var redStat = [];
 var sortedBlue = [];
 var sortedGreen = [];
 var sortedGrey = [];
-var sortedRed = [];
+//let sortedRed: number[] = [];
 var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
     var msgp = document.getElementById('msgp');
@@ -476,6 +476,12 @@ function dumpRowWaitColor(rows, color, shiftX) {
         var prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
         var first = arr.map(function (x) { return x; });
         first.sort(function (aa, bb) { return bb.summ - aa.summ; });
+        if (rr == 0) {
+            sortedGrey = [];
+            for (var ff = 0; ff < first.length; ff++) {
+                sortedGrey[ff] = first[ff].ball;
+            }
+        }
         var begin = -1;
         var end = -1;
         var begin2 = -1;
@@ -603,6 +609,12 @@ function dumpRowFillsColor(rows, color, shiftX) {
         //console.log(ballFills);
         var first = ballFills.map(function (x) { return x; });
         first.sort(function (aa, bb) { return bb.summ - aa.summ; });
+        if (rr == 0) {
+            sortedGreen = [];
+            for (var ff = 0; ff < first.length; ff++) {
+                sortedGreen[ff] = first[ff].ball;
+            }
+        }
         var begin = -1;
         var end = -1;
         var begin2 = -1;
@@ -712,6 +724,12 @@ function dumpTriads(svg, rows) {
         var first = calcs.map(function (x) { return x; });
         var lbl = "";
         first.sort(function (aa, bb) { return aa.summ - bb.summ; });
+        if (rr == 0) {
+            sortedBlue = [];
+            for (var ff = 0; ff < first.length; ff++) {
+                sortedBlue[ff] = first[ff].ball;
+            }
+        }
         lbl = 'blue';
         var begin = -1;
         var end = -1;
@@ -961,9 +979,14 @@ function addTails() {
     dumpRowFills(slicedrows);
     fillCells();
 }
+function drawTestLines(data) {
+    for (var ii = 0; ii < data.length; ii++) {
+        markLines.push({ fromX: data[ii] - 1, fromY: skipRowsCount + 0, toX: data[ii] - 1, toY: skipRowsCount + 19, color: '#ffcc00', manual: true });
+    }
+}
 function testTest() {
     var yyy = rowsVisibleCount + 22 + skipRowsCount - 1;
-    //console.log('TESTtEST', markLines, (yyy));
+    //console.log('TESTtEST', sortedBlue, sortedGreen, sortedGrey);
     var leftBlue = Math.ceil(0 * rowLen / 2);
     var rightBlue = Math.ceil(1 * rowLen / 2) - 1;
     var leftGreen = Math.ceil(1 * rowLen / 2);
@@ -977,31 +1000,64 @@ function testTest() {
         var line = markLines[mm];
         if (line.fromY == yyy && line.toY == yyy) {
             if (line.fromX == leftBlue || line.toX == leftBlue) {
-                console.log('leftBlue', 2 * Math.abs(line.fromX - line.toX), blueStat[0]);
+                var nn = 2 * Math.abs(line.fromX - line.toX);
+                var data = sortedBlue.slice(0, nn);
+                console.log('leftBlue', nn, data);
+                drawTestLines(data);
             }
             if (line.fromX == rightBlue || line.toX == rightBlue) {
-                console.log('rightBlue', 2 * Math.abs(line.fromX - line.toX), blueStat[0]);
+                var nn = 2 * Math.abs(line.fromX - line.toX);
+                var data = sortedBlue.slice(sortedBlue.length - nn);
+                console.log('rightBlue', nn, data);
+                drawTestLines(data);
             }
             if (line.fromX == leftGreen || line.toX == leftGreen) {
-                console.log('leftGreen', 2 * Math.abs(line.fromX - line.toX), greenStat[0]);
+                var nn = 2 * Math.abs(line.fromX - line.toX);
+                var data = sortedGreen.slice(0, nn);
+                console.log('leftGreen', nn, data);
+                drawTestLines(data);
             }
             if (line.fromX == rightGreen || line.toX == rightGreen) {
-                console.log('rightGreen', 2 * Math.abs(line.fromX - line.toX), greenStat[0]);
+                var nn = 2 * Math.abs(line.fromX - line.toX);
+                var data = sortedGreen.slice(sortedGreen.length - nn);
+                console.log('rightGreen', nn, data);
+                drawTestLines(data);
             }
             if (line.fromX == leftGrey || line.toX == leftGrey) {
-                console.log('leftGrey', 2 * Math.abs(line.fromX - line.toX), greyStat[0]);
+                var nn = 2 * Math.abs(line.fromX - line.toX);
+                var data = sortedGrey.slice(0, nn);
+                console.log('leftGrey', nn, data);
+                drawTestLines(data);
             }
             if (line.fromX == rightGrey || line.toX == rightGrey) {
-                console.log('rightGrey', 2 * Math.abs(line.fromX - line.toX), greyStat[0]);
+                var nn = 2 * Math.abs(line.fromX - line.toX);
+                var data = sortedGrey.slice(sortedGrey.length - nn);
+                console.log('rightGrey', nn, data);
+                drawTestLines(data);
             }
             if (line.fromX == leftRed || line.toX == leftRed) {
-                console.log('leftRed', 2 * Math.abs(line.fromX - line.toX), redStat[0]);
+                var nn = 2 * Math.abs(line.fromX - line.toX);
+                var data = [];
+                for (var rr = 0; rr < nn; rr++) {
+                    var kk = rr + 1;
+                    data.push(kk);
+                }
+                console.log('leftRed', nn, data);
+                drawTestLines(data);
             }
             if (line.fromX == rightRed || line.toX == rightRed) {
-                console.log('rightRed', 2 * Math.abs(line.fromX - line.toX), redStat[0]);
+                var nn = 2 * Math.abs(line.fromX - line.toX);
+                var data = [];
+                for (var rr = 0; rr < nn; rr++) {
+                    var kk = rowLen - rr;
+                    data.push(kk);
+                }
+                console.log('rightRed', nn, data);
+                drawTestLines(data);
             }
         }
     }
+    drawLines();
 }
 init();
 addTails();

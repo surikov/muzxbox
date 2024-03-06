@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.94 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.95 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -40,7 +40,7 @@ let redStat: StatBeginEnd[] = [];
 let sortedBlue: number[] = [];
 let sortedGreen: number[] = [];
 let sortedGrey: number[] = [];
-let sortedRed: number[] = [];
+//let sortedRed: number[] = [];
 
 let markLines: { fromX: number, fromY: number, toX: number, toY: number, color: string, manual: boolean }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
@@ -529,6 +529,12 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 
 		let first = arr.map((x) => x);
 		first.sort((aa, bb) => { return bb.summ - aa.summ; });
+		if (rr == 0) {
+			sortedGrey = [];
+			for (let ff = 0; ff < first.length; ff++) {
+				sortedGrey[ff] = first[ff].ball;
+			}
+		}
 		let begin = -1;
 		let end = -1;
 		let begin2 = -1;
@@ -649,6 +655,12 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 
 		let first = ballFills.map((x) => x);
 		first.sort((aa, bb) => { return bb.summ - aa.summ; });
+		if (rr == 0) {
+			sortedGreen = [];
+			for (let ff = 0; ff < first.length; ff++) {
+				sortedGreen[ff] = first[ff].ball;
+			}
+		}
 		let begin = -1;
 		let end = -1;
 		let begin2 = -1;
@@ -755,6 +767,12 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		let first = calcs.map((x) => x);
 		let lbl = "";
 		first.sort((aa, bb) => { return aa.summ - bb.summ; });
+		if (rr == 0) {
+			sortedBlue = [];
+			for (let ff = 0; ff < first.length; ff++) {
+				sortedBlue[ff] = first[ff].ball;
+			}
+		}
 		lbl = 'blue';
 		let begin = -1;
 		let end = -1;
@@ -1018,10 +1036,15 @@ function addTails() {
 	dumpRowFills(slicedrows);
 	fillCells();
 }
-
+function drawTestLines(data:number[]){
+	for(let ii=0;ii<data.length;ii++){
+		markLines.push({ fromX: data[ii]-1, fromY: skipRowsCount+0, toX: data[ii]-1, toY: skipRowsCount+19, color: '#ffcc00', manual: true });
+	}
+	
+}
 function testTest() {
 	let yyy = rowsVisibleCount + 22 + skipRowsCount - 1;
-	//console.log('TESTtEST', markLines, (yyy));
+	//console.log('TESTtEST', sortedBlue, sortedGreen, sortedGrey);
 	let leftBlue = Math.ceil(0 * rowLen / 2);
 	let rightBlue = Math.ceil(1 * rowLen / 2) - 1;
 	let leftGreen = Math.ceil(1 * rowLen / 2);
@@ -1035,33 +1058,66 @@ function testTest() {
 		let line = markLines[mm];
 		if (line.fromY == yyy && line.toY == yyy) {
 			if (line.fromX == leftBlue || line.toX == leftBlue) {
-				console.log('leftBlue', 2 * Math.abs(line.fromX - line.toX), blueStat[0]);
+				let nn = 2 * Math.abs(line.fromX - line.toX);
+				let data = sortedBlue.slice(0, nn);
+				console.log('leftBlue', nn, data);
+				drawTestLines(data);
 			}
 			if (line.fromX == rightBlue || line.toX == rightBlue) {
-				console.log('rightBlue', 2 * Math.abs(line.fromX - line.toX), blueStat[0]);
+				let nn = 2 * Math.abs(line.fromX - line.toX);
+				let data = sortedBlue.slice(sortedBlue.length - nn);
+				console.log('rightBlue', nn, data);
+				drawTestLines(data);
 			}
 			if (line.fromX == leftGreen || line.toX == leftGreen) {
-				console.log('leftGreen', 2 * Math.abs(line.fromX - line.toX), greenStat[0]);
+				let nn = 2 * Math.abs(line.fromX - line.toX);
+				let data = sortedGreen.slice(0, nn);
+				console.log('leftGreen', nn, data);
+				drawTestLines(data);
 			}
 			if (line.fromX == rightGreen || line.toX == rightGreen) {
-				console.log('rightGreen', 2 * Math.abs(line.fromX - line.toX), greenStat[0]);
+				let nn = 2 * Math.abs(line.fromX - line.toX);
+				let data = sortedGreen.slice(sortedGreen.length - nn);
+				console.log('rightGreen', nn, data);
+				drawTestLines(data);
 			}
 			if (line.fromX == leftGrey || line.toX == leftGrey) {
-				console.log('leftGrey', 2 * Math.abs(line.fromX - line.toX), greyStat[0]);
+				let nn = 2 * Math.abs(line.fromX - line.toX);
+				let data = sortedGrey.slice(0, nn);
+				console.log('leftGrey', nn, data);
+				drawTestLines(data);
 			}
 			if (line.fromX == rightGrey || line.toX == rightGrey) {
-				console.log('rightGrey', 2 * Math.abs(line.fromX - line.toX), greyStat[0]);
+				let nn = 2 * Math.abs(line.fromX - line.toX);
+				let data = sortedGrey.slice(sortedGrey.length - nn);
+				console.log('rightGrey', nn, data);
+				drawTestLines(data);
 			}
 			if (line.fromX == leftRed || line.toX == leftRed) {
-				console.log('leftRed', 2 * Math.abs(line.fromX - line.toX), redStat[0]);
+				let nn = 2 * Math.abs(line.fromX - line.toX);
+				let data: number[] = [];
+				for (let rr = 0; rr < nn; rr++) {
+					let kk: number = rr + 1;
+					data.push(kk);
+				}
+				console.log('leftRed', nn, data);
+				drawTestLines(data);
 			}
 			if (line.fromX == rightRed || line.toX == rightRed) {
-				console.log('rightRed', 2 * Math.abs(line.fromX - line.toX), redStat[0]);
+				let nn = 2 * Math.abs(line.fromX - line.toX);
+				let data: number[] = [];
+				for (let rr = 0; rr < nn; rr++) {
+					let kk: number = rowLen - rr;
+					data.push(kk);
+				}
+				console.log('rightRed', nn, data);
+				drawTestLines(data);
 			}
 
 
 		}
 	}
+	drawLines();
 }
 init();
 addTails();
