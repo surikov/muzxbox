@@ -36,26 +36,13 @@ function score2schedule(title: string, comment: string, score: Score): MZXBX_Pro
 		, filters: []
 		, comments: []
 	};
-	for (let tt = 0; tt < score.tracks.length; tt++) {
-		let track = score.tracks[tt];
-		let pp = false;
-		for (let ss = 0; ss < track.staves.length; ss++) {
-			if (track.staves[ss].isPercussion) {
-				pp = true;
-			}
-		}
-		if (pp) {
-			addScoreDrumsTracks(project, track);
-		} else {
-			addScoreInsTrack(project, track);
-		}
-	}
+
 	let tempo = 120;
 	for (let bb = 0; bb < score.masterBars.length; bb++) {
 		let maBar = score.masterBars[bb];
 		if (maBar.tempoAutomation) {
 			if (maBar.tempoAutomation.value > 0) {
-				tempo=maBar.tempoAutomation.value;
+				tempo = maBar.tempoAutomation.value;
 			}
 		}
 		let measure: MZXBX_SongMeasure = {
@@ -66,21 +53,50 @@ function score2schedule(title: string, comment: string, score: Score): MZXBX_Pro
 			}
 		};
 		project.timeline.push(measure);
-		for (let tr = 0; tr < project.tracks.length; tr++) {
-			project.tracks[tr].measures.push({ chords: [] });
+
+	}
+	for (let tt = 0; tt < score.tracks.length; tt++) {
+		let scoreTrack = score.tracks[tt];
+		let pp = false;
+		for (let ss = 0; ss < scoreTrack.staves.length; ss++) {
+			if (scoreTrack.staves[ss].isPercussion) {
+				pp = true;
+			}
+		}
+		if (pp) {
+			addScoreDrumsTracks(project, scoreTrack);
+		} else {
+			addScoreInsTrack(project, scoreTrack);
 		}
 	}
 	return project;
 }
-function addScoreInsTrack(project: MZXBX_Project, fromTrack: Track) {
-	let toTrack: MZXBX_MusicTrack = {
-		title: fromTrack.name
+function addScoreInsTrack(project: MZXBX_Project, scoreTrack: Track) {
+	let mzxbxTrack: MZXBX_MusicTrack = {
+		title: scoreTrack.name
 		, measures: []
 		, filters: []
 		, performer: { id: '', data: '' }
 	};
-	project.tracks.push(toTrack);
+	project.tracks.push(mzxbxTrack);
+	for (let tr = 0; tr < project.timeline.length; tr++) {
+		let mzxbxMeasure: MZXBX_TrackMeasure = { chords: [] };
+		project.tracks[tr].measures.push(mzxbxMeasure);
+		for (let ss = 0; ss < scoreTrack.staves.length; ss++) {
+			let staff = scoreTrack.staves[ss];
+			let bar = staff.bars[tr];
+			for (let vv = 0; vv < bar.voices.length; vv++) {
+				let voice = bar.voices[vv];
+				for (let bb = 0; bb < voice.beats.length; bb) {
+					let beat = voice.beats[bb];
+
+				}
+			}
+
+		}
+		let bar = scoreTrack.staves
+	}
 }
-function addScoreDrumsTracks(project: MZXBX_Project, fromTrack: Track) {
+function addScoreDrumsTracks(project: MZXBX_Project, scoreTrack: Track) {
 
 }
