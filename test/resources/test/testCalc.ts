@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.95 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.96 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -1036,11 +1036,17 @@ function addTails() {
 	dumpRowFills(slicedrows);
 	fillCells();
 }
-function drawTestLines(data:number[]){
-	for(let ii=0;ii<data.length;ii++){
-		markLines.push({ fromX: data[ii]-1, fromY: skipRowsCount+0, toX: data[ii]-1, toY: skipRowsCount+19, color: '#ffcc00', manual: true });
+function drawTestLines(data: { ball: number, color: string }[]) {
+	for (let ii = 0; ii < data.length; ii++) {
+		markLines.push({
+			fromX: data[ii].ball - 1
+			, fromY: skipRowsCount + 0
+			, toX: data[ii].ball - 1
+			, toY: skipRowsCount + 19
+			, color: data[ii].color, manual: true
+		});
 	}
-	
+
 }
 function testTest() {
 	let yyy = rowsVisibleCount + 22 + skipRowsCount - 1;
@@ -1059,56 +1065,90 @@ function testTest() {
 		if (line.fromY == yyy && line.toY == yyy) {
 			if (line.fromX == leftBlue || line.toX == leftBlue) {
 				let nn = 2 * Math.abs(line.fromX - line.toX);
-				let data = sortedBlue.slice(0, nn);
+				let orders: number[] = sortedBlue.slice(0, nn);
+				let data: { ball: number, color: string }[] = [];
+				for (let bb = 0; bb < orders.length; bb++) {
+					data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
+				}
 				console.log('leftBlue', nn, data);
 				drawTestLines(data);
+
 			}
 			if (line.fromX == rightBlue || line.toX == rightBlue) {
 				let nn = 2 * Math.abs(line.fromX - line.toX);
-				let data = sortedBlue.slice(sortedBlue.length - nn);
+				//let data = sortedBlue.slice(sortedBlue.length - nn);
+				let orders: number[] = sortedBlue.slice(sortedBlue.length - nn);
+				let data: { ball: number, color: string }[] = [];
+				for (let bb = 0; bb < orders.length; bb++) {
+					data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
+				}
 				console.log('rightBlue', nn, data);
 				drawTestLines(data);
 			}
 			if (line.fromX == leftGreen || line.toX == leftGreen) {
 				let nn = 2 * Math.abs(line.fromX - line.toX);
-				let data = sortedGreen.slice(0, nn);
+				//let data = sortedGreen.slice(0, nn);
+				let orders: number[] = sortedGreen.slice(0, nn);
+				let data: { ball: number, color: string }[] = [];
+				for (let bb = 0; bb < orders.length; bb++) {
+					data.push({ ball: orders[bb] - 0.1, color: '#00990099' });
+				}
 				console.log('leftGreen', nn, data);
 				drawTestLines(data);
 			}
 			if (line.fromX == rightGreen || line.toX == rightGreen) {
 				let nn = 2 * Math.abs(line.fromX - line.toX);
-				let data = sortedGreen.slice(sortedGreen.length - nn);
+				//let data = sortedGreen.slice(sortedGreen.length - nn);
+				let orders: number[] = sortedGreen.slice(sortedGreen.length - nn);
+				let data: { ball: number, color: string }[] = [];
+				for (let bb = 0; bb < orders.length; bb++) {
+					data.push({ ball: orders[bb] - 0.1, color: '#00990099' });
+				}
 				console.log('rightGreen', nn, data);
 				drawTestLines(data);
 			}
 			if (line.fromX == leftGrey || line.toX == leftGrey) {
 				let nn = 2 * Math.abs(line.fromX - line.toX);
-				let data = sortedGrey.slice(0, nn);
+				//let data = sortedGrey.slice(0, nn);
+				let orders: number[] = sortedGrey.slice(0, nn);
+				let data: { ball: number, color: string }[] = [];
+				for (let bb = 0; bb < orders.length; bb++) {
+					data.push({ ball: orders[bb] - 0.2, color: '#66666699' });
+				}
 				console.log('leftGrey', nn, data);
 				drawTestLines(data);
 			}
 			if (line.fromX == rightGrey || line.toX == rightGrey) {
 				let nn = 2 * Math.abs(line.fromX - line.toX);
-				let data = sortedGrey.slice(sortedGrey.length - nn);
+				//let data = sortedGrey.slice(sortedGrey.length - nn);
+				let orders: number[] = sortedGrey.slice(sortedGrey.length - nn);
+				let data: { ball: number, color: string }[] = [];
+				for (let bb = 0; bb < orders.length; bb++) {
+					data.push({ ball: orders[bb] - 0.2, color: '#66666699' });
+				}
 				console.log('rightGrey', nn, data);
 				drawTestLines(data);
 			}
 			if (line.fromX == leftRed || line.toX == leftRed) {
 				let nn = 2 * Math.abs(line.fromX - line.toX);
-				let data: number[] = [];
+				//let data: number[] = [];
+				let data: { ball: number, color: string }[] = [];
 				for (let rr = 0; rr < nn; rr++) {
 					let kk: number = rr + 1;
-					data.push(kk);
+					//data.push(kk);
+					data.push({ ball: 1 + kk, color: '#ff000099' });
 				}
 				console.log('leftRed', nn, data);
 				drawTestLines(data);
 			}
 			if (line.fromX == rightRed || line.toX == rightRed) {
 				let nn = 2 * Math.abs(line.fromX - line.toX);
-				let data: number[] = [];
+				//let data: number[] = [];
+				let data: { ball: number, color: string }[] = [];
 				for (let rr = 0; rr < nn; rr++) {
 					let kk: number = rowLen - rr;
-					data.push(kk);
+					//data.push(kk);
+					data.push({ ball: 1 + kk, color: '#ff000099' });
 				}
 				console.log('rightRed', nn, data);
 				drawTestLines(data);

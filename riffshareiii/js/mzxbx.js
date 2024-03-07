@@ -2266,11 +2266,9 @@ class GPImporter {
         console.log('load', arrayBuffer);
         let gp3To5Importer = new Gp3To5Importer();
         let uint8Array = new Uint8Array(arrayBuffer);
-        console.log('uint8Array', uint8Array);
         let data = ByteBuffer.fromBuffer(uint8Array);
         let settings = new Settings();
         gp3To5Importer.init(data, settings);
-        console.log('gp3To5Importer', gp3To5Importer);
         this.score = gp3To5Importer.readScore();
     }
     convertProject(title, comment) {
