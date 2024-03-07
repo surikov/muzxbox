@@ -140,7 +140,7 @@ class CommandDispatcher {
 	promptTestImport() {
 		console.log('promptTestImport');
 		let me = this;
-		let filesinput: HTMLElement | null = document.getElementById('file_test_input');
+		let filesinput: HTMLElement | null = document.getElementById('file_gp35_input');
 		if (filesinput) {
 			if (!(this.listener)) {
 				this.listener = function (this: HTMLElement, ievent: HTMLElementEventMap['change']) {
