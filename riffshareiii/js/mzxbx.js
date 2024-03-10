@@ -86,7 +86,7 @@ class MZXBX_MetreMath {
     }
 }
 function MZMM() {
-    return new MZXBX_MetreMath();
+    return new MZXBX_MetreMath().set({ count: 0, part: 1 });
 }
 class MZXBX_ScaleMath {
     scale() {
@@ -2292,21 +2292,6 @@ function score2schedule(title, comment, score) {
         filters: [],
         comments: []
     };
-    for (let tt = 0; tt < score.tracks.length; tt++) {
-        let track = score.tracks[tt];
-        let pp = false;
-        for (let ss = 0; ss < track.staves.length; ss++) {
-            if (track.staves[ss].isPercussion) {
-                pp = true;
-            }
-        }
-        if (pp) {
-            addScoreDrumsTracks(project, track);
-        }
-        else {
-            addScoreInsTrack(project, track);
-        }
-    }
     let tempo = 120;
     for (let bb = 0; bb < score.masterBars.length; bb++) {
         let maBar = score.masterBars[bb];
@@ -2323,22 +2308,160 @@ function score2schedule(title, comment, score) {
             }
         };
         project.timeline.push(measure);
-        for (let tr = 0; tr < project.tracks.length; tr++) {
-            project.tracks[tr].measures.push({ chords: [] });
+    }
+    for (let tt = 0; tt < score.tracks.length; tt++) {
+        let scoreTrack = score.tracks[tt];
+        let pp = false;
+        for (let ss = 0; ss < scoreTrack.staves.length; ss++) {
+            if (scoreTrack.staves[ss].isPercussion) {
+                pp = true;
+            }
+        }
+        if (pp) {
+            addScoreDrumsTracks(project, scoreTrack);
+        }
+        else {
+            addScoreInsTrack(project, scoreTrack);
         }
     }
+    console.log(project);
     return project;
 }
-function addScoreInsTrack(project, fromTrack) {
-    let toTrack = {
-        title: fromTrack.name,
+function stringFret2pitch(stringNum, fretNum, tuning) {
+    if (stringNum > 0 && stringNum <= tuning.length) {
+        return tuning[tuning.length - stringNum] + fretNum;
+    }
+    return -1;
+}
+function beatDuration(beat) {
+    let duration = MZMM().set({ count: 1, part: beat.duration });
+    if (beat.dots > 0) {
+        duration = duration.plus({ count: duration.count, part: 2 * beat.duration });
+    }
+    if (beat.dots > 1) {
+        duration = duration.plus({ count: duration.count, part: 4 * beat.duration });
+    }
+    if (beat.dots > 2) {
+        duration = duration.plus({ count: duration.count, part: 8 * beat.duration });
+    }
+    if (beat.dots > 3) {
+        duration = duration.plus({ count: duration.count, part: 16 * beat.duration });
+    }
+    return duration;
+}
+function takeChord(start, measure) {
+    let startBeat = MZMM().set(start);
+    for (let cc = 0; cc < measure.chords.length; cc++) {
+        if (startBeat.equals(measure.chords[cc].skip)) {
+            return measure.chords[cc];
+        }
+    }
+    let newChord = { notes: [], skip: { count: start.count, part: start.part } };
+    measure.chords.push(newChord);
+    return newChord;
+}
+function addScoreInsTrack(project, scoreTrack) {
+    let mzxbxTrack = {
+        title: scoreTrack.name,
         measures: [],
         filters: [],
         performer: { id: '', data: '' }
     };
-    project.tracks.push(toTrack);
+    project.tracks.push(mzxbxTrack);
+    for (let mm = 0; mm < project.timeline.length; mm++) {
+        let mzxbxMeasure = { chords: [] };
+        mzxbxTrack.measures.push(mzxbxMeasure);
+        for (let ss = 0; ss < scoreTrack.staves.length; ss++) {
+            let staff = scoreTrack.staves[ss];
+            let tuning = staff.stringTuning.tunings;
+            let bar = staff.bars[mm];
+            for (let vv = 0; vv < bar.voices.length; vv++) {
+                let voice = bar.voices[vv];
+                let start = MZMM();
+                for (let bb = 0; bb < voice.beats.length; bb++) {
+                    let beat = voice.beats[bb];
+                    let currentDuration = beatDuration(beat);
+                    for (let nn = 0; nn < beat.notes.length; nn++) {
+                        let note = beat.notes[nn];
+                        let pitch = stringFret2pitch(note.string, note.fret, tuning);
+                        let chord = takeChord(start, mzxbxMeasure);
+                        let mzxbxNote = {
+                            pitch: pitch,
+                            slides: [{
+                                    delta: 0,
+                                    duration: currentDuration
+                                }]
+                        };
+                        chord.notes.push(mzxbxNote);
+                    }
+                    start = start.plus(currentDuration);
+                }
+            }
+        }
+    }
 }
-function addScoreDrumsTracks(project, fromTrack) {
+function takeDrumTrack(title, trackDrums, drumNum) {
+    if (trackDrums[drumNum]) {
+    }
+    else {
+        let track = {
+            title: title,
+            measures: [],
+            filters: [],
+            sampler: { id: '', data: '' }
+        };
+        trackDrums[drumNum] = track;
+    }
+    trackDrums[drumNum].title = title;
+    return trackDrums[drumNum];
+}
+function takeDrumMeasure(trackDrum, barNum) {
+    if (trackDrum.measures[barNum]) {
+    }
+    else {
+        let measure = {
+            skips: []
+        };
+        trackDrum.measures[barNum] = measure;
+    }
+    return trackDrum.measures[barNum];
+}
+function addScoreDrumsTracks(project, scoreTrack) {
+    let trackDrums = [];
+    for (let mm = 0; mm < project.timeline.length; mm++) {
+        for (let ss = 0; ss < scoreTrack.staves.length; ss++) {
+            let staff = scoreTrack.staves[ss];
+            let bar = staff.bars[mm];
+            for (let vv = 0; vv < bar.voices.length; vv++) {
+                let voice = bar.voices[vv];
+                let start = MZMM();
+                for (let bb = 0; bb < voice.beats.length; bb++) {
+                    let beat = voice.beats[bb];
+                    let currentDuration = beatDuration(beat);
+                    for (let nn = 0; nn < beat.notes.length; nn++) {
+                        let note = beat.notes[nn];
+                        let drum = note.percussionArticulation;
+                        let track = takeDrumTrack(scoreTrack.name + ': ' + drum, trackDrums, drum);
+                        let measure = takeDrumMeasure(track, mm);
+                        measure.skips.push(start);
+                    }
+                    start = start.plus(currentDuration);
+                }
+            }
+        }
+    }
+    for (let mm = 0; mm < project.timeline.length; mm++) {
+        for (let tt = 0; tt < trackDrums.length; tt++) {
+            if (trackDrums[tt]) {
+                takeDrumMeasure(trackDrums[tt], mm);
+            }
+        }
+    }
+    for (let tt = 0; tt < trackDrums.length; tt++) {
+        if (trackDrums[tt]) {
+            project.percussions.push(trackDrums[tt]);
+        }
+    }
 }
 class ImporterSettings {
     constructor() {
@@ -2488,6 +2611,9 @@ var MusicFontSymbol;
     MusicFontSymbol[MusicFontSymbol["OctaveBaselineB"] = 60563] = "OctaveBaselineB";
 })(MusicFontSymbol || (MusicFontSymbol = {}));
 class Gp3To5Importer extends ScoreImporter {
+    get name() {
+        return 'Guitar Pro 3-5';
+    }
     constructor() {
         super();
         this._versionNumber = 0;
@@ -2498,9 +2624,6 @@ class Gp3To5Importer extends ScoreImporter {
         this._trackCount = 0;
         this._playbackInfos = [];
         this._beatTextChunksByTrack = new Map();
-    }
-    get name() {
-        return 'Guitar Pro 3-5';
     }
     readScore() {
         this.readVersion();
@@ -5487,11 +5610,6 @@ var TripletFeel;
     TripletFeel[TripletFeel["Scottish8th"] = 6] = "Scottish8th";
 })(TripletFeel || (TripletFeel = {}));
 class Tuning {
-    constructor(name = '', tuning = null, isStandard = false) {
-        this.isStandard = isStandard;
-        this.name = name;
-        this.tunings = tuning !== null && tuning !== void 0 ? tuning : [];
-    }
     static getTextForTuning(tuning, includeOctave) {
         let parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];
@@ -5592,6 +5710,11 @@ class Tuning {
             }
         }
         return null;
+    }
+    constructor(name = '', tuning = null, isStandard = false) {
+        this.isStandard = isStandard;
+        this.name = name;
+        this.tunings = tuning !== null && tuning !== void 0 ? tuning : [];
     }
     finish() {
         const knownTuning = Tuning.findTuning(this.tunings);

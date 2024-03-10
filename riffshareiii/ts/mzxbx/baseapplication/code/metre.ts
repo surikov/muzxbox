@@ -94,5 +94,5 @@ class MZXBX_MetreMath implements MZXBX_MetreMathType {
 
 }
 function MZMM(): MZXBX_MetreMathType {
-    return new MZXBX_MetreMath();
+    return new MZXBX_MetreMath().set({count:0,part:1});
 }
