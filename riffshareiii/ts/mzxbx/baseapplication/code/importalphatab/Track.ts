@@ -38,7 +38,7 @@
     /**
      * Gets or sets the long name of this track.
      */
-    public name: string = '';
+    public trackName: string = '';
 
     /**
      * Gets or sets the short name of this track.
@@ -77,7 +77,7 @@
 
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         if (!this.shortName) {
-            this.shortName = this.name;
+            this.shortName = this.trackName;
             if (this.shortName.length > Track.ShortNameMaxLength) {
                 this.shortName = this.shortName.substr(0, Track.ShortNameMaxLength);
             }

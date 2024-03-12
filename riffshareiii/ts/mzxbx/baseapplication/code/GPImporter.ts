@@ -9,6 +9,7 @@ class GPImporter {
         //console.log('uint8Array', uint8Array);
         let data: ByteBuffer = ByteBuffer.fromBuffer(uint8Array);
         let settings: Settings = new Settings();
+		settings.importer.encoding='windows-1251';
         gp3To5Importer.init(data, settings);
         //console.log('gp3To5Importer', gp3To5Importer);
         this.score = gp3To5Importer.readScore();
@@ -118,7 +119,7 @@ function takeChord(start: MZXBX_Metre, measure: MZXBX_TrackMeasure): MZXBX_Chord
 }
 function addScoreInsTrack(project: MZXBX_Project, scoreTrack: Track) {
     let mzxbxTrack: MZXBX_MusicTrack = {
-        title: scoreTrack.name
+        title: scoreTrack.trackName
         , measures: []
         , filters: []
         , performer: { id: '', data: '' }
@@ -203,7 +204,7 @@ function addScoreDrumsTracks(project: MZXBX_Project, scoreTrack: Track) {
                     for (let nn = 0; nn < beat.notes.length; nn++) {
                         let note = beat.notes[nn];
                         let drum = note.percussionArticulation;
-                        let track = takeDrumTrack(scoreTrack.name + ': ' + drum, trackDrums, drum);
+                        let track = takeDrumTrack(scoreTrack.trackName + ': ' + drum, trackDrums, drum);
                         let measure = takeDrumMeasure(track, mm);
                         measure.skips.push(start);
                         /*let pitch = stringFret2pitch(note.string, note.fret, tuning);

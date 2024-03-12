@@ -347,7 +347,10 @@ import { Tuning } from '@src/model/Tuning';
         this._score.addTrack(newTrack);
         let mainStaff: Staff = newTrack.staves[0];
         let flags: number = this.data.readByte();
-        newTrack.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 40, this.settings.importer.encoding);
+		//console.log('readTrack encoding',this.settings.importer.encoding);
+        newTrack.trackName = GpBinaryHelpers.gpReadStringByteLength(this.data, 40, this.settings.importer.encoding);
+		//let encoding='windows-1251';
+		//newTrack.trackName = GpBinaryHelpers.gpReadStringByteLength(this.data, 40, encoding);
         if ((flags & 0x01) !== 0) {
             mainStaff.isPercussion = true;
         }

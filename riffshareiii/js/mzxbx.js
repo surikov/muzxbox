@@ -2268,6 +2268,7 @@ class GPImporter {
         let uint8Array = new Uint8Array(arrayBuffer);
         let data = ByteBuffer.fromBuffer(uint8Array);
         let settings = new Settings();
+        settings.importer.encoding = 'windows-1251';
         gp3To5Importer.init(data, settings);
         this.score = gp3To5Importer.readScore();
     }
@@ -2362,7 +2363,7 @@ function takeChord(start, measure) {
 }
 function addScoreInsTrack(project, scoreTrack) {
     let mzxbxTrack = {
-        title: scoreTrack.name,
+        title: scoreTrack.trackName,
         measures: [],
         filters: [],
         performer: { id: '', data: '' }
@@ -2441,7 +2442,7 @@ function addScoreDrumsTracks(project, scoreTrack) {
                     for (let nn = 0; nn < beat.notes.length; nn++) {
                         let note = beat.notes[nn];
                         let drum = note.percussionArticulation;
-                        let track = takeDrumTrack(scoreTrack.name + ': ' + drum, trackDrums, drum);
+                        let track = takeDrumTrack(scoreTrack.trackName + ': ' + drum, trackDrums, drum);
                         let measure = takeDrumMeasure(track, mm);
                         measure.skips.push(start);
                     }
@@ -2611,9 +2612,6 @@ var MusicFontSymbol;
     MusicFontSymbol[MusicFontSymbol["OctaveBaselineB"] = 60563] = "OctaveBaselineB";
 })(MusicFontSymbol || (MusicFontSymbol = {}));
 class Gp3To5Importer extends ScoreImporter {
-    get name() {
-        return 'Guitar Pro 3-5';
-    }
     constructor() {
         super();
         this._versionNumber = 0;
@@ -2624,6 +2622,9 @@ class Gp3To5Importer extends ScoreImporter {
         this._trackCount = 0;
         this._playbackInfos = [];
         this._beatTextChunksByTrack = new Map();
+    }
+    get name() {
+        return 'Guitar Pro 3-5';
     }
     readScore() {
         this.readVersion();
@@ -2836,7 +2837,7 @@ class Gp3To5Importer extends ScoreImporter {
         this._score.addTrack(newTrack);
         let mainStaff = newTrack.staves[0];
         let flags = this.data.readByte();
-        newTrack.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 40, this.settings.importer.encoding);
+        newTrack.trackName = GpBinaryHelpers.gpReadStringByteLength(this.data, 40, this.settings.importer.encoding);
         if ((flags & 0x01) !== 0) {
             mainStaff.isPercussion = true;
         }
@@ -4689,7 +4690,7 @@ class Track {
         this.staves = [];
         this.playbackInfo = new PlaybackInformation();
         this.color = new Color(200, 0, 0, 255);
-        this.name = '';
+        this.trackName = '';
         this.shortName = '';
         this.defaultSystemsLayout = 3;
         this.systemsLayout = [];
@@ -4707,7 +4708,7 @@ class Track {
     }
     finish(settings, sharedDataBag = null) {
         if (!this.shortName) {
-            this.shortName = this.name;
+            this.shortName = this.trackName;
             if (this.shortName.length > Track.ShortNameMaxLength) {
                 this.shortName = this.shortName.substr(0, Track.ShortNameMaxLength);
             }
@@ -5610,6 +5611,11 @@ var TripletFeel;
     TripletFeel[TripletFeel["Scottish8th"] = 6] = "Scottish8th";
 })(TripletFeel || (TripletFeel = {}));
 class Tuning {
+    constructor(name = '', tuning = null, isStandard = false) {
+        this.isStandard = isStandard;
+        this.name = name;
+        this.tunings = tuning !== null && tuning !== void 0 ? tuning : [];
+    }
     static getTextForTuning(tuning, includeOctave) {
         let parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];
@@ -5710,11 +5716,6 @@ class Tuning {
             }
         }
         return null;
-    }
-    constructor(name = '', tuning = null, isStandard = false) {
-        this.isStandard = isStandard;
-        this.name = name;
-        this.tunings = tuning !== null && tuning !== void 0 ? tuning : [];
     }
     finish() {
         const knownTuning = Tuning.findTuning(this.tunings);

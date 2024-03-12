@@ -25,13 +25,13 @@ declare class MZXBX_ScaleMath {
     step7: MZXBX_StepSkip;
     scale(): MZXBX_Scale;
 }
-type MZXBX_CachedWave = {
+declare type MZXBX_CachedWave = {
     path: string;
     buffer: AudioBuffer | null;
     canceled?: boolean;
     line100?: number[];
 };
-type MZXBX_Metre = {
+declare type MZXBX_Metre = {
     count: number;
     part: number;
 };
@@ -50,12 +50,12 @@ interface MZXBX_MetreMathType {
     duration(tempo: number): number;
     calculate(duration: number, tempo: number): MZXBX_MetreMathType;
 }
-type MZXBX_HalfTone = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
-type MZXBX_Octave = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-type MZXBX_Step = 1 | 2 | 3 | 4 | 5 | 6 | 7;
-type MZXBX_StepShift = -2 | -1 | 0 | 1 | 2;
-type MZXBX_StepSkip = 1 | 2;
-type MZXBX_Scale = {
+declare type MZXBX_HalfTone = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
+declare type MZXBX_Octave = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+declare type MZXBX_Step = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+declare type MZXBX_StepShift = -2 | -1 | 0 | 1 | 2;
+declare type MZXBX_StepSkip = 1 | 2;
+declare type MZXBX_Scale = {
     basePitch: MZXBX_HalfTone;
     step2: MZXBX_StepSkip;
     step3: MZXBX_StepSkip;
@@ -64,77 +64,77 @@ type MZXBX_Scale = {
     step6: MZXBX_StepSkip;
     step7: MZXBX_StepSkip;
 };
-type MZXBX_Slide = {
+declare type MZXBX_Slide = {
     duration: MZXBX_Metre;
     delta: number;
 };
-type MZXBX_Note = {
+declare type MZXBX_Note = {
     step?: MZXBX_Step;
     shift?: MZXBX_StepShift;
     octave?: MZXBX_Octave;
     pitch: number;
     slides: MZXBX_Slide[];
 };
-type MZXBX_PluginBase = {
+declare type MZXBX_PluginBase = {
     setup: (audioContext: AudioContext) => boolean;
 };
-type MZXBX_PluginFilter = MZXBX_PluginBase | {
+declare type MZXBX_PluginFilter = MZXBX_PluginBase | {
     input: string;
 };
-type MZXBX_PluginPerformer = MZXBX_PluginBase | {
+declare type MZXBX_PluginPerformer = MZXBX_PluginBase | {
     output: string;
     schedule: (chord: MZXBX_Chord, when: number) => boolean;
 };
-type MZXBX_PluginSampler = MZXBX_PluginBase | {
+declare type MZXBX_PluginSampler = MZXBX_PluginBase | {
     output: string;
 };
-type MZXBX_AudioFilter = {
+declare type MZXBX_AudioFilter = {
     id: string;
     data: string;
 };
-type MZXBX_AudioPerformer = {
+declare type MZXBX_AudioPerformer = {
     id: string;
     data: string;
 };
-type MZXBX_AudioSampler = {
+declare type MZXBX_AudioSampler = {
     id: string;
     data: string;
 };
-type MZXBX_Chord = {
+declare type MZXBX_Chord = {
     skip: MZXBX_Metre;
     notes: MZXBX_Note[];
 };
-type MZXBX_TrackMeasure = {
+declare type MZXBX_TrackMeasure = {
     chords: MZXBX_Chord[];
 };
-type MZXBX_PercussionMeasure = {
+declare type MZXBX_PercussionMeasure = {
     skips: MZXBX_Metre[];
 };
-type MZXBX_SongMeasure = {
+declare type MZXBX_SongMeasure = {
     tempo: number;
     metre: MZXBX_Metre;
     scale?: MZXBX_Scale;
 };
-type MZXBX_PercussionTrack = {
+declare type MZXBX_PercussionTrack = {
     title: string;
     measures: MZXBX_PercussionMeasure[];
     filters: MZXBX_AudioFilter[];
     sampler: MZXBX_AudioSampler;
 };
-type MZXBX_MusicTrack = {
+declare type MZXBX_MusicTrack = {
     title: string;
     measures: MZXBX_TrackMeasure[];
     filters: MZXBX_AudioFilter[];
     performer: MZXBX_AudioPerformer;
 };
-type MZXBX_CommentText = {
+declare type MZXBX_CommentText = {
     skip: MZXBX_Metre;
     text: string;
 };
-type MZXBX_CommentMeasure = {
+declare type MZXBX_CommentMeasure = {
     texts: MZXBX_CommentText[];
 };
-type MZXBX_Project = {
+declare type MZXBX_Project = {
     title: string;
     timeline: MZXBX_SongMeasure[];
     tracks: MZXBX_MusicTrack[];
@@ -142,76 +142,76 @@ type MZXBX_Project = {
     comments: MZXBX_CommentMeasure[];
     filters: MZXBX_AudioFilter[];
 };
-type MZXBX_FilterHolder = {
+declare type MZXBX_FilterHolder = {
     plugin: MZXBX_AudioFilterPlugin | null;
     id: string;
     kind: string;
     properties: string;
     launched: boolean;
 };
-type MZXBX_PerformerHolder = {
+declare type MZXBX_PerformerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | null;
     id: string;
     kind: string;
     properties: string;
     launched: boolean;
 };
-type MZXBX_Channel = {
+declare type MZXBX_Channel = {
     id: string;
     comment?: string;
     filters: MZXBX_ChannelFilter[];
     performer: MZXBX_ChannelPerformer;
 };
-type MZXBX_SlideItem = {
+declare type MZXBX_SlideItem = {
     duration: number;
     delta: number;
 };
-type MZXBX_PlayItem = {
+declare type MZXBX_PlayItem = {
     skip: number;
     channelId: string;
     pitch: number;
     slides: MZXBX_SlideItem[];
 };
-type MZXBX_FilterState = {
+declare type MZXBX_FilterState = {
     skip: number;
     filterId: string;
     data: string;
 };
-type MZXBX_Set = {
+declare type MZXBX_Set = {
     duration: number;
     items: MZXBX_PlayItem[];
     states: MZXBX_FilterState[];
 };
-type MZXBX_ChannelFilter = {
+declare type MZXBX_ChannelFilter = {
     id: string;
     kind: string;
     properties: string;
 };
-type MZXBX_AudioFilterPlugin = {
+declare type MZXBX_AudioFilterPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
     schedule: (when: number, parameters: string) => void;
     input: () => AudioNode | null;
     output: () => AudioNode | null;
 };
-type MZXBX_ChannelPerformer = {
+declare type MZXBX_ChannelPerformer = {
     id: string;
     kind: string;
     properties: string;
 };
-type MZXBX_AudioPerformerPlugin = {
+declare type MZXBX_AudioPerformerPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
     schedule: (when: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
 };
-type MZXBX_Schedule = {
+declare type MZXBX_Schedule = {
     series: MZXBX_Set[];
     channels: MZXBX_Channel[];
     filters: MZXBX_ChannelFilter[];
 };
-type MZXBX_Player = {
+declare type MZXBX_Player = {
     setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;
     startLoop: (from: number, position: number, to: number) => string;
     cancel: () => void;
@@ -219,7 +219,7 @@ type MZXBX_Player = {
     allPerformers(): MZXBX_PerformerHolder[];
     position: number;
 };
-type MZXBX_import = {
+declare type MZXBX_import = {
     import: () => MZXBX_Schedule | null;
 };
 declare let testSchedule: MZXBX_Schedule;
@@ -300,26 +300,26 @@ declare class PluginLoader {
         functionName: string;
     } | null;
 }
-type ImportMeasure = MZXBX_SongMeasure & {
+declare type ImportMeasure = MZXBX_SongMeasure & {
     startMs: number;
     durationMs: number;
 };
 declare let drumNames: string[];
 declare let insNames: string[];
-type XYp = {
+declare type XYp = {
     x: number;
     y: number;
 };
-type PP = {
+declare type PP = {
     p1: XYp;
     p2: XYp;
 };
-type TrackChord = {
+declare type TrackChord = {
     when: number;
     channel: number;
     notes: TrackNote[];
 };
-type TrackNote = {
+declare type TrackNote = {
     closed: boolean;
     bendPoints: NotePitch[];
     openEvent?: MIDIEvent;
@@ -328,11 +328,11 @@ type TrackNote = {
     basePitch: number;
     baseDuration: number;
 };
-type NotePitch = {
+declare type NotePitch = {
     pointDuration: number;
     basePitchDelta: number;
 };
-type MIDIEvent = {
+declare type MIDIEvent = {
     offset: number;
     delta: number;
     eventTypeByte: number;
@@ -365,22 +365,22 @@ type MIDIEvent = {
     trackNum?: number;
     text?: string;
 };
-type MIDISongPoint = {
+declare type MIDISongPoint = {
     pitch: number;
     durationms: number;
     midipoint?: TrackNote;
 };
-type MIDISongNote = {
+declare type MIDISongNote = {
     midiPitch: number;
     midiDuration: number;
     slidePoints: MIDISongPoint[];
 };
-type MIDISongChord = {
+declare type MIDISongChord = {
     when: number;
     channel: number;
     notes: MIDISongNote[];
 };
-type MIDISongTrack = {
+declare type MIDISongTrack = {
     title: string;
     channelNum: number;
     program: number;
@@ -393,7 +393,7 @@ type MIDISongTrack = {
     songchords: MIDISongChord[];
     order: number;
 };
-type MIDISongData = {
+declare type MIDISongData = {
     duration: number;
     parser: string;
     bpm: number;
@@ -1209,7 +1209,7 @@ declare class Track {
     staves: Staff[];
     playbackInfo: PlaybackInformation;
     color: Color;
-    name: string;
+    trackName: string;
     shortName: string;
     defaultSystemsLayout: number;
     systemsLayout: number[];
