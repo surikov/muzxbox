@@ -276,6 +276,25 @@ class CommandDispatcher {
             filesinput.click();
         }
     }
+    promptPluginGUI() {
+        console.log('promptPluginGUI');
+        document.getElementById("pluginDiv").style.visibility = "visible";
+        let pluginFrame = document.getElementById("pluginFrame");
+        if (pluginFrame) {
+            if (pluginFrame.contentWindow) {
+                let pluginWindow = pluginFrame.contentWindow;
+                console.log('pluginWindow', pluginWindow);
+                pluginWindow.postMessage({
+                    name: 'Testing messaging',
+                    waitID: 'qqq123'
+                }, '*');
+            }
+        }
+    }
+    cancelPluginGUI() {
+        console.log('cancelPluginGUI');
+        document.getElementById("pluginDiv").style.visibility = "hidden";
+    }
     promptTestImport() {
         console.log('promptTestImport');
         let me = this;
@@ -1097,8 +1116,12 @@ function composeBaseMenu() {
                     commandDispatcher.promptImportFromMIDI();
                 }
             }, {
-                text: "TestImport", onClick: () => {
+                text: "GP35Import", onClick: () => {
                     commandDispatcher.promptTestImport();
+                }
+            }, {
+                text: "Test iFrame GUI", onClick: () => {
+                    commandDispatcher.promptPluginGUI();
                 }
             }, menuPointTracks,
             menuPointPercussion,

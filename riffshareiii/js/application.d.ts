@@ -42,6 +42,8 @@ declare class CommandDispatcher {
     setTrackSoloState(state: number): void;
     setDrumSoloState(state: number): void;
     promptImportFromMIDI(): void;
+    promptPluginGUI(): void;
+    cancelPluginGUI(): void;
     promptTestImport(): void;
 }
 declare let commandDispatcher: CommandDispatcher;

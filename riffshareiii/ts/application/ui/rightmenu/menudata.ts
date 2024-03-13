@@ -38,8 +38,12 @@ function composeBaseMenu(): MenuInfo[] {
                     commandDispatcher.promptImportFromMIDI();
                 }
             },{
-                text: "TestImport", onClick: () => {
+                text: "GP35Import", onClick: () => {
                     commandDispatcher.promptTestImport();
+                }
+			},{
+                text: "Test iFrame GUI", onClick: () => {
+                    commandDispatcher.promptPluginGUI();
                 }
             }, menuPointTracks
             , menuPointPercussion

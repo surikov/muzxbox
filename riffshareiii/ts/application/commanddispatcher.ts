@@ -137,6 +137,31 @@ class CommandDispatcher {
 			//console.log('setup', filesinput);
 		}
 	}
+	promptPluginGUI() {
+		console.log('promptPluginGUI');
+		(document.getElementById("pluginDiv") as any).style.visibility = "visible";
+
+		let pluginFrame = document.getElementById("pluginFrame") as any;
+		if (pluginFrame) {
+
+			if (pluginFrame.contentWindow) {
+				/*let tefunc = pluginWindow.testFunction;
+				if (tefunc) {
+					console.log('pluginFrame', tefunc('qqq123'));
+				}*/
+				let pluginWindow: Window = pluginFrame.contentWindow;
+				console.log('pluginWindow', pluginWindow);
+				pluginWindow.postMessage({
+					name: 'Testing messaging'
+					, waitID:'qqq123'
+				}, '*');//web/test/plugin.html');
+			}
+		}
+	}
+	cancelPluginGUI() {
+		console.log('cancelPluginGUI');
+		(document.getElementById("pluginDiv") as any).style.visibility = "hidden";
+	}
 	promptTestImport() {
 		console.log('promptTestImport');
 		let me = this;
@@ -169,7 +194,7 @@ class CommandDispatcher {
 						if (progressEvent != null) {
 							var arrayBuffer = progressEvent.target.result;
 							var pp = newGPparser(arrayBuffer);
-							let result: MZXBX_Project = pp.convertProject(title,comment);
+							let result: MZXBX_Project = pp.convertProject(title, comment);
 							me.registerWorkProject(result);
 							me.resetProject();
 						}

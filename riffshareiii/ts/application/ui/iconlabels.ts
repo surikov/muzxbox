@@ -1,3 +1,5 @@
+//https://zavoloklom.github.io/material-design-iconic-font/icons.html
+
 let icon_play='&#xf3aa;';
 let icon_pause='&#xf3a7;';
 let icon_hor_menu='&#xf19c;';
