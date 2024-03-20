@@ -659,8 +659,8 @@ class PluginLoader {
         if (tt) {
             let info = tt;
             MZXBX_appendScriptURL(info.url);
-            MZXBX_waitForCondition(250, () => { return (window[info.functionName]); }, () => {
-                let exe = window[info.functionName];
+            MZXBX_waitForCondition(250, () => { return (window[info.evaluate]); }, () => {
+                let exe = window[info.evaluate];
                 let plugin = exe();
                 if (plugin) {
                     onDone(plugin);
@@ -691,9 +691,9 @@ class PluginLoader {
         performers.push({ plugin: null, id: id, kind: kind, properties: properties, launched: false });
     }
     findPluginInfo(kind) {
-        for (let ll = 0; ll < pluginListKindUrlName.length; ll++) {
-            if (pluginListKindUrlName[ll].kind == kind) {
-                return pluginListKindUrlName[ll];
+        for (let ll = 0; ll < MZXBX_currentPlugins().length; ll++) {
+            if (MZXBX_currentPlugins()[ll].group == kind) {
+                return MZXBX_currentPlugins()[ll];
             }
         }
         return null;

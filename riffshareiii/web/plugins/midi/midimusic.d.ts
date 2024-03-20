@@ -1,5 +1,7 @@
-declare let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[];
-declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
+declare class MIDIIImportMusicPlugin implements MZXBX_ImportMusicPlugin {
+    GUIURL(callback: (imported: MZXBX_Project) => void): string;
+}
+declare function createImportMIDIfile(): MZXBX_ImportMusicPlugin;
 declare type MZXBX_CachedWave = {
     path: string;
     buffer: AudioBuffer | null;

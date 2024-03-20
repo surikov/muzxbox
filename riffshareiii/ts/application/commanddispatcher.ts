@@ -137,8 +137,8 @@ class CommandDispatcher {
 			//console.log('setup', filesinput);
 		}
 	}
-	promptPluginGUI() {
-		console.log('promptPluginGUI');
+	promptPluginGUI(url: string) {
+		console.log('promptPluginGUI', url);
 		(document.getElementById("pluginDiv") as any).style.visibility = "visible";
 
 		let pluginFrame = document.getElementById("pluginFrame") as any;
@@ -150,10 +150,11 @@ class CommandDispatcher {
 					console.log('pluginFrame', tefunc('qqq123'));
 				}*/
 				let pluginWindow: Window = pluginFrame.contentWindow;
-				console.log('pluginWindow', pluginWindow);
+				pluginFrame.src=url;
+				//console.log('pluginWindow', pluginWindow);
 				pluginWindow.postMessage({
 					name: 'Testing messaging'
-					, waitID:'qqq123'
+					, waitID: 'qqq123'
 				}, '*');//web/test/plugin.html');
 			}
 		}

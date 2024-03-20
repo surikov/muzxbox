@@ -1,9 +1,9 @@
 type MZXBX_CachedWave = {
 	path: string;
-    buffer: AudioBuffer | null;
-    canceled?:boolean;
-    //dots?:{x:number,y:number}[];
-    line100?:number[];
+	buffer: AudioBuffer | null;
+	canceled?: boolean;
+	//dots?:{x:number,y:number}[];
+	line100?: number[];
 };
 type MZXBX_Metre = {
 	count: number;
@@ -21,9 +21,9 @@ interface MZXBX_MetreMathType {
 	more(metre: MZXBX_Metre): boolean;
 	plus(metre: MZXBX_Metre): MZXBX_MetreMathType;
 	minus(metre: MZXBX_Metre): MZXBX_MetreMathType;
-    //duration(metre: MZXBX_Metre, tempo: number): number;
-    duration( tempo: number): number;
-    calculate(duration: number,tempo:number): MZXBX_MetreMathType ;
+	//duration(metre: MZXBX_Metre, tempo: number): number;
+	duration(tempo: number): number;
+	calculate(duration: number, tempo: number): MZXBX_MetreMathType;
 }
 type MZXBX_HalfTone = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 type MZXBX_Octave = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -46,8 +46,8 @@ type MZXBX_Slide = {
 type MZXBX_Note = {
 	step?: MZXBX_Step;
 	shift?: MZXBX_StepShift;
-    octave?: MZXBX_Octave;
-    pitch:number;
+	octave?: MZXBX_Octave;
+	pitch: number;
 	slides: MZXBX_Slide[];
 };
 /*
@@ -132,12 +132,12 @@ type MZXBX_MusicTrack = {
 	filters: MZXBX_AudioFilter[];
 	performer: MZXBX_AudioPerformer;
 };
-type MZXBX_CommentText={
-    skip:MZXBX_Metre;
-    text:string;
+type MZXBX_CommentText = {
+	skip: MZXBX_Metre;
+	text: string;
 };
-type MZXBX_CommentMeasure={
-    texts:MZXBX_CommentText[];
+type MZXBX_CommentMeasure = {
+	texts: MZXBX_CommentText[];
 };
 /*
 type MZXBX_Theme={
@@ -149,25 +149,25 @@ type MZXBX_Project = {
 	title: string;
 	timeline: MZXBX_SongMeasure[];
 	tracks: MZXBX_MusicTrack[];
-    percussions: MZXBX_PercussionTrack[];
-    comments: MZXBX_CommentMeasure[];
+	percussions: MZXBX_PercussionTrack[];
+	comments: MZXBX_CommentMeasure[];
 	filters: MZXBX_AudioFilter[];
 	//theme:MZXBX_Theme;
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 type MZXBX_FilterHolder = {
-    plugin: MZXBX_AudioFilterPlugin | null
-    , id: string
-    , kind: string
-    , properties: string
-    , launched: boolean
+	plugin: MZXBX_AudioFilterPlugin | null
+	, id: string
+	, kind: string
+	, properties: string
+	, launched: boolean
 };
 type MZXBX_PerformerHolder = {
-    plugin: MZXBX_AudioPerformerPlugin | null
-    , id: string
-    , kind: string
-    , properties: string
-    , launched: boolean
+	plugin: MZXBX_AudioPerformerPlugin | null
+	, id: string
+	, kind: string
+	, properties: string
+	, launched: boolean
 };
 type MZXBX_Channel = {
 	id: string;
@@ -232,13 +232,25 @@ type MZXBX_Player = {
 	//reconnect:()=> void;
 	//findFilterPlugin(filterId: string): MZXBX_AudioFilterPlugin | null;
 	//findPerformerPlugin(channelId: string): MZXBX_AudioPerformerPlugin | null;
-	allFilters():MZXBX_FilterHolder[];
-	allPerformers():MZXBX_PerformerHolder[];
+	allFilters(): MZXBX_FilterHolder[];
+	allPerformers(): MZXBX_PerformerHolder[];
 	position: number;
 };
 type MZXBX_import = {
 	import: () => MZXBX_Schedule | null;
 };
-
+/*type MZXBX_Plugin = {
+	import: MZXBX_ImportMusicPlugin[]
+};*/
+type MZXBX_ImportMusicPlugin = {
+	GUIURL: (callback: (imported: MZXBX_Project) => void) => string;
+}
+type MZXBX_PluginRegistrationInformation = {
+	id: string
+	, label: string
+	, group: string
+	, url: string
+	, evaluate: string
+};
 
 

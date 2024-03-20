@@ -20,6 +20,17 @@ declare function createTileLevel(): TileLevelBase;
 declare function startApplication(): void;
 declare function initWebAudioFromUI(): void;
 declare function startLoadCSSfile(cssurl: string): void;
+declare class MusicDataImporter {
+    loadedObjects: {
+        url: string;
+        obj: any;
+    }[];
+    takeCachedInfo(url: string): ({
+        url: string;
+        obj: any;
+    });
+    runPluginGUIImport(url: string, functionName: string, onDone: (loaded: any) => void): void;
+}
 declare function newMIDIparser(arrayBuffer: ArrayBuffer): any;
 declare function newGPparser(arrayBuffer: ArrayBuffer): any;
 declare class CommandDispatcher {
@@ -42,7 +53,7 @@ declare class CommandDispatcher {
     setTrackSoloState(state: number): void;
     setDrumSoloState(state: number): void;
     promptImportFromMIDI(): void;
-    promptPluginGUI(): void;
+    promptPluginGUI(url: string): void;
     cancelPluginGUI(): void;
     promptTestImport(): void;
 }
@@ -189,6 +200,7 @@ declare class RightMenuItem {
     calculateHeight(): number;
     buildTile(itemTop: number, itemWidth: number): TileItem;
 }
+declare let importer: MusicDataImporter;
 declare type MenuInfo = {
     text: string;
     noLocalization?: boolean;
@@ -204,6 +216,9 @@ declare type MenuInfo = {
 declare let menuItemsData: MenuInfo[] | null;
 declare let menuPointTracks: MenuInfo;
 declare let menuPointPercussion: MenuInfo;
+declare let menuPointFileImport: MenuInfo;
+declare let menuPointFile: MenuInfo;
+declare function fillMenuImportPlugins(): void;
 declare function composeBaseMenu(): MenuInfo[];
 declare class LeftPanel {
     leftLayer: TileLayerDefinition;
@@ -680,7 +695,18 @@ declare type MZXBX_Player = {
 declare type MZXBX_import = {
     import: () => MZXBX_Schedule | null;
 };
+declare type MZXBX_ImportMusicPlugin = {
+    GUIURL: (callback: (imported: MZXBX_Project) => void) => string;
+};
+declare type MZXBX_PluginRegistrationInformation = {
+    id: string;
+    label: string;
+    group: string;
+    url: string;
+    evaluate: string;
+};
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
 declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MZMM(): MZXBX_MetreMathType;
+declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];

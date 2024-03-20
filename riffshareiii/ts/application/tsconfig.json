@@ -24,6 +24,7 @@
 	"files": [
         "treevalue/treevalue.ts"
         ,"startup.ts"
+		,"impexport/importutil.ts"
         ,"commanddispatcher.ts"
         ,"ui/renderer.ts"
         ,"ui/localedictionary.ts"
@@ -49,6 +50,7 @@
         ,"data/musicmetremath.ts"
         ,"data/mixerdatamath.ts"
         ,"data/numathutil.ts"
+		
         ,"../tilelevel/apitilelevel.ts"
         ,"../mzxbx/publictypes/musicenginetypes.ts"
 		,"../mzxbx/publictypes/musicenginedeclarations.ts"

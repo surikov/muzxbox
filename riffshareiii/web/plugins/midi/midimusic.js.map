@@ -1,0 +1,1 @@
+{"version":3,"file":"midimusic.js","sourceRoot":"","sources":["../../../ts/mzxbx/customcomponents/importfrommidi/midiimport.ts","../../../ts/mzxbx/publictypes/musicenginetypes.ts"],"names":[],"mappings":";AAAA,MAAM,sBAAsB;IAC3B,MAAM,CAAC,QAA2C;QACjD,OAAO,yCAAyC,CAAC;IAClD,CAAC;CAED;AACD,SAAS,oBAAoB;IAC5B,OAAO,IAAI,sBAAsB,EAAE,CAAC;AACrC,CAAC"}

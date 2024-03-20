@@ -222,6 +222,16 @@ declare type MZXBX_Player = {
 declare type MZXBX_import = {
     import: () => MZXBX_Schedule | null;
 };
+declare type MZXBX_ImportMusicPlugin = {
+    GUIURL: (callback: (imported: MZXBX_Project) => void) => string;
+};
+declare type MZXBX_PluginRegistrationInformation = {
+    id: string;
+    label: string;
+    group: string;
+    url: string;
+    evaluate: string;
+};
 declare let testSchedule: MZXBX_Schedule;
 declare class MuzXbox {
     uiStarted: boolean;
@@ -239,11 +249,6 @@ declare class MuzXbox {
     initAudioContext(): void;
     resumeContext(audioContext: AudioContext): void;
 }
-declare let pluginListKindUrlName: {
-    kind: string;
-    url: string;
-    functionName: string;
-}[];
 declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
 declare function fillLinesOfBuffer(buffer: null | AudioBuffer): number[];
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
@@ -288,17 +293,14 @@ declare class MusicTicker {
     setPosition(seconds: number): void;
     getPosition(): number;
 }
+declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 declare class PluginLoader {
     collectLoadPlugins(schedule: MZXBX_Schedule, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[], afterLoad: () => void): void;
     startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[], afterLoad: () => void): void;
     startLoadPluginStarter(kind: string, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[], onDone: (plugin: any) => void, afterLoad: () => void): void;
     сollectFilterPlugin(id: string, kind: string, properties: string, filters: MZXBX_FilterHolder[]): void;
     сollectPerformerPlugin(id: string, kind: string, properties: string, performers: MZXBX_PerformerHolder[]): void;
-    findPluginInfo(kind: string): {
-        kind: string;
-        url: string;
-        functionName: string;
-    } | null;
+    findPluginInfo(kind: string): MZXBX_PluginRegistrationInformation | null;
 }
 declare type ImportMeasure = MZXBX_SongMeasure & {
     startMs: number;

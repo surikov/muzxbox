@@ -157,6 +157,33 @@ function startLoadCSSfile(cssurl) {
     link.media = 'all';
     head.appendChild(link);
 }
+class MusicDataImporter {
+    constructor() {
+        this.loadedObjects = [];
+    }
+    takeCachedInfo(url) {
+        for (let ii = 0; ii < this.loadedObjects.length; ii++) {
+            if (this.loadedObjects[ii].url == url) {
+                return this.loadedObjects[ii];
+            }
+        }
+        MZXBX_appendScriptURL(url);
+        let newObj = { url: url, obj: null, evaluate: '' };
+        this.loadedObjects.push(newObj);
+        return newObj;
+    }
+    runPluginGUIImport(url, functionName, onDone) {
+        console.log('runPluginGUIImport', url);
+        let info = this.takeCachedInfo(url);
+        MZXBX_waitForCondition(250, () => { return (window[functionName]); }, () => {
+            if (!(info.obj)) {
+                let exe = window[functionName];
+                info.obj = exe();
+            }
+            onDone(info.obj);
+        });
+    }
+}
 class CommandDispatcher {
     constructor() {
         this.tapSizeRatio = 1;
@@ -276,14 +303,14 @@ class CommandDispatcher {
             filesinput.click();
         }
     }
-    promptPluginGUI() {
-        console.log('promptPluginGUI');
+    promptPluginGUI(url) {
+        console.log('promptPluginGUI', url);
         document.getElementById("pluginDiv").style.visibility = "visible";
         let pluginFrame = document.getElementById("pluginFrame");
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
                 let pluginWindow = pluginFrame.contentWindow;
-                console.log('pluginWindow', pluginWindow);
+                pluginFrame.src = url;
                 pluginWindow.postMessage({
                     name: 'Testing messaging',
                     waitID: 'qqq123'
@@ -1098,6 +1125,7 @@ class RightMenuItem {
         return anchor;
     }
 }
+let importer = new MusicDataImporter();
 let menuItemsData = null;
 let menuPointTracks = {
     text: localMenuTracksFolder
@@ -1105,12 +1133,43 @@ let menuPointTracks = {
 let menuPointPercussion = {
     text: localMenuPercussionFolder
 };
+let menuPointFileImport = {
+    text: 'import'
+};
+let menuPointFile = {
+    text: 'file',
+    children: [menuPointFileImport]
+};
+function fillMenuImportPlugins() {
+    menuPointFileImport.children = [];
+    for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
+        if (MZXBX_currentPlugins()[ii].group == 'import') {
+            let label = MZXBX_currentPlugins()[ii].label;
+            let evaluate = MZXBX_currentPlugins()[ii].evaluate;
+            let url = MZXBX_currentPlugins()[ii].url;
+            menuPointFileImport.children.push({
+                text: label, onClick: () => {
+                    importer.runPluginGUIImport(url, evaluate, (loaded) => {
+                        let plugin = loaded;
+                        let url = plugin.GUIURL(() => {
+                            console.log('done plugin inport');
+                        });
+                        console.log('plugin', loaded, url);
+                        commandDispatcher.promptPluginGUI(url);
+                    });
+                }
+            });
+        }
+    }
+}
 function composeBaseMenu() {
+    fillMenuImportPlugins();
     if (menuItemsData) {
         return menuItemsData;
     }
     else {
         menuItemsData = [
+            menuPointFile,
             {
                 text: localMenuImportMIDI, onClick: () => {
                     commandDispatcher.promptImportFromMIDI();
@@ -1121,7 +1180,7 @@ function composeBaseMenu() {
                 }
             }, {
                 text: "Test iFrame GUI", onClick: () => {
-                    commandDispatcher.promptPluginGUI();
+                    commandDispatcher.promptPluginGUI('./web/test/plugin.html');
                 }
             }, menuPointTracks,
             menuPointPercussion,

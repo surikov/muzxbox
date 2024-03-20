@@ -1,4 +1,4 @@
-declare let pluginListKindUrlName: { kind: string, url: string, functionName: string }[];
+//declare let pluginListKindUrlName: {group: string,kind: string, url: string, functionName: string }[];
 
 function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void {
     if (window['decodedArrayBuffer']) {
@@ -108,6 +108,37 @@ function MZXBX_appendScriptURL(url: string): boolean {
     head.appendChild(scriptElement);
     return true;
 }
+/*function loadOrFindFromScript(url: string, onDone: (r: any) => void) {
+	let cachedObjects: { url: string, createFunction: null | (() => any), createdObject: any }[] = window['cachedScripts'];
+	cachedObjects = cachedObjects || [];
+	let found: null | { url: string, createFunction: null | (() => any), createdObject: any } = null;
+	for (let ii = 0; ii < cachedObjects.length; ii++) {
+		if (cachedObjects[ii].url == url) {
+			found = cachedObjects[ii];
+		}
+	}
+	if (found == null) {
+		found = { url: url, createFunction: null, createdObject: null };
+		cachedObjects.push(found);
+		MZXBX_appendScriptURL(url);
+	}
+	MZXBX_waitForCondition(250, () => {
+		if (found != null) {
+			return (found.createFunction != null);
+		} else {
+			return false;
+		}
+	}, () => {
+		if (found != null) {
+			if (found.createdObject == null) {
+				if (found.createFunction != null) {
+					found.createdObject = found.createFunction();
+				}
+			}
+			onDone(found.createdObject);
+		}
+	});
+}*/
 function createSchedulePlayer(): MZXBX_Player {
     return new SchedulePlayer();
 }

@@ -1,15 +1,20 @@
-let pluginListKindUrlName :{ kind: string, url: string, functionName: string }[]= [
-	{ kind: 'volume', functionName: 'createBaseVolumeFx', url: './plugins/filters/base_volume_fx.js' }
-	, { kind: 'compression', functionName: 'basePluginForCompression', url: './plugins/filters/compressor.js' }
-	, { kind: 'echo_filter_base', functionName: 'createPluginForEchoIRR', url: './plugins/filters/irrecho.js' }
-	, { kind: 'waf_ins_performer_1_test', functionName: 'testPluginForInstrum1', url: './plugins/performers/testins.js' }
-	, { kind: 'waf_drums_performer_1_test', functionName: 'testPluginForDrum1', url: './plugins/performers/testperc.js' }
-	, { kind: 'sinewave_performer_1_test', functionName: 'testPluginSingleWave', url: './plugins/performers/testsinewave.js' }
-    , { kind: 'waf_performer_1_test', functionName: 'testPluginWAF', url: './plugins/performers/testwaf.js' }
-    , { kind: 'drums_performer_1_test', functionName: 'testPluginDrums', url: './plugins/performers/drumswaf.js' }
-	, { kind: 'emptySilent', functionName: 'testCreateEmpty', url: './plugins/performers/testempty.js' }
-	, { kind: 'vox2', functionName: 'testPluginVoxPerf', url: './plugins/performers/vox.js' }
-    , { kind: 'cachedWave', functionName: 'createPluginCachedVoxPerf', url: './plugins/performers/cachedvox.js' }
-    , { kind: 'equalizer10b', functionName: 'equalizer10bands', url: './plugins/filters/equalizer10band.js' }
+let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
+	{ label: 'vouleme plu', group: 'filter', id: 'volume', evaluate: 'createBaseVolumeFx', url: './plugins/filters/base_volume_fx.js' }
+	, { label: 'cmprsor', group: 'filter', id: 'compression', evaluate: 'basePluginForCompression', url: './plugins/filters/compressor.js' }
+	, { label: 'echo1', group: 'filter', id: 'echo_filter_base', evaluate: 'createPluginForEchoIRR', url: './plugins/filters/irrecho.js' }
+	, { label: 'webaudiofont instr', group: 'sequencer', id: 'waf_ins_performer_1_test', evaluate: 'testPluginForInstrum1', url: './plugins/performers/testins.js' }
+	, { label: 'webaudiofont drms', group: 'sampler', id: 'waf_drums_performer_1_test', evaluate: 'testPluginForDrum1', url: './plugins/performers/testperc.js' }
+	, { label: 'sine test', group: 'sequencer', id: 'sinewave_performer_1_test', evaluate: 'testPluginSingleWave', url: './plugins/performers/testsinewave.js' }
+	, { label: 'webaudiofont test', group: 'sequencer', id: 'waf_performer_1_test', evaluate: 'testPluginWAF', url: './plugins/performers/testwaf.js' }
+	, { label: 'webaudiofont drum test', group: 'sampler', id: 'drums_performer_1_test', evaluate: 'testPluginDrums', url: './plugins/performers/drumswaf.js' }
+	, { label: 'Silent', group: '', id: 'emptySilent', evaluate: 'testCreateEmpty', url: './plugins/performers/testempty.js' }
+	, { label: 'a voice', group: 'sampler', id: 'vox2', evaluate: 'testPluginVoxPerf', url: './plugins/performers/vox.js' }
+	, { label: 'wave', group: 'sampler', id: 'cachedWave', evaluate: 'createPluginCachedVoxPerf', url: './plugins/performers/cachedvox.js' }
+	, { label: 'EQ10B', group: 'filter', id: 'equalizer10b', evaluate: 'equalizer10bands', url: './plugins/filters/equalizer10band.js' }
+	, { label: 'Import MIDI from file', group: 'import', id: 'importmidifile', evaluate: 'createImportMIDIfile', url: './web/plugins/midi/midimusic.js' }
+	, { label: 'Import Guitar Pro file', group: 'import', id: 'import345gp', evaluate: 'createImportGP345file', url: './plugins/import/gp345/gpold.js' }
 ];
+function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[] {
+	return _t_all_registerd_plugins_list;
+}
 //console.log('pluginListKindUrlName',pluginListKindUrlName);
