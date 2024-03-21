@@ -1,5 +1,5 @@
 class MusicDataImporter {
-	loadedObjects: { url: string, obj: any }[]=[];
+	/*loadedObjects: { url: string, obj: any }[]=[];
 	takeCachedInfo(url: string): ({ url: string, obj: any }) {
 		for (let ii = 0; ii < this.loadedObjects.length; ii++) {
 			if (this.loadedObjects[ii].url == url) {
@@ -22,5 +22,5 @@ class MusicDataImporter {
 			}
 			onDone(info.obj);
 		});
-	}
+	}*/
 }

@@ -242,9 +242,9 @@ type MZXBX_import = {
 /*type MZXBX_Plugin = {
 	import: MZXBX_ImportMusicPlugin[]
 };*/
-type MZXBX_ImportMusicPlugin = {
+/*type MZXBX_ImportMusicPlugin = {
 	GUIURL: (callback: (imported: MZXBX_Project) => void) => string;
-}
+}*/
 type MZXBX_PluginRegistrationInformation = {
 	id: string
 	, label: string

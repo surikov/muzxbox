@@ -1,7 +1,6 @@
-declare class MIDIIImportMusicPlugin implements MZXBX_ImportMusicPlugin {
-    GUIURL(callback: (imported: MZXBX_Project) => void): string;
+declare class MIDIIImportMusicPlugin {
+    init(): void;
 }
-declare function createImportMIDIfile(): MZXBX_ImportMusicPlugin;
 declare type MZXBX_CachedWave = {
     path: string;
     buffer: AudioBuffer | null;
@@ -198,9 +197,6 @@ declare type MZXBX_Player = {
 };
 declare type MZXBX_import = {
     import: () => MZXBX_Schedule | null;
-};
-declare type MZXBX_ImportMusicPlugin = {
-    GUIURL: (callback: (imported: MZXBX_Project) => void) => string;
 };
 declare type MZXBX_PluginRegistrationInformation = {
     id: string;

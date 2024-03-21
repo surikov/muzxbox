@@ -52,6 +52,7 @@
 	width:1cm;
 	height:1cm;
 	text-align: center;
+	padding-top: 0.1cm;
 	background-color2: var(--color-interactive);
 	border-color2: var(--color-text);
 	border-style2: solid;

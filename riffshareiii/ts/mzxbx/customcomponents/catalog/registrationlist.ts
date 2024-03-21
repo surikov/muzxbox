@@ -11,8 +11,8 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 	, { label: 'a voice', group: 'sampler', id: 'vox2', evaluate: 'testPluginVoxPerf', url: './plugins/performers/vox.js' }
 	, { label: 'wave', group: 'sampler', id: 'cachedWave', evaluate: 'createPluginCachedVoxPerf', url: './plugins/performers/cachedvox.js' }
 	, { label: 'EQ10B', group: 'filter', id: 'equalizer10b', evaluate: 'equalizer10bands', url: './plugins/filters/equalizer10band.js' }
-	, { label: 'Import MIDI from file', group: 'import', id: 'importmidifile', evaluate: 'createImportMIDIfile', url: './web/plugins/midi/midimusic.js' }
-	, { label: 'Import Guitar Pro file', group: 'import', id: 'import345gp', evaluate: 'createImportGP345file', url: './plugins/import/gp345/gpold.js' }
+	, { label: 'Import MIDI from file', group: 'import', id: 'importmidifile', evaluate: '', url: './web/plugins/midi/midimusicimport.html' }
+	, { label: 'Import Guitar Pro file', group: 'import', id: 'import345gp', evaluate: '', url: './plugins/import/gp345/gpold.js' }
 ];
 function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[] {
 	return _t_all_registerd_plugins_list;

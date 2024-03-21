@@ -158,30 +158,57 @@ function startLoadCSSfile(cssurl) {
     head.appendChild(link);
 }
 class MusicDataImporter {
+}
+class PluginDialogPrompt {
     constructor() {
-        this.loadedObjects = [];
+        this.waitFor = '?';
+        window.addEventListener('message', this.receiveMessage.bind(this), false);
     }
-    takeCachedInfo(url) {
-        for (let ii = 0; ii < this.loadedObjects.length; ii++) {
-            if (this.loadedObjects[ii].url == url) {
-                return this.loadedObjects[ii];
+    openDialogFrame(label, url, callback) {
+        this.waitCall = callback;
+        let pluginTitle = document.getElementById("pluginTitle");
+        pluginTitle.innerHTML = label;
+        let pluginFrame = document.getElementById("pluginFrame");
+        this.waitFor = '' + Math.random();
+        let me = this;
+        if (pluginFrame) {
+            if (pluginFrame.contentWindow) {
+                pluginFrame.onload = function () {
+                    console.log('onload', me.waitFor);
+                    pluginFrame.contentWindow.postMessage(me.waitFor, '*');
+                };
+                pluginFrame.src = url;
+                document.getElementById("pluginDiv").style.visibility = "visible";
             }
         }
-        MZXBX_appendScriptURL(url);
-        let newObj = { url: url, obj: null, evaluate: '' };
-        this.loadedObjects.push(newObj);
-        return newObj;
     }
-    runPluginGUIImport(url, functionName, onDone) {
-        console.log('runPluginGUIImport', url);
-        let info = this.takeCachedInfo(url);
-        MZXBX_waitForCondition(250, () => { return (window[functionName]); }, () => {
-            if (!(info.obj)) {
-                let exe = window[functionName];
-                info.obj = exe();
+    closeDialogFrame() {
+        document.getElementById("pluginDiv").style.visibility = "hidden";
+    }
+    receiveMessage(e) {
+        let parsed = null;
+        try {
+            parsed = JSON.parse(e.data);
+        }
+        catch (xxx) {
+            console.log(xxx);
+        }
+        console.log('parsed', parsed);
+        if (parsed) {
+            if (parsed.id == this.waitFor) {
+                console.log('data', parsed.data);
+                let close = this.waitCall(parsed.data);
+                if (close) {
+                    this.closeDialogFrame();
+                }
             }
-            onDone(info.obj);
-        });
+            else {
+                console.log('wrong received message id', parsed.id, this.waitFor);
+            }
+        }
+        else {
+            console.log('wrong received object');
+        }
     }
 }
 class CommandDispatcher {
@@ -303,24 +330,13 @@ class CommandDispatcher {
             filesinput.click();
         }
     }
-    promptPluginGUI(url) {
+    promptPluginGUI(label, url, callback) {
         console.log('promptPluginGUI', url);
-        document.getElementById("pluginDiv").style.visibility = "visible";
-        let pluginFrame = document.getElementById("pluginFrame");
-        if (pluginFrame) {
-            if (pluginFrame.contentWindow) {
-                let pluginWindow = pluginFrame.contentWindow;
-                pluginFrame.src = url;
-                pluginWindow.postMessage({
-                    name: 'Testing messaging',
-                    waitID: 'qqq123'
-                }, '*');
-            }
-        }
+        pluginDialogPrompt.openDialogFrame(label, url, callback);
     }
     cancelPluginGUI() {
         console.log('cancelPluginGUI');
-        document.getElementById("pluginDiv").style.visibility = "hidden";
+        pluginDialogPrompt.closeDialogFrame();
     }
     promptTestImport() {
         console.log('promptTestImport');
@@ -371,6 +387,7 @@ class CommandDispatcher {
     }
 }
 let commandDispatcher = new CommandDispatcher();
+let pluginDialogPrompt = new PluginDialogPrompt();
 let gridLinesBrief = [
     { ratio: 0.4, duration: { count: 1, part: 2 } }
 ];
@@ -1145,17 +1162,12 @@ function fillMenuImportPlugins() {
     for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
         if (MZXBX_currentPlugins()[ii].group == 'import') {
             let label = MZXBX_currentPlugins()[ii].label;
-            let evaluate = MZXBX_currentPlugins()[ii].evaluate;
             let url = MZXBX_currentPlugins()[ii].url;
             menuPointFileImport.children.push({
                 text: label, onClick: () => {
-                    importer.runPluginGUIImport(url, evaluate, (loaded) => {
-                        let plugin = loaded;
-                        let url = plugin.GUIURL(() => {
-                            console.log('done plugin inport');
-                        });
-                        console.log('plugin', loaded, url);
-                        commandDispatcher.promptPluginGUI(url);
+                    commandDispatcher.promptPluginGUI(label, url, (obj) => {
+                        console.log('set project from', obj);
+                        return true;
                     });
                 }
             });
@@ -1180,7 +1192,7 @@ function composeBaseMenu() {
                 }
             }, {
                 text: "Test iFrame GUI", onClick: () => {
-                    commandDispatcher.promptPluginGUI('./web/test/plugin.html');
+                    commandDispatcher.promptPluginGUI('Plugin UI', './web/test/plugin.html', (obj) => { return false; });
                 }
             }, menuPointTracks,
             menuPointPercussion,

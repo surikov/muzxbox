@@ -25,6 +25,7 @@
         "treevalue/treevalue.ts"
         ,"startup.ts"
 		,"impexport/importutil.ts"
+		,"ui/pluginprompt/plugindialog.ts"
         ,"commanddispatcher.ts"
         ,"ui/renderer.ts"
         ,"ui/localedictionary.ts"
@@ -42,6 +43,7 @@
         ,"ui/mixer/uimixer.ts"
         ,"ui/mixer/grid/mixerzoomlevel.ts"
         ,"ui/buttons/iconlabelbutton.ts"
+		
 		,"ui/iconlabels.ts"
         ,"ui/debugPane/debuglayer.ts"
 		,"ui/dialogs/warningui.ts"

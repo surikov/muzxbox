@@ -1,6 +1,57 @@
 <html>
-	<body>
-		<h1>MIDI</h1>
-		<p>test</p>
-	</body>
+
+<head>
+	<style>
+		html {
+			--color-background: #ffffffcc;
+			--color-text: #003366ff;
+			--color-scroll: color-mix(in lab, transparent 90%, var(--color-text));
+
+			font-family: "Bruno Ace", sans-serif;
+
+			background-color: var(--color-background);
+			color: var(--color-text);
+			scrollbar-color: var(--color-scroll) var(--color-background);
+			scrollbar-width: thin;
+		}
+	</style>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&display=swap" rel="stylesheet">
+</head>
+
+<body>
+	<h1>MIDI import</h1>
+	<p><input type="file" id="file_midi_input" accept="audio/midi, audio/x-midi" onchange="loadfile" /></p>
+	<p>
+		<button onclick='sendTestData();'>Send data</button>
+	</p>
+</body>
+<script>
+	var callbackID = '';
+
+	function sendTestData() {
+		console.log('sendTestData');
+		var oo = {
+			id: callbackID,
+			data: {
+				bla: 'bla',
+				test: 121212
+			}
+		};
+		window.parent.postMessage(JSON.stringify(oo), '*');
+	}
+
+	function loadfile(ff) {
+		console.log('loadfile', ff);
+	}
+
+	function receiveHostMessage(par) {
+		console.log('receiveHostMessage', par);
+		callbackID = par.data;
+	}
+	window.addEventListener('message', receiveHostMessage, false);
+	//console.log(this);
+</script>
+
 </html>

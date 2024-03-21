@@ -21,15 +21,14 @@ declare function startApplication(): void;
 declare function initWebAudioFromUI(): void;
 declare function startLoadCSSfile(cssurl: string): void;
 declare class MusicDataImporter {
-    loadedObjects: {
-        url: string;
-        obj: any;
-    }[];
-    takeCachedInfo(url: string): ({
-        url: string;
-        obj: any;
-    });
-    runPluginGUIImport(url: string, functionName: string, onDone: (loaded: any) => void): void;
+}
+declare class PluginDialogPrompt {
+    waitFor: string;
+    waitCall: (obj: any) => boolean;
+    constructor();
+    openDialogFrame(label: string, url: string, callback: (obj: any) => boolean): void;
+    closeDialogFrame(): void;
+    receiveMessage(e: any): void;
 }
 declare function newMIDIparser(arrayBuffer: ArrayBuffer): any;
 declare function newGPparser(arrayBuffer: ArrayBuffer): any;
@@ -53,11 +52,12 @@ declare class CommandDispatcher {
     setTrackSoloState(state: number): void;
     setDrumSoloState(state: number): void;
     promptImportFromMIDI(): void;
-    promptPluginGUI(url: string): void;
+    promptPluginGUI(label: string, url: string, callback: (obj: any) => boolean): void;
     cancelPluginGUI(): void;
     promptTestImport(): void;
 }
 declare let commandDispatcher: CommandDispatcher;
+declare let pluginDialogPrompt: PluginDialogPrompt;
 declare type GridTimeTemplate14 = {
     ratio: number;
     duration: MZXBX_Metre;
@@ -694,9 +694,6 @@ declare type MZXBX_Player = {
 };
 declare type MZXBX_import = {
     import: () => MZXBX_Schedule | null;
-};
-declare type MZXBX_ImportMusicPlugin = {
-    GUIURL: (callback: (imported: MZXBX_Project) => void) => string;
 };
 declare type MZXBX_PluginRegistrationInformation = {
     id: string;

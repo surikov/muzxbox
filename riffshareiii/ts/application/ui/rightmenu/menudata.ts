@@ -47,19 +47,24 @@ function fillMenuImportPlugins() {
 		if (MZXBX_currentPlugins()[ii].group == 'import') {
 			let label: string = MZXBX_currentPlugins()[ii].label;
 			//let id: string = MZXBX_currentPlugins()[ii].id;
-			let evaluate: string = MZXBX_currentPlugins()[ii].evaluate;
+			//let evaluate: string = MZXBX_currentPlugins()[ii].evaluate;
 			let url: string = MZXBX_currentPlugins()[ii].url;
+
 			menuPointFileImport.children.push({
 				text: label, onClick: () => {
-					importer.runPluginGUIImport(url, evaluate, (loaded: any) => {
+					commandDispatcher.promptPluginGUI(label, url, (obj: any) => {
+						console.log('set project from', obj);
+						return true;
+					});
+					/*importer.runPluginGUIImport(url, evaluate, (loaded: any) => {
 						let plugin: MZXBX_ImportMusicPlugin = loaded as MZXBX_ImportMusicPlugin;
 						
 						let url = plugin.GUIURL(() => {
 							console.log('done plugin inport');
 						});
 						console.log('plugin', loaded, url);
-						commandDispatcher.promptPluginGUI(url);
-					});
+						commandDispatcher.promptPluginGUI(label,url);
+					});*/
 				}
 			});
 		}
@@ -81,7 +86,7 @@ function composeBaseMenu(): MenuInfo[] {
 				}
 			}, {
 				text: "Test iFrame GUI", onClick: () => {
-					commandDispatcher.promptPluginGUI('./web/test/plugin.html');
+					commandDispatcher.promptPluginGUI('Plugin UI', './web/test/plugin.html', (obj: any) => { return false });
 				}
 			}, menuPointTracks
 			, menuPointPercussion

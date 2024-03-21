@@ -137,31 +137,35 @@ class CommandDispatcher {
 			//console.log('setup', filesinput);
 		}
 	}
-	promptPluginGUI(url: string) {
+
+	promptPluginGUI(label: string, url: string, callback: (obj: any) => boolean) {
 		console.log('promptPluginGUI', url);
-		(document.getElementById("pluginDiv") as any).style.visibility = "visible";
+		pluginDialogPrompt.openDialogFrame(label, url, callback);
 
-		let pluginFrame = document.getElementById("pluginFrame") as any;
-		if (pluginFrame) {
+		//let pluginFrame = document.getElementById("pluginFrame") as any;
+		//if (pluginFrame) {
 
-			if (pluginFrame.contentWindow) {
-				/*let tefunc = pluginWindow.testFunction;
-				if (tefunc) {
-					console.log('pluginFrame', tefunc('qqq123'));
-				}*/
-				let pluginWindow: Window = pluginFrame.contentWindow;
-				pluginFrame.src=url;
-				//console.log('pluginWindow', pluginWindow);
-				pluginWindow.postMessage({
-					name: 'Testing messaging'
-					, waitID: 'qqq123'
-				}, '*');//web/test/plugin.html');
-			}
-		}
+		//if (pluginFrame.contentWindow) {
+		/*let tefunc = pluginWindow.testFunction;
+		if (tefunc) {
+			console.log('pluginFrame', tefunc('qqq123'));
+		}*/
+		//let pluginContent: Window = pluginFrame.contentWindow;
+		//pluginFrame.src = url;
+		//(document.getElementById("pluginDiv") as any).style.visibility = "visible";
+		//console.log('pluginWindow', pluginWindow);
+		/*
+		pluginContent.postMessage({
+			name: 'Testing messaging'
+			, waitID: 'qqq123'
+		}, '*');//web/test/plugin.html');
+		*/
+		//}
+		//}
 	}
 	cancelPluginGUI() {
 		console.log('cancelPluginGUI');
-		(document.getElementById("pluginDiv") as any).style.visibility = "hidden";
+		pluginDialogPrompt.closeDialogFrame();
 	}
 	promptTestImport() {
 		console.log('promptTestImport');
@@ -207,5 +211,7 @@ class CommandDispatcher {
 			filesinput.click();
 		}
 	}
+
 }
 let commandDispatcher = new CommandDispatcher();
+let pluginDialogPrompt = new PluginDialogPrompt();
