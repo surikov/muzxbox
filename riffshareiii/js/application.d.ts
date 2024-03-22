@@ -23,12 +23,13 @@ declare function startLoadCSSfile(cssurl: string): void;
 declare class MusicDataImporter {
 }
 declare class PluginDialogPrompt {
-    waitFor: string;
-    waitCall: (obj: any) => boolean;
+    dialogID: string;
+    waitCallback: (obj: any) => boolean;
     constructor();
     openDialogFrame(label: string, url: string, callback: (obj: any) => boolean): void;
+    sendMessageToPlugin(data: any): void;
     closeDialogFrame(): void;
-    receiveMessage(e: any): void;
+    receiveMessageFromPlugin(e: any): void;
 }
 declare function newMIDIparser(arrayBuffer: ArrayBuffer): any;
 declare function newGPparser(arrayBuffer: ArrayBuffer): any;

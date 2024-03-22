@@ -161,31 +161,39 @@ class MusicDataImporter {
 }
 class PluginDialogPrompt {
     constructor() {
-        this.waitFor = '?';
-        window.addEventListener('message', this.receiveMessage.bind(this), false);
+        this.dialogID = '?';
+        window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
     }
     openDialogFrame(label, url, callback) {
-        this.waitCall = callback;
+        this.waitCallback = callback;
         let pluginTitle = document.getElementById("pluginTitle");
         pluginTitle.innerHTML = label;
         let pluginFrame = document.getElementById("pluginFrame");
-        this.waitFor = '' + Math.random();
+        this.dialogID = '' + Math.random();
         let me = this;
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
                 pluginFrame.onload = function () {
-                    console.log('onload', me.waitFor);
-                    pluginFrame.contentWindow.postMessage(me.waitFor, '*');
+                    me.sendMessageToPlugin('');
                 };
                 pluginFrame.src = url;
                 document.getElementById("pluginDiv").style.visibility = "visible";
             }
         }
     }
+    sendMessageToPlugin(data) {
+        console.log('sendMessageToPlugin', this.dialogID);
+        let pluginFrame = document.getElementById("pluginFrame");
+        if (pluginFrame) {
+            let message = { dialog: this.dialogID, data: data };
+            let txt = JSON.stringify(message);
+            pluginFrame.contentWindow.postMessage(txt, '*');
+        }
+    }
     closeDialogFrame() {
         document.getElementById("pluginDiv").style.visibility = "hidden";
     }
-    receiveMessage(e) {
+    receiveMessageFromPlugin(e) {
         let parsed = null;
         try {
             parsed = JSON.parse(e.data);
@@ -195,15 +203,15 @@ class PluginDialogPrompt {
         }
         console.log('parsed', parsed);
         if (parsed) {
-            if (parsed.id == this.waitFor) {
+            if (parsed.dialog == this.dialogID) {
                 console.log('data', parsed.data);
-                let close = this.waitCall(parsed.data);
+                let close = this.waitCallback(parsed.data);
                 if (close) {
                     this.closeDialogFrame();
                 }
             }
             else {
-                console.log('wrong received message id', parsed.id, this.waitFor);
+                console.log('wrong received message id', parsed.id, this.dialogID);
             }
         }
         else {

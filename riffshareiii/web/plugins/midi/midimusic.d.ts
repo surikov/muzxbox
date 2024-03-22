@@ -1,5 +1,10 @@
 declare class MIDIIImportMusicPlugin {
+    callbackID: string;
+    constructor();
     init(): void;
+    sendTestData(): void;
+    loadfile(inputFile: any): void;
+    receiveHostMessage(par: any): void;
 }
 declare type MZXBX_CachedWave = {
     path: string;
