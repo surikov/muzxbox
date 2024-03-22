@@ -1174,7 +1174,8 @@ function fillMenuImportPlugins() {
             menuPointFileImport.children.push({
                 text: label, onClick: () => {
                     commandDispatcher.promptPluginGUI(label, url, (obj) => {
-                        console.log('set project from', obj);
+                        commandDispatcher.registerWorkProject(obj);
+                        commandDispatcher.resetProject();
                         return true;
                     });
                 }

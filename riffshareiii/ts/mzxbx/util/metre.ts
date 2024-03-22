@@ -1,14 +1,14 @@
-class MZXBX_MetreMath implements MZXBX_MetreMathType {
+class MZXBX_MetreMathUtil implements MZXBX_MetreMathType {
     count: number;
     part: number;
-    set(from: MZXBX_Metre): MZXBX_MetreMath {
+    set(from: MZXBX_Metre): MZXBX_MetreMathUtil {
         this.count = from.count;
         this.part = from.part;
         return this;
     }
-    calculate(duration: number, tempo: number): MZXBX_MetreMath {
+    calculate(duration: number, tempo: number): MZXBX_MetreMathUtil {
         this.part = 1024.0;
-        let tempPart = new MZXBX_MetreMath().set({ count: 1, part: this.part }).duration(tempo);
+        let tempPart = new MZXBX_MetreMathUtil().set({ count: 1, part: this.part }).duration(tempo);
         this.count = Math.round(duration / tempPart);
         return this.simplyfy();
         //return this;
@@ -16,7 +16,7 @@ class MZXBX_MetreMath implements MZXBX_MetreMathType {
     metre(): MZXBX_Metre {
         return { count: this.count, part: this.part };
     }
-    simplyfy(): MZXBX_MetreMath {
+    simplyfy(): MZXBX_MetreMathUtil {
         let cc = this.count;
         let pp = this.part;
         if (cc > 0 && pp > 0) {
@@ -25,9 +25,9 @@ class MZXBX_MetreMath implements MZXBX_MetreMathType {
                 pp = pp / 2;
             }
         }
-        return new MZXBX_MetreMath().set({ count: cc, part: pp });
+        return new MZXBX_MetreMathUtil().set({ count: cc, part: pp });
     }
-    strip(toPart: number): MZXBX_MetreMath {
+    strip(toPart: number): MZXBX_MetreMathUtil {
         let cc = this.count;
         let pp = this.part;
         let rr = pp / toPart;
@@ -36,7 +36,7 @@ class MZXBX_MetreMath implements MZXBX_MetreMathType {
         //if (cc < 1) {
         //    cc = 1;
         //}
-        let r=new MZXBX_MetreMath().set({ count: cc, part: pp }).simplyfy();
+        let r=new MZXBX_MetreMathUtil().set({ count: cc, part: pp }).simplyfy();
         return r;
     }
     equals(metre: MZXBX_Metre): boolean {
@@ -66,17 +66,17 @@ class MZXBX_MetreMath implements MZXBX_MetreMathType {
             return false;
         }
     }
-    plus(metre: MZXBX_Metre): MZXBX_MetreMath {
+    plus(metre: MZXBX_Metre): MZXBX_MetreMathUtil {
         let countMe = this.count * metre.part;
         let countTo = metre.count * this.part;
         let rr = { count: countMe + countTo, part: metre.part * this.part };
-        return new MZXBX_MetreMath().set(rr).simplyfy();
+        return new MZXBX_MetreMathUtil().set(rr).simplyfy();
     }
-    minus(metre: MZXBX_Metre): MZXBX_MetreMath {
+    minus(metre: MZXBX_Metre): MZXBX_MetreMathUtil {
         let countMe = this.count * metre.part;
         let countTo = metre.count * this.part;
         let rr = { count: countMe - countTo, part: metre.part * this.part };
-        return new MZXBX_MetreMath().set(rr).simplyfy();
+        return new MZXBX_MetreMathUtil().set(rr).simplyfy();
     }
 	/*duration(metre: MZXBX_Metre, tempo: number): number {
 		let wholeNoteSeconds = (4 * 60) / tempo;
@@ -94,5 +94,5 @@ class MZXBX_MetreMath implements MZXBX_MetreMathType {
 
 }
 function MZMM(): MZXBX_MetreMathType {
-    return new MZXBX_MetreMath().set({count:0,part:1});
+    return new MZXBX_MetreMathUtil().set({count:0,part:1});
 }

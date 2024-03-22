@@ -1,20 +1,3 @@
-declare class MZXBX_MetreMath implements MZXBX_MetreMathType {
-    count: number;
-    part: number;
-    set(from: MZXBX_Metre): MZXBX_MetreMath;
-    calculate(duration: number, tempo: number): MZXBX_MetreMath;
-    metre(): MZXBX_Metre;
-    simplyfy(): MZXBX_MetreMath;
-    strip(toPart: number): MZXBX_MetreMath;
-    equals(metre: MZXBX_Metre): boolean;
-    less(metre: MZXBX_Metre): boolean;
-    more(metre: MZXBX_Metre): boolean;
-    plus(metre: MZXBX_Metre): MZXBX_MetreMath;
-    minus(metre: MZXBX_Metre): MZXBX_MetreMath;
-    duration(tempo: number): number;
-    width(tempo: number, ratio: number): number;
-}
-declare function MZMM(): MZXBX_MetreMathType;
 declare class MZXBX_ScaleMath {
     basePitch: MZXBX_HalfTone;
     step2: MZXBX_StepSkip;
@@ -229,6 +212,11 @@ declare type MZXBX_PluginRegistrationInformation = {
     url: string;
     evaluate: string;
 };
+declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
+declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
+declare function MZXBX_appendScriptURL(url: string): boolean;
+declare function MZMM(): MZXBX_MetreMathType;
+declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 declare let testSchedule: MZXBX_Schedule;
 declare class MuzXbox {
     uiStarted: boolean;
@@ -246,10 +234,7 @@ declare class MuzXbox {
     initAudioContext(): void;
     resumeContext(audioContext: AudioContext): void;
 }
-declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
 declare function fillLinesOfBuffer(buffer: null | AudioBuffer): number[];
-declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
-declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function createSchedulePlayer(): MZXBX_Player;
 declare class SchedulePlayer implements MZXBX_Player {
     position: number;
@@ -616,7 +601,7 @@ declare class MidiParser {
     addLyricsPoints(commentPoint: MZXBX_CommentMeasure, skip: MZXBX_Metre, txt: string): void;
     collectDrums(midiTrack: MIDISongTrack): number[];
     numratio(nn: number): number;
-    stripDuration(what: MZXBX_MetreMath): MZXBX_MetreMath;
+    stripDuration(what: MZXBX_MetreMathType): MZXBX_MetreMathType;
     createProjectTrack(timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_MusicTrack;
     createProjectDrums(drum: number, timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_PercussionTrack;
 }

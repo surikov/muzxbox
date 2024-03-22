@@ -22,9 +22,10 @@
         "types": []
     },
     "files": [
-        "./code/metre.ts",
+        
         "./code/scale.ts",
         "../publictypes/musicenginetypes.ts",
+		"../publictypes/musicenginedeclarations.ts",
 		
         "./code/main.ts"
 		,"./code/player.ts"

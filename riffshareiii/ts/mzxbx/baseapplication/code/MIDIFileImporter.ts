@@ -1638,7 +1638,7 @@ class MidiParser {
 		return nextChange;
 	}
 	calcMeasureDuration(midiSongData: MIDISongData, meter: MZXBX_Metre, bpm: number, part: number, startMs: number): number {
-		let metreMath = new MZXBX_MetreMath();
+		let metreMath =  MZXBX();
 		let wholeDurationMs = 1000 * metreMath.set(meter).duration(bpm);
 		let partDurationMs = part * wholeDurationMs;
 		let nextChange = this.findNextChange(midiSongData, startMs);
@@ -1857,7 +1857,7 @@ class MidiParser {
 		let rr = 1;//0000;
 		return Math.round(nn * rr);
 	}
-	stripDuration(what: MZXBX_MetreMath): MZXBX_MetreMath {
+	stripDuration(what: MZXBX_MetreMathType): MZXBX_MetreMathType {
 		return what;
 	}
 	createProjectTrack(timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_MusicTrack {
@@ -1867,7 +1867,7 @@ class MidiParser {
 			, filters: []
 			, performer: { id: '', data: '' }
 		};
-		let mm = new MZXBX_MetreMath();
+		let mm =  MZXBX();
 		for (let tt = 0; tt < timeline.length; tt++) {
 			let projectMeasure: MZXBX_TrackMeasure = { chords: [] };
 			projectTrack.measures.push(projectMeasure);
@@ -1952,7 +1952,7 @@ class MidiParser {
 			, sampler: { id: '', data: '' }
 		};
 		let currentTimeMs = 0;
-		let mm = new MZXBX_MetreMath();
+		let mm =  MZXBX();
 		for (let tt = 0; tt < timeline.length; tt++) {
 			let projectMeasure: MZXBX_PercussionMeasure = { skips: [] };
 			projectDrums.measures.push(projectMeasure);
@@ -1981,7 +1981,7 @@ class MidiParser {
 }
 function findMeasureSkipByTime(time: number, measures: MZXBX_SongMeasure[]): null | { idx: number, skip: MZXBX_Metre } {
 	let curTime = 0;
-	let mm = new MZXBX_MetreMath();
+	let mm =  MZXBX();
 	for (let ii = 0; ii < measures.length; ii++) {
 		let cumea = measures[ii];
 		let measureDurationS = mm.set(cumea.metre).duration(cumea.tempo);

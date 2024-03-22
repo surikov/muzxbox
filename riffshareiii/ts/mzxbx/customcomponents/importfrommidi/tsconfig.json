@@ -27,5 +27,6 @@
 		
 		"midiimport.ts"
         ,"../../publictypes/musicenginetypes.ts"
+		,"../../publictypes/musicenginedeclarations.ts"
 	]
 }

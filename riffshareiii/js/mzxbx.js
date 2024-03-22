@@ -1,93 +1,4 @@
 "use strict";
-class MZXBX_MetreMath {
-    set(from) {
-        this.count = from.count;
-        this.part = from.part;
-        return this;
-    }
-    calculate(duration, tempo) {
-        this.part = 1024.0;
-        let tempPart = new MZXBX_MetreMath().set({ count: 1, part: this.part }).duration(tempo);
-        this.count = Math.round(duration / tempPart);
-        return this.simplyfy();
-    }
-    metre() {
-        return { count: this.count, part: this.part };
-    }
-    simplyfy() {
-        let cc = this.count;
-        let pp = this.part;
-        if (cc > 0 && pp > 0) {
-            while (cc % 2 == 0 && pp % 2 == 0) {
-                cc = cc / 2;
-                pp = pp / 2;
-            }
-        }
-        return new MZXBX_MetreMath().set({ count: cc, part: pp });
-    }
-    strip(toPart) {
-        let cc = this.count;
-        let pp = this.part;
-        let rr = pp / toPart;
-        cc = Math.round(cc / rr);
-        pp = toPart;
-        let r = new MZXBX_MetreMath().set({ count: cc, part: pp }).simplyfy();
-        return r;
-    }
-    equals(metre) {
-        let countMe = this.count * metre.part;
-        let countTo = metre.count * this.part;
-        if (countMe == countTo) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    less(metre) {
-        let countMe = this.count * metre.part;
-        let countTo = metre.count * this.part;
-        if (countMe < countTo) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    more(metre) {
-        let countMe = this.count * metre.part;
-        let countTo = metre.count * this.part;
-        if (countMe > countTo) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    plus(metre) {
-        let countMe = this.count * metre.part;
-        let countTo = metre.count * this.part;
-        let rr = { count: countMe + countTo, part: metre.part * this.part };
-        return new MZXBX_MetreMath().set(rr).simplyfy();
-    }
-    minus(metre) {
-        let countMe = this.count * metre.part;
-        let countTo = metre.count * this.part;
-        let rr = { count: countMe - countTo, part: metre.part * this.part };
-        return new MZXBX_MetreMath().set(rr).simplyfy();
-    }
-    duration(tempo) {
-        let wholeNoteSeconds = (4 * 60) / tempo;
-        let meterSeconds = (wholeNoteSeconds * this.count) / this.part;
-        return meterSeconds;
-    }
-    width(tempo, ratio) {
-        return this.duration(tempo) * ratio;
-    }
-}
-function MZMM() {
-    return new MZXBX_MetreMath().set({ count: 0, part: 1 });
-}
 class MZXBX_ScaleMath {
     scale() {
         return {
@@ -1948,7 +1859,7 @@ class MidiParser {
         return nextChange;
     }
     calcMeasureDuration(midiSongData, meter, bpm, part, startMs) {
-        let metreMath = new MZXBX_MetreMath();
+        let metreMath = MZXBX();
         let wholeDurationMs = 1000 * metreMath.set(meter).duration(bpm);
         let partDurationMs = part * wholeDurationMs;
         let nextChange = this.findNextChange(midiSongData, startMs);
@@ -2145,7 +2056,7 @@ class MidiParser {
             filters: [],
             performer: { id: '', data: '' }
         };
-        let mm = new MZXBX_MetreMath();
+        let mm = MZXBX();
         for (let tt = 0; tt < timeline.length; tt++) {
             let projectMeasure = { chords: [] };
             projectTrack.measures.push(projectMeasure);
@@ -2218,7 +2129,7 @@ class MidiParser {
             sampler: { id: '', data: '' }
         };
         let currentTimeMs = 0;
-        let mm = new MZXBX_MetreMath();
+        let mm = MZXBX();
         for (let tt = 0; tt < timeline.length; tt++) {
             let projectMeasure = { skips: [] };
             projectDrums.measures.push(projectMeasure);
@@ -2244,7 +2155,7 @@ class MidiParser {
 }
 function findMeasureSkipByTime(time, measures) {
     let curTime = 0;
-    let mm = new MZXBX_MetreMath();
+    let mm = MZXBX();
     for (let ii = 0; ii < measures.length; ii++) {
         let cumea = measures[ii];
         let measureDurationS = mm.set(cumea.metre).duration(cumea.tempo);

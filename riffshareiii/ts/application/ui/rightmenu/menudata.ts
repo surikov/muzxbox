@@ -53,7 +53,10 @@ function fillMenuImportPlugins() {
 			menuPointFileImport.children.push({
 				text: label, onClick: () => {
 					commandDispatcher.promptPluginGUI(label, url, (obj: any) => {
-						console.log('set project from', obj);
+						//console.log('set project from', obj);
+						
+						commandDispatcher.registerWorkProject(obj as MZXBX_Project);
+						commandDispatcher.resetProject();
 						return true;
 					});
 					/*importer.runPluginGUIImport(url, evaluate, (loaded: any) => {

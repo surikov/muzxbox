@@ -1,11 +1,355 @@
 declare class MIDIIImportMusicPlugin {
     callbackID: string;
+    parsedProject: MZXBX_Project | null;
     constructor();
     init(): void;
     sendTestData(): void;
     loadfile(inputFile: any): void;
     receiveHostMessage(par: any): void;
 }
+declare type ImportMeasure = MZXBX_SongMeasure & {
+    startMs: number;
+    durationMs: number;
+};
+declare let drumNames: string[];
+declare let insNames: string[];
+declare type XYp = {
+    x: number;
+    y: number;
+};
+declare type PP = {
+    p1: XYp;
+    p2: XYp;
+};
+declare type TrackChord = {
+    when: number;
+    channel: number;
+    notes: TrackNote[];
+};
+declare type TrackNote = {
+    closed: boolean;
+    bendPoints: NotePitch[];
+    openEvent?: MIDIEvent;
+    closeEvent?: MIDIEvent;
+    volume?: number;
+    basePitch: number;
+    baseDuration: number;
+};
+declare type NotePitch = {
+    pointDuration: number;
+    basePitchDelta: number;
+};
+declare type MIDIEvent = {
+    offset: number;
+    delta: number;
+    eventTypeByte: number;
+    basetype?: number;
+    subtype?: number;
+    index?: string;
+    length?: number;
+    msb?: number;
+    lsb?: number;
+    prefix?: number;
+    data?: number[];
+    tempo?: number;
+    tempoBPM?: number;
+    hour?: number;
+    minutes?: number;
+    seconds?: number;
+    frames?: number;
+    subframes?: number;
+    key?: number;
+    param1?: number;
+    param2?: number;
+    param3?: number;
+    param4?: number;
+    scale?: number;
+    badsubtype?: number;
+    midiChannel?: number;
+    playTimeMs: number;
+    preTimeMs?: number;
+    deltaTimeMs?: number;
+    trackNum?: number;
+    text?: string;
+};
+declare type MIDISongPoint = {
+    pitch: number;
+    durationms: number;
+    midipoint?: TrackNote;
+};
+declare type MIDISongNote = {
+    midiPitch: number;
+    midiDuration: number;
+    slidePoints: MIDISongPoint[];
+};
+declare type MIDISongChord = {
+    when: number;
+    channel: number;
+    notes: MIDISongNote[];
+};
+declare type MIDISongTrack = {
+    title: string;
+    channelNum: number;
+    program: number;
+    trackVolumes: {
+        ms: number;
+        value: number;
+        meausre?: number;
+        skip384?: number;
+    }[];
+    songchords: MIDISongChord[];
+    order: number;
+};
+declare type MIDISongData = {
+    duration: number;
+    parser: string;
+    bpm: number;
+    changes: {
+        track: number;
+        ms: number;
+        resolution: number;
+        bpm: number;
+    }[];
+    meters: {
+        track: number;
+        ms: number;
+        count: number;
+        division: number;
+    }[];
+    lyrics: {
+        track: number;
+        ms: number;
+        txt: string;
+    }[];
+    key: number;
+    mode: number;
+    meter: {
+        count: number;
+        division: number;
+    };
+    signs: {
+        track: number;
+        ms: number;
+        sign: string;
+    }[];
+    miditracks: MIDISongTrack[];
+    speedMode: number;
+    lineMode: number;
+};
+declare let instrumentNamesArray: string[];
+declare let drumNamesArray: string[];
+declare function findrumTitles(nn: number): string;
+declare function drumTitles(): string[];
+declare function instrumentTitles(): string[];
+declare class DataViewStream {
+    position: number;
+    buffer: DataView;
+    constructor(dv: DataView);
+    readUint8(): number;
+    readUint16(): number;
+    readVarInt(): number;
+    readBytes(length: number): number[];
+    offset(): number;
+    end(): boolean;
+}
+declare class MIDIFileHeader {
+    datas: DataView;
+    HEADER_LENGTH: number;
+    format: number;
+    trackCount: number;
+    tempoBPM: number;
+    changes: {
+        track: number;
+        ms: number;
+        resolution: number;
+        bpm: number;
+    }[];
+    meters: {
+        track: number;
+        ms: number;
+        count: number;
+        division: number;
+    }[];
+    lyrics: {
+        track: number;
+        ms: number;
+        txt: string;
+    }[];
+    signs: {
+        track: number;
+        ms: number;
+        sign: string;
+    }[];
+    meterCount: number;
+    meterDivision: number;
+    keyFlatSharp: number;
+    keyMajMin: number;
+    lastNonZeroQuarter: number;
+    constructor(buffer: ArrayBuffer);
+    getCalculatedTickResolution(tempo: number): number;
+    get0TickResolution(): number;
+    getTicksPerBeat(): number;
+    getTicksPerFrame(): number;
+    getSMPTEFrames(): number;
+}
+declare class LastKeyVal {
+    data: {
+        name: string;
+        value: number;
+    }[];
+    take(keyName: string): {
+        name: string;
+        value: number;
+    };
+}
+declare class MIDIFileTrack {
+    datas: DataView;
+    HDR_LENGTH: number;
+    trackLength: number;
+    trackContent: DataView;
+    trackevents: MIDIEvent[];
+    trackTitle: string;
+    instrumentName: string;
+    programChannel: {
+        program: number;
+        channel: number;
+    }[];
+    trackVolumePoints: {
+        ms: number;
+        value: number;
+        channel: number;
+    }[];
+    chords: TrackChord[];
+    constructor(buffer: ArrayBuffer, start: number);
+}
+declare function utf8ArrayToString(aBytes: any): string;
+declare class MidiParser {
+    header: MIDIFileHeader;
+    parsedTracks: MIDIFileTrack[];
+    instrumentNamesArray: string[];
+    drumNamesArray: string[];
+    EVENT_META: number;
+    EVENT_SYSEX: number;
+    EVENT_DIVSYSEX: number;
+    EVENT_MIDI: number;
+    EVENT_META_SEQUENCE_NUMBER: number;
+    EVENT_META_TEXT: number;
+    EVENT_META_COPYRIGHT_NOTICE: number;
+    EVENT_META_TRACK_NAME: number;
+    EVENT_META_INSTRUMENT_NAME: number;
+    EVENT_META_LYRICS: number;
+    EVENT_META_MARKER: number;
+    EVENT_META_CUE_POINT: number;
+    EVENT_META_MIDI_CHANNEL_PREFIX: number;
+    EVENT_META_END_OF_TRACK: number;
+    EVENT_META_SET_TEMPO: number;
+    EVENT_META_SMTPE_OFFSET: number;
+    EVENT_META_TIME_SIGNATURE: number;
+    EVENT_META_KEY_SIGNATURE: number;
+    EVENT_META_SEQUENCER_SPECIFIC: number;
+    EVENT_MIDI_NOTE_OFF: number;
+    EVENT_MIDI_NOTE_ON: number;
+    EVENT_MIDI_NOTE_AFTERTOUCH: number;
+    EVENT_MIDI_CONTROLLER: number;
+    EVENT_MIDI_PROGRAM_CHANGE: number;
+    EVENT_MIDI_CHANNEL_AFTERTOUCH: number;
+    EVENT_MIDI_PITCH_BEND: number;
+    midiEventType: number;
+    midiEventChannel: number;
+    midiEventParam1: number;
+    controller_BankSelectMSB: number;
+    controller_ModulationWheel: number;
+    controller_coarseDataEntrySlider: number;
+    controller_coarseVolume: number;
+    controller_ballance: number;
+    controller_pan: number;
+    controller_expression: number;
+    controller_BankSelectLSBGS: number;
+    controller_fineDataEntrySlider: number;
+    controller_ReverbLevel: number;
+    controller_HoldPedal1: number;
+    controller_TremoloDepth: number;
+    controller_ChorusLevel: number;
+    controller_NRPNParameterLSB: number;
+    controller_NRPNParameterMSB: number;
+    controller_fineRPN: number;
+    controller_coarseRPN: number;
+    controller_ResetAllControllers: number;
+    constructor(arrayBuffer: ArrayBuffer);
+    parseTracks(arrayBuffer: ArrayBuffer): void;
+    toText(arr: number[]): string;
+    findChordBefore(when: number, track: MIDIFileTrack, channel: number): TrackChord | null;
+    findOpenedNoteBefore(firstPitch: number, when: number, track: MIDIFileTrack, channel: number): {
+        chord: TrackChord;
+        note: TrackNote;
+    } | null;
+    takeChord(when: number, track: MIDIFileTrack, channel: number): TrackChord;
+    takeOpenedNote(first: number, when: number, track: MIDIFileTrack, channel: number): TrackNote;
+    distanceToPoint(line: PP, point: XYp): number;
+    douglasPeucker(points: XYp[], tolerance: number): XYp[];
+    simplifySinglePath(points: XYp[], tolerance: number): XYp[];
+    simplifyAllPaths(): void;
+    dumpResolutionChanges(): void;
+    lastResolution(ms: number): number;
+    parseTicks2time(track: MIDIFileTrack): void;
+    parseNotes(): void;
+    nextEvent(stream: DataViewStream): MIDIEvent;
+    parseTrackEvents(track: MIDIFileTrack): void;
+    findOrCreateTrack(parsedtrack: MIDIFileTrack, trackNum: number, channelNum: number, trackChannel: {
+        trackNum: number;
+        channelNum: number;
+        track: MIDISongTrack;
+    }[]): {
+        trackNum: number;
+        channelNum: number;
+        track: MIDISongTrack;
+    };
+    findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): MZXBX_Metre;
+    findLastChange(midiSongData: MIDISongData, beforeMs: number): {
+        track: number;
+        ms: number;
+        resolution: number;
+        bpm: number;
+    };
+    findNextChange(midiSongData: MIDISongData, afterMs: number): {
+        track: number;
+        ms: number;
+        resolution: number;
+        bpm: number;
+    };
+    calcMeasureDuration(midiSongData: MIDISongData, meter: MZXBX_Metre, bpm: number, part: number, startMs: number): number;
+    createMeasure(midiSongData: MIDISongData, fromMs: number, barIdx: number): ImportMeasure;
+    createTimeLine(midiSongData: MIDISongData): MZXBX_SongMeasure[];
+    convertProject(title: string, comment: string): MZXBX_Project;
+    addLyricsPoints(commentPoint: MZXBX_CommentMeasure, skip: MZXBX_Metre, txt: string): void;
+    collectDrums(midiTrack: MIDISongTrack): number[];
+    numratio(nn: number): number;
+    stripDuration(what: MZXBX_MetreMath2): MZXBX_MetreMath2;
+    createProjectTrack(timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_MusicTrack;
+    createProjectDrums(drum: number, timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_PercussionTrack;
+}
+declare function findMeasureSkipByTime(time: number, measures: MZXBX_SongMeasure[]): null | {
+    idx: number;
+    skip: MZXBX_Metre;
+};
+declare class MZXBX_MetreMath2 implements MZXBX_MetreMathType {
+    count: number;
+    part: number;
+    set(from: MZXBX_Metre): MZXBX_MetreMath2;
+    calculate(duration: number, tempo: number): MZXBX_MetreMath2;
+    metre(): MZXBX_Metre;
+    simplyfy(): MZXBX_MetreMath2;
+    strip(toPart: number): MZXBX_MetreMath2;
+    equals(metre: MZXBX_Metre): boolean;
+    less(metre: MZXBX_Metre): boolean;
+    more(metre: MZXBX_Metre): boolean;
+    plus(metre: MZXBX_Metre): MZXBX_MetreMath2;
+    minus(metre: MZXBX_Metre): MZXBX_MetreMath2;
+    duration(tempo: number): number;
+    width(tempo: number, ratio: number): number;
+}
+declare function MZMM2(): MZXBX_MetreMathType;
+declare function newMIDIparser2(arrayBuffer: ArrayBuffer): MidiParser;
 declare type MZXBX_CachedWave = {
     path: string;
     buffer: AudioBuffer | null;
