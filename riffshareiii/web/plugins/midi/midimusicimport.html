@@ -18,14 +18,16 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&display=swap" rel="stylesheet">
-	<script type='text/javascript' src='./midimusic.js'></script>
+    <script type='text/javascript' src='./midimusic.js'></script>
+    <script type='text/javascript' src='../../../js/mzxbxlib.js'></script>
 </head>
 
 <body>
 	<h1>MIDI import</h1>
-	<p><input type="file" id="file_midi_input" accept="audio/midi, audio/x-midi" onchange="plugin.loadfile(this);" /></p>
+    <p><input type="file" id="file_midi_input" accept="audio/midi, audio/x-midi" 
+        onchange="plugin.loadMIDIfile(this);" /></p>
 	<p>
-		<button onclick='plugin.sendTestData();'>Send data</button>
+		<button onclick='plugin.sendImportedMIDIData();'>Send data</button>
 	</p>
 </body>
 <script>

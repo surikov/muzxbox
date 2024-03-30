@@ -23,6 +23,8 @@
     },
     "files": [
         "./metre.ts",
+        "./loading.ts",
+        "./flow.ts",
         "../publictypes/musicenginetypes.ts",
 		
 

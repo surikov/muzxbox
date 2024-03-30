@@ -8,8 +8,8 @@ class MIDIIImportMusicPlugin {
 		console.log('init MIDI import');
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
 	}
-	sendTestData() {
-		console.log('sendTestData');
+	sendImportedMIDIData() {
+		console.log('sendImportedMIDIData');
 		if (this.parsedProject) {
 			var oo = {
 				dialog: this.callbackID,
@@ -21,8 +21,8 @@ class MIDIIImportMusicPlugin {
 		}
 	}
 
-	loadfile(inputFile) {
-		console.log('loadfile', inputFile.files);
+	loadMIDIfile(inputFile) {
+		console.log('loadMIDIfile', inputFile.files);
 		var file = inputFile.files[0];
 		var fileReader = new FileReader();
 		let me = this;

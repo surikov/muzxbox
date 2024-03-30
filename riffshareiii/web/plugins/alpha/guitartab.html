@@ -1,0 +1,38 @@
+<html>
+
+<head>
+	<style>
+		html {
+			--color-background: #ffffffcc;
+			--color-text: #003366ff;
+			--color-scroll: color-mix(in lab, transparent 90%, var(--color-text));
+
+			font-family: "Bruno Ace", sans-serif;
+
+			background-color: var(--color-background);
+			color: var(--color-text);
+			scrollbar-color: var(--color-scroll) var(--color-background);
+			scrollbar-width: thin;
+		}
+	</style>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&display=swap" rel="stylesheet">
+    <script type='text/javascript' src='./guitartabimport.js'></script>
+    <script type='text/javascript' src='../../../js/mzxbxlib.js'></script>
+</head>
+
+<body>
+	<h1>Import *.gp3, *.gp4, *.gp5</h1>
+    <p><input type="file" id="file_midi_input" accept=".gp3, .gp4, .gp5" 
+        onchange="plugin.loadGP345file(this);" /></p>
+	<p>
+		<button onclick='plugin.sendParsedGP345Data();'>Send data</button>
+	</p>
+</body>
+<script>
+	
+	let plugin=new GP345ImportMusicPlugin();
+</script>
+
+</html>

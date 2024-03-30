@@ -1,0 +1,109 @@
+{
+	"compilerOptions": {
+		"target": "es2015"
+        ,"outFile": "../../../../../web/plugins/alpha/guitartabimport.js"
+        //,"outDir":"../js"
+		,"strictNullChecks": true
+		,"alwaysStrict": true
+		,"esModuleInterop": true
+		,"noResolve": false
+        ,"noImplicitAny": false
+        ,"removeComments": true
+        ,"preserveConstEnums": true
+        ,"sourceMap": true
+        ,"experimentalDecorators": true
+        ,"isolatedModules": false
+		,"module": "AMD"
+        ,"lib": [
+            "dom"
+            ,"es2015"
+            ,"es5"
+        ]
+        ,"declaration": true
+		,"types": [ ]
+	}
+	,"files": [
+		
+		
+		"GPImporter.ts"
+        ,"../../../publictypes/musicenginetypes.ts"
+        ,"../../../publictypes/musicenginedeclarations.ts"
+        
+        
+		,"../alphatab/ImporterSettings.ts"
+		,"../alphatab/ScoreImporter.ts"
+		,"../alphatab/MusicFontSymbol.ts"
+
+		,"../alphatab/Gp3To5Importer.ts"
+		
+		,"../alphatab/IReadable.ts"
+		,"../alphatab/Settings.ts"
+		,"../alphatab/Score.ts"
+		,"../alphatab/RepeatGroup.ts"
+		,"../alphatab/AccentuationType.ts"
+		,"../alphatab/AccidentalType.ts"
+		,"../alphatab/Automation.ts"
+		,"../alphatab/Bar.ts"
+		,"../alphatab/Beat.ts"
+		,"../alphatab/BendPoint.ts"
+		,"../alphatab/BendStyle.ts"
+		,"../alphatab/BendType.ts"
+		,"../alphatab/BrushType.ts"
+		,"../alphatab/Chord.ts"
+		,"../alphatab/Clef.ts"
+		,"../alphatab/Fermata.ts"
+		,"../alphatab/KeySignature.ts"
+		,"../alphatab/KeySignatureType.ts"
+		,"../alphatab/MasterBar.ts"
+		,"../alphatab/MidiUtils.ts"
+		,"../alphatab/Duration.ts"
+		,"../alphatab/Ottavia.ts"
+		,"../alphatab/Staff.ts"
+		,"../alphatab/Track.ts"
+		,"../alphatab/Voice.ts"
+		,"../alphatab/SimileMark.ts"
+		,"../alphatab/Note.ts"
+		,"../alphatab/NoteAccidentalMode.ts"
+		,"../alphatab/HarmonicType.ts"
+		,"../alphatab/WhammyType.ts"
+		,"../alphatab/TripletFeel.ts"
+		,"../alphatab/Tuning.ts"
+		,"../alphatab/TupletGroup.ts"
+		,"../alphatab/VibratoType.ts"
+		,"../alphatab/SlideOutType.ts"
+		,"../alphatab/SlideInType.ts"
+		,"../alphatab/PickStroke.ts"
+		
+		,"../alphatab/GraceGroup.ts"
+		,"../alphatab/GraceType.ts"
+		,"../alphatab/Fingers.ts"
+		,"../alphatab/CrescendoType.ts"
+		,"../alphatab/DynamicValue.ts"
+		,"../alphatab/Lyrics.ts"
+		,"../alphatab/PlaybackInformation.ts"
+		,"../alphatab/InstrumentArticulation.ts"
+
+		,"../alphatab/PercussionMapper.ts"
+		
+		,"../alphatab/NotationSettings.ts"
+		,"../alphatab/Lazy.ts"
+		,"../alphatab/ModelUtils.ts"
+		,"../alphatab/DynamicValue.ts"
+		,"../alphatab/Fingers.ts"
+		,"../alphatab/Section.ts"
+		,"../alphatab/TripletFeel.ts"
+		,"../alphatab/IOHelper.ts"
+		,"../alphatab/ByteBuffer.ts"
+		,"../alphatab/IReadable.ts"
+		,"../alphatab/IWriteable.ts"
+		,"../alphatab/TypeConversions.ts"
+		,"../alphatab/BeatCloner.ts"
+		,"../alphatab/NoteCloner.ts"
+		,"../alphatab/BendPointCloner.ts"
+		,"../alphatab/Color.ts"
+		,"../alphatab/BeamDirection.ts"
+		,"../alphatab/AutomationCloner.ts"
+		,"../alphatab/GeneralMidi.ts"
+
+	]
+}

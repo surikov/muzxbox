@@ -104,109 +104,6 @@ class MuzXbox {
         }
     }
 }
-function MZXBX_loadCachedBuffer(audioContext, path, onDone) {
-    if (window['decodedArrayBuffer']) {
-    }
-    else {
-        window['decodedArrayBuffer'] = [];
-    }
-    let waves = window['decodedArrayBuffer'];
-    for (let ii = 0; ii < waves.length; ii++) {
-        if (waves[ii].path == path) {
-            if (waves[ii].buffer) {
-                if (!(waves[ii].line100)) {
-                    waves[ii].line100 = fillLinesOfBuffer(waves[ii].buffer);
-                }
-                onDone(waves[ii]);
-            }
-            else {
-                if (waves[ii].canceled) {
-                    console.log('cancel', waves[ii]);
-                }
-                else {
-                    setTimeout(() => {
-                    }, 999);
-                }
-            }
-            return;
-        }
-    }
-    let wave = {
-        path: path, buffer: null
-    };
-    window['decodedArrayBuffer'].push(wave);
-    let xhr = new XMLHttpRequest();
-    xhr.responseType = 'arraybuffer';
-    xhr.open("GET", path);
-    let xonload = function () {
-        audioContext.decodeAudioData(xhr.response, function (decodedData) {
-            let waves = window['decodedArrayBuffer'];
-            for (let ii = 0; ii < waves.length; ii++) {
-                if (waves[ii].path == path) {
-                    waves[ii].buffer = decodedData;
-                    if (!(waves[ii].line100)) {
-                        waves[ii].line100 = fillLinesOfBuffer(waves[ii].buffer);
-                    }
-                    onDone(waves[ii]);
-                    return;
-                }
-            }
-        }, function (err) {
-            console.log(err);
-            wave.canceled = true;
-        });
-    };
-    xhr.onload = xonload;
-    xhr.onerror = () => {
-        wave.canceled = true;
-        console.log('error', wave);
-    };
-    xhr.send();
-}
-function fillLinesOfBuffer(buffer) {
-    let dots = [];
-    if (buffer) {
-        let data = buffer.getChannelData(0);
-        let step = Math.round(data.length / 100);
-        for (let ii = 0; ii < data.length; ii = ii + step) {
-            let mx = 0;
-            for (let kk = 0; kk < step; kk++) {
-                if (Math.abs(data[ii + kk]) > mx)
-                    mx = Math.abs(data[ii + kk]);
-            }
-            dots.push(mx);
-        }
-    }
-    return dots;
-}
-function MZXBX_waitForCondition(sleepMs, isDone, onFinish) {
-    if (isDone()) {
-        onFinish();
-    }
-    else {
-        setTimeout(() => {
-            MZXBX_waitForCondition(sleepMs, isDone, onFinish);
-        }, sleepMs);
-    }
-}
-function MZXBX_appendScriptURL(url) {
-    let scripts = document.getElementsByTagName("script");
-    for (let ii = 0; ii < scripts.length; ii++) {
-        let script = scripts.item(ii);
-        if (script) {
-            if (url == script.lockedLoaderURL) {
-                return false;
-            }
-        }
-    }
-    var scriptElement = document.createElement('script');
-    scriptElement.setAttribute("type", "text/javascript");
-    scriptElement.setAttribute("src", url);
-    scriptElement.lockedLoaderURL = url;
-    let head = document.getElementsByTagName("head")[0];
-    head.appendChild(scriptElement);
-    return true;
-}
 function createSchedulePlayer() {
     return new SchedulePlayer();
 }
@@ -1859,7 +1756,7 @@ class MidiParser {
         return nextChange;
     }
     calcMeasureDuration(midiSongData, meter, bpm, part, startMs) {
-        let metreMath = MZXBX();
+        let metreMath = MZMM();
         let wholeDurationMs = 1000 * metreMath.set(meter).duration(bpm);
         let partDurationMs = part * wholeDurationMs;
         let nextChange = this.findNextChange(midiSongData, startMs);
@@ -2056,7 +1953,7 @@ class MidiParser {
             filters: [],
             performer: { id: '', data: '' }
         };
-        let mm = MZXBX();
+        let mm = MZMM();
         for (let tt = 0; tt < timeline.length; tt++) {
             let projectMeasure = { chords: [] };
             projectTrack.measures.push(projectMeasure);
@@ -2129,7 +2026,7 @@ class MidiParser {
             sampler: { id: '', data: '' }
         };
         let currentTimeMs = 0;
-        let mm = MZXBX();
+        let mm = MZMM();
         for (let tt = 0; tt < timeline.length; tt++) {
             let projectMeasure = { skips: [] };
             projectDrums.measures.push(projectMeasure);
@@ -2155,7 +2052,7 @@ class MidiParser {
 }
 function findMeasureSkipByTime(time, measures) {
     let curTime = 0;
-    let mm = MZXBX();
+    let mm = MZMM();
     for (let ii = 0; ii < measures.length; ii++) {
         let cumea = measures[ii];
         let measureDurationS = mm.set(cumea.metre).duration(cumea.tempo);
@@ -2523,6 +2420,9 @@ var MusicFontSymbol;
     MusicFontSymbol[MusicFontSymbol["OctaveBaselineB"] = 60563] = "OctaveBaselineB";
 })(MusicFontSymbol || (MusicFontSymbol = {}));
 class Gp3To5Importer extends ScoreImporter {
+    get name() {
+        return 'Guitar Pro 3-5';
+    }
     constructor() {
         super();
         this._versionNumber = 0;
@@ -2533,9 +2433,6 @@ class Gp3To5Importer extends ScoreImporter {
         this._trackCount = 0;
         this._playbackInfos = [];
         this._beatTextChunksByTrack = new Map();
-    }
-    get name() {
-        return 'Guitar Pro 3-5';
     }
     readScore() {
         this.readVersion();
@@ -5522,11 +5419,6 @@ var TripletFeel;
     TripletFeel[TripletFeel["Scottish8th"] = 6] = "Scottish8th";
 })(TripletFeel || (TripletFeel = {}));
 class Tuning {
-    constructor(name = '', tuning = null, isStandard = false) {
-        this.isStandard = isStandard;
-        this.name = name;
-        this.tunings = tuning !== null && tuning !== void 0 ? tuning : [];
-    }
     static getTextForTuning(tuning, includeOctave) {
         let parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];
@@ -5627,6 +5519,11 @@ class Tuning {
             }
         }
         return null;
+    }
+    constructor(name = '', tuning = null, isStandard = false) {
+        this.isStandard = isStandard;
+        this.name = name;
+        this.tunings = tuning !== null && tuning !== void 0 ? tuning : [];
     }
     finish() {
         const knownTuning = Tuning.findTuning(this.tunings);
