@@ -1,9 +1,9 @@
 declare class GPImporter {
     score: Score;
-    load(arrayBuffer: ArrayBuffer): void;
+    load(arrayBuffer: ArrayBuffer, ext: string): void;
     convertProject(title: string, comment: string): MZXBX_Project;
 }
-declare function newGPparser(arrayBuffer: ArrayBuffer): GPImporter;
+declare function newGPparser(arrayBuffer: ArrayBuffer, ext: string): GPImporter;
 declare function score2schedule(title: string, comment: string, score: Score): MZXBX_Project;
 declare function stringFret2pitch(stringNum: number, fretNum: number, tuning: number[]): number;
 declare function beatDuration(beat: Beat): MZXBX_MetreMathType;
@@ -444,6 +444,9 @@ interface IReadable {
     readByte(): number;
     read(buffer: Uint8Array, offset: number, count: number): number;
     readAll(): Uint8Array;
+}
+declare class EndOfReaderError {
+    constructor();
 }
 declare class Settings {
     readonly notation: NotationSettings;
@@ -1319,4 +1322,309 @@ declare class GeneralMidi {
     static getValue(name: string): number;
     static isPiano(program: number): boolean;
     static isGuitar(program: number): boolean;
+}
+declare class GpxImporter extends ScoreImporter {
+    get name(): string;
+    constructor();
+    readScore(): Score;
+}
+declare class GpxFile {
+    fileName: string;
+    fileSize: number;
+    data: Uint8Array | null;
+}
+declare class GpxFileSystem {
+    static readonly HeaderBcFs: string;
+    static readonly HeaderBcFz: string;
+    static readonly ScoreGpif: string;
+    static readonly BinaryStylesheet: string;
+    static readonly PartConfiguration: string;
+    fileFilter: (fileName: string) => boolean;
+    files: GpxFile[];
+    constructor();
+    load(s: IReadable): void;
+    readHeader(src: BitReader): string;
+    decompress(src: BitReader, skipHeader?: boolean): Uint8Array;
+    private readBlock;
+    private readUncompressedBlock;
+    private getString;
+    private getInteger;
+}
+declare class BitReader {
+    private static readonly ByteSize;
+    private _currentByte;
+    private _position;
+    private _source;
+    constructor(source: IReadable);
+    readByte(): number;
+    readBytes(count: number): Uint8Array;
+    readBits(count: number): number;
+    readBitsReversed(count: number): number;
+    readBit(): number;
+    readAll(): Uint8Array;
+}
+declare class UnsupportedFormatError {
+    constructor(message?: string | null, inner?: Error | null);
+}
+declare class GpifRhythm {
+    id: string;
+    dots: number;
+    tupletDenominator: number;
+    tupletNumerator: number;
+    value: Duration;
+}
+declare class GpifSound {
+    name: string;
+    path: string;
+    role: string;
+    get uniqueId(): string;
+    program: number;
+}
+declare class GpifParser {
+    private static readonly InvalidId;
+    private static readonly BendPointPositionFactor;
+    private static readonly BendPointValueFactor;
+    score: Score;
+    private _masterTrackAutomations;
+    private _automationsPerTrackIdAndBarIndex;
+    private _tracksMapping;
+    private _tracksById;
+    private _masterBars;
+    private _barsOfMasterBar;
+    private _barsById;
+    private _voicesOfBar;
+    private _voiceById;
+    private _beatsOfVoice;
+    private _rhythmOfBeat;
+    private _beatById;
+    private _rhythmById;
+    private _noteById;
+    private _notesOfBeat;
+    private _tappedNotes;
+    private _lyricsByTrack;
+    private _soundsByTrack;
+    private _hasAnacrusis;
+    private _articulationByName;
+    private _skipApplyLyrics;
+    parseXml(xml: string, settings: Settings): void;
+    private parseDom;
+    private parseScoreNode;
+    private parseMasterTrackNode;
+    private parseAutomations;
+    private parseAutomation;
+    private parseTracksNode;
+    private parseTrack;
+    private parseTrackAutomations;
+    private parseNotationPatch;
+    private parseInstrumentSet;
+    private parseElements;
+    private parseElement;
+    private parseArticulations;
+    private parseArticulation;
+    private parseTechniqueSymbol;
+    private parseNoteHead;
+    private parseStaves;
+    private parseStaff;
+    private parseStaffProperties;
+    private parseStaffProperty;
+    private parseLyrics;
+    private parseLyricsLine;
+    private parseDiagramCollectionForTrack;
+    private parseDiagramCollectionForStaff;
+    private parseDiagramItemForTrack;
+    private parseDiagramItemForStaff;
+    private parseDiagramItemForChord;
+    private parseTrackProperties;
+    private parseTrackProperty;
+    private parseGeneralMidi;
+    private parseSounds;
+    private parseSound;
+    private parseSoundMidi;
+    private parsePartSounding;
+    private parseTranspose;
+    private parseRSE;
+    private parseChannelStrip;
+    private parseChannelStripParameters;
+    private parseMasterBarsNode;
+    private parseMasterBar;
+    private parseFermatas;
+    private parseFermata;
+    private parseBars;
+    private parseBar;
+    private parseVoices;
+    private parseVoice;
+    private parseBeats;
+    private parseBeat;
+    private parseBeatLyrics;
+    private parseBeatXProperties;
+    private parseBarXProperties;
+    private parseMasterBarXProperties;
+    private parseBeatProperties;
+    private parseNotes;
+    private parseNote;
+    private parseNoteProperties;
+    private parseConcertPitch;
+    private toBendValue;
+    private toBendOffset;
+    private parseRhythms;
+    private parseRhythm;
+    private buildModel;
+}
+declare enum XmlNodeType {
+    None = 0,
+    Element = 1,
+    Text = 2,
+    CDATA = 3,
+    Document = 4,
+    DocumentType = 5
+}
+declare class XmlNode {
+    nodeType: XmlNodeType;
+    localName: string | null;
+    value: string | null;
+    childNodes: XmlNode[];
+    attributes: Map<string, string>;
+    firstChild: XmlNode | null;
+    firstElement: XmlNode | null;
+    addChild(node: XmlNode): void;
+    getAttribute(name: string): string;
+    getElementsByTagName(name: string, recursive?: boolean): XmlNode[];
+    private searchElementsByTagName;
+    findChildElement(name: string): XmlNode | null;
+    addElement(name: string): XmlNode;
+    get innerText(): string;
+    set innerText(value: string);
+    setCData(s: string): void;
+}
+declare class XmlDocument extends XmlNode {
+    constructor();
+    parse(xml: string): void;
+    toString(): string;
+    toFormattedString(indention?: string, xmlHeader?: boolean): string;
+}
+declare enum XmlState {
+    IgnoreSpaces = 0,
+    Begin = 1,
+    BeginNode = 2,
+    TagName = 3,
+    Body = 4,
+    AttribName = 5,
+    Equals = 6,
+    AttvalBegin = 7,
+    AttribVal = 8,
+    Childs = 9,
+    Close = 10,
+    WaitEnd = 11,
+    WaitEndRet = 12,
+    Pcdata = 13,
+    Header = 14,
+    Comment = 15,
+    Doctype = 16,
+    Cdata = 17,
+    Escape = 18
+}
+declare class XmlParser {
+    static readonly CharCodeLF: number;
+    static readonly CharCodeTab: number;
+    static readonly CharCodeCR: number;
+    static readonly CharCodeSpace: number;
+    static readonly CharCodeLowerThan: number;
+    static readonly CharCodeAmp: number;
+    static readonly CharCodeBrackedClose: number;
+    static readonly CharCodeBrackedOpen: number;
+    static readonly CharCodeGreaterThan: number;
+    static readonly CharCodeExclamation: number;
+    static readonly CharCodeUpperD: number;
+    static readonly CharCodeLowerD: number;
+    static readonly CharCodeMinus: number;
+    static readonly CharCodeQuestion: number;
+    static readonly CharCodeSlash: number;
+    static readonly CharCodeEquals: number;
+    static readonly CharCodeDoubleQuote: number;
+    static readonly CharCodeSingleQuote: number;
+    static readonly CharCodeSharp: number;
+    static readonly CharCodeLowerX: number;
+    static readonly CharCodeLowerA: number;
+    static readonly CharCodeLowerZ: number;
+    static readonly CharCodeUpperA: number;
+    static readonly CharCodeUpperZ: number;
+    static readonly CharCode0: number;
+    static readonly CharCode9: number;
+    static readonly CharCodeColon: number;
+    static readonly CharCodeDot: number;
+    static readonly CharCodeUnderscore: number;
+    static readonly CharCodeSemi: number;
+    private static Escapes;
+    static parse(str: string, p: number, parent: XmlNode): number;
+    private static isValidChar;
+}
+declare enum AlphaTabErrorType {
+    General = 0,
+    Format = 1,
+    AlphaTex = 2
+}
+declare class AlphaTabError extends Error {
+    inner: Error | null;
+    type: AlphaTabErrorType;
+    constructor(type: AlphaTabErrorType, message?: string | null, inner?: Error);
+}
+declare class XmlError extends AlphaTabError {
+    xml: string;
+    pos: number;
+    constructor(message: string, xml: string, pos: number);
+}
+declare enum DataType {
+    Boolean = 0,
+    Integer = 1,
+    Float = 2,
+    String = 3,
+    Point = 4,
+    Size = 5,
+    Rectangle = 6,
+    Color = 7
+}
+declare class BinaryStylesheet {
+    readonly raw: Map<string, unknown>;
+    constructor(data: Uint8Array);
+    apply(score: Score): void;
+    addValue(key: string, value: unknown): void;
+    static writeForScore(score: Score): Uint8Array;
+    private static writeBooleanEntry;
+}
+declare class Bounds {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+}
+declare class ScoreView {
+    isMultiRest: boolean;
+    trackViewGroups: TrackViewGroup[];
+}
+declare class TrackViewGroup {
+    showSlash: boolean;
+    showStandardNotation: boolean;
+    showTablature: boolean;
+}
+declare class PartConfiguration {
+    scoreViews: ScoreView[];
+    apply(score: Score): void;
+    constructor(partConfigurationData: Uint8Array);
+    static writeForScore(score: Score): Uint8Array;
+}
+declare class XmlWriter {
+    static write(xml: XmlNode, indention: string, xmlHeader: boolean): string;
+    private _result;
+    private _indention;
+    private _xmlHeader;
+    private _isStartOfLine;
+    private _currentIndention;
+    constructor(indention: string, xmlHeader: boolean);
+    writeNode(xml: XmlNode): void;
+    private unindend;
+    private indent;
+    private writeAttributeValue;
+    private write;
+    private writeLine;
+    toString(): string;
 }

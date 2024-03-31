@@ -1,5 +1,5 @@
 //declare let pluginListKindUrlName: { group: string, kind: string, url: string, functionName: string }[];
-let importer = new MusicDataImporter();
+//let importer = new MusicDataImporter();
 type MenuInfo = {
 	text: string;
 	noLocalization?: boolean;
@@ -79,7 +79,7 @@ function composeBaseMenu(): MenuInfo[] {
 	if (menuItemsData) { return menuItemsData; } else {
 		menuItemsData = [
 			menuPointFile
-			, {
+			/*, {
 				text: localMenuImportMIDI, onClick: () => {
 					commandDispatcher.promptImportFromMIDI();
 				}
@@ -91,7 +91,7 @@ function composeBaseMenu(): MenuInfo[] {
 				text: "Test iFrame GUI", onClick: () => {
 					commandDispatcher.promptPluginGUI('Plugin UI', './web/test/plugin.html', (obj: any) => { return false });
 				}
-			}, menuPointTracks
+			}*/, menuPointTracks
 			, menuPointPercussion
 			, {
 				text: localMenuItemSettings, children: [

@@ -24,7 +24,7 @@
 	"files": [
         "treevalue/treevalue.ts"
         ,"startup.ts"
-		,"impexport/importutil.ts"
+		
 		,"ui/pluginprompt/plugindialog.ts"
         ,"commanddispatcher.ts"
         ,"ui/renderer.ts"

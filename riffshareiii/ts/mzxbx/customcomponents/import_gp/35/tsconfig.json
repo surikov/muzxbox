@@ -103,7 +103,23 @@
 		,"../alphatab/Color.ts"
 		,"../alphatab/BeamDirection.ts"
 		,"../alphatab/AutomationCloner.ts"
-		,"../alphatab/GeneralMidi.ts"
+        ,"../alphatab/GeneralMidi.ts"
+        ,"../alphatab/GpxImporter.ts"
+        ,"../alphatab/GpxFileSystem.ts"
+        ,"../alphatab/BitReader.ts"
+        ,"../alphatab/UnsupportedFormatError.ts"
+        ,"../alphatab/GpifParser.ts"
+        ,"../alphatab/XmlNode.ts"
+        ,"../alphatab/XmlDocument.ts"
+        ,"../alphatab/XmlParser.ts"
+        ,"../alphatab/AlphaTabError.ts"
+        ,"../alphatab/XmlError.ts"
+        
+        ,"../alphatab/BinaryStylesheet.ts"
+        ,"../alphatab/Bounds.ts"
+
+        ,"../alphatab/PartConfiguration.ts"
+        ,"../alphatab/XmlWriter.ts"
 
 	]
 }

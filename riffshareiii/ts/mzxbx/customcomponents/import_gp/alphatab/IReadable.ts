@@ -46,10 +46,10 @@
      */
     readAll(): Uint8Array;
 }
-/*
- class EndOfReaderError extends AlphaTabError {
+
+ class EndOfReaderError {//extends AlphaTabError {
     public constructor() {
-        super(AlphaTabErrorType.Format, 'Unexpected end of data within reader');
-        Object.setPrototypeOf(this, EndOfReaderError.prototype);
+        //super(AlphaTabErrorType.Format, 'Unexpected end of data within reader');
+        //Object.setPrototypeOf(this, EndOfReaderError.prototype);
     }
-}*/
+}

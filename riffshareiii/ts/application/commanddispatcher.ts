@@ -86,7 +86,7 @@ class CommandDispatcher {
 	setDrumSoloState(state: number) {
 		console.log('setDrumSoloState', state);
 	}
-	promptImportFromMIDI() {
+	/*promptImportFromMIDI() {
 		console.log('promptImportFromMIDI');
 		let me = this;
 		let filesinput: HTMLElement | null = document.getElementById('file_midi_input');
@@ -137,7 +137,7 @@ class CommandDispatcher {
 			//console.log('setup', filesinput);
 		}
 	}
-
+*/
 	promptPluginGUI(label: string, url: string, callback: (obj: any) => boolean) {
 		console.log('promptPluginGUI', url);
 		pluginDialogPrompt.openDialogFrame(label, url, callback);
@@ -167,7 +167,7 @@ class CommandDispatcher {
 		console.log('cancelPluginGUI');
 		pluginDialogPrompt.closeDialogFrame();
 	}
-	promptTestImport() {
+	/*promptTestImport() {
 		console.log('promptTestImport');
 		let me = this;
 		let filesinput: HTMLElement | null = document.getElementById('file_gp35_input');
@@ -210,7 +210,7 @@ class CommandDispatcher {
 			}
 			filesinput.click();
 		}
-	}
+	}*/
 
 }
 let commandDispatcher = new CommandDispatcher();

@@ -157,8 +157,6 @@ function startLoadCSSfile(cssurl) {
     link.media = 'all';
     head.appendChild(link);
 }
-class MusicDataImporter {
-}
 class PluginDialogPrompt {
     constructor() {
         this.dialogID = '?';
@@ -291,53 +289,6 @@ class CommandDispatcher {
     setDrumSoloState(state) {
         console.log('setDrumSoloState', state);
     }
-    promptImportFromMIDI() {
-        console.log('promptImportFromMIDI');
-        let me = this;
-        let filesinput = document.getElementById('file_midi_input');
-        if (filesinput) {
-            if (!(this.listener)) {
-                this.listener = function (ievent) {
-                    var file = ievent.target.files[0];
-                    let title = file.name;
-                    let dat = '' + file.lastModifiedDate;
-                    try {
-                        let last = file.lastModifiedDate;
-                        dat = '' + last.getFullYear();
-                        if (last.getMonth() < 10) {
-                            dat = dat + '-' + last.getMonth();
-                        }
-                        else {
-                            dat = dat + '-0' + last.getMonth();
-                        }
-                        if (last.getDate() < 10) {
-                            dat = dat + '-' + last.getDate();
-                        }
-                        else {
-                            dat = dat + '-0' + last.getDate();
-                        }
-                    }
-                    catch (xx) {
-                        console.log(xx);
-                    }
-                    let comment = ', ' + file.size / 1000 + 'kb, ' + dat;
-                    var fileReader = new FileReader();
-                    fileReader.onload = function (progressEvent) {
-                        if (progressEvent != null) {
-                            var arrayBuffer = progressEvent.target.result;
-                            var midiParser = newMIDIparser(arrayBuffer);
-                            let result = midiParser.convertProject(title, comment);
-                            me.registerWorkProject(result);
-                            me.resetProject();
-                        }
-                    };
-                    fileReader.readAsArrayBuffer(file);
-                };
-                filesinput.addEventListener('change', this.listener, false);
-            }
-            filesinput.click();
-        }
-    }
     promptPluginGUI(label, url, callback) {
         console.log('promptPluginGUI', url);
         pluginDialogPrompt.openDialogFrame(label, url, callback);
@@ -345,53 +296,6 @@ class CommandDispatcher {
     cancelPluginGUI() {
         console.log('cancelPluginGUI');
         pluginDialogPrompt.closeDialogFrame();
-    }
-    promptTestImport() {
-        console.log('promptTestImport');
-        let me = this;
-        let filesinput = document.getElementById('file_gp35_input');
-        if (filesinput) {
-            if (!(this.listener)) {
-                this.listener = function (ievent) {
-                    var file = ievent.target.files[0];
-                    var fileReader = new FileReader();
-                    let title = file.name;
-                    let dat = '' + file.lastModifiedDate;
-                    try {
-                        let last = file.lastModifiedDate;
-                        dat = '' + last.getFullYear();
-                        if (last.getMonth() < 10) {
-                            dat = dat + '-' + last.getMonth();
-                        }
-                        else {
-                            dat = dat + '-0' + last.getMonth();
-                        }
-                        if (last.getDate() < 10) {
-                            dat = dat + '-' + last.getDate();
-                        }
-                        else {
-                            dat = dat + '-0' + last.getDate();
-                        }
-                    }
-                    catch (xx) {
-                        console.log(xx);
-                    }
-                    let comment = ', ' + file.size / 1000 + 'kb, ' + dat;
-                    fileReader.onload = function (progressEvent) {
-                        if (progressEvent != null) {
-                            var arrayBuffer = progressEvent.target.result;
-                            var pp = newGPparser(arrayBuffer);
-                            let result = pp.convertProject(title, comment);
-                            me.registerWorkProject(result);
-                            me.resetProject();
-                        }
-                    };
-                    fileReader.readAsArrayBuffer(file);
-                };
-                filesinput.addEventListener('change', this.listener, false);
-            }
-            filesinput.click();
-        }
     }
 }
 let commandDispatcher = new CommandDispatcher();
@@ -522,7 +426,6 @@ let localNameLocal = 'localNameLocal';
 let localeFontRatio = 1;
 let localMenuItemSettings = 'localMenuItemSettings';
 let localMenuTracksFolder = 'localMenuTracksFolder';
-let localMenuImportMIDI = 'localMenuImportMIDI';
 let localMenuPercussionFolder = 'localMenuPercussionFolder';
 let localeDictionary = [
     {
@@ -541,12 +444,6 @@ let localeDictionary = [
         id: localMenuTracksFolder, data: [
             { locale: 'en', text: 'Tracks' },
             { locale: 'ru', text: 'Треки' },
-            { locale: 'zh', text: '?' }
-        ]
-    }, {
-        id: localMenuImportMIDI, data: [
-            { locale: 'en', text: 'Import from MIDI-file' },
-            { locale: 'ru', text: 'Импорт из файлв MIDI' },
             { locale: 'zh', text: '?' }
         ]
     },
@@ -1150,7 +1047,6 @@ class RightMenuItem {
         return anchor;
     }
 }
-let importer = new MusicDataImporter();
 let menuItemsData = null;
 let menuPointTracks = {
     text: localMenuTracksFolder
@@ -1191,19 +1087,7 @@ function composeBaseMenu() {
     else {
         menuItemsData = [
             menuPointFile,
-            {
-                text: localMenuImportMIDI, onClick: () => {
-                    commandDispatcher.promptImportFromMIDI();
-                }
-            }, {
-                text: "GP35Import", onClick: () => {
-                    commandDispatcher.promptTestImport();
-                }
-            }, {
-                text: "Test iFrame GUI", onClick: () => {
-                    commandDispatcher.promptPluginGUI('Plugin UI', './web/test/plugin.html', (obj) => { return false; });
-                }
-            }, menuPointTracks,
+            menuPointTracks,
             menuPointPercussion,
             {
                 text: localMenuItemSettings, children: [

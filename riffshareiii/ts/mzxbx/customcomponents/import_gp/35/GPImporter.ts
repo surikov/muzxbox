@@ -2,18 +2,28 @@
 */
 class GPImporter {
     score: Score;
-    load(arrayBuffer: ArrayBuffer) {
+    load(arrayBuffer: ArrayBuffer, ext: string) {
         console.log('load', arrayBuffer);
-        let gp3To5Importer: Gp3To5Importer = new Gp3To5Importer();
-        let uint8Array: Uint8Array = new Uint8Array(arrayBuffer);
-        //console.log('uint8Array', uint8Array);
-        let data: ByteBuffer = ByteBuffer.fromBuffer(uint8Array);
-        let settings: Settings = new Settings();
-		settings.importer.encoding='windows-1251';
-        gp3To5Importer.init(data, settings);
-        //console.log('gp3To5Importer', gp3To5Importer);
-        this.score = gp3To5Importer.readScore();
-        //console.log("score", this.score);
+        let scoreImporter: ScoreImporter | null = null;
+        if (ext.toUpperCase() == 'GP3' || ext.toUpperCase() == 'GP4' || ext.toUpperCase() == 'GP5') {
+            scoreImporter = new Gp3To5Importer();
+            //let gp3To5Importer: Gp3To5Importer = new Gp3To5Importer();
+            let uint8Array: Uint8Array = new Uint8Array(arrayBuffer);
+            //console.log('uint8Array', uint8Array);
+            let data: ByteBuffer = ByteBuffer.fromBuffer(uint8Array);
+            let settings: Settings = new Settings();
+            settings.importer.encoding = 'windows-1251';
+            scoreImporter.init(data, settings);
+            //console.log('gp3To5Importer', gp3To5Importer);
+            this.score = scoreImporter.readScore();
+            //console.log("score", this.score);
+        } else {
+            if (ext.toUpperCase() == 'GPX') {
+                //
+            } else {
+                console.log('Unknown file ' + ext);
+            }
+        }
     }
     convertProject(title: string, comment: string): MZXBX_Project {
         //console.log('GPImporter.convertProject');
@@ -21,10 +31,10 @@ class GPImporter {
         return project;
     }
 }
-function newGPparser(arrayBuffer: ArrayBuffer) {
+function newGPparser(arrayBuffer: ArrayBuffer, ext: string) {
     console.log("newGPparser");
     let pp = new GPImporter();
-    pp.load(arrayBuffer);
+    pp.load(arrayBuffer, ext);
     return pp;
 }
 function score2schedule(title: string, comment: string, score: Score): MZXBX_Project {
@@ -239,28 +249,29 @@ function addScoreDrumsTracks(project: MZXBX_Project, scoreTrack: Track) {
         }
     }
 }
-class GP345ImportMusicPlugin{
+class GP345ImportMusicPlugin {
     callbackID = '';
     parsedProject: MZXBX_Project | null = null;
-    constructor(){
+    constructor() {
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
     }
     receiveHostMessage(par) {
-		console.log('receiveHostMessage', par);
-		//callbackID = par.data;
-		try {
-			var oo = JSON.parse(par.data);
-			this.callbackID = oo.dialog;
-		} catch (xx) {
-			console.log(xx);
-		}
-	}
-    loadGP345file(from){
-        console.log('loadGP345file',from.files);
-        let me=this;
+        console.log('receiveHostMessage', par);
+        //callbackID = par.data;
+        try {
+            var oo = JSON.parse(par.data);
+            this.callbackID = oo.dialog;
+        } catch (xx) {
+            console.log(xx);
+        }
+    }
+    loadGP345file(from) {
+        console.log('loadGP345file', from.files);
+        let me = this;
         var file = from.files[0];
         var fileReader = new FileReader();
         let title: string = file.name;
+        let ext: string | undefined = ('' + file.name).split('.').pop();
         let dat = '' + file.lastModifiedDate;
         try {
             let last: Date = file.lastModifiedDate;
@@ -282,25 +293,30 @@ class GP345ImportMusicPlugin{
         fileReader.onload = function (progressEvent: any) {
             if (progressEvent != null) {
                 var arrayBuffer = progressEvent.target.result;
-                var pp = newGPparser(arrayBuffer);
-                let result: MZXBX_Project = pp.convertProject(title, comment);
-                //me.registerWorkProject(result);
-                //me.resetProject();
-                me.parsedProject=result;
+
+                var pp = newGPparser(arrayBuffer, '' + ext);
+                try {
+                    let result: MZXBX_Project = pp.convertProject(title, comment);
+                    //me.registerWorkProject(result);
+                    //me.resetProject();
+                    me.parsedProject = result;
+                } catch (xxx) {
+                    console.log(xxx);
+                }
             }
         };
         fileReader.readAsArrayBuffer(file);
     }
-    sendParsedGP345Data(){
+    sendParsedGP345Data() {
         console.log('sendParsedGP345Data');
-		if (this.parsedProject) {
-			var oo = {
-				dialog: this.callbackID,
-				data: this.parsedProject
-			};
-			window.parent.postMessage(JSON.stringify(oo), '*');
-		}else{
-			alert('No parsed data');
-		}
+        if (this.parsedProject) {
+            var oo = {
+                dialog: this.callbackID,
+                data: this.parsedProject
+            };
+            window.parent.postMessage(JSON.stringify(oo), '*');
+        } else {
+            alert('No parsed data');
+        }
     }
 }

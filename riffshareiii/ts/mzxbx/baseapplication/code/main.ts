@@ -19,7 +19,7 @@ class MuzXbox {
 		} else {
 			console.log("start initFromUI");
 			this.initAudioContext();
-			let filesinput: HTMLElement | null = document.getElementById('filesinput');
+			/*let filesinput: HTMLElement | null = document.getElementById('filesinput');
 			if (filesinput) {
 				let listener: (this: HTMLElement, event: HTMLElementEventMap['change']) => any = function (this: HTMLElement, ievent: HTMLElementEventMap['change']) {
 					//console.log('event',event);
@@ -39,7 +39,7 @@ class MuzXbox {
 					fileReader.readAsArrayBuffer(file);
 				};
 				filesinput.addEventListener('change', listener, false);
-			}
+			}*/
 			//console.log('filesinput',filesinput);
 			this.songslide = document.getElementById('songslide') as HTMLInputElement;
 			if (this.songslide) {
