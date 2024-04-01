@@ -84,6 +84,8 @@
 		,"../alphatab/InstrumentArticulation.ts"
 
 		,"../alphatab/PercussionMapper.ts"
+
+		,"../alphatab/FormatError.ts"
 		
 		,"../alphatab/NotationSettings.ts"
 		,"../alphatab/Lazy.ts"
@@ -120,6 +122,16 @@
 
         ,"../alphatab/PartConfiguration.ts"
         ,"../alphatab/XmlWriter.ts"
+/*
+		,"../alphatab/Gp7Importer.ts"
+		,"../alphatab/ZipEntry.ts"
+		,"../alphatab/ZipReader.ts"
+		,"../alphatab/HuffTools.ts"
+		
+		
+		,"../alphatab/Huffman.ts"
+		,"../alphatab/Inflate.ts"*/
+
 
 	]
 }

@@ -5,19 +5,22 @@ class GPImporter {
         let scoreImporter = null;
         if (ext.toUpperCase() == 'GP3' || ext.toUpperCase() == 'GP4' || ext.toUpperCase() == 'GP5') {
             scoreImporter = new Gp3To5Importer();
+        }
+        else {
+            if (ext.toUpperCase() == 'GPX') {
+                scoreImporter = new GpxImporter();
+            }
+            else {
+                console.log('Unknown file ' + ext);
+            }
+        }
+        if (scoreImporter) {
             let uint8Array = new Uint8Array(arrayBuffer);
             let data = ByteBuffer.fromBuffer(uint8Array);
             let settings = new Settings();
             settings.importer.encoding = 'windows-1251';
             scoreImporter.init(data, settings);
             this.score = scoreImporter.readScore();
-        }
-        else {
-            if (ext.toUpperCase() == 'GPX') {
-            }
-            else {
-                console.log('Unknown file ' + ext);
-            }
         }
     }
     convertProject(title, comment) {
@@ -433,9 +436,6 @@ var MusicFontSymbol;
     MusicFontSymbol[MusicFontSymbol["OctaveBaselineB"] = 60563] = "OctaveBaselineB";
 })(MusicFontSymbol || (MusicFontSymbol = {}));
 class Gp3To5Importer extends ScoreImporter {
-    get name() {
-        return 'Guitar Pro 3-5';
-    }
     constructor() {
         super();
         this._versionNumber = 0;
@@ -446,6 +446,9 @@ class Gp3To5Importer extends ScoreImporter {
         this._trackCount = 0;
         this._playbackInfos = [];
         this._beatTextChunksByTrack = new Map();
+    }
+    get name() {
+        return 'Guitar Pro 3-5';
     }
     readScore() {
         this.readVersion();
@@ -3436,6 +3439,11 @@ var TripletFeel;
     TripletFeel[TripletFeel["Scottish8th"] = 6] = "Scottish8th";
 })(TripletFeel || (TripletFeel = {}));
 class Tuning {
+    constructor(name = '', tuning = null, isStandard = false) {
+        this.isStandard = isStandard;
+        this.name = name;
+        this.tunings = tuning !== null && tuning !== void 0 ? tuning : [];
+    }
     static getTextForTuning(tuning, includeOctave) {
         let parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];
@@ -3536,11 +3544,6 @@ class Tuning {
             }
         }
         return null;
-    }
-    constructor(name = '', tuning = null, isStandard = false) {
-        this.isStandard = isStandard;
-        this.name = name;
-        this.tunings = tuning !== null && tuning !== void 0 ? tuning : [];
     }
     finish() {
         const knownTuning = Tuning.findTuning(this.tunings);
@@ -4015,6 +4018,11 @@ PercussionMapper.instrumentArticulations = new Map([
     [33, new InstrumentArticulation("snare", 3, 37, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
     [34, new InstrumentArticulation("snare", 3, 38, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadBlack)]
 ]);
+class FormatError {
+    constructor(message) {
+        Object.setPrototypeOf(this, FormatError.prototype);
+    }
+}
 var TabRhythmMode;
 (function (TabRhythmMode) {
     TabRhythmMode[TabRhythmMode["Hidden"] = 0] = "Hidden";
@@ -7867,21 +7875,6 @@ class TrackViewGroup {
     }
 }
 class PartConfiguration {
-    apply(score) {
-        if (this.scoreViews.length > 0) {
-            let trackIndex = 0;
-            for (let trackConfig of this.scoreViews[0].trackViewGroups) {
-                if (trackIndex < score.tracks.length) {
-                    const track = score.tracks[trackIndex];
-                    for (const staff of track.staves) {
-                        staff.showTablature = trackConfig.showTablature;
-                        staff.showStandardNotation = trackConfig.showStandardNotation;
-                    }
-                }
-                trackIndex++;
-            }
-        }
-    }
     constructor(partConfigurationData) {
         this.scoreViews = [];
         let readable = ByteBuffer.fromBuffer(partConfigurationData);
@@ -7901,6 +7894,21 @@ class PartConfiguration {
                 trackConfiguration.showTablature = (flags & 0x02) !== 0;
                 trackConfiguration.showSlash = (flags & 0x04) !== 0;
                 scoreView.trackViewGroups.push(trackConfiguration);
+            }
+        }
+    }
+    apply(score) {
+        if (this.scoreViews.length > 0) {
+            let trackIndex = 0;
+            for (let trackConfig of this.scoreViews[0].trackViewGroups) {
+                if (trackIndex < score.tracks.length) {
+                    const track = score.tracks[trackIndex];
+                    for (const staff of track.staves) {
+                        staff.showTablature = trackConfig.showTablature;
+                        staff.showStandardNotation = trackConfig.showStandardNotation;
+                    }
+                }
+                trackIndex++;
             }
         }
     }
@@ -7941,17 +7949,17 @@ class PartConfiguration {
     }
 }
 class XmlWriter {
-    static write(xml, indention, xmlHeader) {
-        const writer = new XmlWriter(indention, xmlHeader);
-        writer.writeNode(xml);
-        return writer.toString();
-    }
     constructor(indention, xmlHeader) {
         this._result = [];
         this._indention = indention;
         this._xmlHeader = xmlHeader;
         this._currentIndention = '';
         this._isStartOfLine = true;
+    }
+    static write(xml, indention, xmlHeader) {
+        const writer = new XmlWriter(indention, xmlHeader);
+        writer.writeNode(xml);
+        return writer.toString();
     }
     writeNode(xml) {
         switch (xml.nodeType) {
