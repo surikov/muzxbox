@@ -6,13 +6,15 @@ let localMenuItemSettings = 'localMenuItemSettings';
 let localMenuTracksFolder = 'localMenuTracksFolder';
 //let localMenuImportMIDI = 'localMenuImportMIDI';
 let localMenuPercussionFolder='localMenuPercussionFolder';
+let localMenuImportFolder='localMenuImportFolder';
+let localMenuFileFolder='localMenuFileFolder';
 
 let localeDictionary: { id: string, data: { locale: string, text: string }[] }[] = [
     {
         id: localNameLocal, data: [
             { locale: 'en', text: 'English' }
             , { locale: 'ru', text: 'Русский' }
-            , { locale: 'zh', text: '汉语口语' }]
+            , { locale: 'zh', text: '中文' }]
     }, {
         id: localMenuItemSettings, data: [
             { locale: 'en', text: 'Settings' }
@@ -33,6 +35,17 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
         id: localMenuPercussionFolder, data: [
             { locale: 'en', text: 'Sampler' }
             , { locale: 'ru', text: 'Сэмплер' }
+            , { locale: 'zh', text: '?' }]
+    }
+	, {
+        id: localMenuFileFolder, data: [
+            { locale: 'en', text: 'File' }
+            , { locale: 'ru', text: 'Файл' }
+            , { locale: 'zh', text: '?' }]
+    }, {
+        id: localMenuImportFolder, data: [
+            { locale: 'en', text: 'Import' }
+            , { locale: 'ru', text: 'Импорт' }
             , { locale: 'zh', text: '?' }]
     }
 ];

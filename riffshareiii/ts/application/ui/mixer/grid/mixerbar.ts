@@ -152,7 +152,7 @@ class MixerBar {
 					, y: top//mixm.gridTop()
 					, w: line.ratio * zoomInfo.minZoom / 2
 					, h: height//mixm.gridHeight()
-					, css: 'timeMeasureMark'
+					, css: 'mixTimeMeasureMark'
 				};
 				barOctaveAnchor.content.push(mark);
 				if (data.percussions.length) {
@@ -161,7 +161,7 @@ class MixerBar {
 						, y: mixm.samplerTop()
 						, w: line.ratio * zoomInfo.minZoom / 2
 						, h: data.percussions.length * mixm.notePathHeight
-						, css: 'timeMeasureMark'
+						, css: 'mixTimeMeasureMark'
 					};
 					barOctaveAnchor.content.push(sammark);
 				}

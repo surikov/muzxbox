@@ -109,6 +109,10 @@
 	stroke-opacity: 15%;
 }
 
+.mixTimeMeasureMark{
+    fill: var(--color-lines);
+	fill-opacity: 25%;
+}
 
 .mixFiller1{
     fill: var(--color-text);

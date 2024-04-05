@@ -3,6 +3,15 @@
 	fill-opacity: 25%;
 }
 
+.timeMarkButton{
+    fill: var(--color-interactive);
+	
+}
+.timeMarkButtonBorder{
+    fill: var(--color-text);
+	
+}
+
 .timeBarNum025 {
     fill: var(--color-lines);
 	fill-opacity: 90%;

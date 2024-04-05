@@ -48,7 +48,7 @@ class TimeSelectBar {
 						x: xx, y: 0
 						, w: line.ratio * 4 * zoomInfo.minZoom
 						, h: line.ratio * 4 * zoomInfo.minZoom
-						, css: 'timeMeasureMark'
+						, css: 'timeMarkButton'
 					};
 					measureAnchor.content.push(mark);
 					let mtr: TileText = {
@@ -67,8 +67,19 @@ class TimeSelectBar {
 		}
 	}
 
-	createBarMark(barLeft: number, width: number, height: number, measureAnchor: TileAnchor) {
-		let mark: TileRectangle = { x: barLeft, y: 0, w: width, h: height, css: 'timeMeasureMark' };
+	createBarMark(barLeft: number, size: number, measureAnchor: TileAnchor) {
+		let brdrwidth = 0.03 * size;
+		let border: TileRectangle = {
+			x: barLeft - brdrwidth / 2
+			, y: 0 - brdrwidth / 2
+			, w: size + brdrwidth
+			, h: size + brdrwidth
+			, rx: (size+brdrwidth) / 2
+			, ry: (size+brdrwidth) / 2
+			, css: 'timeMarkButtonBorder'
+		};
+		measureAnchor.content.push(border);
+		let mark: TileRectangle = { x: barLeft, y: 0, w: size, h: size, rx: size / 2, ry: size / 2, css: 'timeMarkButton' };
 		measureAnchor.content.push(mark);
 	}
 	createBarNumber(barLeft: number//, top: number
@@ -84,7 +95,7 @@ class TimeSelectBar {
 		let nm: TileText = {
 			x: barLeft
 			, y: zoomPrefixLevelsCSS[zz].minZoom * 2
-			, text: '' + (1 + barnum) + ': ' + mins + '\'' + (secs>9?'':'0')+secs + '.' + hunds
+			, text: '' + (1 + barnum) + ': ' + mins + '\'' + (secs > 9 ? '' : '0') + secs + '.' + hunds
 			, css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
 		};
 		measureAnchor.content.push(nm);
@@ -138,8 +149,8 @@ class TimeSelectBar {
 				this.addGridMarks(data, kk, barLeft, curBar, measureAnchor, zz);
 				if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
 					this.createBarMark(barLeft
-						, zoomPrefixLevelsCSS[zz].minZoom * 3
-						, zoomPrefixLevelsCSS[zz].minZoom * 3
+						, zoomPrefixLevelsCSS[zz].minZoom * 1.5
+						//, zoomPrefixLevelsCSS[zz].minZoom * 3
 						, measureAnchor);
 					this.createBarNumber(barLeft
 						//, zoomPrefixLevelsCSS[zz].minZoom * 3

@@ -427,12 +427,14 @@ let localeFontRatio = 1;
 let localMenuItemSettings = 'localMenuItemSettings';
 let localMenuTracksFolder = 'localMenuTracksFolder';
 let localMenuPercussionFolder = 'localMenuPercussionFolder';
+let localMenuImportFolder = 'localMenuImportFolder';
+let localMenuFileFolder = 'localMenuFileFolder';
 let localeDictionary = [
     {
         id: localNameLocal, data: [
             { locale: 'en', text: 'English' },
             { locale: 'ru', text: 'Русский' },
-            { locale: 'zh', text: '汉语口语' }
+            { locale: 'zh', text: '中文' }
         ]
     }, {
         id: localMenuItemSettings, data: [
@@ -451,6 +453,19 @@ let localeDictionary = [
         id: localMenuPercussionFolder, data: [
             { locale: 'en', text: 'Sampler' },
             { locale: 'ru', text: 'Сэмплер' },
+            { locale: 'zh', text: '?' }
+        ]
+    },
+    {
+        id: localMenuFileFolder, data: [
+            { locale: 'en', text: 'File' },
+            { locale: 'ru', text: 'Файл' },
+            { locale: 'zh', text: '?' }
+        ]
+    }, {
+        id: localMenuImportFolder, data: [
+            { locale: 'en', text: 'Import' },
+            { locale: 'ru', text: 'Импорт' },
             { locale: 'zh', text: '?' }
         ]
     }
@@ -511,7 +526,7 @@ class TimeSelectBar {
                         x: xx, y: 0,
                         w: line.ratio * 4 * zoomInfo.minZoom,
                         h: line.ratio * 4 * zoomInfo.minZoom,
-                        css: 'timeMeasureMark'
+                        css: 'timeMarkButton'
                     };
                     measureAnchor.content.push(mark);
                     let mtr = {
@@ -529,8 +544,19 @@ class TimeSelectBar {
             }
         }
     }
-    createBarMark(barLeft, width, height, measureAnchor) {
-        let mark = { x: barLeft, y: 0, w: width, h: height, css: 'timeMeasureMark' };
+    createBarMark(barLeft, size, measureAnchor) {
+        let brdrwidth = 0.03 * size;
+        let border = {
+            x: barLeft - brdrwidth / 2,
+            y: 0 - brdrwidth / 2,
+            w: size + brdrwidth,
+            h: size + brdrwidth,
+            rx: (size + brdrwidth) / 2,
+            ry: (size + brdrwidth) / 2,
+            css: 'timeMarkButtonBorder'
+        };
+        measureAnchor.content.push(border);
+        let mark = { x: barLeft, y: 0, w: size, h: size, rx: size / 2, ry: size / 2, css: 'timeMarkButton' };
         measureAnchor.content.push(mark);
     }
     createBarNumber(barLeft, barnum, zz, curBar, measureAnchor, barTime) {
@@ -581,7 +607,7 @@ class TimeSelectBar {
                 selectLevelAnchor.content.push(measureAnchor);
                 this.addGridMarks(data, kk, barLeft, curBar, measureAnchor, zz);
                 if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
-                    this.createBarMark(barLeft, zoomPrefixLevelsCSS[zz].minZoom * 3, zoomPrefixLevelsCSS[zz].minZoom * 3, measureAnchor);
+                    this.createBarMark(barLeft, zoomPrefixLevelsCSS[zz].minZoom * 1.5, measureAnchor);
                     this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor, barTime);
                 }
                 barLeft = barLeft + barWidth;
@@ -1055,10 +1081,10 @@ let menuPointPercussion = {
     text: localMenuPercussionFolder
 };
 let menuPointFileImport = {
-    text: 'import'
+    text: localMenuImportFolder
 };
-let menuPointFile = {
-    text: 'file',
+let menuPointMenuFile = {
+    text: localMenuFileFolder,
     children: [menuPointFileImport]
 };
 function fillMenuImportPlugins() {
@@ -1068,7 +1094,7 @@ function fillMenuImportPlugins() {
             let label = MZXBX_currentPlugins()[ii].label;
             let url = MZXBX_currentPlugins()[ii].url;
             menuPointFileImport.children.push({
-                text: label, onClick: () => {
+                text: label, noLocalization: true, onClick: () => {
                     commandDispatcher.promptPluginGUI(label, url, (obj) => {
                         commandDispatcher.registerWorkProject(obj);
                         commandDispatcher.resetProject();
@@ -1086,7 +1112,7 @@ function composeBaseMenu() {
     }
     else {
         menuItemsData = [
-            menuPointFile,
+            menuPointMenuFile,
             menuPointTracks,
             menuPointPercussion,
             {
@@ -1441,7 +1467,7 @@ class MixerBar {
                     y: top,
                     w: line.ratio * zoomInfo.minZoom / 2,
                     h: height,
-                    css: 'timeMeasureMark'
+                    css: 'mixTimeMeasureMark'
                 };
                 barOctaveAnchor.content.push(mark);
                 if (data.percussions.length) {
@@ -1450,7 +1476,7 @@ class MixerBar {
                         y: mixm.samplerTop(),
                         w: line.ratio * zoomInfo.minZoom / 2,
                         h: data.percussions.length * mixm.notePathHeight,
-                        css: 'timeMeasureMark'
+                        css: 'mixTimeMeasureMark'
                     };
                     barOctaveAnchor.content.push(sammark);
                 }

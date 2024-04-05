@@ -33,10 +33,10 @@ let menuPointPercussion: MenuInfo = {
 	text: localMenuPercussionFolder
 };
 let menuPointFileImport: MenuInfo = {
-	text: 'import'
+	text: localMenuImportFolder
 };
-let menuPointFile: MenuInfo = {
-	text: 'file'
+let menuPointMenuFile: MenuInfo = {
+	text: localMenuFileFolder
 	, children: [menuPointFileImport]
 };
 
@@ -51,7 +51,7 @@ function fillMenuImportPlugins() {
 			let url: string = MZXBX_currentPlugins()[ii].url;
 
 			menuPointFileImport.children.push({
-				text: label, onClick: () => {
+				text: label, noLocalization: true, onClick: () => {
 					commandDispatcher.promptPluginGUI(label, url, (obj: any) => {
 						//console.log('set project from', obj);
 						
@@ -78,7 +78,7 @@ function composeBaseMenu(): MenuInfo[] {
 	fillMenuImportPlugins();
 	if (menuItemsData) { return menuItemsData; } else {
 		menuItemsData = [
-			menuPointFile
+			menuPointMenuFile
 			/*, {
 				text: localMenuImportMIDI, onClick: () => {
 					commandDispatcher.promptImportFromMIDI();
