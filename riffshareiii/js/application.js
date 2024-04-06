@@ -524,9 +524,9 @@ class TimeSelectBar {
                     let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
                     let mark = {
                         x: xx, y: 0,
-                        w: line.ratio * 4 * zoomInfo.minZoom,
-                        h: line.ratio * 4 * zoomInfo.minZoom,
-                        css: 'timeMarkButton'
+                        w: line.ratio * 2 * zoomInfo.minZoom,
+                        h: line.ratio * 8 * zoomInfo.minZoom,
+                        css: 'timeSubMark'
                     };
                     measureAnchor.content.push(mark);
                     let mtr = {
@@ -556,7 +556,7 @@ class TimeSelectBar {
             css: 'timeMarkButtonBorder'
         };
         measureAnchor.content.push(border);
-        let mark = { x: barLeft, y: 0, w: size, h: size, rx: size / 2, ry: size / 2, css: 'timeMarkButton' };
+        let mark = { x: barLeft, y: 0, w: size, h: size, rx: size / 2, ry: size / 2, css: 'timeMarkButtonCircle' };
         measureAnchor.content.push(mark);
     }
     createBarNumber(barLeft, barnum, zz, curBar, measureAnchor, barTime) {
@@ -1672,15 +1672,17 @@ class MixerZoomLevel {
     addLines(barOctaveAnchor, data) {
         let mixm = new MixerDataMath(data);
         if (this.zoomLevelIndex < 4) {
-            for (let oo = 1; oo < mixm.octaveCount; oo++) {
-                let octaveBottomBorder = {
-                    x: mixm.LeftPad,
-                    y: mixm.gridTop() + oo * 12 * mixm.notePathHeight,
-                    w: mixm.timelineWidth(),
-                    h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0,
-                    css: 'octaveBottomBorder'
-                };
-                barOctaveAnchor.content.push(octaveBottomBorder);
+            for (let oo = 0; oo < mixm.octaveCount; oo++) {
+                if (oo > 0) {
+                    let octaveBottomBorder = {
+                        x: mixm.LeftPad,
+                        y: mixm.gridTop() + oo * 12 * mixm.notePathHeight,
+                        w: mixm.timelineWidth(),
+                        h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0,
+                        css: 'octaveBottomBorder'
+                    };
+                    barOctaveAnchor.content.push(octaveBottomBorder);
+                }
                 if (this.zoomLevelIndex < 3) {
                     for (let kk = 1; kk < 12; kk++) {
                         barOctaveAnchor.content.push({

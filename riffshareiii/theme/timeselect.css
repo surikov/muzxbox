@@ -1,9 +1,13 @@
-.timeMeasureMark{
+.timeMeasureMark22222{
     fill: var(--color-lines);
 	fill-opacity: 25%;
 }
-
-.timeMarkButton{
+.timeSubMark{
+    fill: var(--color-lines);
+	fill-opacity: 25%;
+	
+}
+.timeMarkButtonCircle{
     fill: var(--color-interactive);
 	
 }

@@ -65,15 +65,17 @@ class MixerZoomLevel {
 	addLines(barOctaveAnchor: TileAnchor, data: MZXBX_Project) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		if (this.zoomLevelIndex < 4) {
-			for (let oo = 1; oo < mixm.octaveCount; oo++) {
-				let octaveBottomBorder: TileRectangle = {
-					x: mixm.LeftPad
-					, y: mixm.gridTop() + oo * 12 * mixm.notePathHeight
-					, w: mixm.timelineWidth()
-					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0
-					, css: 'octaveBottomBorder'
-				};
-				barOctaveAnchor.content.push(octaveBottomBorder);
+			for (let oo = 0; oo < mixm.octaveCount; oo++) {
+				if (oo > 0) {
+					let octaveBottomBorder: TileRectangle = {
+						x: mixm.LeftPad
+						, y: mixm.gridTop() + oo * 12 * mixm.notePathHeight
+						, w: mixm.timelineWidth()
+						, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0
+						, css: 'octaveBottomBorder'
+					};
+					barOctaveAnchor.content.push(octaveBottomBorder);
+				}
 				if (this.zoomLevelIndex < 3) {
 					for (let kk = 1; kk < 12; kk++) {
 						barOctaveAnchor.content.push({

@@ -46,9 +46,9 @@ class TimeSelectBar {
 					let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
 					let mark: TileRectangle = {
 						x: xx, y: 0
-						, w: line.ratio * 4 * zoomInfo.minZoom
-						, h: line.ratio * 4 * zoomInfo.minZoom
-						, css: 'timeMarkButton'
+						, w: line.ratio * 2 * zoomInfo.minZoom
+						, h: line.ratio * 8 * zoomInfo.minZoom
+						, css: 'timeSubMark'
 					};
 					measureAnchor.content.push(mark);
 					let mtr: TileText = {
@@ -79,7 +79,7 @@ class TimeSelectBar {
 			, css: 'timeMarkButtonBorder'
 		};
 		measureAnchor.content.push(border);
-		let mark: TileRectangle = { x: barLeft, y: 0, w: size, h: size, rx: size / 2, ry: size / 2, css: 'timeMarkButton' };
+		let mark: TileRectangle = { x: barLeft, y: 0, w: size, h: size, rx: size / 2, ry: size / 2, css: 'timeMarkButtonCircle' };
 		measureAnchor.content.push(mark);
 	}
 	createBarNumber(barLeft: number//, top: number
