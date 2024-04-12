@@ -297,6 +297,40 @@ class CommandDispatcher {
         console.log('cancelPluginGUI');
         pluginDialogPrompt.closeDialogFrame();
     }
+    expandTimeLineSelection(idx) {
+        console.log('select bar', idx);
+        if (this.workData) {
+            if (idx > 0 && idx < this.workData.timeline.length) {
+                if (this.workData.selection) {
+                    if (this.workData.selection.startMeasure == this.workData.selection.endMeasure) {
+                        if (this.workData.selection.startMeasure == idx) {
+                            this.workData.selection = undefined;
+                        }
+                        else {
+                            if (this.workData.selection.startMeasure > idx) {
+                                this.workData.selection.endMeasure = this.workData.selection.startMeasure;
+                                this.workData.selection.startMeasure = idx;
+                            }
+                            else {
+                                this.workData.selection.endMeasure = idx;
+                            }
+                        }
+                    }
+                    else {
+                        this.workData.selection.startMeasure = idx;
+                        this.workData.selection.endMeasure = idx;
+                    }
+                }
+                else {
+                    this.workData.selection = {
+                        startMeasure: idx,
+                        endMeasure: idx
+                    };
+                }
+            }
+        }
+        this.renderer.timeselectbar.moveTimeSelection();
+    }
 }
 let commandDispatcher = new CommandDispatcher();
 let pluginDialogPrompt = new PluginDialogPrompt();
@@ -504,47 +538,31 @@ class TimeSelectBar {
                 this.selectBarAnchor
             ], mode: LevelModes.top
         };
-        return [this.selectionBarLayer];
+        this.selectedTimeSVGGroup = document.getElementById("selectedTime");
+        this.selectionMark = {
+            x: 0, y: 0,
+            w: 11,
+            h: 77,
+            css: 'timeSelection'
+        };
+        this.selectionAnchor = {
+            xx: 0, yy: 0, ww: 1, hh: 1,
+            showZoom: zoomPrefixLevelsCSS[0].minZoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            content: [this.selectionMark]
+        };
+        this.selectedTimeLayer = {
+            g: this.selectedTimeSVGGroup, anchors: [this.selectionAnchor], mode: LevelModes.normal
+        };
+        return [this.selectionBarLayer, this.selectedTimeLayer];
     }
     resizeTimeScale(viewWIdth, viewHeight) {
+        console.log('resizeTimeScale');
     }
-    addGridMarks(data, barnum, barLeft, curBar, measureAnchor, zIndex) {
-        let zoomInfo = zoomPrefixLevelsCSS[zIndex];
-        if (zoomInfo.gridLines.length > 0) {
-            let mixm = new MixerDataMath(data);
-            let lineCount = 0;
-            let skip = MZMM().set({ count: 0, part: 1 });
-            while (true) {
-                let line = zoomInfo.gridLines[lineCount];
-                skip = skip.plus(line.duration).simplyfy();
-                if (!skip.less(curBar.metre)) {
-                    break;
-                }
-                if (line.label) {
-                    let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
-                    let mark = {
-                        x: xx, y: 0,
-                        w: line.ratio * 2 * zoomInfo.minZoom,
-                        h: line.ratio * 8 * zoomInfo.minZoom,
-                        css: 'timeSubMark'
-                    };
-                    measureAnchor.content.push(mark);
-                    let mtr = {
-                        x: xx,
-                        y: 1 * zoomInfo.minZoom,
-                        text: '' + skip.count + '/' + skip.part,
-                        css: 'timeBarInfo' + zoomPrefixLevelsCSS[zIndex].prefix
-                    };
-                    measureAnchor.content.push(mtr);
-                }
-                lineCount++;
-                if (lineCount >= zoomInfo.gridLines.length) {
-                    lineCount = 0;
-                }
-            }
-        }
+    moveTimeSelection() {
+        console.log('moveTimeSelection');
     }
-    createBarMark(barLeft, size, measureAnchor) {
+    createBarMark(barIdx, barLeft, size, measureAnchor, data) {
         let brdrwidth = 0.03 * size;
         let border = {
             x: barLeft - brdrwidth / 2,
@@ -556,7 +574,11 @@ class TimeSelectBar {
             css: 'timeMarkButtonBorder'
         };
         measureAnchor.content.push(border);
-        let mark = { x: barLeft, y: 0, w: size, h: size, rx: size / 2, ry: size / 2, css: 'timeMarkButtonCircle' };
+        let mark = {
+            x: barLeft, y: 0, w: size, h: size, rx: size / 2, ry: size / 2, css: 'timeMarkButtonCircle', activation: (x, y) => {
+                commandDispatcher.expandTimeLineSelection(barIdx);
+            }
+        };
         measureAnchor.content.push(mark);
     }
     createBarNumber(barLeft, barnum, zz, curBar, measureAnchor, barTime) {
@@ -605,9 +627,8 @@ class TimeSelectBar {
                     id: 'measure' + (kk + Math.random())
                 };
                 selectLevelAnchor.content.push(measureAnchor);
-                this.addGridMarks(data, kk, barLeft, curBar, measureAnchor, zz);
                 if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
-                    this.createBarMark(barLeft, zoomPrefixLevelsCSS[zz].minZoom * 1.5, measureAnchor);
+                    this.createBarMark(kk, barLeft, zoomPrefixLevelsCSS[zz].minZoom * 1.5, measureAnchor, data);
                     this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor, barTime);
                 }
                 barLeft = barLeft + barWidth;

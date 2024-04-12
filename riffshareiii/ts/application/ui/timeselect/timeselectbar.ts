@@ -5,6 +5,10 @@ class TimeSelectBar {
 	selectBarAnchor: TileAnchor;
 	zoomAnchors: TileAnchor[];
 
+	selectedTimeLayer: TileLayerDefinition;
+	selectedTimeSVGGroup: SVGElement;
+	selectionAnchor: TileAnchor;
+	selectionMark: TileRectangle;
 
 	constructor() {
 
@@ -23,12 +27,33 @@ class TimeSelectBar {
 				this.selectBarAnchor
 			], mode: LevelModes.top
 		};
-		return [this.selectionBarLayer];
+
+		this.selectedTimeSVGGroup = (document.getElementById("selectedTime") as any) as SVGElement;
+		this.selectionMark = {
+			x: 0, y: 0
+			, w: 11
+			, h: 77
+			, css: 'timeSelection'
+		};
+		this.selectionAnchor = {
+			xx: 0, yy: 0, ww: 1, hh: 1
+			, showZoom: zoomPrefixLevelsCSS[0].minZoom
+			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
+			, content: [this.selectionMark]
+		};
+		this.selectedTimeLayer = {
+			g: this.selectedTimeSVGGroup, anchors: [this.selectionAnchor], mode: LevelModes.normal
+		};
+
+		return [this.selectionBarLayer, this.selectedTimeLayer];
 	}
 	resizeTimeScale(viewWIdth: number, viewHeight: number) {
-
+		console.log('resizeTimeScale');
 	}
-	addGridMarks(data: MZXBX_Project, barnum: number, barLeft: number, curBar: MZXBX_SongMeasure
+	moveTimeSelection() {
+		console.log('moveTimeSelection');
+	}
+	/*moveGridMarks(data: MZXBX_Project, barnum: number, barLeft: number, curBar: MZXBX_SongMeasure
 		, measureAnchor: TileAnchor, zIndex: number) {
 		let zoomInfo = zoomPrefixLevelsCSS[zIndex];
 		if (zoomInfo.gridLines.length > 0) {
@@ -65,21 +90,73 @@ class TimeSelectBar {
 				}
 			}
 		}
-	}
-
-	createBarMark(barLeft: number, size: number, measureAnchor: TileAnchor) {
+	}*/
+	/*
+	reBuildSelectionMark(zz: number, data: MZXBX_Project) {
+		if (data.selection) {
+			let mixm: MixerDataMath = new MixerDataMath(data);
+			let mm: MZXBX_MetreMathType = MZMM();
+			let barLeft = mixm.LeftPad;
+			let startSel = 1;
+			let widthSel = 1;
+			let startIdx = 0;
+			for (startIdx = 0; startIdx < data.timeline.length; startIdx++) {
+				let curBar = data.timeline[startIdx];
+				let curMeasureMeter = mm.set(curBar.metre);
+				let barWidth = curMeasureMeter.duration(curBar.tempo) * mixm.widthDurationRatio;
+				if (startIdx == data.selection.startMeasure) {
+					startSel = barLeft;
+					break;
+				}
+				barLeft = barLeft + barWidth;
+			}
+			for (let ii = startIdx; ii < data.timeline.length; ii++) {
+				let curBar = data.timeline[ii];
+				let curMeasureMeter = mm.set(curBar.metre);
+				let barWidth = curMeasureMeter.duration(curBar.tempo) * mixm.widthDurationRatio;
+				widthSel = widthSel + barWidth;
+				if (ii == data.selection.endMeasure) {
+					break;
+				}
+			}
+			let sere: TileRectangle = {
+				x: startSel
+				, y: 0
+				, w: widthSel
+				, h: 100
+				,
+				css: 'timeSelection'
+			};
+			this.selectedTimeLayer.anchors.push({
+				showZoom: zoomPrefixLevelsCSS[zz].minZoom
+				, hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom
+				, xx: 0
+				, yy: 0
+				, ww: mixm.mixerWidth()
+				, hh: mixm.mixerHeight()
+				, content: [sere]
+				, id: 'selection' + (zz + Math.random())
+			});
+		}
+	}*/
+	createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, data: MZXBX_Project) {
 		let brdrwidth = 0.03 * size;
 		let border: TileRectangle = {
 			x: barLeft - brdrwidth / 2
 			, y: 0 - brdrwidth / 2
 			, w: size + brdrwidth
 			, h: size + brdrwidth
-			, rx: (size+brdrwidth) / 2
-			, ry: (size+brdrwidth) / 2
+			, rx: (size + brdrwidth) / 2
+			, ry: (size + brdrwidth) / 2
 			, css: 'timeMarkButtonBorder'
 		};
 		measureAnchor.content.push(border);
-		let mark: TileRectangle = { x: barLeft, y: 0, w: size, h: size, rx: size / 2, ry: size / 2, css: 'timeMarkButtonCircle' };
+		let mark: TileRectangle = {
+			x: barLeft, y: 0, w: size, h: size, rx: size / 2, ry: size / 2, css: 'timeMarkButtonCircle', activation: (x, y) => {
+				//console.log('barIdx', barIdx);
+				commandDispatcher.expandTimeLineSelection(barIdx);
+			}
+		};
 		measureAnchor.content.push(mark);
 	}
 	createBarNumber(barLeft: number//, top: number
@@ -132,6 +209,8 @@ class TimeSelectBar {
 			};
 			this.zoomAnchors.push(selectLevelAnchor);
 			let mm: MZXBX_MetreMathType = MZMM();
+			//this.reBuildSelectionMark(zz, data);
+
 			let barLeft = mixm.LeftPad;
 			let barTime = 0;
 			for (let kk = 0; kk < data.timeline.length; kk++) {
@@ -146,12 +225,14 @@ class TimeSelectBar {
 				};
 				selectLevelAnchor.content.push(measureAnchor);
 
-				this.addGridMarks(data, kk, barLeft, curBar, measureAnchor, zz);
+				//this.addGridMarks(data, kk, barLeft, curBar, measureAnchor, zz);
 				if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
-					this.createBarMark(barLeft
+					this.createBarMark(kk, barLeft
 						, zoomPrefixLevelsCSS[zz].minZoom * 1.5
 						//, zoomPrefixLevelsCSS[zz].minZoom * 3
-						, measureAnchor);
+						, measureAnchor
+						, data
+					);
 					this.createBarNumber(barLeft
 						//, zoomPrefixLevelsCSS[zz].minZoom * 3
 						, kk, zz, curBar, measureAnchor, barTime);

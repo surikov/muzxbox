@@ -52,10 +52,11 @@ declare class CommandDispatcher {
     setDrumSoloState(state: number): void;
     promptPluginGUI(label: string, url: string, callback: (obj: any) => boolean): void;
     cancelPluginGUI(): void;
+    expandTimeLineSelection(idx: number): void;
 }
 declare let commandDispatcher: CommandDispatcher;
 declare let pluginDialogPrompt: PluginDialogPrompt;
-type GridTimeTemplate14 = {
+declare type GridTimeTemplate14 = {
     ratio: number;
     duration: MZXBX_Metre;
     label?: boolean;
@@ -109,11 +110,15 @@ declare class TimeSelectBar {
     selectionBarSVGGroup: SVGElement;
     selectBarAnchor: TileAnchor;
     zoomAnchors: TileAnchor[];
+    selectedTimeLayer: TileLayerDefinition;
+    selectedTimeSVGGroup: SVGElement;
+    selectionAnchor: TileAnchor;
+    selectionMark: TileRectangle;
     constructor();
     createTimeScale(): TileLayerDefinition[];
     resizeTimeScale(viewWIdth: number, viewHeight: number): void;
-    addGridMarks(data: MZXBX_Project, barnum: number, barLeft: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor, zIndex: number): void;
-    createBarMark(barLeft: number, size: number, measureAnchor: TileAnchor): void;
+    moveTimeSelection(): void;
+    createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, data: MZXBX_Project): void;
     createBarNumber(barLeft: number, barnum: number, zz: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor, barTime: number): void;
     fillTimeBar(data: MZXBX_Project): void;
 }
@@ -198,7 +203,7 @@ declare class RightMenuItem {
     calculateHeight(): number;
     buildTile(itemTop: number, itemWidth: number): TileItem;
 }
-type MenuInfo = {
+declare type MenuInfo = {
     text: string;
     noLocalization?: boolean;
     focused?: boolean;
@@ -372,27 +377,27 @@ declare class MixerDataMath {
     gridHeight(): number;
 }
 declare let biChar32: String[];
-type PackedChannel = {
+declare type PackedChannel = {
     wafIndex: number;
 };
-type PackedBar = {
+declare type PackedBar = {
     tone: number;
     mode: number;
 };
-type PackedProject = {
+declare type PackedProject = {
     bars: PackedBar[];
 };
 declare function testNumMathUtil(): void;
-type TileZoom = {
+declare type TileZoom = {
     x: number;
     y: number;
     z: number;
 };
-type TilePoint = {
+declare type TilePoint = {
     x: number;
     y: number;
 };
-type TileBaseDefinition = {
+declare type TileBaseDefinition = {
     id?: string;
     css?: string;
     style?: string;
@@ -407,7 +412,7 @@ declare enum LevelModes {
     bottom = 4,
     overlay = 5
 }
-type TileLayerDefinition = {
+declare type TileLayerDefinition = {
     g: SVGElement;
     mode: 0 | 1 | 2 | 3 | 4 | 5;
     stickLeft?: number;
@@ -416,8 +421,8 @@ type TileLayerDefinition = {
     stickRight?: number;
     anchors: TileAnchor[];
 };
-type TileItem = TileAnchor | TileRectangle | TileText | TilePath | TileLine | TilePolygon | TileImage;
-type TileAnchor = {
+declare type TileItem = TileAnchor | TileRectangle | TileText | TilePath | TileLine | TilePolygon | TileImage;
+declare type TileAnchor = {
     xx: number;
     yy: number;
     ww: number;
@@ -428,7 +433,7 @@ type TileAnchor = {
     translation?: TilePoint;
 } & TileBaseDefinition;
 declare function TAnchor(xx: number, yy: number, ww: number, hh: number, showZoom: number, hideZoom: number, id?: string, translation?: TilePoint): TileAnchor;
-type TileImage = {
+declare type TileImage = {
     x: number;
     y: number;
     w: number;
@@ -436,7 +441,7 @@ type TileImage = {
     preserveAspectRatio?: string;
     href: string;
 } & TileBaseDefinition;
-type TileRectangle = {
+declare type TileRectangle = {
     x: number;
     y: number;
     w: number;
@@ -444,32 +449,32 @@ type TileRectangle = {
     rx?: number;
     ry?: number;
 } & TileBaseDefinition;
-type TileText = {
+declare type TileText = {
     x: number;
     y: number;
     text: string;
     maxWidth?: string;
 } & TileBaseDefinition;
 declare function TText(x: number, y: number, css: string, text: string): TileText;
-type TilePath = {
+declare type TilePath = {
     x?: number;
     y?: number;
     scale?: number;
     points: string;
 } & TileBaseDefinition;
-type TileLine = {
+declare type TileLine = {
     x1: number;
     x2: number;
     y1: number;
     y2: number;
 } & TileBaseDefinition;
-type TilePolygon = {
+declare type TilePolygon = {
     x?: number;
     y?: number;
     scale?: number;
     dots: number[];
 } & TileBaseDefinition;
-type TileSVGElement = SVGElement & {
+declare type TileSVGElement = SVGElement & {
     onClickFunction: (x: number, y: number) => void;
     watchX: number;
     watchY: number;
@@ -480,7 +485,7 @@ type TileSVGElement = SVGElement & {
     translateX: number;
     translateY: number;
 };
-type TileLevelBase = {
+declare type TileLevelBase = {
     dump: () => void;
     tapPxSize: () => number;
     setupTapSize: (ratioCm: number) => void;
@@ -495,13 +500,13 @@ type TileLevelBase = {
     resetInnerSize(inWidth: number, inHeight: number): void;
     initRun(svgObject: SVGElement, stickLeft: boolean, inWidth: number, inHeight: number, minZoom: number, curZoom: number, maxZoom: number, layers: TileLayerDefinition[]): void;
 };
-type MZXBX_CachedWave = {
+declare type MZXBX_CachedWave = {
     path: string;
     buffer: AudioBuffer | null;
     canceled?: boolean;
     line100?: number[];
 };
-type MZXBX_Metre = {
+declare type MZXBX_Metre = {
     count: number;
     part: number;
 };
@@ -520,12 +525,12 @@ interface MZXBX_MetreMathType {
     duration(tempo: number): number;
     calculate(duration: number, tempo: number): MZXBX_MetreMathType;
 }
-type MZXBX_HalfTone = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
-type MZXBX_Octave = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-type MZXBX_Step = 1 | 2 | 3 | 4 | 5 | 6 | 7;
-type MZXBX_StepShift = -2 | -1 | 0 | 1 | 2;
-type MZXBX_StepSkip = 1 | 2;
-type MZXBX_Scale = {
+declare type MZXBX_HalfTone = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
+declare type MZXBX_Octave = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+declare type MZXBX_Step = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+declare type MZXBX_StepShift = -2 | -1 | 0 | 1 | 2;
+declare type MZXBX_StepSkip = 1 | 2;
+declare type MZXBX_Scale = {
     basePitch: MZXBX_HalfTone;
     step2: MZXBX_StepSkip;
     step3: MZXBX_StepSkip;
@@ -534,154 +539,159 @@ type MZXBX_Scale = {
     step6: MZXBX_StepSkip;
     step7: MZXBX_StepSkip;
 };
-type MZXBX_Slide = {
+declare type MZXBX_Slide = {
     duration: MZXBX_Metre;
     delta: number;
 };
-type MZXBX_Note = {
+declare type MZXBX_Note = {
     step?: MZXBX_Step;
     shift?: MZXBX_StepShift;
     octave?: MZXBX_Octave;
     pitch: number;
     slides: MZXBX_Slide[];
 };
-type MZXBX_PluginBase = {
+declare type MZXBX_PluginBase = {
     setup: (audioContext: AudioContext) => boolean;
 };
-type MZXBX_PluginFilter = MZXBX_PluginBase | {
+declare type MZXBX_PluginFilter = MZXBX_PluginBase | {
     input: string;
 };
-type MZXBX_PluginPerformer = MZXBX_PluginBase | {
+declare type MZXBX_PluginPerformer = MZXBX_PluginBase | {
     output: string;
     schedule: (chord: MZXBX_Chord, when: number) => boolean;
 };
-type MZXBX_PluginSampler = MZXBX_PluginBase | {
+declare type MZXBX_PluginSampler = MZXBX_PluginBase | {
     output: string;
 };
-type MZXBX_AudioFilter = {
+declare type MZXBX_AudioFilter = {
     id: string;
     data: string;
 };
-type MZXBX_AudioPerformer = {
+declare type MZXBX_AudioPerformer = {
     id: string;
     data: string;
 };
-type MZXBX_AudioSampler = {
+declare type MZXBX_AudioSampler = {
     id: string;
     data: string;
 };
-type MZXBX_Chord = {
+declare type MZXBX_Chord = {
     skip: MZXBX_Metre;
     notes: MZXBX_Note[];
 };
-type MZXBX_TrackMeasure = {
+declare type MZXBX_TrackMeasure = {
     chords: MZXBX_Chord[];
 };
-type MZXBX_PercussionMeasure = {
+declare type MZXBX_PercussionMeasure = {
     skips: MZXBX_Metre[];
 };
-type MZXBX_SongMeasure = {
+declare type MZXBX_SongMeasure = {
     tempo: number;
     metre: MZXBX_Metre;
     scale?: MZXBX_Scale;
 };
-type MZXBX_PercussionTrack = {
+declare type MZXBX_PercussionTrack = {
     title: string;
     measures: MZXBX_PercussionMeasure[];
     filters: MZXBX_AudioFilter[];
     sampler: MZXBX_AudioSampler;
 };
-type MZXBX_MusicTrack = {
+declare type MZXBX_MusicTrack = {
     title: string;
     measures: MZXBX_TrackMeasure[];
     filters: MZXBX_AudioFilter[];
     performer: MZXBX_AudioPerformer;
 };
-type MZXBX_CommentText = {
+declare type MZXBX_CommentText = {
     skip: MZXBX_Metre;
     text: string;
 };
-type MZXBX_CommentMeasure = {
+declare type MZXBX_CommentMeasure = {
     texts: MZXBX_CommentText[];
 };
-type MZXBX_Project = {
+declare type MZXBX_Selection = {
+    startMeasure: number;
+    endMeasure: number;
+};
+declare type MZXBX_Project = {
     title: string;
     timeline: MZXBX_SongMeasure[];
     tracks: MZXBX_MusicTrack[];
     percussions: MZXBX_PercussionTrack[];
     comments: MZXBX_CommentMeasure[];
     filters: MZXBX_AudioFilter[];
+    selection?: MZXBX_Selection;
 };
-type MZXBX_FilterHolder = {
+declare type MZXBX_FilterHolder = {
     plugin: MZXBX_AudioFilterPlugin | null;
     id: string;
     kind: string;
     properties: string;
     launched: boolean;
 };
-type MZXBX_PerformerHolder = {
+declare type MZXBX_PerformerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | null;
     id: string;
     kind: string;
     properties: string;
     launched: boolean;
 };
-type MZXBX_Channel = {
+declare type MZXBX_Channel = {
     id: string;
     comment?: string;
     filters: MZXBX_ChannelFilter[];
     performer: MZXBX_ChannelPerformer;
 };
-type MZXBX_SlideItem = {
+declare type MZXBX_SlideItem = {
     duration: number;
     delta: number;
 };
-type MZXBX_PlayItem = {
+declare type MZXBX_PlayItem = {
     skip: number;
     channelId: string;
     pitch: number;
     slides: MZXBX_SlideItem[];
 };
-type MZXBX_FilterState = {
+declare type MZXBX_FilterState = {
     skip: number;
     filterId: string;
     data: string;
 };
-type MZXBX_Set = {
+declare type MZXBX_Set = {
     duration: number;
     items: MZXBX_PlayItem[];
     states: MZXBX_FilterState[];
 };
-type MZXBX_ChannelFilter = {
+declare type MZXBX_ChannelFilter = {
     id: string;
     kind: string;
     properties: string;
 };
-type MZXBX_AudioFilterPlugin = {
+declare type MZXBX_AudioFilterPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
     schedule: (when: number, parameters: string) => void;
     input: () => AudioNode | null;
     output: () => AudioNode | null;
 };
-type MZXBX_ChannelPerformer = {
+declare type MZXBX_ChannelPerformer = {
     id: string;
     kind: string;
     properties: string;
 };
-type MZXBX_AudioPerformerPlugin = {
+declare type MZXBX_AudioPerformerPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
     schedule: (when: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
 };
-type MZXBX_Schedule = {
+declare type MZXBX_Schedule = {
     series: MZXBX_Set[];
     channels: MZXBX_Channel[];
     filters: MZXBX_ChannelFilter[];
 };
-type MZXBX_Player = {
+declare type MZXBX_Player = {
     setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;
     startLoop: (from: number, position: number, to: number) => string;
     cancel: () => void;
@@ -689,10 +699,10 @@ type MZXBX_Player = {
     allPerformers(): MZXBX_PerformerHolder[];
     position: number;
 };
-type MZXBX_import = {
+declare type MZXBX_import = {
     import: () => MZXBX_Schedule | null;
 };
-type MZXBX_PluginRegistrationInformation = {
+declare type MZXBX_PluginRegistrationInformation = {
     id: string;
     label: string;
     group: string;

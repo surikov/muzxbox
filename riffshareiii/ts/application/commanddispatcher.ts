@@ -211,7 +211,37 @@ class CommandDispatcher {
 			filesinput.click();
 		}
 	}*/
-
+	expandTimeLineSelection(idx: number) {
+		console.log('select bar', idx);
+		if (this.workData) {
+			if (idx > 0 && idx < this.workData.timeline.length) {
+				if (this.workData.selection) {
+					if (this.workData.selection.startMeasure == this.workData.selection.endMeasure) {
+						if (this.workData.selection.startMeasure == idx) {
+							this.workData.selection = undefined;
+						} else {
+							if (this.workData.selection.startMeasure > idx) {
+								this.workData.selection.endMeasure = this.workData.selection.startMeasure;
+								this.workData.selection.startMeasure = idx;
+							} else {
+								this.workData.selection.endMeasure = idx;
+							}
+						}
+					} else {
+						this.workData.selection.startMeasure = idx;
+						this.workData.selection.endMeasure = idx;
+					}
+				} else {
+					this.workData.selection = {
+						startMeasure: idx
+						, endMeasure: idx
+					};
+				}
+			}
+		}
+		//console.log(this.workData.selection);
+		this.renderer.timeselectbar.moveTimeSelection();
+	}
 }
 let commandDispatcher = new CommandDispatcher();
 let pluginDialogPrompt = new PluginDialogPrompt();

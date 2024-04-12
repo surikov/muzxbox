@@ -64,51 +64,61 @@
 	fill-opacity: 50%;
     font-size: calc(1*0.25*var(--tapSize));
     text-anchor22: start;
+	pointer-events: none;
 }
 .octaveSubLabel05 {
 	fill: var(--color-lines);
 	fill-opacity: 50%;
     font-size: calc(1*0.5*var(--tapSize));
+	pointer-events: none;
 }
 .octaveSubLabel1 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
     font-size: calc(1*var(--tapSize));
+	pointer-events: none;
 }
 .octaveSubLabel2 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
     font-size: calc(1*2*var(--tapSize));
+	pointer-events: none;
 }
 .octaveSubLabel4 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
     font-size: calc(1*4*var(--tapSize));
+	pointer-events: none;
 }
 .octaveSubLabel8 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
     font-size: calc(1*8*var(--tapSize));
+	pointer-events: none;
 }
 .octaveSubLabel16 {
 	fill: var(--color-lines);
 	fill-opacity: 50%;
     font-size: calc(1*16*var(--tapSize));
+	pointer-events: none;
 }
 .octaveSubLabel32 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
     font-size: calc(1*32*var(--tapSize));
+	pointer-events: none;
 }
 .octaveSubLabel64 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
     font-size: calc(1*64*var(--tapSize));
+	pointer-events: none;
 }
 .octaveSubLabel128 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
     font-size: calc(1*128*var(--tapSize));
+	pointer-events: none;
 }
 
 
@@ -118,21 +128,25 @@
     fill: var(--color-lines);
 	fill-opacity: 50%;
     font-size: calc(1*0.125*var(--tapSize));
+	pointer-events: none;
 }
 .samplerRowLabel05 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
     font-size: calc(2*0.125*var(--tapSize));
+	pointer-events: none;
 }
 .samplerRowLabel1 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
     font-size: calc(3*0.125*var(--tapSize));
+	pointer-events: none;
 }
 .samplerRowLabel2 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
     font-size: calc(4*0.125*var(--tapSize));
+	pointer-events: none;
 }
 
 

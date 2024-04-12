@@ -145,6 +145,10 @@ type MZXBX_Theme={
 	,notePathHeight:number
 	,octaveCount:number
 };*/
+type MZXBX_Selection={
+	startMeasure:number;
+	endMeasure:number;
+};
 type MZXBX_Project = {
 	title: string;
 	timeline: MZXBX_SongMeasure[];
@@ -153,6 +157,7 @@ type MZXBX_Project = {
 	comments: MZXBX_CommentMeasure[];
 	filters: MZXBX_AudioFilter[];
 	//theme:MZXBX_Theme;
+	selection?:MZXBX_Selection;
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 type MZXBX_FilterHolder = {
