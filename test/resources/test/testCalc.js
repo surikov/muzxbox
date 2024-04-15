@@ -1072,11 +1072,9 @@ function testTest() {
             }
             if (line.fromX == leftRed || line.toX == leftRed) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
-                //let data: number[] = [];
                 var data = [];
                 for (var rr = 0; rr < nn; rr++) {
-                    var kk = rr + 1;
-                    //data.push(kk);
+                    var kk = rr;
                     data.push({ ball: 1 + kk, color: '#ff000099' });
                 }
                 console.log('leftRed', nn, data);
@@ -1084,11 +1082,9 @@ function testTest() {
             }
             if (line.fromX == rightRed || line.toX == rightRed) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
-                //let data: number[] = [];
                 var data = [];
                 for (var rr = 0; rr < nn; rr++) {
-                    var kk = rowLen - rr;
-                    //data.push(kk);
+                    var kk = rowLen - rr - 1;
                     data.push({ ball: 1 + kk, color: '#ff000099' });
                 }
                 console.log('rightRed', nn, data);
