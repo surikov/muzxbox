@@ -132,11 +132,12 @@ for (let i = 0; i < numDataPoints; i++) {
 	});
 }
 
-var hiddenNodes = parseInt(document.querySelector('#hiddenNodes').value);
+//var hiddenNodes = parseInt(document.querySelector('#hiddenNodes').value);
 
 var neuralNetwork = "";
 
 function initialise() {
+	var hiddenNodes = parseInt(document.querySelector('#hiddenNodes').value);
 	console.log("HN", hiddenNodes);
 	clearCanvas();
 	neuralNetwork = new NeuralNetwork(2, hiddenNodes, 4);
@@ -147,13 +148,8 @@ function train() {
 		const data =
 			trainingData[Math.floor(Math.random() * trainingData.length)];
 		neuralNetwork.train([data.x, data.y], oneHotEncode(data.label));
-		if(i<5){
-			console.log(i
-	,'weightsInputToHidden',neuralNetwork.weightsInputToHidden
-	,'weightsHiddenToOutput',neuralNetwork.weightsHiddenToOutput);
-		}
 	}
-	console.log("Training complete");
+	console.log("Training complete",neuralNetwork.weightsInputToHidden,neuralNetwork.weightsHiddenToOutput);
 }
 
 function classifyPoints() {
