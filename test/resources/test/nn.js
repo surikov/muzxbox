@@ -467,37 +467,74 @@ function readParseStat(dataBalls) {
 }
 var Tester2 = /** @class */ (function () {
     function Tester2() {
-        var ratio = 0.00003;
-        console.log('Tester2', datarows.length, ratio);
-        var prerowcount = 17;
-        var neuralNetwork = new NeuralNetwork(rowLen * prerowcount, 1000, rowLen);
-        for (var ii = 0; ii < 50000; ii++) {
+        this.counterFirst = 0;
+        this.counter1Mx = 0;
+        this.counter1Middle = 0;
+        this.counter1Min = 0;
+        this.counterXMx = 0;
+        this.counterXMin = 0;
+        this.counterXMiddle = 0;
+        var ratio = 0.000003;
+        var traint = 50000;
+        console.log('Tester2', datarows.length, ratio, traint);
+        var prerowcount = 5;
+        var neuralNetwork = new NeuralNetwork(rowLen * prerowcount, 1000, 1);
+        for (var ii = 0; ii < traint; ii++) {
             this.sendTrain(ratio, prerowcount, neuralNetwork);
         }
         //console.log('weightsInputToHidden', neuralNetwork.weightsInputToHidden);
         //console.log('weightsHiddenToOutput', neuralNetwork.weightsHiddenToOutput);
-        for (var ii = 0; ii < 23; ii++) {
-            this.predict(233 + ii, prerowcount, neuralNetwork);
+        for (var ii = 0; ii < 100; ii++) {
+            this.predict(233 + Math.round(Math.random() * 3210), prerowcount, neuralNetwork);
         }
+        console.log(this.counterFirst, 'first', this.counter1Min, this.counter1Middle, this.counter1Mx, 'all', this.counterXMin, this.counterXMiddle, this.counterXMx);
     }
     Tester2.prototype.predict = function (rowIdx, prerowcount, neuralNetwork) {
         //console.log(datarows[rowIdx ]);
         var data = this.rowData(rowIdx, prerowcount, neuralNetwork);
         var result = neuralNetwork.findByPattern(data);
-        var txt = '';
-        for (var ii = 0; ii < rowLen; ii++) {
+        var txt = ' ';
+        /*for (let ii = 0; ii < rowLen; ii++) {
             txt = txt + ' ' + Math.round(100 * result[ii]);
-        }
+        }*/
         //console.log(datarows[rowIdx]);
-        console.log(txt, datarows[rowIdx]);
+        if (datarows[rowIdx].balls[0] == 1) {
+            txt = '*';
+            this.counterFirst++;
+            if (result[0] < 0.33) {
+                this.counter1Min++;
+            }
+            else {
+                if (result[0] < 0.66) {
+                    this.counter1Middle++;
+                }
+                else {
+                    this.counter1Mx++;
+                }
+            }
+        }
+        if (result[0] < 0.33) {
+            this.counterXMin++;
+        }
+        else {
+            if (result[0] < 0.66) {
+                this.counterXMiddle++;
+            }
+            else {
+                this.counterXMx++;
+            }
+        }
+        console.log(Math.round(result[0] * 10), txt, datarows[rowIdx]);
     };
     Tester2.prototype.sendTrain = function (ratio, prerowcount, neuralNetwork) {
         var start = 5;
         var idx = Math.round(start + Math.random() * 5432);
-        var result = neuralNetwork.createArrayZero(rowLen);
+        var result = [0]; //neuralNetwork.createArrayZero(rowLen);
         var firstBall = datarows[idx].balls[0];
         //let firstBall = datarows[rowNum+1].balls[0];//test
-        result[firstBall - 1] = 1;
+        if (firstBall == 1) {
+            result[0] = 1;
+        }
         var data = this.rowData(idx, prerowcount, neuralNetwork);
         //console.log(data, result);
         neuralNetwork.singleTrain(ratio, data, result);
