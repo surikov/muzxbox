@@ -570,7 +570,7 @@ class TimeSelectBar {
             let mm = MZMM();
             let barLeft = mixm.LeftPad;
             let startSel = 1;
-            let widthSel = 1;
+            let widthSel = 0;
             let startIdx = 0;
             for (startIdx = 0; startIdx < data.timeline.length; startIdx++) {
                 let curBar = data.timeline[startIdx];
@@ -591,8 +591,10 @@ class TimeSelectBar {
                     break;
                 }
             }
-            this.selectionMark.x = startSel;
-            this.selectionMark.w = widthSel;
+            if (widthSel) {
+                this.selectionMark.x = startSel;
+                this.selectionMark.w = widthSel;
+            }
         }
         else {
             this.selectionMark.x = -1;
