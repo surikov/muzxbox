@@ -214,7 +214,7 @@ class CommandDispatcher {
 	expandTimeLineSelection(idx: number) {
 		console.log('select bar', idx);
 		if (this.workData) {
-			if (idx > 0 && idx < this.workData.timeline.length) {
+			if (idx >= 0 && idx < this.workData.timeline.length) {
 				if (this.workData.selection) {
 					if (this.workData.selection.startMeasure == this.workData.selection.endMeasure) {
 						if (this.workData.selection.startMeasure == idx) {
@@ -240,7 +240,10 @@ class CommandDispatcher {
 			}
 		}
 		//console.log(this.workData.selection);
-		this.renderer.timeselectbar.moveTimeSelection();
+		this.renderer.timeselectbar.updateTimeSelectionBar(this.workData);
+		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
+			, this.renderer.timeselectbar.selectionAnchor
+			, LevelModes.top);
 	}
 }
 let commandDispatcher = new CommandDispatcher();

@@ -117,7 +117,7 @@ declare class TimeSelectBar {
     constructor();
     createTimeScale(): TileLayerDefinition[];
     resizeTimeScale(viewWIdth: number, viewHeight: number): void;
-    moveTimeSelection(): void;
+    updateTimeSelectionBar(data: MZXBX_Project): void;
     createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, data: MZXBX_Project): void;
     createBarNumber(barLeft: number, barnum: number, zz: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor, barTime: number): void;
     fillTimeBar(data: MZXBX_Project): void;

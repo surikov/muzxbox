@@ -300,7 +300,7 @@ class CommandDispatcher {
     expandTimeLineSelection(idx) {
         console.log('select bar', idx);
         if (this.workData) {
-            if (idx > 0 && idx < this.workData.timeline.length) {
+            if (idx >= 0 && idx < this.workData.timeline.length) {
                 if (this.workData.selection) {
                     if (this.workData.selection.startMeasure == this.workData.selection.endMeasure) {
                         if (this.workData.selection.startMeasure == idx) {
@@ -329,7 +329,8 @@ class CommandDispatcher {
                 }
             }
         }
-        this.renderer.timeselectbar.moveTimeSelection();
+        this.renderer.timeselectbar.updateTimeSelectionBar(this.workData);
+        this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup, this.renderer.timeselectbar.selectionAnchor, LevelModes.top);
     }
 }
 let commandDispatcher = new CommandDispatcher();
@@ -540,7 +541,8 @@ class TimeSelectBar {
         };
         this.selectedTimeSVGGroup = document.getElementById("selectedTime");
         this.selectionMark = {
-            x: 0, y: 0,
+            x: 0,
+            y: 0,
             w: 11,
             h: 77,
             css: 'timeSelection'
@@ -552,15 +554,51 @@ class TimeSelectBar {
             content: [this.selectionMark]
         };
         this.selectedTimeLayer = {
-            g: this.selectedTimeSVGGroup, anchors: [this.selectionAnchor], mode: LevelModes.normal
+            g: this.selectedTimeSVGGroup, anchors: [this.selectionAnchor], mode: LevelModes.top
         };
         return [this.selectionBarLayer, this.selectedTimeLayer];
     }
     resizeTimeScale(viewWIdth, viewHeight) {
         console.log('resizeTimeScale');
+        this.selectionAnchor.ww = viewWIdth * 128;
+        this.selectionAnchor.hh = viewHeight * 128;
+        this.selectionMark.h = viewHeight * 128;
     }
-    moveTimeSelection() {
-        console.log('moveTimeSelection');
+    updateTimeSelectionBar(data) {
+        if (data.selection) {
+            let mixm = new MixerDataMath(data);
+            let mm = MZMM();
+            let barLeft = mixm.LeftPad;
+            let startSel = 1;
+            let widthSel = 1;
+            let startIdx = 0;
+            for (startIdx = 0; startIdx < data.timeline.length; startIdx++) {
+                let curBar = data.timeline[startIdx];
+                let curMeasureMeter = mm.set(curBar.metre);
+                let barWidth = curMeasureMeter.duration(curBar.tempo) * mixm.widthDurationRatio;
+                if (startIdx == data.selection.startMeasure) {
+                    startSel = barLeft;
+                    break;
+                }
+                barLeft = barLeft + barWidth;
+            }
+            for (let ii = startIdx; ii < data.timeline.length; ii++) {
+                let curBar = data.timeline[ii];
+                let curMeasureMeter = mm.set(curBar.metre);
+                let barWidth = curMeasureMeter.duration(curBar.tempo) * mixm.widthDurationRatio;
+                widthSel = widthSel + barWidth;
+                if (ii == data.selection.endMeasure) {
+                    break;
+                }
+            }
+            this.selectionMark.x = startSel;
+            this.selectionMark.w = widthSel;
+        }
+        else {
+            this.selectionMark.x = -1;
+            this.selectionMark.w = 0.5;
+        }
+        console.log('updateTimeSelectionBar', data.selection, this.selectionMark);
     }
     createBarMark(barIdx, barLeft, size, measureAnchor, data) {
         let brdrwidth = 0.03 * size;
@@ -636,6 +674,7 @@ class TimeSelectBar {
             }
         }
         this.selectBarAnchor.content = this.zoomAnchors;
+        this.updateTimeSelectionBar(data);
     }
 }
 class UIToolbar {

@@ -4,7 +4,7 @@
 }
 .timeSelection{
     fill: var(--color-focus);
-	fill-opacity: 95%;
+	fill-opacity: 50%;
 	
 }
 .timeSubMark{
