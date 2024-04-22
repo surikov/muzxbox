@@ -879,6 +879,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 	//console.log('blueStat', blueStat);
 	//console.log('redStat', redStat);
 	dumpColorStat();
+	dumpStat2();
 }
 function roundDown(num: number, base: number): number {
 	return Math.floor(num / base) * base;
@@ -896,6 +897,34 @@ function countColorStat(kk: number, sz: number): number {
 	if (redStat[kk].right > sz) countS++;
 	return countS;
 }*/
+
+function dumpStat2(){
+	console.log(greenStat);
+	for(let ii=1;ii<greenStat.length-3;ii++){
+		let cur=greenStat[ii];
+		let pre=(greenStat[ii+1].left+greenStat[ii+2].left+greenStat[ii+3].left)/3;
+		let lin=[];
+		for(let kk=0;kk<40;kk++){
+			lin.push('-');
+		}
+		let val=cur.left-greenStat[ii+1].left;
+		//let val=Math.round(cur.left-pre);
+		let shft=0;
+		if(val>0){
+			shft=20;
+		}else{
+			shft=20+val;
+		}
+		for(let kk=0;kk<Math.abs(val);kk++){
+			lin[shft+kk]='#';
+		}
+		let txt='';
+		for(let kk=0;kk<lin.length;kk++){
+			txt=txt+lin[kk];
+		}
+		console.log(txt,val,cur.left);
+	}
+}
 function dumpColorStat() {
 	//console.log('stat');
 	let skip = 1;
@@ -1050,7 +1079,7 @@ function drawTestLines(data: { ball: number, color: string }[]) {
 }
 function testTest() {
 	let yyy = rowsVisibleCount + 22 + skipRowsCount - 1;
-	//console.log('TESTtEST', sortedBlue, sortedGreen, sortedGrey);
+	console.log('TESTtEST', sortedBlue, sortedGreen, sortedGrey);
 	let leftBlue = Math.ceil(0 * rowLen / 2);
 	let rightBlue = Math.ceil(1 * rowLen / 2) - 1;
 	let leftGreen = Math.ceil(1 * rowLen / 2);
