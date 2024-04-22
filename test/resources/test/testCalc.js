@@ -849,7 +849,7 @@ function countColorStat(kk: number, sz: number): number {
 }*/
 function dumpStat2() {
     console.log(greenStat);
-    for (var ii = 1; ii < greenStat.length - 3; ii++) {
+    for (var ii = 0; ii < 10; ii++) {
         var cur = greenStat[ii];
         var pre = (greenStat[ii + 1].left + greenStat[ii + 2].left + greenStat[ii + 3].left) / 3;
         var lin = [];

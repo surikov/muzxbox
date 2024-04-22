@@ -900,7 +900,7 @@ function countColorStat(kk: number, sz: number): number {
 
 function dumpStat2(){
 	console.log(greenStat);
-	for(let ii=1;ii<greenStat.length-3;ii++){
+	for(let ii=0;ii<10;ii++){
 		let cur=greenStat[ii];
 		let pre=(greenStat[ii+1].left+greenStat[ii+2].left+greenStat[ii+3].left)/3;
 		let lin=[];
