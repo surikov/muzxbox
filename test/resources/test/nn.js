@@ -563,5 +563,12 @@ var Tester2 = /** @class */ (function () {
     };
     return Tester2;
 }());
+var Tester3 = /** @class */ (function () {
+    function Tester3() {
+        console.log('Tester3');
+    }
+    return Tester3;
+}());
 //new NNTester();
-new Tester2();
+//new Tester2();
+new Tester3();

@@ -618,7 +618,12 @@ class Tester2 {
 	}
 
 }
+class Tester3{
+	constructor(){
+		console.log('Tester3');
+	}
+}
 
 //new NNTester();
-new Tester2();
-
+//new Tester2();
+new Tester3();
