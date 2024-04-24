@@ -3,13 +3,15 @@
 	fill-opacity: 25%;
 }
 .timeSelection{
-    fill: var(--color-focus);
 	fill-opacity: 40%;
+	fill: var(--color-focus);
+    pointer-events: none;
+    animation: focusFlashFill 4s linear infinite;
 	
 }
 .timeSubMark{
     fill: var(--color-lines);
-	fill-opacity: 25%;
+	fill-opacity: 50%;
 	
 }
 .timeMarkButtonCircle{

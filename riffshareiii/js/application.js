@@ -671,6 +671,40 @@ class TimeSelectBar {
                     this.createBarMark(kk, barLeft, zoomPrefixLevelsCSS[zz].minZoom * 1.5, measureAnchor, data);
                     this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor, barTime);
                 }
+                let zoomInfo = zoomPrefixLevelsCSS[zz];
+                if (zoomInfo.gridLines.length > 0) {
+                    let mixm = new MixerDataMath(data);
+                    let lineCount = 0;
+                    let skip = MZMM().set({ count: 0, part: 1 });
+                    while (true) {
+                        let line = zoomInfo.gridLines[lineCount];
+                        skip = skip.plus(line.duration).simplyfy();
+                        if (!skip.less(curBar.metre)) {
+                            break;
+                        }
+                        if (line.label) {
+                            let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
+                            let mark = {
+                                x: xx, y: 0,
+                                w: line.ratio * 2 * zoomInfo.minZoom,
+                                h: line.ratio * 8 * zoomInfo.minZoom,
+                                css: 'timeSubMark'
+                            };
+                            measureAnchor.content.push(mark);
+                            let mtr = {
+                                x: xx,
+                                y: 0.5 * zoomInfo.minZoom,
+                                text: '' + skip.count + '/' + skip.part,
+                                css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
+                            };
+                            measureAnchor.content.push(mtr);
+                        }
+                        lineCount++;
+                        if (lineCount >= zoomInfo.gridLines.length) {
+                            lineCount = 0;
+                        }
+                    }
+                }
                 barLeft = barLeft + barWidth;
                 barTime = barTime + curMeasureMeter.duration(curBar.tempo);
             }
@@ -1501,7 +1535,7 @@ class MixerBar {
         let barRightBorder = {
             x: barLeft + width,
             y: top,
-            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
+            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
             h: height,
             css: 'barRightBorder'
         };
@@ -1510,7 +1544,7 @@ class MixerBar {
             let barSamRightBorder = {
                 x: barLeft + width,
                 y: mixm.samplerTop(),
-                w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
+                w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
                 h: data.percussions.length * mixm.notePathHeight,
                 css: 'barRightBorder'
             };

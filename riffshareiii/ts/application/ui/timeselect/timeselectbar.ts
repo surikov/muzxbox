@@ -200,7 +200,8 @@ class TimeSelectBar {
 		measureAnchor.content.push(mark);
 	}
 	createBarNumber(barLeft: number//, top: number
-		, barnum: number, zz: number
+		, barnum: number
+		, zz: number
 		, curBar: MZXBX_SongMeasure
 		, measureAnchor: TileAnchor
 		, barTime: number
@@ -276,6 +277,41 @@ class TimeSelectBar {
 					this.createBarNumber(barLeft
 						//, zoomPrefixLevelsCSS[zz].minZoom * 3
 						, kk, zz, curBar, measureAnchor, barTime);
+				}
+				let zoomInfo = zoomPrefixLevelsCSS[zz];
+				if (zoomInfo.gridLines.length > 0) {
+					let mixm: MixerDataMath = new MixerDataMath(data);
+					let lineCount = 0;
+					let skip: MZXBX_MetreMathType = MZMM().set({ count: 0, part: 1 });
+					while (true) {
+						let line = zoomInfo.gridLines[lineCount];
+						skip = skip.plus(line.duration).simplyfy();
+						if (!skip.less(curBar.metre)) {
+							break;
+						}
+		
+						if (line.label) {
+							let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
+							let mark: TileRectangle = {
+								x: xx, y: 0
+								, w: line.ratio * 2 * zoomInfo.minZoom
+								, h: line.ratio * 8 * zoomInfo.minZoom
+								, css: 'timeSubMark'
+							};
+							measureAnchor.content.push(mark);
+							let mtr: TileText = {
+								x: xx
+								, y: 0.5 * zoomInfo.minZoom
+								, text: '' + skip.count + '/' + skip.part
+								, css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
+							};
+							measureAnchor.content.push(mtr);
+						}
+						lineCount++;
+						if (lineCount >= zoomInfo.gridLines.length) {
+							lineCount = 0;
+						}
+					}
 				}
 				barLeft = barLeft + barWidth;
 				barTime = barTime + curMeasureMeter.duration(curBar.tempo);

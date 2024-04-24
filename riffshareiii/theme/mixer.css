@@ -220,4 +220,5 @@
 	fill: var(--color-lines);
 	fill-opacity:25%;
     stroke: none;
+	pointer-events: none;
 }

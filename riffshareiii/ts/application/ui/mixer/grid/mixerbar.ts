@@ -98,12 +98,14 @@ class MixerBar {
 			}
 		}
 	}
-	addOctaveGridSteps(barIdx: number,
-		data: MZXBX_Project
+	addOctaveGridSteps(
+		barIdx: number
+		,		data: MZXBX_Project
 		, barLeft: number
 		, width: number
 		//, top: number, height: number
-		, barOctaveAnchor: TileAnchor, zIndex: number) {
+		, barOctaveAnchor: TileAnchor
+		, zIndex: number) {
 		let zoomInfo = zoomPrefixLevelsCSS[zIndex];
 		//console.log('MixerBar',barIdx,zoomLevel);
 		let curBar = data.timeline[barIdx];
@@ -119,7 +121,7 @@ class MixerBar {
 		let barRightBorder: TileRectangle = {
 			x: barLeft + width
 			, y: top
-			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25 //zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0
+			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5 //zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0
 			, h: height
 			, css: 'barRightBorder'
 		};
@@ -128,7 +130,7 @@ class MixerBar {
 			let barSamRightBorder: TileRectangle = {
 				x: barLeft + width
 				, y: mixm.samplerTop()
-				, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25 //zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0
+				, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5 //zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0
 				, h: data.percussions.length * mixm.notePathHeight
 				, css: 'barRightBorder'
 			};
