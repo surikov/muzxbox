@@ -1368,16 +1368,14 @@ class SamplerBar {
         for (let ss = 0; ss < measure.skips.length; ss++) {
             let skip = measure.skips[ss];
             let xx = left + MZMM().set(skip).duration(tempo) * mixm.widthDurationRatio;
-            let dot = {
-                x: xx,
-                y: yy + 0.1,
-                w: 0.8 * mixm.notePathHeight,
-                h: 0.8 * mixm.notePathHeight,
-                rx: 1 * mixm.notePathHeight / 8,
-                ry: 1 * mixm.notePathHeight / 8,
+            let ply = {
+                dots: [xx, yy + 0.025,
+                    xx, yy + 0.975,
+                    xx + 0.75, yy + 0.5
+                ],
                 css: 'samplerDrumDot'
             };
-            anchor.content.push(dot);
+            anchor.content.push(ply);
         }
     }
 }
@@ -1512,7 +1510,7 @@ class MixerBar {
         if (zoomLevel < 6) {
             this.addOctaveGridSteps(barIdx, data, left, ww, gridZoomBarAnchor, zoomLevel);
         }
-        if (zoomLevel < 6) {
+        if (zoomLevel < 7) {
             for (let pp = 0; pp < data.percussions.length; pp++) {
                 let drum = data.percussions[pp];
                 if (drum) {
@@ -1551,6 +1549,10 @@ class MixerBar {
             barOctaveAnchor.content.push(barSamRightBorder);
         }
         if (zoomInfo.gridLines.length > 0) {
+            let css = 'octaveBottomBorder';
+            if (zIndex < 3) {
+                css = 'interactiveTimeMeasureMark';
+            }
             while (true) {
                 let line = zoomInfo.gridLines[lineCount];
                 skip = skip.plus(line.duration).simplyfy();
@@ -1563,7 +1565,7 @@ class MixerBar {
                     y: top,
                     w: line.ratio * zoomInfo.minZoom / 2,
                     h: height,
-                    css: 'mixTimeMeasureMark'
+                    css: css
                 };
                 barOctaveAnchor.content.push(mark);
                 if (data.percussions.length) {
@@ -1572,7 +1574,7 @@ class MixerBar {
                         y: mixm.samplerTop(),
                         w: line.ratio * zoomInfo.minZoom / 2,
                         h: data.percussions.length * mixm.notePathHeight,
-                        css: 'mixTimeMeasureMark'
+                        css: css
                     };
                     barOctaveAnchor.content.push(sammark);
                 }
@@ -1786,7 +1788,7 @@ class MixerZoomLevel {
                             y: mixm.gridTop() + (oo * 12 + kk) * mixm.notePathHeight,
                             w: mixm.timelineWidth(),
                             h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
-                            css: 'octaveBottomBorder'
+                            css: 'interActiveGridLine'
                         });
                     }
                 }

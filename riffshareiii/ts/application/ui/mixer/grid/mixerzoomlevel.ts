@@ -83,7 +83,7 @@ class MixerZoomLevel {
 							, y: mixm.gridTop() + (oo * 12 + kk) * mixm.notePathHeight
 							, w: mixm.timelineWidth()
 							, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
-							, css: 'octaveBottomBorder'
+							, css: 'interActiveGridLine'
 						});
 					}
 				}

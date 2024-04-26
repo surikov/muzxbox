@@ -9,6 +9,7 @@ class SamplerBar {
 		for (let ss = 0; ss < measure.skips.length; ss++) {
 			let skip: MZXBX_Metre = measure.skips[ss];
 			let xx = left + MZMM().set(skip).duration(tempo) * mixm.widthDurationRatio
+/*
 			let dot: TileRectangle = {
 				x: xx
 				, y: yy + 0.1
@@ -19,6 +20,15 @@ class SamplerBar {
 				, css: 'samplerDrumDot'
 			};
 			anchor.content.push(dot);
+			*/
+			let ply: TilePolygon = {
+				dots: [xx, yy + 0.025
+					, xx, yy + 0.975
+					, xx + 0.75, yy + 0.5
+				]
+				, css: 'samplerDrumDot'
+			};
+			anchor.content.push(ply);
 		}
 	}
 }
