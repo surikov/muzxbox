@@ -55,7 +55,7 @@ function fillMenuImportPlugins() {
 					commandDispatcher.promptPluginGUI(label, url, (obj: any) => {
 						//console.log('set project from', obj);
 						
-						commandDispatcher.registerWorkProject(obj as MZXBX_Project);
+						commandDispatcher.registerWorkProject(obj as Zvoog_Project);
 						commandDispatcher.resetProject();
 						return true;
 					});

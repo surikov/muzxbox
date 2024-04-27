@@ -11,7 +11,7 @@ type RenderedLayers = RenderedPart & {
 */
 type GridTimeTemplate14 = {
 	ratio: number
-	, duration: MZXBX_Metre
+	, duration: Zvoog_Metre
 	, label?: boolean
 };
 let gridLinesBrief: GridTimeTemplate14[] = [
@@ -79,7 +79,7 @@ class UIRenderer {//} implements RenderedPart {
 	tiler: TileLevelBase;
 	tileLevelSVG: SVGElement;
 	//commands: CommandDispatcher;
-	lastUsedData: MZXBX_Project;
+	lastUsedData: Zvoog_Project;
 	constructor() {
 		//this.commands = commands;
 		commandDispatcher.registerUI(this);

@@ -23,7 +23,7 @@ class WarningUI {
 		};
 		this.warningLayer = { g: this.warningGroup, anchors: [this.warningAnchor], mode: LevelModes.overlay };
 	}
-	resetDialogView(data: MZXBX_Project) {
+	resetDialogView(data: Zvoog_Project) {
 		//console.log('resetDialogView');
 		//this.resizeDialog();
 	}

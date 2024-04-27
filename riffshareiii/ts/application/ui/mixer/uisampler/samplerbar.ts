@@ -1,14 +1,14 @@
 class SamplerBar {
-	constructor(data: MZXBX_Project, barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number) {
+	constructor(data: Zvoog_Project, barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
-		let drum: MZXBX_PercussionTrack = data.percussions[drumIdx];
-		let measure: MZXBX_PercussionMeasure = drum.measures[barIdx];
+		let drum: Zvoog_PercussionTrack = data.percussions[drumIdx];
+		let measure: Zvoog_PercussionMeasure = drum.measures[barIdx];
 		//console.log(drum.title,barIdx,measure.skips);
 		let yy = mixm.samplerTop() + drumIdx * mixm.notePathHeight;
 		let tempo = data.timeline[barIdx].tempo;
 		for (let ss = 0; ss < measure.skips.length; ss++) {
-			let skip: MZXBX_Metre = measure.skips[ss];
-			let xx = left + MZMM().set(skip).duration(tempo) * mixm.widthDurationRatio
+			let skip: Zvoog_Metre = measure.skips[ss];
+			let xx = left + MMUtil().set(skip).duration(tempo) * mixm.widthDurationRatio
 /*
 			let dot: TileRectangle = {
 				x: xx

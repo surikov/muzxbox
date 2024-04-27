@@ -85,7 +85,7 @@ class MZXBX_MetreMathUtil {
         return this.duration(tempo) * ratio;
     }
 }
-function MZMM() {
+function MMUtil() {
     return new MZXBX_MetreMathUtil().set({ count: 0, part: 1 });
 }
 function MZXBX_appendScriptURL(url) {

@@ -220,7 +220,7 @@ class RightMenuPanel {
 			}
 		}
 	}
-	readCurrentSongData(project: MZXBX_Project) {
+	readCurrentSongData(project: Zvoog_Project) {
 
 		menuPointTracks.children = [];
 		for (let tt = 0; tt < project.tracks.length; tt++) {

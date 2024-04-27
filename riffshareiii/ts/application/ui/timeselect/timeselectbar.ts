@@ -54,11 +54,11 @@ class TimeSelectBar {
 		this.selectionAnchor.hh = viewHeight * 128;
 		this.selectionMark.h = viewHeight * 128;
 	}
-	updateTimeSelectionBar(data: MZXBX_Project) {
+	updateTimeSelectionBar(data: Zvoog_Project) {
 		
 		if (data.selection) {
 			let mixm: MixerDataMath = new MixerDataMath(data);
-			let mm: MZXBX_MetreMathType = MZMM();
+			let mm: Zvoog_MetreMathType = MMUtil();
 			let barLeft = mixm.LeftPad;
 			let startSel = 1;
 			let widthSel = 0;
@@ -179,7 +179,7 @@ class TimeSelectBar {
 			});
 		}
 	}*/
-	createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, data: MZXBX_Project) {
+	createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, data: Zvoog_Project) {
 		let brdrwidth = 0.03 * size;
 		let border: TileRectangle = {
 			x: barLeft - brdrwidth / 2
@@ -202,7 +202,7 @@ class TimeSelectBar {
 	createBarNumber(barLeft: number//, top: number
 		, barnum: number
 		, zz: number
-		, curBar: MZXBX_SongMeasure
+		, curBar: Zvoog_SongMeasure
 		, measureAnchor: TileAnchor
 		, barTime: number
 	) {
@@ -234,7 +234,7 @@ class TimeSelectBar {
 		measureAnchor.content.push(mtr);*/
 	}
 
-	fillTimeBar(data: MZXBX_Project) {
+	fillTimeBar(data:Zvoog_Project) {
 		//console.log('fillTimeBar', data.timeline);
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		this.selectBarAnchor.ww = mixm.mixerWidth();
@@ -249,7 +249,7 @@ class TimeSelectBar {
 				, id: 'time' + (zz + Math.random())
 			};
 			this.zoomAnchors.push(selectLevelAnchor);
-			let mm: MZXBX_MetreMathType = MZMM();
+			let mm: Zvoog_MetreMathType = MMUtil();
 			//this.reBuildSelectionMark(zz, data);
 
 			let barLeft = mixm.LeftPad;
@@ -282,7 +282,7 @@ class TimeSelectBar {
 				if (zoomInfo.gridLines.length > 0) {
 					let mixm: MixerDataMath = new MixerDataMath(data);
 					let lineCount = 0;
-					let skip: MZXBX_MetreMathType = MZMM().set({ count: 0, part: 1 });
+					let skip: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 1 });
 					while (true) {
 						let line = zoomInfo.gridLines[lineCount];
 						skip = skip.plus(line.duration).simplyfy();

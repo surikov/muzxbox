@@ -1,16 +1,5 @@
 "use strict";
 class MZXBX_ScaleMath {
-    scale() {
-        return {
-            basePitch: this.basePitch,
-            step2: this.step2,
-            step3: this.step3,
-            step4: this.step4,
-            step5: this.step5,
-            step6: this.step6,
-            step7: this.step7
-        };
-    }
 }
 console.log("MuzXbox v1.0.2");
 class MuzXbox {

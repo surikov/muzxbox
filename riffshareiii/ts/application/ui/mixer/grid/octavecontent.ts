@@ -3,7 +3,7 @@ class OctaveContent {
 	constructor(barIdx: number
 		, octaveIdx: number
 		, left: number, top: number, width: number, height: number
-		, data: MZXBX_Project
+		, data: Zvoog_Project
 		, barOctaveTrackAnchor: TileAnchor
 		, barOctaveFirstAnchor: TileAnchor
 		, zoomLevel: number) {
@@ -18,7 +18,7 @@ class OctaveContent {
 
 	addUpperNotes(barIdx: number, octaveIdx: number
 		, left: number, top: number, width: number, height: number
-		, barOctaveAnchor: TileAnchor, data: MZXBX_Project
+		, barOctaveAnchor: TileAnchor, data: Zvoog_Project
 		, zoomLevel: number
 	) {
 		if (data.tracks.length) {
@@ -36,7 +36,7 @@ class OctaveContent {
 	}
 	addOtherNotes(barIdx: number, octaveIdx: number
 		, left: number, top: number, width: number, height: number
-		, barOctaveAnchor: TileAnchor, data: MZXBX_Project
+		, barOctaveAnchor: TileAnchor, data: Zvoog_Project
 	) {
 		for (let ii = 1; ii < data.tracks.length; ii++) {
 			let track = data.tracks[ii];
@@ -45,21 +45,21 @@ class OctaveContent {
 			);
 		}
 	}
-	addTrackNotes(track: MZXBX_MusicTrack, barIdx: number, octaveIdx: number
+	addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number
 		, left: number, top: number, width: number, height: number
-		, barOctaveAnchor: TileAnchor, data: MZXBX_Project
+		, barOctaveAnchor: TileAnchor, data: Zvoog_Project
 		, css: string, addMoreInfo: boolean
 	) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
-		let measure: MZXBX_TrackMeasure = track.measures[barIdx];
+		let measure: Zvoog_TrackMeasure = track.measures[barIdx];
 		for (let cc = 0; cc < measure.chords.length; cc++) {
-			let chord: MZXBX_Chord = measure.chords[cc];
+			let chord: Zvoog_Chord = measure.chords[cc];
 			for (let nn = 0; nn < chord.notes.length; nn++) {
-				let note: MZXBX_Note = chord.notes[nn];
+				let note: Zvoog_Note = chord.notes[nn];
 				let from = octaveIdx * 12;
 				let to = (octaveIdx + 1) * 12;
 				if (note.pitch >= from && note.pitch < to) {
-					let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
+					let x1 = left + MMUtil().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
 					let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
 					let slidearr = note.slides;
 					/*if (slidearr.length > 1) {
@@ -67,7 +67,7 @@ class OctaveContent {
 					}*/
 					for (let ss = 0; ss < slidearr.length; ss++) {
 						//if (ss > 2) break;
-						let x2 = x1 + MZMM().set(slidearr[ss].duration).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
+						let x2 = x1 + MMUtil().set(slidearr[ss].duration).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
 						let y2 = y1 + slidearr[ss].delta * mixm.notePathHeight;
 						let r_x1 = x1 + mixm.notePathHeight / 2;
 						if (ss > 0) {

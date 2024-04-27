@@ -35,10 +35,10 @@ declare class CommandDispatcher {
     renderer: UIRenderer;
     audioContext: AudioContext;
     tapSizeRatio: number;
-    workData: MZXBX_Project;
+    workData: Zvoog_Project;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
     initAudioFromUI(): void;
-    registerWorkProject(data: MZXBX_Project): void;
+    registerWorkProject(data: Zvoog_Project): void;
     registerUI(renderer: UIRenderer): void;
     showRightMenu(): void;
     setThemeLocale(loc: string, ratio: number): void;
@@ -58,7 +58,7 @@ declare let commandDispatcher: CommandDispatcher;
 declare let pluginDialogPrompt: PluginDialogPrompt;
 declare type GridTimeTemplate14 = {
     ratio: number;
-    duration: MZXBX_Metre;
+    duration: Zvoog_Metre;
     label?: boolean;
 };
 declare let gridLinesBrief: GridTimeTemplate14[];
@@ -80,7 +80,7 @@ declare class UIRenderer {
     leftPanel: LeftPanel;
     tiler: TileLevelBase;
     tileLevelSVG: SVGElement;
-    lastUsedData: MZXBX_Project;
+    lastUsedData: Zvoog_Project;
     constructor();
     changeTapSIze(ratio: number): void;
     createUI(): void;
@@ -117,10 +117,10 @@ declare class TimeSelectBar {
     constructor();
     createTimeScale(): TileLayerDefinition[];
     resizeTimeScale(viewWIdth: number, viewHeight: number): void;
-    updateTimeSelectionBar(data: MZXBX_Project): void;
-    createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, data: MZXBX_Project): void;
-    createBarNumber(barLeft: number, barnum: number, zz: number, curBar: MZXBX_SongMeasure, measureAnchor: TileAnchor, barTime: number): void;
-    fillTimeBar(data: MZXBX_Project): void;
+    updateTimeSelectionBar(data: Zvoog_Project): void;
+    createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, data: Zvoog_Project): void;
+    createBarNumber(barLeft: number, barnum: number, zz: number, curBar: Zvoog_SongMeasure, measureAnchor: TileAnchor, barTime: number): void;
+    fillTimeBar(data: Zvoog_Project): void;
 }
 declare class UIToolbar {
     toolBarAnchor: TileAnchor;
@@ -172,7 +172,7 @@ declare class RightMenuPanel {
     setFocus(it: MenuInfo, infos: MenuInfo[]): void;
     setOpenState(state: boolean, it: MenuInfo, infos: MenuInfo[]): void;
     fillMenuItemChildren(pad: number, infos: MenuInfo[]): void;
-    readCurrentSongData(project: MZXBX_Project): void;
+    readCurrentSongData(project: Zvoog_Project): void;
     rerenderMenuContent(folder: RightMenuItem | null): void;
     resizeMenu(viewWidth: number, viewHeight: number): void;
 }
@@ -227,25 +227,25 @@ declare class LeftPanel {
     leftZoomAnchors: TileAnchor[];
     constructor();
     createLeftPanel(): TileLayerDefinition[];
-    reFillLeftPanel(data: MZXBX_Project): void;
+    reFillLeftPanel(data: Zvoog_Project): void;
 }
 declare class SamplerBar {
-    constructor(data: MZXBX_Project, barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number);
+    constructor(data: Zvoog_Project, barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number);
 }
 declare class BarOctave {
-    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number, data: MZXBX_Project);
+    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number, data: Zvoog_Project);
 }
 declare class OctaveContent {
-    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, data: MZXBX_Project, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number);
-    addUpperNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project, zoomLevel: number): void;
-    addOtherNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project): void;
-    addTrackNotes(track: MZXBX_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: MZXBX_Project, css: string, addMoreInfo: boolean): void;
+    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, data: Zvoog_Project, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number);
+    addUpperNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: Zvoog_Project, zoomLevel: number): void;
+    addOtherNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: Zvoog_Project): void;
+    addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: Zvoog_Project, css: string, addMoreInfo: boolean): void;
 }
 declare class MixerBar {
     octaves: BarOctave[];
     zoomLevel: number;
-    constructor(barIdx: number, left: number, ww: number, zoomLevel: number, gridZoomBarAnchor: TileAnchor, tracksZoomBarAnchor: TileAnchor, firstZoomBarAnchor: TileAnchor, data: MZXBX_Project);
-    addOctaveGridSteps(barIdx: number, data: MZXBX_Project, barLeft: number, width: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
+    constructor(barIdx: number, left: number, ww: number, zoomLevel: number, gridZoomBarAnchor: TileAnchor, tracksZoomBarAnchor: TileAnchor, firstZoomBarAnchor: TileAnchor, data: Zvoog_Project);
+    addOctaveGridSteps(barIdx: number, data: Zvoog_Project, barLeft: number, width: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
 }
 declare class MixerUI {
     gridLayers: TileLayerDefinition;
@@ -253,9 +253,9 @@ declare class MixerUI {
     firstLayers: TileLayerDefinition;
     levels: MixerZoomLevel[];
     fillerAnchor: TileAnchor;
-    reFillMixerUI(data: MZXBX_Project): void;
+    reFillMixerUI(data: Zvoog_Project): void;
     createMixerLayers(): TileLayerDefinition[];
-    reFillTracksRatio(data: MZXBX_Project): void;
+    reFillTracksRatio(data: Zvoog_Project): void;
 }
 declare class MixerZoomLevel {
     zoomGridAnchor: TileAnchor;
@@ -264,8 +264,8 @@ declare class MixerZoomLevel {
     bars: MixerBar[];
     zoomLevelIndex: number;
     constructor(zoomLevel: number, anchorGrid: TileAnchor, anchorTracks: TileAnchor, anchorFirst: TileAnchor);
-    reCreateBars(data: MZXBX_Project): void;
-    addLines(barOctaveAnchor: TileAnchor, data: MZXBX_Project): void;
+    reCreateBars(data: Zvoog_Project): void;
+    addLines(barOctaveAnchor: TileAnchor, data: Zvoog_Project): void;
 }
 declare class IconLabelButton {
     anchor: TileAnchor;
@@ -308,7 +308,7 @@ declare class DebugLayerUI {
     debugLayer: TileLayerDefinition;
     allLayers(): TileLayerDefinition[];
     setupUI(): void;
-    resetDebugView(data: MZXBX_Project): void;
+    resetDebugView(data: Zvoog_Project): void;
     deleteDebbugView(): void;
 }
 declare class WarningUI {
@@ -321,13 +321,13 @@ declare class WarningUI {
     warningDescription: TileText;
     cancel: () => void;
     initDialogUI(): void;
-    resetDialogView(data: MZXBX_Project): void;
+    resetDialogView(data: Zvoog_Project): void;
     resizeDialog(ww: number, hh: number, resetWarningAnchor: () => void): void;
     allLayers(): TileLayerDefinition[];
     showWarning(): void;
     hideWarning(): void;
 }
-declare let mzxbxProjectForTesting2: MZXBX_Project;
+declare let mzxbxProjectForTesting2: Zvoog_Project;
 declare let testBigMixerData: {
     title: string;
     timeline: {
@@ -359,7 +359,7 @@ declare let testEmptyMixerData: {
     }[];
 };
 declare class MixerDataMath {
-    data: MZXBX_Project;
+    data: Zvoog_Project;
     projTitleHeight: number;
     LeftPad: number;
     rightPad: number;
@@ -369,7 +369,7 @@ declare class MixerDataMath {
     octaveCount: number;
     samplerBottomPad: number;
     titleBottomPad: number;
-    constructor(data: MZXBX_Project);
+    constructor(data: Zvoog_Project);
     mixerWidth(): number;
     heightOfTitle(): number;
     timelineWidth(): number;
@@ -503,127 +503,123 @@ declare type TileLevelBase = {
     resetInnerSize(inWidth: number, inHeight: number): void;
     initRun(svgObject: SVGElement, stickLeft: boolean, inWidth: number, inHeight: number, minZoom: number, curZoom: number, maxZoom: number, layers: TileLayerDefinition[]): void;
 };
+declare type Zvoog_Metre = {
+    count: number;
+    part: number;
+};
+interface Zvoog_MetreMathType {
+    count: number;
+    part: number;
+    set(from: Zvoog_Metre): Zvoog_MetreMathType;
+    metre(): Zvoog_Metre;
+    simplyfy(): Zvoog_MetreMathType;
+    strip(toPart: number): Zvoog_MetreMathType;
+    equals(metre: Zvoog_Metre): boolean;
+    less(metre: Zvoog_Metre): boolean;
+    more(metre: Zvoog_Metre): boolean;
+    plus(metre: Zvoog_Metre): Zvoog_MetreMathType;
+    minus(metre: Zvoog_Metre): Zvoog_MetreMathType;
+    duration(tempo: number): number;
+    calculate(duration: number, tempo: number): Zvoog_MetreMathType;
+}
+declare type Zvoog_Slide = {
+    duration: Zvoog_Metre;
+    delta: number;
+};
+declare type Zvoog_Note = {
+    pitch: number;
+    slides: Zvoog_Slide[];
+};
+declare type Zvoog_PluginBase = {
+    setup: (audioContext: AudioContext) => boolean;
+};
+declare type Zvoog_PluginFilter = Zvoog_PluginBase | {
+    input: string;
+};
+declare type Zvoog_PluginPerformer = Zvoog_PluginBase | {
+    output: string;
+    schedule: (chord: Zvoog_Chord, when: number) => boolean;
+};
+declare type Zvoog_PluginSampler = Zvoog_PluginBase | {
+    output: string;
+};
+declare type Zvoog_FilterTarget = {
+    id: string;
+    kind: string;
+    data: string;
+    output: null | Zvoog_FilterTarget;
+    automation: Zvoog_AutomationTrack;
+};
+declare type Zvoog_AudioSequencer = {
+    id: string;
+    data: string;
+    kind: string;
+    output: null | Zvoog_FilterTarget;
+};
+declare type Zvoog_AudioSampler = {
+    id: string;
+    data: string;
+};
+declare type Zvoog_Chord = {
+    skip: Zvoog_Metre;
+    notes: Zvoog_Note[];
+};
+declare type Zvoog_TrackMeasure = {
+    chords: Zvoog_Chord[];
+};
+declare type Zvoog_PercussionMeasure = {
+    skips: Zvoog_Metre[];
+};
+declare type Zvoog_SongMeasure = {
+    tempo: number;
+    metre: Zvoog_Metre;
+};
+declare type Zvoog_AutomationTrack = {
+    title: string;
+    measures: Zvoog_FilterMeasure[];
+};
+declare type Zvoog_FilterMeasure = {
+    changes: Zvoog_FilterStateChange[];
+};
+declare type Zvoog_FilterStateChange = {
+    skip: Zvoog_Metre;
+    stateBlob: string;
+};
+declare type Zvoog_PercussionTrack = {
+    title: string;
+    measures: Zvoog_PercussionMeasure[];
+    sampler: Zvoog_AudioSampler;
+};
+declare type Zvoog_MusicTrack = {
+    title: string;
+    measures: Zvoog_TrackMeasure[];
+    performer: Zvoog_AudioSequencer;
+};
+declare type Zvoog_CommentText = {
+    skip: Zvoog_Metre;
+    text: string;
+};
+declare type Zvoog_CommentMeasure = {
+    texts: Zvoog_CommentText[];
+};
+declare type Zvoog_Selection = {
+    startMeasure: number;
+    endMeasure: number;
+};
+declare type Zvoog_Project = {
+    title: string;
+    timeline: Zvoog_SongMeasure[];
+    tracks: Zvoog_MusicTrack[];
+    percussions: Zvoog_PercussionTrack[];
+    comments: Zvoog_CommentMeasure[];
+    filters: Zvoog_FilterTarget[];
+    selection?: Zvoog_Selection;
+};
 declare type MZXBX_CachedWave = {
     path: string;
     buffer: AudioBuffer | null;
     canceled?: boolean;
     line100?: number[];
-};
-declare type MZXBX_Metre = {
-    count: number;
-    part: number;
-};
-interface MZXBX_MetreMathType {
-    count: number;
-    part: number;
-    set(from: MZXBX_Metre): MZXBX_MetreMathType;
-    metre(): MZXBX_Metre;
-    simplyfy(): MZXBX_MetreMathType;
-    strip(toPart: number): MZXBX_MetreMathType;
-    equals(metre: MZXBX_Metre): boolean;
-    less(metre: MZXBX_Metre): boolean;
-    more(metre: MZXBX_Metre): boolean;
-    plus(metre: MZXBX_Metre): MZXBX_MetreMathType;
-    minus(metre: MZXBX_Metre): MZXBX_MetreMathType;
-    duration(tempo: number): number;
-    calculate(duration: number, tempo: number): MZXBX_MetreMathType;
-}
-declare type MZXBX_HalfTone = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
-declare type MZXBX_Octave = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-declare type MZXBX_Step = 1 | 2 | 3 | 4 | 5 | 6 | 7;
-declare type MZXBX_StepShift = -2 | -1 | 0 | 1 | 2;
-declare type MZXBX_StepSkip = 1 | 2;
-declare type MZXBX_Scale = {
-    basePitch: MZXBX_HalfTone;
-    step2: MZXBX_StepSkip;
-    step3: MZXBX_StepSkip;
-    step4: MZXBX_StepSkip;
-    step5: MZXBX_StepSkip;
-    step6: MZXBX_StepSkip;
-    step7: MZXBX_StepSkip;
-};
-declare type MZXBX_Slide = {
-    duration: MZXBX_Metre;
-    delta: number;
-};
-declare type MZXBX_Note = {
-    step?: MZXBX_Step;
-    shift?: MZXBX_StepShift;
-    octave?: MZXBX_Octave;
-    pitch: number;
-    slides: MZXBX_Slide[];
-};
-declare type MZXBX_PluginBase = {
-    setup: (audioContext: AudioContext) => boolean;
-};
-declare type MZXBX_PluginFilter = MZXBX_PluginBase | {
-    input: string;
-};
-declare type MZXBX_PluginPerformer = MZXBX_PluginBase | {
-    output: string;
-    schedule: (chord: MZXBX_Chord, when: number) => boolean;
-};
-declare type MZXBX_PluginSampler = MZXBX_PluginBase | {
-    output: string;
-};
-declare type MZXBX_AudioFilter = {
-    id: string;
-    data: string;
-};
-declare type MZXBX_AudioPerformer = {
-    id: string;
-    data: string;
-};
-declare type MZXBX_AudioSampler = {
-    id: string;
-    data: string;
-};
-declare type MZXBX_Chord = {
-    skip: MZXBX_Metre;
-    notes: MZXBX_Note[];
-};
-declare type MZXBX_TrackMeasure = {
-    chords: MZXBX_Chord[];
-};
-declare type MZXBX_PercussionMeasure = {
-    skips: MZXBX_Metre[];
-};
-declare type MZXBX_SongMeasure = {
-    tempo: number;
-    metre: MZXBX_Metre;
-    scale?: MZXBX_Scale;
-};
-declare type MZXBX_PercussionTrack = {
-    title: string;
-    measures: MZXBX_PercussionMeasure[];
-    filters: MZXBX_AudioFilter[];
-    sampler: MZXBX_AudioSampler;
-};
-declare type MZXBX_MusicTrack = {
-    title: string;
-    measures: MZXBX_TrackMeasure[];
-    filters: MZXBX_AudioFilter[];
-    performer: MZXBX_AudioPerformer;
-};
-declare type MZXBX_CommentText = {
-    skip: MZXBX_Metre;
-    text: string;
-};
-declare type MZXBX_CommentMeasure = {
-    texts: MZXBX_CommentText[];
-};
-declare type MZXBX_Selection = {
-    startMeasure: number;
-    endMeasure: number;
-};
-declare type MZXBX_Project = {
-    title: string;
-    timeline: MZXBX_SongMeasure[];
-    tracks: MZXBX_MusicTrack[];
-    percussions: MZXBX_PercussionTrack[];
-    comments: MZXBX_CommentMeasure[];
-    filters: MZXBX_AudioFilter[];
-    selection?: MZXBX_Selection;
 };
 declare type MZXBX_FilterHolder = {
     plugin: MZXBX_AudioFilterPlugin | null;
@@ -702,9 +698,6 @@ declare type MZXBX_Player = {
     allPerformers(): MZXBX_PerformerHolder[];
     position: number;
 };
-declare type MZXBX_import = {
-    import: () => MZXBX_Schedule | null;
-};
 declare type MZXBX_PluginRegistrationInformation = {
     id: string;
     label: string;
@@ -715,5 +708,5 @@ declare type MZXBX_PluginRegistrationInformation = {
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
 declare function MZXBX_appendScriptURL(url: string): boolean;
-declare function MZMM(): MZXBX_MetreMathType;
+declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];

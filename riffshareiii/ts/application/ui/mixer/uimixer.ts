@@ -9,7 +9,7 @@ class MixerUI {
 	fillerAnchor: TileAnchor;
 	//samplerUI: SamplerRows;
 
-	reFillMixerUI(data: MZXBX_Project) {
+	reFillMixerUI(data: Zvoog_Project) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		let ww = mixm.mixerWidth();
 		let hh = mixm.mixerHeight();
@@ -79,7 +79,7 @@ class MixerUI {
 		return [this.gridLayers, this.trackLayers, this.firstLayers];
 	}
 
-	reFillTracksRatio(data: MZXBX_Project) {
+	reFillTracksRatio(data: Zvoog_Project) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		let mxNotes = 0;
 		let mxDrums = 0;
@@ -121,7 +121,7 @@ class MixerUI {
 
 			}
 			let css = 'mixFiller' + (1 + Math.round(7 * notecount / mxNotes));
-			let barwidth = MZMM().set(data.timeline[bb].metre).duration(data.timeline[bb].tempo) * mixm.widthDurationRatio;
+			let barwidth = MMUtil().set(data.timeline[bb].metre).duration(data.timeline[bb].tempo) * mixm.widthDurationRatio;
 			let fillRectangle: TileRectangle = {
 				x: mixm.LeftPad + barX
 				, y: mixm.gridTop()

@@ -15,7 +15,7 @@ class MixerBar {
 		, gridZoomBarAnchor: TileAnchor
 		, tracksZoomBarAnchor: TileAnchor
 		, firstZoomBarAnchor: TileAnchor
-		, data: MZXBX_Project
+		, data: Zvoog_Project
 	) {
 		//console.log('MixerBar',zoomLevel,left,ww,data.theme.octaveCount);
 		//this.zoomLevel = zoomLevel;
@@ -88,9 +88,9 @@ class MixerBar {
 
 		if (zoomLevel < 7) {
 			for (let pp = 0; pp < data.percussions.length; pp++) {
-				let drum: MZXBX_PercussionTrack = data.percussions[pp];
+				let drum: Zvoog_PercussionTrack = data.percussions[pp];
 				if (drum) {
-					let measure: MZXBX_PercussionMeasure = drum.measures[barIdx];
+					let measure: Zvoog_PercussionMeasure = drum.measures[barIdx];
 					if (measure) {
 						new SamplerBar(data, barIdx, pp, zoomLevel, firstZoomBarAnchor, left);
 					}
@@ -100,7 +100,7 @@ class MixerBar {
 	}
 	addOctaveGridSteps(
 		barIdx: number
-		, data: MZXBX_Project
+		, data: Zvoog_Project
 		, barLeft: number
 		, width: number
 		//, top: number, height: number
@@ -111,7 +111,7 @@ class MixerBar {
 		let curBar = data.timeline[barIdx];
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		let lineCount = 0;
-		let skip: MZXBX_MetreMathType = MZMM().set({ count: 0, part: 1 });
+		let skip: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 1 });
 		//let barLeft = mixm.LeftPad;
 		let top = mixm.gridTop();
 		let height = mixm.gridHeight();

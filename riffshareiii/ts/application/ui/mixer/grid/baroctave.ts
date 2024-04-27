@@ -5,7 +5,7 @@ class BarOctave {
 		, barOctaveTrackAnchor: TileAnchor
 		, barOctaveFirstAnchor: TileAnchor
 		, zoomLevel: number
-		, data: MZXBX_Project
+		, data: Zvoog_Project
 	) {
 		new OctaveContent(barIdx, octaveIdx, left, top, width, height, data, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel);
 		//if (zoomLevel < 6) {

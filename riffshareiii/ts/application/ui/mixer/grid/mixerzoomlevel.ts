@@ -10,7 +10,7 @@ class MixerZoomLevel {
 		this.zoomTracksAnchor = anchorTracks;
 		this.zoomFirstAnchor = anchorFirst;
 	}
-	reCreateBars(data: MZXBX_Project) {
+	reCreateBars(data:Zvoog_Project) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		this.zoomGridAnchor.content = [];//this.projectTitle,this.trackTitle];
 		this.zoomTracksAnchor.content = [];
@@ -20,7 +20,7 @@ class MixerZoomLevel {
 		let width = 0;
 		for (let ii = 0; ii < data.timeline.length; ii++) {
 			let timebar = data.timeline[ii];
-			width = MZMM().set(timebar.metre).duration(timebar.tempo) * mixm.widthDurationRatio;
+			width = MMUtil().set(timebar.metre).duration(timebar.tempo) * mixm.widthDurationRatio;
 
 			let barGridAnchor: TileAnchor = {
 				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
@@ -68,7 +68,7 @@ class MixerZoomLevel {
 		}
 		this.addLines(this.zoomGridAnchor, data);//zoomLevel, left, top, width, height, data, barIdx, octaveIdx);
 	}
-	addLines(barOctaveAnchor: TileAnchor, data: MZXBX_Project) {
+	addLines(barOctaveAnchor: TileAnchor, data: Zvoog_Project) {
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		if (this.zoomLevelIndex < 4) {
 			for (let oo = 0; oo < mixm.octaveCount; oo++) {

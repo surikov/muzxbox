@@ -1,5 +1,5 @@
 class MixerDataMath {
-	data: MZXBX_Project;
+	data: Zvoog_Project;
 	projTitleHeight: number = 33;
 	LeftPad: number = 3;
 	rightPad: number = 10;
@@ -10,7 +10,7 @@ class MixerDataMath {
 	samplerBottomPad = 1;
 	titleBottomPad = 1;
 
-	constructor(data: MZXBX_Project) {
+	constructor(data: Zvoog_Project) {
 		this.data = data;
 	}
 	mixerWidth(): number {
@@ -20,7 +20,7 @@ class MixerDataMath {
 		return this.projTitleHeight;
 	}
 	timelineWidth(): number {
-		let mm: MZXBX_MetreMathType = MZMM();
+		let mm: Zvoog_MetreMathType = MMUtil();
 		let ww = 0;
 		for (let ii = 0; ii < this.data.timeline.length; ii++) {
 			ww = ww + mm.set(this.data.timeline[ii].metre).duration(this.data.timeline[ii].tempo) * this.widthDurationRatio;

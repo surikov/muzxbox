@@ -41,7 +41,7 @@ class LeftPanel {
 
 		}
 	}*/
-	reFillLeftPanel(data: MZXBX_Project) {
+	reFillLeftPanel(data: Zvoog_Project) {
 		//console.log('reFillLeftPanel');
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		for (let zz = 0; zz < this.leftZoomAnchors.length; zz++) {

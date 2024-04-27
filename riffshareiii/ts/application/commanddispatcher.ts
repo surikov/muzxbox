@@ -4,14 +4,14 @@ class CommandDispatcher {
 	renderer: UIRenderer;
 	audioContext: AudioContext;
 	tapSizeRatio: number = 1;
-	workData: MZXBX_Project;
+	workData: Zvoog_Project;
 	listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any) = null;
 	initAudioFromUI() {
 		console.log('initAudioFromUI');
 		var AudioContext = window.AudioContext;// || window.webkitAudioContext;
 		this.audioContext = new AudioContext();
 	}
-	registerWorkProject(data: MZXBX_Project) {
+	registerWorkProject(data: Zvoog_Project) {
 		this.workData = data;
 	}
 	registerUI(renderer: UIRenderer) {

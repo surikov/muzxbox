@@ -567,7 +567,7 @@ class TimeSelectBar {
     updateTimeSelectionBar(data) {
         if (data.selection) {
             let mixm = new MixerDataMath(data);
-            let mm = MZMM();
+            let mm = MMUtil();
             let barLeft = mixm.LeftPad;
             let startSel = 1;
             let widthSel = 0;
@@ -653,7 +653,7 @@ class TimeSelectBar {
                 id: 'time' + (zz + Math.random())
             };
             this.zoomAnchors.push(selectLevelAnchor);
-            let mm = MZMM();
+            let mm = MMUtil();
             let barLeft = mixm.LeftPad;
             let barTime = 0;
             for (let kk = 0; kk < data.timeline.length; kk++) {
@@ -675,7 +675,7 @@ class TimeSelectBar {
                 if (zoomInfo.gridLines.length > 0) {
                     let mixm = new MixerDataMath(data);
                     let lineCount = 0;
-                    let skip = MZMM().set({ count: 0, part: 1 });
+                    let skip = MMUtil().set({ count: 0, part: 1 });
                     while (true) {
                         let line = zoomInfo.gridLines[lineCount];
                         skip = skip.plus(line.duration).simplyfy();
@@ -1370,7 +1370,7 @@ class SamplerBar {
         let tempo = data.timeline[barIdx].tempo;
         for (let ss = 0; ss < measure.skips.length; ss++) {
             let skip = measure.skips[ss];
-            let xx = left + MZMM().set(skip).duration(tempo) * mixm.widthDurationRatio;
+            let xx = left + MMUtil().set(skip).duration(tempo) * mixm.widthDurationRatio;
             let ply = {
                 dots: [xx, yy + 0.025,
                     xx, yy + 0.975,
@@ -1422,11 +1422,11 @@ class OctaveContent {
                 let from = octaveIdx * 12;
                 let to = (octaveIdx + 1) * 12;
                 if (note.pitch >= from && note.pitch < to) {
-                    let x1 = left + MZMM().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
+                    let x1 = left + MMUtil().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
                     let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
                     let slidearr = note.slides;
                     for (let ss = 0; ss < slidearr.length; ss++) {
-                        let x2 = x1 + MZMM().set(slidearr[ss].duration).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
+                        let x2 = x1 + MMUtil().set(slidearr[ss].duration).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
                         let y2 = y1 + slidearr[ss].delta * mixm.notePathHeight;
                         let r_x1 = x1 + mixm.notePathHeight / 2;
                         if (ss > 0) {
@@ -1530,7 +1530,7 @@ class MixerBar {
         let curBar = data.timeline[barIdx];
         let mixm = new MixerDataMath(data);
         let lineCount = 0;
-        let skip = MZMM().set({ count: 0, part: 1 });
+        let skip = MMUtil().set({ count: 0, part: 1 });
         let top = mixm.gridTop();
         let height = mixm.gridHeight();
         let barRightBorder = {
@@ -1687,7 +1687,7 @@ class MixerUI {
                 }
             }
             let css = 'mixFiller' + (1 + Math.round(7 * notecount / mxNotes));
-            let barwidth = MZMM().set(data.timeline[bb].metre).duration(data.timeline[bb].tempo) * mixm.widthDurationRatio;
+            let barwidth = MMUtil().set(data.timeline[bb].metre).duration(data.timeline[bb].tempo) * mixm.widthDurationRatio;
             let fillRectangle = {
                 x: mixm.LeftPad + barX,
                 y: mixm.gridTop(),
@@ -1735,7 +1735,7 @@ class MixerZoomLevel {
         let width = 0;
         for (let ii = 0; ii < data.timeline.length; ii++) {
             let timebar = data.timeline[ii];
-            width = MZMM().set(timebar.metre).duration(timebar.tempo) * mixm.widthDurationRatio;
+            width = MMUtil().set(timebar.metre).duration(timebar.tempo) * mixm.widthDurationRatio;
             let barGridAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
                 xx: left, yy: 0, ww: width, hh: mixm.mixerHeight(), content: [], id: 'barGrid' + (ii + Math.random())
@@ -1976,23 +1976,29 @@ let mzxbxProjectForTesting2 = {
                 }, { chords: [
                         { skip: { count: 0, part: 2 }, notes: [{ pitch: 31, slides: [] }] }
                     ] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
-            ], filters: [], performer: { id: '', data: '' }
+            ],
+            performer: { id: '', data: '', kind: '', output: null }
         },
         {
             title: "Second track", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
-            ], filters: [], performer: { id: '', data: '' }
+            ],
+            performer: { id: '', data: '', kind: '', output: null }
         },
         {
             title: "Third track", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
-            ], filters: [], performer: { id: '', data: '' }
+            ],
+            performer: { id: '', data: '', kind: '', output: null }
         }
     ],
     percussions: [
-        { title: "Snare", measures: [], filters: [], sampler: { id: '', data: '' } },
-        { title: "Snare2", measures: [], filters: [], sampler: { id: '', data: '' } },
-        { title: "Snare3", measures: [], filters: [], sampler: { id: '', data: '' } }
+        { title: "Snare", measures: [],
+            sampler: { id: '', data: '' } },
+        { title: "Snare2", measures: [],
+            sampler: { id: '', data: '' } },
+        { title: "Snare3", measures: [],
+            sampler: { id: '', data: '' } }
     ],
     comments: [{ texts: [] }, { texts: [] }, { texts: [] }, { texts: [] }],
     filters: []
@@ -2086,7 +2092,7 @@ class MixerDataMath {
         return this.projTitleHeight;
     }
     timelineWidth() {
-        let mm = MZMM();
+        let mm = MMUtil();
         let ww = 0;
         for (let ii = 0; ii < this.data.timeline.length; ii++) {
             ww = ww + mm.set(this.data.timeline[ii].metre).duration(this.data.timeline[ii].tempo) * this.widthDurationRatio;

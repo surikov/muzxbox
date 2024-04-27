@@ -1,7 +1,7 @@
-class MZXBX_MetreMathUtil implements MZXBX_MetreMathType {
+class MZXBX_MetreMathUtil implements Zvoog_MetreMathType {
     count: number;
     part: number;
-    set(from: MZXBX_Metre): MZXBX_MetreMathUtil {
+    set(from: Zvoog_Metre): MZXBX_MetreMathUtil {
         this.count = from.count;
         this.part = from.part;
         return this;
@@ -13,7 +13,7 @@ class MZXBX_MetreMathUtil implements MZXBX_MetreMathType {
         return this.simplyfy();
         //return this;
     }
-    metre(): MZXBX_Metre {
+    metre(): Zvoog_Metre {
         return { count: this.count, part: this.part };
     }
     simplyfy(): MZXBX_MetreMathUtil {
@@ -39,7 +39,7 @@ class MZXBX_MetreMathUtil implements MZXBX_MetreMathType {
         let r=new MZXBX_MetreMathUtil().set({ count: cc, part: pp }).simplyfy();
         return r;
     }
-    equals(metre: MZXBX_Metre): boolean {
+    equals(metre: Zvoog_Metre): boolean {
         let countMe = this.count * metre.part;
         let countTo = metre.count * this.part;
         if (countMe == countTo) {
@@ -48,7 +48,7 @@ class MZXBX_MetreMathUtil implements MZXBX_MetreMathType {
             return false;
         }
     }
-    less(metre: MZXBX_Metre): boolean {
+    less(metre: Zvoog_Metre): boolean {
         let countMe = this.count * metre.part;
         let countTo = metre.count * this.part;
         if (countMe < countTo) {
@@ -57,7 +57,7 @@ class MZXBX_MetreMathUtil implements MZXBX_MetreMathType {
             return false;
         }
     }
-    more(metre: MZXBX_Metre): boolean {
+    more(metre: Zvoog_Metre): boolean {
         let countMe = this.count * metre.part;
         let countTo = metre.count * this.part;
         if (countMe > countTo) {
@@ -66,13 +66,13 @@ class MZXBX_MetreMathUtil implements MZXBX_MetreMathType {
             return false;
         }
     }
-    plus(metre: MZXBX_Metre): MZXBX_MetreMathUtil {
+    plus(metre: Zvoog_Metre): MZXBX_MetreMathUtil {
         let countMe = this.count * metre.part;
         let countTo = metre.count * this.part;
         let rr = { count: countMe + countTo, part: metre.part * this.part };
         return new MZXBX_MetreMathUtil().set(rr).simplyfy();
     }
-    minus(metre: MZXBX_Metre): MZXBX_MetreMathUtil {
+    minus(metre: Zvoog_Metre): MZXBX_MetreMathUtil {
         let countMe = this.count * metre.part;
         let countTo = metre.count * this.part;
         let rr = { count: countMe - countTo, part: metre.part * this.part };
@@ -93,6 +93,6 @@ class MZXBX_MetreMathUtil implements MZXBX_MetreMathType {
     }
 
 }
-function MZMM(): MZXBX_MetreMathType {
+function MMUtil(): Zvoog_MetreMathType {
     return new MZXBX_MetreMathUtil().set({count:0,part:1});
 }
