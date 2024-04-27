@@ -1340,7 +1340,10 @@ class LeftPanel {
             }
             if (data.tracks.length > 0) {
                 let trackLabel = {
-                    text: '' + data.tracks[0].title, x: 0, y: mixm.gridTop(), css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
+                    text: '' + data.tracks[0].title,
+                    x: 0,
+                    y: mixm.gridTop() + zoomPrefixLevelsCSS[zz].minZoom * 0.5,
+                    css: 'curTrackTitleLabel' + zoomPrefixLevelsCSS[zz].prefix
                 };
                 this.leftZoomAnchors[zz].content.push(trackLabel);
             }
@@ -1752,7 +1755,12 @@ class MixerZoomLevel {
             this.bars.push(mixBar);
             left = left + width;
         }
-        let titleLabel = { x: 0, y: mixm.gridTop() - zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom * 2, text: data.title, css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix };
+        let titleLabel = {
+            x: 0,
+            y: mixm.heightOfTitle(),
+            text: data.title,
+            css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix
+        };
         this.zoomGridAnchor.content.push(titleLabel);
         if (this.zoomLevelIndex < 4) {
             for (let ss = 1; ss < data.percussions.length; ss++) {
@@ -2060,18 +2068,22 @@ let testEmptyMixerData = {
 };
 class MixerDataMath {
     constructor(data) {
-        this.titleHeight = 33;
+        this.projTitleHeight = 33;
         this.LeftPad = 3;
         this.rightPad = 10;
         this.bottomMixerPad = 11;
         this.notePathHeight = 1;
         this.widthDurationRatio = 27;
         this.octaveCount = 10;
-        this.sequencerBottomPad = 2;
+        this.samplerBottomPad = 1;
+        this.titleBottomPad = 1;
         this.data = data;
     }
     mixerWidth() {
         return this.LeftPad + this.timelineWidth() + this.rightPad;
+    }
+    heightOfTitle() {
+        return this.projTitleHeight;
     }
     timelineWidth() {
         let mm = MZMM();
@@ -2082,20 +2094,23 @@ class MixerDataMath {
         return ww;
     }
     mixerHeight() {
-        return this.titleHeight
+        return this.heightOfTitle()
+            + this.samplerHeight()
+            + this.samplerBottomPad
             + this.gridHeight()
-            + this.sequencerBottomPad
-            + this.data.percussions.length * this.notePathHeight
             + this.bottomMixerPad;
     }
     gridTop() {
-        return this.titleHeight;
+        return this.heightOfTitle() + this.titleBottomPad + this.samplerHeight() + this.samplerBottomPad;
     }
     samplerTop() {
-        return this.gridTop() + this.gridHeight() + this.sequencerBottomPad;
+        return this.heightOfTitle() + this.titleBottomPad;
     }
     gridHeight() {
         return this.notePathHeight * this.octaveCount * 12;
+    }
+    samplerHeight() {
+        return this.data.percussions.length * this.notePathHeight;
     }
 }
 let biChar32 = [];

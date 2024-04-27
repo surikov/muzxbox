@@ -123,6 +123,70 @@
 
 
 
+.curTrackTitleLabel025 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(0.5*0.25*var(--tapSize));
+    text-anchor22: start;
+	pointer-events: none;
+}
+.curTrackTitleLabel05 {
+	fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(0.5*0.5*var(--tapSize));
+	pointer-events: none;
+}
+.curTrackTitleLabel1 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(0.5*var(--tapSize));
+	pointer-events: none;
+}
+.curTrackTitleLabel2 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(0.5*2*var(--tapSize));
+	pointer-events: none;
+}
+.curTrackTitleLabel4 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(0.5*4*var(--tapSize));
+	pointer-events: none;
+}
+.curTrackTitleLabel8 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(0.5*8*var(--tapSize));
+	pointer-events: none;
+}
+.curTrackTitleLabel16 {
+	fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(0.5*16*var(--tapSize));
+	pointer-events: none;
+}
+.curTrackTitleLabel32 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(0.5*32*var(--tapSize));
+	pointer-events: none;
+}
+.curTrackTitleLabel64 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(0.5*64*var(--tapSize));
+	pointer-events: none;
+}
+.curTrackTitleLabel128 {
+    fill: var(--color-lines);
+	fill-opacity: 50%;
+    font-size: calc(0.5*128*var(--tapSize));
+	pointer-events: none;
+}
+
+
+
 
 .samplerRowLabel025 {
     fill: var(--color-lines);

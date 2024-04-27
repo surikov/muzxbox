@@ -1,19 +1,23 @@
 class MixerDataMath {
 	data: MZXBX_Project;
-	titleHeight: number = 33;
+	projTitleHeight: number = 33;
 	LeftPad: number = 3;
 	rightPad: number = 10;
 	bottomMixerPad = 11;
 	notePathHeight = 1;
 	widthDurationRatio = 27;
 	octaveCount = 10;
-	sequencerBottomPad = 2;
+	samplerBottomPad = 1;
+	titleBottomPad = 1;
 
 	constructor(data: MZXBX_Project) {
 		this.data = data;
 	}
 	mixerWidth(): number {
 		return this.LeftPad + this.timelineWidth() + this.rightPad;
+	}
+	heightOfTitle(): number {
+		return this.projTitleHeight;
 	}
 	timelineWidth(): number {
 		let mm: MZXBX_MetreMathType = MZMM();
@@ -24,20 +28,25 @@ class MixerDataMath {
 		return ww;
 	}
 	mixerHeight(): number {
-		return this.titleHeight
+		return this.heightOfTitle()
+			+ this.samplerHeight()
+			+ this.samplerBottomPad
 			+ this.gridHeight()
-			+ this.sequencerBottomPad
-			+ this.data.percussions.length * this.notePathHeight
+			//data.percussions.length * this.notePathHeight
 			+ this.bottomMixerPad;
 	}
 	gridTop(): number {
-		return this.titleHeight;
+		return this.heightOfTitle()+this.titleBottomPad + this.samplerHeight() + this.samplerBottomPad;
 	}
 	samplerTop(): number {
-		return this.gridTop() + this.gridHeight() + this.sequencerBottomPad;
+		//return this.gridTop() + this.gridHeight() + this.sequencerBottomPad;
+		return this.heightOfTitle()+this.titleBottomPad;
 	}
 
 	gridHeight(): number {
 		return this.notePathHeight * this.octaveCount * 12;
+	}
+	samplerHeight(): number {
+		return this.data.percussions.length * this.notePathHeight;
 	}
 }

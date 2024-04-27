@@ -156,62 +156,62 @@
 .titleLabel025 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
-    font-size: calc(1*var(--tapSize));
+    font-size: calc(0.5*var(--tapSize));
     text-anchor22: start;
 	pointer-events: none;
 }
 .titleLabel05 {
 	fill: var(--color-lines);
 	fill-opacity: 50%;
-    font-size: calc(2*var(--tapSize));
+    font-size: calc(1*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel1 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
-    font-size: calc(4*var(--tapSize));
+    font-size: calc(2*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel2 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
-    font-size: calc(8*var(--tapSize));
+    font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel4 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
-    font-size: calc(16*var(--tapSize));
+    font-size: calc(8*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel8 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
-    font-size: calc(32*var(--tapSize));
+    font-size: calc(16*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel16 {
 	fill: var(--color-lines);
 	fill-opacity:50%;
-    font-size: calc(64*var(--tapSize));
+    font-size: calc(32*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel32 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
-    font-size: calc(128*var(--tapSize));
+    font-size: calc(64*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel64 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
-    font-size: calc(256*var(--tapSize));
+    font-size: calc(128*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel128 {
     fill: var(--color-lines);
 	fill-opacity: 50%;
-    font-size: calc(512*var(--tapSize));
+    font-size: calc(256*var(--tapSize));
 	pointer-events: none;
 }
 

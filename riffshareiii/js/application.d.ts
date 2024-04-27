@@ -360,21 +360,24 @@ declare let testEmptyMixerData: {
 };
 declare class MixerDataMath {
     data: MZXBX_Project;
-    titleHeight: number;
+    projTitleHeight: number;
     LeftPad: number;
     rightPad: number;
     bottomMixerPad: number;
     notePathHeight: number;
     widthDurationRatio: number;
     octaveCount: number;
-    sequencerBottomPad: number;
+    samplerBottomPad: number;
+    titleBottomPad: number;
     constructor(data: MZXBX_Project);
     mixerWidth(): number;
+    heightOfTitle(): number;
     timelineWidth(): number;
     mixerHeight(): number;
     gridTop(): number;
     samplerTop(): number;
     gridHeight(): number;
+    samplerHeight(): number;
 }
 declare let biChar32: String[];
 declare type PackedChannel = {

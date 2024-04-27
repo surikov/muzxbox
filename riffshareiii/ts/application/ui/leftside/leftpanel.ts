@@ -96,7 +96,10 @@ class LeftPanel {
 			}
 			if (data.tracks.length > 0) {
 				let trackLabel: TileText = {
-					text: '' + data.tracks[0].title, x: 0, y: mixm.gridTop(), css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
+					text: '' + data.tracks[0].title
+					, x: 0
+					, y: mixm.gridTop()+zoomPrefixLevelsCSS[zz].minZoom*0.5
+					, css: 'curTrackTitleLabel' + zoomPrefixLevelsCSS[zz].prefix
 				};
 				this.leftZoomAnchors[zz].content.push(trackLabel);
 			}

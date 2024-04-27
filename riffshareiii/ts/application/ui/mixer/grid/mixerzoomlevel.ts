@@ -46,7 +46,13 @@ class MixerZoomLevel {
 			this.bars.push(mixBar);
 			left = left + width;
 		}
-		let titleLabel: TileText = { x: 0, y: mixm.gridTop() - zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom * 2, text: data.title, css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix };
+		let titleLabel: TileText = {
+			x: 0
+			//, y: mixm.gridTop() - zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom * 2
+			, y: mixm.heightOfTitle()
+			, text: data.title
+			, css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix
+		};
 		this.zoomGridAnchor.content.push(titleLabel);
 
 		if (this.zoomLevelIndex < 4) {
