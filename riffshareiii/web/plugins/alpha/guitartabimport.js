@@ -86,7 +86,7 @@ function stringFret2pitch(stringNum, fretNum, tuning) {
     return -1;
 }
 function beatDuration(beat) {
-    let duration = MZMM().set({ count: 1, part: beat.duration });
+    let duration = MMUtil().set({ count: 1, part: beat.duration });
     if (beat.dots > 0) {
         duration = duration.plus({ count: duration.count, part: 2 * beat.duration });
     }
@@ -102,7 +102,7 @@ function beatDuration(beat) {
     return duration;
 }
 function takeChord(start, measure) {
-    let startBeat = MZMM().set(start);
+    let startBeat = MMUtil().set(start);
     for (let cc = 0; cc < measure.chords.length; cc++) {
         if (startBeat.equals(measure.chords[cc].skip)) {
             return measure.chords[cc];
@@ -116,8 +116,7 @@ function addScoreInsTrack(project, scoreTrack) {
     let mzxbxTrack = {
         title: scoreTrack.trackName,
         measures: [],
-        filters: [],
-        performer: { id: '', data: '' }
+        performer: { id: '', data: '', kind: '', outputId: '' }
     };
     project.tracks.push(mzxbxTrack);
     for (let mm = 0; mm < project.timeline.length; mm++) {
@@ -129,7 +128,7 @@ function addScoreInsTrack(project, scoreTrack) {
             let bar = staff.bars[mm];
             for (let vv = 0; vv < bar.voices.length; vv++) {
                 let voice = bar.voices[vv];
-                let start = MZMM();
+                let start = MMUtil();
                 for (let bb = 0; bb < voice.beats.length; bb++) {
                     let beat = voice.beats[bb];
                     let currentDuration = beatDuration(beat);
@@ -159,8 +158,7 @@ function takeDrumTrack(title, trackDrums, drumNum) {
         let track = {
             title: title,
             measures: [],
-            filters: [],
-            sampler: { id: '', data: '' }
+            sampler: { id: '', data: '', kind: '', outputId: '' }
         };
         trackDrums[drumNum] = track;
     }
@@ -186,7 +184,7 @@ function addScoreDrumsTracks(project, scoreTrack) {
             let bar = staff.bars[mm];
             for (let vv = 0; vv < bar.voices.length; vv++) {
                 let voice = bar.voices[vv];
-                let start = MZMM();
+                let start = MMUtil();
                 for (let bb = 0; bb < voice.beats.length; bb++) {
                     let beat = voice.beats[bb];
                     let currentDuration = beatDuration(beat);
@@ -436,6 +434,9 @@ var MusicFontSymbol;
     MusicFontSymbol[MusicFontSymbol["OctaveBaselineB"] = 60563] = "OctaveBaselineB";
 })(MusicFontSymbol || (MusicFontSymbol = {}));
 class Gp3To5Importer extends ScoreImporter {
+    get name() {
+        return 'Guitar Pro 3-5';
+    }
     constructor() {
         super();
         this._versionNumber = 0;
@@ -446,9 +447,6 @@ class Gp3To5Importer extends ScoreImporter {
         this._trackCount = 0;
         this._playbackInfos = [];
         this._beatTextChunksByTrack = new Map();
-    }
-    get name() {
-        return 'Guitar Pro 3-5';
     }
     readScore() {
         this.readVersion();
@@ -3439,11 +3437,6 @@ var TripletFeel;
     TripletFeel[TripletFeel["Scottish8th"] = 6] = "Scottish8th";
 })(TripletFeel || (TripletFeel = {}));
 class Tuning {
-    constructor(name = '', tuning = null, isStandard = false) {
-        this.isStandard = isStandard;
-        this.name = name;
-        this.tunings = tuning !== null && tuning !== void 0 ? tuning : [];
-    }
     static getTextForTuning(tuning, includeOctave) {
         let parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];
@@ -3544,6 +3537,11 @@ class Tuning {
             }
         }
         return null;
+    }
+    constructor(name = '', tuning = null, isStandard = false) {
+        this.isStandard = isStandard;
+        this.name = name;
+        this.tunings = tuning !== null && tuning !== void 0 ? tuning : [];
     }
     finish() {
         const knownTuning = Tuning.findTuning(this.tunings);
@@ -7875,6 +7873,21 @@ class TrackViewGroup {
     }
 }
 class PartConfiguration {
+    apply(score) {
+        if (this.scoreViews.length > 0) {
+            let trackIndex = 0;
+            for (let trackConfig of this.scoreViews[0].trackViewGroups) {
+                if (trackIndex < score.tracks.length) {
+                    const track = score.tracks[trackIndex];
+                    for (const staff of track.staves) {
+                        staff.showTablature = trackConfig.showTablature;
+                        staff.showStandardNotation = trackConfig.showStandardNotation;
+                    }
+                }
+                trackIndex++;
+            }
+        }
+    }
     constructor(partConfigurationData) {
         this.scoreViews = [];
         let readable = ByteBuffer.fromBuffer(partConfigurationData);
@@ -7894,21 +7907,6 @@ class PartConfiguration {
                 trackConfiguration.showTablature = (flags & 0x02) !== 0;
                 trackConfiguration.showSlash = (flags & 0x04) !== 0;
                 scoreView.trackViewGroups.push(trackConfiguration);
-            }
-        }
-    }
-    apply(score) {
-        if (this.scoreViews.length > 0) {
-            let trackIndex = 0;
-            for (let trackConfig of this.scoreViews[0].trackViewGroups) {
-                if (trackIndex < score.tracks.length) {
-                    const track = score.tracks[trackIndex];
-                    for (const staff of track.staves) {
-                        staff.showTablature = trackConfig.showTablature;
-                        staff.showStandardNotation = trackConfig.showStandardNotation;
-                    }
-                }
-                trackIndex++;
             }
         }
     }
@@ -7949,17 +7947,17 @@ class PartConfiguration {
     }
 }
 class XmlWriter {
+    static write(xml, indention, xmlHeader) {
+        const writer = new XmlWriter(indention, xmlHeader);
+        writer.writeNode(xml);
+        return writer.toString();
+    }
     constructor(indention, xmlHeader) {
         this._result = [];
         this._indention = indention;
         this._xmlHeader = xmlHeader;
         this._currentIndention = '';
         this._isStartOfLine = true;
-    }
-    static write(xml, indention, xmlHeader) {
-        const writer = new XmlWriter(indention, xmlHeader);
-        writer.writeNode(xml);
-        return writer.toString();
     }
     writeNode(xml) {
         switch (xml.nodeType) {

@@ -1318,7 +1318,7 @@ class MidiParser {
         return nextChange;
     }
     calcMeasureDuration(midiSongData, meter, bpm, part, startMs) {
-        let metreMath = MZMM();
+        let metreMath = MMUtil();
         let wholeDurationMs = 1000 * metreMath.set(meter).duration(bpm);
         let partDurationMs = part * wholeDurationMs;
         let nextChange = this.findNextChange(midiSongData, startMs);
@@ -1512,10 +1512,9 @@ class MidiParser {
         let projectTrack = {
             title: midiTrack.title + ' [' + midiTrack.program + '] ' + insNames[midiTrack.program],
             measures: [],
-            filters: [],
-            performer: { id: '', data: '' }
+            performer: { id: '', data: '', kind: '', outputId: '' }
         };
-        let mm = MZMM();
+        let mm = MMUtil();
         for (let tt = 0; tt < timeline.length; tt++) {
             let projectMeasure = { chords: [] };
             projectTrack.measures.push(projectMeasure);
@@ -1584,11 +1583,10 @@ class MidiParser {
         let projectDrums = {
             title: midiTrack.title + ' [' + drum + '] ' + drumNames[drum],
             measures: [],
-            filters: [],
-            sampler: { id: '', data: '' }
+            sampler: { id: '', data: '', kind: '', outputId: '' }
         };
         let currentTimeMs = 0;
-        let mm = MZMM();
+        let mm = MMUtil();
         for (let tt = 0; tt < timeline.length; tt++) {
             let projectMeasure = { skips: [] };
             projectDrums.measures.push(projectMeasure);
@@ -1614,7 +1612,7 @@ class MidiParser {
 }
 function findMeasureSkipByTime(time, measures) {
     let curTime = 0;
-    let mm = MZMM();
+    let mm = MMUtil();
     for (let ii = 0; ii < measures.length; ii++) {
         let cumea = measures[ii];
         let measureDurationS = mm.set(cumea.metre).duration(cumea.tempo);

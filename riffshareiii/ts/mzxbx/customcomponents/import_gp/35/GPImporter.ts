@@ -29,9 +29,9 @@ class GPImporter {
 			//console.log("score", this.score);
 		}
 	}
-	convertProject(title: string, comment: string): MZXBX_Project {
+	convertProject(title: string, comment: string): Zvoog_Project {
 		//console.log('GPImporter.convertProject');
-		let project: MZXBX_Project = score2schedule(title, comment, this.score);
+		let project: Zvoog_Project = score2schedule(title, comment, this.score);
 		return project;
 	}
 }
@@ -41,9 +41,9 @@ function newGPparser(arrayBuffer: ArrayBuffer, ext: string) {
 	pp.load(arrayBuffer, ext);
 	return pp;
 }
-function score2schedule(title: string, comment: string, score: Score): MZXBX_Project {
+function score2schedule(title: string, comment: string, score: Score): Zvoog_Project {
 	console.log('score2schedule', score);
-	let project: MZXBX_Project = {
+	let project: Zvoog_Project = {
 		title: title + ' ' + comment
 		, timeline: []
 		, tracks: []
@@ -60,7 +60,7 @@ function score2schedule(title: string, comment: string, score: Score): MZXBX_Pro
 				tempo = maBar.tempoAutomation.value;
 			}
 		}
-		let measure: MZXBX_SongMeasure = {
+		let measure: Zvoog_SongMeasure = {
 			tempo: tempo
 			, metre: {
 				count: maBar.timeSignatureNumerator
@@ -104,8 +104,8 @@ function stringFret2pitch(stringNum: number, fretNum: number, tuning: number[]):
 	*/
 	return -1;
 }
-function beatDuration(beat: Beat): MZXBX_MetreMathType {
-	let duration: MZXBX_MetreMathType = MZMM().set({ count: 1, part: beat.duration });
+function beatDuration(beat: Beat): Zvoog_MetreMathType {
+	let duration: Zvoog_MetreMathType = MMUtil().set({ count: 1, part: beat.duration });
 	if (beat.dots > 0) {
 		duration = duration.plus({ count: duration.count, part: 2 * beat.duration });
 	}
@@ -120,27 +120,27 @@ function beatDuration(beat: Beat): MZXBX_MetreMathType {
 	}
 	return duration;
 }
-function takeChord(start: MZXBX_Metre, measure: MZXBX_TrackMeasure): MZXBX_Chord {
-	let startBeat = MZMM().set(start);
+function takeChord(start: Zvoog_Metre, measure: Zvoog_TrackMeasure): Zvoog_Chord {
+	let startBeat = MMUtil().set(start);
 	for (let cc = 0; cc < measure.chords.length; cc++) {
 		if (startBeat.equals(measure.chords[cc].skip)) {
 			return measure.chords[cc];
 		}
 	}
-	let newChord: MZXBX_Chord = { notes: [], skip: { count: start.count, part: start.part } };
+	let newChord: Zvoog_Chord = { notes: [], skip: { count: start.count, part: start.part } };
 	measure.chords.push(newChord);
 	return newChord;
 }
-function addScoreInsTrack(project: MZXBX_Project, scoreTrack: Track) {
-	let mzxbxTrack: MZXBX_MusicTrack = {
+function addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track) {
+	let mzxbxTrack: Zvoog_MusicTrack = {
 		title: scoreTrack.trackName
 		, measures: []
-		, filters: []
-		, performer: { id: '', data: '' }
+		//, filters: []
+		, performer: { id: '', data: '',kind:'',outputId:'' }
 	};
 	project.tracks.push(mzxbxTrack);
 	for (let mm = 0; mm < project.timeline.length; mm++) {
-		let mzxbxMeasure: MZXBX_TrackMeasure = { chords: [] };
+		let mzxbxMeasure: Zvoog_TrackMeasure = { chords: [] };
 		mzxbxTrack.measures.push(mzxbxMeasure);
 		for (let ss = 0; ss < scoreTrack.staves.length; ss++) {
 			let staff = scoreTrack.staves[ss];
@@ -148,15 +148,15 @@ function addScoreInsTrack(project: MZXBX_Project, scoreTrack: Track) {
 			let bar = staff.bars[mm];
 			for (let vv = 0; vv < bar.voices.length; vv++) {
 				let voice = bar.voices[vv];
-				let start: MZXBX_MetreMathType = MZMM();
+				let start: Zvoog_MetreMathType = MMUtil();
 				for (let bb = 0; bb < voice.beats.length; bb++) {
 					let beat = voice.beats[bb];
 					let currentDuration = beatDuration(beat);
 					for (let nn = 0; nn < beat.notes.length; nn++) {
 						let note = beat.notes[nn];
 						let pitch = stringFret2pitch(note.string, note.fret, tuning);
-						let chord: MZXBX_Chord = takeChord(start, mzxbxMeasure);
-						let mzxbxNote: MZXBX_Note = {
+						let chord: Zvoog_Chord = takeChord(start, mzxbxMeasure);
+						let mzxbxNote: Zvoog_Note = {
 							pitch: pitch
 							, slides: [{
 								delta: 0
@@ -173,26 +173,26 @@ function addScoreInsTrack(project: MZXBX_Project, scoreTrack: Track) {
 		//let bar = scoreTrack.staves
 	}
 }
-function takeDrumTrack(title: string, trackDrums: MZXBX_PercussionTrack[], drumNum: number): MZXBX_PercussionTrack {
+function takeDrumTrack(title: string, trackDrums: Zvoog_PercussionTrack[], drumNum: number): Zvoog_PercussionTrack {
 	if (trackDrums[drumNum]) {
 		//
 	} else {
-		let track: MZXBX_PercussionTrack = {
+		let track: Zvoog_PercussionTrack = {
 			title: title
 			, measures: []
-			, filters: []
-			, sampler: { id: '', data: '' }
+			//, filters: []
+			, sampler: { id: '', data: '',kind:'',outputId:'' }
 		};
 		trackDrums[drumNum] = track;
 	}
 	trackDrums[drumNum].title = title;
 	return trackDrums[drumNum];
 }
-function takeDrumMeasure(trackDrum: MZXBX_PercussionTrack, barNum: number): MZXBX_PercussionMeasure {
+function takeDrumMeasure(trackDrum: Zvoog_PercussionTrack, barNum: number): Zvoog_PercussionMeasure {
 	if (trackDrum.measures[barNum]) {
 		//
 	} else {
-		let measure: MZXBX_PercussionMeasure = {
+		let measure: Zvoog_PercussionMeasure = {
 			skips: []
 		};
 		trackDrum.measures[barNum] = measure;
@@ -200,10 +200,10 @@ function takeDrumMeasure(trackDrum: MZXBX_PercussionTrack, barNum: number): MZXB
 	return trackDrum.measures[barNum];
 }
 
-function addScoreDrumsTracks(project: MZXBX_Project, scoreTrack: Track) {
-	let trackDrums: MZXBX_PercussionTrack[] = [];
+function addScoreDrumsTracks(project: Zvoog_Project, scoreTrack: Track) {
+	let trackDrums: Zvoog_PercussionTrack[] = [];
 	for (let mm = 0; mm < project.timeline.length; mm++) {
-		//let mzxbxMeasure: MZXBX_TrackMeasure = { chords: [] };
+		//let mzxbxMeasure: Zvoog_TrackMeasure = { chords: [] };
 		//mzxbxTrack.measures.push(mzxbxMeasure);
 		for (let ss = 0; ss < scoreTrack.staves.length; ss++) {
 			let staff = scoreTrack.staves[ss];
@@ -211,7 +211,7 @@ function addScoreDrumsTracks(project: MZXBX_Project, scoreTrack: Track) {
 			let bar = staff.bars[mm];
 			for (let vv = 0; vv < bar.voices.length; vv++) {
 				let voice = bar.voices[vv];
-				let start: MZXBX_MetreMathType = MZMM();
+				let start: Zvoog_MetreMathType = MMUtil();
 				for (let bb = 0; bb < voice.beats.length; bb++) {
 					let beat = voice.beats[bb];
 					let currentDuration = beatDuration(beat);
@@ -222,8 +222,8 @@ function addScoreDrumsTracks(project: MZXBX_Project, scoreTrack: Track) {
 						let measure = takeDrumMeasure(track, mm);
 						measure.skips.push(start);
 						/*let pitch = stringFret2pitch(note.string, note.fret, tuning);
-						let chord: MZXBX_Chord = takeChord(start, mzxbxMeasure);
-						let mzxbxNote: MZXBX_Note = {
+						let chord: Zvoog_Chord = takeChord(start, mzxbxMeasure);
+						let mzxbxNote: Zvoog_Note = {
 							pitch: pitch
 							, slides: [{
 								delta: 0
@@ -255,7 +255,7 @@ function addScoreDrumsTracks(project: MZXBX_Project, scoreTrack: Track) {
 }
 class GP345ImportMusicPlugin {
 	callbackID = '';
-	parsedProject: MZXBX_Project | null = null;
+	parsedProject: Zvoog_Project | null = null;
 	constructor() {
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
 	}
@@ -300,7 +300,7 @@ class GP345ImportMusicPlugin {
 
 				var pp = newGPparser(arrayBuffer, '' + ext);
 				try {
-					let result: MZXBX_Project = pp.convertProject(title, comment);
+					let result: Zvoog_Project = pp.convertProject(title, comment);
 					//me.registerWorkProject(result);
 					//me.resetProject();
 					me.parsedProject = result;

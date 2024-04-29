@@ -1,6 +1,6 @@
 class MIDIIImportMusicPlugin {
 	callbackID = '';
-	parsedProject: MZXBX_Project | null = null;
+	parsedProject: Zvoog_Project | null = null;
 	constructor() {
 		this.init();
 	}
@@ -70,7 +70,7 @@ class MIDIIImportMusicPlugin {
 }
 //http://midi.teragonaudio.com/tech/midispec.htm
 
-type ImportMeasure = MZXBX_SongMeasure & {
+type ImportMeasure = Zvoog_SongMeasure & {
 	startMs: number;
 	durationMs: number;
 };
@@ -1671,8 +1671,8 @@ class MidiParser {
 		}
 		return schedule;//midiSongData;
 	}*/
-	findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): MZXBX_Metre {
-		let metre: MZXBX_Metre = {
+	findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): Zvoog_Metre {
+		let metre: Zvoog_Metre = {
 			count: midiSongData.meter.count
 			, part: midiSongData.meter.division
 		};
@@ -1707,8 +1707,8 @@ class MidiParser {
 		}
 		return nextChange;
 	}
-	calcMeasureDuration(midiSongData: MIDISongData, meter: MZXBX_Metre, bpm: number, part: number, startMs: number): number {
-		let metreMath =  MZMM();
+	calcMeasureDuration(midiSongData: MIDISongData, meter: Zvoog_Metre, bpm: number, part: number, startMs: number): number {
+		let metreMath =  MMUtil();
 		let wholeDurationMs = 1000 * metreMath.set(meter).duration(bpm);
 		let partDurationMs = part * wholeDurationMs;
 		let nextChange = this.findNextChange(midiSongData, startMs);
@@ -1725,7 +1725,7 @@ class MidiParser {
 	}
 	createMeasure(midiSongData: MIDISongData, fromMs: number, barIdx: number): ImportMeasure {
 		let change = this.findLastChange(midiSongData, fromMs);
-		let meter: MZXBX_Metre = this.findLastMeter(midiSongData, fromMs, barIdx);
+		let meter: Zvoog_Metre = this.findLastMeter(midiSongData, fromMs, barIdx);
 		let duration = this.calcMeasureDuration(midiSongData, meter, change.bpm, 1, fromMs);
 		let measure: ImportMeasure = {
 			tempo: change.bpm
@@ -1737,12 +1737,12 @@ class MidiParser {
 		return measure;
 	}
 
-	createTimeLine(midiSongData: MIDISongData): MZXBX_SongMeasure[] {
+	createTimeLine(midiSongData: MIDISongData): Zvoog_SongMeasure[] {
 		let count = 0;
 		let part = 0;
 		let bpm = 0;
 
-		let timeline: MZXBX_SongMeasure[] = [];
+		let timeline: Zvoog_SongMeasure[] = [];
 		let fromMs = 0;
 		while (fromMs < midiSongData.duration) {
 			let measure: ImportMeasure = this.createMeasure(midiSongData, fromMs, timeline.length);
@@ -1760,7 +1760,7 @@ class MidiParser {
 		}
 		return timeline;
 	}
-	convertProject(title: string, comment: string): MZXBX_Project {
+	convertProject(title: string, comment: string): Zvoog_Project {
 		console.log('MidiParser.convertProject', this);
 		let midiSongData: MIDISongData = {
 			parser: '1.12'
@@ -1844,11 +1844,11 @@ class MidiParser {
 			}
 		}
 
-		let newtimeline: MZXBX_SongMeasure[] = this.createTimeLine(midiSongData);
+		let newtimeline: Zvoog_SongMeasure[] = this.createTimeLine(midiSongData);
 
 
 
-		let project: MZXBX_Project = {
+		let project: Zvoog_Project = {
 			title: title + ' ' + comment
 			, timeline: newtimeline
 			, tracks: []
@@ -1886,7 +1886,7 @@ class MidiParser {
 		return project;
 	}
 
-	addLyricsPoints(commentPoint: MZXBX_CommentMeasure, skip: MZXBX_Metre, txt: string) {
+	addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string) {
 
 		txt = txt.replace(/(\r)/g, '~');
 		txt = txt.replace(/\\r/g, '~');
@@ -1927,19 +1927,19 @@ class MidiParser {
 		let rr = 1;//0000;
 		return Math.round(nn * rr);
 	}
-	stripDuration(what: MZXBX_MetreMathType): MZXBX_MetreMathType {
+	stripDuration(what: Zvoog_MetreMathType): Zvoog_MetreMathType {
 		return what;
 	}
-	createProjectTrack(timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_MusicTrack {
-		let projectTrack: MZXBX_MusicTrack = {
+	createProjectTrack(timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack): Zvoog_MusicTrack {
+		let projectTrack: Zvoog_MusicTrack = {
 			title: midiTrack.title + ' [' + midiTrack.program + '] ' + insNames[midiTrack.program]
 			, measures: []
-			, filters: []
-			, performer: { id: '', data: '' }
+			//, filters: []
+			, performer: { id: '', data: '' ,kind:'',outputId:''}
 		};
-		let mm = MZMM();
+		let mm = MMUtil();
 		for (let tt = 0; tt < timeline.length; tt++) {
-			let projectMeasure: MZXBX_TrackMeasure = { chords: [] };
+			let projectMeasure: Zvoog_TrackMeasure = { chords: [] };
 			projectTrack.measures.push(projectMeasure);
 			let nextMeasure = timeline[tt];
 			for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
@@ -1948,7 +1948,7 @@ class MidiParser {
 					this.numratio(midiChord.when) >= (nextMeasure as any).startMs //this.numratio(currentMeasureStart) - 33
 					&& this.numratio(midiChord.when) < (nextMeasure as any).startMs + (nextMeasure as any).durationMs //this.numratio(currentMeasureStart + measureDurationMs) - 33
 				) {
-					let trackChord: MZXBX_Chord | null = null;
+					let trackChord: Zvoog_Chord | null = null;
 					let skip = mm.calculate((midiChord.when - (nextMeasure as any).startMs) / 1000.0, nextMeasure.tempo).strip(32);
 					if (skip.count < 0) {
 						skip.count = 0;
@@ -1970,11 +1970,11 @@ class MidiParser {
 							let currentSlidePitch = midiNote.midiPitch;
 							//let startDuration = mm.calculate((midiNote.points[0].durationms - 66) / 1000.0, nextMeasure.tempo).strip(32);
 							let startDuration = mm.calculate(midiNote.midiDuration / 1000.0, nextMeasure.tempo);
-							let curSlide: MZXBX_Slide = {
+							let curSlide: Zvoog_Slide = {
 								duration: startDuration
 								, delta: 0
 							};
-							let trackNote: MZXBX_Note = { pitch: currentSlidePitch, slides: [curSlide] };
+							let trackNote: Zvoog_Note = { pitch: currentSlidePitch, slides: [curSlide] };
 							if (midiNote.slidePoints.length > 0) {
 								trackNote.slides = [];
 								let bendDuration = 0;
@@ -2014,17 +2014,17 @@ class MidiParser {
 		}
 		return projectTrack;
 	}
-	createProjectDrums(drum: number, timeline: MZXBX_SongMeasure[], midiTrack: MIDISongTrack): MZXBX_PercussionTrack {
-		let projectDrums: MZXBX_PercussionTrack = {
+	createProjectDrums(drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack): Zvoog_PercussionTrack {
+		let projectDrums: Zvoog_PercussionTrack = {
 			title: midiTrack.title + ' [' + drum + '] ' + drumNames[drum]
 			, measures: []
-			, filters: []
-			, sampler: { id: '', data: '' }
+			//, filters: []
+			, sampler: { id: '', data: '' ,kind:'',outputId:''}
 		};
 		let currentTimeMs = 0;
-		let mm = MZMM();
+		let mm = MMUtil();
 		for (let tt = 0; tt < timeline.length; tt++) {
-			let projectMeasure: MZXBX_PercussionMeasure = { skips: [] };
+			let projectMeasure: Zvoog_PercussionMeasure = { skips: [] };
 			projectDrums.measures.push(projectMeasure);
 			let nextMeasure = timeline[tt];
 			let measureDurationS = mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
@@ -2049,9 +2049,9 @@ class MidiParser {
 		return projectDrums;
 	}
 }
-function findMeasureSkipByTime(time: number, measures: MZXBX_SongMeasure[]): null | { idx: number, skip: MZXBX_Metre } {
+function findMeasureSkipByTime(time: number, measures: Zvoog_SongMeasure[]): null | { idx: number, skip: Zvoog_Metre } {
 	let curTime = 0;
-	let mm = MZMM();
+	let mm = MMUtil();
 	for (let ii = 0; ii < measures.length; ii++) {
 		let cumea = measures[ii];
 		let measureDurationS = mm.set(cumea.metre).duration(cumea.tempo);
@@ -2067,25 +2067,25 @@ function findMeasureSkipByTime(time: number, measures: MZXBX_SongMeasure[]): nul
 	return null;
 }
 /*
-class MZXBX_MetreMath2 implements MZXBX_MetreMathType {
+class Zvoog_MetreMath2 implements Zvoog_MetreMathType {
 	count: number;
 	part: number;
-	set(from: MZXBX_Metre): MZXBX_MetreMath2 {
+	set(from: Zvoog_Metre): Zvoog_MetreMath2 {
 		this.count = from.count;
 		this.part = from.part;
 		return this;
 	}
-	calculate(duration: number, tempo: number): MZXBX_MetreMath2 {
+	calculate(duration: number, tempo: number): Zvoog_MetreMath2 {
 		this.part = 1024.0;
-		let tempPart = new MZXBX_MetreMath2().set({ count: 1, part: this.part }).duration(tempo);
+		let tempPart = new Zvoog_MetreMath2().set({ count: 1, part: this.part }).duration(tempo);
 		this.count = Math.round(duration / tempPart);
 		return this.simplyfy();
 		//return this;
 	}
-	metre(): MZXBX_Metre {
+	metre(): Zvoog_Metre {
 		return { count: this.count, part: this.part };
 	}
-	simplyfy(): MZXBX_MetreMath2 {
+	simplyfy(): Zvoog_MetreMath2 {
 		let cc = this.count;
 		let pp = this.part;
 		if (cc > 0 && pp > 0) {
@@ -2094,9 +2094,9 @@ class MZXBX_MetreMath2 implements MZXBX_MetreMathType {
 				pp = pp / 2;
 			}
 		}
-		return new MZXBX_MetreMath2().set({ count: cc, part: pp });
+		return new Zvoog_MetreMath2().set({ count: cc, part: pp });
 	}
-	strip(toPart: number): MZXBX_MetreMath2 {
+	strip(toPart: number): Zvoog_MetreMath2 {
 		let cc = this.count;
 		let pp = this.part;
 		let rr = pp / toPart;
@@ -2105,10 +2105,10 @@ class MZXBX_MetreMath2 implements MZXBX_MetreMathType {
 		//if (cc < 1) {
 		//    cc = 1;
 		//}
-		let r = new MZXBX_MetreMath2().set({ count: cc, part: pp }).simplyfy();
+		let r = new Zvoog_MetreMath2().set({ count: cc, part: pp }).simplyfy();
 		return r;
 	}
-	equals(metre: MZXBX_Metre): boolean {
+	equals(metre: Zvoog_Metre): boolean {
 		let countMe = this.count * metre.part;
 		let countTo = metre.count * this.part;
 		if (countMe == countTo) {
@@ -2117,7 +2117,7 @@ class MZXBX_MetreMath2 implements MZXBX_MetreMathType {
 			return false;
 		}
 	}
-	less(metre: MZXBX_Metre): boolean {
+	less(metre: Zvoog_Metre): boolean {
 		let countMe = this.count * metre.part;
 		let countTo = metre.count * this.part;
 		if (countMe < countTo) {
@@ -2126,7 +2126,7 @@ class MZXBX_MetreMath2 implements MZXBX_MetreMathType {
 			return false;
 		}
 	}
-	more(metre: MZXBX_Metre): boolean {
+	more(metre: Zvoog_Metre): boolean {
 		let countMe = this.count * metre.part;
 		let countTo = metre.count * this.part;
 		if (countMe > countTo) {
@@ -2135,17 +2135,17 @@ class MZXBX_MetreMath2 implements MZXBX_MetreMathType {
 			return false;
 		}
 	}
-	plus(metre: MZXBX_Metre): MZXBX_MetreMath2 {
+	plus(metre: Zvoog_Metre): Zvoog_MetreMath2 {
 		let countMe = this.count * metre.part;
 		let countTo = metre.count * this.part;
 		let rr = { count: countMe + countTo, part: metre.part * this.part };
-		return new MZXBX_MetreMath2().set(rr).simplyfy();
+		return new Zvoog_MetreMath2().set(rr).simplyfy();
 	}
-	minus(metre: MZXBX_Metre): MZXBX_MetreMath2 {
+	minus(metre: Zvoog_Metre): Zvoog_MetreMath2 {
 		let countMe = this.count * metre.part;
 		let countTo = metre.count * this.part;
 		let rr = { count: countMe - countTo, part: metre.part * this.part };
-		return new MZXBX_MetreMath2().set(rr).simplyfy();
+		return new Zvoog_MetreMath2().set(rr).simplyfy();
 	}
 
 	duration(tempo: number): number {
@@ -2160,8 +2160,8 @@ class MZXBX_MetreMath2 implements MZXBX_MetreMathType {
 }
 */
 /*
-function MZMM2(): MZXBX_MetreMathType {
-	return new MZXBX_MetreMath2().set({ count: 0, part: 1 });
+function MZMM2(): Zvoog_MetreMathType {
+	return new Zvoog_MetreMath2().set({ count: 0, part: 1 });
 }
 */
 function newMIDIparser2(arrayBuffer: ArrayBuffer) {

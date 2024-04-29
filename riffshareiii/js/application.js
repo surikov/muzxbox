@@ -1977,28 +1977,28 @@ let mzxbxProjectForTesting2 = {
                         { skip: { count: 0, part: 2 }, notes: [{ pitch: 31, slides: [] }] }
                     ] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: '', data: '', kind: '', output: null }
+            performer: { id: '', data: '', kind: '', outputId: '' }
         },
         {
             title: "Second track", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: '', data: '', kind: '', output: null }
+            performer: { id: '', data: '', kind: '', outputId: '' }
         },
         {
             title: "Third track", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: '', data: '', kind: '', output: null }
+            performer: { id: '', data: '', kind: '', outputId: '' }
         }
     ],
     percussions: [
         { title: "Snare", measures: [],
-            sampler: { id: '', data: '' } },
+            sampler: { id: '', data: '', kind: '', outputId: '' } },
         { title: "Snare2", measures: [],
-            sampler: { id: '', data: '' } },
+            sampler: { id: '', data: '', kind: '', outputId: '' } },
         { title: "Snare3", measures: [],
-            sampler: { id: '', data: '' } }
+            sampler: { id: '', data: '', kind: '', outputId: '' } }
     ],
     comments: [{ texts: [] }, { texts: [] }, { texts: [] }, { texts: [] }],
     filters: []

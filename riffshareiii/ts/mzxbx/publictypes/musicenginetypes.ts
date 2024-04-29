@@ -44,18 +44,20 @@ type Zvoog_FilterTarget = {
 	id: string;
 	kind: string;
 	data: string;
-	output: null | Zvoog_FilterTarget;
+	outputId: string;
 	automation: Zvoog_AutomationTrack;
 };
 type Zvoog_AudioSequencer = {
 	id: string;
 	data: string;
 	kind: string;
-	output: null | Zvoog_FilterTarget;
+	outputId: string;
 };
 type Zvoog_AudioSampler = {
 	id: string;
 	data: string;
+	kind: string;
+	outputId: string;
 };
 type Zvoog_Chord = {
 	skip: Zvoog_Metre;
