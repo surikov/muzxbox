@@ -603,19 +603,9 @@ class TimeSelectBar {
         console.log('updateTimeSelectionBar', data.selection, this.selectionMark);
     }
     createBarMark(barIdx, barLeft, size, measureAnchor, data) {
-        let brdrwidth = 0.03 * size;
-        let border = {
-            x: barLeft - brdrwidth / 2,
-            y: 0 - brdrwidth / 2,
-            w: size + brdrwidth,
-            h: size + brdrwidth,
-            rx: (size + brdrwidth) / 2,
-            ry: (size + brdrwidth) / 2,
-            css: 'timeMarkButtonBorder'
-        };
-        measureAnchor.content.push(border);
         let mark = {
-            x: barLeft, y: 0, w: size, h: size, rx: size / 2, ry: size / 2, css: 'timeMarkButtonCircle', activation: (x, y) => {
+            x: barLeft, y: 0, w: size, h: size,
+            css: 'timeMarkButtonCircle', activation: (x, y) => {
                 commandDispatcher.expandTimeLineSelection(barIdx);
             }
         };
@@ -627,14 +617,14 @@ class TimeSelectBar {
         let hunds = Math.round(100 * (barTime - Math.floor(barTime)));
         let nm = {
             x: barLeft,
-            y: zoomPrefixLevelsCSS[zz].minZoom * 2,
+            y: zoomPrefixLevelsCSS[zz].minZoom * 1,
             text: '' + (1 + barnum) + ': ' + mins + '\'' + (secs > 9 ? '' : '0') + secs + '.' + hunds,
             css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(nm);
         let bpm = {
             x: barLeft,
-            y: zoomPrefixLevelsCSS[zz].minZoom * 3,
+            y: zoomPrefixLevelsCSS[zz].minZoom * 2,
             text: '' + Math.round(curBar.tempo) + ': ' + curBar.metre.count + '/' + curBar.metre.part,
             css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
         };

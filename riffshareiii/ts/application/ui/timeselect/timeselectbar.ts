@@ -179,20 +179,23 @@ class TimeSelectBar {
 			});
 		}
 	}*/
-	createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, data: Zvoog_Project) {
+	createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, data: Zvoog_Project) {/*
 		let brdrwidth = 0.03 * size;
 		let border: TileRectangle = {
 			x: barLeft - brdrwidth / 2
 			, y: 0 - brdrwidth / 2
 			, w: size + brdrwidth
 			, h: size + brdrwidth
-			, rx: (size + brdrwidth) / 2
-			, ry: (size + brdrwidth) / 2
+			//, rx: (size + brdrwidth) / 2
+			//, ry: (size + brdrwidth) / 2
 			, css: 'timeMarkButtonBorder'
 		};
 		measureAnchor.content.push(border);
+		*/
 		let mark: TileRectangle = {
-			x: barLeft, y: 0, w: size, h: size, rx: size / 2, ry: size / 2, css: 'timeMarkButtonCircle', activation: (x, y) => {
+			x: barLeft, y: 0, w: size, h: size
+			//, rx: size / 2, ry: size / 2
+			, css: 'timeMarkButtonCircle', activation: (x, y) => {
 				//console.log('barIdx', barIdx);
 				commandDispatcher.expandTimeLineSelection(barIdx);
 			}
@@ -212,7 +215,7 @@ class TimeSelectBar {
 		//let timeText = Math.round(barTime * 100) / 100;
 		let nm: TileText = {
 			x: barLeft
-			, y: zoomPrefixLevelsCSS[zz].minZoom * 2
+			, y: zoomPrefixLevelsCSS[zz].minZoom * 1
 			, text: '' + (1 + barnum) + ': ' + mins + '\'' + (secs > 9 ? '' : '0') + secs + '.' + hunds
 			, css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
 		};
@@ -220,7 +223,7 @@ class TimeSelectBar {
 
 		let bpm: TileText = {
 			x: barLeft
-			, y: zoomPrefixLevelsCSS[zz].minZoom * 3
+			, y: zoomPrefixLevelsCSS[zz].minZoom * 2
 			, text: '' + Math.round(curBar.tempo) + ': ' + curBar.metre.count + '/' + curBar.metre.part
 			, css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
 		};
