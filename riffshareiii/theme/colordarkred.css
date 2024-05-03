@@ -1,20 +1,21 @@
 
 :root {
 	
+
+
     --color-debug: #800;
     
 	--color-shadow: #00000066;
 
-    --color-background: #660000ff;
-    --color-lines: #334455ff;
-    --color-panel: #113344ff;
+    --color-background: #ddeeff;
+    --color-lines: #000;
+    --color-panel: #ccd;
 
-	--color-focus: #cc0066ff;
-    --color-interactive: #5566ccff;
+	--color-focus: #06f;
+    --color-interactive: #f00;
 
-	--color-subtext: #99ffccff;
-    --color-text: #ddeeffff;
-
+	--color-subtext: #0f3;
+    --color-text: #006;
 }
 #pagediv {
     background-image: url("bg/olen.jpg");

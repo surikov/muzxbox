@@ -109,6 +109,8 @@ class MixerUI {
 			//console.log(bb, notecount);
 		}
 		//console.log(mxNotes);
+		if(mxDrums<1)mxDrums=1;
+		if(mxNotes<1)mxNotes=1;
 		this.fillerAnchor.content = [];
 		let barX = 0;
 		for (let bb = 0; bb < data.timeline.length; bb++) {
@@ -120,7 +122,8 @@ class MixerUI {
 				}
 
 			}
-			let css = 'mixFiller' + (1 + Math.round(7 * notecount / mxNotes));
+			let filIdx=1 + Math.round(7 * notecount / mxNotes);
+			let css = 'mixFiller' + filIdx;
 			let barwidth = MMUtil().set(data.timeline[bb].metre).duration(data.timeline[bb].tempo) * mixm.widthDurationRatio;
 			let fillRectangle: TileRectangle = {
 				x: mixm.LeftPad + barX
@@ -140,7 +143,8 @@ class MixerUI {
 						drumcount = drumcount + bar.skips.length;
 					}
 				}
-				let css2 = 'mixFiller' + (1 + Math.round(7 * drumcount / mxDrums));
+				filIdx=1 + Math.round(7 * drumcount / mxDrums);
+				let css2 = 'mixFiller' + filIdx;
 				let fillDrumBar: TileRectangle = {
 					x: mixm.LeftPad + barX
 					, y: mixm.samplerTop()

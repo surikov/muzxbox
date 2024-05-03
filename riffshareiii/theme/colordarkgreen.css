@@ -1,19 +1,18 @@
 
 :root {
-	
-    --color-debug: #800;
+	--color-debug: #800;
     
-	--color-shadow: #00000066;
+	--color-shadow: #99999966;
 
-    --color-background: #006600ff;
-    --color-lines: #334455ff;
-    --color-panel: #113344ff;
+    --color-background: #000;
+    --color-lines: #fff;
+    --color-panel: #333;
 
-	--color-focus: #cc0066ff;
-    --color-interactive: #5566ccff;
+	--color-focus: #ccf;
+    --color-interactive: #3c3;
 
 	--color-subtext: #99ffccff;
-    --color-text: #ddeeffff;
+    --color-text: #ff9;
 
 }
 #pagediv {

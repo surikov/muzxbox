@@ -1528,6 +1528,8 @@ class MixerBar {
             y: top,
             w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
             h: height,
+            rx: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
+            ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
             css: 'barRightBorder'
         };
         barOctaveAnchor.content.push(barRightBorder);
@@ -1537,6 +1539,8 @@ class MixerBar {
                 y: mixm.samplerTop(),
                 w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
                 h: data.percussions.length * mixm.notePathHeight,
+                rx: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
+                ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
                 css: 'barRightBorder'
             };
             barOctaveAnchor.content.push(barSamRightBorder);
@@ -1578,6 +1582,8 @@ class MixerBar {
             }
         }
     }
+}
+class TextComments {
 }
 class MixerUI {
     constructor() {
@@ -1666,6 +1672,10 @@ class MixerUI {
                 mxDrums = drumcount;
             }
         }
+        if (mxDrums < 1)
+            mxDrums = 1;
+        if (mxNotes < 1)
+            mxNotes = 1;
         this.fillerAnchor.content = [];
         let barX = 0;
         for (let bb = 0; bb < data.timeline.length; bb++) {
@@ -1676,7 +1686,8 @@ class MixerUI {
                     notecount = notecount + bar.chords[cc].notes.length;
                 }
             }
-            let css = 'mixFiller' + (1 + Math.round(7 * notecount / mxNotes));
+            let filIdx = 1 + Math.round(7 * notecount / mxNotes);
+            let css = 'mixFiller' + filIdx;
             let barwidth = MMUtil().set(data.timeline[bb].metre).duration(data.timeline[bb].tempo) * mixm.widthDurationRatio;
             let fillRectangle = {
                 x: mixm.LeftPad + barX,
@@ -1694,7 +1705,8 @@ class MixerUI {
                         drumcount = drumcount + bar.skips.length;
                     }
                 }
-                let css2 = 'mixFiller' + (1 + Math.round(7 * drumcount / mxDrums));
+                filIdx = 1 + Math.round(7 * drumcount / mxDrums);
+                let css2 = 'mixFiller' + filIdx;
                 let fillDrumBar = {
                     x: mixm.LeftPad + barX,
                     y: mixm.samplerTop(),

@@ -114,7 +114,7 @@ body {
     width: 100%;
     height555: 100%;
     min-height777: 100%;
-    background-color: var(--color-background);
+    background-color22: var(--color-background);
     user-select: none;
     touch-action: manipulation;
     background-size: cover;
@@ -122,10 +122,11 @@ body {
     margin: 0px;
     padding: 0px;
     background-color2: #00ffff;
-    background2: color-mix(in lab, transparent 10%, var(--color-background));
+    background: color-mix(in lab, transparent 10%, var(--color-background));
     flex-basis: 0;
     flex-shrink: 1;
     flex-grow: 1;
+	
 }
 
 

@@ -97,6 +97,10 @@ class MixerBar {
 				}
 			}
 		}
+
+		if (zoomLevel < 5) {
+			new TextComments(barIdx, data, left, gridZoomBarAnchor, zoomLevel);
+		}
 	}
 	addOctaveGridSteps(
 		barIdx: number
@@ -123,6 +127,8 @@ class MixerBar {
 			, y: top
 			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5 //zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0
 			, h: height
+			, rx: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25
+			, ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25
 			, css: 'barRightBorder'
 		};
 		barOctaveAnchor.content.push(barRightBorder);
@@ -132,14 +138,16 @@ class MixerBar {
 				, y: mixm.samplerTop()
 				, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5 //zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0
 				, h: data.percussions.length * mixm.notePathHeight
+				, rx: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25
+				, ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25
 				, css: 'barRightBorder'
 			};
 			barOctaveAnchor.content.push(barSamRightBorder);
 		}
 		if (zoomInfo.gridLines.length > 0) {
-			let css='octaveBottomBorder';
-			if(zIndex<3){
-				css='interactiveTimeMeasureMark';
+			let css = 'octaveBottomBorder';
+			if (zIndex < 3) {
+				css = 'interactiveTimeMeasureMark';
 			}
 			while (true) {
 				let line = zoomInfo.gridLines[lineCount];
