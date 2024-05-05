@@ -24,11 +24,20 @@ class TextComments {
 		barOctaveAnchor.content.push(barTxtRightBorder);
 		//console.log(barIdx,barLeft,width);
 		if (barIdx < data.comments.length) {
+			let placedX: number[] = [];
 			for (let ii = 0; ii < data.comments[barIdx].texts.length; ii++) {
-
+				let xx = barLeft + MMUtil().set(data.comments[barIdx].texts[ii].skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
+				let placeIdx = 1;
+				let x100 = Math.round(xx * 100);
+				for (let kk = 0; kk < placedX.length; kk++) {
+					if (x100 == placedX[kk]) {
+						placeIdx++;
+					}
+				}
+				placedX.push(x100);
 				let tt: TileText = {
-					x: barLeft + MMUtil().set(data.comments[barIdx].texts[ii].skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio
-					, y: top + zoomPrefixLevelsCSS[zIndex].minZoom
+					x: xx
+					, y: top + zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx
 					, text: data.comments[barIdx].texts[ii].text
 					, css: 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix
 				};
