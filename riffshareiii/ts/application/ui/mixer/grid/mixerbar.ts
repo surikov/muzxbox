@@ -98,7 +98,7 @@ class MixerBar {
 			}
 		}
 
-		if (zoomLevel < 5) {
+		if (zoomLevel < 6) {
 			new TextComments(barIdx, data, left, gridZoomBarAnchor, zoomLevel);
 		}
 	}

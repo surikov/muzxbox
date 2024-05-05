@@ -122,7 +122,7 @@ body {
     margin: 0px;
     padding: 0px;
     background-color2: #00ffff;
-    background: color-mix(in lab, transparent 10%, var(--color-background));
+    background: color-mix(in lab, transparent 20%, var(--color-background));
     flex-basis: 0;
     flex-shrink: 1;
     flex-grow: 1;

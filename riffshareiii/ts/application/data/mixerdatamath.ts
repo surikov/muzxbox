@@ -9,6 +9,8 @@ class MixerDataMath {
 	octaveCount = 10;
 	samplerBottomPad = 1;
 	titleBottomPad = 1;
+	gridBottomPad = 3;
+	commentsHeight = 10;
 
 	constructor(data: Zvoog_Project) {
 		this.data = data;
@@ -33,7 +35,17 @@ class MixerDataMath {
 			+ this.samplerBottomPad
 			+ this.gridHeight()
 			//data.percussions.length * this.notePathHeight
+			+this.gridBottomPad
+			+this.commentsHeight
 			+ this.bottomMixerPad;
+	}
+	commentsTop():number{
+		return this.heightOfTitle()
+			+ this.samplerHeight()
+			+ this.samplerBottomPad
+			+ this.gridHeight()
+			//data.percussions.length * this.notePathHeight
+			+this.gridBottomPad;
 	}
 	gridTop(): number {
 		return this.heightOfTitle()+this.titleBottomPad + this.samplerHeight() + this.samplerBottomPad;

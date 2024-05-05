@@ -1514,6 +1514,9 @@ class MixerBar {
                 }
             }
         }
+        if (zoomLevel < 6) {
+            new TextComments(barIdx, data, left, gridZoomBarAnchor, zoomLevel);
+        }
     }
     addOctaveGridSteps(barIdx, data, barLeft, width, barOctaveAnchor, zIndex) {
         let zoomInfo = zoomPrefixLevelsCSS[zIndex];
@@ -1584,6 +1587,35 @@ class MixerBar {
     }
 }
 class TextComments {
+    constructor(barIdx, data, barLeft, barOctaveAnchor, zIndex) {
+        let curBar = data.timeline[barIdx];
+        let mixm = new MixerDataMath(data);
+        let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * mixm.widthDurationRatio;
+        let left = barLeft + width;
+        let top = mixm.commentsTop();
+        let height = mixm.commentsHeight;
+        let barTxtRightBorder = {
+            x: left,
+            y: top,
+            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
+            h: height,
+            rx: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
+            ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
+            css: 'barRightBorder'
+        };
+        barOctaveAnchor.content.push(barTxtRightBorder);
+        if (barIdx < data.comments.length) {
+            for (let ii = 0; ii < data.comments[barIdx].texts.length; ii++) {
+                let tt = {
+                    x: barLeft + MMUtil().set(data.comments[barIdx].texts[ii].skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio,
+                    y: top + zoomPrefixLevelsCSS[zIndex].minZoom,
+                    text: data.comments[barIdx].texts[ii].text,
+                    css: 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix
+                };
+                barOctaveAnchor.content.push(tt);
+            }
+        }
+    }
 }
 class MixerUI {
     constructor() {
@@ -1648,9 +1680,11 @@ class MixerUI {
         let mixm = new MixerDataMath(data);
         let mxNotes = 0;
         let mxDrums = 0;
+        let mxTxt = 0;
         for (let bb = 0; bb < data.timeline.length; bb++) {
             let notecount = 0;
             let drumcount = 0;
+            let txtcnt = 0;
             for (let tt = 0; tt < data.tracks.length; tt++) {
                 let bar = data.tracks[tt].measures[bb];
                 if (bar) {
@@ -1671,11 +1705,18 @@ class MixerUI {
             if (mxDrums < drumcount) {
                 mxDrums = drumcount;
             }
+            if (data.comments[bb])
+                if (data.comments[bb].texts)
+                    if (mxTxt < data.comments[bb].texts.length) {
+                        mxTxt = data.comments[bb].texts.length;
+                    }
         }
         if (mxDrums < 1)
             mxDrums = 1;
         if (mxNotes < 1)
             mxNotes = 1;
+        if (mxTxt < 1)
+            mxTxt = 1;
         this.fillerAnchor.content = [];
         let barX = 0;
         for (let bb = 0; bb < data.timeline.length; bb++) {
@@ -1716,6 +1757,19 @@ class MixerUI {
                 };
                 this.fillerAnchor.content.push(fillDrumBar);
             }
+            filIdx = 1;
+            if (data.comments[bb])
+                if (data.comments[bb].texts)
+                    filIdx = 1 + Math.round(7 * data.comments[bb].texts.length / mxTxt);
+            css = 'mixFiller' + filIdx;
+            let fillTxtBar = {
+                x: mixm.LeftPad + barX,
+                y: mixm.commentsTop(),
+                w: barwidth,
+                h: mixm.commentsHeight,
+                css: css
+            };
+            this.fillerAnchor.content.push(fillTxtBar);
             barX = barX + barwidth;
         }
     }
@@ -2085,6 +2139,8 @@ class MixerDataMath {
         this.octaveCount = 10;
         this.samplerBottomPad = 1;
         this.titleBottomPad = 1;
+        this.gridBottomPad = 3;
+        this.commentsHeight = 10;
         this.data = data;
     }
     mixerWidth() {
@@ -2106,7 +2162,16 @@ class MixerDataMath {
             + this.samplerHeight()
             + this.samplerBottomPad
             + this.gridHeight()
+            + this.gridBottomPad
+            + this.commentsHeight
             + this.bottomMixerPad;
+    }
+    commentsTop() {
+        return this.heightOfTitle()
+            + this.samplerHeight()
+            + this.samplerBottomPad
+            + this.gridHeight()
+            + this.gridBottomPad;
     }
     gridTop() {
         return this.heightOfTitle() + this.titleBottomPad + this.samplerHeight() + this.samplerBottomPad;

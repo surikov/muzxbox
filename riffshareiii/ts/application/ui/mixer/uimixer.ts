@@ -83,9 +83,11 @@ class MixerUI {
 		let mixm: MixerDataMath = new MixerDataMath(data);
 		let mxNotes = 0;
 		let mxDrums = 0;
+		let mxTxt = 0;
 		for (let bb = 0; bb < data.timeline.length; bb++) {
 			let notecount = 0;
 			let drumcount = 0;
+			let txtcnt = 0;
 			for (let tt = 0; tt < data.tracks.length; tt++) {
 				let bar = data.tracks[tt].measures[bb];
 				if (bar) {
@@ -106,11 +108,18 @@ class MixerUI {
 			if (mxDrums < drumcount) {
 				mxDrums = drumcount;
 			}
+			if (data.comments[bb])
+				if (data.comments[bb].texts)
+					if (mxTxt < data.comments[bb].texts.length) {
+						mxTxt = data.comments[bb].texts.length;
+					}
+			//txtcnt = txtcnt + data.comments[bb].texts.length;
 			//console.log(bb, notecount);
 		}
 		//console.log(mxNotes);
-		if(mxDrums<1)mxDrums=1;
-		if(mxNotes<1)mxNotes=1;
+		if (mxDrums < 1) mxDrums = 1;
+		if (mxNotes < 1) mxNotes = 1;
+		if (mxTxt < 1) mxTxt = 1;
 		this.fillerAnchor.content = [];
 		let barX = 0;
 		for (let bb = 0; bb < data.timeline.length; bb++) {
@@ -122,7 +131,7 @@ class MixerUI {
 				}
 
 			}
-			let filIdx=1 + Math.round(7 * notecount / mxNotes);
+			let filIdx = 1 + Math.round(7 * notecount / mxNotes);
 			let css = 'mixFiller' + filIdx;
 			let barwidth = MMUtil().set(data.timeline[bb].metre).duration(data.timeline[bb].tempo) * mixm.widthDurationRatio;
 			let fillRectangle: TileRectangle = {
@@ -143,7 +152,7 @@ class MixerUI {
 						drumcount = drumcount + bar.skips.length;
 					}
 				}
-				filIdx=1 + Math.round(7 * drumcount / mxDrums);
+				filIdx = 1 + Math.round(7 * drumcount / mxDrums);
 				let css2 = 'mixFiller' + filIdx;
 				let fillDrumBar: TileRectangle = {
 					x: mixm.LeftPad + barX
@@ -154,6 +163,20 @@ class MixerUI {
 				};
 				this.fillerAnchor.content.push(fillDrumBar);
 			}
+			filIdx = 1;
+			if (data.comments[bb])
+				if (data.comments[bb].texts)
+					filIdx = 1 + Math.round(7 * data.comments[bb].texts.length / mxTxt);
+			css = 'mixFiller' + filIdx;
+			let fillTxtBar: TileRectangle = {
+				x: mixm.LeftPad + barX
+				, y: mixm.commentsTop()
+				, w: barwidth
+				, h: mixm.commentsHeight
+				, css: css
+			};
+			this.fillerAnchor.content.push(fillTxtBar);
+
 
 			barX = barX + barwidth;
 		}
