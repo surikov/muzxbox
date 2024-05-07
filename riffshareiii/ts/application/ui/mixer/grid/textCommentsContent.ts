@@ -11,7 +11,7 @@ class TextComments {
 		let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * mixm.widthDurationRatio;
 		let left = barLeft + width;
 		let top = mixm.commentsTop();
-		let height = mixm.commentsHeight;
+		let height = mixm.commentsMaxHeight();
 		let barTxtRightBorder: TileRectangle = {
 			x: left
 			, y: top
@@ -21,6 +21,11 @@ class TextComments {
 			, ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25
 			, css: 'barRightBorder'
 		};
+		/*console.log('comments', top, height, mixm.heightOfTitle()
+			, mixm.samplerHeight()
+			, mixm.samplerBottomPad
+			, mixm.gridHeight()
+			, mixm.gridBottomPad);*/
 		barOctaveAnchor.content.push(barTxtRightBorder);
 		//console.log(barIdx,barLeft,width);
 		if (barIdx < data.comments.length) {

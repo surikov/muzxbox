@@ -543,8 +543,8 @@ class TimeSelectBar {
         this.selectionMark = {
             x: 0,
             y: 0,
-            w: 11,
-            h: 77,
+            w: 1,
+            h: 1,
             css: 'timeSelection'
         };
         this.selectionAnchor = {
@@ -558,11 +558,11 @@ class TimeSelectBar {
         };
         return [this.selectionBarLayer, this.selectedTimeLayer];
     }
-    resizeTimeScale(viewWIdth, viewHeight) {
-        console.log('resizeTimeScale');
-        this.selectionAnchor.ww = viewWIdth * 128;
-        this.selectionAnchor.hh = viewHeight * 128;
-        this.selectionMark.h = viewHeight * 128;
+    resizeTimeScale(viewWidth, viewHeight) {
+        console.log('resizeTimeSelect', viewWidth, viewHeight);
+        this.selectionAnchor.ww = viewWidth * 1024;
+        this.selectionAnchor.hh = viewHeight * 1024;
+        this.selectionMark.h = viewHeight * 1024;
     }
     updateTimeSelectionBar(data) {
         if (data.selection) {
@@ -600,7 +600,7 @@ class TimeSelectBar {
             this.selectionMark.x = -1;
             this.selectionMark.w = 0.5;
         }
-        console.log('updateTimeSelectionBar', data.selection, this.selectionMark);
+        console.log('updateTimeSelectionBar', this.selectionMark.x, this.selectionMark.w);
     }
     createBarMark(barIdx, barLeft, size, measureAnchor, data) {
         let mark = {
@@ -1593,7 +1593,7 @@ class TextComments {
         let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * mixm.widthDurationRatio;
         let left = barLeft + width;
         let top = mixm.commentsTop();
-        let height = mixm.commentsHeight;
+        let height = mixm.commentsMaxHeight();
         let barTxtRightBorder = {
             x: left,
             y: top,
@@ -1768,15 +1768,17 @@ class MixerUI {
                 this.fillerAnchor.content.push(fillDrumBar);
             }
             filIdx = 1;
-            if (data.comments[bb])
-                if (data.comments[bb].texts)
+            if (data.comments[bb]) {
+                if (data.comments[bb].texts) {
                     filIdx = 1 + Math.round(7 * data.comments[bb].texts.length / mxTxt);
+                }
+            }
             css = 'mixFiller' + filIdx;
             let fillTxtBar = {
                 x: mixm.LeftPad + barX,
                 y: mixm.commentsTop(),
                 w: barwidth,
-                h: mixm.commentsHeight,
+                h: mixm.commentsMaxHeight(),
                 css: css
             };
             this.fillerAnchor.content.push(fillTxtBar);
@@ -2140,7 +2142,6 @@ let testEmptyMixerData = {
 };
 class MixerDataMath {
     constructor(data) {
-        this.projTitleHeight = 33;
         this.LeftPad = 3;
         this.rightPad = 10;
         this.bottomMixerPad = 11;
@@ -2149,15 +2150,14 @@ class MixerDataMath {
         this.octaveCount = 10;
         this.samplerBottomPad = 1;
         this.titleBottomPad = 1;
-        this.gridBottomPad = 3;
-        this.commentsHeight = 10;
+        this.gridBottomPad = 1;
         this.data = data;
     }
     mixerWidth() {
         return this.LeftPad + this.timelineWidth() + this.rightPad;
     }
     heightOfTitle() {
-        return this.projTitleHeight;
+        return 0;
     }
     timelineWidth() {
         let mm = MMUtil();
@@ -2168,32 +2168,42 @@ class MixerDataMath {
         return ww;
     }
     mixerHeight() {
-        return this.heightOfTitle()
-            + this.samplerHeight()
-            + this.samplerBottomPad
-            + this.gridHeight()
-            + this.gridBottomPad
-            + this.commentsHeight
+        return this.commentsTop()
+            + this.commentsMaxHeight()
             + this.bottomMixerPad;
     }
+    commentsMaxHeight() {
+        let mx = 1;
+        for (let ii = 0; ii < this.data.comments.length; ii++) {
+            let skips = [];
+            let txts = this.data.comments[ii].texts;
+            for (let tt = 0; tt < txts.length; tt++) {
+                for (let kk = 0; kk < skips.length; kk++) {
+                    if (MMUtil().set(txts[tt].skip).equals(skips[kk])) {
+                        mx++;
+                    }
+                    skips.push(txts[tt].skip);
+                }
+            }
+        }
+        return mx * this.notePathHeight;
+    }
     commentsTop() {
-        return this.heightOfTitle()
-            + this.samplerHeight()
-            + this.samplerBottomPad
+        return this.gridTop()
             + this.gridHeight()
             + this.gridBottomPad;
     }
     gridTop() {
-        return this.heightOfTitle() + this.titleBottomPad + this.samplerHeight() + this.samplerBottomPad;
-    }
-    samplerTop() {
-        return this.heightOfTitle() + this.titleBottomPad;
+        return this.samplerTop() + this.samplerHeight() + this.samplerBottomPad;
     }
     gridHeight() {
         return this.notePathHeight * this.octaveCount * 12;
     }
     samplerHeight() {
         return this.data.percussions.length * this.notePathHeight;
+    }
+    samplerTop() {
+        return this.heightOfTitle() + this.titleBottomPad;
     }
 }
 let biChar32 = [];

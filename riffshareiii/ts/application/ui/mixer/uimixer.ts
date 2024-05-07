@@ -164,15 +164,17 @@ class MixerUI {
 				this.fillerAnchor.content.push(fillDrumBar);
 			}
 			filIdx = 1;
-			if (data.comments[bb])
-				if (data.comments[bb].texts)
+			if (data.comments[bb]) {
+				if (data.comments[bb].texts) {
 					filIdx = 1 + Math.round(7 * data.comments[bb].texts.length / mxTxt);
+				}
+			}
 			css = 'mixFiller' + filIdx;
 			let fillTxtBar: TileRectangle = {
 				x: mixm.LeftPad + barX
 				, y: mixm.commentsTop()
 				, w: barwidth
-				, h: mixm.commentsHeight
+				, h: mixm.commentsMaxHeight()
 				, css: css
 			};
 			this.fillerAnchor.content.push(fillTxtBar);
