@@ -19,7 +19,7 @@ class MixerDataMath {
 		return this.LeftPad + this.timelineWidth() + this.rightPad;
 	}
 	heightOfTitle(): number {
-		return 0;
+		return 10;
 	}
 	timelineWidth(): number {
 		let mm: Zvoog_MetreMathType = MMUtil();
@@ -35,29 +35,36 @@ class MixerDataMath {
 			+ this.bottomMixerPad;
 	}
 	commentsMaxHeight(): number {
-		//let ratio = 2;
-		let mx = 1;
-
+		let wholeMax = 0;
+		let txtExsts=false;
 		for (let ii = 0; ii < this.data.comments.length; ii++) {
-
 			let placedX: number[] = [];
 			let txts = this.data.comments[ii].texts;
-			//console.log('commentsMaxHeight',ii,mx);
+
 			for (let tt = 0; tt < txts.length; tt++) {
-				//let skipS = MMUtil().set(txts[tt].skip).duration(this.data.timeline[tt].tempo);
-				let skipS = 0.5 * Math.round(MMUtil().set(txts[tt].skip).duration(this.data.timeline[ii].tempo) / 0.5);
+				txtExsts=true;
+				let skipS = 0.5 * Math.floor(MMUtil().set(txts[tt].skip).duration(this.data.timeline[ii].tempo) / 0.5);
+				let barMx = 0;
 				for (let kk = 0; kk < placedX.length; kk++) {
-					//if (Math.abs(skipS - placedX[kk]) < 0.3) {
 					if (skipS == placedX[kk]) {
-						mx++;
+						barMx++;
 					}
 				}
 				placedX.push(skipS);
-
+				if (barMx > wholeMax) {
+					wholeMax = barMx;
+					//console.log(wholeMax);
+				}
 			}
+
+		}
+		if (txtExsts) {
+			wholeMax = wholeMax + 2;
+		} else {
+			wholeMax = 1;
 		}
 
-		return mx * this.notePathHeight;
+		return wholeMax * this.notePathHeight;
 	}
 
 	commentsTop(): number {

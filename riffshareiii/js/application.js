@@ -1593,7 +1593,7 @@ class TextComments {
         let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * mixm.widthDurationRatio;
         let left = barLeft + width;
         let top = mixm.commentsTop();
-        let height = zoomPrefixLevelsCSS[zIndex].minZoom * mixm.commentsMaxHeight() / mixm.notePathHeight;
+        let height = mixm.commentsMaxHeight();
         let barTxtRightBorder = {
             x: left,
             y: top,
@@ -1603,13 +1603,12 @@ class TextComments {
             ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
             css: 'barRightBorder'
         };
-        console.log('comments', barIdx, zIndex, top, height, zoomPrefixLevelsCSS[zIndex].minZoom);
         barOctaveAnchor.content.push(barTxtRightBorder);
         if (barIdx < data.comments.length) {
             let placedX = [];
             for (let ii = 0; ii < data.comments[barIdx].texts.length; ii++) {
                 let itxt = data.comments[barIdx].texts[ii];
-                let skipS = 0.5 * Math.round(MMUtil().set(itxt.skip).duration(curBar.tempo) / 0.5);
+                let skipS = 0.5 * Math.floor(MMUtil().set(itxt.skip).duration(curBar.tempo) / 0.5);
                 let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * mixm.widthDurationRatio;
                 let placeIdx = 1;
                 for (let kk = 0; kk < placedX.length; kk++) {
@@ -1624,7 +1623,6 @@ class TextComments {
                     text: data.comments[barIdx].texts[ii].text,
                     css: 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix
                 };
-                console.log(zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx, placeIdx, data.comments[barIdx].texts[ii].text);
                 barOctaveAnchor.content.push(tt);
             }
         }
@@ -2189,7 +2187,7 @@ class MixerDataMath {
         return this.LeftPad + this.timelineWidth() + this.rightPad;
     }
     heightOfTitle() {
-        return 0;
+        return 10;
     }
     timelineWidth() {
         let mm = MMUtil();
@@ -2205,21 +2203,33 @@ class MixerDataMath {
             + this.bottomMixerPad;
     }
     commentsMaxHeight() {
-        let mx = 1;
+        let wholeMax = 0;
+        let txtExsts = false;
         for (let ii = 0; ii < this.data.comments.length; ii++) {
             let placedX = [];
             let txts = this.data.comments[ii].texts;
             for (let tt = 0; tt < txts.length; tt++) {
-                let skipS = 0.5 * Math.round(MMUtil().set(txts[tt].skip).duration(this.data.timeline[ii].tempo) / 0.5);
+                txtExsts = true;
+                let skipS = 0.5 * Math.floor(MMUtil().set(txts[tt].skip).duration(this.data.timeline[ii].tempo) / 0.5);
+                let barMx = 0;
                 for (let kk = 0; kk < placedX.length; kk++) {
                     if (skipS == placedX[kk]) {
-                        mx++;
+                        barMx++;
                     }
                 }
                 placedX.push(skipS);
+                if (barMx > wholeMax) {
+                    wholeMax = barMx;
+                }
             }
         }
-        return mx * this.notePathHeight;
+        if (txtExsts) {
+            wholeMax = wholeMax + 2;
+        }
+        else {
+            wholeMax = 1;
+        }
+        return wholeMax * this.notePathHeight;
     }
     commentsTop() {
         return this.gridTop()
