@@ -1593,7 +1593,7 @@ class TextComments {
         let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * mixm.widthDurationRatio;
         let left = barLeft + width;
         let top = mixm.commentsTop();
-        let height = mixm.commentsMaxHeight();
+        let height = zoomPrefixLevelsCSS[zIndex].minZoom * mixm.commentsMaxHeight() / mixm.notePathHeight;
         let barTxtRightBorder = {
             x: left,
             y: top,
@@ -1603,25 +1603,28 @@ class TextComments {
             ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
             css: 'barRightBorder'
         };
+        console.log('comments', barIdx, zIndex, top, height, zoomPrefixLevelsCSS[zIndex].minZoom);
         barOctaveAnchor.content.push(barTxtRightBorder);
         if (barIdx < data.comments.length) {
             let placedX = [];
             for (let ii = 0; ii < data.comments[barIdx].texts.length; ii++) {
-                let xx = barLeft + MMUtil().set(data.comments[barIdx].texts[ii].skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
+                let itxt = data.comments[barIdx].texts[ii];
+                let skipS = 0.5 * Math.round(MMUtil().set(itxt.skip).duration(curBar.tempo) / 0.5);
+                let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * mixm.widthDurationRatio;
                 let placeIdx = 1;
-                let x100 = Math.round(xx * 100);
                 for (let kk = 0; kk < placedX.length; kk++) {
-                    if (x100 == placedX[kk]) {
+                    if (skipS == placedX[kk]) {
                         placeIdx++;
                     }
                 }
-                placedX.push(x100);
+                placedX.push(skipS);
                 let tt = {
                     x: xx,
                     y: top + zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx,
                     text: data.comments[barIdx].texts[ii].text,
                     css: 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix
                 };
+                console.log(zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx, placeIdx, data.comments[barIdx].texts[ii].text);
                 barOctaveAnchor.content.push(tt);
             }
         }
@@ -2041,9 +2044,11 @@ let mzxbxProjectForTesting2 = {
                         { skip: { count: 7, part: 16 }, notes: [{ pitch: 32, slides: [] }] },
                         { skip: { count: 1, part: 2 }, notes: [{ pitch: 33, slides: [] }] }
                     ]
-                }, { chords: [
+                }, {
+                    chords: [
                         { skip: { count: 0, part: 2 }, notes: [{ pitch: 31, slides: [] }] }
-                    ] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+                    ]
+                }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
             performer: { id: '', data: '', kind: '', outputId: '' }
         },
@@ -2061,14 +2066,41 @@ let mzxbxProjectForTesting2 = {
         }
     ],
     percussions: [
-        { title: "Snare", measures: [],
-            sampler: { id: '', data: '', kind: '', outputId: '' } },
-        { title: "Snare2", measures: [],
-            sampler: { id: '', data: '', kind: '', outputId: '' } },
-        { title: "Snare3", measures: [],
-            sampler: { id: '', data: '', kind: '', outputId: '' } }
+        {
+            title: "Snare", measures: [],
+            sampler: { id: '', data: '', kind: '', outputId: '' }
+        },
+        {
+            title: "Snare2", measures: [],
+            sampler: { id: '', data: '', kind: '', outputId: '' }
+        },
+        {
+            title: "Snare3", measures: [],
+            sampler: { id: '', data: '', kind: '', outputId: '' }
+        }
     ],
-    comments: [{ texts: [] }, { texts: [] }, { texts: [] }, { texts: [] }],
+    comments: [{ texts: [{ skip: { count: 2, part: 16 }, text: '1-2/16' }] }, {
+            texts: [
+                { skip: { count: 0, part: 16 }, text: '20' },
+                { skip: { count: 1, part: 16 }, text: '21' },
+                { skip: { count: 2, part: 16 }, text: '22' },
+                { skip: { count: 3, part: 16 }, text: '23' },
+                { skip: { count: 4, part: 16 }, text: '24' },
+                { skip: { count: 5, part: 16 }, text: '25' },
+                { skip: { count: 6, part: 16 }, text: '26' },
+                { skip: { count: 7, part: 16 }, text: '27' },
+                { skip: { count: 8, part: 16 }, text: '28\ntest' },
+                { skip: { count: 9, part: 16 }, text: '29' },
+                { skip: { count: 10, part: 16 }, text: '2-10' },
+                { skip: { count: 11, part: 16 }, text: '2-11' },
+                { skip: { count: 12, part: 16 }, text: '2-12' },
+                { skip: { count: 13, part: 16 }, text: '2-13' },
+                { skip: { count: 14, part: 16 }, text: '2-14' },
+                { skip: { count: 15, part: 16 }, text: '2-15' }
+            ]
+        }, { texts: [{ skip: { count: 2, part: 16 }, text: '3-2/16' }] },
+        { texts: [{ skip: { count: 2, part: 16 }, text: '4-2/16' }] },
+        { texts: [{ skip: { count: 2, part: 16 }, text: '5-2/16' }] }],
     filters: []
 };
 let testBigMixerData = {
@@ -2175,15 +2207,16 @@ class MixerDataMath {
     commentsMaxHeight() {
         let mx = 1;
         for (let ii = 0; ii < this.data.comments.length; ii++) {
-            let skips = [];
+            let placedX = [];
             let txts = this.data.comments[ii].texts;
             for (let tt = 0; tt < txts.length; tt++) {
-                for (let kk = 0; kk < skips.length; kk++) {
-                    if (MMUtil().set(txts[tt].skip).equals(skips[kk])) {
+                let skipS = 0.5 * Math.round(MMUtil().set(txts[tt].skip).duration(this.data.timeline[ii].tempo) / 0.5);
+                for (let kk = 0; kk < placedX.length; kk++) {
+                    if (skipS == placedX[kk]) {
                         mx++;
                     }
-                    skips.push(txts[tt].skip);
                 }
+                placedX.push(skipS);
             }
         }
         return mx * this.notePathHeight;

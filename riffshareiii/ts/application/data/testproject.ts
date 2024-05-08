@@ -22,43 +22,73 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 				{
 					chords: [
 						{ skip: { count: 0, part: 1 }, notes: [{ pitch: 25, slides: [] }] }
-						,{ skip: { count: 1, part: 16 }, notes: [{ pitch: 26, slides: [] }] }
-						,{ skip: { count: 1, part: 8 }, notes: [{ pitch: 27, slides: [] }] }
-						,{ skip: { count: 3, part: 16 }, notes: [{ pitch: 28, slides: [] }] }
-						,{ skip: { count: 1, part: 4 }, notes: [{ pitch: 29, slides: [] }] }
-						,{ skip: { count: 5, part: 16 }, notes: [{ pitch: 30, slides: [] }] }
-						,{ skip: { count: 3, part: 8 }, notes: [{ pitch: 31, slides: [] }] }
-						,{ skip: { count: 7, part: 16 }, notes: [{ pitch: 32, slides: [] }] }
-						,{ skip: { count: 1, part: 2 }, notes: [{ pitch: 33, slides: [] }] }
+						, { skip: { count: 1, part: 16 }, notes: [{ pitch: 26, slides: [] }] }
+						, { skip: { count: 1, part: 8 }, notes: [{ pitch: 27, slides: [] }] }
+						, { skip: { count: 3, part: 16 }, notes: [{ pitch: 28, slides: [] }] }
+						, { skip: { count: 1, part: 4 }, notes: [{ pitch: 29, slides: [] }] }
+						, { skip: { count: 5, part: 16 }, notes: [{ pitch: 30, slides: [] }] }
+						, { skip: { count: 3, part: 8 }, notes: [{ pitch: 31, slides: [] }] }
+						, { skip: { count: 7, part: 16 }, notes: [{ pitch: 32, slides: [] }] }
+						, { skip: { count: 1, part: 2 }, notes: [{ pitch: 33, slides: [] }] }
 					]
-				}, { chords: [
-					{ skip: { count: 0, part: 2 }, notes: [{ pitch: 31, slides: [] }] }
-				] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+				}, {
+					chords: [
+						{ skip: { count: 0, part: 2 }, notes: [{ pitch: 31, slides: [] }] }
+					]
+				}, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			]//, filters: []
-			, performer: { id: '', data: '' ,kind:'',outputId:''}
+			, performer: { id: '', data: '', kind: '', outputId: '' }
 		}
 		, {
 			title: "Second track", measures: [
 				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			]//, filters: []
-			, performer: { id: '', data: '',kind:'',outputId:'' }
-        }
-        , {
+			, performer: { id: '', data: '', kind: '', outputId: '' }
+		}
+		, {
 			title: "Third track", measures: [
 				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			]//, filters: []
-			, performer: { id: '', data: '',kind:'',outputId:'' }
+			, performer: { id: '', data: '', kind: '', outputId: '' }
 		}
 	]
 	, percussions: [
-        { title: "Snare", measures: []//, filters: []
-		, sampler: { id: '', data: '',kind:'',outputId:'' } }
-        ,{ title: "Snare2", measures: []//, filters: []
-		, sampler: { id: '', data: '' ,kind:'',outputId:''} }
-        ,{ title: "Snare3", measures: []//, filters: []
-		, sampler: { id: '', data: '' ,kind:'',outputId:''} }
+		{
+			title: "Snare", measures: []//, filters: []
+			, sampler: { id: '', data: '', kind: '', outputId: '' }
+		}
+		, {
+			title: "Snare2", measures: []//, filters: []
+			, sampler: { id: '', data: '', kind: '', outputId: '' }
+		}
+		, {
+			title: "Snare3", measures: []//, filters: []
+			, sampler: { id: '', data: '', kind: '', outputId: '' }
+		}
 	]
-	, comments: [{ texts: [] }, { texts: [] }, { texts: [] }, { texts: [] }]
+	, comments: [{ texts: [{ skip: { count: 2, part: 16 }, text: '1-2/16' }] }, {
+		texts: [
+			{ skip: { count: 0, part: 16 }, text: '20' }
+			, { skip: { count: 1, part: 16 }, text: '21' }
+			, { skip: { count: 2, part: 16 }, text: '22' }
+			, { skip: { count: 3, part: 16 }, text: '23' }
+			, { skip: { count: 4, part: 16 }, text: '24' }
+			, { skip: { count: 5, part: 16 }, text: '25' }
+			, { skip: { count: 6, part: 16 }, text: '26' }
+			, { skip: { count: 7, part: 16 }, text: '27' }
+			, { skip: { count: 8, part: 16 }, text: '28\ntest' }
+			, { skip: { count: 9, part: 16 }, text: '29' }
+			, { skip: { count: 10, part: 16 }, text: '2-10' }
+			, { skip: { count: 11, part: 16 }, text: '2-11' }
+			, { skip: { count: 12, part: 16 }, text: '2-12' }
+			, { skip: { count: 13, part: 16 }, text: '2-13' }
+			, { skip: { count: 14, part: 16 }, text: '2-14' }
+			, { skip: { count: 15, part: 16 }, text: '2-15' }
+
+		]
+	}, { texts: [{ skip: { count: 2, part: 16 }, text: '3-2/16' }] }
+		, { texts: [{ skip: { count: 2, part: 16 }, text: '4-2/16' }] }
+		, { texts: [{ skip: { count: 2, part: 16 }, text: '5-2/16' }] }]
 	, filters: []
 	/*, theme: {
 		notePathHeight: 0.5

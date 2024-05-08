@@ -39,18 +39,24 @@ class MixerDataMath {
 		let mx = 1;
 
 		for (let ii = 0; ii < this.data.comments.length; ii++) {
-			let skips: Zvoog_Metre[] = [];
+
+			let placedX: number[] = [];
 			let txts = this.data.comments[ii].texts;
+			//console.log('commentsMaxHeight',ii,mx);
 			for (let tt = 0; tt < txts.length; tt++) {
-				for (let kk = 0; kk < skips.length; kk++) {
-					if (MMUtil().set(txts[tt].skip).equals(skips[kk])) {
+				//let skipS = MMUtil().set(txts[tt].skip).duration(this.data.timeline[tt].tempo);
+				let skipS = 0.5 * Math.round(MMUtil().set(txts[tt].skip).duration(this.data.timeline[ii].tempo) / 0.5);
+				for (let kk = 0; kk < placedX.length; kk++) {
+					//if (Math.abs(skipS - placedX[kk]) < 0.3) {
+					if (skipS == placedX[kk]) {
 						mx++;
 					}
-					skips.push(txts[tt].skip);
 				}
+				placedX.push(skipS);
 
 			}
 		}
+
 		return mx * this.notePathHeight;
 	}
 
