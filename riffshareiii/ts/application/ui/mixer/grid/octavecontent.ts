@@ -3,14 +3,15 @@ class OctaveContent {
 	constructor(barIdx: number
 		, octaveIdx: number
 		, left: number, top: number, width: number, height: number
-		, data: Zvoog_Project
+		//, data: Zvoog_Project
+		,cfg:MixerDataMathUtility
 		, barOctaveTrackAnchor: TileAnchor
 		, barOctaveFirstAnchor: TileAnchor
 		, zoomLevel: number) {
 		if (zoomLevel < 8) {
-			this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, data, zoomLevel);
+			this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, cfg, zoomLevel);
 			if (zoomLevel < 7) {
-				this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, data);
+				this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, cfg);
 
 			}
 		}
@@ -18,16 +19,17 @@ class OctaveContent {
 
 	addUpperNotes(barIdx: number, octaveIdx: number
 		, left: number, top: number, width: number, height: number
-		, barOctaveAnchor: TileAnchor, data: Zvoog_Project
+		, barOctaveAnchor: TileAnchor//, data: Zvoog_Project
+		,cfg:MixerDataMathUtility
 		, zoomLevel: number
 	) {
-		if (data.tracks.length) {
+		if (cfg.data.tracks.length) {
 			if (zoomLevel == 0) {
-				this.addTrackNotes(data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data
+				this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg
 					, 'mixNoteLine', true
 				);
 			} else {
-				this.addTrackNotes(data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data
+				this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg
 					, 'mixNoteLine', false
 				);
 			}
@@ -36,21 +38,24 @@ class OctaveContent {
 	}
 	addOtherNotes(barIdx: number, octaveIdx: number
 		, left: number, top: number, width: number, height: number
-		, barOctaveAnchor: TileAnchor, data: Zvoog_Project
+		, barOctaveAnchor: TileAnchor//, data: Zvoog_Project
+		,cfg:MixerDataMathUtility
 	) {
-		for (let ii = 1; ii < data.tracks.length; ii++) {
-			let track = data.tracks[ii];
-			this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data
+		for (let ii = 1; ii < cfg.data.tracks.length; ii++) {
+			let track = cfg.data.tracks[ii];
+			this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg
 				, 'mixNoteSub', false
 			);
 		}
 	}
 	addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number
 		, left: number, top: number, width: number, height: number
-		, barOctaveAnchor: TileAnchor, data: Zvoog_Project
+		, barOctaveAnchor: TileAnchor
+		//, data: Zvoog_Project
+		,cfg:MixerDataMathUtility
 		, css: string, addMoreInfo: boolean
 	) {
-		let mixm: MixerDataMath = new MixerDataMath(data);
+		//let mixm: MixerDataMath = new MixerDataMath(data);
 		let measure: Zvoog_TrackMeasure = track.measures[barIdx];
 		for (let cc = 0; cc < measure.chords.length; cc++) {
 			let chord: Zvoog_Chord = measure.chords[cc];
@@ -59,25 +64,25 @@ class OctaveContent {
 				let from = octaveIdx * 12;
 				let to = (octaveIdx + 1) * 12;
 				if (note.pitch >= from && note.pitch < to) {
-					let x1 = left + MMUtil().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
-					let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
+					let x1 = left + MMUtil().set(chord.skip).duration(cfg.data.timeline[barIdx].tempo) * cfg.widthDurationRatio;
+					let y1 = top + height - (note.pitch - from) * cfg.notePathHeight;
 					let slidearr = note.slides;
 					/*if (slidearr.length > 1) {
 						console.log(track.title, barIdx, slidearr);
 					}*/
 					for (let ss = 0; ss < slidearr.length; ss++) {
 						//if (ss > 2) break;
-						let x2 = x1 + MMUtil().set(slidearr[ss].duration).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
-						let y2 = y1 + slidearr[ss].delta * mixm.notePathHeight;
-						let r_x1 = x1 + mixm.notePathHeight / 2;
+						let x2 = x1 + MMUtil().set(slidearr[ss].duration).duration(cfg.data.timeline[barIdx].tempo) * cfg.widthDurationRatio;
+						let y2 = y1 + slidearr[ss].delta * cfg.notePathHeight;
+						let r_x1 = x1 + cfg.notePathHeight / 2;
 						if (ss > 0) {
 							r_x1 = x1;
 						}
-						let r_x2 = x2 - mixm.notePathHeight / 2;
+						let r_x2 = x2 - cfg.notePathHeight / 2;
 						if (ss < slidearr.length - 1) {
 							r_x2 = x2;
 						}
-						if (r_x2 - r_x1 < mixm.notePathHeight / 2) {
+						if (r_x2 - r_x1 < cfg.notePathHeight / 2) {
 							r_x2 = r_x1 + 0.000001;
 						}
 						if (barOctaveAnchor.ww < r_x2 - barOctaveAnchor.xx) {
@@ -85,9 +90,9 @@ class OctaveContent {
 						}
 						let line: TileLine = {
 							x1: r_x1
-							, y1: y1 - mixm.notePathHeight / 2
+							, y1: y1 - cfg.notePathHeight / 2
 							, x2: r_x2
-							, y2: y2 - mixm.notePathHeight / 2
+							, y2: y2 - cfg.notePathHeight / 2
 							, css: css
 						};
 						//if (slidearr.length > 1) {

@@ -228,7 +228,7 @@ class CommandDispatcher {
         this.audioContext = new AudioContext();
     }
     registerWorkProject(data) {
-        this.workData = data;
+        this.cfg = new MixerDataMathUtility(data);
     }
     registerUI(renderer) {
         this.renderer = renderer;
@@ -272,15 +272,15 @@ class CommandDispatcher {
         this.renderer.fillWholeUI();
     }
     moveTrackTop(trackNum) {
-        let it = this.workData.tracks[trackNum];
-        this.workData.tracks.splice(trackNum, 1);
-        this.workData.tracks.unshift(it);
+        let it = this.cfg.data.tracks[trackNum];
+        this.cfg.data.tracks.splice(trackNum, 1);
+        this.cfg.data.tracks.unshift(it);
         commandDispatcher.resetProject();
     }
     moveDrumTop(drumNum) {
-        let it = this.workData.percussions[drumNum];
-        this.workData.percussions.splice(drumNum, 1);
-        this.workData.percussions.unshift(it);
+        let it = this.cfg.data.percussions[drumNum];
+        this.cfg.data.percussions.splice(drumNum, 1);
+        this.cfg.data.percussions.unshift(it);
         commandDispatcher.resetProject();
     }
     setTrackSoloState(state) {
@@ -299,37 +299,39 @@ class CommandDispatcher {
     }
     expandTimeLineSelection(idx) {
         console.log('select bar', idx);
-        if (this.workData) {
-            if (idx >= 0 && idx < this.workData.timeline.length) {
-                if (this.workData.selection) {
-                    if (this.workData.selection.startMeasure == this.workData.selection.endMeasure) {
-                        if (this.workData.selection.startMeasure == idx) {
-                            this.workData.selection = undefined;
+        if (this.cfg.data) {
+            if (idx >= 0 && idx < this.cfg.data.timeline.length) {
+                let curPro = this.cfg.data;
+                if (curPro.selection) {
+                    let curProjectSelection = curPro.selection;
+                    if (curProjectSelection.startMeasure == curProjectSelection.endMeasure) {
+                        if (curProjectSelection.startMeasure == idx) {
+                            curPro.selection = undefined;
                         }
                         else {
-                            if (this.workData.selection.startMeasure > idx) {
-                                this.workData.selection.endMeasure = this.workData.selection.startMeasure;
-                                this.workData.selection.startMeasure = idx;
+                            if (curProjectSelection.startMeasure > idx) {
+                                curProjectSelection.endMeasure = curProjectSelection.startMeasure;
+                                curProjectSelection.startMeasure = idx;
                             }
                             else {
-                                this.workData.selection.endMeasure = idx;
+                                curProjectSelection.endMeasure = idx;
                             }
                         }
                     }
                     else {
-                        this.workData.selection.startMeasure = idx;
-                        this.workData.selection.endMeasure = idx;
+                        curProjectSelection.startMeasure = idx;
+                        curProjectSelection.endMeasure = idx;
                     }
                 }
                 else {
-                    this.workData.selection = {
+                    curPro.selection = {
                         startMeasure: idx,
                         endMeasure: idx
                     };
                 }
             }
         }
-        this.renderer.timeselectbar.updateTimeSelectionBar(this.workData);
+        this.renderer.timeselectbar.updateTimeSelectionBar(this.cfg);
         this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup, this.renderer.timeselectbar.selectionAnchor, LevelModes.top);
     }
 }
@@ -420,28 +422,26 @@ class UIRenderer {
         });
     }
     fillWholeUI() {
-        let mixm = new MixerDataMath(commandDispatcher.workData);
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
-        this.tiler.resetInnerSize(mixm.mixerWidth(), mixm.mixerHeight());
-        this.mixer.reFillMixerUI(commandDispatcher.workData);
-        this.leftPanel.reFillLeftPanel(commandDispatcher.workData);
-        this.debug.resetDebugView(commandDispatcher.workData);
+        this.tiler.resetInnerSize(commandDispatcher.cfg.mixerWidth(), commandDispatcher.cfg.mixerHeight());
+        this.mixer.reFillMixerUI(commandDispatcher.cfg);
+        this.leftPanel.reFillLeftPanel(commandDispatcher.cfg);
+        this.debug.resetDebugView(commandDispatcher.cfg);
         this.toolbar.resizeToolbar(vw, vh);
-        this.menu.readCurrentSongData(commandDispatcher.workData);
+        this.menu.readCurrentSongData(commandDispatcher.cfg.data);
         this.menu.resizeMenu(vw, vh);
         this.warning.resizeDialog(vw, vh, () => {
             this.tiler.resetAnchor(this.warning.warningGroup, this.warning.warningAnchor, LevelModes.overlay);
         });
-        this.timeselectbar.fillTimeBar(commandDispatcher.workData);
+        this.timeselectbar.fillTimeBar(commandDispatcher.cfg);
         this.timeselectbar.resizeTimeScale(vw, vh);
         this.tiler.resetModel();
     }
     onReSizeView() {
         let mixH = 1;
         if (this.lastUsedData) {
-            let mixm = new MixerDataMath(this.lastUsedData);
-            mixH = mixm.mixerHeight();
+            mixH = commandDispatcher.cfg.mixerHeight();
         }
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
@@ -564,30 +564,29 @@ class TimeSelectBar {
         this.selectionAnchor.hh = viewHeight * 1024;
         this.selectionMark.h = viewHeight * 1024;
     }
-    updateTimeSelectionBar(data) {
-        if (data.selection) {
-            let mixm = new MixerDataMath(data);
+    updateTimeSelectionBar(cfg) {
+        if (cfg.data.selection) {
             let mm = MMUtil();
-            let barLeft = mixm.LeftPad;
+            let barLeft = cfg.LeftPad;
             let startSel = 1;
             let widthSel = 0;
             let startIdx = 0;
-            for (startIdx = 0; startIdx < data.timeline.length; startIdx++) {
-                let curBar = data.timeline[startIdx];
+            for (startIdx = 0; startIdx < cfg.data.timeline.length; startIdx++) {
+                let curBar = cfg.data.timeline[startIdx];
                 let curMeasureMeter = mm.set(curBar.metre);
-                let barWidth = curMeasureMeter.duration(curBar.tempo) * mixm.widthDurationRatio;
-                if (startIdx == data.selection.startMeasure) {
+                let barWidth = curMeasureMeter.duration(curBar.tempo) * cfg.widthDurationRatio;
+                if (startIdx == cfg.data.selection.startMeasure) {
                     startSel = barLeft;
                     break;
                 }
                 barLeft = barLeft + barWidth;
             }
-            for (let ii = startIdx; ii < data.timeline.length; ii++) {
-                let curBar = data.timeline[ii];
+            for (let ii = startIdx; ii < cfg.data.timeline.length; ii++) {
+                let curBar = cfg.data.timeline[ii];
                 let curMeasureMeter = mm.set(curBar.metre);
-                let barWidth = curMeasureMeter.duration(curBar.tempo) * mixm.widthDurationRatio;
+                let barWidth = curMeasureMeter.duration(curBar.tempo) * cfg.widthDurationRatio;
                 widthSel = widthSel + barWidth;
-                if (ii == data.selection.endMeasure) {
+                if (ii == cfg.data.selection.endMeasure) {
                     break;
                 }
             }
@@ -602,7 +601,7 @@ class TimeSelectBar {
         }
         console.log('updateTimeSelectionBar', this.selectionMark.x, this.selectionMark.w);
     }
-    createBarMark(barIdx, barLeft, size, measureAnchor, data) {
+    createBarMark(barIdx, barLeft, size, measureAnchor, cfg) {
         let mark = {
             x: barLeft, y: 0, w: size, h: size,
             css: 'timeMarkButtonCircle', activation: (x, y) => {
@@ -630,26 +629,25 @@ class TimeSelectBar {
         };
         measureAnchor.content.push(bpm);
     }
-    fillTimeBar(data) {
-        let mixm = new MixerDataMath(data);
-        this.selectBarAnchor.ww = mixm.mixerWidth();
-        this.selectBarAnchor.hh = mixm.mixerHeight();
+    fillTimeBar(cfg) {
+        this.selectBarAnchor.ww = cfg.mixerWidth();
+        this.selectBarAnchor.hh = cfg.mixerHeight();
         this.zoomAnchors = [];
         for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
             let selectLevelAnchor = {
                 showZoom: zoomPrefixLevelsCSS[zz].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
-                xx: 0, yy: 0, ww: mixm.mixerWidth(), hh: mixm.mixerHeight(), content: [],
+                xx: 0, yy: 0, ww: cfg.mixerWidth(), hh: cfg.mixerHeight(), content: [],
                 id: 'time' + (zz + Math.random())
             };
             this.zoomAnchors.push(selectLevelAnchor);
             let mm = MMUtil();
-            let barLeft = mixm.LeftPad;
+            let barLeft = cfg.LeftPad;
             let barTime = 0;
-            for (let kk = 0; kk < data.timeline.length; kk++) {
-                let curBar = data.timeline[kk];
+            for (let kk = 0; kk < cfg.data.timeline.length; kk++) {
+                let curBar = cfg.data.timeline[kk];
                 let curMeasureMeter = mm.set(curBar.metre);
-                let barWidth = curMeasureMeter.duration(curBar.tempo) * mixm.widthDurationRatio;
+                let barWidth = curMeasureMeter.duration(curBar.tempo) * cfg.widthDurationRatio;
                 let measureAnchor = {
                     showZoom: zoomPrefixLevelsCSS[zz].minZoom,
                     hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
@@ -658,12 +656,11 @@ class TimeSelectBar {
                 };
                 selectLevelAnchor.content.push(measureAnchor);
                 if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
-                    this.createBarMark(kk, barLeft, zoomPrefixLevelsCSS[zz].minZoom * 1.5, measureAnchor, data);
+                    this.createBarMark(kk, barLeft, zoomPrefixLevelsCSS[zz].minZoom * 1.5, measureAnchor, cfg);
                     this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor, barTime);
                 }
                 let zoomInfo = zoomPrefixLevelsCSS[zz];
                 if (zoomInfo.gridLines.length > 0) {
-                    let mixm = new MixerDataMath(data);
                     let lineCount = 0;
                     let skip = MMUtil().set({ count: 0, part: 1 });
                     while (true) {
@@ -673,7 +670,7 @@ class TimeSelectBar {
                             break;
                         }
                         if (line.label) {
-                            let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
+                            let xx = barLeft + skip.duration(curBar.tempo) * cfg.widthDurationRatio;
                             let mark = {
                                 x: xx, y: 0,
                                 w: line.ratio * 2 * zoomInfo.minZoom,
@@ -700,7 +697,7 @@ class TimeSelectBar {
             }
         }
         this.selectBarAnchor.content = this.zoomAnchors;
-        this.updateTimeSelectionBar(data);
+        this.updateTimeSelectionBar(cfg);
     }
 }
 class UIToolbar {
@@ -1279,16 +1276,15 @@ class LeftPanel {
         }
         return [this.leftLayer];
     }
-    reFillLeftPanel(data) {
-        let mixm = new MixerDataMath(data);
+    reFillLeftPanel(cfg) {
         for (let zz = 0; zz < this.leftZoomAnchors.length; zz++) {
-            this.leftZoomAnchors[zz].hh = mixm.mixerHeight();
+            this.leftZoomAnchors[zz].hh = cfg.mixerHeight();
             this.leftZoomAnchors[zz].content = [];
-            for (let oo = 1; oo < mixm.octaveCount; oo++) {
+            for (let oo = 1; oo < cfg.octaveCount; oo++) {
                 if (zz < 4) {
                     let octavemark = {
                         x: 0,
-                        y: mixm.gridTop() + 12 * oo,
+                        y: cfg.gridTop() + 12 * oo,
                         w: 2 * zoomPrefixLevelsCSS[zz].minZoom,
                         h: 2 * zoomPrefixLevelsCSS[zz].minZoom,
                         css: 'octaveMark'
@@ -1296,31 +1292,31 @@ class LeftPanel {
                     this.leftZoomAnchors[zz].content.push(octavemark);
                     let nm = {
                         x: 0,
-                        y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 2 * zoomPrefixLevelsCSS[zz].minZoom,
-                        text: '' + (mixm.octaveCount - oo + 0),
+                        y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 2 * zoomPrefixLevelsCSS[zz].minZoom,
+                        text: '' + (cfg.octaveCount - oo + 0),
                         css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
                     };
                     this.leftZoomAnchors[zz].content.push(nm);
                     if (zz < 2) {
                         let nm = {
                             x: 0,
-                            y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 6 * mixm.notePathHeight,
-                            text: '' + (mixm.octaveCount - oo + 0),
+                            y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 6 * cfg.notePathHeight,
+                            text: '' + (cfg.octaveCount - oo + 0),
                             css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
                         };
                         this.leftZoomAnchors[zz].content.push(nm);
                         if (zz < 1) {
                             let nm = {
                                 x: 0,
-                                y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 3 * mixm.notePathHeight,
-                                text: '' + (mixm.octaveCount - oo + 0),
+                                y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 3 * cfg.notePathHeight,
+                                text: '' + (cfg.octaveCount - oo + 0),
                                 css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
                             };
                             this.leftZoomAnchors[zz].content.push(nm);
                             nm = {
                                 x: 0,
-                                y: mixm.gridTop() + 12 * oo * mixm.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 9 * mixm.notePathHeight,
-                                text: '' + (mixm.octaveCount - oo + 0),
+                                y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 9 * cfg.notePathHeight,
+                                text: '' + (cfg.octaveCount - oo + 0),
                                 css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
                             };
                             this.leftZoomAnchors[zz].content.push(nm);
@@ -1328,21 +1324,21 @@ class LeftPanel {
                     }
                 }
             }
-            if (data.tracks.length > 0) {
+            if (cfg.data.tracks.length > 0) {
                 let trackLabel = {
-                    text: '' + data.tracks[0].title,
+                    text: '' + cfg.data.tracks[0].title,
                     x: 0,
-                    y: mixm.gridTop() + zoomPrefixLevelsCSS[zz].minZoom * 0.5,
+                    y: cfg.gridTop() + zoomPrefixLevelsCSS[zz].minZoom * 0.5,
                     css: 'curTrackTitleLabel' + zoomPrefixLevelsCSS[zz].prefix
                 };
                 this.leftZoomAnchors[zz].content.push(trackLabel);
             }
             if (zz < 4) {
-                for (let ss = 0; ss < data.percussions.length; ss++) {
+                for (let ss = 0; ss < cfg.data.percussions.length; ss++) {
                     let samplerLabel = {
-                        text: '' + data.percussions[ss].title,
+                        text: '' + cfg.data.percussions[ss].title,
                         x: 0,
-                        y: mixm.samplerTop() + mixm.notePathHeight * ss + mixm.notePathHeight,
+                        y: cfg.samplerTop() + cfg.notePathHeight * ss + cfg.notePathHeight,
                         css: 'samplerRowLabel' + zoomPrefixLevelsCSS[zz].prefix
                     };
                     this.leftZoomAnchors[zz].content.push(samplerLabel);
@@ -1352,15 +1348,14 @@ class LeftPanel {
     }
 }
 class SamplerBar {
-    constructor(data, barIdx, drumIdx, zoomLevel, anchor, left) {
-        let mixm = new MixerDataMath(data);
-        let drum = data.percussions[drumIdx];
+    constructor(cfg, barIdx, drumIdx, zoomLevel, anchor, left) {
+        let drum = cfg.data.percussions[drumIdx];
         let measure = drum.measures[barIdx];
-        let yy = mixm.samplerTop() + drumIdx * mixm.notePathHeight;
-        let tempo = data.timeline[barIdx].tempo;
+        let yy = cfg.samplerTop() + drumIdx * cfg.notePathHeight;
+        let tempo = cfg.data.timeline[barIdx].tempo;
         for (let ss = 0; ss < measure.skips.length; ss++) {
             let skip = measure.skips[ss];
-            let xx = left + MMUtil().set(skip).duration(tempo) * mixm.widthDurationRatio;
+            let xx = left + MMUtil().set(skip).duration(tempo) * cfg.widthDurationRatio;
             let ply = {
                 dots: [xx, yy + 0.025,
                     xx, yy + 0.975,
@@ -1373,37 +1368,36 @@ class SamplerBar {
     }
 }
 class BarOctave {
-    constructor(barIdx, octaveIdx, left, top, width, height, barOctaveGridAnchor, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel, data) {
-        new OctaveContent(barIdx, octaveIdx, left, top, width, height, data, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel);
+    constructor(barIdx, octaveIdx, left, top, width, height, barOctaveGridAnchor, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel, cfg) {
+        new OctaveContent(barIdx, octaveIdx, left, top, width, height, cfg, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel);
     }
 }
 class OctaveContent {
-    constructor(barIdx, octaveIdx, left, top, width, height, data, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel) {
+    constructor(barIdx, octaveIdx, left, top, width, height, cfg, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel) {
         if (zoomLevel < 8) {
-            this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, data, zoomLevel);
+            this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, cfg, zoomLevel);
             if (zoomLevel < 7) {
-                this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, data);
+                this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, cfg);
             }
         }
     }
-    addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, zoomLevel) {
-        if (data.tracks.length) {
+    addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, zoomLevel) {
+        if (cfg.data.tracks.length) {
             if (zoomLevel == 0) {
-                this.addTrackNotes(data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, 'mixNoteLine', true);
+                this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, 'mixNoteLine', true);
             }
             else {
-                this.addTrackNotes(data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, 'mixNoteLine', false);
+                this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, 'mixNoteLine', false);
             }
         }
     }
-    addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data) {
-        for (let ii = 1; ii < data.tracks.length; ii++) {
-            let track = data.tracks[ii];
-            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, 'mixNoteSub', false);
+    addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg) {
+        for (let ii = 1; ii < cfg.data.tracks.length; ii++) {
+            let track = cfg.data.tracks[ii];
+            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, 'mixNoteSub', false);
         }
     }
-    addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, data, css, addMoreInfo) {
-        let mixm = new MixerDataMath(data);
+    addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, css, addMoreInfo) {
         let measure = track.measures[barIdx];
         for (let cc = 0; cc < measure.chords.length; cc++) {
             let chord = measure.chords[cc];
@@ -1412,21 +1406,21 @@ class OctaveContent {
                 let from = octaveIdx * 12;
                 let to = (octaveIdx + 1) * 12;
                 if (note.pitch >= from && note.pitch < to) {
-                    let x1 = left + MMUtil().set(chord.skip).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
-                    let y1 = top + height - (note.pitch - from) * mixm.notePathHeight;
+                    let x1 = left + MMUtil().set(chord.skip).duration(cfg.data.timeline[barIdx].tempo) * cfg.widthDurationRatio;
+                    let y1 = top + height - (note.pitch - from) * cfg.notePathHeight;
                     let slidearr = note.slides;
                     for (let ss = 0; ss < slidearr.length; ss++) {
-                        let x2 = x1 + MMUtil().set(slidearr[ss].duration).duration(data.timeline[barIdx].tempo) * mixm.widthDurationRatio;
-                        let y2 = y1 + slidearr[ss].delta * mixm.notePathHeight;
-                        let r_x1 = x1 + mixm.notePathHeight / 2;
+                        let x2 = x1 + MMUtil().set(slidearr[ss].duration).duration(cfg.data.timeline[barIdx].tempo) * cfg.widthDurationRatio;
+                        let y2 = y1 + slidearr[ss].delta * cfg.notePathHeight;
+                        let r_x1 = x1 + cfg.notePathHeight / 2;
                         if (ss > 0) {
                             r_x1 = x1;
                         }
-                        let r_x2 = x2 - mixm.notePathHeight / 2;
+                        let r_x2 = x2 - cfg.notePathHeight / 2;
                         if (ss < slidearr.length - 1) {
                             r_x2 = x2;
                         }
-                        if (r_x2 - r_x1 < mixm.notePathHeight / 2) {
+                        if (r_x2 - r_x1 < cfg.notePathHeight / 2) {
                             r_x2 = r_x1 + 0.000001;
                         }
                         if (barOctaveAnchor.ww < r_x2 - barOctaveAnchor.xx) {
@@ -1434,9 +1428,9 @@ class OctaveContent {
                         }
                         let line = {
                             x1: r_x1,
-                            y1: y1 - mixm.notePathHeight / 2,
+                            y1: y1 - cfg.notePathHeight / 2,
                             x2: r_x2,
-                            y2: y2 - mixm.notePathHeight / 2,
+                            y2: y2 - cfg.notePathHeight / 2,
                             css: css
                         };
                         barOctaveAnchor.content.push(line);
@@ -1458,15 +1452,14 @@ class OctaveContent {
     }
 }
 class MixerBar {
-    constructor(barIdx, left, ww, zoomLevel, gridZoomBarAnchor, tracksZoomBarAnchor, firstZoomBarAnchor, data) {
-        let mixm = new MixerDataMath(data);
-        let h12 = 12 * mixm.notePathHeight;
-        for (let oo = 0; oo < mixm.octaveCount; oo++) {
+    constructor(barIdx, left, ww, zoomLevel, gridZoomBarAnchor, tracksZoomBarAnchor, firstZoomBarAnchor, cfg) {
+        let h12 = 12 * cfg.notePathHeight;
+        for (let oo = 0; oo < cfg.octaveCount; oo++) {
             let gridOctaveAnchor = {
                 showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom,
                 xx: left,
-                yy: mixm.gridTop() + oo * h12,
+                yy: cfg.gridTop() + oo * h12,
                 ww: ww,
                 hh: h12, content: [],
                 id: 'octaveGridz' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
@@ -1476,7 +1469,7 @@ class MixerBar {
                 showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom,
                 xx: left,
-                yy: mixm.gridTop() + oo * h12,
+                yy: cfg.gridTop() + oo * h12,
                 ww: ww,
                 hh: h12, content: [],
                 id: 'octaveTracks' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
@@ -1486,13 +1479,13 @@ class MixerBar {
                 showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom,
                 xx: left,
-                yy: mixm.gridTop() + oo * h12,
+                yy: cfg.gridTop() + oo * h12,
                 ww: ww,
                 hh: h12, content: [],
                 id: 'octaveFirst' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
             };
             firstZoomBarAnchor.content.push(firstOctaveAnchor);
-            new BarOctave(barIdx, (mixm.octaveCount - oo - 1), left, mixm.gridTop() + oo * h12, ww, h12, gridOctaveAnchor, tracksOctaveAnchor, firstOctaveAnchor, zoomLevel, data);
+            new BarOctave(barIdx, (cfg.octaveCount - oo - 1), left, cfg.gridTop() + oo * h12, ww, h12, gridOctaveAnchor, tracksOctaveAnchor, firstOctaveAnchor, zoomLevel, cfg);
             if (firstZoomBarAnchor.ww < firstOctaveAnchor.ww) {
                 firstZoomBarAnchor.ww = firstOctaveAnchor.ww;
             }
@@ -1501,31 +1494,30 @@ class MixerBar {
             }
         }
         if (zoomLevel < 6) {
-            this.addOctaveGridSteps(barIdx, data, left, ww, gridZoomBarAnchor, zoomLevel);
+            this.addOctaveGridSteps(barIdx, cfg, left, ww, gridZoomBarAnchor, zoomLevel);
         }
         if (zoomLevel < 7) {
-            for (let pp = 0; pp < data.percussions.length; pp++) {
-                let drum = data.percussions[pp];
+            for (let pp = 0; pp < cfg.data.percussions.length; pp++) {
+                let drum = cfg.data.percussions[pp];
                 if (drum) {
                     let measure = drum.measures[barIdx];
                     if (measure) {
-                        new SamplerBar(data, barIdx, pp, zoomLevel, firstZoomBarAnchor, left);
+                        new SamplerBar(cfg, barIdx, pp, zoomLevel, firstZoomBarAnchor, left);
                     }
                 }
             }
         }
         if (zoomLevel < 6) {
-            new TextComments(barIdx, data, left, gridZoomBarAnchor, zoomLevel);
+            new TextComments(barIdx, cfg, left, gridZoomBarAnchor, zoomLevel);
         }
     }
-    addOctaveGridSteps(barIdx, data, barLeft, width, barOctaveAnchor, zIndex) {
+    addOctaveGridSteps(barIdx, cfg, barLeft, width, barOctaveAnchor, zIndex) {
         let zoomInfo = zoomPrefixLevelsCSS[zIndex];
-        let curBar = data.timeline[barIdx];
-        let mixm = new MixerDataMath(data);
+        let curBar = cfg.data.timeline[barIdx];
         let lineCount = 0;
         let skip = MMUtil().set({ count: 0, part: 1 });
-        let top = mixm.gridTop();
-        let height = mixm.gridHeight();
+        let top = cfg.gridTop();
+        let height = cfg.gridHeight();
         let barRightBorder = {
             x: barLeft + width,
             y: top,
@@ -1536,12 +1528,12 @@ class MixerBar {
             css: 'barRightBorder'
         };
         barOctaveAnchor.content.push(barRightBorder);
-        if (data.percussions.length) {
+        if (cfg.data.percussions.length) {
             let barSamRightBorder = {
                 x: barLeft + width,
-                y: mixm.samplerTop(),
+                y: cfg.samplerTop(),
                 w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
-                h: data.percussions.length * mixm.notePathHeight,
+                h: cfg.data.percussions.length * cfg.notePathHeight,
                 rx: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
                 ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
                 css: 'barRightBorder'
@@ -1559,7 +1551,7 @@ class MixerBar {
                 if (!skip.less(curBar.metre)) {
                     break;
                 }
-                let xx = barLeft + skip.duration(curBar.tempo) * mixm.widthDurationRatio;
+                let xx = barLeft + skip.duration(curBar.tempo) * cfg.widthDurationRatio;
                 let mark = {
                     x: xx,
                     y: top,
@@ -1568,16 +1560,24 @@ class MixerBar {
                     css: css
                 };
                 barOctaveAnchor.content.push(mark);
-                if (data.percussions.length) {
+                if (cfg.data.percussions.length) {
                     let sammark = {
                         x: xx,
-                        y: mixm.samplerTop(),
+                        y: cfg.samplerTop(),
                         w: line.ratio * zoomInfo.minZoom / 2,
-                        h: data.percussions.length * mixm.notePathHeight,
+                        h: cfg.data.percussions.length * cfg.notePathHeight,
                         css: css
                     };
                     barOctaveAnchor.content.push(sammark);
                 }
+                let txtmark = {
+                    x: xx,
+                    y: cfg.commentsTop(),
+                    w: line.ratio * zoomInfo.minZoom / 2,
+                    h: cfg.commentsMaxHeight(),
+                    css: css
+                };
+                barOctaveAnchor.content.push(txtmark);
                 lineCount++;
                 if (lineCount >= zoomInfo.gridLines.length) {
                     lineCount = 0;
@@ -1587,13 +1587,12 @@ class MixerBar {
     }
 }
 class TextComments {
-    constructor(barIdx, data, barLeft, barOctaveAnchor, zIndex) {
-        let curBar = data.timeline[barIdx];
-        let mixm = new MixerDataMath(data);
-        let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * mixm.widthDurationRatio;
+    constructor(barIdx, cfg, barLeft, barOctaveAnchor, zIndex) {
+        let curBar = cfg.data.timeline[barIdx];
+        let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * cfg.widthDurationRatio;
         let left = barLeft + width;
-        let top = mixm.commentsTop();
-        let height = mixm.commentsMaxHeight();
+        let top = cfg.commentsTop();
+        let height = cfg.commentsMaxHeight();
         let barTxtRightBorder = {
             x: left,
             y: top,
@@ -1604,23 +1603,21 @@ class TextComments {
             css: 'barRightBorder'
         };
         barOctaveAnchor.content.push(barTxtRightBorder);
-        if (barIdx < data.comments.length) {
-            let placedX = [];
-            for (let ii = 0; ii < data.comments[barIdx].texts.length; ii++) {
-                let itxt = data.comments[barIdx].texts[ii];
-                let skipS = 0.5 * Math.floor(MMUtil().set(itxt.skip).duration(curBar.tempo) / 0.5);
-                let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * mixm.widthDurationRatio;
-                let placeIdx = 1;
-                for (let kk = 0; kk < placedX.length; kk++) {
-                    if (skipS == placedX[kk]) {
-                        placeIdx++;
-                    }
-                }
-                placedX.push(skipS);
+        if (barIdx < cfg.data.comments.length) {
+            let txtZoomRatio = 1;
+            if (zIndex > 2)
+                txtZoomRatio = 2;
+            if (zIndex > 3)
+                txtZoomRatio = 4;
+            if (zIndex > 4)
+                txtZoomRatio = 8;
+            for (let ii = 0; ii < cfg.data.comments[barIdx].points.length; ii++) {
+                let itxt = cfg.data.comments[barIdx].points[ii];
+                let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * cfg.widthDurationRatio;
                 let tt = {
                     x: xx,
-                    y: top + zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx,
-                    text: data.comments[barIdx].texts[ii].text,
+                    y: top + cfg.notePathHeight * (1 + itxt.row) * txtZoomRatio,
+                    text: cfg.data.comments[barIdx].points[ii].text,
                     css: 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix
                 };
                 barOctaveAnchor.content.push(tt);
@@ -1632,10 +1629,9 @@ class MixerUI {
     constructor() {
         this.levels = [];
     }
-    reFillMixerUI(data) {
-        let mixm = new MixerDataMath(data);
-        let ww = mixm.mixerWidth();
-        let hh = mixm.mixerHeight();
+    reFillMixerUI(cfg) {
+        let ww = cfg.mixerWidth();
+        let hh = cfg.mixerHeight();
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             this.gridLayers.anchors[ii].ww = ww;
             this.gridLayers.anchors[ii].hh = hh;
@@ -1643,13 +1639,13 @@ class MixerUI {
             this.trackLayers.anchors[ii].hh = hh;
             this.firstLayers.anchors[ii].ww = ww;
             this.firstLayers.anchors[ii].hh = hh;
-            this.levels[ii].reCreateBars(data);
+            this.levels[ii].reCreateBars(cfg);
         }
-        this.fillerAnchor.xx = mixm.LeftPad;
-        this.fillerAnchor.yy = mixm.gridTop();
-        this.fillerAnchor.ww = mixm.mixerWidth() - mixm.LeftPad - mixm.rightPad;
-        this.fillerAnchor.hh = mixm.gridHeight();
-        this.reFillTracksRatio(data);
+        this.fillerAnchor.xx = cfg.LeftPad;
+        this.fillerAnchor.yy = cfg.gridTop();
+        this.fillerAnchor.ww = cfg.mixerWidth() - cfg.LeftPad - cfg.rightPad;
+        this.fillerAnchor.hh = cfg.gridHeight();
+        this.reFillTracksRatio(cfg);
     }
     createMixerLayers() {
         let tracksLayerZoom = document.getElementById('tracksLayerZoom');
@@ -1687,17 +1683,16 @@ class MixerUI {
         this.gridLayers.anchors.push(this.fillerAnchor);
         return [this.gridLayers, this.trackLayers, this.firstLayers];
     }
-    reFillTracksRatio(data) {
-        let mixm = new MixerDataMath(data);
+    reFillTracksRatio(cfg) {
         let mxNotes = 0;
         let mxDrums = 0;
         let mxTxt = 0;
-        for (let bb = 0; bb < data.timeline.length; bb++) {
+        for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
             let notecount = 0;
             let drumcount = 0;
             let txtcnt = 0;
-            for (let tt = 0; tt < data.tracks.length; tt++) {
-                let bar = data.tracks[tt].measures[bb];
+            for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
+                let bar = cfg.data.tracks[tt].measures[bb];
                 if (bar) {
                     for (let cc = 0; cc < bar.chords.length; cc++) {
                         notecount = notecount + bar.chords[cc].notes.length;
@@ -1707,8 +1702,8 @@ class MixerUI {
             if (mxNotes < notecount) {
                 mxNotes = notecount;
             }
-            for (let tt = 0; tt < data.percussions.length; tt++) {
-                let bar = data.percussions[tt].measures[bb];
+            for (let tt = 0; tt < cfg.data.percussions.length; tt++) {
+                let bar = cfg.data.percussions[tt].measures[bb];
                 if (bar) {
                     drumcount = drumcount + bar.skips.length;
                 }
@@ -1716,10 +1711,10 @@ class MixerUI {
             if (mxDrums < drumcount) {
                 mxDrums = drumcount;
             }
-            if (data.comments[bb])
-                if (data.comments[bb].texts)
-                    if (mxTxt < data.comments[bb].texts.length) {
-                        mxTxt = data.comments[bb].texts.length;
+            if (cfg.data.comments[bb])
+                if (cfg.data.comments[bb].points)
+                    if (mxTxt < cfg.data.comments[bb].points.length) {
+                        mxTxt = cfg.data.comments[bb].points.length;
                     }
         }
         if (mxDrums < 1)
@@ -1730,29 +1725,29 @@ class MixerUI {
             mxTxt = 1;
         this.fillerAnchor.content = [];
         let barX = 0;
-        for (let bb = 0; bb < data.timeline.length; bb++) {
+        for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
             let notecount = 0;
-            for (let tt = 0; tt < data.tracks.length; tt++) {
-                let bar = data.tracks[tt].measures[bb];
+            for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
+                let bar = cfg.data.tracks[tt].measures[bb];
                 for (let cc = 0; cc < bar.chords.length; cc++) {
                     notecount = notecount + bar.chords[cc].notes.length;
                 }
             }
             let filIdx = 1 + Math.round(7 * notecount / mxNotes);
             let css = 'mixFiller' + filIdx;
-            let barwidth = MMUtil().set(data.timeline[bb].metre).duration(data.timeline[bb].tempo) * mixm.widthDurationRatio;
+            let barwidth = MMUtil().set(cfg.data.timeline[bb].metre).duration(cfg.data.timeline[bb].tempo) * cfg.widthDurationRatio;
             let fillRectangle = {
-                x: mixm.LeftPad + barX,
-                y: mixm.gridTop(),
+                x: cfg.LeftPad + barX,
+                y: cfg.gridTop(),
                 w: barwidth,
-                h: mixm.gridHeight(),
+                h: cfg.gridHeight(),
                 css: css
             };
             this.fillerAnchor.content.push(fillRectangle);
-            if (data.percussions.length) {
+            if (cfg.data.percussions.length) {
                 let drumcount = 0;
-                for (let tt = 0; tt < data.percussions.length; tt++) {
-                    let bar = data.percussions[tt].measures[bb];
+                for (let tt = 0; tt < cfg.data.percussions.length; tt++) {
+                    let bar = cfg.data.percussions[tt].measures[bb];
                     if (bar) {
                         drumcount = drumcount + bar.skips.length;
                     }
@@ -1760,26 +1755,26 @@ class MixerUI {
                 filIdx = 1 + Math.round(7 * drumcount / mxDrums);
                 let css2 = 'mixFiller' + filIdx;
                 let fillDrumBar = {
-                    x: mixm.LeftPad + barX,
-                    y: mixm.samplerTop(),
+                    x: cfg.LeftPad + barX,
+                    y: cfg.samplerTop(),
                     w: barwidth,
-                    h: data.percussions.length * mixm.notePathHeight,
+                    h: cfg.data.percussions.length * cfg.notePathHeight,
                     css: css2
                 };
                 this.fillerAnchor.content.push(fillDrumBar);
             }
             filIdx = 1;
-            if (data.comments[bb]) {
-                if (data.comments[bb].texts) {
-                    filIdx = 1 + Math.round(7 * data.comments[bb].texts.length / mxTxt);
+            if (cfg.data.comments[bb]) {
+                if (cfg.data.comments[bb].points) {
+                    filIdx = 1 + Math.round(7 * cfg.data.comments[bb].points.length / mxTxt);
                 }
             }
             css = 'mixFiller' + filIdx;
             let fillTxtBar = {
-                x: mixm.LeftPad + barX,
-                y: mixm.commentsTop(),
+                x: cfg.LeftPad + barX,
+                y: cfg.commentsTop(),
                 w: barwidth,
-                h: mixm.commentsMaxHeight(),
+                h: cfg.commentsMaxHeight(),
                 css: css
             };
             this.fillerAnchor.content.push(fillTxtBar);
@@ -1794,65 +1789,80 @@ class MixerZoomLevel {
         this.zoomTracksAnchor = anchorTracks;
         this.zoomFirstAnchor = anchorFirst;
     }
-    reCreateBars(data) {
-        let mixm = new MixerDataMath(data);
+    reCreateBars(cfg) {
         this.zoomGridAnchor.content = [];
         this.zoomTracksAnchor.content = [];
         this.zoomFirstAnchor.content = [];
         this.bars = [];
-        let left = mixm.LeftPad;
+        let left = cfg.LeftPad;
         let width = 0;
-        for (let ii = 0; ii < data.timeline.length; ii++) {
-            let timebar = data.timeline[ii];
-            width = MMUtil().set(timebar.metre).duration(timebar.tempo) * mixm.widthDurationRatio;
+        for (let ii = 0; ii < cfg.data.timeline.length; ii++) {
+            let timebar = cfg.data.timeline[ii];
+            width = MMUtil().set(timebar.metre).duration(timebar.tempo) * cfg.widthDurationRatio;
             let barGridAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
-                xx: left, yy: 0, ww: width, hh: mixm.mixerHeight(), content: [], id: 'barGrid' + (ii + Math.random())
+                xx: left, yy: 0, ww: width, hh: cfg.mixerHeight(), content: [], id: 'barGrid' + (ii + Math.random())
             };
             this.zoomGridAnchor.content.push(barGridAnchor);
             let barTracksAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
-                xx: left, yy: 0, ww: width, hh: mixm.mixerHeight(), content: [], id: 'barTrack' + (ii + Math.random())
+                xx: left, yy: 0, ww: width, hh: cfg.mixerHeight(), content: [], id: 'barTrack' + (ii + Math.random())
             };
             this.zoomTracksAnchor.content.push(barTracksAnchor);
             let barFirstAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
-                xx: left, yy: 0, ww: width, hh: mixm.mixerHeight(), content: [], id: 'barFirst' + (ii + Math.random())
+                xx: left, yy: 0, ww: width, hh: cfg.mixerHeight(), content: [], id: 'barFirst' + (ii + Math.random())
             };
             this.zoomFirstAnchor.content.push(barFirstAnchor);
-            let mixBar = new MixerBar(ii, left, width, this.zoomLevelIndex, barGridAnchor, barTracksAnchor, barFirstAnchor, data);
+            let mixBar = new MixerBar(ii, left, width, this.zoomLevelIndex, barGridAnchor, barTracksAnchor, barFirstAnchor, cfg);
             this.bars.push(mixBar);
             left = left + width;
         }
         let titleLabel = {
             x: 0,
-            y: mixm.heightOfTitle(),
-            text: data.title,
+            y: cfg.heightOfTitle(),
+            text: cfg.data.title,
             css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix
         };
         this.zoomGridAnchor.content.push(titleLabel);
+        this.addDrumLines(cfg);
+        this.addGridLines(this.zoomGridAnchor, cfg);
+        this.addCommentLines(cfg);
+    }
+    addDrumLines(cfg) {
         if (this.zoomLevelIndex < 4) {
-            for (let ss = 1; ss < data.percussions.length; ss++) {
+            for (let ss = 1; ss < cfg.data.percussions.length; ss++) {
                 let line = {
-                    x: mixm.LeftPad,
-                    y: mixm.samplerTop() + mixm.notePathHeight * ss,
+                    x: cfg.LeftPad,
+                    y: cfg.samplerTop() + cfg.notePathHeight * ss,
                     h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0,
-                    w: mixm.timelineWidth(), css: 'samplerRowBorder'
+                    w: cfg.timelineWidth(), css: 'samplerRowBorder'
                 };
                 this.zoomGridAnchor.content.push(line);
             }
         }
-        this.addLines(this.zoomGridAnchor, data);
     }
-    addLines(barOctaveAnchor, data) {
-        let mixm = new MixerDataMath(data);
+    addCommentLines(cfg) {
+        if (this.zoomLevelIndex < 3) {
+            for (let ss = 0; ss <= cfg.maxCommentRowCount; ss++) {
+                let line = {
+                    x: cfg.LeftPad,
+                    y: cfg.commentsTop() + cfg.notePathHeight * (ss + 1),
+                    h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
+                    w: cfg.timelineWidth(), css: 'interActiveGridLine'
+                };
+                this.zoomGridAnchor.content.push(line);
+            }
+        }
+    }
+    addGridLines(barOctaveAnchor, cfg) {
         if (this.zoomLevelIndex < 4) {
-            for (let oo = 0; oo < mixm.octaveCount; oo++) {
+            for (let oo = 0; oo < cfg.octaveCount; oo++) {
                 if (oo > 0) {
                     let octaveBottomBorder = {
-                        x: mixm.LeftPad,
-                        y: mixm.gridTop() + oo * 12 * mixm.notePathHeight,
-                        w: mixm.timelineWidth(),
+                        x: cfg.LeftPad,
+                        y: cfg.gridTop() + oo * 12 * cfg.notePathHeight,
+                        w: cfg.timelineWidth(),
                         h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0,
                         css: 'octaveBottomBorder'
                     };
@@ -1861,9 +1871,9 @@ class MixerZoomLevel {
                 if (this.zoomLevelIndex < 3) {
                     for (let kk = 1; kk < 12; kk++) {
                         barOctaveAnchor.content.push({
-                            x: mixm.LeftPad,
-                            y: mixm.gridTop() + (oo * 12 + kk) * mixm.notePathHeight,
-                            w: mixm.timelineWidth(),
+                            x: cfg.LeftPad,
+                            y: cfg.gridTop() + (oo * 12 + kk) * cfg.notePathHeight,
+                            w: cfg.timelineWidth(),
                             h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
                             css: 'interActiveGridLine'
                         });
@@ -1956,10 +1966,9 @@ class DebugLayerUI {
             ], mode: LevelModes.normal
         };
     }
-    resetDebugView(data) {
-        let mixm = new MixerDataMath(data);
-        let ww = mixm.mixerWidth();
-        let hh = mixm.mixerHeight();
+    resetDebugView(cfg) {
+        let ww = cfg.mixerWidth();
+        let hh = cfg.mixerHeight();
         this.debugRectangle.w = ww;
         this.debugRectangle.h = hh;
         this.debugAnchor.ww = ww;
@@ -2077,28 +2086,28 @@ let mzxbxProjectForTesting2 = {
             sampler: { id: '', data: '', kind: '', outputId: '' }
         }
     ],
-    comments: [{ texts: [{ skip: { count: 2, part: 16 }, text: '1-2/16' }] }, {
-            texts: [
-                { skip: { count: 0, part: 16 }, text: '20' },
-                { skip: { count: 1, part: 16 }, text: '21' },
-                { skip: { count: 2, part: 16 }, text: '22' },
-                { skip: { count: 3, part: 16 }, text: '23' },
-                { skip: { count: 4, part: 16 }, text: '24' },
-                { skip: { count: 5, part: 16 }, text: '25' },
-                { skip: { count: 6, part: 16 }, text: '26' },
-                { skip: { count: 7, part: 16 }, text: '27' },
-                { skip: { count: 8, part: 16 }, text: '28\ntest' },
-                { skip: { count: 9, part: 16 }, text: '29' },
-                { skip: { count: 10, part: 16 }, text: '2-10' },
-                { skip: { count: 11, part: 16 }, text: '2-11' },
-                { skip: { count: 12, part: 16 }, text: '2-12' },
-                { skip: { count: 13, part: 16 }, text: '2-13' },
-                { skip: { count: 14, part: 16 }, text: '2-14' },
-                { skip: { count: 15, part: 16 }, text: '2-15' }
+    comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16', row: 0 }] }, {
+            points: [
+                { skip: { count: 0, part: 16 }, text: '20', row: 0 },
+                { skip: { count: 1, part: 16 }, text: '21', row: 1 },
+                { skip: { count: 2, part: 16 }, text: '22', row: 2 },
+                { skip: { count: 3, part: 16 }, text: '23', row: 0 },
+                { skip: { count: 4, part: 16 }, text: '24', row: 1 },
+                { skip: { count: 5, part: 16 }, text: '25', row: 2 },
+                { skip: { count: 6, part: 16 }, text: '26', row: 0 },
+                { skip: { count: 7, part: 16 }, text: '27', row: 1 },
+                { skip: { count: 8, part: 16 }, text: '28\ntest', row: 2 },
+                { skip: { count: 9, part: 16 }, text: '29', row: 0 },
+                { skip: { count: 10, part: 16 }, text: '2-10', row: 1 },
+                { skip: { count: 11, part: 16 }, text: '2-11', row: 2 },
+                { skip: { count: 12, part: 16 }, text: '2-12', row: 0 },
+                { skip: { count: 13, part: 16 }, text: '2-13', row: 1 },
+                { skip: { count: 14, part: 16 }, text: '2-14', row: 2 },
+                { skip: { count: 15, part: 16 }, text: '2-15', row: 0 }
             ]
-        }, { texts: [{ skip: { count: 2, part: 16 }, text: '3-2/16' }] },
-        { texts: [{ skip: { count: 2, part: 16 }, text: '4-2/16' }] },
-        { texts: [{ skip: { count: 2, part: 16 }, text: '5-2/16' }] }],
+        }, { points: [{ skip: { count: 2, part: 16 }, text: '3-2/16', row: 0 }] },
+        { points: [{ skip: { count: 2, part: 16 }, text: '4-2/16', row: 0 }] },
+        { points: [{ skip: { count: 2, part: 16 }, text: '5-2/16', row: 0 }] }],
     filters: []
 };
 let testBigMixerData = {
@@ -2170,7 +2179,7 @@ let testEmptyMixerData = {
         { title: 'Second track' }
     ]
 };
-class MixerDataMath {
+class MixerDataMathUtility {
     constructor(data) {
         this.LeftPad = 3;
         this.rightPad = 10;
@@ -2181,7 +2190,17 @@ class MixerDataMath {
         this.samplerBottomPad = 1;
         this.titleBottomPad = 1;
         this.gridBottomPad = 1;
+        this.maxCommentRowCount = 0;
         this.data = data;
+        this.maxCommentRowCount = -1;
+        for (let ii = 0; ii < this.data.comments.length; ii++) {
+            let txts = this.data.comments[ii].points;
+            for (let tt = 0; tt < txts.length; tt++) {
+                if (this.maxCommentRowCount < txts[tt].row) {
+                    this.maxCommentRowCount = txts[tt].row;
+                }
+            }
+        }
     }
     mixerWidth() {
         return this.LeftPad + this.timelineWidth() + this.rightPad;
@@ -2203,33 +2222,7 @@ class MixerDataMath {
             + this.bottomMixerPad;
     }
     commentsMaxHeight() {
-        let wholeMax = 0;
-        let txtExsts = false;
-        for (let ii = 0; ii < this.data.comments.length; ii++) {
-            let placedX = [];
-            let txts = this.data.comments[ii].texts;
-            for (let tt = 0; tt < txts.length; tt++) {
-                txtExsts = true;
-                let skipS = 0.5 * Math.floor(MMUtil().set(txts[tt].skip).duration(this.data.timeline[ii].tempo) / 0.5);
-                let barMx = 0;
-                for (let kk = 0; kk < placedX.length; kk++) {
-                    if (skipS == placedX[kk]) {
-                        barMx++;
-                    }
-                }
-                placedX.push(skipS);
-                if (barMx > wholeMax) {
-                    wholeMax = barMx;
-                }
-            }
-        }
-        if (txtExsts) {
-            wholeMax = wholeMax + 2;
-        }
-        else {
-            wholeMax = 1;
-        }
-        return wholeMax * this.notePathHeight;
+        return (2 + this.maxCommentRowCount) * this.notePathHeight * 8;
     }
     commentsTop() {
         return this.gridTop()

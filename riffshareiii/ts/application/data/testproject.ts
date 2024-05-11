@@ -66,29 +66,29 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 			, sampler: { id: '', data: '', kind: '', outputId: '' }
 		}
 	]
-	, comments: [{ texts: [{ skip: { count: 2, part: 16 }, text: '1-2/16' }] }, {
-		texts: [
-			{ skip: { count: 0, part: 16 }, text: '20' }
-			, { skip: { count: 1, part: 16 }, text: '21' }
-			, { skip: { count: 2, part: 16 }, text: '22' }
-			, { skip: { count: 3, part: 16 }, text: '23' }
-			, { skip: { count: 4, part: 16 }, text: '24' }
-			, { skip: { count: 5, part: 16 }, text: '25' }
-			, { skip: { count: 6, part: 16 }, text: '26' }
-			, { skip: { count: 7, part: 16 }, text: '27' }
-			, { skip: { count: 8, part: 16 }, text: '28\ntest' }
-			, { skip: { count: 9, part: 16 }, text: '29' }
-			, { skip: { count: 10, part: 16 }, text: '2-10' }
-			, { skip: { count: 11, part: 16 }, text: '2-11' }
-			, { skip: { count: 12, part: 16 }, text: '2-12' }
-			, { skip: { count: 13, part: 16 }, text: '2-13' }
-			, { skip: { count: 14, part: 16 }, text: '2-14' }
-			, { skip: { count: 15, part: 16 }, text: '2-15' }
+	, comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16' ,row:0}] }, {
+		points: [
+			{ skip: { count: 0, part: 16 }, text: '20' ,row:0}
+			, { skip: { count: 1, part: 16 }, text: '21' ,row:1}
+			, { skip: { count: 2, part: 16 }, text: '22' ,row:2}
+			, { skip: { count: 3, part: 16 }, text: '23' ,row:0}
+			, { skip: { count: 4, part: 16 }, text: '24' ,row:1}
+			, { skip: { count: 5, part: 16 }, text: '25' ,row:2}
+			, { skip: { count: 6, part: 16 }, text: '26' ,row:0}
+			, { skip: { count: 7, part: 16 }, text: '27' ,row:1}
+			, { skip: { count: 8, part: 16 }, text: '28\ntest' ,row:2}
+			, { skip: { count: 9, part: 16 }, text: '29',row:0 }
+			, { skip: { count: 10, part: 16 }, text: '2-10',row:1 }
+			, { skip: { count: 11, part: 16 }, text: '2-11',row:2 }
+			, { skip: { count: 12, part: 16 }, text: '2-12',row:0 }
+			, { skip: { count: 13, part: 16 }, text: '2-13',row:1 }
+			, { skip: { count: 14, part: 16 }, text: '2-14' ,row:2}
+			, { skip: { count: 15, part: 16 }, text: '2-15' ,row:0}
 
 		]
-	}, { texts: [{ skip: { count: 2, part: 16 }, text: '3-2/16' }] }
-		, { texts: [{ skip: { count: 2, part: 16 }, text: '4-2/16' }] }
-		, { texts: [{ skip: { count: 2, part: 16 }, text: '5-2/16' }] }]
+	}, { points: [{ skip: { count: 2, part: 16 }, text: '3-2/16',row:0 }] }
+		, { points: [{ skip: { count: 2, part: 16 }, text: '4-2/16',row:0 }] }
+		, { points: [{ skip: { count: 2, part: 16 }, text: '5-2/16' ,row:0}] }]
 	, filters: []
 	/*, theme: {
 		notePathHeight: 0.5

@@ -159,21 +159,21 @@ class UIRenderer {//} implements RenderedPart {
 	}
 
 	fillWholeUI() {
-		let mixm: MixerDataMath = new MixerDataMath(commandDispatcher.workData);
+		//let mixm: MixerDataMath = new MixerDataMath(commandDispatcher.cfg.data);
 		let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
 		let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
-		this.tiler.resetInnerSize(mixm.mixerWidth(), mixm.mixerHeight());
+		this.tiler.resetInnerSize(commandDispatcher.cfg.mixerWidth(), commandDispatcher.cfg.mixerHeight());
 
-		this.mixer.reFillMixerUI(commandDispatcher.workData);
-		this.leftPanel.reFillLeftPanel(commandDispatcher.workData);
+		this.mixer.reFillMixerUI(commandDispatcher.cfg);
+		this.leftPanel.reFillLeftPanel(commandDispatcher.cfg);
 
-		this.debug.resetDebugView(commandDispatcher.workData);
+		this.debug.resetDebugView(commandDispatcher.cfg);
 
 		//this.toolbar.fillToolbar(vw, vh);
 		this.toolbar.resizeToolbar(vw, vh);
 
 		//this.menu.fillMenuItems();
-		this.menu.readCurrentSongData(commandDispatcher.workData);
+		this.menu.readCurrentSongData(commandDispatcher.cfg.data);
 		this.menu.resizeMenu(vw, vh);
 		//this.menu.rerenderContent();
 		//this.warning.resetDialogView(data);
@@ -182,7 +182,7 @@ class UIRenderer {//} implements RenderedPart {
 		});
 
 
-		this.timeselectbar.fillTimeBar(commandDispatcher.workData);
+		this.timeselectbar.fillTimeBar(commandDispatcher.cfg);
 		this.timeselectbar.resizeTimeScale(vw, vh);
 
 		//this.leftBar.resizeHeaders(mixm.mixerHeight(), vw, vh, this.tiler.getCurrentPointPosition().z);
@@ -197,8 +197,8 @@ class UIRenderer {//} implements RenderedPart {
 		//console.log('onReSizeView');
 		let mixH = 1;
 		if (this.lastUsedData) {
-			let mixm: MixerDataMath = new MixerDataMath(this.lastUsedData);
-			mixH = mixm.mixerHeight();
+			//let mixm: MixerDataMath = new MixerDataMath(this.lastUsedData);
+			mixH = commandDispatcher.cfg.mixerHeight();
 		}
 		let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
 		let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();

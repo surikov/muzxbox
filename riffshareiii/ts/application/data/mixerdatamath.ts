@@ -1,4 +1,4 @@
-class MixerDataMath {
+class MixerDataMathUtility {
 	data: Zvoog_Project;
 	//projTitleHeight: number = 33;
 	LeftPad: number = 3;
@@ -11,9 +11,21 @@ class MixerDataMath {
 	titleBottomPad = 1;
 	gridBottomPad = 1;
 	//commentsMaxHeight = 10;
+	//static lastTxtCount=0;
+	maxCommentRowCount = 0;
 
 	constructor(data: Zvoog_Project) {
 		this.data = data;
+		this.maxCommentRowCount = -1;
+		for (let ii = 0; ii < this.data.comments.length; ii++) {
+			let txts = this.data.comments[ii].points;
+			for (let tt = 0; tt < txts.length; tt++) {
+				if (this.maxCommentRowCount < txts[tt].row) {
+					this.maxCommentRowCount = txts[tt].row;
+				}
+			}
+		}
+		//console.log('maxCommentRowCount',this.maxCommentRowCount);
 	}
 	mixerWidth(): number {
 		return this.LeftPad + this.timelineWidth() + this.rightPad;
@@ -35,6 +47,7 @@ class MixerDataMath {
 			+ this.bottomMixerPad;
 	}
 	commentsMaxHeight(): number {
+		/*
 		let wholeMax = 0;
 		let txtExsts=false;
 		for (let ii = 0; ii < this.data.comments.length; ii++) {
@@ -65,6 +78,21 @@ class MixerDataMath {
 		}
 
 		return wholeMax * this.notePathHeight;
+		*/
+		/*
+		let maxRow = 0;
+		for (let ii = 0; ii < this.data.comments.length; ii++) {
+			let txts = this.data.comments[ii].points;
+			for (let tt = 0; tt < txts.length; tt++) {
+				if (maxRow < txts[tt].row) {
+					maxRow = txts[tt].row;
+				}
+			}
+		}
+		return (maxRow + 1) * this.notePathHeight;
+		*/
+		
+		return (2 + this.maxCommentRowCount) * this.notePathHeight*8;
 	}
 
 	commentsTop(): number {

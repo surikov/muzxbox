@@ -35,10 +35,10 @@ class DebugLayerUI {//} implements RenderedLayers {
             ], mode: LevelModes.normal
         };
     }
-    resetDebugView(data:Zvoog_Project) {
-        let mixm: MixerDataMath = new MixerDataMath(data);
-        let ww = mixm.mixerWidth();
-        let hh = mixm.mixerHeight();
+    resetDebugView(cfg:MixerDataMathUtility) {
+        //let mixm: MixerDataMath = new MixerDataMath(data);
+        let ww = cfg.mixerWidth();
+        let hh = cfg.mixerHeight();
         this.debugRectangle.w = ww;
         this.debugRectangle.h = hh;
         this.debugAnchor.ww = ww;

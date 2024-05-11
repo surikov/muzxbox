@@ -10,31 +10,33 @@ class MixerZoomLevel {
 		this.zoomTracksAnchor = anchorTracks;
 		this.zoomFirstAnchor = anchorFirst;
 	}
-	reCreateBars(data:Zvoog_Project) {
-		let mixm: MixerDataMath = new MixerDataMath(data);
+	reCreateBars(//data:Zvoog_Project
+		cfg: MixerDataMathUtility
+	) {
+		//let mixm: MixerDataMath = new MixerDataMath(data);
 		this.zoomGridAnchor.content = [];//this.projectTitle,this.trackTitle];
 		this.zoomTracksAnchor.content = [];
 		this.zoomFirstAnchor.content = [];
 		this.bars = [];
-		let left = mixm.LeftPad;
+		let left = cfg.LeftPad;
 		let width = 0;
-		for (let ii = 0; ii < data.timeline.length; ii++) {
-			let timebar = data.timeline[ii];
-			width = MMUtil().set(timebar.metre).duration(timebar.tempo) * mixm.widthDurationRatio;
+		for (let ii = 0; ii < cfg.data.timeline.length; ii++) {
+			let timebar = cfg.data.timeline[ii];
+			width = MMUtil().set(timebar.metre).duration(timebar.tempo) * cfg.widthDurationRatio;
 
 			let barGridAnchor: TileAnchor = {
 				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
-				, xx: left, yy: 0, ww: width, hh: mixm.mixerHeight(), content: [], id: 'barGrid' + (ii + Math.random())
+				, xx: left, yy: 0, ww: width, hh: cfg.mixerHeight(), content: [], id: 'barGrid' + (ii + Math.random())
 			};
 			this.zoomGridAnchor.content.push(barGridAnchor);
 			let barTracksAnchor: TileAnchor = {
 				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
-				, xx: left, yy: 0, ww: width, hh: mixm.mixerHeight(), content: [], id: 'barTrack' + (ii + Math.random())
+				, xx: left, yy: 0, ww: width, hh: cfg.mixerHeight(), content: [], id: 'barTrack' + (ii + Math.random())
 			};
 			this.zoomTracksAnchor.content.push(barTracksAnchor);
 			let barFirstAnchor: TileAnchor = {
 				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
-				, xx: left, yy: 0, ww: width, hh: mixm.mixerHeight(), content: [], id: 'barFirst' + (ii + Math.random())
+				, xx: left, yy: 0, ww: width, hh: cfg.mixerHeight(), content: [], id: 'barFirst' + (ii + Math.random())
 			};
 			this.zoomFirstAnchor.content.push(barFirstAnchor);
 
@@ -42,41 +44,60 @@ class MixerZoomLevel {
 				, barGridAnchor
 				, barTracksAnchor
 				, barFirstAnchor
-				, data);
+				, cfg);
 			this.bars.push(mixBar);
 			left = left + width;
 		}
 		let titleLabel: TileText = {
 			x: 0
-			//, y: mixm.gridTop() - zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom * 2
-			, y: mixm.heightOfTitle()
-			, text: data.title
+			//, y: cfg.gridTop() - zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom * 2
+			, y: cfg.heightOfTitle()
+			, text: cfg.data.title
 			, css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix
 		};
 		this.zoomGridAnchor.content.push(titleLabel);
+		this.addDrumLines(cfg);
 
+		this.addGridLines(this.zoomGridAnchor, cfg);//zoomLevel, left, top, width, height, data, barIdx, octaveIdx);
+		this.addCommentLines(cfg);
+	}
+	addDrumLines(cfg: MixerDataMathUtility) {
 		if (this.zoomLevelIndex < 4) {
-			for (let ss = 1; ss < data.percussions.length; ss++) {
+			for (let ss = 1; ss < cfg.data.percussions.length; ss++) {
 				let line: TileRectangle = {
-					x: mixm.LeftPad
-					, y: mixm.samplerTop() + mixm.notePathHeight * ss
+					x: cfg.LeftPad
+					, y: cfg.samplerTop() + cfg.notePathHeight * ss
 					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0
-					, w: mixm.timelineWidth(), css: 'samplerRowBorder'
+					, w: cfg.timelineWidth(), css: 'samplerRowBorder'
 				};
 				this.zoomGridAnchor.content.push(line);
 			}
 		}
-		this.addLines(this.zoomGridAnchor, data);//zoomLevel, left, top, width, height, data, barIdx, octaveIdx);
 	}
-	addLines(barOctaveAnchor: TileAnchor, data: Zvoog_Project) {
-		let mixm: MixerDataMath = new MixerDataMath(data);
+	addCommentLines(cfg: MixerDataMathUtility) {
+		if (this.zoomLevelIndex < 3) {
+			for (let ss = 0; ss <= cfg.maxCommentRowCount; ss++) {
+				let line: TileRectangle = {
+					x: cfg.LeftPad
+					, y: cfg.commentsTop() + cfg.notePathHeight * (ss + 1)
+					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
+					, w: cfg.timelineWidth(), css: 'interActiveGridLine'
+				};
+				this.zoomGridAnchor.content.push(line);
+			}
+		}
+	}
+	addGridLines(barOctaveAnchor: TileAnchor//, data: Zvoog_Project
+		, cfg: MixerDataMathUtility
+	) {
+		//let mixm: MixerDataMath = new MixerDataMath(data);
 		if (this.zoomLevelIndex < 4) {
-			for (let oo = 0; oo < mixm.octaveCount; oo++) {
+			for (let oo = 0; oo < cfg.octaveCount; oo++) {
 				if (oo > 0) {
 					let octaveBottomBorder: TileRectangle = {
-						x: mixm.LeftPad
-						, y: mixm.gridTop() + oo * 12 * mixm.notePathHeight
-						, w: mixm.timelineWidth()
+						x: cfg.LeftPad
+						, y: cfg.gridTop() + oo * 12 * cfg.notePathHeight
+						, w: cfg.timelineWidth()
 						, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0
 						, css: 'octaveBottomBorder'
 					};
@@ -85,9 +106,9 @@ class MixerZoomLevel {
 				if (this.zoomLevelIndex < 3) {
 					for (let kk = 1; kk < 12; kk++) {
 						barOctaveAnchor.content.push({
-							x: mixm.LeftPad
-							, y: mixm.gridTop() + (oo * 12 + kk) * mixm.notePathHeight
-							, w: mixm.timelineWidth()
+							x: cfg.LeftPad
+							, y: cfg.gridTop() + (oo * 12 + kk) * cfg.notePathHeight
+							, w: cfg.timelineWidth()
 							, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
 							, css: 'interActiveGridLine'
 						});

@@ -321,7 +321,7 @@ declare class MidiParser {
     createMeasure(midiSongData: MIDISongData, fromMs: number, barIdx: number): ImportMeasure;
     createTimeLine(midiSongData: MIDISongData): Zvoog_SongMeasure[];
     convertProject(title: string, comment: string): Zvoog_Project;
-    addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string): void;
+    addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string, tempo: number): void;
     collectDrums(midiTrack: MIDISongTrack): number[];
     numratio(nn: number): number;
     stripDuration(what: Zvoog_MetreMathType): Zvoog_MetreMathType;
@@ -430,9 +430,10 @@ type Zvoog_MusicTrack = {
 type Zvoog_CommentText = {
     skip: Zvoog_Metre;
     text: string;
+    row: number;
 };
 type Zvoog_CommentMeasure = {
-    texts: Zvoog_CommentText[];
+    points: Zvoog_CommentText[];
 };
 type Zvoog_Selection = {
     startMeasure: number;

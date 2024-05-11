@@ -16,7 +16,7 @@ class MIDIIImportMusicPlugin {
 				data: this.parsedProject
 			};
 			window.parent.postMessage(JSON.stringify(oo), '*');
-		}else{
+		} else {
 			alert('No parsed data');
 		}
 	}
@@ -1708,7 +1708,7 @@ class MidiParser {
 		return nextChange;
 	}
 	calcMeasureDuration(midiSongData: MIDISongData, meter: Zvoog_Metre, bpm: number, part: number, startMs: number): number {
-		let metreMath =  MMUtil();
+		let metreMath = MMUtil();
 		let wholeDurationMs = 1000 * metreMath.set(meter).duration(bpm);
 		let partDurationMs = part * wholeDurationMs;
 		let nextChange = this.findNextChange(midiSongData, startMs);
@@ -1858,13 +1858,13 @@ class MidiParser {
 		};
 
 		for (let ii = 0; ii < project.timeline.length; ii++) {
-			project.comments.push({ texts: [] });
+			project.comments.push({ points: [] });
 		}
 		for (let ii = 0; ii < midiSongData.lyrics.length; ii++) {
 			let textpoint = midiSongData.lyrics[ii];
 			let pnt = findMeasureSkipByTime(textpoint.ms / 1000, project.timeline);
 			if (pnt) {
-				this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt);
+				this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
 			}
 		}
 		for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
@@ -1886,7 +1886,7 @@ class MidiParser {
 		return project;
 	}
 
-	addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string) {
+	addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string, tempo: number) {
 
 		txt = txt.replace(/(\r)/g, '~');
 		txt = txt.replace(/\\r/g, '~');
@@ -1898,8 +1898,18 @@ class MidiParser {
 		txt = txt.replace(/(~~)/g, '~');
 		let strings: string[] = txt.split('~');
 		if (strings.length) {
+			let roundN = 333;
+			let nextMs = 1000 * MMUtil().set(skip).duration(tempo);
 			for (let ii = 0; ii < strings.length; ii++) {
-				commentPoint.texts.push({ skip: skip, text: strings[ii].trim() });
+				let row = 0;
+				for (let ii = 0; ii < commentPoint.points.length; ii++) {
+					let existsMs = 1000 * MMUtil().set(commentPoint.points[ii].skip).duration(tempo);
+					if (Math.floor(Math.floor(existsMs / roundN) * roundN) == Math.floor(Math.floor(nextMs / roundN) * roundN)) {
+						row++;
+					}
+				}
+				//console.log(row, nextMs, Math.floor(nextMs / roundN) * roundN);
+				commentPoint.points.push({ skip: skip, text: strings[ii].trim(), row: row });
 			}
 		}
 	}
@@ -1935,7 +1945,7 @@ class MidiParser {
 			title: midiTrack.title + ' [' + midiTrack.program + '] ' + insNames[midiTrack.program]
 			, measures: []
 			//, filters: []
-			, performer: { id: '', data: '' ,kind:'',outputId:''}
+			, performer: { id: '', data: '', kind: '', outputId: '' }
 		};
 		let mm = MMUtil();
 		for (let tt = 0; tt < timeline.length; tt++) {
@@ -2019,7 +2029,7 @@ class MidiParser {
 			title: midiTrack.title + ' [' + drum + '] ' + drumNames[drum]
 			, measures: []
 			//, filters: []
-			, sampler: { id: '', data: '' ,kind:'',outputId:''}
+			, sampler: { id: '', data: '', kind: '', outputId: '' }
 		};
 		let currentTimeMs = 0;
 		let mm = MMUtil();

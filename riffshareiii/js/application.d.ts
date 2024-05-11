@@ -29,13 +29,11 @@ declare class PluginDialogPrompt {
     closeDialogFrame(): void;
     receiveMessageFromPlugin(e: any): void;
 }
-declare function newMIDIparser(arrayBuffer: ArrayBuffer): any;
-declare function newGPparser(arrayBuffer: ArrayBuffer): any;
 declare class CommandDispatcher {
     renderer: UIRenderer;
     audioContext: AudioContext;
     tapSizeRatio: number;
-    workData: Zvoog_Project;
+    cfg: MixerDataMathUtility;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
     initAudioFromUI(): void;
     registerWorkProject(data: Zvoog_Project): void;
@@ -117,10 +115,10 @@ declare class TimeSelectBar {
     constructor();
     createTimeScale(): TileLayerDefinition[];
     resizeTimeScale(viewWidth: number, viewHeight: number): void;
-    updateTimeSelectionBar(data: Zvoog_Project): void;
-    createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, data: Zvoog_Project): void;
+    updateTimeSelectionBar(cfg: MixerDataMathUtility): void;
+    createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, cfg: MixerDataMathUtility): void;
     createBarNumber(barLeft: number, barnum: number, zz: number, curBar: Zvoog_SongMeasure, measureAnchor: TileAnchor, barTime: number): void;
-    fillTimeBar(data: Zvoog_Project): void;
+    fillTimeBar(cfg: MixerDataMathUtility): void;
 }
 declare class UIToolbar {
     toolBarAnchor: TileAnchor;
@@ -227,28 +225,28 @@ declare class LeftPanel {
     leftZoomAnchors: TileAnchor[];
     constructor();
     createLeftPanel(): TileLayerDefinition[];
-    reFillLeftPanel(data: Zvoog_Project): void;
+    reFillLeftPanel(cfg: MixerDataMathUtility): void;
 }
 declare class SamplerBar {
-    constructor(data: Zvoog_Project, barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number);
+    constructor(cfg: MixerDataMathUtility, barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number);
 }
 declare class BarOctave {
-    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number, data: Zvoog_Project);
+    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number, cfg: MixerDataMathUtility);
 }
 declare class OctaveContent {
-    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, data: Zvoog_Project, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number);
-    addUpperNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: Zvoog_Project, zoomLevel: number): void;
-    addOtherNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: Zvoog_Project): void;
-    addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, data: Zvoog_Project, css: string, addMoreInfo: boolean): void;
+    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, cfg: MixerDataMathUtility, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number);
+    addUpperNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, cfg: MixerDataMathUtility, zoomLevel: number): void;
+    addOtherNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, cfg: MixerDataMathUtility): void;
+    addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, cfg: MixerDataMathUtility, css: string, addMoreInfo: boolean): void;
 }
 declare class MixerBar {
     octaves: BarOctave[];
     zoomLevel: number;
-    constructor(barIdx: number, left: number, ww: number, zoomLevel: number, gridZoomBarAnchor: TileAnchor, tracksZoomBarAnchor: TileAnchor, firstZoomBarAnchor: TileAnchor, data: Zvoog_Project);
-    addOctaveGridSteps(barIdx: number, data: Zvoog_Project, barLeft: number, width: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
+    constructor(barIdx: number, left: number, ww: number, zoomLevel: number, gridZoomBarAnchor: TileAnchor, tracksZoomBarAnchor: TileAnchor, firstZoomBarAnchor: TileAnchor, cfg: MixerDataMathUtility);
+    addOctaveGridSteps(barIdx: number, cfg: MixerDataMathUtility, barLeft: number, width: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
 }
 declare class TextComments {
-    constructor(barIdx: number, data: Zvoog_Project, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number);
+    constructor(barIdx: number, cfg: MixerDataMathUtility, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number);
 }
 declare class MixerUI {
     gridLayers: TileLayerDefinition;
@@ -256,9 +254,9 @@ declare class MixerUI {
     firstLayers: TileLayerDefinition;
     levels: MixerZoomLevel[];
     fillerAnchor: TileAnchor;
-    reFillMixerUI(data: Zvoog_Project): void;
+    reFillMixerUI(cfg: MixerDataMathUtility): void;
     createMixerLayers(): TileLayerDefinition[];
-    reFillTracksRatio(data: Zvoog_Project): void;
+    reFillTracksRatio(cfg: MixerDataMathUtility): void;
 }
 declare class MixerZoomLevel {
     zoomGridAnchor: TileAnchor;
@@ -267,8 +265,10 @@ declare class MixerZoomLevel {
     bars: MixerBar[];
     zoomLevelIndex: number;
     constructor(zoomLevel: number, anchorGrid: TileAnchor, anchorTracks: TileAnchor, anchorFirst: TileAnchor);
-    reCreateBars(data: Zvoog_Project): void;
-    addLines(barOctaveAnchor: TileAnchor, data: Zvoog_Project): void;
+    reCreateBars(cfg: MixerDataMathUtility): void;
+    addDrumLines(cfg: MixerDataMathUtility): void;
+    addCommentLines(cfg: MixerDataMathUtility): void;
+    addGridLines(barOctaveAnchor: TileAnchor, cfg: MixerDataMathUtility): void;
 }
 declare class IconLabelButton {
     anchor: TileAnchor;
@@ -311,7 +311,7 @@ declare class DebugLayerUI {
     debugLayer: TileLayerDefinition;
     allLayers(): TileLayerDefinition[];
     setupUI(): void;
-    resetDebugView(data: Zvoog_Project): void;
+    resetDebugView(cfg: MixerDataMathUtility): void;
     deleteDebbugView(): void;
 }
 declare class WarningUI {
@@ -361,7 +361,7 @@ declare let testEmptyMixerData: {
         title: string;
     }[];
 };
-declare class MixerDataMath {
+declare class MixerDataMathUtility {
     data: Zvoog_Project;
     LeftPad: number;
     rightPad: number;
@@ -372,6 +372,7 @@ declare class MixerDataMath {
     samplerBottomPad: number;
     titleBottomPad: number;
     gridBottomPad: number;
+    maxCommentRowCount: number;
     constructor(data: Zvoog_Project);
     mixerWidth(): number;
     heightOfTitle(): number;
@@ -605,9 +606,10 @@ type Zvoog_MusicTrack = {
 type Zvoog_CommentText = {
     skip: Zvoog_Metre;
     text: string;
+    row: number;
 };
 type Zvoog_CommentMeasure = {
-    texts: Zvoog_CommentText[];
+    points: Zvoog_CommentText[];
 };
 type Zvoog_Selection = {
     startMeasure: number;

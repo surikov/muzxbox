@@ -252,17 +252,17 @@
 }
 .commentLineText2 {
     fill: var(--color-lines);
-    font-size: calc(1*var(--tapSize));
+    font-size: calc(2*var(--tapSize));
 	pointer-events: none;
 }
 .commentLineText4 {
     fill: var(--color-lines);
-    font-size: calc(2*var(--tapSize));
+    font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
 .commentLineText8 {
     fill: var(--color-lines);
-    font-size: calc(2*var(--tapSize));
+    font-size: calc(8*var(--tapSize));
 	pointer-events: none;
 }
 

@@ -1,19 +1,25 @@
-declare function newMIDIparser(arrayBuffer: ArrayBuffer): any;
-declare function newGPparser(arrayBuffer: ArrayBuffer): any;
+//declare function newMIDIparser(arrayBuffer: ArrayBuffer): any;
+//declare function newGPparser(arrayBuffer: ArrayBuffer): any;
 class CommandDispatcher {
 	renderer: UIRenderer;
 	audioContext: AudioContext;
 	tapSizeRatio: number = 1;
-	workData: Zvoog_Project;
+	//currentLOadedProject: Zvoog_Project;
+	cfg: MixerDataMathUtility;
 	listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any) = null;
+
 	initAudioFromUI() {
 		console.log('initAudioFromUI');
 		var AudioContext = window.AudioContext;// || window.webkitAudioContext;
 		this.audioContext = new AudioContext();
 	}
 	registerWorkProject(data: Zvoog_Project) {
-		this.workData = data;
+		//this.currentLOadedProject = data;
+		this.cfg = new MixerDataMathUtility(data);
 	}
+	//cfg.data: Zvoog_Project {
+	//	return this.currentLOadedProject;
+	//}
 	registerUI(renderer: UIRenderer) {
 		this.renderer = renderer;
 	}
@@ -67,17 +73,17 @@ class CommandDispatcher {
 	}
 	moveTrackTop(trackNum: number) {
 		//console.log('moveTrackTop', trackNum);
-		let it = this.workData.tracks[trackNum];
-		this.workData.tracks.splice(trackNum, 1);
-		this.workData.tracks.unshift(it);
+		let it = this.cfg.data.tracks[trackNum];
+		this.cfg.data.tracks.splice(trackNum, 1);
+		this.cfg.data.tracks.unshift(it);
 		commandDispatcher.resetProject();
 	}
 	moveDrumTop(drumNum: number) {
 		//console.log('moveDrumTop', drumNum);
 		//console.log('moveTrackTop', trackNum);
-		let it = this.workData.percussions[drumNum];
-		this.workData.percussions.splice(drumNum, 1);
-		this.workData.percussions.unshift(it);
+		let it = this.cfg.data.percussions[drumNum];
+		this.cfg.data.percussions.splice(drumNum, 1);
+		this.cfg.data.percussions.unshift(it);
 		commandDispatcher.resetProject();
 	}
 	setTrackSoloState(state: number) {
@@ -213,26 +219,28 @@ class CommandDispatcher {
 	}*/
 	expandTimeLineSelection(idx: number) {
 		console.log('select bar', idx);
-		if (this.workData) {
-			if (idx >= 0 && idx < this.workData.timeline.length) {
-				if (this.workData.selection) {
-					if (this.workData.selection.startMeasure == this.workData.selection.endMeasure) {
-						if (this.workData.selection.startMeasure == idx) {
-							this.workData.selection = undefined;
+		if (this.cfg.data) {
+			if (idx >= 0 && idx < this.cfg.data.timeline.length) {
+				let curPro = this.cfg.data;
+				if (curPro.selection) {
+					let curProjectSelection: Zvoog_Selection = curPro.selection;
+					if (curProjectSelection.startMeasure == curProjectSelection.endMeasure) {
+						if (curProjectSelection.startMeasure == idx) {
+							curPro.selection = undefined;
 						} else {
-							if (this.workData.selection.startMeasure > idx) {
-								this.workData.selection.endMeasure = this.workData.selection.startMeasure;
-								this.workData.selection.startMeasure = idx;
+							if (curProjectSelection.startMeasure > idx) {
+								curProjectSelection.endMeasure = curProjectSelection.startMeasure;
+								curProjectSelection.startMeasure = idx;
 							} else {
-								this.workData.selection.endMeasure = idx;
+								curProjectSelection.endMeasure = idx;
 							}
 						}
 					} else {
-						this.workData.selection.startMeasure = idx;
-						this.workData.selection.endMeasure = idx;
+						curProjectSelection.startMeasure = idx;
+						curProjectSelection.endMeasure = idx;
 					}
 				} else {
-					this.workData.selection = {
+					curPro.selection = {
 						startMeasure: idx
 						, endMeasure: idx
 					};
@@ -240,7 +248,7 @@ class CommandDispatcher {
 			}
 		}
 		//console.log(this.workData.selection);
-		this.renderer.timeselectbar.updateTimeSelectionBar(this.workData);
+		this.renderer.timeselectbar.updateTimeSelectionBar(this.cfg);
 		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
 			, this.renderer.timeselectbar.selectionAnchor
 			, LevelModes.top);

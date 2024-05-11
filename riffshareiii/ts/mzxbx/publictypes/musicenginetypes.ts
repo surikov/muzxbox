@@ -99,9 +99,10 @@ type Zvoog_MusicTrack = {
 type Zvoog_CommentText = {
 	skip: Zvoog_Metre;
 	text: string;
+	row:number;
 };
 type Zvoog_CommentMeasure = {
-	texts: Zvoog_CommentText[];
+	points: Zvoog_CommentText[];
 };
 
 type Zvoog_Selection = {
