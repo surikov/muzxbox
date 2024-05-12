@@ -1898,7 +1898,7 @@ class MidiParser {
 		txt = txt.replace(/(~~)/g, '~');
 		let strings: string[] = txt.split('~');
 		if (strings.length) {
-			let roundN = 333;
+			let roundN = 750;
 			let nextMs = 1000 * MMUtil().set(skip).duration(tempo);
 			for (let ii = 0; ii < strings.length; ii++) {
 				let row = 0;

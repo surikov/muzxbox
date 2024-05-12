@@ -552,9 +552,9 @@ type Zvoog_PluginSampler = Zvoog_PluginBase | {
 type Zvoog_FilterTarget = {
     id: string;
     kind: string;
-    data: string;
+    dataBlob: string;
     outputId: string;
-    automation: Zvoog_AutomationTrack;
+    automation: Zvoog_AutomationTrack | null;
 };
 type Zvoog_AudioSequencer = {
     id: string;

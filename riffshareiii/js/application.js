@@ -1574,7 +1574,7 @@ class MixerBar {
                     x: xx,
                     y: cfg.commentsTop(),
                     w: line.ratio * zoomInfo.minZoom / 2,
-                    h: cfg.commentsMaxHeight(),
+                    h: cfg.maxCommentRowCount + 2,
                     css: css
                 };
                 barOctaveAnchor.content.push(txtmark);
@@ -1592,7 +1592,7 @@ class TextComments {
         let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * cfg.widthDurationRatio;
         let left = barLeft + width;
         let top = cfg.commentsTop();
-        let height = cfg.commentsMaxHeight();
+        let height = cfg.maxCommentRowCount + 2;
         let barTxtRightBorder = {
             x: left,
             y: top,
@@ -2108,7 +2108,28 @@ let mzxbxProjectForTesting2 = {
         }, { points: [{ skip: { count: 2, part: 16 }, text: '3-2/16', row: 0 }] },
         { points: [{ skip: { count: 2, part: 16 }, text: '4-2/16', row: 0 }] },
         { points: [{ skip: { count: 2, part: 16 }, text: '5-2/16', row: 0 }] }],
-    filters: []
+    filters: [
+        {
+            id: 'volumeSlide',
+            kind: 'baseVolume',
+            dataBlob: '',
+            outputId: 'masterVolme',
+            automation: {
+                title: '',
+                measures: [
+                    { changes: [] }, { changes: [] },
+                    { changes: [{ skip: { count: 3, part: 4 }, stateBlob: '' }] }
+                ]
+            }
+        },
+        {
+            id: 'masterVolme',
+            kind: 'base_volume',
+            dataBlob: '',
+            outputId: '',
+            automation: null
+        }
+    ]
 };
 let testBigMixerData = {
     title: 'test data for debug',

@@ -180,7 +180,7 @@ class MixerBar {
 					x: xx
 					, y: cfg.commentsTop()
 					, w: line.ratio * zoomInfo.minZoom / 2
-					, h: cfg.commentsMaxHeight()
+					, h: cfg.maxCommentRowCount+2
 					, css: css
 				};
 				barOctaveAnchor.content.push(txtmark);

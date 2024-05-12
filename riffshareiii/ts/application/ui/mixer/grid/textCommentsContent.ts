@@ -12,7 +12,7 @@ class TextComments {
 		let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * cfg.widthDurationRatio;
 		let left = barLeft + width;
 		let top = cfg.commentsTop();
-		let height = cfg.commentsMaxHeight();
+		let height = cfg.maxCommentRowCount+2;
 		let barTxtRightBorder: TileRectangle = {
 			x: left
 			, y: top

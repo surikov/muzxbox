@@ -66,30 +66,51 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 			, sampler: { id: '', data: '', kind: '', outputId: '' }
 		}
 	]
-	, comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16' ,row:0}] }, {
+	, comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16', row: 0 }] }, {
 		points: [
-			{ skip: { count: 0, part: 16 }, text: '20' ,row:0}
-			, { skip: { count: 1, part: 16 }, text: '21' ,row:1}
-			, { skip: { count: 2, part: 16 }, text: '22' ,row:2}
-			, { skip: { count: 3, part: 16 }, text: '23' ,row:0}
-			, { skip: { count: 4, part: 16 }, text: '24' ,row:1}
-			, { skip: { count: 5, part: 16 }, text: '25' ,row:2}
-			, { skip: { count: 6, part: 16 }, text: '26' ,row:0}
-			, { skip: { count: 7, part: 16 }, text: '27' ,row:1}
-			, { skip: { count: 8, part: 16 }, text: '28\ntest' ,row:2}
-			, { skip: { count: 9, part: 16 }, text: '29',row:0 }
-			, { skip: { count: 10, part: 16 }, text: '2-10',row:1 }
-			, { skip: { count: 11, part: 16 }, text: '2-11',row:2 }
-			, { skip: { count: 12, part: 16 }, text: '2-12',row:0 }
-			, { skip: { count: 13, part: 16 }, text: '2-13',row:1 }
-			, { skip: { count: 14, part: 16 }, text: '2-14' ,row:2}
-			, { skip: { count: 15, part: 16 }, text: '2-15' ,row:0}
+			{ skip: { count: 0, part: 16 }, text: '20', row: 0 }
+			, { skip: { count: 1, part: 16 }, text: '21', row: 1 }
+			, { skip: { count: 2, part: 16 }, text: '22', row: 2 }
+			, { skip: { count: 3, part: 16 }, text: '23', row: 0 }
+			, { skip: { count: 4, part: 16 }, text: '24', row: 1 }
+			, { skip: { count: 5, part: 16 }, text: '25', row: 2 }
+			, { skip: { count: 6, part: 16 }, text: '26', row: 0 }
+			, { skip: { count: 7, part: 16 }, text: '27', row: 1 }
+			, { skip: { count: 8, part: 16 }, text: '28\ntest', row: 2 }
+			, { skip: { count: 9, part: 16 }, text: '29', row: 0 }
+			, { skip: { count: 10, part: 16 }, text: '2-10', row: 1 }
+			, { skip: { count: 11, part: 16 }, text: '2-11', row: 2 }
+			, { skip: { count: 12, part: 16 }, text: '2-12', row: 0 }
+			, { skip: { count: 13, part: 16 }, text: '2-13', row: 1 }
+			, { skip: { count: 14, part: 16 }, text: '2-14', row: 2 }
+			, { skip: { count: 15, part: 16 }, text: '2-15', row: 0 }
 
 		]
-	}, { points: [{ skip: { count: 2, part: 16 }, text: '3-2/16',row:0 }] }
-		, { points: [{ skip: { count: 2, part: 16 }, text: '4-2/16',row:0 }] }
-		, { points: [{ skip: { count: 2, part: 16 }, text: '5-2/16' ,row:0}] }]
-	, filters: []
+	}, { points: [{ skip: { count: 2, part: 16 }, text: '3-2/16', row: 0 }] }
+		, { points: [{ skip: { count: 2, part: 16 }, text: '4-2/16', row: 0 }] }
+		, { points: [{ skip: { count: 2, part: 16 }, text: '5-2/16', row: 0 }] }]
+	, filters: [
+		{
+			id: 'volumeSlide'
+			, kind: 'baseVolume'
+			, dataBlob: ''
+			, outputId: 'masterVolme'
+			, automation: {
+				title: ''
+				, measures: [
+					{changes:[]},{changes:[]}
+					,{changes:[{skip:{count:3,part:4},stateBlob:''}]}
+				]
+			}
+		}
+		, {
+			id: 'masterVolme'
+			, kind: 'base_volume'
+			, dataBlob: ''
+			, outputId: ''
+			, automation: null
+		}
+	]
 	/*, theme: {
 		notePathHeight: 0.5
 		, widthDurationRatio: 17
