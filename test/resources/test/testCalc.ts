@@ -17,7 +17,7 @@ let markX = -1;
 let markY = -1;
 let cellSize = 12;
 let topShift = cellSize * 21;
-let rowsVisibleCount = 66;
+let rowsVisibleCount = 51;
 let rowsAvgCount = 5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let reduceRatio = 1;
@@ -1194,9 +1194,26 @@ function dumpStat5(){
 		if(!(ss[kk]))ss[kk]=0;
 		ss[kk]++;
 	}
+	let itg=0;
 	for(let ii=1;ii<ss.length;ii++){
-		console.log(ii,Math.round(1000*ss[ii]/datarows.length)/10);
+		let procnt=Math.round(1000*ss[ii]/datarows.length)/10;
+		itg=itg+procnt;
+		console.log(ii,procnt,itg);
 	}
+	
+	let sngl=0;
+	let grp=0;
+	for(let ii=1;ii<datarows.length-5;ii++){
+		let kk=datarows[ii].balls[0];
+		if(kk>20){
+			if(datarows[ii+1].balls[0]<8){
+				sngl++;
+			}else{
+				grp++;
+			}
+		}
+	}
+	console.log('single',sngl,'group',grp);
 	console.log('end dumpStat5');
 }
 init();

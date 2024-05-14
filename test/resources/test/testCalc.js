@@ -9,7 +9,7 @@ var markX = -1;
 var markY = -1;
 var cellSize = 12;
 var topShift = cellSize * 21;
-var rowsVisibleCount = 66;
+var rowsVisibleCount = 51;
 var rowsAvgCount = 5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 var reduceRatio = 1;
@@ -1133,9 +1133,26 @@ function dumpStat5() {
             ss[kk] = 0;
         ss[kk]++;
     }
+    var itg = 0;
     for (var ii = 1; ii < ss.length; ii++) {
-        console.log(ii, Math.round(1000 * ss[ii] / datarows.length) / 10);
+        var procnt = Math.round(1000 * ss[ii] / datarows.length) / 10;
+        itg = itg + procnt;
+        console.log(ii, procnt, itg);
     }
+    var sngl = 0;
+    var grp = 0;
+    for (var ii = 1; ii < datarows.length - 5; ii++) {
+        var kk = datarows[ii].balls[0];
+        if (kk > 20) {
+            if (datarows[ii + 1].balls[0] < 8) {
+                sngl++;
+            }
+            else {
+                grp++;
+            }
+        }
+    }
+    console.log('single', sngl, 'group', grp);
     console.log('end dumpStat5');
 }
 init();
