@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.96 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.97 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -879,7 +879,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 	//console.log('blueStat', blueStat);
 	//console.log('redStat', redStat);
 	dumpColorStat();
-	dumpStat2();
+	//dumpStat2();
 }
 function roundDown(num: number, base: number): number {
 	return Math.floor(num / base) * base;
@@ -897,7 +897,7 @@ function countColorStat(kk: number, sz: number): number {
 	if (redStat[kk].right > sz) countS++;
 	return countS;
 }*/
-
+/*
 function dumpStat2(){
 	console.log(greenStat);
 	for(let ii=0;ii<10;ii++){
@@ -925,6 +925,7 @@ function dumpStat2(){
 		console.log(txt,val,cur.left);
 	}
 }
+*/
 function dumpColorStat() {
 	//console.log('stat');
 	let skip = 1;
@@ -1185,6 +1186,19 @@ function testTest() {
 	}
 	drawLines();
 }
+function dumpStat5(){
+	console.log('start dumpStat5',datarows);
+	let ss:number[]=[];
+	for(let ii=1;ii<datarows.length;ii++){
+		let kk=datarows[ii].balls[0];
+		if(!(ss[kk]))ss[kk]=0;
+		ss[kk]++;
+	}
+	for(let ii=1;ii<ss.length;ii++){
+		console.log(ii,Math.round(1000*ss[ii]/datarows.length)/10);
+	}
+	console.log('end dumpStat5');
+}
 init();
 addTails();
-
+dumpStat5();

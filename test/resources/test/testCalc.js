@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.96 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.97 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -829,7 +829,7 @@ function dumpTriads(svg, rows) {
     //console.log('blueStat', blueStat);
     //console.log('redStat', redStat);
     dumpColorStat();
-    dumpStat2();
+    //dumpStat2();
 }
 function roundDown(num, base) {
     return Math.floor(num / base) * base;
@@ -847,34 +847,35 @@ function countColorStat(kk: number, sz: number): number {
     if (redStat[kk].right > sz) countS++;
     return countS;
 }*/
-function dumpStat2() {
+/*
+function dumpStat2(){
     console.log(greenStat);
-    for (var ii = 0; ii < 10; ii++) {
-        var cur = greenStat[ii];
-        var pre = (greenStat[ii + 1].left + greenStat[ii + 2].left + greenStat[ii + 3].left) / 3;
-        var lin = [];
-        for (var kk = 0; kk < 40; kk++) {
+    for(let ii=0;ii<10;ii++){
+        let cur=greenStat[ii];
+        let pre=(greenStat[ii+1].left+greenStat[ii+2].left+greenStat[ii+3].left)/3;
+        let lin=[];
+        for(let kk=0;kk<40;kk++){
             lin.push('-');
         }
-        var val = cur.left - greenStat[ii + 1].left;
+        let val=cur.left-greenStat[ii+1].left;
         //let val=Math.round(cur.left-pre);
-        var shft = 0;
-        if (val > 0) {
-            shft = 20;
+        let shft=0;
+        if(val>0){
+            shft=20;
+        }else{
+            shft=20+val;
         }
-        else {
-            shft = 20 + val;
+        for(let kk=0;kk<Math.abs(val);kk++){
+            lin[shft+kk]='#';
         }
-        for (var kk = 0; kk < Math.abs(val); kk++) {
-            lin[shft + kk] = '#';
+        let txt='';
+        for(let kk=0;kk<lin.length;kk++){
+            txt=txt+lin[kk];
         }
-        var txt = '';
-        for (var kk = 0; kk < lin.length; kk++) {
-            txt = txt + lin[kk];
-        }
-        console.log(txt, val, cur.left);
+        console.log(txt,val,cur.left);
     }
 }
+*/
 function dumpColorStat() {
     //console.log('stat');
     var skip = 1;
@@ -1123,5 +1124,20 @@ function testTest() {
     }
     drawLines();
 }
+function dumpStat5() {
+    console.log('start dumpStat5', datarows);
+    var ss = [];
+    for (var ii = 1; ii < datarows.length; ii++) {
+        var kk = datarows[ii].balls[0];
+        if (!(ss[kk]))
+            ss[kk] = 0;
+        ss[kk]++;
+    }
+    for (var ii = 1; ii < ss.length; ii++) {
+        console.log(ii, Math.round(1000 * ss[ii] / datarows.length) / 10);
+    }
+    console.log('end dumpStat5');
+}
 init();
 addTails();
+dumpStat5();

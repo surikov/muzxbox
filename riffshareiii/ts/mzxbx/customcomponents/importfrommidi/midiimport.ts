@@ -1202,7 +1202,11 @@ class MidiParser {
 					}
 					//}
 				} else {
+					
 					if (evnt.subtype == this.EVENT_META_TEXT) {
+						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
+					}
+					if (evnt.subtype == this.EVENT_META_MARKER) {
 						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
 					}
 					if (evnt.subtype == this.EVENT_META_COPYRIGHT_NOTICE) {
@@ -1887,7 +1891,7 @@ class MidiParser {
 	}
 
 	addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string, tempo: number) {
-
+		//console.log('addLyricsPoints',txt);
 		txt = txt.replace(/(\r)/g, '~');
 		txt = txt.replace(/\\r/g, '~');
 		txt = txt.replace(/(\n)/g, '~');
