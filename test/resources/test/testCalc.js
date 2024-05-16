@@ -1124,8 +1124,8 @@ function testTest() {
     }
     drawLines();
 }
-function dumpStat5() {
-    console.log('start dumpStat5', datarows);
+function dumpLeftStat() {
+    console.log('dumpLeftStat', datarows);
     var ss = [];
     for (var ii = 1; ii < datarows.length; ii++) {
         var kk = datarows[ii].balls[0];
@@ -1139,21 +1139,48 @@ function dumpStat5() {
         itg = itg + procnt;
         console.log(ii, procnt, itg);
     }
-    var sngl = 0;
-    var grp = 0;
-    for (var ii = 1; ii < datarows.length - 5; ii++) {
-        var kk = datarows[ii].balls[0];
-        if (kk > 20) {
-            if (datarows[ii + 1].balls[0] < 8) {
+    /*
+    let sngl=0;
+    let grp=0;
+    for(let ii=1;ii<datarows.length-5;ii++){
+        let kk=datarows[ii].balls[0];
+        if(kk>20){
+            if(datarows[ii+1].balls[0]<8){
                 sngl++;
-            }
-            else {
+            }else{
                 grp++;
             }
         }
     }
-    console.log('single', sngl, 'group', grp);
-    console.log('end dumpStat5');
+    console.log('single',sngl,'group',grp);
+    */
+}
+function dumpPatternStat() {
+    console.log('dumpPatternStat');
+    var exists = 0;
+    var no = 0;
+    for (var ii = 1; ii < datarows.length - 22; ii++) {
+        if ((datarows[ii + 1].balls[0]
+            + datarows[ii + 2].balls[0]
+            + datarows[ii + 3].balls[0]
+            + datarows[ii + 4].balls[0]
+            + datarows[ii + 5].balls[0]
+            + datarows[ii + 6].balls[0]
+            + datarows[ii + 7].balls[0]
+            + datarows[ii + 8].balls[0]) / 8 < 5) {
+            if (datarows[ii + 0].balls[0] > 20) {
+                exists++;
+            }
+            else {
+                no++;
+            }
+        }
+    }
+    console.log('', 'exists', exists, 'no', no);
+}
+function dumpStat5() {
+    dumpLeftStat();
+    dumpPatternStat();
 }
 init();
 addTails();

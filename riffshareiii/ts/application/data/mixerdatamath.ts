@@ -1,6 +1,5 @@
 class MixerDataMathUtility {
 	data: Zvoog_Project;
-	//projTitleHeight: number = 33;
 	LeftPad: number = 3;
 	rightPad: number = 10;
 	bottomMixerPad = 11;
@@ -10,9 +9,8 @@ class MixerDataMathUtility {
 	samplerBottomPad = 1;
 	titleBottomPad = 1;
 	gridBottomPad = 1;
-	//commentsMaxHeight = 10;
-	//static lastTxtCount=0;
 	maxCommentRowCount = 0;
+	maxAutomationsCount = 0;
 
 	constructor(data: Zvoog_Project) {
 		this.data = data;
@@ -25,7 +23,12 @@ class MixerDataMathUtility {
 				}
 			}
 		}
-		//console.log('maxCommentRowCount',this.maxCommentRowCount);
+		this.maxAutomationsCount = -1;
+		for (let ff = 0; ff < this.data.filters.length; ff++) {
+			if (this.data.filters[ff].automation) {
+				this.maxAutomationsCount++;
+			}
+		}
 	}
 	mixerWidth(): number {
 		return this.LeftPad + this.timelineWidth() + this.rightPad;
@@ -46,53 +49,11 @@ class MixerDataMathUtility {
 			+ this.commentsMaxHeight()
 			+ this.bottomMixerPad;
 	}
+	automationMaxHeight(): number {
+		return this.maxAutomationsCount * this.notePathHeight;
+	}
 	commentsMaxHeight(): number {
-		/*
-		let wholeMax = 0;
-		let txtExsts=false;
-		for (let ii = 0; ii < this.data.comments.length; ii++) {
-			let placedX: number[] = [];
-			let txts = this.data.comments[ii].texts;
-
-			for (let tt = 0; tt < txts.length; tt++) {
-				txtExsts=true;
-				let skipS = 0.5 * Math.floor(MMUtil().set(txts[tt].skip).duration(this.data.timeline[ii].tempo) / 0.5);
-				let barMx = 0;
-				for (let kk = 0; kk < placedX.length; kk++) {
-					if (skipS == placedX[kk]) {
-						barMx++;
-					}
-				}
-				placedX.push(skipS);
-				if (barMx > wholeMax) {
-					wholeMax = barMx;
-					//console.log(wholeMax);
-				}
-			}
-
-		}
-		if (txtExsts) {
-			wholeMax = wholeMax + 2;
-		} else {
-			wholeMax = 1;
-		}
-
-		return wholeMax * this.notePathHeight;
-		*/
-		/*
-		let maxRow = 0;
-		for (let ii = 0; ii < this.data.comments.length; ii++) {
-			let txts = this.data.comments[ii].points;
-			for (let tt = 0; tt < txts.length; tt++) {
-				if (maxRow < txts[tt].row) {
-					maxRow = txts[tt].row;
-				}
-			}
-		}
-		return (maxRow + 1) * this.notePathHeight;
-		*/
-		
-		return (2 + this.maxCommentRowCount) * this.notePathHeight*8;
+		return (2 + this.maxCommentRowCount) * this.notePathHeight * 8;
 	}
 
 	commentsTop(): number {
@@ -101,12 +62,6 @@ class MixerDataMathUtility {
 			+ this.gridBottomPad;
 	}
 	gridTop(): number {
-		/*
-		return this.heightOfTitle()
-			+ this.titleBottomPad
-			+ this.samplerHeight()
-			+ this.samplerBottomPad;
-			*/
 		return this.samplerTop() + this.samplerHeight() + this.samplerBottomPad;
 	}
 
@@ -118,7 +73,6 @@ class MixerDataMathUtility {
 		return this.data.percussions.length * this.notePathHeight;
 	}
 	samplerTop(): number {
-		//return this.gridTop() + this.gridHeight() + this.sequencerBottomPad;
 		return this.heightOfTitle() + this.titleBottomPad;
 	}
 }
