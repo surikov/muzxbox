@@ -44,7 +44,11 @@ class CommandDispatcher {
 		if (loc == 'zh') {
 			startLoadCSSfile('theme/font2big.css');
 		} else {
-			startLoadCSSfile('theme/font1small.css');
+			if (loc == 'ru') {
+				startLoadCSSfile('theme/font3cyr.css');
+			} else {
+				startLoadCSSfile('theme/font1small.css');
+			}
 		}
 		this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
 		//this.renderer.menu.resetAllAnchors();

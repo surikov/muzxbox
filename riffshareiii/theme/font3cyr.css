@@ -1,0 +1,10 @@
+:root {
+    --font-ratio: 1.1;
+}
+@font-face {
+    font-family: 'font3';
+    src: url(TriodPostnaja.ttf);
+}
+html {
+    font-family: 'font3';
+}
