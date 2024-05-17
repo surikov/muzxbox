@@ -1221,28 +1221,23 @@ function dumpPatternStat(){
 	console.log('dumpPatternStat');
 	let exists=0;
 	let no=0;
-	for(let ii=1;ii<datarows.length-22;ii++){
-		if((datarows[ii+1].balls[0] 
-				+ datarows[ii+2].balls[0] 
-				+ datarows[ii+3].balls[0] 
-				+ datarows[ii+4].balls[0] 
-				+ datarows[ii+5].balls[0]
-				+ datarows[ii+6].balls[0]
-				+ datarows[ii+7].balls[0]
-				+ datarows[ii+8].balls[0]
-				)/8 < 5){
-			if(datarows[ii+0].balls[0]>20){
-				exists++;
-			}else{
-				no++;
-			}
-		}
+	for(let ii=1;ii<200;ii++){
+		let bn=100000000000000
+			+datarows[ii].balls[0]*Math.pow(45,6)
+			+datarows[ii].balls[1]*Math.pow(45,5)
+			+datarows[ii].balls[2]*Math.pow(45,4)
+			+datarows[ii].balls[3]*Math.pow(45,3)
+			+datarows[ii].balls[4]*Math.pow(45,2)
+			+datarows[ii].balls[5]*Math.pow(45,1)
+		;
+		console.log(ii,bn,datarows[ii].balls);
 	}
-	console.log('','exists',exists,'no',no);
+	
 }
 function dumpStat5(){
 	dumpLeftStat();
 	dumpPatternStat();
+	console.log(45*45*45*45*45*45); 
 }
 init();
 addTails();
