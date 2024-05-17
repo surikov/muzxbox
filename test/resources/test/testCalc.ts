@@ -1221,16 +1221,16 @@ function dumpPatternStat(){
 	console.log('dumpPatternStat');
 	let exists=0;
 	let no=0;
-	for(let ii=1;ii<200;ii++){
-		let bn=100000000000000
-			+datarows[ii].balls[0]*Math.pow(45,6)
-			+datarows[ii].balls[1]*Math.pow(45,5)
-			+datarows[ii].balls[2]*Math.pow(45,4)
-			+datarows[ii].balls[3]*Math.pow(45,3)
-			+datarows[ii].balls[4]*Math.pow(45,2)
-			+datarows[ii].balls[5]*Math.pow(45,1)
+	for(let ii=1;ii<20;ii++){
+		let bn= 
+			datarows[ii].balls[0]*Math.pow(45,1)
+			+datarows[ii].balls[1]*Math.pow(45,2)
+			+datarows[ii].balls[2]*Math.pow(45,3)
+			+datarows[ii].balls[3]*Math.pow(45,4)
+			+datarows[ii].balls[4]*Math.pow(45,5)
+			+datarows[ii].balls[5]*Math.pow(45,6)
 		;
-		console.log(ii,bn,datarows[ii].balls);
+		console.log(ii,Math.round(bn/Math.pow(45,6)),datarows[ii].balls);
 	}
 	
 }
