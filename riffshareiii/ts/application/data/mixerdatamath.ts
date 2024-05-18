@@ -8,7 +8,7 @@ class MixerDataMathUtility {
 	widthDurationRatio = 27;
 	octaveCount = 10;
 	samplerBottomPad = 1;
-	titleBottomPad = 1;
+	titleBottomPad = 5;
 	automationBottomPad = 1;
 	gridBottomPad = 1;
 	maxCommentRowCount = 0;

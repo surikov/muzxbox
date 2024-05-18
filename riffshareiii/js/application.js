@@ -2234,7 +2234,7 @@ class MixerDataMathUtility {
         this.widthDurationRatio = 27;
         this.octaveCount = 10;
         this.samplerBottomPad = 1;
-        this.titleBottomPad = 1;
+        this.titleBottomPad = 5;
         this.automationBottomPad = 1;
         this.gridBottomPad = 1;
         this.maxCommentRowCount = 0;

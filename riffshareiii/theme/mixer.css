@@ -244,32 +244,32 @@
 
 
 .commentLineText025 {
-    fill: var(--color-lines);
+    fill: var(--color-text);
     font-size: calc(0.25*var(--tapSize));
 	pointer-events: none;
 }
 .commentLineText05 {
-    fill: var(--color-lines);
+    fill: var(--color-text);
     font-size: calc(0.5*var(--tapSize));
 	pointer-events: none;
 }
 .commentLineText1 {
-    fill: var(--color-lines);
+    fill: var(--color-text);
     font-size: calc(1*var(--tapSize));
 	pointer-events: none;
 }
 .commentLineText2 {
-    fill: var(--color-lines);
+    fill: var(--color-text);
     font-size: calc(2*var(--tapSize));
 	pointer-events: none;
 }
 .commentLineText4 {
-    fill: var(--color-lines);
+    fill: var(--color-text);
     font-size: calc(3*var(--tapSize));
 	pointer-events: none;
 }
 .commentLineText8 {
-    fill: var(--color-lines);
+    fill: var(--color-text);
     font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
