@@ -221,6 +221,14 @@
 	fill-opacity:25%;
     stroke: none;
 }
+
+.stepPartDelimiter{
+	fill: var(--color-lines);
+
+	fill-opacity:25%;
+    stroke: none;
+}
+
 .barRightBorder{
 	fill: var(--color-lines);
 	fill-opacity:25%;
@@ -257,12 +265,12 @@
 }
 .commentLineText4 {
     fill: var(--color-lines);
-    font-size: calc(4*var(--tapSize));
+    font-size: calc(3*var(--tapSize));
 	pointer-events: none;
 }
 .commentLineText8 {
     fill: var(--color-lines);
-    font-size: calc(8*var(--tapSize));
+    font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
 

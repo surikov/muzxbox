@@ -162,7 +162,7 @@ class UIRenderer {//} implements RenderedPart {
 		//let mixm: MixerDataMath = new MixerDataMath(commandDispatcher.cfg.data);
 		let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
 		let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
-		this.tiler.resetInnerSize(commandDispatcher.cfg.mixerWidth(), commandDispatcher.cfg.mixerHeight());
+		this.tiler.resetInnerSize(commandDispatcher.cfg.wholeWidth(), commandDispatcher.cfg.wholeHeight());
 
 		this.mixer.reFillMixerUI(commandDispatcher.cfg);
 		this.leftPanel.reFillLeftPanel(commandDispatcher.cfg);
@@ -198,7 +198,7 @@ class UIRenderer {//} implements RenderedPart {
 		let mixH = 1;
 		if (this.lastUsedData) {
 			//let mixm: MixerDataMath = new MixerDataMath(this.lastUsedData);
-			mixH = commandDispatcher.cfg.mixerHeight();
+			mixH = commandDispatcher.cfg.wholeHeight();
 		}
 		let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
 		let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();

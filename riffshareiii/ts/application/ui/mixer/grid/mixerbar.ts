@@ -147,7 +147,7 @@ class MixerBar {
 			barOctaveAnchor.content.push(barSamRightBorder);
 		}
 		if (zoomInfo.gridLines.length > 0) {
-			let css = 'octaveBottomBorder';
+			let css = 'stepPartDelimiter';
 			if (zIndex < 3) {
 				css = 'interactiveTimeMeasureMark';
 			}
@@ -176,11 +176,21 @@ class MixerBar {
 					};
 					barOctaveAnchor.content.push(sammark);
 				}
+				let txtH=cfg.maxCommentRowCount+2;
+				if(zIndex==3){
+					txtH=(cfg.maxCommentRowCount+2)*2;
+				}
+				if(zIndex==4){
+					txtH=(cfg.maxCommentRowCount+2)*4;
+				}
+				if(zIndex>4){
+					txtH=(cfg.maxCommentRowCount+2)*8;
+				}
 				let txtmark: TileRectangle = {
 					x: xx
 					, y: cfg.commentsTop()
 					, w: line.ratio * zoomInfo.minZoom / 2
-					, h: cfg.maxCommentRowCount+2
+					, h: txtH //cfg.maxCommentRowCount+2
 					, css: css
 				};
 				barOctaveAnchor.content.push(txtmark);

@@ -47,7 +47,7 @@ class LeftPanel {
 		for (let zz = 0; zz < this.leftZoomAnchors.length; zz++) {
 			//this.leftZoomAnchors[zz].yy = cfg.gridTop();
 			//this.leftZoomAnchors[zz].hh = cfg.gridHeight();
-			this.leftZoomAnchors[zz].hh = cfg.mixerHeight();
+			this.leftZoomAnchors[zz].hh = cfg.wholeHeight();
 			this.leftZoomAnchors[zz].content = [];
 			for (let oo = 1; oo < cfg.octaveCount; oo++) {
 				if (zz < 4) {

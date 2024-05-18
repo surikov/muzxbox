@@ -13,8 +13,8 @@ class MixerUI {
 		cfg:MixerDataMathUtility
 	) {
 		//let mixm: MixerDataMath = new MixerDataMath(data);
-		let ww = cfg.mixerWidth();
-		let hh = cfg.mixerHeight();
+		let ww = cfg.wholeWidth();
+		let hh = cfg.wholeHeight();
 		for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
 			//this.zoomLayers[ii].anchors[0].ww = ww;
 			//this.zoomLayers[ii].anchors[0].hh = hh;
@@ -28,7 +28,7 @@ class MixerUI {
 		}
 		this.fillerAnchor.xx = cfg.LeftPad;
 		this.fillerAnchor.yy = cfg.gridTop();
-		this.fillerAnchor.ww = cfg.mixerWidth() - cfg.LeftPad - cfg.rightPad;
+		this.fillerAnchor.ww = cfg.wholeWidth() - cfg.LeftPad - cfg.rightPad;
 		this.fillerAnchor.hh = cfg.gridHeight();
 		this.reFillTracksRatio(cfg);
 

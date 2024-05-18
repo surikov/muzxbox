@@ -26,17 +26,17 @@ class MixerZoomLevel {
 
 			let barGridAnchor: TileAnchor = {
 				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
-				, xx: left, yy: 0, ww: width, hh: cfg.mixerHeight(), content: [], id: 'barGrid' + (ii + Math.random())
+				, xx: left, yy: 0, ww: width, hh: cfg.wholeHeight(), content: [], id: 'barGrid' + (ii + Math.random())
 			};
 			this.zoomGridAnchor.content.push(barGridAnchor);
 			let barTracksAnchor: TileAnchor = {
 				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
-				, xx: left, yy: 0, ww: width, hh: cfg.mixerHeight(), content: [], id: 'barTrack' + (ii + Math.random())
+				, xx: left, yy: 0, ww: width, hh: cfg.wholeHeight(), content: [], id: 'barTrack' + (ii + Math.random())
 			};
 			this.zoomTracksAnchor.content.push(barTracksAnchor);
 			let barFirstAnchor: TileAnchor = {
 				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
-				, xx: left, yy: 0, ww: width, hh: cfg.mixerHeight(), content: [], id: 'barFirst' + (ii + Math.random())
+				, xx: left, yy: 0, ww: width, hh: cfg.wholeHeight(), content: [], id: 'barFirst' + (ii + Math.random())
 			};
 			this.zoomFirstAnchor.content.push(barFirstAnchor);
 

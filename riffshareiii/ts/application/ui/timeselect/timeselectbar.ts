@@ -143,15 +143,15 @@ class TimeSelectBar {
 	) {
 		//console.log('fillTimeBar', cfg.data.timeline);
 		//let mixm: MixerDataMath = new MixerDataMath(data);
-		this.selectBarAnchor.ww = cfg.mixerWidth();
-		this.selectBarAnchor.hh = cfg.mixerHeight();
+		this.selectBarAnchor.ww = cfg.wholeWidth();
+		this.selectBarAnchor.hh = cfg.wholeHeight();
 		this.zoomAnchors = [];
 		for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
 			//console.log('add',zoomPrefixLevelsCSS[zz]);
 			let selectLevelAnchor: TileAnchor = {
 				showZoom: zoomPrefixLevelsCSS[zz].minZoom
 				, hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom
-				, xx: 0, yy: 0, ww: cfg.mixerWidth(), hh: cfg.mixerHeight(), content: []
+				, xx: 0, yy: 0, ww: cfg.wholeWidth(), hh: cfg.wholeHeight(), content: []
 				, id: 'time' + (zz + Math.random())
 			};
 			this.zoomAnchors.push(selectLevelAnchor);

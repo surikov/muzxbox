@@ -13,6 +13,16 @@ class TextComments {
 		let left = barLeft + width;
 		let top = cfg.commentsTop();
 		let height = cfg.maxCommentRowCount+2;
+		//console.log(zIndex);
+		if(zIndex==3){
+			height=(cfg.maxCommentRowCount+2)*2;
+		}
+		if(zIndex==4){
+			height=(cfg.maxCommentRowCount+2)*4;
+		}
+		if(zIndex>4){
+			height=(cfg.maxCommentRowCount+2)*8;
+		}
 		let barTxtRightBorder: TileRectangle = {
 			x: left
 			, y: top
