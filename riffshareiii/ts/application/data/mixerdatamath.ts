@@ -1,16 +1,21 @@
 class MixerDataMathUtility {
 	data: Zvoog_Project;
-	LeftPad: number = 3;
+
+	leftPad: number = 3;
 	rightPad: number = 10;
 	bottomPad = 11;
-	topPad=2;
+	topPad = 2;
+
 	notePathHeight = 1;
 	widthDurationRatio = 27;
 	octaveCount = 10;
-	samplerBottomPad = 1;
+
+
 	titleBottomPad = 5;
 	automationBottomPad = 1;
+	samplerBottomPad = 1;
 	gridBottomPad = 1;
+
 	maxCommentRowCount = 0;
 	maxAutomationsCount = 0;
 
@@ -33,10 +38,10 @@ class MixerDataMathUtility {
 		}
 	}
 	wholeWidth(): number {
-		return this.LeftPad + this.timelineWidth() + this.rightPad;
+		return this.leftPad + this.timelineWidth() + this.rightPad;
 	}
 	heightOfTitle(): number {
-		return this.topPad+10;
+		return 10;
 	}
 	timelineWidth(): number {
 		let mm: Zvoog_MetreMathType = MMUtil();
@@ -52,10 +57,13 @@ class MixerDataMathUtility {
 			+ this.bottomPad;
 	}
 	automationMaxHeight(): number {
-		return this.maxAutomationsCount * this.notePathHeight*2;
+		return this.maxAutomationsCount * this.notePathHeight * 2;
 	}
 	commentsMaxHeight(): number {
 		return (2 + this.maxCommentRowCount) * this.notePathHeight * 8;
+	}
+	automationTop(): number {
+		return this.topPad + this.heightOfTitle()+this.titleBottomPad;
 	}
 
 	commentsTop(): number {
@@ -75,6 +83,6 @@ class MixerDataMathUtility {
 		return this.data.percussions.length * this.notePathHeight;
 	}
 	samplerTop(): number {
-		return this.heightOfTitle() + this.titleBottomPad+this.automationMaxHeight()+this.automationBottomPad;
+		return this.automationTop() + this.automationMaxHeight() + this.automationBottomPad;
 	}
 }

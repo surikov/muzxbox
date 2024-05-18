@@ -363,16 +363,16 @@ declare let testEmptyMixerData: {
 };
 declare class MixerDataMathUtility {
     data: Zvoog_Project;
-    LeftPad: number;
+    leftPad: number;
     rightPad: number;
     bottomPad: number;
     topPad: number;
     notePathHeight: number;
     widthDurationRatio: number;
     octaveCount: number;
-    samplerBottomPad: number;
     titleBottomPad: number;
     automationBottomPad: number;
+    samplerBottomPad: number;
     gridBottomPad: number;
     maxCommentRowCount: number;
     maxAutomationsCount: number;
@@ -383,6 +383,7 @@ declare class MixerDataMathUtility {
     wholeHeight(): number;
     automationMaxHeight(): number;
     commentsMaxHeight(): number;
+    automationTop(): number;
     commentsTop(): number;
     gridTop(): number;
     gridHeight(): number;

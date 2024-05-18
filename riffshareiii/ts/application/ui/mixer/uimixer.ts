@@ -26,9 +26,9 @@ class MixerUI {
 			this.firstLayers.anchors[ii].hh = hh;
 			this.levels[ii].reCreateBars(cfg);
 		}
-		this.fillerAnchor.xx = cfg.LeftPad;
+		this.fillerAnchor.xx = cfg.leftPad;
 		this.fillerAnchor.yy = cfg.gridTop();
-		this.fillerAnchor.ww = cfg.wholeWidth() - cfg.LeftPad - cfg.rightPad;
+		this.fillerAnchor.ww = cfg.wholeWidth() - cfg.leftPad - cfg.rightPad;
 		this.fillerAnchor.hh = cfg.gridHeight();
 		this.reFillTracksRatio(cfg);
 
@@ -139,7 +139,7 @@ class MixerUI {
 			let css = 'mixFiller' + filIdx;
 			let barwidth = MMUtil().set(cfg.data.timeline[bb].metre).duration(cfg.data.timeline[bb].tempo) * cfg.widthDurationRatio;
 			let fillRectangle: TileRectangle = {
-				x: cfg.LeftPad + barX
+				x: cfg.leftPad + barX
 				, y: cfg.gridTop()
 				, w: barwidth
 				, h: cfg.gridHeight()
@@ -159,7 +159,7 @@ class MixerUI {
 				filIdx = 1 + Math.round(7 * drumcount / mxDrums);
 				let css2 = 'mixFiller' + filIdx;
 				let fillDrumBar: TileRectangle = {
-					x: cfg.LeftPad + barX
+					x: cfg.leftPad + barX
 					, y: cfg.samplerTop()
 					, w: barwidth
 					, h: cfg.data.percussions.length * cfg.notePathHeight
@@ -175,7 +175,7 @@ class MixerUI {
 			}
 			css = 'mixFiller' + filIdx;
 			let fillTxtBar: TileRectangle = {
-				x: cfg.LeftPad + barX
+				x: cfg.leftPad + barX
 				, y: cfg.commentsTop()
 				, w: barwidth
 				, h: cfg.commentsMaxHeight()

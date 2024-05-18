@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.97 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.98 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -397,11 +397,14 @@ function calculateBallFrequency(rowNum: number, rows: BallsRow[]): { ball: numbe
 		resu.push(one);
 		for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
 			if (ballExists(nn + 1, rows[rr])) {
-				one.summ++;
+				//one.summ++;
+				break;
 			}
+			one.summ++;
 		}
 		one.logr = one.summ;
 	}
+	//console.log('calculateBallFrequency',rowNum,resu);
 	return resu;
 }
 /*
@@ -970,8 +973,8 @@ function fillCells() {
 
 	var msgp: HTMLElement = (document.getElementById('stepsize') as any) as HTMLElement;
 	msgp.innerText = '' + reduceRatio;
-	msgp = (document.getElementById('calcLen') as any) as HTMLElement;
-	msgp.innerText = '' + calcLen;
+	//msgp = (document.getElementById('calcLen') as any) as HTMLElement;
+	//msgp.innerText = '' + calcLen;
 	msgp = (document.getElementById('calcWide') as any) as HTMLElement;
 	msgp.innerText = '' + diffWide;
 

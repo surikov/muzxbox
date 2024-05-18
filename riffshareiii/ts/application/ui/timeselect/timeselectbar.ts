@@ -61,7 +61,7 @@ class TimeSelectBar {
 		if (cfg.data.selection) {
 			//let mixm: MixerDataMath = new MixerDataMath(data);
 			let mm: Zvoog_MetreMathType = MMUtil();
-			let barLeft = cfg.LeftPad;
+			let barLeft = cfg.leftPad;
 			let startSel = 1;
 			let widthSel = 0;
 			let startIdx = 0;
@@ -158,7 +158,7 @@ class TimeSelectBar {
 			let mm: Zvoog_MetreMathType = MMUtil();
 			//this.reBuildSelectionMark(zz, data);
 
-			let barLeft = cfg.LeftPad;
+			let barLeft = cfg.leftPad;
 			let barTime = 0;
 			for (let kk = 0; kk < cfg.data.timeline.length; kk++) {
 				let curBar = cfg.data.timeline[kk];

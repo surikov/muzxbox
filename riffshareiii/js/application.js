@@ -572,7 +572,7 @@ class TimeSelectBar {
     updateTimeSelectionBar(cfg) {
         if (cfg.data.selection) {
             let mm = MMUtil();
-            let barLeft = cfg.LeftPad;
+            let barLeft = cfg.leftPad;
             let startSel = 1;
             let widthSel = 0;
             let startIdx = 0;
@@ -647,7 +647,7 @@ class TimeSelectBar {
             };
             this.zoomAnchors.push(selectLevelAnchor);
             let mm = MMUtil();
-            let barLeft = cfg.LeftPad;
+            let barLeft = cfg.leftPad;
             let barTime = 0;
             for (let kk = 0; kk < cfg.data.timeline.length; kk++) {
                 let curBar = cfg.data.timeline[kk];
@@ -1665,9 +1665,9 @@ class MixerUI {
             this.firstLayers.anchors[ii].hh = hh;
             this.levels[ii].reCreateBars(cfg);
         }
-        this.fillerAnchor.xx = cfg.LeftPad;
+        this.fillerAnchor.xx = cfg.leftPad;
         this.fillerAnchor.yy = cfg.gridTop();
-        this.fillerAnchor.ww = cfg.wholeWidth() - cfg.LeftPad - cfg.rightPad;
+        this.fillerAnchor.ww = cfg.wholeWidth() - cfg.leftPad - cfg.rightPad;
         this.fillerAnchor.hh = cfg.gridHeight();
         this.reFillTracksRatio(cfg);
     }
@@ -1761,7 +1761,7 @@ class MixerUI {
             let css = 'mixFiller' + filIdx;
             let barwidth = MMUtil().set(cfg.data.timeline[bb].metre).duration(cfg.data.timeline[bb].tempo) * cfg.widthDurationRatio;
             let fillRectangle = {
-                x: cfg.LeftPad + barX,
+                x: cfg.leftPad + barX,
                 y: cfg.gridTop(),
                 w: barwidth,
                 h: cfg.gridHeight(),
@@ -1779,7 +1779,7 @@ class MixerUI {
                 filIdx = 1 + Math.round(7 * drumcount / mxDrums);
                 let css2 = 'mixFiller' + filIdx;
                 let fillDrumBar = {
-                    x: cfg.LeftPad + barX,
+                    x: cfg.leftPad + barX,
                     y: cfg.samplerTop(),
                     w: barwidth,
                     h: cfg.data.percussions.length * cfg.notePathHeight,
@@ -1795,7 +1795,7 @@ class MixerUI {
             }
             css = 'mixFiller' + filIdx;
             let fillTxtBar = {
-                x: cfg.LeftPad + barX,
+                x: cfg.leftPad + barX,
                 y: cfg.commentsTop(),
                 w: barwidth,
                 h: cfg.commentsMaxHeight(),
@@ -1818,7 +1818,7 @@ class MixerZoomLevel {
         this.zoomTracksAnchor.content = [];
         this.zoomFirstAnchor.content = [];
         this.bars = [];
-        let left = cfg.LeftPad;
+        let left = cfg.leftPad;
         let width = 0;
         for (let ii = 0; ii < cfg.data.timeline.length; ii++) {
             let timebar = cfg.data.timeline[ii];
@@ -1857,7 +1857,7 @@ class MixerZoomLevel {
         if (this.zoomLevelIndex < 4) {
             for (let ss = 1; ss < cfg.data.percussions.length; ss++) {
                 let line = {
-                    x: cfg.LeftPad,
+                    x: cfg.leftPad,
                     y: cfg.samplerTop() + cfg.notePathHeight * ss,
                     h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0,
                     w: cfg.timelineWidth(), css: 'samplerRowBorder'
@@ -1870,7 +1870,7 @@ class MixerZoomLevel {
         if (this.zoomLevelIndex < 3) {
             for (let ss = 0; ss <= cfg.maxCommentRowCount; ss++) {
                 let line = {
-                    x: cfg.LeftPad,
+                    x: cfg.leftPad,
                     y: cfg.commentsTop() + cfg.notePathHeight * (ss + 1),
                     h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
                     w: cfg.timelineWidth(), css: 'interActiveGridLine'
@@ -1884,7 +1884,7 @@ class MixerZoomLevel {
             for (let oo = 0; oo < cfg.octaveCount; oo++) {
                 if (oo > 0) {
                     let octaveBottomBorder = {
-                        x: cfg.LeftPad,
+                        x: cfg.leftPad,
                         y: cfg.gridTop() + oo * 12 * cfg.notePathHeight,
                         w: cfg.timelineWidth(),
                         h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0,
@@ -1895,7 +1895,7 @@ class MixerZoomLevel {
                 if (this.zoomLevelIndex < 3) {
                     for (let kk = 1; kk < 12; kk++) {
                         barOctaveAnchor.content.push({
-                            x: cfg.LeftPad,
+                            x: cfg.leftPad,
                             y: cfg.gridTop() + (oo * 12 + kk) * cfg.notePathHeight,
                             w: cfg.timelineWidth(),
                             h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
@@ -2226,16 +2226,16 @@ let testEmptyMixerData = {
 };
 class MixerDataMathUtility {
     constructor(data) {
-        this.LeftPad = 3;
+        this.leftPad = 3;
         this.rightPad = 10;
         this.bottomPad = 11;
         this.topPad = 2;
         this.notePathHeight = 1;
         this.widthDurationRatio = 27;
         this.octaveCount = 10;
-        this.samplerBottomPad = 1;
         this.titleBottomPad = 5;
         this.automationBottomPad = 1;
+        this.samplerBottomPad = 1;
         this.gridBottomPad = 1;
         this.maxCommentRowCount = 0;
         this.maxAutomationsCount = 0;
@@ -2257,10 +2257,10 @@ class MixerDataMathUtility {
         }
     }
     wholeWidth() {
-        return this.LeftPad + this.timelineWidth() + this.rightPad;
+        return this.leftPad + this.timelineWidth() + this.rightPad;
     }
     heightOfTitle() {
-        return this.topPad + 10;
+        return 10;
     }
     timelineWidth() {
         let mm = MMUtil();
@@ -2281,6 +2281,9 @@ class MixerDataMathUtility {
     commentsMaxHeight() {
         return (2 + this.maxCommentRowCount) * this.notePathHeight * 8;
     }
+    automationTop() {
+        return this.topPad + this.heightOfTitle() + this.titleBottomPad;
+    }
     commentsTop() {
         return this.gridTop()
             + this.gridHeight()
@@ -2296,7 +2299,7 @@ class MixerDataMathUtility {
         return this.data.percussions.length * this.notePathHeight;
     }
     samplerTop() {
-        return this.heightOfTitle() + this.titleBottomPad + this.automationMaxHeight() + this.automationBottomPad;
+        return this.automationTop() + this.automationMaxHeight() + this.automationBottomPad;
     }
 }
 let biChar32 = [];

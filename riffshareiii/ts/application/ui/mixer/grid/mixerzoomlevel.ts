@@ -18,7 +18,7 @@ class MixerZoomLevel {
 		this.zoomTracksAnchor.content = [];
 		this.zoomFirstAnchor.content = [];
 		this.bars = [];
-		let left = cfg.LeftPad;
+		let left = cfg.leftPad;
 		let width = 0;
 		for (let ii = 0; ii < cfg.data.timeline.length; ii++) {
 			let timebar = cfg.data.timeline[ii];
@@ -65,7 +65,7 @@ class MixerZoomLevel {
 		if (this.zoomLevelIndex < 4) {
 			for (let ss = 1; ss < cfg.data.percussions.length; ss++) {
 				let line: TileRectangle = {
-					x: cfg.LeftPad
+					x: cfg.leftPad
 					, y: cfg.samplerTop() + cfg.notePathHeight * ss
 					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0
 					, w: cfg.timelineWidth(), css: 'samplerRowBorder'
@@ -78,7 +78,7 @@ class MixerZoomLevel {
 		if (this.zoomLevelIndex < 3) {
 			for (let ss = 0; ss <= cfg.maxCommentRowCount; ss++) {
 				let line: TileRectangle = {
-					x: cfg.LeftPad
+					x: cfg.leftPad
 					, y: cfg.commentsTop() + cfg.notePathHeight * (ss + 1)
 					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
 					, w: cfg.timelineWidth(), css: 'interActiveGridLine'
@@ -95,7 +95,7 @@ class MixerZoomLevel {
 			for (let oo = 0; oo < cfg.octaveCount; oo++) {
 				if (oo > 0) {
 					let octaveBottomBorder: TileRectangle = {
-						x: cfg.LeftPad
+						x: cfg.leftPad
 						, y: cfg.gridTop() + oo * 12 * cfg.notePathHeight
 						, w: cfg.timelineWidth()
 						, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0
@@ -106,7 +106,7 @@ class MixerZoomLevel {
 				if (this.zoomLevelIndex < 3) {
 					for (let kk = 1; kk < 12; kk++) {
 						barOctaveAnchor.content.push({
-							x: cfg.LeftPad
+							x: cfg.leftPad
 							, y: cfg.gridTop() + (oo * 12 + kk) * cfg.notePathHeight
 							, w: cfg.timelineWidth()
 							, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
