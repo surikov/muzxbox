@@ -10,7 +10,7 @@ class MixerUI {
 	//samplerUI: SamplerRows;
 
 	reFillMixerUI(//data: Zvoog_Project
-		cfg:MixerDataMathUtility
+		cfg: MixerDataMathUtility
 	) {
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		let ww = cfg.wholeWidth();
@@ -82,16 +82,17 @@ class MixerUI {
 	}
 
 	reFillTracksRatio(//data: Zvoog_Project
-		cfg:MixerDataMathUtility
+		cfg: MixerDataMathUtility
 	) {
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		let mxNotes = 0;
 		let mxDrums = 0;
 		let mxTxt = 0;
+		let mxAuto = 0;
 		for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
 			let notecount = 0;
 			let drumcount = 0;
-			let txtcnt = 0;
+			//let txtcnt = 0;
 			for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
 				let bar = cfg.data.tracks[tt].measures[bb];
 				if (bar) {
@@ -112,11 +113,25 @@ class MixerUI {
 			if (mxDrums < drumcount) {
 				mxDrums = drumcount;
 			}
-			if (cfg.data.comments[bb])
-				if (cfg.data.comments[bb].points)
+			if (cfg.data.comments[bb]) {
+				if (cfg.data.comments[bb].points) {
 					if (mxTxt < cfg.data.comments[bb].points.length) {
 						mxTxt = cfg.data.comments[bb].points.length;
 					}
+				}
+			}
+			let autoCnt = 0;
+			for (let ff = 0; ff < cfg.data.filters.length; ff++) {
+				let filter = cfg.data.filters[ff];
+				if (filter.automation) {
+					if (filter.automation.measures[bb]) {
+						autoCnt = autoCnt + filter.automation.measures[bb].changes.length;
+					}
+				}
+			}
+			if (mxAuto < autoCnt) {
+				mxAuto = autoCnt;
+			}
 			//txtcnt = txtcnt + cfg.data.comments[bb].texts.length;
 			//console.log(bb, notecount);
 		}
@@ -124,6 +139,7 @@ class MixerUI {
 		if (mxDrums < 1) mxDrums = 1;
 		if (mxNotes < 1) mxNotes = 1;
 		if (mxTxt < 1) mxTxt = 1;
+		if (mxAuto < 1) mxAuto = 1;
 		this.fillerAnchor.content = [];
 		let barX = 0;
 		for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
