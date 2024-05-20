@@ -99,7 +99,7 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 				title: ''
 				, measures: [
 					{changes:[]},{changes:[]}
-					,{changes:[{skip:{count:3,part:4},stateBlob:''}]}
+					,{changes:[{skip:{count:5,part:16},stateBlob:''}]}
 				]
 			}
 		}

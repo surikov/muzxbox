@@ -30,12 +30,13 @@ class MixerDataMathUtility {
 				}
 			}
 		}
-		this.maxAutomationsCount = -1;
+		this.maxAutomationsCount = 0;
 		for (let ff = 0; ff < this.data.filters.length; ff++) {
 			if (this.data.filters[ff].automation) {
 				this.maxAutomationsCount++;
 			}
 		}
+		//console.log();
 	}
 	wholeWidth(): number {
 		return this.leftPad + this.timelineWidth() + this.rightPad;

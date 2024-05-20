@@ -102,6 +102,9 @@ class MixerBar {
 		if (zoomLevel < 6) {
 			new TextComments(barIdx, cfg, left, gridZoomBarAnchor, zoomLevel);
 		}
+		if (zoomLevel < 6) {
+			new AutomationBarContent(barIdx, cfg, left, gridZoomBarAnchor, zoomLevel);
+		}
 	}
 	addOctaveGridSteps(
 		barIdx: number

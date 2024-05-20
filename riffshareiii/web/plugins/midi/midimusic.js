@@ -682,7 +682,8 @@ class MidiParser {
         try {
             let win1251decoder = new TextDecoder("windows-1251");
             let bytes = new Uint8Array(arr);
-            txt = win1251decoder.decode(bytes);
+            let txt1251 = win1251decoder.decode(bytes);
+            txt = txt1251;
         }
         catch (xx) {
             console.log(xx);

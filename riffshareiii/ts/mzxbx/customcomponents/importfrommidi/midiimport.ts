@@ -810,8 +810,13 @@ class MidiParser {
 		let txt = '';
 		try {
 			let win1251decoder = new TextDecoder("windows-1251");
+			//let utf8decoder = new TextDecoder("utf-8");
 			let bytes = new Uint8Array(arr);
-			txt = win1251decoder.decode(bytes);
+			let txt1251 = win1251decoder.decode(bytes);
+			//let txt8 = utf8decoder.decode(bytes);
+			//console.log('decode',txt8,txt1251);
+
+			txt=txt1251;			
 		} catch (xx) {
 			console.log(xx);
 			var rr: string = '';
@@ -820,6 +825,7 @@ class MidiParser {
 			}
 			txt = rr;
 		}
+		
 
 		txt = txt.replace("\\n", " ");
 		txt = txt.replace("\\r", " ");
@@ -838,7 +844,7 @@ class MidiParser {
 		txt = txt.replace("  ", " ");
 		txt = txt.replace("  ", " ");
 		txt = txt.replace("  ", " ");
-
+		
 		return txt;
 	}
 	findChordBefore(when: number, track: MIDIFileTrack, channel: number): TrackChord | null {

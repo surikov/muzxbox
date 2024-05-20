@@ -1515,6 +1515,9 @@ class MixerBar {
         if (zoomLevel < 6) {
             new TextComments(barIdx, cfg, left, gridZoomBarAnchor, zoomLevel);
         }
+        if (zoomLevel < 6) {
+            new AutomationBarContent(barIdx, cfg, left, gridZoomBarAnchor, zoomLevel);
+        }
     }
     addOctaveGridSteps(barIdx, cfg, barLeft, width, barOctaveAnchor, zIndex) {
         let zoomInfo = zoomPrefixLevelsCSS[zIndex];
@@ -1649,6 +1652,45 @@ class TextComments {
         }
     }
 }
+class AutomationBarContent {
+    constructor(barIdx, cfg, barLeft, barOctaveAnchor, zIndex) {
+        let curBar = cfg.data.timeline[barIdx];
+        let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * cfg.widthDurationRatio;
+        let left = barLeft + width;
+        let top = cfg.automationTop();
+        let height = cfg.automationMaxHeight();
+        let barAutoRightBorder = {
+            x: left,
+            y: top,
+            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
+            h: height,
+            rx: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
+            ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
+            css: 'barRightBorder'
+        };
+        barOctaveAnchor.content.push(barAutoRightBorder);
+        for (let ff = 0; ff < cfg.data.filters.length; ff++) {
+            let filter = cfg.data.filters[ff];
+            if (filter.automation) {
+                if (filter.automation.measures[barIdx]) {
+                    let measure = filter.automation.measures[barIdx];
+                    for (let ii = 0; ii < measure.changes.length; ii++) {
+                        let change = measure.changes[ii];
+                        let xx = barLeft + MMUtil().set(change.skip).duration(curBar.tempo) * cfg.widthDurationRatio;
+                        let aubtn = {
+                            dots: [xx, top + cfg.notePathHeight * ff,
+                                xx + 1, top + cfg.notePathHeight * ff,
+                                xx, top + cfg.notePathHeight * (ff + 1)
+                            ],
+                            css: 'automationChangeDot'
+                        };
+                        barOctaveAnchor.content.push(aubtn);
+                    }
+                }
+            }
+        }
+    }
+}
 class MixerUI {
     constructor() {
         this.levels = [];
@@ -1711,10 +1753,10 @@ class MixerUI {
         let mxNotes = 0;
         let mxDrums = 0;
         let mxTxt = 0;
+        let mxAuto = 0;
         for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
             let notecount = 0;
             let drumcount = 0;
-            let txtcnt = 0;
             for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
                 let bar = cfg.data.tracks[tt].measures[bb];
                 if (bar) {
@@ -1735,11 +1777,25 @@ class MixerUI {
             if (mxDrums < drumcount) {
                 mxDrums = drumcount;
             }
-            if (cfg.data.comments[bb])
-                if (cfg.data.comments[bb].points)
+            if (cfg.data.comments[bb]) {
+                if (cfg.data.comments[bb].points) {
                     if (mxTxt < cfg.data.comments[bb].points.length) {
                         mxTxt = cfg.data.comments[bb].points.length;
                     }
+                }
+            }
+            let autoCnt = 0;
+            for (let ff = 0; ff < cfg.data.filters.length; ff++) {
+                let filter = cfg.data.filters[ff];
+                if (filter.automation) {
+                    if (filter.automation.measures[bb]) {
+                        autoCnt = autoCnt + filter.automation.measures[bb].changes.length;
+                    }
+                }
+            }
+            if (mxAuto < autoCnt) {
+                mxAuto = autoCnt;
+            }
         }
         if (mxDrums < 1)
             mxDrums = 1;
@@ -1747,6 +1803,8 @@ class MixerUI {
             mxNotes = 1;
         if (mxTxt < 1)
             mxTxt = 1;
+        if (mxAuto < 1)
+            mxAuto = 1;
         this.fillerAnchor.content = [];
         let barX = 0;
         for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
@@ -1802,6 +1860,24 @@ class MixerUI {
                 css: css
             };
             this.fillerAnchor.content.push(fillTxtBar);
+            filIdx = 1;
+            for (let ff = 0; ff < cfg.data.filters.length; ff++) {
+                let filter = cfg.data.filters[ff];
+                if (filter.automation) {
+                    if (filter.automation.measures[bb]) {
+                        filIdx = 1 + Math.round(7 * filter.automation.measures[bb].changes.length / mxAuto);
+                    }
+                }
+            }
+            css = 'mixFiller' + filIdx;
+            let fillAutoBar = {
+                x: cfg.leftPad + barX,
+                y: cfg.automationTop(),
+                w: barwidth,
+                h: cfg.automationMaxHeight(),
+                css: css
+            };
+            this.fillerAnchor.content.push(fillAutoBar);
             barX = barX + barwidth;
         }
     }
@@ -2142,7 +2218,7 @@ let mzxbxProjectForTesting2 = {
                 title: '',
                 measures: [
                     { changes: [] }, { changes: [] },
-                    { changes: [{ skip: { count: 3, part: 4 }, stateBlob: '' }] }
+                    { changes: [{ skip: { count: 5, part: 16 }, stateBlob: '' }] }
                 ]
             }
         },
@@ -2249,7 +2325,7 @@ class MixerDataMathUtility {
                 }
             }
         }
-        this.maxAutomationsCount = -1;
+        this.maxAutomationsCount = 0;
         for (let ff = 0; ff < this.data.filters.length; ff++) {
             if (this.data.filters[ff].automation) {
                 this.maxAutomationsCount++;

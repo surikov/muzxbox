@@ -41,6 +41,7 @@
 		,"ui/mixer/grid/octavecontent.ts"
 		,"ui/mixer/grid/mixerbar.ts"
 		,"ui/mixer/grid/textCommentsContent.ts"
+		,"ui/mixer/grid/autoBar.ts"
         ,"ui/mixer/uimixer.ts"
         ,"ui/mixer/grid/mixerzoomlevel.ts"
         ,"ui/buttons/iconlabelbutton.ts"

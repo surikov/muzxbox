@@ -120,6 +120,7 @@ class MixerUI {
 					}
 				}
 			}
+			
 			let autoCnt = 0;
 			for (let ff = 0; ff < cfg.data.filters.length; ff++) {
 				let filter = cfg.data.filters[ff];
@@ -132,6 +133,7 @@ class MixerUI {
 			if (mxAuto < autoCnt) {
 				mxAuto = autoCnt;
 			}
+			//console.log(bb,mxAuto);
 			//txtcnt = txtcnt + cfg.data.comments[bb].texts.length;
 			//console.log(bb, notecount);
 		}
@@ -182,6 +184,7 @@ class MixerUI {
 					, css: css2
 				};
 				this.fillerAnchor.content.push(fillDrumBar);
+				//console.log('drum',bb,fillDrumBar);
 			}
 			filIdx = 1;
 			if (cfg.data.comments[bb]) {
@@ -198,6 +201,26 @@ class MixerUI {
 				, css: css
 			};
 			this.fillerAnchor.content.push(fillTxtBar);
+
+			filIdx = 1;
+			for (let ff = 0; ff < cfg.data.filters.length; ff++) {
+				let filter = cfg.data.filters[ff];
+				if (filter.automation) {
+					if (filter.automation.measures[bb]) {
+						filIdx = 1 + Math.round(7 * filter.automation.measures[bb].changes.length / mxAuto);
+					}
+				}
+			}
+			css = 'mixFiller' + filIdx;
+			let fillAutoBar: TileRectangle = {
+				x: cfg.leftPad + barX
+				, y: cfg.automationTop()
+				, w: barwidth
+				, h: cfg.automationMaxHeight()
+				, css: css
+			};
+			this.fillerAnchor.content.push(fillAutoBar);
+			//console.log('auto',bb,fillAutoBar);
 
 
 			barX = barX + barwidth;
