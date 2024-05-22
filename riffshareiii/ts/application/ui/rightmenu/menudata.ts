@@ -30,11 +30,15 @@ let menuItemsData: MenuInfo[] | null = null;
 let menuPointTracks: MenuInfo = {
 	text: localMenuTracksFolder
 };
-/*
+
 let menuPointPercussion: MenuInfo = {
 	text: localMenuPercussionFolder
 };
-*/
+
+let menuPointAutomation: MenuInfo = {
+	text: localMenuAutomationFolder
+};
+
 let menuPointFileImport: MenuInfo = {
 	text: localMenuImportFolder
 };
@@ -98,7 +102,11 @@ function composeBaseMenu(): MenuInfo[] {
 				}
 			}*/
 			 menuPointTracks
-			//, menuPointPercussion
+			, menuPointPercussion
+			, menuPointAutomation
+			,{
+				text: localMenuCommentsLayer
+			}
 			, {
 				text: localMenuItemSettings, children: [
 					menuPointMenuFile

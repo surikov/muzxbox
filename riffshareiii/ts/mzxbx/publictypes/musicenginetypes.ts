@@ -117,7 +117,7 @@ type Zvoog_Project = {
 	comments: Zvoog_CommentMeasure[];
 	filters: Zvoog_FilterTarget[];
 	selection?: Zvoog_Selection;
-	order?: { comments: number, percussians: number, automations: number }
+	//order?: { comments: number, percussians: number, automations: number }
 };
 
 

@@ -8,6 +8,8 @@ let localMenuTracksFolder = 'localMenuTracksFolder';
 let localMenuPercussionFolder='localMenuPercussionFolder';
 let localMenuImportFolder='localMenuImportFolder';
 let localMenuFileFolder='localMenuFileFolder';
+let localMenuAutomationFolder='localMenuAutomationFolder';
+let localMenuCommentsLayer='localMenuCommentsLayer';
 
 let localeDictionary: { id: string, data: { locale: string, text: string }[] }[] = [
     {
@@ -46,6 +48,16 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
         id: localMenuImportFolder, data: [
             { locale: 'en', text: 'Import' }
             , { locale: 'ru', text: 'Импорт' }
+            , { locale: 'zh', text: '?' }]
+    }, {
+        id: localMenuCommentsLayer, data: [
+            { locale: 'en', text: 'Comments' }
+            , { locale: 'ru', text: 'Комментарии' }
+            , { locale: 'zh', text: '?' }]
+    }, {
+        id: localMenuAutomationFolder, data: [
+            { locale: 'en', text: 'Automation' }
+            , { locale: 'ru', text: 'Автоматизация' }
             , { locale: 'zh', text: '?' }]
     }
 ];

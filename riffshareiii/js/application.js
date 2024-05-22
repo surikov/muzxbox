@@ -469,6 +469,8 @@ let localMenuTracksFolder = 'localMenuTracksFolder';
 let localMenuPercussionFolder = 'localMenuPercussionFolder';
 let localMenuImportFolder = 'localMenuImportFolder';
 let localMenuFileFolder = 'localMenuFileFolder';
+let localMenuAutomationFolder = 'localMenuAutomationFolder';
+let localMenuCommentsLayer = 'localMenuCommentsLayer';
 let localeDictionary = [
     {
         id: localNameLocal, data: [
@@ -506,6 +508,18 @@ let localeDictionary = [
         id: localMenuImportFolder, data: [
             { locale: 'en', text: 'Import' },
             { locale: 'ru', text: 'Импорт' },
+            { locale: 'zh', text: '?' }
+        ]
+    }, {
+        id: localMenuCommentsLayer, data: [
+            { locale: 'en', text: 'Comments' },
+            { locale: 'ru', text: 'Комментарии' },
+            { locale: 'zh', text: '?' }
+        ]
+    }, {
+        id: localMenuAutomationFolder, data: [
+            { locale: 'en', text: 'Automation' },
+            { locale: 'ru', text: 'Автоматизация' },
             { locale: 'zh', text: '?' }
         ]
     }
@@ -950,6 +964,7 @@ class RightMenuPanel {
             };
             menuPointTracks.children.push(item);
         }
+        menuPointPercussion.children = [];
         for (let tt = 0; tt < project.percussions.length; tt++) {
             let drum = project.percussions[tt];
             let item = {
@@ -965,9 +980,24 @@ class RightMenuPanel {
                 states: [icon_sound_low, icon_hide, icon_sound_loud],
                 selection: 0
             };
-            console.log('menu drum', item);
-            if (menuItemsData)
-                menuItemsData.push(item);
+            menuPointPercussion.children.push(item);
+        }
+        menuPointAutomation.children = [];
+        for (let ff = 0; ff < project.filters.length; ff++) {
+            let filter = project.filters[ff];
+            if (filter.automation) {
+                let item = {
+                    text: filter.automation.title,
+                    noLocalization: true,
+                    onClick: () => {
+                    },
+                    onSubClick: () => {
+                    },
+                    states: [icon_sound_low, icon_hide, icon_sound_loud],
+                    selection: 0
+                };
+                menuPointAutomation.children.push(item);
+            }
         }
     }
     rerenderMenuContent(folder) {
@@ -1166,6 +1196,12 @@ let menuItemsData = null;
 let menuPointTracks = {
     text: localMenuTracksFolder
 };
+let menuPointPercussion = {
+    text: localMenuPercussionFolder
+};
+let menuPointAutomation = {
+    text: localMenuAutomationFolder
+};
 let menuPointFileImport = {
     text: localMenuImportFolder
 };
@@ -1199,6 +1235,11 @@ function composeBaseMenu() {
     else {
         menuItemsData = [
             menuPointTracks,
+            menuPointPercussion,
+            menuPointAutomation,
+            {
+                text: localMenuCommentsLayer
+            },
             {
                 text: localMenuItemSettings, children: [
                     menuPointMenuFile,
