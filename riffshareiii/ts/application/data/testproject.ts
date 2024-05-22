@@ -96,19 +96,39 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 			, dataBlob: ''
 			, outputId: 'masterVolme'
 			, automation: {
-				title: ''
+				title: 'Simple test'
 				, measures: [
-					{changes:[]},{changes:[]}
-					,{changes:[{skip:{count:5,part:16},stateBlob:''}]}
+					{ changes: [] }
+					, {
+						changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }
+							, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }]
+					}
+					, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }
 				]
 			}
 		}
 		, {
 			id: 'masterVolme'
 			, kind: 'base_volume'
-			, dataBlob: ''
+			, dataBlob: 'bb1'
 			, outputId: ''
-			, automation: null
+			, automation: {
+				title: 'test1122'
+				, measures: [
+					{ changes: [] }, { changes: [] }
+					, {
+						changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }
+							, { skip: { count: 2, part: 16 }, stateBlob: 's1' }
+							, { skip: { count: 3, part: 16 }, stateBlob: 's1' }
+							, { skip: { count: 4, part: 16 }, stateBlob: 's1' }
+							, { skip: { count: 5, part: 16 }, stateBlob: 's1' }
+							, { skip: { count: 6, part: 16 }, stateBlob: 's1' }
+							, { skip: { count: 7, part: 16 }, stateBlob: 's1' }
+						]
+					}
+					, { changes: [] }
+				]
+			}
 		}
 	]
 	/*, theme: {

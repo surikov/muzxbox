@@ -215,7 +215,6 @@ declare type MenuInfo = {
 };
 declare let menuItemsData: MenuInfo[] | null;
 declare let menuPointTracks: MenuInfo;
-declare let menuPointPercussion: MenuInfo;
 declare let menuPointFileImport: MenuInfo;
 declare let menuPointMenuFile: MenuInfo;
 declare function fillMenuImportPlugins(): void;
@@ -631,6 +630,11 @@ declare type Zvoog_Project = {
     comments: Zvoog_CommentMeasure[];
     filters: Zvoog_FilterTarget[];
     selection?: Zvoog_Selection;
+    order?: {
+        comments: number;
+        percussians: number;
+        automations: number;
+    };
 };
 declare type MZXBX_CachedWave = {
     path: string;

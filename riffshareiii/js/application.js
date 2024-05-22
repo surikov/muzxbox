@@ -950,7 +950,6 @@ class RightMenuPanel {
             };
             menuPointTracks.children.push(item);
         }
-        menuPointPercussion.children = [];
         for (let tt = 0; tt < project.percussions.length; tt++) {
             let drum = project.percussions[tt];
             let item = {
@@ -966,7 +965,9 @@ class RightMenuPanel {
                 states: [icon_sound_low, icon_hide, icon_sound_loud],
                 selection: 0
             };
-            menuPointPercussion.children.push(item);
+            console.log('menu drum', item);
+            if (menuItemsData)
+                menuItemsData.push(item);
         }
     }
     rerenderMenuContent(folder) {
@@ -1165,9 +1166,6 @@ let menuItemsData = null;
 let menuPointTracks = {
     text: localMenuTracksFolder
 };
-let menuPointPercussion = {
-    text: localMenuPercussionFolder
-};
 let menuPointFileImport = {
     text: localMenuImportFolder
 };
@@ -1200,11 +1198,10 @@ function composeBaseMenu() {
     }
     else {
         menuItemsData = [
-            menuPointMenuFile,
             menuPointTracks,
-            menuPointPercussion,
             {
                 text: localMenuItemSettings, children: [
+                    menuPointMenuFile,
                     {
                         text: 'Size', children: [
                             {
@@ -1260,6 +1257,7 @@ function composeBaseMenu() {
                 ]
             }
         ];
+        console.log('base menu', menuItemsData);
         return menuItemsData;
     }
 }
@@ -1860,15 +1858,16 @@ class MixerUI {
                 css: css
             };
             this.fillerAnchor.content.push(fillTxtBar);
-            filIdx = 1;
+            filIdx = 0;
             for (let ff = 0; ff < cfg.data.filters.length; ff++) {
                 let filter = cfg.data.filters[ff];
                 if (filter.automation) {
                     if (filter.automation.measures[bb]) {
-                        filIdx = 1 + Math.round(7 * filter.automation.measures[bb].changes.length / mxAuto);
+                        filIdx = filIdx + filter.automation.measures[bb].changes.length;
                     }
                 }
             }
+            filIdx = 1 + Math.round(7 * filIdx / mxAuto);
             css = 'mixFiller' + filIdx;
             let fillAutoBar = {
                 x: cfg.leftPad + barX,
@@ -2215,19 +2214,39 @@ let mzxbxProjectForTesting2 = {
             dataBlob: '',
             outputId: 'masterVolme',
             automation: {
-                title: '',
+                title: 'Simple test',
                 measures: [
-                    { changes: [] }, { changes: [] },
-                    { changes: [{ skip: { count: 5, part: 16 }, stateBlob: '' }] }
+                    { changes: [] },
+                    {
+                        changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' },
+                            { skip: { count: 1, part: 16 }, stateBlob: 'sss' }]
+                    },
+                    { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }
                 ]
             }
         },
         {
             id: 'masterVolme',
             kind: 'base_volume',
-            dataBlob: '',
+            dataBlob: 'bb1',
             outputId: '',
-            automation: null
+            automation: {
+                title: 'test1122',
+                measures: [
+                    { changes: [] }, { changes: [] },
+                    {
+                        changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' },
+                            { skip: { count: 2, part: 16 }, stateBlob: 's1' },
+                            { skip: { count: 3, part: 16 }, stateBlob: 's1' },
+                            { skip: { count: 4, part: 16 }, stateBlob: 's1' },
+                            { skip: { count: 5, part: 16 }, stateBlob: 's1' },
+                            { skip: { count: 6, part: 16 }, stateBlob: 's1' },
+                            { skip: { count: 7, part: 16 }, stateBlob: 's1' }
+                        ]
+                    },
+                    { changes: [] }
+                ]
+            }
         }
     ]
 };

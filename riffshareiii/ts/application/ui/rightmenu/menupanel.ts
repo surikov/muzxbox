@@ -243,7 +243,7 @@ class RightMenuPanel {
 
 			menuPointTracks.children.push(item);
 		}
-		menuPointPercussion.children = [];
+		//menuPointPercussion.children = [];
 		for (let tt = 0; tt < project.percussions.length; tt++) {
 			let drum = project.percussions[tt];
 			let item: MenuInfo = {
@@ -261,8 +261,9 @@ class RightMenuPanel {
 				, states: [icon_sound_low, icon_hide, icon_sound_loud]
 				, selection: 0
 			};
-
-			menuPointPercussion.children.push(item);
+console.log('menu drum',item);
+//if(menuItemsData)menuItemsData.push(item);
+			//menuPointPercussion.children.push(item);
 		}
 	}
 	rerenderMenuContent(folder: RightMenuItem | null) {

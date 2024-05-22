@@ -26,12 +26,15 @@ let commandImportFromMIDI = 'commandImportFromMIDI';
 let commandTracksFolder = 'commandTracksFolder';
 */
 let menuItemsData: MenuInfo[] | null = null;
+
 let menuPointTracks: MenuInfo = {
 	text: localMenuTracksFolder
 };
+/*
 let menuPointPercussion: MenuInfo = {
 	text: localMenuPercussionFolder
 };
+*/
 let menuPointFileImport: MenuInfo = {
 	text: localMenuImportFolder
 };
@@ -54,7 +57,7 @@ function fillMenuImportPlugins() {
 				text: label, noLocalization: true, onClick: () => {
 					commandDispatcher.promptPluginGUI(label, url, (obj: any) => {
 						//console.log('set project from', obj);
-						
+
 						commandDispatcher.registerWorkProject(obj as Zvoog_Project);
 						commandDispatcher.resetProject();
 						return true;
@@ -76,9 +79,11 @@ function fillMenuImportPlugins() {
 }
 function composeBaseMenu(): MenuInfo[] {
 	fillMenuImportPlugins();
-	if (menuItemsData) { return menuItemsData; } else {
+	if (menuItemsData) {
+		return menuItemsData;
+	} else {
 		menuItemsData = [
-			menuPointMenuFile
+			
 			/*, {
 				text: localMenuImportMIDI, onClick: () => {
 					commandDispatcher.promptImportFromMIDI();
@@ -91,11 +96,13 @@ function composeBaseMenu(): MenuInfo[] {
 				text: "Test iFrame GUI", onClick: () => {
 					commandDispatcher.promptPluginGUI('Plugin UI', './web/test/plugin.html', (obj: any) => { return false });
 				}
-			}*/, menuPointTracks
-			, menuPointPercussion
+			}*/
+			 menuPointTracks
+			//, menuPointPercussion
 			, {
 				text: localMenuItemSettings, children: [
-					{
+					menuPointMenuFile
+					,{
 						text: 'Size', children: [
 							{
 								text: 'Small', onClick: () => {
@@ -149,6 +156,7 @@ function composeBaseMenu(): MenuInfo[] {
 				]
 			}
 		];
+		console.log('base menu',menuItemsData);
 		return menuItemsData;
 	}
 }

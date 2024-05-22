@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.98 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.99 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -23,9 +23,9 @@ let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let reduceRatio = 1;
 let highLightMode = 1;
 var calcLen = 32;
-let diffWide = 1;
+let diffWide = 5;
 
-let wideRange = false;
+let wideRange = true;
 
 type StatBeginEnd = {
 	row: number;

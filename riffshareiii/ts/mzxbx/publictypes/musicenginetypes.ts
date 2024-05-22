@@ -45,7 +45,7 @@ type Zvoog_FilterTarget = {
 	kind: string;
 	dataBlob: string;
 	outputId: string;
-	automation: Zvoog_AutomationTrack|null;
+	automation: Zvoog_AutomationTrack | null;
 };
 type Zvoog_AudioSequencer = {
 	id: string;
@@ -99,7 +99,7 @@ type Zvoog_MusicTrack = {
 type Zvoog_CommentText = {
 	skip: Zvoog_Metre;
 	text: string;
-	row:number;
+	row: number;
 };
 type Zvoog_CommentMeasure = {
 	points: Zvoog_CommentText[];
@@ -117,6 +117,7 @@ type Zvoog_Project = {
 	comments: Zvoog_CommentMeasure[];
 	filters: Zvoog_FilterTarget[];
 	selection?: Zvoog_Selection;
+	order?: { comments: number, percussians: number, automations: number }
 };
 
 
