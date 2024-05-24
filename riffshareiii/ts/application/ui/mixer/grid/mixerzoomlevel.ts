@@ -62,7 +62,7 @@ class MixerZoomLevel {
 		this.addCommentLines(cfg);
 	}
 	addDrumLines(cfg: MixerDataMathUtility) {
-		if (this.zoomLevelIndex < 4) {
+	/*	if (this.zoomLevelIndex < 4) {
 			for (let ss = 1; ss < cfg.data.percussions.length; ss++) {
 				let line: TileRectangle = {
 					x: cfg.leftPad
@@ -72,20 +72,20 @@ class MixerZoomLevel {
 				};
 				this.zoomGridAnchor.content.push(line);
 			}
-		}
+		}*/
 	}
 	addCommentLines(cfg: MixerDataMathUtility) {
-		if (this.zoomLevelIndex < 3) {
+		/*if (this.zoomLevelIndex < 3) {
 			for (let ss = 0; ss <= cfg.maxCommentRowCount; ss++) {
 				let line: TileRectangle = {
 					x: cfg.leftPad
-					, y: cfg.commentsTop() + cfg.notePathHeight * (ss + 1)
+					, y: cfg.gridTop() + cfg.notePathHeight * (ss + 1)
 					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
 					, w: cfg.timelineWidth(), css: 'interActiveGridLine'
 				};
 				this.zoomGridAnchor.content.push(line);
 			}
-		}
+		}*/
 	}
 	addGridLines(barOctaveAnchor: TileAnchor//, data: Zvoog_Project
 		, cfg: MixerDataMathUtility

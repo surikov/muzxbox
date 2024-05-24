@@ -137,6 +137,7 @@ class MixerBar {
 			, css: 'barRightBorder'
 		};
 		barOctaveAnchor.content.push(barRightBorder);
+		/*
 		if (cfg.data.percussions.length) {
 			let barSamRightBorder: TileRectangle = {
 				x: barLeft + width
@@ -148,7 +149,7 @@ class MixerBar {
 				, css: 'barRightBorder'
 			};
 			barOctaveAnchor.content.push(barSamRightBorder);
-		}
+		}*/
 		if (zoomInfo.gridLines.length > 0) {
 			let css = 'stepPartDelimiter';
 			if (zIndex < 3) {
@@ -169,6 +170,7 @@ class MixerBar {
 					, css: css
 				};
 				barOctaveAnchor.content.push(mark);
+				/*
 				if (cfg.data.percussions.length) {
 					let sammark: TileRectangle = {
 						x: xx
@@ -178,7 +180,8 @@ class MixerBar {
 						, css: css
 					};
 					barOctaveAnchor.content.push(sammark);
-				}
+				}*/
+				/*
 				let txtH=cfg.maxCommentRowCount+2;
 				if(zIndex==3){
 					txtH=(cfg.maxCommentRowCount+2)*2;
@@ -197,6 +200,7 @@ class MixerBar {
 					, css: css
 				};
 				barOctaveAnchor.content.push(txtmark);
+				*/
 				lineCount++;
 				if (lineCount >= zoomInfo.gridLines.length) {
 					lineCount = 0;

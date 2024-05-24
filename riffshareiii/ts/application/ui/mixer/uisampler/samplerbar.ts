@@ -6,7 +6,9 @@ class SamplerBar {
 		let drum: Zvoog_PercussionTrack = cfg.data.percussions[drumIdx];
 		let measure: Zvoog_PercussionMeasure = drum.measures[barIdx];
 		//console.log(drum.title,barIdx,measure.skips);
-		let yy = cfg.samplerTop() + drumIdx * cfg.notePathHeight;
+		//let yy = cfg.samplerTop() + drumIdx * cfg.notePathHeight;
+		//let yy = cfg.gridTop() + drumIdx * cfg.notePathHeight;
+		let yy = cfg.gridTop() + cfg.gridHeight() - cfg.data.percussions.length+ drumIdx * cfg.notePathHeight;
 		let tempo = cfg.data.timeline[barIdx].tempo;
 		for (let ss = 0; ss < measure.skips.length; ss++) {
 			let skip: Zvoog_Metre = measure.skips[ss];

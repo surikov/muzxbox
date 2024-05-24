@@ -54,7 +54,9 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 	]
 	, percussions: [
 		{
-			title: "Snare", measures: []//, filters: []
+			title: "Snare", measures: [
+				{skips:[]},{skips:[{count: 2, part: 16 }]},{skips:[]},{skips:[{count: 0, part: 16 }]}
+			]//, filters: []
 			, sampler: { id: '', data: '', kind: '', outputId: '' }
 		}
 		, {
@@ -62,7 +64,7 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 			, sampler: { id: '', data: '', kind: '', outputId: '' }
 		}
 		, {
-			title: "Snare3", measures: []//, filters: []
+			title: "Snare3", measures: [{skips:[]},{skips:[{count:1, part: 16 }]}]//, filters: []
 			, sampler: { id: '', data: '', kind: '', outputId: '' }
 		}
 	]

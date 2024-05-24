@@ -41,7 +41,7 @@ class LeftPanel {
 
 		}
 	}*/
-	reFillLeftPanel(cfg:MixerDataMathUtility) {
+	reFillLeftPanel(cfg: MixerDataMathUtility) {
 		//console.log('reFillLeftPanel');
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		for (let zz = 0; zz < this.leftZoomAnchors.length; zz++) {
@@ -98,7 +98,7 @@ class LeftPanel {
 				let trackLabel: TileText = {
 					text: '' + cfg.data.tracks[0].title
 					, x: 0
-					, y: cfg.gridTop()+zoomPrefixLevelsCSS[zz].minZoom*0.5
+					, y: cfg.gridTop() + zoomPrefixLevelsCSS[zz].minZoom * 0.5
 					, css: 'curTrackTitleLabel' + zoomPrefixLevelsCSS[zz].prefix
 				};
 				this.leftZoomAnchors[zz].content.push(trackLabel);
@@ -108,8 +108,8 @@ class LeftPanel {
 					let samplerLabel: TileText = {
 						text: '' + cfg.data.percussions[ss].title
 						, x: 0
-						, y: cfg.samplerTop() + cfg.notePathHeight * ss + cfg.notePathHeight
-						, css: 'samplerRowLabel'+ zoomPrefixLevelsCSS[zz].prefix
+						, y: cfg.gridTop() + cfg.gridHeight() - cfg.data.percussions.length + cfg.notePathHeight * ss + cfg.notePathHeight
+						, css: 'samplerRowLabel' + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(samplerLabel);
 				}

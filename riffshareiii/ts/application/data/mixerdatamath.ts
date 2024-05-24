@@ -53,9 +53,14 @@ class MixerDataMathUtility {
 		return ww;
 	}
 	wholeHeight(): number {
-		return this.commentsTop()
+		/*return this.commentsTop()
 			+ this.commentsMaxHeight()
-			+ this.bottomPad;
+			+ this.bottomPad;*/
+		return this.gridTop()
+			+ this.gridHeight()
+			+ this.bottomPad
+
+			;
 	}
 	automationMaxHeight(): number {
 		return this.maxAutomationsCount * this.notePathHeight * 2;
@@ -64,26 +69,30 @@ class MixerDataMathUtility {
 		return (2 + this.maxCommentRowCount) * this.notePathHeight * 8;
 	}
 	automationTop(): number {
-		return this.topPad + this.heightOfTitle()+this.titleBottomPad;
+		return this.topPad + this.heightOfTitle() + this.titleBottomPad;
 	}
-
-	commentsTop(): number {
-		return this.gridTop()
-			+ this.gridHeight()
-			+ this.gridBottomPad;
-	}
+	/*
+		commentsTop(): number {
+			return this.gridTop()
+				+ this.gridHeight()
+				+ this.gridBottomPad;
+		}
+		*/
 	gridTop(): number {
-		return this.samplerTop() + this.samplerHeight() + this.samplerBottomPad;
+		//return this.samplerTop() + this.samplerHeight() + this.samplerBottomPad;
+		return this.topPad + this.heightOfTitle() + this.titleBottomPad;
 	}
 
 
 	gridHeight(): number {
 		return this.notePathHeight * this.octaveCount * 12;
 	}
+	/*
 	samplerHeight(): number {
 		return this.data.percussions.length * this.notePathHeight;
 	}
 	samplerTop(): number {
 		return this.automationTop() + this.automationMaxHeight() + this.automationBottomPad;
 	}
+	*/
 }

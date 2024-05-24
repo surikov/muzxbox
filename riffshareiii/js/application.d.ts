@@ -390,11 +390,8 @@ declare class MixerDataMathUtility {
     automationMaxHeight(): number;
     commentsMaxHeight(): number;
     automationTop(): number;
-    commentsTop(): number;
     gridTop(): number;
     gridHeight(): number;
-    samplerHeight(): number;
-    samplerTop(): number;
 }
 declare let biChar32: String[];
 declare type PackedChannel = {

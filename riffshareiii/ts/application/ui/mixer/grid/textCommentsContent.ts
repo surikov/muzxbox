@@ -1,7 +1,7 @@
 class TextComments {
 	constructor(barIdx: number
 		//, data: Zvoog_Project
-		,cfg:MixerDataMathUtility
+		, cfg: MixerDataMathUtility
 		, barLeft: number
 		, barOctaveAnchor: TileAnchor
 		, zIndex: number
@@ -9,19 +9,20 @@ class TextComments {
 		let curBar = cfg.data.timeline[barIdx];
 
 		//let mixm: MixerDataMath = new MixerDataMath(data);
-		let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * cfg.widthDurationRatio;
-		let left = barLeft + width;
-		let top = cfg.commentsTop();
-		let height = cfg.maxCommentRowCount+2;
+		//let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * cfg.widthDurationRatio;
+		//let left = barLeft + width;
+		let top = cfg.gridTop();
+		//let height = cfg.maxCommentRowCount + 2;
 		//console.log(zIndex);
-		if(zIndex==3){
-			height=(cfg.maxCommentRowCount+2)*2;
+		/*
+		if (zIndex == 3) {
+			height = (cfg.maxCommentRowCount + 2) * 2;
 		}
-		if(zIndex==4){
-			height=(cfg.maxCommentRowCount+2)*4;
+		if (zIndex == 4) {
+			height = (cfg.maxCommentRowCount + 2) * 4;
 		}
-		if(zIndex>4){
-			height=(cfg.maxCommentRowCount+2)*8;
+		if (zIndex > 4) {
+			height = (cfg.maxCommentRowCount + 2) * 8;
 		}
 		let barTxtRightBorder: TileRectangle = {
 			x: left
@@ -31,9 +32,9 @@ class TextComments {
 			, rx: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25
 			, ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25
 			, css: 'barRightBorder'
-		};
+		};*/
 		//console.log('comments', barIdx, zIndex, top, height, zoomPrefixLevelsCSS[zIndex].minZoom);
-		barOctaveAnchor.content.push(barTxtRightBorder);
+		//barOctaveAnchor.content.push(barTxtRightBorder);
 		//console.log(barIdx,barLeft,width);
 		if (barIdx < cfg.data.comments.length) {
 			/*let placedX: number[] = [];
@@ -59,16 +60,16 @@ class TextComments {
 				//console.log(zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx, placeIdx, cfg.data.comments[barIdx].texts[ii].text);
 				barOctaveAnchor.content.push(tt);
 			}*/
-			let txtZoomRatio=1;
-			if(zIndex>2)txtZoomRatio=2;
-			if(zIndex>3)txtZoomRatio=4;
-			if(zIndex>4)txtZoomRatio=8;
+			let txtZoomRatio = 1;
+			if (zIndex > 2) txtZoomRatio = 2;
+			if (zIndex > 3) txtZoomRatio = 4;
+			if (zIndex > 4) txtZoomRatio = 8;
 			for (let ii = 0; ii < cfg.data.comments[barIdx].points.length; ii++) {
 				let itxt = cfg.data.comments[barIdx].points[ii];
 				let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * cfg.widthDurationRatio;
 				let tt: TileText = {
 					x: xx
-					, y: top + cfg.notePathHeight * (1+itxt.row)*txtZoomRatio
+					, y: top + cfg.notePathHeight * (1 + itxt.row) * txtZoomRatio
 					, text: cfg.data.comments[barIdx].points[ii].text
 					, css: 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix
 				};

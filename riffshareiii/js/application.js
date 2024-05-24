@@ -1382,7 +1382,7 @@ class LeftPanel {
                     let samplerLabel = {
                         text: '' + cfg.data.percussions[ss].title,
                         x: 0,
-                        y: cfg.samplerTop() + cfg.notePathHeight * ss + cfg.notePathHeight,
+                        y: cfg.gridTop() + cfg.gridHeight() - cfg.data.percussions.length + cfg.notePathHeight * ss + cfg.notePathHeight,
                         css: 'samplerRowLabel' + zoomPrefixLevelsCSS[zz].prefix
                     };
                     this.leftZoomAnchors[zz].content.push(samplerLabel);
@@ -1395,7 +1395,7 @@ class SamplerBar {
     constructor(cfg, barIdx, drumIdx, zoomLevel, anchor, left) {
         let drum = cfg.data.percussions[drumIdx];
         let measure = drum.measures[barIdx];
-        let yy = cfg.samplerTop() + drumIdx * cfg.notePathHeight;
+        let yy = cfg.gridTop() + cfg.gridHeight() - cfg.data.percussions.length + drumIdx * cfg.notePathHeight;
         let tempo = cfg.data.timeline[barIdx].tempo;
         for (let ss = 0; ss < measure.skips.length; ss++) {
             let skip = measure.skips[ss];
@@ -1575,18 +1575,6 @@ class MixerBar {
             css: 'barRightBorder'
         };
         barOctaveAnchor.content.push(barRightBorder);
-        if (cfg.data.percussions.length) {
-            let barSamRightBorder = {
-                x: barLeft + width,
-                y: cfg.samplerTop(),
-                w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
-                h: cfg.data.percussions.length * cfg.notePathHeight,
-                rx: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
-                ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
-                css: 'barRightBorder'
-            };
-            barOctaveAnchor.content.push(barSamRightBorder);
-        }
         if (zoomInfo.gridLines.length > 0) {
             let css = 'stepPartDelimiter';
             if (zIndex < 3) {
@@ -1607,34 +1595,6 @@ class MixerBar {
                     css: css
                 };
                 barOctaveAnchor.content.push(mark);
-                if (cfg.data.percussions.length) {
-                    let sammark = {
-                        x: xx,
-                        y: cfg.samplerTop(),
-                        w: line.ratio * zoomInfo.minZoom / 2,
-                        h: cfg.data.percussions.length * cfg.notePathHeight,
-                        css: css
-                    };
-                    barOctaveAnchor.content.push(sammark);
-                }
-                let txtH = cfg.maxCommentRowCount + 2;
-                if (zIndex == 3) {
-                    txtH = (cfg.maxCommentRowCount + 2) * 2;
-                }
-                if (zIndex == 4) {
-                    txtH = (cfg.maxCommentRowCount + 2) * 4;
-                }
-                if (zIndex > 4) {
-                    txtH = (cfg.maxCommentRowCount + 2) * 8;
-                }
-                let txtmark = {
-                    x: xx,
-                    y: cfg.commentsTop(),
-                    w: line.ratio * zoomInfo.minZoom / 2,
-                    h: txtH,
-                    css: css
-                };
-                barOctaveAnchor.content.push(txtmark);
                 lineCount++;
                 if (lineCount >= zoomInfo.gridLines.length) {
                     lineCount = 0;
@@ -1646,29 +1606,7 @@ class MixerBar {
 class TextComments {
     constructor(barIdx, cfg, barLeft, barOctaveAnchor, zIndex) {
         let curBar = cfg.data.timeline[barIdx];
-        let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * cfg.widthDurationRatio;
-        let left = barLeft + width;
-        let top = cfg.commentsTop();
-        let height = cfg.maxCommentRowCount + 2;
-        if (zIndex == 3) {
-            height = (cfg.maxCommentRowCount + 2) * 2;
-        }
-        if (zIndex == 4) {
-            height = (cfg.maxCommentRowCount + 2) * 4;
-        }
-        if (zIndex > 4) {
-            height = (cfg.maxCommentRowCount + 2) * 8;
-        }
-        let barTxtRightBorder = {
-            x: left,
-            y: top,
-            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
-            h: height,
-            rx: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
-            ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
-            css: 'barRightBorder'
-        };
-        barOctaveAnchor.content.push(barTxtRightBorder);
+        let top = cfg.gridTop();
         if (barIdx < cfg.data.comments.length) {
             let txtZoomRatio = 1;
             if (zIndex > 2)
@@ -1875,30 +1813,7 @@ class MixerUI {
                 }
                 filIdx = 1 + Math.round(7 * drumcount / mxDrums);
                 let css2 = 'mixFiller' + filIdx;
-                let fillDrumBar = {
-                    x: cfg.leftPad + barX,
-                    y: cfg.samplerTop(),
-                    w: barwidth,
-                    h: cfg.data.percussions.length * cfg.notePathHeight,
-                    css: css2
-                };
-                this.fillerAnchor.content.push(fillDrumBar);
             }
-            filIdx = 1;
-            if (cfg.data.comments[bb]) {
-                if (cfg.data.comments[bb].points) {
-                    filIdx = 1 + Math.round(7 * cfg.data.comments[bb].points.length / mxTxt);
-                }
-            }
-            css = 'mixFiller' + filIdx;
-            let fillTxtBar = {
-                x: cfg.leftPad + barX,
-                y: cfg.commentsTop(),
-                w: barwidth,
-                h: cfg.commentsMaxHeight(),
-                css: css
-            };
-            this.fillerAnchor.content.push(fillTxtBar);
             filIdx = 0;
             for (let ff = 0; ff < cfg.data.filters.length; ff++) {
                 let filter = cfg.data.filters[ff];
@@ -1970,30 +1885,8 @@ class MixerZoomLevel {
         this.addCommentLines(cfg);
     }
     addDrumLines(cfg) {
-        if (this.zoomLevelIndex < 4) {
-            for (let ss = 1; ss < cfg.data.percussions.length; ss++) {
-                let line = {
-                    x: cfg.leftPad,
-                    y: cfg.samplerTop() + cfg.notePathHeight * ss,
-                    h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0,
-                    w: cfg.timelineWidth(), css: 'samplerRowBorder'
-                };
-                this.zoomGridAnchor.content.push(line);
-            }
-        }
     }
     addCommentLines(cfg) {
-        if (this.zoomLevelIndex < 3) {
-            for (let ss = 0; ss <= cfg.maxCommentRowCount; ss++) {
-                let line = {
-                    x: cfg.leftPad,
-                    y: cfg.commentsTop() + cfg.notePathHeight * (ss + 1),
-                    h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
-                    w: cfg.timelineWidth(), css: 'interActiveGridLine'
-                };
-                this.zoomGridAnchor.content.push(line);
-            }
-        }
     }
     addGridLines(barOctaveAnchor, cfg) {
         if (this.zoomLevelIndex < 4) {
@@ -2214,7 +2107,9 @@ let mzxbxProjectForTesting2 = {
     ],
     percussions: [
         {
-            title: "Snare", measures: [],
+            title: "Snare", measures: [
+                { skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
+            ],
             sampler: { id: '', data: '', kind: '', outputId: '' }
         },
         {
@@ -2222,7 +2117,7 @@ let mzxbxProjectForTesting2 = {
             sampler: { id: '', data: '', kind: '', outputId: '' }
         },
         {
-            title: "Snare3", measures: [],
+            title: "Snare3", measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }],
             sampler: { id: '', data: '', kind: '', outputId: '' }
         }
     ],
@@ -2407,8 +2302,8 @@ class MixerDataMathUtility {
         return ww;
     }
     wholeHeight() {
-        return this.commentsTop()
-            + this.commentsMaxHeight()
+        return this.gridTop()
+            + this.gridHeight()
             + this.bottomPad;
     }
     automationMaxHeight() {
@@ -2420,22 +2315,11 @@ class MixerDataMathUtility {
     automationTop() {
         return this.topPad + this.heightOfTitle() + this.titleBottomPad;
     }
-    commentsTop() {
-        return this.gridTop()
-            + this.gridHeight()
-            + this.gridBottomPad;
-    }
     gridTop() {
-        return this.samplerTop() + this.samplerHeight() + this.samplerBottomPad;
+        return this.topPad + this.heightOfTitle() + this.titleBottomPad;
     }
     gridHeight() {
         return this.notePathHeight * this.octaveCount * 12;
-    }
-    samplerHeight() {
-        return this.data.percussions.length * this.notePathHeight;
-    }
-    samplerTop() {
-        return this.automationTop() + this.automationMaxHeight() + this.automationBottomPad;
     }
 }
 let biChar32 = [];

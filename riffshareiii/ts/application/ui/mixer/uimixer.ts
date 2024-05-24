@@ -176,6 +176,7 @@ class MixerUI {
 				}
 				filIdx = 1 + Math.round(7 * drumcount / mxDrums);
 				let css2 = 'mixFiller' + filIdx;
+				/*
 				let fillDrumBar: TileRectangle = {
 					x: cfg.leftPad + barX
 					, y: cfg.samplerTop()
@@ -184,8 +185,10 @@ class MixerUI {
 					, css: css2
 				};
 				this.fillerAnchor.content.push(fillDrumBar);
+				*/
 				//console.log('drum',bb,fillDrumBar);
 			}
+			/*
 			filIdx = 1;
 			if (cfg.data.comments[bb]) {
 				if (cfg.data.comments[bb].points) {
@@ -201,6 +204,7 @@ class MixerUI {
 				, css: css
 			};
 			this.fillerAnchor.content.push(fillTxtBar);
+*/
 
 			filIdx = 0;
 			for (let ff = 0; ff < cfg.data.filters.length; ff++) {
