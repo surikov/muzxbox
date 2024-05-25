@@ -120,7 +120,7 @@ class MixerUI {
 					}
 				}
 			}
-			
+
 			let autoCnt = 0;
 			for (let ff = 0; ff < cfg.data.filters.length; ff++) {
 				let filter = cfg.data.filters[ff];
@@ -156,15 +156,21 @@ class MixerUI {
 			let filIdx = 1 + Math.round(7 * notecount / mxNotes);
 			let css = 'mixFiller' + filIdx;
 			let barwidth = MMUtil().set(cfg.data.timeline[bb].metre).duration(cfg.data.timeline[bb].tempo) * cfg.widthDurationRatio;
-			let fillRectangle: TileRectangle = {
+			let fillSequencerRectangle: TileRectangle = {
 				x: cfg.leftPad + barX
 				, y: cfg.gridTop()
 				, w: barwidth
 				, h: cfg.gridHeight()
 				, css: css
 			};
-			//console.log(bb, notecount, css,fillRectangle);
-			this.fillerAnchor.content.push(fillRectangle);
+			//console.log(bb, notecount, css,fillSequencerRectangle);
+			this.fillerAnchor.content.push(fillSequencerRectangle);
+
+
+
+
+
+
 
 			if (cfg.data.percussions.length) {
 				let drumcount = 0;
@@ -176,19 +182,29 @@ class MixerUI {
 				}
 				filIdx = 1 + Math.round(7 * drumcount / mxDrums);
 				let css2 = 'mixFiller' + filIdx;
-				/*
+
 				let fillDrumBar: TileRectangle = {
 					x: cfg.leftPad + barX
-					, y: cfg.samplerTop()
+					, y: cfg.gridTop() + cfg.gridHeight() - cfg.data.percussions.length * cfg.notePathHeight
 					, w: barwidth
 					, h: cfg.data.percussions.length * cfg.notePathHeight
 					, css: css2
 				};
+
+
+
+
+
+
 				this.fillerAnchor.content.push(fillDrumBar);
-				*/
+
+
+
+
+
 				//console.log('drum',bb,fillDrumBar);
 			}
-			/*
+
 			filIdx = 1;
 			if (cfg.data.comments[bb]) {
 				if (cfg.data.comments[bb].points) {
@@ -198,13 +214,25 @@ class MixerUI {
 			css = 'mixFiller' + filIdx;
 			let fillTxtBar: TileRectangle = {
 				x: cfg.leftPad + barX
-				, y: cfg.commentsTop()
+				, y: cfg.gridTop()
 				, w: barwidth
 				, h: cfg.commentsMaxHeight()
 				, css: css
 			};
+
+
+
+
+
+
 			this.fillerAnchor.content.push(fillTxtBar);
-*/
+
+
+
+
+
+
+
 
 			filIdx = 0;
 			for (let ff = 0; ff < cfg.data.filters.length; ff++) {
@@ -225,7 +253,13 @@ class MixerUI {
 				, h: cfg.automationMaxHeight()
 				, css: css
 			};
+			
+			
+			
 			this.fillerAnchor.content.push(fillAutoBar);
+			
+			
+			
 			//console.log('auto',bb,fillAutoBar);
 
 

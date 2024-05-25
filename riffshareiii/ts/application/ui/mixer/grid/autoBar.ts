@@ -9,6 +9,7 @@ class AutomationBarContent {
 		let left = barLeft + width;
 		let top = cfg.automationTop();
 		let height = cfg.automationMaxHeight();
+		/*
 		let barAutoRightBorder: TileRectangle = {
 			x: left
 			, y: top
@@ -19,6 +20,7 @@ class AutomationBarContent {
 			, css: 'barRightBorder'
 		};
 		barOctaveAnchor.content.push(barAutoRightBorder);
+*/
 		for (let ff = 0; ff < cfg.data.filters.length; ff++) {
 			let filter = cfg.data.filters[ff];
 			if (filter.automation) {

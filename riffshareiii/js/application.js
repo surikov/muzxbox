@@ -1636,16 +1636,6 @@ class AutomationBarContent {
         let left = barLeft + width;
         let top = cfg.automationTop();
         let height = cfg.automationMaxHeight();
-        let barAutoRightBorder = {
-            x: left,
-            y: top,
-            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
-            h: height,
-            rx: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
-            ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25,
-            css: 'barRightBorder'
-        };
-        barOctaveAnchor.content.push(barAutoRightBorder);
         for (let ff = 0; ff < cfg.data.filters.length; ff++) {
             let filter = cfg.data.filters[ff];
             if (filter.automation) {
@@ -1795,14 +1785,14 @@ class MixerUI {
             let filIdx = 1 + Math.round(7 * notecount / mxNotes);
             let css = 'mixFiller' + filIdx;
             let barwidth = MMUtil().set(cfg.data.timeline[bb].metre).duration(cfg.data.timeline[bb].tempo) * cfg.widthDurationRatio;
-            let fillRectangle = {
+            let fillSequencerRectangle = {
                 x: cfg.leftPad + barX,
                 y: cfg.gridTop(),
                 w: barwidth,
                 h: cfg.gridHeight(),
                 css: css
             };
-            this.fillerAnchor.content.push(fillRectangle);
+            this.fillerAnchor.content.push(fillSequencerRectangle);
             if (cfg.data.percussions.length) {
                 let drumcount = 0;
                 for (let tt = 0; tt < cfg.data.percussions.length; tt++) {
@@ -1813,7 +1803,30 @@ class MixerUI {
                 }
                 filIdx = 1 + Math.round(7 * drumcount / mxDrums);
                 let css2 = 'mixFiller' + filIdx;
+                let fillDrumBar = {
+                    x: cfg.leftPad + barX,
+                    y: cfg.gridTop() + cfg.gridHeight() - cfg.data.percussions.length * cfg.notePathHeight,
+                    w: barwidth,
+                    h: cfg.data.percussions.length * cfg.notePathHeight,
+                    css: css2
+                };
+                this.fillerAnchor.content.push(fillDrumBar);
             }
+            filIdx = 1;
+            if (cfg.data.comments[bb]) {
+                if (cfg.data.comments[bb].points) {
+                    filIdx = 1 + Math.round(7 * cfg.data.comments[bb].points.length / mxTxt);
+                }
+            }
+            css = 'mixFiller' + filIdx;
+            let fillTxtBar = {
+                x: cfg.leftPad + barX,
+                y: cfg.gridTop(),
+                w: barwidth,
+                h: cfg.commentsMaxHeight(),
+                css: css
+            };
+            this.fillerAnchor.content.push(fillTxtBar);
             filIdx = 0;
             for (let ff = 0; ff < cfg.data.filters.length; ff++) {
                 let filter = cfg.data.filters[ff];
