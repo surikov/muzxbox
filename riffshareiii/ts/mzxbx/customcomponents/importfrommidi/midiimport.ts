@@ -816,7 +816,7 @@ class MidiParser {
 			//let txt8 = utf8decoder.decode(bytes);
 			//console.log('decode',txt8,txt1251);
 
-			txt=txt1251;			
+			txt = txt1251;
 		} catch (xx) {
 			console.log(xx);
 			var rr: string = '';
@@ -825,7 +825,7 @@ class MidiParser {
 			}
 			txt = rr;
 		}
-		
+
 
 		txt = txt.replace("\\n", " ");
 		txt = txt.replace("\\r", " ");
@@ -844,7 +844,7 @@ class MidiParser {
 		txt = txt.replace("  ", " ");
 		txt = txt.replace("  ", " ");
 		txt = txt.replace("  ", " ");
-		
+
 		return txt;
 	}
 	findChordBefore(when: number, track: MIDIFileTrack, channel: number): TrackChord | null {
@@ -1208,7 +1208,7 @@ class MidiParser {
 					}
 					//}
 				} else {
-					
+
 					if (evnt.subtype == this.EVENT_META_TEXT) {
 						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
 					}
@@ -1874,6 +1874,7 @@ class MidiParser {
 			let textpoint = midiSongData.lyrics[ii];
 			let pnt = findMeasureSkipByTime(textpoint.ms / 1000, project.timeline);
 			if (pnt) {
+				//console.log(pnt.skip, textpoint.ms, textpoint.txt);
 				this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
 			}
 		}
@@ -2069,17 +2070,24 @@ class MidiParser {
 		return projectDrums;
 	}
 }
+function round1000(nn: number): number {
+	return Math.round(1000 * nn) / 1000;
+}
 function findMeasureSkipByTime(time: number, measures: Zvoog_SongMeasure[]): null | { idx: number, skip: Zvoog_Metre } {
 	let curTime = 0;
 	let mm = MMUtil();
 	for (let ii = 0; ii < measures.length; ii++) {
 		let cumea = measures[ii];
 		let measureDurationS = mm.set(cumea.metre).duration(cumea.tempo);
-		if (curTime + measureDurationS > time) {
-			//console.log(time - curTime);
+		if (round1000(curTime + measureDurationS) > round1000(time)) {
+			//console.log(time - curTime, curTime, measureDurationS, time,round1000(curTime + measureDurationS ),round1000( time));
+			let delta = time - curTime;
+			if (delta < 0) {
+				delta = 0;
+			}
 			return {
 				idx: ii
-				, skip: mm.calculate(time - curTime, cumea.tempo)
+				, skip: mm.calculate(delta, cumea.tempo)
 			};
 		}
 		curTime = curTime + measureDurationS;

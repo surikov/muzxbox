@@ -1623,16 +1623,23 @@ class MidiParser {
         return projectDrums;
     }
 }
+function round1000(nn) {
+    return Math.round(1000 * nn) / 1000;
+}
 function findMeasureSkipByTime(time, measures) {
     let curTime = 0;
     let mm = MMUtil();
     for (let ii = 0; ii < measures.length; ii++) {
         let cumea = measures[ii];
         let measureDurationS = mm.set(cumea.metre).duration(cumea.tempo);
-        if (curTime + measureDurationS > time) {
+        if (round1000(curTime + measureDurationS) > round1000(time)) {
+            let delta = time - curTime;
+            if (delta < 0) {
+                delta = 0;
+            }
             return {
                 idx: ii,
-                skip: mm.calculate(time - curTime, cumea.tempo)
+                skip: mm.calculate(delta, cumea.tempo)
             };
         }
         curTime = curTime + measureDurationS;
