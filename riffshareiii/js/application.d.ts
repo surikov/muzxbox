@@ -389,6 +389,7 @@ declare class MixerDataMathUtility {
     wholeHeight(): number;
     automationMaxHeight(): number;
     commentsMaxHeight(): number;
+    commentsAverageFillHeight(): number;
     automationTop(): number;
     gridTop(): number;
     gridHeight(): number;

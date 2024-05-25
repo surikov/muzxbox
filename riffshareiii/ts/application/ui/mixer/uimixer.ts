@@ -216,7 +216,7 @@ class MixerUI {
 				x: cfg.leftPad + barX
 				, y: cfg.gridTop()
 				, w: barwidth
-				, h: cfg.commentsMaxHeight()
+				, h: cfg.commentsAverageFillHeight()
 				, css: css
 			};
 

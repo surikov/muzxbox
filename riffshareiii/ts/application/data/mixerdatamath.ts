@@ -68,6 +68,14 @@ class MixerDataMathUtility {
 	commentsMaxHeight(): number {
 		return (2 + this.maxCommentRowCount) * this.notePathHeight * 8;
 	}
+	commentsAverageFillHeight(): number {
+		let rcount=this.maxCommentRowCount;
+		if(rcount>3){
+			rcount=3;
+		}
+		return (2 + rcount) * this.notePathHeight * 8;
+		
+	}
 	automationTop(): number {
 		return this.topPad + this.heightOfTitle() + this.titleBottomPad;
 	}

@@ -1823,7 +1823,7 @@ class MixerUI {
                 x: cfg.leftPad + barX,
                 y: cfg.gridTop(),
                 w: barwidth,
-                h: cfg.commentsMaxHeight(),
+                h: cfg.commentsAverageFillHeight(),
                 css: css
             };
             this.fillerAnchor.content.push(fillTxtBar);
@@ -2324,6 +2324,13 @@ class MixerDataMathUtility {
     }
     commentsMaxHeight() {
         return (2 + this.maxCommentRowCount) * this.notePathHeight * 8;
+    }
+    commentsAverageFillHeight() {
+        let rcount = this.maxCommentRowCount;
+        if (rcount > 3) {
+            rcount = 3;
+        }
+        return (2 + rcount) * this.notePathHeight * 8;
     }
     automationTop() {
         return this.topPad + this.heightOfTitle() + this.titleBottomPad;
