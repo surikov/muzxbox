@@ -75,21 +75,49 @@ class CommandDispatcher {
 		//this.registerWorkProject(data);
 		this.renderer.fillWholeUI();//this.workData);
 	}
+
+
 	moveTrackTop(trackNum: number) {
-		//console.log('moveTrackTop', trackNum);
+		console.log('moveTrackTop', trackNum);
 		let it = this.cfg.data.tracks[trackNum];
 		this.cfg.data.tracks.splice(trackNum, 1);
 		this.cfg.data.tracks.unshift(it);
-		commandDispatcher.resetProject();
+		this.upTracksLayer();
 	}
 	moveDrumTop(drumNum: number) {
-		//console.log('moveDrumTop', drumNum);
+		console.log('moveDrumTop', drumNum);
 		//console.log('moveTrackTop', trackNum);
 		let it = this.cfg.data.percussions[drumNum];
 		this.cfg.data.percussions.splice(drumNum, 1);
 		this.cfg.data.percussions.unshift(it);
+		this.upDrumsLayer();
+	}
+	moveAutomationTop(filterNum: number) {
+		console.log('moveAutomationTop', filterNum);
+		this.upAutoayer();
+	}
+	upTracksLayer() {
+		console.log('upTracksLayer');
+		this.cfg.data.focus=0;
 		commandDispatcher.resetProject();
 	}
+	upDrumsLayer() {
+		console.log('upDrumsLayer');
+		this.cfg.data.focus=1;
+		commandDispatcher.resetProject();
+	}
+	upAutoayer() {
+		console.log('upAutoayer');
+		this.cfg.data.focus=2;
+		commandDispatcher.resetProject();
+	}
+	upCommentsLayer() {
+		console.log('upCommentsLayer');
+		this.cfg.data.focus=3;
+		commandDispatcher.resetProject();
+	}
+
+
 	setTrackSoloState(state: number) {
 		console.log('setTrackSoloState', state);
 	}

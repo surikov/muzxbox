@@ -275,7 +275,7 @@ class RightMenuPanel {
 					, noLocalization: true
 					, onClick: () => {
 	
-						//commandDispatcher.moveDrumTop(tt);
+						commandDispatcher.moveAutomationTop(ff);
 					}
 					, onSubClick: () => {
 	

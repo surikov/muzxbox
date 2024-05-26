@@ -46,6 +46,11 @@ declare class CommandDispatcher {
     resetProject(): void;
     moveTrackTop(trackNum: number): void;
     moveDrumTop(drumNum: number): void;
+    moveAutomationTop(filterNum: number): void;
+    upTracksLayer(): void;
+    upDrumsLayer(): void;
+    upAutoayer(): void;
+    upCommentsLayer(): void;
     setTrackSoloState(state: number): void;
     setDrumSoloState(state: number): void;
     promptPluginGUI(label: string, url: string, callback: (obj: any) => boolean): void;
@@ -96,6 +101,7 @@ declare let localMenuImportFolder: string;
 declare let localMenuFileFolder: string;
 declare let localMenuAutomationFolder: string;
 declare let localMenuCommentsLayer: string;
+declare let localMenuPlayPause: string;
 declare let localeDictionary: {
     id: string;
     data: {
@@ -632,7 +638,12 @@ type Zvoog_Project = {
     comments: Zvoog_CommentMeasure[];
     filters: Zvoog_FilterTarget[];
     selection?: Zvoog_Selection;
+    focus?: Zvoog_FocusSequencer | Zvoog_FocusDrums | Zvoog_FocusAutomation | Zvoog_FocusComments;
 };
+type Zvoog_FocusSequencer = 0;
+type Zvoog_FocusDrums = 1;
+type Zvoog_FocusAutomation = 2;
+type Zvoog_FocusComments = 3;
 type MZXBX_CachedWave = {
     path: string;
     buffer: AudioBuffer | null;

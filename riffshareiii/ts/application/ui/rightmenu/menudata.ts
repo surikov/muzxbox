@@ -87,7 +87,11 @@ function composeBaseMenu(): MenuInfo[] {
 		return menuItemsData;
 	} else {
 		menuItemsData = [
-			
+			{
+				text: localMenuPlayPause, onClick: () => {
+					
+				}
+			}
 			/*, {
 				text: localMenuImportMIDI, onClick: () => {
 					commandDispatcher.promptImportFromMIDI();
@@ -101,16 +105,11 @@ function composeBaseMenu(): MenuInfo[] {
 					commandDispatcher.promptPluginGUI('Plugin UI', './web/test/plugin.html', (obj: any) => { return false });
 				}
 			}*/
-			 menuPointTracks
-			, menuPointPercussion
-			, menuPointAutomation
-			,{
-				text: localMenuCommentsLayer
-			}
+
 			, {
 				text: localMenuItemSettings, children: [
 					menuPointMenuFile
-					,{
+					, {
 						text: 'Size', children: [
 							{
 								text: 'Small', onClick: () => {
@@ -162,9 +161,16 @@ function composeBaseMenu(): MenuInfo[] {
 						]
 					}
 				]
+			}, menuPointTracks
+			, menuPointPercussion
+			, menuPointAutomation
+			, {
+				text: localMenuCommentsLayer, onClick: () => {
+					commandDispatcher.upCommentsLayer();
+				}
 			}
 		];
-		console.log('base menu',menuItemsData);
+		console.log('base menu', menuItemsData);
 		return menuItemsData;
 	}
 }

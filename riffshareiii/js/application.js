@@ -277,15 +277,37 @@ class CommandDispatcher {
         this.renderer.fillWholeUI();
     }
     moveTrackTop(trackNum) {
+        console.log('moveTrackTop', trackNum);
         let it = this.cfg.data.tracks[trackNum];
         this.cfg.data.tracks.splice(trackNum, 1);
         this.cfg.data.tracks.unshift(it);
-        commandDispatcher.resetProject();
+        this.upTracksLayer();
     }
     moveDrumTop(drumNum) {
+        console.log('moveDrumTop', drumNum);
         let it = this.cfg.data.percussions[drumNum];
         this.cfg.data.percussions.splice(drumNum, 1);
         this.cfg.data.percussions.unshift(it);
+        this.upDrumsLayer();
+    }
+    moveAutomationTop(filterNum) {
+        console.log('moveAutomationTop', filterNum);
+        this.upAutoayer();
+    }
+    upTracksLayer() {
+        console.log('upTracksLayer');
+        commandDispatcher.resetProject();
+    }
+    upDrumsLayer() {
+        console.log('upDrumsLayer');
+        commandDispatcher.resetProject();
+    }
+    upAutoayer() {
+        console.log('upAutoayer');
+        commandDispatcher.resetProject();
+    }
+    upCommentsLayer() {
+        console.log('upCommentsLayer');
         commandDispatcher.resetProject();
     }
     setTrackSoloState(state) {
@@ -471,6 +493,7 @@ let localMenuImportFolder = 'localMenuImportFolder';
 let localMenuFileFolder = 'localMenuFileFolder';
 let localMenuAutomationFolder = 'localMenuAutomationFolder';
 let localMenuCommentsLayer = 'localMenuCommentsLayer';
+let localMenuPlayPause = 'localMenuPlayPause';
 let localeDictionary = [
     {
         id: localNameLocal, data: [
@@ -520,6 +543,12 @@ let localeDictionary = [
         id: localMenuAutomationFolder, data: [
             { locale: 'en', text: 'Automation' },
             { locale: 'ru', text: 'Автоматизация' },
+            { locale: 'zh', text: '?' }
+        ]
+    }, {
+        id: localMenuPlayPause, data: [
+            { locale: 'en', text: 'Play/Pause' },
+            { locale: 'ru', text: 'Старт/Стоп' },
             { locale: 'zh', text: '?' }
         ]
     }
@@ -990,6 +1019,7 @@ class RightMenuPanel {
                     text: filter.automation.title,
                     noLocalization: true,
                     onClick: () => {
+                        commandDispatcher.moveAutomationTop(ff);
                     },
                     onSubClick: () => {
                     },
@@ -1234,11 +1264,9 @@ function composeBaseMenu() {
     }
     else {
         menuItemsData = [
-            menuPointTracks,
-            menuPointPercussion,
-            menuPointAutomation,
             {
-                text: localMenuCommentsLayer
+                text: localMenuPlayPause, onClick: () => {
+                }
             },
             {
                 text: localMenuItemSettings, children: [
@@ -1296,6 +1324,13 @@ function composeBaseMenu() {
                         ]
                     }
                 ]
+            }, menuPointTracks,
+            menuPointPercussion,
+            menuPointAutomation,
+            {
+                text: localMenuCommentsLayer, onClick: () => {
+                    commandDispatcher.upCommentsLayer();
+                }
             }
         ];
         console.log('base menu', menuItemsData);

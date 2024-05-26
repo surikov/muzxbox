@@ -109,6 +109,7 @@ type Zvoog_Selection = {
 	startMeasure: number;
 	endMeasure: number;
 };
+
 type Zvoog_Project = {
 	title: string;
 	timeline: Zvoog_SongMeasure[];
@@ -117,7 +118,7 @@ type Zvoog_Project = {
 	comments: Zvoog_CommentMeasure[];
 	filters: Zvoog_FilterTarget[];
 	selection?: Zvoog_Selection;
-	//order?: { comments: number, percussians: number, automations: number }
+	focus?: 0 | 1 | 2 | 3;
 };
 
 

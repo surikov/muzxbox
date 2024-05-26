@@ -10,6 +10,7 @@ let localMenuImportFolder='localMenuImportFolder';
 let localMenuFileFolder='localMenuFileFolder';
 let localMenuAutomationFolder='localMenuAutomationFolder';
 let localMenuCommentsLayer='localMenuCommentsLayer';
+let localMenuPlayPause='localMenuPlayPause';
 
 let localeDictionary: { id: string, data: { locale: string, text: string }[] }[] = [
     {
@@ -58,6 +59,11 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
         id: localMenuAutomationFolder, data: [
             { locale: 'en', text: 'Automation' }
             , { locale: 'ru', text: 'Автоматизация' }
+            , { locale: 'zh', text: '?' }]
+    }, {
+        id: localMenuPlayPause, data: [
+            { locale: 'en', text: 'Play/Pause' }
+            , { locale: 'ru', text: 'Старт/Стоп' }
             , { locale: 'zh', text: '?' }]
     }
 ];
