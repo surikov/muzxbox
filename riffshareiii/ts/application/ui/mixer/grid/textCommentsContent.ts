@@ -64,6 +64,12 @@ class TextComments {
 			if (zIndex > 2) txtZoomRatio = 2;
 			if (zIndex > 3) txtZoomRatio = 4;
 			if (zIndex > 4) txtZoomRatio = 8;
+			let css= 'commentReadText' + zoomPrefixLevelsCSS[zIndex].prefix;
+			if(cfg.data.focus){
+				if(cfg.data.focus==3){
+					css= 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix;
+				}
+			}
 			for (let ii = 0; ii < cfg.data.comments[barIdx].points.length; ii++) {
 				let itxt = cfg.data.comments[barIdx].points[ii];
 				let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * cfg.widthDurationRatio;
@@ -71,7 +77,7 @@ class TextComments {
 					x: xx
 					, y: top + cfg.notePathHeight * (1 + itxt.row) * txtZoomRatio
 					, text: cfg.data.comments[barIdx].points[ii].text
-					, css: 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix
+					, css: css //'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix
 				};
 				//console.log(zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx, placeIdx, cfg.data.comments[barIdx].texts[ii].text);
 				barOctaveAnchor.content.push(tt);

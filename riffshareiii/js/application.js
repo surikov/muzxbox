@@ -292,22 +292,26 @@ class CommandDispatcher {
     }
     moveAutomationTop(filterNum) {
         console.log('moveAutomationTop', filterNum);
-        this.upAutoayer();
+        this.upAutoLayer();
     }
     upTracksLayer() {
         console.log('upTracksLayer');
+        this.cfg.data.focus = 0;
         commandDispatcher.resetProject();
     }
     upDrumsLayer() {
         console.log('upDrumsLayer');
+        this.cfg.data.focus = 1;
         commandDispatcher.resetProject();
     }
-    upAutoayer() {
+    upAutoLayer() {
         console.log('upAutoayer');
+        this.cfg.data.focus = 2;
         commandDispatcher.resetProject();
     }
     upCommentsLayer() {
         console.log('upCommentsLayer');
+        this.cfg.data.focus = 3;
         commandDispatcher.resetProject();
     }
     setTrackSoloState(state) {
@@ -913,7 +917,6 @@ class RightMenuPanel {
         let me = this;
         for (let ii = 0; ii < infos.length; ii++) {
             let it = infos[ii];
-            let focused = (it.focused) ? true : false;
             let opened = (it.opened) ? true : false;
             let children = it.children;
             let itemLabel = '';
@@ -930,6 +933,9 @@ class RightMenuPanel {
                 }
                 else {
                     let si = new RightMenuItem(it, pad, () => {
+                        if (it.onOpen) {
+                            it.onOpen();
+                        }
                         me.setOpenState(true, it, infos);
                         me.rerenderMenuContent(si);
                     }).initClosedFolderItem();
@@ -1224,13 +1230,22 @@ class RightMenuItem {
 }
 let menuItemsData = null;
 let menuPointTracks = {
-    text: localMenuTracksFolder
+    text: localMenuTracksFolder,
+    onOpen: () => {
+        commandDispatcher.upTracksLayer();
+    }
 };
 let menuPointPercussion = {
-    text: localMenuPercussionFolder
+    text: localMenuPercussionFolder,
+    onOpen: () => {
+        commandDispatcher.upDrumsLayer();
+    }
 };
 let menuPointAutomation = {
-    text: localMenuAutomationFolder
+    text: localMenuAutomationFolder,
+    onOpen: () => {
+        commandDispatcher.upAutoLayer();
+    }
 };
 let menuPointFileImport = {
     text: localMenuImportFolder
@@ -1454,7 +1469,11 @@ class BarOctave {
 class OctaveContent {
     constructor(barIdx, octaveIdx, left, top, width, height, cfg, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel) {
         if (zoomLevel < 8) {
-            this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, cfg, zoomLevel);
+            if (cfg.data.focus) {
+            }
+            else {
+                this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, cfg, zoomLevel);
+            }
             if (zoomLevel < 7) {
                 this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, cfg);
             }
@@ -1471,6 +1490,10 @@ class OctaveContent {
         }
     }
     addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg) {
+        let start = 1;
+        if (cfg.data.focus) {
+            start = 0;
+        }
         for (let ii = 1; ii < cfg.data.tracks.length; ii++) {
             let track = cfg.data.tracks[ii];
             this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, 'mixNoteSub', false);
@@ -1650,6 +1673,12 @@ class TextComments {
                 txtZoomRatio = 4;
             if (zIndex > 4)
                 txtZoomRatio = 8;
+            let css = 'commentReadText' + zoomPrefixLevelsCSS[zIndex].prefix;
+            if (cfg.data.focus) {
+                if (cfg.data.focus == 3) {
+                    css = 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix;
+                }
+            }
             for (let ii = 0; ii < cfg.data.comments[barIdx].points.length; ii++) {
                 let itxt = cfg.data.comments[barIdx].points[ii];
                 let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * cfg.widthDurationRatio;
@@ -1657,7 +1686,7 @@ class TextComments {
                     x: xx,
                     y: top + cfg.notePathHeight * (1 + itxt.row) * txtZoomRatio,
                     text: cfg.data.comments[barIdx].points[ii].text,
-                    css: 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix
+                    css: css
                 };
                 barOctaveAnchor.content.push(tt);
             }
@@ -1752,6 +1781,93 @@ class MixerUI {
         return [this.gridLayers, this.trackLayers, this.firstLayers];
     }
     reFillTracksRatio(cfg) {
+        this.fillerAnchor.content = [];
+        let countFunction;
+        if (cfg.data.focus) {
+            if (cfg.data.focus == 1) {
+                countFunction = this.barDrumCount;
+            }
+            else {
+                if (cfg.data.focus == 2) {
+                    countFunction = this.barAutoCount;
+                }
+                else {
+                    countFunction = this.barCommentsCount;
+                }
+            }
+        }
+        else {
+            countFunction = this.barTrackCount;
+        }
+        let mxItems = 0;
+        for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
+            let itemcount = countFunction(cfg, bb);
+            if (mxItems < itemcount) {
+                mxItems = itemcount;
+            }
+        }
+        if (mxItems < 1)
+            mxItems = 1;
+        let barX = 0;
+        for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
+            let itemcount = countFunction(cfg, bb);
+            let filIdx = 1 + Math.round(7 * itemcount / mxItems);
+            let css = 'mixFiller' + filIdx;
+            let barwidth = MMUtil().set(cfg.data.timeline[bb].metre).duration(cfg.data.timeline[bb].tempo) * cfg.widthDurationRatio;
+            let fillRectangle = {
+                x: cfg.leftPad + barX,
+                y: cfg.gridTop(),
+                w: barwidth,
+                h: cfg.gridHeight(),
+                css: css
+            };
+            this.fillerAnchor.content.push(fillRectangle);
+            barX = barX + barwidth;
+        }
+    }
+    barTrackCount(cfg, bb) {
+        let notecount = 0;
+        for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
+            let bar = cfg.data.tracks[tt].measures[bb];
+            if (bar) {
+                for (let cc = 0; cc < bar.chords.length; cc++) {
+                    notecount = notecount + bar.chords[cc].notes.length;
+                }
+            }
+        }
+        return notecount;
+    }
+    barDrumCount(cfg, bb) {
+        let drumcount = 0;
+        for (let tt = 0; tt < cfg.data.percussions.length; tt++) {
+            let bar = cfg.data.percussions[tt].measures[bb];
+            if (bar) {
+                drumcount = drumcount + bar.skips.length;
+            }
+        }
+        return drumcount;
+    }
+    barAutoCount(cfg, bb) {
+        let autoCnt = 0;
+        for (let ff = 0; ff < cfg.data.filters.length; ff++) {
+            let filter = cfg.data.filters[ff];
+            if (filter.automation) {
+                if (filter.automation.measures[bb]) {
+                    autoCnt = autoCnt + filter.automation.measures[bb].changes.length;
+                }
+            }
+        }
+        return autoCnt;
+    }
+    barCommentsCount(cfg, bb) {
+        if (cfg.data.comments[bb]) {
+            if (cfg.data.comments[bb].points) {
+                return cfg.data.comments[bb].points.length;
+            }
+        }
+        return 0;
+    }
+    reFillTracksRatio22(cfg) {
         let mxNotes = 0;
         let mxDrums = 0;
         let mxTxt = 0;

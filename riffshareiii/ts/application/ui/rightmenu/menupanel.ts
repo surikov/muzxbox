@@ -159,7 +159,7 @@ class RightMenuPanel {
 		let me = this;
 		for (let ii = 0; ii < infos.length; ii++) {
 			let it = infos[ii];
-			let focused = (it.focused) ? true : false;
+			//let focused = (it.focused) ? true : false;
 			let opened = (it.opened) ? true : false;
 			let children = it.children;
 			let itemLabel = '';
@@ -174,9 +174,13 @@ class RightMenuPanel {
 					this.fillMenuItemChildren(pad + 0.5, children);
 				} else {
 					let si: RightMenuItem = new RightMenuItem(it, pad, () => {
-
+						//console.log('test', it.text, it.onOpen);
+						if (it.onOpen) {
+							it.onOpen();
+						}
 						me.setOpenState(true, it, infos);
 						me.rerenderMenuContent(si);
+
 					}).initClosedFolderItem();
 					this.items.push(si);
 
@@ -262,23 +266,23 @@ class RightMenuPanel {
 				, selection: 0
 			};
 			menuPointPercussion.children.push(item);
-//console.log('menu drum',item);
-//if(menuItemsData)menuItemsData.push(item);
+			//console.log('menu drum',item);
+			//if(menuItemsData)menuItemsData.push(item);
 			//menuPointPercussion.children.push(item);
 		}
-		menuPointAutomation.children=[];
-		for(let ff=0;ff<project.filters.length;ff++){
-			let filter=project.filters[ff];
-			if(filter.automation){
+		menuPointAutomation.children = [];
+		for (let ff = 0; ff < project.filters.length; ff++) {
+			let filter = project.filters[ff];
+			if (filter.automation) {
 				let item: MenuInfo = {
 					text: filter.automation.title
 					, noLocalization: true
 					, onClick: () => {
-	
+
 						commandDispatcher.moveAutomationTop(ff);
 					}
 					, onSubClick: () => {
-	
+
 						//let state = item.selection ? item.selection : 0;
 						//commandDispatcher.setDrumSoloState(state);
 					}
@@ -288,7 +292,7 @@ class RightMenuPanel {
 				menuPointAutomation.children.push(item);
 			}
 		}
-		
+
 	}
 	rerenderMenuContent(folder: RightMenuItem | null) {
 

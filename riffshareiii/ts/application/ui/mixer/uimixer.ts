@@ -80,11 +80,130 @@ class MixerUI {
 		this.gridLayers.anchors.push(this.fillerAnchor);
 		return [this.gridLayers, this.trackLayers, this.firstLayers];
 	}
+	reFillTracksRatio(cfg: MixerDataMathUtility) {
+		this.fillerAnchor.content = [];
+		let countFunction: (cfg: MixerDataMathUtility, barIdx: number) => number;
+		if (cfg.data.focus) {
+			if (cfg.data.focus == 1) {
+				//this.addFillerDrums(cfg);
+				countFunction = this.barDrumCount;
+			} else {
+				if (cfg.data.focus == 2) {
+					//this.addFillerAutomation(cfg);
+					countFunction = this.barAutoCount;
+				} else {
+					//this.addFillerComments(cfg);
+					countFunction = this.barCommentsCount;
+				}
+			}
+		} else {
+			//this.addFillerTracks(cfg);
+			countFunction = this.barTrackCount;
+		}
+		let mxItems = 0;
+		for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
+			let itemcount = countFunction(cfg, bb);
+			if (mxItems < itemcount) {
+				mxItems = itemcount;
+			}
+		}
+		if (mxItems < 1) mxItems = 1;
+		let barX = 0;
+		for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
+			let itemcount =countFunction(cfg, bb);
+			let filIdx = 1 + Math.round(7 * itemcount / mxItems);
+			let css = 'mixFiller' + filIdx;
+			let barwidth = MMUtil().set(cfg.data.timeline[bb].metre).duration(cfg.data.timeline[bb].tempo) * cfg.widthDurationRatio;
+			let fillRectangle: TileRectangle = {
+				x: cfg.leftPad + barX
+				, y: cfg.gridTop()
+				, w: barwidth
+				, h: cfg.gridHeight()
+				, css: css
+			};
+			this.fillerAnchor.content.push(fillRectangle);
+			barX = barX + barwidth;
+		}
+	}
+	barTrackCount(cfg: MixerDataMathUtility, bb: number): number {
+		let notecount = 0;
+		for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
+			let bar = cfg.data.tracks[tt].measures[bb];
+			if (bar) {
+				for (let cc = 0; cc < bar.chords.length; cc++) {
+					notecount = notecount + bar.chords[cc].notes.length;
+				}
+			}
+		}
+		return notecount;
+	}
+	barDrumCount(cfg: MixerDataMathUtility, bb: number): number {
+		let drumcount = 0;
+		for (let tt = 0; tt < cfg.data.percussions.length; tt++) {
+			let bar = cfg.data.percussions[tt].measures[bb];
+			if (bar) {
+				drumcount = drumcount + bar.skips.length;
+			}
+		}
+		return drumcount;
+	}
+	barAutoCount(cfg: MixerDataMathUtility, bb: number): number {
+		let autoCnt = 0;
+		for (let ff = 0; ff < cfg.data.filters.length; ff++) {
+			let filter = cfg.data.filters[ff];
+			if (filter.automation) {
+				if (filter.automation.measures[bb]) {
+					autoCnt = autoCnt + filter.automation.measures[bb].changes.length;
+				}
+			}
+		}
+		return autoCnt;
+	}
+	barCommentsCount(cfg: MixerDataMathUtility, bb: number): number {
+		if (cfg.data.comments[bb]) {
+			if (cfg.data.comments[bb].points) {
+				return cfg.data.comments[bb].points.length;
+			}
+		}
+		return 0;
+	}
+	/*
+	addFillerTracks(cfg: MixerDataMathUtility) {
+		let mxNotes = 0;
+		for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
+			let notecount = this.barTrackCount(cfg, bb);
+			if (mxNotes < notecount) {
+				mxNotes = notecount;
+			}
+		}
+		if (mxNotes < 1) mxNotes = 1;
+		let barX = 0;
+		for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
+			let notecount = this.barTrackCount(cfg, bb);
+			let filIdx = 1 + Math.round(7 * notecount / mxNotes);
+			let css = 'mixFiller' + filIdx;
+			let barwidth = MMUtil().set(cfg.data.timeline[bb].metre).duration(cfg.data.timeline[bb].tempo) * cfg.widthDurationRatio;
+			let fillSequencerRectangle: TileRectangle = {
+				x: cfg.leftPad + barX
+				, y: cfg.gridTop()
+				, w: barwidth
+				, h: cfg.gridHeight()
+				, css: css
+			};
+			this.fillerAnchor.content.push(fillSequencerRectangle);
+			barX = barX + barwidth;
+		}
+	}
+	addFillerDrums(cfg: MixerDataMathUtility) {
 
-	reFillTracksRatio(//data: Zvoog_Project
-		cfg: MixerDataMathUtility
-	) {
-		//let mixm: MixerDataMath = new MixerDataMath(data);
+	}
+	addFillerAutomation(cfg: MixerDataMathUtility) {
+
+	}
+	addFillerComments(cfg: MixerDataMathUtility) {
+
+	}*/
+	reFillTracksRatio22(cfg: MixerDataMathUtility) {
 		let mxNotes = 0;
 		let mxDrums = 0;
 		let mxTxt = 0;
@@ -120,7 +239,6 @@ class MixerUI {
 					}
 				}
 			}
-
 			let autoCnt = 0;
 			for (let ff = 0; ff < cfg.data.filters.length; ff++) {
 				let filter = cfg.data.filters[ff];
@@ -133,11 +251,7 @@ class MixerUI {
 			if (mxAuto < autoCnt) {
 				mxAuto = autoCnt;
 			}
-			//console.log(bb,autoCnt,mxAuto);
-			//txtcnt = txtcnt + cfg.data.comments[bb].texts.length;
-			//console.log(bb, notecount);
 		}
-		//console.log(mxNotes);
 		if (mxDrums < 1) mxDrums = 1;
 		if (mxNotes < 1) mxNotes = 1;
 		if (mxTxt < 1) mxTxt = 1;
@@ -163,15 +277,7 @@ class MixerUI {
 				, h: cfg.gridHeight()
 				, css: css
 			};
-			//console.log(bb, notecount, css,fillSequencerRectangle);
 			this.fillerAnchor.content.push(fillSequencerRectangle);
-
-
-
-
-
-
-
 			if (cfg.data.percussions.length) {
 				let drumcount = 0;
 				for (let tt = 0; tt < cfg.data.percussions.length; tt++) {
@@ -182,7 +288,6 @@ class MixerUI {
 				}
 				filIdx = 1 + Math.round(7 * drumcount / mxDrums);
 				let css2 = 'mixFiller' + filIdx;
-
 				let fillDrumBar: TileRectangle = {
 					x: cfg.leftPad + barX
 					, y: cfg.gridTop() + cfg.gridHeight() - cfg.data.percussions.length * cfg.notePathHeight
@@ -190,21 +295,8 @@ class MixerUI {
 					, h: cfg.data.percussions.length * cfg.notePathHeight
 					, css: css2
 				};
-
-
-
-
-
-
 				this.fillerAnchor.content.push(fillDrumBar);
-
-
-
-
-
-				//console.log('drum',bb,fillDrumBar);
 			}
-
 			filIdx = 1;
 			if (cfg.data.comments[bb]) {
 				if (cfg.data.comments[bb].points) {
@@ -219,21 +311,7 @@ class MixerUI {
 				, h: cfg.commentsAverageFillHeight()
 				, css: css
 			};
-
-
-
-
-
-
 			this.fillerAnchor.content.push(fillTxtBar);
-
-
-
-
-
-
-
-
 			filIdx = 0;
 			for (let ff = 0; ff < cfg.data.filters.length; ff++) {
 				let filter = cfg.data.filters[ff];
@@ -243,7 +321,6 @@ class MixerUI {
 					}
 				}
 			}
-			//console.log(bb,filIdx);
 			filIdx = 1 + Math.round(7 * filIdx / mxAuto);
 			css = 'mixFiller' + filIdx;
 			let fillAutoBar: TileRectangle = {
@@ -253,16 +330,7 @@ class MixerUI {
 				, h: cfg.automationMaxHeight()
 				, css: css
 			};
-			
-			
-			
 			this.fillerAnchor.content.push(fillAutoBar);
-			
-			
-			
-			//console.log('auto',bb,fillAutoBar);
-
-
 			barX = barX + barwidth;
 		}
 

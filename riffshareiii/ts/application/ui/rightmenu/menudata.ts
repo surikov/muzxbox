@@ -9,6 +9,7 @@ type MenuInfo = {
 	sid?: string;
 	onClick?: () => void;
 	onSubClick?: () => void;
+	onOpen?: () => void;
 	states?: string[];
 	selection?: number;
 };
@@ -29,14 +30,23 @@ let menuItemsData: MenuInfo[] | null = null;
 
 let menuPointTracks: MenuInfo = {
 	text: localMenuTracksFolder
+	, onOpen: () => {
+		commandDispatcher.upTracksLayer();
+	}
 };
 
 let menuPointPercussion: MenuInfo = {
 	text: localMenuPercussionFolder
+	, onOpen: () => {
+		commandDispatcher.upDrumsLayer();
+	}
 };
 
 let menuPointAutomation: MenuInfo = {
 	text: localMenuAutomationFolder
+	, onOpen: () => {
+		commandDispatcher.upAutoLayer();
+	}
 };
 
 let menuPointFileImport: MenuInfo = {

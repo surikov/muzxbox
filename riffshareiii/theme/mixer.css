@@ -274,8 +274,42 @@
 	pointer-events: none;
 }
 
+
+
+
+.commentReadText025 {
+    fill: var(--color-lines);
+    font-size: calc(0.25*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText05 {
+    fill: var(--color-lines);
+    font-size: calc(0.5*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText1 {
+    fill: var(--color-lines);
+    font-size: calc(1*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText2 {
+    fill: var(--color-lines);
+    font-size: calc(2*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText4 {
+    fill: var(--color-lines);
+    font-size: calc(3*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText8 {
+    fill: var(--color-lines);
+    font-size: calc(4*var(--tapSize));
+	pointer-events: none;
+}
+
 .automationChangeDot{
-	fill: var(--color-text);
+	fill: var(--color-lines);
 	fill-opacity:75%;
     stroke: none;
 }

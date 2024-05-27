@@ -94,7 +94,7 @@ class CommandDispatcher {
 	}
 	moveAutomationTop(filterNum: number) {
 		console.log('moveAutomationTop', filterNum);
-		this.upAutoayer();
+		this.upAutoLayer();
 	}
 	upTracksLayer() {
 		console.log('upTracksLayer');
@@ -106,7 +106,7 @@ class CommandDispatcher {
 		this.cfg.data.focus=1;
 		commandDispatcher.resetProject();
 	}
-	upAutoayer() {
+	upAutoLayer() {
 		console.log('upAutoayer');
 		this.cfg.data.focus=2;
 		commandDispatcher.resetProject();
