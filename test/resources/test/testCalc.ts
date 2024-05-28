@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.99 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.123 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -745,7 +745,7 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 
 	//console.log('blue');
-	let ratioPre = 0.66;//0.99;
+	let ratioPre = 0.99;//0.99;
 	//console.log('dumpTriads mode', highLightMode);
 	blueStat = [];
 	redStat = [];
@@ -781,7 +781,13 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		let end = -1;
 		let begin2 = -1;
 		let end2 = -1;
+		//let part1=true;
 		for (let kk = 0; kk < first.length; kk++) {
+			/*if(first[kk].summ>Math.floor(first[0].summ/2)){
+				lbl = lbl + '_';
+			}else{
+				lbl = lbl + ' ';
+			}*/
 			if (ballExists(first[kk].ball, rows[rr])) {
 				if (showFirstRow || rr > 0) {
 					lbl = lbl + ' ●' + first[kk].ball;
@@ -795,6 +801,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			} else {
 				lbl = lbl + ' ' + first[kk].ball;
 			}
+			
 		}
 		for (let kk = 0; kk < first.length; kk++) {
 			if (ballExists(first[kk].ball, rows[rr])) {
@@ -808,7 +815,8 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		}
 		lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
 		if (rr == 0) {
-			//console.log(lbl);
+			//let middle=(first[first.length-1].summ-first[0].summ)/2+first[0].summ;
+			//console.log(lbl,first,middle);
 			dumpInfo2('statblue', lbl);
 
 		}
@@ -865,6 +873,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		for (let ii = 0; ii < rowLen; ii++) {
 			let idx = ratioPre * (calcs[ii].summ - minCnt) / df;
 			let color = 'rgba(0,0,255,' + idx + ')';
+			//console.log(idx,color);
 			addRect(svg
 				, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize
 				, topShift + 0 * cellSize + rr * cellSize
@@ -1081,6 +1090,7 @@ function drawTestLines(data: { ball: number, color: string }[]) {
 	}
 
 }
+/*
 function testTest() {
 	let yyy = rowsVisibleCount + 22 + skipRowsCount - 1;
 	console.log('TESTtEST', sortedBlue, sortedGreen, sortedGrey);
@@ -1189,6 +1199,7 @@ function testTest() {
 	}
 	drawLines();
 }
+*/
 function dumpLeftStat(){
 	console.log('dumpLeftStat',datarows);
 	let ss:number[]=[];
@@ -1220,6 +1231,7 @@ function dumpLeftStat(){
 	*/
 	
 }
+/*
 function dumpPatternStat(){
 	console.log('dumpPatternStat');
 	let exists=0;
@@ -1242,6 +1254,7 @@ function dumpStat5(){
 	dumpPatternStat();
 	console.log(45*45*45*45*45*45); 
 }
+*/
 init();
 addTails();
-dumpStat5();
+//dumpStat5();
