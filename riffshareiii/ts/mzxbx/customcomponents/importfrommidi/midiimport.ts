@@ -1835,7 +1835,11 @@ class MidiParser {
 				let chanTrack = this.findOrCreateTrack(miditrack, i, newchord.channel, tracksChannels);
 				chanTrack.track.songchords.push(newchord);
 			}
+
+
+			//console.log(miditrack.trackTitle,miditrack.trackVolumePoints,);
 		}
+
 		for (let tt = 0; tt < tracksChannels.length; tt++) {
 			let trackChan = tracksChannels[tt];
 			if (trackChan.track.songchords.length > 0) {
@@ -1879,20 +1883,47 @@ class MidiParser {
 			}
 		}
 		for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
-			let midiTrack: MIDISongTrack = midiSongData.miditracks[ii];
-			if (midiTrack.channelNum == 9) {
+			let midiSongTrack: MIDISongTrack = midiSongData.miditracks[ii];
+			let filterID = 'f' + ii;
+			let filterVolume: Zvoog_FilterTarget = { id: filterID, kind: 'VolumeGain', dataBlob: '', outputId: '', automation: null };
+			project.filters.push(filterVolume);
 
-				let drums: number[] = this.collectDrums(midiTrack);
+			if (midiSongTrack.trackVolumes.length == 1) {
+				let vol: number = 1 * midiSongTrack.trackVolumes[0].value;
+				filterVolume.dataBlob = '' + Math.round(vol * 100) + '%';
+			} else {
+				if (midiSongTrack.trackVolumes.length > 1) {
+					filterVolume.automation = { title: 'for ' + filterID, measures: [] };
+					for (let mm = 0; mm < project.timeline.length; mm++) {
+						filterVolume.automation.measures.push({ changes: [] });
+					}
+					for (let vv = 0; vv < midiSongTrack.trackVolumes.length; vv++) {
+						let gain = midiSongTrack.trackVolumes[vv];
+						let vol = '' + Math.round(gain.value * 100) + '%';
+						let pnt = findMeasureSkipByTime(gain.ms / 1000, project.timeline);
+						console.log(filterID, vol, pnt,vol);
+						if (pnt) {
+							filterVolume.automation.measures[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
+						}
+					}
+				}
+			}
+
+			//console.log('filterVolume', filterVolume);
+
+			if (midiSongTrack.channelNum == 9) {
+				let drums: number[] = this.collectDrums(midiSongTrack);
 				//console.log(midiTrack,drums);
 				for (let dd = 0; dd < drums.length; dd++) {
-					project.percussions.push(this.createProjectDrums(drums[dd], project.timeline, midiTrack));
-
+					project.percussions.push(this.createProjectDrums(drums[dd], project.timeline, midiSongTrack, filterID));
 				}
 			} else {
-				project.tracks.push(this.createProjectTrack(project.timeline, midiTrack));
+				project.tracks.push(this.createProjectTrack(project.timeline, midiSongTrack, filterID));
 			}
-		}
 
+
+		}
+		console.log('midiSongData', midiSongData);
 		console.log('project', project);
 		return project;
 	}
@@ -1951,12 +1982,12 @@ class MidiParser {
 	stripDuration(what: Zvoog_MetreMathType): Zvoog_MetreMathType {
 		return what;
 	}
-	createProjectTrack(timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack): Zvoog_MusicTrack {
+	createProjectTrack(timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack {
 		let projectTrack: Zvoog_MusicTrack = {
 			title: midiTrack.title + ' [' + midiTrack.program + '] ' + insNames[midiTrack.program]
 			, measures: []
 			//, filters: []
-			, performer: { id: '', data: '', kind: '', outputId: '' }
+			, performer: { id: '', data: '', kind: '', outputId: outputId }
 		};
 		let mm = MMUtil();
 		for (let tt = 0; tt < timeline.length; tt++) {
@@ -2035,12 +2066,12 @@ class MidiParser {
 		}
 		return projectTrack;
 	}
-	createProjectDrums(drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack): Zvoog_PercussionTrack {
+	createProjectDrums(drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack {
 		let projectDrums: Zvoog_PercussionTrack = {
 			title: midiTrack.title + ' [' + drum + '] ' + drumNames[drum]
 			, measures: []
 			//, filters: []
-			, sampler: { id: '', data: '', kind: '', outputId: '' }
+			, sampler: { id: '', data: '', kind: '', outputId: outputId }
 		};
 		let currentTimeMs = 0;
 		let mm = MMUtil();

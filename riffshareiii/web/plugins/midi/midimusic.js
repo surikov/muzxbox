@@ -1462,17 +1462,42 @@ class MidiParser {
             }
         }
         for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
-            let midiTrack = midiSongData.miditracks[ii];
-            if (midiTrack.channelNum == 9) {
-                let drums = this.collectDrums(midiTrack);
+            let midiSongTrack = midiSongData.miditracks[ii];
+            let filterID = 'f' + ii;
+            let filterVolume = { id: filterID, kind: 'VolumeGain', dataBlob: '', outputId: '', automation: null };
+            project.filters.push(filterVolume);
+            if (midiSongTrack.trackVolumes.length == 1) {
+                let vol = 1 * midiSongTrack.trackVolumes[0].value;
+                filterVolume.dataBlob = '' + Math.round(vol * 100) + '%';
+            }
+            else {
+                if (midiSongTrack.trackVolumes.length > 1) {
+                    filterVolume.automation = { title: 'for ' + filterID, measures: [] };
+                    for (let mm = 0; mm < project.timeline.length; mm++) {
+                        filterVolume.automation.measures.push({ changes: [] });
+                    }
+                    for (let vv = 0; vv < midiSongTrack.trackVolumes.length; vv++) {
+                        let gain = midiSongTrack.trackVolumes[vv];
+                        let vol = '' + Math.round(gain.value * 100) + '%';
+                        let pnt = findMeasureSkipByTime(gain.ms / 1000, project.timeline);
+                        console.log(filterID, vol, pnt, vol);
+                        if (pnt) {
+                            filterVolume.automation.measures[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
+                        }
+                    }
+                }
+            }
+            if (midiSongTrack.channelNum == 9) {
+                let drums = this.collectDrums(midiSongTrack);
                 for (let dd = 0; dd < drums.length; dd++) {
-                    project.percussions.push(this.createProjectDrums(drums[dd], project.timeline, midiTrack));
+                    project.percussions.push(this.createProjectDrums(drums[dd], project.timeline, midiSongTrack, filterID));
                 }
             }
             else {
-                project.tracks.push(this.createProjectTrack(project.timeline, midiTrack));
+                project.tracks.push(this.createProjectTrack(project.timeline, midiSongTrack, filterID));
             }
         }
+        console.log('midiSongData', midiSongData);
         console.log('project', project);
         return project;
     }
@@ -1521,11 +1546,11 @@ class MidiParser {
     stripDuration(what) {
         return what;
     }
-    createProjectTrack(timeline, midiTrack) {
+    createProjectTrack(timeline, midiTrack, outputId) {
         let projectTrack = {
             title: midiTrack.title + ' [' + midiTrack.program + '] ' + insNames[midiTrack.program],
             measures: [],
-            performer: { id: '', data: '', kind: '', outputId: '' }
+            performer: { id: '', data: '', kind: '', outputId: outputId }
         };
         let mm = MMUtil();
         for (let tt = 0; tt < timeline.length; tt++) {
@@ -1592,11 +1617,11 @@ class MidiParser {
         }
         return projectTrack;
     }
-    createProjectDrums(drum, timeline, midiTrack) {
+    createProjectDrums(drum, timeline, midiTrack, outputId) {
         let projectDrums = {
             title: midiTrack.title + ' [' + drum + '] ' + drumNames[drum],
             measures: [],
-            sampler: { id: '', data: '', kind: '', outputId: '' }
+            sampler: { id: '', data: '', kind: '', outputId: outputId }
         };
         let currentTimeMs = 0;
         let mm = MMUtil();
