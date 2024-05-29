@@ -98,22 +98,29 @@ class CommandDispatcher {
 	}
 	upTracksLayer() {
 		console.log('upTracksLayer');
-		this.cfg.data.focus=0;
+		this.cfg.data.focus = 0;
+		this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
+		if (this.cfg.data.tracks)
+			if (this.cfg.data.tracks[0])
+				this.renderer.menu.layerCurrentTitle.text = this.cfg.data.tracks[0].title;
 		commandDispatcher.resetProject();
 	}
 	upDrumsLayer() {
 		console.log('upDrumsLayer');
-		this.cfg.data.focus=1;
+		this.cfg.data.focus = 1;
+		this.renderer.menu.layerCurrentTitle.text = LO(localMenuPercussionFolder);
 		commandDispatcher.resetProject();
 	}
 	upAutoLayer() {
 		console.log('upAutoayer');
-		this.cfg.data.focus=2;
+		this.cfg.data.focus = 2;
+		this.renderer.menu.layerCurrentTitle.text = LO(localMenuAutomationFolder);
 		commandDispatcher.resetProject();
 	}
 	upCommentsLayer() {
 		console.log('upCommentsLayer');
-		this.cfg.data.focus=3;
+		this.cfg.data.focus = 3;
+		this.renderer.menu.layerCurrentTitle.text = LO(localMenuCommentsLayer);
 		commandDispatcher.resetProject();
 	}
 

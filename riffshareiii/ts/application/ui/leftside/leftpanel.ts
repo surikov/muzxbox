@@ -94,15 +94,20 @@ class LeftPanel {
 
 				}
 			}
-			if (cfg.data.tracks.length > 0) {
-				let trackLabel: TileText = {
-					text: '' + cfg.data.tracks[0].title
-					, x: 0
-					, y: cfg.gridTop() + zoomPrefixLevelsCSS[zz].minZoom * 0.5
-					, css: 'curTrackTitleLabel' + zoomPrefixLevelsCSS[zz].prefix
-				};
-				this.leftZoomAnchors[zz].content.push(trackLabel);
-			}
+			/*
+			if (cfg.data.focus) {
+				//
+			} else {
+				if (cfg.data.tracks.length > 0) {
+					let trackLabel: TileText = {
+						text: '' + cfg.data.tracks[0].title
+						, x: 0
+						, y: cfg.gridTop()// + zoomPrefixLevelsCSS[zz].minZoom * 0.5
+						, css: 'curTrackTitleLabel' + zoomPrefixLevelsCSS[zz].prefix
+					};
+					this.leftZoomAnchors[zz].content.push(trackLabel);
+				}
+			}*/
 			if (zz < 4) {
 				for (let ss = 0; ss < cfg.data.percussions.length; ss++) {
 					let samplerLabel: TileText = {

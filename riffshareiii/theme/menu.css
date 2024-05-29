@@ -72,3 +72,12 @@
     pointer-events:none;
 	font-family: "Material-Design-Iconic-Font";
 }
+
+.currentTitleLabel {
+    fill: var(--color-lines);
+    font-size: var(--label-1cm);
+    pointer-events: none;
+	opacity: 50%;
+	transform: rotate(90deg);
+	transform-origin: 0cm 0cm;
+}

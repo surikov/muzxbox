@@ -1480,8 +1480,15 @@ class MidiParser {
                         let gain = midiSongTrack.trackVolumes[vv];
                         let vol = '' + Math.round(gain.value * 100) + '%';
                         let pnt = findMeasureSkipByTime(gain.ms / 1000, project.timeline);
-                        console.log(filterID, vol, pnt, vol);
                         if (pnt) {
+                            pnt.skip = MMUtil().set(pnt.skip).strip(16);
+                            for (let aa = 0; aa < filterVolume.automation.measures[pnt.idx].changes.length; aa++) {
+                                let sk = filterVolume.automation.measures[pnt.idx].changes[aa].skip;
+                                if (MMUtil().set(sk).equals(pnt.skip)) {
+                                    filterVolume.automation.measures[pnt.idx].changes.splice(aa, 1);
+                                    break;
+                                }
+                            }
                             filterVolume.automation.measures[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
                         }
                     }

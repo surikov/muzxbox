@@ -297,21 +297,28 @@ class CommandDispatcher {
     upTracksLayer() {
         console.log('upTracksLayer');
         this.cfg.data.focus = 0;
+        this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
+        if (this.cfg.data.tracks)
+            if (this.cfg.data.tracks[0])
+                this.renderer.menu.layerCurrentTitle.text = this.cfg.data.tracks[0].title;
         commandDispatcher.resetProject();
     }
     upDrumsLayer() {
         console.log('upDrumsLayer');
         this.cfg.data.focus = 1;
+        this.renderer.menu.layerCurrentTitle.text = LO(localMenuPercussionFolder);
         commandDispatcher.resetProject();
     }
     upAutoLayer() {
         console.log('upAutoayer');
         this.cfg.data.focus = 2;
+        this.renderer.menu.layerCurrentTitle.text = LO(localMenuAutomationFolder);
         commandDispatcher.resetProject();
     }
     upCommentsLayer() {
         console.log('upCommentsLayer');
         this.cfg.data.focus = 3;
+        this.renderer.menu.layerCurrentTitle.text = LO(localMenuCommentsLayer);
         commandDispatcher.resetProject();
     }
     setTrackSoloState(state) {
@@ -837,11 +844,13 @@ class RightMenuPanel {
             this.scrollY = 0;
             this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         });
+        this.layerCurrentTitle = { x: 2.5, y: 0, text: LO(localMenuTracksFolder), css: 'currentTitleLabel' };
         this.backgroundAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111,
             showZoom: zoomPrefixLevelsCSS[0].minZoom,
             hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
+                this.layerCurrentTitle,
                 this.listingShadow,
                 this.backgroundRectangle
             ], id: 'rightMenuBackgroundAnchor'
@@ -1417,15 +1426,6 @@ class LeftPanel {
                         }
                     }
                 }
-            }
-            if (cfg.data.tracks.length > 0) {
-                let trackLabel = {
-                    text: '' + cfg.data.tracks[0].title,
-                    x: 0,
-                    y: cfg.gridTop() + zoomPrefixLevelsCSS[zz].minZoom * 0.5,
-                    css: 'curTrackTitleLabel' + zoomPrefixLevelsCSS[zz].prefix
-                };
-                this.leftZoomAnchors[zz].content.push(trackLabel);
             }
             if (zz < 4) {
                 for (let ss = 0; ss < cfg.data.percussions.length; ss++) {
