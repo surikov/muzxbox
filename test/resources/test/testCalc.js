@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.123 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.124 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -733,7 +733,8 @@ function dumpTriads(svg, rows) {
                 sortedBlue[ff] = first[ff].ball;
             }
         }
-        lbl = 'blue';
+        //lbl = 'blue';
+        lbl = '';
         var begin = -1;
         var end = -1;
         var begin2 = -1;
@@ -747,18 +748,21 @@ function dumpTriads(svg, rows) {
             }*/
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
-                    lbl = lbl + ' ●' + first[kk].ball;
+                    //lbl = lbl + ' ●' + first[kk].ball;
+                    lbl = '●' + first[kk].ball + ' ' + lbl;
                     end = kk;
                     if (begin == -1) {
                         begin = kk;
                     }
                 }
                 else {
-                    lbl = lbl + ' ' + first[kk].ball;
+                    //lbl = lbl + ' ' + first[kk].ball;
+                    lbl = first[kk].ball + ' ' + lbl;
                 }
             }
             else {
-                lbl = lbl + ' ' + first[kk].ball;
+                //lbl = lbl + ' ' + first[kk].ball;
+                lbl = first[kk].ball + ' ' + lbl;
             }
         }
         for (var kk = 0; kk < first.length; kk++) {
@@ -772,7 +776,8 @@ function dumpTriads(svg, rows) {
                 }
             }
         }
-        lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+        //lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+        lbl = '' + (rowLen - end - 1) + ':' + end + '(' + begin + '): blue ' + lbl;
         if (rr == 0) {
             //let middle=(first[first.length-1].summ-first[0].summ)/2+first[0].summ;
             //console.log(lbl,first,middle);
@@ -786,12 +791,17 @@ function dumpTriads(svg, rows) {
         var xxx = 0 * rowLen / 2;
         //if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
         if (showFirstRow || rr > 0) {
+            var x2 = xxx + (rowLen - 1) / 2;
             var blue2 = '#3333ff33';
-            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: blue2, manual: false });
-            markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue2, manual: false });
+            markLines.push({ fromX: x2, fromY: yyy, toX: x2 - begin2 / 2, toY: yyy, color: blue2, manual: false });
+            markLines.push({ fromX: xxx, fromY: yyy, toX: x2 - end2 / 2, toY: yyy, color: blue2, manual: false });
+            //markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: blue2, manual: false });
+            //markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue2, manual: false });
             var blue = '#3333ffff';
-            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: blue, manual: false });
-            markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue, manual: false });
+            markLines.push({ fromX: x2, fromY: yyy, toX: x2 - begin / 2, toY: yyy, color: blue, manual: false });
+            markLines.push({ fromX: xxx, fromY: yyy, toX: x2 - end / 2, toY: yyy, color: blue, manual: false });
+            //markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: blue, manual: false });
+            //markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue, manual: false });
             blueStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
         }
         if (showFirstRow || rr > 0) {
@@ -1031,116 +1041,112 @@ function drawTestLines(data) {
         });
     }
 }
-/*
 function testTest() {
-    let yyy = rowsVisibleCount + 22 + skipRowsCount - 1;
+    var yyy = rowsVisibleCount + 22 + skipRowsCount - 1;
     console.log('TESTtEST', sortedBlue, sortedGreen, sortedGrey);
-    let leftBlue = Math.ceil(0 * rowLen / 2);
-    let rightBlue = Math.ceil(1 * rowLen / 2) - 1;
-    let leftGreen = Math.ceil(1 * rowLen / 2);
-    let rightGreen = Math.ceil(2 * rowLen / 2) - 1;
-    let leftGrey = Math.ceil(2 * rowLen / 2);
-    let rightGrey = Math.ceil(3 * rowLen / 2) - 1;
-    let leftRed = Math.ceil(3 * rowLen / 2);
-    let rightRed = Math.ceil(4 * rowLen / 2) - 1;
+    var rightBlue = Math.ceil(0 * rowLen / 2);
+    var leftBlue = Math.ceil(1 * rowLen / 2) - 1;
+    //let leftBlue = Math.ceil(0 * rowLen / 2);
+    //let rightBlue = Math.ceil(1 * rowLen / 2) - 1;
+    var leftGreen = Math.ceil(1 * rowLen / 2);
+    var rightGreen = Math.ceil(2 * rowLen / 2) - 1;
+    var leftGrey = Math.ceil(2 * rowLen / 2);
+    var rightGrey = Math.ceil(3 * rowLen / 2) - 1;
+    var leftRed = Math.ceil(3 * rowLen / 2);
+    var rightRed = Math.ceil(4 * rowLen / 2) - 1;
     //console.log(leftBlue, rightBlue, leftGreen, rightGreen, leftGrey, rightGrey, leftRed, rightRed);
-    for (let mm = 0; mm < markLines.length; mm++) {
-        let line = markLines[mm];
+    for (var mm = 0; mm < markLines.length; mm++) {
+        var line = markLines[mm];
         if (line.fromY == yyy && line.toY == yyy) {
             if (line.fromX == leftBlue || line.toX == leftBlue) {
-                let nn = 2 * Math.abs(line.fromX - line.toX);
-                let orders: number[] = sortedBlue.slice(0, nn);
-                let data: { ball: number, color: string }[] = [];
-                for (let bb = 0; bb < orders.length; bb++) {
-                    data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
-                }
-                console.log('leftBlue', nn, data);
-                drawTestLines(data);
-
-            }
-            if (line.fromX == rightBlue || line.toX == rightBlue) {
-                let nn = 2 * Math.abs(line.fromX - line.toX);
-                //let data = sortedBlue.slice(sortedBlue.length - nn);
-                let orders: number[] = sortedBlue.slice(sortedBlue.length - nn);
-                let data: { ball: number, color: string }[] = [];
-                for (let bb = 0; bb < orders.length; bb++) {
+                var nn = 2 * Math.abs(line.fromX - line.toX);
+                var orders = sortedBlue.slice(0, nn);
+                var data = [];
+                for (var bb = 0; bb < orders.length; bb++) {
                     data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
                 }
                 console.log('rightBlue', nn, data);
                 drawTestLines(data);
             }
+            if (line.fromX == rightBlue || line.toX == rightBlue) {
+                var nn = 2 * Math.abs(line.fromX - line.toX);
+                //let data = sortedBlue.slice(sortedBlue.length - nn);
+                var orders = sortedBlue.slice(sortedBlue.length - nn);
+                var data = [];
+                for (var bb = 0; bb < orders.length; bb++) {
+                    data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
+                }
+                console.log('leftBlue', nn, data);
+                drawTestLines(data);
+            }
             if (line.fromX == leftGreen || line.toX == leftGreen) {
-                let nn = 2 * Math.abs(line.fromX - line.toX);
+                var nn = 2 * Math.abs(line.fromX - line.toX);
                 //let data = sortedGreen.slice(0, nn);
-                let orders: number[] = sortedGreen.slice(0, nn);
-                let data: { ball: number, color: string }[] = [];
-                for (let bb = 0; bb < orders.length; bb++) {
+                var orders = sortedGreen.slice(0, nn);
+                var data = [];
+                for (var bb = 0; bb < orders.length; bb++) {
                     data.push({ ball: orders[bb] - 0.1, color: '#00990099' });
                 }
                 console.log('leftGreen', nn, data);
                 drawTestLines(data);
             }
             if (line.fromX == rightGreen || line.toX == rightGreen) {
-                let nn = 2 * Math.abs(line.fromX - line.toX);
+                var nn = 2 * Math.abs(line.fromX - line.toX);
                 //let data = sortedGreen.slice(sortedGreen.length - nn);
-                let orders: number[] = sortedGreen.slice(sortedGreen.length - nn);
-                let data: { ball: number, color: string }[] = [];
-                for (let bb = 0; bb < orders.length; bb++) {
+                var orders = sortedGreen.slice(sortedGreen.length - nn);
+                var data = [];
+                for (var bb = 0; bb < orders.length; bb++) {
                     data.push({ ball: orders[bb] - 0.1, color: '#00990099' });
                 }
                 console.log('rightGreen', nn, data);
                 drawTestLines(data);
             }
             if (line.fromX == leftGrey || line.toX == leftGrey) {
-                let nn = 2 * Math.abs(line.fromX - line.toX);
+                var nn = 2 * Math.abs(line.fromX - line.toX);
                 //let data = sortedGrey.slice(0, nn);
-                let orders: number[] = sortedGrey.slice(0, nn);
-                let data: { ball: number, color: string }[] = [];
-                for (let bb = 0; bb < orders.length; bb++) {
+                var orders = sortedGrey.slice(0, nn);
+                var data = [];
+                for (var bb = 0; bb < orders.length; bb++) {
                     data.push({ ball: orders[bb] - 0.2, color: '#66666699' });
                 }
                 console.log('leftGrey', nn, data);
                 drawTestLines(data);
             }
             if (line.fromX == rightGrey || line.toX == rightGrey) {
-                let nn = 2 * Math.abs(line.fromX - line.toX);
+                var nn = 2 * Math.abs(line.fromX - line.toX);
                 //let data = sortedGrey.slice(sortedGrey.length - nn);
-                let orders: number[] = sortedGrey.slice(sortedGrey.length - nn);
-                let data: { ball: number, color: string }[] = [];
-                for (let bb = 0; bb < orders.length; bb++) {
+                var orders = sortedGrey.slice(sortedGrey.length - nn);
+                var data = [];
+                for (var bb = 0; bb < orders.length; bb++) {
                     data.push({ ball: orders[bb] - 0.2, color: '#66666699' });
                 }
                 console.log('rightGrey', nn, data);
                 drawTestLines(data);
             }
-            
             if (line.fromX == leftRed || line.toX == leftRed) {
-                let nn = 2 * Math.abs(line.fromX - line.toX);
-                let data: { ball: number, color: string }[] = [];
-                for (let rr = 0; rr < nn; rr++) {
-                    let kk: number = rr ;
+                var nn = 2 * Math.abs(line.fromX - line.toX);
+                var data = [];
+                for (var rr = 0; rr < nn; rr++) {
+                    var kk = rr;
                     data.push({ ball: 1 + kk, color: '#ff000099' });
                 }
                 console.log('leftRed', nn, data);
                 drawTestLines(data);
             }
             if (line.fromX == rightRed || line.toX == rightRed) {
-                let nn = 2 * Math.abs(line.fromX - line.toX);
-                let data: { ball: number, color: string }[] = [];
-                for (let rr = 0; rr < nn; rr++) {
-                    let kk: number = rowLen - rr-1;
+                var nn = 2 * Math.abs(line.fromX - line.toX);
+                var data = [];
+                for (var rr = 0; rr < nn; rr++) {
+                    var kk = rowLen - rr - 1;
                     data.push({ ball: 1 + kk, color: '#ff000099' });
                 }
                 console.log('rightRed', nn, data);
                 drawTestLines(data);
             }
-
-
         }
     }
     drawLines();
 }
-*/
 function dumpLeftStat() {
     console.log('dumpLeftStat', datarows);
     var ss = [];

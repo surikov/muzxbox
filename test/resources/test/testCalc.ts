@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.123 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.124 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -776,7 +776,8 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 				sortedBlue[ff] = first[ff].ball;
 			}
 		}
-		lbl = 'blue';
+		//lbl = 'blue';
+		lbl = '';
 		let begin = -1;
 		let end = -1;
 		let begin2 = -1;
@@ -790,16 +791,19 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			}*/
 			if (ballExists(first[kk].ball, rows[rr])) {
 				if (showFirstRow || rr > 0) {
-					lbl = lbl + ' ●' + first[kk].ball;
+					//lbl = lbl + ' ●' + first[kk].ball;
+					lbl =  '●' + first[kk].ball+' '+lbl;
 					end = kk;
 					if (begin == -1) {
 						begin = kk;
 					}
 				} else {
-					lbl = lbl + ' ' + first[kk].ball;
+					//lbl = lbl + ' ' + first[kk].ball;
+					lbl =  first[kk].ball+' '+lbl;
 				}
 			} else {
-				lbl = lbl + ' ' + first[kk].ball;
+				//lbl = lbl + ' ' + first[kk].ball;
+				lbl =  first[kk].ball+' '+lbl;
 			}
 			
 		}
@@ -813,7 +817,8 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 				}
 			}
 		}
-		lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+		//lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+		lbl = '' + (rowLen - end - 1) + ':' + end + '(' + begin + '): blue ' + lbl;
 		if (rr == 0) {
 			//let middle=(first[first.length-1].summ-first[0].summ)/2+first[0].summ;
 			//console.log(lbl,first,middle);
@@ -829,12 +834,17 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		//if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
 
 		if (showFirstRow || rr > 0) {
+			let x2=xxx + (rowLen - 1) / 2;
 			let blue2 = '#3333ff33';
-			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: blue2, manual: false });
-			markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue2, manual: false });
+			markLines.push({ fromX: x2, fromY: yyy, toX: x2- begin2 / 2, toY: yyy, color: blue2, manual: false });
+			markLines.push({ fromX: xxx, fromY: yyy, toX: x2  - end2 / 2, toY: yyy, color: blue2, manual: false });
+			//markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: blue2, manual: false });
+			//markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue2, manual: false });
 			let blue = '#3333ffff';
-			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: blue, manual: false });
-			markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue, manual: false });
+			markLines.push({ fromX: x2, fromY: yyy, toX: x2- begin / 2, toY: yyy, color: blue, manual: false });
+			markLines.push({ fromX: xxx, fromY: yyy, toX: x2  - end / 2, toY: yyy, color: blue, manual: false });
+			//markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: blue, manual: false });
+			//markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue, manual: false });
 			blueStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
 		}
 		if (showFirstRow || rr > 0) {
@@ -859,10 +869,10 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			let red = '#ff3333ff';
 			let red2 = '#ff333333';
 			//if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
-			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: red2, manual: false });
-			markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red2, manual: false });
-			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: red, manual: false });
-			markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red, manual: false });
+			markLines.push({ fromX: xxx, fromY: yyy				, toX: xxx + begin2 / 2, toY: yyy, color: red2, manual: false });
+			markLines.push({ fromX: xxx + end2 / 2, fromY: yyy	, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red2, manual: false });
+			markLines.push({ fromX: xxx, fromY: yyy				, toX: xxx + begin / 2, toY: yyy, color: red, manual: false });
+			markLines.push({ fromX: xxx + end / 2, fromY: yyy	, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red, manual: false });
 			//console.log('red');
 			redStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
 		}
@@ -1090,12 +1100,14 @@ function drawTestLines(data: { ball: number, color: string }[]) {
 	}
 
 }
-/*
+
 function testTest() {
 	let yyy = rowsVisibleCount + 22 + skipRowsCount - 1;
 	console.log('TESTtEST', sortedBlue, sortedGreen, sortedGrey);
-	let leftBlue = Math.ceil(0 * rowLen / 2);
-	let rightBlue = Math.ceil(1 * rowLen / 2) - 1;
+	let rightBlue = Math.ceil(0 * rowLen / 2);
+	let leftBlue = Math.ceil(1 * rowLen / 2)-1;
+	//let leftBlue = Math.ceil(0 * rowLen / 2);
+	//let rightBlue = Math.ceil(1 * rowLen / 2) - 1;
 	let leftGreen = Math.ceil(1 * rowLen / 2);
 	let rightGreen = Math.ceil(2 * rowLen / 2) - 1;
 	let leftGrey = Math.ceil(2 * rowLen / 2);
@@ -1113,7 +1125,7 @@ function testTest() {
 				for (let bb = 0; bb < orders.length; bb++) {
 					data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
 				}
-				console.log('leftBlue', nn, data);
+				console.log('rightBlue', nn, data);
 				drawTestLines(data);
 
 			}
@@ -1125,7 +1137,7 @@ function testTest() {
 				for (let bb = 0; bb < orders.length; bb++) {
 					data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
 				}
-				console.log('rightBlue', nn, data);
+				console.log('leftBlue', nn, data);
 				drawTestLines(data);
 			}
 			if (line.fromX == leftGreen || line.toX == leftGreen) {
@@ -1199,7 +1211,7 @@ function testTest() {
 	}
 	drawLines();
 }
-*/
+
 function dumpLeftStat(){
 	console.log('dumpLeftStat',datarows);
 	let ss:number[]=[];
