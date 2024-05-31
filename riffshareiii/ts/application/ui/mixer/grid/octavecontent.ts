@@ -31,11 +31,11 @@ class OctaveContent {
 		if (cfg.data.tracks.length) {
 			if (zoomLevel == 0) {
 				this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg
-					, 'mixNoteLine', true
+					, 'mixNoteLine'//, true
 				);
 			} else {
 				this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg
-					, 'mixNoteLine', false
+					, 'mixNoteLine'//, false
 				);
 			}
 
@@ -53,7 +53,7 @@ class OctaveContent {
 		for (let ii = 1; ii < cfg.data.tracks.length; ii++) {
 			let track = cfg.data.tracks[ii];
 			this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg
-				, 'mixNoteSub', false
+				, 'mixNoteSub'//, false
 			);
 		}
 	}
@@ -62,7 +62,7 @@ class OctaveContent {
 		, barOctaveAnchor: TileAnchor
 		//, data: Zvoog_Project
 		, cfg: MixerDataMathUtility
-		, css: string, addMoreInfo: boolean
+		, css: string//, addMoreInfo: boolean
 	) {
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		let measure: Zvoog_TrackMeasure = track.measures[barIdx];
@@ -111,7 +111,7 @@ class OctaveContent {
 						/*if (slidearr.length > 1) {
 							console.log(line);
 						}*/
-						if (addMoreInfo && ss == 0) {
+						/*if (addMoreInfo && ss == 0) {
 							let txt = '' + (barIdx + 1)
 								+ ':' + chord.skip.count + '/' + chord.skip.part
 								+ '(' + note.pitch
@@ -119,7 +119,7 @@ class OctaveContent {
 								+ ')';
 							let info: TileText = { x: x1, y: y1 + 0.25, text: txt, css: 'timeBarNum025' };
 							barOctaveAnchor.content.push(info);
-						}
+						}*/
 						x1 = x2;
 						y1 = y2;
 					}

@@ -1385,39 +1385,34 @@ class LeftPanel {
             this.leftZoomAnchors[zz].content = [];
             for (let oo = 1; oo < cfg.octaveCount; oo++) {
                 if (zz < 4) {
-                    let octavemark = {
-                        x: 0,
-                        y: cfg.gridTop() + 12 * oo,
-                        w: 2 * zoomPrefixLevelsCSS[zz].minZoom,
-                        h: 2 * zoomPrefixLevelsCSS[zz].minZoom,
-                        css: 'octaveMark'
-                    };
-                    this.leftZoomAnchors[zz].content.push(octavemark);
-                    let nm = {
-                        x: 0,
-                        y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 2 * zoomPrefixLevelsCSS[zz].minZoom,
+                    let nm3 = {
+                        x: 1,
+                        y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom,
                         text: '' + (cfg.octaveCount - oo + 0),
                         css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
                     };
-                    this.leftZoomAnchors[zz].content.push(nm);
+                    this.leftZoomAnchors[zz].content.push(nm3);
                     if (zz < 2) {
-                        let nm = {
-                            x: 0,
+                        nm3.x = 0.5;
+                        let nm2 = {
+                            x: 0.5,
                             y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 6 * cfg.notePathHeight,
                             text: '' + (cfg.octaveCount - oo + 0),
                             css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
                         };
-                        this.leftZoomAnchors[zz].content.push(nm);
+                        this.leftZoomAnchors[zz].content.push(nm2);
                         if (zz < 1) {
+                            nm2.x = 0.25;
+                            nm3.x = 0.25;
                             let nm = {
-                                x: 0,
+                                x: 0.25,
                                 y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 3 * cfg.notePathHeight,
                                 text: '' + (cfg.octaveCount - oo + 0),
                                 css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
                             };
                             this.leftZoomAnchors[zz].content.push(nm);
                             nm = {
-                                x: 0,
+                                x: 0.25,
                                 y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 9 * cfg.notePathHeight,
                                 text: '' + (cfg.octaveCount - oo + 0),
                                 css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
@@ -1482,10 +1477,10 @@ class OctaveContent {
     addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, zoomLevel) {
         if (cfg.data.tracks.length) {
             if (zoomLevel == 0) {
-                this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, 'mixNoteLine', true);
+                this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, 'mixNoteLine');
             }
             else {
-                this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, 'mixNoteLine', false);
+                this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, 'mixNoteLine');
             }
         }
     }
@@ -1496,10 +1491,10 @@ class OctaveContent {
         }
         for (let ii = 1; ii < cfg.data.tracks.length; ii++) {
             let track = cfg.data.tracks[ii];
-            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, 'mixNoteSub', false);
+            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, 'mixNoteSub');
         }
     }
-    addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, css, addMoreInfo) {
+    addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, css) {
         let measure = track.measures[barIdx];
         for (let cc = 0; cc < measure.chords.length; cc++) {
             let chord = measure.chords[cc];
@@ -1536,15 +1531,6 @@ class OctaveContent {
                             css: css
                         };
                         barOctaveAnchor.content.push(line);
-                        if (addMoreInfo && ss == 0) {
-                            let txt = '' + (barIdx + 1)
-                                + ':' + chord.skip.count + '/' + chord.skip.part
-                                + '(' + note.pitch
-                                + '-' + slidearr[0].duration.count + '/' + slidearr[0].duration.part
-                                + ')';
-                            let info = { x: x1, y: y1 + 0.25, text: txt, css: 'timeBarNum025' };
-                            barOctaveAnchor.content.push(info);
-                        }
                         x1 = x2;
                         y1 = y2;
                     }
@@ -2238,15 +2224,15 @@ let mzxbxProjectForTesting2 = {
             title: "Track one", measures: [
                 {
                     chords: [
-                        { skip: { count: 0, part: 1 }, notes: [{ pitch: 25, slides: [] }] },
-                        { skip: { count: 1, part: 16 }, notes: [{ pitch: 26, slides: [] }] },
-                        { skip: { count: 1, part: 8 }, notes: [{ pitch: 27, slides: [] }] },
-                        { skip: { count: 3, part: 16 }, notes: [{ pitch: 28, slides: [] }] },
-                        { skip: { count: 1, part: 4 }, notes: [{ pitch: 29, slides: [] }] },
-                        { skip: { count: 5, part: 16 }, notes: [{ pitch: 30, slides: [] }] },
-                        { skip: { count: 3, part: 8 }, notes: [{ pitch: 31, slides: [] }] },
-                        { skip: { count: 7, part: 16 }, notes: [{ pitch: 32, slides: [] }] },
-                        { skip: { count: 1, part: 2 }, notes: [{ pitch: 33, slides: [] }] }
+                        { skip: { count: 0, part: 1 }, notes: [{ pitch: 25, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
+                        { skip: { count: 1, part: 16 }, notes: [{ pitch: 26, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
+                        { skip: { count: 1, part: 8 }, notes: [{ pitch: 27, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
+                        { skip: { count: 3, part: 16 }, notes: [{ pitch: 28, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
+                        { skip: { count: 1, part: 4 }, notes: [{ pitch: 29, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
+                        { skip: { count: 5, part: 16 }, notes: [{ pitch: 30, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
+                        { skip: { count: 3, part: 8 }, notes: [{ pitch: 31, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
+                        { skip: { count: 7, part: 16 }, notes: [{ pitch: 32, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
+                        { skip: { count: 1, part: 2 }, notes: [{ pitch: 33, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] }
                     ]
                 }, {
                     chords: [

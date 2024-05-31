@@ -51,44 +51,50 @@ class LeftPanel {
 			this.leftZoomAnchors[zz].content = [];
 			for (let oo = 1; oo < cfg.octaveCount; oo++) {
 				if (zz < 4) {
+					/*
 					let octavemark: TileRectangle = {
 						x: 0
 						, y: cfg.gridTop() + 12 * oo
 						, w: 2 * zoomPrefixLevelsCSS[zz].minZoom
-						, h: 2 * zoomPrefixLevelsCSS[zz].minZoom
+						, h: 0.5 * zoomPrefixLevelsCSS[zz].minZoom
 						, css: 'octaveMark'
 					};
 					this.leftZoomAnchors[zz].content.push(octavemark);
-					let nm: TileText = {
-						x: 0
-						, y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 2 * zoomPrefixLevelsCSS[zz].minZoom
+					*/
+					let nm3: TileText = {
+						x:1
+						, y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom
 						, text: '' + (cfg.octaveCount - oo + 0)
 						, css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
 					};
-					this.leftZoomAnchors[zz].content.push(nm);
+					this.leftZoomAnchors[zz].content.push(nm3);
 					if (zz < 2) {
-						let nm: TileText = {
-							x: 0
+						nm3.x=0.5;
+						let nm2: TileText = {
+							x: 0.5
 							, y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 6 * cfg.notePathHeight
 							, text: '' + (cfg.octaveCount - oo + 0)
 							, css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
 						};
-						this.leftZoomAnchors[zz].content.push(nm);
+						this.leftZoomAnchors[zz].content.push(nm2);
 						if (zz < 1) {
+							nm2.x=0.25;
+							nm3.x=0.25;
 							let nm: TileText = {
-								x: 0
+								x: 0.25
 								, y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 3 * cfg.notePathHeight
 								, text: '' + (cfg.octaveCount - oo + 0)
 								, css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
 							};
 							this.leftZoomAnchors[zz].content.push(nm);
 							nm = {
-								x: 0
+								x: 0.25
 								, y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 9 * cfg.notePathHeight
 								, text: '' + (cfg.octaveCount - oo + 0)
 								, css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
 							};
 							this.leftZoomAnchors[zz].content.push(nm);
+							//octavemark.w=4 * zoomPrefixLevelsCSS[zz].minZoom;
 						}
 					}
 

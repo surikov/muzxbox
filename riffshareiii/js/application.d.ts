@@ -248,7 +248,7 @@ declare class OctaveContent {
     constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, cfg: MixerDataMathUtility, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number);
     addUpperNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, cfg: MixerDataMathUtility, zoomLevel: number): void;
     addOtherNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, cfg: MixerDataMathUtility): void;
-    addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, cfg: MixerDataMathUtility, css: string, addMoreInfo: boolean): void;
+    addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, cfg: MixerDataMathUtility, css: string): void;
 }
 declare class MixerBar {
     octaves: BarOctave[];

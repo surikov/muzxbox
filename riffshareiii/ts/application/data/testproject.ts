@@ -21,15 +21,15 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 			title: "Track one", measures: [
 				{
 					chords: [
-						{ skip: { count: 0, part: 1 }, notes: [{ pitch: 25, slides: [] }] }
-						, { skip: { count: 1, part: 16 }, notes: [{ pitch: 26, slides: [] }] }
-						, { skip: { count: 1, part: 8 }, notes: [{ pitch: 27, slides: [] }] }
-						, { skip: { count: 3, part: 16 }, notes: [{ pitch: 28, slides: [] }] }
-						, { skip: { count: 1, part: 4 }, notes: [{ pitch: 29, slides: [] }] }
-						, { skip: { count: 5, part: 16 }, notes: [{ pitch: 30, slides: [] }] }
-						, { skip: { count: 3, part: 8 }, notes: [{ pitch: 31, slides: [] }] }
-						, { skip: { count: 7, part: 16 }, notes: [{ pitch: 32, slides: [] }] }
-						, { skip: { count: 1, part: 2 }, notes: [{ pitch: 33, slides: [] }] }
+						{ skip: { count: 0, part: 1 }, notes: [{ pitch: 25, slides: [{duration:{count:1,part:8},delta:0}] }] }
+						, { skip: { count: 1, part: 16 }, notes: [{ pitch: 26, slides: [{duration:{count:1,part:8},delta:0}] }] }
+						, { skip: { count: 1, part: 8 }, notes: [{ pitch: 27, slides: [{duration:{count:1,part:8},delta:0}] }] }
+						, { skip: { count: 3, part: 16 }, notes: [{ pitch: 28, slides: [{duration:{count:1,part:8},delta:0}] }] }
+						, { skip: { count: 1, part: 4 }, notes: [{ pitch: 29, slides: [{duration:{count:1,part:8},delta:0}] }] }
+						, { skip: { count: 5, part: 16 }, notes: [{ pitch: 30, slides: [{duration:{count:1,part:8},delta:0}] }] }
+						, { skip: { count: 3, part: 8 }, notes: [{ pitch: 31, slides: [{duration:{count:1,part:8},delta:0}] }] }
+						, { skip: { count: 7, part: 16 }, notes: [{ pitch: 32, slides: [{duration:{count:1,part:8},delta:0}] }] }
+						, { skip: { count: 1, part: 2 }, notes: [{ pitch: 33, slides: [{duration:{count:1,part:8},delta:0}] }] }
 					]
 				}, {
 					chords: [

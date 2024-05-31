@@ -75,7 +75,7 @@
 
 .currentTitleLabel {
     fill: var(--color-lines);
-    font-size: var(--label-1cm);
+    font-size: var(--label-05cm);
     pointer-events: none;
 	opacity: 50%;
 	transform: rotate(90deg);
