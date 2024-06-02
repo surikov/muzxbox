@@ -167,7 +167,7 @@ function init() {
     levelA = document.getElementById('levelA');
     linesLevel = document.getElementById('linesLevel');
     dataBalls = window[dataName];
-    console.log(dataBalls);
+    //console.log(dataBalls);
     datarows = readParseStat(dataBalls);
     //dumpStatLeftRed(datarows);
 }
@@ -1147,37 +1147,38 @@ function testTest() {
     }
     drawLines();
 }
-function dumpLeftStat() {
-    console.log('dumpLeftStat', datarows);
-    var ss = [];
-    for (var ii = 1; ii < datarows.length; ii++) {
-        var kk = datarows[ii].balls[0];
-        if (!(ss[kk]))
-            ss[kk] = 0;
+/*
+function dumpLeftStat(){
+    console.log('dumpLeftStat',datarows);
+    let ss:number[]=[];
+    for(let ii=1;ii<datarows.length;ii++){
+        let kk=datarows[ii].balls[0];
+        if(!(ss[kk]))ss[kk]=0;
         ss[kk]++;
     }
-    var itg = 0;
-    for (var ii = 1; ii < ss.length; ii++) {
-        var procnt = Math.round(1000 * ss[ii] / datarows.length) / 10;
-        itg = itg + procnt;
-        console.log(ii, procnt, itg);
+    let itg=0;
+    for(let ii=1;ii<ss.length;ii++){
+        let procnt=Math.round(1000*ss[ii]/datarows.length)/10;
+        itg=itg+procnt;
+        console.log(ii,procnt,itg);
     }
-    /*
-    let sngl=0;
-    let grp=0;
-    for(let ii=1;ii<datarows.length-5;ii++){
-        let kk=datarows[ii].balls[0];
-        if(kk>20){
-            if(datarows[ii+1].balls[0]<8){
-                sngl++;
-            }else{
-                grp++;
-            }
+*/
+/*
+let sngl=0;
+let grp=0;
+for(let ii=1;ii<datarows.length-5;ii++){
+    let kk=datarows[ii].balls[0];
+    if(kk>20){
+        if(datarows[ii+1].balls[0]<8){
+            sngl++;
+        }else{
+            grp++;
         }
     }
-    console.log('single',sngl,'group',grp);
-    */
 }
+console.log('single',sngl,'group',grp);
+*/
+//}
 /*
 function dumpPatternStat(){
     console.log('dumpPatternStat');
@@ -1202,6 +1203,59 @@ function dumpStat5(){
     console.log(45*45*45*45*45*45);
 }
 */
+function countHoles(datarows, long) {
+    var avg = 0;
+    for (var rr = 1; rr < datarows.length; rr++) {
+        var row = datarows[rr];
+        //console.log(row);
+        var rowCount = 0;
+        for (var bb = 1; bb <= rowLen; bb++) {
+            //console.log(bb);
+            var hole = true;
+            for (var kk = 0; kk < long; kk++) {
+                //console.log(kk);
+                if (ballExists(bb + kk, row)) { //console.log('exists',bb+kk);
+                    hole = false;
+                    break;
+                } //else console.log('not exists',bb+kk);
+            }
+            if (hole) {
+                rowCount++;
+            }
+        }
+        avg = avg + rowCount / rowLen;
+    }
+    console.log(long, avg / (datarows.length - 1));
+}
+function dumpHoleStat() {
+    var dataBalls = window[dataName];
+    var datarows = readParseStat(dataBalls);
+    console.log(datarows);
+    countHoles(datarows, 1);
+    countHoles(datarows, 2);
+    countHoles(datarows, 3);
+    countHoles(datarows, 4);
+    countHoles(datarows, 5);
+    countHoles(datarows, 6);
+    countHoles(datarows, 7);
+    countHoles(datarows, 8);
+    countHoles(datarows, 9);
+    countHoles(datarows, 10);
+    countHoles(datarows, 11);
+    countHoles(datarows, 12);
+    countHoles(datarows, 13);
+    countHoles(datarows, 14);
+    countHoles(datarows, 15);
+    countHoles(datarows, 16);
+    countHoles(datarows, 17);
+    countHoles(datarows, 18);
+    countHoles(datarows, 19);
+    countHoles(datarows, 20);
+    countHoles(datarows, 21);
+    countHoles(datarows, 22);
+    countHoles(datarows, 23);
+}
 init();
 addTails();
 //dumpStat5();
+dumpHoleStat();

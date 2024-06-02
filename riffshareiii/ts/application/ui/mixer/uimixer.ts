@@ -8,6 +8,10 @@ class MixerUI {
 	levels: MixerZoomLevel[] = [];
 	fillerAnchor: TileAnchor;
 	//samplerUI: SamplerRows;
+	fanPanel:FanPane=new FanPane();
+	constructor(){
+
+	}
 
 	reFillMixerUI(//data: Zvoog_Project
 		cfg: MixerDataMathUtility
@@ -31,6 +35,8 @@ class MixerUI {
 		this.fillerAnchor.ww = cfg.wholeWidth() - cfg.leftPad - cfg.rightPad;
 		this.fillerAnchor.hh = cfg.gridHeight();
 		this.reFillTracksRatio(cfg);
+		this.reFillTracksCompound(cfg);
+		this.fanPanel.resetPlates(cfg);
 
 	}
 	createMixerLayers(): TileLayerDefinition[] {
@@ -79,6 +85,9 @@ class MixerUI {
 		};
 		this.gridLayers.anchors.push(this.fillerAnchor);
 		return [this.gridLayers, this.trackLayers, this.firstLayers];
+	}
+	reFillTracksCompound(cfg: MixerDataMathUtility) {
+
 	}
 	reFillTracksRatio(cfg: MixerDataMathUtility) {
 		this.fillerAnchor.content = [];
@@ -203,6 +212,7 @@ class MixerUI {
 	addFillerComments(cfg: MixerDataMathUtility) {
 
 	}*/
+	/*
 	reFillTracksRatio22(cfg: MixerDataMathUtility) {
 		let mxNotes = 0;
 		let mxDrums = 0;
@@ -334,6 +344,6 @@ class MixerUI {
 			barX = barX + barwidth;
 		}
 
-	}
+	}*/
 
 }

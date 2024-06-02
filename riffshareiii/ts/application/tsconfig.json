@@ -44,6 +44,7 @@
 		,"ui/mixer/grid/autoBar.ts"
         ,"ui/mixer/uimixer.ts"
         ,"ui/mixer/grid/mixerzoomlevel.ts"
+		,"ui/mixer/fan/fanpane.ts"
         ,"ui/buttons/iconlabelbutton.ts"
 		
 		,"ui/iconlabels.ts"

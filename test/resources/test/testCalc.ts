@@ -186,7 +186,7 @@ function init() {
 	levelA = (document.getElementById('levelA') as any) as SVGElement;
 	linesLevel = (document.getElementById('linesLevel') as any) as SVGElement;
 	dataBalls = window[dataName];
-	console.log(dataBalls);
+	//console.log(dataBalls);
 	datarows = readParseStat(dataBalls);
 	//dumpStatLeftRed(datarows);
 }
@@ -1211,7 +1211,7 @@ function testTest() {
 	}
 	drawLines();
 }
-
+/*
 function dumpLeftStat(){
 	console.log('dumpLeftStat',datarows);
 	let ss:number[]=[];
@@ -1226,6 +1226,7 @@ function dumpLeftStat(){
 		itg=itg+procnt;
 		console.log(ii,procnt,itg);
 	}
+*/
 	/*
 	let sngl=0;
 	let grp=0;
@@ -1242,7 +1243,7 @@ function dumpLeftStat(){
 	console.log('single',sngl,'group',grp);
 	*/
 	
-}
+//}
 /*
 function dumpPatternStat(){
 	console.log('dumpPatternStat');
@@ -1267,6 +1268,66 @@ function dumpStat5(){
 	console.log(45*45*45*45*45*45); 
 }
 */
+function countHoles(datarows:BallsRow[],long:number){
+    let avg=0;
+    for(let rr=1;rr<datarows.length;rr++){
+        let row:BallsRow=datarows[rr];
+        //console.log(row);
+        let rowCount=0;
+        for(let bb=1;bb<=rowLen;bb++){
+            //console.log(bb);
+            let hole=true;
+            for(let kk=0;kk<long;kk++){
+                //console.log(kk);
+                if(ballExists(bb+kk,row)){//console.log('exists',bb+kk);
+                    hole=false;
+                    break;
+                }//else console.log('not exists',bb+kk);
+            }
+            if(hole){
+                rowCount++;
+            }
+        }
+        avg=avg+rowCount/rowLen;
+    }
+    console.log(long,avg/(datarows.length-1));
+}
+function dumpHoleStat(){
+    let dataBalls = window[dataName];
+	let datarows:BallsRow[]  = readParseStat(dataBalls);
+    console.log(datarows);
+    countHoles(datarows,1);
+    countHoles(datarows,2);
+    countHoles(datarows,3);
+    countHoles(datarows,4);
+    countHoles(datarows,5);
+    countHoles(datarows,6);
+    countHoles(datarows,7);
+    countHoles(datarows,8);
+    countHoles(datarows,9);
+    countHoles(datarows,10);
+    countHoles(datarows,11);
+    countHoles(datarows,12);
+    countHoles(datarows,13);
+    countHoles(datarows,14);
+    countHoles(datarows,15);
+    countHoles(datarows,16);
+    countHoles(datarows,17);
+    countHoles(datarows,18);
+    countHoles(datarows,19);
+    countHoles(datarows,20);
+    countHoles(datarows,21);
+    countHoles(datarows,22);
+    countHoles(datarows,23);
+}
 init();
 addTails();
 //dumpStat5();
+dumpHoleStat();
+
+
+
+
+
+
+

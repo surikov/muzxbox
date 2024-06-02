@@ -1711,6 +1711,7 @@ class AutomationBarContent {
 class MixerUI {
     constructor() {
         this.levels = [];
+        this.fanPanel = new FanPane();
     }
     reFillMixerUI(cfg) {
         let ww = cfg.wholeWidth();
@@ -1729,6 +1730,7 @@ class MixerUI {
         this.fillerAnchor.ww = cfg.wholeWidth() - cfg.leftPad - cfg.rightPad;
         this.fillerAnchor.hh = cfg.gridHeight();
         this.reFillTracksRatio(cfg);
+        this.fanPanel.resetPlates(cfg);
     }
     createMixerLayers() {
         let tracksLayerZoom = document.getElementById('tracksLayerZoom');
@@ -2064,6 +2066,11 @@ class MixerZoomLevel {
                 }
             }
         }
+    }
+}
+class FanPane {
+    resetPlates(cfg) {
+        console.log(cfg);
     }
 }
 class IconLabelButton {
