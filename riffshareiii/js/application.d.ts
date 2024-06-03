@@ -272,8 +272,8 @@ declare class MixerUI {
     constructor();
     reFillMixerUI(cfg: MixerDataMathUtility): void;
     createMixerLayers(): TileLayerDefinition[];
-    reFillTracksCompound(cfg: MixerDataMathUtility): void;
-    reFillTracksRatio(cfg: MixerDataMathUtility): void;
+    reFillSingleRatio(cfg: MixerDataMathUtility): void;
+    reFillWholeRatio(cfg: MixerDataMathUtility): void;
     barTrackCount(cfg: MixerDataMathUtility, bb: number): number;
     barDrumCount(cfg: MixerDataMathUtility, bb: number): number;
     barAutoCount(cfg: MixerDataMathUtility, bb: number): number;

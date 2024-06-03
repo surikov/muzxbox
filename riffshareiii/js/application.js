@@ -1730,8 +1730,8 @@ class MixerUI {
         this.fillerAnchor.ww = cfg.wholeWidth() - cfg.leftPad - cfg.rightPad;
         this.fillerAnchor.hh = cfg.gridHeight();
         this.fillerAnchor.content = [];
-        this.reFillTracksRatio(cfg);
-        this.reFillTracksCompound(cfg);
+        this.reFillWholeRatio(cfg);
+        this.reFillSingleRatio(cfg);
         this.fanPanel.resetPlates(cfg);
     }
     createMixerLayers() {
@@ -1770,10 +1770,10 @@ class MixerUI {
         this.gridLayers.anchors.push(this.fillerAnchor);
         return [this.gridLayers, this.trackLayers, this.firstLayers];
     }
-    reFillTracksCompound(cfg) {
+    reFillSingleRatio(cfg) {
         let countFunction;
-        let yy = cfg.gridTop();
-        let hh = cfg.gridHeight();
+        let yy = cfg.gridTop() + cfg.gridHeight() / 8;
+        let hh = cfg.gridHeight() * 6 / 8;
         if (cfg.data.focus) {
             if (cfg.data.focus == 1) {
                 countFunction = this.barDrumCount;
@@ -1822,7 +1822,25 @@ class MixerUI {
             barX = barX + barwidth;
         }
     }
-    reFillTracksRatio(cfg) {
+    reFillWholeRatio(cfg) {
+        let yy = cfg.gridTop();
+        let hh = cfg.gridHeight() / 8;
+        if (cfg.data.focus) {
+            if (cfg.data.focus == 1) {
+                yy = cfg.gridTop();
+                hh = cfg.gridHeight() - cfg.data.percussions.length;
+            }
+            else {
+                if (cfg.data.focus == 2) {
+                    yy = cfg.gridTop() + cfg.maxAutomationsCount;
+                    hh = cfg.gridHeight() - cfg.maxAutomationsCount;
+                }
+                else {
+                    yy = cfg.gridTop() + cfg.commentsMaxHeight();
+                    hh = cfg.gridHeight() - cfg.commentsMaxHeight();
+                }
+            }
+        }
         let countFunction = (cfg, barIdx) => {
             return this.barDrumCount(cfg, barIdx) + this.barAutoCount(cfg, barIdx) + this.barCommentsCount(cfg, barIdx) + this.barTrackCount(cfg, barIdx);
         };
@@ -1843,12 +1861,23 @@ class MixerUI {
             let barwidth = MMUtil().set(cfg.data.timeline[bb].metre).duration(cfg.data.timeline[bb].tempo) * cfg.widthDurationRatio;
             let fillRectangle = {
                 x: cfg.leftPad + barX,
-                y: cfg.gridTop(),
+                y: yy,
                 w: barwidth,
-                h: cfg.gridHeight(),
+                h: hh,
                 css: css
             };
             this.fillerAnchor.content.push(fillRectangle);
+            if (cfg.data.focus) {
+            }
+            else {
+                this.fillerAnchor.content.push({
+                    x: cfg.leftPad + barX,
+                    y: cfg.gridTop() + cfg.gridHeight() * 7 / 8,
+                    w: barwidth,
+                    h: hh,
+                    css: css
+                });
+            }
             barX = barX + barwidth;
         }
     }
