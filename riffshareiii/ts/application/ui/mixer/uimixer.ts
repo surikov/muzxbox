@@ -94,8 +94,8 @@ class MixerUI {
 		if (cfg.data.focus) {
 			if (cfg.data.focus == 1) {
 				countFunction = this.barDrumCount;
-				yy = cfg.gridTop() + cfg.gridHeight() - cfg.data.percussions.length;
-				hh = cfg.data.percussions.length;
+				yy = cfg.gridTop() + cfg.gridHeight() - 2*cfg.data.percussions.length;
+				hh = 2*cfg.data.percussions.length;
 			} else {
 				if (cfg.data.focus == 2) {
 					countFunction = this.barAutoCount;
@@ -162,7 +162,7 @@ class MixerUI {
 		if (cfg.data.focus) {
 			if (cfg.data.focus == 1) {
 				yy = cfg.gridTop();
-				hh = cfg.gridHeight() - cfg.data.percussions.length;
+				hh = cfg.gridHeight() - 2*cfg.data.percussions.length;
 			} else {
 				if (cfg.data.focus == 2) {
 					yy = cfg.gridTop() + cfg.maxAutomationsCount;

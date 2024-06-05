@@ -62,14 +62,14 @@ class LeftPanel {
 					this.leftZoomAnchors[zz].content.push(octavemark);
 					*/
 					let nm3: TileText = {
-						x:1
+						x: 1
 						, y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom
 						, text: '' + (cfg.octaveCount - oo + 0)
 						, css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(nm3);
 					if (zz < 2) {
-						nm3.x=0.5;
+						nm3.x = 0.5;
 						let nm2: TileText = {
 							x: 0.5
 							, y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 6 * cfg.notePathHeight
@@ -78,8 +78,8 @@ class LeftPanel {
 						};
 						this.leftZoomAnchors[zz].content.push(nm2);
 						if (zz < 1) {
-							nm2.x=0.25;
-							nm3.x=0.25;
+							nm2.x = 0.25;
+							nm3.x = 0.25;
 							let nm: TileText = {
 								x: 0.25
 								, y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 3 * cfg.notePathHeight
@@ -119,10 +119,28 @@ class LeftPanel {
 					let samplerLabel: TileText = {
 						text: '' + cfg.data.percussions[ss].title
 						, x: 0
-						, y: cfg.gridTop() + cfg.gridHeight() - cfg.data.percussions.length + cfg.notePathHeight * ss + cfg.notePathHeight
+						, y: cfg.gridTop() + cfg.gridHeight() - 2 * cfg.data.percussions.length + 2 * cfg.notePathHeight * ss + 2 * cfg.notePathHeight
 						, css: 'samplerRowLabel' + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(samplerLabel);
+					//console.log('samplerLabel', samplerLabel);
+				}
+			}
+			if (zz < 4) {
+				let yy = 0;
+				for (let ff = 0; ff < cfg.data.filters.length; ff++) {
+					let filter = cfg.data.filters[ff];
+					if (filter.automation) {
+						let autoLabel: TileText = {
+							text: '' + filter.automation.title
+							, x: 0
+							, y: (cfg.gridTop()+yy+1) * cfg.notePathHeight
+							, css: 'autoRowLabel' + zoomPrefixLevelsCSS[zz].prefix
+						};
+						this.leftZoomAnchors[zz].content.push(autoLabel);
+						//console.log('autoLabel', autoLabel);
+						yy++;
+					}
 				}
 			}
 		}

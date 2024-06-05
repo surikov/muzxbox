@@ -9,11 +9,11 @@ class OctaveContent {
 		, barOctaveFirstAnchor: TileAnchor
 		, zoomLevel: number) {
 		if (zoomLevel < 8) {
-			if (cfg.data.focus) {
+			//if (cfg.data.focus) {
 				//
-			} else {
+			//} else {
 				this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, cfg, zoomLevel);
-			}
+			//}
 			if (zoomLevel < 7) {
 
 				this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, cfg);
@@ -29,13 +29,17 @@ class OctaveContent {
 		, zoomLevel: number
 	) {
 		if (cfg.data.tracks.length) {
+			let css='mixNoteLine';
+			if (cfg.data.focus) {
+				css='mixNoteSub';
+				}
 			if (zoomLevel == 0) {
 				this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg
-					, 'mixNoteLine'//, true
+					, css//, true
 				);
 			} else {
 				this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg
-					, 'mixNoteLine'//, false
+					, css//, false
 				);
 			}
 
@@ -46,10 +50,10 @@ class OctaveContent {
 		, barOctaveAnchor: TileAnchor//, data: Zvoog_Project
 		, cfg: MixerDataMathUtility
 	) {
-		let start=1;
-		if (cfg.data.focus) {
-			start=0;
-		}
+		//let start=1;
+		//if (cfg.data.focus) {
+		//	start=0;
+		//}
 		for (let ii = 1; ii < cfg.data.tracks.length; ii++) {
 			let track = cfg.data.tracks[ii];
 			this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg

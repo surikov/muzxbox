@@ -1,6 +1,6 @@
 class SamplerBar {
 	constructor(//data: Zvoog_Project
-	cfg:MixerDataMathUtility
+		cfg: MixerDataMathUtility
 		, barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number) {
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		let drum: Zvoog_PercussionTrack = cfg.data.percussions[drumIdx];
@@ -8,29 +8,32 @@ class SamplerBar {
 		//console.log(drum.title,barIdx,measure.skips);
 		//let yy = cfg.samplerTop() + drumIdx * cfg.notePathHeight;
 		//let yy = cfg.gridTop() + drumIdx * cfg.notePathHeight;
-		let yy = cfg.gridTop() + cfg.gridHeight() - cfg.data.percussions.length+ drumIdx * cfg.notePathHeight;
+		let yy = cfg.gridTop() + cfg.gridHeight() - 2 * cfg.data.percussions.length + drumIdx * cfg.notePathHeight * 2;
 		let tempo = cfg.data.timeline[barIdx].tempo;
+		let css = 'samplerDrumDotBg';
+		if (cfg.data.focus) if (cfg.data.focus == 1) css = 'samplerDrumDotFocused';
 		for (let ss = 0; ss < measure.skips.length; ss++) {
 			let skip: Zvoog_Metre = measure.skips[ss];
 			let xx = left + MMUtil().set(skip).duration(tempo) * cfg.widthDurationRatio
-/*
-			let dot: TileRectangle = {
-				x: xx
-				, y: yy + 0.1
-				, w: 0.8 * mixm.notePathHeight
-				, h: 0.8 * mixm.notePathHeight
-				, rx: 1 * mixm.notePathHeight / 8
-				, ry: 1 * mixm.notePathHeight / 8
-				, css: 'samplerDrumDot'
-			};
-			anchor.content.push(dot);
-			*/
+			/*
+						let dot: TileRectangle = {
+							x: xx
+							, y: yy + 0.1
+							, w: 0.8 * mixm.notePathHeight
+							, h: 0.8 * mixm.notePathHeight
+							, rx: 1 * mixm.notePathHeight / 8
+							, ry: 1 * mixm.notePathHeight / 8
+							, css: 'samplerDrumDot'
+						};
+						anchor.content.push(dot);
+						*/
+
 			let ply: TilePolygon = {
 				dots: [xx, yy + 0.025
-					, xx, yy + 0.975
-					, xx + 0.75, yy + 0.5
+					, xx, yy + 2 - 0.025
+					, xx + 1.5, yy + 1
 				]
-				, css: 'samplerDrumDot'
+				, css: css
 			};
 			anchor.content.push(ply);
 		}

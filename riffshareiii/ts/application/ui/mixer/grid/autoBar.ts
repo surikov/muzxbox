@@ -21,6 +21,9 @@ class AutomationBarContent {
 		};
 		barOctaveAnchor.content.push(barAutoRightBorder);
 */
+		let css = 'automationBgDot';
+		if (cfg.data.focus) if (cfg.data.focus == 2) css = 'automationFocusedDot';
+		let yy =0;
 		for (let ff = 0; ff < cfg.data.filters.length; ff++) {
 			let filter = cfg.data.filters[ff];
 			if (filter.automation) {
@@ -30,14 +33,16 @@ class AutomationBarContent {
 						let change = measure.changes[ii];
 						let xx = barLeft + MMUtil().set(change.skip).duration(curBar.tempo) * cfg.widthDurationRatio;
 						let aubtn: TilePolygon = {
-							dots: [xx, top + cfg.notePathHeight * ff
-								, xx+1,top + cfg.notePathHeight * ff
-								, xx , top + cfg.notePathHeight * (ff+1)
+							dots: [xx, top + cfg.notePathHeight * yy//cfg.notePathHeight * ff
+								, xx + 1, top + cfg.notePathHeight * yy//cfg.notePathHeight * ff
+								, xx, top + cfg.notePathHeight * (yy+1)//cfg.notePathHeight * (ff + 1)
 							]
-							, css: 'automationChangeDot'
+							, css: css
 						};
 						barOctaveAnchor.content.push(aubtn);
+						
 					}
+					yy++;
 				}
 			}
 		}

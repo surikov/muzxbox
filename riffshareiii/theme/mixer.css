@@ -308,8 +308,13 @@
 	pointer-events: none;
 }
 
-.automationChangeDot{
+.automationBgDot{
 	fill: var(--color-lines);
+	fill-opacity:75%;
+    stroke: none;
+}
+.automationFocusedDot{
+	fill: var(--color-text);
 	fill-opacity:75%;
     stroke: none;
 }

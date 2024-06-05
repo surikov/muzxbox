@@ -62,17 +62,17 @@ class MixerZoomLevel {
 		this.addCommentLines(cfg);
 	}
 	addDrumLines(cfg: MixerDataMathUtility) {
-	/*	if (this.zoomLevelIndex < 4) {
-			for (let ss = 1; ss < cfg.data.percussions.length; ss++) {
-				let line: TileRectangle = {
-					x: cfg.leftPad
-					, y: cfg.samplerTop() + cfg.notePathHeight * ss
-					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0
-					, w: cfg.timelineWidth(), css: 'samplerRowBorder'
-				};
-				this.zoomGridAnchor.content.push(line);
-			}
-		}*/
+		/*	if (this.zoomLevelIndex < 4) {
+				for (let ss = 1; ss < cfg.data.percussions.length; ss++) {
+					let line: TileRectangle = {
+						x: cfg.leftPad
+						, y: cfg.samplerTop() + cfg.notePathHeight * ss
+						, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0
+						, w: cfg.timelineWidth(), css: 'samplerRowBorder'
+					};
+					this.zoomGridAnchor.content.push(line);
+				}
+			}*/
 	}
 	addCommentLines(cfg: MixerDataMathUtility) {
 		/*if (this.zoomLevelIndex < 3) {
@@ -105,13 +105,38 @@ class MixerZoomLevel {
 				}
 				if (this.zoomLevelIndex < 3) {
 					for (let kk = 1; kk < 12; kk++) {
-						barOctaveAnchor.content.push({
-							x: cfg.leftPad
-							, y: cfg.gridTop() + (oo * 12 + kk) * cfg.notePathHeight
-							, w: cfg.timelineWidth()
-							, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
-							, css: 'interActiveGridLine'
-						});
+						//let yy = cfg.gridTop() + (oo * 12 + kk) * cfg.notePathHeight;
+						let need = false;
+						if (cfg.data.focus) {
+							if (cfg.data.focus == 1) {
+								if (oo * 12 + kk > 12 * cfg.octaveCount - cfg.data.percussions.length * 2-2) {
+									if (!((oo * 12 + kk) % 2)) {
+										need = true;
+									}
+								}
+							} else {
+								if (cfg.data.focus == 2) {
+									if (oo * 12 + kk <= cfg.maxAutomationsCount ) {
+										need = true;
+									}
+								} else {
+									if (oo * 12 + kk < 2+cfg.maxCommentRowCount ) {
+										need = true;
+									}
+								}
+							}
+						} else {
+							need = true;
+						}
+						if (need) {
+							barOctaveAnchor.content.push({
+								x: cfg.leftPad
+								, y: cfg.gridTop() + (oo * 12 + kk) * cfg.notePathHeight
+								, w: cfg.timelineWidth()
+								, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
+								, css: 'interActiveGridLine'
+							});
+						}
 					}
 				}
 			}

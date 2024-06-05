@@ -1427,10 +1427,26 @@ class LeftPanel {
                     let samplerLabel = {
                         text: '' + cfg.data.percussions[ss].title,
                         x: 0,
-                        y: cfg.gridTop() + cfg.gridHeight() - cfg.data.percussions.length + cfg.notePathHeight * ss + cfg.notePathHeight,
+                        y: cfg.gridTop() + cfg.gridHeight() - 2 * cfg.data.percussions.length + 2 * cfg.notePathHeight * ss + 2 * cfg.notePathHeight,
                         css: 'samplerRowLabel' + zoomPrefixLevelsCSS[zz].prefix
                     };
                     this.leftZoomAnchors[zz].content.push(samplerLabel);
+                }
+            }
+            if (zz < 4) {
+                let yy = 0;
+                for (let ff = 0; ff < cfg.data.filters.length; ff++) {
+                    let filter = cfg.data.filters[ff];
+                    if (filter.automation) {
+                        let autoLabel = {
+                            text: '' + filter.automation.title,
+                            x: 0,
+                            y: (cfg.gridTop() + yy + 1) * cfg.notePathHeight,
+                            css: 'autoRowLabel' + zoomPrefixLevelsCSS[zz].prefix
+                        };
+                        this.leftZoomAnchors[zz].content.push(autoLabel);
+                        yy++;
+                    }
                 }
             }
         }
@@ -1440,17 +1456,21 @@ class SamplerBar {
     constructor(cfg, barIdx, drumIdx, zoomLevel, anchor, left) {
         let drum = cfg.data.percussions[drumIdx];
         let measure = drum.measures[barIdx];
-        let yy = cfg.gridTop() + cfg.gridHeight() - cfg.data.percussions.length + drumIdx * cfg.notePathHeight;
+        let yy = cfg.gridTop() + cfg.gridHeight() - 2 * cfg.data.percussions.length + drumIdx * cfg.notePathHeight * 2;
         let tempo = cfg.data.timeline[barIdx].tempo;
+        let css = 'samplerDrumDotBg';
+        if (cfg.data.focus)
+            if (cfg.data.focus == 1)
+                css = 'samplerDrumDotFocused';
         for (let ss = 0; ss < measure.skips.length; ss++) {
             let skip = measure.skips[ss];
             let xx = left + MMUtil().set(skip).duration(tempo) * cfg.widthDurationRatio;
             let ply = {
                 dots: [xx, yy + 0.025,
-                    xx, yy + 0.975,
-                    xx + 0.75, yy + 0.5
+                    xx, yy + 2 - 0.025,
+                    xx + 1.5, yy + 1
                 ],
-                css: 'samplerDrumDot'
+                css: css
             };
             anchor.content.push(ply);
         }
@@ -1464,11 +1484,7 @@ class BarOctave {
 class OctaveContent {
     constructor(barIdx, octaveIdx, left, top, width, height, cfg, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel) {
         if (zoomLevel < 8) {
-            if (cfg.data.focus) {
-            }
-            else {
-                this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, cfg, zoomLevel);
-            }
+            this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, cfg, zoomLevel);
             if (zoomLevel < 7) {
                 this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, cfg);
             }
@@ -1476,19 +1492,19 @@ class OctaveContent {
     }
     addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, zoomLevel) {
         if (cfg.data.tracks.length) {
+            let css = 'mixNoteLine';
+            if (cfg.data.focus) {
+                css = 'mixNoteSub';
+            }
             if (zoomLevel == 0) {
-                this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, 'mixNoteLine');
+                this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, css);
             }
             else {
-                this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, 'mixNoteLine');
+                this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, css);
             }
         }
     }
     addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg) {
-        let start = 1;
-        if (cfg.data.focus) {
-            start = 0;
-        }
         for (let ii = 1; ii < cfg.data.tracks.length; ii++) {
             let track = cfg.data.tracks[ii];
             this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, 'mixNoteSub');
@@ -1686,6 +1702,11 @@ class AutomationBarContent {
         let left = barLeft + width;
         let top = cfg.automationTop();
         let height = cfg.automationMaxHeight();
+        let css = 'automationBgDot';
+        if (cfg.data.focus)
+            if (cfg.data.focus == 2)
+                css = 'automationFocusedDot';
+        let yy = 0;
         for (let ff = 0; ff < cfg.data.filters.length; ff++) {
             let filter = cfg.data.filters[ff];
             if (filter.automation) {
@@ -1695,14 +1716,15 @@ class AutomationBarContent {
                         let change = measure.changes[ii];
                         let xx = barLeft + MMUtil().set(change.skip).duration(curBar.tempo) * cfg.widthDurationRatio;
                         let aubtn = {
-                            dots: [xx, top + cfg.notePathHeight * ff,
-                                xx + 1, top + cfg.notePathHeight * ff,
-                                xx, top + cfg.notePathHeight * (ff + 1)
+                            dots: [xx, top + cfg.notePathHeight * yy,
+                                xx + 1, top + cfg.notePathHeight * yy,
+                                xx, top + cfg.notePathHeight * (yy + 1)
                             ],
-                            css: 'automationChangeDot'
+                            css: css
                         };
                         barOctaveAnchor.content.push(aubtn);
                     }
+                    yy++;
                 }
             }
         }
@@ -1777,8 +1799,8 @@ class MixerUI {
         if (cfg.data.focus) {
             if (cfg.data.focus == 1) {
                 countFunction = this.barDrumCount;
-                yy = cfg.gridTop() + cfg.gridHeight() - cfg.data.percussions.length;
-                hh = cfg.data.percussions.length;
+                yy = cfg.gridTop() + cfg.gridHeight() - 2 * cfg.data.percussions.length;
+                hh = 2 * cfg.data.percussions.length;
             }
             else {
                 if (cfg.data.focus == 2) {
@@ -1828,7 +1850,7 @@ class MixerUI {
         if (cfg.data.focus) {
             if (cfg.data.focus == 1) {
                 yy = cfg.gridTop();
-                hh = cfg.gridHeight() - cfg.data.percussions.length;
+                hh = cfg.gridHeight() - 2 * cfg.data.percussions.length;
             }
             else {
                 if (cfg.data.focus == 2) {
@@ -1990,13 +2012,40 @@ class MixerZoomLevel {
                 }
                 if (this.zoomLevelIndex < 3) {
                     for (let kk = 1; kk < 12; kk++) {
-                        barOctaveAnchor.content.push({
-                            x: cfg.leftPad,
-                            y: cfg.gridTop() + (oo * 12 + kk) * cfg.notePathHeight,
-                            w: cfg.timelineWidth(),
-                            h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
-                            css: 'interActiveGridLine'
-                        });
+                        let need = false;
+                        if (cfg.data.focus) {
+                            if (cfg.data.focus == 1) {
+                                if (oo * 12 + kk > 12 * cfg.octaveCount - cfg.data.percussions.length * 2 - 2) {
+                                    if (!((oo * 12 + kk) % 2)) {
+                                        need = true;
+                                    }
+                                }
+                            }
+                            else {
+                                if (cfg.data.focus == 2) {
+                                    if (oo * 12 + kk <= cfg.maxAutomationsCount) {
+                                        need = true;
+                                    }
+                                }
+                                else {
+                                    if (oo * 12 + kk < 2 + cfg.maxCommentRowCount) {
+                                        need = true;
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            need = true;
+                        }
+                        if (need) {
+                            barOctaveAnchor.content.push({
+                                x: cfg.leftPad,
+                                y: cfg.gridTop() + (oo * 12 + kk) * cfg.notePathHeight,
+                                w: cfg.timelineWidth(),
+                                h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
+                                css: 'interActiveGridLine'
+                            });
+                        }
                     }
                 }
             }

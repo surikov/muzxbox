@@ -3,8 +3,13 @@
 	fill-opacity:25%;
     stroke: none;
 }
-.samplerDrumDot{
+.samplerDrumDotFocused{
 	fill: var(--color-text);
+	fill-opacity:99%;
+    stroke: none;
+}
+.samplerDrumDotBg{
+	fill: var(--color-lines);
 	fill-opacity:75%;
     stroke: none;
 }
