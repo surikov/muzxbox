@@ -171,14 +171,17 @@ function composeBaseMenu(): MenuInfo[] {
 						]
 					}
 				]
-			}, menuPointTracks
-			, menuPointPercussion
-			, menuPointAutomation
+			}
 			, {
 				text: localMenuCommentsLayer, onClick: () => {
 					commandDispatcher.upCommentsLayer();
 				}
 			}
+			, menuPointAutomation
+			, menuPointTracks
+			, menuPointPercussion
+			
+			
 		];
 		console.log('base menu', menuItemsData);
 		return menuItemsData;

@@ -273,6 +273,11 @@
     font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
+.commentLineText16 {
+    fill: var(--color-text);
+    font-size: calc(4*var(--tapSize));
+	pointer-events: none;
+}
 
 
 
@@ -303,6 +308,11 @@
 	pointer-events: none;
 }
 .commentReadText8 {
+    fill: var(--color-lines);
+    font-size: calc(4*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText16 {
     fill: var(--color-lines);
     font-size: calc(4*var(--tapSize));
 	pointer-events: none;

@@ -1348,14 +1348,15 @@ function composeBaseMenu() {
                         ]
                     }
                 ]
-            }, menuPointTracks,
-            menuPointPercussion,
-            menuPointAutomation,
+            },
             {
                 text: localMenuCommentsLayer, onClick: () => {
                     commandDispatcher.upCommentsLayer();
                 }
-            }
+            },
+            menuPointAutomation,
+            menuPointTracks,
+            menuPointPercussion
         ];
         console.log('base menu', menuItemsData);
         return menuItemsData;
@@ -1611,10 +1612,10 @@ class MixerBar {
                 }
             }
         }
-        if (zoomLevel < 6) {
+        if (zoomLevel < 7) {
             new TextComments(barIdx, cfg, left, gridZoomBarAnchor, zoomLevel);
         }
-        if (zoomLevel < 6) {
+        if (zoomLevel < 7) {
             new AutomationBarContent(barIdx, cfg, left, gridZoomBarAnchor, zoomLevel);
         }
     }
@@ -2054,7 +2055,20 @@ class MixerZoomLevel {
 }
 class FanPane {
     resetPlates(cfg) {
-        console.log(cfg);
+        console.log('FanPane.resetPlates', cfg);
+        for (let ff = 0; ff < cfg.data.filters.length; ff++) {
+            if (cfg.data.filters[ff].automation) {
+                console.log('automation', ff, cfg.data.filters[ff]);
+            }
+        }
+        for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
+            new PerformerIcon().buildPerformerSpot(cfg.data.tracks[tt]);
+        }
+    }
+}
+class PerformerIcon {
+    buildPerformerSpot(track) {
+        console.log('buildPerformerSpot', track.performer);
     }
 }
 class IconLabelButton {
@@ -2231,19 +2245,19 @@ let mzxbxProjectForTesting2 = {
                     ]
                 }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: '', data: '', kind: '', outputId: '' }
+            performer: { id: 't1', data: '', kind: 'basePitched', outputId: 'track1Volme' }
         },
         {
             title: "Second track", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: '', data: '', kind: '', outputId: '' }
+            performer: { id: 't2', data: '', kind: 'basePitched', outputId: 'track2Volme' }
         },
         {
             title: "Third track", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: '', data: '', kind: '', outputId: '' }
+            performer: { id: 't3', data: '', kind: 'basePitched', outputId: 'track3Volme' }
         }
     ],
     percussions: [
@@ -2251,15 +2265,15 @@ let mzxbxProjectForTesting2 = {
             title: "Snare", measures: [
                 { skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
             ],
-            sampler: { id: '', data: '', kind: '', outputId: '' }
+            sampler: { id: 'd1', data: '', kind: 'baseSampler', outputId: 'drum1Volme' }
         },
         {
             title: "Snare2", measures: [],
-            sampler: { id: '', data: '', kind: '', outputId: '' }
+            sampler: { id: 'd2', data: '', kind: 'baseSampler', outputId: 'drum2Volme' }
         },
         {
             title: "Snare3", measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }],
-            sampler: { id: '', data: '', kind: '', outputId: '' }
+            sampler: { id: 'd3', data: '', kind: 'baseSampler', outputId: 'drum3Volme' }
         }
     ],
     comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16', row: 0 }] }, {
@@ -2285,46 +2299,15 @@ let mzxbxProjectForTesting2 = {
         { points: [{ skip: { count: 2, part: 16 }, text: '4-2/16', row: 0 }] },
         { points: [{ skip: { count: 2, part: 16 }, text: '5-2/16', row: 0 }] }],
     filters: [
-        {
-            id: 'volumeSlide',
-            kind: 'baseVolume',
-            dataBlob: '',
-            outputId: 'masterVolme',
-            automation: {
-                title: 'Simple test',
-                measures: [
-                    { changes: [] },
-                    {
-                        changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' },
-                            { skip: { count: 1, part: 16 }, stateBlob: 'sss' }]
-                    },
-                    { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }
-                ]
-            }
-        },
-        {
-            id: 'masterVolme',
-            kind: 'base_volume',
-            dataBlob: 'bb1',
-            outputId: '',
-            automation: {
-                title: 'test1122',
-                measures: [
-                    { changes: [] }, { changes: [] },
-                    {
-                        changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' },
-                            { skip: { count: 2, part: 16 }, stateBlob: 's1' },
-                            { skip: { count: 3, part: 16 }, stateBlob: 's1' },
-                            { skip: { count: 4, part: 16 }, stateBlob: 's1' },
-                            { skip: { count: 5, part: 16 }, stateBlob: 's1' },
-                            { skip: { count: 6, part: 16 }, stateBlob: 's1' },
-                            { skip: { count: 7, part: 16 }, stateBlob: 's1' }
-                        ]
-                    },
-                    { changes: [] }
-                ]
-            }
-        }
+        { id: 'volumeSlide', kind: 'baseVolume', dataBlob: '', outputId: 'masterVolme', automation: { title: 'Simple test', measures: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }] }, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }] } },
+        { id: 'masterVolme', kind: 'base_volume', dataBlob: 'bb1', outputId: '', automation: { title: 'test1122', measures: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }] } },
+        { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null },
+        { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null },
+        { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null },
+        { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null },
+        { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null },
+        { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null },
+        { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null }
     ]
 };
 let testBigMixerData = {

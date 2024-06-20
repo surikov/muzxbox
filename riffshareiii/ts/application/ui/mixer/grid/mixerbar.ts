@@ -99,10 +99,10 @@ class MixerBar {
 			}
 		}
 
-		if (zoomLevel < 6) {
+		if (zoomLevel < 7) {
 			new TextComments(barIdx, cfg, left, gridZoomBarAnchor, zoomLevel);
 		}
-		if (zoomLevel < 6) {
+		if (zoomLevel < 7) {
 			new AutomationBarContent(barIdx, cfg, left, gridZoomBarAnchor, zoomLevel);
 		}
 	}

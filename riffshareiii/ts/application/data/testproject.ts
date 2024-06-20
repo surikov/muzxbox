@@ -21,15 +21,15 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 			title: "Track one", measures: [
 				{
 					chords: [
-						{ skip: { count: 0, part: 1 }, notes: [{ pitch: 25, slides: [{duration:{count:1,part:8},delta:0}] }] }
-						, { skip: { count: 1, part: 16 }, notes: [{ pitch: 26, slides: [{duration:{count:1,part:8},delta:0}] }] }
-						, { skip: { count: 1, part: 8 }, notes: [{ pitch: 27, slides: [{duration:{count:1,part:8},delta:0}] }] }
-						, { skip: { count: 3, part: 16 }, notes: [{ pitch: 28, slides: [{duration:{count:1,part:8},delta:0}] }] }
-						, { skip: { count: 1, part: 4 }, notes: [{ pitch: 29, slides: [{duration:{count:1,part:8},delta:0}] }] }
-						, { skip: { count: 5, part: 16 }, notes: [{ pitch: 30, slides: [{duration:{count:1,part:8},delta:0}] }] }
-						, { skip: { count: 3, part: 8 }, notes: [{ pitch: 31, slides: [{duration:{count:1,part:8},delta:0}] }] }
-						, { skip: { count: 7, part: 16 }, notes: [{ pitch: 32, slides: [{duration:{count:1,part:8},delta:0}] }] }
-						, { skip: { count: 1, part: 2 }, notes: [{ pitch: 33, slides: [{duration:{count:1,part:8},delta:0}] }] }
+						{ skip: { count: 0, part: 1 }, notes: [{ pitch: 25, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] }
+						, { skip: { count: 1, part: 16 }, notes: [{ pitch: 26, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] }
+						, { skip: { count: 1, part: 8 }, notes: [{ pitch: 27, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] }
+						, { skip: { count: 3, part: 16 }, notes: [{ pitch: 28, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] }
+						, { skip: { count: 1, part: 4 }, notes: [{ pitch: 29, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] }
+						, { skip: { count: 5, part: 16 }, notes: [{ pitch: 30, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] }
+						, { skip: { count: 3, part: 8 }, notes: [{ pitch: 31, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] }
+						, { skip: { count: 7, part: 16 }, notes: [{ pitch: 32, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] }
+						, { skip: { count: 1, part: 2 }, notes: [{ pitch: 33, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] }
 					]
 				}, {
 					chords: [
@@ -37,35 +37,35 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 					]
 				}, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			]//, filters: []
-			, performer: { id: '', data: '', kind: '', outputId: '' }
+			, performer: { id: 't1', data: '', kind: 'basePitched', outputId: 'track1Volme' }
 		}
 		, {
 			title: "Second track", measures: [
 				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			]//, filters: []
-			, performer: { id: '', data: '', kind: '', outputId: '' }
+			, performer: { id: 't2', data: '', kind: 'basePitched', outputId: 'track2Volme' }
 		}
 		, {
 			title: "Third track", measures: [
 				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			]//, filters: []
-			, performer: { id: '', data: '', kind: '', outputId: '' }
+			, performer: { id: 't3', data: '', kind: 'basePitched', outputId: 'track3Volme' }
 		}
 	]
 	, percussions: [
 		{
 			title: "Snare", measures: [
-				{skips:[]},{skips:[{count: 2, part: 16 }]},{skips:[]},{skips:[{count: 0, part: 16 }]}
+				{ skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
 			]//, filters: []
-			, sampler: { id: '', data: '', kind: '', outputId: '' }
+			, sampler: { id: 'd1', data: '', kind: 'baseSampler', outputId: 'drum1Volme' }
 		}
 		, {
 			title: "Snare2", measures: []//, filters: []
-			, sampler: { id: '', data: '', kind: '', outputId: '' }
+			, sampler: { id: 'd2', data: '', kind: 'baseSampler', outputId: 'drum2Volme' }
 		}
 		, {
-			title: "Snare3", measures: [{skips:[]},{skips:[{count:1, part: 16 }]}]//, filters: []
-			, sampler: { id: '', data: '', kind: '', outputId: '' }
+			title: "Snare3", measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }]//, filters: []
+			, sampler: { id: 'd3', data: '', kind: 'baseSampler', outputId: 'drum3Volme' }
 		}
 	]
 	, comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16', row: 0 }] }, {
@@ -92,46 +92,15 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 		, { points: [{ skip: { count: 2, part: 16 }, text: '4-2/16', row: 0 }] }
 		, { points: [{ skip: { count: 2, part: 16 }, text: '5-2/16', row: 0 }] }]
 	, filters: [
-		{
-			id: 'volumeSlide'
-			, kind: 'baseVolume'
-			, dataBlob: ''
-			, outputId: 'masterVolme'
-			, automation: {
-				title: 'Simple test'
-				, measures: [
-					{ changes: [] }
-					, {
-						changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }
-							, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }]
-					}
-					, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }
-				]
-			}
-		}
-		, {
-			id: 'masterVolme'
-			, kind: 'base_volume'
-			, dataBlob: 'bb1'
-			, outputId: ''
-			, automation: {
-				title: 'test1122'
-				, measures: [
-					{ changes: [] }, { changes: [] }
-					, {
-						changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }
-							, { skip: { count: 2, part: 16 }, stateBlob: 's1' }
-							, { skip: { count: 3, part: 16 }, stateBlob: 's1' }
-							, { skip: { count: 4, part: 16 }, stateBlob: 's1' }
-							, { skip: { count: 5, part: 16 }, stateBlob: 's1' }
-							, { skip: { count: 6, part: 16 }, stateBlob: 's1' }
-							, { skip: { count: 7, part: 16 }, stateBlob: 's1' }
-						]
-					}
-					, { changes: [] }
-				]
-			}
-		}
+		{ id: 'volumeSlide', kind: 'baseVolume', dataBlob: '', outputId: 'masterVolme', automation: { title: 'Simple test', measures: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }] }, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }] } }
+		, { id: 'masterVolme', kind: 'base_volume', dataBlob: 'bb1', outputId: '', automation: { title: 'test1122', measures: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }] } }
+		, { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null }
+		, { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null }
+		, { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null }
+		, { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null }
+		, { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null }
+		, { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null }
+		, { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null }
 	]
 	/*, theme: {
 		notePathHeight: 0.5

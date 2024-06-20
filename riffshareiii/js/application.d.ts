@@ -294,6 +294,9 @@ declare class MixerZoomLevel {
 declare class FanPane {
     resetPlates(cfg: MixerDataMathUtility): void;
 }
+declare class PerformerIcon {
+    buildPerformerSpot(track: Zvoog_MusicTrack): void;
+}
 declare class IconLabelButton {
     anchor: TileAnchor;
     bg: TileRectangle;
