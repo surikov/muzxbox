@@ -1734,7 +1734,7 @@ class AutomationBarContent {
 class MixerUI {
     constructor() {
         this.levels = [];
-        this.fanPanel = new FanPane();
+        this.fanPane = new FanPane();
     }
     reFillMixerUI(cfg) {
         let ww = cfg.wholeWidth();
@@ -1755,7 +1755,7 @@ class MixerUI {
         this.fillerAnchor.content = [];
         this.reFillWholeRatio(cfg);
         this.reFillSingleRatio(cfg);
-        this.fanPanel.resetPlates(cfg);
+        this.fanPane.resetPlates(cfg);
     }
     createMixerLayers() {
         let tracksLayerZoom = document.getElementById('tracksLayerZoom');
@@ -1764,6 +1764,8 @@ class MixerUI {
         this.gridLayers = { g: gridLayerZoom, anchors: [], mode: LevelModes.normal };
         let firstLayerZoom = document.getElementById('firstLayerZoom');
         this.firstLayers = { g: firstLayerZoom, anchors: [], mode: LevelModes.normal };
+        let fanSVGgroup = document.getElementById('fanLayer');
+        this.fanLayer = { g: fanSVGgroup, anchors: [], mode: LevelModes.normal };
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             let mixerGridAnchor = {
                 showZoom: zoomPrefixLevelsCSS[ii].minZoom,
@@ -1791,7 +1793,7 @@ class MixerUI {
             xx: 0, yy: 0, ww: 1, hh: 1, content: []
         };
         this.gridLayers.anchors.push(this.fillerAnchor);
-        return [this.gridLayers, this.trackLayers, this.firstLayers];
+        return [this.gridLayers, this.trackLayers, this.firstLayers, this.fanLayer];
     }
     reFillSingleRatio(cfg) {
         let countFunction;
@@ -2056,19 +2058,67 @@ class MixerZoomLevel {
 class FanPane {
     resetPlates(cfg) {
         console.log('FanPane.resetPlates', cfg);
+        this.filterIcons = [];
+        this.performerIcons = [];
         for (let ff = 0; ff < cfg.data.filters.length; ff++) {
-            if (cfg.data.filters[ff].automation) {
-                console.log('automation', ff, cfg.data.filters[ff]);
-            }
+            this.filterIcons.push(new FilterIcon(cfg.data.filters[ff]));
         }
         for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
-            new PerformerIcon().buildPerformerSpot(cfg.data.tracks[tt]);
+            this.performerIcons.push(new PerformerIcon(cfg.data.tracks[tt]));
         }
+        this.buildPerformerIcons();
+        this.buildAutoIcons();
+        this.buildFilterIcons();
+        this.buildOutIcon();
+    }
+    buildPerformerIcons() {
+        for (let ii = 0; ii < this.performerIcons.length; ii++) {
+            this.performerIcons[ii].buildPerformerSpot();
+        }
+    }
+    buildAutoIcons() {
+        for (let ii = 0; ii < this.filterIcons.length; ii++) {
+            if (this.filterIcons[ii].filter.automation) {
+                this.filterIcons[ii].buildFilterSpot();
+            }
+            else {
+            }
+        }
+    }
+    buildFilterIcons() {
+        for (let ii = 0; ii < this.filterIcons.length; ii++) {
+            if (this.filterIcons[ii].filter.automation) {
+            }
+            else {
+                this.filterIcons[ii].buildFilterSpot();
+            }
+        }
+    }
+    buildOutIcon() {
+    }
+    connectPerformers() {
+    }
+    connectFilters() {
     }
 }
 class PerformerIcon {
-    buildPerformerSpot(track) {
-        console.log('buildPerformerSpot', track.performer);
+    constructor(track) {
+        console.log('PerformerIcon', track.performer);
+        this.track = track;
+    }
+    buildPerformerSpot() {
+    }
+}
+class FilterIcon {
+    constructor(filter) {
+        console.log('FilterIcon', filter);
+        this.filter = filter;
+    }
+    buildFilterSpot() {
+    }
+}
+class SpearConnection {
+    constructor(fromX, fromY, toX, toY) {
     }
 }
 class IconLabelButton {

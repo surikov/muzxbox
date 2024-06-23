@@ -1,5 +1,10 @@
 class PerformerIcon{
-	buildPerformerSpot(track:Zvoog_MusicTrack){
-		console.log('buildPerformerSpot', track.performer);
+	track:Zvoog_MusicTrack;
+	constructor(track:Zvoog_MusicTrack){
+		console.log('PerformerIcon', track.performer);
+		this.track=track;
+	}
+	buildPerformerSpot(){
+		
 	}
 }

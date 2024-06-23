@@ -5,10 +5,11 @@ class MixerUI {
 	gridLayers: TileLayerDefinition;
 	trackLayers: TileLayerDefinition;
 	firstLayers: TileLayerDefinition;
+	fanLayer: TileLayerDefinition;
 	levels: MixerZoomLevel[] = [];
 	fillerAnchor: TileAnchor;
 	//samplerUI: SamplerRows;
-	fanPanel: FanPane = new FanPane();
+	fanPane: FanPane = new FanPane();
 	constructor() {
 
 	}
@@ -37,7 +38,7 @@ class MixerUI {
 		this.fillerAnchor.content = [];
 		this.reFillWholeRatio(cfg);
 		this.reFillSingleRatio(cfg);
-		this.fanPanel.resetPlates(cfg);
+		this.fanPane.resetPlates(cfg);
 
 	}
 	createMixerLayers(): TileLayerDefinition[] {
@@ -49,6 +50,9 @@ class MixerUI {
 
 		let firstLayerZoom: SVGElement = (document.getElementById('firstLayerZoom') as any) as SVGElement;
 		this.firstLayers = { g: firstLayerZoom, anchors: [], mode: LevelModes.normal };
+
+		let fanSVGgroup: SVGElement = (document.getElementById('fanLayer') as any) as SVGElement;
+		this.fanLayer = { g: fanSVGgroup, anchors: [], mode: LevelModes.normal };
 
 		for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
 			//this.svgs.push((document.getElementById(zoomPrefixLevelsCSS[ii].svg) as any) as SVGElement);
@@ -85,7 +89,7 @@ class MixerUI {
 			, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 		};
 		this.gridLayers.anchors.push(this.fillerAnchor);
-		return [this.gridLayers, this.trackLayers, this.firstLayers];
+		return [this.gridLayers, this.trackLayers, this.firstLayers,this.fanLayer];
 	}
 	reFillSingleRatio(cfg: MixerDataMathUtility) {
 		let countFunction: (cfg: MixerDataMathUtility, barIdx: number) => number;
@@ -94,8 +98,8 @@ class MixerUI {
 		if (cfg.data.focus) {
 			if (cfg.data.focus == 1) {
 				countFunction = this.barDrumCount;
-				yy = cfg.gridTop() + cfg.gridHeight() - 2*cfg.data.percussions.length;
-				hh = 2*cfg.data.percussions.length;
+				yy = cfg.gridTop() + cfg.gridHeight() - 2 * cfg.data.percussions.length;
+				hh = 2 * cfg.data.percussions.length;
 			} else {
 				if (cfg.data.focus == 2) {
 					countFunction = this.barAutoCount;
@@ -162,7 +166,7 @@ class MixerUI {
 		if (cfg.data.focus) {
 			if (cfg.data.focus == 1) {
 				yy = cfg.gridTop();
-				hh = cfg.gridHeight() - 2*cfg.data.percussions.length;
+				hh = cfg.gridHeight() - 2 * cfg.data.percussions.length;
 			} else {
 				if (cfg.data.focus == 2) {
 					yy = cfg.gridTop() + cfg.maxAutomationsCount;
@@ -198,18 +202,18 @@ class MixerUI {
 				, css: css
 			};
 			this.fillerAnchor.content.push(fillRectangle);
-			if(cfg.data.focus ){
+			if (cfg.data.focus) {
 				//
-			}else{
+			} else {
 				this.fillerAnchor.content.push({
 					x: cfg.leftPad + barX
-					, y: cfg.gridTop()+cfg.gridHeight()*7/8
+					, y: cfg.gridTop() + cfg.gridHeight() * 7 / 8
 					, w: barwidth
 					, h: hh//cfg.gridHeight()
 					, css: css
 				});
 			}
-			
+
 			barX = barX + barwidth;
 		}
 	}
