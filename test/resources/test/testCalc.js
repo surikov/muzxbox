@@ -1037,7 +1037,7 @@ function addTails() {
         var blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
         var green = sortedGreen.indexOf(ii + 1);
         var black = sortedGrey.indexOf(ii + 1);
-        console.log((1 + ii), ':', blue, green, black, '~', Math.round((blue + green + black) / 3));
+        console.log((1 + ii), ':', blue + 1, green + 1, black + 1, '~', Math.round((blue + green + black) / 3));
     }
 }
 function drawTestLines(data) {
