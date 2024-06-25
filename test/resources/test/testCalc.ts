@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.125 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.126 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -504,6 +504,7 @@ function dumpRowFills(inrows: BallsRow[]) {
 		dumpRowWaitColor(inrows, '#009900cc', 0);
 		dumpRowFillsColor(inrows, '#00000033', 0);
 	}
+	
 }
 
 function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
@@ -1087,6 +1088,17 @@ function addTails() {
 	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
 	dumpRowFills(slicedrows);
 	fillCells();
+	console.log('blue/green/black');
+	//console.log(sortedBlue,sortedGreen,sortedGrey);
+	for(let ii=0;ii<rowLen;ii++){
+		//let blueOrder=sortedBlue.indexOf(ii+1);
+		//console.log((1+ii),sortedBlue[rowLen-ii-1],sortedGreen[ii],sortedGrey[ii]);
+		let blue=rowLen-sortedBlue.indexOf(ii+1)-1;
+		let green=sortedGreen.indexOf(ii+1);
+		let black=sortedGrey.indexOf(ii+1);
+		console.log((1+ii),':',blue,green,black,'~',Math.round((blue+green+black)/3));
+		
+	}
 }
 function drawTestLines(data: { ball: number, color: string }[]) {
 	for (let ii = 0; ii < data.length; ii++) {

@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.125 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.126 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -1029,6 +1029,16 @@ function addTails() {
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
     dumpRowFills(slicedrows);
     fillCells();
+    console.log('blue/green/black');
+    //console.log(sortedBlue,sortedGreen,sortedGrey);
+    for (var ii = 0; ii < rowLen; ii++) {
+        //let blueOrder=sortedBlue.indexOf(ii+1);
+        //console.log((1+ii),sortedBlue[rowLen-ii-1],sortedGreen[ii],sortedGrey[ii]);
+        var blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
+        var green = sortedGreen.indexOf(ii + 1);
+        var black = sortedGrey.indexOf(ii + 1);
+        console.log((1 + ii), ':', blue, green, black, '~', Math.round((blue + green + black) / 3));
+    }
 }
 function drawTestLines(data) {
     for (var ii = 0; ii < data.length; ii++) {
