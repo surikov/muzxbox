@@ -1029,7 +1029,9 @@ function addTails() {
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
     dumpRowFills(slicedrows);
     fillCells();
-    console.log('blue/green/black');
+    var txt = 'blue/green/black/min/max/avg';
+    console.log(txt);
+    var statdump = txt;
     //console.log(sortedBlue,sortedGreen,sortedGrey);
     for (var ii = 0; ii < rowLen; ii++) {
         //let blueOrder=sortedBlue.indexOf(ii+1);
@@ -1037,8 +1039,15 @@ function addTails() {
         var blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
         var green = sortedGreen.indexOf(ii + 1);
         var black = sortedGrey.indexOf(ii + 1);
-        console.log((1 + ii), ':', blue + 1, green + 1, black + 1, '~', Math.round((blue + green + black) / 3));
+        txt = '' + (1 + ii) + ': '
+            + (blue + 1) + ' ' + (green + 1) + ' ' + (black + 1)
+            + ' ' + Math.min(Math.abs(blue - green), Math.abs(blue - black), Math.abs(green - black)) + '/' + Math.max(Math.abs(blue - green), Math.abs(blue - black), Math.abs(green - black))
+            + ' ~' + Math.round((blue + green + black) / 3);
+        console.log(txt);
+        statdump = statdump + '\n' + txt;
     }
+    var el = document.getElementById('statdump');
+    el.innerText = statdump;
 }
 function drawTestLines(data) {
     for (var ii = 0; ii < data.length; ii++) {

@@ -1088,7 +1088,10 @@ function addTails() {
 	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
 	dumpRowFills(slicedrows);
 	fillCells();
-	console.log('blue/green/black');
+	let txt='blue/green/black/min/max/avg';
+	console.log(txt);
+	let statdump=txt;
+	
 	//console.log(sortedBlue,sortedGreen,sortedGrey);
 	for(let ii=0;ii<rowLen;ii++){
 		//let blueOrder=sortedBlue.indexOf(ii+1);
@@ -1096,9 +1099,16 @@ function addTails() {
 		let blue=rowLen-sortedBlue.indexOf(ii+1)-1;
 		let green=sortedGreen.indexOf(ii+1);
 		let black=sortedGrey.indexOf(ii+1);
-		console.log((1+ii),':',blue+1,green+1,black+1,'~',Math.round((blue+green+black)/3));
+		txt=''+(1+ii)+': '
+			+(blue+1)+' '+(green+1)+' '+(black+1)
+			+' '+Math.min(Math.abs(blue-green),Math.abs(blue-black),Math.abs(green-black))+'/'+Math.max(Math.abs(blue-green),Math.abs(blue-black),Math.abs(green-black))
+			+' ~'+Math.round((blue+green+black)/3);
+		console.log(txt);
+		statdump=statdump+'\n'+txt;
 		
 	}
+	var el: HTMLElement = (document.getElementById('statdump') as any) as HTMLElement;
+	el.innerText = statdump;
 }
 function drawTestLines(data: { ball: number, color: string }[]) {
 	for (let ii = 0; ii < data.length; ii++) {
