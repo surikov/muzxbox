@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.126 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.127 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -1029,9 +1029,9 @@ function addTails() {
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
     dumpRowFills(slicedrows);
     fillCells();
-    var txt = 'blue/green/black/min/max/avg';
-    console.log(txt);
-    var statdump = txt;
+    var texts = [];
+    //console.log(txt);
+    //let statdump=txt;
     //console.log(sortedBlue,sortedGreen,sortedGrey);
     for (var ii = 0; ii < rowLen; ii++) {
         //let blueOrder=sortedBlue.indexOf(ii+1);
@@ -1039,15 +1039,29 @@ function addTails() {
         var blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
         var green = sortedGreen.indexOf(ii + 1);
         var black = sortedGrey.indexOf(ii + 1);
-        txt = '' + (1 + ii) + ': '
-            + (blue + 1) + ' ' + (green + 1) + ' ' + (black + 1)
-            + ' ' + Math.min(Math.abs(blue - green), Math.abs(blue - black), Math.abs(green - black)) + '/' + Math.max(Math.abs(blue - green), Math.abs(blue - black), Math.abs(green - black))
-            + ' ~' + Math.round((blue + green + black) / 3);
-        console.log(txt);
-        statdump = statdump + '\n' + txt;
+        var avg = Math.round((blue + green + black) / 3);
+        var line = ''
+            + (('' + (100 + avg)).substr(1))
+            + (' - ' + (1 + ii) + ': ')
+            + (blue + 1) + ' ' + (green + 1) + ' ' + (black + 1);
+        if (showFirstRow) {
+            if (ballExists(1 + ii, slicedrows[0])) {
+                line = line + ' <@';
+            }
+        }
+        texts.push(line);
+        //console.log(txt);
+        //statdump=statdump+'\n'+txt;
+    }
+    var data = 'avg/ball/blue/green/black \n';
+    console.log(data);
+    texts.sort();
+    for (var ii = 0; ii < texts.length; ii++) {
+        console.log(texts[ii]);
+        data = data + texts[ii] + '\n';
     }
     var el = document.getElementById('statdump');
-    el.innerText = statdump;
+    el.innerText = data;
 }
 function drawTestLines(data) {
     for (var ii = 0; ii < data.length; ii++) {

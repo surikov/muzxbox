@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.126 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.127 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -1088,9 +1088,9 @@ function addTails() {
 	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
 	dumpRowFills(slicedrows);
 	fillCells();
-	let txt='blue/green/black/min/max/avg';
-	console.log(txt);
-	let statdump=txt;
+	let texts:string[]=[];
+	//console.log(txt);
+	//let statdump=txt;
 	
 	//console.log(sortedBlue,sortedGreen,sortedGrey);
 	for(let ii=0;ii<rowLen;ii++){
@@ -1099,16 +1099,34 @@ function addTails() {
 		let blue=rowLen-sortedBlue.indexOf(ii+1)-1;
 		let green=sortedGreen.indexOf(ii+1);
 		let black=sortedGrey.indexOf(ii+1);
-		txt=''+(1+ii)+': '
+		let avg=Math.round((blue+green+black)/3);
+		
+		
+		let line=''
+			+((''+(100+avg)).substr(1))
+			+(' - '+(1+ii)+': ')
 			+(blue+1)+' '+(green+1)+' '+(black+1)
-			+' '+Math.min(Math.abs(blue-green),Math.abs(blue-black),Math.abs(green-black))+'/'+Math.max(Math.abs(blue-green),Math.abs(blue-black),Math.abs(green-black))
-			+' ~'+Math.round((blue+green+black)/3);
-		console.log(txt);
-		statdump=statdump+'\n'+txt;
+			//+' '+Math.min(Math.abs(blue-green),Math.abs(blue-black),Math.abs(green-black))+'/'+Math.max(Math.abs(blue-green),Math.abs(blue-black),Math.abs(green-black))
+			;
+		if(showFirstRow){
+			if(ballExists(1+ii,slicedrows[0])){
+				line=line+' <@';
+			}
+		}
+		texts.push(line);
+		//console.log(txt);
+		//statdump=statdump+'\n'+txt;
 		
 	}
+	let data='avg/ball/blue/green/black \n';
+	console.log(data);
+	texts.sort();
+	for(let ii=0;ii<texts.length;ii++){
+		console.log(texts[ii]);
+		data=data+texts[ii]+'\n';
+	}
 	var el: HTMLElement = (document.getElementById('statdump') as any) as HTMLElement;
-	el.innerText = statdump;
+	el.innerText = data;
 }
 function drawTestLines(data: { ball: number, color: string }[]) {
 	for (let ii = 0; ii < data.length; ii++) {
