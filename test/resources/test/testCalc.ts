@@ -1089,24 +1089,21 @@ function addTails() {
 	dumpRowFills(slicedrows);
 	fillCells();
 	let texts:string[]=[];
-	//console.log(txt);
-	//let statdump=txt;
-	
-	//console.log(sortedBlue,sortedGreen,sortedGrey);
 	for(let ii=0;ii<rowLen;ii++){
-		//let blueOrder=sortedBlue.indexOf(ii+1);
-		//console.log((1+ii),sortedBlue[rowLen-ii-1],sortedGreen[ii],sortedGrey[ii]);
 		let blue=rowLen-sortedBlue.indexOf(ii+1)-1;
 		let green=sortedGreen.indexOf(ii+1);
 		let black=sortedGrey.indexOf(ii+1);
+		let blueGreenDiff=Math.abs(blue-green);
+		let greenBlackDiff=Math.abs(green-black);
+		let blackBlueDiff=Math.abs(black-blue);
+
 		let avg=Math.round((blue+green+black)/3);
-		
+		//let avg=Math.round((blueGreenDiff+greenBlackDiff+blackBlueDiff)/3);
 		
 		let line=''
 			+((''+(100+avg)).substr(1))
 			+(' - '+(1+ii)+': ')
 			+(blue+1)+' '+(green+1)+' '+(black+1)
-			//+' '+Math.min(Math.abs(blue-green),Math.abs(blue-black),Math.abs(green-black))+'/'+Math.max(Math.abs(blue-green),Math.abs(blue-black),Math.abs(green-black))
 			;
 		if(showFirstRow){
 			if(ballExists(1+ii,slicedrows[0])){
@@ -1114,9 +1111,6 @@ function addTails() {
 			}
 		}
 		texts.push(line);
-		//console.log(txt);
-		//statdump=statdump+'\n'+txt;
-		
 	}
 	let data='avg/ball/blue/green/black \n';
 	console.log(data);

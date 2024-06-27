@@ -1030,16 +1030,15 @@ function addTails() {
     dumpRowFills(slicedrows);
     fillCells();
     var texts = [];
-    //console.log(txt);
-    //let statdump=txt;
-    //console.log(sortedBlue,sortedGreen,sortedGrey);
     for (var ii = 0; ii < rowLen; ii++) {
-        //let blueOrder=sortedBlue.indexOf(ii+1);
-        //console.log((1+ii),sortedBlue[rowLen-ii-1],sortedGreen[ii],sortedGrey[ii]);
         var blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
         var green = sortedGreen.indexOf(ii + 1);
         var black = sortedGrey.indexOf(ii + 1);
+        var blueGreenDiff = Math.abs(blue - green);
+        var greenBlackDiff = Math.abs(green - black);
+        var blackBlueDiff = Math.abs(black - blue);
         var avg = Math.round((blue + green + black) / 3);
+        //let avg=Math.round((blueGreenDiff+greenBlackDiff+blackBlueDiff)/3);
         var line = ''
             + (('' + (100 + avg)).substr(1))
             + (' - ' + (1 + ii) + ': ')
@@ -1050,8 +1049,6 @@ function addTails() {
             }
         }
         texts.push(line);
-        //console.log(txt);
-        //statdump=statdump+'\n'+txt;
     }
     var data = 'avg/ball/blue/green/black \n';
     console.log(data);
