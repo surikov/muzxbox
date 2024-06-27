@@ -1043,7 +1043,7 @@ function addTails() {
     dumpRowFills(slicedrows);
     fillCells();
     var texts = [];
-    var texts2 = [];
+    //let texts2: string[] = [];
     for (var ii = 0; ii < rowLen; ii++) {
         var blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
         var green = sortedGreen.indexOf(ii + 1);
@@ -1067,39 +1067,43 @@ function addTails() {
                 diffMax = blueGreenDiff;
             }
         }
+        //let avg2=diffMin / diffMax;
+        var avg2 = Math.round((diffMin + diffMax) / 2);
         var avg = Math.round((blue + green + black) / 3);
         //let avg=Math.round((blueGreenDiff+greenBlackDiff+blackBlueDiff)/3);
         var line = ''
-            + (('' + (100 + avg)).substr(1))
-            + (' - ' + (1 + ii) + ': ')
-            + (blue + 1) + ' ' + (green + 1) + ' ' + (black + 1)
-            + ' ' + Math.round(100 * diffMin / diffMax) + '%';
-        var line2 = ''
-            + (('' + (100 + Math.round(100 * diffMin / diffMax))).substr(1))
-            + (' ' + ('' + (100 + avg)).substr(1))
-            + (' - ' + (1 + ii) + ': ')
-            + (blue + 1) + ' ' + (green + 1) + ' ' + (black + 1);
+            + ('' + (101 + ii)).substr(1) + ': '
+            + ('' + (blue + 101)).substr(1) + ' ' + ('' + (green + 101)).substr(1) + ' ' + ('' + (black + 101)).substr(1)
+            + ' ' + avg + '/' + avg2;
+        /*let line2 = ''
+            + (('' + (100 + Math.round(avg2))).substr(1))
+             + (' - ' + (1 + ii) + ': ')
+             + (blue + 1) + ' ' + (green + 1) + ' ' + (black + 1)
+             ;
+             */
         if (showFirstRow) {
             if (ballExists(1 + ii, slicedrows[0])) {
-                line = line + ' <@!';
-                line2 = line2 + ' <@!';
+                line = line + ' *****';
+                //line2 = line2 + ' <@!';
             }
         }
         texts.push(line);
-        texts2.push(line2);
+        //texts2.push(line2);
     }
-    var data = '#. avg - ball: blue green black %' + '	' + '#. % avg - ball: blue green black\n';
+    var data = 'ball: blue green black avg/diff \n';
+    //let data = '#. avg - ball: blue green black '+'	'+'diff - ball: blue green black\n';
     //let data2 = '#. % avg - ball: blue green black\n';
     //console.log(data);
     texts.sort();
-    texts2.sort();
+    //texts2.sort();
     for (var ii = 0; ii < texts.length; ii++) {
         //texts[ii] = '' + (1 + ii) + '.	 ' + texts[ii];
         //texts2[ii] = '' + (1 + ii) + '.	 ' + texts2[ii];
-        var prnt = '' + (1 + ii) + '.	 ' + padLen(texts[ii], 33) + ' ' + texts2[ii];
+        //let prnt='' + (1 + ii) + '.	 ' +padLen(texts[ii],25)+' '+texts2[ii];
         //console.log(prnt);
-        data = data + prnt + '\n';
+        //data = data + prnt + '\n';
         //data2 = data2 + texts2[ii] + '\n';
+        data = data + texts[ii] + '\n';
     }
     var el = document.getElementById('statdump');
     el.innerText = data;
