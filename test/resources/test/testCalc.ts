@@ -1083,45 +1083,88 @@ function sobstvennoe(balls: number[]): number {
 	if (r0 < 2) r0 = -(pre[1] + pre[0]);
 	return r0;
 }
+function padLen(txt:string,sz:number){
+	let len=txt.length;
+	let add=0;
+	if(len<sz){
+		add=sz-len;
+	}
+	let rez=txt;
+	for(let ii=0;ii<add;ii++){
+		rez=rez+' ';
+	}
+	//console.log(rez,add);
+	return rez;
+}
 function addTails() {
 	clearNonManual();
 	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
 	dumpRowFills(slicedrows);
 	fillCells();
-	let texts:string[]=[];
-	for(let ii=0;ii<rowLen;ii++){
-		let blue=rowLen-sortedBlue.indexOf(ii+1)-1;
-		let green=sortedGreen.indexOf(ii+1);
-		let black=sortedGrey.indexOf(ii+1);
-		let blueGreenDiff=Math.abs(blue-green);
-		let greenBlackDiff=Math.abs(green-black);
-		let blackBlueDiff=Math.abs(black-blue);
+	let texts: string[] = [];
+	let texts2: string[] = [];
+	for (let ii = 0; ii < rowLen; ii++) {
+		let blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
+		let green = sortedGreen.indexOf(ii + 1);
+		let black = sortedGrey.indexOf(ii + 1);
+		let blueGreenDiff = Math.abs(blue - green);
+		let greenBlackDiff = Math.abs(green - black);
+		let blackBlueDiff = Math.abs(black - blue);
+		let diffMin = 0;
+		let diffMax = 0;
+		if (blueGreenDiff == Math.min(blueGreenDiff, greenBlackDiff, blackBlueDiff)) {
+			diffMin = blueGreenDiff;
+			diffMax=greenBlackDiff;
+		} else {
+			if (greenBlackDiff == Math.min(blueGreenDiff, greenBlackDiff, blackBlueDiff)) {
+				diffMin = greenBlackDiff;
+				diffMax=blackBlueDiff;
+			} else {
+				diffMin = blackBlueDiff;
+				diffMax=blueGreenDiff;
+			}
+		}
 
-		let avg=Math.round((blue+green+black)/3);
+		let avg = Math.round((blue + green + black) / 3);
 		//let avg=Math.round((blueGreenDiff+greenBlackDiff+blackBlueDiff)/3);
-		
-		let line=''
-			+((''+(100+avg)).substr(1))
-			+(' - '+(1+ii)+': ')
-			+(blue+1)+' '+(green+1)+' '+(black+1)
-			;
-		if(showFirstRow){
-			if(ballExists(1+ii,slicedrows[0])){
-				line=line+' <@';
+
+		let line = ''
+			 + (('' + (100 + avg)).substr(1))
+			 + (' - ' + (1 + ii) + ': ')
+			 + (blue + 1) + ' ' + (green + 1) + ' ' + (black + 1)
+			 + ' ' + Math.round(100*diffMin / diffMax)+'%';
+		let line2 = ''
+			+ (('' + (100 + Math.round(100*diffMin / diffMax))).substr(1))
+			 + (' '+('' + (100 + avg)).substr(1))
+			 + (' - ' + (1 + ii) + ': ')
+			 + (blue + 1) + ' ' + (green + 1) + ' ' + (black + 1)
+			 ;
+		if (showFirstRow) {
+			if (ballExists(1 + ii, slicedrows[0])) {
+				line = line + ' <@!';
+				line2 = line2 + ' <@!';
 			}
 		}
 		texts.push(line);
+		texts2.push(line2);
 	}
-	let data='avg/ball/blue/green/black \n';
-	console.log(data);
+	let data = '#. avg - ball: blue green black %'+'	'+'#. % avg - ball: blue green black\n';
+	//let data2 = '#. % avg - ball: blue green black\n';
+	//console.log(data);
 	texts.sort();
-	for(let ii=0;ii<texts.length;ii++){
-		console.log(texts[ii]);
-		data=data+texts[ii]+'\n';
+	texts2.sort();
+	for (let ii = 0; ii < texts.length; ii++) {
+		//texts[ii] = '' + (1 + ii) + '.	 ' + texts[ii];
+		//texts2[ii] = '' + (1 + ii) + '.	 ' + texts2[ii];
+		let prnt='' + (1 + ii) + '.	 ' +padLen(texts[ii],33)+' '+texts2[ii];
+		//console.log(prnt);
+		data = data + prnt + '\n';
+		//data2 = data2 + texts2[ii] + '\n';
 	}
-	var el: HTMLElement = (document.getElementById('statdump') as any) as HTMLElement;
+	var el: HTMLElement = (document.getElementById('statdump')as any)as HTMLElement;
 	el.innerText = data;
 }
+
 function drawTestLines(data: { ball: number, color: string }[]) {
 	for (let ii = 0; ii < data.length; ii++) {
 		markLines.push({
