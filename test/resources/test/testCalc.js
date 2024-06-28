@@ -454,7 +454,7 @@ function dumpRowFills(inrows) {
     }
 }
 function dumpRowWaitColor(rows, color, shiftX) {
-    var lbl = 'grey';
+    var lbl = '';
     greyStat = [];
     for (var rr = 0; rr < rowsVisibleCount; rr++) {
         var arr = [];
@@ -492,18 +492,18 @@ function dumpRowWaitColor(rows, color, shiftX) {
         for (var kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
-                    lbl = lbl + ' ●' + first[kk].ball;
+                    lbl = lbl + padLen('' + '●' + first[kk].ball, 4);
                     end = kk;
                     if (begin == -1) {
                         begin = kk;
                     }
                 }
                 else {
-                    lbl = lbl + ' ' + first[kk].ball;
+                    lbl = lbl + padLen('' + first[kk].ball, 4);
                 }
             }
             else {
-                lbl = lbl + ' ' + first[kk].ball;
+                lbl = lbl + padLen('' + first[kk].ball, 4);
             }
         }
         for (var kk = 0; kk < first.length; kk++) {
@@ -517,7 +517,7 @@ function dumpRowWaitColor(rows, color, shiftX) {
                 }
             }
         }
-        lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+        lbl = padLen('' + begin + ':' + end + '(' + (rowLen - end - 1) + '): grey', 20) + lbl;
         if (rr == 0) {
             //console.log(lbl);
             dumpInfo2('statgrey', lbl);
@@ -590,7 +590,7 @@ function makeWader(ballFills) {
     }
 }
 function dumpRowFillsColor(rows, color, shiftX) {
-    var lbl = 'green';
+    var lbl = '';
     //console.log(lbl);
     greenStat = [];
     for (var rr = 0; rr < rowsVisibleCount; rr++) {
@@ -625,18 +625,18 @@ function dumpRowFillsColor(rows, color, shiftX) {
         for (var kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
-                    lbl = lbl + ' ●' + first[kk].ball;
+                    lbl = lbl + padLen('●' + first[kk].ball, 4);
                     end = kk;
                     if (begin == -1) {
                         begin = kk;
                     }
                 }
                 else {
-                    lbl = lbl + ' ' + first[kk].ball;
+                    lbl = lbl + padLen('' + first[kk].ball, 4);
                 }
             }
             else {
-                lbl = lbl + ' ' + first[kk].ball;
+                lbl = lbl + padLen('' + first[kk].ball, 4);
             }
         }
         for (var kk = 0; kk < first.length; kk++) {
@@ -650,7 +650,7 @@ function dumpRowFillsColor(rows, color, shiftX) {
                 }
             }
         }
-        lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
+        lbl = padLen('' + begin + ':' + end + '(' + (rowLen - end - 1) + '): green', 20) + lbl;
         //console.log(lbl);
         if (rr == 0) {
             dumpInfo2('statgreen', lbl);
@@ -749,7 +749,7 @@ function dumpTriads(svg, rows) {
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
                     //lbl = lbl + ' ●' + first[kk].ball;
-                    lbl = '●' + first[kk].ball + ' ' + lbl;
+                    lbl = padLen('' + '●' + first[kk].ball, 4) + lbl;
                     end = kk;
                     if (begin == -1) {
                         begin = kk;
@@ -757,12 +757,12 @@ function dumpTriads(svg, rows) {
                 }
                 else {
                     //lbl = lbl + ' ' + first[kk].ball;
-                    lbl = first[kk].ball + ' ' + lbl;
+                    lbl = padLen('' + first[kk].ball, 4) + lbl;
                 }
             }
             else {
                 //lbl = lbl + ' ' + first[kk].ball;
-                lbl = first[kk].ball + ' ' + lbl;
+                lbl = padLen('' + first[kk].ball, 4) + lbl;
             }
         }
         for (var kk = 0; kk < first.length; kk++) {
@@ -777,7 +777,7 @@ function dumpTriads(svg, rows) {
             }
         }
         //lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
-        lbl = '' + (rowLen - end - 1) + ':' + end + '(' + begin + '): blue ' + lbl;
+        lbl = padLen('' + (rowLen - end - 1) + ':' + end + '(' + begin + '): blue ', 20) + lbl;
         if (rr == 0) {
             //let middle=(first[first.length-1].summ-first[0].summ)/2+first[0].summ;
             //console.log(lbl,first,middle);
@@ -1042,8 +1042,9 @@ function addTails() {
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
     dumpRowFills(slicedrows);
     fillCells();
-    var texts = [];
+    //let texts: string[] = [];
     //let texts2: string[] = [];
+    var mxdata = [];
     for (var ii = 0; ii < rowLen; ii++) {
         var blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
         var green = sortedGreen.indexOf(ii + 1);
@@ -1070,6 +1071,7 @@ function addTails() {
         //let avg = Math.round((blue + green + black) / 3);
         //let avg=Math.round((blueGreenDiff+greenBlackDiff+blackBlueDiff)/3);
         var mx = Math.max(blueGreenDiff, greenBlackDiff, blackBlueDiff);
+        mxdata.push({ ball: ii + 1, mx: mx });
         var line = ''
             + ('' + (100 + mx)).substr(1)
             + ': ' + ('' + (101 + ii)).substr(1) + ': '
@@ -1091,16 +1093,17 @@ function addTails() {
                 //line2 = line2 + ' <@!';
             }
         }
-        texts.push(line);
+        //texts.push(line);
         //texts2.push(line2);
     }
-    var data = 'mx: ball: blue green black avg/diff \n';
+    /*
+    let data = 'mx: ball: blue green black avg/diff \n';
     //let data = '#. avg - ball: blue green black '+'	'+'diff - ball: blue green black\n';
     //let data2 = '#. % avg - ball: blue green black\n';
     //console.log(data);
     texts.sort();
     //texts2.sort();
-    for (var ii = 0; ii < texts.length; ii++) {
+    for (let ii = 0; ii < texts.length; ii++) {
         //texts[ii] = '' + (1 + ii) + '.	 ' + texts[ii];
         //texts2[ii] = '' + (1 + ii) + '.	 ' + texts2[ii];
         //let prnt='' + (1 + ii) + '.	 ' +padLen(texts[ii],25)+' '+texts2[ii];
@@ -1109,8 +1112,34 @@ function addTails() {
         //data2 = data2 + texts2[ii] + '\n';
         data = data + texts[ii] + '\n';
     }
-    var el = document.getElementById('statdump');
-    el.innerText = data;
+    //var el: HTMLElement = (document.getElementById('statdump')as any)as HTMLElement;
+    //el.innerText = data;
+    */
+    var lbl = '';
+    mxdata.sort(function (a, b) {
+        return a.mx - b.mx;
+    });
+    var begin = -1;
+    var end = -1;
+    for (var kk = 0; kk < mxdata.length; kk++) {
+        if (ballExists(mxdata[kk].ball, slicedrows[0])) {
+            if (showFirstRow) {
+                lbl = lbl + padLen('●' + mxdata[kk].ball, 4);
+                end = kk;
+                if (begin == -1) {
+                    begin = kk;
+                }
+            }
+            else {
+                lbl = lbl + padLen('' + mxdata[kk].ball, 4);
+            }
+        }
+        else {
+            lbl = lbl + padLen('' + mxdata[kk].ball, 4);
+        }
+    }
+    //console.log(mxdata,lbl);
+    dumpInfo2('statpurple', padLen('mx ' + (0 + begin) + ':' + end + '(' + (rowLen - end - 1) + ')', 20) + lbl);
 }
 function drawTestLines(data) {
     for (var ii = 0; ii < data.length; ii++) {

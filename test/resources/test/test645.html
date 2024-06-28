@@ -16,23 +16,32 @@
 
 		#statblue {
 			color: #0033cc;
-			font-size: small;
+			font-size2: small;
 		}
 
 		#statgreen {
 			color: #339900;
-			font-size: small;
+			font-size2: small;
 		}
 
 		#statgrey {
 			color: #666666;
-			font-size: small;
+			font-size2: small;
+		}
+		
+		#statpurple {
+			color: #990099;
+			font-size2: small;
 		}
 		
 .svgpane {
 			fill: #666666;
 		}
-
+pre{
+font-weight: bolder;
+font-size: small;
+margin:0;
+}
 
 	</style>
 </head>
@@ -68,11 +77,12 @@
 		<span id='calcWide'>wwww</span>
 		<button onclick='lessWide();'>-w</button>
 		<br />
-		<span id='statblue'>blue</span>
-		<br />
-		<span id='statgreen'>green</span>
-		<br />
-		<span id='statgrey'>grey</span>
+		<pre id='statblue'>blue</pre>
+		
+		<pre id='statgreen'>green</pre>
+		
+		<pre id='statgrey'>grey</pre>
+		<pre id='statpurple'>purple</pre>
 	</p>
 	<svg id='svgpane' width="1700" height="1300">
 		<rect width="1300" height="5000" rx="20" ry="20" fill="#ffe" />
