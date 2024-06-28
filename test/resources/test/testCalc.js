@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.127 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.128 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -1043,9 +1043,8 @@ function addTails() {
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
     dumpRowFills(slicedrows);
     fillCells();
-    //let texts: string[] = [];
-    //let texts2: string[] = [];
     var mxdata = [];
+    var avgdata = [];
     for (var ii = 0; ii < rowLen; ii++) {
         var blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
         var green = sortedGreen.indexOf(ii + 1);
@@ -1053,69 +1052,11 @@ function addTails() {
         var blueGreenDiff = Math.abs(blue - green);
         var greenBlackDiff = Math.abs(green - black);
         var blackBlueDiff = Math.abs(black - blue);
-        /*let diffMin = 0;
-        let diffMax = 0;
-        if (blueGreenDiff == Math.min(blueGreenDiff, greenBlackDiff, blackBlueDiff)) {
-            diffMin = blueGreenDiff;
-            diffMax=greenBlackDiff;
-        } else {
-            if (greenBlackDiff == Math.min(blueGreenDiff, greenBlackDiff, blackBlueDiff)) {
-                diffMin = greenBlackDiff;
-                diffMax=blackBlueDiff;
-            } else {
-                diffMin = blackBlueDiff;
-                diffMax=blueGreenDiff;
-            }
-        }*/
-        //let avg2=diffMin / diffMax;
-        //let avg2=Math.round((diffMin + diffMax)/2);
-        //let avg = Math.round((blue + green + black) / 3);
-        //let avg=Math.round((blueGreenDiff+greenBlackDiff+blackBlueDiff)/3);
         var mx = Math.max(blueGreenDiff, greenBlackDiff, blackBlueDiff);
         mxdata.push({ ball: ii + 1, mx: mx });
-        var line = ''
-            + ('' + (100 + mx)).substr(1)
-            + ': ' + ('' + (101 + ii)).substr(1) + ': '
-            + ('' + (blue + 101)).substr(1) + ' ' + ('' + (green + 101)).substr(1) + ' ' + ('' + (black + 101)).substr(1);
-        /*let line = ''
-             + (''+(101 + ii)).substr(1) + ': '
-             + (''+(blue + 101)).substr(1) + ' ' + (''+(green + 101)).substr(1) + ' ' + (''+(black + 101)).substr(1)
-             +' '+avg+'/'+avg2
-             ;*/
-        /*let line2 = ''
-            + (('' + (100 + Math.round(avg2))).substr(1))
-             + (' - ' + (1 + ii) + ': ')
-             + (blue + 1) + ' ' + (green + 1) + ' ' + (black + 1)
-             ;
-             */
-        if (showFirstRow) {
-            if (ballExists(1 + ii, slicedrows[0])) {
-                line = line + ' *****';
-                //line2 = line2 + ' <@!';
-            }
-        }
-        //texts.push(line);
-        //texts2.push(line2);
+        var avg = Math.round((blue + green + black) / 3);
+        avgdata.push({ ball: ii + 1, avg: avg });
     }
-    /*
-    let data = 'mx: ball: blue green black avg/diff \n';
-    //let data = '#. avg - ball: blue green black '+'	'+'diff - ball: blue green black\n';
-    //let data2 = '#. % avg - ball: blue green black\n';
-    //console.log(data);
-    texts.sort();
-    //texts2.sort();
-    for (let ii = 0; ii < texts.length; ii++) {
-        //texts[ii] = '' + (1 + ii) + '.	 ' + texts[ii];
-        //texts2[ii] = '' + (1 + ii) + '.	 ' + texts2[ii];
-        //let prnt='' + (1 + ii) + '.	 ' +padLen(texts[ii],25)+' '+texts2[ii];
-        //console.log(prnt);
-        //data = data + prnt + '\n';
-        //data2 = data2 + texts2[ii] + '\n';
-        data = data + texts[ii] + '\n';
-    }
-    //var el: HTMLElement = (document.getElementById('statdump')as any)as HTMLElement;
-    //el.innerText = data;
-    */
     var lbl = '';
     mxdata.sort(function (a, b) {
         return a.mx - b.mx;
@@ -1139,8 +1080,32 @@ function addTails() {
             lbl = lbl + padLen('' + mxdata[kk].ball, 4);
         }
     }
-    //console.log(mxdata,lbl);
     dumpInfo2('statpurple', padLen('mx ' + (0 + begin) + ':' + end + '(' + (rowLen - end - 1) + ')', 20) + lbl);
+    lbl = '';
+    avgdata.sort(function (a, b) {
+        return a.avg - b.avg;
+    });
+    begin = -1;
+    end = -1;
+    for (var kk = 0; kk < avgdata.length; kk++) {
+        if (ballExists(avgdata[kk].ball, slicedrows[0])) {
+            if (showFirstRow) {
+                lbl = lbl + padLen('●' + avgdata[kk].ball, 4);
+                end = kk;
+                if (begin == -1) {
+                    begin = kk;
+                }
+            }
+            else {
+                lbl = lbl + padLen('' + avgdata[kk].ball, 4);
+            }
+        }
+        else {
+            lbl = lbl + padLen('' + avgdata[kk].ball, 4);
+        }
+    }
+    dumpInfo2('statred', padLen('avg ' + (0 + begin) + ':' + end + '(' + (rowLen - end - 1) + ')', 20) + lbl);
+    //console.log(avgdata);
 }
 function drawTestLines(data) {
     for (var ii = 0; ii < data.length; ii++) {
