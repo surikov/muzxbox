@@ -25,7 +25,7 @@ let highLightMode = 1;
 var calcLen = 32;
 let diffWide = 5;
 
-let wideRange = true;
+let wideRange = false;
 
 type StatBeginEnd = {
 	row: number;
