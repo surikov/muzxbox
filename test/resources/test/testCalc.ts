@@ -811,7 +811,9 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		for (let kk = 0; kk < first.length; kk++) {
 			if (ballExists(first[kk].ball, rows[rr])) {
 				if (showFirstRow || rr > 0) {
-					if (kk < end) end2 = kk;
+					if (kk < end) {
+						end2 = kk;
+					}
 					if (begin2 == -1 && kk > begin) {
 						begin2 = kk;
 					}
@@ -819,7 +821,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			}
 		}
 		//lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
-		lbl = padLen('' + (rowLen - end - 1) + ':' + end + '(' + begin + '): blue ' ,20)+ lbl;
+		lbl = padLen('' + (rowLen - end - 1) + ':' + (rowLen-begin-1) + '(' + begin + '): blue ' ,20)+ lbl;
 		if (rr == 0) {
 			//let middle=(first[first.length-1].summ-first[0].summ)/2+first[0].summ;
 			//console.log(lbl,first,middle);
@@ -1381,7 +1383,7 @@ function dumpStat5(){
 	console.log(45*45*45*45*45*45); 
 }
 */
-function countHoles(datarows:BallsRow[],long:number){
+function countHoles(datarows:BallsRow[],longe:number){
     let avg=0;
     for(let rr=1;rr<datarows.length;rr++){
         let row:BallsRow=datarows[rr];
@@ -1390,7 +1392,7 @@ function countHoles(datarows:BallsRow[],long:number){
         for(let bb=1;bb<=rowLen;bb++){
             //console.log(bb);
             let hole=true;
-            for(let kk=0;kk<long;kk++){
+            for(let kk=0;kk<longe;kk++){
                 //console.log(kk);
                 if(ballExists(bb+kk,row)){//console.log('exists',bb+kk);
                     hole=false;
@@ -1403,12 +1405,13 @@ function countHoles(datarows:BallsRow[],long:number){
         }
         avg=avg+rowCount/rowLen;
     }
-    console.log(long,avg/(datarows.length-1));
+    console.log(longe,avg/(datarows.length-1));
 }
 function dumpHoleStat(){
     let dataBalls = window[dataName];
 	let datarows:BallsRow[]  = readParseStat(dataBalls);
     console.log(datarows);
+	console.log('countHoles');
     countHoles(datarows,1);
     countHoles(datarows,2);
     countHoles(datarows,3);

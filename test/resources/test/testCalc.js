@@ -768,8 +768,9 @@ function dumpTriads(svg, rows) {
         for (var kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
-                    if (kk < end)
+                    if (kk < end) {
                         end2 = kk;
+                    }
                     if (begin2 == -1 && kk > begin) {
                         begin2 = kk;
                     }
@@ -777,7 +778,7 @@ function dumpTriads(svg, rows) {
             }
         }
         //lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
-        lbl = padLen('' + (rowLen - end - 1) + ':' + end + '(' + begin + '): blue ', 20) + lbl;
+        lbl = padLen('' + (rowLen - end - 1) + ':' + (rowLen - begin - 1) + '(' + begin + '): blue ', 20) + lbl;
         if (rr == 0) {
             //let middle=(first[first.length-1].summ-first[0].summ)/2+first[0].summ;
             //console.log(lbl,first,middle);
@@ -1314,7 +1315,7 @@ function dumpStat5(){
     console.log(45*45*45*45*45*45);
 }
 */
-function countHoles(datarows, long) {
+function countHoles(datarows, longe) {
     var avg = 0;
     for (var rr = 1; rr < datarows.length; rr++) {
         var row = datarows[rr];
@@ -1323,7 +1324,7 @@ function countHoles(datarows, long) {
         for (var bb = 1; bb <= rowLen; bb++) {
             //console.log(bb);
             var hole = true;
-            for (var kk = 0; kk < long; kk++) {
+            for (var kk = 0; kk < longe; kk++) {
                 //console.log(kk);
                 if (ballExists(bb + kk, row)) { //console.log('exists',bb+kk);
                     hole = false;
@@ -1336,12 +1337,13 @@ function countHoles(datarows, long) {
         }
         avg = avg + rowCount / rowLen;
     }
-    console.log(long, avg / (datarows.length - 1));
+    console.log(longe, avg / (datarows.length - 1));
 }
 function dumpHoleStat() {
     var dataBalls = window[dataName];
     var datarows = readParseStat(dataBalls);
     console.log(datarows);
+    console.log('countHoles');
     countHoles(datarows, 1);
     countHoles(datarows, 2);
     countHoles(datarows, 3);
