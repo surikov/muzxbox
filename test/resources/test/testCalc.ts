@@ -1110,7 +1110,7 @@ function addTails() {
 		let blueGreenDiff = Math.abs(blue - green);
 		let greenBlackDiff = Math.abs(green - black);
 		let blackBlueDiff = Math.abs(black - blue);
-		let diffMin = 0;
+		/*let diffMin = 0;
 		let diffMax = 0;
 		if (blueGreenDiff == Math.min(blueGreenDiff, greenBlackDiff, blackBlueDiff)) {
 			diffMin = blueGreenDiff;
@@ -1123,17 +1123,22 @@ function addTails() {
 				diffMin = blackBlueDiff;
 				diffMax=blueGreenDiff;
 			}
-		}
+		}*/
 		//let avg2=diffMin / diffMax;
-		let avg2=Math.round((diffMin + diffMax)/2);
-		let avg = Math.round((blue + green + black) / 3);
+		//let avg2=Math.round((diffMin + diffMax)/2);
+		//let avg = Math.round((blue + green + black) / 3);
 		//let avg=Math.round((blueGreenDiff+greenBlackDiff+blackBlueDiff)/3);
-
+		let mx=Math.max(blueGreenDiff,greenBlackDiff,blackBlueDiff);
 		let line = ''
+			+(''+(100 + mx)).substr(1)
+			 + ': '+(''+(101 + ii)).substr(1) + ': '
+			 + (''+(blue + 101)).substr(1) + ' ' + (''+(green + 101)).substr(1) + ' ' + (''+(black + 101)).substr(1)
+			 ;
+		/*let line = ''
 			 + (''+(101 + ii)).substr(1) + ': '
 			 + (''+(blue + 101)).substr(1) + ' ' + (''+(green + 101)).substr(1) + ' ' + (''+(black + 101)).substr(1)
 			 +' '+avg+'/'+avg2
-			 ;
+			 ;*/
 		/*let line2 = ''
 			+ (('' + (100 + Math.round(avg2))).substr(1))
 			 + (' - ' + (1 + ii) + ': ')
@@ -1149,7 +1154,7 @@ function addTails() {
 		texts.push(line);
 		//texts2.push(line2);
 	}
-	let data = 'ball: blue green black avg/diff \n';
+	let data = 'mx: ball: blue green black avg/diff \n';
 	//let data = '#. avg - ball: blue green black '+'	'+'diff - ball: blue green black\n';
 	//let data2 = '#. % avg - ball: blue green black\n';
 	//console.log(data);

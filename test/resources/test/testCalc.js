@@ -1051,30 +1051,34 @@ function addTails() {
         var blueGreenDiff = Math.abs(blue - green);
         var greenBlackDiff = Math.abs(green - black);
         var blackBlueDiff = Math.abs(black - blue);
-        var diffMin = 0;
-        var diffMax = 0;
+        /*let diffMin = 0;
+        let diffMax = 0;
         if (blueGreenDiff == Math.min(blueGreenDiff, greenBlackDiff, blackBlueDiff)) {
             diffMin = blueGreenDiff;
-            diffMax = greenBlackDiff;
-        }
-        else {
+            diffMax=greenBlackDiff;
+        } else {
             if (greenBlackDiff == Math.min(blueGreenDiff, greenBlackDiff, blackBlueDiff)) {
                 diffMin = greenBlackDiff;
-                diffMax = blackBlueDiff;
-            }
-            else {
+                diffMax=blackBlueDiff;
+            } else {
                 diffMin = blackBlueDiff;
-                diffMax = blueGreenDiff;
+                diffMax=blueGreenDiff;
             }
-        }
+        }*/
         //let avg2=diffMin / diffMax;
-        var avg2 = Math.round((diffMin + diffMax) / 2);
-        var avg = Math.round((blue + green + black) / 3);
+        //let avg2=Math.round((diffMin + diffMax)/2);
+        //let avg = Math.round((blue + green + black) / 3);
         //let avg=Math.round((blueGreenDiff+greenBlackDiff+blackBlueDiff)/3);
+        var mx = Math.max(blueGreenDiff, greenBlackDiff, blackBlueDiff);
         var line = ''
-            + ('' + (101 + ii)).substr(1) + ': '
-            + ('' + (blue + 101)).substr(1) + ' ' + ('' + (green + 101)).substr(1) + ' ' + ('' + (black + 101)).substr(1)
-            + ' ' + avg + '/' + avg2;
+            + ('' + (100 + mx)).substr(1)
+            + ': ' + ('' + (101 + ii)).substr(1) + ': '
+            + ('' + (blue + 101)).substr(1) + ' ' + ('' + (green + 101)).substr(1) + ' ' + ('' + (black + 101)).substr(1);
+        /*let line = ''
+             + (''+(101 + ii)).substr(1) + ': '
+             + (''+(blue + 101)).substr(1) + ' ' + (''+(green + 101)).substr(1) + ' ' + (''+(black + 101)).substr(1)
+             +' '+avg+'/'+avg2
+             ;*/
         /*let line2 = ''
             + (('' + (100 + Math.round(avg2))).substr(1))
              + (' - ' + (1 + ii) + ': ')
@@ -1090,7 +1094,7 @@ function addTails() {
         texts.push(line);
         //texts2.push(line2);
     }
-    var data = 'ball: blue green black avg/diff \n';
+    var data = 'mx: ball: blue green black avg/diff \n';
     //let data = '#. avg - ball: blue green black '+'	'+'diff - ball: blue green black\n';
     //let data2 = '#. % avg - ball: blue green black\n';
     //console.log(data);
