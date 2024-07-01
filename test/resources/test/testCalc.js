@@ -499,11 +499,11 @@ function dumpRowWaitColor(rows, color, shiftX) {
                     }
                 }
                 else {
-                    lbl = lbl + padLen('' + first[kk].ball, 4);
+                    lbl = lbl + padLen(' ' + first[kk].ball, 4);
                 }
             }
             else {
-                lbl = lbl + padLen('' + first[kk].ball, 4);
+                lbl = lbl + padLen(' ' + first[kk].ball, 4);
             }
         }
         for (var kk = 0; kk < first.length; kk++) {
@@ -632,11 +632,11 @@ function dumpRowFillsColor(rows, color, shiftX) {
                     }
                 }
                 else {
-                    lbl = lbl + padLen('' + first[kk].ball, 4);
+                    lbl = lbl + padLen(' ' + first[kk].ball, 4);
                 }
             }
             else {
-                lbl = lbl + padLen('' + first[kk].ball, 4);
+                lbl = lbl + padLen(' ' + first[kk].ball, 4);
             }
         }
         for (var kk = 0; kk < first.length; kk++) {
@@ -756,12 +756,12 @@ function dumpTriads(svg, rows) {
                 }
                 else {
                     //lbl = lbl + ' ' + first[kk].ball;
-                    lbl = padLen('' + first[kk].ball, 4) + lbl;
+                    lbl = padLen(' ' + first[kk].ball, 4) + lbl;
                 }
             }
             else {
                 //lbl = lbl + ' ' + first[kk].ball;
-                lbl = padLen('' + first[kk].ball, 4) + lbl;
+                lbl = padLen(' ' + first[kk].ball, 4) + lbl;
             }
         }
         for (var kk = 0; kk < first.length; kk++) {
@@ -1031,11 +1031,11 @@ function addTails() {
                 }
             }
             else {
-                lbl = lbl + padLen('' + mxdata[kk].ball, 4);
+                lbl = lbl + padLen(' ' + mxdata[kk].ball, 4);
             }
         }
         else {
-            lbl = lbl + padLen('' + mxdata[kk].ball, 4);
+            lbl = lbl + padLen(' ' + mxdata[kk].ball, 4);
         }
     }
     dumpInfo2('statpurple', padLen('mx ' + (0 + begin) + ':' + end + '(' + (rowLen - end - 1) + ')', 20) + lbl);
@@ -1055,11 +1055,11 @@ function addTails() {
                 }
             }
             else {
-                lbl = lbl + padLen('' + avgdata[kk].ball, 4);
+                lbl = lbl + padLen(' ' + avgdata[kk].ball, 4);
             }
         }
         else {
-            lbl = lbl + padLen('' + avgdata[kk].ball, 4);
+            lbl = lbl + padLen(' ' + avgdata[kk].ball, 4);
         }
     }
     dumpInfo2('statred', padLen('min ' + (0 + begin) + ':' + end + '(' + (rowLen - end - 1) + ')', 20) + lbl);

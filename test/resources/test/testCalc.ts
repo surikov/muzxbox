@@ -552,10 +552,10 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 						begin = kk;
 					}
 				} else {
-					lbl = lbl + padLen('' + first[kk].ball,4);
+					lbl = lbl + padLen(' ' + first[kk].ball,4);
 				}
 			} else {
-				lbl = lbl +padLen('' + first[kk].ball,4);
+				lbl = lbl +padLen(' ' + first[kk].ball,4);
 			}
 		}
 		for (let kk = 0; kk < first.length; kk++) {
@@ -678,10 +678,10 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 						begin = kk;
 					}
 				} else {
-					lbl = lbl + padLen( ''+first[kk].ball,4);
+					lbl = lbl + padLen( ' '+first[kk].ball,4);
 				}
 			} else {
-				lbl = lbl +padLen( ''+first[kk].ball,4);
+				lbl = lbl +padLen( ' '+first[kk].ball,4);
 			}
 		}
 		for (let kk = 0; kk < first.length; kk++) {
@@ -800,11 +800,11 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 					}
 				} else {
 					//lbl = lbl + ' ' + first[kk].ball;
-					lbl =  padLen( ''+first[kk].ball,4)+lbl;
+					lbl =  padLen( ' '+first[kk].ball,4)+lbl;
 				}
 			} else {
 				//lbl = lbl + ' ' + first[kk].ball;
-				lbl =  padLen( ''+first[kk].ball,4)+lbl;
+				lbl =  padLen( ' '+first[kk].ball,4)+lbl;
 			}
 			
 		}
@@ -1092,10 +1092,10 @@ function addTails() {
 						begin = kk;
 					}
 				} else {
-					lbl = lbl + padLen( ''+mxdata[kk].ball,4);
+					lbl = lbl + padLen( ' '+mxdata[kk].ball,4);
 				}
 			} else {
-				lbl = lbl +padLen( ''+mxdata[kk].ball,4);
+				lbl = lbl +padLen( ' '+mxdata[kk].ball,4);
 			}
 		}
 	dumpInfo2('statpurple', padLen('mx '+(0+begin)+':'+end+'('+(rowLen-end-1)+')',20)+lbl);
@@ -1115,10 +1115,10 @@ function addTails() {
 						begin = kk;
 					}
 				} else {
-					lbl = lbl + padLen( ''+avgdata[kk].ball,4);
+					lbl = lbl + padLen( ' '+avgdata[kk].ball,4);
 				}
 			} else {
-				lbl = lbl +padLen( ''+avgdata[kk].ball,4);
+				lbl = lbl +padLen( ' '+avgdata[kk].ball,4);
 			}
 		}
 	dumpInfo2('statred', padLen('min '+(0+begin)+':'+end+'('+(rowLen-end-1)+')',20)+lbl);
