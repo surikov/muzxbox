@@ -568,7 +568,7 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 				}
 			}
 		}
-		lbl = padLen('' + begin + ':' + end + '(' + (rowLen - end - 1) + '): grey',20) + lbl;
+		lbl = padLen('' + padLen(''+begin,2) + ':' + padLen(''+end,2) + '(' + padLen(''+(rowLen - end - 1),2) + '): grey',20) + lbl;
 		if (rr == 0) {
 
 			//console.log(lbl);
@@ -694,7 +694,7 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 				}
 			}
 		}
-		lbl = padLen('' + begin + ':' + end + '(' + (rowLen - end - 1) + '): green',20) + lbl;
+		lbl = padLen('' + padLen(''+begin,2) + ':' + padLen(''+end,2) + '(' + padLen(''+(rowLen - end - 1),2) + '): green',20) + lbl;
 		//console.log(lbl);
 		if (rr == 0) {
 			dumpInfo2('statgreen', lbl);
@@ -821,7 +821,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			}
 		}
 		//lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
-		lbl = padLen('' + (rowLen - end - 1) + ':' + (rowLen-begin-1) + '(' + begin + '): blue ' ,20)+ lbl;
+		lbl = padLen('' + padLen(''+(rowLen - end - 1),2) + ':' + padLen(''+(rowLen-begin-1),2) + '(' + padLen(''+begin,2) + '): blue ' ,20)+ lbl;
 		if (rr == 0) {
 			//let middle=(first[first.length-1].summ-first[0].summ)/2+first[0].summ;
 			//console.log(lbl,first,middle);
@@ -1063,7 +1063,7 @@ function addTails() {
 	dumpRowFills(slicedrows);
 	fillCells();
 	let mxdata:{ball:number,mx:number}[]=[];
-	let avgdata:{ball:number,avg:number}[]=[];
+	let mindata:{ball:number,min:number}[]=[];
 	for (let ii = 0; ii < rowLen; ii++) {
 		let blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
 		let green = sortedGreen.indexOf(ii + 1);
@@ -1074,8 +1074,8 @@ function addTails() {
 		let mx=Math.max(blueGreenDiff,greenBlackDiff,blackBlueDiff);
 		mxdata.push({ball:ii+1,mx:mx});
 		//let avg=Math.round((blue+green+black)/3);
-		let avg=Math.min(blueGreenDiff,greenBlackDiff,blackBlueDiff);
-		avgdata.push({ball:ii+1,avg:avg});
+		let min=Math.min(blueGreenDiff,greenBlackDiff,blackBlueDiff);
+		mindata.push({ball:ii+1,min:min});
 	}
 	let lbl='';
 	mxdata.sort((a:{ball:number,mx:number},b:{ball:number,mx:number})=>{
@@ -1098,31 +1098,35 @@ function addTails() {
 				lbl = lbl +padLen( ' '+mxdata[kk].ball,4);
 			}
 		}
-	dumpInfo2('statpurple', padLen('mx '+(0+begin)+':'+end+'('+(rowLen-end-1)+')',20)+lbl);
+	dumpInfo2('statpurple', padLen(''+padLen(''+(0+begin),2)+':'+padLen(''+end,2)+'('+padLen(''+(rowLen-end-1),2)+'): mx:',20)+lbl);
 	
 	lbl='';
-	avgdata.sort((a:{ball:number,avg:number},b:{ball:number,avg:number})=>{
-		return a.avg-b.avg;
+	mindata.sort((a:{ball:number,min:number},b:{ball:number,min:number})=>{
+		return a.min-b.min;
 	});
 	begin = -1;
 	end = -1;
-	for (let kk = 0; kk < avgdata.length; kk++) {
-			if (ballExists(avgdata[kk].ball, slicedrows[0])) {
+	for (let kk = 0; kk < mindata.length; kk++) {
+			if (ballExists(mindata[kk].ball, slicedrows[0])) {
 				if (showFirstRow ) {
-					lbl = lbl + padLen('[' + avgdata[kk].ball+']',4);
+					lbl = lbl + padLen('[' + mindata[kk].ball+']',4);
 					end = kk;
 					if (begin == -1) {
 						begin = kk;
 					}
 				} else {
-					lbl = lbl + padLen( ' '+avgdata[kk].ball,4);
+					lbl = lbl + padLen( ' '+mindata[kk].ball,4);
 				}
 			} else {
-				lbl = lbl +padLen( ' '+avgdata[kk].ball,4);
+				lbl = lbl +padLen( ' '+mindata[kk].ball,4);
 			}
 		}
-	dumpInfo2('statred', padLen('min '+(0+begin)+':'+end+'('+(rowLen-end-1)+')',20)+lbl);
+	//dumpInfo2('statred', padLen(''+(0+begin)+':'+end+'('+(rowLen-end-1)+'): min:',20)+lbl);
+	dumpInfo2('statred', padLen(''+padLen(''+(0+begin),2)+':'+padLen(''+end,2)+'('+padLen(''+(rowLen-end-1),2)+'): min:',20)+lbl);
 	//console.log(avgdata);
+	//for(let ii=0;ii<mindata.length;ii++){
+	//	console.log(ii,mindata[ii],mxdata[ii]);
+	//}
 }
 
 function drawTestLines(data: { ball: number, color: string }[]) {

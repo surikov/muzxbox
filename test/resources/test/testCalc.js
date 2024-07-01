@@ -517,7 +517,7 @@ function dumpRowWaitColor(rows, color, shiftX) {
                 }
             }
         }
-        lbl = padLen('' + begin + ':' + end + '(' + (rowLen - end - 1) + '): grey', 20) + lbl;
+        lbl = padLen('' + padLen('' + begin, 2) + ':' + padLen('' + end, 2) + '(' + padLen('' + (rowLen - end - 1), 2) + '): grey', 20) + lbl;
         if (rr == 0) {
             //console.log(lbl);
             dumpInfo2('statgrey', lbl);
@@ -650,7 +650,7 @@ function dumpRowFillsColor(rows, color, shiftX) {
                 }
             }
         }
-        lbl = padLen('' + begin + ':' + end + '(' + (rowLen - end - 1) + '): green', 20) + lbl;
+        lbl = padLen('' + padLen('' + begin, 2) + ':' + padLen('' + end, 2) + '(' + padLen('' + (rowLen - end - 1), 2) + '): green', 20) + lbl;
         //console.log(lbl);
         if (rr == 0) {
             dumpInfo2('statgreen', lbl);
@@ -777,7 +777,7 @@ function dumpTriads(svg, rows) {
             }
         }
         //lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
-        lbl = padLen('' + (rowLen - end - 1) + ':' + (rowLen - begin - 1) + '(' + begin + '): blue ', 20) + lbl;
+        lbl = padLen('' + padLen('' + (rowLen - end - 1), 2) + ':' + padLen('' + (rowLen - begin - 1), 2) + '(' + padLen('' + begin, 2) + '): blue ', 20) + lbl;
         if (rr == 0) {
             //let middle=(first[first.length-1].summ-first[0].summ)/2+first[0].summ;
             //console.log(lbl,first,middle);
@@ -1001,7 +1001,7 @@ function addTails() {
     dumpRowFills(slicedrows);
     fillCells();
     var mxdata = [];
-    var avgdata = [];
+    var mindata = [];
     for (var ii = 0; ii < rowLen; ii++) {
         var blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
         var green = sortedGreen.indexOf(ii + 1);
@@ -1012,8 +1012,8 @@ function addTails() {
         var mx = Math.max(blueGreenDiff, greenBlackDiff, blackBlueDiff);
         mxdata.push({ ball: ii + 1, mx: mx });
         //let avg=Math.round((blue+green+black)/3);
-        var avg = Math.min(blueGreenDiff, greenBlackDiff, blackBlueDiff);
-        avgdata.push({ ball: ii + 1, avg: avg });
+        var min = Math.min(blueGreenDiff, greenBlackDiff, blackBlueDiff);
+        mindata.push({ ball: ii + 1, min: min });
     }
     var lbl = '';
     mxdata.sort(function (a, b) {
@@ -1038,32 +1038,36 @@ function addTails() {
             lbl = lbl + padLen(' ' + mxdata[kk].ball, 4);
         }
     }
-    dumpInfo2('statpurple', padLen('mx ' + (0 + begin) + ':' + end + '(' + (rowLen - end - 1) + ')', 20) + lbl);
+    dumpInfo2('statpurple', padLen('' + padLen('' + (0 + begin), 2) + ':' + padLen('' + end, 2) + '(' + padLen('' + (rowLen - end - 1), 2) + '): mx:', 20) + lbl);
     lbl = '';
-    avgdata.sort(function (a, b) {
-        return a.avg - b.avg;
+    mindata.sort(function (a, b) {
+        return a.min - b.min;
     });
     begin = -1;
     end = -1;
-    for (var kk = 0; kk < avgdata.length; kk++) {
-        if (ballExists(avgdata[kk].ball, slicedrows[0])) {
+    for (var kk = 0; kk < mindata.length; kk++) {
+        if (ballExists(mindata[kk].ball, slicedrows[0])) {
             if (showFirstRow) {
-                lbl = lbl + padLen('[' + avgdata[kk].ball + ']', 4);
+                lbl = lbl + padLen('[' + mindata[kk].ball + ']', 4);
                 end = kk;
                 if (begin == -1) {
                     begin = kk;
                 }
             }
             else {
-                lbl = lbl + padLen(' ' + avgdata[kk].ball, 4);
+                lbl = lbl + padLen(' ' + mindata[kk].ball, 4);
             }
         }
         else {
-            lbl = lbl + padLen(' ' + avgdata[kk].ball, 4);
+            lbl = lbl + padLen(' ' + mindata[kk].ball, 4);
         }
     }
-    dumpInfo2('statred', padLen('min ' + (0 + begin) + ':' + end + '(' + (rowLen - end - 1) + ')', 20) + lbl);
+    //dumpInfo2('statred', padLen(''+(0+begin)+':'+end+'('+(rowLen-end-1)+'): min:',20)+lbl);
+    dumpInfo2('statred', padLen('' + padLen('' + (0 + begin), 2) + ':' + padLen('' + end, 2) + '(' + padLen('' + (rowLen - end - 1), 2) + '): min:', 20) + lbl);
     //console.log(avgdata);
+    //for(let ii=0;ii<mindata.length;ii++){
+    //	console.log(ii,mindata[ii],mxdata[ii]);
+    //}
 }
 function drawTestLines(data) {
     for (var ii = 0; ii < data.length; ii++) {
