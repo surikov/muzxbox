@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.128 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.129 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -492,7 +492,7 @@ function dumpRowWaitColor(rows, color, shiftX) {
         for (var kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
-                    lbl = lbl + padLen('' + '●' + first[kk].ball, 4);
+                    lbl = lbl + padLen('[' + first[kk].ball + ']', 4);
                     end = kk;
                     if (begin == -1) {
                         begin = kk;
@@ -625,7 +625,7 @@ function dumpRowFillsColor(rows, color, shiftX) {
         for (var kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
-                    lbl = lbl + padLen('●' + first[kk].ball, 4);
+                    lbl = lbl + padLen('[' + first[kk].ball + ']', 4);
                     end = kk;
                     if (begin == -1) {
                         begin = kk;
@@ -748,8 +748,7 @@ function dumpTriads(svg, rows) {
             }*/
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
-                    //lbl = lbl + ' ●' + first[kk].ball;
-                    lbl = padLen('' + '●' + first[kk].ball, 4) + lbl;
+                    lbl = padLen('[' + first[kk].ball + ']', 4) + lbl;
                     end = kk;
                     if (begin == -1) {
                         begin = kk;
@@ -856,48 +855,6 @@ function dumpTriads(svg, rows) {
 function roundDown(num, base) {
     return Math.floor(num / base) * base;
 }
-/*
-function countColorStat(kk: number, sz: number): number {
-    let countS = 0;
-    if (blueStat[kk].left > sz) countS++;
-    if (blueStat[kk].right > sz) countS++;
-    if (greenStat[kk].left > sz) countS++;
-    if (greenStat[kk].right > sz) countS++;
-    if (greyStat[kk].left > sz) countS++;
-    if (greyStat[kk].right > sz) countS++;
-    if (redStat[kk].left > sz) countS++;
-    if (redStat[kk].right > sz) countS++;
-    return countS;
-}*/
-/*
-function dumpStat2(){
-    console.log(greenStat);
-    for(let ii=0;ii<10;ii++){
-        let cur=greenStat[ii];
-        let pre=(greenStat[ii+1].left+greenStat[ii+2].left+greenStat[ii+3].left)/3;
-        let lin=[];
-        for(let kk=0;kk<40;kk++){
-            lin.push('-');
-        }
-        let val=cur.left-greenStat[ii+1].left;
-        //let val=Math.round(cur.left-pre);
-        let shft=0;
-        if(val>0){
-            shft=20;
-        }else{
-            shft=20+val;
-        }
-        for(let kk=0;kk<Math.abs(val);kk++){
-            lin[shft+kk]='#';
-        }
-        let txt='';
-        for(let kk=0;kk<lin.length;kk++){
-            txt=txt+lin[kk];
-        }
-        console.log(txt,val,cur.left);
-    }
-}
-*/
 function dumpColorStat() {
     //console.log('stat');
     var skip = 1;
@@ -1054,7 +1011,8 @@ function addTails() {
         var blackBlueDiff = Math.abs(black - blue);
         var mx = Math.max(blueGreenDiff, greenBlackDiff, blackBlueDiff);
         mxdata.push({ ball: ii + 1, mx: mx });
-        var avg = Math.round((blue + green + black) / 3);
+        //let avg=Math.round((blue+green+black)/3);
+        var avg = Math.min(blueGreenDiff, greenBlackDiff, blackBlueDiff);
         avgdata.push({ ball: ii + 1, avg: avg });
     }
     var lbl = '';
@@ -1066,7 +1024,7 @@ function addTails() {
     for (var kk = 0; kk < mxdata.length; kk++) {
         if (ballExists(mxdata[kk].ball, slicedrows[0])) {
             if (showFirstRow) {
-                lbl = lbl + padLen('●' + mxdata[kk].ball, 4);
+                lbl = lbl + padLen('[' + mxdata[kk].ball + ']', 4);
                 end = kk;
                 if (begin == -1) {
                     begin = kk;
@@ -1090,7 +1048,7 @@ function addTails() {
     for (var kk = 0; kk < avgdata.length; kk++) {
         if (ballExists(avgdata[kk].ball, slicedrows[0])) {
             if (showFirstRow) {
-                lbl = lbl + padLen('●' + avgdata[kk].ball, 4);
+                lbl = lbl + padLen('[' + avgdata[kk].ball + ']', 4);
                 end = kk;
                 if (begin == -1) {
                     begin = kk;
@@ -1104,7 +1062,7 @@ function addTails() {
             lbl = lbl + padLen('' + avgdata[kk].ball, 4);
         }
     }
-    dumpInfo2('statred', padLen('avg ' + (0 + begin) + ':' + end + '(' + (rowLen - end - 1) + ')', 20) + lbl);
+    dumpInfo2('statred', padLen('min ' + (0 + begin) + ':' + end + '(' + (rowLen - end - 1) + ')', 20) + lbl);
     //console.log(avgdata);
 }
 function drawTestLines(data) {
