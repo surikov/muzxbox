@@ -38,6 +38,12 @@ class MixerDataMathUtility {
 		}
 		//console.log();
 	}
+	extractDifference(from: Zvoog_Project): Object {
+		return '';
+	}
+	mergeDifference(diff:Object) {
+
+	}
 	wholeWidth(): number {
 		return this.leftPad + this.timelineWidth() + this.rightPad;
 	}
@@ -69,12 +75,12 @@ class MixerDataMathUtility {
 		return (2 + this.maxCommentRowCount) * this.notePathHeight * 8;
 	}
 	commentsAverageFillHeight(): number {
-		let rcount=this.maxCommentRowCount;
-		if(rcount>3){
-			rcount=3;
+		let rcount = this.maxCommentRowCount;
+		if (rcount > 3) {
+			rcount = 3;
 		}
 		return (2 + rcount) * this.notePathHeight * 8;
-		
+
 	}
 	automationTop(): number {
 		return this.topPad + this.heightOfTitle() + this.titleBottomPad;

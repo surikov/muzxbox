@@ -10,6 +10,7 @@ class MixerUI {
 	fillerAnchor: TileAnchor;
 	//samplerUI: SamplerRows;
 	fanPane: FanPane = new FanPane();
+	fanAnchor: TileAnchor;
 	constructor() {
 
 	}
@@ -29,6 +30,8 @@ class MixerUI {
 			this.trackLayers.anchors[ii].hh = hh;
 			this.firstLayers.anchors[ii].ww = ww;
 			this.firstLayers.anchors[ii].hh = hh;
+			this.fanLayer.anchors[ii].ww = ww;
+			this.fanLayer.anchors[ii].hh = hh;
 			this.levels[ii].reCreateBars(cfg);
 		}
 		this.fillerAnchor.xx = cfg.leftPad;
@@ -38,7 +41,7 @@ class MixerUI {
 		this.fillerAnchor.content = [];
 		this.reFillWholeRatio(cfg);
 		this.reFillSingleRatio(cfg);
-		this.fanPane.resetPlates(cfg);
+		this.fanPane.resetPlates(cfg,this.fanAnchor);
 
 	}
 	createMixerLayers(): TileLayerDefinition[] {
@@ -74,6 +77,13 @@ class MixerUI {
 				, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 			};
 			this.firstLayers.anchors.push(mixerFirstAnchor);
+
+			this.fanAnchor = {
+				showZoom: zoomPrefixLevelsCSS[ii].minZoom
+				, hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom
+				, xx: 0, yy: 0, ww: 1, hh: 1, content: []
+			};
+			this.fanLayer.anchors.push(this.fanAnchor);
 
 			this.levels.push(new MixerZoomLevel(ii
 				, mixerGridAnchor
@@ -141,26 +151,6 @@ class MixerUI {
 	}
 	reFillWholeRatio(cfg: MixerDataMathUtility) {
 
-		/*
-		let countFunction: (cfg: MixerDataMathUtility, barIdx: number) => number;
-		if (cfg.data.focus) {
-			if (cfg.data.focus == 1) {
-				//this.addFillerDrums(cfg);
-				countFunction = this.barDrumCount;
-			} else {
-				if (cfg.data.focus == 2) {
-					//this.addFillerAutomation(cfg);
-					countFunction = this.barAutoCount;
-				} else {
-					//this.addFillerComments(cfg);
-					countFunction = this.barCommentsCount;
-				}
-			}
-		} else {
-			//this.addFillerTracks(cfg);
-			countFunction = this.barTrackCount;
-		}
-		*/
 		let yy = cfg.gridTop();
 		let hh = cfg.gridHeight() / 8;
 		if (cfg.data.focus) {
@@ -260,174 +250,5 @@ class MixerUI {
 		}
 		return 0;
 	}
-	/*
-	addFillerTracks(cfg: MixerDataMathUtility) {
-		let mxNotes = 0;
-		for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
-			let notecount = this.barTrackCount(cfg, bb);
-			if (mxNotes < notecount) {
-				mxNotes = notecount;
-			}
-		}
-		if (mxNotes < 1) mxNotes = 1;
-		let barX = 0;
-		for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
-			let notecount = this.barTrackCount(cfg, bb);
-			let filIdx = 1 + Math.round(7 * notecount / mxNotes);
-			let css = 'mixFiller' + filIdx;
-			let barwidth = MMUtil().set(cfg.data.timeline[bb].metre).duration(cfg.data.timeline[bb].tempo) * cfg.widthDurationRatio;
-			let fillSequencerRectangle: TileRectangle = {
-				x: cfg.leftPad + barX
-				, y: cfg.gridTop()
-				, w: barwidth
-				, h: cfg.gridHeight()
-				, css: css
-			};
-			this.fillerAnchor.content.push(fillSequencerRectangle);
-			barX = barX + barwidth;
-		}
-	}
-	addFillerDrums(cfg: MixerDataMathUtility) {
-
-	}
-	addFillerAutomation(cfg: MixerDataMathUtility) {
-
-	}
-	addFillerComments(cfg: MixerDataMathUtility) {
-
-	}*/
-	/*
-	reFillTracksRatio22(cfg: MixerDataMathUtility) {
-		let mxNotes = 0;
-		let mxDrums = 0;
-		let mxTxt = 0;
-		let mxAuto = 0;
-		for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
-			let notecount = 0;
-			let drumcount = 0;
-			//let txtcnt = 0;
-			for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
-				let bar = cfg.data.tracks[tt].measures[bb];
-				if (bar) {
-					for (let cc = 0; cc < bar.chords.length; cc++) {
-						notecount = notecount + bar.chords[cc].notes.length;
-					}
-				}
-			}
-			if (mxNotes < notecount) {
-				mxNotes = notecount;
-			}
-			for (let tt = 0; tt < cfg.data.percussions.length; tt++) {
-				let bar = cfg.data.percussions[tt].measures[bb];
-				if (bar) {
-					drumcount = drumcount + bar.skips.length;
-				}
-			}
-			if (mxDrums < drumcount) {
-				mxDrums = drumcount;
-			}
-			if (cfg.data.comments[bb]) {
-				if (cfg.data.comments[bb].points) {
-					if (mxTxt < cfg.data.comments[bb].points.length) {
-						mxTxt = cfg.data.comments[bb].points.length;
-					}
-				}
-			}
-			let autoCnt = 0;
-			for (let ff = 0; ff < cfg.data.filters.length; ff++) {
-				let filter = cfg.data.filters[ff];
-				if (filter.automation) {
-					if (filter.automation.measures[bb]) {
-						autoCnt = autoCnt + filter.automation.measures[bb].changes.length;
-					}
-				}
-			}
-			if (mxAuto < autoCnt) {
-				mxAuto = autoCnt;
-			}
-		}
-		if (mxDrums < 1) mxDrums = 1;
-		if (mxNotes < 1) mxNotes = 1;
-		if (mxTxt < 1) mxTxt = 1;
-		if (mxAuto < 1) mxAuto = 1;
-		this.fillerAnchor.content = [];
-		let barX = 0;
-		for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
-			let notecount = 0;
-			for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
-				let bar = cfg.data.tracks[tt].measures[bb];
-				for (let cc = 0; cc < bar.chords.length; cc++) {
-					notecount = notecount + bar.chords[cc].notes.length;
-				}
-
-			}
-			let filIdx = 1 + Math.round(7 * notecount / mxNotes);
-			let css = 'mixFiller' + filIdx;
-			let barwidth = MMUtil().set(cfg.data.timeline[bb].metre).duration(cfg.data.timeline[bb].tempo) * cfg.widthDurationRatio;
-			let fillSequencerRectangle: TileRectangle = {
-				x: cfg.leftPad + barX
-				, y: cfg.gridTop()
-				, w: barwidth
-				, h: cfg.gridHeight()
-				, css: css
-			};
-			this.fillerAnchor.content.push(fillSequencerRectangle);
-			if (cfg.data.percussions.length) {
-				let drumcount = 0;
-				for (let tt = 0; tt < cfg.data.percussions.length; tt++) {
-					let bar = cfg.data.percussions[tt].measures[bb];
-					if (bar) {
-						drumcount = drumcount + bar.skips.length;
-					}
-				}
-				filIdx = 1 + Math.round(7 * drumcount / mxDrums);
-				let css2 = 'mixFiller' + filIdx;
-				let fillDrumBar: TileRectangle = {
-					x: cfg.leftPad + barX
-					, y: cfg.gridTop() + cfg.gridHeight() - cfg.data.percussions.length * cfg.notePathHeight
-					, w: barwidth
-					, h: cfg.data.percussions.length * cfg.notePathHeight
-					, css: css2
-				};
-				this.fillerAnchor.content.push(fillDrumBar);
-			}
-			filIdx = 1;
-			if (cfg.data.comments[bb]) {
-				if (cfg.data.comments[bb].points) {
-					filIdx = 1 + Math.round(7 * cfg.data.comments[bb].points.length / mxTxt);
-				}
-			}
-			css = 'mixFiller' + filIdx;
-			let fillTxtBar: TileRectangle = {
-				x: cfg.leftPad + barX
-				, y: cfg.gridTop()
-				, w: barwidth
-				, h: cfg.commentsAverageFillHeight()
-				, css: css
-			};
-			this.fillerAnchor.content.push(fillTxtBar);
-			filIdx = 0;
-			for (let ff = 0; ff < cfg.data.filters.length; ff++) {
-				let filter = cfg.data.filters[ff];
-				if (filter.automation) {
-					if (filter.automation.measures[bb]) {
-						filIdx = filIdx + filter.automation.measures[bb].changes.length;
-					}
-				}
-			}
-			filIdx = 1 + Math.round(7 * filIdx / mxAuto);
-			css = 'mixFiller' + filIdx;
-			let fillAutoBar: TileRectangle = {
-				x: cfg.leftPad + barX
-				, y: cfg.automationTop()
-				, w: barwidth
-				, h: cfg.automationMaxHeight()
-				, css: css
-			};
-			this.fillerAnchor.content.push(fillAutoBar);
-			barX = barX + barwidth;
-		}
-
-	}*/
-
+	
 }

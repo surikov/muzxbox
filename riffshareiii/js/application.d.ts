@@ -297,7 +297,7 @@ declare class FanPane {
     performerIcons: PerformerIcon[];
     spears: SpearConnection[];
     resetPlates(cfg: MixerDataMathUtility): void;
-    buildPerformerIcons(): void;
+    buildPerformerIcons(cfg: MixerDataMathUtility): void;
     buildAutoIcons(): void;
     buildFilterIcons(): void;
     buildOutIcon(): void;
@@ -305,9 +305,9 @@ declare class FanPane {
     connectFilters(): void;
 }
 declare class PerformerIcon {
-    track: Zvoog_MusicTrack;
-    constructor(track: Zvoog_MusicTrack);
-    buildPerformerSpot(): void;
+    performerId: string;
+    constructor(performerId: string);
+    buildPerformerSpot(cfg: MixerDataMathUtility): void;
 }
 declare class FilterIcon {
     filter: Zvoog_FilterTarget;
@@ -424,6 +424,8 @@ declare class MixerDataMathUtility {
     maxCommentRowCount: number;
     maxAutomationsCount: number;
     constructor(data: Zvoog_Project);
+    extractDifference(from: Zvoog_Project): Object;
+    mergeDifference(diff: Object): void;
     wholeWidth(): number;
     heightOfTitle(): number;
     timelineWidth(): number;
@@ -625,6 +627,10 @@ type Zvoog_AudioSampler = {
     data: string;
     kind: string;
     outputId: string;
+    iconPosition?: {
+        x: number;
+        y: number;
+    };
 };
 type Zvoog_Chord = {
     skip: Zvoog_Metre;

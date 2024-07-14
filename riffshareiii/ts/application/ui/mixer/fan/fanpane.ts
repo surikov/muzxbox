@@ -2,7 +2,7 @@ class FanPane {
 	filterIcons: FilterIcon[];
 	performerIcons: PerformerIcon[];
 	spears: SpearConnection[];
-	resetPlates(cfg: MixerDataMathUtility): void {
+	resetPlates(cfg: MixerDataMathUtility,fanAnchor: TileAnchor): void {
 		console.log('FanPane.resetPlates', cfg);
 		this.filterIcons = [];
 		this.performerIcons = [];
@@ -11,16 +11,16 @@ class FanPane {
 			this.filterIcons.push(new FilterIcon(cfg.data.filters[ff]));
 		}
 		for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
-			this.performerIcons.push(new PerformerIcon(cfg.data.tracks[tt]));
+			this.performerIcons.push(new PerformerIcon(cfg.data.tracks[tt].performer.id));
 		}
-		this.buildPerformerIcons();
+		this.buildPerformerIcons(cfg);
 		this.buildAutoIcons();
 		this.buildFilterIcons();
 		this.buildOutIcon();
 	}
-	buildPerformerIcons() {
+	buildPerformerIcons(cfg: MixerDataMathUtility) {
 		for (let ii = 0; ii < this.performerIcons.length; ii++) {
-			this.performerIcons[ii].buildPerformerSpot();
+			this.performerIcons[ii].buildPerformerSpot(cfg);
 		}
 	}
 	buildAutoIcons() {

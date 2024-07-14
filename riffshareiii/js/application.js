@@ -1746,6 +1746,8 @@ class MixerUI {
             this.trackLayers.anchors[ii].hh = hh;
             this.firstLayers.anchors[ii].ww = ww;
             this.firstLayers.anchors[ii].hh = hh;
+            this.fanLayer.anchors[ii].ww = ww;
+            this.fanLayer.anchors[ii].hh = hh;
             this.levels[ii].reCreateBars(cfg);
         }
         this.fillerAnchor.xx = cfg.leftPad;
@@ -1785,6 +1787,12 @@ class MixerUI {
                 xx: 0, yy: 0, ww: 1, hh: 1, content: []
             };
             this.firstLayers.anchors.push(mixerFirstAnchor);
+            let fanAnchor = {
+                showZoom: zoomPrefixLevelsCSS[ii].minZoom,
+                hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
+                xx: 0, yy: 0, ww: 1, hh: 1, content: []
+            };
+            this.fanLayer.anchors.push(fanAnchor);
             this.levels.push(new MixerZoomLevel(ii, mixerGridAnchor, mixerTrackAnchor, mixerFirstAnchor));
         }
         this.fillerAnchor = {
@@ -2064,16 +2072,16 @@ class FanPane {
             this.filterIcons.push(new FilterIcon(cfg.data.filters[ff]));
         }
         for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
-            this.performerIcons.push(new PerformerIcon(cfg.data.tracks[tt]));
+            this.performerIcons.push(new PerformerIcon(cfg.data.tracks[tt].performer.id));
         }
-        this.buildPerformerIcons();
+        this.buildPerformerIcons(cfg);
         this.buildAutoIcons();
         this.buildFilterIcons();
         this.buildOutIcon();
     }
-    buildPerformerIcons() {
+    buildPerformerIcons(cfg) {
         for (let ii = 0; ii < this.performerIcons.length; ii++) {
-            this.performerIcons[ii].buildPerformerSpot();
+            this.performerIcons[ii].buildPerformerSpot(cfg);
         }
     }
     buildAutoIcons() {
@@ -2102,16 +2110,15 @@ class FanPane {
     }
 }
 class PerformerIcon {
-    constructor(track) {
-        console.log('PerformerIcon', track.performer);
-        this.track = track;
+    constructor(performerId) {
+        this.performerId = performerId;
     }
-    buildPerformerSpot() {
+    buildPerformerSpot(cfg) {
+        console.log('buildPerformerSpot', this.performerId);
     }
 }
 class FilterIcon {
     constructor(filter) {
-        console.log('FilterIcon', filter);
         this.filter = filter;
     }
     buildFilterSpot() {
@@ -2295,19 +2302,19 @@ let mzxbxProjectForTesting2 = {
                     ]
                 }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 't1', data: '', kind: 'basePitched', outputId: 'track1Volme' }
+            performer: { id: 'firstPerfoemrID', data: '', kind: 'basePitched', outputId: 'track1Volme', iconPosition: { x: 7, y: 3 } }
         },
         {
             title: "Second track", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 't2', data: '', kind: 'basePitched', outputId: 'track2Volme' }
+            performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputId: 'track2Volme', iconPosition: { x: 10, y: 22 } }
         },
         {
             title: "Third track", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 't3', data: '', kind: 'basePitched', outputId: 'track3Volme' }
+            performer: { id: 't3', data: '', kind: 'basePitched', outputId: 'track3Volme', iconPosition: { x: 2, y: 33 } }
         }
     ],
     percussions: [
@@ -2315,15 +2322,15 @@ let mzxbxProjectForTesting2 = {
             title: "Snare", measures: [
                 { skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
             ],
-            sampler: { id: 'd1', data: '', kind: 'baseSampler', outputId: 'drum1Volme' }
+            sampler: { id: 'd1', data: '', kind: 'baseSampler', outputId: 'drum1Volme', iconPosition: { x: 44, y: 55 } }
         },
         {
             title: "Snare2", measures: [],
-            sampler: { id: 'd2', data: '', kind: 'baseSampler', outputId: 'drum2Volme' }
+            sampler: { id: 'd2', data: '', kind: 'baseSampler', outputId: 'drum2Volme', iconPosition: { x: 23, y: 41 } }
         },
         {
             title: "Snare3", measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }],
-            sampler: { id: 'd3', data: '', kind: 'baseSampler', outputId: 'drum3Volme' }
+            sampler: { id: 'd3', data: '', kind: 'baseSampler', outputId: 'drum3Volme', iconPosition: { x: 12, y: 13 } }
         }
     ],
     comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16', row: 0 }] }, {
@@ -2349,15 +2356,23 @@ let mzxbxProjectForTesting2 = {
         { points: [{ skip: { count: 2, part: 16 }, text: '4-2/16', row: 0 }] },
         { points: [{ skip: { count: 2, part: 16 }, text: '5-2/16', row: 0 }] }],
     filters: [
-        { id: 'volumeSlide', kind: 'baseVolume', dataBlob: '', outputId: 'masterVolme', automation: { title: 'Simple test', measures: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }] }, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }] } },
-        { id: 'masterVolme', kind: 'base_volume', dataBlob: 'bb1', outputId: '', automation: { title: 'test1122', measures: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }] } },
-        { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null },
-        { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null },
-        { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null },
-        { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null },
-        { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null },
-        { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null },
-        { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null }
+        {
+            id: 'volumeSlide', kind: 'baseVolume', dataBlob: '', outputId: 'masterVolme',
+            automation: { title: 'Simple test', measures: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }] }, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }] },
+            iconPosition: { x: 62, y: 39 }
+        },
+        {
+            id: 'masterVolme', kind: 'base_volume', dataBlob: 'bb1', outputId: '',
+            automation: { title: 'test1122', measures: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }] },
+            iconPosition: { x: 28, y: 77 }
+        },
+        { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 32, y: 33 } },
+        { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null, iconPosition: { x: 42, y: 93 } },
+        { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null, iconPosition: { x: 12, y: 53 } },
+        { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null, iconPosition: { x: 82, y: 9 } },
+        { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 32, y: 23 } },
+        { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 62, y: 4 } },
+        { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 72, y: 83 } }
     ]
 };
 let testBigMixerData = {
@@ -2460,6 +2475,11 @@ class MixerDataMathUtility {
                 this.maxAutomationsCount++;
             }
         }
+    }
+    extractDifference(from) {
+        return '';
+    }
+    mergeDifference(diff) {
     }
     wholeWidth() {
         return this.leftPad + this.timelineWidth() + this.rightPad;

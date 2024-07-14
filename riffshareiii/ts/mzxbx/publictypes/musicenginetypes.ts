@@ -60,6 +60,7 @@ type Zvoog_AudioSampler = {
 	data: string;
 	kind: string;
 	outputId: string;
+	iconPosition?:{x:number,y:number};
 };
 type Zvoog_Chord = {
 	skip: Zvoog_Metre;
