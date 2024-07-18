@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.130 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.131 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -330,7 +330,7 @@ function calcRowPatterns(rowNum, rows) {
 function calculateBallTriadChain(rowNum, rows, counts) {
     var resu = [];
     for (var nn = 0; nn < rowLen; nn++) {
-        var one = { ball: nn + 1, fills: [], summ: 0 };
+        var one = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
         resu.push(one);
         for (var dx1 = 0; dx1 < rowLen; dx1++) {
             for (var dx2 = 0; dx2 < rowLen; dx2++) {
@@ -341,6 +341,7 @@ function calculateBallTriadChain(rowNum, rows, counts) {
                 }
             }
         }
+        one.logr = one.summ;
     }
     return resu;
 }
@@ -356,7 +357,14 @@ function calculateBallFrequency(rowNum, rows) {
             }
             one.summ++;
         }
-        one.logr = one.summ;
+        var cntbl = 1;
+        for (var rr = rowNum + 1; rr < rowNum + 1 + 50; rr++) {
+            if (ballExists(nn + 1, rows[rr])) {
+                cntbl++;
+            }
+        }
+        one.logr = one.summ + 1 / cntbl;
+        //one.summ=one.summ;+1/nn;
     }
     //console.log('calculateBallFrequency',rowNum,resu);
     return resu;
@@ -732,13 +740,14 @@ function dumpTriads(svg, rows) {
         var df = mxCount - minCnt;
         var first = calcs.map(function (x) { return x; });
         var lbl = "";
-        first.sort(function (aa, bb) { return aa.summ - bb.summ; });
+        first.sort(function (aa, bb) { return aa.logr - bb.logr; });
         if (rr == 0) {
             sortedBlue = [];
             for (var ff = 0; ff < first.length; ff++) {
                 sortedBlue[ff] = first[ff].ball;
             }
         }
+        //console.log(rr,highLightMode,first,sortedBlue);
         //lbl = 'blue';
         lbl = '';
         var begin = -1;
@@ -865,7 +874,8 @@ function roundDown(num, base) {
     return Math.floor(num / base) * base;
 }
 function dumpColorStat() {
-    //console.log('stat');
+    //console.log('dumpColorStat');
+    //console.log('sortedBlue', sortedBlue);
     var skip = 1;
     if (showFirstRow) {
         skip = 0;

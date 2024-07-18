@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.130 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.131 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -373,10 +373,10 @@ function calcRowPatterns(rowNum: number, rows: BallsRow[]): number[] {
 	}
 	return cnts;
 }
-function calculateBallTriadChain(rowNum: number, rows: BallsRow[], counts: number[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] {
-	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[] = [];
+function calculateBallTriadChain(rowNum: number, rows: BallsRow[], counts: number[]): { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] {
+	let resu: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[] = [];
 	for (let nn = 0; nn < rowLen; nn++) {
-		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number } = { ball: nn + 1, fills: [], summ: 0 };
+		let one: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number } = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
 		resu.push(one);
 		for (let dx1 = 0; dx1 < rowLen; dx1++) {
 			for (let dx2 = 0; dx2 < rowLen; dx2++) {
@@ -387,6 +387,7 @@ function calculateBallTriadChain(rowNum: number, rows: BallsRow[], counts: numbe
 				}
 			}
 		}
+		one.logr = one.summ;
 	}
 	return resu;
 }
@@ -402,7 +403,15 @@ function calculateBallFrequency(rowNum: number, rows: BallsRow[]): { ball: numbe
 			}
 			one.summ++;
 		}
-		one.logr = one.summ;
+		let cntbl=1;
+		for (var rr = rowNum + 1; rr < rowNum + 1 + 50; rr++) {
+			if (ballExists(nn + 1, rows[rr])) {
+				cntbl++;
+			}
+		}
+		
+		one.logr = one.summ+1/cntbl;
+		//one.summ=one.summ;+1/nn;
 	}
 	//console.log('calculateBallFrequency',rowNum,resu);
 	return resu;
@@ -758,7 +767,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 	redStat = [];
 	for (let rr = 0; rr < rowsVisibleCount; rr++) {
 		if (rr > rows.length - 6) break;
-		let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number }[];
+		let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[];
 		if (highLightMode == 1) {
 			calcs = calculateBallFrequency(rr, rows);
 		} else {
@@ -776,13 +785,15 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 
 		let first = calcs.map((x) => x);
 		let lbl = "";
-		first.sort((aa, bb) => { return aa.summ - bb.summ; });
+		first.sort((aa, bb) => { return aa.logr - bb.logr; });
+		
 		if (rr == 0) {
 			sortedBlue = [];
 			for (let ff = 0; ff < first.length; ff++) {
 				sortedBlue[ff] = first[ff].ball;
 			}
 		}
+		//console.log(rr,highLightMode,first,sortedBlue);
 		//lbl = 'blue';
 		lbl = '';
 		let begin = -1;
@@ -920,7 +931,8 @@ function roundDown(num: number, base: number): number {
 }
 
 function dumpColorStat() {
-	//console.log('stat');
+	//console.log('dumpColorStat');
+	//console.log('sortedBlue', sortedBlue);
 	let skip = 1;
 	if (showFirstRow) {
 		skip = 0;
