@@ -1,0 +1,10 @@
+.fanSamplerIcon {
+	fill: var(--color-panel);
+	font-size: var(--label-04cm);
+	pointer-events: none;
+	border-color: var(--color-text);
+	stroke: var(--color-text);
+	stroke-width: 0.1cm;
+	stroke-linejoin: round;
+	paint-order: stroke;
+}

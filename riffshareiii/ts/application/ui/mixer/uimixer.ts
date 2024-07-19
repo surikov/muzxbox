@@ -10,7 +10,7 @@ class MixerUI {
 	fillerAnchor: TileAnchor;
 	//samplerUI: SamplerRows;
 	fanPane: FanPane = new FanPane();
-	fanAnchor: TileAnchor;
+	//iconsFanAnchor: TileAnchor;
 	constructor() {
 
 	}
@@ -26,14 +26,22 @@ class MixerUI {
 			//this.zoomLayers[ii].anchors[0].hh = hh;
 			this.gridLayers.anchors[ii].ww = ww;
 			this.gridLayers.anchors[ii].hh = hh;
+
 			this.trackLayers.anchors[ii].ww = ww;
 			this.trackLayers.anchors[ii].hh = hh;
+
 			this.firstLayers.anchors[ii].ww = ww;
 			this.firstLayers.anchors[ii].hh = hh;
+
 			this.fanLayer.anchors[ii].ww = ww;
 			this.fanLayer.anchors[ii].hh = hh;
+
+			
 			this.levels[ii].reCreateBars(cfg);
 		}
+		this.fanPane.resetPlates(cfg,this.fanLayer.anchors);
+		//this.iconsFanAnchor.ww = cfg.wholeWidth() - cfg.leftPad - cfg.rightPad;
+		//this.iconsFanAnchor.hh = cfg.gridHeight();
 		this.fillerAnchor.xx = cfg.leftPad;
 		this.fillerAnchor.yy = cfg.gridTop();
 		this.fillerAnchor.ww = cfg.wholeWidth() - cfg.leftPad - cfg.rightPad;
@@ -41,8 +49,7 @@ class MixerUI {
 		this.fillerAnchor.content = [];
 		this.reFillWholeRatio(cfg);
 		this.reFillSingleRatio(cfg);
-		this.fanPane.resetPlates(cfg,this.fanAnchor);
-
+		
 	}
 	createMixerLayers(): TileLayerDefinition[] {
 		let tracksLayerZoom: SVGElement = (document.getElementById('tracksLayerZoom') as any) as SVGElement;
@@ -56,7 +63,15 @@ class MixerUI {
 
 		let fanSVGgroup: SVGElement = (document.getElementById('fanLayer') as any) as SVGElement;
 		this.fanLayer = { g: fanSVGgroup, anchors: [], mode: LevelModes.normal };
-
+		/*
+		this.iconsFanAnchor = {
+			showZoom: zoomPrefixLevelsCSS[0].minZoom
+			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom
+			, xx: 0, yy: 0, ww: 1, hh: 1, content: []
+		};
+		console.log('createMixerLayers',this.iconsFanAnchor);
+		this.fanLayer.anchors.push(this.iconsFanAnchor);
+*/
 		for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
 			//this.svgs.push((document.getElementById(zoomPrefixLevelsCSS[ii].svg) as any) as SVGElement);
 			let mixerGridAnchor: TileAnchor = {
@@ -77,13 +92,15 @@ class MixerUI {
 				, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 			};
 			this.firstLayers.anchors.push(mixerFirstAnchor);
-
-			this.fanAnchor = {
+			let fanLevelAnchor = {
 				showZoom: zoomPrefixLevelsCSS[ii].minZoom
 				, hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom
 				, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 			};
-			this.fanLayer.anchors.push(this.fanAnchor);
+
+			this.fanLayer.anchors.push(fanLevelAnchor);
+
+			
 
 			this.levels.push(new MixerZoomLevel(ii
 				, mixerGridAnchor
@@ -93,6 +110,7 @@ class MixerUI {
 
 			//
 		}
+		console.log('this.fanLayer',this.fanLayer);
 		this.fillerAnchor = {
 			showZoom: zoomPrefixLevelsCSS[6].minZoom
 			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1

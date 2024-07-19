@@ -37,19 +37,19 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 					]
 				}, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			]//, filters: []
-			, performer: { id: 'firstPerfoemrID', data: '', kind: 'basePitched', outputId: 'track1Volme', iconPosition: { x: 7, y: 3 } }
+			, performer: { id: 'firstPerfoemrID', data: '', kind: 'basePitched', outputId: 'track1Volme', iconPosition: { x: 7, y: 0 } }
 		}
 		, {
 			title: "Second track", measures: [
 				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			]//, filters: []
-			, performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputId: 'track2Volme', iconPosition: { x: 10, y: 22 } }
+			, performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputId: 'track2Volme', iconPosition: { x: 10, y: 99 } }
 		}
 		, {
 			title: "Third track", measures: [
 				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			]//, filters: []
-			, performer: { id: 't3', data: '', kind: 'basePitched', outputId: 'track3Volme', iconPosition: { x: 2, y: 33 } }
+			, performer: { id: 't3', data: '', kind: 'basePitched', outputId: 'track3Volme', iconPosition: { x: 0, y: 33 } }
 		}
 	]
 	, percussions: [

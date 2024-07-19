@@ -1750,6 +1750,7 @@ class MixerUI {
             this.fanLayer.anchors[ii].hh = hh;
             this.levels[ii].reCreateBars(cfg);
         }
+        this.fanPane.resetPlates(cfg, this.fanLayer.anchors);
         this.fillerAnchor.xx = cfg.leftPad;
         this.fillerAnchor.yy = cfg.gridTop();
         this.fillerAnchor.ww = cfg.wholeWidth() - cfg.leftPad - cfg.rightPad;
@@ -1757,7 +1758,6 @@ class MixerUI {
         this.fillerAnchor.content = [];
         this.reFillWholeRatio(cfg);
         this.reFillSingleRatio(cfg);
-        this.fanPane.resetPlates(cfg);
     }
     createMixerLayers() {
         let tracksLayerZoom = document.getElementById('tracksLayerZoom');
@@ -1787,14 +1787,15 @@ class MixerUI {
                 xx: 0, yy: 0, ww: 1, hh: 1, content: []
             };
             this.firstLayers.anchors.push(mixerFirstAnchor);
-            let fanAnchor = {
+            let fanLevelAnchor = {
                 showZoom: zoomPrefixLevelsCSS[ii].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
                 xx: 0, yy: 0, ww: 1, hh: 1, content: []
             };
-            this.fanLayer.anchors.push(fanAnchor);
+            this.fanLayer.anchors.push(fanLevelAnchor);
             this.levels.push(new MixerZoomLevel(ii, mixerGridAnchor, mixerTrackAnchor, mixerFirstAnchor));
         }
+        console.log('this.fanLayer', this.fanLayer);
         this.fillerAnchor = {
             showZoom: zoomPrefixLevelsCSS[6].minZoom,
             hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1,
@@ -2064,57 +2065,46 @@ class MixerZoomLevel {
     }
 }
 class FanPane {
-    resetPlates(cfg) {
-        console.log('FanPane.resetPlates', cfg);
-        this.filterIcons = [];
+    resetPlates(cfg, fanAnchors) {
+        console.log('FanPane.resetPlates', cfg, fanAnchors);
         this.performerIcons = [];
-        for (let ff = 0; ff < cfg.data.filters.length; ff++) {
-            this.filterIcons.push(new FilterIcon(cfg.data.filters[ff]));
-        }
         for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
             this.performerIcons.push(new PerformerIcon(cfg.data.tracks[tt].performer.id));
         }
-        this.buildPerformerIcons(cfg);
-        this.buildAutoIcons();
-        this.buildFilterIcons();
-        this.buildOutIcon();
+        for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
+            this.buildPerformerIcons(cfg, fanAnchors[ii], ii);
+        }
     }
-    buildPerformerIcons(cfg) {
+    buildPerformerIcons(cfg, fanAnchor, zidx) {
         for (let ii = 0; ii < this.performerIcons.length; ii++) {
-            this.performerIcons[ii].buildPerformerSpot(cfg);
+            this.performerIcons[ii].buildPerformerSpot(cfg, fanAnchor, zidx);
         }
-    }
-    buildAutoIcons() {
-        for (let ii = 0; ii < this.filterIcons.length; ii++) {
-            if (this.filterIcons[ii].filter.automation) {
-                this.filterIcons[ii].buildFilterSpot();
-            }
-            else {
-            }
-        }
-    }
-    buildFilterIcons() {
-        for (let ii = 0; ii < this.filterIcons.length; ii++) {
-            if (this.filterIcons[ii].filter.automation) {
-            }
-            else {
-                this.filterIcons[ii].buildFilterSpot();
-            }
-        }
-    }
-    buildOutIcon() {
-    }
-    connectPerformers() {
-    }
-    connectFilters() {
     }
 }
 class PerformerIcon {
     constructor(performerId) {
         this.performerId = performerId;
     }
-    buildPerformerSpot(cfg) {
-        console.log('buildPerformerSpot', this.performerId);
+    buildPerformerSpot(cfg, fanLevelAnchor, zidx) {
+        for (let ii = 0; ii < cfg.data.tracks.length; ii++) {
+            if (cfg.data.tracks[ii].performer.id == this.performerId) {
+                let audioSeq = cfg.data.tracks[ii].performer;
+                this.addPerformerSpot(cfg, audioSeq, fanLevelAnchor, zidx);
+                break;
+            }
+        }
+    }
+    addPerformerSpot(cfg, audioSeq, fanLevelAnchor, zidx) {
+        let xx = 0;
+        let yy = 0;
+        if (audioSeq.iconPosition) {
+            xx = audioSeq.iconPosition.x;
+            yy = audioSeq.iconPosition.y;
+        }
+        let rec = { x: xx + zidx, y: yy, w: 100, h: 10, css: 'fanSamplerIcon' };
+        fanLevelAnchor.content.push(rec);
+        let txt = { text: '' + zidx, x: xx + zidx, y: yy, css: 'fanSamplerIcon' };
+        fanLevelAnchor.content.push(txt);
     }
 }
 class FilterIcon {
@@ -2302,19 +2292,19 @@ let mzxbxProjectForTesting2 = {
                     ]
                 }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'firstPerfoemrID', data: '', kind: 'basePitched', outputId: 'track1Volme', iconPosition: { x: 7, y: 3 } }
+            performer: { id: 'firstPerfoemrID', data: '', kind: 'basePitched', outputId: 'track1Volme', iconPosition: { x: 7, y: 0 } }
         },
         {
             title: "Second track", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputId: 'track2Volme', iconPosition: { x: 10, y: 22 } }
+            performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputId: 'track2Volme', iconPosition: { x: 10, y: 99 } }
         },
         {
             title: "Third track", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 't3', data: '', kind: 'basePitched', outputId: 'track3Volme', iconPosition: { x: 2, y: 33 } }
+            performer: { id: 't3', data: '', kind: 'basePitched', outputId: 'track3Volme', iconPosition: { x: 0, y: 33 } }
         }
     ],
     percussions: [
