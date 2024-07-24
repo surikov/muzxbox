@@ -1701,7 +1701,7 @@ class AutomationBarContent {
         let curBar = cfg.data.timeline[barIdx];
         let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * cfg.widthDurationRatio;
         let left = barLeft + width;
-        let top = cfg.automationTop();
+        let top = cfg.gridTop();
         let height = cfg.automationMaxHeight();
         let css = 'automationBgDot';
         if (cfg.data.focus)
@@ -2095,16 +2095,23 @@ class PerformerIcon {
         }
     }
     addPerformerSpot(cfg, audioSeq, fanLevelAnchor, zidx) {
-        let xx = 0;
-        let yy = 0;
+        let left = cfg.timelineWidth() + cfg.padGridFan;
+        let top = cfg.gridTop();
+        let xx = left;
+        let yy = top;
         if (audioSeq.iconPosition) {
-            xx = audioSeq.iconPosition.x;
-            yy = audioSeq.iconPosition.y;
+            xx = left + audioSeq.iconPosition.x;
+            yy = top + audioSeq.iconPosition.y;
         }
-        let rec = { x: xx + zidx, y: yy, w: 100, h: 10, css: 'fanSamplerIcon' };
+        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
         fanLevelAnchor.content.push(rec);
-        let txt = { text: '' + zidx, x: xx + zidx, y: yy, css: 'fanSamplerIcon' };
+        let txt = { text: 'z' + zidx + ':' + zoomPrefixLevelsCSS[zidx].minZoom + ':' + audioSeq.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
         fanLevelAnchor.content.push(txt);
+        this.addSpear(0, 0, xx, yy, fanLevelAnchor);
+    }
+    addSpear(fromX, fromY, toX, toY, anchor) {
+        let line = { x1: fromX, x2: toX, y1: fromY, y2: toY, css: 'fanSamplerIcon' };
+        anchor.content.push(line);
     }
 }
 class FilterIcon {
@@ -2292,13 +2299,13 @@ let mzxbxProjectForTesting2 = {
                     ]
                 }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'firstPerfoemrID', data: '', kind: 'basePitched', outputId: 'track1Volme', iconPosition: { x: 7, y: 0 } }
+            performer: { id: 'firstPerfoemrID', data: '', kind: 'basePitched', outputId: 'track1Volme', iconPosition: { x: 27, y: 0 } }
         },
         {
             title: "Second track", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputId: 'track2Volme', iconPosition: { x: 10, y: 99 } }
+            performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputId: 'track2Volme', iconPosition: { x: 110, y: 69 } }
         },
         {
             title: "Third track", measures: [
@@ -2449,6 +2456,9 @@ class MixerDataMathUtility {
         this.gridBottomPad = 1;
         this.maxCommentRowCount = 0;
         this.maxAutomationsCount = 0;
+        this.pluginIconWidth = 15;
+        this.pluginIconHeight = 25;
+        this.padGridFan = 5;
         this.data = data;
         this.maxCommentRowCount = -1;
         for (let ii = 0; ii < this.data.comments.length; ii++) {
@@ -2472,7 +2482,21 @@ class MixerDataMathUtility {
     mergeDifference(diff) {
     }
     wholeWidth() {
-        return this.leftPad + this.timelineWidth() + this.rightPad;
+        return this.leftPad + this.timelineWidth() + this.padGridFan + this.fanWidth() + this.rightPad;
+    }
+    fanWidth() {
+        let ww = 1;
+        for (let tt = 0; tt < this.data.tracks.length; tt++) {
+            let iconPosition = this.data.tracks[tt].performer.iconPosition;
+            let pp = { x: 0, y: 0 };
+            if (iconPosition) {
+                pp = iconPosition;
+            }
+            if (ww < pp.x + this.pluginIconWidth) {
+                ww = pp.x + this.pluginIconWidth;
+            }
+        }
+        return ww;
     }
     heightOfTitle() {
         return 10;
@@ -2502,9 +2526,6 @@ class MixerDataMathUtility {
             rcount = 3;
         }
         return (2 + rcount) * this.notePathHeight * 8;
-    }
-    automationTop() {
-        return this.topPad + this.heightOfTitle() + this.titleBottomPad;
     }
     gridTop() {
         return this.topPad + this.heightOfTitle() + this.titleBottomPad;

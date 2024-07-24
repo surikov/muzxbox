@@ -1,6 +1,6 @@
 .fanSamplerIcon {
 	fill: var(--color-panel);
-	font-size: var(--label-04cm);
+	font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 	border-color: var(--color-text);
 	stroke: var(--color-text);

@@ -19,6 +19,11 @@ class MixerDataMathUtility {
 	maxCommentRowCount = 0;
 	maxAutomationsCount = 0;
 
+	pluginIconWidth = 15;
+	pluginIconHeight = 25;
+
+	padGridFan = 5;
+
 	constructor(data: Zvoog_Project) {
 		this.data = data;
 		this.maxCommentRowCount = -1;
@@ -41,11 +46,25 @@ class MixerDataMathUtility {
 	extractDifference(from: Zvoog_Project): Object {
 		return '';
 	}
-	mergeDifference(diff:Object) {
+	mergeDifference(diff: Object) {
 
 	}
 	wholeWidth(): number {
-		return this.leftPad + this.timelineWidth() + this.rightPad;
+		return this.leftPad + this.timelineWidth() + this.padGridFan + this.fanWidth() + this.rightPad;
+	}
+	fanWidth(): number {
+		let ww = 1;
+		for (let tt = 0; tt < this.data.tracks.length; tt++) {
+			let iconPosition = this.data.tracks[tt].performer.iconPosition;
+			let pp: { x: number, y: number } = { x: 0, y: 0 };
+			if (iconPosition) {
+				pp = iconPosition;
+			}
+			if (ww < pp.x + this.pluginIconWidth) {
+				ww = pp.x + this.pluginIconWidth;
+			}
+		}
+		return ww;
 	}
 	heightOfTitle(): number {
 		return 10;
@@ -82,9 +101,9 @@ class MixerDataMathUtility {
 		return (2 + rcount) * this.notePathHeight * 8;
 
 	}
-	automationTop(): number {
-		return this.topPad + this.heightOfTitle() + this.titleBottomPad;
-	}
+	//automationTop(): number {
+	//	return this.topPad + this.heightOfTitle() + this.titleBottomPad;
+	//}
 	/*
 		commentsTop(): number {
 			return this.gridTop()
@@ -101,6 +120,7 @@ class MixerDataMathUtility {
 	gridHeight(): number {
 		return this.notePathHeight * this.octaveCount * 12;
 	}
+
 	/*
 	samplerHeight(): number {
 		return this.data.percussions.length * this.notePathHeight;

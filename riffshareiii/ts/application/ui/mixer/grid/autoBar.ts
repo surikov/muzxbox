@@ -7,7 +7,7 @@ class AutomationBarContent {
 		let curBar = cfg.data.timeline[barIdx];
 		let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * cfg.widthDurationRatio;
 		let left = barLeft + width;
-		let top = cfg.automationTop();
+		let top = cfg.gridTop();
 		let height = cfg.automationMaxHeight();
 		/*
 		let barAutoRightBorder: TileRectangle = {

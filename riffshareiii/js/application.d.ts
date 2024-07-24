@@ -303,6 +303,7 @@ declare class PerformerIcon {
     constructor(performerId: string);
     buildPerformerSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number): void;
     addPerformerSpot(cfg: MixerDataMathUtility, audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, zidx: number): void;
+    addSpear(fromX: number, fromY: number, toX: number, toY: number, anchor: TileAnchor): void;
 }
 declare class FilterIcon {
     filter: Zvoog_FilterTarget;
@@ -418,17 +419,20 @@ declare class MixerDataMathUtility {
     gridBottomPad: number;
     maxCommentRowCount: number;
     maxAutomationsCount: number;
+    pluginIconWidth: number;
+    pluginIconHeight: number;
+    padGridFan: number;
     constructor(data: Zvoog_Project);
     extractDifference(from: Zvoog_Project): Object;
     mergeDifference(diff: Object): void;
     wholeWidth(): number;
+    fanWidth(): number;
     heightOfTitle(): number;
     timelineWidth(): number;
     wholeHeight(): number;
     automationMaxHeight(): number;
     commentsMaxHeight(): number;
     commentsAverageFillHeight(): number;
-    automationTop(): number;
     gridTop(): number;
     gridHeight(): number;
 }
