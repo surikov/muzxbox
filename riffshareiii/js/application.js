@@ -449,7 +449,7 @@ class UIRenderer {
         this.mixer = new MixerUI();
         let me = this;
         layers = layers.concat(this.debug.allLayers(), this.toolbar.createToolbar(), this.menu.createMenu(), this.mixer.createMixerLayers(), this.warning.allLayers(), this.timeselectbar.createTimeScale(), this.leftPanel.createLeftPanel());
-        this.tiler.initRun(this.tileLevelSVG, true, 1, 1, zoomPrefixLevelsCSS[0].minZoom, zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].minZoom, zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom - 1, layers);
+        this.tiler.initRun(this.tileLevelSVG, false, 1, 1, zoomPrefixLevelsCSS[0].minZoom, zoomPrefixLevelsCSS[Math.floor(zoomPrefixLevelsCSS.length / 2)].minZoom, zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom - 1, layers);
         this.tiler.setAfterZoomCallback(() => {
             if (this.menu) {
                 this.menu.lastZ = this.tiler.getCurrentPointPosition().z;
@@ -2067,18 +2067,56 @@ class MixerZoomLevel {
 class FanPane {
     resetPlates(cfg, fanAnchors) {
         console.log('FanPane.resetPlates', cfg, fanAnchors);
+        this.filterIcons = [];
+        this.autoIcons = [];
         this.performerIcons = [];
+        this.samplerIcons = [];
+        for (let ff = 0; ff < cfg.data.filters.length; ff++) {
+            if (cfg.data.filters[ff].automation) {
+                this.autoIcons.push(new FilterIcon(cfg.data.filters[ff].id));
+            }
+            else {
+                this.filterIcons.push(new FilterIcon(cfg.data.filters[ff].id));
+            }
+        }
         for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
             this.performerIcons.push(new PerformerIcon(cfg.data.tracks[tt].performer.id));
         }
+        for (let tt = 0; tt < cfg.data.percussions.length; tt++) {
+            this.samplerIcons.push(new SamplerIcon(cfg.data.percussions[tt].sampler.id));
+        }
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             this.buildPerformerIcons(cfg, fanAnchors[ii], ii);
+            this.buildFilterIcons(cfg, fanAnchors[ii], ii);
+            this.buildAutoIcons(cfg, fanAnchors[ii], ii);
+            this.buildSamplerIcons(cfg, fanAnchors[ii], ii);
         }
     }
     buildPerformerIcons(cfg, fanAnchor, zidx) {
         for (let ii = 0; ii < this.performerIcons.length; ii++) {
             this.performerIcons[ii].buildPerformerSpot(cfg, fanAnchor, zidx);
         }
+    }
+    buildSamplerIcons(cfg, fanAnchor, zidx) {
+        for (let ii = 0; ii < this.samplerIcons.length; ii++) {
+            this.samplerIcons[ii].buildSamplerSpot(cfg, fanAnchor, zidx);
+        }
+    }
+    buildAutoIcons(cfg, fanAnchor, zidx) {
+        for (let ii = 0; ii < this.autoIcons.length; ii++) {
+            this.autoIcons[ii].buildAutoSpot(cfg, fanAnchor, zidx);
+        }
+    }
+    buildFilterIcons(cfg, fanAnchor, zidx) {
+        for (let ii = 0; ii < this.filterIcons.length; ii++) {
+            this.filterIcons[ii].buildFilterSpot(cfg, fanAnchor, zidx);
+        }
+    }
+    buildOutIcon() {
+    }
+    connectPerformers() {
+    }
+    connectFilters() {
     }
 }
 class PerformerIcon {
@@ -2095,7 +2133,7 @@ class PerformerIcon {
         }
     }
     addPerformerSpot(cfg, audioSeq, fanLevelAnchor, zidx) {
-        let left = cfg.timelineWidth() + cfg.padGridFan;
+        let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
         let top = cfg.gridTop();
         let xx = left;
         let yy = top;
@@ -2107,18 +2145,88 @@ class PerformerIcon {
         fanLevelAnchor.content.push(rec);
         let txt = { text: 'z' + zidx + ':' + zoomPrefixLevelsCSS[zidx].minZoom + ':' + audioSeq.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
         fanLevelAnchor.content.push(txt);
-        this.addSpear(0, 0, xx, yy, fanLevelAnchor);
+        cfg.addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconHeight / 2, xx, yy + cfg.pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
     }
-    addSpear(fromX, fromY, toX, toY, anchor) {
-        let line = { x1: fromX, x2: toX, y1: fromY, y2: toY, css: 'fanSamplerIcon' };
-        anchor.content.push(line);
+}
+class SamplerIcon {
+    constructor(samplerId) {
+        this.samplerId = samplerId;
+    }
+    buildSamplerSpot(cfg, fanLevelAnchor, zidx) {
+        for (let ii = 0; ii < cfg.data.percussions.length; ii++) {
+            if (cfg.data.percussions[ii].sampler.id == this.samplerId) {
+                let sampler = cfg.data.percussions[ii].sampler;
+                this.addSamplerSpot(cfg, sampler, fanLevelAnchor, zidx);
+                break;
+            }
+        }
+    }
+    addSamplerSpot(cfg, audioSeq, fanLevelAnchor, zidx) {
+        let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
+        let top = cfg.gridTop();
+        let xx = left;
+        let yy = top;
+        if (audioSeq.iconPosition) {
+            xx = left + audioSeq.iconPosition.x;
+            yy = top + audioSeq.iconPosition.y;
+        }
+        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+        fanLevelAnchor.content.push(rec);
+        let txt = { text: 'z' + zidx + ':' + zoomPrefixLevelsCSS[zidx].minZoom + ':' + audioSeq.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+        fanLevelAnchor.content.push(txt);
+        cfg.addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconHeight / 2, xx, yy + cfg.pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
     }
 }
 class FilterIcon {
-    constructor(filter) {
-        this.filter = filter;
+    constructor(filterId) {
+        this.filterId = filterId;
     }
-    buildFilterSpot() {
+    buildFilterSpot(cfg, fanLevelAnchor, zidx) {
+        for (let ii = 0; ii < cfg.data.filters.length; ii++) {
+            if (cfg.data.filters[ii].id == this.filterId) {
+                let filterTarget = cfg.data.filters[ii];
+                this.addFilterSpot(cfg, filterTarget, fanLevelAnchor, zidx);
+                break;
+            }
+        }
+    }
+    addFilterSpot(cfg, filterTarget, fanLevelAnchor, zidx) {
+        let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
+        let top = cfg.gridTop();
+        let xx = left;
+        let yy = top;
+        if (filterTarget.iconPosition) {
+            xx = left + filterTarget.iconPosition.x;
+            yy = top + filterTarget.iconPosition.y;
+        }
+        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, rx: cfg.pluginIconHeight / 4, ry: cfg.pluginIconHeight / 4, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+        fanLevelAnchor.content.push(rec);
+        let txt = { text: 'z' + zidx + ':' + zoomPrefixLevelsCSS[zidx].minZoom + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+        fanLevelAnchor.content.push(txt);
+    }
+    buildAutoSpot(cfg, fanLevelAnchor, zidx) {
+        for (let ii = 0; ii < cfg.data.filters.length; ii++) {
+            if (cfg.data.filters[ii].id == this.filterId) {
+                let filterTarget = cfg.data.filters[ii];
+                this.addAutoSpot(cfg, filterTarget, fanLevelAnchor, zidx);
+                break;
+            }
+        }
+    }
+    addAutoSpot(cfg, filterTarget, fanLevelAnchor, zidx) {
+        let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
+        let top = cfg.gridTop();
+        let xx = left;
+        let yy = top;
+        if (filterTarget.iconPosition) {
+            xx = left + filterTarget.iconPosition.x;
+            yy = top + filterTarget.iconPosition.y;
+        }
+        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, rx: cfg.pluginIconHeight / 4, ry: cfg.pluginIconHeight / 4, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+        fanLevelAnchor.content.push(rec);
+        let txt = { text: 'z' + zidx + ':' + zoomPrefixLevelsCSS[zidx].minZoom + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+        fanLevelAnchor.content.push(txt);
+        cfg.addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconHeight / 2, xx, yy + cfg.pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
     }
 }
 class SpearConnection {
@@ -2299,7 +2407,7 @@ let mzxbxProjectForTesting2 = {
                     ]
                 }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'firstPerfoemrID', data: '', kind: 'basePitched', outputId: 'track1Volme', iconPosition: { x: 27, y: 0 } }
+            performer: { id: 'firstPerfoemrID', data: '', kind: 'basePitched', outputId: 'track1Volme', iconPosition: { x: 27, y: 20 } }
         },
         {
             title: "Second track", measures: [
@@ -2311,7 +2419,7 @@ let mzxbxProjectForTesting2 = {
             title: "Third track", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 't3', data: '', kind: 'basePitched', outputId: 'track3Volme', iconPosition: { x: 0, y: 33 } }
+            performer: { id: 't3', data: '', kind: 'basePitched', outputId: 'track3Volme', iconPosition: { x: 60, y: 33 } }
         }
     ],
     percussions: [
@@ -2327,7 +2435,7 @@ let mzxbxProjectForTesting2 = {
         },
         {
             title: "Snare3", measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }],
-            sampler: { id: 'd3', data: '', kind: 'baseSampler', outputId: 'drum3Volme', iconPosition: { x: 12, y: 13 } }
+            sampler: { id: 'd3', data: '', kind: 'baseSampler', outputId: 'drum3Volme', iconPosition: { x: 112, y: 223 } }
         }
     ],
     comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16', row: 0 }] }, {
@@ -2363,13 +2471,13 @@ let mzxbxProjectForTesting2 = {
             automation: { title: 'test1122', measures: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }] },
             iconPosition: { x: 28, y: 77 }
         },
-        { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 32, y: 33 } },
+        { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 132, y: 33 } },
         { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null, iconPosition: { x: 42, y: 93 } },
-        { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null, iconPosition: { x: 12, y: 53 } },
-        { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null, iconPosition: { x: 82, y: 9 } },
-        { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 32, y: 23 } },
-        { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 62, y: 4 } },
-        { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 72, y: 83 } }
+        { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null, iconPosition: { x: 112, y: 53 } },
+        { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null, iconPosition: { x: 182, y: 9 } },
+        { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 132, y: 23 } },
+        { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 162, y: 4 } },
+        { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 172, y: 83 } }
     ]
 };
 let testBigMixerData = {
@@ -2456,8 +2564,8 @@ class MixerDataMathUtility {
         this.gridBottomPad = 1;
         this.maxCommentRowCount = 0;
         this.maxAutomationsCount = 0;
-        this.pluginIconWidth = 15;
-        this.pluginIconHeight = 25;
+        this.pluginIconWidth = 9;
+        this.pluginIconHeight = 7;
         this.padGridFan = 5;
         this.data = data;
         this.maxCommentRowCount = -1;
@@ -2488,6 +2596,26 @@ class MixerDataMathUtility {
         let ww = 1;
         for (let tt = 0; tt < this.data.tracks.length; tt++) {
             let iconPosition = this.data.tracks[tt].performer.iconPosition;
+            let pp = { x: 0, y: 0 };
+            if (iconPosition) {
+                pp = iconPosition;
+            }
+            if (ww < pp.x + this.pluginIconWidth) {
+                ww = pp.x + this.pluginIconWidth;
+            }
+        }
+        for (let tt = 0; tt < this.data.filters.length; tt++) {
+            let iconPosition = this.data.filters[tt].iconPosition;
+            let pp = { x: 0, y: 0 };
+            if (iconPosition) {
+                pp = iconPosition;
+            }
+            if (ww < pp.x + this.pluginIconWidth) {
+                ww = pp.x + this.pluginIconWidth;
+            }
+        }
+        for (let tt = 0; tt < this.data.percussions.length; tt++) {
+            let iconPosition = this.data.percussions[tt].sampler.iconPosition;
             let pp = { x: 0, y: 0 };
             if (iconPosition) {
                 pp = iconPosition;
@@ -2532,6 +2660,20 @@ class MixerDataMathUtility {
     }
     gridHeight() {
         return this.notePathHeight * this.octaveCount * 12;
+    }
+    addSpear(headLen, fromX, fromY, toX, toY, anchor, css) {
+        let mainLine = { x1: fromX, x2: toX, y1: fromY, y2: toY, css: css };
+        anchor.content.push(mainLine);
+        let angle = Math.atan2(toY - fromY, toX - fromX);
+        let da = Math.PI * 5 / 6.0;
+        let dx = headLen * Math.cos(angle - da);
+        let dy = headLen * Math.sin(angle - da);
+        let first = { x1: toX, x2: toX + dx, y1: toY, y2: toY + dy, css: css };
+        anchor.content.push(first);
+        let dx2 = headLen * Math.cos(angle + da);
+        let dy2 = headLen * Math.sin(angle + da);
+        let second = { x1: toX, x2: toX + dx2, y1: toY, y2: toY + dy2, css: css };
+        anchor.content.push(second);
     }
 }
 let biChar32 = [];

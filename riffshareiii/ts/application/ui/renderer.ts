@@ -137,7 +137,7 @@ class UIRenderer {//} implements RenderedPart {
 
 
 		this.tiler.initRun(this.tileLevelSVG
-			, true
+			, false
 			, 1
 			, 1
 			, zoomPrefixLevelsCSS[0].minZoom

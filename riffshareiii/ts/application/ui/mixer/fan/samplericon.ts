@@ -1,22 +1,22 @@
-class PerformerIcon {
+class SamplerIcon {
 	//track:Zvoog_MusicTrack;
-	performerId: string;
-	constructor(performerId: string) {
+	samplerId: string;
+	constructor(samplerId: string) {
 		//console.log('PerformerIcon', track.performer);
 		//this.track=track;
-		this.performerId = performerId;
+		this.samplerId = samplerId;
 	}
-	buildPerformerSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number) {
+	buildSamplerSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number) {
 		//console.log('buildPerformerSpot', this.performerId);
-		for (let ii = 0; ii < cfg.data.tracks.length; ii++) {
-			if (cfg.data.tracks[ii].performer.id == this.performerId) {
-				let audioSeq: Zvoog_AudioSequencer = cfg.data.tracks[ii].performer;
-				this.addPerformerSpot(cfg, audioSeq, fanLevelAnchor, zidx);
+		for (let ii = 0; ii < cfg.data.percussions.length; ii++) {
+			if (cfg.data.percussions[ii].sampler.id == this.samplerId) {
+				let sampler: Zvoog_AudioSampler = cfg.data.percussions[ii].sampler;
+				this.addSamplerSpot(cfg, sampler, fanLevelAnchor, zidx);
 				break;
 			}
 		}
 	}
-	addPerformerSpot(cfg: MixerDataMathUtility, audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, zidx: number) {
+	addSamplerSpot(cfg: MixerDataMathUtility, audioSeq: Zvoog_AudioSampler, fanLevelAnchor: TileAnchor, zidx: number) {
 		let left = cfg.leftPad+cfg.timelineWidth() + cfg.padGridFan;
 		let top = cfg.gridTop();
 		let xx = left;

@@ -293,22 +293,39 @@ declare class MixerZoomLevel {
     addGridLines(barOctaveAnchor: TileAnchor, cfg: MixerDataMathUtility): void;
 }
 declare class FanPane {
+    filterIcons: FilterIcon[];
+    autoIcons: FilterIcon[];
     performerIcons: PerformerIcon[];
+    samplerIcons: SamplerIcon[];
     spears: SpearConnection[];
     resetPlates(cfg: MixerDataMathUtility, fanAnchors: TileAnchor[]): void;
     buildPerformerIcons(cfg: MixerDataMathUtility, fanAnchor: TileAnchor, zidx: number): void;
+    buildSamplerIcons(cfg: MixerDataMathUtility, fanAnchor: TileAnchor, zidx: number): void;
+    buildAutoIcons(cfg: MixerDataMathUtility, fanAnchor: TileAnchor, zidx: number): void;
+    buildFilterIcons(cfg: MixerDataMathUtility, fanAnchor: TileAnchor, zidx: number): void;
+    buildOutIcon(): void;
+    connectPerformers(): void;
+    connectFilters(): void;
 }
 declare class PerformerIcon {
     performerId: string;
     constructor(performerId: string);
     buildPerformerSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number): void;
     addPerformerSpot(cfg: MixerDataMathUtility, audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, zidx: number): void;
-    addSpear(fromX: number, fromY: number, toX: number, toY: number, anchor: TileAnchor): void;
+}
+declare class SamplerIcon {
+    samplerId: string;
+    constructor(samplerId: string);
+    buildSamplerSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number): void;
+    addSamplerSpot(cfg: MixerDataMathUtility, audioSeq: Zvoog_AudioSampler, fanLevelAnchor: TileAnchor, zidx: number): void;
 }
 declare class FilterIcon {
-    filter: Zvoog_FilterTarget;
-    constructor(filter: Zvoog_FilterTarget);
-    buildFilterSpot(): void;
+    filterId: string;
+    constructor(filterId: string);
+    buildFilterSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number): void;
+    addFilterSpot(cfg: MixerDataMathUtility, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, zidx: number): void;
+    buildAutoSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number): void;
+    addAutoSpot(cfg: MixerDataMathUtility, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, zidx: number): void;
 }
 declare class SpearConnection {
     constructor(fromX: number, fromY: number, toX: number, toY: number);
@@ -435,6 +452,7 @@ declare class MixerDataMathUtility {
     commentsAverageFillHeight(): number;
     gridTop(): number;
     gridHeight(): number;
+    addSpear(headLen: number, fromX: number, fromY: number, toX: number, toY: number, anchor: TileAnchor, css: string): void;
 }
 declare let biChar32: String[];
 declare type PackedChannel = {
