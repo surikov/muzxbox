@@ -2090,6 +2090,7 @@ class FanPane {
             this.buildFilterIcons(cfg, fanAnchors[ii], ii);
             this.buildAutoIcons(cfg, fanAnchors[ii], ii);
             this.buildSamplerIcons(cfg, fanAnchors[ii], ii);
+            this.buildOutIcon(cfg, fanAnchors[ii], ii);
         }
     }
     buildPerformerIcons(cfg, fanAnchor, zidx) {
@@ -2112,11 +2113,15 @@ class FanPane {
             this.filterIcons[ii].buildFilterSpot(cfg, fanAnchor, zidx);
         }
     }
-    buildOutIcon() {
-    }
-    connectPerformers() {
-    }
-    connectFilters() {
+    buildOutIcon(cfg, fanAnchor, zidx) {
+        let xx = cfg.wholeWidth() - cfg.pluginIconWidth;
+        let yy = cfg.gridTop() + cfg.gridHeight() / 2 - cfg.pluginIconHeight / 2;
+        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, rx: cfg.pluginIconWidth / 3, ry: cfg.pluginIconHeight / 3, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+        fanAnchor.content.push(rec);
+        if (zidx < 5) {
+            let txt = { text: 'Speaker', x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+            fanAnchor.content.push(txt);
+        }
     }
 }
 class PerformerIcon {
@@ -2143,9 +2148,37 @@ class PerformerIcon {
         }
         let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
         fanLevelAnchor.content.push(rec);
-        let txt = { text: 'z' + zidx + ':' + zoomPrefixLevelsCSS[zidx].minZoom + ':' + audioSeq.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
-        fanLevelAnchor.content.push(txt);
-        cfg.addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconHeight / 2, xx, yy + cfg.pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
+        if (zidx < 5) {
+            let txt = { text: audioSeq.kind + ':' + audioSeq.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+            fanLevelAnchor.content.push(txt);
+        }
+        new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconHeight / 2, xx, yy + cfg.pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
+        this.addOutputs(cfg, audioSeq.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconWidth, yy + cfg.pluginIconHeight / 2);
+    }
+    addOutputs(cfg, outputs, fanLevelAnchor, zidx, fromX, fromY) {
+        if (outputs.length > 0) {
+            for (let oo = 0; oo < outputs.length; oo++) {
+                let outId = outputs[oo];
+                for (let ii = 0; ii < cfg.data.filters.length; ii++) {
+                    if (cfg.data.filters[ii].id == outId) {
+                        let toFilter = cfg.data.filters[ii];
+                        let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
+                        let top = cfg.gridTop();
+                        let xx = left;
+                        let yy = top;
+                        if (toFilter.iconPosition) {
+                            xx = left + toFilter.iconPosition.x;
+                            yy = top + toFilter.iconPosition.y + cfg.pluginIconHeight / 2;
+                        }
+                        new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanSamplerIcon');
+                        break;
+                    }
+                }
+            }
+        }
+        else {
+            new SpearConnection().addSpear(3, fromX, fromY, cfg.wholeWidth() - cfg.pluginIconWidth, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanSamplerIcon');
+        }
     }
 }
 class SamplerIcon {
@@ -2161,20 +2194,48 @@ class SamplerIcon {
             }
         }
     }
-    addSamplerSpot(cfg, audioSeq, fanLevelAnchor, zidx) {
+    addSamplerSpot(cfg, sampler, fanLevelAnchor, zidx) {
         let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
         let top = cfg.gridTop();
         let xx = left;
         let yy = top;
-        if (audioSeq.iconPosition) {
-            xx = left + audioSeq.iconPosition.x;
-            yy = top + audioSeq.iconPosition.y;
+        if (sampler.iconPosition) {
+            xx = left + sampler.iconPosition.x;
+            yy = top + sampler.iconPosition.y;
         }
-        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, h: cfg.pluginIconHeight, rx: cfg.pluginIconHeight / 2, ry: cfg.pluginIconHeight / 2, css: 'fanSamplerIcon' };
         fanLevelAnchor.content.push(rec);
-        let txt = { text: 'z' + zidx + ':' + zoomPrefixLevelsCSS[zidx].minZoom + ':' + audioSeq.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
-        fanLevelAnchor.content.push(txt);
-        cfg.addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconHeight / 2, xx, yy + cfg.pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
+        if (zidx < 5) {
+            let txt = { text: sampler.kind + ':' + sampler.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+            fanLevelAnchor.content.push(txt);
+        }
+        new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconHeight / 2, xx, yy + cfg.pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
+        this.addOutputs(cfg, sampler.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconWidth, yy + cfg.pluginIconHeight / 2);
+    }
+    addOutputs(cfg, outputs, fanLevelAnchor, zidx, fromX, fromY) {
+        if (outputs.length > 0) {
+            for (let oo = 0; oo < outputs.length; oo++) {
+                let outId = outputs[oo];
+                for (let ii = 0; ii < cfg.data.filters.length; ii++) {
+                    if (cfg.data.filters[ii].id == outId) {
+                        let toFilter = cfg.data.filters[ii];
+                        let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
+                        let top = cfg.gridTop();
+                        let xx = left;
+                        let yy = top;
+                        if (toFilter.iconPosition) {
+                            xx = left + toFilter.iconPosition.x;
+                            yy = top + toFilter.iconPosition.y + cfg.pluginIconHeight / 2;
+                        }
+                        new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanSamplerIcon');
+                        break;
+                    }
+                }
+            }
+        }
+        else {
+            new SpearConnection().addSpear(3, fromX, fromY, cfg.wholeWidth() - cfg.pluginIconWidth, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanSamplerIcon');
+        }
     }
 }
 class FilterIcon {
@@ -2199,10 +2260,13 @@ class FilterIcon {
             xx = left + filterTarget.iconPosition.x;
             yy = top + filterTarget.iconPosition.y;
         }
-        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, rx: cfg.pluginIconHeight / 4, ry: cfg.pluginIconHeight / 4, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, rx: cfg.pluginIconWidth / 3, ry: cfg.pluginIconHeight / 3, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
         fanLevelAnchor.content.push(rec);
-        let txt = { text: 'z' + zidx + ':' + zoomPrefixLevelsCSS[zidx].minZoom + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
-        fanLevelAnchor.content.push(txt);
+        if (zidx < 5) {
+            let txt = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+            fanLevelAnchor.content.push(txt);
+        }
+        this.addOutputs(cfg, filterTarget.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconWidth, yy + cfg.pluginIconHeight / 2);
     }
     buildAutoSpot(cfg, fanLevelAnchor, zidx) {
         for (let ii = 0; ii < cfg.data.filters.length; ii++) {
@@ -2222,15 +2286,57 @@ class FilterIcon {
             xx = left + filterTarget.iconPosition.x;
             yy = top + filterTarget.iconPosition.y;
         }
-        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, rx: cfg.pluginIconHeight / 4, ry: cfg.pluginIconHeight / 4, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, rx: cfg.pluginIconWidth / 3, ry: cfg.pluginIconHeight / 3, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
         fanLevelAnchor.content.push(rec);
-        let txt = { text: 'z' + zidx + ':' + zoomPrefixLevelsCSS[zidx].minZoom + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
-        fanLevelAnchor.content.push(txt);
-        cfg.addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconHeight / 2, xx, yy + cfg.pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
+        if (zidx < 5) {
+            let txt = { text: '' + filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+            fanLevelAnchor.content.push(txt);
+        }
+        new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconHeight / 2, xx, yy + cfg.pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
+        this.addOutputs(cfg, filterTarget.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconWidth, yy + cfg.pluginIconHeight / 2);
+    }
+    addOutputs(cfg, outputs, fanLevelAnchor, zidx, fromX, fromY) {
+        if (outputs.length > 0) {
+            for (let oo = 0; oo < outputs.length; oo++) {
+                let outId = outputs[oo];
+                for (let ii = 0; ii < cfg.data.filters.length; ii++) {
+                    if (cfg.data.filters[ii].id == outId) {
+                        let toFilter = cfg.data.filters[ii];
+                        let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
+                        let top = cfg.gridTop();
+                        let xx = left;
+                        let yy = top;
+                        if (toFilter.iconPosition) {
+                            xx = left + toFilter.iconPosition.x;
+                            yy = top + toFilter.iconPosition.y + cfg.pluginIconHeight / 2;
+                        }
+                        new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanSamplerIcon');
+                        break;
+                    }
+                }
+            }
+        }
+        else {
+            new SpearConnection().addSpear(3, fromX, fromY, cfg.wholeWidth() - cfg.pluginIconWidth, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanSamplerIcon');
+        }
     }
 }
 class SpearConnection {
-    constructor(fromX, fromY, toX, toY) {
+    constructor() {
+    }
+    addSpear(headLen, fromX, fromY, toX, toY, anchor, css) {
+        let mainLine = { x1: fromX, x2: toX, y1: fromY, y2: toY, css: css };
+        anchor.content.push(mainLine);
+        let angle = Math.atan2(toY - fromY, toX - fromX);
+        let da = Math.PI * 5 / 6.0;
+        let dx = headLen * Math.cos(angle - da);
+        let dy = headLen * Math.sin(angle - da);
+        let first = { x1: toX, x2: toX + dx, y1: toY, y2: toY + dy, css: css };
+        anchor.content.push(first);
+        let dx2 = headLen * Math.cos(angle + da);
+        let dy2 = headLen * Math.sin(angle + da);
+        let second = { x1: toX, x2: toX + dx2, y1: toY, y2: toY + dy2, css: css };
+        anchor.content.push(second);
     }
 }
 class IconLabelButton {
@@ -2407,19 +2513,19 @@ let mzxbxProjectForTesting2 = {
                     ]
                 }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'firstPerfoemrID', data: '', kind: 'basePitched', outputId: 'track1Volme', iconPosition: { x: 27, y: 20 } }
+            performer: { id: 'firstPerfoemrID', data: '', kind: 'basePitched', outputs: ['track1Volme'], iconPosition: { x: 27, y: 20 } }
         },
         {
             title: "Second track", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputId: 'track2Volme', iconPosition: { x: 110, y: 69 } }
+            performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 } }
         },
         {
             title: "Third track", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 't3', data: '', kind: 'basePitched', outputId: 'track3Volme', iconPosition: { x: 60, y: 33 } }
+            performer: { id: 't3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 40, y: 33 } }
         }
     ],
     percussions: [
@@ -2427,15 +2533,15 @@ let mzxbxProjectForTesting2 = {
             title: "Snare", measures: [
                 { skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
             ],
-            sampler: { id: 'd1', data: '', kind: 'baseSampler', outputId: 'drum1Volme', iconPosition: { x: 44, y: 55 } }
+            sampler: { id: 'd1', data: '', kind: 'baseSampler', outputs: ['drum1Volme'], iconPosition: { x: 14, y: 75 } }
         },
         {
             title: "Snare2", measures: [],
-            sampler: { id: 'd2', data: '', kind: 'baseSampler', outputId: 'drum2Volme', iconPosition: { x: 23, y: 41 } }
+            sampler: { id: 'd2', data: '', kind: 'baseSampler', outputs: ['drum2Volme'], iconPosition: { x: 23, y: 91 } }
         },
         {
             title: "Snare3", measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }],
-            sampler: { id: 'd3', data: '', kind: 'baseSampler', outputId: 'drum3Volme', iconPosition: { x: 112, y: 223 } }
+            sampler: { id: 'd3', data: '', kind: 'baseSampler', outputs: ['drum3Volme'], iconPosition: { x: 32, y: 99 } }
         }
     ],
     comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16', row: 0 }] }, {
@@ -2462,22 +2568,22 @@ let mzxbxProjectForTesting2 = {
         { points: [{ skip: { count: 2, part: 16 }, text: '5-2/16', row: 0 }] }],
     filters: [
         {
-            id: 'volumeSlide', kind: 'baseVolume', dataBlob: '', outputId: 'masterVolme',
+            id: 'volumeSlide', kind: 'baseVolume', dataBlob: '', outputs: ['masterVolme'],
             automation: { title: 'Simple test', measures: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }] }, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }] },
-            iconPosition: { x: 62, y: 39 }
+            iconPosition: { x: 152, y: 39 }
         },
         {
-            id: 'masterVolme', kind: 'base_volume', dataBlob: 'bb1', outputId: '',
+            id: 'masterVolme', kind: 'base_volume', dataBlob: 'bb1', outputs: [],
             automation: { title: 'test1122', measures: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }] },
-            iconPosition: { x: 28, y: 77 }
+            iconPosition: { x: 188, y: 7 }
         },
-        { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 132, y: 33 } },
-        { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null, iconPosition: { x: 42, y: 93 } },
-        { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null, iconPosition: { x: 112, y: 53 } },
-        { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputId: 'allDrumsVolme', automation: null, iconPosition: { x: 182, y: 9 } },
-        { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 132, y: 23 } },
-        { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 162, y: 4 } },
-        { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputId: 'volumeSlide', automation: null, iconPosition: { x: 172, y: 83 } }
+        { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputs: ['masterVolme'], automation: null, iconPosition: { x: 112, y: 87 } },
+        { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], automation: null, iconPosition: { x: 52, y: 73 } },
+        { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], automation: null, iconPosition: { x: 72, y: 83 } },
+        { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], automation: null, iconPosition: { x: 82, y: 119 } },
+        { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], automation: null, iconPosition: { x: 132, y: 23 } },
+        { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], automation: null, iconPosition: { x: 102, y: 64 } },
+        { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], automation: null, iconPosition: { x: 72, y: 30 } }
     ]
 };
 let testBigMixerData = {
@@ -2564,8 +2670,9 @@ class MixerDataMathUtility {
         this.gridBottomPad = 1;
         this.maxCommentRowCount = 0;
         this.maxAutomationsCount = 0;
-        this.pluginIconWidth = 9;
+        this.pluginIconWidth = 17;
         this.pluginIconHeight = 7;
+        this.speakerIconPad = 11;
         this.padGridFan = 5;
         this.data = data;
         this.maxCommentRowCount = -1;
@@ -2624,6 +2731,7 @@ class MixerDataMathUtility {
                 ww = pp.x + this.pluginIconWidth;
             }
         }
+        ww = ww + this.speakerIconPad + this.pluginIconWidth;
         return ww;
     }
     heightOfTitle() {
@@ -2660,20 +2768,6 @@ class MixerDataMathUtility {
     }
     gridHeight() {
         return this.notePathHeight * this.octaveCount * 12;
-    }
-    addSpear(headLen, fromX, fromY, toX, toY, anchor, css) {
-        let mainLine = { x1: fromX, x2: toX, y1: fromY, y2: toY, css: css };
-        anchor.content.push(mainLine);
-        let angle = Math.atan2(toY - fromY, toX - fromX);
-        let da = Math.PI * 5 / 6.0;
-        let dx = headLen * Math.cos(angle - da);
-        let dy = headLen * Math.sin(angle - da);
-        let first = { x1: toX, x2: toX + dx, y1: toY, y2: toY + dy, css: css };
-        anchor.content.push(first);
-        let dx2 = headLen * Math.cos(angle + da);
-        let dy2 = headLen * Math.sin(angle + da);
-        let second = { x1: toX, x2: toX + dx2, y1: toY, y2: toY + dy2, css: css };
-        anchor.content.push(second);
     }
 }
 let biChar32 = [];

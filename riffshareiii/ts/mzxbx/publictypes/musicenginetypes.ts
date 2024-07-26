@@ -44,7 +44,7 @@ type Zvoog_FilterTarget = {
 	id: string;
 	kind: string;
 	dataBlob: string;
-	outputId: string;
+	outputs: string[];
 	automation: Zvoog_AutomationTrack | null;
 	iconPosition?:{x:number,y:number};
 };
@@ -52,14 +52,14 @@ type Zvoog_AudioSequencer = {
 	id: string;
 	data: string;
 	kind: string;
-	outputId: string;
+	outputs: string[];
 	iconPosition?:{x:number,y:number};
 };
 type Zvoog_AudioSampler = {
 	id: string;
 	data: string;
 	kind: string;
-	outputId: string;
+	outputs: string[];
 	iconPosition?:{x:number,y:number};
 };
 type Zvoog_Chord = {

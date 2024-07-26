@@ -303,21 +303,21 @@ declare class FanPane {
     buildSamplerIcons(cfg: MixerDataMathUtility, fanAnchor: TileAnchor, zidx: number): void;
     buildAutoIcons(cfg: MixerDataMathUtility, fanAnchor: TileAnchor, zidx: number): void;
     buildFilterIcons(cfg: MixerDataMathUtility, fanAnchor: TileAnchor, zidx: number): void;
-    buildOutIcon(): void;
-    connectPerformers(): void;
-    connectFilters(): void;
+    buildOutIcon(cfg: MixerDataMathUtility, fanAnchor: TileAnchor, zidx: number): void;
 }
 declare class PerformerIcon {
     performerId: string;
     constructor(performerId: string);
     buildPerformerSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number): void;
     addPerformerSpot(cfg: MixerDataMathUtility, audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, zidx: number): void;
+    addOutputs(cfg: MixerDataMathUtility, outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number): void;
 }
 declare class SamplerIcon {
     samplerId: string;
     constructor(samplerId: string);
     buildSamplerSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number): void;
-    addSamplerSpot(cfg: MixerDataMathUtility, audioSeq: Zvoog_AudioSampler, fanLevelAnchor: TileAnchor, zidx: number): void;
+    addSamplerSpot(cfg: MixerDataMathUtility, sampler: Zvoog_AudioSampler, fanLevelAnchor: TileAnchor, zidx: number): void;
+    addOutputs(cfg: MixerDataMathUtility, outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number): void;
 }
 declare class FilterIcon {
     filterId: string;
@@ -326,9 +326,11 @@ declare class FilterIcon {
     addFilterSpot(cfg: MixerDataMathUtility, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, zidx: number): void;
     buildAutoSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number): void;
     addAutoSpot(cfg: MixerDataMathUtility, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, zidx: number): void;
+    addOutputs(cfg: MixerDataMathUtility, outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number): void;
 }
 declare class SpearConnection {
-    constructor(fromX: number, fromY: number, toX: number, toY: number);
+    constructor();
+    addSpear(headLen: number, fromX: number, fromY: number, toX: number, toY: number, anchor: TileAnchor, css: string): void;
 }
 declare class IconLabelButton {
     anchor: TileAnchor;
@@ -438,6 +440,7 @@ declare class MixerDataMathUtility {
     maxAutomationsCount: number;
     pluginIconWidth: number;
     pluginIconHeight: number;
+    speakerIconPad: number;
     padGridFan: number;
     constructor(data: Zvoog_Project);
     extractDifference(from: Zvoog_Project): Object;
@@ -452,7 +455,6 @@ declare class MixerDataMathUtility {
     commentsAverageFillHeight(): number;
     gridTop(): number;
     gridHeight(): number;
-    addSpear(headLen: number, fromX: number, fromY: number, toX: number, toY: number, anchor: TileAnchor, css: string): void;
 }
 declare let biChar32: String[];
 declare type PackedChannel = {
@@ -622,7 +624,7 @@ declare type Zvoog_FilterTarget = {
     id: string;
     kind: string;
     dataBlob: string;
-    outputId: string;
+    outputs: string[];
     automation: Zvoog_AutomationTrack | null;
     iconPosition?: {
         x: number;
@@ -633,7 +635,7 @@ declare type Zvoog_AudioSequencer = {
     id: string;
     data: string;
     kind: string;
-    outputId: string;
+    outputs: string[];
     iconPosition?: {
         x: number;
         y: number;
@@ -643,7 +645,7 @@ declare type Zvoog_AudioSampler = {
     id: string;
     data: string;
     kind: string;
-    outputId: string;
+    outputs: string[];
     iconPosition?: {
         x: number;
         y: number;
