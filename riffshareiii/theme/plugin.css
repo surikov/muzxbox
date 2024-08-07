@@ -45,6 +45,7 @@
     font-size: var(--label-04cm);
 	padding-left: 0.5cm;
 	padding-top: 0.25cm;
+	flex-grow: 1;
 }
 #pluginCancel{
 	color: var(--color-text);
@@ -53,7 +54,7 @@
 	height:1cm;
 	text-align: center;
 	padding-top: 0.1cm;
-	background-color2: var(--color-interactive);
+	background-color2: green;
 	border-color2: var(--color-text);
 	border-style2: solid;
 	border-width2: 0.0025cm;
@@ -62,4 +63,16 @@
 	font-family: "Material-Design-Iconic-Font";
 	vertical-align22: middle;
 	alignment-baseline22: middle;
+	cursor:pointer;
+}
+#pluginRefresh{
+	color: var(--color-text);
+    font-size: var(--label-075cm);
+	width:1cm;
+	height:1cm;
+	text-align: center;
+	padding-top: 0.1cm;
+	font-family: "Material-Design-Iconic-Font";
+	background-color2: brown;
+	cursor:pointer;
 }

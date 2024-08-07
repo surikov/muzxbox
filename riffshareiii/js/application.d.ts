@@ -24,8 +24,8 @@ declare class PluginDialogPrompt {
     dialogID: string;
     waitCallback: (obj: any) => boolean;
     constructor();
-    openDialogFrame(label: string, url: string, callback: (obj: any) => boolean): void;
-    sendMessageToPlugin(data: any): void;
+    openProjectDialogFrame(label: string, url: string, projectClone: string, callback: (obj: any) => boolean): void;
+    sendProjectMessageToPlugin(projectClone: string): void;
     closeDialogFrame(): void;
     receiveMessageFromPlugin(e: any): void;
 }
@@ -53,13 +53,14 @@ declare class CommandDispatcher {
     upCommentsLayer(): void;
     setTrackSoloState(state: number): void;
     setDrumSoloState(state: number): void;
-    promptPluginGUI(label: string, url: string, callback: (obj: any) => boolean): void;
+    promptProjectPluginGUI(label: string, url: string, callback: (obj: any) => boolean): void;
+    promptPointPluginGUI(label: string, url: string, callback: (obj: any) => boolean): void;
     cancelPluginGUI(): void;
     expandTimeLineSelection(idx: number): void;
 }
 declare let commandDispatcher: CommandDispatcher;
 declare let pluginDialogPrompt: PluginDialogPrompt;
-declare type GridTimeTemplate14 = {
+type GridTimeTemplate14 = {
     ratio: number;
     duration: Zvoog_Metre;
     label?: boolean;
@@ -102,6 +103,10 @@ declare let localMenuFileFolder: string;
 declare let localMenuAutomationFolder: string;
 declare let localMenuCommentsLayer: string;
 declare let localMenuPlayPause: string;
+declare let localMenuActionsFolder: string;
+declare let localMenuPerformersFolder: string;
+declare let localMenuFiltersFolder: string;
+declare let localMenuSamplersFolder: string;
 declare let localeDictionary: {
     id: string;
     data: {
@@ -210,7 +215,7 @@ declare class RightMenuItem {
     calculateHeight(): number;
     buildTile(itemTop: number, itemWidth: number): TileItem;
 }
-declare type MenuInfo = {
+type MenuInfo = {
     text: string;
     noLocalization?: boolean;
     focused?: boolean;
@@ -224,12 +229,14 @@ declare type MenuInfo = {
     selection?: number;
 };
 declare let menuItemsData: MenuInfo[] | null;
+declare let menuPointActions: MenuInfo;
+declare let menuPointPerformers: MenuInfo;
+declare let menuPointFilters: MenuInfo;
+declare let menuPointSamplers: MenuInfo;
 declare let menuPointTracks: MenuInfo;
 declare let menuPointPercussion: MenuInfo;
 declare let menuPointAutomation: MenuInfo;
-declare let menuPointFileImport: MenuInfo;
-declare let menuPointMenuFile: MenuInfo;
-declare function fillMenuImportPlugins(): void;
+declare function fillPluginsLists(): void;
 declare function composeBaseMenu(): MenuInfo[];
 declare class LeftPanel {
     leftLayer: TileLayerDefinition;
@@ -457,27 +464,27 @@ declare class MixerDataMathUtility {
     gridHeight(): number;
 }
 declare let biChar32: String[];
-declare type PackedChannel = {
+type PackedChannel = {
     wafIndex: number;
 };
-declare type PackedBar = {
+type PackedBar = {
     tone: number;
     mode: number;
 };
-declare type PackedProject = {
+type PackedProject = {
     bars: PackedBar[];
 };
 declare function testNumMathUtil(): void;
-declare type TileZoom = {
+type TileZoom = {
     x: number;
     y: number;
     z: number;
 };
-declare type TilePoint = {
+type TilePoint = {
     x: number;
     y: number;
 };
-declare type TileBaseDefinition = {
+type TileBaseDefinition = {
     id?: string;
     css?: string;
     style?: string;
@@ -492,7 +499,7 @@ declare enum LevelModes {
     bottom = 4,
     overlay = 5
 }
-declare type TileLayerDefinition = {
+type TileLayerDefinition = {
     g: SVGElement;
     mode: 0 | 1 | 2 | 3 | 4 | 5;
     stickLeft?: number;
@@ -501,8 +508,8 @@ declare type TileLayerDefinition = {
     stickRight?: number;
     anchors: TileAnchor[];
 };
-declare type TileItem = TileAnchor | TileRectangle | TileText | TilePath | TileLine | TilePolygon | TileImage;
-declare type TileAnchor = {
+type TileItem = TileAnchor | TileRectangle | TileText | TilePath | TileLine | TilePolygon | TileImage;
+type TileAnchor = {
     xx: number;
     yy: number;
     ww: number;
@@ -513,7 +520,7 @@ declare type TileAnchor = {
     translation?: TilePoint;
 } & TileBaseDefinition;
 declare function TAnchor(xx: number, yy: number, ww: number, hh: number, showZoom: number, hideZoom: number, id?: string, translation?: TilePoint): TileAnchor;
-declare type TileImage = {
+type TileImage = {
     x: number;
     y: number;
     w: number;
@@ -521,7 +528,7 @@ declare type TileImage = {
     preserveAspectRatio?: string;
     href: string;
 } & TileBaseDefinition;
-declare type TileRectangle = {
+type TileRectangle = {
     x: number;
     y: number;
     w: number;
@@ -529,32 +536,32 @@ declare type TileRectangle = {
     rx?: number;
     ry?: number;
 } & TileBaseDefinition;
-declare type TileText = {
+type TileText = {
     x: number;
     y: number;
     text: string;
     maxWidth?: string;
 } & TileBaseDefinition;
 declare function TText(x: number, y: number, css: string, text: string): TileText;
-declare type TilePath = {
+type TilePath = {
     x?: number;
     y?: number;
     scale?: number;
     points: string;
 } & TileBaseDefinition;
-declare type TileLine = {
+type TileLine = {
     x1: number;
     x2: number;
     y1: number;
     y2: number;
 } & TileBaseDefinition;
-declare type TilePolygon = {
+type TilePolygon = {
     x?: number;
     y?: number;
     scale?: number;
     dots: number[];
 } & TileBaseDefinition;
-declare type TileSVGElement = SVGElement & {
+type TileSVGElement = SVGElement & {
     onClickFunction: (x: number, y: number) => void;
     watchX: number;
     watchY: number;
@@ -565,7 +572,7 @@ declare type TileSVGElement = SVGElement & {
     translateX: number;
     translateY: number;
 };
-declare type TileLevelBase = {
+type TileLevelBase = {
     dump: () => void;
     tapPxSize: () => number;
     setupTapSize: (ratioCm: number) => void;
@@ -580,7 +587,7 @@ declare type TileLevelBase = {
     resetInnerSize(inWidth: number, inHeight: number): void;
     initRun(svgObject: SVGElement, stickLeft: boolean, inWidth: number, inHeight: number, minZoom: number, curZoom: number, maxZoom: number, layers: TileLayerDefinition[]): void;
 };
-declare type Zvoog_Metre = {
+type Zvoog_Metre = {
     count: number;
     part: number;
 };
@@ -599,28 +606,28 @@ interface Zvoog_MetreMathType {
     duration(tempo: number): number;
     calculate(duration: number, tempo: number): Zvoog_MetreMathType;
 }
-declare type Zvoog_Slide = {
+type Zvoog_Slide = {
     duration: Zvoog_Metre;
     delta: number;
 };
-declare type Zvoog_Note = {
+type Zvoog_Note = {
     pitch: number;
     slides: Zvoog_Slide[];
 };
-declare type Zvoog_PluginBase = {
+type Zvoog_PluginBase = {
     setup: (audioContext: AudioContext) => boolean;
 };
-declare type Zvoog_PluginFilter = Zvoog_PluginBase | {
+type Zvoog_PluginFilter = Zvoog_PluginBase | {
     input: string;
 };
-declare type Zvoog_PluginPerformer = Zvoog_PluginBase | {
+type Zvoog_PluginPerformer = Zvoog_PluginBase | {
     output: string;
     schedule: (chord: Zvoog_Chord, when: number) => boolean;
 };
-declare type Zvoog_PluginSampler = Zvoog_PluginBase | {
+type Zvoog_PluginSampler = Zvoog_PluginBase | {
     output: string;
 };
-declare type Zvoog_FilterTarget = {
+type Zvoog_FilterTarget = {
     id: string;
     kind: string;
     dataBlob: string;
@@ -631,7 +638,7 @@ declare type Zvoog_FilterTarget = {
         y: number;
     };
 };
-declare type Zvoog_AudioSequencer = {
+type Zvoog_AudioSequencer = {
     id: string;
     data: string;
     kind: string;
@@ -641,7 +648,7 @@ declare type Zvoog_AudioSequencer = {
         y: number;
     };
 };
-declare type Zvoog_AudioSampler = {
+type Zvoog_AudioSampler = {
     id: string;
     data: string;
     kind: string;
@@ -651,54 +658,54 @@ declare type Zvoog_AudioSampler = {
         y: number;
     };
 };
-declare type Zvoog_Chord = {
+type Zvoog_Chord = {
     skip: Zvoog_Metre;
     notes: Zvoog_Note[];
 };
-declare type Zvoog_TrackMeasure = {
+type Zvoog_TrackMeasure = {
     chords: Zvoog_Chord[];
 };
-declare type Zvoog_PercussionMeasure = {
+type Zvoog_PercussionMeasure = {
     skips: Zvoog_Metre[];
 };
-declare type Zvoog_SongMeasure = {
+type Zvoog_SongMeasure = {
     tempo: number;
     metre: Zvoog_Metre;
 };
-declare type Zvoog_AutomationTrack = {
+type Zvoog_AutomationTrack = {
     title: string;
     measures: Zvoog_FilterMeasure[];
 };
-declare type Zvoog_FilterMeasure = {
+type Zvoog_FilterMeasure = {
     changes: Zvoog_FilterStateChange[];
 };
-declare type Zvoog_FilterStateChange = {
+type Zvoog_FilterStateChange = {
     skip: Zvoog_Metre;
     stateBlob: string;
 };
-declare type Zvoog_PercussionTrack = {
+type Zvoog_PercussionTrack = {
     title: string;
     measures: Zvoog_PercussionMeasure[];
     sampler: Zvoog_AudioSampler;
 };
-declare type Zvoog_MusicTrack = {
+type Zvoog_MusicTrack = {
     title: string;
     measures: Zvoog_TrackMeasure[];
     performer: Zvoog_AudioSequencer;
 };
-declare type Zvoog_CommentText = {
+type Zvoog_CommentText = {
     skip: Zvoog_Metre;
     text: string;
     row: number;
 };
-declare type Zvoog_CommentMeasure = {
+type Zvoog_CommentMeasure = {
     points: Zvoog_CommentText[];
 };
-declare type Zvoog_Selection = {
+type Zvoog_Selection = {
     startMeasure: number;
     endMeasure: number;
 };
-declare type Zvoog_Project = {
+type Zvoog_Project = {
     title: string;
     timeline: Zvoog_SongMeasure[];
     tracks: Zvoog_MusicTrack[];
@@ -708,82 +715,82 @@ declare type Zvoog_Project = {
     selection?: Zvoog_Selection;
     focus?: 0 | 1 | 2 | 3;
 };
-declare type MZXBX_CachedWave = {
+type MZXBX_CachedWave = {
     path: string;
     buffer: AudioBuffer | null;
     canceled?: boolean;
     line100?: number[];
 };
-declare type MZXBX_FilterHolder = {
+type MZXBX_FilterHolder = {
     plugin: MZXBX_AudioFilterPlugin | null;
     id: string;
-    kind: string;
+    kind: MZXBX_PluginKind;
     properties: string;
     launched: boolean;
 };
-declare type MZXBX_PerformerHolder = {
+type MZXBX_PerformerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | null;
     id: string;
-    kind: string;
+    kind: MZXBX_PluginKind;
     properties: string;
     launched: boolean;
 };
-declare type MZXBX_Channel = {
+type MZXBX_Channel = {
     id: string;
     comment?: string;
     filters: MZXBX_ChannelFilter[];
     performer: MZXBX_ChannelPerformer;
 };
-declare type MZXBX_SlideItem = {
+type MZXBX_SlideItem = {
     duration: number;
     delta: number;
 };
-declare type MZXBX_PlayItem = {
+type MZXBX_PlayItem = {
     skip: number;
     channelId: string;
     pitch: number;
     slides: MZXBX_SlideItem[];
 };
-declare type MZXBX_FilterState = {
+type MZXBX_FilterState = {
     skip: number;
     filterId: string;
     data: string;
 };
-declare type MZXBX_Set = {
+type MZXBX_Set = {
     duration: number;
     items: MZXBX_PlayItem[];
     states: MZXBX_FilterState[];
 };
-declare type MZXBX_ChannelFilter = {
+type MZXBX_ChannelFilter = {
     id: string;
-    kind: string;
+    kind: MZXBX_PluginKind;
     properties: string;
 };
-declare type MZXBX_AudioFilterPlugin = {
+type MZXBX_AudioFilterPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
     schedule: (when: number, parameters: string) => void;
     input: () => AudioNode | null;
     output: () => AudioNode | null;
 };
-declare type MZXBX_ChannelPerformer = {
+type MZXBX_ChannelPerformer = {
     id: string;
-    kind: string;
+    kind: MZXBX_PluginKind;
     properties: string;
 };
-declare type MZXBX_AudioPerformerPlugin = {
+type MZXBX_AudioPerformerPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
     schedule: (when: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
 };
-declare type MZXBX_Schedule = {
+type MZXBX_Schedule = {
     series: MZXBX_Set[];
     channels: MZXBX_Channel[];
     filters: MZXBX_ChannelFilter[];
 };
-declare type MZXBX_Player = {
+type MZXBX_Player = {
     setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;
     startLoop: (from: number, position: number, to: number) => string;
     cancel: () => void;
@@ -791,12 +798,21 @@ declare type MZXBX_Player = {
     allPerformers(): MZXBX_PerformerHolder[];
     position: number;
 };
-declare type MZXBX_PluginRegistrationInformation = {
+declare enum MZXBX_PluginKind {
+    Action = 0,
+    Filter = 1,
+    Sampler = 2,
+    Performer = 3
+}
+type MZXBX_PluginRegistrationInformation = {
     id: string;
     label: string;
-    group: string;
+    kind: MZXBX_PluginKind;
     url: string;
-    evaluate: string;
+};
+type MZXBX_PluginMessage = {
+    dialogID: string;
+    data: string;
 };
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;

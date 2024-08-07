@@ -37,7 +37,7 @@ class PerformerIcon {
 		this.addOutputs(cfg, audioSeq.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconWidth, yy + cfg.pluginIconHeight / 2);
 	}
 	addOutputs(cfg: MixerDataMathUtility, outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number) {
-		if (outputs.length > 0) {
+		if (outputs)if (outputs.length > 0) {
 			for (let oo = 0; oo < outputs.length; oo++) {
 				let outId = outputs[oo];
 				for (let ii = 0; ii < cfg.data.filters.length; ii++) {

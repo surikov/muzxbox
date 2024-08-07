@@ -183,9 +183,11 @@ class CommandDispatcher {
 		}
 	}
 */
-	promptPluginGUI(label: string, url: string, callback: (obj: any) => boolean) {
-		console.log('promptPluginGUI', url);
-		pluginDialogPrompt.openDialogFrame(label, url, callback);
+	promptProjectPluginGUI(label: string, url: string, callback: (obj: any) => boolean) {
+		console.log('promptProjectPluginGUI', url);
+		
+		let projectClone:string=JSON.stringify(this.cfg.data);
+		pluginDialogPrompt.openDialogFrame(label, url, projectClone,callback);
 
 		//let pluginFrame = document.getElementById("pluginFrame") as any;
 		//if (pluginFrame) {
@@ -207,6 +209,10 @@ class CommandDispatcher {
 		*/
 		//}
 		//}
+	}
+	promptPointPluginGUI(label: string, url: string, callback: (obj: any) => boolean) {
+		console.log('promptPointPluginGUI', url);
+		pluginDialogPrompt.openDialogFrame(label, url, 'data for testing',callback);
 	}
 	cancelPluginGUI() {
 		console.log('cancelPluginGUI');

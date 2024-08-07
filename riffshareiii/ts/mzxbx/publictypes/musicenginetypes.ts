@@ -46,21 +46,21 @@ type Zvoog_FilterTarget = {
 	dataBlob: string;
 	outputs: string[];
 	automation: Zvoog_AutomationTrack | null;
-	iconPosition?:{x:number,y:number};
+	iconPosition?: { x: number, y: number };
 };
 type Zvoog_AudioSequencer = {
 	id: string;
 	data: string;
 	kind: string;
 	outputs: string[];
-	iconPosition?:{x:number,y:number};
+	iconPosition?: { x: number, y: number };
 };
 type Zvoog_AudioSampler = {
 	id: string;
 	data: string;
 	kind: string;
 	outputs: string[];
-	iconPosition?:{x:number,y:number};
+	iconPosition?: { x: number, y: number };
 };
 type Zvoog_Chord = {
 	skip: Zvoog_Metre;
@@ -152,14 +152,14 @@ type MZXBX_CachedWave = {
 type MZXBX_FilterHolder = {
 	plugin: MZXBX_AudioFilterPlugin | null
 	, id: string
-	, kind: string
+	, kind: MZXBX_PluginKind
 	, properties: string
 	, launched: boolean
 };
 type MZXBX_PerformerHolder = {
 	plugin: MZXBX_AudioPerformerPlugin | null
 	, id: string
-	, kind: string
+	, kind: MZXBX_PluginKind
 	, properties: string
 	, launched: boolean
 };
@@ -191,7 +191,7 @@ type MZXBX_Set = {
 };
 type MZXBX_ChannelFilter = {
 	id: string;
-	kind: string;
+	kind: MZXBX_PluginKind;
 	properties: string;
 };
 type MZXBX_AudioFilterPlugin = {
@@ -201,15 +201,29 @@ type MZXBX_AudioFilterPlugin = {
 	input: () => AudioNode | null;
 	output: () => AudioNode | null;
 };
-type MZXBX_ChannelPerformer = {
+type MZXBX_ChannelSampler = {
 	id: string;
-	kind: string;
+	kind: MZXBX_PluginKind;
 	properties: string;
 };
+type MZXBX_AudioSamplerPlugin = {
+	launch: (context: AudioContext, parameters: string) => void;
+	busy: () => null | string;
+	schedule: (when: number) => void;
+	cancel: () => void;
+	output: () => AudioNode | null;
+};
+
+type MZXBX_ChannelPerformer = {
+	id: string;
+	kind: MZXBX_PluginKind;
+	properties: string;
+};
+
 type MZXBX_AudioPerformerPlugin = {
 	launch: (context: AudioContext, parameters: string) => void;
 	busy: () => null | string;
-	schedule: (when: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
+	schedule: (when: number,duraton: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]) => void;
 	cancel: () => void;
 	output: () => AudioNode | null;
 };
@@ -230,12 +244,20 @@ type MZXBX_Player = {
 type Zvoog_import = {
 	import: () => Zvoog_Schedule | null;
 };*/
+enum MZXBX_PluginKind {
+	Action,
+	Filter,
+	Sampler,
+	Performer
+}
 type MZXBX_PluginRegistrationInformation = {
 	id: string
 	, label: string
-	, group: string
+	, kind: MZXBX_PluginKind
 	, url: string
-	, evaluate: string
 };
-
+type MZXBX_PluginMessage = {
+	dialogID: string
+	, data: string
+};
 

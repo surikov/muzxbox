@@ -162,7 +162,7 @@ class PluginDialogPrompt {
         this.dialogID = '?';
         window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
     }
-    openDialogFrame(label, url, callback) {
+    openProjectDialogFrame(label, url, projectClone, callback) {
         this.waitCallback = callback;
         let pluginTitle = document.getElementById("pluginTitle");
         pluginTitle.innerHTML = label;
@@ -172,18 +172,18 @@ class PluginDialogPrompt {
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
                 pluginFrame.onload = function () {
-                    me.sendMessageToPlugin('');
+                    me.sendProjectMessageToPlugin(projectClone);
                 };
                 pluginFrame.src = url;
                 document.getElementById("pluginDiv").style.visibility = "visible";
             }
         }
     }
-    sendMessageToPlugin(data) {
+    sendProjectMessageToPlugin(projectClone) {
         console.log('sendMessageToPlugin', this.dialogID);
         let pluginFrame = document.getElementById("pluginFrame");
         if (pluginFrame) {
-            let message = { dialog: this.dialogID, data: data };
+            let message = { dialogID: this.dialogID, data: projectClone };
             let txt = JSON.stringify(message);
             pluginFrame.contentWindow.postMessage(txt, '*');
         }
@@ -201,15 +201,14 @@ class PluginDialogPrompt {
         }
         console.log('parsed', parsed);
         if (parsed) {
-            if (parsed.dialog == this.dialogID) {
-                console.log('data', parsed.data);
+            if (parsed.dialogID == this.dialogID) {
                 let close = this.waitCallback(parsed.data);
                 if (close) {
                     this.closeDialogFrame();
                 }
             }
             else {
-                console.log('wrong received message id', parsed.id, this.dialogID);
+                console.log('wrong received message id', parsed.dialogID, this.dialogID);
             }
         }
         else {
@@ -327,9 +326,14 @@ class CommandDispatcher {
     setDrumSoloState(state) {
         console.log('setDrumSoloState', state);
     }
-    promptPluginGUI(label, url, callback) {
-        console.log('promptPluginGUI', url);
-        pluginDialogPrompt.openDialogFrame(label, url, callback);
+    promptProjectPluginGUI(label, url, callback) {
+        console.log('promptProjectPluginGUI', url);
+        let projectClone = JSON.stringify(this.cfg.data);
+        pluginDialogPrompt.openProjectDialogFrame(label, url, projectClone, callback);
+    }
+    promptPointPluginGUI(label, url, callback) {
+        console.log('promptPointPluginGUI', url);
+        pluginDialogPrompt.openProjectDialogFrame(label, url, 'data for testing', callback);
     }
     cancelPluginGUI() {
         console.log('cancelPluginGUI');
@@ -505,6 +509,10 @@ let localMenuFileFolder = 'localMenuFileFolder';
 let localMenuAutomationFolder = 'localMenuAutomationFolder';
 let localMenuCommentsLayer = 'localMenuCommentsLayer';
 let localMenuPlayPause = 'localMenuPlayPause';
+let localMenuActionsFolder = 'localMenuActionsFolder';
+let localMenuPerformersFolder = 'localMenuPerformersFolder';
+let localMenuFiltersFolder = 'localMenuFiltersFolder';
+let localMenuSamplersFolder = 'localMenuSamplersFolder';
 let localeDictionary = [
     {
         id: localNameLocal, data: [
@@ -560,6 +568,31 @@ let localeDictionary = [
         id: localMenuPlayPause, data: [
             { locale: 'en', text: 'Play/Pause' },
             { locale: 'ru', text: 'Старт/Стоп' },
+            { locale: 'zh', text: '?' }
+        ]
+    },
+    {
+        id: localMenuActionsFolder, data: [
+            { locale: 'en', text: 'Actions' },
+            { locale: 'ru', text: 'Действия' },
+            { locale: 'zh', text: '?' }
+        ]
+    }, {
+        id: localMenuPerformersFolder, data: [
+            { locale: 'en', text: 'Performers' },
+            { locale: 'ru', text: 'Перформеры' },
+            { locale: 'zh', text: '?' }
+        ]
+    }, {
+        id: localMenuFiltersFolder, data: [
+            { locale: 'en', text: 'Filters' },
+            { locale: 'ru', text: 'Фильтры' },
+            { locale: 'zh', text: '?' }
+        ]
+    }, {
+        id: localMenuSamplersFolder, data: [
+            { locale: 'en', text: 'Samplers' },
+            { locale: 'ru', text: 'Сэмплеры' },
             { locale: 'zh', text: '?' }
         ]
     }
@@ -1238,6 +1271,30 @@ class RightMenuItem {
     }
 }
 let menuItemsData = null;
+let menuPointActions = {
+    text: 'localMenuActionsFolder',
+    onOpen: () => {
+        console.log('actions');
+    }
+};
+let menuPointPerformers = {
+    text: 'localMenuPerformersFolder',
+    onOpen: () => {
+        console.log('performers');
+    }
+};
+let menuPointFilters = {
+    text: 'localMenuFiltersFolder',
+    onOpen: () => {
+        console.log('filters');
+    }
+};
+let menuPointSamplers = {
+    text: 'localMenuSamplersFolder',
+    onOpen: () => {
+        console.log('samplers');
+    }
+};
 let menuPointTracks = {
     text: localMenuTracksFolder,
     onOpen: () => {
@@ -1256,33 +1313,64 @@ let menuPointAutomation = {
         commandDispatcher.upAutoLayer();
     }
 };
-let menuPointFileImport = {
-    text: localMenuImportFolder
-};
-let menuPointMenuFile = {
-    text: localMenuFileFolder,
-    children: [menuPointFileImport]
-};
-function fillMenuImportPlugins() {
-    menuPointFileImport.children = [];
+function fillPluginsLists() {
+    menuPointFilters.children = [];
+    menuPointPerformers.children = [];
+    menuPointSamplers.children = [];
+    menuPointActions.children = [];
     for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
-        if (MZXBX_currentPlugins()[ii].group == 'import') {
-            let label = MZXBX_currentPlugins()[ii].label;
-            let url = MZXBX_currentPlugins()[ii].url;
-            menuPointFileImport.children.push({
+        let label = MZXBX_currentPlugins()[ii].label;
+        let kind = MZXBX_currentPlugins()[ii].kind;
+        let url = MZXBX_currentPlugins()[ii].url;
+        if (kind == MZXBX_PluginKind.Action) {
+            menuPointActions.children.push({
                 text: label, noLocalization: true, onClick: () => {
-                    commandDispatcher.promptPluginGUI(label, url, (obj) => {
-                        commandDispatcher.registerWorkProject(obj);
+                    commandDispatcher.promptProjectPluginGUI(label, url, (obj) => {
+                        let project = JSON.parse(obj);
+                        commandDispatcher.registerWorkProject(project);
                         commandDispatcher.resetProject();
                         return true;
                     });
                 }
             });
         }
+        else {
+            if (kind == MZXBX_PluginKind.Sampler) {
+                menuPointSamplers.children.push({
+                    text: label, noLocalization: true, onClick: () => {
+                        console.log(kind, label);
+                    }
+                });
+            }
+            else {
+                if (kind == MZXBX_PluginKind.Performer) {
+                    menuPointPerformers.children.push({
+                        text: label, noLocalization: true, onClick: () => {
+                            commandDispatcher.promptPointPluginGUI(label, url, (obj) => {
+                                console.log('performer callback', obj);
+                                return true;
+                            });
+                        }
+                    });
+                }
+                else {
+                    if (kind == MZXBX_PluginKind.Filter) {
+                        menuPointFilters.children.push({
+                            text: label, noLocalization: true, onClick: () => {
+                                console.log(kind, label);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('unknown plugin kind');
+                    }
+                }
+            }
+        }
     }
 }
 function composeBaseMenu() {
-    fillMenuImportPlugins();
+    fillPluginsLists();
     if (menuItemsData) {
         return menuItemsData;
     }
@@ -1294,7 +1382,6 @@ function composeBaseMenu() {
             },
             {
                 text: localMenuItemSettings, children: [
-                    menuPointMenuFile,
                     {
                         text: 'Size', children: [
                             {
@@ -1356,7 +1443,11 @@ function composeBaseMenu() {
             },
             menuPointAutomation,
             menuPointTracks,
-            menuPointPercussion
+            menuPointPercussion,
+            menuPointActions,
+            menuPointFilters,
+            menuPointPerformers,
+            menuPointSamplers
         ];
         console.log('base menu', menuItemsData);
         return menuItemsData;
@@ -1737,6 +1828,7 @@ class MixerUI {
         this.fanPane = new FanPane();
     }
     reFillMixerUI(cfg) {
+        console.log('reFillMixerUI', this.fanLayer.anchors.length);
         let ww = cfg.wholeWidth();
         let hh = cfg.wholeHeight();
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
@@ -1748,6 +1840,7 @@ class MixerUI {
             this.firstLayers.anchors[ii].hh = hh;
             this.fanLayer.anchors[ii].ww = ww;
             this.fanLayer.anchors[ii].hh = hh;
+            this.fanLayer.anchors[ii].content = [];
             this.levels[ii].reCreateBars(cfg);
         }
         this.fanPane.resetPlates(cfg, this.fanLayer.anchors);
@@ -2156,29 +2249,30 @@ class PerformerIcon {
         this.addOutputs(cfg, audioSeq.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconWidth, yy + cfg.pluginIconHeight / 2);
     }
     addOutputs(cfg, outputs, fanLevelAnchor, zidx, fromX, fromY) {
-        if (outputs.length > 0) {
-            for (let oo = 0; oo < outputs.length; oo++) {
-                let outId = outputs[oo];
-                for (let ii = 0; ii < cfg.data.filters.length; ii++) {
-                    if (cfg.data.filters[ii].id == outId) {
-                        let toFilter = cfg.data.filters[ii];
-                        let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
-                        let top = cfg.gridTop();
-                        let xx = left;
-                        let yy = top;
-                        if (toFilter.iconPosition) {
-                            xx = left + toFilter.iconPosition.x;
-                            yy = top + toFilter.iconPosition.y + cfg.pluginIconHeight / 2;
+        if (outputs)
+            if (outputs.length > 0) {
+                for (let oo = 0; oo < outputs.length; oo++) {
+                    let outId = outputs[oo];
+                    for (let ii = 0; ii < cfg.data.filters.length; ii++) {
+                        if (cfg.data.filters[ii].id == outId) {
+                            let toFilter = cfg.data.filters[ii];
+                            let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
+                            let top = cfg.gridTop();
+                            let xx = left;
+                            let yy = top;
+                            if (toFilter.iconPosition) {
+                                xx = left + toFilter.iconPosition.x;
+                                yy = top + toFilter.iconPosition.y + cfg.pluginIconHeight / 2;
+                            }
+                            new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanSamplerIcon');
+                            break;
                         }
-                        new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanSamplerIcon');
-                        break;
                     }
                 }
             }
-        }
-        else {
-            new SpearConnection().addSpear(3, fromX, fromY, cfg.wholeWidth() - cfg.pluginIconWidth, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanSamplerIcon');
-        }
+            else {
+                new SpearConnection().addSpear(3, fromX, fromY, cfg.wholeWidth() - cfg.pluginIconWidth, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanSamplerIcon');
+            }
     }
 }
 class SamplerIcon {
@@ -2213,29 +2307,30 @@ class SamplerIcon {
         this.addOutputs(cfg, sampler.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconWidth, yy + cfg.pluginIconHeight / 2);
     }
     addOutputs(cfg, outputs, fanLevelAnchor, zidx, fromX, fromY) {
-        if (outputs.length > 0) {
-            for (let oo = 0; oo < outputs.length; oo++) {
-                let outId = outputs[oo];
-                for (let ii = 0; ii < cfg.data.filters.length; ii++) {
-                    if (cfg.data.filters[ii].id == outId) {
-                        let toFilter = cfg.data.filters[ii];
-                        let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
-                        let top = cfg.gridTop();
-                        let xx = left;
-                        let yy = top;
-                        if (toFilter.iconPosition) {
-                            xx = left + toFilter.iconPosition.x;
-                            yy = top + toFilter.iconPosition.y + cfg.pluginIconHeight / 2;
+        if (outputs)
+            if (outputs.length > 0) {
+                for (let oo = 0; oo < outputs.length; oo++) {
+                    let outId = outputs[oo];
+                    for (let ii = 0; ii < cfg.data.filters.length; ii++) {
+                        if (cfg.data.filters[ii].id == outId) {
+                            let toFilter = cfg.data.filters[ii];
+                            let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
+                            let top = cfg.gridTop();
+                            let xx = left;
+                            let yy = top;
+                            if (toFilter.iconPosition) {
+                                xx = left + toFilter.iconPosition.x;
+                                yy = top + toFilter.iconPosition.y + cfg.pluginIconHeight / 2;
+                            }
+                            new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanSamplerIcon');
+                            break;
                         }
-                        new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanSamplerIcon');
-                        break;
                     }
                 }
             }
-        }
-        else {
-            new SpearConnection().addSpear(3, fromX, fromY, cfg.wholeWidth() - cfg.pluginIconWidth, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanSamplerIcon');
-        }
+            else {
+                new SpearConnection().addSpear(3, fromX, fromY, cfg.wholeWidth() - cfg.pluginIconWidth, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanSamplerIcon');
+            }
     }
 }
 class FilterIcon {
@@ -2296,29 +2391,30 @@ class FilterIcon {
         this.addOutputs(cfg, filterTarget.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconWidth, yy + cfg.pluginIconHeight / 2);
     }
     addOutputs(cfg, outputs, fanLevelAnchor, zidx, fromX, fromY) {
-        if (outputs.length > 0) {
-            for (let oo = 0; oo < outputs.length; oo++) {
-                let outId = outputs[oo];
-                for (let ii = 0; ii < cfg.data.filters.length; ii++) {
-                    if (cfg.data.filters[ii].id == outId) {
-                        let toFilter = cfg.data.filters[ii];
-                        let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
-                        let top = cfg.gridTop();
-                        let xx = left;
-                        let yy = top;
-                        if (toFilter.iconPosition) {
-                            xx = left + toFilter.iconPosition.x;
-                            yy = top + toFilter.iconPosition.y + cfg.pluginIconHeight / 2;
+        if (outputs)
+            if (outputs.length > 0) {
+                for (let oo = 0; oo < outputs.length; oo++) {
+                    let outId = outputs[oo];
+                    for (let ii = 0; ii < cfg.data.filters.length; ii++) {
+                        if (cfg.data.filters[ii].id == outId) {
+                            let toFilter = cfg.data.filters[ii];
+                            let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
+                            let top = cfg.gridTop();
+                            let xx = left;
+                            let yy = top;
+                            if (toFilter.iconPosition) {
+                                xx = left + toFilter.iconPosition.x;
+                                yy = top + toFilter.iconPosition.y + cfg.pluginIconHeight / 2;
+                            }
+                            new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanSamplerIcon');
+                            break;
                         }
-                        new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanSamplerIcon');
-                        break;
                     }
                 }
             }
-        }
-        else {
-            new SpearConnection().addSpear(3, fromX, fromY, cfg.wholeWidth() - cfg.pluginIconWidth, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanSamplerIcon');
-        }
+            else {
+                new SpearConnection().addSpear(3, fromX, fromY, cfg.wholeWidth() - cfg.pluginIconWidth, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanSamplerIcon');
+            }
     }
 }
 class SpearConnection {
@@ -2822,4 +2918,11 @@ function TAnchor(xx, yy, ww, hh, showZoom, hideZoom, id, translation) {
 function TText(x, y, css, text) {
     return { x: x, y: y, text: text, css: css, };
 }
+var MZXBX_PluginKind;
+(function (MZXBX_PluginKind) {
+    MZXBX_PluginKind[MZXBX_PluginKind["Action"] = 0] = "Action";
+    MZXBX_PluginKind[MZXBX_PluginKind["Filter"] = 1] = "Filter";
+    MZXBX_PluginKind[MZXBX_PluginKind["Sampler"] = 2] = "Sampler";
+    MZXBX_PluginKind[MZXBX_PluginKind["Performer"] = 3] = "Performer";
+})(MZXBX_PluginKind || (MZXBX_PluginKind = {}));
 //# sourceMappingURL=application.js.map

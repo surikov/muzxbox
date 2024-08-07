@@ -28,6 +28,36 @@ let commandTracksFolder = 'commandTracksFolder';
 */
 let menuItemsData: MenuInfo[] | null = null;
 
+
+
+let menuPointActions: MenuInfo = {
+	text: 'localMenuActionsFolder'
+	, onOpen: () => {
+		console.log('actions');
+	}
+};
+let menuPointPerformers: MenuInfo = {
+	text: 'localMenuPerformersFolder'
+	, onOpen: () => {
+		console.log('performers');
+	}
+};
+let menuPointFilters: MenuInfo = {
+	text: 'localMenuFiltersFolder'
+	, onOpen: () => {
+		console.log('filters');
+	}
+};
+let menuPointSamplers: MenuInfo = {
+	text: 'localMenuSamplersFolder'
+	, onOpen: () => {
+		console.log('samplers');
+	}
+};
+
+
+
+
 let menuPointTracks: MenuInfo = {
 	text: localMenuTracksFolder
 	, onOpen: () => {
@@ -48,10 +78,11 @@ let menuPointAutomation: MenuInfo = {
 		commandDispatcher.upAutoLayer();
 	}
 };
-
+/*
 let menuPointFileImport: MenuInfo = {
 	text: localMenuImportFolder
 };
+
 let menuPointMenuFile: MenuInfo = {
 	text: localMenuFileFolder
 	, children: [menuPointFileImport]
@@ -76,30 +107,76 @@ function fillMenuImportPlugins() {
 						commandDispatcher.resetProject();
 						return true;
 					});
-					/*importer.runPluginGUIImport(url, evaluate, (loaded: any) => {
-						let plugin: MZXBX_ImportMusicPlugin = loaded as MZXBX_ImportMusicPlugin;
-						
-						let url = plugin.GUIURL(() => {
-							console.log('done plugin inport');
-						});
-						console.log('plugin', loaded, url);
-						commandDispatcher.promptPluginGUI(label,url);
-					});*/
 				}
 			});
 		}
 	}
 
+}*/
+function fillPluginsLists() {
+	menuPointFilters.children = [];
+	menuPointPerformers.children = [];
+	menuPointSamplers.children = [];
+	menuPointActions.children = [];
+	for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
+		let label: string = MZXBX_currentPlugins()[ii].label;
+		let kind: MZXBX_PluginKind = MZXBX_currentPlugins()[ii].kind;
+		let url: string = MZXBX_currentPlugins()[ii].url;
+
+		if (kind == MZXBX_PluginKind.Action) {
+			menuPointActions.children.push({
+				text: label, noLocalization: true, onClick: () => {
+					commandDispatcher.promptProjectPluginGUI(label, url, (obj: any) => {
+						let project:Zvoog_Project=JSON.parse(obj);
+						//console.log(project);
+						commandDispatcher.registerWorkProject(project);
+						commandDispatcher.resetProject();
+						return true;
+					});
+				}
+			});
+		} else {
+			if (kind == MZXBX_PluginKind.Sampler) {
+				menuPointSamplers.children.push({
+					text: label, noLocalization: true, onClick: () => {
+						console.log(kind, label);
+					}
+				});
+			} else {
+				if (kind == MZXBX_PluginKind.Performer) {
+					menuPointPerformers.children.push({
+						text: label, noLocalization: true, onClick: () => {
+							commandDispatcher.promptPointPluginGUI(label, url, (obj: any) => {
+								console.log('performer callback',obj);
+								return true;
+							});
+						}
+					});
+				} else {
+					if (kind == MZXBX_PluginKind.Filter) {
+						menuPointFilters.children.push({
+							text: label, noLocalization: true, onClick: () => {
+								console.log(kind, label);
+							}
+						});
+					} else {
+						console.log('unknown plugin kind');
+					}
+				}
+			}
+		}
+	}
 }
 function composeBaseMenu(): MenuInfo[] {
-	fillMenuImportPlugins();
+	//fillMenuImportPlugins();
+	fillPluginsLists();
 	if (menuItemsData) {
 		return menuItemsData;
 	} else {
 		menuItemsData = [
 			{
 				text: localMenuPlayPause, onClick: () => {
-					
+
 				}
 			}
 			/*, {
@@ -118,8 +195,9 @@ function composeBaseMenu(): MenuInfo[] {
 
 			, {
 				text: localMenuItemSettings, children: [
-					menuPointMenuFile
-					, {
+					//menuPointMenuFile
+					//, 
+					{
 						text: 'Size', children: [
 							{
 								text: 'Small', onClick: () => {
@@ -180,8 +258,12 @@ function composeBaseMenu(): MenuInfo[] {
 			, menuPointAutomation
 			, menuPointTracks
 			, menuPointPercussion
-			
-			
+
+			, menuPointActions
+			, menuPointFilters
+			, menuPointPerformers
+			, menuPointSamplers
+
 		];
 		console.log('base menu', menuItemsData);
 		return menuItemsData;

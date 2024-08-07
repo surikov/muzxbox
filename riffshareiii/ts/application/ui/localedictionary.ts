@@ -12,6 +12,16 @@ let localMenuAutomationFolder='localMenuAutomationFolder';
 let localMenuCommentsLayer='localMenuCommentsLayer';
 let localMenuPlayPause='localMenuPlayPause';
 
+
+
+
+
+
+let localMenuActionsFolder='localMenuActionsFolder';
+let localMenuPerformersFolder='localMenuPerformersFolder';
+let localMenuFiltersFolder='localMenuFiltersFolder';
+let localMenuSamplersFolder='localMenuSamplersFolder';
+
 let localeDictionary: { id: string, data: { locale: string, text: string }[] }[] = [
     {
         id: localNameLocal, data: [
@@ -64,6 +74,30 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
         id: localMenuPlayPause, data: [
             { locale: 'en', text: 'Play/Pause' }
             , { locale: 'ru', text: 'Старт/Стоп' }
+            , { locale: 'zh', text: '?' }]
+    }
+
+
+
+    , {
+        id: localMenuActionsFolder, data: [
+            { locale: 'en', text: 'Actions' }
+            , { locale: 'ru', text: 'Действия' }
+            , { locale: 'zh', text: '?' }]
+    }, {
+        id: localMenuPerformersFolder, data: [
+            { locale: 'en', text: 'Performers' }
+            , { locale: 'ru', text: 'Перформеры' }
+            , { locale: 'zh', text: '?' }]
+    }, {
+        id: localMenuFiltersFolder, data: [
+            { locale: 'en', text: 'Filters' }
+            , { locale: 'ru', text: 'Фильтры' }
+            , { locale: 'zh', text: '?' }]
+    }, {
+        id: localMenuSamplersFolder, data: [
+            { locale: 'en', text: 'Samplers' }
+            , { locale: 'ru', text: 'Сэмплеры' }
             , { locale: 'zh', text: '?' }]
     }
 ];

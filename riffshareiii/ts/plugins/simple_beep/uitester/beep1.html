@@ -1,0 +1,39 @@
+<html>
+
+<head>
+	<style>
+		html {
+			--color-background: #ffffffcc;
+			--color-text: #003366ff;
+			--color-scroll: color-mix(in lab, transparent 90%, var(--color-text));
+
+			font-family: "Bruno Ace", sans-serif;
+
+			background-color: var(--color-background);
+			color: var(--color-text);
+			scrollbar-color: var(--color-scroll) var(--color-background);
+			scrollbar-width: thin;
+		}
+	</style>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&display=swap" rel="stylesheet">
+    <script type='text/javascript' src='../beeper/beep_plugin.js'></script>
+	<script type='text/javascript' src='./beeppui.js'></script>
+
+    <script type='text/javascript' src='../../../../js/mzxbxlib.js'></script>
+</head>
+
+<body>
+	<h1>Simple beep</h1>
+	
+	<p>
+		<button onclick='plugin.test();'>Test</button>
+	</p>
+</body>
+<script>
+
+	let plugin=new SimpleBeepPlugin();
+</script>
+
+</html>

@@ -18,6 +18,7 @@ class MixerUI {
 	reFillMixerUI(//data: Zvoog_Project
 		cfg: MixerDataMathUtility
 	) {
+		console.log('reFillMixerUI',this.fanLayer.anchors.length);
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		let ww = cfg.wholeWidth();
 		let hh = cfg.wholeHeight();
@@ -35,7 +36,7 @@ class MixerUI {
 
 			this.fanLayer.anchors[ii].ww = ww;
 			this.fanLayer.anchors[ii].hh = hh;
-
+			this.fanLayer.anchors[ii].content=[];
 			
 			this.levels[ii].reCreateBars(cfg);
 		}

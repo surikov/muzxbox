@@ -10,7 +10,7 @@
 	<script type='text/javascript' src='./js/mzxbx.js'></script>
     <script type='text/javascript' src='./js/mzxbxlib.js'></script>
 	<script type='text/javascript' src='./js/application.js'></script>
-	<script type='text/javascript' src='./web/plugins/catalog.js'></script>
+	<script type='text/javascript' src='./web/catalog.js'></script>
 	<script type='text/javascript' src='./js/tilerender.js'></script>
 
 	<link rel="stylesheet" type="text/css" href="theme/colordarkblue.css">
@@ -34,11 +34,12 @@
 
 <body>
 	<div id="pluginDiv">
-		<div id="pluginHeader" onclick="commandDispatcher.cancelPluginGUI();">
+		<div id="pluginHeader">
 			<div id="pluginTitle">Plugin name and other information for identification</div>
-			<div id="pluginCancel">&#xf271;</div>
+			<div id="pluginRefresh"  onclick="commandDispatcher.refreshPluginGUI();">&#xf1b9;</div>
+			<div id="pluginCancel"  onclick="commandDispatcher.cancelPluginGUI();">&#xf134;</div>
 		</div>
-		<iframe id="pluginFrame" src="web/test/plugin.html"></iframe>
+		<iframe id="pluginFrame" src="web/pluginplaceholder.html"></iframe>
 	</div>
 	<div id='pagediv'>
 		<input type="file" id="file_midi_input" accept="audio/midi, audio/x-midi" />
