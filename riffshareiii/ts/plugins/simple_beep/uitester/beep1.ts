@@ -2,6 +2,7 @@ declare function newSimpleBeepImplementation(): MZXBX_AudioPerformerPlugin;
 class SimpleBeepPlugin {
 	audioContext: AudioContext;
 	plugin: MZXBX_AudioPerformerPlugin;
+	lastMessage: MZXBX_PluginMessage|null=null;
 	constructor() {
 		console.log('SimpleBeepPlugin');
 		//setTimeout(() => { this.register(); }, 999);
@@ -11,15 +12,16 @@ class SimpleBeepPlugin {
 		console.log('register');
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
 	}
-	receiveHostMessage(par) {
-		console.log('receiveHostMessage', par);
+	receiveHostMessage(messageEvent:MessageEvent) {
+		console.log('receiveHostMessage', messageEvent);
+		this.lastMessage=messageEvent.data;
 		//callbackID = par.data;
-		try {
+		/*try {
 			var oo = JSON.parse(par.data);
 			console.log('receiveHostMessage', oo);
 		} catch (xx) {
 			console.log(xx);
-		}
+		}*/
 	}
 	test() {
 		console.log('test beep');

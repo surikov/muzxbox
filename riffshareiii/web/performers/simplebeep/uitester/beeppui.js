@@ -8,6 +8,7 @@ var MZXBX_PluginKind;
 })(MZXBX_PluginKind || (MZXBX_PluginKind = {}));
 class SimpleBeepPlugin {
     constructor() {
+        this.lastMessage = null;
         console.log('SimpleBeepPlugin');
         this.register();
     }
@@ -15,15 +16,9 @@ class SimpleBeepPlugin {
         console.log('register');
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
     }
-    receiveHostMessage(par) {
-        console.log('receiveHostMessage', par);
-        try {
-            var oo = JSON.parse(par.data);
-            console.log('receiveHostMessage', oo);
-        }
-        catch (xx) {
-            console.log(xx);
-        }
+    receiveHostMessage(messageEvent) {
+        console.log('receiveHostMessage', messageEvent);
+        this.lastMessage = messageEvent.data;
     }
     test() {
         console.log('test beep');

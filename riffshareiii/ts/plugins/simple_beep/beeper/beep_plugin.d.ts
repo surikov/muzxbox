@@ -235,7 +235,7 @@ type MZXBX_PluginRegistrationInformation = {
 };
 type MZXBX_PluginMessage = {
     dialogID: string;
-    data: string;
+    data: any;
 };
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
@@ -245,7 +245,7 @@ declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 declare class SimpleBeepImplementation implements MZXBX_AudioPerformerPlugin {
     audioContext: AudioContext;
     oscillators: OscillatorNode[];
-    gain: GainNode;
+    volume: GainNode;
     launch(context: AudioContext, parameters: string): void;
     busy(): null | string;
     schedule(when: number, duraton: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]): void;

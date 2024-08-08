@@ -1,43 +1,47 @@
 class PluginDialogPrompt {
-	dialogID: string = '?';
+	//dialogID: string = '?';
+	//dialogData: string = '';
+	dialogMessage: MZXBX_PluginMessage|null=null;
 	waitCallback: (obj: any) => boolean;
 	constructor() {
 		window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
 	}
-	openDialogFrame(label: string, url: string, data: string,callback: (obj: any) => boolean): void {
+	openDialogFrame(label: string, url: string, initOrProject: any, callback: (obj: any) => boolean): void {
 		this.waitCallback = callback;
 		let pluginTitle = document.getElementById("pluginTitle") as any;
 		pluginTitle.innerHTML = label;
 		let pluginFrame = document.getElementById("pluginFrame") as any;
-		this.dialogID = '' + Math.random();
+		//this.dialogID = '' + Math.random();
+		//this.dialogData = data;
+		this.dialogMessage = { dialogID: '' + Math.random(), data: initOrProject };
 		let me = this;
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
 				pluginFrame.onload = function () {
 					//console.log('onload', me.waitForId);
 					//pluginFrame.contentWindow.postMessage(me.waitForId, '*')
-					me.sendMessageToPlugin(data);
+					me.sendMessageToPlugin();
 				};
 				pluginFrame.src = url;
 				(document.getElementById("pluginDiv") as any).style.visibility = "visible";
 			}
 		}
 	}
-	sendMessageToPlugin(data: string) {
-		console.log('sendMessageToPlugin', this.dialogID);
+	sendMessageToPlugin() {
+		console.log('sendMessageToPlugin', this.dialogMessage);
 		let pluginFrame = document.getElementById("pluginFrame") as any;
 		if (pluginFrame) {
-			let message: MZXBX_PluginMessage = { dialogID: this.dialogID, data: data };
-			let txt = JSON.stringify(message);
-			pluginFrame.contentWindow.postMessage(txt, '*');
+			//let message: MZXBX_PluginMessage = { dialogID: this.dialogID, data: this.dialogData };
+			//let txt = JSON.stringify(message);
+			pluginFrame.contentWindow.postMessage(this.dialogMessage, '*');
 		}
 	}
 	closeDialogFrame(): void {
 		(document.getElementById("pluginDiv") as any).style.visibility = "hidden";
 	}
 	receiveMessageFromPlugin(e) {
-		//console.log('receiveMessage', e);
-		let parsed: MZXBX_PluginMessage |null=null;
+		console.log('receiveMessage', e);
+		/*let parsed: MZXBX_PluginMessage | null = null;
 		try {
 			parsed = JSON.parse(e.data)
 		} catch (xxx) {
@@ -56,6 +60,6 @@ class PluginDialogPrompt {
 			}
 		} else {
 			console.log('wrong received object');
-		}
+		}*/
 	}
 }

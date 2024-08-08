@@ -1,17 +1,18 @@
 class SimpleBeepImplementation implements MZXBX_AudioPerformerPlugin {
 	audioContext: AudioContext;
 	oscillators: OscillatorNode[] = [];
-	gain: GainNode;
+	volume: GainNode;
 	launch(context: AudioContext, parameters: string): void {
 		this.audioContext = context;
-		this.gain = this.audioContext.createGain();
+		this.volume = this.audioContext.createGain();
+		this.volume.gain.setValueAtTime(0.7,0);
 	}
 	busy(): null | string {
 		return null;
 	}
 	schedule(when: number, duraton: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]) {
 		if (this.audioContext) {
-			if (this.gain) {
+			if (this.volume) {
 
 				this.cancel();
 				for (let ii = 0; ii < pitches.length; ii++) {
@@ -21,7 +22,7 @@ class SimpleBeepImplementation implements MZXBX_AudioPerformerPlugin {
 					let A4half = 48;
 					let frequency = A4frequency * Math.pow(Math.pow(2, (1 / 12)), pitches[ii] - A4half);
 					oscillator.frequency.setValueAtTime(frequency, 0);
-					oscillator.connect(this.gain);
+					oscillator.connect(this.volume);
 					oscillator.start(when);
 					oscillator.stop(when + duraton);
 					this.oscillators.push(oscillator);
@@ -36,8 +37,8 @@ class SimpleBeepImplementation implements MZXBX_AudioPerformerPlugin {
 		this.oscillators = [];
 	}
 	output(): AudioNode | null {
-		if (this.gain) {
-			return this.gain;
+		if (this.volume) {
+			return this.volume;
 		} else {
 			return null;
 		}

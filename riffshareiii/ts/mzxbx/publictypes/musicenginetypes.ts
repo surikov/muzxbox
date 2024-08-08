@@ -258,6 +258,6 @@ type MZXBX_PluginRegistrationInformation = {
 };
 type MZXBX_PluginMessage = {
 	dialogID: string
-	, data: string
+	, data: any
 };
 

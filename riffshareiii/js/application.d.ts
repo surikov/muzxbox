@@ -21,11 +21,11 @@ declare function startApplication(): void;
 declare function initWebAudioFromUI(): void;
 declare function startLoadCSSfile(cssurl: string): void;
 declare class PluginDialogPrompt {
-    dialogID: string;
+    dialogMessage: MZXBX_PluginMessage | null;
     waitCallback: (obj: any) => boolean;
     constructor();
-    openProjectDialogFrame(label: string, url: string, projectClone: string, callback: (obj: any) => boolean): void;
-    sendProjectMessageToPlugin(projectClone: string): void;
+    openDialogFrame(label: string, url: string, initOrProject: any, callback: (obj: any) => boolean): void;
+    sendMessageToPlugin(): void;
     closeDialogFrame(): void;
     receiveMessageFromPlugin(e: any): void;
 }
@@ -54,6 +54,7 @@ declare class CommandDispatcher {
     setTrackSoloState(state: number): void;
     setDrumSoloState(state: number): void;
     promptProjectPluginGUI(label: string, url: string, callback: (obj: any) => boolean): void;
+    resendMessagePluginGUI(): void;
     promptPointPluginGUI(label: string, url: string, callback: (obj: any) => boolean): void;
     cancelPluginGUI(): void;
     expandTimeLineSelection(idx: number): void;
@@ -389,6 +390,10 @@ declare class WarningUI {
     warningGroup: SVGElement;
     warningLayer: TileLayerDefinition;
     warningIcon: TileText;
+    warningInfo1: TileImage;
+    warningInfo2: TileImage;
+    warningInfo3: TileImage;
+    warningInfo4: TileImage;
     warningTitle: TileText;
     warningDescription: TileText;
     cancel: () => void;
@@ -773,6 +778,18 @@ type MZXBX_AudioFilterPlugin = {
     input: () => AudioNode | null;
     output: () => AudioNode | null;
 };
+type MZXBX_ChannelSampler = {
+    id: string;
+    kind: MZXBX_PluginKind;
+    properties: string;
+};
+type MZXBX_AudioSamplerPlugin = {
+    launch: (context: AudioContext, parameters: string) => void;
+    busy: () => null | string;
+    schedule: (when: number) => void;
+    cancel: () => void;
+    output: () => AudioNode | null;
+};
 type MZXBX_ChannelPerformer = {
     id: string;
     kind: MZXBX_PluginKind;
@@ -781,7 +798,7 @@ type MZXBX_ChannelPerformer = {
 type MZXBX_AudioPerformerPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
-    schedule: (when: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
+    schedule: (when: number, duraton: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
 };
@@ -812,7 +829,7 @@ type MZXBX_PluginRegistrationInformation = {
 };
 type MZXBX_PluginMessage = {
     dialogID: string;
-    data: string;
+    data: any;
 };
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;

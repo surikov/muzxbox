@@ -171,7 +171,9 @@ body {
     text-anchor: middle;
     pointer-events: none;
 }
-
+.warningInfoIcon{
+fill:#ff993300;
+}
 
 
 .mixTextFill{

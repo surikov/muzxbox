@@ -12,14 +12,15 @@ class SimpleBeepImplementation {
     }
     launch(context, parameters) {
         this.audioContext = context;
-        this.gain = this.audioContext.createGain();
+        this.volume = this.audioContext.createGain();
+        this.volume.gain.setValueAtTime(0.7, 0);
     }
     busy() {
         return null;
     }
     schedule(when, duraton, pitches, tempo, slides) {
         if (this.audioContext) {
-            if (this.gain) {
+            if (this.volume) {
                 this.cancel();
                 for (let ii = 0; ii < pitches.length; ii++) {
                     console.log('schedule', when, duraton, pitches[ii], tempo, slides);
@@ -28,7 +29,7 @@ class SimpleBeepImplementation {
                     let A4half = 48;
                     let frequency = A4frequency * Math.pow(Math.pow(2, (1 / 12)), pitches[ii] - A4half);
                     oscillator.frequency.setValueAtTime(frequency, 0);
-                    oscillator.connect(this.gain);
+                    oscillator.connect(this.volume);
                     oscillator.start(when);
                     oscillator.stop(when + duraton);
                     this.oscillators.push(oscillator);
@@ -43,8 +44,8 @@ class SimpleBeepImplementation {
         this.oscillators = [];
     }
     output() {
-        if (this.gain) {
-            return this.gain;
+        if (this.volume) {
+            return this.volume;
         }
         else {
             return null;

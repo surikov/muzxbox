@@ -159,61 +159,38 @@ function startLoadCSSfile(cssurl) {
 }
 class PluginDialogPrompt {
     constructor() {
-        this.dialogID = '?';
+        this.dialogMessage = null;
         window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
     }
-    openProjectDialogFrame(label, url, projectClone, callback) {
+    openDialogFrame(label, url, initOrProject, callback) {
         this.waitCallback = callback;
         let pluginTitle = document.getElementById("pluginTitle");
         pluginTitle.innerHTML = label;
         let pluginFrame = document.getElementById("pluginFrame");
-        this.dialogID = '' + Math.random();
+        this.dialogMessage = { dialogID: '' + Math.random(), data: initOrProject };
         let me = this;
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
                 pluginFrame.onload = function () {
-                    me.sendProjectMessageToPlugin(projectClone);
+                    me.sendMessageToPlugin();
                 };
                 pluginFrame.src = url;
                 document.getElementById("pluginDiv").style.visibility = "visible";
             }
         }
     }
-    sendProjectMessageToPlugin(projectClone) {
-        console.log('sendMessageToPlugin', this.dialogID);
+    sendMessageToPlugin() {
+        console.log('sendMessageToPlugin', this.dialogMessage);
         let pluginFrame = document.getElementById("pluginFrame");
         if (pluginFrame) {
-            let message = { dialogID: this.dialogID, data: projectClone };
-            let txt = JSON.stringify(message);
-            pluginFrame.contentWindow.postMessage(txt, '*');
+            pluginFrame.contentWindow.postMessage(this.dialogMessage, '*');
         }
     }
     closeDialogFrame() {
         document.getElementById("pluginDiv").style.visibility = "hidden";
     }
     receiveMessageFromPlugin(e) {
-        let parsed = null;
-        try {
-            parsed = JSON.parse(e.data);
-        }
-        catch (xxx) {
-            console.log(xxx);
-        }
-        console.log('parsed', parsed);
-        if (parsed) {
-            if (parsed.dialogID == this.dialogID) {
-                let close = this.waitCallback(parsed.data);
-                if (close) {
-                    this.closeDialogFrame();
-                }
-            }
-            else {
-                console.log('wrong received message id', parsed.dialogID, this.dialogID);
-            }
-        }
-        else {
-            console.log('wrong received object');
-        }
+        console.log('receiveMessage', e);
     }
 }
 class CommandDispatcher {
@@ -329,11 +306,14 @@ class CommandDispatcher {
     promptProjectPluginGUI(label, url, callback) {
         console.log('promptProjectPluginGUI', url);
         let projectClone = JSON.stringify(this.cfg.data);
-        pluginDialogPrompt.openProjectDialogFrame(label, url, projectClone, callback);
+        pluginDialogPrompt.openDialogFrame(label, url, projectClone, callback);
+    }
+    resendMessagePluginGUI() {
+        pluginDialogPrompt.sendMessageToPlugin();
     }
     promptPointPluginGUI(label, url, callback) {
         console.log('promptPointPluginGUI', url);
-        pluginDialogPrompt.openProjectDialogFrame(label, url, 'data for testing', callback);
+        pluginDialogPrompt.openDialogFrame(label, url, 'data for testing', callback);
     }
     cancelPluginGUI() {
         console.log('cancelPluginGUI');
@@ -2537,15 +2517,21 @@ class WarningUI {
     }
     initDialogUI() {
         this.warningIcon = { x: 0, y: 0, text: icon_warningPlay, css: 'warningIcon' };
-        this.warningTitle = { x: 0, y: 0, text: 'Title', css: 'warningTitle' };
-        this.warningDescription = { x: 0, y: 0, text: 'Some optional text information.', css: 'warningDescription' };
+        this.warningInfo1 = { x: 0, y: 0, w: 1, h: 1, href: 'theme/img/mouse.png', css: 'warningInfoIcon' };
+        this.warningInfo2 = { x: 0, y: 0, w: 1, h: 1, href: 'theme/img/wheel.png', css: 'warningInfoIcon' };
+        this.warningInfo3 = { x: 0, y: 0, w: 1, h: 1, href: 'theme/img/hand.png', css: 'warningInfoIcon' };
+        this.warningInfo4 = { x: 0, y: 0, w: 1, h: 1, href: 'theme/img/trackpad.png', css: 'warningInfoIcon' };
+        this.warningTitle = { x: 0, y: 0, text: 'Play', css: 'warningTitle' };
+        this.warningDescription = { x: 0, y: 0, text: 'Use mouse or touchpad to move and zoom piano roll', css: 'warningDescription' };
         this.warningGroup = document.getElementById("warningDialogGroup");
         this.warningRectangle = { x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: this.cancel.bind(this) };
         this.warningAnchor = {
             id: 'warningAnchor', xx: 0, yy: 0, ww: 1, hh: 1,
             showZoom: zoomPrefixLevelsCSS[0].minZoom,
             hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1,
-            content: [this.warningRectangle, this.warningIcon, this.warningTitle, this.warningDescription]
+            content: [this.warningRectangle, this.warningIcon, this.warningTitle, this.warningDescription,
+                this.warningInfo1, this.warningInfo2, this.warningInfo3, this.warningInfo4
+            ]
         };
         this.warningLayer = { g: this.warningGroup, anchors: [this.warningAnchor], mode: LevelModes.overlay };
     }
@@ -2562,6 +2548,14 @@ class WarningUI {
         this.warningTitle.y = hh / 3 + 1.5;
         this.warningDescription.x = ww / 2;
         this.warningDescription.y = hh / 3 + 2;
+        this.warningInfo1.x = ww / 2 - 3;
+        this.warningInfo1.y = hh - 1.5;
+        this.warningInfo2.x = ww / 2 - 1.5;
+        this.warningInfo2.y = hh - 1.5;
+        this.warningInfo3.x = ww / 2 + 0;
+        this.warningInfo3.y = hh - 1.5;
+        this.warningInfo4.x = ww / 2 + 1.5;
+        this.warningInfo4.y = hh - 1.5;
         resetWarningAnchor();
     }
     allLayers() {

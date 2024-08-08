@@ -30,8 +30,8 @@
 }
 #pluginHeader{
 	width:100%;
-	height:1cm;
-	background-color: var(--color-interactive);
+	height:1.0cm;
+	background-color: var(--color-panel);
 	border-radius: 0.125cm 0.125cm 0.0cm 0.0cm;
 	flex-basis: auto;
     flex-shrink: 0;
@@ -39,6 +39,7 @@
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
+	padding-top: 0.1cm;
 }
 #pluginTitle{
 	color: var(--color-text);
@@ -46,33 +47,55 @@
 	padding-left: 0.5cm;
 	padding-top: 0.25cm;
 	flex-grow: 1;
+	white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 #pluginCancel{
+	border-radius: 0.4cm;
+	background-color: var(--color-interactive);
 	color: var(--color-text);
-    font-size: var(--label-075cm);
-	width:1cm;
-	height:1cm;
+	box-shadow:inset 0px 0px 0px 0.5px var(--color-text);
+	text-shadow2: 0.25px 0px var(--color-text),-0.25px 0px var(--color-text),0px 0.25px var(--color-text),0px -0.25px var(--color-text);
+    font-size: var(--label-05cm);
+	width:0.8cm;
+	height:0.8cm;
 	text-align: center;
-	padding-top: 0.1cm;
+	padding-top2: 0.05cm;
 	background-color2: green;
 	border-color2: var(--color-text);
 	border-style2: solid;
-	border-width2: 0.0025cm;
+	border-width2: 1px;
 	border-radius2:1cm;
 	margin2: 0.05cm;
 	font-family: "Material-Design-Iconic-Font";
 	vertical-align22: middle;
 	alignment-baseline22: middle;
 	cursor:pointer;
+	margin-left: 0.2cm;
+	margin-right: 0.2cm;
+	display: flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 0.8cm;
 }
 #pluginRefresh{
+	border-radius: 0.4cm;
+	background-color: var(--color-interactive);
 	color: var(--color-text);
-    font-size: var(--label-075cm);
-	width:1cm;
-	height:1cm;
+	text-shadow2: 0.25px 0px var(--color-text),-0.25px 0px var(--color-text),0px 0.25px var(--color-text),0px -0.25px var(--color-text);
+    font-size: var(--label-05cm);
+	width:0.8cm;
+	height:0.8cm;
 	text-align: center;
-	padding-top: 0.1cm;
+	margin-to2p: 0.1cm;
 	font-family: "Material-Design-Iconic-Font";
 	background-color2: brown;
 	cursor:pointer;
+	box-shadow:inset 0px 0px 0px 0.5px var(--color-text);
+	display: flex;
+		align-items: center;
+		justify-content: center;
+	min-width: 0.8cm;
+	  
 }

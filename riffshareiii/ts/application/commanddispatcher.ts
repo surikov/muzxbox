@@ -210,6 +210,9 @@ class CommandDispatcher {
 		//}
 		//}
 	}
+	resendMessagePluginGUI(){
+		pluginDialogPrompt.sendMessageToPlugin();
+	}
 	promptPointPluginGUI(label: string, url: string, callback: (obj: any) => boolean) {
 		console.log('promptPointPluginGUI', url);
 		pluginDialogPrompt.openDialogFrame(label, url, 'data for testing',callback);
