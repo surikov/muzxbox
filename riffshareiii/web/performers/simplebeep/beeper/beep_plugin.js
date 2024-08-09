@@ -18,20 +18,32 @@ class SimpleBeepImplementation {
     busy() {
         return null;
     }
-    schedule(when, duraton, pitches, tempo, slides) {
+    schedule(when, pitches, tempo, slides) {
         if (this.audioContext) {
             if (this.volume) {
+                let duration = 0;
+                for (let ss = 0; ss < slides.length; ss++) {
+                    duration = duration + slides[ss].duration;
+                }
+                let A4frequency = 440.0;
+                let A4half = 48;
                 this.cancel();
                 for (let ii = 0; ii < pitches.length; ii++) {
-                    console.log('schedule', when, duraton, pitches[ii], tempo, slides);
+                    console.log('schedule', when, duration, pitches[ii], tempo, slides);
                     let oscillator = this.audioContext.createOscillator();
-                    let A4frequency = 440.0;
-                    let A4half = 48;
-                    let frequency = A4frequency * Math.pow(Math.pow(2, (1 / 12)), pitches[ii] - A4half);
-                    oscillator.frequency.setValueAtTime(frequency, 0);
+                    let currentPitch = pitches[ii];
+                    let frequency = A4frequency * Math.pow(Math.pow(2, (1 / 12)), currentPitch - A4half);
+                    oscillator.frequency.setValueAtTime(frequency, when);
+                    let currentWhen = when;
+                    for (let ss = 0; ss < slides.length; ss++) {
+                        frequency = A4frequency * Math.pow(Math.pow(2, (1 / 12)), currentPitch - A4half);
+                        currentWhen = currentWhen + slides[ss].duration;
+                        currentPitch = currentPitch + slides[ss].delta;
+                        oscillator.frequency.linearRampToValueAtTime(frequency, currentWhen);
+                    }
                     oscillator.connect(this.volume);
                     oscillator.start(when);
-                    oscillator.stop(when + duraton);
+                    oscillator.stop(when + duration);
                     this.oscillators.push(oscillator);
                 }
             }

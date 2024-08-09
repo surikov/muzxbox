@@ -204,7 +204,7 @@ type MZXBX_ChannelPerformer = {
 type MZXBX_AudioPerformerPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
-    schedule: (when: number, duraton: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]) => void;
+    schedule: (when: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
 };
@@ -248,7 +248,7 @@ declare class SimpleBeepImplementation implements MZXBX_AudioPerformerPlugin {
     volume: GainNode;
     launch(context: AudioContext, parameters: string): void;
     busy(): null | string;
-    schedule(when: number, duraton: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]): void;
+    schedule(when: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]): void;
     cancel(): void;
     output(): AudioNode | null;
 }
