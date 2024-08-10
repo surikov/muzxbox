@@ -39,6 +39,7 @@ declare class CommandDispatcher {
     registerWorkProject(data: Zvoog_Project): void;
     registerUI(renderer: UIRenderer): void;
     showRightMenu(): void;
+    toggleStartStop(): void;
     setThemeLocale(loc: string, ratio: number): void;
     setThemeColor(cssPath: string): void;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;

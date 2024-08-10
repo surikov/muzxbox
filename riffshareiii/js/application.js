@@ -217,6 +217,9 @@ class CommandDispatcher {
         this.renderer.menu.resetAllAnchors();
     }
     ;
+    toggleStartStop() {
+        console.log('toggleStartStop');
+    }
     setThemeLocale(loc, ratio) {
         console.log("setThemeLocale " + loc);
         setLocaleID(loc, ratio);
@@ -1358,6 +1361,8 @@ function composeBaseMenu() {
         menuItemsData = [
             {
                 text: localMenuPlayPause, onClick: () => {
+                    console.log('start/stop');
+                    commandDispatcher.toggleStartStop();
                 }
             },
             {

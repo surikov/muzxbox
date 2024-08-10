@@ -30,6 +30,9 @@ class CommandDispatcher {
 		this.renderer.menu.resizeMenu(vw, vh);
 		this.renderer.menu.resetAllAnchors();
 	};
+	toggleStartStop(){
+console.log('toggleStartStop');
+	}
 	/*toggleLeftMenu() {
 		//console.log('toggleLeftMenu');
 		this.renderer.leftBar.leftHide=!this.renderer.leftBar.leftHide;
