@@ -72,27 +72,27 @@ class OctaveContent {
 		let measure: Zvoog_TrackMeasure = track.measures[barIdx];
 		for (let cc = 0; cc < measure.chords.length; cc++) {
 			let chord: Zvoog_Chord = measure.chords[cc];
-			for (let nn = 0; nn < chord.notes.length; nn++) {
-				let note: Zvoog_Note = chord.notes[nn];
+			for (let nn = 0; nn < chord.pitches.length; nn++) {
+				//let note: Zvoog_Note = chord.notes[nn];
 				let from = octaveIdx * 12;
 				let to = (octaveIdx + 1) * 12;
-				if (note.pitch >= from && note.pitch < to) {
+				if (chord.pitches[nn] >= from && chord.pitches[nn] < to) {
 					let x1 = left + MMUtil().set(chord.skip).duration(cfg.data.timeline[barIdx].tempo) * cfg.widthDurationRatio;
-					let y1 = top + height - (note.pitch - from) * cfg.notePathHeight;
-					let slidearr = note.slides;
+					let y1 = top + height - (chord.pitches[nn] - from) * cfg.notePathHeight;
+					//let slidearr = note.slides;
 					/*if (slidearr.length > 1) {
 						console.log(track.title, barIdx, slidearr);
 					}*/
-					for (let ss = 0; ss < slidearr.length; ss++) {
+					for (let ss = 0; ss < chord.slides.length; ss++) {
 						//if (ss > 2) break;
-						let x2 = x1 + MMUtil().set(slidearr[ss].duration).duration(cfg.data.timeline[barIdx].tempo) * cfg.widthDurationRatio;
-						let y2 = y1 + slidearr[ss].delta * cfg.notePathHeight;
+						let x2 = x1 + MMUtil().set(chord.slides[ss].duration).duration(cfg.data.timeline[barIdx].tempo) * cfg.widthDurationRatio;
+						let y2 = y1 - chord.slides[ss].delta * cfg.notePathHeight;
 						let r_x1 = x1 + cfg.notePathHeight / 2;
 						if (ss > 0) {
 							r_x1 = x1;
 						}
 						let r_x2 = x2 - cfg.notePathHeight / 2;
-						if (ss < slidearr.length - 1) {
+						if (ss < chord.slides.length - 1) {
 							r_x2 = x2;
 						}
 						if (r_x2 - r_x1 < cfg.notePathHeight / 2) {

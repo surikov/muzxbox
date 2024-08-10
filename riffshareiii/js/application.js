@@ -1586,23 +1586,21 @@ class OctaveContent {
         let measure = track.measures[barIdx];
         for (let cc = 0; cc < measure.chords.length; cc++) {
             let chord = measure.chords[cc];
-            for (let nn = 0; nn < chord.notes.length; nn++) {
-                let note = chord.notes[nn];
+            for (let nn = 0; nn < chord.pitches.length; nn++) {
                 let from = octaveIdx * 12;
                 let to = (octaveIdx + 1) * 12;
-                if (note.pitch >= from && note.pitch < to) {
+                if (chord.pitches[nn] >= from && chord.pitches[nn] < to) {
                     let x1 = left + MMUtil().set(chord.skip).duration(cfg.data.timeline[barIdx].tempo) * cfg.widthDurationRatio;
-                    let y1 = top + height - (note.pitch - from) * cfg.notePathHeight;
-                    let slidearr = note.slides;
-                    for (let ss = 0; ss < slidearr.length; ss++) {
-                        let x2 = x1 + MMUtil().set(slidearr[ss].duration).duration(cfg.data.timeline[barIdx].tempo) * cfg.widthDurationRatio;
-                        let y2 = y1 + slidearr[ss].delta * cfg.notePathHeight;
+                    let y1 = top + height - (chord.pitches[nn] - from) * cfg.notePathHeight;
+                    for (let ss = 0; ss < chord.slides.length; ss++) {
+                        let x2 = x1 + MMUtil().set(chord.slides[ss].duration).duration(cfg.data.timeline[barIdx].tempo) * cfg.widthDurationRatio;
+                        let y2 = y1 - chord.slides[ss].delta * cfg.notePathHeight;
                         let r_x1 = x1 + cfg.notePathHeight / 2;
                         if (ss > 0) {
                             r_x1 = x1;
                         }
                         let r_x2 = x2 - cfg.notePathHeight / 2;
-                        if (ss < slidearr.length - 1) {
+                        if (ss < chord.slides.length - 1) {
                             r_x2 = x2;
                         }
                         if (r_x2 - r_x1 < cfg.notePathHeight / 2) {
@@ -1994,7 +1992,7 @@ class MixerUI {
             let bar = cfg.data.tracks[tt].measures[bb];
             if (bar) {
                 for (let cc = 0; cc < bar.chords.length; cc++) {
-                    notecount = notecount + bar.chords[cc].notes.length;
+                    notecount = notecount + bar.chords[cc].pitches.length;
                 }
             }
         }
@@ -2587,19 +2585,23 @@ let mzxbxProjectForTesting2 = {
             title: "Track one", measures: [
                 {
                     chords: [
-                        { skip: { count: 0, part: 1 }, notes: [{ pitch: 25, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
-                        { skip: { count: 1, part: 16 }, notes: [{ pitch: 26, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
-                        { skip: { count: 1, part: 8 }, notes: [{ pitch: 27, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
-                        { skip: { count: 3, part: 16 }, notes: [{ pitch: 28, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
-                        { skip: { count: 1, part: 4 }, notes: [{ pitch: 29, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
-                        { skip: { count: 5, part: 16 }, notes: [{ pitch: 30, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
-                        { skip: { count: 3, part: 8 }, notes: [{ pitch: 31, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
-                        { skip: { count: 7, part: 16 }, notes: [{ pitch: 32, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] },
-                        { skip: { count: 1, part: 2 }, notes: [{ pitch: 33, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] }
+                        { skip: { count: 0, part: 1 }, pitches: [25], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 1, part: 16 }, pitches: [26], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 1, part: 8 }, pitches: [27], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 3, part: 16 }, pitches: [28], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 1, part: 4 }, pitches: [29], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 5, part: 16 }, pitches: [30], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 3, part: 8 }, pitches: [31], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 7, part: 16 }, pitches: [32], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 1, part: 2 }, pitches: [33], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }
                     ]
                 }, {
                     chords: [
-                        { skip: { count: 0, part: 2 }, notes: [{ pitch: 31, slides: [] }] }
+                        { skip: { count: 0, part: 2 }, pitches: [60], slides: [
+                                { duration: { count: 1, part: 8 }, delta: 5 },
+                                { duration: { count: 1, part: 8 }, delta: -5 },
+                                { duration: { count: 1, part: 4 }, delta: 0 }
+                            ] }
                     ]
                 }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],

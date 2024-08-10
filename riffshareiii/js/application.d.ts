@@ -615,10 +615,6 @@ type Zvoog_Slide = {
     duration: Zvoog_Metre;
     delta: number;
 };
-type Zvoog_Note = {
-    pitch: number;
-    slides: Zvoog_Slide[];
-};
 type Zvoog_PluginBase = {
     setup: (audioContext: AudioContext) => boolean;
 };
@@ -665,7 +661,8 @@ type Zvoog_AudioSampler = {
 };
 type Zvoog_Chord = {
     skip: Zvoog_Metre;
-    notes: Zvoog_Note[];
+    pitches: number[];
+    slides: Zvoog_Slide[];
 };
 type Zvoog_TrackMeasure = {
     chords: Zvoog_Chord[];

@@ -233,7 +233,8 @@ class MixerUI {
 			let bar = cfg.data.tracks[tt].measures[bb];
 			if (bar) {
 				for (let cc = 0; cc < bar.chords.length; cc++) {
-					notecount = notecount + bar.chords[cc].notes.length;
+					//notecount = notecount + bar.chords[cc].notes.length;
+					notecount = notecount + bar.chords[cc].pitches.length;
 				}
 			}
 		}
