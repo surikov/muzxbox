@@ -228,14 +228,30 @@
 	fill-opacity:25%;
     stroke: none;
 }
-
+.verLineFrom {
+    stop-color: var(--color-lines);
+    stop-opacity: 25%;
+  }
+  .verLineMiddle{
+    stop-color: var(--color-lines);
+    stop-opacity: 15%;
+  }
+  .verLineTo {
+    stop-color: var(--color-lines);
+    stop-opacity: 0;
+  }
 .barRightBorder{
+	fill: url(#verticalBorderLine);;
+	fill-opacity2:25%;
+    stroke: none;
+	pointer-events: none;
+}
+.barRightBorder2{
 	fill: var(--color-lines);
 	fill-opacity:25%;
     stroke: none;
 	pointer-events: none;
 }
-
 .interActiveGridLine{
 	fill: var(--color-interactive);
 	fill-opacity:50%;
