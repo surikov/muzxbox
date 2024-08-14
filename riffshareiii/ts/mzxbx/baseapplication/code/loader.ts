@@ -48,7 +48,10 @@ class PluginLoader {
 			let info: MZXBX_PluginRegistrationInformation = tt;
 			//console.log('wait',info);
 			MZXBX_appendScriptURL(info.url);
-			MZXBX_waitForCondition(250, () => { return (window[info.evaluate]); }, () => {
+			MZXBX_waitForCondition(250, () => { 
+				
+				return (window[info.evaluate]); 
+			}, () => {
 				let exe = window[info.evaluate];
 				let plugin = exe();
 				//console.log(plugin);

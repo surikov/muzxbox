@@ -66,7 +66,7 @@ type Zvoog_AudioSampler = {
 type Zvoog_Chord = {
 	skip: Zvoog_Metre;
 	//notes: Zvoog_Note[];
-	pitches:number[];
+	pitches: number[];
 	slides: Zvoog_Slide[];
 };
 type Zvoog_TrackMeasure = {
@@ -179,7 +179,7 @@ type MZXBX_SlideItem = {
 type MZXBX_PlayItem = {
 	skip: number;
 	channelId: string;
-	pitch: number;
+	pitches: number[];
 	slides: MZXBX_SlideItem[];
 };
 type MZXBX_FilterState = {
@@ -189,6 +189,7 @@ type MZXBX_FilterState = {
 };
 type MZXBX_Set = {
 	duration: number;
+	tempo:number;
 	items: MZXBX_PlayItem[];
 	states: MZXBX_FilterState[];
 };
@@ -248,16 +249,17 @@ type Zvoog_import = {
 	import: () => Zvoog_Schedule | null;
 };*/
 enum MZXBX_PluginKind {
-	Action,
-	Filter,
-	Sampler,
-	Performer
+	Action
+	, Filter
+	, Sampler
+	, Performer
 }
 type MZXBX_PluginRegistrationInformation = {
 	id: string
 	, label: string
 	, kind: MZXBX_PluginKind
 	, url: string
+	,evaluate:string
 };
 type MZXBX_PluginMessage = {
 	dialogID: string

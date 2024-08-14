@@ -1,6 +1,13 @@
 "use strict";
 class MZXBX_ScaleMath {
 }
+var MZXBX_PluginKind;
+(function (MZXBX_PluginKind) {
+    MZXBX_PluginKind[MZXBX_PluginKind["Action"] = 0] = "Action";
+    MZXBX_PluginKind[MZXBX_PluginKind["Filter"] = 1] = "Filter";
+    MZXBX_PluginKind[MZXBX_PluginKind["Sampler"] = 2] = "Sampler";
+    MZXBX_PluginKind[MZXBX_PluginKind["Performer"] = 3] = "Performer";
+})(MZXBX_PluginKind || (MZXBX_PluginKind = {}));
 console.log("MuzXbox v1.0.2");
 class MuzXbox {
     constructor() {
@@ -332,10 +339,10 @@ class SchedulePlayer {
         console.error('No performer for', channelId);
         return null;
     }
-    sendPerformerItem(it, whenAudio) {
+    sendPerformerItem(it, whenAudio, tempo) {
         let plugin = this.findPerformerPlugin(it.channelId);
         if (plugin) {
-            plugin.schedule(whenAudio, it.pitch, it.slides);
+            plugin.schedule(whenAudio, it.pitches, tempo, it.slides);
         }
     }
     findFilterPlugin(filterId) {
@@ -374,7 +381,7 @@ class SchedulePlayer {
                         let it = cuSerie.items[nn];
                         if (this.ms(serieStart + it.skip) >= this.ms(fromPosition)
                             && this.ms(serieStart + it.skip) < this.ms(toPosition)) {
-                            this.sendPerformerItem(it, whenAudio + serieStart + it.skip - fromPosition);
+                            this.sendPerformerItem(it, whenAudio + serieStart + it.skip - fromPosition, cuSerie.tempo);
                         }
                     }
                     for (let nn = 0; nn < cuSerie.states.length; nn++) {
@@ -441,7 +448,9 @@ class PluginLoader {
         if (tt) {
             let info = tt;
             MZXBX_appendScriptURL(info.url);
-            MZXBX_waitForCondition(250, () => { return (window[info.evaluate]); }, () => {
+            MZXBX_waitForCondition(250, () => {
+                return (window[info.evaluate]);
+            }, () => {
                 let exe = window[info.evaluate];
                 let plugin = exe();
                 if (plugin) {
@@ -474,7 +483,7 @@ class PluginLoader {
     }
     findPluginInfo(kind) {
         for (let ll = 0; ll < MZXBX_currentPlugins().length; ll++) {
-            if (MZXBX_currentPlugins()[ll].group == kind) {
+            if (MZXBX_currentPlugins()[ll].kind == kind) {
                 return MZXBX_currentPlugins()[ll];
             }
         }

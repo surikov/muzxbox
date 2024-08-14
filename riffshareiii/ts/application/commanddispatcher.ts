@@ -30,8 +30,9 @@ class CommandDispatcher {
 		this.renderer.menu.resizeMenu(vw, vh);
 		this.renderer.menu.resetAllAnchors();
 	};
-	toggleStartStop(){
-console.log('toggleStartStop');
+	toggleStartStop() {
+		console.log('toggleStartStop');
+		
 	}
 	/*toggleLeftMenu() {
 		//console.log('toggleLeftMenu');
@@ -188,9 +189,9 @@ console.log('toggleStartStop');
 */
 	promptProjectPluginGUI(label: string, url: string, callback: (obj: any) => boolean) {
 		console.log('promptProjectPluginGUI', url);
-		
-		let projectClone:string=JSON.stringify(this.cfg.data);
-		pluginDialogPrompt.openDialogFrame(label, url, projectClone,callback);
+
+		let projectClone: string = JSON.stringify(this.cfg.data);
+		pluginDialogPrompt.openDialogFrame(label, url, projectClone, callback);
 
 		//let pluginFrame = document.getElementById("pluginFrame") as any;
 		//if (pluginFrame) {
@@ -213,12 +214,12 @@ console.log('toggleStartStop');
 		//}
 		//}
 	}
-	resendMessagePluginGUI(){
+	resendMessagePluginGUI() {
 		pluginDialogPrompt.sendMessageToPlugin();
 	}
 	promptPointPluginGUI(label: string, url: string, callback: (obj: any) => boolean) {
 		console.log('promptPointPluginGUI', url);
-		pluginDialogPrompt.openDialogFrame(label, url, 'data for testing',callback);
+		pluginDialogPrompt.openDialogFrame(label, url, 'data for testing', callback);
 	}
 	cancelPluginGUI() {
 		console.log('cancelPluginGUI');

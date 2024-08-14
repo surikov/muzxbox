@@ -98,7 +98,7 @@ class MixerZoomLevel {
 						x: cfg.leftPad
 						, y: cfg.gridTop() + oo * 12 * cfg.notePathHeight
 						, w: cfg.timelineWidth()
-						, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 8.0
+						, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 2.0
 						, css: 'octaveBottomBorder'
 					};
 					barOctaveAnchor.content.push(octaveBottomBorder);

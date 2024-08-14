@@ -40,7 +40,7 @@ class SchedulePlayer implements MZXBX_Player {
     position: number = 0;
     audioContext: AudioContext;
     schedule: MZXBX_Schedule | null = null;
-    performers: { plugin: MZXBX_AudioPerformerPlugin | null, id: string, kind: string, properties: string, launched: boolean }[] = [];
+    performers: MZXBX_PerformerHolder[]=[];//{ plugin: MZXBX_AudioPerformerPlugin | null, id: string, kind: string, properties: string, launched: boolean }[] = [];
     filters: MZXBX_FilterHolder[] = [];// { plugin: MZXBX_AudioFilterPlugin | null, id: string, kind: string, properties: string }[] = [];
     pluginsList: MZXBX_PerformerHolder[] = [];// { url: string, name: string, kind: string }[];
     //stateSetupDone: boolean = false;
@@ -325,7 +325,7 @@ class SchedulePlayer implements MZXBX_Player {
         console.error('No performer for', channelId);
         return null;
     }
-    sendPerformerItem(it: MZXBX_PlayItem, whenAudio: number) {
+    sendPerformerItem(it: MZXBX_PlayItem, whenAudio: number, tempo: number) {
         //console.log('sendPerformerItem',it, whenAudio);
 		/*if (this.schedule) {
 			for (let ii = 0; ii < this.schedule.channels.length; ii++) {
@@ -346,7 +346,8 @@ class SchedulePlayer implements MZXBX_Player {
         let plugin: MZXBX_AudioPerformerPlugin | null = this.findPerformerPlugin(it.channelId);
         if (plugin) {
             //console.log(plugin);
-            plugin.schedule(whenAudio, it.pitch, it.slides);
+            //plugin.schedule(whenAudio, it.pitch, it.slides);
+			plugin.schedule(whenAudio, it.pitches , tempo, it.slides);
         }
     }
     findFilterPlugin(filterId: string): MZXBX_AudioFilterPlugin | null {
@@ -402,7 +403,7 @@ class SchedulePlayer implements MZXBX_Player {
                         if (this.ms(serieStart + it.skip) >= this.ms(fromPosition)
                             && this.ms(serieStart + it.skip) < this.ms(toPosition)) {//}, it.channelId) {
                             //console.log('  sendPerformerItem', (ii + it.skip), it.channelId, it.pitch, (whenAudio + serieStart + it.skip - fromPosition));
-                            this.sendPerformerItem(it, whenAudio + serieStart + it.skip - fromPosition);
+                            this.sendPerformerItem(it, whenAudio + serieStart + it.skip - fromPosition,cuSerie.tempo);
                         }
                     }
                     for (let nn = 0; nn < cuSerie.states.length; nn++) {

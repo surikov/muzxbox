@@ -23,10 +23,6 @@ declare type Zvoog_Slide = {
     duration: Zvoog_Metre;
     delta: number;
 };
-declare type Zvoog_Note = {
-    pitch: number;
-    slides: Zvoog_Slide[];
-};
 declare type Zvoog_PluginBase = {
     setup: (audioContext: AudioContext) => boolean;
 };
@@ -43,23 +39,38 @@ declare type Zvoog_PluginSampler = Zvoog_PluginBase | {
 declare type Zvoog_FilterTarget = {
     id: string;
     kind: string;
-    data: string;
-    output: null | Zvoog_FilterTarget;
-    automation: Zvoog_AutomationTrack;
+    dataBlob: string;
+    outputs: string[];
+    automation: Zvoog_AutomationTrack | null;
+    iconPosition?: {
+        x: number;
+        y: number;
+    };
 };
 declare type Zvoog_AudioSequencer = {
     id: string;
     data: string;
     kind: string;
-    output: null | Zvoog_FilterTarget;
+    outputs: string[];
+    iconPosition?: {
+        x: number;
+        y: number;
+    };
 };
 declare type Zvoog_AudioSampler = {
     id: string;
     data: string;
+    kind: string;
+    outputs: string[];
+    iconPosition?: {
+        x: number;
+        y: number;
+    };
 };
 declare type Zvoog_Chord = {
     skip: Zvoog_Metre;
-    notes: Zvoog_Note[];
+    pitches: number[];
+    slides: Zvoog_Slide[];
 };
 declare type Zvoog_TrackMeasure = {
     chords: Zvoog_Chord[];
@@ -95,9 +106,10 @@ declare type Zvoog_MusicTrack = {
 declare type Zvoog_CommentText = {
     skip: Zvoog_Metre;
     text: string;
+    row: number;
 };
 declare type Zvoog_CommentMeasure = {
-    texts: Zvoog_CommentText[];
+    points: Zvoog_CommentText[];
 };
 declare type Zvoog_Selection = {
     startMeasure: number;
@@ -111,6 +123,7 @@ declare type Zvoog_Project = {
     comments: Zvoog_CommentMeasure[];
     filters: Zvoog_FilterTarget[];
     selection?: Zvoog_Selection;
+    focus?: 0 | 1 | 2 | 3;
 };
 declare type MZXBX_CachedWave = {
     path: string;
@@ -121,14 +134,14 @@ declare type MZXBX_CachedWave = {
 declare type MZXBX_FilterHolder = {
     plugin: MZXBX_AudioFilterPlugin | null;
     id: string;
-    kind: string;
+    kind: MZXBX_PluginKind;
     properties: string;
     launched: boolean;
 };
 declare type MZXBX_PerformerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | null;
     id: string;
-    kind: string;
+    kind: MZXBX_PluginKind;
     properties: string;
     launched: boolean;
 };
@@ -145,7 +158,7 @@ declare type MZXBX_SlideItem = {
 declare type MZXBX_PlayItem = {
     skip: number;
     channelId: string;
-    pitch: number;
+    pitches: number[];
     slides: MZXBX_SlideItem[];
 };
 declare type MZXBX_FilterState = {
@@ -155,12 +168,13 @@ declare type MZXBX_FilterState = {
 };
 declare type MZXBX_Set = {
     duration: number;
+    tempo: number;
     items: MZXBX_PlayItem[];
     states: MZXBX_FilterState[];
 };
 declare type MZXBX_ChannelFilter = {
     id: string;
-    kind: string;
+    kind: MZXBX_PluginKind;
     properties: string;
 };
 declare type MZXBX_AudioFilterPlugin = {
@@ -170,15 +184,27 @@ declare type MZXBX_AudioFilterPlugin = {
     input: () => AudioNode | null;
     output: () => AudioNode | null;
 };
+declare type MZXBX_ChannelSampler = {
+    id: string;
+    kind: MZXBX_PluginKind;
+    properties: string;
+};
+declare type MZXBX_AudioSamplerPlugin = {
+    launch: (context: AudioContext, parameters: string) => void;
+    busy: () => null | string;
+    schedule: (when: number) => void;
+    cancel: () => void;
+    output: () => AudioNode | null;
+};
 declare type MZXBX_ChannelPerformer = {
     id: string;
-    kind: string;
+    kind: MZXBX_PluginKind;
     properties: string;
 };
 declare type MZXBX_AudioPerformerPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
-    schedule: (when: number, pitch: number, slides: MZXBX_SlideItem[]) => void;
+    schedule: (when: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
 };
@@ -195,12 +221,22 @@ declare type MZXBX_Player = {
     allPerformers(): MZXBX_PerformerHolder[];
     position: number;
 };
+declare enum MZXBX_PluginKind {
+    Action = 0,
+    Filter = 1,
+    Sampler = 2,
+    Performer = 3
+}
 declare type MZXBX_PluginRegistrationInformation = {
     id: string;
     label: string;
-    group: string;
+    kind: MZXBX_PluginKind;
     url: string;
     evaluate: string;
+};
+declare type MZXBX_PluginMessage = {
+    dialogID: string;
+    data: any;
 };
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
@@ -229,13 +265,7 @@ declare class SchedulePlayer implements MZXBX_Player {
     position: number;
     audioContext: AudioContext;
     schedule: MZXBX_Schedule | null;
-    performers: {
-        plugin: MZXBX_AudioPerformerPlugin | null;
-        id: string;
-        kind: string;
-        properties: string;
-        launched: boolean;
-    }[];
+    performers: MZXBX_PerformerHolder[];
     filters: MZXBX_FilterHolder[];
     pluginsList: MZXBX_PerformerHolder[];
     nextAudioContextStart: number;
@@ -251,7 +281,7 @@ declare class SchedulePlayer implements MZXBX_Player {
     disconnect(): void;
     tick(loopStart: number, loopEnd: number): void;
     findPerformerPlugin(channelId: string): MZXBX_AudioPerformerPlugin | null;
-    sendPerformerItem(it: MZXBX_PlayItem, whenAudio: number): void;
+    sendPerformerItem(it: MZXBX_PlayItem, whenAudio: number, tempo: number): void;
     findFilterPlugin(filterId: string): MZXBX_AudioFilterPlugin | null;
     sendFilterItem(state: MZXBX_FilterState, whenAudio: number): void;
     ms(nn: number): number;
@@ -268,8 +298,8 @@ declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 declare class PluginLoader {
     collectLoadPlugins(schedule: MZXBX_Schedule, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[], afterLoad: () => void): void;
     startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[], afterLoad: () => void): void;
-    startLoadPluginStarter(kind: string, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[], onDone: (plugin: any) => void, afterLoad: () => void): void;
-    сollectFilterPlugin(id: string, kind: string, properties: string, filters: MZXBX_FilterHolder[]): void;
-    сollectPerformerPlugin(id: string, kind: string, properties: string, performers: MZXBX_PerformerHolder[]): void;
-    findPluginInfo(kind: string): MZXBX_PluginRegistrationInformation | null;
+    startLoadPluginStarter(kind: MZXBX_PluginKind, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[], onDone: (plugin: any) => void, afterLoad: () => void): void;
+    сollectFilterPlugin(id: string, kind: MZXBX_PluginKind, properties: string, filters: MZXBX_FilterHolder[]): void;
+    сollectPerformerPlugin(id: string, kind: MZXBX_PluginKind, properties: string, performers: MZXBX_PerformerHolder[]): void;
+    findPluginInfo(kind: MZXBX_PluginKind): MZXBX_PluginRegistrationInformation | null;
 }

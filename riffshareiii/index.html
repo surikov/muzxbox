@@ -8,7 +8,7 @@
 	<meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
 
 	<script type='text/javascript' src='./js/mzxbx.js'></script>
-    <script type='text/javascript' src='./js/mzxbxlib.js'></script>
+	<script type='text/javascript' src='./js/mzxbxlib.js'></script>
 	<script type='text/javascript' src='./js/application.js'></script>
 	<script type='text/javascript' src='./web/catalog.js'></script>
 	<script type='text/javascript' src='./js/tilerender.js'></script>
@@ -27,7 +27,7 @@
 	<link rel="stylesheet" type="text/css" href="theme/timeselect.css">
 	<link rel="stylesheet" type="text/css" href="theme/plugin.css">
 	<link rel="stylesheet" type="text/css" href="theme/fanpane.css">
-	
+
 
 	<title>ZvoogHub</title>
 </head>
@@ -36,8 +36,8 @@
 	<div id="pluginDiv">
 		<div id="pluginHeader">
 			<div id="pluginTitle">Plugin name and other information for identification</div>
-			<div id="pluginRefresh"  onclick="commandDispatcher.resendMessagePluginGUI();">&#xf258;</div>
-			<div id="pluginCancel"  onclick="commandDispatcher.cancelPluginGUI();">&#xf136;</div>
+			<div id="pluginRefresh" onclick="commandDispatcher.resendMessagePluginGUI();">&#xf258;</div>
+			<div id="pluginCancel" onclick="commandDispatcher.cancelPluginGUI();">&#xf136;</div>
 		</div>
 		<iframe id="pluginFrame" src="web/pluginplaceholder.html"></iframe>
 	</div>
@@ -64,8 +64,13 @@
 				<stop class="verLineFrom" offset="0%" />
 				<stop class="verLineMiddle" offset="25%" />
 				<stop class="verLineTo" offset="100%" />
-			  </linearGradient>
-			  
+			</linearGradient>
+			<linearGradient id="horizontalBorderLine" x1="0" x2="0" y1="0" y2="1">
+				<stop class="verLineFrom" offset="0%" />
+				<stop class="verLineMiddle" offset="25%" />
+				<stop class="verLineTo" offset="100%" />
+			</linearGradient>
+
 			<g id='backgroundLayer' />
 			<g id='selectedTime' />
 			<g id='timeselectbar' />

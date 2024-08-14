@@ -216,17 +216,26 @@
 }
 
 
-.octaveBottomBorder{
+.octaveBottomBorder222{
 	fill: var(--color-lines);
 	fill-opacity:25%;
     stroke: none;
 }
+.octaveBottomBorder{
+	fill: url(#horizontalBorderLine);;
+    stroke: none;
+	pointer-events: none;
+}
 
 .stepPartDelimiter{
-	fill: var(--color-lines);
+	fill2: var(--color-lines);
 
-	fill-opacity:25%;
+	fill-opacity2:25%;
+    stroke2: none;
+
+	fill: url(#verticalBorderLine);;
     stroke: none;
+	pointer-events: none;
 }
 .verLineFrom {
     stop-color: var(--color-lines);
@@ -242,10 +251,11 @@
   }
 .barRightBorder{
 	fill: url(#verticalBorderLine);;
-	fill-opacity2:25%;
     stroke: none;
 	pointer-events: none;
 }
+
+
 .barRightBorder2{
 	fill: var(--color-lines);
 	fill-opacity:25%;
