@@ -1,11 +1,12 @@
 "use strict";
-var MZXBX_PluginKind;
-(function (MZXBX_PluginKind) {
-    MZXBX_PluginKind[MZXBX_PluginKind["Action"] = 0] = "Action";
-    MZXBX_PluginKind[MZXBX_PluginKind["Filter"] = 1] = "Filter";
-    MZXBX_PluginKind[MZXBX_PluginKind["Sampler"] = 2] = "Sampler";
-    MZXBX_PluginKind[MZXBX_PluginKind["Performer"] = 3] = "Performer";
-})(MZXBX_PluginKind || (MZXBX_PluginKind = {}));
+var MZXBX_PluginPurpose;
+(function (MZXBX_PluginPurpose) {
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Action"] = 0] = "Action";
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Filter"] = 1] = "Filter";
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Sampler"] = 2] = "Sampler";
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Performer"] = 3] = "Performer";
+})(MZXBX_PluginPurpose || (MZXBX_PluginPurpose = {}));
+console.log('Simple beep plugin? build 1');
 class SimpleBeepImplementation {
     constructor() {
         this.oscillators = [];
@@ -18,32 +19,43 @@ class SimpleBeepImplementation {
     busy() {
         return null;
     }
+    clear() {
+        this.oscillators = this.oscillators.filter((it) => {
+            if (it.done < this.audioContext.currentTime) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        });
+    }
     schedule(when, pitches, tempo, slides) {
         if (this.audioContext) {
             if (this.volume) {
+                this.clear();
                 let duration = 0;
                 for (let ss = 0; ss < slides.length; ss++) {
                     duration = duration + slides[ss].duration;
                 }
                 let A4frequency = 440.0;
                 let A4half = 48;
-                this.cancel();
                 for (let ii = 0; ii < pitches.length; ii++) {
-                    console.log('schedule', when, duration, pitches[ii], tempo, slides);
+                    let currentWhen = when;
                     let oscillator = this.audioContext.createOscillator();
                     let currentPitch = pitches[ii];
                     let frequency = A4frequency * Math.pow(Math.pow(2, (1 / 12)), currentPitch - A4half);
                     oscillator.frequency.setValueAtTime(frequency, when);
-                    let currentWhen = when;
                     for (let ss = 0; ss < slides.length; ss++) {
+                        let bend = slides[ss];
+                        currentWhen = currentWhen + bend.duration;
+                        currentPitch = currentPitch + bend.delta;
                         frequency = A4frequency * Math.pow(Math.pow(2, (1 / 12)), currentPitch - A4half);
-                        currentWhen = currentWhen + slides[ss].duration;
-                        currentPitch = currentPitch + slides[ss].delta;
                         oscillator.frequency.linearRampToValueAtTime(frequency, currentWhen);
                     }
                     oscillator.connect(this.volume);
                     oscillator.start(when);
                     oscillator.stop(when + duration);
+                    oscillator.done = when + duration;
                     this.oscillators.push(oscillator);
                 }
             }

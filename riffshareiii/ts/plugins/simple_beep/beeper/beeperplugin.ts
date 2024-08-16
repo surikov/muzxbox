@@ -1,3 +1,5 @@
+
+console.log('Simple beep plugin? build 1');
 class SimpleBeepImplementation implements MZXBX_AudioPerformerPlugin {
 	audioContext: AudioContext;
 	oscillators: OscillatorNode[] = [];
@@ -10,32 +12,46 @@ class SimpleBeepImplementation implements MZXBX_AudioPerformerPlugin {
 	busy(): null | string {
 		return null;
 	}
+	clear() {
+		this.oscillators = this.oscillators.filter((it) => {
+			if ((it as any).done < this.audioContext.currentTime) {
+				return false;
+			} else {
+				return true;
+			}
+		});
+	}
 	schedule(when: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]) {
+		//console.log(when, pitches, tempo, slides);
 		if (this.audioContext) {
 			if (this.volume) {
+				this.clear();
 				let duration: number = 0;
 				for (let ss = 0; ss < slides.length; ss++) {
 					duration = duration + slides[ss].duration;
 				}
 				let A4frequency = 440.0;
 				let A4half = 48;
-				this.cancel();
 				for (let ii = 0; ii < pitches.length; ii++) {
-					console.log('schedule', when, duration, pitches[ii], tempo, slides);
+					//console.log('schedule', when, duration, pitches[ii], tempo, slides);
+					let currentWhen = when;
 					let oscillator: OscillatorNode = this.audioContext.createOscillator();
 					let currentPitch = pitches[ii];
 					let frequency = A4frequency * Math.pow(Math.pow(2, (1 / 12)), currentPitch - A4half);
 					oscillator.frequency.setValueAtTime(frequency, when);
-					let currentWhen = when;
+					//console.log('set',frequency, currentWhen);
 					for (let ss = 0; ss < slides.length; ss++) {
+						let bend = slides[ss];
+						currentWhen = currentWhen + bend.duration
+						currentPitch = currentPitch + bend.delta;
 						frequency = A4frequency * Math.pow(Math.pow(2, (1 / 12)), currentPitch - A4half);
-						currentWhen = currentWhen + slides[ss].duration
-						currentPitch = currentPitch + slides[ss].delta;
 						oscillator.frequency.linearRampToValueAtTime(frequency, currentWhen);
+						//console.log('move',frequency, currentWhen);
 					}
 					oscillator.connect(this.volume);
 					oscillator.start(when);
 					oscillator.stop(when + duration);
+					(oscillator as any).done = when + duration;
 					this.oscillators.push(oscillator);
 				}
 			}

@@ -16,6 +16,7 @@ class WarningUI {
 		this.hideWarning();
 	};
 	initDialogUI() {
+		let me =this;
 		this.warningIcon = { x: 0, y: 0, text: icon_warningPlay, css: 'warningIcon' };
 
 		this.warningInfo1 = { x: 0, y: 0, w: 1, h: 1, href: 'theme/img/mouse.png', css: 'warningInfoIcon'  };
@@ -27,7 +28,13 @@ class WarningUI {
 		this.warningTitle = { x: 0, y: 0, text: 'Play', css: 'warningTitle' };
 		this.warningDescription = { x: 0, y: 0, text: 'Use mouse or touchpad to move and zoom piano roll', css: 'warningDescription' };
 		this.warningGroup = (document.getElementById("warningDialogGroup") as any) as SVGElement;
-		this.warningRectangle = { x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: this.cancel.bind(this) };
+		this.warningRectangle = { x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: ()=>{
+			commandDispatcher.initAudioFromUI();
+			me.cancel();
+		}
+
+		//this.cancel.bind(this) 
+	};
 		this.warningAnchor = {
 			id: 'warningAnchor', xx: 0, yy: 0, ww: 1, hh: 1
 			, showZoom: zoomPrefixLevelsCSS[0].minZoom

@@ -1,3 +1,4 @@
+console.log('Simple beep UI');
 declare function newSimpleBeepImplementation(): MZXBX_AudioPerformerPlugin;
 class SimpleBeepPlugin {
 	audioContext: AudioContext;

@@ -16,12 +16,12 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 	//{ label: 'Import MIDI from file', kind: MZXBX_PluginKind.Action, id: 'importmidifile', evaluate: '', url: './web/plugins/midi/midimusicimport.html' }
 	//, { label: 'Import Guitar Pro file', kind: MZXBX_PluginKind.Action, id: 'import345gp', evaluate: '', url: './web/plugins/alpha/guitartab.html' }
 
-	{ label: 'Import MIDI from file', kind: MZXBX_PluginKind.Action, id: 'importmidifile', url: './web/actions/midi/midimusicimport.html' }
-	, { label: 'Import Guitar Pro file', kind: MZXBX_PluginKind.Action, id: 'import345gp', url: './web/actions/alphagpimport/guitartab.html' }
-	, { label: 'Base Volume', kind: MZXBX_PluginKind.Filter, id: 'basevolume', url: './web/filters/basevolume/volume1.html' }
-	, { label: 'Project info', kind: MZXBX_PluginKind.Action, id: 'projectstatistics', url: './web/actions/projinfo/info.html' }
-	, { label: 'Simple beep sound', kind: MZXBX_PluginKind.Performer, id: 'beep1', url: './web/performers/simplebeep/uitester/beep1.html' }
-	
+	{ label: 'Import MIDI from file', purpose: MZXBX_PluginPurpose.Action, kind: 'importmidifile', ui: './web/actions/midi/midimusicimport.html', evaluate: 'exe', script: 'none' }
+	, { label: 'Import Guitar Pro file', purpose: MZXBX_PluginPurpose.Action, kind: 'import345gp', ui: './web/actions/alphagpimport/guitartab.html', evaluate: 'exe', script: 'none' }
+	, { label: 'Base Volume', purpose: MZXBX_PluginPurpose.Filter, kind: 'basevolume', ui: './web/filters/basevolume/volume1.html', evaluate: 'exe', script: 'none' }
+	, { label: 'Project info', purpose: MZXBX_PluginPurpose.Action, kind: 'projectstatistics', ui: './web/actions/projinfo/info.html', evaluate: 'exe', script: 'none' }
+	, { label: 'Simple beep sound', purpose: MZXBX_PluginPurpose.Performer, kind: 'beep1', ui: './web/performers/simplebeep/uitester/beep1.html', evaluate: 'newSimpleBeepImplementation', script: './web/performers/simplebeep/beeper/beep_plugin.js' }
+
 
 
 ];

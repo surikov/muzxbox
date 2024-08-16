@@ -120,10 +120,10 @@ function fillPluginsLists() {
 	menuPointActions.children = [];
 	for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
 		let label: string = MZXBX_currentPlugins()[ii].label;
-		let kind: MZXBX_PluginKind = MZXBX_currentPlugins()[ii].kind;
-		let url: string = MZXBX_currentPlugins()[ii].url;
+		let purpose: MZXBX_PluginPurpose = MZXBX_currentPlugins()[ii].purpose;
+		let url: string = MZXBX_currentPlugins()[ii].ui;
 
-		if (kind == MZXBX_PluginKind.Action) {
+		if (purpose == MZXBX_PluginPurpose.Action) {
 			menuPointActions.children.push({
 				text: label, noLocalization: true, onClick: () => {
 					commandDispatcher.promptProjectPluginGUI(label, url, (obj: any) => {
@@ -136,14 +136,14 @@ function fillPluginsLists() {
 				}
 			});
 		} else {
-			if (kind == MZXBX_PluginKind.Sampler) {
+			if (purpose == MZXBX_PluginPurpose.Sampler) {
 				menuPointSamplers.children.push({
 					text: label, noLocalization: true, onClick: () => {
-						console.log(kind, label);
+						console.log(purpose, label);
 					}
 				});
 			} else {
-				if (kind == MZXBX_PluginKind.Performer) {
+				if (purpose == MZXBX_PluginPurpose.Performer) {
 					menuPointPerformers.children.push({
 						text: label, noLocalization: true, onClick: () => {
 							commandDispatcher.promptPointPluginGUI(label, url, (obj: any) => {
@@ -153,10 +153,10 @@ function fillPluginsLists() {
 						}
 					});
 				} else {
-					if (kind == MZXBX_PluginKind.Filter) {
+					if (purpose == MZXBX_PluginPurpose.Filter) {
 						menuPointFilters.children.push({
 							text: label, noLocalization: true, onClick: () => {
-								console.log(kind, label);
+								console.log(purpose, label);
 							}
 						});
 					} else {

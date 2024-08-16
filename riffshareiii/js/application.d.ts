@@ -30,9 +30,11 @@ declare class PluginDialogPrompt {
     receiveMessageFromPlugin(e: any): void;
 }
 declare class CommandDispatcher {
+    player: MZXBX_Player;
     renderer: UIRenderer;
     audioContext: AudioContext;
     tapSizeRatio: number;
+    onAir: boolean;
     cfg: MixerDataMathUtility;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
     initAudioFromUI(): void;
@@ -727,14 +729,14 @@ declare type MZXBX_CachedWave = {
 declare type MZXBX_FilterHolder = {
     plugin: MZXBX_AudioFilterPlugin | null;
     id: string;
-    kind: MZXBX_PluginKind;
+    kind: string;
     properties: string;
     launched: boolean;
 };
 declare type MZXBX_PerformerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | null;
     id: string;
-    kind: MZXBX_PluginKind;
+    kind: string;
     properties: string;
     launched: boolean;
 };
@@ -751,7 +753,7 @@ declare type MZXBX_SlideItem = {
 declare type MZXBX_PlayItem = {
     skip: number;
     channelId: string;
-    pitch: number;
+    pitches: number[];
     slides: MZXBX_SlideItem[];
 };
 declare type MZXBX_FilterState = {
@@ -761,12 +763,13 @@ declare type MZXBX_FilterState = {
 };
 declare type MZXBX_Set = {
     duration: number;
+    tempo: number;
     items: MZXBX_PlayItem[];
     states: MZXBX_FilterState[];
 };
 declare type MZXBX_ChannelFilter = {
     id: string;
-    kind: MZXBX_PluginKind;
+    kind: string;
     properties: string;
 };
 declare type MZXBX_AudioFilterPlugin = {
@@ -778,7 +781,7 @@ declare type MZXBX_AudioFilterPlugin = {
 };
 declare type MZXBX_ChannelSampler = {
     id: string;
-    kind: MZXBX_PluginKind;
+    kind: string;
     properties: string;
 };
 declare type MZXBX_AudioSamplerPlugin = {
@@ -790,7 +793,7 @@ declare type MZXBX_AudioSamplerPlugin = {
 };
 declare type MZXBX_ChannelPerformer = {
     id: string;
-    kind: MZXBX_PluginKind;
+    kind: string;
     properties: string;
 };
 declare type MZXBX_AudioPerformerPlugin = {
@@ -813,17 +816,19 @@ declare type MZXBX_Player = {
     allPerformers(): MZXBX_PerformerHolder[];
     position: number;
 };
-declare enum MZXBX_PluginKind {
+declare enum MZXBX_PluginPurpose {
     Action = 0,
     Filter = 1,
     Sampler = 2,
     Performer = 3
 }
 declare type MZXBX_PluginRegistrationInformation = {
-    id: string;
     label: string;
-    kind: MZXBX_PluginKind;
-    url: string;
+    kind: string;
+    purpose: MZXBX_PluginPurpose;
+    ui: string;
+    evaluate: string;
+    script: string;
 };
 declare type MZXBX_PluginMessage = {
     dialogID: string;

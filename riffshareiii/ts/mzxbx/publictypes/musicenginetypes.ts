@@ -155,14 +155,14 @@ type MZXBX_CachedWave = {
 type MZXBX_FilterHolder = {
 	plugin: MZXBX_AudioFilterPlugin | null
 	, id: string
-	, kind: MZXBX_PluginKind
+	, kind: string
 	, properties: string
 	, launched: boolean
 };
 type MZXBX_PerformerHolder = {
 	plugin: MZXBX_AudioPerformerPlugin | null
 	, id: string
-	, kind: MZXBX_PluginKind
+	, kind: string
 	, properties: string
 	, launched: boolean
 };
@@ -189,13 +189,13 @@ type MZXBX_FilterState = {
 };
 type MZXBX_Set = {
 	duration: number;
-	tempo:number;
+	tempo: number;
 	items: MZXBX_PlayItem[];
 	states: MZXBX_FilterState[];
 };
 type MZXBX_ChannelFilter = {
 	id: string;
-	kind: MZXBX_PluginKind;
+	kind: string;
 	properties: string;
 };
 type MZXBX_AudioFilterPlugin = {
@@ -207,7 +207,7 @@ type MZXBX_AudioFilterPlugin = {
 };
 type MZXBX_ChannelSampler = {
 	id: string;
-	kind: MZXBX_PluginKind;
+	kind: string;
 	properties: string;
 };
 type MZXBX_AudioSamplerPlugin = {
@@ -220,7 +220,7 @@ type MZXBX_AudioSamplerPlugin = {
 
 type MZXBX_ChannelPerformer = {
 	id: string;
-	kind: MZXBX_PluginKind;
+	kind: string;
 	properties: string;
 };
 
@@ -248,18 +248,19 @@ type MZXBX_Player = {
 type Zvoog_import = {
 	import: () => Zvoog_Schedule | null;
 };*/
-enum MZXBX_PluginKind {
+enum MZXBX_PluginPurpose {
 	Action
 	, Filter
 	, Sampler
 	, Performer
 }
 type MZXBX_PluginRegistrationInformation = {
-	id: string
-	, label: string
-	, kind: MZXBX_PluginKind
-	, url: string
-	,evaluate:string
+	label: string
+	, kind: string
+	, purpose: MZXBX_PluginPurpose
+	, ui: string
+	, evaluate: string
+	, script: string
 };
 type MZXBX_PluginMessage = {
 	dialogID: string

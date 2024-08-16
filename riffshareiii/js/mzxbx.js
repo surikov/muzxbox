@@ -1,13 +1,13 @@
 "use strict";
 class MZXBX_ScaleMath {
 }
-var MZXBX_PluginKind;
-(function (MZXBX_PluginKind) {
-    MZXBX_PluginKind[MZXBX_PluginKind["Action"] = 0] = "Action";
-    MZXBX_PluginKind[MZXBX_PluginKind["Filter"] = 1] = "Filter";
-    MZXBX_PluginKind[MZXBX_PluginKind["Sampler"] = 2] = "Sampler";
-    MZXBX_PluginKind[MZXBX_PluginKind["Performer"] = 3] = "Performer";
-})(MZXBX_PluginKind || (MZXBX_PluginKind = {}));
+var MZXBX_PluginPurpose;
+(function (MZXBX_PluginPurpose) {
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Action"] = 0] = "Action";
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Filter"] = 1] = "Filter";
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Sampler"] = 2] = "Sampler";
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Performer"] = 3] = "Performer";
+})(MZXBX_PluginPurpose || (MZXBX_PluginPurpose = {}));
 console.log("MuzXbox v1.0.2");
 class MuzXbox {
     constructor() {
@@ -156,7 +156,6 @@ class SchedulePlayer {
         return null;
     }
     startLoop(loopStart, currentPosition, loopEnd) {
-        console.log('startLoop', loopStart, currentPosition, loopEnd);
         let msg = this.connect();
         if (msg) {
             return msg;
@@ -425,6 +424,7 @@ class PluginLoader {
         this.startLoadCollectedPlugins(filters, performers, afterLoad);
     }
     startLoadCollectedPlugins(filters, performers, afterLoad) {
+        console.log('startLoadCollectedPlugins', filters, performers);
         for (let ff = 0; ff < filters.length; ff++) {
             if (!(filters[ff].plugin)) {
                 this.startLoadPluginStarter(filters[ff].kind, filters, performers, (plugin) => {
@@ -437,6 +437,7 @@ class PluginLoader {
             if (!(performers[pp].plugin)) {
                 this.startLoadPluginStarter(performers[pp].kind, filters, performers, (plugin) => {
                     performers[pp].plugin = plugin;
+                    console.log('assign performer', pp, performers[pp]);
                 }, afterLoad);
                 return;
             }
@@ -444,10 +445,12 @@ class PluginLoader {
         afterLoad();
     }
     startLoadPluginStarter(kind, filters, performers, onDone, afterLoad) {
+        console.log('startLoadSinglePlugin', kind);
         let tt = this.findPluginInfo(kind);
         if (tt) {
             let info = tt;
-            MZXBX_appendScriptURL(info.url);
+            console.log('wait', info);
+            MZXBX_appendScriptURL(info.script);
             MZXBX_waitForCondition(250, () => {
                 return (window[info.evaluate]);
             }, () => {
@@ -460,7 +463,7 @@ class PluginLoader {
             });
         }
         else {
-            console.log('Not found ', kind);
+            console.log('Not found registration for', kind);
         }
     }
     сollectFilterPlugin(id, kind, properties, filters) {
@@ -473,6 +476,7 @@ class PluginLoader {
         filters.push({ plugin: null, id: id, kind: kind, properties: properties, launched: false });
     }
     сollectPerformerPlugin(id, kind, properties, performers) {
+        console.log('сollectPerformerPlugin id:', id, 'kind', kind);
         for (let ii = 0; ii < performers.length; ii++) {
             if (performers[ii].id == id) {
                 performers[ii].properties = properties;

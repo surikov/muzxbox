@@ -1,11 +1,12 @@
 "use strict";
-var MZXBX_PluginKind;
-(function (MZXBX_PluginKind) {
-    MZXBX_PluginKind[MZXBX_PluginKind["Action"] = 0] = "Action";
-    MZXBX_PluginKind[MZXBX_PluginKind["Filter"] = 1] = "Filter";
-    MZXBX_PluginKind[MZXBX_PluginKind["Sampler"] = 2] = "Sampler";
-    MZXBX_PluginKind[MZXBX_PluginKind["Performer"] = 3] = "Performer";
-})(MZXBX_PluginKind || (MZXBX_PluginKind = {}));
+var MZXBX_PluginPurpose;
+(function (MZXBX_PluginPurpose) {
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Action"] = 0] = "Action";
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Filter"] = 1] = "Filter";
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Sampler"] = 2] = "Sampler";
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Performer"] = 3] = "Performer";
+})(MZXBX_PluginPurpose || (MZXBX_PluginPurpose = {}));
+console.log('Simple beep UI');
 class SimpleBeepPlugin {
     constructor() {
         this.lastMessage = null;

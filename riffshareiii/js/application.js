@@ -196,12 +196,14 @@ class PluginDialogPrompt {
 class CommandDispatcher {
     constructor() {
         this.tapSizeRatio = 1;
+        this.onAir = false;
         this.listener = null;
     }
     initAudioFromUI() {
         console.log('initAudioFromUI');
         var AudioContext = window.AudioContext;
         this.audioContext = new AudioContext();
+        this.player = createSchedulePlayer();
     }
     registerWorkProject(data) {
         this.cfg = new MixerDataMathUtility(data);
@@ -219,6 +221,42 @@ class CommandDispatcher {
     ;
     toggleStartStop() {
         console.log('toggleStartStop');
+        if (this.onAir) {
+            this.onAir = !this.onAir;
+            this.player.cancel();
+        }
+        else {
+            this.onAir = !this.onAir;
+            let schedule = {
+                series: [
+                    { duration: 1.5, tempo: 120, items: [
+                            {
+                                skip: 0,
+                                channelId: 'test1',
+                                pitches: [60],
+                                slides: [{ duration: 0.5, delta: 10 }, { duration: 0.5, delta: -5 }]
+                            }
+                        ], states: [] },
+                    { duration: 1.5, tempo: 170, items: [], states: [] },
+                    { duration: 10.5, tempo: 100, items: [], states: [] }
+                ],
+                channels: [{
+                        id: 'test1',
+                        filters: [],
+                        performer: {
+                            id: 'test1',
+                            kind: 'beep1',
+                            properties: 'Nope'
+                        }
+                    }],
+                filters: []
+            };
+            let me = this;
+            me.player.setupPlugins(me.audioContext, schedule, () => {
+                console.log('toggleStartStop setupPlugins done');
+                me.player.startLoop(0, 0, 2.5);
+            });
+        }
     }
     setThemeLocale(loc, ratio) {
         console.log("setThemeLocale " + loc);
@@ -1303,9 +1341,9 @@ function fillPluginsLists() {
     menuPointActions.children = [];
     for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
         let label = MZXBX_currentPlugins()[ii].label;
-        let kind = MZXBX_currentPlugins()[ii].kind;
-        let url = MZXBX_currentPlugins()[ii].url;
-        if (kind == MZXBX_PluginKind.Action) {
+        let purpose = MZXBX_currentPlugins()[ii].purpose;
+        let url = MZXBX_currentPlugins()[ii].ui;
+        if (purpose == MZXBX_PluginPurpose.Action) {
             menuPointActions.children.push({
                 text: label, noLocalization: true, onClick: () => {
                     commandDispatcher.promptProjectPluginGUI(label, url, (obj) => {
@@ -1318,15 +1356,15 @@ function fillPluginsLists() {
             });
         }
         else {
-            if (kind == MZXBX_PluginKind.Sampler) {
+            if (purpose == MZXBX_PluginPurpose.Sampler) {
                 menuPointSamplers.children.push({
                     text: label, noLocalization: true, onClick: () => {
-                        console.log(kind, label);
+                        console.log(purpose, label);
                     }
                 });
             }
             else {
-                if (kind == MZXBX_PluginKind.Performer) {
+                if (purpose == MZXBX_PluginPurpose.Performer) {
                     menuPointPerformers.children.push({
                         text: label, noLocalization: true, onClick: () => {
                             commandDispatcher.promptPointPluginGUI(label, url, (obj) => {
@@ -1337,10 +1375,10 @@ function fillPluginsLists() {
                     });
                 }
                 else {
-                    if (kind == MZXBX_PluginKind.Filter) {
+                    if (purpose == MZXBX_PluginPurpose.Filter) {
                         menuPointFilters.children.push({
                             text: label, noLocalization: true, onClick: () => {
-                                console.log(kind, label);
+                                console.log(purpose, label);
                             }
                         });
                     }
@@ -2517,6 +2555,7 @@ class WarningUI {
         };
     }
     initDialogUI() {
+        let me = this;
         this.warningIcon = { x: 0, y: 0, text: icon_warningPlay, css: 'warningIcon' };
         this.warningInfo1 = { x: 0, y: 0, w: 1, h: 1, href: 'theme/img/mouse.png', css: 'warningInfoIcon' };
         this.warningInfo2 = { x: 0, y: 0, w: 1, h: 1, href: 'theme/img/wheel.png', css: 'warningInfoIcon' };
@@ -2525,7 +2564,11 @@ class WarningUI {
         this.warningTitle = { x: 0, y: 0, text: 'Play', css: 'warningTitle' };
         this.warningDescription = { x: 0, y: 0, text: 'Use mouse or touchpad to move and zoom piano roll', css: 'warningDescription' };
         this.warningGroup = document.getElementById("warningDialogGroup");
-        this.warningRectangle = { x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: this.cancel.bind(this) };
+        this.warningRectangle = { x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: () => {
+                commandDispatcher.initAudioFromUI();
+                me.cancel();
+            }
+        };
         this.warningAnchor = {
             id: 'warningAnchor', xx: 0, yy: 0, ww: 1, hh: 1,
             showZoom: zoomPrefixLevelsCSS[0].minZoom,
@@ -2917,11 +2960,11 @@ function TAnchor(xx, yy, ww, hh, showZoom, hideZoom, id, translation) {
 function TText(x, y, css, text) {
     return { x: x, y: y, text: text, css: css, };
 }
-var MZXBX_PluginKind;
-(function (MZXBX_PluginKind) {
-    MZXBX_PluginKind[MZXBX_PluginKind["Action"] = 0] = "Action";
-    MZXBX_PluginKind[MZXBX_PluginKind["Filter"] = 1] = "Filter";
-    MZXBX_PluginKind[MZXBX_PluginKind["Sampler"] = 2] = "Sampler";
-    MZXBX_PluginKind[MZXBX_PluginKind["Performer"] = 3] = "Performer";
-})(MZXBX_PluginKind || (MZXBX_PluginKind = {}));
+var MZXBX_PluginPurpose;
+(function (MZXBX_PluginPurpose) {
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Action"] = 0] = "Action";
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Filter"] = 1] = "Filter";
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Sampler"] = 2] = "Sampler";
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Performer"] = 3] = "Performer";
+})(MZXBX_PluginPurpose || (MZXBX_PluginPurpose = {}));
 //# sourceMappingURL=application.js.map

@@ -1,9 +1,12 @@
 //declare function newMIDIparser(arrayBuffer: ArrayBuffer): any;
 //declare function newGPparser(arrayBuffer: ArrayBuffer): any;
+//declare function createSchedulePlayer(): MZXBX_Player;
 class CommandDispatcher {
+	player: MZXBX_Player;
 	renderer: UIRenderer;
 	audioContext: AudioContext;
 	tapSizeRatio: number = 1;
+	onAir = false;
 	//currentLOadedProject: Zvoog_Project;
 	cfg: MixerDataMathUtility;
 	listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any) = null;
@@ -12,6 +15,7 @@ class CommandDispatcher {
 		console.log('initAudioFromUI');
 		var AudioContext = window.AudioContext;// || window.webkitAudioContext;
 		this.audioContext = new AudioContext();
+		this.player = createSchedulePlayer();
 	}
 	registerWorkProject(data: Zvoog_Project) {
 		//this.currentLOadedProject = data;
@@ -32,7 +36,42 @@ class CommandDispatcher {
 	};
 	toggleStartStop() {
 		console.log('toggleStartStop');
-		
+
+		if (this.onAir) {
+			this.onAir = !this.onAir;
+			this.player.cancel();
+		} else {
+			this.onAir = !this.onAir;
+			let schedule: MZXBX_Schedule = {
+				series: [
+					{ duration: 1.5, tempo: 120, items: [
+						{
+							skip: 0
+							,channelId: 'test1'
+							,pitches: [60]
+							,slides: [{duration:0.5,delta:10},{duration:0.5,delta:-5}]
+						}
+					], states: [] }
+					, { duration: 1.5, tempo: 170, items: [], states: [] }
+					, { duration: 10.5, tempo: 100, items: [], states: [] }
+				]
+				, channels: [{
+					id: 'test1'
+					, filters: []
+					, performer: {
+						id: 'test1'
+						, kind: 'beep1'
+						, properties: 'Nope'
+					}
+				}]
+				, filters: []
+			};
+			let me = this;
+			me.player.setupPlugins(me.audioContext, schedule, () => {
+				console.log('toggleStartStop setupPlugins done');
+				me.player.startLoop(0, 0, 2.5);
+			});
+		}
 	}
 	/*toggleLeftMenu() {
 		//console.log('toggleLeftMenu');

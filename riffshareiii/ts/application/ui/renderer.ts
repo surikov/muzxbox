@@ -103,6 +103,7 @@ class UIRenderer {//} implements RenderedPart {
 		this.debug.setupUI();
 		this.warning = new WarningUI();
 		this.warning.initDialogUI();
+		//this.warning.showWarning();
 		this.toolbar = new UIToolbar();
 		this.timeselectbar = new TimeSelectBar();
 		this.leftPanel = new LeftPanel();
