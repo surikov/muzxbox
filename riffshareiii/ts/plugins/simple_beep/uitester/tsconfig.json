@@ -1,8 +1,8 @@
 {
 	"compilerOptions": {
 		"target": "es2015"
-        ,"outFile": "beeppui.js"
-        //,"outFile": "../../../web/performers/simplebeep/beepplugin.js"
+        //,"outFile": "beeppui.js"
+        ,"outFile": "../../../../web/performers/simplebeep/uitester/beeppui.js"
         //,"outDir":"../js"
 		,"strictNullChecks": true
 		,"alwaysStrict": true
