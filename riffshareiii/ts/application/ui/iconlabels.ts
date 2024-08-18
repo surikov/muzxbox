@@ -18,7 +18,7 @@ let icon_gear='&#xf1c6;';
 
 let icon_sound_low='&#xf3ba;';
 let icon_sound_middle='&#xf3b9;';
-let icon_sound_loud='&#xf3bc;';
+let icon_sound_loud='&#xf3bc;';//
 let icon_sound_none='&#xf3bb;';
 let icon_sound_surround='&#xf3b7;';
 let icon_hide='&#xf15b;';

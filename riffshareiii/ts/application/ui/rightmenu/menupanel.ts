@@ -197,9 +197,9 @@ class RightMenuPanel {
 						me.setFocus(it, infos);
 						me.resetAllAnchors();
 					}, () => {
-						if (it.states) {
+						if (it.itemStates) {
 							let sel = it.selection ? it.selection : 0;
-							if (it.states.length - 1 > sel) {
+							if (it.itemStates.length - 1 > sel) {
 								sel++;
 							} else {
 								sel = 0;
@@ -244,7 +244,7 @@ class RightMenuPanel {
 					let state = item.selection ? item.selection : 0;
 					commandDispatcher.setTrackSoloState(state);
 				}
-				, states: [icon_sound_low, icon_hide, icon_sound_loud]
+				, itemStates: [icon_sound_low, icon_hide, icon_sound_loud]
 				, selection: 0
 			};
 
@@ -265,7 +265,7 @@ class RightMenuPanel {
 					let state = item.selection ? item.selection : 0;
 					commandDispatcher.setDrumSoloState(state);
 				}
-				, states: [icon_sound_low, icon_hide, icon_sound_loud]
+				, itemStates: [icon_sound_low, icon_hide, icon_sound_loud]
 				, selection: 0
 			};
 			menuPointPercussion.children.push(item);
@@ -289,7 +289,7 @@ class RightMenuPanel {
 						//let state = item.selection ? item.selection : 0;
 						//commandDispatcher.setDrumSoloState(state);
 					}
-					, states: [icon_sound_low, icon_hide, icon_sound_loud]
+					, itemStates: [icon_sound_low, icon_hide, icon_sound_loud]
 					, selection: 0
 				};
 				menuPointAutomation.children.push(item);

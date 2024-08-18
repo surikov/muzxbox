@@ -10,7 +10,7 @@ type MenuInfo = {
 	onClick?: () => void;
 	onSubClick?: () => void;
 	onOpen?: () => void;
-	states?: string[];
+	itemStates?: string[];
 	selection?: number;
 };
 /*

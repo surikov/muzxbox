@@ -19,8 +19,10 @@ class MixerDataMathUtility {
 	maxCommentRowCount = 0;
 	maxAutomationsCount = 0;
 
-	pluginIconWidth = 17;
-	pluginIconHeight = 7;
+	//pluginIconWidth = 17;
+	//pluginIconHeight = 7;
+	pluginIconSize = 17;
+	speakerIconSize = 33;
 	speakerIconPad = 11;
 
 	padGridFan = 5;
@@ -61,8 +63,8 @@ class MixerDataMathUtility {
 			if (iconPosition) {
 				pp = iconPosition;
 			}
-			if (ww < pp.x + this.pluginIconWidth) {
-				ww = pp.x + this.pluginIconWidth;
+			if (ww < pp.x + this.pluginIconSize) {
+				ww = pp.x + this.pluginIconSize;
 			}
 		}
 		for (let tt = 0; tt < this.data.filters.length; tt++) {
@@ -71,8 +73,8 @@ class MixerDataMathUtility {
 			if (iconPosition) {
 				pp = iconPosition;
 			}
-			if (ww < pp.x + this.pluginIconWidth) {
-				ww = pp.x + this.pluginIconWidth;
+			if (ww < pp.x + this.pluginIconSize) {
+				ww = pp.x + this.pluginIconSize;
 			}
 		}
 		for (let tt = 0; tt < this.data.percussions.length; tt++) {
@@ -81,11 +83,11 @@ class MixerDataMathUtility {
 			if (iconPosition) {
 				pp = iconPosition;
 			}
-			if (ww < pp.x + this.pluginIconWidth) {
-				ww = pp.x + this.pluginIconWidth;
+			if (ww < pp.x + this.pluginIconSize) {
+				ww = pp.x + this.pluginIconSize;
 			}
 		}
-		ww=ww+this.speakerIconPad+this.pluginIconWidth;
+		ww = ww + this.speakerIconPad + 2*this.pluginIconSize;
 		return ww;
 	}
 	heightOfTitle(): number {
@@ -151,5 +153,5 @@ class MixerDataMathUtility {
 		return this.automationTop() + this.automationMaxHeight() + this.automationBottomPad;
 	}
 	*/
-	
+
 }

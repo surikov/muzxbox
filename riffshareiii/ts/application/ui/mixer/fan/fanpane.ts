@@ -3,7 +3,7 @@ class FanPane {
 	autoIcons: FilterIcon[];
 	performerIcons: PerformerIcon[];
 	samplerIcons: SamplerIcon[];
-	spears: SpearConnection[];
+	//connectionspears: SpearConnection[];
 	resetPlates(cfg: MixerDataMathUtility, fanAnchors: TileAnchor[]): void {
 		console.log('FanPane.resetPlates', cfg, fanAnchors);
 		this.filterIcons = [];
@@ -58,15 +58,18 @@ class FanPane {
 		}
 	}
 	buildOutIcon(cfg: MixerDataMathUtility, fanAnchor: TileAnchor, zidx: number) {
-		let xx = cfg.wholeWidth() - cfg.pluginIconWidth;
-		let yy = cfg.gridTop() + cfg.gridHeight() / 2-cfg.pluginIconHeight/2;
+		let xx = cfg.wholeWidth() - cfg.speakerIconPad-cfg.rightPad;
+		let yy = cfg.gridTop() + cfg.gridHeight() / 2-cfg.speakerIconSize/2;
 
-		let rec: TileRectangle = { x: xx, y: yy, w: cfg.pluginIconWidth, rx: cfg.pluginIconWidth / 3, ry: cfg.pluginIconHeight / 3, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+		let rec: TileRectangle = { x: xx, y: yy, w: cfg.speakerIconSize, h: cfg.speakerIconSize
+			, rx: cfg.speakerIconSize/2, ry: cfg.speakerIconSize/2, css: 'fanSpeakerIcon' };
 		fanAnchor.content.push(rec);
-		if (zidx < 5) {
-			let txt: TileText = { text: 'Speaker', x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+		let icon:TileText={ x: xx+cfg.speakerIconSize, y: yy+cfg.speakerIconSize, text: icon_sound_loud, css: 'fanSpeakerIconLabel' };
+		fanAnchor.content.push(icon);
+		/*if (zidx < 5) {
+			let txt: TileText = { text: 'Speaker', x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSpeakerLabel' };
 			fanAnchor.content.push(txt);
-		}
+		}*/
 	}
 	
 }

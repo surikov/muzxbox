@@ -7,7 +7,7 @@ class SpearConnection {
 		anchor.content.push(mainLine);
 		//let headLen = 31;
 		let angle = Math.atan2(toY - fromY, toX - fromX);
-		let da = Math.PI * 5 / 6.0;
+		let da = Math.PI * 19 / 20.0;
 		let dx = headLen * Math.cos(angle - da);
 		let dy = headLen * Math.sin(angle - da);
 		let first: TileLine = { x1: toX, x2: toX + dx, y1: toY, y2: toY + dy, css: css };

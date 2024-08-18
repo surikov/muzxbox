@@ -26,18 +26,24 @@ class PerformerIcon {
 			yy = top + audioSeq.iconPosition.y;
 		}
 
-		let rec: TileRectangle = { x: xx, y: yy, w: cfg.pluginIconWidth, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+		let rec: TileRectangle = {
+			x: xx, y: yy
+			, w: cfg.pluginIconSize, h: cfg.pluginIconSize
+			, rx: cfg.pluginIconSize/2, ry: cfg.pluginIconSize/2
+			, css: 'fanPerformerIcon'
+		};
 		fanLevelAnchor.content.push(rec);
 		if (zidx < 5) {
-			let txt: TileText = { text: audioSeq.kind + ':' + audioSeq.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+			let txt: TileText = { text: audioSeq.kind + ':' + audioSeq.id, x: xx, y: yy + cfg.pluginIconSize, css: 'fanSamplerIcon' };
 			fanLevelAnchor.content.push(txt);
 		}
 		//console.log('PerformerIcon', rec);
-		new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconHeight / 2, xx, yy + cfg.pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
-		this.addOutputs(cfg, audioSeq.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconWidth, yy + cfg.pluginIconHeight / 2);
+		new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconSize / 2, xx, yy + cfg.pluginIconSize / 2, fanLevelAnchor
+		, 'fanStream');
+		this.addOutputs(cfg, audioSeq.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
 	}
 	addOutputs(cfg: MixerDataMathUtility, outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number) {
-		if (outputs)if (outputs.length > 0) {
+		if (outputs) if (outputs.length > 0) {
 			for (let oo = 0; oo < outputs.length; oo++) {
 				let outId = outputs[oo];
 				for (let ii = 0; ii < cfg.data.filters.length; ii++) {
@@ -49,15 +55,16 @@ class PerformerIcon {
 						let yy = top;
 						if (toFilter.iconPosition) {
 							xx = left + toFilter.iconPosition.x;
-							yy = top + toFilter.iconPosition.y + cfg.pluginIconHeight / 2;
+							yy = top + toFilter.iconPosition.y + cfg.pluginIconSize / 2;
 						}
-						new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanSamplerIcon');
+						new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanConnection');
 						break;
 					}
 				}
 			}
 		} else {
-			new SpearConnection().addSpear(3, fromX, fromY, cfg.wholeWidth() - cfg.pluginIconWidth, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanSamplerIcon');
+			let speakerX = cfg.wholeWidth() - cfg.speakerIconPad - cfg.rightPad;
+			new SpearConnection().addSpear(3, fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanConnection');
 		}
 	}
 }

@@ -227,18 +227,30 @@ class CommandDispatcher {
         }
         else {
             this.onAir = !this.onAir;
+            let n120 = 120 / 60;
+            let A3 = 33;
             let schedule = {
                 series: [
-                    { duration: 1.5, tempo: 120, items: [
-                            {
-                                skip: 0,
-                                channelId: 'test1',
-                                pitches: [60],
-                                slides: [{ duration: 0.5, delta: 10 }, { duration: 0.5, delta: -5 }]
-                            }
-                        ], states: [] },
-                    { duration: 1.5, tempo: 170, items: [], states: [] },
-                    { duration: 10.5, tempo: 100, items: [], states: [] }
+                    {
+                        duration: n120, tempo: 120, items: [
+                            { skip: 0 * n120, channelId: 'test1', pitches: [A3 - 0 - 4], slides: [{ duration: 2 / 16 * n120, delta: 4 }, { duration: 2 / 16 * n120, delta: 0 }] },
+                            { skip: 1 / 4 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] },
+                            { skip: 2 / 4 * n120, channelId: 'test1', pitches: [A3 - 0], slides: [{ duration: 1 / 4 * n120, delta: 0 }] },
+                            { skip: 3 / 4 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
+                        ], states: []
+                    },
+                    {
+                        duration: n120, tempo: 120, items: [
+                            { skip: 0 * n120, channelId: 'test1', pitches: [A3 - 0], slides: [{ duration: 1 / 4 * n120, delta: 0 }] },
+                            { skip: 1 / 4 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] },
+                            { skip: 2 / 4 * n120, channelId: 'test1', pitches: [A3 - 0], slides: [{ duration: 1 / 8 * n120, delta: 0 }] },
+                            { skip: 5 / 8 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 8 * n120, delta: 0 }] },
+                            { skip: 6 / 8 * n120, channelId: 'test1', pitches: [A3 - 4], slides: [{ duration: 1 / 8 * n120, delta: 0 }] },
+                            { skip: 7 / 8 * n120, channelId: 'test1', pitches: [A3 - 2], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
+                        ], states: []
+                    },
+                    { duration: n120, tempo: 120, items: [], states: [] },
+                    { duration: n120, tempo: 120, items: [], states: [] }
                 ],
                 channels: [{
                         id: 'test1',
@@ -254,7 +266,7 @@ class CommandDispatcher {
             let me = this;
             me.player.setupPlugins(me.audioContext, schedule, () => {
                 console.log('toggleStartStop setupPlugins done');
-                me.player.startLoop(0, 0, 2.5);
+                me.player.startLoop(0, 0, n120 * 2);
             });
         }
     }
@@ -1014,9 +1026,9 @@ class RightMenuPanel {
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
                     }, () => {
-                        if (it.states) {
+                        if (it.itemStates) {
                             let sel = it.selection ? it.selection : 0;
-                            if (it.states.length - 1 > sel) {
+                            if (it.itemStates.length - 1 > sel) {
                                 sel++;
                             }
                             else {
@@ -1057,7 +1069,7 @@ class RightMenuPanel {
                     let state = item.selection ? item.selection : 0;
                     commandDispatcher.setTrackSoloState(state);
                 },
-                states: [icon_sound_low, icon_hide, icon_sound_loud],
+                itemStates: [icon_sound_low, icon_hide, icon_sound_loud],
                 selection: 0
             };
             menuPointTracks.children.push(item);
@@ -1075,7 +1087,7 @@ class RightMenuPanel {
                     let state = item.selection ? item.selection : 0;
                     commandDispatcher.setDrumSoloState(state);
                 },
-                states: [icon_sound_low, icon_hide, icon_sound_loud],
+                itemStates: [icon_sound_low, icon_hide, icon_sound_loud],
                 selection: 0
             };
             menuPointPercussion.children.push(item);
@@ -1092,7 +1104,7 @@ class RightMenuPanel {
                     },
                     onSubClick: () => {
                     },
-                    states: [icon_sound_low, icon_hide, icon_sound_loud],
+                    itemStates: [icon_sound_low, icon_hide, icon_sound_loud],
                     selection: 0
                 };
                 menuPointAutomation.children.push(item);
@@ -1246,17 +1258,17 @@ class RightMenuItem {
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindAction2) {
-            let icon = '?';
+            let stateIicon = '?';
             let sel = this.info.selection ? this.info.selection : 0;
-            if (this.info.states) {
-                if (this.info.states.length > sel) {
-                    icon = this.info.states[sel];
+            if (this.info.itemStates) {
+                if (this.info.itemStates.length > sel) {
+                    stateIicon = this.info.itemStates[sel];
                 }
             }
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
             anchor.content.push({ x: itemWidth - 1.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-            anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: icon, css: 'rightMenuIconLabel' });
+            anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
             spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
         }
         if (this.kind == this.kindDraggable) {
@@ -2226,14 +2238,13 @@ class FanPane {
         }
     }
     buildOutIcon(cfg, fanAnchor, zidx) {
-        let xx = cfg.wholeWidth() - cfg.pluginIconWidth;
-        let yy = cfg.gridTop() + cfg.gridHeight() / 2 - cfg.pluginIconHeight / 2;
-        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, rx: cfg.pluginIconWidth / 3, ry: cfg.pluginIconHeight / 3, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+        let xx = cfg.wholeWidth() - cfg.speakerIconPad - cfg.rightPad;
+        let yy = cfg.gridTop() + cfg.gridHeight() / 2 - cfg.speakerIconSize / 2;
+        let rec = { x: xx, y: yy, w: cfg.speakerIconSize, h: cfg.speakerIconSize,
+            rx: cfg.speakerIconSize / 2, ry: cfg.speakerIconSize / 2, css: 'fanSpeakerIcon' };
         fanAnchor.content.push(rec);
-        if (zidx < 5) {
-            let txt = { text: 'Speaker', x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
-            fanAnchor.content.push(txt);
-        }
+        let icon = { x: xx + cfg.speakerIconSize, y: yy + cfg.speakerIconSize, text: icon_sound_loud, css: 'fanSpeakerIconLabel' };
+        fanAnchor.content.push(icon);
     }
 }
 class PerformerIcon {
@@ -2258,14 +2269,19 @@ class PerformerIcon {
             xx = left + audioSeq.iconPosition.x;
             yy = top + audioSeq.iconPosition.y;
         }
-        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+        let rec = {
+            x: xx, y: yy,
+            w: cfg.pluginIconSize, h: cfg.pluginIconSize,
+            rx: cfg.pluginIconSize / 2, ry: cfg.pluginIconSize / 2,
+            css: 'fanPerformerIcon'
+        };
         fanLevelAnchor.content.push(rec);
         if (zidx < 5) {
-            let txt = { text: audioSeq.kind + ':' + audioSeq.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+            let txt = { text: audioSeq.kind + ':' + audioSeq.id, x: xx, y: yy + cfg.pluginIconSize, css: 'fanSamplerIcon' };
             fanLevelAnchor.content.push(txt);
         }
-        new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconHeight / 2, xx, yy + cfg.pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
-        this.addOutputs(cfg, audioSeq.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconWidth, yy + cfg.pluginIconHeight / 2);
+        new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconSize / 2, xx, yy + cfg.pluginIconSize / 2, fanLevelAnchor, 'fanStream');
+        this.addOutputs(cfg, audioSeq.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
     }
     addOutputs(cfg, outputs, fanLevelAnchor, zidx, fromX, fromY) {
         if (outputs)
@@ -2281,16 +2297,17 @@ class PerformerIcon {
                             let yy = top;
                             if (toFilter.iconPosition) {
                                 xx = left + toFilter.iconPosition.x;
-                                yy = top + toFilter.iconPosition.y + cfg.pluginIconHeight / 2;
+                                yy = top + toFilter.iconPosition.y + cfg.pluginIconSize / 2;
                             }
-                            new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanSamplerIcon');
+                            new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanConnection');
                             break;
                         }
                     }
                 }
             }
             else {
-                new SpearConnection().addSpear(3, fromX, fromY, cfg.wholeWidth() - cfg.pluginIconWidth, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanSamplerIcon');
+                let speakerX = cfg.wholeWidth() - cfg.speakerIconPad - cfg.rightPad;
+                new SpearConnection().addSpear(3, fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanConnection');
             }
     }
 }
@@ -2316,14 +2333,14 @@ class SamplerIcon {
             xx = left + sampler.iconPosition.x;
             yy = top + sampler.iconPosition.y;
         }
-        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, h: cfg.pluginIconHeight, rx: cfg.pluginIconHeight / 2, ry: cfg.pluginIconHeight / 2, css: 'fanSamplerIcon' };
+        let rec = { x: xx, y: yy, w: cfg.pluginIconSize, h: cfg.pluginIconSize, rx: cfg.pluginIconSize / 2, ry: cfg.pluginIconSize / 2, css: 'fanSamplerIcon' };
         fanLevelAnchor.content.push(rec);
         if (zidx < 5) {
-            let txt = { text: sampler.kind + ':' + sampler.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+            let txt = { text: sampler.kind + ':' + sampler.id, x: xx, y: yy + cfg.pluginIconSize, css: 'fanSamplerIcon' };
             fanLevelAnchor.content.push(txt);
         }
-        new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconHeight / 2, xx, yy + cfg.pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
-        this.addOutputs(cfg, sampler.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconWidth, yy + cfg.pluginIconHeight / 2);
+        new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconSize / 2, xx, yy + cfg.pluginIconSize / 2, fanLevelAnchor, 'fanStream');
+        this.addOutputs(cfg, sampler.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
     }
     addOutputs(cfg, outputs, fanLevelAnchor, zidx, fromX, fromY) {
         if (outputs)
@@ -2339,16 +2356,17 @@ class SamplerIcon {
                             let yy = top;
                             if (toFilter.iconPosition) {
                                 xx = left + toFilter.iconPosition.x;
-                                yy = top + toFilter.iconPosition.y + cfg.pluginIconHeight / 2;
+                                yy = top + toFilter.iconPosition.y + cfg.pluginIconSize / 2;
                             }
-                            new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanSamplerIcon');
+                            new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanConnection');
                             break;
                         }
                     }
                 }
             }
             else {
-                new SpearConnection().addSpear(3, fromX, fromY, cfg.wholeWidth() - cfg.pluginIconWidth, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanSamplerIcon');
+                let speakerX = cfg.wholeWidth() - cfg.speakerIconPad - cfg.rightPad;
+                new SpearConnection().addSpear(3, fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanConnection');
             }
     }
 }
@@ -2374,13 +2392,14 @@ class FilterIcon {
             xx = left + filterTarget.iconPosition.x;
             yy = top + filterTarget.iconPosition.y;
         }
-        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, rx: cfg.pluginIconWidth / 3, ry: cfg.pluginIconHeight / 3, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+        let rec = { x: xx, y: yy, w: cfg.pluginIconSize, rx: cfg.pluginIconSize / 2, ry: cfg.pluginIconSize / 2,
+            h: cfg.pluginIconSize, css: 'fanFilterIcon' };
         fanLevelAnchor.content.push(rec);
         if (zidx < 5) {
-            let txt = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+            let txt = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconSize, css: 'fanSamplerIcon' };
             fanLevelAnchor.content.push(txt);
         }
-        this.addOutputs(cfg, filterTarget.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconWidth, yy + cfg.pluginIconHeight / 2);
+        this.addOutputs(cfg, filterTarget.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
     }
     buildAutoSpot(cfg, fanLevelAnchor, zidx) {
         for (let ii = 0; ii < cfg.data.filters.length; ii++) {
@@ -2400,14 +2419,15 @@ class FilterIcon {
             xx = left + filterTarget.iconPosition.x;
             yy = top + filterTarget.iconPosition.y;
         }
-        let rec = { x: xx, y: yy, w: cfg.pluginIconWidth, rx: cfg.pluginIconWidth / 3, ry: cfg.pluginIconHeight / 3, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+        let rec = { x: xx, y: yy, w: cfg.pluginIconSize, rx: cfg.pluginIconSize / 2, ry: cfg.pluginIconSize / 2,
+            h: cfg.pluginIconSize, css: 'fanFilterIcon' };
         fanLevelAnchor.content.push(rec);
         if (zidx < 5) {
-            let txt = { text: '' + filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+            let txt = { text: '' + filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconSize, css: 'fanSamplerIcon' };
             fanLevelAnchor.content.push(txt);
         }
-        new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconHeight / 2, xx, yy + cfg.pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
-        this.addOutputs(cfg, filterTarget.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconWidth, yy + cfg.pluginIconHeight / 2);
+        new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconSize / 2, xx, yy + cfg.pluginIconSize / 2, fanLevelAnchor, 'fanStream');
+        this.addOutputs(cfg, filterTarget.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
     }
     addOutputs(cfg, outputs, fanLevelAnchor, zidx, fromX, fromY) {
         if (outputs)
@@ -2423,16 +2443,17 @@ class FilterIcon {
                             let yy = top;
                             if (toFilter.iconPosition) {
                                 xx = left + toFilter.iconPosition.x;
-                                yy = top + toFilter.iconPosition.y + cfg.pluginIconHeight / 2;
+                                yy = top + toFilter.iconPosition.y + cfg.pluginIconSize / 2;
                             }
-                            new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanSamplerIcon');
+                            new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanConnection');
                             break;
                         }
                     }
                 }
             }
             else {
-                new SpearConnection().addSpear(3, fromX, fromY, cfg.wholeWidth() - cfg.pluginIconWidth, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanSamplerIcon');
+                let speakerX = cfg.wholeWidth() - cfg.speakerIconPad - cfg.rightPad;
+                new SpearConnection().addSpear(3, fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanConnection');
             }
     }
 }
@@ -2443,7 +2464,7 @@ class SpearConnection {
         let mainLine = { x1: fromX, x2: toX, y1: fromY, y2: toY, css: css };
         anchor.content.push(mainLine);
         let angle = Math.atan2(toY - fromY, toX - fromX);
-        let da = Math.PI * 5 / 6.0;
+        let da = Math.PI * 19 / 20.0;
         let dx = headLen * Math.cos(angle - da);
         let dy = headLen * Math.sin(angle - da);
         let first = { x1: toX, x2: toX + dx, y1: toY, y2: toY + dy, css: css };
@@ -2808,8 +2829,8 @@ class MixerDataMathUtility {
         this.gridBottomPad = 1;
         this.maxCommentRowCount = 0;
         this.maxAutomationsCount = 0;
-        this.pluginIconWidth = 17;
-        this.pluginIconHeight = 7;
+        this.pluginIconSize = 17;
+        this.speakerIconSize = 33;
         this.speakerIconPad = 11;
         this.padGridFan = 5;
         this.data = data;
@@ -2845,8 +2866,8 @@ class MixerDataMathUtility {
             if (iconPosition) {
                 pp = iconPosition;
             }
-            if (ww < pp.x + this.pluginIconWidth) {
-                ww = pp.x + this.pluginIconWidth;
+            if (ww < pp.x + this.pluginIconSize) {
+                ww = pp.x + this.pluginIconSize;
             }
         }
         for (let tt = 0; tt < this.data.filters.length; tt++) {
@@ -2855,8 +2876,8 @@ class MixerDataMathUtility {
             if (iconPosition) {
                 pp = iconPosition;
             }
-            if (ww < pp.x + this.pluginIconWidth) {
-                ww = pp.x + this.pluginIconWidth;
+            if (ww < pp.x + this.pluginIconSize) {
+                ww = pp.x + this.pluginIconSize;
             }
         }
         for (let tt = 0; tt < this.data.percussions.length; tt++) {
@@ -2865,11 +2886,11 @@ class MixerDataMathUtility {
             if (iconPosition) {
                 pp = iconPosition;
             }
-            if (ww < pp.x + this.pluginIconWidth) {
-                ww = pp.x + this.pluginIconWidth;
+            if (ww < pp.x + this.pluginIconSize) {
+                ww = pp.x + this.pluginIconSize;
             }
         }
-        ww = ww + this.speakerIconPad + this.pluginIconWidth;
+        ww = ww + this.speakerIconPad + 2 * this.pluginIconSize;
         return ww;
     }
     heightOfTitle() {

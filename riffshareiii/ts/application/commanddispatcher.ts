@@ -42,18 +42,30 @@ class CommandDispatcher {
 			this.player.cancel();
 		} else {
 			this.onAir = !this.onAir;
+			let n120 = 120 / 60;
+			let A3 = 33;
 			let schedule: MZXBX_Schedule = {
 				series: [
-					{ duration: 1.5, tempo: 120, items: [
-						{
-							skip: 0
-							,channelId: 'test1'
-							,pitches: [60]
-							,slides: [{duration:0.5,delta:10},{duration:0.5,delta:-5}]
-						}
-					], states: [] }
-					, { duration: 1.5, tempo: 170, items: [], states: [] }
-					, { duration: 10.5, tempo: 100, items: [], states: [] }
+					{
+						duration: n120, tempo: 120, items: [
+							{ skip: 0 * n120, channelId: 'test1', pitches: [A3 - 0-4], slides: [{ duration: 2 / 16 * n120, delta: 4 },{ duration: 2/16 * n120, delta: 0 }] }
+							, { skip: 1 / 4 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
+							, { skip: 2 / 4 * n120, channelId: 'test1', pitches: [A3 - 0], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
+							, { skip: 3 / 4 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
+						], states: []
+					}
+					, {
+						duration: n120, tempo: 120, items: [
+							{ skip: 0 * n120, channelId: 'test1', pitches: [A3 - 0], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
+							, { skip: 1 / 4 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
+							, { skip: 2 / 4 * n120, channelId: 'test1', pitches: [A3 - 0], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
+							, { skip: 5 / 8 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
+							, { skip: 6 / 8 * n120, channelId: 'test1', pitches: [A3 - 4], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
+							, { skip: 7 / 8 * n120, channelId: 'test1', pitches: [A3 - 2], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
+						], states: []
+					}
+					, { duration: n120, tempo: 120, items: [], states: [] }
+					, { duration: n120, tempo: 120, items: [], states: [] }
 				]
 				, channels: [{
 					id: 'test1'
@@ -69,7 +81,7 @@ class CommandDispatcher {
 			let me = this;
 			me.player.setupPlugins(me.audioContext, schedule, () => {
 				console.log('toggleStartStop setupPlugins done');
-				me.player.startLoop(0, 0, 2.5);
+				me.player.startLoop(0, 0, n120*2);
 			});
 		}
 	}

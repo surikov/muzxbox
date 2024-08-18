@@ -26,15 +26,16 @@ class FilterIcon {
 			yy = top + filterTarget.iconPosition.y;
 		}
 
-		let rec: TileRectangle = { x: xx, y: yy, w: cfg.pluginIconWidth, rx: cfg.pluginIconWidth / 3, ry: cfg.pluginIconHeight / 3, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+		let rec: TileRectangle = { x: xx, y: yy, w: cfg.pluginIconSize, rx: cfg.pluginIconSize / 2, ry: cfg.pluginIconSize / 2
+		, h: cfg.pluginIconSize, css: 'fanFilterIcon' };
 		fanLevelAnchor.content.push(rec);
 		if (zidx < 5) {
-			let txt: TileText = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+			let txt: TileText = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconSize, css: 'fanSamplerIcon' };
 			fanLevelAnchor.content.push(txt);
 		}
 		//console.log('PerformerIcon', rec);
 		//cfg.addSpear(3, cfg.leftPad+cfg.timelineWidth(), yy + cfg.pluginIconHeight / 2, xx, yy + cfg.pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
-		this.addOutputs(cfg, filterTarget.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconWidth, yy + cfg.pluginIconHeight / 2);
+		this.addOutputs(cfg, filterTarget.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
 	}
 	buildAutoSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number) {
 		//console.log('buildPerformerSpot', this.performerId);
@@ -56,15 +57,17 @@ class FilterIcon {
 			yy = top + filterTarget.iconPosition.y;
 		}
 
-		let rec: TileRectangle = { x: xx, y: yy, w: cfg.pluginIconWidth, rx: cfg.pluginIconWidth / 3, ry: cfg.pluginIconHeight / 3, h: cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+		let rec: TileRectangle = { x: xx, y: yy, w: cfg.pluginIconSize, rx: cfg.pluginIconSize / 2, ry: cfg.pluginIconSize / 2
+		, h: cfg.pluginIconSize, css: 'fanFilterIcon' };
 		fanLevelAnchor.content.push(rec);
 		if (zidx < 5) {
-			let txt: TileText = { text: '' + filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconHeight, css: 'fanSamplerIcon' };
+			let txt: TileText = { text: '' + filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconSize, css: 'fanSamplerIcon' };
 			fanLevelAnchor.content.push(txt);
 		}
 		//console.log('PerformerIcon', rec);
-		new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconHeight / 2, xx, yy + cfg.pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
-		this.addOutputs(cfg, filterTarget.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconWidth, yy + cfg.pluginIconHeight / 2);
+		new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconSize / 2, xx, yy + cfg.pluginIconSize / 2
+		, fanLevelAnchor, 'fanStream');
+		this.addOutputs(cfg, filterTarget.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
 	}
 	addOutputs(cfg: MixerDataMathUtility, outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number) {
 		if (outputs)if (outputs.length > 0) {
@@ -79,15 +82,16 @@ class FilterIcon {
 						let yy = top;
 						if (toFilter.iconPosition) {
 							xx = left + toFilter.iconPosition.x;
-							yy = top + toFilter.iconPosition.y + cfg.pluginIconHeight / 2;
+							yy = top + toFilter.iconPosition.y + cfg.pluginIconSize / 2;
 						}
-						new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanSamplerIcon');
+						new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanConnection');
 						break;
 					}
 				}
 			}
 		} else {
-			new SpearConnection().addSpear(3, fromX, fromY, cfg.wholeWidth() - cfg.pluginIconWidth, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanSamplerIcon');
+			let speakerX=cfg.wholeWidth() - cfg.speakerIconPad-cfg.rightPad;
+			new SpearConnection().addSpear(3, fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanConnection');
 		}
 	}
 }
