@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.132 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.133 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -880,7 +880,27 @@ function dumpColorStat() {
     if (showFirstRow) {
         skip = 0;
     }
+    var blueleft = 0;
+    var blueright = 0;
+    var greenleft = 0;
+    var greenright = 0;
+    var silverleft = 0;
+    var silverright = 0;
+    var redleft = 0;
+    var redright = 0;
+    var rowcount = 0;
     for (var kk = 0; kk < redStat.length; kk++) {
+        if (kk >= 1 - skip && kk < 1 - skip + rowsVisibleCount - 2) {
+            blueright = blueright + blueStat[kk].left;
+            blueleft = blueleft + blueStat[kk].right;
+            greenleft = greenleft + greenStat[kk].left;
+            greenright = greenright + greenStat[kk].right;
+            silverleft = silverleft + greyStat[kk].left;
+            silverright = silverright + greyStat[kk].right;
+            redleft = redleft + redStat[kk].left;
+            redright = redright + redStat[kk].right;
+            rowcount++;
+        }
         var sum = 0;
         //if (showFirstRow || kk > 0) {
         sum = redStat[kk].left + redStat[kk].right
@@ -900,6 +920,12 @@ function dumpColorStat() {
             manual: false
         });
     }
+    var msgp = document.getElementById('statdump');
+    msgp.innerText = 'blue: ' + Math.round(blueleft / rowcount) + '/' + Math.round(blueright / rowcount)
+        + ', green: ' + Math.round(greenleft / rowcount) + '/' + Math.round(greenright / rowcount)
+        + ', silver: ' + Math.round(silverleft / rowcount) + '/' + Math.round(silverright / rowcount)
+        + ', red: ' + Math.round(redleft / rowcount) + '/' + Math.round(redright / rowcount);
+    //console.log(skip,'blue',blueleft,blueright,'green',greenleft,greenright,'silver',silverleft,silverright,'red',redleft,redright);
 }
 function fillCells() {
     clearSVGgroup(levelA);
@@ -1312,7 +1338,7 @@ function countHoles(datarows, longe) {
         }
         avg = avg + rowCount / rowLen;
     }
-    console.log(longe, avg / (datarows.length - 1));
+    console.log('empty duration more or equal', longe, 'average count', avg / (datarows.length - 1));
 }
 function dumpHoleStat() {
     var dataBalls = window[dataName];

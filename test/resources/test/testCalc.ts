@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.132 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.133 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -937,7 +937,31 @@ function dumpColorStat() {
 	if (showFirstRow) {
 		skip = 0;
 	}
+	let blueleft=0;
+	let blueright=0;
+	let greenleft=0;
+	let greenright=0;
+	let silverleft=0;
+	let silverright=0;
+	let redleft=0;
+	let redright=0;
+	let rowcount=0;
 	for (let kk = 0; kk < redStat.length; kk++) {
+		if(kk>=1-skip &&kk<1-skip+rowsVisibleCount-2  ){
+			blueright=blueright+blueStat[kk].left;
+			blueleft=blueleft+blueStat[kk].right;
+			
+			greenleft=greenleft+greenStat[kk].left;
+			greenright=greenright+greenStat[kk].right;
+			
+			silverleft=silverleft+greyStat[kk].left;
+			silverright=silverright+greyStat[kk].right;
+			
+			redleft=redleft+redStat[kk].left;
+			redright=redright+redStat[kk].right;
+			
+			rowcount++;
+		}
 		let sum = 0;
 		//if (showFirstRow || kk > 0) {
 		sum = redStat[kk].left + redStat[kk].right
@@ -959,7 +983,16 @@ function dumpColorStat() {
 			, color: purple
 			, manual: false
 		});
+
 	}
+
+	var msgp: HTMLElement = (document.getElementById('statdump') as any) as HTMLElement;
+	msgp.innerText = 'blue: '+Math.round(blueleft/rowcount)+'/'+Math.round(blueright/rowcount)
+				+', green: '+Math.round(greenleft/rowcount)+'/'+Math.round(greenright/rowcount)
+				+', silver: '+Math.round(silverleft/rowcount)+'/'+Math.round(silverright/rowcount)
+				+', red: '+Math.round(redleft/rowcount)+'/'+Math.round(redright/rowcount)
+				;
+	//console.log(skip,'blue',blueleft,blueright,'green',greenleft,greenright,'silver',silverleft,silverright,'red',redleft,redright);
 }
 function fillCells() {
 	clearSVGgroup(levelA);
@@ -1381,7 +1414,7 @@ function countHoles(datarows:BallsRow[],longe:number){
         }
         avg=avg+rowCount/rowLen;
     }
-    console.log(longe,avg/(datarows.length-1));
+    console.log('empty duration more or equal',longe,'average count',avg/(datarows.length-1));
 }
 function dumpHoleStat(){
     let dataBalls = window[dataName];
