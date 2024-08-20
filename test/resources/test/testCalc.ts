@@ -935,7 +935,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 				if(mx<calcs[ii].summ)mx=calcs[ii].summ;
 				if(min>calcs[ii].summ)min=calcs[ii].summ;
 			}
-			console.log(min,mx,calcs);
+			//console.log(min,mx,calcs);
 			let blue = '#0000ff33';
 			let preVal=calcs[calcs.length-1].summ;
 			for (let ii = 0; ii < rowLen; ii++) {

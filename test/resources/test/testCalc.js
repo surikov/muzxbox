@@ -874,7 +874,7 @@ function dumpTriads(svg, rows) {
                 if (min > calcs[ii].summ)
                     min = calcs[ii].summ;
             }
-            console.log(min, mx, calcs);
+            //console.log(min,mx,calcs);
             var blue = '#0000ff33';
             var preVal = calcs[calcs.length - 1].summ;
             for (var ii = 0; ii < rowLen; ii++) {
