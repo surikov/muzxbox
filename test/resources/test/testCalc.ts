@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.133 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.134 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -504,6 +504,7 @@ function countInfo(inrows: BallsRow[]) {
 	}*/
 }
 function dumpRowFills(inrows: BallsRow[]) {
+	
 
 	if (highLightMode == 1) {
 		dumpRowFillsColor(inrows, '#009900cc', 0);
@@ -513,6 +514,8 @@ function dumpRowFills(inrows: BallsRow[]) {
 		dumpRowWaitColor(inrows, '#009900cc', 0);
 		dumpRowFillsColor(inrows, '#00000033', 0);
 	}
+	
+	
 	
 }
 
@@ -787,6 +790,8 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		let lbl = "";
 		first.sort((aa, bb) => { return aa.logr - bb.logr; });
 		
+		//console.log(first);
+		
 		if (rr == 0) {
 			sortedBlue = [];
 			for (let ff = 0; ff < first.length; ff++) {
@@ -919,6 +924,30 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 				, cellSize
 				, cellSize //- 0.1
 				, color);
+			
+		}
+		if ( rr == 0) {
+			
+			let min=999999;
+			let mx=-9999;
+
+			for (let ii = 0; ii < rowLen; ii++) {
+				if(mx<calcs[ii].summ)mx=calcs[ii].summ;
+				if(min>calcs[ii].summ)min=calcs[ii].summ;
+			}
+			console.log(min,mx,calcs);
+			let blue = '#0000ff33';
+			let preVal=calcs[calcs.length-1].summ;
+			for (let ii = 0; ii < rowLen; ii++) {
+				let nextVal=calcs[ii].summ;
+				markLines.push({ fromX: ii-1, fromY: 21*(preVal-min)/(mx-min+2)+ skipRowsCount
+									, toX: ii, toY: 21*(nextVal-min)/(mx-min+2)+ skipRowsCount
+								, color: blue, manual: false });
+				markLines.push({ fromX: ii-1+rowLen, fromY: 21*(preVal-min)/(mx-min+2)+ skipRowsCount
+									, toX: ii+rowLen, toY: 21*(nextVal-min)/(mx-min+2)+ skipRowsCount
+								, color: blue, manual: false });
+				preVal=nextVal;
+			}
 		}
 	}
 	//console.log('blueStat', blueStat);
@@ -926,6 +955,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 	dumpColorStat();
 	//dumpStat2();
 }
+
 function roundDown(num: number, base: number): number {
 	return Math.floor(num / base) * base;
 }
@@ -1138,6 +1168,7 @@ function addTails() {
 	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
 	dumpRowFills(slicedrows);
 	fillCells();
+	
 	let mxdata:{ball:number,mx:number}[]=[];
 	let mindata:{ball:number,min:number}[]=[];
 	for (let ii = 0; ii < rowLen; ii++) {
@@ -1209,6 +1240,7 @@ function addTails() {
 	//for(let ii=0;ii<mindata.length;ii++){
 	//	console.log(ii,mindata[ii],mxdata[ii]);
 	//}
+	//console.log(sortedBlue);
 	resetNumbs();
 }
 
@@ -1392,6 +1424,7 @@ function dumpStat5(){
 	console.log(45*45*45*45*45*45); 
 }
 */
+/*
 function countHoles(datarows:BallsRow[],longe:number){
     let avg=0;
     for(let rr=1;rr<datarows.length;rr++){
@@ -1416,6 +1449,7 @@ function countHoles(datarows:BallsRow[],longe:number){
     }
     console.log('empty duration more or equal',longe,'average count',avg/(datarows.length-1));
 }
+
 function dumpHoleStat(){
     let dataBalls = window[dataName];
 	let datarows:BallsRow[]  = readParseStat(dataBalls);
@@ -1445,10 +1479,11 @@ function dumpHoleStat(){
     countHoles(datarows,22);
     countHoles(datarows,23);
 }
+*/
 init();
 addTails();
 //dumpStat5();
-dumpHoleStat();
+//dumpHoleStat();
 
 
 

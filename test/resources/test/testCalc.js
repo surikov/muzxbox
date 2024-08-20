@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.133 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.134 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -741,6 +741,7 @@ function dumpTriads(svg, rows) {
         var first = calcs.map(function (x) { return x; });
         var lbl = "";
         first.sort(function (aa, bb) { return aa.logr - bb.logr; });
+        //console.log(first);
         if (rr == 0) {
             sortedBlue = [];
             for (var ff = 0; ff < first.length; ff++) {
@@ -863,6 +864,29 @@ function dumpTriads(svg, rows) {
             , color);
             addRect(svg, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
             , color);
+        }
+        if (rr == 0) {
+            var min = 999999;
+            var mx = -9999;
+            for (var ii = 0; ii < rowLen; ii++) {
+                if (mx < calcs[ii].summ)
+                    mx = calcs[ii].summ;
+                if (min > calcs[ii].summ)
+                    min = calcs[ii].summ;
+            }
+            console.log(min, mx, calcs);
+            var blue = '#0000ff33';
+            var preVal = calcs[calcs.length - 1].summ;
+            for (var ii = 0; ii < rowLen; ii++) {
+                var nextVal = calcs[ii].summ;
+                markLines.push({ fromX: ii - 1, fromY: 21 * (preVal - min) / (mx - min + 2) + skipRowsCount,
+                    toX: ii, toY: 21 * (nextVal - min) / (mx - min + 2) + skipRowsCount,
+                    color: blue, manual: false });
+                markLines.push({ fromX: ii - 1 + rowLen, fromY: 21 * (preVal - min) / (mx - min + 2) + skipRowsCount,
+                    toX: ii + rowLen, toY: 21 * (nextVal - min) / (mx - min + 2) + skipRowsCount,
+                    color: blue, manual: false });
+                preVal = nextVal;
+            }
         }
     }
     //console.log('blueStat', blueStat);
@@ -1141,6 +1165,7 @@ function addTails() {
     //for(let ii=0;ii<mindata.length;ii++){
     //	console.log(ii,mindata[ii],mxdata[ii]);
     //}
+    //console.log(sortedBlue);
     resetNumbs();
 }
 function drawTestLines(data) {
@@ -1316,60 +1341,63 @@ function dumpStat5(){
     console.log(45*45*45*45*45*45);
 }
 */
-function countHoles(datarows, longe) {
-    var avg = 0;
-    for (var rr = 1; rr < datarows.length; rr++) {
-        var row = datarows[rr];
+/*
+function countHoles(datarows:BallsRow[],longe:number){
+    let avg=0;
+    for(let rr=1;rr<datarows.length;rr++){
+        let row:BallsRow=datarows[rr];
         //console.log(row);
-        var rowCount = 0;
-        for (var bb = 1; bb <= rowLen; bb++) {
+        let rowCount=0;
+        for(let bb=1;bb<=rowLen;bb++){
             //console.log(bb);
-            var hole = true;
-            for (var kk = 0; kk < longe; kk++) {
+            let hole=true;
+            for(let kk=0;kk<longe;kk++){
                 //console.log(kk);
-                if (ballExists(bb + kk, row)) { //console.log('exists',bb+kk);
-                    hole = false;
+                if(ballExists(bb+kk,row)){//console.log('exists',bb+kk);
+                    hole=false;
                     break;
-                } //else console.log('not exists',bb+kk);
+                }//else console.log('not exists',bb+kk);
             }
-            if (hole) {
+            if(hole){
                 rowCount++;
             }
         }
-        avg = avg + rowCount / rowLen;
+        avg=avg+rowCount/rowLen;
     }
-    console.log('empty duration more or equal', longe, 'average count', avg / (datarows.length - 1));
+    console.log('empty duration more or equal',longe,'average count',avg/(datarows.length-1));
 }
-function dumpHoleStat() {
-    var dataBalls = window[dataName];
-    var datarows = readParseStat(dataBalls);
+
+function dumpHoleStat(){
+    let dataBalls = window[dataName];
+    let datarows:BallsRow[]  = readParseStat(dataBalls);
     console.log(datarows);
     console.log('countHoles');
-    countHoles(datarows, 1);
-    countHoles(datarows, 2);
-    countHoles(datarows, 3);
-    countHoles(datarows, 4);
-    countHoles(datarows, 5);
-    countHoles(datarows, 6);
-    countHoles(datarows, 7);
-    countHoles(datarows, 8);
-    countHoles(datarows, 9);
-    countHoles(datarows, 10);
-    countHoles(datarows, 11);
-    countHoles(datarows, 12);
-    countHoles(datarows, 13);
-    countHoles(datarows, 14);
-    countHoles(datarows, 15);
-    countHoles(datarows, 16);
-    countHoles(datarows, 17);
-    countHoles(datarows, 18);
-    countHoles(datarows, 19);
-    countHoles(datarows, 20);
-    countHoles(datarows, 21);
-    countHoles(datarows, 22);
-    countHoles(datarows, 23);
+    countHoles(datarows,1);
+    countHoles(datarows,2);
+    countHoles(datarows,3);
+    countHoles(datarows,4);
+    countHoles(datarows,5);
+    countHoles(datarows,6);
+    countHoles(datarows,7);
+    countHoles(datarows,8);
+    countHoles(datarows,9);
+    countHoles(datarows,10);
+    countHoles(datarows,11);
+    countHoles(datarows,12);
+    countHoles(datarows,13);
+    countHoles(datarows,14);
+    countHoles(datarows,15);
+    countHoles(datarows,16);
+    countHoles(datarows,17);
+    countHoles(datarows,18);
+    countHoles(datarows,19);
+    countHoles(datarows,20);
+    countHoles(datarows,21);
+    countHoles(datarows,22);
+    countHoles(datarows,23);
 }
+*/
 init();
 addTails();
 //dumpStat5();
-dumpHoleStat();
+//dumpHoleStat();
