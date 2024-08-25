@@ -65,7 +65,7 @@ class FilterIcon {
 			fanLevelAnchor.content.push(txt);
 		}
 		//console.log('PerformerIcon', rec);
-		let controlLineWidth=xx-cfg.leftPad - cfg.timelineWidth() - cfg.padGridFan;
+		let controlLineWidth=xx-cfg.leftPad - cfg.timelineWidth() ;
 		new ControlConnection().addLineFlow(cfg, yy + cfg.pluginIconSize / 2,  controlLineWidth
 		, fanLevelAnchor);
 		this.addOutputs(cfg, filterTarget.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
