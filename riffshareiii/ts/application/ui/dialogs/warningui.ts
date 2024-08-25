@@ -29,7 +29,7 @@ class WarningUI {
 		this.warningDescription = { x: 0, y: 0, text: 'Use mouse or touchpad to move and zoom piano roll', css: 'warningDescription' };
 		this.warningGroup = (document.getElementById("warningDialogGroup") as any) as SVGElement;
 		this.warningRectangle = { x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: ()=>{
-			commandDispatcher.initAudioFromUI();
+			globalCommandDispatcher.initAudioFromUI();
 			me.cancel();
 		}
 

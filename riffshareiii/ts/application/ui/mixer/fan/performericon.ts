@@ -29,7 +29,7 @@ class PerformerIcon {
 		let rec: TileRectangle = {
 			x: xx, y: yy
 			, w: cfg.pluginIconSize, h: cfg.pluginIconSize
-			, rx: cfg.pluginIconSize/2, ry: cfg.pluginIconSize/2
+			, rx: cfg.pluginIconSize / 2, ry: cfg.pluginIconSize / 2
 			, css: 'fanPerformerIcon'
 		};
 		fanLevelAnchor.content.push(rec);
@@ -38,8 +38,10 @@ class PerformerIcon {
 			fanLevelAnchor.content.push(txt);
 		}
 		//console.log('PerformerIcon', rec);
-		new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconSize / 2, xx, yy + cfg.pluginIconSize / 2, fanLevelAnchor
-		, 'fanStream');
+		let controlLineWidth=xx-cfg.leftPad - cfg.timelineWidth() - cfg.padGridFan;
+		new ControlConnection().addLineFlow(cfg, yy + cfg.pluginIconSize / 2
+			, controlLineWidth, fanLevelAnchor
+		);
 		this.addOutputs(cfg, audioSeq.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
 	}
 	addOutputs(cfg: MixerDataMathUtility, outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number) {
@@ -57,14 +59,14 @@ class PerformerIcon {
 							xx = left + toFilter.iconPosition.x;
 							yy = top + toFilter.iconPosition.y + cfg.pluginIconSize / 2;
 						}
-						new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanConnection');
+						new SpearConnection().addSpear( fromX, fromY, xx, yy, fanLevelAnchor);
 						break;
 					}
 				}
 			}
 		} else {
 			let speakerX = cfg.wholeWidth() - cfg.speakerIconPad - cfg.rightPad;
-			new SpearConnection().addSpear(3, fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanConnection');
+			new SpearConnection().addSpear(fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor);
 		}
 	}
 }

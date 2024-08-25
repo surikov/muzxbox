@@ -141,12 +141,12 @@ function startApplication() {
     console.log('startApplication v1.6.01');
     let ui = new UIRenderer();
     ui.createUI();
-    commandDispatcher.registerWorkProject(mzxbxProjectForTesting2);
-    commandDispatcher.resetProject();
+    globalCommandDispatcher.registerWorkProject(mzxbxProjectForTesting2);
+    globalCommandDispatcher.resetProject();
 }
 function initWebAudioFromUI() {
     console.log('initWebAudioFromUI');
-    commandDispatcher.initAudioFromUI();
+    globalCommandDispatcher.initAudioFromUI();
 }
 function startLoadCSSfile(cssurl) {
     var head = document.getElementsByTagName('head')[0];
@@ -199,6 +199,9 @@ class CommandDispatcher {
         this.onAir = false;
         this.listener = null;
     }
+    cfg() {
+        return this._cfg;
+    }
     initAudioFromUI() {
         console.log('initAudioFromUI');
         var AudioContext = window.AudioContext;
@@ -206,7 +209,7 @@ class CommandDispatcher {
         this.player = createSchedulePlayer();
     }
     registerWorkProject(data) {
-        this.cfg = new MixerDataMathUtility(data);
+        this._cfg = new MixerDataMathUtility(data);
     }
     registerUI(renderer) {
         this.renderer = renderer;
@@ -214,7 +217,7 @@ class CommandDispatcher {
     showRightMenu() {
         let vw = this.renderer.tileLevelSVG.clientWidth / this.renderer.tiler.tapPxSize();
         let vh = this.renderer.tileLevelSVG.clientHeight / this.renderer.tiler.tapPxSize();
-        this.renderer.menu.showState = !this.renderer.menu.showState;
+        this.cfg().data.list = true;
         this.renderer.menu.resizeMenu(vw, vh);
         this.renderer.menu.resetAllAnchors();
     }
@@ -307,16 +310,16 @@ class CommandDispatcher {
     }
     moveTrackTop(trackNum) {
         console.log('moveTrackTop', trackNum);
-        let it = this.cfg.data.tracks[trackNum];
-        this.cfg.data.tracks.splice(trackNum, 1);
-        this.cfg.data.tracks.unshift(it);
+        let it = this.cfg().data.tracks[trackNum];
+        this.cfg().data.tracks.splice(trackNum, 1);
+        this.cfg().data.tracks.unshift(it);
         this.upTracksLayer();
     }
     moveDrumTop(drumNum) {
         console.log('moveDrumTop', drumNum);
-        let it = this.cfg.data.percussions[drumNum];
-        this.cfg.data.percussions.splice(drumNum, 1);
-        this.cfg.data.percussions.unshift(it);
+        let it = this.cfg().data.percussions[drumNum];
+        this.cfg().data.percussions.splice(drumNum, 1);
+        this.cfg().data.percussions.unshift(it);
         this.upDrumsLayer();
     }
     moveAutomationTop(filterNum) {
@@ -325,30 +328,30 @@ class CommandDispatcher {
     }
     upTracksLayer() {
         console.log('upTracksLayer');
-        this.cfg.data.focus = 0;
+        this.cfg().data.focus = 0;
         this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
-        if (this.cfg.data.tracks)
-            if (this.cfg.data.tracks[0])
-                this.renderer.menu.layerCurrentTitle.text = this.cfg.data.tracks[0].title;
-        commandDispatcher.resetProject();
+        if (this.cfg().data.tracks)
+            if (this.cfg().data.tracks[0])
+                this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
+        this.resetProject();
     }
     upDrumsLayer() {
         console.log('upDrumsLayer');
-        this.cfg.data.focus = 1;
+        this.cfg().data.focus = 1;
         this.renderer.menu.layerCurrentTitle.text = LO(localMenuPercussionFolder);
-        commandDispatcher.resetProject();
+        this.resetProject();
     }
     upAutoLayer() {
         console.log('upAutoayer');
-        this.cfg.data.focus = 2;
+        this.cfg().data.focus = 2;
         this.renderer.menu.layerCurrentTitle.text = LO(localMenuAutomationFolder);
-        commandDispatcher.resetProject();
+        this.resetProject();
     }
     upCommentsLayer() {
         console.log('upCommentsLayer');
-        this.cfg.data.focus = 3;
+        this.cfg().data.focus = 3;
         this.renderer.menu.layerCurrentTitle.text = LO(localMenuCommentsLayer);
-        commandDispatcher.resetProject();
+        this.resetProject();
     }
     setTrackSoloState(state) {
         console.log('setTrackSoloState', state);
@@ -358,7 +361,7 @@ class CommandDispatcher {
     }
     promptProjectPluginGUI(label, url, callback) {
         console.log('promptProjectPluginGUI', url);
-        let projectClone = JSON.stringify(this.cfg.data);
+        let projectClone = JSON.stringify(this.cfg().data);
         pluginDialogPrompt.openDialogFrame(label, url, projectClone, callback);
     }
     resendMessagePluginGUI() {
@@ -374,9 +377,9 @@ class CommandDispatcher {
     }
     expandTimeLineSelection(idx) {
         console.log('select bar', idx);
-        if (this.cfg.data) {
-            if (idx >= 0 && idx < this.cfg.data.timeline.length) {
-                let curPro = this.cfg.data;
+        if (this.cfg().data) {
+            if (idx >= 0 && idx < this.cfg().data.timeline.length) {
+                let curPro = this.cfg().data;
                 if (curPro.selection) {
                     let curProjectSelection = curPro.selection;
                     if (curProjectSelection.startMeasure == curProjectSelection.endMeasure) {
@@ -406,11 +409,11 @@ class CommandDispatcher {
                 }
             }
         }
-        this.renderer.timeselectbar.updateTimeSelectionBar(this.cfg);
+        this.renderer.timeselectbar.updateTimeSelectionBar();
         this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup, this.renderer.timeselectbar.selectionAnchor, LevelModes.top);
     }
 }
-let commandDispatcher = new CommandDispatcher();
+let globalCommandDispatcher = new CommandDispatcher();
 let pluginDialogPrompt = new PluginDialogPrompt();
 let gridLinesBrief = [
     { ratio: 0.4, duration: { count: 1, part: 2 } }
@@ -463,7 +466,7 @@ let zoomPrefixLevelsCSS = [
 ];
 class UIRenderer {
     constructor() {
-        commandDispatcher.registerUI(this);
+        globalCommandDispatcher.registerUI(this);
     }
     changeTapSIze(ratio) {
         console.log('changeTapSIze', ratio, this);
@@ -499,24 +502,24 @@ class UIRenderer {
     fillWholeUI() {
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
-        this.tiler.resetInnerSize(commandDispatcher.cfg.wholeWidth(), commandDispatcher.cfg.wholeHeight());
-        this.mixer.reFillMixerUI(commandDispatcher.cfg);
-        this.leftPanel.reFillLeftPanel(commandDispatcher.cfg);
-        this.debug.resetDebugView(commandDispatcher.cfg);
+        this.tiler.resetInnerSize(globalCommandDispatcher.cfg().wholeWidth(), globalCommandDispatcher.cfg().wholeHeight());
+        this.mixer.reFillMixerUI(globalCommandDispatcher.cfg());
+        this.leftPanel.reFillLeftPanel(globalCommandDispatcher.cfg());
+        this.debug.resetDebugView(globalCommandDispatcher.cfg());
         this.toolbar.resizeToolbar(vw, vh);
-        this.menu.readCurrentSongData(commandDispatcher.cfg.data);
+        this.menu.readCurrentSongData(globalCommandDispatcher.cfg().data);
         this.menu.resizeMenu(vw, vh);
         this.warning.resizeDialog(vw, vh, () => {
             this.tiler.resetAnchor(this.warning.warningGroup, this.warning.warningAnchor, LevelModes.overlay);
         });
-        this.timeselectbar.fillTimeBar(commandDispatcher.cfg);
+        this.timeselectbar.fillTimeBar(globalCommandDispatcher.cfg());
         this.timeselectbar.resizeTimeScale(vw, vh);
         this.tiler.resetModel();
     }
     onReSizeView() {
         let mixH = 1;
         if (this.lastUsedData) {
-            mixH = commandDispatcher.cfg.wholeHeight();
+            mixH = globalCommandDispatcher.cfg().wholeHeight();
         }
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
@@ -689,29 +692,30 @@ class TimeSelectBar {
         this.selectionAnchor.hh = viewHeight * 1024;
         this.selectionMark.h = viewHeight * 1024;
     }
-    updateTimeSelectionBar(cfg) {
-        if (cfg.data.selection) {
+    updateTimeSelectionBar() {
+        let selection = globalCommandDispatcher.cfg().data.selection;
+        if (selection) {
             let mm = MMUtil();
-            let barLeft = cfg.leftPad;
+            let barLeft = globalCommandDispatcher.cfg().leftPad;
             let startSel = 1;
             let widthSel = 0;
             let startIdx = 0;
-            for (startIdx = 0; startIdx < cfg.data.timeline.length; startIdx++) {
-                let curBar = cfg.data.timeline[startIdx];
+            for (startIdx = 0; startIdx < globalCommandDispatcher.cfg().data.timeline.length; startIdx++) {
+                let curBar = globalCommandDispatcher.cfg().data.timeline[startIdx];
                 let curMeasureMeter = mm.set(curBar.metre);
-                let barWidth = curMeasureMeter.duration(curBar.tempo) * cfg.widthDurationRatio;
-                if (startIdx == cfg.data.selection.startMeasure) {
+                let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                if (startIdx == selection.startMeasure) {
                     startSel = barLeft;
                     break;
                 }
                 barLeft = barLeft + barWidth;
             }
-            for (let ii = startIdx; ii < cfg.data.timeline.length; ii++) {
-                let curBar = cfg.data.timeline[ii];
+            for (let ii = startIdx; ii < globalCommandDispatcher.cfg().data.timeline.length; ii++) {
+                let curBar = globalCommandDispatcher.cfg().data.timeline[ii];
                 let curMeasureMeter = mm.set(curBar.metre);
-                let barWidth = curMeasureMeter.duration(curBar.tempo) * cfg.widthDurationRatio;
+                let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
                 widthSel = widthSel + barWidth;
-                if (ii == cfg.data.selection.endMeasure) {
+                if (ii == selection.endMeasure) {
                     break;
                 }
             }
@@ -730,7 +734,7 @@ class TimeSelectBar {
         let mark = {
             x: barLeft, y: 0, w: size, h: size,
             css: 'timeMarkButtonCircle', activation: (x, y) => {
-                commandDispatcher.expandTimeLineSelection(barIdx);
+                globalCommandDispatcher.expandTimeLineSelection(barIdx);
             }
         };
         measureAnchor.content.push(mark);
@@ -822,7 +826,7 @@ class TimeSelectBar {
             }
         }
         this.selectBarAnchor.content = this.zoomAnchors;
-        this.updateTimeSelectionBar(cfg);
+        this.updateTimeSelectionBar();
     }
 }
 class UIToolbar {
@@ -830,8 +834,8 @@ class UIToolbar {
     }
     createToolbar() {
         this.menuButton = new ToolBarButton([icon_ver_menu], 1, 0, (nn) => {
-            commandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
-            commandDispatcher.showRightMenu();
+            globalCommandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
+            globalCommandDispatcher.showRightMenu();
         });
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
         this.toolBarAnchor = {
@@ -878,7 +882,6 @@ class ToolBarButton {
 }
 class RightMenuPanel {
     constructor() {
-        this.showState = true;
         this.lastWidth = 0;
         this.lastHeight = 0;
         this.items = [];
@@ -888,10 +891,10 @@ class RightMenuPanel {
         this.itemsWidth = 0;
     }
     resetAllAnchors() {
-        commandDispatcher.resetAnchor(this.menuPanelBackground, this.backgroundAnchor, LevelModes.overlay);
-        commandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
-        commandDispatcher.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
-        commandDispatcher.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
+        globalCommandDispatcher.resetAnchor(this.menuPanelBackground, this.backgroundAnchor, LevelModes.overlay);
+        globalCommandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
+        globalCommandDispatcher.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
+        globalCommandDispatcher.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
     }
     createMenu() {
         this.menuPanelBackground = document.getElementById("menuPanelBackground");
@@ -902,7 +905,7 @@ class RightMenuPanel {
         this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
         this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
         this.menuCloseButton = new IconLabelButton([icon_moveright], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
-            this.showState = false;
+            globalCommandDispatcher.cfg().data.list = false;
             this.resizeMenu(this.lastWidth, this.lastHeight);
             this.resetAllAnchors();
         });
@@ -967,7 +970,7 @@ class RightMenuPanel {
         }
         this.scrollY = yy;
         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
-        commandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
+        globalCommandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
     fillMenuItems() {
         this.items = [];
@@ -1063,11 +1066,11 @@ class RightMenuPanel {
                 text: track.title,
                 noLocalization: true,
                 onClick: () => {
-                    commandDispatcher.moveTrackTop(tt);
+                    globalCommandDispatcher.moveTrackTop(tt);
                 },
                 onSubClick: () => {
                     let state = item.selection ? item.selection : 0;
-                    commandDispatcher.setTrackSoloState(state);
+                    globalCommandDispatcher.setTrackSoloState(state);
                 },
                 itemStates: [icon_sound_low, icon_hide, icon_sound_loud],
                 selection: 0
@@ -1081,11 +1084,11 @@ class RightMenuPanel {
                 text: drum.title,
                 noLocalization: true,
                 onClick: () => {
-                    commandDispatcher.moveDrumTop(tt);
+                    globalCommandDispatcher.moveDrumTop(tt);
                 },
                 onSubClick: () => {
                     let state = item.selection ? item.selection : 0;
-                    commandDispatcher.setDrumSoloState(state);
+                    globalCommandDispatcher.setDrumSoloState(state);
                 },
                 itemStates: [icon_sound_low, icon_hide, icon_sound_loud],
                 selection: 0
@@ -1100,7 +1103,7 @@ class RightMenuPanel {
                     text: filter.automation.title,
                     noLocalization: true,
                     onClick: () => {
-                        commandDispatcher.moveAutomationTop(ff);
+                        globalCommandDispatcher.moveAutomationTop(ff);
                     },
                     onSubClick: () => {
                     },
@@ -1128,7 +1131,7 @@ class RightMenuPanel {
             this.contentAnchor.content.push(tile);
             position = position + this.items[ii].calculateHeight();
         }
-        commandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
+        globalCommandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
     }
     resizeMenu(viewWidth, viewHeight) {
         this.lastWidth = viewWidth;
@@ -1140,7 +1143,7 @@ class RightMenuPanel {
             this.itemsWidth = 2;
         }
         this.shiftX = viewWidth - this.itemsWidth;
-        if (!this.showState) {
+        if (!globalCommandDispatcher.cfg().data.list) {
             this.shiftX = viewWidth + 1;
         }
         else {
@@ -1178,6 +1181,7 @@ class RightMenuPanel {
         this.menuCloseButton.resize(this.shiftX + this.itemsWidth - 1, viewHeight - 1, 1);
         this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
         this.rerenderMenuContent(null);
+        console.log('globalCommandDispatcher.cfg.data.list', globalCommandDispatcher.cfg().data.list);
     }
 }
 class RightMenuItem {
@@ -1331,19 +1335,19 @@ let menuPointSamplers = {
 let menuPointTracks = {
     text: localMenuTracksFolder,
     onOpen: () => {
-        commandDispatcher.upTracksLayer();
+        globalCommandDispatcher.upTracksLayer();
     }
 };
 let menuPointPercussion = {
     text: localMenuPercussionFolder,
     onOpen: () => {
-        commandDispatcher.upDrumsLayer();
+        globalCommandDispatcher.upDrumsLayer();
     }
 };
 let menuPointAutomation = {
     text: localMenuAutomationFolder,
     onOpen: () => {
-        commandDispatcher.upAutoLayer();
+        globalCommandDispatcher.upAutoLayer();
     }
 };
 function fillPluginsLists() {
@@ -1358,10 +1362,10 @@ function fillPluginsLists() {
         if (purpose == MZXBX_PluginPurpose.Action) {
             menuPointActions.children.push({
                 text: label, noLocalization: true, onClick: () => {
-                    commandDispatcher.promptProjectPluginGUI(label, url, (obj) => {
+                    globalCommandDispatcher.promptProjectPluginGUI(label, url, (obj) => {
                         let project = JSON.parse(obj);
-                        commandDispatcher.registerWorkProject(project);
-                        commandDispatcher.resetProject();
+                        globalCommandDispatcher.registerWorkProject(project);
+                        globalCommandDispatcher.resetProject();
                         return true;
                     });
                 }
@@ -1379,7 +1383,7 @@ function fillPluginsLists() {
                 if (purpose == MZXBX_PluginPurpose.Performer) {
                     menuPointPerformers.children.push({
                         text: label, noLocalization: true, onClick: () => {
-                            commandDispatcher.promptPointPluginGUI(label, url, (obj) => {
+                            globalCommandDispatcher.promptPointPluginGUI(label, url, (obj) => {
                                 console.log('performer callback', obj);
                                 return true;
                             });
@@ -1412,7 +1416,7 @@ function composeBaseMenu() {
             {
                 text: localMenuPlayPause, onClick: () => {
                     console.log('start/stop');
-                    commandDispatcher.toggleStartStop();
+                    globalCommandDispatcher.toggleStartStop();
                 }
             },
             {
@@ -1422,17 +1426,17 @@ function composeBaseMenu() {
                             {
                                 text: 'Small', onClick: () => {
                                     startLoadCSSfile('theme/sizesmall.css');
-                                    commandDispatcher.changeTapSize(1);
+                                    globalCommandDispatcher.changeTapSize(1);
                                 }
                             }, {
                                 text: 'Big', onClick: () => {
                                     startLoadCSSfile('theme/sizebig.css');
-                                    commandDispatcher.changeTapSize(1.5);
+                                    globalCommandDispatcher.changeTapSize(1.5);
                                 }
                             }, {
                                 text: 'Huge', onClick: () => {
                                     startLoadCSSfile('theme/sizehuge.css');
-                                    commandDispatcher.changeTapSize(4);
+                                    globalCommandDispatcher.changeTapSize(4);
                                 }
                             }
                         ]
@@ -1440,15 +1444,15 @@ function composeBaseMenu() {
                         text: 'Locale', children: [
                             {
                                 text: 'Russian', onClick: () => {
-                                    commandDispatcher.setThemeLocale('ru', 1);
+                                    globalCommandDispatcher.setThemeLocale('ru', 1);
                                 }
                             }, {
                                 text: 'English', onClick: () => {
-                                    commandDispatcher.setThemeLocale('en', 1);
+                                    globalCommandDispatcher.setThemeLocale('en', 1);
                                 }
                             }, {
                                 text: '中文界面语言', onClick: () => {
-                                    commandDispatcher.setThemeLocale('zh', 1.5);
+                                    globalCommandDispatcher.setThemeLocale('zh', 1.5);
                                 }
                             }
                         ]
@@ -1456,15 +1460,15 @@ function composeBaseMenu() {
                         text: 'Colors', children: [
                             {
                                 text: 'Red', onClick: () => {
-                                    commandDispatcher.setThemeColor('theme/colordarkred.css');
+                                    globalCommandDispatcher.setThemeColor('theme/colordarkred.css');
                                 }
                             }, {
                                 text: 'Green', onClick: () => {
-                                    commandDispatcher.setThemeColor('theme/colordarkgreen.css');
+                                    globalCommandDispatcher.setThemeColor('theme/colordarkgreen.css');
                                 }
                             }, {
                                 text: 'Blue', onClick: () => {
-                                    commandDispatcher.setThemeColor('theme/colordarkblue.css');
+                                    globalCommandDispatcher.setThemeColor('theme/colordarkblue.css');
                                 }
                             }
                         ]
@@ -1473,7 +1477,7 @@ function composeBaseMenu() {
             },
             {
                 text: localMenuCommentsLayer, onClick: () => {
-                    commandDispatcher.upCommentsLayer();
+                    globalCommandDispatcher.upCommentsLayer();
                 }
             },
             menuPointAutomation,
@@ -2280,7 +2284,8 @@ class PerformerIcon {
             let txt = { text: audioSeq.kind + ':' + audioSeq.id, x: xx, y: yy + cfg.pluginIconSize, css: 'fanSamplerIcon' };
             fanLevelAnchor.content.push(txt);
         }
-        new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconSize / 2, xx, yy + cfg.pluginIconSize / 2, fanLevelAnchor, 'fanStream');
+        let controlLineWidth = xx - cfg.leftPad - cfg.timelineWidth() - cfg.padGridFan;
+        new ControlConnection().addLineFlow(cfg, yy + cfg.pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
         this.addOutputs(cfg, audioSeq.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
     }
     addOutputs(cfg, outputs, fanLevelAnchor, zidx, fromX, fromY) {
@@ -2299,7 +2304,7 @@ class PerformerIcon {
                                 xx = left + toFilter.iconPosition.x;
                                 yy = top + toFilter.iconPosition.y + cfg.pluginIconSize / 2;
                             }
-                            new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanConnection');
+                            new SpearConnection().addSpear(fromX, fromY, xx, yy, fanLevelAnchor);
                             break;
                         }
                     }
@@ -2307,7 +2312,7 @@ class PerformerIcon {
             }
             else {
                 let speakerX = cfg.wholeWidth() - cfg.speakerIconPad - cfg.rightPad;
-                new SpearConnection().addSpear(3, fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanConnection');
+                new SpearConnection().addSpear(fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor);
             }
     }
 }
@@ -2333,13 +2338,14 @@ class SamplerIcon {
             xx = left + sampler.iconPosition.x;
             yy = top + sampler.iconPosition.y;
         }
+        let controlLineWidth = xx - cfg.leftPad - cfg.timelineWidth() - cfg.padGridFan;
         let rec = { x: xx, y: yy, w: cfg.pluginIconSize, h: cfg.pluginIconSize, rx: cfg.pluginIconSize / 2, ry: cfg.pluginIconSize / 2, css: 'fanSamplerIcon' };
         fanLevelAnchor.content.push(rec);
         if (zidx < 5) {
             let txt = { text: sampler.kind + ':' + sampler.id, x: xx, y: yy + cfg.pluginIconSize, css: 'fanSamplerIcon' };
             fanLevelAnchor.content.push(txt);
         }
-        new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconSize / 2, xx, yy + cfg.pluginIconSize / 2, fanLevelAnchor, 'fanStream');
+        new ControlConnection().addLineFlow(cfg, yy + cfg.pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
         this.addOutputs(cfg, sampler.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
     }
     addOutputs(cfg, outputs, fanLevelAnchor, zidx, fromX, fromY) {
@@ -2358,7 +2364,7 @@ class SamplerIcon {
                                 xx = left + toFilter.iconPosition.x;
                                 yy = top + toFilter.iconPosition.y + cfg.pluginIconSize / 2;
                             }
-                            new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanConnection');
+                            new SpearConnection().addSpear(fromX, fromY, xx, yy, fanLevelAnchor);
                             break;
                         }
                     }
@@ -2366,7 +2372,7 @@ class SamplerIcon {
             }
             else {
                 let speakerX = cfg.wholeWidth() - cfg.speakerIconPad - cfg.rightPad;
-                new SpearConnection().addSpear(3, fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanConnection');
+                new SpearConnection().addSpear(fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor);
             }
     }
 }
@@ -2426,7 +2432,8 @@ class FilterIcon {
             let txt = { text: '' + filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconSize, css: 'fanSamplerIcon' };
             fanLevelAnchor.content.push(txt);
         }
-        new SpearConnection().addSpear(3, cfg.leftPad + cfg.timelineWidth(), yy + cfg.pluginIconSize / 2, xx, yy + cfg.pluginIconSize / 2, fanLevelAnchor, 'fanStream');
+        let controlLineWidth = xx - cfg.leftPad - cfg.timelineWidth() - cfg.padGridFan;
+        new ControlConnection().addLineFlow(cfg, yy + cfg.pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
         this.addOutputs(cfg, filterTarget.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
     }
     addOutputs(cfg, outputs, fanLevelAnchor, zidx, fromX, fromY) {
@@ -2445,7 +2452,7 @@ class FilterIcon {
                                 xx = left + toFilter.iconPosition.x;
                                 yy = top + toFilter.iconPosition.y + cfg.pluginIconSize / 2;
                             }
-                            new SpearConnection().addSpear(3, fromX, fromY, xx, yy, fanLevelAnchor, 'fanConnection');
+                            new SpearConnection().addSpear(fromX, fromY, xx, yy, fanLevelAnchor);
                             break;
                         }
                     }
@@ -2453,14 +2460,24 @@ class FilterIcon {
             }
             else {
                 let speakerX = cfg.wholeWidth() - cfg.speakerIconPad - cfg.rightPad;
-                new SpearConnection().addSpear(3, fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor, 'fanConnection');
+                new SpearConnection().addSpear(fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor);
             }
+    }
+}
+class ControlConnection {
+    addLineFlow(cfg, yy, ww, anchor) {
+        let css = 'debug';
+        let left = cfg.leftPad + cfg.timelineWidth();
+        let line = { x: left, y: yy, w: ww, h: 8, css: css };
+        anchor.content.push(line);
     }
 }
 class SpearConnection {
     constructor() {
     }
-    addSpear(headLen, fromX, fromY, toX, toY, anchor, css) {
+    addSpear(fromX, fromY, toX, toY, anchor) {
+        let headLen = 3;
+        let css = 'fanConnection';
         let mainLine = { x1: fromX, x2: toX, y1: fromY, y2: toY, css: css };
         anchor.content.push(mainLine);
         let angle = Math.atan2(toY - fromY, toX - fromX);
@@ -2586,7 +2603,7 @@ class WarningUI {
         this.warningDescription = { x: 0, y: 0, text: 'Use mouse or touchpad to move and zoom piano roll', css: 'warningDescription' };
         this.warningGroup = document.getElementById("warningDialogGroup");
         this.warningRectangle = { x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: () => {
-                commandDispatcher.initAudioFromUI();
+                globalCommandDispatcher.initAudioFromUI();
                 me.cancel();
             }
         };

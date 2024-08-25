@@ -1,7 +1,7 @@
 class RightMenuPanel {
 	menuCloseButton: IconLabelButton;
 	menuUpButton: IconLabelButton;
-	showState: boolean = true;
+	//showState: boolean = true;
 	lastWidth: number = 0;
 	lastHeight: number = 0;
 
@@ -39,10 +39,10 @@ class RightMenuPanel {
 	}
 	resetAllAnchors() {
 
-		commandDispatcher.resetAnchor(this.menuPanelBackground, this.backgroundAnchor, LevelModes.overlay);
-		commandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
-		commandDispatcher.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
-		commandDispatcher.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
+		globalCommandDispatcher.resetAnchor(this.menuPanelBackground, this.backgroundAnchor, LevelModes.overlay);
+		globalCommandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
+		globalCommandDispatcher.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
+		globalCommandDispatcher.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
 	}
 
 	createMenu(): TileLayerDefinition[] {
@@ -58,7 +58,7 @@ class RightMenuPanel {
 
 		this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
 		this.menuCloseButton = new IconLabelButton([icon_moveright], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
-			this.showState = false;
+			globalCommandDispatcher.cfg().data.list = false;
 			this.resizeMenu(this.lastWidth, this.lastHeight);
 			this.resetAllAnchors();
 		});
@@ -132,7 +132,7 @@ class RightMenuPanel {
 
 		this.scrollY = yy;
 		this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
-		commandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
+		globalCommandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
 	}
 
 	fillMenuItems() {
@@ -237,12 +237,12 @@ class RightMenuPanel {
 				, noLocalization: true
 				, onClick: () => {
 
-					commandDispatcher.moveTrackTop(tt);
+					globalCommandDispatcher.moveTrackTop(tt);
 				}
 				, onSubClick: () => {
 
 					let state = item.selection ? item.selection : 0;
-					commandDispatcher.setTrackSoloState(state);
+					globalCommandDispatcher.setTrackSoloState(state);
 				}
 				, itemStates: [icon_sound_low, icon_hide, icon_sound_loud]
 				, selection: 0
@@ -258,12 +258,12 @@ class RightMenuPanel {
 				, noLocalization: true
 				, onClick: () => {
 
-					commandDispatcher.moveDrumTop(tt);
+					globalCommandDispatcher.moveDrumTop(tt);
 				}
 				, onSubClick: () => {
 
 					let state = item.selection ? item.selection : 0;
-					commandDispatcher.setDrumSoloState(state);
+					globalCommandDispatcher.setDrumSoloState(state);
 				}
 				, itemStates: [icon_sound_low, icon_hide, icon_sound_loud]
 				, selection: 0
@@ -282,12 +282,12 @@ class RightMenuPanel {
 					, noLocalization: true
 					, onClick: () => {
 
-						commandDispatcher.moveAutomationTop(ff);
+						globalCommandDispatcher.moveAutomationTop(ff);
 					}
 					, onSubClick: () => {
 
 						//let state = item.selection ? item.selection : 0;
-						//commandDispatcher.setDrumSoloState(state);
+						//globalCommandDispatcher.setDrumSoloState(state);
 					}
 					, itemStates: [icon_sound_low, icon_hide, icon_sound_loud]
 					, selection: 0
@@ -318,7 +318,7 @@ class RightMenuPanel {
 			position = position + this.items[ii].calculateHeight();
 		}
 
-		commandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
+		globalCommandDispatcher.resetAnchor(this.menuPanelContent, this.contentAnchor, LevelModes.overlay);
 
 	}
 	resizeMenu(viewWidth: number, viewHeight: number) {
@@ -331,7 +331,7 @@ class RightMenuPanel {
 			this.itemsWidth = 2;
 		}
 		this.shiftX = viewWidth - this.itemsWidth;
-		if (!this.showState) {
+		if (!globalCommandDispatcher.cfg().data.list) {
 			this.shiftX = viewWidth + 1;
 
 		} else {
@@ -384,6 +384,10 @@ class RightMenuPanel {
 
 
 		this.rerenderMenuContent(null);
+
+
+		//cfg.data.list=this.showState;
+		console.log('globalCommandDispatcher.cfg.data.list',globalCommandDispatcher.cfg().data.list);
 	}
 
 }

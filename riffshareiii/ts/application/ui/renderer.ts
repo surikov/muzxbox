@@ -82,7 +82,7 @@ class UIRenderer {//} implements RenderedPart {
 	lastUsedData: Zvoog_Project;
 	constructor() {
 		//this.commands = commands;
-		commandDispatcher.registerUI(this);
+		globalCommandDispatcher.registerUI(this);
 	}
 	/* resetAnchor: (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) => void
 		 = (parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void => {
@@ -160,21 +160,22 @@ class UIRenderer {//} implements RenderedPart {
 	}
 
 	fillWholeUI() {
-		//let mixm: MixerDataMath = new MixerDataMath(commandDispatcher.cfg.data);
+		//let mixm: MixerDataMath = new MixerDataMath(globalCommandDispatcher.cfg.data);
 		let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
 		let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
-		this.tiler.resetInnerSize(commandDispatcher.cfg.wholeWidth(), commandDispatcher.cfg.wholeHeight());
+		this.tiler.resetInnerSize(globalCommandDispatcher.cfg().wholeWidth()
+		, globalCommandDispatcher.cfg().wholeHeight());
 
-		this.mixer.reFillMixerUI(commandDispatcher.cfg);
-		this.leftPanel.reFillLeftPanel(commandDispatcher.cfg);
+		this.mixer.reFillMixerUI(globalCommandDispatcher.cfg());
+		this.leftPanel.reFillLeftPanel(globalCommandDispatcher.cfg());
 
-		this.debug.resetDebugView(commandDispatcher.cfg);
+		this.debug.resetDebugView(globalCommandDispatcher.cfg());
 
 		//this.toolbar.fillToolbar(vw, vh);
 		this.toolbar.resizeToolbar(vw, vh);
 
 		//this.menu.fillMenuItems();
-		this.menu.readCurrentSongData(commandDispatcher.cfg.data);
+		this.menu.readCurrentSongData(globalCommandDispatcher.cfg().data);
 		this.menu.resizeMenu(vw, vh);
 		//this.menu.rerenderContent();
 		//this.warning.resetDialogView(data);
@@ -183,7 +184,7 @@ class UIRenderer {//} implements RenderedPart {
 		});
 
 
-		this.timeselectbar.fillTimeBar(commandDispatcher.cfg);
+		this.timeselectbar.fillTimeBar(globalCommandDispatcher.cfg());
 		this.timeselectbar.resizeTimeScale(vw, vh);
 
 		//this.leftBar.resizeHeaders(mixm.mixerHeight(), vw, vh, this.tiler.getCurrentPointPosition().z);
@@ -199,7 +200,7 @@ class UIRenderer {//} implements RenderedPart {
 		let mixH = 1;
 		if (this.lastUsedData) {
 			//let mixm: MixerDataMath = new MixerDataMath(this.lastUsedData);
-			mixH = commandDispatcher.cfg.wholeHeight();
+			mixH = globalCommandDispatcher.cfg().wholeHeight();
 		}
 		let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
 		let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();

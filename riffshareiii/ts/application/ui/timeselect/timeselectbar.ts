@@ -55,32 +55,32 @@ class TimeSelectBar {
 		this.selectionMark.h = viewHeight * 1024;
 	}
 	updateTimeSelectionBar(//data: Zvoog_Project
-	cfg:MixerDataMathUtility
+	//cfg:MixerDataMathUtility
 	) {
-		
-		if (cfg.data.selection) {
+		let selection: Zvoog_Selection|undefined=globalCommandDispatcher.cfg().data.selection;
+		if (selection) {
 			//let mixm: MixerDataMath = new MixerDataMath(data);
 			let mm: Zvoog_MetreMathType = MMUtil();
-			let barLeft = cfg.leftPad;
+			let barLeft = globalCommandDispatcher.cfg().leftPad;
 			let startSel = 1;
 			let widthSel = 0;
 			let startIdx = 0;
-			for (startIdx = 0; startIdx < cfg.data.timeline.length; startIdx++) {
-				let curBar = cfg.data.timeline[startIdx];
+			for (startIdx = 0; startIdx < globalCommandDispatcher.cfg().data.timeline.length; startIdx++) {
+				let curBar = globalCommandDispatcher.cfg().data.timeline[startIdx];
 				let curMeasureMeter = mm.set(curBar.metre);
-				let barWidth = curMeasureMeter.duration(curBar.tempo) * cfg.widthDurationRatio;
-				if (startIdx == cfg.data.selection.startMeasure) {
+				let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+				if (startIdx == selection.startMeasure) {
 					startSel = barLeft;
 					break;
 				}
 				barLeft = barLeft + barWidth;
 			}
-			for (let ii = startIdx; ii < cfg.data.timeline.length; ii++) {
-				let curBar = cfg.data.timeline[ii];
+			for (let ii = startIdx; ii < globalCommandDispatcher.cfg().data.timeline.length; ii++) {
+				let curBar = globalCommandDispatcher.cfg().data.timeline[ii];
 				let curMeasureMeter = mm.set(curBar.metre);
-				let barWidth = curMeasureMeter.duration(curBar.tempo) * cfg.widthDurationRatio;
+				let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 				widthSel = widthSel + barWidth;
-				if (ii == cfg.data.selection.endMeasure) {
+				if (ii == selection.endMeasure) {
 					break;
 				}
 			}
@@ -104,7 +104,7 @@ class TimeSelectBar {
 			//, rx: size / 2, ry: size / 2
 			, css: 'timeMarkButtonCircle', activation: (x, y) => {
 				//console.log('barIdx', barIdx);
-				commandDispatcher.expandTimeLineSelection(barIdx);
+				globalCommandDispatcher.expandTimeLineSelection(barIdx);
 			}
 		};
 		measureAnchor.content.push(mark);
@@ -224,6 +224,6 @@ class TimeSelectBar {
 			}
 		}
 		this.selectBarAnchor.content = this.zoomAnchors;
-		this.updateTimeSelectionBar(cfg);
+		this.updateTimeSelectionBar();
 	}
 }

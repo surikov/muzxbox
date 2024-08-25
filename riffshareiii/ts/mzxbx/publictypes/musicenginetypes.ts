@@ -125,6 +125,12 @@ type Zvoog_Project = {
 	filters: Zvoog_FilterTarget[];
 	selection?: Zvoog_Selection;
 	focus?: 0 | 1 | 2 | 3;//track/drum/auto/comment
+	position?: {
+		x: number;
+		y: number;
+		z: number;
+	};
+	list?:boolean;
 };
 
 

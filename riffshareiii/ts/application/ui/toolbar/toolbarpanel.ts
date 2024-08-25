@@ -9,8 +9,8 @@ class UIToolbar {
     }
     createToolbar():TileLayerDefinition[]{
         this.menuButton = new ToolBarButton([icon_ver_menu], 1, 0, (nn: number) => {
-            commandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
-            commandDispatcher.showRightMenu();
+            globalCommandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
+            globalCommandDispatcher.showRightMenu();
         });
         this.toolBarGroup = (document.getElementById("toolBarPanelGroup") as any) as SVGElement;
         this.toolBarAnchor = {

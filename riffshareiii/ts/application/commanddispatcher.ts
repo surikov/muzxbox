@@ -8,9 +8,11 @@ class CommandDispatcher {
 	tapSizeRatio: number = 1;
 	onAir = false;
 	//currentLOadedProject: Zvoog_Project;
-	cfg: MixerDataMathUtility;
+	_cfg: MixerDataMathUtility;
 	listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any) = null;
-
+cfg(): MixerDataMathUtility{
+	return this._cfg;
+}
 	initAudioFromUI() {
 		console.log('initAudioFromUI');
 		var AudioContext = window.AudioContext;// || window.webkitAudioContext;
@@ -19,7 +21,7 @@ class CommandDispatcher {
 	}
 	registerWorkProject(data: Zvoog_Project) {
 		//this.currentLOadedProject = data;
-		this.cfg = new MixerDataMathUtility(data);
+		this._cfg = new MixerDataMathUtility(data);
 	}
 	//cfg.data: Zvoog_Project {
 	//	return this.currentLOadedProject;
@@ -30,9 +32,11 @@ class CommandDispatcher {
 	showRightMenu() {
 		let vw = this.renderer.tileLevelSVG.clientWidth / this.renderer.tiler.tapPxSize();
 		let vh = this.renderer.tileLevelSVG.clientHeight / this.renderer.tiler.tapPxSize();
-		this.renderer.menu.showState = !this.renderer.menu.showState;
+		//this.renderer.menu.showState = !this.renderer.menu.showState;
+		this.cfg().data.list=true;
 		this.renderer.menu.resizeMenu(vw, vh);
 		this.renderer.menu.resetAllAnchors();
+		
 	};
 	toggleStartStop() {
 		console.log('toggleStartStop');
@@ -134,17 +138,17 @@ class CommandDispatcher {
 
 	moveTrackTop(trackNum: number) {
 		console.log('moveTrackTop', trackNum);
-		let it = this.cfg.data.tracks[trackNum];
-		this.cfg.data.tracks.splice(trackNum, 1);
-		this.cfg.data.tracks.unshift(it);
+		let it = this.cfg().data.tracks[trackNum];
+		this.cfg().data.tracks.splice(trackNum, 1);
+		this.cfg().data.tracks.unshift(it);
 		this.upTracksLayer();
 	}
 	moveDrumTop(drumNum: number) {
 		console.log('moveDrumTop', drumNum);
 		//console.log('moveTrackTop', trackNum);
-		let it = this.cfg.data.percussions[drumNum];
-		this.cfg.data.percussions.splice(drumNum, 1);
-		this.cfg.data.percussions.unshift(it);
+		let it = this.cfg().data.percussions[drumNum];
+		this.cfg().data.percussions.splice(drumNum, 1);
+		this.cfg().data.percussions.unshift(it);
 		this.upDrumsLayer();
 	}
 	moveAutomationTop(filterNum: number) {
@@ -153,30 +157,30 @@ class CommandDispatcher {
 	}
 	upTracksLayer() {
 		console.log('upTracksLayer');
-		this.cfg.data.focus = 0;
+		this.cfg().data.focus = 0;
 		this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
-		if (this.cfg.data.tracks)
-			if (this.cfg.data.tracks[0])
-				this.renderer.menu.layerCurrentTitle.text = this.cfg.data.tracks[0].title;
-		commandDispatcher.resetProject();
+		if (this.cfg().data.tracks)
+			if (this.cfg().data.tracks[0])
+				this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
+		this.resetProject();
 	}
 	upDrumsLayer() {
 		console.log('upDrumsLayer');
-		this.cfg.data.focus = 1;
+		this.cfg().data.focus = 1;
 		this.renderer.menu.layerCurrentTitle.text = LO(localMenuPercussionFolder);
-		commandDispatcher.resetProject();
+		this.resetProject();
 	}
 	upAutoLayer() {
 		console.log('upAutoayer');
-		this.cfg.data.focus = 2;
+		this.cfg().data.focus = 2;
 		this.renderer.menu.layerCurrentTitle.text = LO(localMenuAutomationFolder);
-		commandDispatcher.resetProject();
+		this.resetProject();
 	}
 	upCommentsLayer() {
 		console.log('upCommentsLayer');
-		this.cfg.data.focus = 3;
+		this.cfg().data.focus = 3;
 		this.renderer.menu.layerCurrentTitle.text = LO(localMenuCommentsLayer);
-		commandDispatcher.resetProject();
+		this.resetProject();
 	}
 
 
@@ -241,7 +245,7 @@ class CommandDispatcher {
 	promptProjectPluginGUI(label: string, url: string, callback: (obj: any) => boolean) {
 		console.log('promptProjectPluginGUI', url);
 
-		let projectClone: string = JSON.stringify(this.cfg.data);
+		let projectClone: string = JSON.stringify(this.cfg().data);
 		pluginDialogPrompt.openDialogFrame(label, url, projectClone, callback);
 
 		//let pluginFrame = document.getElementById("pluginFrame") as any;
@@ -322,9 +326,9 @@ class CommandDispatcher {
 	}*/
 	expandTimeLineSelection(idx: number) {
 		console.log('select bar', idx);
-		if (this.cfg.data) {
-			if (idx >= 0 && idx < this.cfg.data.timeline.length) {
-				let curPro = this.cfg.data;
+		if (this.cfg().data) {
+			if (idx >= 0 && idx < this.cfg().data.timeline.length) {
+				let curPro = this.cfg().data;
 				if (curPro.selection) {
 					let curProjectSelection: Zvoog_Selection = curPro.selection;
 					if (curProjectSelection.startMeasure == curProjectSelection.endMeasure) {
@@ -351,11 +355,11 @@ class CommandDispatcher {
 			}
 		}
 		//console.log(this.workData.selection);
-		this.renderer.timeselectbar.updateTimeSelectionBar(this.cfg);
+		this.renderer.timeselectbar.updateTimeSelectionBar();
 		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
 			, this.renderer.timeselectbar.selectionAnchor
 			, LevelModes.top);
 	}
 }
-let commandDispatcher = new CommandDispatcher();
+let globalCommandDispatcher = new CommandDispatcher();
 let pluginDialogPrompt = new PluginDialogPrompt();

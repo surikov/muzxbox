@@ -35,8 +35,9 @@ declare class CommandDispatcher {
     audioContext: AudioContext;
     tapSizeRatio: number;
     onAir: boolean;
-    cfg: MixerDataMathUtility;
+    _cfg: MixerDataMathUtility;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
+    cfg(): MixerDataMathUtility;
     initAudioFromUI(): void;
     registerWorkProject(data: Zvoog_Project): void;
     registerUI(renderer: UIRenderer): void;
@@ -62,7 +63,7 @@ declare class CommandDispatcher {
     cancelPluginGUI(): void;
     expandTimeLineSelection(idx: number): void;
 }
-declare let commandDispatcher: CommandDispatcher;
+declare let globalCommandDispatcher: CommandDispatcher;
 declare let pluginDialogPrompt: PluginDialogPrompt;
 type GridTimeTemplate14 = {
     ratio: number;
@@ -132,7 +133,7 @@ declare class TimeSelectBar {
     constructor();
     createTimeScale(): TileLayerDefinition[];
     resizeTimeScale(viewWidth: number, viewHeight: number): void;
-    updateTimeSelectionBar(cfg: MixerDataMathUtility): void;
+    updateTimeSelectionBar(): void;
     createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, cfg: MixerDataMathUtility): void;
     createBarNumber(barLeft: number, barnum: number, zz: number, curBar: Zvoog_SongMeasure, measureAnchor: TileAnchor, barTime: number): void;
     fillTimeBar(cfg: MixerDataMathUtility): void;
@@ -156,7 +157,6 @@ declare class ToolBarButton {
 declare class RightMenuPanel {
     menuCloseButton: IconLabelButton;
     menuUpButton: IconLabelButton;
-    showState: boolean;
     lastWidth: number;
     lastHeight: number;
     backgroundRectangle: TileRectangle;
@@ -338,9 +338,12 @@ declare class FilterIcon {
     addAutoSpot(cfg: MixerDataMathUtility, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, zidx: number): void;
     addOutputs(cfg: MixerDataMathUtility, outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number): void;
 }
+declare class ControlConnection {
+    addLineFlow(cfg: MixerDataMathUtility, yy: number, ww: number, anchor: TileAnchor): void;
+}
 declare class SpearConnection {
     constructor();
-    addSpear(headLen: number, fromX: number, fromY: number, toX: number, toY: number, anchor: TileAnchor, css: string): void;
+    addSpear(fromX: number, fromY: number, toX: number, toY: number, anchor: TileAnchor): void;
 }
 declare class IconLabelButton {
     anchor: TileAnchor;
@@ -718,6 +721,12 @@ type Zvoog_Project = {
     filters: Zvoog_FilterTarget[];
     selection?: Zvoog_Selection;
     focus?: 0 | 1 | 2 | 3;
+    position?: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    list?: boolean;
 };
 type MZXBX_CachedWave = {
     path: string;

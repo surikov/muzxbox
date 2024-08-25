@@ -22,7 +22,7 @@
         "types": []
     },
     "files": [
-        "./TileLevel.ts",
+        "./tilelevel.ts",
         "./shortnames.ts",
         "./tilelevelutil.ts",
 		"./tileinteraction.ts",

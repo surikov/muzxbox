@@ -6,8 +6,8 @@ function startApplication() {
     //let commands = new CommandDispatcher();
     let ui = new UIRenderer();
     ui.createUI();
-    commandDispatcher.registerWorkProject(mzxbxProjectForTesting2);
-    commandDispatcher.resetProject();
+    globalCommandDispatcher.registerWorkProject(mzxbxProjectForTesting2);
+    globalCommandDispatcher.resetProject();
     //ui.fillWholeUI();//testBigMixerData);//testEmptyMixerData);
     //testNumMathUtil();
     //console.log('done startApplication');
@@ -19,7 +19,7 @@ function startApplication() {
 }
 function initWebAudioFromUI() {
     console.log('initWebAudioFromUI');
-    commandDispatcher.initAudioFromUI();
+    globalCommandDispatcher.initAudioFromUI();
 }
 function startLoadCSSfile(cssurl: string) {
     var head = document.getElementsByTagName('head')[0];

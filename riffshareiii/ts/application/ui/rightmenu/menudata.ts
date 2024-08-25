@@ -61,21 +61,21 @@ let menuPointSamplers: MenuInfo = {
 let menuPointTracks: MenuInfo = {
 	text: localMenuTracksFolder
 	, onOpen: () => {
-		commandDispatcher.upTracksLayer();
+		globalCommandDispatcher.upTracksLayer();
 	}
 };
 
 let menuPointPercussion: MenuInfo = {
 	text: localMenuPercussionFolder
 	, onOpen: () => {
-		commandDispatcher.upDrumsLayer();
+		globalCommandDispatcher.upDrumsLayer();
 	}
 };
 
 let menuPointAutomation: MenuInfo = {
 	text: localMenuAutomationFolder
 	, onOpen: () => {
-		commandDispatcher.upAutoLayer();
+		globalCommandDispatcher.upAutoLayer();
 	}
 };
 /*
@@ -100,11 +100,11 @@ function fillMenuImportPlugins() {
 
 			menuPointFileImport.children.push({
 				text: label, noLocalization: true, onClick: () => {
-					commandDispatcher.promptPluginGUI(label, url, (obj: any) => {
+					globalCommandDispatcher.promptPluginGUI(label, url, (obj: any) => {
 						//console.log('set project from', obj);
 
-						commandDispatcher.registerWorkProject(obj as Zvoog_Project);
-						commandDispatcher.resetProject();
+						globalCommandDispatcher.registerWorkProject(obj as Zvoog_Project);
+						globalCommandDispatcher.resetProject();
 						return true;
 					});
 				}
@@ -126,11 +126,11 @@ function fillPluginsLists() {
 		if (purpose == MZXBX_PluginPurpose.Action) {
 			menuPointActions.children.push({
 				text: label, noLocalization: true, onClick: () => {
-					commandDispatcher.promptProjectPluginGUI(label, url, (obj: any) => {
+					globalCommandDispatcher.promptProjectPluginGUI(label, url, (obj: any) => {
 						let project:Zvoog_Project=JSON.parse(obj);
 						//console.log(project);
-						commandDispatcher.registerWorkProject(project);
-						commandDispatcher.resetProject();
+						globalCommandDispatcher.registerWorkProject(project);
+						globalCommandDispatcher.resetProject();
 						return true;
 					});
 				}
@@ -146,7 +146,7 @@ function fillPluginsLists() {
 				if (purpose == MZXBX_PluginPurpose.Performer) {
 					menuPointPerformers.children.push({
 						text: label, noLocalization: true, onClick: () => {
-							commandDispatcher.promptPointPluginGUI(label, url, (obj: any) => {
+							globalCommandDispatcher.promptPointPluginGUI(label, url, (obj: any) => {
 								console.log('performer callback',obj);
 								return true;
 							});
@@ -177,20 +177,20 @@ function composeBaseMenu(): MenuInfo[] {
 			{
 				text: localMenuPlayPause, onClick: () => {
 console.log('start/stop');
-commandDispatcher.toggleStartStop();
+globalCommandDispatcher.toggleStartStop();
 				}
 			}
 			/*, {
 				text: localMenuImportMIDI, onClick: () => {
-					commandDispatcher.promptImportFromMIDI();
+					globalCommandDispatcher.promptImportFromMIDI();
 				}
 			}, {
 				text: "GP35Import", onClick: () => {
-					commandDispatcher.promptTestImport();
+					globalCommandDispatcher.promptTestImport();
 				}
 			}, {
 				text: "Test iFrame GUI", onClick: () => {
-					commandDispatcher.promptPluginGUI('Plugin UI', './web/test/plugin.html', (obj: any) => { return false });
+					globalCommandDispatcher.promptPluginGUI('Plugin UI', './web/test/plugin.html', (obj: any) => { return false });
 				}
 			}*/
 
@@ -203,17 +203,17 @@ commandDispatcher.toggleStartStop();
 							{
 								text: 'Small', onClick: () => {
 									startLoadCSSfile('theme/sizesmall.css');
-									commandDispatcher.changeTapSize(1);
+									globalCommandDispatcher.changeTapSize(1);
 								}
 							}, {
 								text: 'Big', onClick: () => {
 									startLoadCSSfile('theme/sizebig.css');
-									commandDispatcher.changeTapSize(1.5);
+									globalCommandDispatcher.changeTapSize(1.5);
 								}
 							}, {
 								text: 'Huge', onClick: () => {
 									startLoadCSSfile('theme/sizehuge.css');
-									commandDispatcher.changeTapSize(4);
+									globalCommandDispatcher.changeTapSize(4);
 								}
 							}
 						]
@@ -221,30 +221,30 @@ commandDispatcher.toggleStartStop();
 						text: 'Locale', children: [
 							{
 								text: 'Russian', onClick: () => {
-									commandDispatcher.setThemeLocale('ru', 1);
+									globalCommandDispatcher.setThemeLocale('ru', 1);
 								}
 							}, {
 								text: 'English', onClick: () => {
-									commandDispatcher.setThemeLocale('en', 1);
+									globalCommandDispatcher.setThemeLocale('en', 1);
 								}
 							}, {
 								text: '中文界面语言', onClick: () => {
-									commandDispatcher.setThemeLocale('zh', 1.5);
+									globalCommandDispatcher.setThemeLocale('zh', 1.5);
 								}
 							}]
 					}, {
 						text: 'Colors', children: [
 							{
 								text: 'Red', onClick: () => {
-									commandDispatcher.setThemeColor('theme/colordarkred.css');
+									globalCommandDispatcher.setThemeColor('theme/colordarkred.css');
 								}
 							}, {
 								text: 'Green', onClick: () => {
-									commandDispatcher.setThemeColor('theme/colordarkgreen.css');
+									globalCommandDispatcher.setThemeColor('theme/colordarkgreen.css');
 								}
 							}, {
 								text: 'Blue', onClick: () => {
-									commandDispatcher.setThemeColor('theme/colordarkblue.css');
+									globalCommandDispatcher.setThemeColor('theme/colordarkblue.css');
 								}
 							}
 						]
@@ -253,7 +253,7 @@ commandDispatcher.toggleStartStop();
 			}
 			, {
 				text: localMenuCommentsLayer, onClick: () => {
-					commandDispatcher.upCommentsLayer();
+					globalCommandDispatcher.upCommentsLayer();
 				}
 			}
 			, menuPointAutomation
