@@ -41,20 +41,20 @@ class LeftPanel {
 
 		}
 	}*/
-	reFillLeftPanel(cfg: MixerDataMathUtility) {
+	reFillLeftPanel() {
 		//console.log('reFillLeftPanel');
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		for (let zz = 0; zz < this.leftZoomAnchors.length; zz++) {
-			//this.leftZoomAnchors[zz].yy = cfg.gridTop();
-			//this.leftZoomAnchors[zz].hh = cfg.gridHeight();
-			this.leftZoomAnchors[zz].hh = cfg.wholeHeight();
+			//this.leftZoomAnchors[zz].yy = globalCommandDispatcher.cfg().gridTop();
+			//this.leftZoomAnchors[zz].hh = globalCommandDispatcher.cfg().gridHeight();
+			this.leftZoomAnchors[zz].hh = globalCommandDispatcher.cfg().wholeHeight();
 			this.leftZoomAnchors[zz].content = [];
-			for (let oo = 1; oo < cfg.octaveCount; oo++) {
+			for (let oo = 1; oo < globalCommandDispatcher.cfg().octaveCount; oo++) {
 				if (zz < 4) {
 					/*
 					let octavemark: TileRectangle = {
 						x: 0
-						, y: cfg.gridTop() + 12 * oo
+						, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo
 						, w: 2 * zoomPrefixLevelsCSS[zz].minZoom
 						, h: 0.5 * zoomPrefixLevelsCSS[zz].minZoom
 						, css: 'octaveMark'
@@ -63,8 +63,8 @@ class LeftPanel {
 					*/
 					let nm3: TileText = {
 						x: 1
-						, y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom
-						, text: '' + (cfg.octaveCount - oo + 0)
+						, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom
+						, text: '' + (globalCommandDispatcher.cfg().octaveCount - oo + 0)
 						, css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(nm3);
@@ -72,8 +72,8 @@ class LeftPanel {
 						nm3.x = 0.5;
 						let nm2: TileText = {
 							x: 0.5
-							, y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 6 * cfg.notePathHeight
-							, text: '' + (cfg.octaveCount - oo + 0)
+							, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 6 * globalCommandDispatcher.cfg().notePathHeight
+							, text: '' + (globalCommandDispatcher.cfg().octaveCount - oo + 0)
 							, css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
 						};
 						this.leftZoomAnchors[zz].content.push(nm2);
@@ -82,15 +82,15 @@ class LeftPanel {
 							nm3.x = 0.25;
 							let nm: TileText = {
 								x: 0.25
-								, y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 3 * cfg.notePathHeight
-								, text: '' + (cfg.octaveCount - oo + 0)
+								, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 3 * globalCommandDispatcher.cfg().notePathHeight
+								, text: '' + (globalCommandDispatcher.cfg().octaveCount - oo + 0)
 								, css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
 							};
 							this.leftZoomAnchors[zz].content.push(nm);
 							nm = {
 								x: 0.25
-								, y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 9 * cfg.notePathHeight
-								, text: '' + (cfg.octaveCount - oo + 0)
+								, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 9 * globalCommandDispatcher.cfg().notePathHeight
+								, text: '' + (globalCommandDispatcher.cfg().octaveCount - oo + 0)
 								, css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
 							};
 							this.leftZoomAnchors[zz].content.push(nm);
@@ -101,25 +101,25 @@ class LeftPanel {
 				}
 			}
 			/*
-			if (cfg.data.focus) {
+			if (globalCommandDispatcher.cfg().data.focus) {
 				//
 			} else {
-				if (cfg.data.tracks.length > 0) {
+				if (globalCommandDispatcher.cfg().data.tracks.length > 0) {
 					let trackLabel: TileText = {
-						text: '' + cfg.data.tracks[0].title
+						text: '' + globalCommandDispatcher.cfg().data.tracks[0].title
 						, x: 0
-						, y: cfg.gridTop()// + zoomPrefixLevelsCSS[zz].minZoom * 0.5
+						, y: globalCommandDispatcher.cfg().gridTop()// + zoomPrefixLevelsCSS[zz].minZoom * 0.5
 						, css: 'curTrackTitleLabel' + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(trackLabel);
 				}
 			}*/
 			if (zz < 4) {
-				for (let ss = 0; ss < cfg.data.percussions.length; ss++) {
+				for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++) {
 					let samplerLabel: TileText = {
-						text: '' + cfg.data.percussions[ss].title
+						text: '' + globalCommandDispatcher.cfg().data.percussions[ss].title
 						, x: 0
-						, y: cfg.gridTop() + cfg.gridHeight() - 2 * cfg.data.percussions.length + 2 * cfg.notePathHeight * ss + 2 * cfg.notePathHeight
+						, y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length + 2 * globalCommandDispatcher.cfg().notePathHeight * ss + 2 * globalCommandDispatcher.cfg().notePathHeight
 						, css: 'samplerRowLabel' + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(samplerLabel);
@@ -128,13 +128,13 @@ class LeftPanel {
 			}
 			if (zz < 4) {
 				let yy = 0;
-				for (let ff = 0; ff < cfg.data.filters.length; ff++) {
-					let filter = cfg.data.filters[ff];
+				for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
+					let filter = globalCommandDispatcher.cfg().data.filters[ff];
 					if (filter.automation) {
 						let autoLabel: TileText = {
 							text: '' + filter.automation.title
 							, x: 0
-							, y: (cfg.gridTop()+yy+1) * cfg.notePathHeight
+							, y: (globalCommandDispatcher.cfg().gridTop()+yy+1) * globalCommandDispatcher.cfg().notePathHeight
 							, css: 'autoRowLabel' + zoomPrefixLevelsCSS[zz].prefix
 						};
 						this.leftZoomAnchors[zz].content.push(autoLabel);

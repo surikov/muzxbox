@@ -16,12 +16,12 @@ class MixerUI {
 	}
 
 	reFillMixerUI(//data: Zvoog_Project
-		cfg: MixerDataMathUtility
+
 	) {
-		console.log('reFillMixerUI',this.fanLayer.anchors.length);
+		console.log('reFillMixerUI', this.fanLayer.anchors.length);
 		//let mixm: MixerDataMath = new MixerDataMath(data);
-		let ww = cfg.wholeWidth();
-		let hh = cfg.wholeHeight();
+		let ww = globalCommandDispatcher.cfg().wholeWidth();
+		let hh = globalCommandDispatcher.cfg().wholeHeight();
 		for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
 			//this.zoomLayers[ii].anchors[0].ww = ww;
 			//this.zoomLayers[ii].anchors[0].hh = hh;
@@ -36,21 +36,21 @@ class MixerUI {
 
 			this.fanLayer.anchors[ii].ww = ww;
 			this.fanLayer.anchors[ii].hh = hh;
-			this.fanLayer.anchors[ii].content=[];
-			
-			this.levels[ii].reCreateBars(cfg);
+			this.fanLayer.anchors[ii].content = [];
+
+			this.levels[ii].reCreateBars();
 		}
-		this.fanPane.resetPlates(cfg,this.fanLayer.anchors);
-		//this.iconsFanAnchor.ww = cfg.wholeWidth() - cfg.leftPad - cfg.rightPad;
-		//this.iconsFanAnchor.hh = cfg.gridHeight();
-		this.fillerAnchor.xx = cfg.leftPad;
-		this.fillerAnchor.yy = cfg.gridTop();
-		this.fillerAnchor.ww = cfg.wholeWidth() - cfg.leftPad - cfg.rightPad;
-		this.fillerAnchor.hh = cfg.gridHeight();
+		this.fanPane.resetPlates(this.fanLayer.anchors);
+		//this.iconsFanAnchor.ww = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().rightPad;
+		//this.iconsFanAnchor.hh = globalCommandDispatcher.cfg().gridHeight();
+		this.fillerAnchor.xx = globalCommandDispatcher.cfg().leftPad;
+		this.fillerAnchor.yy = globalCommandDispatcher.cfg().gridTop();
+		this.fillerAnchor.ww = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().rightPad;
+		this.fillerAnchor.hh = globalCommandDispatcher.cfg().gridHeight();
 		this.fillerAnchor.content = [];
-		this.reFillWholeRatio(cfg);
-		this.reFillSingleRatio(cfg);
-		
+		this.reFillWholeRatio();
+		this.reFillSingleRatio();
+
 	}
 	createMixerLayers(): TileLayerDefinition[] {
 		let tracksLayerZoom: SVGElement = (document.getElementById('tracksLayerZoom') as any) as SVGElement;
@@ -101,7 +101,7 @@ class MixerUI {
 
 			this.fanLayer.anchors.push(fanLevelAnchor);
 
-			
+
 
 			this.levels.push(new MixerZoomLevel(ii
 				, mixerGridAnchor
@@ -111,54 +111,54 @@ class MixerUI {
 
 			//
 		}
-		console.log('this.fanLayer',this.fanLayer);
+		console.log('this.fanLayer', this.fanLayer);
 		this.fillerAnchor = {
 			showZoom: zoomPrefixLevelsCSS[6].minZoom
 			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1
 			, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 		};
 		this.gridLayers.anchors.push(this.fillerAnchor);
-		return [this.gridLayers, this.trackLayers, this.firstLayers,this.fanLayer];
+		return [this.gridLayers, this.trackLayers, this.firstLayers, this.fanLayer];
 	}
-	reFillSingleRatio(cfg: MixerDataMathUtility) {
-		let countFunction: (cfg: MixerDataMathUtility, barIdx: number) => number;
-		let yy = cfg.gridTop() + cfg.gridHeight() / 8;
-		let hh = cfg.gridHeight() * 6 / 8;
-		if (cfg.data.focus) {
-			if (cfg.data.focus == 1) {
+	reFillSingleRatio() {
+		let countFunction: (barIdx: number) => number;
+		let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 8;
+		let hh = globalCommandDispatcher.cfg().gridHeight() * 6 / 8;
+		if (globalCommandDispatcher.cfg().data.focus) {
+			if (globalCommandDispatcher.cfg().data.focus == 1) {
 				countFunction = this.barDrumCount;
-				yy = cfg.gridTop() + cfg.gridHeight() - 2 * cfg.data.percussions.length;
-				hh = 2 * cfg.data.percussions.length;
+				yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length;
+				hh = 2 * globalCommandDispatcher.cfg().data.percussions.length;
 			} else {
-				if (cfg.data.focus == 2) {
+				if (globalCommandDispatcher.cfg().data.focus == 2) {
 					countFunction = this.barAutoCount;
-					yy = cfg.gridTop();
-					hh = cfg.maxAutomationsCount;
+					yy = globalCommandDispatcher.cfg().gridTop();
+					hh = globalCommandDispatcher.cfg().maxAutomationsCount;
 				} else {
 					countFunction = this.barCommentsCount;
-					yy = cfg.gridTop();
-					hh = cfg.commentsMaxHeight();
+					yy = globalCommandDispatcher.cfg().gridTop();
+					hh = globalCommandDispatcher.cfg().commentsMaxHeight();
 				}
 			}
 		} else {
 			countFunction = this.barTrackCount;
 		}
 		let mxItems = 0;
-		for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
-			let itemcount = countFunction(cfg, bb);
+		for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
+			let itemcount = countFunction(bb);
 			if (mxItems < itemcount) {
 				mxItems = itemcount;
 			}
 		}
 		if (mxItems < 1) mxItems = 1;
 		let barX = 0;
-		for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
-			let itemcount = countFunction(cfg, bb);
+		for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
+			let itemcount = countFunction(bb);
 			let filIdx = 1 + Math.round(7 * itemcount / mxItems);
 			let css = 'mixFiller' + filIdx;
-			let barwidth = MMUtil().set(cfg.data.timeline[bb].metre).duration(cfg.data.timeline[bb].tempo) * cfg.widthDurationRatio;
+			let barwidth = MMUtil().set(globalCommandDispatcher.cfg().data.timeline[bb].metre).duration(globalCommandDispatcher.cfg().data.timeline[bb].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 			let fillRectangle: TileRectangle = {
-				x: cfg.leftPad + barX
+				x: globalCommandDispatcher.cfg().leftPad + barX
 				, y: yy
 				, w: barwidth
 				, h: hh
@@ -168,57 +168,58 @@ class MixerUI {
 			barX = barX + barwidth;
 		}
 	}
-	reFillWholeRatio(cfg: MixerDataMathUtility) {
+	reFillWholeRatio() {
 
-		let yy = cfg.gridTop();
-		let hh = cfg.gridHeight() / 8;
-		if (cfg.data.focus) {
-			if (cfg.data.focus == 1) {
-				yy = cfg.gridTop();
-				hh = cfg.gridHeight() - 2 * cfg.data.percussions.length;
+		let yy = globalCommandDispatcher.cfg().gridTop();
+		let hh = globalCommandDispatcher.cfg().gridHeight() / 8;
+		if (globalCommandDispatcher.cfg().data.focus) {
+			if (globalCommandDispatcher.cfg().data.focus == 1) {
+				yy = globalCommandDispatcher.cfg().gridTop();
+				hh = globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length;
 			} else {
-				if (cfg.data.focus == 2) {
-					yy = cfg.gridTop() + cfg.maxAutomationsCount;
-					hh = cfg.gridHeight() - cfg.maxAutomationsCount;
+				if (globalCommandDispatcher.cfg().data.focus == 2) {
+					yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().maxAutomationsCount;
+					hh = globalCommandDispatcher.cfg().gridHeight() - globalCommandDispatcher.cfg().maxAutomationsCount;
 				} else {
-					yy = cfg.gridTop() + cfg.commentsMaxHeight();
-					hh = cfg.gridHeight() - cfg.commentsMaxHeight();
+					yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().commentsMaxHeight();
+					hh = globalCommandDispatcher.cfg().gridHeight() - globalCommandDispatcher.cfg().commentsMaxHeight();
 				}
 			}
 		}
-		let countFunction: (cfg: MixerDataMathUtility, barIdx: number) => number = (cfg: MixerDataMathUtility, barIdx: number) => {
-			return this.barDrumCount(cfg, barIdx) + this.barAutoCount(cfg, barIdx) + this.barCommentsCount(cfg, barIdx) + this.barTrackCount(cfg, barIdx);
+		let countFunction: (barIdx: number) => number = (barIdx: number) => {
+			return this.barDrumCount(barIdx) + this.barAutoCount(barIdx)
+				+ this.barCommentsCount(barIdx) + this.barTrackCount(barIdx);
 		};
 		let mxItems = 0;
-		for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
-			let itemcount = countFunction(cfg, bb);
+		for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
+			let itemcount = countFunction(bb);
 			if (mxItems < itemcount) {
 				mxItems = itemcount;
 			}
 		}
 		if (mxItems < 1) mxItems = 1;
 		let barX = 0;
-		for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
-			let itemcount = countFunction(cfg, bb);
+		for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
+			let itemcount = countFunction(bb);
 			let filIdx = 1 + Math.round(7 * itemcount / mxItems);
 			let css = 'mixFiller' + filIdx;
-			let barwidth = MMUtil().set(cfg.data.timeline[bb].metre).duration(cfg.data.timeline[bb].tempo) * cfg.widthDurationRatio;
+			let barwidth = MMUtil().set(globalCommandDispatcher.cfg().data.timeline[bb].metre).duration(globalCommandDispatcher.cfg().data.timeline[bb].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 			let fillRectangle: TileRectangle = {
-				x: cfg.leftPad + barX
-				, y: yy//cfg.gridTop()
+				x: globalCommandDispatcher.cfg().leftPad + barX
+				, y: yy//globalCommandDispatcher.cfg().gridTop()
 				, w: barwidth
-				, h: hh//cfg.gridHeight()
+				, h: hh//globalCommandDispatcher.cfg().gridHeight()
 				, css: css
 			};
 			this.fillerAnchor.content.push(fillRectangle);
-			if (cfg.data.focus) {
+			if (globalCommandDispatcher.cfg().data.focus) {
 				//
 			} else {
 				this.fillerAnchor.content.push({
-					x: cfg.leftPad + barX
-					, y: cfg.gridTop() + cfg.gridHeight() * 7 / 8
+					x: globalCommandDispatcher.cfg().leftPad + barX
+					, y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() * 7 / 8
 					, w: barwidth
-					, h: hh//cfg.gridHeight()
+					, h: hh//globalCommandDispatcher.cfg().gridHeight()
 					, css: css
 				});
 			}
@@ -227,10 +228,10 @@ class MixerUI {
 		}
 	}
 
-	barTrackCount(cfg: MixerDataMathUtility, bb: number): number {
+	barTrackCount(bb: number): number {
 		let notecount = 0;
-		for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
-			let bar = cfg.data.tracks[tt].measures[bb];
+		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+			let bar = globalCommandDispatcher.cfg().data.tracks[tt].measures[bb];
 			if (bar) {
 				for (let cc = 0; cc < bar.chords.length; cc++) {
 					//notecount = notecount + bar.chords[cc].notes.length;
@@ -240,20 +241,20 @@ class MixerUI {
 		}
 		return notecount;
 	}
-	barDrumCount(cfg: MixerDataMathUtility, bb: number): number {
+	barDrumCount(bb: number): number {
 		let drumcount = 0;
-		for (let tt = 0; tt < cfg.data.percussions.length; tt++) {
-			let bar = cfg.data.percussions[tt].measures[bb];
+		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.percussions.length; tt++) {
+			let bar = globalCommandDispatcher.cfg().data.percussions[tt].measures[bb];
 			if (bar) {
 				drumcount = drumcount + bar.skips.length;
 			}
 		}
 		return drumcount;
 	}
-	barAutoCount(cfg: MixerDataMathUtility, bb: number): number {
+	barAutoCount(bb: number): number {
 		let autoCnt = 0;
-		for (let ff = 0; ff < cfg.data.filters.length; ff++) {
-			let filter = cfg.data.filters[ff];
+		for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
+			let filter = globalCommandDispatcher.cfg().data.filters[ff];
 			if (filter.automation) {
 				if (filter.automation.measures[bb]) {
 					autoCnt = autoCnt + filter.automation.measures[bb].changes.length;
@@ -262,13 +263,13 @@ class MixerUI {
 		}
 		return autoCnt;
 	}
-	barCommentsCount(cfg: MixerDataMathUtility, bb: number): number {
-		if (cfg.data.comments[bb]) {
-			if (cfg.data.comments[bb].points) {
-				return cfg.data.comments[bb].points.length;
+	barCommentsCount(bb: number): number {
+		if (globalCommandDispatcher.cfg().data.comments[bb]) {
+			if (globalCommandDispatcher.cfg().data.comments[bb].points) {
+				return globalCommandDispatcher.cfg().data.comments[bb].points.length;
 			}
 		}
 		return 0;
 	}
-	
+
 }

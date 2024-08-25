@@ -8,11 +8,11 @@ class CommandDispatcher {
 	tapSizeRatio: number = 1;
 	onAir = false;
 	//currentLOadedProject: Zvoog_Project;
-	_cfg: MixerDataMathUtility;
+	_mixerDataMathUtility: MixerDataMathUtility;
 	listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any) = null;
-cfg(): MixerDataMathUtility{
-	return this._cfg;
-}
+	cfg(): MixerDataMathUtility {
+		return this._mixerDataMathUtility;
+	}
 	initAudioFromUI() {
 		console.log('initAudioFromUI');
 		var AudioContext = window.AudioContext;// || window.webkitAudioContext;
@@ -21,9 +21,9 @@ cfg(): MixerDataMathUtility{
 	}
 	registerWorkProject(data: Zvoog_Project) {
 		//this.currentLOadedProject = data;
-		this._cfg = new MixerDataMathUtility(data);
+		this._mixerDataMathUtility = new MixerDataMathUtility(data);
 	}
-	//cfg.data: Zvoog_Project {
+	//globalCommandDispatcher.cfg().data: Zvoog_Project {
 	//	return this.currentLOadedProject;
 	//}
 	registerUI(renderer: UIRenderer) {
@@ -33,10 +33,10 @@ cfg(): MixerDataMathUtility{
 		let vw = this.renderer.tileLevelSVG.clientWidth / this.renderer.tiler.tapPxSize();
 		let vh = this.renderer.tileLevelSVG.clientHeight / this.renderer.tiler.tapPxSize();
 		//this.renderer.menu.showState = !this.renderer.menu.showState;
-		this.cfg().data.list=true;
+		this.cfg().data.list = true;
 		this.renderer.menu.resizeMenu(vw, vh);
 		this.renderer.menu.resetAllAnchors();
-		
+
 	};
 	toggleStartStop() {
 		console.log('toggleStartStop');
@@ -52,7 +52,7 @@ cfg(): MixerDataMathUtility{
 				series: [
 					{
 						duration: n120, tempo: 120, items: [
-							{ skip: 0 * n120, channelId: 'test1', pitches: [A3 - 0-4], slides: [{ duration: 2 / 16 * n120, delta: 4 },{ duration: 2/16 * n120, delta: 0 }] }
+							{ skip: 0 * n120, channelId: 'test1', pitches: [A3 - 0 - 4], slides: [{ duration: 2 / 16 * n120, delta: 4 }, { duration: 2 / 16 * n120, delta: 0 }] }
 							, { skip: 1 / 4 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
 							, { skip: 2 / 4 * n120, channelId: 'test1', pitches: [A3 - 0], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
 							, { skip: 3 / 4 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
@@ -85,7 +85,7 @@ cfg(): MixerDataMathUtility{
 			let me = this;
 			me.player.setupPlugins(me.audioContext, schedule, () => {
 				console.log('toggleStartStop setupPlugins done');
-				me.player.startLoop(0, 0, n120*2);
+				me.player.startLoop(0, 0, n120 * 2);
 			});
 		}
 	}

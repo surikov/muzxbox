@@ -1,20 +1,19 @@
 class SamplerBar {
 	constructor(//data: Zvoog_Project
-		cfg: MixerDataMathUtility
-		, barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number) {
+		 barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number) {
 		//let mixm: MixerDataMath = new MixerDataMath(data);
-		let drum: Zvoog_PercussionTrack = cfg.data.percussions[drumIdx];
+		let drum: Zvoog_PercussionTrack = globalCommandDispatcher.cfg().data.percussions[drumIdx];
 		let measure: Zvoog_PercussionMeasure = drum.measures[barIdx];
 		//console.log(drum.title,barIdx,measure.skips);
-		//let yy = cfg.samplerTop() + drumIdx * cfg.notePathHeight;
-		//let yy = cfg.gridTop() + drumIdx * cfg.notePathHeight;
-		let yy = cfg.gridTop() + cfg.gridHeight() - 2 * cfg.data.percussions.length + drumIdx * cfg.notePathHeight * 2;
-		let tempo = cfg.data.timeline[barIdx].tempo;
+		//let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().notePathHeight;
+		//let yy = globalCommandDispatcher.cfg().gridTop() + drumIdx * globalCommandDispatcher.cfg().notePathHeight;
+		let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length + drumIdx * globalCommandDispatcher.cfg().notePathHeight * 2;
+		let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
 		let css = 'samplerDrumDotBg';
-		if (cfg.data.focus) if (cfg.data.focus == 1) css = 'samplerDrumDotFocused';
+		if (globalCommandDispatcher.cfg().data.focus) if (globalCommandDispatcher.cfg().data.focus == 1) css = 'samplerDrumDotFocused';
 		for (let ss = 0; ss < measure.skips.length; ss++) {
 			let skip: Zvoog_Metre = measure.skips[ss];
-			let xx = left + MMUtil().set(skip).duration(tempo) * cfg.widthDurationRatio
+			let xx = left + MMUtil().set(skip).duration(tempo) * globalCommandDispatcher.cfg().widthDurationRatio
 			/*
 						let dot: TileRectangle = {
 							x: xx

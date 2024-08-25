@@ -1,28 +1,28 @@
 class TextComments {
 	constructor(barIdx: number
 		//, data: Zvoog_Project
-		, cfg: MixerDataMathUtility
+		//, cfg: MixerDataMathUtility
 		, barLeft: number
 		, barOctaveAnchor: TileAnchor
 		, zIndex: number
 	) {
-		let curBar = cfg.data.timeline[barIdx];
+		let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
 
 		//let mixm: MixerDataMath = new MixerDataMath(data);
-		//let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * cfg.widthDurationRatio;
+		//let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 		//let left = barLeft + width;
-		let top = cfg.gridTop();
-		//let height = cfg.maxCommentRowCount + 2;
+		let top = globalCommandDispatcher.cfg().gridTop();
+		//let height = globalCommandDispatcher.cfg().maxCommentRowCount + 2;
 		//console.log(zIndex);
 		/*
 		if (zIndex == 3) {
-			height = (cfg.maxCommentRowCount + 2) * 2;
+			height = (globalCommandDispatcher.cfg().maxCommentRowCount + 2) * 2;
 		}
 		if (zIndex == 4) {
-			height = (cfg.maxCommentRowCount + 2) * 4;
+			height = (globalCommandDispatcher.cfg().maxCommentRowCount + 2) * 4;
 		}
 		if (zIndex > 4) {
-			height = (cfg.maxCommentRowCount + 2) * 8;
+			height = (globalCommandDispatcher.cfg().maxCommentRowCount + 2) * 8;
 		}
 		let barTxtRightBorder: TileRectangle = {
 			x: left
@@ -36,12 +36,12 @@ class TextComments {
 		//console.log('comments', barIdx, zIndex, top, height, zoomPrefixLevelsCSS[zIndex].minZoom);
 		//barOctaveAnchor.content.push(barTxtRightBorder);
 		//console.log(barIdx,barLeft,width);
-		if (barIdx < cfg.data.comments.length) {
+		if (barIdx < globalCommandDispatcher.cfg().data.comments.length) {
 			/*let placedX: number[] = [];
-			for (let ii = 0; ii < cfg.data.comments[barIdx].texts.length; ii++) {
-				let itxt = cfg.data.comments[barIdx].texts[ii];
+			for (let ii = 0; ii < globalCommandDispatcher.cfg().data.comments[barIdx].texts.length; ii++) {
+				let itxt = globalCommandDispatcher.cfg().data.comments[barIdx].texts[ii];
 				let skipS = 0.5 * Math.floor(MMUtil().set(itxt.skip).duration(curBar.tempo) / 0.5);
-				let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * cfg.widthDurationRatio;
+				let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 				let placeIdx = 1;
 				//let x10 = Math.round(xx * 10);
 				for (let kk = 0; kk < placedX.length; kk++) {
@@ -54,10 +54,10 @@ class TextComments {
 				let tt: TileText = {
 					x: xx
 					, y: top + zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx
-					, text: cfg.data.comments[barIdx].texts[ii].text
+					, text: globalCommandDispatcher.cfg().data.comments[barIdx].texts[ii].text
 					, css: 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix
 				};
-				//console.log(zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx, placeIdx, cfg.data.comments[barIdx].texts[ii].text);
+				//console.log(zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx, placeIdx, globalCommandDispatcher.cfg().data.comments[barIdx].texts[ii].text);
 				barOctaveAnchor.content.push(tt);
 			}*/
 			let txtZoomRatio = 1;
@@ -65,21 +65,21 @@ class TextComments {
 			if (zIndex > 3) txtZoomRatio = 4;
 			if (zIndex > 4) txtZoomRatio = 8;
 			let css= 'commentReadText' + zoomPrefixLevelsCSS[zIndex].prefix;
-			if(cfg.data.focus){
-				if(cfg.data.focus==3){
+			if(globalCommandDispatcher.cfg().data.focus){
+				if(globalCommandDispatcher.cfg().data.focus==3){
 					css= 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix;
 				}
 			}
-			for (let ii = 0; ii < cfg.data.comments[barIdx].points.length; ii++) {
-				let itxt = cfg.data.comments[barIdx].points[ii];
-				let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * cfg.widthDurationRatio;
+			for (let ii = 0; ii < globalCommandDispatcher.cfg().data.comments[barIdx].points.length; ii++) {
+				let itxt = globalCommandDispatcher.cfg().data.comments[barIdx].points[ii];
+				let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 				let tt: TileText = {
 					x: xx
-					, y: top + cfg.notePathHeight * (1 + itxt.row) * txtZoomRatio
-					, text: cfg.data.comments[barIdx].points[ii].text
+					, y: top + globalCommandDispatcher.cfg().notePathHeight * (1 + itxt.row) * txtZoomRatio
+					, text: globalCommandDispatcher.cfg().data.comments[barIdx].points[ii].text
 					, css: css //'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix
 				};
-				//console.log(zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx, placeIdx, cfg.data.comments[barIdx].texts[ii].text);
+				//console.log(zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx, placeIdx, globalCommandDispatcher.cfg().data.comments[barIdx].texts[ii].text);
 				barOctaveAnchor.content.push(tt);
 			}
 		}

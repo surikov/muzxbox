@@ -6,19 +6,19 @@ class PerformerIcon {
 		//this.track=track;
 		this.performerId = performerId;
 	}
-	buildPerformerSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number) {
+	buildPerformerSpot(fanLevelAnchor: TileAnchor, zidx: number) {
 		//console.log('buildPerformerSpot', this.performerId);
-		for (let ii = 0; ii < cfg.data.tracks.length; ii++) {
-			if (cfg.data.tracks[ii].performer.id == this.performerId) {
-				let audioSeq: Zvoog_AudioSequencer = cfg.data.tracks[ii].performer;
-				this.addPerformerSpot(cfg, audioSeq, fanLevelAnchor, zidx);
+		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
+			if (globalCommandDispatcher.cfg().data.tracks[ii].performer.id == this.performerId) {
+				let audioSeq: Zvoog_AudioSequencer = globalCommandDispatcher.cfg().data.tracks[ii].performer;
+				this.addPerformerSpot(audioSeq, fanLevelAnchor, zidx);
 				break;
 			}
 		}
 	}
-	addPerformerSpot(cfg: MixerDataMathUtility, audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, zidx: number) {
-		let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
-		let top = cfg.gridTop();
+	addPerformerSpot(audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, zidx: number) {
+		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+		let top = globalCommandDispatcher.cfg().gridTop();
 		let xx = left;
 		let yy = top;
 		if (audioSeq.iconPosition) {
@@ -28,45 +28,49 @@ class PerformerIcon {
 
 		let rec: TileRectangle = {
 			x: xx, y: yy
-			, w: cfg.pluginIconSize, h: cfg.pluginIconSize
-			, rx: cfg.pluginIconSize / 2, ry: cfg.pluginIconSize / 2
+			, w: globalCommandDispatcher.cfg().pluginIconSize, h: globalCommandDispatcher.cfg().pluginIconSize
+			, rx: globalCommandDispatcher.cfg().pluginIconSize / 2, ry: globalCommandDispatcher.cfg().pluginIconSize / 2
 			, css: 'fanPerformerIcon'
 		};
 		fanLevelAnchor.content.push(rec);
 		if (zidx < 5) {
-			let txt: TileText = { text: audioSeq.kind + ':' + audioSeq.id, x: xx, y: yy + cfg.pluginIconSize, css: 'fanSamplerIcon' };
+			let txt: TileText = {
+				text: audioSeq.kind + ':' + audioSeq.id
+				, x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanSamplerIcon'
+			};
 			fanLevelAnchor.content.push(txt);
 		}
 		//console.log('PerformerIcon', rec);
-		let controlLineWidth=xx-cfg.leftPad - cfg.timelineWidth() ;
-		new ControlConnection().addLineFlow(cfg, yy + cfg.pluginIconSize / 2
+		let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
+		new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2
 			, controlLineWidth, fanLevelAnchor
 		);
-		this.addOutputs(cfg, audioSeq.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
+		this.addOutputs(audioSeq.outputs, fanLevelAnchor, zidx
+			, xx + globalCommandDispatcher.cfg().pluginIconSize, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
 	}
-	addOutputs(cfg: MixerDataMathUtility, outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number) {
+	addOutputs(outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number) {
 		if (outputs) if (outputs.length > 0) {
 			for (let oo = 0; oo < outputs.length; oo++) {
 				let outId = outputs[oo];
-				for (let ii = 0; ii < cfg.data.filters.length; ii++) {
-					if (cfg.data.filters[ii].id == outId) {
-						let toFilter: Zvoog_FilterTarget = cfg.data.filters[ii];
-						let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
-						let top = cfg.gridTop();
+				for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
+					if (globalCommandDispatcher.cfg().data.filters[ii].id == outId) {
+						let toFilter: Zvoog_FilterTarget = globalCommandDispatcher.cfg().data.filters[ii];
+						let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+						let top = globalCommandDispatcher.cfg().gridTop();
 						let xx = left;
 						let yy = top;
 						if (toFilter.iconPosition) {
 							xx = left + toFilter.iconPosition.x;
-							yy = top + toFilter.iconPosition.y + cfg.pluginIconSize / 2;
+							yy = top + toFilter.iconPosition.y + globalCommandDispatcher.cfg().pluginIconSize / 2;
 						}
-						new SpearConnection().addSpear( fromX, fromY, xx, yy, fanLevelAnchor);
+						new SpearConnection().addSpear(fromX, fromY, xx, yy, fanLevelAnchor);
 						break;
 					}
 				}
 			}
 		} else {
-			let speakerX = cfg.wholeWidth() - cfg.speakerIconPad - cfg.rightPad;
-			new SpearConnection().addSpear(fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor);
+			let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad;
+			new SpearConnection().addSpear(fromX, fromY, speakerX, globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2, fanLevelAnchor);
 		}
 	}
 }

@@ -16,22 +16,22 @@ class MixerBar {
 		, tracksZoomBarAnchor: TileAnchor
 		, firstZoomBarAnchor: TileAnchor
 		//, data: Zvoog_Project
-		,cfg:MixerDataMathUtility
+		//,cfg:MixerDataMathUtility
 	) {
-		//console.log('MixerBar',zoomLevel,left,ww,cfg.data.theme.octaveCount);
+		//console.log('MixerBar',zoomLevel,left,ww,globalCommandDispatcher.cfg().data.theme.octaveCount);
 		//this.zoomLevel = zoomLevel;
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		//this.singleBarGridAnchor = gridZoomBarAnchor;
 		//this.singleBarOtherTracksAnchor = tracksZoomBarAnchor;
 		//this.singleBarFirstAnchor = firstZoomBarAnchor;
 		//this.octaves = [];
-		let h12 = 12 * cfg.notePathHeight;
-		for (let oo = 0; oo < cfg.octaveCount; oo++) {
+		let h12 = 12 * globalCommandDispatcher.cfg().notePathHeight;
+		for (let oo = 0; oo < globalCommandDispatcher.cfg().octaveCount; oo++) {
 			let gridOctaveAnchor: TileAnchor = {
 				showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom
 				, hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom
 				, xx: left
-				, yy: cfg.gridTop() + oo * h12
+				, yy: globalCommandDispatcher.cfg().gridTop() + oo * h12
 				, ww: ww
 				, hh: h12, content: []
 				, id: 'octaveGridz' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
@@ -41,7 +41,7 @@ class MixerBar {
 				showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom
 				, hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom
 				, xx: left
-				, yy: cfg.gridTop() + oo * h12
+				, yy: globalCommandDispatcher.cfg().gridTop() + oo * h12
 				, ww: ww
 				, hh: h12, content: []
 				, id: 'octaveTracks' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
@@ -51,7 +51,7 @@ class MixerBar {
 				showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom
 				, hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom
 				, xx: left
-				, yy: cfg.gridTop() + oo * h12
+				, yy: globalCommandDispatcher.cfg().gridTop() + oo * h12
 				, ww: ww
 				, hh: h12, content: []
 				, id: 'octaveFirst' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
@@ -59,12 +59,12 @@ class MixerBar {
 			firstZoomBarAnchor.content.push(firstOctaveAnchor);
 			//let bo: BarOctave = 
 			new BarOctave(
-				barIdx, (cfg.octaveCount - oo - 1), left, cfg.gridTop() + oo * h12
+				barIdx, (globalCommandDispatcher.cfg().octaveCount - oo - 1), left, globalCommandDispatcher.cfg().gridTop() + oo * h12
 				, ww, h12
 				, gridOctaveAnchor
 				, tracksOctaveAnchor
 				, firstOctaveAnchor
-				, zoomLevel, cfg);
+				, zoomLevel);
 			if (firstZoomBarAnchor.ww < firstOctaveAnchor.ww) {
 				firstZoomBarAnchor.ww = firstOctaveAnchor.ww;
 			}
@@ -84,32 +84,32 @@ class MixerBar {
 		}
 
 		if (zoomLevel < 6) {
-			this.addOctaveGridSteps(barIdx, cfg, left, ww, gridZoomBarAnchor, zoomLevel);
+			this.addOctaveGridSteps(barIdx,  left, ww, gridZoomBarAnchor, zoomLevel);
 		}
 
 		if (zoomLevel < 7) {
-			for (let pp = 0; pp < cfg.data.percussions.length; pp++) {
-				let drum: Zvoog_PercussionTrack = cfg.data.percussions[pp];
+			for (let pp = 0; pp < globalCommandDispatcher.cfg().data.percussions.length; pp++) {
+				let drum: Zvoog_PercussionTrack = globalCommandDispatcher.cfg().data.percussions[pp];
 				if (drum) {
 					let measure: Zvoog_PercussionMeasure = drum.measures[barIdx];
 					if (measure) {
-						new SamplerBar(cfg, barIdx, pp, zoomLevel, firstZoomBarAnchor, left);
+						new SamplerBar( barIdx, pp, zoomLevel, firstZoomBarAnchor, left);
 					}
 				}
 			}
 		}
 
 		if (zoomLevel < 7) {
-			new TextComments(barIdx, cfg, left, gridZoomBarAnchor, zoomLevel);
+			new TextComments(barIdx,  left, gridZoomBarAnchor, zoomLevel);
 		}
 		if (zoomLevel < 7) {
-			new AutomationBarContent(barIdx, cfg, left, gridZoomBarAnchor, zoomLevel);
+			new AutomationBarContent(barIdx,  left, gridZoomBarAnchor, zoomLevel);
 		}
 	}
 	addOctaveGridSteps(
 		barIdx: number
 		//, data: Zvoog_Project
-		,cfg:MixerDataMathUtility
+		//,cfg:MixerDataMathUtility
 		, barLeft: number
 		, width: number
 		//, top: number, height: number
@@ -117,13 +117,13 @@ class MixerBar {
 		, zIndex: number) {
 		let zoomInfo = zoomPrefixLevelsCSS[zIndex];
 		//console.log('MixerBar',barIdx,zoomLevel);
-		let curBar = cfg.data.timeline[barIdx];
+		let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		let lineCount = 0;
 		let skip: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 1 });
-		//let barLeft = cfg.LeftPad;
-		let top = cfg.gridTop();
-		let height = cfg.gridHeight();
+		//let barLeft = globalCommandDispatcher.cfg().LeftPad;
+		let top = globalCommandDispatcher.cfg().gridTop();
+		let height = globalCommandDispatcher.cfg().gridHeight();
 
 
 
@@ -138,12 +138,12 @@ class MixerBar {
 		};
 		barOctaveAnchor.content.push(barRightBorder);
 		/*
-		if (cfg.data.percussions.length) {
+		if (globalCommandDispatcher.cfg().data.percussions.length) {
 			let barSamRightBorder: TileRectangle = {
 				x: barLeft + width
-				, y: cfg.samplerTop()
+				, y: globalCommandDispatcher.cfg().samplerTop()
 				, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5 //zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0
-				, h: cfg.data.percussions.length * cfg.notePathHeight
+				, h: globalCommandDispatcher.cfg().data.percussions.length * globalCommandDispatcher.cfg().notePathHeight
 				, rx: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25
 				, ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25
 				, css: 'barRightBorder'
@@ -161,42 +161,42 @@ class MixerBar {
 				if (!skip.less(curBar.metre)) {
 					break;
 				}
-				let xx = barLeft + skip.duration(curBar.tempo) * cfg.widthDurationRatio;
+				let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 				let mark: TileRectangle = {
 					x: xx
-					, y: top//cfg.gridTop()
+					, y: top//globalCommandDispatcher.cfg().gridTop()
 					, w: line.ratio * zoomInfo.minZoom / 2
-					, h: height//cfg.gridHeight()
+					, h: height//globalCommandDispatcher.cfg().gridHeight()
 					, css: css
 				};
 				barOctaveAnchor.content.push(mark);
 				/*
-				if (cfg.data.percussions.length) {
+				if (globalCommandDispatcher.cfg().data.percussions.length) {
 					let sammark: TileRectangle = {
 						x: xx
-						, y: cfg.samplerTop()
+						, y: globalCommandDispatcher.cfg().samplerTop()
 						, w: line.ratio * zoomInfo.minZoom / 2
-						, h: cfg.data.percussions.length * cfg.notePathHeight
+						, h: globalCommandDispatcher.cfg().data.percussions.length * globalCommandDispatcher.cfg().notePathHeight
 						, css: css
 					};
 					barOctaveAnchor.content.push(sammark);
 				}*/
 				/*
-				let txtH=cfg.maxCommentRowCount+2;
+				let txtH=globalCommandDispatcher.cfg().maxCommentRowCount+2;
 				if(zIndex==3){
-					txtH=(cfg.maxCommentRowCount+2)*2;
+					txtH=(globalCommandDispatcher.cfg().maxCommentRowCount+2)*2;
 				}
 				if(zIndex==4){
-					txtH=(cfg.maxCommentRowCount+2)*4;
+					txtH=(globalCommandDispatcher.cfg().maxCommentRowCount+2)*4;
 				}
 				if(zIndex>4){
-					txtH=(cfg.maxCommentRowCount+2)*8;
+					txtH=(globalCommandDispatcher.cfg().maxCommentRowCount+2)*8;
 				}
 				let txtmark: TileRectangle = {
 					x: xx
-					, y: cfg.commentsTop()
+					, y: globalCommandDispatcher.cfg().commentsTop()
 					, w: line.ratio * zoomInfo.minZoom / 2
-					, h: txtH //cfg.maxCommentRowCount+2
+					, h: txtH //globalCommandDispatcher.cfg().maxCommentRowCount+2
 					, css: css
 				};
 				barOctaveAnchor.content.push(txtmark);

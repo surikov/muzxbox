@@ -35,7 +35,7 @@ declare class CommandDispatcher {
     audioContext: AudioContext;
     tapSizeRatio: number;
     onAir: boolean;
-    _cfg: MixerDataMathUtility;
+    _mixerDataMathUtility: MixerDataMathUtility;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
     cfg(): MixerDataMathUtility;
     initAudioFromUI(): void;
@@ -134,9 +134,9 @@ declare class TimeSelectBar {
     createTimeScale(): TileLayerDefinition[];
     resizeTimeScale(viewWidth: number, viewHeight: number): void;
     updateTimeSelectionBar(): void;
-    createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, cfg: MixerDataMathUtility): void;
+    createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor): void;
     createBarNumber(barLeft: number, barnum: number, zz: number, curBar: Zvoog_SongMeasure, measureAnchor: TileAnchor, barTime: number): void;
-    fillTimeBar(cfg: MixerDataMathUtility): void;
+    fillTimeBar(): void;
 }
 declare class UIToolbar {
     toolBarAnchor: TileAnchor;
@@ -247,31 +247,31 @@ declare class LeftPanel {
     leftZoomAnchors: TileAnchor[];
     constructor();
     createLeftPanel(): TileLayerDefinition[];
-    reFillLeftPanel(cfg: MixerDataMathUtility): void;
+    reFillLeftPanel(): void;
 }
 declare class SamplerBar {
-    constructor(cfg: MixerDataMathUtility, barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number);
+    constructor(barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number);
 }
 declare class BarOctave {
-    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number, cfg: MixerDataMathUtility);
+    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number);
 }
 declare class OctaveContent {
-    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, cfg: MixerDataMathUtility, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number);
-    addUpperNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, cfg: MixerDataMathUtility, zoomLevel: number): void;
-    addOtherNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, cfg: MixerDataMathUtility): void;
-    addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, cfg: MixerDataMathUtility, css: string): void;
+    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number);
+    addUpperNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, zoomLevel: number): void;
+    addOtherNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor): void;
+    addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, css: string): void;
 }
 declare class MixerBar {
     octaves: BarOctave[];
     zoomLevel: number;
-    constructor(barIdx: number, left: number, ww: number, zoomLevel: number, gridZoomBarAnchor: TileAnchor, tracksZoomBarAnchor: TileAnchor, firstZoomBarAnchor: TileAnchor, cfg: MixerDataMathUtility);
-    addOctaveGridSteps(barIdx: number, cfg: MixerDataMathUtility, barLeft: number, width: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
+    constructor(barIdx: number, left: number, ww: number, zoomLevel: number, gridZoomBarAnchor: TileAnchor, tracksZoomBarAnchor: TileAnchor, firstZoomBarAnchor: TileAnchor);
+    addOctaveGridSteps(barIdx: number, barLeft: number, width: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
 }
 declare class TextComments {
-    constructor(barIdx: number, cfg: MixerDataMathUtility, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number);
+    constructor(barIdx: number, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number);
 }
 declare class AutomationBarContent {
-    constructor(barIdx: number, cfg: MixerDataMathUtility, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number);
+    constructor(barIdx: number, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number);
 }
 declare class MixerUI {
     gridLayers: TileLayerDefinition;
@@ -282,14 +282,14 @@ declare class MixerUI {
     fillerAnchor: TileAnchor;
     fanPane: FanPane;
     constructor();
-    reFillMixerUI(cfg: MixerDataMathUtility): void;
+    reFillMixerUI(): void;
     createMixerLayers(): TileLayerDefinition[];
-    reFillSingleRatio(cfg: MixerDataMathUtility): void;
-    reFillWholeRatio(cfg: MixerDataMathUtility): void;
-    barTrackCount(cfg: MixerDataMathUtility, bb: number): number;
-    barDrumCount(cfg: MixerDataMathUtility, bb: number): number;
-    barAutoCount(cfg: MixerDataMathUtility, bb: number): number;
-    barCommentsCount(cfg: MixerDataMathUtility, bb: number): number;
+    reFillSingleRatio(): void;
+    reFillWholeRatio(): void;
+    barTrackCount(bb: number): number;
+    barDrumCount(bb: number): number;
+    barAutoCount(bb: number): number;
+    barCommentsCount(bb: number): number;
 }
 declare class MixerZoomLevel {
     zoomGridAnchor: TileAnchor;
@@ -298,48 +298,48 @@ declare class MixerZoomLevel {
     bars: MixerBar[];
     zoomLevelIndex: number;
     constructor(zoomLevel: number, anchorGrid: TileAnchor, anchorTracks: TileAnchor, anchorFirst: TileAnchor);
-    reCreateBars(cfg: MixerDataMathUtility): void;
-    addDrumLines(cfg: MixerDataMathUtility): void;
-    addCommentLines(cfg: MixerDataMathUtility): void;
-    addGridLines(barOctaveAnchor: TileAnchor, cfg: MixerDataMathUtility): void;
+    reCreateBars(): void;
+    addDrumLines(): void;
+    addCommentLines(): void;
+    addGridLines(barOctaveAnchor: TileAnchor): void;
 }
 declare class FanPane {
     filterIcons: FilterIcon[];
     autoIcons: FilterIcon[];
     performerIcons: PerformerIcon[];
     samplerIcons: SamplerIcon[];
-    resetPlates(cfg: MixerDataMathUtility, fanAnchors: TileAnchor[]): void;
-    buildPerformerIcons(cfg: MixerDataMathUtility, fanAnchor: TileAnchor, zidx: number): void;
-    buildSamplerIcons(cfg: MixerDataMathUtility, fanAnchor: TileAnchor, zidx: number): void;
-    buildAutoIcons(cfg: MixerDataMathUtility, fanAnchor: TileAnchor, zidx: number): void;
-    buildFilterIcons(cfg: MixerDataMathUtility, fanAnchor: TileAnchor, zidx: number): void;
-    buildOutIcon(cfg: MixerDataMathUtility, fanAnchor: TileAnchor, zidx: number): void;
+    resetPlates(fanAnchors: TileAnchor[]): void;
+    buildPerformerIcons(fanAnchor: TileAnchor, zidx: number): void;
+    buildSamplerIcons(fanAnchor: TileAnchor, zidx: number): void;
+    buildAutoIcons(fanAnchor: TileAnchor, zidx: number): void;
+    buildFilterIcons(fanAnchor: TileAnchor, zidx: number): void;
+    buildOutIcon(fanAnchor: TileAnchor, zidx: number): void;
 }
 declare class PerformerIcon {
     performerId: string;
     constructor(performerId: string);
-    buildPerformerSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number): void;
-    addPerformerSpot(cfg: MixerDataMathUtility, audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, zidx: number): void;
-    addOutputs(cfg: MixerDataMathUtility, outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number): void;
+    buildPerformerSpot(fanLevelAnchor: TileAnchor, zidx: number): void;
+    addPerformerSpot(audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, zidx: number): void;
+    addOutputs(outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number): void;
 }
 declare class SamplerIcon {
     samplerId: string;
     constructor(samplerId: string);
-    buildSamplerSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number): void;
-    addSamplerSpot(cfg: MixerDataMathUtility, sampler: Zvoog_AudioSampler, fanLevelAnchor: TileAnchor, zidx: number): void;
-    addOutputs(cfg: MixerDataMathUtility, outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number): void;
+    buildSamplerSpot(fanLevelAnchor: TileAnchor, zidx: number): void;
+    addSamplerSpot(sampler: Zvoog_AudioSampler, fanLevelAnchor: TileAnchor, zidx: number): void;
+    addOutputs(outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number): void;
 }
 declare class FilterIcon {
     filterId: string;
     constructor(filterId: string);
-    buildFilterSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number): void;
-    addFilterSpot(cfg: MixerDataMathUtility, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, zidx: number): void;
-    buildAutoSpot(cfg: MixerDataMathUtility, fanLevelAnchor: TileAnchor, zidx: number): void;
-    addAutoSpot(cfg: MixerDataMathUtility, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, zidx: number): void;
-    addOutputs(cfg: MixerDataMathUtility, outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number): void;
+    buildFilterSpot(fanLevelAnchor: TileAnchor, zidx: number): void;
+    addFilterSpot(filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, zidx: number): void;
+    buildAutoSpot(fanLevelAnchor: TileAnchor, zidx: number): void;
+    addAutoSpot(filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, zidx: number): void;
+    addOutputs(outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number): void;
 }
 declare class ControlConnection {
-    addLineFlow(cfg: MixerDataMathUtility, yy: number, ww: number, anchor: TileAnchor): void;
+    addLineFlow(yy: number, ww: number, anchor: TileAnchor): void;
 }
 declare class SpearConnection {
     constructor();
@@ -386,7 +386,7 @@ declare class DebugLayerUI {
     debugLayer: TileLayerDefinition;
     allLayers(): TileLayerDefinition[];
     setupUI(): void;
-    resetDebugView(cfg: MixerDataMathUtility): void;
+    resetDebugView(): void;
     deleteDebbugView(): void;
 }
 declare class WarningUI {

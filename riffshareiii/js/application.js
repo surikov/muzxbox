@@ -200,7 +200,7 @@ class CommandDispatcher {
         this.listener = null;
     }
     cfg() {
-        return this._cfg;
+        return this._mixerDataMathUtility;
     }
     initAudioFromUI() {
         console.log('initAudioFromUI');
@@ -209,7 +209,7 @@ class CommandDispatcher {
         this.player = createSchedulePlayer();
     }
     registerWorkProject(data) {
-        this._cfg = new MixerDataMathUtility(data);
+        this._mixerDataMathUtility = new MixerDataMathUtility(data);
     }
     registerUI(renderer) {
         this.renderer = renderer;
@@ -505,16 +505,16 @@ class UIRenderer {
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.tiler.resetInnerSize(globalCommandDispatcher.cfg().wholeWidth(), globalCommandDispatcher.cfg().wholeHeight());
-        this.mixer.reFillMixerUI(globalCommandDispatcher.cfg());
-        this.leftPanel.reFillLeftPanel(globalCommandDispatcher.cfg());
-        this.debug.resetDebugView(globalCommandDispatcher.cfg());
+        this.mixer.reFillMixerUI();
+        this.leftPanel.reFillLeftPanel();
+        this.debug.resetDebugView();
         this.toolbar.resizeToolbar(vw, vh);
         this.menu.readCurrentSongData(globalCommandDispatcher.cfg().data);
         this.menu.resizeMenu(vw, vh);
         this.warning.resizeDialog(vw, vh, () => {
             this.tiler.resetAnchor(this.warning.warningGroup, this.warning.warningAnchor, LevelModes.overlay);
         });
-        this.timeselectbar.fillTimeBar(globalCommandDispatcher.cfg());
+        this.timeselectbar.fillTimeBar();
         this.timeselectbar.resizeTimeScale(vw, vh);
         let xyz = globalCommandDispatcher.cfg().data.position;
         if (xyz) {
@@ -740,7 +740,7 @@ class TimeSelectBar {
         }
         console.log('updateTimeSelectionBar', this.selectionMark.x, this.selectionMark.w);
     }
-    createBarMark(barIdx, barLeft, size, measureAnchor, cfg) {
+    createBarMark(barIdx, barLeft, size, measureAnchor) {
         let mark = {
             x: barLeft, y: 0, w: size, h: size,
             css: 'timeMarkButtonCircle', activation: (x, y) => {
@@ -768,25 +768,25 @@ class TimeSelectBar {
         };
         measureAnchor.content.push(bpm);
     }
-    fillTimeBar(cfg) {
-        this.selectBarAnchor.ww = cfg.wholeWidth();
-        this.selectBarAnchor.hh = cfg.wholeHeight();
+    fillTimeBar() {
+        this.selectBarAnchor.ww = globalCommandDispatcher.cfg().wholeWidth();
+        this.selectBarAnchor.hh = globalCommandDispatcher.cfg().wholeHeight();
         this.zoomAnchors = [];
         for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
             let selectLevelAnchor = {
                 showZoom: zoomPrefixLevelsCSS[zz].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
-                xx: 0, yy: 0, ww: cfg.wholeWidth(), hh: cfg.wholeHeight(), content: [],
+                xx: 0, yy: 0, ww: globalCommandDispatcher.cfg().wholeWidth(), hh: globalCommandDispatcher.cfg().wholeHeight(), content: [],
                 id: 'time' + (zz + Math.random())
             };
             this.zoomAnchors.push(selectLevelAnchor);
             let mm = MMUtil();
-            let barLeft = cfg.leftPad;
+            let barLeft = globalCommandDispatcher.cfg().leftPad;
             let barTime = 0;
-            for (let kk = 0; kk < cfg.data.timeline.length; kk++) {
-                let curBar = cfg.data.timeline[kk];
+            for (let kk = 0; kk < globalCommandDispatcher.cfg().data.timeline.length; kk++) {
+                let curBar = globalCommandDispatcher.cfg().data.timeline[kk];
                 let curMeasureMeter = mm.set(curBar.metre);
-                let barWidth = curMeasureMeter.duration(curBar.tempo) * cfg.widthDurationRatio;
+                let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
                 let measureAnchor = {
                     showZoom: zoomPrefixLevelsCSS[zz].minZoom,
                     hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
@@ -795,7 +795,7 @@ class TimeSelectBar {
                 };
                 selectLevelAnchor.content.push(measureAnchor);
                 if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
-                    this.createBarMark(kk, barLeft, zoomPrefixLevelsCSS[zz].minZoom * 1.5, measureAnchor, cfg);
+                    this.createBarMark(kk, barLeft, zoomPrefixLevelsCSS[zz].minZoom * 1.5, measureAnchor);
                     this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor, barTime);
                 }
                 let zoomInfo = zoomPrefixLevelsCSS[zz];
@@ -809,7 +809,7 @@ class TimeSelectBar {
                             break;
                         }
                         if (line.label) {
-                            let xx = barLeft + skip.duration(curBar.tempo) * cfg.widthDurationRatio;
+                            let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
                             let mark = {
                                 x: xx, y: 0,
                                 w: line.ratio * 2 * zoomInfo.minZoom,
@@ -1191,7 +1191,7 @@ class RightMenuPanel {
         this.menuCloseButton.resize(this.shiftX + this.itemsWidth - 1, viewHeight - 1, 1);
         this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
         this.rerenderMenuContent(null);
-        console.log('resizeMenu globalCommandDispatcher.cfg.data.list', globalCommandDispatcher.cfg().data.list);
+        console.log('resizeMenu globalCommandDispatcher.globalCommandDispatcher.cfg().data.list', globalCommandDispatcher.cfg().data.list);
     }
 }
 class RightMenuItem {
@@ -1520,16 +1520,16 @@ class LeftPanel {
         }
         return [this.leftLayer];
     }
-    reFillLeftPanel(cfg) {
+    reFillLeftPanel() {
         for (let zz = 0; zz < this.leftZoomAnchors.length; zz++) {
-            this.leftZoomAnchors[zz].hh = cfg.wholeHeight();
+            this.leftZoomAnchors[zz].hh = globalCommandDispatcher.cfg().wholeHeight();
             this.leftZoomAnchors[zz].content = [];
-            for (let oo = 1; oo < cfg.octaveCount; oo++) {
+            for (let oo = 1; oo < globalCommandDispatcher.cfg().octaveCount; oo++) {
                 if (zz < 4) {
                     let nm3 = {
                         x: 1,
-                        y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom,
-                        text: '' + (cfg.octaveCount - oo + 0),
+                        y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom,
+                        text: '' + (globalCommandDispatcher.cfg().octaveCount - oo + 0),
                         css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
                     };
                     this.leftZoomAnchors[zz].content.push(nm3);
@@ -1537,8 +1537,8 @@ class LeftPanel {
                         nm3.x = 0.5;
                         let nm2 = {
                             x: 0.5,
-                            y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 6 * cfg.notePathHeight,
-                            text: '' + (cfg.octaveCount - oo + 0),
+                            y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 6 * globalCommandDispatcher.cfg().notePathHeight,
+                            text: '' + (globalCommandDispatcher.cfg().octaveCount - oo + 0),
                             css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
                         };
                         this.leftZoomAnchors[zz].content.push(nm2);
@@ -1547,15 +1547,15 @@ class LeftPanel {
                             nm3.x = 0.25;
                             let nm = {
                                 x: 0.25,
-                                y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 3 * cfg.notePathHeight,
-                                text: '' + (cfg.octaveCount - oo + 0),
+                                y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 3 * globalCommandDispatcher.cfg().notePathHeight,
+                                text: '' + (globalCommandDispatcher.cfg().octaveCount - oo + 0),
                                 css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
                             };
                             this.leftZoomAnchors[zz].content.push(nm);
                             nm = {
                                 x: 0.25,
-                                y: cfg.gridTop() + 12 * oo * cfg.notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 9 * cfg.notePathHeight,
-                                text: '' + (cfg.octaveCount - oo + 0),
+                                y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 9 * globalCommandDispatcher.cfg().notePathHeight,
+                                text: '' + (globalCommandDispatcher.cfg().octaveCount - oo + 0),
                                 css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
                             };
                             this.leftZoomAnchors[zz].content.push(nm);
@@ -1564,11 +1564,11 @@ class LeftPanel {
                 }
             }
             if (zz < 4) {
-                for (let ss = 0; ss < cfg.data.percussions.length; ss++) {
+                for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++) {
                     let samplerLabel = {
-                        text: '' + cfg.data.percussions[ss].title,
+                        text: '' + globalCommandDispatcher.cfg().data.percussions[ss].title,
                         x: 0,
-                        y: cfg.gridTop() + cfg.gridHeight() - 2 * cfg.data.percussions.length + 2 * cfg.notePathHeight * ss + 2 * cfg.notePathHeight,
+                        y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length + 2 * globalCommandDispatcher.cfg().notePathHeight * ss + 2 * globalCommandDispatcher.cfg().notePathHeight,
                         css: 'samplerRowLabel' + zoomPrefixLevelsCSS[zz].prefix
                     };
                     this.leftZoomAnchors[zz].content.push(samplerLabel);
@@ -1576,13 +1576,13 @@ class LeftPanel {
             }
             if (zz < 4) {
                 let yy = 0;
-                for (let ff = 0; ff < cfg.data.filters.length; ff++) {
-                    let filter = cfg.data.filters[ff];
+                for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
+                    let filter = globalCommandDispatcher.cfg().data.filters[ff];
                     if (filter.automation) {
                         let autoLabel = {
                             text: '' + filter.automation.title,
                             x: 0,
-                            y: (cfg.gridTop() + yy + 1) * cfg.notePathHeight,
+                            y: (globalCommandDispatcher.cfg().gridTop() + yy + 1) * globalCommandDispatcher.cfg().notePathHeight,
                             css: 'autoRowLabel' + zoomPrefixLevelsCSS[zz].prefix
                         };
                         this.leftZoomAnchors[zz].content.push(autoLabel);
@@ -1594,18 +1594,18 @@ class LeftPanel {
     }
 }
 class SamplerBar {
-    constructor(cfg, barIdx, drumIdx, zoomLevel, anchor, left) {
-        let drum = cfg.data.percussions[drumIdx];
+    constructor(barIdx, drumIdx, zoomLevel, anchor, left) {
+        let drum = globalCommandDispatcher.cfg().data.percussions[drumIdx];
         let measure = drum.measures[barIdx];
-        let yy = cfg.gridTop() + cfg.gridHeight() - 2 * cfg.data.percussions.length + drumIdx * cfg.notePathHeight * 2;
-        let tempo = cfg.data.timeline[barIdx].tempo;
+        let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length + drumIdx * globalCommandDispatcher.cfg().notePathHeight * 2;
+        let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
         let css = 'samplerDrumDotBg';
-        if (cfg.data.focus)
-            if (cfg.data.focus == 1)
+        if (globalCommandDispatcher.cfg().data.focus)
+            if (globalCommandDispatcher.cfg().data.focus == 1)
                 css = 'samplerDrumDotFocused';
         for (let ss = 0; ss < measure.skips.length; ss++) {
             let skip = measure.skips[ss];
-            let xx = left + MMUtil().set(skip).duration(tempo) * cfg.widthDurationRatio;
+            let xx = left + MMUtil().set(skip).duration(tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
             let ply = {
                 dots: [xx, yy + 0.025,
                     xx, yy + 2 - 0.025,
@@ -1618,40 +1618,40 @@ class SamplerBar {
     }
 }
 class BarOctave {
-    constructor(barIdx, octaveIdx, left, top, width, height, barOctaveGridAnchor, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel, cfg) {
-        new OctaveContent(barIdx, octaveIdx, left, top, width, height, cfg, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel);
+    constructor(barIdx, octaveIdx, left, top, width, height, barOctaveGridAnchor, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel) {
+        new OctaveContent(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel);
     }
 }
 class OctaveContent {
-    constructor(barIdx, octaveIdx, left, top, width, height, cfg, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel) {
+    constructor(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, barOctaveFirstAnchor, zoomLevel) {
         if (zoomLevel < 8) {
-            this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, cfg, zoomLevel);
+            this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, zoomLevel);
             if (zoomLevel < 7) {
-                this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, cfg);
+                this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor);
             }
         }
     }
-    addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, zoomLevel) {
-        if (cfg.data.tracks.length) {
+    addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel) {
+        if (globalCommandDispatcher.cfg().data.tracks.length) {
             let css = 'mixNoteLine';
-            if (cfg.data.focus) {
+            if (globalCommandDispatcher.cfg().data.focus) {
                 css = 'mixNoteSub';
             }
             if (zoomLevel == 0) {
-                this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, css);
+                this.addTrackNotes(globalCommandDispatcher.cfg().data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, css);
             }
             else {
-                this.addTrackNotes(cfg.data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, css);
+                this.addTrackNotes(globalCommandDispatcher.cfg().data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, css);
             }
         }
     }
-    addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg) {
-        for (let ii = 1; ii < cfg.data.tracks.length; ii++) {
-            let track = cfg.data.tracks[ii];
-            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, 'mixNoteSub');
+    addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor) {
+        for (let ii = 1; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
+            let track = globalCommandDispatcher.cfg().data.tracks[ii];
+            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, 'mixNoteSub');
         }
     }
-    addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, cfg, css) {
+    addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, css) {
         let measure = track.measures[barIdx];
         for (let cc = 0; cc < measure.chords.length; cc++) {
             let chord = measure.chords[cc];
@@ -1659,20 +1659,20 @@ class OctaveContent {
                 let from = octaveIdx * 12;
                 let to = (octaveIdx + 1) * 12;
                 if (chord.pitches[nn] >= from && chord.pitches[nn] < to) {
-                    let x1 = left + MMUtil().set(chord.skip).duration(cfg.data.timeline[barIdx].tempo) * cfg.widthDurationRatio;
-                    let y1 = top + height - (chord.pitches[nn] - from) * cfg.notePathHeight;
+                    let x1 = left + MMUtil().set(chord.skip).duration(globalCommandDispatcher.cfg().data.timeline[barIdx].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                    let y1 = top + height - (chord.pitches[nn] - from) * globalCommandDispatcher.cfg().notePathHeight;
                     for (let ss = 0; ss < chord.slides.length; ss++) {
-                        let x2 = x1 + MMUtil().set(chord.slides[ss].duration).duration(cfg.data.timeline[barIdx].tempo) * cfg.widthDurationRatio;
-                        let y2 = y1 - chord.slides[ss].delta * cfg.notePathHeight;
-                        let r_x1 = x1 + cfg.notePathHeight / 2;
+                        let x2 = x1 + MMUtil().set(chord.slides[ss].duration).duration(globalCommandDispatcher.cfg().data.timeline[barIdx].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                        let y2 = y1 - chord.slides[ss].delta * globalCommandDispatcher.cfg().notePathHeight;
+                        let r_x1 = x1 + globalCommandDispatcher.cfg().notePathHeight / 2;
                         if (ss > 0) {
                             r_x1 = x1;
                         }
-                        let r_x2 = x2 - cfg.notePathHeight / 2;
+                        let r_x2 = x2 - globalCommandDispatcher.cfg().notePathHeight / 2;
                         if (ss < chord.slides.length - 1) {
                             r_x2 = x2;
                         }
-                        if (r_x2 - r_x1 < cfg.notePathHeight / 2) {
+                        if (r_x2 - r_x1 < globalCommandDispatcher.cfg().notePathHeight / 2) {
                             r_x2 = r_x1 + 0.000001;
                         }
                         if (barOctaveAnchor.ww < r_x2 - barOctaveAnchor.xx) {
@@ -1680,9 +1680,9 @@ class OctaveContent {
                         }
                         let line = {
                             x1: r_x1,
-                            y1: y1 - cfg.notePathHeight / 2,
+                            y1: y1 - globalCommandDispatcher.cfg().notePathHeight / 2,
                             x2: r_x2,
-                            y2: y2 - cfg.notePathHeight / 2,
+                            y2: y2 - globalCommandDispatcher.cfg().notePathHeight / 2,
                             css: css
                         };
                         barOctaveAnchor.content.push(line);
@@ -1695,14 +1695,14 @@ class OctaveContent {
     }
 }
 class MixerBar {
-    constructor(barIdx, left, ww, zoomLevel, gridZoomBarAnchor, tracksZoomBarAnchor, firstZoomBarAnchor, cfg) {
-        let h12 = 12 * cfg.notePathHeight;
-        for (let oo = 0; oo < cfg.octaveCount; oo++) {
+    constructor(barIdx, left, ww, zoomLevel, gridZoomBarAnchor, tracksZoomBarAnchor, firstZoomBarAnchor) {
+        let h12 = 12 * globalCommandDispatcher.cfg().notePathHeight;
+        for (let oo = 0; oo < globalCommandDispatcher.cfg().octaveCount; oo++) {
             let gridOctaveAnchor = {
                 showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom,
                 xx: left,
-                yy: cfg.gridTop() + oo * h12,
+                yy: globalCommandDispatcher.cfg().gridTop() + oo * h12,
                 ww: ww,
                 hh: h12, content: [],
                 id: 'octaveGridz' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
@@ -1712,7 +1712,7 @@ class MixerBar {
                 showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom,
                 xx: left,
-                yy: cfg.gridTop() + oo * h12,
+                yy: globalCommandDispatcher.cfg().gridTop() + oo * h12,
                 ww: ww,
                 hh: h12, content: [],
                 id: 'octaveTracks' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
@@ -1722,13 +1722,13 @@ class MixerBar {
                 showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom,
                 xx: left,
-                yy: cfg.gridTop() + oo * h12,
+                yy: globalCommandDispatcher.cfg().gridTop() + oo * h12,
                 ww: ww,
                 hh: h12, content: [],
                 id: 'octaveFirst' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
             };
             firstZoomBarAnchor.content.push(firstOctaveAnchor);
-            new BarOctave(barIdx, (cfg.octaveCount - oo - 1), left, cfg.gridTop() + oo * h12, ww, h12, gridOctaveAnchor, tracksOctaveAnchor, firstOctaveAnchor, zoomLevel, cfg);
+            new BarOctave(barIdx, (globalCommandDispatcher.cfg().octaveCount - oo - 1), left, globalCommandDispatcher.cfg().gridTop() + oo * h12, ww, h12, gridOctaveAnchor, tracksOctaveAnchor, firstOctaveAnchor, zoomLevel);
             if (firstZoomBarAnchor.ww < firstOctaveAnchor.ww) {
                 firstZoomBarAnchor.ww = firstOctaveAnchor.ww;
             }
@@ -1737,33 +1737,33 @@ class MixerBar {
             }
         }
         if (zoomLevel < 6) {
-            this.addOctaveGridSteps(barIdx, cfg, left, ww, gridZoomBarAnchor, zoomLevel);
+            this.addOctaveGridSteps(barIdx, left, ww, gridZoomBarAnchor, zoomLevel);
         }
         if (zoomLevel < 7) {
-            for (let pp = 0; pp < cfg.data.percussions.length; pp++) {
-                let drum = cfg.data.percussions[pp];
+            for (let pp = 0; pp < globalCommandDispatcher.cfg().data.percussions.length; pp++) {
+                let drum = globalCommandDispatcher.cfg().data.percussions[pp];
                 if (drum) {
                     let measure = drum.measures[barIdx];
                     if (measure) {
-                        new SamplerBar(cfg, barIdx, pp, zoomLevel, firstZoomBarAnchor, left);
+                        new SamplerBar(barIdx, pp, zoomLevel, firstZoomBarAnchor, left);
                     }
                 }
             }
         }
         if (zoomLevel < 7) {
-            new TextComments(barIdx, cfg, left, gridZoomBarAnchor, zoomLevel);
+            new TextComments(barIdx, left, gridZoomBarAnchor, zoomLevel);
         }
         if (zoomLevel < 7) {
-            new AutomationBarContent(barIdx, cfg, left, gridZoomBarAnchor, zoomLevel);
+            new AutomationBarContent(barIdx, left, gridZoomBarAnchor, zoomLevel);
         }
     }
-    addOctaveGridSteps(barIdx, cfg, barLeft, width, barOctaveAnchor, zIndex) {
+    addOctaveGridSteps(barIdx, barLeft, width, barOctaveAnchor, zIndex) {
         let zoomInfo = zoomPrefixLevelsCSS[zIndex];
-        let curBar = cfg.data.timeline[barIdx];
+        let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
         let lineCount = 0;
         let skip = MMUtil().set({ count: 0, part: 1 });
-        let top = cfg.gridTop();
-        let height = cfg.gridHeight();
+        let top = globalCommandDispatcher.cfg().gridTop();
+        let height = globalCommandDispatcher.cfg().gridHeight();
         let barRightBorder = {
             x: barLeft + width,
             y: top,
@@ -1783,7 +1783,7 @@ class MixerBar {
                 if (!skip.less(curBar.metre)) {
                     break;
                 }
-                let xx = barLeft + skip.duration(curBar.tempo) * cfg.widthDurationRatio;
+                let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
                 let mark = {
                     x: xx,
                     y: top,
@@ -1801,10 +1801,10 @@ class MixerBar {
     }
 }
 class TextComments {
-    constructor(barIdx, cfg, barLeft, barOctaveAnchor, zIndex) {
-        let curBar = cfg.data.timeline[barIdx];
-        let top = cfg.gridTop();
-        if (barIdx < cfg.data.comments.length) {
+    constructor(barIdx, barLeft, barOctaveAnchor, zIndex) {
+        let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
+        let top = globalCommandDispatcher.cfg().gridTop();
+        if (barIdx < globalCommandDispatcher.cfg().data.comments.length) {
             let txtZoomRatio = 1;
             if (zIndex > 2)
                 txtZoomRatio = 2;
@@ -1813,18 +1813,18 @@ class TextComments {
             if (zIndex > 4)
                 txtZoomRatio = 8;
             let css = 'commentReadText' + zoomPrefixLevelsCSS[zIndex].prefix;
-            if (cfg.data.focus) {
-                if (cfg.data.focus == 3) {
+            if (globalCommandDispatcher.cfg().data.focus) {
+                if (globalCommandDispatcher.cfg().data.focus == 3) {
                     css = 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix;
                 }
             }
-            for (let ii = 0; ii < cfg.data.comments[barIdx].points.length; ii++) {
-                let itxt = cfg.data.comments[barIdx].points[ii];
-                let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * cfg.widthDurationRatio;
+            for (let ii = 0; ii < globalCommandDispatcher.cfg().data.comments[barIdx].points.length; ii++) {
+                let itxt = globalCommandDispatcher.cfg().data.comments[barIdx].points[ii];
+                let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
                 let tt = {
                     x: xx,
-                    y: top + cfg.notePathHeight * (1 + itxt.row) * txtZoomRatio,
-                    text: cfg.data.comments[barIdx].points[ii].text,
+                    y: top + globalCommandDispatcher.cfg().notePathHeight * (1 + itxt.row) * txtZoomRatio,
+                    text: globalCommandDispatcher.cfg().data.comments[barIdx].points[ii].text,
                     css: css
                 };
                 barOctaveAnchor.content.push(tt);
@@ -1833,29 +1833,29 @@ class TextComments {
     }
 }
 class AutomationBarContent {
-    constructor(barIdx, cfg, barLeft, barOctaveAnchor, zIndex) {
-        let curBar = cfg.data.timeline[barIdx];
-        let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * cfg.widthDurationRatio;
+    constructor(barIdx, barLeft, barOctaveAnchor, zIndex) {
+        let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
+        let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
         let left = barLeft + width;
-        let top = cfg.gridTop();
-        let height = cfg.automationMaxHeight();
+        let top = globalCommandDispatcher.cfg().gridTop();
+        let height = globalCommandDispatcher.cfg().automationMaxHeight();
         let css = 'automationBgDot';
-        if (cfg.data.focus)
-            if (cfg.data.focus == 2)
+        if (globalCommandDispatcher.cfg().data.focus)
+            if (globalCommandDispatcher.cfg().data.focus == 2)
                 css = 'automationFocusedDot';
         let yy = 0;
-        for (let ff = 0; ff < cfg.data.filters.length; ff++) {
-            let filter = cfg.data.filters[ff];
+        for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
+            let filter = globalCommandDispatcher.cfg().data.filters[ff];
             if (filter.automation) {
                 if (filter.automation.measures[barIdx]) {
                     let measure = filter.automation.measures[barIdx];
                     for (let ii = 0; ii < measure.changes.length; ii++) {
                         let change = measure.changes[ii];
-                        let xx = barLeft + MMUtil().set(change.skip).duration(curBar.tempo) * cfg.widthDurationRatio;
+                        let xx = barLeft + MMUtil().set(change.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
                         let aubtn = {
-                            dots: [xx, top + cfg.notePathHeight * yy,
-                                xx + 1, top + cfg.notePathHeight * yy,
-                                xx, top + cfg.notePathHeight * (yy + 1)
+                            dots: [xx, top + globalCommandDispatcher.cfg().notePathHeight * yy,
+                                xx + 1, top + globalCommandDispatcher.cfg().notePathHeight * yy,
+                                xx, top + globalCommandDispatcher.cfg().notePathHeight * (yy + 1)
                             ],
                             css: css
                         };
@@ -1872,10 +1872,10 @@ class MixerUI {
         this.levels = [];
         this.fanPane = new FanPane();
     }
-    reFillMixerUI(cfg) {
+    reFillMixerUI() {
         console.log('reFillMixerUI', this.fanLayer.anchors.length);
-        let ww = cfg.wholeWidth();
-        let hh = cfg.wholeHeight();
+        let ww = globalCommandDispatcher.cfg().wholeWidth();
+        let hh = globalCommandDispatcher.cfg().wholeHeight();
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             this.gridLayers.anchors[ii].ww = ww;
             this.gridLayers.anchors[ii].hh = hh;
@@ -1886,16 +1886,16 @@ class MixerUI {
             this.fanLayer.anchors[ii].ww = ww;
             this.fanLayer.anchors[ii].hh = hh;
             this.fanLayer.anchors[ii].content = [];
-            this.levels[ii].reCreateBars(cfg);
+            this.levels[ii].reCreateBars();
         }
-        this.fanPane.resetPlates(cfg, this.fanLayer.anchors);
-        this.fillerAnchor.xx = cfg.leftPad;
-        this.fillerAnchor.yy = cfg.gridTop();
-        this.fillerAnchor.ww = cfg.wholeWidth() - cfg.leftPad - cfg.rightPad;
-        this.fillerAnchor.hh = cfg.gridHeight();
+        this.fanPane.resetPlates(this.fanLayer.anchors);
+        this.fillerAnchor.xx = globalCommandDispatcher.cfg().leftPad;
+        this.fillerAnchor.yy = globalCommandDispatcher.cfg().gridTop();
+        this.fillerAnchor.ww = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().rightPad;
+        this.fillerAnchor.hh = globalCommandDispatcher.cfg().gridHeight();
         this.fillerAnchor.content = [];
-        this.reFillWholeRatio(cfg);
-        this.reFillSingleRatio(cfg);
+        this.reFillWholeRatio();
+        this.reFillSingleRatio();
     }
     createMixerLayers() {
         let tracksLayerZoom = document.getElementById('tracksLayerZoom');
@@ -1942,26 +1942,26 @@ class MixerUI {
         this.gridLayers.anchors.push(this.fillerAnchor);
         return [this.gridLayers, this.trackLayers, this.firstLayers, this.fanLayer];
     }
-    reFillSingleRatio(cfg) {
+    reFillSingleRatio() {
         let countFunction;
-        let yy = cfg.gridTop() + cfg.gridHeight() / 8;
-        let hh = cfg.gridHeight() * 6 / 8;
-        if (cfg.data.focus) {
-            if (cfg.data.focus == 1) {
+        let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 8;
+        let hh = globalCommandDispatcher.cfg().gridHeight() * 6 / 8;
+        if (globalCommandDispatcher.cfg().data.focus) {
+            if (globalCommandDispatcher.cfg().data.focus == 1) {
                 countFunction = this.barDrumCount;
-                yy = cfg.gridTop() + cfg.gridHeight() - 2 * cfg.data.percussions.length;
-                hh = 2 * cfg.data.percussions.length;
+                yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length;
+                hh = 2 * globalCommandDispatcher.cfg().data.percussions.length;
             }
             else {
-                if (cfg.data.focus == 2) {
+                if (globalCommandDispatcher.cfg().data.focus == 2) {
                     countFunction = this.barAutoCount;
-                    yy = cfg.gridTop();
-                    hh = cfg.maxAutomationsCount;
+                    yy = globalCommandDispatcher.cfg().gridTop();
+                    hh = globalCommandDispatcher.cfg().maxAutomationsCount;
                 }
                 else {
                     countFunction = this.barCommentsCount;
-                    yy = cfg.gridTop();
-                    hh = cfg.commentsMaxHeight();
+                    yy = globalCommandDispatcher.cfg().gridTop();
+                    hh = globalCommandDispatcher.cfg().commentsMaxHeight();
                 }
             }
         }
@@ -1969,8 +1969,8 @@ class MixerUI {
             countFunction = this.barTrackCount;
         }
         let mxItems = 0;
-        for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
-            let itemcount = countFunction(cfg, bb);
+        for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
+            let itemcount = countFunction(bb);
             if (mxItems < itemcount) {
                 mxItems = itemcount;
             }
@@ -1978,13 +1978,13 @@ class MixerUI {
         if (mxItems < 1)
             mxItems = 1;
         let barX = 0;
-        for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
-            let itemcount = countFunction(cfg, bb);
+        for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
+            let itemcount = countFunction(bb);
             let filIdx = 1 + Math.round(7 * itemcount / mxItems);
             let css = 'mixFiller' + filIdx;
-            let barwidth = MMUtil().set(cfg.data.timeline[bb].metre).duration(cfg.data.timeline[bb].tempo) * cfg.widthDurationRatio;
+            let barwidth = MMUtil().set(globalCommandDispatcher.cfg().data.timeline[bb].metre).duration(globalCommandDispatcher.cfg().data.timeline[bb].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
             let fillRectangle = {
-                x: cfg.leftPad + barX,
+                x: globalCommandDispatcher.cfg().leftPad + barX,
                 y: yy,
                 w: barwidth,
                 h: hh,
@@ -1994,31 +1994,32 @@ class MixerUI {
             barX = barX + barwidth;
         }
     }
-    reFillWholeRatio(cfg) {
-        let yy = cfg.gridTop();
-        let hh = cfg.gridHeight() / 8;
-        if (cfg.data.focus) {
-            if (cfg.data.focus == 1) {
-                yy = cfg.gridTop();
-                hh = cfg.gridHeight() - 2 * cfg.data.percussions.length;
+    reFillWholeRatio() {
+        let yy = globalCommandDispatcher.cfg().gridTop();
+        let hh = globalCommandDispatcher.cfg().gridHeight() / 8;
+        if (globalCommandDispatcher.cfg().data.focus) {
+            if (globalCommandDispatcher.cfg().data.focus == 1) {
+                yy = globalCommandDispatcher.cfg().gridTop();
+                hh = globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length;
             }
             else {
-                if (cfg.data.focus == 2) {
-                    yy = cfg.gridTop() + cfg.maxAutomationsCount;
-                    hh = cfg.gridHeight() - cfg.maxAutomationsCount;
+                if (globalCommandDispatcher.cfg().data.focus == 2) {
+                    yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().maxAutomationsCount;
+                    hh = globalCommandDispatcher.cfg().gridHeight() - globalCommandDispatcher.cfg().maxAutomationsCount;
                 }
                 else {
-                    yy = cfg.gridTop() + cfg.commentsMaxHeight();
-                    hh = cfg.gridHeight() - cfg.commentsMaxHeight();
+                    yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().commentsMaxHeight();
+                    hh = globalCommandDispatcher.cfg().gridHeight() - globalCommandDispatcher.cfg().commentsMaxHeight();
                 }
             }
         }
-        let countFunction = (cfg, barIdx) => {
-            return this.barDrumCount(cfg, barIdx) + this.barAutoCount(cfg, barIdx) + this.barCommentsCount(cfg, barIdx) + this.barTrackCount(cfg, barIdx);
+        let countFunction = (barIdx) => {
+            return this.barDrumCount(barIdx) + this.barAutoCount(barIdx)
+                + this.barCommentsCount(barIdx) + this.barTrackCount(barIdx);
         };
         let mxItems = 0;
-        for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
-            let itemcount = countFunction(cfg, bb);
+        for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
+            let itemcount = countFunction(bb);
             if (mxItems < itemcount) {
                 mxItems = itemcount;
             }
@@ -2026,25 +2027,25 @@ class MixerUI {
         if (mxItems < 1)
             mxItems = 1;
         let barX = 0;
-        for (let bb = 0; bb < cfg.data.timeline.length; bb++) {
-            let itemcount = countFunction(cfg, bb);
+        for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
+            let itemcount = countFunction(bb);
             let filIdx = 1 + Math.round(7 * itemcount / mxItems);
             let css = 'mixFiller' + filIdx;
-            let barwidth = MMUtil().set(cfg.data.timeline[bb].metre).duration(cfg.data.timeline[bb].tempo) * cfg.widthDurationRatio;
+            let barwidth = MMUtil().set(globalCommandDispatcher.cfg().data.timeline[bb].metre).duration(globalCommandDispatcher.cfg().data.timeline[bb].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
             let fillRectangle = {
-                x: cfg.leftPad + barX,
+                x: globalCommandDispatcher.cfg().leftPad + barX,
                 y: yy,
                 w: barwidth,
                 h: hh,
                 css: css
             };
             this.fillerAnchor.content.push(fillRectangle);
-            if (cfg.data.focus) {
+            if (globalCommandDispatcher.cfg().data.focus) {
             }
             else {
                 this.fillerAnchor.content.push({
-                    x: cfg.leftPad + barX,
-                    y: cfg.gridTop() + cfg.gridHeight() * 7 / 8,
+                    x: globalCommandDispatcher.cfg().leftPad + barX,
+                    y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() * 7 / 8,
                     w: barwidth,
                     h: hh,
                     css: css
@@ -2053,10 +2054,10 @@ class MixerUI {
             barX = barX + barwidth;
         }
     }
-    barTrackCount(cfg, bb) {
+    barTrackCount(bb) {
         let notecount = 0;
-        for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
-            let bar = cfg.data.tracks[tt].measures[bb];
+        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+            let bar = globalCommandDispatcher.cfg().data.tracks[tt].measures[bb];
             if (bar) {
                 for (let cc = 0; cc < bar.chords.length; cc++) {
                     notecount = notecount + bar.chords[cc].pitches.length;
@@ -2065,20 +2066,20 @@ class MixerUI {
         }
         return notecount;
     }
-    barDrumCount(cfg, bb) {
+    barDrumCount(bb) {
         let drumcount = 0;
-        for (let tt = 0; tt < cfg.data.percussions.length; tt++) {
-            let bar = cfg.data.percussions[tt].measures[bb];
+        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.percussions.length; tt++) {
+            let bar = globalCommandDispatcher.cfg().data.percussions[tt].measures[bb];
             if (bar) {
                 drumcount = drumcount + bar.skips.length;
             }
         }
         return drumcount;
     }
-    barAutoCount(cfg, bb) {
+    barAutoCount(bb) {
         let autoCnt = 0;
-        for (let ff = 0; ff < cfg.data.filters.length; ff++) {
-            let filter = cfg.data.filters[ff];
+        for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
+            let filter = globalCommandDispatcher.cfg().data.filters[ff];
             if (filter.automation) {
                 if (filter.automation.measures[bb]) {
                     autoCnt = autoCnt + filter.automation.measures[bb].changes.length;
@@ -2087,10 +2088,10 @@ class MixerUI {
         }
         return autoCnt;
     }
-    barCommentsCount(cfg, bb) {
-        if (cfg.data.comments[bb]) {
-            if (cfg.data.comments[bb].points) {
-                return cfg.data.comments[bb].points.length;
+    barCommentsCount(bb) {
+        if (globalCommandDispatcher.cfg().data.comments[bb]) {
+            if (globalCommandDispatcher.cfg().data.comments[bb].points) {
+                return globalCommandDispatcher.cfg().data.comments[bb].points.length;
             }
         }
         return 0;
@@ -2103,58 +2104,58 @@ class MixerZoomLevel {
         this.zoomTracksAnchor = anchorTracks;
         this.zoomFirstAnchor = anchorFirst;
     }
-    reCreateBars(cfg) {
+    reCreateBars() {
         this.zoomGridAnchor.content = [];
         this.zoomTracksAnchor.content = [];
         this.zoomFirstAnchor.content = [];
         this.bars = [];
-        let left = cfg.leftPad;
+        let left = globalCommandDispatcher.cfg().leftPad;
         let width = 0;
-        for (let ii = 0; ii < cfg.data.timeline.length; ii++) {
-            let timebar = cfg.data.timeline[ii];
-            width = MMUtil().set(timebar.metre).duration(timebar.tempo) * cfg.widthDurationRatio;
+        for (let ii = 0; ii < globalCommandDispatcher.cfg().data.timeline.length; ii++) {
+            let timebar = globalCommandDispatcher.cfg().data.timeline[ii];
+            width = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
             let barGridAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
-                xx: left, yy: 0, ww: width, hh: cfg.wholeHeight(), content: [], id: 'barGrid' + (ii + Math.random())
+                xx: left, yy: 0, ww: width, hh: globalCommandDispatcher.cfg().wholeHeight(), content: [], id: 'barGrid' + (ii + Math.random())
             };
             this.zoomGridAnchor.content.push(barGridAnchor);
             let barTracksAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
-                xx: left, yy: 0, ww: width, hh: cfg.wholeHeight(), content: [], id: 'barTrack' + (ii + Math.random())
+                xx: left, yy: 0, ww: width, hh: globalCommandDispatcher.cfg().wholeHeight(), content: [], id: 'barTrack' + (ii + Math.random())
             };
             this.zoomTracksAnchor.content.push(barTracksAnchor);
             let barFirstAnchor = {
                 showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
-                xx: left, yy: 0, ww: width, hh: cfg.wholeHeight(), content: [], id: 'barFirst' + (ii + Math.random())
+                xx: left, yy: 0, ww: width, hh: globalCommandDispatcher.cfg().wholeHeight(), content: [], id: 'barFirst' + (ii + Math.random())
             };
             this.zoomFirstAnchor.content.push(barFirstAnchor);
-            let mixBar = new MixerBar(ii, left, width, this.zoomLevelIndex, barGridAnchor, barTracksAnchor, barFirstAnchor, cfg);
+            let mixBar = new MixerBar(ii, left, width, this.zoomLevelIndex, barGridAnchor, barTracksAnchor, barFirstAnchor);
             this.bars.push(mixBar);
             left = left + width;
         }
         let titleLabel = {
             x: 0,
-            y: cfg.heightOfTitle(),
-            text: cfg.data.title,
+            y: globalCommandDispatcher.cfg().heightOfTitle(),
+            text: globalCommandDispatcher.cfg().data.title,
             css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix
         };
         this.zoomGridAnchor.content.push(titleLabel);
-        this.addDrumLines(cfg);
-        this.addGridLines(this.zoomGridAnchor, cfg);
-        this.addCommentLines(cfg);
+        this.addDrumLines();
+        this.addGridLines(this.zoomGridAnchor);
+        this.addCommentLines();
     }
-    addDrumLines(cfg) {
+    addDrumLines() {
     }
-    addCommentLines(cfg) {
+    addCommentLines() {
     }
-    addGridLines(barOctaveAnchor, cfg) {
+    addGridLines(barOctaveAnchor) {
         if (this.zoomLevelIndex < 4) {
-            for (let oo = 0; oo < cfg.octaveCount; oo++) {
+            for (let oo = 0; oo < globalCommandDispatcher.cfg().octaveCount; oo++) {
                 if (oo > 0) {
                     let octaveBottomBorder = {
-                        x: cfg.leftPad,
-                        y: cfg.gridTop() + oo * 12 * cfg.notePathHeight,
-                        w: cfg.timelineWidth(),
+                        x: globalCommandDispatcher.cfg().leftPad,
+                        y: globalCommandDispatcher.cfg().gridTop() + oo * 12 * globalCommandDispatcher.cfg().notePathHeight,
+                        w: globalCommandDispatcher.cfg().timelineWidth(),
                         h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 2.0,
                         css: 'octaveBottomBorder'
                     };
@@ -2163,22 +2164,22 @@ class MixerZoomLevel {
                 if (this.zoomLevelIndex < 3) {
                     for (let kk = 1; kk < 12; kk++) {
                         let need = false;
-                        if (cfg.data.focus) {
-                            if (cfg.data.focus == 1) {
-                                if (oo * 12 + kk > 12 * cfg.octaveCount - cfg.data.percussions.length * 2 - 2) {
+                        if (globalCommandDispatcher.cfg().data.focus) {
+                            if (globalCommandDispatcher.cfg().data.focus == 1) {
+                                if (oo * 12 + kk > 12 * globalCommandDispatcher.cfg().octaveCount - globalCommandDispatcher.cfg().data.percussions.length * 2 - 2) {
                                     if (!((oo * 12 + kk) % 2)) {
                                         need = true;
                                     }
                                 }
                             }
                             else {
-                                if (cfg.data.focus == 2) {
-                                    if (oo * 12 + kk <= cfg.maxAutomationsCount) {
+                                if (globalCommandDispatcher.cfg().data.focus == 2) {
+                                    if (oo * 12 + kk <= globalCommandDispatcher.cfg().maxAutomationsCount) {
                                         need = true;
                                     }
                                 }
                                 else {
-                                    if (oo * 12 + kk < 2 + cfg.maxCommentRowCount) {
+                                    if (oo * 12 + kk < 2 + globalCommandDispatcher.cfg().maxCommentRowCount) {
                                         need = true;
                                     }
                                 }
@@ -2189,9 +2190,9 @@ class MixerZoomLevel {
                         }
                         if (need) {
                             barOctaveAnchor.content.push({
-                                x: cfg.leftPad,
-                                y: cfg.gridTop() + (oo * 12 + kk) * cfg.notePathHeight,
-                                w: cfg.timelineWidth(),
+                                x: globalCommandDispatcher.cfg().leftPad,
+                                y: globalCommandDispatcher.cfg().gridTop() + (oo * 12 + kk) * globalCommandDispatcher.cfg().notePathHeight,
+                                w: globalCommandDispatcher.cfg().timelineWidth(),
                                 h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
                                 css: 'interActiveGridLine'
                             });
@@ -2203,61 +2204,65 @@ class MixerZoomLevel {
     }
 }
 class FanPane {
-    resetPlates(cfg, fanAnchors) {
-        console.log('FanPane.resetPlates', cfg, fanAnchors);
+    resetPlates(fanAnchors) {
         this.filterIcons = [];
         this.autoIcons = [];
         this.performerIcons = [];
         this.samplerIcons = [];
-        for (let ff = 0; ff < cfg.data.filters.length; ff++) {
-            if (cfg.data.filters[ff].automation) {
-                this.autoIcons.push(new FilterIcon(cfg.data.filters[ff].id));
+        for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
+            if (globalCommandDispatcher.cfg().data.filters[ff].automation) {
+                this.autoIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
             }
             else {
-                this.filterIcons.push(new FilterIcon(cfg.data.filters[ff].id));
+                this.filterIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
             }
         }
-        for (let tt = 0; tt < cfg.data.tracks.length; tt++) {
-            this.performerIcons.push(new PerformerIcon(cfg.data.tracks[tt].performer.id));
+        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+            this.performerIcons.push(new PerformerIcon(globalCommandDispatcher.cfg().data.tracks[tt].performer.id));
         }
-        for (let tt = 0; tt < cfg.data.percussions.length; tt++) {
-            this.samplerIcons.push(new SamplerIcon(cfg.data.percussions[tt].sampler.id));
+        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.percussions.length; tt++) {
+            this.samplerIcons.push(new SamplerIcon(globalCommandDispatcher.cfg().data.percussions[tt].sampler.id));
         }
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
-            this.buildPerformerIcons(cfg, fanAnchors[ii], ii);
-            this.buildFilterIcons(cfg, fanAnchors[ii], ii);
-            this.buildAutoIcons(cfg, fanAnchors[ii], ii);
-            this.buildSamplerIcons(cfg, fanAnchors[ii], ii);
-            this.buildOutIcon(cfg, fanAnchors[ii], ii);
+            this.buildPerformerIcons(fanAnchors[ii], ii);
+            this.buildFilterIcons(fanAnchors[ii], ii);
+            this.buildAutoIcons(fanAnchors[ii], ii);
+            this.buildSamplerIcons(fanAnchors[ii], ii);
+            this.buildOutIcon(fanAnchors[ii], ii);
         }
     }
-    buildPerformerIcons(cfg, fanAnchor, zidx) {
+    buildPerformerIcons(fanAnchor, zidx) {
         for (let ii = 0; ii < this.performerIcons.length; ii++) {
-            this.performerIcons[ii].buildPerformerSpot(cfg, fanAnchor, zidx);
+            this.performerIcons[ii].buildPerformerSpot(fanAnchor, zidx);
         }
     }
-    buildSamplerIcons(cfg, fanAnchor, zidx) {
+    buildSamplerIcons(fanAnchor, zidx) {
         for (let ii = 0; ii < this.samplerIcons.length; ii++) {
-            this.samplerIcons[ii].buildSamplerSpot(cfg, fanAnchor, zidx);
+            this.samplerIcons[ii].buildSamplerSpot(fanAnchor, zidx);
         }
     }
-    buildAutoIcons(cfg, fanAnchor, zidx) {
+    buildAutoIcons(fanAnchor, zidx) {
         for (let ii = 0; ii < this.autoIcons.length; ii++) {
-            this.autoIcons[ii].buildAutoSpot(cfg, fanAnchor, zidx);
+            this.autoIcons[ii].buildAutoSpot(fanAnchor, zidx);
         }
     }
-    buildFilterIcons(cfg, fanAnchor, zidx) {
+    buildFilterIcons(fanAnchor, zidx) {
         for (let ii = 0; ii < this.filterIcons.length; ii++) {
-            this.filterIcons[ii].buildFilterSpot(cfg, fanAnchor, zidx);
+            this.filterIcons[ii].buildFilterSpot(fanAnchor, zidx);
         }
     }
-    buildOutIcon(cfg, fanAnchor, zidx) {
-        let xx = cfg.wholeWidth() - cfg.speakerIconPad - cfg.rightPad;
-        let yy = cfg.gridTop() + cfg.gridHeight() / 2 - cfg.speakerIconSize / 2;
-        let rec = { x: xx, y: yy, w: cfg.speakerIconSize, h: cfg.speakerIconSize,
-            rx: cfg.speakerIconSize / 2, ry: cfg.speakerIconSize / 2, css: 'fanSpeakerIcon' };
+    buildOutIcon(fanAnchor, zidx) {
+        let xx = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad;
+        let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
+        let rec = {
+            x: xx, y: yy, w: globalCommandDispatcher.cfg().speakerIconSize, h: globalCommandDispatcher.cfg().speakerIconSize,
+            rx: globalCommandDispatcher.cfg().speakerIconSize / 2, ry: globalCommandDispatcher.cfg().speakerIconSize / 2, css: 'fanSpeakerIcon'
+        };
         fanAnchor.content.push(rec);
-        let icon = { x: xx + cfg.speakerIconSize, y: yy + cfg.speakerIconSize, text: icon_sound_loud, css: 'fanSpeakerIconLabel' };
+        let icon = {
+            x: xx + globalCommandDispatcher.cfg().speakerIconSize,
+            y: yy + globalCommandDispatcher.cfg().speakerIconSize, text: icon_sound_loud, css: 'fanSpeakerIconLabel'
+        };
         fanAnchor.content.push(icon);
     }
 }
@@ -2265,18 +2270,18 @@ class PerformerIcon {
     constructor(performerId) {
         this.performerId = performerId;
     }
-    buildPerformerSpot(cfg, fanLevelAnchor, zidx) {
-        for (let ii = 0; ii < cfg.data.tracks.length; ii++) {
-            if (cfg.data.tracks[ii].performer.id == this.performerId) {
-                let audioSeq = cfg.data.tracks[ii].performer;
-                this.addPerformerSpot(cfg, audioSeq, fanLevelAnchor, zidx);
+    buildPerformerSpot(fanLevelAnchor, zidx) {
+        for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
+            if (globalCommandDispatcher.cfg().data.tracks[ii].performer.id == this.performerId) {
+                let audioSeq = globalCommandDispatcher.cfg().data.tracks[ii].performer;
+                this.addPerformerSpot(audioSeq, fanLevelAnchor, zidx);
                 break;
             }
         }
     }
-    addPerformerSpot(cfg, audioSeq, fanLevelAnchor, zidx) {
-        let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
-        let top = cfg.gridTop();
+    addPerformerSpot(audioSeq, fanLevelAnchor, zidx) {
+        let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+        let top = globalCommandDispatcher.cfg().gridTop();
         let xx = left;
         let yy = top;
         if (audioSeq.iconPosition) {
@@ -2285,34 +2290,37 @@ class PerformerIcon {
         }
         let rec = {
             x: xx, y: yy,
-            w: cfg.pluginIconSize, h: cfg.pluginIconSize,
-            rx: cfg.pluginIconSize / 2, ry: cfg.pluginIconSize / 2,
+            w: globalCommandDispatcher.cfg().pluginIconSize, h: globalCommandDispatcher.cfg().pluginIconSize,
+            rx: globalCommandDispatcher.cfg().pluginIconSize / 2, ry: globalCommandDispatcher.cfg().pluginIconSize / 2,
             css: 'fanPerformerIcon'
         };
         fanLevelAnchor.content.push(rec);
         if (zidx < 5) {
-            let txt = { text: audioSeq.kind + ':' + audioSeq.id, x: xx, y: yy + cfg.pluginIconSize, css: 'fanSamplerIcon' };
+            let txt = {
+                text: audioSeq.kind + ':' + audioSeq.id,
+                x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanSamplerIcon'
+            };
             fanLevelAnchor.content.push(txt);
         }
-        let controlLineWidth = xx - cfg.leftPad - cfg.timelineWidth() - cfg.padGridFan;
-        new ControlConnection().addLineFlow(cfg, yy + cfg.pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
-        this.addOutputs(cfg, audioSeq.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
+        let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
+        new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
+        this.addOutputs(audioSeq.outputs, fanLevelAnchor, zidx, xx + globalCommandDispatcher.cfg().pluginIconSize, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
     }
-    addOutputs(cfg, outputs, fanLevelAnchor, zidx, fromX, fromY) {
+    addOutputs(outputs, fanLevelAnchor, zidx, fromX, fromY) {
         if (outputs)
             if (outputs.length > 0) {
                 for (let oo = 0; oo < outputs.length; oo++) {
                     let outId = outputs[oo];
-                    for (let ii = 0; ii < cfg.data.filters.length; ii++) {
-                        if (cfg.data.filters[ii].id == outId) {
-                            let toFilter = cfg.data.filters[ii];
-                            let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
-                            let top = cfg.gridTop();
+                    for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
+                        if (globalCommandDispatcher.cfg().data.filters[ii].id == outId) {
+                            let toFilter = globalCommandDispatcher.cfg().data.filters[ii];
+                            let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+                            let top = globalCommandDispatcher.cfg().gridTop();
                             let xx = left;
                             let yy = top;
                             if (toFilter.iconPosition) {
                                 xx = left + toFilter.iconPosition.x;
-                                yy = top + toFilter.iconPosition.y + cfg.pluginIconSize / 2;
+                                yy = top + toFilter.iconPosition.y + globalCommandDispatcher.cfg().pluginIconSize / 2;
                             }
                             new SpearConnection().addSpear(fromX, fromY, xx, yy, fanLevelAnchor);
                             break;
@@ -2321,8 +2329,8 @@ class PerformerIcon {
                 }
             }
             else {
-                let speakerX = cfg.wholeWidth() - cfg.speakerIconPad - cfg.rightPad;
-                new SpearConnection().addSpear(fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor);
+                let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad;
+                new SpearConnection().addSpear(fromX, fromY, speakerX, globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2, fanLevelAnchor);
             }
     }
 }
@@ -2330,49 +2338,53 @@ class SamplerIcon {
     constructor(samplerId) {
         this.samplerId = samplerId;
     }
-    buildSamplerSpot(cfg, fanLevelAnchor, zidx) {
-        for (let ii = 0; ii < cfg.data.percussions.length; ii++) {
-            if (cfg.data.percussions[ii].sampler.id == this.samplerId) {
-                let sampler = cfg.data.percussions[ii].sampler;
-                this.addSamplerSpot(cfg, sampler, fanLevelAnchor, zidx);
+    buildSamplerSpot(fanLevelAnchor, zidx) {
+        for (let ii = 0; ii < globalCommandDispatcher.cfg().data.percussions.length; ii++) {
+            if (globalCommandDispatcher.cfg().data.percussions[ii].sampler.id == this.samplerId) {
+                let sampler = globalCommandDispatcher.cfg().data.percussions[ii].sampler;
+                this.addSamplerSpot(sampler, fanLevelAnchor, zidx);
                 break;
             }
         }
     }
-    addSamplerSpot(cfg, sampler, fanLevelAnchor, zidx) {
-        let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
-        let top = cfg.gridTop();
+    addSamplerSpot(sampler, fanLevelAnchor, zidx) {
+        let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+        let top = globalCommandDispatcher.cfg().gridTop();
         let xx = left;
         let yy = top;
         if (sampler.iconPosition) {
             xx = left + sampler.iconPosition.x;
             yy = top + sampler.iconPosition.y;
         }
-        let controlLineWidth = xx - cfg.leftPad - cfg.timelineWidth() - cfg.padGridFan;
-        let rec = { x: xx, y: yy, w: cfg.pluginIconSize, h: cfg.pluginIconSize, rx: cfg.pluginIconSize / 2, ry: cfg.pluginIconSize / 2, css: 'fanSamplerIcon' };
+        let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth() - globalCommandDispatcher.cfg().padGridFan;
+        let rec = { x: xx, y: yy,
+            w: globalCommandDispatcher.cfg().pluginIconSize, h: globalCommandDispatcher.cfg().pluginIconSize,
+            rx: globalCommandDispatcher.cfg().pluginIconSize / 2, ry: globalCommandDispatcher.cfg().pluginIconSize / 2,
+            css: 'fanSamplerIcon' };
         fanLevelAnchor.content.push(rec);
         if (zidx < 5) {
-            let txt = { text: sampler.kind + ':' + sampler.id, x: xx, y: yy + cfg.pluginIconSize, css: 'fanSamplerIcon' };
+            let txt = { text: sampler.kind + ':' + sampler.id,
+                x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanSamplerIcon' };
             fanLevelAnchor.content.push(txt);
         }
-        new ControlConnection().addLineFlow(cfg, yy + cfg.pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
-        this.addOutputs(cfg, sampler.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
+        new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
+        this.addOutputs(sampler.outputs, fanLevelAnchor, zidx, xx + globalCommandDispatcher.cfg().pluginIconSize, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
     }
-    addOutputs(cfg, outputs, fanLevelAnchor, zidx, fromX, fromY) {
+    addOutputs(outputs, fanLevelAnchor, zidx, fromX, fromY) {
         if (outputs)
             if (outputs.length > 0) {
                 for (let oo = 0; oo < outputs.length; oo++) {
                     let outId = outputs[oo];
-                    for (let ii = 0; ii < cfg.data.filters.length; ii++) {
-                        if (cfg.data.filters[ii].id == outId) {
-                            let toFilter = cfg.data.filters[ii];
-                            let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
-                            let top = cfg.gridTop();
+                    for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
+                        if (globalCommandDispatcher.cfg().data.filters[ii].id == outId) {
+                            let toFilter = globalCommandDispatcher.cfg().data.filters[ii];
+                            let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+                            let top = globalCommandDispatcher.cfg().gridTop();
                             let xx = left;
                             let yy = top;
                             if (toFilter.iconPosition) {
                                 xx = left + toFilter.iconPosition.x;
-                                yy = top + toFilter.iconPosition.y + cfg.pluginIconSize / 2;
+                                yy = top + toFilter.iconPosition.y + globalCommandDispatcher.cfg().pluginIconSize / 2;
                             }
                             new SpearConnection().addSpear(fromX, fromY, xx, yy, fanLevelAnchor);
                             break;
@@ -2381,8 +2393,8 @@ class SamplerIcon {
                 }
             }
             else {
-                let speakerX = cfg.wholeWidth() - cfg.speakerIconPad - cfg.rightPad;
-                new SpearConnection().addSpear(fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor);
+                let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad;
+                new SpearConnection().addSpear(fromX, fromY, speakerX, globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2, fanLevelAnchor);
             }
     }
 }
@@ -2390,77 +2402,80 @@ class FilterIcon {
     constructor(filterId) {
         this.filterId = filterId;
     }
-    buildFilterSpot(cfg, fanLevelAnchor, zidx) {
-        for (let ii = 0; ii < cfg.data.filters.length; ii++) {
-            if (cfg.data.filters[ii].id == this.filterId) {
-                let filterTarget = cfg.data.filters[ii];
-                this.addFilterSpot(cfg, filterTarget, fanLevelAnchor, zidx);
+    buildFilterSpot(fanLevelAnchor, zidx) {
+        for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
+            if (globalCommandDispatcher.cfg().data.filters[ii].id == this.filterId) {
+                let filterTarget = globalCommandDispatcher.cfg().data.filters[ii];
+                this.addFilterSpot(filterTarget, fanLevelAnchor, zidx);
                 break;
             }
         }
     }
-    addFilterSpot(cfg, filterTarget, fanLevelAnchor, zidx) {
-        let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
-        let top = cfg.gridTop();
+    addFilterSpot(filterTarget, fanLevelAnchor, zidx) {
+        let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+        let top = globalCommandDispatcher.cfg().gridTop();
         let xx = left;
         let yy = top;
         if (filterTarget.iconPosition) {
             xx = left + filterTarget.iconPosition.x;
             yy = top + filterTarget.iconPosition.y;
         }
-        let rec = { x: xx, y: yy, w: cfg.pluginIconSize, rx: cfg.pluginIconSize / 2, ry: cfg.pluginIconSize / 2,
-            h: cfg.pluginIconSize, css: 'fanFilterIcon' };
+        let rec = { x: xx, y: yy, w: globalCommandDispatcher.cfg().pluginIconSize,
+            rx: globalCommandDispatcher.cfg().pluginIconSize / 2, ry: globalCommandDispatcher.cfg().pluginIconSize / 2,
+            h: globalCommandDispatcher.cfg().pluginIconSize, css: 'fanFilterIcon' };
         fanLevelAnchor.content.push(rec);
         if (zidx < 5) {
-            let txt = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconSize, css: 'fanSamplerIcon' };
+            let txt = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanSamplerIcon' };
             fanLevelAnchor.content.push(txt);
         }
-        this.addOutputs(cfg, filterTarget.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
+        this.addOutputs(filterTarget.outputs, fanLevelAnchor, zidx, xx + globalCommandDispatcher.cfg().pluginIconSize, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
     }
-    buildAutoSpot(cfg, fanLevelAnchor, zidx) {
-        for (let ii = 0; ii < cfg.data.filters.length; ii++) {
-            if (cfg.data.filters[ii].id == this.filterId) {
-                let filterTarget = cfg.data.filters[ii];
-                this.addAutoSpot(cfg, filterTarget, fanLevelAnchor, zidx);
+    buildAutoSpot(fanLevelAnchor, zidx) {
+        for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
+            if (globalCommandDispatcher.cfg().data.filters[ii].id == this.filterId) {
+                let filterTarget = globalCommandDispatcher.cfg().data.filters[ii];
+                this.addAutoSpot(filterTarget, fanLevelAnchor, zidx);
                 break;
             }
         }
     }
-    addAutoSpot(cfg, filterTarget, fanLevelAnchor, zidx) {
-        let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
-        let top = cfg.gridTop();
+    addAutoSpot(filterTarget, fanLevelAnchor, zidx) {
+        let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+        let top = globalCommandDispatcher.cfg().gridTop();
         let xx = left;
         let yy = top;
         if (filterTarget.iconPosition) {
             xx = left + filterTarget.iconPosition.x;
             yy = top + filterTarget.iconPosition.y;
         }
-        let rec = { x: xx, y: yy, w: cfg.pluginIconSize, rx: cfg.pluginIconSize / 2, ry: cfg.pluginIconSize / 2,
-            h: cfg.pluginIconSize, css: 'fanFilterIcon' };
+        let rec = { x: xx, y: yy, w: globalCommandDispatcher.cfg().pluginIconSize,
+            rx: globalCommandDispatcher.cfg().pluginIconSize / 2, ry: globalCommandDispatcher.cfg().pluginIconSize / 2,
+            h: globalCommandDispatcher.cfg().pluginIconSize, css: 'fanFilterIcon' };
         fanLevelAnchor.content.push(rec);
         if (zidx < 5) {
-            let txt = { text: '' + filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + cfg.pluginIconSize, css: 'fanSamplerIcon' };
+            let txt = { text: '' + filterTarget.kind + ':' + filterTarget.id,
+                x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanSamplerIcon' };
             fanLevelAnchor.content.push(txt);
         }
-        let controlLineWidth = xx - cfg.leftPad - cfg.timelineWidth() - cfg.padGridFan;
-        new ControlConnection().addLineFlow(cfg, yy + cfg.pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
-        this.addOutputs(cfg, filterTarget.outputs, fanLevelAnchor, zidx, xx + cfg.pluginIconSize, yy + cfg.pluginIconSize / 2);
+        let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
+        new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
+        this.addOutputs(filterTarget.outputs, fanLevelAnchor, zidx, xx + globalCommandDispatcher.cfg().pluginIconSize, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
     }
-    addOutputs(cfg, outputs, fanLevelAnchor, zidx, fromX, fromY) {
+    addOutputs(outputs, fanLevelAnchor, zidx, fromX, fromY) {
         if (outputs)
             if (outputs.length > 0) {
                 for (let oo = 0; oo < outputs.length; oo++) {
                     let outId = outputs[oo];
-                    for (let ii = 0; ii < cfg.data.filters.length; ii++) {
-                        if (cfg.data.filters[ii].id == outId) {
-                            let toFilter = cfg.data.filters[ii];
-                            let left = cfg.leftPad + cfg.timelineWidth() + cfg.padGridFan;
-                            let top = cfg.gridTop();
+                    for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
+                        if (globalCommandDispatcher.cfg().data.filters[ii].id == outId) {
+                            let toFilter = globalCommandDispatcher.cfg().data.filters[ii];
+                            let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+                            let top = globalCommandDispatcher.cfg().gridTop();
                             let xx = left;
                             let yy = top;
                             if (toFilter.iconPosition) {
                                 xx = left + toFilter.iconPosition.x;
-                                yy = top + toFilter.iconPosition.y + cfg.pluginIconSize / 2;
+                                yy = top + toFilter.iconPosition.y + globalCommandDispatcher.cfg().pluginIconSize / 2;
                             }
                             new SpearConnection().addSpear(fromX, fromY, xx, yy, fanLevelAnchor);
                             break;
@@ -2469,15 +2484,15 @@ class FilterIcon {
                 }
             }
             else {
-                let speakerX = cfg.wholeWidth() - cfg.speakerIconPad - cfg.rightPad;
-                new SpearConnection().addSpear(fromX, fromY, speakerX, cfg.gridTop() + cfg.gridHeight() / 2, fanLevelAnchor);
+                let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad;
+                new SpearConnection().addSpear(fromX, fromY, speakerX, globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2, fanLevelAnchor);
             }
     }
 }
 class ControlConnection {
-    addLineFlow(cfg, yy, ww, anchor) {
+    addLineFlow(yy, ww, anchor) {
         let css = 'debug';
-        let left = cfg.leftPad + cfg.timelineWidth();
+        let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
         let line = { x: left, y: yy, w: ww, h: 8, css: css };
         anchor.content.push(line);
     }
@@ -2585,9 +2600,9 @@ class DebugLayerUI {
             ], mode: LevelModes.normal
         };
     }
-    resetDebugView(cfg) {
-        let ww = cfg.wholeWidth();
-        let hh = cfg.wholeHeight();
+    resetDebugView() {
+        let ww = globalCommandDispatcher.cfg().wholeWidth();
+        let hh = globalCommandDispatcher.cfg().wholeHeight();
         this.debugRectangle.w = ww;
         this.debugRectangle.h = hh;
         this.debugAnchor.ww = ww;

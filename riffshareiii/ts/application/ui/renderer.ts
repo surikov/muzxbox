@@ -162,16 +162,16 @@ class UIRenderer {//} implements RenderedPart {
 	}
 
 	fillWholeUI() {
-		//let mixm: MixerDataMath = new MixerDataMath(globalCommandDispatcher.cfg.data);
+		//let mixm: MixerDataMath = new MixerDataMath(globalCommandDispatcher.globalCommandDispatcher.cfg().data);
 		let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
 		let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
 		this.tiler.resetInnerSize(globalCommandDispatcher.cfg().wholeWidth()
 			, globalCommandDispatcher.cfg().wholeHeight());
 
-		this.mixer.reFillMixerUI(globalCommandDispatcher.cfg());
-		this.leftPanel.reFillLeftPanel(globalCommandDispatcher.cfg());
+		this.mixer.reFillMixerUI();
+		this.leftPanel.reFillLeftPanel();
 
-		this.debug.resetDebugView(globalCommandDispatcher.cfg());
+		this.debug.resetDebugView();
 
 		//this.toolbar.fillToolbar(vw, vh);
 		this.toolbar.resizeToolbar(vw, vh);
@@ -186,7 +186,7 @@ class UIRenderer {//} implements RenderedPart {
 		});
 
 
-		this.timeselectbar.fillTimeBar(globalCommandDispatcher.cfg());
+		this.timeselectbar.fillTimeBar();
 		this.timeselectbar.resizeTimeScale(vw, vh);
 
 		//this.leftBar.resizeHeaders(mixm.mixerHeight(), vw, vh, this.tiler.getCurrentPointPosition().z);

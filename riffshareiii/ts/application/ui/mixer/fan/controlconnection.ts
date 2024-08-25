@@ -1,7 +1,7 @@
 class ControlConnection{
-    addLineFlow( cfg: MixerDataMathUtility,yy: number,  ww: number, anchor: TileAnchor) {
+    addLineFlow( yy: number,  ww: number, anchor: TileAnchor) {
         let css='debug';//'fanStream';
-        let left = cfg.leftPad + cfg.timelineWidth() ;
+        let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() ;
         let line:TileRectangle={x:left,y:yy,w:ww,h:8,css:css};
         anchor.content.push(line);
         /*

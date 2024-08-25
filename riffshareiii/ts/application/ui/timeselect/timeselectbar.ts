@@ -97,7 +97,7 @@ class TimeSelectBar {
 	}
 	
 	createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor//, data: Zvoog_Project
-	,cfg:MixerDataMathUtility
+	//,cfg:MixerDataMathUtility
 	) {
 		let mark: TileRectangle = {
 			x: barLeft, y: 0, w: size, h: size
@@ -139,31 +139,31 @@ class TimeSelectBar {
 	}
 
 	fillTimeBar(//data:Zvoog_Project
-		cfg:MixerDataMathUtility
+		//cfg:MixerDataMathUtility
 	) {
-		//console.log('fillTimeBar', cfg.data.timeline);
+		//console.log('fillTimeBar', globalCommandDispatcher.cfg().data.timeline);
 		//let mixm: MixerDataMath = new MixerDataMath(data);
-		this.selectBarAnchor.ww = cfg.wholeWidth();
-		this.selectBarAnchor.hh = cfg.wholeHeight();
+		this.selectBarAnchor.ww = globalCommandDispatcher.cfg().wholeWidth();
+		this.selectBarAnchor.hh = globalCommandDispatcher.cfg().wholeHeight();
 		this.zoomAnchors = [];
 		for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
 			//console.log('add',zoomPrefixLevelsCSS[zz]);
 			let selectLevelAnchor: TileAnchor = {
 				showZoom: zoomPrefixLevelsCSS[zz].minZoom
 				, hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom
-				, xx: 0, yy: 0, ww: cfg.wholeWidth(), hh: cfg.wholeHeight(), content: []
+				, xx: 0, yy: 0, ww: globalCommandDispatcher.cfg().wholeWidth(), hh: globalCommandDispatcher.cfg().wholeHeight(), content: []
 				, id: 'time' + (zz + Math.random())
 			};
 			this.zoomAnchors.push(selectLevelAnchor);
 			let mm: Zvoog_MetreMathType = MMUtil();
 			//this.reBuildSelectionMark(zz, data);
 
-			let barLeft = cfg.leftPad;
+			let barLeft = globalCommandDispatcher.cfg().leftPad;
 			let barTime = 0;
-			for (let kk = 0; kk < cfg.data.timeline.length; kk++) {
-				let curBar = cfg.data.timeline[kk];
+			for (let kk = 0; kk < globalCommandDispatcher.cfg().data.timeline.length; kk++) {
+				let curBar = globalCommandDispatcher.cfg().data.timeline[kk];
 				let curMeasureMeter = mm.set(curBar.metre);
-				let barWidth = curMeasureMeter.duration(curBar.tempo) * cfg.widthDurationRatio;
+				let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 				let measureAnchor: TileAnchor = {
 					showZoom: zoomPrefixLevelsCSS[zz].minZoom
 					, hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom
@@ -178,7 +178,7 @@ class TimeSelectBar {
 						, zoomPrefixLevelsCSS[zz].minZoom * 1.5
 						//, zoomPrefixLevelsCSS[zz].minZoom * 3
 						, measureAnchor
-						, cfg
+						//, cfg
 					);
 					this.createBarNumber(barLeft
 						//, zoomPrefixLevelsCSS[zz].minZoom * 3
@@ -197,7 +197,7 @@ class TimeSelectBar {
 						}
 		
 						if (line.label) {
-							let xx = barLeft + skip.duration(curBar.tempo) * cfg.widthDurationRatio;
+							let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 							let mark: TileRectangle = {
 								x: xx, y: 0
 								, w: line.ratio * 2 * zoomInfo.minZoom

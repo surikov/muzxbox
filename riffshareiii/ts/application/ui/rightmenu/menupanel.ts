@@ -386,8 +386,8 @@ class RightMenuPanel {
 		this.rerenderMenuContent(null);
 
 
-		//cfg.data.list=this.showState;
-		console.log('resizeMenu globalCommandDispatcher.cfg.data.list',globalCommandDispatcher.cfg().data.list);
+		//globalCommandDispatcher.cfg().data.list=this.showState;
+		console.log('resizeMenu globalCommandDispatcher.globalCommandDispatcher.cfg().data.list',globalCommandDispatcher.cfg().data.list);
 	}
 
 }
