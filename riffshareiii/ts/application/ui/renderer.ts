@@ -151,6 +151,8 @@ class UIRenderer {//} implements RenderedPart {
 			if (this.menu) {
 				this.menu.lastZ = this.tiler.getCurrentPointPosition().z;
 			}
+			let xyz = this.tiler.getCurrentPointPosition();
+			globalCommandDispatcher.cfg().data.position = xyz;
 		});
 		this.tiler.setAfterResizeCallback(() => {
 			//console.log('afterResizeCallback',this.tiler.getCurrentPointPosition()) ;
@@ -164,7 +166,7 @@ class UIRenderer {//} implements RenderedPart {
 		let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
 		let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
 		this.tiler.resetInnerSize(globalCommandDispatcher.cfg().wholeWidth()
-		, globalCommandDispatcher.cfg().wholeHeight());
+			, globalCommandDispatcher.cfg().wholeHeight());
 
 		this.mixer.reFillMixerUI(globalCommandDispatcher.cfg());
 		this.leftPanel.reFillLeftPanel(globalCommandDispatcher.cfg());
@@ -189,10 +191,16 @@ class UIRenderer {//} implements RenderedPart {
 
 		//this.leftBar.resizeHeaders(mixm.mixerHeight(), vw, vh, this.tiler.getCurrentPointPosition().z);
 		//this.leftBar.fillTrackHeaders(data);
+		let xyz = globalCommandDispatcher.cfg().data.position;
+		if (xyz) {
+			this.tiler.setCurrentPointPosition(xyz);
+		} else {
+			this.tiler.setCurrentPointPosition({ x: 0, y: 0, z: 32 });
+		}
 
 		this.tiler.resetModel();
 
-		//console.log('fillWholeUI',this.tiler);
+		console.log('fillWholeUI', this.tiler);
 
 	}
 	onReSizeView() {

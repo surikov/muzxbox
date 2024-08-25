@@ -588,6 +588,7 @@ type TileLevelBase = {
     setupTapSize: (ratioCm: number) => void;
     resetModel: () => void;
     getCurrentPointPosition(): TileZoom;
+    setCurrentPointPosition: (xyz: TileZoom) => void;
     getStartMouseScreen(): TilePoint;
     screen2view(screen: TilePoint): TilePoint;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;

@@ -127,7 +127,7 @@ function fillPluginsLists() {
 			menuPointActions.children.push({
 				text: label, noLocalization: true, onClick: () => {
 					globalCommandDispatcher.promptProjectPluginGUI(label, url, (obj: any) => {
-						let project:Zvoog_Project=JSON.parse(obj);
+						let project: Zvoog_Project = JSON.parse(obj);
 						//console.log(project);
 						globalCommandDispatcher.registerWorkProject(project);
 						globalCommandDispatcher.resetProject();
@@ -147,7 +147,7 @@ function fillPluginsLists() {
 					menuPointPerformers.children.push({
 						text: label, noLocalization: true, onClick: () => {
 							globalCommandDispatcher.promptPointPluginGUI(label, url, (obj: any) => {
-								console.log('performer callback',obj);
+								console.log('performer callback', obj);
 								return true;
 							});
 						}
@@ -176,8 +176,8 @@ function composeBaseMenu(): MenuInfo[] {
 		menuItemsData = [
 			{
 				text: localMenuPlayPause, onClick: () => {
-console.log('start/stop');
-globalCommandDispatcher.toggleStartStop();
+					console.log('start/stop');
+					globalCommandDispatcher.toggleStartStop();
 				}
 			}
 			/*, {

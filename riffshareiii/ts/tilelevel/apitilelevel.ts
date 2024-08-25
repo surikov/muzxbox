@@ -109,7 +109,7 @@ type TileRectangle = {
     //,image?:string
 } & TileBaseDefinition;
 /*function TRectangle(x: number, y: number, w: number, h: number, rx?: number, ry?: number, id?: string, css?: string, dragX?: boolean, dragY?: boolean, action?: (x: number, y: number) => void | undefined): TileRectangle {
-	return { x: x, y: y, w: w, h: h, rx: rx, ry: ry, id: id, css: css, dragX: dragX, dragY: dragY, action: action };
+    return { x: x, y: y, w: w, h: h, rx: rx, ry: ry, id: id, css: css, dragX: dragX, dragY: dragY, action: action };
 }*/
 
 type TileText = {
@@ -129,7 +129,7 @@ type TilePath = {
     , points: string//path definition
 } & TileBaseDefinition;
 /*function TPath(x: number, y: number,scale: number, points: string, id?: string, css?: string, dragX?: boolean, dragY?: boolean, action?: (x: number, y: number) => void | undefined): TilePath {
-	return { x: x, y: y, scale: scale, points: points, id: id, css: css, dragX: dragX, dragY: dragY, action: action };
+    return { x: x, y: y, scale: scale, points: points, id: id, css: css, dragX: dragX, dragY: dragY, action: action };
 }*/
 
 type TileLine = {
@@ -163,6 +163,7 @@ type TileLevelBase = {
     setupTapSize: (ratioCm: number) => void;
     resetModel: () => void;
     getCurrentPointPosition(): TileZoom;
+    setCurrentPointPosition: (xyz: TileZoom) => void;
     getStartMouseScreen(): TilePoint;
     screen2view(screen: TilePoint): TilePoint;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor

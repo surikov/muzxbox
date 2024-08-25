@@ -494,6 +494,8 @@ class UIRenderer {
             if (this.menu) {
                 this.menu.lastZ = this.tiler.getCurrentPointPosition().z;
             }
+            let xyz = this.tiler.getCurrentPointPosition();
+            globalCommandDispatcher.cfg().data.position = xyz;
         });
         this.tiler.setAfterResizeCallback(() => {
             this.onReSizeView();
@@ -514,7 +516,15 @@ class UIRenderer {
         });
         this.timeselectbar.fillTimeBar(globalCommandDispatcher.cfg());
         this.timeselectbar.resizeTimeScale(vw, vh);
+        let xyz = globalCommandDispatcher.cfg().data.position;
+        if (xyz) {
+            this.tiler.setCurrentPointPosition(xyz);
+        }
+        else {
+            this.tiler.setCurrentPointPosition({ x: 0, y: 0, z: 32 });
+        }
         this.tiler.resetModel();
+        console.log('fillWholeUI', this.tiler);
     }
     onReSizeView() {
         let mixH = 1;
@@ -1181,7 +1191,7 @@ class RightMenuPanel {
         this.menuCloseButton.resize(this.shiftX + this.itemsWidth - 1, viewHeight - 1, 1);
         this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
         this.rerenderMenuContent(null);
-        console.log('globalCommandDispatcher.cfg.data.list', globalCommandDispatcher.cfg().data.list);
+        console.log('resizeMenu globalCommandDispatcher.cfg.data.list', globalCommandDispatcher.cfg().data.list);
     }
 }
 class RightMenuItem {
@@ -2652,6 +2662,8 @@ class WarningUI {
 }
 let mzxbxProjectForTesting2 = {
     title: 'test data for debug',
+    list: false,
+    position: { x: -13037.9, y: -1317.9, z: 4.7 },
     timeline: [
         { tempo: 120, metre: { count: 4, part: 4 } },
         { tempo: 120, metre: { count: 4, part: 4 } },
@@ -2681,11 +2693,13 @@ let mzxbxProjectForTesting2 = {
                     ]
                 }, {
                     chords: [
-                        { skip: { count: 0, part: 2 }, pitches: [60], slides: [
+                        {
+                            skip: { count: 0, part: 2 }, pitches: [60], slides: [
                                 { duration: { count: 1, part: 8 }, delta: 5 },
                                 { duration: { count: 1, part: 8 }, delta: -5 },
                                 { duration: { count: 1, part: 4 }, delta: 0 }
-                            ] }
+                            ]
+                        }
                     ]
                 }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],

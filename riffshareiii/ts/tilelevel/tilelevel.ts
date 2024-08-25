@@ -102,7 +102,11 @@ class TileLevelRealTime implements TileLevelBase {
 			x: this.startMouseScreenX, y: this.startMouseScreenY
 		};
 	}
-
+	setCurrentPointPosition(position: TileZoom): void {
+		this._translateX = position.x;
+		this._translateY = position.y;
+		this._translateZ = position.z;
+	}
 	getCurrentPointPosition(): TileZoom {
 		return {
 			x: this.translateX, y: this.translateY, z: this.translateZ
@@ -601,7 +605,7 @@ class TileLevelRealTime implements TileLevelBase {
 				, anchor.ww * this.tapSize
 				, anchor.hh * this.tapSize //
 				, x, y, w, h);
-			if (layerMode==LevelModes.overlay || collide) {
+			if (layerMode == LevelModes.overlay || collide) {
 				//console.log(anchor.id, anchor.xx * this.tapSize, anchor.yy * this.tapSize, ':', anchor.ww * this.tapSize, anchor.hh * this.tapSize, '/', x, y, ':', w, h,LevelModes.overlay,collide);
 				var gid: string = anchor.id ? anchor.id : '';
 				let existedSVGchild: SVGElement | null = this.groupChildWithID(parentSVGElement, gid);

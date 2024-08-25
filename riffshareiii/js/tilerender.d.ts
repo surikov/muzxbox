@@ -52,6 +52,7 @@ declare class TileLevelRealTime implements TileLevelBase {
     get translateY(): number;
     set translateY(y: number);
     getStartMouseScreen(): TilePoint;
+    setCurrentPointPosition(position: TileZoom): void;
     getCurrentPointPosition(): TileZoom;
     screen2view(screen: TilePoint): TilePoint;
     resetInnerSize(inWidth: number, inHeight: number): void;
@@ -246,6 +247,7 @@ type TileLevelBase = {
     setupTapSize: (ratioCm: number) => void;
     resetModel: () => void;
     getCurrentPointPosition(): TileZoom;
+    setCurrentPointPosition: (xyz: TileZoom) => void;
     getStartMouseScreen(): TilePoint;
     screen2view(screen: TilePoint): TilePoint;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;

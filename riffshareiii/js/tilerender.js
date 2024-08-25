@@ -81,6 +81,11 @@ class TileLevelRealTime {
             x: this.startMouseScreenX, y: this.startMouseScreenY
         };
     }
+    setCurrentPointPosition(position) {
+        this._translateX = position.x;
+        this._translateY = position.y;
+        this._translateZ = position.z;
+    }
     getCurrentPointPosition() {
         return {
             x: this.translateX, y: this.translateY, z: this.translateZ
