@@ -115,7 +115,7 @@
 }
 
 .interactiveTimeMeasureMark{
-    fill: var(--color-interactive);
+    fill: var(--action-color);
 	fill-opacity: 50%;
 }
 
@@ -263,7 +263,7 @@
 	pointer-events: none;
 }
 .interActiveGridLine{
-	fill: var(--color-interactive);
+	fill: var(--action-color);
 	fill-opacity:50%;
     stroke: none;
 }

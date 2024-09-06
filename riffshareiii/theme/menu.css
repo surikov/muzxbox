@@ -33,16 +33,16 @@
 .rightMenuItemActionBG {
     stroke: var(--color-text);
     stroke-width: 0.01cm;
-    fill: var(--color-interactive);
+    fill: var(--action-color);
 }
 .rightMenuItemSubActionBG {
     fill: none;
-    stroke: var(--color-interactive);
+    stroke: var(--action-color);
     stroke-width: 0.05cm;
 }
 
 .rightMenuButtonLabel {
-    fill: var(--color-interactive);
+    fill: var(--action-color);
     text-anchor: middle;
     alignment-baseline22: middle;
     font-size: var(--label-05cm);
@@ -60,7 +60,7 @@
 
 
 .menuButtonCircle {
-    fill: var(--color-interactive);
+    fill: var(--action-color);
 	stroke: var(--color-text);
     stroke-width: 0.01cm;
 }

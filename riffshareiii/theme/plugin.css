@@ -53,7 +53,7 @@
 }
 #pluginCancel{
 	border-radius: 0.4cm;
-	background-color: var(--color-interactive);
+	background-color: var(--action-color);
 	color: var(--color-text);
 	box-shadow:inset 0px 0px 0px 0.5px var(--color-text);
 	text-shadow2: 0.25px 0px var(--color-text),-0.25px 0px var(--color-text),0px 0.25px var(--color-text),0px -0.25px var(--color-text);
@@ -81,7 +81,7 @@
 }
 #pluginRefresh{
 	border-radius: 0.4cm;
-	background-color: var(--color-interactive);
+	background-color: var(--action-color);
 	color: var(--color-text);
 	text-shadow2: 0.25px 0px var(--color-text),-0.25px 0px var(--color-text),0px 0.25px var(--color-text),0px -0.25px var(--color-text);
     font-size: var(--label-05cm);

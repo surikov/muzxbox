@@ -15,7 +15,7 @@
 	
 }
 .timeMarkButtonCircle{
-    fill: var(--color-interactive);
+    fill: var(--action-color);
 	
 }
 .timeMarkButtonBorder{

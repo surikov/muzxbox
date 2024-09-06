@@ -22,7 +22,7 @@
 }
 
 .toolBarButtonCircle {
-    fill: var(--color-interactive);
+    fill: var(--action-color);
 	stroke: var(--color-text);
     stroke-width: 0.01cm;
 }
