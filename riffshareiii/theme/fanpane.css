@@ -72,3 +72,8 @@
 	fill: var(--color-text);
 	font-family: 'Material-Design-Iconic-Font';
 }
+
+.controlConnection{
+	fill: var(--color-text);
+	fill-opacity:25%;
+}

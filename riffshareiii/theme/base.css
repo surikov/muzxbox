@@ -133,10 +133,10 @@ body {
 
 .debug {
     fill: var(--color-debug);
-    fill-opacity: 25%;
+    fill-opacity: 30%;
     stroke: var(--color-debug);
-    stroke-opacity: 75%;
-    stroke-width: 0.0256%;
+    stroke-opacity: 90%;
+    stroke-width: 0.3%;
 }
 
 .fillShadow {

@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.134 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.135 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -949,7 +949,7 @@ function dumpColorStat() {
         + ', green: ' + Math.round(greenleft / rowcount) + '/' + Math.round(greenright / rowcount)
         + ', silver: ' + Math.round(silverleft / rowcount) + '/' + Math.round(silverright / rowcount)
         + ', red: ' + Math.round(redleft / rowcount) + '/' + Math.round(redright / rowcount);
-    //console.log(skip,'blue',blueleft,blueright,'green',greenleft,greenright,'silver',silverleft,silverright,'red',redleft,redright);
+    console.log(skip, 'blue', blueleft, blueright, 'green', greenleft, greenright, 'silver', silverleft, silverright, 'red', redleft, redright);
 }
 function fillCells() {
     clearSVGgroup(levelA);

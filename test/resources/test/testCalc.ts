@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.134 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.135 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -1022,7 +1022,7 @@ function dumpColorStat() {
 				+', silver: '+Math.round(silverleft/rowcount)+'/'+Math.round(silverright/rowcount)
 				+', red: '+Math.round(redleft/rowcount)+'/'+Math.round(redright/rowcount)
 				;
-	//console.log(skip,'blue',blueleft,blueright,'green',greenleft,greenright,'silver',silverleft,silverright,'red',redleft,redright);
+	console.log(skip,'blue',blueleft,blueright,'green',greenleft,greenright,'silver',silverleft,silverright,'red',redleft,redright);
 }
 function fillCells() {
 	clearSVGgroup(levelA);
@@ -1367,6 +1367,7 @@ function testTest() {
 	}
 	drawLines();
 }
+
 /*
 function dumpLeftStat(){
 	console.log('dumpLeftStat',datarows);
