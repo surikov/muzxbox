@@ -1,121 +1,121 @@
 .leftBlackKey{
-	fill: var(--color-subtext);
+	fill: var(--aux-color);
 }
 .leftKeyWhite{
-	fill: var(--color-focus);
+	fill: var(--focus-color);
 }
 
 
 .octaveLabel025 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*0.25*var(--tapSize));
-    text-anchor22: start;
+
 }
 .octaveLabel05 {
-	fill: var(--color-lines);
+	fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*0.5*var(--tapSize));
 }
 .octaveLabel1 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*var(--tapSize));
 }
 .octaveLabel2 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*2*var(--tapSize));
 }
 .octaveLabel4 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*4*var(--tapSize));
 }
 .octaveLabel8 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*8*var(--tapSize));
 }
 .octaveLabel16 {
-	fill: var(--color-lines);
+	fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*16*var(--tapSize));
 }
 .octaveLabel32 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*32*var(--tapSize));
 }
 .octaveLabel64 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*64*var(--tapSize));
 }
 .octaveLabel128 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*128*var(--tapSize));
 }
 
 
 .octaveSubLabel025 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*0.25*var(--tapSize));
     text-anchor22: start;
 	pointer-events: none;
 }
 .octaveSubLabel05 {
-	fill: var(--color-lines);
+	fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*0.5*var(--tapSize));
 	pointer-events: none;
 }
 .octaveSubLabel1 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*var(--tapSize));
 	pointer-events: none;
 }
 .octaveSubLabel2 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*2*var(--tapSize));
 	pointer-events: none;
 }
 .octaveSubLabel4 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*4*var(--tapSize));
 	pointer-events: none;
 }
 .octaveSubLabel8 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*8*var(--tapSize));
 	pointer-events: none;
 }
 .octaveSubLabel16 {
-	fill: var(--color-lines);
+	fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*16*var(--tapSize));
 	pointer-events: none;
 }
 .octaveSubLabel32 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*32*var(--tapSize));
 	pointer-events: none;
 }
 .octaveSubLabel64 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*64*var(--tapSize));
 	pointer-events: none;
 }
 .octaveSubLabel128 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*128*var(--tapSize));
 	pointer-events: none;
@@ -124,62 +124,62 @@
 
 
 .curTrackTitleLabel025 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(0.5*0.25*var(--tapSize));
     text-anchor22: start;
 	pointer-events: none;
 }
 .curTrackTitleLabel05 {
-	fill: var(--color-lines);
+	fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(0.5*0.5*var(--tapSize));
 	pointer-events: none;
 }
 .curTrackTitleLabel1 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(0.5*var(--tapSize));
 	pointer-events: none;
 }
 .curTrackTitleLabel2 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(0.5*2*var(--tapSize));
 	pointer-events: none;
 }
 .curTrackTitleLabel4 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(0.5*4*var(--tapSize));
 	pointer-events: none;
 }
 .curTrackTitleLabel8 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(0.5*8*var(--tapSize));
 	pointer-events: none;
 }
 .curTrackTitleLabel16 {
-	fill: var(--color-lines);
+	fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(0.5*16*var(--tapSize));
 	pointer-events: none;
 }
 .curTrackTitleLabel32 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(0.5*32*var(--tapSize));
 	pointer-events: none;
 }
 .curTrackTitleLabel64 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(0.5*64*var(--tapSize));
 	pointer-events: none;
 }
 .curTrackTitleLabel128 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(0.5*128*var(--tapSize));
 	pointer-events: none;
@@ -189,50 +189,50 @@
 
 
 .samplerRowLabel025 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(2*0.125*var(--tapSize));
 	pointer-events: none;
 }
 .samplerRowLabel05 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(4*0.125*var(--tapSize));
 	pointer-events: none;
 }
 .samplerRowLabel1 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(6*0.125*var(--tapSize));
 	pointer-events: none;
 }
 .samplerRowLabel2 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(8*0.125*var(--tapSize));
 	pointer-events: none;
 }
 
 .autoRowLabel025 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(2*0.125*var(--tapSize));
 	pointer-events: none;
 }
 .autoRowLabel05 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(4*0.125*var(--tapSize));
 	pointer-events: none;
 }
 .autoRowLabel1 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(6*0.125*var(--tapSize));
 	pointer-events: none;
 }
 .autoRowLabel2 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(8*0.125*var(--tapSize));
 	pointer-events: none;
@@ -242,6 +242,6 @@
 
 
 .octaveMark{
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 25%;
 }

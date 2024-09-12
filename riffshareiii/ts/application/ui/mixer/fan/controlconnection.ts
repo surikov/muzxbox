@@ -1,22 +1,22 @@
 class ControlConnection {
 	addLineFlow(yy: number, ww: number, anchor: TileAnchor) {
 		let css = 'controlConnection';//'fanStream';
-		let sz4=globalCommandDispatcher.cfg().pluginIconSize / 4;
+		let sz4 = globalCommandDispatcher.cfg().pluginIconSize / 4;
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
 		let line: TileRectangle = {
 			x: left
 			, y: yy - sz4
 			, w: ww - sz4
-			, h:sz4*2
+			, h: sz4 * 2
 			, css: css
 		};
 		anchor.content.push(line);
 		let spearHead: TilePolygon = {
-			x: left+ww - sz4, y: yy - sz4, css:css,dots: [
-				0,0
-				,sz4,sz4
-				,0,sz4*2
-				
+			x: left + ww - sz4, y: yy - sz4, css: css, dots: [
+				0, 0
+				, sz4, sz4
+				, 0, sz4 * 2
+
 			]
 		};
 		anchor.content.push(spearHead);

@@ -60,8 +60,11 @@ class MIDIIImportMusicPlugin {
 		console.log('receiveHostMessage', par);
 		//callbackID = par.data;
 		try {
-			var oo:MZXBX_PluginMessage = JSON.parse(par.data);
-			this.callbackID = oo.dialogID;
+			console.log('parse',par.data.data);
+			var oo:MZXBX_PluginMessage = JSON.parse(par.data.data);
+			console.log('result',oo);
+			this.callbackID = par.data.dialogID;
+			console.log('dialogID',this.callbackID);
 		} catch (xx) {
 			console.log(xx);
 		}
@@ -2021,7 +2024,7 @@ class MidiParser {
 						}
 					}
 					if (trackChord == null) {
-						trackChord = { skip: skip, notes: [] };
+						trackChord = { skip: skip, pitches: [] ,slides:[]};
 						projectMeasure.chords.push(trackChord);
 					}
 					if (trackChord) {
@@ -2036,9 +2039,12 @@ class MidiParser {
 								duration: startDuration
 								, delta: 0
 							};
-							let trackNote: Zvoog_Note = { pitch: currentSlidePitch, slides: [curSlide] };
+							//let trackNote: Zvoog_Note = { pitch: currentSlidePitch, slides: [curSlide] };
+							let singlePitch=currentSlidePitch;
+							
 							if (midiNote.slidePoints.length > 0) {
-								trackNote.slides = [];
+								//trackNote.slides = [];
+								trackChord.slides=[];
 								let bendDuration = 0;
 								for (let pp = 0; pp < midiNote.slidePoints.length; pp++) {
 									let midiPoint = midiNote.slidePoints[pp];
@@ -2052,7 +2058,8 @@ class MidiParser {
 										, delta: 0
 									};
 									bendDuration = bendDuration + midiPoint.durationms;
-									trackNote.slides.push(curSlide);
+									//trackNote.slides.push(curSlide);
+									trackChord.slides.push(curSlide);
 									//console.log(midiNote.midiPitch,pp,midiPoint.durationms,xduration);
 								}
 								//console.log(midiNote,bendDuration);
@@ -2062,10 +2069,15 @@ class MidiParser {
 										duration: mm.calculate(remains / 1000.0, nextMeasure.tempo)
 										, delta: currentSlidePitch - Math.round(currentSlidePitch)
 									};
-									trackNote.slides.push(curSlide);
+									//trackNote.slides.push(curSlide);
+									trackChord.slides.push(curSlide);
 								}
+							}else{
+								trackChord.slides=[curSlide];
 							}
-							trackChord.notes.push(trackNote);
+
+							//trackChord.notes.push(trackNote);
+							trackChord.pitches.push(singlePitch);
 							/*if (trackNote.slides.length > 1) {
 								console.log(projectTrack.title, trackNote);
 							}*/

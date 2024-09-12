@@ -1,37 +1,37 @@
 
 .rightMenuPanel {
-    fill: var(--color-panel);
+    fill: var(--panel-color);
 }
 
 .rightMenuDelimiterLine {
-    fill: var(--color-background);
+    fill: var(--background-color);
     pointer-events: none;
 }
 .rightMenuFocusedDelimiter {
-    fill: var(--color-focus);
+    fill: var(--focus-color);
     pointer-events: none;
     animation: focusFlashFill 4s linear infinite;
 }
 
 .rightMenuLabel {
-    fill: var(--color-text);
+    fill: var(--main-color);
     font-size: var(--label-04cm);
     pointer-events: none;
 }
 .rightMenuSubLabel {
-    fill: var(--color-subtext);
+    fill: var(--aux-color);
     font-size: var(--label-04cm);
     pointer-events: none;
 }
 
 .rightMenuItemDragBG {
-    stroke: var(--color-text);
+    stroke: var(--main-color);
     stroke-width: 0.01cm;
-    fill: var(--color-focus);
+    fill: var(--focus-color);
     
 }
 .rightMenuItemActionBG {
-    stroke: var(--color-text);
+    stroke: var(--main-color);
     stroke-width: 0.01cm;
     fill: var(--action-color);
 }
@@ -44,15 +44,15 @@
 .rightMenuButtonLabel {
     fill: var(--action-color);
     text-anchor: middle;
-    alignment-baseline22: middle;
+
     font-size: var(--label-05cm);
     pointer-events: none;
 	font-family: "Material-Design-Iconic-Font";
 }
 .rightMenuIconLabel {
-    fill: var(--color-text);
+    fill: var(--main-color);
     text-anchor: middle;
-    alignment-baseline22: middle;
+
     font-size: var(--icon-05cm);
     pointer-events: none;
 	font-family: "Material-Design-Iconic-Font";
@@ -61,12 +61,12 @@
 
 .menuButtonCircle {
     fill: var(--action-color);
-	stroke: var(--color-text);
+	stroke: var(--main-color);
     stroke-width: 0.01cm;
 }
 
 .menuButtonLabel {
-    fill: var(--color-text);
+    fill: var(--main-color);
     text-anchor: middle;
     font-size: var(--icon-05cm);
     pointer-events:none;
@@ -74,7 +74,7 @@
 }
 
 .currentTitleLabel {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
     font-size: var(--label-05cm);
     pointer-events: none;
 	opacity: 50%;

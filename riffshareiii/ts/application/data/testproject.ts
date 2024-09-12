@@ -78,7 +78,7 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 			title: "Snare", measures: [
 				{ skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
 			]//, filters: []
-			, sampler: { id: 'd1', data: '', kind: 'baseSampler', outputs: ['drum1Volme'], iconPosition: { x: 14, y: 75 } }
+			, sampler: { id: 'd1', data: '', kind: 'baseSampler', outputs: ['drum1Volme'], iconPosition: { x: 0, y: 75 } }
 		}
 		, {
 			title: "Snare2", measures: []//, filters: []

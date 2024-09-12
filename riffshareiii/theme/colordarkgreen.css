@@ -5,14 +5,14 @@
 	--color-shadow: #99999966;
 
     --color-background: #000;
-    --color-lines: #fff;
+    --panel-color2: #fff;
     --color-panel: #333;
 
 	--color-focus: #ccf;
     --color-interactive: #3c3;
 
 	--color-subtext: #99ffccff;
-    --color-text: #ff9;
+    --main-color2: #ff9;
 
 }
 #pagediv {

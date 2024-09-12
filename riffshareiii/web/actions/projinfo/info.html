@@ -4,13 +4,13 @@
 	<style>
 		html {
 			--color-background: #ffffffcc;
-			--color-text: #003366ff;
-			--color-scroll: color-mix(in lab, transparent 90%, var(--color-text));
+			(((--main-color))): #003366ff;
+			--color-scroll: color-mix(in lab, transparent 90%, var(--main-color));
 
 			font-family: "Bruno Ace", sans-serif;
 
 			background-color: var(--color-background);
-			color: var(--color-text);
+			color: var(--main-color);
 			scrollbar-color: var(--color-scroll) var(--color-background);
 			scrollbar-width: thin;
 		}

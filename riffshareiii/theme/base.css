@@ -46,7 +46,12 @@
 ::-webkit-scrollbar2 {
 	display: none;
 }
-
+:root {
+    --font-ratio: 1;
+}
+:root {
+	--tapSize: 1cm;
+}
 :root {
 	--label-4cm: calc(4.0*var(--font-ratio)*var(--tapSize));
 	--label-1cm: calc(1.0*var(--font-ratio)*var(--tapSize));
@@ -59,26 +64,33 @@
 	--icon-075cm: calc(0.75*var(--tapSize));
 	--icon-05cm: calc(0.5*var(--tapSize));
 	--icon-04cm: calc(0.4*var(--tapSize));
+}
+:root {
+	
 
 	--color-debug: #800;
+	/*
 	--color-shadow: #00000066;
 	--color-background: #000000ff;
 	--color-panel: #114466ff;
 	--color-focus: #009933ff;
 	--color-interactive: #cc6633ff;
-	--color-lines: #44ccffff;
+	--color-panel: #44ccffff;
 	--color-subtext: #99ccccff;
-	--color-text: #ddeeffff;
+	(((--main-color))): #ddeeffff;
+*/
+	--background-color: #000;
+	--main-color:#fff;
+	--aux-color:#9fff;
+	--panel-color:#f0f;
+	--action-color:#cc0;
+	--focus-color:#0c0;
+	
 
-	--background-color: #000000ff;
-	--panel-color:#0000ffff;
-	--action-color:#ff0000ff;
-	--focus-color:#ffff00ff;
-	--main-color:#ff00ffff;
-	--aux-color:#00ffffff;
-
-	--fog-color: color-mix(in lab, transparent 75%, var(--background-color));
-	--selection-color: color-mix(in lab, transparent 50%, var(--focus-color));
+}
+:root {
+	--fog-color: color-mix(in lab, transparent 25%, var(--background-color));
+	--shadow-color: color-mix(in lab, transparent 50%, var(((--main-color))));
 }
 
 #file_midi_input {
@@ -91,11 +103,11 @@
 
 @keyframes focusFlashFill {
 	0% {
-		fill: var(--color-focus)
+		fill: var(--focus-color)
 	}
 
 	74% {
-		fill: var(--color-focus)
+		fill: var(--focus-color)
 	}
 
 	75% {
@@ -103,7 +115,7 @@
 	}
 
 	100% {
-		fill: var(--color-focus)
+		fill: var(--focus-color)
 	}
 }
 
@@ -134,7 +146,6 @@ body {
 	margin: 0px;
 	padding: 0px;
 	min-height: 100%;
-	background-color22: #0000ff;
 	background-image: url("bg/burevestnik.jpg");
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -145,17 +156,13 @@ body {
 
 #tileLevelSVG {
 	width: 100%;
-	height555: 100%;
-	min-height777: 100%;
-	background-color22: var(--color-background);
 	user-select: none;
 	touch-action: manipulation;
 	background-size: cover;
 	stroke-linecap: round;
 	margin: 0px;
 	padding: 0px;
-	background-color2: #00ffff;
-	background: color-mix(in lab, transparent 15%, var(--color-background));
+	background: var(--fog-color);
 	flex-basis: 0;
 	flex-shrink: 1;
 	flex-grow: 1;
@@ -173,17 +180,17 @@ body {
 }
 
 .fillShadow {
-	fill: var(--color-shadow);
+	fill: var(--shadow-color);
 }
 
 .warningBG {
-	fill: color-mix(in lab, transparent 10%, var(--color-background));
+	fill: var(--fog-color);
 }
 
 .warningIcon {
 	font-size222: calc(4*var(--tapSize));
 	font-size: var(--icon-4cm);
-	fill: var(--color-lines);
+	fill: var(--panel-color);
 	text-anchor: middle;
 	font-family: 'Material-Design-Iconic-Font';
 	pointer-events: none;
@@ -192,7 +199,7 @@ body {
 .warningTitle {
 	font-size222: calc(0.75*var(--tapSize));
 	font-size: var(--label-075cm);
-	fill: var(--color-text);
+	fill: var(--main-color);
 	text-anchor: middle;
 	pointer-events: none;
 }
@@ -200,7 +207,7 @@ body {
 .warningDescription {
 	font-size222: calc(0.33*var(--tapSize));
 	font-size: var(--label-04cm);
-	fill: var(--color-subtext);
+	fill: var(--aux-color);
 	text-anchor: middle;
 	pointer-events: none;
 }
@@ -211,12 +218,12 @@ body {
 
 
 .mixTextFill {
-	fill: var(--color-text);
+	fill: var(--main-color);
 	stroke: none;
 }
 
 .mixSubtextFill {
-	fill: var(--color-subtext);
+	fill: var(--aux-color);
 	stroke: none;
 }
 

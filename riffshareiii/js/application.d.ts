@@ -343,6 +343,7 @@ declare class ControlConnection {
 }
 declare class SpearConnection {
     constructor();
+    nonan(nn: number): number;
     addSpear(fromX: number, fromY: number, toX: number, toY: number, anchor: TileAnchor): void;
 }
 declare class IconLabelButton {

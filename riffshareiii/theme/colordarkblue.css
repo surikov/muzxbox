@@ -13,7 +13,7 @@
     --color-default: var(--aux-color);
 
     --color-paper: #def;
-    --color-textline: #332244;
+    (((--main-color)))line: #332244;
     
     --color-green: #080;
     --color-blue: #008;
@@ -28,9 +28,9 @@
     --color-panel: #114466ff;
     --color-focus: #009933ff;
     --color-interactive: #cc6633ff;
-    --color-lines: #44ccffff;
+    --panel-color2: #44ccffff;
 	--color-subtext: #99ccccff;
-    --color-text: #ddeeffff;
+    --main-color: #ddeeffff;
 
 }
 

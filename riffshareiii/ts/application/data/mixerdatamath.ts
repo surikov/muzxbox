@@ -25,7 +25,7 @@ class MixerDataMathUtility {
 	speakerIconSize = 33;
 	speakerIconPad = 11;
 
-	padGridFan = 5;
+	padGridFan = 15;
 
 	constructor(data: Zvoog_Project) {
 		this.data = data;

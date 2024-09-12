@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.135 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.136 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -961,7 +961,7 @@ function roundDown(num: number, base: number): number {
 }
 
 function dumpColorStat() {
-	//console.log('dumpColorStat');
+	console.log('dumpColorStat');
 	//console.log('sortedBlue', sortedBlue);
 	let skip = 1;
 	if (showFirstRow) {
@@ -1023,6 +1023,30 @@ function dumpColorStat() {
 				+', red: '+Math.round(redleft/rowcount)+'/'+Math.round(redright/rowcount)
 				;
 	console.log(skip,'blue',blueleft,blueright,'green',greenleft,greenright,'silver',silverleft,silverright,'red',redleft,redright);
+	
+	dumpGroupStat();
+}
+
+function dumpGroupStat(){
+
+	let cntEx=0;
+	let cntNot=0;
+	for (let kk = 0; kk < redStat.length-5; kk++) {
+		let r0=redStat[kk+0].left;
+		let r1=redStat[kk+1].left;
+		let r2=redStat[kk+2].left;
+		let r3=redStat[kk+3].left;
+		let r4=redStat[kk+4].left;
+		if(r1<5 && r2>6 && r3<5){
+			console.log(kk,':',r0,r1,r2,r3);
+			if(r0>6 ){
+				cntEx++;
+			}else{
+				cntNot++;
+			}
+		}
+	}
+	console.log('dumpGroupStat',cntEx,'/'+(cntEx+cntNot));
 }
 function fillCells() {
 	clearSVGgroup(levelA);

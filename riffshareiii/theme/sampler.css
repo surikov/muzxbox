@@ -1,15 +1,15 @@
 .samplerRowBorder{
-	fill: var(--color-lines);
+	fill: var(--panel-color);
 	fill-opacity:25%;
     stroke: none;
 }
 .samplerDrumDotFocused{
-	fill: var(--color-text);
+	fill: var(--main-color);
 	fill-opacity:99%;
     stroke: none;
 }
 .samplerDrumDotBg{
-	fill: var(--color-lines);
+	fill: var(--panel-color);
 	fill-opacity:75%;
     stroke: none;
 }

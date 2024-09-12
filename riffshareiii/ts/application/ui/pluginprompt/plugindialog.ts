@@ -1,7 +1,7 @@
 class PluginDialogPrompt {
 	//dialogID: string = '?';
 	//dialogData: string = '';
-	dialogMessage: MZXBX_PluginMessage|null=null;
+	dialogMessage: MZXBX_PluginMessage | null = null;
 	waitCallback: (obj: any) => boolean;
 	constructor() {
 		window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
@@ -41,7 +41,7 @@ class PluginDialogPrompt {
 	}
 	receiveMessageFromPlugin(e) {
 		console.log('receiveMessage', e);
-		/*let parsed: MZXBX_PluginMessage | null = null;
+		let parsed: MZXBX_PluginMessage | null = null;
 		try {
 			parsed = JSON.parse(e.data)
 		} catch (xxx) {
@@ -49,17 +49,19 @@ class PluginDialogPrompt {
 		}
 		console.log('parsed', parsed);
 		if (parsed) {
-			if (parsed.dialogID == this.dialogID) {
-				//console.log('data', parsed.data);
-				let close: boolean = this.waitCallback(parsed.data);
-				if (close) {
-					this.closeDialogFrame();
+			if (this.dialogMessage) {
+				if (parsed.dialogID == this.dialogMessage.dialogID) {
+					//console.log('data', parsed.data);
+					let close: boolean = this.waitCallback(parsed.data);
+					if (close) {
+						this.closeDialogFrame();
+					}
+				} else {
+					console.log('wrong received message id', parsed.dialogID, this.dialogMessage.dialogID);
 				}
 			} else {
-				console.log('wrong received message id', parsed.dialogID, this.dialogID);
+				console.log('wrong received object');
 			}
-		} else {
-			console.log('wrong received object');
-		}*/
+		}
 	}
 }

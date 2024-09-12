@@ -191,6 +191,30 @@ class PluginDialogPrompt {
     }
     receiveMessageFromPlugin(e) {
         console.log('receiveMessage', e);
+        let parsed = null;
+        try {
+            parsed = JSON.parse(e.data);
+        }
+        catch (xxx) {
+            console.log(xxx);
+        }
+        console.log('parsed', parsed);
+        if (parsed) {
+            if (this.dialogMessage) {
+                if (parsed.dialogID == this.dialogMessage.dialogID) {
+                    let close = this.waitCallback(parsed.data);
+                    if (close) {
+                        this.closeDialogFrame();
+                    }
+                }
+                else {
+                    console.log('wrong received message id', parsed.dialogID, this.dialogMessage.dialogID);
+                }
+            }
+            else {
+                console.log('wrong received object');
+            }
+        }
     }
 }
 class CommandDispatcher {
@@ -2473,6 +2497,9 @@ class ControlConnection {
 class SpearConnection {
     constructor() {
     }
+    nonan(nn) {
+        return (nn) ? nn : 0;
+    }
     addSpear(fromX, fromY, toX, toY, anchor) {
         let headLen = 3;
         let css = 'fanConnection';
@@ -2484,17 +2511,17 @@ class SpearConnection {
         let yy1 = fromY + diffY / ratio;
         let xx2 = toX - diffX / ratio;
         let yy2 = toY - diffY / ratio;
-        let mainLine = { x1: xx1, x2: xx2, y1: yy1, y2: yy2, css: css };
+        let mainLine = { x1: this.nonan(xx1), x2: this.nonan(xx2), y1: this.nonan(yy1), y2: this.nonan(yy2), css: css };
         anchor.content.push(mainLine);
         let angle = Math.atan2(yy2 - yy1, xx2 - xx1);
         let da = Math.PI * 19 / 20.0;
         let dx = headLen * Math.cos(angle - da);
         let dy = headLen * Math.sin(angle - da);
-        let first = { x1: xx2, x2: xx2 + dx, y1: yy2, y2: yy2 + dy, css: css };
+        let first = { x1: this.nonan(xx2), x2: this.nonan(xx2 + dx), y1: this.nonan(yy2), y2: this.nonan(yy2 + dy), css: css };
         anchor.content.push(first);
         let dx2 = headLen * Math.cos(angle + da);
         let dy2 = headLen * Math.sin(angle + da);
-        let second = { x1: xx2, x2: xx2 + dx2, y1: yy2, y2: yy2 + dy2, css: css };
+        let second = { x1: this.nonan(xx2), x2: this.nonan(xx2 + dx2), y1: this.nonan(yy2), y2: this.nonan(yy2 + dy2), css: css };
         anchor.content.push(second);
     }
 }
@@ -2719,7 +2746,7 @@ let mzxbxProjectForTesting2 = {
             title: "Snare", measures: [
                 { skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
             ],
-            sampler: { id: 'd1', data: '', kind: 'baseSampler', outputs: ['drum1Volme'], iconPosition: { x: 14, y: 75 } }
+            sampler: { id: 'd1', data: '', kind: 'baseSampler', outputs: ['drum1Volme'], iconPosition: { x: 0, y: 75 } }
         },
         {
             title: "Snare2", measures: [],
@@ -2859,7 +2886,7 @@ class MixerDataMathUtility {
         this.pluginIconSize = 17;
         this.speakerIconSize = 33;
         this.speakerIconPad = 11;
-        this.padGridFan = 5;
+        this.padGridFan = 15;
         this.data = data;
         this.maxCommentRowCount = -1;
         for (let ii = 0; ii < this.data.comments.length; ii++) {

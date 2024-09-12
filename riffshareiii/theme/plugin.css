@@ -31,7 +31,7 @@
 #pluginHeader{
 	width:100%;
 	height:1.0cm;
-	background-color: var(--color-panel);
+	background-color: var(--panel-color);
 	border-radius: 0.125cm 0.125cm 0.0cm 0.0cm;
 	flex-basis: auto;
     flex-shrink: 0;
@@ -42,7 +42,7 @@
 	padding-top: 0.1cm;
 }
 #pluginTitle{
-	color: var(--color-text);
+	color: var(--main-color);
     font-size: var(--label-04cm);
 	padding-left: 0.5cm;
 	padding-top: 0.25cm;
@@ -54,16 +54,16 @@
 #pluginCancel{
 	border-radius: 0.4cm;
 	background-color: var(--action-color);
-	color: var(--color-text);
-	box-shadow:inset 0px 0px 0px 0.5px var(--color-text);
-	text-shadow2: 0.25px 0px var(--color-text),-0.25px 0px var(--color-text),0px 0.25px var(--color-text),0px -0.25px var(--color-text);
+	color: var(--main-color);
+	box-shadow:inset 0px 0px 0px 0.5px var(--main-color);
+	text-shadow2: 0.25px 0px var(--main-color),-0.25px 0px var(--main-color),0px 0.25px var(--main-color),0px -0.25px var(--main-color);
     font-size: var(--label-05cm);
 	width:0.8cm;
 	height:0.8cm;
 	text-align: center;
 	padding-top2: 0.05cm;
 	background-color2: green;
-	border-color2: var(--color-text);
+	border-color2: var(--main-color);
 	border-style2: solid;
 	border-width2: 1px;
 	border-radius2:1cm;
@@ -82,8 +82,8 @@
 #pluginRefresh{
 	border-radius: 0.4cm;
 	background-color: var(--action-color);
-	color: var(--color-text);
-	text-shadow2: 0.25px 0px var(--color-text),-0.25px 0px var(--color-text),0px 0.25px var(--color-text),0px -0.25px var(--color-text);
+	color: var(--main-color);
+	text-shadow2: 0.25px 0px var(--main-color),-0.25px 0px var(--main-color),0px 0.25px var(--main-color),0px -0.25px var(--main-color);
     font-size: var(--label-05cm);
 	width:0.8cm;
 	height:0.8cm;
@@ -92,7 +92,7 @@
 	font-family: "Material-Design-Iconic-Font";
 	background-color2: brown;
 	cursor:pointer;
-	box-shadow:inset 0px 0px 0px 0.5px var(--color-text);
+	box-shadow:inset 0px 0px 0px 0.5px var(--main-color);
 	display: flex;
 		align-items: center;
 		justify-content: center;

@@ -1,116 +1,28 @@
 
-/*
-.mixFieldBg025 {
-    fill: var(--color-panel);
-    stroke: var(--color-lines);
-    stroke-linejoin: round;
-    stroke-width: calc(0.01*var(--tapSize));
-    fill-opacity:0;
-}
 
-.mixFieldBg05 {
-    fill: var(--color-panel);
-    stroke: var(--color-lines);
-    stroke-linejoin: round;
-    stroke-width: calc(0.02*var(--tapSize));
-    fill-opacity:0;
-}
-
-.mixFieldBg1 {
-    fill: var(--color-panel);
-    stroke: var(--color-lines);
-    stroke-linejoin: round;
-    stroke-width: calc(0.04*var(--tapSize));
-    fill-opacity:0;
-}
-
-.mixFieldBg2 {
-    fill: var(--color-panel);
-    stroke: var(--color-lines);
-    stroke-linejoin: round;
-    stroke-width: calc(0.08*var(--tapSize));
-    fill-opacity:0;
-}
-
-.mixFieldBg4 {
-    fill: var(--color-panel);
-    stroke: var(--color-lines);
-    stroke-linejoin: round;
-    stroke-width: calc(0.16*var(--tapSize));
-    fill-opacity:0;
-}
-
-.mixFieldBg8 {
-    fill: var(--color-panel);
-    stroke: var(--color-lines);
-    stroke-linejoin: round;
-    stroke-width: calc(0.32*var(--tapSize));
-    fill-opacity:0;
-}
-
-.mixFieldBg16 {
-    fill: var(--color-panel);
-    stroke: var(--color-lines);
-    stroke-linejoin: round;
-    stroke-width: calc(0.64*var(--tapSize));
-    fill-opacity:0;
-}
-
-.mixFieldBg32 {
-    fill: var(--color-panel);
-    stroke: var(--color-lines);
-    stroke-linejoin: round;
-    stroke-width: calc(1.28*var(--tapSize));
-    fill-opacity:0;
-}
-
-.mixFieldBg64 {
-    fill: var(--color-panel);
-    stroke: var(--color-lines);
-    stroke-linejoin: round;
-    stroke-width: calc(2.56*var(--tapSize));
-    fill-opacity:0;
-}
-
-.mixFieldBg128 {
-    fill: var(--color-panel);
-    stroke: var(--color-lines);
-    stroke-linejoin: round;
-    stroke-width: calc(5.12*var(--tapSize));
-    fill-opacity:0;
-}
-
-.mixFieldBg256 {
-    fill: var(--color-panel);
-    stroke: var(--color-lines);
-    stroke-linejoin: round;
-    stroke-width: calc(10.24*var(--tapSize));
-    fill-opacity:0;
-}
-*/
 .projectTitle222222 {
-    fill: var(--color-subtext);
+    fill: var(--aux-color);
 	font-size: var(--label-4cm);
 }
 .trackTitle {
-    fill: var(--color-subtext);
+    fill: var(--aux-color);
 	font-size: var(--label-1cm);
 }
 .mixNoteLine{
-    stroke: var(--color-text);
+    stroke: var(--main-color);
     stroke-linejoin: round;
     stroke-width: calc(0.95*var(--tapSize));
 	stroke-opacity: 90%;
 }
 .mixNoteSub{
-    stroke: var(--color-text);
+    stroke: var(--main-color);
     stroke-linejoin: round;
     stroke-width: calc(0.95*var(--tapSize));
 	stroke-opacity: 15%;
 }
 
 .mixTimeMeasureMark{
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 25%;
 }
 
@@ -120,96 +32,96 @@
 }
 
 .mixFiller1{
-    fill: var(--color-text);
+    fill: var(--main-color);
 	fill-opacity: 5%;
 }
 .mixFiller2{
-    fill: var(--color-text);
+    fill: var(--main-color);
 	fill-opacity: 10%;
 }
 .mixFiller3{
-    fill: var(--color-text);
+    fill: var(--main-color);
 	fill-opacity: 15%;
 }
 .mixFiller4{
-    fill: var(--color-text);
+    fill: var(--main-color);
 	fill-opacity: 20%;
 }
 .mixFiller5{
-    fill: var(--color-text);
+    fill: var(--main-color);
 	fill-opacity: 25%;
 }
 .mixFiller6{
-    fill: var(--color-text);
+    fill: var(--main-color);
 	fill-opacity: 30%;
 }
 .mixFiller7{
-    fill: var(--color-text);
+    fill: var(--main-color);
 	fill-opacity: 35%;
 }
 .mixFiller8{
-    fill: var(--color-text);
+    fill: var(--main-color);
 	fill-opacity: 40%;
 }
 
 
 .titleLabel025 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(0.5*var(--tapSize));
     text-anchor22: start;
 	pointer-events: none;
 }
 .titleLabel05 {
-	fill: var(--color-lines);
+	fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(1*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel1 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(2*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel2 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel4 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(8*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel8 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(16*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel16 {
-	fill: var(--color-lines);
+	fill: var(--panel-color);
 	fill-opacity:50%;
     font-size: calc(32*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel32 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(64*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel64 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(128*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel128 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
 	fill-opacity: 50%;
     font-size: calc(256*var(--tapSize));
 	pointer-events: none;
@@ -217,7 +129,7 @@
 
 
 .octaveBottomBorder222{
-	fill: var(--color-lines);
+	fill: var(--panel-color);
 	fill-opacity:25%;
     stroke: none;
 }
@@ -228,7 +140,7 @@
 }
 
 .stepPartDelimiter{
-	fill2: var(--color-lines);
+	fill2: var(--panel-color);
 
 	fill-opacity2:25%;
     stroke2: none;
@@ -238,15 +150,15 @@
 	pointer-events: none;
 }
 .verLineFrom {
-    stop-color: var(--color-lines);
+    stop-color: var(--panel-color);
     stop-opacity: 25%;
   }
   .verLineMiddle{
-    stop-color: var(--color-lines);
+    stop-color: var(--panel-color);
     stop-opacity: 15%;
   }
   .verLineTo {
-    stop-color: var(--color-lines);
+    stop-color: var(--panel-color);
     stop-opacity: 0;
   }
 .barRightBorder{
@@ -257,7 +169,7 @@
 
 
 .barRightBorder2{
-	fill: var(--color-lines);
+	fill: var(--panel-color);
 	fill-opacity:25%;
     stroke: none;
 	pointer-events: none;
@@ -270,37 +182,37 @@
 
 
 .commentLineText025 {
-    fill: var(--color-text);
+    fill: var(--main-color);
     font-size: calc(0.25*var(--tapSize));
 	pointer-events: none;
 }
 .commentLineText05 {
-    fill: var(--color-text);
+    fill: var(--main-color);
     font-size: calc(0.5*var(--tapSize));
 	pointer-events: none;
 }
 .commentLineText1 {
-    fill: var(--color-text);
+    fill: var(--main-color);
     font-size: calc(1*var(--tapSize));
 	pointer-events: none;
 }
 .commentLineText2 {
-    fill: var(--color-text);
+    fill: var(--main-color);
     font-size: calc(2*var(--tapSize));
 	pointer-events: none;
 }
 .commentLineText4 {
-    fill: var(--color-text);
+    fill: var(--main-color);
     font-size: calc(3*var(--tapSize));
 	pointer-events: none;
 }
 .commentLineText8 {
-    fill: var(--color-text);
+    fill: var(--main-color);
     font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
 .commentLineText16 {
-    fill: var(--color-text);
+    fill: var(--main-color);
     font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
@@ -309,48 +221,48 @@
 
 
 .commentReadText025 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
     font-size: calc(0.25*var(--tapSize));
 	pointer-events: none;
 }
 .commentReadText05 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
     font-size: calc(0.5*var(--tapSize));
 	pointer-events: none;
 }
 .commentReadText1 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
     font-size: calc(1*var(--tapSize));
 	pointer-events: none;
 }
 .commentReadText2 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
     font-size: calc(2*var(--tapSize));
 	pointer-events: none;
 }
 .commentReadText4 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
     font-size: calc(3*var(--tapSize));
 	pointer-events: none;
 }
 .commentReadText8 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
     font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
 .commentReadText16 {
-    fill: var(--color-lines);
+    fill: var(--panel-color);
     font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
 
 .automationBgDot{
-	fill: var(--color-lines);
+	fill: var(--panel-color);
 	fill-opacity:75%;
     stroke: none;
 }
 .automationFocusedDot{
-	fill: var(--color-text);
+	fill: var(--main-color);
 	fill-opacity:75%;
     stroke: none;
 }

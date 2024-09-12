@@ -1,29 +1,29 @@
 .fanSamplerIcon {
-	fill: var(--color-panel);
+	fill: var(--panel-color);
 	font-size: calc(4*var(--tapSize));
 	pointer-events: none;
-	border-color: var(--color-text);
-	stroke: var(--color-text);
+	border-color: var(--main-color);
+	stroke: var(--main-color);
 	stroke-width: 0.25cm;
 	stroke-linejoin: round;
 	paint-order: stroke;
 }
 .fanPerformerIcon {
-	fill2: yellow;
-	fill: var(--color-panel);
+	
+	fill: var(--panel-color);
 	stroke-dasharray:15,15;
 	pointer-events: none;
-	stroke: var(--color-text);
+	stroke: var(--main-color);
 	stroke-width: 0.25cm;
 	stroke-linejoin: round;
 	paint-order: stroke;
 }
 .fanFilterIcon {
-	fill2: yellow;
-	fill: var(--color-panel);
+	
+	fill: var(--panel-color);
 	stroke-dasharray:45,45;
 	pointer-events: none;
-	stroke: var(--color-text);
+	stroke: var(--main-color);
 	stroke-width: 0.25cm;
 	stroke-linejoin: round;
 	paint-order: stroke;
@@ -31,14 +31,14 @@
 
 .fanConnection {
 	pointer-events: none;
-	stroke: var(--color-text);
+	stroke: var(--main-color);
 	stroke-width: 0.5cm;
 	stroke-linejoin: round;
 	paint-order: stroke;
 }
 .fanStream {
 	pointer-events: none;
-	stroke: var(--color-text);
+	stroke: var(--main-color);
 	stroke-width: 2cm;
 	stroke-linejoin: round;
 	paint-order: stroke;
@@ -46,21 +46,21 @@
 
 
 .fanSpeakerIcon {
-	fill: var(--color-panel);
+	fill: var(--panel-color);
 	font-size: calc(4*var(--tapSize));
 	pointer-events: none;
-	border-color: var(--color-text);
-	stroke: var(--color-text);
+	border-color: var(--main-color);
+	stroke: var(--main-color);
 	stroke-width: 0.1cm;
 	stroke-linejoin: round;
 	paint-order: stroke;
 }
 .fanSpeakerLabel {
-	fill: var(--color-panel);
+	fill: var(--panel-color);
 	font-size: calc(4*var(--tapSize));
 	pointer-events: none;
-	border-color: var(--color-text);
-	stroke: var(--color-text);
+	border-color: var(--main-color);
+	stroke: var(--main-color);
 	stroke-width: 0.1cm;
 	stroke-linejoin: round;
 	paint-order: stroke;
@@ -69,11 +69,11 @@
 .fanSpeakerIconLabel{
 	font-size: calc(8*var(--tapSize));
 	pointer-events: none;
-	fill: var(--color-text);
+	fill: var(--main-color);
 	font-family: 'Material-Design-Iconic-Font';
 }
 
 .controlConnection{
-	fill: var(--color-text);
+	fill: var(--main-color);
 	fill-opacity:25%;
 }

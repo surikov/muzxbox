@@ -1,11 +1,11 @@
 "use strict";
-var MZXBX_PluginKind;
-(function (MZXBX_PluginKind) {
-    MZXBX_PluginKind[MZXBX_PluginKind["Action"] = 0] = "Action";
-    MZXBX_PluginKind[MZXBX_PluginKind["Filter"] = 1] = "Filter";
-    MZXBX_PluginKind[MZXBX_PluginKind["Sampler"] = 2] = "Sampler";
-    MZXBX_PluginKind[MZXBX_PluginKind["Performer"] = 3] = "Performer";
-})(MZXBX_PluginKind || (MZXBX_PluginKind = {}));
+var MZXBX_PluginPurpose;
+(function (MZXBX_PluginPurpose) {
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Action"] = 0] = "Action";
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Filter"] = 1] = "Filter";
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Sampler"] = 2] = "Sampler";
+    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Performer"] = 3] = "Performer";
+})(MZXBX_PluginPurpose || (MZXBX_PluginPurpose = {}));
 class MIDIIImportMusicPlugin {
     constructor() {
         this.callbackID = '';
@@ -68,8 +68,11 @@ class MIDIIImportMusicPlugin {
     receiveHostMessage(par) {
         console.log('receiveHostMessage', par);
         try {
-            var oo = JSON.parse(par.data);
-            this.callbackID = oo.dialogID;
+            console.log('parse', par.data.data);
+            var oo = JSON.parse(par.data.data);
+            console.log('result', oo);
+            this.callbackID = par.data.dialogID;
+            console.log('dialogID', this.callbackID);
         }
         catch (xx) {
             console.log(xx);
@@ -1586,7 +1589,7 @@ class MidiParser {
                         }
                     }
                     if (trackChord == null) {
-                        trackChord = { skip: skip, notes: [] };
+                        trackChord = { skip: skip, pitches: [], slides: [] };
                         projectMeasure.chords.push(trackChord);
                     }
                     if (trackChord) {
@@ -1598,9 +1601,9 @@ class MidiParser {
                                 duration: startDuration,
                                 delta: 0
                             };
-                            let trackNote = { pitch: currentSlidePitch, slides: [curSlide] };
+                            let singlePitch = currentSlidePitch;
                             if (midiNote.slidePoints.length > 0) {
-                                trackNote.slides = [];
+                                trackChord.slides = [];
                                 let bendDuration = 0;
                                 for (let pp = 0; pp < midiNote.slidePoints.length; pp++) {
                                     let midiPoint = midiNote.slidePoints[pp];
@@ -1612,7 +1615,7 @@ class MidiParser {
                                         delta: 0
                                     };
                                     bendDuration = bendDuration + midiPoint.durationms;
-                                    trackNote.slides.push(curSlide);
+                                    trackChord.slides.push(curSlide);
                                 }
                                 let remains = midiNote.midiDuration - bendDuration;
                                 if (remains > 0) {
@@ -1620,10 +1623,13 @@ class MidiParser {
                                         duration: mm.calculate(remains / 1000.0, nextMeasure.tempo),
                                         delta: currentSlidePitch - Math.round(currentSlidePitch)
                                     };
-                                    trackNote.slides.push(curSlide);
+                                    trackChord.slides.push(curSlide);
                                 }
                             }
-                            trackChord.notes.push(trackNote);
+                            else {
+                                trackChord.slides = [curSlide];
+                            }
+                            trackChord.pitches.push(singlePitch);
                         }
                     }
                 }

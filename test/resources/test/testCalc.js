@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.135 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.136 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -898,7 +898,7 @@ function roundDown(num, base) {
     return Math.floor(num / base) * base;
 }
 function dumpColorStat() {
-    //console.log('dumpColorStat');
+    console.log('dumpColorStat');
     //console.log('sortedBlue', sortedBlue);
     var skip = 1;
     if (showFirstRow) {
@@ -950,6 +950,28 @@ function dumpColorStat() {
         + ', silver: ' + Math.round(silverleft / rowcount) + '/' + Math.round(silverright / rowcount)
         + ', red: ' + Math.round(redleft / rowcount) + '/' + Math.round(redright / rowcount);
     console.log(skip, 'blue', blueleft, blueright, 'green', greenleft, greenright, 'silver', silverleft, silverright, 'red', redleft, redright);
+    dumpGroupStat();
+}
+function dumpGroupStat() {
+    var cntEx = 0;
+    var cntNot = 0;
+    for (var kk = 0; kk < redStat.length - 5; kk++) {
+        var r0 = redStat[kk + 0].left;
+        var r1 = redStat[kk + 1].left;
+        var r2 = redStat[kk + 2].left;
+        var r3 = redStat[kk + 3].left;
+        var r4 = redStat[kk + 4].left;
+        if (r1 < 5 && r2 > 6 && r3 < 5) {
+            console.log(kk, ':', r0, r1, r2, r3);
+            if (r0 > 6) {
+                cntEx++;
+            }
+            else {
+                cntNot++;
+            }
+        }
+    }
+    console.log('dumpGroupStat', cntEx, '/' + (cntEx + cntNot));
 }
 function fillCells() {
     clearSVGgroup(levelA);

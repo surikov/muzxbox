@@ -8,14 +8,14 @@
 	--color-shadow: #00000066;
 
     --color-background: #ddeeff;
-    --color-lines: #000;
+    --panel-color2: #000;
     --color-panel: #ccd;
 
 	--color-focus: #06f;
     --color-interactive: #f00;
 
 	--color-subtext: #0f3;
-    --color-text: #006;
+    --main-color2: #006;
 }
 #pagediv {
     background-image: url("bg/red.jpg");
