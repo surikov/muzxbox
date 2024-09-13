@@ -11,7 +11,7 @@ class MIDIIImportMusicPlugin {
 	sendImportedMIDIData() {
 		console.log('sendImportedMIDIData');
 		if (this.parsedProject) {
-			var oo:MZXBX_PluginMessage = {
+			var oo: MZXBX_PluginMessage = {
 				dialogID: this.callbackID,
 				data: JSON.stringify(this.parsedProject)
 			};
@@ -60,11 +60,11 @@ class MIDIIImportMusicPlugin {
 		console.log('receiveHostMessage', par);
 		//callbackID = par.data;
 		try {
-			console.log('parse',par.data.data);
-			var oo:MZXBX_PluginMessage = JSON.parse(par.data.data);
-			console.log('result',oo);
+			console.log('parse', par.data.data);
+			var oo: MZXBX_PluginMessage = JSON.parse(par.data.data);
+			console.log('result', oo);
 			this.callbackID = par.data.dialogID;
-			console.log('dialogID',this.callbackID);
+			console.log('dialogID', this.callbackID);
 		} catch (xx) {
 			console.log(xx);
 		}
@@ -1885,10 +1885,15 @@ class MidiParser {
 				this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
 			}
 		}
+		let top=0;
 		for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
 			let midiSongTrack: MIDISongTrack = midiSongData.miditracks[ii];
 			let filterID = 'f' + ii;
-			let filterVolume: Zvoog_FilterTarget = { id: filterID, kind: 'VolumeGain', dataBlob: '', outputs: [], automation: null };
+			let filterVolume: Zvoog_FilterTarget = {
+				id: filterID
+				, kind: 'VolumeGain', dataBlob: '', outputs: [], automation: null
+				, iconPosition: { x: 33, y: ii*22 }
+			};
 			project.filters.push(filterVolume);
 
 			if (midiSongTrack.trackVolumes.length == 1) {
@@ -1928,12 +1933,14 @@ class MidiParser {
 				let drums: number[] = this.collectDrums(midiSongTrack);
 				//console.log(midiTrack,drums);
 				for (let dd = 0; dd < drums.length; dd++) {
-					project.percussions.push(this.createProjectDrums(drums[dd], project.timeline, midiSongTrack, filterID));
+					project.percussions.push(this.createProjectDrums(top*22,drums[dd], project.timeline, midiSongTrack, filterID));
+					top++;
 				}
 			} else {
-				project.tracks.push(this.createProjectTrack(project.timeline, midiSongTrack, filterID));
+				project.tracks.push(this.createProjectTrack(top*22,project.timeline, midiSongTrack, filterID));
+				top++;
 			}
-
+//console.log(top,ii);
 
 		}
 		console.log('midiSongData', midiSongData);
@@ -1995,12 +2002,14 @@ class MidiParser {
 	stripDuration(what: Zvoog_MetreMathType): Zvoog_MetreMathType {
 		return what;
 	}
-	createProjectTrack(timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack {
+	createProjectTrack(top:number,timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack {
 		let projectTrack: Zvoog_MusicTrack = {
 			title: midiTrack.title + ' [' + midiTrack.program + '] ' + insNames[midiTrack.program]
 			, measures: []
 			//, filters: []
-			, performer: { id: '', data: '', kind: '', outputs: [outputId] }
+			, performer: { id: 'p'+Math.random(), data: '', kind: '', outputs: [outputId] 
+			,iconPosition: { x: 0, y: top }
+		}
 		};
 		let mm = MMUtil();
 		for (let tt = 0; tt < timeline.length; tt++) {
@@ -2024,7 +2033,7 @@ class MidiParser {
 						}
 					}
 					if (trackChord == null) {
-						trackChord = { skip: skip, pitches: [] ,slides:[]};
+						trackChord = { skip: skip, pitches: [], slides: [] };
 						projectMeasure.chords.push(trackChord);
 					}
 					if (trackChord) {
@@ -2040,11 +2049,11 @@ class MidiParser {
 								, delta: 0
 							};
 							//let trackNote: Zvoog_Note = { pitch: currentSlidePitch, slides: [curSlide] };
-							let singlePitch=currentSlidePitch;
-							
+							let singlePitch = currentSlidePitch;
+
 							if (midiNote.slidePoints.length > 0) {
 								//trackNote.slides = [];
-								trackChord.slides=[];
+								trackChord.slides = [];
 								let bendDuration = 0;
 								for (let pp = 0; pp < midiNote.slidePoints.length; pp++) {
 									let midiPoint = midiNote.slidePoints[pp];
@@ -2072,8 +2081,8 @@ class MidiParser {
 									//trackNote.slides.push(curSlide);
 									trackChord.slides.push(curSlide);
 								}
-							}else{
-								trackChord.slides=[curSlide];
+							} else {
+								trackChord.slides = [curSlide];
 							}
 
 							//trackChord.notes.push(trackNote);
@@ -2088,12 +2097,14 @@ class MidiParser {
 		}
 		return projectTrack;
 	}
-	createProjectDrums(drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack {
+	createProjectDrums(top:number,drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack {
 		let projectDrums: Zvoog_PercussionTrack = {
 			title: midiTrack.title + ' [' + drum + '] ' + drumNames[drum]
 			, measures: []
 			//, filters: []
-			, sampler: { id: '', data: '', kind: '', outputs: [outputId] }
+			, sampler: { id: 'd'+Math.random(), data: '', kind: '', outputs: [outputId] 
+			,iconPosition: { x: 10, y: top }
+		}
 		};
 		let currentTimeMs = 0;
 		let mm = MMUtil();

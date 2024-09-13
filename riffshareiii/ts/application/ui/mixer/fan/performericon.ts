@@ -25,7 +25,7 @@ class PerformerIcon {
 			xx = left + audioSeq.iconPosition.x;
 			yy = top + audioSeq.iconPosition.y;
 		}
-
+//console.log('addPerformerSpot',zidx,yy,audioSeq.iconPosition);
 		let rec: TileRectangle = {
 			x: xx, y: yy
 			, w: globalCommandDispatcher.cfg().pluginIconSize, h: globalCommandDispatcher.cfg().pluginIconSize

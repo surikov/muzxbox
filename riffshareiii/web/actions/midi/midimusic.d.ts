@@ -575,8 +575,8 @@ declare class MidiParser {
     collectDrums(midiTrack: MIDISongTrack): number[];
     numratio(nn: number): number;
     stripDuration(what: Zvoog_MetreMathType): Zvoog_MetreMathType;
-    createProjectTrack(timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack;
-    createProjectDrums(drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack;
+    createProjectTrack(top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack;
+    createProjectDrums(top: number, drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack;
 }
 declare function round1000(nn: number): number;
 declare function findMeasureSkipByTime(time: number, measures: Zvoog_SongMeasure[]): null | {

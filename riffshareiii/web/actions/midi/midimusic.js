@@ -1471,10 +1471,15 @@ class MidiParser {
                 this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
             }
         }
+        let top = 0;
         for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
             let midiSongTrack = midiSongData.miditracks[ii];
             let filterID = 'f' + ii;
-            let filterVolume = { id: filterID, kind: 'VolumeGain', dataBlob: '', outputs: [], automation: null };
+            let filterVolume = {
+                id: filterID,
+                kind: 'VolumeGain', dataBlob: '', outputs: [], automation: null,
+                iconPosition: { x: 33, y: ii * 22 }
+            };
             project.filters.push(filterVolume);
             if (midiSongTrack.trackVolumes.length == 1) {
                 let vol = 1 * midiSongTrack.trackVolumes[0].value;
@@ -1507,11 +1512,13 @@ class MidiParser {
             if (midiSongTrack.channelNum == 9) {
                 let drums = this.collectDrums(midiSongTrack);
                 for (let dd = 0; dd < drums.length; dd++) {
-                    project.percussions.push(this.createProjectDrums(drums[dd], project.timeline, midiSongTrack, filterID));
+                    project.percussions.push(this.createProjectDrums(top * 22, drums[dd], project.timeline, midiSongTrack, filterID));
+                    top++;
                 }
             }
             else {
-                project.tracks.push(this.createProjectTrack(project.timeline, midiSongTrack, filterID));
+                project.tracks.push(this.createProjectTrack(top * 22, project.timeline, midiSongTrack, filterID));
+                top++;
             }
         }
         console.log('midiSongData', midiSongData);
@@ -1563,11 +1570,13 @@ class MidiParser {
     stripDuration(what) {
         return what;
     }
-    createProjectTrack(timeline, midiTrack, outputId) {
+    createProjectTrack(top, timeline, midiTrack, outputId) {
         let projectTrack = {
             title: midiTrack.title + ' [' + midiTrack.program + '] ' + insNames[midiTrack.program],
             measures: [],
-            performer: { id: '', data: '', kind: '', outputs: [outputId] }
+            performer: { id: 'p' + Math.random(), data: '', kind: '', outputs: [outputId],
+                iconPosition: { x: 0, y: top }
+            }
         };
         let mm = MMUtil();
         for (let tt = 0; tt < timeline.length; tt++) {
@@ -1637,11 +1646,13 @@ class MidiParser {
         }
         return projectTrack;
     }
-    createProjectDrums(drum, timeline, midiTrack, outputId) {
+    createProjectDrums(top, drum, timeline, midiTrack, outputId) {
         let projectDrums = {
             title: midiTrack.title + ' [' + drum + '] ' + drumNames[drum],
             measures: [],
-            sampler: { id: '', data: '', kind: '', outputs: [outputId] }
+            sampler: { id: 'd' + Math.random(), data: '', kind: '', outputs: [outputId],
+                iconPosition: { x: 10, y: top }
+            }
         };
         let currentTimeMs = 0;
         let mm = MMUtil();
