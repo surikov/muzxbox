@@ -5,19 +5,22 @@ class SpearConnection {
 	nonan(nn: number): number {
 		return (nn) ? nn : 0;
 	}
-	addSpear(fromX: number, fromY: number, toX: number, toY: number, anchor: TileAnchor) {
+	addSpear(fromSize: number, fromX: number, fromY: number
+		, toSize: number, toX: number, toY: number
+		, anchor: TileAnchor) {
 		let headLen = 3;
 		let css = 'fanConnection';
 
 		let diffX = toX - fromX;
 		let diffY = toY - fromY;
 		let pathLen = Math.sqrt(diffX * diffX + diffY * diffY);
-		let ratio = pathLen / (globalCommandDispatcher.cfg().pluginIconSize / 1.8);
+		let fromRatio = 0.7*pathLen / (fromSize / 2 );
+		let toRatio = 0.7*pathLen / (toSize / 2 );
 
-		let xx1 = fromX + diffX / ratio;
-		let yy1 = fromY + diffY / ratio;
-		let xx2 = toX - diffX / ratio;
-		let yy2 = toY - diffY / ratio;
+		let xx1 = fromX + diffX / fromRatio;
+		let yy1 = fromY + diffY / fromRatio;
+		let xx2 = toX - diffX / toRatio;
+		let yy2 = toY - diffY / toRatio;
 
 		//let mainLine: TileLine = { x1: fromX, x2: toX, y1: fromY, y2: toY, css: css };
 		let mainLine: TileLine = { x1: this.nonan(xx1), x2: this.nonan(xx2), y1: this.nonan(yy1), y2: this.nonan(yy2), css: css };

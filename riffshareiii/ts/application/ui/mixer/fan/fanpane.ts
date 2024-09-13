@@ -58,17 +58,21 @@ class FanPane {
 		}
 	}
 	buildOutIcon(fanAnchor: TileAnchor, zidx: number) {
-		let xx = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad;
-		let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
+		//let xx = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad;
+		//let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
+
+		let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().pluginIconSize / 2;
+		let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
+
 
 		let rec: TileRectangle = {
-			x: xx, y: yy, w: globalCommandDispatcher.cfg().speakerIconSize, h: globalCommandDispatcher.cfg().speakerIconSize
+			x: speakerX, y: speakerY, w: globalCommandDispatcher.cfg().speakerIconSize, h: globalCommandDispatcher.cfg().speakerIconSize
 			, rx: globalCommandDispatcher.cfg().speakerIconSize / 2, ry: globalCommandDispatcher.cfg().speakerIconSize / 2, css: 'fanSpeakerIcon'
 		};
 		fanAnchor.content.push(rec);
 		let icon: TileText = {
-			x: xx + globalCommandDispatcher.cfg().speakerIconSize
-			, y: yy + globalCommandDispatcher.cfg().speakerIconSize, text: icon_sound_loud, css: 'fanSpeakerIconLabel'
+			x: speakerX + globalCommandDispatcher.cfg().speakerIconSize
+			, y: speakerY + globalCommandDispatcher.cfg().speakerIconSize, text: icon_sound_loud, css: 'fanSpeakerIconLabel'
 		};
 		fanAnchor.content.push(icon);
 		/*if (zidx < 5) {

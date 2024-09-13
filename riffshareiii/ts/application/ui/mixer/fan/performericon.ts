@@ -25,18 +25,18 @@ class PerformerIcon {
 			xx = left + audioSeq.iconPosition.x;
 			yy = top + audioSeq.iconPosition.y;
 		}
-//console.log('addPerformerSpot',zidx,yy,audioSeq.iconPosition);
+		//console.log('addPerformerSpot',zidx,yy,audioSeq.iconPosition);
 		let rec: TileRectangle = {
 			x: xx, y: yy
 			, w: globalCommandDispatcher.cfg().pluginIconSize, h: globalCommandDispatcher.cfg().pluginIconSize
-			, rx: globalCommandDispatcher.cfg().pluginIconSize / 2, ry: globalCommandDispatcher.cfg().pluginIconSize / 2
+			//, rx: globalCommandDispatcher.cfg().pluginIconSize / 2, ry: globalCommandDispatcher.cfg().pluginIconSize / 2
 			, css: 'fanPerformerIcon'
 		};
 		fanLevelAnchor.content.push(rec);
 		if (zidx < 5) {
 			let txt: TileText = {
 				text: audioSeq.kind + ':' + audioSeq.id
-				, x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanSamplerIcon'
+				, x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanIconLabel'
 			};
 			fanLevelAnchor.content.push(txt);
 		}
@@ -92,14 +92,23 @@ class FanOutputLine {
 							xx = left + toFilter.iconPosition.x + globalCommandDispatcher.cfg().pluginIconSize / 2;
 							yy = top + toFilter.iconPosition.y + globalCommandDispatcher.cfg().pluginIconSize / 2;
 						}
-						new SpearConnection().addSpear(fromX, fromY, xx, yy, fanLevelAnchor);
+						new SpearConnection().addSpear(globalCommandDispatcher.cfg().pluginIconSize, fromX, fromY
+							, globalCommandDispatcher.cfg().pluginIconSize, xx, yy
+							, fanLevelAnchor);
 						break;
 					}
 				}
 			}
 		} else {
-			let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad+ globalCommandDispatcher.cfg().pluginIconSize / 2;
-			new SpearConnection().addSpear(fromX, fromY, speakerX, globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2, fanLevelAnchor);
+			let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().pluginIconSize / 2;
+			let speakerY=globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2-globalCommandDispatcher.cfg().speakerIconSize / 2;
+			new SpearConnection().addSpear(globalCommandDispatcher.cfg().pluginIconSize
+				, fromX
+				, fromY
+				, globalCommandDispatcher.cfg().speakerIconSize
+				, speakerX + globalCommandDispatcher.cfg().speakerIconSize / 2
+				, speakerY+ globalCommandDispatcher.cfg().speakerIconSize / 2
+				, fanLevelAnchor);
 		}
 	}
 }

@@ -2,7 +2,7 @@ class MixerDataMathUtility {
 	data: Zvoog_Project;
 
 	leftPad: number = 3;
-	rightPad: number = 10;
+	rightPad: number = 50;
 	bottomPad = 11;
 	topPad = 2;
 
@@ -21,7 +21,7 @@ class MixerDataMathUtility {
 
 	//pluginIconWidth = 17;
 	//pluginIconHeight = 7;
-	pluginIconSize = 17;
+	pluginIconSize = 3;
 	speakerIconSize = 33;
 	speakerIconPad = 11;
 

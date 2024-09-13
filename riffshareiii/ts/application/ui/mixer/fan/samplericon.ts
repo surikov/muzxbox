@@ -26,17 +26,31 @@ class SamplerIcon {
 			yy = top + sampler.iconPosition.y;
 		}
 		let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
+		/*
 		let rec: TileRectangle = {
 			x: xx, y: yy
 			, w: globalCommandDispatcher.cfg().pluginIconSize, h: globalCommandDispatcher.cfg().pluginIconSize
-			, rx: globalCommandDispatcher.cfg().pluginIconSize / 2, ry: globalCommandDispatcher.cfg().pluginIconSize / 2
+			, rx: globalCommandDispatcher.cfg().pluginIconSize / 2
+			, ry: globalCommandDispatcher.cfg().pluginIconSize / 2
+			, css: 'fanSamplerIcon'
+		};
+		*/
+		let rec: TilePolygon = {
+			x: xx, y: yy
+			, dots:[
+				0,0
+				,globalCommandDispatcher.cfg().pluginIconSize/2,0
+				,globalCommandDispatcher.cfg().pluginIconSize,globalCommandDispatcher.cfg().pluginIconSize/2
+				,globalCommandDispatcher.cfg().pluginIconSize/2,globalCommandDispatcher.cfg().pluginIconSize
+				,0,globalCommandDispatcher.cfg().pluginIconSize
+			]
 			, css: 'fanSamplerIcon'
 		};
 		fanLevelAnchor.content.push(rec);
 		if (zidx < 5) {
 			let txt: TileText = {
 				text: sampler.kind + ':' + sampler.id
-				, x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanSamplerIcon'
+				, x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanIconLabel'
 			};
 			fanLevelAnchor.content.push(txt);
 		}

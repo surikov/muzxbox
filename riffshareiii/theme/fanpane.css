@@ -1,6 +1,11 @@
+.fanIconLabel {
+	fill: var(--aux-color);
+	font-size: calc(0.25*var(--tapSize));
+	pointer-events: none;
+}
 .fanSamplerIcon {
 	fill: var(--panel-color);
-	font-size: calc(4*var(--tapSize));
+	font-size: calc(0.25*var(--tapSize));
 	pointer-events: none;
 	border-color: var(--main-color);
 	stroke: var(--main-color);

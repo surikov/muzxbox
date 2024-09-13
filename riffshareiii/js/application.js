@@ -2276,16 +2276,16 @@ class FanPane {
         }
     }
     buildOutIcon(fanAnchor, zidx) {
-        let xx = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad;
-        let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
+        let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().pluginIconSize / 2;
+        let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
         let rec = {
-            x: xx, y: yy, w: globalCommandDispatcher.cfg().speakerIconSize, h: globalCommandDispatcher.cfg().speakerIconSize,
+            x: speakerX, y: speakerY, w: globalCommandDispatcher.cfg().speakerIconSize, h: globalCommandDispatcher.cfg().speakerIconSize,
             rx: globalCommandDispatcher.cfg().speakerIconSize / 2, ry: globalCommandDispatcher.cfg().speakerIconSize / 2, css: 'fanSpeakerIcon'
         };
         fanAnchor.content.push(rec);
         let icon = {
-            x: xx + globalCommandDispatcher.cfg().speakerIconSize,
-            y: yy + globalCommandDispatcher.cfg().speakerIconSize, text: icon_sound_loud, css: 'fanSpeakerIconLabel'
+            x: speakerX + globalCommandDispatcher.cfg().speakerIconSize,
+            y: speakerY + globalCommandDispatcher.cfg().speakerIconSize, text: icon_sound_loud, css: 'fanSpeakerIconLabel'
         };
         fanAnchor.content.push(icon);
     }
@@ -2315,14 +2315,13 @@ class PerformerIcon {
         let rec = {
             x: xx, y: yy,
             w: globalCommandDispatcher.cfg().pluginIconSize, h: globalCommandDispatcher.cfg().pluginIconSize,
-            rx: globalCommandDispatcher.cfg().pluginIconSize / 2, ry: globalCommandDispatcher.cfg().pluginIconSize / 2,
             css: 'fanPerformerIcon'
         };
         fanLevelAnchor.content.push(rec);
         if (zidx < 5) {
             let txt = {
                 text: audioSeq.kind + ':' + audioSeq.id,
-                x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanSamplerIcon'
+                x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanIconLabel'
             };
             fanLevelAnchor.content.push(txt);
         }
@@ -2348,7 +2347,7 @@ class FanOutputLine {
                                 xx = left + toFilter.iconPosition.x + globalCommandDispatcher.cfg().pluginIconSize / 2;
                                 yy = top + toFilter.iconPosition.y + globalCommandDispatcher.cfg().pluginIconSize / 2;
                             }
-                            new SpearConnection().addSpear(fromX, fromY, xx, yy, fanLevelAnchor);
+                            new SpearConnection().addSpear(globalCommandDispatcher.cfg().pluginIconSize, fromX, fromY, globalCommandDispatcher.cfg().pluginIconSize, xx, yy, fanLevelAnchor);
                             break;
                         }
                     }
@@ -2356,7 +2355,8 @@ class FanOutputLine {
             }
             else {
                 let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().pluginIconSize / 2;
-                new SpearConnection().addSpear(fromX, fromY, speakerX, globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2, fanLevelAnchor);
+                let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
+                new SpearConnection().addSpear(globalCommandDispatcher.cfg().pluginIconSize, fromX, fromY, globalCommandDispatcher.cfg().speakerIconSize, speakerX + globalCommandDispatcher.cfg().speakerIconSize / 2, speakerY + globalCommandDispatcher.cfg().speakerIconSize / 2, fanLevelAnchor);
             }
     }
 }
@@ -2385,15 +2385,20 @@ class SamplerIcon {
         let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
         let rec = {
             x: xx, y: yy,
-            w: globalCommandDispatcher.cfg().pluginIconSize, h: globalCommandDispatcher.cfg().pluginIconSize,
-            rx: globalCommandDispatcher.cfg().pluginIconSize / 2, ry: globalCommandDispatcher.cfg().pluginIconSize / 2,
+            dots: [
+                0, 0,
+                globalCommandDispatcher.cfg().pluginIconSize / 2, 0,
+                globalCommandDispatcher.cfg().pluginIconSize, globalCommandDispatcher.cfg().pluginIconSize / 2,
+                globalCommandDispatcher.cfg().pluginIconSize / 2, globalCommandDispatcher.cfg().pluginIconSize,
+                0, globalCommandDispatcher.cfg().pluginIconSize
+            ],
             css: 'fanSamplerIcon'
         };
         fanLevelAnchor.content.push(rec);
         if (zidx < 5) {
             let txt = {
                 text: sampler.kind + ':' + sampler.id,
-                x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanSamplerIcon'
+                x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanIconLabel'
             };
             fanLevelAnchor.content.push(txt);
         }
@@ -2430,7 +2435,7 @@ class FilterIcon {
         };
         fanLevelAnchor.content.push(rec);
         if (zidx < 5) {
-            let txt = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanSamplerIcon' };
+            let txt = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanIconLabel' };
             fanLevelAnchor.content.push(txt);
         }
         new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, zidx, xx + globalCommandDispatcher.cfg().pluginIconSize / 2, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
@@ -2462,7 +2467,7 @@ class FilterIcon {
         if (zidx < 5) {
             let txt = {
                 text: '' + filterTarget.kind + ':' + filterTarget.id,
-                x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanSamplerIcon'
+                x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanIconLabel'
             };
             fanLevelAnchor.content.push(txt);
         }
@@ -2500,17 +2505,18 @@ class SpearConnection {
     nonan(nn) {
         return (nn) ? nn : 0;
     }
-    addSpear(fromX, fromY, toX, toY, anchor) {
+    addSpear(fromSize, fromX, fromY, toSize, toX, toY, anchor) {
         let headLen = 3;
         let css = 'fanConnection';
         let diffX = toX - fromX;
         let diffY = toY - fromY;
         let pathLen = Math.sqrt(diffX * diffX + diffY * diffY);
-        let ratio = pathLen / (globalCommandDispatcher.cfg().pluginIconSize / 1.8);
-        let xx1 = fromX + diffX / ratio;
-        let yy1 = fromY + diffY / ratio;
-        let xx2 = toX - diffX / ratio;
-        let yy2 = toY - diffY / ratio;
+        let fromRatio = 0.7 * pathLen / (fromSize / 2);
+        let toRatio = 0.7 * pathLen / (toSize / 2);
+        let xx1 = fromX + diffX / fromRatio;
+        let yy1 = fromY + diffY / fromRatio;
+        let xx2 = toX - diffX / toRatio;
+        let yy2 = toY - diffY / toRatio;
         let mainLine = { x1: this.nonan(xx1), x2: this.nonan(xx2), y1: this.nonan(yy1), y2: this.nonan(yy2), css: css };
         anchor.content.push(mainLine);
         let angle = Math.atan2(yy2 - yy1, xx2 - xx1);
@@ -2871,7 +2877,7 @@ let testEmptyMixerData = {
 class MixerDataMathUtility {
     constructor(data) {
         this.leftPad = 3;
-        this.rightPad = 10;
+        this.rightPad = 50;
         this.bottomPad = 11;
         this.topPad = 2;
         this.notePathHeight = 1;
@@ -2883,7 +2889,7 @@ class MixerDataMathUtility {
         this.gridBottomPad = 1;
         this.maxCommentRowCount = 0;
         this.maxAutomationsCount = 0;
-        this.pluginIconSize = 17;
+        this.pluginIconSize = 3;
         this.speakerIconSize = 33;
         this.speakerIconPad = 11;
         this.padGridFan = 15;

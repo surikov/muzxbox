@@ -33,7 +33,7 @@ class FilterIcon {
 		};
 		fanLevelAnchor.content.push(rec);
 		if (zidx < 5) {
-			let txt: TileText = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanSamplerIcon' };
+			let txt: TileText = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanIconLabel' };
 			fanLevelAnchor.content.push(txt);
 		}
 		//console.log('PerformerIcon', rec);
@@ -71,7 +71,7 @@ class FilterIcon {
 		if (zidx < 5) {
 			let txt: TileText = {
 				text: '' + filterTarget.kind + ':' + filterTarget.id
-				, x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanSamplerIcon'
+				, x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanIconLabel'
 			};
 			fanLevelAnchor.content.push(txt);
 		}

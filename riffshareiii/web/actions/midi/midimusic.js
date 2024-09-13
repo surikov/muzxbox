@@ -1478,7 +1478,7 @@ class MidiParser {
             let filterVolume = {
                 id: filterID,
                 kind: 'VolumeGain', dataBlob: '', outputs: [], automation: null,
-                iconPosition: { x: 33, y: ii * 22 }
+                iconPosition: { x: 33, y: ii * 4 + 2 }
             };
             project.filters.push(filterVolume);
             if (midiSongTrack.trackVolumes.length == 1) {
@@ -1512,12 +1512,12 @@ class MidiParser {
             if (midiSongTrack.channelNum == 9) {
                 let drums = this.collectDrums(midiSongTrack);
                 for (let dd = 0; dd < drums.length; dd++) {
-                    project.percussions.push(this.createProjectDrums(top * 22, drums[dd], project.timeline, midiSongTrack, filterID));
+                    project.percussions.push(this.createProjectDrums(top * 4, drums[dd], project.timeline, midiSongTrack, filterID));
                     top++;
                 }
             }
             else {
-                project.tracks.push(this.createProjectTrack(top * 22, project.timeline, midiSongTrack, filterID));
+                project.tracks.push(this.createProjectTrack(top * 4, project.timeline, midiSongTrack, filterID));
                 top++;
             }
         }
