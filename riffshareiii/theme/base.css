@@ -81,16 +81,16 @@
 */
 	--background-color: #000;
 	--main-color:#fff;
-	--aux-color:#9fff;
-	--panel-color:#f0f;
-	--action-color:#cc0;
-	--focus-color:#0c0;
+	--aux-color:#9f0;
+	--panel-color:#0ff;
+	--action-color:#c06;
+	--focus-color:#ff0;
 	
 
 }
 :root {
-	--fog-color: color-mix(in lab, transparent 25%, var(--background-color));
-	--shadow-color: color-mix(in lab, transparent 50%, var(((--main-color))));
+	--fog-color: color-mix(in lab, transparent 10%, var(--background-color));
+	--shadow-color: color-mix(in lab, transparent 75%, var(--main-color));
 }
 
 #file_midi_input {

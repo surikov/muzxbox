@@ -1182,7 +1182,7 @@ class RightMenuPanel {
         }
         else {
         }
-        let shn = 0.05;
+        let shn = 0.1;
         this.listingShadow.x = this.shiftX - shn;
         this.listingShadow.y = -shn;
         this.listingShadow.w = this.itemsWidth + shn + shn;
@@ -2511,8 +2511,8 @@ class SpearConnection {
         let diffX = toX - fromX;
         let diffY = toY - fromY;
         let pathLen = Math.sqrt(diffX * diffX + diffY * diffY);
-        let fromRatio = 0.7 * pathLen / (fromSize / 2);
-        let toRatio = 0.7 * pathLen / (toSize / 2);
+        let fromRatio = pathLen / (fromSize / 2);
+        let toRatio = pathLen / (toSize / 2);
         let xx1 = fromX + diffX / fromRatio;
         let yy1 = fromY + diffY / fromRatio;
         let xx2 = toX - diffX / toRatio;

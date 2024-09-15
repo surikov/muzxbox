@@ -338,7 +338,7 @@ class RightMenuPanel {
 			//
 		}
 
-		let shn = 0.05;
+		let shn = 0.1;
 
 		this.listingShadow.x = this.shiftX - shn;
 		this.listingShadow.y = -shn;

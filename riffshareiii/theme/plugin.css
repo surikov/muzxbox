@@ -7,7 +7,7 @@
 	bottom:0.5cm;
 	border-style: solid;
 	border-width: 0.125cm;
-	border-color: #66666699;
+	border-color: var(--shadow-color);
 	display: flex;
     flex-direction: column;
 	visibility: hidden;
@@ -19,7 +19,7 @@
 	top:1.0cm;
 	bottom:0.0cm;
 	border:none;
-	background-color: #66666633;
+	background-color222: #66666633;
 	flex-basis: 0;
     flex-shrink: 1;
     flex-grow: 1;

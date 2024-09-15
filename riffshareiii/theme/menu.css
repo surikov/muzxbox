@@ -1,10 +1,10 @@
 
 .rightMenuPanel {
-    fill: var(--panel-color);
+    fill: var(--background-color);
 }
 
 .rightMenuDelimiterLine {
-    fill: var(--background-color);
+    fill: var(--shadow-color);
     pointer-events: none;
 }
 .rightMenuFocusedDelimiter {

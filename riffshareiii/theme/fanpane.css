@@ -7,31 +7,21 @@
 	fill: var(--panel-color);
 	font-size: calc(0.25*var(--tapSize));
 	pointer-events: none;
-	border-color: var(--main-color);
-	stroke: var(--main-color);
-	stroke-width: 0.25cm;
-	stroke-linejoin: round;
-	paint-order: stroke;
+	
 }
 .fanPerformerIcon {
 	
 	fill: var(--panel-color);
 	stroke-dasharray:15,15;
 	pointer-events: none;
-	stroke: var(--main-color);
-	stroke-width: 0.25cm;
-	stroke-linejoin: round;
-	paint-order: stroke;
+	
 }
 .fanFilterIcon {
 	
 	fill: var(--panel-color);
 	stroke-dasharray:45,45;
 	pointer-events: none;
-	stroke: var(--main-color);
-	stroke-width: 0.25cm;
-	stroke-linejoin: round;
-	paint-order: stroke;
+	
 }
 
 .fanConnection {
