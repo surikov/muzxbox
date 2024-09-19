@@ -79,7 +79,7 @@
 	--color-subtext: #99ccccff;
 	(((--main-color))): #ddeeffff;
 */
-	--background-color: #000;
+	--background-color: #222;
 	--main-color:#fff;
 	--aux-color:#9f0;
 	--panel-color:#0ff;
