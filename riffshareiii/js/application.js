@@ -2347,7 +2347,7 @@ class FanOutputLine {
                                 xx = left + toFilter.iconPosition.x + globalCommandDispatcher.cfg().pluginIconSize / 2;
                                 yy = top + toFilter.iconPosition.y + globalCommandDispatcher.cfg().pluginIconSize / 2;
                             }
-                            new SpearConnection().addSpear(globalCommandDispatcher.cfg().pluginIconSize, fromX, fromY, globalCommandDispatcher.cfg().pluginIconSize, xx, yy, fanLevelAnchor);
+                            new SpearConnection().addSpear(fromX, fromY, globalCommandDispatcher.cfg().pluginIconSize, xx, yy, fanLevelAnchor);
                             break;
                         }
                     }
@@ -2356,7 +2356,7 @@ class FanOutputLine {
             else {
                 let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().pluginIconSize / 2;
                 let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
-                new SpearConnection().addSpear(globalCommandDispatcher.cfg().pluginIconSize, fromX, fromY, globalCommandDispatcher.cfg().speakerIconSize, speakerX + globalCommandDispatcher.cfg().speakerIconSize / 2, speakerY + globalCommandDispatcher.cfg().speakerIconSize / 2, fanLevelAnchor);
+                new SpearConnection().addSpear(fromX, fromY, globalCommandDispatcher.cfg().speakerIconSize, speakerX + globalCommandDispatcher.cfg().speakerIconSize / 2, speakerY + globalCommandDispatcher.cfg().speakerIconSize / 2, fanLevelAnchor);
             }
     }
 }
@@ -2386,11 +2386,10 @@ class SamplerIcon {
         let rec = {
             x: xx, y: yy,
             dots: [
-                0, 0,
+                0, globalCommandDispatcher.cfg().pluginIconSize / 2,
                 globalCommandDispatcher.cfg().pluginIconSize / 2, 0,
                 globalCommandDispatcher.cfg().pluginIconSize, globalCommandDispatcher.cfg().pluginIconSize / 2,
-                globalCommandDispatcher.cfg().pluginIconSize / 2, globalCommandDispatcher.cfg().pluginIconSize,
-                0, globalCommandDispatcher.cfg().pluginIconSize
+                globalCommandDispatcher.cfg().pluginIconSize / 2, globalCommandDispatcher.cfg().pluginIconSize
             ],
             css: 'fanSamplerIcon'
         };
@@ -2505,21 +2504,18 @@ class SpearConnection {
     nonan(nn) {
         return (nn) ? nn : 0;
     }
-    addSpear(fromSize, fromX, fromY, toSize, toX, toY, anchor) {
+    addSpear(fromX, fromY, toSize, toX, toY, anchor) {
         let headLen = 3;
         let css = 'fanConnection';
         let diffX = toX - fromX;
         let diffY = toY - fromY;
         let pathLen = Math.sqrt(diffX * diffX + diffY * diffY);
-        let fromRatio = pathLen / (fromSize / 2);
         let toRatio = pathLen / (toSize / 2);
-        let xx1 = fromX + diffX / fromRatio;
-        let yy1 = fromY + diffY / fromRatio;
         let xx2 = toX - diffX / toRatio;
         let yy2 = toY - diffY / toRatio;
-        let mainLine = { x1: this.nonan(xx1), x2: this.nonan(xx2), y1: this.nonan(yy1), y2: this.nonan(yy2), css: css };
+        let mainLine = { x1: this.nonan(fromX), x2: this.nonan(xx2), y1: this.nonan(fromY), y2: this.nonan(yy2), css: css };
         anchor.content.push(mainLine);
-        let angle = Math.atan2(yy2 - yy1, xx2 - xx1);
+        let angle = Math.atan2(yy2 - fromY, xx2 - fromX);
         let da = Math.PI * 19 / 20.0;
         let dx = headLen * Math.cos(angle - da);
         let dy = headLen * Math.sin(angle - da);

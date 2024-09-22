@@ -37,12 +37,19 @@ class SamplerIcon {
 		*/
 		let rec: TilePolygon = {
 			x: xx, y: yy
-			, dots:[
-				0,0
-				,globalCommandDispatcher.cfg().pluginIconSize/2,0
-				,globalCommandDispatcher.cfg().pluginIconSize,globalCommandDispatcher.cfg().pluginIconSize/2
-				,globalCommandDispatcher.cfg().pluginIconSize/2,globalCommandDispatcher.cfg().pluginIconSize
-				,0,globalCommandDispatcher.cfg().pluginIconSize
+			/*, dots: [
+				0, 0
+				, globalCommandDispatcher.cfg().pluginIconSize / 2, 0
+				, globalCommandDispatcher.cfg().pluginIconSize, globalCommandDispatcher.cfg().pluginIconSize / 2
+				, globalCommandDispatcher.cfg().pluginIconSize / 2, globalCommandDispatcher.cfg().pluginIconSize
+				, 0, globalCommandDispatcher.cfg().pluginIconSize
+			]*/
+			, dots: [
+				0, globalCommandDispatcher.cfg().pluginIconSize / 2
+				, globalCommandDispatcher.cfg().pluginIconSize / 2,0
+				, globalCommandDispatcher.cfg().pluginIconSize , globalCommandDispatcher.cfg().pluginIconSize / 2
+				,globalCommandDispatcher.cfg().pluginIconSize / 2, globalCommandDispatcher.cfg().pluginIconSize 
+				
 			]
 			, css: 'fanSamplerIcon'
 		};
@@ -57,7 +64,7 @@ class SamplerIcon {
 		//console.log('PerformerIcon', rec);
 		new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
 		new FanOutputLine().addOutputs(sampler.outputs, fanLevelAnchor, zidx
-			, xx + globalCommandDispatcher.cfg().pluginIconSize/2
+			, xx + globalCommandDispatcher.cfg().pluginIconSize / 2
 			, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
 	}
 	/*addOutputs(outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number) {
