@@ -11,13 +11,13 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.136 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.137 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
 let cellSize = 12;
 let topShift = cellSize * 21;
-let rowsVisibleCount = 51;
+let rowsVisibleCount = 101;
 let rowsAvgCount = 5;
 let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
 let reduceRatio = 1;
