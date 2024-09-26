@@ -92,7 +92,8 @@ class FanOutputLine {
 							xx = left + toFilter.iconPosition.x + globalCommandDispatcher.cfg().pluginIconSize / 2;
 							yy = top + toFilter.iconPosition.y + globalCommandDispatcher.cfg().pluginIconSize / 2;
 						}
-						new SpearConnection().addSpear(globalCommandDispatcher.cfg().pluginIconSize, fromX, fromY
+						new SpearConnection().addSpear(//globalCommandDispatcher.cfg().pluginIconSize, 
+						fromX, fromY
 							, globalCommandDispatcher.cfg().pluginIconSize, xx, yy
 							, fanLevelAnchor);
 						break;
@@ -102,8 +103,9 @@ class FanOutputLine {
 		} else {
 			let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().pluginIconSize / 2;
 			let speakerY=globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2-globalCommandDispatcher.cfg().speakerIconSize / 2;
-			new SpearConnection().addSpear(globalCommandDispatcher.cfg().pluginIconSize
-				, fromX
+			new SpearConnection().addSpear(//globalCommandDispatcher.cfg().pluginIconSize
+				//, 
+				fromX
 				, fromY
 				, globalCommandDispatcher.cfg().speakerIconSize
 				, speakerX + globalCommandDispatcher.cfg().speakerIconSize / 2
