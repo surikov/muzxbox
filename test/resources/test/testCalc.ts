@@ -1017,16 +1017,16 @@ function dumpColorStat() {
 	}
 
 	var msgp: HTMLElement = (document.getElementById('statdump') as any) as HTMLElement;
-	msgp.innerText = 'blue: '+Math.round(blueleft/rowcount)+'/'+Math.round(blueright/rowcount)
-				+', green: '+Math.round(greenleft/rowcount)+'/'+Math.round(greenright/rowcount)
-				+', silver: '+Math.round(silverleft/rowcount)+'/'+Math.round(silverright/rowcount)
-				+', red: '+Math.round(redleft/rowcount)+'/'+Math.round(redright/rowcount)
+	msgp.innerText = '%blue: '+Math.round(10*blueleft/rowcount)+'/'+Math.round(10*blueright/rowcount)
+				+', %green: '+Math.round(10*greenleft/rowcount)+'/'+Math.round(10*greenright/rowcount)
+				+', %silver: '+Math.round(10*silverleft/rowcount)+'/'+Math.round(10*silverright/rowcount)
+				+', %red: '+Math.round(10*redleft/rowcount)+'/'+Math.round(10*redright/rowcount)
 				;
 	console.log(skip,'blue',blueleft,blueright,'green',greenleft,greenright,'silver',silverleft,silverright,'red',redleft,redright);
 	
-	dumpGroupStat();
+	//dumpGroupStat();
 }
-
+/*
 function dumpGroupStat(){
 
 	let cntEx=0;
@@ -1047,7 +1047,7 @@ function dumpGroupStat(){
 		}
 	}
 	console.log('dumpGroupStat',cntEx,'/'+(cntEx+cntNot));
-}
+}*/
 function fillCells() {
 	clearSVGgroup(levelA);
 	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount + calcLen);

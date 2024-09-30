@@ -945,34 +945,35 @@ function dumpColorStat() {
         });
     }
     var msgp = document.getElementById('statdump');
-    msgp.innerText = 'blue: ' + Math.round(blueleft / rowcount) + '/' + Math.round(blueright / rowcount)
-        + ', green: ' + Math.round(greenleft / rowcount) + '/' + Math.round(greenright / rowcount)
-        + ', silver: ' + Math.round(silverleft / rowcount) + '/' + Math.round(silverright / rowcount)
-        + ', red: ' + Math.round(redleft / rowcount) + '/' + Math.round(redright / rowcount);
+    msgp.innerText = '%blue: ' + Math.round(10 * blueleft / rowcount) + '/' + Math.round(10 * blueright / rowcount)
+        + ', %green: ' + Math.round(10 * greenleft / rowcount) + '/' + Math.round(10 * greenright / rowcount)
+        + ', %silver: ' + Math.round(10 * silverleft / rowcount) + '/' + Math.round(10 * silverright / rowcount)
+        + ', %red: ' + Math.round(10 * redleft / rowcount) + '/' + Math.round(10 * redright / rowcount);
     console.log(skip, 'blue', blueleft, blueright, 'green', greenleft, greenright, 'silver', silverleft, silverright, 'red', redleft, redright);
-    dumpGroupStat();
+    //dumpGroupStat();
 }
-function dumpGroupStat() {
-    var cntEx = 0;
-    var cntNot = 0;
-    for (var kk = 0; kk < redStat.length - 5; kk++) {
-        var r0 = redStat[kk + 0].left;
-        var r1 = redStat[kk + 1].left;
-        var r2 = redStat[kk + 2].left;
-        var r3 = redStat[kk + 3].left;
-        var r4 = redStat[kk + 4].left;
-        if (r1 < 5 && r2 > 6 && r3 < 5) {
-            console.log(kk, ':', r0, r1, r2, r3);
-            if (r0 > 6) {
+/*
+function dumpGroupStat(){
+
+    let cntEx=0;
+    let cntNot=0;
+    for (let kk = 0; kk < redStat.length-5; kk++) {
+        let r0=redStat[kk+0].left;
+        let r1=redStat[kk+1].left;
+        let r2=redStat[kk+2].left;
+        let r3=redStat[kk+3].left;
+        let r4=redStat[kk+4].left;
+        if(r1<5 && r2>6 && r3<5){
+            console.log(kk,':',r0,r1,r2,r3);
+            if(r0>6 ){
                 cntEx++;
-            }
-            else {
+            }else{
                 cntNot++;
             }
         }
     }
-    console.log('dumpGroupStat', cntEx, '/' + (cntEx + cntNot));
-}
+    console.log('dumpGroupStat',cntEx,'/'+(cntEx+cntNot));
+}*/
 function fillCells() {
     clearSVGgroup(levelA);
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount + calcLen);
