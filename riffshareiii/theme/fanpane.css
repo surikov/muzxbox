@@ -1,24 +1,24 @@
 .fanIconLabel {
-	fill: var(--aux-color);
-	font-size: calc(0.25*var(--tapSize));
+	fill: var(--drag-color);
+	font-size: calc(1*var(--tapSize));
 	pointer-events: none;
 }
 .fanSamplerIcon {
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	font-size: calc(0.25*var(--tapSize));
 	pointer-events: none;
 	
 }
 .fanPerformerIcon {
 	
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	stroke-dasharray:15,15;
 	pointer-events: none;
 	
 }
 .fanFilterIcon {
 	
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	stroke-dasharray:45,45;
 	pointer-events: none;
 	
@@ -41,7 +41,7 @@
 
 
 .fanSpeakerIcon {
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 	border-color: var(--main-color);
@@ -51,7 +51,7 @@
 	paint-order: stroke;
 }
 .fanSpeakerLabel {
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 	border-color: var(--main-color);

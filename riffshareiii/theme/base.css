@@ -81,9 +81,9 @@
 */
 	--background-color: #222;
 	--main-color:#fff;
-	--aux-color:#9f0;
-	--panel-color:#0ff;
-	--action-color:#c06;
+	--drag-color:#9f0;
+	--line-color:#0ff;
+	--click-color:#c06;
 	--focus-color:#ff0;
 	
 
@@ -111,7 +111,7 @@
 	}
 
 	75% {
-		fill: var(--action-color)
+		fill: var(--click-color)
 	}
 
 	100% {
@@ -190,7 +190,7 @@ body {
 .warningIcon {
 	font-size222: calc(4*var(--tapSize));
 	font-size: var(--icon-4cm);
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	text-anchor: middle;
 	font-family: 'Material-Design-Iconic-Font';
 	pointer-events: none;
@@ -207,7 +207,7 @@ body {
 .warningDescription {
 	font-size222: calc(0.33*var(--tapSize));
 	font-size: var(--label-04cm);
-	fill: var(--aux-color);
+	fill: var(--drag-color);
 	text-anchor: middle;
 	pointer-events: none;
 }
@@ -223,7 +223,7 @@ body {
 }
 
 .mixSubtextFill {
-	fill: var(--aux-color);
+	fill: var(--drag-color);
 	stroke: none;
 }
 

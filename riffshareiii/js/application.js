@@ -2315,7 +2315,9 @@ class PerformerIcon {
         let rec = {
             x: xx, y: yy,
             w: globalCommandDispatcher.cfg().pluginIconSize, h: globalCommandDispatcher.cfg().pluginIconSize,
-            css: 'fanPerformerIcon'
+            css: 'fanPerformerIcon',
+            draggable: true,
+            activation: (x, y) => { console.log(x, y); }
         };
         fanLevelAnchor.content.push(rec);
         if (zidx < 5) {
