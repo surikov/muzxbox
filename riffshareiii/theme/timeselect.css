@@ -4,7 +4,7 @@
 }
 .timeSelection{
 	fill-opacity: 40%;
-	fill: var(--focus-color);
+	fill: var(--main-color);
     pointer-events: none;
     animation: focusFlashFill 4s linear infinite;
 	

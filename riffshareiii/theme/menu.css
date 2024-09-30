@@ -8,7 +8,7 @@
     pointer-events: none;
 }
 .rightMenuFocusedDelimiter {
-    fill: var(--focus-color);
+    fill: var(--main-color);
     pointer-events: none;
     animation: focusFlashFill 4s linear infinite;
 }
@@ -27,7 +27,7 @@
 .rightMenuItemDragBG {
     stroke: var(--main-color);
     stroke-width: 0.01cm;
-    fill: var(--focus-color);
+    fill: var(--main-color);
     
 }
 .rightMenuItemActionBG {

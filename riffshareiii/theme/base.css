@@ -81,10 +81,10 @@
 */
 	--background-color: #222;
 	--main-color:#fff;
-	--drag-color:#9f0;
-	--line-color:#0ff;
-	--click-color:#c06;
-	--focus-color:#ff0;
+	--drag-color:#6c0;
+	--line-color:#9ef;
+	--click-color:#c39;
+
 	
 
 }
@@ -103,11 +103,11 @@
 
 @keyframes focusFlashFill {
 	0% {
-		fill: var(--focus-color)
+		fill: var(--main-color)
 	}
 
 	74% {
-		fill: var(--focus-color)
+		fill: var(--main-color)
 	}
 
 	75% {
@@ -115,7 +115,7 @@
 	}
 
 	100% {
-		fill: var(--focus-color)
+		fill: var(--main-color)
 	}
 }
 
