@@ -1,6 +1,6 @@
 
 .toolBarPanel {
-    fill: var(--panel-color);
+    fill: var(--line-color);
     pointer-events: none;
 }
 
@@ -22,7 +22,7 @@
 }
 
 .toolBarButtonCircle {
-    fill: var(--action-color);
+    fill: var(--click-color);
 	stroke: var(--main-color);
     stroke-width: 0.01cm;
 }

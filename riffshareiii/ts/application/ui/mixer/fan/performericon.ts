@@ -31,6 +31,8 @@ class PerformerIcon {
 			, w: globalCommandDispatcher.cfg().pluginIconSize, h: globalCommandDispatcher.cfg().pluginIconSize
 			//, rx: globalCommandDispatcher.cfg().pluginIconSize / 2, ry: globalCommandDispatcher.cfg().pluginIconSize / 2
 			, css: 'fanPerformerIcon'
+			,draggable:true
+			,activation:(x:number,y:number)=>{console.log(x,y);}
 		};
 		fanLevelAnchor.content.push(rec);
 		if (zidx < 5) {

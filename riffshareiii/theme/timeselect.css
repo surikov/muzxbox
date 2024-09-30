@@ -1,5 +1,5 @@
 .timeMeasureMark22222{
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 25%;
 }
 .timeSelection{
@@ -10,12 +10,12 @@
 	
 }
 .timeSubMark{
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 50%;
 	
 }
 .timeMarkButtonCircle{
-    fill: var(--action-color);
+    fill: var(--click-color);
 	
 }
 .timeMarkButtonBorder{
@@ -24,62 +24,62 @@
 }
 
 .timeBarNum025 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(0.25*var(--tapSize));
     text-anchor22: start;
 	pointer-events: none;
 }
 .timeBarNum05 {
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(0.5*var(--tapSize));
 	pointer-events: none;
 }
 .timeBarNum1 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(1*var(--tapSize));
 	pointer-events: none;
 }
 .timeBarNum2 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(2*var(--tapSize));
 	pointer-events: none;
 }
 .timeBarNum4 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
 .timeBarNum8 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(8*var(--tapSize));
 	pointer-events: none;
 }
 .timeBarNum16 {
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(16*var(--tapSize));
 	pointer-events: none;
 }
 .timeBarNum32 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(32*var(--tapSize));
 	pointer-events: none;
 }
 .timeBarNum64 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(64*var(--tapSize));
 	pointer-events: none;
 }
 .timeBarNum128 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(128*var(--tapSize));
 	pointer-events: none;
@@ -93,61 +93,61 @@
 
 
 .timeBarInfo025 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(0.5*0.25*var(--tapSize));
     text-anchor2: end;
 }
 .timeBarInfo05 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(0.5*0.5*var(--tapSize));
     text-anchor2: end;
 }
 .timeBarInfo1 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(0.5*1*var(--tapSize));
     text-anchor2: end;
 }
 .timeBarInfo2 {
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(0.5*2*var(--tapSize));
     text-anchor2: end;
 }
 .timeBarInfo4 {
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(0.5*4*var(--tapSize));
     text-anchor2: end;
 }
 .timeBarInfo8 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(0.5*8*var(--tapSize));
     text-anchor2: end;
 }
 .timeBarInfo16 {
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(0.5*16*var(--tapSize));
     text-anchor2: end;
 }
 .timeBarInfo32 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(0.5*32*var(--tapSize));
     text-anchor2: end;
 }
 .timeBarInfo64 {
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(0.5*64*var(--tapSize));
     text-anchor2: end;
 }
 .timeBarInfo128 {
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	fill-opacity: 90%;
     font-size: calc(0.5*128*var(--tapSize));
     text-anchor2: end;

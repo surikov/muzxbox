@@ -2,7 +2,7 @@
 :root {
 	/*
     --background-color: #6688aa;
-    --panel-color: #ccdddd;
+    --line-color: #ccdddd;
     --line-color: #111133;
     --focus-color: #ff4455;
     --interaction-color: #9f5ba5;
@@ -10,7 +10,7 @@
 
     --tapSize: 50px;
 
-    --color-default: var(--aux-color);
+    --color-default: var(--drag-color);
 
     --color-paper: #def;
     (((--main-color)))line: #332244;
@@ -28,7 +28,7 @@
     --color-panel: #114466ff;
     --color-focus: #009933ff;
     --color-interactive: #cc6633ff;
-    --panel-color2: #44ccffff;
+    --line-color2: #44ccffff;
 	--color-subtext: #99ccccff;
     --main-color: #ddeeffff;
 

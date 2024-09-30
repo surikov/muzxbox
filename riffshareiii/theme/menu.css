@@ -19,7 +19,7 @@
     pointer-events: none;
 }
 .rightMenuSubLabel {
-    fill: var(--aux-color);
+    fill: var(--drag-color);
     font-size: var(--label-04cm);
     pointer-events: none;
 }
@@ -33,16 +33,16 @@
 .rightMenuItemActionBG {
     stroke: var(--main-color);
     stroke-width: 0.01cm;
-    fill: var(--action-color);
+    fill: var(--click-color);
 }
 .rightMenuItemSubActionBG {
     fill: none;
-    stroke: var(--action-color);
+    stroke: var(--click-color);
     stroke-width: 0.05cm;
 }
 
 .rightMenuButtonLabel {
-    fill: var(--action-color);
+    fill: var(--click-color);
     text-anchor: middle;
 
     font-size: var(--label-05cm);
@@ -60,7 +60,7 @@
 
 
 .menuButtonCircle {
-    fill: var(--action-color);
+    fill: var(--click-color);
 	stroke: var(--main-color);
     stroke-width: 0.01cm;
 }
@@ -74,7 +74,7 @@
 }
 
 .currentTitleLabel {
-    fill: var(--panel-color);
+    fill: var(--line-color);
     font-size: var(--label-05cm);
     pointer-events: none;
 	opacity: 50%;

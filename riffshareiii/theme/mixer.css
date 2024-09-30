@@ -1,11 +1,11 @@
 
 
 .projectTitle222222 {
-    fill: var(--aux-color);
+    fill: var(--drag-color);
 	font-size: var(--label-4cm);
 }
 .trackTitle {
-    fill: var(--aux-color);
+    fill: var(--drag-color);
 	font-size: var(--label-1cm);
 }
 .mixNoteLine{
@@ -22,12 +22,12 @@
 }
 
 .mixTimeMeasureMark{
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 25%;
 }
 
 .interactiveTimeMeasureMark{
-    fill: var(--action-color);
+    fill: var(--click-color);
 	fill-opacity: 50%;
 }
 
@@ -66,62 +66,62 @@
 
 
 .titleLabel025 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 50%;
     font-size: calc(0.5*var(--tapSize));
     text-anchor22: start;
 	pointer-events: none;
 }
 .titleLabel05 {
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
     font-size: calc(1*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel1 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 50%;
     font-size: calc(2*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel2 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 50%;
     font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel4 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 50%;
     font-size: calc(8*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel8 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 50%;
     font-size: calc(16*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel16 {
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	fill-opacity:50%;
     font-size: calc(32*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel32 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 50%;
     font-size: calc(64*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel64 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 50%;
     font-size: calc(128*var(--tapSize));
 	pointer-events: none;
 }
 .titleLabel128 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
 	fill-opacity: 50%;
     font-size: calc(256*var(--tapSize));
 	pointer-events: none;
@@ -129,7 +129,7 @@
 
 
 .octaveBottomBorder222{
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	fill-opacity:25%;
     stroke: none;
 }
@@ -140,7 +140,7 @@
 }
 
 .stepPartDelimiter{
-	fill2: var(--panel-color);
+	fill2: var(--line-color);
 
 	fill-opacity2:25%;
     stroke2: none;
@@ -150,15 +150,15 @@
 	pointer-events: none;
 }
 .verLineFrom {
-    stop-color: var(--panel-color);
+    stop-color: var(--line-color);
     stop-opacity: 25%;
   }
   .verLineMiddle{
-    stop-color: var(--panel-color);
+    stop-color: var(--line-color);
     stop-opacity: 15%;
   }
   .verLineTo {
-    stop-color: var(--panel-color);
+    stop-color: var(--line-color);
     stop-opacity: 0;
   }
 .barRightBorder{
@@ -169,13 +169,13 @@
 
 
 .barRightBorder2{
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	fill-opacity:25%;
     stroke: none;
 	pointer-events: none;
 }
 .interActiveGridLine{
-	fill: var(--action-color);
+	fill: var(--click-color);
 	fill-opacity:50%;
     stroke: none;
 }
@@ -221,43 +221,43 @@
 
 
 .commentReadText025 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
     font-size: calc(0.25*var(--tapSize));
 	pointer-events: none;
 }
 .commentReadText05 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
     font-size: calc(0.5*var(--tapSize));
 	pointer-events: none;
 }
 .commentReadText1 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
     font-size: calc(1*var(--tapSize));
 	pointer-events: none;
 }
 .commentReadText2 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
     font-size: calc(2*var(--tapSize));
 	pointer-events: none;
 }
 .commentReadText4 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
     font-size: calc(3*var(--tapSize));
 	pointer-events: none;
 }
 .commentReadText8 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
     font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
 .commentReadText16 {
-    fill: var(--panel-color);
+    fill: var(--line-color);
     font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
 
 .automationBgDot{
-	fill: var(--panel-color);
+	fill: var(--line-color);
 	fill-opacity:75%;
     stroke: none;
 }
