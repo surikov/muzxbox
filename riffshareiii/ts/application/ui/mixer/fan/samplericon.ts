@@ -43,7 +43,7 @@ class SamplerIcon {
 			fanLevelAnchor.content.push(txt);
 		}
 		new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
-		new FanOutputLine().addOutputs(sampler.outputs, spearsAnchor
+		new FanOutputLine().addOutputs(sampler.outputs, fanLevelAnchor,spearsAnchor
 			, xx + globalCommandDispatcher.cfg().pluginIconSize / 2
 			, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
 	}

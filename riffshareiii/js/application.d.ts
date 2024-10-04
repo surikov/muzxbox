@@ -345,7 +345,9 @@ declare class SpearConnection {
     addSpear(fromX: number, fromY: number, toSize: number, toX: number, toY: number, anchor: TileAnchor): void;
 }
 declare class FanOutputLine {
-    addOutputs(outputs: string[], fanLinesAnchor: TileAnchor, fromX: number, fromY: number): void;
+    addOutputs(outputs: string[], buttonsAnchor: TileAnchor, fanLinesAnchor: TileAnchor, fromX: number, fromY: number): void;
+    nonan1(nn: number): number;
+    addDeleteSpear(fromX: number, fromY: number, toSize: number, toX: number, toY: number, anchor: TileAnchor): void;
 }
 declare class IconLabelButton {
     anchor: TileAnchor;
