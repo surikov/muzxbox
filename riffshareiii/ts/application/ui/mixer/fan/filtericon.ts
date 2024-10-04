@@ -6,17 +6,17 @@ class FilterIcon {
 		this.filterId = filterId;
 	}
 
-	buildFilterSpot(fanLevelAnchor: TileAnchor, zidx: number) {
+	buildFilterSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		//console.log('buildPerformerSpot', this.performerId);
 		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
 			if (globalCommandDispatcher.cfg().data.filters[ii].id == this.filterId) {
 				let filterTarget: Zvoog_FilterTarget = globalCommandDispatcher.cfg().data.filters[ii];
-				this.addFilterSpot(filterTarget, fanLevelAnchor, zidx);
+				this.addFilterSpot(filterTarget, fanLevelAnchor, spearsAnchor, zidx);
 				break;
 			}
 		}
 	}
-	addFilterSpot(filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, zidx: number) {
+	addFilterSpot(filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
 		let xx = left;
@@ -38,21 +38,21 @@ class FilterIcon {
 		}
 		//console.log('PerformerIcon', rec);
 		//globalCommandDispatcher.cfg().addSpear(3, globalCommandDispatcher.cfg().leftPad+globalCommandDispatcher.cfg().timelineWidth(), yy + globalCommandDispatcher.cfg().pluginIconHeight / 2, xx, yy + globalCommandDispatcher.cfg().pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
-		new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, zidx
+		new FanOutputLine().addOutputs(filterTarget.outputs, spearsAnchor
 			, xx + globalCommandDispatcher.cfg().pluginIconSize/2
 			, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
 	}
-	buildAutoSpot(fanLevelAnchor: TileAnchor, zidx: number) {
+	buildAutoSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		//console.log('buildPerformerSpot', this.performerId);
 		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
 			if (globalCommandDispatcher.cfg().data.filters[ii].id == this.filterId) {
 				let filterTarget: Zvoog_FilterTarget = globalCommandDispatcher.cfg().data.filters[ii];
-				this.addAutoSpot(filterTarget, fanLevelAnchor, zidx);
+				this.addAutoSpot(filterTarget, fanLevelAnchor, spearsAnchor, zidx);
 				break;
 			}
 		}
 	}
-	addAutoSpot(filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, zidx: number) {
+	addAutoSpot(filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
 		let xx = left;
@@ -78,7 +78,7 @@ class FilterIcon {
 		//console.log('PerformerIcon', rec);
 		let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
 		new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
-		new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, zidx
+		new FanOutputLine().addOutputs(filterTarget.outputs, spearsAnchor
 			, xx + globalCommandDispatcher.cfg().pluginIconSize/2
 			, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
 	}

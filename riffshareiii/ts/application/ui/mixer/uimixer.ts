@@ -5,7 +5,10 @@ class MixerUI {
 	gridLayers: TileLayerDefinition;
 	trackLayers: TileLayerDefinition;
 	firstLayers: TileLayerDefinition;
+
 	fanLayer: TileLayerDefinition;
+	spearsLayer: TileLayerDefinition;
+
 	levels: MixerZoomLevel[] = [];
 	fillerAnchor: TileAnchor;
 	//samplerUI: SamplerRows;
@@ -18,7 +21,7 @@ class MixerUI {
 	reFillMixerUI(//data: Zvoog_Project
 
 	) {
-		console.log('reFillMixerUI', this.fanLayer.anchors.length);
+		//console.log('reFillMixerUI', this.fanLayer.anchors.length);
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		let ww = globalCommandDispatcher.cfg().wholeWidth();
 		let hh = globalCommandDispatcher.cfg().wholeHeight();
@@ -38,9 +41,13 @@ class MixerUI {
 			this.fanLayer.anchors[ii].hh = hh;
 			this.fanLayer.anchors[ii].content = [];
 
+			this.spearsLayer.anchors[ii].ww = ww;
+			this.spearsLayer.anchors[ii].hh = hh;
+			this.spearsLayer.anchors[ii].content = [];
+
 			this.levels[ii].reCreateBars();
 		}
-		this.fanPane.resetPlates(this.fanLayer.anchors);
+		this.fanPane.resetPlates(this.fanLayer.anchors,this.spearsLayer.anchors);
 		//this.iconsFanAnchor.ww = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().rightPad;
 		//this.iconsFanAnchor.hh = globalCommandDispatcher.cfg().gridHeight();
 		this.fillerAnchor.xx = globalCommandDispatcher.cfg().leftPad;
@@ -64,6 +71,10 @@ class MixerUI {
 
 		let fanSVGgroup: SVGElement = (document.getElementById('fanLayer') as any) as SVGElement;
 		this.fanLayer = { g: fanSVGgroup, anchors: [], mode: LevelModes.normal };
+		let spearsSVGgroup: SVGElement = (document.getElementById('spearsLayer') as any) as SVGElement;
+		this.spearsLayer = { g: spearsSVGgroup, anchors: [], mode: LevelModes.normal };
+
+
 		/*
 		this.iconsFanAnchor = {
 			showZoom: zoomPrefixLevelsCSS[0].minZoom
@@ -98,8 +109,13 @@ class MixerUI {
 				, hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom
 				, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 			};
-
 			this.fanLayer.anchors.push(fanLevelAnchor);
+			let spearAnchor = {
+				showZoom: zoomPrefixLevelsCSS[ii].minZoom
+				, hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom
+				, xx: 0, yy: 0, ww: 1, hh: 1, content: []
+			};
+			this.spearsLayer.anchors.push(spearAnchor);
 
 
 
@@ -111,14 +127,14 @@ class MixerUI {
 
 			//
 		}
-		console.log('this.fanLayer', this.fanLayer);
+		//console.log('this.fanLayer', this.fanLayer);
 		this.fillerAnchor = {
 			showZoom: zoomPrefixLevelsCSS[6].minZoom
 			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1
 			, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 		};
 		this.gridLayers.anchors.push(this.fillerAnchor);
-		return [this.gridLayers, this.trackLayers, this.firstLayers, this.fanLayer];
+		return [this.gridLayers, this.trackLayers, this.firstLayers, this.fanLayer, this.spearsLayer];
 	}
 	reFillSingleRatio() {
 		let countFunction: (barIdx: number) => number;

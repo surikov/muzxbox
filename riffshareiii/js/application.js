@@ -1897,7 +1897,6 @@ class MixerUI {
         this.fanPane = new FanPane();
     }
     reFillMixerUI() {
-        console.log('reFillMixerUI', this.fanLayer.anchors.length);
         let ww = globalCommandDispatcher.cfg().wholeWidth();
         let hh = globalCommandDispatcher.cfg().wholeHeight();
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
@@ -1910,9 +1909,12 @@ class MixerUI {
             this.fanLayer.anchors[ii].ww = ww;
             this.fanLayer.anchors[ii].hh = hh;
             this.fanLayer.anchors[ii].content = [];
+            this.spearsLayer.anchors[ii].ww = ww;
+            this.spearsLayer.anchors[ii].hh = hh;
+            this.spearsLayer.anchors[ii].content = [];
             this.levels[ii].reCreateBars();
         }
-        this.fanPane.resetPlates(this.fanLayer.anchors);
+        this.fanPane.resetPlates(this.fanLayer.anchors, this.spearsLayer.anchors);
         this.fillerAnchor.xx = globalCommandDispatcher.cfg().leftPad;
         this.fillerAnchor.yy = globalCommandDispatcher.cfg().gridTop();
         this.fillerAnchor.ww = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().rightPad;
@@ -1930,6 +1932,8 @@ class MixerUI {
         this.firstLayers = { g: firstLayerZoom, anchors: [], mode: LevelModes.normal };
         let fanSVGgroup = document.getElementById('fanLayer');
         this.fanLayer = { g: fanSVGgroup, anchors: [], mode: LevelModes.normal };
+        let spearsSVGgroup = document.getElementById('spearsLayer');
+        this.spearsLayer = { g: spearsSVGgroup, anchors: [], mode: LevelModes.normal };
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             let mixerGridAnchor = {
                 showZoom: zoomPrefixLevelsCSS[ii].minZoom,
@@ -1955,16 +1959,21 @@ class MixerUI {
                 xx: 0, yy: 0, ww: 1, hh: 1, content: []
             };
             this.fanLayer.anchors.push(fanLevelAnchor);
+            let spearAnchor = {
+                showZoom: zoomPrefixLevelsCSS[ii].minZoom,
+                hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
+                xx: 0, yy: 0, ww: 1, hh: 1, content: []
+            };
+            this.spearsLayer.anchors.push(spearAnchor);
             this.levels.push(new MixerZoomLevel(ii, mixerGridAnchor, mixerTrackAnchor, mixerFirstAnchor));
         }
-        console.log('this.fanLayer', this.fanLayer);
         this.fillerAnchor = {
             showZoom: zoomPrefixLevelsCSS[6].minZoom,
             hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1,
             xx: 0, yy: 0, ww: 1, hh: 1, content: []
         };
         this.gridLayers.anchors.push(this.fillerAnchor);
-        return [this.gridLayers, this.trackLayers, this.firstLayers, this.fanLayer];
+        return [this.gridLayers, this.trackLayers, this.firstLayers, this.fanLayer, this.spearsLayer];
     }
     reFillSingleRatio() {
         let countFunction;
@@ -2228,7 +2237,7 @@ class MixerZoomLevel {
     }
 }
 class FanPane {
-    resetPlates(fanAnchors) {
+    resetPlates(fanAnchors, spearsAnchors) {
         this.filterIcons = [];
         this.autoIcons = [];
         this.performerIcons = [];
@@ -2248,31 +2257,31 @@ class FanPane {
             this.samplerIcons.push(new SamplerIcon(globalCommandDispatcher.cfg().data.percussions[tt].sampler.id));
         }
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
-            this.buildPerformerIcons(fanAnchors[ii], ii);
-            this.buildFilterIcons(fanAnchors[ii], ii);
-            this.buildAutoIcons(fanAnchors[ii], ii);
-            this.buildSamplerIcons(fanAnchors[ii], ii);
+            this.buildPerformerIcons(fanAnchors[ii], spearsAnchors[ii], ii);
+            this.buildFilterIcons(fanAnchors[ii], spearsAnchors[ii], ii);
+            this.buildAutoIcons(fanAnchors[ii], spearsAnchors[ii], ii);
+            this.buildSamplerIcons(fanAnchors[ii], spearsAnchors[ii], ii);
             this.buildOutIcon(fanAnchors[ii], ii);
         }
     }
-    buildPerformerIcons(fanAnchor, zidx) {
+    buildPerformerIcons(fanAnchor, spearsAnchor, zidx) {
         for (let ii = 0; ii < this.performerIcons.length; ii++) {
-            this.performerIcons[ii].buildPerformerSpot(fanAnchor, zidx);
+            this.performerIcons[ii].buildPerformerSpot(fanAnchor, spearsAnchor, zidx);
         }
     }
-    buildSamplerIcons(fanAnchor, zidx) {
+    buildSamplerIcons(fanAnchor, spearsAnchor, zidx) {
         for (let ii = 0; ii < this.samplerIcons.length; ii++) {
-            this.samplerIcons[ii].buildSamplerSpot(fanAnchor, zidx);
+            this.samplerIcons[ii].buildSamplerSpot(fanAnchor, spearsAnchor, zidx);
         }
     }
-    buildAutoIcons(fanAnchor, zidx) {
+    buildAutoIcons(fanAnchor, spearsAnchor, zidx) {
         for (let ii = 0; ii < this.autoIcons.length; ii++) {
-            this.autoIcons[ii].buildAutoSpot(fanAnchor, zidx);
+            this.autoIcons[ii].buildAutoSpot(fanAnchor, spearsAnchor, zidx);
         }
     }
-    buildFilterIcons(fanAnchor, zidx) {
+    buildFilterIcons(fanAnchor, spearsAnchor, zidx) {
         for (let ii = 0; ii < this.filterIcons.length; ii++) {
-            this.filterIcons[ii].buildFilterSpot(fanAnchor, zidx);
+            this.filterIcons[ii].buildFilterSpot(fanAnchor, spearsAnchor, zidx);
         }
     }
     buildOutIcon(fanAnchor, zidx) {
@@ -2294,16 +2303,16 @@ class PerformerIcon {
     constructor(performerId) {
         this.performerId = performerId;
     }
-    buildPerformerSpot(fanLevelAnchor, zidx) {
+    buildPerformerSpot(fanLevelAnchor, spearsAnchor, zidx) {
         for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
             if (globalCommandDispatcher.cfg().data.tracks[ii].performer.id == this.performerId) {
                 let audioSeq = globalCommandDispatcher.cfg().data.tracks[ii].performer;
-                this.addPerformerSpot(audioSeq, fanLevelAnchor, zidx);
+                this.addPerformerSpot(audioSeq, fanLevelAnchor, spearsAnchor, zidx);
                 break;
             }
         }
     }
-    addPerformerSpot(audioSeq, fanLevelAnchor, zidx) {
+    addPerformerSpot(audioSeq, fanLevelAnchor, spearsAnchor, zidx) {
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
         let top = globalCommandDispatcher.cfg().gridTop();
         let xx = left;
@@ -2329,53 +2338,23 @@ class PerformerIcon {
         }
         let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
         new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
-        new FanOutputLine().addOutputs(audioSeq.outputs, fanLevelAnchor, zidx, xx + globalCommandDispatcher.cfg().pluginIconSize / 2, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
-    }
-}
-class FanOutputLine {
-    addOutputs(outputs, fanLevelAnchor, zidx, fromX, fromY) {
-        if (outputs)
-            if (outputs.length > 0) {
-                for (let oo = 0; oo < outputs.length; oo++) {
-                    let outId = outputs[oo];
-                    for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
-                        if (globalCommandDispatcher.cfg().data.filters[ii].id == outId) {
-                            let toFilter = globalCommandDispatcher.cfg().data.filters[ii];
-                            let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
-                            let top = globalCommandDispatcher.cfg().gridTop();
-                            let xx = left + globalCommandDispatcher.cfg().pluginIconSize / 2;
-                            let yy = top + globalCommandDispatcher.cfg().pluginIconSize / 2;
-                            if (toFilter.iconPosition) {
-                                xx = left + toFilter.iconPosition.x + globalCommandDispatcher.cfg().pluginIconSize / 2;
-                                yy = top + toFilter.iconPosition.y + globalCommandDispatcher.cfg().pluginIconSize / 2;
-                            }
-                            new SpearConnection().addSpear(fromX, fromY, globalCommandDispatcher.cfg().pluginIconSize, xx, yy, fanLevelAnchor);
-                            break;
-                        }
-                    }
-                }
-            }
-            else {
-                let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().pluginIconSize / 2;
-                let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
-                new SpearConnection().addSpear(fromX, fromY, globalCommandDispatcher.cfg().speakerIconSize, speakerX + globalCommandDispatcher.cfg().speakerIconSize / 2, speakerY + globalCommandDispatcher.cfg().speakerIconSize / 2, fanLevelAnchor);
-            }
+        new FanOutputLine().addOutputs(audioSeq.outputs, spearsAnchor, xx + globalCommandDispatcher.cfg().pluginIconSize / 2, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
     }
 }
 class SamplerIcon {
     constructor(samplerId) {
         this.samplerId = samplerId;
     }
-    buildSamplerSpot(fanLevelAnchor, zidx) {
+    buildSamplerSpot(fanLevelAnchor, spearsAnchor, zidx) {
         for (let ii = 0; ii < globalCommandDispatcher.cfg().data.percussions.length; ii++) {
             if (globalCommandDispatcher.cfg().data.percussions[ii].sampler.id == this.samplerId) {
                 let sampler = globalCommandDispatcher.cfg().data.percussions[ii].sampler;
-                this.addSamplerSpot(sampler, fanLevelAnchor, zidx);
+                this.addSamplerSpot(sampler, fanLevelAnchor, spearsAnchor, zidx);
                 break;
             }
         }
     }
-    addSamplerSpot(sampler, fanLevelAnchor, zidx) {
+    addSamplerSpot(sampler, fanLevelAnchor, spearsAnchor, zidx) {
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
         let top = globalCommandDispatcher.cfg().gridTop();
         let xx = left;
@@ -2404,23 +2383,23 @@ class SamplerIcon {
             fanLevelAnchor.content.push(txt);
         }
         new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
-        new FanOutputLine().addOutputs(sampler.outputs, fanLevelAnchor, zidx, xx + globalCommandDispatcher.cfg().pluginIconSize / 2, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
+        new FanOutputLine().addOutputs(sampler.outputs, spearsAnchor, xx + globalCommandDispatcher.cfg().pluginIconSize / 2, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
     }
 }
 class FilterIcon {
     constructor(filterId) {
         this.filterId = filterId;
     }
-    buildFilterSpot(fanLevelAnchor, zidx) {
+    buildFilterSpot(fanLevelAnchor, spearsAnchor, zidx) {
         for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
             if (globalCommandDispatcher.cfg().data.filters[ii].id == this.filterId) {
                 let filterTarget = globalCommandDispatcher.cfg().data.filters[ii];
-                this.addFilterSpot(filterTarget, fanLevelAnchor, zidx);
+                this.addFilterSpot(filterTarget, fanLevelAnchor, spearsAnchor, zidx);
                 break;
             }
         }
     }
-    addFilterSpot(filterTarget, fanLevelAnchor, zidx) {
+    addFilterSpot(filterTarget, fanLevelAnchor, spearsAnchor, zidx) {
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
         let top = globalCommandDispatcher.cfg().gridTop();
         let xx = left;
@@ -2439,18 +2418,18 @@ class FilterIcon {
             let txt = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanIconLabel' };
             fanLevelAnchor.content.push(txt);
         }
-        new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, zidx, xx + globalCommandDispatcher.cfg().pluginIconSize / 2, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
+        new FanOutputLine().addOutputs(filterTarget.outputs, spearsAnchor, xx + globalCommandDispatcher.cfg().pluginIconSize / 2, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
     }
-    buildAutoSpot(fanLevelAnchor, zidx) {
+    buildAutoSpot(fanLevelAnchor, spearsAnchor, zidx) {
         for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
             if (globalCommandDispatcher.cfg().data.filters[ii].id == this.filterId) {
                 let filterTarget = globalCommandDispatcher.cfg().data.filters[ii];
-                this.addAutoSpot(filterTarget, fanLevelAnchor, zidx);
+                this.addAutoSpot(filterTarget, fanLevelAnchor, spearsAnchor, zidx);
                 break;
             }
         }
     }
-    addAutoSpot(filterTarget, fanLevelAnchor, zidx) {
+    addAutoSpot(filterTarget, fanLevelAnchor, spearsAnchor, zidx) {
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
         let top = globalCommandDispatcher.cfg().gridTop();
         let xx = left;
@@ -2474,7 +2453,7 @@ class FilterIcon {
         }
         let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
         new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
-        new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, zidx, xx + globalCommandDispatcher.cfg().pluginIconSize / 2, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
+        new FanOutputLine().addOutputs(filterTarget.outputs, spearsAnchor, xx + globalCommandDispatcher.cfg().pluginIconSize / 2, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
     }
 }
 class ControlConnection {
@@ -2527,6 +2506,36 @@ class SpearConnection {
         let dy2 = headLen * Math.sin(angle + da);
         let second = { x1: this.nonan(xx2), x2: this.nonan(xx2 + dx2), y1: this.nonan(yy2), y2: this.nonan(yy2 + dy2), css: css };
         anchor.content.push(second);
+    }
+}
+class FanOutputLine {
+    addOutputs(outputs, fanLinesAnchor, fromX, fromY) {
+        if (outputs)
+            if (outputs.length > 0) {
+                for (let oo = 0; oo < outputs.length; oo++) {
+                    let outId = outputs[oo];
+                    for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
+                        if (globalCommandDispatcher.cfg().data.filters[ii].id == outId) {
+                            let toFilter = globalCommandDispatcher.cfg().data.filters[ii];
+                            let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+                            let top = globalCommandDispatcher.cfg().gridTop();
+                            let xx = left + globalCommandDispatcher.cfg().pluginIconSize / 2;
+                            let yy = top + globalCommandDispatcher.cfg().pluginIconSize / 2;
+                            if (toFilter.iconPosition) {
+                                xx = left + toFilter.iconPosition.x + globalCommandDispatcher.cfg().pluginIconSize / 2;
+                                yy = top + toFilter.iconPosition.y + globalCommandDispatcher.cfg().pluginIconSize / 2;
+                            }
+                            new SpearConnection().addSpear(fromX, fromY, globalCommandDispatcher.cfg().pluginIconSize, xx, yy, fanLinesAnchor);
+                            break;
+                        }
+                    }
+                }
+            }
+            else {
+                let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().pluginIconSize / 2;
+                let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
+                new SpearConnection().addSpear(fromX, fromY, globalCommandDispatcher.cfg().speakerIconSize, speakerX + globalCommandDispatcher.cfg().speakerIconSize / 2, speakerY + globalCommandDispatcher.cfg().speakerIconSize / 2, fanLinesAnchor);
+            }
     }
 }
 class IconLabelButton {

@@ -50,6 +50,7 @@
 		,"ui/mixer/fan/filtericon.ts"
 		,"ui/mixer/fan/controlconnection.ts"
 		,"ui/mixer/fan/spearconnection.ts"
+		,"ui/mixer/fan/fanoutput.ts"
         ,"ui/buttons/iconlabelbutton.ts"
 		
 		,"ui/iconlabels.ts"

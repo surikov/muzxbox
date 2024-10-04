@@ -4,7 +4,7 @@ class FanPane {
 	performerIcons: PerformerIcon[];
 	samplerIcons: SamplerIcon[];
 	//connectionspears: SpearConnection[];
-	resetPlates(fanAnchors: TileAnchor[]): void {
+	resetPlates(fanAnchors: TileAnchor[], spearsAnchors: TileAnchor[]): void {
 		//console.log('FanPane.resetPlates', cfg, fanAnchors);
 		this.filterIcons = [];
 		this.autoIcons = [];
@@ -26,10 +26,10 @@ class FanPane {
 		}
 
 		for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
-			this.buildPerformerIcons(fanAnchors[ii], ii);
-			this.buildFilterIcons(fanAnchors[ii], ii);
-			this.buildAutoIcons(fanAnchors[ii], ii);
-			this.buildSamplerIcons(fanAnchors[ii], ii);
+			this.buildPerformerIcons(fanAnchors[ii],spearsAnchors[ii], ii);
+			this.buildFilterIcons(fanAnchors[ii],spearsAnchors[ii], ii);
+			this.buildAutoIcons(fanAnchors[ii],spearsAnchors[ii], ii);
+			this.buildSamplerIcons(fanAnchors[ii],spearsAnchors[ii], ii);
 			this.buildOutIcon(fanAnchors[ii], ii);
 			//this.connectPlugins(cfg, fanAnchors[ii], ii);
 		}
@@ -37,24 +37,24 @@ class FanPane {
 		//this.buildFilterIcons();
 		//this.buildOutIcon();
 	}
-	buildPerformerIcons(fanAnchor: TileAnchor, zidx: number) {
+	buildPerformerIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < this.performerIcons.length; ii++) {
-			this.performerIcons[ii].buildPerformerSpot(fanAnchor, zidx);
+			this.performerIcons[ii].buildPerformerSpot(fanAnchor, spearsAnchor, zidx);
 		}
 	}
-	buildSamplerIcons(fanAnchor: TileAnchor, zidx: number) {
+	buildSamplerIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < this.samplerIcons.length; ii++) {
-			this.samplerIcons[ii].buildSamplerSpot(fanAnchor, zidx);
+			this.samplerIcons[ii].buildSamplerSpot(fanAnchor, spearsAnchor, zidx);
 		}
 	}
-	buildAutoIcons(fanAnchor: TileAnchor, zidx: number) {
+	buildAutoIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < this.autoIcons.length; ii++) {
-			this.autoIcons[ii].buildAutoSpot(fanAnchor, zidx);
+			this.autoIcons[ii].buildAutoSpot(fanAnchor, spearsAnchor, zidx);
 		}
 	}
-	buildFilterIcons(fanAnchor: TileAnchor, zidx: number) {
+	buildFilterIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < this.filterIcons.length; ii++) {
-			this.filterIcons[ii].buildFilterSpot(fanAnchor, zidx);
+			this.filterIcons[ii].buildFilterSpot(fanAnchor, spearsAnchor, zidx);
 		}
 	}
 	buildOutIcon(fanAnchor: TileAnchor, zidx: number) {
