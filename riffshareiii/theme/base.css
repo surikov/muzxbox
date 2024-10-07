@@ -106,15 +106,15 @@
 		fill: var(--main-color)
 	}
 	
-	70% {
+	40% {
 		fill: var(--main-color)
 	}
 
-	80% {
+	60% {
 		fill: var(--drag-color)
 	}
 
-	90% {
+	80% {
 		fill: var(--click-color)
 	}
 

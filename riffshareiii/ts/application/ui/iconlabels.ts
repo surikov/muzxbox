@@ -5,8 +5,12 @@ let icon_pause='&#xf3a7;';
 let icon_hor_menu='&#xf19c;';
 let icon_ver_menu='&#xf19b;';
 let icon_closemenu='&#xf1ea;';
+
 let icon_closedbranch='&#xf2f6;';
 let icon_openedbranch='&#xf2f2;';
+let icon_blackfolder='&#xf228;';
+let icon_whitefolder='&#xf224;';
+
 let icon_openleft='&#xf244;';
 let icon_closeleft='&#xf243;';
 let icon_moveup='&#xf2fc;';
@@ -22,3 +26,8 @@ let icon_sound_loud='&#xf3bc;';//
 let icon_sound_none='&#xf3bb;';
 let icon_sound_surround='&#xf3b7;';
 let icon_hide='&#xf15b;';
+
+let icon_close='&#xf136;';
+let icon_refresh='&#xf1b9;';
+let icon_search='&#xf1c3;';
+let icon_splitfan='&#xf2ef;';

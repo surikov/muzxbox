@@ -1316,12 +1316,12 @@ class RightMenuItem {
         }
         if (this.kind == this.kindOpenedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_movedown, css: 'rightMenuIconLabel' });
+            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_whitefolder, css: 'rightMenuIconLabel' });
             anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindClosedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_moveright, css: 'rightMenuIconLabel' });
+            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_blackfolder, css: 'rightMenuIconLabel' });
             anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindPreview) {
@@ -2540,13 +2540,17 @@ class FanOutputLine {
             }
         }
     }
-    nonan1(nn) {
-        return (nn) ? nn : 0;
-    }
     addDeleteSpear(fromX, fromY, toSize, toX, toY, anchor) {
+        let diffX = toX - fromX;
+        let diffY = toY - fromY;
+        let pathLen = Math.sqrt(diffX * diffX + diffY * diffY);
+        let spearLen = pathLen - globalCommandDispatcher.cfg().pluginIconSize / 2 - toSize / 2;
+        let ratio = spearLen / pathLen;
+        let dx = ratio * (toX - fromX) / 2;
+        let dy = ratio * (toY - fromY) / 2;
         let delBut = {
-            x: this.nonan1(fromX + (toX - fromX) / 2 - globalCommandDispatcher.cfg().pluginIconSize / 2),
-            y: this.nonan1(fromY + (toY - fromY) / 2 - globalCommandDispatcher.cfg().pluginIconSize / 2),
+            x: fromX + dx - globalCommandDispatcher.cfg().pluginIconSize / 2,
+            y: fromY + dy - globalCommandDispatcher.cfg().pluginIconSize / 2,
             w: globalCommandDispatcher.cfg().pluginIconSize,
             h: globalCommandDispatcher.cfg().pluginIconSize,
             rx: globalCommandDispatcher.cfg().pluginIconSize / 2,
@@ -2606,6 +2610,8 @@ let icon_ver_menu = '&#xf19b;';
 let icon_closemenu = '&#xf1ea;';
 let icon_closedbranch = '&#xf2f6;';
 let icon_openedbranch = '&#xf2f2;';
+let icon_blackfolder = '&#xf228;';
+let icon_whitefolder = '&#xf224;';
 let icon_openleft = '&#xf244;';
 let icon_closeleft = '&#xf243;';
 let icon_moveup = '&#xf2fc;';
@@ -2620,6 +2626,10 @@ let icon_sound_loud = '&#xf3bc;';
 let icon_sound_none = '&#xf3bb;';
 let icon_sound_surround = '&#xf3b7;';
 let icon_hide = '&#xf15b;';
+let icon_close = '&#xf136;';
+let icon_refresh = '&#xf1b9;';
+let icon_search = '&#xf1c3;';
+let icon_splitfan = '&#xf2ef;';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];

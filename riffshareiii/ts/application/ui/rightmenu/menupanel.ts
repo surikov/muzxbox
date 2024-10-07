@@ -68,6 +68,9 @@ class RightMenuPanel {
 		});
 		this.layerCurrentTitle = { x: 2.5, y: 0, text:LO(localMenuTracksFolder),css: 'currentTitleLabel' };
 
+
+		
+
 		this.backgroundAnchor = {
 			xx: 0, yy: 0, ww: 111, hh: 111
 			, showZoom: zoomPrefixLevelsCSS[0].minZoom

@@ -47,21 +47,30 @@ class FanOutputLine {
 			}
 		}
 	}
-	nonan1(nn: number): number {
-		return (nn) ? nn : 0;
-	}
+	//nonan1(nn: number): number {
+	//	return (nn) ? nn : 0;
+	//	}
 	addDeleteSpear(fromX: number, fromY: number
 		, toSize: number
 		, toX: number, toY: number
 		, anchor: TileAnchor) {
-		let delBut: TileRectangle = { 
-			x: this.nonan1(fromX + (toX - fromX) / 2-globalCommandDispatcher.cfg().pluginIconSize/2)
-			, y: this.nonan1(fromY + (toY - fromY) / 2-globalCommandDispatcher.cfg().pluginIconSize/2)
+		let diffX = toX - fromX;
+		let diffY = toY - fromY;
+		let pathLen = Math.sqrt(diffX * diffX + diffY * diffY);
+		let spearLen = pathLen - globalCommandDispatcher.cfg().pluginIconSize / 2 - toSize / 2;
+		let ratio = spearLen/pathLen;//globalCommandDispatcher.cfg().pluginIconSize / toSize;
+		//console.log(ratio);
+		let dx = ratio*(toX - fromX) / 2;
+		let dy = ratio*(toY - fromY) / 2;
+		let delBut: TileRectangle = {
+			x: fromX + dx - globalCommandDispatcher.cfg().pluginIconSize / 2
+			, y: fromY + dy - globalCommandDispatcher.cfg().pluginIconSize / 2
 			, w: globalCommandDispatcher.cfg().pluginIconSize
 			, h: globalCommandDispatcher.cfg().pluginIconSize
-			,rx:globalCommandDispatcher.cfg().pluginIconSize/2
-			,ry:globalCommandDispatcher.cfg().pluginIconSize/2
-			, css: 'fanConnection' };
+			, rx: globalCommandDispatcher.cfg().pluginIconSize / 2
+			, ry: globalCommandDispatcher.cfg().pluginIconSize / 2
+			, css: 'fanConnection'
+		};
 		anchor.content.push(delBut);
 
 	}
