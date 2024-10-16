@@ -961,7 +961,7 @@ function roundDown(num: number, base: number): number {
 }
 
 function dumpColorStat() {
-	console.log('dumpColorStat');
+	//console.log('dumpColorStat');
 	//console.log('sortedBlue', sortedBlue);
 	let skip = 1;
 	if (showFirstRow) {
@@ -1013,7 +1013,7 @@ function dumpColorStat() {
 			, color: purple
 			, manual: false
 		});
-
+	
 	}
 
 	var msgp: HTMLElement = (document.getElementById('statdump') as any) as HTMLElement;
@@ -1022,7 +1022,73 @@ function dumpColorStat() {
 				+', %silver: '+Math.round(10*silverleft/rowcount)+'/'+Math.round(10*silverright/rowcount)
 				+', %red: '+Math.round(10*redleft/rowcount)+'/'+Math.round(10*redright/rowcount)
 				;
-	console.log(skip,'blue',blueleft,blueright,'green',greenleft,greenright,'silver',silverleft,silverright,'red',redleft,redright);
+	//console.log('skip',skip,'blue',blueleft,blueright,'green',greenleft,greenright,'silver',silverleft,silverright,'red',redleft,redright);
+	//console.log('dumpColorStat');//,'blue',blueStat,'green',greenStat,'silver',greyStat,'red',redStat);
+	
+	
+	
+	let delt=5;
+	
+	let sle:number[]=[];
+	for(let barlen=0;barlen<44;barlen=barlen+delt){
+		for(let ii=0;ii<blueStat.length;ii++){
+			if(Math.floor(blueStat[ii].right/delt)*delt==barlen){
+				sle[barlen]=sle[barlen]?sle[barlen]:0;
+				sle[barlen]++;
+			}
+		}
+	}
+	let sri:number[]=[];
+	for(let barlen=0;barlen<44;barlen=barlen+delt){
+		for(let ii=0;ii<blueStat.length;ii++){
+			if(Math.floor(blueStat[ii].left/delt)*delt==barlen){
+				sri[barlen]=sri[barlen]?sri[barlen]:0;
+				sri[barlen]++;
+			}
+		}
+	}
+	console.log('blue',sle,sri);
+	
+	sle=[];
+	for(let barlen=0;barlen<44;barlen=barlen+delt){
+		for(let ii=0;ii<greenStat.length;ii++){
+			if(Math.floor(greenStat[ii].left/delt)*delt==barlen){
+				sle[barlen]=sle[barlen]?sle[barlen]:0;
+				sle[barlen]++;
+			}
+		}
+	}
+	sri=[];
+	for(let barlen=0;barlen<44;barlen=barlen+delt){
+		for(let ii=0;ii<greenStat.length;ii++){
+			if(Math.floor(greenStat[ii].right/delt)*delt==barlen){
+				sri[barlen]=sri[barlen]?sri[barlen]:0;
+				sri[barlen]++;
+			}
+		}
+	}
+	console.log('green',sle,sri);
+	
+	sle=[];
+	for(let barlen=0;barlen<44;barlen=barlen+delt){
+		for(let ii=0;ii<greyStat.length;ii++){
+			if(Math.floor(greyStat[ii].left/delt)*delt==barlen){
+				sle[barlen]=sle[barlen]?sle[barlen]:0;
+				sle[barlen]++;
+			}
+		}
+	}
+	sri=[];
+	for(let barlen=0;barlen<44;barlen=barlen+delt){
+		for(let ii=0;ii<greyStat.length;ii++){
+			if(Math.floor(greyStat[ii].right/delt)*delt==barlen){
+				sri[barlen]=sri[barlen]?sri[barlen]:0;
+				sri[barlen]++;
+			}
+		}
+	}
+	console.log('silver',sle,sri);
+	
 	
 	//dumpGroupStat();
 }
@@ -1268,13 +1334,28 @@ function addTails() {
 	resetNumbs();
 }
 
-function drawTestLines(data: { ball: number, color: string }[]) {
+function drawTestLinesLeft(data: { ball: number, color: string }[]) {
+	let bas=19;
 	for (let ii = 0; ii < data.length; ii++) {
 		markLines.push({
 			fromX: data[ii].ball - 1
-			, fromY: skipRowsCount + 0
+			, fromY: skipRowsCount + 0.75*(bas-bas/data.length*ii)
 			, toX: data[ii].ball - 1
-			, toY: skipRowsCount + 19
+			, toY: skipRowsCount + bas
+			, color: data[ii].color, manual: true
+		});
+	}
+
+}
+function drawTestLinesRight(data: { ball: number, color: string }[]) {
+	let bas=19;
+	//for (let ii = 0; ii < data.length; ii++) {
+	for (let ii = data.length-1; ii >= 0; ii--) {
+		markLines.push({
+			fromX: data[ii].ball - 1
+			, fromY: skipRowsCount + 0.75*(bas-bas/data.length*ii)
+			, toX: data[ii].ball - 1
+			, toY: skipRowsCount + bas
 			, color: data[ii].color, manual: true
 		});
 	}
@@ -1306,7 +1387,7 @@ function testTest() {
 					data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
 				}
 				console.log('rightBlue', nn, data);
-				drawTestLines(data);
+				drawTestLinesRight(data);
 
 			}
 			if (line.fromX == rightBlue || line.toX == rightBlue) {
@@ -1318,7 +1399,7 @@ function testTest() {
 					data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
 				}
 				console.log('leftBlue', nn, data);
-				drawTestLines(data);
+				drawTestLinesLeft(data);
 			}
 			if (line.fromX == leftGreen || line.toX == leftGreen) {
 				let nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1329,7 +1410,7 @@ function testTest() {
 					data.push({ ball: orders[bb] - 0.1, color: '#00990099' });
 				}
 				console.log('leftGreen', nn, data);
-				drawTestLines(data);
+				drawTestLinesLeft(data);
 			}
 			if (line.fromX == rightGreen || line.toX == rightGreen) {
 				let nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1340,7 +1421,7 @@ function testTest() {
 					data.push({ ball: orders[bb] - 0.1, color: '#00990099' });
 				}
 				console.log('rightGreen', nn, data);
-				drawTestLines(data);
+				drawTestLinesRight(data);
 			}
 			if (line.fromX == leftGrey || line.toX == leftGrey) {
 				let nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1351,7 +1432,7 @@ function testTest() {
 					data.push({ ball: orders[bb] - 0.2, color: '#66666699' });
 				}
 				console.log('leftGrey', nn, data);
-				drawTestLines(data);
+				drawTestLinesLeft(data);
 			}
 			if (line.fromX == rightGrey || line.toX == rightGrey) {
 				let nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1362,7 +1443,7 @@ function testTest() {
 					data.push({ ball: orders[bb] - 0.2, color: '#66666699' });
 				}
 				console.log('rightGrey', nn, data);
-				drawTestLines(data);
+				drawTestLinesRight(data);
 			}
 			
 			if (line.fromX == leftRed || line.toX == leftRed) {
@@ -1373,7 +1454,7 @@ function testTest() {
 					data.push({ ball: 1 + kk, color: '#ff000099' });
 				}
 				console.log('leftRed', nn, data);
-				drawTestLines(data);
+				drawTestLinesLeft(data);
 			}
 			if (line.fromX == rightRed || line.toX == rightRed) {
 				let nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1383,7 +1464,7 @@ function testTest() {
 					data.push({ ball: 1 + kk, color: '#ff000099' });
 				}
 				console.log('rightRed', nn, data);
-				drawTestLines(data);
+				drawTestLinesRight(data);
 			}
 
 

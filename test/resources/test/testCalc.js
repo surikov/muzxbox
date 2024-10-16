@@ -898,7 +898,7 @@ function roundDown(num, base) {
     return Math.floor(num / base) * base;
 }
 function dumpColorStat() {
-    console.log('dumpColorStat');
+    //console.log('dumpColorStat');
     //console.log('sortedBlue', sortedBlue);
     var skip = 1;
     if (showFirstRow) {
@@ -949,7 +949,66 @@ function dumpColorStat() {
         + ', %green: ' + Math.round(10 * greenleft / rowcount) + '/' + Math.round(10 * greenright / rowcount)
         + ', %silver: ' + Math.round(10 * silverleft / rowcount) + '/' + Math.round(10 * silverright / rowcount)
         + ', %red: ' + Math.round(10 * redleft / rowcount) + '/' + Math.round(10 * redright / rowcount);
-    console.log(skip, 'blue', blueleft, blueright, 'green', greenleft, greenright, 'silver', silverleft, silverright, 'red', redleft, redright);
+    //console.log('skip',skip,'blue',blueleft,blueright,'green',greenleft,greenright,'silver',silverleft,silverright,'red',redleft,redright);
+    //console.log('dumpColorStat');//,'blue',blueStat,'green',greenStat,'silver',greyStat,'red',redStat);
+    var delt = 5;
+    var sle = [];
+    for (var barlen = 0; barlen < 44; barlen = barlen + delt) {
+        for (var ii = 0; ii < blueStat.length; ii++) {
+            if (Math.floor(blueStat[ii].right / delt) * delt == barlen) {
+                sle[barlen] = sle[barlen] ? sle[barlen] : 0;
+                sle[barlen]++;
+            }
+        }
+    }
+    var sri = [];
+    for (var barlen = 0; barlen < 44; barlen = barlen + delt) {
+        for (var ii = 0; ii < blueStat.length; ii++) {
+            if (Math.floor(blueStat[ii].left / delt) * delt == barlen) {
+                sri[barlen] = sri[barlen] ? sri[barlen] : 0;
+                sri[barlen]++;
+            }
+        }
+    }
+    console.log('blue', sle, sri);
+    sle = [];
+    for (var barlen = 0; barlen < 44; barlen = barlen + delt) {
+        for (var ii = 0; ii < greenStat.length; ii++) {
+            if (Math.floor(greenStat[ii].left / delt) * delt == barlen) {
+                sle[barlen] = sle[barlen] ? sle[barlen] : 0;
+                sle[barlen]++;
+            }
+        }
+    }
+    sri = [];
+    for (var barlen = 0; barlen < 44; barlen = barlen + delt) {
+        for (var ii = 0; ii < greenStat.length; ii++) {
+            if (Math.floor(greenStat[ii].right / delt) * delt == barlen) {
+                sri[barlen] = sri[barlen] ? sri[barlen] : 0;
+                sri[barlen]++;
+            }
+        }
+    }
+    console.log('green', sle, sri);
+    sle = [];
+    for (var barlen = 0; barlen < 44; barlen = barlen + delt) {
+        for (var ii = 0; ii < greyStat.length; ii++) {
+            if (Math.floor(greyStat[ii].left / delt) * delt == barlen) {
+                sle[barlen] = sle[barlen] ? sle[barlen] : 0;
+                sle[barlen]++;
+            }
+        }
+    }
+    sri = [];
+    for (var barlen = 0; barlen < 44; barlen = barlen + delt) {
+        for (var ii = 0; ii < greyStat.length; ii++) {
+            if (Math.floor(greyStat[ii].right / delt) * delt == barlen) {
+                sri[barlen] = sri[barlen] ? sri[barlen] : 0;
+                sri[barlen]++;
+            }
+        }
+    }
+    console.log('silver', sle, sri);
     //dumpGroupStat();
 }
 /*
@@ -1191,13 +1250,27 @@ function addTails() {
     //console.log(sortedBlue);
     resetNumbs();
 }
-function drawTestLines(data) {
+function drawTestLinesLeft(data) {
+    var bas = 19;
     for (var ii = 0; ii < data.length; ii++) {
         markLines.push({
             fromX: data[ii].ball - 1,
-            fromY: skipRowsCount + 0,
+            fromY: skipRowsCount + 0.75 * (bas - bas / data.length * ii),
             toX: data[ii].ball - 1,
-            toY: skipRowsCount + 19,
+            toY: skipRowsCount + bas,
+            color: data[ii].color, manual: true
+        });
+    }
+}
+function drawTestLinesRight(data) {
+    var bas = 19;
+    //for (let ii = 0; ii < data.length; ii++) {
+    for (var ii = data.length - 1; ii >= 0; ii--) {
+        markLines.push({
+            fromX: data[ii].ball - 1,
+            fromY: skipRowsCount + 0.75 * (bas - bas / data.length * ii),
+            toX: data[ii].ball - 1,
+            toY: skipRowsCount + bas,
             color: data[ii].color, manual: true
         });
     }
@@ -1227,7 +1300,7 @@ function testTest() {
                     data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
                 }
                 console.log('rightBlue', nn, data);
-                drawTestLines(data);
+                drawTestLinesRight(data);
             }
             if (line.fromX == rightBlue || line.toX == rightBlue) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1238,7 +1311,7 @@ function testTest() {
                     data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
                 }
                 console.log('leftBlue', nn, data);
-                drawTestLines(data);
+                drawTestLinesLeft(data);
             }
             if (line.fromX == leftGreen || line.toX == leftGreen) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1249,7 +1322,7 @@ function testTest() {
                     data.push({ ball: orders[bb] - 0.1, color: '#00990099' });
                 }
                 console.log('leftGreen', nn, data);
-                drawTestLines(data);
+                drawTestLinesLeft(data);
             }
             if (line.fromX == rightGreen || line.toX == rightGreen) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1260,7 +1333,7 @@ function testTest() {
                     data.push({ ball: orders[bb] - 0.1, color: '#00990099' });
                 }
                 console.log('rightGreen', nn, data);
-                drawTestLines(data);
+                drawTestLinesRight(data);
             }
             if (line.fromX == leftGrey || line.toX == leftGrey) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1271,7 +1344,7 @@ function testTest() {
                     data.push({ ball: orders[bb] - 0.2, color: '#66666699' });
                 }
                 console.log('leftGrey', nn, data);
-                drawTestLines(data);
+                drawTestLinesLeft(data);
             }
             if (line.fromX == rightGrey || line.toX == rightGrey) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1282,7 +1355,7 @@ function testTest() {
                     data.push({ ball: orders[bb] - 0.2, color: '#66666699' });
                 }
                 console.log('rightGrey', nn, data);
-                drawTestLines(data);
+                drawTestLinesRight(data);
             }
             if (line.fromX == leftRed || line.toX == leftRed) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1292,7 +1365,7 @@ function testTest() {
                     data.push({ ball: 1 + kk, color: '#ff000099' });
                 }
                 console.log('leftRed', nn, data);
-                drawTestLines(data);
+                drawTestLinesLeft(data);
             }
             if (line.fromX == rightRed || line.toX == rightRed) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1302,7 +1375,7 @@ function testTest() {
                     data.push({ ball: 1 + kk, color: '#ff000099' });
                 }
                 console.log('rightRed', nn, data);
-                drawTestLines(data);
+                drawTestLinesRight(data);
             }
         }
     }
