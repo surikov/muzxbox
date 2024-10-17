@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.137 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.138 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -546,33 +546,29 @@ function dumpRowWaitColor(rows, color, shiftX) {
             //console.log('grey');
             greyStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
         }
-        if (rr == 0) {
-            for (var bb = 0; bb < rowLen; bb++) {
-                var hh = (mx - min - (arr[bb].summ - min)) / hr;
-                var fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
-                var toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
+        /*if (rr == 0) {
+            for (let bb = 0; bb < rowLen; bb++) {
+                let hh = (mx - min - (arr[bb].summ - min)) / hr;
+                let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
+                let toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
                 markLines.push({
-                    fromX: bb + shiftX - 1,
-                    fromY: fromY //skipRowsCount + 0 + prehh
-                    ,
-                    toX: bb + shiftX,
-                    toY: toY //skipRowsCount + hh - 0
-                    ,
-                    color: color, manual: false
+                    fromX: bb + shiftX - 1
+                    , fromY: fromY //skipRowsCount + 0 + prehh
+                    , toX: bb + shiftX
+                    , toY: toY //skipRowsCount + hh - 0
+                    , color: color, manual: false
                 });
                 markLines.push({
-                    fromX: bb + shiftX - 1 + rowLen,
-                    fromY: fromY //skipRowsCount + 0 + prehh
-                    ,
-                    toX: bb + shiftX + rowLen,
-                    toY: toY //skipRowsCount + hh - 0
-                    ,
-                    color: color, manual: false
+                    fromX: bb + shiftX - 1 + rowLen
+                    , fromY: fromY //skipRowsCount + 0 + prehh
+                    , toX: bb + shiftX + rowLen
+                    , toY: toY //skipRowsCount + hh - 0
+                    , color: color, manual: false
                 });
                 prehh = hh;
             }
             //console.log(arr);
-        }
+        }*/
     }
     //console.log('greyStat', greyStat);
 }
@@ -682,32 +678,30 @@ function dumpRowFillsColor(rows, color, shiftX) {
             //console.log(rr,'green',begin,(rowLen - end - 1));
             greenStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
         }
-        if (rr == 0) {
-            for (var bb = 0; bb < rowLen; bb++) {
-                var hh = (mx - min - (ballFills[bb].summ - min)) / hr;
-                var fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
-                var toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
-                markLines.push({
-                    fromX: bb + shiftX - 1,
-                    fromY: fromY //skipRowsCount + 0 + prehh
-                    ,
-                    toX: bb + shiftX,
-                    toY: toY //skipRowsCount + hh - 0
-                    ,
-                    color: color, manual: false
-                });
-                markLines.push({
-                    fromX: bb + shiftX - 1 + rowLen,
-                    fromY: fromY //skipRowsCount + 0 + prehh
-                    ,
-                    toX: bb + shiftX + rowLen,
-                    toY: toY //skipRowsCount + hh - 0
-                    ,
-                    color: color, manual: false
-                });
-                prehh = hh;
-            }
-        }
+        /*
+                if (rr == 0) {
+        
+                    for (let bb = 0; bb < rowLen; bb++) {
+                        let hh = (mx - min - (ballFills[bb].summ - min)) / hr;
+                        let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
+                        let toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
+                        markLines.push({
+                            fromX: bb + shiftX - 1
+                            , fromY: fromY //skipRowsCount + 0 + prehh
+                            , toX: bb + shiftX
+                            , toY: toY //skipRowsCount + hh - 0
+                            , color: color, manual: false
+                        });
+                        markLines.push({
+                            fromX: bb + shiftX - 1 + rowLen
+                            , fromY: fromY //skipRowsCount + 0 + prehh
+                            , toX: bb + shiftX + rowLen
+                            , toY: toY //skipRowsCount + hh - 0
+                            , color: color, manual: false
+                        });
+                        prehh = hh;
+                    }
+                }*/
     }
     //console.log('greenStat', greenStat);
 }
@@ -865,29 +859,29 @@ function dumpTriads(svg, rows) {
             addRect(svg, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
             , color);
         }
-        if (rr == 0) {
-            var min = 999999;
-            var mx = -9999;
-            for (var ii = 0; ii < rowLen; ii++) {
-                if (mx < calcs[ii].summ)
-                    mx = calcs[ii].summ;
-                if (min > calcs[ii].summ)
-                    min = calcs[ii].summ;
+        /*if ( rr == 0) {
+            
+            let min=999999;
+            let mx=-9999;
+
+            for (let ii = 0; ii < rowLen; ii++) {
+                if(mx<calcs[ii].summ)mx=calcs[ii].summ;
+                if(min>calcs[ii].summ)min=calcs[ii].summ;
             }
             //console.log(min,mx,calcs);
-            var blue = '#0000ff33';
-            var preVal = calcs[calcs.length - 1].summ;
-            for (var ii = 0; ii < rowLen; ii++) {
-                var nextVal = calcs[ii].summ;
-                markLines.push({ fromX: ii - 1, fromY: 21 * (preVal - min) / (mx - min + 2) + skipRowsCount,
-                    toX: ii, toY: 21 * (nextVal - min) / (mx - min + 2) + skipRowsCount,
-                    color: blue, manual: false });
-                markLines.push({ fromX: ii - 1 + rowLen, fromY: 21 * (preVal - min) / (mx - min + 2) + skipRowsCount,
-                    toX: ii + rowLen, toY: 21 * (nextVal - min) / (mx - min + 2) + skipRowsCount,
-                    color: blue, manual: false });
-                preVal = nextVal;
+            let blue = '#0000ff33';
+            let preVal=calcs[calcs.length-1].summ;
+            for (let ii = 0; ii < rowLen; ii++) {
+                let nextVal=calcs[ii].summ;
+                markLines.push({ fromX: ii-1, fromY: 21*(preVal-min)/(mx-min+2)+ skipRowsCount
+                                    , toX: ii, toY: 21*(nextVal-min)/(mx-min+2)+ skipRowsCount
+                                , color: blue, manual: false });
+                markLines.push({ fromX: ii-1+rowLen, fromY: 21*(preVal-min)/(mx-min+2)+ skipRowsCount
+                                    , toX: ii+rowLen, toY: 21*(nextVal-min)/(mx-min+2)+ skipRowsCount
+                                , color: blue, manual: false });
+                preVal=nextVal;
             }
-        }
+        }*/
     }
     //console.log('blueStat', blueStat);
     //console.log('redStat', redStat);
@@ -1250,25 +1244,56 @@ function addTails() {
     //console.log(sortedBlue);
     resetNumbs();
 }
-function drawTestLinesLeft(data) {
+/*
+function drawTestLinesRight(data: { ball: number, color: string }[]) {
+    let bas=19;
+    //for (let ii = 0; ii < data.length; ii++) {
+    for (let ii = data.length-1; ii >= 0; ii--) {
+        markLines.push({
+            fromX: data[ii].ball - 1
+            , fromY: skipRowsCount + 0.75*(bas/data.length*ii)
+            , toX: data[ii].ball - 1
+            , toY: skipRowsCount + bas
+            , color: data[ii].color, manual: true
+        });
+    }
+
+}
+function drawTestLinesLeft(data: { ball: number, color: string }[]) {
+    let bas=19;
+    //for (let ii = 0; ii < data.length; ii++) {
+    for (let ii = data.length-1; ii >= 0; ii--) {
+        markLines.push({
+            fromX: data[ii].ball - 1
+            , fromY: skipRowsCount + 0.75*(bas/data.length*ii)
+            , toX: data[ii].ball - 1
+            , toY: skipRowsCount + bas
+            , color: data[ii].color, manual: true
+        });
+    }
+
+}
+*/
+function addTestLines1(data) {
     var bas = 19;
     for (var ii = 0; ii < data.length; ii++) {
+        //for (let ii = data.length-1; ii >= 0; ii--) {
         markLines.push({
             fromX: data[ii].ball - 1,
-            fromY: skipRowsCount + 0.75 * (bas - bas / data.length * ii),
+            fromY: skipRowsCount + 0.85 * (bas / data.length * ii),
             toX: data[ii].ball - 1,
             toY: skipRowsCount + bas,
             color: data[ii].color, manual: true
         });
     }
 }
-function drawTestLinesRight(data) {
+function addTestLines2(data) {
     var bas = 19;
-    //for (let ii = 0; ii < data.length; ii++) {
-    for (var ii = data.length - 1; ii >= 0; ii--) {
+    for (var ii = 0; ii < data.length; ii++) {
+        //for (let ii = data.length-1; ii >= 0; ii--) {
         markLines.push({
             fromX: data[ii].ball - 1,
-            fromY: skipRowsCount + 0.75 * (bas - bas / data.length * ii),
+            fromY: skipRowsCount + 0.85 * (bas - bas / data.length * ii),
             toX: data[ii].ball - 1,
             toY: skipRowsCount + bas,
             color: data[ii].color, manual: true
@@ -1300,7 +1325,7 @@ function testTest() {
                     data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
                 }
                 console.log('rightBlue', nn, data);
-                drawTestLinesRight(data);
+                addTestLines1(data);
             }
             if (line.fromX == rightBlue || line.toX == rightBlue) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1311,7 +1336,7 @@ function testTest() {
                     data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
                 }
                 console.log('leftBlue', nn, data);
-                drawTestLinesLeft(data);
+                addTestLines2(data);
             }
             if (line.fromX == leftGreen || line.toX == leftGreen) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1322,7 +1347,7 @@ function testTest() {
                     data.push({ ball: orders[bb] - 0.1, color: '#00990099' });
                 }
                 console.log('leftGreen', nn, data);
-                drawTestLinesLeft(data);
+                addTestLines1(data);
             }
             if (line.fromX == rightGreen || line.toX == rightGreen) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1333,7 +1358,7 @@ function testTest() {
                     data.push({ ball: orders[bb] - 0.1, color: '#00990099' });
                 }
                 console.log('rightGreen', nn, data);
-                drawTestLinesRight(data);
+                addTestLines2(data);
             }
             if (line.fromX == leftGrey || line.toX == leftGrey) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1344,7 +1369,7 @@ function testTest() {
                     data.push({ ball: orders[bb] - 0.2, color: '#66666699' });
                 }
                 console.log('leftGrey', nn, data);
-                drawTestLinesLeft(data);
+                addTestLines1(data);
             }
             if (line.fromX == rightGrey || line.toX == rightGrey) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1355,7 +1380,7 @@ function testTest() {
                     data.push({ ball: orders[bb] - 0.2, color: '#66666699' });
                 }
                 console.log('rightGrey', nn, data);
-                drawTestLinesRight(data);
+                addTestLines2(data);
             }
             if (line.fromX == leftRed || line.toX == leftRed) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1365,7 +1390,7 @@ function testTest() {
                     data.push({ ball: 1 + kk, color: '#ff000099' });
                 }
                 console.log('leftRed', nn, data);
-                drawTestLinesLeft(data);
+                addTestLines1(data);
             }
             if (line.fromX == rightRed || line.toX == rightRed) {
                 var nn = 2 * Math.abs(line.fromX - line.toX);
@@ -1375,7 +1400,7 @@ function testTest() {
                     data.push({ ball: 1 + kk, color: '#ff000099' });
                 }
                 console.log('rightRed', nn, data);
-                drawTestLinesRight(data);
+                addTestLines1(data);
             }
         }
     }
