@@ -62,7 +62,7 @@ class FanOutputLine {
 		//console.log(ratio);
 		let dx = ratio*(toX - fromX) / 2;
 		let dy = ratio*(toY - fromY) / 2;
-		let delBut: TileRectangle = {
+		let deleteButton: TileRectangle = {
 			x: fromX + dx - globalCommandDispatcher.cfg().pluginIconSize / 2
 			, y: fromY + dy - globalCommandDispatcher.cfg().pluginIconSize / 2
 			, w: globalCommandDispatcher.cfg().pluginIconSize
@@ -71,7 +71,13 @@ class FanOutputLine {
 			, ry: globalCommandDispatcher.cfg().pluginIconSize / 2
 			, css: 'fanConnection'
 		};
-		anchor.content.push(delBut);
-
+		anchor.content.push(deleteButton);
+		let deleteIcon:TileText={
+			x: fromX + dx //- globalCommandDispatcher.cfg().pluginIconSize / 2
+			, y: fromY + dy + globalCommandDispatcher.cfg().pluginIconSize / 4
+			,text:icon_close
+			, css: 'fanDeleteIcon'
+		};
+		anchor.content.push(deleteIcon);
 	}
 }

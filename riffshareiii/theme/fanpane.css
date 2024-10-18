@@ -6,8 +6,7 @@
 .fanSamplerIcon {
 	fill: var(--line-color);
 	font-size: calc(0.25*var(--tapSize));
-	pointer-events: none;
-	
+
 }
 .fanPerformerIcon {
 	
@@ -37,6 +36,14 @@
 	stroke-width: 2cm;
 	stroke-linejoin: round;
 	paint-order: stroke;
+}
+
+.fanDeleteIcon{
+	fill: var(--main-color);
+    text-anchor: middle;
+	font-size: var(--icon-2cm);
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
 }
 
 

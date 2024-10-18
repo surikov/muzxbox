@@ -7,6 +7,7 @@ class MixerUI {
 	firstLayers: TileLayerDefinition;
 
 	fanLayer: TileLayerDefinition;
+	fanSVGgroup: SVGElement;
 	spearsLayer: TileLayerDefinition;
 
 	levels: MixerZoomLevel[] = [];
@@ -69,8 +70,8 @@ class MixerUI {
 		let firstLayerZoom: SVGElement = (document.getElementById('firstLayerZoom') as any) as SVGElement;
 		this.firstLayers = { g: firstLayerZoom, anchors: [], mode: LevelModes.normal };
 
-		let fanSVGgroup: SVGElement = (document.getElementById('fanLayer') as any) as SVGElement;
-		this.fanLayer = { g: fanSVGgroup, anchors: [], mode: LevelModes.normal };
+		 this.fanSVGgroup = (document.getElementById('fanLayer') as any) as SVGElement;
+		this.fanLayer = { g: this.fanSVGgroup, anchors: [], mode: LevelModes.normal };
 		let spearsSVGgroup: SVGElement = (document.getElementById('spearsLayer') as any) as SVGElement;
 		this.spearsLayer = { g: spearsSVGgroup, anchors: [], mode: LevelModes.normal };
 

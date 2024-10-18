@@ -1930,8 +1930,8 @@ class MixerUI {
         this.gridLayers = { g: gridLayerZoom, anchors: [], mode: LevelModes.normal };
         let firstLayerZoom = document.getElementById('firstLayerZoom');
         this.firstLayers = { g: firstLayerZoom, anchors: [], mode: LevelModes.normal };
-        let fanSVGgroup = document.getElementById('fanLayer');
-        this.fanLayer = { g: fanSVGgroup, anchors: [], mode: LevelModes.normal };
+        this.fanSVGgroup = document.getElementById('fanLayer');
+        this.fanLayer = { g: this.fanSVGgroup, anchors: [], mode: LevelModes.normal };
         let spearsSVGgroup = document.getElementById('spearsLayer');
         this.spearsLayer = { g: spearsSVGgroup, anchors: [], mode: LevelModes.normal };
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
@@ -2364,6 +2364,8 @@ class SamplerIcon {
             yy = top + sampler.iconPosition.y;
         }
         let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
+        let dragAnchor = { xx: xx, yy: yy, ww: globalCommandDispatcher.cfg().pluginIconSize, hh: globalCommandDispatcher.cfg().pluginIconSize, showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [], translation: { x: 0, y: 0 } };
+        fanLevelAnchor.content.push(dragAnchor);
         let rec = {
             x: xx, y: yy,
             dots: [
@@ -2372,15 +2374,37 @@ class SamplerIcon {
                 globalCommandDispatcher.cfg().pluginIconSize, globalCommandDispatcher.cfg().pluginIconSize / 2,
                 globalCommandDispatcher.cfg().pluginIconSize / 2, globalCommandDispatcher.cfg().pluginIconSize
             ],
+            draggable: true,
+            activation: (x, y) => {
+                console.log('sampler', x, y);
+                if (!dragAnchor.translation) {
+                    dragAnchor.translation = { x: 0, y: 0 };
+                }
+                if (x == 0 && y == 0) {
+                    console.log('done', dragAnchor.translation);
+                    if (!sampler.iconPosition) {
+                        sampler.iconPosition = { x: 0, y: 0 };
+                    }
+                    sampler.iconPosition.x = sampler.iconPosition.x + dragAnchor.translation.x;
+                    sampler.iconPosition.y = sampler.iconPosition.y + dragAnchor.translation.y;
+                    dragAnchor.translation = { x: 0, y: 0 };
+                    globalCommandDispatcher.resetProject();
+                }
+                else {
+                    dragAnchor.translation.x = dragAnchor.translation.x + x;
+                    dragAnchor.translation.y = dragAnchor.translation.y + y;
+                    globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+                }
+            },
             css: 'fanSamplerIcon'
         };
-        fanLevelAnchor.content.push(rec);
+        dragAnchor.content.push(rec);
         if (zidx < 5) {
             let txt = {
                 text: sampler.kind + ':' + sampler.id,
                 x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanIconLabel'
             };
-            fanLevelAnchor.content.push(txt);
+            dragAnchor.content.push(txt);
         }
         new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
         new FanOutputLine().addOutputs(sampler.outputs, fanLevelAnchor, spearsAnchor, xx + globalCommandDispatcher.cfg().pluginIconSize / 2, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
@@ -2548,7 +2572,7 @@ class FanOutputLine {
         let ratio = spearLen / pathLen;
         let dx = ratio * (toX - fromX) / 2;
         let dy = ratio * (toY - fromY) / 2;
-        let delBut = {
+        let deleteButton = {
             x: fromX + dx - globalCommandDispatcher.cfg().pluginIconSize / 2,
             y: fromY + dy - globalCommandDispatcher.cfg().pluginIconSize / 2,
             w: globalCommandDispatcher.cfg().pluginIconSize,
@@ -2557,7 +2581,14 @@ class FanOutputLine {
             ry: globalCommandDispatcher.cfg().pluginIconSize / 2,
             css: 'fanConnection'
         };
-        anchor.content.push(delBut);
+        anchor.content.push(deleteButton);
+        let deleteIcon = {
+            x: fromX + dx,
+            y: fromY + dy + globalCommandDispatcher.cfg().pluginIconSize / 4,
+            text: icon_close,
+            css: 'fanDeleteIcon'
+        };
+        anchor.content.push(deleteIcon);
     }
 }
 class IconLabelButton {

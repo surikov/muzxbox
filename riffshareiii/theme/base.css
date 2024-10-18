@@ -60,6 +60,7 @@
 	--label-04cm: calc(0.4*var(--font-ratio)*var(--tapSize));
 
 	--icon-4cm: calc(4.0*var(--tapSize));
+	--icon-2cm: calc(2.0*var(--tapSize));
 	--icon-1cm: calc(1.0*var(--tapSize));
 	--icon-075cm: calc(0.75*var(--tapSize));
 	--icon-05cm: calc(0.5*var(--tapSize));
