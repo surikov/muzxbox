@@ -31,8 +31,8 @@ class PerformerIcon {
 			, w: globalCommandDispatcher.cfg().pluginIconSize, h: globalCommandDispatcher.cfg().pluginIconSize
 			//, rx: globalCommandDispatcher.cfg().pluginIconSize / 2, ry: globalCommandDispatcher.cfg().pluginIconSize / 2
 			, css: 'fanPerformerIcon'
-			,draggable:true
-			,activation:(x:number,y:number)=>{console.log(x,y);}
+			, draggable: true
+			, activation: (x: number, y: number) => { console.log(x, y); }
 		};
 		fanLevelAnchor.content.push(rec);
 		if (zidx < 5) {
@@ -45,7 +45,8 @@ class PerformerIcon {
 		//console.log('PerformerIcon', rec);
 		let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
 		new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
-		new FanOutputLine().addOutputs(audioSeq.outputs, fanLevelAnchor,spearsAnchor
+		new FanOutputLine().addOutputs(audioSeq.outputs, fanLevelAnchor, spearsAnchor
+			, audioSeq.id
 			, xx + globalCommandDispatcher.cfg().pluginIconSize / 2
 			, yy + globalCommandDispatcher.cfg().pluginIconSize / 2
 		);

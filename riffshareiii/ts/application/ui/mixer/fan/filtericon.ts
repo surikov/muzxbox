@@ -38,8 +38,9 @@ class FilterIcon {
 		}
 		//console.log('PerformerIcon', rec);
 		//globalCommandDispatcher.cfg().addSpear(3, globalCommandDispatcher.cfg().leftPad+globalCommandDispatcher.cfg().timelineWidth(), yy + globalCommandDispatcher.cfg().pluginIconHeight / 2, xx, yy + globalCommandDispatcher.cfg().pluginIconHeight / 2, fanLevelAnchor, 'fanSamplerIcon');
-		new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor,spearsAnchor
-			, xx + globalCommandDispatcher.cfg().pluginIconSize/2
+		new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, spearsAnchor
+			, filterTarget.id
+			, xx + globalCommandDispatcher.cfg().pluginIconSize / 2
 			, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
 	}
 	buildAutoSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
@@ -78,8 +79,9 @@ class FilterIcon {
 		//console.log('PerformerIcon', rec);
 		let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
 		new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
-		new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor,spearsAnchor
-			, xx + globalCommandDispatcher.cfg().pluginIconSize/2
+		new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, spearsAnchor
+			, filterTarget.id
+			, xx + globalCommandDispatcher.cfg().pluginIconSize / 2
 			, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
 	}
 	/*

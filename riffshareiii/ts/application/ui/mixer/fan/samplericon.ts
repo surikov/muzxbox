@@ -58,10 +58,10 @@ class SamplerIcon {
 						, fanLevelAnchor
 						, LevelModes.normal);
 				}
-				
-				
+
+
 			}
-			, css: 'fanSamplerIcon'
+			, css: 'fanSamplerMoveIcon'
 		};
 		dragAnchor.content.push(rec);
 		if (zidx < 5) {
@@ -73,6 +73,7 @@ class SamplerIcon {
 		}
 		new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
 		new FanOutputLine().addOutputs(sampler.outputs, fanLevelAnchor, spearsAnchor
+			, sampler.id
 			, xx + globalCommandDispatcher.cfg().pluginIconSize / 2
 			, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
 	}

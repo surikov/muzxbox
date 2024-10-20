@@ -1,6 +1,8 @@
 
 class FanOutputLine {
-	addOutputs(outputs: string[], buttonsAnchor: TileAnchor, fanLinesAnchor: TileAnchor, fromX: number, fromY: number) {
+	addOutputs(outputs: string[], buttonsAnchor: TileAnchor, fanLinesAnchor: TileAnchor
+		, fromID: string
+		, fromX: number, fromY: number) {
 		if (outputs) {
 			if (outputs.length > 0) {
 				for (let oo = 0; oo < outputs.length; oo++) {
@@ -20,7 +22,7 @@ class FanOutputLine {
 								fromX, fromY
 								, globalCommandDispatcher.cfg().pluginIconSize, xx, yy
 								, fanLinesAnchor);
-							this.addDeleteSpear(fromX, fromY
+							this.addDeleteSpear(fromID, toFilter.id, fromX, fromY
 								, globalCommandDispatcher.cfg().pluginIconSize, xx, yy
 								, buttonsAnchor);
 							break;
@@ -38,7 +40,9 @@ class FanOutputLine {
 					, speakerX + globalCommandDispatcher.cfg().speakerIconSize / 2
 					, speakerY + globalCommandDispatcher.cfg().speakerIconSize / 2
 					, fanLinesAnchor);
-				this.addDeleteSpear(fromX
+				this.addDeleteSpear(
+					fromID, ''
+					, fromX
 					, fromY
 					, globalCommandDispatcher.cfg().speakerIconSize
 					, speakerX + globalCommandDispatcher.cfg().speakerIconSize / 2
@@ -50,7 +54,8 @@ class FanOutputLine {
 	//nonan1(nn: number): number {
 	//	return (nn) ? nn : 0;
 	//	}
-	addDeleteSpear(fromX: number, fromY: number
+	addDeleteSpear(fromID: string, toID: string
+		, fromX: number, fromY: number
 		, toSize: number
 		, toX: number, toY: number
 		, anchor: TileAnchor) {
@@ -58,25 +63,29 @@ class FanOutputLine {
 		let diffY = toY - fromY;
 		let pathLen = Math.sqrt(diffX * diffX + diffY * diffY);
 		let spearLen = pathLen - globalCommandDispatcher.cfg().pluginIconSize / 2 - toSize / 2;
-		let ratio = spearLen/pathLen;//globalCommandDispatcher.cfg().pluginIconSize / toSize;
+		let ratio = spearLen / pathLen;//globalCommandDispatcher.cfg().pluginIconSize / toSize;
 		//console.log(ratio);
-		let dx = ratio*(toX - fromX) / 2;
-		let dy = ratio*(toY - fromY) / 2;
+		let dx = ratio * (toX - fromX) / 2;
+		let dy = ratio * (toY - fromY) / 2;
 		let deleteButton: TileRectangle = {
-			x: fromX + dx - globalCommandDispatcher.cfg().pluginIconSize / 2
-			, y: fromY + dy - globalCommandDispatcher.cfg().pluginIconSize / 2
-			, w: globalCommandDispatcher.cfg().pluginIconSize
-			, h: globalCommandDispatcher.cfg().pluginIconSize
-			, rx: globalCommandDispatcher.cfg().pluginIconSize / 2
-			, ry: globalCommandDispatcher.cfg().pluginIconSize / 2
-			, css: 'fanConnection'
+			x: fromX + dx - globalCommandDispatcher.cfg().pluginIconSize / 4
+			, y: fromY + dy - globalCommandDispatcher.cfg().pluginIconSize / 4
+			, w: globalCommandDispatcher.cfg().pluginIconSize / 2
+			, h: globalCommandDispatcher.cfg().pluginIconSize / 2
+			, rx: globalCommandDispatcher.cfg().pluginIconSize / 4
+			, ry: globalCommandDispatcher.cfg().pluginIconSize / 4
+			, css: 'fanDropConnection'
+			, activation: (x: number, y: number) => {
+				console.log('delete link from', fromID, 'to', toID);
+			}
 		};
 		anchor.content.push(deleteButton);
-		let deleteIcon:TileText={
+		let deleteIcon: TileText = {
 			x: fromX + dx //- globalCommandDispatcher.cfg().pluginIconSize / 2
-			, y: fromY + dy + globalCommandDispatcher.cfg().pluginIconSize / 4
-			,text:icon_close
+			, y: fromY + dy + globalCommandDispatcher.cfg().pluginIconSize / 8
+			, text: icon_close
 			, css: 'fanDeleteIcon'
+
 		};
 		anchor.content.push(deleteIcon);
 	}

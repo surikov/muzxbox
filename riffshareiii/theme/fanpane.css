@@ -3,10 +3,15 @@
 	font-size: calc(1*var(--tapSize));
 	pointer-events: none;
 }
-.fanSamplerIcon {
-	fill: var(--line-color);
+.fanSamplerMoveIcon {
+	fill: var(--drag-color);
 	font-size: calc(0.25*var(--tapSize));
-
+	cursor:move;
+}
+.fanSamplerClickIcon {
+	fill: var(--click-color);
+	font-size: calc(0.25*var(--tapSize));
+	cursor:pointer;
 }
 .fanPerformerIcon {
 	
@@ -37,11 +42,19 @@
 	stroke-linejoin: round;
 	paint-order: stroke;
 }
+.fanDropConnection {
+	cursor:pointer;
+	stroke: var(--line-color);
+	stroke-width: 0.5cm;
+	stroke-linejoin: round;
+	paint-order: stroke;
+	fill: var(--click-color);
+}
 
 .fanDeleteIcon{
 	fill: var(--main-color);
     text-anchor: middle;
-	font-size: var(--icon-2cm);
+	font-size: var(--icon-1cm);
 	pointer-events: none;
 	font-family: "Material-Design-Iconic-Font";
 }
