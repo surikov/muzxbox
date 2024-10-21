@@ -1,0 +1,143 @@
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>749</title>
+	<style>
+		#fogRect {
+			fill: #ff000001;
+
+		}
+
+		button {
+			width: 3cm;
+			height: 2cm;
+			font-size: large;
+		}
+
+		#statblue {
+			color: #0033cc;
+			font-size2: small;
+		}
+
+		#statgreen {
+			color: #339900;
+			font-size2: small;
+		}
+
+		#statgrey {
+			color: #333333;
+			font-size2: small;
+		}
+		
+		#statpurple {
+			color: #990099;
+			font-size2: small;
+		}
+		#statred {
+			color: #cc0000;
+			font-size2: small;
+		}
+		#statnums{
+			color: #666666;
+
+		}
+		
+		.focusedNum{
+			background-color: #ffff00;
+
+		}
+		
+.svgpane {
+			fill: #666666;
+		}
+pre{
+font-weight: bold;
+font-size: medium;
+font-stretch: condensed;
+margin:0;
+padding:0;
+transform2: scaleX(0.75);
+}
+
+	</style>
+</head>
+
+<body>
+
+	<p>
+		<span id='msgp'>test</span>
+
+		<button onclick='clickHop();'>hop</button>
+		<button onclick='toggleFirst();'>first</button>
+		<button onclick='toggleWide();'>wide</button>
+		<button onclick='clickClearLines();'>clear</button>
+		<br />
+		<button onclick='clickGoSkip(-100);'>+100</button>
+		<button onclick='clickGoSkip(-5);'>+5</button>
+		<button onclick='clickGoSkip(-1);'>+1</button>
+		<button onclick='clickGoSkip(1);'>-1</button>
+		<button onclick='clickGoSkip(5);'>-5</button>
+		<button onclick='clickGoSkip(100);'>-100</button>
+
+		<button onclick='toggleRatioPre();'>light</button>
+		<button onclick='addTails();'>tail</button>
+		<br />
+		<button onclick='moreReduceRatio();'>+step</button>
+		<span id='stepsize'>+step</span>
+		<button onclick='lessReduceRatio();'>-step</button>
+<!--
+		<button onclick='moreCalcLen();'>+len</button>
+		<span id='calcLen'>+len</span>
+		<button onclick='lessCalcLen();'>-len</button>
+	-->
+		<button onclick='moreWide();'>+w</button>
+		<span id='calcWide'>wwww</span>
+		<button onclick='lessWide();'>-w</button>
+		<br />
+		<pre id='statnums'>nums <span class='focusedNum'>2</span>456</pre>
+		<br/>
+		<pre id='statblue'>blue</pre>
+		<pre id='statgreen'>green</pre>
+		<pre id='statgrey'>grey</pre>
+		<br/>
+		<pre id='statpurple'>purple</pre>
+		<pre id='statred'>red</pre>
+	</p>
+	<svg id='svgpane' width="1700" height="2300">
+		<rect width="1300" height="1470" rx="20" ry="20" fill="#ffe" />
+		<g id='levelA'></g>
+		<g id='linesLevel'></g>
+		<rect id="fogRect" x="0" y="0" width="1300" height="5000" onclick="clickFog(event);" />
+		<rect id="lineMark" width="1" height="1" x="0" y="0" fill="#ff9900cc" />
+	</svg>
+	<p>
+		<button onclick='clickHop();'>hop</button>
+		<button onclick='clickGoSkip(-5);'>+5</button>
+		<button onclick='clickGoSkip(-1);'>+1</button>
+		<button onclick='clickGoSkip(1);'>-1</button>
+		<button onclick='clickGoSkip(5);'>-5</button>
+        <button onclick='moreReduceRatio();'>+step</button>
+        <button onclick='lessReduceRatio();'>-step</button>
+		<!--
+		<button onclick='moreCalcLen();'>+len</button>
+		<button onclick='lessCalcLen();'>-len</button>
+		-->
+		<button onclick='moreWide();'>+w</button>
+        <button onclick='lessWide();'>-w</button>
+        <button onclick='toggleFirst();'>first</button>
+		<button onclick='testTest();'>test</button>
+	</p>
+	<pre id='statdump'>123
+	</pre>
+	<!--<script src="a749data.js"></script>-->
+	<script src="749/7x49parsed.js"></script>
+	<script>
+		let dataName = 'parseddata';
+		let rowLen = 49;
+		let ballsInRow = 7;
+	</script>
+	<script src="749Calc.js"></script>
+</body>
+
+</html>
