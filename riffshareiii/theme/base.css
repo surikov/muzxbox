@@ -58,6 +58,8 @@
 	--label-075cm: calc(0.75*var(--font-ratio)*var(--tapSize));
 	--label-05cm: calc(0.5*var(--font-ratio)*var(--tapSize));
 	--label-04cm: calc(0.4*var(--font-ratio)*var(--tapSize));
+	--label-025cm: calc(0.25*var(--font-ratio)*var(--tapSize));
+	--label-0125cm: calc(0.125*var(--font-ratio)*var(--tapSize));
 
 	--icon-4cm: calc(4.0*var(--tapSize));
 	--icon-2cm: calc(2.0*var(--tapSize));
@@ -82,7 +84,7 @@
 */
 	--background-color: #222;
 	--main-color:#fff;
-	--drag-color:#6c0;
+	--drag-color:#3c3;
 	--line-color:#9ef;
 	--click-color:#c39;
 

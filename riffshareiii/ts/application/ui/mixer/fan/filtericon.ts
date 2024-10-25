@@ -41,7 +41,8 @@ class FilterIcon {
 		new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, spearsAnchor
 			, filterTarget.id
 			, xx + globalCommandDispatcher.cfg().pluginIconSize / 2
-			, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
+			, yy + globalCommandDispatcher.cfg().pluginIconSize / 2
+			,zidx);
 	}
 	buildAutoSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		//console.log('buildPerformerSpot', this.performerId);
@@ -82,7 +83,8 @@ class FilterIcon {
 		new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, spearsAnchor
 			, filterTarget.id
 			, xx + globalCommandDispatcher.cfg().pluginIconSize / 2
-			, yy + globalCommandDispatcher.cfg().pluginIconSize / 2);
+			, yy + globalCommandDispatcher.cfg().pluginIconSize / 2
+			,zidx);
 	}
 	/*
 	addOutputs(outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number) {

@@ -1,11 +1,17 @@
 .fanIconLabel {
-	fill: var(--drag-color);
-	font-size: calc(1*var(--tapSize));
+	fill: var(--main-color);
+	font-size: var(--label-025cm);
 	pointer-events: none;
+	dominant-baseline22:middle;
+	 text-anchor:middle;
 }
 .fanSamplerMoveIcon {
 	fill: var(--drag-color);
 	font-size: calc(0.25*var(--tapSize));
+	cursor:move;
+}
+.fanPointLinker{
+	fill: var(--drag-color);
 	cursor:move;
 }
 .fanSamplerClickIcon {
