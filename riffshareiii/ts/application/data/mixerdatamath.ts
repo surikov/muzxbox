@@ -3,18 +3,24 @@ class MixerDataMathUtility {
 
 	leftPad: number = 3;
 	rightPad: number = 50;
-	bottomPad = 11;
+
 	topPad = 2;
+	parTitleGrid=5;
+	padGrid2Sampler=5;
+	padSampler2Automation=5;
+	padAutomation2Comments=5;
+	bottomPad = 11;
+	
 
 	notePathHeight = 1;
 	widthDurationRatio = 27;
 	octaveCount = 10;
 
 
-	titleBottomPad = 5;
-	automationBottomPad = 1;
-	samplerBottomPad = 1;
-	gridBottomPad = 1;
+	//titleBottomPad = 5;
+	//automationBottomPad = 1;
+	//samplerBottomPad = 1;
+	//gridBottomPad = 1;
 
 	maxCommentRowCount = 0;
 	maxAutomationsCount = 0;
@@ -137,7 +143,7 @@ class MixerDataMathUtility {
 		*/
 	gridTop(): number {
 		//return this.samplerTop() + this.samplerHeight() + this.samplerBottomPad;
-		return this.topPad + this.heightOfTitle() + this.titleBottomPad;
+		return this.topPad + this.heightOfTitle() + this.parTitleGrid;
 	}
 
 
@@ -145,13 +151,13 @@ class MixerDataMathUtility {
 		return this.notePathHeight * this.octaveCount * 12;
 	}
 
-	/*
+	
 	samplerHeight(): number {
 		return this.data.percussions.length * this.notePathHeight;
 	}
 	samplerTop(): number {
-		return this.automationTop() + this.automationMaxHeight() + this.automationBottomPad;
+		return this.gridTop() + this.gridHeight() + this.padGrid2Sampler;
 	}
-	*/
+	
 
 }

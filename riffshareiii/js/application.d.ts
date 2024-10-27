@@ -454,15 +454,15 @@ declare class MixerDataMathUtility {
     data: Zvoog_Project;
     leftPad: number;
     rightPad: number;
-    bottomPad: number;
     topPad: number;
+    parTitleGrid: number;
+    padGrid2Sampler: number;
+    padSampler2Automation: number;
+    padAutomation2Comments: number;
+    bottomPad: number;
     notePathHeight: number;
     widthDurationRatio: number;
     octaveCount: number;
-    titleBottomPad: number;
-    automationBottomPad: number;
-    samplerBottomPad: number;
-    gridBottomPad: number;
     maxCommentRowCount: number;
     maxAutomationsCount: number;
     pluginIconSize: number;
@@ -482,6 +482,8 @@ declare class MixerDataMathUtility {
     commentsAverageFillHeight(): number;
     gridTop(): number;
     gridHeight(): number;
+    samplerHeight(): number;
+    samplerTop(): number;
 }
 declare let biChar32: String[];
 type PackedChannel = {

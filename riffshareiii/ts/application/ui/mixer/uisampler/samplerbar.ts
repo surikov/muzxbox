@@ -7,7 +7,8 @@ class SamplerBar {
 		//console.log(drum.title,barIdx,measure.skips);
 		//let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().notePathHeight;
 		//let yy = globalCommandDispatcher.cfg().gridTop() + drumIdx * globalCommandDispatcher.cfg().notePathHeight;
-		let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length + drumIdx * globalCommandDispatcher.cfg().notePathHeight * 2;
+		//let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length + drumIdx * globalCommandDispatcher.cfg().notePathHeight * 2;
+		let yy = globalCommandDispatcher.cfg().samplerTop()+ drumIdx * globalCommandDispatcher.cfg().notePathHeight * 2;
 		let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
 		let css = 'samplerDrumDotBg';
 		if (globalCommandDispatcher.cfg().data.focus) if (globalCommandDispatcher.cfg().data.focus == 1) css = 'samplerDrumDotFocused';

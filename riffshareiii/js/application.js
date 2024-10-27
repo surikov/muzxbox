@@ -1621,7 +1621,7 @@ class SamplerBar {
     constructor(barIdx, drumIdx, zoomLevel, anchor, left) {
         let drum = globalCommandDispatcher.cfg().data.percussions[drumIdx];
         let measure = drum.measures[barIdx];
-        let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length + drumIdx * globalCommandDispatcher.cfg().notePathHeight * 2;
+        let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().notePathHeight * 2;
         let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
         let css = 'samplerDrumDotBg';
         if (globalCommandDispatcher.cfg().data.focus)
@@ -2979,15 +2979,15 @@ class MixerDataMathUtility {
     constructor(data) {
         this.leftPad = 3;
         this.rightPad = 50;
-        this.bottomPad = 11;
         this.topPad = 2;
+        this.parTitleGrid = 5;
+        this.padGrid2Sampler = 5;
+        this.padSampler2Automation = 5;
+        this.padAutomation2Comments = 5;
+        this.bottomPad = 11;
         this.notePathHeight = 1;
         this.widthDurationRatio = 27;
         this.octaveCount = 10;
-        this.titleBottomPad = 5;
-        this.automationBottomPad = 1;
-        this.samplerBottomPad = 1;
-        this.gridBottomPad = 1;
         this.maxCommentRowCount = 0;
         this.maxAutomationsCount = 0;
         this.pluginIconSize = 3;
@@ -3084,10 +3084,16 @@ class MixerDataMathUtility {
         return (2 + rcount) * this.notePathHeight * 8;
     }
     gridTop() {
-        return this.topPad + this.heightOfTitle() + this.titleBottomPad;
+        return this.topPad + this.heightOfTitle() + this.parTitleGrid;
     }
     gridHeight() {
         return this.notePathHeight * this.octaveCount * 12;
+    }
+    samplerHeight() {
+        return this.data.percussions.length * this.notePathHeight;
+    }
+    samplerTop() {
+        return this.gridTop() + this.gridHeight() + this.padGrid2Sampler;
     }
 }
 let biChar32 = [];
