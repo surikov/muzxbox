@@ -1,5 +1,5 @@
 class ControlConnection {
-	addLineFlow(yy: number, ww: number, anchor: TileAnchor) {
+	addAudioStreamLineFlow(yy: number, ww: number, anchor: TileAnchor) {
 		let css = 'controlConnection';//'fanStream';
 		let sz4 = globalCommandDispatcher.cfg().pluginIconSize / 4;
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();

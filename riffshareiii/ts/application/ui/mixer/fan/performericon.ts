@@ -44,7 +44,7 @@ class PerformerIcon {
 		}
 		//console.log('PerformerIcon', rec);
 		let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
-		new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
+		new ControlConnection().addAudioStreamLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
 		new FanOutputLine().addOutputs(audioSeq.outputs, fanLevelAnchor, spearsAnchor
 			, audioSeq.id
 			, xx + globalCommandDispatcher.cfg().pluginIconSize / 2

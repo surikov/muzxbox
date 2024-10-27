@@ -30,4 +30,4 @@ let icon_hide='&#xf15b;';
 let icon_close='&#xf136;';
 let icon_refresh='&#xf1b9;';
 let icon_search='&#xf1c3;';
-let icon_splitfan='&#xf2ef;';
+let icon_splitfan='&#xf302;';

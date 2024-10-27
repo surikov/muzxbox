@@ -2337,7 +2337,7 @@ class PerformerIcon {
             fanLevelAnchor.content.push(txt);
         }
         let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
-        new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
+        new ControlConnection().addAudioStreamLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
         new FanOutputLine().addOutputs(audioSeq.outputs, fanLevelAnchor, spearsAnchor, audioSeq.id, xx + globalCommandDispatcher.cfg().pluginIconSize / 2, yy + globalCommandDispatcher.cfg().pluginIconSize / 2, zidx);
     }
 }
@@ -2410,28 +2410,34 @@ class SamplerIcon {
                 dragAnchor.content.push(txt);
             }
             if (zidx < 4) {
-                let cx = xx + globalCommandDispatcher.cfg().pluginIconSize + 2;
+                let cx = xx + globalCommandDispatcher.cfg().pluginIconSize;
                 let cy = yy + globalCommandDispatcher.cfg().pluginIconSize / 2;
-                let btnsz = 4;
+                let btnsz = 1.5;
                 if (zidx < 1) {
                     btnsz = 0.5;
                 }
                 else {
                     if (zidx < 2) {
-                        btnsz = 1;
+                        btnsz = 0.75;
                     }
                     else {
                         if (zidx < 3) {
-                            btnsz = 2;
+                            btnsz = 1;
                         }
                     }
                 }
-                let link = { x: cx - btnsz / 2, y: cy - btnsz / 2, w: btnsz, h: btnsz, rx: btnsz / 2, ry: btnsz / 2, css: 'fanPointLinker' };
+                let link = { x: cx - btnsz / 2, y: cy - btnsz / 2,
+                    w: btnsz, h: btnsz, rx: btnsz / 2, ry: btnsz / 2,
+                    css: 'fanPointLinker' };
                 dragAnchor.content.push(link);
+                let linkIcon = {
+                    x: cx, y: cy + btnsz / 5, text: icon_splitfan, css: 'fanSplitIconLabel'
+                };
+                dragAnchor.content.push(linkIcon);
             }
         }
-        new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
-        new FanOutputLine().addOutputs(sampler.outputs, fanLevelAnchor, spearsAnchor, sampler.id, xx + globalCommandDispatcher.cfg().pluginIconSize / 2, yy + globalCommandDispatcher.cfg().pluginIconSize / 2, zidx);
+        new ControlConnection().addAudioStreamLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
+        new FanOutputLine().addOutputs(sampler.outputs, fanLevelAnchor, spearsAnchor, sampler.id, xx + globalCommandDispatcher.cfg().pluginIconSize, yy + globalCommandDispatcher.cfg().pluginIconSize / 2, zidx);
     }
 }
 class FilterIcon {
@@ -2500,12 +2506,12 @@ class FilterIcon {
             fanLevelAnchor.content.push(txt);
         }
         let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
-        new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
+        new ControlConnection().addAudioStreamLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
         new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, spearsAnchor, filterTarget.id, xx + globalCommandDispatcher.cfg().pluginIconSize / 2, yy + globalCommandDispatcher.cfg().pluginIconSize / 2, zidx);
     }
 }
 class ControlConnection {
-    addLineFlow(yy, ww, anchor) {
+    addAudioStreamLineFlow(yy, ww, anchor) {
         let css = 'controlConnection';
         let sz4 = globalCommandDispatcher.cfg().pluginIconSize / 4;
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
@@ -2689,7 +2695,7 @@ let icon_hide = '&#xf15b;';
 let icon_close = '&#xf136;';
 let icon_refresh = '&#xf1b9;';
 let icon_search = '&#xf1c3;';
-let icon_splitfan = '&#xf2ef;';
+let icon_splitfan = '&#xf302;';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];

@@ -2,36 +2,50 @@
 	fill: var(--main-color);
 	font-size: var(--label-025cm);
 	pointer-events: none;
-	dominant-baseline22:middle;
-	 text-anchor:middle;
+	dominant-baseline22: middle;
+	text-anchor: middle;
 }
+
 .fanSamplerMoveIcon {
 	fill: var(--drag-color);
+
 	font-size: calc(0.25*var(--tapSize));
-	cursor:move;
+	cursor: move;
+	stroke: var(--line-color);
+	stroke-width: calc(0.125*var(--tapSize));
+	stroke-linejoin: round;
+	paint-order: stroke fill;
 }
-.fanPointLinker{
+
+.fanPointLinker {
 	fill: var(--drag-color);
-	cursor:move;
+	cursor: move;
+	stroke: var(--line-color);
+	stroke-width: calc(0.125*var(--tapSize));
+	stroke-linejoin: round;
+	paint-order: stroke fill;
 }
+
 .fanSamplerClickIcon {
 	fill: var(--click-color);
 	font-size: calc(0.25*var(--tapSize));
-	cursor:pointer;
+	cursor: pointer;
 }
+
 .fanPerformerIcon {
-	
+
 	fill: var(--line-color);
-	stroke-dasharray:15,15;
+	stroke-dasharray: 15, 15;
 	pointer-events: none;
-	
+
 }
+
 .fanFilterIcon {
-	
+
 	fill: var(--line-color);
-	stroke-dasharray:45,45;
+	stroke-dasharray: 45, 45;
 	pointer-events: none;
-	
+
 }
 
 .fanConnection {
@@ -41,6 +55,7 @@
 	stroke-linejoin: round;
 	paint-order: stroke;
 }
+
 .fanStream {
 	pointer-events: none;
 	stroke: var(--main-color);
@@ -48,8 +63,9 @@
 	stroke-linejoin: round;
 	paint-order: stroke;
 }
+
 .fanDropConnection {
-	cursor:pointer;
+	cursor: pointer;
 	stroke: var(--line-color);
 	stroke-width: 0.5cm;
 	stroke-linejoin: round;
@@ -57,9 +73,9 @@
 	fill: var(--click-color);
 }
 
-.fanDeleteIcon{
+.fanDeleteIcon {
 	fill: var(--main-color);
-    text-anchor: middle;
+	text-anchor: middle;
 	font-size: var(--icon-1cm);
 	pointer-events: none;
 	font-family: "Material-Design-Iconic-Font";
@@ -76,6 +92,7 @@
 	stroke-linejoin: round;
 	paint-order: stroke;
 }
+
 .fanSpeakerLabel {
 	fill: var(--line-color);
 	font-size: calc(4*var(--tapSize));
@@ -87,14 +104,22 @@
 	paint-order: stroke;
 }
 
-.fanSpeakerIconLabel{
+.fanSpeakerIconLabel {
 	font-size: calc(8*var(--tapSize));
 	pointer-events: none;
 	fill: var(--main-color);
 	font-family: 'Material-Design-Iconic-Font';
 }
 
-.controlConnection{
+.controlConnection {
 	fill: var(--main-color);
-	fill-opacity:25%;
+	fill-opacity: 25%;
+}
+
+.fanSplitIconLabel {
+	fill: var(--main-color);
+	font-size: var(--label-025cm);
+	pointer-events: none;
+	text-anchor: middle;
+	font-family: "Material-Design-Iconic-Font";
 }

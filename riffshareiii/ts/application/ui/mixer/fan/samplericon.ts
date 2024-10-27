@@ -75,9 +75,9 @@ class SamplerIcon {
 
 			}
 			if (zidx < 4) {
-				let cx = xx + globalCommandDispatcher.cfg().pluginIconSize + 2;
+				let cx = xx + globalCommandDispatcher.cfg().pluginIconSize;
 				let cy = yy + globalCommandDispatcher.cfg().pluginIconSize/2 ;
-				let btnsz = 4;
+				let btnsz = 1.5;
 
 				//let left = xx + globalCommandDispatcher.cfg().pluginIconSize;
 				//let top = yy + globalCommandDispatcher.cfg().pluginIconSize / 4;
@@ -86,23 +86,28 @@ class SamplerIcon {
 					btnsz = 0.5;
 				} else {
 					if (zidx < 2) {
-						btnsz = 1;
+						btnsz = 0.75;
 					} else {
 						if (zidx < 3) {
-							btnsz = 2;
+							btnsz = 1;
 						}
 					}
 				}
-				let link: TileRectangle = { x: cx - btnsz / 2, y: cy - btnsz / 2, w: btnsz, h: btnsz, rx: btnsz / 2, ry: btnsz / 2, css: 'fanPointLinker' };
+				let link: TileRectangle = { x: cx - btnsz / 2, y: cy - btnsz / 2
+					, w: btnsz, h: btnsz, rx: btnsz / 2, ry: btnsz / 2
+					, css: 'fanPointLinker' };
 				dragAnchor.content.push(link);
-
+				let linkIcon:TileText={
+					x: cx , y: cy + btnsz / 5,text:icon_splitfan, css: 'fanSplitIconLabel'
+				};
+				dragAnchor.content.push(linkIcon);
 			}
 		}
-		new ControlConnection().addLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
+		new ControlConnection().addAudioStreamLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
 		new FanOutputLine().addOutputs(sampler.outputs, fanLevelAnchor, spearsAnchor
 			, sampler.id
-			, xx + globalCommandDispatcher.cfg().pluginIconSize / 2
-			, yy + globalCommandDispatcher.cfg().pluginIconSize / 2
+			, xx + globalCommandDispatcher.cfg().pluginIconSize
+			, yy + globalCommandDispatcher.cfg().pluginIconSize /2
 			, zidx
 		);
 	}
