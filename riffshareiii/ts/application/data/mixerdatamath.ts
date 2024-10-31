@@ -12,7 +12,10 @@ class MixerDataMathUtility {
 	bottomPad = 11;
 	
 
-	notePathHeight = 1;
+	notePathHeight = 1.5;
+	samplerDotHeight = 3;
+	autoPointHeight=4;
+
 	widthDurationRatio = 27;
 	octaveCount = 10;
 
@@ -111,8 +114,8 @@ class MixerDataMathUtility {
 		/*return this.commentsTop()
 			+ this.commentsMaxHeight()
 			+ this.bottomPad;*/
-		return this.gridTop()
-			+ this.gridHeight()
+		return this.samplerTop()
+			+ this.samplerHeight()
 			+ this.bottomPad
 
 			;
@@ -153,7 +156,7 @@ class MixerDataMathUtility {
 
 	
 	samplerHeight(): number {
-		return this.data.percussions.length * this.notePathHeight;
+		return this.data.percussions.length * this.samplerDotHeight;
 	}
 	samplerTop(): number {
 		return this.gridTop() + this.gridHeight() + this.padGrid2Sampler;

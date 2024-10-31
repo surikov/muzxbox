@@ -10,9 +10,9 @@ class OctaveContent {
 		, zoomLevel: number) {
 		if (zoomLevel < 8) {
 			//if (globalCommandDispatcher.cfg().data.focus) {
-				//
+			//
 			//} else {
-				this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, zoomLevel);
+			this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, zoomLevel);
 			//}
 			if (zoomLevel < 7) {
 
@@ -29,18 +29,18 @@ class OctaveContent {
 		, zoomLevel: number
 	) {
 		if (globalCommandDispatcher.cfg().data.tracks.length) {
-			let css='mixNoteLine';
-			if (globalCommandDispatcher.cfg().data.focus) {
-				css='mixNoteSub';
-				}
+			let css = 'mixNoteLine';
+			//if (globalCommandDispatcher.cfg().data.focus) {
+			//	css = 'mixNoteSub';
+			//}
 			if (zoomLevel == 0) {
 				this.addTrackNotes(globalCommandDispatcher.cfg().data.tracks[0], barIdx, octaveIdx
-				, left, top, width, height, barOctaveAnchor
+					, left, top, width, height, barOctaveAnchor
 					, css//, true
 				);
 			} else {
 				this.addTrackNotes(globalCommandDispatcher.cfg().data.tracks[0], barIdx, octaveIdx
-				, left, top, width, height, barOctaveAnchor
+					, left, top, width, height, barOctaveAnchor
 					, css//, false
 				);
 			}

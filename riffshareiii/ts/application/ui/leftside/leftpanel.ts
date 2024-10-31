@@ -119,7 +119,9 @@ class LeftPanel {
 					let samplerLabel: TileText = {
 						text: '' + globalCommandDispatcher.cfg().data.percussions[ss].title
 						, x: 0
-						, y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length + 2 * globalCommandDispatcher.cfg().notePathHeight * ss + 2 * globalCommandDispatcher.cfg().notePathHeight
+						, y: globalCommandDispatcher.cfg().samplerTop()
+							+ globalCommandDispatcher.cfg().samplerDotHeight * (1 + ss)
+							- globalCommandDispatcher.cfg().samplerDotHeight * 0.3
 						, css: 'samplerRowLabel' + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(samplerLabel);
@@ -134,7 +136,7 @@ class LeftPanel {
 						let autoLabel: TileText = {
 							text: '' + filter.automation.title
 							, x: 0
-							, y: (globalCommandDispatcher.cfg().gridTop()+yy+1) * globalCommandDispatcher.cfg().notePathHeight
+							, y: (globalCommandDispatcher.cfg().gridTop() + yy + 1) * globalCommandDispatcher.cfg().notePathHeight
 							, css: 'autoRowLabel' + zoomPrefixLevelsCSS[zz].prefix
 						};
 						this.leftZoomAnchors[zz].content.push(autoLabel);

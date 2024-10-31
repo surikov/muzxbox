@@ -1,6 +1,7 @@
 class SamplerBar {
 	constructor(//data: Zvoog_Project
-		 barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number) {
+		barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number) {
+		let ww =  globalCommandDispatcher.cfg().samplerDotHeight * (1 + zoomLevel/3)/2;
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		let drum: Zvoog_PercussionTrack = globalCommandDispatcher.cfg().data.percussions[drumIdx];
 		let measure: Zvoog_PercussionMeasure = drum.measures[barIdx];
@@ -8,10 +9,10 @@ class SamplerBar {
 		//let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().notePathHeight;
 		//let yy = globalCommandDispatcher.cfg().gridTop() + drumIdx * globalCommandDispatcher.cfg().notePathHeight;
 		//let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length + drumIdx * globalCommandDispatcher.cfg().notePathHeight * 2;
-		let yy = globalCommandDispatcher.cfg().samplerTop()+ drumIdx * globalCommandDispatcher.cfg().notePathHeight * 2;
+		let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().samplerDotHeight;
 		let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
 		let css = 'samplerDrumDotBg';
-		if (globalCommandDispatcher.cfg().data.focus) if (globalCommandDispatcher.cfg().data.focus == 1) css = 'samplerDrumDotFocused';
+		//if (globalCommandDispatcher.cfg().data.focus) if (globalCommandDispatcher.cfg().data.focus == 1) css = 'samplerDrumDotFocused';
 		for (let ss = 0; ss < measure.skips.length; ss++) {
 			let skip: Zvoog_Metre = measure.skips[ss];
 			let xx = left + MMUtil().set(skip).duration(tempo) * globalCommandDispatcher.cfg().widthDurationRatio
@@ -28,10 +29,14 @@ class SamplerBar {
 						anchor.content.push(dot);
 						*/
 
+
+			//console.log(zoomLevel, ww, xx);
+
 			let ply: TilePolygon = {
-				dots: [xx, yy + 0.025
-					, xx, yy + 2 - 0.025
-					, xx + 1.5, yy + 1
+				//id:''+ww+'x'+zoomLevel+'x'+Math.random(),
+				dots: [xx, yy
+					, xx, yy + globalCommandDispatcher.cfg().samplerDotHeight
+					, xx + ww, yy + globalCommandDispatcher.cfg().samplerDotHeight / 2
 				]
 				, css: css
 			};

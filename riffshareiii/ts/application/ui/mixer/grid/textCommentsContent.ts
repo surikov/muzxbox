@@ -65,11 +65,11 @@ class TextComments {
 			if (zIndex > 3) txtZoomRatio = 4;
 			if (zIndex > 4) txtZoomRatio = 8;
 			let css= 'commentReadText' + zoomPrefixLevelsCSS[zIndex].prefix;
-			if(globalCommandDispatcher.cfg().data.focus){
-				if(globalCommandDispatcher.cfg().data.focus==3){
+			//if(globalCommandDispatcher.cfg().data.focus){
+			//	if(globalCommandDispatcher.cfg().data.focus==3){
 					css= 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix;
-				}
-			}
+			//	}
+			//}
 			for (let ii = 0; ii < globalCommandDispatcher.cfg().data.comments[barIdx].points.length; ii++) {
 				let itxt = globalCommandDispatcher.cfg().data.comments[barIdx].points[ii];
 				let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;

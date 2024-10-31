@@ -352,7 +352,6 @@ class CommandDispatcher {
     }
     upTracksLayer() {
         console.log('upTracksLayer');
-        this.cfg().data.focus = 0;
         this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
         if (this.cfg().data.tracks)
             if (this.cfg().data.tracks[0])
@@ -361,19 +360,16 @@ class CommandDispatcher {
     }
     upDrumsLayer() {
         console.log('upDrumsLayer');
-        this.cfg().data.focus = 1;
         this.renderer.menu.layerCurrentTitle.text = LO(localMenuPercussionFolder);
         this.resetProject();
     }
     upAutoLayer() {
         console.log('upAutoayer');
-        this.cfg().data.focus = 2;
         this.renderer.menu.layerCurrentTitle.text = LO(localMenuAutomationFolder);
         this.resetProject();
     }
     upCommentsLayer() {
         console.log('upCommentsLayer');
-        this.cfg().data.focus = 3;
         this.renderer.menu.layerCurrentTitle.text = LO(localMenuCommentsLayer);
         this.resetProject();
     }
@@ -1592,7 +1588,9 @@ class LeftPanel {
                     let samplerLabel = {
                         text: '' + globalCommandDispatcher.cfg().data.percussions[ss].title,
                         x: 0,
-                        y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length + 2 * globalCommandDispatcher.cfg().notePathHeight * ss + 2 * globalCommandDispatcher.cfg().notePathHeight,
+                        y: globalCommandDispatcher.cfg().samplerTop()
+                            + globalCommandDispatcher.cfg().samplerDotHeight * (1 + ss)
+                            - globalCommandDispatcher.cfg().samplerDotHeight * 0.3,
                         css: 'samplerRowLabel' + zoomPrefixLevelsCSS[zz].prefix
                     };
                     this.leftZoomAnchors[zz].content.push(samplerLabel);
@@ -1619,21 +1617,19 @@ class LeftPanel {
 }
 class SamplerBar {
     constructor(barIdx, drumIdx, zoomLevel, anchor, left) {
+        let ww = globalCommandDispatcher.cfg().samplerDotHeight * (1 + zoomLevel / 3) / 2;
         let drum = globalCommandDispatcher.cfg().data.percussions[drumIdx];
         let measure = drum.measures[barIdx];
-        let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().notePathHeight * 2;
+        let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().samplerDotHeight;
         let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
         let css = 'samplerDrumDotBg';
-        if (globalCommandDispatcher.cfg().data.focus)
-            if (globalCommandDispatcher.cfg().data.focus == 1)
-                css = 'samplerDrumDotFocused';
         for (let ss = 0; ss < measure.skips.length; ss++) {
             let skip = measure.skips[ss];
             let xx = left + MMUtil().set(skip).duration(tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
             let ply = {
-                dots: [xx, yy + 0.025,
-                    xx, yy + 2 - 0.025,
-                    xx + 1.5, yy + 1
+                dots: [xx, yy,
+                    xx, yy + globalCommandDispatcher.cfg().samplerDotHeight,
+                    xx + ww, yy + globalCommandDispatcher.cfg().samplerDotHeight / 2
                 ],
                 css: css
             };
@@ -1658,9 +1654,6 @@ class OctaveContent {
     addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel) {
         if (globalCommandDispatcher.cfg().data.tracks.length) {
             let css = 'mixNoteLine';
-            if (globalCommandDispatcher.cfg().data.focus) {
-                css = 'mixNoteSub';
-            }
             if (zoomLevel == 0) {
                 this.addTrackNotes(globalCommandDispatcher.cfg().data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, css);
             }
@@ -1786,16 +1779,20 @@ class MixerBar {
         let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
         let lineCount = 0;
         let skip = MMUtil().set({ count: 0, part: 1 });
-        let top = globalCommandDispatcher.cfg().gridTop();
-        let height = globalCommandDispatcher.cfg().gridHeight();
-        let barRightBorder = {
+        barOctaveAnchor.content.push({
             x: barLeft + width,
-            y: top,
+            y: globalCommandDispatcher.cfg().gridTop(),
             w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
-            h: height,
+            h: globalCommandDispatcher.cfg().gridHeight(),
             css: 'barRightBorder'
-        };
-        barOctaveAnchor.content.push(barRightBorder);
+        });
+        barOctaveAnchor.content.push({
+            x: barLeft + width,
+            y: globalCommandDispatcher.cfg().samplerTop(),
+            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
+            h: globalCommandDispatcher.cfg().samplerHeight(),
+            css: 'barRightBorder'
+        });
         if (zoomInfo.gridLines.length > 0) {
             let css = 'stepPartDelimiter';
             if (zIndex < 3) {
@@ -1808,14 +1805,20 @@ class MixerBar {
                     break;
                 }
                 let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-                let mark = {
+                barOctaveAnchor.content.push({
                     x: xx,
-                    y: top,
+                    y: globalCommandDispatcher.cfg().gridTop(),
                     w: line.ratio * zoomInfo.minZoom / 2,
-                    h: height,
+                    h: globalCommandDispatcher.cfg().gridHeight(),
                     css: css
-                };
-                barOctaveAnchor.content.push(mark);
+                });
+                barOctaveAnchor.content.push({
+                    x: xx,
+                    y: globalCommandDispatcher.cfg().samplerTop(),
+                    w: line.ratio * zoomInfo.minZoom / 2,
+                    h: globalCommandDispatcher.cfg().samplerHeight(),
+                    css: css
+                });
                 lineCount++;
                 if (lineCount >= zoomInfo.gridLines.length) {
                     lineCount = 0;
@@ -1837,11 +1840,7 @@ class TextComments {
             if (zIndex > 4)
                 txtZoomRatio = 8;
             let css = 'commentReadText' + zoomPrefixLevelsCSS[zIndex].prefix;
-            if (globalCommandDispatcher.cfg().data.focus) {
-                if (globalCommandDispatcher.cfg().data.focus == 3) {
-                    css = 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix;
-                }
-            }
+            css = 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix;
             for (let ii = 0; ii < globalCommandDispatcher.cfg().data.comments[barIdx].points.length; ii++) {
                 let itxt = globalCommandDispatcher.cfg().data.comments[barIdx].points[ii];
                 let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
@@ -1864,9 +1863,6 @@ class AutomationBarContent {
         let top = globalCommandDispatcher.cfg().gridTop();
         let height = globalCommandDispatcher.cfg().automationMaxHeight();
         let css = 'automationBgDot';
-        if (globalCommandDispatcher.cfg().data.focus)
-            if (globalCommandDispatcher.cfg().data.focus == 2)
-                css = 'automationFocusedDot';
         let yy = 0;
         for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
             let filter = globalCommandDispatcher.cfg().data.filters[ff];
@@ -1979,28 +1975,7 @@ class MixerUI {
         let countFunction;
         let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 8;
         let hh = globalCommandDispatcher.cfg().gridHeight() * 6 / 8;
-        if (globalCommandDispatcher.cfg().data.focus) {
-            if (globalCommandDispatcher.cfg().data.focus == 1) {
-                countFunction = this.barDrumCount;
-                yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length;
-                hh = 2 * globalCommandDispatcher.cfg().data.percussions.length;
-            }
-            else {
-                if (globalCommandDispatcher.cfg().data.focus == 2) {
-                    countFunction = this.barAutoCount;
-                    yy = globalCommandDispatcher.cfg().gridTop();
-                    hh = globalCommandDispatcher.cfg().maxAutomationsCount;
-                }
-                else {
-                    countFunction = this.barCommentsCount;
-                    yy = globalCommandDispatcher.cfg().gridTop();
-                    hh = globalCommandDispatcher.cfg().commentsMaxHeight();
-                }
-            }
-        }
-        else {
-            countFunction = this.barTrackCount;
-        }
+        countFunction = this.barTrackCount;
         let mxItems = 0;
         for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
             let itemcount = countFunction(bb);
@@ -2030,22 +2005,6 @@ class MixerUI {
     reFillWholeRatio() {
         let yy = globalCommandDispatcher.cfg().gridTop();
         let hh = globalCommandDispatcher.cfg().gridHeight() / 8;
-        if (globalCommandDispatcher.cfg().data.focus) {
-            if (globalCommandDispatcher.cfg().data.focus == 1) {
-                yy = globalCommandDispatcher.cfg().gridTop();
-                hh = globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length;
-            }
-            else {
-                if (globalCommandDispatcher.cfg().data.focus == 2) {
-                    yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().maxAutomationsCount;
-                    hh = globalCommandDispatcher.cfg().gridHeight() - globalCommandDispatcher.cfg().maxAutomationsCount;
-                }
-                else {
-                    yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().commentsMaxHeight();
-                    hh = globalCommandDispatcher.cfg().gridHeight() - globalCommandDispatcher.cfg().commentsMaxHeight();
-                }
-            }
-        }
         let countFunction = (barIdx) => {
             return this.barDrumCount(barIdx) + this.barAutoCount(barIdx)
                 + this.barCommentsCount(barIdx) + this.barTrackCount(barIdx);
@@ -2073,17 +2032,13 @@ class MixerUI {
                 css: css
             };
             this.fillerAnchor.content.push(fillRectangle);
-            if (globalCommandDispatcher.cfg().data.focus) {
-            }
-            else {
-                this.fillerAnchor.content.push({
-                    x: globalCommandDispatcher.cfg().leftPad + barX,
-                    y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() * 7 / 8,
-                    w: barwidth,
-                    h: hh,
-                    css: css
-                });
-            }
+            this.fillerAnchor.content.push({
+                x: globalCommandDispatcher.cfg().leftPad + barX,
+                y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() * 7 / 8,
+                w: barwidth,
+                h: hh,
+                css: css
+            });
             barX = barX + barwidth;
         }
     }
@@ -2196,42 +2151,24 @@ class MixerZoomLevel {
                 }
                 if (this.zoomLevelIndex < 3) {
                     for (let kk = 1; kk < 12; kk++) {
-                        let need = false;
-                        if (globalCommandDispatcher.cfg().data.focus) {
-                            if (globalCommandDispatcher.cfg().data.focus == 1) {
-                                if (oo * 12 + kk > 12 * globalCommandDispatcher.cfg().octaveCount - globalCommandDispatcher.cfg().data.percussions.length * 2 - 2) {
-                                    if (!((oo * 12 + kk) % 2)) {
-                                        need = true;
-                                    }
-                                }
-                            }
-                            else {
-                                if (globalCommandDispatcher.cfg().data.focus == 2) {
-                                    if (oo * 12 + kk <= globalCommandDispatcher.cfg().maxAutomationsCount) {
-                                        need = true;
-                                    }
-                                }
-                                else {
-                                    if (oo * 12 + kk < 2 + globalCommandDispatcher.cfg().maxCommentRowCount) {
-                                        need = true;
-                                    }
-                                }
-                            }
-                        }
-                        else {
-                            need = true;
-                        }
-                        if (need) {
-                            barOctaveAnchor.content.push({
-                                x: globalCommandDispatcher.cfg().leftPad,
-                                y: globalCommandDispatcher.cfg().gridTop() + (oo * 12 + kk) * globalCommandDispatcher.cfg().notePathHeight,
-                                w: globalCommandDispatcher.cfg().timelineWidth(),
-                                h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
-                                css: 'interActiveGridLine'
-                            });
-                        }
+                        barOctaveAnchor.content.push({
+                            x: globalCommandDispatcher.cfg().leftPad,
+                            y: globalCommandDispatcher.cfg().gridTop() + (oo * 12 + kk) * globalCommandDispatcher.cfg().notePathHeight,
+                            w: globalCommandDispatcher.cfg().timelineWidth(),
+                            h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
+                            css: 'interActiveGridLine'
+                        });
                     }
                 }
+            }
+            for (let pp = 1; pp < globalCommandDispatcher.cfg().data.percussions.length; pp++) {
+                barOctaveAnchor.content.push({
+                    x: globalCommandDispatcher.cfg().leftPad,
+                    y: globalCommandDispatcher.cfg().samplerTop() + pp * globalCommandDispatcher.cfg().samplerDotHeight,
+                    w: globalCommandDispatcher.cfg().timelineWidth(),
+                    h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 16.0,
+                    css: 'interActiveGridLine'
+                });
             }
         }
     }
@@ -2985,7 +2922,9 @@ class MixerDataMathUtility {
         this.padSampler2Automation = 5;
         this.padAutomation2Comments = 5;
         this.bottomPad = 11;
-        this.notePathHeight = 1;
+        this.notePathHeight = 1.5;
+        this.samplerDotHeight = 3;
+        this.autoPointHeight = 4;
         this.widthDurationRatio = 27;
         this.octaveCount = 10;
         this.maxCommentRowCount = 0;
@@ -3066,8 +3005,8 @@ class MixerDataMathUtility {
         return ww;
     }
     wholeHeight() {
-        return this.gridTop()
-            + this.gridHeight()
+        return this.samplerTop()
+            + this.samplerHeight()
             + this.bottomPad;
     }
     automationMaxHeight() {
@@ -3090,7 +3029,7 @@ class MixerDataMathUtility {
         return this.notePathHeight * this.octaveCount * 12;
     }
     samplerHeight() {
-        return this.data.percussions.length * this.notePathHeight;
+        return this.data.percussions.length * this.samplerDotHeight;
     }
     samplerTop() {
         return this.gridTop() + this.gridHeight() + this.padGrid2Sampler;

@@ -124,7 +124,7 @@ type Zvoog_Project = {
 	comments: Zvoog_CommentMeasure[];
 	filters: Zvoog_FilterTarget[];
 	selection?: Zvoog_Selection;
-	focus?: 0 | 1 | 2 | 3;//track/drum/auto/comment
+	//focus?: 0 | 1 | 2 | 3;//track/drum/auto/comment
 	position?: {
 		x: number;
 		y: number;

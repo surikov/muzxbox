@@ -44,7 +44,7 @@ class MixerZoomLevel {
 				, barGridAnchor
 				, barTracksAnchor
 				, barFirstAnchor
-				);
+			);
 			this.bars.push(mixBar);
 			left = left + width;
 		}
@@ -106,21 +106,21 @@ class MixerZoomLevel {
 				if (this.zoomLevelIndex < 3) {
 					for (let kk = 1; kk < 12; kk++) {
 						//let yy = globalCommandDispatcher.cfg().gridTop() + (oo * 12 + kk) * globalCommandDispatcher.cfg().notePathHeight;
-						let need = false;
+						/*let need = false;
 						if (globalCommandDispatcher.cfg().data.focus) {
 							if (globalCommandDispatcher.cfg().data.focus == 1) {
-								if (oo * 12 + kk > 12 * globalCommandDispatcher.cfg().octaveCount - globalCommandDispatcher.cfg().data.percussions.length * 2-2) {
+								if (oo * 12 + kk > 12 * globalCommandDispatcher.cfg().octaveCount - globalCommandDispatcher.cfg().data.percussions.length * 2 - 2) {
 									if (!((oo * 12 + kk) % 2)) {
 										need = true;
 									}
 								}
 							} else {
 								if (globalCommandDispatcher.cfg().data.focus == 2) {
-									if (oo * 12 + kk <= globalCommandDispatcher.cfg().maxAutomationsCount ) {
+									if (oo * 12 + kk <= globalCommandDispatcher.cfg().maxAutomationsCount) {
 										need = true;
 									}
 								} else {
-									if (oo * 12 + kk < 2+globalCommandDispatcher.cfg().maxCommentRowCount ) {
+									if (oo * 12 + kk < 2 + globalCommandDispatcher.cfg().maxCommentRowCount) {
 										need = true;
 									}
 								}
@@ -128,7 +128,7 @@ class MixerZoomLevel {
 						} else {
 							need = true;
 						}
-						if (need) {
+						if (need) {*/
 							barOctaveAnchor.content.push({
 								x: globalCommandDispatcher.cfg().leftPad
 								, y: globalCommandDispatcher.cfg().gridTop() + (oo * 12 + kk) * globalCommandDispatcher.cfg().notePathHeight
@@ -136,9 +136,18 @@ class MixerZoomLevel {
 								, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
 								, css: 'interActiveGridLine'
 							});
-						}
+						//}
 					}
 				}
+			}
+			for (let pp = 1; pp < globalCommandDispatcher.cfg().data.percussions.length; pp++) {
+				barOctaveAnchor.content.push({
+					x: globalCommandDispatcher.cfg().leftPad
+					, y: globalCommandDispatcher.cfg().samplerTop() + pp * globalCommandDispatcher.cfg().samplerDotHeight
+					, w: globalCommandDispatcher.cfg().timelineWidth()
+					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 16.0
+					, css: 'interActiveGridLine'
+				});
 			}
 		}
 	}

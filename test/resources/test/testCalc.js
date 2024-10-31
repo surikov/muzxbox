@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.138 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.139 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -885,8 +885,8 @@ function dumpTriads(svg, rows) {
     }
     //console.log('blueStat', blueStat);
     //console.log('redStat', redStat);
-    dumpColorStat();
-    //dumpStat2();
+    //dumpColorStat();
+    //dumpStat3();
 }
 function roundDown(num, base) {
     return Math.floor(num / base) * base;
@@ -1518,7 +1518,55 @@ function dumpHoleStat(){
     countHoles(datarows,23);
 }
 */
+function dumpMoreEquals(hi, cur, p1, p2) {
+    var ratio = 2;
+    if (p2 > p1 * ratio && p2 == hi) {
+        if (cur >= p1) {
+            return +1;
+        }
+        else {
+            return -1;
+        }
+    }
+    return 0;
+}
+function dumpHill(hi) {
+    var moreequal = 0;
+    var less = 0;
+    for (var ii = 1; ii < datarows.length - 3; ii++) {
+        var cur = datarows[ii + 0].balls[0];
+        var p1 = datarows[ii + 1].balls[0];
+        var p2 = datarows[ii + 2].balls[0];
+        var rr = dumpMoreEquals(hi, cur, p1, p2);
+        if (rr == 0) {
+            //
+        }
+        else {
+            if (rr > 0) {
+                moreequal++;
+            }
+            else {
+                less++;
+            }
+            //console.log(hi,':',cur,p1,p2);
+        }
+    }
+    console.log('-_' + hi + '_', moreequal, less, moreequal / less);
+}
+function dumpStat3() {
+    console.log('dumpStat3', datarows);
+    var counts = [];
+    for (var ii = 1; ii < datarows.length - 3; ii++) {
+        var idx = datarows[ii].balls[0];
+        counts[idx] = (counts[idx]) ? counts[idx] : 0;
+        counts[idx]++;
+    }
+    console.log('counts', counts);
+    for (var kk = 3; kk < 33; kk++) {
+        dumpHill(kk);
+    }
+}
 init();
 addTails();
-//dumpStat5();
+dumpStat3();
 //dumpHoleStat();

@@ -141,7 +141,7 @@ class MixerUI {
 		let countFunction: (barIdx: number) => number;
 		let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 8;
 		let hh = globalCommandDispatcher.cfg().gridHeight() * 6 / 8;
-		if (globalCommandDispatcher.cfg().data.focus) {
+		/*if (globalCommandDispatcher.cfg().data.focus) {
 			if (globalCommandDispatcher.cfg().data.focus == 1) {
 				countFunction = this.barDrumCount;
 				yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length;
@@ -159,7 +159,8 @@ class MixerUI {
 			}
 		} else {
 			countFunction = this.barTrackCount;
-		}
+		}*/
+		countFunction = this.barTrackCount;
 		let mxItems = 0;
 		for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
 			let itemcount = countFunction(bb);
@@ -189,7 +190,7 @@ class MixerUI {
 
 		let yy = globalCommandDispatcher.cfg().gridTop();
 		let hh = globalCommandDispatcher.cfg().gridHeight() / 8;
-		if (globalCommandDispatcher.cfg().data.focus) {
+		/*if (globalCommandDispatcher.cfg().data.focus) {
 			if (globalCommandDispatcher.cfg().data.focus == 1) {
 				yy = globalCommandDispatcher.cfg().gridTop();
 				hh = globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length;
@@ -202,7 +203,7 @@ class MixerUI {
 					hh = globalCommandDispatcher.cfg().gridHeight() - globalCommandDispatcher.cfg().commentsMaxHeight();
 				}
 			}
-		}
+		}*/
 		let countFunction: (barIdx: number) => number = (barIdx: number) => {
 			return this.barDrumCount(barIdx) + this.barAutoCount(barIdx)
 				+ this.barCommentsCount(barIdx) + this.barTrackCount(barIdx);
@@ -229,9 +230,9 @@ class MixerUI {
 				, css: css
 			};
 			this.fillerAnchor.content.push(fillRectangle);
-			if (globalCommandDispatcher.cfg().data.focus) {
+			//if (globalCommandDispatcher.cfg().data.focus) {
 				//
-			} else {
+			//} else {
 				this.fillerAnchor.content.push({
 					x: globalCommandDispatcher.cfg().leftPad + barX
 					, y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() * 7 / 8
@@ -239,7 +240,7 @@ class MixerUI {
 					, h: hh//globalCommandDispatcher.cfg().gridHeight()
 					, css: css
 				});
-			}
+			//}
 
 			barX = barX + barwidth;
 		}
