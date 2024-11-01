@@ -1243,6 +1243,23 @@ function addTails() {
     //}
     //console.log(sortedBlue);
     resetNumbs();
+    /*
+    dumpStat123('blue',blueStat);
+    dumpStat123('green',greenStat);
+    dumpStat123('grey',greyStat);
+    dumpStat123('red',redStat);
+    */
+}
+function dumpStat123(label, stat) {
+    var absLeft = 0;
+    var absRight = 0;
+    for (var kk = 1; kk < stat.length - 1; kk++) {
+        absLeft = absLeft + Math.abs(stat[kk + 0].right - stat[kk + 1].right);
+    }
+    for (var kk = 1; kk < stat.length - 1; kk++) {
+        absRight = absRight + Math.abs(stat[kk + 0].left - stat[kk + 1].left);
+    }
+    console.log(label, absLeft / stat.length, absRight / stat.length);
 }
 /*
 function drawTestLinesRight(data: { ball: number, color: string }[]) {
@@ -1518,55 +1535,46 @@ function dumpHoleStat(){
     countHoles(datarows,23);
 }
 */
-function dumpMoreEquals(hi, cur, p1, p2) {
-    var ratio = 2;
-    if (p2 > p1 * ratio && p2 == hi) {
-        if (cur >= p1) {
-            return +1;
-        }
-        else {
-            return -1;
-        }
-    }
-    return 0;
-}
-function dumpHill(hi) {
-    var moreequal = 0;
-    var less = 0;
-    for (var ii = 1; ii < datarows.length - 3; ii++) {
-        var cur = datarows[ii + 0].balls[0];
-        var p1 = datarows[ii + 1].balls[0];
-        var p2 = datarows[ii + 2].balls[0];
-        var rr = dumpMoreEquals(hi, cur, p1, p2);
-        if (rr == 0) {
-            //
-        }
-        else {
-            if (rr > 0) {
+/*
+function dumpHill(target:number,lft:number,mid:number,rt:number){
+    let moreequal=0;
+    let less=0;
+    for (let ii = 1; ii < datarows.length - 4; ii++) {
+        let cur=datarows[ii+0].balls[0];
+        let p1=datarows[ii+1].balls[0];
+        let p2=datarows[ii+2].balls[0];
+        let p3=datarows[ii+3].balls[0];
+        let p4=datarows[ii+4].balls[0];
+        if((p1<=lft && p2>=mid && p3<=rt)||(p1<=lft && p2>=mid && p3>=mid && p4<=rt)){
+            if(cur>=target){
                 moreequal++;
-            }
-            else {
+            }else{
                 less++;
             }
-            //console.log(hi,':',cur,p1,p2);
+            //console.log(cur,':',p1,p2,p3);
         }
     }
-    console.log('-_' + hi + '_', moreequal, less, moreequal / less);
+    console.log(target,':',lft,mid,rt,'=', moreequal,less, moreequal/less);
 }
 function dumpStat3() {
     console.log('dumpStat3', datarows);
-    var counts = [];
-    for (var ii = 1; ii < datarows.length - 3; ii++) {
-        var idx = datarows[ii].balls[0];
+    let counts: number[] = [];
+    for (let ii = 1; ii < datarows.length - 3; ii++) {
+        let idx = datarows[ii].balls[0];
         counts[idx] = (counts[idx]) ? counts[idx] : 0;
         counts[idx]++;
     }
-    console.log('counts', counts);
-    for (var kk = 3; kk < 33; kk++) {
-        dumpHill(kk);
+    //console.log('counts', counts);
+    for(let ii=0;ii<counts.length;ii++){
+        console.log(ii,counts[ii],counts[ii]/datarows.length);
     }
+    for(let kk=1;kk<10;kk++){
+        dumpHill(kk,6,11,6);
+    }
+    
 }
+*/
 init();
 addTails();
-dumpStat3();
+//dumpStat3();
 //dumpHoleStat();
