@@ -1671,8 +1671,36 @@ function dumpStat3() {
 	
 }
 */
+type Stat22 = {
+	bl: number;
+	cnt:number;
+	nxt:Stat22[];
+};
+function dumpStat22(){
+	console.log('dumpStat22');
+	let counts: Stat22[] = [];
+	for (let ii = 1; ii < datarows.length - 3; ii++) {
+		let p0=Math.floor(datarows[ii+0].balls[0]/4)*4;
+		let p1=Math.floor(datarows[ii+1].balls[0]/4)*4;
+		let p2=Math.floor(datarows[ii+2].balls[0]/4)*4;
+		if(!(counts[p0])){
+			counts[p0]={bl:p0,cnt:0,nxt:[]};
+		}
+		counts[p0].cnt++;
+		if(!(counts[p0].nxt[p1])){
+			counts[p0].nxt[p1]={bl:p1,cnt:0,nxt:[]};
+		}
+		counts[p0].nxt[p1].cnt++;
+		if(!(counts[p0].nxt[p1].nxt[p2])){
+			counts[p0].nxt[p1].nxt[p2]={bl:p2,cnt:0,nxt:[]};
+		}
+		counts[p0].nxt[p1].nxt[p2].cnt++;
+	}
+	console.log(counts);
+}
 init();
 addTails();
+dumpStat22();
 //dumpStat3();
 //dumpHoleStat();
 
