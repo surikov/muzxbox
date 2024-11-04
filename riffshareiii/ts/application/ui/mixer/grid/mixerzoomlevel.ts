@@ -140,13 +140,14 @@ class MixerZoomLevel {
 					}
 				}
 			}
+			
 			for (let pp = 1; pp < globalCommandDispatcher.cfg().data.percussions.length; pp++) {
 				barOctaveAnchor.content.push({
 					x: globalCommandDispatcher.cfg().leftPad
 					, y: globalCommandDispatcher.cfg().samplerTop() + pp * globalCommandDispatcher.cfg().samplerDotHeight
 					, w: globalCommandDispatcher.cfg().timelineWidth()
-					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 16.0
-					, css: 'interActiveGridLine'
+					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 2.0
+					, css: 'octaveBottomBorder'
 				});
 			}
 		}

@@ -1916,8 +1916,8 @@ class MixerUI {
         this.fillerAnchor.ww = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().rightPad;
         this.fillerAnchor.hh = globalCommandDispatcher.cfg().gridHeight();
         this.fillerAnchor.content = [];
-        this.reFillWholeRatio();
-        this.reFillSingleRatio();
+        this.reFillSingleRatio(globalCommandDispatcher.cfg().samplerTop(), globalCommandDispatcher.cfg().samplerHeight(), this.barDrumCount);
+        this.reFillSingleRatio(globalCommandDispatcher.cfg().gridTop(), globalCommandDispatcher.cfg().gridHeight(), this.barTrackCount);
     }
     createMixerLayers() {
         let tracksLayerZoom = document.getElementById('tracksLayerZoom');
@@ -1971,11 +1971,7 @@ class MixerUI {
         this.gridLayers.anchors.push(this.fillerAnchor);
         return [this.gridLayers, this.trackLayers, this.firstLayers, this.fanLayer, this.spearsLayer];
     }
-    reFillSingleRatio() {
-        let countFunction;
-        let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 8;
-        let hh = globalCommandDispatcher.cfg().gridHeight() * 6 / 8;
-        countFunction = this.barTrackCount;
+    reFillSingleRatio(yy, hh, countFunction) {
         let mxItems = 0;
         for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
             let itemcount = countFunction(bb);
@@ -2002,7 +1998,7 @@ class MixerUI {
             barX = barX + barwidth;
         }
     }
-    reFillWholeRatio() {
+    __reFillWholeRatio() {
         let yy = globalCommandDispatcher.cfg().gridTop();
         let hh = globalCommandDispatcher.cfg().gridHeight() / 8;
         let countFunction = (barIdx) => {
@@ -2166,8 +2162,8 @@ class MixerZoomLevel {
                     x: globalCommandDispatcher.cfg().leftPad,
                     y: globalCommandDispatcher.cfg().samplerTop() + pp * globalCommandDispatcher.cfg().samplerDotHeight,
                     w: globalCommandDispatcher.cfg().timelineWidth(),
-                    h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 16.0,
-                    css: 'interActiveGridLine'
+                    h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 2.0,
+                    css: 'octaveBottomBorder'
                 });
             }
         }

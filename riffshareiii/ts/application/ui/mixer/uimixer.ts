@@ -48,7 +48,7 @@ class MixerUI {
 
 			this.levels[ii].reCreateBars();
 		}
-		this.fanPane.resetPlates(this.fanLayer.anchors,this.spearsLayer.anchors);
+		this.fanPane.resetPlates(this.fanLayer.anchors, this.spearsLayer.anchors);
 		//this.iconsFanAnchor.ww = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().rightPad;
 		//this.iconsFanAnchor.hh = globalCommandDispatcher.cfg().gridHeight();
 		this.fillerAnchor.xx = globalCommandDispatcher.cfg().leftPad;
@@ -56,8 +56,14 @@ class MixerUI {
 		this.fillerAnchor.ww = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().rightPad;
 		this.fillerAnchor.hh = globalCommandDispatcher.cfg().gridHeight();
 		this.fillerAnchor.content = [];
-		this.reFillWholeRatio();
-		this.reFillSingleRatio();
+		//this.reFillWholeRatio();
+		//this.reFillSingleRatio();
+		this.reFillSingleRatio(globalCommandDispatcher.cfg().samplerTop()
+			, globalCommandDispatcher.cfg().samplerHeight()
+			, this.barDrumCount);
+		this.reFillSingleRatio(globalCommandDispatcher.cfg().gridTop()
+			, globalCommandDispatcher.cfg().gridHeight()
+			, this.barTrackCount);
 
 	}
 	createMixerLayers(): TileLayerDefinition[] {
@@ -70,7 +76,7 @@ class MixerUI {
 		let firstLayerZoom: SVGElement = (document.getElementById('firstLayerZoom') as any) as SVGElement;
 		this.firstLayers = { g: firstLayerZoom, anchors: [], mode: LevelModes.normal };
 
-		 this.fanSVGgroup = (document.getElementById('fanLayer') as any) as SVGElement;
+		this.fanSVGgroup = (document.getElementById('fanLayer') as any) as SVGElement;
 		this.fanLayer = { g: this.fanSVGgroup, anchors: [], mode: LevelModes.normal };
 		let spearsSVGgroup: SVGElement = (document.getElementById('spearsLayer') as any) as SVGElement;
 		this.spearsLayer = { g: spearsSVGgroup, anchors: [], mode: LevelModes.normal };
@@ -137,10 +143,10 @@ class MixerUI {
 		this.gridLayers.anchors.push(this.fillerAnchor);
 		return [this.gridLayers, this.trackLayers, this.firstLayers, this.fanLayer, this.spearsLayer];
 	}
-	reFillSingleRatio() {
-		let countFunction: (barIdx: number) => number;
-		let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 8;
-		let hh = globalCommandDispatcher.cfg().gridHeight() * 6 / 8;
+	reFillSingleRatio(yy: number, hh: number, countFunction: (barIdx: number) => number) {
+		//let countFunction: (barIdx: number) => number;
+		//let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 8;
+		//let hh = globalCommandDispatcher.cfg().gridHeight() * 6 / 8;
 		/*if (globalCommandDispatcher.cfg().data.focus) {
 			if (globalCommandDispatcher.cfg().data.focus == 1) {
 				countFunction = this.barDrumCount;
@@ -160,7 +166,7 @@ class MixerUI {
 		} else {
 			countFunction = this.barTrackCount;
 		}*/
-		countFunction = this.barTrackCount;
+		//countFunction = this.barTrackCount;
 		let mxItems = 0;
 		for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
 			let itemcount = countFunction(bb);
@@ -186,7 +192,7 @@ class MixerUI {
 			barX = barX + barwidth;
 		}
 	}
-	reFillWholeRatio() {
+	__reFillWholeRatio() {
 
 		let yy = globalCommandDispatcher.cfg().gridTop();
 		let hh = globalCommandDispatcher.cfg().gridHeight() / 8;
@@ -231,15 +237,15 @@ class MixerUI {
 			};
 			this.fillerAnchor.content.push(fillRectangle);
 			//if (globalCommandDispatcher.cfg().data.focus) {
-				//
+			//
 			//} else {
-				this.fillerAnchor.content.push({
-					x: globalCommandDispatcher.cfg().leftPad + barX
-					, y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() * 7 / 8
-					, w: barwidth
-					, h: hh//globalCommandDispatcher.cfg().gridHeight()
-					, css: css
-				});
+			this.fillerAnchor.content.push({
+				x: globalCommandDispatcher.cfg().leftPad + barX
+				, y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() * 7 / 8
+				, w: barwidth
+				, h: hh//globalCommandDispatcher.cfg().gridHeight()
+				, css: css
+			});
 			//}
 
 			barX = barX + barwidth;
