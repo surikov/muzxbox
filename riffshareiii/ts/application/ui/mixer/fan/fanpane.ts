@@ -11,12 +11,15 @@ class FanPane {
 		this.performerIcons = [];
 		this.samplerIcons = [];
 		for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
-			if (globalCommandDispatcher.cfg().data.filters[ff].automation) {
+			/*if (globalCommandDispatcher.cfg().data.filters[ff].automation) {
 				this.autoIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
 			} else {
 				this.filterIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
-			}
-
+			}*/
+			this.filterIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
+		}
+		for (let aa = 0; aa < globalCommandDispatcher.cfg().data.automations.length; aa++) {
+			this.autoIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.automations[aa].output));
 		}
 		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
 			this.performerIcons.push(new PerformerIcon(globalCommandDispatcher.cfg().data.tracks[tt].performer.id));

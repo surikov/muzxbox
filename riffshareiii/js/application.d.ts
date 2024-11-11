@@ -466,26 +466,31 @@ declare class MixerDataMathUtility {
     widthDurationRatio: number;
     octaveCount: number;
     maxCommentRowCount: number;
-    maxAutomationsCount: number;
     pluginIconSize: number;
     speakerIconSize: number;
     speakerIconPad: number;
     padGridFan: number;
     constructor(data: Zvoog_Project);
+    recalculateCommantMax(): void;
     extractDifference(from: Zvoog_Project): Object;
     mergeDifference(diff: Object): void;
     wholeWidth(): number;
     fanWidth(): number;
     heightOfTitle(): number;
     timelineWidth(): number;
-    wholeHeight(): number;
-    automationMaxHeight(): number;
     commentsMaxHeight(): number;
+    wholeHeight(): number;
+    automationHeight(): number;
+    commentsZoomHeight(zIndex: number): number;
     commentsAverageFillHeight(): number;
+    automationTop(): number;
+    commentsTop(): number;
     gridTop(): number;
     gridHeight(): number;
     samplerHeight(): number;
     samplerTop(): number;
+    findFilterTarget(filterId: string): Zvoog_FilterTarget | null;
+    textZoomRatio(zIndex: number): number;
 }
 declare let biChar32: String[];
 type PackedChannel = {
@@ -653,7 +658,6 @@ type Zvoog_FilterTarget = {
     kind: string;
     dataBlob: string;
     outputs: string[];
-    automation: Zvoog_AutomationTrack | null;
     iconPosition?: {
         x: number;
         y: number;
@@ -697,6 +701,7 @@ type Zvoog_SongMeasure = {
 type Zvoog_AutomationTrack = {
     title: string;
     measures: Zvoog_FilterMeasure[];
+    output: string;
 };
 type Zvoog_FilterMeasure = {
     changes: Zvoog_FilterStateChange[];
@@ -732,6 +737,7 @@ type Zvoog_Project = {
     timeline: Zvoog_SongMeasure[];
     tracks: Zvoog_MusicTrack[];
     percussions: Zvoog_PercussionTrack[];
+    automations: Zvoog_AutomationTrack[];
     comments: Zvoog_CommentMeasure[];
     filters: Zvoog_FilterTarget[];
     selection?: Zvoog_Selection;

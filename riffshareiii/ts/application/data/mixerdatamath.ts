@@ -5,16 +5,17 @@ class MixerDataMathUtility {
 	rightPad: number = 50;
 
 	topPad = 2;
-	parTitleGrid=5;
-	padGrid2Sampler=5;
-	padSampler2Automation=5;
-	padAutomation2Comments=5;
+	parTitleGrid = 5;
+	padGrid2Sampler = 5;
+	padSampler2Automation = 5;
+	padAutomation2Comments = 5;
 	bottomPad = 11;
-	
+
 
 	notePathHeight = 1.5;
 	samplerDotHeight = 3;
-	autoPointHeight=4;
+	autoPointHeight = 4;
+	//commentPointHeight = 9;
 
 	widthDurationRatio = 27;
 	octaveCount = 10;
@@ -26,7 +27,7 @@ class MixerDataMathUtility {
 	//gridBottomPad = 1;
 
 	maxCommentRowCount = 0;
-	maxAutomationsCount = 0;
+	//maxAutomationsCount = 0;
 
 	//pluginIconWidth = 17;
 	//pluginIconHeight = 7;
@@ -38,6 +39,19 @@ class MixerDataMathUtility {
 
 	constructor(data: Zvoog_Project) {
 		this.data = data;
+		this.recalculateCommantMax();
+		//this.recalculateAutoMax();
+		//console.log();
+	}
+	/*recalculateAutoMax() {
+		this.maxAutomationsCount = 0;
+		for (let ff = 0; ff < this.data.filters.length; ff++) {
+			if (this.data.filters[ff].automation) {
+				this.maxAutomationsCount++;
+			}
+		}
+	}*/
+	recalculateCommantMax() {
 		this.maxCommentRowCount = -1;
 		for (let ii = 0; ii < this.data.comments.length; ii++) {
 			let txts = this.data.comments[ii].points;
@@ -47,13 +61,6 @@ class MixerDataMathUtility {
 				}
 			}
 		}
-		this.maxAutomationsCount = 0;
-		for (let ff = 0; ff < this.data.filters.length; ff++) {
-			if (this.data.filters[ff].automation) {
-				this.maxAutomationsCount++;
-			}
-		}
-		//console.log();
 	}
 	extractDifference(from: Zvoog_Project): Object {
 		return '';
@@ -96,7 +103,7 @@ class MixerDataMathUtility {
 				ww = pp.x + this.pluginIconSize;
 			}
 		}
-		ww = ww + this.speakerIconPad + 2*this.pluginIconSize;
+		ww = ww + this.speakerIconPad + 2 * this.pluginIconSize;
 		return ww;
 	}
 	heightOfTitle(): number {
@@ -110,21 +117,24 @@ class MixerDataMathUtility {
 		}
 		return ww;
 	}
+	commentsMaxHeight(): number {
+		return this.commentsZoomHeight(zoomPrefixLevelsCSS.length - 1);
+	}
 	wholeHeight(): number {
 		/*return this.commentsTop()
 			+ this.commentsMaxHeight()
 			+ this.bottomPad;*/
-		return this.samplerTop()
-			+ this.samplerHeight()
+		return this.commentsTop()
+			+ this.commentsMaxHeight()
 			+ this.bottomPad
 
 			;
 	}
-	automationMaxHeight(): number {
-		return this.maxAutomationsCount * this.notePathHeight * 2;
+	automationHeight(): number {
+		return this.data.automations.length * this.autoPointHeight;
 	}
-	commentsMaxHeight(): number {
-		return (2 + this.maxCommentRowCount) * this.notePathHeight * 8;
+	commentsZoomHeight(zIndex: number): number {
+		return (2 + this.maxCommentRowCount) * this.notePathHeight * this.textZoomRatio(zIndex);
 	}
 	commentsAverageFillHeight(): number {
 		let rcount = this.maxCommentRowCount;
@@ -134,16 +144,17 @@ class MixerDataMathUtility {
 		return (2 + rcount) * this.notePathHeight * 8;
 
 	}
-	//automationTop(): number {
-	//	return this.topPad + this.heightOfTitle() + this.titleBottomPad;
-	//}
-	/*
-		commentsTop(): number {
-			return this.gridTop()
-				+ this.gridHeight()
-				+ this.gridBottomPad;
-		}
-		*/
+	automationTop(): number {
+		return this.samplerTop() + this.samplerHeight() + this.padSampler2Automation;
+	}
+
+
+	commentsTop(): number {
+		return this.automationTop()
+			+ this.automationHeight()
+			+ this.padAutomation2Comments;
+	}
+
 	gridTop(): number {
 		//return this.samplerTop() + this.samplerHeight() + this.samplerBottomPad;
 		return this.topPad + this.heightOfTitle() + this.parTitleGrid;
@@ -154,13 +165,30 @@ class MixerDataMathUtility {
 		return this.notePathHeight * this.octaveCount * 12;
 	}
 
-	
+
 	samplerHeight(): number {
 		return this.data.percussions.length * this.samplerDotHeight;
 	}
 	samplerTop(): number {
 		return this.gridTop() + this.gridHeight() + this.padGrid2Sampler;
 	}
-	
+	findFilterTarget(filterId: string): Zvoog_FilterTarget | null {
+		if (this.data) {
+			for (let nn = 0; nn < this.data.filters.length; nn++) {
+				let filter = this.data.filters[nn];
+				if (filter.id == filterId) {
+					return filter;
+				}
+			}
+		}
+		return null;
+	}
+	textZoomRatio(zIndex: number): number {
+		let txtZoomRatio = 1;
+		if (zIndex > 2) txtZoomRatio = 2;
+		if (zIndex > 3) txtZoomRatio = 4;
+		if (zIndex > 4) txtZoomRatio = 8;
+		return txtZoomRatio;
+	}
 
 }

@@ -3,7 +3,14 @@ class ControlConnection {
 		let css = 'controlConnection';//'fanStream';
 		let sz4 = globalCommandDispatcher.cfg().pluginIconSize / 4;
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
-		let line: TileRectangle = {
+		new SpearConnection().addSpear(
+					left
+					, yy
+					, 1
+					, left+ww
+					, yy
+					, anchor);
+		/*let line: TileRectangle = {
 			x: left
 			, y: yy - sz4
 			, w: ww - sz4
@@ -19,7 +26,7 @@ class ControlConnection {
 
 			]
 		};
-		anchor.content.push(spearHead);
+		anchor.content.push(spearHead);*/
 		/*
 		let mainLine: TileLine = { x1: fromX, x2: toX, y1: fromY, y2: toY, css: css };
 		anchor.content.push(mainLine);

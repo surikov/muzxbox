@@ -129,20 +129,23 @@ class LeftPanel {
 				}
 			}
 			if (zz < 4) {
-				let yy = 0;
-				for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
-					let filter = globalCommandDispatcher.cfg().data.filters[ff];
-					if (filter.automation) {
-						let autoLabel: TileText = {
-							text: '' + filter.automation.title
-							, x: 0
-							, y: (globalCommandDispatcher.cfg().gridTop() + yy + 1) * globalCommandDispatcher.cfg().notePathHeight
-							, css: 'autoRowLabel' + zoomPrefixLevelsCSS[zz].prefix
-						};
-						this.leftZoomAnchors[zz].content.push(autoLabel);
-						//console.log('autoLabel', autoLabel);
-						yy++;
-					}
+				//let yy = 0;
+				for (let ff = 0; ff < globalCommandDispatcher.cfg().data.automations.length; ff++) {
+					let automation = globalCommandDispatcher.cfg().data.automations[ff];
+					//if (filter.automation) {
+					let autoLabel: TileText = {
+						text: '' + automation.title
+						, x: 0
+						, y: globalCommandDispatcher.cfg().automationTop()
+							+ (1 + ff) * globalCommandDispatcher.cfg().autoPointHeight
+							- 0.3 * globalCommandDispatcher.cfg().autoPointHeight
+						, css: 'autoRowLabel' + zoomPrefixLevelsCSS[zz].prefix
+					};
+					this.leftZoomAnchors[zz].content.push(autoLabel);
+					//console.log('autoLabel', autoLabel);
+					//yy++;
+					//}
+					//console.log(ff, autoLabel);
 				}
 			}
 		}

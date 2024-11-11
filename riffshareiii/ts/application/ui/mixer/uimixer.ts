@@ -65,6 +65,13 @@ class MixerUI {
 			, globalCommandDispatcher.cfg().gridHeight()
 			, this.barTrackCount);
 
+		this.reFillSingleRatio(globalCommandDispatcher.cfg().automationTop()
+			, globalCommandDispatcher.cfg().automationHeight()
+			, this.barAutoCount);
+
+		this.reFillSingleRatio(globalCommandDispatcher.cfg().commentsTop()
+			, globalCommandDispatcher.cfg().commentsMaxHeight()
+			, this.barCommentsCount);
 	}
 	createMixerLayers(): TileLayerDefinition[] {
 		let tracksLayerZoom: SVGElement = (document.getElementById('tracksLayerZoom') as any) as SVGElement;
@@ -277,11 +284,11 @@ class MixerUI {
 	}
 	barAutoCount(bb: number): number {
 		let autoCnt = 0;
-		for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
-			let filter = globalCommandDispatcher.cfg().data.filters[ff];
-			if (filter.automation) {
-				if (filter.automation.measures[bb]) {
-					autoCnt = autoCnt + filter.automation.measures[bb].changes.length;
+		for (let ff = 0; ff < globalCommandDispatcher.cfg().data.automations.length; ff++) {
+			let automation = globalCommandDispatcher.cfg().data.automations[ff];
+			if (automation) {
+				if (automation.measures[bb]) {
+					autoCnt = autoCnt + automation.measures[bb].changes.length;
 				}
 			}
 		}

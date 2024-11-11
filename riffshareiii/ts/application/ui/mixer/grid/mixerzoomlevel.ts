@@ -129,18 +129,18 @@ class MixerZoomLevel {
 							need = true;
 						}
 						if (need) {*/
-							barOctaveAnchor.content.push({
-								x: globalCommandDispatcher.cfg().leftPad
-								, y: globalCommandDispatcher.cfg().gridTop() + (oo * 12 + kk) * globalCommandDispatcher.cfg().notePathHeight
-								, w: globalCommandDispatcher.cfg().timelineWidth()
-								, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
-								, css: 'interActiveGridLine'
-							});
+						barOctaveAnchor.content.push({
+							x: globalCommandDispatcher.cfg().leftPad
+							, y: globalCommandDispatcher.cfg().gridTop() + (oo * 12 + kk) * globalCommandDispatcher.cfg().notePathHeight
+							, w: globalCommandDispatcher.cfg().timelineWidth()
+							, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
+							, css: 'interActiveGridLine'
+						});
 						//}
 					}
 				}
 			}
-			
+
 			for (let pp = 1; pp < globalCommandDispatcher.cfg().data.percussions.length; pp++) {
 				barOctaveAnchor.content.push({
 					x: globalCommandDispatcher.cfg().leftPad
@@ -149,6 +149,28 @@ class MixerZoomLevel {
 					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 2.0
 					, css: 'octaveBottomBorder'
 				});
+			}
+			for (let aa = 1; aa < globalCommandDispatcher.cfg().data.automations.length; aa++) {
+				barOctaveAnchor.content.push({
+					x: globalCommandDispatcher.cfg().leftPad
+					, y: globalCommandDispatcher.cfg().automationTop() + aa * globalCommandDispatcher.cfg().autoPointHeight
+					, w: globalCommandDispatcher.cfg().timelineWidth()
+					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 2.0
+					, css: 'octaveBottomBorder'
+				});
+			}
+			if (this.zoomLevelIndex < 3) {
+				let ratio = globalCommandDispatcher.cfg().textZoomRatio(this.zoomLevelIndex);
+				//console.log(this.zoomLevelIndex, ratio);
+				for (let tt = 0; tt <= globalCommandDispatcher.cfg().maxCommentRowCount; tt++) {
+					barOctaveAnchor.content.push({
+						x: globalCommandDispatcher.cfg().leftPad
+						, y: globalCommandDispatcher.cfg().commentsTop() + (1 + tt) * globalCommandDispatcher.cfg().notePathHeight * ratio
+						, w: globalCommandDispatcher.cfg().timelineWidth()
+						, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
+						, css: 'interActiveGridLine'
+					});
+				}
 			}
 		}
 	}

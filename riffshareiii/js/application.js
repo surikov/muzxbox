@@ -1126,22 +1126,20 @@ class RightMenuPanel {
             menuPointPercussion.children.push(item);
         }
         menuPointAutomation.children = [];
-        for (let ff = 0; ff < project.filters.length; ff++) {
-            let filter = project.filters[ff];
-            if (filter.automation) {
-                let item = {
-                    text: filter.automation.title,
-                    noLocalization: true,
-                    onClick: () => {
-                        globalCommandDispatcher.moveAutomationTop(ff);
-                    },
-                    onSubClick: () => {
-                    },
-                    itemStates: [icon_sound_low, icon_hide, icon_sound_loud],
-                    selection: 0
-                };
-                menuPointAutomation.children.push(item);
-            }
+        for (let ff = 0; ff < project.automations.length; ff++) {
+            let automation = project.automations[ff];
+            let item = {
+                text: automation.title,
+                noLocalization: true,
+                onClick: () => {
+                    globalCommandDispatcher.moveAutomationTop(ff);
+                },
+                onSubClick: () => {
+                },
+                itemStates: [icon_sound_low, icon_hide, icon_sound_loud],
+                selection: 0
+            };
+            menuPointAutomation.children.push(item);
         }
     }
     rerenderMenuContent(folder) {
@@ -1597,19 +1595,17 @@ class LeftPanel {
                 }
             }
             if (zz < 4) {
-                let yy = 0;
-                for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
-                    let filter = globalCommandDispatcher.cfg().data.filters[ff];
-                    if (filter.automation) {
-                        let autoLabel = {
-                            text: '' + filter.automation.title,
-                            x: 0,
-                            y: (globalCommandDispatcher.cfg().gridTop() + yy + 1) * globalCommandDispatcher.cfg().notePathHeight,
-                            css: 'autoRowLabel' + zoomPrefixLevelsCSS[zz].prefix
-                        };
-                        this.leftZoomAnchors[zz].content.push(autoLabel);
-                        yy++;
-                    }
+                for (let ff = 0; ff < globalCommandDispatcher.cfg().data.automations.length; ff++) {
+                    let automation = globalCommandDispatcher.cfg().data.automations[ff];
+                    let autoLabel = {
+                        text: '' + automation.title,
+                        x: 0,
+                        y: globalCommandDispatcher.cfg().automationTop()
+                            + (1 + ff) * globalCommandDispatcher.cfg().autoPointHeight
+                            - 0.3 * globalCommandDispatcher.cfg().autoPointHeight,
+                        css: 'autoRowLabel' + zoomPrefixLevelsCSS[zz].prefix
+                    };
+                    this.leftZoomAnchors[zz].content.push(autoLabel);
                 }
             }
         }
@@ -1617,7 +1613,7 @@ class LeftPanel {
 }
 class SamplerBar {
     constructor(barIdx, drumIdx, zoomLevel, anchor, left) {
-        let ww = globalCommandDispatcher.cfg().samplerDotHeight * (1 + zoomLevel / 3) / 2;
+        let ww = globalCommandDispatcher.cfg().samplerDotHeight * (1 + zoomLevel / 3) / 4;
         let drum = globalCommandDispatcher.cfg().data.percussions[drumIdx];
         let measure = drum.measures[barIdx];
         let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().samplerDotHeight;
@@ -1793,6 +1789,20 @@ class MixerBar {
             h: globalCommandDispatcher.cfg().samplerHeight(),
             css: 'barRightBorder'
         });
+        barOctaveAnchor.content.push({
+            x: barLeft + width,
+            y: globalCommandDispatcher.cfg().automationTop(),
+            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
+            h: globalCommandDispatcher.cfg().automationHeight(),
+            css: 'barRightBorder'
+        });
+        barOctaveAnchor.content.push({
+            x: barLeft + width,
+            y: globalCommandDispatcher.cfg().commentsTop(),
+            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
+            h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex),
+            css: 'barRightBorder'
+        });
         if (zoomInfo.gridLines.length > 0) {
             let css = 'stepPartDelimiter';
             if (zIndex < 3) {
@@ -1819,6 +1829,20 @@ class MixerBar {
                     h: globalCommandDispatcher.cfg().samplerHeight(),
                     css: css
                 });
+                barOctaveAnchor.content.push({
+                    x: xx,
+                    y: globalCommandDispatcher.cfg().automationTop(),
+                    w: line.ratio * zoomInfo.minZoom / 2,
+                    h: globalCommandDispatcher.cfg().automationHeight(),
+                    css: css
+                });
+                barOctaveAnchor.content.push({
+                    x: xx,
+                    y: globalCommandDispatcher.cfg().commentsTop(),
+                    w: line.ratio * zoomInfo.minZoom / 2,
+                    h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex),
+                    css: css
+                });
                 lineCount++;
                 if (lineCount >= zoomInfo.gridLines.length) {
                     lineCount = 0;
@@ -1830,23 +1854,18 @@ class MixerBar {
 class TextComments {
     constructor(barIdx, barLeft, barOctaveAnchor, zIndex) {
         let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
-        let top = globalCommandDispatcher.cfg().gridTop();
+        let top = globalCommandDispatcher.cfg().commentsTop();
         if (barIdx < globalCommandDispatcher.cfg().data.comments.length) {
-            let txtZoomRatio = 1;
-            if (zIndex > 2)
-                txtZoomRatio = 2;
-            if (zIndex > 3)
-                txtZoomRatio = 4;
-            if (zIndex > 4)
-                txtZoomRatio = 8;
+            let pad = 0.125 * globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().textZoomRatio(zIndex);
             let css = 'commentReadText' + zoomPrefixLevelsCSS[zIndex].prefix;
             css = 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix;
             for (let ii = 0; ii < globalCommandDispatcher.cfg().data.comments[barIdx].points.length; ii++) {
                 let itxt = globalCommandDispatcher.cfg().data.comments[barIdx].points[ii];
-                let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio + pad;
+                let yy = top + globalCommandDispatcher.cfg().notePathHeight * (1 + itxt.row) * globalCommandDispatcher.cfg().textZoomRatio(zIndex) - pad;
                 let tt = {
                     x: xx,
-                    y: top + globalCommandDispatcher.cfg().notePathHeight * (1 + itxt.row) * txtZoomRatio,
+                    y: yy,
                     text: globalCommandDispatcher.cfg().data.comments[barIdx].points[ii].text,
                     css: css
                 };
@@ -1858,30 +1877,23 @@ class TextComments {
 class AutomationBarContent {
     constructor(barIdx, barLeft, barOctaveAnchor, zIndex) {
         let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
-        let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-        let left = barLeft + width;
-        let top = globalCommandDispatcher.cfg().gridTop();
-        let height = globalCommandDispatcher.cfg().automationMaxHeight();
+        let top = globalCommandDispatcher.cfg().automationTop();
         let css = 'automationBgDot';
-        let yy = 0;
-        for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
-            let filter = globalCommandDispatcher.cfg().data.filters[ff];
-            if (filter.automation) {
-                if (filter.automation.measures[barIdx]) {
-                    let measure = filter.automation.measures[barIdx];
-                    for (let ii = 0; ii < measure.changes.length; ii++) {
-                        let change = measure.changes[ii];
-                        let xx = barLeft + MMUtil().set(change.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-                        let aubtn = {
-                            dots: [xx, top + globalCommandDispatcher.cfg().notePathHeight * yy,
-                                xx + 1, top + globalCommandDispatcher.cfg().notePathHeight * yy,
-                                xx, top + globalCommandDispatcher.cfg().notePathHeight * (yy + 1)
-                            ],
-                            css: css
-                        };
-                        barOctaveAnchor.content.push(aubtn);
-                    }
-                    yy++;
+        for (let aa = 0; aa < globalCommandDispatcher.cfg().data.automations.length; aa++) {
+            let automation = globalCommandDispatcher.cfg().data.automations[aa];
+            if (automation.measures[barIdx]) {
+                let measure = automation.measures[barIdx];
+                for (let ii = 0; ii < measure.changes.length; ii++) {
+                    let change = measure.changes[ii];
+                    let xx = barLeft + MMUtil().set(change.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                    let aubtn = {
+                        dots: [xx, top + globalCommandDispatcher.cfg().autoPointHeight * aa,
+                            xx + globalCommandDispatcher.cfg().autoPointHeight, top + globalCommandDispatcher.cfg().autoPointHeight * aa,
+                            xx, top + globalCommandDispatcher.cfg().autoPointHeight * (aa + 1)
+                        ],
+                        css: css
+                    };
+                    barOctaveAnchor.content.push(aubtn);
                 }
             }
         }
@@ -1918,6 +1930,8 @@ class MixerUI {
         this.fillerAnchor.content = [];
         this.reFillSingleRatio(globalCommandDispatcher.cfg().samplerTop(), globalCommandDispatcher.cfg().samplerHeight(), this.barDrumCount);
         this.reFillSingleRatio(globalCommandDispatcher.cfg().gridTop(), globalCommandDispatcher.cfg().gridHeight(), this.barTrackCount);
+        this.reFillSingleRatio(globalCommandDispatcher.cfg().automationTop(), globalCommandDispatcher.cfg().automationHeight(), this.barAutoCount);
+        this.reFillSingleRatio(globalCommandDispatcher.cfg().commentsTop(), globalCommandDispatcher.cfg().commentsMaxHeight(), this.barCommentsCount);
     }
     createMixerLayers() {
         let tracksLayerZoom = document.getElementById('tracksLayerZoom');
@@ -2062,11 +2076,11 @@ class MixerUI {
     }
     barAutoCount(bb) {
         let autoCnt = 0;
-        for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
-            let filter = globalCommandDispatcher.cfg().data.filters[ff];
-            if (filter.automation) {
-                if (filter.automation.measures[bb]) {
-                    autoCnt = autoCnt + filter.automation.measures[bb].changes.length;
+        for (let ff = 0; ff < globalCommandDispatcher.cfg().data.automations.length; ff++) {
+            let automation = globalCommandDispatcher.cfg().data.automations[ff];
+            if (automation) {
+                if (automation.measures[bb]) {
+                    autoCnt = autoCnt + automation.measures[bb].changes.length;
                 }
             }
         }
@@ -2166,6 +2180,27 @@ class MixerZoomLevel {
                     css: 'octaveBottomBorder'
                 });
             }
+            for (let aa = 1; aa < globalCommandDispatcher.cfg().data.automations.length; aa++) {
+                barOctaveAnchor.content.push({
+                    x: globalCommandDispatcher.cfg().leftPad,
+                    y: globalCommandDispatcher.cfg().automationTop() + aa * globalCommandDispatcher.cfg().autoPointHeight,
+                    w: globalCommandDispatcher.cfg().timelineWidth(),
+                    h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 2.0,
+                    css: 'octaveBottomBorder'
+                });
+            }
+            if (this.zoomLevelIndex < 3) {
+                let ratio = globalCommandDispatcher.cfg().textZoomRatio(this.zoomLevelIndex);
+                for (let tt = 0; tt <= globalCommandDispatcher.cfg().maxCommentRowCount; tt++) {
+                    barOctaveAnchor.content.push({
+                        x: globalCommandDispatcher.cfg().leftPad,
+                        y: globalCommandDispatcher.cfg().commentsTop() + (1 + tt) * globalCommandDispatcher.cfg().notePathHeight * ratio,
+                        w: globalCommandDispatcher.cfg().timelineWidth(),
+                        h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
+                        css: 'interActiveGridLine'
+                    });
+                }
+            }
         }
     }
 }
@@ -2176,12 +2211,10 @@ class FanPane {
         this.performerIcons = [];
         this.samplerIcons = [];
         for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
-            if (globalCommandDispatcher.cfg().data.filters[ff].automation) {
-                this.autoIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
-            }
-            else {
-                this.filterIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
-            }
+            this.filterIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
+        }
+        for (let aa = 0; aa < globalCommandDispatcher.cfg().data.automations.length; aa++) {
+            this.autoIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.automations[aa].output));
         }
         for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
             this.performerIcons.push(new PerformerIcon(globalCommandDispatcher.cfg().data.tracks[tt].performer.id));
@@ -2448,22 +2481,7 @@ class ControlConnection {
         let css = 'controlConnection';
         let sz4 = globalCommandDispatcher.cfg().pluginIconSize / 4;
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
-        let line = {
-            x: left,
-            y: yy - sz4,
-            w: ww - sz4,
-            h: sz4 * 2,
-            css: css
-        };
-        anchor.content.push(line);
-        let spearHead = {
-            x: left + ww - sz4, y: yy - sz4, css: css, dots: [
-                0, 0,
-                sz4, sz4,
-                0, sz4 * 2
-            ]
-        };
-        anchor.content.push(spearHead);
+        new SpearConnection().addSpear(left, yy, 1, left + ww, yy, anchor);
     }
 }
 class SpearConnection {
@@ -2822,21 +2840,23 @@ let mzxbxProjectForTesting2 = {
     filters: [
         {
             id: 'volumeSlide', kind: 'baseVolume', dataBlob: '', outputs: ['masterVolme'],
-            automation: { title: 'Simple test', measures: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }] }, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }] },
             iconPosition: { x: 152, y: 39 }
         },
         {
             id: 'masterVolme', kind: 'base_volume', dataBlob: 'bb1', outputs: [],
-            automation: { title: 'test1122', measures: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }] },
             iconPosition: { x: 188, y: 7 }
         },
-        { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputs: ['masterVolme'], automation: null, iconPosition: { x: 112, y: 87 } },
-        { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], automation: null, iconPosition: { x: 52, y: 73 } },
-        { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], automation: null, iconPosition: { x: 72, y: 83 } },
-        { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], automation: null, iconPosition: { x: 82, y: 119 } },
-        { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], automation: null, iconPosition: { x: 132, y: 23 } },
-        { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], automation: null, iconPosition: { x: 102, y: 64 } },
-        { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], automation: null, iconPosition: { x: 72, y: 30 } }
+        { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 } },
+        { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 } },
+        { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 } },
+        { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 } },
+        { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 } },
+        { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 } },
+        { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 } }
+    ],
+    automations: [
+        { output: 'masterVolme', title: 'test1122', measures: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }] },
+        { output: 'volumeSlide', title: 'Simple test', measures: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }] }, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }] }
     ]
 };
 let testBigMixerData = {
@@ -2924,12 +2944,14 @@ class MixerDataMathUtility {
         this.widthDurationRatio = 27;
         this.octaveCount = 10;
         this.maxCommentRowCount = 0;
-        this.maxAutomationsCount = 0;
         this.pluginIconSize = 3;
         this.speakerIconSize = 33;
         this.speakerIconPad = 11;
         this.padGridFan = 15;
         this.data = data;
+        this.recalculateCommantMax();
+    }
+    recalculateCommantMax() {
         this.maxCommentRowCount = -1;
         for (let ii = 0; ii < this.data.comments.length; ii++) {
             let txts = this.data.comments[ii].points;
@@ -2937,12 +2959,6 @@ class MixerDataMathUtility {
                 if (this.maxCommentRowCount < txts[tt].row) {
                     this.maxCommentRowCount = txts[tt].row;
                 }
-            }
-        }
-        this.maxAutomationsCount = 0;
-        for (let ff = 0; ff < this.data.filters.length; ff++) {
-            if (this.data.filters[ff].automation) {
-                this.maxAutomationsCount++;
             }
         }
     }
@@ -3000,16 +3016,19 @@ class MixerDataMathUtility {
         }
         return ww;
     }
+    commentsMaxHeight() {
+        return this.commentsZoomHeight(zoomPrefixLevelsCSS.length - 1);
+    }
     wholeHeight() {
-        return this.samplerTop()
-            + this.samplerHeight()
+        return this.commentsTop()
+            + this.commentsMaxHeight()
             + this.bottomPad;
     }
-    automationMaxHeight() {
-        return this.maxAutomationsCount * this.notePathHeight * 2;
+    automationHeight() {
+        return this.data.automations.length * this.autoPointHeight;
     }
-    commentsMaxHeight() {
-        return (2 + this.maxCommentRowCount) * this.notePathHeight * 8;
+    commentsZoomHeight(zIndex) {
+        return (2 + this.maxCommentRowCount) * this.notePathHeight * this.textZoomRatio(zIndex);
     }
     commentsAverageFillHeight() {
         let rcount = this.maxCommentRowCount;
@@ -3017,6 +3036,14 @@ class MixerDataMathUtility {
             rcount = 3;
         }
         return (2 + rcount) * this.notePathHeight * 8;
+    }
+    automationTop() {
+        return this.samplerTop() + this.samplerHeight() + this.padSampler2Automation;
+    }
+    commentsTop() {
+        return this.automationTop()
+            + this.automationHeight()
+            + this.padAutomation2Comments;
     }
     gridTop() {
         return this.topPad + this.heightOfTitle() + this.parTitleGrid;
@@ -3029,6 +3056,27 @@ class MixerDataMathUtility {
     }
     samplerTop() {
         return this.gridTop() + this.gridHeight() + this.padGrid2Sampler;
+    }
+    findFilterTarget(filterId) {
+        if (this.data) {
+            for (let nn = 0; nn < this.data.filters.length; nn++) {
+                let filter = this.data.filters[nn];
+                if (filter.id == filterId) {
+                    return filter;
+                }
+            }
+        }
+        return null;
+    }
+    textZoomRatio(zIndex) {
+        let txtZoomRatio = 1;
+        if (zIndex > 2)
+            txtZoomRatio = 2;
+        if (zIndex > 3)
+            txtZoomRatio = 4;
+        if (zIndex > 4)
+            txtZoomRatio = 8;
+        return txtZoomRatio;
     }
 }
 let biChar32 = [];

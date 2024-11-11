@@ -1,7 +1,7 @@
 class SamplerBar {
 	constructor(//data: Zvoog_Project
 		barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number) {
-		let ww =  globalCommandDispatcher.cfg().samplerDotHeight * (1 + zoomLevel/3)/2;
+		let ww =  globalCommandDispatcher.cfg().samplerDotHeight * (1 + zoomLevel/3)/4;
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		let drum: Zvoog_PercussionTrack = globalCommandDispatcher.cfg().data.percussions[drumIdx];
 		let measure: Zvoog_PercussionMeasure = drum.measures[barIdx];

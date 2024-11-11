@@ -11,7 +11,7 @@ class TextComments {
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		//let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 		//let left = barLeft + width;
-		let top = globalCommandDispatcher.cfg().gridTop();
+		let top = globalCommandDispatcher.cfg().commentsTop();
 		//let height = globalCommandDispatcher.cfg().maxCommentRowCount + 2;
 		//console.log(zIndex);
 		/*
@@ -60,10 +60,7 @@ class TextComments {
 				//console.log(zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx, placeIdx, globalCommandDispatcher.cfg().data.comments[barIdx].texts[ii].text);
 				barOctaveAnchor.content.push(tt);
 			}*/
-			let txtZoomRatio = 1;
-			if (zIndex > 2) txtZoomRatio = 2;
-			if (zIndex > 3) txtZoomRatio = 4;
-			if (zIndex > 4) txtZoomRatio = 8;
+			let pad=0.125*globalCommandDispatcher.cfg().notePathHeight *  globalCommandDispatcher.cfg().textZoomRatio(zIndex);
 			let css= 'commentReadText' + zoomPrefixLevelsCSS[zIndex].prefix;
 			//if(globalCommandDispatcher.cfg().data.focus){
 			//	if(globalCommandDispatcher.cfg().data.focus==3){
@@ -72,10 +69,11 @@ class TextComments {
 			//}
 			for (let ii = 0; ii < globalCommandDispatcher.cfg().data.comments[barIdx].points.length; ii++) {
 				let itxt = globalCommandDispatcher.cfg().data.comments[barIdx].points[ii];
-				let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+				let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio+pad;
+				let yy=top + globalCommandDispatcher.cfg().notePathHeight * (1 + itxt.row) * globalCommandDispatcher.cfg().textZoomRatio(zIndex)-pad;
 				let tt: TileText = {
 					x: xx
-					, y: top + globalCommandDispatcher.cfg().notePathHeight * (1 + itxt.row) * txtZoomRatio
+					, y: yy //top + globalCommandDispatcher.cfg().notePathHeight * (1 + itxt.row) * txtZoomRatio
 					, text: globalCommandDispatcher.cfg().data.comments[barIdx].points[ii].text
 					, css: css //'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix
 				};

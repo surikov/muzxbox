@@ -277,11 +277,11 @@ class RightMenuPanel {
 			//menuPointPercussion.children.push(item);
 		}
 		menuPointAutomation.children = [];
-		for (let ff = 0; ff < project.filters.length; ff++) {
-			let filter = project.filters[ff];
-			if (filter.automation) {
+		for (let ff = 0; ff < project.automations.length; ff++) {
+			let automation = project.automations[ff];
+			//if (filter.automation) {
 				let item: MenuInfo = {
-					text: filter.automation.title
+					text: automation.title
 					, noLocalization: true
 					, onClick: () => {
 
@@ -296,7 +296,7 @@ class RightMenuPanel {
 					, selection: 0
 				};
 				menuPointAutomation.children.push(item);
-			}
+			//}
 		}
 
 	}
