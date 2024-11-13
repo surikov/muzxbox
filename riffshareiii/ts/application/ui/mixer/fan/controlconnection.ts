@@ -1,15 +1,15 @@
 class ControlConnection {
-	addAudioStreamLineFlow(yy: number, ww: number, anchor: TileAnchor) {
-		let css = 'controlConnection';//'fanStream';
-		let sz4 = globalCommandDispatcher.cfg().pluginIconSize / 4;
+	addAudioStreamLineFlow(yy: number, toX: number, toY: number, anchor: TileAnchor) {
+		//let css = 'controlConnection';//'fanStream';
+		//let sz4 = globalCommandDispatcher.cfg().pluginIconSize / 4;
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
 		new SpearConnection().addSpear(
-					left
-					, yy
-					, 1
-					, left+ww
-					, yy
-					, anchor);
+			left
+			, yy
+			, globalCommandDispatcher.cfg().pluginIconSize 
+			,  toX
+			, toY
+			, anchor);
 		/*let line: TileRectangle = {
 			x: left
 			, y: yy - sz4

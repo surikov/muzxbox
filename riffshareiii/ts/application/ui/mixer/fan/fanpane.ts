@@ -42,17 +42,17 @@ class FanPane {
 	}
 	buildPerformerIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < this.performerIcons.length; ii++) {
-			this.performerIcons[ii].buildPerformerSpot(fanAnchor, spearsAnchor, zidx);
+			this.performerIcons[ii].buildPerformerSpot(ii,this.performerIcons.length,fanAnchor, spearsAnchor, zidx);
 		}
 	}
 	buildSamplerIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < this.samplerIcons.length; ii++) {
-			this.samplerIcons[ii].buildSamplerSpot(fanAnchor, spearsAnchor, zidx);
+			this.samplerIcons[ii].buildSamplerSpot(ii,fanAnchor, spearsAnchor, zidx);
 		}
 	}
 	buildAutoIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < this.autoIcons.length; ii++) {
-			this.autoIcons[ii].buildAutoSpot(fanAnchor, spearsAnchor, zidx);
+			this.autoIcons[ii].buildAutoSpot(ii,fanAnchor, spearsAnchor, zidx);
 		}
 	}
 	buildFilterIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
@@ -64,18 +64,24 @@ class FanPane {
 		//let xx = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad;
 		//let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
 
-		let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().pluginIconSize / 2;
+		let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().speakerIconSize / 2;
 		let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
 
 
 		let rec: TileRectangle = {
-			x: speakerX, y: speakerY, w: globalCommandDispatcher.cfg().speakerIconSize, h: globalCommandDispatcher.cfg().speakerIconSize
-			, rx: globalCommandDispatcher.cfg().speakerIconSize / 2, ry: globalCommandDispatcher.cfg().speakerIconSize / 2, css: 'fanSpeakerIcon'
+			x: speakerX-globalCommandDispatcher.cfg().speakerIconSize / 2
+			, y: speakerY-globalCommandDispatcher.cfg().speakerIconSize / 2
+			, w: globalCommandDispatcher.cfg().speakerIconSize
+			, h: globalCommandDispatcher.cfg().speakerIconSize
+			, rx: globalCommandDispatcher.cfg().speakerIconSize / 2
+			, ry: globalCommandDispatcher.cfg().speakerIconSize / 2
+			, css: 'fanSpeakerIcon'
 		};
 		fanAnchor.content.push(rec);
 		let icon: TileText = {
-			x: speakerX + globalCommandDispatcher.cfg().speakerIconSize
-			, y: speakerY + globalCommandDispatcher.cfg().speakerIconSize, text: icon_sound_loud, css: 'fanSpeakerIconLabel'
+			x: speakerX //+ globalCommandDispatcher.cfg().speakerIconSize
+			, y: speakerY //+ globalCommandDispatcher.cfg().speakerIconSize
+			, text: icon_sound_loud, css: 'fanSpeakerIconLabel'
 		};
 		fanAnchor.content.push(icon);
 		/*if (zidx < 5) {

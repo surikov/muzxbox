@@ -4,6 +4,7 @@ class FanOutputLine {
 		, fromID: string
 		, fromX: number, fromY: number
 		, zidx: number) {
+			let sz = globalCommandDispatcher.cfg().pluginIconSize;
 		if (outputs) {
 			if (outputs.length > 0) {
 				for (let oo = 0; oo < outputs.length; oo++) {
@@ -13,41 +14,46 @@ class FanOutputLine {
 							let toFilter: Zvoog_FilterTarget = globalCommandDispatcher.cfg().data.filters[ii];
 							let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 							let top = globalCommandDispatcher.cfg().gridTop();
-							let xx = left + globalCommandDispatcher.cfg().pluginIconSize / 2;
-							let yy = top + globalCommandDispatcher.cfg().pluginIconSize / 2;
+							let xx = left ;
+							let yy = top ;
 							if (toFilter.iconPosition) {
-								xx = left + toFilter.iconPosition.x + globalCommandDispatcher.cfg().pluginIconSize / 2;
-								yy = top + toFilter.iconPosition.y + globalCommandDispatcher.cfg().pluginIconSize / 2;
+								xx = left + toFilter.iconPosition.x ;
+								yy = top + toFilter.iconPosition.y ;
 							}
 							new SpearConnection().addSpear(//globalCommandDispatcher.cfg().pluginIconSize, 
 								fromX, fromY
-								, globalCommandDispatcher.cfg().pluginIconSize, xx, yy
+								, sz, xx, yy
 								, fanLinesAnchor);
 							this.addDeleteSpear(fromID, toFilter.id, fromX, fromY
-								, globalCommandDispatcher.cfg().pluginIconSize, xx, yy
+								, sz, xx, yy
 								, buttonsAnchor, zidx);
 							break;
 						}
 					}
 				}
 			} else {
-				let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().pluginIconSize / 2;
+				//let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().pluginIconSize / 2;
+				//let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
+				
+				let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().speakerIconSize / 2;
 				let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
+
+
 				new SpearConnection().addSpear(//globalCommandDispatcher.cfg().pluginIconSize
 					//, 
 					fromX
 					, fromY
 					, globalCommandDispatcher.cfg().speakerIconSize
-					, speakerX + globalCommandDispatcher.cfg().speakerIconSize / 2
-					, speakerY + globalCommandDispatcher.cfg().speakerIconSize / 2
+					, speakerX 
+					, speakerY 
 					, fanLinesAnchor);
 				this.addDeleteSpear(
 					fromID, ''
 					, fromX
 					, fromY
 					, globalCommandDispatcher.cfg().speakerIconSize
-					, speakerX + globalCommandDispatcher.cfg().speakerIconSize / 2
-					, speakerY + globalCommandDispatcher.cfg().speakerIconSize / 2
+					, speakerX 
+					, speakerY 
 					, buttonsAnchor, zidx);
 			}
 		}

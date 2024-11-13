@@ -6,17 +6,18 @@ class PerformerIcon {
 		//this.track=track;
 		this.performerId = performerId;
 	}
-	buildPerformerSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
+	buildPerformerSpot(order: number, sum: number, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		//console.log('buildPerformerSpot', this.performerId);
 		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
 			if (globalCommandDispatcher.cfg().data.tracks[ii].performer.id == this.performerId) {
 				let audioSeq: Zvoog_AudioSequencer = globalCommandDispatcher.cfg().data.tracks[ii].performer;
-				this.addPerformerSpot(audioSeq, fanLevelAnchor, spearsAnchor, zidx);
+				this.addPerformerSpot(order, sum, audioSeq, fanLevelAnchor, spearsAnchor, zidx);
 				break;
 			}
 		}
 	}
-	addPerformerSpot(audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
+	addPerformerSpot(order: number, sum: number, audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
+		let sz = globalCommandDispatcher.cfg().pluginIconSize;
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
 		let xx = left;
@@ -27,8 +28,8 @@ class PerformerIcon {
 		}
 		//console.log('addPerformerSpot',zidx,yy,audioSeq.iconPosition);
 		let rec: TileRectangle = {
-			x: xx, y: yy
-			, w: globalCommandDispatcher.cfg().pluginIconSize, h: globalCommandDispatcher.cfg().pluginIconSize
+			x: xx-sz/2, y: yy-sz/2
+			, w: sz, h: sz
 			//, rx: globalCommandDispatcher.cfg().pluginIconSize / 2, ry: globalCommandDispatcher.cfg().pluginIconSize / 2
 			, css: 'fanPerformerIcon'
 			, draggable: true
@@ -38,18 +39,20 @@ class PerformerIcon {
 		if (zidx < 5) {
 			let txt: TileText = {
 				text: audioSeq.kind + ':' + audioSeq.id
-				, x: xx, y: yy + globalCommandDispatcher.cfg().pluginIconSize, css: 'fanIconLabel'
+				, x: xx, y: yy , css: 'fanIconLabel'
 			};
 			fanLevelAnchor.content.push(txt);
 		}
 		//console.log('PerformerIcon', rec);
-		let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
-		new ControlConnection().addAudioStreamLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
+		//let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
+		let step = globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveCount * 12 / sum;
+		let performerFromY = globalCommandDispatcher.cfg().gridTop() + (order + 0.5) * step;
+		new ControlConnection().addAudioStreamLineFlow(performerFromY, xx, yy , spearsAnchor);
 		new FanOutputLine().addOutputs(audioSeq.outputs, fanLevelAnchor, spearsAnchor
 			, audioSeq.id
-			, xx + globalCommandDispatcher.cfg().pluginIconSize / 2
-			, yy + globalCommandDispatcher.cfg().pluginIconSize / 2
-			,zidx);
+			, xx 
+			, yy 
+			, zidx);
 	}
 	/*
 	addOutputs(outputs: string[], fanLevelAnchor: TileAnchor, zidx: number, fromX: number, fromY: number) {
