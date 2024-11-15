@@ -2354,7 +2354,6 @@ class SamplerIcon {
             ],
             draggable: true,
             activation: (x, y) => {
-                console.log('sampler', x, y);
                 if (!dragAnchor.translation) {
                     dragAnchor.translation = { x: 0, y: 0 };
                 }
@@ -2365,6 +2364,7 @@ class SamplerIcon {
                     }
                     sampler.iconPosition.x = sampler.iconPosition.x + dragAnchor.translation.x;
                     sampler.iconPosition.y = sampler.iconPosition.y + dragAnchor.translation.y;
+                    console.log('drop' + sampler.kind + ':' + sampler.id + ' to ' + sampler.iconPosition.x + '/' + sampler.iconPosition.y);
                     dragAnchor.translation = { x: 0, y: 0 };
                     globalCommandDispatcher.resetProject();
                 }
@@ -2383,6 +2383,31 @@ class SamplerIcon {
                 x: xx,
                 y: yy,
                 css: 'fanIconLabel'
+            };
+            dragAnchor.content.push(txt);
+        }
+        let btnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
+        if (zidx < 5) {
+            let btn = {
+                x: xx - btnSz / 2,
+                y: yy + sz / 5 - btnSz / 2,
+                w: btnSz,
+                h: btnSz,
+                rx: btnSz / 2,
+                ry: btnSz / 2,
+                css: 'fanSamplerInteractionIcon',
+                activation: (x, y) => {
+                    console.log('' + sampler.kind + ':' + sampler.id);
+                }
+            };
+            dragAnchor.content.push(btn);
+        }
+        if (zidx < 4) {
+            let txt = {
+                text: icon_gear,
+                x: xx,
+                y: yy + sz / 5 + btnSz / 2,
+                css: 'fanSamplerActionIconLabel'
             };
             dragAnchor.content.push(txt);
         }

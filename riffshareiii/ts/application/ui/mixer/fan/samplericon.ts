@@ -13,7 +13,7 @@ class SamplerIcon {
 		}
 	}
 	addSamplerSpot(order: number, sampler: Zvoog_AudioSampler, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
-		let sz = globalCommandDispatcher.cfg().pluginIconSize * 1.3 *zoomPrefixLevelsCSS[ zidx].iconRatio;
+		let sz = globalCommandDispatcher.cfg().pluginIconSize * 1.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
 		//console.log(zidx);
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
@@ -24,56 +24,84 @@ class SamplerIcon {
 			yy = top + sampler.iconPosition.y;
 		}
 		//if (zidx < 7) {
-			let dragAnchor: TileAnchor = {
-				xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz
-				, showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [], translation: { x: 0, y: 0 }
-			};
-			fanLevelAnchor.content.push(dragAnchor);
-			let rec: TilePolygon = {
-				x: xx - sz/2
-				, y: yy-sz/2
-				, dots: [
-					0, sz / 2
-					, sz / 2, 0
-					, sz, sz / 2
-					, sz / 2, sz
-				]
-				, draggable: true
-				, activation: (x: number, y: number) => {
-					console.log('sampler', x, y);
-					if (!dragAnchor.translation) {
-						dragAnchor.translation = { x: 0, y: 0 };
-					}
-					if (x == 0 && y == 0) {
-						console.log('done', dragAnchor.translation);
-						if (!sampler.iconPosition) {
-							sampler.iconPosition = { x: 0, y: 0 };
-						}
-						sampler.iconPosition.x = sampler.iconPosition.x + dragAnchor.translation.x;
-						sampler.iconPosition.y = sampler.iconPosition.y + dragAnchor.translation.y;
-						dragAnchor.translation = { x: 0, y: 0 };
-						globalCommandDispatcher.resetProject();
-					} else {
-						dragAnchor.translation.x = dragAnchor.translation.x + x;
-						dragAnchor.translation.y = dragAnchor.translation.y + y;
-						globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
-							, fanLevelAnchor
-							, LevelModes.normal);
-					}
+		let dragAnchor: TileAnchor = {
+			xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz
+			, showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [], translation: { x: 0, y: 0 }
+		};
+		fanLevelAnchor.content.push(dragAnchor);
+		let rec: TilePolygon = {
+			x: xx - sz / 2
+			, y: yy - sz / 2
+			, dots: [
+				0, sz / 2
+				, sz / 2, 0
+				, sz, sz / 2
+				, sz / 2, sz
+			]
+			, draggable: true
+			, activation: (x: number, y: number) => {
+				//console.log('sampler', x, y);
+				if (!dragAnchor.translation) {
+					dragAnchor.translation = { x: 0, y: 0 };
 				}
-				, css: 'fanSamplerMoveIcon'
-			};
-			dragAnchor.content.push(rec);
-			if (zidx < 3) {
-				let txt: TileText = {
-					text: sampler.kind + ':' + sampler.id
-					, x: xx
-					, y: yy
-					, css: 'fanIconLabel'
-				};
-				dragAnchor.content.push(txt);
-
+				if (x == 0 && y == 0) {
+					console.log('done', dragAnchor.translation);
+					if (!sampler.iconPosition) {
+						sampler.iconPosition = { x: 0, y: 0 };
+					}
+					sampler.iconPosition.x = sampler.iconPosition.x + dragAnchor.translation.x;
+					sampler.iconPosition.y = sampler.iconPosition.y + dragAnchor.translation.y;
+					console.log('drop' + sampler.kind + ':' + sampler.id+' to '+sampler.iconPosition.x+'/'+sampler.iconPosition.y);
+					dragAnchor.translation = { x: 0, y: 0 };
+					globalCommandDispatcher.resetProject();
+				} else {
+					dragAnchor.translation.x = dragAnchor.translation.x + x;
+					dragAnchor.translation.y = dragAnchor.translation.y + y;
+					globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
+						, fanLevelAnchor
+						, LevelModes.normal);
+				}
 			}
+			, css: 'fanSamplerMoveIcon'
+		};
+		dragAnchor.content.push(rec);
+		if (zidx < 3) {
+			let txt: TileText = {
+				text: sampler.kind + ':' + sampler.id
+				, x: xx
+				, y: yy
+				, css: 'fanIconLabel'
+			};
+			dragAnchor.content.push(txt);
+
+		}
+		let btnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
+		if (zidx < 5) {
+			
+			let btn: TileRectangle = {
+				x: xx - btnSz / 2
+				, y: yy + sz / 5 - btnSz / 2
+				, w: btnSz
+				, h: btnSz
+				, rx: btnSz / 2
+				, ry: btnSz / 2
+				, css: 'fanSamplerInteractionIcon'
+				, activation: (x: number, y: number) => {
+					console.log('' + sampler.kind + ':' + sampler.id);
+				}
+			};
+			dragAnchor.content.push(btn);
+			
+		}
+		if (zidx < 4) {
+			let txt: TileText = {
+				text: icon_gear
+				, x: xx
+				, y: yy + sz / 5 + btnSz / 2
+				, css: 'fanSamplerActionIconLabel'
+			};
+			dragAnchor.content.push(txt);
+		}
 		//}
 		let samplerFromY = globalCommandDispatcher.cfg().samplerTop() + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
 		new ControlConnection().addAudioStreamLineFlow(samplerFromY, xx, yy, spearsAnchor);

@@ -16,6 +16,22 @@
 	stroke-linejoin: round;
 	paint-order: stroke fill;
 }
+.fanSamplerInteractionIcon {
+	fill: var(--click-color);
+	font-size: calc(0.25*var(--tapSize));
+	cursor: pointer;
+	stroke: var(--line-color);
+	stroke-width: calc(0.125*var(--tapSize));
+	stroke-linejoin: round;
+	paint-order: stroke fill;
+}
+.fanSamplerActionIconLabel {
+	fill: var(--main-color);
+	font-size: var(--label-1cm);
+	pointer-events: none;
+	text-anchor: middle;
+	font-family: "Material-Design-Iconic-Font";
+}
 
 .fanPointLinker {
 	fill: var(--drag-color);
