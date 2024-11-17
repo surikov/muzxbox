@@ -83,7 +83,7 @@ class FilterIcon {
 		//let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
 		//new ControlConnection().addAudioStreamLineFlow(yy + globalCommandDispatcher.cfg().pluginIconSize / 2, controlLineWidth, fanLevelAnchor);
 		let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order +0.5)* globalCommandDispatcher.cfg().autoPointHeight;
-		new ControlConnection().addAudioStreamLineFlow(filterFromY
+		new ControlConnection().addAudioStreamLineFlow(zidx,filterFromY
 			, xx, yy, spearsAnchor);
 		new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, spearsAnchor
 			, filterTarget.id

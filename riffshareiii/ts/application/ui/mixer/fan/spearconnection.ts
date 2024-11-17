@@ -5,13 +5,14 @@ class SpearConnection {
 	nonan(nn: number): number {
 		return (nn) ? nn : 0;
 	}
-	addSpear(//fromSize: number, 
+	addSpear(zidx: number, 
 		fromX: number, fromY: number
 		, toSize: number
 		, toX: number, toY: number
 		, anchor: TileAnchor) {
 		let headLen = 3;
-		let css = 'fanConnection';
+		let css = 'fanConnectionBase fanConnection'+zidx;
+		//console.log(zidx);
 
 		let diffX = toX - fromX;
 		let diffY = toY - fromY;

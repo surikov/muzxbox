@@ -47,7 +47,7 @@ class PerformerIcon {
 		//let controlLineWidth = xx - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().timelineWidth();
 		let step = globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveCount * 12 / sum;
 		let performerFromY = globalCommandDispatcher.cfg().gridTop() + (order + 0.5) * step;
-		new ControlConnection().addAudioStreamLineFlow(performerFromY, xx, yy , spearsAnchor);
+		new ControlConnection().addAudioStreamLineFlow(zidx,performerFromY, xx, yy , spearsAnchor);
 		new FanOutputLine().addOutputs(audioSeq.outputs, fanLevelAnchor, spearsAnchor
 			, audioSeq.id
 			, xx 

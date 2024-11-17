@@ -64,13 +64,22 @@
 
 }
 
-.fanConnection {
+.fanConnectionBase {
 	pointer-events: none;
-	stroke: var(--main-color);
-	stroke-width: 0.5cm;
+	stroke: var(--line-color);
+	stroke-width2: 0.5cm;
 	stroke-linejoin: round;
 	paint-order: stroke;
 }
+.fanConnection0 {stroke-width: 0.02cm;}
+.fanConnection1 {stroke-width: 0.04cm;}
+.fanConnection2 {stroke-width: 0.08cm;}
+.fanConnection3 {stroke-width: 0.16cm;}
+.fanConnection4 {stroke-width: 0.32cm;}
+.fanConnection5 {stroke-width: 0.65cm;}
+.fanConnection6 {stroke-width: 1.28cm;}
+.fanConnection7 {stroke-width: 2.56cm;}
+.fanConnection8 {stroke-width: 5.12cm;}
 
 .fanStream {
 	pointer-events: none;

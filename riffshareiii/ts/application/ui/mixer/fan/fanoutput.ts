@@ -20,7 +20,7 @@ class FanOutputLine {
 								xx = left + toFilter.iconPosition.x ;
 								yy = top + toFilter.iconPosition.y ;
 							}
-							new SpearConnection().addSpear(//globalCommandDispatcher.cfg().pluginIconSize, 
+							new SpearConnection().addSpear(zidx, 
 								fromX, fromY
 								, sz, xx, yy
 								, fanLinesAnchor);
@@ -39,8 +39,7 @@ class FanOutputLine {
 				let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
 
 
-				new SpearConnection().addSpear(//globalCommandDispatcher.cfg().pluginIconSize
-					//, 
+				new SpearConnection().addSpear(zidx, 
 					fromX
 					, fromY
 					, globalCommandDispatcher.cfg().speakerIconSize

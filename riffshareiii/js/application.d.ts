@@ -339,12 +339,12 @@ declare class FilterIcon {
     addAutoSpot(order: number, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
 }
 declare class ControlConnection {
-    addAudioStreamLineFlow(yy: number, toX: number, toY: number, anchor: TileAnchor): void;
+    addAudioStreamLineFlow(zIndex: number, yy: number, toX: number, toY: number, anchor: TileAnchor): void;
 }
 declare class SpearConnection {
     constructor();
     nonan(nn: number): number;
-    addSpear(fromX: number, fromY: number, toSize: number, toX: number, toY: number, anchor: TileAnchor): void;
+    addSpear(zidx: number, fromX: number, fromY: number, toSize: number, toX: number, toY: number, anchor: TileAnchor): void;
 }
 declare class FanOutputLine {
     addOutputs(outputs: string[], buttonsAnchor: TileAnchor, fanLinesAnchor: TileAnchor, fromID: string, fromX: number, fromY: number, zidx: number): void;

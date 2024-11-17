@@ -2311,7 +2311,7 @@ class PerformerIcon {
         }
         let step = globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveCount * 12 / sum;
         let performerFromY = globalCommandDispatcher.cfg().gridTop() + (order + 0.5) * step;
-        new ControlConnection().addAudioStreamLineFlow(performerFromY, xx, yy, spearsAnchor);
+        new ControlConnection().addAudioStreamLineFlow(zidx, performerFromY, xx, yy, spearsAnchor);
         new FanOutputLine().addOutputs(audioSeq.outputs, fanLevelAnchor, spearsAnchor, audioSeq.id, xx, yy, zidx);
     }
 }
@@ -2419,7 +2419,7 @@ class SamplerIcon {
             dragAnchor.content.push(txt);
         }
         let samplerFromY = globalCommandDispatcher.cfg().samplerTop() + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
-        new ControlConnection().addAudioStreamLineFlow(samplerFromY, xx, yy, spearsAnchor);
+        new ControlConnection().addAudioStreamLineFlow(zidx, samplerFromY, xx, yy, spearsAnchor);
         new FanOutputLine().addOutputs(sampler.outputs, fanLevelAnchor, spearsAnchor, sampler.id, xx, yy, zidx);
     }
 }
@@ -2491,14 +2491,14 @@ class FilterIcon {
             fanLevelAnchor.content.push(txt);
         }
         let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;
-        new ControlConnection().addAudioStreamLineFlow(filterFromY, xx, yy, spearsAnchor);
+        new ControlConnection().addAudioStreamLineFlow(zidx, filterFromY, xx, yy, spearsAnchor);
         new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, spearsAnchor, filterTarget.id, xx, yy, zidx);
     }
 }
 class ControlConnection {
-    addAudioStreamLineFlow(yy, toX, toY, anchor) {
+    addAudioStreamLineFlow(zIndex, yy, toX, toY, anchor) {
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
-        new SpearConnection().addSpear(left, yy, globalCommandDispatcher.cfg().pluginIconSize, toX, toY, anchor);
+        new SpearConnection().addSpear(zIndex, left, yy, globalCommandDispatcher.cfg().pluginIconSize, toX, toY, anchor);
     }
 }
 class SpearConnection {
@@ -2507,9 +2507,9 @@ class SpearConnection {
     nonan(nn) {
         return (nn) ? nn : 0;
     }
-    addSpear(fromX, fromY, toSize, toX, toY, anchor) {
+    addSpear(zidx, fromX, fromY, toSize, toX, toY, anchor) {
         let headLen = 3;
-        let css = 'fanConnection';
+        let css = 'fanConnectionBase fanConnection' + zidx;
         let diffX = toX - fromX;
         let diffY = toY - fromY;
         let pathLen = Math.sqrt(diffX * diffX + diffY * diffY);
@@ -2548,7 +2548,7 @@ class FanOutputLine {
                                 xx = left + toFilter.iconPosition.x;
                                 yy = top + toFilter.iconPosition.y;
                             }
-                            new SpearConnection().addSpear(fromX, fromY, sz, xx, yy, fanLinesAnchor);
+                            new SpearConnection().addSpear(zidx, fromX, fromY, sz, xx, yy, fanLinesAnchor);
                             this.addDeleteSpear(fromID, toFilter.id, fromX, fromY, sz, xx, yy, buttonsAnchor, zidx);
                             break;
                         }
@@ -2558,7 +2558,7 @@ class FanOutputLine {
             else {
                 let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().speakerIconSize / 2;
                 let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
-                new SpearConnection().addSpear(fromX, fromY, globalCommandDispatcher.cfg().speakerIconSize, speakerX, speakerY, fanLinesAnchor);
+                new SpearConnection().addSpear(zidx, fromX, fromY, globalCommandDispatcher.cfg().speakerIconSize, speakerX, speakerY, fanLinesAnchor);
                 this.addDeleteSpear(fromID, '', fromX, fromY, globalCommandDispatcher.cfg().speakerIconSize, speakerX, speakerY, buttonsAnchor, zidx);
             }
         }
