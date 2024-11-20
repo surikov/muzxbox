@@ -10,7 +10,7 @@ class SpearConnection {
 		, toSize: number
 		, toX: number, toY: number
 		, anchor: TileAnchor) {
-		let headLen = 3;
+		let headLen = 0.5*(1+zidx);
 		let css = 'fanConnectionBase fanConnection'+zidx;
 		//console.log(zidx);
 

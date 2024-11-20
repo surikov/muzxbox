@@ -4,7 +4,7 @@ class FanOutputLine {
 		, fromID: string
 		, fromX: number, fromY: number
 		, zidx: number) {
-			let sz = globalCommandDispatcher.cfg().pluginIconSize;
+			let sz = globalCommandDispatcher.cfg().pluginIconSize* zoomPrefixLevelsCSS[zidx].iconRatio;
 		if (outputs) {
 			if (outputs.length > 0) {
 				for (let oo = 0; oo < outputs.length; oo++) {
@@ -83,7 +83,7 @@ class FanOutputLine {
 				, h: globalCommandDispatcher.cfg().pluginIconSize / 2
 				, rx: globalCommandDispatcher.cfg().pluginIconSize / 4
 				, ry: globalCommandDispatcher.cfg().pluginIconSize / 4
-				, css: 'fanDropConnection'
+				, css: 'fanDropConnection fanDropConnection'+zidx
 				, activation: (x: number, y: number) => {
 					console.log('delete link from', fromID, 'to', toID);
 				}

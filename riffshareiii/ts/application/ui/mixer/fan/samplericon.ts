@@ -51,7 +51,7 @@ class SamplerIcon {
 					}
 					sampler.iconPosition.x = sampler.iconPosition.x + dragAnchor.translation.x;
 					sampler.iconPosition.y = sampler.iconPosition.y + dragAnchor.translation.y;
-					console.log('drop' + sampler.kind + ':' + sampler.id+' to '+sampler.iconPosition.x+'/'+sampler.iconPosition.y);
+					console.log('drop' + sampler.kind + ':' + sampler.id + ' to ' + sampler.iconPosition.x + '/' + sampler.iconPosition.y);
 					dragAnchor.translation = { x: 0, y: 0 };
 					globalCommandDispatcher.resetProject();
 				} else {
@@ -62,7 +62,7 @@ class SamplerIcon {
 						, LevelModes.normal);
 				}
 			}
-			, css: 'fanSamplerMoveIcon'
+			, css: 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx
 		};
 		dragAnchor.content.push(rec);
 		if (zidx < 3) {
@@ -77,7 +77,7 @@ class SamplerIcon {
 		}
 		let clickBtnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
 		if (zidx < 5) {
-			
+
 			let btn: TileRectangle = {
 				x: xx - clickBtnSz / 2
 				, y: yy + sz / 5 - clickBtnSz / 2
@@ -85,30 +85,32 @@ class SamplerIcon {
 				, h: clickBtnSz
 				, rx: clickBtnSz / 2
 				, ry: clickBtnSz / 2
-				, css: 'fanSamplerInteractionIcon'
+				, css: 'fanSamplerInteractionIcon fanButton' + zidx
 				, activation: (x: number, y: number) => {
 					console.log('' + sampler.kind + ':' + sampler.id);
 				}
 			};
 			dragAnchor.content.push(btn);
-			
+
 		}
 		if (zidx < 4) {
-			let yZshift=1/5;
-			if(zidx < 3) yZshift=1/4;
-			if(zidx < 2) yZshift=1/3;
-			if(zidx < 1) yZshift=1/2.5;
+			let yZshift = 0.3;
+			if (zidx > 0) yZshift = 0.25;
+			if (zidx > 1) yZshift = 0.2;
+			if (zidx > 2) yZshift = 0.15;
+
+
 			let txt: TileText = {
 				text: icon_gear
 				, x: xx
-				, y: yy + sz / 5 + clickBtnSz *yZshift
+				, y: yy + sz / 5 + clickBtnSz * yZshift
 				, css: 'fanSamplerActionIconLabel'
 			};
 			dragAnchor.content.push(txt);
 		}
 		//}
 		let samplerFromY = globalCommandDispatcher.cfg().samplerTop() + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
-		new ControlConnection().addAudioStreamLineFlow(zidx,samplerFromY, xx, yy, spearsAnchor);
+		new ControlConnection().addAudioStreamLineFlow(zidx, samplerFromY, xx, yy, spearsAnchor);
 		new FanOutputLine().addOutputs(sampler.outputs, fanLevelAnchor, spearsAnchor, sampler.id, xx, yy, zidx);
 	}
 }

@@ -4,7 +4,7 @@ class ControlConnection {
 		new SpearConnection().addSpear(zIndex,
 			left
 			, yy
-			, globalCommandDispatcher.cfg().pluginIconSize
+			, globalCommandDispatcher.cfg().pluginIconSize*1.5
 			, toX
 			, toY
 			, anchor);

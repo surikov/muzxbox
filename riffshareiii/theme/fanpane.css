@@ -8,26 +8,41 @@
 
 .fanSamplerMoveIcon {
 	fill: var(--drag-color);
-
 	font-size: calc(0.25*var(--tapSize));
 	cursor: move;
-	stroke: var(--line-color);
+	stroke: var(--main-color);
 	stroke-width: calc(0.125*var(--tapSize));
 	stroke-linejoin: round;
 	paint-order: stroke fill;
 }
+.fanSamplerMoveIcon0 {stroke-width: calc(0.02*var(--tapSize));}
+.fanSamplerMoveIcon1 {stroke-width: calc(0.04*var(--tapSize));}
+.fanSamplerMoveIcon2 {stroke-width: calc(0.08*var(--tapSize));}
+.fanSamplerMoveIcon3 {stroke-width: calc(0.16*var(--tapSize));}
+.fanSamplerMoveIcon4 {stroke-width: calc(0.32*var(--tapSize));}
+.fanSamplerMoveIcon5 {stroke-width: calc(0.64*var(--tapSize));}
+.fanSamplerMoveIcon6 {stroke-width: calc(1.28*var(--tapSize));}
+.fanSamplerMoveIcon7 {stroke-width: calc(2.56*var(--tapSize));}
+.fanSamplerMoveIcon8 {stroke-width: calc(5.12*var(--tapSize));}
+.fanSamplerMoveIcon9 {stroke-width: calc(10.24*var(--tapSize));}
 .fanSamplerInteractionIcon {
 	fill: var(--click-color);
 	font-size: calc(0.25*var(--tapSize));
 	cursor: pointer;
-	stroke: var(--line-color);
-	stroke-width: calc(0.125*var(--tapSize));
+	stroke: var(--main-color);
+	stroke-width2: calc(0.125*var(--tapSize));
 	stroke-linejoin: round;
 	paint-order: stroke fill;
 }
+.fanButton0 {stroke-width: calc(0.02*var(--tapSize));}
+.fanButton1 {stroke-width: calc(0.04*var(--tapSize));}
+.fanButton2 {stroke-width: calc(0.08*var(--tapSize));}
+.fanButton3 {stroke-width: calc(0.16*var(--tapSize));}
+.fanButton4 {stroke-width: calc(0.32*var(--tapSize));}
+
 .fanSamplerActionIconLabel {
 	fill: var(--main-color);
-	font-size: var(--label-1cm);
+	font-size: var(--label-075cm);
 	pointer-events: none;
 	text-anchor: middle;
 	font-family: "Material-Design-Iconic-Font";
@@ -91,12 +106,18 @@
 
 .fanDropConnection {
 	cursor: pointer;
-	stroke: var(--line-color);
+	stroke: var(--main-color);
 	stroke-width: 0.5cm;
 	stroke-linejoin: round;
 	paint-order: stroke;
 	fill: var(--click-color);
 }
+.fanDropConnection0 {stroke-width: 0.02cm;}
+.fanDropConnection1 {stroke-width: 0.04cm;}
+.fanDropConnection2 {stroke-width: 0.08cm;}
+.fanDropConnection3 {stroke-width: 0.16cm;}
+.fanDropConnection4 {stroke-width: 0.32cm;}
+
 
 .fanDeleteIcon {
 	fill: var(--main-color);
