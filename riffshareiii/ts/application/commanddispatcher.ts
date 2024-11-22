@@ -135,7 +135,18 @@ class CommandDispatcher {
 		this.renderer.fillWholeUI();//this.workData);
 	}
 
-
+	setTrackActive(trackNum: number) {
+		for (let tt = 0; tt < this.cfg().data.tracks.length; tt++) {
+			this.cfg().data.tracks[tt].active = false;
+		}
+		this.cfg().data.tracks[trackNum].active = true;
+		this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
+		if (this.cfg().data.tracks)
+			if (this.cfg().data.tracks[trackNum])
+				this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[trackNum].title;
+		this.resetProject();
+		console.log('setTrackActive',trackNum,this.cfg().data.tracks);
+	}
 	moveTrackTop(trackNum: number) {
 		console.log('moveTrackTop', trackNum);
 		let it = this.cfg().data.tracks[trackNum];

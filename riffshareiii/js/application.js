@@ -332,6 +332,18 @@ class CommandDispatcher {
     resetProject() {
         this.renderer.fillWholeUI();
     }
+    setTrackActive(trackNum) {
+        for (let tt = 0; tt < this.cfg().data.tracks.length; tt++) {
+            this.cfg().data.tracks[tt].active = false;
+        }
+        this.cfg().data.tracks[trackNum].active = true;
+        this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
+        if (this.cfg().data.tracks)
+            if (this.cfg().data.tracks[trackNum])
+                this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[trackNum].title;
+        this.resetProject();
+        console.log('setTrackActive', trackNum, this.cfg().data.tracks);
+    }
     moveTrackTop(trackNum) {
         console.log('moveTrackTop', trackNum);
         let it = this.cfg().data.tracks[trackNum];
@@ -1096,7 +1108,7 @@ class RightMenuPanel {
                 text: track.title,
                 noLocalization: true,
                 onClick: () => {
-                    globalCommandDispatcher.moveTrackTop(tt);
+                    globalCommandDispatcher.setTrackActive(tt);
                 },
                 onSubClick: () => {
                     let state = item.selection ? item.selection : 0;
@@ -1649,19 +1661,24 @@ class OctaveContent {
     }
     addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel) {
         if (globalCommandDispatcher.cfg().data.tracks.length) {
-            let css = 'mixNoteLine';
-            if (zoomLevel == 0) {
-                this.addTrackNotes(globalCommandDispatcher.cfg().data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, css);
-            }
-            else {
-                this.addTrackNotes(globalCommandDispatcher.cfg().data.tracks[0], barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, css);
+            for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+                let track = globalCommandDispatcher.cfg().data.tracks[tt];
+                if (track.active) {
+                    let css = 'mixNoteLine';
+                    this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, css);
+                    break;
+                }
             }
         }
     }
     addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor) {
-        for (let ii = 1; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
+        for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
             let track = globalCommandDispatcher.cfg().data.tracks[ii];
-            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, 'mixNoteSub');
+            if (track.active) {
+            }
+            else {
+                this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, 'mixNoteSub');
+            }
         }
     }
     addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, css) {
@@ -2586,7 +2603,11 @@ class FilterIcon {
         }
         if (order > -1) {
             let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;
-            new ControlConnection().addAudioStreamLineFlow(zidx, filterFromY, xx, yy, spearsAnchor);
+            let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+            let css = 'fanConnectionBase fanConnection' + zidx;
+            let hoLine = { x1: left, x2: xx, y1: filterFromY, y2: filterFromY, css: css };
+            spearsAnchor.content.push(hoLine);
+            new SpearConnection().addSpear(zidx, xx, filterFromY, sz, xx, yy, spearsAnchor);
         }
         new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, spearsAnchor, filterTarget.id, xx, yy, zidx);
     }
@@ -2594,7 +2615,7 @@ class FilterIcon {
 class ControlConnection {
     addAudioStreamLineFlow(zIndex, yy, toX, toY, anchor) {
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
-        new SpearConnection().addSpear(zIndex, left, yy, globalCommandDispatcher.cfg().pluginIconSize * 1.5, toX, toY, anchor);
+        new SpearConnection().addSpear(zIndex, left, yy, globalCommandDispatcher.cfg().pluginIconSize * 2, toX, toY, anchor);
     }
 }
 class SpearConnection {

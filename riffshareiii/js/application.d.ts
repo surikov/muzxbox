@@ -48,6 +48,7 @@ declare class CommandDispatcher {
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     changeTapSize(ratio: number): void;
     resetProject(): void;
+    setTrackActive(trackNum: number): void;
     moveTrackTop(trackNum: number): void;
     moveDrumTop(drumNum: number): void;
     moveAutomationTop(filterNum: number): void;
@@ -717,6 +718,7 @@ declare type Zvoog_PercussionTrack = {
 };
 declare type Zvoog_MusicTrack = {
     title: string;
+    active?: boolean;
     measures: Zvoog_TrackMeasure[];
     performer: Zvoog_AudioSequencer;
 };

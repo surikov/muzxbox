@@ -24,7 +24,7 @@ class FilterIcon {
 		}
 	}
 	addFilterSpot(order: number, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
-		let sz = globalCommandDispatcher.cfg().pluginIconSize* zoomPrefixLevelsCSS[zidx].iconRatio;
+		let sz = globalCommandDispatcher.cfg().pluginIconSize * zoomPrefixLevelsCSS[zidx].iconRatio;
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
 		let xx = left;
@@ -108,8 +108,19 @@ class FilterIcon {
 		}
 		if (order > -1) {
 			let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;
-			new ControlConnection().addAudioStreamLineFlow(zidx, filterFromY
-				, xx, yy, spearsAnchor);
+			//new ControlConnection().addAudioStreamLineFlow(zidx, filterFromY, xx, yy, spearsAnchor);
+			let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+			let css = 'fanConnectionBase fanConnection'+zidx;
+			let hoLine: TileLine = { x1: left, x2: xx, y1: filterFromY, y2: filterFromY, css: css };
+			spearsAnchor.content.push(hoLine);
+			new SpearConnection().addSpear(zidx,
+				xx
+				, filterFromY
+				, sz //globalCommandDispatcher.cfg().pluginIconSize
+				, xx
+				, yy
+				, spearsAnchor);
+			//console.log(hoLine);
 		}
 		new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, spearsAnchor
 			, filterTarget.id

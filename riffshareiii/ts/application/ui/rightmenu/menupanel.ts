@@ -239,8 +239,8 @@ class RightMenuPanel {
 				text: track.title
 				, noLocalization: true
 				, onClick: () => {
-
-					globalCommandDispatcher.moveTrackTop(tt);
+					//globalCommandDispatcher.moveTrackTop(tt);
+					globalCommandDispatcher.setTrackActive(tt);
 				}
 				, onSubClick: () => {
 

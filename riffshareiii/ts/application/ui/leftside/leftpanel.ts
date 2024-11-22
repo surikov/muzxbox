@@ -100,20 +100,7 @@ class LeftPanel {
 
 				}
 			}
-			/*
-			if (globalCommandDispatcher.cfg().data.focus) {
-				//
-			} else {
-				if (globalCommandDispatcher.cfg().data.tracks.length > 0) {
-					let trackLabel: TileText = {
-						text: '' + globalCommandDispatcher.cfg().data.tracks[0].title
-						, x: 0
-						, y: globalCommandDispatcher.cfg().gridTop()// + zoomPrefixLevelsCSS[zz].minZoom * 0.5
-						, css: 'curTrackTitleLabel' + zoomPrefixLevelsCSS[zz].prefix
-					};
-					this.leftZoomAnchors[zz].content.push(trackLabel);
-				}
-			}*/
+		
 			if (zz < 4) {
 				for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++) {
 					let samplerLabel: TileText = {

@@ -1871,6 +1871,7 @@ class MidiParser {
 			, tracks: []
 			, percussions: []
 			, filters: []
+			,automations: []
 			, comments: []
 		};
 
@@ -1891,8 +1892,8 @@ class MidiParser {
 			let filterID = 'f' + ii;
 			let filterVolume: Zvoog_FilterTarget = {
 				id: filterID
-				, kind: 'VolumeGain', dataBlob: '', outputs: [], automation: null
-				, iconPosition: { x: 33, y: ii*4+2 }
+				, kind: 'VolumeGain', dataBlob: '', outputs: []
+				, iconPosition: { x: 77+ii*3, y: ii*8+2 }
 			};
 			project.filters.push(filterVolume);
 
@@ -1901,9 +1902,16 @@ class MidiParser {
 				filterVolume.dataBlob = '' + Math.round(vol * 100) + '%';
 			} else {
 				if (midiSongTrack.trackVolumes.length > 1) {
-					filterVolume.automation = { title: 'for ' + filterID, measures: [] };
+					let filterVolumeAutomation:Zvoog_AutomationTrack={
+						title: 'for ' + filterID
+						, measures: []
+						,output:filterVolume.id
+					};
+					project.automations.push(filterVolumeAutomation);
+					//filterVolume.automation = { title: 'for ' + filterID, measures: [] };
 					for (let mm = 0; mm < project.timeline.length; mm++) {
-						filterVolume.automation.measures.push({ changes: [] });
+						//filterVolume.automation.measures.push({ changes: [] });
+						filterVolumeAutomation.measures.push({ changes: [] });
 					}
 					for (let vv = 0; vv < midiSongTrack.trackVolumes.length; vv++) {
 						let gain = midiSongTrack.trackVolumes[vv];
@@ -1913,14 +1921,14 @@ class MidiParser {
 						//
 						if (pnt) {
 							pnt.skip = MMUtil().set(pnt.skip).strip(16);
-							for (let aa = 0; aa < filterVolume.automation.measures[pnt.idx].changes.length; aa++) {
-								let sk = filterVolume.automation.measures[pnt.idx].changes[aa].skip;
+							for (let aa = 0; aa < filterVolumeAutomation.measures[pnt.idx].changes.length; aa++) {
+								let sk = filterVolumeAutomation.measures[pnt.idx].changes[aa].skip;
 								if (MMUtil().set(sk).equals(pnt.skip)) {
-									filterVolume.automation.measures[pnt.idx].changes.splice(aa, 1);
+									filterVolumeAutomation.measures[pnt.idx].changes.splice(aa, 1);
 									break;
 								}
 							}
-							filterVolume.automation.measures[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
+							filterVolumeAutomation.measures[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
 							//console.log(filterID, vol, pnt,vol);
 						}
 					}
@@ -1933,11 +1941,11 @@ class MidiParser {
 				let drums: number[] = this.collectDrums(midiSongTrack);
 				//console.log(midiTrack,drums);
 				for (let dd = 0; dd < drums.length; dd++) {
-					project.percussions.push(this.createProjectDrums(top*4,drums[dd], project.timeline, midiSongTrack, filterID));
+					project.percussions.push(this.createProjectDrums(top*9,drums[dd], project.timeline, midiSongTrack, filterID));
 					top++;
 				}
 			} else {
-				project.tracks.push(this.createProjectTrack(top*4,project.timeline, midiSongTrack, filterID));
+				project.tracks.push(this.createProjectTrack(top*8,project.timeline, midiSongTrack, filterID));
 				top++;
 			}
 //console.log(top,ii);
@@ -2008,7 +2016,7 @@ class MidiParser {
 			, measures: []
 			//, filters: []
 			, performer: { id: 'p'+Math.random(), data: '', kind: '', outputs: [outputId] 
-			,iconPosition: { x: 0, y: top }
+			,iconPosition: { x: top/3, y: top }
 		}
 		};
 		let mm = MMUtil();
@@ -2103,7 +2111,7 @@ class MidiParser {
 			, measures: []
 			//, filters: []
 			, sampler: { id: 'd'+Math.random(), data: '', kind: '', outputs: [outputId] 
-			,iconPosition: { x: 10, y: top }
+			,iconPosition: { x: top/2, y: top }
 		}
 		};
 		let currentTimeMs = 0;

@@ -100,6 +100,7 @@ type Zvoog_PercussionTrack = {
 };
 type Zvoog_MusicTrack = {
 	title: string;
+	active?:boolean;
 	measures: Zvoog_TrackMeasure[];
 	performer: Zvoog_AudioSequencer;
 };

@@ -29,22 +29,28 @@ class OctaveContent {
 		, zoomLevel: number
 	) {
 		if (globalCommandDispatcher.cfg().data.tracks.length) {
-			let css = 'mixNoteLine';
-			//if (globalCommandDispatcher.cfg().data.focus) {
-			//	css = 'mixNoteSub';
-			//}
-			if (zoomLevel == 0) {
-				this.addTrackNotes(globalCommandDispatcher.cfg().data.tracks[0], barIdx, octaveIdx
-					, left, top, width, height, barOctaveAnchor
-					, css//, true
-				);
-			} else {
-				this.addTrackNotes(globalCommandDispatcher.cfg().data.tracks[0], barIdx, octaveIdx
-					, left, top, width, height, barOctaveAnchor
-					, css//, false
-				);
+			for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+				let track = globalCommandDispatcher.cfg().data.tracks[tt];
+				if (track.active) {
+					let css = 'mixNoteLine';
+					//if (globalCommandDispatcher.cfg().data.focus) {
+					//	css = 'mixNoteSub';
+					//}
+					/*if (zoomLevel == 0) {
+						this.addTrackNotes(track, barIdx, octaveIdx
+							, left, top, width, height, barOctaveAnchor
+							, css//, true
+						);
+					} else {
+						this.addTrackNotes(track, barIdx, octaveIdx
+							, left, top, width, height, barOctaveAnchor
+							, css//, false
+						);
+					}*/
+					this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, css);
+					break;
+				}
 			}
-
 		}
 	}
 	addOtherNotes(barIdx: number, octaveIdx: number
@@ -56,11 +62,15 @@ class OctaveContent {
 		//if (globalCommandDispatcher.cfg().data.focus) {
 		//	start=0;
 		//}
-		for (let ii = 1; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
+
+		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
 			let track = globalCommandDispatcher.cfg().data.tracks[ii];
-			this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor
-				, 'mixNoteSub'//, false
-			);
+			if (track.active) {
+				//skip
+			} else {
+				this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, 'mixNoteSub');
+			}
+
 		}
 	}
 	addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number

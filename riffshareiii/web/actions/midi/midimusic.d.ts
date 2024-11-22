@@ -39,7 +39,6 @@ declare type Zvoog_FilterTarget = {
     kind: string;
     dataBlob: string;
     outputs: string[];
-    automation: Zvoog_AutomationTrack | null;
     iconPosition?: {
         x: number;
         y: number;
@@ -83,6 +82,7 @@ declare type Zvoog_SongMeasure = {
 declare type Zvoog_AutomationTrack = {
     title: string;
     measures: Zvoog_FilterMeasure[];
+    output: string;
 };
 declare type Zvoog_FilterMeasure = {
     changes: Zvoog_FilterStateChange[];
@@ -118,10 +118,10 @@ declare type Zvoog_Project = {
     timeline: Zvoog_SongMeasure[];
     tracks: Zvoog_MusicTrack[];
     percussions: Zvoog_PercussionTrack[];
+    automations: Zvoog_AutomationTrack[];
     comments: Zvoog_CommentMeasure[];
     filters: Zvoog_FilterTarget[];
     selection?: Zvoog_Selection;
-    focus?: 0 | 1 | 2 | 3;
     position?: {
         x: number;
         y: number;
