@@ -71,6 +71,9 @@ class MixerDataMathUtility {
 	wholeWidth(): number {
 		return this.leftPad + this.timelineWidth() + this.padGridFan + this.fanWidth() + this.rightPad;
 	}
+	fanPluginIconSize(zidx: number) {
+		return this.pluginIconSize * zoomPrefixLevelsCSS[zidx].iconRatio;
+	}
 	fanWidth(): number {
 		let ww = 1;
 		for (let tt = 0; tt < this.data.tracks.length; tt++) {
@@ -105,6 +108,23 @@ class MixerDataMathUtility {
 		}
 		ww = ww + this.speakerIconPad + 2 * this.pluginIconSize;
 		return ww;
+	}
+	findPluginSamplerIcon(x: number, y: number, z: number, xid: string): Zvoog_AudioSampler | null {
+		let sz = this.fanPluginIconSize(z);
+		for (let ii = 0; ii < this.data.percussions.length; ii++) {
+			let plugin = this.data.percussions[ii].sampler;
+			if (plugin.id != xid) {
+				if (plugin.iconPosition) {
+					if (Math.abs(x - plugin.iconPosition.x) < sz*0.75) {
+						if (Math.abs(y - plugin.iconPosition.y) < sz*0.75) {
+							console.log(plugin.iconPosition, x, y, z);
+							return plugin;
+						}
+					}
+				}
+			}
+		}
+		return null;
 	}
 	heightOfTitle(): number {
 		return 10;

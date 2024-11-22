@@ -13,7 +13,9 @@ class SamplerIcon {
 		}
 	}
 	addSamplerSpot(order: number, sampler: Zvoog_AudioSampler, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
-		let sz = globalCommandDispatcher.cfg().pluginIconSize * 1.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
+		//let sz = globalCommandDispatcher.cfg().pluginIconSize * 1.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
+		let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 1.3 ;
+		
 		//console.log(zidx);
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
@@ -57,6 +59,12 @@ class SamplerIcon {
 				} else {
 					dragAnchor.translation.x = dragAnchor.translation.x + x;
 					dragAnchor.translation.y = dragAnchor.translation.y + y;
+					if (sampler.iconPosition) {
+						let xx = sampler.iconPosition.x + dragAnchor.translation.x;
+						let yy = sampler.iconPosition.y + dragAnchor.translation.y;
+						//console.log(xx,yy);
+						let toplugin=globalCommandDispatcher.cfg().findPluginSamplerIcon(xx,yy,zidx,sampler.id);
+					}
 					globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
 						, fanLevelAnchor
 						, LevelModes.normal);
@@ -75,7 +83,9 @@ class SamplerIcon {
 			dragAnchor.content.push(txt);
 
 		}
-		let clickBtnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
+		//let clickBtnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
+		let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3 ;
+		
 		if (zidx < 5) {
 
 			let btn: TileRectangle = {

@@ -2302,7 +2302,7 @@ class PerformerIcon {
         }
     }
     addPerformerSpot(order, sum, audioSeq, fanLevelAnchor, spearsAnchor, zidx) {
-        let sz = globalCommandDispatcher.cfg().pluginIconSize * zoomPrefixLevelsCSS[zidx].iconRatio;
+        let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
         let top = globalCommandDispatcher.cfg().gridTop();
         let xx = left;
@@ -2353,7 +2353,7 @@ class PerformerIcon {
             };
             dragAnchor.content.push(txt);
         }
-        let clickBtnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
+        let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3;
         if (zidx < 5) {
             let btn = {
                 x: xx - clickBtnSz / 2,
@@ -2405,7 +2405,7 @@ class SamplerIcon {
         }
     }
     addSamplerSpot(order, sampler, fanLevelAnchor, spearsAnchor, zidx) {
-        let sz = globalCommandDispatcher.cfg().pluginIconSize * 1.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
+        let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 1.3;
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
         let top = globalCommandDispatcher.cfg().gridTop();
         let xx = left;
@@ -2447,6 +2447,11 @@ class SamplerIcon {
                 else {
                     dragAnchor.translation.x = dragAnchor.translation.x + x;
                     dragAnchor.translation.y = dragAnchor.translation.y + y;
+                    if (sampler.iconPosition) {
+                        let xx = sampler.iconPosition.x + dragAnchor.translation.x;
+                        let yy = sampler.iconPosition.y + dragAnchor.translation.y;
+                        let toplugin = globalCommandDispatcher.cfg().findPluginSamplerIcon(xx, yy, zidx, sampler.id);
+                    }
                     globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
                 }
             },
@@ -2462,7 +2467,7 @@ class SamplerIcon {
             };
             dragAnchor.content.push(txt);
         }
-        let clickBtnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
+        let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3;
         if (zidx < 5) {
             let btn = {
                 x: xx - clickBtnSz / 2,
@@ -2522,7 +2527,7 @@ class FilterIcon {
         }
     }
     addFilterSpot(order, filterTarget, fanLevelAnchor, spearsAnchor, zidx) {
-        let sz = globalCommandDispatcher.cfg().pluginIconSize * zoomPrefixLevelsCSS[zidx].iconRatio;
+        let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
         let top = globalCommandDispatcher.cfg().gridTop();
         let xx = left;
@@ -2569,7 +2574,7 @@ class FilterIcon {
             let txt = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy, css: 'fanIconLabel' };
             dragAnchor.content.push(txt);
         }
-        let clickBtnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
+        let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3;
         if (zidx < 5) {
             let btn = {
                 x: xx - clickBtnSz / 2,
@@ -2615,7 +2620,7 @@ class FilterIcon {
 class ControlConnection {
     addAudioStreamLineFlow(zIndex, yy, toX, toY, anchor) {
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
-        new SpearConnection().addSpear(zIndex, left, yy, globalCommandDispatcher.cfg().pluginIconSize * 2, toX, toY, anchor);
+        new SpearConnection().addSpear(zIndex, left, yy, globalCommandDispatcher.cfg().fanPluginIconSize(zIndex), toX, toY, anchor);
     }
 }
 class SpearConnection {
@@ -3105,6 +3110,9 @@ class MixerDataMathUtility {
     wholeWidth() {
         return this.leftPad + this.timelineWidth() + this.padGridFan + this.fanWidth() + this.rightPad;
     }
+    fanPluginIconSize(zidx) {
+        return this.pluginIconSize * zoomPrefixLevelsCSS[zidx].iconRatio;
+    }
     fanWidth() {
         let ww = 1;
         for (let tt = 0; tt < this.data.tracks.length; tt++) {
@@ -3139,6 +3147,23 @@ class MixerDataMathUtility {
         }
         ww = ww + this.speakerIconPad + 2 * this.pluginIconSize;
         return ww;
+    }
+    findPluginSamplerIcon(x, y, z, xid) {
+        let sz = this.fanPluginIconSize(z);
+        for (let ii = 0; ii < this.data.percussions.length; ii++) {
+            let plugin = this.data.percussions[ii].sampler;
+            if (plugin.id != xid) {
+                if (plugin.iconPosition) {
+                    if (Math.abs(x - plugin.iconPosition.x) < sz * 0.75) {
+                        if (Math.abs(y - plugin.iconPosition.y) < sz * 0.75) {
+                            console.log(plugin.iconPosition, x, y, z);
+                            return plugin;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
     heightOfTitle() {
         return 10;

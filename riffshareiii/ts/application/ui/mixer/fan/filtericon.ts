@@ -24,7 +24,8 @@ class FilterIcon {
 		}
 	}
 	addFilterSpot(order: number, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
-		let sz = globalCommandDispatcher.cfg().pluginIconSize * zoomPrefixLevelsCSS[zidx].iconRatio;
+		//let sz = globalCommandDispatcher.cfg().pluginIconSize * zoomPrefixLevelsCSS[zidx].iconRatio;
+		let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx)  ;
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
 		let xx = left;
@@ -73,7 +74,8 @@ class FilterIcon {
 			let txt: TileText = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy, css: 'fanIconLabel' };
 			dragAnchor.content.push(txt);
 		}
-		let clickBtnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
+		//let clickBtnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
+		let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3 ;
 		if (zidx < 5) {
 
 			let btn: TileRectangle = {

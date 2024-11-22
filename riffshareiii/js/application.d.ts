@@ -476,7 +476,9 @@ declare class MixerDataMathUtility {
     extractDifference(from: Zvoog_Project): Object;
     mergeDifference(diff: Object): void;
     wholeWidth(): number;
+    fanPluginIconSize(zidx: number): number;
     fanWidth(): number;
+    findPluginSamplerIcon(x: number, y: number, z: number, xid: string): Zvoog_AudioSampler | null;
     heightOfTitle(): number;
     timelineWidth(): number;
     commentsMaxHeight(): number;

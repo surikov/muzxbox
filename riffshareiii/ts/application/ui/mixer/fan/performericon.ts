@@ -47,7 +47,8 @@ class PerformerIcon {
 			, yy 
 			, zidx);
 			*/
-			let sz = globalCommandDispatcher.cfg().pluginIconSize *  zoomPrefixLevelsCSS[zidx].iconRatio;
+			//let sz = globalCommandDispatcher.cfg().pluginIconSize *  zoomPrefixLevelsCSS[zidx].iconRatio;
+			let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) ;
 		//console.log(zidx);
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
@@ -103,7 +104,8 @@ class PerformerIcon {
 			dragAnchor.content.push(txt);
 
 		}
-		let clickBtnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
+		//let clickBtnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
+		let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3 ;
 		if (zidx < 5) {
 
 			let btn: TileRectangle = {

@@ -1,10 +1,11 @@
 class ControlConnection {
 	addAudioStreamLineFlow(zIndex: number, yy: number, toX: number, toY: number, anchor: TileAnchor) {
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
-		new SpearConnection().addSpear(zIndex,
-			left
+		new SpearConnection().addSpear(zIndex
+			, left
 			, yy
-			, globalCommandDispatcher.cfg().pluginIconSize*2
+			//, globalCommandDispatcher.cfg().pluginIconSize * 2
+			,globalCommandDispatcher.cfg().fanPluginIconSize(zIndex) 
 			, toX
 			, toY
 			, anchor);
