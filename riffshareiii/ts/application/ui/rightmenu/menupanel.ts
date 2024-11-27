@@ -253,6 +253,7 @@ class RightMenuPanel {
 
 			menuPointTracks.children.push(item);
 		}
+		/*
 		menuPointPercussion.children = [];
 		for (let tt = 0; tt < project.percussions.length; tt++) {
 			let drum = project.percussions[tt];
@@ -298,7 +299,7 @@ class RightMenuPanel {
 				menuPointAutomation.children.push(item);
 			//}
 		}
-
+*/
 	}
 	rerenderMenuContent(folder: RightMenuItem | null) {
 

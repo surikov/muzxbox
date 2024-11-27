@@ -372,17 +372,14 @@ class CommandDispatcher {
     }
     upDrumsLayer() {
         console.log('upDrumsLayer');
-        this.renderer.menu.layerCurrentTitle.text = LO(localMenuPercussionFolder);
         this.resetProject();
     }
     upAutoLayer() {
         console.log('upAutoayer');
-        this.renderer.menu.layerCurrentTitle.text = LO(localMenuAutomationFolder);
         this.resetProject();
     }
     upCommentsLayer() {
         console.log('upCommentsLayer');
-        this.renderer.menu.layerCurrentTitle.text = LO(localMenuCommentsLayer);
         this.resetProject();
     }
     setTrackSoloState(state) {
@@ -581,11 +578,6 @@ let localNameLocal = 'localNameLocal';
 let localeFontRatio = 1;
 let localMenuItemSettings = 'localMenuItemSettings';
 let localMenuTracksFolder = 'localMenuTracksFolder';
-let localMenuPercussionFolder = 'localMenuPercussionFolder';
-let localMenuImportFolder = 'localMenuImportFolder';
-let localMenuFileFolder = 'localMenuFileFolder';
-let localMenuAutomationFolder = 'localMenuAutomationFolder';
-let localMenuCommentsLayer = 'localMenuCommentsLayer';
 let localMenuPlayPause = 'localMenuPlayPause';
 let localMenuActionsFolder = 'localMenuActionsFolder';
 let localMenuPerformersFolder = 'localMenuPerformersFolder';
@@ -612,37 +604,6 @@ let localeDictionary = [
         ]
     },
     {
-        id: localMenuPercussionFolder, data: [
-            { locale: 'en', text: 'Sampler' },
-            { locale: 'ru', text: 'Сэмплер' },
-            { locale: 'zh', text: '?' }
-        ]
-    },
-    {
-        id: localMenuFileFolder, data: [
-            { locale: 'en', text: 'File' },
-            { locale: 'ru', text: 'Файл' },
-            { locale: 'zh', text: '?' }
-        ]
-    }, {
-        id: localMenuImportFolder, data: [
-            { locale: 'en', text: 'Import' },
-            { locale: 'ru', text: 'Импорт' },
-            { locale: 'zh', text: '?' }
-        ]
-    }, {
-        id: localMenuCommentsLayer, data: [
-            { locale: 'en', text: 'Comments' },
-            { locale: 'ru', text: 'Комментарии' },
-            { locale: 'zh', text: '?' }
-        ]
-    }, {
-        id: localMenuAutomationFolder, data: [
-            { locale: 'en', text: 'Automation' },
-            { locale: 'ru', text: 'Автоматизация' },
-            { locale: 'zh', text: '?' }
-        ]
-    }, {
         id: localMenuPlayPause, data: [
             { locale: 'en', text: 'Play/Pause' },
             { locale: 'ru', text: 'Старт/Стоп' },
@@ -1119,40 +1080,6 @@ class RightMenuPanel {
             };
             menuPointTracks.children.push(item);
         }
-        menuPointPercussion.children = [];
-        for (let tt = 0; tt < project.percussions.length; tt++) {
-            let drum = project.percussions[tt];
-            let item = {
-                text: drum.title,
-                noLocalization: true,
-                onClick: () => {
-                    globalCommandDispatcher.moveDrumTop(tt);
-                },
-                onSubClick: () => {
-                    let state = item.selection ? item.selection : 0;
-                    globalCommandDispatcher.setDrumSoloState(state);
-                },
-                itemStates: [icon_sound_low, icon_hide, icon_sound_loud],
-                selection: 0
-            };
-            menuPointPercussion.children.push(item);
-        }
-        menuPointAutomation.children = [];
-        for (let ff = 0; ff < project.automations.length; ff++) {
-            let automation = project.automations[ff];
-            let item = {
-                text: automation.title,
-                noLocalization: true,
-                onClick: () => {
-                    globalCommandDispatcher.moveAutomationTop(ff);
-                },
-                onSubClick: () => {
-                },
-                itemStates: [icon_sound_low, icon_hide, icon_sound_loud],
-                selection: 0
-            };
-            menuPointAutomation.children.push(item);
-        }
     }
     rerenderMenuContent(folder) {
         this.contentAnchor.content = [];
@@ -1322,12 +1249,12 @@ class RightMenuItem {
         }
         if (this.kind == this.kindOpenedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_whitefolder, css: 'rightMenuIconLabel' });
+            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_movedown, css: 'rightMenuIconLabel' });
             anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindClosedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_blackfolder, css: 'rightMenuIconLabel' });
+            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_moveright, css: 'rightMenuIconLabel' });
             anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindPreview) {
@@ -1376,18 +1303,6 @@ let menuPointTracks = {
     text: localMenuTracksFolder,
     onOpen: () => {
         globalCommandDispatcher.upTracksLayer();
-    }
-};
-let menuPointPercussion = {
-    text: localMenuPercussionFolder,
-    onOpen: () => {
-        globalCommandDispatcher.upDrumsLayer();
-    }
-};
-let menuPointAutomation = {
-    text: localMenuAutomationFolder,
-    onOpen: () => {
-        globalCommandDispatcher.upAutoLayer();
     }
 };
 function fillPluginsLists() {
@@ -1515,14 +1430,7 @@ function composeBaseMenu() {
                     }
                 ]
             },
-            {
-                text: localMenuCommentsLayer, onClick: () => {
-                    globalCommandDispatcher.upCommentsLayer();
-                }
-            },
-            menuPointAutomation,
             menuPointTracks,
-            menuPointPercussion,
             menuPointActions,
             menuPointFilters,
             menuPointPerformers,
@@ -2240,6 +2148,36 @@ class FanPane {
             this.samplerIcons.push(new SamplerIcon(globalCommandDispatcher.cfg().data.percussions[tt].sampler.id));
         }
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
+            let css = 'fanConnectionBase fanConnection' + ii;
+            let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+            let gridBorder = {
+                x1: left,
+                x2: left,
+                y1: globalCommandDispatcher.cfg().gridTop(),
+                y2: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight(),
+                css: css
+            };
+            spearsAnchors[ii].content.push(gridBorder);
+            if (globalCommandDispatcher.cfg().data.percussions.length) {
+                let samplerBorder = {
+                    x1: left,
+                    x2: left,
+                    y1: globalCommandDispatcher.cfg().samplerTop(),
+                    y2: globalCommandDispatcher.cfg().samplerTop() + globalCommandDispatcher.cfg().samplerHeight(),
+                    css: css
+                };
+                spearsAnchors[ii].content.push(samplerBorder);
+            }
+            if (globalCommandDispatcher.cfg().data.automations.length) {
+                let autoBorder = {
+                    x1: left,
+                    x2: left,
+                    y1: globalCommandDispatcher.cfg().automationTop(),
+                    y2: globalCommandDispatcher.cfg().automationTop() + globalCommandDispatcher.cfg().automationHeight(),
+                    css: css
+                };
+                spearsAnchors[ii].content.push(autoBorder);
+            }
             this.buildPerformerIcons(fanAnchors[ii], spearsAnchors[ii], ii);
             this.buildFilterIcons(fanAnchors[ii], spearsAnchors[ii], ii);
             this.buildAutoIcons(fanAnchors[ii], spearsAnchors[ii], ii);
@@ -2249,7 +2187,7 @@ class FanPane {
     }
     buildPerformerIcons(fanAnchor, spearsAnchor, zidx) {
         for (let ii = 0; ii < this.performerIcons.length; ii++) {
-            this.performerIcons[ii].buildPerformerSpot(ii, this.performerIcons.length, fanAnchor, spearsAnchor, zidx);
+            this.performerIcons[ii].buildPerformerSpot(fanAnchor, spearsAnchor, zidx);
         }
     }
     buildSamplerIcons(fanAnchor, spearsAnchor, zidx) {
@@ -2292,16 +2230,16 @@ class PerformerIcon {
     constructor(performerId) {
         this.performerId = performerId;
     }
-    buildPerformerSpot(order, sum, fanLevelAnchor, spearsAnchor, zidx) {
+    buildPerformerSpot(fanLevelAnchor, spearsAnchor, zidx) {
         for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
             if (globalCommandDispatcher.cfg().data.tracks[ii].performer.id == this.performerId) {
                 let audioSeq = globalCommandDispatcher.cfg().data.tracks[ii].performer;
-                this.addPerformerSpot(order, sum, audioSeq, fanLevelAnchor, spearsAnchor, zidx);
+                this.addPerformerSpot(audioSeq, fanLevelAnchor, spearsAnchor, zidx);
                 break;
             }
         }
     }
-    addPerformerSpot(order, sum, audioSeq, fanLevelAnchor, spearsAnchor, zidx) {
+    addPerformerSpot(audioSeq, fanLevelAnchor, spearsAnchor, zidx) {
         let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
         let top = globalCommandDispatcher.cfg().gridTop();
@@ -2344,6 +2282,11 @@ class PerformerIcon {
             css: 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx
         };
         dragAnchor.content.push(rec);
+        spearsAnchor.content.push({
+            x: xx - sz / 2 + sz * 0.05, y: yy - sz / 2 + sz * 0.05,
+            w: sz * 0.9, h: sz * 0.9,
+            css: 'fanConnectionBase fanConnection' + zidx
+        });
         if (zidx < 3) {
             let txt = {
                 text: audioSeq.kind + ':' + audioSeq.id,
@@ -2385,8 +2328,7 @@ class PerformerIcon {
             };
             dragAnchor.content.push(txt);
         }
-        let step = globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveCount * 12 / sum;
-        let performerFromY = globalCommandDispatcher.cfg().gridTop() + (order + 0.5) * step;
+        let performerFromY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2;
         new ControlConnection().addAudioStreamLineFlow(zidx, performerFromY, xx, yy, spearsAnchor);
         new FanOutputLine().addOutputs(audioSeq.outputs, fanLevelAnchor, spearsAnchor, audioSeq.id, xx, yy, zidx);
     }
@@ -2440,7 +2382,7 @@ class SamplerIcon {
                     }
                     sampler.iconPosition.x = sampler.iconPosition.x + dragAnchor.translation.x;
                     sampler.iconPosition.y = sampler.iconPosition.y + dragAnchor.translation.y;
-                    console.log('drop' + sampler.kind + ':' + sampler.id + ' to ' + sampler.iconPosition.x + '/' + sampler.iconPosition.y);
+                    console.log('move ' + sampler.kind + ':' + sampler.id + ' to ' + sampler.iconPosition.x + '/' + sampler.iconPosition.y);
                     dragAnchor.translation = { x: 0, y: 0 };
                     globalCommandDispatcher.resetProject();
                 }
@@ -2451,6 +2393,7 @@ class SamplerIcon {
                         let xx = sampler.iconPosition.x + dragAnchor.translation.x;
                         let yy = sampler.iconPosition.y + dragAnchor.translation.y;
                         let toplugin = globalCommandDispatcher.cfg().findPluginSamplerIcon(xx, yy, zidx, sampler.id);
+                        console.log('link ' + sampler.kind + ':' + sampler.id + ' to ' + toplugin);
                     }
                     globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
                 }
@@ -2928,7 +2871,9 @@ let mzxbxProjectForTesting2 = {
         },
         {
             title: "Second track", measures: [
-                { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+                { chords: [
+                        { skip: { count: 3, part: 4 }, pitches: [77], slides: [{ duration: { count: 13, part: 8 }, delta: -1 }] }
+                    ] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
             performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 } }
         },

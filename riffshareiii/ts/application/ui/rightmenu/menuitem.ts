@@ -133,12 +133,12 @@ class RightMenuItem {
         }
         if (this.kind == this.kindOpenedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_whitefolder, css: 'rightMenuIconLabel' });
+            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_movedown, css: 'rightMenuIconLabel' });
             anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindClosedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_blackfolder, css: 'rightMenuIconLabel' });
+            anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_moveright, css: 'rightMenuIconLabel' });
             anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindPreview) {

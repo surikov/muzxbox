@@ -62,7 +62,9 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 		}
 		, {
 			title: "Second track", measures: [
-				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+				{ chords: [
+					{ skip: { count: 3, part: 4 }, pitches: [77], slides: [{ duration: { count: 13, part: 8 }, delta: -1 }] }
+				] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			]//, filters: []
 			, performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 } }
 		}

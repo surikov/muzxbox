@@ -29,10 +29,40 @@ class FanPane {
 		}
 
 		for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
-			this.buildPerformerIcons(fanAnchors[ii],spearsAnchors[ii], ii);
-			this.buildFilterIcons(fanAnchors[ii],spearsAnchors[ii], ii);
-			this.buildAutoIcons(fanAnchors[ii],spearsAnchors[ii], ii);
-			this.buildSamplerIcons(fanAnchors[ii],spearsAnchors[ii], ii);
+			let css = 'fanConnectionBase fanConnection' + ii;
+			let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+			let gridBorder: TileLine = {
+				x1: left
+				, x2: left
+				, y1: globalCommandDispatcher.cfg().gridTop()
+				, y2: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight()
+				, css: css
+			};
+			spearsAnchors[ii].content.push(gridBorder);
+			if(globalCommandDispatcher.cfg().data.percussions.length){
+				let samplerBorder: TileLine = {
+					x1: left
+					, x2: left
+					, y1: globalCommandDispatcher.cfg().samplerTop()
+					, y2: globalCommandDispatcher.cfg().samplerTop() + globalCommandDispatcher.cfg().samplerHeight()
+					, css: css
+				};
+				spearsAnchors[ii].content.push(samplerBorder);
+			}
+			if(globalCommandDispatcher.cfg().data.automations.length){
+				let autoBorder: TileLine = {
+					x1: left
+					, x2: left
+					, y1: globalCommandDispatcher.cfg().automationTop()
+					, y2: globalCommandDispatcher.cfg().automationTop() + globalCommandDispatcher.cfg().automationHeight()
+					, css: css
+				};
+				spearsAnchors[ii].content.push(autoBorder);
+			}
+			this.buildPerformerIcons(fanAnchors[ii], spearsAnchors[ii], ii);
+			this.buildFilterIcons(fanAnchors[ii], spearsAnchors[ii], ii);
+			this.buildAutoIcons(fanAnchors[ii], spearsAnchors[ii], ii);
+			this.buildSamplerIcons(fanAnchors[ii], spearsAnchors[ii], ii);
 			this.buildOutIcon(fanAnchors[ii], ii);
 			//this.connectPlugins(cfg, fanAnchors[ii], ii);
 		}
@@ -42,17 +72,17 @@ class FanPane {
 	}
 	buildPerformerIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < this.performerIcons.length; ii++) {
-			this.performerIcons[ii].buildPerformerSpot(ii,this.performerIcons.length,fanAnchor, spearsAnchor, zidx);
+			this.performerIcons[ii].buildPerformerSpot( fanAnchor, spearsAnchor, zidx);
 		}
 	}
 	buildSamplerIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < this.samplerIcons.length; ii++) {
-			this.samplerIcons[ii].buildSamplerSpot(ii,fanAnchor, spearsAnchor, zidx);
+			this.samplerIcons[ii].buildSamplerSpot(ii, fanAnchor, spearsAnchor, zidx);
 		}
 	}
 	buildAutoIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < this.autoIcons.length; ii++) {
-			this.autoIcons[ii].buildAutoSpot(ii,fanAnchor, spearsAnchor, zidx);
+			this.autoIcons[ii].buildAutoSpot(ii, fanAnchor, spearsAnchor, zidx);
 		}
 	}
 	buildFilterIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
@@ -69,8 +99,8 @@ class FanPane {
 
 
 		let rec: TileRectangle = {
-			x: speakerX-globalCommandDispatcher.cfg().speakerIconSize / 2
-			, y: speakerY-globalCommandDispatcher.cfg().speakerIconSize / 2
+			x: speakerX - globalCommandDispatcher.cfg().speakerIconSize / 2
+			, y: speakerY - globalCommandDispatcher.cfg().speakerIconSize / 2
 			, w: globalCommandDispatcher.cfg().speakerIconSize
 			, h: globalCommandDispatcher.cfg().speakerIconSize
 			, rx: globalCommandDispatcher.cfg().speakerIconSize / 2

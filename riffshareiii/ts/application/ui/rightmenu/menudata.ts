@@ -64,7 +64,7 @@ let menuPointTracks: MenuInfo = {
 		globalCommandDispatcher.upTracksLayer();
 	}
 };
-
+/*
 let menuPointPercussion: MenuInfo = {
 	text: localMenuPercussionFolder
 	, onOpen: () => {
@@ -78,6 +78,7 @@ let menuPointAutomation: MenuInfo = {
 		globalCommandDispatcher.upAutoLayer();
 	}
 };
+*/
 /*
 let menuPointFileImport: MenuInfo = {
 	text: localMenuImportFolder
@@ -251,14 +252,14 @@ function composeBaseMenu(): MenuInfo[] {
 					}
 				]
 			}
-			, {
+			/*, {
 				text: localMenuCommentsLayer, onClick: () => {
 					globalCommandDispatcher.upCommentsLayer();
 				}
-			}
-			, menuPointAutomation
+			}*/
+			//, menuPointAutomation
 			, menuPointTracks
-			, menuPointPercussion
+			//, menuPointPercussion
 
 			, menuPointActions
 			, menuPointFilters

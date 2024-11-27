@@ -104,11 +104,6 @@ declare let localNameLocal: string;
 declare let localeFontRatio: number;
 declare let localMenuItemSettings: string;
 declare let localMenuTracksFolder: string;
-declare let localMenuPercussionFolder: string;
-declare let localMenuImportFolder: string;
-declare let localMenuFileFolder: string;
-declare let localMenuAutomationFolder: string;
-declare let localMenuCommentsLayer: string;
 declare let localMenuPlayPause: string;
 declare let localMenuActionsFolder: string;
 declare let localMenuPerformersFolder: string;
@@ -240,8 +235,6 @@ declare let menuPointPerformers: MenuInfo;
 declare let menuPointFilters: MenuInfo;
 declare let menuPointSamplers: MenuInfo;
 declare let menuPointTracks: MenuInfo;
-declare let menuPointPercussion: MenuInfo;
-declare let menuPointAutomation: MenuInfo;
 declare function fillPluginsLists(): void;
 declare function composeBaseMenu(): MenuInfo[];
 declare class LeftPanel {
@@ -322,8 +315,8 @@ declare class FanPane {
 declare class PerformerIcon {
     performerId: string;
     constructor(performerId: string);
-    buildPerformerSpot(order: number, sum: number, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
-    addPerformerSpot(order: number, sum: number, audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
+    buildPerformerSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
+    addPerformerSpot(audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
 }
 declare class SamplerIcon {
     samplerId: string;

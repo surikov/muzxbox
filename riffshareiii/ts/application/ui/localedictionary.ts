@@ -5,11 +5,11 @@ let localeFontRatio = 1;
 let localMenuItemSettings = 'localMenuItemSettings';
 let localMenuTracksFolder = 'localMenuTracksFolder';
 //let localMenuImportMIDI = 'localMenuImportMIDI';
-let localMenuPercussionFolder='localMenuPercussionFolder';
-let localMenuImportFolder='localMenuImportFolder';
-let localMenuFileFolder='localMenuFileFolder';
-let localMenuAutomationFolder='localMenuAutomationFolder';
-let localMenuCommentsLayer='localMenuCommentsLayer';
+//let localMenuPercussionFolder='localMenuPercussionFolder';
+//let localMenuImportFolder='localMenuImportFolder';
+//let localMenuFileFolder='localMenuFileFolder';
+//let localMenuAutomationFolder='localMenuAutomationFolder';
+//let localMenuCommentsLayer='localMenuCommentsLayer';
 let localMenuPlayPause='localMenuPlayPause';
 
 
@@ -44,7 +44,7 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
             , { locale: 'ru', text: 'Импорт из файлв MIDI' }
             , { locale: 'zh', text: '?' }]*/
     }
-    , {
+    ,/* {
         id: localMenuPercussionFolder, data: [
             { locale: 'en', text: 'Sampler' }
             , { locale: 'ru', text: 'Сэмплер' }
@@ -70,7 +70,7 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
             { locale: 'en', text: 'Automation' }
             , { locale: 'ru', text: 'Автоматизация' }
             , { locale: 'zh', text: '?' }]
-    }, {
+    },*/ {
         id: localMenuPlayPause, data: [
             { locale: 'en', text: 'Play/Pause' }
             , { locale: 'ru', text: 'Старт/Стоп' }

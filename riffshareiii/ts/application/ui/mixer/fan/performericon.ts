@@ -3,16 +3,16 @@ class PerformerIcon {
 	constructor(performerId: string) {
 		this.performerId = performerId;
 	}
-	buildPerformerSpot(order: number, sum: number, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
+	buildPerformerSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
 			if (globalCommandDispatcher.cfg().data.tracks[ii].performer.id == this.performerId) {
 				let audioSeq: Zvoog_AudioSequencer = globalCommandDispatcher.cfg().data.tracks[ii].performer;
-				this.addPerformerSpot(order, sum, audioSeq, fanLevelAnchor, spearsAnchor, zidx);
+				this.addPerformerSpot(audioSeq, fanLevelAnchor, spearsAnchor, zidx);
 				break;
 			}
 		}
 	}
-	addPerformerSpot(order: number, sum: number, audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
+	addPerformerSpot(audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		/*
 		let sz = globalCommandDispatcher.cfg().pluginIconSize;
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
@@ -47,8 +47,8 @@ class PerformerIcon {
 			, yy 
 			, zidx);
 			*/
-			//let sz = globalCommandDispatcher.cfg().pluginIconSize *  zoomPrefixLevelsCSS[zidx].iconRatio;
-			let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) ;
+		//let sz = globalCommandDispatcher.cfg().pluginIconSize *  zoomPrefixLevelsCSS[zidx].iconRatio;
+		let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
 		//console.log(zidx);
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
@@ -65,7 +65,7 @@ class PerformerIcon {
 		};
 		fanLevelAnchor.content.push(dragAnchor);
 		let rec: TileRectangle = {
-			x: xx-sz/2, y: yy-sz/2
+			x: xx - sz / 2, y: yy - sz / 2
 			, w: sz, h: sz
 			, draggable: true
 			, activation: (x: number, y: number) => {
@@ -94,6 +94,11 @@ class PerformerIcon {
 			, css: 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx
 		};
 		dragAnchor.content.push(rec);
+		spearsAnchor.content.push({
+			x: xx - sz / 2 + sz * 0.05, y: yy - sz / 2 + sz * 0.05
+			, w: sz * 0.9, h: sz * 0.9
+			, css: 'fanConnectionBase fanConnection' + zidx
+		});
 		if (zidx < 3) {
 			let txt: TileText = {
 				text: audioSeq.kind + ':' + audioSeq.id
@@ -105,7 +110,7 @@ class PerformerIcon {
 
 		}
 		//let clickBtnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
-		let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3 ;
+		let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3;
 		if (zidx < 5) {
 
 			let btn: TileRectangle = {
@@ -140,8 +145,9 @@ class PerformerIcon {
 		}
 		//}
 		//let samplerFromY = globalCommandDispatcher.cfg().samplerTop() + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
-		let step = globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveCount * 12 / sum;
-		let performerFromY = globalCommandDispatcher.cfg().gridTop() + (order + 0.5) * step;
+		//let step = globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveCount * 12 / sum;
+		//let performerFromY = globalCommandDispatcher.cfg().gridTop() + (order + 0.5) * step;
+		let performerFromY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2;
 		new ControlConnection().addAudioStreamLineFlow(zidx, performerFromY, xx, yy, spearsAnchor);
 		new FanOutputLine().addOutputs(audioSeq.outputs, fanLevelAnchor, spearsAnchor, audioSeq.id, xx, yy, zidx);
 	}

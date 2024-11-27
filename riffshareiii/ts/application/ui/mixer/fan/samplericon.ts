@@ -53,7 +53,7 @@ class SamplerIcon {
 					}
 					sampler.iconPosition.x = sampler.iconPosition.x + dragAnchor.translation.x;
 					sampler.iconPosition.y = sampler.iconPosition.y + dragAnchor.translation.y;
-					console.log('drop' + sampler.kind + ':' + sampler.id + ' to ' + sampler.iconPosition.x + '/' + sampler.iconPosition.y);
+					console.log('move ' + sampler.kind + ':' + sampler.id + ' to ' + sampler.iconPosition.x + '/' + sampler.iconPosition.y);
 					dragAnchor.translation = { x: 0, y: 0 };
 					globalCommandDispatcher.resetProject();
 				} else {
@@ -64,6 +64,7 @@ class SamplerIcon {
 						let yy = sampler.iconPosition.y + dragAnchor.translation.y;
 						//console.log(xx,yy);
 						let toplugin=globalCommandDispatcher.cfg().findPluginSamplerIcon(xx,yy,zidx,sampler.id);
+						console.log('link ' + sampler.kind + ':' + sampler.id + ' to '+toplugin );
 					}
 					globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
 						, fanLevelAnchor

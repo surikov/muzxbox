@@ -85,6 +85,7 @@
 	stroke-width2: 0.5cm;
 	stroke-linejoin: round;
 	paint-order: stroke;
+	fill:none;
 }
 .fanConnection0 {stroke-width: 0.02cm;}
 .fanConnection1 {stroke-width: 0.04cm;}
