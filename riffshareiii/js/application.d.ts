@@ -48,14 +48,9 @@ declare class CommandDispatcher {
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     changeTapSize(ratio: number): void;
     resetProject(): void;
-    setTrackActive(trackNum: number): void;
     moveTrackTop(trackNum: number): void;
     moveDrumTop(drumNum: number): void;
     moveAutomationTop(filterNum: number): void;
-    upTracksLayer(): void;
-    upDrumsLayer(): void;
-    upAutoLayer(): void;
-    upCommentsLayer(): void;
     setTrackSoloState(state: number): void;
     setDrumSoloState(state: number): void;
     promptProjectPluginGUI(label: string, url: string, callback: (obj: any) => boolean): void;
@@ -196,7 +191,8 @@ declare class RightMenuItem {
     kindClosedFolder: 4;
     kindOpenedFolder: 5;
     kindAction2: 6;
-    kind: 1 | 2 | 3 | 4 | 5 | 6;
+    kindActionDisabled: 7;
+    kind: 1 | 2 | 3 | 4 | 5 | 6 | 7;
     action?: {
         (): void;
     };
@@ -207,6 +203,7 @@ declare class RightMenuItem {
     top: number;
     info: MenuInfo;
     constructor(info: MenuInfo, pad: number, tap?: () => void, tap2?: () => void);
+    initDisabledItem(): RightMenuItem;
     initActionItem(): RightMenuItem;
     initActionItem2(): RightMenuItem;
     initDraggableItem(): RightMenuItem;
@@ -316,7 +313,7 @@ declare class PerformerIcon {
     performerId: string;
     constructor(performerId: string);
     buildPerformerSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
-    addPerformerSpot(audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
+    addPerformerSpot(secondary: boolean, audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
 }
 declare class SamplerIcon {
     samplerId: string;
@@ -332,12 +329,12 @@ declare class FilterIcon {
     addFilterSpot(order: number, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
 }
 declare class ControlConnection {
-    addAudioStreamLineFlow(zIndex: number, yy: number, toX: number, toY: number, anchor: TileAnchor): void;
+    addAudioStreamLineFlow(secondary: boolean, zIndex: number, yy: number, toX: number, toY: number, anchor: TileAnchor): void;
 }
 declare class SpearConnection {
     constructor();
     nonan(nn: number): number;
-    addSpear(zidx: number, fromX: number, fromY: number, toSize: number, toX: number, toY: number, anchor: TileAnchor): void;
+    addSpear(secondary: boolean, zidx: number, fromX: number, fromY: number, toSize: number, toX: number, toY: number, anchor: TileAnchor): void;
 }
 declare class FanOutputLine {
     addOutputs(outputs: string[], buttonsAnchor: TileAnchor, fanLinesAnchor: TileAnchor, fromID: string, fromX: number, fromY: number, zidx: number): void;
@@ -713,7 +710,6 @@ declare type Zvoog_PercussionTrack = {
 };
 declare type Zvoog_MusicTrack = {
     title: string;
-    active?: boolean;
     measures: Zvoog_TrackMeasure[];
     performer: Zvoog_AudioSequencer;
 };

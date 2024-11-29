@@ -87,6 +87,9 @@
 	paint-order: stroke;
 	fill:none;
 }
+.fanConnectionSecondary{
+	stroke: var(--line-color75);
+}
 .fanConnection0 {stroke-width: 0.02cm;}
 .fanConnection1 {stroke-width: 0.04cm;}
 .fanConnection2 {stroke-width: 0.08cm;}

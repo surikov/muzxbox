@@ -7,12 +7,12 @@ class PerformerIcon {
 		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
 			if (globalCommandDispatcher.cfg().data.tracks[ii].performer.id == this.performerId) {
 				let audioSeq: Zvoog_AudioSequencer = globalCommandDispatcher.cfg().data.tracks[ii].performer;
-				this.addPerformerSpot(audioSeq, fanLevelAnchor, spearsAnchor, zidx);
+				this.addPerformerSpot(ii>0,audioSeq, fanLevelAnchor, spearsAnchor, zidx);
 				break;
 			}
 		}
 	}
-	addPerformerSpot(audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
+	addPerformerSpot(secondary:boolean,audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		/*
 		let sz = globalCommandDispatcher.cfg().pluginIconSize;
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
@@ -148,7 +148,7 @@ class PerformerIcon {
 		//let step = globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveCount * 12 / sum;
 		//let performerFromY = globalCommandDispatcher.cfg().gridTop() + (order + 0.5) * step;
 		let performerFromY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2;
-		new ControlConnection().addAudioStreamLineFlow(zidx, performerFromY, xx, yy, spearsAnchor);
+		new ControlConnection().addAudioStreamLineFlow(secondary,zidx, performerFromY, xx, yy, spearsAnchor);
 		new FanOutputLine().addOutputs(audioSeq.outputs, fanLevelAnchor, spearsAnchor, audioSeq.id, xx, yy, zidx);
 	}
 }

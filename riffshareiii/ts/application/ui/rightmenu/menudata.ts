@@ -61,7 +61,7 @@ let menuPointSamplers: MenuInfo = {
 let menuPointTracks: MenuInfo = {
 	text: localMenuTracksFolder
 	, onOpen: () => {
-		globalCommandDispatcher.upTracksLayer();
+		//globalCommandDispatcher.upTracksLayer();
 	}
 };
 /*

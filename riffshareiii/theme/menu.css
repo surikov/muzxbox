@@ -35,6 +35,11 @@
     stroke-width: 0.01cm;
     fill: var(--click-color);
 }
+.rightMenuItemDisabledBG{
+	stroke: var(--main-color);
+    stroke-width: 0.01cm;
+    fill: none;
+}
 .rightMenuItemSubActionBG {
     fill: none;
     stroke: var(--click-color);

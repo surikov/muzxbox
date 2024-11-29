@@ -134,7 +134,7 @@ class CommandDispatcher {
 		//this.registerWorkProject(data);
 		this.renderer.fillWholeUI();//this.workData);
 	}
-	
+	/*
 	setTrackActive(trackNum: number) {
 		for (let tt = 0; tt < this.cfg().data.tracks.length; tt++) {
 			this.cfg().data.tracks[tt].active = false;
@@ -146,13 +146,18 @@ class CommandDispatcher {
 				this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[trackNum].title;
 		this.resetProject();
 		console.log('setTrackActive', trackNum, this.cfg().data.tracks);
-	}
+	}*/
 	moveTrackTop(trackNum: number) {
 		console.log('moveTrackTop', trackNum);
 		let it = this.cfg().data.tracks[trackNum];
 		this.cfg().data.tracks.splice(trackNum, 1);
 		this.cfg().data.tracks.unshift(it);
-		this.upTracksLayer();
+		//this.upTracksLayer();
+		this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
+		if (this.cfg().data.tracks)
+			if (this.cfg().data.tracks[0])
+				this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
+		this.resetProject();
 	}
 	moveDrumTop(drumNum: number) {
 		console.log('moveDrumTop', drumNum);
@@ -160,12 +165,13 @@ class CommandDispatcher {
 		let it = this.cfg().data.percussions[drumNum];
 		this.cfg().data.percussions.splice(drumNum, 1);
 		this.cfg().data.percussions.unshift(it);
-		this.upDrumsLayer();
+		//this.upDrumsLayer();
 	}
 	moveAutomationTop(filterNum: number) {
 		console.log('moveAutomationTop', filterNum);
-		this.upAutoLayer();
+		//this.upAutoLayer();
 	}
+	/*
 	upTracksLayer() {
 		console.log('upTracksLayer');
 		//this.cfg().data.focus = 0;
@@ -193,7 +199,7 @@ class CommandDispatcher {
 		//this.renderer.menu.layerCurrentTitle.text = LO(localMenuCommentsLayer);
 		this.resetProject();
 	}
-
+*/
 
 	setTrackSoloState(state: number) {
 		console.log('setTrackSoloState', state);

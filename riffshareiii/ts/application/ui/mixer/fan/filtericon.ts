@@ -115,7 +115,7 @@ class FilterIcon {
 			let css = 'fanConnectionBase fanConnection'+zidx;
 			let hoLine: TileLine = { x1: left, x2: xx, y1: filterFromY, y2: filterFromY, css: css };
 			spearsAnchor.content.push(hoLine);
-			new SpearConnection().addSpear(zidx,
+			new SpearConnection().addSpear(false,zidx,
 				xx
 				, filterFromY
 				, sz //globalCommandDispatcher.cfg().pluginIconSize

@@ -332,55 +332,25 @@ class CommandDispatcher {
     resetProject() {
         this.renderer.fillWholeUI();
     }
-    setTrackActive(trackNum) {
-        for (let tt = 0; tt < this.cfg().data.tracks.length; tt++) {
-            this.cfg().data.tracks[tt].active = false;
-        }
-        this.cfg().data.tracks[trackNum].active = true;
-        this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
-        if (this.cfg().data.tracks)
-            if (this.cfg().data.tracks[trackNum])
-                this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[trackNum].title;
-        this.resetProject();
-        console.log('setTrackActive', trackNum, this.cfg().data.tracks);
-    }
     moveTrackTop(trackNum) {
         console.log('moveTrackTop', trackNum);
         let it = this.cfg().data.tracks[trackNum];
         this.cfg().data.tracks.splice(trackNum, 1);
         this.cfg().data.tracks.unshift(it);
-        this.upTracksLayer();
-    }
-    moveDrumTop(drumNum) {
-        console.log('moveDrumTop', drumNum);
-        let it = this.cfg().data.percussions[drumNum];
-        this.cfg().data.percussions.splice(drumNum, 1);
-        this.cfg().data.percussions.unshift(it);
-        this.upDrumsLayer();
-    }
-    moveAutomationTop(filterNum) {
-        console.log('moveAutomationTop', filterNum);
-        this.upAutoLayer();
-    }
-    upTracksLayer() {
-        console.log('upTracksLayer');
         this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
         if (this.cfg().data.tracks)
             if (this.cfg().data.tracks[0])
                 this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
         this.resetProject();
     }
-    upDrumsLayer() {
-        console.log('upDrumsLayer');
-        this.resetProject();
+    moveDrumTop(drumNum) {
+        console.log('moveDrumTop', drumNum);
+        let it = this.cfg().data.percussions[drumNum];
+        this.cfg().data.percussions.splice(drumNum, 1);
+        this.cfg().data.percussions.unshift(it);
     }
-    upAutoLayer() {
-        console.log('upAutoayer');
-        this.resetProject();
-    }
-    upCommentsLayer() {
-        console.log('upCommentsLayer');
-        this.resetProject();
+    moveAutomationTop(filterNum) {
+        console.log('moveAutomationTop', filterNum);
     }
     setTrackSoloState(state) {
         console.log('setTrackSoloState', state);
@@ -1050,13 +1020,21 @@ class RightMenuPanel {
                     this.items.push(rightMenuItem.initActionItem2());
                 }
                 else {
-                    this.items.push(new RightMenuItem(it, pad, () => {
-                        if (it.onClick) {
-                            it.onClick();
-                        }
-                        me.setFocus(it, infos);
-                        me.resetAllAnchors();
-                    }).initActionItem());
+                    if (it.onClick) {
+                        this.items.push(new RightMenuItem(it, pad, () => {
+                            if (it.onClick) {
+                                it.onClick();
+                            }
+                            me.setFocus(it, infos);
+                            me.resetAllAnchors();
+                        }).initActionItem());
+                    }
+                    else {
+                        this.items.push(new RightMenuItem(it, pad, () => {
+                            me.setFocus(it, infos);
+                            me.resetAllAnchors();
+                        }).initDisabledItem());
+                    }
                 }
             }
         }
@@ -1068,16 +1046,13 @@ class RightMenuPanel {
             let item = {
                 text: track.title,
                 noLocalization: true,
-                onClick: () => {
-                    globalCommandDispatcher.setTrackActive(tt);
-                },
-                onSubClick: () => {
-                    let state = item.selection ? item.selection : 0;
-                    globalCommandDispatcher.setTrackSoloState(state);
-                },
-                itemStates: [icon_sound_low, icon_hide, icon_sound_loud],
                 selection: 0
             };
+            if (tt > 0) {
+                item.onClick = () => {
+                    globalCommandDispatcher.moveTrackTop(tt);
+                };
+            }
             menuPointTracks.children.push(item);
         }
     }
@@ -1159,6 +1134,7 @@ class RightMenuItem {
         this.kindClosedFolder = 4;
         this.kindOpenedFolder = 5;
         this.kindAction2 = 6;
+        this.kindActionDisabled = 7;
         this.kind = this.kindAction;
         this.pad = 0;
         this.info = info;
@@ -1170,6 +1146,10 @@ class RightMenuItem {
         else {
             this.info.sid = 'random' + Math.random();
         }
+    }
+    initDisabledItem() {
+        this.kind = this.kindActionDisabled;
+        return this;
     }
     initActionItem() {
         this.kind = this.kindAction;
@@ -1226,6 +1206,10 @@ class RightMenuItem {
         let spot2 = null;
         if (this.kind == this.kindAction) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+        }
+        if (this.kind == this.kindActionDisabled) {
+            anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindAction2) {
@@ -1302,7 +1286,6 @@ let menuPointSamplers = {
 let menuPointTracks = {
     text: localMenuTracksFolder,
     onOpen: () => {
-        globalCommandDispatcher.upTracksLayer();
     }
 };
 function fillPluginsLists() {
@@ -1569,24 +1552,15 @@ class OctaveContent {
     }
     addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, zoomLevel) {
         if (globalCommandDispatcher.cfg().data.tracks.length) {
-            for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
-                let track = globalCommandDispatcher.cfg().data.tracks[tt];
-                if (track.active) {
-                    let css = 'mixNoteLine';
-                    this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, css);
-                    break;
-                }
-            }
+            let track = globalCommandDispatcher.cfg().data.tracks[0];
+            let css = 'mixNoteLine';
+            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, css);
         }
     }
     addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor) {
-        for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
+        for (let ii = 1; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
             let track = globalCommandDispatcher.cfg().data.tracks[ii];
-            if (track.active) {
-            }
-            else {
-                this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, 'mixNoteSub');
-            }
+            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, 'mixNoteSub');
         }
     }
     addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, css) {
@@ -2234,12 +2208,12 @@ class PerformerIcon {
         for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
             if (globalCommandDispatcher.cfg().data.tracks[ii].performer.id == this.performerId) {
                 let audioSeq = globalCommandDispatcher.cfg().data.tracks[ii].performer;
-                this.addPerformerSpot(audioSeq, fanLevelAnchor, spearsAnchor, zidx);
+                this.addPerformerSpot(ii > 0, audioSeq, fanLevelAnchor, spearsAnchor, zidx);
                 break;
             }
         }
     }
-    addPerformerSpot(audioSeq, fanLevelAnchor, spearsAnchor, zidx) {
+    addPerformerSpot(secondary, audioSeq, fanLevelAnchor, spearsAnchor, zidx) {
         let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
         let top = globalCommandDispatcher.cfg().gridTop();
@@ -2329,7 +2303,7 @@ class PerformerIcon {
             dragAnchor.content.push(txt);
         }
         let performerFromY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2;
-        new ControlConnection().addAudioStreamLineFlow(zidx, performerFromY, xx, yy, spearsAnchor);
+        new ControlConnection().addAudioStreamLineFlow(secondary, zidx, performerFromY, xx, yy, spearsAnchor);
         new FanOutputLine().addOutputs(audioSeq.outputs, fanLevelAnchor, spearsAnchor, audioSeq.id, xx, yy, zidx);
     }
 }
@@ -2443,7 +2417,7 @@ class SamplerIcon {
             dragAnchor.content.push(txt);
         }
         let samplerFromY = globalCommandDispatcher.cfg().samplerTop() + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
-        new ControlConnection().addAudioStreamLineFlow(zidx, samplerFromY, xx, yy, spearsAnchor);
+        new ControlConnection().addAudioStreamLineFlow(false, zidx, samplerFromY, xx, yy, spearsAnchor);
         new FanOutputLine().addOutputs(sampler.outputs, fanLevelAnchor, spearsAnchor, sampler.id, xx, yy, zidx);
     }
 }
@@ -2555,15 +2529,15 @@ class FilterIcon {
             let css = 'fanConnectionBase fanConnection' + zidx;
             let hoLine = { x1: left, x2: xx, y1: filterFromY, y2: filterFromY, css: css };
             spearsAnchor.content.push(hoLine);
-            new SpearConnection().addSpear(zidx, xx, filterFromY, sz, xx, yy, spearsAnchor);
+            new SpearConnection().addSpear(false, zidx, xx, filterFromY, sz, xx, yy, spearsAnchor);
         }
         new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, spearsAnchor, filterTarget.id, xx, yy, zidx);
     }
 }
 class ControlConnection {
-    addAudioStreamLineFlow(zIndex, yy, toX, toY, anchor) {
+    addAudioStreamLineFlow(secondary, zIndex, yy, toX, toY, anchor) {
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
-        new SpearConnection().addSpear(zIndex, left, yy, globalCommandDispatcher.cfg().fanPluginIconSize(zIndex), toX, toY, anchor);
+        new SpearConnection().addSpear(secondary, zIndex, left, yy, globalCommandDispatcher.cfg().fanPluginIconSize(zIndex), toX, toY, anchor);
     }
 }
 class SpearConnection {
@@ -2572,9 +2546,12 @@ class SpearConnection {
     nonan(nn) {
         return (nn) ? nn : 0;
     }
-    addSpear(zidx, fromX, fromY, toSize, toX, toY, anchor) {
+    addSpear(secondary, zidx, fromX, fromY, toSize, toX, toY, anchor) {
         let headLen = 0.5 * (1 + zidx);
         let css = 'fanConnectionBase fanConnection' + zidx;
+        if (secondary) {
+            css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
+        }
         let diffX = toX - fromX;
         let diffY = toY - fromY;
         let pathLen = Math.sqrt(diffX * diffX + diffY * diffY);
@@ -2613,7 +2590,7 @@ class FanOutputLine {
                                 xx = left + toFilter.iconPosition.x;
                                 yy = top + toFilter.iconPosition.y;
                             }
-                            new SpearConnection().addSpear(zidx, fromX, fromY, sz, xx, yy, fanLinesAnchor);
+                            new SpearConnection().addSpear(false, zidx, fromX, fromY, sz, xx, yy, fanLinesAnchor);
                             this.addDeleteSpear(fromID, toFilter.id, fromX, fromY, sz, xx, yy, buttonsAnchor, zidx);
                             break;
                         }
@@ -2623,7 +2600,7 @@ class FanOutputLine {
             else {
                 let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().speakerIconSize / 2;
                 let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
-                new SpearConnection().addSpear(zidx, fromX, fromY, globalCommandDispatcher.cfg().speakerIconSize, speakerX, speakerY, fanLinesAnchor);
+                new SpearConnection().addSpear(false, zidx, fromX, fromY, globalCommandDispatcher.cfg().speakerIconSize, speakerX, speakerY, fanLinesAnchor);
                 this.addDeleteSpear(fromID, '', fromX, fromY, globalCommandDispatcher.cfg().speakerIconSize, speakerX, speakerY, buttonsAnchor, zidx);
             }
         }

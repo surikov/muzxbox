@@ -121,7 +121,7 @@ class SamplerIcon {
 		}
 		//}
 		let samplerFromY = globalCommandDispatcher.cfg().samplerTop() + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
-		new ControlConnection().addAudioStreamLineFlow(zidx, samplerFromY, xx, yy, spearsAnchor);
+		new ControlConnection().addAudioStreamLineFlow(false,zidx, samplerFromY, xx, yy, spearsAnchor);
 		new FanOutputLine().addOutputs(sampler.outputs, fanLevelAnchor, spearsAnchor, sampler.id, xx, yy, zidx);
 	}
 }

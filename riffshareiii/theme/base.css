@@ -88,7 +88,9 @@
 	--line-color:#9ef;
 	--click-color:#c39;
 
-	
+	--click-color50: color-mix(in lab, transparent 50%, var(--click-color));
+	--line-color50: color-mix(in lab, transparent 50%, var(--line-color));
+	--line-color75: color-mix(in lab, transparent 75%, var(--line-color));
 
 }
 :root {

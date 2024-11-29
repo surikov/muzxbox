@@ -66,10 +66,10 @@ class RightMenuPanel {
 			this.scrollY = 0;
 			this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
 		});
-		this.layerCurrentTitle = { x: 2.5, y: 0, text:LO(localMenuTracksFolder),css: 'currentTitleLabel' };
+		this.layerCurrentTitle = { x: 2.5, y: 0, text: LO(localMenuTracksFolder), css: 'currentTitleLabel' };
 
 
-		
+
 
 		this.backgroundAnchor = {
 			xx: 0, yy: 0, ww: 111, hh: 111
@@ -77,9 +77,9 @@ class RightMenuPanel {
 			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
 			, content: [
 				this.layerCurrentTitle
-				,this.listingShadow
+				, this.listingShadow
 				, this.backgroundRectangle
-				 
+
 			], id: 'rightMenuBackgroundAnchor'
 		};
 		this.contentAnchor = {
@@ -217,13 +217,20 @@ class RightMenuPanel {
 					});
 					this.items.push(rightMenuItem.initActionItem2());
 				} else {
-					this.items.push(new RightMenuItem(it, pad, () => {
-						if (it.onClick) {
-							it.onClick();
-						}
-						me.setFocus(it, infos);
-						me.resetAllAnchors();
-					}).initActionItem());
+					if (it.onClick) {
+						this.items.push(new RightMenuItem(it, pad, () => {
+							if (it.onClick) {
+								it.onClick();
+							}
+							me.setFocus(it, infos);
+							me.resetAllAnchors();
+						}).initActionItem());
+					} else {
+						this.items.push(new RightMenuItem(it, pad, () => {
+							me.setFocus(it, infos);
+							me.resetAllAnchors();
+						}).initDisabledItem());
+					}
 				}
 
 
@@ -235,22 +242,29 @@ class RightMenuPanel {
 		menuPointTracks.children = [];
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let track = project.tracks[tt];
-			let item: MenuInfo = {
+			/*let item: MenuInfo = {
 				text: track.title
 				, noLocalization: true
 				, onClick: () => {
-					//globalCommandDispatcher.moveTrackTop(tt);
-					globalCommandDispatcher.setTrackActive(tt);
+					globalCommandDispatcher.moveTrackTop(tt);
 				}
 				, onSubClick: () => {
-
 					let state = item.selection ? item.selection : 0;
 					globalCommandDispatcher.setTrackSoloState(state);
 				}
 				, itemStates: [icon_sound_low, icon_hide, icon_sound_loud]
 				, selection: 0
+			};*/
+			let item: MenuInfo = {
+				text: track.title
+				, noLocalization: true
+				, selection: 0
 			};
-
+			if (tt > 0) {
+				item.onClick = () => {
+					globalCommandDispatcher.moveTrackTop(tt);
+				};
+			}
 			menuPointTracks.children.push(item);
 		}
 		/*
@@ -391,7 +405,7 @@ class RightMenuPanel {
 
 
 		//globalCommandDispatcher.cfg().data.list=this.showState;
-		console.log('resizeMenu globalCommandDispatcher.globalCommandDispatcher.cfg().data.list',globalCommandDispatcher.cfg().data.list);
+		console.log('resizeMenu globalCommandDispatcher.globalCommandDispatcher.cfg().data.list', globalCommandDispatcher.cfg().data.list);
 	}
 
 }
