@@ -4,7 +4,15 @@ class FanOutputLine {
 		, fromID: string
 		, fromX: number, fromY: number
 		, zidx: number) {
-			let sz = globalCommandDispatcher.cfg().pluginIconSize* zoomPrefixLevelsCSS[zidx].iconRatio;
+		for (let oo = 0; oo < outputs.length; oo++) {
+			let outId = outputs[oo];
+			if (outId) {
+				this.connectOutput(outId, fromID, fromX, fromY, fanLinesAnchor, buttonsAnchor, zidx);
+			} else {
+				this.connectSpeaker(fromID, fromX, fromY, fanLinesAnchor, buttonsAnchor, zidx);
+			}
+		}
+		/*	let sz = globalCommandDispatcher.cfg().pluginIconSize* zoomPrefixLevelsCSS[zidx].iconRatio;
 		if (outputs) {
 			if (outputs.length > 0) {
 				for (let oo = 0; oo < outputs.length; oo++) {
@@ -55,7 +63,50 @@ class FanOutputLine {
 					, speakerY 
 					, buttonsAnchor, zidx);
 			}
+		}*/
+	}
+	connectOutput(outId: string, fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number) {
+		let sz = globalCommandDispatcher.cfg().pluginIconSize * zoomPrefixLevelsCSS[zidx].iconRatio;
+		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
+			if (globalCommandDispatcher.cfg().data.filters[ii].id == outId) {
+				let toFilter: Zvoog_FilterTarget = globalCommandDispatcher.cfg().data.filters[ii];
+				let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+				let top = globalCommandDispatcher.cfg().gridTop();
+				let xx = left;
+				let yy = top;
+				if (toFilter.iconPosition) {
+					xx = left + toFilter.iconPosition.x;
+					yy = top + toFilter.iconPosition.y;
+				}
+				new SpearConnection().addSpear(false, zidx,
+					fromX, fromY
+					, sz, xx, yy
+					, fanLinesAnchor);
+				this.addDeleteSpear(fromID, toFilter.id, fromX, fromY
+					, sz, xx, yy
+					, buttonsAnchor, zidx);
+				break;
+			}
 		}
+	}
+	connectSpeaker(fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number) {
+		let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().speakerIconSize / 2;
+		let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
+		new SpearConnection().addSpear(false, zidx,
+			fromX
+			, fromY
+			, globalCommandDispatcher.cfg().speakerIconSize
+			, speakerX
+			, speakerY
+			, fanLinesAnchor);
+		this.addDeleteSpear(
+			fromID, ''
+			, fromX
+			, fromY
+			, globalCommandDispatcher.cfg().speakerIconSize
+			, speakerX
+			, speakerY
+			, buttonsAnchor, zidx);
 	}
 	//nonan1(nn: number): number {
 	//	return (nn) ? nn : 0;
@@ -83,7 +134,7 @@ class FanOutputLine {
 				, h: globalCommandDispatcher.cfg().pluginIconSize / 2
 				, rx: globalCommandDispatcher.cfg().pluginIconSize / 4
 				, ry: globalCommandDispatcher.cfg().pluginIconSize / 4
-				, css: 'fanDropConnection fanDropConnection'+zidx
+				, css: 'fanDropConnection fanDropConnection' + zidx
 				, activation: (x: number, y: number) => {
 					console.log('delete link from', fromID, 'to', toID);
 				}

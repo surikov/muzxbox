@@ -14,7 +14,7 @@ class FilterIcon {
 			}
 		}
 	}
-	buildFilterSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
+	/*buildFilterSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
 			if (globalCommandDispatcher.cfg().data.filters[ii].id == this.filterId) {
 				let filterTarget: Zvoog_FilterTarget = globalCommandDispatcher.cfg().data.filters[ii];
@@ -22,7 +22,7 @@ class FilterIcon {
 				break;
 			}
 		}
-	}
+	}*/
 	addFilterSpot(order: number, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		//let sz = globalCommandDispatcher.cfg().pluginIconSize * zoomPrefixLevelsCSS[zidx].iconRatio;
 		let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx)  ;
@@ -108,14 +108,15 @@ class FilterIcon {
 			};
 			dragAnchor.content.push(txt);
 		}
-		if (order > -1) {
+		//if (order > -1) {
 			let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;
 			//new ControlConnection().addAudioStreamLineFlow(zidx, filterFromY, xx, yy, spearsAnchor);
-			let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
-			let css = 'fanConnectionBase fanConnection'+zidx;
-			let hoLine: TileLine = { x1: left, x2: xx, y1: filterFromY, y2: filterFromY, css: css };
+			let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+			//let css = 'fanConnectionBase fanConnection'+zidx;
+			let css = 'fanConnectionBase fanConnectionSecondary fanConnection'+zidx;
+			let hoLine: TileLine = { x1: start, x2: xx, y1: filterFromY, y2: filterFromY, css: css };
 			spearsAnchor.content.push(hoLine);
-			new SpearConnection().addSpear(false,zidx,
+			new SpearConnection().addSpear(true,zidx,
 				xx
 				, filterFromY
 				, sz //globalCommandDispatcher.cfg().pluginIconSize
@@ -123,7 +124,7 @@ class FilterIcon {
 				, yy
 				, spearsAnchor);
 			//console.log(hoLine);
-		}
+		//}
 		new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, spearsAnchor
 			, filterTarget.id
 			, xx

@@ -1875,6 +1875,10 @@ class MidiParser {
 			, comments: []
 		};
 
+		let echoID='echoMain';
+
+		
+
 		for (let ii = 0; ii < project.timeline.length; ii++) {
 			project.comments.push({ points: [] });
 		}
@@ -1886,14 +1890,15 @@ class MidiParser {
 				this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
 			}
 		}
+		
 		let top=0;
 		for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
 			let midiSongTrack: MIDISongTrack = midiSongData.miditracks[ii];
 			let filterID = 'f' + ii;
 			let filterVolume: Zvoog_FilterTarget = {
 				id: filterID
-				, kind: 'VolumeGain', dataBlob: '', outputs: []
-				, iconPosition: { x: 77+ii*3, y: ii*8+2 }
+				, kind: 'VolumeGain', dataBlob: '', outputs: [echoID]
+				, iconPosition: { x: 77+ii*5, y: ii*11+2 }
 				,automation:[]
 			};
 			project.filters.push(filterVolume);
@@ -1954,6 +1959,14 @@ class MidiParser {
 //console.log(top,ii);
 
 		}
+		let filterEcho: Zvoog_FilterTarget = {
+			id: echoID
+			, kind: 'Echo', dataBlob: '', outputs: ['']
+			, iconPosition: { x: 77+midiSongData.miditracks.length*3*3, y: midiSongData.miditracks.length*8+2 }
+			,automation:[]
+		};
+		project.filters.push(filterEcho);
+		
 		console.log('midiSongData', midiSongData);
 		console.log('project', project);
 		return project;

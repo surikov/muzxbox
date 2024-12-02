@@ -121,7 +121,7 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 			, iconPosition: { x: 152, y: 39 }
 		}
 		, {
-			id: 'masterVolme', kind: 'base_volume', dataBlob: 'bb1', outputs: []
+			id: 'masterVolme', kind: 'base_volume', dataBlob: 'bb1', outputs: ['']
 			, automation:[{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }] 
 			, iconPosition: { x: 188, y: 7 }
 		}

@@ -323,7 +323,6 @@ declare class FilterIcon {
     filterId: string;
     constructor(filterId: string);
     buildAutoSpot(order: number, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
-    buildFilterSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
     addFilterSpot(order: number, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
 }
 declare class ControlConnection {
@@ -336,6 +335,8 @@ declare class SpearConnection {
 }
 declare class FanOutputLine {
     addOutputs(outputs: string[], buttonsAnchor: TileAnchor, fanLinesAnchor: TileAnchor, fromID: string, fromX: number, fromY: number, zidx: number): void;
+    connectOutput(outId: string, fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number): void;
+    connectSpeaker(fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number): void;
     addDeleteSpear(fromID: string, toID: string, fromX: number, fromY: number, toSize: number, toX: number, toY: number, anchor: TileAnchor, zidx: number): void;
 }
 declare class IconLabelButton {

@@ -14,8 +14,8 @@ class SamplerIcon {
 	}
 	addSamplerSpot(order: number, sampler: Zvoog_AudioSampler, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		//let sz = globalCommandDispatcher.cfg().pluginIconSize * 1.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
-		let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 1.3 ;
-		
+		let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.66 ;
+
 		//console.log(zidx);
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
@@ -32,13 +32,18 @@ class SamplerIcon {
 		};
 		fanLevelAnchor.content.push(dragAnchor);
 		let rec: TilePolygon = {
-			x: xx - sz / 2
-			, y: yy - sz / 2
-			, dots: [
+			x: xx - sz *0.6
+			, y: yy- sz 
+			/*, dots: [
 				0, sz / 2
 				, sz / 2, 0
 				, sz, sz / 2
 				, sz / 2, sz
+			]*/
+			, dots: [
+				0, 0
+				, sz * 2 * 0.8, sz
+				, 0, sz * 2
 			]
 			, draggable: true
 			, activation: (x: number, y: number) => {
@@ -63,8 +68,8 @@ class SamplerIcon {
 						let xx = sampler.iconPosition.x + dragAnchor.translation.x;
 						let yy = sampler.iconPosition.y + dragAnchor.translation.y;
 						//console.log(xx,yy);
-						let toplugin=globalCommandDispatcher.cfg().findPluginSamplerIcon(xx,yy,zidx,sampler.id);
-						console.log('link ' + sampler.kind + ':' + sampler.id + ' to '+toplugin );
+						let toplugin = globalCommandDispatcher.cfg().findPluginSamplerIcon(xx, yy, zidx, sampler.id);
+						console.log('link ' + sampler.kind + ':' + sampler.id + ' to ' + toplugin);
 					}
 					globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
 						, fanLevelAnchor
@@ -85,8 +90,8 @@ class SamplerIcon {
 
 		}
 		//let clickBtnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
-		let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3 ;
-		
+		let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3;
+
 		if (zidx < 5) {
 
 			let btn: TileRectangle = {
@@ -121,7 +126,7 @@ class SamplerIcon {
 		}
 		//}
 		let samplerFromY = globalCommandDispatcher.cfg().samplerTop() + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
-		new ControlConnection().addAudioStreamLineFlow(false,zidx, samplerFromY, xx, yy, spearsAnchor);
+		new ControlConnection().addAudioStreamLineFlow(false, zidx, samplerFromY, xx, yy, spearsAnchor);
 		new FanOutputLine().addOutputs(sampler.outputs, fanLevelAnchor, spearsAnchor, sampler.id, xx, yy, zidx);
 	}
 }
