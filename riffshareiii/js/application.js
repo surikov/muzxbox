@@ -1498,10 +1498,10 @@ class LeftPanel {
                 }
             }
             if (zz < 4) {
-                for (let ff = 0; ff < globalCommandDispatcher.cfg().data.automations.length; ff++) {
-                    let automation = globalCommandDispatcher.cfg().data.automations[ff];
+                for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
+                    let filter = globalCommandDispatcher.cfg().data.filters[ff];
                     let autoLabel = {
-                        text: '' + automation.title,
+                        text: '' + filter.id,
                         x: 0,
                         y: globalCommandDispatcher.cfg().automationTop()
                             + (1 + ff) * globalCommandDispatcher.cfg().autoPointHeight
@@ -1778,10 +1778,10 @@ class AutomationBarContent {
         let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
         let top = globalCommandDispatcher.cfg().automationTop();
         let css = 'automationBgDot';
-        for (let aa = 0; aa < globalCommandDispatcher.cfg().data.automations.length; aa++) {
-            let automation = globalCommandDispatcher.cfg().data.automations[aa];
-            if (automation.measures[barIdx]) {
-                let measure = automation.measures[barIdx];
+        for (let aa = 0; aa < globalCommandDispatcher.cfg().data.filters.length; aa++) {
+            let filter = globalCommandDispatcher.cfg().data.filters[aa];
+            if (filter.automation[barIdx]) {
+                let measure = filter.automation[barIdx];
                 for (let ii = 0; ii < measure.changes.length; ii++) {
                     let change = measure.changes[ii];
                     let xx = barLeft + MMUtil().set(change.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
@@ -1975,12 +1975,10 @@ class MixerUI {
     }
     barAutoCount(bb) {
         let autoCnt = 0;
-        for (let ff = 0; ff < globalCommandDispatcher.cfg().data.automations.length; ff++) {
-            let automation = globalCommandDispatcher.cfg().data.automations[ff];
-            if (automation) {
-                if (automation.measures[bb]) {
-                    autoCnt = autoCnt + automation.measures[bb].changes.length;
-                }
+        for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
+            let filter = globalCommandDispatcher.cfg().data.filters[ff];
+            if (filter.automation[bb]) {
+                autoCnt = autoCnt + filter.automation[bb].changes.length;
             }
         }
         return autoCnt;
@@ -2079,7 +2077,7 @@ class MixerZoomLevel {
                     css: 'octaveBottomBorder'
                 });
             }
-            for (let aa = 1; aa < globalCommandDispatcher.cfg().data.automations.length; aa++) {
+            for (let aa = 1; aa < globalCommandDispatcher.cfg().data.filters.length; aa++) {
                 barOctaveAnchor.content.push({
                     x: globalCommandDispatcher.cfg().leftPad,
                     y: globalCommandDispatcher.cfg().automationTop() + aa * globalCommandDispatcher.cfg().autoPointHeight,
@@ -2105,15 +2103,11 @@ class MixerZoomLevel {
 }
 class FanPane {
     resetPlates(fanAnchors, spearsAnchors) {
-        this.filterIcons = [];
         this.autoIcons = [];
         this.performerIcons = [];
         this.samplerIcons = [];
         for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
-            this.filterIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
-        }
-        for (let aa = 0; aa < globalCommandDispatcher.cfg().data.automations.length; aa++) {
-            this.autoIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.automations[aa].output));
+            this.autoIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
         }
         for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
             this.performerIcons.push(new PerformerIcon(globalCommandDispatcher.cfg().data.tracks[tt].performer.id));
@@ -2142,7 +2136,7 @@ class FanPane {
                 };
                 spearsAnchors[ii].content.push(samplerBorder);
             }
-            if (globalCommandDispatcher.cfg().data.automations.length) {
+            if (globalCommandDispatcher.cfg().data.filters.length) {
                 let autoBorder = {
                     x1: left,
                     x2: left,
@@ -2153,7 +2147,6 @@ class FanPane {
                 spearsAnchors[ii].content.push(autoBorder);
             }
             this.buildPerformerIcons(fanAnchors[ii], spearsAnchors[ii], ii);
-            this.buildFilterIcons(fanAnchors[ii], spearsAnchors[ii], ii);
             this.buildAutoIcons(fanAnchors[ii], spearsAnchors[ii], ii);
             this.buildSamplerIcons(fanAnchors[ii], spearsAnchors[ii], ii);
             this.buildOutIcon(fanAnchors[ii], ii);
@@ -2172,11 +2165,6 @@ class FanPane {
     buildAutoIcons(fanAnchor, spearsAnchor, zidx) {
         for (let ii = 0; ii < this.autoIcons.length; ii++) {
             this.autoIcons[ii].buildAutoSpot(ii, fanAnchor, spearsAnchor, zidx);
-        }
-    }
-    buildFilterIcons(fanAnchor, spearsAnchor, zidx) {
-        for (let ii = 0; ii < this.filterIcons.length; ii++) {
-            this.filterIcons[ii].buildFilterSpot(fanAnchor, spearsAnchor, zidx);
         }
     }
     buildOutIcon(fanAnchor, zidx) {
@@ -2902,23 +2890,21 @@ let mzxbxProjectForTesting2 = {
     filters: [
         {
             id: 'volumeSlide', kind: 'baseVolume', dataBlob: '', outputs: ['masterVolme'],
+            automation: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }] }, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }],
             iconPosition: { x: 152, y: 39 }
         },
         {
             id: 'masterVolme', kind: 'base_volume', dataBlob: 'bb1', outputs: [],
+            automation: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }],
             iconPosition: { x: 188, y: 7 }
         },
-        { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 } },
-        { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 } },
-        { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 } },
-        { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 } },
-        { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 } },
-        { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 } },
-        { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 } }
-    ],
-    automations: [
-        { output: 'masterVolme', title: 'test1122', measures: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }] },
-        { output: 'volumeSlide', title: 'Simple test', measures: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }] }, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }] }
+        { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 }, automation: [] },
+        { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 }, automation: [] },
+        { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 }, automation: [] },
+        { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 }, automation: [] },
+        { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [] },
+        { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [] },
+        { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [] }
     ]
 };
 let testBigMixerData = {
@@ -3107,7 +3093,7 @@ class MixerDataMathUtility {
             + this.bottomPad;
     }
     automationHeight() {
-        return this.data.automations.length * this.autoPointHeight;
+        return this.data.filters.length * this.autoPointHeight;
     }
     commentsZoomHeight(zIndex) {
         return (2 + this.maxCommentRowCount) * this.notePathHeight * this.textZoomRatio(zIndex);

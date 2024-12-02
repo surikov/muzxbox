@@ -150,7 +150,7 @@ class MixerZoomLevel {
 					, css: 'octaveBottomBorder'
 				});
 			}
-			for (let aa = 1; aa < globalCommandDispatcher.cfg().data.automations.length; aa++) {
+			for (let aa = 1; aa < globalCommandDispatcher.cfg().data.filters.length; aa++) {
 				barOctaveAnchor.content.push({
 					x: globalCommandDispatcher.cfg().leftPad
 					, y: globalCommandDispatcher.cfg().automationTop() + aa * globalCommandDispatcher.cfg().autoPointHeight

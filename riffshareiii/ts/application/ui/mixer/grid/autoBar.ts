@@ -46,12 +46,12 @@ class AutomationBarContent {
 				}
 			}
 		}*/
-		for (let aa = 0; aa < globalCommandDispatcher.cfg().data.automations.length; aa++) {
-			let automation = globalCommandDispatcher.cfg().data.automations[aa];
+		for (let aa = 0; aa < globalCommandDispatcher.cfg().data.filters.length; aa++) {
+			let filter = globalCommandDispatcher.cfg().data.filters[aa];
 			//let filter = globalCommandDispatcher.cfg().findFilterTarget[automation.output];
 			//if (filter) {
-				if (automation.measures[barIdx]) {
-					let measure: Zvoog_FilterMeasure = automation.measures[barIdx];
+				if (filter.automation[barIdx]) {
+					let measure: Zvoog_FilterMeasure = filter.automation[barIdx];
 					for (let ii = 0; ii < measure.changes.length; ii++) {
 						let change = measure.changes[ii];
 						let xx = barLeft + MMUtil().set(change.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;

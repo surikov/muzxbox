@@ -284,13 +284,13 @@ class MixerUI {
 	}
 	barAutoCount(bb: number): number {
 		let autoCnt = 0;
-		for (let ff = 0; ff < globalCommandDispatcher.cfg().data.automations.length; ff++) {
-			let automation = globalCommandDispatcher.cfg().data.automations[ff];
-			if (automation) {
-				if (automation.measures[bb]) {
-					autoCnt = autoCnt + automation.measures[bb].changes.length;
+		for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
+			let filter = globalCommandDispatcher.cfg().data.filters[ff];
+			//if (automation) {
+				if (filter.automation[bb]) {
+					autoCnt = autoCnt + filter.automation[bb].changes.length;
 				}
-			}
+			//}
 		}
 		return autoCnt;
 	}

@@ -1459,7 +1459,6 @@ class MidiParser {
             tracks: [],
             percussions: [],
             filters: [],
-            automations: [],
             comments: []
         };
         for (let ii = 0; ii < project.timeline.length; ii++) {
@@ -1479,7 +1478,8 @@ class MidiParser {
             let filterVolume = {
                 id: filterID,
                 kind: 'VolumeGain', dataBlob: '', outputs: [],
-                iconPosition: { x: 77 + ii * 3, y: ii * 8 + 2 }
+                iconPosition: { x: 77 + ii * 3, y: ii * 8 + 2 },
+                automation: []
             };
             project.filters.push(filterVolume);
             if (midiSongTrack.trackVolumes.length == 1) {
@@ -1488,14 +1488,8 @@ class MidiParser {
             }
             else {
                 if (midiSongTrack.trackVolumes.length > 1) {
-                    let filterVolumeAutomation = {
-                        title: 'for ' + filterID,
-                        measures: [],
-                        output: filterVolume.id
-                    };
-                    project.automations.push(filterVolumeAutomation);
                     for (let mm = 0; mm < project.timeline.length; mm++) {
-                        filterVolumeAutomation.measures.push({ changes: [] });
+                        filterVolume.automation.push({ changes: [] });
                     }
                     for (let vv = 0; vv < midiSongTrack.trackVolumes.length; vv++) {
                         let gain = midiSongTrack.trackVolumes[vv];
@@ -1503,14 +1497,14 @@ class MidiParser {
                         let pnt = findMeasureSkipByTime(gain.ms / 1000, project.timeline);
                         if (pnt) {
                             pnt.skip = MMUtil().set(pnt.skip).strip(16);
-                            for (let aa = 0; aa < filterVolumeAutomation.measures[pnt.idx].changes.length; aa++) {
-                                let sk = filterVolumeAutomation.measures[pnt.idx].changes[aa].skip;
+                            for (let aa = 0; aa < filterVolume.automation[pnt.idx].changes.length; aa++) {
+                                let sk = filterVolume.automation[pnt.idx].changes[aa].skip;
                                 if (MMUtil().set(sk).equals(pnt.skip)) {
-                                    filterVolumeAutomation.measures[pnt.idx].changes.splice(aa, 1);
+                                    filterVolume.automation[pnt.idx].changes.splice(aa, 1);
                                     break;
                                 }
                             }
-                            filterVolumeAutomation.measures[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
+                            filterVolume.automation[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
                         }
                     }
                 }

@@ -117,26 +117,28 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 	, filters: [
 		{
 			id: 'volumeSlide', kind: 'baseVolume', dataBlob: '', outputs: ['masterVolme']
-			//, automation: { title: 'Simple test', measures: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }] }, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }] }
+			, automation:[{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }] }, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }] 
 			, iconPosition: { x: 152, y: 39 }
 		}
 		, {
 			id: 'masterVolme', kind: 'base_volume', dataBlob: 'bb1', outputs: []
-			//, automation: { title: 'test1122', measures: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }] }
+			, automation:[{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }] 
 			, iconPosition: { x: 188, y: 7 }
 		}
-		, { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 } }
-		, { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 } }
-		, { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 } }
-		, { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 } }
-		, { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 } }
-		, { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 } }
-		, { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 } }
+		, { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 } ,automation:[]}
+		, { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 } ,automation:[]}
+		, { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 } ,automation:[]}
+		, { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 } ,automation:[]}
+		, { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 } ,automation:[]}
+		, { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 } ,automation:[]}
+		, { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 } ,automation:[]}
 	]
+	/*
 	, automations: [
 		{ output: 'masterVolme', title: 'test1122', measures: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }] }
 		, { output: 'volumeSlide', title: 'Simple test', measures: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }] }, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }] }
 	]
+	*/
 	/*, theme: {
 		notePathHeight: 0.5
 		, widthDurationRatio: 17

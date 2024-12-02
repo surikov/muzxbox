@@ -117,11 +117,11 @@ class LeftPanel {
 			}
 			if (zz < 4) {
 				//let yy = 0;
-				for (let ff = 0; ff < globalCommandDispatcher.cfg().data.automations.length; ff++) {
-					let automation = globalCommandDispatcher.cfg().data.automations[ff];
+				for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
+					let filter = globalCommandDispatcher.cfg().data.filters[ff];
 					//if (filter.automation) {
 					let autoLabel: TileText = {
-						text: '' + automation.title
+						text: '' + filter.id
 						, x: 0
 						, y: globalCommandDispatcher.cfg().automationTop()
 							+ (1 + ff) * globalCommandDispatcher.cfg().autoPointHeight

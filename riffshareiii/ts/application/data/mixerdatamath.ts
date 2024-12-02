@@ -151,7 +151,7 @@ class MixerDataMathUtility {
 			;
 	}
 	automationHeight(): number {
-		return this.data.automations.length * this.autoPointHeight;
+		return this.data.filters.length * this.autoPointHeight;
 	}
 	commentsZoomHeight(zIndex: number): number {
 		return (2 + this.maxCommentRowCount) * this.notePathHeight * this.textZoomRatio(zIndex);
