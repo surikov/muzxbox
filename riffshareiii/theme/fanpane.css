@@ -95,10 +95,10 @@
 .fanConnection2 {stroke-width: 0.08cm;}
 .fanConnection3 {stroke-width: 0.16cm;}
 .fanConnection4 {stroke-width: 0.32cm;}
-.fanConnection5 {stroke-width: 0.65cm;}
-.fanConnection6 {stroke-width: 1.28cm;}
-.fanConnection7 {stroke-width: 2.56cm;}
-.fanConnection8 {stroke-width: 5.12cm;}
+.fanConnection5 {stroke-width: 0.5cm;}
+.fanConnection6 {stroke-width: 0.75cm;}
+.fanConnection7 {stroke-width: 1cm;}
+.fanConnection8 {stroke-width: 2cm;}
 
 .fanStream {
 	pointer-events: none;

@@ -13,43 +13,7 @@ class PerformerIcon {
 		}
 	}
 	addPerformerSpot(secondary:boolean,audioSeq: Zvoog_AudioSequencer, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
-		/*
-		let sz = globalCommandDispatcher.cfg().pluginIconSize;
-		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
-		let top = globalCommandDispatcher.cfg().gridTop();
-		let xx = left;
-		let yy = top;
-		if (audioSeq.iconPosition) {
-			xx = left + audioSeq.iconPosition.x;
-			yy = top + audioSeq.iconPosition.y;
-		}
-		let rec: TileRectangle = {
-			x: xx-sz/2, y: yy-sz/2
-			, w: sz, h: sz
-			, css: 'fanPerformerIcon'
-			, draggable: true
-			, activation: (x: number, y: number) => { console.log(x, y); }
-		};
-		fanLevelAnchor.content.push(rec);
-		if (zidx < 5) {
-			let txt: TileText = {
-				text: audioSeq.kind + ':' + audioSeq.id
-				, x: xx, y: yy , css: 'fanIconLabel'
-			};
-			fanLevelAnchor.content.push(txt);
-		}
-		let step = globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveCount * 12 / sum;
-		let performerFromY = globalCommandDispatcher.cfg().gridTop() + (order + 0.5) * step;
-		new ControlConnection().addAudioStreamLineFlow(zidx,performerFromY, xx, yy , spearsAnchor);
-		new FanOutputLine().addOutputs(audioSeq.outputs, fanLevelAnchor, spearsAnchor
-			, audioSeq.id
-			, xx 
-			, yy 
-			, zidx);
-			*/
-		//let sz = globalCommandDispatcher.cfg().pluginIconSize *  zoomPrefixLevelsCSS[zidx].iconRatio;
 		let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
-		//console.log(zidx);
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
 		let xx = left;
@@ -58,7 +22,6 @@ class PerformerIcon {
 			xx = left + audioSeq.iconPosition.x;
 			yy = top + audioSeq.iconPosition.y;
 		}
-		//if (zidx < 7) {
 		let dragAnchor: TileAnchor = {
 			xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz
 			, showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [], translation: { x: 0, y: 0 }
@@ -69,7 +32,6 @@ class PerformerIcon {
 			, w: sz, h: sz
 			, draggable: true
 			, activation: (x: number, y: number) => {
-				//console.log('sampler', x, y);
 				if (!dragAnchor.translation) {
 					dragAnchor.translation = { x: 0, y: 0 };
 				}
@@ -99,6 +61,36 @@ class PerformerIcon {
 			, w: sz * 0.9, h: sz * 0.9
 			, css: 'fanConnectionBase fanConnection' + zidx
 		});
+		
+		//let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3;
+		if (zidx < 5) {
+			let btn: TileRectangle = {
+				x: xx-sz/2//xx - clickBtnSz / 2
+				, y: yy//yy + sz / 5 - clickBtnSz / 2
+				, w: sz//clickBtnSz
+				, h: sz/2//clickBtnSz
+				//, rx: clickBtnSz / 2
+				//, ry: clickBtnSz / 2
+				, css: 'fanSamplerInteractionIcon fanButton' + zidx
+				, activation: (x: number, y: number) => {
+					console.log('' + audioSeq.kind + ':' + audioSeq.id);
+				}
+			};
+			dragAnchor.content.push(btn);
+		}
+		/*if (zidx < 4) {
+			let yZshift = 0.3;
+			if (zidx > 0) yZshift = 0.25;
+			if (zidx > 1) yZshift = 0.2;
+			if (zidx > 2) yZshift = 0.15;
+			let txt: TileText = {
+				text: icon_gear
+				, x: xx
+				, y: yy + sz / 5 + clickBtnSz * yZshift
+				, css: 'fanSamplerActionIconLabel'
+			};
+			dragAnchor.content.push(txt);
+		}*/
 		if (zidx < 3) {
 			let txt: TileText = {
 				text: audioSeq.kind + ':' + audioSeq.id
@@ -109,44 +101,6 @@ class PerformerIcon {
 			dragAnchor.content.push(txt);
 
 		}
-		//let clickBtnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
-		let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3;
-		if (zidx < 5) {
-
-			let btn: TileRectangle = {
-				x: xx - clickBtnSz / 2
-				, y: yy + sz / 5 - clickBtnSz / 2
-				, w: clickBtnSz
-				, h: clickBtnSz
-				, rx: clickBtnSz / 2
-				, ry: clickBtnSz / 2
-				, css: 'fanSamplerInteractionIcon fanButton' + zidx
-				, activation: (x: number, y: number) => {
-					console.log('' + audioSeq.kind + ':' + audioSeq.id);
-				}
-			};
-			dragAnchor.content.push(btn);
-
-		}
-		if (zidx < 4) {
-			let yZshift = 0.3;
-			if (zidx > 0) yZshift = 0.25;
-			if (zidx > 1) yZshift = 0.2;
-			if (zidx > 2) yZshift = 0.15;
-
-
-			let txt: TileText = {
-				text: icon_gear
-				, x: xx
-				, y: yy + sz / 5 + clickBtnSz * yZshift
-				, css: 'fanSamplerActionIconLabel'
-			};
-			dragAnchor.content.push(txt);
-		}
-		//}
-		//let samplerFromY = globalCommandDispatcher.cfg().samplerTop() + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
-		//let step = globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveCount * 12 / sum;
-		//let performerFromY = globalCommandDispatcher.cfg().gridTop() + (order + 0.5) * step;
 		let performerFromY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2;
 		new ControlConnection().addAudioStreamLineFlow(secondary,zidx, performerFromY, xx, yy, spearsAnchor);
 		new FanOutputLine().addOutputs(audioSeq.outputs, fanLevelAnchor, spearsAnchor, audioSeq.id, xx, yy, zidx);

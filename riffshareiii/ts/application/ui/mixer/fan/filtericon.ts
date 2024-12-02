@@ -14,18 +14,10 @@ class FilterIcon {
 			}
 		}
 	}
-	/*buildFilterSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
-		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
-			if (globalCommandDispatcher.cfg().data.filters[ii].id == this.filterId) {
-				let filterTarget: Zvoog_FilterTarget = globalCommandDispatcher.cfg().data.filters[ii];
-				this.addFilterSpot(-1, filterTarget, fanLevelAnchor, spearsAnchor, zidx);
-				break;
-			}
-		}
-	}*/
+
 	addFilterSpot(order: number, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		//let sz = globalCommandDispatcher.cfg().pluginIconSize * zoomPrefixLevelsCSS[zidx].iconRatio;
-		let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx)  ;
+		let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
 		let xx = left;
@@ -70,21 +62,15 @@ class FilterIcon {
 			, css: 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx
 		};
 		dragAnchor.content.push(rec);
-		if (zidx < 3) {
-			let txt: TileText = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy, css: 'fanIconLabel' };
-			dragAnchor.content.push(txt);
-		}
-		//let clickBtnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
-		let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3 ;
-		if (zidx < 5) {
 
-			let btn: TileRectangle = {
-				x: xx - clickBtnSz / 2
-				, y: yy + sz / 5 - clickBtnSz / 2
-				, w: clickBtnSz
-				, h: clickBtnSz
-				, rx: clickBtnSz / 2
-				, ry: clickBtnSz / 2
+		//let clickBtnSz = globalCommandDispatcher.cfg().pluginIconSize * 0.3 * zoomPrefixLevelsCSS[zidx].iconRatio;
+		//let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3;
+		if (zidx < 5) {
+			let px: number = globalCommandDispatcher.renderer.tiler.tapPxSize();
+			let btn: TilePath = {
+				x: xx-sz/2
+				, y: yy
+				, points: 'M 0 0 a 1 1 0 0 0 ' + (sz * px) + ' 0 Z'
 				, css: 'fanSamplerInteractionIcon fanButton' + zidx
 				, activation: (x: number, y: number) => {
 					console.log('' + filterTarget.kind + ':' + filterTarget.id);
@@ -93,7 +79,11 @@ class FilterIcon {
 			dragAnchor.content.push(btn);
 
 		}
-		if (zidx < 4) {
+		if (zidx < 3) {
+			let txt: TileText = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy, css: 'fanIconLabel' };
+			dragAnchor.content.push(txt);
+		}
+		/*if (zidx < 4) {
 			let yZshift = 0.3;
 			if (zidx > 0) yZshift = 0.25;
 			if (zidx > 1) yZshift = 0.2;
@@ -107,61 +97,26 @@ class FilterIcon {
 				, css: 'fanSamplerActionIconLabel'
 			};
 			dragAnchor.content.push(txt);
-		}
-		//if (order > -1) {
-			let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;
-			//new ControlConnection().addAudioStreamLineFlow(zidx, filterFromY, xx, yy, spearsAnchor);
-			let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
-			//let css = 'fanConnectionBase fanConnection'+zidx;
-			let css = 'fanConnectionBase fanConnectionSecondary fanConnection'+zidx;
-			let hoLine: TileLine = { x1: start, x2: xx, y1: filterFromY, y2: filterFromY, css: css };
-			spearsAnchor.content.push(hoLine);
-			new SpearConnection().addSpear(true,zidx,
-				xx
-				, filterFromY
-				, sz //globalCommandDispatcher.cfg().pluginIconSize
-				, xx
-				, yy
-				, spearsAnchor);
-			//console.log(hoLine);
-		//}
+		}*/
+
+		let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;
+		let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+		let css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
+		let hoLine: TileLine = { x1: start, x2: xx, y1: filterFromY, y2: filterFromY, css: css };
+		spearsAnchor.content.push(hoLine);
+		new SpearConnection().addSpear(true, zidx,
+			xx
+			, filterFromY
+			, sz //globalCommandDispatcher.cfg().pluginIconSize
+			, xx
+			, yy
+			, spearsAnchor);
+
 		new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, spearsAnchor
 			, filterTarget.id
 			, xx
 			, yy
 			, zidx);
 	}
-	/*addAutoSpot(order: number, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
-		let sz = globalCommandDispatcher.cfg().pluginIconSize;
-		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
-		let top = globalCommandDispatcher.cfg().gridTop();
-		let xx = left;
-		let yy = top;
-		if (filterTarget.iconPosition) {
-			xx = left + filterTarget.iconPosition.x;
-			yy = top + filterTarget.iconPosition.y;
-		}
 
-		let rec: TileRectangle = {
-			x: xx-sz/2, y: yy-sz/2, w: sz
-			, rx: sz / 2, ry: sz / 2
-			, h: sz, css: 'fanFilterIcon'
-		};
-		fanLevelAnchor.content.push(rec);
-		if (zidx < 5) {
-			let txt: TileText = {
-				text: '' + filterTarget.kind + ':' + filterTarget.id
-				, x: xx, y: yy , css: 'fanIconLabel'
-			};
-			fanLevelAnchor.content.push(txt);
-		}
-		let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order +0.5)* globalCommandDispatcher.cfg().autoPointHeight;
-		new ControlConnection().addAudioStreamLineFlow(zidx,filterFromY
-			, xx, yy, spearsAnchor);
-		new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, spearsAnchor
-			, filterTarget.id
-			, xx 
-			, yy 
-			, zidx);
-	}*/
 }

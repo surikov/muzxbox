@@ -2249,24 +2249,12 @@ class PerformerIcon {
             w: sz * 0.9, h: sz * 0.9,
             css: 'fanConnectionBase fanConnection' + zidx
         });
-        if (zidx < 3) {
-            let txt = {
-                text: audioSeq.kind + ':' + audioSeq.id,
-                x: xx,
-                y: yy,
-                css: 'fanIconLabel'
-            };
-            dragAnchor.content.push(txt);
-        }
-        let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3;
         if (zidx < 5) {
             let btn = {
-                x: xx - clickBtnSz / 2,
-                y: yy + sz / 5 - clickBtnSz / 2,
-                w: clickBtnSz,
-                h: clickBtnSz,
-                rx: clickBtnSz / 2,
-                ry: clickBtnSz / 2,
+                x: xx - sz / 2,
+                y: yy,
+                w: sz,
+                h: sz / 2,
                 css: 'fanSamplerInteractionIcon fanButton' + zidx,
                 activation: (x, y) => {
                     console.log('' + audioSeq.kind + ':' + audioSeq.id);
@@ -2274,19 +2262,12 @@ class PerformerIcon {
             };
             dragAnchor.content.push(btn);
         }
-        if (zidx < 4) {
-            let yZshift = 0.3;
-            if (zidx > 0)
-                yZshift = 0.25;
-            if (zidx > 1)
-                yZshift = 0.2;
-            if (zidx > 2)
-                yZshift = 0.15;
+        if (zidx < 3) {
             let txt = {
-                text: icon_gear,
+                text: audioSeq.kind + ':' + audioSeq.id,
                 x: xx,
-                y: yy + sz / 5 + clickBtnSz * yZshift,
-                css: 'fanSamplerActionIconLabel'
+                y: yy,
+                css: 'fanIconLabel'
             };
             dragAnchor.content.push(txt);
         }
@@ -2362,24 +2343,15 @@ class SamplerIcon {
             css: 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx
         };
         dragAnchor.content.push(rec);
-        if (zidx < 3) {
-            let txt = {
-                text: sampler.kind + ':' + sampler.id,
-                x: xx,
-                y: yy,
-                css: 'fanIconLabel'
-            };
-            dragAnchor.content.push(txt);
-        }
-        let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3;
         if (zidx < 5) {
             let btn = {
-                x: xx - clickBtnSz / 2,
-                y: yy + sz / 5 - clickBtnSz / 2,
-                w: clickBtnSz,
-                h: clickBtnSz,
-                rx: clickBtnSz / 2,
-                ry: clickBtnSz / 2,
+                x: xx - sz * 0.6,
+                y: yy - sz,
+                dots: [
+                    0, sz,
+                    sz * 2 * 0.8, sz,
+                    0, sz * 2
+                ],
                 css: 'fanSamplerInteractionIcon fanButton' + zidx,
                 activation: (x, y) => {
                     console.log('' + sampler.kind + ':' + sampler.id);
@@ -2387,19 +2359,12 @@ class SamplerIcon {
             };
             dragAnchor.content.push(btn);
         }
-        if (zidx < 4) {
-            let yZshift = 0.3;
-            if (zidx > 0)
-                yZshift = 0.25;
-            if (zidx > 1)
-                yZshift = 0.2;
-            if (zidx > 2)
-                yZshift = 0.15;
+        if (zidx < 3) {
             let txt = {
-                text: icon_gear,
+                text: sampler.kind + ':' + sampler.id,
                 x: xx,
-                y: yy + sz / 5 + clickBtnSz * yZshift,
-                css: 'fanSamplerActionIconLabel'
+                y: yy,
+                css: 'fanIconLabel'
             };
             dragAnchor.content.push(txt);
         }
@@ -2465,19 +2430,12 @@ class FilterIcon {
             css: 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx
         };
         dragAnchor.content.push(rec);
-        if (zidx < 3) {
-            let txt = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy, css: 'fanIconLabel' };
-            dragAnchor.content.push(txt);
-        }
-        let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3;
         if (zidx < 5) {
+            let px = globalCommandDispatcher.renderer.tiler.tapPxSize();
             let btn = {
-                x: xx - clickBtnSz / 2,
-                y: yy + sz / 5 - clickBtnSz / 2,
-                w: clickBtnSz,
-                h: clickBtnSz,
-                rx: clickBtnSz / 2,
-                ry: clickBtnSz / 2,
+                x: xx - sz / 2,
+                y: yy,
+                points: 'M 0 0 a 1 1 0 0 0 ' + (sz * px) + ' 0 Z',
                 css: 'fanSamplerInteractionIcon fanButton' + zidx,
                 activation: (x, y) => {
                     console.log('' + filterTarget.kind + ':' + filterTarget.id);
@@ -2485,20 +2443,8 @@ class FilterIcon {
             };
             dragAnchor.content.push(btn);
         }
-        if (zidx < 4) {
-            let yZshift = 0.3;
-            if (zidx > 0)
-                yZshift = 0.25;
-            if (zidx > 1)
-                yZshift = 0.2;
-            if (zidx > 2)
-                yZshift = 0.15;
-            let txt = {
-                text: icon_gear,
-                x: xx,
-                y: yy + sz / 5 + clickBtnSz * yZshift,
-                css: 'fanSamplerActionIconLabel'
-            };
+        if (zidx < 3) {
+            let txt = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy, css: 'fanIconLabel' };
             dragAnchor.content.push(txt);
         }
         let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;
