@@ -2195,21 +2195,20 @@ class PerformerIcon {
     buildPerformerSpot(fanLevelAnchor, spearsAnchor, zidx) {
         for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
             if (globalCommandDispatcher.cfg().data.tracks[ii].performer.id == this.performerId) {
-                let audioSeq = globalCommandDispatcher.cfg().data.tracks[ii].performer;
-                this.addPerformerSpot(ii > 0, audioSeq, fanLevelAnchor, spearsAnchor, zidx);
+                this.addPerformerSpot(ii > 0, globalCommandDispatcher.cfg().data.tracks[ii], fanLevelAnchor, spearsAnchor, zidx);
                 break;
             }
         }
     }
-    addPerformerSpot(secondary, audioSeq, fanLevelAnchor, spearsAnchor, zidx) {
+    addPerformerSpot(secondary, track, fanLevelAnchor, spearsAnchor, zidx) {
         let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
         let top = globalCommandDispatcher.cfg().gridTop();
         let xx = left;
         let yy = top;
-        if (audioSeq.iconPosition) {
-            xx = left + audioSeq.iconPosition.x;
-            yy = top + audioSeq.iconPosition.y;
+        if (track.performer.iconPosition) {
+            xx = left + track.performer.iconPosition.x;
+            yy = top + track.performer.iconPosition.y;
         }
         let dragAnchor = {
             xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
@@ -2226,12 +2225,12 @@ class PerformerIcon {
                 }
                 if (x == 0 && y == 0) {
                     console.log('done', dragAnchor.translation);
-                    if (!audioSeq.iconPosition) {
-                        audioSeq.iconPosition = { x: 0, y: 0 };
+                    if (!track.performer.iconPosition) {
+                        track.performer.iconPosition = { x: 0, y: 0 };
                     }
-                    audioSeq.iconPosition.x = audioSeq.iconPosition.x + dragAnchor.translation.x;
-                    audioSeq.iconPosition.y = audioSeq.iconPosition.y + dragAnchor.translation.y;
-                    console.log('drop' + audioSeq.kind + ':' + audioSeq.id + ' to ' + audioSeq.iconPosition.x + '/' + audioSeq.iconPosition.y);
+                    track.performer.iconPosition.x = track.performer.iconPosition.x + dragAnchor.translation.x;
+                    track.performer.iconPosition.y = track.performer.iconPosition.y + dragAnchor.translation.y;
+                    console.log('drop' + track.performer.kind + ':' + track.performer.id + ' to ' + track.performer.iconPosition.x + '/' + track.performer.iconPosition.y);
                     dragAnchor.translation = { x: 0, y: 0 };
                     globalCommandDispatcher.resetProject();
                 }
@@ -2257,14 +2256,14 @@ class PerformerIcon {
                 h: sz / 2,
                 css: 'fanSamplerInteractionIcon fanButton' + zidx,
                 activation: (x, y) => {
-                    console.log('' + audioSeq.kind + ':' + audioSeq.id);
+                    console.log('' + track.performer.kind + ':' + track.performer.id);
                 }
             };
             dragAnchor.content.push(btn);
         }
         if (zidx < 3) {
             let txt = {
-                text: audioSeq.kind + ':' + audioSeq.id,
+                text: track.title + ': ' + track.volume + ': ' + track.performer.kind + ': ' + track.performer.id,
                 x: xx,
                 y: yy,
                 css: 'fanIconLabel'
@@ -2273,7 +2272,7 @@ class PerformerIcon {
         }
         let performerFromY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2;
         new ControlConnection().addAudioStreamLineFlow(secondary, zidx, performerFromY, xx, yy, spearsAnchor);
-        new FanOutputLine().addOutputs(audioSeq.outputs, fanLevelAnchor, spearsAnchor, audioSeq.id, xx, yy, zidx);
+        new FanOutputLine().addOutputs(track.performer.outputs, fanLevelAnchor, spearsAnchor, track.performer.id, xx, yy, zidx);
     }
 }
 class SamplerIcon {
@@ -2283,21 +2282,20 @@ class SamplerIcon {
     buildSamplerSpot(order, fanLevelAnchor, spearsAnchor, zidx) {
         for (let ii = 0; ii < globalCommandDispatcher.cfg().data.percussions.length; ii++) {
             if (globalCommandDispatcher.cfg().data.percussions[ii].sampler.id == this.samplerId) {
-                let sampler = globalCommandDispatcher.cfg().data.percussions[ii].sampler;
-                this.addSamplerSpot(order, sampler, fanLevelAnchor, spearsAnchor, zidx);
+                this.addSamplerSpot(order, globalCommandDispatcher.cfg().data.percussions[ii], fanLevelAnchor, spearsAnchor, zidx);
                 break;
             }
         }
     }
-    addSamplerSpot(order, sampler, fanLevelAnchor, spearsAnchor, zidx) {
+    addSamplerSpot(order, samplerTrack, fanLevelAnchor, spearsAnchor, zidx) {
         let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.66;
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
         let top = globalCommandDispatcher.cfg().gridTop();
         let xx = left;
         let yy = top;
-        if (sampler.iconPosition) {
-            xx = left + sampler.iconPosition.x;
-            yy = top + sampler.iconPosition.y;
+        if (samplerTrack.sampler.iconPosition) {
+            xx = left + samplerTrack.sampler.iconPosition.x;
+            yy = top + samplerTrack.sampler.iconPosition.y;
         }
         let dragAnchor = {
             xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
@@ -2319,23 +2317,23 @@ class SamplerIcon {
                 }
                 if (x == 0 && y == 0) {
                     console.log('done', dragAnchor.translation);
-                    if (!sampler.iconPosition) {
-                        sampler.iconPosition = { x: 0, y: 0 };
+                    if (!samplerTrack.sampler.iconPosition) {
+                        samplerTrack.sampler.iconPosition = { x: 0, y: 0 };
                     }
-                    sampler.iconPosition.x = sampler.iconPosition.x + dragAnchor.translation.x;
-                    sampler.iconPosition.y = sampler.iconPosition.y + dragAnchor.translation.y;
-                    console.log('move ' + sampler.kind + ':' + sampler.id + ' to ' + sampler.iconPosition.x + '/' + sampler.iconPosition.y);
+                    samplerTrack.sampler.iconPosition.x = samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x;
+                    samplerTrack.sampler.iconPosition.y = samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y;
+                    console.log('move ' + samplerTrack.sampler.kind + ':' + samplerTrack.sampler.id + ' to ' + samplerTrack.sampler.iconPosition.x + '/' + samplerTrack.sampler.iconPosition.y);
                     dragAnchor.translation = { x: 0, y: 0 };
                     globalCommandDispatcher.resetProject();
                 }
                 else {
                     dragAnchor.translation.x = dragAnchor.translation.x + x;
                     dragAnchor.translation.y = dragAnchor.translation.y + y;
-                    if (sampler.iconPosition) {
-                        let xx = sampler.iconPosition.x + dragAnchor.translation.x;
-                        let yy = sampler.iconPosition.y + dragAnchor.translation.y;
-                        let toplugin = globalCommandDispatcher.cfg().findPluginSamplerIcon(xx, yy, zidx, sampler.id);
-                        console.log('link ' + sampler.kind + ':' + sampler.id + ' to ' + toplugin);
+                    if (samplerTrack.sampler.iconPosition) {
+                        let xx = samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x;
+                        let yy = samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y;
+                        let toplugin = globalCommandDispatcher.cfg().findPluginSamplerIcon(xx, yy, zidx, samplerTrack.sampler.id);
+                        console.log('link ' + samplerTrack.sampler.kind + ':' + samplerTrack.sampler.id + ' to ' + toplugin);
                     }
                     globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
                 }
@@ -2354,14 +2352,14 @@ class SamplerIcon {
                 ],
                 css: 'fanSamplerInteractionIcon fanButton' + zidx,
                 activation: (x, y) => {
-                    console.log('' + sampler.kind + ':' + sampler.id);
+                    console.log('' + samplerTrack.sampler.kind + ':' + samplerTrack.sampler.id);
                 }
             };
             dragAnchor.content.push(btn);
         }
         if (zidx < 3) {
             let txt = {
-                text: sampler.kind + ':' + sampler.id,
+                text: samplerTrack.title + ": " + samplerTrack.volume + ": " + samplerTrack.sampler.kind + ': ' + samplerTrack.sampler.id,
                 x: xx,
                 y: yy,
                 css: 'fanIconLabel'
@@ -2370,7 +2368,7 @@ class SamplerIcon {
         }
         let samplerFromY = globalCommandDispatcher.cfg().samplerTop() + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
         new ControlConnection().addAudioStreamLineFlow(false, zidx, samplerFromY, xx, yy, spearsAnchor);
-        new FanOutputLine().addOutputs(sampler.outputs, fanLevelAnchor, spearsAnchor, sampler.id, xx, yy, zidx);
+        new FanOutputLine().addOutputs(samplerTrack.sampler.outputs, fanLevelAnchor, spearsAnchor, samplerTrack.sampler.id, xx, yy, zidx);
     }
 }
 class FilterIcon {
@@ -2745,7 +2743,7 @@ let mzxbxProjectForTesting2 = {
     ],
     tracks: [
         {
-            title: "Track one", measures: [
+            title: "Track one", volume: 1, measures: [
                 {
                     chords: [
                         { skip: { count: 0, part: 1 }, pitches: [25], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
@@ -2773,7 +2771,7 @@ let mzxbxProjectForTesting2 = {
             performer: { id: 'firstPerfoemrID', data: '', kind: 'basePitched', outputs: ['track1Volme'], iconPosition: { x: 40, y: 20 } }
         },
         {
-            title: "Second track", measures: [
+            title: "Second track", volume: 1, measures: [
                 { chords: [
                         { skip: { count: 3, part: 4 }, pitches: [77], slides: [{ duration: { count: 13, part: 8 }, delta: -1 }] }
                     ] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
@@ -2781,7 +2779,7 @@ let mzxbxProjectForTesting2 = {
             performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 } }
         },
         {
-            title: "Third track", measures: [
+            title: "Third track", volume: 1, measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
             performer: { id: 't3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 40, y: 33 } }
@@ -2789,17 +2787,17 @@ let mzxbxProjectForTesting2 = {
     ],
     percussions: [
         {
-            title: "Snare", measures: [
+            title: "Snare", volume: 1, measures: [
                 { skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
             ],
             sampler: { id: 'd1', data: '', kind: 'baseSampler', outputs: ['drum1Volme'], iconPosition: { x: 22, y: 75 } }
         },
         {
-            title: "Snare2", measures: [],
+            title: "Snare2", volume: 1, measures: [],
             sampler: { id: 'd2', data: '', kind: 'baseSampler', outputs: ['drum2Volme'], iconPosition: { x: 22, y: 91 } }
         },
         {
-            title: "Snare3", measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }],
+            title: "Snare3", volume: 1, measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }],
             sampler: { id: 'd3', data: '', kind: 'baseSampler', outputs: ['drum3Volme'], iconPosition: { x: 22, y: 99 } }
         }
     ],
@@ -2924,7 +2922,7 @@ class MixerDataMathUtility {
         this.padSampler2Automation = 5;
         this.padAutomation2Comments = 5;
         this.bottomPad = 11;
-        this.notePathHeight = 1.5;
+        this.notePathHeight = 1.01;
         this.samplerDotHeight = 3;
         this.autoPointHeight = 4;
         this.widthDurationRatio = 27;

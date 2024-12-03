@@ -1875,9 +1875,7 @@ class MidiParser {
 			, comments: []
 		};
 
-		let echoID='echoMain';
-
-		
+		let echoID = 'echoMain';
 
 		for (let ii = 0; ii < project.timeline.length; ii++) {
 			project.comments.push({ points: [] });
@@ -1890,86 +1888,117 @@ class MidiParser {
 				this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
 			}
 		}
-		
-		let top=0;
+
+		let top = 0;
+		let outputID = '';
+		let volume = 1;
 		for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
 			let midiSongTrack: MIDISongTrack = midiSongData.miditracks[ii];
-			let filterID = 'f' + ii;
-			let filterVolume: Zvoog_FilterTarget = {
-				id: filterID
-				, kind: 'VolumeGain', dataBlob: '', outputs: [echoID]
-				, iconPosition: { x: 77+ii*5, y: ii*11+2 }
-				,automation:[]
-			};
-			project.filters.push(filterVolume);
+			if (midiSongTrack.trackVolumes.length > 1) {
+				let filterID = 'f' + ii;
+				let filterVolume: Zvoog_FilterTarget = {
+					id: filterID
+					, kind: 'VolumeGain', dataBlob: '', outputs: [echoID]
+					, iconPosition: { x: 77 + ii * 5, y: ii * 11 + 2 }
+					, automation: []
+				};
+				outputID = filterID;
+				project.filters.push(filterVolume);
+				for (let mm = 0; mm < project.timeline.length; mm++) {
+					filterVolume.automation.push({ changes: [] });
+				}
+				for (let vv = 0; vv < midiSongTrack.trackVolumes.length; vv++) {
+					let gain = midiSongTrack.trackVolumes[vv];
+					let vol = '' + Math.round(gain.value * 100) + '%';
+					let pnt = findMeasureSkipByTime(gain.ms / 1000, project.timeline);
 
-			if (midiSongTrack.trackVolumes.length == 1) {
-				let vol: number = 1 * midiSongTrack.trackVolumes[0].value;
-				filterVolume.dataBlob = '' + Math.round(vol * 100) + '%';
-			} else {
-				if (midiSongTrack.trackVolumes.length > 1) {
-					/*let filterVolumeAutomation:Zvoog_AutomationTrack={
-						title: 'for ' + filterID
-						, measures: []
-						,output:filterVolume.id
-					};
-					project.automations.push(filterVolumeAutomation);
-					*/
-					//filterVolume.automation = { title: 'for ' + filterID, measures: [] };
-					for (let mm = 0; mm < project.timeline.length; mm++) {
-						//filterVolume.automation.measures.push({ changes: [] });
-						//filterVolumeAutomation.measures.push({ changes: [] });
-						filterVolume.automation.push({ changes: [] });
-					}
-					for (let vv = 0; vv < midiSongTrack.trackVolumes.length; vv++) {
-						let gain = midiSongTrack.trackVolumes[vv];
-						let vol = '' + Math.round(gain.value * 100) + '%';
-						let pnt = findMeasureSkipByTime(gain.ms / 1000, project.timeline);
-
-						//
-						if (pnt) {
-							pnt.skip = MMUtil().set(pnt.skip).strip(16);
-							for (let aa = 0; aa < filterVolume.automation[pnt.idx].changes.length; aa++) {
-								let sk = filterVolume.automation[pnt.idx].changes[aa].skip;
-								if (MMUtil().set(sk).equals(pnt.skip)) {
-									filterVolume.automation[pnt.idx].changes.splice(aa, 1);
-									break;
-								}
+					//
+					if (pnt) {
+						pnt.skip = MMUtil().set(pnt.skip).strip(16);
+						for (let aa = 0; aa < filterVolume.automation[pnt.idx].changes.length; aa++) {
+							let sk = filterVolume.automation[pnt.idx].changes[aa].skip;
+							if (MMUtil().set(sk).equals(pnt.skip)) {
+								filterVolume.automation[pnt.idx].changes.splice(aa, 1);
+								break;
 							}
-							filterVolume.automation[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
-							//console.log(filterID, vol, pnt,vol);
 						}
+						filterVolume.automation[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
+						//console.log(filterID, vol, pnt,vol);
 					}
 				}
+				//console.log(midiSongTrack.title, 'auto',midiSongTrack.trackVolumes.length);
+			} else {
+				outputID = echoID;
+				if (midiSongTrack.trackVolumes.length == 1) {
+					let vol: number = 1 * midiSongTrack.trackVolumes[0].value;
+					//filterVolume.dataBlob = '' + Math.round(vol * 100) + '%';
+					//console.log(midiSongTrack.title, 'set', vol);
+					volume = 1 * midiSongTrack.trackVolumes[0].value;
+				} else {
+					//console.log(midiSongTrack.title,'default');
+				}
+
 			}
 
 			//console.log('filterVolume', filterVolume);
 
 			if (midiSongTrack.channelNum == 9) {
 				let drums: number[] = this.collectDrums(midiSongTrack);
-				//console.log(midiTrack,drums);
+				//console.log('drums',drums);
 				for (let dd = 0; dd < drums.length; dd++) {
-					project.percussions.push(this.createProjectDrums(top*9,drums[dd], project.timeline, midiSongTrack, filterID));
+					project.percussions.push(this.createProjectDrums(1, top * 9, drums[dd], project.timeline, midiSongTrack, outputID));
 					top++;
 				}
 			} else {
-				project.tracks.push(this.createProjectTrack(top*8,project.timeline, midiSongTrack, filterID));
+				project.tracks.push(this.createProjectTrack(volume, top * 8, project.timeline, midiSongTrack, outputID));
 				top++;
 			}
-//console.log(top,ii);
+			//console.log(top,ii);
 
 		}
 		let filterEcho: Zvoog_FilterTarget = {
 			id: echoID
 			, kind: 'Echo', dataBlob: '', outputs: ['']
-			, iconPosition: { x: 77+midiSongData.miditracks.length*3*3, y: midiSongData.miditracks.length*8+2 }
-			,automation:[]
+			, iconPosition: { x: 77 + midiSongData.miditracks.length * 3 * 3, y: midiSongData.miditracks.length * 8 + 2 }
+			, automation: []
 		};
 		project.filters.push(filterEcho);
-		
+
 		console.log('midiSongData', midiSongData);
 		console.log('project', project);
+		this.trimProject(project);
 		return project;
+	}
+
+	trimProject(project: Zvoog_Project) {
+		let len = project.timeline.length;
+		for (let ii = len - 1; ii > 0; ii--) {
+			if (this.isBarEmpty(ii, project)) {
+				//
+			} else {
+				project.timeline.length = ii+2;
+				return;
+			}
+		}
+	}
+	isBarEmpty(barIdx: number, project: Zvoog_Project): boolean {
+		for (let tt = 0; tt < project.tracks.length; tt++) {
+			let track = project.tracks[tt];
+			if (track.measures[barIdx]) {
+				if (track.measures[barIdx].chords.length) {
+					return false;
+				}
+			}
+		}
+		for (let tt = 0; tt < project.percussions.length; tt++) {
+			let drum = project.percussions[tt];
+			if (drum.measures[barIdx]) {
+				if (drum.measures[barIdx].skips.length) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string, tempo: number) {
@@ -2026,14 +2055,16 @@ class MidiParser {
 	stripDuration(what: Zvoog_MetreMathType): Zvoog_MetreMathType {
 		return what;
 	}
-	createProjectTrack(top:number,timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack {
+	createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack {
 		let projectTrack: Zvoog_MusicTrack = {
 			title: midiTrack.title + ' [' + midiTrack.program + '] ' + insNames[midiTrack.program]
 			, measures: []
 			//, filters: []
-			, performer: { id: 'p'+Math.random(), data: '', kind: '', outputs: [outputId] 
-			,iconPosition: { x: top/3, y: top }
-		}
+			, performer: {
+				id: 'p' + Math.random(), data: '', kind: '', outputs: [outputId]
+				, iconPosition: { x: top / 3, y: top }
+			}
+			, volume: volume
 		};
 		let mm = MMUtil();
 		for (let tt = 0; tt < timeline.length; tt++) {
@@ -2121,14 +2152,16 @@ class MidiParser {
 		}
 		return projectTrack;
 	}
-	createProjectDrums(top:number,drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack {
+	createProjectDrums(volume: number, top: number, drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack {
 		let projectDrums: Zvoog_PercussionTrack = {
 			title: midiTrack.title + ' [' + drum + '] ' + drumNames[drum]
 			, measures: []
 			//, filters: []
-			, sampler: { id: 'd'+Math.random(), data: '', kind: '', outputs: [outputId] 
-			,iconPosition: { x: top/2, y: top }
-		}
+			, sampler: {
+				id: 'd' + Math.random(), data: '', kind: '', outputs: [outputId]
+				, iconPosition: { x: top / 2, y: top }
+			}
+			, volume: volume
 		};
 		let currentTimeMs = 0;
 		let mm = MMUtil();

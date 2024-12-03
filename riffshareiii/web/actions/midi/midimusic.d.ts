@@ -1,4 +1,4 @@
-type Zvoog_Metre = {
+declare type Zvoog_Metre = {
     count: number;
     part: number;
 };
@@ -17,24 +17,24 @@ interface Zvoog_MetreMathType {
     duration(tempo: number): number;
     calculate(duration: number, tempo: number): Zvoog_MetreMathType;
 }
-type Zvoog_Slide = {
+declare type Zvoog_Slide = {
     duration: Zvoog_Metre;
     delta: number;
 };
-type Zvoog_PluginBase = {
+declare type Zvoog_PluginBase = {
     setup: (audioContext: AudioContext) => boolean;
 };
-type Zvoog_PluginFilter = Zvoog_PluginBase | {
+declare type Zvoog_PluginFilter = Zvoog_PluginBase | {
     input: string;
 };
-type Zvoog_PluginPerformer = Zvoog_PluginBase | {
+declare type Zvoog_PluginPerformer = Zvoog_PluginBase | {
     output: string;
     schedule: (chord: Zvoog_Chord, when: number) => boolean;
 };
-type Zvoog_PluginSampler = Zvoog_PluginBase | {
+declare type Zvoog_PluginSampler = Zvoog_PluginBase | {
     output: string;
 };
-type Zvoog_FilterTarget = {
+declare type Zvoog_FilterTarget = {
     id: string;
     kind: string;
     dataBlob: string;
@@ -45,7 +45,7 @@ type Zvoog_FilterTarget = {
         y: number;
     };
 };
-type Zvoog_AudioSequencer = {
+declare type Zvoog_AudioSequencer = {
     id: string;
     data: string;
     kind: string;
@@ -55,7 +55,7 @@ type Zvoog_AudioSequencer = {
         y: number;
     };
 };
-type Zvoog_AudioSampler = {
+declare type Zvoog_AudioSampler = {
     id: string;
     data: string;
     kind: string;
@@ -65,51 +65,53 @@ type Zvoog_AudioSampler = {
         y: number;
     };
 };
-type Zvoog_Chord = {
+declare type Zvoog_Chord = {
     skip: Zvoog_Metre;
     pitches: number[];
     slides: Zvoog_Slide[];
 };
-type Zvoog_TrackMeasure = {
+declare type Zvoog_TrackMeasure = {
     chords: Zvoog_Chord[];
 };
-type Zvoog_PercussionMeasure = {
+declare type Zvoog_PercussionMeasure = {
     skips: Zvoog_Metre[];
 };
-type Zvoog_SongMeasure = {
+declare type Zvoog_SongMeasure = {
     tempo: number;
     metre: Zvoog_Metre;
 };
-type Zvoog_FilterMeasure = {
+declare type Zvoog_FilterMeasure = {
     changes: Zvoog_FilterStateChange[];
 };
-type Zvoog_FilterStateChange = {
+declare type Zvoog_FilterStateChange = {
     skip: Zvoog_Metre;
     stateBlob: string;
 };
-type Zvoog_PercussionTrack = {
+declare type Zvoog_PercussionTrack = {
     title: string;
     measures: Zvoog_PercussionMeasure[];
     sampler: Zvoog_AudioSampler;
+    volume: number;
 };
-type Zvoog_MusicTrack = {
+declare type Zvoog_MusicTrack = {
     title: string;
     measures: Zvoog_TrackMeasure[];
     performer: Zvoog_AudioSequencer;
+    volume: number;
 };
-type Zvoog_CommentText = {
+declare type Zvoog_CommentText = {
     skip: Zvoog_Metre;
     text: string;
     row: number;
 };
-type Zvoog_CommentMeasure = {
+declare type Zvoog_CommentMeasure = {
     points: Zvoog_CommentText[];
 };
-type Zvoog_Selection = {
+declare type Zvoog_Selection = {
     startMeasure: number;
     endMeasure: number;
 };
-type Zvoog_Project = {
+declare type Zvoog_Project = {
     title: string;
     timeline: Zvoog_SongMeasure[];
     tracks: Zvoog_MusicTrack[];
@@ -124,95 +126,95 @@ type Zvoog_Project = {
     };
     list?: boolean;
 };
-type MZXBX_CachedWave = {
+declare type MZXBX_CachedWave = {
     path: string;
     buffer: AudioBuffer | null;
     canceled?: boolean;
     line100?: number[];
 };
-type MZXBX_FilterHolder = {
+declare type MZXBX_FilterHolder = {
     plugin: MZXBX_AudioFilterPlugin | null;
     id: string;
     kind: string;
     properties: string;
     launched: boolean;
 };
-type MZXBX_PerformerHolder = {
+declare type MZXBX_PerformerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | null;
     id: string;
     kind: string;
     properties: string;
     launched: boolean;
 };
-type MZXBX_Channel = {
+declare type MZXBX_Channel = {
     id: string;
     comment?: string;
     filters: MZXBX_ChannelFilter[];
     performer: MZXBX_ChannelPerformer;
 };
-type MZXBX_SlideItem = {
+declare type MZXBX_SlideItem = {
     duration: number;
     delta: number;
 };
-type MZXBX_PlayItem = {
+declare type MZXBX_PlayItem = {
     skip: number;
     channelId: string;
     pitches: number[];
     slides: MZXBX_SlideItem[];
 };
-type MZXBX_FilterState = {
+declare type MZXBX_FilterState = {
     skip: number;
     filterId: string;
     data: string;
 };
-type MZXBX_Set = {
+declare type MZXBX_Set = {
     duration: number;
     tempo: number;
     items: MZXBX_PlayItem[];
     states: MZXBX_FilterState[];
 };
-type MZXBX_ChannelFilter = {
+declare type MZXBX_ChannelFilter = {
     id: string;
     kind: string;
     properties: string;
 };
-type MZXBX_AudioFilterPlugin = {
+declare type MZXBX_AudioFilterPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
     schedule: (when: number, parameters: string) => void;
     input: () => AudioNode | null;
     output: () => AudioNode | null;
 };
-type MZXBX_ChannelSampler = {
+declare type MZXBX_ChannelSampler = {
     id: string;
     kind: string;
     properties: string;
 };
-type MZXBX_AudioSamplerPlugin = {
+declare type MZXBX_AudioSamplerPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
     schedule: (when: number) => void;
     cancel: () => void;
     output: () => AudioNode | null;
 };
-type MZXBX_ChannelPerformer = {
+declare type MZXBX_ChannelPerformer = {
     id: string;
     kind: string;
     properties: string;
 };
-type MZXBX_AudioPerformerPlugin = {
+declare type MZXBX_AudioPerformerPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
     schedule: (when: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
 };
-type MZXBX_Schedule = {
+declare type MZXBX_Schedule = {
     series: MZXBX_Set[];
     channels: MZXBX_Channel[];
     filters: MZXBX_ChannelFilter[];
 };
-type MZXBX_Player = {
+declare type MZXBX_Player = {
     setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;
     startLoop: (from: number, position: number, to: number) => string;
     cancel: () => void;
@@ -226,7 +228,7 @@ declare enum MZXBX_PluginPurpose {
     Sampler = 2,
     Performer = 3
 }
-type MZXBX_PluginRegistrationInformation = {
+declare type MZXBX_PluginRegistrationInformation = {
     label: string;
     kind: string;
     purpose: MZXBX_PluginPurpose;
@@ -234,7 +236,7 @@ type MZXBX_PluginRegistrationInformation = {
     evaluate: string;
     script: string;
 };
-type MZXBX_PluginMessage = {
+declare type MZXBX_PluginMessage = {
     dialogID: string;
     data: any;
 };
@@ -252,26 +254,26 @@ declare class MIDIIImportMusicPlugin {
     loadMIDIfile(inputFile: any): void;
     receiveHostMessage(par: any): void;
 }
-type ImportMeasure = Zvoog_SongMeasure & {
+declare type ImportMeasure = Zvoog_SongMeasure & {
     startMs: number;
     durationMs: number;
 };
 declare let drumNames: string[];
 declare let insNames: string[];
-type XYp = {
+declare type XYp = {
     x: number;
     y: number;
 };
-type PP = {
+declare type PP = {
     p1: XYp;
     p2: XYp;
 };
-type TrackChord = {
+declare type TrackChord = {
     when: number;
     channel: number;
     notes: TrackNote[];
 };
-type TrackNote = {
+declare type TrackNote = {
     closed: boolean;
     bendPoints: NotePitch[];
     openEvent?: MIDIEvent;
@@ -280,11 +282,11 @@ type TrackNote = {
     basePitch: number;
     baseDuration: number;
 };
-type NotePitch = {
+declare type NotePitch = {
     pointDuration: number;
     basePitchDelta: number;
 };
-type MIDIEvent = {
+declare type MIDIEvent = {
     offset: number;
     delta: number;
     eventTypeByte: number;
@@ -317,22 +319,22 @@ type MIDIEvent = {
     trackNum?: number;
     text?: string;
 };
-type MIDISongPoint = {
+declare type MIDISongPoint = {
     pitch: number;
     durationms: number;
     midipoint?: TrackNote;
 };
-type MIDISongNote = {
+declare type MIDISongNote = {
     midiPitch: number;
     midiDuration: number;
     slidePoints: MIDISongPoint[];
 };
-type MIDISongChord = {
+declare type MIDISongChord = {
     when: number;
     channel: number;
     notes: MIDISongNote[];
 };
-type MIDISongTrack = {
+declare type MIDISongTrack = {
     title: string;
     channelNum: number;
     program: number;
@@ -345,7 +347,7 @@ type MIDISongTrack = {
     songchords: MIDISongChord[];
     order: number;
 };
-type MIDISongData = {
+declare type MIDISongData = {
     duration: number;
     parser: string;
     bpm: number;
@@ -566,12 +568,14 @@ declare class MidiParser {
     createMeasure(midiSongData: MIDISongData, fromMs: number, barIdx: number): ImportMeasure;
     createTimeLine(midiSongData: MIDISongData): Zvoog_SongMeasure[];
     convertProject(title: string, comment: string): Zvoog_Project;
+    trimProject(project: Zvoog_Project): void;
+    isBarEmpty(barIdx: number, project: Zvoog_Project): boolean;
     addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string, tempo: number): void;
     collectDrums(midiTrack: MIDISongTrack): number[];
     numratio(nn: number): number;
     stripDuration(what: Zvoog_MetreMathType): Zvoog_MetreMathType;
-    createProjectTrack(top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack;
-    createProjectDrums(top: number, drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack;
+    createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack;
+    createProjectDrums(volume: number, top: number, drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack;
 }
 declare function round1000(nn: number): number;
 declare function findMeasureSkipByTime(time: number, measures: Zvoog_SongMeasure[]): null | {

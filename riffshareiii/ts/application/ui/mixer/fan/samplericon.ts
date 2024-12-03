@@ -6,21 +6,21 @@ class SamplerIcon {
 	buildSamplerSpot(order: number, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.percussions.length; ii++) {
 			if (globalCommandDispatcher.cfg().data.percussions[ii].sampler.id == this.samplerId) {
-				let sampler: Zvoog_AudioSampler = globalCommandDispatcher.cfg().data.percussions[ii].sampler;
-				this.addSamplerSpot(order, sampler, fanLevelAnchor, spearsAnchor, zidx);
+				//let sampler: Zvoog_AudioSampler = globalCommandDispatcher.cfg().data.percussions[ii].sampler;
+				this.addSamplerSpot(order,  globalCommandDispatcher.cfg().data.percussions[ii], fanLevelAnchor, spearsAnchor, zidx);
 				break;
 			}
 		}
 	}
-	addSamplerSpot(order: number, sampler: Zvoog_AudioSampler, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
+	addSamplerSpot(order: number, samplerTrack: Zvoog_PercussionTrack, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.66;
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
 		let xx = left;
 		let yy = top;
-		if (sampler.iconPosition) {
-			xx = left + sampler.iconPosition.x;
-			yy = top + sampler.iconPosition.y;
+		if (samplerTrack.sampler.iconPosition) {
+			xx = left + samplerTrack.sampler.iconPosition.x;
+			yy = top + samplerTrack.sampler.iconPosition.y;
 		}
 		let dragAnchor: TileAnchor = {
 			xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz
@@ -42,22 +42,22 @@ class SamplerIcon {
 				}
 				if (x == 0 && y == 0) {
 					console.log('done', dragAnchor.translation);
-					if (!sampler.iconPosition) {
-						sampler.iconPosition = { x: 0, y: 0 };
+					if (!samplerTrack.sampler.iconPosition) {
+						samplerTrack.sampler.iconPosition = { x: 0, y: 0 };
 					}
-					sampler.iconPosition.x = sampler.iconPosition.x + dragAnchor.translation.x;
-					sampler.iconPosition.y = sampler.iconPosition.y + dragAnchor.translation.y;
-					console.log('move ' + sampler.kind + ':' + sampler.id + ' to ' + sampler.iconPosition.x + '/' + sampler.iconPosition.y);
+					samplerTrack.sampler.iconPosition.x = samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x;
+					samplerTrack.sampler.iconPosition.y = samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y;
+					console.log('move ' + samplerTrack.sampler.kind + ':' + samplerTrack.sampler.id + ' to ' + samplerTrack.sampler.iconPosition.x + '/' + samplerTrack.sampler.iconPosition.y);
 					dragAnchor.translation = { x: 0, y: 0 };
 					globalCommandDispatcher.resetProject();
 				} else {
 					dragAnchor.translation.x = dragAnchor.translation.x + x;
 					dragAnchor.translation.y = dragAnchor.translation.y + y;
-					if (sampler.iconPosition) {
-						let xx = sampler.iconPosition.x + dragAnchor.translation.x;
-						let yy = sampler.iconPosition.y + dragAnchor.translation.y;
-						let toplugin = globalCommandDispatcher.cfg().findPluginSamplerIcon(xx, yy, zidx, sampler.id);
-						console.log('link ' + sampler.kind + ':' + sampler.id + ' to ' + toplugin);
+					if (samplerTrack.sampler.iconPosition) {
+						let xx = samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x;
+						let yy = samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y;
+						let toplugin = globalCommandDispatcher.cfg().findPluginSamplerIcon(xx, yy, zidx, samplerTrack.sampler.id);
+						console.log('link ' + samplerTrack.sampler.kind + ':' + samplerTrack.sampler.id + ' to ' + toplugin);
 					}
 					globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
 						, fanLevelAnchor
@@ -94,14 +94,14 @@ class SamplerIcon {
 				]
 				, css: 'fanSamplerInteractionIcon fanButton' + zidx
 				, activation: (x: number, y: number) => {
-					console.log('' + sampler.kind + ':' + sampler.id);
+					console.log('' + samplerTrack.sampler.kind + ':' + samplerTrack.sampler.id);
 				}
 			};
 			dragAnchor.content.push(btn);
 		}
 		if (zidx < 3) {
 			let txt: TileText = {
-				text: sampler.kind + ':' + sampler.id
+				text: samplerTrack.title+": "+samplerTrack.volume+": "+samplerTrack.sampler.kind + ': ' + samplerTrack.sampler.id
 				, x: xx
 				, y: yy
 				, css: 'fanIconLabel'
@@ -124,6 +124,6 @@ class SamplerIcon {
 		//}
 		let samplerFromY = globalCommandDispatcher.cfg().samplerTop() + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
 		new ControlConnection().addAudioStreamLineFlow(false, zidx, samplerFromY, xx, yy, spearsAnchor);
-		new FanOutputLine().addOutputs(sampler.outputs, fanLevelAnchor, spearsAnchor, sampler.id, xx, yy, zidx);
+		new FanOutputLine().addOutputs(samplerTrack.sampler.outputs, fanLevelAnchor, spearsAnchor, samplerTrack.sampler.id, xx, yy, zidx);
 	}
 }

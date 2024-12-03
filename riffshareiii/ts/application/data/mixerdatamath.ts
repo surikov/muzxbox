@@ -12,7 +12,7 @@ class MixerDataMathUtility {
 	bottomPad = 11;
 
 
-	notePathHeight = 1.5;
+	notePathHeight = 1.01;
 	samplerDotHeight = 3;
 	autoPointHeight = 4;
 	//commentPointHeight = 9;
