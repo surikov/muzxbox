@@ -33,7 +33,7 @@ class MixerDataMathUtility {
 	//pluginIconHeight = 7;
 	pluginIconSize = 3;
 	speakerIconSize = 33;
-	speakerIconPad = 11;
+	speakerIconPad = 22;
 
 	padGridFan = 15;
 
@@ -109,15 +109,16 @@ class MixerDataMathUtility {
 		ww = ww + this.speakerIconPad + 2 * this.pluginIconSize;
 		return ww;
 	}
+	/*
 	findPluginSamplerIcon(x: number, y: number, z: number, xid: string): Zvoog_AudioSampler | null {
 		let sz = this.fanPluginIconSize(z);
 		for (let ii = 0; ii < this.data.percussions.length; ii++) {
 			let plugin = this.data.percussions[ii].sampler;
 			if (plugin.id != xid) {
 				if (plugin.iconPosition) {
-					if (Math.abs(x - plugin.iconPosition.x) < sz*0.75) {
-						if (Math.abs(y - plugin.iconPosition.y) < sz*0.75) {
-							console.log(plugin.iconPosition, x, y, z);
+					if (Math.abs(x - plugin.iconPosition.x) < sz * 0.75) {
+						if (Math.abs(y - plugin.iconPosition.y) < sz * 0.75) {
+							//console.log(plugin.iconPosition, x, y, z);
 							return plugin;
 						}
 					}
@@ -125,6 +126,64 @@ class MixerDataMathUtility {
 			}
 		}
 		return null;
+	}
+	findPluginPerformerIcon(x: number, y: number, z: number, xid: string): Zvoog_AudioSequencer | null {
+		let sz = this.fanPluginIconSize(z);
+		for (let ii = 0; ii < this.data.tracks.length; ii++) {
+			let plugin = this.data.tracks[ii].performer;
+			if (plugin.id != xid) {
+				if (plugin.iconPosition) {
+					if (Math.abs(x - plugin.iconPosition.x) < sz * 0.75) {
+						if (Math.abs(y - plugin.iconPosition.y) < sz * 0.75) {
+							//console.log(plugin.iconPosition, x, y, z);
+							return plugin;
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}*/
+	dragFindPluginFilterIcon(x: number, y: number, z: number, xid: string, outputs: string[]): Zvoog_FilterTarget | null {
+
+		let sz = this.fanPluginIconSize(z);
+		for (let ii = 0; ii < this.data.filters.length; ii++) {
+			let plugin = this.data.filters[ii];
+			if (plugin.id != xid) {
+				if (outputs.indexOf(plugin.id, 0) < 0) {
+					if (plugin.iconPosition) {
+						if (Math.abs(x - plugin.iconPosition.x) < sz * 0.75) {
+							if (Math.abs(y - plugin.iconPosition.y) < sz * 0.75) {
+								//console.log(plugin.iconPosition, x, y, z);
+								return plugin;
+							}
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+	dragCollisionSpeaker(fanx: number, fany: number, outputs: string[]): boolean {
+		if (outputs.indexOf('', 0) > -1) {
+			return false;
+		}
+		let sz = this.speakerIconSize;
+		let speaker = this.speakerFanPosition();
+		let x = fanx + this.leftPad + this.timelineWidth() + this.padGridFan;
+		let y = fany + this.gridTop();
+		//console.log(x,y,speaker);
+		if (Math.abs(x - speaker.x) < sz * 0.75) {
+			if (Math.abs(y - speaker.y) < sz * 0.75) {
+				return true;
+			}
+		}
+		return false;
+	}
+	speakerFanPosition(): TilePoint {
+		let speakerX = this.wholeWidth() - this.speakerIconPad - this.rightPad + this.speakerIconSize / 2;
+		let speakerY = this.gridTop() + this.gridHeight() / 2 - this.speakerIconSize / 2;
+		return { x: speakerX, y: speakerY };
 	}
 	heightOfTitle(): number {
 		return 10;

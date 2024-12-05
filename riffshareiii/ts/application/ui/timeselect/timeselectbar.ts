@@ -49,7 +49,7 @@ class TimeSelectBar {
 		return [this.selectionBarLayer, this.selectedTimeLayer];
 	}
 	resizeTimeScale(viewWidth: number, viewHeight: number) {
-		console.log('resizeTimeSelect',viewWidth,viewHeight);
+		//console.log('resizeTimeSelect',viewWidth,viewHeight);
 		this.selectionAnchor.ww = viewWidth * 1024;
 		this.selectionAnchor.hh = viewHeight * 1024;
 		this.selectionMark.h = viewHeight * 1024;
@@ -93,7 +93,7 @@ class TimeSelectBar {
 			this.selectionMark.x = -1;
 			this.selectionMark.w = 0.5;
 		}
-		console.log('updateTimeSelectionBar',this.selectionMark.x,this.selectionMark.w);
+		//console.log('updateTimeSelectionBar',this.selectionMark.x,this.selectionMark.w);
 	}
 	
 	createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor//, data: Zvoog_Project

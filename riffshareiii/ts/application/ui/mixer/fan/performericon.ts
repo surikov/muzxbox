@@ -6,7 +6,6 @@ class PerformerIcon {
 	buildPerformerSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
 			if (globalCommandDispatcher.cfg().data.tracks[ii].performer.id == this.performerId) {
-				//let audioSeq: Zvoog_AudioSequencer = globalCommandDispatcher.cfg().data.tracks[ii].performer;
 				this.addPerformerSpot(ii>0,globalCommandDispatcher.cfg().data.tracks[ii], fanLevelAnchor, spearsAnchor, zidx);
 				break;
 			}
@@ -27,10 +26,15 @@ class PerformerIcon {
 			, showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [], translation: { x: 0, y: 0 }
 		};
 		fanLevelAnchor.content.push(dragAnchor);
+		let dropAnchor: TileAnchor = {
+			xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz
+			, showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [], translation: { x: 0, y: 0 }
+		};
+		fanLevelAnchor.content.push(dropAnchor);
 		let rec: TileRectangle = {
 			x: xx - sz / 2, y: yy - sz / 2
 			, w: sz, h: sz
-			, draggable: true
+			/*, draggable: true
 			, activation: (x: number, y: number) => {
 				if (!dragAnchor.translation) {
 					dragAnchor.translation = { x: 0, y: 0 };
@@ -53,24 +57,97 @@ class PerformerIcon {
 						, LevelModes.normal);
 				}
 			}
-			, css: 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx
+			, css: 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx*/
 		};
+		if (zidx < 7) {
+			rec.draggable = true;
+			let toFilter: Zvoog_FilterTarget | null = null;
+			let toSpeaker: boolean = false;
+			rec.activation = (x: number, y: number) => {
+				if (!dragAnchor.translation) {
+					dragAnchor.translation = { x: 0, y: 0 };
+				}
+				dropAnchor.content = [];
+				if (x == 0 && y == 0) {
+					if (!track.performer.iconPosition) {
+						track.performer.iconPosition = { x: 0, y: 0 };
+					}
+					if (toSpeaker) {
+						track.performer.outputs.push('');
+					} else {
+						if (toFilter) {
+							track.performer.outputs.push(toFilter.id);
+						} else {
+							track.performer.iconPosition.x = track.performer.iconPosition.x + dragAnchor.translation.x;
+							track.performer.iconPosition.y = track.performer.iconPosition.y + dragAnchor.translation.y;
+						}
+					}
+					dragAnchor.translation = { x: 0, y: 0 };
+					globalCommandDispatcher.resetProject();
+				} else {
+					dragAnchor.translation.x = dragAnchor.translation.x + x;
+					dragAnchor.translation.y = dragAnchor.translation.y + y;
+					if (track.performer.iconPosition) {
+						let xx = track.performer.iconPosition.x + dragAnchor.translation.x;
+						let yy = track.performer.iconPosition.y + dragAnchor.translation.y;
+						toFilter = globalCommandDispatcher.cfg().dragFindPluginFilterIcon(xx, yy, zidx, track.performer.id, track.performer.outputs);
+						if (toFilter) {
+							toSpeaker = false;
+							let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
+							let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+							let top = globalCommandDispatcher.cfg().gridTop();
+							let fx = left;
+							let fy = top;
+							if (toFilter.iconPosition) {
+								fx = left + toFilter.iconPosition.x;
+								fy = top + toFilter.iconPosition.y;
+							}
+							dropAnchor.content.push({
+								x: fx - sz * 0.75, y: fy - sz * 0.75
+								, w: sz * 1.5, h: sz * 1.5
+								, rx: sz * 0.75, ry: sz * 0.75
+								, css: 'fanConnectionBase  fanConnection' + zidx
+							});
+						} else {
+							if (globalCommandDispatcher.cfg().dragCollisionSpeaker(xx, yy, track.performer.outputs)) {
+								toFilter = null;
+								toSpeaker = true;
+								let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
+								let rec: TileRectangle = {
+									x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize * 0.55
+									, y: speakerCenter.y - globalCommandDispatcher.cfg().speakerIconSize * 0.55
+									, w: globalCommandDispatcher.cfg().speakerIconSize * 1.1
+									, h: globalCommandDispatcher.cfg().speakerIconSize * 1.1
+									, rx: globalCommandDispatcher.cfg().speakerIconSize * 0.55
+									, ry: globalCommandDispatcher.cfg().speakerIconSize * 0.55
+									, css: 'fanConnectionBase  fanConnection' + zidx
+								};
+								dropAnchor.content = [rec];
+							}
+						}
+					}
+					globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
+						, fanLevelAnchor
+						, LevelModes.normal);
+				}
+			}
+			rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
+		} else {
+			rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
+		}
 		dragAnchor.content.push(rec);
 		spearsAnchor.content.push({
 			x: xx - sz / 2 + sz * 0.05, y: yy - sz / 2 + sz * 0.05
 			, w: sz * 0.9, h: sz * 0.9
-			, css: 'fanConnectionBase fanConnection' + zidx
+			, css: 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx
 		});
 		
-		//let clickBtnSz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.3;
 		if (zidx < 5) {
 			let btn: TileRectangle = {
-				x: xx-sz/2//xx - clickBtnSz / 2
-				, y: yy//yy + sz / 5 - clickBtnSz / 2
-				, w: sz//clickBtnSz
-				, h: sz/2//clickBtnSz
-				//, rx: clickBtnSz / 2
-				//, ry: clickBtnSz / 2
+				x: xx-sz/2
+				, y: yy
+				, w: sz
+				, h: sz/2
 				, css: 'fanSamplerInteractionIcon fanButton' + zidx
 				, activation: (x: number, y: number) => {
 					console.log('' + track.performer.kind + ':' + track.performer.id);
@@ -78,19 +155,6 @@ class PerformerIcon {
 			};
 			dragAnchor.content.push(btn);
 		}
-		/*if (zidx < 4) {
-			let yZshift = 0.3;
-			if (zidx > 0) yZshift = 0.25;
-			if (zidx > 1) yZshift = 0.2;
-			if (zidx > 2) yZshift = 0.15;
-			let txt: TileText = {
-				text: icon_gear
-				, x: xx
-				, y: yy + sz / 5 + clickBtnSz * yZshift
-				, css: 'fanSamplerActionIconLabel'
-			};
-			dragAnchor.content.push(txt);
-		}*/
 		if (zidx < 3) {
 			let txt: TileText = {
 				text: track.title + ': '+track.volume + ': '+track.performer.kind + ': ' + track.performer.id

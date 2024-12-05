@@ -95,13 +95,13 @@ class FanPane {
 		//let xx = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad;
 		//let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
 
-		let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().speakerIconSize / 2;
-		let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
-
+		//let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().speakerIconSize / 2;
+		//let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
+		let speakerCenter=globalCommandDispatcher.cfg().speakerFanPosition();
 
 		let rec: TileRectangle = {
-			x: speakerX - globalCommandDispatcher.cfg().speakerIconSize / 2
-			, y: speakerY - globalCommandDispatcher.cfg().speakerIconSize / 2
+			x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize / 2
+			, y: speakerCenter.y - globalCommandDispatcher.cfg().speakerIconSize / 2
 			, w: globalCommandDispatcher.cfg().speakerIconSize
 			, h: globalCommandDispatcher.cfg().speakerIconSize
 			, rx: globalCommandDispatcher.cfg().speakerIconSize / 2
@@ -110,8 +110,8 @@ class FanPane {
 		};
 		fanAnchor.content.push(rec);
 		let icon: TileText = {
-			x: speakerX //+ globalCommandDispatcher.cfg().speakerIconSize
-			, y: speakerY //+ globalCommandDispatcher.cfg().speakerIconSize
+			x: speakerCenter.x //+ globalCommandDispatcher.cfg().speakerIconSize
+			, y: speakerCenter.y //+ globalCommandDispatcher.cfg().speakerIconSize
 			, text: icon_sound_loud, css: 'fanSpeakerIconLabel'
 		};
 		fanAnchor.content.push(icon);

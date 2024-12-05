@@ -201,7 +201,7 @@ class UIRenderer {//} implements RenderedPart {
 
 		this.tiler.resetModel();
 
-		console.log('fillWholeUI', this.tiler);
+		//console.log('fillWholeUI', this.tiler);
 
 	}
 	onReSizeView() {

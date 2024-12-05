@@ -335,9 +335,10 @@ declare class SpearConnection {
 }
 declare class FanOutputLine {
     addOutputs(outputs: string[], buttonsAnchor: TileAnchor, fanLinesAnchor: TileAnchor, fromID: string, fromX: number, fromY: number, zidx: number): void;
-    connectOutput(outId: string, fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number): void;
-    connectSpeaker(fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number): void;
-    addDeleteSpear(fromID: string, toID: string, fromX: number, fromY: number, toSize: number, toX: number, toY: number, anchor: TileAnchor, zidx: number): void;
+    connectOutput(outId: string, fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number, outputs: string[]): void;
+    connectSpeaker(fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number, outputs: string[]): void;
+    addDeleteSpear(fromID: string, toID: string, fromX: number, fromY: number, toSize: number, toX: number, toY: number, anchor: TileAnchor, zidx: number, outputs: string[]): void;
+    deleteConnection(id: string, outputs: string[]): void;
 }
 declare class IconLabelButton {
     anchor: TileAnchor;
@@ -467,7 +468,9 @@ declare class MixerDataMathUtility {
     wholeWidth(): number;
     fanPluginIconSize(zidx: number): number;
     fanWidth(): number;
-    findPluginSamplerIcon(x: number, y: number, z: number, xid: string): Zvoog_AudioSampler | null;
+    dragFindPluginFilterIcon(x: number, y: number, z: number, xid: string, outputs: string[]): Zvoog_FilterTarget | null;
+    dragCollisionSpeaker(fanx: number, fany: number, outputs: string[]): boolean;
+    speakerFanPosition(): TilePoint;
     heightOfTitle(): number;
     timelineWidth(): number;
     commentsMaxHeight(): number;
