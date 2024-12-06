@@ -79,6 +79,13 @@
 
 }
 
+.fanConnectionButton {
+	cursor: ns-resize;
+	stroke: var(--main-color);
+	fill: var(--drag-color);
+	stroke-width: calc(0.0256*var(--tapSize));
+}
+
 .fanConnectionBase {
 	pointer-events: none;
 	stroke: var(--line-color);

@@ -2635,6 +2635,18 @@ class ControlConnection {
     addAudioStreamLineFlow(secondary, zIndex, yy, toX, toY, anchor) {
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
         new SpearConnection().addSpear(secondary, zIndex, left, yy, globalCommandDispatcher.cfg().fanPluginIconSize(zIndex), toX, toY, anchor);
+        if (!secondary) {
+            let buttn = {
+                x: left - 1,
+                y: yy - 1,
+                w: 2,
+                h: 2,
+                rx: 1,
+                ry: 1,
+                css: 'fanConnectionButton'
+            };
+            anchor.content.push(buttn);
+        }
     }
 }
 class SpearConnection {
