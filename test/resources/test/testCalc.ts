@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.140 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.141 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -960,7 +960,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 function dumpAvgFromAvg(){
 	//console.log('dumpAvgFromAvg', blueStat);
 	let data:StatBeginEnd[]=blueStat;
-	let calcDeep=7;
+	let calcDeep=4;
 	let preAvg=0;
 	let preHp=0;
 	for(let ii=0;ii<data.length-calcDeep;ii++){
@@ -976,15 +976,15 @@ function dumpAvgFromAvg(){
 		let hp=dff/calcDeep;
 		//console.log(data[ii].row,Math.round(avg),Math.round(hp));
 		//let top=rowsVisibleCount*cellSize+topShift+cellSize*1.5;
-		let top = rowsVisibleCount + 22 + 0.66 * data[ii].row ;
+		let top = rowsVisibleCount + 22 + 0.66 * data[ii].row -0.66/2;
 		//composeLine(linesLevel, avg*10,top*cellSize, hp*10,top*cellSize, 4, '#ff00ccff');
 		if(ii>0){
-			let res=hp/avg;
-			if(!(res))res=hp;
-			let preRes=preHp/preAvg;
-			if(!(preRes))preRes=preHp;
+			let res=Math.abs(hp-avg)+0.66/2;
+			//if(!(res))res=hp;
+			let preRes=Math.abs(preHp-preAvg)+0.66/2;
+			//if(!(preRes))preRes=preHp;
 			//composeLine(linesLevel, avg*10,top*cellSize, preAvg*10,(top - 0.66)*cellSize, 1, '#660000ff');
-			composeLine(linesLevel, res*99,top*cellSize, preRes*99,(top - 0.66)*cellSize, 3, '#ff66ccff');
+			composeLine(linesLevel, res*11,top*cellSize, preRes*11,(top - 0.66)*cellSize, 3, '#ff66ccff');
 		}
 		preAvg=avg;
 		preHp=hp;
