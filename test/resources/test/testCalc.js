@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.139 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.140 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -888,123 +888,178 @@ function dumpTriads(svg, rows) {
     //dumpColorStat();
     //dumpStat3();
 }
+function dumpAvgFromAvg() {
+    //console.log('dumpAvgFromAvg', blueStat);
+    var data = blueStat;
+    var calcDeep = 7;
+    var preAvg = 0;
+    var preHp = 0;
+    for (var ii = 0; ii < data.length - calcDeep; ii++) {
+        var smm = 0;
+        for (var kk = 0; kk < calcDeep; kk++) {
+            smm = smm + data[ii + kk].right;
+        }
+        var avg = smm / calcDeep;
+        var dff = 0;
+        for (var kk = 0; kk < calcDeep; kk++) {
+            dff = dff + Math.abs(data[ii + kk].right - avg);
+        }
+        var hp = dff / calcDeep;
+        //console.log(data[ii].row,Math.round(avg),Math.round(hp));
+        //let top=rowsVisibleCount*cellSize+topShift+cellSize*1.5;
+        var top_1 = rowsVisibleCount + 22 + 0.66 * data[ii].row;
+        //composeLine(linesLevel, avg*10,top*cellSize, hp*10,top*cellSize, 4, '#ff00ccff');
+        if (ii > 0) {
+            var res = hp / avg;
+            if (!(res))
+                res = hp;
+            var preRes = preHp / preAvg;
+            if (!(preRes))
+                preRes = preHp;
+            //composeLine(linesLevel, avg*10,top*cellSize, preAvg*10,(top - 0.66)*cellSize, 1, '#660000ff');
+            composeLine(linesLevel, res * 99, top_1 * cellSize, preRes * 99, (top_1 - 0.66) * cellSize, 3, '#ff66ccff');
+        }
+        preAvg = avg;
+        preHp = hp;
+    }
+}
 function roundDown(num, base) {
     return Math.floor(num / base) * base;
 }
+/*
 function dumpColorStat() {
     //console.log('dumpColorStat');
     //console.log('sortedBlue', sortedBlue);
-    var skip = 1;
+    let skip = 1;
     if (showFirstRow) {
         skip = 0;
     }
-    var blueleft = 0;
-    var blueright = 0;
-    var greenleft = 0;
-    var greenright = 0;
-    var silverleft = 0;
-    var silverright = 0;
-    var redleft = 0;
-    var redright = 0;
-    var rowcount = 0;
-    for (var kk = 0; kk < redStat.length; kk++) {
-        if (kk >= 1 - skip && kk < 1 - skip + rowsVisibleCount - 2) {
-            blueright = blueright + blueStat[kk].left;
-            blueleft = blueleft + blueStat[kk].right;
-            greenleft = greenleft + greenStat[kk].left;
-            greenright = greenright + greenStat[kk].right;
-            silverleft = silverleft + greyStat[kk].left;
-            silverright = silverright + greyStat[kk].right;
-            redleft = redleft + redStat[kk].left;
-            redright = redright + redStat[kk].right;
+    let blueleft=0;
+    let blueright=0;
+    let greenleft=0;
+    let greenright=0;
+    let silverleft=0;
+    let silverright=0;
+    let redleft=0;
+    let redright=0;
+    let rowcount=0;
+    for (let kk = 0; kk < redStat.length; kk++) {
+        if(kk>=1-skip &&kk<1-skip+rowsVisibleCount-2  ){
+            blueright=blueright+blueStat[kk].left;
+            blueleft=blueleft+blueStat[kk].right;
+            
+            greenleft=greenleft+greenStat[kk].left;
+            greenright=greenright+greenStat[kk].right;
+            
+            silverleft=silverleft+greyStat[kk].left;
+            silverright=silverright+greyStat[kk].right;
+            
+            redleft=redleft+redStat[kk].left;
+            redright=redright+redStat[kk].right;
+            
             rowcount++;
         }
-        var sum = 0;
+        let sum = 0;
         //if (showFirstRow || kk > 0) {
         sum = redStat[kk].left + redStat[kk].right
             + blueStat[kk].left + blueStat[kk].right
             + greyStat[kk].left + greyStat[kk].right
             + greenStat[kk].left + greenStat[kk].right;
         //}
-        addSmallText(levelA, 2 * rowLen * cellSize + cellSize * 0.5, cellSize * (rowsVisibleCount + 22.8 + 0.66 * (skip + kk) + 0), '' + (skip + kk) + ': ' + sum);
-        var purple = '#ff33ffff';
-        var xxx = 2 * rowLen + 2.5;
+        addSmallText(levelA
+            , 2 * rowLen * cellSize + cellSize * 0.5
+            , cellSize * (rowsVisibleCount + 22.8 + 0.66 * (skip + kk) + 0)
+            , '' + (skip + kk) + ': ' + sum);
+        let purple = '#ff33ffff';
+        let xxx = 2 * rowLen + 2.5;
         markLines.push({
-            fromX: xxx,
-            fromY: rowsVisibleCount + 22.8 + 0.66 * (skip + kk) + skipRowsCount - 0.8,
-            toX: xxx + sum / 3,
-            toY: rowsVisibleCount + 22.8 + 0.66 * (skip + kk) + skipRowsCount - 0.8,
-            color: purple,
-            manual: false
+            fromX: xxx
+            , fromY: rowsVisibleCount + 22.8 + 0.66 * (skip + kk) + skipRowsCount - 0.8
+            , toX: xxx + sum / 3
+            , toY: rowsVisibleCount + 22.8 + 0.66 * (skip + kk) + skipRowsCount - 0.8
+            , color: purple
+            , manual: false
         });
+    
     }
-    var msgp = document.getElementById('statdump');
-    msgp.innerText = '%blue: ' + Math.round(10 * blueleft / rowcount) + '/' + Math.round(10 * blueright / rowcount)
-        + ', %green: ' + Math.round(10 * greenleft / rowcount) + '/' + Math.round(10 * greenright / rowcount)
-        + ', %silver: ' + Math.round(10 * silverleft / rowcount) + '/' + Math.round(10 * silverright / rowcount)
-        + ', %red: ' + Math.round(10 * redleft / rowcount) + '/' + Math.round(10 * redright / rowcount);
+
+    var msgp: HTMLElement = (document.getElementById('statdump') as any) as HTMLElement;
+    msgp.innerText = '%blue: '+Math.round(10*blueleft/rowcount)+'/'+Math.round(10*blueright/rowcount)
+                +', %green: '+Math.round(10*greenleft/rowcount)+'/'+Math.round(10*greenright/rowcount)
+                +', %silver: '+Math.round(10*silverleft/rowcount)+'/'+Math.round(10*silverright/rowcount)
+                +', %red: '+Math.round(10*redleft/rowcount)+'/'+Math.round(10*redright/rowcount)
+                ;
     //console.log('skip',skip,'blue',blueleft,blueright,'green',greenleft,greenright,'silver',silverleft,silverright,'red',redleft,redright);
     //console.log('dumpColorStat');//,'blue',blueStat,'green',greenStat,'silver',greyStat,'red',redStat);
-    var delt = 5;
-    var sle = [];
-    for (var barlen = 0; barlen < 44; barlen = barlen + delt) {
-        for (var ii = 0; ii < blueStat.length; ii++) {
-            if (Math.floor(blueStat[ii].right / delt) * delt == barlen) {
-                sle[barlen] = sle[barlen] ? sle[barlen] : 0;
+    
+    
+    
+    let delt=5;
+    
+    let sle:number[]=[];
+    for(let barlen=0;barlen<44;barlen=barlen+delt){
+        for(let ii=0;ii<blueStat.length;ii++){
+            if(Math.floor(blueStat[ii].right/delt)*delt==barlen){
+                sle[barlen]=sle[barlen]?sle[barlen]:0;
                 sle[barlen]++;
             }
         }
     }
-    var sri = [];
-    for (var barlen = 0; barlen < 44; barlen = barlen + delt) {
-        for (var ii = 0; ii < blueStat.length; ii++) {
-            if (Math.floor(blueStat[ii].left / delt) * delt == barlen) {
-                sri[barlen] = sri[barlen] ? sri[barlen] : 0;
+    let sri:number[]=[];
+    for(let barlen=0;barlen<44;barlen=barlen+delt){
+        for(let ii=0;ii<blueStat.length;ii++){
+            if(Math.floor(blueStat[ii].left/delt)*delt==barlen){
+                sri[barlen]=sri[barlen]?sri[barlen]:0;
                 sri[barlen]++;
             }
         }
     }
-    console.log('blue', sle, sri);
-    sle = [];
-    for (var barlen = 0; barlen < 44; barlen = barlen + delt) {
-        for (var ii = 0; ii < greenStat.length; ii++) {
-            if (Math.floor(greenStat[ii].left / delt) * delt == barlen) {
-                sle[barlen] = sle[barlen] ? sle[barlen] : 0;
+    console.log('blue',sle,sri);
+    
+    sle=[];
+    for(let barlen=0;barlen<44;barlen=barlen+delt){
+        for(let ii=0;ii<greenStat.length;ii++){
+            if(Math.floor(greenStat[ii].left/delt)*delt==barlen){
+                sle[barlen]=sle[barlen]?sle[barlen]:0;
                 sle[barlen]++;
             }
         }
     }
-    sri = [];
-    for (var barlen = 0; barlen < 44; barlen = barlen + delt) {
-        for (var ii = 0; ii < greenStat.length; ii++) {
-            if (Math.floor(greenStat[ii].right / delt) * delt == barlen) {
-                sri[barlen] = sri[barlen] ? sri[barlen] : 0;
+    sri=[];
+    for(let barlen=0;barlen<44;barlen=barlen+delt){
+        for(let ii=0;ii<greenStat.length;ii++){
+            if(Math.floor(greenStat[ii].right/delt)*delt==barlen){
+                sri[barlen]=sri[barlen]?sri[barlen]:0;
                 sri[barlen]++;
             }
         }
     }
-    console.log('green', sle, sri);
-    sle = [];
-    for (var barlen = 0; barlen < 44; barlen = barlen + delt) {
-        for (var ii = 0; ii < greyStat.length; ii++) {
-            if (Math.floor(greyStat[ii].left / delt) * delt == barlen) {
-                sle[barlen] = sle[barlen] ? sle[barlen] : 0;
+    console.log('green',sle,sri);
+    
+    sle=[];
+    for(let barlen=0;barlen<44;barlen=barlen+delt){
+        for(let ii=0;ii<greyStat.length;ii++){
+            if(Math.floor(greyStat[ii].left/delt)*delt==barlen){
+                sle[barlen]=sle[barlen]?sle[barlen]:0;
                 sle[barlen]++;
             }
         }
     }
-    sri = [];
-    for (var barlen = 0; barlen < 44; barlen = barlen + delt) {
-        for (var ii = 0; ii < greyStat.length; ii++) {
-            if (Math.floor(greyStat[ii].right / delt) * delt == barlen) {
-                sri[barlen] = sri[barlen] ? sri[barlen] : 0;
+    sri=[];
+    for(let barlen=0;barlen<44;barlen=barlen+delt){
+        for(let ii=0;ii<greyStat.length;ii++){
+            if(Math.floor(greyStat[ii].right/delt)*delt==barlen){
+                sri[barlen]=sri[barlen]?sri[barlen]:0;
                 sri[barlen]++;
             }
         }
     }
-    console.log('silver', sle, sri);
+    console.log('silver',sle,sri);
+    
+    
     //dumpGroupStat();
 }
+*/
 /*
 function dumpGroupStat(){
 
@@ -1249,6 +1304,7 @@ function addTails() {
     dumpStat123('grey',greyStat);
     dumpStat123('red',redStat);
     */
+    dumpAvgFromAvg();
 }
 function dumpStat123(label, stat) {
     var absLeft = 0;
@@ -1423,27 +1479,175 @@ function testTest() {
     }
     drawLines();
 }
+/*
+function dumpLeftStat(){
+    console.log('dumpLeftStat',datarows);
+    let ss:number[]=[];
+    for(let ii=1;ii<datarows.length;ii++){
+        let kk=datarows[ii].balls[0];
+        if(!(ss[kk]))ss[kk]=0;
+        ss[kk]++;
+    }
+    let itg=0;
+    for(let ii=1;ii<ss.length;ii++){
+        let procnt=Math.round(1000*ss[ii]/datarows.length)/10;
+        itg=itg+procnt;
+        console.log(ii,procnt,itg);
+    }
+*/
+/*
+let sngl=0;
+let grp=0;
+for(let ii=1;ii<datarows.length-5;ii++){
+    let kk=datarows[ii].balls[0];
+    if(kk>20){
+        if(datarows[ii+1].balls[0]<8){
+            sngl++;
+        }else{
+            grp++;
+        }
+    }
+}
+console.log('single',sngl,'group',grp);
+*/
+//}
+/*
+function dumpPatternStat(){
+    console.log('dumpPatternStat');
+    let exists=0;
+    let no=0;
+    for(let ii=1;ii<20;ii++){
+        let bn=
+            datarows[ii].balls[0]*Math.pow(45,1)
+            +datarows[ii].balls[1]*Math.pow(45,2)
+            +datarows[ii].balls[2]*Math.pow(45,3)
+            +datarows[ii].balls[3]*Math.pow(45,4)
+            +datarows[ii].balls[4]*Math.pow(45,5)
+            +datarows[ii].balls[5]*Math.pow(45,6)
+        ;
+        console.log(ii,Math.round(bn/Math.pow(45,6)),datarows[ii].balls);
+    }
+    
+}
+function dumpStat5(){
+    dumpLeftStat();
+    dumpPatternStat();
+    console.log(45*45*45*45*45*45);
+}
+*/
+/*
+function countHoles(datarows:BallsRow[],longe:number){
+    let avg=0;
+    for(let rr=1;rr<datarows.length;rr++){
+        let row:BallsRow=datarows[rr];
+        //console.log(row);
+        let rowCount=0;
+        for(let bb=1;bb<=rowLen;bb++){
+            //console.log(bb);
+            let hole=true;
+            for(let kk=0;kk<longe;kk++){
+                //console.log(kk);
+                if(ballExists(bb+kk,row)){//console.log('exists',bb+kk);
+                    hole=false;
+                    break;
+                }//else console.log('not exists',bb+kk);
+            }
+            if(hole){
+                rowCount++;
+            }
+        }
+        avg=avg+rowCount/rowLen;
+    }
+    console.log('empty duration more or equal',longe,'average count',avg/(datarows.length-1));
+}
+
+function dumpHoleStat(){
+    let dataBalls = window[dataName];
+    let datarows:BallsRow[]  = readParseStat(dataBalls);
+    console.log(datarows);
+    console.log('countHoles');
+    countHoles(datarows,1);
+    countHoles(datarows,2);
+    countHoles(datarows,3);
+    countHoles(datarows,4);
+    countHoles(datarows,5);
+    countHoles(datarows,6);
+    countHoles(datarows,7);
+    countHoles(datarows,8);
+    countHoles(datarows,9);
+    countHoles(datarows,10);
+    countHoles(datarows,11);
+    countHoles(datarows,12);
+    countHoles(datarows,13);
+    countHoles(datarows,14);
+    countHoles(datarows,15);
+    countHoles(datarows,16);
+    countHoles(datarows,17);
+    countHoles(datarows,18);
+    countHoles(datarows,19);
+    countHoles(datarows,20);
+    countHoles(datarows,21);
+    countHoles(datarows,22);
+    countHoles(datarows,23);
+}
+*/
+/*
+function dumpHill(target:number,lft:number,mid:number,rt:number){
+    let moreequal=0;
+    let less=0;
+    for (let ii = 1; ii < datarows.length - 4; ii++) {
+        let cur=datarows[ii+0].balls[0];
+        let p1=datarows[ii+1].balls[0];
+        let p2=datarows[ii+2].balls[0];
+        let p3=datarows[ii+3].balls[0];
+        let p4=datarows[ii+4].balls[0];
+        if((p1<=lft && p2>=mid && p3<=rt)||(p1<=lft && p2>=mid && p3>=mid && p4<=rt)){
+            if(cur>=target){
+                moreequal++;
+            }else{
+                less++;
+            }
+            //console.log(cur,':',p1,p2,p3);
+        }
+    }
+    console.log(target,':',lft,mid,rt,'=', moreequal,less, moreequal/less);
+}
+function dumpStat3() {
+    console.log('dumpStat3', datarows);
+    let counts: number[] = [];
+    for (let ii = 1; ii < datarows.length - 3; ii++) {
+        let idx = datarows[ii].balls[0];
+        counts[idx] = (counts[idx]) ? counts[idx] : 0;
+        counts[idx]++;
+    }
+    //console.log('counts', counts);
+    for(let ii=0;ii<counts.length;ii++){
+        console.log(ii,counts[ii],counts[ii]/datarows.length);
+    }
+    for(let kk=1;kk<10;kk++){
+        dumpHill(kk,6,11,6);
+    }
+    
+}
+*/
 function dumpStat22() {
     console.log('dumpStat22');
     var counts = [];
     for (var ii = 1; ii < datarows.length - 3; ii++) {
-        var p0 = Math.floor(datarows[ii + 0].balls[0] / 4) * 4;
-        var p1 = Math.floor(datarows[ii + 1].balls[0] / 4) * 4;
-        var p2 = Math.floor(datarows[ii + 2].balls[0] / 4) * 4;
-        if (!(counts[p0])) {
-            counts[p0] = { bl: p0, cnt: 0, nxt: [] };
+        var idx = datarows[ii + 0].balls[0];
+        if (idx) {
+            if (!(counts[idx])) {
+                counts[idx] = 0;
+            }
+            counts[idx]++;
         }
-        counts[p0].cnt++;
-        if (!(counts[p0].nxt[p1])) {
-            counts[p0].nxt[p1] = { bl: p1, cnt: 0, nxt: [] };
-        }
-        counts[p0].nxt[p1].cnt++;
-        if (!(counts[p0].nxt[p1].nxt[p2])) {
-            counts[p0].nxt[p1].nxt[p2] = { bl: p2, cnt: 0, nxt: [] };
-        }
-        counts[p0].nxt[p1].nxt[p2].cnt++;
     }
-    console.log(counts);
+    var itog = [];
+    for (var ii = counts.length - 2; ii > 0; ii--) {
+        itog[ii] = Math.round(100 * counts[ii] / datarows.length) + ((itog[ii + 1]) ? itog[ii + 1] : 0);
+    }
+    console.log(counts, itog);
+    console.log(datarows.length);
 }
 init();
 addTails();

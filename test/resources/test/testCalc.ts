@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.139 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.140 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -954,12 +954,47 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 	//console.log('redStat', redStat);
 	//dumpColorStat();
 	//dumpStat3();
+	
+}
+
+function dumpAvgFromAvg(){
+	//console.log('dumpAvgFromAvg', blueStat);
+	let data:StatBeginEnd[]=blueStat;
+	let calcDeep=7;
+	let preAvg=0;
+	let preHp=0;
+	for(let ii=0;ii<data.length-calcDeep;ii++){
+		let smm=0;
+		for(let kk=0;kk<calcDeep;kk++){
+			smm=smm+data[ii+kk].right;
+		}
+		let avg=smm/calcDeep;
+		let dff=0;
+		for(let kk=0;kk<calcDeep;kk++){
+			dff=dff+Math.abs(data[ii+kk].right-avg);
+		}
+		let hp=dff/calcDeep;
+		//console.log(data[ii].row,Math.round(avg),Math.round(hp));
+		//let top=rowsVisibleCount*cellSize+topShift+cellSize*1.5;
+		let top = rowsVisibleCount + 22 + 0.66 * data[ii].row ;
+		//composeLine(linesLevel, avg*10,top*cellSize, hp*10,top*cellSize, 4, '#ff00ccff');
+		if(ii>0){
+			let res=hp/avg;
+			if(!(res))res=hp;
+			let preRes=preHp/preAvg;
+			if(!(preRes))preRes=preHp;
+			//composeLine(linesLevel, avg*10,top*cellSize, preAvg*10,(top - 0.66)*cellSize, 1, '#660000ff');
+			composeLine(linesLevel, res*99,top*cellSize, preRes*99,(top - 0.66)*cellSize, 3, '#ff66ccff');
+		}
+		preAvg=avg;
+		preHp=hp;
+	}
 }
 
 function roundDown(num: number, base: number): number {
 	return Math.floor(num / base) * base;
 }
-
+/*
 function dumpColorStat() {
 	//console.log('dumpColorStat');
 	//console.log('sortedBlue', sortedBlue);
@@ -1092,6 +1127,7 @@ function dumpColorStat() {
 	
 	//dumpGroupStat();
 }
+*/
 /*
 function dumpGroupStat(){
 
@@ -1338,6 +1374,7 @@ function addTails() {
 	dumpStat123('grey',greyStat);
 	dumpStat123('red',redStat);
 	*/
+	dumpAvgFromAvg();
 }
 function dumpStat123(label:string,stat: StatBeginEnd[]){
 	let absLeft=0;
@@ -1671,32 +1708,24 @@ function dumpStat3() {
 	
 }
 */
-type Stat22 = {
-	bl: number;
-	cnt:number;
-	nxt:Stat22[];
-};
 function dumpStat22(){
 	console.log('dumpStat22');
-	let counts: Stat22[] = [];
+	let counts: number[] = [];
 	for (let ii = 1; ii < datarows.length - 3; ii++) {
-		let p0=Math.floor(datarows[ii+0].balls[0]/4)*4;
-		let p1=Math.floor(datarows[ii+1].balls[0]/4)*4;
-		let p2=Math.floor(datarows[ii+2].balls[0]/4)*4;
-		if(!(counts[p0])){
-			counts[p0]={bl:p0,cnt:0,nxt:[]};
+		let idx=datarows[ii+0].balls[0];
+		if(idx){
+			if(!(counts[idx])){
+				counts[idx]=0;
+			}
+			counts[idx]++;
 		}
-		counts[p0].cnt++;
-		if(!(counts[p0].nxt[p1])){
-			counts[p0].nxt[p1]={bl:p1,cnt:0,nxt:[]};
-		}
-		counts[p0].nxt[p1].cnt++;
-		if(!(counts[p0].nxt[p1].nxt[p2])){
-			counts[p0].nxt[p1].nxt[p2]={bl:p2,cnt:0,nxt:[]};
-		}
-		counts[p0].nxt[p1].nxt[p2].cnt++;
 	}
-	console.log(counts);
+	let itog: number[] = [];
+	for(let ii=counts.length-2;ii>0;ii--){
+		itog[ii]=Math.round(100*counts[ii]/datarows.length)+((itog[ii+1])?itog[ii+1]:0);
+	}
+	console.log(counts,itog);
+	console.log(datarows.length);
 }
 init();
 addTails();
