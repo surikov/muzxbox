@@ -1,6 +1,8 @@
 //declare function newMIDIparser(arrayBuffer: ArrayBuffer): any;
 //declare function newGPparser(arrayBuffer: ArrayBuffer): any;
 //declare function createSchedulePlayer(): MZXBX_Player;
+let uiLinkFilterToSpeaker='uiLinkFilterToSpeaker';
+let uiLinkFilterToFilter='uiLinkFilterToFilter';
 class CommandDispatcher {
 	player: MZXBX_Player;
 	renderer: UIRenderer;
@@ -376,6 +378,9 @@ class CommandDispatcher {
 		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
 			, this.renderer.timeselectbar.selectionAnchor
 			, LevelModes.top);
+	}
+	doUIaction(){
+
 	}
 }
 let globalCommandDispatcher = new CommandDispatcher();

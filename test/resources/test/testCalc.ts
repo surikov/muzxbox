@@ -956,7 +956,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 	//dumpStat3();
 	
 }
-
+/*
 function dumpAvgFromAvg(){
 	//console.log('dumpAvgFromAvg', blueStat);
 	let data:StatBeginEnd[]=blueStat;
@@ -990,7 +990,7 @@ function dumpAvgFromAvg(){
 		preHp=hp;
 	}
 }
-
+*/
 function roundDown(num: number, base: number): number {
 	return Math.floor(num / base) * base;
 }
@@ -1374,7 +1374,7 @@ function addTails() {
 	dumpStat123('grey',greyStat);
 	dumpStat123('red',redStat);
 	*/
-	dumpAvgFromAvg();
+	//dumpAvgFromAvg();
 }
 function dumpStat123(label:string,stat: StatBeginEnd[]){
 	let absLeft=0;

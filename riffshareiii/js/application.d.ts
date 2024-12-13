@@ -29,6 +29,8 @@ declare class PluginDialogPrompt {
     closeDialogFrame(): void;
     receiveMessageFromPlugin(e: any): void;
 }
+declare let uiLinkFilterToSpeaker: string;
+declare let uiLinkFilterToFilter: string;
 declare class CommandDispatcher {
     player: MZXBX_Player;
     renderer: UIRenderer;
@@ -58,6 +60,7 @@ declare class CommandDispatcher {
     promptPointPluginGUI(label: string, url: string, callback: (obj: any) => boolean): void;
     cancelPluginGUI(): void;
     expandTimeLineSelection(idx: number): void;
+    doUIaction(): void;
 }
 declare let globalCommandDispatcher: CommandDispatcher;
 declare let pluginDialogPrompt: PluginDialogPrompt;
@@ -352,6 +355,18 @@ declare class IconLabelButton {
     selection: number;
     constructor(labels: string[], cssBG: string, cssLabel: string, action: (nn: number) => void);
     resize(left: number, top: number, size: number): void;
+}
+declare abstract class UIAction {
+    abstract doAction: (blobParameters: string) => boolean;
+    name: string;
+}
+declare class UILinkFilterToFilter implements UIAction {
+    doAction(blobParameters: string): boolean;
+    name: string;
+}
+declare class UnDoReDo {
+    uiactions: UIAction[];
+    doAction(actionID: string, data: string): boolean;
 }
 declare let icon_play: string;
 declare let icon_pause: string;

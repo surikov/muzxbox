@@ -62,6 +62,8 @@ class SamplerIcon {
 					dragAnchor.translation = { x: 0, y: 0 };
 					globalCommandDispatcher.resetProject();
 				} else {
+					toSpeaker = false;
+					toFilter = null;
 					dragAnchor.translation.x = dragAnchor.translation.x + x;
 					dragAnchor.translation.y = dragAnchor.translation.y + y;
 					if (samplerTrack.sampler.iconPosition) {
@@ -69,7 +71,7 @@ class SamplerIcon {
 						let yy = samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y;
 						toFilter = globalCommandDispatcher.cfg().dragFindPluginFilterIcon(xx, yy, zidx, samplerTrack.sampler.id, samplerTrack.sampler.outputs);
 						if (toFilter) {
-							toSpeaker = false;
+							//toSpeaker = false;
 							let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
 							let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 							let top = globalCommandDispatcher.cfg().gridTop();
@@ -86,8 +88,9 @@ class SamplerIcon {
 								, css: 'fanConnectionBase  fanConnection' + zidx
 							});
 						} else {
+							
 							if (globalCommandDispatcher.cfg().dragCollisionSpeaker(xx, yy, samplerTrack.sampler.outputs)) {
-								toFilter = null;
+								//toFilter = null;
 								toSpeaker = true;
 								let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
 								let rec: TileRectangle = {

@@ -888,39 +888,41 @@ function dumpTriads(svg, rows) {
     //dumpColorStat();
     //dumpStat3();
 }
-function dumpAvgFromAvg() {
+/*
+function dumpAvgFromAvg(){
     //console.log('dumpAvgFromAvg', blueStat);
-    var data = blueStat;
-    var calcDeep = 4;
-    var preAvg = 0;
-    var preHp = 0;
-    for (var ii = 0; ii < data.length - calcDeep; ii++) {
-        var smm = 0;
-        for (var kk = 0; kk < calcDeep; kk++) {
-            smm = smm + data[ii + kk].right;
+    let data:StatBeginEnd[]=blueStat;
+    let calcDeep=4;
+    let preAvg=0;
+    let preHp=0;
+    for(let ii=0;ii<data.length-calcDeep;ii++){
+        let smm=0;
+        for(let kk=0;kk<calcDeep;kk++){
+            smm=smm+data[ii+kk].right;
         }
-        var avg = smm / calcDeep;
-        var dff = 0;
-        for (var kk = 0; kk < calcDeep; kk++) {
-            dff = dff + Math.abs(data[ii + kk].right - avg);
+        let avg=smm/calcDeep;
+        let dff=0;
+        for(let kk=0;kk<calcDeep;kk++){
+            dff=dff+Math.abs(data[ii+kk].right-avg);
         }
-        var hp = dff / calcDeep;
+        let hp=dff/calcDeep;
         //console.log(data[ii].row,Math.round(avg),Math.round(hp));
         //let top=rowsVisibleCount*cellSize+topShift+cellSize*1.5;
-        var top_1 = rowsVisibleCount + 22 + 0.66 * data[ii].row - 0.66 / 2;
+        let top = rowsVisibleCount + 22 + 0.66 * data[ii].row -0.66/2;
         //composeLine(linesLevel, avg*10,top*cellSize, hp*10,top*cellSize, 4, '#ff00ccff');
-        if (ii > 0) {
-            var res = Math.abs(hp - avg) + 0.66 / 2;
+        if(ii>0){
+            let res=Math.abs(hp-avg)+0.66/2;
             //if(!(res))res=hp;
-            var preRes = Math.abs(preHp - preAvg) + 0.66 / 2;
+            let preRes=Math.abs(preHp-preAvg)+0.66/2;
             //if(!(preRes))preRes=preHp;
             //composeLine(linesLevel, avg*10,top*cellSize, preAvg*10,(top - 0.66)*cellSize, 1, '#660000ff');
-            composeLine(linesLevel, res * 11, top_1 * cellSize, preRes * 11, (top_1 - 0.66) * cellSize, 3, '#ff66ccff');
+            composeLine(linesLevel, res*11,top*cellSize, preRes*11,(top - 0.66)*cellSize, 3, '#ff66ccff');
         }
-        preAvg = avg;
-        preHp = hp;
+        preAvg=avg;
+        preHp=hp;
     }
 }
+*/
 function roundDown(num, base) {
     return Math.floor(num / base) * base;
 }
@@ -1302,7 +1304,7 @@ function addTails() {
     dumpStat123('grey',greyStat);
     dumpStat123('red',redStat);
     */
-    dumpAvgFromAvg();
+    //dumpAvgFromAvg();
 }
 function dumpStat123(label, stat) {
     var absLeft = 0;

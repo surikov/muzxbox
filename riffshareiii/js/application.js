@@ -217,6 +217,8 @@ class PluginDialogPrompt {
         }
     }
 }
+let uiLinkFilterToSpeaker = 'uiLinkFilterToSpeaker';
+let uiLinkFilterToFilter = 'uiLinkFilterToFilter';
 class CommandDispatcher {
     constructor() {
         this.tapSizeRatio = 1;
@@ -410,6 +412,8 @@ class CommandDispatcher {
         }
         this.renderer.timeselectbar.updateTimeSelectionBar();
         this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup, this.renderer.timeselectbar.selectionAnchor, LevelModes.top);
+    }
+    doUIaction() {
     }
 }
 let globalCommandDispatcher = new CommandDispatcher();
@@ -2248,6 +2252,8 @@ class PerformerIcon {
                     globalCommandDispatcher.resetProject();
                 }
                 else {
+                    toSpeaker = false;
+                    toFilter = null;
                     dragAnchor.translation.x = dragAnchor.translation.x + x;
                     dragAnchor.translation.y = dragAnchor.translation.y + y;
                     if (track.performer.iconPosition) {
@@ -2255,7 +2261,6 @@ class PerformerIcon {
                         let yy = track.performer.iconPosition.y + dragAnchor.translation.y;
                         toFilter = globalCommandDispatcher.cfg().dragFindPluginFilterIcon(xx, yy, zidx, track.performer.id, track.performer.outputs);
                         if (toFilter) {
-                            toSpeaker = false;
                             let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
                             let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
                             let top = globalCommandDispatcher.cfg().gridTop();
@@ -2274,7 +2279,6 @@ class PerformerIcon {
                         }
                         else {
                             if (globalCommandDispatcher.cfg().dragCollisionSpeaker(xx, yy, track.performer.outputs)) {
-                                toFilter = null;
                                 toSpeaker = true;
                                 let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
                                 let rec = {
@@ -2397,6 +2401,8 @@ class SamplerIcon {
                     globalCommandDispatcher.resetProject();
                 }
                 else {
+                    toSpeaker = false;
+                    toFilter = null;
                     dragAnchor.translation.x = dragAnchor.translation.x + x;
                     dragAnchor.translation.y = dragAnchor.translation.y + y;
                     if (samplerTrack.sampler.iconPosition) {
@@ -2404,7 +2410,6 @@ class SamplerIcon {
                         let yy = samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y;
                         toFilter = globalCommandDispatcher.cfg().dragFindPluginFilterIcon(xx, yy, zidx, samplerTrack.sampler.id, samplerTrack.sampler.outputs);
                         if (toFilter) {
-                            toSpeaker = false;
                             let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
                             let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
                             let top = globalCommandDispatcher.cfg().gridTop();
@@ -2423,7 +2428,6 @@ class SamplerIcon {
                         }
                         else {
                             if (globalCommandDispatcher.cfg().dragCollisionSpeaker(xx, yy, samplerTrack.sampler.outputs)) {
-                                toFilter = null;
                                 toSpeaker = true;
                                 let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
                                 let rec = {
@@ -2547,6 +2551,8 @@ class FilterIcon {
                     globalCommandDispatcher.resetProject();
                 }
                 else {
+                    toSpeaker = false;
+                    toFilter = null;
                     dragAnchor.translation.x = dragAnchor.translation.x + x;
                     dragAnchor.translation.y = dragAnchor.translation.y + y;
                     if (filterTarget.iconPosition) {
@@ -2554,7 +2560,6 @@ class FilterIcon {
                         let yy = filterTarget.iconPosition.y + dragAnchor.translation.y;
                         toFilter = globalCommandDispatcher.cfg().dragFindPluginFilterIcon(xx, yy, zidx, filterTarget.id, filterTarget.outputs);
                         if (toFilter) {
-                            toSpeaker = false;
                             let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
                             let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
                             let top = globalCommandDispatcher.cfg().gridTop();
@@ -2573,7 +2578,6 @@ class FilterIcon {
                         }
                         else {
                             if (globalCommandDispatcher.cfg().dragCollisionSpeaker(xx, yy, filterTarget.outputs)) {
-                                toFilter = null;
                                 toSpeaker = true;
                                 let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
                                 let rec = {
@@ -2799,6 +2803,31 @@ class IconLabelButton {
         this.label.y = top + 0.69;
         this.spot.x = left;
         this.spot.y = top;
+    }
+}
+class UIAction {
+}
+class UILinkFilterToFilter {
+    constructor() {
+        this.name = 'UILinkFilterToFilter';
+    }
+    doAction(blobParameters) {
+        return false;
+    }
+}
+class UnDoReDo {
+    constructor() {
+        this.uiactions = [
+            new UILinkFilterToFilter()
+        ];
+    }
+    doAction(actionID, data) {
+        for (let ii = 0; ii < this.uiactions.length; ii++) {
+            if (this.uiactions[ii].name == actionID) {
+                return this.uiactions[ii].doAction(data);
+            }
+        }
+        return false;
     }
 }
 let icon_play = '&#xf3aa;';
