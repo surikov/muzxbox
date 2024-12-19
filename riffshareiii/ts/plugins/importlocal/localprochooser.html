@@ -1,0 +1,28 @@
+<html>
+
+<head>
+	<style>
+		html {
+
+			background-color: #333;
+			color: #ccc;
+		}
+	</style>
+    <script type='text/javascript' src='./localprojimp.js'></script>
+    <script type='text/javascript' src='../../../js/mzxbxlib.js'></script>
+</head>
+
+<body>
+	<h1>Local import</h1>
+    <p><input type="file" id="file_midi_input" accept="application/json" 
+        onchange="plugin.loadLocalFile(this);" /></p>
+	<p>
+		<button onclick='plugin.sendLoadedData();'>Send data</button>
+	</p>
+</body>
+<script>
+	
+	let plugin=new LocalProjectImport();
+</script>
+
+</html>

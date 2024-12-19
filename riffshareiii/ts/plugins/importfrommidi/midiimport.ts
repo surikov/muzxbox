@@ -64,7 +64,7 @@ class MIDIIImportMusicPlugin {
 			var oo: MZXBX_PluginMessage = JSON.parse(par.data.data);
 			console.log('result', oo);
 			this.callbackID = par.data.dialogID;
-			console.log('dialogID', this.callbackID);
+			//console.log('dialogID', this.callbackID);
 		} catch (xx) {
 			console.log(xx);
 		}

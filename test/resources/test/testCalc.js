@@ -1305,6 +1305,7 @@ function addTails() {
     dumpStat123('red',redStat);
     */
     //dumpAvgFromAvg();
+    //dumpPairsPatterns();
 }
 function dumpStat123(label, stat) {
     var absLeft = 0;
@@ -1649,8 +1650,39 @@ function dumpStat22() {
     console.log(counts, itog);
     console.log(datarows.length);
 }
+function diffPart(a, b) {
+    if (a > b) {
+        return a / b;
+    }
+    else {
+        return b / a;
+    }
+}
+function dumpPairsPatterns() {
+    console.log('dumpPairsPatterns', datarows); //,skipRowsCount,redStat);
+    var calcLen = 7;
+    for (var lop = 1; lop < 5000; lop++) {
+        //console.log('---',lop,datarows[lop].balls);
+        for (var kk = 1; kk < datarows.length - calcLen; kk++) {
+            if (lop != kk) {
+                var smm = 0;
+                for (var ii = 0; ii < calcLen; ii++) {
+                    var a = datarows[ii + lop].balls[0];
+                    var b = datarows[ii + kk].balls[0];
+                    var dp = diffPart(a, b);
+                    //console.log(ii,':',a,b,'=',dp);
+                    smm = smm + dp;
+                }
+                if (smm / calcLen < 1.25) {
+                    console.log(lop, datarows[lop - 1].balls[0], datarows[kk - 1].balls[0], ':', kk, smm / calcLen);
+                }
+            }
+        }
+    }
+}
 init();
 addTails();
-dumpStat22();
+//dumpStat22();
 //dumpStat3();
 //dumpHoleStat();
+//dumpPairsPatterns();

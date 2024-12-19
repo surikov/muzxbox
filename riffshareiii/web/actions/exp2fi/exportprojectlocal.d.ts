@@ -240,5 +240,16 @@ declare type MZXBX_PluginMessage = {
     dialogID: string;
     data: any;
 };
-declare let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[];
+declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
+declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
+declare function MZXBX_appendScriptURL(url: string): boolean;
+declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
+declare class LocalExportPlugin {
+    callbackID: string;
+    parsedProject: Zvoog_Project | null;
+    constructor();
+    receiveHostMessage(par: any): void;
+    exportLocalfile(th: any): void;
+    download(data: string, filename: string, type: string): void;
+}
