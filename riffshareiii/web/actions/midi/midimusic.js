@@ -1538,6 +1538,24 @@ class MidiParser {
         return project;
     }
     trimProject(project) {
+        let c32 = 0;
+        let cOther = 0;
+        for (let tt = 0; tt < project.tracks.length; tt++) {
+            let track = project.tracks[tt];
+            for (let mm = 0; mm < track.measures.length; mm++) {
+                let measure = track.measures[mm];
+                for (let cc = 0; cc < measure.chords.length; cc++) {
+                    let chord = measure.chords[cc];
+                    if (chord.skip.count == 1 && chord.skip.part == 32) {
+                        c32++;
+                    }
+                    else {
+                        cOther++;
+                    }
+                }
+            }
+        }
+        console.log('trimProject', c32, cOther);
         let len = project.timeline.length;
         for (let ii = len - 1; ii > 0; ii--) {
             if (this.isBarEmpty(ii, project)) {
