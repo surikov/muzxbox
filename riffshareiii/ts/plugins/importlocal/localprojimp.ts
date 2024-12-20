@@ -25,7 +25,7 @@ class LocalProjectImport {
 	sendLoadedData() {
 		if (this.parsedProject) {
 			var oo: MZXBX_MessageToHost = { dialogID: this.id, pluginData: this.parsedProject };
-			window.parent.postMessage(JSON.stringify(oo), '*');
+			window.parent.postMessage(oo, '*');
 		}
 	}
 

@@ -9,14 +9,16 @@ class MixerBar {
 		, gridZoomBarAnchor: TileAnchor
 		, tracksZoomBarAnchor: TileAnchor
 		, firstZoomBarAnchor: TileAnchor
+
 	) {
 		let h12 = 12 * globalCommandDispatcher.cfg().notePathHeight;
-		for (let oo = 0; oo < globalCommandDispatcher.cfg().octaveCount; oo++) {
+		let transpose = globalCommandDispatcher.cfg().transposeOctaveCount() * 12;
+		for (let oo = 0; oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
 			let gridOctaveAnchor: TileAnchor = {
 				showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom
 				, hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom
 				, xx: left
-				, yy: globalCommandDispatcher.cfg().gridTop() + oo * h12
+				, yy: globalCommandDispatcher.cfg().gridTop() + oo * h12 - transpose
 				, ww: ww
 				, hh: h12, content: []
 				, id: 'octaveGridz' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
@@ -26,7 +28,7 @@ class MixerBar {
 				showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom
 				, hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom
 				, xx: left
-				, yy: globalCommandDispatcher.cfg().gridTop() + oo * h12
+				, yy: globalCommandDispatcher.cfg().gridTop() + oo * h12 - transpose
 				, ww: ww
 				, hh: h12, content: []
 				, id: 'octaveTracks' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
@@ -36,18 +38,19 @@ class MixerBar {
 				showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom
 				, hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom
 				, xx: left
-				, yy: globalCommandDispatcher.cfg().gridTop() + oo * h12
+				, yy: globalCommandDispatcher.cfg().gridTop() + oo * h12 - transpose
 				, ww: ww
 				, hh: h12, content: []
 				, id: 'octaveFirst' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
 			};
 			firstZoomBarAnchor.content.push(firstOctaveAnchor);
 			new BarOctave(
-				barIdx, (globalCommandDispatcher.cfg().octaveCount - oo - 1), left, globalCommandDispatcher.cfg().gridTop() + oo * h12
+				barIdx, (globalCommandDispatcher.cfg().drawOctaveCount() - oo - 1), left, globalCommandDispatcher.cfg().gridTop() + oo * h12
 				, ww, h12
 				, gridOctaveAnchor
 				, tracksOctaveAnchor
 				, firstOctaveAnchor
+				, transpose
 				, zoomLevel);
 			if (firstZoomBarAnchor.ww < firstOctaveAnchor.ww) {
 				firstZoomBarAnchor.ww = firstOctaveAnchor.ww;

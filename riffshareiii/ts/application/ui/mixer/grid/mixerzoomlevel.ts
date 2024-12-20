@@ -92,7 +92,7 @@ class MixerZoomLevel {
 	) {
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		if (this.zoomLevelIndex < 4) {
-			for (let oo = 0; oo < globalCommandDispatcher.cfg().octaveCount; oo++) {
+			for (let oo = 0; oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
 				if (oo > 0) {
 					let octaveBottomBorder: TileRectangle = {
 						x: globalCommandDispatcher.cfg().leftPad

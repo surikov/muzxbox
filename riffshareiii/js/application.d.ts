@@ -253,13 +253,13 @@ declare class SamplerBar {
     constructor(barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number);
 }
 declare class BarOctave {
-    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number);
+    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, transpose: number, zoomLevel: number);
 }
 declare class OctaveContent {
-    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, zoomLevel: number);
-    addUpperNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, zoomLevel: number): void;
-    addOtherNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor): void;
-    addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, css: string): void;
+    constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, transpose: number, zoomLevel: number);
+    addUpperNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, transpose: number, zoomLevel: number): void;
+    addOtherNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, transpose: number): void;
+    addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, transpose: number, css: string): void;
 }
 declare class MixerBar {
     octaves: BarOctave[];
@@ -495,7 +495,8 @@ declare class MixerDataMathUtility {
     samplerDotHeight: number;
     autoPointHeight: number;
     widthDurationRatio: number;
-    octaveCount: number;
+    octaveDrawCount: number;
+    octaveTransposeCount: number;
     maxCommentRowCount: number;
     pluginIconSize: number;
     speakerIconSize: number;
@@ -521,6 +522,8 @@ declare class MixerDataMathUtility {
     automationTop(): number;
     commentsTop(): number;
     gridTop(): number;
+    drawOctaveCount(): number;
+    transposeOctaveCount(): number;
     gridHeight(): number;
     samplerHeight(): number;
     samplerTop(): number;

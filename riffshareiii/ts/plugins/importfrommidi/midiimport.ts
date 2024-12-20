@@ -7,15 +7,16 @@ class MIDIIImportMusicPlugin {
 	init() {
 		console.log('init MIDI import');
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
+		window.parent.postMessage('', '*');
 	}
 	sendImportedMIDIData() {
 		console.log('sendImportedMIDIData');
 		if (this.parsedProject) {
-			var oo: MZXBX_PluginMessage = {
+			var oo: MZXBX_MessageToHost = {
 				dialogID: this.callbackID,
-				data: JSON.stringify(this.parsedProject)
+				pluginData: this.parsedProject
 			};
-			window.parent.postMessage(JSON.stringify(oo), '*');
+			window.parent.postMessage(oo, '*');
 		} else {
 			alert('No parsed data');
 		}
@@ -59,6 +60,7 @@ class MIDIIImportMusicPlugin {
 	receiveHostMessage(par) {
 		console.log('receiveHostMessage', par);
 		//callbackID = par.data;
+		/*
 		try {
 			console.log('parse', par.data.data);
 			var oo: MZXBX_PluginMessage = JSON.parse(par.data.data);
@@ -67,6 +69,14 @@ class MIDIIImportMusicPlugin {
 			//console.log('dialogID', this.callbackID);
 		} catch (xx) {
 			console.log(xx);
+		}
+		console.log('receiveHostMessage', par);
+		*/
+		let message: MZXBX_MessageToPlugin = par.data;
+		if (this.callbackID) {
+			//
+		} else {
+			this.callbackID = message.hostData;
 		}
 	}
 

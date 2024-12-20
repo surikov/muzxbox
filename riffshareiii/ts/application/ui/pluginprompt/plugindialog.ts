@@ -68,7 +68,7 @@ class PluginDialogPrompt {
 		console.log('receiveMessage', e);
 		
 		if (e.data) {
-			let message: MZXBX_MessageToHost = JSON.parse(e.data);
+			let message: MZXBX_MessageToHost = e.data;
 			if (message.dialogID == this.dialogID) {
 				if (this.waitProjectCallback) {
 					this.waitProjectCallback(message.pluginData);

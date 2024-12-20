@@ -32,7 +32,7 @@ class LocalProjectImport {
     sendLoadedData() {
         if (this.parsedProject) {
             var oo = { dialogID: this.id, pluginData: this.parsedProject };
-            window.parent.postMessage(JSON.stringify(oo), '*');
+            window.parent.postMessage(oo, '*');
         }
     }
     receiveHostMessage(par) {

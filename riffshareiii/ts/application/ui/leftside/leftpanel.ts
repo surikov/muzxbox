@@ -49,7 +49,7 @@ class LeftPanel {
 			//this.leftZoomAnchors[zz].hh = globalCommandDispatcher.cfg().gridHeight();
 			this.leftZoomAnchors[zz].hh = globalCommandDispatcher.cfg().wholeHeight();
 			this.leftZoomAnchors[zz].content = [];
-			for (let oo = 1; oo < globalCommandDispatcher.cfg().octaveCount; oo++) {
+			for (let oo = 1; oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
 				if (zz < 4) {
 					/*
 					let octavemark: TileRectangle = {
@@ -61,10 +61,11 @@ class LeftPanel {
 					};
 					this.leftZoomAnchors[zz].content.push(octavemark);
 					*/
+					let olabel='' + (globalCommandDispatcher.cfg().drawOctaveCount() - oo);// + globalCommandDispatcher.cfg().transposeOctaveCount());
 					let nm3: TileText = {
 						x: 1
 						, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom
-						, text: '' + (globalCommandDispatcher.cfg().octaveCount - oo + 0)
+						, text: olabel//'' + (globalCommandDispatcher.cfg().drawOctaveCount() - oo + globalCommandDispatcher.cfg().transposeOctaveCount())
 						, css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(nm3);
@@ -73,7 +74,7 @@ class LeftPanel {
 						let nm2: TileText = {
 							x: 0.5
 							, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 6 * globalCommandDispatcher.cfg().notePathHeight
-							, text: '' + (globalCommandDispatcher.cfg().octaveCount - oo + 0)
+							, text: olabel//'' + (globalCommandDispatcher.cfg().octaveCount - oo + 0)
 							, css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
 						};
 						this.leftZoomAnchors[zz].content.push(nm2);
@@ -83,14 +84,14 @@ class LeftPanel {
 							let nm: TileText = {
 								x: 0.25
 								, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 3 * globalCommandDispatcher.cfg().notePathHeight
-								, text: '' + (globalCommandDispatcher.cfg().octaveCount - oo + 0)
+								, text: olabel//'' + (globalCommandDispatcher.cfg().octaveCount - oo + 0)
 								, css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
 							};
 							this.leftZoomAnchors[zz].content.push(nm);
 							nm = {
 								x: 0.25
 								, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 9 * globalCommandDispatcher.cfg().notePathHeight
-								, text: '' + (globalCommandDispatcher.cfg().octaveCount - oo + 0)
+								, text: olabel//'' + (globalCommandDispatcher.cfg().octaveCount - oo + 0)
 								, css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
 							};
 							this.leftZoomAnchors[zz].content.push(nm);

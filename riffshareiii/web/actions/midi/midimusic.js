@@ -15,15 +15,16 @@ class MIDIIImportMusicPlugin {
     init() {
         console.log('init MIDI import');
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
+        window.parent.postMessage('', '*');
     }
     sendImportedMIDIData() {
         console.log('sendImportedMIDIData');
         if (this.parsedProject) {
             var oo = {
                 dialogID: this.callbackID,
-                data: JSON.stringify(this.parsedProject)
+                pluginData: this.parsedProject
             };
-            window.parent.postMessage(JSON.stringify(oo), '*');
+            window.parent.postMessage(oo, '*');
         }
         else {
             alert('No parsed data');
@@ -67,15 +68,11 @@ class MIDIIImportMusicPlugin {
     }
     receiveHostMessage(par) {
         console.log('receiveHostMessage', par);
-        try {
-            console.log('parse', par.data.data);
-            var oo = JSON.parse(par.data.data);
-            console.log('result', oo);
-            this.callbackID = par.data.dialogID;
-            console.log('dialogID', this.callbackID);
+        let message = par.data;
+        if (this.callbackID) {
         }
-        catch (xx) {
-            console.log(xx);
+        else {
+            this.callbackID = message.hostData;
         }
     }
 }

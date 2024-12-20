@@ -18,7 +18,8 @@ class MixerDataMathUtility {
 	//commentPointHeight = 9;
 
 	widthDurationRatio = 27;
-	octaveCount = 10;
+	octaveDrawCount = 6;
+	octaveTransposeCount = -2;
 
 
 	//titleBottomPad = 5;
@@ -239,9 +240,14 @@ class MixerDataMathUtility {
 		return this.topPad + this.heightOfTitle() + this.parTitleGrid;
 	}
 
-
+	drawOctaveCount() {
+		return this.octaveDrawCount;
+	}
+	transposeOctaveCount(){
+		return this.octaveTransposeCount;
+	}
 	gridHeight(): number {
-		return this.notePathHeight * this.octaveCount * 12;
+		return this.notePathHeight * this.drawOctaveCount() * 12;
 	}
 
 
