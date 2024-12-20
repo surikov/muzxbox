@@ -127,8 +127,8 @@ function fillPluginsLists() {
 		if (purpose == MZXBX_PluginPurpose.Action) {
 			menuPointActions.children.push({
 				text: label, noLocalization: true, onClick: () => {
-					globalCommandDispatcher.promptProjectPluginGUI(label, url, (obj: any) => {
-						let project: Zvoog_Project = JSON.parse(obj);
+					globalCommandDispatcher.promptProjectPluginGUI(label, url, (obj: Zvoog_Project) => {
+						let project: Zvoog_Project = obj;
 						//console.log(project);
 						globalCommandDispatcher.registerWorkProject(project);
 						globalCommandDispatcher.resetProject();

@@ -1,38 +1,32 @@
 console.log('Simple beep UI');
 declare function newSimpleBeepImplementation(): MZXBX_AudioPerformerPlugin;
 class SimpleBeepPlugin {
+	id: string;
+	data: string;
 	audioContext: AudioContext;
 	plugin: MZXBX_AudioPerformerPlugin;
-	lastMessage: MZXBX_PluginMessage | null = null;
 	constructor() {
 		console.log('SimpleBeepPlugin');
-		//setTimeout(() => { this.register(); }, 999);
 		this.register();
 	}
 	register() {
 		console.log('register');
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
+		window.parent.postMessage('', '*');
 	}
 	receiveHostMessage(messageEvent: MessageEvent) {
 		console.log('receiveHostMessage', messageEvent);
-		this.lastMessage = messageEvent.data;
-		//callbackID = par.data;
-		/*try {
-			var oo = JSON.parse(par.data);
-			console.log('receiveHostMessage', oo);
-		} catch (xx) {
-			console.log(xx);
-		}*/
-	}
-	sendMessageToHost(data:string) {
-		console.log('sendMessageToHost');
-		if (this.lastMessage) {
-			var message: MZXBX_PluginMessage = {
-				dialogID: this.lastMessage.dialogID,
-				data: data
-			};
-			window.parent.postMessage(message, '*');
+		let message: MZXBX_MessageToPlugin = messageEvent.data;
+		if (this.id) {
+			this.data = message.hostData;
+		} else {
+			this.id = message.hostData;
 		}
+	}
+	sendMessageToHost(data: string) {
+		console.log('sendMessageToHost');
+		var message: MZXBX_MessageToHost = { dialogID: this.id, pluginData: data };
+		window.parent.postMessage(message, '*');
 	}
 	test() {
 		console.log('test beep');
@@ -62,8 +56,6 @@ class SimpleBeepPlugin {
 				]);
 
 		}
-
-
 	}
 	set() {
 		this.sendMessageToHost('test answer from beep');

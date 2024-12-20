@@ -274,8 +274,15 @@ type MZXBX_PluginRegistrationInformation = {
 	, evaluate: string
 	, script: string
 };
+/*
 type MZXBX_PluginMessage = {
 	dialogID: string
 	, data: any
+};*/
+type MZXBX_MessageToPlugin = {
+	hostData: any
 };
-
+type MZXBX_MessageToHost = {
+	dialogID: string
+	, pluginData: any
+};

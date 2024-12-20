@@ -261,11 +261,12 @@ class CommandDispatcher {
 		}
 	}
 */
-	promptProjectPluginGUI(label: string, url: string, callback: (obj: any) => boolean) {
+	promptProjectPluginGUI(label: string, url: string, callback: (obj: Zvoog_Project) => void) {
 		console.log('promptProjectPluginGUI', url);
-
-		let projectClone: string = JSON.stringify(this.cfg().data);
-		pluginDialogPrompt.openDialogFrame(label, url, projectClone, callback);
+		
+		pluginDialogPrompt.openActionDialogFrame(label, url,  callback);
+		//let projectClone: string = JSON.stringify(this.cfg().data);
+		//pluginDialogPrompt.openDialogFrame(label, url, projectClone, callback);
 
 		//let pluginFrame = document.getElementById("pluginFrame") as any;
 		//if (pluginFrame) {
@@ -288,12 +289,12 @@ class CommandDispatcher {
 		//}
 		//}
 	}
-	resendMessagePluginGUI() {
+	/*resendMessagePluginGUI() {
 		pluginDialogPrompt.sendMessageToPlugin();
-	}
+	}*/
 	promptPointPluginGUI(label: string, url: string, callback: (obj: any) => boolean) {
 		console.log('promptPointPluginGUI', url);
-		pluginDialogPrompt.openDialogFrame(label, url, 'data for testing', callback);
+		pluginDialogPrompt.openPointDialogFrame(label, url, 'data for testing', callback);
 	}
 	cancelPluginGUI() {
 		console.log('cancelPluginGUI');

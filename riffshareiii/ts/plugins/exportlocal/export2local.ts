@@ -5,11 +5,12 @@ class LocalExportPlugin {
 	constructor() {
 		console.log('LocalExportPlugin create');
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
+		window.parent.postMessage('', '*');
 	}
 	receiveHostMessage(par) {
 		console.log('receiveHostMessage', par);
 		//callbackID = par.data;
-		try {
+		/*try {
 			//console.log('parse', par.data.data);
 			this.parsedProject = JSON.parse(par.data.data);
 			//console.log('result', oo);
@@ -17,12 +18,18 @@ class LocalExportPlugin {
 			//console.log('dialogID', this.callbackID);
 		} catch (xx) {
 			console.log(xx);
+		}*/
+		let message: MZXBX_MessageToPlugin = par.data;
+		if (this.callbackID) {
+			this.parsedProject = message.hostData;
+		} else {
+			this.callbackID = message.hostData;
 		}
 	}
 	exportLocalfile(th) {
 		console.log('exportLocalfile', th);
 		if (this.parsedProject) {
-			this.download(JSON.stringify(this.parsedProject, null, '	'), 'testproject', 'application/json');
+			this.download(JSON.stringify(this.parsedProject, null, '	'), 'export', 'application/json');
 		}
 	}
 	download(data: string, filename: string, type: string) {

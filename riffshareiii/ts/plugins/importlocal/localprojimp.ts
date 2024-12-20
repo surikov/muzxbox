@@ -1,5 +1,5 @@
 class LocalProjectImport {
-	callbackID = '';
+	id = '';
 	parsedProject: Zvoog_Project | null = null;
 	constructor() {
 		this.init();
@@ -7,6 +7,7 @@ class LocalProjectImport {
 	init() {
 		console.log('init MIDI import');
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
+		window.parent.postMessage('', '*');
 	}
 
 	loadLocalFile(inputFile) {
@@ -23,28 +24,21 @@ class LocalProjectImport {
 	}
 	sendLoadedData() {
 		if (this.parsedProject) {
-			var oo: MZXBX_PluginMessage = {
-				dialogID: this.callbackID,
-				data: JSON.stringify(this.parsedProject)
-			};
+			var oo: MZXBX_MessageToHost = { dialogID: this.id, pluginData: this.parsedProject };
 			window.parent.postMessage(JSON.stringify(oo), '*');
 		}
 	}
-	
+
 
 
 
 	receiveHostMessage(par) {
 		console.log('receiveHostMessage', par);
-		//callbackID = par.data;
-		try {
-			//console.log('parse', par.data.data);
-			//var oo: MZXBX_PluginMessage = JSON.parse(par.data.data);
-			//console.log('result', oo);
-			this.callbackID = par.data.dialogID;
-			//console.log('dialogID', this.callbackID);
-		} catch (xx) {
-			console.log(xx);
+		let message: MZXBX_MessageToPlugin = par.data;
+		if (this.id) {
+			//
+		} else {
+			this.id = message.hostData;
 		}
 	}
 

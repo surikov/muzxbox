@@ -21,11 +21,17 @@ declare function startApplication(): void;
 declare function initWebAudioFromUI(): void;
 declare function startLoadCSSfile(cssurl: string): void;
 declare class PluginDialogPrompt {
-    dialogMessage: MZXBX_PluginMessage | null;
-    waitCallback: (obj: any) => boolean;
+    dialogID: string;
+    waitForPluginInit: boolean;
+    waitProjectCallback: null | ((newProject: Zvoog_Project) => void);
+    waitTimelinePointCallback: null | ((raw: any) => void);
+    rawData: any;
     constructor();
-    openDialogFrame(label: string, url: string, initOrProject: any, callback: (obj: any) => boolean): void;
-    sendMessageToPlugin(): void;
+    openActionDialogFrame(label: string, url: string, callback: (obj: Zvoog_Project) => void): void;
+    openPointDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void): void;
+    sendNewIdToPlugin(): void;
+    sendCurrentProjectToPlugin(): void;
+    sendPointToPlugin(): void;
     closeDialogFrame(): void;
     receiveMessageFromPlugin(e: any): void;
 }
@@ -55,8 +61,7 @@ declare class CommandDispatcher {
     moveAutomationTop(filterNum: number): void;
     setTrackSoloState(state: number): void;
     setDrumSoloState(state: number): void;
-    promptProjectPluginGUI(label: string, url: string, callback: (obj: any) => boolean): void;
-    resendMessagePluginGUI(): void;
+    promptProjectPluginGUI(label: string, url: string, callback: (obj: Zvoog_Project) => void): void;
     promptPointPluginGUI(label: string, url: string, callback: (obj: any) => boolean): void;
     cancelPluginGUI(): void;
     expandTimeLineSelection(idx: number): void;
@@ -360,7 +365,27 @@ declare abstract class UIAction {
     abstract doAction: (blobParameters: string) => boolean;
     name: string;
 }
-declare class UILinkFilterToFilter implements UIAction {
+declare class UILinkFilterToTarget implements UIAction {
+    doAction(blobParameters: string): boolean;
+    name: string;
+}
+declare class UISeparateFilterFromTarget implements UIAction {
+    doAction(blobParameters: string): boolean;
+    name: string;
+}
+declare class UILinkPerformerToTarget implements UIAction {
+    doAction(blobParameters: string): boolean;
+    name: string;
+}
+declare class UISeparatePerformerFromTarget implements UIAction {
+    doAction(blobParameters: string): boolean;
+    name: string;
+}
+declare class UILinkSamplerToTarget implements UIAction {
+    doAction(blobParameters: string): boolean;
+    name: string;
+}
+declare class UISeparateSamplerFromTarget implements UIAction {
     doAction(blobParameters: string): boolean;
     name: string;
 }
@@ -865,9 +890,12 @@ declare type MZXBX_PluginRegistrationInformation = {
     evaluate: string;
     script: string;
 };
-declare type MZXBX_PluginMessage = {
+declare type MZXBX_MessageToPlugin = {
+    hostData: any;
+};
+declare type MZXBX_MessageToHost = {
     dialogID: string;
-    data: any;
+    pluginData: any;
 };
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;

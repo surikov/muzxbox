@@ -12,21 +12,22 @@ class LocalExportPlugin {
         this.parsedProject = null;
         console.log('LocalExportPlugin create');
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
+        window.parent.postMessage('', '*');
     }
     receiveHostMessage(par) {
         console.log('receiveHostMessage', par);
-        try {
-            this.parsedProject = JSON.parse(par.data.data);
-            this.callbackID = par.data.dialogID;
+        let message = par.data;
+        if (this.callbackID) {
+            this.parsedProject = message.hostData;
         }
-        catch (xx) {
-            console.log(xx);
+        else {
+            this.callbackID = message.hostData;
         }
     }
     exportLocalfile(th) {
         console.log('exportLocalfile', th);
         if (this.parsedProject) {
-            this.download(JSON.stringify(this.parsedProject, null, '	'), 'testproject', 'application/json');
+            this.download(JSON.stringify(this.parsedProject, null, '	'), 'export', 'application/json');
         }
     }
     download(data, filename, type) {

@@ -8,13 +8,14 @@ var MZXBX_PluginPurpose;
 })(MZXBX_PluginPurpose || (MZXBX_PluginPurpose = {}));
 class LocalProjectImport {
     constructor() {
-        this.callbackID = '';
+        this.id = '';
         this.parsedProject = null;
         this.init();
     }
     init() {
         console.log('init MIDI import');
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
+        window.parent.postMessage('', '*');
     }
     loadLocalFile(inputFile) {
         var file = inputFile.files[0];
@@ -30,20 +31,17 @@ class LocalProjectImport {
     }
     sendLoadedData() {
         if (this.parsedProject) {
-            var oo = {
-                dialogID: this.callbackID,
-                data: JSON.stringify(this.parsedProject)
-            };
+            var oo = { dialogID: this.id, pluginData: this.parsedProject };
             window.parent.postMessage(JSON.stringify(oo), '*');
         }
     }
     receiveHostMessage(par) {
         console.log('receiveHostMessage', par);
-        try {
-            this.callbackID = par.data.dialogID;
+        let message = par.data;
+        if (this.id) {
         }
-        catch (xx) {
-            console.log(xx);
+        else {
+            this.id = message.hostData;
         }
     }
 }

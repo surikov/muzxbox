@@ -39,7 +39,7 @@ declare type Zvoog_FilterTarget = {
     kind: string;
     dataBlob: string;
     outputs: string[];
-    automation: Zvoog_AutomationTrack | null;
+    automation: Zvoog_FilterMeasure[];
     iconPosition?: {
         x: number;
         y: number;
@@ -80,10 +80,6 @@ declare type Zvoog_SongMeasure = {
     tempo: number;
     metre: Zvoog_Metre;
 };
-declare type Zvoog_AutomationTrack = {
-    title: string;
-    measures: Zvoog_FilterMeasure[];
-};
 declare type Zvoog_FilterMeasure = {
     changes: Zvoog_FilterStateChange[];
 };
@@ -95,11 +91,13 @@ declare type Zvoog_PercussionTrack = {
     title: string;
     measures: Zvoog_PercussionMeasure[];
     sampler: Zvoog_AudioSampler;
+    volume: number;
 };
 declare type Zvoog_MusicTrack = {
     title: string;
     measures: Zvoog_TrackMeasure[];
     performer: Zvoog_AudioSequencer;
+    volume: number;
 };
 declare type Zvoog_CommentText = {
     skip: Zvoog_Metre;
@@ -121,7 +119,12 @@ declare type Zvoog_Project = {
     comments: Zvoog_CommentMeasure[];
     filters: Zvoog_FilterTarget[];
     selection?: Zvoog_Selection;
-    focus?: 0 | 1 | 2 | 3;
+    position?: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    list?: boolean;
 };
 declare type MZXBX_CachedWave = {
     path: string;
@@ -233,9 +236,12 @@ declare type MZXBX_PluginRegistrationInformation = {
     evaluate: string;
     script: string;
 };
-declare type MZXBX_PluginMessage = {
+declare type MZXBX_MessageToPlugin = {
+    hostData: any;
+};
+declare type MZXBX_MessageToHost = {
     dialogID: string;
-    data: any;
+    pluginData: any;
 };
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;

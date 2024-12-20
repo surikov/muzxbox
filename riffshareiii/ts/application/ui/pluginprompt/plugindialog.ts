@@ -1,39 +1,64 @@
 class PluginDialogPrompt {
-	//dialogID: string = '?';
-	//dialogData: string = '';
-	dialogMessage: MZXBX_PluginMessage | null = null;
-	waitCallback: (obj: any) => boolean;
+	dialogID: string = '?';
+	waitForPluginInit: boolean = false;
+	waitProjectCallback: null | ((newProject: Zvoog_Project) => void) = null;
+	waitTimelinePointCallback: null | ((raw: any) => void) = null;
+	rawData: any;
 	constructor() {
 		window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
 	}
-	openDialogFrame(label: string, url: string, initOrProject: any, callback: (obj: any) => boolean): void {
-		this.waitCallback = callback;
+	openActionDialogFrame(label: string, url: string, callback: (obj: Zvoog_Project) => void): void {
+		this.waitProjectCallback = callback;
+		this.waitTimelinePointCallback = null;
 		let pluginTitle = document.getElementById("pluginTitle") as any;
 		pluginTitle.innerHTML = label;
 		let pluginFrame = document.getElementById("pluginFrame") as any;
-		//this.dialogID = '' + Math.random();
-		//this.dialogData = data;
-		this.dialogMessage = { dialogID: '' + Math.random(), data: initOrProject };
-		let me = this;
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
-				pluginFrame.onload = function () {
-					//console.log('onload', me.waitForId);
-					//pluginFrame.contentWindow.postMessage(me.waitForId, '*')
-					me.sendMessageToPlugin();
-				};
+				this.waitForPluginInit = true;
 				pluginFrame.src = url;
 				(document.getElementById("pluginDiv") as any).style.visibility = "visible";
 			}
 		}
 	}
-	sendMessageToPlugin() {
-		console.log('sendMessageToPlugin', this.dialogMessage);
+	openPointDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void): void {
+		this.waitProjectCallback = null;
+		this.waitTimelinePointCallback = callback;
+		this.rawData = raw;
+		let pluginTitle = document.getElementById("pluginTitle") as any;
+		pluginTitle.innerHTML = label;
 		let pluginFrame = document.getElementById("pluginFrame") as any;
 		if (pluginFrame) {
-			//let message: MZXBX_PluginMessage = { dialogID: this.dialogID, data: this.dialogData };
-			//let txt = JSON.stringify(message);
-			pluginFrame.contentWindow.postMessage(this.dialogMessage, '*');
+			if (pluginFrame.contentWindow) {
+				this.waitForPluginInit = true;
+				pluginFrame.src = url;
+				(document.getElementById("pluginDiv") as any).style.visibility = "visible";
+			}
+		}
+	}
+	sendNewIdToPlugin() {
+		console.log('sendNewIdToPlugin');
+		let pluginFrame = document.getElementById("pluginFrame") as any;
+		if (pluginFrame) {
+			this.dialogID = '' + Math.random();
+			let message: MZXBX_MessageToPlugin = { hostData: this.dialogID };
+			pluginFrame.contentWindow.postMessage(message, '*');
+		}
+	}
+	sendCurrentProjectToPlugin() {
+		console.log('sendCurrentProjectToPlugin');
+		let pluginFrame = document.getElementById("pluginFrame") as any;
+		if (pluginFrame) {
+			let message: MZXBX_MessageToPlugin = { hostData: globalCommandDispatcher.cfg().data };
+			pluginFrame.contentWindow.postMessage(message, '*');
+		}
+	}
+	sendPointToPlugin() {
+		console.log('sendCurrentProjectToPlugin');
+		let pluginFrame = document.getElementById("pluginFrame") as any;
+		if (pluginFrame) {
+			let message: MZXBX_MessageToPlugin = { hostData: this.rawData };
+			pluginFrame.contentWindow.postMessage(message, '*');
 		}
 	}
 	closeDialogFrame(): void {
@@ -41,23 +66,30 @@ class PluginDialogPrompt {
 	}
 	receiveMessageFromPlugin(e) {
 		console.log('receiveMessage', e);
-		let parsed: MZXBX_PluginMessage | null = null;
-		try {
-			parsed = JSON.parse(e.data)
-		} catch (xxx) {
-			console.log(xxx);
-		}
-		console.log('parsed', parsed);
-		if (parsed) {
-			if (this.dialogMessage) {
-				if (parsed.dialogID == this.dialogMessage.dialogID) {
-					//console.log('data', parsed.data);
-					let close: boolean = this.waitCallback(parsed.data);
-					if (close) {
-						this.closeDialogFrame();
-					}
+		
+		if (e.data) {
+			let message: MZXBX_MessageToHost = JSON.parse(e.data);
+			if (message.dialogID == this.dialogID) {
+				if (this.waitProjectCallback) {
+					this.waitProjectCallback(message.pluginData);
 				} else {
-					console.log('wrong received message id', parsed.dialogID, this.dialogMessage.dialogID);
+					if (this.waitTimelinePointCallback) {
+						this.waitTimelinePointCallback(message.pluginData);
+					}
+				}
+			} else {
+				console.log('wrong received message id', message.dialogID, this.dialogID);
+			}
+		} else {
+			if (this.waitForPluginInit) {
+				this.waitForPluginInit = false;
+				this.sendNewIdToPlugin();
+				if (this.waitProjectCallback) {
+					this.sendCurrentProjectToPlugin();
+				} else {
+					if (this.waitTimelinePointCallback) {
+						this.sendPointToPlugin();
+					}
 				}
 			} else {
 				console.log('wrong received object');

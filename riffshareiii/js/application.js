@@ -159,31 +159,64 @@ function startLoadCSSfile(cssurl) {
 }
 class PluginDialogPrompt {
     constructor() {
-        this.dialogMessage = null;
+        this.dialogID = '?';
+        this.waitForPluginInit = false;
+        this.waitProjectCallback = null;
+        this.waitTimelinePointCallback = null;
         window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
     }
-    openDialogFrame(label, url, initOrProject, callback) {
-        this.waitCallback = callback;
+    openActionDialogFrame(label, url, callback) {
+        this.waitProjectCallback = callback;
+        this.waitTimelinePointCallback = null;
         let pluginTitle = document.getElementById("pluginTitle");
         pluginTitle.innerHTML = label;
         let pluginFrame = document.getElementById("pluginFrame");
-        this.dialogMessage = { dialogID: '' + Math.random(), data: initOrProject };
-        let me = this;
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
-                pluginFrame.onload = function () {
-                    me.sendMessageToPlugin();
-                };
+                this.waitForPluginInit = true;
                 pluginFrame.src = url;
                 document.getElementById("pluginDiv").style.visibility = "visible";
             }
         }
     }
-    sendMessageToPlugin() {
-        console.log('sendMessageToPlugin', this.dialogMessage);
+    openPointDialogFrame(label, url, raw, callback) {
+        this.waitProjectCallback = null;
+        this.waitTimelinePointCallback = callback;
+        this.rawData = raw;
+        let pluginTitle = document.getElementById("pluginTitle");
+        pluginTitle.innerHTML = label;
         let pluginFrame = document.getElementById("pluginFrame");
         if (pluginFrame) {
-            pluginFrame.contentWindow.postMessage(this.dialogMessage, '*');
+            if (pluginFrame.contentWindow) {
+                this.waitForPluginInit = true;
+                pluginFrame.src = url;
+                document.getElementById("pluginDiv").style.visibility = "visible";
+            }
+        }
+    }
+    sendNewIdToPlugin() {
+        console.log('sendNewIdToPlugin');
+        let pluginFrame = document.getElementById("pluginFrame");
+        if (pluginFrame) {
+            this.dialogID = '' + Math.random();
+            let message = { hostData: this.dialogID };
+            pluginFrame.contentWindow.postMessage(message, '*');
+        }
+    }
+    sendCurrentProjectToPlugin() {
+        console.log('sendCurrentProjectToPlugin');
+        let pluginFrame = document.getElementById("pluginFrame");
+        if (pluginFrame) {
+            let message = { hostData: globalCommandDispatcher.cfg().data };
+            pluginFrame.contentWindow.postMessage(message, '*');
+        }
+    }
+    sendPointToPlugin() {
+        console.log('sendCurrentProjectToPlugin');
+        let pluginFrame = document.getElementById("pluginFrame");
+        if (pluginFrame) {
+            let message = { hostData: this.rawData };
+            pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     closeDialogFrame() {
@@ -191,24 +224,33 @@ class PluginDialogPrompt {
     }
     receiveMessageFromPlugin(e) {
         console.log('receiveMessage', e);
-        let parsed = null;
-        try {
-            parsed = JSON.parse(e.data);
-        }
-        catch (xxx) {
-            console.log(xxx);
-        }
-        console.log('parsed', parsed);
-        if (parsed) {
-            if (this.dialogMessage) {
-                if (parsed.dialogID == this.dialogMessage.dialogID) {
-                    let close = this.waitCallback(parsed.data);
-                    if (close) {
-                        this.closeDialogFrame();
-                    }
+        if (e.data) {
+            let message = JSON.parse(e.data);
+            if (message.dialogID == this.dialogID) {
+                if (this.waitProjectCallback) {
+                    this.waitProjectCallback(message.pluginData);
                 }
                 else {
-                    console.log('wrong received message id', parsed.dialogID, this.dialogMessage.dialogID);
+                    if (this.waitTimelinePointCallback) {
+                        this.waitTimelinePointCallback(message.pluginData);
+                    }
+                }
+            }
+            else {
+                console.log('wrong received message id', message.dialogID, this.dialogID);
+            }
+        }
+        else {
+            if (this.waitForPluginInit) {
+                this.waitForPluginInit = false;
+                this.sendNewIdToPlugin();
+                if (this.waitProjectCallback) {
+                    this.sendCurrentProjectToPlugin();
+                }
+                else {
+                    if (this.waitTimelinePointCallback) {
+                        this.sendPointToPlugin();
+                    }
                 }
             }
             else {
@@ -362,15 +404,11 @@ class CommandDispatcher {
     }
     promptProjectPluginGUI(label, url, callback) {
         console.log('promptProjectPluginGUI', url);
-        let projectClone = JSON.stringify(this.cfg().data);
-        pluginDialogPrompt.openDialogFrame(label, url, projectClone, callback);
-    }
-    resendMessagePluginGUI() {
-        pluginDialogPrompt.sendMessageToPlugin();
+        pluginDialogPrompt.openActionDialogFrame(label, url, callback);
     }
     promptPointPluginGUI(label, url, callback) {
         console.log('promptPointPluginGUI', url);
-        pluginDialogPrompt.openDialogFrame(label, url, 'data for testing', callback);
+        pluginDialogPrompt.openPointDialogFrame(label, url, 'data for testing', callback);
     }
     cancelPluginGUI() {
         console.log('cancelPluginGUI');
@@ -1301,7 +1339,7 @@ function fillPluginsLists() {
             menuPointActions.children.push({
                 text: label, noLocalization: true, onClick: () => {
                     globalCommandDispatcher.promptProjectPluginGUI(label, url, (obj) => {
-                        let project = JSON.parse(obj);
+                        let project = obj;
                         globalCommandDispatcher.registerWorkProject(project);
                         globalCommandDispatcher.resetProject();
                         return true;
@@ -2807,9 +2845,49 @@ class IconLabelButton {
 }
 class UIAction {
 }
-class UILinkFilterToFilter {
+class UILinkFilterToTarget {
     constructor() {
-        this.name = 'UILinkFilterToFilter';
+        this.name = 'UILinkFilterToTarget';
+    }
+    doAction(blobParameters) {
+        return false;
+    }
+}
+class UISeparateFilterFromTarget {
+    constructor() {
+        this.name = 'UISeparateFilterFromTarget';
+    }
+    doAction(blobParameters) {
+        return false;
+    }
+}
+class UILinkPerformerToTarget {
+    constructor() {
+        this.name = 'UILinkPerformerToTarget';
+    }
+    doAction(blobParameters) {
+        return false;
+    }
+}
+class UISeparatePerformerFromTarget {
+    constructor() {
+        this.name = 'UISeparatePerformerFromTarget';
+    }
+    doAction(blobParameters) {
+        return false;
+    }
+}
+class UILinkSamplerToTarget {
+    constructor() {
+        this.name = 'UILinkSamplerToTarget';
+    }
+    doAction(blobParameters) {
+        return false;
+    }
+}
+class UISeparateSamplerFromTarget {
+    constructor() {
+        this.name = 'UISeparateSamplerFromTarget';
     }
     doAction(blobParameters) {
         return false;
@@ -2818,7 +2896,12 @@ class UILinkFilterToFilter {
 class UnDoReDo {
     constructor() {
         this.uiactions = [
-            new UILinkFilterToFilter()
+            new UILinkFilterToTarget(),
+            new UISeparateFilterFromTarget(),
+            new UILinkPerformerToTarget(),
+            new UISeparatePerformerFromTarget(),
+            new UILinkSamplerToTarget(),
+            new UISeparateSamplerFromTarget()
         ];
     }
     doAction(actionID, data) {

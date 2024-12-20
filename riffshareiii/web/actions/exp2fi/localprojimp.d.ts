@@ -236,9 +236,12 @@ declare type MZXBX_PluginRegistrationInformation = {
     evaluate: string;
     script: string;
 };
-declare type MZXBX_PluginMessage = {
+declare type MZXBX_MessageToPlugin = {
+    hostData: any;
+};
+declare type MZXBX_MessageToHost = {
     dialogID: string;
-    data: any;
+    pluginData: any;
 };
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
@@ -246,7 +249,7 @@ declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 declare class LocalProjectImport {
-    callbackID: string;
+    id: string;
     parsedProject: Zvoog_Project | null;
     constructor();
     init(): void;

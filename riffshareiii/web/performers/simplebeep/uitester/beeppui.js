@@ -9,27 +9,28 @@ var MZXBX_PluginPurpose;
 console.log('Simple beep UI');
 class SimpleBeepPlugin {
     constructor() {
-        this.lastMessage = null;
         console.log('SimpleBeepPlugin');
         this.register();
     }
     register() {
         console.log('register');
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
+        window.parent.postMessage('', '*');
     }
     receiveHostMessage(messageEvent) {
         console.log('receiveHostMessage', messageEvent);
-        this.lastMessage = messageEvent.data;
+        let message = messageEvent.data;
+        if (this.id) {
+            this.data = message.hostData;
+        }
+        else {
+            this.id = message.hostData;
+        }
     }
     sendMessageToHost(data) {
         console.log('sendMessageToHost');
-        if (this.lastMessage) {
-            var message = {
-                dialogID: this.lastMessage.dialogID,
-                data: data
-            };
-            window.parent.postMessage(message, '*');
-        }
+        var message = { dialogID: this.id, pluginData: data };
+        window.parent.postMessage(message, '*');
     }
     test() {
         console.log('test beep');
