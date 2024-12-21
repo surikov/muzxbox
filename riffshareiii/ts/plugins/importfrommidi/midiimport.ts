@@ -1969,7 +1969,7 @@ class MidiParser {
 		let filterEcho: Zvoog_FilterTarget = {
 			id: echoID
 			, kind: 'Echo', dataBlob: '', outputs: ['']
-			, iconPosition: { x: 77 + midiSongData.miditracks.length * 3 * 3, y: midiSongData.miditracks.length * 8 + 2 }
+			, iconPosition: { x: 77 + midiSongData.miditracks.length * 30, y: midiSongData.miditracks.length * 8 + 2 }
 			, automation: []
 		};
 		project.filters.push(filterEcho);
@@ -1981,23 +1981,33 @@ class MidiParser {
 	}
 
 	trimProject(project: Zvoog_Project) {
-		let c32=0;
-		let cOther=0;
+		let c32 = 0;
+		let cOther = 0;
+		let c0 = 0;
+		let cPre = 0;
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let track = project.tracks[tt];
 			for (let mm = 0; mm < track.measures.length; mm++) {
 				let measure = track.measures[mm];
+				let meme = MMUtil().set(project.timeline[mm].metre);
 				for (let cc = 0; cc < measure.chords.length; cc++) {
 					let chord = measure.chords[cc];
-					if(chord.skip.count==1 && chord.skip.part==32){
+					//let chordSkip = MMUtil().set(chord.skip);
+					if (chord.skip.count == 1 && chord.skip.part == 32) {
 						c32++;
-					}else{
-						cOther++;
+					} else {
+						if (chord.skip.count == 0) { c0++; } else {
+							if (meme.minus({ count: 1, part: 32 }).equals(chord.skip)) {
+								cPre++;
+							} else {
+								cOther++;
+							}
+						}
 					}
 				}
 			}
 		}
-		console.log('trimProject',c32,cOther);
+		console.log('trimProject pre/0/32/other', cPre, c0, c32, cOther);
 
 		let len = project.timeline.length;
 		for (let ii = len - 1; ii > 0; ii--) {
@@ -2008,7 +2018,7 @@ class MidiParser {
 				return;
 			}
 		}
-		
+
 	}
 	isBarEmpty(barIdx: number, project: Zvoog_Project): boolean {
 		for (let tt = 0; tt < project.tracks.length; tt++) {
@@ -2081,9 +2091,9 @@ class MidiParser {
 		let rr = 1;//0000;
 		return Math.round(nn * rr);
 	}
-	stripDuration(what: Zvoog_MetreMathType): Zvoog_MetreMathType {
+	/*stripDuration(what: Zvoog_MetreMathType): Zvoog_MetreMathType {
 		return what;
-	}
+	}*/
 	createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack {
 		let projectTrack: Zvoog_MusicTrack = {
 			title: midiTrack.title + ' [' + midiTrack.program + '] ' + insNames[midiTrack.program]
@@ -2091,8 +2101,7 @@ class MidiParser {
 			//, filters: []
 			, performer: {
 				id: 'p' + Math.random(), data: '', kind: '', outputs: [outputId]
-				, iconPosition: { x: top / 3, y: top }
-			}
+				, iconPosition: { x: top* 2, y: top }			}
 			, volume: volume
 		};
 		let mm = MMUtil();
@@ -2188,7 +2197,7 @@ class MidiParser {
 			//, filters: []
 			, sampler: {
 				id: 'd' + Math.random(), data: '', kind: '', outputs: [outputId]
-				, iconPosition: { x: top / 2, y: top }
+				, iconPosition: { x: top * 1.5, y: top /2}
 			}
 			, volume: volume
 		};

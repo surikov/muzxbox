@@ -1362,6 +1362,37 @@ function addTails() {
 		}
 	//dumpInfo2('statred', padLen(''+(0+begin)+':'+end+'('+(rowLen-end-1)+'): min:',20)+lbl);
 	dumpInfo2('statred', padLen(''+padLen(''+(0+begin),2)+':'+padLen(''+end,2)+'('+padLen(''+(rowLen-end-1),2)+'): min:',20)+lbl);
+
+	//console.log(mindata,mxdata);
+	let purpleiff=padLen('',21);
+	for (let kk = 0; kk < mxdata.length; kk++) {
+		let dist=0;
+		for(let xx=0;xx<mindata.length;xx++){
+			//console.log(mindata[xx].ball,mxdata[kk].ball);
+			if(mindata[xx].ball==mxdata[kk].ball){
+				dist=xx-kk;
+				break;
+			}
+		}
+		purpleiff=purpleiff+padLen((dist>0?'+':'')+dist,4);
+	}
+	let rediff=padLen('',21);
+	for (let kk = 0; kk < mindata.length; kk++) {
+		let dist=0;
+		for(let xx=0;xx<mxdata.length;xx++){
+			//console.log(mindata[xx].ball,mxdata[kk].ball);
+			if(mxdata[xx].ball==mindata[kk].ball){
+				dist=xx-kk;
+				break;
+			}
+		}
+		rediff=rediff+padLen((dist>0?'+':'')+dist,4);
+	}
+	var span: HTMLElement = (document.getElementById('infopurple') as any) as HTMLElement;
+	span.innerText = purpleiff;
+	span = (document.getElementById('infored') as any) as HTMLElement;
+	span.innerText = rediff;
+
 	//console.log(avgdata);
 	//for(let ii=0;ii<mindata.length;ii++){
 	//	console.log(ii,mindata[ii],mxdata[ii]);
@@ -1765,7 +1796,7 @@ addTails();
 //dumpStat3();
 //dumpHoleStat();
 //dumpPairsPatterns();
-
+console.log('start');
 
 
 
