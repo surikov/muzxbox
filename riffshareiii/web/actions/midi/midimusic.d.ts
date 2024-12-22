@@ -572,6 +572,8 @@ declare class MidiParser {
     createTimeLine(midiSongData: MIDISongData): Zvoog_SongMeasure[];
     convertProject(title: string, comment: string): Zvoog_Project;
     trimProject(project: Zvoog_Project): void;
+    shiftForwar32(): void;
+    shiftBackwar32(project: Zvoog_Project): void;
     isBarEmpty(barIdx: number, project: Zvoog_Project): boolean;
     addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string, tempo: number): void;
     collectDrums(midiTrack: MIDISongTrack): number[];

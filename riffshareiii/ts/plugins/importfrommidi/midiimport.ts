@@ -1981,10 +1981,10 @@ class MidiParser {
 	}
 
 	trimProject(project: Zvoog_Project) {
-		let c32 = 0;
+		let plus32 = 0;
 		let cOther = 0;
 		let c0 = 0;
-		let cPre = 0;
+		let minus32 = 0;
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let track = project.tracks[tt];
 			for (let mm = 0; mm < track.measures.length; mm++) {
@@ -1994,11 +1994,11 @@ class MidiParser {
 					let chord = measure.chords[cc];
 					//let chordSkip = MMUtil().set(chord.skip);
 					if (chord.skip.count == 1 && chord.skip.part == 32) {
-						c32++;
+						plus32++;
 					} else {
 						if (chord.skip.count == 0) { c0++; } else {
 							if (meme.minus({ count: 1, part: 32 }).equals(chord.skip)) {
-								cPre++;
+								minus32++;
 							} else {
 								cOther++;
 							}
@@ -2007,7 +2007,10 @@ class MidiParser {
 				}
 			}
 		}
-		console.log('trimProject pre/0/32/other', cPre, c0, c32, cOther);
+		console.log('trimProject pre/0/32/other', minus32, c0, plus32, cOther);
+		if(minus32 && c0/minus32<0.5){
+this.shiftBackwar32(project);
+		}
 
 		let len = project.timeline.length;
 		for (let ii = len - 1; ii > 0; ii--) {
@@ -2019,6 +2022,33 @@ class MidiParser {
 			}
 		}
 
+	}
+	shiftForwar32() {
+
+	}
+	shiftBackwar32(project: Zvoog_Project) {
+		console.log('shiftBackwar32');
+		for (let tt = 0; tt < project.tracks.length; tt++) {
+			let track = project.tracks[tt];
+			for (let mm = 0; mm < track.measures.length; mm++) {
+				let measure = track.measures[mm];
+				for (let cc = 0; cc < measure.chords.length; cc++) {
+					let chord = measure.chords[cc];
+					chord.skip = MMUtil().set(chord.skip).minus({ count: 1, part: 32 }).simplyfy();
+				}
+			}
+		}
+		for (let ss = 0; ss < project.percussions.length; ss++) {
+			let sampleTrack = project.percussions[ss];
+			for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
+				let measure = sampleTrack.measures[mm];
+				for (let mp = 0; mp < measure.skips.length; mp++) {
+					let newSkip = MMUtil().set(measure.skips[mp]).minus({ count: 1, part: 32 }).simplyfy();
+					measure.skips[mp].count = newSkip.count;
+					measure.skips[mp].part = newSkip.part;
+				}
+			}
+		}
 	}
 	isBarEmpty(barIdx: number, project: Zvoog_Project): boolean {
 		for (let tt = 0; tt < project.tracks.length; tt++) {
@@ -2101,7 +2131,8 @@ class MidiParser {
 			//, filters: []
 			, performer: {
 				id: 'p' + Math.random(), data: '', kind: '', outputs: [outputId]
-				, iconPosition: { x: top* 2, y: top }			}
+				, iconPosition: { x: top * 2, y: top }
+			}
 			, volume: volume
 		};
 		let mm = MMUtil();
@@ -2197,7 +2228,7 @@ class MidiParser {
 			//, filters: []
 			, sampler: {
 				id: 'd' + Math.random(), data: '', kind: '', outputs: [outputId]
-				, iconPosition: { x: top * 1.5, y: top /2}
+				, iconPosition: { x: top * 1.5, y: top / 2 }
 			}
 			, volume: volume
 		};

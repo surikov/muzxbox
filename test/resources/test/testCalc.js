@@ -1293,6 +1293,9 @@ function addTails() {
     //dumpInfo2('statred', padLen(''+(0+begin)+':'+end+'('+(rowLen-end-1)+'): min:',20)+lbl);
     dumpInfo2('statred', padLen('' + padLen('' + (0 + begin), 2) + ':' + padLen('' + end, 2) + '(' + padLen('' + (rowLen - end - 1), 2) + '): min:', 20) + lbl);
     //console.log(mindata,mxdata);
+    var minDist = 99;
+    var summDist = 0;
+    var maxDist = -1;
     var purpleiff = padLen('', 21);
     for (var kk = 0; kk < mxdata.length; kk++) {
         var dist = 0;
@@ -1304,8 +1307,14 @@ function addTails() {
             }
         }
         purpleiff = purpleiff + padLen((dist > 0 ? '+' : '') + dist, 4);
+        summDist = summDist + Math.abs(dist);
+        if (minDist > Math.abs(dist))
+            minDist = Math.abs(dist);
+        if (maxDist < Math.abs(dist))
+            maxDist = Math.abs(dist);
     }
-    var rediff = padLen('', 21);
+    var avgDist = Math.round(summDist / mindata.length);
+    var rediff = padLen('' + minDist + '/' + avgDist + '/' + maxDist, 21);
     for (var kk = 0; kk < mindata.length; kk++) {
         var dist = 0;
         for (var xx = 0; xx < mxdata.length; xx++) {

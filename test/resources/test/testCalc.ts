@@ -403,14 +403,14 @@ function calculateBallFrequency(rowNum: number, rows: BallsRow[]): { ball: numbe
 			}
 			one.summ++;
 		}
-		let cntbl=1;
+		let cntbl = 1;
 		for (var rr = rowNum + 1; rr < rowNum + 1 + 50; rr++) {
 			if (ballExists(nn + 1, rows[rr])) {
 				cntbl++;
 			}
 		}
-		
-		one.logr = one.summ+1/cntbl;
+
+		one.logr = one.summ + 1 / cntbl;
 		//one.summ=one.summ;+1/nn;
 	}
 	//console.log('calculateBallFrequency',rowNum,resu);
@@ -504,7 +504,7 @@ function countInfo(inrows: BallsRow[]) {
 	}*/
 }
 function dumpRowFills(inrows: BallsRow[]) {
-	
+
 
 	if (highLightMode == 1) {
 		dumpRowFillsColor(inrows, '#009900cc', 0);
@@ -514,9 +514,9 @@ function dumpRowFills(inrows: BallsRow[]) {
 		dumpRowWaitColor(inrows, '#009900cc', 0);
 		dumpRowFillsColor(inrows, '#00000033', 0);
 	}
-	
-	
-	
+
+
+
 }
 
 function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
@@ -559,18 +559,18 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 			if (ballExists(first[kk].ball, rows[rr])) {
 				if (showFirstRow || rr > 0) {
 					//lbl = lbl + padLen('[' + first[kk].ball+']',4);
-					lbl = lbl + '[' +pad0( ''+first[kk].ball,2)+']';
+					lbl = lbl + '[' + pad0('' + first[kk].ball, 2) + ']';
 					end = kk;
 					if (begin == -1) {
 						begin = kk;
 					}
 				} else {
 					//lbl = lbl + padLen(' ' + first[kk].ball,4);
-					lbl = lbl + ' '+pad0('' + first[kk].ball,2)+' ';
+					lbl = lbl + ' ' + pad0('' + first[kk].ball, 2) + ' ';
 				}
 			} else {
 				//lbl = lbl +padLen(' ' + first[kk].ball,4);
-				lbl = lbl + ' '+pad0('' + first[kk].ball,2)+' ';
+				lbl = lbl + ' ' + pad0('' + first[kk].ball, 2) + ' ';
 			}
 		}
 		for (let kk = 0; kk < first.length; kk++) {
@@ -583,7 +583,7 @@ function dumpRowWaitColor(rows: BallsRow[], color: string, shiftX: number) {
 				}
 			}
 		}
-		lbl = padLen('' + padLen(''+begin,2) + ':' + padLen(''+end,2) + '(' + padLen(''+(rowLen - end - 1),2) + '): grey',20) + lbl;
+		lbl = padLen('' + padLen('' + begin, 2) + ':' + padLen('' + end, 2) + '(' + padLen('' + (rowLen - end - 1), 2) + '): grey', 20) + lbl;
 		if (rr == 0) {
 
 			//console.log(lbl);
@@ -688,18 +688,18 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 			if (ballExists(first[kk].ball, rows[rr])) {
 				if (showFirstRow || rr > 0) {
 					//lbl = lbl + padLen('[' + first[kk].ball+']',4);
-					lbl = lbl + '[' +pad0( ''+first[kk].ball,2)+']';
+					lbl = lbl + '[' + pad0('' + first[kk].ball, 2) + ']';
 					end = kk;
 					if (begin == -1) {
 						begin = kk;
 					}
 				} else {
 					//lbl = lbl + padLen( ' '+first[kk].ball,4);
-					lbl = lbl + ' '+pad0( ''+first[kk].ball,2)+' ';
+					lbl = lbl + ' ' + pad0('' + first[kk].ball, 2) + ' ';
 				}
 			} else {
 				//lbl = lbl +padLen( ' '+first[kk].ball,4);
-				lbl = lbl + ' '+pad0( ''+first[kk].ball,2)+' ';
+				lbl = lbl + ' ' + pad0('' + first[kk].ball, 2) + ' ';
 			}
 		}
 		for (let kk = 0; kk < first.length; kk++) {
@@ -712,7 +712,7 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 				}
 			}
 		}
-		lbl = padLen('' + padLen(''+begin,2) + ':' + padLen(''+end,2) + '(' + padLen(''+(rowLen - end - 1),2) + '): green',20) + lbl;
+		lbl = padLen('' + padLen('' + begin, 2) + ':' + padLen('' + end, 2) + '(' + padLen('' + (rowLen - end - 1), 2) + '): green', 20) + lbl;
 		//console.log(lbl);
 		if (rr == 0) {
 			dumpInfo2('statgreen', lbl);
@@ -733,30 +733,30 @@ function dumpRowFillsColor(rows: BallsRow[], color: string, shiftX: number) {
 			greenStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
 		}
 
-/*
-		if (rr == 0) {
-
-			for (let bb = 0; bb < rowLen; bb++) {
-				let hh = (mx - min - (ballFills[bb].summ - min)) / hr;
-				let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
-				let toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
-				markLines.push({
-					fromX: bb + shiftX - 1
-					, fromY: fromY //skipRowsCount + 0 + prehh
-					, toX: bb + shiftX
-					, toY: toY //skipRowsCount + hh - 0
-					, color: color, manual: false
-				});
-				markLines.push({
-					fromX: bb + shiftX - 1 + rowLen
-					, fromY: fromY //skipRowsCount + 0 + prehh
-					, toX: bb + shiftX + rowLen
-					, toY: toY //skipRowsCount + hh - 0
-					, color: color, manual: false
-				});
-				prehh = hh;
-			}
-		}*/
+		/*
+				if (rr == 0) {
+		
+					for (let bb = 0; bb < rowLen; bb++) {
+						let hh = (mx - min - (ballFills[bb].summ - min)) / hr;
+						let fromY = Math.round((topShift) / cellSize) + skipRowsCount + 0 - prehh - 2;
+						let toY = Math.round((topShift) / cellSize) + skipRowsCount - hh - 0 - 2;
+						markLines.push({
+							fromX: bb + shiftX - 1
+							, fromY: fromY //skipRowsCount + 0 + prehh
+							, toX: bb + shiftX
+							, toY: toY //skipRowsCount + hh - 0
+							, color: color, manual: false
+						});
+						markLines.push({
+							fromX: bb + shiftX - 1 + rowLen
+							, fromY: fromY //skipRowsCount + 0 + prehh
+							, toX: bb + shiftX + rowLen
+							, toY: toY //skipRowsCount + hh - 0
+							, color: color, manual: false
+						});
+						prehh = hh;
+					}
+				}*/
 
 	}
 	//console.log('greenStat', greenStat);
@@ -789,9 +789,9 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		let first = calcs.map((x) => x);
 		let lbl = "";
 		first.sort((aa, bb) => { return aa.logr - bb.logr; });
-		
+
 		//console.log(first);
-		
+
 		if (rr == 0) {
 			sortedBlue = [];
 			for (let ff = 0; ff < first.length; ff++) {
@@ -814,9 +814,9 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			}*/
 			if (ballExists(first[kk].ball, rows[rr])) {
 				if (showFirstRow || rr > 0) {
-					
+
 					//lbl =  padLen( '[' + first[kk].ball+']',4)+lbl;
-					lbl =  '[' +pad0( ''+first[kk].ball,2)+']'+lbl;
+					lbl = '[' + pad0('' + first[kk].ball, 2) + ']' + lbl;
 					end = kk;
 					if (begin == -1) {
 						begin = kk;
@@ -824,14 +824,14 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 				} else {
 					//lbl = lbl + ' ' + first[kk].ball;
 					//lbl =  padLen( ' '+first[kk].ball,4)+lbl;
-					lbl =  ' '+pad0( ''+first[kk].ball,2)+' '+lbl;
+					lbl = ' ' + pad0('' + first[kk].ball, 2) + ' ' + lbl;
 				}
 			} else {
 				//lbl = lbl + ' ' + first[kk].ball;
 				//lbl =  padLen( ' '+first[kk].ball,4)+lbl;
-				lbl =  ' '+pad0( ''+first[kk].ball,2)+' '+lbl;
+				lbl = ' ' + pad0('' + first[kk].ball, 2) + ' ' + lbl;
 			}
-			
+
 		}
 		for (let kk = 0; kk < first.length; kk++) {
 			if (ballExists(first[kk].ball, rows[rr])) {
@@ -846,7 +846,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			}
 		}
 		//lbl = '' + begin + ':' + end + '(' + (rowLen - end - 1) + '): ' + lbl;
-		lbl = padLen('' + padLen(''+(rowLen - end - 1),2) + ':' + padLen(''+(rowLen-begin-1),2) + '(' + padLen(''+begin,2) + '): blue ' ,20)+ lbl;
+		lbl = padLen('' + padLen('' + (rowLen - end - 1), 2) + ':' + padLen('' + (rowLen - begin - 1), 2) + '(' + padLen('' + begin, 2) + '): blue ', 20) + lbl;
 		if (rr == 0) {
 			//let middle=(first[first.length-1].summ-first[0].summ)/2+first[0].summ;
 			//console.log(lbl,first,middle);
@@ -862,15 +862,15 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		//if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
 
 		if (showFirstRow || rr > 0) {
-			let x2=xxx + (rowLen - 1) / 2;
+			let x2 = xxx + (rowLen - 1) / 2;
 			let blue2 = '#3333ff33';
-			markLines.push({ fromX: x2, fromY: yyy, toX: x2- begin2 / 2, toY: yyy, color: blue2, manual: false });
-			markLines.push({ fromX: xxx, fromY: yyy, toX: x2  - end2 / 2, toY: yyy, color: blue2, manual: false });
+			markLines.push({ fromX: x2, fromY: yyy, toX: x2 - begin2 / 2, toY: yyy, color: blue2, manual: false });
+			markLines.push({ fromX: xxx, fromY: yyy, toX: x2 - end2 / 2, toY: yyy, color: blue2, manual: false });
 			//markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: blue2, manual: false });
 			//markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue2, manual: false });
 			let blue = '#3333ffff';
-			markLines.push({ fromX: x2, fromY: yyy, toX: x2- begin / 2, toY: yyy, color: blue, manual: false });
-			markLines.push({ fromX: xxx, fromY: yyy, toX: x2  - end / 2, toY: yyy, color: blue, manual: false });
+			markLines.push({ fromX: x2, fromY: yyy, toX: x2 - begin / 2, toY: yyy, color: blue, manual: false });
+			markLines.push({ fromX: xxx, fromY: yyy, toX: x2 - end / 2, toY: yyy, color: blue, manual: false });
 			//markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: blue, manual: false });
 			//markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: blue, manual: false });
 			blueStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
@@ -897,10 +897,10 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			let red = '#ff3333ff';
 			let red2 = '#ff333333';
 			//if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
-			markLines.push({ fromX: xxx, fromY: yyy				, toX: xxx + begin2 / 2, toY: yyy, color: red2, manual: false });
-			markLines.push({ fromX: xxx + end2 / 2, fromY: yyy	, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red2, manual: false });
-			markLines.push({ fromX: xxx, fromY: yyy				, toX: xxx + begin / 2, toY: yyy, color: red, manual: false });
-			markLines.push({ fromX: xxx + end / 2, fromY: yyy	, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red, manual: false });
+			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: red2, manual: false });
+			markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red2, manual: false });
+			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: red, manual: false });
+			markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red, manual: false });
 			//console.log('red');
 			redStat.push({ row: rr, left: begin, right: rowLen - end - 1 });
 		}
@@ -924,7 +924,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 				, cellSize
 				, cellSize //- 0.1
 				, color);
-			
+
 		}
 		/*if ( rr == 0) {
 			
@@ -954,7 +954,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 	//console.log('redStat', redStat);
 	//dumpColorStat();
 	//dumpStat3();
-	
+
 }
 /*
 function dumpAvgFromAvg(){
@@ -1254,49 +1254,49 @@ function sobstvennoe(balls: number[]): number {
 	if (r0 < 2) r0 = -(pre[1] + pre[0]);
 	return r0;
 }
-function padLen(txt:string,sz:number){
-	let len=txt.length;
-	let add=0;
-	if(len<sz){
-		add=sz-len;
+function padLen(txt: string, sz: number) {
+	let len = txt.length;
+	let add = 0;
+	if (len < sz) {
+		add = sz - len;
 	}
-	let rez=txt;
-	for(let ii=0;ii<add;ii++){
-		rez=rez+' ';
+	let rez = txt;
+	for (let ii = 0; ii < add; ii++) {
+		rez = rez + ' ';
 	}
 	//console.log(rez,add);
 	return rez;
 }
-function pad0(txt:string,sz:number){
-	let len=txt.length;
-	let add=0;
-	if(len<sz){
-		add=sz-len;
+function pad0(txt: string, sz: number) {
+	let len = txt.length;
+	let add = 0;
+	if (len < sz) {
+		add = sz - len;
 	}
-	let rez='';
-	for(let ii=0;ii<add;ii++){
-		rez=rez+'0';
+	let rez = '';
+	for (let ii = 0; ii < add; ii++) {
+		rez = rez + '0';
 	}
-	rez=rez+txt;
+	rez = rez + txt;
 	//console.log(rez,add);
 	return rez;
 }
-function resetNumbs(){
-	let lbl=' ';
-	for(let ii=0;ii<rowLen;ii++){
-		lbl=lbl+pad0(''+(1+ii),2);
-		lbl=lbl+'  ';
+function resetNumbs() {
+	let lbl = ' ';
+	for (let ii = 0; ii < rowLen; ii++) {
+		lbl = lbl + pad0('' + (1 + ii), 2);
+		lbl = lbl + '  ';
 	}
-	dumpInfo2('statnums', padLen('',20)+lbl);
+	dumpInfo2('statnums', padLen('', 20) + lbl);
 }
 function addTails() {
 	clearNonManual();
 	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
 	dumpRowFills(slicedrows);
 	fillCells();
-	
-	let mxdata:{ball:number,mx:number}[]=[];
-	let mindata:{ball:number,min:number}[]=[];
+
+	let mxdata: { ball: number, mx: number }[] = [];
+	let mindata: { ball: number, min: number }[] = [];
 	for (let ii = 0; ii < rowLen; ii++) {
 		let blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
 		let green = sortedGreen.indexOf(ii + 1);
@@ -1304,89 +1304,97 @@ function addTails() {
 		let blueGreenDiff = Math.abs(blue - green);
 		let greenBlackDiff = Math.abs(green - black);
 		let blackBlueDiff = Math.abs(black - blue);
-		let mx=Math.max(blueGreenDiff,greenBlackDiff,blackBlueDiff);
-		mxdata.push({ball:ii+1,mx:mx});
+		let mx = Math.max(blueGreenDiff, greenBlackDiff, blackBlueDiff);
+		mxdata.push({ ball: ii + 1, mx: mx });
 		//let avg=Math.round((blue+green+black)/3);
-		let min=Math.min(blueGreenDiff,greenBlackDiff,blackBlueDiff);
-		mindata.push({ball:ii+1,min:min});
+		let min = Math.min(blueGreenDiff, greenBlackDiff, blackBlueDiff);
+		mindata.push({ ball: ii + 1, min: min });
 	}
-	let lbl='';
-	mxdata.sort((a:{ball:number,mx:number},b:{ball:number,mx:number})=>{
-		return a.mx-b.mx;
+	let lbl = '';
+	mxdata.sort((a: { ball: number, mx: number }, b: { ball: number, mx: number }) => {
+		return a.mx - b.mx;
 	});
 	let begin = -1;
 	let end = -1;
 	for (let kk = 0; kk < mxdata.length; kk++) {
-			if (ballExists(mxdata[kk].ball, slicedrows[0])) {
-				if (showFirstRow ) {
-					//lbl = lbl + padLen('[' + mxdata[kk].ball+']',4);
-					lbl = lbl + '[' +pad0( ''+mxdata[kk].ball,2)+']';
-					end = kk;
-					if (begin == -1) {
-						begin = kk;
-					}
-				} else {
-					//lbl = lbl + padLen( ' '+mxdata[kk].ball,4);
-					lbl = lbl + ' '+pad0( ''+mxdata[kk].ball,2)+' ';
+		if (ballExists(mxdata[kk].ball, slicedrows[0])) {
+			if (showFirstRow) {
+				//lbl = lbl + padLen('[' + mxdata[kk].ball+']',4);
+				lbl = lbl + '[' + pad0('' + mxdata[kk].ball, 2) + ']';
+				end = kk;
+				if (begin == -1) {
+					begin = kk;
 				}
 			} else {
-				//lbl = lbl +padLen( ' '+mxdata[kk].ball,4);
-				lbl = lbl + ' '+pad0( ''+mxdata[kk].ball,2)+' ';
+				//lbl = lbl + padLen( ' '+mxdata[kk].ball,4);
+				lbl = lbl + ' ' + pad0('' + mxdata[kk].ball, 2) + ' ';
 			}
+		} else {
+			//lbl = lbl +padLen( ' '+mxdata[kk].ball,4);
+			lbl = lbl + ' ' + pad0('' + mxdata[kk].ball, 2) + ' ';
 		}
-	dumpInfo2('statpurple', padLen(''+padLen(''+(0+begin),2)+':'+padLen(''+end,2)+'('+padLen(''+(rowLen-end-1),2)+'): mx:',20)+lbl);
-	
-	lbl='';
-	mindata.sort((a:{ball:number,min:number},b:{ball:number,min:number})=>{
-		return a.min-b.min;
+	}
+	dumpInfo2('statpurple', padLen('' + padLen('' + (0 + begin), 2) + ':' + padLen('' + end, 2) + '(' + padLen('' + (rowLen - end - 1), 2) + '): mx:', 20) + lbl);
+
+	lbl = '';
+	mindata.sort((a: { ball: number, min: number }, b: { ball: number, min: number }) => {
+		return a.min - b.min;
 	});
 	begin = -1;
 	end = -1;
 	for (let kk = 0; kk < mindata.length; kk++) {
-			if (ballExists(mindata[kk].ball, slicedrows[0])) {
-				if (showFirstRow ) {
-					//lbl = lbl + padLen('[' + mindata[kk].ball+']',4);
-					lbl = lbl + '[' +pad0( ''+mindata[kk].ball,2)+']';
-					end = kk;
-					if (begin == -1) {
-						begin = kk;
-					}
-				} else {
-					//lbl = lbl + padLen( ' '+mindata[kk].ball,4);
-					lbl = lbl + ' '+pad0( ''+mindata[kk].ball,2)+' ';
+		if (ballExists(mindata[kk].ball, slicedrows[0])) {
+			if (showFirstRow) {
+				//lbl = lbl + padLen('[' + mindata[kk].ball+']',4);
+				lbl = lbl + '[' + pad0('' + mindata[kk].ball, 2) + ']';
+				end = kk;
+				if (begin == -1) {
+					begin = kk;
 				}
 			} else {
-				//lbl = lbl +padLen( ' '+mindata[kk].ball,4);
-				lbl = lbl + ' '+pad0( ''+mindata[kk].ball,2)+' ';
+				//lbl = lbl + padLen( ' '+mindata[kk].ball,4);
+				lbl = lbl + ' ' + pad0('' + mindata[kk].ball, 2) + ' ';
 			}
+		} else {
+			//lbl = lbl +padLen( ' '+mindata[kk].ball,4);
+			lbl = lbl + ' ' + pad0('' + mindata[kk].ball, 2) + ' ';
 		}
+	}
 	//dumpInfo2('statred', padLen(''+(0+begin)+':'+end+'('+(rowLen-end-1)+'): min:',20)+lbl);
-	dumpInfo2('statred', padLen(''+padLen(''+(0+begin),2)+':'+padLen(''+end,2)+'('+padLen(''+(rowLen-end-1),2)+'): min:',20)+lbl);
+	dumpInfo2('statred', padLen('' + padLen('' + (0 + begin), 2) + ':' + padLen('' + end, 2) + '(' + padLen('' + (rowLen - end - 1), 2) + '): min:', 20) + lbl);
 
 	//console.log(mindata,mxdata);
-	let purpleiff=padLen('',21);
+	let minDist = 99;
+	let summDist = 0;
+	let maxDist = -1;
+	let purpleiff = padLen('', 21);
 	for (let kk = 0; kk < mxdata.length; kk++) {
-		let dist=0;
-		for(let xx=0;xx<mindata.length;xx++){
+		let dist = 0;
+		for (let xx = 0; xx < mindata.length; xx++) {
 			//console.log(mindata[xx].ball,mxdata[kk].ball);
-			if(mindata[xx].ball==mxdata[kk].ball){
-				dist=xx-kk;
+			if (mindata[xx].ball == mxdata[kk].ball) {
+				dist = xx - kk;
 				break;
 			}
 		}
-		purpleiff=purpleiff+padLen((dist>0?'+':'')+dist,4);
+		purpleiff = purpleiff + padLen((dist > 0 ? '+' : '') + dist, 4);
+		summDist = summDist + Math.abs(dist);
+		if (minDist > Math.abs(dist)) minDist = Math.abs(dist);
+		if (maxDist < Math.abs(dist)) maxDist = Math.abs(dist);
 	}
-	let rediff=padLen('',21);
+	let avgDist = Math.round(summDist / mindata.length);
+
+	let rediff = padLen('' + minDist + '/' + avgDist + '/' + maxDist, 21);
 	for (let kk = 0; kk < mindata.length; kk++) {
-		let dist=0;
-		for(let xx=0;xx<mxdata.length;xx++){
+		let dist = 0;
+		for (let xx = 0; xx < mxdata.length; xx++) {
 			//console.log(mindata[xx].ball,mxdata[kk].ball);
-			if(mxdata[xx].ball==mindata[kk].ball){
-				dist=xx-kk;
+			if (mxdata[xx].ball == mindata[kk].ball) {
+				dist = xx - kk;
 				break;
 			}
 		}
-		rediff=rediff+padLen((dist>0?'+':'')+dist,4);
+		rediff = rediff + padLen((dist > 0 ? '+' : '') + dist, 4);
 	}
 	var span: HTMLElement = (document.getElementById('infopurple') as any) as HTMLElement;
 	span.innerText = purpleiff;
@@ -1409,16 +1417,16 @@ function addTails() {
 	//dumpPairsPatterns();
 }
 
-function dumpStat123(label:string,stat: StatBeginEnd[]){
-	let absLeft=0;
-	let absRight=0;
-	for(let kk=1;kk<stat.length-1;kk++){
-		absLeft=absLeft+Math.abs(stat[kk+0].right-stat[kk+1].right);
+function dumpStat123(label: string, stat: StatBeginEnd[]) {
+	let absLeft = 0;
+	let absRight = 0;
+	for (let kk = 1; kk < stat.length - 1; kk++) {
+		absLeft = absLeft + Math.abs(stat[kk + 0].right - stat[kk + 1].right);
 	}
-	for(let kk=1;kk<stat.length-1;kk++){
-		absRight=absRight+Math.abs(stat[kk+0].left-stat[kk+1].left);
+	for (let kk = 1; kk < stat.length - 1; kk++) {
+		absRight = absRight + Math.abs(stat[kk + 0].left - stat[kk + 1].left);
 	}
-	console.log(label,absLeft/stat.length,absRight/stat.length);
+	console.log(label, absLeft / stat.length, absRight / stat.length);
 }
 
 /*
@@ -1452,12 +1460,12 @@ function drawTestLinesLeft(data: { ball: number, color: string }[]) {
 }
 */
 function addTestLines1(data: { ball: number, color: string }[]) {
-	let bas=19;
+	let bas = 19;
 	for (let ii = 0; ii < data.length; ii++) {
-	//for (let ii = data.length-1; ii >= 0; ii--) {
+		//for (let ii = data.length-1; ii >= 0; ii--) {
 		markLines.push({
 			fromX: data[ii].ball - 1
-			, fromY: skipRowsCount + 0.85*(bas/data.length*ii)
+			, fromY: skipRowsCount + 0.85 * (bas / data.length * ii)
 			, toX: data[ii].ball - 1
 			, toY: skipRowsCount + bas
 			, color: data[ii].color, manual: true
@@ -1465,12 +1473,12 @@ function addTestLines1(data: { ball: number, color: string }[]) {
 	}
 }
 function addTestLines2(data: { ball: number, color: string }[]) {
-	let bas=19;
+	let bas = 19;
 	for (let ii = 0; ii < data.length; ii++) {
-	//for (let ii = data.length-1; ii >= 0; ii--) {
+		//for (let ii = data.length-1; ii >= 0; ii--) {
 		markLines.push({
 			fromX: data[ii].ball - 1
-			, fromY: skipRowsCount + 0.85*(bas-bas/data.length*ii)
+			, fromY: skipRowsCount + 0.85 * (bas - bas / data.length * ii)
 			, toX: data[ii].ball - 1
 			, toY: skipRowsCount + bas
 			, color: data[ii].color, manual: true
@@ -1482,7 +1490,7 @@ function testTest() {
 	let yyy = rowsVisibleCount + 22 + skipRowsCount - 1;
 	console.log('TESTtEST', sortedBlue, sortedGreen, sortedGrey);
 	let rightBlue = Math.ceil(0 * rowLen / 2);
-	let leftBlue = Math.ceil(1 * rowLen / 2)-1;
+	let leftBlue = Math.ceil(1 * rowLen / 2) - 1;
 	//let leftBlue = Math.ceil(0 * rowLen / 2);
 	//let rightBlue = Math.ceil(1 * rowLen / 2) - 1;
 	let leftGreen = Math.ceil(1 * rowLen / 2);
@@ -1561,12 +1569,12 @@ function testTest() {
 				console.log('rightGrey', nn, data);
 				addTestLines2(data);
 			}
-			
+
 			if (line.fromX == leftRed || line.toX == leftRed) {
 				let nn = 2 * Math.abs(line.fromX - line.toX);
 				let data: { ball: number, color: string }[] = [];
 				for (let rr = 0; rr < nn; rr++) {
-					let kk: number = rr ;
+					let kk: number = rr;
 					data.push({ ball: 1 + kk, color: '#ff000099' });
 				}
 				console.log('leftRed', nn, data);
@@ -1576,7 +1584,7 @@ function testTest() {
 				let nn = 2 * Math.abs(line.fromX - line.toX);
 				let data: { ball: number, color: string }[] = [];
 				for (let rr = 0; rr < nn; rr++) {
-					let kk: number = rowLen - rr-1;
+					let kk: number = rowLen - rr - 1;
 					data.push({ ball: 1 + kk, color: '#ff000099' });
 				}
 				console.log('rightRed', nn, data);
@@ -1605,22 +1613,22 @@ function dumpLeftStat(){
 		console.log(ii,procnt,itg);
 	}
 */
-	/*
-	let sngl=0;
-	let grp=0;
-	for(let ii=1;ii<datarows.length-5;ii++){
-		let kk=datarows[ii].balls[0];
-		if(kk>20){
-			if(datarows[ii+1].balls[0]<8){
-				sngl++;
-			}else{
-				grp++;
-			}
+/*
+let sngl=0;
+let grp=0;
+for(let ii=1;ii<datarows.length-5;ii++){
+	let kk=datarows[ii].balls[0];
+	if(kk>20){
+		if(datarows[ii+1].balls[0]<8){
+			sngl++;
+		}else{
+			grp++;
 		}
 	}
-	console.log('single',sngl,'group',grp);
-	*/
-	
+}
+console.log('single',sngl,'group',grp);
+*/
+
 //}
 /*
 function dumpPatternStat(){
@@ -1648,58 +1656,58 @@ function dumpStat5(){
 */
 /*
 function countHoles(datarows:BallsRow[],longe:number){
-    let avg=0;
-    for(let rr=1;rr<datarows.length;rr++){
-        let row:BallsRow=datarows[rr];
-        //console.log(row);
-        let rowCount=0;
-        for(let bb=1;bb<=rowLen;bb++){
-            //console.log(bb);
-            let hole=true;
-            for(let kk=0;kk<longe;kk++){
-                //console.log(kk);
-                if(ballExists(bb+kk,row)){//console.log('exists',bb+kk);
-                    hole=false;
-                    break;
-                }//else console.log('not exists',bb+kk);
-            }
-            if(hole){
-                rowCount++;
-            }
-        }
-        avg=avg+rowCount/rowLen;
-    }
-    console.log('empty duration more or equal',longe,'average count',avg/(datarows.length-1));
+	let avg=0;
+	for(let rr=1;rr<datarows.length;rr++){
+		let row:BallsRow=datarows[rr];
+		//console.log(row);
+		let rowCount=0;
+		for(let bb=1;bb<=rowLen;bb++){
+			//console.log(bb);
+			let hole=true;
+			for(let kk=0;kk<longe;kk++){
+				//console.log(kk);
+				if(ballExists(bb+kk,row)){//console.log('exists',bb+kk);
+					hole=false;
+					break;
+				}//else console.log('not exists',bb+kk);
+			}
+			if(hole){
+				rowCount++;
+			}
+		}
+		avg=avg+rowCount/rowLen;
+	}
+	console.log('empty duration more or equal',longe,'average count',avg/(datarows.length-1));
 }
 
 function dumpHoleStat(){
-    let dataBalls = window[dataName];
+	let dataBalls = window[dataName];
 	let datarows:BallsRow[]  = readParseStat(dataBalls);
-    console.log(datarows);
+	console.log(datarows);
 	console.log('countHoles');
-    countHoles(datarows,1);
-    countHoles(datarows,2);
-    countHoles(datarows,3);
-    countHoles(datarows,4);
-    countHoles(datarows,5);
-    countHoles(datarows,6);
-    countHoles(datarows,7);
-    countHoles(datarows,8);
-    countHoles(datarows,9);
-    countHoles(datarows,10);
-    countHoles(datarows,11);
-    countHoles(datarows,12);
-    countHoles(datarows,13);
-    countHoles(datarows,14);
-    countHoles(datarows,15);
-    countHoles(datarows,16);
-    countHoles(datarows,17);
-    countHoles(datarows,18);
-    countHoles(datarows,19);
-    countHoles(datarows,20);
-    countHoles(datarows,21);
-    countHoles(datarows,22);
-    countHoles(datarows,23);
+	countHoles(datarows,1);
+	countHoles(datarows,2);
+	countHoles(datarows,3);
+	countHoles(datarows,4);
+	countHoles(datarows,5);
+	countHoles(datarows,6);
+	countHoles(datarows,7);
+	countHoles(datarows,8);
+	countHoles(datarows,9);
+	countHoles(datarows,10);
+	countHoles(datarows,11);
+	countHoles(datarows,12);
+	countHoles(datarows,13);
+	countHoles(datarows,14);
+	countHoles(datarows,15);
+	countHoles(datarows,16);
+	countHoles(datarows,17);
+	countHoles(datarows,18);
+	countHoles(datarows,19);
+	countHoles(datarows,20);
+	countHoles(datarows,21);
+	countHoles(datarows,22);
+	countHoles(datarows,23);
 }
 */
 /*
@@ -1741,50 +1749,50 @@ function dumpStat3() {
 	
 }
 */
-function dumpStat22(){
+function dumpStat22() {
 	console.log('dumpStat22');
 	let counts: number[] = [];
 	for (let ii = 1; ii < datarows.length - 3; ii++) {
-		let idx=datarows[ii+0].balls[0];
-		if(idx){
-			if(!(counts[idx])){
-				counts[idx]=0;
+		let idx = datarows[ii + 0].balls[0];
+		if (idx) {
+			if (!(counts[idx])) {
+				counts[idx] = 0;
 			}
 			counts[idx]++;
 		}
 	}
 	let itog: number[] = [];
-	for(let ii=counts.length-2;ii>0;ii--){
-		itog[ii]=Math.round(100*counts[ii]/datarows.length)+((itog[ii+1])?itog[ii+1]:0);
+	for (let ii = counts.length - 2; ii > 0; ii--) {
+		itog[ii] = Math.round(100 * counts[ii] / datarows.length) + ((itog[ii + 1]) ? itog[ii + 1] : 0);
 	}
-	console.log(counts,itog);
+	console.log(counts, itog);
 	console.log(datarows.length);
 }
-function diffPart(a:number,b:number):number{
-	if(a>b){
-		return a/b;
-	}else{
-		return b/a;
+function diffPart(a: number, b: number): number {
+	if (a > b) {
+		return a / b;
+	} else {
+		return b / a;
 	}
 }
-function dumpPairsPatterns(){
-	console.log('dumpPairsPatterns',datarows);//,skipRowsCount,redStat);
-	let calcLen=7;
-	
-	for(let lop=1;lop<5000;lop++){
+function dumpPairsPatterns() {
+	console.log('dumpPairsPatterns', datarows);//,skipRowsCount,redStat);
+	let calcLen = 7;
+
+	for (let lop = 1; lop < 5000; lop++) {
 		//console.log('---',lop,datarows[lop].balls);
-		for(let kk=1;kk<datarows.length-calcLen;kk++){
-			if(lop!=kk){
-				let smm=0;
-				for(let ii=0;ii<calcLen;ii++){
-					let a=datarows[ii+lop].balls[0];
-					let b=datarows[ii+kk].balls[0];
-					let dp=diffPart(a,b);
+		for (let kk = 1; kk < datarows.length - calcLen; kk++) {
+			if (lop != kk) {
+				let smm = 0;
+				for (let ii = 0; ii < calcLen; ii++) {
+					let a = datarows[ii + lop].balls[0];
+					let b = datarows[ii + kk].balls[0];
+					let dp = diffPart(a, b);
 					//console.log(ii,':',a,b,'=',dp);
-					smm=smm+dp;
+					smm = smm + dp;
 				}
-				if(smm/calcLen<1.25){
-					console.log(lop,datarows[lop-1].balls[0],datarows[kk-1].balls[0],':',kk,smm/calcLen);
+				if (smm / calcLen < 1.25) {
+					console.log(lop, datarows[lop - 1].balls[0], datarows[kk - 1].balls[0], ':', kk, smm / calcLen);
 				}
 			}
 		}
