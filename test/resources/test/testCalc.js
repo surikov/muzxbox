@@ -1235,7 +1235,13 @@ function addTails() {
         mxdata.push({ ball: ii + 1, mx: mx });
         //let avg=Math.round((blue+green+black)/3);
         var min = Math.min(blueGreenDiff, greenBlackDiff, blackBlueDiff);
-        mindata.push({ ball: ii + 1, min: min });
+        mindata.push({ ball: ii + 1, min: min, diff: 0 });
+        //if(showFirstRow){
+        //console.log(mindata[0].ball, slicedrows[0]);
+        if (ballExists(mindata[mindata.length - 1].ball, slicedrows[0])) {
+            mindata[mindata.length - 1].exists = true;
+        }
+        //}
     }
     var lbl = '';
     mxdata.sort(function (a, b) {
@@ -1292,7 +1298,6 @@ function addTails() {
     }
     //dumpInfo2('statred', padLen(''+(0+begin)+':'+end+'('+(rowLen-end-1)+'): min:',20)+lbl);
     dumpInfo2('statred', padLen('' + padLen('' + (0 + begin), 2) + ':' + padLen('' + end, 2) + '(' + padLen('' + (rowLen - end - 1), 2) + '): min:', 20) + lbl);
-    //console.log(mindata,mxdata);
     var minDist = 99;
     var summDist = 0;
     var maxDist = -1;
@@ -1325,11 +1330,17 @@ function addTails() {
             }
         }
         rediff = rediff + padLen((dist > 0 ? '+' : '') + dist, 4);
+        mindata[kk].diff = dist;
     }
     var span = document.getElementById('infopurple');
     span.innerText = purpleiff;
     span = document.getElementById('infored');
     span.innerText = rediff;
+    mindata.sort(function (a, b) {
+        //console.log(a,b,Math.abs(Math.abs(a.diff) - Math.abs(b.diff)));
+        return Math.abs(a.diff) - Math.abs(b.diff);
+    });
+    console.log('mindata', mindata);
     //console.log(avgdata);
     //for(let ii=0;ii<mindata.length;ii++){
     //	console.log(ii,mindata[ii],mxdata[ii]);

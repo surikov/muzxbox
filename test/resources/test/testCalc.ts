@@ -1296,7 +1296,7 @@ function addTails() {
 	fillCells();
 
 	let mxdata: { ball: number, mx: number }[] = [];
-	let mindata: { ball: number, min: number }[] = [];
+	let mindata: { ball: number, min: number ,exists?:boolean,diff:number}[] = [];
 	for (let ii = 0; ii < rowLen; ii++) {
 		let blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
 		let green = sortedGreen.indexOf(ii + 1);
@@ -1305,10 +1305,16 @@ function addTails() {
 		let greenBlackDiff = Math.abs(green - black);
 		let blackBlueDiff = Math.abs(black - blue);
 		let mx = Math.max(blueGreenDiff, greenBlackDiff, blackBlueDiff);
-		mxdata.push({ ball: ii + 1, mx: mx });
+		mxdata.push({ ball: ii + 1, mx: mx});
 		//let avg=Math.round((blue+green+black)/3);
 		let min = Math.min(blueGreenDiff, greenBlackDiff, blackBlueDiff);
-		mindata.push({ ball: ii + 1, min: min });
+		mindata.push({ ball: ii + 1, min: min ,diff:0 });
+		//if(showFirstRow){
+			//console.log(mindata[0].ball, slicedrows[0]);
+			if(ballExists(mindata[mindata.length-1].ball, slicedrows[0])){
+				mindata[mindata.length-1].exists=true;
+			}
+		//}
 	}
 	let lbl = '';
 	mxdata.sort((a: { ball: number, mx: number }, b: { ball: number, mx: number }) => {
@@ -1363,7 +1369,7 @@ function addTails() {
 	//dumpInfo2('statred', padLen(''+(0+begin)+':'+end+'('+(rowLen-end-1)+'): min:',20)+lbl);
 	dumpInfo2('statred', padLen('' + padLen('' + (0 + begin), 2) + ':' + padLen('' + end, 2) + '(' + padLen('' + (rowLen - end - 1), 2) + '): min:', 20) + lbl);
 
-	//console.log(mindata,mxdata);
+	
 	let minDist = 99;
 	let summDist = 0;
 	let maxDist = -1;
@@ -1395,11 +1401,18 @@ function addTails() {
 			}
 		}
 		rediff = rediff + padLen((dist > 0 ? '+' : '') + dist, 4);
+		mindata[kk].diff=dist;
 	}
 	var span: HTMLElement = (document.getElementById('infopurple') as any) as HTMLElement;
 	span.innerText = purpleiff;
 	span = (document.getElementById('infored') as any) as HTMLElement;
 	span.innerText = rediff;
+	
+	mindata.sort((a: {diff: number }, b: { diff: number }) => {
+		//console.log(a,b,Math.abs(Math.abs(a.diff) - Math.abs(b.diff)));
+		return Math.abs(a.diff) - Math.abs(b.diff);
+	});
+	console.log('mindata',mindata);
 
 	//console.log(avgdata);
 	//for(let ii=0;ii<mindata.length;ii++){
