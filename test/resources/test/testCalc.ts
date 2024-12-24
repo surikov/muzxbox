@@ -1412,7 +1412,7 @@ function addTails() {
 		//console.log(a,b,Math.abs(Math.abs(a.diff) - Math.abs(b.diff)));
 		return Math.abs(a.diff) - Math.abs(b.diff);
 	});
-	console.log('mindata',mindata);
+	//console.log('mindata',mindata);
 
 	//console.log(avgdata);
 	//for(let ii=0;ii<mindata.length;ii++){

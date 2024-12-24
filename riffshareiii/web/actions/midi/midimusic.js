@@ -1538,6 +1538,41 @@ class MidiParser {
         return project;
     }
     trimProject(project) {
+        for (let tt = 0; tt < project.tracks.length; tt++) {
+            let track = project.tracks[tt];
+            for (let mm = 0; mm < track.measures.length; mm++) {
+                let measure = track.measures[mm];
+                for (let cc = 0; cc < measure.chords.length; cc++) {
+                    let chord = measure.chords[cc];
+                    chord.skip = MMUtil().set(chord.skip).strip(32);
+                }
+            }
+        }
+        for (let ss = 0; ss < project.percussions.length; ss++) {
+            let sampleTrack = project.percussions[ss];
+            for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
+                let measure = sampleTrack.measures[mm];
+                for (let mp = 0; mp < measure.skips.length; mp++) {
+                    let newSkip = MMUtil().set(measure.skips[mp]).strip(32);
+                    measure.skips[mp].count = newSkip.count;
+                    measure.skips[mp].part = newSkip.part;
+                }
+            }
+        }
+        this.reShiftSequencer(project);
+        this.reShiftDrums(project);
+        this.cutShift(project);
+        let len = project.timeline.length;
+        for (let ii = len - 1; ii > 0; ii--) {
+            if (this.isBarEmpty(ii, project)) {
+            }
+            else {
+                project.timeline.length = ii + 2;
+                return;
+            }
+        }
+    }
+    reShiftSequencer(project) {
         let plus32 = 0;
         let cOther = 0;
         let c0 = 0;
@@ -1568,31 +1603,88 @@ class MidiParser {
                 }
             }
         }
-        console.log('trimProject pre/0/32/other', minus32, c0, plus32, cOther);
-        if (minus32 && c0 / minus32 < 0.5) {
-            this.shiftBackwar32(project);
+        console.log('reShiftSequencer -32/0/+32/other:', minus32, c0, plus32, cOther);
+        if (plus32 && c0 / plus32 < 0.5) {
+            this.shiftBackwar(32, project);
         }
-        let len = project.timeline.length;
-        for (let ii = len - 1; ii > 0; ii--) {
-            if (this.isBarEmpty(ii, project)) {
-            }
-            else {
-                project.timeline.length = ii + 2;
-                return;
+        else {
+            if (minus32 && c0 / minus32 < 0.5) {
+                this.shiftForwar32(project);
             }
         }
     }
-    shiftForwar32() {
+    reShiftDrums(project) {
+        let plus32 = 0;
+        let cOther = 0;
+        let c0 = 0;
+        let minus32 = 0;
+        for (let tt = 0; tt < project.percussions.length; tt++) {
+            let track = project.percussions[tt];
+            for (let mm = 0; mm < track.measures.length; mm++) {
+                let measure = track.measures[mm];
+                let meme = MMUtil().set(project.timeline[mm].metre);
+                for (let cc = 0; cc < measure.skips.length; cc++) {
+                    let chord = measure.skips[cc];
+                    if (chord.count == 1 && chord.part == 32) {
+                        plus32++;
+                    }
+                    else {
+                        if (chord.count == 0) {
+                            c0++;
+                        }
+                        else {
+                            if (meme.minus({ count: 1, part: 32 }).equals(chord)) {
+                                minus32++;
+                            }
+                            else {
+                                cOther++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        console.log('reShiftDrums -32/0/+32/other:', minus32, c0, plus32, cOther);
+        if (plus32 && c0 / plus32 < 0.5) {
+            this.drumBackwar(32, project);
+        }
+        else {
+            if (minus32 && c0 / minus32 < 0.5) {
+                this.drumForwar32(project);
+            }
+        }
     }
-    shiftBackwar32(project) {
-        console.log('shiftBackwar32');
+    cutShift(project) {
         for (let tt = 0; tt < project.tracks.length; tt++) {
             let track = project.tracks[tt];
             for (let mm = 0; mm < track.measures.length; mm++) {
                 let measure = track.measures[mm];
                 for (let cc = 0; cc < measure.chords.length; cc++) {
                     let chord = measure.chords[cc];
-                    chord.skip = MMUtil().set(chord.skip).minus({ count: 1, part: 32 }).simplyfy();
+                    if (chord.skip.count < 0) {
+                        if (mm > 0) {
+                            let premetre = MMUtil().set(project.timeline[mm - 1].metre);
+                            chord.skip = premetre.plus(chord.skip);
+                            track.measures[mm - 1].chords.push(chord);
+                            track.measures[mm].chords.splice(cc, 1);
+                            cc--;
+                        }
+                        else {
+                            chord.skip.count = 0;
+                        }
+                    }
+                    else {
+                        let metre = MMUtil().set(project.timeline[mm].metre);
+                        if (metre.less(chord.skip)) {
+                            if (mm < project.timeline.length - 1) {
+                                let metre = MMUtil().set(project.timeline[mm + 1].metre);
+                                chord.skip = MMUtil().set(chord.skip).minus(metre);
+                                track.measures[mm + 1].chords.push(chord);
+                                track.measures[mm].chords.splice(cc, 1);
+                                cc--;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1601,7 +1693,83 @@ class MidiParser {
             for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
                 let measure = sampleTrack.measures[mm];
                 for (let mp = 0; mp < measure.skips.length; mp++) {
-                    let newSkip = MMUtil().set(measure.skips[mp]).minus({ count: 1, part: 32 }).simplyfy();
+                    let skip = measure.skips[mp];
+                    if (skip.count < 0) {
+                        if (mm > 0) {
+                            let premetre = MMUtil().set(project.timeline[mm - 1].metre);
+                            let newskip = premetre.plus(skip);
+                            sampleTrack.measures[mm - 1].skips.push(newskip);
+                            measure.skips.splice(mp, 1);
+                            mp--;
+                        }
+                        else {
+                            skip.count = 0;
+                        }
+                    }
+                    else {
+                        let metre = MMUtil().set(project.timeline[mm].metre);
+                        if (metre.less(skip)) {
+                            if (mm < project.timeline.length - 1) {
+                                let metre = MMUtil().set(project.timeline[mm + 1].metre);
+                                let newskip = MMUtil().set(skip).minus(metre);
+                                sampleTrack.measures[mm + 1].skips.push(newskip);
+                                measure.skips.splice(mp, 1);
+                                mp--;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    shiftForwar32(project) {
+        console.log('shiftForwar32');
+        for (let tt = 0; tt < project.tracks.length; tt++) {
+            let track = project.tracks[tt];
+            for (let mm = 0; mm < track.measures.length; mm++) {
+                let measure = track.measures[mm];
+                for (let cc = 0; cc < measure.chords.length; cc++) {
+                    let chord = measure.chords[cc];
+                    chord.skip = MMUtil().set(chord.skip).plus({ count: 1, part: 32 }).simplyfy();
+                }
+            }
+        }
+    }
+    drumForwar32(project) {
+        console.log('drumForwar32');
+        for (let ss = 0; ss < project.percussions.length; ss++) {
+            let sampleTrack = project.percussions[ss];
+            for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
+                let measure = sampleTrack.measures[mm];
+                for (let mp = 0; mp < measure.skips.length; mp++) {
+                    let newSkip = MMUtil().set(measure.skips[mp]).plus({ count: 1, part: 32 }).simplyfy();
+                    measure.skips[mp].count = newSkip.count;
+                    measure.skips[mp].part = newSkip.part;
+                }
+            }
+        }
+    }
+    shiftBackwar(part, project) {
+        console.log('shiftBackwar', part);
+        for (let tt = 0; tt < project.tracks.length; tt++) {
+            let track = project.tracks[tt];
+            for (let mm = 0; mm < track.measures.length; mm++) {
+                let measure = track.measures[mm];
+                for (let cc = 0; cc < measure.chords.length; cc++) {
+                    let chord = measure.chords[cc];
+                    chord.skip = MMUtil().set(chord.skip).minus({ count: 1, part: part }).simplyfy();
+                }
+            }
+        }
+    }
+    drumBackwar(part, project) {
+        console.log('drumBackwar', part);
+        for (let ss = 0; ss < project.percussions.length; ss++) {
+            let sampleTrack = project.percussions[ss];
+            for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
+                let measure = sampleTrack.measures[mm];
+                for (let mp = 0; mp < measure.skips.length; mp++) {
+                    let newSkip = MMUtil().set(measure.skips[mp]).minus({ count: 1, part: part }).simplyfy();
                     measure.skips[mp].count = newSkip.count;
                     measure.skips[mp].part = newSkip.part;
                 }
