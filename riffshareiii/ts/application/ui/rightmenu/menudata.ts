@@ -54,6 +54,12 @@ let menuPointSamplers: MenuInfo = {
 		console.log('samplers');
 	}
 };
+let menuPointUndo: MenuInfo = {
+	text: 'localMenuUndoFolder'
+	, onOpen: () => {
+		console.log('undo');
+	}
+};
 
 
 
@@ -119,6 +125,7 @@ function fillPluginsLists() {
 	menuPointPerformers.children = [];
 	menuPointSamplers.children = [];
 	menuPointActions.children = [];
+	menuPointUndo.children = [];
 	for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
 		let label: string = MZXBX_currentPlugins()[ii].label;
 		let purpose: MZXBX_PluginPurpose = MZXBX_currentPlugins()[ii].purpose;
@@ -265,7 +272,7 @@ function composeBaseMenu(): MenuInfo[] {
 			, menuPointFilters
 			, menuPointPerformers
 			, menuPointSamplers
-
+			, menuPointUndo
 		];
 		console.log('base menu', menuItemsData);
 		return menuItemsData;

@@ -26,7 +26,8 @@
         ,"startup.ts"
 		
 		,"ui/pluginprompt/plugindialog.ts"
-        ,"commanddispatcher.ts"
+        ,"commands/commanddispatcher.ts"
+		,"commands/execommand.ts"
         ,"ui/renderer.ts"
         ,"ui/localedictionary.ts"
         ,"ui/timeselect/timeselectbar.ts"

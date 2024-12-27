@@ -21,6 +21,7 @@ let localMenuActionsFolder='localMenuActionsFolder';
 let localMenuPerformersFolder='localMenuPerformersFolder';
 let localMenuFiltersFolder='localMenuFiltersFolder';
 let localMenuSamplersFolder='localMenuSamplersFolder';
+let localMenuUndoFolder='localMenuUndoFolder';
 
 let localeDictionary: { id: string, data: { locale: string, text: string }[] }[] = [
     {
@@ -98,6 +99,11 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
         id: localMenuSamplersFolder, data: [
             { locale: 'en', text: 'Samplers' }
             , { locale: 'ru', text: 'Сэмплеры' }
+            , { locale: 'zh', text: '?' }]
+    }, {
+        id: localMenuUndoFolder, data: [
+            { locale: 'en', text: 'Undo/Redo' }
+            , { locale: 'ru', text: 'Вернуть/Повторить' }
             , { locale: 'zh', text: '?' }]
     }
 ];

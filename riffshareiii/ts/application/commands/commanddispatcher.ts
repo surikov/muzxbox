@@ -1,8 +1,56 @@
 //declare function newMIDIparser(arrayBuffer: ArrayBuffer): any;
 //declare function newGPparser(arrayBuffer: ArrayBuffer): any;
 //declare function createSchedulePlayer(): MZXBX_Player;
-let uiLinkFilterToSpeaker='uiLinkFilterToSpeaker';
-let uiLinkFilterToFilter='uiLinkFilterToFilter';
+
+/*
+abstract class UndoRedoCommand {
+	abstract cmdkey: string;
+	abstract setup(cmdParameters: string): void;
+	abstract redo(): void;
+	abstract undo(): void;
+	queue(cmd: Zvoog_Command): boolean {
+		if (cmd.id == 'CmdDeleteTrack') {
+			this.setup(cmd.parameters);
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+class CmdDeleteTrack extends UndoRedoCommand {
+	cmdkey: string = 'CmdDeleteTrack';
+	clone: string;
+	nn: number;
+	setup(cmdParameters: string) {
+		this.nn = parseInt(cmdParameters);
+		this.clone = JSON.stringify(globalCommandDispatcher.cfg().data.tracks[this.nn]);
+	}
+	redo() {
+		globalCommandDispatcher.cfg().data.tracks.splice(this.nn, 1);
+	}
+	undo() {
+		globalCommandDispatcher.cfg().data.tracks.splice(this.nn, 0, JSON.parse(this.clone));
+	}
+}
+class CmdMoveTrackUp extends UndoRedoCommand {
+	cmdkey: string = 'CmdMoveTrackUp';
+	nn: number;
+	setup(cmdParameters: string) {
+		this.nn = parseInt(cmdParameters);
+	}
+	redo() {
+		let track: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(this.nn, 1)[0];
+		globalCommandDispatcher.cfg().data.tracks.splice(this.nn, 0, track);
+	}
+	undo() {
+		let clone: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(0, 1)[0];
+		globalCommandDispatcher.cfg().data.tracks.splice(this.nn, 0, clone);
+	}
+}
+*/
+
+let uiLinkFilterToSpeaker = 'uiLinkFilterToSpeaker';
+let uiLinkFilterToFilter = 'uiLinkFilterToFilter';
 class CommandDispatcher {
 	player: MZXBX_Player;
 	renderer: UIRenderer;
@@ -263,8 +311,8 @@ class CommandDispatcher {
 */
 	promptProjectPluginGUI(label: string, url: string, callback: (obj: Zvoog_Project) => void) {
 		console.log('promptProjectPluginGUI', url);
-		
-		pluginDialogPrompt.openActionDialogFrame(label, url,  callback);
+
+		pluginDialogPrompt.openActionDialogFrame(label, url, callback);
 		//let projectClone: string = JSON.stringify(this.cfg().data);
 		//pluginDialogPrompt.openDialogFrame(label, url, projectClone, callback);
 
@@ -380,7 +428,7 @@ class CommandDispatcher {
 			, this.renderer.timeselectbar.selectionAnchor
 			, LevelModes.top);
 	}
-	doUIaction(){
+	doUIaction() {
 
 	}
 }

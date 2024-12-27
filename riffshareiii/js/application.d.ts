@@ -69,6 +69,34 @@ declare class CommandDispatcher {
 }
 declare let globalCommandDispatcher: CommandDispatcher;
 declare let pluginDialogPrompt: PluginDialogPrompt;
+declare type CommandParameters = {
+    position: {
+        x: number;
+        y: number;
+        z: number;
+    };
+};
+declare abstract class UndoRedoCommand {
+    parameters: CommandParameters;
+    abstract redo(): void;
+    abstract undo(): void;
+    constructor(pars: CommandParameters);
+}
+declare type ParameterDeleteTrack = CommandParameters & {
+    trackPosition: number;
+    trackData: Zvoog_MusicTrack;
+};
+declare class CmdDeleteTrack extends UndoRedoCommand {
+    redo(): void;
+    undo(): void;
+}
+declare type ParameterMoveTrackUp = CommandParameters & {
+    trackPrePosition: number;
+};
+declare class CmdMoveTrackUp extends UndoRedoCommand {
+    redo(): void;
+    undo(): void;
+}
 declare type GridTimeTemplate14 = {
     ratio: number;
     duration: Zvoog_Metre;
@@ -112,6 +140,7 @@ declare let localMenuActionsFolder: string;
 declare let localMenuPerformersFolder: string;
 declare let localMenuFiltersFolder: string;
 declare let localMenuSamplersFolder: string;
+declare let localMenuUndoFolder: string;
 declare let localeDictionary: {
     id: string;
     data: {
@@ -239,6 +268,7 @@ declare let menuPointActions: MenuInfo;
 declare let menuPointPerformers: MenuInfo;
 declare let menuPointFilters: MenuInfo;
 declare let menuPointSamplers: MenuInfo;
+declare let menuPointUndo: MenuInfo;
 declare let menuPointTracks: MenuInfo;
 declare function fillPluginsLists(): void;
 declare function composeBaseMenu(): MenuInfo[];
@@ -768,6 +798,10 @@ declare type Zvoog_Selection = {
     startMeasure: number;
     endMeasure: number;
 };
+declare type Zvoog_Command = {
+    id: string;
+    parameters: string;
+};
 declare type Zvoog_Project = {
     title: string;
     timeline: Zvoog_SongMeasure[];
@@ -782,6 +816,7 @@ declare type Zvoog_Project = {
         z: number;
     };
     list?: boolean;
+    commands?: Zvoog_Command[];
 };
 declare type MZXBX_CachedWave = {
     path: string;

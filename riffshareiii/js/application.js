@@ -456,6 +456,33 @@ class CommandDispatcher {
 }
 let globalCommandDispatcher = new CommandDispatcher();
 let pluginDialogPrompt = new PluginDialogPrompt();
+class UndoRedoCommand {
+    constructor(pars) {
+        this.parameters = pars;
+    }
+}
+class CmdDeleteTrack extends UndoRedoCommand {
+    redo() {
+        let pp = this.parameters;
+        globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPosition, 1);
+    }
+    undo() {
+        let pp = this.parameters;
+        globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPosition, 0, pp.trackData);
+    }
+}
+class CmdMoveTrackUp extends UndoRedoCommand {
+    redo() {
+        let pp = this.parameters;
+        let track = globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPrePosition, 1)[0];
+        globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPrePosition, 0, track);
+    }
+    undo() {
+        let pp = this.parameters;
+        let clone = globalCommandDispatcher.cfg().data.tracks.splice(0, 1)[0];
+        globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPrePosition, 0, clone);
+    }
+}
 let gridLinesBrief = [
     { ratio: 0.4, duration: { count: 1, part: 2 } }
 ];
@@ -594,6 +621,7 @@ let localMenuActionsFolder = 'localMenuActionsFolder';
 let localMenuPerformersFolder = 'localMenuPerformersFolder';
 let localMenuFiltersFolder = 'localMenuFiltersFolder';
 let localMenuSamplersFolder = 'localMenuSamplersFolder';
+let localMenuUndoFolder = 'localMenuUndoFolder';
 let localeDictionary = [
     {
         id: localNameLocal, data: [
@@ -643,6 +671,12 @@ let localeDictionary = [
         id: localMenuSamplersFolder, data: [
             { locale: 'en', text: 'Samplers' },
             { locale: 'ru', text: 'Сэмплеры' },
+            { locale: 'zh', text: '?' }
+        ]
+    }, {
+        id: localMenuUndoFolder, data: [
+            { locale: 'en', text: 'Undo/Redo' },
+            { locale: 'ru', text: 'Вернуть/Повторить' },
             { locale: 'zh', text: '?' }
         ]
     }
@@ -1321,6 +1355,12 @@ let menuPointSamplers = {
         console.log('samplers');
     }
 };
+let menuPointUndo = {
+    text: 'localMenuUndoFolder',
+    onOpen: () => {
+        console.log('undo');
+    }
+};
 let menuPointTracks = {
     text: localMenuTracksFolder,
     onOpen: () => {
@@ -1331,6 +1371,7 @@ function fillPluginsLists() {
     menuPointPerformers.children = [];
     menuPointSamplers.children = [];
     menuPointActions.children = [];
+    menuPointUndo.children = [];
     for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
         let label = MZXBX_currentPlugins()[ii].label;
         let purpose = MZXBX_currentPlugins()[ii].purpose;
@@ -1455,7 +1496,8 @@ function composeBaseMenu() {
             menuPointActions,
             menuPointFilters,
             menuPointPerformers,
-            menuPointSamplers
+            menuPointSamplers,
+            menuPointUndo
         ];
         console.log('base menu', menuItemsData);
         return menuItemsData;

@@ -98,14 +98,14 @@ type Zvoog_PercussionTrack = {
 	title: string;
 	measures: Zvoog_PercussionMeasure[];
 	sampler: Zvoog_AudioSampler;
-	volume:number;
+	volume: number;
 };
 type Zvoog_MusicTrack = {
 	title: string;
 	//active?:boolean;
 	measures: Zvoog_TrackMeasure[];
 	performer: Zvoog_AudioSequencer;
-	volume:number;
+	volume: number;
 };
 type Zvoog_CommentText = {
 	skip: Zvoog_Metre;
@@ -121,22 +121,26 @@ type Zvoog_Selection = {
 	endMeasure: number;
 };
 
+type Zvoog_Command = {
+	id: string;
+	parameters: string;
+}
+
 type Zvoog_Project = {
 	title: string;
 	timeline: Zvoog_SongMeasure[];
 	tracks: Zvoog_MusicTrack[];
 	percussions: Zvoog_PercussionTrack[];
-	//automations: Zvoog_AutomationTrack[];
 	comments: Zvoog_CommentMeasure[];
 	filters: Zvoog_FilterTarget[];
 	selection?: Zvoog_Selection;
-	//focus?: 0 | 1 | 2 | 3;//track/drum/auto/comment
 	position?: {
 		x: number;
 		y: number;
 		z: number;
 	};
-	list?:boolean;
+	list?: boolean;
+	commands?: Zvoog_Command[];
 };
 
 

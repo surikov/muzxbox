@@ -1981,7 +1981,6 @@ class MidiParser {
 	}
 
 	trimProject(project: Zvoog_Project) {
-
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let track = project.tracks[tt];
 			for (let mm = 0; mm < track.measures.length; mm++) {
@@ -2003,12 +2002,11 @@ class MidiParser {
 				}
 			}
 		}
-
-		//}
+		//---------------
 		this.reShiftSequencer(project);
 		this.reShiftDrums(project)
 		this.cutShift(project);
-		//
+		//---------------
 		let len = project.timeline.length;
 		for (let ii = len - 1; ii > 0; ii--) {
 			if (this.isBarEmpty(ii, project)) {
@@ -2018,7 +2016,6 @@ class MidiParser {
 				return;
 			}
 		}
-
 	}
 	reShiftSequencer(project: Zvoog_Project) {
 		let plus32 = 0;
