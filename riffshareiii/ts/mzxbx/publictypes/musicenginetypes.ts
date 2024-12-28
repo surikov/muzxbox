@@ -120,12 +120,12 @@ type Zvoog_Selection = {
 	startMeasure: number;
 	endMeasure: number;
 };
-
+/*
 type Zvoog_Command = {
 	id: string;
 	parameters: string;
 }
-
+*/
 type Zvoog_Project = {
 	title: string;
 	timeline: Zvoog_SongMeasure[];
@@ -140,7 +140,8 @@ type Zvoog_Project = {
 		z: number;
 	};
 	list?: boolean;
-	commands?: Zvoog_Command[];
+	undo?: string[];//Zvoog_Command[];
+	redo?: string[];//Zvoog_Command[];
 };
 
 

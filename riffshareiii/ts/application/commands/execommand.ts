@@ -13,6 +13,7 @@ abstract class UndoRedoCommand {
 		this.parameters = pars;
 	}
 }
+//
 type ParameterDeleteTrack = CommandParameters & {
 	trackPosition: number;
 	trackData: Zvoog_MusicTrack;
@@ -27,18 +28,36 @@ class CmdDeleteTrack extends UndoRedoCommand {
 		globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPosition, 0, pp.trackData);
 	}
 }
-type ParameterMoveTrackUp = CommandParameters & {
+//
+type ParameterMoveTrackTop = CommandParameters & {
 	trackPrePosition: number;
 };
-class CmdMoveTrackUp extends UndoRedoCommand {
+class CmdMoveTrackTop extends UndoRedoCommand {
 	redo(): void {
-		let pp: ParameterMoveTrackUp = this.parameters as ParameterMoveTrackUp;
+		let pp: ParameterMoveTrackTop = this.parameters as ParameterMoveTrackTop;
 		let track: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPrePosition, 1)[0];
-		globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPrePosition, 0, track);
+		console.log('track', track);
+		globalCommandDispatcher.cfg().data.tracks.splice(0, 0, track);
 	}
 	undo(): void {
-		let pp: ParameterMoveTrackUp = this.parameters as ParameterMoveTrackUp;
+		let pp: ParameterMoveTrackTop = this.parameters as ParameterMoveTrackTop;
 		let clone: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(0, 1)[0];
 		globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPrePosition, 0, clone);
+	}
+}
+class CommandExe {
+	executeCommand(cmd: string) {
+		let parts=cmd.split(',');
+		switch (parts[0]) {
+			case 'MoveTrack':
+				let from = parseInt(parts[1]);
+				let to = parseInt(parts[2]);
+				let track: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(from, 1)[0];
+				globalCommandDispatcher.cfg().data.tracks.splice(to, 0, track);
+				break;
+			default:
+				console.log('unknown ', cmd);
+		}
+		globalCommandDispatcher.resetProject();
 	}
 }

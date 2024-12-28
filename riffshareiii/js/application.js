@@ -259,6 +259,50 @@ class PluginDialogPrompt {
         }
     }
 }
+class UndoRedoCommand {
+    constructor(pars) {
+        this.parameters = pars;
+    }
+}
+class CmdDeleteTrack extends UndoRedoCommand {
+    redo() {
+        let pp = this.parameters;
+        globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPosition, 1);
+    }
+    undo() {
+        let pp = this.parameters;
+        globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPosition, 0, pp.trackData);
+    }
+}
+class CmdMoveTrackTop extends UndoRedoCommand {
+    redo() {
+        let pp = this.parameters;
+        let track = globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPrePosition, 1)[0];
+        console.log('track', track);
+        globalCommandDispatcher.cfg().data.tracks.splice(0, 0, track);
+    }
+    undo() {
+        let pp = this.parameters;
+        let clone = globalCommandDispatcher.cfg().data.tracks.splice(0, 1)[0];
+        globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPrePosition, 0, clone);
+    }
+}
+class CommandExe {
+    executeCommand(cmd) {
+        let parts = cmd.split(',');
+        switch (parts[0]) {
+            case 'MoveTrack':
+                let from = parseInt(parts[1]);
+                let to = parseInt(parts[2]);
+                let track = globalCommandDispatcher.cfg().data.tracks.splice(from, 1)[0];
+                globalCommandDispatcher.cfg().data.tracks.splice(to, 0, track);
+                break;
+            default:
+                console.log('unknown ', cmd);
+        }
+        globalCommandDispatcher.resetProject();
+    }
+}
 let uiLinkFilterToSpeaker = 'uiLinkFilterToSpeaker';
 let uiLinkFilterToFilter = 'uiLinkFilterToFilter';
 class CommandDispatcher {
@@ -266,6 +310,7 @@ class CommandDispatcher {
         this.tapSizeRatio = 1;
         this.onAir = false;
         this.listener = null;
+        this.exe = new CommandExe();
     }
     cfg() {
         return this._mixerDataMathUtility;
@@ -378,14 +423,7 @@ class CommandDispatcher {
     }
     moveTrackTop(trackNum) {
         console.log('moveTrackTop', trackNum);
-        let it = this.cfg().data.tracks[trackNum];
-        this.cfg().data.tracks.splice(trackNum, 1);
-        this.cfg().data.tracks.unshift(it);
-        this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
-        if (this.cfg().data.tracks)
-            if (this.cfg().data.tracks[0])
-                this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
-        this.resetProject();
+        this.exe.executeCommand('MoveTrack,' + trackNum + ',0');
     }
     moveDrumTop(drumNum) {
         console.log('moveDrumTop', drumNum);
@@ -456,33 +494,6 @@ class CommandDispatcher {
 }
 let globalCommandDispatcher = new CommandDispatcher();
 let pluginDialogPrompt = new PluginDialogPrompt();
-class UndoRedoCommand {
-    constructor(pars) {
-        this.parameters = pars;
-    }
-}
-class CmdDeleteTrack extends UndoRedoCommand {
-    redo() {
-        let pp = this.parameters;
-        globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPosition, 1);
-    }
-    undo() {
-        let pp = this.parameters;
-        globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPosition, 0, pp.trackData);
-    }
-}
-class CmdMoveTrackUp extends UndoRedoCommand {
-    redo() {
-        let pp = this.parameters;
-        let track = globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPrePosition, 1)[0];
-        globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPrePosition, 0, track);
-    }
-    undo() {
-        let pp = this.parameters;
-        let clone = globalCommandDispatcher.cfg().data.tracks.splice(0, 1)[0];
-        globalCommandDispatcher.cfg().data.tracks.splice(pp.trackPrePosition, 0, clone);
-    }
-}
 let gridLinesBrief = [
     { ratio: 0.4, duration: { count: 1, part: 2 } }
 ];
@@ -3135,7 +3146,18 @@ let mzxbxProjectForTesting2 = {
             title: "Third track", volume: 1, measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 't3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 40, y: 33 } }
+            performer: { id: 'at3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 } }
+        },
+        {
+            title: "A track 1", volume: 1, measures: [
+                { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+            ],
+            performer: { id: 'bt3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 } }
+        }, {
+            title: "A track 987654321", volume: 1, measures: [
+                { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+            ],
+            performer: { id: 'ct3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 77, y: 66 } }
         }
     ],
     percussions: [

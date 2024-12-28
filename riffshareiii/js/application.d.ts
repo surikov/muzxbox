@@ -35,6 +35,37 @@ declare class PluginDialogPrompt {
     closeDialogFrame(): void;
     receiveMessageFromPlugin(e: any): void;
 }
+declare type CommandParameters = {
+    position: {
+        x: number;
+        y: number;
+        z: number;
+    };
+};
+declare abstract class UndoRedoCommand {
+    parameters: CommandParameters;
+    abstract redo(): void;
+    abstract undo(): void;
+    constructor(pars: CommandParameters);
+}
+declare type ParameterDeleteTrack = CommandParameters & {
+    trackPosition: number;
+    trackData: Zvoog_MusicTrack;
+};
+declare class CmdDeleteTrack extends UndoRedoCommand {
+    redo(): void;
+    undo(): void;
+}
+declare type ParameterMoveTrackTop = CommandParameters & {
+    trackPrePosition: number;
+};
+declare class CmdMoveTrackTop extends UndoRedoCommand {
+    redo(): void;
+    undo(): void;
+}
+declare class CommandExe {
+    executeCommand(cmd: string): void;
+}
 declare let uiLinkFilterToSpeaker: string;
 declare let uiLinkFilterToFilter: string;
 declare class CommandDispatcher {
@@ -45,6 +76,7 @@ declare class CommandDispatcher {
     onAir: boolean;
     _mixerDataMathUtility: MixerDataMathUtility;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
+    exe: CommandExe;
     cfg(): MixerDataMathUtility;
     initAudioFromUI(): void;
     registerWorkProject(data: Zvoog_Project): void;
@@ -69,34 +101,6 @@ declare class CommandDispatcher {
 }
 declare let globalCommandDispatcher: CommandDispatcher;
 declare let pluginDialogPrompt: PluginDialogPrompt;
-declare type CommandParameters = {
-    position: {
-        x: number;
-        y: number;
-        z: number;
-    };
-};
-declare abstract class UndoRedoCommand {
-    parameters: CommandParameters;
-    abstract redo(): void;
-    abstract undo(): void;
-    constructor(pars: CommandParameters);
-}
-declare type ParameterDeleteTrack = CommandParameters & {
-    trackPosition: number;
-    trackData: Zvoog_MusicTrack;
-};
-declare class CmdDeleteTrack extends UndoRedoCommand {
-    redo(): void;
-    undo(): void;
-}
-declare type ParameterMoveTrackUp = CommandParameters & {
-    trackPrePosition: number;
-};
-declare class CmdMoveTrackUp extends UndoRedoCommand {
-    redo(): void;
-    undo(): void;
-}
 declare type GridTimeTemplate14 = {
     ratio: number;
     duration: Zvoog_Metre;
@@ -798,10 +802,6 @@ declare type Zvoog_Selection = {
     startMeasure: number;
     endMeasure: number;
 };
-declare type Zvoog_Command = {
-    id: string;
-    parameters: string;
-};
 declare type Zvoog_Project = {
     title: string;
     timeline: Zvoog_SongMeasure[];
@@ -816,7 +816,8 @@ declare type Zvoog_Project = {
         z: number;
     };
     list?: boolean;
-    commands?: Zvoog_Command[];
+    undo?: string[];
+    redo?: string[];
 };
 declare type MZXBX_CachedWave = {
     path: string;

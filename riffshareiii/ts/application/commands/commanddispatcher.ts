@@ -1,54 +1,3 @@
-//declare function newMIDIparser(arrayBuffer: ArrayBuffer): any;
-//declare function newGPparser(arrayBuffer: ArrayBuffer): any;
-//declare function createSchedulePlayer(): MZXBX_Player;
-
-/*
-abstract class UndoRedoCommand {
-	abstract cmdkey: string;
-	abstract setup(cmdParameters: string): void;
-	abstract redo(): void;
-	abstract undo(): void;
-	queue(cmd: Zvoog_Command): boolean {
-		if (cmd.id == 'CmdDeleteTrack') {
-			this.setup(cmd.parameters);
-			return true;
-		} else {
-			return false;
-		}
-	}
-}
-class CmdDeleteTrack extends UndoRedoCommand {
-	cmdkey: string = 'CmdDeleteTrack';
-	clone: string;
-	nn: number;
-	setup(cmdParameters: string) {
-		this.nn = parseInt(cmdParameters);
-		this.clone = JSON.stringify(globalCommandDispatcher.cfg().data.tracks[this.nn]);
-	}
-	redo() {
-		globalCommandDispatcher.cfg().data.tracks.splice(this.nn, 1);
-	}
-	undo() {
-		globalCommandDispatcher.cfg().data.tracks.splice(this.nn, 0, JSON.parse(this.clone));
-	}
-}
-class CmdMoveTrackUp extends UndoRedoCommand {
-	cmdkey: string = 'CmdMoveTrackUp';
-	nn: number;
-	setup(cmdParameters: string) {
-		this.nn = parseInt(cmdParameters);
-	}
-	redo() {
-		let track: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(this.nn, 1)[0];
-		globalCommandDispatcher.cfg().data.tracks.splice(this.nn, 0, track);
-	}
-	undo() {
-		let clone: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(0, 1)[0];
-		globalCommandDispatcher.cfg().data.tracks.splice(this.nn, 0, clone);
-	}
-}
-*/
-
 let uiLinkFilterToSpeaker = 'uiLinkFilterToSpeaker';
 let uiLinkFilterToFilter = 'uiLinkFilterToFilter';
 class CommandDispatcher {
@@ -57,12 +6,42 @@ class CommandDispatcher {
 	audioContext: AudioContext;
 	tapSizeRatio: number = 1;
 	onAir = false;
-	//currentLOadedProject: Zvoog_Project;
 	_mixerDataMathUtility: MixerDataMathUtility;
 	listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any) = null;
+	exe: CommandExe = new CommandExe();
+	//undoQueue: UndoRedoCommand[] = [];
+	//redoQueue: UndoRedoCommand[] = [];
 	cfg(): MixerDataMathUtility {
 		return this._mixerDataMathUtility;
 	}
+	/*addUndoRedo(cc: UndoRedoCommand) {
+		cc.redo();
+		this.undoQueue.push(cc);
+		this.redoQueue.length = 0;
+		this.resetProject();
+	}
+	redoFromQueue(cnt: number) {
+		for (let ii = 0; ii < cnt; ii++) {
+			let cmd = this.redoQueue.shift();
+			if (cmd) {
+				cmd.redo();
+				this.renderer.tiler.setCurrentPointPosition(cmd.parameters.position);
+				this.undoQueue.push(cmd);
+			}
+		}
+		this.resetProject();
+	}
+	undoFromQueue(cnt: number) {
+		for (let ii = 0; ii < cnt; ii++) {
+			let cmd = this.undoQueue.pop();
+			if (cmd) {
+				cmd.undo();
+				this.renderer.tiler.setCurrentPointPosition(cmd.parameters.position);
+				this.redoQueue.unshift(cmd);
+			}
+		}
+		this.resetProject();
+	}*/
 	initAudioFromUI() {
 		console.log('initAudioFromUI');
 		var AudioContext = window.AudioContext;// || window.webkitAudioContext;
@@ -70,27 +49,20 @@ class CommandDispatcher {
 		this.player = createSchedulePlayer();
 	}
 	registerWorkProject(data: Zvoog_Project) {
-		//this.currentLOadedProject = data;
 		this._mixerDataMathUtility = new MixerDataMathUtility(data);
 	}
-	//globalCommandDispatcher.cfg().data: Zvoog_Project {
-	//	return this.currentLOadedProject;
-	//}
 	registerUI(renderer: UIRenderer) {
 		this.renderer = renderer;
 	}
 	showRightMenu() {
 		let vw = this.renderer.tileLevelSVG.clientWidth / this.renderer.tiler.tapPxSize();
 		let vh = this.renderer.tileLevelSVG.clientHeight / this.renderer.tiler.tapPxSize();
-		//this.renderer.menu.showState = !this.renderer.menu.showState;
 		this.cfg().data.list = true;
 		this.renderer.menu.resizeMenu(vw, vh);
 		this.renderer.menu.resetAllAnchors();
-
 	};
 	toggleStartStop() {
 		console.log('toggleStartStop');
-
 		if (this.onAir) {
 			this.onAir = !this.onAir;
 			this.player.cancel();
@@ -139,14 +111,6 @@ class CommandDispatcher {
 			});
 		}
 	}
-	/*toggleLeftMenu() {
-		//console.log('toggleLeftMenu');
-		this.renderer.leftBar.leftHide=!this.renderer.leftBar.leftHide;
-		let vw = this.renderer.tileLevelSVG.clientWidth / this.renderer.tiler.tapPxSize();
-		let vh = this.renderer.tileLevelSVG.clientHeight / this.renderer.tiler.tapPxSize();
-		this.renderer.leftBar.reShowLeftPanel(vw, vh);
-		//this.renderer.leftBar.resetAllAnchors();
-	}*/
 	setThemeLocale(loc: string, ratio: number) {
 		console.log("setThemeLocale " + loc);
 		setLocaleID(loc, ratio);
@@ -160,13 +124,11 @@ class CommandDispatcher {
 			}
 		}
 		this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
-		//this.renderer.menu.resetAllAnchors();
 	}
 	setThemeColor(cssPath: string) {
 		console.log("cssPath " + cssPath);
 		startLoadCSSfile(cssPath);
 		this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
-		//this.renderer.menu.resetAllAnchors();
 	}
 	resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) {
 		this.renderer.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
@@ -178,168 +140,49 @@ class CommandDispatcher {
 		this.renderer.onReSizeView();
 		this.renderer.tiler.resetModel();
 	}
-	resetProject() {//data: MZXBX_Project) {
-		//console.log('resetProject', data);
-		//this.renderer.menu.readCurrentSongData(data);
-		//this.registerWorkProject(data);
-		this.renderer.fillWholeUI();//this.workData);
+	resetProject() {
+		this.renderer.fillWholeUI();
 	}
-	/*
-	setTrackActive(trackNum: number) {
-		for (let tt = 0; tt < this.cfg().data.tracks.length; tt++) {
-			this.cfg().data.tracks[tt].active = false;
-		}
-		this.cfg().data.tracks[trackNum].active = true;
-		this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
-		if (this.cfg().data.tracks)
-			if (this.cfg().data.tracks[trackNum])
-				this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[trackNum].title;
-		this.resetProject();
-		console.log('setTrackActive', trackNum, this.cfg().data.tracks);
-	}*/
 	moveTrackTop(trackNum: number) {
 		console.log('moveTrackTop', trackNum);
+		/*
 		let it = this.cfg().data.tracks[trackNum];
 		this.cfg().data.tracks.splice(trackNum, 1);
 		this.cfg().data.tracks.unshift(it);
-		//this.upTracksLayer();
+*/
+
+		//let par: ParameterMoveTrackTop = { trackPrePosition: trackNum, position: this.renderer.tiler.getCurrentPointPosition() };
+		//let cmd = new CmdMoveTrackTop(par);
+		//this.addUndoRedo(new CmdMoveTrackTop(par));
+		this.exe.executeCommand('MoveTrack,' + trackNum + ',0');
+		//cmd.redo();
+		/*
 		this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
 		if (this.cfg().data.tracks)
 			if (this.cfg().data.tracks[0])
 				this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
-		this.resetProject();
+				*/
+		//this.resetProject();
 	}
 	moveDrumTop(drumNum: number) {
 		console.log('moveDrumTop', drumNum);
-		//console.log('moveTrackTop', trackNum);
 		let it = this.cfg().data.percussions[drumNum];
 		this.cfg().data.percussions.splice(drumNum, 1);
 		this.cfg().data.percussions.unshift(it);
-		//this.upDrumsLayer();
 	}
 	moveAutomationTop(filterNum: number) {
 		console.log('moveAutomationTop', filterNum);
-		//this.upAutoLayer();
 	}
-	/*
-	upTracksLayer() {
-		console.log('upTracksLayer');
-		//this.cfg().data.focus = 0;
-		this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
-		if (this.cfg().data.tracks)
-			if (this.cfg().data.tracks[0])
-				this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
-		this.resetProject();
-	}
-	upDrumsLayer() {
-		console.log('upDrumsLayer');
-		//this.cfg().data.focus = 1;
-		//this.renderer.menu.layerCurrentTitle.text = LO(localMenuPercussionFolder);
-		this.resetProject();
-	}
-	upAutoLayer() {
-		console.log('upAutoayer');
-		//this.cfg().data.focus = 2;
-		//this.renderer.menu.layerCurrentTitle.text = LO(localMenuAutomationFolder);
-		this.resetProject();
-	}
-	upCommentsLayer() {
-		console.log('upCommentsLayer');
-		//this.cfg().data.focus = 3;
-		//this.renderer.menu.layerCurrentTitle.text = LO(localMenuCommentsLayer);
-		this.resetProject();
-	}
-*/
-
 	setTrackSoloState(state: number) {
 		console.log('setTrackSoloState', state);
 	}
 	setDrumSoloState(state: number) {
 		console.log('setDrumSoloState', state);
 	}
-	/*promptImportFromMIDI() {
-		console.log('promptImportFromMIDI');
-		let me = this;
-		let filesinput: HTMLElement | null = document.getElementById('file_midi_input');
-		if (filesinput) {
-			if (!(this.listener)) {
-				this.listener = function (this: HTMLElement, ievent: HTMLElementEventMap['change']) {
-					//console.log('change',ievent);
-					var file = (ievent as any).target.files[0];
-					//console.log('file',file);
-					let title: string = file.name;
-					let dat = '' + file.lastModifiedDate;
-					try {
-						let last: Date = file.lastModifiedDate;
-						dat = '' + last.getFullYear();
-						if (last.getMonth() < 10) {
-							dat = dat + '-' + last.getMonth();
-						} else {
-							dat = dat + '-0' + last.getMonth();
-						}
-						if (last.getDate() < 10) {
-							dat = dat + '-' + last.getDate();
-						} else {
-							dat = dat + '-0' + last.getDate();
-						}
-					} catch (xx) {
-						console.log(xx);
-					}
-					let comment: string = ', ' + file.size / 1000 + 'kb, ' + dat;
-					var fileReader = new FileReader();
-
-					fileReader.onload = function (progressEvent: any) {
-						//console.log('progressEvent', progressEvent);
-						if (progressEvent != null) {
-							var arrayBuffer = progressEvent.target.result;
-							//console.log('arrayBuffer',arrayBuffer);
-							var midiParser = newMIDIparser(arrayBuffer);
-							let result: MZXBX_Project = midiParser.convertProject(title, comment);
-							//console.log('result',result);
-							me.registerWorkProject(result);
-							me.resetProject();
-						}
-					};
-					fileReader.readAsArrayBuffer(file);
-				};
-				filesinput.addEventListener('change', this.listener, false);
-			}
-			filesinput.click();
-			//console.log('setup', filesinput);
-		}
-	}
-*/
 	promptProjectPluginGUI(label: string, url: string, callback: (obj: Zvoog_Project) => void) {
 		console.log('promptProjectPluginGUI', url);
-
 		pluginDialogPrompt.openActionDialogFrame(label, url, callback);
-		//let projectClone: string = JSON.stringify(this.cfg().data);
-		//pluginDialogPrompt.openDialogFrame(label, url, projectClone, callback);
-
-		//let pluginFrame = document.getElementById("pluginFrame") as any;
-		//if (pluginFrame) {
-
-		//if (pluginFrame.contentWindow) {
-		/*let tefunc = pluginWindow.testFunction;
-		if (tefunc) {
-			console.log('pluginFrame', tefunc('qqq123'));
-		}*/
-		//let pluginContent: Window = pluginFrame.contentWindow;
-		//pluginFrame.src = url;
-		//(document.getElementById("pluginDiv") as any).style.visibility = "visible";
-		//console.log('pluginWindow', pluginWindow);
-		/*
-		pluginContent.postMessage({
-			name: 'Testing messaging'
-			, waitID: 'qqq123'
-		}, '*');//web/test/plugin.html');
-		*/
-		//}
-		//}
 	}
-	/*resendMessagePluginGUI() {
-		pluginDialogPrompt.sendMessageToPlugin();
-	}*/
 	promptPointPluginGUI(label: string, url: string, callback: (obj: any) => boolean) {
 		console.log('promptPointPluginGUI', url);
 		pluginDialogPrompt.openPointDialogFrame(label, url, 'data for testing', callback);
@@ -348,50 +191,6 @@ class CommandDispatcher {
 		console.log('cancelPluginGUI');
 		pluginDialogPrompt.closeDialogFrame();
 	}
-	/*promptTestImport() {
-		console.log('promptTestImport');
-		let me = this;
-		let filesinput: HTMLElement | null = document.getElementById('file_gp35_input');
-		if (filesinput) {
-			if (!(this.listener)) {
-				this.listener = function (this: HTMLElement, ievent: HTMLElementEventMap['change']) {
-					var file = (ievent as any).target.files[0];
-					var fileReader = new FileReader();
-					let title: string = file.name;
-					let dat = '' + file.lastModifiedDate;
-					try {
-						let last: Date = file.lastModifiedDate;
-						dat = '' + last.getFullYear();
-						if (last.getMonth() < 10) {
-							dat = dat + '-' + last.getMonth();
-						} else {
-							dat = dat + '-0' + last.getMonth();
-						}
-						if (last.getDate() < 10) {
-							dat = dat + '-' + last.getDate();
-						} else {
-							dat = dat + '-0' + last.getDate();
-						}
-					} catch (xx) {
-						console.log(xx);
-					}
-					let comment: string = ', ' + file.size / 1000 + 'kb, ' + dat;
-					fileReader.onload = function (progressEvent: any) {
-						if (progressEvent != null) {
-							var arrayBuffer = progressEvent.target.result;
-							var pp = newGPparser(arrayBuffer);
-							let result: MZXBX_Project = pp.convertProject(title, comment);
-							me.registerWorkProject(result);
-							me.resetProject();
-						}
-					};
-					fileReader.readAsArrayBuffer(file);
-				};
-				filesinput.addEventListener('change', this.listener, false);
-			}
-			filesinput.click();
-		}
-	}*/
 	expandTimeLineSelection(idx: number) {
 		console.log('select bar', idx);
 		if (this.cfg().data) {
@@ -422,7 +221,6 @@ class CommandDispatcher {
 				}
 			}
 		}
-		//console.log(this.workData.selection);
 		this.renderer.timeselectbar.updateTimeSelectionBar();
 		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
 			, this.renderer.timeselectbar.selectionAnchor
