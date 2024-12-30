@@ -1,20 +1,24 @@
 
 class FanOutputLine {
-	addOutputs(outputs: string[], buttonsAnchor: TileAnchor, fanLinesAnchor: TileAnchor
+	/*addOutputs(outputs: string[], buttonsAnchor: TileAnchor, fanLinesAnchor: TileAnchor
 		, fromID: string
 		, fromX: number, fromY: number
-		, zidx: number) {
+		, zidx: number
+		, onDelete: (x: number, y: number) => void
+	) {
 		for (let oo = 0; oo < outputs.length; oo++) {
 			let outId = outputs[oo];
 			if (outId) {
-				this.connectOutput(outId, fromID, fromX, fromY, fanLinesAnchor, buttonsAnchor, zidx, outputs);
+				this.connectOutput(outId, fromID, fromX, fromY, fanLinesAnchor, buttonsAnchor, zidx, outputs, onDelete);
 			} else {
-				this.connectSpeaker(fromID, fromX, fromY, fanLinesAnchor, buttonsAnchor, zidx, outputs);
+				this.connectSpeaker(fromID, fromX, fromY, fanLinesAnchor, buttonsAnchor, zidx, outputs, onDelete);
 			}
 		}
 
-	}
-	connectOutput(outId: string, fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number, outputs: string[]) {
+	}*/
+	connectOutput(outId: string, fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number, outputs: string[]
+		, onDelete: (x: number, y: number) => void
+	) {
 		let sz = globalCommandDispatcher.cfg().pluginIconSize * zoomPrefixLevelsCSS[zidx].iconRatio;
 		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
 			if (globalCommandDispatcher.cfg().data.filters[ii].id == outId) {
@@ -33,12 +37,15 @@ class FanOutputLine {
 					, fanLinesAnchor);
 				this.addDeleteSpear(fromID, toFilter.id, fromX, fromY
 					, sz, xx, yy
-					, buttonsAnchor, zidx, outputs);
+					, buttonsAnchor, zidx, outputs, onDelete);
 				break;
 			}
 		}
 	}
-	connectSpeaker(fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number, outputs: string[]) {
+	connectSpeaker(fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number, outputs: string[]
+		, onDelete: (x: number, y: number) => void
+
+	) {
 		let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().speakerIconSize / 2;
 		let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
 		new SpearConnection().addSpear(false, zidx,
@@ -55,7 +62,9 @@ class FanOutputLine {
 			, globalCommandDispatcher.cfg().speakerIconSize
 			, speakerX
 			, speakerY
-			, buttonsAnchor, zidx, outputs);
+			, buttonsAnchor, zidx, outputs
+			, onDelete
+		);
 	}
 	//nonan1(nn: number): number {
 	//	return (nn) ? nn : 0;
@@ -68,6 +77,7 @@ class FanOutputLine {
 		, anchor: TileAnchor
 		, zidx: number
 		, outputs: string[]
+		, onDelete: (x: number, y: number) => void
 	) {
 		if (zidx < 5) {
 			let diffX = toX - fromX;
@@ -86,10 +96,11 @@ class FanOutputLine {
 				, rx: globalCommandDispatcher.cfg().pluginIconSize / 4
 				, ry: globalCommandDispatcher.cfg().pluginIconSize / 4
 				, css: 'fanDropConnection fanDropConnection' + zidx
-				, activation: (x: number, y: number) => {
+				, activation: onDelete
+				/*, activation: (x: number, y: number) => {
 					console.log('delete link from', fromID, 'to', toID);
 					this.deleteConnection(toID, outputs);
-				}
+				}*/
 			};
 			anchor.content.push(deleteButton);
 			let deleteIcon: TileText = {
@@ -102,11 +113,11 @@ class FanOutputLine {
 			anchor.content.push(deleteIcon);
 		}
 	}
-	deleteConnection(id: string, outputs: string[]) {
+	/*deleteConnection(id: string, outputs: string[]) {
 		let nn = outputs.indexOf(id, 0);
 		if (nn > -1) {
 			outputs.splice(nn, 1);
 			globalCommandDispatcher.resetProject();
 		}
-	}
+	}*/
 }

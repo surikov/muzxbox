@@ -145,6 +145,21 @@ class SamplerIcon {
 		}
 		let samplerFromY = globalCommandDispatcher.cfg().samplerTop() + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
 		new ControlConnection().addAudioStreamLineFlow(false, zidx, samplerFromY, xx, yy, spearsAnchor);
-		new FanOutputLine().addOutputs(samplerTrack.sampler.outputs, fanLevelAnchor, spearsAnchor, samplerTrack.sampler.id, xx, yy, zidx);
+		//new FanOutputLine().addOutputs(samplerTrack.sampler.outputs, fanLevelAnchor, spearsAnchor, samplerTrack.sampler.id, xx, yy, zidx);
+		let fol = new FanOutputLine();
+		for (let oo = 0; oo < samplerTrack.sampler.outputs.length; oo++) {
+			let outId = samplerTrack.sampler.outputs[oo];
+			if (outId) {
+				fol.connectOutput(outId, samplerTrack.sampler.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, samplerTrack.sampler.outputs
+					, (x: number, y: number) => {
+						console.log('split', samplerTrack.sampler.id, 'from', outId);
+					});
+			} else {
+				fol.connectSpeaker(samplerTrack.sampler.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, samplerTrack.sampler.outputs
+					, (x: number, y: number) => {
+						console.log('split', samplerTrack.sampler.id, 'from speaker');
+					});
+			}
+		}
 	}
 }

@@ -103,9 +103,11 @@ class TileLevelRealTime implements TileLevelBase {
 		};
 	}
 	setCurrentPointPosition(position: TileZoom): void {
+		//console.log('setCurrentPointPosition',position);
 		this._translateX = position.x;
 		this._translateY = position.y;
 		this._translateZ = position.z;
+		this.applyZoomPosition();
 	}
 	getCurrentPointPosition(): TileZoom {
 		return {

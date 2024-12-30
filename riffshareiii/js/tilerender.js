@@ -85,6 +85,7 @@ class TileLevelRealTime {
         this._translateX = position.x;
         this._translateY = position.y;
         this._translateZ = position.z;
+        this.applyZoomPosition();
     }
     getCurrentPointPosition() {
         return {

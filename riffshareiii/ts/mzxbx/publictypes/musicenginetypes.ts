@@ -47,21 +47,21 @@ type Zvoog_FilterTarget = {
 	dataBlob: string;
 	outputs: string[];
 	automation: Zvoog_FilterMeasure[];
-	iconPosition?: { x: number, y: number };
+	iconPosition: { x: number, y: number };
 };
 type Zvoog_AudioSequencer = {
 	id: string;
 	data: string;
 	kind: string;
 	outputs: string[];
-	iconPosition?: { x: number, y: number };
+	iconPosition: { x: number, y: number };
 };
 type Zvoog_AudioSampler = {
 	id: string;
 	data: string;
 	kind: string;
 	outputs: string[];
-	iconPosition?: { x: number, y: number };
+	iconPosition: { x: number, y: number };
 };
 type Zvoog_Chord = {
 	skip: Zvoog_Metre;
@@ -126,6 +126,15 @@ type Zvoog_Command = {
 	parameters: string;
 }
 */
+type Zvoog_Command = {
+	kind: string;
+	position: {
+		x: number;
+		y: number;
+		z: number;
+	};
+	params: any;
+};
 type Zvoog_Project = {
 	title: string;
 	timeline: Zvoog_SongMeasure[];
@@ -133,15 +142,15 @@ type Zvoog_Project = {
 	percussions: Zvoog_PercussionTrack[];
 	comments: Zvoog_CommentMeasure[];
 	filters: Zvoog_FilterTarget[];
-	selection?: Zvoog_Selection;
-	position?: {
+	selection: Zvoog_Selection|undefined;
+	position: {
 		x: number;
 		y: number;
 		z: number;
 	};
-	list?: boolean;
-	undo?: string[];//Zvoog_Command[];
-	redo?: string[];//Zvoog_Command[];
+	list: boolean;
+	undo: Zvoog_Command[];//Zvoog_Command[];
+	redo: Zvoog_Command[];//Zvoog_Command[];
 };
 
 

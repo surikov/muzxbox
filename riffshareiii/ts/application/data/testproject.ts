@@ -1,6 +1,9 @@
 let mzxbxProjectForTesting2: Zvoog_Project = {
 	title: 'test data for debug'
 	, list: false
+	,selection:undefined
+	,undo:[]
+	,redo:[]
 	, position: { x: -13037.9, y: -1317.9, z: 4.7 }
 	, timeline: [
 		{ tempo: 120, metre: { count: 4, part: 4 } }

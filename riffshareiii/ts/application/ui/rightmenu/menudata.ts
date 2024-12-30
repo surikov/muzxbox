@@ -57,7 +57,7 @@ let menuPointSamplers: MenuInfo = {
 let menuPointUndo: MenuInfo = {
 	text: 'localMenuUndoFolder'
 	, onOpen: () => {
-		console.log('undo');
+		console.log('show undo');
 	}
 };
 
@@ -273,6 +273,17 @@ function composeBaseMenu(): MenuInfo[] {
 			, menuPointPerformers
 			, menuPointSamplers
 			, menuPointUndo
+			,{
+				text: 'test undo', onClick: () => {
+					console.log('undo');
+					globalCommandDispatcher.exe.undo(1);
+				}
+			},{
+				text: 'test redo', onClick: () => {
+					console.log('redo');
+					globalCommandDispatcher.exe.redo(1);
+				}
+			}
 		];
 		console.log('base menu', menuItemsData);
 		return menuItemsData;

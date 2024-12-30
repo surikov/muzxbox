@@ -144,16 +144,16 @@ declare function tilePolygon(svgns: string, tapSize: number, g: SVGElement, x: n
 declare function tileRectangle(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, w: number, h: number, rx: number | undefined, ry: number | undefined, cssClass: string, cssStyle: string): TileSVGElement;
 declare function tileImage(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, w: number, h: number, href: string | undefined, preserveAspectRatio: string | undefined, cssClass: string): TileSVGElement;
 declare function tileText(svgns: string, tapSize: number, g: SVGElement, x: number, y: number, html: string, maxWidth: string, cssClass: string, cssStyle: string): TileSVGElement;
-type TileZoom = {
+declare type TileZoom = {
     x: number;
     y: number;
     z: number;
 };
-type TilePoint = {
+declare type TilePoint = {
     x: number;
     y: number;
 };
-type TileBaseDefinition = {
+declare type TileBaseDefinition = {
     id?: string;
     css?: string;
     style?: string;
@@ -168,7 +168,7 @@ declare enum LevelModes {
     bottom = 4,
     overlay = 5
 }
-type TileLayerDefinition = {
+declare type TileLayerDefinition = {
     g: SVGElement;
     mode: 0 | 1 | 2 | 3 | 4 | 5;
     stickLeft?: number;
@@ -177,8 +177,8 @@ type TileLayerDefinition = {
     stickRight?: number;
     anchors: TileAnchor[];
 };
-type TileItem = TileAnchor | TileRectangle | TileText | TilePath | TileLine | TilePolygon | TileImage;
-type TileAnchor = {
+declare type TileItem = TileAnchor | TileRectangle | TileText | TilePath | TileLine | TilePolygon | TileImage;
+declare type TileAnchor = {
     xx: number;
     yy: number;
     ww: number;
@@ -189,7 +189,7 @@ type TileAnchor = {
     translation?: TilePoint;
 } & TileBaseDefinition;
 declare function TAnchor(xx: number, yy: number, ww: number, hh: number, showZoom: number, hideZoom: number, id?: string, translation?: TilePoint): TileAnchor;
-type TileImage = {
+declare type TileImage = {
     x: number;
     y: number;
     w: number;
@@ -197,7 +197,7 @@ type TileImage = {
     preserveAspectRatio?: string;
     href: string;
 } & TileBaseDefinition;
-type TileRectangle = {
+declare type TileRectangle = {
     x: number;
     y: number;
     w: number;
@@ -205,32 +205,32 @@ type TileRectangle = {
     rx?: number;
     ry?: number;
 } & TileBaseDefinition;
-type TileText = {
+declare type TileText = {
     x: number;
     y: number;
     text: string;
     maxWidth?: string;
 } & TileBaseDefinition;
 declare function TText(x: number, y: number, css: string, text: string): TileText;
-type TilePath = {
+declare type TilePath = {
     x?: number;
     y?: number;
     scale?: number;
     points: string;
 } & TileBaseDefinition;
-type TileLine = {
+declare type TileLine = {
     x1: number;
     x2: number;
     y1: number;
     y2: number;
 } & TileBaseDefinition;
-type TilePolygon = {
+declare type TilePolygon = {
     x?: number;
     y?: number;
     scale?: number;
     dots: number[];
 } & TileBaseDefinition;
-type TileSVGElement = SVGElement & {
+declare type TileSVGElement = SVGElement & {
     onClickFunction: (x: number, y: number) => void;
     watchX: number;
     watchY: number;
@@ -241,7 +241,7 @@ type TileSVGElement = SVGElement & {
     translateX: number;
     translateY: number;
 };
-type TileLevelBase = {
+declare type TileLevelBase = {
     dump: () => void;
     tapPxSize: () => number;
     setupTapSize: (ratioCm: number) => void;

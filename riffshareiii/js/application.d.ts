@@ -35,36 +35,27 @@ declare class PluginDialogPrompt {
     closeDialogFrame(): void;
     receiveMessageFromPlugin(e: any): void;
 }
-declare type CommandParameters = {
-    position: {
+declare const ExeMoveTrack = "ExeMoveTrack";
+declare const ExeMovePerformerIcon = "ExeMovePerformerIcon";
+declare const ExeConnectPerformer = "ExeConnectPerformer";
+declare const ExeDisonnectPerformer = "ExeDisonnectPerformer";
+declare const ExeMoveSamplerIcon = "ExeMoveSamplerIcon";
+declare const ExeConnectSampler = "ExeConnectSampler";
+declare const ExeDisonnectSampler = "ExeDisonnectSampler";
+declare const ExeMoveFilterIcon = "ExeMoveFilterIcon";
+declare const ExeConnectFilter = "ExeConnectFilter";
+declare const ExeDisonnectFilter = "ExeDisonnectFilter";
+declare class CommandExe {
+    executeCommand(kind: string, pars: any, undo: boolean): void;
+    cloneCurPosition(): {
         x: number;
         y: number;
         z: number;
     };
-};
-declare abstract class UndoRedoCommand {
-    parameters: CommandParameters;
-    abstract redo(): void;
-    abstract undo(): void;
-    constructor(pars: CommandParameters);
-}
-declare type ParameterDeleteTrack = CommandParameters & {
-    trackPosition: number;
-    trackData: Zvoog_MusicTrack;
-};
-declare class CmdDeleteTrack extends UndoRedoCommand {
-    redo(): void;
-    undo(): void;
-}
-declare type ParameterMoveTrackTop = CommandParameters & {
-    trackPrePosition: number;
-};
-declare class CmdMoveTrackTop extends UndoRedoCommand {
-    redo(): void;
-    undo(): void;
-}
-declare class CommandExe {
-    executeCommand(cmd: string): void;
+    setCurPosition(xyz: TileZoom): void;
+    addUndoCommand(kind: string, pars: any): void;
+    undo(cnt: number): void;
+    redo(cnt: number): void;
 }
 declare let uiLinkFilterToSpeaker: string;
 declare let uiLinkFilterToFilter: string;
@@ -89,10 +80,6 @@ declare class CommandDispatcher {
     changeTapSize(ratio: number): void;
     resetProject(): void;
     moveTrackTop(trackNum: number): void;
-    moveDrumTop(drumNum: number): void;
-    moveAutomationTop(filterNum: number): void;
-    setTrackSoloState(state: number): void;
-    setDrumSoloState(state: number): void;
     promptProjectPluginGUI(label: string, url: string, callback: (obj: Zvoog_Project) => void): void;
     promptPointPluginGUI(label: string, url: string, callback: (obj: any) => boolean): void;
     cancelPluginGUI(): void;
@@ -353,7 +340,7 @@ declare class PerformerIcon {
     performerId: string;
     constructor(performerId: string);
     buildPerformerSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
-    addPerformerSpot(secondary: boolean, track: Zvoog_MusicTrack, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
+    addPerformerSpot(secondary: boolean, trackNo: number, track: Zvoog_MusicTrack, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
 }
 declare class SamplerIcon {
     samplerId: string;
@@ -376,11 +363,9 @@ declare class SpearConnection {
     addSpear(secondary: boolean, zidx: number, fromX: number, fromY: number, toSize: number, toX: number, toY: number, anchor: TileAnchor): void;
 }
 declare class FanOutputLine {
-    addOutputs(outputs: string[], buttonsAnchor: TileAnchor, fanLinesAnchor: TileAnchor, fromID: string, fromX: number, fromY: number, zidx: number): void;
-    connectOutput(outId: string, fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number, outputs: string[]): void;
-    connectSpeaker(fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number, outputs: string[]): void;
-    addDeleteSpear(fromID: string, toID: string, fromX: number, fromY: number, toSize: number, toX: number, toY: number, anchor: TileAnchor, zidx: number, outputs: string[]): void;
-    deleteConnection(id: string, outputs: string[]): void;
+    connectOutput(outId: string, fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number, outputs: string[], onDelete: (x: number, y: number) => void): void;
+    connectSpeaker(fromID: string, fromX: number, fromY: number, fanLinesAnchor: TileAnchor, buttonsAnchor: TileAnchor, zidx: number, outputs: string[], onDelete: (x: number, y: number) => void): void;
+    addDeleteSpear(fromID: string, toID: string, fromX: number, fromY: number, toSize: number, toX: number, toY: number, anchor: TileAnchor, zidx: number, outputs: string[], onDelete: (x: number, y: number) => void): void;
 }
 declare class IconLabelButton {
     anchor: TileAnchor;
@@ -731,7 +716,7 @@ declare type Zvoog_FilterTarget = {
     dataBlob: string;
     outputs: string[];
     automation: Zvoog_FilterMeasure[];
-    iconPosition?: {
+    iconPosition: {
         x: number;
         y: number;
     };
@@ -741,7 +726,7 @@ declare type Zvoog_AudioSequencer = {
     data: string;
     kind: string;
     outputs: string[];
-    iconPosition?: {
+    iconPosition: {
         x: number;
         y: number;
     };
@@ -751,7 +736,7 @@ declare type Zvoog_AudioSampler = {
     data: string;
     kind: string;
     outputs: string[];
-    iconPosition?: {
+    iconPosition: {
         x: number;
         y: number;
     };
@@ -802,6 +787,15 @@ declare type Zvoog_Selection = {
     startMeasure: number;
     endMeasure: number;
 };
+declare type Zvoog_Command = {
+    kind: string;
+    position: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    params: any;
+};
 declare type Zvoog_Project = {
     title: string;
     timeline: Zvoog_SongMeasure[];
@@ -809,15 +803,15 @@ declare type Zvoog_Project = {
     percussions: Zvoog_PercussionTrack[];
     comments: Zvoog_CommentMeasure[];
     filters: Zvoog_FilterTarget[];
-    selection?: Zvoog_Selection;
-    position?: {
+    selection: Zvoog_Selection | undefined;
+    position: {
         x: number;
         y: number;
         z: number;
     };
-    list?: boolean;
-    undo?: string[];
-    redo?: string[];
+    list: boolean;
+    undo: Zvoog_Command[];
+    redo: Zvoog_Command[];
 };
 declare type MZXBX_CachedWave = {
     path: string;

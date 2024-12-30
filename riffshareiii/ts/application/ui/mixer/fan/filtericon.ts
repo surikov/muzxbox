@@ -86,7 +86,7 @@ class FilterIcon {
 							filterTarget.outputs.push(toFilter.id);
 						} else {
 							filterTarget.iconPosition.x = filterTarget.iconPosition.x + dragAnchor.translation.x;
-							filterTarget.iconPosition.y =filterTarget.iconPosition.y + dragAnchor.translation.y;
+							filterTarget.iconPosition.y = filterTarget.iconPosition.y + dragAnchor.translation.y;
 						}
 					}
 					dragAnchor.translation = { x: 0, y: 0 };
@@ -202,11 +202,26 @@ class FilterIcon {
 			, yy
 			, spearsAnchor);
 
-		new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, spearsAnchor
+		/*new FanOutputLine().addOutputs(filterTarget.outputs, fanLevelAnchor, spearsAnchor
 			, filterTarget.id
 			, xx
 			, yy
-			, zidx);
+			, zidx);*/
+		let fol = new FanOutputLine();
+		for (let oo = 0; oo < filterTarget.outputs.length; oo++) {
+			let outId = filterTarget.outputs[oo];
+			if (outId) {
+				fol.connectOutput(outId, filterTarget.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, filterTarget.outputs
+					, (x: number, y: number) => {
+						console.log('split', filterTarget.id, 'from', outId);
+					});
+			} else {
+				fol.connectSpeaker(filterTarget.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, filterTarget.outputs
+					, (x: number, y: number) => {
+						console.log('split', filterTarget.id, 'from speaker');
+					});
+			}
+		}
 	}
 
 }

@@ -154,7 +154,7 @@ class CommandDispatcher {
 		//let par: ParameterMoveTrackTop = { trackPrePosition: trackNum, position: this.renderer.tiler.getCurrentPointPosition() };
 		//let cmd = new CmdMoveTrackTop(par);
 		//this.addUndoRedo(new CmdMoveTrackTop(par));
-		this.exe.executeCommand('MoveTrack,' + trackNum + ',0');
+		this.exe.addUndoCommand(ExeMoveTrack, { from: trackNum, to: 0 });
 		//cmd.redo();
 		/*
 		this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
@@ -164,13 +164,13 @@ class CommandDispatcher {
 				*/
 		//this.resetProject();
 	}
-	moveDrumTop(drumNum: number) {
+	/*moveDrumTop(drumNum: number) {
 		console.log('moveDrumTop', drumNum);
 		let it = this.cfg().data.percussions[drumNum];
 		this.cfg().data.percussions.splice(drumNum, 1);
 		this.cfg().data.percussions.unshift(it);
-	}
-	moveAutomationTop(filterNum: number) {
+	}*/
+	/*moveAutomationTop(filterNum: number) {
 		console.log('moveAutomationTop', filterNum);
 	}
 	setTrackSoloState(state: number) {
@@ -178,7 +178,7 @@ class CommandDispatcher {
 	}
 	setDrumSoloState(state: number) {
 		console.log('setDrumSoloState', state);
-	}
+	}*/
 	promptProjectPluginGUI(label: string, url: string, callback: (obj: Zvoog_Project) => void) {
 		console.log('promptProjectPluginGUI', url);
 		pluginDialogPrompt.openActionDialogFrame(label, url, callback);

@@ -6,12 +6,12 @@ class PerformerIcon {
 	buildPerformerSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
 			if (globalCommandDispatcher.cfg().data.tracks[ii].performer.id == this.performerId) {
-				this.addPerformerSpot(ii>0,globalCommandDispatcher.cfg().data.tracks[ii], fanLevelAnchor, spearsAnchor, zidx);
+				this.addPerformerSpot(ii > 0, ii, globalCommandDispatcher.cfg().data.tracks[ii], fanLevelAnchor, spearsAnchor, zidx);
 				break;
 			}
 		}
 	}
-	addPerformerSpot(secondary:boolean,track: Zvoog_MusicTrack, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
+	addPerformerSpot(secondary: boolean, trackNo: number, track: Zvoog_MusicTrack, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
@@ -73,13 +73,28 @@ class PerformerIcon {
 						track.performer.iconPosition = { x: 0, y: 0 };
 					}
 					if (toSpeaker) {
-						track.performer.outputs.push('');
+						//track.performer.outputs.push('');
+						globalCommandDispatcher.exe.addUndoCommand(ExeConnectPerformer, {
+							track: trackNo
+							, id: ''
+						});
 					} else {
 						if (toFilter) {
-							track.performer.outputs.push(toFilter.id);
+							//track.performer.outputs.push(toFilter.id);
+							globalCommandDispatcher.exe.addUndoCommand(ExeConnectPerformer, {
+								track: trackNo
+								, id: toFilter.id
+							});
 						} else {
+							let xx = track.performer.iconPosition.x;
+							let yy = track.performer.iconPosition.y;
 							track.performer.iconPosition.x = track.performer.iconPosition.x + dragAnchor.translation.x;
 							track.performer.iconPosition.y = track.performer.iconPosition.y + dragAnchor.translation.y;
+							globalCommandDispatcher.exe.addUndoCommand(ExeMovePerformerIcon, {
+								track: trackNo
+								, from: { x: xx, y: yy }
+								, to: { x: track.performer.iconPosition.x, y: track.performer.iconPosition.y }
+							});
 						}
 					}
 					dragAnchor.translation = { x: 0, y: 0 };
@@ -110,7 +125,7 @@ class PerformerIcon {
 								, rx: sz * 0.75, ry: sz * 0.75
 								, css: 'fanConnectionBase  fanConnection' + zidx
 							});
-						} else {							
+						} else {
 							if (globalCommandDispatcher.cfg().dragCollisionSpeaker(xx, yy, track.performer.outputs)) {
 								//toFilter = null;
 								toSpeaker = true;
@@ -143,13 +158,13 @@ class PerformerIcon {
 			, w: sz * 0.9, h: sz * 0.9
 			, css: 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx
 		});
-		
+
 		if (zidx < 5) {
 			let btn: TileRectangle = {
-				x: xx-sz/2
+				x: xx - sz / 2
 				, y: yy
 				, w: sz
-				, h: sz/2
+				, h: sz / 2
 				, css: 'fanSamplerInteractionIcon fanButton' + zidx
 				, activation: (x: number, y: number) => {
 					console.log('' + track.performer.kind + ':' + track.performer.id);
@@ -159,7 +174,7 @@ class PerformerIcon {
 		}
 		if (zidx < 3) {
 			let txt: TileText = {
-				text: track.title + ': '+track.volume + ': '+track.performer.kind + ': ' + track.performer.id
+				text: track.title + ': ' + track.volume + ': ' + track.performer.kind + ': ' + track.performer.id
 				, x: xx
 				, y: yy
 				, css: 'fanIconLabel'
@@ -168,8 +183,31 @@ class PerformerIcon {
 
 		}
 		let performerFromY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2;
-		new ControlConnection().addAudioStreamLineFlow(secondary,zidx, performerFromY, xx, yy, spearsAnchor);
-		new FanOutputLine().addOutputs(track.performer.outputs, fanLevelAnchor, spearsAnchor, track.performer.id, xx, yy, zidx);
+		new ControlConnection().addAudioStreamLineFlow(secondary, zidx, performerFromY, xx, yy, spearsAnchor);
+		//new FanOutputLine().addOutputs(track.performer.outputs, fanLevelAnchor, spearsAnchor, track.performer.id, xx, yy, zidx);
+		let fol = new FanOutputLine();
+		for (let oo = 0; oo < track.performer.outputs.length; oo++) {
+			let outId = track.performer.outputs[oo];
+			if (outId) {
+				fol.connectOutput(outId, track.performer.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, track.performer.outputs
+					, (x: number, y: number) => {
+						//console.log('split', track.title, 'from', outId);
+						globalCommandDispatcher.exe.addUndoCommand(ExeDisonnectPerformer, {
+							track: trackNo
+							, id: outId
+						});
+					});
+			} else {
+				fol.connectSpeaker(track.performer.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, track.performer.outputs
+					, (x: number, y: number) => {
+						//console.log('split', track.title, 'from speaker');
+						globalCommandDispatcher.exe.addUndoCommand(ExeDisonnectPerformer, {
+							track: trackNo
+							, id: ''
+						});
+					});
+			}
+		}
 	}
 }
 
