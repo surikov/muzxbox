@@ -74,26 +74,29 @@ class PerformerIcon {
 					}
 					if (toSpeaker) {
 						//track.performer.outputs.push('');
-						globalCommandDispatcher.exe.addUndoCommand(ExeConnectPerformer, {
+						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectPerformer, {
 							track: trackNo
 							, id: ''
 						});
 					} else {
 						if (toFilter) {
 							//track.performer.outputs.push(toFilter.id);
-							globalCommandDispatcher.exe.addUndoCommand(ExeConnectPerformer, {
+							globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectPerformer, {
 								track: trackNo
 								, id: toFilter.id
 							});
 						} else {
 							let xx = track.performer.iconPosition.x;
 							let yy = track.performer.iconPosition.y;
-							track.performer.iconPosition.x = track.performer.iconPosition.x + dragAnchor.translation.x;
-							track.performer.iconPosition.y = track.performer.iconPosition.y + dragAnchor.translation.y;
-							globalCommandDispatcher.exe.addUndoCommand(ExeMovePerformerIcon, {
+							//track.performer.iconPosition.x = track.performer.iconPosition.x + dragAnchor.translation.x;
+							//track.performer.iconPosition.y = track.performer.iconPosition.y + dragAnchor.translation.y;
+							globalCommandDispatcher.exe.addUndoCommandFromUI(ExeMovePerformerIcon, {
 								track: trackNo
 								, from: { x: xx, y: yy }
-								, to: { x: track.performer.iconPosition.x, y: track.performer.iconPosition.y }
+								, to: {
+									x: track.performer.iconPosition.x + dragAnchor.translation.x
+									, y: track.performer.iconPosition.y + dragAnchor.translation.y
+								}
 							});
 						}
 					}
@@ -192,7 +195,7 @@ class PerformerIcon {
 				fol.connectOutput(outId, track.performer.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, track.performer.outputs
 					, (x: number, y: number) => {
 						//console.log('split', track.title, 'from', outId);
-						globalCommandDispatcher.exe.addUndoCommand(ExeDisonnectPerformer, {
+						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectPerformer, {
 							track: trackNo
 							, id: outId
 						});
@@ -201,7 +204,7 @@ class PerformerIcon {
 				fol.connectSpeaker(track.performer.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, track.performer.outputs
 					, (x: number, y: number) => {
 						//console.log('split', track.title, 'from speaker');
-						globalCommandDispatcher.exe.addUndoCommand(ExeDisonnectPerformer, {
+						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectPerformer, {
 							track: trackNo
 							, id: ''
 						});

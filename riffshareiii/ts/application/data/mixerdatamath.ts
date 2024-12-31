@@ -258,14 +258,17 @@ class MixerDataMathUtility {
 		return this.gridTop() + this.gridHeight() + this.padGrid2Sampler;
 	}
 	findFilterTarget(filterId: string): Zvoog_FilterTarget | null {
+		//console.log('findFilterTarget start -----------------------------------------------------');
 		if (this.data) {
 			for (let nn = 0; nn < this.data.filters.length; nn++) {
 				let filter = this.data.filters[nn];
+				//console.log('findFilterTarget',filterId,filter);
 				if (filter.id == filterId) {
 					return filter;
 				}
 			}
 		}
+		//console.log('findFilterTarget no',filterId);
 		return null;
 	}
 	textZoomRatio(zIndex: number): number {

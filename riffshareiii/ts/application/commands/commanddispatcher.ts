@@ -154,7 +154,7 @@ class CommandDispatcher {
 		//let par: ParameterMoveTrackTop = { trackPrePosition: trackNum, position: this.renderer.tiler.getCurrentPointPosition() };
 		//let cmd = new CmdMoveTrackTop(par);
 		//this.addUndoRedo(new CmdMoveTrackTop(par));
-		this.exe.addUndoCommand(ExeMoveTrack, { from: trackNum, to: 0 });
+		this.exe.addUndoCommandFromUI(ExeMoveTrack, { from: trackNum, to: 0 });
 		//cmd.redo();
 		/*
 		this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);

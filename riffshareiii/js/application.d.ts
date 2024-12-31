@@ -53,7 +53,7 @@ declare class CommandExe {
         z: number;
     };
     setCurPosition(xyz: TileZoom): void;
-    addUndoCommand(kind: string, pars: any): void;
+    addUndoCommandFromUI(kind: string, pars: any): void;
     undo(cnt: number): void;
     redo(cnt: number): void;
 }

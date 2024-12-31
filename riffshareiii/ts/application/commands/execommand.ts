@@ -99,37 +99,46 @@ class CommandExe {
 				break;
 			/////////////////////////////////////////////////////////
 			case ExeMoveFilterIcon: {
-				let filter = globalCommandDispatcher.cfg().findFilterTarget[pars.filter];
-				let iconPosition = filter.iconPosition;
-				if (undo) {
-					iconPosition.x = pars.from.x;
-					iconPosition.y = pars.from.y;
-				} else {
-					iconPosition.x = pars.to.x;
-					iconPosition.y = pars.to.y;
+				//console.log('ExeMoveFilterIcon', pars, globalCommandDispatcher.cfg().data.filters);
+				//console.log('t',);
+				let filter = globalCommandDispatcher.cfg().findFilterTarget(pars.filter);
+				//console.log('found', filter);
+				if (filter) {
+					let iconPosition = filter.iconPosition;
+					if (undo) {
+						iconPosition.x = pars.from.x;
+						iconPosition.y = pars.from.y;
+					} else {
+						iconPosition.x = pars.to.x;
+						iconPosition.y = pars.to.y;
+					}
 				}
 			}
 				break;
 			case ExeConnectFilter: {
-				let filter = globalCommandDispatcher.cfg().findFilterTarget[pars.filter];
-				if (undo) {
-					let nn = filter.outputs.indexOf(pars.id);
-					if (nn > -1) {
-						filter.outputs.splice(nn, 1);
+				let filter = globalCommandDispatcher.cfg().findFilterTarget(pars.filter);
+				if (filter) {
+					if (undo) {
+						let nn = filter.outputs.indexOf(pars.id);
+						if (nn > -1) {
+							filter.outputs.splice(nn, 1);
+						}
+					} else {
+						filter.outputs.push(pars.id);
 					}
-				} else {
-					filter.outputs.push(pars.id);
 				}
 			}
 				break;
 			case ExeDisonnectFilter: {
-				let filter = globalCommandDispatcher.cfg().findFilterTarget[pars.filter];
-				if (undo) {
-					filter.outputs.push(pars.id);
-				} else {
-					let nn = filter.outputs.indexOf(pars.id);
-					if (nn > -1) {
-						filter.outputs.splice(nn, 1);
+				let filter = globalCommandDispatcher.cfg().findFilterTarget(pars.filter);
+				if (filter) {
+					if (undo) {
+						filter.outputs.push(pars.id);
+					} else {
+						let nn = filter.outputs.indexOf(pars.id);
+						if (nn > -1) {
+							filter.outputs.splice(nn, 1);
+						}
 					}
 				}
 			}
@@ -149,7 +158,7 @@ class CommandExe {
 	setCurPosition(xyz: TileZoom) {
 		globalCommandDispatcher.cfg().data.position = { x: xyz.x, y: xyz.y, z: xyz.z };
 	}
-	addUndoCommand(kind: string, pars: any) {
+	addUndoCommandFromUI(kind: string, pars: any) {
 		this.executeCommand(kind, pars, false);
 		globalCommandDispatcher.cfg().data.redo.length = 0;
 		globalCommandDispatcher.cfg().data.undo.push({

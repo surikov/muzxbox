@@ -80,13 +80,31 @@ class FilterIcon {
 						filterTarget.iconPosition = { x: 0, y: 0 };
 					}
 					if (toSpeaker) {
-						filterTarget.outputs.push('');
+						//filterTarget.outputs.push('');
+						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectFilter, {
+							filter: filterTarget.id
+							, id: ''
+						});
 					} else {
 						if (toFilter) {
-							filterTarget.outputs.push(toFilter.id);
+							//filterTarget.outputs.push(toFilter.id);
+							globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectFilter, {
+								filter: filterTarget.id
+								, id: toFilter.id
+							});
 						} else {
-							filterTarget.iconPosition.x = filterTarget.iconPosition.x + dragAnchor.translation.x;
-							filterTarget.iconPosition.y = filterTarget.iconPosition.y + dragAnchor.translation.y;
+							//filterTarget.iconPosition.x = filterTarget.iconPosition.x + dragAnchor.translation.x;
+							//filterTarget.iconPosition.y = filterTarget.iconPosition.y + dragAnchor.translation.y;
+							let xx = filterTarget.iconPosition.x;
+							let yy = filterTarget.iconPosition.y;
+							globalCommandDispatcher.exe.addUndoCommandFromUI(ExeMoveFilterIcon, {
+								filter: filterTarget.id
+								, from: { x: xx, y: yy }
+								, to: {
+									x: filterTarget.iconPosition.x + dragAnchor.translation.x
+									, y: filterTarget.iconPosition.y + dragAnchor.translation.y
+								}
+							});
 						}
 					}
 					dragAnchor.translation = { x: 0, y: 0 };
@@ -213,12 +231,20 @@ class FilterIcon {
 			if (outId) {
 				fol.connectOutput(outId, filterTarget.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, filterTarget.outputs
 					, (x: number, y: number) => {
-						console.log('split', filterTarget.id, 'from', outId);
+						//console.log('split', filterTarget.id, 'from', outId);
+						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectFilter, {
+							filter: filterTarget.id
+							, id: outId
+						});
 					});
 			} else {
 				fol.connectSpeaker(filterTarget.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, filterTarget.outputs
 					, (x: number, y: number) => {
-						console.log('split', filterTarget.id, 'from speaker');
+						//console.log('split', filterTarget.id, 'from speaker');
+						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectFilter, {
+							filter: filterTarget.id
+							, id: outId
+						});
 					});
 			}
 		}

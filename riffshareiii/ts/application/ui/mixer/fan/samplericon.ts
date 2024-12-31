@@ -50,13 +50,31 @@ class SamplerIcon {
 						samplerTrack.sampler.iconPosition = { x: 0, y: 0 };
 					}
 					if (toSpeaker) {
-						samplerTrack.sampler.outputs.push('');
+						//samplerTrack.sampler.outputs.push('');
+						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectSampler, {
+							drum: order
+							, id: ''
+						});
 					} else {
 						if (toFilter) {
-							samplerTrack.sampler.outputs.push(toFilter.id);
+							//samplerTrack.sampler.outputs.push(toFilter.id);
+							globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectSampler, {
+								drum: order
+								, id: toFilter.id
+							});
 						} else {
-							samplerTrack.sampler.iconPosition.x = samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x;
-							samplerTrack.sampler.iconPosition.y = samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y;
+							//samplerTrack.sampler.iconPosition.x = samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x;
+							//samplerTrack.sampler.iconPosition.y = samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y;
+							let xx = samplerTrack.sampler.iconPosition.x;
+							let yy = samplerTrack.sampler.iconPosition.y;
+							globalCommandDispatcher.exe.addUndoCommandFromUI(ExeMoveSamplerIcon, {
+								drum: order
+								, from: { x: xx, y: yy }
+								, to: {
+									x: samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x
+									, y: samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y
+								}
+							});
 						}
 					}
 					dragAnchor.translation = { x: 0, y: 0 };
@@ -88,7 +106,7 @@ class SamplerIcon {
 								, css: 'fanConnectionBase  fanConnection' + zidx
 							});
 						} else {
-							
+
 							if (globalCommandDispatcher.cfg().dragCollisionSpeaker(xx, yy, samplerTrack.sampler.outputs)) {
 								//toFilter = null;
 								toSpeaker = true;
@@ -152,12 +170,20 @@ class SamplerIcon {
 			if (outId) {
 				fol.connectOutput(outId, samplerTrack.sampler.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, samplerTrack.sampler.outputs
 					, (x: number, y: number) => {
-						console.log('split', samplerTrack.sampler.id, 'from', outId);
+						//console.log('split', samplerTrack.sampler.id, 'from', outId);
+						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectSampler, {
+							drum: order
+							, id: outId
+						});
 					});
 			} else {
 				fol.connectSpeaker(samplerTrack.sampler.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, samplerTrack.sampler.outputs
 					, (x: number, y: number) => {
-						console.log('split', samplerTrack.sampler.id, 'from speaker');
+						//console.log('split', samplerTrack.sampler.id, 'from speaker');
+						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectSampler, {
+							drum: order
+							, id: ''
+						});
 					});
 			}
 		}
