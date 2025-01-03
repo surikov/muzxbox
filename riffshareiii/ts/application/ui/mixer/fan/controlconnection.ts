@@ -9,7 +9,7 @@ class ControlConnection {
 			, toX
 			, toY
 			, anchor);
-		if (!secondary) {
+		/*if (!secondary) {
 			let buttn: TileRectangle = {
 				x: left - 1
 				, y: yy - 1
@@ -20,6 +20,6 @@ class ControlConnection {
 				, css: 'fanConnectionButton'
 			};
 			anchor.content.push(buttn);
-		}
+		}*/
 	}
 }

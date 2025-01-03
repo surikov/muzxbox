@@ -8,6 +8,8 @@ class MixerUI {
 
 	fanLayer: TileLayerDefinition;
 	fanSVGgroup: SVGElement;
+
+	spearsSVGgroup: SVGElement;
 	spearsLayer: TileLayerDefinition;
 
 	levels: MixerZoomLevel[] = [];
@@ -49,6 +51,7 @@ class MixerUI {
 			this.levels[ii].reCreateBars();
 		}
 		this.fanPane.resetPlates(this.fanLayer.anchors, this.spearsLayer.anchors);
+		console.log('spearsLayer',this.spearsLayer.anchors);
 		//this.iconsFanAnchor.ww = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().rightPad;
 		//this.iconsFanAnchor.hh = globalCommandDispatcher.cfg().gridHeight();
 		this.fillerAnchor.xx = globalCommandDispatcher.cfg().leftPad;
@@ -85,8 +88,8 @@ class MixerUI {
 
 		this.fanSVGgroup = (document.getElementById('fanLayer') as any) as SVGElement;
 		this.fanLayer = { g: this.fanSVGgroup, anchors: [], mode: LevelModes.normal };
-		let spearsSVGgroup: SVGElement = (document.getElementById('spearsLayer') as any) as SVGElement;
-		this.spearsLayer = { g: spearsSVGgroup, anchors: [], mode: LevelModes.normal };
+		this.spearsSVGgroup = (document.getElementById('spearsLayer') as any) as SVGElement;
+		this.spearsLayer = { g: this.spearsSVGgroup, anchors: [], mode: LevelModes.normal };
 
 
 		/*

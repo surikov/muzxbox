@@ -15,7 +15,7 @@
 		"module": "AMD",
 		"lib": [
 			"dom",
-			"es2015",
+			"es2016",
 			"es5"
 		],
 		"declaration": true,
@@ -23,7 +23,10 @@
 	},
 	"files": [
         "treevalue/treevalue.ts"
+		,"treevalue/odiff.ts"
         ,"startup.ts"
+
+
 		
 		,"ui/pluginprompt/plugindialog.ts"
 

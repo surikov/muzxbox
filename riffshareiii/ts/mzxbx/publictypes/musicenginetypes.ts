@@ -136,13 +136,14 @@ type Zvoog_Command = {
 	params: any;
 };
 type Zvoog_Project = {
+	versionCode:'1'
 	title: string;
 	timeline: Zvoog_SongMeasure[];
 	tracks: Zvoog_MusicTrack[];
 	percussions: Zvoog_PercussionTrack[];
 	comments: Zvoog_CommentMeasure[];
 	filters: Zvoog_FilterTarget[];
-	selection: Zvoog_Selection|undefined;
+	selectePart: Zvoog_Selection;
 	position: {
 		x: number;
 		y: number;

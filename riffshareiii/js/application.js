@@ -136,6 +136,92 @@ class TreeValue {
     }
     ;
 }
+class MicroDiff {
+    constructor(obj) {
+        this.base = obj;
+    }
+    calculateCommands(changed) {
+        return this.calculateDiff([], this.base, changed);
+    }
+    calculateDiff(nodePath, old, changed) {
+        var _a, _b, _c;
+        let diffs = [];
+        for (let key in old) {
+            let oldValue = old[key];
+            let folder;
+            if (Array.isArray(old)) {
+                folder = parseInt(key);
+            }
+            else {
+                folder = key;
+            }
+            let currentPath = nodePath.slice(0);
+            currentPath.push(folder);
+            if (!(key in changed)) {
+                let newDiff = { path: currentPath, type: "-", oldValue: oldValue };
+                diffs.push(newDiff);
+            }
+            else {
+                let newValue = changed[key];
+                let arrayOrObject = false;
+                if (typeof oldValue === "object"
+                    && typeof newValue === "object"
+                    && Array.isArray(oldValue) === Array.isArray(newValue)) {
+                    arrayOrObject = true;
+                }
+                let rawTypeValue = false;
+                if (((_a = oldValue.constructor) === null || _a === void 0 ? void 0 : _a.name) === 'String'
+                    || ((_b = oldValue.constructor) === null || _b === void 0 ? void 0 : _b.name) === 'Number'
+                    || ((_c = oldValue.constructor) === null || _c === void 0 ? void 0 : _c.name) === 'Boolean') {
+                    rawTypeValue = true;
+                }
+                if (oldValue
+                    && newValue
+                    && arrayOrObject
+                    && (!rawTypeValue)) {
+                    let children = this.calculateDiff(currentPath, oldValue, newValue);
+                    diffs.push.apply(diffs, children);
+                }
+                else {
+                    let bothSameType = false;
+                    if (isNaN(oldValue)) {
+                        if (oldValue + "" === newValue + "") {
+                            bothSameType = true;
+                        }
+                    }
+                    else {
+                        if (0 + oldValue === 0 + newValue) {
+                            bothSameType = true;
+                        }
+                    }
+                    if (oldValue !== newValue
+                        && !(Number.isNaN(newValue) && Number.isNaN(newValue))
+                        && !arrayOrObject
+                        && !bothSameType) {
+                        let newDiff = { path: currentPath, type: "=", newValue: newValue, oldValue: oldValue };
+                        diffs.push(newDiff);
+                    }
+                }
+            }
+        }
+        for (const key in changed) {
+            if (!(key in old)) {
+                let folder;
+                if (Array.isArray(changed)) {
+                    folder = parseInt(key);
+                }
+                else {
+                    folder = key;
+                }
+                let currentPath = nodePath.slice(0);
+                currentPath.push(folder);
+                let newDiff = { path: currentPath, type: "+", newValue: changed[key] };
+                diffs.push(newDiff);
+            }
+        }
+        return diffs;
+    }
+}
 console.log('startup v1.02');
 function startApplication() {
     console.log('startApplication v1.6.01');
@@ -368,10 +454,7 @@ class CommandExe {
                 break;
             case ExeMoveFilterIcon:
                 {
-                    console.log('ExeMoveFilterIcon', pars, globalCommandDispatcher.cfg().data.filters);
-                    console.log('t');
                     let filter = globalCommandDispatcher.cfg().findFilterTarget(pars.filter);
-                    console.log('found', filter);
                     if (filter) {
                         let iconPosition = filter.iconPosition;
                         if (undo) {
@@ -609,11 +692,14 @@ class CommandDispatcher {
         if (this.cfg().data) {
             if (idx >= 0 && idx < this.cfg().data.timeline.length) {
                 let curPro = this.cfg().data;
-                if (curPro.selection) {
-                    let curProjectSelection = curPro.selection;
+                if (curPro.selectePart.startMeasure > -1 || curPro.selectePart.endMeasure > -1) {
+                    let curProjectSelection = curPro.selectePart;
                     if (curProjectSelection.startMeasure == curProjectSelection.endMeasure) {
                         if (curProjectSelection.startMeasure == idx) {
-                            curPro.selection = undefined;
+                            curPro.selectePart = {
+                                startMeasure: -1,
+                                endMeasure: -1
+                            };
                         }
                         else {
                             if (curProjectSelection.startMeasure > idx) {
@@ -631,7 +717,7 @@ class CommandDispatcher {
                     }
                 }
                 else {
-                    curPro.selection = {
+                    curPro.selectePart = {
                         startMeasure: idx,
                         endMeasure: idx
                     };
@@ -903,8 +989,8 @@ class TimeSelectBar {
         this.selectionMark.h = viewHeight * 1024;
     }
     updateTimeSelectionBar() {
-        let selection = globalCommandDispatcher.cfg().data.selection;
-        if (selection) {
+        let selection = globalCommandDispatcher.cfg().data.selectePart;
+        if (selection.startMeasure > -1 || selection.endMeasure > -1) {
             let mm = MMUtil();
             let barLeft = globalCommandDispatcher.cfg().leftPad;
             let startSel = 1;
@@ -2078,6 +2164,7 @@ class MixerUI {
             this.levels[ii].reCreateBars();
         }
         this.fanPane.resetPlates(this.fanLayer.anchors, this.spearsLayer.anchors);
+        console.log('spearsLayer', this.spearsLayer.anchors);
         this.fillerAnchor.xx = globalCommandDispatcher.cfg().leftPad;
         this.fillerAnchor.yy = globalCommandDispatcher.cfg().gridTop();
         this.fillerAnchor.ww = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().rightPad;
@@ -2097,8 +2184,8 @@ class MixerUI {
         this.firstLayers = { g: firstLayerZoom, anchors: [], mode: LevelModes.normal };
         this.fanSVGgroup = document.getElementById('fanLayer');
         this.fanLayer = { g: this.fanSVGgroup, anchors: [], mode: LevelModes.normal };
-        let spearsSVGgroup = document.getElementById('spearsLayer');
-        this.spearsLayer = { g: spearsSVGgroup, anchors: [], mode: LevelModes.normal };
+        this.spearsSVGgroup = document.getElementById('spearsLayer');
+        this.spearsLayer = { g: this.spearsSVGgroup, anchors: [], mode: LevelModes.normal };
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             let mixerGridAnchor = {
                 showZoom: zoomPrefixLevelsCSS[ii].minZoom,
@@ -2782,7 +2869,8 @@ class SamplerIcon {
             };
             dragAnchor.content.push(txt);
         }
-        let samplerFromY = globalCommandDispatcher.cfg().samplerTop() + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
+        let samplerFromY = globalCommandDispatcher.cfg().samplerTop()
+            + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
         new ControlConnection().addAudioStreamLineFlow(false, zidx, samplerFromY, xx, yy, spearsAnchor);
         let fol = new FanOutputLine();
         for (let oo = 0; oo < samplerTrack.sampler.outputs.length; oo++) {
@@ -2804,6 +2892,35 @@ class SamplerIcon {
                 });
             }
         }
+        let sbuttn = {
+            x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1,
+            y: samplerFromY - 1,
+            w: 2,
+            h: 2,
+            rx: 1,
+            ry: 1,
+            css: 'fanSampleDrragger',
+            draggable: true
+        };
+        let btnAnchor = {
+            xx: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1,
+            yy: samplerFromY - 1,
+            ww: 2,
+            hh: 2,
+            showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [sbuttn], translation: { x: 0, y: 0 }
+        };
+        sbuttn.activation = (x, y) => {
+            if (!btnAnchor.translation) {
+                btnAnchor.translation = { x: 0, y: 0 };
+            }
+            if (x == 0 && y == 0) {
+            }
+            else {
+                btnAnchor.translation.y = btnAnchor.translation.y + y;
+            }
+            globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.spearsSVGgroup, spearsAnchor, LevelModes.normal);
+        };
+        spearsAnchor.content.push(btnAnchor);
     }
 }
 class FilterIcon {
@@ -2994,18 +3111,6 @@ class ControlConnection {
     addAudioStreamLineFlow(secondary, zIndex, yy, toX, toY, anchor) {
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
         new SpearConnection().addSpear(secondary, zIndex, left, yy, globalCommandDispatcher.cfg().fanPluginIconSize(zIndex), toX, toY, anchor);
-        if (!secondary) {
-            let buttn = {
-                x: left - 1,
-                y: yy - 1,
-                w: 2,
-                h: 2,
-                rx: 1,
-                ry: 1,
-                css: 'fanConnectionButton'
-            };
-            anchor.content.push(buttn);
-        }
     }
 }
 class SpearConnection {
@@ -3332,8 +3437,9 @@ class WarningUI {
 }
 let mzxbxProjectForTesting2 = {
     title: 'test data for debug',
+    versionCode: '1',
     list: false,
-    selection: undefined,
+    selectePart: { startMeasure: 1, endMeasure: 1 },
     undo: [],
     redo: [],
     position: { x: -13037.9, y: -1317.9, z: 4.7 },
@@ -3380,9 +3486,11 @@ let mzxbxProjectForTesting2 = {
         },
         {
             title: "Second track", volume: 1, measures: [
-                { chords: [
+                {
+                    chords: [
                         { skip: { count: 3, part: 4 }, pitches: [77], slides: [{ duration: { count: 13, part: 8 }, delta: -1 }] }
-                    ] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+                    ]
+                }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
             performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 } }
         },
@@ -3398,6 +3506,142 @@ let mzxbxProjectForTesting2 = {
             ],
             performer: { id: 'bt3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 } }
         }, {
+            title: "A track 987654321", volume: 1, measures: [
+                { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+            ],
+            performer: { id: 'ct3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 77, y: 66 } }
+        }
+    ],
+    percussions: [
+        {
+            title: "Snare", volume: 1, measures: [
+                { skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
+            ],
+            sampler: { id: 'd1', data: '', kind: 'baseSampler', outputs: ['drum1Volme'], iconPosition: { x: 22, y: 75 } }
+        },
+        {
+            title: "Snare2", volume: 1, measures: [],
+            sampler: { id: 'd2', data: '', kind: 'baseSampler', outputs: ['drum2Volme'], iconPosition: { x: 22, y: 91 } }
+        },
+        {
+            title: "Snare3", volume: 1, measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }],
+            sampler: { id: 'd3', data: '', kind: 'baseSampler', outputs: ['drum3Volme'], iconPosition: { x: 22, y: 99 } }
+        }
+    ],
+    comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16', row: 0 }] }, {
+            points: [
+                { skip: { count: 0, part: 16 }, text: '20', row: 0 },
+                { skip: { count: 1, part: 16 }, text: '21', row: 1 },
+                { skip: { count: 2, part: 16 }, text: '22', row: 2 },
+                { skip: { count: 3, part: 16 }, text: '23', row: 0 },
+                { skip: { count: 4, part: 16 }, text: '24', row: 1 },
+                { skip: { count: 5, part: 16 }, text: '25', row: 2 },
+                { skip: { count: 6, part: 16 }, text: '26', row: 0 },
+                { skip: { count: 7, part: 16 }, text: '27', row: 1 },
+                { skip: { count: 8, part: 16 }, text: '28\ntest', row: 2 },
+                { skip: { count: 9, part: 16 }, text: '29', row: 0 },
+                { skip: { count: 10, part: 16 }, text: '2-10', row: 1 },
+                { skip: { count: 11, part: 16 }, text: '2-11', row: 2 },
+                { skip: { count: 12, part: 16 }, text: '2-12', row: 0 },
+                { skip: { count: 13, part: 16 }, text: '2-13', row: 1 },
+                { skip: { count: 14, part: 16 }, text: '2-14', row: 2 },
+                { skip: { count: 15, part: 16 }, text: '2-15', row: 0 }
+            ]
+        }, { points: [{ skip: { count: 2, part: 16 }, text: '3-2/16', row: 0 }] },
+        { points: [{ skip: { count: 2, part: 16 }, text: '4-2/16', row: 0 }] },
+        { points: [{ skip: { count: 2, part: 16 }, text: '5-2/16', row: 0 }] }],
+    filters: [
+        {
+            id: 'volumeSlide', kind: 'baseVolume', dataBlob: '', outputs: ['masterVolme'],
+            automation: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }] }, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }],
+            iconPosition: { x: 152, y: 39 }
+        },
+        {
+            id: 'masterVolme', kind: 'base_volume', dataBlob: 'bb1', outputs: [''],
+            automation: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }],
+            iconPosition: { x: 188, y: 7 }
+        },
+        { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 }, automation: [] },
+        { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 }, automation: [] },
+        { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 }, automation: [] },
+        { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 }, automation: [] },
+        { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [] },
+        { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [] },
+        { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [] }
+    ]
+};
+let mzxbxProjectForTesting3 = {
+    title: 'test 33 data for debug',
+    versionCode: '1',
+    list: false,
+    selectePart: { startMeasure: 1, endMeasure: 2 },
+    undo: [],
+    redo: [],
+    position: { x: -13037.9, y: -1317.9, z: 4.007 },
+    timeline: [
+        { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 201, metre: { count: 3, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } },
+        { tempo: 200, metre: { count: 3, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } },
+        { tempo: 200, metre: { count: 3, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } },
+        { tempo: 200, metre: { count: 3, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } }
+    ],
+    tracks: [
+        {
+            title: "Second track", volume: 1, measures: [
+                {
+                    chords: [
+                        { skip: { count: 3, part: 4 }, pitches: [77], slides: [{ duration: { count: 13, part: 8 }, delta: -1 }] }
+                    ]
+                }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+            ],
+            performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 } }
+        },
+        {
+            title: "A track 1", volume: 1, measures: [
+                { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+            ],
+            performer: { id: 'bt3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 } }
+        },
+        {
+            title: "Track one", volume: 1, measures: [
+                {
+                    chords: [
+                        { skip: { count: 0, part: 1 }, pitches: [25], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 1, part: 16 }, pitches: [26], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 1, part: 8 }, pitches: [27], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 3, part: 16 }, pitches: [28], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 1, part: 4 }, pitches: [29], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 5, part: 16 }, pitches: [30], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 3, part: 8 }, pitches: [31], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 7, part: 16 }, pitches: [32], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
+                        { skip: { count: 1, part: 2 }, pitches: [33], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }
+                    ]
+                }, {
+                    chords: [
+                        {
+                            skip: { count: 0, part: 2 }, pitches: [60], slides: [
+                                { duration: { count: 1, part: 8 }, delta: 5 },
+                                { duration: { count: 1, part: 8 }, delta: -57 },
+                                { duration: { count: 1, part: 4 }, delta: 0 }
+                            ]
+                        }
+                    ]
+                }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+            ],
+            performer: { id: 'firstPerfoemrID', data: '', kind: 'basePitched', outputs: ['track1Volme'], iconPosition: { x: 40, y: 20 } }
+        },
+        {
+            title: "Third track", volume: 1, measures: [
+                { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+            ],
+            performer: { id: 'at3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 } }
+        },
+        {
             title: "A track 987654321", volume: 1, measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
@@ -3531,6 +3775,18 @@ let testEmptyMixerData = {
         { title: 'Second track' }
     ]
 };
+let msstart = Date.now();
+const obj1 = {
+    originalProperty: true,
+};
+const obj2 = {
+    originalProperty: true,
+    newProperty: "new",
+};
+let diff = new MicroDiff(mzxbxProjectForTesting2);
+let resu = diff.calculateCommands(mzxbxProjectForTesting3);
+console.log(resu);
+console.log(Date.now() - msstart, 'difference');
 class MixerDataMathUtility {
     constructor(data) {
         this.leftPad = 3;
@@ -3709,17 +3965,14 @@ class MixerDataMathUtility {
         return this.gridTop() + this.gridHeight() + this.padGrid2Sampler;
     }
     findFilterTarget(filterId) {
-        console.log('findFilterTarget start -----------------------------------------------------');
         if (this.data) {
             for (let nn = 0; nn < this.data.filters.length; nn++) {
                 let filter = this.data.filters[nn];
-                console.log('findFilterTarget', filterId, filter);
                 if (filter.id == filterId) {
                     return filter;
                 }
             }
         }
-        console.log('findFilterTarget no', filterId);
         return null;
     }
     textZoomRatio(zIndex) {

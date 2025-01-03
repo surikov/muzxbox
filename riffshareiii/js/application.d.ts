@@ -15,6 +15,29 @@ declare class TreeValue {
     fillFromJSONstring(json: string): void;
     dump(pad: string, symbol: string): void;
 }
+interface DifferenceCreate {
+    type: "+";
+    path: (string | number)[];
+    newValue: any;
+}
+interface DifferenceRemove {
+    type: "-";
+    path: (string | number)[];
+    oldValue: any;
+}
+interface DifferenceChange {
+    type: "=";
+    path: (string | number)[];
+    newValue: any;
+    oldValue: any;
+}
+declare type RawDifference = DifferenceCreate | DifferenceRemove | DifferenceChange;
+declare class MicroDiff {
+    base: any;
+    constructor(obj: any);
+    calculateCommands(changed: any): RawDifference[];
+    calculateDiff(nodePath: (string | number)[], old: any, changed: any): RawDifference[];
+}
 declare function createSchedulePlayer(): MZXBX_Player;
 declare function createTileLevel(): TileLevelBase;
 declare function startApplication(): void;
@@ -300,6 +323,7 @@ declare class MixerUI {
     firstLayers: TileLayerDefinition;
     fanLayer: TileLayerDefinition;
     fanSVGgroup: SVGElement;
+    spearsSVGgroup: SVGElement;
     spearsLayer: TileLayerDefinition;
     levels: MixerZoomLevel[];
     fillerAnchor: TileAnchor;
@@ -470,6 +494,7 @@ declare class WarningUI {
     hideWarning(): void;
 }
 declare let mzxbxProjectForTesting2: Zvoog_Project;
+declare let mzxbxProjectForTesting3: Zvoog_Project;
 declare let testBigMixerData: {
     title: string;
     timeline: {
@@ -500,6 +525,16 @@ declare let testEmptyMixerData: {
         title: string;
     }[];
 };
+declare let msstart: number;
+declare const obj1: {
+    originalProperty: boolean;
+};
+declare const obj2: {
+    originalProperty: boolean;
+    newProperty: string;
+};
+declare let diff: MicroDiff;
+declare let resu: RawDifference[];
 declare class MixerDataMathUtility {
     data: Zvoog_Project;
     leftPad: number;
@@ -797,13 +832,14 @@ declare type Zvoog_Command = {
     params: any;
 };
 declare type Zvoog_Project = {
+    versionCode: '1';
     title: string;
     timeline: Zvoog_SongMeasure[];
     tracks: Zvoog_MusicTrack[];
     percussions: Zvoog_PercussionTrack[];
     comments: Zvoog_CommentMeasure[];
     filters: Zvoog_FilterTarget[];
-    selection: Zvoog_Selection | undefined;
+    selectePart: Zvoog_Selection;
     position: {
         x: number;
         y: number;

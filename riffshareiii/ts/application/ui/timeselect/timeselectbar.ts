@@ -55,10 +55,11 @@ class TimeSelectBar {
 		this.selectionMark.h = viewHeight * 1024;
 	}
 	updateTimeSelectionBar(//data: Zvoog_Project
-	//cfg:MixerDataMathUtility
+		//cfg:MixerDataMathUtility
 	) {
-		let selection: Zvoog_Selection|undefined=globalCommandDispatcher.cfg().data.selection;
-		if (selection) {
+		let selection: Zvoog_Selection = globalCommandDispatcher.cfg().data.selectePart;
+		//if (selection) {
+		if (selection.startMeasure > -1 || selection.endMeasure > -1) {
 			//let mixm: MixerDataMath = new MixerDataMath(data);
 			let mm: Zvoog_MetreMathType = MMUtil();
 			let barLeft = globalCommandDispatcher.cfg().leftPad;
@@ -84,20 +85,20 @@ class TimeSelectBar {
 					break;
 				}
 			}
-			if(widthSel){
+			if (widthSel) {
 				this.selectionMark.x = startSel;
 				this.selectionMark.w = widthSel;
 			}
-			
-		}else{
+
+		} else {
 			this.selectionMark.x = -1;
 			this.selectionMark.w = 0.5;
 		}
 		//console.log('updateTimeSelectionBar',this.selectionMark.x,this.selectionMark.w);
 	}
-	
+
 	createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor//, data: Zvoog_Project
-	//,cfg:MixerDataMathUtility
+		//,cfg:MixerDataMathUtility
 	) {
 		let mark: TileRectangle = {
 			x: barLeft, y: 0, w: size, h: size
@@ -135,7 +136,7 @@ class TimeSelectBar {
 			, css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
 		};
 		measureAnchor.content.push(bpm);
-	
+
 	}
 
 	fillTimeBar(//data:Zvoog_Project
@@ -195,7 +196,7 @@ class TimeSelectBar {
 						if (!skip.less(curBar.metre)) {
 							break;
 						}
-		
+
 						if (line.label) {
 							let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 							let mark: TileRectangle = {

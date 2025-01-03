@@ -12,6 +12,7 @@ class SamplerIcon {
 		}
 	}
 	addSamplerSpot(order: number, samplerTrack: Zvoog_PercussionTrack, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
+
 		let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.66;
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
@@ -161,7 +162,9 @@ class SamplerIcon {
 			};
 			dragAnchor.content.push(txt);
 		}
-		let samplerFromY = globalCommandDispatcher.cfg().samplerTop() + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
+		let samplerFromY = globalCommandDispatcher.cfg().samplerTop()
+			+ (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
+		//console.log('addSamplerSpot', order, samplerFromY);
 		new ControlConnection().addAudioStreamLineFlow(false, zidx, samplerFromY, xx, yy, spearsAnchor);
 		//new FanOutputLine().addOutputs(samplerTrack.sampler.outputs, fanLevelAnchor, spearsAnchor, samplerTrack.sampler.id, xx, yy, zidx);
 		let fol = new FanOutputLine();
@@ -187,5 +190,43 @@ class SamplerIcon {
 					});
 			}
 		}
+
+
+		let sbuttn: TileRectangle = {
+			x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1
+			, y: samplerFromY - 1
+			, w: 2
+			, h: 2
+			, rx: 1
+			, ry: 1
+			, css: 'fanSampleDrragger'
+			, draggable: true
+		};
+		let btnAnchor: TileAnchor = {
+			xx: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1
+			, yy: samplerFromY - 1
+			, ww: 2
+			, hh: 2
+			, showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [sbuttn], translation: { x: 0, y: 0 }
+		};
+		sbuttn.activation = (x: number, y: number) => {
+			if (!btnAnchor.translation) {
+				btnAnchor.translation = { x: 0, y: 0 };
+			}
+			if (x == 0 && y == 0) {
+				//btnAnchor.translation.x = 0;
+				//btnAnchor.translation.y = 0;
+			} else {
+				//btnAnchor.translation.x = btnAnchor.translation.x + x;
+				btnAnchor.translation.y = btnAnchor.translation.y + y;
+				//console.log(btnAnchor.translation.y);
+			}
+			globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.spearsSVGgroup
+				, spearsAnchor
+				, LevelModes.normal);
+		};
+
+		spearsAnchor.content.push(btnAnchor);
+		//console.log(order,samplerFromY, zidx, spearsAnchor);
 	}
 }
