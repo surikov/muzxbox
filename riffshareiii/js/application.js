@@ -136,6 +136,55 @@ class TreeValue {
     }
     ;
 }
+class ODiff {
+    constructor(obj) {
+        this.base = obj;
+    }
+    createDiffCommands(changed) {
+        let cmds = [];
+        this.calculateDiff([], cmds, this.base, changed);
+        return cmds;
+    }
+    calculateDiff(nodePath, commands, old, changed) {
+        if (Array.isArray(old)) {
+            this.calculateArray(nodePath, commands, old, changed);
+        }
+        else {
+            this.calculateNonArray(nodePath, commands, old, changed);
+        }
+    }
+    calculateNonArray(nodePath, commands, old, changed) {
+        for (let prop in old) {
+            let currentPath = nodePath.slice(0);
+            currentPath.push(prop);
+            if (typeof old[prop] === "object" || Array.isArray(old[prop])) {
+                this.calculateDiff(currentPath, commands, old[prop], changed[prop]);
+            }
+            else {
+                if (old[prop] !== changed[prop]) {
+                    commands.push({ path: currentPath, type: "=", newValue: changed[prop], oldValue: old[prop] });
+                }
+            }
+        }
+    }
+    calculateArray(nodePath, commands, old, changed) {
+        for (let ii = 0; ii < old.length && ii < changed.length; ii++) {
+            let currentPath = nodePath.slice(0);
+            currentPath.push(ii);
+            this.calculateDiff(currentPath, commands, old[ii], changed[ii]);
+        }
+        for (let ii = old.length; ii < changed.length; ii++) {
+            let currentPath = nodePath.slice(0);
+            currentPath.push(ii);
+            commands.push({ path: currentPath, type: "+", newValue: changed[ii] });
+        }
+        for (let ii = changed.length; ii < old.length; ii++) {
+            let currentPath = nodePath.slice(0);
+            currentPath.push(ii);
+            commands.push({ path: currentPath, type: "-", oldValue: old[ii] });
+        }
+    }
+}
 class MicroDiff {
     constructor(obj) {
         this.base = obj;
@@ -3783,9 +3832,9 @@ const obj2 = {
     originalProperty: true,
     newProperty: "new",
 };
-let diff = new MicroDiff(mzxbxProjectForTesting2);
-let resu = diff.calculateCommands(mzxbxProjectForTesting3);
-console.log(resu);
+let diff = new ODiff(mzxbxProjectForTesting2);
+let resu = diff.createDiffCommands(mzxbxProjectForTesting3);
+console.log(structuredClone(resu));
 console.log(Date.now() - msstart, 'difference');
 class MixerDataMathUtility {
     constructor(data) {

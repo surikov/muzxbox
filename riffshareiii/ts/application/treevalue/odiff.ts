@@ -19,6 +19,55 @@ interface DifferenceChange {
 
 type RawDifference = DifferenceCreate | DifferenceRemove | DifferenceChange;
 
+class ODiff {
+    base: any;
+    constructor(obj: any) {
+        this.base = obj;
+    }
+    createDiffCommands(changed: any): RawDifference[] {
+        let cmds: RawDifference[] = [];
+        this.calculateDiff([], cmds, this.base, changed);
+        return cmds;
+    }
+    calculateDiff(nodePath: (string | number)[], commands: RawDifference[], old: any, changed: any): void {
+        if (Array.isArray(old)) {
+            this.calculateArray(nodePath, commands, old, changed);
+        } else {
+            this.calculateNonArray(nodePath, commands, old, changed);
+        }
+    }
+    calculateNonArray(nodePath: (string | number)[], commands: RawDifference[], old: any, changed: any): void {
+        for (let prop in old) {
+            let currentPath: (string | number)[] = nodePath.slice(0);
+            currentPath.push(prop);
+            if (typeof old[prop] === "object" || Array.isArray(old[prop])) {
+                this.calculateDiff(currentPath, commands, old[prop], changed[prop]);
+            } else {
+                if (old[prop] !== changed[prop]) {
+                    commands.push({ path: currentPath, type: "=", newValue: changed[prop], oldValue: old[prop] });
+                }
+            }
+        }
+    }
+    calculateArray(nodePath: (string | number)[], commands: RawDifference[], old: any[], changed: any[]): void {
+        for (let ii = 0; ii < old.length && ii < changed.length; ii++) {
+            let currentPath: (string | number)[] = nodePath.slice(0);
+            currentPath.push(ii);
+            this.calculateDiff(currentPath, commands, old[ii], changed[ii]);
+        }
+        for (let ii = old.length; ii < changed.length; ii++) {
+            let currentPath: (string | number)[] = nodePath.slice(0);
+            currentPath.push(ii);
+            commands.push({ path: currentPath, type: "+", newValue: changed[ii] });
+        }
+        for (let ii = changed.length; ii < old.length; ii++) {
+            let currentPath: (string | number)[] = nodePath.slice(0);
+            currentPath.push(ii);
+            commands.push({ path: currentPath, type: "-", oldValue: old[ii] });
+        }
+    }
+}
+
 class MicroDiff {
     base: any;
     constructor(obj: any) {
@@ -104,13 +153,13 @@ class MicroDiff {
                 }
                 let currentPath: (string | number)[] = nodePath.slice(0);
                 currentPath.push(folder);
-                let newDiff: DifferenceCreate={ path: currentPath, type: "+", newValue: changed[key] };
-/*
-                if (Array.isArray(changed)) {
-                    newDiff = { path: [0 + key], type: "+", newValue: changed[key] };
-                } else {
-                    newDiff = { path: [key], type: "+", newValue: changed[key] };
-                }*/
+                let newDiff: DifferenceCreate = { path: currentPath, type: "+", newValue: changed[key] };
+                /*
+                                if (Array.isArray(changed)) {
+                                    newDiff = { path: [0 + key], type: "+", newValue: changed[key] };
+                                } else {
+                                    newDiff = { path: [key], type: "+", newValue: changed[key] };
+                                }*/
                 diffs.push(newDiff);
             }
         }

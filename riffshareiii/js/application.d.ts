@@ -32,6 +32,14 @@ interface DifferenceChange {
     oldValue: any;
 }
 declare type RawDifference = DifferenceCreate | DifferenceRemove | DifferenceChange;
+declare class ODiff {
+    base: any;
+    constructor(obj: any);
+    createDiffCommands(changed: any): RawDifference[];
+    calculateDiff(nodePath: (string | number)[], commands: RawDifference[], old: any, changed: any): void;
+    calculateNonArray(nodePath: (string | number)[], commands: RawDifference[], old: any, changed: any): void;
+    calculateArray(nodePath: (string | number)[], commands: RawDifference[], old: any[], changed: any[]): void;
+}
 declare class MicroDiff {
     base: any;
     constructor(obj: any);
@@ -533,7 +541,7 @@ declare const obj2: {
     originalProperty: boolean;
     newProperty: string;
 };
-declare let diff: MicroDiff;
+declare let diff: ODiff;
 declare let resu: RawDifference[];
 declare class MixerDataMathUtility {
     data: Zvoog_Project;

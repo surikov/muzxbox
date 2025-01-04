@@ -487,9 +487,14 @@ const obj2 = {
     originalProperty: true,
     newProperty: "new",
 };
+/*
 let diff = new MicroDiff(mzxbxProjectForTesting2);
 let resu = diff.calculateCommands(mzxbxProjectForTesting3);
 console.log(resu);
+*/
+let diff = new ODiff(mzxbxProjectForTesting2);
+let resu = diff.createDiffCommands(mzxbxProjectForTesting3);
+console.log(structuredClone(resu));
 //console.log(diff(mzxbxProjectForTesting2, mzxbxProjectForTesting3));
 console.log(Date.now() - msstart, 'difference');
 
