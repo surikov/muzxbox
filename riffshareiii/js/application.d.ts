@@ -40,12 +40,6 @@ declare class ODiff {
     calculateNonArray(nodePath: (string | number)[], commands: RawDifference[], old: any, changed: any): void;
     calculateArray(nodePath: (string | number)[], commands: RawDifference[], old: any[], changed: any[]): void;
 }
-declare class MicroDiff {
-    base: any;
-    constructor(obj: any);
-    calculateCommands(changed: any): RawDifference[];
-    calculateDiff(nodePath: (string | number)[], old: any, changed: any): RawDifference[];
-}
 declare function createSchedulePlayer(): MZXBX_Player;
 declare function createTileLevel(): TileLevelBase;
 declare function startApplication(): void;

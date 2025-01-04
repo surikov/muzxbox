@@ -67,7 +67,7 @@ class ODiff {
         }
     }
 }
-
+/*
 class MicroDiff {
     base: any;
     constructor(obj: any) {
@@ -114,10 +114,7 @@ class MicroDiff {
                     && (!rawTypeValue)
                 ) {
                     let children = this.calculateDiff(currentPath, oldValue, newValue);
-                    /*children.map((item) => {
-                        item.path.unshift(currentPath);
-                        return item;
-                    });*/
+      
                     diffs.push.apply(diffs, children);
                 } else {
                     let bothSameType = false;
@@ -154,15 +151,11 @@ class MicroDiff {
                 let currentPath: (string | number)[] = nodePath.slice(0);
                 currentPath.push(folder);
                 let newDiff: DifferenceCreate = { path: currentPath, type: "+", newValue: changed[key] };
-                /*
-                                if (Array.isArray(changed)) {
-                                    newDiff = { path: [0 + key], type: "+", newValue: changed[key] };
-                                } else {
-                                    newDiff = { path: [key], type: "+", newValue: changed[key] };
-                                }*/
+ 
                 diffs.push(newDiff);
             }
         }
         return diffs;
     }
 }
+*/
