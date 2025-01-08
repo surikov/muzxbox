@@ -81,28 +81,60 @@ class FilterIcon {
 					}
 					if (toSpeaker) {
 						//filterTarget.outputs.push('');
-						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectFilter, {
+						/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectFilter, {
 							filter: filterTarget.id
 							, id: ''
+						});*/
+						/*let state = new StateDiff(['filters', order]);
+						filterTarget.outputs.push('');
+						globalCommandDispatcher.exe.addUndoCommandFromUI(state.diffChangedCommands());
+						*/
+						globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+							filterTarget.outputs.push('');
 						});
 					} else {
 						if (toFilter) {
 							//filterTarget.outputs.push(toFilter.id);
-							globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectFilter, {
+							/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectFilter, {
 								filter: filterTarget.id
 								, id: toFilter.id
+							});*/
+							/*
+							let state = new StateDiff(['filters', order]);
+							filterTarget.outputs.push(toFilter.id);
+							globalCommandDispatcher.exe.addUndoCommandFromUI(state.diffChangedCommands());
+*/
+							globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+								if (toFilter) filterTarget.outputs.push(toFilter.id);
 							});
 						} else {
 							//filterTarget.iconPosition.x = filterTarget.iconPosition.x + dragAnchor.translation.x;
 							//filterTarget.iconPosition.y = filterTarget.iconPosition.y + dragAnchor.translation.y;
-							let xx = filterTarget.iconPosition.x;
-							let yy = filterTarget.iconPosition.y;
-							globalCommandDispatcher.exe.addUndoCommandFromUI(ExeMoveFilterIcon, {
-								filter: filterTarget.id
-								, from: { x: xx, y: yy }
-								, to: {
-									x: filterTarget.iconPosition.x + dragAnchor.translation.x
-									, y: filterTarget.iconPosition.y + dragAnchor.translation.y
+							//let xx = filterTarget.iconPosition.x;
+							//let yy = filterTarget.iconPosition.y;
+							/*
+														//let undoPath: (string | number)[] = ['filters', order];
+														let state = new StateDiff(['filters', order]);
+														//console.log('ExeMoveFilterIcon', undoPath, filterTarget.id);
+														filterTarget.iconPosition.x = filterTarget.iconPosition.x + dragAnchor.translation.x;
+														filterTarget.iconPosition.y = filterTarget.iconPosition.y + dragAnchor.translation.y;
+														/
+																					globalCommandDispatcher.exe.addUndoCommandFromUI(ExeMoveFilterIcon, {
+																						filter: filterTarget.id
+																						, from: { x: xx, y: yy }
+																						, to: {
+																							x: filterTarget.iconPosition.x + dragAnchor.translation.x
+																							, y: filterTarget.iconPosition.y + dragAnchor.translation.y
+																						}
+																					});/
+														//let cmds = state.diffChangedCommands();
+														globalCommandDispatcher.exe.addUndoCommandFromUI(state.diffChangedCommands());
+														//console.log(cmds);
+														*/
+							globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+								if (dragAnchor.translation) {
+									filterTarget.iconPosition.x = filterTarget.iconPosition.x + dragAnchor.translation.x;
+									filterTarget.iconPosition.y = filterTarget.iconPosition.y + dragAnchor.translation.y;
 								}
 							});
 						}
@@ -232,18 +264,45 @@ class FilterIcon {
 				fol.connectOutput(outId, filterTarget.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, filterTarget.outputs
 					, (x: number, y: number) => {
 						//console.log('split', filterTarget.id, 'from', outId);
-						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectFilter, {
+						/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectFilter, {
 							filter: filterTarget.id
 							, id: outId
+						});
+						*/
+						/*let state = new StateDiff(['filters', order]);
+						let nn = filterTarget.outputs.indexOf(outId);
+						if (nn > -1) {
+							filterTarget.outputs.splice(nn, 1);
+						}
+						globalCommandDispatcher.exe.addUndoCommandFromUI(state.diffChangedCommands());
+*/
+						globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+							let nn = filterTarget.outputs.indexOf(outId);
+							if (nn > -1) {
+								filterTarget.outputs.splice(nn, 1);
+							}
 						});
 					});
 			} else {
 				fol.connectSpeaker(filterTarget.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, filterTarget.outputs
 					, (x: number, y: number) => {
 						//console.log('split', filterTarget.id, 'from speaker');
-						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectFilter, {
+						/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectFilter, {
 							filter: filterTarget.id
 							, id: outId
+						});*/
+						/*let state = new StateDiff(['filters', order]);
+						let nn = filterTarget.outputs.indexOf('');
+						if (nn > -1) {
+							filterTarget.outputs.splice(nn, 1);
+						}
+						globalCommandDispatcher.exe.addUndoCommandFromUI(state.diffChangedCommands());
+						*/
+						globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+							let nn = filterTarget.outputs.indexOf('');
+							if (nn > -1) {
+								filterTarget.outputs.splice(nn, 1);
+							}
 						});
 					});
 			}

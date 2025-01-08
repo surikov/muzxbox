@@ -136,16 +136,33 @@ class TreeValue {
     }
     ;
 }
-class ODiff {
-    constructor(obj) {
-        this.base = obj;
+class StateDiff {
+    constructor(path) {
+        this.basePath = path.slice(0);
+        this.pathDataCopy = JSON.parse(JSON.stringify(this.findNodeByPath()));
     }
-    createDiffCommands(changed) {
+    findNodeByPath() {
+        let parent = globalCommandDispatcher.cfg().data;
+        for (let ii = 0; ii < this.basePath.length; ii++) {
+            parent = parent[this.basePath[ii]];
+        }
+        return parent;
+    }
+    diffChangedCommands() {
         let cmds = [];
-        this.calculateDiff([], cmds, this.base, changed);
-        return cmds;
+        let changed = this.findNodeByPath();
+        this.addDiff(this.basePath, cmds, this.pathDataCopy, changed);
+        let dc = {
+            actions: cmds,
+            position: {
+                x: globalCommandDispatcher.cfg().data.position.x,
+                y: globalCommandDispatcher.cfg().data.position.y,
+                z: globalCommandDispatcher.cfg().data.position.z
+            }
+        };
+        return dc;
     }
-    calculateDiff(nodePath, commands, old, changed) {
+    addDiff(nodePath, commands, old, changed) {
         if (Array.isArray(old)) {
             this.calculateArray(nodePath, commands, old, changed);
         }
@@ -158,11 +175,16 @@ class ODiff {
             let currentPath = nodePath.slice(0);
             currentPath.push(prop);
             if (typeof old[prop] === "object" || Array.isArray(old[prop])) {
-                this.calculateDiff(currentPath, commands, old[prop], changed[prop]);
+                this.addDiff(currentPath, commands, old[prop], changed[prop]);
             }
             else {
                 if (old[prop] !== changed[prop]) {
-                    commands.push({ path: currentPath, type: "=", newValue: changed[prop], oldValue: old[prop] });
+                    commands.push({
+                        path: currentPath,
+                        type: "=",
+                        newValue: changed[prop],
+                        oldValue: old[prop]
+                    });
                 }
             }
         }
@@ -171,17 +193,25 @@ class ODiff {
         for (let ii = 0; ii < old.length && ii < changed.length; ii++) {
             let currentPath = nodePath.slice(0);
             currentPath.push(ii);
-            this.calculateDiff(currentPath, commands, old[ii], changed[ii]);
+            this.addDiff(currentPath, commands, old[ii], changed[ii]);
         }
         for (let ii = old.length; ii < changed.length; ii++) {
             let currentPath = nodePath.slice(0);
             currentPath.push(ii);
-            commands.push({ path: currentPath, type: "+", newValue: changed[ii] });
+            commands.push({
+                path: currentPath,
+                type: "+",
+                newNode: JSON.parse(JSON.stringify(changed[ii]))
+            });
         }
         for (let ii = changed.length; ii < old.length; ii++) {
             let currentPath = nodePath.slice(0);
             currentPath.push(ii);
-            commands.push({ path: currentPath, type: "-", oldValue: old[ii] });
+            commands.push({
+                path: currentPath,
+                type: "-",
+                oldNode: old[ii]
+            });
         }
     }
 }
@@ -308,212 +338,21 @@ class PluginDialogPrompt {
         }
     }
 }
-const ExeMoveTrack = 'ExeMoveTrack';
-const ExeMovePerformerIcon = 'ExeMovePerformerIcon';
-const ExeConnectPerformer = 'ExeConnectPerformer';
-const ExeDisonnectPerformer = 'ExeDisonnectPerformer';
-const ExeMoveSamplerIcon = 'ExeMoveSamplerIcon';
-const ExeConnectSampler = 'ExeConnectSampler';
-const ExeDisonnectSampler = 'ExeDisonnectSampler';
-const ExeMoveFilterIcon = 'ExeMoveFilterIcon';
-const ExeConnectFilter = 'ExeConnectFilter';
-const ExeDisonnectFilter = 'ExeDisonnectFilter';
 class CommandExe {
-    executeCommand(kind, pars, undo) {
-        switch (kind) {
-            case ExeMoveTrack:
-                {
-                    if (undo) {
-                        let track = globalCommandDispatcher.cfg().data.tracks.splice(pars.to, 1)[0];
-                        globalCommandDispatcher.cfg().data.tracks.splice(pars.from, 0, track);
-                    }
-                    else {
-                        let track = globalCommandDispatcher.cfg().data.tracks.splice(pars.from, 1)[0];
-                        globalCommandDispatcher.cfg().data.tracks.splice(pars.to, 0, track);
-                    }
-                }
-                break;
-            case ExeMovePerformerIcon:
-                {
-                    let iconPosition = globalCommandDispatcher.cfg().data.tracks[pars.track].performer.iconPosition;
-                    if (undo) {
-                        iconPosition.x = pars.from.x;
-                        iconPosition.y = pars.from.y;
-                    }
-                    else {
-                        iconPosition.x = pars.to.x;
-                        iconPosition.y = pars.to.y;
-                    }
-                }
-                break;
-            case ExeConnectPerformer:
-                {
-                    let performer = globalCommandDispatcher.cfg().data.tracks[pars.track].performer;
-                    if (undo) {
-                        let nn = performer.outputs.indexOf(pars.id);
-                        if (nn > -1) {
-                            performer.outputs.splice(nn, 1);
-                        }
-                    }
-                    else {
-                        performer.outputs.push(pars.id);
-                    }
-                }
-                break;
-            case ExeDisonnectPerformer:
-                {
-                    let performer = globalCommandDispatcher.cfg().data.tracks[pars.track].performer;
-                    if (undo) {
-                        performer.outputs.push(pars.id);
-                    }
-                    else {
-                        let nn = performer.outputs.indexOf(pars.id);
-                        if (nn > -1) {
-                            performer.outputs.splice(nn, 1);
-                        }
-                    }
-                }
-                break;
-            case ExeMoveSamplerIcon:
-                {
-                    let iconPosition = globalCommandDispatcher.cfg().data.percussions[pars.drum].sampler.iconPosition;
-                    if (undo) {
-                        iconPosition.x = pars.from.x;
-                        iconPosition.y = pars.from.y;
-                    }
-                    else {
-                        iconPosition.x = pars.to.x;
-                        iconPosition.y = pars.to.y;
-                    }
-                }
-                break;
-            case ExeConnectSampler:
-                {
-                    let sampler = globalCommandDispatcher.cfg().data.percussions[pars.drum].sampler;
-                    if (undo) {
-                        let nn = sampler.outputs.indexOf(pars.id);
-                        if (nn > -1) {
-                            sampler.outputs.splice(nn, 1);
-                        }
-                    }
-                    else {
-                        sampler.outputs.push(pars.id);
-                    }
-                }
-                break;
-            case ExeDisonnectSampler:
-                {
-                    let sampler = globalCommandDispatcher.cfg().data.percussions[pars.drum].sampler;
-                    if (undo) {
-                        sampler.outputs.push(pars.id);
-                    }
-                    else {
-                        let nn = sampler.outputs.indexOf(pars.id);
-                        if (nn > -1) {
-                            sampler.outputs.splice(nn, 1);
-                        }
-                    }
-                }
-                break;
-            case ExeMoveFilterIcon:
-                {
-                    let filter = globalCommandDispatcher.cfg().findFilterTarget(pars.filter);
-                    if (filter) {
-                        let iconPosition = filter.iconPosition;
-                        if (undo) {
-                            iconPosition.x = pars.from.x;
-                            iconPosition.y = pars.from.y;
-                        }
-                        else {
-                            iconPosition.x = pars.to.x;
-                            iconPosition.y = pars.to.y;
-                        }
-                    }
-                }
-                break;
-            case ExeConnectFilter:
-                {
-                    let filter = globalCommandDispatcher.cfg().findFilterTarget(pars.filter);
-                    if (filter) {
-                        if (undo) {
-                            let nn = filter.outputs.indexOf(pars.id);
-                            if (nn > -1) {
-                                filter.outputs.splice(nn, 1);
-                            }
-                        }
-                        else {
-                            filter.outputs.push(pars.id);
-                        }
-                    }
-                }
-                break;
-            case ExeDisonnectFilter:
-                {
-                    let filter = globalCommandDispatcher.cfg().findFilterTarget(pars.filter);
-                    if (filter) {
-                        if (undo) {
-                            filter.outputs.push(pars.id);
-                        }
-                        else {
-                            let nn = filter.outputs.indexOf(pars.id);
-                            if (nn > -1) {
-                                filter.outputs.splice(nn, 1);
-                            }
-                        }
-                    }
-                }
-                break;
-            default:
-                console.log('unknown command', kind, pars);
-        }
+    commitProjectChanges(path, proAction) {
+        let state = new StateDiff(path);
+        proAction();
+        this.addUndoCommandActiions(state.diffChangedCommands());
     }
-    cloneCurPosition() {
-        return {
-            x: globalCommandDispatcher.cfg().data.position.x,
-            y: globalCommandDispatcher.cfg().data.position.y,
-            z: globalCommandDispatcher.cfg().data.position.z
-        };
-    }
-    setCurPosition(xyz) {
-        globalCommandDispatcher.cfg().data.position = { x: xyz.x, y: xyz.y, z: xyz.z };
-    }
-    addUndoCommandFromUI(kind, pars) {
-        this.executeCommand(kind, pars, false);
+    addUndoCommandActiions(cmd) {
+        console.log(cmd);
         globalCommandDispatcher.cfg().data.redo.length = 0;
-        globalCommandDispatcher.cfg().data.undo.push({
-            kind: kind, params: pars, position: this.cloneCurPosition()
-        });
+        globalCommandDispatcher.cfg().data.undo.push(cmd);
         globalCommandDispatcher.resetProject();
     }
     undo(cnt) {
-        for (let ii = 0; ii < cnt; ii++) {
-            if (globalCommandDispatcher.cfg().data.undo.length) {
-                let cmd = globalCommandDispatcher.cfg().data.undo.pop();
-                if (cmd) {
-                    this.executeCommand(cmd.kind, cmd.params, true);
-                    globalCommandDispatcher.cfg().data.redo.unshift(cmd);
-                    if (cmd.position) {
-                        this.setCurPosition(cmd.position);
-                    }
-                }
-            }
-        }
-        globalCommandDispatcher.resetProject();
     }
     redo(cnt) {
-        for (let ii = 0; ii < cnt; ii++) {
-            if (globalCommandDispatcher.cfg().data.redo.length) {
-                let cmd = globalCommandDispatcher.cfg().data.redo.shift();
-                if (cmd) {
-                    this.executeCommand(cmd.kind, cmd.params, false);
-                    globalCommandDispatcher.cfg().data.undo.push(cmd);
-                    if (cmd.position) {
-                        this.setCurPosition(cmd.position);
-                    }
-                }
-            }
-        }
-        globalCommandDispatcher.resetProject();
     }
 }
 let uiLinkFilterToSpeaker = 'uiLinkFilterToSpeaker';
@@ -633,10 +472,6 @@ class CommandDispatcher {
     }
     resetProject() {
         this.renderer.fillWholeUI();
-    }
-    moveTrackTop(trackNum) {
-        console.log('moveTrackTop', trackNum);
-        this.exe.addUndoCommandFromUI(ExeMoveTrack, { from: trackNum, to: 0 });
     }
     promptProjectPluginGUI(label, url, callback) {
         console.log('promptProjectPluginGUI', url);
@@ -1335,7 +1170,10 @@ class RightMenuPanel {
             };
             if (tt > 0) {
                 item.onClick = () => {
-                    globalCommandDispatcher.moveTrackTop(tt);
+                    globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+                        let track = globalCommandDispatcher.cfg().data.tracks.splice(tt, 1)[0];
+                        globalCommandDispatcher.cfg().data.tracks.splice(0, 0, track);
+                    });
                 };
             }
             menuPointTracks.children.push(item);
@@ -2127,7 +1965,6 @@ class MixerUI {
             this.levels[ii].reCreateBars();
         }
         this.fanPane.resetPlates(this.fanLayer.anchors, this.spearsLayer.anchors);
-        console.log('spearsLayer', this.spearsLayer.anchors);
         this.fillerAnchor.xx = globalCommandDispatcher.cfg().leftPad;
         this.fillerAnchor.yy = globalCommandDispatcher.cfg().gridTop();
         this.fillerAnchor.ww = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().rightPad;
@@ -2409,11 +2246,11 @@ class MixerZoomLevel {
 }
 class FanPane {
     resetPlates(fanAnchors, spearsAnchors) {
-        this.autoIcons = [];
+        this.filterIcons = [];
         this.performerIcons = [];
         this.samplerIcons = [];
         for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
-            this.autoIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
+            this.filterIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
         }
         for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
             this.performerIcons.push(new PerformerIcon(globalCommandDispatcher.cfg().data.tracks[tt].performer.id));
@@ -2469,8 +2306,8 @@ class FanPane {
         }
     }
     buildAutoIcons(fanAnchor, spearsAnchor, zidx) {
-        for (let ii = 0; ii < this.autoIcons.length; ii++) {
-            this.autoIcons[ii].buildAutoSpot(ii, fanAnchor, spearsAnchor, zidx);
+        for (let ii = 0; ii < this.filterIcons.length; ii++) {
+            this.filterIcons[ii].buildAutoSpot(ii, fanAnchor, spearsAnchor, zidx);
         }
     }
     buildOutIcon(fanAnchor, zidx) {
@@ -2543,27 +2380,22 @@ class PerformerIcon {
                         track.performer.iconPosition = { x: 0, y: 0 };
                     }
                     if (toSpeaker) {
-                        globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectPerformer, {
-                            track: trackNo,
-                            id: ''
+                        globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer', 'outputs'], () => {
+                            track.performer.outputs.push('');
                         });
                     }
                     else {
                         if (toFilter) {
-                            globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectPerformer, {
-                                track: trackNo,
-                                id: toFilter.id
+                            globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer', 'outputs'], () => {
+                                if (toFilter)
+                                    track.performer.outputs.push(toFilter.id);
                             });
                         }
                         else {
-                            let xx = track.performer.iconPosition.x;
-                            let yy = track.performer.iconPosition.y;
-                            globalCommandDispatcher.exe.addUndoCommandFromUI(ExeMovePerformerIcon, {
-                                track: trackNo,
-                                from: { x: xx, y: yy },
-                                to: {
-                                    x: track.performer.iconPosition.x + dragAnchor.translation.x,
-                                    y: track.performer.iconPosition.y + dragAnchor.translation.y
+                            globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer'], () => {
+                                if (dragAnchor.translation) {
+                                    track.performer.iconPosition.x = track.performer.iconPosition.x + dragAnchor.translation.x;
+                                    track.performer.iconPosition.y = track.performer.iconPosition.y + dragAnchor.translation.y;
                                 }
                             });
                         }
@@ -2657,17 +2489,21 @@ class PerformerIcon {
             let outId = track.performer.outputs[oo];
             if (outId) {
                 fol.connectOutput(outId, track.performer.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, track.performer.outputs, (x, y) => {
-                    globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectPerformer, {
-                        track: trackNo,
-                        id: outId
+                    globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer'], () => {
+                        let nn = track.performer.outputs.indexOf(outId);
+                        if (nn > -1) {
+                            track.performer.outputs.splice(nn, 1);
+                        }
                     });
                 });
             }
             else {
                 fol.connectSpeaker(track.performer.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, track.performer.outputs, (x, y) => {
-                    globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectPerformer, {
-                        track: trackNo,
-                        id: ''
+                    globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer'], () => {
+                        let nn = track.performer.outputs.indexOf('');
+                        if (nn > -1) {
+                            track.performer.outputs.splice(nn, 1);
+                        }
                     });
                 });
             }
@@ -2725,27 +2561,22 @@ class SamplerIcon {
                         samplerTrack.sampler.iconPosition = { x: 0, y: 0 };
                     }
                     if (toSpeaker) {
-                        globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectSampler, {
-                            drum: order,
-                            id: ''
+                        globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler', 'outputs'], () => {
+                            samplerTrack.sampler.outputs.push('');
                         });
                     }
                     else {
                         if (toFilter) {
-                            globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectSampler, {
-                                drum: order,
-                                id: toFilter.id
+                            globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler', 'outputs'], () => {
+                                if (toFilter)
+                                    samplerTrack.sampler.outputs.push(toFilter.id);
                             });
                         }
                         else {
-                            let xx = samplerTrack.sampler.iconPosition.x;
-                            let yy = samplerTrack.sampler.iconPosition.y;
-                            globalCommandDispatcher.exe.addUndoCommandFromUI(ExeMoveSamplerIcon, {
-                                drum: order,
-                                from: { x: xx, y: yy },
-                                to: {
-                                    x: samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x,
-                                    y: samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y
+                            globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler'], () => {
+                                if (dragAnchor.translation) {
+                                    samplerTrack.sampler.iconPosition.x = samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x;
+                                    samplerTrack.sampler.iconPosition.y = samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y;
                                 }
                             });
                         }
@@ -2840,17 +2671,21 @@ class SamplerIcon {
             let outId = samplerTrack.sampler.outputs[oo];
             if (outId) {
                 fol.connectOutput(outId, samplerTrack.sampler.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, samplerTrack.sampler.outputs, (x, y) => {
-                    globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectSampler, {
-                        drum: order,
-                        id: outId
+                    globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler', 'outputs'], () => {
+                        let nn = samplerTrack.sampler.outputs.indexOf(outId);
+                        if (nn > -1) {
+                            samplerTrack.sampler.outputs.splice(nn, 1);
+                        }
                     });
                 });
             }
             else {
                 fol.connectSpeaker(samplerTrack.sampler.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, samplerTrack.sampler.outputs, (x, y) => {
-                    globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectSampler, {
-                        drum: order,
-                        id: ''
+                    globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler', 'outputs'], () => {
+                        let nn = samplerTrack.sampler.outputs.indexOf('');
+                        if (nn > -1) {
+                            samplerTrack.sampler.outputs.splice(nn, 1);
+                        }
                     });
                 });
             }
@@ -2938,27 +2773,22 @@ class FilterIcon {
                         filterTarget.iconPosition = { x: 0, y: 0 };
                     }
                     if (toSpeaker) {
-                        globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectFilter, {
-                            filter: filterTarget.id,
-                            id: ''
+                        globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+                            filterTarget.outputs.push('');
                         });
                     }
                     else {
                         if (toFilter) {
-                            globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectFilter, {
-                                filter: filterTarget.id,
-                                id: toFilter.id
+                            globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+                                if (toFilter)
+                                    filterTarget.outputs.push(toFilter.id);
                             });
                         }
                         else {
-                            let xx = filterTarget.iconPosition.x;
-                            let yy = filterTarget.iconPosition.y;
-                            globalCommandDispatcher.exe.addUndoCommandFromUI(ExeMoveFilterIcon, {
-                                filter: filterTarget.id,
-                                from: { x: xx, y: yy },
-                                to: {
-                                    x: filterTarget.iconPosition.x + dragAnchor.translation.x,
-                                    y: filterTarget.iconPosition.y + dragAnchor.translation.y
+                            globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+                                if (dragAnchor.translation) {
+                                    filterTarget.iconPosition.x = filterTarget.iconPosition.x + dragAnchor.translation.x;
+                                    filterTarget.iconPosition.y = filterTarget.iconPosition.y + dragAnchor.translation.y;
                                 }
                             });
                         }
@@ -3053,17 +2883,21 @@ class FilterIcon {
             let outId = filterTarget.outputs[oo];
             if (outId) {
                 fol.connectOutput(outId, filterTarget.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, filterTarget.outputs, (x, y) => {
-                    globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectFilter, {
-                        filter: filterTarget.id,
-                        id: outId
+                    globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+                        let nn = filterTarget.outputs.indexOf(outId);
+                        if (nn > -1) {
+                            filterTarget.outputs.splice(nn, 1);
+                        }
                     });
                 });
             }
             else {
                 fol.connectSpeaker(filterTarget.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, filterTarget.outputs, (x, y) => {
-                    globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectFilter, {
-                        filter: filterTarget.id,
-                        id: outId
+                    globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+                        let nn = filterTarget.outputs.indexOf('');
+                        if (nn > -1) {
+                            filterTarget.outputs.splice(nn, 1);
+                        }
                     });
                 });
             }
@@ -3669,87 +3503,6 @@ let mzxbxProjectForTesting3 = {
         { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [] }
     ]
 };
-let testBigMixerData = {
-    title: 'test data for debug',
-    timeline: [
-        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
-        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
-        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
-        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 7, part: 8 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 2, part: 2 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 5, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 3, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
-        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
-        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
-        { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } }, { tempo: 140, metre: { count: 3, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } }, { tempo: 180, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 7, part: 8 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 2, part: 2 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 5, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 3, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }, { tempo: 120, metre: { count: 4, part: 4 } }
-    ],
-    notePathHeight: 0.25,
-    widthDurationRatio: 15,
-    pitchedTracks: [
-        { title: 'Test track 1' },
-        { title: 'Test track 2' },
-        { title: 'Test track 3' },
-        { title: 'Test track 4' },
-        { title: 'Test track 5' },
-        { title: 'Test track 6' },
-        { title: 'Test track 7' },
-        { title: 'Test track 8' },
-        { title: 'Test track 9' },
-        { title: 'Test track 10' },
-        { title: 'Test track 11' },
-        { title: 'Test track 12' },
-        { title: 'Test track 13' },
-        { title: 'Test track 14' },
-        { title: 'Test track 15' },
-        { title: 'Test track 16' }
-    ]
-};
-let testEmptyMixerData = {
-    title: 'small data for debug',
-    timeline: [
-        { tempo: 120, metre: { count: 4, part: 4 } }
-    ],
-    notePathHeight: 0.25,
-    widthDurationRatio: 11,
-    pitchedTracks: [
-        { title: 'A track1' },
-        { title: 'Second track' }
-    ]
-};
-let msstart = Date.now();
-const obj1 = {
-    originalProperty: true,
-};
-const obj2 = {
-    originalProperty: true,
-    newProperty: "new",
-};
-let diff = new ODiff(mzxbxProjectForTesting2);
-let resu = diff.createDiffCommands(mzxbxProjectForTesting3);
-console.log(structuredClone(resu));
-console.log(Date.now() - msstart, 'difference');
 class MixerDataMathUtility {
     constructor(data) {
         this.leftPad = 3;

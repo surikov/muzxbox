@@ -15,30 +15,15 @@ declare class TreeValue {
     fillFromJSONstring(json: string): void;
     dump(pad: string, symbol: string): void;
 }
-interface DifferenceCreate {
-    type: "+";
-    path: (string | number)[];
-    newValue: any;
-}
-interface DifferenceRemove {
-    type: "-";
-    path: (string | number)[];
-    oldValue: any;
-}
-interface DifferenceChange {
-    type: "=";
-    path: (string | number)[];
-    newValue: any;
-    oldValue: any;
-}
-declare type RawDifference = DifferenceCreate | DifferenceRemove | DifferenceChange;
-declare class ODiff {
-    base: any;
-    constructor(obj: any);
-    createDiffCommands(changed: any): RawDifference[];
-    calculateDiff(nodePath: (string | number)[], commands: RawDifference[], old: any, changed: any): void;
-    calculateNonArray(nodePath: (string | number)[], commands: RawDifference[], old: any, changed: any): void;
-    calculateArray(nodePath: (string | number)[], commands: RawDifference[], old: any[], changed: any[]): void;
+declare class StateDiff {
+    pathDataCopy: any;
+    basePath: (string | number)[];
+    constructor(path: (string | number)[]);
+    findNodeByPath(): any;
+    diffChangedCommands(): Zvoog_UICommand;
+    addDiff(nodePath: (string | number)[], commands: Zvoog_Action[], old: any, changed: any): void;
+    calculateNonArray(nodePath: (string | number)[], commands: Zvoog_Action[], old: any, changed: any): void;
+    calculateArray(nodePath: (string | number)[], commands: Zvoog_Action[], old: any[], changed: any[]): void;
 }
 declare function createSchedulePlayer(): MZXBX_Player;
 declare function createTileLevel(): TileLevelBase;
@@ -60,25 +45,9 @@ declare class PluginDialogPrompt {
     closeDialogFrame(): void;
     receiveMessageFromPlugin(e: any): void;
 }
-declare const ExeMoveTrack = "ExeMoveTrack";
-declare const ExeMovePerformerIcon = "ExeMovePerformerIcon";
-declare const ExeConnectPerformer = "ExeConnectPerformer";
-declare const ExeDisonnectPerformer = "ExeDisonnectPerformer";
-declare const ExeMoveSamplerIcon = "ExeMoveSamplerIcon";
-declare const ExeConnectSampler = "ExeConnectSampler";
-declare const ExeDisonnectSampler = "ExeDisonnectSampler";
-declare const ExeMoveFilterIcon = "ExeMoveFilterIcon";
-declare const ExeConnectFilter = "ExeConnectFilter";
-declare const ExeDisonnectFilter = "ExeDisonnectFilter";
 declare class CommandExe {
-    executeCommand(kind: string, pars: any, undo: boolean): void;
-    cloneCurPosition(): {
-        x: number;
-        y: number;
-        z: number;
-    };
-    setCurPosition(xyz: TileZoom): void;
-    addUndoCommandFromUI(kind: string, pars: any): void;
+    commitProjectChanges(path: (string | number)[], proAction: () => void): void;
+    addUndoCommandActiions(cmd: Zvoog_UICommand): void;
     undo(cnt: number): void;
     redo(cnt: number): void;
 }
@@ -104,7 +73,6 @@ declare class CommandDispatcher {
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     changeTapSize(ratio: number): void;
     resetProject(): void;
-    moveTrackTop(trackNum: number): void;
     promptProjectPluginGUI(label: string, url: string, callback: (obj: Zvoog_Project) => void): void;
     promptPointPluginGUI(label: string, url: string, callback: (obj: any) => boolean): void;
     cancelPluginGUI(): void;
@@ -353,7 +321,7 @@ declare class MixerZoomLevel {
     addGridLines(barOctaveAnchor: TileAnchor): void;
 }
 declare class FanPane {
-    autoIcons: FilterIcon[];
+    filterIcons: FilterIcon[];
     performerIcons: PerformerIcon[];
     samplerIcons: SamplerIcon[];
     resetPlates(fanAnchors: TileAnchor[], spearsAnchors: TileAnchor[]): void;
@@ -497,46 +465,6 @@ declare class WarningUI {
 }
 declare let mzxbxProjectForTesting2: Zvoog_Project;
 declare let mzxbxProjectForTesting3: Zvoog_Project;
-declare let testBigMixerData: {
-    title: string;
-    timeline: {
-        tempo: number;
-        metre: {
-            count: number;
-            part: number;
-        };
-    }[];
-    notePathHeight: number;
-    widthDurationRatio: number;
-    pitchedTracks: {
-        title: string;
-    }[];
-};
-declare let testEmptyMixerData: {
-    title: string;
-    timeline: {
-        tempo: number;
-        metre: {
-            count: number;
-            part: number;
-        };
-    }[];
-    notePathHeight: number;
-    widthDurationRatio: number;
-    pitchedTracks: {
-        title: string;
-    }[];
-};
-declare let msstart: number;
-declare const obj1: {
-    originalProperty: boolean;
-};
-declare const obj2: {
-    originalProperty: boolean;
-    newProperty: string;
-};
-declare let diff: ODiff;
-declare let resu: RawDifference[];
 declare class MixerDataMathUtility {
     data: Zvoog_Project;
     leftPad: number;
@@ -824,14 +752,26 @@ declare type Zvoog_Selection = {
     startMeasure: number;
     endMeasure: number;
 };
-declare type Zvoog_Command = {
-    kind: string;
-    position: {
-        x: number;
-        y: number;
-        z: number;
-    };
-    params: any;
+declare type DifferenceCreate = {
+    type: "+";
+    path: (string | number)[];
+    newNode: any;
+};
+declare type DifferenceRemove = {
+    type: "-";
+    path: (string | number)[];
+    oldNode: any;
+};
+declare type DifferenceChange = {
+    type: "=";
+    path: (string | number)[];
+    newValue: any;
+    oldValue: any;
+};
+declare type Zvoog_Action = DifferenceCreate | DifferenceRemove | DifferenceChange;
+declare type Zvoog_UICommand = {
+    position: TileZoom;
+    actions: Zvoog_Action[];
 };
 declare type Zvoog_Project = {
     versionCode: '1';
@@ -848,8 +788,8 @@ declare type Zvoog_Project = {
         z: number;
     };
     list: boolean;
-    undo: Zvoog_Command[];
-    redo: Zvoog_Command[];
+    undo: Zvoog_UICommand[];
+    redo: Zvoog_UICommand[];
 };
 declare type MZXBX_CachedWave = {
     path: string;

@@ -126,6 +126,7 @@ type Zvoog_Command = {
 	parameters: string;
 }
 */
+/*
 type Zvoog_Command = {
 	kind: string;
 	position: {
@@ -134,9 +135,34 @@ type Zvoog_Command = {
 		z: number;
 	};
 	params: any;
+};*/
+type DifferenceCreate = {
+	type: "+";
+	path: (string | number)[];
+	newNode: any;
+}
+
+type DifferenceRemove = {
+	type: "-";
+	path: (string | number)[];
+	oldNode: any;
+}
+
+type DifferenceChange = {
+	type: "=";
+	path: (string | number)[];
+	newValue: any;
+	oldValue: any;
+}
+type Zvoog_Action = DifferenceCreate | DifferenceRemove | DifferenceChange;
+
+type Zvoog_UICommand = {
+	position: TileZoom;
+	actions: Zvoog_Action[];
 };
+
 type Zvoog_Project = {
-	versionCode:'1'
+	versionCode: '1'
 	title: string;
 	timeline: Zvoog_SongMeasure[];
 	tracks: Zvoog_MusicTrack[];
@@ -150,8 +176,8 @@ type Zvoog_Project = {
 		z: number;
 	};
 	list: boolean;
-	undo: Zvoog_Command[];//Zvoog_Command[];
-	redo: Zvoog_Command[];//Zvoog_Command[];
+	undo: Zvoog_UICommand[];//Zvoog_Command[];
+	redo: Zvoog_UICommand[];//Zvoog_Command[];
 };
 
 

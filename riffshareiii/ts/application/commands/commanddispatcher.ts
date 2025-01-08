@@ -143,8 +143,8 @@ class CommandDispatcher {
 	resetProject() {
 		this.renderer.fillWholeUI();
 	}
-	moveTrackTop(trackNum: number) {
-		console.log('moveTrackTop', trackNum);
+	//moveTrackTop(trackNum: number) {
+		//console.log('moveTrackTop', trackNum);
 		/*
 		let it = this.cfg().data.tracks[trackNum];
 		this.cfg().data.tracks.splice(trackNum, 1);
@@ -154,7 +154,7 @@ class CommandDispatcher {
 		//let par: ParameterMoveTrackTop = { trackPrePosition: trackNum, position: this.renderer.tiler.getCurrentPointPosition() };
 		//let cmd = new CmdMoveTrackTop(par);
 		//this.addUndoRedo(new CmdMoveTrackTop(par));
-		this.exe.addUndoCommandFromUI(ExeMoveTrack, { from: trackNum, to: 0 });
+		///////////////////////////////this.exe.addUndoCommandFromUI(ExeMoveTrack, { from: trackNum, to: 0 });
 		//cmd.redo();
 		/*
 		this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
@@ -163,7 +163,7 @@ class CommandDispatcher {
 				this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
 				*/
 		//this.resetProject();
-	}
+	//}
 	/*moveDrumTop(drumNum: number) {
 		console.log('moveDrumTop', drumNum);
 		let it = this.cfg().data.percussions[drumNum];

@@ -1,13 +1,13 @@
 class FanPane {
-	//filterIcons: FilterIcon[];
-	autoIcons: FilterIcon[];
+	filterIcons: FilterIcon[];
+	//autoIcons: FilterIcon[];
 	performerIcons: PerformerIcon[];
 	samplerIcons: SamplerIcon[];
 	//connectionspears: SpearConnection[];
 	resetPlates(fanAnchors: TileAnchor[], spearsAnchors: TileAnchor[]): void {
 		//console.log('FanPane.resetPlates', cfg, fanAnchors);
 		//this.filterIcons = [];
-		this.autoIcons = [];
+		this.filterIcons = [];
 		this.performerIcons = [];
 		this.samplerIcons = [];
 		for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
@@ -17,7 +17,7 @@ class FanPane {
 				this.filterIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
 			}*/
 			//this.filterIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
-			this.autoIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
+			this.filterIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
 		}
 		//for (let aa = 0; aa < globalCommandDispatcher.cfg().data.automations.length; aa++) {
 		//	this.autoIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.automations[aa].output));
@@ -82,8 +82,8 @@ class FanPane {
 		}
 	}
 	buildAutoIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
-		for (let ii = 0; ii < this.autoIcons.length; ii++) {
-			this.autoIcons[ii].buildAutoSpot(ii, fanAnchor, spearsAnchor, zidx);
+		for (let ii = 0; ii < this.filterIcons.length; ii++) {
+			this.filterIcons[ii].buildAutoSpot(ii, fanAnchor, spearsAnchor, zidx);
 		}
 	}
 	/*buildFilterIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {

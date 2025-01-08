@@ -51,7 +51,7 @@ class MixerUI {
 			this.levels[ii].reCreateBars();
 		}
 		this.fanPane.resetPlates(this.fanLayer.anchors, this.spearsLayer.anchors);
-		console.log('spearsLayer',this.spearsLayer.anchors);
+		//console.log('spearsLayer',this.spearsLayer.anchors);
 		//this.iconsFanAnchor.ww = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().rightPad;
 		//this.iconsFanAnchor.hh = globalCommandDispatcher.cfg().gridHeight();
 		this.fillerAnchor.xx = globalCommandDispatcher.cfg().leftPad;

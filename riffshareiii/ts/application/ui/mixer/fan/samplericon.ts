@@ -52,28 +52,40 @@ class SamplerIcon {
 					}
 					if (toSpeaker) {
 						//samplerTrack.sampler.outputs.push('');
-						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectSampler, {
+						/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectSampler, {
 							drum: order
 							, id: ''
+						});*/
+						globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler', 'outputs'], () => {
+							samplerTrack.sampler.outputs.push('');
 						});
 					} else {
 						if (toFilter) {
 							//samplerTrack.sampler.outputs.push(toFilter.id);
-							globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectSampler, {
+							/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectSampler, {
 								drum: order
 								, id: toFilter.id
+							});*/
+							globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler', 'outputs'], () => {
+								if (toFilter) samplerTrack.sampler.outputs.push(toFilter.id);
 							});
 						} else {
 							//samplerTrack.sampler.iconPosition.x = samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x;
 							//samplerTrack.sampler.iconPosition.y = samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y;
-							let xx = samplerTrack.sampler.iconPosition.x;
-							let yy = samplerTrack.sampler.iconPosition.y;
-							globalCommandDispatcher.exe.addUndoCommandFromUI(ExeMoveSamplerIcon, {
+							//let xx = samplerTrack.sampler.iconPosition.x;
+							//let yy = samplerTrack.sampler.iconPosition.y;
+							/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeMoveSamplerIcon, {
 								drum: order
 								, from: { x: xx, y: yy }
 								, to: {
 									x: samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x
 									, y: samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y
+								}
+							});*/
+							globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler'], () => {
+								if (dragAnchor.translation) {
+									samplerTrack.sampler.iconPosition.x = samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x;
+									samplerTrack.sampler.iconPosition.y = samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y;
 								}
 							});
 						}
@@ -174,18 +186,30 @@ class SamplerIcon {
 				fol.connectOutput(outId, samplerTrack.sampler.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, samplerTrack.sampler.outputs
 					, (x: number, y: number) => {
 						//console.log('split', samplerTrack.sampler.id, 'from', outId);
-						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectSampler, {
+						/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectSampler, {
 							drum: order
 							, id: outId
+						});*/
+						globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler', 'outputs'], () => {
+							let nn = samplerTrack.sampler.outputs.indexOf(outId);
+							if (nn > -1) {
+								samplerTrack.sampler.outputs.splice(nn, 1);
+							}
 						});
 					});
 			} else {
 				fol.connectSpeaker(samplerTrack.sampler.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, samplerTrack.sampler.outputs
 					, (x: number, y: number) => {
 						//console.log('split', samplerTrack.sampler.id, 'from speaker');
-						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectSampler, {
+						/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectSampler, {
 							drum: order
 							, id: ''
+						});*/
+						globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler', 'outputs'], () => {
+							let nn = samplerTrack.sampler.outputs.indexOf('');
+							if (nn > -1) {
+								samplerTrack.sampler.outputs.splice(nn, 1);
+							}
 						});
 					});
 			}

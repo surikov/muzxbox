@@ -74,28 +74,41 @@ class PerformerIcon {
 					}
 					if (toSpeaker) {
 						//track.performer.outputs.push('');
-						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectPerformer, {
+						/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectPerformer, {
 							track: trackNo
 							, id: ''
+						});*/
+						globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer', 'outputs'], () => {
+							track.performer.outputs.push('');
 						});
 					} else {
 						if (toFilter) {
 							//track.performer.outputs.push(toFilter.id);
-							globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectPerformer, {
+							/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectPerformer, {
 								track: trackNo
 								, id: toFilter.id
+							});*/
+
+							globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer', 'outputs'], () => {
+								if (toFilter) track.performer.outputs.push(toFilter.id);
 							});
 						} else {
-							let xx = track.performer.iconPosition.x;
-							let yy = track.performer.iconPosition.y;
+							//let xx = track.performer.iconPosition.x;
+							//let yy = track.performer.iconPosition.y;
 							//track.performer.iconPosition.x = track.performer.iconPosition.x + dragAnchor.translation.x;
 							//track.performer.iconPosition.y = track.performer.iconPosition.y + dragAnchor.translation.y;
-							globalCommandDispatcher.exe.addUndoCommandFromUI(ExeMovePerformerIcon, {
+							/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeMovePerformerIcon, {
 								track: trackNo
 								, from: { x: xx, y: yy }
 								, to: {
 									x: track.performer.iconPosition.x + dragAnchor.translation.x
 									, y: track.performer.iconPosition.y + dragAnchor.translation.y
+								}
+							});*/
+							globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer'], () => {
+								if (dragAnchor.translation) {
+									track.performer.iconPosition.x = track.performer.iconPosition.x + dragAnchor.translation.x;
+									track.performer.iconPosition.y = track.performer.iconPosition.y + dragAnchor.translation.y;
 								}
 							});
 						}
@@ -195,18 +208,30 @@ class PerformerIcon {
 				fol.connectOutput(outId, track.performer.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, track.performer.outputs
 					, (x: number, y: number) => {
 						//console.log('split', track.title, 'from', outId);
-						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectPerformer, {
+						/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectPerformer, {
 							track: trackNo
 							, id: outId
+						});*/
+						globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer'], () => {
+							let nn = track.performer.outputs.indexOf(outId);
+							if (nn > -1) {
+								track.performer.outputs.splice(nn, 1);
+							}
 						});
 					});
 			} else {
 				fol.connectSpeaker(track.performer.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, track.performer.outputs
 					, (x: number, y: number) => {
 						//console.log('split', track.title, 'from speaker');
-						globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectPerformer, {
+						/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeDisonnectPerformer, {
 							track: trackNo
 							, id: ''
+						});*/
+						globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer'], () => {
+							let nn = track.performer.outputs.indexOf('');
+							if (nn > -1) {
+								track.performer.outputs.splice(nn, 1);
+							}
 						});
 					});
 			}

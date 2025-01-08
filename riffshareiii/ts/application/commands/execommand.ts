@@ -1,3 +1,4 @@
+/*
 const ExeMoveTrack = 'ExeMoveTrack';
 
 const ExeMovePerformerIcon = 'ExeMovePerformerIcon';
@@ -11,9 +12,9 @@ const ExeDisonnectSampler = 'ExeDisonnectSampler';
 const ExeMoveFilterIcon = 'ExeMoveFilterIcon';
 const ExeConnectFilter = 'ExeConnectFilter';
 const ExeDisonnectFilter = 'ExeDisonnectFilter';
-
+*/
 class CommandExe {
-	executeCommand(kind: string, pars: any, undo: boolean) {
+	/*executeCommand(kind: string, pars: any, undo: boolean) {
 		switch (kind) {
 			case ExeMoveTrack: {
 				if (undo) {
@@ -147,27 +148,37 @@ class CommandExe {
 			default:
 				console.log('unknown command', kind, pars);
 		}
-	}
-	cloneCurPosition() {
+	}*/
+	/*cloneCurPosition() {
 		return {
 			x: globalCommandDispatcher.cfg().data.position.x
 			, y: globalCommandDispatcher.cfg().data.position.y
 			, z: globalCommandDispatcher.cfg().data.position.z
 		};
-	}
-	setCurPosition(xyz: TileZoom) {
+	}*/
+	/*setCurPosition(xyz: TileZoom) {
 		globalCommandDispatcher.cfg().data.position = { x: xyz.x, y: xyz.y, z: xyz.z };
+	}*/
+	commitProjectChanges(path: (string | number)[], proAction: () => void) {
+		let state = new StateDiff(path);
+		proAction();
+		this.addUndoCommandActiions(state.diffChangedCommands());
 	}
-	addUndoCommandFromUI(kind: string, pars: any) {
-		this.executeCommand(kind, pars, false);
+	addUndoCommandActiions(cmd: Zvoog_UICommand) {//kind: string, pars: any) {
+		console.log(cmd);
+		//this.executeCommand(kind, pars, false);
+		//cmd.position.x=globalCommandDispatcher.cfg().data.position.x;
+		//cmd.position.y=globalCommandDispatcher.cfg().data.position.y;
+		//cmd.position.z=globalCommandDispatcher.cfg().data.position.z;
 		globalCommandDispatcher.cfg().data.redo.length = 0;
-		globalCommandDispatcher.cfg().data.undo.push({
-			kind: kind, params: pars, position: this.cloneCurPosition()
-		});
+		globalCommandDispatcher.cfg().data.undo.push(cmd);
+		//globalCommandDispatcher.cfg().data.undo.push({
+		//	kind: kind, params: pars, position: this.cloneCurPosition()
+		//});
 		globalCommandDispatcher.resetProject();
 	}
 	undo(cnt: number) {
-		for (let ii = 0; ii < cnt; ii++) {
+		/*for (let ii = 0; ii < cnt; ii++) {
 			if (globalCommandDispatcher.cfg().data.undo.length) {
 				let cmd = globalCommandDispatcher.cfg().data.undo.pop();
 				if (cmd) {
@@ -179,10 +190,10 @@ class CommandExe {
 				}
 			}
 		}
-		globalCommandDispatcher.resetProject();
+		globalCommandDispatcher.resetProject();*/
 	}
 	redo(cnt: number) {
-		for (let ii = 0; ii < cnt; ii++) {
+		/*for (let ii = 0; ii < cnt; ii++) {
 			if (globalCommandDispatcher.cfg().data.redo.length) {
 				let cmd = globalCommandDispatcher.cfg().data.redo.shift();
 				if (cmd) {
@@ -194,6 +205,6 @@ class CommandExe {
 				}
 			}
 		}
-		globalCommandDispatcher.resetProject();
+		globalCommandDispatcher.resetProject();*/
 	}
 }

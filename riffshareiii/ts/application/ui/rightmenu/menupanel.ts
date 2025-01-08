@@ -262,7 +262,18 @@ class RightMenuPanel {
 			};
 			if (tt > 0) {
 				item.onClick = () => {
-					globalCommandDispatcher.moveTrackTop(tt);
+					//globalCommandDispatcher.moveTrackTop(tt);
+					/*
+					let state = new StateDiff(['tracks']);
+					let track: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(tt, 1)[0];
+					globalCommandDispatcher.cfg().data.tracks.splice(0, 0, track);
+					globalCommandDispatcher.exe.addUndoCommandFromUI(state.diffChangedCommands());
+					*/
+					globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+						let track: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(tt, 1)[0];
+						globalCommandDispatcher.cfg().data.tracks.splice(0, 0, track);
+					});
+
 				};
 			}
 			menuPointTracks.children.push(item);
