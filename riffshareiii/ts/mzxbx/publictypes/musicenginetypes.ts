@@ -137,19 +137,19 @@ type Zvoog_Command = {
 	params: any;
 };*/
 type DifferenceCreate = {
-	type: "+";
+	kind: "+";
 	path: (string | number)[];
 	newNode: any;
 }
 
 type DifferenceRemove = {
-	type: "-";
+	kind: "-";
 	path: (string | number)[];
 	oldNode: any;
 }
 
 type DifferenceChange = {
-	type: "=";
+	kind: "=";
 	path: (string | number)[];
 	newValue: any;
 	oldValue: any;

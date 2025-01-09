@@ -44,7 +44,7 @@ class StateDiff {
                 if (old[prop] !== changed[prop]) {
                     commands.push({
                         path: currentPath
-                        , type: "="
+                        , kind: "="
                         , newValue: changed[prop]
                         , oldValue: old[prop]
                     });
@@ -63,7 +63,7 @@ class StateDiff {
             currentPath.push(ii);
             commands.push({
                 path: currentPath
-                , type: "+"
+                , kind: "+"
                 , newNode: JSON.parse(JSON.stringify(changed[ii]))
             });
         }
@@ -72,7 +72,7 @@ class StateDiff {
             currentPath.push(ii);
             commands.push({
                 path: currentPath
-                , type: "-"
+                , kind: "-"
                 , oldNode: old[ii]
             });
         }

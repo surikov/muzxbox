@@ -46,8 +46,12 @@ declare class PluginDialogPrompt {
     receiveMessageFromPlugin(e: any): void;
 }
 declare class CommandExe {
+    setCurPosition(xyz: TileZoom): void;
     commitProjectChanges(path: (string | number)[], proAction: () => void): void;
     addUndoCommandActiions(cmd: Zvoog_UICommand): void;
+    parentFromPath(path: (string | number)[]): any;
+    unAction(cmd: Zvoog_UICommand): void;
+    reAction(cmd: Zvoog_UICommand): void;
     undo(cnt: number): void;
     redo(cnt: number): void;
 }
@@ -753,17 +757,17 @@ declare type Zvoog_Selection = {
     endMeasure: number;
 };
 declare type DifferenceCreate = {
-    type: "+";
+    kind: "+";
     path: (string | number)[];
     newNode: any;
 };
 declare type DifferenceRemove = {
-    type: "-";
+    kind: "-";
     path: (string | number)[];
     oldNode: any;
 };
 declare type DifferenceChange = {
-    type: "=";
+    kind: "=";
     path: (string | number)[];
     newValue: any;
     oldValue: any;

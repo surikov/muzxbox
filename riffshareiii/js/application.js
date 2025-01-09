@@ -181,7 +181,7 @@ class StateDiff {
                 if (old[prop] !== changed[prop]) {
                     commands.push({
                         path: currentPath,
-                        type: "=",
+                        kind: "=",
                         newValue: changed[prop],
                         oldValue: old[prop]
                     });
@@ -200,7 +200,7 @@ class StateDiff {
             currentPath.push(ii);
             commands.push({
                 path: currentPath,
-                type: "+",
+                kind: "+",
                 newNode: JSON.parse(JSON.stringify(changed[ii]))
             });
         }
@@ -209,7 +209,7 @@ class StateDiff {
             currentPath.push(ii);
             commands.push({
                 path: currentPath,
-                type: "-",
+                kind: "-",
                 oldNode: old[ii]
             });
         }
@@ -339,6 +339,9 @@ class PluginDialogPrompt {
     }
 }
 class CommandExe {
+    setCurPosition(xyz) {
+        globalCommandDispatcher.cfg().data.position = { x: xyz.x, y: xyz.y, z: xyz.z };
+    }
     commitProjectChanges(path, proAction) {
         let state = new StateDiff(path);
         proAction();
@@ -350,9 +353,92 @@ class CommandExe {
         globalCommandDispatcher.cfg().data.undo.push(cmd);
         globalCommandDispatcher.resetProject();
     }
+    parentFromPath(path) {
+        let parent = globalCommandDispatcher.cfg().data;
+        for (let ii = 0; ii < path.length - 1; ii++) {
+            parent = parent[path[ii]];
+        }
+        return parent;
+    }
+    unAction(cmd) {
+        for (let ii = cmd.actions.length - 1; ii >= 0; ii--) {
+            let act = cmd.actions[ii];
+            let parent = this.parentFromPath(act.path);
+            let prop = act.path[act.path.length - 1];
+            if (act.kind == '+') {
+                let idx = prop;
+                parent.splice(idx, 1);
+            }
+            else {
+                if (act.kind == '-') {
+                    let remove = act;
+                    let value = JSON.parse(JSON.stringify(remove.oldNode));
+                    let idx = prop;
+                    parent.splice(idx, 0, value);
+                }
+                else {
+                    if (act.kind == '=') {
+                        let change = act;
+                        parent[prop] = JSON.parse(JSON.stringify(change.oldValue));
+                    }
+                }
+            }
+        }
+    }
+    reAction(cmd) {
+        for (let ii = 0; ii < cmd.actions.length; ii++) {
+            let act = cmd.actions[ii];
+            let parent = this.parentFromPath(act.path);
+            let prop = act.path[act.path.length - 1];
+            if (act.kind == '+') {
+                let create = act;
+                let value = JSON.parse(JSON.stringify(create.newNode));
+                let idx = prop;
+                parent.splice(idx, 0, value);
+            }
+            else {
+                if (act.kind == '-') {
+                    let idx = prop;
+                    parent.splice(idx, 1);
+                }
+                else {
+                    if (act.kind == '=') {
+                        let change = act;
+                        parent[prop] = JSON.parse(JSON.stringify(change.newValue));
+                    }
+                }
+            }
+        }
+    }
     undo(cnt) {
+        for (let ii = 0; ii < cnt; ii++) {
+            if (globalCommandDispatcher.cfg().data.undo.length) {
+                let cmd = globalCommandDispatcher.cfg().data.undo.pop();
+                if (cmd) {
+                    this.unAction(cmd);
+                    globalCommandDispatcher.cfg().data.redo.unshift(cmd);
+                    if (cmd.position) {
+                        this.setCurPosition(cmd.position);
+                    }
+                }
+            }
+        }
+        globalCommandDispatcher.resetProject();
     }
     redo(cnt) {
+        for (let ii = 0; ii < cnt; ii++) {
+            if (globalCommandDispatcher.cfg().data.redo.length) {
+                let cmd = globalCommandDispatcher.cfg().data.redo.shift();
+                if (cmd) {
+                    this.reAction(cmd);
+                    globalCommandDispatcher.cfg().data.undo.push(cmd);
+                    if (cmd.position) {
+                        this.setCurPosition(cmd.position);
+                    }
+                }
+            }
+        }
+        globalCommandDispatcher.resetProject();
     }
 }
 let uiLinkFilterToSpeaker = 'uiLinkFilterToSpeaker';
