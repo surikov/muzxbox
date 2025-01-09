@@ -57,7 +57,7 @@ class TimeSelectBar {
 	updateTimeSelectionBar(//data: Zvoog_Project
 		//cfg:MixerDataMathUtility
 	) {
-		let selection: Zvoog_Selection = globalCommandDispatcher.cfg().data.selectePart;
+		let selection: Zvoog_Selection = globalCommandDispatcher.cfg().data.selectedPart;
 		//if (selection) {
 		if (selection.startMeasure > -1 || selection.endMeasure > -1) {
 			//let mixm: MixerDataMath = new MixerDataMath(data);

@@ -587,11 +587,11 @@ class CommandDispatcher {
         if (this.cfg().data) {
             if (idx >= 0 && idx < this.cfg().data.timeline.length) {
                 let curPro = this.cfg().data;
-                if (curPro.selectePart.startMeasure > -1 || curPro.selectePart.endMeasure > -1) {
-                    let curProjectSelection = curPro.selectePart;
+                if (curPro.selectedPart.startMeasure > -1 || curPro.selectedPart.endMeasure > -1) {
+                    let curProjectSelection = curPro.selectedPart;
                     if (curProjectSelection.startMeasure == curProjectSelection.endMeasure) {
                         if (curProjectSelection.startMeasure == idx) {
-                            curPro.selectePart = {
+                            curPro.selectedPart = {
                                 startMeasure: -1,
                                 endMeasure: -1
                             };
@@ -612,7 +612,7 @@ class CommandDispatcher {
                     }
                 }
                 else {
-                    curPro.selectePart = {
+                    curPro.selectedPart = {
                         startMeasure: idx,
                         endMeasure: idx
                     };
@@ -892,7 +892,7 @@ class TimeSelectBar {
         this.selectionMark.h = viewHeight * 1024;
     }
     updateTimeSelectionBar() {
-        let selection = globalCommandDispatcher.cfg().data.selectePart;
+        let selection = globalCommandDispatcher.cfg().data.selectedPart;
         if (selection.startMeasure > -1 || selection.endMeasure > -1) {
             let mm = MMUtil();
             let barLeft = globalCommandDispatcher.cfg().leftPad;
@@ -3393,7 +3393,7 @@ let mzxbxProjectForTesting2 = {
     title: 'test data for debug',
     versionCode: '1',
     list: false,
-    selectePart: { startMeasure: 1, endMeasure: 1 },
+    selectedPart: { startMeasure: 1, endMeasure: 1 },
     undo: [],
     redo: [],
     position: { x: -13037.9, y: -1317.9, z: 4.7 },
@@ -3528,7 +3528,7 @@ let mzxbxProjectForTesting3 = {
     title: 'test 33 data for debug',
     versionCode: '1',
     list: false,
-    selectePart: { startMeasure: 1, endMeasure: 2 },
+    selectedPart: { startMeasure: 1, endMeasure: 2 },
     undo: [],
     redo: [],
     position: { x: -13037.9, y: -1317.9, z: 4.007 },

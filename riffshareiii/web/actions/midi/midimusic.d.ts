@@ -40,7 +40,7 @@ declare type Zvoog_FilterTarget = {
     dataBlob: string;
     outputs: string[];
     automation: Zvoog_FilterMeasure[];
-    iconPosition?: {
+    iconPosition: {
         x: number;
         y: number;
     };
@@ -50,7 +50,7 @@ declare type Zvoog_AudioSequencer = {
     data: string;
     kind: string;
     outputs: string[];
-    iconPosition?: {
+    iconPosition: {
         x: number;
         y: number;
     };
@@ -60,7 +60,7 @@ declare type Zvoog_AudioSampler = {
     data: string;
     kind: string;
     outputs: string[];
-    iconPosition?: {
+    iconPosition: {
         x: number;
         y: number;
     };
@@ -111,20 +111,48 @@ declare type Zvoog_Selection = {
     startMeasure: number;
     endMeasure: number;
 };
+declare type DifferenceCreate = {
+    kind: "+";
+    path: (string | number)[];
+    newNode: any;
+};
+declare type DifferenceRemove = {
+    kind: "-";
+    path: (string | number)[];
+    oldNode: any;
+};
+declare type DifferenceChange = {
+    kind: "=";
+    path: (string | number)[];
+    newValue: any;
+    oldValue: any;
+};
+declare type Zvoog_Action = DifferenceCreate | DifferenceRemove | DifferenceChange;
+declare type Zvoog_UICommand = {
+    position: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    actions: Zvoog_Action[];
+};
 declare type Zvoog_Project = {
+    versionCode: '1';
     title: string;
     timeline: Zvoog_SongMeasure[];
     tracks: Zvoog_MusicTrack[];
     percussions: Zvoog_PercussionTrack[];
     comments: Zvoog_CommentMeasure[];
     filters: Zvoog_FilterTarget[];
-    selection?: Zvoog_Selection;
-    position?: {
+    selectedPart: Zvoog_Selection;
+    position: {
         x: number;
         y: number;
         z: number;
     };
-    list?: boolean;
+    list: boolean;
+    undo: Zvoog_UICommand[];
+    redo: Zvoog_UICommand[];
 };
 declare type MZXBX_CachedWave = {
     path: string;

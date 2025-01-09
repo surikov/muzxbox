@@ -1456,7 +1456,16 @@ class MidiParser {
             tracks: [],
             percussions: [],
             filters: [],
-            comments: []
+            comments: [],
+            selectedPart: {
+                startMeasure: -1,
+                endMeasure: -1
+            },
+            versionCode: '1',
+            list: false,
+            undo: [],
+            redo: [],
+            position: { x: 0, y: 0, z: 100 }
         };
         let echoID = 'echoMain';
         for (let ii = 0; ii < project.timeline.length; ii++) {
@@ -1538,6 +1547,20 @@ class MidiParser {
         return project;
     }
     trimProject(project) {
+        for (let ii = 0; ii < project.tracks.length; ii++) {
+            project.tracks[ii].performer.iconPosition.x = 10 + ii * 9;
+            project.tracks[ii].performer.iconPosition.y = 0 + ii * 4;
+        }
+        for (let ii = 0; ii < project.percussions.length; ii++) {
+            project.percussions[ii].sampler.iconPosition.x = 20 + ii * 4;
+            project.percussions[ii].sampler.iconPosition.y = 30 + ii * 9;
+        }
+        for (let ii = 0; ii < project.filters.length - 1; ii++) {
+            project.filters[ii].iconPosition.x = 10 + project.tracks.length * 9 + 5 + ii * 4;
+            project.filters[ii].iconPosition.y = ii * 9;
+        }
+        project.filters[project.filters.length - 1].iconPosition.x = 10 + project.tracks.length * 9 + 15 + project.filters.length * 4;
+        project.filters[project.filters.length - 1].iconPosition.y = project.filters.length * 6;
         for (let tt = 0; tt < project.tracks.length; tt++) {
             let track = project.tracks[tt];
             for (let mm = 0; mm < track.measures.length; mm++) {

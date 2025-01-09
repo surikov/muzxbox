@@ -196,11 +196,11 @@ class CommandDispatcher {
 		if (this.cfg().data) {
 			if (idx >= 0 && idx < this.cfg().data.timeline.length) {
 				let curPro = this.cfg().data;
-				if (curPro.selectePart.startMeasure > -1 || curPro.selectePart.endMeasure > -1) {
-					let curProjectSelection: Zvoog_Selection = curPro.selectePart;
+				if (curPro.selectedPart.startMeasure > -1 || curPro.selectedPart.endMeasure > -1) {
+					let curProjectSelection: Zvoog_Selection = curPro.selectedPart;
 					if (curProjectSelection.startMeasure == curProjectSelection.endMeasure) {
 						if (curProjectSelection.startMeasure == idx) {
-							curPro.selectePart = {
+							curPro.selectedPart = {
 								startMeasure: -1
 								, endMeasure: -1
 							};
@@ -217,7 +217,7 @@ class CommandDispatcher {
 						curProjectSelection.endMeasure = idx;
 					}
 				} else {
-					curPro.selectePart = {
+					curPro.selectedPart = {
 						startMeasure: idx
 						, endMeasure: idx
 					};

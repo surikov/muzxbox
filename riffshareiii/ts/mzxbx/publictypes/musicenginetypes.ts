@@ -157,7 +157,11 @@ type DifferenceChange = {
 type Zvoog_Action = DifferenceCreate | DifferenceRemove | DifferenceChange;
 
 type Zvoog_UICommand = {
-	position: TileZoom;
+	position: {
+		x: number,
+		y: number,
+		z: number
+	};
 	actions: Zvoog_Action[];
 };
 
@@ -169,7 +173,7 @@ type Zvoog_Project = {
 	percussions: Zvoog_PercussionTrack[];
 	comments: Zvoog_CommentMeasure[];
 	filters: Zvoog_FilterTarget[];
-	selectePart: Zvoog_Selection;
+	selectedPart: Zvoog_Selection;
 	position: {
 		x: number;
 		y: number;

@@ -2,7 +2,7 @@ let mzxbxProjectForTesting2: Zvoog_Project = {
 	title: 'test data for debug'
 	,versionCode:'1'
 	, list: false
-	, selectePart: {startMeasure: 1,		endMeasure: 1}
+	, selectedPart: {startMeasure: 1,		endMeasure: 1}
 	, undo: []
 	, redo: []
 	, position: { x: -13037.9, y: -1317.9, z: 4.7 }
@@ -193,7 +193,7 @@ let mzxbxProjectForTesting3: Zvoog_Project = {
 	title: 'test 33 data for debug'
 	,versionCode:'1'
 	, list: false
-	, selectePart: {startMeasure: 1,		endMeasure: 2}
+	, selectedPart: {startMeasure: 1,		endMeasure: 2}
 	, undo: []
 	, redo: []
 	, position: { x: -13037.9, y: -1317.9, z: 4.007 }
