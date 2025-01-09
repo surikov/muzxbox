@@ -147,6 +147,7 @@ body {
 	padding: 0px;
 	touch-action: manipulation;
 	background-color: #ff00ff;
+	cursor:grab;
 }
 
 #pagediv {

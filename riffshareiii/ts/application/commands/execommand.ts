@@ -8,7 +8,7 @@ class CommandExe {
 		this.addUndoCommandActiions(state.diffChangedCommands());
 	}
 	addUndoCommandActiions(cmd: Zvoog_UICommand) {
-		console.log(cmd);
+		//console.log(cmd);
 		globalCommandDispatcher.cfg().data.redo.length = 0;
 		globalCommandDispatcher.cfg().data.undo.push(cmd);
 		globalCommandDispatcher.resetProject();
@@ -23,6 +23,7 @@ class CommandExe {
 	unAction(cmd: Zvoog_UICommand) {
 		for (let ii = cmd.actions.length - 1; ii >= 0; ii--) {
 			let act = cmd.actions[ii];
+			//console.log('undo',act);
 			let parent = this.parentFromPath(act.path);
 			let prop = act.path[act.path.length - 1];
 			if (act.kind == '+') {
@@ -46,6 +47,7 @@ class CommandExe {
 	reAction(cmd: Zvoog_UICommand) {
 		for (let ii = 0; ii < cmd.actions.length; ii++) {
 			let act = cmd.actions[ii];
+			//console.log('redo',act);
 			let parent = this.parentFromPath(act.path);
 			let prop = act.path[act.path.length - 1];
 			if (act.kind == '+') {

@@ -190,27 +190,39 @@ class StateDiff {
         }
     }
     calculateArray(nodePath, commands, old, changed) {
-        for (let ii = 0; ii < old.length && ii < changed.length; ii++) {
+        for (let idx = 0; idx < old.length && idx < changed.length; idx++) {
             let currentPath = nodePath.slice(0);
-            currentPath.push(ii);
-            this.addDiff(currentPath, commands, old[ii], changed[ii]);
+            currentPath.push(idx);
+            if (typeof old[idx] === "object" || Array.isArray(old[idx])) {
+                this.addDiff(currentPath, commands, old[idx], changed[idx]);
+            }
+            else {
+                if (old[idx] !== changed[idx]) {
+                    commands.push({
+                        path: currentPath,
+                        kind: "=",
+                        newValue: changed[idx],
+                        oldValue: old[idx]
+                    });
+                }
+            }
         }
-        for (let ii = old.length; ii < changed.length; ii++) {
+        for (let idx = old.length; idx < changed.length; idx++) {
             let currentPath = nodePath.slice(0);
-            currentPath.push(ii);
+            currentPath.push(idx);
             commands.push({
                 path: currentPath,
                 kind: "+",
-                newNode: JSON.parse(JSON.stringify(changed[ii]))
+                newNode: JSON.parse(JSON.stringify(changed[idx]))
             });
         }
-        for (let ii = changed.length; ii < old.length; ii++) {
+        for (let idx = changed.length; idx < old.length; idx++) {
             let currentPath = nodePath.slice(0);
-            currentPath.push(ii);
+            currentPath.push(idx);
             commands.push({
                 path: currentPath,
                 kind: "-",
-                oldNode: old[ii]
+                oldNode: old[idx]
             });
         }
     }
@@ -348,7 +360,6 @@ class CommandExe {
         this.addUndoCommandActiions(state.diffChangedCommands());
     }
     addUndoCommandActiions(cmd) {
-        console.log(cmd);
         globalCommandDispatcher.cfg().data.redo.length = 0;
         globalCommandDispatcher.cfg().data.undo.push(cmd);
         globalCommandDispatcher.resetProject();
@@ -750,11 +761,12 @@ let localeFontRatio = 1;
 let localMenuItemSettings = 'localMenuItemSettings';
 let localMenuTracksFolder = 'localMenuTracksFolder';
 let localMenuPlayPause = 'localMenuPlayPause';
+let localMenuUndo = 'localMenuUndo';
+let localMenuRedo = 'localMenuRedo';
 let localMenuActionsFolder = 'localMenuActionsFolder';
 let localMenuPerformersFolder = 'localMenuPerformersFolder';
 let localMenuFiltersFolder = 'localMenuFiltersFolder';
 let localMenuSamplersFolder = 'localMenuSamplersFolder';
-let localMenuUndoFolder = 'localMenuUndoFolder';
 let localeDictionary = [
     {
         id: localNameLocal, data: [
@@ -807,9 +819,16 @@ let localeDictionary = [
             { locale: 'zh', text: '?' }
         ]
     }, {
-        id: localMenuUndoFolder, data: [
-            { locale: 'en', text: 'Undo/Redo' },
-            { locale: 'ru', text: 'Вернуть/Повторить' },
+        id: localMenuUndo, data: [
+            { locale: 'en', text: 'Undo' },
+            { locale: 'ru', text: 'Вернуть' },
+            { locale: 'zh', text: '?' }
+        ]
+    },
+    {
+        id: localMenuRedo, data: [
+            { locale: 'en', text: 'Redo' },
+            { locale: 'ru', text: 'Повторить' },
             { locale: 'zh', text: '?' }
         ]
     }
@@ -1016,13 +1035,21 @@ class UIToolbar {
             globalCommandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
             globalCommandDispatcher.showRightMenu();
         });
+        this.undoButton = new ToolBarButton([icon_undo], -1, 0, (nn) => {
+            globalCommandDispatcher.exe.undo(1);
+        });
+        this.redoButton = new ToolBarButton([icon_redo], -1, 1, (nn) => {
+            globalCommandDispatcher.exe.redo(1);
+        });
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
         this.toolBarAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111,
             showZoom: zoomPrefixLevelsCSS[0].minZoom,
             hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
-                this.menuButton.iconLabelButton.anchor
+                this.menuButton.iconLabelButton.anchor,
+                this.undoButton.iconLabelButton.anchor,
+                this.redoButton.iconLabelButton.anchor
             ]
         };
         this.toolBarLayer = {
@@ -1038,6 +1065,8 @@ class UIToolbar {
         this.toolBarAnchor.ww = viewWIdth;
         this.toolBarAnchor.hh = viewHeight;
         this.menuButton.resize(viewWIdth, viewHeight);
+        this.undoButton.resize(viewWIdth, viewHeight);
+        this.redoButton.resize(viewWIdth, viewHeight);
     }
 }
 class ToolBarButton {
@@ -1491,12 +1520,6 @@ let menuPointSamplers = {
         console.log('samplers');
     }
 };
-let menuPointUndo = {
-    text: 'localMenuUndoFolder',
-    onOpen: () => {
-        console.log('show undo');
-    }
-};
 let menuPointTracks = {
     text: localMenuTracksFolder,
     onOpen: () => {
@@ -1507,7 +1530,6 @@ function fillPluginsLists() {
     menuPointPerformers.children = [];
     menuPointSamplers.children = [];
     menuPointActions.children = [];
-    menuPointUndo.children = [];
     for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
         let label = MZXBX_currentPlugins()[ii].label;
         let purpose = MZXBX_currentPlugins()[ii].purpose;
@@ -1632,19 +1654,7 @@ function composeBaseMenu() {
             menuPointActions,
             menuPointFilters,
             menuPointPerformers,
-            menuPointSamplers,
-            menuPointUndo,
-            {
-                text: 'test undo', onClick: () => {
-                    console.log('undo');
-                    globalCommandDispatcher.exe.undo(1);
-                }
-            }, {
-                text: 'test redo', onClick: () => {
-                    console.log('redo');
-                    globalCommandDispatcher.exe.redo(1);
-                }
-            }
+            menuPointSamplers
         ];
         console.log('base menu', menuItemsData);
         return menuItemsData;
@@ -2776,35 +2786,50 @@ class SamplerIcon {
                 });
             }
         }
-        let sbuttn = {
-            x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1,
-            y: samplerFromY - 1,
-            w: 2,
-            h: 2,
-            rx: 1,
-            ry: 1,
-            css: 'fanSampleDrragger',
-            draggable: true
-        };
-        let btnAnchor = {
-            xx: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1,
-            yy: samplerFromY - 1,
-            ww: 2,
-            hh: 2,
-            showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [sbuttn], translation: { x: 0, y: 0 }
-        };
-        sbuttn.activation = (x, y) => {
-            if (!btnAnchor.translation) {
-                btnAnchor.translation = { x: 0, y: 0 };
-            }
-            if (x == 0 && y == 0) {
-            }
-            else {
-                btnAnchor.translation.y = btnAnchor.translation.y + y;
-            }
-            globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.spearsSVGgroup, spearsAnchor, LevelModes.normal);
-        };
-        spearsAnchor.content.push(btnAnchor);
+        if (zidx < 5) {
+            let sbuttn = {
+                x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1,
+                y: samplerFromY - 1,
+                w: 2,
+                h: 2,
+                rx: 1,
+                ry: 1,
+                css: 'fanSampleDrragger',
+                draggable: true
+            };
+            let btnAnchor = {
+                xx: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1,
+                yy: samplerFromY - 1,
+                ww: 2,
+                hh: 2,
+                showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [sbuttn], translation: { x: 0, y: 0 }
+            };
+            sbuttn.activation = (x, y) => {
+                if (!btnAnchor.translation) {
+                    btnAnchor.translation = { x: 0, y: 0 };
+                }
+                if (x == 0 && y == 0) {
+                    let dy = btnAnchor.translation.y;
+                    btnAnchor.translation.y = 0;
+                    let newOrder = order + Math.round(dy / globalCommandDispatcher.cfg().samplerDotHeight);
+                    if (newOrder < 0)
+                        newOrder = 0;
+                    if (newOrder > globalCommandDispatcher.cfg().data.percussions.length - 1)
+                        newOrder > globalCommandDispatcher.cfg().data.percussions.length - 1;
+                    if (order != newOrder) {
+                        globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+                            globalCommandDispatcher.cfg().data.percussions.splice(order, 1);
+                            globalCommandDispatcher.cfg().data.percussions.splice(newOrder, 0, samplerTrack);
+                        });
+                    }
+                }
+                else {
+                    btnAnchor.translation.y = btnAnchor.translation.y + y;
+                }
+                globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.spearsSVGgroup, spearsAnchor, LevelModes.normal);
+            };
+            spearsAnchor.content.push(btnAnchor);
+        }
     }
 }
 class FilterIcon {
@@ -2987,6 +3012,50 @@ class FilterIcon {
                     });
                 });
             }
+        }
+        if (zidx < 5) {
+            let sbuttn = {
+                x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1,
+                y: filterFromY - 1,
+                w: 2,
+                h: 2,
+                rx: 1,
+                ry: 1,
+                css: 'fanSampleDrragger',
+                draggable: true
+            };
+            let btnAnchor = {
+                xx: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1,
+                yy: filterFromY - 1,
+                ww: 2,
+                hh: 2,
+                showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [sbuttn], translation: { x: 0, y: 0 }
+            };
+            sbuttn.activation = (x, y) => {
+                if (!btnAnchor.translation) {
+                    btnAnchor.translation = { x: 0, y: 0 };
+                }
+                if (x == 0 && y == 0) {
+                    let dy = btnAnchor.translation.y;
+                    btnAnchor.translation.y = 0;
+                    let newOrder = order + Math.round(dy / globalCommandDispatcher.cfg().autoPointHeight);
+                    if (newOrder < 0)
+                        newOrder = 0;
+                    if (newOrder > globalCommandDispatcher.cfg().data.percussions.length - 1)
+                        newOrder > globalCommandDispatcher.cfg().data.percussions.length - 1;
+                    if (order != newOrder) {
+                        globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+                            globalCommandDispatcher.cfg().data.filters.splice(order, 1);
+                            globalCommandDispatcher.cfg().data.filters.splice(newOrder, 0, filterTarget);
+                        });
+                    }
+                }
+                else {
+                    btnAnchor.translation.y = btnAnchor.translation.y + y;
+                }
+                globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.spearsSVGgroup, spearsAnchor, LevelModes.normal);
+            };
+            spearsAnchor.content.push(btnAnchor);
         }
     }
 }
@@ -3224,6 +3293,8 @@ let icon_close = '&#xf136;';
 let icon_refresh = '&#xf1b9;';
 let icon_search = '&#xf1c3;';
 let icon_splitfan = '&#xf302;';
+let icon_undo = '&#xf258;';
+let icon_redo = '&#xf253;';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];

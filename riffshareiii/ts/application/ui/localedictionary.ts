@@ -12,8 +12,8 @@ let localMenuTracksFolder = 'localMenuTracksFolder';
 //let localMenuCommentsLayer='localMenuCommentsLayer';
 let localMenuPlayPause='localMenuPlayPause';
 
-
-
+let localMenuUndo='localMenuUndo';
+let localMenuRedo='localMenuRedo';
 
 
 
@@ -21,7 +21,7 @@ let localMenuActionsFolder='localMenuActionsFolder';
 let localMenuPerformersFolder='localMenuPerformersFolder';
 let localMenuFiltersFolder='localMenuFiltersFolder';
 let localMenuSamplersFolder='localMenuSamplersFolder';
-let localMenuUndoFolder='localMenuUndoFolder';
+//let localMenuUndoFolder='localMenuUndoFolder';
 
 let localeDictionary: { id: string, data: { locale: string, text: string }[] }[] = [
     {
@@ -101,9 +101,15 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
             , { locale: 'ru', text: 'Сэмплеры' }
             , { locale: 'zh', text: '?' }]
     }, {
-        id: localMenuUndoFolder, data: [
-            { locale: 'en', text: 'Undo/Redo' }
-            , { locale: 'ru', text: 'Вернуть/Повторить' }
+        id: localMenuUndo, data: [
+            { locale: 'en', text: 'Undo' }
+            , { locale: 'ru', text: 'Вернуть' }
+            , { locale: 'zh', text: '?' }]
+    }
+	, {
+        id: localMenuRedo, data: [
+            { locale: 'en', text: 'Redo' }
+            , { locale: 'ru', text: 'Повторить' }
             , { locale: 'zh', text: '?' }]
     }
 ];

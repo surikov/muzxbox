@@ -31,3 +31,6 @@ let icon_close='&#xf136;';
 let icon_refresh='&#xf1b9;';
 let icon_search='&#xf1c3;';
 let icon_splitfan='&#xf302;';
+
+let icon_undo='&#xf258;';
+let icon_redo='&#xf253;';

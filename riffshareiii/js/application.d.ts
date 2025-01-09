@@ -124,11 +124,12 @@ declare let localeFontRatio: number;
 declare let localMenuItemSettings: string;
 declare let localMenuTracksFolder: string;
 declare let localMenuPlayPause: string;
+declare let localMenuUndo: string;
+declare let localMenuRedo: string;
 declare let localMenuActionsFolder: string;
 declare let localMenuPerformersFolder: string;
 declare let localMenuFiltersFolder: string;
 declare let localMenuSamplersFolder: string;
-declare let localMenuUndoFolder: string;
 declare let localeDictionary: {
     id: string;
     data: {
@@ -160,6 +161,8 @@ declare class UIToolbar {
     toolBarGroup: SVGElement;
     toolBarLayer: TileLayerDefinition;
     menuButton: ToolBarButton;
+    undoButton: ToolBarButton;
+    redoButton: ToolBarButton;
     constructor();
     createToolbar(): TileLayerDefinition[];
     resizeToolbar(viewWIdth: number, viewHeight: number): void;
@@ -256,7 +259,6 @@ declare let menuPointActions: MenuInfo;
 declare let menuPointPerformers: MenuInfo;
 declare let menuPointFilters: MenuInfo;
 declare let menuPointSamplers: MenuInfo;
-declare let menuPointUndo: MenuInfo;
 declare let menuPointTracks: MenuInfo;
 declare function fillPluginsLists(): void;
 declare function composeBaseMenu(): MenuInfo[];
@@ -437,6 +439,8 @@ declare let icon_close: string;
 declare let icon_refresh: string;
 declare let icon_search: string;
 declare let icon_splitfan: string;
+declare let icon_undo: string;
+declare let icon_redo: string;
 declare class DebugLayerUI {
     debugRectangle: TileRectangle;
     debugAnchor: TileAnchor;
