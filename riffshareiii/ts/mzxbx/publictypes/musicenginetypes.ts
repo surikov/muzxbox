@@ -330,4 +330,5 @@ type MZXBX_MessageToPlugin = {
 type MZXBX_MessageToHost = {
 	dialogID: string
 	, pluginData: any
+	, done: boolean
 };

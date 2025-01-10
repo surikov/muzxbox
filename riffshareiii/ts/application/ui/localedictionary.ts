@@ -14,6 +14,7 @@ let localMenuPlayPause='localMenuPlayPause';
 
 let localMenuUndo='localMenuUndo';
 let localMenuRedo='localMenuRedo';
+let localMenuClearUndoRedo='localMenuClearUndoRedo';
 
 
 
@@ -110,6 +111,12 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
         id: localMenuRedo, data: [
             { locale: 'en', text: 'Redo' }
             , { locale: 'ru', text: 'Повторить' }
+            , { locale: 'zh', text: '?' }]
+    }
+	, {
+        id: localMenuClearUndoRedo, data: [
+            { locale: 'en', text: 'Clear Undo queue' }
+            , { locale: 'ru', text: 'Очистить очередь действий' }
             , { locale: 'zh', text: '?' }]
     }
 ];

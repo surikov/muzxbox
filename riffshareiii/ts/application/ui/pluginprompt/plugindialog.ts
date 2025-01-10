@@ -65,16 +65,24 @@ class PluginDialogPrompt {
 		(document.getElementById("pluginDiv") as any).style.visibility = "hidden";
 	}
 	receiveMessageFromPlugin(e) {
-		console.log('receiveMessage', e);
 		
+
 		if (e.data) {
 			let message: MZXBX_MessageToHost = e.data;
+			console.log('receiveMessage', message);
 			if (message.dialogID == this.dialogID) {
 				if (this.waitProjectCallback) {
+					console.log('waitProjectCallback');
 					this.waitProjectCallback(message.pluginData);
+					if (message.done) {
+						this.closeDialogFrame();
+					}
 				} else {
+					console.log('next');
 					if (this.waitTimelinePointCallback) {
+						console.log('waitTimelinePointCallback');
 						this.waitTimelinePointCallback(message.pluginData);
+						
 					}
 				}
 			} else {

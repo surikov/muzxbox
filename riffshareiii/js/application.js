@@ -314,15 +314,21 @@ class PluginDialogPrompt {
         document.getElementById("pluginDiv").style.visibility = "hidden";
     }
     receiveMessageFromPlugin(e) {
-        console.log('receiveMessage', e);
         if (e.data) {
             let message = e.data;
+            console.log('receiveMessage', message);
             if (message.dialogID == this.dialogID) {
                 if (this.waitProjectCallback) {
+                    console.log('waitProjectCallback');
                     this.waitProjectCallback(message.pluginData);
+                    if (message.done) {
+                        this.closeDialogFrame();
+                    }
                 }
                 else {
+                    console.log('next');
                     if (this.waitTimelinePointCallback) {
+                        console.log('waitTimelinePointCallback');
                         this.waitTimelinePointCallback(message.pluginData);
                     }
                 }
@@ -763,6 +769,7 @@ let localMenuTracksFolder = 'localMenuTracksFolder';
 let localMenuPlayPause = 'localMenuPlayPause';
 let localMenuUndo = 'localMenuUndo';
 let localMenuRedo = 'localMenuRedo';
+let localMenuClearUndoRedo = 'localMenuClearUndoRedo';
 let localMenuActionsFolder = 'localMenuActionsFolder';
 let localMenuPerformersFolder = 'localMenuPerformersFolder';
 let localMenuFiltersFolder = 'localMenuFiltersFolder';
@@ -829,6 +836,13 @@ let localeDictionary = [
         id: localMenuRedo, data: [
             { locale: 'en', text: 'Redo' },
             { locale: 'ru', text: 'Повторить' },
+            { locale: 'zh', text: '?' }
+        ]
+    },
+    {
+        id: localMenuClearUndoRedo, data: [
+            { locale: 'en', text: 'Clear Undo queue' },
+            { locale: 'ru', text: 'Очистить очередь действий' },
             { locale: 'zh', text: '?' }
         ]
     }
@@ -1647,6 +1661,12 @@ function composeBaseMenu() {
                                 }
                             }
                         ]
+                    },
+                    {
+                        text: localMenuClearUndoRedo, onClick: () => {
+                            globalCommandDispatcher.cfg().data.undo = [];
+                            globalCommandDispatcher.cfg().data.redo = [];
+                        }
                     }
                 ]
             },

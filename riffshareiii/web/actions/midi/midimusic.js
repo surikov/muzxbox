@@ -18,12 +18,13 @@ class MIDIIImportMusicPlugin {
         window.parent.postMessage('', '*');
     }
     sendImportedMIDIData() {
-        console.log('sendImportedMIDIData');
         if (this.parsedProject) {
             var oo = {
                 dialogID: this.callbackID,
-                pluginData: this.parsedProject
+                pluginData: this.parsedProject,
+                done: true
             };
+            console.log('sendImportedMIDIData', oo);
             window.parent.postMessage(oo, '*');
         }
         else {

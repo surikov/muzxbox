@@ -10,12 +10,14 @@ class MIDIIImportMusicPlugin {
 		window.parent.postMessage('', '*');
 	}
 	sendImportedMIDIData() {
-		console.log('sendImportedMIDIData');
+		
 		if (this.parsedProject) {
 			var oo: MZXBX_MessageToHost = {
-				dialogID: this.callbackID,
-				pluginData: this.parsedProject
+				dialogID: this.callbackID
+				, pluginData: this.parsedProject
+				, done: true
 			};
+			console.log('sendImportedMIDIData',oo);
 			window.parent.postMessage(oo, '*');
 		} else {
 			alert('No parsed data');
@@ -1998,12 +2000,12 @@ class MidiParser {
 			project.percussions[ii].sampler.iconPosition.x = 20 + ii * 4;
 			project.percussions[ii].sampler.iconPosition.y = 30 + ii * 9;
 		}
-		for (let ii = 0; ii < project.filters.length-1; ii++) {
+		for (let ii = 0; ii < project.filters.length - 1; ii++) {
 			project.filters[ii].iconPosition.x = 10 + project.tracks.length * 9 + 5 + ii * 4;
-			project.filters[ii].iconPosition.y =  ii * 9;
+			project.filters[ii].iconPosition.y = ii * 9;
 		}
-		project.filters[project.filters.length-1].iconPosition.x = 10 + project.tracks.length * 9 + 15 + project.filters.length * 4;
-		project.filters[project.filters.length-1].iconPosition.y =  project.filters.length * 6;
+		project.filters[project.filters.length - 1].iconPosition.x = 10 + project.tracks.length * 9 + 15 + project.filters.length * 4;
+		project.filters[project.filters.length - 1].iconPosition.y = project.filters.length * 6;
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let track = project.tracks[tt];
 			for (let mm = 0; mm < track.measures.length; mm++) {

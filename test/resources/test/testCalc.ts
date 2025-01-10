@@ -1346,6 +1346,9 @@ function addTails() {
 	mindata.sort((a: { ball: number, min: number }, b: { ball: number, min: number }) => {
 		return a.min - b.min;
 	});
+	/*for(let ii=0;ii<mindata.length;ii++){
+		console.log(mindata[ii]);
+	}*/
 	begin = -1;
 	end = -1;
 	for (let kk = 0; kk < mindata.length; kk++) {
