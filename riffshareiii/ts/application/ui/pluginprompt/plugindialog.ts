@@ -65,24 +65,33 @@ class PluginDialogPrompt {
 		(document.getElementById("pluginDiv") as any).style.visibility = "hidden";
 	}
 	receiveMessageFromPlugin(e) {
-		
+
 
 		if (e.data) {
 			let message: MZXBX_MessageToHost = e.data;
 			console.log('receiveMessage', message);
 			if (message.dialogID == this.dialogID) {
+
 				if (this.waitProjectCallback) {
+					let me = this;
 					console.log('waitProjectCallback');
-					this.waitProjectCallback(message.pluginData);
-					if (message.done) {
-						this.closeDialogFrame();
-					}
+					globalCommandDispatcher.exe.commitProjectChanges([], () => {
+						if (me.waitProjectCallback) {
+							let newProj: Zvoog_Project = message.pluginData;
+							newProj.undo = globalCommandDispatcher.cfg().data.undo;
+							me.waitProjectCallback(message.pluginData);
+							if (message.done) {
+								me.closeDialogFrame();
+							}
+						}
+					});
+
 				} else {
 					console.log('next');
 					if (this.waitTimelinePointCallback) {
 						console.log('waitTimelinePointCallback');
 						this.waitTimelinePointCallback(message.pluginData);
-						
+
 					}
 				}
 			} else {

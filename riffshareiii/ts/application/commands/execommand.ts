@@ -21,9 +21,10 @@ class CommandExe {
 		return parent;
 	}
 	unAction(cmd: Zvoog_UICommand) {
+		console.log('undo',cmd);
 		for (let ii = cmd.actions.length - 1; ii >= 0; ii--) {
 			let act = cmd.actions[ii];
-			//console.log('undo',act);
+			
 			let parent = this.parentFromPath(act.path);
 			let prop = act.path[act.path.length - 1];
 			if (act.kind == '+') {
@@ -45,9 +46,10 @@ class CommandExe {
 		}
 	}
 	reAction(cmd: Zvoog_UICommand) {
+		console.log('redo',cmd);
 		for (let ii = 0; ii < cmd.actions.length; ii++) {
 			let act = cmd.actions[ii];
-			//console.log('redo',act);
+			
 			let parent = this.parentFromPath(act.path);
 			let prop = act.path[act.path.length - 1];
 			if (act.kind == '+') {

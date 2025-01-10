@@ -192,9 +192,12 @@ body {
 .fillShadow {
 	fill: var(--shadow-color);
 }
-
+.warningAnchor22{
+	cursor:default;
+}
 .warningBG {
 	fill: var(--fog-color);
+	cursor:default;
 }
 
 .warningIcon {

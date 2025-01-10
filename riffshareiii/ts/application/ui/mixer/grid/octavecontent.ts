@@ -91,6 +91,7 @@ class OctaveContent {
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		//let transpose=-2*12;
 		let measure: Zvoog_TrackMeasure = track.measures[barIdx];
+		console.log('addTrackNotes',barIdx,track);
 		for (let cc = 0; cc < measure.chords.length; cc++) {
 			let chord: Zvoog_Chord = measure.chords[cc];
 			for (let nn = 0; nn < chord.pitches.length; nn++) {

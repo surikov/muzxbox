@@ -172,19 +172,23 @@ class StateDiff {
     }
     calculateNonArray(nodePath, commands, old, changed) {
         for (let prop in old) {
-            let currentPath = nodePath.slice(0);
-            currentPath.push(prop);
-            if (typeof old[prop] === "object" || Array.isArray(old[prop])) {
-                this.addDiff(currentPath, commands, old[prop], changed[prop]);
+            if (prop == 'undo' || prop == 'redo') {
             }
             else {
-                if (old[prop] !== changed[prop]) {
-                    commands.push({
-                        path: currentPath,
-                        kind: "=",
-                        newValue: changed[prop],
-                        oldValue: old[prop]
-                    });
+                let currentPath = nodePath.slice(0);
+                currentPath.push(prop);
+                if (typeof old[prop] === "object" || Array.isArray(old[prop])) {
+                    this.addDiff(currentPath, commands, old[prop], changed[prop]);
+                }
+                else {
+                    if (old[prop] !== changed[prop]) {
+                        commands.push({
+                            path: currentPath,
+                            kind: "=",
+                            newValue: changed[prop],
+                            oldValue: old[prop]
+                        });
+                    }
                 }
             }
         }
@@ -319,11 +323,18 @@ class PluginDialogPrompt {
             console.log('receiveMessage', message);
             if (message.dialogID == this.dialogID) {
                 if (this.waitProjectCallback) {
+                    let me = this;
                     console.log('waitProjectCallback');
-                    this.waitProjectCallback(message.pluginData);
-                    if (message.done) {
-                        this.closeDialogFrame();
-                    }
+                    globalCommandDispatcher.exe.commitProjectChanges([], () => {
+                        if (me.waitProjectCallback) {
+                            let newProj = message.pluginData;
+                            newProj.undo = globalCommandDispatcher.cfg().data.undo;
+                            me.waitProjectCallback(message.pluginData);
+                            if (message.done) {
+                                me.closeDialogFrame();
+                            }
+                        }
+                    });
                 }
                 else {
                     console.log('next');
@@ -378,6 +389,7 @@ class CommandExe {
         return parent;
     }
     unAction(cmd) {
+        console.log('undo', cmd);
         for (let ii = cmd.actions.length - 1; ii >= 0; ii--) {
             let act = cmd.actions[ii];
             let parent = this.parentFromPath(act.path);
@@ -403,6 +415,7 @@ class CommandExe {
         }
     }
     reAction(cmd) {
+        console.log('redo', cmd);
         for (let ii = 0; ii < cmd.actions.length; ii++) {
             let act = cmd.actions[ii];
             let parent = this.parentFromPath(act.path);

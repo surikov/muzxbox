@@ -37,19 +37,23 @@ class StateDiff {
 	calculateNonArray(nodePath: (string | number)[], commands: Zvoog_Action[], old: any, changed: any): void {
 		//console.log('calculateNonArray', nodePath, old, changed);
 		for (let prop in old) {
-			let currentPath: (string | number)[] = nodePath.slice(0);
-			currentPath.push(prop);
-			if (typeof old[prop] === "object" || Array.isArray(old[prop])) {
-				this.addDiff(currentPath, commands, old[prop], changed[prop]);
+			if (prop == 'undo' || prop == 'redo') {
+				//skip
 			} else {
-				if (old[prop] !== changed[prop]) {
-					commands.push({
-						path: currentPath
-						, kind: "="
-						, newValue: changed[prop]
-						, oldValue: old[prop]
-					});
-					//console.log(commands[commands.length-1]);
+				let currentPath: (string | number)[] = nodePath.slice(0);
+				currentPath.push(prop);
+				if (typeof old[prop] === "object" || Array.isArray(old[prop])) {
+					this.addDiff(currentPath, commands, old[prop], changed[prop]);
+				} else {
+					if (old[prop] !== changed[prop]) {
+						commands.push({
+							path: currentPath
+							, kind: "="
+							, newValue: changed[prop]
+							, oldValue: old[prop]
+						});
+						//console.log(commands[commands.length-1]);
+					}
 				}
 			}
 		}
