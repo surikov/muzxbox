@@ -12,9 +12,9 @@ class SamplerBar {
 		let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().samplerDotHeight;
 		let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
 		let css = 'samplerDrumDotBg';
-		if(zoomLevel<3){
+		/*if (zoomLevel < 3) {
 			css = 'samplerDrumDotActive';
-		}
+		}*/
 		//if (globalCommandDispatcher.cfg().data.focus) if (globalCommandDispatcher.cfg().data.focus == 1) css = 'samplerDrumDotFocused';
 		for (let ss = 0; ss < measure.skips.length; ss++) {
 			let skip: Zvoog_Metre = measure.skips[ss];
@@ -54,6 +54,18 @@ class SamplerBar {
 				, css: css
 			};
 			anchor.content.push(ply);
+			if (zoomLevel < 3) {
+				let idot: TileRectangle = {
+					x: xx + globalCommandDispatcher.cfg().samplerDotHeight / 16
+					, y: yy + globalCommandDispatcher.cfg().samplerDotHeight * (1 / 2 - 1 / 16)
+					, w: globalCommandDispatcher.cfg().samplerDotHeight / 8
+					, h: globalCommandDispatcher.cfg().samplerDotHeight / 8
+					, rx: globalCommandDispatcher.cfg().samplerDotHeight / 16
+					, ry: globalCommandDispatcher.cfg().samplerDotHeight / 16
+					, css: 'samplerDrumDotActive'
+				};
+				anchor.content.push(idot);
+			}
 		}
 	}
 }

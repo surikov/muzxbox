@@ -1834,9 +1834,6 @@ class SamplerBar {
         let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().samplerDotHeight;
         let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
         let css = 'samplerDrumDotBg';
-        if (zoomLevel < 3) {
-            css = 'samplerDrumDotActive';
-        }
         for (let ss = 0; ss < measure.skips.length; ss++) {
             let skip = measure.skips[ss];
             let xx = left + MMUtil().set(skip).duration(tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
@@ -1857,6 +1854,18 @@ class SamplerBar {
                 css: css
             };
             anchor.content.push(ply);
+            if (zoomLevel < 3) {
+                let idot = {
+                    x: xx + globalCommandDispatcher.cfg().samplerDotHeight / 16,
+                    y: yy + globalCommandDispatcher.cfg().samplerDotHeight * (1 / 2 - 1 / 16),
+                    w: globalCommandDispatcher.cfg().samplerDotHeight / 8,
+                    h: globalCommandDispatcher.cfg().samplerDotHeight / 8,
+                    rx: globalCommandDispatcher.cfg().samplerDotHeight / 16,
+                    ry: globalCommandDispatcher.cfg().samplerDotHeight / 16,
+                    css: 'samplerDrumDotActive'
+                };
+                anchor.content.push(idot);
+            }
         }
     }
 }
@@ -2134,9 +2143,6 @@ class AutomationBarContent {
         let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
         let top = globalCommandDispatcher.cfg().automationTop();
         let css = 'automationBgDot';
-        if (zIndex < 3) {
-            css = 'automationFocusedDot';
-        }
         for (let aa = 0; aa < globalCommandDispatcher.cfg().data.filters.length; aa++) {
             let filter = globalCommandDispatcher.cfg().data.filters[aa];
             if (filter.automation[barIdx]) {
@@ -2152,6 +2158,18 @@ class AutomationBarContent {
                         css: css
                     };
                     barOctaveAnchor.content.push(aubtn);
+                    if (zIndex < 3) {
+                        let idot = {
+                            x: xx + globalCommandDispatcher.cfg().autoPointHeight / 16,
+                            y: top + globalCommandDispatcher.cfg().autoPointHeight / 16 + globalCommandDispatcher.cfg().autoPointHeight * aa,
+                            w: globalCommandDispatcher.cfg().autoPointHeight / 8,
+                            h: globalCommandDispatcher.cfg().autoPointHeight / 8,
+                            rx: globalCommandDispatcher.cfg().autoPointHeight / 16,
+                            ry: globalCommandDispatcher.cfg().autoPointHeight / 16,
+                            css: 'automationFocusedDot'
+                        };
+                        barOctaveAnchor.content.push(idot);
+                    }
                 }
             }
         }
