@@ -46,12 +46,14 @@ declare class PluginDialogPrompt {
     receiveMessageFromPlugin(e: any): void;
 }
 declare class CommandExe {
+    lockUndoRedo: boolean;
     setCurPosition(xyz: TileZoom): void;
     commitProjectChanges(path: (string | number)[], proAction: () => void): void;
     addUndoCommandActiions(cmd: Zvoog_UICommand): void;
     parentFromPath(path: (string | number)[]): any;
     unAction(cmd: Zvoog_UICommand): void;
     reAction(cmd: Zvoog_UICommand): void;
+    cutLongUndo(): void;
     undo(cnt: number): void;
     redo(cnt: number): void;
 }

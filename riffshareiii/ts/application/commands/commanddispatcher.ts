@@ -141,28 +141,33 @@ class CommandDispatcher {
 		this.renderer.tiler.resetModel();
 	}
 	resetProject() {
-		this.renderer.fillWholeUI();
+		try {
+			this.renderer.fillWholeUI();
+		} catch (xx) {
+			console.log('resetProject', xx);
+			console.log('data', this.cfg().data);
+		}
 	}
 	//moveTrackTop(trackNum: number) {
-		//console.log('moveTrackTop', trackNum);
-		/*
-		let it = this.cfg().data.tracks[trackNum];
-		this.cfg().data.tracks.splice(trackNum, 1);
-		this.cfg().data.tracks.unshift(it);
+	//console.log('moveTrackTop', trackNum);
+	/*
+	let it = this.cfg().data.tracks[trackNum];
+	this.cfg().data.tracks.splice(trackNum, 1);
+	this.cfg().data.tracks.unshift(it);
 */
 
-		//let par: ParameterMoveTrackTop = { trackPrePosition: trackNum, position: this.renderer.tiler.getCurrentPointPosition() };
-		//let cmd = new CmdMoveTrackTop(par);
-		//this.addUndoRedo(new CmdMoveTrackTop(par));
-		///////////////////////////////this.exe.addUndoCommandFromUI(ExeMoveTrack, { from: trackNum, to: 0 });
-		//cmd.redo();
-		/*
-		this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
-		if (this.cfg().data.tracks)
-			if (this.cfg().data.tracks[0])
-				this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
-				*/
-		//this.resetProject();
+	//let par: ParameterMoveTrackTop = { trackPrePosition: trackNum, position: this.renderer.tiler.getCurrentPointPosition() };
+	//let cmd = new CmdMoveTrackTop(par);
+	//this.addUndoRedo(new CmdMoveTrackTop(par));
+	///////////////////////////////this.exe.addUndoCommandFromUI(ExeMoveTrack, { from: trackNum, to: 0 });
+	//cmd.redo();
+	/*
+	this.renderer.menu.layerCurrentTitle.text = LO(localMenuTracksFolder);
+	if (this.cfg().data.tracks)
+		if (this.cfg().data.tracks[0])
+			this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
+			*/
+	//this.resetProject();
 	//}
 	/*moveDrumTop(drumNum: number) {
 		console.log('moveDrumTop', drumNum);

@@ -114,7 +114,7 @@ class PerformerIcon {
 						}
 					}
 					dragAnchor.translation = { x: 0, y: 0 };
-					globalCommandDispatcher.resetProject();
+					//globalCommandDispatcher.resetProject();
 				} else {
 					toSpeaker = false;
 					toFilter = null;

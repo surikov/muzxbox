@@ -368,6 +368,9 @@ class PluginDialogPrompt {
     }
 }
 class CommandExe {
+    constructor() {
+        this.lockUndoRedo = false;
+    }
     setCurPosition(xyz) {
         globalCommandDispatcher.cfg().data.position = { x: xyz.x, y: xyz.y, z: xyz.z };
     }
@@ -375,6 +378,7 @@ class CommandExe {
         let state = new StateDiff(path);
         proAction();
         this.addUndoCommandActiions(state.diffChangedCommands());
+        this.cutLongUndo();
     }
     addUndoCommandActiions(cmd) {
         globalCommandDispatcher.cfg().data.redo.length = 0;
@@ -389,7 +393,6 @@ class CommandExe {
         return parent;
     }
     unAction(cmd) {
-        console.log('undo', cmd);
         for (let ii = cmd.actions.length - 1; ii >= 0; ii--) {
             let act = cmd.actions[ii];
             let parent = this.parentFromPath(act.path);
@@ -415,7 +418,6 @@ class CommandExe {
         }
     }
     reAction(cmd) {
-        console.log('redo', cmd);
         for (let ii = 0; ii < cmd.actions.length; ii++) {
             let act = cmd.actions[ii];
             let parent = this.parentFromPath(act.path);
@@ -440,33 +442,66 @@ class CommandExe {
             }
         }
     }
+    cutLongUndo() {
+        let unCnt = 0;
+        for (let ii = 0; ii < globalCommandDispatcher.cfg().data.undo.length; ii++) {
+            let one = globalCommandDispatcher.cfg().data.undo[ii];
+            unCnt = unCnt + one.actions.length;
+        }
+        let reCnt = 0;
+        for (let ii = 0; ii < globalCommandDispatcher.cfg().data.redo.length; ii++) {
+            let one = globalCommandDispatcher.cfg().data.redo[ii];
+            reCnt = reCnt + one.actions.length;
+        }
+        console.log('undo', unCnt, 'redo', reCnt);
+        if (unCnt > 32100) {
+            console.log('cut undo queue');
+            let cmd = globalCommandDispatcher.cfg().data.undo.shift();
+        }
+    }
     undo(cnt) {
-        for (let ii = 0; ii < cnt; ii++) {
-            if (globalCommandDispatcher.cfg().data.undo.length) {
-                let cmd = globalCommandDispatcher.cfg().data.undo.pop();
-                if (cmd) {
-                    this.unAction(cmd);
-                    globalCommandDispatcher.cfg().data.redo.unshift(cmd);
-                    if (cmd.position) {
-                        this.setCurPosition(cmd.position);
+        if (this.lockUndoRedo) {
+            console.log('lockUndoRedo');
+        }
+        else {
+            this.lockUndoRedo = true;
+            for (let ii = 0; ii < cnt; ii++) {
+                if (globalCommandDispatcher.cfg().data.undo.length) {
+                    let cmd = globalCommandDispatcher.cfg().data.undo.pop();
+                    if (cmd) {
+                        this.unAction(cmd);
+                        globalCommandDispatcher.cfg().data.redo.unshift(cmd);
+                        if (cmd.position) {
+                            this.setCurPosition(cmd.position);
+                        }
                     }
                 }
             }
+            this.lockUndoRedo = false;
+            this.cutLongUndo();
         }
         globalCommandDispatcher.resetProject();
     }
     redo(cnt) {
-        for (let ii = 0; ii < cnt; ii++) {
-            if (globalCommandDispatcher.cfg().data.redo.length) {
-                let cmd = globalCommandDispatcher.cfg().data.redo.shift();
-                if (cmd) {
-                    this.reAction(cmd);
-                    globalCommandDispatcher.cfg().data.undo.push(cmd);
-                    if (cmd.position) {
-                        this.setCurPosition(cmd.position);
+        if (this.lockUndoRedo) {
+            console.log('lockUndoRedo');
+        }
+        else {
+            this.lockUndoRedo = true;
+            for (let ii = 0; ii < cnt; ii++) {
+                if (globalCommandDispatcher.cfg().data.redo.length) {
+                    let cmd = globalCommandDispatcher.cfg().data.redo.shift();
+                    if (cmd) {
+                        this.reAction(cmd);
+                        globalCommandDispatcher.cfg().data.undo.push(cmd);
+                        if (cmd.position) {
+                            this.setCurPosition(cmd.position);
+                        }
                     }
                 }
             }
+            this.lockUndoRedo = false;
+            this.cutLongUndo();
         }
         globalCommandDispatcher.resetProject();
     }
@@ -587,7 +622,13 @@ class CommandDispatcher {
         this.renderer.tiler.resetModel();
     }
     resetProject() {
-        this.renderer.fillWholeUI();
+        try {
+            this.renderer.fillWholeUI();
+        }
+        catch (xx) {
+            console.log('resetProject', xx);
+            console.log('data', this.cfg().data);
+        }
     }
     promptProjectPluginGUI(label, url, callback) {
         console.log('promptProjectPluginGUI', url);
@@ -2530,7 +2571,6 @@ class PerformerIcon {
                         }
                     }
                     dragAnchor.translation = { x: 0, y: 0 };
-                    globalCommandDispatcher.resetProject();
                 }
                 else {
                     toSpeaker = false;
@@ -2711,7 +2751,6 @@ class SamplerIcon {
                         }
                     }
                     dragAnchor.translation = { x: 0, y: 0 };
-                    globalCommandDispatcher.resetProject();
                 }
                 else {
                     toSpeaker = false;
@@ -2938,7 +2977,6 @@ class FilterIcon {
                         }
                     }
                     dragAnchor.translation = { x: 0, y: 0 };
-                    globalCommandDispatcher.resetProject();
                 }
                 else {
                     toSpeaker = false;

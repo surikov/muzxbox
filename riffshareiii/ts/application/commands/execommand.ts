@@ -1,4 +1,5 @@
 class CommandExe {
+	lockUndoRedo = false;
 	setCurPosition(xyz: TileZoom) {
 		globalCommandDispatcher.cfg().data.position = { x: xyz.x, y: xyz.y, z: xyz.z };
 	}
@@ -6,6 +7,7 @@ class CommandExe {
 		let state = new StateDiff(path);
 		proAction();
 		this.addUndoCommandActiions(state.diffChangedCommands());
+		this.cutLongUndo();
 	}
 	addUndoCommandActiions(cmd: Zvoog_UICommand) {
 		//console.log(cmd);
@@ -21,10 +23,10 @@ class CommandExe {
 		return parent;
 	}
 	unAction(cmd: Zvoog_UICommand) {
-		console.log('undo',cmd);
+		//console.log('undo', cmd);
 		for (let ii = cmd.actions.length - 1; ii >= 0; ii--) {
 			let act = cmd.actions[ii];
-			
+
 			let parent = this.parentFromPath(act.path);
 			let prop = act.path[act.path.length - 1];
 			if (act.kind == '+') {
@@ -46,10 +48,10 @@ class CommandExe {
 		}
 	}
 	reAction(cmd: Zvoog_UICommand) {
-		console.log('redo',cmd);
+		//console.log('redo', cmd);
 		for (let ii = 0; ii < cmd.actions.length; ii++) {
 			let act = cmd.actions[ii];
-			
+
 			let parent = this.parentFromPath(act.path);
 			let prop = act.path[act.path.length - 1];
 			if (act.kind == '+') {
@@ -70,35 +72,68 @@ class CommandExe {
 			}
 		}
 	}
+	cutLongUndo() {
+		let unCnt = 0;
+		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.undo.length; ii++) {
+			let one = globalCommandDispatcher.cfg().data.undo[ii];
+			unCnt = unCnt + one.actions.length;
+		}
+		let reCnt = 0;
+		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.redo.length; ii++) {
+			let one = globalCommandDispatcher.cfg().data.redo[ii];
+			reCnt = reCnt + one.actions.length;
+		}
+		console.log('undo', unCnt, 'redo', reCnt);
+		if (unCnt > 32100) {
+			console.log('cut undo queue');
+			let cmd = globalCommandDispatcher.cfg().data.undo.shift();
+		}
+	}
 	undo(cnt: number) {
-		for (let ii = 0; ii < cnt; ii++) {
-			if (globalCommandDispatcher.cfg().data.undo.length) {
-				let cmd = globalCommandDispatcher.cfg().data.undo.pop();
-				if (cmd) {
-					//this.executeCommand(cmd.kind, cmd.params, true);
-					this.unAction(cmd);
-					globalCommandDispatcher.cfg().data.redo.unshift(cmd);
-					if (cmd.position) {
-						this.setCurPosition(cmd.position);
+		if (this.lockUndoRedo) {
+			console.log('lockUndoRedo');
+		} else {
+			this.lockUndoRedo = true;
+			for (let ii = 0; ii < cnt; ii++) {
+				if (globalCommandDispatcher.cfg().data.undo.length) {
+					let cmd = globalCommandDispatcher.cfg().data.undo.pop();
+					if (cmd) {
+						//this.executeCommand(cmd.kind, cmd.params, true);
+						this.unAction(cmd);
+						globalCommandDispatcher.cfg().data.redo.unshift(cmd);
+						if (cmd.position) {
+							this.setCurPosition(cmd.position);
+						}
 					}
 				}
 			}
+
+			this.lockUndoRedo = false;
+			this.cutLongUndo();
 		}
 		globalCommandDispatcher.resetProject();
 	}
 	redo(cnt: number) {
-		for (let ii = 0; ii < cnt; ii++) {
-			if (globalCommandDispatcher.cfg().data.redo.length) {
-				let cmd = globalCommandDispatcher.cfg().data.redo.shift();
-				if (cmd) {
-					//this.executeCommand(cmd.kind, cmd.params, false);
-					this.reAction(cmd);
-					globalCommandDispatcher.cfg().data.undo.push(cmd);
-					if (cmd.position) {
-						this.setCurPosition(cmd.position);
+		if (this.lockUndoRedo) {
+			console.log('lockUndoRedo');
+		} else {
+			this.lockUndoRedo = true;
+			for (let ii = 0; ii < cnt; ii++) {
+				if (globalCommandDispatcher.cfg().data.redo.length) {
+					let cmd = globalCommandDispatcher.cfg().data.redo.shift();
+					if (cmd) {
+						//this.executeCommand(cmd.kind, cmd.params, false);
+						this.reAction(cmd);
+						globalCommandDispatcher.cfg().data.undo.push(cmd);
+						if (cmd.position) {
+							this.setCurPosition(cmd.position);
+						}
 					}
 				}
 			}
+
+			this.lockUndoRedo = false;
+			this.cutLongUndo();
 		}
 		globalCommandDispatcher.resetProject();
 	}
