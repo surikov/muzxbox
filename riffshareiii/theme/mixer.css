@@ -257,12 +257,12 @@
 }
 
 .automationBgDot{
-	fill: var(--line-color);
+	fill: var(--main-color);
 	fill-opacity:75%;
     stroke: none;
 }
 .automationFocusedDot{
-	fill: var(--main-color);
-	fill-opacity:75%;
+	fill: var(--click-color);
+	fill-opacity:90%;
     stroke: none;
 }

@@ -217,20 +217,21 @@ class SamplerIcon {
 
 		if (zidx < 5) {
 			let sbuttn: TileRectangle = {
-				x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1
-				, y: samplerFromY - 1
-				, w: 2
-				, h: 2
-				, rx: 1
-				, ry: 1
+				x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth()
+					- 0.9*globalCommandDispatcher.cfg().samplerDotHeight / 2
+				, y: samplerFromY - 0.9*globalCommandDispatcher.cfg().samplerDotHeight / 2
+				, w: 0.9*globalCommandDispatcher.cfg().samplerDotHeight
+				, h: 0.9*globalCommandDispatcher.cfg().samplerDotHeight
+				, rx: 0.9*globalCommandDispatcher.cfg().samplerDotHeight / 2
+				, ry: 0.9*globalCommandDispatcher.cfg().samplerDotHeight / 2
 				, css: 'fanSampleDrragger'
 				, draggable: true
 			};
 			let btnAnchor: TileAnchor = {
-				xx: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1
-				, yy: samplerFromY - 1
-				, ww: 2
-				, hh: 2
+				xx: sbuttn.x
+				, yy: sbuttn.y
+				, ww: sbuttn.w
+				, hh: sbuttn.h
 				, showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [sbuttn], translation: { x: 0, y: 0 }
 			};
 			sbuttn.activation = (x: number, y: number) => {

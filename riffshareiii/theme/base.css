@@ -71,7 +71,7 @@
 :root {
 	
 
-	--color-debug: #800;
+	--color-debug: #c00;
 	/*
 	--color-shadow: #00000066;
 	--color-background: #000000ff;
@@ -82,11 +82,11 @@
 	--color-subtext: #99ccccff;
 	(((--main-color))): #ddeeffff;
 */
-	--background-color: #222;
+	--background-color: #010;
 	--main-color:#fff;
-	--drag-color:#3c3;
-	--line-color:#9ef;
-	--click-color:#c39;
+	--drag-color:#390;
+	--line-color:#9cf;
+	--click-color:#906;
 
 	--click-color50: color-mix(in lab, transparent 50%, var(--click-color));
 	--line-color50: color-mix(in lab, transparent 50%, var(--line-color));
@@ -95,6 +95,7 @@
 }
 :root {
 	--fog-color: color-mix(in lab, transparent 10%, var(--background-color));
+	--back-color: color-mix(in lab, transparent 3%, var(--background-color));
 	--shadow-color: color-mix(in lab, transparent 75%, var(--main-color));
 }
 
@@ -135,7 +136,7 @@ html {
 	padding: 0px;
 	font-family2: 'Poiret One';
 	font-family2: 'Fontquan-XinYiJiXiangSong-Regular';
-	background-color: #ff0000;
+	background-color2: #ff0000;
 	user-select: none;
 
 }
@@ -146,8 +147,9 @@ body {
 	margin: 0px;
 	padding: 0px;
 	touch-action: manipulation;
-	background-color: #ff00ff;
+	background-color2: #ff00ff;
 	cursor:grab;
+	background-color: var(--main-color);
 }
 
 #pagediv {
@@ -172,7 +174,7 @@ body {
 	stroke-linecap: round;
 	margin: 0px;
 	padding: 0px;
-	background: var(--fog-color);
+	background: var(--back-color);
 	flex-basis: 0;
 	flex-shrink: 1;
 	flex-grow: 1;

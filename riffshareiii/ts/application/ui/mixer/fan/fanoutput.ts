@@ -89,12 +89,12 @@ class FanOutputLine {
 			let dx = ratio * (toX - fromX) / 2;
 			let dy = ratio * (toY - fromY) / 2;
 			let deleteButton: TileRectangle = {
-				x: fromX + dx - globalCommandDispatcher.cfg().pluginIconSize / 4
-				, y: fromY + dy - globalCommandDispatcher.cfg().pluginIconSize / 4
-				, w: globalCommandDispatcher.cfg().pluginIconSize / 2
-				, h: globalCommandDispatcher.cfg().pluginIconSize / 2
-				, rx: globalCommandDispatcher.cfg().pluginIconSize / 4
-				, ry: globalCommandDispatcher.cfg().pluginIconSize / 4
+				x: fromX + dx - globalCommandDispatcher.cfg().pluginIconSize /2
+				, y: fromY + dy - globalCommandDispatcher.cfg().pluginIconSize /2
+				, w: globalCommandDispatcher.cfg().pluginIconSize 
+				, h: globalCommandDispatcher.cfg().pluginIconSize 
+				, rx: globalCommandDispatcher.cfg().pluginIconSize 
+				, ry: globalCommandDispatcher.cfg().pluginIconSize 
 				, css: 'fanDropConnection fanDropConnection' + zidx
 				, activation: onDelete
 				/*, activation: (x: number, y: number) => {
@@ -105,7 +105,7 @@ class FanOutputLine {
 			anchor.content.push(deleteButton);
 			let deleteIcon: TileText = {
 				x: fromX + dx //- globalCommandDispatcher.cfg().pluginIconSize / 2
-				, y: fromY + dy + globalCommandDispatcher.cfg().pluginIconSize / 8
+				, y: fromY + dy + globalCommandDispatcher.cfg().pluginIconSize / 4
 				, text: icon_close
 				, css: 'fanDeleteIcon'
 

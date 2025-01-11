@@ -22,6 +22,9 @@ class AutomationBarContent {
 		barOctaveAnchor.content.push(barAutoRightBorder);
 */
 		let css = 'automationBgDot';
+		if(zIndex<3){
+			css = 'automationFocusedDot';
+		}
 		//if (globalCommandDispatcher.cfg().data.focus) if (globalCommandDispatcher.cfg().data.focus == 2) css = 'automationFocusedDot';
 		/*let yy =0;
 		for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {

@@ -9,7 +9,17 @@
     stroke: none;
 }
 .samplerDrumDotBg{
-	fill: var(--line-color);
+	fill: var(--main-color);
 	fill-opacity:75%;
+    stroke: none;
+}
+.samplerDrumDotActive{
+	fill: var(--click-color);
+	fill-opacity2:75%;
+    stroke: none;
+}
+.samplerDrumDotLine{
+	fill: var(--line-color);
+	fill-opacity:50%;
     stroke: none;
 }

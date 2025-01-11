@@ -155,7 +155,7 @@ class FilterIcon {
 		new SpearConnection().addSpear(true, zidx,
 			xx
 			, filterFromY
-			, sz 
+			, sz
 			, xx
 			, yy
 			, spearsAnchor);
@@ -186,20 +186,20 @@ class FilterIcon {
 		}
 		if (zidx < 5) {
 			let sbuttn: TileRectangle = {
-				x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1
-				, y: filterFromY - 1
-				, w: 2
-				, h: 2
-				, rx: 1
-				, ry: 1
+				x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
+				, y: filterFromY - 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
+				, w: 0.9 * globalCommandDispatcher.cfg().autoPointHeight
+				, h: 0.9 * globalCommandDispatcher.cfg().autoPointHeight
+				, rx: 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
+				, ry: 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
 				, css: 'fanSampleDrragger'
 				, draggable: true
 			};
 			let btnAnchor: TileAnchor = {
-				xx: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1
-				, yy: filterFromY - 1
-				, ww: 2
-				, hh: 2
+				xx: sbuttn.x
+				, yy: sbuttn.y
+				, ww: sbuttn.w
+				, hh: sbuttn.h
 				, showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [sbuttn], translation: { x: 0, y: 0 }
 			};
 			sbuttn.activation = (x: number, y: number) => {

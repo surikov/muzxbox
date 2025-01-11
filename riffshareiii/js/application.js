@@ -1834,9 +1834,21 @@ class SamplerBar {
         let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().samplerDotHeight;
         let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
         let css = 'samplerDrumDotBg';
+        if (zoomLevel < 3) {
+            css = 'samplerDrumDotActive';
+        }
         for (let ss = 0; ss < measure.skips.length; ss++) {
             let skip = measure.skips[ss];
             let xx = left + MMUtil().set(skip).duration(tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+            let durationLen = 5;
+            let bgline = {
+                dots: [xx, yy,
+                    xx, yy + globalCommandDispatcher.cfg().samplerDotHeight,
+                    xx + durationLen, yy + globalCommandDispatcher.cfg().samplerDotHeight / 2
+                ],
+                css: 'samplerDrumDotLine'
+            };
+            anchor.content.push(bgline);
             let ply = {
                 dots: [xx, yy,
                     xx, yy + globalCommandDispatcher.cfg().samplerDotHeight,
@@ -1877,44 +1889,49 @@ class OctaveContent {
     }
     addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css) {
         let measure = track.measures[barIdx];
-        for (let cc = 0; cc < measure.chords.length; cc++) {
-            let chord = measure.chords[cc];
-            for (let nn = 0; nn < chord.pitches.length; nn++) {
-                let from = octaveIdx * 12;
-                let to = (octaveIdx + 1) * 12;
-                if (chord.pitches[nn] >= from && chord.pitches[nn] < to) {
-                    let x1 = left + MMUtil().set(chord.skip).duration(globalCommandDispatcher.cfg().data.timeline[barIdx].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-                    let y1 = top + height - (chord.pitches[nn] - from + transpose) * globalCommandDispatcher.cfg().notePathHeight;
-                    for (let ss = 0; ss < chord.slides.length; ss++) {
-                        let x2 = x1 + MMUtil().set(chord.slides[ss].duration).duration(globalCommandDispatcher.cfg().data.timeline[barIdx].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-                        let y2 = y1 - chord.slides[ss].delta * globalCommandDispatcher.cfg().notePathHeight;
-                        let r_x1 = x1 + globalCommandDispatcher.cfg().notePathHeight / 2;
-                        if (ss > 0) {
-                            r_x1 = x1;
+        if (measure) {
+            for (let cc = 0; cc < measure.chords.length; cc++) {
+                let chord = measure.chords[cc];
+                for (let nn = 0; nn < chord.pitches.length; nn++) {
+                    let from = octaveIdx * 12;
+                    let to = (octaveIdx + 1) * 12;
+                    if (chord.pitches[nn] >= from && chord.pitches[nn] < to) {
+                        let x1 = left + MMUtil().set(chord.skip).duration(globalCommandDispatcher.cfg().data.timeline[barIdx].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                        let y1 = top + height - (chord.pitches[nn] - from + transpose) * globalCommandDispatcher.cfg().notePathHeight;
+                        for (let ss = 0; ss < chord.slides.length; ss++) {
+                            let x2 = x1 + MMUtil().set(chord.slides[ss].duration).duration(globalCommandDispatcher.cfg().data.timeline[barIdx].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                            let y2 = y1 - chord.slides[ss].delta * globalCommandDispatcher.cfg().notePathHeight;
+                            let r_x1 = x1 + globalCommandDispatcher.cfg().notePathHeight / 2;
+                            if (ss > 0) {
+                                r_x1 = x1;
+                            }
+                            let r_x2 = x2 - globalCommandDispatcher.cfg().notePathHeight / 2;
+                            if (ss < chord.slides.length - 1) {
+                                r_x2 = x2;
+                            }
+                            if (r_x2 - r_x1 < globalCommandDispatcher.cfg().notePathHeight / 2) {
+                                r_x2 = r_x1 + 0.000001;
+                            }
+                            if (barOctaveAnchor.ww < r_x2 - barOctaveAnchor.xx) {
+                                barOctaveAnchor.ww = r_x2 - barOctaveAnchor.xx;
+                            }
+                            let line = {
+                                x1: r_x1,
+                                y1: y1 - globalCommandDispatcher.cfg().notePathHeight / 2,
+                                x2: r_x2,
+                                y2: y2 - globalCommandDispatcher.cfg().notePathHeight / 2,
+                                css: css
+                            };
+                            barOctaveAnchor.content.push(line);
+                            x1 = x2;
+                            y1 = y2;
                         }
-                        let r_x2 = x2 - globalCommandDispatcher.cfg().notePathHeight / 2;
-                        if (ss < chord.slides.length - 1) {
-                            r_x2 = x2;
-                        }
-                        if (r_x2 - r_x1 < globalCommandDispatcher.cfg().notePathHeight / 2) {
-                            r_x2 = r_x1 + 0.000001;
-                        }
-                        if (barOctaveAnchor.ww < r_x2 - barOctaveAnchor.xx) {
-                            barOctaveAnchor.ww = r_x2 - barOctaveAnchor.xx;
-                        }
-                        let line = {
-                            x1: r_x1,
-                            y1: y1 - globalCommandDispatcher.cfg().notePathHeight / 2,
-                            x2: r_x2,
-                            y2: y2 - globalCommandDispatcher.cfg().notePathHeight / 2,
-                            css: css
-                        };
-                        barOctaveAnchor.content.push(line);
-                        x1 = x2;
-                        y1 = y2;
                     }
                 }
             }
+        }
+        else {
+            console.log('addTrackNotes no measure', barIdx, track);
         }
     }
 }
@@ -2091,6 +2108,9 @@ class AutomationBarContent {
         let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
         let top = globalCommandDispatcher.cfg().automationTop();
         let css = 'automationBgDot';
+        if (zIndex < 3) {
+            css = 'automationFocusedDot';
+        }
         for (let aa = 0; aa < globalCommandDispatcher.cfg().data.filters.length; aa++) {
             let filter = globalCommandDispatcher.cfg().data.filters[aa];
             if (filter.automation[barIdx]) {
@@ -2860,20 +2880,21 @@ class SamplerIcon {
         }
         if (zidx < 5) {
             let sbuttn = {
-                x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1,
-                y: samplerFromY - 1,
-                w: 2,
-                h: 2,
-                rx: 1,
-                ry: 1,
+                x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth()
+                    - 0.9 * globalCommandDispatcher.cfg().samplerDotHeight / 2,
+                y: samplerFromY - 0.9 * globalCommandDispatcher.cfg().samplerDotHeight / 2,
+                w: 0.9 * globalCommandDispatcher.cfg().samplerDotHeight,
+                h: 0.9 * globalCommandDispatcher.cfg().samplerDotHeight,
+                rx: 0.9 * globalCommandDispatcher.cfg().samplerDotHeight / 2,
+                ry: 0.9 * globalCommandDispatcher.cfg().samplerDotHeight / 2,
                 css: 'fanSampleDrragger',
                 draggable: true
             };
             let btnAnchor = {
-                xx: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1,
-                yy: samplerFromY - 1,
-                ww: 2,
-                hh: 2,
+                xx: sbuttn.x,
+                yy: sbuttn.y,
+                ww: sbuttn.w,
+                hh: sbuttn.h,
                 showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [sbuttn], translation: { x: 0, y: 0 }
             };
             sbuttn.activation = (x, y) => {
@@ -3086,20 +3107,20 @@ class FilterIcon {
         }
         if (zidx < 5) {
             let sbuttn = {
-                x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1,
-                y: filterFromY - 1,
-                w: 2,
-                h: 2,
-                rx: 1,
-                ry: 1,
+                x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2,
+                y: filterFromY - 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2,
+                w: 0.9 * globalCommandDispatcher.cfg().autoPointHeight,
+                h: 0.9 * globalCommandDispatcher.cfg().autoPointHeight,
+                rx: 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2,
+                ry: 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2,
                 css: 'fanSampleDrragger',
                 draggable: true
             };
             let btnAnchor = {
-                xx: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 1,
-                yy: filterFromY - 1,
-                ww: 2,
-                hh: 2,
+                xx: sbuttn.x,
+                yy: sbuttn.y,
+                ww: sbuttn.w,
+                hh: sbuttn.h,
                 showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [sbuttn], translation: { x: 0, y: 0 }
             };
             sbuttn.activation = (x, y) => {
@@ -3204,19 +3225,19 @@ class FanOutputLine {
             let dx = ratio * (toX - fromX) / 2;
             let dy = ratio * (toY - fromY) / 2;
             let deleteButton = {
-                x: fromX + dx - globalCommandDispatcher.cfg().pluginIconSize / 4,
-                y: fromY + dy - globalCommandDispatcher.cfg().pluginIconSize / 4,
-                w: globalCommandDispatcher.cfg().pluginIconSize / 2,
-                h: globalCommandDispatcher.cfg().pluginIconSize / 2,
-                rx: globalCommandDispatcher.cfg().pluginIconSize / 4,
-                ry: globalCommandDispatcher.cfg().pluginIconSize / 4,
+                x: fromX + dx - globalCommandDispatcher.cfg().pluginIconSize / 2,
+                y: fromY + dy - globalCommandDispatcher.cfg().pluginIconSize / 2,
+                w: globalCommandDispatcher.cfg().pluginIconSize,
+                h: globalCommandDispatcher.cfg().pluginIconSize,
+                rx: globalCommandDispatcher.cfg().pluginIconSize,
+                ry: globalCommandDispatcher.cfg().pluginIconSize,
                 css: 'fanDropConnection fanDropConnection' + zidx,
                 activation: onDelete
             };
             anchor.content.push(deleteButton);
             let deleteIcon = {
                 x: fromX + dx,
-                y: fromY + dy + globalCommandDispatcher.cfg().pluginIconSize / 8,
+                y: fromY + dy + globalCommandDispatcher.cfg().pluginIconSize / 4,
                 text: icon_close,
                 css: 'fanDeleteIcon'
             };
