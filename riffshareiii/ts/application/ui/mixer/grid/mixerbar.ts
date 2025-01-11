@@ -93,28 +93,28 @@ class MixerBar {
 		barOctaveAnchor.content.push({
 			x: barLeft + width
 			, y: globalCommandDispatcher.cfg().gridTop()
-			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5
+			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05
 			, h: globalCommandDispatcher.cfg().gridHeight()
 			, css: 'barRightBorder'
 		});
 		barOctaveAnchor.content.push({
 			x: barLeft + width
 			, y: globalCommandDispatcher.cfg().samplerTop()
-			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5
+			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05
 			, h: globalCommandDispatcher.cfg().samplerHeight()
 			, css: 'barRightBorder'
 		});
 		barOctaveAnchor.content.push({
 			x: barLeft + width
 			, y: globalCommandDispatcher.cfg().automationTop()
-			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5
+			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05
 			, h: globalCommandDispatcher.cfg().automationHeight()
 			, css: 'barRightBorder'
 		});
 		barOctaveAnchor.content.push({
 			x: barLeft + width
 			, y: globalCommandDispatcher.cfg().commentsTop()
-			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5
+			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05
 			, h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex)
 			, css: 'barRightBorder'
 		});

@@ -1870,7 +1870,7 @@ class OctaveContent {
         if (zoomLevel < 8) {
             this.addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveFirstAnchor, transpose, zoomLevel);
             if (zoomLevel < 7) {
-                this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, transpose);
+                this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, transpose, zoomLevel);
             }
         }
     }
@@ -1878,16 +1878,16 @@ class OctaveContent {
         if (globalCommandDispatcher.cfg().data.tracks.length) {
             let track = globalCommandDispatcher.cfg().data.tracks[0];
             let css = 'mixNoteLine';
-            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css);
+            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, true, zoomLevel);
         }
     }
-    addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose) {
+    addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, zoomLevel) {
         for (let ii = 1; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
             let track = globalCommandDispatcher.cfg().data.tracks[ii];
-            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, 'mixNoteSub');
+            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, 'mixNoteSub', false, zoomLevel);
         }
     }
-    addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css) {
+    addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, interact, zoomLevel) {
         let measure = track.measures[barIdx];
         if (measure) {
             for (let cc = 0; cc < measure.chords.length; cc++) {
@@ -1896,8 +1896,10 @@ class OctaveContent {
                     let from = octaveIdx * 12;
                     let to = (octaveIdx + 1) * 12;
                     if (chord.pitches[nn] >= from && chord.pitches[nn] < to) {
-                        let x1 = left + MMUtil().set(chord.skip).duration(globalCommandDispatcher.cfg().data.timeline[barIdx].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-                        let y1 = top + height - (chord.pitches[nn] - from + transpose) * globalCommandDispatcher.cfg().notePathHeight;
+                        let xStart = left + MMUtil().set(chord.skip).duration(globalCommandDispatcher.cfg().data.timeline[barIdx].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                        let yStart = top + height - (chord.pitches[nn] - from + transpose) * globalCommandDispatcher.cfg().notePathHeight;
+                        let x1 = xStart;
+                        let y1 = yStart;
                         for (let ss = 0; ss < chord.slides.length; ss++) {
                             let x2 = x1 + MMUtil().set(chord.slides[ss].duration).duration(globalCommandDispatcher.cfg().data.timeline[barIdx].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
                             let y2 = y1 - chord.slides[ss].delta * globalCommandDispatcher.cfg().notePathHeight;
@@ -1925,6 +1927,30 @@ class OctaveContent {
                             barOctaveAnchor.content.push(line);
                             x1 = x2;
                             y1 = y2;
+                        }
+                        if (interact) {
+                            if (zoomLevel < 3) {
+                                let inetrDot = {
+                                    x: xStart + globalCommandDispatcher.cfg().notePathHeight / 4,
+                                    y: yStart - globalCommandDispatcher.cfg().notePathHeight * 3 / 4,
+                                    w: globalCommandDispatcher.cfg().notePathHeight / 2,
+                                    h: globalCommandDispatcher.cfg().notePathHeight / 2,
+                                    rx: globalCommandDispatcher.cfg().notePathHeight / 4,
+                                    ry: globalCommandDispatcher.cfg().notePathHeight / 4,
+                                    css: 'mixDropNote'
+                                };
+                                barOctaveAnchor.content.push(inetrDot);
+                                let slideDot = {
+                                    x: x1 - globalCommandDispatcher.cfg().notePathHeight * 5 / 8,
+                                    y: y1 - globalCommandDispatcher.cfg().notePathHeight * 5 / 8,
+                                    w: globalCommandDispatcher.cfg().notePathHeight / 4,
+                                    h: globalCommandDispatcher.cfg().notePathHeight / 4,
+                                    rx: globalCommandDispatcher.cfg().notePathHeight / 8,
+                                    ry: globalCommandDispatcher.cfg().notePathHeight / 8,
+                                    css: 'mixDropNote'
+                                };
+                                barOctaveAnchor.content.push(slideDot);
+                            }
                         }
                     }
                 }
@@ -2007,28 +2033,28 @@ class MixerBar {
         barOctaveAnchor.content.push({
             x: barLeft + width,
             y: globalCommandDispatcher.cfg().gridTop(),
-            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
+            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05,
             h: globalCommandDispatcher.cfg().gridHeight(),
             css: 'barRightBorder'
         });
         barOctaveAnchor.content.push({
             x: barLeft + width,
             y: globalCommandDispatcher.cfg().samplerTop(),
-            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
+            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05,
             h: globalCommandDispatcher.cfg().samplerHeight(),
             css: 'barRightBorder'
         });
         barOctaveAnchor.content.push({
             x: barLeft + width,
             y: globalCommandDispatcher.cfg().automationTop(),
-            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
+            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05,
             h: globalCommandDispatcher.cfg().automationHeight(),
             css: 'barRightBorder'
         });
         barOctaveAnchor.content.push({
             x: barLeft + width,
             y: globalCommandDispatcher.cfg().commentsTop(),
-            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5,
+            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05,
             h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex),
             css: 'barRightBorder'
         });
@@ -2377,14 +2403,14 @@ class MixerZoomLevel {
     addCommentLines() {
     }
     addGridLines(barOctaveAnchor) {
-        if (this.zoomLevelIndex < 4) {
+        if (this.zoomLevelIndex < 6) {
             for (let oo = 0; oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
                 if (oo > 0) {
                     let octaveBottomBorder = {
                         x: globalCommandDispatcher.cfg().leftPad,
                         y: globalCommandDispatcher.cfg().gridTop() + oo * 12 * globalCommandDispatcher.cfg().notePathHeight,
                         w: globalCommandDispatcher.cfg().timelineWidth(),
-                        h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 2.0,
+                        h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
                         css: 'octaveBottomBorder'
                     };
                     barOctaveAnchor.content.push(octaveBottomBorder);
@@ -2406,7 +2432,7 @@ class MixerZoomLevel {
                     x: globalCommandDispatcher.cfg().leftPad,
                     y: globalCommandDispatcher.cfg().samplerTop() + pp * globalCommandDispatcher.cfg().samplerDotHeight,
                     w: globalCommandDispatcher.cfg().timelineWidth(),
-                    h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 2.0,
+                    h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 128.0,
                     css: 'octaveBottomBorder'
                 });
             }
@@ -2415,7 +2441,7 @@ class MixerZoomLevel {
                     x: globalCommandDispatcher.cfg().leftPad,
                     y: globalCommandDispatcher.cfg().automationTop() + aa * globalCommandDispatcher.cfg().autoPointHeight,
                     w: globalCommandDispatcher.cfg().timelineWidth(),
-                    h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 2.0,
+                    h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 128.0,
                     css: 'octaveBottomBorder'
                 });
             }

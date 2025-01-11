@@ -281,8 +281,8 @@ declare class BarOctave {
 declare class OctaveContent {
     constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, transpose: number, zoomLevel: number);
     addUpperNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, transpose: number, zoomLevel: number): void;
-    addOtherNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, transpose: number): void;
-    addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, transpose: number, css: string): void;
+    addOtherNotes(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, transpose: number, zoomLevel: number): void;
+    addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, transpose: number, css: string, interact: boolean, zoomLevel: number): void;
 }
 declare class MixerBar {
     octaves: BarOctave[];

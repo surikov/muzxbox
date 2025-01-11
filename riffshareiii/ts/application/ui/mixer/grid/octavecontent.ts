@@ -17,7 +17,7 @@ class OctaveContent {
 			//}
 			if (zoomLevel < 7) {
 
-				this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, transpose);
+				this.addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, transpose, zoomLevel);
 
 			}
 		}
@@ -33,7 +33,9 @@ class OctaveContent {
 		if (globalCommandDispatcher.cfg().data.tracks.length) {
 			let track = globalCommandDispatcher.cfg().data.tracks[0];
 			let css = 'mixNoteLine';
-			this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css);
+			this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, true, zoomLevel);
+
+
 
 			//for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
 			//	let track = globalCommandDispatcher.cfg().data.tracks[tt];
@@ -64,6 +66,7 @@ class OctaveContent {
 		, barOctaveAnchor: TileAnchor//, data: Zvoog_Project
 		//, cfg: MixerDataMathUtility
 		, transpose: number
+		, zoomLevel: number
 	) {
 		//let start=1;
 		//if (globalCommandDispatcher.cfg().data.focus) {
@@ -77,7 +80,7 @@ class OctaveContent {
 			} else {
 				this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, 'mixNoteSub');
 			}*/
-			this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, 'mixNoteSub');
+			this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, 'mixNoteSub', false, zoomLevel);
 		}
 	}
 	addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number
@@ -87,6 +90,7 @@ class OctaveContent {
 		//, data: Zvoog_Project
 		//, cfg: MixerDataMathUtility
 		, css: string//, addMoreInfo: boolean
+		, interact: boolean, zoomLevel: number
 	) {
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		//let transpose=-2*12;
@@ -100,8 +104,10 @@ class OctaveContent {
 					let from = octaveIdx * 12;
 					let to = (octaveIdx + 1) * 12;
 					if (chord.pitches[nn] >= from && chord.pitches[nn] < to) {
-						let x1 = left + MMUtil().set(chord.skip).duration(globalCommandDispatcher.cfg().data.timeline[barIdx].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-						let y1 = top + height - (chord.pitches[nn] - from + transpose) * globalCommandDispatcher.cfg().notePathHeight;
+						let xStart = left + MMUtil().set(chord.skip).duration(globalCommandDispatcher.cfg().data.timeline[barIdx].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+						let yStart = top + height - (chord.pitches[nn] - from + transpose) * globalCommandDispatcher.cfg().notePathHeight;
+						let x1 = xStart;
+						let y1 = yStart;
 						//let slidearr = note.slides;
 						/*if (slidearr.length > 1) {
 							console.log(track.title, barIdx, slidearr);
@@ -135,6 +141,9 @@ class OctaveContent {
 							//	console.log(slidearr[ss], x1, x2, line);
 							//}
 							barOctaveAnchor.content.push(line);
+
+
+
 							/*if (slidearr.length > 1) {
 								console.log(line);
 							}*/
@@ -150,11 +159,35 @@ class OctaveContent {
 							x1 = x2;
 							y1 = y2;
 						}
+						if (interact) {
+							if (zoomLevel < 3) {
+								let inetrDot: TileRectangle = {
+									x: xStart + globalCommandDispatcher.cfg().notePathHeight / 4
+									, y: yStart - globalCommandDispatcher.cfg().notePathHeight * 3 / 4
+									, w: globalCommandDispatcher.cfg().notePathHeight / 2
+									, h: globalCommandDispatcher.cfg().notePathHeight / 2
+									, rx: globalCommandDispatcher.cfg().notePathHeight / 4
+									, ry: globalCommandDispatcher.cfg().notePathHeight / 4
+									, css: 'mixDropNote'
+								};
+								barOctaveAnchor.content.push(inetrDot);
+								let slideDot: TileRectangle = {
+									x: x1 - globalCommandDispatcher.cfg().notePathHeight * 5 / 8
+									, y: y1 - globalCommandDispatcher.cfg().notePathHeight * 5 / 8
+									, w: globalCommandDispatcher.cfg().notePathHeight / 4
+									, h: globalCommandDispatcher.cfg().notePathHeight / 4
+									, rx: globalCommandDispatcher.cfg().notePathHeight / 8
+									, ry: globalCommandDispatcher.cfg().notePathHeight / 8
+									, css: 'mixDropNote'
+								};
+								barOctaveAnchor.content.push(slideDot);
+							}
+						}
 					}
 				}
 			}
-		}else{
-			console.log('addTrackNotes no measure',barIdx,track);
+		} else {
+			console.log('addTrackNotes no measure', barIdx, track);
 		}
 	}
 }

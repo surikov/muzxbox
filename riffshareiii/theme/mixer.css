@@ -14,11 +14,15 @@
     stroke-width: calc(0.95*var(--tapSize));
 	stroke-opacity: 90%;
 }
+.mixDropNote{
+    fill: var(--click-color);
+	fill-opacity: 90%;
+}
 .mixNoteSub{
-    stroke: var(--main-color);
+    stroke: var(--line-color);
     stroke-linejoin: round;
     stroke-width: calc(0.95*var(--tapSize));
-	stroke-opacity: 15%;
+	stroke-opacity: 33%;
 }
 
 .mixTimeMeasureMark{
@@ -128,12 +132,12 @@
 }
 
 
-.octaveBottomBorder222{
+.octaveBottomBorder{
 	fill: var(--line-color);
-	fill-opacity:25%;
+	fill-opacity:75%;
     stroke: none;
 }
-.octaveBottomBorder{
+.octaveBottomBorder123{
 	fill: url(#horizontalBorderLine);;
     stroke: none;
 	pointer-events: none;
@@ -161,16 +165,16 @@
     stop-color: var(--line-color);
     stop-opacity: 0;
   }
-.barRightBorder{
+.barRightBorder2{
 	fill: url(#verticalBorderLine);;
     stroke: none;
 	pointer-events: none;
 }
 
 
-.barRightBorder2{
+.barRightBorder{
 	fill: var(--line-color);
-	fill-opacity:25%;
+	fill-opacity:75%;
     stroke: none;
 	pointer-events: none;
 }

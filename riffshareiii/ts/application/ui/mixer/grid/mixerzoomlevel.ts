@@ -91,14 +91,14 @@ class MixerZoomLevel {
 		//, cfg: MixerDataMathUtility
 	) {
 		//let mixm: MixerDataMath = new MixerDataMath(data);
-		if (this.zoomLevelIndex < 4) {
+		if (this.zoomLevelIndex < 6) {
 			for (let oo = 0; oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
 				if (oo > 0) {
 					let octaveBottomBorder: TileRectangle = {
 						x: globalCommandDispatcher.cfg().leftPad
 						, y: globalCommandDispatcher.cfg().gridTop() + oo * 12 * globalCommandDispatcher.cfg().notePathHeight
 						, w: globalCommandDispatcher.cfg().timelineWidth()
-						, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 2.0
+						, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
 						, css: 'octaveBottomBorder'
 					};
 					barOctaveAnchor.content.push(octaveBottomBorder);
@@ -146,7 +146,7 @@ class MixerZoomLevel {
 					x: globalCommandDispatcher.cfg().leftPad
 					, y: globalCommandDispatcher.cfg().samplerTop() + pp * globalCommandDispatcher.cfg().samplerDotHeight
 					, w: globalCommandDispatcher.cfg().timelineWidth()
-					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 2.0
+					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 128.0
 					, css: 'octaveBottomBorder'
 				});
 			}
@@ -155,7 +155,7 @@ class MixerZoomLevel {
 					x: globalCommandDispatcher.cfg().leftPad
 					, y: globalCommandDispatcher.cfg().automationTop() + aa * globalCommandDispatcher.cfg().autoPointHeight
 					, w: globalCommandDispatcher.cfg().timelineWidth()
-					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 2.0
+					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 128.0
 					, css: 'octaveBottomBorder'
 				});
 			}
