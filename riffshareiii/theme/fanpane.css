@@ -10,7 +10,7 @@
 	fill: var(--drag-color);
 	font-size: calc(0.25*var(--tapSize));
 	cursor: move;
-	stroke: var(--main-color);
+	stroke: var(--line-color);
 	stroke-width: calc(0.125*var(--tapSize));
 	stroke-linejoin: round;
 	paint-order: stroke fill;
@@ -29,7 +29,7 @@
 	fill: var(--click-color);
 	font-size: calc(0.25*var(--tapSize));
 	cursor: pointer;
-	stroke: var(--main-color);
+	stroke: var(--line-color);
 	stroke-width2: calc(0.125*var(--tapSize));
 	stroke-linejoin: round;
 	paint-order: stroke fill;
@@ -86,7 +86,13 @@
 }
 .fanSampleDrragger {
 	cursor: ns-resize;
-	stroke: var(--main-color);
+	stroke: var(--line-color);
+	fill: var(--drag-color);
+	stroke-width: calc(0.1024*var(--tapSize));
+}
+.fanFilterDrragger {
+	cursor: ns-resize;
+	stroke: var(--line-color);
 	fill: var(--drag-color);
 	stroke-width: calc(0.1024*var(--tapSize));
 }
@@ -122,7 +128,7 @@
 
 .fanDropConnection {
 	cursor: pointer;
-	stroke: var(--main-color);
+	stroke: var(--line-color);
 	stroke-width: 0.5cm;
 	stroke-linejoin: round;
 	paint-order: stroke;

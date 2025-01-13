@@ -192,7 +192,7 @@ class FilterIcon {
 				, h: 0.9 * globalCommandDispatcher.cfg().autoPointHeight
 				, rx: 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
 				, ry: 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
-				, css: 'fanSampleDrragger'
+				, css: 'fanFilterDrragger'
 				, draggable: true
 			};
 			let btnAnchor: TileAnchor = {

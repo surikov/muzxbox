@@ -12,6 +12,7 @@ type MenuInfo = {
 	onOpen?: () => void;
 	itemStates?: string[];
 	selection?: number;
+	dragMix?:boolean;
 };
 /*
 let commandThemeSizeSmall = 'commandThemeSizeSmall';
@@ -147,14 +148,16 @@ function fillPluginsLists() {
 		} else {
 			if (purpose == MZXBX_PluginPurpose.Sampler) {
 				menuPointSamplers.children.push({
-					text: label, noLocalization: true, onClick: () => {
+					dragMix:true
+					,text: label, noLocalization: true, onClick: () => {
 						console.log(purpose, label);
 					}
 				});
 			} else {
 				if (purpose == MZXBX_PluginPurpose.Performer) {
 					menuPointPerformers.children.push({
-						text: label, noLocalization: true, onClick: () => {
+						dragMix:true
+						,text: label, noLocalization: true, onClick: () => {
 							globalCommandDispatcher.promptPointPluginGUI(label, url, (obj: any) => {
 								console.log('performer callback', obj);
 								return true;
@@ -164,7 +167,8 @@ function fillPluginsLists() {
 				} else {
 					if (purpose == MZXBX_PluginPurpose.Filter) {
 						menuPointFilters.children.push({
-							text: label, noLocalization: true, onClick: () => {
+							dragMix:true
+							,text: label, noLocalization: true, onClick: () => {
 								console.log(purpose, label);
 							}
 						});
@@ -189,6 +193,13 @@ function composeBaseMenu(): MenuInfo[] {
 					globalCommandDispatcher.toggleStartStop();
 				}
 			}
+			, menuPointTracks
+			//, menuPointPercussion
+
+			, menuPointActions
+			, menuPointFilters
+			, menuPointPerformers
+			, menuPointSamplers
 			/*, {
 				text: localMenuImportMIDI, onClick: () => {
 					globalCommandDispatcher.promptImportFromMIDI();
@@ -272,13 +283,7 @@ function composeBaseMenu(): MenuInfo[] {
 				}
 			}*/
 			//, menuPointAutomation
-			, menuPointTracks
-			//, menuPointPercussion
-
-			, menuPointActions
-			, menuPointFilters
-			, menuPointPerformers
-			, menuPointSamplers
+			
 			//, menuPointUndo
 			/*,{
 				text: localMenuUndo, onClick: () => {

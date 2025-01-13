@@ -84,9 +84,9 @@
 */
 	--background-color: #010;
 	--main-color:#fff;
-	--drag-color:#c60;
+	--drag-color:#c69;
 	--line-color:#9cf;
-	--click-color:#390;
+	--click-color:#690;
 
 	--click-color50: color-mix(in lab, transparent 50%, var(--click-color));
 	--line-color50: color-mix(in lab, transparent 50%, var(--line-color));

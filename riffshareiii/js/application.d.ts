@@ -256,6 +256,7 @@ declare type MenuInfo = {
     onOpen?: () => void;
     itemStates?: string[];
     selection?: number;
+    dragMix?: boolean;
 };
 declare let menuItemsData: MenuInfo[] | null;
 declare let menuPointActions: MenuInfo;

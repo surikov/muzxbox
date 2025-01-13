@@ -192,48 +192,58 @@ class RightMenuPanel {
 
 				}
 			} else {
-				if (it.onSubClick) {
-					let rightMenuItem = new RightMenuItem(it, pad, () => {
+				if (it.dragMix) {
+					this.items.push(new RightMenuItem(it, pad, () => {
 						if (it.onClick) {
 							it.onClick();
 						}
 						me.setFocus(it, infos);
 						me.resetAllAnchors();
-					}, () => {
-						if (it.itemStates) {
-							let sel = it.selection ? it.selection : 0;
-							if (it.itemStates.length - 1 > sel) {
-								sel++;
-							} else {
-								sel = 0;
-							}
-							it.selection = sel;
-						}
-						if (it.onSubClick) {
-							it.onSubClick();
-						}
-
-						me.rerenderMenuContent(rightMenuItem);
-					});
-					this.items.push(rightMenuItem.initActionItem2());
+					}).initDraggableItem());
 				} else {
-					if (it.onClick) {
-						this.items.push(new RightMenuItem(it, pad, () => {
+					if (it.onSubClick) {
+						let rightMenuItem = new RightMenuItem(it, pad, () => {
 							if (it.onClick) {
 								it.onClick();
 							}
 							me.setFocus(it, infos);
 							me.resetAllAnchors();
-						}).initActionItem());
+						}, () => {
+							if (it.itemStates) {
+								let sel = it.selection ? it.selection : 0;
+								if (it.itemStates.length - 1 > sel) {
+									sel++;
+								} else {
+									sel = 0;
+								}
+								it.selection = sel;
+							}
+							if (it.onSubClick) {
+								it.onSubClick();
+							}
+
+							me.rerenderMenuContent(rightMenuItem);
+						});
+						this.items.push(rightMenuItem.initActionItem2());
 					} else {
-						this.items.push(new RightMenuItem(it, pad, () => {
-							me.setFocus(it, infos);
-							me.resetAllAnchors();
-						}).initDisabledItem());
+						if (it.onClick) {
+							this.items.push(new RightMenuItem(it, pad, () => {
+								if (it.onClick) {
+									it.onClick();
+								}
+								me.setFocus(it, infos);
+								me.resetAllAnchors();
+							}).initActionItem());
+						} else {
+							this.items.push(new RightMenuItem(it, pad, () => {
+								me.setFocus(it, infos);
+								me.resetAllAnchors();
+							}).initDisabledItem());
+						}
 					}
+
+
 				}
-
-
 			}
 		}
 	}

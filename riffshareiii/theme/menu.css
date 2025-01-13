@@ -27,7 +27,7 @@
 .rightMenuItemDragBG {
     stroke: var(--main-color);
     stroke-width: 0.01cm;
-    fill: var(--main-color);
+    fill: var(--drag-color);
     
 }
 .rightMenuItemActionBG {

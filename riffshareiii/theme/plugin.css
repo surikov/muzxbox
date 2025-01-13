@@ -1,101 +1,106 @@
 #pluginDiv {
 	position: absolute;
 	z-index: 999;
-	left:0.5cm;
-	right:0.5cm;
-	top:0.5cm;
-	bottom:0.5cm;
+	left: 0.5cm;
+	right: 0.5cm;
+	top: 0.5cm;
+	bottom: 0.5cm;
 	border-style: solid;
 	border-width: 0.125cm;
 	border-color: var(--shadow-color);
 	display: flex;
-    flex-direction: column;
+	flex-direction: column;
 	visibility: hidden;
 	border-radius: 0.25cm;
 }
-#pluginFrame{
-	left:0.0cm;
-	right:0.0cm;
-	top:1.0cm;
-	bottom:0.0cm;
-	border:none;
+
+#pluginFrame {
+	left: 0.0cm;
+	right: 0.0cm;
+	top: 1.0cm;
+	bottom: 0.0cm;
+	border: none;
 	background-color222: #66666633;
 	flex-basis: 0;
-    flex-shrink: 1;
-    flex-grow: 1;
+	flex-shrink: 1;
+	flex-grow: 1;
 	border-radius: 0.0cm 0.0cm 0.125cm 0.125cm;
 	overflow: scroll;
-  scrollbar-color: red orange;
-  scrollbar-width: thin;
+	scrollbar-color: red orange;
+	scrollbar-width: thin;
 }
-#pluginHeader{
-	width:100%;
-	height:1.0cm;
-	background-color: var(--line-color);
+
+#pluginHeader {
+	width: 100%;
+	height: 1.0cm;
+	background-color: var(--background-color);
 	border-radius: 0.125cm 0.125cm 0.0cm 0.0cm;
 	flex-basis: auto;
-    flex-shrink: 0;
-    flex-grow: 0;
+	flex-shrink: 0;
+	flex-grow: 0;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	padding-top: 0.1cm;
 }
-#pluginTitle{
+
+#pluginTitle {
 	color: var(--main-color);
-    font-size: var(--label-04cm);
+	font-size: var(--label-04cm);
 	padding-left: 0.5cm;
 	padding-top: 0.25cm;
 	flex-grow: 1;
 	white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
-#pluginCancel{
+
+#pluginCancel {
 	border-radius: 0.4cm;
 	background-color: var(--click-color);
 	color: var(--main-color);
-	box-shadow:inset 0px 0px 0px 0.5px var(--main-color);
-	text-shadow2: 0.25px 0px var(--main-color),-0.25px 0px var(--main-color),0px 0.25px var(--main-color),0px -0.25px var(--main-color);
-    font-size: var(--label-05cm);
-	width:0.8cm;
-	height:0.8cm;
+	box-shadow: inset 0px 0px 0px 0.5px var(--main-color);
+	text-shadow2: 0.25px 0px var(--main-color), -0.25px 0px var(--main-color), 0px 0.25px var(--main-color), 0px -0.25px var(--main-color);
+	font-size: var(--label-05cm);
+	width: 0.8cm;
+	height: 0.8cm;
 	text-align: center;
 	padding-top2: 0.05cm;
 	background-color2: green;
 	border-color2: var(--main-color);
 	border-style2: solid;
 	border-width2: 1px;
-	border-radius2:1cm;
+	border-radius2: 1cm;
 	margin2: 0.05cm;
 	font-family: "Material-Design-Iconic-Font";
 	vertical-align22: middle;
 	alignment-baseline22: middle;
-	cursor:pointer;
+	cursor: pointer;
 	margin-left: 0.2cm;
 	margin-right: 0.2cm;
 	display: flex;
-		align-items: center;
-		justify-content: center;
-		min-width: 0.8cm;
+	align-items: center;
+	justify-content: center;
+	min-width: 0.8cm;
 }
-#pluginRefresh{
+
+#pluginRefresh {
 	border-radius: 0.4cm;
 	background-color: var(--click-color);
 	color: var(--main-color);
-	text-shadow2: 0.25px 0px var(--main-color),-0.25px 0px var(--main-color),0px 0.25px var(--main-color),0px -0.25px var(--main-color);
-    font-size: var(--label-05cm);
-	width:0.8cm;
-	height:0.8cm;
+	text-shadow2: 0.25px 0px var(--main-color), -0.25px 0px var(--main-color), 0px 0.25px var(--main-color), 0px -0.25px var(--main-color);
+	font-size: var(--label-05cm);
+	width: 0.8cm;
+	height: 0.8cm;
 	text-align: center;
 	margin-to2p: 0.1cm;
 	font-family: "Material-Design-Iconic-Font";
 	background-color2: brown;
-	cursor:pointer;
-	box-shadow:inset 0px 0px 0px 0.5px var(--main-color);
+	cursor: pointer;
+	box-shadow: inset 0px 0px 0px 0.5px var(--main-color);
 	display: flex;
-		align-items: center;
-		justify-content: center;
+	align-items: center;
+	justify-content: center;
 	min-width: 0.8cm;
-	  
+
 }

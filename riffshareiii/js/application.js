@@ -1297,46 +1297,57 @@ class RightMenuPanel {
                 }
             }
             else {
-                if (it.onSubClick) {
-                    let rightMenuItem = new RightMenuItem(it, pad, () => {
+                if (it.dragMix) {
+                    this.items.push(new RightMenuItem(it, pad, () => {
                         if (it.onClick) {
                             it.onClick();
                         }
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
-                    }, () => {
-                        if (it.itemStates) {
-                            let sel = it.selection ? it.selection : 0;
-                            if (it.itemStates.length - 1 > sel) {
-                                sel++;
-                            }
-                            else {
-                                sel = 0;
-                            }
-                            it.selection = sel;
-                        }
-                        if (it.onSubClick) {
-                            it.onSubClick();
-                        }
-                        me.rerenderMenuContent(rightMenuItem);
-                    });
-                    this.items.push(rightMenuItem.initActionItem2());
+                    }).initDraggableItem());
                 }
                 else {
-                    if (it.onClick) {
-                        this.items.push(new RightMenuItem(it, pad, () => {
+                    if (it.onSubClick) {
+                        let rightMenuItem = new RightMenuItem(it, pad, () => {
                             if (it.onClick) {
                                 it.onClick();
                             }
                             me.setFocus(it, infos);
                             me.resetAllAnchors();
-                        }).initActionItem());
+                        }, () => {
+                            if (it.itemStates) {
+                                let sel = it.selection ? it.selection : 0;
+                                if (it.itemStates.length - 1 > sel) {
+                                    sel++;
+                                }
+                                else {
+                                    sel = 0;
+                                }
+                                it.selection = sel;
+                            }
+                            if (it.onSubClick) {
+                                it.onSubClick();
+                            }
+                            me.rerenderMenuContent(rightMenuItem);
+                        });
+                        this.items.push(rightMenuItem.initActionItem2());
                     }
                     else {
-                        this.items.push(new RightMenuItem(it, pad, () => {
-                            me.setFocus(it, infos);
-                            me.resetAllAnchors();
-                        }).initDisabledItem());
+                        if (it.onClick) {
+                            this.items.push(new RightMenuItem(it, pad, () => {
+                                if (it.onClick) {
+                                    it.onClick();
+                                }
+                                me.setFocus(it, infos);
+                                me.resetAllAnchors();
+                            }).initActionItem());
+                        }
+                        else {
+                            this.items.push(new RightMenuItem(it, pad, () => {
+                                me.setFocus(it, infos);
+                                me.resetAllAnchors();
+                            }).initDisabledItem());
+                        }
                     }
                 }
             }
@@ -1617,6 +1628,7 @@ function fillPluginsLists() {
         else {
             if (purpose == MZXBX_PluginPurpose.Sampler) {
                 menuPointSamplers.children.push({
+                    dragMix: true,
                     text: label, noLocalization: true, onClick: () => {
                         console.log(purpose, label);
                     }
@@ -1625,6 +1637,7 @@ function fillPluginsLists() {
             else {
                 if (purpose == MZXBX_PluginPurpose.Performer) {
                     menuPointPerformers.children.push({
+                        dragMix: true,
                         text: label, noLocalization: true, onClick: () => {
                             globalCommandDispatcher.promptPointPluginGUI(label, url, (obj) => {
                                 console.log('performer callback', obj);
@@ -1636,6 +1649,7 @@ function fillPluginsLists() {
                 else {
                     if (purpose == MZXBX_PluginPurpose.Filter) {
                         menuPointFilters.children.push({
+                            dragMix: true,
                             text: label, noLocalization: true, onClick: () => {
                                 console.log(purpose, label);
                             }
@@ -1662,6 +1676,11 @@ function composeBaseMenu() {
                     globalCommandDispatcher.toggleStartStop();
                 }
             },
+            menuPointTracks,
+            menuPointActions,
+            menuPointFilters,
+            menuPointPerformers,
+            menuPointSamplers,
             {
                 text: localMenuItemSettings, children: [
                     {
@@ -1723,12 +1742,7 @@ function composeBaseMenu() {
                         }
                     }
                 ]
-            },
-            menuPointTracks,
-            menuPointActions,
-            menuPointFilters,
-            menuPointPerformers,
-            menuPointSamplers
+            }
         ];
         console.log('base menu', menuItemsData);
         return menuItemsData;
@@ -3157,7 +3171,7 @@ class FilterIcon {
                 h: 0.9 * globalCommandDispatcher.cfg().autoPointHeight,
                 rx: 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2,
                 ry: 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2,
-                css: 'fanSampleDrragger',
+                css: 'fanFilterDrragger',
                 draggable: true
             };
             let btnAnchor = {
