@@ -273,6 +273,7 @@ type MZXBX_AudioSamplerPlugin = {
 	schedule: (when: number) => void;
 	cancel: () => void;
 	output: () => AudioNode | null;
+	duration: () => number;
 };
 
 type MZXBX_ChannelPerformer = {
@@ -305,16 +306,17 @@ type MZXBX_Player = {
 type Zvoog_import = {
 	import: () => Zvoog_Schedule | null;
 };*/
+/*
 enum MZXBX_PluginPurpose {
 	Action
 	, Filter
 	, Sampler
 	, Performer
-}
+}*/
 type MZXBX_PluginRegistrationInformation = {
 	label: string
 	, kind: string
-	, purpose: MZXBX_PluginPurpose
+	, purpose: 'Action'| 'Filter'| 'Sampler'| 'Performer'
 	, ui: string
 	, evaluate: string
 	, script: string

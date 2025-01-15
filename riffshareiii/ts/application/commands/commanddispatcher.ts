@@ -74,10 +74,19 @@ class CommandDispatcher {
 				series: [
 					{
 						duration: n120, tempo: 120, items: [
-							{ skip: 0 * n120, channelId: 'test1', pitches: [A3 - 0 - 4], slides: [{ duration: 2 / 16 * n120, delta: 4 }, { duration: 2 / 16 * n120, delta: 0 }] }
+							/*{ skip: 0 * n120, channelId: 'test1', pitches: [A3 - 0 - 4], slides: [{ duration: 2 / 16 * n120, delta: 4 }, { duration: 2 / 16 * n120, delta: 0 }] }
 							, { skip: 1 / 4 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
 							, { skip: 2 / 4 * n120, channelId: 'test1', pitches: [A3 - 0], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
-							, { skip: 3 / 4 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
+							, { skip: 3 / 4 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }*/
+							{ skip: 0 / 8 * n120, channelId: 'drumKick1', pitches: [35], slides: [] }
+							, { skip: 1 / 8 * n120, channelId: 'drumKick1', pitches: [35], slides: [] }
+							, { skip: 2 / 8 * n120, channelId: 'drumKick1', pitches: [35], slides: [] }
+							, { skip: 3 / 8 * n120, channelId: 'drumKick1', pitches: [35], slides: [] }
+							
+							,{ skip: 4 / 8 * n120, channelId: 'drumSnare1', pitches: [36], slides: [] }
+							, { skip: 5 / 8 * n120, channelId: 'drumSnare1', pitches: [36], slides: [] }
+							, { skip: 6 / 8 * n120, channelId: 'drumSnare1', pitches: [36], slides: [] }
+							, { skip: 7 / 8 * n120, channelId: 'drumSnare1', pitches: [36], slides: [] }
 						], states: []
 					}
 					, {
@@ -101,7 +110,24 @@ class CommandDispatcher {
 						, kind: 'beep1'
 						, properties: 'Nope'
 					}
-				}]
+				}, {
+					id: 'drumKick1'
+					, filters: []
+					, performer: {
+						id: 'perfKick1'
+						, kind: 'zdrum1'
+						, properties: '35'
+					}
+				}, {
+					id: 'drumSnare1'
+					, filters: []
+					, performer: {
+						id: 'perfSnare1'
+						, kind: 'zdrum1'
+						, properties: '38'
+					}
+				}
+				]
 				, filters: []
 			};
 			let me = this;

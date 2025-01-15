@@ -552,10 +552,14 @@ class CommandDispatcher {
                 series: [
                     {
                         duration: n120, tempo: 120, items: [
-                            { skip: 0 * n120, channelId: 'test1', pitches: [A3 - 0 - 4], slides: [{ duration: 2 / 16 * n120, delta: 4 }, { duration: 2 / 16 * n120, delta: 0 }] },
-                            { skip: 1 / 4 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] },
-                            { skip: 2 / 4 * n120, channelId: 'test1', pitches: [A3 - 0], slides: [{ duration: 1 / 4 * n120, delta: 0 }] },
-                            { skip: 3 / 4 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
+                            { skip: 0 / 8 * n120, channelId: 'drumKick1', pitches: [35], slides: [] },
+                            { skip: 1 / 8 * n120, channelId: 'drumKick1', pitches: [35], slides: [] },
+                            { skip: 2 / 8 * n120, channelId: 'drumKick1', pitches: [35], slides: [] },
+                            { skip: 3 / 8 * n120, channelId: 'drumKick1', pitches: [35], slides: [] },
+                            { skip: 4 / 8 * n120, channelId: 'drumSnare1', pitches: [36], slides: [] },
+                            { skip: 5 / 8 * n120, channelId: 'drumSnare1', pitches: [36], slides: [] },
+                            { skip: 6 / 8 * n120, channelId: 'drumSnare1', pitches: [36], slides: [] },
+                            { skip: 7 / 8 * n120, channelId: 'drumSnare1', pitches: [36], slides: [] }
                         ], states: []
                     },
                     {
@@ -579,7 +583,24 @@ class CommandDispatcher {
                             kind: 'beep1',
                             properties: 'Nope'
                         }
-                    }],
+                    }, {
+                        id: 'drumKick1',
+                        filters: [],
+                        performer: {
+                            id: 'perfKick1',
+                            kind: 'zdrum1',
+                            properties: '35'
+                        }
+                    }, {
+                        id: 'drumSnare1',
+                        filters: [],
+                        performer: {
+                            id: 'perfSnare1',
+                            kind: 'zdrum1',
+                            properties: '38'
+                        }
+                    }
+                ],
                 filters: []
             };
             let me = this;
@@ -1613,7 +1634,7 @@ function fillPluginsLists() {
         let label = MZXBX_currentPlugins()[ii].label;
         let purpose = MZXBX_currentPlugins()[ii].purpose;
         let url = MZXBX_currentPlugins()[ii].ui;
-        if (purpose == MZXBX_PluginPurpose.Action) {
+        if (purpose == 'Action') {
             menuPointActions.children.push({
                 text: label, noLocalization: true, onClick: () => {
                     globalCommandDispatcher.promptProjectPluginGUI(label, url, (obj) => {
@@ -1626,7 +1647,7 @@ function fillPluginsLists() {
             });
         }
         else {
-            if (purpose == MZXBX_PluginPurpose.Sampler) {
+            if (purpose == 'Sampler') {
                 menuPointSamplers.children.push({
                     dragMix: true,
                     text: label, noLocalization: true, onClick: () => {
@@ -1635,7 +1656,7 @@ function fillPluginsLists() {
                 });
             }
             else {
-                if (purpose == MZXBX_PluginPurpose.Performer) {
+                if (purpose == 'Performer') {
                     menuPointPerformers.children.push({
                         dragMix: true,
                         text: label, noLocalization: true, onClick: () => {
@@ -1647,7 +1668,7 @@ function fillPluginsLists() {
                     });
                 }
                 else {
-                    if (purpose == MZXBX_PluginPurpose.Filter) {
+                    if (purpose == 'Filter') {
                         menuPointFilters.children.push({
                             dragMix: true,
                             text: label, noLocalization: true, onClick: () => {
@@ -4061,11 +4082,4 @@ function TAnchor(xx, yy, ww, hh, showZoom, hideZoom, id, translation) {
 function TText(x, y, css, text) {
     return { x: x, y: y, text: text, css: css, };
 }
-var MZXBX_PluginPurpose;
-(function (MZXBX_PluginPurpose) {
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Action"] = 0] = "Action";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Filter"] = 1] = "Filter";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Sampler"] = 2] = "Sampler";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Performer"] = 3] = "Performer";
-})(MZXBX_PluginPurpose || (MZXBX_PluginPurpose = {}));
 //# sourceMappingURL=application.js.map

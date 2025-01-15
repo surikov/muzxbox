@@ -267,5 +267,99 @@ declare type MZXBX_MessageToHost = {
     pluginData: any;
     done: boolean;
 };
-declare let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[];
+declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
+declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
+declare function MZXBX_appendScriptURL(url: string): boolean;
+declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
+declare type ZDRWaveEnvelope = {
+    audioBufferSourceNode?: AudioBufferSourceNode | null;
+    target: AudioNode;
+    when: number;
+    duration: number;
+    cancel: () => void;
+    pitch: number;
+    preset: ZDRWavePreset;
+};
+declare type ZDRWaveAHDSR = {
+    duration: number;
+    volume: number;
+};
+declare type ZDRWaveZone = {
+    keyRangeLow: number;
+    keyRangeHigh: number;
+    originalPitch: number;
+    coarseTune: number;
+    fineTune: number;
+    loopStart: number;
+    loopEnd: number;
+    buffer?: AudioBuffer;
+    sampleRate: number;
+    sample?: string;
+    file?: string;
+    sustain?: number;
+    ahdsr?: boolean | ZDRWaveAHDSR[];
+};
+declare type ZDRWavePreset = {
+    zones: ZDRWaveZone[];
+};
+declare type ZDRCachedPreset = {
+    variableName: string;
+    filePath: string;
+};
+declare type ZDRPresetInfo = {
+    variable: string;
+    url: string;
+    title: string;
+    pitch: number;
+};
+declare class ZDRWebAudioFontLoader {
+    cached: ZDRCachedPreset[];
+    drumNamesArray: string[];
+    drumKeyArray: string[];
+    constructor();
+    startLoad(audioContext: AudioContext, filePath: string, variableName: string): void;
+    adjustPreset(audioContext: AudioContext, preset: ZDRWavePreset): void;
+    adjustZone(audioContext: AudioContext, zone: ZDRWaveZone): void;
+    numValue(aValue: any, defValue: number): number;
+    decodeAfterLoading(audioContext: AudioContext, variableName: string): void;
+    waitOrFinish(variableName: string, onFinish: () => void): void;
+    loaded(variableName: string): boolean;
+    progress(): number;
+    waitLoad(onFinish: () => void): void;
+    drumTitles(): string[];
+    drumKeys(): string[];
+    drumInfo(n: number): ZDRPresetInfo;
+    findDrum(midinu: number): number;
+}
+declare class ZDRWebAudioFontPlayer {
+    envelopes: ZDRWaveEnvelope[];
+    loader: ZDRWebAudioFontLoader;
+    afterTime: number;
+    nearZero: number;
+    limitVolume(volume: number | undefined): number;
+    resumeContext(audioContext: AudioContext): void;
+    queueWaveTable(audioContext: AudioContext, target: AudioNode, preset: ZDRWavePreset, when: number, pitch: number, duration: number, volume: number): ZDRWaveEnvelope | null;
+    noZeroVolume(n: number): number;
+    setupEnvelope(audioContext: AudioContext, envelope: ZDRWaveEnvelope, zone: ZDRWaveZone, volume: number, when: number, sampleDuration: number, noteDuration: number): void;
+    numValue(aValue: any, defValue: number): number;
+    findEnvelope(audioContext: AudioContext, target: AudioNode): ZDRWaveEnvelope;
+    findZone(audioContext: AudioContext, preset: ZDRWavePreset, pitch: number): ZDRWaveZone | null;
+    cancelQueue(audioContext: AudioContext): void;
+}
+declare class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
+    audioContext: AudioContext;
+    player: ZDRWebAudioFontPlayer;
+    volume: GainNode;
+    loader: ZDRWebAudioFontLoader;
+    midinumber: number;
+    info: ZDRPresetInfo;
+    preset: ZDRWavePreset | null;
+    launch(context: AudioContext, parameters: string): void;
+    busy(): null | string;
+    schedule(when: number): void;
+    cancel(): void;
+    output(): AudioNode | null;
+    duration(): number;
+}
+declare function newZvoogDrumKitImplementation(): MZXBX_AudioSamplerPlugin;

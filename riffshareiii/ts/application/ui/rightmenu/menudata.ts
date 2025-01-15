@@ -130,10 +130,11 @@ function fillPluginsLists() {
 	//menuPointUndo.children = [];
 	for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
 		let label: string = MZXBX_currentPlugins()[ii].label;
-		let purpose: MZXBX_PluginPurpose = MZXBX_currentPlugins()[ii].purpose;
+		//let purpose: MZXBX_PluginPurpose = MZXBX_currentPlugins()[ii].purpose;
+		let purpose: string = MZXBX_currentPlugins()[ii].purpose;
 		let url: string = MZXBX_currentPlugins()[ii].ui;
 
-		if (purpose == MZXBX_PluginPurpose.Action) {
+		if (purpose == 'Action') {
 			menuPointActions.children.push({
 				text: label, noLocalization: true, onClick: () => {
 					globalCommandDispatcher.promptProjectPluginGUI(label, url, (obj: Zvoog_Project) => {
@@ -146,7 +147,7 @@ function fillPluginsLists() {
 				}
 			});
 		} else {
-			if (purpose == MZXBX_PluginPurpose.Sampler) {
+			if (purpose == 'Sampler') {
 				menuPointSamplers.children.push({
 					dragMix:true
 					,text: label, noLocalization: true, onClick: () => {
@@ -154,7 +155,7 @@ function fillPluginsLists() {
 					}
 				});
 			} else {
-				if (purpose == MZXBX_PluginPurpose.Performer) {
+				if (purpose == 'Performer') {
 					menuPointPerformers.children.push({
 						dragMix:true
 						,text: label, noLocalization: true, onClick: () => {
@@ -165,7 +166,7 @@ function fillPluginsLists() {
 						}
 					});
 				} else {
-					if (purpose == MZXBX_PluginPurpose.Filter) {
+					if (purpose == 'Filter') {
 						menuPointFilters.children.push({
 							dragMix:true
 							,text: label, noLocalization: true, onClick: () => {

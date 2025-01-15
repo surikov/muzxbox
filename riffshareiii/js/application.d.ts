@@ -877,6 +877,7 @@ declare type MZXBX_AudioSamplerPlugin = {
     schedule: (when: number) => void;
     cancel: () => void;
     output: () => AudioNode | null;
+    duration: () => number;
 };
 declare type MZXBX_ChannelPerformer = {
     id: string;
@@ -903,16 +904,10 @@ declare type MZXBX_Player = {
     allPerformers(): MZXBX_PerformerHolder[];
     position: number;
 };
-declare enum MZXBX_PluginPurpose {
-    Action = 0,
-    Filter = 1,
-    Sampler = 2,
-    Performer = 3
-}
 declare type MZXBX_PluginRegistrationInformation = {
     label: string;
     kind: string;
-    purpose: MZXBX_PluginPurpose;
+    purpose: 'Action' | 'Filter' | 'Sampler' | 'Performer';
     ui: string;
     evaluate: string;
     script: string;
