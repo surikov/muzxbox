@@ -18,13 +18,18 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 		this.loader.startLoad(context, this.info.url, this.info.variable);
 		this.loader.waitLoad(() => {
 			this.preset = window[this.info.variable];
+			//console.log('preset',this.preset,this.info);
 		});
 	}
 	busy(): null | string {
 		if (this.preset == null) {
-			return '' + this.info;
+			return 'preset ' + this.info;
 		} else {
-			return null;
+			if (!this.loader.loaded(this.info.variable)) {
+				return 'loaded ' + this.info;
+			} else {
+				return null;
+			}
 		}
 	}
 	schedule(when: number) {

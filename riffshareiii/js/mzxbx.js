@@ -1,13 +1,6 @@
 "use strict";
 class MZXBX_ScaleMath {
 }
-var MZXBX_PluginPurpose;
-(function (MZXBX_PluginPurpose) {
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Action"] = 0] = "Action";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Filter"] = 1] = "Filter";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Sampler"] = 2] = "Sampler";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Performer"] = 3] = "Performer";
-})(MZXBX_PluginPurpose || (MZXBX_PluginPurpose = {}));
 console.log("MuzXbox v1.0.2");
 class MuzXbox {
     constructor() {
@@ -156,7 +149,7 @@ class SchedulePlayer {
         return null;
     }
     startLoop(loopStart, currentPosition, loopEnd) {
-        let msg = this.connect();
+        let msg = this.connectAllPlugins();
         if (msg) {
             return msg;
         }
@@ -168,7 +161,7 @@ class SchedulePlayer {
             return '';
         }
     }
-    connect() {
+    connectAllPlugins() {
         let msg = this.launchCollectedPlugins();
         if (msg) {
             return msg;
@@ -180,47 +173,48 @@ class SchedulePlayer {
             }
             else {
                 if (this.schedule) {
-                    let masterOutput = this.audioContext.destination;
-                    masterOutput.debug = 'destination';
+                    let master = this.audioContext.destination;
                     for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
                         let filter = this.schedule.filters[ff];
                         let plugin = this.findFilterPlugin(filter.id);
                         if (plugin) {
                             let pluginOutput = plugin.output();
                             if (pluginOutput) {
-                                pluginOutput.debug = filter.id;
-                                pluginOutput.connect(masterOutput);
-                                let pluginInput = plugin.input();
-                                if (pluginInput) {
-                                    masterOutput = pluginInput;
+                                for (let oo = 0; oo < filter.outputs.length; oo++) {
+                                    let outId = filter.outputs[oo];
+                                    let targetNode = master;
+                                    if (outId) {
+                                        let target = this.findFilterPlugin(outId);
+                                        if (target) {
+                                            targetNode = target.input();
+                                            if (targetNode) {
+                                                pluginOutput.connect(targetNode);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                     for (let cc = 0; cc < this.schedule.channels.length; cc++) {
                         let channel = this.schedule.channels[cc];
-                        let channelOutput = masterOutput;
-                        for (let ff = channel.filters.length - 1; ff >= 0; ff--) {
-                            let filter = channel.filters[ff];
-                            let plugin = this.findFilterPlugin(filter.id);
-                            if (plugin) {
-                                let output = plugin.output();
-                                if (output) {
-                                    output.debug = filter.id;
-                                    output.connect(channelOutput);
-                                    let input = plugin.input();
-                                    if (input) {
-                                        channelOutput = input;
+                        let performer = this.findPerformerPlugin(channel.id);
+                        if (performer) {
+                            let output = performer.output();
+                            if (output) {
+                                for (let oo = 0; oo < channel.outputs.length; oo++) {
+                                    let outId = channel.outputs[oo];
+                                    let targetNode = master;
+                                    if (outId) {
+                                        let target = this.findFilterPlugin(outId);
+                                        if (target) {
+                                            targetNode = target.input();
+                                            if (targetNode) {
+                                                output.connect(targetNode);
+                                            }
+                                        }
                                     }
                                 }
-                            }
-                        }
-                        let plugin = this.findPerformerPlugin(channel.id);
-                        if (plugin) {
-                            let output = plugin.output();
-                            if (output) {
-                                output.debug = channel.id;
-                                output.connect(channelOutput);
                             }
                         }
                     }
@@ -229,55 +223,52 @@ class SchedulePlayer {
             }
         }
     }
-    disconnect() {
+    disconnectAllPlugins() {
         if (this.schedule) {
-            let toNode = this.audioContext.destination;
+            let master = this.audioContext.destination;
             for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
                 let filter = this.schedule.filters[ff];
                 let plugin = this.findFilterPlugin(filter.id);
                 if (plugin) {
                     let output = plugin.output();
                     if (output) {
-                        try {
-                            output.disconnect(toNode);
-                        }
-                        catch (ex) {
-                        }
-                        let input = plugin.input();
-                        if (input) {
-                            toNode = input;
+                        for (let oo = 0; oo < filter.outputs.length; oo++) {
+                            let outId = filter.outputs[oo];
+                            let targetNode = master;
+                            if (outId) {
+                                let target = this.findFilterPlugin(outId);
+                                if (target) {
+                                    targetNode = target.input();
+                                    if (targetNode) {
+                                        output.disconnect(targetNode);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
             for (let cc = 0; cc < this.schedule.channels.length; cc++) {
                 let channel = this.schedule.channels[cc];
-                let channelOutput = toNode;
-                for (let ff = channel.filters.length - 1; ff >= 0; ff--) {
-                    let filter = channel.filters[ff];
-                    let plugin = this.findFilterPlugin(filter.id);
-                    if (plugin) {
-                        let output = plugin.output();
-                        if (output) {
-                            try {
-                                output.disconnect(channelOutput);
-                            }
-                            catch (ex) {
-                            }
-                            let input = plugin.input();
-                            if (input) {
-                                channelOutput = input;
-                            }
-                        }
-                    }
-                }
                 let plugin = this.findPerformerPlugin(channel.id);
                 if (plugin) {
                     let output = plugin.output();
                     if (output) {
                         try {
                             plugin.cancel();
-                            output.disconnect(channelOutput);
+                            for (let oo = 0; oo < channel.outputs.length; oo++) {
+                                let outId = channel.outputs[oo];
+                                let targetNode = master;
+                                if (outId) {
+                                    let target = this.findFilterPlugin(outId);
+                                    if (target) {
+                                        targetNode = target.input();
+                                        if (targetNode) {
+                                            output.disconnect(targetNode);
+                                        }
+                                    }
+                                }
+                            }
                         }
                         catch (ex) {
                         }
@@ -311,7 +302,7 @@ class SchedulePlayer {
             });
         }
         else {
-            this.disconnect();
+            this.disconnectAllPlugins();
         }
     }
     findPerformerPlugin(channelId) {
@@ -416,19 +407,15 @@ class PluginLoader {
         for (let ch = 0; ch < schedule.channels.length; ch++) {
             let performer = schedule.channels[ch].performer;
             this.сollectPerformerPlugin(performer.id, performer.kind, performer.properties, performers);
-            for (let ff = 0; ff < schedule.channels[ch].filters.length; ff++) {
-                let filter = schedule.channels[ch].filters[ff];
-                this.сollectFilterPlugin(filter.id, filter.kind, filter.properties, filters);
-            }
         }
         this.startLoadCollectedPlugins(filters, performers, afterLoad);
     }
     startLoadCollectedPlugins(filters, performers, afterLoad) {
-        console.log('startLoadCollectedPlugins', filters, performers);
         for (let ff = 0; ff < filters.length; ff++) {
             if (!(filters[ff].plugin)) {
                 this.startLoadPluginStarter(filters[ff].kind, filters, performers, (plugin) => {
                     filters[ff].plugin = plugin;
+                    console.log('assign filter', ff, plugin);
                 }, afterLoad);
                 return;
             }
@@ -445,11 +432,9 @@ class PluginLoader {
         afterLoad();
     }
     startLoadPluginStarter(kind, filters, performers, onDone, afterLoad) {
-        console.log('startLoadSinglePlugin', kind);
         let tt = this.findPluginInfo(kind);
         if (tt) {
             let info = tt;
-            console.log('wait', info);
             MZXBX_appendScriptURL(info.script);
             MZXBX_waitForCondition(250, () => {
                 return (window[info.evaluate]);
@@ -476,7 +461,6 @@ class PluginLoader {
         filters.push({ plugin: null, id: id, kind: kind, properties: properties, launched: false });
     }
     сollectPerformerPlugin(id, kind, properties, performers) {
-        console.log('сollectPerformerPlugin id:', id, 'kind', kind);
         for (let ii = 0; ii < performers.length; ii++) {
             if (performers[ii].id == id) {
                 performers[ii].properties = properties;

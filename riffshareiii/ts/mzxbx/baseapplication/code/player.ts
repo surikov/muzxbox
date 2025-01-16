@@ -130,7 +130,7 @@ class SchedulePlayer implements MZXBX_Player {
 
 			});
 		}*/
-		let msg: string | null = this.connect();
+		let msg: string | null = this.connectAllPlugins();
 		if (msg) {
 			//console.log('Can\'t start loop:', msg);
 			return msg;
@@ -149,8 +149,8 @@ class SchedulePlayer implements MZXBX_Player {
 			this.launchCollectedPlugins();
 		}
 	}*/
-	connect(): string | null {
-		//console.log('connect');
+	connectAllPlugins(): string | null {
+		//console.log('connectAllPlugins');
 		let msg: string | null = this.launchCollectedPlugins();
 		if (msg) {
 			return msg;
@@ -160,28 +160,42 @@ class SchedulePlayer implements MZXBX_Player {
 				return msg;
 			} else {
 				if (this.schedule) {
-					let masterOutput: AudioNode = this.audioContext.destination;
-					(masterOutput as any).debug = 'destination';
+					let master: AudioNode = this.audioContext.destination;
+					//(masterOutput as any).debug = 'destination';
 					for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
 						let filter = this.schedule.filters[ff];
 						let plugin = this.findFilterPlugin(filter.id);
 						if (plugin) {
 							let pluginOutput = plugin.output();
 							if (pluginOutput) {
-								(pluginOutput as any).debug = filter.id;
+								/*(pluginOutput as any).debug = filter.id;
 								pluginOutput.connect(masterOutput);
 								let pluginInput = plugin.input();
 								if (pluginInput) {
 									//console.log(pluginInput,pluginOutput, masterOutput);
 									masterOutput = pluginInput;
 								}
+							}*/
+								for (let oo = 0; oo < filter.outputs.length; oo++) {
+									let outId = filter.outputs[oo];
+									let targetNode: AudioNode | null = master;
+									if (outId) {
+										let target = this.findFilterPlugin(outId);
+										if (target) {
+											targetNode = target.input();
+											if (targetNode) {
+												pluginOutput.connect(targetNode);
+											}
+										}
+									}
+								}
 							}
 						}
 					}
 					for (let cc = 0; cc < this.schedule.channels.length; cc++) {
 						let channel = this.schedule.channels[cc];
-						let channelOutput = masterOutput;
-						for (let ff = channel.filters.length - 1; ff >= 0; ff--) {
+						//let channelOutput = masterOutput;
+						/*for (let ff = channel.filters.length - 1; ff >= 0; ff--) {
 							let filter = channel.filters[ff];
 							let plugin = this.findFilterPlugin(filter.id);
 							if (plugin) {
@@ -196,14 +210,27 @@ class SchedulePlayer implements MZXBX_Player {
 									}
 								}
 							}
-						}
-						let plugin = this.findPerformerPlugin(channel.id);
-						if (plugin) {
-							let output = plugin.output();
+						}*/
+						let performer = this.findPerformerPlugin(channel.id);
+						if (performer) {
+							let output = performer.output();
 							if (output) {
-								(output as any).debug = channel.id;
+								//(output as any).debug = channel.id;
 								//console.log(output,channelOutput);
-								output.connect(channelOutput);
+								//output.connect(channelOutput);
+								for (let oo = 0; oo < channel.outputs.length; oo++) {
+									let outId = channel.outputs[oo];
+									let targetNode: AudioNode | null = master;
+									if (outId) {
+										let target = this.findFilterPlugin(outId);
+										if (target) {
+											targetNode = target.input();
+											if (targetNode) {
+												output.connect(targetNode);
+											}
+										}
+									}
+								}
 							}
 						}
 					}
@@ -212,17 +239,18 @@ class SchedulePlayer implements MZXBX_Player {
 			}
 		}
 	}
-	disconnect() {
+	disconnectAllPlugins() {
 		//console.log('disconnect');
 		if (this.schedule) {
-			let toNode: AudioNode = this.audioContext.destination;
+			let master: AudioNode = this.audioContext.destination;
+			//let toNode: AudioNode = this.audioContext.destination;
 			for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
 				let filter = this.schedule.filters[ff];
 				let plugin = this.findFilterPlugin(filter.id);
 				if (plugin) {
 					let output = plugin.output();
 					if (output) {
-						try {
+						/*try {
 							output.disconnect(toNode);
 						} catch (ex) {
 							//ignore
@@ -231,13 +259,27 @@ class SchedulePlayer implements MZXBX_Player {
 						let input = plugin.input();
 						if (input) {
 							toNode = input;
+						}*/
+						for (let oo = 0; oo < filter.outputs.length; oo++) {
+							let outId = filter.outputs[oo];
+							let targetNode: AudioNode | null = master;
+							if (outId) {
+								let target = this.findFilterPlugin(outId);
+								if (target) {
+									targetNode = target.input();
+									if (targetNode) {
+										output.disconnect(targetNode);
+									}
+								}
+							}
 						}
 					}
 				}
 			}
 			for (let cc = 0; cc < this.schedule.channels.length; cc++) {
 				let channel = this.schedule.channels[cc];
-				let channelOutput = toNode;
+				/*let channelOutput = toNode;
+				
 				for (let ff = channel.filters.length - 1; ff >= 0; ff--) {
 					let filter = channel.filters[ff];
 					let plugin = this.findFilterPlugin(filter.id);
@@ -253,16 +295,30 @@ class SchedulePlayer implements MZXBX_Player {
 							if (input) {
 								channelOutput = input;
 							}
+							
 						}
 					}
-				}
+				}*/
 				let plugin = this.findPerformerPlugin(channel.id);
 				if (plugin) {
 					let output = plugin.output();
 					if (output) {
 						try {
 							plugin.cancel();
-							output.disconnect(channelOutput);
+							//output.disconnect(channelOutput);
+							for (let oo = 0; oo < channel.outputs.length; oo++) {
+								let outId = channel.outputs[oo];
+								let targetNode: AudioNode | null = master;
+								if (outId) {
+									let target = this.findFilterPlugin(outId);
+									if (target) {
+										targetNode = target.input();
+										if (targetNode) {
+											output.disconnect(targetNode);
+										}
+									}
+								}
+							}
 						} catch (ex) {
 							//ignore
 						}
@@ -299,7 +355,7 @@ class SchedulePlayer implements MZXBX_Player {
 				me.tick(loopStart, loopEnd);
 			});
 		} else {
-			this.disconnect();
+			this.disconnectAllPlugins();
 		}
 	}
 	findPerformerPlugin(channelId: string): MZXBX_AudioPerformerPlugin | null {

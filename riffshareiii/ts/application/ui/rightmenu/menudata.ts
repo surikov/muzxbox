@@ -190,7 +190,7 @@ function composeBaseMenu(): MenuInfo[] {
 		menuItemsData = [
 			{
 				text: localMenuPlayPause, onClick: () => {
-					console.log('start/stop');
+					//console.log('start/stop');
 					globalCommandDispatcher.toggleStartStop();
 				}
 			}

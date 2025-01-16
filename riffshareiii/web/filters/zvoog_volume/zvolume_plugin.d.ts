@@ -1,5 +1,3 @@
-declare class MZXBX_ScaleMath {
-}
 declare type Zvoog_Metre = {
     count: number;
     part: number;
@@ -239,6 +237,7 @@ declare type MZXBX_Schedule = {
     series: MZXBX_Set[];
     channels: MZXBX_Channel[];
     filters: MZXBX_Filter[];
+    outputs: string[];
 };
 declare type MZXBX_Player = {
     setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;
@@ -269,63 +268,14 @@ declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string
 declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
-declare let testSchedule: MZXBX_Schedule;
-declare class MuzXbox {
-    uiStarted: boolean;
+declare class ZVolImplementation implements MZXBX_AudioFilterPlugin {
     audioContext: AudioContext;
-    player: SchedulePlayer;
-    setupDone: boolean;
-    currentDuration: number;
-    songslide: HTMLInputElement | null;
-    constructor();
-    initAfterLoad(): void;
-    initFromUI(): void;
-    updatePosition(pp: number): void;
-    updateSongSlider(): void;
-    setSongSlider(): void;
-    initAudioContext(): void;
-    resumeContext(audioContext: AudioContext): void;
+    volume: GainNode;
+    num: number;
+    launch(context: AudioContext, parameters: string): void;
+    busy(): null | string;
+    schedule(when: number, parameters: string): void;
+    input(): AudioNode | null;
+    output(): AudioNode | null;
 }
-declare function createSchedulePlayer(): MZXBX_Player;
-declare class SchedulePlayer implements MZXBX_Player {
-    position: number;
-    audioContext: AudioContext;
-    schedule: MZXBX_Schedule | null;
-    performers: MZXBX_PerformerHolder[];
-    filters: MZXBX_FilterHolder[];
-    pluginsList: MZXBX_PerformerHolder[];
-    nextAudioContextStart: number;
-    tickDuration: number;
-    onAir: boolean;
-    setupPlugins(context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void): void;
-    allFilters(): MZXBX_FilterHolder[];
-    allPerformers(): MZXBX_PerformerHolder[];
-    launchCollectedPlugins(): null | string;
-    checkCollectedPlugins(): null | string;
-    startLoop(loopStart: number, currentPosition: number, loopEnd: number): string;
-    connectAllPlugins(): string | null;
-    disconnectAllPlugins(): void;
-    tick(loopStart: number, loopEnd: number): void;
-    findPerformerPlugin(channelId: string): MZXBX_AudioPerformerPlugin | null;
-    sendPerformerItem(it: MZXBX_PlayItem, whenAudio: number, tempo: number): void;
-    findFilterPlugin(filterId: string): MZXBX_AudioFilterPlugin | null;
-    sendFilterItem(state: MZXBX_FilterState, whenAudio: number): void;
-    ms(nn: number): number;
-    sendPiece(fromPosition: number, toPosition: number, whenAudio: number): void;
-    cancel(): void;
-}
-declare class MusicTicker {
-    startPlay(): void;
-    cancelPlay(): void;
-    setPosition(seconds: number): void;
-    getPosition(): number;
-}
-declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
-declare class PluginLoader {
-    collectLoadPlugins(schedule: MZXBX_Schedule, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[], afterLoad: () => void): void;
-    startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[], afterLoad: () => void): void;
-    startLoadPluginStarter(kind: string, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[], onDone: (plugin: any) => void, afterLoad: () => void): void;
-    сollectFilterPlugin(id: string, kind: string, properties: string, filters: MZXBX_FilterHolder[]): void;
-    сollectPerformerPlugin(id: string, kind: string, properties: string, performers: MZXBX_PerformerHolder[]): void;
-    findPluginInfo(kind: string): MZXBX_PluginRegistrationInformation | null;
-}
+declare function newZvoogVolumeImplementation(): MZXBX_AudioFilterPlugin;

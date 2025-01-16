@@ -3,27 +3,28 @@ declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 class PluginLoader {
 	collectLoadPlugins(schedule: MZXBX_Schedule, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[], afterLoad: () => void) {
 		for (let ff = 0; ff < schedule.filters.length; ff++) {
-			let filter: MZXBX_ChannelFilter = schedule.filters[ff];
+			let filter: MZXBX_Filter = schedule.filters[ff];
 			this.сollectFilterPlugin(filter.id, filter.kind, filter.properties, filters);
 		}
 		for (let ch = 0; ch < schedule.channels.length; ch++) {
-			let performer: MZXBX_ChannelPerformer = schedule.channels[ch].performer;
+			let performer: MZXBX_ChannelSource = schedule.channels[ch].performer;
 			this.сollectPerformerPlugin(performer.id, performer.kind, performer.properties, performers);
-			for (let ff = 0; ff < schedule.channels[ch].filters.length; ff++) {
+			/*for (let ff = 0; ff < schedule.channels[ch].filters.length; ff++) {
 				let filter: MZXBX_ChannelFilter = schedule.channels[ch].filters[ff];
 				this.сollectFilterPlugin(filter.id, filter.kind, filter.properties, filters);
-			}
+			}*/
 		}
 		this.startLoadCollectedPlugins(filters, performers, afterLoad);
 	}
 	startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[], afterLoad: () => void) {
-		console.log('startLoadCollectedPlugins',filters,performers);
+		//console.log('startLoadCollectedPlugins',filters,performers);
 		for (let ff = 0; ff < filters.length; ff++) {
 			//console.log('check filter',filters[ff]);
 			if (!(filters[ff].plugin)) {
 				this.startLoadPluginStarter(filters[ff].kind, filters, performers, (plugin) => {
-					//console.log('assign filter',ff,plugin);
+
 					filters[ff].plugin = plugin;
+					console.log('assign filter',ff,plugin);
 				}, afterLoad);
 				return;
 			}
@@ -42,15 +43,16 @@ class PluginLoader {
 		//this.stateSetupDone = true;
 		afterLoad();
 	}
+
 	startLoadPluginStarter(kind: string, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[]
 		, onDone: (plugin) => void
 		, afterLoad: () => void
 	) {
-		console.log('startLoadSinglePlugin', kind);
+		//console.log('startLoadSinglePlugin', kind);
 		let tt: MZXBX_PluginRegistrationInformation | null = this.findPluginInfo(kind);
 		if (tt) {
 			let info: MZXBX_PluginRegistrationInformation = tt;
-			console.log('wait',info);
+			//console.log('wait',info);
 			MZXBX_appendScriptURL(info.script);
 			MZXBX_waitForCondition(250, () => {
 
@@ -79,7 +81,7 @@ class PluginLoader {
 		filters.push({ plugin: null, id: id, kind: kind, properties: properties, launched: false });
 	}
 	сollectPerformerPlugin(id: string, kind: string, properties: string, performers: MZXBX_PerformerHolder[]): void {
-		console.log('сollectPerformerPlugin id:', id, 'kind', kind);
+		//console.log('сollectPerformerPlugin id:', id, 'kind', kind);
 		for (let ii = 0; ii < performers.length; ii++) {
 			if (performers[ii].id == id) {
 				performers[ii].properties = properties;

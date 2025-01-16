@@ -24,7 +24,8 @@ class ZDRWebAudioFontLoader {
 		document.getElementsByTagName("head")[0].appendChild(r);
 		this.decodeAfterLoading(audioContext, variableName);
 	};
-	adjustPreset  (audioContext: AudioContext, preset: ZDRWavePreset) {
+	adjustPreset(audioContext: AudioContext, preset: ZDRWavePreset) {
+		console.log('adjustPreset',preset);
 		for (var i = 0; i < preset.zones.length; i++) {
 			this.adjustZone(audioContext, preset.zones[i]);
 		}
@@ -89,6 +90,7 @@ class ZDRWebAudioFontLoader {
 		}
 	};
 	decodeAfterLoading(audioContext: AudioContext, variableName: string) {
+		//console.log('decodeAfterLoading',variableName);
 		var me = this;
 		this.waitOrFinish(variableName, function () {
 			me.adjustPreset(audioContext, (window[variableName] as any) as ZDRWavePreset);
@@ -105,11 +107,13 @@ class ZDRWebAudioFontLoader {
 		}
 	};
 	loaded(variableName: string): boolean {
+		//console.log('loaded', variableName);
 		if (!(window[variableName])) {
 			return false;
 		}
 		var preset: ZDRWavePreset = (window[variableName] as any) as ZDRWavePreset;
 		for (var i = 0; i < preset.zones.length; i++) {
+			//console.log('zone', preset.zones[i].buffer);
 			if (!(preset.zones[i].buffer)) {
 				return false;
 			}
@@ -117,6 +121,7 @@ class ZDRWebAudioFontLoader {
 		return true;
 	};
 	progress(): number {
+		//console.log('progress', this.cached.length);
 		if (this.cached.length > 0) {
 			for (var k = 0; k < this.cached.length; k++) {
 				if (!this.loaded(this.cached[k].variableName)) {
@@ -129,8 +134,9 @@ class ZDRWebAudioFontLoader {
 		}
 	};
 	waitLoad(onFinish: () => void) {
+		//console.log('waitLoad');
 		var me = this;
-		if (this.progress() >= 1) {
+		if (this.progress() >= 0) {
 			onFinish();
 		} else {
 			setTimeout(function () {

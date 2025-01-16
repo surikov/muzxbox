@@ -225,9 +225,10 @@ type MZXBX_PerformerHolder = {
 };
 type MZXBX_Channel = {
 	id: string;
-	comment?: string;
-	filters: MZXBX_ChannelFilter[];
-	performer: MZXBX_ChannelPerformer;
+	//comment?: string;
+	//filters: MZXBX_ChannelFilter[];
+	performer: MZXBX_ChannelSource;
+	outputs:string[];
 };
 type MZXBX_SlideItem = {
 	duration: number;
@@ -250,10 +251,11 @@ type MZXBX_Set = {
 	items: MZXBX_PlayItem[];
 	states: MZXBX_FilterState[];
 };
-type MZXBX_ChannelFilter = {
+type MZXBX_Filter = {
 	id: string;
 	kind: string;
 	properties: string;
+	outputs:string[];
 };
 type MZXBX_AudioFilterPlugin = {
 	launch: (context: AudioContext, parameters: string) => void;
@@ -262,11 +264,13 @@ type MZXBX_AudioFilterPlugin = {
 	input: () => AudioNode | null;
 	output: () => AudioNode | null;
 };
+/*
 type MZXBX_ChannelSampler = {
 	id: string;
 	kind: string;
 	properties: string;
 };
+*/
 type MZXBX_AudioSamplerPlugin = {
 	launch: (context: AudioContext, parameters: string) => void;
 	busy: () => null | string;
@@ -276,7 +280,7 @@ type MZXBX_AudioSamplerPlugin = {
 	duration: () => number;
 };
 
-type MZXBX_ChannelPerformer = {
+type MZXBX_ChannelSource = {
 	id: string;
 	kind: string;
 	properties: string;
@@ -292,7 +296,7 @@ type MZXBX_AudioPerformerPlugin = {
 type MZXBX_Schedule = {
 	series: MZXBX_Set[];
 	channels: MZXBX_Channel[];
-	filters: MZXBX_ChannelFilter[];
+	filters: MZXBX_Filter[];
 };
 type MZXBX_Player = {
 	setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;

@@ -26,6 +26,7 @@ class ZDRWebAudioFontLoader {
     }
     ;
     adjustPreset(audioContext, preset) {
+        console.log('adjustPreset', preset);
         for (var i = 0; i < preset.zones.length; i++) {
             this.adjustZone(audioContext, preset.zones[i]);
         }
@@ -137,7 +138,7 @@ class ZDRWebAudioFontLoader {
     ;
     waitLoad(onFinish) {
         var me = this;
-        if (this.progress() >= 1) {
+        if (this.progress() >= 0) {
             onFinish();
         }
         else {
@@ -508,10 +509,15 @@ class ZvoogDrumKitImplementation {
     }
     busy() {
         if (this.preset == null) {
-            return '' + this.info;
+            return 'preset ' + this.info;
         }
         else {
-            return null;
+            if (!this.loader.loaded(this.info.variable)) {
+                return 'loaded ' + this.info;
+            }
+            else {
+                return null;
+            }
         }
     }
     schedule(when) {

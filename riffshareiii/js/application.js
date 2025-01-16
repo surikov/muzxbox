@@ -548,18 +548,18 @@ class CommandDispatcher {
             this.onAir = !this.onAir;
             let n120 = 120 / 60;
             let A3 = 33;
-            let schedule = {
+            let testingschedule = {
                 series: [
                     {
                         duration: n120, tempo: 120, items: [
-                            { skip: 0 / 8 * n120, channelId: 'drumKick1', pitches: [35], slides: [] },
-                            { skip: 1 / 8 * n120, channelId: 'drumKick1', pitches: [35], slides: [] },
-                            { skip: 2 / 8 * n120, channelId: 'drumKick1', pitches: [35], slides: [] },
-                            { skip: 3 / 8 * n120, channelId: 'drumKick1', pitches: [35], slides: [] },
-                            { skip: 4 / 8 * n120, channelId: 'drumSnare1', pitches: [36], slides: [] },
-                            { skip: 5 / 8 * n120, channelId: 'drumSnare1', pitches: [36], slides: [] },
-                            { skip: 6 / 8 * n120, channelId: 'drumSnare1', pitches: [36], slides: [] },
-                            { skip: 7 / 8 * n120, channelId: 'drumSnare1', pitches: [36], slides: [] }
+                            { skip: 0 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] },
+                            { skip: 1 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] },
+                            { skip: 2 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] },
+                            { skip: 3 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] },
+                            { skip: 4 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] },
+                            { skip: 5 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] },
+                            { skip: 6 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] },
+                            { skip: 7 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] }
                         ], states: []
                     },
                     {
@@ -577,7 +577,7 @@ class CommandDispatcher {
                 ],
                 channels: [{
                         id: 'test1',
-                        filters: [],
+                        outputs: ['volTest1'],
                         performer: {
                             id: 'test1',
                             kind: 'beep1',
@@ -585,7 +585,7 @@ class CommandDispatcher {
                         }
                     }, {
                         id: 'drumKick1',
-                        filters: [],
+                        outputs: ['volTest1'],
                         performer: {
                             id: 'perfKick1',
                             kind: 'zdrum1',
@@ -593,7 +593,7 @@ class CommandDispatcher {
                         }
                     }, {
                         id: 'drumSnare1',
-                        filters: [],
+                        outputs: ['volTest1'],
                         performer: {
                             id: 'perfSnare1',
                             kind: 'zdrum1',
@@ -601,12 +601,26 @@ class CommandDispatcher {
                         }
                     }
                 ],
-                filters: []
+                filters: [
+                    {
+                        id: 'volTest1',
+                        kind: 'zvolume1',
+                        properties: '50%',
+                        outputs: ['']
+                    }
+                ]
             };
             let me = this;
-            me.player.setupPlugins(me.audioContext, schedule, () => {
-                console.log('toggleStartStop setupPlugins done');
-                me.player.startLoop(0, 0, n120 * 2);
+            me.player.setupPlugins(me.audioContext, testingschedule, () => {
+                let msg = me.player.startLoop(0, 0, n120 * 2);
+                if (msg) {
+                    this.onAir = false;
+                    console.log('toggleStartStop cancel', msg);
+                    alert('Wait for ' + msg);
+                }
+                else {
+                    console.log('toggleStartStop setupPlugins done');
+                }
             });
         }
     }
@@ -1693,7 +1707,6 @@ function composeBaseMenu() {
         menuItemsData = [
             {
                 text: localMenuPlayPause, onClick: () => {
-                    console.log('start/stop');
                     globalCommandDispatcher.toggleStartStop();
                 }
             },

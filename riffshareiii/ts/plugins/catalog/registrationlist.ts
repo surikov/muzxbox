@@ -25,10 +25,12 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 	, {
 		label: 'Simple beep sound', purpose: 'Performer', kind: 'beep1', ui: './web/performers/simplebeep/uitester/beep1.html'
 		, evaluate: 'newSimpleBeepImplementation', script: './web/performers/simplebeep/beeper/beep_plugin.js'
-	}
-	, {
+	}, {
 		label: 'Zvoog DrumKit', purpose: 'Sampler', kind: 'zdrum1', ui: './web/samplers/zvoog_drum_kit/zvoogdrumkit_plugin.html'
 		, evaluate: 'newZvoogDrumKitImplementation', script: './web/samplers/zvoog_drum_kit/zvoogdrumkit_plugin.js'
+	}, {
+		label: 'Zvoog Volume', purpose: 'Filter', kind: 'zvolume1', ui: './web/filters/zvoog_volume/zvolume1.html'
+		, evaluate: 'newZvoogVolumeImplementation', script: './web/filters/zvoog_volume/zvolume_plugin.js'
 	}
 
 
