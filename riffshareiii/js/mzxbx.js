@@ -182,15 +182,17 @@ class SchedulePlayer {
                             if (pluginOutput) {
                                 for (let oo = 0; oo < filter.outputs.length; oo++) {
                                     let outId = filter.outputs[oo];
+                                    console.log('check filter', filter.id, outId);
                                     let targetNode = master;
                                     if (outId) {
                                         let target = this.findFilterPlugin(outId);
                                         if (target) {
                                             targetNode = target.input();
-                                            if (targetNode) {
-                                                pluginOutput.connect(targetNode);
-                                            }
                                         }
+                                    }
+                                    if (targetNode) {
+                                        console.log('connect filter', filter.id, outId);
+                                        pluginOutput.connect(targetNode);
                                     }
                                 }
                             }
@@ -209,10 +211,11 @@ class SchedulePlayer {
                                         let target = this.findFilterPlugin(outId);
                                         if (target) {
                                             targetNode = target.input();
-                                            if (targetNode) {
-                                                output.connect(targetNode);
-                                            }
                                         }
+                                    }
+                                    if (targetNode) {
+                                        console.log('connect channel', channel.id, outId);
+                                        output.connect(targetNode);
                                     }
                                 }
                             }
@@ -239,10 +242,10 @@ class SchedulePlayer {
                                 let target = this.findFilterPlugin(outId);
                                 if (target) {
                                     targetNode = target.input();
-                                    if (targetNode) {
-                                        output.disconnect(targetNode);
-                                    }
                                 }
+                            }
+                            if (targetNode) {
+                                output.disconnect(targetNode);
                             }
                         }
                     }
@@ -263,10 +266,10 @@ class SchedulePlayer {
                                     let target = this.findFilterPlugin(outId);
                                     if (target) {
                                         targetNode = target.input();
-                                        if (targetNode) {
-                                            output.disconnect(targetNode);
-                                        }
                                     }
+                                }
+                                if (targetNode) {
+                                    output.disconnect(targetNode);
                                 }
                             }
                         }
