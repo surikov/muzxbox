@@ -262,5 +262,121 @@ declare type MZXBX_MessageToHost = {
     pluginData: any;
     done: boolean;
 };
-declare let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[];
+declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
+declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
+declare function MZXBX_appendScriptURL(url: string): boolean;
+declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
+declare type ZPWaveEnvelope = {
+    audioBufferSourceNode?: AudioBufferSourceNode | null;
+    target: AudioNode;
+    when: number;
+    duration: number;
+    cancel: () => void;
+    pitch: number;
+    preset: ZPWavePreset;
+};
+declare type ZPWaveZone = {
+    keyRangeLow: number;
+    keyRangeHigh: number;
+    originalPitch: number;
+    coarseTune: number;
+    fineTune: number;
+    loopStart: number;
+    loopEnd: number;
+    buffer?: AudioBuffer;
+    sampleRate: number;
+    delay?: number;
+    ahdsr?: boolean | ZPWaveAHDSR[];
+    sample?: string;
+    file?: string;
+    sustain?: number;
+};
+declare type ZPWavePreset = {
+    zones: ZPWaveZone[];
+};
+declare type ZPWaveSlide = {
+    when: number;
+    delta: number;
+};
+declare type ZPWaveAHDSR = {
+    duration: number;
+    volume: number;
+};
+declare type ZPCachedPreset = {
+    variableName: string;
+    filePath: string;
+};
+declare type ZPNumPair = number[];
+declare type ZPPresetInfo = {
+    variable: string;
+    url: string;
+    title: string;
+    pitch: number;
+};
+declare type ChordQueue = {
+    when: number;
+    destination: AudioNode;
+    preset: ZPWavePreset;
+    pitch: number;
+    duration: number;
+    volume?: number;
+    slides?: ZPWaveSlide[];
+};
+declare class ZPWebAudioFontLoader {
+    cached: ZPCachedPreset[];
+    player: ZPWebAudioFontPlayer;
+    instrumentKeyArray: string[];
+    instrumentNamesArray: string[];
+    choosenInfos: ZPNumPair[];
+    drumNamesArray: string[];
+    drumKeyArray: string[];
+    constructor(player: ZPWebAudioFontPlayer);
+    startLoad(audioContext: AudioContext, filePath: string, variableName: string): void;
+    decodeAfterLoading(audioContext: AudioContext, variableName: string): void;
+    waitOrFinish(variableName: string, onFinish: () => void): void;
+    loaded(variableName: string): boolean;
+    progress(): number;
+    waitLoad(onFinish: () => void): void;
+    instrumentTitles: () => string[];
+    instrumentKeys(): string[];
+    instrumentInfo(n: number): ZPPresetInfo;
+    findInstrument(program: number): number;
+}
+declare class ZPWebAudioFontPlayer {
+    envelopes: ZPWaveEnvelope[];
+    loader: ZPWebAudioFontLoader;
+    afterTime: number;
+    nearZero: number;
+    limitVolume(volume: number | undefined): number;
+    queueChord(audioContext: AudioContext, target: AudioNode, preset: ZPWavePreset, when: number, pitches: number[], duration: number, volume?: number, slides?: MZXBX_SlideItem[]): ZPWaveEnvelope[];
+    queueStrumUp(audioContext: AudioContext, target: AudioNode, preset: ZPWavePreset, when: number, pitches: number[], duration: number, volume?: number, slides?: MZXBX_SlideItem[]): ZPWaveEnvelope[];
+    queueStrumDown(audioContext: AudioContext, target: AudioNode, preset: ZPWavePreset, when: number, pitches: number[], duration: number, volume?: number, slides?: MZXBX_SlideItem[]): ZPWaveEnvelope[];
+    queueStrum(audioContext: AudioContext, target: AudioNode, preset: ZPWavePreset, when: number, pitches: number[], duration: number, volume?: number, slides?: MZXBX_SlideItem[]): ZPWaveEnvelope[];
+    queueSnap(audioContext: AudioContext, target: AudioNode, preset: ZPWavePreset, when: number, pitches: number[], duration: number, volume?: number, slides?: MZXBX_SlideItem[]): ZPWaveEnvelope[];
+    resumeContext(audioContext: AudioContext): void;
+    queueWaveTable(audioContext: AudioContext, target: AudioNode, preset: ZPWavePreset, when: number, pitch: number, duration: number, volume?: number, slides?: MZXBX_SlideItem[]): ZPWaveEnvelope | null;
+    noZeroVolume(n: number): number;
+    setupEnvelope(audioContext: AudioContext, envelope: ZPWaveEnvelope, zone: ZPWaveZone, volume: number, when: number, sampleDuration: number, noteDuration: number): void;
+    numValue(aValue: any, defValue: number): number;
+    findEnvelope(audioContext: AudioContext, target: AudioNode): ZPWaveEnvelope;
+    adjustPreset: (audioContext: AudioContext, preset: ZPWavePreset) => void;
+    adjustZone: (audioContext: AudioContext, zone: ZPWaveZone) => void;
+    findZone(audioContext: AudioContext, preset: ZPWavePreset, pitch: number): ZPWaveZone | null;
+    cancelQueue(audioContext: AudioContext): void;
+}
+declare class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
+    audioContext: AudioContext;
+    player: ZPWebAudioFontPlayer;
+    volume: GainNode;
+    loader: ZPWebAudioFontLoader;
+    midinumber: number;
+    info: ZPPresetInfo;
+    preset: ZPWavePreset | null;
+    launch(context: AudioContext, parameters: string): void;
+    busy(): null | string;
+    schedule(when: number, zpitches: number[], tempo: number, mzbxslide: MZXBX_SlideItem[]): void;
+    cancel(): void;
+    output(): AudioNode | null;
+}
+declare function newZvoogBasePerformerImplementation(): MZXBX_AudioPerformerPlugin;

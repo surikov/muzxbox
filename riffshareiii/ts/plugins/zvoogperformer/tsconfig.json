@@ -1,0 +1,32 @@
+{
+	"compilerOptions": {
+		"target": "es2015"
+        //,"outFile": "beep_plugin.js"
+        ,"outFile": "../../../web/performers/zvoog_perf/zvoogperf_plugin.js"
+        //,"outDir":"../js"
+		,"strictNullChecks": true
+		,"alwaysStrict": true
+		,"esModuleInterop": true
+		,"noResolve": false
+        ,"noImplicitAny": false
+        ,"removeComments": true
+        ,"preserveConstEnums": true
+        ,"sourceMap": true
+        ,"experimentalDecorators": true
+        ,"isolatedModules": false
+		,"module": "AMD"
+        ,"lib": [
+            "dom"
+            ,"es2015"
+            ,"es5"
+        ]
+        ,"declaration": true
+		,"types": [ ]
+	}
+	,"files": [
+        "../../mzxbx/publictypes/musicenginetypes.ts"
+		,"../../mzxbx/publictypes/musicenginedeclarations.ts"
+		,"xwaf.ts"
+        ,"zpinstr.ts"
+	]
+}

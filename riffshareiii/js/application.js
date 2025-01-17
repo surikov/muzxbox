@@ -538,6 +538,24 @@ class CommandDispatcher {
         this.renderer.menu.resetAllAnchors();
     }
     ;
+    renderCurrentProjectForOutput() {
+        let forOutput = {
+            series: [],
+            channels: [],
+            filters: []
+        };
+        let prj = this.cfg().data;
+        for (let ff = 0; ff < prj.filters.length; ff++) {
+            let filter = prj.filters[ff];
+            forOutput.filters.push({
+                id: filter.id,
+                kind: filter.kind,
+                properties: filter.dataBlob,
+                outputs: filter.outputs
+            });
+        }
+        return forOutput;
+    }
     toggleStartStop() {
         console.log('toggleStartStop');
         if (this.onAir) {
@@ -552,31 +570,32 @@ class CommandDispatcher {
                 series: [
                     {
                         duration: n120, tempo: 120, items: [
-                            { skip: 0 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] },
-                            { skip: 1 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] },
-                            { skip: 2 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] },
-                            { skip: 3 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] },
-                            { skip: 4 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] },
-                            { skip: 5 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] },
-                            { skip: 6 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] },
-                            { skip: 7 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] }
+                            {
+                                skip: 0 * n120, channelId: 'anymidi1', pitches: [A3 - 0],
+                                slides: [
+                                    { duration: 4 / 16 * n120, delta: -5 },
+                                    { duration: 4 / 16 * n120, delta: 0 },
+                                    { duration: 4 / 16 * n120, delta: 12 },
+                                    { duration: 4 / 16 * n120, delta: 0 }
+                                ]
+                            }
                         ], states: []
                     },
                     {
                         duration: n120, tempo: 120, items: [
-                            { skip: 0 * n120, channelId: 'test1', pitches: [A3 - 0], slides: [{ duration: 1 / 4 * n120, delta: 0 }] },
-                            { skip: 1 / 4 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] },
-                            { skip: 2 / 4 * n120, channelId: 'test1', pitches: [A3 - 0], slides: [{ duration: 1 / 8 * n120, delta: 0 }] },
-                            { skip: 5 / 8 * n120, channelId: 'test1', pitches: [A3 - 5], slides: [{ duration: 1 / 8 * n120, delta: 0 }] },
-                            { skip: 6 / 8 * n120, channelId: 'test1', pitches: [A3 - 4], slides: [{ duration: 1 / 8 * n120, delta: 0 }] },
-                            { skip: 7 / 8 * n120, channelId: 'test1', pitches: [A3 - 2], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
+                            { skip: 0 * n120, channelId: 'anymidi1', pitches: [A3 - 0], slides: [{ duration: 1 / 4 * n120, delta: 0 }] },
+                            { skip: 1 / 4 * n120, channelId: 'anymidi1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] },
+                            { skip: 2 / 4 * n120, channelId: 'anymidi1', pitches: [A3 - 0], slides: [{ duration: 1 / 8 * n120, delta: 0 }] },
+                            { skip: 5 / 8 * n120, channelId: 'anymidi1', pitches: [A3 - 5], slides: [{ duration: 1 / 8 * n120, delta: 0 }] },
+                            { skip: 6 / 8 * n120, channelId: 'anymidi1', pitches: [A3 - 4], slides: [{ duration: 1 / 8 * n120, delta: 0 }] },
+                            { skip: 7 / 8 * n120, channelId: 'anymidi1', pitches: [A3 - 2], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
                         ], states: []
                     },
                     { duration: n120, tempo: 120, items: [], states: [] },
                     { duration: n120, tempo: 120, items: [], states: [] }
                 ],
                 channels: [{
-                        id: 'test1',
+                        id: 'anymidi2',
                         outputs: ['volTest1'],
                         performer: {
                             id: 'test1',
@@ -599,13 +618,21 @@ class CommandDispatcher {
                             kind: 'zdrum1',
                             properties: '38'
                         }
+                    }, {
+                        id: 'anymidi1',
+                        outputs: ['volTest1'],
+                        performer: {
+                            id: 'instest',
+                            kind: 'zinstr1',
+                            properties: '19'
+                        }
                     }
                 ],
                 filters: [
                     {
                         id: 'volTest1',
                         kind: 'zvolume1',
-                        properties: '50%',
+                        properties: '66%',
                         outputs: ['']
                     }
                 ]

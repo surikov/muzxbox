@@ -237,7 +237,6 @@ declare type MZXBX_Schedule = {
     series: MZXBX_Set[];
     channels: MZXBX_Channel[];
     filters: MZXBX_Filter[];
-    outputs: string[];
 };
 declare type MZXBX_Player = {
     setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;

@@ -52,6 +52,13 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 		}
 	}
 	duration(): number {
+		if (this.preset) {
+			if (this.preset.zones.length > 0) {
+				if (this.preset.zones[0].buffer) {
+					return this.preset.zones[0].buffer.duration;
+				}
+			}
+		}
 		return 1;
 	}
 

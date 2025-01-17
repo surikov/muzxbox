@@ -73,6 +73,7 @@ declare class CommandDispatcher {
     registerWorkProject(data: Zvoog_Project): void;
     registerUI(renderer: UIRenderer): void;
     showRightMenu(): void;
+    renderCurrentProjectForOutput(): MZXBX_Schedule;
     toggleStartStop(): void;
     setThemeLocale(loc: string, ratio: number): void;
     setThemeColor(cssPath: string): void;

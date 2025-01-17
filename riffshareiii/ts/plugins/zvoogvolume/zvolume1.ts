@@ -4,7 +4,7 @@ class ZVolImplementation implements MZXBX_AudioFilterPlugin {
 	volume: GainNode;
 	num: number;
 	launch(context: AudioContext, parameters: string): void {
-		console.log('ZVolImplementation launch', parameters);
+		//console.log('ZVolImplementation launch', parameters);
 		this.audioContext = context;
 		this.volume = this.audioContext.createGain();
 		this.num = parseInt(parameters);
@@ -14,10 +14,10 @@ class ZVolImplementation implements MZXBX_AudioFilterPlugin {
 		return null;
 	}
 	schedule(when: number, parameters: string): void {
-		console.log('ZVolImplementation schedule', when, parameters);
+		//console.log('ZVolImplementation schedule', when, parameters);
 		this.volume.gain.setValueAtTime(this.num / 100, when);
 		this.num = parseInt(parameters);
-		this.volume.gain.linearRampToValueAtTime(0.7 * this.num, when + 0.001);
+		this.volume.gain.linearRampToValueAtTime(this.num / 100, when + 0.001);
 
 	}
 	input(): AudioNode | null {
