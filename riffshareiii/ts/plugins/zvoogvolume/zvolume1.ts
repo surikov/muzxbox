@@ -17,6 +17,7 @@ class ZVolImplementation implements MZXBX_AudioFilterPlugin {
 		//console.log('ZVolImplementation schedule', when, parameters);
 		this.volume.gain.setValueAtTime(this.num / 100, when);
 		this.num = parseInt(parameters);
+		//console.log(parameters,this.num, when);
 		this.volume.gain.linearRampToValueAtTime(this.num / 100, when + 0.001);
 
 	}

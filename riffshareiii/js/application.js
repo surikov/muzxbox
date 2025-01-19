@@ -236,7 +236,7 @@ function startApplication() {
     console.log('startApplication v1.6.01');
     let ui = new UIRenderer();
     ui.createUI();
-    globalCommandDispatcher.registerWorkProject(mzxbxProjectForTesting2);
+    globalCommandDispatcher.registerWorkProject(_mzxbxProjectForTesting2);
     globalCommandDispatcher.resetProject();
 }
 function initWebAudioFromUI() {
@@ -512,6 +512,7 @@ class CommandDispatcher {
     constructor() {
         this.tapSizeRatio = 1;
         this.onAir = false;
+        this.neeToStart = false;
         this.listener = null;
         this.exe = new CommandExe();
     }
@@ -554,101 +555,127 @@ class CommandDispatcher {
                 outputs: filter.outputs
             });
         }
+        for (let ss = 0; ss < prj.percussions.length; ss++) {
+            let sampler = prj.percussions[ss];
+            let mchannel = {
+                id: sampler.sampler.id,
+                outputs: sampler.sampler.outputs,
+                performer: {
+                    kind: sampler.sampler.kind,
+                    properties: sampler.sampler.data
+                }
+            };
+            forOutput.channels.push(mchannel);
+        }
+        for (let tt = 0; tt < prj.tracks.length; tt++) {
+            let track = prj.tracks[tt];
+            let mchannel = {
+                id: track.performer.id,
+                outputs: track.performer.outputs,
+                performer: {
+                    kind: track.performer.kind,
+                    properties: track.performer.data
+                }
+            };
+            forOutput.channels.push(mchannel);
+        }
+        for (let mm = 0; mm < prj.timeline.length; mm++) {
+            let measure = prj.timeline[mm];
+            let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
+            let singleSet = {
+                duration: cuDuration,
+                tempo: measure.tempo,
+                items: [],
+                states: []
+            };
+            forOutput.series.push(singleSet);
+            for (let ff = 0; ff < prj.filters.length; ff++) {
+                let filter = prj.filters[ff];
+                let auto = filter.automation[mm];
+                if (auto) {
+                    for (let aa = 0; aa < auto.changes.length; aa++) {
+                        let change = auto.changes[aa];
+                        let start = MMUtil().set(change.skip).duration(measure.tempo);
+                        let filterChange = { skip: start, filterId: filter.id, data: change.stateBlob };
+                        singleSet.states.push(filterChange);
+                    }
+                }
+            }
+            for (let ss = 0; ss < prj.percussions.length; ss++) {
+                let channel = forOutput.channels[ss];
+                let sampler = prj.percussions[ss];
+                let percBar = sampler.measures[mm];
+                if (percBar) {
+                    for (let ski = 0; ski < percBar.skips.length; ski++) {
+                        let askip = percBar.skips[ski];
+                        let start = MMUtil().set(askip).duration(measure.tempo);
+                        let it = { skip: start, channelId: channel.id, pitches: [], slides: [] };
+                        singleSet.items.push(it);
+                    }
+                }
+            }
+            for (let ss = 0; ss < prj.tracks.length; ss++) {
+                let channel = forOutput.channels[ss + prj.percussions.length];
+                let track = prj.tracks[ss];
+                let trackBar = track.measures[mm];
+                if (trackBar) {
+                    for (let ch = 0; ch < trackBar.chords.length; ch++) {
+                        let chord = trackBar.chords[ch];
+                        let start = MMUtil().set(chord.skip).duration(measure.tempo);
+                        let it = { skip: start, channelId: channel.id, pitches: chord.pitches, slides: [] };
+                        singleSet.items.push(it);
+                        for (let kk = 0; kk < chord.slides.length; kk++) {
+                            let one = chord.slides[kk];
+                            it.slides.push({ duration: MMUtil().set(one.duration).duration(measure.tempo), delta: one.delta });
+                        }
+                    }
+                }
+            }
+        }
         return forOutput;
     }
     toggleStartStop() {
-        console.log('toggleStartStop');
+        console.log('toggleStartStop', this.onAir);
         if (this.onAir) {
-            this.onAir = !this.onAir;
+            this.onAir = false;
             this.player.cancel();
         }
         else {
-            this.onAir = !this.onAir;
-            let n120 = 120 / 60;
-            let A3 = 33;
-            let testingschedule = {
-                series: [
-                    {
-                        duration: n120, tempo: 120, items: [
-                            {
-                                skip: 0 * n120, channelId: 'anymidi1', pitches: [A3 - 0],
-                                slides: [
-                                    { duration: 4 / 16 * n120, delta: -5 },
-                                    { duration: 4 / 16 * n120, delta: 0 },
-                                    { duration: 4 / 16 * n120, delta: 12 },
-                                    { duration: 4 / 16 * n120, delta: 0 }
-                                ]
-                            }
-                        ], states: []
-                    },
-                    {
-                        duration: n120, tempo: 120, items: [
-                            { skip: 0 * n120, channelId: 'anymidi1', pitches: [A3 - 0], slides: [{ duration: 1 / 4 * n120, delta: 0 }] },
-                            { skip: 1 / 4 * n120, channelId: 'anymidi1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] },
-                            { skip: 2 / 4 * n120, channelId: 'anymidi1', pitches: [A3 - 0], slides: [{ duration: 1 / 8 * n120, delta: 0 }] },
-                            { skip: 5 / 8 * n120, channelId: 'anymidi1', pitches: [A3 - 5], slides: [{ duration: 1 / 8 * n120, delta: 0 }] },
-                            { skip: 6 / 8 * n120, channelId: 'anymidi1', pitches: [A3 - 4], slides: [{ duration: 1 / 8 * n120, delta: 0 }] },
-                            { skip: 7 / 8 * n120, channelId: 'anymidi1', pitches: [A3 - 2], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
-                        ], states: []
-                    },
-                    { duration: n120, tempo: 120, items: [], states: [] },
-                    { duration: n120, tempo: 120, items: [], states: [] }
-                ],
-                channels: [{
-                        id: 'anymidi2',
-                        outputs: ['volTest1'],
-                        performer: {
-                            id: 'test1',
-                            kind: 'beep1',
-                            properties: 'Nope'
-                        }
-                    }, {
-                        id: 'drumKick1',
-                        outputs: ['volTest1'],
-                        performer: {
-                            id: 'perfKick1',
-                            kind: 'zdrum1',
-                            properties: '35'
-                        }
-                    }, {
-                        id: 'drumSnare1',
-                        outputs: ['volTest1'],
-                        performer: {
-                            id: 'perfSnare1',
-                            kind: 'zdrum1',
-                            properties: '38'
-                        }
-                    }, {
-                        id: 'anymidi1',
-                        outputs: ['volTest1'],
-                        performer: {
-                            id: 'instest',
-                            kind: 'zinstr1',
-                            properties: '19'
-                        }
-                    }
-                ],
-                filters: [
-                    {
-                        id: 'volTest1',
-                        kind: 'zvolume1',
-                        properties: '66%',
-                        outputs: ['']
-                    }
-                ]
-            };
+            this.onAir = true;
+            let schedule = this.renderCurrentProjectForOutput();
+            console.log(schedule);
+            let duration = 0;
+            for (let nn = 0; nn < schedule.series.length; nn++) {
+                duration = duration + schedule.series[nn].duration;
+            }
             let me = this;
-            me.player.setupPlugins(me.audioContext, testingschedule, () => {
-                let msg = me.player.startLoop(0, 0, n120 * 2);
-                if (msg) {
-                    this.onAir = false;
-                    console.log('toggleStartStop cancel', msg);
-                    alert('Wait for ' + msg);
-                }
-                else {
-                    console.log('toggleStartStop setupPlugins done');
-                }
+            let result = me.player.setupPlugins(me.audioContext, schedule, () => {
+                me.neeToStart = true;
+                me.startPlay(0, 0, duration);
             });
+            if (result != null) {
+                this.onAir = false;
+                this.neeToStart = false;
+                me.renderer.warning.showWarning('Start playing', result, null);
+            }
+        }
+    }
+    startPlay(from, position, to) {
+        if (this.neeToStart) {
+            let me = this;
+            let msg = me.player.startLoop(from, position, to);
+            if (msg) {
+                console.log('toggleStartStop cancel', msg);
+                me.renderer.warning.showWarning('Start playing', 'Wait for ' + msg, () => { me.neeToStart = false; me.onAir = false; });
+                setTimeout(() => {
+                    me.startPlay(from, position, to);
+                }, 543);
+            }
+            else {
+                console.log('toggleStartStop setupPlugins done', from, position, to);
+                me.renderer.warning.hideWarning();
+                me.neeToStart = false;
+            }
         }
     }
     setThemeLocale(loc, ratio) {
@@ -3537,11 +3564,13 @@ class DebugLayerUI {
     }
 }
 class WarningUI {
-    constructor() {
-        this.cancel = function () {
-            this.hideWarning();
-        };
+    cancel() {
+        this.hideWarning();
+        if (this.onCancel) {
+            this.onCancel();
+        }
     }
+    ;
     initDialogUI() {
         let me = this;
         this.warningIcon = { x: 0, y: 0, text: icon_warningPlay, css: 'warningIcon' };
@@ -3552,7 +3581,8 @@ class WarningUI {
         this.warningTitle = { x: 0, y: 0, text: 'Play', css: 'warningTitle' };
         this.warningDescription = { x: 0, y: 0, text: 'Use mouse or touchpad to move and zoom piano roll', css: 'warningDescription' };
         this.warningGroup = document.getElementById("warningDialogGroup");
-        this.warningRectangle = { x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: () => {
+        this.warningRectangle = {
+            x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: () => {
                 globalCommandDispatcher.initAudioFromUI();
                 me.cancel();
             }
@@ -3579,7 +3609,7 @@ class WarningUI {
         this.warningTitle.x = ww / 2;
         this.warningTitle.y = hh / 3 + 1.5;
         this.warningDescription.x = ww / 2;
-        this.warningDescription.y = hh / 3 + 2;
+        this.warningDescription.y = hh / 3 + 2.5;
         this.warningInfo1.x = ww / 2 - 3;
         this.warningInfo1.y = hh - 1.5;
         this.warningInfo2.x = ww / 2 - 1.5;
@@ -3593,14 +3623,20 @@ class WarningUI {
     allLayers() {
         return [this.warningLayer];
     }
-    showWarning() {
+    showWarning(title, msg, onCancel) {
+        console.log('WarningUI show', title, msg);
+        this.onCancel = onCancel;
+        this.warningTitle.text = title;
+        this.warningDescription.text = msg;
+        globalCommandDispatcher.renderer.tiler.resetAnchor(this.warningGroup, this.warningAnchor, LevelModes.overlay);
         document.getElementById("warningDialogGroup").style.visibility = "visible";
     }
     hideWarning() {
         document.getElementById("warningDialogGroup").style.visibility = "hidden";
+        this.onCancel = null;
     }
 }
-let mzxbxProjectForTesting2 = {
+let _mzxbxProjectForTesting2 = {
     title: 'test data for debug',
     versionCode: '1',
     list: false,
@@ -3647,7 +3683,7 @@ let mzxbxProjectForTesting2 = {
                     ]
                 }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'firstPerfoemrID', data: '', kind: 'basePitched', outputs: ['track1Volme'], iconPosition: { x: 40, y: 20 } }
+            performer: { id: 'firstPerfoemrID', data: '77', kind: 'zinstr1', outputs: ['track1Volme'], iconPosition: { x: 40, y: 20 } }
         },
         {
             title: "Second track", volume: 1, measures: [
@@ -3657,24 +3693,24 @@ let mzxbxProjectForTesting2 = {
                     ]
                 }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 } }
+            performer: { id: 'secTrPerfId', data: '34', kind: 'zinstr1', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 } }
         },
         {
             title: "Third track", volume: 1, measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'at3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 } }
+            performer: { id: 'at3', data: '23', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 } }
         },
         {
             title: "A track 1", volume: 1, measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'bt3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 } }
+            performer: { id: 'bt3', data: '29', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 } }
         }, {
             title: "A track 987654321", volume: 1, measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'ct3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 77, y: 66 } }
+            performer: { id: 'ct3', data: '44', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 77, y: 66 } }
         }
     ],
     percussions: [
@@ -3682,15 +3718,15 @@ let mzxbxProjectForTesting2 = {
             title: "Snare", volume: 1, measures: [
                 { skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
             ],
-            sampler: { id: 'd1', data: '', kind: 'baseSampler', outputs: ['drum1Volme'], iconPosition: { x: 22, y: 75 } }
+            sampler: { id: 'd1', data: '39', kind: 'zdrum1', outputs: ['drum1Volme'], iconPosition: { x: 22, y: 75 } }
         },
         {
             title: "Snare2", volume: 1, measures: [],
-            sampler: { id: 'd2', data: '', kind: 'baseSampler', outputs: ['drum2Volme'], iconPosition: { x: 22, y: 91 } }
+            sampler: { id: 'd2', data: '41', kind: 'zdrum1', outputs: ['drum2Volme'], iconPosition: { x: 22, y: 91 } }
         },
         {
             title: "Snare3", volume: 1, measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }],
-            sampler: { id: 'd3', data: '', kind: 'baseSampler', outputs: ['drum3Volme'], iconPosition: { x: 22, y: 99 } }
+            sampler: { id: 'd3', data: '47', kind: 'zdrum1', outputs: ['drum3Volme'], iconPosition: { x: 22, y: 99 } }
         }
     ],
     comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16', row: 0 }] }, {
@@ -3717,158 +3753,35 @@ let mzxbxProjectForTesting2 = {
         { points: [{ skip: { count: 2, part: 16 }, text: '5-2/16', row: 0 }] }],
     filters: [
         {
-            id: 'volumeSlide', kind: 'baseVolume', dataBlob: '', outputs: ['masterVolme'],
-            automation: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }] }, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }],
+            id: 'volumeSlide', kind: 'zvolume1', dataBlob: '99', outputs: ['masterVolme'],
+            automation: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: '99' }, { skip: { count: 1, part: 16 }, stateBlob: '99' }] },
+                { changes: [{ skip: { count: 1, part: 4 }, stateBlob: '99' }] }],
             iconPosition: { x: 152, y: 39 }
         },
         {
-            id: 'masterVolme', kind: 'base_volume', dataBlob: 'bb1', outputs: [''],
-            automation: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }],
+            id: 'masterVolme', kind: 'zvolume1', dataBlob: '99', outputs: [''],
+            automation: [{ changes: [] }, { changes: [] },
+                {
+                    changes: [
+                        { skip: { count: 1, part: 16 }, stateBlob: '99' },
+                        { skip: { count: 2, part: 16 }, stateBlob: '99' },
+                        { skip: { count: 3, part: 16 }, stateBlob: '99' },
+                        { skip: { count: 4, part: 16 }, stateBlob: '99' },
+                        { skip: { count: 5, part: 16 }, stateBlob: '99' },
+                        { skip: { count: 6, part: 16 }, stateBlob: '99' },
+                        { skip: { count: 7, part: 16 }, stateBlob: '99' }
+                    ]
+                },
+                { changes: [] }],
             iconPosition: { x: 188, y: 7 }
         },
-        { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 }, automation: [] },
-        { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 }, automation: [] },
-        { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 }, automation: [] },
-        { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 }, automation: [] },
-        { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [] },
-        { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [] },
-        { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [] }
-    ]
-};
-let mzxbxProjectForTesting3 = {
-    title: 'test 33 data for debug',
-    versionCode: '1',
-    list: false,
-    selectedPart: { startMeasure: 1, endMeasure: 2 },
-    undo: [],
-    redo: [],
-    position: { x: -13037.9, y: -1317.9, z: 4.007 },
-    timeline: [
-        { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 201, metre: { count: 3, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } },
-        { tempo: 200, metre: { count: 3, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } },
-        { tempo: 200, metre: { count: 3, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } },
-        { tempo: 200, metre: { count: 3, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } }
-    ],
-    tracks: [
-        {
-            title: "Second track", volume: 1, measures: [
-                {
-                    chords: [
-                        { skip: { count: 3, part: 4 }, pitches: [77], slides: [{ duration: { count: 13, part: 8 }, delta: -1 }] }
-                    ]
-                }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
-            ],
-            performer: { id: 'secTrPerfId', data: '', kind: 'basePitched', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 } }
-        },
-        {
-            title: "A track 1", volume: 1, measures: [
-                { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
-            ],
-            performer: { id: 'bt3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 } }
-        },
-        {
-            title: "Track one", volume: 1, measures: [
-                {
-                    chords: [
-                        { skip: { count: 0, part: 1 }, pitches: [25], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
-                        { skip: { count: 1, part: 16 }, pitches: [26], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
-                        { skip: { count: 1, part: 8 }, pitches: [27], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
-                        { skip: { count: 3, part: 16 }, pitches: [28], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
-                        { skip: { count: 1, part: 4 }, pitches: [29], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
-                        { skip: { count: 5, part: 16 }, pitches: [30], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
-                        { skip: { count: 3, part: 8 }, pitches: [31], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
-                        { skip: { count: 7, part: 16 }, pitches: [32], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
-                        { skip: { count: 1, part: 2 }, pitches: [33], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }
-                    ]
-                }, {
-                    chords: [
-                        {
-                            skip: { count: 0, part: 2 }, pitches: [60], slides: [
-                                { duration: { count: 1, part: 8 }, delta: 5 },
-                                { duration: { count: 1, part: 8 }, delta: -57 },
-                                { duration: { count: 1, part: 4 }, delta: 0 }
-                            ]
-                        }
-                    ]
-                }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
-            ],
-            performer: { id: 'firstPerfoemrID', data: '', kind: 'basePitched', outputs: ['track1Volme'], iconPosition: { x: 40, y: 20 } }
-        },
-        {
-            title: "Third track", volume: 1, measures: [
-                { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
-            ],
-            performer: { id: 'at3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 } }
-        },
-        {
-            title: "A track 987654321", volume: 1, measures: [
-                { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
-            ],
-            performer: { id: 'ct3', data: '', kind: 'basePitched', outputs: ['track3Volme'], iconPosition: { x: 77, y: 66 } }
-        }
-    ],
-    percussions: [
-        {
-            title: "Snare", volume: 1, measures: [
-                { skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
-            ],
-            sampler: { id: 'd1', data: '', kind: 'baseSampler', outputs: ['drum1Volme'], iconPosition: { x: 22, y: 75 } }
-        },
-        {
-            title: "Snare2", volume: 1, measures: [],
-            sampler: { id: 'd2', data: '', kind: 'baseSampler', outputs: ['drum2Volme'], iconPosition: { x: 22, y: 91 } }
-        },
-        {
-            title: "Snare3", volume: 1, measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }],
-            sampler: { id: 'd3', data: '', kind: 'baseSampler', outputs: ['drum3Volme'], iconPosition: { x: 22, y: 99 } }
-        }
-    ],
-    comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16', row: 0 }] }, {
-            points: [
-                { skip: { count: 0, part: 16 }, text: '20', row: 0 },
-                { skip: { count: 1, part: 16 }, text: '21', row: 1 },
-                { skip: { count: 2, part: 16 }, text: '22', row: 2 },
-                { skip: { count: 3, part: 16 }, text: '23', row: 0 },
-                { skip: { count: 4, part: 16 }, text: '24', row: 1 },
-                { skip: { count: 5, part: 16 }, text: '25', row: 2 },
-                { skip: { count: 6, part: 16 }, text: '26', row: 0 },
-                { skip: { count: 7, part: 16 }, text: '27', row: 1 },
-                { skip: { count: 8, part: 16 }, text: '28\ntest', row: 2 },
-                { skip: { count: 9, part: 16 }, text: '29', row: 0 },
-                { skip: { count: 10, part: 16 }, text: '2-10', row: 1 },
-                { skip: { count: 11, part: 16 }, text: '2-11', row: 2 },
-                { skip: { count: 12, part: 16 }, text: '2-12', row: 0 },
-                { skip: { count: 13, part: 16 }, text: '2-13', row: 1 },
-                { skip: { count: 14, part: 16 }, text: '2-14', row: 2 },
-                { skip: { count: 15, part: 16 }, text: '2-15', row: 0 }
-            ]
-        }, { points: [{ skip: { count: 2, part: 16 }, text: '3-2/16', row: 0 }] },
-        { points: [{ skip: { count: 2, part: 16 }, text: '4-2/16', row: 0 }] },
-        { points: [{ skip: { count: 2, part: 16 }, text: '5-2/16', row: 0 }] }],
-    filters: [
-        {
-            id: 'volumeSlide', kind: 'baseVolume', dataBlob: '', outputs: ['masterVolme'],
-            automation: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: 'sss' }, { skip: { count: 1, part: 16 }, stateBlob: 'sss' }] }, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: 'sss2' }] }],
-            iconPosition: { x: 152, y: 39 }
-        },
-        {
-            id: 'masterVolme', kind: 'base_volume', dataBlob: 'bb1', outputs: [''],
-            automation: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }],
-            iconPosition: { x: 188, y: 7 }
-        },
-        { id: 'allDrumsVolme', kind: 'base_volume', dataBlob: '', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 }, automation: [] },
-        { id: 'drum1Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 }, automation: [] },
-        { id: 'drum2Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 }, automation: [] },
-        { id: 'drum3Volme', kind: 'base_volume', dataBlob: '', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 }, automation: [] },
-        { id: 'track1Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [] },
-        { id: 'track2Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [] },
-        { id: 'track3Volme', kind: 'base_volume', dataBlob: '', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [] }
+        { id: 'allDrumsVolme', kind: 'zvolume1', dataBlob: '99', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 }, automation: [] },
+        { id: 'drum1Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 }, automation: [] },
+        { id: 'drum2Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 }, automation: [] },
+        { id: 'drum3Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 }, automation: [] },
+        { id: 'track1Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [] },
+        { id: 'track2Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [] },
+        { id: 'track3Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [] }
     ]
 };
 class MixerDataMathUtility {

@@ -6,7 +6,7 @@ function startApplication() {
     //let commands = new CommandDispatcher();
     let ui = new UIRenderer();
     ui.createUI();
-    globalCommandDispatcher.registerWorkProject(mzxbxProjectForTesting2);
+    globalCommandDispatcher.registerWorkProject(_mzxbxProjectForTesting2);
     globalCommandDispatcher.resetProject();
     //ui.fillWholeUI();//testBigMixerData);//testEmptyMixerData);
     //testNumMathUtil();

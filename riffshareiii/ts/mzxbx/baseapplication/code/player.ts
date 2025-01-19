@@ -49,13 +49,15 @@ class SchedulePlayer implements MZXBX_Player {
 	tickDuration = 0.25;
 	onAir = false;
 
-	setupPlugins(context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void): void {
+	setupPlugins(context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void): null | string {
 		this.audioContext = context;
 		this.schedule = schedule;
 		//this.stateSetupDone = false;
 		if (this.schedule) {
 			let pluginLoader: PluginLoader = new PluginLoader();
-			pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers, onDone);
+			return pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers, onDone);
+		} else {
+			return 'Empty schedule';
 		}
 	}
 
@@ -100,17 +102,17 @@ class SchedulePlayer implements MZXBX_Player {
 			let plugin: MZXBX_AudioFilterPlugin | null = this.filters[ff].plugin;
 			if (plugin) {
 				if (plugin.busy()) {
-					return 'filter ' + this.filters[ff].id + ' ' + plugin.busy();
+					return 'filter ' + this.filters[ff].filterId + ' ' + plugin.busy();
 				}
 			} else {
-				return 'empty plugin for filter ' + this.filters[ff].id;
+				return 'empty plugin for filter ' + this.filters[ff].filterId;
 			}
 		}
 		for (let pp = 0; pp < this.performers.length; pp++) {
 			let plugin: MZXBX_AudioPerformerPlugin | null = this.performers[pp].plugin;
 			if (plugin) {
 				if (plugin.busy()) {
-					return 'performer ' + this.performers[pp].id + ' ' + plugin.busy();
+					return 'performer ' + this.performers[pp].channelId + ' ' + plugin.busy();
 				}
 			} else {
 				return 'empty performer ' + this.performers[pp];
@@ -165,10 +167,10 @@ class SchedulePlayer implements MZXBX_Player {
 					for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
 						let filter = this.schedule.filters[ff];
 						let plugin = this.findFilterPlugin(filter.id);
-						
+
 						if (plugin) {
 							let pluginOutput = plugin.output();
-							
+
 							if (pluginOutput) {
 								/*(pluginOutput as any).debug = filter.id;
 								pluginOutput.connect(masterOutput);
@@ -185,9 +187,9 @@ class SchedulePlayer implements MZXBX_Player {
 									if (outId) {
 										let target = this.findFilterPlugin(outId);
 										if (target) {
-											targetNode = target.input();											
+											targetNode = target.input();
 										}
-										
+
 									}
 									if (targetNode) {
 										console.log('connect filter', filter.id, outId);
@@ -230,9 +232,9 @@ class SchedulePlayer implements MZXBX_Player {
 										let target = this.findFilterPlugin(outId);
 										if (target) {
 											targetNode = target.input();
-											
+
 										}
-										
+
 									}
 									if (targetNode) {
 										console.log('connect channel', channel.id, outId);
@@ -275,7 +277,7 @@ class SchedulePlayer implements MZXBX_Player {
 								let target = this.findFilterPlugin(outId);
 								if (target) {
 									targetNode = target.input();
-									
+
 								}
 							}
 							if (targetNode) {
@@ -322,7 +324,7 @@ class SchedulePlayer implements MZXBX_Player {
 									let target = this.findFilterPlugin(outId);
 									if (target) {
 										targetNode = target.input();
-										
+
 									}
 								}
 								if (targetNode) {
@@ -372,10 +374,10 @@ class SchedulePlayer implements MZXBX_Player {
 		if (this.schedule) {
 			for (let ii = 0; ii < this.schedule.channels.length; ii++) {
 				if (this.schedule.channels[ii].id == channelId) {
-					let performerId = this.schedule.channels[ii].performer.id;
+					//let performerId = this.schedule.channels[ii].performer.id;
 					for (let nn = 0; nn < this.performers.length; nn++) {
 						let performer = this.performers[nn];
-						if (performerId == performer.id) {
+						if (channelId == performer.channelId) {
 							if (performer.plugin) {
 								let plugin: MZXBX_AudioPerformerPlugin = performer.plugin;
 								return plugin;
@@ -420,7 +422,7 @@ class SchedulePlayer implements MZXBX_Player {
 		if (this.schedule) {
 			for (let nn = 0; nn < this.filters.length; nn++) {
 				let filter = this.filters[nn];
-				if (filter.id == filterId) {
+				if (filter.filterId == filterId) {
 					if (filter.plugin) {
 						let plugin: MZXBX_AudioFilterPlugin = filter.plugin;
 						if (plugin) {

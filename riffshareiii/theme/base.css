@@ -222,7 +222,7 @@ body {
 .warningDescription {
 	font-size222: calc(0.33*var(--tapSize));
 	font-size: var(--label-04cm);
-	fill: var(--drag-color);
+	fill: var(--line-color);
 	text-anchor: middle;
 	pointer-events: none;
 }

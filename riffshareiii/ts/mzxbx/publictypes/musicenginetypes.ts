@@ -211,14 +211,14 @@ type MZXBX_CachedWave = {
 };
 type MZXBX_FilterHolder = {
 	plugin: MZXBX_AudioFilterPlugin | null
-	, id: string
+	, filterId: string
 	, kind: string
 	, properties: string
 	, launched: boolean
 };
 type MZXBX_PerformerHolder = {
 	plugin: MZXBX_AudioPerformerPlugin | null
-	, id: string
+	, channelId: string
 	, kind: string
 	, properties: string
 	, launched: boolean
@@ -281,7 +281,7 @@ type MZXBX_AudioSamplerPlugin = {
 };
 
 type MZXBX_ChannelSource = {
-	id: string;
+	//id: string;
 	kind: string;
 	properties: string;
 };
@@ -299,7 +299,7 @@ type MZXBX_Schedule = {
 	filters: MZXBX_Filter[];
 };
 type MZXBX_Player = {
-	setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;
+	setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => string|null;
 	startLoop: (from: number, position: number, to: number) => string;
 	cancel: () => void;
 	allFilters(): MZXBX_FilterHolder[];

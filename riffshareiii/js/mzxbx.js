@@ -97,7 +97,10 @@ class SchedulePlayer {
         this.schedule = schedule;
         if (this.schedule) {
             let pluginLoader = new PluginLoader();
-            pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers, onDone);
+            return pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers, onDone);
+        }
+        else {
+            return 'Empty schedule';
         }
     }
     allFilters() {
@@ -128,18 +131,18 @@ class SchedulePlayer {
             let plugin = this.filters[ff].plugin;
             if (plugin) {
                 if (plugin.busy()) {
-                    return 'filter ' + this.filters[ff].id + ' ' + plugin.busy();
+                    return 'filter ' + this.filters[ff].filterId + ' ' + plugin.busy();
                 }
             }
             else {
-                return 'empty plugin for filter ' + this.filters[ff].id;
+                return 'empty plugin for filter ' + this.filters[ff].filterId;
             }
         }
         for (let pp = 0; pp < this.performers.length; pp++) {
             let plugin = this.performers[pp].plugin;
             if (plugin) {
                 if (plugin.busy()) {
-                    return 'performer ' + this.performers[pp].id + ' ' + plugin.busy();
+                    return 'performer ' + this.performers[pp].channelId + ' ' + plugin.busy();
                 }
             }
             else {
@@ -312,10 +315,9 @@ class SchedulePlayer {
         if (this.schedule) {
             for (let ii = 0; ii < this.schedule.channels.length; ii++) {
                 if (this.schedule.channels[ii].id == channelId) {
-                    let performerId = this.schedule.channels[ii].performer.id;
                     for (let nn = 0; nn < this.performers.length; nn++) {
                         let performer = this.performers[nn];
-                        if (performerId == performer.id) {
+                        if (channelId == performer.channelId) {
                             if (performer.plugin) {
                                 let plugin = performer.plugin;
                                 return plugin;
@@ -342,7 +344,7 @@ class SchedulePlayer {
         if (this.schedule) {
             for (let nn = 0; nn < this.filters.length; nn++) {
                 let filter = this.filters[nn];
-                if (filter.id == filterId) {
+                if (filter.filterId == filterId) {
                     if (filter.plugin) {
                         let plugin = filter.plugin;
                         if (plugin) {
@@ -409,30 +411,37 @@ class PluginLoader {
         }
         for (let ch = 0; ch < schedule.channels.length; ch++) {
             let performer = schedule.channels[ch].performer;
-            this.сollectPerformerPlugin(performer.id, performer.kind, performer.properties, performers);
+            let chanid = schedule.channels[ch].id;
+            this.сollectPerformerPlugin(chanid, performer.kind, performer.properties, performers);
         }
-        this.startLoadCollectedPlugins(filters, performers, afterLoad);
+        let result = this.startLoadCollectedPlugins(filters, performers, afterLoad);
+        return result;
     }
     startLoadCollectedPlugins(filters, performers, afterLoad) {
         for (let ff = 0; ff < filters.length; ff++) {
             if (!(filters[ff].plugin)) {
-                this.startLoadPluginStarter(filters[ff].kind, filters, performers, (plugin) => {
+                let result = this.startLoadPluginStarter(filters[ff].kind, filters, performers, (plugin) => {
                     filters[ff].plugin = plugin;
                     console.log('assign filter', ff, plugin);
                 }, afterLoad);
-                return;
+                if (result != null) {
+                    return result;
+                }
             }
         }
         for (let pp = 0; pp < performers.length; pp++) {
             if (!(performers[pp].plugin)) {
-                this.startLoadPluginStarter(performers[pp].kind, filters, performers, (plugin) => {
+                let result = this.startLoadPluginStarter(performers[pp].kind, filters, performers, (plugin) => {
                     performers[pp].plugin = plugin;
                     console.log('assign performer', pp, performers[pp]);
                 }, afterLoad);
-                return;
+                if (result != null) {
+                    return result;
+                }
             }
         }
         afterLoad();
+        return null;
     }
     startLoadPluginStarter(kind, filters, performers, onDone, afterLoad) {
         let tt = this.findPluginInfo(kind);
@@ -449,28 +458,30 @@ class PluginLoader {
                     this.startLoadCollectedPlugins(filters, performers, afterLoad);
                 }
             });
+            return null;
         }
         else {
             console.log('Not found registration for', kind);
+            return 'Not found registration for ' + kind;
         }
     }
     сollectFilterPlugin(id, kind, properties, filters) {
         for (let ii = 0; ii < filters.length; ii++) {
-            if (filters[ii].id == id) {
+            if (filters[ii].filterId == id) {
                 filters[ii].properties = properties;
                 return;
             }
         }
-        filters.push({ plugin: null, id: id, kind: kind, properties: properties, launched: false });
+        filters.push({ plugin: null, filterId: id, kind: kind, properties: properties, launched: false });
     }
     сollectPerformerPlugin(id, kind, properties, performers) {
         for (let ii = 0; ii < performers.length; ii++) {
-            if (performers[ii].id == id) {
+            if (performers[ii].channelId == id) {
                 performers[ii].properties = properties;
                 return;
             }
         }
-        performers.push({ plugin: null, id: id, kind: kind, properties: properties, launched: false });
+        performers.push({ plugin: null, channelId: id, kind: kind, properties: properties, launched: false });
     }
     findPluginInfo(kind) {
         for (let ll = 0; ll < MZXBX_currentPlugins().length; ll++) {

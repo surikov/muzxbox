@@ -6,6 +6,8 @@ class CommandDispatcher {
 	audioContext: AudioContext;
 	tapSizeRatio: number = 1;
 	onAir = false;
+	neeToStart = false;
+
 	_mixerDataMathUtility: MixerDataMathUtility;
 	listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any) = null;
 	exe: CommandExe = new CommandExe();
@@ -77,137 +79,135 @@ class CommandDispatcher {
 				, outputs: filter.outputs
 			});
 		}
+		for (let ss = 0; ss < prj.percussions.length; ss++) {
+			let sampler = prj.percussions[ss];
+			let mchannel: MZXBX_Channel = {
+				id: sampler.sampler.id
+				, outputs: sampler.sampler.outputs
+				, performer: {
+					//id: sampler.sampler.id
+					kind: sampler.sampler.kind
+					, properties: sampler.sampler.data
+				}
+			};
+			forOutput.channels.push(mchannel);
+		}
+
+		for (let tt = 0; tt < prj.tracks.length; tt++) {
+			let track = prj.tracks[tt];
+			let mchannel: MZXBX_Channel = {
+				id: track.performer.id
+				, outputs: track.performer.outputs
+				, performer: {
+					//id: track.performer.id
+					kind: track.performer.kind
+					, properties: track.performer.data
+				}
+			};
+			forOutput.channels.push(mchannel);
+		}
+		//let cuStart = 0;
+		for (let mm = 0; mm < prj.timeline.length; mm++) {
+			let measure: Zvoog_SongMeasure = prj.timeline[mm];
+			let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
+			let singleSet: MZXBX_Set = {
+				duration: cuDuration
+				, tempo: measure.tempo
+				, items: []
+				, states: []
+			};
+			forOutput.series.push(singleSet);
+			for (let ff = 0; ff < prj.filters.length; ff++) {
+				let filter = prj.filters[ff];
+				let auto = filter.automation[mm];
+				if (auto) {
+					for (let aa = 0; aa < auto.changes.length; aa++) {
+						let change = auto.changes[aa];
+						let start = MMUtil().set(change.skip).duration(measure.tempo);
+						let filterChange: MZXBX_FilterState = { skip: start, filterId: filter.id, data: change.stateBlob };
+						singleSet.states.push(filterChange);
+					}
+				}
+			}
+			for (let ss = 0; ss < prj.percussions.length; ss++) {
+				let channel = forOutput.channels[ss];
+				let sampler = prj.percussions[ss];
+				let percBar = sampler.measures[mm];
+				if (percBar) {
+					for (let ski = 0; ski < percBar.skips.length; ski++) {
+						let askip = percBar.skips[ski];
+						let start = MMUtil().set(askip).duration(measure.tempo);
+						let it: MZXBX_PlayItem = { skip: start, channelId: channel.id, pitches: [], slides: [] };
+						singleSet.items.push(it);
+					}
+				}
+			}
+			for (let ss = 0; ss < prj.tracks.length; ss++) {
+				let channel = forOutput.channels[ss + prj.percussions.length];
+				let track = prj.tracks[ss];
+				let trackBar = track.measures[mm];
+				if (trackBar) {
+					for (let ch = 0; ch < trackBar.chords.length; ch++) {
+						let chord = trackBar.chords[ch];
+						//for (let ski = 0; ski < trackBar.skips.length; ski++) {
+						//let askip = trackBar.skips[ski];
+						let start = MMUtil().set(chord.skip).duration(measure.tempo);
+						let it: MZXBX_PlayItem = { skip: start, channelId: channel.id, pitches: chord.pitches, slides: [] };
+						singleSet.items.push(it);
+						for (let kk = 0; kk < chord.slides.length; kk++) {
+							let one = chord.slides[kk];
+							it.slides.push({ duration: MMUtil().set(one.duration).duration(measure.tempo), delta: one.delta });
+						}
+						//}
+					}
+				}
+			}
+		}
 		return forOutput;
 	}
 	toggleStartStop() {
-		console.log('toggleStartStop');
+		console.log('toggleStartStop', this.onAir);
 		if (this.onAir) {
-			this.onAir = !this.onAir;
+			this.onAir = false;
 			this.player.cancel();
 		} else {
-			this.onAir = !this.onAir;
-			let n120 = 120 / 60;
-			let A3 = 33;
-			let testingschedule: MZXBX_Schedule = {
-				series: [
-					{
-						duration: n120, tempo: 120, items: [
-							{
-								skip: 0 * n120, channelId: 'anymidi1', pitches: [A3 - 0]
-								, slides: [
-									{ duration: 4 / 16 * n120, delta: -5 }
-									, { duration: 4 / 16 * n120, delta: 0 }
-									, { duration: 4 / 16 * n120, delta: 12 }
-									, { duration: 4 / 16 * n120, delta: 0 }
-								]
-							}
-							//, { skip: 1 / 4 * n120, channelId: 'anymidi1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
-							//, { skip: 2 / 4 * n120, channelId: 'anymidi1', pitches: [A3 - 0], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
-							//, { skip: 3 / 4 * n120, channelId: 'anymidi1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
-							/*
-														{ skip: 0 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] }
-														, { skip: 1 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] }
-														, { skip: 2 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] }
-														, { skip: 3 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] }
-							
-														, { skip: 4 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] }
-														, { skip: 5 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] }
-														, { skip: 6 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] }
-														, { skip: 7 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] }
-														, {
-															skip: 0 * n120, channelId: 'anymidi1', pitches: [A3 - 0 - 4], slides: [
-																{ duration: 2 / 16 * n120, delta: 4 }
-																, { duration: 2 / 16 * n120, delta: 0 }]
-														}*/
-						], states: [
-							/*{ skip: 0 / 8 * n120, filterId: 'volTest1', data: '99%' }
-							, { skip: 1 / 8 * n120, filterId: 'volTest1', data: '88%' }
-							, { skip: 3 / 8 * n120, filterId: 'volTest1', data: '77%' }
-							, { skip: 4 / 8 * n120, filterId: 'volTest1', data: '66%' }
-							, { skip: 5 / 8 * n120, filterId: 'volTest1', data: '55%' }
-							, { skip: 6 / 8 * n120, filterId: 'volTest1', data: '44%' }
-							, { skip: 7 / 8 * n120, filterId: 'volTest1', data: '33%' }
-*/
-						]
-					}
-					, {
-						duration: n120, tempo: 120, items: [
-							{ skip: 0 * n120, channelId: 'anymidi1', pitches: [A3 - 0], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
-							, { skip: 1 / 4 * n120, channelId: 'anymidi1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
-							, { skip: 2 / 4 * n120, channelId: 'anymidi1', pitches: [A3 - 0], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
-							, { skip: 5 / 8 * n120, channelId: 'anymidi1', pitches: [A3 - 5], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
-							, { skip: 6 / 8 * n120, channelId: 'anymidi1', pitches: [A3 - 4], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
-							, { skip: 7 / 8 * n120, channelId: 'anymidi1', pitches: [A3 - 2], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
-						], states: [
-							/*{ skip: 0 / 8 * n120, filterId: 'volTest1', data: '22%' }
-							, { skip: 1 / 8 * n120, filterId: 'volTest1', data: '11%' }
-							, { skip: 3 / 8 * n120, filterId: 'volTest1', data: '1%' }
-							, { skip: 4 / 8 * n120, filterId: 'volTest1', data: '22%' }
-							, { skip: 5 / 8 * n120, filterId: 'volTest1', data: '33%' }
-							, { skip: 6 / 8 * n120, filterId: 'volTest1', data: '66%' }
-							, { skip: 7 / 8 * n120, filterId: 'volTest1', data: '99%' }*/
-						]
-					}
-					, { duration: n120, tempo: 120, items: [], states: [] }
-					, { duration: n120, tempo: 120, items: [], states: [] }
-				]
-				, channels: [{
-					id: 'anymidi2'
-					, outputs: ['volTest1']
-					, performer: {
-						id: 'test1'
-						, kind: 'beep1'
-						, properties: 'Nope'
-					}
-				}, {
-					id: 'drumKick1'
-					, outputs: ['volTest1']
-					, performer: {
-						id: 'perfKick1'
-						, kind: 'zdrum1'
-						, properties: '35'
-					}
-				}, {
-					id: 'drumSnare1'
-					, outputs: ['volTest1']
-					, performer: {
-						id: 'perfSnare1'
-						, kind: 'zdrum1'
-						, properties: '38'
-					}
-				}, {
-					id: 'anymidi1'
-					, outputs: ['volTest1']
-					, performer: {
-						id: 'instest'
-						, kind: 'zinstr1'
-						, properties: '19'
-					}
-				}
+			this.onAir = true;
 
-
-				]
-				, filters: [
-					{
-						id: 'volTest1'
-						, kind: 'zvolume1'
-						, properties: '66%'
-						, outputs: ['']
-					}
-				]
-			};
+			let schedule = this.renderCurrentProjectForOutput();
+			console.log(schedule);
+			let duration = 0;
+			for (let nn = 0; nn < schedule.series.length; nn++) {
+				duration = duration+schedule.series[nn].duration;
+			}
 			let me = this;
-			me.player.setupPlugins(me.audioContext, testingschedule, () => {
-
-				let msg: string = me.player.startLoop(0, 0, n120 * 2);
-				if (msg) {
-					this.onAir = false;
-					console.log('toggleStartStop cancel', msg);
-					alert('Wait for ' + msg);
-				} else {
-					console.log('toggleStartStop setupPlugins done');
-				}
+			let result=me.player.setupPlugins(me.audioContext, schedule, () => {
+				me.neeToStart = true;
+				me.startPlay(0, 0, duration);
 			});
+			if(result!=null){
+				this.onAir =false;
+				this.neeToStart = false;
+				me.renderer.warning.showWarning('Start playing', result, null);
+			}
+		}
+	}
+	startPlay(from: number, position: number, to: number) {
+		if (this.neeToStart) {
+			let me = this;
+			//let n120 = 120 / 60;
+			let msg: string = me.player.startLoop(from, position, to);
+			if (msg) {
+				//me.onAir = false;
+				console.log('toggleStartStop cancel', msg);
+				me.renderer.warning.showWarning('Start playing', 'Wait for ' + msg, () => { me.neeToStart = false; me.onAir = false; });
+				setTimeout(() => {
+					me.startPlay(from, position, to);
+				}, 543);
+			} else {
+				console.log('toggleStartStop setupPlugins done',from,position,to);
+				me.renderer.warning.hideWarning();
+				me.neeToStart = false;
+			}
 		}
 	}
 	setThemeLocale(loc: string, ratio: number) {
@@ -339,3 +339,119 @@ class CommandDispatcher {
 }
 let globalCommandDispatcher = new CommandDispatcher();
 let pluginDialogPrompt = new PluginDialogPrompt();
+
+
+
+/*
+let n120 = 120 / 60;
+			let A3 = 33;
+			let testingschedule: MZXBX_Schedule = {
+				series: [
+					{
+						duration: n120, tempo: 120, items: [
+							{
+								skip: 0 * n120, channelId: 'anymidi1', pitches: [A3 - 0]
+								, slides: [
+									{ duration: 4 / 16 * n120, delta: -5 }
+									, { duration: 4 / 16 * n120, delta: 0 }
+									, { duration: 4 / 16 * n120, delta: 12 }
+									, { duration: 4 / 16 * n120, delta: 0 }
+								]
+							}
+							//, { skip: 1 / 4 * n120, channelId: 'anymidi1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
+							//, { skip: 2 / 4 * n120, channelId: 'anymidi1', pitches: [A3 - 0], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
+							//, { skip: 3 / 4 * n120, channelId: 'anymidi1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
+							/*
+														{ skip: 0 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] }
+														, { skip: 1 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] }
+														, { skip: 2 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] }
+														, { skip: 3 / 8 * n120, channelId: 'drumKick1', pitches: [0], slides: [] }
+							
+														, { skip: 4 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] }
+														, { skip: 5 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] }
+														, { skip: 6 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] }
+														, { skip: 7 / 8 * n120, channelId: 'drumSnare1', pitches: [0], slides: [] }
+														, {
+															skip: 0 * n120, channelId: 'anymidi1', pitches: [A3 - 0 - 4], slides: [
+																{ duration: 2 / 16 * n120, delta: 4 }
+																, { duration: 2 / 16 * n120, delta: 0 }]
+														}*
+													], states: [
+														/*{ skip: 0 / 8 * n120, filterId: 'volTest1', data: '99%' }
+														, { skip: 1 / 8 * n120, filterId: 'volTest1', data: '88%' }
+														, { skip: 3 / 8 * n120, filterId: 'volTest1', data: '77%' }
+														, { skip: 4 / 8 * n120, filterId: 'volTest1', data: '66%' }
+														, { skip: 5 / 8 * n120, filterId: 'volTest1', data: '55%' }
+														, { skip: 6 / 8 * n120, filterId: 'volTest1', data: '44%' }
+														, { skip: 7 / 8 * n120, filterId: 'volTest1', data: '33%' }
+							*
+													]
+												}
+												, {
+													duration: n120, tempo: 120, items: [
+														{ skip: 0 * n120, channelId: 'anymidi1', pitches: [A3 - 0], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
+														, { skip: 1 / 4 * n120, channelId: 'anymidi1', pitches: [A3 - 5], slides: [{ duration: 1 / 4 * n120, delta: 0 }] }
+														, { skip: 2 / 4 * n120, channelId: 'anymidi1', pitches: [A3 - 0], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
+														, { skip: 5 / 8 * n120, channelId: 'anymidi1', pitches: [A3 - 5], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
+														, { skip: 6 / 8 * n120, channelId: 'anymidi1', pitches: [A3 - 4], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
+														, { skip: 7 / 8 * n120, channelId: 'anymidi1', pitches: [A3 - 2], slides: [{ duration: 1 / 8 * n120, delta: 0 }] }
+													], states: [
+														/*{ skip: 0 / 8 * n120, filterId: 'volTest1', data: '22%' }
+														, { skip: 1 / 8 * n120, filterId: 'volTest1', data: '11%' }
+														, { skip: 3 / 8 * n120, filterId: 'volTest1', data: '1%' }
+														, { skip: 4 / 8 * n120, filterId: 'volTest1', data: '22%' }
+														, { skip: 5 / 8 * n120, filterId: 'volTest1', data: '33%' }
+														, { skip: 6 / 8 * n120, filterId: 'volTest1', data: '66%' }
+														, { skip: 7 / 8 * n120, filterId: 'volTest1', data: '99%' }*
+													]
+												}
+												, { duration: n120, tempo: 120, items: [], states: [] }
+												, { duration: n120, tempo: 120, items: [], states: [] }
+											]
+											, channels: [{
+												id: 'anymidi2'
+												, outputs: ['volTest1']
+												, performer: {
+													//id: 'test1'
+													kind: 'beep1'
+													, properties: 'Nope'
+												}
+											}, {
+												id: 'drumKick1'
+												, outputs: ['volTest1']
+												, performer: {
+													//id: 'perfKick1'
+													kind: 'zdrum1'
+													, properties: '35'
+												}
+											}, {
+												id: 'drumSnare1'
+												, outputs: ['volTest1']
+												, performer: {
+													//id: 'perfSnare1'
+													kind: 'zdrum1'
+													, properties: '38'
+												}
+											}, {
+												id: 'anymidi1'
+												, outputs: ['volTest1']
+												, performer: {
+													//id: 'instest'
+													kind: 'zinstr1'
+													, properties: '19'
+												}
+											}
+							
+							
+											]
+											, filters: [
+												{
+													id: 'volTest1'
+													, kind: 'zvolume1'
+													, properties: '66%'
+													, outputs: ['']
+												}
+											]
+										};
+										//
+*/

@@ -65,6 +65,7 @@ declare class CommandDispatcher {
     audioContext: AudioContext;
     tapSizeRatio: number;
     onAir: boolean;
+    neeToStart: boolean;
     _mixerDataMathUtility: MixerDataMathUtility;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
     exe: CommandExe;
@@ -75,6 +76,7 @@ declare class CommandDispatcher {
     showRightMenu(): void;
     renderCurrentProjectForOutput(): MZXBX_Schedule;
     toggleStartStop(): void;
+    startPlay(from: number, position: number, to: number): void;
     setThemeLocale(loc: string, ratio: number): void;
     setThemeColor(cssPath: string): void;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
@@ -468,16 +470,16 @@ declare class WarningUI {
     warningInfo4: TileImage;
     warningTitle: TileText;
     warningDescription: TileText;
-    cancel: () => void;
+    onCancel: null | (() => void);
+    cancel(): void;
     initDialogUI(): void;
     resetDialogView(data: Zvoog_Project): void;
     resizeDialog(ww: number, hh: number, resetWarningAnchor: () => void): void;
     allLayers(): TileLayerDefinition[];
-    showWarning(): void;
+    showWarning(title: string, msg: string, onCancel: null | (() => void)): void;
     hideWarning(): void;
 }
-declare let mzxbxProjectForTesting2: Zvoog_Project;
-declare let mzxbxProjectForTesting3: Zvoog_Project;
+declare let _mzxbxProjectForTesting2: Zvoog_Project;
 declare class MixerDataMathUtility {
     data: Zvoog_Project;
     leftPad: number;
@@ -816,14 +818,14 @@ declare type MZXBX_CachedWave = {
 };
 declare type MZXBX_FilterHolder = {
     plugin: MZXBX_AudioFilterPlugin | null;
-    id: string;
+    filterId: string;
     kind: string;
     properties: string;
     launched: boolean;
 };
 declare type MZXBX_PerformerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | null;
-    id: string;
+    channelId: string;
     kind: string;
     properties: string;
     launched: boolean;
@@ -876,7 +878,6 @@ declare type MZXBX_AudioSamplerPlugin = {
     duration: () => number;
 };
 declare type MZXBX_ChannelSource = {
-    id: string;
     kind: string;
     properties: string;
 };
@@ -893,7 +894,7 @@ declare type MZXBX_Schedule = {
     filters: MZXBX_Filter[];
 };
 declare type MZXBX_Player = {
-    setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;
+    setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => string | null;
     startLoop: (from: number, position: number, to: number) => string;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];
