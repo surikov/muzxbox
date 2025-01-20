@@ -93,7 +93,7 @@ class MixerBar {
 				if (arr[ii].channelId == samplerId) {
 					try {
 						let smplr = arr[ii].plugin as MZXBX_AudioSamplerPlugin;
-						console.log('findDurationOfSample', samplerId,smplr.duration());
+						//console.log('findDurationOfSample', samplerId,smplr.duration());
 						return smplr.duration();
 					} catch (xxx) {
 						console.log(xxx);
