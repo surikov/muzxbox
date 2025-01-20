@@ -2153,7 +2153,6 @@ class MixerBar {
                 if (arr[ii].channelId == samplerId) {
                     try {
                         let smplr = arr[ii].plugin;
-                        console.log('findDurationOfSample', samplerId, smplr.duration());
                         return smplr.duration();
                     }
                     catch (xxx) {
