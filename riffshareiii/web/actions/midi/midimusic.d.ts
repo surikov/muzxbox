@@ -162,23 +162,22 @@ declare type MZXBX_CachedWave = {
 };
 declare type MZXBX_FilterHolder = {
     plugin: MZXBX_AudioFilterPlugin | null;
-    id: string;
+    filterId: string;
     kind: string;
     properties: string;
     launched: boolean;
 };
 declare type MZXBX_PerformerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | null;
-    id: string;
+    channelId: string;
     kind: string;
     properties: string;
     launched: boolean;
 };
 declare type MZXBX_Channel = {
     id: string;
-    comment?: string;
-    filters: MZXBX_ChannelFilter[];
-    performer: MZXBX_ChannelPerformer;
+    performer: MZXBX_ChannelSource;
+    outputs: string[];
 };
 declare type MZXBX_SlideItem = {
     duration: number;
@@ -201,10 +200,11 @@ declare type MZXBX_Set = {
     items: MZXBX_PlayItem[];
     states: MZXBX_FilterState[];
 };
-declare type MZXBX_ChannelFilter = {
+declare type MZXBX_Filter = {
     id: string;
     kind: string;
     properties: string;
+    outputs: string[];
 };
 declare type MZXBX_AudioFilterPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
@@ -213,20 +213,15 @@ declare type MZXBX_AudioFilterPlugin = {
     input: () => AudioNode | null;
     output: () => AudioNode | null;
 };
-declare type MZXBX_ChannelSampler = {
-    id: string;
-    kind: string;
-    properties: string;
-};
 declare type MZXBX_AudioSamplerPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
     schedule: (when: number) => void;
     cancel: () => void;
     output: () => AudioNode | null;
+    duration: () => number;
 };
-declare type MZXBX_ChannelPerformer = {
-    id: string;
+declare type MZXBX_ChannelSource = {
     kind: string;
     properties: string;
 };
@@ -240,26 +235,20 @@ declare type MZXBX_AudioPerformerPlugin = {
 declare type MZXBX_Schedule = {
     series: MZXBX_Set[];
     channels: MZXBX_Channel[];
-    filters: MZXBX_ChannelFilter[];
+    filters: MZXBX_Filter[];
 };
 declare type MZXBX_Player = {
-    setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;
+    setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => string | null;
     startLoop: (from: number, position: number, to: number) => string;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];
     allPerformers(): MZXBX_PerformerHolder[];
     position: number;
 };
-declare enum MZXBX_PluginPurpose {
-    Action = 0,
-    Filter = 1,
-    Sampler = 2,
-    Performer = 3
-}
 declare type MZXBX_PluginRegistrationInformation = {
     label: string;
     kind: string;
-    purpose: MZXBX_PluginPurpose;
+    purpose: 'Action' | 'Filter' | 'Sampler' | 'Performer';
     ui: string;
     evaluate: string;
     script: string;

@@ -1,11 +1,4 @@
 "use strict";
-var MZXBX_PluginPurpose;
-(function (MZXBX_PluginPurpose) {
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Action"] = 0] = "Action";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Filter"] = 1] = "Filter";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Sampler"] = 2] = "Sampler";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Performer"] = 3] = "Performer";
-})(MZXBX_PluginPurpose || (MZXBX_PluginPurpose = {}));
 class MIDIIImportMusicPlugin {
     constructor() {
         this.callbackID = '';
@@ -1488,7 +1481,7 @@ class MidiParser {
                 let filterID = 'f' + ii;
                 let filterVolume = {
                     id: filterID,
-                    kind: 'VolumeGain', dataBlob: '', outputs: [echoID],
+                    kind: 'zvolume1', dataBlob: '99', outputs: [echoID],
                     iconPosition: { x: 77 + ii * 5, y: ii * 11 + 2 },
                     automation: []
                 };
@@ -1537,7 +1530,7 @@ class MidiParser {
         }
         let filterEcho = {
             id: echoID,
-            kind: 'Echo', dataBlob: '', outputs: [''],
+            kind: 'zvolume1', dataBlob: '99', outputs: [''],
             iconPosition: { x: 77 + midiSongData.miditracks.length * 30, y: midiSongData.miditracks.length * 8 + 2 },
             automation: []
         };
@@ -1866,7 +1859,7 @@ class MidiParser {
             title: midiTrack.title + ' [' + midiTrack.program + '] ' + insNames[midiTrack.program],
             measures: [],
             performer: {
-                id: 'p' + Math.random(), data: '', kind: '', outputs: [outputId],
+                id: 'p' + Math.random(), data: '' + midiTrack.program, kind: 'zinstr1', outputs: [outputId],
                 iconPosition: { x: top * 2, y: top }
             },
             volume: volume
@@ -1944,7 +1937,7 @@ class MidiParser {
             title: midiTrack.title + ' [' + drum + '] ' + drumNames[drum],
             measures: [],
             sampler: {
-                id: 'd' + Math.random(), data: '', kind: '', outputs: [outputId],
+                id: 'd' + Math.random(), data: '' + drum, kind: 'zdrum1', outputs: [outputId],
                 iconPosition: { x: top * 1.5, y: top / 2 }
             },
             volume: volume

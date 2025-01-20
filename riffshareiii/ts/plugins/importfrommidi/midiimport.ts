@@ -1919,7 +1919,7 @@ class MidiParser {
 				let filterID = 'f' + ii;
 				let filterVolume: Zvoog_FilterTarget = {
 					id: filterID
-					, kind: 'VolumeGain', dataBlob: '', outputs: [echoID]
+					, kind: 'zvolume1', dataBlob: '99', outputs: [echoID]
 					, iconPosition: { x: 77 + ii * 5, y: ii * 11 + 2 }
 					, automation: []
 				};
@@ -1979,7 +1979,7 @@ class MidiParser {
 		}
 		let filterEcho: Zvoog_FilterTarget = {
 			id: echoID
-			, kind: 'Echo', dataBlob: '', outputs: ['']
+			, kind: 'zvolume1', dataBlob: '99', outputs: ['']
 			, iconPosition: { x: 77 + midiSongData.miditracks.length * 30, y: midiSongData.miditracks.length * 8 + 2 }
 			, automation: []
 		};
@@ -2320,7 +2320,7 @@ class MidiParser {
 			, measures: []
 			//, filters: []
 			, performer: {
-				id: 'p' + Math.random(), data: '', kind: '', outputs: [outputId]
+				id: 'p' + Math.random(), data: ''+midiTrack.program, kind: 'zinstr1', outputs: [outputId]
 				, iconPosition: { x: top * 2, y: top }
 			}
 			, volume: volume
@@ -2417,7 +2417,7 @@ class MidiParser {
 			, measures: []
 			//, filters: []
 			, sampler: {
-				id: 'd' + Math.random(), data: '', kind: '', outputs: [outputId]
+				id: 'd' + Math.random(), data: ''+drum, kind: 'zdrum1', outputs: [outputId]
 				, iconPosition: { x: top * 1.5, y: top / 2 }
 			}
 			, volume: volume

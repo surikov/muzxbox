@@ -50,7 +50,7 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 					}
 					let pitches: number[] = [];
 					for (let ii = 0; ii < zpitches.length; ii++) {
-						pitches.push(zpitches[ii] + 36);
+						pitches.push(zpitches[ii] + 0);
 					}
 					//console.log(duration, zpitches, mzbxslide);
 					this.player.queueChord(this.audioContext, this.volume, this.preset, when, pitches, duration, volume, mzbxslide);
