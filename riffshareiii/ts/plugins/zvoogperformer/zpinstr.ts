@@ -38,7 +38,7 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 				if (this.preset) {
 					let duration = 0;
 					let volume = 1;
-					let slides: ZPWaveSlide[][] = [];
+					//let slides: ZPWaveSlide[][] = [];
 					for (let ii = 0; ii < mzbxslide.length; ii++) {
 						let one = mzbxslide[ii];
 						duration = duration + one.duration;

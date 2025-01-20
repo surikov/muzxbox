@@ -493,6 +493,7 @@ class ZvoogDrumKitImplementation {
         this.loader = new ZDRWebAudioFontLoader();
         this.midinumber = 0;
         this.preset = null;
+        this.sampleDuration = 0.0001;
     }
     launch(context, parameters) {
         this.preset = null;
@@ -516,6 +517,13 @@ class ZvoogDrumKitImplementation {
                 return 'loaded ' + this.info;
             }
             else {
+                if (this.preset) {
+                    if (this.preset.zones.length > 0) {
+                        if (this.preset.zones[0].buffer) {
+                            this.sampleDuration = this.preset.zones[0].buffer.duration;
+                        }
+                    }
+                }
                 return null;
             }
         }
@@ -541,7 +549,7 @@ class ZvoogDrumKitImplementation {
         }
     }
     duration() {
-        return 1;
+        return this.sampleDuration;
     }
 }
 function newZvoogDrumKitImplementation() {

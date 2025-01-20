@@ -185,7 +185,6 @@ class SchedulePlayer {
                             if (pluginOutput) {
                                 for (let oo = 0; oo < filter.outputs.length; oo++) {
                                     let outId = filter.outputs[oo];
-                                    console.log('check filter', filter.id, outId);
                                     let targetNode = master;
                                     if (outId) {
                                         let target = this.findFilterPlugin(outId);
@@ -194,7 +193,6 @@ class SchedulePlayer {
                                         }
                                     }
                                     if (targetNode) {
-                                        console.log('connect filter', filter.id, outId);
                                         pluginOutput.connect(targetNode);
                                     }
                                 }
@@ -217,7 +215,6 @@ class SchedulePlayer {
                                         }
                                     }
                                     if (targetNode) {
-                                        console.log('connect channel', channel.id, outId);
                                         output.connect(targetNode);
                                     }
                                 }
@@ -422,7 +419,6 @@ class PluginLoader {
             if (!(filters[ff].plugin)) {
                 let result = this.startLoadPluginStarter(filters[ff].kind, filters, performers, (plugin) => {
                     filters[ff].plugin = plugin;
-                    console.log('assign filter', ff, plugin);
                 }, afterLoad);
                 if (result != null) {
                     return result;
@@ -433,7 +429,6 @@ class PluginLoader {
             if (!(performers[pp].plugin)) {
                 let result = this.startLoadPluginStarter(performers[pp].kind, filters, performers, (plugin) => {
                     performers[pp].plugin = plugin;
-                    console.log('assign performer', pp, performers[pp]);
                 }, afterLoad);
                 if (result != null) {
                     return result;

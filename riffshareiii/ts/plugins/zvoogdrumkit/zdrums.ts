@@ -7,6 +7,7 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 	midinumber: number = 0;
 	info: ZDRPresetInfo;
 	preset: ZDRWavePreset | null = null;
+	sampleDuration=0.0001;
 	launch(context: AudioContext, parameters: string): void {
 		this.preset = null;
 		this.audioContext = context;
@@ -28,6 +29,13 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 			if (!this.loader.loaded(this.info.variable)) {
 				return 'loaded ' + this.info;
 			} else {
+				if (this.preset) {
+					if (this.preset.zones.length > 0) {
+						if (this.preset.zones[0].buffer) {
+							this.sampleDuration=this.preset.zones[0].buffer.duration;
+						}
+					}
+				}
 				return null;
 			}
 		}
@@ -52,14 +60,7 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 		}
 	}
 	duration(): number {
-		if (this.preset) {
-			if (this.preset.zones.length > 0) {
-				if (this.preset.zones[0].buffer) {
-					return this.preset.zones[0].buffer.duration;
-				}
-			}
-		}
-		return 1;
+		return this.sampleDuration;
 	}
 
 }

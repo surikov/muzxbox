@@ -277,7 +277,7 @@ declare class LeftPanel {
     reFillLeftPanel(): void;
 }
 declare class SamplerBar {
-    constructor(barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number);
+    constructor(barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number, durationLen: number);
 }
 declare class BarOctave {
     constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, transpose: number, zoomLevel: number);
@@ -292,6 +292,7 @@ declare class MixerBar {
     octaves: BarOctave[];
     zoomLevel: number;
     constructor(barIdx: number, left: number, ww: number, zoomLevel: number, gridZoomBarAnchor: TileAnchor, tracksZoomBarAnchor: TileAnchor, firstZoomBarAnchor: TileAnchor);
+    findDurationOfSample(samplerId: string): number;
     addOctaveGridSteps(barIdx: number, barLeft: number, width: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
 }
 declare class TextComments {

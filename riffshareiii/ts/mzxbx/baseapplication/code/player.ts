@@ -182,7 +182,7 @@ class SchedulePlayer implements MZXBX_Player {
 							}*/
 								for (let oo = 0; oo < filter.outputs.length; oo++) {
 									let outId = filter.outputs[oo];
-									console.log('check filter', filter.id, outId);
+									//console.log('check filter', filter.id, outId);
 									let targetNode: AudioNode | null = master;
 									if (outId) {
 										let target = this.findFilterPlugin(outId);
@@ -192,7 +192,7 @@ class SchedulePlayer implements MZXBX_Player {
 
 									}
 									if (targetNode) {
-										console.log('connect filter', filter.id, outId);
+										//console.log('connect filter', filter.id, outId);
 										pluginOutput.connect(targetNode);
 									}
 								}
@@ -237,7 +237,7 @@ class SchedulePlayer implements MZXBX_Player {
 
 									}
 									if (targetNode) {
-										console.log('connect channel', channel.id, outId);
+										//console.log('connect channel', channel.id, outId);
 										output.connect(targetNode);
 									}
 								}

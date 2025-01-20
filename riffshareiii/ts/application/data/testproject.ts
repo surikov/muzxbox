@@ -68,15 +68,33 @@ let _mzxbxProjectForTesting2: Zvoog_Project = {
 			title: "Second track", volume: 1, measures: [
 				{
 					chords: [
-						{ skip: { count: 3, part: 4 }, pitches: [77], slides: [{ duration: { count: 13, part: 8 }, delta: -1 }] }
+						{ skip: { count: 3, part: 4 }, pitches: [44,47,49], slides: [{ duration: { count: 5, part: 8 }, delta: -5 }] }
 					]
-				}, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+				}
+				, { chords: [] }
+				, { chords: [] }
+				, { chords: [] }
+				, { chords: [] }
+				, { chords: [] }
+				, { chords: [] }
+				, { chords: [] }
+				, { chords: [] }
+				, { chords: [] }
 			]//, filters: []
 			, performer: { id: 'secTrPerfId', data: '34', kind: 'zinstr1', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 } }
 		}
 		, {
 			title: "Third track", volume: 1, measures: [
-				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+				{ chords: [] }
+				, { chords: [] }
+				, { chords: [] }
+				, { chords: [] }
+				, { chords: [] }
+				, { chords: [] }
+				, { chords: [] }
+				, { chords: [] }
+				, { chords: [] }
+				, { chords: [] }
 			]//, filters: []
 			, performer: { id: 'at3', data: '23', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 } }
 		}
@@ -87,7 +105,8 @@ let _mzxbxProjectForTesting2: Zvoog_Project = {
 			, performer: { id: 'bt3', data: '29', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 } }
 		}, {
 			title: "A track 987654321", volume: 1, measures: [
-				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+				, { chords: [] }
 			]//, filters: []
 			, performer: { id: 'ct3', data: '44', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 77, y: 66 } }
 		}

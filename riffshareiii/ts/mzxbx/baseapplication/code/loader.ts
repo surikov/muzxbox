@@ -27,7 +27,7 @@ class PluginLoader {
 				let result = this.startLoadPluginStarter(filters[ff].kind, filters, performers, (plugin) => {
 
 					filters[ff].plugin = plugin;
-					console.log('assign filter', ff, plugin);
+					//console.log('assign filter', ff, plugin);
 				}, afterLoad);
 				if (result != null) {
 					return result;
@@ -41,7 +41,7 @@ class PluginLoader {
 				let result = this.startLoadPluginStarter(performers[pp].kind, filters, performers, (plugin) => {
 
 					performers[pp].plugin = plugin;
-					console.log('assign performer', pp, performers[pp]);
+					//console.log('assign performer', pp, performers[pp]);
 				}, afterLoad);
 				//return 'No performer ' + performers[pp].channelId;
 				if (result != null) {

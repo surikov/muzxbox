@@ -166,7 +166,7 @@ class CommandDispatcher {
 		return forOutput;
 	}
 	toggleStartStop() {
-		console.log('toggleStartStop', this.onAir);
+		//console.log('toggleStartStop', this.onAir);
 		if (this.onAir) {
 			this.onAir = false;
 			this.player.cancel();
@@ -175,17 +175,30 @@ class CommandDispatcher {
 
 			let schedule = this.renderCurrentProjectForOutput();
 			console.log(schedule);
-			let duration = 0;
-			for (let nn = 0; nn < schedule.series.length; nn++) {
-				duration = duration+schedule.series[nn].duration;
+			//let duration = 0;
+			let from = 0;
+			let to = 0;
+			
+			if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
+				for (let nn = 0; nn <= globalCommandDispatcher.cfg().data.selectedPart.endMeasure; nn++) {
+					to = to + schedule.series[nn].duration;
+					if (nn < globalCommandDispatcher.cfg().data.selectedPart.startMeasure) {
+						from = to;
+					}
+				}
+			} else {
+				for (let nn = 0; nn < schedule.series.length; nn++) {
+					to = to + schedule.series[nn].duration;
+				}
 			}
+			console.log(globalCommandDispatcher.cfg().data.selectedPart,from,to);
 			let me = this;
-			let result=me.player.setupPlugins(me.audioContext, schedule, () => {
+			let result = me.player.setupPlugins(me.audioContext, schedule, () => {
 				me.neeToStart = true;
-				me.startPlay(0, 0, duration);
+				me.startPlay(from, from, to);
 			});
-			if(result!=null){
-				this.onAir =false;
+			if (result != null) {
+				this.onAir = false;
 				this.neeToStart = false;
 				me.renderer.warning.showWarning('Start playing', result, null);
 			}
@@ -198,15 +211,16 @@ class CommandDispatcher {
 			let msg: string = me.player.startLoop(from, position, to);
 			if (msg) {
 				//me.onAir = false;
-				console.log('toggleStartStop cancel', msg);
+				//console.log('toggleStartStop cancel', msg);
 				me.renderer.warning.showWarning('Start playing', 'Wait for ' + msg, () => { me.neeToStart = false; me.onAir = false; });
 				setTimeout(() => {
 					me.startPlay(from, position, to);
 				}, 543);
 			} else {
-				console.log('toggleStartStop setupPlugins done',from,position,to);
+				//console.log('toggleStartStop setupPlugins done', from, position, to);
 				me.renderer.warning.hideWarning();
 				me.neeToStart = false;
+				me.resetProject();
 			}
 		}
 	}
@@ -294,6 +308,7 @@ class CommandDispatcher {
 	cancelPluginGUI() {
 		console.log('cancelPluginGUI');
 		pluginDialogPrompt.closeDialogFrame();
+		
 	}
 	expandTimeLineSelection(idx: number) {
 		console.log('select bar', idx);

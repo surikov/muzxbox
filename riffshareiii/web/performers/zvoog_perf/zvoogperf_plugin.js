@@ -906,7 +906,6 @@ class ZvoogBasePerformerImplementation {
                 if (this.preset) {
                     let duration = 0;
                     let volume = 1;
-                    let slides = [];
                     for (let ii = 0; ii < mzbxslide.length; ii++) {
                         let one = mzbxslide[ii];
                         duration = duration + one.duration;

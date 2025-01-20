@@ -635,7 +635,6 @@ class CommandDispatcher {
         return forOutput;
     }
     toggleStartStop() {
-        console.log('toggleStartStop', this.onAir);
         if (this.onAir) {
             this.onAir = false;
             this.player.cancel();
@@ -644,14 +643,26 @@ class CommandDispatcher {
             this.onAir = true;
             let schedule = this.renderCurrentProjectForOutput();
             console.log(schedule);
-            let duration = 0;
-            for (let nn = 0; nn < schedule.series.length; nn++) {
-                duration = duration + schedule.series[nn].duration;
+            let from = 0;
+            let to = 0;
+            if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
+                for (let nn = 0; nn <= globalCommandDispatcher.cfg().data.selectedPart.endMeasure; nn++) {
+                    to = to + schedule.series[nn].duration;
+                    if (nn < globalCommandDispatcher.cfg().data.selectedPart.startMeasure) {
+                        from = to;
+                    }
+                }
             }
+            else {
+                for (let nn = 0; nn < schedule.series.length; nn++) {
+                    to = to + schedule.series[nn].duration;
+                }
+            }
+            console.log(globalCommandDispatcher.cfg().data.selectedPart, from, to);
             let me = this;
             let result = me.player.setupPlugins(me.audioContext, schedule, () => {
                 me.neeToStart = true;
-                me.startPlay(0, 0, duration);
+                me.startPlay(from, from, to);
             });
             if (result != null) {
                 this.onAir = false;
@@ -665,16 +676,15 @@ class CommandDispatcher {
             let me = this;
             let msg = me.player.startLoop(from, position, to);
             if (msg) {
-                console.log('toggleStartStop cancel', msg);
                 me.renderer.warning.showWarning('Start playing', 'Wait for ' + msg, () => { me.neeToStart = false; me.onAir = false; });
                 setTimeout(() => {
                     me.startPlay(from, position, to);
                 }, 543);
             }
             else {
-                console.log('toggleStartStop setupPlugins done', from, position, to);
                 me.renderer.warning.hideWarning();
                 me.neeToStart = false;
+                me.resetProject();
             }
         }
     }
@@ -1929,7 +1939,7 @@ class LeftPanel {
     }
 }
 class SamplerBar {
-    constructor(barIdx, drumIdx, zoomLevel, anchor, left) {
+    constructor(barIdx, drumIdx, zoomLevel, anchor, left, durationLen) {
         let ww = globalCommandDispatcher.cfg().samplerDotHeight * (1 + zoomLevel / 3) / 4;
         let drum = globalCommandDispatcher.cfg().data.percussions[drumIdx];
         let measure = drum.measures[barIdx];
@@ -1939,7 +1949,6 @@ class SamplerBar {
         for (let ss = 0; ss < measure.skips.length; ss++) {
             let skip = measure.skips[ss];
             let xx = left + MMUtil().set(skip).duration(tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-            let durationLen = 5;
             let bgline = {
                 dots: [xx, yy,
                     xx, yy + globalCommandDispatcher.cfg().samplerDotHeight,
@@ -2121,10 +2130,11 @@ class MixerBar {
         if (zoomLevel < 7) {
             for (let pp = 0; pp < globalCommandDispatcher.cfg().data.percussions.length; pp++) {
                 let drum = globalCommandDispatcher.cfg().data.percussions[pp];
+                let durationLen = this.findDurationOfSample(drum.sampler.id) * globalCommandDispatcher.cfg().widthDurationRatio;
                 if (drum) {
                     let measure = drum.measures[barIdx];
                     if (measure) {
-                        new SamplerBar(barIdx, pp, zoomLevel, firstZoomBarAnchor, left);
+                        new SamplerBar(barIdx, pp, zoomLevel, firstZoomBarAnchor, left, durationLen);
                     }
                 }
             }
@@ -2135,6 +2145,25 @@ class MixerBar {
         if (zoomLevel < 7) {
             new AutomationBarContent(barIdx, left, gridZoomBarAnchor, zoomLevel);
         }
+    }
+    findDurationOfSample(samplerId) {
+        if (globalCommandDispatcher.player) {
+            let arr = globalCommandDispatcher.player.allPerformers();
+            for (let ii = 0; ii < arr.length; ii++) {
+                if (arr[ii].channelId == samplerId) {
+                    try {
+                        let smplr = arr[ii].plugin;
+                        console.log('findDurationOfSample', samplerId, smplr.duration());
+                        return smplr.duration();
+                    }
+                    catch (xxx) {
+                        console.log(xxx);
+                        return 0.2;
+                    }
+                }
+            }
+        }
+        return 1;
     }
     addOctaveGridSteps(barIdx, barLeft, width, barOctaveAnchor, zIndex) {
         let zoomInfo = zoomPrefixLevelsCSS[zIndex];
@@ -3689,15 +3718,33 @@ let _mzxbxProjectForTesting2 = {
             title: "Second track", volume: 1, measures: [
                 {
                     chords: [
-                        { skip: { count: 3, part: 4 }, pitches: [77], slides: [{ duration: { count: 13, part: 8 }, delta: -1 }] }
+                        { skip: { count: 3, part: 4 }, pitches: [44, 47, 49], slides: [{ duration: { count: 5, part: 8 }, delta: -5 }] }
                     ]
-                }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+                },
+                { chords: [] },
+                { chords: [] },
+                { chords: [] },
+                { chords: [] },
+                { chords: [] },
+                { chords: [] },
+                { chords: [] },
+                { chords: [] },
+                { chords: [] }
             ],
             performer: { id: 'secTrPerfId', data: '34', kind: 'zinstr1', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 } }
         },
         {
             title: "Third track", volume: 1, measures: [
-                { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+                { chords: [] },
+                { chords: [] },
+                { chords: [] },
+                { chords: [] },
+                { chords: [] },
+                { chords: [] },
+                { chords: [] },
+                { chords: [] },
+                { chords: [] },
+                { chords: [] }
             ],
             performer: { id: 'at3', data: '23', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 } }
         },
@@ -3708,7 +3755,8 @@ let _mzxbxProjectForTesting2 = {
             performer: { id: 'bt3', data: '29', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 } }
         }, {
             title: "A track 987654321", volume: 1, measures: [
-                { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
+                { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] },
+                { chords: [] }
             ],
             performer: { id: 'ct3', data: '44', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 77, y: 66 } }
         }

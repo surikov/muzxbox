@@ -1,6 +1,9 @@
 class SamplerBar {
 	constructor(//data: Zvoog_Project
-		barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number) {
+		barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number
+		, durationLen: number
+	) {
+		//let durationLen = 1 * globalCommandDispatcher.cfg().widthDurationRatio;
 		let ww = globalCommandDispatcher.cfg().samplerDotHeight * (1 + zoomLevel / 3) / 4;
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		let drum: Zvoog_PercussionTrack = globalCommandDispatcher.cfg().data.percussions[drumIdx];
@@ -34,7 +37,7 @@ class SamplerBar {
 
 
 			//console.log(zoomLevel, ww, xx);
-			let durationLen = 5;
+
 			let bgline: TilePolygon = {
 				//id:''+ww+'x'+zoomLevel+'x'+Math.random(),
 				dots: [xx, yy

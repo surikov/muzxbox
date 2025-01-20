@@ -240,7 +240,7 @@ declare type MZXBX_Schedule = {
     filters: MZXBX_Filter[];
 };
 declare type MZXBX_Player = {
-    setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => void;
+    setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => string | null;
     startLoop: (from: number, position: number, to: number) => string;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];

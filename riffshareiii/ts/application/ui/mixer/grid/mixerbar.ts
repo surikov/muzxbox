@@ -9,8 +9,10 @@ class MixerBar {
 		, gridZoomBarAnchor: TileAnchor
 		, tracksZoomBarAnchor: TileAnchor
 		, firstZoomBarAnchor: TileAnchor
+		//, durationLen: number
 
 	) {
+		//let durationLen = 1 * globalCommandDispatcher.cfg().widthDurationRatio;
 		let h12 = 12 * globalCommandDispatcher.cfg().notePathHeight;
 		let transpose = globalCommandDispatcher.cfg().transposeOctaveCount() * 12;
 		for (let oo = 0; oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
@@ -65,10 +67,11 @@ class MixerBar {
 		if (zoomLevel < 7) {
 			for (let pp = 0; pp < globalCommandDispatcher.cfg().data.percussions.length; pp++) {
 				let drum: Zvoog_PercussionTrack = globalCommandDispatcher.cfg().data.percussions[pp];
+				let durationLen: number = this.findDurationOfSample(drum.sampler.id) * globalCommandDispatcher.cfg().widthDurationRatio;
 				if (drum) {
 					let measure: Zvoog_PercussionMeasure = drum.measures[barIdx];
 					if (measure) {
-						new SamplerBar(barIdx, pp, zoomLevel, firstZoomBarAnchor, left);
+						new SamplerBar(barIdx, pp, zoomLevel, firstZoomBarAnchor, left, durationLen);
 					}
 				}
 			}
@@ -79,6 +82,27 @@ class MixerBar {
 		if (zoomLevel < 7) {
 			new AutomationBarContent(barIdx, left, gridZoomBarAnchor, zoomLevel);
 		}
+	}
+	findDurationOfSample(samplerId: string): number {
+
+		if (globalCommandDispatcher.player) {
+
+			let arr = globalCommandDispatcher.player.allPerformers();
+			//console.log('findDurationOfSample', samplerId,arr);
+			for (let ii = 0; ii < arr.length; ii++) {
+				if (arr[ii].channelId == samplerId) {
+					try {
+						let smplr = arr[ii].plugin as MZXBX_AudioSamplerPlugin;
+						console.log('findDurationOfSample', samplerId,smplr.duration());
+						return smplr.duration();
+					} catch (xxx) {
+						console.log(xxx);
+						return 0.2;
+					}
+				}
+			}
+		}
+		return 1;
 	}
 	addOctaveGridSteps(
 		barIdx: number
