@@ -202,29 +202,49 @@ class RightMenuPanel {
 					}).initDraggableItem());
 				} else {
 					if (it.onSubClick) {
-						let rightMenuItem = new RightMenuItem(it, pad, () => {
-							if (it.onClick) {
-								it.onClick();
-							}
-							me.setFocus(it, infos);
-							me.resetAllAnchors();
-						}, () => {
-							if (it.itemStates) {
-								let sel = it.selection ? it.selection : 0;
-								if (it.itemStates.length - 1 > sel) {
-									sel++;
-								} else {
-									sel = 0;
+						if (it.onClick) {
+							let rightMenuItem = new RightMenuItem(it, pad, () => {
+								if (it.onClick) {
+									it.onClick();
 								}
-								it.selection = sel;
-							}
-							if (it.onSubClick) {
-								it.onSubClick();
-							}
-
-							me.rerenderMenuContent(rightMenuItem);
-						});
-						this.items.push(rightMenuItem.initActionItem2());
+								me.setFocus(it, infos);
+								me.resetAllAnchors();
+							}, () => {
+								if (it.itemStates) {
+									let sel = it.selectedState ? it.selectedState : 0;
+									if (it.itemStates.length - 1 > sel) {
+										sel++;
+									} else {
+										sel = 0;
+									}
+									it.selectedState = sel;
+								}
+								if (it.onSubClick) {
+									it.onSubClick();
+								}
+								me.rerenderMenuContent(rightMenuItem);
+							});
+							this.items.push(rightMenuItem.initActionItem2());
+						} else {
+							let rightMenuItem = new RightMenuItem(it, pad, () => {
+								//
+							}, () => {
+								if (it.itemStates) {
+									let sel = it.selectedState ? it.selectedState : 0;
+									if (it.itemStates.length - 1 > sel) {
+										sel++;
+									} else {
+										sel = 0;
+									}
+									it.selectedState = sel;
+								}
+								if (it.onSubClick) {
+									it.onSubClick();
+								}
+								me.rerenderMenuContent(rightMenuItem);
+							});
+							this.items.push(rightMenuItem.initDisabledItem2());
+						}
 					} else {
 						if (it.onClick) {
 							this.items.push(new RightMenuItem(it, pad, () => {
@@ -252,89 +272,115 @@ class RightMenuPanel {
 		menuPointTracks.children = [];
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let track = project.tracks[tt];
-			/*let item: MenuInfo = {
-				text: track.title
-				, noLocalization: true
-				, onClick: () => {
-					globalCommandDispatcher.moveTrackTop(tt);
-				}
-				, onSubClick: () => {
-					let state = item.selection ? item.selection : 0;
-					globalCommandDispatcher.setTrackSoloState(state);
-				}
-				, itemStates: [icon_sound_low, icon_hide, icon_sound_loud]
-				, selection: 0
-			};*/
 			let item: MenuInfo = {
 				text: track.title
 				, noLocalization: true
-				, selection: 0
+				, selectedState: track.performer.state
+				, itemStates: [icon_sound_loud, icon_sound_none, icon_flash]
+				, onSubClick: () => {
+					globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+						if (item.selectedState == 1) {
+							track.performer.state = 1;
+						} else {
+							if (item.selectedState == 2) {
+								track.performer.state = 2;
+							} else {
+								track.performer.state = 0;
+							}
+						}
+					});
+					globalCommandDispatcher.reConnectPlayer();
+				}
 			};
 			if (tt > 0) {
 				item.onClick = () => {
-					//globalCommandDispatcher.moveTrackTop(tt);
-					/*
-					let state = new StateDiff(['tracks']);
-					let track: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(tt, 1)[0];
-					globalCommandDispatcher.cfg().data.tracks.splice(0, 0, track);
-					globalCommandDispatcher.exe.addUndoCommandFromUI(state.diffChangedCommands());
-					*/
 					globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
 						let track: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(tt, 1)[0];
 						globalCommandDispatcher.cfg().data.tracks.splice(0, 0, track);
 					});
-
+					//globalCommandDispatcher.relaunchPlayer();
 				};
 			}
 			menuPointTracks.children.push(item);
 		}
-		/*
-		menuPointPercussion.children = [];
+
+		//menuPointPercussion.children = [];
 		for (let tt = 0; tt < project.percussions.length; tt++) {
 			let drum = project.percussions[tt];
 			let item: MenuInfo = {
 				text: drum.title
 				, noLocalization: true
-				, onClick: () => {
-
-					globalCommandDispatcher.moveDrumTop(tt);
-				}
 				, onSubClick: () => {
-
-					let state = item.selection ? item.selection : 0;
-					globalCommandDispatcher.setDrumSoloState(state);
+					/*item.selectedState = item.selectedState ? item.selectedState : 0;
+					if (item.selectedState > 2) {
+						item.selectedState = 0;
+					}
+					console.log(item.selectedState, drum);*/
+					globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+						if (item.selectedState == 1) {
+							drum.sampler.state = 1;
+						} else {
+							if (item.selectedState == 2) {
+								drum.sampler.state = 2;
+							} else {
+								drum.sampler.state = 0;
+							}
+						}
+					});
+					globalCommandDispatcher.reConnectPlayer();
 				}
-				, itemStates: [icon_sound_low, icon_hide, icon_sound_loud]
-				, selection: 0
+				, itemStates: [icon_sound_loud, icon_sound_none, icon_flash]
+				, selectedState: drum.sampler.state
 			};
-			menuPointPercussion.children.push(item);
-			//console.log('menu drum',item);
-			//if(menuItemsData)menuItemsData.push(item);
-			//menuPointPercussion.children.push(item);
-		}
-		menuPointAutomation.children = [];
-		for (let ff = 0; ff < project.automations.length; ff++) {
-			let automation = project.automations[ff];
-			//if (filter.automation) {
-				let item: MenuInfo = {
-					text: automation.title
-					, noLocalization: true
-					, onClick: () => {
-
-						globalCommandDispatcher.moveAutomationTop(ff);
-					}
-					, onSubClick: () => {
-
-						//let state = item.selection ? item.selection : 0;
-						//globalCommandDispatcher.setDrumSoloState(state);
-					}
-					, itemStates: [icon_sound_low, icon_hide, icon_sound_loud]
-					, selection: 0
+			if (tt > 0) {
+				item.onClick = () => {
+					globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+						let smpl: Zvoog_PercussionTrack = globalCommandDispatcher.cfg().data.percussions.splice(tt, 1)[0];
+						globalCommandDispatcher.cfg().data.percussions.splice(0, 0, smpl);
+					});
+					//globalCommandDispatcher.relaunchPlayer();
 				};
-				menuPointAutomation.children.push(item);
+			}
+			menuPointTracks.children.push(item);
+		}
+		//menuPointAutomation.children = [];
+		for (let ff = 0; ff < project.filters.length; ff++) {
+			let filter = project.filters[ff];
+			//if (filter.automation) {
+			let item: MenuInfo = {
+				text: filter.id
+				, noLocalization: true
+				, itemStates: [icon_equalizer, icon_block]
+				, selectedState: filter.state
+			};
+			item.onSubClick = () => {
+				//item.selectedState = item.selectedState ? item.selectedState : 0;
+				//if (item.selectedState > 1) {
+				//	item.selectedState = 0;
+				//}
+				//console.log(item.selectedState, filter);
+				globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+					if (item.selectedState == 1) {
+						filter.state = 1;
+					} else {
+						filter.state = 0;
+					}
+				});
+				globalCommandDispatcher.reConnectPlayer();
+			};
+			if (ff > 0) {
+				item.onClick = () => {
+					globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+						let fltr: Zvoog_FilterTarget = globalCommandDispatcher.cfg().data.filters.splice(ff, 1)[0];
+						globalCommandDispatcher.cfg().data.filters.splice(0, 0, fltr);
+					});
+					//globalCommandDispatcher.relaunchPlayer();
+				};
+			}
+			menuPointTracks.children.push(item);
 			//}
 		}
-*/
+
 	}
 	rerenderMenuContent(folder: RightMenuItem | null) {
 

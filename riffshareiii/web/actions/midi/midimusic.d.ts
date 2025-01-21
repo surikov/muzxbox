@@ -44,6 +44,7 @@ declare type Zvoog_FilterTarget = {
         x: number;
         y: number;
     };
+    state: 0 | 1;
 };
 declare type Zvoog_AudioSequencer = {
     id: string;
@@ -54,6 +55,7 @@ declare type Zvoog_AudioSequencer = {
         x: number;
         y: number;
     };
+    state: 0 | 1 | 2;
 };
 declare type Zvoog_AudioSampler = {
     id: string;
@@ -64,6 +66,7 @@ declare type Zvoog_AudioSampler = {
         x: number;
         y: number;
     };
+    state: 0 | 1 | 2;
 };
 declare type Zvoog_Chord = {
     skip: Zvoog_Metre;

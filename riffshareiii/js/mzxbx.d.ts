@@ -46,6 +46,7 @@ declare type Zvoog_FilterTarget = {
         x: number;
         y: number;
     };
+    state: 0 | 1;
 };
 declare type Zvoog_AudioSequencer = {
     id: string;
@@ -56,6 +57,7 @@ declare type Zvoog_AudioSequencer = {
         x: number;
         y: number;
     };
+    state: 0 | 1 | 2;
 };
 declare type Zvoog_AudioSampler = {
     id: string;
@@ -66,6 +68,7 @@ declare type Zvoog_AudioSampler = {
         x: number;
         y: number;
     };
+    state: 0 | 1 | 2;
 };
 declare type Zvoog_Chord = {
     skip: Zvoog_Metre;
@@ -242,6 +245,7 @@ declare type MZXBX_Schedule = {
 declare type MZXBX_Player = {
     setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => string | null;
     startLoop: (from: number, position: number, to: number) => string;
+    reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];
     allPerformers(): MZXBX_PerformerHolder[];
@@ -301,6 +305,7 @@ declare class SchedulePlayer implements MZXBX_Player {
     allPerformers(): MZXBX_PerformerHolder[];
     launchCollectedPlugins(): null | string;
     checkCollectedPlugins(): null | string;
+    reconnectAllPlugins(schedule: MZXBX_Schedule): void;
     startLoop(loopStart: number, currentPosition: number, loopEnd: number): string;
     connectAllPlugins(): string | null;
     disconnectAllPlugins(): void;

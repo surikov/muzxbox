@@ -548,12 +548,29 @@ class CommandDispatcher {
         let prj = this.cfg().data;
         for (let ff = 0; ff < prj.filters.length; ff++) {
             let filter = prj.filters[ff];
-            forOutput.filters.push({
+            let outFilter = {
                 id: filter.id,
                 kind: filter.kind,
                 properties: filter.dataBlob,
                 outputs: filter.outputs
-            });
+            };
+            if (filter.state == 1) {
+                outFilter.outputs = [];
+            }
+            forOutput.filters.push(outFilter);
+        }
+        let soloOnly = false;
+        for (let ss = 0; ss < prj.percussions.length; ss++) {
+            if (prj.percussions[ss].sampler.state == 2) {
+                soloOnly = true;
+                break;
+            }
+        }
+        for (let tt = 0; tt < prj.tracks.length; tt++) {
+            if (prj.tracks[tt].performer.state == 2) {
+                soloOnly = true;
+                break;
+            }
         }
         for (let ss = 0; ss < prj.percussions.length; ss++) {
             let sampler = prj.percussions[ss];
@@ -565,6 +582,10 @@ class CommandDispatcher {
                     properties: sampler.sampler.data
                 }
             };
+            if ((soloOnly && sampler.sampler.state != 2)
+                || ((!soloOnly) && sampler.sampler.state == 1)) {
+                mchannel.outputs = [];
+            }
             forOutput.channels.push(mchannel);
         }
         for (let tt = 0; tt < prj.tracks.length; tt++) {
@@ -577,6 +598,10 @@ class CommandDispatcher {
                     properties: track.performer.data
                 }
             };
+            if ((soloOnly && track.performer.state != 2)
+                || ((!soloOnly) && track.performer.state == 1)) {
+                mchannel.outputs = [];
+            }
             forOutput.channels.push(mchannel);
         }
         for (let mm = 0; mm < prj.timeline.length; mm++) {
@@ -634,6 +659,12 @@ class CommandDispatcher {
         }
         return forOutput;
     }
+    reConnectPlayer() {
+        if (this.onAir && (!this.neeToStart)) {
+            let schedule = this.renderCurrentProjectForOutput();
+            this.player.reconnectAllPlugins(schedule);
+        }
+    }
     toggleStartStop() {
         if (this.onAir) {
             this.onAir = false;
@@ -642,7 +673,6 @@ class CommandDispatcher {
         else {
             this.onAir = true;
             let schedule = this.renderCurrentProjectForOutput();
-            console.log(schedule);
             let from = 0;
             let to = 0;
             if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
@@ -658,7 +688,6 @@ class CommandDispatcher {
                     to = to + schedule.series[nn].duration;
                 }
             }
-            console.log(globalCommandDispatcher.cfg().data.selectedPart, from, to);
             let me = this;
             let result = me.player.setupPlugins(me.audioContext, schedule, () => {
                 me.neeToStart = true;
@@ -919,6 +948,8 @@ let localNameLocal = 'localNameLocal';
 let localeFontRatio = 1;
 let localMenuItemSettings = 'localMenuItemSettings';
 let localMenuTracksFolder = 'localMenuTracksFolder';
+let localMenuPercussionFolder = 'localMenuPercussionFolder';
+let localMenuAutomationFolder = 'localMenuAutomationFolder';
 let localMenuPlayPause = 'localMenuPlayPause';
 let localMenuUndo = 'localMenuUndo';
 let localMenuRedo = 'localMenuRedo';
@@ -948,6 +979,19 @@ let localeDictionary = [
         ]
     },
     {
+        id: localMenuPercussionFolder, data: [
+            { locale: 'en', text: 'Sampler' },
+            { locale: 'ru', text: 'Сэмплер' },
+            { locale: 'zh', text: '?' }
+        ]
+    },
+    {
+        id: localMenuAutomationFolder, data: [
+            { locale: 'en', text: 'Automation' },
+            { locale: 'ru', text: 'Автоматизация' },
+            { locale: 'zh', text: '?' }
+        ]
+    }, {
         id: localMenuPlayPause, data: [
             { locale: 'en', text: 'Play/Pause' },
             { locale: 'ru', text: 'Старт/Стоп' },
@@ -1407,29 +1451,51 @@ class RightMenuPanel {
                 }
                 else {
                     if (it.onSubClick) {
-                        let rightMenuItem = new RightMenuItem(it, pad, () => {
-                            if (it.onClick) {
-                                it.onClick();
-                            }
-                            me.setFocus(it, infos);
-                            me.resetAllAnchors();
-                        }, () => {
-                            if (it.itemStates) {
-                                let sel = it.selection ? it.selection : 0;
-                                if (it.itemStates.length - 1 > sel) {
-                                    sel++;
+                        if (it.onClick) {
+                            let rightMenuItem = new RightMenuItem(it, pad, () => {
+                                if (it.onClick) {
+                                    it.onClick();
                                 }
-                                else {
-                                    sel = 0;
+                                me.setFocus(it, infos);
+                                me.resetAllAnchors();
+                            }, () => {
+                                if (it.itemStates) {
+                                    let sel = it.selectedState ? it.selectedState : 0;
+                                    if (it.itemStates.length - 1 > sel) {
+                                        sel++;
+                                    }
+                                    else {
+                                        sel = 0;
+                                    }
+                                    it.selectedState = sel;
                                 }
-                                it.selection = sel;
-                            }
-                            if (it.onSubClick) {
-                                it.onSubClick();
-                            }
-                            me.rerenderMenuContent(rightMenuItem);
-                        });
-                        this.items.push(rightMenuItem.initActionItem2());
+                                if (it.onSubClick) {
+                                    it.onSubClick();
+                                }
+                                me.rerenderMenuContent(rightMenuItem);
+                            });
+                            this.items.push(rightMenuItem.initActionItem2());
+                        }
+                        else {
+                            let rightMenuItem = new RightMenuItem(it, pad, () => {
+                            }, () => {
+                                if (it.itemStates) {
+                                    let sel = it.selectedState ? it.selectedState : 0;
+                                    if (it.itemStates.length - 1 > sel) {
+                                        sel++;
+                                    }
+                                    else {
+                                        sel = 0;
+                                    }
+                                    it.selectedState = sel;
+                                }
+                                if (it.onSubClick) {
+                                    it.onSubClick();
+                                }
+                                me.rerenderMenuContent(rightMenuItem);
+                            });
+                            this.items.push(rightMenuItem.initDisabledItem2());
+                        }
                     }
                     else {
                         if (it.onClick) {
@@ -1459,13 +1525,93 @@ class RightMenuPanel {
             let item = {
                 text: track.title,
                 noLocalization: true,
-                selection: 0
+                selectedState: track.performer.state,
+                itemStates: [icon_sound_loud, icon_sound_none, icon_flash],
+                onSubClick: () => {
+                    globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+                        if (item.selectedState == 1) {
+                            track.performer.state = 1;
+                        }
+                        else {
+                            if (item.selectedState == 2) {
+                                track.performer.state = 2;
+                            }
+                            else {
+                                track.performer.state = 0;
+                            }
+                        }
+                    });
+                    globalCommandDispatcher.reConnectPlayer();
+                }
             };
             if (tt > 0) {
                 item.onClick = () => {
                     globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
                         let track = globalCommandDispatcher.cfg().data.tracks.splice(tt, 1)[0];
                         globalCommandDispatcher.cfg().data.tracks.splice(0, 0, track);
+                    });
+                };
+            }
+            menuPointTracks.children.push(item);
+        }
+        for (let tt = 0; tt < project.percussions.length; tt++) {
+            let drum = project.percussions[tt];
+            let item = {
+                text: drum.title,
+                noLocalization: true,
+                onSubClick: () => {
+                    globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+                        if (item.selectedState == 1) {
+                            drum.sampler.state = 1;
+                        }
+                        else {
+                            if (item.selectedState == 2) {
+                                drum.sampler.state = 2;
+                            }
+                            else {
+                                drum.sampler.state = 0;
+                            }
+                        }
+                    });
+                    globalCommandDispatcher.reConnectPlayer();
+                },
+                itemStates: [icon_sound_loud, icon_sound_none, icon_flash],
+                selectedState: drum.sampler.state
+            };
+            if (tt > 0) {
+                item.onClick = () => {
+                    globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+                        let smpl = globalCommandDispatcher.cfg().data.percussions.splice(tt, 1)[0];
+                        globalCommandDispatcher.cfg().data.percussions.splice(0, 0, smpl);
+                    });
+                };
+            }
+            menuPointTracks.children.push(item);
+        }
+        for (let ff = 0; ff < project.filters.length; ff++) {
+            let filter = project.filters[ff];
+            let item = {
+                text: filter.id,
+                noLocalization: true,
+                itemStates: [icon_equalizer, icon_block],
+                selectedState: filter.state
+            };
+            item.onSubClick = () => {
+                globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+                    if (item.selectedState == 1) {
+                        filter.state = 1;
+                    }
+                    else {
+                        filter.state = 0;
+                    }
+                });
+                globalCommandDispatcher.reConnectPlayer();
+            };
+            if (ff > 0) {
+                item.onClick = () => {
+                    globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+                        let fltr = globalCommandDispatcher.cfg().data.filters.splice(ff, 1)[0];
+                        globalCommandDispatcher.cfg().data.filters.splice(0, 0, fltr);
                     });
                 };
             }
@@ -1550,6 +1696,7 @@ class RightMenuItem {
         this.kindOpenedFolder = 5;
         this.kindAction2 = 6;
         this.kindActionDisabled = 7;
+        this.kindActionDisabled2 = 8;
         this.kind = this.kindAction;
         this.pad = 0;
         this.info = info;
@@ -1564,6 +1711,10 @@ class RightMenuItem {
     }
     initDisabledItem() {
         this.kind = this.kindActionDisabled;
+        return this;
+    }
+    initDisabledItem2() {
+        this.kind = this.kindActionDisabled2;
         return this;
     }
     initActionItem() {
@@ -1627,9 +1778,23 @@ class RightMenuItem {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
+        if (this.kind == this.kindActionDisabled2) {
+            let stateIicon = '?';
+            let sel = this.info.selectedState ? this.info.selectedState : 0;
+            if (this.info.itemStates) {
+                if (this.info.itemStates.length > sel) {
+                    stateIicon = this.info.itemStates[sel];
+                }
+            }
+            anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: itemWidth - 1.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
+            anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
+            spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
+        }
         if (this.kind == this.kindAction2) {
             let stateIicon = '?';
-            let sel = this.info.selection ? this.info.selection : 0;
+            let sel = this.info.selectedState ? this.info.selectedState : 0;
             if (this.info.itemStates) {
                 if (this.info.itemStates.length > sel) {
                     stateIicon = this.info.itemStates[sel];
@@ -2085,7 +2250,7 @@ class MixerBar {
     constructor(barIdx, left, ww, zoomLevel, gridZoomBarAnchor, tracksZoomBarAnchor, firstZoomBarAnchor) {
         let h12 = 12 * globalCommandDispatcher.cfg().notePathHeight;
         let transpose = globalCommandDispatcher.cfg().transposeOctaveCount() * 12;
-        for (let oo = 0; oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
+        for (let oo = globalCommandDispatcher.cfg().transposeOctaveCount(); oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
             let gridOctaveAnchor = {
                 showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom,
                 hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom,
@@ -3554,13 +3719,18 @@ let icon_sound_middle = '&#xf3b9;';
 let icon_sound_loud = '&#xf3bc;';
 let icon_sound_none = '&#xf3bb;';
 let icon_sound_surround = '&#xf3b7;';
+let icon_sound_speaker = '&#xf2d5;';
 let icon_hide = '&#xf15b;';
+let icon_flash = '&#xf166;';
 let icon_close = '&#xf136;';
 let icon_refresh = '&#xf1b9;';
 let icon_search = '&#xf1c3;';
 let icon_splitfan = '&#xf302;';
 let icon_undo = '&#xf258;';
 let icon_redo = '&#xf253;';
+let icon_forward = '&#xf2fd;';
+let icon_block = '&#xf119;';
+let icon_equalizer = '&#xf39e;';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];
@@ -3652,7 +3822,6 @@ class WarningUI {
         return [this.warningLayer];
     }
     showWarning(title, msg, onCancel) {
-        console.log('WarningUI show', title, msg);
         this.onCancel = onCancel;
         this.warningTitle.text = title;
         this.warningDescription.text = msg;
@@ -3711,7 +3880,7 @@ let _mzxbxProjectForTesting2 = {
                     ]
                 }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'firstPerfoemrID', data: '77', kind: 'zinstr1', outputs: ['track1Volme'], iconPosition: { x: 40, y: 20 } }
+            performer: { id: 'firstPerfoemrID', data: '77', kind: 'zinstr1', outputs: ['track1Volme'], iconPosition: { x: 40, y: 20 }, state: 0 }
         },
         {
             title: "Second track", volume: 1, measures: [
@@ -3730,7 +3899,7 @@ let _mzxbxProjectForTesting2 = {
                 { chords: [] },
                 { chords: [] }
             ],
-            performer: { id: 'secTrPerfId', data: '34', kind: 'zinstr1', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 } }
+            performer: { id: 'secTrPerfId', data: '34', kind: 'zinstr1', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 }, state: 0 }
         },
         {
             title: "Third track", volume: 1, measures: [
@@ -3745,19 +3914,19 @@ let _mzxbxProjectForTesting2 = {
                 { chords: [] },
                 { chords: [] }
             ],
-            performer: { id: 'at3', data: '23', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 } }
+            performer: { id: 'at3', data: '23', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 }, state: 0 }
         },
         {
             title: "A track 1", volume: 1, measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'bt3', data: '29', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 } }
+            performer: { id: 'bt3', data: '29', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 }, state: 0 }
         }, {
             title: "A track 987654321", volume: 1, measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] },
                 { chords: [] }
             ],
-            performer: { id: 'ct3', data: '44', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 77, y: 66 } }
+            performer: { id: 'ct3', data: '44', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 77, y: 66 }, state: 0 }
         }
     ],
     percussions: [
@@ -3765,15 +3934,15 @@ let _mzxbxProjectForTesting2 = {
             title: "Snare", volume: 1, measures: [
                 { skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
             ],
-            sampler: { id: 'd1', data: '39', kind: 'zdrum1', outputs: ['drum1Volme'], iconPosition: { x: 22, y: 75 } }
+            sampler: { id: 'd1', data: '39', kind: 'zdrum1', outputs: ['drum1Volme'], iconPosition: { x: 22, y: 75 }, state: 0 }
         },
         {
             title: "Snare2", volume: 1, measures: [],
-            sampler: { id: 'd2', data: '41', kind: 'zdrum1', outputs: ['drum2Volme'], iconPosition: { x: 22, y: 91 } }
+            sampler: { id: 'd2', data: '41', kind: 'zdrum1', outputs: ['drum2Volme'], iconPosition: { x: 22, y: 91 }, state: 0 }
         },
         {
             title: "Snare3", volume: 1, measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }],
-            sampler: { id: 'd3', data: '47', kind: 'zdrum1', outputs: ['drum3Volme'], iconPosition: { x: 22, y: 99 } }
+            sampler: { id: 'd3', data: '47', kind: 'zdrum1', outputs: ['drum3Volme'], iconPosition: { x: 22, y: 99 }, state: 0 }
         }
     ],
     comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16', row: 0 }] }, {
@@ -3803,7 +3972,7 @@ let _mzxbxProjectForTesting2 = {
             id: 'volumeSlide', kind: 'zvolume1', dataBlob: '99', outputs: ['masterVolme'],
             automation: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: '99' }, { skip: { count: 1, part: 16 }, stateBlob: '99' }] },
                 { changes: [{ skip: { count: 1, part: 4 }, stateBlob: '99' }] }],
-            iconPosition: { x: 152, y: 39 }
+            iconPosition: { x: 152, y: 39 }, state: 0
         },
         {
             id: 'masterVolme', kind: 'zvolume1', dataBlob: '99', outputs: [''],
@@ -3820,15 +3989,15 @@ let _mzxbxProjectForTesting2 = {
                     ]
                 },
                 { changes: [] }],
-            iconPosition: { x: 188, y: 7 }
+            iconPosition: { x: 188, y: 7 }, state: 0
         },
-        { id: 'allDrumsVolme', kind: 'zvolume1', dataBlob: '99', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 }, automation: [] },
-        { id: 'drum1Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 }, automation: [] },
-        { id: 'drum2Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 }, automation: [] },
-        { id: 'drum3Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 }, automation: [] },
-        { id: 'track1Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [] },
-        { id: 'track2Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [] },
-        { id: 'track3Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [] }
+        { id: 'allDrumsVolme', kind: 'zvolume1', dataBlob: '99', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 }, automation: [], state: 0 },
+        { id: 'drum1Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 }, automation: [], state: 0 },
+        { id: 'drum2Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 }, automation: [], state: 0 },
+        { id: 'drum3Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 }, automation: [], state: 0 },
+        { id: 'track1Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [], state: 0 },
+        { id: 'track2Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [], state: 0 },
+        { id: 'track3Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [], state: 0 }
     ]
 };
 class MixerDataMathUtility {

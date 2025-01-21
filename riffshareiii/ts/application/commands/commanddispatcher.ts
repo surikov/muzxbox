@@ -72,12 +72,29 @@ class CommandDispatcher {
 		let prj: Zvoog_Project = this.cfg().data;
 		for (let ff = 0; ff < prj.filters.length; ff++) {
 			let filter = prj.filters[ff];
-			forOutput.filters.push({
+			let outFilter: MZXBX_Filter = {
 				id: filter.id
 				, kind: filter.kind
 				, properties: filter.dataBlob
 				, outputs: filter.outputs
-			});
+			}
+			if (filter.state == 1) {
+				outFilter.outputs = [];
+			}
+			forOutput.filters.push(outFilter);
+		}
+		let soloOnly = false;
+		for (let ss = 0; ss < prj.percussions.length; ss++) {
+			if (prj.percussions[ss].sampler.state == 2) {
+				soloOnly = true;
+				break;
+			}
+		}
+		for (let tt = 0; tt < prj.tracks.length; tt++) {
+			if (prj.tracks[tt].performer.state == 2) {
+				soloOnly = true;
+				break;
+			}
 		}
 		for (let ss = 0; ss < prj.percussions.length; ss++) {
 			let sampler = prj.percussions[ss];
@@ -90,6 +107,12 @@ class CommandDispatcher {
 					, properties: sampler.sampler.data
 				}
 			};
+			if (
+				(soloOnly && sampler.sampler.state != 2)
+				|| ((!soloOnly) && sampler.sampler.state == 1)
+			) {
+				mchannel.outputs = [];
+			}
 			forOutput.channels.push(mchannel);
 		}
 
@@ -104,6 +127,12 @@ class CommandDispatcher {
 					, properties: track.performer.data
 				}
 			};
+			if (
+				(soloOnly && track.performer.state != 2)
+				|| ((!soloOnly) && track.performer.state == 1)
+			) {
+				mchannel.outputs = [];
+			}
 			forOutput.channels.push(mchannel);
 		}
 		//let cuStart = 0;
@@ -165,6 +194,12 @@ class CommandDispatcher {
 		}
 		return forOutput;
 	}
+	reConnectPlayer(){
+		if(this.onAir && (!this.neeToStart)){
+			let schedule = this.renderCurrentProjectForOutput();
+			this.player.reconnectAllPlugins(schedule);
+		}
+	}
 	toggleStartStop() {
 		//console.log('toggleStartStop', this.onAir);
 		if (this.onAir) {
@@ -174,11 +209,11 @@ class CommandDispatcher {
 			this.onAir = true;
 
 			let schedule = this.renderCurrentProjectForOutput();
-			console.log(schedule);
+			//console.log(schedule);
 			//let duration = 0;
 			let from = 0;
 			let to = 0;
-			
+
 			if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
 				for (let nn = 0; nn <= globalCommandDispatcher.cfg().data.selectedPart.endMeasure; nn++) {
 					to = to + schedule.series[nn].duration;
@@ -191,7 +226,7 @@ class CommandDispatcher {
 					to = to + schedule.series[nn].duration;
 				}
 			}
-			console.log(globalCommandDispatcher.cfg().data.selectedPart,from,to);
+			//console.log(globalCommandDispatcher.cfg().data.selectedPart, from, to);
 			let me = this;
 			let result = me.player.setupPlugins(me.audioContext, schedule, () => {
 				me.neeToStart = true;
@@ -308,7 +343,7 @@ class CommandDispatcher {
 	cancelPluginGUI() {
 		console.log('cancelPluginGUI');
 		pluginDialogPrompt.closeDialogFrame();
-		
+
 	}
 	expandTimeLineSelection(idx: number) {
 		console.log('select bar', idx);

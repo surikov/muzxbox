@@ -120,6 +120,11 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 		return null;
 	}
+	reconnectAllPlugins(schedule: MZXBX_Schedule): void {
+		this.disconnectAllPlugins();
+		this.schedule = schedule;
+		this.connectAllPlugins();
+	}
 	startLoop(loopStart: number, currentPosition: number, loopEnd: number): string {
 		//loopStart=8;
 		//currentPosition=2;

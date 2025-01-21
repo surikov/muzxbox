@@ -75,6 +75,7 @@ declare class CommandDispatcher {
     registerUI(renderer: UIRenderer): void;
     showRightMenu(): void;
     renderCurrentProjectForOutput(): MZXBX_Schedule;
+    reConnectPlayer(): void;
     toggleStartStop(): void;
     startPlay(from: number, position: number, to: number): void;
     setThemeLocale(loc: string, ratio: number): void;
@@ -128,6 +129,8 @@ declare let localNameLocal: string;
 declare let localeFontRatio: number;
 declare let localMenuItemSettings: string;
 declare let localMenuTracksFolder: string;
+declare let localMenuPercussionFolder: string;
+declare let localMenuAutomationFolder: string;
 declare let localMenuPlayPause: string;
 declare let localMenuUndo: string;
 declare let localMenuRedo: string;
@@ -226,7 +229,8 @@ declare class RightMenuItem {
     kindOpenedFolder: 5;
     kindAction2: 6;
     kindActionDisabled: 7;
-    kind: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+    kindActionDisabled2: 8;
+    kind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
     action?: {
         (): void;
     };
@@ -238,6 +242,7 @@ declare class RightMenuItem {
     info: MenuInfo;
     constructor(info: MenuInfo, pad: number, tap?: () => void, tap2?: () => void);
     initDisabledItem(): RightMenuItem;
+    initDisabledItem2(): RightMenuItem;
     initActionItem(): RightMenuItem;
     initActionItem2(): RightMenuItem;
     initDraggableItem(): RightMenuItem;
@@ -258,7 +263,7 @@ declare type MenuInfo = {
     onSubClick?: () => void;
     onOpen?: () => void;
     itemStates?: string[];
-    selection?: number;
+    selectedState?: number;
     dragMix?: boolean;
 };
 declare let menuItemsData: MenuInfo[] | null;
@@ -442,13 +447,18 @@ declare let icon_sound_middle: string;
 declare let icon_sound_loud: string;
 declare let icon_sound_none: string;
 declare let icon_sound_surround: string;
+declare let icon_sound_speaker: string;
 declare let icon_hide: string;
+declare let icon_flash: string;
 declare let icon_close: string;
 declare let icon_refresh: string;
 declare let icon_search: string;
 declare let icon_splitfan: string;
 declare let icon_undo: string;
 declare let icon_redo: string;
+declare let icon_forward: string;
+declare let icon_block: string;
+declare let icon_equalizer: string;
 declare class DebugLayerUI {
     debugRectangle: TileRectangle;
     debugAnchor: TileAnchor;
@@ -701,6 +711,7 @@ declare type Zvoog_FilterTarget = {
         x: number;
         y: number;
     };
+    state: 0 | 1;
 };
 declare type Zvoog_AudioSequencer = {
     id: string;
@@ -711,6 +722,7 @@ declare type Zvoog_AudioSequencer = {
         x: number;
         y: number;
     };
+    state: 0 | 1 | 2;
 };
 declare type Zvoog_AudioSampler = {
     id: string;
@@ -721,6 +733,7 @@ declare type Zvoog_AudioSampler = {
         x: number;
         y: number;
     };
+    state: 0 | 1 | 2;
 };
 declare type Zvoog_Chord = {
     skip: Zvoog_Metre;
@@ -897,6 +910,7 @@ declare type MZXBX_Schedule = {
 declare type MZXBX_Player = {
     setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => string | null;
     startLoop: (from: number, position: number, to: number) => string;
+    reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];
     allPerformers(): MZXBX_PerformerHolder[];

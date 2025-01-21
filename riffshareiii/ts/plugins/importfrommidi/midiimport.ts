@@ -1921,7 +1921,7 @@ class MidiParser {
 					id: filterID
 					, kind: 'zvolume1', dataBlob: '99', outputs: [echoID]
 					, iconPosition: { x: 77 + ii * 5, y: ii * 11 + 2 }
-					, automation: []
+					, automation: [],state:0
 				};
 				outputID = filterID;
 				project.filters.push(filterVolume);
@@ -1981,7 +1981,7 @@ class MidiParser {
 			id: echoID
 			, kind: 'zvolume1', dataBlob: '99', outputs: ['']
 			, iconPosition: { x: 77 + midiSongData.miditracks.length * 30, y: midiSongData.miditracks.length * 8 + 2 }
-			, automation: []
+			, automation: [],state:0
 		};
 		project.filters.push(filterEcho);
 
@@ -2321,7 +2321,7 @@ class MidiParser {
 			//, filters: []
 			, performer: {
 				id: 'p' + Math.random(), data: ''+midiTrack.program, kind: 'zinstr1', outputs: [outputId]
-				, iconPosition: { x: top * 2, y: top }
+				, iconPosition: { x: top * 2, y: top },state:0
 			}
 			, volume: volume
 		};
@@ -2418,7 +2418,7 @@ class MidiParser {
 			//, filters: []
 			, sampler: {
 				id: 'd' + Math.random(), data: ''+drum, kind: 'zdrum1', outputs: [outputId]
-				, iconPosition: { x: top * 1.5, y: top / 2 }
+				, iconPosition: { x: top * 1.5, y: top / 2 },state:0
 			}
 			, volume: volume
 		};

@@ -11,8 +11,8 @@ type MenuInfo = {
 	onSubClick?: () => void;
 	onOpen?: () => void;
 	itemStates?: string[];
-	selection?: number;
-	dragMix?:boolean;
+	selectedState?: number;
+	dragMix?: boolean;
 };
 /*
 let commandThemeSizeSmall = 'commandThemeSizeSmall';
@@ -76,14 +76,14 @@ let menuPointTracks: MenuInfo = {
 let menuPointPercussion: MenuInfo = {
 	text: localMenuPercussionFolder
 	, onOpen: () => {
-		globalCommandDispatcher.upDrumsLayer();
+		//globalCommandDispatcher.upDrumsLayer();
 	}
 };
 
 let menuPointAutomation: MenuInfo = {
 	text: localMenuAutomationFolder
 	, onOpen: () => {
-		globalCommandDispatcher.upAutoLayer();
+		//globalCommandDispatcher.upAutoLayer();
 	}
 };
 */
@@ -149,16 +149,16 @@ function fillPluginsLists() {
 		} else {
 			if (purpose == 'Sampler') {
 				menuPointSamplers.children.push({
-					dragMix:true
-					,text: label, noLocalization: true, onClick: () => {
+					dragMix: true
+					, text: label, noLocalization: true, onClick: () => {
 						console.log(purpose, label);
 					}
 				});
 			} else {
 				if (purpose == 'Performer') {
 					menuPointPerformers.children.push({
-						dragMix:true
-						,text: label, noLocalization: true, onClick: () => {
+						dragMix: true
+						, text: label, noLocalization: true, onClick: () => {
 							globalCommandDispatcher.promptPointPluginGUI(label, url, (obj: any) => {
 								console.log('performer callback', obj);
 								return true;
@@ -168,8 +168,8 @@ function fillPluginsLists() {
 				} else {
 					if (purpose == 'Filter') {
 						menuPointFilters.children.push({
-							dragMix:true
-							,text: label, noLocalization: true, onClick: () => {
+							dragMix: true
+							, text: label, noLocalization: true, onClick: () => {
 								console.log(purpose, label);
 							}
 						});
@@ -196,6 +196,7 @@ function composeBaseMenu(): MenuInfo[] {
 			}
 			, menuPointTracks
 			//, menuPointPercussion
+			//, menuPointAutomation
 
 			, menuPointActions
 			, menuPointFilters
@@ -272,8 +273,8 @@ function composeBaseMenu(): MenuInfo[] {
 					}
 					, {
 						text: localMenuClearUndoRedo, onClick: () => {
-							globalCommandDispatcher.cfg().data.undo=[];
-							globalCommandDispatcher.cfg().data.redo=[];
+							globalCommandDispatcher.cfg().data.undo = [];
+							globalCommandDispatcher.cfg().data.redo = [];
 						}
 					}
 				]
@@ -284,7 +285,7 @@ function composeBaseMenu(): MenuInfo[] {
 				}
 			}*/
 			//, menuPointAutomation
-			
+
 			//, menuPointUndo
 			/*,{
 				text: localMenuUndo, onClick: () => {

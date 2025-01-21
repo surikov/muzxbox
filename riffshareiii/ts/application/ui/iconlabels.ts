@@ -22,10 +22,13 @@ let icon_gear='&#xf1c6;';
 
 let icon_sound_low='&#xf3ba;';
 let icon_sound_middle='&#xf3b9;';
-let icon_sound_loud='&#xf3bc;';//
+let icon_sound_loud='&#xf3bc;';
 let icon_sound_none='&#xf3bb;';
 let icon_sound_surround='&#xf3b7;';
+let icon_sound_speaker='&#xf2d5;';
 let icon_hide='&#xf15b;';
+
+let icon_flash='&#xf166;';
 
 let icon_close='&#xf136;';
 let icon_refresh='&#xf1b9;';
@@ -34,3 +37,10 @@ let icon_splitfan='&#xf302;';
 
 let icon_undo='&#xf258;';
 let icon_redo='&#xf253;';
+
+let icon_forward='&#xf2fd;';
+let icon_block='&#xf119;';
+let icon_equalizer='&#xf39e;';
+
+
+

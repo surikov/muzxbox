@@ -48,6 +48,7 @@ type Zvoog_FilterTarget = {
 	outputs: string[];
 	automation: Zvoog_FilterMeasure[];
 	iconPosition: { x: number, y: number };
+	state:0|1;
 };
 type Zvoog_AudioSequencer = {
 	id: string;
@@ -55,6 +56,7 @@ type Zvoog_AudioSequencer = {
 	kind: string;
 	outputs: string[];
 	iconPosition: { x: number, y: number };
+	state:0|1|2;
 };
 type Zvoog_AudioSampler = {
 	id: string;
@@ -62,6 +64,7 @@ type Zvoog_AudioSampler = {
 	kind: string;
 	outputs: string[];
 	iconPosition: { x: number, y: number };
+	state:0|1|2;
 };
 type Zvoog_Chord = {
 	skip: Zvoog_Metre;
@@ -301,6 +304,7 @@ type MZXBX_Schedule = {
 type MZXBX_Player = {
 	setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => string|null;
 	startLoop: (from: number, position: number, to: number) => string;
+	reconnectAllPlugins:(schedule: MZXBX_Schedule)=>void;
 	cancel: () => void;
 	allFilters(): MZXBX_FilterHolder[];
 	allPerformers(): MZXBX_PerformerHolder[];

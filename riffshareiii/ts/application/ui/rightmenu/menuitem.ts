@@ -13,7 +13,8 @@ class RightMenuItem {
 	kindOpenedFolder: 5 = 5;
 	kindAction2: 6 = 6;
 	kindActionDisabled: 7 = 7;
-	kind: 1 | 2 | 3 | 4 | 5 | 6 | 7 = this.kindAction;
+	kindActionDisabled2: 8 = 8;
+	kind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 = this.kindAction;
 	action?: { (): void };
 	action2?: { (): void };
 	pad: number = 0;
@@ -35,6 +36,10 @@ class RightMenuItem {
 	}
 	initDisabledItem(): RightMenuItem {
 		this.kind = this.kindActionDisabled;
+		return this;
+	}
+	initDisabledItem2(): RightMenuItem {
+		this.kind = this.kindActionDisabled2;
 		return this;
 	}
 	initActionItem(/*pad: number, focused: boolean, label: string, tap: () => void*/): RightMenuItem {
@@ -121,9 +126,27 @@ class RightMenuItem {
 			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
 			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
 		}
+		if (this.kind == this.kindActionDisabled2) {
+			//anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
+			//anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+			let stateIicon = '?';
+			let sel = this.info.selectedState ? this.info.selectedState : 0;
+			//console.log(this.info.text,sel,this.info.selectedState);
+			if (this.info.itemStates) {
+				if (this.info.itemStates.length > sel) {
+					stateIicon = this.info.itemStates[sel];
+				}
+			}
+			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
+			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+			anchor.content.push({ x: itemWidth - 1.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
+			anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
+			spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
+		}
 		if (this.kind == this.kindAction2) {
 			let stateIicon = '?';
-			let sel = this.info.selection ? this.info.selection : 0;
+			let sel = this.info.selectedState ? this.info.selectedState : 0;
+			//console.log(this.info.text,sel,this.info.selectedState);
 			if (this.info.itemStates) {
 				if (this.info.itemStates.length > sel) {
 					stateIicon = this.info.itemStates[sel];

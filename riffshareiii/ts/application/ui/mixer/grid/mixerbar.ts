@@ -15,7 +15,7 @@ class MixerBar {
 		//let durationLen = 1 * globalCommandDispatcher.cfg().widthDurationRatio;
 		let h12 = 12 * globalCommandDispatcher.cfg().notePathHeight;
 		let transpose = globalCommandDispatcher.cfg().transposeOctaveCount() * 12;
-		for (let oo = 0; oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
+		for (let oo = globalCommandDispatcher.cfg().transposeOctaveCount(); oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
 			let gridOctaveAnchor: TileAnchor = {
 				showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom
 				, hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom
@@ -54,6 +54,7 @@ class MixerBar {
 				, firstOctaveAnchor
 				, transpose
 				, zoomLevel);
+//console.log('BarOctave',zoomLevel,(globalCommandDispatcher.cfg().drawOctaveCount() - oo - 1));
 			if (firstZoomBarAnchor.ww < firstOctaveAnchor.ww) {
 				firstZoomBarAnchor.ww = firstOctaveAnchor.ww;
 			}

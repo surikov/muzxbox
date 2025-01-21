@@ -62,7 +62,7 @@ let _mzxbxProjectForTesting2: Zvoog_Project = {
 					]
 				}, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			]//, filters: []
-			, performer: { id: 'firstPerfoemrID', data: '77', kind: 'zinstr1', outputs: ['track1Volme'], iconPosition: { x: 40, y: 20 } }
+			, performer: { id: 'firstPerfoemrID', data: '77', kind: 'zinstr1', outputs: ['track1Volme'], iconPosition: { x: 40, y: 20 },state:0 }
 		}
 		, {
 			title: "Second track", volume: 1, measures: [
@@ -81,7 +81,7 @@ let _mzxbxProjectForTesting2: Zvoog_Project = {
 				, { chords: [] }
 				, { chords: [] }
 			]//, filters: []
-			, performer: { id: 'secTrPerfId', data: '34', kind: 'zinstr1', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 } }
+			, performer: { id: 'secTrPerfId', data: '34', kind: 'zinstr1', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 },state:0 }
 		}
 		, {
 			title: "Third track", volume: 1, measures: [
@@ -96,19 +96,19 @@ let _mzxbxProjectForTesting2: Zvoog_Project = {
 				, { chords: [] }
 				, { chords: [] }
 			]//, filters: []
-			, performer: { id: 'at3', data: '23', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 } }
+			, performer: { id: 'at3', data: '23', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 } ,state:0}
 		}
 		, {
 			title: "A track 1", volume: 1, measures: [
 				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			]//, filters: []
-			, performer: { id: 'bt3', data: '29', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 } }
+			, performer: { id: 'bt3', data: '29', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 } ,state:0}
 		}, {
 			title: "A track 987654321", volume: 1, measures: [
 				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 				, { chords: [] }
 			]//, filters: []
-			, performer: { id: 'ct3', data: '44', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 77, y: 66 } }
+			, performer: { id: 'ct3', data: '44', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 77, y: 66 } ,state:0}
 		}
 	]
 	, percussions: [
@@ -116,15 +116,15 @@ let _mzxbxProjectForTesting2: Zvoog_Project = {
 			title: "Snare", volume: 1, measures: [
 				{ skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
 			]//, filters: []
-			, sampler: { id: 'd1', data: '39', kind: 'zdrum1', outputs: ['drum1Volme'], iconPosition: { x: 22, y: 75 } }
+			, sampler: { id: 'd1', data: '39', kind: 'zdrum1', outputs: ['drum1Volme'], iconPosition: { x: 22, y: 75 } ,state:0}
 		}
 		, {
 			title: "Snare2", volume: 1, measures: []//, filters: []
-			, sampler: { id: 'd2', data: '41', kind: 'zdrum1', outputs: ['drum2Volme'], iconPosition: { x: 22, y: 91 } }
+			, sampler: { id: 'd2', data: '41', kind: 'zdrum1', outputs: ['drum2Volme'], iconPosition: { x: 22, y: 91 } ,state:0}
 		}
 		, {
 			title: "Snare3", volume: 1, measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }]//, filters: []
-			, sampler: { id: 'd3', data: '47', kind: 'zdrum1', outputs: ['drum3Volme'], iconPosition: { x: 22, y: 99 } }
+			, sampler: { id: 'd3', data: '47', kind: 'zdrum1', outputs: ['drum3Volme'], iconPosition: { x: 22, y: 99 } ,state:0}
 		}
 	]
 	, comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16', row: 0 }] }, {
@@ -155,7 +155,7 @@ let _mzxbxProjectForTesting2: Zvoog_Project = {
 			id: 'volumeSlide', kind: 'zvolume1', dataBlob: '99', outputs: ['masterVolme']
 			, automation: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: '99' }, { skip: { count: 1, part: 16 }, stateBlob: '99' }] }
 				, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: '99' }] }]
-			, iconPosition: { x: 152, y: 39 }
+			, iconPosition: { x: 152, y: 39 },state:0
 		}
 		, {
 			id: 'masterVolme', kind: 'zvolume1', dataBlob: '99', outputs: ['']
@@ -171,15 +171,15 @@ let _mzxbxProjectForTesting2: Zvoog_Project = {
 					, { skip: { count: 7, part: 16 }, stateBlob: '99' }]
 			}
 				, { changes: [] }]
-			, iconPosition: { x: 188, y: 7 }
+			, iconPosition: { x: 188, y: 7 },state:0
 		}
-		, { id: 'allDrumsVolme', kind: 'zvolume1', dataBlob: '99', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 }, automation: [] }
-		, { id: 'drum1Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 }, automation: [] }
-		, { id: 'drum2Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 }, automation: [] }
-		, { id: 'drum3Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 }, automation: [] }
-		, { id: 'track1Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [] }
-		, { id: 'track2Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [] }
-		, { id: 'track3Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [] }
+		, { id: 'allDrumsVolme', kind: 'zvolume1', dataBlob: '99', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 }, automation: [],state:0 }
+		, { id: 'drum1Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 }, automation: [],state:0 }
+		, { id: 'drum2Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 }, automation: [],state:0 }
+		, { id: 'drum3Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 }, automation: [] ,state:0}
+		, { id: 'track1Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [],state:0 }
+		, { id: 'track2Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [],state:0 }
+		, { id: 'track3Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [],state:0 }
 	]
 	/*
 	, automations: [
