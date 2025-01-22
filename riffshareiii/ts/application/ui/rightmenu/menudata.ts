@@ -139,7 +139,6 @@ function fillPluginsLists() {
 				text: label, noLocalization: true, onClick: () => {
 					globalCommandDispatcher.promptProjectPluginGUI(label, url, (obj: Zvoog_Project) => {
 						let project: Zvoog_Project = obj;
-						//console.log(project);
 						globalCommandDispatcher.registerWorkProject(project);
 						globalCommandDispatcher.resetProject();
 						return true;

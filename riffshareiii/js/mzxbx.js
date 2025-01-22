@@ -78,11 +78,11 @@ class MuzXbox {
         }
     }
 }
-function createSchedulePlayer() {
-    return new SchedulePlayer();
+function createSchedulePlayer(callback) {
+    return new SchedulePlayer(callback);
 }
 class SchedulePlayer {
-    constructor() {
+    constructor(callback) {
         this.position = 0;
         this.schedule = null;
         this.performers = [];
@@ -91,6 +91,8 @@ class SchedulePlayer {
         this.nextAudioContextStart = 0;
         this.tickDuration = 0.25;
         this.onAir = false;
+        this.playCallback = (start, position, end) => { };
+        this.playCallback = callback;
     }
     setupPlugins(context, schedule, onDone) {
         this.audioContext = context;
@@ -302,6 +304,7 @@ class SchedulePlayer {
             if (this.nextAudioContextStart < this.audioContext.currentTime) {
                 this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
             }
+            this.playCallback(loopStart, this.position, loopEnd);
         }
         let me = this;
         if (this.onAir) {

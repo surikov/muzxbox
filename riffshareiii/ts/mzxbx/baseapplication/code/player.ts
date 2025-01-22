@@ -33,8 +33,8 @@
 		}
 	});
 }*/
-function createSchedulePlayer(): MZXBX_Player {
-	return new SchedulePlayer();
+function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player {
+	return new SchedulePlayer(callback);
 }
 class SchedulePlayer implements MZXBX_Player {
 	position: number = 0;
@@ -48,7 +48,11 @@ class SchedulePlayer implements MZXBX_Player {
 	//currentPosition: number = 0;
 	tickDuration = 0.25;
 	onAir = false;
+	playCallback: (start: number, position: number, end: number) => void = (start: number, position: number, end: number) => { };
 
+	constructor(callback: (start: number, position: number, end: number) => void) {
+		this.playCallback = callback;
+	}
 	setupPlugins(context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void): null | string {
 		this.audioContext = context;
 		this.schedule = schedule;
@@ -365,6 +369,7 @@ class SchedulePlayer implements MZXBX_Player {
 			if (this.nextAudioContextStart < this.audioContext.currentTime) {
 				this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
 			}
+			this.playCallback(loopStart, this.position, loopEnd);
 		}
 		let me = this;
 		if (this.onAir) {

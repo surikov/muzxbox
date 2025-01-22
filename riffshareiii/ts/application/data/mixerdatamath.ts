@@ -207,7 +207,13 @@ class MixerDataMathUtility {
 		return this.commentsTop()
 			+ this.commentsMaxHeight()
 			+ this.bottomPad
-
+			;
+	}
+	workHeight() {
+		return this.gridHeight()
+			+ this.padGrid2Sampler + this.samplerHeight()
+			+ this.padSampler2Automation + this.automationHeight()
+			+ this.padAutomation2Comments + this.commentsMaxHeight()
 			;
 	}
 	automationHeight(): number {
@@ -243,7 +249,7 @@ class MixerDataMathUtility {
 	drawOctaveCount() {
 		return this.octaveDrawCount;
 	}
-	transposeOctaveCount(){
+	transposeOctaveCount() {
 		return this.octaveTransposeCount;
 	}
 	gridHeight(): number {

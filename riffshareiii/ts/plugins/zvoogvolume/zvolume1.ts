@@ -31,3 +31,12 @@ class ZVolImplementation implements MZXBX_AudioFilterPlugin {
 function newZvoogVolumeImplementation(): MZXBX_AudioFilterPlugin {
 	return new ZVolImplementation();
 }
+class ZVUI{
+	init(){
+		console.log('ZVUI init');
+	}
+}
+function initZVUI(){
+	let zz=new ZVUI();
+	zz.init();
+}

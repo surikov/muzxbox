@@ -289,7 +289,7 @@ declare class MuzXbox {
     initAudioContext(): void;
     resumeContext(audioContext: AudioContext): void;
 }
-declare function createSchedulePlayer(): MZXBX_Player;
+declare function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player;
 declare class SchedulePlayer implements MZXBX_Player {
     position: number;
     audioContext: AudioContext;
@@ -300,6 +300,8 @@ declare class SchedulePlayer implements MZXBX_Player {
     nextAudioContextStart: number;
     tickDuration: number;
     onAir: boolean;
+    playCallback: (start: number, position: number, end: number) => void;
+    constructor(callback: (start: number, position: number, end: number) => void);
     setupPlugins(context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void): null | string;
     allFilters(): MZXBX_FilterHolder[];
     allPerformers(): MZXBX_PerformerHolder[];

@@ -10,6 +10,13 @@ class TimeSelectBar {
 	selectionAnchor: TileAnchor;
 	selectionMark: TileRectangle;
 
+	positionTimeLayer: TileLayerDefinition;
+	positionTimeSVGGroup: SVGElement;
+	positionTimeAnchor: TileAnchor;
+	positionTimeMark: TileRectangle;
+
+	positionTimeMarkWidth = 11;
+
 	constructor() {
 
 	}
@@ -45,14 +52,44 @@ class TimeSelectBar {
 		this.selectedTimeLayer = {
 			g: this.selectedTimeSVGGroup, anchors: [this.selectionAnchor], mode: LevelModes.top
 		};
+		///////////////////////////////////////////////////////
+		this.positionTimeSVGGroup = (document.getElementById("timepositionmark") as any) as SVGElement;
+		this.positionTimeMark = {
+			x: 0
+			, y: 0
+			, w: this.positionTimeMarkWidth
+			, h: 11
+			, css: 'positionTimeMark'
+		};
+		this.positionTimeAnchor = {
+			xx: 0, yy: 0, ww: 1, hh: 1
+			, showZoom: zoomPrefixLevelsCSS[0].minZoom
+			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
+			, content: [this.positionTimeMark]
+		};
+		this.positionTimeLayer = {
+			g: this.positionTimeSVGGroup, anchors: [this.positionTimeAnchor], mode: LevelModes.normal
+		};
+		///////////////////////////////////////////
 
-		return [this.selectionBarLayer, this.selectedTimeLayer];
+		return [this.selectionBarLayer, this.selectedTimeLayer, this.positionTimeLayer];
 	}
 	resizeTimeScale(viewWidth: number, viewHeight: number) {
-		//console.log('resizeTimeSelect',viewWidth,viewHeight);
+		console.log('resizeTimeSelect',viewWidth,viewHeight);
+		let ww = 0.001;
+		if (globalCommandDispatcher.onAir) {
+			ww = this.positionTimeMarkWidth;
+		}
+		this.positionTimeMark.w = ww;
+		this.positionTimeAnchor.ww = viewWidth * 1024;
+		this.positionTimeAnchor.hh = viewHeight * 1024;
+		this.positionTimeMark.y = globalCommandDispatcher.cfg().gridTop();
+		this.positionTimeMark.h = globalCommandDispatcher.cfg().workHeight();
+
 		this.selectionAnchor.ww = viewWidth * 1024;
 		this.selectionAnchor.hh = viewHeight * 1024;
 		this.selectionMark.h = viewHeight * 1024;
+
 	}
 	updateTimeSelectionBar(//data: Zvoog_Project
 		//cfg:MixerDataMathUtility
@@ -91,8 +128,8 @@ class TimeSelectBar {
 			}
 
 		} else {
-			this.selectionMark.x = -1;
-			this.selectionMark.w = 0.5;
+			this.selectionMark.x = 0;
+			this.selectionMark.w = 0.0005;
 		}
 		//console.log('updateTimeSelectionBar',this.selectionMark.x,this.selectionMark.w);
 	}

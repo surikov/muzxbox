@@ -25,7 +25,7 @@ declare class StateDiff {
     calculateNonArray(nodePath: (string | number)[], commands: Zvoog_Action[], old: any, changed: any): void;
     calculateArray(nodePath: (string | number)[], commands: Zvoog_Action[], old: any[], changed: any[]): void;
 }
-declare function createSchedulePlayer(): MZXBX_Player;
+declare function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player;
 declare function createTileLevel(): TileLevelBase;
 declare function startApplication(): void;
 declare function initWebAudioFromUI(): void;
@@ -66,6 +66,7 @@ declare class CommandDispatcher {
     tapSizeRatio: number;
     onAir: boolean;
     neeToStart: boolean;
+    callback: (start: number, position: number, end: number) => void;
     _mixerDataMathUtility: MixerDataMathUtility;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
     exe: CommandExe;
@@ -157,6 +158,11 @@ declare class TimeSelectBar {
     selectedTimeSVGGroup: SVGElement;
     selectionAnchor: TileAnchor;
     selectionMark: TileRectangle;
+    positionTimeLayer: TileLayerDefinition;
+    positionTimeSVGGroup: SVGElement;
+    positionTimeAnchor: TileAnchor;
+    positionTimeMark: TileRectangle;
+    positionTimeMarkWidth: number;
     constructor();
     createTimeScale(): TileLayerDefinition[];
     resizeTimeScale(viewWidth: number, viewHeight: number): void;
@@ -526,6 +532,7 @@ declare class MixerDataMathUtility {
     timelineWidth(): number;
     commentsMaxHeight(): number;
     wholeHeight(): number;
+    workHeight(): number;
     automationHeight(): number;
     commentsZoomHeight(zIndex: number): number;
     commentsAverageFillHeight(): number;

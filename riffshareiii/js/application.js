@@ -513,6 +513,13 @@ class CommandDispatcher {
         this.tapSizeRatio = 1;
         this.onAir = false;
         this.neeToStart = false;
+        this.callback = (start, position, end) => {
+            let xx = this.cfg().leftPad
+                + position * this.cfg().widthDurationRatio
+                - this.renderer.timeselectbar.positionTimeMarkWidth;
+            this.renderer.timeselectbar.positionTimeAnchor.translation = { x: xx, y: 0 };
+            this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
+        };
         this.listener = null;
         this.exe = new CommandExe();
     }
@@ -523,7 +530,7 @@ class CommandDispatcher {
         console.log('initAudioFromUI');
         var AudioContext = window.AudioContext;
         this.audioContext = new AudioContext();
-        this.player = createSchedulePlayer();
+        this.player = createSchedulePlayer(this.callback);
     }
     registerWorkProject(data) {
         this._mixerDataMathUtility = new MixerDataMathUtility(data);
@@ -1064,6 +1071,7 @@ function LO(id) {
 }
 class TimeSelectBar {
     constructor() {
+        this.positionTimeMarkWidth = 11;
     }
     createTimeScale() {
         this.selectionBarSVGGroup = document.getElementById("timeselectbar");
@@ -1095,9 +1103,36 @@ class TimeSelectBar {
         this.selectedTimeLayer = {
             g: this.selectedTimeSVGGroup, anchors: [this.selectionAnchor], mode: LevelModes.top
         };
-        return [this.selectionBarLayer, this.selectedTimeLayer];
+        this.positionTimeSVGGroup = document.getElementById("timepositionmark");
+        this.positionTimeMark = {
+            x: 0,
+            y: 0,
+            w: this.positionTimeMarkWidth,
+            h: 11,
+            css: 'positionTimeMark'
+        };
+        this.positionTimeAnchor = {
+            xx: 0, yy: 0, ww: 1, hh: 1,
+            showZoom: zoomPrefixLevelsCSS[0].minZoom,
+            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            content: [this.positionTimeMark]
+        };
+        this.positionTimeLayer = {
+            g: this.positionTimeSVGGroup, anchors: [this.positionTimeAnchor], mode: LevelModes.normal
+        };
+        return [this.selectionBarLayer, this.selectedTimeLayer, this.positionTimeLayer];
     }
     resizeTimeScale(viewWidth, viewHeight) {
+        console.log('resizeTimeSelect', viewWidth, viewHeight);
+        let ww = 0.001;
+        if (globalCommandDispatcher.onAir) {
+            ww = this.positionTimeMarkWidth;
+        }
+        this.positionTimeMark.w = ww;
+        this.positionTimeAnchor.ww = viewWidth * 1024;
+        this.positionTimeAnchor.hh = viewHeight * 1024;
+        this.positionTimeMark.y = globalCommandDispatcher.cfg().gridTop();
+        this.positionTimeMark.h = globalCommandDispatcher.cfg().workHeight();
         this.selectionAnchor.ww = viewWidth * 1024;
         this.selectionAnchor.hh = viewHeight * 1024;
         this.selectionMark.h = viewHeight * 1024;
@@ -1135,8 +1170,8 @@ class TimeSelectBar {
             }
         }
         else {
-            this.selectionMark.x = -1;
-            this.selectionMark.w = 0.5;
+            this.selectionMark.x = 0;
+            this.selectionMark.w = 0.0005;
         }
     }
     createBarMark(barIdx, barLeft, size, measureAnchor) {
@@ -3399,13 +3434,18 @@ class FilterIcon {
         });
         if (zidx < 5) {
             let px = globalCommandDispatcher.renderer.tiler.tapPxSize();
+            let url = MZXBX_currentPlugins()[order].ui;
             let btn = {
                 x: xx - sz / 2,
                 y: yy,
                 points: 'M 0 0 a 1 1 0 0 0 ' + (sz * px) + ' 0 Z',
                 css: 'fanSamplerInteractionIcon fanButton' + zidx,
                 activation: (x, y) => {
-                    console.log('' + filterTarget.kind + ':' + filterTarget.id);
+                    console.log('' + filterTarget.kind + ':' + filterTarget.id, url);
+                    globalCommandDispatcher.promptPointPluginGUI(filterTarget.id, url, (obj) => {
+                        console.log('plugin callback', obj);
+                        return true;
+                    });
                 }
             };
             dragAnchor.content.push(btn);
@@ -4137,6 +4177,12 @@ class MixerDataMathUtility {
         return this.commentsTop()
             + this.commentsMaxHeight()
             + this.bottomPad;
+    }
+    workHeight() {
+        return this.gridHeight()
+            + this.padGrid2Sampler + this.samplerHeight()
+            + this.padSampler2Automation + this.automationHeight()
+            + this.padAutomation2Comments + this.commentsMaxHeight();
     }
     automationHeight() {
         return this.data.filters.length * this.autoPointHeight;

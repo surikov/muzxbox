@@ -7,6 +7,18 @@ class CommandDispatcher {
 	tapSizeRatio: number = 1;
 	onAir = false;
 	neeToStart = false;
+	callback: (start: number, position: number, end: number) => void = (start: number, position: number, end: number) => {
+
+		//this.renderer.timeselectbar.positionTimeMark.x 
+
+		let xx = this.cfg().leftPad
+			+ position * this.cfg().widthDurationRatio
+			- this.renderer.timeselectbar.positionTimeMarkWidth;
+		this.renderer.timeselectbar.positionTimeAnchor.translation = { x: xx, y: 0 };
+		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup
+			, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
+		//console.log('play state', start, position, end);
+	};
 
 	_mixerDataMathUtility: MixerDataMathUtility;
 	listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any) = null;
@@ -48,7 +60,7 @@ class CommandDispatcher {
 		console.log('initAudioFromUI');
 		var AudioContext = window.AudioContext;// || window.webkitAudioContext;
 		this.audioContext = new AudioContext();
-		this.player = createSchedulePlayer();
+		this.player = createSchedulePlayer(this.callback);
 	}
 	registerWorkProject(data: Zvoog_Project) {
 		this._mixerDataMathUtility = new MixerDataMathUtility(data);
@@ -194,8 +206,8 @@ class CommandDispatcher {
 		}
 		return forOutput;
 	}
-	reConnectPlayer(){
-		if(this.onAir && (!this.neeToStart)){
+	reConnectPlayer() {
+		if (this.onAir && (!this.neeToStart)) {
 			let schedule = this.renderCurrentProjectForOutput();
 			this.player.reconnectAllPlugins(schedule);
 		}
