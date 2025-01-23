@@ -127,7 +127,8 @@ class SchedulePlayer implements MZXBX_Player {
 	reconnectAllPlugins(schedule: MZXBX_Schedule): void {
 		this.disconnectAllPlugins();
 		this.schedule = schedule;
-		this.connectAllPlugins();
+		let msg=this.connectAllPlugins();
+		console.log('reconnectAllPlugins',msg);
 	}
 	startLoop(loopStart: number, currentPosition: number, loopEnd: number): string {
 		//loopStart=8;

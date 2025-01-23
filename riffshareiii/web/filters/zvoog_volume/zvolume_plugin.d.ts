@@ -281,7 +281,3 @@ declare class ZVolImplementation implements MZXBX_AudioFilterPlugin {
     output(): AudioNode | null;
 }
 declare function newZvoogVolumeImplementation(): MZXBX_AudioFilterPlugin;
-declare class ZVUI {
-    init(): void;
-}
-declare function initZVUI(): void;

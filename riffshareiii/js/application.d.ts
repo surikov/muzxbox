@@ -43,7 +43,7 @@ declare class PluginDialogPrompt {
     sendCurrentProjectToPlugin(): void;
     sendPointToPlugin(): void;
     closeDialogFrame(): void;
-    receiveMessageFromPlugin(e: any): void;
+    receiveMessageFromPlugin(event: any): void;
 }
 declare class CommandExe {
     lockUndoRedo: boolean;
@@ -66,6 +66,7 @@ declare class CommandDispatcher {
     tapSizeRatio: number;
     onAir: boolean;
     neeToStart: boolean;
+    lastPosition: number;
     callback: (start: number, position: number, end: number) => void;
     _mixerDataMathUtility: MixerDataMathUtility;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
@@ -78,6 +79,7 @@ declare class CommandDispatcher {
     renderCurrentProjectForOutput(): MZXBX_Schedule;
     reConnectPlayer(): void;
     toggleStartStop(): void;
+    setupAndStartPlay(): void;
     startPlay(from: number, position: number, to: number): void;
     setThemeLocale(loc: string, ratio: number): void;
     setThemeColor(cssPath: string): void;
@@ -85,7 +87,8 @@ declare class CommandDispatcher {
     changeTapSize(ratio: number): void;
     resetProject(): void;
     promptProjectPluginGUI(label: string, url: string, callback: (obj: Zvoog_Project) => void): void;
-    promptPointPluginGUI(label: string, url: string, callback: (obj: any) => boolean): void;
+    promptPointPluginGUI(label: string, url: string, rawdata: string, callback: (obj: any) => boolean): void;
+    findPluginRegistrationByKind(kind: String): null | MZXBX_PluginRegistrationInformation;
     cancelPluginGUI(): void;
     expandTimeLineSelection(idx: number): void;
     doUIaction(): void;

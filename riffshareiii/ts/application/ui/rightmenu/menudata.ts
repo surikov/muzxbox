@@ -158,7 +158,7 @@ function fillPluginsLists() {
 					menuPointPerformers.children.push({
 						dragMix: true
 						, text: label, noLocalization: true, onClick: () => {
-							globalCommandDispatcher.promptPointPluginGUI(label, url, (obj: any) => {
+							globalCommandDispatcher.promptPointPluginGUI(label, url, 'no data from menu',(obj: any) => {
 								console.log('performer callback', obj);
 								return true;
 							});

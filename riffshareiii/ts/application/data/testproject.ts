@@ -153,7 +153,8 @@ let _mzxbxProjectForTesting2: Zvoog_Project = {
 	, filters: [
 		{
 			id: 'volumeSlide', kind: 'zvolume1', dataBlob: '99', outputs: ['masterVolme']
-			, automation: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: '99' }, { skip: { count: 1, part: 16 }, stateBlob: '99' }] }
+			, automation: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: '99' }
+			, { skip: { count: 1, part: 16 }, stateBlob: '99' }] }
 				, { changes: [{ skip: { count: 1, part: 4 }, stateBlob: '99' }] }]
 			, iconPosition: { x: 152, y: 39 },state:0
 		}

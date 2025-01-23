@@ -265,5 +265,19 @@ declare type MZXBX_MessageToHost = {
     pluginData: any;
     done: boolean;
 };
-declare let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[];
+declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
+declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
+declare function MZXBX_appendScriptURL(url: string): boolean;
+declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
+declare class ZVUI {
+    id: string;
+    data: string;
+    slider: any;
+    init(): void;
+    sendMessageToHost(data: string): void;
+    receiveHostMessage(messageEvent: MessageEvent): void;
+    setMessagingId(newId: string): void;
+    setState(data: string): void;
+}
+declare function initZVUI(): void;

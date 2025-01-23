@@ -54,7 +54,7 @@ class PluginDialogPrompt {
 		}
 	}
 	sendPointToPlugin() {
-		console.log('sendCurrentProjectToPlugin');
+		console.log('sendPointToPlugin');
 		let pluginFrame = document.getElementById("pluginFrame") as any;
 		if (pluginFrame) {
 			let message: MZXBX_MessageToPlugin = { hostData: this.rawData };
@@ -64,52 +64,52 @@ class PluginDialogPrompt {
 	closeDialogFrame(): void {
 		(document.getElementById("pluginDiv") as any).style.visibility = "hidden";
 	}
-	receiveMessageFromPlugin(e) {
-
-
-		if (e.data) {
-			let message: MZXBX_MessageToHost = e.data;
-			console.log('receiveMessage', message);
-			if (message.dialogID == this.dialogID) {
-
-				if (this.waitProjectCallback) {
-					let me = this;
-					console.log('waitProjectCallback');
-					globalCommandDispatcher.exe.commitProjectChanges([], () => {
-						if (me.waitProjectCallback) {
-							let newProj: Zvoog_Project = message.pluginData;
-							newProj.undo = globalCommandDispatcher.cfg().data.undo;
-							me.waitProjectCallback(message.pluginData);
-							if (message.done) {
-								me.closeDialogFrame();
-							}
-						}
-					});
-
-				} else {
-					console.log('next');
-					if (this.waitTimelinePointCallback) {
-						console.log('waitTimelinePointCallback');
-						this.waitTimelinePointCallback(message.pluginData);
-
-					}
-				}
-			} else {
-				console.log('wrong received message id', message.dialogID, this.dialogID);
-			}
+	receiveMessageFromPlugin(event) {
+		if (!(event.data)) {
+			console.log('empty message data');
 		} else {
-			if (this.waitForPluginInit) {
-				this.waitForPluginInit = false;
-				this.sendNewIdToPlugin();
-				if (this.waitProjectCallback) {
-					this.sendCurrentProjectToPlugin();
-				} else {
-					if (this.waitTimelinePointCallback) {
-						this.sendPointToPlugin();
+			let message: MZXBX_MessageToHost = event.data;
+			if (message.dialogID) {
+				console.log('receiveMessageFromPlugin', message);
+				if (message.dialogID == this.dialogID) {
+					if (this.waitProjectCallback) {
+						let me = this;
+						console.log('waitProjectCallback');
+						globalCommandDispatcher.exe.commitProjectChanges([], () => {
+							if (me.waitProjectCallback) {
+								let newProj: Zvoog_Project = message.pluginData;
+								newProj.undo = globalCommandDispatcher.cfg().data.undo;
+								me.waitProjectCallback(message.pluginData);
+								if (message.done) {
+									me.closeDialogFrame();
+								}
+							}
+						});
+					} else {
+						console.log('plugin point');
+						if (this.waitTimelinePointCallback) {
+							console.log('waitTimelinePointCallback');
+							this.waitTimelinePointCallback(message.pluginData);
+						}
 					}
+				} else {
+					console.log('wrong received message id', message.dialogID, this.dialogID);
 				}
 			} else {
-				console.log('wrong received object');
+				console.log('init receiveMessageFromPlugin');
+				if (this.waitForPluginInit) {
+					this.waitForPluginInit = false;
+					this.sendNewIdToPlugin();
+					if (this.waitProjectCallback) {
+						this.sendCurrentProjectToPlugin();
+					} else {
+						if (this.waitTimelinePointCallback) {
+							this.sendPointToPlugin();
+						}
+					}
+				} else {
+					console.log('wrong received object');
+				}
 			}
 		}
 	}

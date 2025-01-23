@@ -156,7 +156,8 @@ class SchedulePlayer {
     reconnectAllPlugins(schedule) {
         this.disconnectAllPlugins();
         this.schedule = schedule;
-        this.connectAllPlugins();
+        let msg = this.connectAllPlugins();
+        console.log('reconnectAllPlugins', msg);
     }
     startLoop(loopStart, currentPosition, loopEnd) {
         let msg = this.connectAllPlugins();

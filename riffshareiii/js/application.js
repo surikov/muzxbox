@@ -307,7 +307,7 @@ class PluginDialogPrompt {
         }
     }
     sendPointToPlugin() {
-        console.log('sendCurrentProjectToPlugin');
+        console.log('sendPointToPlugin');
         let pluginFrame = document.getElementById("pluginFrame");
         if (pluginFrame) {
             let message = { hostData: this.rawData };
@@ -317,52 +317,58 @@ class PluginDialogPrompt {
     closeDialogFrame() {
         document.getElementById("pluginDiv").style.visibility = "hidden";
     }
-    receiveMessageFromPlugin(e) {
-        if (e.data) {
-            let message = e.data;
-            console.log('receiveMessage', message);
-            if (message.dialogID == this.dialogID) {
-                if (this.waitProjectCallback) {
-                    let me = this;
-                    console.log('waitProjectCallback');
-                    globalCommandDispatcher.exe.commitProjectChanges([], () => {
-                        if (me.waitProjectCallback) {
-                            let newProj = message.pluginData;
-                            newProj.undo = globalCommandDispatcher.cfg().data.undo;
-                            me.waitProjectCallback(message.pluginData);
-                            if (message.done) {
-                                me.closeDialogFrame();
-                            }
-                        }
-                    });
-                }
-                else {
-                    console.log('next');
-                    if (this.waitTimelinePointCallback) {
-                        console.log('waitTimelinePointCallback');
-                        this.waitTimelinePointCallback(message.pluginData);
-                    }
-                }
-            }
-            else {
-                console.log('wrong received message id', message.dialogID, this.dialogID);
-            }
+    receiveMessageFromPlugin(event) {
+        if (!(event.data)) {
+            console.log('empty message data');
         }
         else {
-            if (this.waitForPluginInit) {
-                this.waitForPluginInit = false;
-                this.sendNewIdToPlugin();
-                if (this.waitProjectCallback) {
-                    this.sendCurrentProjectToPlugin();
+            let message = event.data;
+            if (message.dialogID) {
+                console.log('receiveMessageFromPlugin', message);
+                if (message.dialogID == this.dialogID) {
+                    if (this.waitProjectCallback) {
+                        let me = this;
+                        console.log('waitProjectCallback');
+                        globalCommandDispatcher.exe.commitProjectChanges([], () => {
+                            if (me.waitProjectCallback) {
+                                let newProj = message.pluginData;
+                                newProj.undo = globalCommandDispatcher.cfg().data.undo;
+                                me.waitProjectCallback(message.pluginData);
+                                if (message.done) {
+                                    me.closeDialogFrame();
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        console.log('plugin point');
+                        if (this.waitTimelinePointCallback) {
+                            console.log('waitTimelinePointCallback');
+                            this.waitTimelinePointCallback(message.pluginData);
+                        }
+                    }
                 }
                 else {
-                    if (this.waitTimelinePointCallback) {
-                        this.sendPointToPlugin();
-                    }
+                    console.log('wrong received message id', message.dialogID, this.dialogID);
                 }
             }
             else {
-                console.log('wrong received object');
+                console.log('init receiveMessageFromPlugin');
+                if (this.waitForPluginInit) {
+                    this.waitForPluginInit = false;
+                    this.sendNewIdToPlugin();
+                    if (this.waitProjectCallback) {
+                        this.sendCurrentProjectToPlugin();
+                    }
+                    else {
+                        if (this.waitTimelinePointCallback) {
+                            this.sendPointToPlugin();
+                        }
+                    }
+                }
+                else {
+                    console.log('wrong received object');
+                }
             }
         }
     }
@@ -513,9 +519,11 @@ class CommandDispatcher {
         this.tapSizeRatio = 1;
         this.onAir = false;
         this.neeToStart = false;
-        this.callback = (start, position, end) => {
+        this.lastPosition = 0;
+        this.callback = (start, pos, end) => {
+            this.lastPosition = pos;
             let xx = this.cfg().leftPad
-                + position * this.cfg().widthDurationRatio
+                + this.lastPosition * this.cfg().widthDurationRatio
                 - this.renderer.timeselectbar.positionTimeMarkWidth;
             this.renderer.timeselectbar.positionTimeAnchor.translation = { x: xx, y: 0 };
             this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
@@ -678,33 +686,36 @@ class CommandDispatcher {
             this.player.cancel();
         }
         else {
-            this.onAir = true;
-            let schedule = this.renderCurrentProjectForOutput();
-            let from = 0;
-            let to = 0;
-            if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
-                for (let nn = 0; nn <= globalCommandDispatcher.cfg().data.selectedPart.endMeasure; nn++) {
-                    to = to + schedule.series[nn].duration;
-                    if (nn < globalCommandDispatcher.cfg().data.selectedPart.startMeasure) {
-                        from = to;
-                    }
+            this.setupAndStartPlay();
+        }
+    }
+    setupAndStartPlay() {
+        this.onAir = true;
+        let schedule = this.renderCurrentProjectForOutput();
+        let from = 0;
+        let to = 0;
+        if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
+            for (let nn = 0; nn <= globalCommandDispatcher.cfg().data.selectedPart.endMeasure; nn++) {
+                to = to + schedule.series[nn].duration;
+                if (nn < globalCommandDispatcher.cfg().data.selectedPart.startMeasure) {
+                    from = to;
                 }
             }
-            else {
-                for (let nn = 0; nn < schedule.series.length; nn++) {
-                    to = to + schedule.series[nn].duration;
-                }
+        }
+        else {
+            for (let nn = 0; nn < schedule.series.length; nn++) {
+                to = to + schedule.series[nn].duration;
             }
-            let me = this;
-            let result = me.player.setupPlugins(me.audioContext, schedule, () => {
-                me.neeToStart = true;
-                me.startPlay(from, from, to);
-            });
-            if (result != null) {
-                this.onAir = false;
-                this.neeToStart = false;
-                me.renderer.warning.showWarning('Start playing', result, null);
-            }
+        }
+        let me = this;
+        let result = me.player.setupPlugins(me.audioContext, schedule, () => {
+            me.neeToStart = true;
+            me.startPlay(from, from, to);
+        });
+        if (result != null) {
+            this.onAir = false;
+            this.neeToStart = false;
+            me.renderer.warning.showWarning('Start playing', result, null);
         }
     }
     startPlay(from, position, to) {
@@ -769,9 +780,19 @@ class CommandDispatcher {
         console.log('promptProjectPluginGUI', url);
         pluginDialogPrompt.openActionDialogFrame(label, url, callback);
     }
-    promptPointPluginGUI(label, url, callback) {
+    promptPointPluginGUI(label, url, rawdata, callback) {
         console.log('promptPointPluginGUI', url);
-        pluginDialogPrompt.openPointDialogFrame(label, url, 'data for testing', callback);
+        pluginDialogPrompt.openPointDialogFrame(label, url, rawdata, callback);
+    }
+    findPluginRegistrationByKind(kind) {
+        let list = MZXBX_currentPlugins();
+        for (let ii = 0; ii < list.length; ii++) {
+            if (list[ii].kind == kind) {
+                return list[ii];
+            }
+        }
+        console.log('findPluginRegistrationByKind wrong', kind);
+        return null;
     }
     cancelPluginGUI() {
         console.log('cancelPluginGUI');
@@ -1938,7 +1959,7 @@ function fillPluginsLists() {
                     menuPointPerformers.children.push({
                         dragMix: true,
                         text: label, noLocalization: true, onClick: () => {
-                            globalCommandDispatcher.promptPointPluginGUI(label, url, (obj) => {
+                            globalCommandDispatcher.promptPointPluginGUI(label, url, 'no data from menu', (obj) => {
                                 console.log('performer callback', obj);
                                 return true;
                             });
@@ -3434,18 +3455,25 @@ class FilterIcon {
         });
         if (zidx < 5) {
             let px = globalCommandDispatcher.renderer.tiler.tapPxSize();
-            let url = MZXBX_currentPlugins()[order].ui;
             let btn = {
                 x: xx - sz / 2,
                 y: yy,
                 points: 'M 0 0 a 1 1 0 0 0 ' + (sz * px) + ' 0 Z',
                 css: 'fanSamplerInteractionIcon fanButton' + zidx,
                 activation: (x, y) => {
-                    console.log('' + filterTarget.kind + ':' + filterTarget.id, url);
-                    globalCommandDispatcher.promptPointPluginGUI(filterTarget.id, url, (obj) => {
-                        console.log('plugin callback', obj);
-                        return true;
-                    });
+                    let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
+                    if (info) {
+                        let url = info.ui;
+                        console.log('filter' + filterTarget.kind, filterTarget.id, url);
+                        console.log(order, MZXBX_currentPlugins()[order]);
+                        console.log(MZXBX_currentPlugins());
+                        globalCommandDispatcher.promptPointPluginGUI(filterTarget.id, url, filterTarget.dataBlob, (obj) => {
+                            console.log('plugin callback', obj);
+                            filterTarget.dataBlob = obj;
+                            globalCommandDispatcher.reConnectPlayer();
+                            return true;
+                        });
+                    }
                 }
             };
             dragAnchor.content.push(btn);
@@ -4010,7 +4038,8 @@ let _mzxbxProjectForTesting2 = {
     filters: [
         {
             id: 'volumeSlide', kind: 'zvolume1', dataBlob: '99', outputs: ['masterVolme'],
-            automation: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: '99' }, { skip: { count: 1, part: 16 }, stateBlob: '99' }] },
+            automation: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: '99' },
+                        { skip: { count: 1, part: 16 }, stateBlob: '99' }] },
                 { changes: [{ skip: { count: 1, part: 4 }, stateBlob: '99' }] }],
             iconPosition: { x: 152, y: 39 }, state: 0
         },

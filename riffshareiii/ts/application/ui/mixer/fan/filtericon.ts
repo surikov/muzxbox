@@ -132,18 +132,26 @@ class FilterIcon {
 		});
 		if (zidx < 5) {
 			let px: number = globalCommandDispatcher.renderer.tiler.tapPxSize();
-			let url: string = MZXBX_currentPlugins()[order].ui;
+			//let url: string = MZXBX_currentPlugins()[order].ui;
 			let btn: TilePath = {
 				x: xx - sz / 2
 				, y: yy
 				, points: 'M 0 0 a 1 1 0 0 0 ' + (sz * px) + ' 0 Z'
 				, css: 'fanSamplerInteractionIcon fanButton' + zidx
 				, activation: (x: number, y: number) => {
-					console.log('' + filterTarget.kind + ':' + filterTarget.id,url);
-					globalCommandDispatcher.promptPointPluginGUI(filterTarget.id, url, (obj: any) => {
-						console.log('plugin callback', obj);
-						return true;
-					});
+					let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
+					if (info) {
+						let url = info.ui;
+						console.log('filter' + filterTarget.kind, filterTarget.id, url);
+						console.log(order, MZXBX_currentPlugins()[order]);
+						console.log(MZXBX_currentPlugins());
+						globalCommandDispatcher.promptPointPluginGUI(filterTarget.id, url, filterTarget.dataBlob, (obj: any) => {
+							console.log('plugin callback', obj);
+							filterTarget.dataBlob=obj;
+							globalCommandDispatcher.reConnectPlayer();
+							return true;
+						});
+					}
 				}
 			};
 			dragAnchor.content.push(btn);

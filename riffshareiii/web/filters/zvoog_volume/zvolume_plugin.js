@@ -1,5 +1,5 @@
 "use strict";
-console.log('zvolume');
+console.log('zvolume v1.0');
 class ZVolImplementation {
     launch(context, parameters) {
         this.audioContext = context;
@@ -24,14 +24,5 @@ class ZVolImplementation {
 }
 function newZvoogVolumeImplementation() {
     return new ZVolImplementation();
-}
-class ZVUI {
-    init() {
-        console.log('ZVUI init');
-    }
-}
-function initZVUI() {
-    let zz = new ZVUI();
-    zz.init();
 }
 //# sourceMappingURL=zvolume_plugin.js.map

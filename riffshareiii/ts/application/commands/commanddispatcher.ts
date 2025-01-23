@@ -7,12 +7,13 @@ class CommandDispatcher {
 	tapSizeRatio: number = 1;
 	onAir = false;
 	neeToStart = false;
-	callback: (start: number, position: number, end: number) => void = (start: number, position: number, end: number) => {
-
+	lastPosition = 0;
+	callback: (start: number, position: number, end: number) => void = (start: number, pos: number, end: number) => {
+		this.lastPosition = pos;
 		//this.renderer.timeselectbar.positionTimeMark.x 
 
 		let xx = this.cfg().leftPad
-			+ position * this.cfg().widthDurationRatio
+			+ this.lastPosition * this.cfg().widthDurationRatio
 			- this.renderer.timeselectbar.positionTimeMarkWidth;
 		this.renderer.timeselectbar.positionTimeAnchor.translation = { x: xx, y: 0 };
 		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup
@@ -218,37 +219,35 @@ class CommandDispatcher {
 			this.onAir = false;
 			this.player.cancel();
 		} else {
-			this.onAir = true;
-
-			let schedule = this.renderCurrentProjectForOutput();
-			//console.log(schedule);
-			//let duration = 0;
-			let from = 0;
-			let to = 0;
-
-			if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
-				for (let nn = 0; nn <= globalCommandDispatcher.cfg().data.selectedPart.endMeasure; nn++) {
-					to = to + schedule.series[nn].duration;
-					if (nn < globalCommandDispatcher.cfg().data.selectedPart.startMeasure) {
-						from = to;
-					}
-				}
-			} else {
-				for (let nn = 0; nn < schedule.series.length; nn++) {
-					to = to + schedule.series[nn].duration;
+			this.setupAndStartPlay();
+		}
+	}
+	setupAndStartPlay() {
+		this.onAir = true;
+		let schedule = this.renderCurrentProjectForOutput();
+		let from = 0;
+		let to = 0;
+		if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
+			for (let nn = 0; nn <= globalCommandDispatcher.cfg().data.selectedPart.endMeasure; nn++) {
+				to = to + schedule.series[nn].duration;
+				if (nn < globalCommandDispatcher.cfg().data.selectedPart.startMeasure) {
+					from = to;
 				}
 			}
-			//console.log(globalCommandDispatcher.cfg().data.selectedPart, from, to);
-			let me = this;
-			let result = me.player.setupPlugins(me.audioContext, schedule, () => {
-				me.neeToStart = true;
-				me.startPlay(from, from, to);
-			});
-			if (result != null) {
-				this.onAir = false;
-				this.neeToStart = false;
-				me.renderer.warning.showWarning('Start playing', result, null);
+		} else {
+			for (let nn = 0; nn < schedule.series.length; nn++) {
+				to = to + schedule.series[nn].duration;
 			}
+		}
+		let me = this;
+		let result = me.player.setupPlugins(me.audioContext, schedule, () => {
+			me.neeToStart = true;
+			me.startPlay(from, from, to);
+		});
+		if (result != null) {
+			this.onAir = false;
+			this.neeToStart = false;
+			me.renderer.warning.showWarning('Start playing', result, null);
 		}
 	}
 	startPlay(from: number, position: number, to: number) {
@@ -348,9 +347,19 @@ class CommandDispatcher {
 		console.log('promptProjectPluginGUI', url);
 		pluginDialogPrompt.openActionDialogFrame(label, url, callback);
 	}
-	promptPointPluginGUI(label: string, url: string, callback: (obj: any) => boolean) {
+	promptPointPluginGUI(label: string, url: string, rawdata: string, callback: (obj: any) => boolean) {
 		console.log('promptPointPluginGUI', url);
-		pluginDialogPrompt.openPointDialogFrame(label, url, 'data for testing', callback);
+		pluginDialogPrompt.openPointDialogFrame(label, url, rawdata, callback);
+	}
+	findPluginRegistrationByKind(kind: String): null | MZXBX_PluginRegistrationInformation {
+		let list: MZXBX_PluginRegistrationInformation[] = MZXBX_currentPlugins();
+		for (let ii = 0; ii < list.length; ii++) {
+			if (list[ii].kind == kind) {
+				return list[ii];
+			}
+		}
+		console.log('findPluginRegistrationByKind wrong', kind);
+		return null;
 	}
 	cancelPluginGUI() {
 		console.log('cancelPluginGUI');
