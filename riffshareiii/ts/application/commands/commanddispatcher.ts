@@ -207,20 +207,28 @@ class CommandDispatcher {
 		}
 		return forOutput;
 	}
-	reConnectPlayer() {
+	reStartPlayIfPlay() {
 		if (this.onAir && (!this.neeToStart)) {
-			let schedule = this.renderCurrentProjectForOutput();
-			this.player.reconnectAllPlugins(schedule);
+			//let schedule = this.renderCurrentProjectForOutput();
+			//console.log('schedule',schedule);
+			//this.player.reconnectAllPlugins(schedule);
+			if (this.onAir) {
+				this.stopPlay();
+				this.setupAndStartPlay();
+			}
 		}
 	}
 	toggleStartStop() {
 		//console.log('toggleStartStop', this.onAir);
 		if (this.onAir) {
-			this.onAir = false;
-			this.player.cancel();
+			this.stopPlay();
 		} else {
 			this.setupAndStartPlay();
 		}
+	}
+	stopPlay() {
+		this.onAir = false;
+		this.player.cancel();
 	}
 	setupAndStartPlay() {
 		this.onAir = true;
@@ -242,7 +250,13 @@ class CommandDispatcher {
 		let me = this;
 		let result = me.player.setupPlugins(me.audioContext, schedule, () => {
 			me.neeToStart = true;
-			me.startPlay(from, from, to);
+			if (this.lastPosition < from) {
+				this.lastPosition = from;
+			}
+			if (this.lastPosition >= to) {
+				this.lastPosition = to;
+			}
+			me.startPlay(from, this.lastPosition, to);
 		});
 		if (result != null) {
 			this.onAir = false;

@@ -116,14 +116,12 @@ class SchedulePlayer {
             let plugin = this.filters[ff].plugin;
             if (plugin) {
                 plugin.launch(this.audioContext, this.filters[ff].properties);
-                this.filters[ff].launched = true;
             }
         }
         for (let pp = 0; pp < this.performers.length; pp++) {
             let plugin = this.performers[pp].plugin;
             if (plugin) {
                 plugin.launch(this.audioContext, this.performers[pp].properties);
-                this.performers[pp].launched = true;
             }
         }
         return null;
@@ -157,7 +155,6 @@ class SchedulePlayer {
         this.disconnectAllPlugins();
         this.schedule = schedule;
         let msg = this.connectAllPlugins();
-        console.log('reconnectAllPlugins', msg);
     }
     startLoop(loopStart, currentPosition, loopEnd) {
         let msg = this.connectAllPlugins();
@@ -243,18 +240,23 @@ class SchedulePlayer {
                 if (plugin) {
                     let output = plugin.output();
                     if (output) {
-                        for (let oo = 0; oo < filter.outputs.length; oo++) {
-                            let outId = filter.outputs[oo];
-                            let targetNode = master;
-                            if (outId) {
-                                let target = this.findFilterPlugin(outId);
-                                if (target) {
-                                    targetNode = target.input();
+                        try {
+                            for (let oo = 0; oo < filter.outputs.length; oo++) {
+                                let outId = filter.outputs[oo];
+                                let targetNode = master;
+                                if (outId) {
+                                    let target = this.findFilterPlugin(outId);
+                                    if (target) {
+                                        targetNode = target.input();
+                                    }
+                                }
+                                if (targetNode) {
+                                    output.disconnect(targetNode);
                                 }
                             }
-                            if (targetNode) {
-                                output.disconnect(targetNode);
-                            }
+                        }
+                        catch (ex) {
+                            console.log(ex);
                         }
                     }
                 }
@@ -282,6 +284,7 @@ class SchedulePlayer {
                             }
                         }
                         catch (ex) {
+                            console.log(ex);
                         }
                     }
                 }
@@ -476,7 +479,7 @@ class PluginLoader {
                 return;
             }
         }
-        filters.push({ plugin: null, filterId: id, kind: kind, properties: properties, launched: false });
+        filters.push({ plugin: null, filterId: id, kind: kind, properties: properties });
     }
     сollectPerformerPlugin(id, kind, properties, performers) {
         for (let ii = 0; ii < performers.length; ii++) {
@@ -485,7 +488,7 @@ class PluginLoader {
                 return;
             }
         }
-        performers.push({ plugin: null, channelId: id, kind: kind, properties: properties, launched: false });
+        performers.push({ plugin: null, channelId: id, kind: kind, properties: properties });
     }
     findPluginInfo(kind) {
         for (let ll = 0; ll < MZXBX_currentPlugins().length; ll++) {

@@ -168,14 +168,12 @@ declare type MZXBX_FilterHolder = {
     filterId: string;
     kind: string;
     properties: string;
-    launched: boolean;
 };
 declare type MZXBX_PerformerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | null;
     channelId: string;
     kind: string;
     properties: string;
-    launched: boolean;
 };
 declare type MZXBX_Channel = {
     id: string;
@@ -243,7 +241,6 @@ declare type MZXBX_Schedule = {
 declare type MZXBX_Player = {
     setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => string | null;
     startLoop: (from: number, position: number, to: number) => string;
-    reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];
     allPerformers(): MZXBX_PerformerHolder[];

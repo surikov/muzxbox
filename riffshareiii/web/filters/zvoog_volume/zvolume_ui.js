@@ -15,7 +15,6 @@ class ZVUI {
     sendMessageToHost(data) {
         var message = { dialogID: this.id, pluginData: data, done: false };
         window.parent.postMessage(message, '*');
-        console.log('sendMessageToHost', message);
     }
     receiveHostMessage(messageEvent) {
         let message = messageEvent.data;

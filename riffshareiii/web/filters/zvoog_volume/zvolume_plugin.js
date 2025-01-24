@@ -1,11 +1,13 @@
 "use strict";
 console.log('zvolume v1.0');
 class ZVolImplementation {
+    constructor() {
+        this.num = 0;
+    }
     launch(context, parameters) {
         this.audioContext = context;
         this.volume = this.audioContext.createGain();
-        this.num = parseInt(parameters);
-        this.volume.gain.setValueAtTime(this.num / 100, 0);
+        this.schedule(this.audioContext.currentTime + 0.001, parameters);
     }
     busy() {
         return null;

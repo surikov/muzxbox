@@ -142,13 +142,13 @@ class FilterIcon {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
 					if (info) {
 						let url = info.ui;
-						console.log('filter' + filterTarget.kind, filterTarget.id, url);
-						console.log(order, MZXBX_currentPlugins()[order]);
-						console.log(MZXBX_currentPlugins());
+						//console.log('filter' + filterTarget.kind, filterTarget.id, url);
+						//console.log(order, MZXBX_currentPlugins()[order]);
+						//console.log(MZXBX_currentPlugins());
 						globalCommandDispatcher.promptPointPluginGUI(filterTarget.id, url, filterTarget.dataBlob, (obj: any) => {
-							console.log('plugin callback', obj);
-							filterTarget.dataBlob=obj;
-							globalCommandDispatcher.reConnectPlayer();
+							console.log('plugin callback', filterTarget.id, filterTarget.dataBlob, '=>', obj);
+							filterTarget.dataBlob = obj;
+							globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
 						});
 					}

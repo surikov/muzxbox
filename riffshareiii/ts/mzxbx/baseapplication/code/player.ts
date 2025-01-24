@@ -77,26 +77,17 @@ class SchedulePlayer implements MZXBX_Player {
 	launchCollectedPlugins(): null | string {
 		for (let ff = 0; ff < this.filters.length; ff++) {
 			let plugin: MZXBX_AudioFilterPlugin | null = this.filters[ff].plugin;
-			//console.log('filter', this.filters[ff].id, this.filters[ff].kind, this.filters[ff].properties);
 			if (plugin) {
-				//console.log('launch');
-				//if (!this.filters[ff].launched) {
+				//console.log('launch',this.filters[ff].filterId,this.filters[ff].properties,this.filters[ff]);
 				plugin.launch(this.audioContext, this.filters[ff].properties);
-				this.filters[ff].launched = true;
-				//console.log('launch',this.filters[ff]);
-				//}
+				//this.filters[ff].launched = true;
 			}
 		}
 		for (let pp = 0; pp < this.performers.length; pp++) {
 			let plugin: MZXBX_AudioPerformerPlugin | null = this.performers[pp].plugin;
-			//console.log('performer', this.performers[pp].id, this.performers[pp].kind, this.performers[pp].properties);
 			if (plugin) {
-				//console.log('launch');
-				//if (!this.performers[pp].launched) {
 				plugin.launch(this.audioContext, this.performers[pp].properties);
-				this.performers[pp].launched = true;
-				//console.log('launch',this.performers[pp]);
-				//}
+				//this.performers[pp].launched = true;
 			}
 		}
 		return null;
@@ -127,8 +118,8 @@ class SchedulePlayer implements MZXBX_Player {
 	reconnectAllPlugins(schedule: MZXBX_Schedule): void {
 		this.disconnectAllPlugins();
 		this.schedule = schedule;
-		let msg=this.connectAllPlugins();
-		console.log('reconnectAllPlugins',msg);
+		let msg = this.connectAllPlugins();
+		//console.log('reconnectAllPlugins', msg, schedule);
 	}
 	startLoop(loopStart: number, currentPosition: number, loopEnd: number): string {
 		//loopStart=8;
@@ -162,7 +153,6 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 	}*/
 	connectAllPlugins(): string | null {
-		//console.log('connectAllPlugins');
 		let msg: string | null = this.launchCollectedPlugins();
 		if (msg) {
 			return msg;
@@ -173,36 +163,22 @@ class SchedulePlayer implements MZXBX_Player {
 			} else {
 				if (this.schedule) {
 					let master: AudioNode = this.audioContext.destination;
-					//(masterOutput as any).debug = 'destination';
 					for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
 						let filter = this.schedule.filters[ff];
 						let plugin = this.findFilterPlugin(filter.id);
-
 						if (plugin) {
 							let pluginOutput = plugin.output();
-
 							if (pluginOutput) {
-								/*(pluginOutput as any).debug = filter.id;
-								pluginOutput.connect(masterOutput);
-								let pluginInput = plugin.input();
-								if (pluginInput) {
-									//console.log(pluginInput,pluginOutput, masterOutput);
-									masterOutput = pluginInput;
-								}
-							}*/
 								for (let oo = 0; oo < filter.outputs.length; oo++) {
 									let outId = filter.outputs[oo];
-									//console.log('check filter', filter.id, outId);
 									let targetNode: AudioNode | null = master;
 									if (outId) {
 										let target = this.findFilterPlugin(outId);
 										if (target) {
 											targetNode = target.input();
 										}
-
 									}
 									if (targetNode) {
-										//console.log('connect filter', filter.id, outId);
 										pluginOutput.connect(targetNode);
 									}
 								}
@@ -211,30 +187,10 @@ class SchedulePlayer implements MZXBX_Player {
 					}
 					for (let cc = 0; cc < this.schedule.channels.length; cc++) {
 						let channel = this.schedule.channels[cc];
-						//let channelOutput = masterOutput;
-						/*for (let ff = channel.filters.length - 1; ff >= 0; ff--) {
-							let filter = channel.filters[ff];
-							let plugin = this.findFilterPlugin(filter.id);
-							if (plugin) {
-								let output = plugin.output();
-								if (output) {
-									(output as any).debug = filter.id;
-									output.connect(channelOutput);
-									let input = plugin.input();
-									if (input) {
-										//console.log(input,output, masterOutput);
-										channelOutput = input;
-									}
-								}
-							}
-						}*/
 						let performer = this.findPerformerPlugin(channel.id);
 						if (performer) {
 							let output = performer.output();
 							if (output) {
-								//(output as any).debug = channel.id;
-								//console.log(output,channelOutput);
-								//output.connect(channelOutput);
 								for (let oo = 0; oo < channel.outputs.length; oo++) {
 									let outId = channel.outputs[oo];
 									let targetNode: AudioNode | null = master;
@@ -242,12 +198,9 @@ class SchedulePlayer implements MZXBX_Player {
 										let target = this.findFilterPlugin(outId);
 										if (target) {
 											targetNode = target.input();
-
 										}
-
 									}
 									if (targetNode) {
-										//console.log('connect channel', channel.id, outId);
 										output.connect(targetNode);
 									}
 								}
@@ -270,29 +223,33 @@ class SchedulePlayer implements MZXBX_Player {
 				if (plugin) {
 					let output = plugin.output();
 					if (output) {
-						/*try {
-							output.disconnect(toNode);
-						} catch (ex) {
-							//ignore
-						}
-						//output.disconnect(toNode);
-						let input = plugin.input();
-						if (input) {
-							toNode = input;
-						}*/
-						for (let oo = 0; oo < filter.outputs.length; oo++) {
-							let outId = filter.outputs[oo];
-							let targetNode: AudioNode | null = master;
-							if (outId) {
-								let target = this.findFilterPlugin(outId);
-								if (target) {
-									targetNode = target.input();
+						try {
+							/*try {
+								output.disconnect(toNode);
+							} catch (ex) {
+								//ignore
+							}
+							//output.disconnect(toNode);
+							let input = plugin.input();
+							if (input) {
+								toNode = input;
+							}*/
+							for (let oo = 0; oo < filter.outputs.length; oo++) {
+								let outId = filter.outputs[oo];
+								let targetNode: AudioNode | null = master;
+								if (outId) {
+									let target = this.findFilterPlugin(outId);
+									if (target) {
+										targetNode = target.input();
 
+									}
+								}
+								if (targetNode) {
+									output.disconnect(targetNode);
 								}
 							}
-							if (targetNode) {
-								output.disconnect(targetNode);
-							}
+						} catch (ex) {
+							console.log(ex);
 						}
 					}
 				}
@@ -342,7 +299,7 @@ class SchedulePlayer implements MZXBX_Player {
 								}
 							}
 						} catch (ex) {
-							//ignore
+							console.log(ex);
 						}
 					}
 				}

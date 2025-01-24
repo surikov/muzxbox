@@ -7,6 +7,7 @@ class ZVUI {
 		this.sendMessageToHost('');
 		this.slider = document.getElementById('voluctrl');
 		this.slider.addEventListener('change', (event) => {
+			//console.log(event,this.slider.value);
 			this.sendMessageToHost(this.slider.value);
 		});
 	}

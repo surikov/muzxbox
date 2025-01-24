@@ -674,20 +674,25 @@ class CommandDispatcher {
         }
         return forOutput;
     }
-    reConnectPlayer() {
+    reStartPlayIfPlay() {
         if (this.onAir && (!this.neeToStart)) {
-            let schedule = this.renderCurrentProjectForOutput();
-            this.player.reconnectAllPlugins(schedule);
+            if (this.onAir) {
+                this.stopPlay();
+                this.setupAndStartPlay();
+            }
         }
     }
     toggleStartStop() {
         if (this.onAir) {
-            this.onAir = false;
-            this.player.cancel();
+            this.stopPlay();
         }
         else {
             this.setupAndStartPlay();
         }
+    }
+    stopPlay() {
+        this.onAir = false;
+        this.player.cancel();
     }
     setupAndStartPlay() {
         this.onAir = true;
@@ -710,7 +715,13 @@ class CommandDispatcher {
         let me = this;
         let result = me.player.setupPlugins(me.audioContext, schedule, () => {
             me.neeToStart = true;
-            me.startPlay(from, from, to);
+            if (this.lastPosition < from) {
+                this.lastPosition = from;
+            }
+            if (this.lastPosition >= to) {
+                this.lastPosition = to;
+            }
+            me.startPlay(from, this.lastPosition, to);
         });
         if (result != null) {
             this.onAir = false;
@@ -1597,7 +1608,7 @@ class RightMenuPanel {
                             }
                         }
                     });
-                    globalCommandDispatcher.reConnectPlayer();
+                    globalCommandDispatcher.reStartPlayIfPlay();
                 }
             };
             if (tt > 0) {
@@ -1629,7 +1640,7 @@ class RightMenuPanel {
                             }
                         }
                     });
-                    globalCommandDispatcher.reConnectPlayer();
+                    globalCommandDispatcher.reStartPlayIfPlay();
                 },
                 itemStates: [icon_sound_loud, icon_sound_none, icon_flash],
                 selectedState: drum.sampler.state
@@ -1661,7 +1672,7 @@ class RightMenuPanel {
                         filter.state = 0;
                     }
                 });
-                globalCommandDispatcher.reConnectPlayer();
+                globalCommandDispatcher.reStartPlayIfPlay();
             };
             if (ff > 0) {
                 item.onClick = () => {
@@ -3464,13 +3475,10 @@ class FilterIcon {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
                     if (info) {
                         let url = info.ui;
-                        console.log('filter' + filterTarget.kind, filterTarget.id, url);
-                        console.log(order, MZXBX_currentPlugins()[order]);
-                        console.log(MZXBX_currentPlugins());
                         globalCommandDispatcher.promptPointPluginGUI(filterTarget.id, url, filterTarget.dataBlob, (obj) => {
-                            console.log('plugin callback', obj);
+                            console.log('plugin callback', filterTarget.id, filterTarget.dataBlob, '=>', obj);
                             filterTarget.dataBlob = obj;
-                            globalCommandDispatcher.reConnectPlayer();
+                            globalCommandDispatcher.reStartPlayIfPlay();
                             return true;
                         });
                     }
@@ -4038,24 +4046,19 @@ let _mzxbxProjectForTesting2 = {
     filters: [
         {
             id: 'volumeSlide', kind: 'zvolume1', dataBlob: '99', outputs: ['masterVolme'],
-            automation: [{ changes: [] }, { changes: [{ skip: { count: 5, part: 16 }, stateBlob: '99' },
-                        { skip: { count: 1, part: 16 }, stateBlob: '99' }] },
-                { changes: [{ skip: { count: 1, part: 4 }, stateBlob: '99' }] }],
+            automation: [{ changes: [] }, {
+                    changes: []
+                },
+                {
+                    changes: []
+                }],
             iconPosition: { x: 152, y: 39 }, state: 0
         },
         {
             id: 'masterVolme', kind: 'zvolume1', dataBlob: '99', outputs: [''],
             automation: [{ changes: [] }, { changes: [] },
                 {
-                    changes: [
-                        { skip: { count: 1, part: 16 }, stateBlob: '99' },
-                        { skip: { count: 2, part: 16 }, stateBlob: '99' },
-                        { skip: { count: 3, part: 16 }, stateBlob: '99' },
-                        { skip: { count: 4, part: 16 }, stateBlob: '99' },
-                        { skip: { count: 5, part: 16 }, stateBlob: '99' },
-                        { skip: { count: 6, part: 16 }, stateBlob: '99' },
-                        { skip: { count: 7, part: 16 }, stateBlob: '99' }
-                    ]
+                    changes: []
                 },
                 { changes: [] }],
             iconPosition: { x: 188, y: 7 }, state: 0

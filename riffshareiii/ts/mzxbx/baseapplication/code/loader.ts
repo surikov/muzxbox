@@ -90,7 +90,7 @@ class PluginLoader {
 				return;
 			}
 		}
-		filters.push({ plugin: null, filterId: id, kind: kind, properties: properties, launched: false });
+		filters.push({ plugin: null, filterId: id, kind: kind, properties: properties });
 	}
 	сollectPerformerPlugin(id: string, kind: string, properties: string, performers: MZXBX_PerformerHolder[]): void {
 		//console.log('сollectPerformerPlugin id:', id, 'kind', kind);
@@ -100,7 +100,7 @@ class PluginLoader {
 				return;
 			}
 		}
-		performers.push({ plugin: null, channelId: id, kind: kind, properties: properties, launched: false });
+		performers.push({ plugin: null, channelId: id, kind: kind, properties: properties });
 	}
 	findPluginInfo(kind: string): MZXBX_PluginRegistrationInformation | null {
 		for (let ll = 0; ll < MZXBX_currentPlugins().length; ll++) {
