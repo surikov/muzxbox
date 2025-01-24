@@ -142,12 +142,10 @@ class FilterIcon {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
 					if (info) {
 						let url = info.ui;
-						//console.log('filter' + filterTarget.kind, filterTarget.id, url);
-						//console.log(order, MZXBX_currentPlugins()[order]);
-						//console.log(MZXBX_currentPlugins());
 						globalCommandDispatcher.promptPointPluginGUI(filterTarget.id, url, filterTarget.dataBlob, (obj: any) => {
-							console.log('plugin callback', filterTarget.id, filterTarget.dataBlob, '=>', obj);
-							filterTarget.dataBlob = obj;
+							globalCommandDispatcher.exe.commitProjectChanges(['filters',order], () => {
+								filterTarget.dataBlob = obj;
+							});
 							globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
 						});

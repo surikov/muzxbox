@@ -7,7 +7,12 @@ class MIDIIImportMusicPlugin {
 	init() {
 		console.log('init MIDI import');
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
-		window.parent.postMessage('', '*');
+		//window.parent.postMessage('', '*');
+		window.parent.postMessage({
+			dialogID: this.callbackID
+			, pluginData: this.parsedProject
+			, done: false
+		}, '*');
 	}
 	sendImportedMIDIData() {
 		

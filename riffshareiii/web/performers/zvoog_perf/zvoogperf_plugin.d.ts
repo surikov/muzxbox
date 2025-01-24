@@ -44,6 +44,7 @@ declare type Zvoog_FilterTarget = {
         x: number;
         y: number;
     };
+    state: 0 | 1;
 };
 declare type Zvoog_AudioSequencer = {
     id: string;
@@ -54,6 +55,7 @@ declare type Zvoog_AudioSequencer = {
         x: number;
         y: number;
     };
+    state: 0 | 1 | 2;
 };
 declare type Zvoog_AudioSampler = {
     id: string;
@@ -64,6 +66,7 @@ declare type Zvoog_AudioSampler = {
         x: number;
         y: number;
     };
+    state: 0 | 1 | 2;
 };
 declare type Zvoog_Chord = {
     skip: Zvoog_Metre;
@@ -165,14 +168,12 @@ declare type MZXBX_FilterHolder = {
     filterId: string;
     kind: string;
     properties: string;
-    launched: boolean;
 };
 declare type MZXBX_PerformerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | null;
     channelId: string;
     kind: string;
     properties: string;
-    launched: boolean;
 };
 declare type MZXBX_Channel = {
     id: string;
@@ -240,6 +241,7 @@ declare type MZXBX_Schedule = {
 declare type MZXBX_Player = {
     setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => string | null;
     startLoop: (from: number, position: number, to: number) => string;
+    reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];
     allPerformers(): MZXBX_PerformerHolder[];
@@ -369,7 +371,8 @@ declare class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPl
     player: ZPWebAudioFontPlayer;
     volume: GainNode;
     loader: ZPWebAudioFontLoader;
-    midinumber: number;
+    midiidx: number;
+    listidx: number;
     info: ZPPresetInfo;
     preset: ZPWavePreset | null;
     launch(context: AudioContext, parameters: string): void;
@@ -378,4 +381,16 @@ declare class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPl
     cancel(): void;
     output(): AudioNode | null;
 }
+declare class ZPUI {
+    id: string;
+    data: string;
+    list: any;
+    player: ZPWebAudioFontPlayer;
+    init(): void;
+    sendMessageToHost(data: string): void;
+    receiveHostMessage(messageEvent: MessageEvent): void;
+    setMessagingId(newId: string): void;
+    setState(data: string): void;
+}
+declare function initZPerfUI(): void;
 declare function newZvoogBasePerformerImplementation(): MZXBX_AudioPerformerPlugin;

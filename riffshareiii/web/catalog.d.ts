@@ -168,14 +168,12 @@ declare type MZXBX_FilterHolder = {
     filterId: string;
     kind: string;
     properties: string;
-    launched: boolean;
 };
 declare type MZXBX_PerformerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | null;
     channelId: string;
     kind: string;
     properties: string;
-    launched: boolean;
 };
 declare type MZXBX_Channel = {
     id: string;

@@ -278,8 +278,9 @@ class ZPWebAudioFontLoader {
                 '0302_Aspirin_sf2_file', '0302_GeneralUserGS_sf2_file', '0302_JCLive_sf2_file', '0303_Aspirin_sf2_file', '0304_Aspirin_sf2_file', '0310_Aspirin_sf2_file', '0310_Chaos_sf2_file',
                 '0310_FluidR3_GM_sf2_file', '0310_GeneralUserGS_sf2_file', '0310_JCLive_sf2_file', '0310_LesPaul_sf2', '0310_LesPaul_sf2_file', '0310_SBAWE32_sf2_file', '0310_SBLive_sf2',
                 '0310_SoundBlasterOld_sf2', '0311_FluidR3_GM_sf2_file', '0311_GeneralUserGS_sf2_file', '0320_Aspirin_sf2_file', '0320_Chaos_sf2_file', '0320_FluidR3_GM_sf2_file', '0320_GeneralUserGS_sf2_file',
-                '0320_JCLive_sf2_file', '0320_SBLive_sf2', '0320_SoundBlasterOld_sf2', '0321_GeneralUserGS_sf2_file', '0322_GeneralUserGS_sf2_file', '0330_Aspirin_sf2_file', '0330_Chaos_sf2_file',
-                '0330_FluidR3_GM_sf2_file', '0330_GeneralUserGS_sf2_file', '0330_JCLive_sf2_file', '0330_SBLive_sf2', '0330_SoundBlasterOld_sf2', '0331_GeneralUserGS_sf2_file', '0332_GeneralUserGS_sf2_file',
+                '0320_JCLive_sf2_file', '0320_SBLive_sf2', '0320_SoundBlasterOld_sf2', '0321_GeneralUserGS_sf2_file', '0322_GeneralUserGS_sf2_file',
+                '0330_JCLive_sf2_file',
+                '0330_Aspirin_sf2_file', '0330_Chaos_sf2_file', '0330_FluidR3_GM_sf2_file', '0330_GeneralUserGS_sf2_file', '0330_SBLive_sf2', '0330_SoundBlasterOld_sf2', '0331_GeneralUserGS_sf2_file', '0332_GeneralUserGS_sf2_file',
                 '0340_Aspirin_sf2_file', '0340_Chaos_sf2_file', '0340_FluidR3_GM_sf2_file', '0340_GeneralUserGS_sf2_file', '0340_JCLive_sf2_file', '0340_SBLive_sf2', '0340_SoundBlasterOld_sf2',
                 '0341_Aspirin_sf2_file', '0341_GeneralUserGS_sf2_file', '0350_Aspirin_sf2_file', '0350_Chaos_sf2_file', '0350_FluidR3_GM_sf2_file', '0350_GeneralUserGS_sf2_file', '0350_JCLive_sf2_file',
                 '0350_SBLive_sf2', '0350_SoundBlasterOld_sf2', '0351_GeneralUserGS_sf2_file', '0360_Aspirin_sf2_file', '0360_Chaos_sf2_file', '0360_FluidR3_GM_sf2_file', '0360_GeneralUserGS_sf2_file',
@@ -871,7 +872,8 @@ class ZvoogBasePerformerImplementation {
     constructor() {
         this.player = new ZPWebAudioFontPlayer();
         this.loader = new ZPWebAudioFontLoader(this.player);
-        this.midinumber = 0;
+        this.midiidx = 0;
+        this.listidx = -1;
         this.preset = null;
     }
     launch(context, parameters) {
@@ -879,8 +881,18 @@ class ZvoogBasePerformerImplementation {
         this.audioContext = context;
         this.volume = this.audioContext.createGain();
         this.volume.gain.setValueAtTime(0.7, 0);
-        this.midinumber = parseInt(parameters);
-        let idx = this.loader.findInstrument(this.midinumber);
+        let split = parameters.split('/');
+        let idx = 0;
+        if (split.length == 2) {
+            this.listidx = parseInt(split[1]);
+            this.midiidx = parseInt(split[0]);
+            idx = this.listidx;
+        }
+        else {
+            this.listidx = -1;
+            this.midiidx = parseInt(parameters);
+            idx = this.loader.findInstrument(this.midiidx);
+        }
         this.info = this.loader.instrumentInfo(idx);
         this.loader.startLoad(context, this.info.url, this.info.variable);
         this.loader.waitLoad(() => {
@@ -930,6 +942,60 @@ class ZvoogBasePerformerImplementation {
             return null;
         }
     }
+}
+class ZPUI {
+    constructor() {
+        this.id = '';
+        this.data = '';
+        this.player = new ZPWebAudioFontPlayer();
+    }
+    init() {
+        window.addEventListener('message', this.receiveHostMessage.bind(this), false);
+        this.sendMessageToHost('');
+        this.list = document.getElementById('inslist');
+        let ins = this.player.loader.instrumentKeys();
+        for (let ii = 0; ii < ins.length; ii++) {
+            var option = document.createElement('option');
+            option.value = '' + ii;
+            option.innerHTML = ins[ii];
+            this.list.appendChild(option);
+        }
+        this.list.addEventListener('change', (event) => {
+            console.dir(this.player.loader.instrumentKeys()[1 * this.list.value]);
+            this.sendMessageToHost('0/' + this.list.value);
+        });
+    }
+    sendMessageToHost(data) {
+        var message = { dialogID: this.id, pluginData: data, done: false };
+        window.parent.postMessage(message, '*');
+    }
+    receiveHostMessage(messageEvent) {
+        let message = messageEvent.data;
+        if (this.id) {
+            this.setState(message.hostData);
+        }
+        else {
+            this.setMessagingId(message.hostData);
+        }
+    }
+    setMessagingId(newId) {
+        this.id = newId;
+    }
+    setState(data) {
+        console.log('setState', data);
+        this.data = data;
+        let split = this.data.split('/');
+        if (split.length == 2) {
+            this.list.value = parseInt(split[1]);
+        }
+        else {
+            this.list.value = this.player.loader.findInstrument(parseInt(split[0]));
+        }
+    }
+}
+function initZPerfUI() {
+    console.log('initZPerfUI');
+    new ZPUI().init();
 }
 function newZvoogBasePerformerImplementation() {
     return new ZvoogBasePerformerImplementation();

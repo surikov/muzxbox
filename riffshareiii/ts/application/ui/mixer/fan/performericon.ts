@@ -183,7 +183,20 @@ class PerformerIcon {
 				, h: sz / 2
 				, css: 'fanSamplerInteractionIcon fanButton' + zidx
 				, activation: (x: number, y: number) => {
-					console.log('' + track.performer.kind + ':' + track.performer.id);
+					//console.log('' + track.performer.kind + ':' + track.performer.id);
+					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
+					if (info) {
+						let url = info.ui;
+						globalCommandDispatcher.promptPointPluginGUI(track.performer.id, url, track.performer.data, (obj: any) => {
+							globalCommandDispatcher.exe.commitProjectChanges(['tracks',trackNo,'performer'], () => {
+								track.performer.data = obj;
+							});
+							globalCommandDispatcher.reStartPlayIfPlay();
+							return true;
+						});
+					}
+
+
 				}
 			};
 			dragAnchor.content.push(btn);

@@ -33,7 +33,7 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 		, evaluate: 'newZvoogVolumeImplementation', script: './web/filters/zvoog_volume/zvolume_plugin.js'
 	}
 	, {
-		label: 'Zvoog Performer', purpose: 'Performer', kind: 'zinstr1', ui: './web/performers/zvoog_perf/zpui.html'
+		label: 'Zvoog Performer', purpose: 'Performer', kind: 'zinstr1', ui: './web/performers/zvoog_perf/perfui.html'
 		, evaluate: 'newZvoogBasePerformerImplementation', script: './web/performers/zvoog_perf/zvoogperf_plugin.js'
 	}
 

@@ -399,6 +399,7 @@ class CommandExe {
         return parent;
     }
     unAction(cmd) {
+        globalCommandDispatcher.stopPlay();
         for (let ii = cmd.actions.length - 1; ii >= 0; ii--) {
             let act = cmd.actions[ii];
             let parent = this.parentFromPath(act.path);
@@ -424,6 +425,7 @@ class CommandExe {
         }
     }
     reAction(cmd) {
+        globalCommandDispatcher.stopPlay();
         for (let ii = 0; ii < cmd.actions.length; ii++) {
             let act = cmd.actions[ii];
             let parent = this.parentFromPath(act.path);
@@ -674,12 +676,17 @@ class CommandDispatcher {
         }
         return forOutput;
     }
+    reConnectPlugins() {
+        if (this.onAir && (!this.neeToStart)) {
+            let schedule = this.renderCurrentProjectForOutput();
+            console.log('schedule', schedule);
+            this.player.reconnectAllPlugins(schedule);
+        }
+    }
     reStartPlayIfPlay() {
         if (this.onAir && (!this.neeToStart)) {
-            if (this.onAir) {
-                this.stopPlay();
-                this.setupAndStartPlay();
-            }
+            this.stopPlay();
+            this.setupAndStartPlay();
         }
     }
     toggleStartStop() {
@@ -691,8 +698,10 @@ class CommandDispatcher {
         }
     }
     stopPlay() {
-        this.onAir = false;
-        this.player.cancel();
+        if (this.onAir) {
+            this.onAir = false;
+            this.player.cancel();
+        }
     }
     setupAndStartPlay() {
         this.onAir = true;
@@ -1608,7 +1617,7 @@ class RightMenuPanel {
                             }
                         }
                     });
-                    globalCommandDispatcher.reStartPlayIfPlay();
+                    globalCommandDispatcher.reConnectPlugins();
                 }
             };
             if (tt > 0) {
@@ -1640,7 +1649,7 @@ class RightMenuPanel {
                             }
                         }
                     });
-                    globalCommandDispatcher.reStartPlayIfPlay();
+                    globalCommandDispatcher.reConnectPlugins();
                 },
                 itemStates: [icon_sound_loud, icon_sound_none, icon_flash],
                 selectedState: drum.sampler.state
@@ -1672,7 +1681,7 @@ class RightMenuPanel {
                         filter.state = 0;
                     }
                 });
-                globalCommandDispatcher.reStartPlayIfPlay();
+                globalCommandDispatcher.reConnectPlugins();
             };
             if (ff > 0) {
                 item.onClick = () => {
@@ -3063,7 +3072,17 @@ class PerformerIcon {
                 h: sz / 2,
                 css: 'fanSamplerInteractionIcon fanButton' + zidx,
                 activation: (x, y) => {
-                    console.log('' + track.performer.kind + ':' + track.performer.id);
+                    let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
+                    if (info) {
+                        let url = info.ui;
+                        globalCommandDispatcher.promptPointPluginGUI(track.performer.id, url, track.performer.data, (obj) => {
+                            globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer'], () => {
+                                track.performer.data = obj;
+                            });
+                            globalCommandDispatcher.reStartPlayIfPlay();
+                            return true;
+                        });
+                    }
                 }
             };
             dragAnchor.content.push(btn);
@@ -3476,8 +3495,9 @@ class FilterIcon {
                     if (info) {
                         let url = info.ui;
                         globalCommandDispatcher.promptPointPluginGUI(filterTarget.id, url, filterTarget.dataBlob, (obj) => {
-                            console.log('plugin callback', filterTarget.id, filterTarget.dataBlob, '=>', obj);
-                            filterTarget.dataBlob = obj;
+                            globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+                                filterTarget.dataBlob = obj;
+                            });
                             globalCommandDispatcher.reStartPlayIfPlay();
                             return true;
                         });

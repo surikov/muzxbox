@@ -4,7 +4,8 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 	player: ZPWebAudioFontPlayer = new ZPWebAudioFontPlayer();
 	volume: GainNode;
 	loader: ZPWebAudioFontLoader = new ZPWebAudioFontLoader(this.player);
-	midinumber: number = 0;
+	midiidx: number = 0;
+	listidx: number = -1;
 	info: ZPPresetInfo;
 	preset: ZPWavePreset | null = null;
 	launch(context: AudioContext, parameters: string): void {
@@ -12,8 +13,19 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 		this.audioContext = context;
 		this.volume = this.audioContext.createGain();
 		this.volume.gain.setValueAtTime(0.7, 0);
-		this.midinumber = parseInt(parameters);
-		let idx = this.loader.findInstrument(this.midinumber);
+		let split = parameters.split('/');
+		let idx = 0;
+		if (split.length == 2) {
+			this.listidx = parseInt(split[1]);
+			this.midiidx = parseInt(split[0]);
+			idx = this.listidx;
+		} else {
+			this.listidx = -1;
+			this.midiidx = parseInt(parameters);
+			idx = this.loader.findInstrument(this.midiidx);
+		}
+		//this.midinumber = parseInt(parameters);
+		//let idx = this.loader.findInstrument(this.midinumber);
 		this.info = this.loader.instrumentInfo(idx);
 		this.loader.startLoad(context, this.info.url, this.info.variable);
 		this.loader.waitLoad(() => {
@@ -69,6 +81,59 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 		}
 	}
 }
+class ZPUI {
+	id: string = '';
+	data: string = '';
+	list: any;
+	player: ZPWebAudioFontPlayer = new ZPWebAudioFontPlayer();
+	init() {
+		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
+		this.sendMessageToHost('');
+		this.list = document.getElementById('inslist');
+		let ins = this.player.loader.instrumentKeys();
+		for (let ii = 0; ii < ins.length; ii++) {
+			var option = document.createElement('option');
+			option.value = '' + ii;
+			option.innerHTML = ins[ii];
+			this.list.appendChild(option);
+		}
+		this.list.addEventListener('change', (event) => {
+			console.dir(this.player.loader.instrumentKeys()[1 * this.list.value]);
+			this.sendMessageToHost('0/' + this.list.value);
+		});
+
+	}
+	sendMessageToHost(data: string) {
+		var message: MZXBX_MessageToHost = { dialogID: this.id, pluginData: data, done: false };
+		window.parent.postMessage(message, '*');
+	}
+	receiveHostMessage(messageEvent: MessageEvent) {
+		let message: MZXBX_MessageToPlugin = messageEvent.data;
+		if (this.id) {
+			this.setState(message.hostData);
+		} else {
+			this.setMessagingId(message.hostData);
+		}
+	}
+	setMessagingId(newId: string) {
+		this.id = newId;
+	}
+	setState(data: string) {
+		console.log('setState', data);
+		this.data = data;
+		let split = this.data.split('/');
+		if (split.length == 2) {
+			this.list.value = parseInt(split[1]);
+		} else {
+			this.list.value = this.player.loader.findInstrument(parseInt(split[0]));
+		}
+	}
+}
+function initZPerfUI() {
+	console.log('initZPerfUI');
+	new ZPUI().init();
+}
 function newZvoogBasePerformerImplementation(): MZXBX_AudioPerformerPlugin {
 	return new ZvoogBasePerformerImplementation();
 }
+

@@ -207,15 +207,17 @@ class CommandDispatcher {
 		}
 		return forOutput;
 	}
+	reConnectPlugins() {
+		if (this.onAir && (!this.neeToStart)) {
+			let schedule = this.renderCurrentProjectForOutput();
+			console.log('schedule', schedule);
+			this.player.reconnectAllPlugins(schedule);
+		}
+	}
 	reStartPlayIfPlay() {
 		if (this.onAir && (!this.neeToStart)) {
-			//let schedule = this.renderCurrentProjectForOutput();
-			//console.log('schedule',schedule);
-			//this.player.reconnectAllPlugins(schedule);
-			if (this.onAir) {
-				this.stopPlay();
-				this.setupAndStartPlay();
-			}
+			this.stopPlay();
+			this.setupAndStartPlay();
 		}
 	}
 	toggleStartStop() {
@@ -227,8 +229,10 @@ class CommandDispatcher {
 		}
 	}
 	stopPlay() {
-		this.onAir = false;
-		this.player.cancel();
+		if (this.onAir) {
+			this.onAir = false;
+			this.player.cancel();
+		}
 	}
 	setupAndStartPlay() {
 		this.onAir = true;
