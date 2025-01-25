@@ -15,14 +15,14 @@ class MIDIIImportMusicPlugin {
 		}, '*');
 	}
 	sendImportedMIDIData() {
-		
+
 		if (this.parsedProject) {
 			var oo: MZXBX_MessageToHost = {
 				dialogID: this.callbackID
 				, pluginData: this.parsedProject
 				, done: true
 			};
-			console.log('sendImportedMIDIData',oo);
+			console.log('sendImportedMIDIData', oo);
 			window.parent.postMessage(oo, '*');
 		} else {
 			alert('No parsed data');
@@ -824,7 +824,7 @@ class MidiParser {
 			this.parseTrackEvents(this.parsedTracks[i]);
 		}
 		this.parseNotes();
-		this.simplifyAllPaths();
+		this.simplifyAllBendPaths();
 	}
 	toText(arr: number[]): string {
 		let txt = '';
@@ -968,9 +968,10 @@ class MidiParser {
 	simplifySinglePath(points: XYp[], tolerance: number): XYp[] {
 		var arr: XYp[] = this.douglasPeucker(points, tolerance);
 		arr.push(points[points.length - 1]);
+		//console.log(points, tolerance, arr);
 		return arr;
 	}
-	simplifyAllPaths() {
+	simplifyAllBendPaths() {
 		for (var t = 0; t < this.parsedTracks.length; t++) {
 			var track: MIDIFileTrack = this.parsedTracks[t];
 			//console.log('simplify',track.trackTitle);
@@ -987,7 +988,7 @@ class MidiParser {
 							tolerance = 0.5;
 						}
 						if (note.bendPoints.length > 50) {
-							tolerance = 1;
+							tolerance = 0.95;
 						}
 						//console.log('simplify',note.points.length,note);
 						var xx = 0;
@@ -1002,15 +1003,18 @@ class MidiParser {
 						note.bendPoints = [];
 						for (var p = 0; p < lessPoints.length - 1; p++) {
 							var xypoint: XYp = lessPoints[p];
+							var xyNext: XYp = lessPoints[p + 1];
 							var xyduration = lessPoints[p + 1].x - xypoint.x;
-							if (xyduration < 0) {
-								xyduration = 0;
-							}
+							//if (xyduration < 0) {
+							//xyduration = 0;
+							//}
 							//let yy=xypoint.y;
 							//console.log(note,yy);
-							note.bendPoints.push({ pointDuration: xyduration, basePitchDelta: xypoint.y });
+							if (xyduration > 0) {
+								note.bendPoints.push({ pointDuration: xyduration, basePitchDelta: xyNext.y });
+							}
 						}
-						//console.log(lessPoints);
+						console.log(lessPoints, note);
 					} else {
 						if (note.bendPoints.length == 1) {
 							if (note.bendPoints[0].pointDuration > 4321) {
@@ -1021,6 +1025,31 @@ class MidiParser {
 				}
 			}
 		}
+	}
+	simplifyAllBendPaths22() {
+		for (var t = 0; t < this.parsedTracks.length; t++) {
+			var track: MIDIFileTrack = this.parsedTracks[t];
+			//console.log('simplify',track.trackTitle);
+			for (var ch = 0; ch < track.chords.length; ch++) {
+				var chord: TrackChord = track.chords[ch];
+				for (var n = 0; n < chord.notes.length; n++) {
+					var note: TrackNote = chord.notes[n];
+					if (note.bendPoints.length > 1) {
+						this.simplifyNoteBendPath(note);
+					} else {
+						if (note.bendPoints.length == 1) {
+							if (note.bendPoints[0].pointDuration > 4321) {
+								note.bendPoints[0].pointDuration = 1234;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	simplifyNoteBendPath(note: TrackNote) {
+		console.log(note.baseDuration, note.bendPoints);
+		let step = 0.005;
 	}
 	dumpResolutionChanges(): void {
 		this.header.changes = [];
@@ -1926,7 +1955,7 @@ class MidiParser {
 					id: filterID
 					, kind: 'zvolume1', dataBlob: '99', outputs: [echoID]
 					, iconPosition: { x: 77 + ii * 5, y: ii * 11 + 2 }
-					, automation: [],state:0
+					, automation: [], state: 0
 				};
 				outputID = filterID;
 				project.filters.push(filterVolume);
@@ -1986,7 +2015,7 @@ class MidiParser {
 			id: echoID
 			, kind: 'zvolume1', dataBlob: '99', outputs: ['']
 			, iconPosition: { x: 77 + midiSongData.miditracks.length * 30, y: midiSongData.miditracks.length * 8 + 2 }
-			, automation: [],state:0
+			, automation: [], state: 0
 		};
 		project.filters.push(filterEcho);
 
@@ -2325,8 +2354,8 @@ class MidiParser {
 			, measures: []
 			//, filters: []
 			, performer: {
-				id: 'p' + Math.random(), data: ''+midiTrack.program, kind: 'zinstr1', outputs: [outputId]
-				, iconPosition: { x: top * 2, y: top },state:0
+				id: 'p' + Math.random(), data: '' + midiTrack.program, kind: 'zinstr1', outputs: [outputId]
+				, iconPosition: { x: top * 2, y: top }, state: 0
 			}
 			, volume: volume
 		};
@@ -2422,8 +2451,8 @@ class MidiParser {
 			, measures: []
 			//, filters: []
 			, sampler: {
-				id: 'd' + Math.random(), data: ''+drum, kind: 'zdrum1', outputs: [outputId]
-				, iconPosition: { x: top * 1.5, y: top / 2 },state:0
+				id: 'd' + Math.random(), data: '' + drum, kind: 'zdrum1', outputs: [outputId]
+				, iconPosition: { x: top * 1.5, y: top / 2 }, state: 0
 			}
 			, volume: volume
 		};

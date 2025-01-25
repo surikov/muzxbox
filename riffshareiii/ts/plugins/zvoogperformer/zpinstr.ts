@@ -12,7 +12,7 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 		this.preset = null;
 		this.audioContext = context;
 		this.volume = this.audioContext.createGain();
-		this.volume.gain.setValueAtTime(0.7, 0);
+		
 		let split = parameters.split('/');
 		let idx = 0;
 		if (split.length == 2) {
@@ -28,9 +28,17 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 		//let idx = this.loader.findInstrument(this.midinumber);
 		this.info = this.loader.instrumentInfo(idx);
 		this.loader.startLoad(context, this.info.url, this.info.variable);
+		this.volume.gain.setValueAtTime(0.5, this.audioContext.currentTime+0.001);
+		if(this.info.variable=="_tone_0300_SBAWE32_sf2_file"){
+			this.volume.gain.setValueAtTime(0.99, this.audioContext.currentTime+0.002);
+		}
+		if(this.info.variable=="_tone_0290_GeneralUserGS_sf2_file"){
+			this.volume.gain.setValueAtTime(0.99, this.audioContext.currentTime+0.002);
+		}
 		this.loader.waitLoad(() => {
 			this.preset = window[this.info.variable];
-			//console.log('preset',this.preset,this.info);
+			//console.log('preset', this.preset, this.info);
+			
 		});
 	}
 	busy(): null | string {
@@ -49,7 +57,7 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 			if (this.volume) {
 				if (this.preset) {
 					let duration = 0;
-					let volume = 1;
+					let volume = 0.99;
 					//let slides: ZPWaveSlide[][] = [];
 					for (let ii = 0; ii < mzbxslide.length; ii++) {
 						let one = mzbxslide[ii];

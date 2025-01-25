@@ -273,9 +273,9 @@ class ZPWebAudioFontLoader {
                 '0281_GeneralUserGS_sf2_file', '0282_FluidR3_GM_sf2_file', '0282_GeneralUserGS_sf2_file', '0283_GeneralUserGS_sf2_file',
                 '0290_GeneralUserGS_sf2_file',
                 '0292_Aspirin_sf2_file', '0290_SBAWE32_sf2_file', '0290_Aspirin_sf2_file', '0290_Chaos_sf2_file', '0290_FluidR3_GM_sf2_file', '0290_JCLive_sf2_file', '0290_LesPaul_sf2', '0290_LesPaul_sf2_file', '0290_SBLive_sf2', '0290_SoundBlasterOld_sf2', '0291_Aspirin_sf2_file', '0291_LesPaul_sf2', '0291_LesPaul_sf2_file', '0291_SBAWE32_sf2_file', '0291_SoundBlasterOld_sf2', '0292_LesPaul_sf2', '0292_LesPaul_sf2_file',
-                '0300_Aspirin_sf2_file',
-                '0300_Chaos_sf2_file', '0300_FluidR3_GM_sf2_file', '0300_GeneralUserGS_sf2_file', '0300_JCLive_sf2_file', '0300_LesPaul_sf2', '0300_LesPaul_sf2_file', '0300_SBAWE32_sf2_file', '0300_SBLive_sf2',
-                '0300_SoundBlasterOld_sf2', '0301_Aspirin_sf2_file', '0301_FluidR3_GM_sf2_file', '0301_GeneralUserGS_sf2_file', '0301_JCLive_sf2_file', '0301_LesPaul_sf2', '0301_LesPaul_sf2_file',
+                '0300_SBAWE32_sf2_file',
+                '0300_SBLive_sf2', '0300_Aspirin_sf2_file', '0300_Chaos_sf2_file', '0300_FluidR3_GM_sf2_file', '0300_GeneralUserGS_sf2_file', '0300_JCLive_sf2_file', '0300_LesPaul_sf2', '0300_LesPaul_sf2_file', '0300_SoundBlasterOld_sf2',
+                '0301_Aspirin_sf2_file', '0301_FluidR3_GM_sf2_file', '0301_GeneralUserGS_sf2_file', '0301_JCLive_sf2_file', '0301_LesPaul_sf2', '0301_LesPaul_sf2_file',
                 '0302_Aspirin_sf2_file', '0302_GeneralUserGS_sf2_file', '0302_JCLive_sf2_file', '0303_Aspirin_sf2_file', '0304_Aspirin_sf2_file', '0310_Aspirin_sf2_file', '0310_Chaos_sf2_file',
                 '0310_FluidR3_GM_sf2_file', '0310_GeneralUserGS_sf2_file', '0310_JCLive_sf2_file', '0310_LesPaul_sf2', '0310_LesPaul_sf2_file', '0310_SBAWE32_sf2_file', '0310_SBLive_sf2',
                 '0310_SoundBlasterOld_sf2', '0311_FluidR3_GM_sf2_file', '0311_GeneralUserGS_sf2_file', '0320_Aspirin_sf2_file', '0320_Chaos_sf2_file', '0320_FluidR3_GM_sf2_file', '0320_GeneralUserGS_sf2_file',
@@ -883,7 +883,6 @@ class ZvoogBasePerformerImplementation {
         this.preset = null;
         this.audioContext = context;
         this.volume = this.audioContext.createGain();
-        this.volume.gain.setValueAtTime(0.7, 0);
         let split = parameters.split('/');
         let idx = 0;
         if (split.length == 2) {
@@ -898,6 +897,13 @@ class ZvoogBasePerformerImplementation {
         }
         this.info = this.loader.instrumentInfo(idx);
         this.loader.startLoad(context, this.info.url, this.info.variable);
+        this.volume.gain.setValueAtTime(0.5, this.audioContext.currentTime + 0.001);
+        if (this.info.variable == "_tone_0300_SBAWE32_sf2_file") {
+            this.volume.gain.setValueAtTime(0.99, this.audioContext.currentTime + 0.002);
+        }
+        if (this.info.variable == "_tone_0290_GeneralUserGS_sf2_file") {
+            this.volume.gain.setValueAtTime(0.99, this.audioContext.currentTime + 0.002);
+        }
         this.loader.waitLoad(() => {
             this.preset = window[this.info.variable];
         });
@@ -920,7 +926,7 @@ class ZvoogBasePerformerImplementation {
             if (this.volume) {
                 if (this.preset) {
                     let duration = 0;
-                    let volume = 1;
+                    let volume = 0.99;
                     for (let ii = 0; ii < mzbxslide.length; ii++) {
                         let one = mzbxslide[ii];
                         duration = duration + one.duration;

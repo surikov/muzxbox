@@ -521,11 +521,11 @@ class CommandDispatcher {
         this.tapSizeRatio = 1;
         this.onAir = false;
         this.neeToStart = false;
-        this.lastPosition = 0;
+        this.playPosition = 0;
         this.callback = (start, pos, end) => {
-            this.lastPosition = pos;
+            this.playPosition = pos;
             let xx = this.cfg().leftPad
-                + this.lastPosition * this.cfg().widthDurationRatio
+                + this.playPosition * this.cfg().widthDurationRatio
                 - this.renderer.timeselectbar.positionTimeMarkWidth;
             this.renderer.timeselectbar.positionTimeAnchor.translation = { x: xx, y: 0 };
             this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
@@ -724,13 +724,13 @@ class CommandDispatcher {
         let me = this;
         let result = me.player.setupPlugins(me.audioContext, schedule, () => {
             me.neeToStart = true;
-            if (this.lastPosition < from) {
-                this.lastPosition = from;
+            if (this.playPosition < from) {
+                this.playPosition = from;
             }
-            if (this.lastPosition >= to) {
-                this.lastPosition = to;
+            if (this.playPosition >= to) {
+                this.playPosition = to;
             }
-            me.startPlay(from, this.lastPosition, to);
+            me.startPlay(from, this.playPosition, to);
         });
         if (result != null) {
             this.onAir = false;
@@ -855,10 +855,14 @@ class CommandDispatcher {
                 }
             }
         }
+        this.playPosition = 0;
+        for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
+            let measure = this.cfg().data.timeline[mm];
+            let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
+            this.playPosition = this.playPosition + cuDuration;
+        }
         this.renderer.timeselectbar.updateTimeSelectionBar();
         this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup, this.renderer.timeselectbar.selectionAnchor, LevelModes.top);
-    }
-    doUIaction() {
     }
 }
 let globalCommandDispatcher = new CommandDispatcher();

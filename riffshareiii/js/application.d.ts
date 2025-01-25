@@ -66,7 +66,7 @@ declare class CommandDispatcher {
     tapSizeRatio: number;
     onAir: boolean;
     neeToStart: boolean;
-    lastPosition: number;
+    playPosition: number;
     callback: (start: number, position: number, end: number) => void;
     _mixerDataMathUtility: MixerDataMathUtility;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
@@ -93,7 +93,6 @@ declare class CommandDispatcher {
     findPluginRegistrationByKind(kind: String): null | MZXBX_PluginRegistrationInformation;
     cancelPluginGUI(): void;
     expandTimeLineSelection(idx: number): void;
-    doUIaction(): void;
 }
 declare let globalCommandDispatcher: CommandDispatcher;
 declare let pluginDialogPrompt: PluginDialogPrompt;

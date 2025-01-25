@@ -680,7 +680,7 @@ class MidiParser {
             this.parseTrackEvents(this.parsedTracks[i]);
         }
         this.parseNotes();
-        this.simplifyAllPaths();
+        this.simplifyAllBendPaths();
     }
     toText(arr) {
         let txt = '';
@@ -818,7 +818,7 @@ class MidiParser {
         arr.push(points[points.length - 1]);
         return arr;
     }
-    simplifyAllPaths() {
+    simplifyAllBendPaths() {
         for (var t = 0; t < this.parsedTracks.length; t++) {
             var track = this.parsedTracks[t];
             for (var ch = 0; ch < track.chords.length; ch++) {
@@ -833,7 +833,7 @@ class MidiParser {
                             tolerance = 0.5;
                         }
                         if (note.bendPoints.length > 50) {
-                            tolerance = 1;
+                            tolerance = 0.95;
                         }
                         var xx = 0;
                         var pnts = [];
@@ -847,12 +847,13 @@ class MidiParser {
                         note.bendPoints = [];
                         for (var p = 0; p < lessPoints.length - 1; p++) {
                             var xypoint = lessPoints[p];
+                            var xyNext = lessPoints[p + 1];
                             var xyduration = lessPoints[p + 1].x - xypoint.x;
-                            if (xyduration < 0) {
-                                xyduration = 0;
+                            if (xyduration > 0) {
+                                note.bendPoints.push({ pointDuration: xyduration, basePitchDelta: xyNext.y });
                             }
-                            note.bendPoints.push({ pointDuration: xyduration, basePitchDelta: xypoint.y });
                         }
+                        console.log(lessPoints, note);
                     }
                     else {
                         if (note.bendPoints.length == 1) {
@@ -864,6 +865,31 @@ class MidiParser {
                 }
             }
         }
+    }
+    simplifyAllBendPaths22() {
+        for (var t = 0; t < this.parsedTracks.length; t++) {
+            var track = this.parsedTracks[t];
+            for (var ch = 0; ch < track.chords.length; ch++) {
+                var chord = track.chords[ch];
+                for (var n = 0; n < chord.notes.length; n++) {
+                    var note = chord.notes[n];
+                    if (note.bendPoints.length > 1) {
+                        this.simplifyNoteBendPath(note);
+                    }
+                    else {
+                        if (note.bendPoints.length == 1) {
+                            if (note.bendPoints[0].pointDuration > 4321) {
+                                note.bendPoints[0].pointDuration = 1234;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    simplifyNoteBendPath(note) {
+        console.log(note.baseDuration, note.bendPoints);
+        let step = 0.005;
     }
     dumpResolutionChanges() {
         this.header.changes = [];

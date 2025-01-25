@@ -558,7 +558,9 @@ declare class MidiParser {
     distanceToPoint(line: PP, point: XYp): number;
     douglasPeucker(points: XYp[], tolerance: number): XYp[];
     simplifySinglePath(points: XYp[], tolerance: number): XYp[];
-    simplifyAllPaths(): void;
+    simplifyAllBendPaths(): void;
+    simplifyAllBendPaths22(): void;
+    simplifyNoteBendPath(note: TrackNote): void;
     dumpResolutionChanges(): void;
     lastResolution(ms: number): number;
     parseTicks2time(track: MIDIFileTrack): void;

@@ -153,6 +153,7 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 	}*/
 	connectAllPlugins(): string | null {
+		console.log('connectAllPlugins');
 		let msg: string | null = this.launchCollectedPlugins();
 		if (msg) {
 			return msg;
@@ -213,7 +214,7 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 	}
 	disconnectAllPlugins() {
-		//console.log('disconnect');
+		console.log('disconnectAllPlugins');
 		if (this.schedule) {
 			let master: AudioNode = this.audioContext.destination;
 			//let toNode: AudioNode = this.audioContext.destination;
