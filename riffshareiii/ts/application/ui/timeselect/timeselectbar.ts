@@ -75,7 +75,7 @@ class TimeSelectBar {
 		return [this.selectionBarLayer, this.selectedTimeLayer, this.positionTimeLayer];
 	}
 	resizeTimeScale(viewWidth: number, viewHeight: number) {
-		console.log('resizeTimeSelect',viewWidth,viewHeight);
+		//console.log('resizeTimeSelect',viewWidth,viewHeight);
 		let ww = 0.001;
 		if (globalCommandDispatcher.onAir) {
 			ww = this.positionTimeMarkWidth;

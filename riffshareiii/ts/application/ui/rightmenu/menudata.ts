@@ -181,18 +181,33 @@ function fillPluginsLists() {
 	}
 }
 function composeBaseMenu(): MenuInfo[] {
+	//console.log('composeBaseMenu',menuItemsData);
 	//fillMenuImportPlugins();
 	fillPluginsLists();
 	if (menuItemsData) {
 		return menuItemsData;
 	} else {
+		let menuPlayStop:MenuInfo={
+			text: '', onClick: () => {
+				//console.log('start/stop');
+				globalCommandDispatcher.toggleStartStop();
+				menuItemsData=null;
+			}
+		};
+		if(globalCommandDispatcher.onAir){
+			menuPlayStop.text=localMenuPause;
+		}else{
+			menuPlayStop.text=localMenuPlay;
+		}
+		//console.log('fill',globalCommandDispatcher.onAir);
 		menuItemsData = [
-			{
+			menuPlayStop
+			/*{
 				text: localMenuPlayPause, onClick: () => {
 					//console.log('start/stop');
 					globalCommandDispatcher.toggleStartStop();
 				}
-			}
+			}*/
 			, menuPointTracks
 			//, menuPointPercussion
 			//, menuPointAutomation
@@ -298,7 +313,7 @@ function composeBaseMenu(): MenuInfo[] {
 				}
 			}*/
 		];
-		console.log('base menu', menuItemsData);
+		//console.log('base menu', menuItemsData);
 		return menuItemsData;
 	}
 }

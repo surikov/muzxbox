@@ -26,7 +26,6 @@ class ZDRWebAudioFontLoader {
     }
     ;
     adjustPreset(audioContext, preset) {
-        console.log('adjustPreset', preset);
         for (var i = 0; i < preset.zones.length; i++) {
             this.adjustZone(audioContext, preset.zones[i]);
         }

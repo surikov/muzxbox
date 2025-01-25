@@ -1002,7 +1002,8 @@ let localMenuItemSettings = 'localMenuItemSettings';
 let localMenuTracksFolder = 'localMenuTracksFolder';
 let localMenuPercussionFolder = 'localMenuPercussionFolder';
 let localMenuAutomationFolder = 'localMenuAutomationFolder';
-let localMenuPlayPause = 'localMenuPlayPause';
+let localMenuPlay = 'localMenuPlay';
+let localMenuPause = 'localMenuPause';
 let localMenuUndo = 'localMenuUndo';
 let localMenuRedo = 'localMenuRedo';
 let localMenuClearUndoRedo = 'localMenuClearUndoRedo';
@@ -1044,9 +1045,15 @@ let localeDictionary = [
             { locale: 'zh', text: '?' }
         ]
     }, {
-        id: localMenuPlayPause, data: [
-            { locale: 'en', text: 'Play/Pause' },
-            { locale: 'ru', text: 'Старт/Стоп' },
+        id: localMenuPlay, data: [
+            { locale: 'en', text: 'Play' },
+            { locale: 'ru', text: 'Старт' },
+            { locale: 'zh', text: '?' }
+        ]
+    }, {
+        id: localMenuPause, data: [
+            { locale: 'en', text: 'Pause' },
+            { locale: 'ru', text: 'Стоп' },
             { locale: 'zh', text: '?' }
         ]
     },
@@ -1168,7 +1175,6 @@ class TimeSelectBar {
         return [this.selectionBarLayer, this.selectedTimeLayer, this.positionTimeLayer];
     }
     resizeTimeScale(viewWidth, viewHeight) {
-        console.log('resizeTimeSelect', viewWidth, viewHeight);
         let ww = 0.001;
         if (globalCommandDispatcher.onAir) {
             ww = this.positionTimeMarkWidth;
@@ -2013,12 +2019,20 @@ function composeBaseMenu() {
         return menuItemsData;
     }
     else {
+        let menuPlayStop = {
+            text: '', onClick: () => {
+                globalCommandDispatcher.toggleStartStop();
+                menuItemsData = null;
+            }
+        };
+        if (globalCommandDispatcher.onAir) {
+            menuPlayStop.text = localMenuPause;
+        }
+        else {
+            menuPlayStop.text = localMenuPlay;
+        }
         menuItemsData = [
-            {
-                text: localMenuPlayPause, onClick: () => {
-                    globalCommandDispatcher.toggleStartStop();
-                }
-            },
+            menuPlayStop,
             menuPointTracks,
             menuPointActions,
             menuPointFilters,
@@ -2087,7 +2101,6 @@ function composeBaseMenu() {
                 ]
             }
         ];
-        console.log('base menu', menuItemsData);
         return menuItemsData;
     }
 }

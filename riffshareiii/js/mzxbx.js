@@ -170,7 +170,6 @@ class SchedulePlayer {
         }
     }
     connectAllPlugins() {
-        console.log('connectAllPlugins');
         let msg = this.launchCollectedPlugins();
         if (msg) {
             return msg;
@@ -233,7 +232,6 @@ class SchedulePlayer {
         }
     }
     disconnectAllPlugins() {
-        console.log('disconnectAllPlugins');
         if (this.schedule) {
             let master = this.audioContext.destination;
             for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {

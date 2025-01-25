@@ -10,7 +10,8 @@ let localMenuPercussionFolder='localMenuPercussionFolder';
 //let localMenuFileFolder='localMenuFileFolder';
 let localMenuAutomationFolder='localMenuAutomationFolder';
 //let localMenuCommentsLayer='localMenuCommentsLayer';
-let localMenuPlayPause='localMenuPlayPause';
+let localMenuPlay='localMenuPlay';
+let localMenuPause='localMenuPause';
 
 let localMenuUndo='localMenuUndo';
 let localMenuRedo='localMenuRedo';
@@ -73,9 +74,14 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
             , { locale: 'ru', text: 'Автоматизация' }
             , { locale: 'zh', text: '?' }]
     }, {
-        id: localMenuPlayPause, data: [
-            { locale: 'en', text: 'Play/Pause' }
-            , { locale: 'ru', text: 'Старт/Стоп' }
+        id: localMenuPlay, data: [
+            { locale: 'en', text: 'Play' }
+            , { locale: 'ru', text: 'Старт' }
+            , { locale: 'zh', text: '?' }]
+    }, {
+        id: localMenuPause, data: [
+            { locale: 'en', text: 'Pause' }
+            , { locale: 'ru', text: 'Стоп' }
             , { locale: 'zh', text: '?' }]
     }
 
