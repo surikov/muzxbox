@@ -13,6 +13,7 @@ type MenuInfo = {
 	itemStates?: string[];
 	selectedState?: number;
 	dragMix?: boolean;
+	highlight?:string;
 };
 /*
 let commandThemeSizeSmall = 'commandThemeSizeSmall';
@@ -183,10 +184,11 @@ function fillPluginsLists() {
 function composeBaseMenu(): MenuInfo[] {
 	//console.log('composeBaseMenu',menuItemsData);
 	//fillMenuImportPlugins();
-	fillPluginsLists();
+	//
 	if (menuItemsData) {
 		return menuItemsData;
 	} else {
+		fillPluginsLists();
 		let menuPlayStop:MenuInfo={
 			text: '', onClick: () => {
 				//console.log('start/stop');

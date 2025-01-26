@@ -240,8 +240,7 @@ declare class RightMenuItem {
     kindOpenedFolder: 5;
     kindAction2: 6;
     kindActionDisabled: 7;
-    kindActionDisabled2: 8;
-    kind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+    kind: 1 | 2 | 3 | 4 | 5 | 6 | 7;
     action?: {
         (): void;
     };
@@ -253,7 +252,6 @@ declare class RightMenuItem {
     info: MenuInfo;
     constructor(info: MenuInfo, pad: number, tap?: () => void, tap2?: () => void);
     initDisabledItem(): RightMenuItem;
-    initDisabledItem2(): RightMenuItem;
     initActionItem(): RightMenuItem;
     initActionItem2(): RightMenuItem;
     initDraggableItem(): RightMenuItem;
@@ -276,6 +274,7 @@ declare type MenuInfo = {
     itemStates?: string[];
     selectedState?: number;
     dragMix?: boolean;
+    highlight?: string;
 };
 declare let menuItemsData: MenuInfo[] | null;
 declare let menuPointActions: MenuInfo;
@@ -470,6 +469,7 @@ declare let icon_redo: string;
 declare let icon_forward: string;
 declare let icon_block: string;
 declare let icon_equalizer: string;
+declare let icon_sliders: string;
 declare class DebugLayerUI {
     debugRectangle: TileRectangle;
     debugAnchor: TileAnchor;

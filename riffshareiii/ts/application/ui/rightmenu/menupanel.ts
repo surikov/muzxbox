@@ -202,7 +202,7 @@ class RightMenuPanel {
 					}).initDraggableItem());
 				} else {
 					if (it.onSubClick) {
-						if (it.onClick) {
+						//if (it.onClick) {
 							let rightMenuItem = new RightMenuItem(it, pad, () => {
 								if (it.onClick) {
 									it.onClick();
@@ -225,7 +225,7 @@ class RightMenuPanel {
 								me.rerenderMenuContent(rightMenuItem);
 							});
 							this.items.push(rightMenuItem.initActionItem2());
-						} else {
+						/*} else {
 							let rightMenuItem = new RightMenuItem(it, pad, () => {
 								//
 							}, () => {
@@ -244,7 +244,7 @@ class RightMenuPanel {
 								me.rerenderMenuContent(rightMenuItem);
 							});
 							this.items.push(rightMenuItem.initDisabledItem2());
-						}
+						}*/
 					} else {
 						if (it.onClick) {
 							this.items.push(new RightMenuItem(it, pad, () => {
@@ -300,6 +300,22 @@ class RightMenuPanel {
 					});
 					//globalCommandDispatcher.relaunchPlayer();
 				};
+			}else{
+				item.onClick = () => {
+					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
+					if (info) {
+						let url = info.ui;
+						globalCommandDispatcher.promptPointPluginGUI(track.performer.id, url, track.performer.data, (obj: any) => {
+							globalCommandDispatcher.exe.commitProjectChanges(['tracks',tt,'performer'], () => {
+								track.performer.data = obj;
+							});
+							globalCommandDispatcher.reStartPlayIfPlay();
+							return true;
+						});
+					}
+					//console.log('first',track);
+				};
+				item.highlight=icon_sliders;
 			}
 			menuPointTracks.children.push(item);
 		}
@@ -340,6 +356,8 @@ class RightMenuPanel {
 					});
 					//globalCommandDispatcher.relaunchPlayer();
 				};
+			}else{
+				item.highlight=icon_sliders;
 			}
 			menuPointTracks.children.push(item);
 		}
@@ -376,6 +394,8 @@ class RightMenuPanel {
 					});
 					//globalCommandDispatcher.relaunchPlayer();
 				};
+			}else{
+				item.highlight=icon_sliders;
 			}
 			menuPointTracks.children.push(item);
 			//}

@@ -1537,51 +1537,29 @@ class RightMenuPanel {
                 }
                 else {
                     if (it.onSubClick) {
-                        if (it.onClick) {
-                            let rightMenuItem = new RightMenuItem(it, pad, () => {
-                                if (it.onClick) {
-                                    it.onClick();
+                        let rightMenuItem = new RightMenuItem(it, pad, () => {
+                            if (it.onClick) {
+                                it.onClick();
+                            }
+                            me.setFocus(it, infos);
+                            me.resetAllAnchors();
+                        }, () => {
+                            if (it.itemStates) {
+                                let sel = it.selectedState ? it.selectedState : 0;
+                                if (it.itemStates.length - 1 > sel) {
+                                    sel++;
                                 }
-                                me.setFocus(it, infos);
-                                me.resetAllAnchors();
-                            }, () => {
-                                if (it.itemStates) {
-                                    let sel = it.selectedState ? it.selectedState : 0;
-                                    if (it.itemStates.length - 1 > sel) {
-                                        sel++;
-                                    }
-                                    else {
-                                        sel = 0;
-                                    }
-                                    it.selectedState = sel;
+                                else {
+                                    sel = 0;
                                 }
-                                if (it.onSubClick) {
-                                    it.onSubClick();
-                                }
-                                me.rerenderMenuContent(rightMenuItem);
-                            });
-                            this.items.push(rightMenuItem.initActionItem2());
-                        }
-                        else {
-                            let rightMenuItem = new RightMenuItem(it, pad, () => {
-                            }, () => {
-                                if (it.itemStates) {
-                                    let sel = it.selectedState ? it.selectedState : 0;
-                                    if (it.itemStates.length - 1 > sel) {
-                                        sel++;
-                                    }
-                                    else {
-                                        sel = 0;
-                                    }
-                                    it.selectedState = sel;
-                                }
-                                if (it.onSubClick) {
-                                    it.onSubClick();
-                                }
-                                me.rerenderMenuContent(rightMenuItem);
-                            });
-                            this.items.push(rightMenuItem.initDisabledItem2());
-                        }
+                                it.selectedState = sel;
+                            }
+                            if (it.onSubClick) {
+                                it.onSubClick();
+                            }
+                            me.rerenderMenuContent(rightMenuItem);
+                        });
+                        this.items.push(rightMenuItem.initActionItem2());
                     }
                     else {
                         if (it.onClick) {
@@ -1638,6 +1616,22 @@ class RightMenuPanel {
                     });
                 };
             }
+            else {
+                item.onClick = () => {
+                    let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
+                    if (info) {
+                        let url = info.ui;
+                        globalCommandDispatcher.promptPointPluginGUI(track.performer.id, url, track.performer.data, (obj) => {
+                            globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt, 'performer'], () => {
+                                track.performer.data = obj;
+                            });
+                            globalCommandDispatcher.reStartPlayIfPlay();
+                            return true;
+                        });
+                    }
+                };
+                item.highlight = icon_sliders;
+            }
             menuPointTracks.children.push(item);
         }
         for (let tt = 0; tt < project.percussions.length; tt++) {
@@ -1672,6 +1666,9 @@ class RightMenuPanel {
                     });
                 };
             }
+            else {
+                item.highlight = icon_sliders;
+            }
             menuPointTracks.children.push(item);
         }
         for (let ff = 0; ff < project.filters.length; ff++) {
@@ -1700,6 +1697,9 @@ class RightMenuPanel {
                         globalCommandDispatcher.cfg().data.filters.splice(0, 0, fltr);
                     });
                 };
+            }
+            else {
+                item.highlight = icon_sliders;
             }
             menuPointTracks.children.push(item);
         }
@@ -1782,7 +1782,6 @@ class RightMenuItem {
         this.kindOpenedFolder = 5;
         this.kindAction2 = 6;
         this.kindActionDisabled = 7;
-        this.kindActionDisabled2 = 8;
         this.kind = this.kindAction;
         this.pad = 0;
         this.info = info;
@@ -1797,10 +1796,6 @@ class RightMenuItem {
     }
     initDisabledItem() {
         this.kind = this.kindActionDisabled;
-        return this;
-    }
-    initDisabledItem2() {
-        this.kind = this.kindActionDisabled2;
         return this;
     }
     initActionItem() {
@@ -1864,20 +1859,6 @@ class RightMenuItem {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
-        if (this.kind == this.kindActionDisabled2) {
-            let stateIicon = '?';
-            let sel = this.info.selectedState ? this.info.selectedState : 0;
-            if (this.info.itemStates) {
-                if (this.info.itemStates.length > sel) {
-                    stateIicon = this.info.itemStates[sel];
-                }
-            }
-            anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
-            anchor.content.push({ x: itemWidth - 1.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-            anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
-            spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
-        }
         if (this.kind == this.kindAction2) {
             let stateIicon = '?';
             let sel = this.info.selectedState ? this.info.selectedState : 0;
@@ -1887,7 +1868,13 @@ class RightMenuItem {
                 }
             }
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+            if (this.info.highlight) {
+                anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: this.info.highlight, css: 'rightMenuIconLabel' });
+                anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+            }
+            else {
+                anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+            }
             anchor.content.push({ x: itemWidth - 1.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
             spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
@@ -2014,11 +2001,11 @@ function fillPluginsLists() {
     }
 }
 function composeBaseMenu() {
-    fillPluginsLists();
     if (menuItemsData) {
         return menuItemsData;
     }
     else {
+        fillPluginsLists();
         let menuPlayStop = {
             text: '', onClick: () => {
                 globalCommandDispatcher.toggleStartStop();
@@ -3844,6 +3831,7 @@ let icon_redo = '&#xf253;';
 let icon_forward = '&#xf2fd;';
 let icon_block = '&#xf119;';
 let icon_equalizer = '&#xf39e;';
+let icon_sliders = '&#xf3b8;';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];

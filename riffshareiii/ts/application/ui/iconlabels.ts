@@ -41,6 +41,7 @@ let icon_redo='&#xf253;';
 let icon_forward='&#xf2fd;';
 let icon_block='&#xf119;';
 let icon_equalizer='&#xf39e;';
+let icon_sliders='&#xf3b8;';
 
 
 
