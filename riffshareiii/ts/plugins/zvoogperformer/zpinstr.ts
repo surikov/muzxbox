@@ -29,12 +29,13 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 		this.info = this.loader.instrumentInfo(idx);
 		this.loader.startLoad(context, this.info.url, this.info.variable);
 		this.volume.gain.setValueAtTime(0.5, this.audioContext.currentTime+0.001);
+		/*
 		if(this.info.variable=="_tone_0300_SBAWE32_sf2_file"){
 			this.volume.gain.setValueAtTime(0.99, this.audioContext.currentTime+0.002);
 		}
 		if(this.info.variable=="_tone_0290_GeneralUserGS_sf2_file"){
 			this.volume.gain.setValueAtTime(0.99, this.audioContext.currentTime+0.002);
-		}
+		}*/
 		this.loader.waitLoad(() => {
 			this.preset = window[this.info.variable];
 			//console.log('preset', this.preset, this.info);
@@ -99,10 +100,12 @@ class ZPUI {
 		this.sendMessageToHost('');
 		this.list = document.getElementById('inslist');
 		let ins = this.player.loader.instrumentKeys();
+		
 		for (let ii = 0; ii < ins.length; ii++) {
 			var option = document.createElement('option');
 			option.value = '' + ii;
-			option.innerHTML = ins[ii];
+			let midi=parseInt(ins[ii].substring(0,3));
+			option.innerHTML = ins[ii]+": "+this.player.loader.instrumentTitles()[midi];
 			this.list.appendChild(option);
 		}
 		this.list.addEventListener('change', (event) => {

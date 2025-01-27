@@ -1953,7 +1953,7 @@ class MidiParser {
 				let filterID = 'f' + ii;
 				let filterVolume: Zvoog_FilterTarget = {
 					id: filterID
-					, kind: 'zvolume1', dataBlob: '99', outputs: [echoID]
+					, kind: 'zvolume1', data: '99', outputs: [echoID]
 					, iconPosition: { x: 77 + ii * 5, y: ii * 11 + 2 }
 					, automation: [], state: 0
 				};
@@ -2013,7 +2013,7 @@ class MidiParser {
 		}
 		let filterEcho: Zvoog_FilterTarget = {
 			id: echoID
-			, kind: 'zvolume1', dataBlob: '99', outputs: ['']
+			, kind: 'zvolume1', data: '99', outputs: ['']
 			, iconPosition: { x: 77 + midiSongData.miditracks.length * 30, y: midiSongData.miditracks.length * 8 + 2 }
 			, automation: [], state: 0
 		};

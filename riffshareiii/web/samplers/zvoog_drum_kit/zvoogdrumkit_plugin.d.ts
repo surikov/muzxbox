@@ -37,7 +37,7 @@ declare type Zvoog_PluginSampler = Zvoog_PluginBase | {
 declare type Zvoog_FilterTarget = {
     id: string;
     kind: string;
-    dataBlob: string;
+    data: string;
     outputs: string[];
     automation: Zvoog_FilterMeasure[];
     iconPosition: {
@@ -359,4 +359,16 @@ declare class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
     output(): AudioNode | null;
     duration(): number;
 }
+declare class ZDUI {
+    id: string;
+    data: string;
+    list: any;
+    player: ZDRWebAudioFontPlayer;
+    init(): void;
+    sendMessageToHost(data: string): void;
+    receiveHostMessage(messageEvent: MessageEvent): void;
+    setMessagingId(newId: string): void;
+    setState(data: string): void;
+}
 declare function newZvoogDrumKitImplementation(): MZXBX_AudioSamplerPlugin;
+declare function initZDRUI(): void;

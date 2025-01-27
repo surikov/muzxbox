@@ -88,7 +88,7 @@ class CommandDispatcher {
 			let outFilter: MZXBX_Filter = {
 				id: filter.id
 				, kind: filter.kind
-				, properties: filter.dataBlob
+				, properties: filter.data
 				, outputs: filter.outputs
 			}
 			if (filter.state == 1) {

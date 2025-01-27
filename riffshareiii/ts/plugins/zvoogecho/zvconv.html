@@ -1,7 +1,7 @@
 <html>
 
 <head>
-	<script src="zvoogperf_plugin.js"></script>
+	<script src="zecho_plugin.js"></script>
 	<style>
 		body {
 			background-color: silver;
@@ -14,11 +14,12 @@
 </head>
 
 <body>
+	<p>Echo level (0 - 100%)</p>
 	<p>
-		<select id="inslist"></select>
+		<input type="range" id="echoctrl" name="volume" min="0" max="100" step="1" />
 	</p>
 	<script>
-		initZPerfUI();
+		initZVECH();
 	</script>
 </body>
 

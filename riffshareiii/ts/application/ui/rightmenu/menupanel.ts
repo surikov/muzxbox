@@ -203,28 +203,28 @@ class RightMenuPanel {
 				} else {
 					if (it.onSubClick) {
 						//if (it.onClick) {
-							let rightMenuItem = new RightMenuItem(it, pad, () => {
-								if (it.onClick) {
-									it.onClick();
+						let rightMenuItem = new RightMenuItem(it, pad, () => {
+							if (it.onClick) {
+								it.onClick();
+							}
+							me.setFocus(it, infos);
+							me.resetAllAnchors();
+						}, () => {
+							if (it.itemStates) {
+								let sel = it.selectedState ? it.selectedState : 0;
+								if (it.itemStates.length - 1 > sel) {
+									sel++;
+								} else {
+									sel = 0;
 								}
-								me.setFocus(it, infos);
-								me.resetAllAnchors();
-							}, () => {
-								if (it.itemStates) {
-									let sel = it.selectedState ? it.selectedState : 0;
-									if (it.itemStates.length - 1 > sel) {
-										sel++;
-									} else {
-										sel = 0;
-									}
-									it.selectedState = sel;
-								}
-								if (it.onSubClick) {
-									it.onSubClick();
-								}
-								me.rerenderMenuContent(rightMenuItem);
-							});
-							this.items.push(rightMenuItem.initActionItem2());
+								it.selectedState = sel;
+							}
+							if (it.onSubClick) {
+								it.onSubClick();
+							}
+							me.rerenderMenuContent(rightMenuItem);
+						});
+						this.items.push(rightMenuItem.initActionItem2());
 						/*} else {
 							let rightMenuItem = new RightMenuItem(it, pad, () => {
 								//
@@ -276,7 +276,7 @@ class RightMenuPanel {
 				text: track.title
 				, noLocalization: true
 				, selectedState: track.performer.state
-				, itemStates: [icon_sound_loud, icon_sound_none, icon_flash]
+				, itemStates: [icon_sound_loud, icon_block, icon_flash]
 				, onSubClick: () => {
 					globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
 						if (item.selectedState == 1) {
@@ -300,13 +300,13 @@ class RightMenuPanel {
 					});
 					//globalCommandDispatcher.relaunchPlayer();
 				};
-			}else{
+			} else {
 				item.onClick = () => {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
 					if (info) {
 						let url = info.ui;
 						globalCommandDispatcher.promptPointPluginGUI(track.performer.id, url, track.performer.data, (obj: any) => {
-							globalCommandDispatcher.exe.commitProjectChanges(['tracks',tt,'performer'], () => {
+							globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt, 'performer'], () => {
 								track.performer.data = obj;
 							});
 							globalCommandDispatcher.reStartPlayIfPlay();
@@ -315,7 +315,7 @@ class RightMenuPanel {
 					}
 					//console.log('first',track);
 				};
-				item.highlight=icon_sliders;
+				item.highlight = icon_sliders;
 			}
 			menuPointTracks.children.push(item);
 		}
@@ -345,7 +345,7 @@ class RightMenuPanel {
 					});
 					globalCommandDispatcher.reConnectPlugins();
 				}
-				, itemStates: [icon_sound_loud, icon_sound_none, icon_flash]
+				, itemStates: [icon_sound_loud, icon_block, icon_flash]
 				, selectedState: drum.sampler.state
 			};
 			if (tt > 0) {
@@ -356,8 +356,22 @@ class RightMenuPanel {
 					});
 					//globalCommandDispatcher.relaunchPlayer();
 				};
-			}else{
-				item.highlight=icon_sliders;
+			} else {
+				item.onClick = () => {
+					let info = globalCommandDispatcher.findPluginRegistrationByKind(drum.sampler.kind);
+					if (info) {
+						let url = info.ui;
+						globalCommandDispatcher.promptPointPluginGUI(drum.sampler.id, url, drum.sampler.data, (obj: any) => {
+							globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt, 'sampler'], () => {
+								drum.sampler.data = obj;
+							});
+							globalCommandDispatcher.reStartPlayIfPlay();
+							return true;
+						});
+					}
+					//console.log('first',track);
+				};
+				item.highlight = icon_sliders;
 			}
 			menuPointTracks.children.push(item);
 		}
@@ -394,8 +408,22 @@ class RightMenuPanel {
 					});
 					//globalCommandDispatcher.relaunchPlayer();
 				};
-			}else{
-				item.highlight=icon_sliders;
+			} else {
+				item.onClick = () => {
+					let info = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
+					if (info) {
+						let url = info.ui;
+						globalCommandDispatcher.promptPointPluginGUI(filter.id, url, filter.data, (obj: any) => {
+							globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
+								filter.data = obj;
+							});
+							globalCommandDispatcher.reStartPlayIfPlay();
+							return true;
+						});
+					}
+					//console.log('first',track);
+				};
+				item.highlight = icon_sliders;
 			}
 			menuPointTracks.children.push(item);
 			//}

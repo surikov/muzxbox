@@ -44,7 +44,7 @@ type Zvoog_PluginSampler = Zvoog_PluginBase | {
 type Zvoog_FilterTarget = {
 	id: string;
 	kind: string;
-	dataBlob: string;
+	data: string;
 	outputs: string[];
 	automation: Zvoog_FilterMeasure[];
 	iconPosition: { x: number, y: number };

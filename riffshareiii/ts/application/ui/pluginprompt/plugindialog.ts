@@ -37,7 +37,7 @@ class PluginDialogPrompt {
 		}
 	}
 	sendNewIdToPlugin() {
-		console.log('sendNewIdToPlugin');
+		//console.log('sendNewIdToPlugin');
 		let pluginFrame = document.getElementById("pluginFrame") as any;
 		if (pluginFrame) {
 			this.dialogID = '' + Math.random();
@@ -46,7 +46,7 @@ class PluginDialogPrompt {
 		}
 	}
 	sendCurrentProjectToPlugin() {
-		console.log('sendCurrentProjectToPlugin');
+		//console.log('sendCurrentProjectToPlugin');
 		let pluginFrame = document.getElementById("pluginFrame") as any;
 		if (pluginFrame) {
 			let message: MZXBX_MessageToPlugin = { hostData: globalCommandDispatcher.cfg().data };
@@ -54,7 +54,7 @@ class PluginDialogPrompt {
 		}
 	}
 	sendPointToPlugin() {
-		console.log('sendPointToPlugin');
+		//console.log('sendPointToPlugin');
 		let pluginFrame = document.getElementById("pluginFrame") as any;
 		if (pluginFrame) {
 			let message: MZXBX_MessageToPlugin = { hostData: this.rawData };
@@ -66,15 +66,15 @@ class PluginDialogPrompt {
 	}
 	receiveMessageFromPlugin(event) {
 		if (!(event.data)) {
-			console.log('empty message data');
+			//console.log('empty message data');
 		} else {
 			let message: MZXBX_MessageToHost = event.data;
 			if (message.dialogID) {
-				console.log('receiveMessageFromPlugin', message);
+				//console.log('receiveMessageFromPlugin', message);
 				if (message.dialogID == this.dialogID) {
 					if (this.waitProjectCallback) {
 						let me = this;
-						console.log('waitProjectCallback');
+						//console.log('waitProjectCallback');
 						globalCommandDispatcher.exe.commitProjectChanges([], () => {
 							if (me.waitProjectCallback) {
 								let newProj: Zvoog_Project = message.pluginData;
@@ -88,15 +88,15 @@ class PluginDialogPrompt {
 					} else {
 						console.log('plugin point');
 						if (this.waitTimelinePointCallback) {
-							console.log('waitTimelinePointCallback');
+							//console.log('waitTimelinePointCallback');
 							this.waitTimelinePointCallback(message.pluginData);
 						}
 					}
 				} else {
-					console.log('wrong received message id', message.dialogID, this.dialogID);
+					//console.log('wrong received message id', message.dialogID, this.dialogID);
 				}
 			} else {
-				console.log('init receiveMessageFromPlugin');
+				//console.log('init receiveMessageFromPlugin');
 				if (this.waitForPluginInit) {
 					this.waitForPluginInit = false;
 					this.sendNewIdToPlugin();

@@ -161,6 +161,17 @@ class SamplerIcon {
 				, css: 'fanSamplerInteractionIcon fanButton' + zidx
 				, activation: (x: number, y: number) => {
 					console.log('' + samplerTrack.sampler.kind + ':' + samplerTrack.sampler.id);
+					let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
+					if (info) {
+						let url = info.ui;
+						globalCommandDispatcher.promptPointPluginGUI(samplerTrack.sampler.id, url, samplerTrack.sampler.data, (obj: any) => {
+							globalCommandDispatcher.exe.commitProjectChanges(['percussions',order], () => {
+								samplerTrack.sampler.data = obj;
+							});
+							globalCommandDispatcher.reStartPlayIfPlay();
+							return true;
+						});
+					}
 				}
 			};
 			dragAnchor.content.push(btn);

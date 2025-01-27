@@ -290,7 +290,6 @@ class PluginDialogPrompt {
         }
     }
     sendNewIdToPlugin() {
-        console.log('sendNewIdToPlugin');
         let pluginFrame = document.getElementById("pluginFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
@@ -299,7 +298,6 @@ class PluginDialogPrompt {
         }
     }
     sendCurrentProjectToPlugin() {
-        console.log('sendCurrentProjectToPlugin');
         let pluginFrame = document.getElementById("pluginFrame");
         if (pluginFrame) {
             let message = { hostData: globalCommandDispatcher.cfg().data };
@@ -307,7 +305,6 @@ class PluginDialogPrompt {
         }
     }
     sendPointToPlugin() {
-        console.log('sendPointToPlugin');
         let pluginFrame = document.getElementById("pluginFrame");
         if (pluginFrame) {
             let message = { hostData: this.rawData };
@@ -319,16 +316,13 @@ class PluginDialogPrompt {
     }
     receiveMessageFromPlugin(event) {
         if (!(event.data)) {
-            console.log('empty message data');
         }
         else {
             let message = event.data;
             if (message.dialogID) {
-                console.log('receiveMessageFromPlugin', message);
                 if (message.dialogID == this.dialogID) {
                     if (this.waitProjectCallback) {
                         let me = this;
-                        console.log('waitProjectCallback');
                         globalCommandDispatcher.exe.commitProjectChanges([], () => {
                             if (me.waitProjectCallback) {
                                 let newProj = message.pluginData;
@@ -343,17 +337,14 @@ class PluginDialogPrompt {
                     else {
                         console.log('plugin point');
                         if (this.waitTimelinePointCallback) {
-                            console.log('waitTimelinePointCallback');
                             this.waitTimelinePointCallback(message.pluginData);
                         }
                     }
                 }
                 else {
-                    console.log('wrong received message id', message.dialogID, this.dialogID);
                 }
             }
             else {
-                console.log('init receiveMessageFromPlugin');
                 if (this.waitForPluginInit) {
                     this.waitForPluginInit = false;
                     this.sendNewIdToPlugin();
@@ -568,7 +559,7 @@ class CommandDispatcher {
             let outFilter = {
                 id: filter.id,
                 kind: filter.kind,
-                properties: filter.dataBlob,
+                properties: filter.data,
                 outputs: filter.outputs
             };
             if (filter.state == 1) {
@@ -1590,7 +1581,7 @@ class RightMenuPanel {
                 text: track.title,
                 noLocalization: true,
                 selectedState: track.performer.state,
-                itemStates: [icon_sound_loud, icon_sound_none, icon_flash],
+                itemStates: [icon_sound_loud, icon_block, icon_flash],
                 onSubClick: () => {
                     globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
                         if (item.selectedState == 1) {
@@ -1655,7 +1646,7 @@ class RightMenuPanel {
                     });
                     globalCommandDispatcher.reConnectPlugins();
                 },
-                itemStates: [icon_sound_loud, icon_sound_none, icon_flash],
+                itemStates: [icon_sound_loud, icon_block, icon_flash],
                 selectedState: drum.sampler.state
             };
             if (tt > 0) {
@@ -1667,6 +1658,19 @@ class RightMenuPanel {
                 };
             }
             else {
+                item.onClick = () => {
+                    let info = globalCommandDispatcher.findPluginRegistrationByKind(drum.sampler.kind);
+                    if (info) {
+                        let url = info.ui;
+                        globalCommandDispatcher.promptPointPluginGUI(drum.sampler.id, url, drum.sampler.data, (obj) => {
+                            globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt, 'sampler'], () => {
+                                drum.sampler.data = obj;
+                            });
+                            globalCommandDispatcher.reStartPlayIfPlay();
+                            return true;
+                        });
+                    }
+                };
                 item.highlight = icon_sliders;
             }
             menuPointTracks.children.push(item);
@@ -1699,6 +1703,19 @@ class RightMenuPanel {
                 };
             }
             else {
+                item.onClick = () => {
+                    let info = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
+                    if (info) {
+                        let url = info.ui;
+                        globalCommandDispatcher.promptPointPluginGUI(filter.id, url, filter.data, (obj) => {
+                            globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
+                                filter.data = obj;
+                            });
+                            globalCommandDispatcher.reStartPlayIfPlay();
+                            return true;
+                        });
+                    }
+                };
                 item.highlight = icon_sliders;
             }
             menuPointTracks.children.push(item);
@@ -2402,12 +2419,12 @@ class MixerBar {
                     }
                     catch (xxx) {
                         console.log(xxx);
-                        return 0.2;
+                        return 0.0002;
                     }
                 }
             }
         }
-        return 1;
+        return 0.0001;
     }
     addOctaveGridSteps(barIdx, barLeft, width, barOctaveAnchor, zIndex) {
         let zoomInfo = zoomPrefixLevelsCSS[zIndex];
@@ -3267,6 +3284,17 @@ class SamplerIcon {
                 css: 'fanSamplerInteractionIcon fanButton' + zidx,
                 activation: (x, y) => {
                     console.log('' + samplerTrack.sampler.kind + ':' + samplerTrack.sampler.id);
+                    let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
+                    if (info) {
+                        let url = info.ui;
+                        globalCommandDispatcher.promptPointPluginGUI(samplerTrack.sampler.id, url, samplerTrack.sampler.data, (obj) => {
+                            globalCommandDispatcher.exe.commitProjectChanges(['percussions', order], () => {
+                                samplerTrack.sampler.data = obj;
+                            });
+                            globalCommandDispatcher.reStartPlayIfPlay();
+                            return true;
+                        });
+                    }
                 }
             };
             dragAnchor.content.push(btn);
@@ -3498,9 +3526,9 @@ class FilterIcon {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
                     if (info) {
                         let url = info.ui;
-                        globalCommandDispatcher.promptPointPluginGUI(filterTarget.id, url, filterTarget.dataBlob, (obj) => {
+                        globalCommandDispatcher.promptPointPluginGUI(filterTarget.id, url, filterTarget.data, (obj) => {
                             globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
-                                filterTarget.dataBlob = obj;
+                                filterTarget.data = obj;
                             });
                             globalCommandDispatcher.reStartPlayIfPlay();
                             return true;
@@ -4070,7 +4098,7 @@ let _mzxbxProjectForTesting2 = {
         { points: [{ skip: { count: 2, part: 16 }, text: '5-2/16', row: 0 }] }],
     filters: [
         {
-            id: 'volumeSlide', kind: 'zvolume1', dataBlob: '99', outputs: ['masterVolme'],
+            id: 'volumeSlide', kind: 'zvolume1', data: '99', outputs: ['masterVolme'],
             automation: [{ changes: [] }, {
                     changes: []
                 },
@@ -4080,7 +4108,7 @@ let _mzxbxProjectForTesting2 = {
             iconPosition: { x: 152, y: 39 }, state: 0
         },
         {
-            id: 'masterVolme', kind: 'zvolume1', dataBlob: '99', outputs: [''],
+            id: 'masterVolme', kind: 'zvolume1', data: '99', outputs: [''],
             automation: [{ changes: [] }, { changes: [] },
                 {
                     changes: []
@@ -4088,13 +4116,13 @@ let _mzxbxProjectForTesting2 = {
                 { changes: [] }],
             iconPosition: { x: 188, y: 7 }, state: 0
         },
-        { id: 'allDrumsVolme', kind: 'zvolume1', dataBlob: '99', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 }, automation: [], state: 0 },
-        { id: 'drum1Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 }, automation: [], state: 0 },
-        { id: 'drum2Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 }, automation: [], state: 0 },
-        { id: 'drum3Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 }, automation: [], state: 0 },
-        { id: 'track1Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [], state: 0 },
-        { id: 'track2Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [], state: 0 },
-        { id: 'track3Volme', kind: 'zvolume1', dataBlob: '99', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [], state: 0 }
+        { id: 'allDrumsVolme', kind: 'zvolume1', data: '99', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 }, automation: [], state: 0 },
+        { id: 'drum1Volme', kind: 'zvolume1', data: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 }, automation: [], state: 0 },
+        { id: 'drum2Volme', kind: 'zvolume1', data: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 }, automation: [], state: 0 },
+        { id: 'drum3Volme', kind: 'zvolume1', data: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 }, automation: [], state: 0 },
+        { id: 'track1Volme', kind: 'zvolume1', data: '99', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [], state: 0 },
+        { id: 'track2Volme', kind: 'zvolume1', data: '99', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [], state: 0 },
+        { id: 'track3Echo', kind: 'zvecho1', data: '100', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [], state: 0 }
     ]
 };
 class MixerDataMathUtility {

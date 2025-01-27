@@ -85,25 +85,24 @@ class MixerBar {
 		}
 	}
 	findDurationOfSample(samplerId: string): number {
-
 		if (globalCommandDispatcher.player) {
-
 			let arr = globalCommandDispatcher.player.allPerformers();
 			//console.log('findDurationOfSample', samplerId,arr);
 			for (let ii = 0; ii < arr.length; ii++) {
 				if (arr[ii].channelId == samplerId) {
 					try {
 						let smplr = arr[ii].plugin as MZXBX_AudioSamplerPlugin;
-						//console.log('findDurationOfSample', samplerId,smplr.duration());
+						//console.log('findDurationOfSample',smplr.duration(),'for', samplerId);
 						return smplr.duration();
 					} catch (xxx) {
 						console.log(xxx);
-						return 0.2;
+						return 0.0002;
 					}
 				}
 			}
 		}
-		return 1;
+		//console.log('findDurationOfSample unknown for', samplerId);
+		return 0.0001;
 	}
 	addOctaveGridSteps(
 		barIdx: number

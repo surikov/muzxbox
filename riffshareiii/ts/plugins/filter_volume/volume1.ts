@@ -1887,12 +1887,12 @@ class MidiParser {
 		for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
 			let midiSongTrack: MIDISongTrack = midiSongData.miditracks[ii];
 			let filterID = 'f' + ii;
-			let filterVolume: Zvoog_FilterTarget = { id: filterID, kind: 'VolumeGain', dataBlob: '', outputs: [], automation: null };
+			let filterVolume: Zvoog_FilterTarget = { id: filterID, kind: 'VolumeGain', data: '', outputs: [], automation: null };
 			project.filters.push(filterVolume);
 
 			if (midiSongTrack.trackVolumes.length == 1) {
 				let vol: number = 1 * midiSongTrack.trackVolumes[0].value;
-				filterVolume.dataBlob = '' + Math.round(vol * 100) + '%';
+				filterVolume.data = '' + Math.round(vol * 100) + '%';
 			} else {
 				if (midiSongTrack.trackVolumes.length > 1) {
 					filterVolume.automation = { title: 'for ' + filterID, measures: [] };

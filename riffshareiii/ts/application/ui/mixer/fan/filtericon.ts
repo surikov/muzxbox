@@ -142,9 +142,9 @@ class FilterIcon {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptPointPluginGUI(filterTarget.id, url, filterTarget.dataBlob, (obj: any) => {
+						globalCommandDispatcher.promptPointPluginGUI(filterTarget.id, url, filterTarget.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['filters',order], () => {
-								filterTarget.dataBlob = obj;
+								filterTarget.data = obj;
 							});
 							globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
