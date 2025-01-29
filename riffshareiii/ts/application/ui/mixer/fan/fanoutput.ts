@@ -46,8 +46,11 @@ class FanOutputLine {
 		, onDelete: (x: number, y: number) => void
 
 	) {
-		let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().speakerIconSize / 2;
-		let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
+		let spos = globalCommandDispatcher.cfg().speakerFanPosition();
+		let speakerX = spos.x ;//+ globalCommandDispatcher.cfg().speakerIconSize / 2;
+		//globalCommandDispatcher.cfg().wholeWidth();// - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().speakerIconSize / 2;
+		let speakerY = spos.y;//+ globalCommandDispatcher.cfg().speakerIconSize / 2;
+		//globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
 		new SpearConnection().addSpear(false, zidx,
 			fromX
 			, fromY
@@ -89,12 +92,12 @@ class FanOutputLine {
 			let dx = ratio * (toX - fromX) / 2;
 			let dy = ratio * (toY - fromY) / 2;
 			let deleteButton: TileRectangle = {
-				x: fromX + dx - globalCommandDispatcher.cfg().pluginIconSize /2
-				, y: fromY + dy - globalCommandDispatcher.cfg().pluginIconSize /2
-				, w: globalCommandDispatcher.cfg().pluginIconSize 
-				, h: globalCommandDispatcher.cfg().pluginIconSize 
-				, rx: globalCommandDispatcher.cfg().pluginIconSize 
-				, ry: globalCommandDispatcher.cfg().pluginIconSize 
+				x: fromX + dx - globalCommandDispatcher.cfg().pluginIconSize / 2
+				, y: fromY + dy - globalCommandDispatcher.cfg().pluginIconSize / 2
+				, w: globalCommandDispatcher.cfg().pluginIconSize
+				, h: globalCommandDispatcher.cfg().pluginIconSize
+				, rx: globalCommandDispatcher.cfg().pluginIconSize
+				, ry: globalCommandDispatcher.cfg().pluginIconSize
 				, css: 'fanDropConnection fanDropConnection' + zidx
 				, activation: onDelete
 				/*, activation: (x: number, y: number) => {

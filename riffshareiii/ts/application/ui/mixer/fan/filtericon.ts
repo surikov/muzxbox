@@ -118,7 +118,11 @@ class FilterIcon {
 						, LevelModes.normal);
 				}
 			}
-			rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
+			//if (order) {
+				rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
+			//} else {
+			//	rec.css = 'fanSamplerMoveIcon fanSamplerUpIcon' + zidx;
+			//}
 		} else {
 			rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
 		}
@@ -143,7 +147,7 @@ class FilterIcon {
 					if (info) {
 						let url = info.ui;
 						globalCommandDispatcher.promptPointPluginGUI(filterTarget.id, url, filterTarget.data, (obj: any) => {
-							globalCommandDispatcher.exe.commitProjectChanges(['filters',order], () => {
+							globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
 								filterTarget.data = obj;
 							});
 							globalCommandDispatcher.reStartPlayIfPlay();
@@ -160,10 +164,13 @@ class FilterIcon {
 		}
 		let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;
 		let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
-		let css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
+		let css ='fanConnectionBase fanConnection' + zidx;
+		if (order) {
+			css =  'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
+		}
 		let hoLine: TileLine = { x1: start, x2: xx, y1: filterFromY, y2: filterFromY, css: css };
 		spearsAnchor.content.push(hoLine);
-		new SpearConnection().addSpear(true, zidx,
+		new SpearConnection().addSpear(order>0, zidx,
 			xx
 			, filterFromY
 			, sz
@@ -195,7 +202,7 @@ class FilterIcon {
 					});
 			}
 		}
-		if (zidx < 5) {
+		/*if (zidx < 5) {
 			let sbuttn: TileRectangle = {
 				x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
 				, y: filterFromY - 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
@@ -238,7 +245,7 @@ class FilterIcon {
 					, LevelModes.normal);
 			};
 			spearsAnchor.content.push(btnAnchor);
-		}
+		}*/
 	}
 
 }

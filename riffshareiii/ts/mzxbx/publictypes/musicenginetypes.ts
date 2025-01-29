@@ -48,7 +48,7 @@ type Zvoog_FilterTarget = {
 	outputs: string[];
 	automation: Zvoog_FilterMeasure[];
 	iconPosition: { x: number, y: number };
-	state:0|1;
+	state:0|1;//on|off
 };
 type Zvoog_AudioSequencer = {
 	id: string;
@@ -56,7 +56,7 @@ type Zvoog_AudioSequencer = {
 	kind: string;
 	outputs: string[];
 	iconPosition: { x: number, y: number };
-	state:0|1|2;
+	state:0|1|2;//on|mute|solo
 };
 type Zvoog_AudioSampler = {
 	id: string;
@@ -64,7 +64,7 @@ type Zvoog_AudioSampler = {
 	kind: string;
 	outputs: string[];
 	iconPosition: { x: number, y: number };
-	state:0|1|2;
+	state:0|1|2;//on|mute|solo
 };
 type Zvoog_Chord = {
 	skip: Zvoog_Metre;

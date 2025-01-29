@@ -8,7 +8,7 @@ class CommandDispatcher {
 	onAir = false;
 	neeToStart = false;
 	playPosition = 0;
-	callback: (start: number, position: number, end: number) => void = (start: number, pos: number, end: number) => {
+	playCallback: (start: number, position: number, end: number) => void = (start: number, pos: number, end: number) => {
 		this.playPosition = pos;
 		//this.renderer.timeselectbar.positionTimeMark.x 
 
@@ -61,7 +61,7 @@ class CommandDispatcher {
 		console.log('initAudioFromUI');
 		var AudioContext = window.AudioContext;// || window.webkitAudioContext;
 		this.audioContext = new AudioContext();
-		this.player = createSchedulePlayer(this.callback);
+		this.player = createSchedulePlayer(this.playCallback);
 	}
 	registerWorkProject(data: Zvoog_Project) {
 		this._mixerDataMathUtility = new MixerDataMathUtility(data);
@@ -76,6 +76,41 @@ class CommandDispatcher {
 		this.renderer.menu.resizeMenu(vw, vh);
 		this.renderer.menu.resetAllAnchors();
 	};
+	findCurrentFilter(id: string): null | Zvoog_FilterTarget {
+		for (let ff = 0; ff < this.cfg().data.filters.length; ff++) {
+			if (this.cfg().data.filters[ff].id == id) {
+				return this.cfg().data.filters[ff];
+			}
+		}
+		return null;
+	}
+	renderCurrentOutputs(id: string, result: string[], outputs: string[]) {
+		//console.log('renderCurrentOutputs', id, outputs);
+		for (let oo = 0; oo < outputs.length; oo++) {
+			let cid = outputs[oo];
+			if (cid) {
+				if (cid != id) {
+					let filter = this.findCurrentFilter(cid);
+					if (filter) {
+						if (filter.state == 1) {//passthrough
+							//console.log('passthrough', filter);
+							this.renderCurrentOutputs(id, result, filter.outputs);
+						} else {
+							if (result.indexOf(cid) < 0) {
+								//console.log('add', cid);
+								result.push(cid);
+							}
+						}
+					}
+				}
+			} else {
+				if (result.indexOf('') < 0) {
+					//console.log('add speaker');
+					result.push('');
+				}
+			}
+		}
+	}
 	renderCurrentProjectForOutput(): MZXBX_Schedule {
 		let forOutput: MZXBX_Schedule = {
 			series: []
@@ -83,19 +118,7 @@ class CommandDispatcher {
 			, filters: []
 		};
 		let prj: Zvoog_Project = this.cfg().data;
-		for (let ff = 0; ff < prj.filters.length; ff++) {
-			let filter = prj.filters[ff];
-			let outFilter: MZXBX_Filter = {
-				id: filter.id
-				, kind: filter.kind
-				, properties: filter.data
-				, outputs: filter.outputs
-			}
-			if (filter.state == 1) {
-				outFilter.outputs = [];
-			}
-			forOutput.filters.push(outFilter);
-		}
+
 		let soloOnly = false;
 		for (let ss = 0; ss < prj.percussions.length; ss++) {
 			if (prj.percussions[ss].sampler.state == 2) {
@@ -113,7 +136,7 @@ class CommandDispatcher {
 			let sampler = prj.percussions[ss];
 			let mchannel: MZXBX_Channel = {
 				id: sampler.sampler.id
-				, outputs: sampler.sampler.outputs
+				, outputs: []//sampler.sampler.outputs
 				, performer: {
 					//id: sampler.sampler.id
 					kind: sampler.sampler.kind
@@ -124,7 +147,9 @@ class CommandDispatcher {
 				(soloOnly && sampler.sampler.state != 2)
 				|| ((!soloOnly) && sampler.sampler.state == 1)
 			) {
-				mchannel.outputs = [];
+				//mchannel.outputs = [];
+			} else {
+				this.renderCurrentOutputs(sampler.sampler.id, mchannel.outputs, sampler.sampler.outputs);
 			}
 			forOutput.channels.push(mchannel);
 		}
@@ -133,7 +158,7 @@ class CommandDispatcher {
 			let track = prj.tracks[tt];
 			let mchannel: MZXBX_Channel = {
 				id: track.performer.id
-				, outputs: track.performer.outputs
+				, outputs: []//track.performer.outputs
 				, performer: {
 					//id: track.performer.id
 					kind: track.performer.kind
@@ -144,9 +169,27 @@ class CommandDispatcher {
 				(soloOnly && track.performer.state != 2)
 				|| ((!soloOnly) && track.performer.state == 1)
 			) {
-				mchannel.outputs = [];
+				//mchannel.outputs = [];
+			} else {
+				this.renderCurrentOutputs(track.performer.id, mchannel.outputs, track.performer.outputs);
 			}
 			forOutput.channels.push(mchannel);
+		}
+
+		for (let ff = 0; ff < prj.filters.length; ff++) {
+			let filter = prj.filters[ff];
+			let outFilter: MZXBX_Filter = {
+				id: filter.id
+				, kind: filter.kind
+				, properties: filter.data
+				, outputs: []//filter.outputs
+			}
+			if (filter.state == 1) {
+				//outFilter.outputs = [];
+			} else {
+				this.renderCurrentOutputs(filter.id, outFilter.outputs, filter.outputs);
+			}
+			forOutput.filters.push(outFilter);
 		}
 		//let cuStart = 0;
 		for (let mm = 0; mm < prj.timeline.length; mm++) {
@@ -205,6 +248,7 @@ class CommandDispatcher {
 				}
 			}
 		}
+		console.log('renderCurrentProjectForOutput', forOutput);
 		return forOutput;
 	}
 	reConnectPlugins() {
@@ -418,17 +462,17 @@ class CommandDispatcher {
 			}
 		}
 		//console.log('selection',this.cfg().data.selectedPart);
-		this.playPosition=0;
+		this.playPosition = 0;
 		for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
 			let measure: Zvoog_SongMeasure = this.cfg().data.timeline[mm];
 			let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
-			this.playPosition=this.playPosition+cuDuration;
+			this.playPosition = this.playPosition + cuDuration;
 		}
 		this.renderer.timeselectbar.updateTimeSelectionBar();
 		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
 			, this.renderer.timeselectbar.selectionAnchor
 			, LevelModes.top);
-		
+
 
 	}
 	/*doUIaction() {

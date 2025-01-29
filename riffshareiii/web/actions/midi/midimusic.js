@@ -853,7 +853,6 @@ class MidiParser {
                                 note.bendPoints.push({ pointDuration: xyduration, basePitchDelta: xyNext.y });
                             }
                         }
-                        console.log(lessPoints, note);
                     }
                     else {
                         if (note.bendPoints.length == 1) {
@@ -1491,7 +1490,8 @@ class MidiParser {
             redo: [],
             position: { x: 0, y: 0, z: 100 }
         };
-        let echoID = 'echoMain';
+        let echoOutID = 'reverberation';
+        let compresID = 'compression';
         for (let ii = 0; ii < project.timeline.length; ii++) {
             project.comments.push({ points: [] });
         }
@@ -1508,10 +1508,10 @@ class MidiParser {
         for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
             let midiSongTrack = midiSongData.miditracks[ii];
             if (midiSongTrack.trackVolumes.length > 1) {
-                let filterID = 'f' + ii;
+                let filterID = 'volume' + ii;
                 let filterVolume = {
                     id: filterID,
-                    kind: 'zvolume1', dataBlob: '99', outputs: [echoID],
+                    kind: 'zvolume1', data: '99', outputs: [compresID],
                     iconPosition: { x: 77 + ii * 5, y: ii * 11 + 2 },
                     automation: [], state: 0
                 };
@@ -1538,7 +1538,7 @@ class MidiParser {
                 }
             }
             else {
-                outputID = echoID;
+                outputID = compresID;
                 if (midiSongTrack.trackVolumes.length == 1) {
                     let vol = 1 * midiSongTrack.trackVolumes[0].value;
                     volume = 1 * midiSongTrack.trackVolumes[0].value;
@@ -1559,12 +1559,25 @@ class MidiParser {
             }
         }
         let filterEcho = {
-            id: echoID,
-            kind: 'zvolume1', dataBlob: '99', outputs: [''],
-            iconPosition: { x: 77 + midiSongData.miditracks.length * 30, y: midiSongData.miditracks.length * 8 + 2 },
+            id: echoOutID,
+            kind: 'zvecho1', data: '33', outputs: [''],
+            iconPosition: {
+                x: 77 + midiSongData.miditracks.length * 30,
+                y: midiSongData.miditracks.length * 8 + 2
+            },
+            automation: [], state: 0
+        };
+        let filterCompression = {
+            id: compresID,
+            kind: 'zvooco1', data: '1', outputs: [echoOutID],
+            iconPosition: {
+                x: 88 + midiSongData.miditracks.length * 30,
+                y: midiSongData.miditracks.length * 8 + 2
+            },
             automation: [], state: 0
         };
         project.filters.push(filterEcho);
+        project.filters.push(filterCompression);
         console.log('midiSongData', midiSongData);
         console.log('project', project);
         this.trimProject(project);
@@ -1579,11 +1592,13 @@ class MidiParser {
             project.percussions[ii].sampler.iconPosition.x = 20 + ii * 4;
             project.percussions[ii].sampler.iconPosition.y = 30 + ii * 9;
         }
-        for (let ii = 0; ii < project.filters.length - 1; ii++) {
+        for (let ii = 0; ii < project.filters.length - 2; ii++) {
             project.filters[ii].iconPosition.x = 10 + project.tracks.length * 9 + 5 + ii * 4;
             project.filters[ii].iconPosition.y = ii * 9;
         }
-        project.filters[project.filters.length - 1].iconPosition.x = 10 + project.tracks.length * 9 + 15 + project.filters.length * 4;
+        project.filters[project.filters.length - 2].iconPosition.x = 35 + project.tracks.length * 9 + project.filters.length * 4;
+        project.filters[project.filters.length - 2].iconPosition.y = project.filters.length * 5;
+        project.filters[project.filters.length - 1].iconPosition.x = 20 + project.tracks.length * 9 + project.filters.length * 4;
         project.filters[project.filters.length - 1].iconPosition.y = project.filters.length * 6;
         for (let tt = 0; tt < project.tracks.length; tt++) {
             let track = project.tracks[tt];
@@ -1886,10 +1901,10 @@ class MidiParser {
     }
     createProjectTrack(volume, top, timeline, midiTrack, outputId) {
         let projectTrack = {
-            title: midiTrack.title + ' [' + midiTrack.program + '] ' + insNames[midiTrack.program],
+            title: midiTrack.title + ' ' + insNames[midiTrack.program],
             measures: [],
             performer: {
-                id: 'p' + Math.random(), data: '' + midiTrack.program, kind: 'zinstr1', outputs: [outputId],
+                id: 'track' + (midiTrack.program + Math.random()), data: '' + midiTrack.program, kind: 'zinstr1', outputs: [outputId],
                 iconPosition: { x: top * 2, y: top }, state: 0
             },
             volume: volume
@@ -1964,10 +1979,10 @@ class MidiParser {
     }
     createProjectDrums(volume, top, drum, timeline, midiTrack, outputId) {
         let projectDrums = {
-            title: midiTrack.title + ' [' + drum + '] ' + drumNames[drum],
+            title: midiTrack.title + ' ' + drumNames[drum],
             measures: [],
             sampler: {
-                id: 'd' + Math.random(), data: '' + drum, kind: 'zdrum1', outputs: [outputId],
+                id: 'drum' + (drum + Math.random()), data: '' + drum, kind: 'zdrum1', outputs: [outputId],
                 iconPosition: { x: top * 1.5, y: top / 2 }, state: 0
             },
             volume: volume

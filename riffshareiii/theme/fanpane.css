@@ -25,6 +25,18 @@
 .fanSamplerMoveIcon7 {stroke-width: calc(2.56*var(--tapSize));}
 .fanSamplerMoveIcon8 {stroke-width: calc(5.12*var(--tapSize));}
 .fanSamplerMoveIcon9 {stroke-width: calc(10.24*var(--tapSize));}
+/*
+.fanSamplerUpIcon0 {stroke-width: calc(0.08*var(--tapSize));}
+.fanSamplerUpIcon1 {stroke-width: calc(0.16*var(--tapSize));}
+.fanSamplerUpIcon2 {stroke-width: calc(0.32*var(--tapSize));}
+.fanSamplerUpIcon3 {stroke-width: calc(0.64*var(--tapSize));}
+.fanSamplerUpIcon4 {stroke-width: calc(1.28*var(--tapSize));}
+.fanSamplerUpIcon5 {stroke-width: calc(2.56*var(--tapSize));}
+.fanSamplerUpIcon6 {stroke-width: calc(5.12*var(--tapSize));}
+.fanSamplerUpIcon7 {stroke-width: calc(7.68*var(--tapSize));}
+.fanSamplerUpIcon8 {stroke-width: calc(10.24*var(--tapSize));}
+.fanSamplerUpIcon9 {stroke-width: calc(20.48*var(--tapSize));}
+*/
 .fanSamplerInteractionIcon {
 	fill: var(--click-color);
 	font-size: calc(0.25*var(--tapSize));

@@ -67,7 +67,7 @@
 .menuButtonCircle {
     fill: var(--click-color);
 	stroke: var(--main-color);
-    stroke-width: 0.01cm;
+    stroke-width: 0.05cm;
 }
 
 .menuButtonLabel {

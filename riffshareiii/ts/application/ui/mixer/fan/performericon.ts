@@ -164,7 +164,12 @@ class PerformerIcon {
 						, LevelModes.normal);
 				}
 			}
-			rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
+			//rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
+			//if(secondary){
+				rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
+			//}else{
+			//	rec.css = 'fanSamplerMoveIcon fanSamplerUpIcon' + zidx;
+			//}
 		} else {
 			rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
 		}

@@ -6,16 +6,16 @@ class SpearConnection {
 		return (nn) ? nn : 0;
 	}
 	addSpear(
-		secondary:boolean
-		,zidx: number 
-		,fromX: number, fromY: number
+		secondary: boolean
+		, zidx: number
+		, fromX: number, fromY: number
 		, toSize: number
 		, toX: number, toY: number
 		, anchor: TileAnchor) {
-		let headLen = 0.5*(1+zidx);
-		let css = 'fanConnectionBase fanConnection'+zidx;
-		if(secondary){
-			css = 'fanConnectionBase fanConnectionSecondary fanConnection'+zidx;
+		let headLen = 0.5 * (1 + zidx);
+		let css = 'fanConnectionBase fanConnection' + zidx;
+		if (secondary) {
+			css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
 		}
 		//console.log(zidx);
 
@@ -23,7 +23,7 @@ class SpearConnection {
 		let diffY = toY - fromY;
 		let pathLen = Math.sqrt(diffX * diffX + diffY * diffY);
 		//let fromRatio = pathLen / (fromSize / 2 );
-		let toRatio = pathLen / (toSize / 2 );
+		let toRatio = pathLen / (toSize / 2);
 
 		//let xx1 = fromX + diffX / fromRatio;
 		//let yy1 = fromY + diffY / fromRatio;
@@ -47,6 +47,6 @@ class SpearConnection {
 		let second: TileLine = { x1: this.nonan(xx2), x2: this.nonan(xx2 + dx2), y1: this.nonan(yy2), y2: this.nonan(yy2 + dy2), css: css };
 		anchor.content.push(second)
 		//console.log(fromX, toX, fromY, toY, angle * 180 / Math.PI, dx, dy);
-		
+
 	}
 }

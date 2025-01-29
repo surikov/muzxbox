@@ -67,7 +67,7 @@ declare class CommandDispatcher {
     onAir: boolean;
     neeToStart: boolean;
     playPosition: number;
-    callback: (start: number, position: number, end: number) => void;
+    playCallback: (start: number, position: number, end: number) => void;
     _mixerDataMathUtility: MixerDataMathUtility;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
     exe: CommandExe;
@@ -76,6 +76,8 @@ declare class CommandDispatcher {
     registerWorkProject(data: Zvoog_Project): void;
     registerUI(renderer: UIRenderer): void;
     showRightMenu(): void;
+    findCurrentFilter(id: string): null | Zvoog_FilterTarget;
+    renderCurrentOutputs(id: string, result: string[], outputs: string[]): void;
     renderCurrentProjectForOutput(): MZXBX_Schedule;
     reConnectPlugins(): void;
     reStartPlayIfPlay(): void;

@@ -142,7 +142,12 @@ class SamplerIcon {
 						, LevelModes.normal);
 				}
 			}
-			rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
+			//rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
+			//if(order){
+				rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
+			//}else{
+			//	rec.css = 'fanSamplerMoveIcon fanSamplerUpIcon' + zidx;
+			//}
 		} else {
 			rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
 		}
@@ -188,7 +193,7 @@ class SamplerIcon {
 		let samplerFromY = globalCommandDispatcher.cfg().samplerTop()
 			+ (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
 		//console.log('addSamplerSpot', order, samplerFromY);
-		new ControlConnection().addAudioStreamLineFlow(false, zidx, samplerFromY, xx, yy, spearsAnchor);
+		new ControlConnection().addAudioStreamLineFlow(order>0, zidx, samplerFromY, xx, yy, spearsAnchor);
 		//new FanOutputLine().addOutputs(samplerTrack.sampler.outputs, fanLevelAnchor, spearsAnchor, samplerTrack.sampler.id, xx, yy, zidx);
 		let fol = new FanOutputLine();
 		for (let oo = 0; oo < samplerTrack.sampler.outputs.length; oo++) {
@@ -225,7 +230,7 @@ class SamplerIcon {
 					});
 			}
 		}
-
+/*
 		if (zidx < 5) {
 			let sbuttn: TileRectangle = {
 				x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth()
@@ -277,6 +282,6 @@ class SamplerIcon {
 
 			spearsAnchor.content.push(btnAnchor);
 			//console.log(order,samplerFromY, zidx, spearsAnchor);
-		}
+		}*/
 	}
 }

@@ -20,6 +20,10 @@ let _t_all_registerd_plugins_list = [
         evaluate: 'newZvoogEchoImplementation', script: './web/filters/zvoog_echo/zecho_plugin.js'
     },
     {
+        label: 'Zvoog Compressor', purpose: 'Filter', kind: 'zvooco1', ui: './web/filters/zvoog_compressor/zvoocomp.html',
+        evaluate: 'newZvoogCompreImplementation', script: './web/filters/zvoog_compressor/zc_plugin.js'
+    },
+    {
         label: 'Zvoog Performer', purpose: 'Performer', kind: 'zinstr1', ui: './web/performers/zvoog_perf/perfui.html',
         evaluate: 'newZvoogBasePerformerImplementation', script: './web/performers/zvoog_perf/zvoogperf_plugin.js'
     }

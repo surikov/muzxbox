@@ -33,8 +33,8 @@ class MixerDataMathUtility {
 	//pluginIconWidth = 17;
 	//pluginIconHeight = 7;
 	pluginIconSize = 3;
-	speakerIconSize = 33;
-	speakerIconPad = 22;
+	speakerIconSize = 22;
+	speakerIconPad = 44;
 
 	padGridFan = 15;
 
@@ -107,7 +107,7 @@ class MixerDataMathUtility {
 				ww = pp.x + this.pluginIconSize;
 			}
 		}
-		ww = ww + this.speakerIconPad + 2 * this.pluginIconSize;
+		ww = ww + this.speakerIconPad + 7 * this.pluginIconSize;
 		return ww;
 	}
 	/*
@@ -183,7 +183,8 @@ class MixerDataMathUtility {
 	}
 	speakerFanPosition(): TilePoint {
 		let speakerX = this.wholeWidth() - this.speakerIconPad - this.rightPad + this.speakerIconSize / 2;
-		let speakerY = this.gridTop() + this.gridHeight() / 2 - this.speakerIconSize / 2;
+		let speakerY = this.wholeHeight()/2-this.speakerIconSize / 2;
+		//this.gridTop() + this.gridHeight() / 2 - this.speakerIconSize / 2;
 		return { x: speakerX, y: speakerY };
 	}
 	heightOfTitle(): number {
