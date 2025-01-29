@@ -15,7 +15,7 @@ class SimpleBeepPlugin {
 		window.parent.postMessage('', '*');
 	}
 	receiveHostMessage(messageEvent: MessageEvent) {
-		console.log('receiveHostMessage', messageEvent);
+		//console.log('receiveHostMessage', messageEvent);
 		let message: MZXBX_MessageToPlugin = messageEvent.data;
 		if (this.id) {
 			this.data = message.hostData;

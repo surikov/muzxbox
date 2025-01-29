@@ -115,7 +115,7 @@ class OctaveContent {
 						for (let ss = 0; ss < chord.slides.length; ss++) {
 							//if (ss > 2) break;
 							let x2 = x1 + MMUtil().set(chord.slides[ss].duration).duration(globalCommandDispatcher.cfg().data.timeline[barIdx].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-							let y2 = y1 - chord.slides[ss].delta * globalCommandDispatcher.cfg().notePathHeight;
+							let y2 = yStart - chord.slides[ss].delta * globalCommandDispatcher.cfg().notePathHeight;
 							let r_x1 = x1 + globalCommandDispatcher.cfg().notePathHeight / 2;
 							if (ss > 0) {
 								r_x1 = x1;

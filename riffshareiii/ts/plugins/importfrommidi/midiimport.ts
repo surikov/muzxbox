@@ -5,7 +5,7 @@ class MIDIIImportMusicPlugin {
 		this.init();
 	}
 	init() {
-		console.log('init MIDI import');
+		//console.log('init MIDI import');
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
 		//window.parent.postMessage('', '*');
 		window.parent.postMessage({
@@ -22,7 +22,7 @@ class MIDIIImportMusicPlugin {
 				, pluginData: this.parsedProject
 				, done: true
 			};
-			console.log('sendImportedMIDIData', oo);
+			//console.log('sendImportedMIDIData', oo);
 			window.parent.postMessage(oo, '*');
 		} else {
 			alert('No parsed data');
@@ -30,7 +30,7 @@ class MIDIIImportMusicPlugin {
 	}
 
 	loadMIDIfile(inputFile) {
-		console.log('loadMIDIfile', inputFile.files);
+		//console.log('loadMIDIfile', inputFile.files);
 		var file = inputFile.files[0];
 		var fileReader = new FileReader();
 		let me = this;
@@ -65,7 +65,7 @@ class MIDIIImportMusicPlugin {
 	}
 
 	receiveHostMessage(par) {
-		console.log('receiveHostMessage', par);
+		//console.log('receiveHostMessage', par);
 		//callbackID = par.data;
 		/*
 		try {
@@ -965,16 +965,19 @@ class MidiParser {
 		}
 		return returnPoints;
 	};
+
 	simplifySinglePath(points: XYp[], tolerance: number): XYp[] {
 		var arr: XYp[] = this.douglasPeucker(points, tolerance);
 		arr.push(points[points.length - 1]);
 		//console.log(points, tolerance, arr);
 		return arr;
 	}
+
 	simplifyAllBendPaths() {
+		let msMin = 75;
 		for (var t = 0; t < this.parsedTracks.length; t++) {
 			var track: MIDIFileTrack = this.parsedTracks[t];
-			//console.log('simplify',track.trackTitle);
+			//console.log('simplify', track.trackTitle);
 			for (var ch = 0; ch < track.chords.length; ch++) {
 				var chord: TrackChord = track.chords[ch];
 				for (var n = 0; n < chord.notes.length; n++) {
@@ -982,39 +985,52 @@ class MidiParser {
 					if (note.bendPoints.length > 1) {
 						//console.log(chord.channel,note.bendPoints.length,note);
 					}
-					if (note.bendPoints.length > 5) {
-						let tolerance = 0.3;
-						if (note.bendPoints.length > 30) {
-							tolerance = 0.5;
-						}
-						if (note.bendPoints.length > 50) {
-							tolerance = 0.95;
-						}
-						//console.log('simplify',note.points.length,note);
-						var xx = 0;
-						var pnts: XYp[] = [];
-						for (var p = 0; p < note.bendPoints.length; p++) {
-							note.bendPoints[p].pointDuration = Math.max(note.bendPoints[p].pointDuration, 0);
-							pnts.push({ x: xx, y: note.bendPoints[p].basePitchDelta });
-							xx = xx + note.bendPoints[p].pointDuration;
-						}
-						pnts.push({ x: xx, y: note.bendPoints[note.bendPoints.length - 1].basePitchDelta });
-						var lessPoints: XYp[] = this.simplifySinglePath(pnts, tolerance);
-						note.bendPoints = [];
-						for (var p = 0; p < lessPoints.length - 1; p++) {
-							var xypoint: XYp = lessPoints[p];
-							var xyNext: XYp = lessPoints[p + 1];
-							var xyduration = lessPoints[p + 1].x - xypoint.x;
-							//if (xyduration < 0) {
-							//xyduration = 0;
-							//}
-							//let yy=xypoint.y;
-							//console.log(note,yy);
-							if (xyduration > 0) {
-								note.bendPoints.push({ pointDuration: xyduration, basePitchDelta: xyNext.y });
+					if (note.bendPoints.length > 1) {
+						//console.log('simplify', note.bendPoints.length, note);
+						let simplifiedPath: NotePitch[] = [];
+						let cuPointDuration = 0;
+						let lastBasePitchDelta = 0;
+						for (let pp = 0; pp < note.bendPoints.length; pp++) {
+							let cuPoint = note.bendPoints[pp];
+							lastBasePitchDelta = cuPoint.basePitchDelta;
+							cuPointDuration = cuPointDuration + cuPoint.pointDuration;
+							if (cuPointDuration > msMin) {
+								simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
+								//console.log(cuPointDuration, lastBasePitchDelta);
+								cuPointDuration = 0;
 							}
 						}
-						//console.log(lessPoints, note);
+						//console.log(cuPointDuration, lastBasePitchDelta);
+						simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
+						note.bendPoints = simplifiedPath;
+						//console.log(simplifiedPath,'original',note.bendPoints);
+						/*
+												let tolerance = 0.3;
+												if (note.bendPoints.length > 30) {
+													tolerance = 0.5;
+												}
+												if (note.bendPoints.length > 50) {
+													tolerance = 0.95;
+												}
+												var xx = 0;
+												var pnts: XYp[] = [];
+												for (var p = 0; p < note.bendPoints.length; p++) {
+													note.bendPoints[p].pointDuration = Math.max(note.bendPoints[p].pointDuration, 0);
+													pnts.push({ x: xx, y: note.bendPoints[p].basePitchDelta });
+													xx = xx + note.bendPoints[p].pointDuration;
+												}
+												pnts.push({ x: xx, y: note.bendPoints[note.bendPoints.length - 1].basePitchDelta });
+												var lessPoints: XYp[] = this.simplifySinglePath(pnts, tolerance);
+												note.bendPoints = [];
+												for (var p = 0; p < lessPoints.length - 1; p++) {
+													var xypoint: XYp = lessPoints[p];
+													var xyNext: XYp = lessPoints[p + 1];
+													var xyduration = lessPoints[p + 1].x - xypoint.x;
+													if (xyduration > 0) {
+														note.bendPoints.push({ pointDuration: xyduration, basePitchDelta: xyNext.y });
+													}
+												}
+												*/
 					} else {
 						if (note.bendPoints.length == 1) {
 							if (note.bendPoints[0].pointDuration > 4321) {
@@ -1821,7 +1837,7 @@ class MidiParser {
 		return timeline;
 	}
 	convertProject(title: string, comment: string): Zvoog_Project {
-		console.log('MidiParser.convertProject', this);
+		//console.log('MidiParser.convertProject', this);
 		let midiSongData: MIDISongData = {
 			parser: '1.12'
 			, duration: 0
@@ -1860,6 +1876,7 @@ class MidiParser {
 					var newnote: MIDISongNote = { slidePoints: [], midiPitch: midinote.basePitch, midiDuration: midinote.baseDuration };
 					newchord.notes.push(newnote);
 					if (midinote.bendPoints.length > 0) {
+
 						for (var v = 0; v < midinote.bendPoints.length; v++) {
 							var midipoint: NotePitch = midinote.bendPoints[v];
 							//var newpoint: MIDISongPoint = { pitch: midipoint.pitch, durationms: midipoint.pointDuration };
@@ -1867,11 +1884,10 @@ class MidiParser {
 								pitch: midinote.basePitch + midipoint.basePitchDelta
 								, durationms: midipoint.pointDuration
 							};
-
 							newpoint.midipoint = midinote;
 							newnote.slidePoints.push(newpoint);
 						}
-						//console.log(newnote);
+						//console.log(midinote,newnote);
 					} else {
 						//newnote.points[newnote.points.length - 1].durationms = newnote.points[newnote.points.length - 1].durationms + 66;
 						/*newnote.points.push({
@@ -2015,7 +2031,7 @@ class MidiParser {
 		}
 		let filterEcho: Zvoog_FilterTarget = {
 			id: echoOutID
-			, kind: 'zvecho1', data: '33', outputs: ['']
+			, kind: 'zvecho1', data: '22', outputs: ['']
 			, iconPosition: {
 				x: 77 + midiSongData.miditracks.length * 30
 				, y: midiSongData.miditracks.length * 8 + 2
@@ -2034,8 +2050,8 @@ class MidiParser {
 		project.filters.push(filterEcho);
 		project.filters.push(filterCompression);
 
-		console.log('midiSongData', midiSongData);
-		console.log('project', project);
+		//console.log('midiSongData', midiSongData);
+		//console.log('project', project);
 		this.trimProject(project);
 		return project;
 	}
@@ -2066,7 +2082,7 @@ class MidiParser {
 				let measure = track.measures[mm];
 				for (let cc = 0; cc < measure.chords.length; cc++) {
 					let chord = measure.chords[cc];
-					chord.skip = MMUtil().set(chord.skip).strip(32);
+					chord.skip = MMUtil().set(chord.skip).strip(1024);
 				}
 			}
 		}
@@ -2075,16 +2091,16 @@ class MidiParser {
 			for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
 				let measure = sampleTrack.measures[mm];
 				for (let mp = 0; mp < measure.skips.length; mp++) {
-					let newSkip = MMUtil().set(measure.skips[mp]).strip(32);
+					let newSkip = MMUtil().set(measure.skips[mp]).strip(1024);
 					measure.skips[mp].count = newSkip.count;
 					measure.skips[mp].part = newSkip.part;
 				}
 			}
 		}
 		//---------------
-		this.reShiftSequencer(project);
-		this.reShiftDrums(project)
-		this.cutShift(project);
+		//this.reShiftSequencer(project);
+		//this.reShiftDrums(project)
+		//this.cutShift(project);
 		//---------------
 		let len = project.timeline.length;
 		for (let ii = len - 1; ii > 0; ii--) {
@@ -2410,55 +2426,48 @@ class MidiParser {
 							let midiNote: MIDISongNote = midiChord.notes[nn];
 							//console.log(midiNote)
 							//let startPitch = midiNote.points[0].pitch;
-							let currentSlidePitch = midiNote.midiPitch;
+							//let prePitch = midiNote.midiPitch;
 							//let startDuration = mm.calculate((midiNote.points[0].durationms - 66) / 1000.0, nextMeasure.tempo).strip(32);
-							let startDuration = mm.calculate(midiNote.midiDuration / 1000.0, nextMeasure.tempo);
-							let curSlide: Zvoog_Slide = {
+
+							/*let curSlide: Zvoog_Slide = {
 								duration: startDuration
 								, delta: 0
-							};
+							};*/
 							//let trackNote: Zvoog_Note = { pitch: currentSlidePitch, slides: [curSlide] };
-							let singlePitch = currentSlidePitch;
-
+							//let singlePitch = currentSlidePitch;
 							if (midiNote.slidePoints.length > 0) {
-								//trackNote.slides = [];
 								trackChord.slides = [];
-								let bendDuration = 0;
+								let bendDurationMs = 0;
 								for (let pp = 0; pp < midiNote.slidePoints.length; pp++) {
 									let midiPoint = midiNote.slidePoints[pp];
-
-									curSlide.delta = currentSlidePitch - midiPoint.pitch;
-									currentSlidePitch = midiPoint.pitch;
-									//let xduration = mm.calculate((midiPoint.durationms - 66) / 1000.0, nextMeasure.tempo);
+									//let curSlideDelta = prePitch - midiPoint.pitch;
+									//prePitch = midiPoint.pitch;
 									let xduration = mm.calculate(midiPoint.durationms / 1000.0, nextMeasure.tempo);
-									curSlide = {
+									trackChord.slides.push({
 										duration: xduration
-										, delta: 0
-									};
-									bendDuration = bendDuration + midiPoint.durationms;
-									//trackNote.slides.push(curSlide);
-									trackChord.slides.push(curSlide);
-									//console.log(midiNote.midiPitch,pp,midiPoint.durationms,xduration);
+										, delta: midiNote.midiPitch - midiPoint.pitch
+									});
+									bendDurationMs = bendDurationMs + midiPoint.durationms;
 								}
-								//console.log(midiNote,bendDuration);
-								let remains = midiNote.midiDuration - bendDuration;
+								let remains = midiNote.midiDuration - bendDurationMs;
 								if (remains > 0) {
-									curSlide = {
+									/*curSlide = {
 										duration: mm.calculate(remains / 1000.0, nextMeasure.tempo)
 										, delta: currentSlidePitch - Math.round(currentSlidePitch)
-									};
-									//trackNote.slides.push(curSlide);
-									trackChord.slides.push(curSlide);
+									};*/
+									trackChord.slides.push({
+										duration: mm.calculate(remains / 1000.0, nextMeasure.tempo)
+										, delta: midiNote.midiPitch - midiNote.slidePoints[midiNote.slidePoints.length - 1].pitch
+									});
 								}
+								//console.log(midiNote, trackChord);
 							} else {
-								trackChord.slides = [curSlide];
+								trackChord.slides = [{
+									duration: mm.calculate(midiNote.midiDuration / 1000.0
+										, nextMeasure.tempo), delta: 0
+								}];
 							}
-
-							//trackChord.notes.push(trackNote);
-							trackChord.pitches.push(singlePitch);
-							/*if (trackNote.slides.length > 1) {
-								console.log(projectTrack.title, trackNote);
-							}*/
+							trackChord.pitches.push(midiNote.midiPitch);
 						}
 					}
 				}

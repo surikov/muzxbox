@@ -7,12 +7,12 @@ class ZCompressorImplementation implements MZXBX_AudioFilterPlugin {
 	dry: GainNode;
 	wet: GainNode;
 	num: number = 1;
-	createAll(context: AudioContext, parameters: string) {
+	createAll(context: AudioContext) {
 		this.audioContext = context;
 		this.inputNode = this.audioContext.createGain();
 		this.outputNode = this.audioContext.createGain();
 		this.compressor = this.audioContext.createDynamicsCompressor();
-		var threshold = -35;
+		var threshold = -40;
 		var knee = 35;
 		var ratio = 15;
 		var attack = 0.02;
@@ -24,8 +24,8 @@ class ZCompressorImplementation implements MZXBX_AudioFilterPlugin {
 		this.compressor.release.setValueAtTime(release, this.audioContext.currentTime + 0.0001);//0,1
 		this.dry = this.audioContext.createGain();
 		this.wet = this.audioContext.createGain();
-		this.dry.gain.setTargetAtTime(0.1, 0, 0.0001);
-		this.wet.gain.setTargetAtTime(0.9, 0, 0.0001);
+		this.dry.gain.setTargetAtTime(0.001, 0, 0.0001);
+		this.wet.gain.setTargetAtTime(0.999, 0, 0.0001);
 		this.inputNode.connect(this.dry);
 		this.inputNode.connect(this.compressor);
 		this.compressor.connect(this.wet);
@@ -36,7 +36,7 @@ class ZCompressorImplementation implements MZXBX_AudioFilterPlugin {
 		if (this.audioContext) {
 			//
 		} else {
-			this.createAll(context, parameters);
+			this.createAll(context);
 		}
 		this.schedule(this.audioContext.currentTime + 0.0001, parameters);
 	}

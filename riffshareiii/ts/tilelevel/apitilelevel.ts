@@ -1,4 +1,4 @@
-console.log('Tile Level API');
+//console.log('Tile Level API');
 
 type TileZoom = {
 	x: number,

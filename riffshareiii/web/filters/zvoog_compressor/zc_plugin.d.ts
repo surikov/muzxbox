@@ -276,7 +276,7 @@ declare class ZCompressorImplementation implements MZXBX_AudioFilterPlugin {
     dry: GainNode;
     wet: GainNode;
     num: number;
-    createAll(context: AudioContext, parameters: string): void;
+    createAll(context: AudioContext): void;
     launch(context: AudioContext, parameters: string): void;
     busy(): null | string;
     schedule(when: number, parameters: string): void;

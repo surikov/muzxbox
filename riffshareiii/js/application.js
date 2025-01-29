@@ -231,9 +231,7 @@ class StateDiff {
         }
     }
 }
-console.log('startup v1.02');
 function startApplication() {
-    console.log('startApplication v1.6.01');
     let ui = new UIRenderer();
     ui.createUI();
     globalCommandDispatcher.registerWorkProject(_mzxbxProjectForTesting2);
@@ -452,7 +450,6 @@ class CommandExe {
             let one = globalCommandDispatcher.cfg().data.redo[ii];
             reCnt = reCnt + one.actions.length;
         }
-        console.log('undo', unCnt, 'redo', reCnt);
         if (unCnt > 32100) {
             console.log('cut undo queue');
             let cmd = globalCommandDispatcher.cfg().data.undo.shift();
@@ -828,11 +825,9 @@ class CommandDispatcher {
         }
     }
     promptProjectPluginGUI(label, url, callback) {
-        console.log('promptProjectPluginGUI', url);
         pluginDialogPrompt.openActionDialogFrame(label, url, callback);
     }
     promptPointPluginGUI(label, url, rawdata, callback) {
-        console.log('promptPointPluginGUI', url);
         pluginDialogPrompt.openPointDialogFrame(label, url, rawdata, callback);
     }
     findPluginRegistrationByKind(kind) {
@@ -842,7 +837,6 @@ class CommandDispatcher {
                 return list[ii];
             }
         }
-        console.log('findPluginRegistrationByKind wrong', kind);
         return null;
     }
     cancelPluginGUI() {
@@ -850,7 +844,6 @@ class CommandDispatcher {
         pluginDialogPrompt.closeDialogFrame();
     }
     expandTimeLineSelection(idx) {
-        console.log('select bar', idx);
         if (this.cfg().data) {
             if (idx >= 0 && idx < this.cfg().data.timeline.length) {
                 let curPro = this.cfg().data;
@@ -1972,25 +1965,21 @@ let menuItemsData = null;
 let menuPointActions = {
     text: 'localMenuActionsFolder',
     onOpen: () => {
-        console.log('actions');
     }
 };
 let menuPointPerformers = {
     text: 'localMenuPerformersFolder',
     onOpen: () => {
-        console.log('performers');
     }
 };
 let menuPointFilters = {
     text: 'localMenuFiltersFolder',
     onOpen: () => {
-        console.log('filters');
     }
 };
 let menuPointSamplers = {
     text: 'localMenuSamplersFolder',
     onOpen: () => {
-        console.log('samplers');
     }
 };
 let menuPointTracks = {
@@ -2324,7 +2313,7 @@ class OctaveContent {
                         let y1 = yStart;
                         for (let ss = 0; ss < chord.slides.length; ss++) {
                             let x2 = x1 + MMUtil().set(chord.slides[ss].duration).duration(globalCommandDispatcher.cfg().data.timeline[barIdx].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-                            let y2 = y1 - chord.slides[ss].delta * globalCommandDispatcher.cfg().notePathHeight;
+                            let y2 = yStart - chord.slides[ss].delta * globalCommandDispatcher.cfg().notePathHeight;
                             let r_x1 = x1 + globalCommandDispatcher.cfg().notePathHeight / 2;
                             if (ss > 0) {
                                 r_x1 = x1;
@@ -4320,7 +4309,6 @@ biChar32[30] = 'u';
 biChar32[31] = 'v';
 function testNumMathUtil() {
 }
-console.log('Tile Level API');
 var LevelModes;
 (function (LevelModes) {
     LevelModes[LevelModes["normal"] = 0] = "normal";

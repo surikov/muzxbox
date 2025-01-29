@@ -260,7 +260,7 @@ class GP345ImportMusicPlugin {
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
 	}
 	receiveHostMessage(par) {
-		console.log('receiveHostMessage', par);
+		//console.log('receiveHostMessage', par);
 		//callbackID = par.data;
 		try {
 			var oo:MZXBX_PluginMessage = JSON.parse(par.data);

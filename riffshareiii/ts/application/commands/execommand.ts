@@ -84,7 +84,7 @@ class CommandExe {
 			let one = globalCommandDispatcher.cfg().data.redo[ii];
 			reCnt = reCnt + one.actions.length;
 		}
-		console.log('undo', unCnt, 'redo', reCnt);
+		//console.log('undo', unCnt, 'redo', reCnt);
 		if (unCnt > 32100) {
 			console.log('cut undo queue');
 			let cmd = globalCommandDispatcher.cfg().data.undo.shift();

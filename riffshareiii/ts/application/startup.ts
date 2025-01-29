@@ -1,8 +1,8 @@
-console.log('startup v1.02');
+//console.log('startup v1.02');
 declare function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player;
 declare function createTileLevel(): TileLevelBase;
 function startApplication() {
-    console.log('startApplication v1.6.01');
+    //console.log('startApplication v1.6.01');
     //let commands = new CommandDispatcher();
     let ui = new UIRenderer();
     ui.createUI();

@@ -1,5 +1,4 @@
 "use strict";
-console.log('tilelevel v2.20.001');
 function createTileLevel() {
     return new TileLevelRealTime();
 }
@@ -151,7 +150,6 @@ class TileLevelRealTime {
         this.tapSize = tbb.width;
         this.svg.removeChild(rect);
         this.clickLimit = this.tapSize / 6;
-        console.log('setupTapSize', baseSize, this.tapSize);
     }
     onAfterResize() {
         this.onResizeDo.start(333, function () {
@@ -1210,7 +1208,6 @@ function tileText(svgns, tapSize, g, x, y, html, maxWidth, cssClass, cssStyle) {
     g.appendChild(txt);
     return txt;
 }
-console.log('Tile Level API');
 var LevelModes;
 (function (LevelModes) {
     LevelModes[LevelModes["normal"] = 0] = "normal";

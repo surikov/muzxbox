@@ -6,7 +6,6 @@ class MIDIIImportMusicPlugin {
         this.init();
     }
     init() {
-        console.log('init MIDI import');
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
         window.parent.postMessage({
             dialogID: this.callbackID,
@@ -21,7 +20,6 @@ class MIDIIImportMusicPlugin {
                 pluginData: this.parsedProject,
                 done: true
             };
-            console.log('sendImportedMIDIData', oo);
             window.parent.postMessage(oo, '*');
         }
         else {
@@ -29,7 +27,6 @@ class MIDIIImportMusicPlugin {
         }
     }
     loadMIDIfile(inputFile) {
-        console.log('loadMIDIfile', inputFile.files);
         var file = inputFile.files[0];
         var fileReader = new FileReader();
         let me = this;
@@ -65,7 +62,6 @@ class MIDIIImportMusicPlugin {
         fileReader.readAsArrayBuffer(file);
     }
     receiveHostMessage(par) {
-        console.log('receiveHostMessage', par);
         let message = par.data;
         if (this.callbackID) {
         }
@@ -819,6 +815,7 @@ class MidiParser {
         return arr;
     }
     simplifyAllBendPaths() {
+        let msMin = 75;
         for (var t = 0; t < this.parsedTracks.length; t++) {
             var track = this.parsedTracks[t];
             for (var ch = 0; ch < track.chords.length; ch++) {
@@ -827,32 +824,21 @@ class MidiParser {
                     var note = chord.notes[n];
                     if (note.bendPoints.length > 1) {
                     }
-                    if (note.bendPoints.length > 5) {
-                        let tolerance = 0.3;
-                        if (note.bendPoints.length > 30) {
-                            tolerance = 0.5;
-                        }
-                        if (note.bendPoints.length > 50) {
-                            tolerance = 0.95;
-                        }
-                        var xx = 0;
-                        var pnts = [];
-                        for (var p = 0; p < note.bendPoints.length; p++) {
-                            note.bendPoints[p].pointDuration = Math.max(note.bendPoints[p].pointDuration, 0);
-                            pnts.push({ x: xx, y: note.bendPoints[p].basePitchDelta });
-                            xx = xx + note.bendPoints[p].pointDuration;
-                        }
-                        pnts.push({ x: xx, y: note.bendPoints[note.bendPoints.length - 1].basePitchDelta });
-                        var lessPoints = this.simplifySinglePath(pnts, tolerance);
-                        note.bendPoints = [];
-                        for (var p = 0; p < lessPoints.length - 1; p++) {
-                            var xypoint = lessPoints[p];
-                            var xyNext = lessPoints[p + 1];
-                            var xyduration = lessPoints[p + 1].x - xypoint.x;
-                            if (xyduration > 0) {
-                                note.bendPoints.push({ pointDuration: xyduration, basePitchDelta: xyNext.y });
+                    if (note.bendPoints.length > 1) {
+                        let simplifiedPath = [];
+                        let cuPointDuration = 0;
+                        let lastBasePitchDelta = 0;
+                        for (let pp = 0; pp < note.bendPoints.length; pp++) {
+                            let cuPoint = note.bendPoints[pp];
+                            lastBasePitchDelta = cuPoint.basePitchDelta;
+                            cuPointDuration = cuPointDuration + cuPoint.pointDuration;
+                            if (cuPointDuration > msMin) {
+                                simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
+                                cuPointDuration = 0;
                             }
                         }
+                        simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
+                        note.bendPoints = simplifiedPath;
                     }
                     else {
                         if (note.bendPoints.length == 1) {
@@ -1401,7 +1387,6 @@ class MidiParser {
         return timeline;
     }
     convertProject(title, comment) {
-        console.log('MidiParser.convertProject', this);
         let midiSongData = {
             parser: '1.12',
             duration: 0,
@@ -1560,7 +1545,7 @@ class MidiParser {
         }
         let filterEcho = {
             id: echoOutID,
-            kind: 'zvecho1', data: '33', outputs: [''],
+            kind: 'zvecho1', data: '22', outputs: [''],
             iconPosition: {
                 x: 77 + midiSongData.miditracks.length * 30,
                 y: midiSongData.miditracks.length * 8 + 2
@@ -1578,8 +1563,6 @@ class MidiParser {
         };
         project.filters.push(filterEcho);
         project.filters.push(filterCompression);
-        console.log('midiSongData', midiSongData);
-        console.log('project', project);
         this.trimProject(project);
         return project;
     }
@@ -1606,7 +1589,7 @@ class MidiParser {
                 let measure = track.measures[mm];
                 for (let cc = 0; cc < measure.chords.length; cc++) {
                     let chord = measure.chords[cc];
-                    chord.skip = MMUtil().set(chord.skip).strip(32);
+                    chord.skip = MMUtil().set(chord.skip).strip(1024);
                 }
             }
         }
@@ -1615,15 +1598,12 @@ class MidiParser {
             for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
                 let measure = sampleTrack.measures[mm];
                 for (let mp = 0; mp < measure.skips.length; mp++) {
-                    let newSkip = MMUtil().set(measure.skips[mp]).strip(32);
+                    let newSkip = MMUtil().set(measure.skips[mp]).strip(1024);
                     measure.skips[mp].count = newSkip.count;
                     measure.skips[mp].part = newSkip.part;
                 }
             }
         }
-        this.reShiftSequencer(project);
-        this.reShiftDrums(project);
-        this.cutShift(project);
         let len = project.timeline.length;
         for (let ii = len - 1; ii > 0; ii--) {
             if (this.isBarEmpty(ii, project)) {
@@ -1935,41 +1915,32 @@ class MidiParser {
                     if (trackChord) {
                         for (let nn = 0; nn < midiChord.notes.length; nn++) {
                             let midiNote = midiChord.notes[nn];
-                            let currentSlidePitch = midiNote.midiPitch;
-                            let startDuration = mm.calculate(midiNote.midiDuration / 1000.0, nextMeasure.tempo);
-                            let curSlide = {
-                                duration: startDuration,
-                                delta: 0
-                            };
-                            let singlePitch = currentSlidePitch;
                             if (midiNote.slidePoints.length > 0) {
                                 trackChord.slides = [];
-                                let bendDuration = 0;
+                                let bendDurationMs = 0;
                                 for (let pp = 0; pp < midiNote.slidePoints.length; pp++) {
                                     let midiPoint = midiNote.slidePoints[pp];
-                                    curSlide.delta = currentSlidePitch - midiPoint.pitch;
-                                    currentSlidePitch = midiPoint.pitch;
                                     let xduration = mm.calculate(midiPoint.durationms / 1000.0, nextMeasure.tempo);
-                                    curSlide = {
+                                    trackChord.slides.push({
                                         duration: xduration,
-                                        delta: 0
-                                    };
-                                    bendDuration = bendDuration + midiPoint.durationms;
-                                    trackChord.slides.push(curSlide);
+                                        delta: midiNote.midiPitch - midiPoint.pitch
+                                    });
+                                    bendDurationMs = bendDurationMs + midiPoint.durationms;
                                 }
-                                let remains = midiNote.midiDuration - bendDuration;
+                                let remains = midiNote.midiDuration - bendDurationMs;
                                 if (remains > 0) {
-                                    curSlide = {
+                                    trackChord.slides.push({
                                         duration: mm.calculate(remains / 1000.0, nextMeasure.tempo),
-                                        delta: currentSlidePitch - Math.round(currentSlidePitch)
-                                    };
-                                    trackChord.slides.push(curSlide);
+                                        delta: midiNote.midiPitch - midiNote.slidePoints[midiNote.slidePoints.length - 1].pitch
+                                    });
                                 }
                             }
                             else {
-                                trackChord.slides = [curSlide];
+                                trackChord.slides = [{
+                                        duration: mm.calculate(midiNote.midiDuration / 1000.0, nextMeasure.tempo), delta: 0
+                                    }];
                             }
-                            trackChord.pitches.push(singlePitch);
+                            trackChord.pitches.push(midiNote.midiPitch);
                         }
                     }
                 }

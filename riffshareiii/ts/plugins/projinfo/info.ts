@@ -8,7 +8,7 @@ class ActionPluginStatistics {
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
 	}
 	sendChangedData() {
-		console.log('sendChangedData');
+		//console.log('sendChangedData');
 		if (this.parsedProject) {
 			let input = document.getElementById('project_title') as any;
 			if (input) {
@@ -27,7 +27,7 @@ class ActionPluginStatistics {
 
 
 	receiveHostMessage(par: any) {
-		console.log('receiveHostMessage', par);
+		//console.log('receiveHostMessage', par);
 		//callbackID = par.data;
 		try {
 			var oo: MZXBX_PluginMessage = JSON.parse(par.data);

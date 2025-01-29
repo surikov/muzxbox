@@ -3,12 +3,12 @@ class LocalExportPlugin {
 	callbackID = '';
 	parsedProject: Zvoog_Project | null = null;
 	constructor() {
-		console.log('LocalExportPlugin create');
+		//console.log('LocalExportPlugin create');
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
 		window.parent.postMessage('', '*');
 	}
 	receiveHostMessage(par) {
-		console.log('receiveHostMessage', par);
+		//console.log('receiveHostMessage', par);
 		//callbackID = par.data;
 		/*try {
 			//console.log('parse', par.data.data);
@@ -27,7 +27,7 @@ class LocalExportPlugin {
 		}
 	}
 	exportLocalfile(th) {
-		console.log('exportLocalfile', th);
+		//console.log('exportLocalfile', th);
 		if (this.parsedProject) {
 			this.download(JSON.stringify(this.parsedProject, null, '	'), 'export', 'application/json');
 		}

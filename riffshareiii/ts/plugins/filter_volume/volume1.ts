@@ -59,7 +59,7 @@ class MIDIIImportMusicPlugin {
 	}
 
 	receiveHostMessage(par) {
-		console.log('receiveHostMessage', par);
+		//console.log('receiveHostMessage', par);
 		//callbackID = par.data;
 		try {
 			var oo = JSON.parse(par.data);

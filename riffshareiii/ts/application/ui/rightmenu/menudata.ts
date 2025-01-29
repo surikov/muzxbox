@@ -35,25 +35,25 @@ let menuItemsData: MenuInfo[] | null = null;
 let menuPointActions: MenuInfo = {
 	text: 'localMenuActionsFolder'
 	, onOpen: () => {
-		console.log('actions');
+		//console.log('actions');
 	}
 };
 let menuPointPerformers: MenuInfo = {
 	text: 'localMenuPerformersFolder'
 	, onOpen: () => {
-		console.log('performers');
+		//console.log('performers');
 	}
 };
 let menuPointFilters: MenuInfo = {
 	text: 'localMenuFiltersFolder'
 	, onOpen: () => {
-		console.log('filters');
+		//console.log('filters');
 	}
 };
 let menuPointSamplers: MenuInfo = {
 	text: 'localMenuSamplersFolder'
 	, onOpen: () => {
-		console.log('samplers');
+		//console.log('samplers');
 	}
 };
 /*

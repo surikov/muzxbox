@@ -33,7 +33,7 @@ class LocalProjectImport {
 
 
 	receiveHostMessage(par) {
-		console.log('receiveHostMessage', par);
+		//console.log('receiveHostMessage', par);
 		let message: MZXBX_MessageToPlugin = par.data;
 		if (this.id) {
 			//

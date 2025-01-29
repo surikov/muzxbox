@@ -1,4 +1,4 @@
-console.log("MuzXbox v1.0.2");
+//console.log("MuzXbox v1.0.2");
 declare let testSchedule: MZXBX_Schedule;
 class MuzXbox {
 	uiStarted: boolean = false;

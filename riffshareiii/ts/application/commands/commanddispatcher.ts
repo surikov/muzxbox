@@ -406,11 +406,11 @@ class CommandDispatcher {
 		console.log('setDrumSoloState', state);
 	}*/
 	promptProjectPluginGUI(label: string, url: string, callback: (obj: Zvoog_Project) => void) {
-		console.log('promptProjectPluginGUI', url);
+		//console.log('promptProjectPluginGUI', url);
 		pluginDialogPrompt.openActionDialogFrame(label, url, callback);
 	}
 	promptPointPluginGUI(label: string, url: string, rawdata: string, callback: (obj: any) => boolean) {
-		console.log('promptPointPluginGUI', url);
+		//console.log('promptPointPluginGUI', url);
 		pluginDialogPrompt.openPointDialogFrame(label, url, rawdata, callback);
 	}
 	findPluginRegistrationByKind(kind: String): null | MZXBX_PluginRegistrationInformation {
@@ -420,7 +420,7 @@ class CommandDispatcher {
 				return list[ii];
 			}
 		}
-		console.log('findPluginRegistrationByKind wrong', kind);
+		//console.log('findPluginRegistrationByKind wrong', kind);
 		return null;
 	}
 	cancelPluginGUI() {
@@ -429,7 +429,7 @@ class CommandDispatcher {
 
 	}
 	expandTimeLineSelection(idx: number) {
-		console.log('select bar', idx);
+		//console.log('select bar', idx);
 		if (this.cfg().data) {
 			if (idx >= 0 && idx < this.cfg().data.timeline.length) {
 				let curPro = this.cfg().data;

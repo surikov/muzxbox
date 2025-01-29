@@ -1,7 +1,6 @@
 "use strict";
 class MZXBX_ScaleMath {
 }
-console.log("MuzXbox v1.0.2");
 class MuzXbox {
     constructor() {
         this.uiStarted = false;
