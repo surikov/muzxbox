@@ -18,8 +18,8 @@ class MixerDataMathUtility {
 	//commentPointHeight = 9;
 
 	widthDurationRatio = 27;
-	octaveDrawCount = 6;
-	octaveTransposeCount = -2;
+	octaveDrawCount = 8;
+	octaveTransposeCount = -1;
 
 
 	//titleBottomPad = 5;

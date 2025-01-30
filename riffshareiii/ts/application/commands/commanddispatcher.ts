@@ -279,6 +279,7 @@ class CommandDispatcher {
 		}
 	}
 	setupAndStartPlay() {
+		console.log('setupAndStartPlay');
 		this.onAir = true;
 		let schedule = this.renderCurrentProjectForOutput();
 		let from = 0;
@@ -297,6 +298,7 @@ class CommandDispatcher {
 		}
 		let me = this;
 		let result = me.player.setupPlugins(me.audioContext, schedule, () => {
+			console.log('after setupPlugins');
 			me.neeToStart = true;
 			if (this.playPosition < from) {
 				this.playPosition = from;
@@ -304,7 +306,7 @@ class CommandDispatcher {
 			if (this.playPosition >= to) {
 				this.playPosition = to;
 			}
-			me.startPlay(from, this.playPosition, to);
+			me.startPlayLoop(from, this.playPosition, to);
 		});
 		if (result != null) {
 			this.onAir = false;
@@ -312,8 +314,8 @@ class CommandDispatcher {
 			me.renderer.warning.showWarning('Start playing', result, null);
 		}
 	}
-	startPlay(from: number, position: number, to: number) {
-		console.log('startPlay',from,position,to);
+	startPlayLoop(from: number, position: number, to: number) {
+		console.log('startPlayLoop',from,position,to);
 		if (this.neeToStart) {
 			let me = this;
 			//let n120 = 120 / 60;
@@ -327,7 +329,7 @@ class CommandDispatcher {
 					me.onAir = false;
 				});
 				let id=setTimeout(() => {
-					me.startPlay(from, position, to);
+					me.startPlayLoop(from, position, to);
 				}, 1000);
 				console.log('wait',id);
 			} else {

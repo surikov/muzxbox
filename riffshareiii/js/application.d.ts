@@ -84,7 +84,7 @@ declare class CommandDispatcher {
     toggleStartStop(): void;
     stopPlay(): void;
     setupAndStartPlay(): void;
-    startPlay(from: number, position: number, to: number): void;
+    startPlayLoop(from: number, position: number, to: number): void;
     setThemeLocale(loc: string, ratio: number): void;
     setThemeColor(cssPath: string): void;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;

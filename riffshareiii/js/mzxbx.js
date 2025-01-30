@@ -419,7 +419,7 @@ class MusicTicker {
     }
 }
 class PluginLoader {
-    collectLoadPlugins(schedule, filters, performers, afterLoad) {
+    collectLoadPlugins(schedule, filters, performers, afterStart) {
         for (let ff = 0; ff < schedule.filters.length; ff++) {
             let filter = schedule.filters[ff];
             this.сollectFilterPlugin(filter.id, filter.kind, filter.properties, filters);
@@ -429,15 +429,16 @@ class PluginLoader {
             let chanid = schedule.channels[ch].id;
             this.сollectPerformerPlugin(chanid, performer.kind, performer.properties, performers);
         }
-        let result = this.startLoadCollectedPlugins(filters, performers, afterLoad);
+        let result = this.startLoadCollectedPlugins(filters, performers);
+        afterStart();
         return result;
     }
-    startLoadCollectedPlugins(filters, performers, afterLoad) {
+    startLoadCollectedPlugins(filters, performers) {
         for (let ff = 0; ff < filters.length; ff++) {
             if (!(filters[ff].plugin)) {
                 let result = this.startLoadPluginStarter(filters[ff].kind, filters, performers, (plugin) => {
                     filters[ff].plugin = plugin;
-                }, afterLoad);
+                });
                 if (result != null) {
                     return result;
                 }
@@ -447,16 +448,15 @@ class PluginLoader {
             if (!(performers[pp].plugin)) {
                 let result = this.startLoadPluginStarter(performers[pp].kind, filters, performers, (plugin) => {
                     performers[pp].plugin = plugin;
-                }, afterLoad);
+                });
                 if (result != null) {
                     return result;
                 }
             }
         }
-        afterLoad();
         return null;
     }
-    startLoadPluginStarter(kind, filters, performers, onDone, afterLoad) {
+    startLoadPluginStarter(kind, filters, performers, onDone) {
         let tt = this.findPluginInfo(kind);
         if (tt) {
             let info = tt;
@@ -468,7 +468,7 @@ class PluginLoader {
                 let plugin = exe();
                 if (plugin) {
                     onDone(plugin);
-                    this.startLoadCollectedPlugins(filters, performers, afterLoad);
+                    this.startLoadCollectedPlugins(filters, performers);
                 }
             });
             return null;

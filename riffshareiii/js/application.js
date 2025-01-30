@@ -730,6 +730,7 @@ class CommandDispatcher {
         }
     }
     setupAndStartPlay() {
+        console.log('setupAndStartPlay');
         this.onAir = true;
         let schedule = this.renderCurrentProjectForOutput();
         let from = 0;
@@ -749,6 +750,7 @@ class CommandDispatcher {
         }
         let me = this;
         let result = me.player.setupPlugins(me.audioContext, schedule, () => {
+            console.log('after setupPlugins');
             me.neeToStart = true;
             if (this.playPosition < from) {
                 this.playPosition = from;
@@ -756,7 +758,7 @@ class CommandDispatcher {
             if (this.playPosition >= to) {
                 this.playPosition = to;
             }
-            me.startPlay(from, this.playPosition, to);
+            me.startPlayLoop(from, this.playPosition, to);
         });
         if (result != null) {
             this.onAir = false;
@@ -764,8 +766,8 @@ class CommandDispatcher {
             me.renderer.warning.showWarning('Start playing', result, null);
         }
     }
-    startPlay(from, position, to) {
-        console.log('startPlay', from, position, to);
+    startPlayLoop(from, position, to) {
+        console.log('startPlayLoop', from, position, to);
         if (this.neeToStart) {
             let me = this;
             let msg = me.player.startLoop(from, position, to);
@@ -776,7 +778,7 @@ class CommandDispatcher {
                     me.onAir = false;
                 });
                 let id = setTimeout(() => {
-                    me.startPlay(from, position, to);
+                    me.startPlayLoop(from, position, to);
                 }, 1000);
                 console.log('wait', id);
             }
@@ -4098,8 +4100,8 @@ class MixerDataMathUtility {
         this.samplerDotHeight = 3;
         this.autoPointHeight = 4;
         this.widthDurationRatio = 27;
-        this.octaveDrawCount = 6;
-        this.octaveTransposeCount = -2;
+        this.octaveDrawCount = 8;
+        this.octaveTransposeCount = -1;
         this.maxCommentRowCount = 0;
         this.pluginIconSize = 3;
         this.speakerIconSize = 22;

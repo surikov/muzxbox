@@ -326,9 +326,9 @@ declare class MusicTicker {
 }
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 declare class PluginLoader {
-    collectLoadPlugins(schedule: MZXBX_Schedule, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[], afterLoad: () => void): null | string;
-    startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[], afterLoad: () => void): null | string;
-    startLoadPluginStarter(kind: string, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[], onDone: (plugin: any) => void, afterLoad: () => void): null | string;
+    collectLoadPlugins(schedule: MZXBX_Schedule, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[], afterStart: () => void): null | string;
+    startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[]): null | string;
+    startLoadPluginStarter(kind: string, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[], onDone: (plugin: any) => void): null | string;
     сollectFilterPlugin(id: string, kind: string, properties: string, filters: MZXBX_FilterHolder[]): void;
     сollectPerformerPlugin(id: string, kind: string, properties: string, performers: MZXBX_PerformerSamplerHolder[]): void;
     findPluginInfo(kind: string): MZXBX_PluginRegistrationInformation | null;

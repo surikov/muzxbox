@@ -36,35 +36,35 @@
 }
 
 .mixFiller1{
-    fill: var(--main-color);
+    fill: var(--line-color);
 	fill-opacity: 5%;
 }
 .mixFiller2{
-    fill: var(--main-color);
+    fill: var(--line-color);
 	fill-opacity: 10%;
 }
 .mixFiller3{
-    fill: var(--main-color);
+    fill: var(--line-color);
 	fill-opacity: 15%;
 }
 .mixFiller4{
-    fill: var(--main-color);
+    fill: var(--line-color);
 	fill-opacity: 20%;
 }
 .mixFiller5{
-    fill: var(--main-color);
+    fill: var(--line-color);
 	fill-opacity: 25%;
 }
 .mixFiller6{
-    fill: var(--main-color);
+    fill: var(--line-color);
 	fill-opacity: 30%;
 }
 .mixFiller7{
-    fill: var(--main-color);
+    fill: var(--line-color);
 	fill-opacity: 35%;
 }
 .mixFiller8{
-    fill: var(--main-color);
+    fill: var(--line-color);
 	fill-opacity: 40%;
 }
 
