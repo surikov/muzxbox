@@ -35,12 +35,12 @@ class ZCompressorImplementation {
         else {
             this.createAll(context);
         }
-        this.schedule(this.audioContext.currentTime + 0.0001, parameters);
+        this.schedule(this.audioContext.currentTime + 0.0001, 120, parameters);
     }
     busy() {
         return null;
     }
-    schedule(when, parameters) {
+    schedule(when, tempo, parameters) {
         this.wet.gain.setValueAtTime(this.num, when);
         this.dry.gain.setValueAtTime(1 - this.num, when);
         this.num = parseInt(parameters);

@@ -149,32 +149,33 @@
 	fill-opacity2:25%;
     stroke2: none;
 
-	fill: url(#verticalBorderLine);;
+	fill22: url(#verticalBorderLine);;
+	fill: var(--line-color);
     stroke: none;
 	pointer-events: none;
 }
 .verLineFrom {
     stop-color: var(--line-color);
-    stop-opacity: 25%;
+    stop-opacity: 50%;
   }
   .verLineMiddle{
     stop-color: var(--line-color);
-    stop-opacity: 15%;
+    stop-opacity: 20%;
   }
   .verLineTo {
     stop-color: var(--line-color);
     stop-opacity: 0;
   }
-.barRightBorder2{
-	fill: url(#verticalBorderLine);;
+.barRightBorder{
+	fill: url(#verticalBorderLine);
     stroke: none;
 	pointer-events: none;
 }
 
 
-.barRightBorder{
+.barRightBorder2{
 	fill: var(--line-color);
-	fill-opacity:75%;
+	fill-opacity:50%;
     stroke: none;
 	pointer-events: none;
 }

@@ -169,8 +169,8 @@ declare type MZXBX_FilterHolder = {
     kind: string;
     properties: string;
 };
-declare type MZXBX_PerformerHolder = {
-    plugin: MZXBX_AudioPerformerPlugin | null;
+declare type MZXBX_PerformerSamplerHolder = {
+    plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null;
     channelId: string;
     kind: string;
     properties: string;
@@ -210,14 +210,14 @@ declare type MZXBX_Filter = {
 declare type MZXBX_AudioFilterPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
-    schedule: (when: number, parameters: string) => void;
+    schedule: (when: number, tempo: number, parameters: string) => void;
     input: () => AudioNode | null;
     output: () => AudioNode | null;
 };
 declare type MZXBX_AudioSamplerPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
-    schedule: (when: number) => void;
+    schedule: (when: number, tempo: number) => void;
     cancel: () => void;
     output: () => AudioNode | null;
     duration: () => number;
@@ -244,7 +244,7 @@ declare type MZXBX_Player = {
     reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];
-    allPerformers(): MZXBX_PerformerHolder[];
+    allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
     position: number;
 };
 declare type MZXBX_PluginRegistrationInformation = {
@@ -279,7 +279,7 @@ declare class ZCompressorImplementation implements MZXBX_AudioFilterPlugin {
     createAll(context: AudioContext): void;
     launch(context: AudioContext, parameters: string): void;
     busy(): null | string;
-    schedule(when: number, parameters: string): void;
+    schedule(when: number, tempo: number, parameters: string): void;
     input(): AudioNode | null;
     output(): AudioNode | null;
 }

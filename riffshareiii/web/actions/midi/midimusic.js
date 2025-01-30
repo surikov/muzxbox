@@ -833,11 +833,11 @@ class MidiParser {
                             lastBasePitchDelta = cuPoint.basePitchDelta;
                             cuPointDuration = cuPointDuration + cuPoint.pointDuration;
                             if (cuPointDuration > msMin) {
-                                simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
+                                simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: Math.round(lastBasePitchDelta) });
                                 cuPointDuration = 0;
                             }
                         }
-                        simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
+                        simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: Math.round(lastBasePitchDelta) });
                         note.bendPoints = simplifiedPath;
                     }
                     else {
@@ -1889,6 +1889,9 @@ class MidiParser {
             },
             volume: volume
         };
+        if (!(midiTrack.program >= 0 && midiTrack.program <= 127)) {
+            projectTrack.performer.outputs = [];
+        }
         let mm = MMUtil();
         for (let tt = 0; tt < timeline.length; tt++) {
             let projectMeasure = { chords: [] };
@@ -1958,6 +1961,9 @@ class MidiParser {
             },
             volume: volume
         };
+        if (!(drum >= 35 && drum <= 81)) {
+            projectDrums.sampler.outputs = [];
+        }
         let currentTimeMs = 0;
         let mm = MMUtil();
         for (let tt = 0; tt < timeline.length; tt++) {

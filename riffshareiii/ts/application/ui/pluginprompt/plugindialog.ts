@@ -86,7 +86,7 @@ class PluginDialogPrompt {
 							}
 						});
 					} else {
-						console.log('plugin point');
+						//console.log('plugin point');
 						if (this.waitTimelinePointCallback) {
 							//console.log('waitTimelinePointCallback');
 							this.waitTimelinePointCallback(message.pluginData);

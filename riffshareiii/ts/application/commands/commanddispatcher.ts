@@ -58,7 +58,7 @@ class CommandDispatcher {
 		this.resetProject();
 	}*/
 	initAudioFromUI() {
-		console.log('initAudioFromUI');
+		//console.log('initAudioFromUI');
 		var AudioContext = window.AudioContext;// || window.webkitAudioContext;
 		this.audioContext = new AudioContext();
 		this.player = createSchedulePlayer(this.playCallback);
@@ -313,6 +313,7 @@ class CommandDispatcher {
 		}
 	}
 	startPlay(from: number, position: number, to: number) {
+		console.log('startPlay',from,position,to);
 		if (this.neeToStart) {
 			let me = this;
 			//let n120 = 120 / 60;
@@ -320,14 +321,19 @@ class CommandDispatcher {
 			if (msg) {
 				//me.onAir = false;
 				//console.log('toggleStartStop cancel', msg);
-				me.renderer.warning.showWarning('Start playing', 'Wait for ' + msg, () => { me.neeToStart = false; me.onAir = false; });
-				setTimeout(() => {
+				me.renderer.warning.showWarning('Start playing', 'Wait for ' + msg, () => {
+					console.log('cancel wait spart loop');
+					me.neeToStart = false;
+					me.onAir = false;
+				});
+				let id=setTimeout(() => {
 					me.startPlay(from, position, to);
-				}, 543);
+				}, 1000);
+				console.log('wait',id);
 			} else {
 				//console.log('toggleStartStop setupPlugins done', from, position, to);
-				me.renderer.warning.hideWarning();
 				me.neeToStart = false;
+				me.renderer.warning.hideWarning();
 				me.resetProject();
 			}
 		}
@@ -424,7 +430,7 @@ class CommandDispatcher {
 		return null;
 	}
 	cancelPluginGUI() {
-		console.log('cancelPluginGUI');
+		//console.log('cancelPluginGUI');
 		pluginDialogPrompt.closeDialogFrame();
 
 	}

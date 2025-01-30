@@ -333,7 +333,6 @@ class PluginDialogPrompt {
                         });
                     }
                     else {
-                        console.log('plugin point');
                         if (this.waitTimelinePointCallback) {
                             this.waitTimelinePointCallback(message.pluginData);
                         }
@@ -525,7 +524,6 @@ class CommandDispatcher {
         return this._mixerDataMathUtility;
     }
     initAudioFromUI() {
-        console.log('initAudioFromUI');
         var AudioContext = window.AudioContext;
         this.audioContext = new AudioContext();
         this.player = createSchedulePlayer(this.playCallback);
@@ -767,18 +765,24 @@ class CommandDispatcher {
         }
     }
     startPlay(from, position, to) {
+        console.log('startPlay', from, position, to);
         if (this.neeToStart) {
             let me = this;
             let msg = me.player.startLoop(from, position, to);
             if (msg) {
-                me.renderer.warning.showWarning('Start playing', 'Wait for ' + msg, () => { me.neeToStart = false; me.onAir = false; });
-                setTimeout(() => {
+                me.renderer.warning.showWarning('Start playing', 'Wait for ' + msg, () => {
+                    console.log('cancel wait spart loop');
+                    me.neeToStart = false;
+                    me.onAir = false;
+                });
+                let id = setTimeout(() => {
                     me.startPlay(from, position, to);
-                }, 543);
+                }, 1000);
+                console.log('wait', id);
             }
             else {
-                me.renderer.warning.hideWarning();
                 me.neeToStart = false;
+                me.renderer.warning.hideWarning();
                 me.resetProject();
             }
         }
@@ -840,7 +844,6 @@ class CommandDispatcher {
         return null;
     }
     cancelPluginGUI() {
-        console.log('cancelPluginGUI');
         pluginDialogPrompt.closeDialogFrame();
     }
     expandTimeLineSelection(idx) {
@@ -2439,12 +2442,17 @@ class MixerBar {
     }
     findDurationOfSample(samplerId) {
         if (globalCommandDispatcher.player) {
-            let arr = globalCommandDispatcher.player.allPerformers();
+            let arr = globalCommandDispatcher.player.allPerformersSamplers();
             for (let ii = 0; ii < arr.length; ii++) {
                 if (arr[ii].channelId == samplerId) {
                     try {
-                        let smplr = arr[ii].plugin;
-                        return smplr.duration();
+                        let pluginImplementation = arr[ii].plugin;
+                        if (pluginImplementation.duration) {
+                            return pluginImplementation.duration();
+                        }
+                        else {
+                            return 0.0001;
+                        }
                     }
                     catch (xxx) {
                         console.log(xxx);
@@ -2463,29 +2471,22 @@ class MixerBar {
         barOctaveAnchor.content.push({
             x: barLeft + width,
             y: globalCommandDispatcher.cfg().gridTop(),
-            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05,
+            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.8,
             h: globalCommandDispatcher.cfg().gridHeight(),
             css: 'barRightBorder'
         });
         barOctaveAnchor.content.push({
             x: barLeft + width,
             y: globalCommandDispatcher.cfg().samplerTop(),
-            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05,
+            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.8,
             h: globalCommandDispatcher.cfg().samplerHeight(),
             css: 'barRightBorder'
         });
         barOctaveAnchor.content.push({
             x: barLeft + width,
             y: globalCommandDispatcher.cfg().automationTop(),
-            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05,
+            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.8,
             h: globalCommandDispatcher.cfg().automationHeight(),
-            css: 'barRightBorder'
-        });
-        barOctaveAnchor.content.push({
-            x: barLeft + width,
-            y: globalCommandDispatcher.cfg().commentsTop(),
-            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05,
-            h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex),
             css: 'barRightBorder'
         });
         if (zoomInfo.gridLines.length > 0) {
@@ -2503,35 +2504,48 @@ class MixerBar {
                 barOctaveAnchor.content.push({
                     x: xx,
                     y: globalCommandDispatcher.cfg().gridTop(),
-                    w: line.ratio * zoomInfo.minZoom / 2,
+                    w: line.ratio * zoomInfo.minZoom / 4,
                     h: globalCommandDispatcher.cfg().gridHeight(),
                     css: css
                 });
                 barOctaveAnchor.content.push({
                     x: xx,
                     y: globalCommandDispatcher.cfg().samplerTop(),
-                    w: line.ratio * zoomInfo.minZoom / 2,
+                    w: line.ratio * zoomInfo.minZoom / 4,
                     h: globalCommandDispatcher.cfg().samplerHeight(),
                     css: css
                 });
                 barOctaveAnchor.content.push({
                     x: xx,
                     y: globalCommandDispatcher.cfg().automationTop(),
-                    w: line.ratio * zoomInfo.minZoom / 2,
+                    w: line.ratio * zoomInfo.minZoom / 4,
                     h: globalCommandDispatcher.cfg().automationHeight(),
                     css: css
                 });
-                barOctaveAnchor.content.push({
-                    x: xx,
-                    y: globalCommandDispatcher.cfg().commentsTop(),
-                    w: line.ratio * zoomInfo.minZoom / 2,
-                    h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex),
-                    css: css
-                });
+                if (zIndex < 3) {
+                    barOctaveAnchor.content.push({
+                        x: xx,
+                        y: globalCommandDispatcher.cfg().commentsTop(),
+                        w: line.ratio * zoomInfo.minZoom / 4,
+                        h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex),
+                        css: css
+                    });
+                }
                 lineCount++;
                 if (lineCount >= zoomInfo.gridLines.length) {
                     lineCount = 0;
                 }
+            }
+            if (zIndex < 3) {
+                let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                let line = zoomInfo.gridLines[lineCount];
+                barOctaveAnchor.content.push({
+                    x: xx,
+                    y: globalCommandDispatcher.cfg().commentsTop(),
+                    w: line.ratio * zoomInfo.minZoom / 4,
+                    h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex),
+                    css: css
+                });
             }
         }
     }
@@ -3895,6 +3909,7 @@ class WarningUI {
         return [this.warningLayer];
     }
     showWarning(title, msg, onCancel) {
+        console.log('WarningUI show', title, msg);
         this.onCancel = onCancel;
         this.warningTitle.text = title;
         this.warningDescription.text = msg;

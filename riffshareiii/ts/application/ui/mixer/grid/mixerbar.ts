@@ -54,7 +54,7 @@ class MixerBar {
 				, firstOctaveAnchor
 				, transpose
 				, zoomLevel);
-//console.log('BarOctave',zoomLevel,(globalCommandDispatcher.cfg().drawOctaveCount() - oo - 1));
+			//console.log('BarOctave',zoomLevel,(globalCommandDispatcher.cfg().drawOctaveCount() - oo - 1));
 			if (firstZoomBarAnchor.ww < firstOctaveAnchor.ww) {
 				firstZoomBarAnchor.ww = firstOctaveAnchor.ww;
 			}
@@ -86,14 +86,19 @@ class MixerBar {
 	}
 	findDurationOfSample(samplerId: string): number {
 		if (globalCommandDispatcher.player) {
-			let arr = globalCommandDispatcher.player.allPerformers();
+			let arr = globalCommandDispatcher.player.allPerformersSamplers();
 			//console.log('findDurationOfSample', samplerId,arr);
 			for (let ii = 0; ii < arr.length; ii++) {
 				if (arr[ii].channelId == samplerId) {
 					try {
-						let smplr = arr[ii].plugin as MZXBX_AudioSamplerPlugin;
+						let pluginImplementation = arr[ii].plugin as any;// as MZXBX_AudioSamplerPlugin;
 						//console.log('findDurationOfSample',smplr.duration(),'for', samplerId);
-						return smplr.duration();
+						//return smplr.duration();
+						if (pluginImplementation.duration) {
+							return pluginImplementation.duration();
+						} else {
+							return 0.0001;
+						}
 					} catch (xxx) {
 						console.log(xxx);
 						return 0.0002;
@@ -117,31 +122,31 @@ class MixerBar {
 		barOctaveAnchor.content.push({
 			x: barLeft + width
 			, y: globalCommandDispatcher.cfg().gridTop()
-			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05
+			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.8
 			, h: globalCommandDispatcher.cfg().gridHeight()
 			, css: 'barRightBorder'
 		});
 		barOctaveAnchor.content.push({
 			x: barLeft + width
 			, y: globalCommandDispatcher.cfg().samplerTop()
-			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05
+			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.8
 			, h: globalCommandDispatcher.cfg().samplerHeight()
 			, css: 'barRightBorder'
 		});
 		barOctaveAnchor.content.push({
 			x: barLeft + width
 			, y: globalCommandDispatcher.cfg().automationTop()
-			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05
+			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.8
 			, h: globalCommandDispatcher.cfg().automationHeight()
 			, css: 'barRightBorder'
 		});
-		barOctaveAnchor.content.push({
+		/*barOctaveAnchor.content.push({
 			x: barLeft + width
 			, y: globalCommandDispatcher.cfg().commentsTop()
 			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05
 			, h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex)
 			, css: 'barRightBorder'
-		});
+		});*/
 		if (zoomInfo.gridLines.length > 0) {
 			let css = 'stepPartDelimiter';
 			if (zIndex < 3) {
@@ -157,35 +162,48 @@ class MixerBar {
 				barOctaveAnchor.content.push({
 					x: xx
 					, y: globalCommandDispatcher.cfg().gridTop()
-					, w: line.ratio * zoomInfo.minZoom / 2
+					, w: line.ratio * zoomInfo.minZoom / 4
 					, h: globalCommandDispatcher.cfg().gridHeight()
 					, css: css
 				});
 				barOctaveAnchor.content.push({
 					x: xx
 					, y: globalCommandDispatcher.cfg().samplerTop()
-					, w: line.ratio * zoomInfo.minZoom / 2
+					, w: line.ratio * zoomInfo.minZoom / 4
 					, h: globalCommandDispatcher.cfg().samplerHeight()
 					, css: css
 				});
 				barOctaveAnchor.content.push({
 					x: xx
 					, y: globalCommandDispatcher.cfg().automationTop()
-					, w: line.ratio * zoomInfo.minZoom / 2
+					, w: line.ratio * zoomInfo.minZoom / 4
 					, h: globalCommandDispatcher.cfg().automationHeight()
 					, css: css
 				});
-				barOctaveAnchor.content.push({
-					x: xx
-					, y: globalCommandDispatcher.cfg().commentsTop()
-					, w: line.ratio * zoomInfo.minZoom / 2
-					, h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex)
-					, css: css
-				});
+				if (zIndex < 3) {
+					barOctaveAnchor.content.push({
+						x: xx
+						, y: globalCommandDispatcher.cfg().commentsTop()
+						, w: line.ratio * zoomInfo.minZoom / 4
+						, h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex)
+						, css: css
+					});
+				}
 				lineCount++;
 				if (lineCount >= zoomInfo.gridLines.length) {
 					lineCount = 0;
 				}
+			}
+			if (zIndex < 3) {
+				let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+				let line = zoomInfo.gridLines[lineCount];
+				barOctaveAnchor.content.push({
+					x: xx
+					, y: globalCommandDispatcher.cfg().commentsTop()
+					, w: line.ratio * zoomInfo.minZoom / 4
+					, h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex)
+					, css: css
+				});
 			}
 		}
 	}

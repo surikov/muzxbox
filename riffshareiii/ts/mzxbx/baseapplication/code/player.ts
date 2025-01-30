@@ -40,9 +40,9 @@ class SchedulePlayer implements MZXBX_Player {
 	position: number = 0;
 	audioContext: AudioContext;
 	schedule: MZXBX_Schedule | null = null;
-	performers: MZXBX_PerformerHolder[] = [];//{ plugin: MZXBX_AudioPerformerPlugin | null, id: string, kind: string, properties: string, launched: boolean }[] = [];
+	performers: MZXBX_PerformerSamplerHolder[] = [];//{ plugin: MZXBX_AudioPerformerPlugin | null, id: string, kind: string, properties: string, launched: boolean }[] = [];
 	filters: MZXBX_FilterHolder[] = [];// { plugin: MZXBX_AudioFilterPlugin | null, id: string, kind: string, properties: string }[] = [];
-	pluginsList: MZXBX_PerformerHolder[] = [];// { url: string, name: string, kind: string }[];
+	pluginsList: MZXBX_PerformerSamplerHolder[] = [];// { url: string, name: string, kind: string }[];
 	//stateSetupDone: boolean = false;
 	nextAudioContextStart: number = 0;
 	//currentPosition: number = 0;
@@ -68,7 +68,7 @@ class SchedulePlayer implements MZXBX_Player {
 	allFilters(): MZXBX_FilterHolder[] {
 		return this.filters;
 	}
-	allPerformers(): MZXBX_PerformerHolder[] {
+	allPerformersSamplers(): MZXBX_PerformerSamplerHolder[] {
 		return this.performers;
 	}
 
@@ -84,7 +84,7 @@ class SchedulePlayer implements MZXBX_Player {
 			}
 		}
 		for (let pp = 0; pp < this.performers.length; pp++) {
-			let plugin: MZXBX_AudioPerformerPlugin | null = this.performers[pp].plugin;
+			let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performers[pp].plugin;
 			if (plugin) {
 				plugin.launch(this.audioContext, this.performers[pp].properties);
 				//this.performers[pp].launched = true;
@@ -104,13 +104,13 @@ class SchedulePlayer implements MZXBX_Player {
 			}
 		}
 		for (let pp = 0; pp < this.performers.length; pp++) {
-			let plugin: MZXBX_AudioPerformerPlugin | null = this.performers[pp].plugin;
+			let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performers[pp].plugin;
 			if (plugin) {
 				if (plugin.busy()) {
-					return 'performer ' + this.performers[pp].channelId + ' ' + plugin.busy();
+					return 'performer/sampler ' + this.performers[pp].channelId + ' ' + plugin.busy();
 				}
 			} else {
-				return 'empty performer ' + this.performers[pp];
+				return 'empty performer/sampler ' + this.performers[pp];
 			}
 		}
 		return null;
@@ -188,7 +188,7 @@ class SchedulePlayer implements MZXBX_Player {
 					}
 					for (let cc = 0; cc < this.schedule.channels.length; cc++) {
 						let channel = this.schedule.channels[cc];
-						let performer = this.findPerformerPlugin(channel.id);
+						let performer = this.findPerformerSamplerPlugin(channel.id);
 						if (performer) {
 							let output = performer.output();
 							if (output) {
@@ -278,7 +278,7 @@ class SchedulePlayer implements MZXBX_Player {
 						}
 					}
 				}*/
-				let plugin = this.findPerformerPlugin(channel.id);
+				let plugin = this.findPerformerSamplerPlugin(channel.id);
 				if (plugin) {
 					let output = plugin.output();
 					if (output) {
@@ -339,7 +339,7 @@ class SchedulePlayer implements MZXBX_Player {
 			this.disconnectAllPlugins();
 		}
 	}
-	findPerformerPlugin(channelId: string): MZXBX_AudioPerformerPlugin | null {
+	findPerformerSamplerPlugin(channelId: string): MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null {
 		if (this.schedule) {
 			for (let ii = 0; ii < this.schedule.channels.length; ii++) {
 				if (this.schedule.channels[ii].id == channelId) {
@@ -348,7 +348,7 @@ class SchedulePlayer implements MZXBX_Player {
 						let performer = this.performers[nn];
 						if (channelId == performer.channelId) {
 							if (performer.plugin) {
-								let plugin: MZXBX_AudioPerformerPlugin = performer.plugin;
+								let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin = performer.plugin;
 								return plugin;
 							} else {
 								console.error('Empty performer plugin for', channelId);
@@ -380,11 +380,17 @@ class SchedulePlayer implements MZXBX_Player {
 				}
 			}
 		}*/
-		let plugin: MZXBX_AudioPerformerPlugin | null = this.findPerformerPlugin(it.channelId);
-		if (plugin) {
+		let pp = this.findPerformerSamplerPlugin(it.channelId) as any;
+		if (pp) {
 			//console.log(plugin,it);
 			//plugin.schedule(whenAudio, it.pitch, it.slides);
-			plugin.schedule(whenAudio, it.pitches, tempo, it.slides);
+			if (pp.start) {
+				let sampler: MZXBX_AudioSamplerPlugin = pp;
+				sampler.start(whenAudio, tempo);
+			} else {
+				let performer: MZXBX_AudioPerformerPlugin = pp;
+				performer.strum(whenAudio, it.pitches, tempo, it.slides);
+			}
 		}
 	}
 	findFilterPlugin(filterId: string): MZXBX_AudioFilterPlugin | null {
@@ -403,7 +409,7 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 		return null;
 	}
-	sendFilterItem(state: MZXBX_FilterState, whenAudio: number) {
+	sendFilterItem(state: MZXBX_FilterState, whenAudio: number, tempo: number) {
 		/*if (this.schedule) {
 			for (let nn = 0; nn < this.filters.length; nn++) {
 				let filter = this.filters[nn];
@@ -418,7 +424,7 @@ class SchedulePlayer implements MZXBX_Player {
 		let plugin: MZXBX_AudioFilterPlugin | null = this.findFilterPlugin(state.filterId);
 		if (plugin) {
 			//console.log('sendFilterItem',state.filterId,whenAudio, state.data);
-			plugin.schedule(whenAudio, state.data);
+			plugin.schedule(whenAudio, tempo, state.data);
 		}
 	}
 	ms(nn: number): number {
@@ -447,7 +453,7 @@ class SchedulePlayer implements MZXBX_Player {
 						let state: MZXBX_FilterState = cuSerie.states[nn];
 						if (this.ms(serieStart + state.skip) >= this.ms(fromPosition)
 							&& this.ms(serieStart + state.skip) < this.ms(toPosition)) {
-							this.sendFilterItem(state, whenAudio + serieStart + state.skip - fromPosition);
+							this.sendFilterItem(state, whenAudio + serieStart + state.skip - fromPosition, cuSerie.tempo);
 						}
 					}
 				}

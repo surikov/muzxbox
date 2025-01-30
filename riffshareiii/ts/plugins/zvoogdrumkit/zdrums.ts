@@ -4,7 +4,9 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 	player: ZDRWebAudioFontPlayer = new ZDRWebAudioFontPlayer();
 	volume: GainNode;
 	loader: ZDRWebAudioFontLoader = new ZDRWebAudioFontLoader();
-	midinumber: number = 0;
+	//midinumber: number = 0;
+	//midiidx: number = 0;
+	//listidx: number = -1;
 	info: ZDRPresetInfo;
 	preset: ZDRWavePreset | null = null;
 	sampleDuration = 0.000001;
@@ -13,9 +15,25 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 		this.audioContext = context;
 		this.volume = this.audioContext.createGain();
 		this.volume.gain.setValueAtTime(0.7, 0);
-		this.midinumber = parseInt(parameters);
-		let idx = this.loader.findDrum(this.midinumber);
+		//this.midinumber = parseInt(parameters);
+
+		//console.log('parameters',parameters);
+		let split = parameters.split('/');
+		let idx = 0;
+		if (split.length == 2) {
+			let listidx = parseInt(split[1]);
+			idx = listidx;
+			//console.log('from list',idx);
+		} else {
+			let midiidx = parseInt(parameters);
+			idx = this.loader.findDrum(midiidx);
+			//console.log('from midi',idx);
+		}
+
+
+		//let idx = this.loader.findDrum(this.midinumber);
 		this.info = this.loader.drumInfo(idx);
+		//console.log('info',this.info);
 		this.loader.startLoad(context, this.info.url, this.info.variable);
 		this.loader.waitLoad(() => {
 			this.preset = window[this.info.variable];
@@ -24,10 +42,10 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 	}
 	busy(): null | string {
 		if (this.preset == null) {
-			return 'preset ' + this.info;
+			return 'empty preset';
 		} else {
 			if (!this.loader.loaded(this.info.variable)) {
-				return 'loaded ' + this.info;
+				return 'no ' + this.info.variable;
 			} else {
 				if (this.preset) {
 					if (this.preset.zones.length > 0) {
@@ -40,11 +58,11 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 			}
 		}
 	}
-	schedule(when: number) {
+	start(when: number) {
 		if (this.audioContext) {
 			if (this.volume) {
 				if (this.preset) {
-					this.player.queueWaveTable(this.audioContext, this.volume, this.preset, when, this.info.pitch, 1, 0.9);
+					this.player.queueWaveTable(this.audioContext, this.volume, this.preset, when, this.info.pitch, this.sampleDuration+0.001, 1.0);
 				}
 			}
 		}
@@ -84,12 +102,15 @@ class ZDUI {
 			this.list.appendChild(option);
 		}
 		this.list.addEventListener('change', (event) => {
-			console.dir(this.player.loader.drumKeys()[1 * this.list.value]);
-			this.sendMessageToHost('0/' + this.list.value);
+			//console.dir(this.player.loader.drumKeys()[1 * this.list.value]);
+			let msg='0/' + this.list.value;
+			//console.log('change', msg);
+			this.sendMessageToHost(msg);
 		});
 
 	}
 	sendMessageToHost(data: string) {
+		
 		var message: MZXBX_MessageToHost = { dialogID: this.id, pluginData: data, done: false };
 		window.parent.postMessage(message, '*');
 	}
@@ -105,13 +126,13 @@ class ZDUI {
 		this.id = newId;
 	}
 	setState(data: string) {
-		console.log('setState', data);
+		//console.log('setState', data);
 		this.data = data;
 		let split = this.data.split('/');
 		if (split.length == 2) {
 			this.list.value = parseInt(split[1]);
 		} else {
-			//this.list.value = this.player.loader.findInstrument(parseInt(split[0]));
+			this.list.value = this.player.loader.findDrum(parseInt(split[0]));
 		}
 	}
 }
@@ -119,6 +140,6 @@ function newZvoogDrumKitImplementation(): MZXBX_AudioSamplerPlugin {
 	return new ZvoogDrumKitImplementation();
 }
 function initZDRUI() {
-	console.log('initZPerfUI');
+	//console.log('initZPerfUI');
 	new ZDUI().init();
 }

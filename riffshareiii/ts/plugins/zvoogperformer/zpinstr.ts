@@ -53,12 +53,12 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 			}
 		}
 	}
-	schedule(when: number, zpitches: number[], tempo: number, mzbxslide: MZXBX_SlideItem[]): void {
+	strum(when: number, zpitches: number[], tempo: number, mzbxslide: MZXBX_SlideItem[]): void {
 		if (this.audioContext) {
 			if (this.volume) {
 				if (this.preset) {
 					let duration = 0;
-					let volume = 0.99;
+					let volumeLevel = 0.66;
 					//let slides: ZPWaveSlide[][] = [];
 					for (let ii = 0; ii < mzbxslide.length; ii++) {
 						let one = mzbxslide[ii];
@@ -74,7 +74,7 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 						pitches.push(zpitches[ii] + 0);
 					}
 					//console.log(duration, zpitches, mzbxslide);
-					this.player.queueChord(this.audioContext, this.volume, this.preset, when, pitches, duration, volume, mzbxslide);
+					this.player.queueChord(this.audioContext, this.volume, this.preset, when, pitches, duration, volumeLevel, mzbxslide);
 				}
 			}
 		}

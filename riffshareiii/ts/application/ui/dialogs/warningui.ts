@@ -83,7 +83,7 @@ class WarningUI {
 		return [this.warningLayer];
 	}
 	showWarning(title: string, msg: string, onCancel: null | (() => void)) {
-		//console.log('WarningUI show', title, msg);
+		console.log('WarningUI show', title, msg);
 		this.onCancel = onCancel;
 		this.warningTitle.text = title;
 		this.warningDescription.text = msg;

@@ -995,13 +995,13 @@ class MidiParser {
 							lastBasePitchDelta = cuPoint.basePitchDelta;
 							cuPointDuration = cuPointDuration + cuPoint.pointDuration;
 							if (cuPointDuration > msMin) {
-								simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
+								simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: Math.round(lastBasePitchDelta) });
 								//console.log(cuPointDuration, lastBasePitchDelta);
 								cuPointDuration = 0;
 							}
 						}
 						//console.log(cuPointDuration, lastBasePitchDelta);
-						simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
+						simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: Math.round(lastBasePitchDelta) });
 						note.bendPoints = simplifiedPath;
 						//console.log(simplifiedPath,'original',note.bendPoints);
 						/*
@@ -2396,6 +2396,9 @@ class MidiParser {
 			}
 			, volume: volume
 		};
+		if (!(midiTrack.program >= 0 && midiTrack.program <= 127)) {
+			projectTrack.performer.outputs = [];
+		}
 		let mm = MMUtil();
 		for (let tt = 0; tt < timeline.length; tt++) {
 			let projectMeasure: Zvoog_TrackMeasure = { chords: [] };
@@ -2476,7 +2479,7 @@ class MidiParser {
 		return projectTrack;
 	}
 	createProjectDrums(volume: number, top: number, drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack {
-		//console.log('createProjectDrums',midiTrack.title);
+		//console.log('createProjectDrums', midiTrack.title, drum);
 		let projectDrums: Zvoog_PercussionTrack = {
 			title: midiTrack.title + ' ' + drumNames[drum]
 			, measures: []
@@ -2487,6 +2490,9 @@ class MidiParser {
 			}
 			, volume: volume
 		};
+		if (!(drum >= 35 && drum <= 81)) {
+			projectDrums.sampler.outputs = [];
+		}
 		let currentTimeMs = 0;
 		let mm = MMUtil();
 		for (let tt = 0; tt < timeline.length; tt++) {

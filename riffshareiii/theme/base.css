@@ -46,12 +46,15 @@
 ::-webkit-scrollbar2 {
 	display: none;
 }
+
 :root {
-    --font-ratio: 1;
+	--font-ratio: 1;
 }
+
 :root {
 	--tapSize: 1cm;
 }
+
 :root {
 	--label-4cm: calc(4.0*var(--font-ratio)*var(--tapSize));
 	--label-1cm: calc(1.0*var(--font-ratio)*var(--tapSize));
@@ -68,8 +71,9 @@
 	--icon-05cm: calc(0.5*var(--tapSize));
 	--icon-04cm: calc(0.4*var(--tapSize));
 }
+
 :root {
-	
+
 
 	--color-debug: #c00;
 	/*
@@ -83,16 +87,17 @@
 	(((--main-color))): #ddeeffff;
 */
 	--background-color: #010;
-	--main-color:#fff;
-	--drag-color:#069;
-	--line-color:#9cf;
-	--click-color:#399;
+	--main-color: #fff;
+	--drag-color: #399;
+	--line-color: #9cf;
+	--click-color: #069;
 
 	--click-color50: color-mix(in lab, transparent 50%, var(--click-color));
 	--line-color50: color-mix(in lab, transparent 50%, var(--line-color));
 	--line-color75: color-mix(in lab, transparent 75%, var(--line-color));
 
 }
+
 :root {
 	--fog-color: color-mix(in lab, transparent 10%, var(--background-color));
 	--back-color: color-mix(in lab, transparent 3%, var(--background-color));
@@ -111,7 +116,7 @@
 	0% {
 		fill: var(--main-color)
 	}
-	
+
 	40% {
 		fill: var(--main-color)
 	}
@@ -148,7 +153,7 @@ body {
 	padding: 0px;
 	touch-action: manipulation;
 	background-color2: #ff00ff;
-	cursor:grab;
+	cursor: grab;
 	background-color: var(--main-color);
 }
 
@@ -194,12 +199,14 @@ body {
 .fillShadow {
 	fill: var(--shadow-color);
 }
-.warningAnchor22{
-	cursor:default;
+
+.warningAnchor22 {
+	cursor: default;
 }
+
 .warningBG {
 	fill: var(--fog-color);
-	cursor:default;
+	cursor: default;
 }
 
 .warningIcon {

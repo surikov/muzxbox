@@ -261,7 +261,6 @@ class ZDRWebAudioFontLoader {
         return 0;
     }
 }
-console.log('WebAudioFont Engine v3.0.04 GPL3');
 class ZDRWebAudioFontPlayer {
     constructor() {
         this.envelopes = [];
@@ -490,7 +489,6 @@ class ZvoogDrumKitImplementation {
     constructor() {
         this.player = new ZDRWebAudioFontPlayer();
         this.loader = new ZDRWebAudioFontLoader();
-        this.midinumber = 0;
         this.preset = null;
         this.sampleDuration = 0.000001;
     }
@@ -499,8 +497,16 @@ class ZvoogDrumKitImplementation {
         this.audioContext = context;
         this.volume = this.audioContext.createGain();
         this.volume.gain.setValueAtTime(0.7, 0);
-        this.midinumber = parseInt(parameters);
-        let idx = this.loader.findDrum(this.midinumber);
+        let split = parameters.split('/');
+        let idx = 0;
+        if (split.length == 2) {
+            let listidx = parseInt(split[1]);
+            idx = listidx;
+        }
+        else {
+            let midiidx = parseInt(parameters);
+            idx = this.loader.findDrum(midiidx);
+        }
         this.info = this.loader.drumInfo(idx);
         this.loader.startLoad(context, this.info.url, this.info.variable);
         this.loader.waitLoad(() => {
@@ -509,11 +515,11 @@ class ZvoogDrumKitImplementation {
     }
     busy() {
         if (this.preset == null) {
-            return 'preset ' + this.info;
+            return 'empty preset';
         }
         else {
             if (!this.loader.loaded(this.info.variable)) {
-                return 'loaded ' + this.info;
+                return 'no ' + this.info.variable;
             }
             else {
                 if (this.preset) {
@@ -527,11 +533,11 @@ class ZvoogDrumKitImplementation {
             }
         }
     }
-    schedule(when) {
+    start(when) {
         if (this.audioContext) {
             if (this.volume) {
                 if (this.preset) {
-                    this.player.queueWaveTable(this.audioContext, this.volume, this.preset, when, this.info.pitch, 1, 0.9);
+                    this.player.queueWaveTable(this.audioContext, this.volume, this.preset, when, this.info.pitch, this.sampleDuration + 0.001, 1.0);
                 }
             }
         }
@@ -571,8 +577,8 @@ class ZDUI {
             this.list.appendChild(option);
         }
         this.list.addEventListener('change', (event) => {
-            console.dir(this.player.loader.drumKeys()[1 * this.list.value]);
-            this.sendMessageToHost('0/' + this.list.value);
+            let msg = '0/' + this.list.value;
+            this.sendMessageToHost(msg);
         });
     }
     sendMessageToHost(data) {
@@ -592,13 +598,13 @@ class ZDUI {
         this.id = newId;
     }
     setState(data) {
-        console.log('setState', data);
         this.data = data;
         let split = this.data.split('/');
         if (split.length == 2) {
             this.list.value = parseInt(split[1]);
         }
         else {
+            this.list.value = this.player.loader.findDrum(parseInt(split[0]));
         }
     }
 }
@@ -606,7 +612,6 @@ function newZvoogDrumKitImplementation() {
     return new ZvoogDrumKitImplementation();
 }
 function initZDRUI() {
-    console.log('initZPerfUI');
     new ZDUI().init();
 }
 //# sourceMappingURL=zvoogdrumkit_plugin.js.map

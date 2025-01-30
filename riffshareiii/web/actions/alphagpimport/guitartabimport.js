@@ -220,7 +220,6 @@ class GP345ImportMusicPlugin {
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
     }
     receiveHostMessage(par) {
-        //console.log('receiveHostMessage', par);
         try {
             var oo = JSON.parse(par.data);
             this.callbackID = oo.dialogID;
@@ -286,13 +285,6 @@ class GP345ImportMusicPlugin {
         }
     }
 }
-var MZXBX_PluginPurpose;
-(function (MZXBX_PluginPurpose) {
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Action"] = 0] = "Action";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Filter"] = 1] = "Filter";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Sampler"] = 2] = "Sampler";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Performer"] = 3] = "Performer";
-})(MZXBX_PluginPurpose || (MZXBX_PluginPurpose = {}));
 class ImporterSettings {
     constructor() {
         this.encoding = 'utf-8';

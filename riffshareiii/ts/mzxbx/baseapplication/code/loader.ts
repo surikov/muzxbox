@@ -1,7 +1,7 @@
 //let  MZXBX_RegisteredPlugins: MZXBX_PluginRegistration[];
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 class PluginLoader {
-	collectLoadPlugins(schedule: MZXBX_Schedule, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[], afterLoad: () => void): null | string {
+	collectLoadPlugins(schedule: MZXBX_Schedule, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[], afterLoad: () => void): null | string {
 		for (let ff = 0; ff < schedule.filters.length; ff++) {
 			let filter: MZXBX_Filter = schedule.filters[ff];
 			this.сollectFilterPlugin(filter.id, filter.kind, filter.properties, filters);
@@ -19,7 +19,7 @@ class PluginLoader {
 		let result = this.startLoadCollectedPlugins(filters, performers, afterLoad);
 		return result;
 	}
-	startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[], afterLoad: () => void): null | string {
+	startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[], afterLoad: () => void): null | string {
 		//console.log('startLoadCollectedPlugins',filters,performers);
 		for (let ff = 0; ff < filters.length; ff++) {
 			//console.log('check filter',filters[ff]);
@@ -54,7 +54,7 @@ class PluginLoader {
 		return null;
 	}
 
-	startLoadPluginStarter(kind: string, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerHolder[]
+	startLoadPluginStarter(kind: string, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[]
 		, onDone: (plugin) => void
 		, afterLoad: () => void
 	): null | string {
@@ -92,7 +92,7 @@ class PluginLoader {
 		}
 		filters.push({ plugin: null, filterId: id, kind: kind, properties: properties });
 	}
-	сollectPerformerPlugin(id: string, kind: string, properties: string, performers: MZXBX_PerformerHolder[]): void {
+	сollectPerformerPlugin(id: string, kind: string, properties: string, performers: MZXBX_PerformerSamplerHolder[]): void {
 		//console.log('сollectPerformerPlugin id:', id, 'kind', kind);
 		for (let ii = 0; ii < performers.length; ii++) {
 			if (performers[ii].channelId == id) {

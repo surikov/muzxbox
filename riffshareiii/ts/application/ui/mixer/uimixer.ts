@@ -198,6 +198,7 @@ class MixerUI {
 				, h: hh
 				, css: css
 			};
+			
 			this.fillerAnchor.content.push(fillRectangle);
 			barX = barX + barwidth;
 		}

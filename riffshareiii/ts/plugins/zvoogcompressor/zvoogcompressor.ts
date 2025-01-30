@@ -38,12 +38,12 @@ class ZCompressorImplementation implements MZXBX_AudioFilterPlugin {
 		} else {
 			this.createAll(context);
 		}
-		this.schedule(this.audioContext.currentTime + 0.0001, parameters);
+		this.schedule(this.audioContext.currentTime + 0.0001, 120, parameters);
 	}
 	busy(): null | string {
 		return null;
 	}
-	schedule(when: number, parameters: string): void {
+	schedule(when: number, tempo: number, parameters: string): void {
 		this.wet.gain.setValueAtTime(this.num, when);
 		this.dry.gain.setValueAtTime(1 - this.num, when);
 		this.num = parseInt(parameters);

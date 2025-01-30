@@ -107,7 +107,7 @@ class SchedulePlayer {
     allFilters() {
         return this.filters;
     }
-    allPerformers() {
+    allPerformersSamplers() {
         return this.performers;
     }
     launchCollectedPlugins() {
@@ -141,11 +141,11 @@ class SchedulePlayer {
             let plugin = this.performers[pp].plugin;
             if (plugin) {
                 if (plugin.busy()) {
-                    return 'performer ' + this.performers[pp].channelId + ' ' + plugin.busy();
+                    return 'performer/sampler ' + this.performers[pp].channelId + ' ' + plugin.busy();
                 }
             }
             else {
-                return 'empty performer ' + this.performers[pp];
+                return 'empty performer/sampler ' + this.performers[pp];
             }
         }
         return null;
@@ -205,7 +205,7 @@ class SchedulePlayer {
                     }
                     for (let cc = 0; cc < this.schedule.channels.length; cc++) {
                         let channel = this.schedule.channels[cc];
-                        let performer = this.findPerformerPlugin(channel.id);
+                        let performer = this.findPerformerSamplerPlugin(channel.id);
                         if (performer) {
                             let output = performer.output();
                             if (output) {
@@ -262,7 +262,7 @@ class SchedulePlayer {
             }
             for (let cc = 0; cc < this.schedule.channels.length; cc++) {
                 let channel = this.schedule.channels[cc];
-                let plugin = this.findPerformerPlugin(channel.id);
+                let plugin = this.findPerformerSamplerPlugin(channel.id);
                 if (plugin) {
                     let output = plugin.output();
                     if (output) {
@@ -319,7 +319,7 @@ class SchedulePlayer {
             this.disconnectAllPlugins();
         }
     }
-    findPerformerPlugin(channelId) {
+    findPerformerSamplerPlugin(channelId) {
         if (this.schedule) {
             for (let ii = 0; ii < this.schedule.channels.length; ii++) {
                 if (this.schedule.channels[ii].id == channelId) {
@@ -343,9 +343,16 @@ class SchedulePlayer {
         return null;
     }
     sendPerformerItem(it, whenAudio, tempo) {
-        let plugin = this.findPerformerPlugin(it.channelId);
-        if (plugin) {
-            plugin.schedule(whenAudio, it.pitches, tempo, it.slides);
+        let pp = this.findPerformerSamplerPlugin(it.channelId);
+        if (pp) {
+            if (pp.start) {
+                let sampler = pp;
+                sampler.start(whenAudio, tempo);
+            }
+            else {
+                let performer = pp;
+                performer.strum(whenAudio, it.pitches, tempo, it.slides);
+            }
         }
     }
     findFilterPlugin(filterId) {
@@ -364,10 +371,10 @@ class SchedulePlayer {
         }
         return null;
     }
-    sendFilterItem(state, whenAudio) {
+    sendFilterItem(state, whenAudio, tempo) {
         let plugin = this.findFilterPlugin(state.filterId);
         if (plugin) {
-            plugin.schedule(whenAudio, state.data);
+            plugin.schedule(whenAudio, tempo, state.data);
         }
     }
     ms(nn) {
@@ -391,7 +398,7 @@ class SchedulePlayer {
                         let state = cuSerie.states[nn];
                         if (this.ms(serieStart + state.skip) >= this.ms(fromPosition)
                             && this.ms(serieStart + state.skip) < this.ms(toPosition)) {
-                            this.sendFilterItem(state, whenAudio + serieStart + state.skip - fromPosition);
+                            this.sendFilterItem(state, whenAudio + serieStart + state.skip - fromPosition, cuSerie.tempo);
                         }
                     }
                 }
