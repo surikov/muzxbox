@@ -533,10 +533,11 @@ class ZvoogDrumKitImplementation {
             }
         }
     }
-    start(when) {
+    start(when, tempo) {
         if (this.audioContext) {
             if (this.volume) {
                 if (this.preset) {
+                    when = when + Math.random() * 1 / tempo;
                     this.player.queueWaveTable(this.audioContext, this.volume, this.preset, when, this.info.pitch, this.sampleDuration + 0.001, 1.0);
                 }
             }

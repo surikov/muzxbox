@@ -1,18 +1,19 @@
 console.log('zvoog defaulet performer v1.0');
-class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
+class ZvoogStrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 	audioContext: AudioContext;
-	player: ZPWebAudioFontPlayer = new ZPWebAudioFontPlayer();
+	player: ZS_WebAudioFontPlayer = new ZS_WebAudioFontPlayer();
 	volume: GainNode;
-	loader: ZPWebAudioFontLoader = new ZPWebAudioFontLoader(this.player);
+	loader: ZS_WebAudioFontLoader = new ZS_WebAudioFontLoader(this.player);
 	midiidx: number = 0;
 	listidx: number = -1;
 	info: ZPPresetInfo;
 	preset: ZPWavePreset | null = null;
+	up = false;
 	launch(context: AudioContext, parameters: string): void {
 		this.preset = null;
 		this.audioContext = context;
 		this.volume = this.audioContext.createGain();
-		
+
 		let split = parameters.split('/');
 		let idx = 0;
 		if (split.length == 2) {
@@ -28,7 +29,7 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 		//let idx = this.loader.findInstrument(this.midinumber);
 		this.info = this.loader.instrumentInfo(idx);
 		this.loader.startLoad(context, this.info.url, this.info.variable);
-		this.volume.gain.setValueAtTime(0.5, this.audioContext.currentTime+0.001);
+		this.volume.gain.setValueAtTime(0.5, this.audioContext.currentTime + 0.001);
 		/*
 		if(this.info.variable=="_tone_0300_SBAWE32_sf2_file"){
 			this.volume.gain.setValueAtTime(0.99, this.audioContext.currentTime+0.002);
@@ -39,7 +40,7 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 		this.loader.waitLoad(() => {
 			this.preset = window[this.info.variable];
 			//console.log('preset', this.preset, this.info);
-			
+
 		});
 	}
 	busy(): null | string {
@@ -74,8 +75,12 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 						pitches.push(zpitches[ii] + 0);
 					}
 					//console.log(duration, zpitches, mzbxslide);
-					when = when + Math.random() * 2 / tempo;
-					this.player.queueChord(this.audioContext, this.volume, this.preset, when, pitches, duration, volumeLevel, mzbxslide);
+					if (this.up) {
+						this.player.queueStrumDown(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+					} else {
+						this.player.queueStrumUp(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+					}
+					this.up = !this.up;
 				}
 			}
 		}
@@ -91,22 +96,22 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 		}
 	}
 }
-class ZPUI {
+class ZSUI {
 	id: string = '';
 	data: string = '';
 	list: any;
-	player: ZPWebAudioFontPlayer = new ZPWebAudioFontPlayer();
+	player: ZS_WebAudioFontPlayer = new ZS_WebAudioFontPlayer();
 	init() {
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
 		this.sendMessageToHost('');
 		this.list = document.getElementById('inslist');
 		let ins = this.player.loader.instrumentKeys();
-		
+
 		for (let ii = 0; ii < ins.length; ii++) {
 			var option = document.createElement('option');
 			option.value = '' + ii;
-			let midi=parseInt(ins[ii].substring(0,3));
-			option.innerHTML = ins[ii]+": "+this.player.loader.instrumentTitles()[midi];
+			let midi = parseInt(ins[ii].substring(0, 3));
+			option.innerHTML = ins[ii] + ": " + this.player.loader.instrumentTitles()[midi];
 			this.list.appendChild(option);
 		}
 		this.list.addEventListener('change', (event) => {
@@ -141,11 +146,11 @@ class ZPUI {
 		}
 	}
 }
-function initZPerfUI() {
+function initZStrumUI() {
 	//console.log('initZPerfUI');
-	new ZPUI().init();
+	new ZSUI().init();
 }
-function newZvoogBasePerformerImplementation(): MZXBX_AudioPerformerPlugin {
-	return new ZvoogBasePerformerImplementation();
+function newZvoogStrumPerformerImplementation(): MZXBX_AudioPerformerPlugin {
+	return new ZvoogStrumPerformerImplementation();
 }
 

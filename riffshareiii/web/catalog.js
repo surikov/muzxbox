@@ -26,6 +26,10 @@ let _t_all_registerd_plugins_list = [
     {
         label: 'Zvoog Performer', purpose: 'Performer', kind: 'zinstr1', ui: './web/performers/zvoog_perf/perfui.html',
         evaluate: 'newZvoogBasePerformerImplementation', script: './web/performers/zvoog_perf/zvoogperf_plugin.js'
+    },
+    {
+        label: 'Zvoog Strum', purpose: 'Performer', kind: 'zvstrumming1', ui: './web/performers/zvoog_strum/strumui.html',
+        evaluate: 'newZvoogStrumPerformerImplementation', script: './web/performers/zvoog_strum/zvoogstrum_plugin.js'
     }
 ];
 function MZXBX_currentPlugins() {

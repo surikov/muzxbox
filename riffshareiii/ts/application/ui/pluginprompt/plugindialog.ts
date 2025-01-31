@@ -92,6 +92,7 @@ class PluginDialogPrompt {
 							this.waitTimelinePointCallback(message.pluginData);
 						}
 					}
+					globalCommandDispatcher.reStartPlayIfPlay();
 				} else {
 					//console.log('wrong received message id', message.dialogID, this.dialogID);
 				}

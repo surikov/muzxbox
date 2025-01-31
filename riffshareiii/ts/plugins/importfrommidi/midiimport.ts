@@ -2098,9 +2098,9 @@ class MidiParser {
 			}
 		}
 		//---------------
-		this.reShiftSequencer(project);
-		this.reShiftDrums(project)
-		this.cutShift(project);
+		//this.reShiftSequencer(project);
+		//this.reShiftDrums(project)
+		//this.cutShift(project);
 		//---------------
 		let len = project.timeline.length;
 		for (let ii = len - 1; ii > 0; ii--) {
@@ -2386,12 +2386,23 @@ class MidiParser {
 	}*/
 	createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack {
 		//console.log('createProjectTrack', midiTrack.title);
+		let perfkind='zinstr1';
+		if(midiTrack.program==24
+			||midiTrack.program==25
+			||midiTrack.program==26
+			||midiTrack.program==27
+			||midiTrack.program==28
+			||midiTrack.program==29
+			||midiTrack.program==30
+			){
+			perfkind='zvstrumming1';
+		}
 		let projectTrack: Zvoog_MusicTrack = {
 			title: midiTrack.title + ' ' + insNames[midiTrack.program]
 			, measures: []
 			//, filters: []
 			, performer: {
-				id: 'track' + (midiTrack.program + Math.random()), data: '' + midiTrack.program, kind: 'zinstr1', outputs: [outputId]
+				id: 'track' + (midiTrack.program + Math.random()), data: '' + midiTrack.program, kind: perfkind, outputs: [outputId]
 				, iconPosition: { x: top * 2, y: top }, state: 0
 			}
 			, volume: volume

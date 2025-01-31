@@ -150,7 +150,7 @@ class FilterIcon {
 							globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
 								filterTarget.data = obj;
 							});
-							globalCommandDispatcher.reStartPlayIfPlay();
+							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
 						});
 					}

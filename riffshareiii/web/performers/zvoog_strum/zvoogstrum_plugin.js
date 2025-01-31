@@ -1,5 +1,5 @@
 "use strict";
-class ZPWebAudioFontLoader {
+class ZS_WebAudioFontLoader {
     constructor(player) {
         this.cached = [];
         this.instrumentKeyArray = [];
@@ -286,8 +286,8 @@ class ZPWebAudioFontLoader {
                 '0281_GeneralUserGS_sf2_file', '0282_FluidR3_GM_sf2_file', '0282_GeneralUserGS_sf2_file', '0283_GeneralUserGS_sf2_file',
                 '0290_GeneralUserGS_sf2_file',
                 '0292_Aspirin_sf2_file', '0290_SBAWE32_sf2_file', '0290_Aspirin_sf2_file', '0290_Chaos_sf2_file', '0290_FluidR3_GM_sf2_file', '0290_JCLive_sf2_file', '0290_LesPaul_sf2', '0290_LesPaul_sf2_file', '0290_SBLive_sf2', '0290_SoundBlasterOld_sf2', '0291_Aspirin_sf2_file', '0291_LesPaul_sf2', '0291_LesPaul_sf2_file', '0291_SBAWE32_sf2_file', '0291_SoundBlasterOld_sf2', '0292_LesPaul_sf2', '0292_LesPaul_sf2_file',
-                '0300_FluidR3_GM_sf2_file',
-                '0300_SBAWE32_sf2_file', '0300_Chaos_sf2_file', '0300_SBLive_sf2', '0300_Aspirin_sf2_file', '0300_GeneralUserGS_sf2_file', '0300_JCLive_sf2_file', '0300_LesPaul_sf2', '0300_LesPaul_sf2_file', '0300_SoundBlasterOld_sf2',
+                '0300_Chaos_sf2_file',
+                '0300_FluidR3_GM_sf2_file', '0300_SBAWE32_sf2_file', '0300_SBLive_sf2', '0300_Aspirin_sf2_file', '0300_GeneralUserGS_sf2_file', '0300_JCLive_sf2_file', '0300_LesPaul_sf2', '0300_LesPaul_sf2_file', '0300_SoundBlasterOld_sf2',
                 '0301_Aspirin_sf2_file', '0301_FluidR3_GM_sf2_file', '0301_GeneralUserGS_sf2_file', '0301_JCLive_sf2_file', '0301_LesPaul_sf2', '0301_LesPaul_sf2_file',
                 '0302_Aspirin_sf2_file', '0302_GeneralUserGS_sf2_file', '0302_JCLive_sf2_file', '0303_Aspirin_sf2_file', '0304_Aspirin_sf2_file',
                 '0310_LesPaul_sf2_file',
@@ -556,10 +556,10 @@ class ZPWebAudioFontLoader {
 }
 'use strict';
 console.log('WebAudioFont Engine v3.0.04 GPL3');
-class ZPWebAudioFontPlayer {
+class ZS_WebAudioFontPlayer {
     constructor() {
         this.envelopes = [];
-        this.loader = new ZPWebAudioFontLoader(this);
+        this.loader = new ZS_WebAudioFontLoader(this);
         this.afterTime = 0.05;
         this.nearZero = 0.000001;
         this.adjustPreset = function (audioContext, preset) {
@@ -640,28 +640,30 @@ class ZPWebAudioFontPlayer {
         return envelopes;
     }
     ;
-    queueStrumUp(audioContext, target, preset, when, pitches, duration, volume, slides) {
+    queueStrumUp(audioContext, target, preset, when, tempo, pitches, duration, volume, slides) {
         pitches.sort(function (a, b) {
             return b - a;
         });
-        return this.queueStrum(audioContext, target, preset, when, pitches, duration, volume, slides);
+        return this.queueStrum(audioContext, target, preset, when, tempo, pitches, duration, volume, slides);
     }
     ;
-    queueStrumDown(audioContext, target, preset, when, pitches, duration, volume, slides) {
+    queueStrumDown(audioContext, target, preset, when, tempo, pitches, duration, volume, slides) {
         pitches.sort(function (a, b) {
             return a - b;
         });
-        return this.queueStrum(audioContext, target, preset, when, pitches, duration, volume, slides);
+        return this.queueStrum(audioContext, target, preset, when, tempo, pitches, duration, volume, slides);
     }
     ;
-    queueStrum(audioContext, target, preset, when, pitches, duration, volume, slides) {
+    queueStrum(audioContext, target, preset, when, tempo, pitches, duration, volume, slides) {
         volume = this.limitVolume(volume);
         if (when < audioContext.currentTime) {
             when = audioContext.currentTime;
         }
+        when = when + Math.random() * 2 / tempo;
         var envelopes = [];
+        let strumStep = 1 / tempo;
         for (var i = 0; i < pitches.length; i++) {
-            var envlp = this.queueWaveTable(audioContext, target, preset, when + i * 0.01, pitches[i], duration, volume - Math.random() * 0.01, slides);
+            var envlp = this.queueWaveTable(audioContext, target, preset, when + i * strumStep, pitches[i], duration, volume - Math.random() * 0.01, slides);
             if (envlp)
                 envelopes.push(envlp);
             volume = 0.9 * volume;
@@ -669,7 +671,7 @@ class ZPWebAudioFontPlayer {
         return envelopes;
     }
     ;
-    queueSnap(audioContext, target, preset, when, pitches, duration, volume, slides) {
+    queueSnap(audioContext, target, preset, when, tempo, pitches, duration, volume, slides) {
         volume = this.limitVolume(volume);
         volume = 1.5 * (volume || 1.0);
         duration = 0.05;
@@ -894,13 +896,14 @@ class ZPWebAudioFontPlayer {
     ;
 }
 console.log('zvoog defaulet performer v1.0');
-class ZvoogBasePerformerImplementation {
+class ZvoogStrumPerformerImplementation {
     constructor() {
-        this.player = new ZPWebAudioFontPlayer();
-        this.loader = new ZPWebAudioFontLoader(this.player);
+        this.player = new ZS_WebAudioFontPlayer();
+        this.loader = new ZS_WebAudioFontLoader(this.player);
         this.midiidx = 0;
         this.listidx = -1;
         this.preset = null;
+        this.up = false;
     }
     launch(context, parameters) {
         this.preset = null;
@@ -952,8 +955,13 @@ class ZvoogBasePerformerImplementation {
                     for (let ii = 0; ii < zpitches.length; ii++) {
                         pitches.push(zpitches[ii] + 0);
                     }
-                    when = when + Math.random() * 2 / tempo;
-                    this.player.queueChord(this.audioContext, this.volume, this.preset, when, pitches, duration, volumeLevel, mzbxslide);
+                    if (this.up) {
+                        this.player.queueStrumDown(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                    }
+                    else {
+                        this.player.queueStrumUp(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                    }
+                    this.up = !this.up;
                 }
             }
         }
@@ -970,11 +978,11 @@ class ZvoogBasePerformerImplementation {
         }
     }
 }
-class ZPUI {
+class ZSUI {
     constructor() {
         this.id = '';
         this.data = '';
-        this.player = new ZPWebAudioFontPlayer();
+        this.player = new ZS_WebAudioFontPlayer();
     }
     init() {
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
@@ -1019,10 +1027,10 @@ class ZPUI {
         }
     }
 }
-function initZPerfUI() {
-    new ZPUI().init();
+function initZStrumUI() {
+    new ZSUI().init();
 }
-function newZvoogBasePerformerImplementation() {
-    return new ZvoogBasePerformerImplementation();
+function newZvoogStrumPerformerImplementation() {
+    return new ZvoogStrumPerformerImplementation();
 }
-//# sourceMappingURL=zvoogperf_plugin.js.map
+//# sourceMappingURL=zvoogstrum_plugin.js.map

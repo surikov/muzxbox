@@ -309,7 +309,7 @@ class RightMenuPanel {
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt, 'performer'], () => {
 								track.performer.data = obj;
 							});
-							globalCommandDispatcher.reStartPlayIfPlay();
+							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
 						});
 					}
@@ -365,7 +365,7 @@ class RightMenuPanel {
 							globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt, 'sampler'], () => {
 								drum.sampler.data = obj;
 							});
-							globalCommandDispatcher.reStartPlayIfPlay();
+							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
 						});
 					}
@@ -417,7 +417,7 @@ class RightMenuPanel {
 							globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
 								filter.data = obj;
 							});
-							globalCommandDispatcher.reStartPlayIfPlay();
+							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
 						});
 					}

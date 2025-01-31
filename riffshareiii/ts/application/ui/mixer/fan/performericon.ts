@@ -196,7 +196,7 @@ class PerformerIcon {
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks',trackNo,'performer'], () => {
 								track.performer.data = obj;
 							});
-							globalCommandDispatcher.reStartPlayIfPlay();
+							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
 						});
 					}

@@ -173,7 +173,7 @@ class SamplerIcon {
 							globalCommandDispatcher.exe.commitProjectChanges(['percussions',order], () => {
 								samplerTrack.sampler.data = obj;
 							});
-							globalCommandDispatcher.reStartPlayIfPlay();
+							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
 						});
 					}

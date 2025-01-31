@@ -337,6 +337,7 @@ class PluginDialogPrompt {
                             this.waitTimelinePointCallback(message.pluginData);
                         }
                     }
+                    globalCommandDispatcher.reStartPlayIfPlay();
                 }
                 else {
                 }
@@ -1656,7 +1657,6 @@ class RightMenuPanel {
                             globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt, 'performer'], () => {
                                 track.performer.data = obj;
                             });
-                            globalCommandDispatcher.reStartPlayIfPlay();
                             return true;
                         });
                     }
@@ -1706,7 +1706,6 @@ class RightMenuPanel {
                             globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt, 'sampler'], () => {
                                 drum.sampler.data = obj;
                             });
-                            globalCommandDispatcher.reStartPlayIfPlay();
                             return true;
                         });
                     }
@@ -1751,7 +1750,6 @@ class RightMenuPanel {
                             globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
                                 filter.data = obj;
                             });
-                            globalCommandDispatcher.reStartPlayIfPlay();
                             return true;
                         });
                     }
@@ -3147,7 +3145,6 @@ class PerformerIcon {
                             globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer'], () => {
                                 track.performer.data = obj;
                             });
-                            globalCommandDispatcher.reStartPlayIfPlay();
                             return true;
                         });
                     }
@@ -3338,7 +3335,6 @@ class SamplerIcon {
                             globalCommandDispatcher.exe.commitProjectChanges(['percussions', order], () => {
                                 samplerTrack.sampler.data = obj;
                             });
-                            globalCommandDispatcher.reStartPlayIfPlay();
                             return true;
                         });
                     }
@@ -3532,7 +3528,6 @@ class FilterIcon {
                             globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
                                 filterTarget.data = obj;
                             });
-                            globalCommandDispatcher.reStartPlayIfPlay();
                             return true;
                         });
                     }
