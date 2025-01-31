@@ -261,8 +261,10 @@ class ZPWebAudioFontLoader {
                 '0170_GeneralUserGS_sf2_file', '0170_JCLive_sf2_file', '0170_SBLive_sf2', '0170_SoundBlasterOld_sf2', '0171_FluidR3_GM_sf2_file', '0171_GeneralUserGS_sf2_file', '0172_FluidR3_GM_sf2_file',
                 '0180_GeneralUserGS_sf2_file',
                 '0180_Aspirin_sf2_file', '0180_Chaos_sf2_file', '0180_FluidR3_GM_sf2_file', '0180_JCLive_sf2_file', '0180_SBLive_sf2', '0180_SoundBlasterOld_sf2',
-                '0181_Aspirin_sf2_file', '0181_GeneralUserGS_sf2_file', '0181_SoundBlasterOld_sf2', '0190_Aspirin_sf2_file', '0190_Chaos_sf2_file', '0190_FluidR3_GM_sf2_file', '0190_GeneralUserGS_sf2_file',
-                '0190_JCLive_sf2_file', '0190_SBLive_sf2', '0190_SoundBlasterOld_sf2', '0191_Aspirin_sf2_file', '0191_GeneralUserGS_sf2_file', '0191_SoundBlasterOld_sf2', '0200_Aspirin_sf2_file',
+                '0181_Aspirin_sf2_file', '0181_GeneralUserGS_sf2_file', '0181_SoundBlasterOld_sf2',
+                '0190_JCLive_sf2_file',
+                '0190_Aspirin_sf2_file', '0190_Chaos_sf2_file', '0190_FluidR3_GM_sf2_file', '0190_GeneralUserGS_sf2_file', '0190_SBLive_sf2', '0190_SoundBlasterOld_sf2', '0191_Aspirin_sf2_file', '0191_GeneralUserGS_sf2_file', '0191_SoundBlasterOld_sf2',
+                '0200_Aspirin_sf2_file',
                 '0200_Chaos_sf2_file', '0200_FluidR3_GM_sf2_file', '0200_GeneralUserGS_sf2_file', '0200_JCLive_sf2_file', '0200_SBLive_sf2', '0200_SoundBlasterOld_sf2', '0201_Aspirin_sf2_file',
                 '0201_FluidR3_GM_sf2_file', '0201_GeneralUserGS_sf2_file', '0201_SoundBlasterOld_sf2', '0210_Aspirin_sf2_file', '0210_Chaos_sf2_file', '0210_FluidR3_GM_sf2_file', '0210_GeneralUserGS_sf2_file',
                 '0210_JCLive_sf2_file', '0210_SBLive_sf2', '0210_SoundBlasterOld_sf2', '0211_Aspirin_sf2_file', '0211_FluidR3_GM_sf2_file', '0211_GeneralUserGS_sf2_file', '0211_SoundBlasterOld_sf2',
@@ -986,7 +988,6 @@ class ZPUI {
             this.list.appendChild(option);
         }
         this.list.addEventListener('change', (event) => {
-            console.dir(this.player.loader.instrumentKeys()[1 * this.list.value]);
             this.sendMessageToHost('0/' + this.list.value);
         });
     }
@@ -1007,7 +1008,6 @@ class ZPUI {
         this.id = newId;
     }
     setState(data) {
-        console.log('setState', data);
         this.data = data;
         let split = this.data.split('/');
         if (split.length == 2) {
@@ -1019,7 +1019,6 @@ class ZPUI {
     }
 }
 function initZPerfUI() {
-    console.log('initZPerfUI');
     new ZPUI().init();
 }
 function newZvoogBasePerformerImplementation() {

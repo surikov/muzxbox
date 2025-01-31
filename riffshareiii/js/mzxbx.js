@@ -93,12 +93,12 @@ class SchedulePlayer {
         this.playCallback = (start, position, end) => { };
         this.playCallback = callback;
     }
-    setupPlugins(context, schedule, onDone) {
+    startSetupPlugins(context, schedule) {
         this.audioContext = context;
         this.schedule = schedule;
         if (this.schedule) {
             let pluginLoader = new PluginLoader();
-            return pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers, onDone);
+            return pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers);
         }
         else {
             return 'Empty schedule';
@@ -419,7 +419,7 @@ class MusicTicker {
     }
 }
 class PluginLoader {
-    collectLoadPlugins(schedule, filters, performers, afterStart) {
+    collectLoadPlugins(schedule, filters, performers) {
         for (let ff = 0; ff < schedule.filters.length; ff++) {
             let filter = schedule.filters[ff];
             this.сollectFilterPlugin(filter.id, filter.kind, filter.properties, filters);
@@ -430,7 +430,6 @@ class PluginLoader {
             this.сollectPerformerPlugin(chanid, performer.kind, performer.properties, performers);
         }
         let result = this.startLoadCollectedPlugins(filters, performers);
-        afterStart();
         return result;
     }
     startLoadCollectedPlugins(filters, performers) {

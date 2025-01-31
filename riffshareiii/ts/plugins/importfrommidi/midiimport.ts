@@ -2098,9 +2098,9 @@ class MidiParser {
 			}
 		}
 		//---------------
-		//this.reShiftSequencer(project);
-		//this.reShiftDrums(project)
-		//this.cutShift(project);
+		this.reShiftSequencer(project);
+		this.reShiftDrums(project)
+		this.cutShift(project);
 		//---------------
 		let len = project.timeline.length;
 		for (let ii = len - 1; ii > 0; ii--) {

@@ -86,11 +86,11 @@
 	--color-subtext: #99ccccff;
 	(((--main-color))): #ddeeffff;
 */
-	--background-color: #010;
+	--background-color: #030900;
 	--main-color: #fff;
-	--drag-color: #399;
-	--line-color: #9cf;
-	--click-color: #069;
+	--drag-color: #066;
+	--line-color: #cff;
+	--click-color: #360;
 
 	--click-color50: color-mix(in lab, transparent 50%, var(--click-color));
 	--line-color50: color-mix(in lab, transparent 50%, var(--line-color));

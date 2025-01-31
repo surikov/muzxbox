@@ -241,7 +241,7 @@ declare type MZXBX_Schedule = {
     filters: MZXBX_Filter[];
 };
 declare type MZXBX_Player = {
-    setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => string | null;
+    startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
     startLoop: (from: number, position: number, to: number) => string;
     reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
     cancel: () => void;
@@ -300,7 +300,7 @@ declare class SchedulePlayer implements MZXBX_Player {
     onAir: boolean;
     playCallback: (start: number, position: number, end: number) => void;
     constructor(callback: (start: number, position: number, end: number) => void);
-    setupPlugins(context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void): null | string;
+    startSetupPlugins(context: AudioContext, schedule: MZXBX_Schedule): null | string;
     allFilters(): MZXBX_FilterHolder[];
     allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
     launchCollectedPlugins(): null | string;
@@ -326,7 +326,7 @@ declare class MusicTicker {
 }
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 declare class PluginLoader {
-    collectLoadPlugins(schedule: MZXBX_Schedule, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[], afterStart: () => void): null | string;
+    collectLoadPlugins(schedule: MZXBX_Schedule, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[]): null | string;
     startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[]): null | string;
     startLoadPluginStarter(kind: string, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[], onDone: (plugin: any) => void): null | string;
     сollectFilterPlugin(id: string, kind: string, properties: string, filters: MZXBX_FilterHolder[]): void;

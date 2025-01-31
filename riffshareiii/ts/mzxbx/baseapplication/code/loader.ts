@@ -1,6 +1,6 @@
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 class PluginLoader {
-	collectLoadPlugins(schedule: MZXBX_Schedule, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[], afterStart: () => void): null | string {
+	collectLoadPlugins(schedule: MZXBX_Schedule, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[]): null | string {
 		for (let ff = 0; ff < schedule.filters.length; ff++) {
 			let filter: MZXBX_Filter = schedule.filters[ff];
 			this.сollectFilterPlugin(filter.id, filter.kind, filter.properties, filters);
@@ -11,7 +11,7 @@ class PluginLoader {
 			this.сollectPerformerPlugin(chanid, performer.kind, performer.properties, performers);
 		}
 		let result = this.startLoadCollectedPlugins(filters, performers);
-		afterStart();
+		//afterStart();
 		return result;
 	}
 	startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[]): null | string {

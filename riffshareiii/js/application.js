@@ -511,17 +511,20 @@ class CommandDispatcher {
         this.playPosition = 0;
         this.playCallback = (start, pos, end) => {
             this.playPosition = pos;
-            let xx = this.cfg().leftPad
-                + this.playPosition * this.cfg().widthDurationRatio
-                - this.renderer.timeselectbar.positionTimeMarkWidth;
-            this.renderer.timeselectbar.positionTimeAnchor.translation = { x: xx, y: 0 };
-            this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
+            this.reDrawPlayPosition();
         };
         this.listener = null;
         this.exe = new CommandExe();
     }
     cfg() {
         return this._mixerDataMathUtility;
+    }
+    reDrawPlayPosition() {
+        let xx = this.cfg().leftPad
+            + this.playPosition * this.cfg().widthDurationRatio
+            - this.renderer.timeselectbar.positionTimeMarkWidth;
+        this.renderer.timeselectbar.positionTimeAnchor.translation = { x: xx, y: 0 };
+        this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
     }
     initAudioFromUI() {
         var AudioContext = window.AudioContext;
@@ -705,7 +708,6 @@ class CommandDispatcher {
     reConnectPlugins() {
         if (this.onAir && (!this.neeToStart)) {
             let schedule = this.renderCurrentProjectForOutput();
-            console.log('schedule', schedule);
             this.player.reconnectAllPlugins(schedule);
         }
     }
@@ -730,7 +732,6 @@ class CommandDispatcher {
         }
     }
     setupAndStartPlay() {
-        console.log('setupAndStartPlay');
         this.onAir = true;
         let schedule = this.renderCurrentProjectForOutput();
         let from = 0;
@@ -749,17 +750,15 @@ class CommandDispatcher {
             }
         }
         let me = this;
-        let result = me.player.setupPlugins(me.audioContext, schedule, () => {
-            console.log('after setupPlugins');
-            me.neeToStart = true;
-            if (this.playPosition < from) {
-                this.playPosition = from;
-            }
-            if (this.playPosition >= to) {
-                this.playPosition = to;
-            }
-            me.startPlayLoop(from, this.playPosition, to);
-        });
+        let result = me.player.startSetupPlugins(me.audioContext, schedule);
+        me.neeToStart = true;
+        if (this.playPosition < from) {
+            this.playPosition = from;
+        }
+        if (this.playPosition >= to) {
+            this.playPosition = to;
+        }
+        me.startPlayLoop(from, this.playPosition, to);
         if (result != null) {
             this.onAir = false;
             this.neeToStart = false;
@@ -767,7 +766,6 @@ class CommandDispatcher {
         }
     }
     startPlayLoop(from, position, to) {
-        console.log('startPlayLoop', from, position, to);
         if (this.neeToStart) {
             let me = this;
             let msg = me.player.startLoop(from, position, to);
@@ -780,7 +778,6 @@ class CommandDispatcher {
                 let id = setTimeout(() => {
                     me.startPlayLoop(from, position, to);
                 }, 1000);
-                console.log('wait', id);
             }
             else {
                 me.neeToStart = false;
@@ -884,14 +881,17 @@ class CommandDispatcher {
                 }
             }
         }
-        this.playPosition = 0;
-        for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
-            let measure = this.cfg().data.timeline[mm];
-            let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
-            this.playPosition = this.playPosition + cuDuration;
+        if (this.cfg().data.selectedPart.startMeasure >= 0) {
+            this.playPosition = 0;
+            for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
+                let measure = this.cfg().data.timeline[mm];
+                let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
+                this.playPosition = this.playPosition + cuDuration;
+            }
         }
         this.renderer.timeselectbar.updateTimeSelectionBar();
         this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup, this.renderer.timeselectbar.selectionAnchor, LevelModes.top);
+        this.reDrawPlayPosition();
     }
 }
 let globalCommandDispatcher = new CommandDispatcher();
@@ -1212,7 +1212,9 @@ class TimeSelectBar {
         this.positionTimeAnchor.ww = viewWidth * 1024;
         this.positionTimeAnchor.hh = viewHeight * 1024;
         this.positionTimeMark.y = globalCommandDispatcher.cfg().gridTop();
-        this.positionTimeMark.h = globalCommandDispatcher.cfg().workHeight();
+        this.positionTimeMark.h = globalCommandDispatcher.cfg().gridHeight()
+            + globalCommandDispatcher.cfg().padGrid2Sampler + globalCommandDispatcher.cfg().samplerHeight()
+            + globalCommandDispatcher.cfg().padSampler2Automation + globalCommandDispatcher.cfg().automationHeight();
         this.selectionAnchor.ww = viewWidth * 1024;
         this.selectionAnchor.hh = viewHeight * 1024;
         this.selectionMark.h = viewHeight * 1024;
@@ -3911,7 +3913,6 @@ class WarningUI {
         return [this.warningLayer];
     }
     showWarning(title, msg, onCancel) {
-        console.log('WarningUI show', title, msg);
         this.onCancel = onCancel;
         this.warningTitle.text = title;
         this.warningDescription.text = msg;

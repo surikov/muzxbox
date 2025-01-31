@@ -7,12 +7,12 @@ class ZVolImplementation {
     launch(context, parameters) {
         this.audioContext = context;
         this.volume = this.audioContext.createGain();
-        this.schedule(this.audioContext.currentTime + 0.001, parameters);
+        this.schedule(this.audioContext.currentTime + 0.001, 120, parameters);
     }
     busy() {
         return null;
     }
-    schedule(when, parameters) {
+    schedule(when, tempo, parameters) {
         this.volume.gain.setValueAtTime(this.num / 100, when);
         this.num = parseInt(parameters);
         this.volume.gain.linearRampToValueAtTime(this.num / 100, when + 0.001);

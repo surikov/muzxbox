@@ -4,17 +4,17 @@
 }
 
 .positionMark1 {
-	stop-color: var(--drag-color);
+	stop-color: var(--line-color);
 	stop-opacity: 0%;
 }
 
 .positionMark2 {
-	stop-color: var(--drag-color);
+	stop-color: var(--line-color);
 	stop-opacity: 50%;
 }
 
 .positionMark3 {
-	stop-color: var(--drag-color);
+	stop-color: var(--line-color);
 	stop-opacity: 100%;
 }
 

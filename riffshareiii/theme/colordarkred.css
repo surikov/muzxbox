@@ -1,22 +1,8 @@
-
 :root {
-	
-
-
-    --color-debug: #800;
-    
-	--color-shadow: #00000066;
-
-    --color-background: #ddeeff;
-    --line-color2: #000;
-    --color-panel: #ccd;
-
-	--color-focus: #06f;
-    --color-interactive: #f00;
-
-	--color-subtext: #0f3;
-    --main-color2: #006;
+	--background-color: #eef6ff;
+	--main-color: #000;
+	--drag-color: #fc0;
+	--line-color: #666;
+	--click-color: #f00;
 }
-#pagediv {
-    background-image: url("bg/red.jpg");
-}
+

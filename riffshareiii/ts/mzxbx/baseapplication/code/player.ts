@@ -53,13 +53,13 @@ class SchedulePlayer implements MZXBX_Player {
 	constructor(callback: (start: number, position: number, end: number) => void) {
 		this.playCallback = callback;
 	}
-	setupPlugins(context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void): null | string {
+	startSetupPlugins(context: AudioContext, schedule: MZXBX_Schedule): null | string {
 		this.audioContext = context;
 		this.schedule = schedule;
 		//this.stateSetupDone = false;
 		if (this.schedule) {
 			let pluginLoader: PluginLoader = new PluginLoader();
-			return pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers, onDone);
+			return pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers);
 		} else {
 			return 'Empty schedule';
 		}

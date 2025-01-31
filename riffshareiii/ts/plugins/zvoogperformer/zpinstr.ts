@@ -109,7 +109,7 @@ class ZPUI {
 			this.list.appendChild(option);
 		}
 		this.list.addEventListener('change', (event) => {
-			console.dir(this.player.loader.instrumentKeys()[1 * this.list.value]);
+			//console.dir(this.player.loader.instrumentKeys()[1 * this.list.value]);
 			this.sendMessageToHost('0/' + this.list.value);
 		});
 
@@ -130,7 +130,7 @@ class ZPUI {
 		this.id = newId;
 	}
 	setState(data: string) {
-		console.log('setState', data);
+		//console.log('setState', data);
 		this.data = data;
 		let split = this.data.split('/');
 		if (split.length == 2) {
@@ -141,7 +141,7 @@ class ZPUI {
 	}
 }
 function initZPerfUI() {
-	console.log('initZPerfUI');
+	//console.log('initZPerfUI');
 	new ZPUI().init();
 }
 function newZvoogBasePerformerImplementation(): MZXBX_AudioPerformerPlugin {

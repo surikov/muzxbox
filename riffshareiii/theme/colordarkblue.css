@@ -1,40 +1,9 @@
-
 :root {
-	/*
-    --background-color: #6688aa;
-    --line-color: #ccdddd;
-    --line-color: #111133;
-    --main-color: #ff4455;
-    --interaction-color: #9f5ba5;
-    --label-color: #eee133;
-
-    --tapSize: 50px;
-
-    --color-default: var(--drag-color);
-
-    --color-paper: #def;
-    (((--main-color)))line: #332244;
-    
-    --color-green: #080;
-    --color-blue: #008;
-    --color-cyan: #088;
-    --color-magenta: #808;
-    --color-yellow: #880;
-	*/
-
-    --color-debug: #800;
-	--color-shadow: #00000066;
-    --color-background: #000000ff;
-    --color-panel: #114466ff;
-    --color-focus: #009933ff;
-    --color-interactive: #cc6633ff;
-    --line-color2: #44ccffff;
-	--color-subtext: #99ccccff;
-    --main-color: #ddeeffff;
-
+	--background-color: #010;
+	--main-color: #fff;
+	--drag-color: #399;
+	--line-color: #9cf;
+	--click-color: #069;
 }
 
-#pagediv {
-    background-image22: url("bg/burevestnik.jpg");
-    background-image: url("bg/blue.jpg");
-}
+

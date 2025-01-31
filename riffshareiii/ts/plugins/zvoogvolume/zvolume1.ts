@@ -8,16 +8,16 @@ class ZVolImplementation implements MZXBX_AudioFilterPlugin {
 		this.volume = this.audioContext.createGain();
 		//this.num = parseInt(parameters);
 		//this.volume.gain.setValueAtTime(this.num / 100, 0);
-		this.schedule(this.audioContext.currentTime + 0.001, parameters);
+		this.schedule(this.audioContext.currentTime + 0.001, 120, parameters);
 	}
 	busy(): null | string {
 		return null;
 	}
-	schedule(when: number, parameters: string): void {
+	schedule(when: number, tempo: number, parameters: string): void {
 		this.volume.gain.setValueAtTime(this.num / 100, when);
 		this.num = parseInt(parameters);
 		this.volume.gain.linearRampToValueAtTime(this.num / 100, when + 0.001);
-		//console.log(this.audioContext.currentTime, when, parameters);
+		//console.log(this.audioContext.currentTime, when, tempo,parameters,this.num);
 	}
 	input(): AudioNode | null {
 		return this.volume;

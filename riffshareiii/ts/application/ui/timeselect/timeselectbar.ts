@@ -84,8 +84,10 @@ class TimeSelectBar {
 		this.positionTimeAnchor.ww = viewWidth * 1024;
 		this.positionTimeAnchor.hh = viewHeight * 1024;
 		this.positionTimeMark.y = globalCommandDispatcher.cfg().gridTop();
-		this.positionTimeMark.h = globalCommandDispatcher.cfg().workHeight();
-
+		//this.positionTimeMark.h = globalCommandDispatcher.cfg().workHeight();
+		this.positionTimeMark.h = globalCommandDispatcher.cfg().gridHeight()
+			+ globalCommandDispatcher.cfg().padGrid2Sampler + globalCommandDispatcher.cfg().samplerHeight()
+			+ globalCommandDispatcher.cfg().padSampler2Automation + globalCommandDispatcher.cfg().automationHeight();
 		this.selectionAnchor.ww = viewWidth * 1024;
 		this.selectionAnchor.hh = viewHeight * 1024;
 		this.selectionMark.h = viewHeight * 1024;

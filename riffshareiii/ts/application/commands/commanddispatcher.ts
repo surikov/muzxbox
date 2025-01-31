@@ -11,13 +11,8 @@ class CommandDispatcher {
 	playCallback: (start: number, position: number, end: number) => void = (start: number, pos: number, end: number) => {
 		this.playPosition = pos;
 		//this.renderer.timeselectbar.positionTimeMark.x 
+		this.reDrawPlayPosition();
 
-		let xx = this.cfg().leftPad
-			+ this.playPosition * this.cfg().widthDurationRatio
-			- this.renderer.timeselectbar.positionTimeMarkWidth;
-		this.renderer.timeselectbar.positionTimeAnchor.translation = { x: xx, y: 0 };
-		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup
-			, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
 		//console.log('play state', start, position, end);
 	};
 
@@ -28,6 +23,14 @@ class CommandDispatcher {
 	//redoQueue: UndoRedoCommand[] = [];
 	cfg(): MixerDataMathUtility {
 		return this._mixerDataMathUtility;
+	}
+	reDrawPlayPosition() {
+		let xx = this.cfg().leftPad
+			+ this.playPosition * this.cfg().widthDurationRatio
+			- this.renderer.timeselectbar.positionTimeMarkWidth;
+		this.renderer.timeselectbar.positionTimeAnchor.translation = { x: xx, y: 0 };
+		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup
+			, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
 	}
 	/*addUndoRedo(cc: UndoRedoCommand) {
 		cc.redo();
@@ -254,7 +257,7 @@ class CommandDispatcher {
 	reConnectPlugins() {
 		if (this.onAir && (!this.neeToStart)) {
 			let schedule = this.renderCurrentProjectForOutput();
-			console.log('schedule', schedule);
+			//console.log('schedule', schedule);
 			this.player.reconnectAllPlugins(schedule);
 		}
 	}
@@ -279,7 +282,7 @@ class CommandDispatcher {
 		}
 	}
 	setupAndStartPlay() {
-		console.log('setupAndStartPlay');
+		//console.log('setupAndStartPlay');
 		this.onAir = true;
 		let schedule = this.renderCurrentProjectForOutput();
 		let from = 0;
@@ -297,17 +300,17 @@ class CommandDispatcher {
 			}
 		}
 		let me = this;
-		let result = me.player.setupPlugins(me.audioContext, schedule, () => {
-			console.log('after setupPlugins');
-			me.neeToStart = true;
-			if (this.playPosition < from) {
-				this.playPosition = from;
-			}
-			if (this.playPosition >= to) {
-				this.playPosition = to;
-			}
-			me.startPlayLoop(from, this.playPosition, to);
-		});
+		let result = me.player.startSetupPlugins(me.audioContext, schedule);
+		//console.log('after setupPlugins');
+		me.neeToStart = true;
+		if (this.playPosition < from) {
+			this.playPosition = from;
+		}
+		if (this.playPosition >= to) {
+			this.playPosition = to;
+		}
+		me.startPlayLoop(from, this.playPosition, to);
+
 		if (result != null) {
 			this.onAir = false;
 			this.neeToStart = false;
@@ -315,7 +318,7 @@ class CommandDispatcher {
 		}
 	}
 	startPlayLoop(from: number, position: number, to: number) {
-		console.log('startPlayLoop',from,position,to);
+		//console.log('startPlayLoop', from, position, to);
 		if (this.neeToStart) {
 			let me = this;
 			//let n120 = 120 / 60;
@@ -328,10 +331,10 @@ class CommandDispatcher {
 					me.neeToStart = false;
 					me.onAir = false;
 				});
-				let id=setTimeout(() => {
+				let id = setTimeout(() => {
 					me.startPlayLoop(from, position, to);
 				}, 1000);
-				console.log('wait',id);
+				//console.log('wait',id);
 			} else {
 				//console.log('toggleStartStop setupPlugins done', from, position, to);
 				me.neeToStart = false;
@@ -469,19 +472,21 @@ class CommandDispatcher {
 				}
 			}
 		}
-		//console.log('selection',this.cfg().data.selectedPart);
-		this.playPosition = 0;
-		for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
-			let measure: Zvoog_SongMeasure = this.cfg().data.timeline[mm];
-			let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
-			this.playPosition = this.playPosition + cuDuration;
+		//console.log('selection', this.cfg().data.selectedPart);
+		if (this.cfg().data.selectedPart.startMeasure >= 0) {
+			this.playPosition = 0;
+			for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
+				let measure: Zvoog_SongMeasure = this.cfg().data.timeline[mm];
+				let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
+				this.playPosition = this.playPosition + cuDuration;
+			}
 		}
 		this.renderer.timeselectbar.updateTimeSelectionBar();
 		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
 			, this.renderer.timeselectbar.selectionAnchor
 			, LevelModes.top);
 
-
+		this.reDrawPlayPosition();
 	}
 	/*doUIaction() {
 

@@ -72,6 +72,7 @@ declare class CommandDispatcher {
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
     exe: CommandExe;
     cfg(): MixerDataMathUtility;
+    reDrawPlayPosition(): void;
     initAudioFromUI(): void;
     registerWorkProject(data: Zvoog_Project): void;
     registerUI(renderer: UIRenderer): void;
@@ -920,7 +921,7 @@ declare type MZXBX_Schedule = {
     filters: MZXBX_Filter[];
 };
 declare type MZXBX_Player = {
-    setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => string | null;
+    startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
     startLoop: (from: number, position: number, to: number) => string;
     reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
     cancel: () => void;
