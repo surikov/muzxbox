@@ -2983,20 +2983,11 @@ class FanPane {
     }
     buildOutIcon(fanAnchor, zidx) {
         let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
-        let rec = {
-            x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize / 2,
-            y: speakerCenter.y - globalCommandDispatcher.cfg().speakerIconSize / 2,
-            w: globalCommandDispatcher.cfg().speakerIconSize,
-            h: globalCommandDispatcher.cfg().speakerIconSize,
-            rx: globalCommandDispatcher.cfg().speakerIconSize / 2,
-            ry: globalCommandDispatcher.cfg().speakerIconSize / 2,
-            css: 'fanSpeakerIcon'
-        };
-        fanAnchor.content.push(rec);
         let icon = {
-            x: speakerCenter.x,
-            y: speakerCenter.y,
-            text: icon_sound_loud, css: 'fanSpeakerIconLabel'
+            x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize / 2.2,
+            y: speakerCenter.y + globalCommandDispatcher.cfg().speakerIconSize / 2.4,
+            text: icon_sound_loud,
+            css: 'fanSpeakerIconLabel'
         };
         fanAnchor.content.push(icon);
     }
@@ -3817,6 +3808,7 @@ let icon_forward = '&#xf2fd;';
 let icon_block = '&#xf119;';
 let icon_equalizer = '&#xf39e;';
 let icon_sliders = '&#xf3b8;';
+let icon_play_circle = '&#xf3a8;';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];

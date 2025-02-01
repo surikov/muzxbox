@@ -40,7 +40,7 @@ class FanPane {
 				, css: css
 			};
 			spearsAnchors[ii].content.push(gridBorder);
-			if(globalCommandDispatcher.cfg().data.percussions.length){
+			if (globalCommandDispatcher.cfg().data.percussions.length) {
 				let samplerBorder: TileLine = {
 					x1: left
 					, x2: left
@@ -50,7 +50,7 @@ class FanPane {
 				};
 				spearsAnchors[ii].content.push(samplerBorder);
 			}
-			if(globalCommandDispatcher.cfg().data.filters.length){
+			if (globalCommandDispatcher.cfg().data.filters.length) {
 				let autoBorder: TileLine = {
 					x1: left
 					, x2: left
@@ -73,7 +73,7 @@ class FanPane {
 	}
 	buildPerformerIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < this.performerIcons.length; ii++) {
-			this.performerIcons[ii].buildPerformerSpot( fanAnchor, spearsAnchor, zidx);
+			this.performerIcons[ii].buildPerformerSpot(fanAnchor, spearsAnchor, zidx);
 		}
 	}
 	buildSamplerIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
@@ -97,8 +97,8 @@ class FanPane {
 
 		//let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().speakerIconSize / 2;
 		//let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
-		let speakerCenter=globalCommandDispatcher.cfg().speakerFanPosition();
-
+		let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
+/*
 		let rec: TileRectangle = {
 			x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize / 2
 			, y: speakerCenter.y - globalCommandDispatcher.cfg().speakerIconSize / 2
@@ -108,11 +108,12 @@ class FanPane {
 			, ry: globalCommandDispatcher.cfg().speakerIconSize / 2
 			, css: 'fanSpeakerIcon'
 		};
-		fanAnchor.content.push(rec);
+		fanAnchor.content.push(rec);*/
 		let icon: TileText = {
-			x: speakerCenter.x //+ globalCommandDispatcher.cfg().speakerIconSize
-			, y: speakerCenter.y //+ globalCommandDispatcher.cfg().speakerIconSize
-			, text: icon_sound_loud, css: 'fanSpeakerIconLabel'
+			x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize/2.2
+			, y: speakerCenter.y + globalCommandDispatcher.cfg().speakerIconSize/2.4
+			, text: icon_sound_loud
+			, css: 'fanSpeakerIconLabel'
 		};
 		fanAnchor.content.push(icon);
 		/*if (zidx < 5) {

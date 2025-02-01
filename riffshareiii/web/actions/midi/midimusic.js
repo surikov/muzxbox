@@ -1604,6 +1604,9 @@ class MidiParser {
                 }
             }
         }
+        this.reShiftSequencer(project);
+        this.reShiftDrums(project);
+        this.cutShift(project);
         let len = project.timeline.length;
         for (let ii = len - 1; ii > 0; ii--) {
             if (this.isBarEmpty(ii, project)) {
@@ -1702,6 +1705,9 @@ class MidiParser {
             for (let mm = 0; mm < track.measures.length; mm++) {
                 let measure = track.measures[mm];
                 for (let cc = 0; cc < measure.chords.length; cc++) {
+                    let m16 = MMUtil().set(measure.chords[cc].skip).strip(16);
+                    measure.chords[cc].skip.count = m16.count;
+                    measure.chords[cc].skip.part = m16.part;
                     let chord = measure.chords[cc];
                     if (chord.skip.count < 0) {
                         if (mm > 0) {
@@ -1735,6 +1741,9 @@ class MidiParser {
             for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
                 let measure = sampleTrack.measures[mm];
                 for (let mp = 0; mp < measure.skips.length; mp++) {
+                    let m16 = MMUtil().set(measure.skips[mp]).strip(16);
+                    measure.skips[mp].count = m16.count;
+                    measure.skips[mp].part = m16.part;
                     let skip = measure.skips[mp];
                     if (skip.count < 0) {
                         if (mm > 0) {

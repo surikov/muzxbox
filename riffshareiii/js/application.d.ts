@@ -473,6 +473,7 @@ declare let icon_forward: string;
 declare let icon_block: string;
 declare let icon_equalizer: string;
 declare let icon_sliders: string;
+declare let icon_play_circle: string;
 declare class DebugLayerUI {
     debugRectangle: TileRectangle;
     debugAnchor: TileAnchor;
