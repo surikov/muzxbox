@@ -43,6 +43,7 @@ class FilterIcon {
 			let toFilter: Zvoog_FilterTarget | null = null;
 			let toSpeaker: boolean = false;
 			rec.activation = (x: number, y: number) => {
+				console.log('filter activation', x, y);
 				if (!dragAnchor.translation) {
 					dragAnchor.translation = { x: 0, y: 0 };
 				}
@@ -119,7 +120,7 @@ class FilterIcon {
 				}
 			}
 			//if (order) {
-				rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
+			rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
 			//} else {
 			//	rec.css = 'fanSamplerMoveIcon fanSamplerUpIcon' + zidx;
 			//}
@@ -164,13 +165,13 @@ class FilterIcon {
 		}
 		let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;
 		let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
-		let css ='fanConnectionBase fanConnection' + zidx;
+		let css = 'fanConnectionBase fanConnection' + zidx;
 		if (order) {
-			css =  'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
+			css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
 		}
 		let hoLine: TileLine = { x1: start, x2: xx, y1: filterFromY, y2: filterFromY, css: css };
 		spearsAnchor.content.push(hoLine);
-		new SpearConnection().addSpear(order>0, zidx,
+		new SpearConnection().addSpear(order > 0, zidx,
 			xx
 			, filterFromY
 			, sz

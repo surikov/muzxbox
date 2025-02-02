@@ -125,7 +125,7 @@ class SchedulePlayer implements MZXBX_Player {
 		//loopStart=8;
 		//currentPosition=2;
 		//loopEnd=16;
-		//console.log('startLoop', loopStart, currentPosition, loopEnd);
+		console.log('startLoop', loopStart, currentPosition, loopEnd);
 		//this.startSetupPlugins();
 		/*if (this.schedule) {
 			let pluginLoader: PluginLoader = new PluginLoader();
@@ -153,7 +153,7 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 	}*/
 	connectAllPlugins(): string | null {
-		//console.log('connectAllPlugins');
+		console.log('connectAllPlugins');
 		let msg: string | null = this.launchCollectedPlugins();
 		if (msg) {
 			return msg;
@@ -214,7 +214,7 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 	}
 	disconnectAllPlugins() {
-		//console.log('disconnectAllPlugins');
+		console.log('disconnectAllPlugins');
 		if (this.schedule) {
 			let master: AudioNode = this.audioContext.destination;
 			//let toNode: AudioNode = this.audioContext.destination;

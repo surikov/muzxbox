@@ -2050,8 +2050,8 @@ class MidiParser {
 		project.filters.push(filterEcho);
 		project.filters.push(filterCompression);
 
-		//console.log('midiSongData', midiSongData);
-		//console.log('project', project);
+		console.log('midiSongData', midiSongData.meters,midiSongData);
+		console.log('project', project);
 		this.trimProject(project);
 		return project;
 	}
@@ -2139,7 +2139,7 @@ class MidiParser {
 				}
 			}
 		}
-		console.log('reShiftSequencer -32/0/+32/other:', minus32, c0, plus32, cOther);
+		//console.log('reShiftSequencer -32/0/+32/other:', minus32, c0, plus32, cOther);
 		if (plus32 && c0 / plus32 < 0.5) {
 			this.shiftBackwar(32, project);
 		} else {
@@ -2174,7 +2174,7 @@ class MidiParser {
 				}
 			}
 		}
-		console.log('reShiftDrums -32/0/+32/other:', minus32, c0, plus32, cOther);
+		//console.log('reShiftDrums -32/0/+32/other:', minus32, c0, plus32, cOther);
 		if (plus32 && c0 / plus32 < 0.5) {
 			this.drumBackwar(32, project);
 		} else {
@@ -2254,7 +2254,7 @@ class MidiParser {
 		}
 	}
 	shiftForwar32(project: Zvoog_Project) {
-		console.log('shiftForwar32');
+		//console.log('shiftForwar32');
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let track = project.tracks[tt];
 			for (let mm = 0; mm < track.measures.length; mm++) {
@@ -2267,7 +2267,7 @@ class MidiParser {
 		}
 	}
 	drumForwar32(project: Zvoog_Project) {
-		console.log('drumForwar32');
+		//console.log('drumForwar32');
 		for (let ss = 0; ss < project.percussions.length; ss++) {
 			let sampleTrack = project.percussions[ss];
 			for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
@@ -2282,7 +2282,7 @@ class MidiParser {
 	}
 
 	shiftBackwar(part: number, project: Zvoog_Project) {
-		console.log('shiftBackwar', part);
+		//console.log('shiftBackwar', part);
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let track = project.tracks[tt];
 			for (let mm = 0; mm < track.measures.length; mm++) {
@@ -2295,7 +2295,7 @@ class MidiParser {
 		}
 	}
 	drumBackwar(part: number, project: Zvoog_Project) {
-		console.log('drumBackwar', part);
+		//console.log('drumBackwar', part);
 		for (let ss = 0; ss < project.percussions.length; ss++) {
 			let sampleTrack = project.percussions[ss];
 			for (let mm = 0; mm < sampleTrack.measures.length; mm++) {

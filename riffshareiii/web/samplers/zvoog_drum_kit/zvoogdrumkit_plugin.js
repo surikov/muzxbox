@@ -496,7 +496,7 @@ class ZvoogDrumKitImplementation {
         this.preset = null;
         this.audioContext = context;
         this.volume = this.audioContext.createGain();
-        this.volume.gain.setValueAtTime(0.7, 0);
+        this.volume.gain.setValueAtTime(0.99, 0);
         let split = parameters.split('/');
         let idx = 0;
         if (split.length == 2) {

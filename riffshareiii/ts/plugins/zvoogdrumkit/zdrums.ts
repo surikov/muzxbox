@@ -14,7 +14,7 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 		this.preset = null;
 		this.audioContext = context;
 		this.volume = this.audioContext.createGain();
-		this.volume.gain.setValueAtTime(0.7, 0);
+		this.volume.gain.setValueAtTime(0.99, 0);
 		//this.midinumber = parseInt(parameters);
 
 		//console.log('parameters',parameters);

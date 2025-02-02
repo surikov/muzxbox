@@ -232,6 +232,7 @@ class StateDiff {
     }
 }
 function startApplication() {
+    console.log('startApplication v1.6.02');
     let ui = new UIRenderer();
     ui.createUI();
     globalCommandDispatcher.registerWorkProject(_mzxbxProjectForTesting2);
@@ -3414,6 +3415,7 @@ class FilterIcon {
             let toFilter = null;
             let toSpeaker = false;
             rec.activation = (x, y) => {
+                console.log('filter activation', x, y);
                 if (!dragAnchor.translation) {
                     dragAnchor.translation = { x: 0, y: 0 };
                 }
