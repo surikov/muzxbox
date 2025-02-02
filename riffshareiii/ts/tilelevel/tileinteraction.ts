@@ -100,7 +100,7 @@ class TileInteraction {
     rakeTouchStart(touchEvent: TouchEvent) {
         console.log('rakeTouchStart', touchEvent);
         this.tiler.slidingLockTo = -1;
-        touchEvent.preventDefault();
+        //touchEvent.preventDefault();
         this.tiler.startedTouch = true;
         this.tiler.waitViewClickAction = false;
         if (touchEvent.touches.length < 2) {
@@ -185,7 +185,7 @@ class TileInteraction {
         }
     }
     rakeTouchEnd(touchEvent: TouchEvent) {
-        touchEvent.preventDefault();
+        //touchEvent.preventDefault();
         //this.currentDragItem = null;
         console.log('rakeTouchEnd',touchEvent);
         this.tiler.allTilesOK = false;
