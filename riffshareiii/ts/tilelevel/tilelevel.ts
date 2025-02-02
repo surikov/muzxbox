@@ -1,4 +1,4 @@
-console.log('tilelevel v2.20.004');
+console.log('tilelevel v2.20.005');
 function createTileLevel(): TileLevelBase {
 	return new TileLevelRealTime();
 }
@@ -721,12 +721,12 @@ class TileLevelRealTime implements TileLevelBase {
 						//console.log('dndMouseStart',dd);
 						me.currentDragItem = dd;
 					};
-					element.addEventListener('mousedown', dndMouseStart, { capture: false, passive: false });
+					element.addEventListener('mousedown', dndMouseStart, { capture: true, passive: true });
 					let dndTouchStart: (touchEvent: TouchEvent) => void = (touchEvent: TouchEvent) => {
 						console.log('dndTouchStart',dd);
 						me.currentDragItem = dd;
 					};
-					element.addEventListener('touchstart', dndTouchStart, { capture: true, passive: false });
+					element.addEventListener('touchstart', dndTouchStart, { capture: true, passive: true });
 					//}
 				} else {
 					element.onClickFunction = dd.activation;
