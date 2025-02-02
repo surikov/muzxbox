@@ -118,7 +118,7 @@ class TileInteraction {
     }
     rakeTouchMove(touchEvent: TouchEvent) {
         console.log('rakeTouchMove',touchEvent.touches[0].clientX,touchEvent.touches[0].clientY);
-        touchEvent.preventDefault();
+        //touchEvent.preventDefault();
         if (this.tiler.startedTouch) {
             if (touchEvent.touches.length < 2) {
                 if (this.tiler.twoZoom) {
