@@ -988,7 +988,7 @@ class TileInteraction {
                 else {
                     let dX = touchEvent.touches[0].clientX - this.tiler.startMouseScreenX;
                     let dY = touchEvent.touches[0].clientY - this.tiler.startMouseScreenY;
-                    console.log('rakeMouseMove', dX, dY, this.tiler.startMouseScreenX, this.tiler.startMouseScreenY);
+                    console.log('to', dX, dY, this.tiler.startMouseScreenX, this.tiler.startMouseScreenY);
                     if (this.tiler.currentDragItem) {
                         if (dX != 0 || dY != 0) {
                             let moveX = this.tiler.translateZ * dX / this.tiler.tapSize;

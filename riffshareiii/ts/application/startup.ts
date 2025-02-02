@@ -2,7 +2,7 @@
 declare function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player;
 declare function createTileLevel(): TileLevelBase;
 function startApplication() {
-    console.log('startApplication v1.6.06');
+    console.log('startApplication v1.6.07');
     //let commands = new CommandDispatcher();
     let ui = new UIRenderer();
     ui.createUI();
