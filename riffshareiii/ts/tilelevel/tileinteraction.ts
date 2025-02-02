@@ -98,7 +98,7 @@ class TileInteraction {
         }
     }
     rakeTouchStart(touchEvent: TouchEvent) {
-        console.log('rakeTouchStart', touchEvent.touches);
+        console.log('rakeTouchStart', touchEvent);
         this.tiler.slidingLockTo = -1;
         touchEvent.preventDefault();
         this.tiler.startedTouch = true;

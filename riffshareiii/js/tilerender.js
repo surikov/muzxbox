@@ -650,11 +650,16 @@ class TileLevelRealTime {
             if (dd.activation) {
                 let me = this;
                 if (dd.draggable) {
-                    let dndstart = (mouseEvent) => {
+                    let dndMouseStart = (mouseEvent) => {
+                        console.log('dndMouseStart', dd);
                         me.currentDragItem = dd;
                     };
-                    element.addEventListener('mousedown', dndstart, { capture: false, passive: false });
-                    element.addEventListener('touchstart', dndstart, { capture: false, passive: false });
+                    element.addEventListener('mousedown', dndMouseStart, { capture: false, passive: false });
+                    let dndTouchStart = (touchEvent) => {
+                        console.log('dndTouchStart', dd);
+                        me.currentDragItem = dd;
+                    };
+                    element.addEventListener('touchstart', dndTouchStart, { capture: false, passive: false });
                 }
                 else {
                     element.onClickFunction = dd.activation;
@@ -956,7 +961,7 @@ class TileInteraction {
         }
     }
     rakeTouchStart(touchEvent) {
-        console.log('rakeTouchStart', touchEvent.touches);
+        console.log('rakeTouchStart', touchEvent);
         this.tiler.slidingLockTo = -1;
         touchEvent.preventDefault();
         this.tiler.startedTouch = true;
