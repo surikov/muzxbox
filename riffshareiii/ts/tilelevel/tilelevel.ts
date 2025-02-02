@@ -1,4 +1,4 @@
-console.log('tilelevel v2.20.003');
+console.log('tilelevel v2.20.004');
 function createTileLevel(): TileLevelBase {
 	return new TileLevelRealTime();
 }

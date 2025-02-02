@@ -1,5 +1,5 @@
 "use strict";
-console.log('tilelevel v2.20.003');
+console.log('tilelevel v2.20.004');
 function createTileLevel() {
     return new TileLevelRealTime();
 }
@@ -963,7 +963,6 @@ class TileInteraction {
     rakeTouchStart(touchEvent) {
         console.log('rakeTouchStart', touchEvent);
         this.tiler.slidingLockTo = -1;
-        touchEvent.preventDefault();
         this.tiler.startedTouch = true;
         this.tiler.waitViewClickAction = false;
         if (touchEvent.touches.length < 2) {
@@ -982,7 +981,6 @@ class TileInteraction {
     }
     rakeTouchMove(touchEvent) {
         console.log('rakeTouchMove', touchEvent.touches[0].clientX, touchEvent.touches[0].clientY);
-        touchEvent.preventDefault();
         if (this.tiler.startedTouch) {
             if (touchEvent.touches.length < 2) {
                 if (this.tiler.twoZoom) {
@@ -1049,7 +1047,6 @@ class TileInteraction {
         }
     }
     rakeTouchEnd(touchEvent) {
-        touchEvent.preventDefault();
         console.log('rakeTouchEnd', touchEvent);
         this.tiler.allTilesOK = false;
         if (!this.tiler.twoZoom) {
