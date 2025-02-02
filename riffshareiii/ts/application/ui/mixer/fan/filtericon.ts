@@ -43,7 +43,7 @@ class FilterIcon {
 			let toFilter: Zvoog_FilterTarget | null = null;
 			let toSpeaker: boolean = false;
 			rec.activation = (x: number, y: number) => {
-				console.log('filter activation', x, y);
+				//https://stackoverflow.com/questions/56653453/why-touchmove-event-is-not-fired-after-dom-changes
 				if (!dragAnchor.translation) {
 					dragAnchor.translation = { x: 0, y: 0 };
 				}
@@ -77,6 +77,15 @@ class FilterIcon {
 					toFilter = null;
 					dragAnchor.translation.x = dragAnchor.translation.x + x;
 					dragAnchor.translation.y = dragAnchor.translation.y + y;
+					if (dragAnchor.id) {
+						let elem = document.getElementById(dragAnchor.id);
+						
+						if (elem) {
+							let translate = 'translate(' + dragAnchor.translation.x + ',' + dragAnchor.translation.y + ')';
+							elem.setAttribute('transform', translate);
+							console.log('translate', translate);
+						}
+					}
 					if (filterTarget.iconPosition) {
 						let xx = filterTarget.iconPosition.x + dragAnchor.translation.x;
 						let yy = filterTarget.iconPosition.y + dragAnchor.translation.y;
@@ -114,9 +123,11 @@ class FilterIcon {
 							}
 						}
 					}
+					/*
 					globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
 						, fanLevelAnchor
 						, LevelModes.normal);
+						*/
 				}
 			}
 			//if (order) {

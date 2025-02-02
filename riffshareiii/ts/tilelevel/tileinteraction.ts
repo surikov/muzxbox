@@ -100,7 +100,7 @@ class TileInteraction {
     rakeTouchStart(touchEvent: TouchEvent) {
         console.log('rakeTouchStart', touchEvent);
         this.tiler.slidingLockTo = -1;
-        //touchEvent.preventDefault();
+        touchEvent.preventDefault();
         this.tiler.startedTouch = true;
         this.tiler.waitViewClickAction = false;
         if (touchEvent.touches.length < 2) {
@@ -118,7 +118,7 @@ class TileInteraction {
     }
     rakeTouchMove(touchEvent: TouchEvent) {
         console.log('rakeTouchMove',touchEvent.touches[0].clientX,touchEvent.touches[0].clientY);
-        //touchEvent.preventDefault();
+        touchEvent.preventDefault();
         if (this.tiler.startedTouch) {
             if (touchEvent.touches.length < 2) {
                 if (this.tiler.twoZoom) {
@@ -126,7 +126,7 @@ class TileInteraction {
                 } else {
                     let dX: number = touchEvent.touches[0].clientX - this.tiler.startMouseScreenX;
                     let dY: number = touchEvent.touches[0].clientY - this.tiler.startMouseScreenY;
-                    console.log('to', dX, dY, this.tiler.startMouseScreenX, this.tiler.startMouseScreenY);
+                    //console.log('to', dX, dY, this.tiler.startMouseScreenX, this.tiler.startMouseScreenY);
                     if (this.tiler.currentDragItem) {
                         if (dX != 0 || dY != 0) {
                             //console.log('rakeMouseMove', dX, dY, this.startMouseScreenX, this.startMouseScreenY);
@@ -185,7 +185,7 @@ class TileInteraction {
         }
     }
     rakeTouchEnd(touchEvent: TouchEvent) {
-        //touchEvent.preventDefault();
+        touchEvent.preventDefault();
         //this.currentDragItem = null;
         console.log('rakeTouchEnd',touchEvent);
         this.tiler.allTilesOK = false;

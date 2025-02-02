@@ -154,9 +154,9 @@ class TileLevelRealTime implements TileLevelBase {
 		this.mn = minZoom;
 		this.translateZ = curZoom;
 		this.svg.addEventListener("wheel", this.interactor.rakeMouseWheel.bind(this.interactor), { capture: false, passive: false });
-		this.svg.addEventListener("touchstart", this.interactor.rakeTouchStart.bind(this.interactor), { capture: false, passive: false });
-		this.svg.addEventListener("touchmove", this.interactor.rakeTouchMove.bind(this.interactor), { capture: false, passive: false });
-		this.svg.addEventListener("touchend", this.interactor.rakeTouchEnd.bind(this.interactor), { capture: false, passive: false });
+		this.svg.addEventListener("touchstart", this.interactor.rakeTouchStart.bind(this.interactor), { capture: true, passive: false });
+		this.svg.addEventListener("touchmove", this.interactor.rakeTouchMove.bind(this.interactor), { capture: true, passive: false });
+		this.svg.addEventListener("touchend", this.interactor.rakeTouchEnd.bind(this.interactor), { capture: true, passive: false });
 		this.svg.addEventListener('mousedown', this.interactor.rakeMouseDown.bind(this.interactor), { capture: false, passive: false });
 		this.svg.addEventListener('mousemove', this.interactor.rakeMouseMove.bind(this.interactor), { capture: false, passive: false });
 		this.svg.addEventListener('mouseup', this.interactor.rakeMouseUp.bind(this.interactor), { capture: false, passive: false });
@@ -721,12 +721,12 @@ class TileLevelRealTime implements TileLevelBase {
 						//console.log('dndMouseStart',dd);
 						me.currentDragItem = dd;
 					};
-					element.addEventListener('mousedown', dndMouseStart, { capture: true, passive: true });
+					element.addEventListener('mousedown', dndMouseStart, { capture: true, passive: false });
 					let dndTouchStart: (touchEvent: TouchEvent) => void = (touchEvent: TouchEvent) => {
 						console.log('dndTouchStart',dd);
 						me.currentDragItem = dd;
 					};
-					element.addEventListener('touchstart', dndTouchStart, { capture: true, passive: true });
+					element.addEventListener('touchstart', dndTouchStart, { capture: true, passive: false });
 					//}
 				} else {
 					element.onClickFunction = dd.activation;

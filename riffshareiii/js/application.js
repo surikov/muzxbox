@@ -3415,7 +3415,6 @@ class FilterIcon {
             let toFilter = null;
             let toSpeaker = false;
             rec.activation = (x, y) => {
-                console.log('filter activation', x, y);
                 if (!dragAnchor.translation) {
                     dragAnchor.translation = { x: 0, y: 0 };
                 }
@@ -3452,6 +3451,14 @@ class FilterIcon {
                     toFilter = null;
                     dragAnchor.translation.x = dragAnchor.translation.x + x;
                     dragAnchor.translation.y = dragAnchor.translation.y + y;
+                    if (dragAnchor.id) {
+                        let elem = document.getElementById(dragAnchor.id);
+                        if (elem) {
+                            let translate = 'translate(' + dragAnchor.translation.x + ',' + dragAnchor.translation.y + ')';
+                            elem.setAttribute('transform', translate);
+                            console.log('translate', translate);
+                        }
+                    }
                     if (filterTarget.iconPosition) {
                         let xx = filterTarget.iconPosition.x + dragAnchor.translation.x;
                         let yy = filterTarget.iconPosition.y + dragAnchor.translation.y;
@@ -3490,7 +3497,6 @@ class FilterIcon {
                             }
                         }
                     }
-                    globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
                 }
             };
             rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
