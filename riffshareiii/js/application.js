@@ -232,7 +232,7 @@ class StateDiff {
     }
 }
 function startApplication() {
-    console.log('startApplication v1.6.10');
+    console.log('startApplication v1.6.11');
     let ui = new UIRenderer();
     ui.createUI();
     globalCommandDispatcher.registerWorkProject(_mzxbxProjectForTesting2);
