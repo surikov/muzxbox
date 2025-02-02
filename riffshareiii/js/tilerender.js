@@ -1,5 +1,5 @@
 "use strict";
-console.log('tilelevel v2.20.002');
+console.log('tilelevel v2.20.003');
 function createTileLevel() {
     return new TileLevelRealTime();
 }
@@ -659,7 +659,7 @@ class TileLevelRealTime {
                         console.log('dndTouchStart', dd);
                         me.currentDragItem = dd;
                     };
-                    element.addEventListener('touchstart', dndTouchStart, { capture: false, passive: false });
+                    element.addEventListener('touchstart', dndTouchStart, { capture: true, passive: false });
                 }
                 else {
                     element.onClickFunction = dd.activation;
