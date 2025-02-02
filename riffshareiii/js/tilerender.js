@@ -1,4 +1,5 @@
 "use strict";
+console.log('tilelevel v2.20.002');
 function createTileLevel() {
     return new TileLevelRealTime();
 }
@@ -123,9 +124,9 @@ class TileLevelRealTime {
         this.mn = minZoom;
         this.translateZ = curZoom;
         this.svg.addEventListener("wheel", this.interactor.rakeMouseWheel.bind(this.interactor), { capture: false, passive: false });
-        this.svg.addEventListener("touchstart", this.interactor.rakeTouchStart.bind(this.interactor), { capture: true, passive: false });
-        this.svg.addEventListener("touchmove", this.interactor.rakeTouchMove.bind(this.interactor), { capture: true, passive: false });
-        this.svg.addEventListener("touchend", this.interactor.rakeTouchEnd.bind(this.interactor), { capture: true, passive: false });
+        this.svg.addEventListener("touchstart", this.interactor.rakeTouchStart.bind(this.interactor), { capture: false, passive: false });
+        this.svg.addEventListener("touchmove", this.interactor.rakeTouchMove.bind(this.interactor), { capture: false, passive: false });
+        this.svg.addEventListener("touchend", this.interactor.rakeTouchEnd.bind(this.interactor), { capture: false, passive: false });
         this.svg.addEventListener('mousedown', this.interactor.rakeMouseDown.bind(this.interactor), { capture: false, passive: false });
         this.svg.addEventListener('mousemove', this.interactor.rakeMouseMove.bind(this.interactor), { capture: false, passive: false });
         this.svg.addEventListener('mouseup', this.interactor.rakeMouseUp.bind(this.interactor), { capture: false, passive: false });
@@ -655,6 +656,7 @@ class TileLevelRealTime {
                     };
                     element.addEventListener('mousedown', dndMouseStart, { capture: false, passive: false });
                     let dndTouchStart = (touchEvent) => {
+                        console.log('dndTouchStart', dd);
                         me.currentDragItem = dd;
                     };
                     element.addEventListener('touchstart', dndTouchStart, { capture: false, passive: false });
