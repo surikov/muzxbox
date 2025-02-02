@@ -718,12 +718,12 @@ class TileLevelRealTime implements TileLevelBase {
 				let me: TileLevelRealTime = this;
 				if (dd.draggable) {
 					let dndMouseStart: (mouseEvent: MouseEvent) => void = (mouseEvent: MouseEvent) => {
-						console.log('dndMouseStart',dd);
+						//console.log('dndMouseStart',dd);
 						me.currentDragItem = dd;
 					};
 					element.addEventListener('mousedown', dndMouseStart, { capture: false, passive: false });
 					let dndTouchStart: (touchEvent: TouchEvent) => void = (touchEvent: TouchEvent) => {
-						console.log('dndTouchStart',dd);
+						//console.log('dndTouchStart',dd);
 						me.currentDragItem = dd;
 					};
 					element.addEventListener('touchstart', dndTouchStart, { capture: false, passive: false });

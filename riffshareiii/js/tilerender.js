@@ -651,12 +651,10 @@ class TileLevelRealTime {
                 let me = this;
                 if (dd.draggable) {
                     let dndMouseStart = (mouseEvent) => {
-                        console.log('dndMouseStart', dd);
                         me.currentDragItem = dd;
                     };
                     element.addEventListener('mousedown', dndMouseStart, { capture: false, passive: false });
                     let dndTouchStart = (touchEvent) => {
-                        console.log('dndTouchStart', dd);
                         me.currentDragItem = dd;
                     };
                     element.addEventListener('touchstart', dndTouchStart, { capture: false, passive: false });
@@ -981,7 +979,7 @@ class TileInteraction {
         }
     }
     rakeTouchMove(touchEvent) {
-        console.log('rakeTouchMove', touchEvent);
+        console.log('rakeTouchMove', touchEvent.touches[0].clientX, touchEvent.touches[0].clientY);
         touchEvent.preventDefault();
         if (this.tiler.startedTouch) {
             if (touchEvent.touches.length < 2) {
@@ -990,6 +988,7 @@ class TileInteraction {
                 else {
                     let dX = touchEvent.touches[0].clientX - this.tiler.startMouseScreenX;
                     let dY = touchEvent.touches[0].clientY - this.tiler.startMouseScreenY;
+                    console.log('rakeMouseMove', dX, dY, this.tiler.startMouseScreenX, this.tiler.startMouseScreenY);
                     if (this.tiler.currentDragItem) {
                         if (dX != 0 || dY != 0) {
                             let moveX = this.tiler.translateZ * dX / this.tiler.tapSize;
