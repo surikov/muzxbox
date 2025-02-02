@@ -956,6 +956,7 @@ class TileInteraction {
         }
     }
     rakeTouchStart(touchEvent) {
+        console.log('rakeTouchStart', touchEvent.touches);
         this.tiler.slidingLockTo = -1;
         touchEvent.preventDefault();
         this.tiler.startedTouch = true;
@@ -975,6 +976,7 @@ class TileInteraction {
         }
     }
     rakeTouchMove(touchEvent) {
+        console.log('rakeTouchMove', touchEvent);
         touchEvent.preventDefault();
         if (this.tiler.startedTouch) {
             if (touchEvent.touches.length < 2) {
@@ -1042,6 +1044,7 @@ class TileInteraction {
     }
     rakeTouchEnd(touchEvent) {
         touchEvent.preventDefault();
+        console.log('rakeTouchEnd', touchEvent);
         this.tiler.allTilesOK = false;
         if (!this.tiler.twoZoom) {
             if (touchEvent.touches.length < 2) {
