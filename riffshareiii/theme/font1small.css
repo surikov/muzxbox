@@ -1,6 +1,10 @@
 :root {
-    --font-ratio: 1;
+    --font-ratio: 1.0;
 }
 html {
-    font-family: 'MontserratAlternates-Regular';
+    font-family2: 'MontserratAlternates-Regular';
+	font-family3: 'Brahms';
+	font-family: 'MontserratAlternates';
+	
+	
 }

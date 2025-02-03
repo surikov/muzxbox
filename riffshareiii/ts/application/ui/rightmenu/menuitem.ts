@@ -1,11 +1,5 @@
 class RightMenuItem {
-	//anchor: TileAnchor;
-	//label: TileText;
-	//bg: TileRectangle;
-	//subline:TileRectangle;
 
-	//label: string = '';
-	//isbig: boolean = false;
 	kindAction: 1 = 1;
 	kindDraggable: 2 = 2;
 	kindPreview: 3 = 3;
@@ -13,13 +7,10 @@ class RightMenuItem {
 	kindOpenedFolder: 5 = 5;
 	kindAction2: 6 = 6;
 	kindActionDisabled: 7 = 7;
-	//kindActionDisabled2: 8 = 8;
 	kind: 1 | 2 | 3 | 4 | 5 | 6 | 7 = this.kindAction;
 	action?: { (): void };
 	action2?: { (): void };
 	pad: number = 0;
-	//focused: boolean = false;
-	//scroll:number=0;
 	top: number;
 	info: MenuInfo;
 
@@ -38,59 +29,30 @@ class RightMenuItem {
 		this.kind = this.kindActionDisabled;
 		return this;
 	}
-	/*initDisabledItem2(): RightMenuItem {
-		this.kind = this.kindActionDisabled2;
-		return this;
-	}*/
-	initActionItem(/*pad: number, focused: boolean, label: string, tap: () => void*/): RightMenuItem {
-		//this.pad = pad;
-		//this.focused = focused;
+	initActionItem(): RightMenuItem {
 		this.kind = this.kindAction;
-		//this.label = label;
-		//this.action = tap;
 		return this;
 	}
-	initActionItem2(): RightMenuItem {//pad: number, focused: boolean, label: string, tap: () => void, tap2: () => void) {
-		//this.pad = pad;
-		//this.focused = focused;
+	initActionItem2(): RightMenuItem {
 		this.kind = this.kindAction2;
-		//this.label = label;
-		//this.action = tap;
-		//this.action2 = tap2;
 		return this;
 	}
-	initDraggableItem(/*pad: number, focused: boolean, tap: () => void*/): RightMenuItem {
+	initDraggableItem(): RightMenuItem {
 		this.kind = this.kindDraggable;
-		//this.focused = focused;
-		//this.pad = pad;
-		//this.action = tap;
 		return this;
 	}
-	initOpenedFolderItem(/*pad: number, focused: boolean, label: string, tap: () => void*/): RightMenuItem {
-		//this.pad = pad;
-		//this.label = label;
-		//this.focused = focused;
+	initOpenedFolderItem(): RightMenuItem {
 		this.kind = this.kindOpenedFolder;
-		//this.action = tap;
 		return this;
 	}
-	initClosedFolderItem(/*pad: number, focused: boolean, label: string, tap: () => void*/): RightMenuItem {
-		//this.pad = pad;
-		//this.label = label;
-		//this.focused = focused;
+	initClosedFolderItem(): RightMenuItem {
 		this.kind = this.kindClosedFolder;
-		//this.action = tap;
 		return this;
 	}
-	initPreviewItem(/*pad: number, focused: boolean, tap: () => void*/): RightMenuItem {
-		//this.focused = focused;
-		//this.pad = pad;
+	initPreviewItem(): RightMenuItem {
 		this.kind = this.kindPreview;
-		//this.action = tap;
 		return this;
 	}
-
-
 	calculateHeight(): number {
 		if (this.kind == this.kindPreview) {
 			return 2;
@@ -126,27 +88,9 @@ class RightMenuItem {
 			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
 			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
 		}
-		/*if (this.kind == this.kindActionDisabled2) {
-			//anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
-			//anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
-			let stateIicon = '?';
-			let sel = this.info.selectedState ? this.info.selectedState : 0;
-			//console.log(this.info.text,sel,this.info.selectedState);
-			if (this.info.itemStates) {
-				if (this.info.itemStates.length > sel) {
-					stateIicon = this.info.itemStates[sel];
-				}
-			}
-			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
-			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
-			anchor.content.push({ x: itemWidth - 1.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-			anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
-			spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
-		}*/
 		if (this.kind == this.kindAction2) {
 			let stateIicon = '?';
 			let sel = this.info.selectedState ? this.info.selectedState : 0;
-			//console.log(this.info.text,sel,this.info.selectedState);
 			if (this.info.itemStates) {
 				if (this.info.itemStates.length > sel) {
 					stateIicon = this.info.itemStates[sel];

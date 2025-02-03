@@ -77,7 +77,7 @@ class FilterIcon {
 					toFilter = null;
 					dragAnchor.translation.x = dragAnchor.translation.x + x;
 					dragAnchor.translation.y = dragAnchor.translation.y + y;
-					if (dragAnchor.id) {
+					/*if (dragAnchor.id) {
 						let elem = document.getElementById(dragAnchor.id);
 
 						if (elem) {
@@ -85,7 +85,7 @@ class FilterIcon {
 							elem.setAttribute('transform', translate);
 							//console.log('translate', translate);
 						}
-					}
+					}*/
 					if (filterTarget.iconPosition) {
 						let xx = filterTarget.iconPosition.x + dragAnchor.translation.x;
 						let yy = filterTarget.iconPosition.y + dragAnchor.translation.y;

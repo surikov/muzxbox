@@ -66,6 +66,7 @@ class RightMenuPanel {
 			this.scrollY = 0;
 			this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
 		});
+
 		this.layerCurrentTitle = { x: 2.5, y: 0, text: LO(localMenuTracksFolder), css: 'currentTitleLabel' };
 
 
@@ -176,13 +177,18 @@ class RightMenuPanel {
 			}
 			if (children) {
 				if (opened) {
-					this.items.push(new RightMenuItem(it, pad).initOpenedFolderItem());
+					let so: RightMenuItem = new RightMenuItem(it, pad, () => {
+						me.setOpenState(false, it, infos);
+						me.rerenderMenuContent(so);
+
+					}).initOpenedFolderItem();
+					this.items.push(so);
 					this.fillMenuItemChildren(pad + 0.5, children);
 				} else {
 					let si: RightMenuItem = new RightMenuItem(it, pad, () => {
 						//console.log('test', it.text, it.onOpen);
-						if (it.onOpen) {
-							it.onOpen();
+						if (it.onFolderOpen) {
+							it.onFolderOpen();
 						}
 						me.setOpenState(true, it, infos);
 						me.rerenderMenuContent(si);

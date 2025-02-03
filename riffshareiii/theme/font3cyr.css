@@ -1,10 +1,14 @@
 :root {
-    --font-ratio: 1.1;
+    --font-ratio: 1.0;
 }
 @font-face {
-    font-family: 'font3';
-    src: url(TriodPostnaja.ttf);
+    font-family2: 'font3';
+    src2: url(TriodPostnaja.ttf);
+	src3: url(ofont.ru_Izvod.ttf);
+	font-family: 'MontserratAlternates';
+	
 }
 html {
-    font-family: 'font3';
+    font-family22: 'font3';
+	font-family: 'MontserratAlternates';
 }

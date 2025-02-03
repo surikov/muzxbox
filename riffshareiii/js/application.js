@@ -822,6 +822,9 @@ class CommandDispatcher {
     }
     resetProject() {
         try {
+            if (this.cfg().data.tracks)
+                if (this.cfg().data.tracks[0])
+                    this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
             this.renderer.fillWholeUI();
         }
         catch (xx) {
@@ -1544,13 +1547,17 @@ class RightMenuPanel {
             }
             if (children) {
                 if (opened) {
-                    this.items.push(new RightMenuItem(it, pad).initOpenedFolderItem());
+                    let so = new RightMenuItem(it, pad, () => {
+                        me.setOpenState(false, it, infos);
+                        me.rerenderMenuContent(so);
+                    }).initOpenedFolderItem();
+                    this.items.push(so);
                     this.fillMenuItemChildren(pad + 0.5, children);
                 }
                 else {
                     let si = new RightMenuItem(it, pad, () => {
-                        if (it.onOpen) {
-                            it.onOpen();
+                        if (it.onFolderOpen) {
+                            it.onFolderOpen();
                         }
                         me.setOpenState(true, it, infos);
                         me.rerenderMenuContent(si);
@@ -1970,27 +1977,27 @@ class RightMenuItem {
 let menuItemsData = null;
 let menuPointActions = {
     text: 'localMenuActionsFolder',
-    onOpen: () => {
+    onFolderOpen: () => {
     }
 };
 let menuPointPerformers = {
     text: 'localMenuPerformersFolder',
-    onOpen: () => {
+    onFolderOpen: () => {
     }
 };
 let menuPointFilters = {
     text: 'localMenuFiltersFolder',
-    onOpen: () => {
+    onFolderOpen: () => {
     }
 };
 let menuPointSamplers = {
     text: 'localMenuSamplersFolder',
-    onOpen: () => {
+    onFolderOpen: () => {
     }
 };
 let menuPointTracks = {
     text: localMenuTracksFolder,
-    onOpen: () => {
+    onFolderOpen: () => {
     }
 };
 function fillPluginsLists() {
@@ -3451,13 +3458,6 @@ class FilterIcon {
                     toFilter = null;
                     dragAnchor.translation.x = dragAnchor.translation.x + x;
                     dragAnchor.translation.y = dragAnchor.translation.y + y;
-                    if (dragAnchor.id) {
-                        let elem = document.getElementById(dragAnchor.id);
-                        if (elem) {
-                            let translate = 'translate(' + dragAnchor.translation.x + ',' + dragAnchor.translation.y + ')';
-                            elem.setAttribute('transform', translate);
-                        }
-                    }
                     if (filterTarget.iconPosition) {
                         let xx = filterTarget.iconPosition.x + dragAnchor.translation.x;
                         let yy = filterTarget.iconPosition.y + dragAnchor.translation.y;

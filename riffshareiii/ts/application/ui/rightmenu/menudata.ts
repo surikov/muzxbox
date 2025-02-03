@@ -9,7 +9,7 @@ type MenuInfo = {
 	sid?: string;
 	onClick?: () => void;
 	onSubClick?: () => void;
-	onOpen?: () => void;
+	onFolderOpen?: () => void;
 	itemStates?: string[];
 	selectedState?: number;
 	dragMix?: boolean;
@@ -34,25 +34,25 @@ let menuItemsData: MenuInfo[] | null = null;
 
 let menuPointActions: MenuInfo = {
 	text: 'localMenuActionsFolder'
-	, onOpen: () => {
+	, onFolderOpen: () => {
 		//console.log('actions');
 	}
 };
 let menuPointPerformers: MenuInfo = {
 	text: 'localMenuPerformersFolder'
-	, onOpen: () => {
+	, onFolderOpen: () => {
 		//console.log('performers');
 	}
 };
 let menuPointFilters: MenuInfo = {
 	text: 'localMenuFiltersFolder'
-	, onOpen: () => {
+	, onFolderOpen: () => {
 		//console.log('filters');
 	}
 };
 let menuPointSamplers: MenuInfo = {
 	text: 'localMenuSamplersFolder'
-	, onOpen: () => {
+	, onFolderOpen: () => {
 		//console.log('samplers');
 	}
 };
@@ -69,7 +69,7 @@ let menuPointUndo: MenuInfo = {
 
 let menuPointTracks: MenuInfo = {
 	text: localMenuTracksFolder
-	, onOpen: () => {
+	, onFolderOpen: () => {
 		//globalCommandDispatcher.upTracksLayer();
 	}
 };

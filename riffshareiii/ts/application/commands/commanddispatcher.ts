@@ -374,6 +374,11 @@ class CommandDispatcher {
 	}
 	resetProject() {
 		try {
+
+			if (this.cfg().data.tracks)
+				if (this.cfg().data.tracks[0])
+					this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
+
 			this.renderer.fillWholeUI();
 		} catch (xx) {
 			console.log('resetProject', xx);

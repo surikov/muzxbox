@@ -273,7 +273,7 @@ declare type MenuInfo = {
     sid?: string;
     onClick?: () => void;
     onSubClick?: () => void;
-    onOpen?: () => void;
+    onFolderOpen?: () => void;
     itemStates?: string[];
     selectedState?: number;
     dragMix?: boolean;
