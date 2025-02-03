@@ -656,10 +656,11 @@ class TileLevelRealTime {
                     };
                     element.addEventListener('mousedown', dndMouseStart, { capture: true, passive: false });
                     let dndTouchStart = (touchEvent) => {
-                        console.log('dndTouchStart', dd);
                         me.currentDragItem = dd;
                     };
                     element.addEventListener('touchstart', dndTouchStart, { capture: true, passive: false });
+                    element.addEventListener('touchmove', this.interactor.rakeTouchMove.bind(this.interactor), { capture: true, passive: false });
+                    element.addEventListener('touchend', this.interactor.rakeTouchEnd.bind(this.interactor), { capture: true, passive: false });
                 }
                 else {
                     element.onClickFunction = dd.activation;
@@ -961,7 +962,6 @@ class TileInteraction {
         }
     }
     rakeTouchStart(touchEvent) {
-        console.log('rakeTouchStart', touchEvent);
         this.tiler.slidingLockTo = -1;
         touchEvent.preventDefault();
         this.tiler.startedTouch = true;
@@ -981,7 +981,6 @@ class TileInteraction {
         }
     }
     rakeTouchMove(touchEvent) {
-        console.log('rakeTouchMove', touchEvent.touches[0].clientX, touchEvent.touches[0].clientY);
         touchEvent.preventDefault();
         if (this.tiler.startedTouch) {
             if (touchEvent.touches.length < 2) {
@@ -1049,7 +1048,6 @@ class TileInteraction {
     }
     rakeTouchEnd(touchEvent) {
         touchEvent.preventDefault();
-        console.log('rakeTouchEnd', touchEvent);
         this.tiler.allTilesOK = false;
         if (!this.tiler.twoZoom) {
             if (touchEvent.touches.length < 2) {

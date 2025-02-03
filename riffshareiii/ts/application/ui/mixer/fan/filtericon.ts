@@ -79,11 +79,11 @@ class FilterIcon {
 					dragAnchor.translation.y = dragAnchor.translation.y + y;
 					if (dragAnchor.id) {
 						let elem = document.getElementById(dragAnchor.id);
-						
+
 						if (elem) {
 							let translate = 'translate(' + dragAnchor.translation.x + ',' + dragAnchor.translation.y + ')';
 							elem.setAttribute('transform', translate);
-							console.log('translate', translate);
+							//console.log('translate', translate);
 						}
 					}
 					if (filterTarget.iconPosition) {
@@ -123,11 +123,11 @@ class FilterIcon {
 							}
 						}
 					}
-					/*
+
 					globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
 						, fanLevelAnchor
 						, LevelModes.normal);
-						*/
+
 				}
 			}
 			//if (order) {

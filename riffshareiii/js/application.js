@@ -3456,7 +3456,6 @@ class FilterIcon {
                         if (elem) {
                             let translate = 'translate(' + dragAnchor.translation.x + ',' + dragAnchor.translation.y + ')';
                             elem.setAttribute('transform', translate);
-                            console.log('translate', translate);
                         }
                     }
                     if (filterTarget.iconPosition) {
@@ -3497,6 +3496,7 @@ class FilterIcon {
                             }
                         }
                     }
+                    globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
                 }
             };
             rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
