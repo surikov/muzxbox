@@ -160,7 +160,7 @@ class OctaveContent {
 							y1 = y2;
 						}
 						if (interact) {
-							if (zoomLevel < 3) {
+							if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
 								let inetrDot: TileRectangle = {
 									x: xStart + globalCommandDispatcher.cfg().notePathHeight / 4
 									, y: yStart - globalCommandDispatcher.cfg().notePathHeight * 3 / 4

@@ -170,7 +170,7 @@ class FilterIcon {
 			};
 			dragAnchor.content.push(btn);
 		}
-		if (zidx < 3) {
+		if (zidx < globalCommandDispatcher.cfg().zoomEditSLess) {
 			let txt: TileText = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy, css: 'fanIconLabel' };
 			dragAnchor.content.push(txt);
 		}

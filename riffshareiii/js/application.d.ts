@@ -313,8 +313,20 @@ declare class MixerBar {
     findDurationOfSample(samplerId: string): number;
     addOctaveGridSteps(barIdx: number, barLeft: number, width: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
 }
-declare class TextComments {
+declare class TextCommentsBar {
     constructor(barIdx: number, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number);
+    testBars(): void;
+    cellClick(x: number, y: number, zz: number, idx: number): void;
+    getFirstCommentText(commentBar: Zvoog_CommentMeasure, row: number, info: {
+        start: Zvoog_MetreMathType;
+        length: Zvoog_MetreMathType;
+        end: Zvoog_MetreMathType;
+    }): string;
+    dropBarComments(commentBar: Zvoog_CommentMeasure, row: number, info: {
+        start: Zvoog_MetreMathType;
+        length: Zvoog_MetreMathType;
+        end: Zvoog_MetreMathType;
+    }): void;
 }
 declare class AutomationBarContent {
     constructor(barIdx: number, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number);
@@ -334,7 +346,6 @@ declare class MixerUI {
     reFillMixerUI(): void;
     createMixerLayers(): TileLayerDefinition[];
     reFillSingleRatio(yy: number, hh: number, countFunction: (barIdx: number) => number): void;
-    __reFillWholeRatio(): void;
     barTrackCount(bb: number): number;
     barDrumCount(bb: number): number;
     barAutoCount(bb: number): number;
@@ -527,6 +538,7 @@ declare class MixerDataMathUtility {
     speakerIconSize: number;
     speakerIconPad: number;
     padGridFan: number;
+    zoomEditSLess: number;
     constructor(data: Zvoog_Project);
     recalculateCommantMax(): void;
     extractDifference(from: Zvoog_Project): Object;
@@ -544,6 +556,7 @@ declare class MixerDataMathUtility {
     workHeight(): number;
     automationHeight(): number;
     commentsZoomHeight(zIndex: number): number;
+    commentsZoomLineY(zIndex: number, lineNo: number): number;
     commentsAverageFillHeight(): number;
     automationTop(): number;
     commentsTop(): number;
@@ -555,6 +568,11 @@ declare class MixerDataMathUtility {
     samplerTop(): number;
     findFilterTarget(filterId: string): Zvoog_FilterTarget | null;
     textZoomRatio(zIndex: number): number;
+    gridClickInfo(barIdx: number, barX: number, zoomIdx: number): {
+        start: Zvoog_MetreMathType;
+        length: Zvoog_MetreMathType;
+        end: Zvoog_MetreMathType;
+    };
 }
 declare let biChar32: String[];
 declare type PackedChannel = {

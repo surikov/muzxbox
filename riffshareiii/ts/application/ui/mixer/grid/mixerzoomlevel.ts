@@ -103,7 +103,7 @@ class MixerZoomLevel {
 					};
 					barOctaveAnchor.content.push(octaveBottomBorder);
 				}
-				if (this.zoomLevelIndex < 3) {
+				if (this.zoomLevelIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
 					for (let kk = 1; kk < 12; kk++) {
 						//let yy = globalCommandDispatcher.cfg().gridTop() + (oo * 12 + kk) * globalCommandDispatcher.cfg().notePathHeight;
 						/*let need = false;
@@ -159,13 +159,13 @@ class MixerZoomLevel {
 					, css: 'octaveBottomBorder'
 				});
 			}
-			if (this.zoomLevelIndex < 3) {
-				let ratio = globalCommandDispatcher.cfg().textZoomRatio(this.zoomLevelIndex);
+			if (this.zoomLevelIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+				//let ratio = globalCommandDispatcher.cfg().textZoomRatio(this.zoomLevelIndex);
 				//console.log(this.zoomLevelIndex, ratio);
 				for (let tt = 0; tt <= globalCommandDispatcher.cfg().maxCommentRowCount; tt++) {
 					barOctaveAnchor.content.push({
 						x: globalCommandDispatcher.cfg().leftPad
-						, y: globalCommandDispatcher.cfg().commentsTop() + (1 + tt) * globalCommandDispatcher.cfg().notePathHeight * ratio
+						, y: globalCommandDispatcher.cfg().commentsTop() +  globalCommandDispatcher.cfg().commentsZoomLineY(this.zoomLevelIndex, tt)
 						, w: globalCommandDispatcher.cfg().timelineWidth()
 						, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
 						, css: 'interActiveGridLine'

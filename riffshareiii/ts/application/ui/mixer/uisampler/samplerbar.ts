@@ -57,7 +57,7 @@ class SamplerBar {
 				, css: css
 			};
 			anchor.content.push(ply);
-			if (zoomLevel < 3) {
+			if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
 				let idot: TileRectangle = {
 					x: xx + globalCommandDispatcher.cfg().samplerDotHeight / 16
 					, y: yy + globalCommandDispatcher.cfg().samplerDotHeight * (1 / 2 - 1 / 16)

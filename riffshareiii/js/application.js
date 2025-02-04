@@ -2269,7 +2269,7 @@ class SamplerBar {
                 css: css
             };
             anchor.content.push(ply);
-            if (zoomLevel < 3) {
+            if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
                 let idot = {
                     x: xx + globalCommandDispatcher.cfg().samplerDotHeight / 16,
                     y: yy + globalCommandDispatcher.cfg().samplerDotHeight * (1 / 2 - 1 / 16),
@@ -2353,7 +2353,7 @@ class OctaveContent {
                             y1 = y2;
                         }
                         if (interact) {
-                            if (zoomLevel < 3) {
+                            if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
                                 let inetrDot = {
                                     x: xStart + globalCommandDispatcher.cfg().notePathHeight / 4,
                                     y: yStart - globalCommandDispatcher.cfg().notePathHeight * 3 / 4,
@@ -2444,7 +2444,7 @@ class MixerBar {
             }
         }
         if (zoomLevel < 7) {
-            new TextComments(barIdx, left, gridZoomBarAnchor, zoomLevel);
+            new TextCommentsBar(barIdx, left, gridZoomBarAnchor, zoomLevel);
         }
         if (zoomLevel < 7) {
             new AutomationBarContent(barIdx, left, gridZoomBarAnchor, zoomLevel);
@@ -2501,7 +2501,7 @@ class MixerBar {
         });
         if (zoomInfo.gridLines.length > 0) {
             let css = 'stepPartDelimiter';
-            if (zIndex < 3) {
+            if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
                 css = 'interactiveTimeMeasureMark';
             }
             while (true) {
@@ -2532,7 +2532,7 @@ class MixerBar {
                     h: globalCommandDispatcher.cfg().automationHeight(),
                     css: css
                 });
-                if (zIndex < 3) {
+                if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
                     barOctaveAnchor.content.push({
                         x: xx,
                         y: globalCommandDispatcher.cfg().commentsTop(),
@@ -2546,7 +2546,7 @@ class MixerBar {
                     lineCount = 0;
                 }
             }
-            if (zIndex < 3) {
+            if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
                 let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
                 let line = zoomInfo.gridLines[lineCount];
                 barOctaveAnchor.content.push({
@@ -2560,7 +2560,7 @@ class MixerBar {
         }
     }
 }
-class TextComments {
+class TextCommentsBar {
     constructor(barIdx, barLeft, barOctaveAnchor, zIndex) {
         let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
         let top = globalCommandDispatcher.cfg().commentsTop();
@@ -2568,6 +2568,7 @@ class TextComments {
             let pad = 0.125 * globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().textZoomRatio(zIndex);
             let css = 'commentReadText' + zoomPrefixLevelsCSS[zIndex].prefix;
             css = 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix;
+            this.testBars();
             for (let ii = 0; ii < globalCommandDispatcher.cfg().data.comments[barIdx].points.length; ii++) {
                 let itxt = globalCommandDispatcher.cfg().data.comments[barIdx].points[ii];
                 let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio + pad;
@@ -2581,6 +2582,83 @@ class TextComments {
                 barOctaveAnchor.content.push(tt);
             }
         }
+        if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+            let interpane = {
+                x: barOctaveAnchor.xx,
+                y: globalCommandDispatcher.cfg().commentsTop(),
+                w: barOctaveAnchor.ww,
+                h: globalCommandDispatcher.cfg().commentsMaxHeight(),
+                css: 'commentPaneForClick',
+                activation: (x, y) => { this.cellClick(x, y, zIndex, barIdx); }
+            };
+            barOctaveAnchor.content.push(interpane);
+        }
+    }
+    testBars() {
+        for (let idx = 0; idx < globalCommandDispatcher.cfg().data.timeline.length; idx++) {
+            if (globalCommandDispatcher.cfg().data.comments[idx]) {
+            }
+            else {
+                globalCommandDispatcher.cfg().data.comments[idx] = {
+                    points: []
+                };
+            }
+        }
+    }
+    cellClick(x, y, zz, idx) {
+        let row = 0;
+        for (let tt = 0; tt <= globalCommandDispatcher.cfg().maxCommentRowCount; tt++) {
+            let nextY = globalCommandDispatcher.cfg().commentsZoomLineY(zz, tt);
+            if (nextY > y) {
+                break;
+            }
+            row++;
+        }
+        let info = globalCommandDispatcher.cfg().gridClickInfo(idx, x, zz);
+        this.testBars();
+        let commentBar = globalCommandDispatcher.cfg().data.comments[idx];
+        let first = this.getFirstCommentText(commentBar, row, info);
+        let re = prompt(first, first);
+        if (re === first) {
+        }
+        else {
+            if (re !== null) {
+                let newText = re;
+                globalCommandDispatcher.exe.commitProjectChanges(['comments', idx], () => {
+                    this.dropBarComments(commentBar, row, info);
+                    commentBar.points.push({
+                        skip: info.start,
+                        text: newText,
+                        row: row
+                    });
+                });
+            }
+        }
+    }
+    getFirstCommentText(commentBar, row, info) {
+        for (let ii = 0; ii < commentBar.points.length; ii++) {
+            let pp = commentBar.points[ii];
+            if (pp.row == row) {
+                if (!info.start.more(pp.skip)) {
+                    if (info.end.more(pp.skip)) {
+                        return pp.text;
+                    }
+                }
+            }
+        }
+        return '';
+    }
+    dropBarComments(commentBar, row, info) {
+        commentBar.points = commentBar.points.filter((pp) => {
+            if (pp.row == row) {
+                if (!info.start.more(pp.skip)) {
+                    if (info.end.more(pp.skip)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        });
     }
 }
 class AutomationBarContent {
@@ -2603,7 +2681,7 @@ class AutomationBarContent {
                         css: css
                     };
                     barOctaveAnchor.content.push(aubtn);
-                    if (zIndex < 3) {
+                    if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
                         let idot = {
                             x: xx + globalCommandDispatcher.cfg().autoPointHeight / 16,
                             y: top + globalCommandDispatcher.cfg().autoPointHeight / 16 + globalCommandDispatcher.cfg().autoPointHeight * aa,
@@ -2733,46 +2811,6 @@ class MixerUI {
             barX = barX + barwidth;
         }
     }
-    __reFillWholeRatio() {
-        let yy = globalCommandDispatcher.cfg().gridTop();
-        let hh = globalCommandDispatcher.cfg().gridHeight() / 8;
-        let countFunction = (barIdx) => {
-            return this.barDrumCount(barIdx) + this.barAutoCount(barIdx)
-                + this.barCommentsCount(barIdx) + this.barTrackCount(barIdx);
-        };
-        let mxItems = 0;
-        for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
-            let itemcount = countFunction(bb);
-            if (mxItems < itemcount) {
-                mxItems = itemcount;
-            }
-        }
-        if (mxItems < 1)
-            mxItems = 1;
-        let barX = 0;
-        for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
-            let itemcount = countFunction(bb);
-            let filIdx = 1 + Math.round(7 * itemcount / mxItems);
-            let css = 'mixFiller' + filIdx;
-            let barwidth = MMUtil().set(globalCommandDispatcher.cfg().data.timeline[bb].metre).duration(globalCommandDispatcher.cfg().data.timeline[bb].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-            let fillRectangle = {
-                x: globalCommandDispatcher.cfg().leftPad + barX,
-                y: yy,
-                w: barwidth,
-                h: hh,
-                css: css
-            };
-            this.fillerAnchor.content.push(fillRectangle);
-            this.fillerAnchor.content.push({
-                x: globalCommandDispatcher.cfg().leftPad + barX,
-                y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() * 7 / 8,
-                w: barwidth,
-                h: hh,
-                css: css
-            });
-            barX = barX + barwidth;
-        }
-    }
     barTrackCount(bb) {
         let notecount = 0;
         for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
@@ -2878,7 +2916,7 @@ class MixerZoomLevel {
                     };
                     barOctaveAnchor.content.push(octaveBottomBorder);
                 }
-                if (this.zoomLevelIndex < 3) {
+                if (this.zoomLevelIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
                     for (let kk = 1; kk < 12; kk++) {
                         barOctaveAnchor.content.push({
                             x: globalCommandDispatcher.cfg().leftPad,
@@ -2908,12 +2946,11 @@ class MixerZoomLevel {
                     css: 'octaveBottomBorder'
                 });
             }
-            if (this.zoomLevelIndex < 3) {
-                let ratio = globalCommandDispatcher.cfg().textZoomRatio(this.zoomLevelIndex);
+            if (this.zoomLevelIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
                 for (let tt = 0; tt <= globalCommandDispatcher.cfg().maxCommentRowCount; tt++) {
                     barOctaveAnchor.content.push({
                         x: globalCommandDispatcher.cfg().leftPad,
-                        y: globalCommandDispatcher.cfg().commentsTop() + (1 + tt) * globalCommandDispatcher.cfg().notePathHeight * ratio,
+                        y: globalCommandDispatcher.cfg().commentsTop() + globalCommandDispatcher.cfg().commentsZoomLineY(this.zoomLevelIndex, tt),
                         w: globalCommandDispatcher.cfg().timelineWidth(),
                         h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
                         css: 'interActiveGridLine'
@@ -3151,7 +3188,7 @@ class PerformerIcon {
             };
             dragAnchor.content.push(btn);
         }
-        if (zidx < 3) {
+        if (zidx < globalCommandDispatcher.cfg().zoomEditSLess) {
             let txt = {
                 text: track.title + ': ' + track.volume + ': ' + track.performer.kind + ': ' + track.performer.id,
                 x: xx,
@@ -3341,7 +3378,7 @@ class SamplerIcon {
             };
             dragAnchor.content.push(btn);
         }
-        if (zidx < 3) {
+        if (zidx < globalCommandDispatcher.cfg().zoomEditSLess) {
             let txt = {
                 text: samplerTrack.title + ": " + samplerTrack.volume + ": " + samplerTrack.sampler.kind + ': ' + samplerTrack.sampler.id,
                 x: xx,
@@ -3534,7 +3571,7 @@ class FilterIcon {
             };
             dragAnchor.content.push(btn);
         }
-        if (zidx < 3) {
+        if (zidx < globalCommandDispatcher.cfg().zoomEditSLess) {
             let txt = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy, css: 'fanIconLabel' };
             dragAnchor.content.push(txt);
         }
@@ -4103,6 +4140,7 @@ class MixerDataMathUtility {
         this.speakerIconSize = 22;
         this.speakerIconPad = 44;
         this.padGridFan = 15;
+        this.zoomEditSLess = 3;
         this.data = data;
         this.recalculateCommantMax();
     }
@@ -4232,6 +4270,11 @@ class MixerDataMathUtility {
     commentsZoomHeight(zIndex) {
         return (2 + this.maxCommentRowCount) * this.notePathHeight * this.textZoomRatio(zIndex);
     }
+    commentsZoomLineY(zIndex, lineNo) {
+        let ratio = globalCommandDispatcher.cfg().textZoomRatio(zIndex);
+        let nextY = (1 + lineNo) * globalCommandDispatcher.cfg().notePathHeight * ratio;
+        return nextY;
+    }
     commentsAverageFillHeight() {
         let rcount = this.maxCommentRowCount;
         if (rcount > 3) {
@@ -4285,6 +4328,28 @@ class MixerDataMathUtility {
         if (zIndex > 4)
             txtZoomRatio = 8;
         return txtZoomRatio;
+    }
+    gridClickInfo(barIdx, barX, zoomIdx) {
+        let curBar = this.data.timeline[barIdx];
+        let curDur = barX / this.widthDurationRatio;
+        let start = MMUtil().set({ count: 0, part: 1 });
+        let end = MMUtil().set({ count: 0, part: 1 });
+        let lineCount = 0;
+        let zoomInfo = zoomPrefixLevelsCSS[zoomIdx];
+        while (true) {
+            let line = zoomInfo.gridLines[lineCount];
+            end = end.plus(line.duration);
+            if (end.duration(curBar.tempo) > curDur) {
+                break;
+            }
+            start = end.simplyfy();
+            lineCount++;
+            if (lineCount >= zoomInfo.gridLines.length) {
+                lineCount = 0;
+            }
+        }
+        let len = end.minus(start);
+        return { start: start, length: len, end: end };
     }
 }
 let biChar32 = [];

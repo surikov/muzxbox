@@ -181,7 +181,7 @@ class SamplerIcon {
 			};
 			dragAnchor.content.push(btn);
 		}
-		if (zidx < 3) {
+		if (zidx < globalCommandDispatcher.cfg().zoomEditSLess) {
 			let txt: TileText = {
 				text: samplerTrack.title + ": " + samplerTrack.volume + ": " + samplerTrack.sampler.kind + ': ' + samplerTrack.sampler.id
 				, x: xx

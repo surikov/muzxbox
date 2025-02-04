@@ -223,7 +223,10 @@
 }
 
 
-
+.commentPaneForClick {
+    fill: #00000000;
+	cursor: pointer;
+}
 
 .commentReadText025 {
     fill: var(--line-color);

@@ -1,86 +1,114 @@
-class TextComments {
+class TextCommentsBar {
+	//zoomLevelIndex = 0;
+	//barIndex = 0;
 	constructor(barIdx: number
-		//, data: Zvoog_Project
-		//, cfg: MixerDataMathUtility
 		, barLeft: number
 		, barOctaveAnchor: TileAnchor
 		, zIndex: number
 	) {
-		let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
+		//this.zoomLevelIndex = zIndex;
+		//this.barIndex = barIdx;
+		//console.log('TextCommentsBar',this.zoomLevelIndex,this.barIndex);
 
-		//let mixm: MixerDataMath = new MixerDataMath(data);
-		//let width = MMUtil().set(curBar.metre).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-		//let left = barLeft + width;
+		let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
 		let top = globalCommandDispatcher.cfg().commentsTop();
-		//let height = globalCommandDispatcher.cfg().maxCommentRowCount + 2;
-		//console.log(zIndex);
-		/*
-		if (zIndex == 3) {
-			height = (globalCommandDispatcher.cfg().maxCommentRowCount + 2) * 2;
-		}
-		if (zIndex == 4) {
-			height = (globalCommandDispatcher.cfg().maxCommentRowCount + 2) * 4;
-		}
-		if (zIndex > 4) {
-			height = (globalCommandDispatcher.cfg().maxCommentRowCount + 2) * 8;
-		}
-		let barTxtRightBorder: TileRectangle = {
-			x: left
-			, y: top
-			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.5 //zoomPrefixLevelsCSS[zoomLevel].minZoom / 8.0
-			, h: height
-			, rx: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25
-			, ry: zoomPrefixLevelsCSS[zIndex].minZoom * 0.25
-			, css: 'barRightBorder'
-		};*/
-		//console.log('comments', barIdx, zIndex, top, height, zoomPrefixLevelsCSS[zIndex].minZoom);
-		//barOctaveAnchor.content.push(barTxtRightBorder);
-		//console.log(barIdx,barLeft,width);
 		if (barIdx < globalCommandDispatcher.cfg().data.comments.length) {
-			/*let placedX: number[] = [];
-			for (let ii = 0; ii < globalCommandDispatcher.cfg().data.comments[barIdx].texts.length; ii++) {
-				let itxt = globalCommandDispatcher.cfg().data.comments[barIdx].texts[ii];
-				let skipS = 0.5 * Math.floor(MMUtil().set(itxt.skip).duration(curBar.tempo) / 0.5);
-				let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-				let placeIdx = 1;
-				//let x10 = Math.round(xx * 10);
-				for (let kk = 0; kk < placedX.length; kk++) {
-					//if (Math.abs(skipS - placedX[kk]) < 0.3) {
-					if (skipS == placedX[kk]) {
-						placeIdx++;
-					}
-				}
-				placedX.push(skipS);
-				let tt: TileText = {
-					x: xx
-					, y: top + zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx
-					, text: globalCommandDispatcher.cfg().data.comments[barIdx].texts[ii].text
-					, css: 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix
-				};
-				//console.log(zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx, placeIdx, globalCommandDispatcher.cfg().data.comments[barIdx].texts[ii].text);
-				barOctaveAnchor.content.push(tt);
-			}*/
-			let pad=0.125*globalCommandDispatcher.cfg().notePathHeight *  globalCommandDispatcher.cfg().textZoomRatio(zIndex);
-			let css= 'commentReadText' + zoomPrefixLevelsCSS[zIndex].prefix;
-			//if(globalCommandDispatcher.cfg().data.focus){
-			//	if(globalCommandDispatcher.cfg().data.focus==3){
-					css= 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix;
-			//	}
-			//}
+			let pad = 0.125 * globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().textZoomRatio(zIndex);
+			let css = 'commentReadText' + zoomPrefixLevelsCSS[zIndex].prefix;
+			css = 'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix;
+			this.testBars();
 			for (let ii = 0; ii < globalCommandDispatcher.cfg().data.comments[barIdx].points.length; ii++) {
 				let itxt = globalCommandDispatcher.cfg().data.comments[barIdx].points[ii];
-				let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio+pad;
-				let yy=top + globalCommandDispatcher.cfg().notePathHeight * (1 + itxt.row) * globalCommandDispatcher.cfg().textZoomRatio(zIndex)-pad;
+				let xx = barLeft + MMUtil().set(itxt.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio + pad;
+				let yy = top + globalCommandDispatcher.cfg().notePathHeight * (1 + itxt.row) * globalCommandDispatcher.cfg().textZoomRatio(zIndex) - pad;
 				let tt: TileText = {
 					x: xx
-					, y: yy //top + globalCommandDispatcher.cfg().notePathHeight * (1 + itxt.row) * txtZoomRatio
+					, y: yy
 					, text: globalCommandDispatcher.cfg().data.comments[barIdx].points[ii].text
-					, css: css //'commentLineText' + zoomPrefixLevelsCSS[zIndex].prefix
+					, css: css
 				};
-				//console.log(zoomPrefixLevelsCSS[zIndex].minZoom * placeIdx, placeIdx, globalCommandDispatcher.cfg().data.comments[barIdx].texts[ii].text);
 				barOctaveAnchor.content.push(tt);
 			}
 		}
+		if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+			let interpane: TileRectangle = {
+				x: barOctaveAnchor.xx
+				, y: globalCommandDispatcher.cfg().commentsTop()
+				, w: barOctaveAnchor.ww
+				, h: globalCommandDispatcher.cfg().commentsMaxHeight()
+				, css: 'commentPaneForClick'
+				, activation: (x: number, y: number) => { this.cellClick(x, y, zIndex, barIdx); }
+			};
+			barOctaveAnchor.content.push(interpane);
+		}
+	}
+	testBars() {
+		for (let idx = 0; idx < globalCommandDispatcher.cfg().data.timeline.length; idx++) {
+			if (globalCommandDispatcher.cfg().data.comments[idx]) {
+				//
+			} else {
+				globalCommandDispatcher.cfg().data.comments[idx] = {
+					points: []
+				};
+			}
+		}
+	}
+	cellClick(x: number, y: number, zz: number, idx: number) {
+		let row = 0;
+		for (let tt = 0; tt <= globalCommandDispatcher.cfg().maxCommentRowCount; tt++) {
+			let nextY = globalCommandDispatcher.cfg().commentsZoomLineY(zz, tt);
+			if (nextY > y) {
+				break;
+			}
+			row++;
+		}
+		let info = globalCommandDispatcher.cfg().gridClickInfo(idx, x, zz);
+		this.testBars();
+		let commentBar = globalCommandDispatcher.cfg().data.comments[idx];
+		let first = this.getFirstCommentText(commentBar, row, info);
+		let re = prompt(first, first);
+		if (re === first) {
+			//
+		} else {
+			if (re !== null) {
+				let newText = re;
+				globalCommandDispatcher.exe.commitProjectChanges(['comments', idx], () => {
+					this.dropBarComments(commentBar, row, info);
+					commentBar.points.push({
+						skip: info.start
+						, text: newText
+						, row: row
+					});
+				});
+
+				//globalCommandDispatcher.resetProject();
+			}
+		}
+	}
+	getFirstCommentText(commentBar: Zvoog_CommentMeasure, row: number, info: { start: Zvoog_MetreMathType, length: Zvoog_MetreMathType, end: Zvoog_MetreMathType }): string {
+		for (let ii = 0; ii < commentBar.points.length; ii++) {
+			let pp = commentBar.points[ii];
+			if (pp.row == row) {
+				if (!info.start.more(pp.skip)) {
+					if (info.end.more(pp.skip)) {
+						return pp.text;
+					}
+				}
+			}
+		}
+		return '';
+	}
+	dropBarComments(commentBar: Zvoog_CommentMeasure, row: number, info: { start: Zvoog_MetreMathType, length: Zvoog_MetreMathType, end: Zvoog_MetreMathType }) {
+		commentBar.points = commentBar.points.filter((pp: Zvoog_CommentText) => {
+			if (pp.row == row) {
+				if (!info.start.more(pp.skip)) {
+					if (info.end.more(pp.skip)) {
+						return false;
+					}
+				}
+			}
+			return true;
+		});
 	}
 
 }

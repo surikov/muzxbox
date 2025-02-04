@@ -67,7 +67,7 @@ class AutomationBarContent {
 					};
 					barOctaveAnchor.content.push(aubtn);
 					//console.log(aubtn);
-					if (zIndex < 3) {
+					if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
 						let idot: TileRectangle = {
 							x: xx + globalCommandDispatcher.cfg().autoPointHeight  /16
 							, y: top + globalCommandDispatcher.cfg().autoPointHeight /16+globalCommandDispatcher.cfg().autoPointHeight * aa

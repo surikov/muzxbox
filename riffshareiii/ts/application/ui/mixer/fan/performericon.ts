@@ -206,7 +206,7 @@ class PerformerIcon {
 			};
 			dragAnchor.content.push(btn);
 		}
-		if (zidx < 3) {
+		if (zidx < globalCommandDispatcher.cfg().zoomEditSLess) {
 			let txt: TileText = {
 				text: track.title + ': ' + track.volume + ': ' + track.performer.kind + ': ' + track.performer.id
 				, x: xx

@@ -38,6 +38,8 @@ class MixerDataMathUtility {
 
 	padGridFan = 15;
 
+	zoomEditSLess = 3;
+
 	constructor(data: Zvoog_Project) {
 		this.data = data;
 		this.recalculateCommantMax();
@@ -183,7 +185,7 @@ class MixerDataMathUtility {
 	}
 	speakerFanPosition(): TilePoint {
 		let speakerX = this.wholeWidth() - this.speakerIconPad - this.rightPad + this.speakerIconSize / 2;
-		let speakerY = this.wholeHeight()/2-this.speakerIconSize / 2;
+		let speakerY = this.wholeHeight() / 2 - this.speakerIconSize / 2;
 		//this.gridTop() + this.gridHeight() / 2 - this.speakerIconSize / 2;
 		return { x: speakerX, y: speakerY };
 	}
@@ -222,6 +224,11 @@ class MixerDataMathUtility {
 	}
 	commentsZoomHeight(zIndex: number): number {
 		return (2 + this.maxCommentRowCount) * this.notePathHeight * this.textZoomRatio(zIndex);
+	}
+	commentsZoomLineY(zIndex: number, lineNo: number): number {
+		let ratio = globalCommandDispatcher.cfg().textZoomRatio(zIndex);
+		let nextY = (1 + lineNo) * globalCommandDispatcher.cfg().notePathHeight * ratio;
+		return nextY;
 	}
 	commentsAverageFillHeight(): number {
 		let rcount = this.maxCommentRowCount;
@@ -285,5 +292,26 @@ class MixerDataMathUtility {
 		if (zIndex > 4) txtZoomRatio = 8;
 		return txtZoomRatio;
 	}
-
+	gridClickInfo(barIdx: number, barX: number, zoomIdx: number): { start: Zvoog_MetreMathType, length: Zvoog_MetreMathType, end: Zvoog_MetreMathType } {
+		let curBar = this.data.timeline[barIdx];
+		let curDur = barX / this.widthDurationRatio;
+		let start: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 1 });
+		let end: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 1 });
+		let lineCount = 0;
+		let zoomInfo = zoomPrefixLevelsCSS[zoomIdx];
+		while (true) {
+			let line = zoomInfo.gridLines[lineCount];
+			end = end.plus(line.duration);
+			if (end.duration(curBar.tempo) > curDur) {
+				break;
+			}
+			start = end.simplyfy();
+			lineCount++;
+			if (lineCount >= zoomInfo.gridLines.length) {
+				lineCount = 0;
+			}
+		}
+		let len: Zvoog_MetreMathType = end.minus(start);
+		return { start: start, length: len, end: end };
+	}
 }

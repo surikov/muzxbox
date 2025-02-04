@@ -78,7 +78,7 @@ class MixerBar {
 			}
 		}
 		if (zoomLevel < 7) {
-			new TextComments(barIdx, left, gridZoomBarAnchor, zoomLevel);
+			new TextCommentsBar(barIdx, left, gridZoomBarAnchor, zoomLevel);
 		}
 		if (zoomLevel < 7) {
 			new AutomationBarContent(barIdx, left, gridZoomBarAnchor, zoomLevel);
@@ -140,16 +140,10 @@ class MixerBar {
 			, h: globalCommandDispatcher.cfg().automationHeight()
 			, css: 'barRightBorder'
 		});
-		/*barOctaveAnchor.content.push({
-			x: barLeft + width
-			, y: globalCommandDispatcher.cfg().commentsTop()
-			, w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.05
-			, h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex)
-			, css: 'barRightBorder'
-		});*/
+
 		if (zoomInfo.gridLines.length > 0) {
 			let css = 'stepPartDelimiter';
-			if (zIndex < 3) {
+			if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
 				css = 'interactiveTimeMeasureMark';
 			}
 			while (true) {
@@ -180,7 +174,7 @@ class MixerBar {
 					, h: globalCommandDispatcher.cfg().automationHeight()
 					, css: css
 				});
-				if (zIndex < 3) {
+				if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
 					barOctaveAnchor.content.push({
 						x: xx
 						, y: globalCommandDispatcher.cfg().commentsTop()
@@ -194,7 +188,7 @@ class MixerBar {
 					lineCount = 0;
 				}
 			}
-			if (zIndex < 3) {
+			if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
 				let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 				let line = zoomInfo.gridLines[lineCount];
 				barOctaveAnchor.content.push({

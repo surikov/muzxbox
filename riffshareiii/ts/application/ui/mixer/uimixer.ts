@@ -154,29 +154,7 @@ class MixerUI {
 		return [this.gridLayers, this.trackLayers, this.firstLayers, this.fanLayer, this.spearsLayer];
 	}
 	reFillSingleRatio(yy: number, hh: number, countFunction: (barIdx: number) => number) {
-		//let countFunction: (barIdx: number) => number;
-		//let yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 8;
-		//let hh = globalCommandDispatcher.cfg().gridHeight() * 6 / 8;
-		/*if (globalCommandDispatcher.cfg().data.focus) {
-			if (globalCommandDispatcher.cfg().data.focus == 1) {
-				countFunction = this.barDrumCount;
-				yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length;
-				hh = 2 * globalCommandDispatcher.cfg().data.percussions.length;
-			} else {
-				if (globalCommandDispatcher.cfg().data.focus == 2) {
-					countFunction = this.barAutoCount;
-					yy = globalCommandDispatcher.cfg().gridTop();
-					hh = globalCommandDispatcher.cfg().maxAutomationsCount;
-				} else {
-					countFunction = this.barCommentsCount;
-					yy = globalCommandDispatcher.cfg().gridTop();
-					hh = globalCommandDispatcher.cfg().commentsMaxHeight();
-				}
-			}
-		} else {
-			countFunction = this.barTrackCount;
-		}*/
-		//countFunction = this.barTrackCount;
+
 		let mxItems = 0;
 		for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
 			let itemcount = countFunction(bb);
@@ -203,65 +181,7 @@ class MixerUI {
 			barX = barX + barwidth;
 		}
 	}
-	__reFillWholeRatio() {
-
-		let yy = globalCommandDispatcher.cfg().gridTop();
-		let hh = globalCommandDispatcher.cfg().gridHeight() / 8;
-		/*if (globalCommandDispatcher.cfg().data.focus) {
-			if (globalCommandDispatcher.cfg().data.focus == 1) {
-				yy = globalCommandDispatcher.cfg().gridTop();
-				hh = globalCommandDispatcher.cfg().gridHeight() - 2 * globalCommandDispatcher.cfg().data.percussions.length;
-			} else {
-				if (globalCommandDispatcher.cfg().data.focus == 2) {
-					yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().maxAutomationsCount;
-					hh = globalCommandDispatcher.cfg().gridHeight() - globalCommandDispatcher.cfg().maxAutomationsCount;
-				} else {
-					yy = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().commentsMaxHeight();
-					hh = globalCommandDispatcher.cfg().gridHeight() - globalCommandDispatcher.cfg().commentsMaxHeight();
-				}
-			}
-		}*/
-		let countFunction: (barIdx: number) => number = (barIdx: number) => {
-			return this.barDrumCount(barIdx) + this.barAutoCount(barIdx)
-				+ this.barCommentsCount(barIdx) + this.barTrackCount(barIdx);
-		};
-		let mxItems = 0;
-		for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
-			let itemcount = countFunction(bb);
-			if (mxItems < itemcount) {
-				mxItems = itemcount;
-			}
-		}
-		if (mxItems < 1) mxItems = 1;
-		let barX = 0;
-		for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
-			let itemcount = countFunction(bb);
-			let filIdx = 1 + Math.round(7 * itemcount / mxItems);
-			let css = 'mixFiller' + filIdx;
-			let barwidth = MMUtil().set(globalCommandDispatcher.cfg().data.timeline[bb].metre).duration(globalCommandDispatcher.cfg().data.timeline[bb].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-			let fillRectangle: TileRectangle = {
-				x: globalCommandDispatcher.cfg().leftPad + barX
-				, y: yy//globalCommandDispatcher.cfg().gridTop()
-				, w: barwidth
-				, h: hh//globalCommandDispatcher.cfg().gridHeight()
-				, css: css
-			};
-			this.fillerAnchor.content.push(fillRectangle);
-			//if (globalCommandDispatcher.cfg().data.focus) {
-			//
-			//} else {
-			this.fillerAnchor.content.push({
-				x: globalCommandDispatcher.cfg().leftPad + barX
-				, y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() * 7 / 8
-				, w: barwidth
-				, h: hh//globalCommandDispatcher.cfg().gridHeight()
-				, css: css
-			});
-			//}
-
-			barX = barX + barwidth;
-		}
-	}
+	
 
 	barTrackCount(bb: number): number {
 		let notecount = 0;

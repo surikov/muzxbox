@@ -24,6 +24,7 @@ class CommandDispatcher {
 	cfg(): MixerDataMathUtility {
 		return this._mixerDataMathUtility;
 	}
+	
 	reDrawPlayPosition() {
 		let xx = this.cfg().leftPad
 			+ this.playPosition * this.cfg().widthDurationRatio
