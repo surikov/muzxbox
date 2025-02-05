@@ -512,7 +512,7 @@ class CommandDispatcher {
         this.neeToStart = false;
         this.playPosition = 0;
         this.playCallback = (start, pos, end) => {
-            this.playPosition = pos;
+            this.playPosition = pos - 0.25;
             this.reDrawPlayPosition();
         };
         this.listener = null;
@@ -2357,16 +2357,23 @@ class OctaveContent {
                         }
                         if (interact) {
                             if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
-                                let inetrDot = {
-                                    x: xStart + globalCommandDispatcher.cfg().notePathHeight / 4,
-                                    y: yStart - globalCommandDispatcher.cfg().notePathHeight * 3 / 4,
-                                    w: globalCommandDispatcher.cfg().notePathHeight / 2,
-                                    h: globalCommandDispatcher.cfg().notePathHeight / 2,
-                                    rx: globalCommandDispatcher.cfg().notePathHeight / 4,
-                                    ry: globalCommandDispatcher.cfg().notePathHeight / 4,
-                                    css: 'mixDropNote'
+                                let yShift = 0.13;
+                                let xShift = 0.10;
+                                if (zoomLevel < 2) {
+                                    yShift = 0.22;
+                                    xShift = 0.21;
+                                }
+                                if (zoomLevel < 1) {
+                                    yShift = 0.33;
+                                    xShift = 0.33;
+                                }
+                                let deleteIcon = {
+                                    x: xStart + xShift,
+                                    y: yStart - yShift,
+                                    text: icon_close_circle,
+                                    css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zoomLevel
                                 };
-                                barOctaveAnchor.content.push(inetrDot);
+                                barOctaveAnchor.content.push(deleteIcon);
                                 let slideDot = {
                                     x: x1 - globalCommandDispatcher.cfg().notePathHeight * 5 / 8,
                                     y: y1 - globalCommandDispatcher.cfg().notePathHeight * 5 / 8,
@@ -2685,16 +2692,18 @@ class AutomationBarContent {
                     };
                     barOctaveAnchor.content.push(aubtn);
                     if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
-                        let idot = {
+                        let yShift = 2 * 0.4;
+                        if (zIndex < 2)
+                            yShift = 2 * 0.27;
+                        if (zIndex < 1)
+                            yShift = 2 * 0.20;
+                        let deleteIcon = {
                             x: xx + globalCommandDispatcher.cfg().autoPointHeight / 16,
-                            y: top + globalCommandDispatcher.cfg().autoPointHeight / 16 + globalCommandDispatcher.cfg().autoPointHeight * aa,
-                            w: globalCommandDispatcher.cfg().autoPointHeight / 8,
-                            h: globalCommandDispatcher.cfg().autoPointHeight / 8,
-                            rx: globalCommandDispatcher.cfg().autoPointHeight / 16,
-                            ry: globalCommandDispatcher.cfg().autoPointHeight / 16,
-                            css: 'automationFocusedDot'
+                            y: top + globalCommandDispatcher.cfg().autoPointHeight / 16 + globalCommandDispatcher.cfg().autoPointHeight * aa + yShift,
+                            text: icon_close_circle,
+                            css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zIndex
                         };
-                        barOctaveAnchor.content.push(idot);
+                        barOctaveAnchor.content.push(deleteIcon);
                     }
                 }
             }

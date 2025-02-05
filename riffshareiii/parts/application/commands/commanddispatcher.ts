@@ -9,7 +9,7 @@ class CommandDispatcher {
 	neeToStart = false;
 	playPosition = 0;
 	playCallback: (start: number, position: number, end: number) => void = (start: number, pos: number, end: number) => {
-		this.playPosition = pos;
+		this.playPosition = pos-0.25;
 		//this.renderer.timeselectbar.positionTimeMark.x 
 		this.reDrawPlayPosition();
 

@@ -266,7 +266,7 @@
 
 .automationBgDot{
 	fill: var(--main-color);
-	fill-opacity:75%;
+	fill-opacity:95%;
     stroke: none;
 }
 .automationFocusedDot{
