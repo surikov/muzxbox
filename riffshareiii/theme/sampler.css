@@ -10,16 +10,32 @@
 }
 .samplerDrumDotBg{
 	fill: var(--main-color);
-	fill-opacity:75%;
+	fill-opacity2:75%;
     stroke: none;
 }
-.samplerDrumDotActive{
+.samplerDrumDotActive23542354{
 	fill: var(--click-color);
 	fill-opacity2:75%;
     stroke: none;
 }
 .samplerDrumDotLine{
-	fill: var(--line-color);
-	fill-opacity:50%;
+	fill: var(--main-color);
+	fill-opacity33:95%;
     stroke: none;
+}
+.samplerDrumDeleteIcon{
+	fill: var(--click-color);
+    stroke: none;
+	font-family: 'Material-Design-Iconic-Font';
+	pointer-events: none;
+	
+}
+.samplerDrumDeleteSize2{
+	font-size: var(--icon-1cm);
+}
+.samplerDrumDeleteSize1{
+	font-size: var(--icon-075cm);
+}
+.samplerDrumDeleteSize0{
+	font-size: var(--icon-05cm);
 }

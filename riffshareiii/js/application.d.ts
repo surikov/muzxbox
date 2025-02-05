@@ -170,9 +170,9 @@ declare class TimeSelectBar {
     positionTimeSVGGroup: SVGElement;
     positionTimeAnchor: TileAnchor;
     positionTimeMark: TileRectangle;
-    positionTimeMarkWidth: number;
     constructor();
     createTimeScale(): TileLayerDefinition[];
+    positionMarkWidth(): number;
     resizeTimeScale(viewWidth: number, viewHeight: number): void;
     updateTimeSelectionBar(): void;
     createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor): void;
@@ -485,6 +485,7 @@ declare let icon_block: string;
 declare let icon_equalizer: string;
 declare let icon_sliders: string;
 declare let icon_play_circle: string;
+declare let icon_close_circle: string;
 declare class DebugLayerUI {
     debugRectangle: TileRectangle;
     debugAnchor: TileAnchor;

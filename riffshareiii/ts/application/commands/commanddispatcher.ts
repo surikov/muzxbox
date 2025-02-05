@@ -24,12 +24,12 @@ class CommandDispatcher {
 	cfg(): MixerDataMathUtility {
 		return this._mixerDataMathUtility;
 	}
-	
+
 	reDrawPlayPosition() {
-		let xx = this.cfg().leftPad
-			+ this.playPosition * this.cfg().widthDurationRatio
-			- this.renderer.timeselectbar.positionTimeMarkWidth;
+		let ww = this.renderer.timeselectbar.positionMarkWidth();
+		let xx = this.cfg().leftPad + this.playPosition * this.cfg().widthDurationRatio - ww;
 		this.renderer.timeselectbar.positionTimeAnchor.translation = { x: xx, y: 0 };
+		this.renderer.timeselectbar.positionTimeMark.w = ww;
 		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup
 			, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
 	}

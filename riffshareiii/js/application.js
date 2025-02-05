@@ -522,10 +522,10 @@ class CommandDispatcher {
         return this._mixerDataMathUtility;
     }
     reDrawPlayPosition() {
-        let xx = this.cfg().leftPad
-            + this.playPosition * this.cfg().widthDurationRatio
-            - this.renderer.timeselectbar.positionTimeMarkWidth;
+        let ww = this.renderer.timeselectbar.positionMarkWidth();
+        let xx = this.cfg().leftPad + this.playPosition * this.cfg().widthDurationRatio - ww;
         this.renderer.timeselectbar.positionTimeAnchor.translation = { x: xx, y: 0 };
+        this.renderer.timeselectbar.positionTimeMark.w = ww;
         this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
     }
     initAudioFromUI() {
@@ -1157,7 +1157,6 @@ function LO(id) {
 }
 class TimeSelectBar {
     constructor() {
-        this.positionTimeMarkWidth = 11;
     }
     createTimeScale() {
         this.selectionBarSVGGroup = document.getElementById("timeselectbar");
@@ -1193,7 +1192,7 @@ class TimeSelectBar {
         this.positionTimeMark = {
             x: 0,
             y: 0,
-            w: this.positionTimeMarkWidth,
+            w: this.positionMarkWidth(),
             h: 11,
             css: 'positionTimeMark'
         };
@@ -1204,22 +1203,24 @@ class TimeSelectBar {
             content: [this.positionTimeMark]
         };
         this.positionTimeLayer = {
-            g: this.positionTimeSVGGroup, anchors: [this.positionTimeAnchor], mode: LevelModes.normal
+            g: this.positionTimeSVGGroup, anchors: [this.positionTimeAnchor], mode: LevelModes.top
         };
         return [this.selectionBarLayer, this.selectedTimeLayer, this.positionTimeLayer];
+    }
+    positionMarkWidth() {
+        let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+        let ww = zz * 2;
+        return ww;
     }
     resizeTimeScale(viewWidth, viewHeight) {
         let ww = 0.001;
         if (globalCommandDispatcher.onAir) {
-            ww = this.positionTimeMarkWidth;
+            ww = this.positionMarkWidth();
         }
         this.positionTimeMark.w = ww;
         this.positionTimeAnchor.ww = viewWidth * 1024;
         this.positionTimeAnchor.hh = viewHeight * 1024;
-        this.positionTimeMark.y = globalCommandDispatcher.cfg().gridTop();
-        this.positionTimeMark.h = globalCommandDispatcher.cfg().gridHeight()
-            + globalCommandDispatcher.cfg().padGrid2Sampler + globalCommandDispatcher.cfg().samplerHeight()
-            + globalCommandDispatcher.cfg().padSampler2Automation + globalCommandDispatcher.cfg().automationHeight();
+        this.positionTimeMark.h = viewHeight * 1024;
         this.selectionAnchor.ww = viewWidth * 1024;
         this.selectionAnchor.hh = viewHeight * 1024;
         this.selectionMark.h = viewHeight * 1024;
@@ -2270,16 +2271,18 @@ class SamplerBar {
             };
             anchor.content.push(ply);
             if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
-                let idot = {
-                    x: xx + globalCommandDispatcher.cfg().samplerDotHeight / 16,
-                    y: yy + globalCommandDispatcher.cfg().samplerDotHeight * (1 / 2 - 1 / 16),
-                    w: globalCommandDispatcher.cfg().samplerDotHeight / 8,
-                    h: globalCommandDispatcher.cfg().samplerDotHeight / 8,
-                    rx: globalCommandDispatcher.cfg().samplerDotHeight / 16,
-                    ry: globalCommandDispatcher.cfg().samplerDotHeight / 16,
-                    css: 'samplerDrumDotActive'
+                let yShift = 0.4;
+                if (zoomLevel < 2)
+                    yShift = 0.27;
+                if (zoomLevel < 1)
+                    yShift = 0.20;
+                let deleteIcon = {
+                    x: xx + globalCommandDispatcher.cfg().samplerDotHeight / 32,
+                    y: yy + globalCommandDispatcher.cfg().samplerDotHeight / 2 + yShift,
+                    text: icon_close_circle,
+                    css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zoomLevel
                 };
-                anchor.content.push(idot);
+                anchor.content.push(deleteIcon);
             }
         }
     }
@@ -3854,6 +3857,7 @@ let icon_block = '&#xf119;';
 let icon_equalizer = '&#xf39e;';
 let icon_sliders = '&#xf3b8;';
 let icon_play_circle = '&#xf3a8;';
+let icon_close_circle = '&#xf134;';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];

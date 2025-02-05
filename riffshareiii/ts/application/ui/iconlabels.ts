@@ -44,5 +44,5 @@ let icon_equalizer='&#xf39e;';
 let icon_sliders='&#xf3b8;';
 
 let icon_play_circle='&#xf3a8;';
-
+let icon_close_circle='&#xf134;';
 

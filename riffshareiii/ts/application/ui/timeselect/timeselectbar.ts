@@ -15,7 +15,7 @@ class TimeSelectBar {
 	positionTimeAnchor: TileAnchor;
 	positionTimeMark: TileRectangle;
 
-	positionTimeMarkWidth = 11;
+	//positionTimeMarkWidth = 11;
 
 	constructor() {
 
@@ -57,7 +57,7 @@ class TimeSelectBar {
 		this.positionTimeMark = {
 			x: 0
 			, y: 0
-			, w: this.positionTimeMarkWidth
+			, w: this.positionMarkWidth()
 			, h: 11
 			, css: 'positionTimeMark'
 		};
@@ -68,26 +68,32 @@ class TimeSelectBar {
 			, content: [this.positionTimeMark]
 		};
 		this.positionTimeLayer = {
-			g: this.positionTimeSVGGroup, anchors: [this.positionTimeAnchor], mode: LevelModes.normal
+			g: this.positionTimeSVGGroup, anchors: [this.positionTimeAnchor], mode: LevelModes.top//LevelModes.normal
 		};
 		///////////////////////////////////////////
 
 		return [this.selectionBarLayer, this.selectedTimeLayer, this.positionTimeLayer];
 	}
+	positionMarkWidth() :number{
+		let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+		let ww=zz*2;
+		return ww;
+	}
 	resizeTimeScale(viewWidth: number, viewHeight: number) {
 		//console.log('resizeTimeSelect',viewWidth,viewHeight);
 		let ww = 0.001;
 		if (globalCommandDispatcher.onAir) {
-			ww = this.positionTimeMarkWidth;
+			ww = this.positionMarkWidth();
 		}
 		this.positionTimeMark.w = ww;
 		this.positionTimeAnchor.ww = viewWidth * 1024;
 		this.positionTimeAnchor.hh = viewHeight * 1024;
-		this.positionTimeMark.y = globalCommandDispatcher.cfg().gridTop();
+		this.positionTimeMark.h = viewHeight * 1024;
+		//this.positionTimeMark.y = globalCommandDispatcher.cfg().gridTop();
 		//this.positionTimeMark.h = globalCommandDispatcher.cfg().workHeight();
-		this.positionTimeMark.h = globalCommandDispatcher.cfg().gridHeight()
-			+ globalCommandDispatcher.cfg().padGrid2Sampler + globalCommandDispatcher.cfg().samplerHeight()
-			+ globalCommandDispatcher.cfg().padSampler2Automation + globalCommandDispatcher.cfg().automationHeight();
+		//this.positionTimeMark.h = globalCommandDispatcher.cfg().gridHeight()
+		//	+ globalCommandDispatcher.cfg().padGrid2Sampler + globalCommandDispatcher.cfg().samplerHeight()
+		//	+ globalCommandDispatcher.cfg().padSampler2Automation + globalCommandDispatcher.cfg().automationHeight();
 		this.selectionAnchor.ww = viewWidth * 1024;
 		this.selectionAnchor.hh = viewHeight * 1024;
 		this.selectionMark.h = viewHeight * 1024;
