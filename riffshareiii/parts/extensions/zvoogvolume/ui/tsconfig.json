@@ -1,0 +1,32 @@
+{
+	"compilerOptions": {
+		"target": "es2015"
+        //,"outFile": "beep_plugin.js"
+        ,"outFile": "../../../exe/plugins/filters/zvoog_volume/zvolume_ui.js"
+        //,"outDir":"../js"
+		,"strictNullChecks": true
+		,"alwaysStrict": true
+		,"esModuleInterop": true
+		,"noResolve": false
+        ,"noImplicitAny": false
+        ,"removeComments": true
+        ,"preserveConstEnums": true
+        ,"sourceMap": true
+        ,"experimentalDecorators": true
+        ,"isolatedModules": false
+		,"module": "AMD"
+        ,"lib": [
+            "dom"
+            ,"es2015"
+            ,"es5"
+        ]
+        ,"declaration": true
+		,"types": [ ]
+	}
+	,"files": [
+        "../../../mzxbxapi/musicenginetypes.ts"
+		,"../../../mzxbxapi/musicenginedeclarations.ts"
+        ,"zvovolumeui.ts"
+
+	]
+}

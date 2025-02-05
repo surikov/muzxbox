@@ -1,0 +1,77 @@
+{
+	"compilerOptions": {
+		"target": "es2015",
+		"outFile": "../exe/js/application.js",
+		"strictNullChecks": true,
+		"alwaysStrict": true,
+		"esModuleInterop": true,
+		"noResolve": false,
+		"noImplicitAny": false,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"sourceMap": true,
+		"experimentalDecorators": true,
+		"isolatedModules": false,
+		"module": "AMD",
+		"lib": [
+			"dom",
+			"es2016",
+			"es5"
+		],
+		"declaration": true,
+		"types": []
+	},
+	"files": [
+        "treevalue/treevalue.ts"
+		,"treevalue/odiff.ts"
+        ,"startup.ts"
+
+
+		
+		,"ui/pluginprompt/plugindialog.ts"
+
+		,"commands/execommand.ts"
+        ,"commands/commanddispatcher.ts"
+		
+        ,"ui/renderer.ts"
+        ,"ui/localedictionary.ts"
+        ,"ui/timeselect/timeselectbar.ts"
+        ,"ui/toolbar/toolbarpanel.ts"
+        ,"ui/toolbar/toolbutton.ts"
+		,"ui/rightmenu/menupanel.ts"
+        ,"ui/rightmenu/menuitem.ts"
+        ,"ui/rightmenu/menudata.ts"
+        ,"ui/leftside/leftpanel.ts"
+		,"ui/mixer/uisampler/samplerbar.ts"
+        ,"ui/mixer/grid/baroctave.ts"
+		,"ui/mixer/grid/octavecontent.ts"
+		,"ui/mixer/grid/mixerbar.ts"
+		,"ui/mixer/grid/textCommentsContent.ts"
+		,"ui/mixer/grid/autoBar.ts"
+        ,"ui/mixer/uimixer.ts"
+        ,"ui/mixer/grid/mixerzoomlevel.ts"
+		,"ui/mixer/fan/fanpane.ts"
+		,"ui/mixer/fan/performericon.ts"
+		,"ui/mixer/fan/samplericon.ts"
+		,"ui/mixer/fan/filtericon.ts"
+		,"ui/mixer/fan/controlconnection.ts"
+		,"ui/mixer/fan/spearconnection.ts"
+		,"ui/mixer/fan/fanoutput.ts"
+        ,"ui/buttons/iconlabelbutton.ts"
+
+		,"ui/undoredo/uiundoredo.ts"
+		
+		,"ui/iconlabels.ts"
+        ,"ui/debugPane/debuglayer.ts"
+		,"ui/dialogs/warningui.ts"
+        ,"data/mixerdata.ts"
+        ,"data/testproject.ts"
+        ,"data/musicmetremath.ts"
+        ,"data/mixerdatamath.ts"
+        ,"data/numathutil.ts"
+		
+        ,"../tilelevelapi/apitilelevel.ts"
+        ,"../../parts/mzxbxapi/musicenginetypes.ts"
+		,"../../parts/mzxbxapi/musicenginedeclarations.ts"
+	]
+}
