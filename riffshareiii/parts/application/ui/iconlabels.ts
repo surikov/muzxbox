@@ -46,3 +46,6 @@ let icon_sliders='&#xf3b8;';
 let icon_play_circle='&#xf3a8;';
 let icon_close_circle='&#xf134;';
 
+let icon_delete='&#xf154;';
+let icon_power='&#xf1af;';
+

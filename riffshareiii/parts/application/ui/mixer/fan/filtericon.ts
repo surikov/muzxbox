@@ -158,7 +158,7 @@ class FilterIcon {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptPointPluginGUI(filterTarget.id, url, filterTarget.data, (obj: any) => {
+						globalCommandDispatcher.promptFilterPluginDialog(filterTarget.id, url, filterTarget.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
 								filterTarget.data = obj;
 							});

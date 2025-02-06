@@ -192,7 +192,7 @@ class PerformerIcon {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptPointPluginGUI(track.performer.id, url, track.performer.data, (obj: any) => {
+						globalCommandDispatcher.promptPerformerPluginDialog(track.performer.id, url, track.performer.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks',trackNo,'performer'], () => {
 								track.performer.data = obj;
 							});

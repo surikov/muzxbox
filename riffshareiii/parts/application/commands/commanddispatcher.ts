@@ -422,13 +422,25 @@ class CommandDispatcher {
 	setDrumSoloState(state: number) {
 		console.log('setDrumSoloState', state);
 	}*/
-	promptProjectPluginGUI(label: string, url: string, callback: (obj: Zvoog_Project) => void) {
+	promptActionPluginDialog(label: string, url: string, callback: (obj: Zvoog_Project) => void) {
 		//console.log('promptProjectPluginGUI', url);
-		pluginDialogPrompt.openActionDialogFrame(label, url, callback);
+		pluginDialogPrompt.openActionPluginDialogFrame(label, url, callback);
 	}
-	promptPointPluginGUI(label: string, url: string, rawdata: string, callback: (obj: any) => boolean) {
+	promptStepPluginGUI(label: string, url: string, rawdata: string, callback: (obj: any) => boolean) {
 		//console.log('promptPointPluginGUI', url);
-		pluginDialogPrompt.openPointDialogFrame(label, url, rawdata, callback);
+		pluginDialogPrompt.openStepDialogFrame(label, url, rawdata, callback);
+	}
+	promptFilterPluginDialog(label: string, url: string, rawdata: string, callback: (obj: any) => boolean) {
+		//console.log('promptPointPluginGUI', url);
+		pluginDialogPrompt.openFilterPluginDialogFrame(label, url, rawdata, callback);
+	}
+	promptSamplerPluginDialog(label: string, url: string, rawdata: string, callback: (obj: any) => boolean) {
+		//console.log('promptPointPluginGUI', url);
+		pluginDialogPrompt.openSamplerPluginDialogFrame(label, url, rawdata, callback);
+	}
+	promptPerformerPluginDialog(label: string, url: string, rawdata: string, callback: (obj: any) => boolean) {
+		//console.log('promptPointPluginGUI', url);
+		pluginDialogPrompt.openPerformerPluginDialogFrame(label, url, rawdata, callback);
 	}
 	findPluginRegistrationByKind(kind: String): null | MZXBX_PluginRegistrationInformation {
 		let list: MZXBX_PluginRegistrationInformation[] = MZXBX_currentPlugins();

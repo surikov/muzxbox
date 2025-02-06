@@ -169,7 +169,7 @@ class SamplerIcon {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptPointPluginGUI(samplerTrack.sampler.id, url, samplerTrack.sampler.data, (obj: any) => {
+						globalCommandDispatcher.promptSamplerPluginDialog(samplerTrack.sampler.id, url, samplerTrack.sampler.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['percussions',order], () => {
 								samplerTrack.sampler.data = obj;
 							});

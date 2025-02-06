@@ -282,7 +282,7 @@ class RightMenuPanel {
 				text: track.title
 				, noLocalization: true
 				, selectedState: track.performer.state
-				, itemStates: [icon_sound_loud, icon_block, icon_flash]
+				, itemStates: [icon_sound_loud, icon_power, icon_flash]
 				, onSubClick: () => {
 					globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
 						if (item.selectedState == 1) {
@@ -311,7 +311,7 @@ class RightMenuPanel {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptPointPluginGUI(track.performer.id, url, track.performer.data, (obj: any) => {
+						globalCommandDispatcher.promptPerformerPluginDialog(track.performer.id, url, track.performer.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt, 'performer'], () => {
 								track.performer.data = obj;
 							});
@@ -351,7 +351,7 @@ class RightMenuPanel {
 					});
 					globalCommandDispatcher.reConnectPlugins();
 				}
-				, itemStates: [icon_sound_loud, icon_block, icon_flash]
+				, itemStates: [icon_sound_loud, icon_power, icon_flash]
 				, selectedState: drum.sampler.state
 			};
 			if (tt > 0) {
@@ -367,7 +367,7 @@ class RightMenuPanel {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(drum.sampler.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptPointPluginGUI(drum.sampler.id, url, drum.sampler.data, (obj: any) => {
+						globalCommandDispatcher.promptSamplerPluginDialog(drum.sampler.id, url, drum.sampler.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt, 'sampler'], () => {
 								drum.sampler.data = obj;
 							});
@@ -388,7 +388,7 @@ class RightMenuPanel {
 			let item: MenuInfo = {
 				text: filter.id
 				, noLocalization: true
-				, itemStates: [icon_equalizer, icon_block]
+				, itemStates: [icon_equalizer, icon_power]
 				, selectedState: filter.state
 			};
 			item.onSubClick = () => {
@@ -419,7 +419,7 @@ class RightMenuPanel {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptPointPluginGUI(filter.id, url, filter.data, (obj: any) => {
+						globalCommandDispatcher.promptFilterPluginDialog(filter.id, url, filter.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
 								filter.data = obj;
 							});

@@ -35,13 +35,13 @@ class AutomationBarContent {
 						let yShift = 2*0.4;
 						if (zIndex < 2) yShift = 2*0.27;
 						if (zIndex < 1) yShift = 2*0.20;
-						let deleteIcon: TileText = {
+						let editIcon: TileText = {
 							x: xx + globalCommandDispatcher.cfg().autoPointHeight / 16
 							, y: top + globalCommandDispatcher.cfg().autoPointHeight / 16 + globalCommandDispatcher.cfg().autoPointHeight * aa +yShift
-							, text: icon_close_circle
+							, text: icon_gear
 							, css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zIndex
 						};
-						barOctaveAnchor.content.push(deleteIcon);
+						barOctaveAnchor.content.push(editIcon);
 					}
 				}
 

@@ -138,7 +138,7 @@ function fillPluginsLists() {
 		if (purpose == 'Action') {
 			menuPointActions.children.push({
 				text: label, noLocalization: true, onClick: () => {
-					globalCommandDispatcher.promptProjectPluginGUI(label, url, (obj: Zvoog_Project) => {
+					globalCommandDispatcher.promptActionPluginDialog(label, url, (obj: Zvoog_Project) => {
 						let project: Zvoog_Project = obj;
 						globalCommandDispatcher.registerWorkProject(project);
 						globalCommandDispatcher.resetProject();
@@ -159,10 +159,11 @@ function fillPluginsLists() {
 					menuPointPerformers.children.push({
 						dragMix: true
 						, text: label, noLocalization: true, onClick: () => {
-							globalCommandDispatcher.promptPointPluginGUI(label, url, 'no data from menu',(obj: any) => {
+							/*globalCommandDispatcher.promptPerFiltGUI(label, url, 'no data from menu',(obj: any) => {
 								console.log('performer callback', obj);
 								return true;
-							});
+							});*/
+							console.log(purpose, label);
 						}
 					});
 				} else {

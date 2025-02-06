@@ -37,10 +37,13 @@
 	<div id="pluginDiv">
 		<div id="pluginHeader">
 			<div id="pluginTitle">Plugin name and other information for identification</div>
-			<!--<div id="pluginRefresh" onclick="globalCommandDispatcher.resendMessagePluginGUI();">&#xf258;</div>-->
 			<div id="pluginCancel" onclick="globalCommandDispatcher.cancelPluginGUI();">&#xf136;</div>
 		</div>
 		<iframe id="pluginFrame" src="plugins/pluginplaceholder.html"></iframe>
+		<div id="pluginBottom">
+			<div id="pluginDeleteLabel">Delete</div>
+			<div id="pluginDeleteButton" onclick="globalCommandDispatcher.delete();">&#xf154;</div>
+		</div>
 	</div>
 	<div id='pagediv'>
 		<input type="file" id="file_midi_input" accept="audio/midi, audio/x-midi" />

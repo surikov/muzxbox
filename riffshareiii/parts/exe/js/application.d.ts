@@ -37,8 +37,11 @@ declare class PluginDialogPrompt {
     waitTimelinePointCallback: null | ((raw: any) => void);
     rawData: any;
     constructor();
-    openActionDialogFrame(label: string, url: string, callback: (obj: Zvoog_Project) => void): void;
-    openPointDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void): void;
+    openActionPluginDialogFrame(label: string, url: string, callback: (obj: Zvoog_Project) => void): void;
+    openFilterPluginDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void): void;
+    openSamplerPluginDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void): void;
+    openPerformerPluginDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void): void;
+    openStepDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void): void;
     sendNewIdToPlugin(): void;
     sendCurrentProjectToPlugin(): void;
     sendPointToPlugin(): void;
@@ -91,8 +94,11 @@ declare class CommandDispatcher {
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     changeTapSize(ratio: number): void;
     resetProject(): void;
-    promptProjectPluginGUI(label: string, url: string, callback: (obj: Zvoog_Project) => void): void;
-    promptPointPluginGUI(label: string, url: string, rawdata: string, callback: (obj: any) => boolean): void;
+    promptActionPluginDialog(label: string, url: string, callback: (obj: Zvoog_Project) => void): void;
+    promptStepPluginGUI(label: string, url: string, rawdata: string, callback: (obj: any) => boolean): void;
+    promptFilterPluginDialog(label: string, url: string, rawdata: string, callback: (obj: any) => boolean): void;
+    promptSamplerPluginDialog(label: string, url: string, rawdata: string, callback: (obj: any) => boolean): void;
+    promptPerformerPluginDialog(label: string, url: string, rawdata: string, callback: (obj: any) => boolean): void;
     findPluginRegistrationByKind(kind: String): null | MZXBX_PluginRegistrationInformation;
     cancelPluginGUI(): void;
     expandTimeLineSelection(idx: number): void;
@@ -486,6 +492,8 @@ declare let icon_equalizer: string;
 declare let icon_sliders: string;
 declare let icon_play_circle: string;
 declare let icon_close_circle: string;
+declare let icon_delete: string;
+declare let icon_power: string;
 declare class DebugLayerUI {
     debugRectangle: TileRectangle;
     debugAnchor: TileAnchor;

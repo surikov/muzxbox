@@ -161,7 +161,7 @@ let _mzxbxProjectForTesting2: Zvoog_Project = {
 			}
 				, {
 					changes: [
-						//{ skip: { count: 1, part: 4 }, stateBlob: '99' }
+						{ skip: { count: 1, part: 4 }, stateBlob: '99' }
 					]
 			}]
 			, iconPosition: { x: 152, y: 39 }, state: 0
