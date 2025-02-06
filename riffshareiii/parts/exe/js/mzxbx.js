@@ -1,6 +1,4 @@
 "use strict";
-class MZXBX_ScaleMath {
-}
 class MuzXbox {
     constructor() {
         this.uiStarted = false;
@@ -33,7 +31,7 @@ class MuzXbox {
     }
     updatePosition(pp) {
         if (this.player) {
-            if (this.player.onAir) {
+            if (this.player.playState == 'playing') {
                 this.player.position = (pp * this.currentDuration) / 100;
             }
         }
@@ -47,7 +45,7 @@ class MuzXbox {
     }
     setSongSlider() {
         if (this.player) {
-            if (this.player.onAir) {
+            if (this.player.playState == 'playing') {
                 if (this.songslide) {
                     let newValue = Math.floor(100 * this.player.position / this.currentDuration);
                     this.songslide.value = '' + newValue;
@@ -89,19 +87,24 @@ class SchedulePlayer {
         this.pluginsList = [];
         this.nextAudioContextStart = 0;
         this.tickDuration = 0.25;
-        this.onAir = false;
+        this.playState = 'waiting';
         this.playCallback = (start, position, end) => { };
         this.playCallback = callback;
     }
     startSetupPlugins(context, schedule) {
-        this.audioContext = context;
-        this.schedule = schedule;
-        if (this.schedule) {
-            let pluginLoader = new PluginLoader();
-            return pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers);
+        if (this.playState == 'waiting') {
+            this.audioContext = context;
+            this.schedule = schedule;
+            if (this.schedule) {
+                let pluginLoader = new PluginLoader();
+                return pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers);
+            }
+            else {
+                return 'Empty schedule';
+            }
         }
         else {
-            return 'Empty schedule';
+            return 'Wrong state - ' + this.playState;
         }
     }
     allFilters() {
@@ -155,8 +158,8 @@ class SchedulePlayer {
         this.schedule = schedule;
         let msg = this.connectAllPlugins();
     }
-    startLoop(loopStart, currentPosition, loopEnd) {
-        console.log('startLoop', loopStart, currentPosition, loopEnd);
+    startLoopTicks(loopStart, currentPosition, loopEnd) {
+        console.log('startLoopTicks', loopStart, currentPosition, loopEnd);
         let msg = this.connectAllPlugins();
         if (msg) {
             return msg;
@@ -164,7 +167,7 @@ class SchedulePlayer {
         else {
             this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
             this.position = currentPosition;
-            this.onAir = true;
+            this.playState = 'playing';
             this.tick(loopStart, loopEnd);
             return '';
         }
@@ -313,7 +316,7 @@ class SchedulePlayer {
             this.playCallback(loopStart, this.position, loopEnd);
         }
         let me = this;
-        if (this.onAir) {
+        if (this.playState == 'playing') {
             window.requestAnimationFrame(function (time) {
                 me.tick(loopStart, loopEnd);
             });
@@ -410,15 +413,7 @@ class SchedulePlayer {
         }
     }
     cancel() {
-        this.onAir = false;
-    }
-}
-class MusicTicker {
-    startPlay() { }
-    cancelPlay() { }
-    setPosition(seconds) { }
-    getPosition() {
-        return 0;
+        this.playState = 'waiting';
     }
 }
 class PluginLoader {

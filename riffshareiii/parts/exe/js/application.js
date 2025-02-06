@@ -829,7 +829,7 @@ class CommandDispatcher {
     startPlayLoop(from, position, to) {
         if (this.neeToStart) {
             let me = this;
-            let msg = me.player.startLoop(from, position, to);
+            let msg = me.player.startLoopTicks(from, position, to);
             if (msg) {
                 me.renderer.warning.showWarning('Start playing', 'Wait for ' + msg, () => {
                     console.log('cancel wait spart loop');
@@ -919,52 +919,73 @@ class CommandDispatcher {
         pluginDialogPrompt.closeDialogFrame();
     }
     expandTimeLineSelection(idx) {
-        if (this.cfg().data) {
-            if (idx >= 0 && idx < this.cfg().data.timeline.length) {
-                let curPro = this.cfg().data;
-                if (curPro.selectedPart.startMeasure > -1 || curPro.selectedPart.endMeasure > -1) {
-                    let curProjectSelection = curPro.selectedPart;
-                    if (curProjectSelection.startMeasure == curProjectSelection.endMeasure) {
-                        if (curProjectSelection.startMeasure == idx) {
-                            curPro.selectedPart = {
-                                startMeasure: -1,
-                                endMeasure: -1
-                            };
-                        }
-                        else {
-                            if (curProjectSelection.startMeasure > idx) {
-                                curProjectSelection.endMeasure = curProjectSelection.startMeasure;
-                                curProjectSelection.startMeasure = idx;
+        console.log('expand', idx, this.onAir);
+        if (!this.onAir) {
+            if (this.cfg().data) {
+                if (idx >= 0 && idx < this.cfg().data.timeline.length) {
+                    let curPro = this.cfg().data;
+                    if (curPro.selectedPart.startMeasure > -1 || curPro.selectedPart.endMeasure > -1) {
+                        let curProjectSelection = curPro.selectedPart;
+                        if (curProjectSelection.startMeasure == curProjectSelection.endMeasure) {
+                            if (curProjectSelection.startMeasure == idx) {
+                                curPro.selectedPart = {
+                                    startMeasure: -1,
+                                    endMeasure: -1
+                                };
                             }
                             else {
-                                curProjectSelection.endMeasure = idx;
+                                if (curProjectSelection.startMeasure > idx) {
+                                    curProjectSelection.endMeasure = curProjectSelection.startMeasure;
+                                    curProjectSelection.startMeasure = idx;
+                                }
+                                else {
+                                    curProjectSelection.endMeasure = idx;
+                                }
                             }
+                        }
+                        else {
+                            curProjectSelection.startMeasure = idx;
+                            curProjectSelection.endMeasure = idx;
                         }
                     }
                     else {
-                        curProjectSelection.startMeasure = idx;
-                        curProjectSelection.endMeasure = idx;
+                        curPro.selectedPart = {
+                            startMeasure: idx,
+                            endMeasure: idx
+                        };
                     }
                 }
-                else {
-                    curPro.selectedPart = {
-                        startMeasure: idx,
-                        endMeasure: idx
-                    };
+            }
+            if (this.cfg().data.selectedPart.startMeasure >= 0) {
+                this.playPosition = 0;
+                for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
+                    let measure = this.cfg().data.timeline[mm];
+                    let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
+                    this.playPosition = this.playPosition + cuDuration;
                 }
             }
+            this.renderer.timeselectbar.updateTimeSelectionBar();
+            this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup, this.renderer.timeselectbar.selectionAnchor, LevelModes.top);
+            this.reDrawPlayPosition();
         }
-        if (this.cfg().data.selectedPart.startMeasure >= 0) {
+        else {
+            this.stopPlay();
+            console.log('last position', this.playPosition);
             this.playPosition = 0;
-            for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
+            this.cfg().data.selectedPart.startMeasure = -1;
+            this.cfg().data.selectedPart.endMeasure = -1;
+            console.log('selection', this.cfg().data.selectedPart);
+            for (let mm = 0; mm < idx; mm++) {
                 let measure = this.cfg().data.timeline[mm];
                 let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
                 this.playPosition = this.playPosition + cuDuration;
             }
+            console.log('position now', this.playPosition);
+            this.renderer.timeselectbar.updateTimeSelectionBar();
+            this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup, this.renderer.timeselectbar.selectionAnchor, LevelModes.top);
+            this.reDrawPlayPosition();
+            this.setupAndStartPlay();
         }
-        this.renderer.timeselectbar.updateTimeSelectionBar();
-        this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup, this.renderer.timeselectbar.selectionAnchor, LevelModes.top);
-        this.reDrawPlayPosition();
     }
 }
 let globalCommandDispatcher = new CommandDispatcher();

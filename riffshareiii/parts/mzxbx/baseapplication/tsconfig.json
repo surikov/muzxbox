@@ -23,13 +23,13 @@
     },
     "files": [
         
-        "./code/scale.ts",
+
         "../../mzxbxapi/musicenginetypes.ts",
 		"../../mzxbxapi/musicenginedeclarations.ts",
 		
         "./code/main.ts"
 		,"./code/player.ts"
-        ,"./code/ticker.ts"
+
         ,"./code/loader.ts"
         
 

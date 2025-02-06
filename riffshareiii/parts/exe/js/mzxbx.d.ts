@@ -1,5 +1,3 @@
-declare class MZXBX_ScaleMath {
-}
 declare type Zvoog_Metre = {
     count: number;
     part: number;
@@ -242,7 +240,7 @@ declare type MZXBX_Schedule = {
 };
 declare type MZXBX_Player = {
     startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
-    startLoop: (from: number, position: number, to: number) => string;
+    startLoopTicks: (from: number, position: number, to: number) => string;
     reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];
@@ -297,7 +295,7 @@ declare class SchedulePlayer implements MZXBX_Player {
     pluginsList: MZXBX_PerformerSamplerHolder[];
     nextAudioContextStart: number;
     tickDuration: number;
-    onAir: boolean;
+    playState: 'waiting' | 'starting' | 'playing' | 'stopping';
     playCallback: (start: number, position: number, end: number) => void;
     constructor(callback: (start: number, position: number, end: number) => void);
     startSetupPlugins(context: AudioContext, schedule: MZXBX_Schedule): null | string;
@@ -306,7 +304,7 @@ declare class SchedulePlayer implements MZXBX_Player {
     launchCollectedPlugins(): null | string;
     checkCollectedPlugins(): null | string;
     reconnectAllPlugins(schedule: MZXBX_Schedule): void;
-    startLoop(loopStart: number, currentPosition: number, loopEnd: number): string;
+    startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number): string;
     connectAllPlugins(): string | null;
     disconnectAllPlugins(): void;
     tick(loopStart: number, loopEnd: number): void;
@@ -317,12 +315,6 @@ declare class SchedulePlayer implements MZXBX_Player {
     ms(nn: number): number;
     sendPiece(fromPosition: number, toPosition: number, whenAudio: number): void;
     cancel(): void;
-}
-declare class MusicTicker {
-    startPlay(): void;
-    cancelPlay(): void;
-    setPosition(seconds: number): void;
-    getPosition(): number;
 }
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 declare class PluginLoader {

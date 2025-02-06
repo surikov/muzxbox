@@ -9,7 +9,7 @@ class CommandDispatcher {
 	neeToStart = false;
 	playPosition = 0;
 	playCallback: (start: number, position: number, end: number) => void = (start: number, pos: number, end: number) => {
-		this.playPosition = pos-0.25;
+		this.playPosition = pos - 0.25;
 		//this.renderer.timeselectbar.positionTimeMark.x 
 		this.reDrawPlayPosition();
 
@@ -323,7 +323,7 @@ class CommandDispatcher {
 		if (this.neeToStart) {
 			let me = this;
 			//let n120 = 120 / 60;
-			let msg: string = me.player.startLoop(from, position, to);
+			let msg: string = me.player.startLoopTicks(from, position, to);
 			if (msg) {
 				//me.onAir = false;
 				//console.log('toggleStartStop cancel', msg);
@@ -458,57 +458,73 @@ class CommandDispatcher {
 
 	}
 	expandTimeLineSelection(idx: number) {
-		//console.log('select bar', idx);
-		if (this.cfg().data) {
-			if (idx >= 0 && idx < this.cfg().data.timeline.length) {
-				let curPro = this.cfg().data;
-				if (curPro.selectedPart.startMeasure > -1 || curPro.selectedPart.endMeasure > -1) {
-					let curProjectSelection: Zvoog_Selection = curPro.selectedPart;
-					if (curProjectSelection.startMeasure == curProjectSelection.endMeasure) {
-						if (curProjectSelection.startMeasure == idx) {
-							curPro.selectedPart = {
-								startMeasure: -1
-								, endMeasure: -1
-							};
-						} else {
-							if (curProjectSelection.startMeasure > idx) {
-								curProjectSelection.endMeasure = curProjectSelection.startMeasure;
-								curProjectSelection.startMeasure = idx;
+		console.log('expand',idx,this.onAir);
+		if (!this.onAir) {
+			if (this.cfg().data) {
+				if (idx >= 0 && idx < this.cfg().data.timeline.length) {
+					let curPro = this.cfg().data;
+					if (curPro.selectedPart.startMeasure > -1 || curPro.selectedPart.endMeasure > -1) {
+						let curProjectSelection: Zvoog_Selection = curPro.selectedPart;
+						if (curProjectSelection.startMeasure == curProjectSelection.endMeasure) {
+							if (curProjectSelection.startMeasure == idx) {
+								curPro.selectedPart = {
+									startMeasure: -1
+									, endMeasure: -1
+								};
 							} else {
-								curProjectSelection.endMeasure = idx;
+								if (curProjectSelection.startMeasure > idx) {
+									curProjectSelection.endMeasure = curProjectSelection.startMeasure;
+									curProjectSelection.startMeasure = idx;
+								} else {
+									curProjectSelection.endMeasure = idx;
+								}
 							}
+						} else {
+							curProjectSelection.startMeasure = idx;
+							curProjectSelection.endMeasure = idx;
 						}
 					} else {
-						curProjectSelection.startMeasure = idx;
-						curProjectSelection.endMeasure = idx;
+						curPro.selectedPart = {
+							startMeasure: idx
+							, endMeasure: idx
+						};
 					}
-				} else {
-					curPro.selectedPart = {
-						startMeasure: idx
-						, endMeasure: idx
-					};
 				}
 			}
-		}
-		//console.log('selection', this.cfg().data.selectedPart);
-		if (this.cfg().data.selectedPart.startMeasure >= 0) {
+			if (this.cfg().data.selectedPart.startMeasure >= 0) {
+				this.playPosition = 0;
+				for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
+					let measure: Zvoog_SongMeasure = this.cfg().data.timeline[mm];
+					let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
+					this.playPosition = this.playPosition + cuDuration;
+				}
+			}
+			this.renderer.timeselectbar.updateTimeSelectionBar();
+			this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
+				, this.renderer.timeselectbar.selectionAnchor
+				, LevelModes.top);
+			this.reDrawPlayPosition();
+		} else {
+			this.stopPlay();
+			console.log('last position',this.playPosition);
 			this.playPosition = 0;
-			for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
+			this.cfg().data.selectedPart.startMeasure = -1;
+			this.cfg().data.selectedPart.endMeasure = -1;
+			console.log('selection',this.cfg().data.selectedPart);
+			for (let mm = 0; mm < idx; mm++) {
 				let measure: Zvoog_SongMeasure = this.cfg().data.timeline[mm];
 				let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
 				this.playPosition = this.playPosition + cuDuration;
 			}
+			console.log('position now',this.playPosition);
+			this.renderer.timeselectbar.updateTimeSelectionBar();
+			this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
+				, this.renderer.timeselectbar.selectionAnchor
+				, LevelModes.top);
+			this.reDrawPlayPosition();
+			this.setupAndStartPlay();
 		}
-		this.renderer.timeselectbar.updateTimeSelectionBar();
-		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
-			, this.renderer.timeselectbar.selectionAnchor
-			, LevelModes.top);
-
-		this.reDrawPlayPosition();
 	}
-	/*doUIaction() {
-
-	}*/
 }
 let globalCommandDispatcher = new CommandDispatcher();
 let pluginDialogPrompt = new PluginDialogPrompt();

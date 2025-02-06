@@ -950,7 +950,7 @@ declare type MZXBX_Schedule = {
 };
 declare type MZXBX_Player = {
     startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
-    startLoop: (from: number, position: number, to: number) => string;
+    startLoopTicks: (from: number, position: number, to: number) => string;
     reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];

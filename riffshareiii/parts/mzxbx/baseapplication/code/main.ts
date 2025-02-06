@@ -19,28 +19,6 @@ class MuzXbox {
 		} else {
 			console.log("start initFromUI");
 			this.initAudioContext();
-			/*let filesinput: HTMLElement | null = document.getElementById('filesinput');
-			if (filesinput) {
-				let listener: (this: HTMLElement, event: HTMLElementEventMap['change']) => any = function (this: HTMLElement, ievent: HTMLElementEventMap['change']) {
-					//console.log('event',event);
-					var file = (ievent as any).target.files[0];
-					//console.log(file);
-					var fileReader = new FileReader();
-					fileReader.onload = function (progressEvent: any) {
-						//console.log('progressEvent',progressEvent);
-						if (progressEvent != null) {
-							var arrayBuffer = progressEvent.target.result;
-							//console.log(arrayBuffer);
-							var midiParser = new MidiParser(arrayBuffer);
-							//testSchedule = midiParser.dump();
-							//console.log('MZXBX_Schedule', testSchedule);
-						}
-					};
-					fileReader.readAsArrayBuffer(file);
-				};
-				filesinput.addEventListener('change', listener, false);
-			}*/
-			//console.log('filesinput',filesinput);
 			this.songslide = document.getElementById('songslide') as HTMLInputElement;
 			if (this.songslide) {
 				let me = this;
@@ -56,29 +34,23 @@ class MuzXbox {
 	}
 	updatePosition(pp:number){
 		if (this.player) {
-			if (this.player.onAir) {
+			if (this.player.playState=='playing') {
 				this.player.position=(pp*this.currentDuration)/100;
-
 			}
 		}
 	}
 	updateSongSlider() {
-
 		let me = this;
 		setTimeout(function () {
-			//console.log('updateSongSlider');
 			me.setSongSlider();
 			me.updateSongSlider();
 		}, 999);
 	}
 	setSongSlider() {
 		if (this.player) {
-			if (this.player.onAir) {
+			if (this.player.playState=='playing') {
 				if (this.songslide) {
-					//console.log('setSongSlider', this.player.position,this.songslide);
-					//console.dir(this.songslide);
 					let newValue = Math.floor(100 * this.player.position / this.currentDuration);
-
 					this.songslide.value = '' + newValue;
 				}
 			}
