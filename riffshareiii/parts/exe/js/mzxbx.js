@@ -31,7 +31,7 @@ class MuzXbox {
     }
     updatePosition(pp) {
         if (this.player) {
-            if (this.player.playState == 'playing') {
+            if (this.player.isPlayLoop) {
                 this.player.position = (pp * this.currentDuration) / 100;
             }
         }
@@ -45,7 +45,7 @@ class MuzXbox {
     }
     setSongSlider() {
         if (this.player) {
-            if (this.player.playState == 'playing') {
+            if (this.player.isPlayLoop) {
                 if (this.songslide) {
                     let newValue = Math.floor(100 * this.player.position / this.currentDuration);
                     this.songslide.value = '' + newValue;
@@ -87,24 +87,35 @@ class SchedulePlayer {
         this.pluginsList = [];
         this.nextAudioContextStart = 0;
         this.tickDuration = 0.25;
-        this.playState = 'waiting';
+        this.isPlayLoop = false;
+        this.isConnected = false;
+        this.isLoadingPlugins = false;
         this.playCallback = (start, position, end) => { };
+        this.waitForID = -1;
         this.playCallback = callback;
     }
     startSetupPlugins(context, schedule) {
-        if (this.playState == 'waiting') {
+        if (!(this.isPlayLoop || this.isLoadingPlugins)) {
+            this.isLoadingPlugins = true;
             this.audioContext = context;
             this.schedule = schedule;
             if (this.schedule) {
                 let pluginLoader = new PluginLoader();
-                return pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers);
+                let waitload = pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers);
+                if (waitload) {
+                    return waitload;
+                }
+                else {
+                    this.isLoadingPlugins = false;
+                    return null;
+                }
             }
             else {
                 return 'Empty schedule';
             }
         }
         else {
-            return 'Wrong state - ' + this.playState;
+            return 'Already playing/loading';
         }
     }
     allFilters() {
@@ -156,7 +167,6 @@ class SchedulePlayer {
     reconnectAllPlugins(schedule) {
         this.disconnectAllPlugins();
         this.schedule = schedule;
-        let msg = this.connectAllPlugins();
     }
     startLoopTicks(loopStart, currentPosition, loopEnd) {
         console.log('startLoopTicks', loopStart, currentPosition, loopEnd);
@@ -167,31 +177,99 @@ class SchedulePlayer {
         else {
             this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
             this.position = currentPosition;
-            this.playState = 'playing';
-            this.tick(loopStart, loopEnd);
+            this.isPlayLoop = true;
+            this.waitForID = Math.random();
+            this.tick(loopStart, loopEnd, this.waitForID);
             return '';
         }
     }
+    playState() {
+        return {
+            connected: this.isConnected,
+            play: this.isPlayLoop,
+            loading: this.isLoadingPlugins
+        };
+    }
     connectAllPlugins() {
         console.log('connectAllPlugins');
-        let msg = this.launchCollectedPlugins();
-        if (msg) {
-            return msg;
-        }
-        else {
-            msg = this.checkCollectedPlugins();
+        if (!this.isConnected) {
+            let msg = this.launchCollectedPlugins();
             if (msg) {
                 return msg;
             }
             else {
-                if (this.schedule) {
-                    let master = this.audioContext.destination;
-                    for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
-                        let filter = this.schedule.filters[ff];
-                        let plugin = this.findFilterPlugin(filter.id);
-                        if (plugin) {
-                            let pluginOutput = plugin.output();
-                            if (pluginOutput) {
+                msg = this.checkCollectedPlugins();
+                if (msg) {
+                    return msg;
+                }
+                else {
+                    if (this.schedule) {
+                        let master = this.audioContext.destination;
+                        for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
+                            let filter = this.schedule.filters[ff];
+                            let plugin = this.findFilterPlugin(filter.id);
+                            if (plugin) {
+                                let pluginOutput = plugin.output();
+                                if (pluginOutput) {
+                                    for (let oo = 0; oo < filter.outputs.length; oo++) {
+                                        let outId = filter.outputs[oo];
+                                        let targetNode = master;
+                                        if (outId) {
+                                            let target = this.findFilterPlugin(outId);
+                                            if (target) {
+                                                targetNode = target.input();
+                                            }
+                                        }
+                                        if (targetNode) {
+                                            pluginOutput.connect(targetNode);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        for (let cc = 0; cc < this.schedule.channels.length; cc++) {
+                            let channel = this.schedule.channels[cc];
+                            let performer = this.findPerformerSamplerPlugin(channel.id);
+                            if (performer) {
+                                let output = performer.output();
+                                if (output) {
+                                    for (let oo = 0; oo < channel.outputs.length; oo++) {
+                                        let outId = channel.outputs[oo];
+                                        let targetNode = master;
+                                        if (outId) {
+                                            let target = this.findFilterPlugin(outId);
+                                            if (target) {
+                                                targetNode = target.input();
+                                            }
+                                        }
+                                        if (targetNode) {
+                                            output.connect(targetNode);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return null;
+                }
+            }
+        }
+        else {
+            return 'Connected aready';
+        }
+    }
+    disconnectAllPlugins() {
+        console.log('disconnectAllPlugins');
+        if (this.isConnected) {
+            if (this.schedule) {
+                let master = this.audioContext.destination;
+                for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
+                    let filter = this.schedule.filters[ff];
+                    let plugin = this.findFilterPlugin(filter.id);
+                    if (plugin) {
+                        let output = plugin.output();
+                        if (output) {
+                            try {
                                 for (let oo = 0; oo < filter.outputs.length; oo++) {
                                     let outId = filter.outputs[oo];
                                     let targetNode = master;
@@ -202,18 +280,24 @@ class SchedulePlayer {
                                         }
                                     }
                                     if (targetNode) {
-                                        pluginOutput.connect(targetNode);
+                                        output.disconnect(targetNode);
                                     }
                                 }
                             }
+                            catch (ex) {
+                                console.log(ex);
+                            }
                         }
                     }
-                    for (let cc = 0; cc < this.schedule.channels.length; cc++) {
-                        let channel = this.schedule.channels[cc];
-                        let performer = this.findPerformerSamplerPlugin(channel.id);
-                        if (performer) {
-                            let output = performer.output();
-                            if (output) {
+                }
+                for (let cc = 0; cc < this.schedule.channels.length; cc++) {
+                    let channel = this.schedule.channels[cc];
+                    let plugin = this.findPerformerSamplerPlugin(channel.id);
+                    if (plugin) {
+                        let output = plugin.output();
+                        if (output) {
+                            try {
+                                plugin.cancel();
                                 for (let oo = 0; oo < channel.outputs.length; oo++) {
                                     let outId = channel.outputs[oo];
                                     let targetNode = master;
@@ -224,105 +308,57 @@ class SchedulePlayer {
                                         }
                                     }
                                     if (targetNode) {
-                                        output.connect(targetNode);
+                                        output.disconnect(targetNode);
                                     }
                                 }
+                            }
+                            catch (ex) {
+                                console.log(ex);
                             }
                         }
                     }
                 }
-                return null;
+                this.isConnected = false;
             }
-        }
-    }
-    disconnectAllPlugins() {
-        console.log('disconnectAllPlugins');
-        if (this.schedule) {
-            let master = this.audioContext.destination;
-            for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
-                let filter = this.schedule.filters[ff];
-                let plugin = this.findFilterPlugin(filter.id);
-                if (plugin) {
-                    let output = plugin.output();
-                    if (output) {
-                        try {
-                            for (let oo = 0; oo < filter.outputs.length; oo++) {
-                                let outId = filter.outputs[oo];
-                                let targetNode = master;
-                                if (outId) {
-                                    let target = this.findFilterPlugin(outId);
-                                    if (target) {
-                                        targetNode = target.input();
-                                    }
-                                }
-                                if (targetNode) {
-                                    output.disconnect(targetNode);
-                                }
-                            }
-                        }
-                        catch (ex) {
-                            console.log(ex);
-                        }
-                    }
-                }
+            else {
+                console.log('empty schedule');
             }
-            for (let cc = 0; cc < this.schedule.channels.length; cc++) {
-                let channel = this.schedule.channels[cc];
-                let plugin = this.findPerformerSamplerPlugin(channel.id);
-                if (plugin) {
-                    let output = plugin.output();
-                    if (output) {
-                        try {
-                            plugin.cancel();
-                            for (let oo = 0; oo < channel.outputs.length; oo++) {
-                                let outId = channel.outputs[oo];
-                                let targetNode = master;
-                                if (outId) {
-                                    let target = this.findFilterPlugin(outId);
-                                    if (target) {
-                                        targetNode = target.input();
-                                    }
-                                }
-                                if (targetNode) {
-                                    output.disconnect(targetNode);
-                                }
-                            }
-                        }
-                        catch (ex) {
-                            console.log(ex);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    tick(loopStart, loopEnd) {
-        let sendFrom = this.position;
-        let sendTo = this.position + this.tickDuration;
-        if (this.audioContext.currentTime > this.nextAudioContextStart - this.tickDuration) {
-            let atTime = this.nextAudioContextStart;
-            if (sendTo > loopEnd) {
-                this.sendPiece(sendFrom, loopEnd, atTime);
-                atTime = atTime + (loopEnd - sendFrom);
-                sendFrom = loopStart;
-                sendTo = loopStart + (sendTo - loopEnd);
-            }
-            this.sendPiece(sendFrom, sendTo, atTime);
-            this.position = sendTo;
-            this.nextAudioContextStart = this.nextAudioContextStart + this.tickDuration;
-            if (this.nextAudioContextStart < this.audioContext.currentTime) {
-                this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
-            }
-            this.playCallback(loopStart, this.position, loopEnd);
-        }
-        let me = this;
-        if (this.playState == 'playing') {
-            window.requestAnimationFrame(function (time) {
-                me.tick(loopStart, loopEnd);
-            });
         }
         else {
-            this.disconnectAllPlugins();
+            console.log('not connected');
+        }
+    }
+    tick(loopStart, loopEnd, waitId) {
+        if (waitId == this.waitForID) {
+            let sendFrom = this.position;
+            let sendTo = this.position + this.tickDuration;
+            if (this.audioContext.currentTime > this.nextAudioContextStart - this.tickDuration) {
+                let atTime = this.nextAudioContextStart;
+                if (sendTo > loopEnd) {
+                    this.sendPiece(sendFrom, loopEnd, atTime);
+                    atTime = atTime + (loopEnd - sendFrom);
+                    sendFrom = loopStart;
+                    sendTo = loopStart + (sendTo - loopEnd);
+                }
+                this.sendPiece(sendFrom, sendTo, atTime);
+                this.position = sendTo;
+                this.nextAudioContextStart = this.nextAudioContextStart + this.tickDuration;
+                if (this.nextAudioContextStart < this.audioContext.currentTime) {
+                    this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
+                }
+                this.playCallback(loopStart, this.position, loopEnd);
+            }
+            let me = this;
+            if (this.isPlayLoop) {
+                if (this.waitForID == waitId) {
+                    this.waitForID = Math.random();
+                    let id = this.waitForID;
+                    window.requestAnimationFrame(function (time) {
+                        me.tick(loopStart, loopEnd, id);
+                    });
+                    this.waitForID = id;
+                }
+            }
         }
     }
     findPerformerSamplerPlugin(channelId) {
@@ -413,7 +449,9 @@ class SchedulePlayer {
         }
     }
     cancel() {
-        this.playState = 'waiting';
+        this.waitForID = -1;
+        this.isPlayLoop = false;
+        this.disconnectAllPlugins();
     }
 }
 class PluginLoader {

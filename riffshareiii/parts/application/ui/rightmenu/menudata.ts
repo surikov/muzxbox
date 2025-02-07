@@ -13,7 +13,7 @@ type MenuInfo = {
 	itemStates?: string[];
 	selectedState?: number;
 	dragMix?: boolean;
-	highlight?:string;
+	highlight?: string;
 };
 /*
 let commandThemeSizeSmall = 'commandThemeSizeSmall';
@@ -123,6 +123,14 @@ function fillMenuImportPlugins() {
 	}
 
 }*/
+let menuPlayStop: MenuInfo = {
+	text: localMenuPlay
+	, onClick: () => {
+		//console.log('start/stop');
+		globalCommandDispatcher.toggleStartStop();
+		menuItemsData = null;
+	}
+};
 function fillPluginsLists() {
 	menuPointFilters.children = [];
 	menuPointPerformers.children = [];
@@ -183,26 +191,27 @@ function fillPluginsLists() {
 	}
 }
 function composeBaseMenu(): MenuInfo[] {
-	//console.log('composeBaseMenu',menuItemsData);
+	//console.log('composeBaseMenu',globalCommandDispatcher.player);
 	//fillMenuImportPlugins();
 	//
+	menuPlayStop.text = localMenuPlay;
+	if (globalCommandDispatcher.player) {
+		console.log('composeBaseMenu', globalCommandDispatcher.player.playState());
+		if (
+			(globalCommandDispatcher.player.playState().play)
+			|| (globalCommandDispatcher.player.playState().loading)
+		) {
+			menuPlayStop.text = localMenuPause;
+		}
+	}
+	console.log('menuPlayStop', menuPlayStop.text);
 	if (menuItemsData) {
 		return menuItemsData;
 	} else {
 		fillPluginsLists();
-		let menuPlayStop:MenuInfo={
-			text: '', onClick: () => {
-				//console.log('start/stop');
-				globalCommandDispatcher.toggleStartStop();
-				menuItemsData=null;
-			}
-		};
-		if(globalCommandDispatcher.onAir){
-			menuPlayStop.text=localMenuPause;
-		}else{
-			menuPlayStop.text=localMenuPlay;
-		}
-		//console.log('fill',globalCommandDispatcher.onAir);
+
+		//menuPlayStop.text = localMenuPlay;
+
 		menuItemsData = [
 			menuPlayStop
 			/*{

@@ -309,6 +309,7 @@ type MZXBX_Player = {
 	allFilters(): MZXBX_FilterHolder[];
 	allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
 	position: number;
+	playState(): { connected: boolean, play: boolean, loading: boolean };
 };
 /*
 type Zvoog_import = {

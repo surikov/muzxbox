@@ -295,7 +295,7 @@ class RightMenuPanel {
 							}
 						}
 					});
-					globalCommandDispatcher.reConnectPlugins();
+					globalCommandDispatcher.reConnectPluginsIfPlay();
 				}
 			};
 			if (tt > 0) {
@@ -349,7 +349,7 @@ class RightMenuPanel {
 							}
 						}
 					});
-					globalCommandDispatcher.reConnectPlugins();
+					globalCommandDispatcher.reConnectPluginsIfPlay();
 				}
 				, itemStates: [icon_sound_loud, icon_power, icon_flash]
 				, selectedState: drum.sampler.state
@@ -404,7 +404,7 @@ class RightMenuPanel {
 						filter.state = 0;
 					}
 				});
-				globalCommandDispatcher.reConnectPlugins();
+				globalCommandDispatcher.reConnectPluginsIfPlay();
 			};
 			if (ff > 0) {
 				item.onClick = () => {

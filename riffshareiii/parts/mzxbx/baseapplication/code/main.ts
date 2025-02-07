@@ -32,10 +32,10 @@ class MuzXbox {
 			}
 		}
 	}
-	updatePosition(pp:number){
+	updatePosition(pp: number) {
 		if (this.player) {
-			if (this.player.playState=='playing') {
-				this.player.position=(pp*this.currentDuration)/100;
+			if (this.player.isPlayLoop) {
+				this.player.position = (pp * this.currentDuration) / 100;
 			}
 		}
 	}
@@ -48,7 +48,7 @@ class MuzXbox {
 	}
 	setSongSlider() {
 		if (this.player) {
-			if (this.player.playState=='playing') {
+			if (this.player.isPlayLoop) {
 				if (this.songslide) {
 					let newValue = Math.floor(100 * this.player.position / this.currentDuration);
 					this.songslide.value = '' + newValue;
@@ -76,6 +76,6 @@ class MuzXbox {
 			//don't care
 		}
 	}
-	
+
 }
 

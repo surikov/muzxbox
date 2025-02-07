@@ -567,8 +567,6 @@ let uiLinkFilterToFilter = 'uiLinkFilterToFilter';
 class CommandDispatcher {
     constructor() {
         this.tapSizeRatio = 1;
-        this.onAir = false;
-        this.neeToStart = false;
         this.playPosition = 0;
         this.playCallback = (start, pos, end) => {
             this.playPosition = pos - 0.25;
@@ -766,20 +764,20 @@ class CommandDispatcher {
         console.log('renderCurrentProjectForOutput', forOutput);
         return forOutput;
     }
-    reConnectPlugins() {
-        if (this.onAir && (!this.neeToStart)) {
+    reConnectPluginsIfPlay() {
+        if (this.player.playState().play) {
             let schedule = this.renderCurrentProjectForOutput();
             this.player.reconnectAllPlugins(schedule);
         }
     }
     reStartPlayIfPlay() {
-        if (this.onAir && (!this.neeToStart)) {
+        if (this.player.playState().play) {
             this.stopPlay();
             this.setupAndStartPlay();
         }
     }
     toggleStartStop() {
-        if (this.onAir) {
+        if (this.player.playState().play) {
             this.stopPlay();
         }
         else {
@@ -787,13 +785,12 @@ class CommandDispatcher {
         }
     }
     stopPlay() {
-        if (this.onAir) {
-            this.onAir = false;
-            this.player.cancel();
-        }
+        this.player.cancel();
+        this.renderer.menu.rerenderMenuContent(null);
+        this.resetProject();
+        console.log('stopPlay done', this.player.playState());
     }
     setupAndStartPlay() {
-        this.onAir = true;
         let schedule = this.renderCurrentProjectForOutput();
         let from = 0;
         let to = 0;
@@ -812,7 +809,6 @@ class CommandDispatcher {
         }
         let me = this;
         let result = me.player.startSetupPlugins(me.audioContext, schedule);
-        me.neeToStart = true;
         if (this.playPosition < from) {
             this.playPosition = from;
         }
@@ -821,30 +817,29 @@ class CommandDispatcher {
         }
         me.startPlayLoop(from, this.playPosition, to);
         if (result != null) {
-            this.onAir = false;
-            this.neeToStart = false;
             me.renderer.warning.showWarning('Start playing', result, null);
+        }
+        else {
         }
     }
     startPlayLoop(from, position, to) {
-        if (this.neeToStart) {
-            let me = this;
-            let msg = me.player.startLoopTicks(from, position, to);
-            if (msg) {
-                me.renderer.warning.showWarning('Start playing', 'Wait for ' + msg, () => {
-                    console.log('cancel wait spart loop');
-                    me.neeToStart = false;
-                    me.onAir = false;
-                });
-                let id = setTimeout(() => {
-                    me.startPlayLoop(from, position, to);
-                }, 1000);
-            }
-            else {
-                me.neeToStart = false;
-                me.renderer.warning.hideWarning();
-                me.resetProject();
-            }
+        console.log('startPlayLoop', from, position, to);
+        let me = this;
+        let msg = me.player.startLoopTicks(from, position, to);
+        if (msg) {
+            me.renderer.warning.showWarning('Start playing', 'Wait for ' + msg, () => {
+                console.log('cancel wait spart loop');
+            });
+            let id = setTimeout(() => {
+                me.startPlayLoop(from, position, to);
+            }, 1000);
+        }
+        else {
+            console.log('startPlayLoop done', from, position, to, me.player.playState());
+            me.renderer.warning.hideWarning();
+            me.renderer.menu.rerenderMenuContent(null);
+            me.resetProject();
+            console.log('startPlayLoop done', from, position, to, me.player.playState());
         }
     }
     setThemeLocale(loc, ratio) {
@@ -919,8 +914,8 @@ class CommandDispatcher {
         pluginDialogPrompt.closeDialogFrame();
     }
     expandTimeLineSelection(idx) {
-        console.log('expand', idx, this.onAir);
-        if (!this.onAir) {
+        console.log('expand', idx);
+        if (this.player.playState().play) {
             if (this.cfg().data) {
                 if (idx >= 0 && idx < this.cfg().data.timeline.length) {
                     let curPro = this.cfg().data;
@@ -1303,7 +1298,7 @@ class TimeSelectBar {
     }
     resizeTimeScale(viewWidth, viewHeight) {
         let ww = 0.001;
-        if (globalCommandDispatcher.onAir) {
+        if ((globalCommandDispatcher.player) && (globalCommandDispatcher.player.playState().play)) {
             ww = this.positionMarkWidth();
         }
         this.positionTimeMark.w = ww;
@@ -1735,7 +1730,7 @@ class RightMenuPanel {
                             }
                         }
                     });
-                    globalCommandDispatcher.reConnectPlugins();
+                    globalCommandDispatcher.reConnectPluginsIfPlay();
                 }
             };
             if (tt > 0) {
@@ -1782,7 +1777,7 @@ class RightMenuPanel {
                             }
                         }
                     });
-                    globalCommandDispatcher.reConnectPlugins();
+                    globalCommandDispatcher.reConnectPluginsIfPlay();
                 },
                 itemStates: [icon_sound_loud, icon_power, icon_flash],
                 selectedState: drum.sampler.state
@@ -1829,7 +1824,7 @@ class RightMenuPanel {
                         filter.state = 0;
                     }
                 });
-                globalCommandDispatcher.reConnectPlugins();
+                globalCommandDispatcher.reConnectPluginsIfPlay();
             };
             if (ff > 0) {
                 item.onClick = () => {
@@ -2090,6 +2085,13 @@ let menuPointTracks = {
     onFolderOpen: () => {
     }
 };
+let menuPlayStop = {
+    text: localMenuPlay,
+    onClick: () => {
+        globalCommandDispatcher.toggleStartStop();
+        menuItemsData = null;
+    }
+};
 function fillPluginsLists() {
     menuPointFilters.children = [];
     menuPointPerformers.children = [];
@@ -2147,23 +2149,20 @@ function fillPluginsLists() {
     }
 }
 function composeBaseMenu() {
+    menuPlayStop.text = localMenuPlay;
+    if (globalCommandDispatcher.player) {
+        console.log('composeBaseMenu', globalCommandDispatcher.player.playState());
+        if ((globalCommandDispatcher.player.playState().play)
+            || (globalCommandDispatcher.player.playState().loading)) {
+            menuPlayStop.text = localMenuPause;
+        }
+    }
+    console.log('menuPlayStop', menuPlayStop.text);
     if (menuItemsData) {
         return menuItemsData;
     }
     else {
         fillPluginsLists();
-        let menuPlayStop = {
-            text: '', onClick: () => {
-                globalCommandDispatcher.toggleStartStop();
-                menuItemsData = null;
-            }
-        };
-        if (globalCommandDispatcher.onAir) {
-            menuPlayStop.text = localMenuPause;
-        }
-        else {
-            menuPlayStop.text = localMenuPlay;
-        }
         menuItemsData = [
             menuPlayStop,
             menuPointTracks,

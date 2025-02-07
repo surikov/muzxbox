@@ -5,8 +5,8 @@ class CommandDispatcher {
 	renderer: UIRenderer;
 	audioContext: AudioContext;
 	tapSizeRatio: number = 1;
-	onAir = false;
-	neeToStart = false;
+	//onAir = false;
+	//neeToStart = false;
 	playPosition = 0;
 	playCallback: (start: number, position: number, end: number) => void = (start: number, pos: number, end: number) => {
 		this.playPosition = pos - 0.25;
@@ -255,36 +255,40 @@ class CommandDispatcher {
 		console.log('renderCurrentProjectForOutput', forOutput);
 		return forOutput;
 	}
-	reConnectPlugins() {
-		if (this.onAir && (!this.neeToStart)) {
+	reConnectPluginsIfPlay() {
+		if (this.player.playState().play) {
 			let schedule = this.renderCurrentProjectForOutput();
 			//console.log('schedule', schedule);
 			this.player.reconnectAllPlugins(schedule);
 		}
 	}
 	reStartPlayIfPlay() {
-		if (this.onAir && (!this.neeToStart)) {
+		if (this.player.playState().play) {
 			this.stopPlay();
 			this.setupAndStartPlay();
 		}
 	}
 	toggleStartStop() {
 		//console.log('toggleStartStop', this.onAir);
-		if (this.onAir) {
+		if (this.player.playState().play) {
 			this.stopPlay();
 		} else {
 			this.setupAndStartPlay();
 		}
 	}
 	stopPlay() {
-		if (this.onAir) {
+		/*if (this.onAir) {
 			this.onAir = false;
 			this.player.cancel();
-		}
+		}*/
+		this.player.cancel();
+		this.renderer.menu.rerenderMenuContent(null);
+		this.resetProject();
+		console.log('stopPlay done', this.player.playState());
 	}
 	setupAndStartPlay() {
 		//console.log('setupAndStartPlay');
-		this.onAir = true;
+		//this.onAir = true;
 		let schedule = this.renderCurrentProjectForOutput();
 		let from = 0;
 		let to = 0;
@@ -303,7 +307,7 @@ class CommandDispatcher {
 		let me = this;
 		let result = me.player.startSetupPlugins(me.audioContext, schedule);
 		//console.log('after setupPlugins');
-		me.neeToStart = true;
+		//me.neeToStart = true;
 		if (this.playPosition < from) {
 			this.playPosition = from;
 		}
@@ -313,36 +317,41 @@ class CommandDispatcher {
 		me.startPlayLoop(from, this.playPosition, to);
 
 		if (result != null) {
-			this.onAir = false;
-			this.neeToStart = false;
+			//this.onAir = false;
+			//this.neeToStart = false;
 			me.renderer.warning.showWarning('Start playing', result, null);
+		} else {
+			//this.renderer.menu.rerenderMenuContent()
 		}
 	}
 	startPlayLoop(from: number, position: number, to: number) {
-		//console.log('startPlayLoop', from, position, to);
-		if (this.neeToStart) {
-			let me = this;
-			//let n120 = 120 / 60;
-			let msg: string = me.player.startLoopTicks(from, position, to);
-			if (msg) {
+		console.log('startPlayLoop', from, position, to);
+		//if (this.neeToStart) {
+		let me = this;
+		//let n120 = 120 / 60;
+		let msg: string = me.player.startLoopTicks(from, position, to);
+		if (msg) {
+			//me.onAir = false;
+			//console.log('toggleStartStop cancel', msg);
+			me.renderer.warning.showWarning('Start playing', 'Wait for ' + msg, () => {
+				console.log('cancel wait spart loop');
+				//me.neeToStart = false;
 				//me.onAir = false;
-				//console.log('toggleStartStop cancel', msg);
-				me.renderer.warning.showWarning('Start playing', 'Wait for ' + msg, () => {
-					console.log('cancel wait spart loop');
-					me.neeToStart = false;
-					me.onAir = false;
-				});
-				let id = setTimeout(() => {
-					me.startPlayLoop(from, position, to);
-				}, 1000);
-				//console.log('wait',id);
-			} else {
-				//console.log('toggleStartStop setupPlugins done', from, position, to);
-				me.neeToStart = false;
-				me.renderer.warning.hideWarning();
-				me.resetProject();
-			}
+			});
+			let id = setTimeout(() => {
+				me.startPlayLoop(from, position, to);
+			}, 1000);
+			//console.log('wait',id);
+		} else {
+			console.log('startPlayLoop done', from, position, to, me.player.playState());
+			//me.neeToStart = false;
+			me.renderer.warning.hideWarning();
+
+			me.renderer.menu.rerenderMenuContent(null);
+			me.resetProject();
+			console.log('startPlayLoop done', from, position, to, me.player.playState());
 		}
+		//}
 	}
 	setThemeLocale(loc: string, ratio: number) {
 		console.log("setThemeLocale " + loc);
@@ -458,8 +467,8 @@ class CommandDispatcher {
 
 	}
 	expandTimeLineSelection(idx: number) {
-		console.log('expand',idx,this.onAir);
-		if (!this.onAir) {
+		console.log('expand', idx);
+		if (this.player.playState().play) {
 			if (this.cfg().data) {
 				if (idx >= 0 && idx < this.cfg().data.timeline.length) {
 					let curPro = this.cfg().data;
@@ -506,17 +515,17 @@ class CommandDispatcher {
 			this.reDrawPlayPosition();
 		} else {
 			this.stopPlay();
-			console.log('last position',this.playPosition);
+			console.log('last position', this.playPosition);
 			this.playPosition = 0;
 			this.cfg().data.selectedPart.startMeasure = -1;
 			this.cfg().data.selectedPart.endMeasure = -1;
-			console.log('selection',this.cfg().data.selectedPart);
+			console.log('selection', this.cfg().data.selectedPart);
 			for (let mm = 0; mm < idx; mm++) {
 				let measure: Zvoog_SongMeasure = this.cfg().data.timeline[mm];
 				let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
 				this.playPosition = this.playPosition + cuDuration;
 			}
-			console.log('position now',this.playPosition);
+			console.log('position now', this.playPosition);
 			this.renderer.timeselectbar.updateTimeSelectionBar();
 			this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
 				, this.renderer.timeselectbar.selectionAnchor

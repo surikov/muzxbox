@@ -67,8 +67,6 @@ declare class CommandDispatcher {
     renderer: UIRenderer;
     audioContext: AudioContext;
     tapSizeRatio: number;
-    onAir: boolean;
-    neeToStart: boolean;
     playPosition: number;
     playCallback: (start: number, position: number, end: number) => void;
     _mixerDataMathUtility: MixerDataMathUtility;
@@ -83,7 +81,7 @@ declare class CommandDispatcher {
     findCurrentFilter(id: string): null | Zvoog_FilterTarget;
     renderCurrentOutputs(id: string, result: string[], outputs: string[]): void;
     renderCurrentProjectForOutput(): MZXBX_Schedule;
-    reConnectPlugins(): void;
+    reConnectPluginsIfPlay(): void;
     reStartPlayIfPlay(): void;
     toggleStartStop(): void;
     stopPlay(): void;
@@ -291,6 +289,7 @@ declare let menuPointPerformers: MenuInfo;
 declare let menuPointFilters: MenuInfo;
 declare let menuPointSamplers: MenuInfo;
 declare let menuPointTracks: MenuInfo;
+declare let menuPlayStop: MenuInfo;
 declare function fillPluginsLists(): void;
 declare function composeBaseMenu(): MenuInfo[];
 declare class LeftPanel {
@@ -956,6 +955,11 @@ declare type MZXBX_Player = {
     allFilters(): MZXBX_FilterHolder[];
     allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
     position: number;
+    playState(): {
+        connected: boolean;
+        play: boolean;
+        loading: boolean;
+    };
 };
 declare type MZXBX_PluginRegistrationInformation = {
     label: string;

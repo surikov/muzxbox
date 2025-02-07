@@ -80,9 +80,9 @@ class TimeSelectBar {
 		return ww;
 	}
 	resizeTimeScale(viewWidth: number, viewHeight: number) {
-		//console.log('resizeTimeSelect',viewWidth,viewHeight);
+		//console.log('resizeTimeSelect',viewWidth,viewHeight,globalCommandDispatcher.player);
 		let ww = 0.001;
-		if (globalCommandDispatcher.onAir) {
+		if((globalCommandDispatcher.player) && (globalCommandDispatcher.player.playState().play)){
 			ww = this.positionMarkWidth();
 		}
 		this.positionTimeMark.w = ww;

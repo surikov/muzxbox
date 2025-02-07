@@ -246,6 +246,11 @@ declare type MZXBX_Player = {
     allFilters(): MZXBX_FilterHolder[];
     allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
     position: number;
+    playState(): {
+        connected: boolean;
+        play: boolean;
+        loading: boolean;
+    };
 };
 declare type MZXBX_PluginRegistrationInformation = {
     label: string;
@@ -295,8 +300,11 @@ declare class SchedulePlayer implements MZXBX_Player {
     pluginsList: MZXBX_PerformerSamplerHolder[];
     nextAudioContextStart: number;
     tickDuration: number;
-    playState: 'waiting' | 'starting' | 'playing' | 'stopping';
+    isPlayLoop: boolean;
+    isConnected: boolean;
+    isLoadingPlugins: boolean;
     playCallback: (start: number, position: number, end: number) => void;
+    waitForID: number;
     constructor(callback: (start: number, position: number, end: number) => void);
     startSetupPlugins(context: AudioContext, schedule: MZXBX_Schedule): null | string;
     allFilters(): MZXBX_FilterHolder[];
@@ -305,9 +313,14 @@ declare class SchedulePlayer implements MZXBX_Player {
     checkCollectedPlugins(): null | string;
     reconnectAllPlugins(schedule: MZXBX_Schedule): void;
     startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number): string;
+    playState(): {
+        connected: boolean;
+        play: boolean;
+        loading: boolean;
+    };
     connectAllPlugins(): string | null;
     disconnectAllPlugins(): void;
-    tick(loopStart: number, loopEnd: number): void;
+    tick(loopStart: number, loopEnd: number, waitId: number): void;
     findPerformerSamplerPlugin(channelId: string): MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null;
     sendPerformerItem(it: MZXBX_PlayItem, whenAudio: number, tempo: number): void;
     findFilterPlugin(filterId: string): MZXBX_AudioFilterPlugin | null;
