@@ -196,7 +196,7 @@ function composeBaseMenu(): MenuInfo[] {
 	//
 	menuPlayStop.text = localMenuPlay;
 	if (globalCommandDispatcher.player) {
-		console.log('composeBaseMenu', globalCommandDispatcher.player.playState());
+		//console.log('composeBaseMenu', globalCommandDispatcher.player.playState());
 		if (
 			(globalCommandDispatcher.player.playState().play)
 			|| (globalCommandDispatcher.player.playState().loading)
@@ -204,7 +204,7 @@ function composeBaseMenu(): MenuInfo[] {
 			menuPlayStop.text = localMenuPause;
 		}
 	}
-	console.log('menuPlayStop', menuPlayStop.text);
+	//console.log('menuPlayStop', menuPlayStop.text);
 	if (menuItemsData) {
 		return menuItemsData;
 	} else {

@@ -284,7 +284,7 @@ class CommandDispatcher {
 		this.player.cancel();
 		this.renderer.menu.rerenderMenuContent(null);
 		this.resetProject();
-		console.log('stopPlay done', this.player.playState());
+		//console.log('stopPlay done', this.player.playState());
 	}
 	setupAndStartPlay() {
 		//console.log('setupAndStartPlay');
@@ -325,7 +325,7 @@ class CommandDispatcher {
 		}
 	}
 	startPlayLoop(from: number, position: number, to: number) {
-		console.log('startPlayLoop', from, position, to);
+		//console.log('startPlayLoop', from, position, to);
 		//if (this.neeToStart) {
 		let me = this;
 		//let n120 = 120 / 60;
@@ -343,13 +343,13 @@ class CommandDispatcher {
 			}, 1000);
 			//console.log('wait',id);
 		} else {
-			console.log('startPlayLoop done', from, position, to, me.player.playState());
+			//console.log('startPlayLoop done', from, position, to, me.player.playState());
 			//me.neeToStart = false;
 			me.renderer.warning.hideWarning();
 
 			me.renderer.menu.rerenderMenuContent(null);
 			me.resetProject();
-			console.log('startPlayLoop done', from, position, to, me.player.playState());
+			//console.log('startPlayLoop done', from, position, to, me.player.playState());
 		}
 		//}
 	}

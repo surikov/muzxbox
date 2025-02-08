@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es2015",
-        "outFile": "../../exe/js/mzxbx.js",
+        "outFile": "../exe/js/mzxbxlib.js",
         "strictNullChecks": true,
         "alwaysStrict": true,
         "esModuleInterop": true,
@@ -22,16 +22,11 @@
         "types": []
     },
     "files": [
-        
-
-        "../../mzxbxapi/musicenginetypes.ts",
-		"../../mzxbxapi/musicenginedeclarations.ts",
+        "./metre.ts",
+        "./loading.ts",
+        "./flow.ts",
+        "../mzxbxapi/musicenginetypes.ts",
 		
-        "./code/main.ts"
-		,"./code/player.ts"
-
-        ,"./code/loader.ts"
-        
 
     ]
 }

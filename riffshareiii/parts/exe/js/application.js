@@ -788,7 +788,6 @@ class CommandDispatcher {
         this.player.cancel();
         this.renderer.menu.rerenderMenuContent(null);
         this.resetProject();
-        console.log('stopPlay done', this.player.playState());
     }
     setupAndStartPlay() {
         let schedule = this.renderCurrentProjectForOutput();
@@ -823,7 +822,6 @@ class CommandDispatcher {
         }
     }
     startPlayLoop(from, position, to) {
-        console.log('startPlayLoop', from, position, to);
         let me = this;
         let msg = me.player.startLoopTicks(from, position, to);
         if (msg) {
@@ -835,11 +833,9 @@ class CommandDispatcher {
             }, 1000);
         }
         else {
-            console.log('startPlayLoop done', from, position, to, me.player.playState());
             me.renderer.warning.hideWarning();
             me.renderer.menu.rerenderMenuContent(null);
             me.resetProject();
-            console.log('startPlayLoop done', from, position, to, me.player.playState());
         }
     }
     setThemeLocale(loc, ratio) {
@@ -2151,13 +2147,11 @@ function fillPluginsLists() {
 function composeBaseMenu() {
     menuPlayStop.text = localMenuPlay;
     if (globalCommandDispatcher.player) {
-        console.log('composeBaseMenu', globalCommandDispatcher.player.playState());
         if ((globalCommandDispatcher.player.playState().play)
             || (globalCommandDispatcher.player.playState().loading)) {
             menuPlayStop.text = localMenuPause;
         }
     }
-    console.log('menuPlayStop', menuPlayStop.text);
     if (menuItemsData) {
         return menuItemsData;
     }

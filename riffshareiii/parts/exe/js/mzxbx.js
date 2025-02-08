@@ -250,6 +250,7 @@ class SchedulePlayer {
                             }
                         }
                     }
+                    this.isConnected = true;
                     return null;
                 }
             }
@@ -358,6 +359,12 @@ class SchedulePlayer {
                     });
                     this.waitForID = id;
                 }
+                else {
+                    console.log('cancel ticks due different id');
+                }
+            }
+            else {
+                console.log('cancel ticks due stop');
             }
         }
     }
@@ -449,9 +456,14 @@ class SchedulePlayer {
         }
     }
     cancel() {
-        this.waitForID = -1;
-        this.isPlayLoop = false;
-        this.disconnectAllPlugins();
+        if (this.isPlayLoop) {
+            this.waitForID = -1;
+            this.isPlayLoop = false;
+            this.disconnectAllPlugins();
+        }
+        else {
+            console.log('No loop to cancel');
+        }
     }
 }
 class PluginLoader {
