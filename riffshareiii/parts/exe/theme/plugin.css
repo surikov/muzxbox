@@ -34,7 +34,7 @@
 #pluginHeader {
 	width: 100%;
 	height: 1.0cm;
-	background-color: var(--background-color);
+	background-color: var(--background-color25);
 	border-radius2: 0.125cm 0.125cm 0.0cm 0.0cm;
 	flex-basis: auto;
 	flex-shrink: 0;
@@ -46,7 +46,7 @@
 }
 
 #pluginTitle {
-	color: var(--main-color);
+	color: var(--line-color);
 	font-size: var(--label-04cm);
 	padding-left: 0.5cm;
 	padding-top: 0.25cm;
@@ -111,7 +111,7 @@
 #pluginBottom {
 	width: 100%;
 	height: 1.0cm;
-	background-color: var(--background-color);
+	background-color: var(--background-color25);
 	border-radius2: 0.125cm 0.125cm 0.0cm 0.0cm;
 	flex-basis: auto;
 	flex-shrink: 0;

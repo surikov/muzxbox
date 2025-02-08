@@ -99,6 +99,8 @@ declare class CommandDispatcher {
     promptPerformerPluginDialog(label: string, url: string, rawdata: string, callback: (obj: any) => boolean): void;
     findPluginRegistrationByKind(kind: String): null | MZXBX_PluginRegistrationInformation;
     cancelPluginGUI(): void;
+    timeSelectChange(idx: number): void;
+    playFromTimeSelection(idx: number): void;
     expandTimeLineSelection(idx: number): void;
 }
 declare let globalCommandDispatcher: CommandDispatcher;

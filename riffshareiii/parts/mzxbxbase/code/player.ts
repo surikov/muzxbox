@@ -88,11 +88,11 @@ class SchedulePlayer implements MZXBX_Player {
 	reconnectAllPlugins(schedule: MZXBX_Schedule): void {
 		this.disconnectAllPlugins();
 		this.schedule = schedule;
-		//let msg = this.connectAllPlugins();
+		let msg = this.connectAllPlugins();
 		//console.log('reconnectAllPlugins', msg, schedule);
 	}
 	startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number): string {
-		console.log('startLoopTicks', loopStart, currentPosition, loopEnd);
+		//console.log('startLoopTicks', loopStart, currentPosition, loopEnd);
 		let msg: string | null = this.connectAllPlugins();
 		if (msg) {
 			//console.log('Can\'t start loop:', msg);
@@ -115,7 +115,7 @@ class SchedulePlayer implements MZXBX_Player {
 		};
 	}
 	connectAllPlugins(): string | null {
-		console.log('connectAllPlugins');
+		//console.log('connectAllPlugins');
 		if (!this.isConnected) {
 			let msg: string | null = this.launchCollectedPlugins();
 			if (msg) {
@@ -181,7 +181,7 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 	}
 	disconnectAllPlugins() {
-		console.log('disconnectAllPlugins');
+		//console.log('disconnectAllPlugins');
 		if (this.isConnected) {
 			if (this.schedule) {
 				let master: AudioNode = this.audioContext.destination;

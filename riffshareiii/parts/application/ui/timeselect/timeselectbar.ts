@@ -150,7 +150,7 @@ class TimeSelectBar {
 			//, rx: size / 2, ry: size / 2
 			, css: 'timeMarkButtonCircle', activation: (x, y) => {
 				//console.log('barIdx', barIdx);
-				globalCommandDispatcher.expandTimeLineSelection(barIdx);
+				globalCommandDispatcher.timeSelectChange(barIdx);//expandTimeLineSelection(barIdx);
 			}
 		};
 		measureAnchor.content.push(mark);

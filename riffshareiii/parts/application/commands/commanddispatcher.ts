@@ -252,10 +252,11 @@ class CommandDispatcher {
 				}
 			}
 		}
-		console.log('renderCurrentProjectForOutput', forOutput);
+		//console.log('renderCurrentProjectForOutput', forOutput);
 		return forOutput;
 	}
 	reConnectPluginsIfPlay() {
+		//console.log('reConnectPluginsIfPlay', this.player.playState());
 		if (this.player.playState().play) {
 			let schedule = this.renderCurrentProjectForOutput();
 			//console.log('schedule', schedule);
@@ -466,73 +467,82 @@ class CommandDispatcher {
 		pluginDialogPrompt.closeDialogFrame();
 
 	}
-	expandTimeLineSelection(idx: number) {
-		console.log('expand', idx);
+	timeSelectChange(idx: number) {
 		if (this.player.playState().play) {
-			if (this.cfg().data) {
-				if (idx >= 0 && idx < this.cfg().data.timeline.length) {
-					let curPro = this.cfg().data;
-					if (curPro.selectedPart.startMeasure > -1 || curPro.selectedPart.endMeasure > -1) {
-						let curProjectSelection: Zvoog_Selection = curPro.selectedPart;
-						if (curProjectSelection.startMeasure == curProjectSelection.endMeasure) {
-							if (curProjectSelection.startMeasure == idx) {
-								curPro.selectedPart = {
-									startMeasure: -1
-									, endMeasure: -1
-								};
-							} else {
-								if (curProjectSelection.startMeasure > idx) {
-									curProjectSelection.endMeasure = curProjectSelection.startMeasure;
-									curProjectSelection.startMeasure = idx;
-								} else {
-									curProjectSelection.endMeasure = idx;
-								}
-							}
+			this.playFromTimeSelection(idx);
+		} else {
+			this.expandTimeLineSelection(idx);
+		}
+	}
+	playFromTimeSelection(idx: number) {
+		this.stopPlay();
+		console.log('last position', this.playPosition);
+		this.playPosition = 0;
+		this.cfg().data.selectedPart.startMeasure = -1;
+		this.cfg().data.selectedPart.endMeasure = -1;
+		console.log('selection', this.cfg().data.selectedPart);
+		for (let mm = 0; mm < idx; mm++) {
+			let measure: Zvoog_SongMeasure = this.cfg().data.timeline[mm];
+			let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
+			this.playPosition = this.playPosition + cuDuration;
+		}
+		console.log('position now', this.playPosition);
+		this.renderer.timeselectbar.updateTimeSelectionBar();
+		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
+			, this.renderer.timeselectbar.selectionAnchor
+			, LevelModes.top);
+		this.reDrawPlayPosition();
+		this.setupAndStartPlay();
+	}
+	expandTimeLineSelection(idx: number) {
+
+		if (this.cfg().data) {
+			if (idx >= 0 && idx < this.cfg().data.timeline.length) {
+				let curPro = this.cfg().data;
+				if (curPro.selectedPart.startMeasure > -1 || curPro.selectedPart.endMeasure > -1) {
+					let curProjectSelection: Zvoog_Selection = curPro.selectedPart;
+					if (curProjectSelection.startMeasure == curProjectSelection.endMeasure) {
+						if (curProjectSelection.startMeasure == idx) {
+							curPro.selectedPart = {
+								startMeasure: -1
+								, endMeasure: -1
+							};
 						} else {
-							curProjectSelection.startMeasure = idx;
-							curProjectSelection.endMeasure = idx;
+							if (curProjectSelection.startMeasure > idx) {
+								curProjectSelection.endMeasure = curProjectSelection.startMeasure;
+								curProjectSelection.startMeasure = idx;
+							} else {
+								curProjectSelection.endMeasure = idx;
+							}
 						}
 					} else {
-						curPro.selectedPart = {
-							startMeasure: idx
-							, endMeasure: idx
-						};
+						curProjectSelection.startMeasure = idx;
+						curProjectSelection.endMeasure = idx;
 					}
+				} else {
+					curPro.selectedPart = {
+						startMeasure: idx
+						, endMeasure: idx
+					};
 				}
 			}
-			if (this.cfg().data.selectedPart.startMeasure >= 0) {
-				this.playPosition = 0;
-				for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
-					let measure: Zvoog_SongMeasure = this.cfg().data.timeline[mm];
-					let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
-					this.playPosition = this.playPosition + cuDuration;
-				}
-			}
-			this.renderer.timeselectbar.updateTimeSelectionBar();
-			this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
-				, this.renderer.timeselectbar.selectionAnchor
-				, LevelModes.top);
-			this.reDrawPlayPosition();
-		} else {
-			this.stopPlay();
-			console.log('last position', this.playPosition);
+		}else{
+			console.log('no project data');
+		}
+		if (this.cfg().data.selectedPart.startMeasure >= 0) {
 			this.playPosition = 0;
-			this.cfg().data.selectedPart.startMeasure = -1;
-			this.cfg().data.selectedPart.endMeasure = -1;
-			console.log('selection', this.cfg().data.selectedPart);
-			for (let mm = 0; mm < idx; mm++) {
+			for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
 				let measure: Zvoog_SongMeasure = this.cfg().data.timeline[mm];
 				let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
 				this.playPosition = this.playPosition + cuDuration;
 			}
-			console.log('position now', this.playPosition);
-			this.renderer.timeselectbar.updateTimeSelectionBar();
-			this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
-				, this.renderer.timeselectbar.selectionAnchor
-				, LevelModes.top);
-			this.reDrawPlayPosition();
-			this.setupAndStartPlay();
 		}
+		this.renderer.timeselectbar.updateTimeSelectionBar();
+		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
+			, this.renderer.timeselectbar.selectionAnchor
+			, LevelModes.top);
+		this.reDrawPlayPosition();
+
 	}
 }
 let globalCommandDispatcher = new CommandDispatcher();

@@ -167,9 +167,9 @@ class SchedulePlayer {
     reconnectAllPlugins(schedule) {
         this.disconnectAllPlugins();
         this.schedule = schedule;
+        let msg = this.connectAllPlugins();
     }
     startLoopTicks(loopStart, currentPosition, loopEnd) {
-        console.log('startLoopTicks', loopStart, currentPosition, loopEnd);
         let msg = this.connectAllPlugins();
         if (msg) {
             return msg;
@@ -191,7 +191,6 @@ class SchedulePlayer {
         };
     }
     connectAllPlugins() {
-        console.log('connectAllPlugins');
         if (!this.isConnected) {
             let msg = this.launchCollectedPlugins();
             if (msg) {
@@ -260,7 +259,6 @@ class SchedulePlayer {
         }
     }
     disconnectAllPlugins() {
-        console.log('disconnectAllPlugins');
         if (this.isConnected) {
             if (this.schedule) {
                 let master = this.audioContext.destination;
