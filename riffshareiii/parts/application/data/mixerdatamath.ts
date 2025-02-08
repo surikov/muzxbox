@@ -42,7 +42,7 @@ class MixerDataMathUtility {
 
 	constructor(data: Zvoog_Project) {
 		this.data = data;
-		this.recalculateCommantMax();
+		this.recalculateCommentMax();
 		//this.recalculateAutoMax();
 		//console.log();
 	}
@@ -54,7 +54,7 @@ class MixerDataMathUtility {
 			}
 		}
 	}*/
-	recalculateCommantMax() {
+	recalculateCommentMax() {
 		this.maxCommentRowCount = -1;
 		for (let ii = 0; ii < this.data.comments.length; ii++) {
 			let txts = this.data.comments[ii].points;

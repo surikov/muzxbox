@@ -17,7 +17,10 @@ let localMenuUndo='localMenuUndo';
 let localMenuRedo='localMenuRedo';
 let localMenuClearUndoRedo='localMenuClearUndoRedo';
 
-
+let localDropInsTrack='localDropInsTrack';
+let localDropSampleTrack='localDropSampleTrack';
+let localDropFilterTrack='localDropFilterTrack';
+let localDropFilterPoint='localDropFilterPoint';
 
 let localMenuActionsFolder='localMenuActionsFolder';
 let localMenuPerformersFolder='localMenuPerformersFolder';

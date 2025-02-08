@@ -169,12 +169,14 @@ class SamplerIcon {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptSamplerPluginDialog(samplerTrack.sampler.id, url, samplerTrack.sampler.data, (obj: any) => {
+						globalCommandDispatcher.promptPluginPointDialog(samplerTrack.sampler.id, url, samplerTrack.sampler.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['percussions',order], () => {
 								samplerTrack.sampler.data = obj;
 							});
 							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
+						},LO(localDropSampleTrack),()=>{
+							console.log(localDropSampleTrack);
 						});
 					}
 				}

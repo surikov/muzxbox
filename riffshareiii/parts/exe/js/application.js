@@ -274,7 +274,7 @@ class PluginDialogPrompt {
             }
         }
     }
-    openFilterPluginDialogFrame(label, url, raw, callback) {
+    openPluginPointDialogFrame(label, url, raw, callback, btnLabel, btnAction) {
         this.waitProjectCallback = null;
         this.waitTimelinePointCallback = callback;
         this.rawData = raw;
@@ -285,58 +285,8 @@ class PluginDialogPrompt {
             if (pluginFrame.contentWindow) {
                 this.waitForPluginInit = true;
                 pluginFrame.src = url;
-                document.getElementById("pluginDeleteLabel").innerHTML = "plugin";
-                document.getElementById("pluginBottom").style.display = "flex";
-                document.getElementById("pluginDiv").style.visibility = "visible";
-            }
-        }
-    }
-    openSamplerPluginDialogFrame(label, url, raw, callback) {
-        this.waitProjectCallback = null;
-        this.waitTimelinePointCallback = callback;
-        this.rawData = raw;
-        let pluginTitle = document.getElementById("pluginTitle");
-        pluginTitle.innerHTML = label;
-        let pluginFrame = document.getElementById("pluginFrame");
-        if (pluginFrame) {
-            if (pluginFrame.contentWindow) {
-                this.waitForPluginInit = true;
-                pluginFrame.src = url;
-                document.getElementById("pluginDeleteLabel").innerHTML = "plugin";
-                document.getElementById("pluginBottom").style.display = "flex";
-                document.getElementById("pluginDiv").style.visibility = "visible";
-            }
-        }
-    }
-    openPerformerPluginDialogFrame(label, url, raw, callback) {
-        this.waitProjectCallback = null;
-        this.waitTimelinePointCallback = callback;
-        this.rawData = raw;
-        let pluginTitle = document.getElementById("pluginTitle");
-        pluginTitle.innerHTML = label;
-        let pluginFrame = document.getElementById("pluginFrame");
-        if (pluginFrame) {
-            if (pluginFrame.contentWindow) {
-                this.waitForPluginInit = true;
-                pluginFrame.src = url;
-                document.getElementById("pluginDeleteLabel").innerHTML = "plugin";
-                document.getElementById("pluginBottom").style.display = "flex";
-                document.getElementById("pluginDiv").style.visibility = "visible";
-            }
-        }
-    }
-    openStepDialogFrame(label, url, raw, callback) {
-        this.waitProjectCallback = null;
-        this.waitTimelinePointCallback = callback;
-        this.rawData = raw;
-        let pluginTitle = document.getElementById("pluginTitle");
-        pluginTitle.innerHTML = label;
-        let pluginFrame = document.getElementById("pluginFrame");
-        if (pluginFrame) {
-            if (pluginFrame.contentWindow) {
-                this.waitForPluginInit = true;
-                pluginFrame.src = url;
-                document.getElementById("pluginDeleteLabel").innerHTML = "step";
+                document.getElementById("pluginDeleteButton").onclick = btnAction;
+                document.getElementById("pluginDeleteLabel").innerHTML = btnLabel;
                 document.getElementById("pluginBottom").style.display = "flex";
                 document.getElementById("pluginDiv").style.visibility = "visible";
             }
@@ -884,17 +834,8 @@ class CommandDispatcher {
     promptActionPluginDialog(label, url, callback) {
         pluginDialogPrompt.openActionPluginDialogFrame(label, url, callback);
     }
-    promptStepPluginGUI(label, url, rawdata, callback) {
-        pluginDialogPrompt.openStepDialogFrame(label, url, rawdata, callback);
-    }
-    promptFilterPluginDialog(label, url, rawdata, callback) {
-        pluginDialogPrompt.openFilterPluginDialogFrame(label, url, rawdata, callback);
-    }
-    promptSamplerPluginDialog(label, url, rawdata, callback) {
-        pluginDialogPrompt.openSamplerPluginDialogFrame(label, url, rawdata, callback);
-    }
-    promptPerformerPluginDialog(label, url, rawdata, callback) {
-        pluginDialogPrompt.openPerformerPluginDialogFrame(label, url, rawdata, callback);
+    promptPluginPointDialog(label, url, rawdata, callback, btnLabel, btnAction) {
+        pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction);
     }
     findPluginRegistrationByKind(kind) {
         let list = MZXBX_currentPlugins();
@@ -1128,6 +1069,10 @@ let localMenuPause = 'localMenuPause';
 let localMenuUndo = 'localMenuUndo';
 let localMenuRedo = 'localMenuRedo';
 let localMenuClearUndoRedo = 'localMenuClearUndoRedo';
+let localDropInsTrack = 'localDropInsTrack';
+let localDropSampleTrack = 'localDropSampleTrack';
+let localDropFilterTrack = 'localDropFilterTrack';
+let localDropFilterPoint = 'localDropFilterPoint';
 let localMenuActionsFolder = 'localMenuActionsFolder';
 let localMenuPerformersFolder = 'localMenuPerformersFolder';
 let localMenuFiltersFolder = 'localMenuFiltersFolder';
@@ -1749,11 +1694,13 @@ class RightMenuPanel {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
                     if (info) {
                         let url = info.ui;
-                        globalCommandDispatcher.promptPerformerPluginDialog(track.performer.id, url, track.performer.data, (obj) => {
+                        globalCommandDispatcher.promptPluginPointDialog(track.performer.id, url, track.performer.data, (obj) => {
                             globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt, 'performer'], () => {
                                 track.performer.data = obj;
                             });
                             return true;
+                        }, LO(localDropInsTrack), () => {
+                            console.log(localDropInsTrack);
                         });
                     }
                 };
@@ -1798,11 +1745,13 @@ class RightMenuPanel {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(drum.sampler.kind);
                     if (info) {
                         let url = info.ui;
-                        globalCommandDispatcher.promptSamplerPluginDialog(drum.sampler.id, url, drum.sampler.data, (obj) => {
+                        globalCommandDispatcher.promptPluginPointDialog(drum.sampler.id, url, drum.sampler.data, (obj) => {
                             globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt, 'sampler'], () => {
                                 drum.sampler.data = obj;
                             });
                             return true;
+                        }, LO(localDropSampleTrack), () => {
+                            console.log(localDropSampleTrack);
                         });
                     }
                 };
@@ -1842,11 +1791,13 @@ class RightMenuPanel {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
                     if (info) {
                         let url = info.ui;
-                        globalCommandDispatcher.promptFilterPluginDialog(filter.id, url, filter.data, (obj) => {
+                        globalCommandDispatcher.promptPluginPointDialog(filter.id, url, filter.data, (obj) => {
                             globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
                                 filter.data = obj;
                             });
                             return true;
+                        }, LO(localDropFilterTrack), () => {
+                            console.log(localDropFilterTrack);
                         });
                     }
                 };
@@ -2728,6 +2679,7 @@ class TextCommentsBar {
                         row: row
                     });
                 });
+                globalCommandDispatcher.cfg().recalculateCommentMax();
             }
         }
     }
@@ -3275,11 +3227,13 @@ class PerformerIcon {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
                     if (info) {
                         let url = info.ui;
-                        globalCommandDispatcher.promptPerformerPluginDialog(track.performer.id, url, track.performer.data, (obj) => {
+                        globalCommandDispatcher.promptPluginPointDialog(track.performer.id, url, track.performer.data, (obj) => {
                             globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer'], () => {
                                 track.performer.data = obj;
                             });
                             return true;
+                        }, LO(localDropInsTrack), () => {
+                            console.log(localDropInsTrack);
                         });
                     }
                 }
@@ -3465,11 +3419,13 @@ class SamplerIcon {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
                     if (info) {
                         let url = info.ui;
-                        globalCommandDispatcher.promptSamplerPluginDialog(samplerTrack.sampler.id, url, samplerTrack.sampler.data, (obj) => {
+                        globalCommandDispatcher.promptPluginPointDialog(samplerTrack.sampler.id, url, samplerTrack.sampler.data, (obj) => {
                             globalCommandDispatcher.exe.commitProjectChanges(['percussions', order], () => {
                                 samplerTrack.sampler.data = obj;
                             });
                             return true;
+                        }, LO(localDropSampleTrack), () => {
+                            console.log(localDropSampleTrack);
                         });
                     }
                 }
@@ -3658,11 +3614,13 @@ class FilterIcon {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
                     if (info) {
                         let url = info.ui;
-                        globalCommandDispatcher.promptFilterPluginDialog(filterTarget.id, url, filterTarget.data, (obj) => {
+                        globalCommandDispatcher.promptPluginPointDialog(filterTarget.id, url, filterTarget.data, (obj) => {
                             globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
                                 filterTarget.data = obj;
                             });
                             return true;
+                        }, LO(localDropFilterTrack), () => {
+                            console.log(localDropFilterTrack);
                         });
                     }
                 }
@@ -4245,9 +4203,9 @@ class MixerDataMathUtility {
         this.padGridFan = 15;
         this.zoomEditSLess = 3;
         this.data = data;
-        this.recalculateCommantMax();
+        this.recalculateCommentMax();
     }
-    recalculateCommantMax() {
+    recalculateCommentMax() {
         this.maxCommentRowCount = -1;
         for (let ii = 0; ii < this.data.comments.length; ii++) {
             let txts = this.data.comments[ii].points;

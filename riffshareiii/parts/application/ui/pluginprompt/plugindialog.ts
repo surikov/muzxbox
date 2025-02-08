@@ -23,7 +23,8 @@ class PluginDialogPrompt {
 			}
 		}
 	}
-	openFilterPluginDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void): void {
+	openPluginPointDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void
+		, btnLabel: string, btnAction: () => void): void {
 		this.waitProjectCallback = null;
 		this.waitTimelinePointCallback = callback;
 		this.rawData = raw;
@@ -34,63 +35,15 @@ class PluginDialogPrompt {
 			if (pluginFrame.contentWindow) {
 				this.waitForPluginInit = true;
 				pluginFrame.src = url;
-				(document.getElementById("pluginDeleteLabel") as any).innerHTML = "plugin";
+				
+				(document.getElementById("pluginDeleteButton") as any).onclick = btnAction;
+				(document.getElementById("pluginDeleteLabel") as any).innerHTML = btnLabel;
 				(document.getElementById("pluginBottom") as any).style.display = "flex";
 				(document.getElementById("pluginDiv") as any).style.visibility = "visible";
 			}
 		}
 	}
-	openSamplerPluginDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void): void {
-		this.waitProjectCallback = null;
-		this.waitTimelinePointCallback = callback;
-		this.rawData = raw;
-		let pluginTitle = document.getElementById("pluginTitle") as any;
-		pluginTitle.innerHTML = label;
-		let pluginFrame = document.getElementById("pluginFrame") as any;
-		if (pluginFrame) {
-			if (pluginFrame.contentWindow) {
-				this.waitForPluginInit = true;
-				pluginFrame.src = url;
-				(document.getElementById("pluginDeleteLabel") as any).innerHTML = "plugin";
-				(document.getElementById("pluginBottom") as any).style.display = "flex";
-				(document.getElementById("pluginDiv") as any).style.visibility = "visible";
-			}
-		}
-	}
-	openPerformerPluginDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void): void {
-		this.waitProjectCallback = null;
-		this.waitTimelinePointCallback = callback;
-		this.rawData = raw;
-		let pluginTitle = document.getElementById("pluginTitle") as any;
-		pluginTitle.innerHTML = label;
-		let pluginFrame = document.getElementById("pluginFrame") as any;
-		if (pluginFrame) {
-			if (pluginFrame.contentWindow) {
-				this.waitForPluginInit = true;
-				pluginFrame.src = url;
-				(document.getElementById("pluginDeleteLabel") as any).innerHTML = "plugin";
-				(document.getElementById("pluginBottom") as any).style.display = "flex";
-				(document.getElementById("pluginDiv") as any).style.visibility = "visible";
-			}
-		}
-	}
-	openStepDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void): void {
-		this.waitProjectCallback = null;
-		this.waitTimelinePointCallback = callback;
-		this.rawData = raw;
-		let pluginTitle = document.getElementById("pluginTitle") as any;
-		pluginTitle.innerHTML = label;
-		let pluginFrame = document.getElementById("pluginFrame") as any;
-		if (pluginFrame) {
-			if (pluginFrame.contentWindow) {
-				this.waitForPluginInit = true;
-				pluginFrame.src = url;
-				(document.getElementById("pluginDeleteLabel") as any).innerHTML = "step";
-				(document.getElementById("pluginBottom") as any).style.display = "flex";
-				(document.getElementById("pluginDiv") as any).style.visibility = "visible";
-			}
-		}
-	}
+
 	sendNewIdToPlugin() {
 		//console.log('sendNewIdToPlugin');
 		let pluginFrame = document.getElementById("pluginFrame") as any;

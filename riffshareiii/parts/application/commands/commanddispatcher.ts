@@ -436,6 +436,11 @@ class CommandDispatcher {
 		//console.log('promptProjectPluginGUI', url);
 		pluginDialogPrompt.openActionPluginDialogFrame(label, url, callback);
 	}
+	promptPluginPointDialog(label: string, url: string, rawdata: string, callback: (obj: Zvoog_Project) => void
+		, btnLabel: string, btnAction: () => void) {
+		pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction);
+	}
+	/*
 	promptStepPluginGUI(label: string, url: string, rawdata: string, callback: (obj: any) => boolean) {
 		//console.log('promptPointPluginGUI', url);
 		pluginDialogPrompt.openStepDialogFrame(label, url, rawdata, callback);
@@ -452,6 +457,7 @@ class CommandDispatcher {
 		//console.log('promptPointPluginGUI', url);
 		pluginDialogPrompt.openPerformerPluginDialogFrame(label, url, rawdata, callback);
 	}
+	*/
 	findPluginRegistrationByKind(kind: String): null | MZXBX_PluginRegistrationInformation {
 		let list: MZXBX_PluginRegistrationInformation[] = MZXBX_currentPlugins();
 		for (let ii = 0; ii < list.length; ii++) {
@@ -526,7 +532,7 @@ class CommandDispatcher {
 					};
 				}
 			}
-		}else{
+		} else {
 			console.log('no project data');
 		}
 		if (this.cfg().data.selectedPart.startMeasure >= 0) {

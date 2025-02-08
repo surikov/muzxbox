@@ -80,7 +80,9 @@ class TextCommentsBar {
 						, row: row
 					});
 				});
-
+				//console.log(globalCommandDispatcher.cfg().maxCommentRowCount);
+				globalCommandDispatcher.cfg().recalculateCommentMax();
+				//console.log(globalCommandDispatcher.cfg().maxCommentRowCount);
 				//globalCommandDispatcher.resetProject();
 			}
 		}

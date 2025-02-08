@@ -311,12 +311,14 @@ class RightMenuPanel {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptPerformerPluginDialog(track.performer.id, url, track.performer.data, (obj: any) => {
+						globalCommandDispatcher.promptPluginPointDialog(track.performer.id, url, track.performer.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt, 'performer'], () => {
 								track.performer.data = obj;
 							});
 							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
+						},LO(localDropInsTrack),()=>{
+							console.log(localDropInsTrack);
 						});
 					}
 					//console.log('first',track);
@@ -367,12 +369,14 @@ class RightMenuPanel {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(drum.sampler.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptSamplerPluginDialog(drum.sampler.id, url, drum.sampler.data, (obj: any) => {
+						globalCommandDispatcher.promptPluginPointDialog(drum.sampler.id, url, drum.sampler.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt, 'sampler'], () => {
 								drum.sampler.data = obj;
 							});
 							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
+						},LO(localDropSampleTrack),()=>{
+							console.log(localDropSampleTrack);
 						});
 					}
 					//console.log('first',track);
@@ -419,12 +423,14 @@ class RightMenuPanel {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptFilterPluginDialog(filter.id, url, filter.data, (obj: any) => {
+						globalCommandDispatcher.promptPluginPointDialog(filter.id, url, filter.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
 								filter.data = obj;
 							});
 							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
+						},LO(localDropFilterTrack),()=>{
+							console.log(localDropFilterTrack);
 						});
 					}
 					//console.log('first',track);
