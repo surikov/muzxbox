@@ -136,7 +136,6 @@ declare let labelLocaleDictionary: string;
 declare let localNameLocal: string;
 declare let localeFontRatio: number;
 declare let localMenuItemSettings: string;
-declare let localMenuTracksFolder: string;
 declare let localMenuPercussionFolder: string;
 declare let localMenuAutomationFolder: string;
 declare let localMenuPlay: string;
@@ -152,6 +151,9 @@ declare let localMenuActionsFolder: string;
 declare let localMenuPerformersFolder: string;
 declare let localMenuFiltersFolder: string;
 declare let localMenuSamplersFolder: string;
+declare let localMenuInsTracksFolder: string;
+declare let localMenuDrumTracksFolder: string;
+declare let localMenuFxTracksFolder: string;
 declare let localeDictionary: {
     id: string;
     data: {
@@ -288,7 +290,9 @@ declare let menuPointActions: MenuInfo;
 declare let menuPointPerformers: MenuInfo;
 declare let menuPointFilters: MenuInfo;
 declare let menuPointSamplers: MenuInfo;
-declare let menuPointTracks: MenuInfo;
+declare let menuPointInsTracks: MenuInfo;
+declare let menuPointDrumTracks: MenuInfo;
+declare let menuPointFxTracks: MenuInfo;
 declare let menuPlayStop: MenuInfo;
 declare function fillPluginsLists(): void;
 declare function composeBaseMenu(): MenuInfo[];

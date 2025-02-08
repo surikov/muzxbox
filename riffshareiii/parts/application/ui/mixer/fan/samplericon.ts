@@ -144,7 +144,7 @@ class SamplerIcon {
 			}
 			//rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
 			//if(order){
-				rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
+			rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
 			//}else{
 			//	rec.css = 'fanSamplerMoveIcon fanSamplerUpIcon' + zidx;
 			//}
@@ -170,13 +170,17 @@ class SamplerIcon {
 					if (info) {
 						let url = info.ui;
 						globalCommandDispatcher.promptPluginPointDialog(samplerTrack.sampler.id, url, samplerTrack.sampler.data, (obj: any) => {
-							globalCommandDispatcher.exe.commitProjectChanges(['percussions',order], () => {
+							globalCommandDispatcher.exe.commitProjectChanges(['percussions', order], () => {
 								samplerTrack.sampler.data = obj;
 							});
 							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
-						},LO(localDropSampleTrack),()=>{
-							console.log(localDropSampleTrack);
+						}, LO(localDropSampleTrack), () => {
+							//console.log(localDropSampleTrack);
+							globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+								globalCommandDispatcher.cfg().data.percussions.splice(order,1);
+							});
+							globalCommandDispatcher.cancelPluginGUI();
 						});
 					}
 				}
@@ -195,7 +199,7 @@ class SamplerIcon {
 		let samplerFromY = globalCommandDispatcher.cfg().samplerTop()
 			+ (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
 		//console.log('addSamplerSpot', order, samplerFromY);
-		new ControlConnection().addAudioStreamLineFlow(order>0, zidx, samplerFromY, xx, yy, spearsAnchor);
+		new ControlConnection().addAudioStreamLineFlow(order > 0, zidx, samplerFromY, xx, yy, spearsAnchor);
 		//new FanOutputLine().addOutputs(samplerTrack.sampler.outputs, fanLevelAnchor, spearsAnchor, samplerTrack.sampler.id, xx, yy, zidx);
 		let fol = new FanOutputLine();
 		for (let oo = 0; oo < samplerTrack.sampler.outputs.length; oo++) {
@@ -232,58 +236,58 @@ class SamplerIcon {
 					});
 			}
 		}
-/*
-		if (zidx < 5) {
-			let sbuttn: TileRectangle = {
-				x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth()
-					- 0.9*globalCommandDispatcher.cfg().samplerDotHeight / 2
-				, y: samplerFromY - 0.9*globalCommandDispatcher.cfg().samplerDotHeight / 2
-				, w: 0.9*globalCommandDispatcher.cfg().samplerDotHeight
-				, h: 0.9*globalCommandDispatcher.cfg().samplerDotHeight
-				, rx: 0.9*globalCommandDispatcher.cfg().samplerDotHeight / 2
-				, ry: 0.9*globalCommandDispatcher.cfg().samplerDotHeight / 2
-				, css: 'fanSampleDrragger'
-				, draggable: true
-			};
-			let btnAnchor: TileAnchor = {
-				xx: sbuttn.x
-				, yy: sbuttn.y
-				, ww: sbuttn.w
-				, hh: sbuttn.h
-				, showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [sbuttn], translation: { x: 0, y: 0 }
-			};
-			sbuttn.activation = (x: number, y: number) => {
-				if (!btnAnchor.translation) {
-					btnAnchor.translation = { x: 0, y: 0 };
-				}
-				if (x == 0 && y == 0) {
-					let dy = btnAnchor.translation.y;
-					//btnAnchor.translation.x = 0;
-					btnAnchor.translation.y = 0;
-					let newOrder = order + Math.round(dy / globalCommandDispatcher.cfg().samplerDotHeight);
-					if (newOrder < 0) newOrder = 0;
-					if (newOrder > globalCommandDispatcher.cfg().data.percussions.length - 1) newOrder > globalCommandDispatcher.cfg().data.percussions.length - 1;
-					//console.log(dy, order, newOrder);
-					if (order != newOrder) {
-						//if (newOrder > order) newOrder = newOrder - 1;
-						globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-							globalCommandDispatcher.cfg().data.percussions.splice(order, 1);
-							globalCommandDispatcher.cfg().data.percussions.splice(newOrder, 0, samplerTrack);
-						});
-					}
-				} else {
-					//btnAnchor.translation.x = btnAnchor.translation.x + x;
-					btnAnchor.translation.y = btnAnchor.translation.y + y;
-					//console.log(btnAnchor.translation.y);
-				}
-				globalCommandDispatcher.renderer.tiler.resetAnchor(
-					globalCommandDispatcher.renderer.mixer.spearsSVGgroup
-					, spearsAnchor
-					, LevelModes.normal);
-			};
-
-			spearsAnchor.content.push(btnAnchor);
-			//console.log(order,samplerFromY, zidx, spearsAnchor);
-		}*/
+		/*
+				if (zidx < 5) {
+					let sbuttn: TileRectangle = {
+						x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth()
+							- 0.9*globalCommandDispatcher.cfg().samplerDotHeight / 2
+						, y: samplerFromY - 0.9*globalCommandDispatcher.cfg().samplerDotHeight / 2
+						, w: 0.9*globalCommandDispatcher.cfg().samplerDotHeight
+						, h: 0.9*globalCommandDispatcher.cfg().samplerDotHeight
+						, rx: 0.9*globalCommandDispatcher.cfg().samplerDotHeight / 2
+						, ry: 0.9*globalCommandDispatcher.cfg().samplerDotHeight / 2
+						, css: 'fanSampleDrragger'
+						, draggable: true
+					};
+					let btnAnchor: TileAnchor = {
+						xx: sbuttn.x
+						, yy: sbuttn.y
+						, ww: sbuttn.w
+						, hh: sbuttn.h
+						, showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [sbuttn], translation: { x: 0, y: 0 }
+					};
+					sbuttn.activation = (x: number, y: number) => {
+						if (!btnAnchor.translation) {
+							btnAnchor.translation = { x: 0, y: 0 };
+						}
+						if (x == 0 && y == 0) {
+							let dy = btnAnchor.translation.y;
+							//btnAnchor.translation.x = 0;
+							btnAnchor.translation.y = 0;
+							let newOrder = order + Math.round(dy / globalCommandDispatcher.cfg().samplerDotHeight);
+							if (newOrder < 0) newOrder = 0;
+							if (newOrder > globalCommandDispatcher.cfg().data.percussions.length - 1) newOrder > globalCommandDispatcher.cfg().data.percussions.length - 1;
+							//console.log(dy, order, newOrder);
+							if (order != newOrder) {
+								//if (newOrder > order) newOrder = newOrder - 1;
+								globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+									globalCommandDispatcher.cfg().data.percussions.splice(order, 1);
+									globalCommandDispatcher.cfg().data.percussions.splice(newOrder, 0, samplerTrack);
+								});
+							}
+						} else {
+							//btnAnchor.translation.x = btnAnchor.translation.x + x;
+							btnAnchor.translation.y = btnAnchor.translation.y + y;
+							//console.log(btnAnchor.translation.y);
+						}
+						globalCommandDispatcher.renderer.tiler.resetAnchor(
+							globalCommandDispatcher.renderer.mixer.spearsSVGgroup
+							, spearsAnchor
+							, LevelModes.normal);
+					};
+		
+					spearsAnchor.content.push(btnAnchor);
+					//console.log(order,samplerFromY, zidx, spearsAnchor);
+				}*/
 	}
 }

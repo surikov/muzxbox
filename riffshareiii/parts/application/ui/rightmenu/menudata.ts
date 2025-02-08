@@ -33,29 +33,50 @@ let menuItemsData: MenuInfo[] | null = null;
 
 
 let menuPointActions: MenuInfo = {
-	text: 'localMenuActionsFolder'
+	text: localMenuActionsFolder
 	, onFolderOpen: () => {
 		//console.log('actions');
 	}
 };
 let menuPointPerformers: MenuInfo = {
-	text: 'localMenuPerformersFolder'
+	text: localMenuPerformersFolder
 	, onFolderOpen: () => {
 		//console.log('performers');
 	}
 };
 let menuPointFilters: MenuInfo = {
-	text: 'localMenuFiltersFolder'
+	text: localMenuFiltersFolder
 	, onFolderOpen: () => {
 		//console.log('filters');
 	}
 };
 let menuPointSamplers: MenuInfo = {
-	text: 'localMenuSamplersFolder'
+	text: localMenuSamplersFolder
 	, onFolderOpen: () => {
 		//console.log('samplers');
 	}
 };
+
+
+let menuPointInsTracks: MenuInfo = {
+	text: localMenuInsTracksFolder
+	, onFolderOpen: () => {
+		//console.log('samplers');
+	}
+};
+let menuPointDrumTracks: MenuInfo = {
+	text: localMenuDrumTracksFolder
+	, onFolderOpen: () => {
+		//console.log('samplers');
+	}
+};
+let menuPointFxTracks: MenuInfo = {
+	text: localMenuFxTracksFolder
+	, onFolderOpen: () => {
+		//console.log('samplers');
+	}
+};
+
 /*
 let menuPointUndo: MenuInfo = {
 	text: 'localMenuUndoFolder'
@@ -65,7 +86,7 @@ let menuPointUndo: MenuInfo = {
 };
 */
 
-
+/*
 
 let menuPointTracks: MenuInfo = {
 	text: localMenuTracksFolder
@@ -73,6 +94,7 @@ let menuPointTracks: MenuInfo = {
 		//globalCommandDispatcher.upTracksLayer();
 	}
 };
+*/
 /*
 let menuPointPercussion: MenuInfo = {
 	text: localMenuPercussionFolder
@@ -220,7 +242,10 @@ function composeBaseMenu(): MenuInfo[] {
 					globalCommandDispatcher.toggleStartStop();
 				}
 			}*/
-			, menuPointTracks
+			//, menuPointTracks
+			,menuPointInsTracks
+			,menuPointDrumTracks
+			,menuPointFxTracks
 			//, menuPointPercussion
 			//, menuPointAutomation
 
@@ -276,7 +301,7 @@ function composeBaseMenu(): MenuInfo[] {
 									globalCommandDispatcher.setThemeLocale('en', 1);
 								}
 							}, {
-								text: '中文界面语言', onClick: () => {
+								text: 'kitaiskiy', onClick: () => {
 									globalCommandDispatcher.setThemeLocale('zh', 1.5);
 								}
 							}]

@@ -165,7 +165,11 @@ class FilterIcon {
 							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
 						},LO(localDropFilterTrack),()=>{
-							console.log(localDropFilterTrack);
+							//console.log(localDropFilterTrack);
+							globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+								globalCommandDispatcher.cfg().data.filters.splice(order, 1);
+							});
+							globalCommandDispatcher.cancelPluginGUI();
 						});
 					}
 				}

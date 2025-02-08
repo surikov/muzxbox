@@ -67,7 +67,7 @@ class RightMenuPanel {
 			this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
 		});
 
-		this.layerCurrentTitle = { x: 2.5, y: 0, text: LO(localMenuTracksFolder), css: 'currentTitleLabel' };
+		this.layerCurrentTitle = { x: 2.5, y: 0, text: '', css: 'currentTitleLabel' };
 
 
 
@@ -275,7 +275,9 @@ class RightMenuPanel {
 	}
 	readCurrentSongData(project: Zvoog_Project) {
 
-		menuPointTracks.children = [];
+		menuPointInsTracks.children = [];
+		menuPointDrumTracks.children = [];
+		menuPointFxTracks.children = [];
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let track = project.tracks[tt];
 			let item: MenuInfo = {
@@ -317,15 +319,19 @@ class RightMenuPanel {
 							});
 							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
-						},LO(localDropInsTrack),()=>{
-							console.log(localDropInsTrack);
+						}, LO(localDropInsTrack), () => {
+							//console.log(localDropInsTrack);
+							globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+								globalCommandDispatcher.cfg().data.tracks.splice(tt, 1);
+							});
+							globalCommandDispatcher.cancelPluginGUI();
 						});
 					}
 					//console.log('first',track);
 				};
 				item.highlight = icon_sliders;
 			}
-			menuPointTracks.children.push(item);
+			menuPointInsTracks.children.push(item);
 		}
 
 		//menuPointPercussion.children = [];
@@ -375,15 +381,19 @@ class RightMenuPanel {
 							});
 							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
-						},LO(localDropSampleTrack),()=>{
-							console.log(localDropSampleTrack);
+						}, LO(localDropSampleTrack), () => {
+							//console.log(localDropSampleTrack);
+							globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+								globalCommandDispatcher.cfg().data.percussions.splice(tt, 1);
+							});
+							globalCommandDispatcher.cancelPluginGUI();
 						});
 					}
 					//console.log('first',track);
 				};
 				item.highlight = icon_sliders;
 			}
-			menuPointTracks.children.push(item);
+			menuPointDrumTracks.children.push(item);
 		}
 		//menuPointAutomation.children = [];
 		for (let ff = 0; ff < project.filters.length; ff++) {
@@ -429,15 +439,19 @@ class RightMenuPanel {
 							});
 							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
-						},LO(localDropFilterTrack),()=>{
-							console.log(localDropFilterTrack);
+						}, LO(localDropFilterTrack), () => {
+							//console.log(localDropFilterTrack);
+							globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+								globalCommandDispatcher.cfg().data.filters.splice(ff, 1);
+							});
+							globalCommandDispatcher.cancelPluginGUI();
 						});
 					}
 					//console.log('first',track);
 				};
 				item.highlight = icon_sliders;
 			}
-			menuPointTracks.children.push(item);
+			menuPointFxTracks.children.push(item);
 			//}
 		}
 

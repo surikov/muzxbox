@@ -199,7 +199,11 @@ class PerformerIcon {
 							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
 						},LO(localDropInsTrack),()=>{
-							console.log(localDropInsTrack);
+							//console.log(localDropInsTrack);
+							globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+								globalCommandDispatcher.cfg().data.tracks.splice(trackNo, 1);
+							});
+							globalCommandDispatcher.cancelPluginGUI();
 						});
 					}
 

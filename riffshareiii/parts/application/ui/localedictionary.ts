@@ -3,7 +3,7 @@ let localNameLocal = 'localNameLocal';
 let localeFontRatio = 1;
 
 let localMenuItemSettings = 'localMenuItemSettings';
-let localMenuTracksFolder = 'localMenuTracksFolder';
+//let localMenuTracksFolder = 'localMenuTracksFolder';
 //let localMenuImportMIDI = 'localMenuImportMIDI';
 let localMenuPercussionFolder='localMenuPercussionFolder';
 //let localMenuImportFolder='localMenuImportFolder';
@@ -27,6 +27,9 @@ let localMenuPerformersFolder='localMenuPerformersFolder';
 let localMenuFiltersFolder='localMenuFiltersFolder';
 let localMenuSamplersFolder='localMenuSamplersFolder';
 //let localMenuUndoFolder='localMenuUndoFolder';
+let localMenuInsTracksFolder='localMenuInsTracksFolder';
+let localMenuDrumTracksFolder='localMenuDrumTracksFolder';
+let localMenuFxTracksFolder='localMenuFxTracksFolder';
 
 let localeDictionary: { id: string, data: { locale: string, text: string }[] }[] = [
     {
@@ -39,12 +42,12 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
             { locale: 'en', text: 'Settings' }
             , { locale: 'ru', text: 'Настройки' }
             , { locale: 'zh', text: '设置' }]
-    }, {
+   /* }, {
         id: localMenuTracksFolder, data: [
             { locale: 'en', text: 'Tracks' }
             , { locale: 'ru', text: 'Треки' }
             , { locale: 'zh', text: '?' }]
-   /* }, {
+    }, {
         id: localMenuImportMIDI, data: [
             { locale: 'en', text: 'Import from MIDI-file' }
             , { locale: 'ru', text: 'Импорт из файлв MIDI' }
@@ -97,16 +100,31 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
             , { locale: 'zh', text: '?' }]
     }, {
         id: localMenuPerformersFolder, data: [
+            { locale: 'en', text: 'Add performer' }
+            , { locale: 'ru', text: '+ Перформер' }
+            , { locale: 'zh', text: '?' }]
+    }, {
+        id: localMenuFiltersFolder, data: [
+            { locale: 'en', text: 'Add filter' }
+            , { locale: 'ru', text: '+ Фильтр' }
+            , { locale: 'zh', text: '?' }]
+    }, {
+        id: localMenuSamplersFolder, data: [
+            { locale: 'en', text: 'Add sampler' }
+            , { locale: 'ru', text: '+ Сэмплер' }
+            , { locale: 'zh', text: '?' }]
+    }, {
+        id: localMenuInsTracksFolder, data: [
             { locale: 'en', text: 'Performers' }
             , { locale: 'ru', text: 'Перформеры' }
             , { locale: 'zh', text: '?' }]
     }, {
-        id: localMenuFiltersFolder, data: [
+        id: localMenuFxTracksFolder, data: [
             { locale: 'en', text: 'Filters' }
             , { locale: 'ru', text: 'Фильтры' }
             , { locale: 'zh', text: '?' }]
     }, {
-        id: localMenuSamplersFolder, data: [
+        id: localMenuDrumTracksFolder, data: [
             { locale: 'en', text: 'Samplers' }
             , { locale: 'ru', text: 'Сэмплеры' }
             , { locale: 'zh', text: '?' }]

@@ -1061,7 +1061,6 @@ let labelLocaleDictionary = 'en';
 let localNameLocal = 'localNameLocal';
 let localeFontRatio = 1;
 let localMenuItemSettings = 'localMenuItemSettings';
-let localMenuTracksFolder = 'localMenuTracksFolder';
 let localMenuPercussionFolder = 'localMenuPercussionFolder';
 let localMenuAutomationFolder = 'localMenuAutomationFolder';
 let localMenuPlay = 'localMenuPlay';
@@ -1077,6 +1076,9 @@ let localMenuActionsFolder = 'localMenuActionsFolder';
 let localMenuPerformersFolder = 'localMenuPerformersFolder';
 let localMenuFiltersFolder = 'localMenuFiltersFolder';
 let localMenuSamplersFolder = 'localMenuSamplersFolder';
+let localMenuInsTracksFolder = 'localMenuInsTracksFolder';
+let localMenuDrumTracksFolder = 'localMenuDrumTracksFolder';
+let localMenuFxTracksFolder = 'localMenuFxTracksFolder';
 let localeDictionary = [
     {
         id: localNameLocal, data: [
@@ -1089,12 +1091,6 @@ let localeDictionary = [
             { locale: 'en', text: 'Settings' },
             { locale: 'ru', text: 'Настройки' },
             { locale: 'zh', text: '设置' }
-        ]
-    }, {
-        id: localMenuTracksFolder, data: [
-            { locale: 'en', text: 'Tracks' },
-            { locale: 'ru', text: 'Треки' },
-            { locale: 'zh', text: '?' }
         ]
     },
     {
@@ -1131,18 +1127,36 @@ let localeDictionary = [
         ]
     }, {
         id: localMenuPerformersFolder, data: [
+            { locale: 'en', text: 'Add performer' },
+            { locale: 'ru', text: '+ Перформер' },
+            { locale: 'zh', text: '?' }
+        ]
+    }, {
+        id: localMenuFiltersFolder, data: [
+            { locale: 'en', text: 'Add filter' },
+            { locale: 'ru', text: '+ Фильтр' },
+            { locale: 'zh', text: '?' }
+        ]
+    }, {
+        id: localMenuSamplersFolder, data: [
+            { locale: 'en', text: 'Add sampler' },
+            { locale: 'ru', text: '+ Сэмплер' },
+            { locale: 'zh', text: '?' }
+        ]
+    }, {
+        id: localMenuInsTracksFolder, data: [
             { locale: 'en', text: 'Performers' },
             { locale: 'ru', text: 'Перформеры' },
             { locale: 'zh', text: '?' }
         ]
     }, {
-        id: localMenuFiltersFolder, data: [
+        id: localMenuFxTracksFolder, data: [
             { locale: 'en', text: 'Filters' },
             { locale: 'ru', text: 'Фильтры' },
             { locale: 'zh', text: '?' }
         ]
     }, {
-        id: localMenuSamplersFolder, data: [
+        id: localMenuDrumTracksFolder, data: [
             { locale: 'en', text: 'Samplers' },
             { locale: 'ru', text: 'Сэмплеры' },
             { locale: 'zh', text: '?' }
@@ -1487,7 +1501,7 @@ class RightMenuPanel {
             this.scrollY = 0;
             this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         });
-        this.layerCurrentTitle = { x: 2.5, y: 0, text: LO(localMenuTracksFolder), css: 'currentTitleLabel' };
+        this.layerCurrentTitle = { x: 2.5, y: 0, text: '', css: 'currentTitleLabel' };
         this.backgroundAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111,
             showZoom: zoomPrefixLevelsCSS[0].minZoom,
@@ -1656,7 +1670,9 @@ class RightMenuPanel {
         }
     }
     readCurrentSongData(project) {
-        menuPointTracks.children = [];
+        menuPointInsTracks.children = [];
+        menuPointDrumTracks.children = [];
+        menuPointFxTracks.children = [];
         for (let tt = 0; tt < project.tracks.length; tt++) {
             let track = project.tracks[tt];
             let item = {
@@ -1700,13 +1716,16 @@ class RightMenuPanel {
                             });
                             return true;
                         }, LO(localDropInsTrack), () => {
-                            console.log(localDropInsTrack);
+                            globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+                                globalCommandDispatcher.cfg().data.tracks.splice(tt, 1);
+                            });
+                            globalCommandDispatcher.cancelPluginGUI();
                         });
                     }
                 };
                 item.highlight = icon_sliders;
             }
-            menuPointTracks.children.push(item);
+            menuPointInsTracks.children.push(item);
         }
         for (let tt = 0; tt < project.percussions.length; tt++) {
             let drum = project.percussions[tt];
@@ -1751,13 +1770,16 @@ class RightMenuPanel {
                             });
                             return true;
                         }, LO(localDropSampleTrack), () => {
-                            console.log(localDropSampleTrack);
+                            globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+                                globalCommandDispatcher.cfg().data.percussions.splice(tt, 1);
+                            });
+                            globalCommandDispatcher.cancelPluginGUI();
                         });
                     }
                 };
                 item.highlight = icon_sliders;
             }
-            menuPointTracks.children.push(item);
+            menuPointDrumTracks.children.push(item);
         }
         for (let ff = 0; ff < project.filters.length; ff++) {
             let filter = project.filters[ff];
@@ -1797,13 +1819,16 @@ class RightMenuPanel {
                             });
                             return true;
                         }, LO(localDropFilterTrack), () => {
-                            console.log(localDropFilterTrack);
+                            globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+                                globalCommandDispatcher.cfg().data.filters.splice(ff, 1);
+                            });
+                            globalCommandDispatcher.cancelPluginGUI();
                         });
                     }
                 };
                 item.highlight = icon_sliders;
             }
-            menuPointTracks.children.push(item);
+            menuPointFxTracks.children.push(item);
         }
     }
     rerenderMenuContent(folder) {
@@ -2015,27 +2040,37 @@ class RightMenuItem {
 }
 let menuItemsData = null;
 let menuPointActions = {
-    text: 'localMenuActionsFolder',
+    text: localMenuActionsFolder,
     onFolderOpen: () => {
     }
 };
 let menuPointPerformers = {
-    text: 'localMenuPerformersFolder',
+    text: localMenuPerformersFolder,
     onFolderOpen: () => {
     }
 };
 let menuPointFilters = {
-    text: 'localMenuFiltersFolder',
+    text: localMenuFiltersFolder,
     onFolderOpen: () => {
     }
 };
 let menuPointSamplers = {
-    text: 'localMenuSamplersFolder',
+    text: localMenuSamplersFolder,
     onFolderOpen: () => {
     }
 };
-let menuPointTracks = {
-    text: localMenuTracksFolder,
+let menuPointInsTracks = {
+    text: localMenuInsTracksFolder,
+    onFolderOpen: () => {
+    }
+};
+let menuPointDrumTracks = {
+    text: localMenuDrumTracksFolder,
+    onFolderOpen: () => {
+    }
+};
+let menuPointFxTracks = {
+    text: localMenuFxTracksFolder,
     onFolderOpen: () => {
     }
 };
@@ -2117,7 +2152,9 @@ function composeBaseMenu() {
         fillPluginsLists();
         menuItemsData = [
             menuPlayStop,
-            menuPointTracks,
+            menuPointInsTracks,
+            menuPointDrumTracks,
+            menuPointFxTracks,
             menuPointActions,
             menuPointFilters,
             menuPointPerformers,
@@ -2154,7 +2191,7 @@ function composeBaseMenu() {
                                     globalCommandDispatcher.setThemeLocale('en', 1);
                                 }
                             }, {
-                                text: '中文界面语言', onClick: () => {
+                                text: 'kitaiskiy', onClick: () => {
                                     globalCommandDispatcher.setThemeLocale('zh', 1.5);
                                 }
                             }
@@ -3233,7 +3270,10 @@ class PerformerIcon {
                             });
                             return true;
                         }, LO(localDropInsTrack), () => {
-                            console.log(localDropInsTrack);
+                            globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+                                globalCommandDispatcher.cfg().data.tracks.splice(trackNo, 1);
+                            });
+                            globalCommandDispatcher.cancelPluginGUI();
                         });
                     }
                 }
@@ -3425,7 +3465,10 @@ class SamplerIcon {
                             });
                             return true;
                         }, LO(localDropSampleTrack), () => {
-                            console.log(localDropSampleTrack);
+                            globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+                                globalCommandDispatcher.cfg().data.percussions.splice(order, 1);
+                            });
+                            globalCommandDispatcher.cancelPluginGUI();
                         });
                     }
                 }
@@ -3620,7 +3663,10 @@ class FilterIcon {
                             });
                             return true;
                         }, LO(localDropFilterTrack), () => {
-                            console.log(localDropFilterTrack);
+                            globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+                                globalCommandDispatcher.cfg().data.filters.splice(order, 1);
+                            });
+                            globalCommandDispatcher.cancelPluginGUI();
                         });
                     }
                 }
