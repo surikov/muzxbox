@@ -158,7 +158,7 @@ class FilterIcon {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptPluginPointDialog(filterTarget.id, url, filterTarget.data, (obj: any) => {
+						globalCommandDispatcher.promptPluginPointDialog(filterTarget.title, url, filterTarget.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
 								filterTarget.data = obj;
 							});
@@ -168,6 +168,11 @@ class FilterIcon {
 							//console.log(localDropFilterTrack);
 							globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
 								globalCommandDispatcher.cfg().data.filters.splice(order, 1);
+							});
+							globalCommandDispatcher.cancelPluginGUI();
+						}, (newTitle: string) => { 
+							globalCommandDispatcher.exe.commitProjectChanges(['filters',order], () => {
+								filterTarget.title=newTitle;
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});

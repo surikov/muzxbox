@@ -1,6 +1,7 @@
 class PluginDialogPrompt {
 	dialogID: string = '?';
 	waitForPluginInit: boolean = false;
+	waitTitleAction: null | ((newTitle: string) => void) = null;
 	waitProjectCallback: null | ((newProject: Zvoog_Project) => void) = null;
 	waitTimelinePointCallback: null | ((raw: any) => void) = null;
 	rawData: any;
@@ -11,20 +12,24 @@ class PluginDialogPrompt {
 		this.waitProjectCallback = callback;
 		this.waitTimelinePointCallback = null;
 		let pluginTitle = document.getElementById("pluginTitle") as any;
-		pluginTitle.innerHTML = label;
+		pluginTitle.innerHTML = " " + label;
 		let pluginFrame = document.getElementById("pluginFrame") as any;
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
 				this.waitForPluginInit = true;
 				pluginFrame.src = url;
 				//(document.getElementById("pluginDeleteLabel") as any).innerHTML = "action";
+				(document.getElementById("pluginEditTitleButton") as any).style.display = "none";
 				(document.getElementById("pluginBottom") as any).style.display = "none";
 				(document.getElementById("pluginDiv") as any).style.visibility = "visible";
 			}
 		}
 	}
 	openPluginPointDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void
-		, btnLabel: string, btnAction: () => void): void {
+		, btnLabel: string, btnAction: () => void
+		, titleAction: (newTitle: string) => void
+	): void {
+		this.waitTitleAction = titleAction;
 		this.waitProjectCallback = null;
 		this.waitTimelinePointCallback = callback;
 		this.rawData = raw;
@@ -35,7 +40,20 @@ class PluginDialogPrompt {
 			if (pluginFrame.contentWindow) {
 				this.waitForPluginInit = true;
 				pluginFrame.src = url;
-				
+
+				(document.getElementById("pluginEditTitleButton") as any).style.display = "flex";
+				(document.getElementById("pluginEditTitleButton") as any).onclick = () => {
+					if (this.waitTitleAction) {
+						let newTitle = prompt(label, label);
+						if (newTitle == label) {
+							//
+						} else {
+							if (newTitle != null) {
+								this.waitTitleAction(newTitle);
+							}
+						}
+					}
+				};
 				(document.getElementById("pluginDeleteButton") as any).onclick = btnAction;
 				(document.getElementById("pluginDeleteLabel") as any).innerHTML = btnLabel;
 				(document.getElementById("pluginBottom") as any).style.display = "flex";

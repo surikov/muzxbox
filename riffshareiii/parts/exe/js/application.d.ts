@@ -33,12 +33,13 @@ declare function startLoadCSSfile(cssurl: string): void;
 declare class PluginDialogPrompt {
     dialogID: string;
     waitForPluginInit: boolean;
+    waitTitleAction: null | ((newTitle: string) => void);
     waitProjectCallback: null | ((newProject: Zvoog_Project) => void);
     waitTimelinePointCallback: null | ((raw: any) => void);
     rawData: any;
     constructor();
     openActionPluginDialogFrame(label: string, url: string, callback: (obj: Zvoog_Project) => void): void;
-    openPluginPointDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void, btnLabel: string, btnAction: () => void): void;
+    openPluginPointDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void, btnLabel: string, btnAction: () => void, titleAction: (newTitle: string) => void): void;
     sendNewIdToPlugin(): void;
     sendCurrentProjectToPlugin(): void;
     sendPointToPlugin(): void;
@@ -90,7 +91,7 @@ declare class CommandDispatcher {
     changeTapSize(ratio: number): void;
     resetProject(): void;
     promptActionPluginDialog(label: string, url: string, callback: (obj: Zvoog_Project) => void): void;
-    promptPluginPointDialog(label: string, url: string, rawdata: string, callback: (obj: Zvoog_Project) => void, btnLabel: string, btnAction: () => void): void;
+    promptPluginPointDialog(label: string, url: string, rawdata: string, callback: (obj: Zvoog_Project) => void, btnLabel: string, btnAction: () => void, titleAction: (newTitle: string) => void): void;
     findPluginRegistrationByKind(kind: String): null | MZXBX_PluginRegistrationInformation;
     cancelPluginGUI(): void;
     timeSelectChange(idx: number): void;
@@ -256,10 +257,13 @@ declare class RightMenuItem {
     action2?: {
         (): void;
     };
+    drag?: {
+        (x: number, y: number): void;
+    };
     pad: number;
     top: number;
     info: MenuInfo;
-    constructor(info: MenuInfo, pad: number, tap?: () => void, tap2?: () => void);
+    constructor(info: MenuInfo, pad: number, tap?: () => void, tap2?: () => void, drag?: (x: number, y: number) => void);
     initDisabledItem(): RightMenuItem;
     initActionItem(): RightMenuItem;
     initActionItem2(): RightMenuItem;
@@ -278,6 +282,7 @@ declare type MenuInfo = {
     children?: MenuInfo[];
     sid?: string;
     onClick?: () => void;
+    onDrag?: (x: number, y: number) => void;
     onSubClick?: () => void;
     onFolderOpen?: () => void;
     itemStates?: string[];
@@ -758,6 +763,7 @@ declare type Zvoog_FilterTarget = {
         y: number;
     };
     state: 0 | 1;
+    title: string;
 };
 declare type Zvoog_AudioSequencer = {
     id: string;

@@ -8,6 +8,7 @@ type MenuInfo = {
 	children?: MenuInfo[];
 	sid?: string;
 	onClick?: () => void;
+	onDrag?: (x: number, y: number) => void;
 	onSubClick?: () => void;
 	onFolderOpen?: () => void;
 	itemStates?: string[];
@@ -180,28 +181,28 @@ function fillPluginsLists() {
 			if (purpose == 'Sampler') {
 				menuPointSamplers.children.push({
 					dragMix: true
-					, text: label, noLocalization: true, onClick: () => {
-						console.log(purpose, label);
+					, text: label, noLocalization: true, onDrag: (x: number, y: number) => {
+						console.log(purpose, label, x, y);
 					}
 				});
 			} else {
 				if (purpose == 'Performer') {
 					menuPointPerformers.children.push({
 						dragMix: true
-						, text: label, noLocalization: true, onClick: () => {
+						, text: label, noLocalization: true, onDrag: (x: number, y: number) => {
 							/*globalCommandDispatcher.promptPerFiltGUI(label, url, 'no data from menu',(obj: any) => {
 								console.log('performer callback', obj);
 								return true;
 							});*/
-							console.log(purpose, label);
+							console.log(purpose, label, x, y);
 						}
 					});
 				} else {
 					if (purpose == 'Filter') {
 						menuPointFilters.children.push({
 							dragMix: true
-							, text: label, noLocalization: true, onClick: () => {
-								console.log(purpose, label);
+							, text: label, noLocalization: true, onDrag: (x: number, y: number) => {
+								console.log(purpose, label, x, y);
 							}
 						});
 					} else {
@@ -243,9 +244,9 @@ function composeBaseMenu(): MenuInfo[] {
 				}
 			}*/
 			//, menuPointTracks
-			,menuPointInsTracks
-			,menuPointDrumTracks
-			,menuPointFxTracks
+			, menuPointInsTracks
+			, menuPointDrumTracks
+			, menuPointFxTracks
 			//, menuPointPercussion
 			//, menuPointAutomation
 

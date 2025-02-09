@@ -437,8 +437,10 @@ class CommandDispatcher {
 		pluginDialogPrompt.openActionPluginDialogFrame(label, url, callback);
 	}
 	promptPluginPointDialog(label: string, url: string, rawdata: string, callback: (obj: Zvoog_Project) => void
-		, btnLabel: string, btnAction: () => void) {
-		pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction);
+		, btnLabel: string, btnAction: () => void
+		, titleAction: (newTitle: string) => void
+	) {
+		pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction, titleAction);
 	}
 	/*
 	promptStepPluginGUI(label: string, url: string, rawdata: string, callback: (obj: any) => boolean) {

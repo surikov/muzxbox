@@ -1,4 +1,3 @@
-
 .rightMenuPanel {
     fill: var(--background-color);
 }
@@ -7,6 +6,7 @@
     fill: var(--shadow-color);
     pointer-events: none;
 }
+
 .rightMenuFocusedDelimiter {
     fill: var(--main-color);
     pointer-events: none;
@@ -18,6 +18,7 @@
     font-size: var(--label-04cm);
     pointer-events: none;
 }
+
 .rightMenuSubLabel {
     fill: var(--drag-color);
     font-size: var(--label-04cm);
@@ -28,18 +29,21 @@
     stroke: var(--main-color);
     stroke-width: 0.01cm;
     fill: var(--drag-color);
-    
+    cursor: move;
 }
+
 .rightMenuItemActionBG {
     stroke: var(--main-color);
     stroke-width: 0.01cm;
     fill: var(--click-color);
 }
-.rightMenuItemDisabledBG{
-	stroke: var(--main-color);
+
+.rightMenuItemDisabledBG {
+    stroke: var(--main-color);
     stroke-width: 0.01cm;
     fill: none;
 }
+
 .rightMenuItemSubActionBG {
     fill: none;
     stroke: var(--click-color);
@@ -52,21 +56,22 @@
 
     font-size: var(--label-05cm);
     pointer-events: none;
-	font-family: "Material-Design-Iconic-Font";
+    font-family: "Material-Design-Iconic-Font";
 }
+
 .rightMenuIconLabel {
     fill: var(--main-color);
     text-anchor: middle;
 
     font-size: var(--icon-05cm);
     pointer-events: none;
-	font-family: "Material-Design-Iconic-Font";
+    font-family: "Material-Design-Iconic-Font";
 }
 
 
 .menuButtonCircle {
     fill: var(--click-color);
-	stroke: var(--main-color);
+    stroke: var(--main-color);
     stroke-width: 0.05cm;
 }
 
@@ -74,15 +79,15 @@
     fill: var(--main-color);
     text-anchor: middle;
     font-size: var(--icon-05cm);
-    pointer-events:none;
-	font-family: "Material-Design-Iconic-Font";
+    pointer-events: none;
+    font-family: "Material-Design-Iconic-Font";
 }
 
 .currentTitleLabel {
     fill: var(--line-color);
     font-size: var(--label-05cm);
     pointer-events: none;
-	opacity: 50%;
-	transform: rotate(90deg);
-	transform-origin: 0cm 0cm;
+    opacity: 50%;
+    transform: rotate(90deg);
+    transform-origin: 0cm 0cm;
 }

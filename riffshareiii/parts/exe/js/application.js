@@ -255,6 +255,7 @@ class PluginDialogPrompt {
     constructor() {
         this.dialogID = '?';
         this.waitForPluginInit = false;
+        this.waitTitleAction = null;
         this.waitProjectCallback = null;
         this.waitTimelinePointCallback = null;
         window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
@@ -263,18 +264,20 @@ class PluginDialogPrompt {
         this.waitProjectCallback = callback;
         this.waitTimelinePointCallback = null;
         let pluginTitle = document.getElementById("pluginTitle");
-        pluginTitle.innerHTML = label;
+        pluginTitle.innerHTML = " " + label;
         let pluginFrame = document.getElementById("pluginFrame");
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
                 this.waitForPluginInit = true;
                 pluginFrame.src = url;
+                document.getElementById("pluginEditTitleButton").style.display = "none";
                 document.getElementById("pluginBottom").style.display = "none";
                 document.getElementById("pluginDiv").style.visibility = "visible";
             }
         }
     }
-    openPluginPointDialogFrame(label, url, raw, callback, btnLabel, btnAction) {
+    openPluginPointDialogFrame(label, url, raw, callback, btnLabel, btnAction, titleAction) {
+        this.waitTitleAction = titleAction;
         this.waitProjectCallback = null;
         this.waitTimelinePointCallback = callback;
         this.rawData = raw;
@@ -285,6 +288,19 @@ class PluginDialogPrompt {
             if (pluginFrame.contentWindow) {
                 this.waitForPluginInit = true;
                 pluginFrame.src = url;
+                document.getElementById("pluginEditTitleButton").style.display = "flex";
+                document.getElementById("pluginEditTitleButton").onclick = () => {
+                    if (this.waitTitleAction) {
+                        let newTitle = prompt(label, label);
+                        if (newTitle == label) {
+                        }
+                        else {
+                            if (newTitle != null) {
+                                this.waitTitleAction(newTitle);
+                            }
+                        }
+                    }
+                };
                 document.getElementById("pluginDeleteButton").onclick = btnAction;
                 document.getElementById("pluginDeleteLabel").innerHTML = btnLabel;
                 document.getElementById("pluginBottom").style.display = "flex";
@@ -834,8 +850,8 @@ class CommandDispatcher {
     promptActionPluginDialog(label, url, callback) {
         pluginDialogPrompt.openActionPluginDialogFrame(label, url, callback);
     }
-    promptPluginPointDialog(label, url, rawdata, callback, btnLabel, btnAction) {
-        pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction);
+    promptPluginPointDialog(label, url, rawdata, callback, btnLabel, btnAction, titleAction) {
+        pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction, titleAction);
     }
     findPluginRegistrationByKind(kind) {
         let list = MZXBX_currentPlugins();
@@ -1614,9 +1630,9 @@ class RightMenuPanel {
             }
             else {
                 if (it.dragMix) {
-                    this.items.push(new RightMenuItem(it, pad, () => {
-                        if (it.onClick) {
-                            it.onClick();
+                    this.items.push(new RightMenuItem(it, pad, () => { }, () => { }, (x, y) => {
+                        if (it.onDrag) {
+                            it.onDrag(x, y);
                         }
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
@@ -1710,7 +1726,7 @@ class RightMenuPanel {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
                     if (info) {
                         let url = info.ui;
-                        globalCommandDispatcher.promptPluginPointDialog(track.performer.id, url, track.performer.data, (obj) => {
+                        globalCommandDispatcher.promptPluginPointDialog(track.title, url, track.performer.data, (obj) => {
                             globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt, 'performer'], () => {
                                 track.performer.data = obj;
                             });
@@ -1718,6 +1734,11 @@ class RightMenuPanel {
                         }, LO(localDropInsTrack), () => {
                             globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
                                 globalCommandDispatcher.cfg().data.tracks.splice(tt, 1);
+                            });
+                            globalCommandDispatcher.cancelPluginGUI();
+                        }, (newTitle) => {
+                            globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt], () => {
+                                track.title = newTitle;
                             });
                             globalCommandDispatcher.cancelPluginGUI();
                         });
@@ -1764,7 +1785,7 @@ class RightMenuPanel {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(drum.sampler.kind);
                     if (info) {
                         let url = info.ui;
-                        globalCommandDispatcher.promptPluginPointDialog(drum.sampler.id, url, drum.sampler.data, (obj) => {
+                        globalCommandDispatcher.promptPluginPointDialog(drum.title, url, drum.sampler.data, (obj) => {
                             globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt, 'sampler'], () => {
                                 drum.sampler.data = obj;
                             });
@@ -1772,6 +1793,11 @@ class RightMenuPanel {
                         }, LO(localDropSampleTrack), () => {
                             globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
                                 globalCommandDispatcher.cfg().data.percussions.splice(tt, 1);
+                            });
+                            globalCommandDispatcher.cancelPluginGUI();
+                        }, (newTitle) => {
+                            globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt], () => {
+                                drum.title = newTitle;
                             });
                             globalCommandDispatcher.cancelPluginGUI();
                         });
@@ -1784,7 +1810,7 @@ class RightMenuPanel {
         for (let ff = 0; ff < project.filters.length; ff++) {
             let filter = project.filters[ff];
             let item = {
-                text: filter.id,
+                text: filter.title,
                 noLocalization: true,
                 itemStates: [icon_equalizer, icon_power],
                 selectedState: filter.state
@@ -1813,7 +1839,7 @@ class RightMenuPanel {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
                     if (info) {
                         let url = info.ui;
-                        globalCommandDispatcher.promptPluginPointDialog(filter.id, url, filter.data, (obj) => {
+                        globalCommandDispatcher.promptPluginPointDialog(filter.title, url, filter.data, (obj) => {
                             globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
                                 filter.data = obj;
                             });
@@ -1821,6 +1847,11 @@ class RightMenuPanel {
                         }, LO(localDropFilterTrack), () => {
                             globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
                                 globalCommandDispatcher.cfg().data.filters.splice(ff, 1);
+                            });
+                            globalCommandDispatcher.cancelPluginGUI();
+                        }, (newTitle) => {
+                            globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
+                                filter.title = newTitle;
                             });
                             globalCommandDispatcher.cancelPluginGUI();
                         });
@@ -1901,7 +1932,7 @@ class RightMenuPanel {
     }
 }
 class RightMenuItem {
-    constructor(info, pad, tap, tap2) {
+    constructor(info, pad, tap, tap2, drag) {
         this.kindAction = 1;
         this.kindDraggable = 2;
         this.kindPreview = 3;
@@ -1915,6 +1946,7 @@ class RightMenuItem {
         this.pad = pad;
         this.action = tap;
         this.action2 = tap2;
+        this.drag = drag;
         if (this.info.sid) {
         }
         else {
@@ -2008,6 +2040,7 @@ class RightMenuItem {
         }
         if (this.kind == this.kindDraggable) {
             spot.draggable = true;
+            spot.activation = this.drag;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
@@ -2106,8 +2139,8 @@ function fillPluginsLists() {
             if (purpose == 'Sampler') {
                 menuPointSamplers.children.push({
                     dragMix: true,
-                    text: label, noLocalization: true, onClick: () => {
-                        console.log(purpose, label);
+                    text: label, noLocalization: true, onDrag: (x, y) => {
+                        console.log(purpose, label, x, y);
                     }
                 });
             }
@@ -2115,8 +2148,8 @@ function fillPluginsLists() {
                 if (purpose == 'Performer') {
                     menuPointPerformers.children.push({
                         dragMix: true,
-                        text: label, noLocalization: true, onClick: () => {
-                            console.log(purpose, label);
+                        text: label, noLocalization: true, onDrag: (x, y) => {
+                            console.log(purpose, label, x, y);
                         }
                     });
                 }
@@ -2124,8 +2157,8 @@ function fillPluginsLists() {
                     if (purpose == 'Filter') {
                         menuPointFilters.children.push({
                             dragMix: true,
-                            text: label, noLocalization: true, onClick: () => {
-                                console.log(purpose, label);
+                            text: label, noLocalization: true, onDrag: (x, y) => {
+                                console.log(purpose, label, x, y);
                             }
                         });
                     }
@@ -3264,7 +3297,7 @@ class PerformerIcon {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
                     if (info) {
                         let url = info.ui;
-                        globalCommandDispatcher.promptPluginPointDialog(track.performer.id, url, track.performer.data, (obj) => {
+                        globalCommandDispatcher.promptPluginPointDialog(track.title, url, track.performer.data, (obj) => {
                             globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer'], () => {
                                 track.performer.data = obj;
                             });
@@ -3272,6 +3305,11 @@ class PerformerIcon {
                         }, LO(localDropInsTrack), () => {
                             globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
                                 globalCommandDispatcher.cfg().data.tracks.splice(trackNo, 1);
+                            });
+                            globalCommandDispatcher.cancelPluginGUI();
+                        }, (newTitle) => {
+                            globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo], () => {
+                                track.title = newTitle;
                             });
                             globalCommandDispatcher.cancelPluginGUI();
                         });
@@ -3459,7 +3497,7 @@ class SamplerIcon {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
                     if (info) {
                         let url = info.ui;
-                        globalCommandDispatcher.promptPluginPointDialog(samplerTrack.sampler.id, url, samplerTrack.sampler.data, (obj) => {
+                        globalCommandDispatcher.promptPluginPointDialog(samplerTrack.title, url, samplerTrack.sampler.data, (obj) => {
                             globalCommandDispatcher.exe.commitProjectChanges(['percussions', order], () => {
                                 samplerTrack.sampler.data = obj;
                             });
@@ -3467,6 +3505,11 @@ class SamplerIcon {
                         }, LO(localDropSampleTrack), () => {
                             globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
                                 globalCommandDispatcher.cfg().data.percussions.splice(order, 1);
+                            });
+                            globalCommandDispatcher.cancelPluginGUI();
+                        }, (newTitle) => {
+                            globalCommandDispatcher.exe.commitProjectChanges(['percussions', order], () => {
+                                samplerTrack.title = newTitle;
                             });
                             globalCommandDispatcher.cancelPluginGUI();
                         });
@@ -3657,7 +3700,7 @@ class FilterIcon {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
                     if (info) {
                         let url = info.ui;
-                        globalCommandDispatcher.promptPluginPointDialog(filterTarget.id, url, filterTarget.data, (obj) => {
+                        globalCommandDispatcher.promptPluginPointDialog(filterTarget.title, url, filterTarget.data, (obj) => {
                             globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
                                 filterTarget.data = obj;
                             });
@@ -3665,6 +3708,11 @@ class FilterIcon {
                         }, LO(localDropFilterTrack), () => {
                             globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
                                 globalCommandDispatcher.cfg().data.filters.splice(order, 1);
+                            });
+                            globalCommandDispatcher.cancelPluginGUI();
+                        }, (newTitle) => {
+                            globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+                                filterTarget.title = newTitle;
                             });
                             globalCommandDispatcher.cancelPluginGUI();
                         });
@@ -4198,6 +4246,7 @@ let _mzxbxProjectForTesting2 = {
     filters: [
         {
             id: 'volumeSlide', kind: 'zvolume1', data: '99', outputs: ['masterVolme'],
+            title: 't1',
             automation: [{ changes: [] }, {
                     changes: []
                 },
@@ -4210,6 +4259,7 @@ let _mzxbxProjectForTesting2 = {
         },
         {
             id: 'masterVolme', kind: 'zvolume1', data: '99', outputs: [''],
+            title: 't2',
             automation: [{ changes: [] }, { changes: [] },
                 {
                     changes: []
@@ -4217,24 +4267,24 @@ let _mzxbxProjectForTesting2 = {
                 { changes: [] }],
             iconPosition: { x: 188, y: 7 }, state: 0
         },
-        { id: 'allDrumsVolme', kind: 'zvolume1', data: '99', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 }, automation: [], state: 0 },
-        { id: 'drum1Volme', kind: 'zvolume1', data: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 }, automation: [], state: 0 },
-        { id: 'drum2Volme', kind: 'zvolume1', data: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 }, automation: [], state: 0 },
-        { id: 'drum3Volme', kind: 'zvolume1', data: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 }, automation: [], state: 0 },
-        { id: 'track1Volme', kind: 'zvolume1', data: '99', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [], state: 0 },
-        { id: 'track2Volme', kind: 'zvolume1', data: '99', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [], state: 0 },
-        { id: 'track3Echo', kind: 'zvecho1', data: '100', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [], state: 0 }
+        { id: 'allDrumsVolme', title: 't1', kind: 'zvolume1', data: '99', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 }, automation: [], state: 0 },
+        { id: 'drum1Volme', title: 't1a', kind: 'zvolume1', data: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 }, automation: [], state: 0 },
+        { id: 'drum2Volme', title: 't1s', kind: 'zvolume1', data: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 }, automation: [], state: 0 },
+        { id: 'drum3Volme', title: 't1d', kind: 'zvolume1', data: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 }, automation: [], state: 0 },
+        { id: 'track1Volme', title: 'tf1', kind: 'zvolume1', data: '99', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [], state: 0 },
+        { id: 'track2Volme', title: 'tg1', kind: 'zvolume1', data: '99', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [], state: 0 },
+        { id: 'track3Echo', title: 't1h', kind: 'zvecho1', data: '100', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [], state: 0 }
     ]
 };
 class MixerDataMathUtility {
     constructor(data) {
         this.leftPad = 3;
         this.rightPad = 50;
-        this.topPad = 2;
+        this.topPad = 12;
         this.parTitleGrid = 5;
-        this.padGrid2Sampler = 5;
-        this.padSampler2Automation = 5;
-        this.padAutomation2Comments = 5;
+        this.padGrid2Sampler = 1;
+        this.padSampler2Automation = 1;
+        this.padAutomation2Comments = 1;
         this.bottomPad = 11;
         this.notePathHeight = 1.01;
         this.samplerDotHeight = 3;

@@ -195,13 +195,12 @@ class RightMenuPanel {
 
 					}).initClosedFolderItem();
 					this.items.push(si);
-
 				}
 			} else {
 				if (it.dragMix) {
-					this.items.push(new RightMenuItem(it, pad, () => {
-						if (it.onClick) {
-							it.onClick();
+					this.items.push(new RightMenuItem(it, pad, () => { }, () => { }, (x: number, y: number) => {
+						if (it.onDrag) {
+							it.onDrag(x, y);
 						}
 						me.setFocus(it, infos);
 						me.resetAllAnchors();
@@ -313,7 +312,7 @@ class RightMenuPanel {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptPluginPointDialog(track.performer.id, url, track.performer.data, (obj: any) => {
+						globalCommandDispatcher.promptPluginPointDialog(track.title, url, track.performer.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt, 'performer'], () => {
 								track.performer.data = obj;
 							});
@@ -323,6 +322,11 @@ class RightMenuPanel {
 							//console.log(localDropInsTrack);
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
 								globalCommandDispatcher.cfg().data.tracks.splice(tt, 1);
+							});
+							globalCommandDispatcher.cancelPluginGUI();
+						}, (newTitle: string) => {
+							globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt], () => {
+								track.title = newTitle;
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});
@@ -375,7 +379,7 @@ class RightMenuPanel {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(drum.sampler.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptPluginPointDialog(drum.sampler.id, url, drum.sampler.data, (obj: any) => {
+						globalCommandDispatcher.promptPluginPointDialog(drum.title, url, drum.sampler.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt, 'sampler'], () => {
 								drum.sampler.data = obj;
 							});
@@ -385,6 +389,11 @@ class RightMenuPanel {
 							//console.log(localDropSampleTrack);
 							globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
 								globalCommandDispatcher.cfg().data.percussions.splice(tt, 1);
+							});
+							globalCommandDispatcher.cancelPluginGUI();
+						}, (newTitle: string) => {
+							globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt], () => {
+								drum.title = newTitle;
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});
@@ -400,7 +409,7 @@ class RightMenuPanel {
 			let filter = project.filters[ff];
 			//if (filter.automation) {
 			let item: MenuInfo = {
-				text: filter.id
+				text: filter.title
 				, noLocalization: true
 				, itemStates: [icon_equalizer, icon_power]
 				, selectedState: filter.state
@@ -433,7 +442,7 @@ class RightMenuPanel {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptPluginPointDialog(filter.id, url, filter.data, (obj: any) => {
+						globalCommandDispatcher.promptPluginPointDialog(filter.title, url, filter.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
 								filter.data = obj;
 							});
@@ -443,6 +452,11 @@ class RightMenuPanel {
 							//console.log(localDropFilterTrack);
 							globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
 								globalCommandDispatcher.cfg().data.filters.splice(ff, 1);
+							});
+							globalCommandDispatcher.cancelPluginGUI();
+						}, (newTitle: string) => {
+							globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
+								filter.title = newTitle;
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});

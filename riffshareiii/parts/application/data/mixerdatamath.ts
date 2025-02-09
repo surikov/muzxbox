@@ -4,11 +4,11 @@ class MixerDataMathUtility {
 	leftPad: number = 3;
 	rightPad: number = 50;
 
-	topPad = 2;
+	topPad = 12;
 	parTitleGrid = 5;
-	padGrid2Sampler = 5;
-	padSampler2Automation = 5;
-	padAutomation2Comments = 5;
+	padGrid2Sampler = 1;
+	padSampler2Automation = 1;
+	padAutomation2Comments = 1;
 	bottomPad = 11;
 
 

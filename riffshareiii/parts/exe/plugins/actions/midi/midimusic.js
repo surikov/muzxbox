@@ -1496,6 +1496,7 @@ class MidiParser {
                 let filterID = 'volume' + ii;
                 let filterVolume = {
                     id: filterID,
+                    title: filterID,
                     kind: 'zvolume1', data: '99', outputs: [compresID],
                     iconPosition: { x: 77 + ii * 5, y: ii * 11 + 2 },
                     automation: [], state: 0
@@ -1544,7 +1545,7 @@ class MidiParser {
             }
         }
         let filterEcho = {
-            id: echoOutID,
+            id: echoOutID, title: echoOutID,
             kind: 'zvecho1', data: '22', outputs: [''],
             iconPosition: {
                 x: 77 + midiSongData.miditracks.length * 30,
@@ -1554,6 +1555,7 @@ class MidiParser {
         };
         let filterCompression = {
             id: compresID,
+            title: compresID,
             kind: 'zvooco1', data: '1', outputs: [echoOutID],
             iconPosition: {
                 x: 88 + midiSongData.miditracks.length * 30,

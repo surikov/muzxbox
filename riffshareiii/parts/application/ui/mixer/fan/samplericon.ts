@@ -169,7 +169,7 @@ class SamplerIcon {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptPluginPointDialog(samplerTrack.sampler.id, url, samplerTrack.sampler.data, (obj: any) => {
+						globalCommandDispatcher.promptPluginPointDialog(samplerTrack.title, url, samplerTrack.sampler.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['percussions', order], () => {
 								samplerTrack.sampler.data = obj;
 							});
@@ -179,6 +179,11 @@ class SamplerIcon {
 							//console.log(localDropSampleTrack);
 							globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
 								globalCommandDispatcher.cfg().data.percussions.splice(order,1);
+							});
+							globalCommandDispatcher.cancelPluginGUI();
+						}, (newTitle: string) => { 
+							globalCommandDispatcher.exe.commitProjectChanges(['percussions',order], () => {
+								samplerTrack.title=newTitle;
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});

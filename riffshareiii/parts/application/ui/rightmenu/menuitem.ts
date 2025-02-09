@@ -10,15 +10,17 @@ class RightMenuItem {
 	kind: 1 | 2 | 3 | 4 | 5 | 6 | 7 = this.kindAction;
 	action?: { (): void };
 	action2?: { (): void };
+	drag?: { (x: number, y: number): void };
 	pad: number = 0;
 	top: number;
 	info: MenuInfo;
 
-	constructor(info: MenuInfo, pad: number, tap?: () => void, tap2?: () => void) {
+	constructor(info: MenuInfo, pad: number, tap?: () => void, tap2?: () => void, drag?: (x: number, y: number) => void) {
 		this.info = info;
 		this.pad = pad;
 		this.action = tap;
 		this.action2 = tap2;
+		this.drag = drag;
 		if (this.info.sid) {
 			//
 		} else {
@@ -109,6 +111,7 @@ class RightMenuItem {
 		}
 		if (this.kind == this.kindDraggable) {
 			spot.draggable = true;
+			spot.activation=this.drag;
 			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
 			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
 		}

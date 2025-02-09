@@ -49,6 +49,7 @@ type Zvoog_FilterTarget = {
 	automation: Zvoog_FilterMeasure[];
 	iconPosition: { x: number, y: number };
 	state: 0 | 1;//on|off
+	title:string;
 };
 type Zvoog_AudioSequencer = {
 	id: string;

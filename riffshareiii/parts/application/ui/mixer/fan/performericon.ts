@@ -192,7 +192,7 @@ class PerformerIcon {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
 					if (info) {
 						let url = info.ui;
-						globalCommandDispatcher.promptPluginPointDialog(track.performer.id, url, track.performer.data, (obj: any) => {
+						globalCommandDispatcher.promptPluginPointDialog(track.title, url, track.performer.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks',trackNo,'performer'], () => {
 								track.performer.data = obj;
 							});
@@ -202,6 +202,11 @@ class PerformerIcon {
 							//console.log(localDropInsTrack);
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
 								globalCommandDispatcher.cfg().data.tracks.splice(trackNo, 1);
+							});
+							globalCommandDispatcher.cancelPluginGUI();
+						}, (newTitle: string) => { 
+							globalCommandDispatcher.exe.commitProjectChanges(['tracks',trackNo], () => {
+								track.title=newTitle;
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});

@@ -1,0 +1,48 @@
+Naruto midi list
+***total: 43
+
+MIDI from OST:
+Naruto_01_-_Rocks
+Naruto_02_-_I_said_Im_Naruto
+Naruto_04_-_Morning
+Naruto_05_-_Narutos_daily_life
+Naruto_07_-_The_raising_fighting_spirit
+Naruto_08_-_Sadness_and_sorrow [2]
+Naruto_09_-_Loneliness
+Naruto_10_-_Sakuras_theme [2]
+Naruto_13_-_Go_go_go_Naruto
+Naruto_14_-_Evening
+Naruto_16_-_ Needs_to_be_Strong
+Naruto_17_-_Bad_situation
+Naruto_18_-_ Strong_and_Strike
+Naruto_20_-_Victory
+Naruto_21_-_main_theme
+Naruto_22_-_Wind [2]
+Naruto_23_-_Haruka_Kanata
+Naruto_24_-_Daylight_of_Konoha
+Naruto_26_-_Evil
+Naruto_27_-_Sasuke-s_theme
+Naruto_28_-_Survival_examination
+Naruto_30_-_Fooling_mode
+Naruto_31_-_Konohamarus_theme
+Naruto_32_-_Its_the_training
+Naruto_34_-_Hinata_Vs_Neji
+Naruto_35_-_Orochimaru-s_theme
+Naruto_36_-_Avenger
+Naruto_39_-_Sasuke_Destiny
+Naruto_40_-_Alone
+
+MIDI from game:
+Naruto_g01_-_kanashimi_wo_yasashisa_ni
+Naruto_g02_-_rock_lee_game_ep31
+Naruto_g03_-_gba_Ending_theme
+Naruto_g04_-_Go
+Naruto_g05_-_Hokage-s_funeral
+Naruto_g06_-_gc_Naruto_main_menu
+
+MIDI from movie:
+Naruto_m05_-_Princess_Fuun_big_adventure
+Naruto_m06_-_Princess_Fuun_show_yourself
+Naruto_m08_-_Yukie_Fujikaze
+Naruto_m12_-_Actress_Yukie_Fujikaze
+Naruto_m20_-_Happy_end
