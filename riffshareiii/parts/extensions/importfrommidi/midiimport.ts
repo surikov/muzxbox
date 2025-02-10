@@ -2104,6 +2104,7 @@ class MidiParser {
 		this.reShiftDrums(project);
 		this.limitShort(project)
 		this.cutShift(project);
+		//this.allShiftForwad(project, { count: 5, part: 8 });
 		//---------------
 		let len = project.timeline.length;
 		for (let ii = len - 1; ii > 0; ii--) {
@@ -2112,6 +2113,72 @@ class MidiParser {
 			} else {
 				project.timeline.length = ii + 2;
 				return;
+			}
+		}
+
+
+	}
+	allShiftForwad(project: Zvoog_Project, shiftSize: Zvoog_Metre) {
+		//console.log('allShiftForwad', shiftSize);
+		for (let tt = 0; tt < project.tracks.length; tt++) {
+			let track = project.tracks[tt];
+			for (let mm = track.measures.length; mm > 1; mm--) {
+				//console.log(mm);
+				let fromDuration = project.timeline[mm - 2].metre;
+				let fromMeasure = track.measures[mm - 2];
+				let toMeasure = track.measures[mm - 1];
+				for (let cc = 0; cc < fromMeasure.chords.length; cc++) {
+					let chord = fromMeasure.chords[cc];
+					let skip: Zvoog_MetreMathType = MMUtil().set(chord.skip).plus(shiftSize);
+					//console.log(chord.skip, skip.simplyfy());
+					if (skip.less(fromDuration)) {
+						chord.skip = skip.simplyfy();
+					} else {
+						chord.skip = skip.minus(fromDuration).simplyfy();
+						toMeasure.chords.push(chord);
+						fromMeasure.chords.splice(cc, 1);
+						cc--;
+					}
+				}
+			}
+		}
+		for (let tt = 0; tt < project.percussions.length; tt++) {
+			let drum = project.percussions[tt];
+			for (let mm = drum.measures.length; mm > 1; mm--) {
+				let fromDuration = project.timeline[mm - 2].metre;
+				let fromMeasure = drum.measures[mm - 2];
+				let toMeasure = drum.measures[mm - 1];
+				for (let cc = 0; cc < fromMeasure.skips.length; cc++) {
+					//let drumskip = fromMeasure.skips[cc];
+					let skip: Zvoog_MetreMathType = MMUtil().set(fromMeasure.skips[cc]).plus(shiftSize);
+					//console.log(chord.skip, skip.simplyfy());
+					if (skip.less(fromDuration)) {
+						fromMeasure.skips[cc] = skip.simplyfy();
+					} else {
+						fromMeasure.skips[cc] = skip.minus(fromDuration).simplyfy();
+						toMeasure.skips.push(fromMeasure.skips[cc]);
+						fromMeasure.skips.splice(cc, 1);
+						cc--;
+					}
+				}
+			}
+		}
+		for (let mm = project.comments.length; mm > 1; mm--) {
+			let fromDuration = project.timeline[mm - 2].metre;
+			let fromMeasure = project.comments[mm - 2];
+			let toMeasure = project.comments[mm - 1];
+			for (let cc = 0; cc < fromMeasure.points.length; cc++) {
+				//let drumskip = fromMeasure.skips[cc];
+				let skip: Zvoog_MetreMathType = MMUtil().set(fromMeasure.points[cc].skip).plus(shiftSize);
+				//console.log(chord.skip, skip.simplyfy());
+				if (skip.less(fromDuration)) {
+					fromMeasure.points[cc].skip = skip.simplyfy();
+				} else {
+					fromMeasure.points[cc].skip = skip.minus(fromDuration).simplyfy();
+					toMeasure.points.push(fromMeasure.points[cc]);
+					fromMeasure.points.splice(cc, 1);
+					cc--;
+				}
 			}
 		}
 	}

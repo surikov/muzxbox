@@ -1622,6 +1622,66 @@ class MidiParser {
             }
         }
     }
+    allShiftForwad(project, shiftSize) {
+        for (let tt = 0; tt < project.tracks.length; tt++) {
+            let track = project.tracks[tt];
+            for (let mm = track.measures.length; mm > 1; mm--) {
+                let fromDuration = project.timeline[mm - 2].metre;
+                let fromMeasure = track.measures[mm - 2];
+                let toMeasure = track.measures[mm - 1];
+                for (let cc = 0; cc < fromMeasure.chords.length; cc++) {
+                    let chord = fromMeasure.chords[cc];
+                    let skip = MMUtil().set(chord.skip).plus(shiftSize);
+                    if (skip.less(fromDuration)) {
+                        chord.skip = skip.simplyfy();
+                    }
+                    else {
+                        chord.skip = skip.minus(fromDuration).simplyfy();
+                        toMeasure.chords.push(chord);
+                        fromMeasure.chords.splice(cc, 1);
+                        cc--;
+                    }
+                }
+            }
+        }
+        for (let tt = 0; tt < project.percussions.length; tt++) {
+            let drum = project.percussions[tt];
+            for (let mm = drum.measures.length; mm > 1; mm--) {
+                let fromDuration = project.timeline[mm - 2].metre;
+                let fromMeasure = drum.measures[mm - 2];
+                let toMeasure = drum.measures[mm - 1];
+                for (let cc = 0; cc < fromMeasure.skips.length; cc++) {
+                    let skip = MMUtil().set(fromMeasure.skips[cc]).plus(shiftSize);
+                    if (skip.less(fromDuration)) {
+                        fromMeasure.skips[cc] = skip.simplyfy();
+                    }
+                    else {
+                        fromMeasure.skips[cc] = skip.minus(fromDuration).simplyfy();
+                        toMeasure.skips.push(fromMeasure.skips[cc]);
+                        fromMeasure.skips.splice(cc, 1);
+                        cc--;
+                    }
+                }
+            }
+        }
+        for (let mm = project.comments.length; mm > 1; mm--) {
+            let fromDuration = project.timeline[mm - 2].metre;
+            let fromMeasure = project.comments[mm - 2];
+            let toMeasure = project.comments[mm - 1];
+            for (let cc = 0; cc < fromMeasure.points.length; cc++) {
+                let skip = MMUtil().set(fromMeasure.points[cc].skip).plus(shiftSize);
+                if (skip.less(fromDuration)) {
+                    fromMeasure.points[cc].skip = skip.simplyfy();
+                }
+                else {
+                    fromMeasure.points[cc].skip = skip.minus(fromDuration).simplyfy();
+                    toMeasure.points.push(fromMeasure.points[cc]);
+                    fromMeasure.points.splice(cc, 1);
+                    cc--;
+                }
+            }
+        }
+    }
     limitShort(project) {
         let note16 = MMUtil().set({ count: 1, part: 16 });
         for (let tt = 0; tt < project.tracks.length; tt++) {
