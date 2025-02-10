@@ -1971,7 +1971,7 @@ class MidiParser {
 				let filterID = 'volume' + ii;
 				let filterVolume: Zvoog_FilterTarget = {
 					id: filterID
-					,title:filterID
+					, title: filterID
 					, kind: 'zvolume1', data: '99', outputs: [compresID]
 					, iconPosition: { x: 77 + ii * 5, y: ii * 11 + 2 }
 					, automation: [], state: 0
@@ -2031,7 +2031,7 @@ class MidiParser {
 
 		}
 		let filterEcho: Zvoog_FilterTarget = {
-			id: echoOutID,title: echoOutID
+			id: echoOutID, title: echoOutID
 			, kind: 'zvecho1', data: '22', outputs: ['']
 			, iconPosition: {
 				x: 77 + midiSongData.miditracks.length * 30
@@ -2041,7 +2041,7 @@ class MidiParser {
 		};
 		let filterCompression: Zvoog_FilterTarget = {
 			id: compresID
-			,title: compresID
+			, title: compresID
 			, kind: 'zvooco1', data: '1', outputs: [echoOutID]
 			, iconPosition: {
 				x: 88 + midiSongData.miditracks.length * 30
@@ -2052,7 +2052,7 @@ class MidiParser {
 		project.filters.push(filterEcho);
 		project.filters.push(filterCompression);
 
-		console.log('midiSongData', midiSongData.meters,midiSongData);
+		console.log('midiSongData', midiSongData.meters, midiSongData);
 		console.log('project', project);
 		this.trimProject(project);
 		return project;
@@ -2101,7 +2101,8 @@ class MidiParser {
 		}
 		//---------------
 		this.reShiftSequencer(project);
-		this.reShiftDrums(project)
+		this.reShiftDrums(project);
+		this.limitShort(project)
 		this.cutShift(project);
 		//---------------
 		let len = project.timeline.length;
@@ -2111,6 +2112,25 @@ class MidiParser {
 			} else {
 				project.timeline.length = ii + 2;
 				return;
+			}
+		}
+	}
+	limitShort(project: Zvoog_Project) {
+		let note16 = MMUtil().set({ count: 1, part: 16 });
+		for (let tt = 0; tt < project.tracks.length; tt++) {
+			let track = project.tracks[tt];
+			for (let mm = 0; mm < track.measures.length; mm++) {
+				let measure = track.measures[mm];
+				for (let cc = 0; cc < measure.chords.length; cc++) {
+					let chord = measure.chords[cc];
+					if (chord.slides.length == 1) {
+						chord.slides[0].duration = MMUtil().set(chord.slides[0].duration).simplyfy();
+						if (note16.more(chord.slides[0].duration)) {
+							//console.log(chord.slides[0].duration);
+							chord.slides[0].duration = note16;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -2191,9 +2211,9 @@ class MidiParser {
 			for (let mm = 0; mm < track.measures.length; mm++) {
 				let measure = track.measures[mm];
 				for (let cc = 0; cc < measure.chords.length; cc++) {
-					let m16=MMUtil().set(measure.chords[cc].skip).strip(16);
-					measure.chords[cc].skip.count=m16.count;
-					measure.chords[cc].skip.part=m16.part;
+					let m16 = MMUtil().set(measure.chords[cc].skip).strip(16);
+					measure.chords[cc].skip.count = m16.count;
+					measure.chords[cc].skip.part = m16.part;
 					let chord = measure.chords[cc];
 					if (chord.skip.count < 0) {
 						if (mm > 0) {
@@ -2225,9 +2245,9 @@ class MidiParser {
 			for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
 				let measure = sampleTrack.measures[mm];
 				for (let mp = 0; mp < measure.skips.length; mp++) {
-					let m16=MMUtil().set(measure.skips[mp]).strip(16);
-					measure.skips[mp].count=m16.count;
-					measure.skips[mp].part=m16.part;
+					let m16 = MMUtil().set(measure.skips[mp]).strip(16);
+					measure.skips[mp].count = m16.count;
+					measure.skips[mp].part = m16.part;
 					let skip = measure.skips[mp];
 					if (skip.count < 0) {
 						if (mm > 0) {
@@ -2386,16 +2406,16 @@ class MidiParser {
 	}*/
 	createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack {
 		//console.log('createProjectTrack', midiTrack.title);
-		let perfkind='zinstr1';
-		if(midiTrack.program==24
-			||midiTrack.program==25
-			||midiTrack.program==26
-			||midiTrack.program==27
-			||midiTrack.program==28
-			||midiTrack.program==29
-			||midiTrack.program==30
-			){
-			perfkind='zvstrumming1';
+		let perfkind = 'zinstr1';
+		if (midiTrack.program == 24
+			|| midiTrack.program == 25
+			|| midiTrack.program == 26
+			|| midiTrack.program == 27
+			|| midiTrack.program == 28
+			|| midiTrack.program == 29
+			|| midiTrack.program == 30
+		) {
+			perfkind = 'zvstrumming1';
 		}
 		let projectTrack: Zvoog_MusicTrack = {
 			title: midiTrack.title + ' ' + insNames[midiTrack.program]

@@ -600,6 +600,7 @@ declare class MidiParser {
     createTimeLine(midiSongData: MIDISongData): Zvoog_SongMeasure[];
     convertProject(title: string, comment: string): Zvoog_Project;
     trimProject(project: Zvoog_Project): void;
+    limitShort(project: Zvoog_Project): void;
     reShiftSequencer(project: Zvoog_Project): void;
     reShiftDrums(project: Zvoog_Project): void;
     cutShift(project: Zvoog_Project): void;

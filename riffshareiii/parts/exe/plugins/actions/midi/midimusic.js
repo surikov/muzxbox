@@ -1610,6 +1610,7 @@ class MidiParser {
         }
         this.reShiftSequencer(project);
         this.reShiftDrums(project);
+        this.limitShort(project);
         this.cutShift(project);
         let len = project.timeline.length;
         for (let ii = len - 1; ii > 0; ii--) {
@@ -1618,6 +1619,24 @@ class MidiParser {
             else {
                 project.timeline.length = ii + 2;
                 return;
+            }
+        }
+    }
+    limitShort(project) {
+        let note16 = MMUtil().set({ count: 1, part: 16 });
+        for (let tt = 0; tt < project.tracks.length; tt++) {
+            let track = project.tracks[tt];
+            for (let mm = 0; mm < track.measures.length; mm++) {
+                let measure = track.measures[mm];
+                for (let cc = 0; cc < measure.chords.length; cc++) {
+                    let chord = measure.chords[cc];
+                    if (chord.slides.length == 1) {
+                        chord.slides[0].duration = MMUtil().set(chord.slides[0].duration).simplyfy();
+                        if (note16.more(chord.slides[0].duration)) {
+                            chord.slides[0].duration = note16;
+                        }
+                    }
+                }
             }
         }
     }
