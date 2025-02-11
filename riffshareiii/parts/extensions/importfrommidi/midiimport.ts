@@ -965,28 +965,23 @@ class MidiParser {
 		}
 		return returnPoints;
 	};
-
+/*
 	simplifySinglePath(points: XYp[], tolerance: number): XYp[] {
 		var arr: XYp[] = this.douglasPeucker(points, tolerance);
 		arr.push(points[points.length - 1]);
 		//console.log(points, tolerance, arr);
 		return arr;
 	}
-
+*/
 	simplifyAllBendPaths() {
 		let msMin = 75;
 		for (var t = 0; t < this.parsedTracks.length; t++) {
 			var track: MIDIFileTrack = this.parsedTracks[t];
-			//console.log('simplify', track.trackTitle);
 			for (var ch = 0; ch < track.chords.length; ch++) {
 				var chord: TrackChord = track.chords[ch];
 				for (var n = 0; n < chord.notes.length; n++) {
 					var note: TrackNote = chord.notes[n];
 					if (note.bendPoints.length > 1) {
-						//console.log(chord.channel,note.bendPoints.length,note);
-					}
-					if (note.bendPoints.length > 1) {
-						//console.log('simplify', note.bendPoints.length, note);
 						let simplifiedPath: NotePitch[] = [];
 						let cuPointDuration = 0;
 						let lastBasePitchDelta = 0;
@@ -995,42 +990,20 @@ class MidiParser {
 							lastBasePitchDelta = cuPoint.basePitchDelta;
 							cuPointDuration = cuPointDuration + cuPoint.pointDuration;
 							if (cuPointDuration > msMin) {
-								simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: Math.round(lastBasePitchDelta) });
-								//console.log(cuPointDuration, lastBasePitchDelta);
+								//simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: Math.round(lastBasePitchDelta) });
+								simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
 								cuPointDuration = 0;
+							}else{
+								if(simplifiedPath.length>0){
+									let prePoint=simplifiedPath[simplifiedPath.length-1];
+									prePoint.basePitchDelta=lastBasePitchDelta;
+								}
 							}
 						}
-						//console.log(cuPointDuration, lastBasePitchDelta);
-						simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: Math.round(lastBasePitchDelta) });
+						//simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: Math.round(lastBasePitchDelta) });
+						simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
+						//console.log(note.bendPoints , simplifiedPath);
 						note.bendPoints = simplifiedPath;
-						//console.log(simplifiedPath,'original',note.bendPoints);
-						/*
-												let tolerance = 0.3;
-												if (note.bendPoints.length > 30) {
-													tolerance = 0.5;
-												}
-												if (note.bendPoints.length > 50) {
-													tolerance = 0.95;
-												}
-												var xx = 0;
-												var pnts: XYp[] = [];
-												for (var p = 0; p < note.bendPoints.length; p++) {
-													note.bendPoints[p].pointDuration = Math.max(note.bendPoints[p].pointDuration, 0);
-													pnts.push({ x: xx, y: note.bendPoints[p].basePitchDelta });
-													xx = xx + note.bendPoints[p].pointDuration;
-												}
-												pnts.push({ x: xx, y: note.bendPoints[note.bendPoints.length - 1].basePitchDelta });
-												var lessPoints: XYp[] = this.simplifySinglePath(pnts, tolerance);
-												note.bendPoints = [];
-												for (var p = 0; p < lessPoints.length - 1; p++) {
-													var xypoint: XYp = lessPoints[p];
-													var xyNext: XYp = lessPoints[p + 1];
-													var xyduration = lessPoints[p + 1].x - xypoint.x;
-													if (xyduration > 0) {
-														note.bendPoints.push({ pointDuration: xyduration, basePitchDelta: xyNext.y });
-													}
-												}
-												*/
 					} else {
 						if (note.bendPoints.length == 1) {
 							if (note.bendPoints[0].pointDuration > 4321) {
@@ -1042,7 +1015,7 @@ class MidiParser {
 			}
 		}
 	}
-	simplifyAllBendPaths22() {
+	/*simplifyAllBendPaths22() {
 		for (var t = 0; t < this.parsedTracks.length; t++) {
 			var track: MIDIFileTrack = this.parsedTracks[t];
 			//console.log('simplify',track.trackTitle);
@@ -1066,7 +1039,7 @@ class MidiParser {
 	simplifyNoteBendPath(note: TrackNote) {
 		console.log(note.baseDuration, note.bendPoints);
 		let step = 0.005;
-	}
+	}*/
 	dumpResolutionChanges(): void {
 		this.header.changes = [];
 		let tickResolution: number = this.header.get0TickResolution();

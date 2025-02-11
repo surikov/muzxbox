@@ -255,7 +255,8 @@ class SchedulePlayer {
             }
         }
         else {
-            return 'Connected aready';
+            console.log('Connected aready');
+            return null;
         }
     }
     disconnectAllPlugins() {

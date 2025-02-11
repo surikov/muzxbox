@@ -45,6 +45,7 @@ declare type Zvoog_FilterTarget = {
         y: number;
     };
     state: 0 | 1;
+    title: string;
 };
 declare type Zvoog_AudioSequencer = {
     id: string;

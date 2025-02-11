@@ -809,11 +809,6 @@ class MidiParser {
         return returnPoints;
     }
     ;
-    simplifySinglePath(points, tolerance) {
-        var arr = this.douglasPeucker(points, tolerance);
-        arr.push(points[points.length - 1]);
-        return arr;
-    }
     simplifyAllBendPaths() {
         let msMin = 75;
         for (var t = 0; t < this.parsedTracks.length; t++) {
@@ -823,8 +818,6 @@ class MidiParser {
                 for (var n = 0; n < chord.notes.length; n++) {
                     var note = chord.notes[n];
                     if (note.bendPoints.length > 1) {
-                    }
-                    if (note.bendPoints.length > 1) {
                         let simplifiedPath = [];
                         let cuPointDuration = 0;
                         let lastBasePitchDelta = 0;
@@ -833,11 +826,17 @@ class MidiParser {
                             lastBasePitchDelta = cuPoint.basePitchDelta;
                             cuPointDuration = cuPointDuration + cuPoint.pointDuration;
                             if (cuPointDuration > msMin) {
-                                simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: Math.round(lastBasePitchDelta) });
+                                simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
                                 cuPointDuration = 0;
                             }
+                            else {
+                                if (simplifiedPath.length > 0) {
+                                    let prePoint = simplifiedPath[simplifiedPath.length - 1];
+                                    prePoint.basePitchDelta = lastBasePitchDelta;
+                                }
+                            }
                         }
-                        simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: Math.round(lastBasePitchDelta) });
+                        simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
                         note.bendPoints = simplifiedPath;
                     }
                     else {
@@ -850,31 +849,6 @@ class MidiParser {
                 }
             }
         }
-    }
-    simplifyAllBendPaths22() {
-        for (var t = 0; t < this.parsedTracks.length; t++) {
-            var track = this.parsedTracks[t];
-            for (var ch = 0; ch < track.chords.length; ch++) {
-                var chord = track.chords[ch];
-                for (var n = 0; n < chord.notes.length; n++) {
-                    var note = chord.notes[n];
-                    if (note.bendPoints.length > 1) {
-                        this.simplifyNoteBendPath(note);
-                    }
-                    else {
-                        if (note.bendPoints.length == 1) {
-                            if (note.bendPoints[0].pointDuration > 4321) {
-                                note.bendPoints[0].pointDuration = 1234;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    simplifyNoteBendPath(note) {
-        console.log(note.baseDuration, note.bendPoints);
-        let step = 0.005;
     }
     dumpResolutionChanges() {
         this.header.changes = [];

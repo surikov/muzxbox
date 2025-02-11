@@ -172,12 +172,13 @@ class SchedulePlayer implements MZXBX_Player {
 							}
 						}
 					}
-					this.isConnected=true;
+					this.isConnected = true;
 					return null;
 				}
 			}
 		} else {
-			return 'Connected aready';
+			console.log('Connected aready');
+			return null;
 		}
 	}
 	disconnectAllPlugins() {
@@ -278,12 +279,12 @@ class SchedulePlayer implements MZXBX_Player {
 						me.tick(loopStart, loopEnd, id);
 					});
 					this.waitForID = id;
-				}else{
+				} else {
 					console.log('cancel ticks due different id');
 				}
 				//} else {
 				//this.disconnectAllPlugins();
-			}else{
+			} else {
 				console.log('cancel ticks due stop');
 			}
 		}
@@ -374,11 +375,11 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 	}
 	cancel(): void {
-		if(this.isPlayLoop){
-		this.waitForID = -1;
-		this.isPlayLoop = false;
-		this.disconnectAllPlugins();
-		}else{
+		if (this.isPlayLoop) {
+			this.waitForID = -1;
+			this.isPlayLoop = false;
+			this.disconnectAllPlugins();
+		} else {
 			console.log('No loop to cancel');
 		}
 	}

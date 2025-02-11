@@ -563,10 +563,7 @@ declare class MidiParser {
     takeOpenedNote(first: number, when: number, track: MIDIFileTrack, channel: number): TrackNote;
     distanceToPoint(line: PP, point: XYp): number;
     douglasPeucker(points: XYp[], tolerance: number): XYp[];
-    simplifySinglePath(points: XYp[], tolerance: number): XYp[];
     simplifyAllBendPaths(): void;
-    simplifyAllBendPaths22(): void;
-    simplifyNoteBendPath(note: TrackNote): void;
     dumpResolutionChanges(): void;
     lastResolution(ms: number): number;
     parseTicks2time(track: MIDIFileTrack): void;

@@ -31,8 +31,8 @@
 }
 
 .interactiveTimeMeasureMark{
-    fill: var(--main-color);
-	fill-opacity: 50%;
+    fill: var(--click-color);
+	fill-opacity: 95%;
 }
 
 .mixFiller1{
@@ -180,8 +180,8 @@
 	pointer-events: none;
 }
 .interActiveGridLine{
-	fill: var(--main-color);
-	fill-opacity:50%;
+	fill: var(--click-color);
+	fill-opacity:95%;
     stroke: none;
 }
 

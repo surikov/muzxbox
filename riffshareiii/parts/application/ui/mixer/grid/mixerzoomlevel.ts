@@ -146,7 +146,7 @@ class MixerZoomLevel {
 					x: globalCommandDispatcher.cfg().leftPad
 					, y: globalCommandDispatcher.cfg().samplerTop() + pp * globalCommandDispatcher.cfg().samplerDotHeight
 					, w: globalCommandDispatcher.cfg().timelineWidth()
-					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 128.0
+					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 64.0
 					, css: 'octaveBottomBorder'
 				});
 			}
@@ -155,7 +155,7 @@ class MixerZoomLevel {
 					x: globalCommandDispatcher.cfg().leftPad
 					, y: globalCommandDispatcher.cfg().automationTop() + aa * globalCommandDispatcher.cfg().autoPointHeight
 					, w: globalCommandDispatcher.cfg().timelineWidth()
-					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 128.0
+					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 64.0
 					, css: 'octaveBottomBorder'
 				});
 			}
