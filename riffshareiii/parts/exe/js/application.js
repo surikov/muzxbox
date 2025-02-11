@@ -1588,10 +1588,6 @@ class RightMenuPanel {
         this.rerenderMenuContent(null);
     }
     setOpenState(state, it, infos) {
-        for (let ii = 0; ii < infos.length; ii++) {
-            infos[ii].opened = false;
-            infos[ii].focused = false;
-        }
         it.focused = true;
         it.opened = state;
     }

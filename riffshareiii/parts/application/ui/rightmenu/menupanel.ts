@@ -153,10 +153,10 @@ class RightMenuPanel {
 
 	}
 	setOpenState(state: boolean, it: MenuInfo, infos: MenuInfo[]) {
-		for (let ii = 0; ii < infos.length; ii++) {
+		/*for (let ii = 0; ii < infos.length; ii++) {
 			infos[ii].opened = false;
 			infos[ii].focused = false;
-		}
+		}*/
 		it.focused = true;
 		it.opened = state;
 	}
