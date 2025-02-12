@@ -1,689 +1,6 @@
-class MIDIIImportMusicPlugin {
-	callbackID = '';
-	parsedProject: Zvoog_Project | null = null;
-	constructor() {
-		this.init();
-	}
-	init() {
-		//console.log('init MIDI import');
-		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
-		//window.parent.postMessage('', '*');
-		window.parent.postMessage({
-			dialogID: this.callbackID
-			, pluginData: this.parsedProject
-			, done: false
-		}, '*');
-	}
-	sendImportedMIDIData() {
-
-		if (this.parsedProject) {
-			var oo: MZXBX_MessageToHost = {
-				dialogID: this.callbackID
-				, pluginData: this.parsedProject
-				, done: true
-			};
-			//console.log('sendImportedMIDIData', oo);
-			window.parent.postMessage(oo, '*');
-		} else {
-			alert('No parsed data');
-		}
-	}
-
-	loadMIDIfile(inputFile) {
-		//console.log('loadMIDIfile', inputFile.files);
-		var file = inputFile.files[0];
-		var fileReader = new FileReader();
-		let me = this;
-		fileReader.onload = function (progressEvent: any) {
-			if (progressEvent != null) {
-				let title: string = file.name;
-				let dat = '' + file.lastModifiedDate;
-				try {
-					let last: Date = file.lastModifiedDate;
-					dat = '' + last.getFullYear();
-					if (last.getMonth() < 10) {
-						dat = dat + '-' + last.getMonth();
-					} else {
-						dat = dat + '-0' + last.getMonth();
-					}
-					if (last.getDate() < 10) {
-						dat = dat + '-' + last.getDate();
-					} else {
-						dat = dat + '-0' + last.getDate();
-					}
-				} catch (xx) {
-					console.log(xx);
-				}
-				let comment: string = ', ' + file.size / 1000 + 'kb, ' + dat;
-				var arrayBuffer = progressEvent.target.result;
-				var midiParser = newMIDIparser2(arrayBuffer);
-				me.parsedProject = midiParser.convertProject(title, comment);
-				//console.log('result', result);
-			}
-		};
-		fileReader.readAsArrayBuffer(file);
-	}
-
-	receiveHostMessage(par) {
-		//console.log('receiveHostMessage', par);
-		//callbackID = par.data;
-		/*
-		try {
-			console.log('parse', par.data.data);
-			var oo: MZXBX_PluginMessage = JSON.parse(par.data.data);
-			console.log('result', oo);
-			this.callbackID = par.data.dialogID;
-			//console.log('dialogID', this.callbackID);
-		} catch (xx) {
-			console.log(xx);
-		}
-		console.log('receiveHostMessage', par);
-		*/
-		let message: MZXBX_MessageToPlugin = par.data;
-		if (this.callbackID) {
-			//
-		} else {
-			this.callbackID = message.hostData;
-		}
-	}
-
-}
-//http://midi.teragonaudio.com/tech/midispec.htm
-
-type ImportMeasure = Zvoog_SongMeasure & {
-	startMs: number;
-	durationMs: number;
-};
 
 
-
-let drumNames: string[] = [];
-drumNames[35] = "Bass Drum 2";
-drumNames[36] = "Bass Drum 1";
-drumNames[37] = "Side Stick/Rimshot";
-drumNames[38] = "Snare Drum 1";
-drumNames[39] = "Hand Clap";
-drumNames[40] = "Snare Drum 2";
-drumNames[41] = "Low Tom 2";
-drumNames[42] = "Closed Hi-hat";
-drumNames[43] = "Low Tom 1";
-drumNames[44] = "Pedal Hi-hat";
-drumNames[45] = "Mid Tom 2";
-drumNames[46] = "Open Hi-hat";
-drumNames[47] = "Mid Tom 1";
-drumNames[48] = "High Tom 2";
-drumNames[49] = "Crash Cymbal 1";
-drumNames[50] = "High Tom 1";
-drumNames[51] = "Ride Cymbal 1";
-drumNames[52] = "Chinese Cymbal";
-drumNames[53] = "Ride Bell";
-drumNames[54] = "Tambourine";
-drumNames[55] = "Splash Cymbal";
-drumNames[56] = "Cowbell";
-drumNames[57] = "Crash Cymbal 2";
-drumNames[58] = "Vibra Slap";
-drumNames[59] = "Ride Cymbal 2";
-drumNames[60] = "High Bongo";
-drumNames[61] = "Low Bongo";
-drumNames[62] = "Mute High Conga";
-drumNames[63] = "Open High Conga";
-drumNames[64] = "Low Conga";
-drumNames[65] = "High Timbale";
-drumNames[66] = "Low Timbale";
-drumNames[67] = "High Agogo";
-drumNames[68] = "Low Agogo";
-drumNames[69] = "Cabasa";
-drumNames[70] = "Maracas";
-drumNames[71] = "Short Whistle";
-drumNames[72] = "Long Whistle";
-drumNames[73] = "Short Guiro";
-drumNames[74] = "Long Guiro";
-drumNames[75] = "Claves";
-drumNames[76] = "High Wood Block";
-drumNames[77] = "Low Wood Block";
-drumNames[78] = "Mute Cuica";
-drumNames[79] = "Open Cuica";
-drumNames[80] = "Mute Triangle";
-drumNames[81] = "Open Triangle";
-let insNames: string[] = [];
-insNames[0] = "Acoustic Grand Piano: Piano";
-insNames[1] = "Bright Acoustic Piano: Piano";
-insNames[2] = "Electric Grand Piano: Piano";
-insNames[3] = "Honky-tonk Piano: Piano";
-insNames[4] = "Electric Piano 1: Piano";
-insNames[5] = "Electric Piano 2: Piano";
-insNames[6] = "Harpsichord: Piano";
-insNames[7] = "Clavinet: Piano";
-insNames[8] = "Celesta: Chromatic Percussion";
-insNames[9] = "Glockenspiel: Chromatic Percussion";
-insNames[10] = "Music Box: Chromatic Percussion";
-insNames[11] = "Vibraphone: Chromatic Percussion";
-insNames[12] = "Marimba: Chromatic Percussion";
-insNames[13] = "Xylophone: Chromatic Percussion";
-insNames[14] = "Tubular Bells: Chromatic Percussion";
-insNames[15] = "Dulcimer: Chromatic Percussion";
-insNames[16] = "Drawbar Organ: Organ";
-insNames[17] = "Percussive Organ: Organ";
-insNames[18] = "Rock Organ: Organ";
-insNames[19] = "Church Organ: Organ";
-insNames[20] = "Reed Organ: Organ";
-insNames[21] = "Accordion: Organ";
-insNames[22] = "Harmonica: Organ";
-insNames[23] = "Tango Accordion: Organ";
-insNames[24] = "Acoustic Guitar (nylon): Guitar";
-insNames[25] = "Acoustic Guitar (steel): Guitar";
-insNames[26] = "Electric Guitar (jazz): Guitar";
-insNames[27] = "Electric Guitar (clean): Guitar";
-insNames[28] = "Electric Guitar (muted): Guitar";
-insNames[29] = "Overdriven Guitar: Guitar";
-insNames[30] = "Distortion Guitar: Guitar";
-insNames[31] = "Guitar Harmonics: Guitar";
-insNames[32] = "Acoustic Bass: Bass";
-insNames[33] = "Electric Bass (finger): Bass";
-insNames[34] = "Electric Bass (pick): Bass";
-insNames[35] = "Fretless Bass: Bass";
-insNames[36] = "Slap Bass 1: Bass";
-insNames[37] = "Slap Bass 2: Bass";
-insNames[38] = "Synth Bass 1: Bass";
-insNames[39] = "Synth Bass 2: Bass";
-insNames[40] = "Violin: Strings";
-insNames[41] = "Viola: Strings";
-insNames[42] = "Cello: Strings";
-insNames[43] = "Contrabass: Strings";
-insNames[44] = "Tremolo Strings: Strings";
-insNames[45] = "Pizzicato Strings: Strings";
-insNames[46] = "Orchestral Harp: Strings";
-insNames[47] = "Timpani: Strings";
-insNames[48] = "String Ensemble 1: Ensemble";
-insNames[49] = "String Ensemble 2: Ensemble";
-insNames[50] = "Synth Strings 1: Ensemble";
-insNames[51] = "Synth Strings 2: Ensemble";
-insNames[52] = "Choir Aahs: Ensemble";
-insNames[53] = "Voice Oohs: Ensemble";
-insNames[54] = "Synth Choir: Ensemble";
-insNames[55] = "Orchestra Hit: Ensemble";
-insNames[56] = "Trumpet: Brass";
-insNames[57] = "Trombone: Brass";
-insNames[58] = "Tuba: Brass";
-insNames[59] = "Muted Trumpet: Brass";
-insNames[60] = "French Horn: Brass";
-insNames[61] = "Brass Section: Brass";
-insNames[62] = "Synth Brass 1: Brass";
-insNames[63] = "Synth Brass 2: Brass";
-insNames[64] = "Soprano Sax: Reed";
-insNames[65] = "Alto Sax: Reed";
-insNames[66] = "Tenor Sax: Reed";
-insNames[67] = "Baritone Sax: Reed";
-insNames[68] = "Oboe: Reed";
-insNames[69] = "English Horn: Reed";
-insNames[70] = "Bassoon: Reed";
-insNames[71] = "Clarinet: Reed";
-insNames[72] = "Piccolo: Pipe";
-insNames[73] = "Flute: Pipe";
-insNames[74] = "Recorder: Pipe";
-insNames[75] = "Pan Flute: Pipe";
-insNames[76] = "Blown bottle: Pipe";
-insNames[77] = "Shakuhachi: Pipe";
-insNames[78] = "Whistle: Pipe";
-insNames[79] = "Ocarina: Pipe";
-insNames[80] = "Lead 1 (square): Synth Lead";
-insNames[81] = "Lead 2 (sawtooth): Synth Lead";
-insNames[82] = "Lead 3 (calliope): Synth Lead";
-insNames[83] = "Lead 4 (chiff): Synth Lead";
-insNames[84] = "Lead 5 (charang): Synth Lead";
-insNames[85] = "Lead 6 (voice): Synth Lead";
-insNames[86] = "Lead 7 (fifths): Synth Lead";
-insNames[87] = "Lead 8 (bass + lead): Synth Lead";
-insNames[88] = "Pad 1 (new age): Synth Pad";
-insNames[89] = "Pad 2 (warm): Synth Pad";
-insNames[90] = "Pad 3 (polysynth): Synth Pad";
-insNames[91] = "Pad 4 (choir): Synth Pad";
-insNames[92] = "Pad 5 (bowed): Synth Pad";
-insNames[93] = "Pad 6 (metallic): Synth Pad";
-insNames[94] = "Pad 7 (halo): Synth Pad";
-insNames[95] = "Pad 8 (sweep): Synth Pad";
-insNames[96] = "FX 1 (rain): Synth Effects";
-insNames[97] = "FX 2 (soundtrack): Synth Effects";
-insNames[98] = "FX 3 (crystal): Synth Effects";
-insNames[99] = "FX 4 (atmosphere): Synth Effects";
-insNames[100] = "FX 5 (brightness): Synth Effects";
-insNames[101] = "FX 6 (goblins): Synth Effects";
-insNames[102] = "FX 7 (echoes): Synth Effects";
-insNames[103] = "FX 8 (sci-fi): Synth Effects";
-insNames[104] = "Sitar: Ethnic";
-insNames[105] = "Banjo: Ethnic";
-insNames[106] = "Shamisen: Ethnic";
-insNames[107] = "Koto: Ethnic";
-insNames[108] = "Kalimba: Ethnic";
-insNames[109] = "Bagpipe: Ethnic";
-insNames[110] = "Fiddle: Ethnic";
-insNames[111] = "Shanai: Ethnic";
-insNames[112] = "Tinkle Bell: Percussive";
-insNames[113] = "Agogo: Percussive";
-insNames[114] = "Steel Drums: Percussive";
-insNames[115] = "Woodblock: Percussive";
-insNames[116] = "Taiko Drum: Percussive";
-insNames[117] = "Melodic Tom: Percussive";
-insNames[118] = "Synth Drum: Percussive";
-insNames[119] = "Reverse Cymbal: Percussive";
-insNames[120] = "Guitar Fret Noise: Sound effects";
-insNames[121] = "Breath Noise: Sound effects";
-insNames[122] = "Seashore: Sound effects";
-insNames[123] = "Bird Tweet: Sound effects";
-insNames[124] = "Telephone Ring: Sound effects";
-insNames[125] = "Helicopter: Sound effects";
-insNames[126] = "Applause: Sound effects";
-insNames[127] = "Gunshot: Sound effects";
-type XYp = {
-	x: number;
-	y: number;
-};
-type PP = {
-	p1: XYp;
-	p2: XYp;
-};
-type TrackChord = {
-	when: number
-	, channel: number
-	, notes: TrackNote[]
-};
-type TrackNote = {
-	closed: boolean
-	, bendPoints: NotePitch[]
-	, openEvent?: MIDIEvent
-	, closeEvent?: MIDIEvent
-	, volume?: number
-	, basePitch: number
-	, baseDuration: number
-}
-type NotePitch = {
-	pointDuration: number
-	, basePitchDelta: number
-}
-type MIDIEvent = {
-	offset: number
-	, delta: number
-	, eventTypeByte: number
-	, basetype?: number
-	, subtype?: number
-	, index?: string
-	, length?: number
-	, msb?: number
-	, lsb?: number
-	, prefix?: number
-	, data?: number[]
-	, tempo?: number
-	, tempoBPM?: number
-	, hour?: number
-	, minutes?: number
-	, seconds?: number
-	, frames?: number
-	, subframes?: number
-	, key?: number
-	, param1?: number
-	, param2?: number
-	, param3?: number
-	, param4?: number
-	, scale?: number
-	, badsubtype?: number
-	, midiChannel?: number
-	, playTimeMs: number
-	, preTimeMs?: number
-	, deltaTimeMs?: number
-	, trackNum?: number
-	, text?: string
-}
-type MIDISongPoint = {
-	pitch: number;
-	durationms: number;
-	midipoint?: TrackNote;
-}
-type MIDISongNote = {
-	midiPitch: number
-	, midiDuration: number
-	, slidePoints: MIDISongPoint[];
-}
-type MIDISongChord = {
-	when: number;
-	channel: number;
-	notes: MIDISongNote[];
-};
-type MIDISongTrack = {
-	title: string;
-	//instrument: string;
-	channelNum: number;
-	program: number;
-	trackVolumes: { ms: number, value: number, meausre?: number, skip384?: number }[];
-	songchords: MIDISongChord[];
-	order: number;
-};
-type MIDISongData = {
-	duration: number;
-	parser: string;
-	bpm: number;
-	changes: { track: number, ms: number, resolution: number, bpm: number }[];
-	meters: { track: number, ms: number, count: number, division: number }[];
-	lyrics: { track: number, ms: number, txt: string }[];
-	key: number;
-	mode: number;
-	meter: { count: number, division: number };
-	signs: { track: number, ms: number, sign: string }[];
-	miditracks: MIDISongTrack[];
-	speedMode: number;
-	lineMode: number;
-};
-let instrumentNamesArray: string[] = [];
-let drumNamesArray: string[] = [];
-function findrumTitles(nn: number): string {
-	let name = drumTitles()[nn];
-	if (name) {
-		return '' + name;
-	} else {
-		return 'MIDI' + nn;
-	}
-
-}
-function drumTitles(): string[] {
-	if (drumNamesArray.length == 0) {
-		var drumNames: string[] = [];
-		drumNames[35] = "Bass Drum 2";
-		drumNames[36] = "Bass Drum 1";
-		drumNames[37] = "Side Stick/Rimshot";
-		drumNames[38] = "Snare Drum 1";
-		drumNames[39] = "Hand Clap";
-		drumNames[40] = "Snare Drum 2";
-		drumNames[41] = "Low Tom 2";
-		drumNames[42] = "Closed Hi-hat";
-		drumNames[43] = "Low Tom 1";
-		drumNames[44] = "Pedal Hi-hat";
-		drumNames[45] = "Mid Tom 2";
-		drumNames[46] = "Open Hi-hat";
-		drumNames[47] = "Mid Tom 1";
-		drumNames[48] = "High Tom 2";
-		drumNames[49] = "Crash Cymbal 1";
-		drumNames[50] = "High Tom 1";
-		drumNames[51] = "Ride Cymbal 1";
-		drumNames[52] = "Chinese Cymbal";
-		drumNames[53] = "Ride Bell";
-		drumNames[54] = "Tambourine";
-		drumNames[55] = "Splash Cymbal";
-		drumNames[56] = "Cowbell";
-		drumNames[57] = "Crash Cymbal 2";
-		drumNames[58] = "Vibra Slap";
-		drumNames[59] = "Ride Cymbal 2";
-		drumNames[60] = "High Bongo";
-		drumNames[61] = "Low Bongo";
-		drumNames[62] = "Mute High Conga";
-		drumNames[63] = "Open High Conga";
-		drumNames[64] = "Low Conga";
-		drumNames[65] = "High Timbale";
-		drumNames[66] = "Low Timbale";
-		drumNames[67] = "High Agogo";
-		drumNames[68] = "Low Agogo";
-		drumNames[69] = "Cabasa";
-		drumNames[70] = "Maracas";
-		drumNames[71] = "Short Whistle";
-		drumNames[72] = "Long Whistle";
-		drumNames[73] = "Short Guiro";
-		drumNames[74] = "Long Guiro";
-		drumNames[75] = "Claves";
-		drumNames[76] = "High Wood Block";
-		drumNames[77] = "Low Wood Block";
-		drumNames[78] = "Mute Cuica";
-		drumNames[79] = "Open Cuica";
-		drumNames[80] = "Mute Triangle";
-		drumNames[81] = "Open Triangle";
-		drumNamesArray = drumNames;
-	}
-	return drumNamesArray;
-};
-function instrumentTitles(): string[] {
-	if (instrumentNamesArray.length == 0) {
-		var insNames: string[] = [];
-		insNames[0] = "Acoustic Grand Piano: Piano";
-		insNames[1] = "Bright Acoustic Piano: Piano";
-		insNames[2] = "Electric Grand Piano: Piano";
-		insNames[3] = "Honky-tonk Piano: Piano";
-		insNames[4] = "Electric Piano 1: Piano";
-		insNames[5] = "Electric Piano 2: Piano";
-		insNames[6] = "Harpsichord: Piano";
-		insNames[7] = "Clavinet: Piano";
-		insNames[8] = "Celesta: Chromatic Percussion";
-		insNames[9] = "Glockenspiel: Chromatic Percussion";
-		insNames[10] = "Music Box: Chromatic Percussion";
-		insNames[11] = "Vibraphone: Chromatic Percussion";
-		insNames[12] = "Marimba: Chromatic Percussion";
-		insNames[13] = "Xylophone: Chromatic Percussion";
-		insNames[14] = "Tubular Bells: Chromatic Percussion";
-		insNames[15] = "Dulcimer: Chromatic Percussion";
-		insNames[16] = "Drawbar Organ: Organ";
-		insNames[17] = "Percussive Organ: Organ";
-		insNames[18] = "Rock Organ: Organ";
-		insNames[19] = "Church Organ: Organ";
-		insNames[20] = "Reed Organ: Organ";
-		insNames[21] = "Accordion: Organ";
-		insNames[22] = "Harmonica: Organ";
-		insNames[23] = "Tango Accordion: Organ";
-		insNames[24] = "Acoustic Guitar (nylon): Guitar";
-		insNames[25] = "Acoustic Guitar (steel): Guitar";
-		insNames[26] = "Electric Guitar (jazz): Guitar";
-		insNames[27] = "Electric Guitar (clean): Guitar";
-		insNames[28] = "Electric Guitar (muted): Guitar";
-		insNames[29] = "Overdriven Guitar: Guitar";
-		insNames[30] = "Distortion Guitar: Guitar";
-		insNames[31] = "Guitar Harmonics: Guitar";
-		insNames[32] = "Acoustic Bass: Bass";
-		insNames[33] = "Electric Bass (finger): Bass";
-		insNames[34] = "Electric Bass (pick): Bass";
-		insNames[35] = "Fretless Bass: Bass";
-		insNames[36] = "Slap Bass 1: Bass";
-		insNames[37] = "Slap Bass 2: Bass";
-		insNames[38] = "Synth Bass 1: Bass";
-		insNames[39] = "Synth Bass 2: Bass";
-		insNames[40] = "Violin: Strings";
-		insNames[41] = "Viola: Strings";
-		insNames[42] = "Cello: Strings";
-		insNames[43] = "Contrabass: Strings";
-		insNames[44] = "Tremolo Strings: Strings";
-		insNames[45] = "Pizzicato Strings: Strings";
-		insNames[46] = "Orchestral Harp: Strings";
-		insNames[47] = "Timpani: Strings";
-		insNames[48] = "String Ensemble 1: Ensemble";
-		insNames[49] = "String Ensemble 2: Ensemble";
-		insNames[50] = "Synth Strings 1: Ensemble";
-		insNames[51] = "Synth Strings 2: Ensemble";
-		insNames[52] = "Choir Aahs: Ensemble";
-		insNames[53] = "Voice Oohs: Ensemble";
-		insNames[54] = "Synth Choir: Ensemble";
-		insNames[55] = "Orchestra Hit: Ensemble";
-		insNames[56] = "Trumpet: Brass";
-		insNames[57] = "Trombone: Brass";
-		insNames[58] = "Tuba: Brass";
-		insNames[59] = "Muted Trumpet: Brass";
-		insNames[60] = "French Horn: Brass";
-		insNames[61] = "Brass Section: Brass";
-		insNames[62] = "Synth Brass 1: Brass";
-		insNames[63] = "Synth Brass 2: Brass";
-		insNames[64] = "Soprano Sax: Reed";
-		insNames[65] = "Alto Sax: Reed";
-		insNames[66] = "Tenor Sax: Reed";
-		insNames[67] = "Baritone Sax: Reed";
-		insNames[68] = "Oboe: Reed";
-		insNames[69] = "English Horn: Reed";
-		insNames[70] = "Bassoon: Reed";
-		insNames[71] = "Clarinet: Reed";
-		insNames[72] = "Piccolo: Pipe";
-		insNames[73] = "Flute: Pipe";
-		insNames[74] = "Recorder: Pipe";
-		insNames[75] = "Pan Flute: Pipe";
-		insNames[76] = "Blown bottle: Pipe";
-		insNames[77] = "Shakuhachi: Pipe";
-		insNames[78] = "Whistle: Pipe";
-		insNames[79] = "Ocarina: Pipe";
-		insNames[80] = "Lead 1 (square): Synth Lead";
-		insNames[81] = "Lead 2 (sawtooth): Synth Lead";
-		insNames[82] = "Lead 3 (calliope): Synth Lead";
-		insNames[83] = "Lead 4 (chiff): Synth Lead";
-		insNames[84] = "Lead 5 (charang): Synth Lead";
-		insNames[85] = "Lead 6 (voice): Synth Lead";
-		insNames[86] = "Lead 7 (fifths): Synth Lead";
-		insNames[87] = "Lead 8 (bass + lead): Synth Lead";
-		insNames[88] = "Pad 1 (new age): Synth Pad";
-		insNames[89] = "Pad 2 (warm): Synth Pad";
-		insNames[90] = "Pad 3 (polysynth): Synth Pad";
-		insNames[91] = "Pad 4 (choir): Synth Pad";
-		insNames[92] = "Pad 5 (bowed): Synth Pad";
-		insNames[93] = "Pad 6 (metallic): Synth Pad";
-		insNames[94] = "Pad 7 (halo): Synth Pad";
-		insNames[95] = "Pad 8 (sweep): Synth Pad";
-		insNames[96] = "FX 1 (rain): Synth Effects";
-		insNames[97] = "FX 2 (soundtrack): Synth Effects";
-		insNames[98] = "FX 3 (crystal): Synth Effects";
-		insNames[99] = "FX 4 (atmosphere): Synth Effects";
-		insNames[100] = "FX 5 (brightness): Synth Effects";
-		insNames[101] = "FX 6 (goblins): Synth Effects";
-		insNames[102] = "FX 7 (echoes): Synth Effects";
-		insNames[103] = "FX 8 (sci-fi): Synth Effects";
-		insNames[104] = "Sitar: Ethnic";
-		insNames[105] = "Banjo: Ethnic";
-		insNames[106] = "Shamisen: Ethnic";
-		insNames[107] = "Koto: Ethnic";
-		insNames[108] = "Kalimba: Ethnic";
-		insNames[109] = "Bagpipe: Ethnic";
-		insNames[110] = "Fiddle: Ethnic";
-		insNames[111] = "Shanai: Ethnic";
-		insNames[112] = "Tinkle Bell: Percussive";
-		insNames[113] = "Agogo: Percussive";
-		insNames[114] = "Steel Drums: Percussive";
-		insNames[115] = "Woodblock: Percussive";
-		insNames[116] = "Taiko Drum: Percussive";
-		insNames[117] = "Melodic Tom: Percussive";
-		insNames[118] = "Synth Drum: Percussive";
-		insNames[119] = "Reverse Cymbal: Percussive";
-		insNames[120] = "Guitar Fret Noise: Sound effects";
-		insNames[121] = "Breath Noise: Sound effects";
-		insNames[122] = "Seashore: Sound effects";
-		insNames[123] = "Bird Tweet: Sound effects";
-		insNames[124] = "Telephone Ring: Sound effects";
-		insNames[125] = "Helicopter: Sound effects";
-		insNames[126] = "Applause: Sound effects";
-		insNames[127] = "Gunshot: Sound effects";
-		instrumentNamesArray = insNames;
-	}
-	return instrumentNamesArray;
-};
-class DataViewStream {
-	position = 0;
-	buffer: DataView;
-	constructor(dv: DataView) {
-		this.buffer = dv;
-	}
-	readUint8(): number {
-		var n: number = (this.buffer as DataView).getUint8(this.position);
-		this.position++;
-		return n;
-	}
-	readUint16(): number {
-		var v = (this.buffer as DataView).getUint16(this.position);
-		this.position = this.position + 2;
-		return v;
-	}
-	readVarInt(): number {
-		var v: number = 0;
-		var i: number = 0;
-		var b: number;
-		while (i < 4) {
-			b = this.readUint8();
-			if (b & 0x80) {
-				v = v + (b & 0x7f);
-				v = v << 7;
-			} else {
-				return v + b;
-			}
-			i++;
-		}
-		throw new Error('readVarInt ' + i);
-	}
-	readBytes(length: number): number[] {
-		var bytes: number[] = [];
-		for (var i = 0; i < length; i++) {
-			bytes.push(this.readUint8());
-		}
-		return bytes;
-	}
-	offset(): number {
-		return this.buffer.byteOffset + this.position;
-	}
-	end(): boolean {
-		return this.position == this.buffer.byteLength;
-	}
-}
-class MIDIFileHeader {
-	datas: DataView;
-	HEADER_LENGTH: number = 14;
-	format: number;
-	trackCount: number;
-	tempoBPM: number = 120;
-	changes: { track: number, ms: number, resolution: number, bpm: number }[] = [];
-	meters: { track: number, ms: number, count: number, division: number }[] = [];
-	lyrics: { track: number, ms: number, txt: string }[] = [];
-	signs: { track: number, ms: number, sign: string }[] = [];
-	meterCount: number = 4;
-	meterDivision: number = 4;
-	keyFlatSharp: number = 0;
-	keyMajMin: number = 0;
-	lastNonZeroQuarter: number = 0;
-	constructor(buffer: ArrayBuffer) {
-		this.datas = new DataView(buffer, 0, this.HEADER_LENGTH);
-		this.format = this.datas.getUint16(8);
-		this.trackCount = this.datas.getUint16(10);
-	}
-	getCalculatedTickResolution(tempo: number): number {
-		this.lastNonZeroQuarter = tempo;
-		if (this.datas.getUint16(12) & 0x8000) {
-			var r = 1000000 / (this.getSMPTEFrames() * this.getTicksPerFrame());
-			return r;
-		} else {
-			tempo = tempo || 500000;
-			var r: number = tempo / this.getTicksPerBeat();
-			return r;
-		}
-	}
-	get0TickResolution(): number {
-		var tempo = 0;
-		if (this.lastNonZeroQuarter) {
-			tempo = this.lastNonZeroQuarter;
-		} else {
-			tempo = 60000000 / this.tempoBPM;
-		}
-		if (this.datas.getUint16(12) & 0x8000) {
-			var r = 1000000 / (this.getSMPTEFrames() * this.getTicksPerFrame());
-			return r;
-		} else {
-			tempo = tempo || 500000;
-			var r: number = tempo / this.getTicksPerBeat();
-			return r;
-		}
-	}
-	getTicksPerBeat(): number {
-		var divisionWord = this.datas.getUint16(12);
-		return divisionWord;
-	}
-	getTicksPerFrame(): number {
-		const divisionWord = this.datas.getUint16(12);
-		return divisionWord & 0x00ff;
-	}
-	getSMPTEFrames(): number {
-		const divisionWord = this.datas.getUint16(12);
-		let smpteFrames: number;
-		smpteFrames = divisionWord & 0x7f00;
-		if (smpteFrames == 29) {
-			return 29.97
-		} else {
-			return smpteFrames;
-		}
-	}
-}
+/*
 class LastKeyVal {
 	data: { name: string, value: number }[] = [];
 	take(keyName: string): { name: string, value: number } {
@@ -697,54 +14,9 @@ class LastKeyVal {
 		return newit;
 	}
 
-}
-class MIDIFileTrack {
-	//nn:number
-	datas: DataView;
-	HDR_LENGTH: number = 8;
-	trackLength: number;
-	trackContent: DataView;
-	trackevents: MIDIEvent[];
-	trackTitle: string;
-	instrumentName: string;
-	programChannel: { program: number, channel: number }[];
-	trackVolumePoints: { ms: number, value: number, channel: number }[];
-	chords: TrackChord[] = [];
-	constructor(buffer: ArrayBuffer, start: number) {
-		this.datas = new DataView(buffer, start, this.HDR_LENGTH);
-		this.trackLength = this.datas.getUint32(4);
-		this.datas = new DataView(buffer, start, this.HDR_LENGTH + this.trackLength);
-		this.trackContent = new DataView(this.datas.buffer, this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
-		this.trackevents = [];
-		this.trackVolumePoints = [];
-		this.programChannel = [];
-	}
-}
-function utf8ArrayToString(aBytes) {
-	var sView = "";
+}*/
 
-	for (var nPart, nLen = aBytes.length, nIdx = 0; nIdx < nLen; nIdx++) {
-		nPart = aBytes[nIdx];
 
-		sView = sView + String.fromCharCode(
-			nPart > 251 && nPart < 254 && nIdx + 5 < nLen ? /* six bytes */
-				/* (nPart - 252 << 30) may be not so safe in ECMAScript! So...: */
-				(nPart - 252) * 1073741824 + (aBytes[++nIdx] - 128 << 24) + (aBytes[++nIdx] - 128 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
-				: nPart > 247 && nPart < 252 && nIdx + 4 < nLen ? /* five bytes */
-					(nPart - 248 << 24) + (aBytes[++nIdx] - 128 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
-					: nPart > 239 && nPart < 248 && nIdx + 3 < nLen ? /* four bytes */
-						(nPart - 240 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
-						: nPart > 223 && nPart < 240 && nIdx + 2 < nLen ? /* three bytes */
-							(nPart - 224 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
-							: nPart > 191 && nPart < 224 && nIdx + 1 < nLen ? /* two bytes */
-								(nPart - 192 << 6) + aBytes[++nIdx] - 128
-								: /* nPart < 127 ? */ /* one byte */
-								nPart
-		);
-	}
-
-	return sView;
-}
 class MidiParser {
 	header: MIDIFileHeader;
 	parsedTracks: MIDIFileTrack[];
@@ -965,14 +237,14 @@ class MidiParser {
 		}
 		return returnPoints;
 	};
-/*
-	simplifySinglePath(points: XYp[], tolerance: number): XYp[] {
-		var arr: XYp[] = this.douglasPeucker(points, tolerance);
-		arr.push(points[points.length - 1]);
-		//console.log(points, tolerance, arr);
-		return arr;
-	}
-*/
+	/*
+		simplifySinglePath(points: XYp[], tolerance: number): XYp[] {
+			var arr: XYp[] = this.douglasPeucker(points, tolerance);
+			arr.push(points[points.length - 1]);
+			//console.log(points, tolerance, arr);
+			return arr;
+		}
+	*/
 	simplifyAllBendPaths() {
 		let msMin = 75;
 		for (var t = 0; t < this.parsedTracks.length; t++) {
@@ -993,10 +265,10 @@ class MidiParser {
 								//simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: Math.round(lastBasePitchDelta) });
 								simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
 								cuPointDuration = 0;
-							}else{
-								if(simplifiedPath.length>0){
-									let prePoint=simplifiedPath[simplifiedPath.length-1];
-									prePoint.basePitchDelta=lastBasePitchDelta;
+							} else {
+								if (simplifiedPath.length > 0) {
+									let prePoint = simplifiedPath[simplifiedPath.length - 1];
+									prePoint.basePitchDelta = lastBasePitchDelta;
 								}
 							}
 						}
@@ -1497,229 +769,7 @@ class MidiParser {
 		trackChannel.push(it);
 		return it;
 	}
-	/*
-	dump(): MZXBX_Schedule {
-		console.log('MidiParser', this);
-		let midiSongData: MIDISongData = {
-			parser: '1.11'
-			, duration: 0
-			, bpm: this.header.tempoBPM
-			, changes: this.header.changes
-			, lyrics: this.header.lyrics
-			, key: this.header.keyFlatSharp
-			, mode: this.header.keyMajMin
-			, meter: { count: this.header.meterCount, division: this.header.meterDivision }
-			, meters: this.header.meters
-			, signs: this.header.signs
-			, miditracks: []
-			, speedMode: 0
-			, lineMode: 0
-		};
-		let tracksChannels: { trackNum: number, channelNum: number, track: MIDISongTrack }[] = [];
-		for (let i = 0; i < this.parsedTracks.length; i++) {
-			let parsedtrack: MIDIFileTrack = this.parsedTracks[i];
-			for (let k = 0; k < parsedtrack.programChannel.length; k++) {
-				this.findOrCreateTrack(parsedtrack, i, parsedtrack.programChannel[k].channel, tracksChannels);
-			}
 
-		}
-		var maxWhen = 0;
-		for (var i = 0; i < this.parsedTracks.length; i++) {
-			var miditrack: MIDIFileTrack = this.parsedTracks[i];
-			for (var ch = 0; ch < miditrack.chords.length; ch++) {
-				var midichord: TrackChord = miditrack.chords[ch];
-				var newchord: MIDISongChord = { when: midichord.when, notes: [], channel: midichord.channel };
-				if (maxWhen < midichord.when) {
-					maxWhen = midichord.when;
-				}
-				for (var n = 0; n < midichord.notes.length; n++) {
-					var midinote: TrackNote = midichord.notes[n];
-					var newnote: MIDISongNote = { points: [] };
-					newchord.notes.push(newnote);
-					for (var v = 0; v < midinote.bendPoints.length; v++) {
-						var midipoint: NotePitch = midinote.bendPoints[v];
-						var newpoint: MIDISongPoint = { pitch: midinote.basePitch + midipoint.basePitchDelta, durationms: midipoint.pointDuration };
-						newpoint.midipoint = midinote;
-						newnote.points.push(newpoint);
-					}
-					newnote.points[newnote.points.length - 1].durationms
-						= newnote.points[newnote.points.length - 1].durationms + 66;
-				}
-				let chanTrack = this.findOrCreateTrack(miditrack, i, newchord.channel, tracksChannels);
-				chanTrack.track.songchords.push(newchord);
-			}
-		}
-		for (let tt = 0; tt < tracksChannels.length; tt++) {
-			let trackChan = tracksChannels[tt];
-			if (trackChan.track.songchords.length > 0) {
-				midiSongData.miditracks.push(tracksChannels[tt].track);
-				if (midiSongData.duration < maxWhen) {
-					midiSongData.duration = 654321 + maxWhen;
-				}
-				for (let i = 0; i < this.parsedTracks.length; i++) {
-					let miditrack: MIDIFileTrack = this.parsedTracks[i];
-					for (let kk = 0; kk < miditrack.programChannel.length; kk++) {
-						if (miditrack.programChannel[kk].channel == trackChan.channelNum) {
-							trackChan.track.program = miditrack.programChannel[kk].program;
-						}
-					}
-				}
-			}
-		}
-		console.log('MIDISongData', midiSongData);
-		let schedule: MZXBX_Schedule = {
-			series: []
-			, channels: []
-			, filters: [
-				//{ id: 'compressor1', kind: 'dynamic_compression', properties: '' }
-				//,{ id: 'masterEcho111', kind: 'echo_filter_1_test', properties: '0.3' }
-			]
-		};
-		let volumeCashe = new LastKeyVal();
-		for (let mt = 0; mt < midiSongData.miditracks.length; mt++) {
-			let miditrack = midiSongData.miditracks[mt];
-			let midinum = 1 + Math.round(miditrack.program);
-
-			for (let ch = 0; ch < miditrack.songchords.length; ch++) {
-				let chord = miditrack.songchords[ch];
-				for (let nn = 0; nn < chord.notes.length; nn++) {
-					let note: MIDISongNote = chord.notes[nn];
-					let timeIndex = Math.floor(chord.when / 1000.0);
-					let channelId: string = 'voice' + mt;
-					let tID = 'voice' + mt + 'subVolume';
-					if (miditrack.channelNum == 9) {
-						channelId = 'drum' + mt + '.' + note.points[0].pitch;
-						tID = 'drum' + mt + '.' + note.points[0].pitch + 'subVolume';
-					}
-					let timeSkip = chord.when / 1000 - timeIndex;
-					if (timeSkip < 0) timeSkip = 0;
-					let item: MZXBX_PlayItem = {
-						skip: timeSkip//(Math.round(chord.when) % 1000.0) / 1000.0
-						, channelId: channelId//channel.id
-						, pitch: note.points[0].pitch
-						, slides: []
-					};
-					item.slides.push({ duration: note.points[0].durationms / 1000, delta: 0 });
-					if (miditrack.channelNum == 9) {
-						//
-					} else {
-						if (note.points.length > 1) {
-							for (let pp = 0; pp < note.points.length - 1; pp++) {
-								item.slides.push({
-									duration: note.points[pp].durationms / 1000
-									, delta: note.points[pp + 1].pitch - item.pitch
-								});
-							}
-							item.slides.push({
-								duration: note.points[note.points.length - 1].durationms / 1000
-								, delta: note.points[note.points.length - 1].pitch - item.pitch
-							});
-							//console.log('item',item.slides);
-						}
-					}
-					if (note.points[0].midipoint) {
-						if (note.points[0].midipoint.volume) {
-							let volVal: number = Math.round(100 * note.points[0].midipoint.volume / 127);
-							let lastVol = volumeCashe.take(tID);
-							if (lastVol.value == volVal) {
-								//
-							} else {
-								lastVol.value = volVal;
-								let newVol = '' + volVal + '%';
-								//console.log(tID, newVol, (timeIndex + '.' + item.skip));
-
-								for (let ii = 0; ii <= timeIndex; ii++) {
-									if (!(schedule.series[ii])) {
-										schedule.series[ii] = { duration: 1, items: [], states: [] };
-									}
-								}
-								schedule.series[timeIndex].states.push({
-									skip: item.skip
-									, filterId: tID
-									, data: newVol
-								});
-							}
-						}
-					}
-					for (let ii = 0; ii <= timeIndex; ii++) {
-						if (!(schedule.series[ii])) {
-							schedule.series[ii] = { duration: 1, items: [], states: [] };
-						}
-					}
-					schedule.series[timeIndex].items.push(item);
-					let exsts = false;
-					for (let ch = 0; ch < schedule.channels.length; ch++) {
-						if (schedule.channels[ch].id == channelId) {
-							exsts = true;
-							break;
-						}
-					}
-					if (!exsts) {
-						if (miditrack.channelNum == 9) {
-							let drumNum = note.points[0].pitch;
-							let performerKind = 'drums_performer_1_test';
-							if (drumNum < 35 || drumNum > 81) {
-								performerKind = 'emptySilent';
-							}
-							let volumeID = 'drum' + mt + '.' + drumNum + 'volume';
-							let tID = 'drum' + mt + '.' + drumNum + 'subVolume';
-							let comment = miditrack.title + ' [' + drumNum + ': ' + drumNames[drumNum] + ': drums]';
-							schedule.channels.push({
-								id: channelId, comment: comment, filters: [
-									{ id: volumeID, kind: 'volume_filter_1_test', properties: '100%' }
-									, { id: tID, kind: 'volume_filter_1_test', properties: '100%' }
-								]
-								, performer: { id: 'drum' + mt + '.' + drumNum + 'performer', kind: performerKind, properties: '' + drumNum }
-							});
-							for (let vv = 0; vv < miditrack.trackVolumes.length; vv++) {
-								let setIndex = Math.floor(miditrack.trackVolumes[vv].ms / 1000.0);
-								for (let ii = 0; ii <= setIndex; ii++) {
-									if (!(schedule.series[ii])) {
-										schedule.series[ii] = { duration: 1, items: [], states: [] };
-									}
-								}
-								schedule.series[setIndex].states.push({
-									skip: (Math.round(miditrack.trackVolumes[vv].ms) % 1000.0) / 1000.0
-									, filterId: volumeID
-									, data: '' + Math.round(100 * miditrack.trackVolumes[vv].value) + '%'
-								});
-							}
-						} else {
-							let performerKind = 'waf_performer_1_test';
-							if (midinum < 1 || midinum > 128) {
-								performerKind = 'emptySilent';
-							}
-							let volumeID = 'voice' + mt + 'volume';
-							let tID = 'voice' + mt + 'subVolume';
-							let comment = miditrack.title + ' [' + midinum + ': ' + insNames[midinum - 1] + ']';
-							schedule.channels.push({
-								id: channelId, comment: comment, filters: [
-									{ id: volumeID, kind: 'volume_filter_1_test', properties: '100%' }
-									, { id: tID, kind: 'volume_filter_1_test', properties: '100%' }
-								]
-								, performer: { id: 'voice' + mt + 'performer', kind: performerKind, properties: '' + midinum }
-							});
-							for (let vv = 0; vv < miditrack.trackVolumes.length; vv++) {
-								let setIndex = Math.floor(miditrack.trackVolumes[vv].ms / 1000.0);
-								for (let ii = 0; ii <= setIndex; ii++) {
-									if (!(schedule.series[ii])) {
-										schedule.series[ii] = { duration: 1, items: [], states: [] };
-									}
-								}
-								schedule.series[setIndex].states.push({
-									skip: (Math.round(miditrack.trackVolumes[vv].ms) % 1000.0) / 1000.0
-									, filterId: volumeID
-									, data: '' + Math.round(100 * miditrack.trackVolumes[vv].value) + '%'
-								});
-							}
-						}
-					}
-				}
-			}
-
-		}
-		return schedule;//midiSongData;
-	}*/
 	findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): Zvoog_Metre {
 		let metre: Zvoog_Metre = {
 			count: midiSongData.meter.count
@@ -2025,12 +1075,86 @@ class MidiParser {
 		project.filters.push(filterEcho);
 		project.filters.push(filterCompression);
 
-		console.log('midiSongData', midiSongData.meters, midiSongData);
+		console.log('midiParser', this);
+		console.log('midiSongData', midiSongData);
 		console.log('project', project);
 		this.trimProject(project);
+		this.calculateShiftDrum(project);
 		return project;
 	}
-
+	avgLineRatio(project: Zvoog_Project, start1: Zvoog_Metre, start2: Zvoog_Metre, duration: Zvoog_Metre):number {
+		let point1: Zvoog_MetreMathType = MMUtil().set(start1);
+		let point2: Zvoog_MetreMathType = MMUtil().set(start2);
+		let ticker: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 32 });
+		let sm = 0;
+		let cnt = 0;
+		while (ticker.less(duration)) {
+			let s1 = this.extractDrumPointStamp(project, point1);
+			let s2 = this.extractDrumPointStamp(project, point2);
+			sm = sm + this.diffPointRatio(s1, s2);
+			cnt++;
+			point1 = point1.plus({ count: 1, part: 32 });
+			point2 = point2.plus({ count: 1, part: 32 });
+			ticker = ticker.plus({ count: 1, part: 32 });
+		}
+		return sm/cnt;
+	}
+	diffPointRatio(a: number[], b: number[]): number {
+		if (a.length == 0 && b.length == 0) {
+			return 0;
+		}
+		let wrong = 0;
+		for (let ii = 0; ii < a.length; ii++) {
+			if (b.indexOf(a[ii]) < 0) {
+				wrong++;
+			}
+		}
+		for (let ii = 0; ii < b.length; ii++) {
+			if (a.indexOf(b[ii]) < 0) {
+				wrong++;
+			}
+		}
+		let ratio = wrong / (a.length + b.length);
+		return ratio;
+	}
+	extractDrumPointStamp(project: Zvoog_Project, at: Zvoog_Metre): number[] {
+		let slice: number[] = [];
+		let end: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 32 });
+		for (let mm = 0; mm < project.timeline.length; mm++) {
+			let barStart = end.simplyfy();
+			end = end.plus(project.timeline[mm].metre);
+			if (end.more(at)) {
+				let skip = MMUtil().set(at).minus(barStart);
+				//console.log(at,mm,skip);
+				for (let pp = 0; pp < project.percussions.length; pp++) {
+					let drum = project.percussions[pp];
+					let bar = drum.measures[mm];
+					//console.log(bar);
+					for (let ss = 0; ss < bar.skips.length; ss++) {
+						if (skip.equals(bar.skips[ss])) {
+							slice.push(pp);
+							break;
+						}
+					}
+				}
+				break;
+			}
+		}
+		return slice;
+	}
+	calculateShiftDrum(project: Zvoog_Project) {
+		let duration: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 32 });
+		for (let mm = 0; mm < project.timeline.length; mm++) {
+			duration = duration.plus(project.timeline[mm].metre);
+		}
+		console.log('calculateShiftDrum', duration);
+		console.log(this.avgLineRatio(project, { count: 4, part: 1 }, { count: 5, part: 1 }, { count: 1, part: 4 }));
+		console.log(this.avgLineRatio(project, { count: 11, part: 1 }, { count: 12, part: 1 }, { count: 1, part: 4 }));
+		//this.extractDrumPointStamp(project, { count: 0, part: 1 });
+		//this.extractDrumPointStamp(project, { count: 1, part: 1 });
+		//this.extractDrumPointStamp(project, { count: 2, part: 1 });
+		//this.extractDrumPointStamp(project, { count: 3, part: 1 });
+	}
 	trimProject(project: Zvoog_Project) {
 		for (let ii = 0; ii < project.tracks.length; ii++) {
 			project.tracks[ii].performer.iconPosition.x = 10 + ii * 9;
@@ -2073,11 +1197,12 @@ class MidiParser {
 			}
 		}
 		//---------------
-		this.reShiftSequencer(project);
-		this.reShiftDrums(project);
+		//this.reShiftSequencer(project);
+		//this.reShiftDrums(project);
 		this.limitShort(project)
 		this.cutShift(project);
 		//this.allShiftForwad(project, { count: 5, part: 8 });
+
 		//---------------
 		let len = project.timeline.length;
 		for (let ii = len - 1; ii > 0; ii--) {
@@ -2091,6 +1216,7 @@ class MidiParser {
 
 
 	}
+/*
 	allShiftForwad(project: Zvoog_Project, shiftSize: Zvoog_Metre) {
 		//console.log('allShiftForwad', shiftSize);
 		for (let tt = 0; tt < project.tracks.length; tt++) {
@@ -2154,7 +1280,7 @@ class MidiParser {
 				}
 			}
 		}
-	}
+	}*/
 	limitShort(project: Zvoog_Project) {
 		let note16 = MMUtil().set({ count: 1, part: 16 });
 		for (let tt = 0; tt < project.tracks.length; tt++) {
@@ -2179,7 +1305,6 @@ class MidiParser {
 		let cOther = 0;
 		let c0 = 0;
 		let minus32 = 0;
-		//let plus16 = 0;
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let track = project.tracks[tt];
 			for (let mm = 0; mm < track.measures.length; mm++) {
@@ -2201,7 +1326,6 @@ class MidiParser {
 				}
 			}
 		}
-		//console.log('reShiftSequencer -32/0/+32/other:', minus32, c0, plus32, cOther);
 		if (plus32 && c0 / plus32 < 0.5) {
 			this.shiftBackwar(32, project);
 		} else {
@@ -2236,7 +1360,6 @@ class MidiParser {
 				}
 			}
 		}
-		//console.log('reShiftDrums -32/0/+32/other:', minus32, c0, plus32, cOther);
 		if (plus32 && c0 / plus32 < 0.5) {
 			this.drumBackwar(32, project);
 		} else {
@@ -2251,7 +1374,8 @@ class MidiParser {
 			for (let mm = 0; mm < track.measures.length; mm++) {
 				let measure = track.measures[mm];
 				for (let cc = 0; cc < measure.chords.length; cc++) {
-					let m16 = MMUtil().set(measure.chords[cc].skip).strip(16);
+					//let m16 = MMUtil().set(measure.chords[cc].skip);
+					let m16 = MMUtil().set(measure.chords[cc].skip).strip(32);
 					measure.chords[cc].skip.count = m16.count;
 					measure.chords[cc].skip.part = m16.part;
 					let chord = measure.chords[cc];
@@ -2285,7 +1409,8 @@ class MidiParser {
 			for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
 				let measure = sampleTrack.measures[mm];
 				for (let mp = 0; mp < measure.skips.length; mp++) {
-					let m16 = MMUtil().set(measure.skips[mp]).strip(16);
+					//let m16 = MMUtil().set(measure.skips[mp]);
+					let m16 = MMUtil().set(measure.skips[mp]).strip(32);
 					measure.skips[mp].count = m16.count;
 					measure.skips[mp].part = m16.part;
 					let skip = measure.skips[mp];
@@ -2316,7 +1441,6 @@ class MidiParser {
 		}
 	}
 	shiftForwar32(project: Zvoog_Project) {
-		//console.log('shiftForwar32');
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let track = project.tracks[tt];
 			for (let mm = 0; mm < track.measures.length; mm++) {
@@ -2329,7 +1453,6 @@ class MidiParser {
 		}
 	}
 	drumForwar32(project: Zvoog_Project) {
-		//console.log('drumForwar32');
 		for (let ss = 0; ss < project.percussions.length; ss++) {
 			let sampleTrack = project.percussions[ss];
 			for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
@@ -2344,7 +1467,6 @@ class MidiParser {
 	}
 
 	shiftBackwar(part: number, project: Zvoog_Project) {
-		//console.log('shiftBackwar', part);
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let track = project.tracks[tt];
 			for (let mm = 0; mm < track.measures.length; mm++) {
@@ -2357,7 +1479,6 @@ class MidiParser {
 		}
 	}
 	drumBackwar(part: number, project: Zvoog_Project) {
-		//console.log('drumBackwar', part);
 		for (let ss = 0; ss < project.percussions.length; ss++) {
 			let sampleTrack = project.percussions[ss];
 			for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
@@ -2391,7 +1512,6 @@ class MidiParser {
 	}
 
 	addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string, tempo: number) {
-		//console.log('addLyricsPoints',txt);
 		txt = txt.replace(/(\r)/g, '~');
 		txt = txt.replace(/\\r/g, '~');
 		txt = txt.replace(/(\n)/g, '~');
@@ -2412,7 +1532,6 @@ class MidiParser {
 						row++;
 					}
 				}
-				//console.log(row, nextMs, Math.floor(nextMs / roundN) * roundN);
 				commentPoint.points.push({ skip: skip, text: strings[ii].trim(), row: row });
 			}
 		}
@@ -2427,12 +1546,6 @@ class MidiParser {
 				if (drums.indexOf(note.midiPitch) < 0) {
 					drums.push(note.midiPitch);
 				}
-				/*for (let pp = 0; pp < note.points.length; pp++) {
-					let pitch = note.points[pp].pitch;
-					if (drums.indexOf(pitch) < 0) {
-						drums.push(pitch);
-					}
-				}*/
 			}
 		}
 		return drums;
@@ -2441,11 +1554,7 @@ class MidiParser {
 		let rr = 1;//0000;
 		return Math.round(nn * rr);
 	}
-	/*stripDuration(what: Zvoog_MetreMathType): Zvoog_MetreMathType {
-		return what;
-	}*/
 	createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack {
-		//console.log('createProjectTrack', midiTrack.title);
 		let perfkind = 'zinstr1';
 		if (midiTrack.program == 24
 			|| midiTrack.program == 25
@@ -2498,24 +1607,11 @@ class MidiParser {
 					if (trackChord) {
 						for (let nn = 0; nn < midiChord.notes.length; nn++) {
 							let midiNote: MIDISongNote = midiChord.notes[nn];
-							//console.log(midiNote)
-							//let startPitch = midiNote.points[0].pitch;
-							//let prePitch = midiNote.midiPitch;
-							//let startDuration = mm.calculate((midiNote.points[0].durationms - 66) / 1000.0, nextMeasure.tempo).strip(32);
-
-							/*let curSlide: Zvoog_Slide = {
-								duration: startDuration
-								, delta: 0
-							};*/
-							//let trackNote: Zvoog_Note = { pitch: currentSlidePitch, slides: [curSlide] };
-							//let singlePitch = currentSlidePitch;
 							if (midiNote.slidePoints.length > 0) {
 								trackChord.slides = [];
 								let bendDurationMs = 0;
 								for (let pp = 0; pp < midiNote.slidePoints.length; pp++) {
 									let midiPoint = midiNote.slidePoints[pp];
-									//let curSlideDelta = prePitch - midiPoint.pitch;
-									//prePitch = midiPoint.pitch;
 									let xduration = mm.calculate(midiPoint.durationms / 1000.0, nextMeasure.tempo);
 									trackChord.slides.push({
 										duration: xduration
@@ -2525,16 +1621,11 @@ class MidiParser {
 								}
 								let remains = midiNote.midiDuration - bendDurationMs;
 								if (remains > 0) {
-									/*curSlide = {
-										duration: mm.calculate(remains / 1000.0, nextMeasure.tempo)
-										, delta: currentSlidePitch - Math.round(currentSlidePitch)
-									};*/
 									trackChord.slides.push({
 										duration: mm.calculate(remains / 1000.0, nextMeasure.tempo)
 										, delta: midiNote.midiPitch - midiNote.slidePoints[midiNote.slidePoints.length - 1].pitch
 									});
 								}
-								//console.log(midiNote, trackChord);
 							} else {
 								trackChord.slides = [{
 									duration: mm.calculate(midiNote.midiDuration / 1000.0
@@ -2550,11 +1641,9 @@ class MidiParser {
 		return projectTrack;
 	}
 	createProjectDrums(volume: number, top: number, drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack {
-		//console.log('createProjectDrums', midiTrack.title, drum);
 		let projectDrums: Zvoog_PercussionTrack = {
 			title: midiTrack.title + ' ' + drumNames[drum]
 			, measures: []
-			//, filters: []
 			, sampler: {
 				id: 'drum' + (drum + Math.random()), data: '' + drum, kind: 'zdrum1', outputs: [outputId]
 				, iconPosition: { x: top * 1.5, y: top / 2 }, state: 0
@@ -2588,132 +1677,6 @@ class MidiParser {
 			}
 			currentTimeMs = currentTimeMs + measureDurationS * 1000;
 		}
-		//console.log(drum,projectDrums,midiTrack);
 		return projectDrums;
 	}
-}
-function round1000(nn: number): number {
-	return Math.round(1000 * nn) / 1000;
-}
-function findMeasureSkipByTime(time: number, measures: Zvoog_SongMeasure[]): null | { idx: number, skip: Zvoog_Metre } {
-	let curTime = 0;
-	let mm = MMUtil();
-	for (let ii = 0; ii < measures.length; ii++) {
-		let cumea = measures[ii];
-		let measureDurationS = mm.set(cumea.metre).duration(cumea.tempo);
-		if (round1000(curTime + measureDurationS) > round1000(time)) {
-			//console.log(time - curTime, curTime, measureDurationS, time,round1000(curTime + measureDurationS ),round1000( time));
-			let delta = time - curTime;
-			if (delta < 0) {
-				delta = 0;
-			}
-			return {
-				idx: ii
-				, skip: mm.calculate(delta, cumea.tempo)
-			};
-		}
-		curTime = curTime + measureDurationS;
-	}
-	return null;
-}
-/*
-class Zvoog_MetreMath2 implements Zvoog_MetreMathType {
-	count: number;
-	part: number;
-	set(from: Zvoog_Metre): Zvoog_MetreMath2 {
-		this.count = from.count;
-		this.part = from.part;
-		return this;
-	}
-	calculate(duration: number, tempo: number): Zvoog_MetreMath2 {
-		this.part = 1024.0;
-		let tempPart = new Zvoog_MetreMath2().set({ count: 1, part: this.part }).duration(tempo);
-		this.count = Math.round(duration / tempPart);
-		return this.simplyfy();
-		//return this;
-	}
-	metre(): Zvoog_Metre {
-		return { count: this.count, part: this.part };
-	}
-	simplyfy(): Zvoog_MetreMath2 {
-		let cc = this.count;
-		let pp = this.part;
-		if (cc > 0 && pp > 0) {
-			while (cc % 2 == 0 && pp % 2 == 0) {
-				cc = cc / 2;
-				pp = pp / 2;
-			}
-		}
-		return new Zvoog_MetreMath2().set({ count: cc, part: pp });
-	}
-	strip(toPart: number): Zvoog_MetreMath2 {
-		let cc = this.count;
-		let pp = this.part;
-		let rr = pp / toPart;
-		cc = Math.round(cc / rr);
-		pp = toPart;
-		//if (cc < 1) {
-		//    cc = 1;
-		//}
-		let r = new Zvoog_MetreMath2().set({ count: cc, part: pp }).simplyfy();
-		return r;
-	}
-	equals(metre: Zvoog_Metre): boolean {
-		let countMe = this.count * metre.part;
-		let countTo = metre.count * this.part;
-		if (countMe == countTo) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	less(metre: Zvoog_Metre): boolean {
-		let countMe = this.count * metre.part;
-		let countTo = metre.count * this.part;
-		if (countMe < countTo) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	more(metre: Zvoog_Metre): boolean {
-		let countMe = this.count * metre.part;
-		let countTo = metre.count * this.part;
-		if (countMe > countTo) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	plus(metre: Zvoog_Metre): Zvoog_MetreMath2 {
-		let countMe = this.count * metre.part;
-		let countTo = metre.count * this.part;
-		let rr = { count: countMe + countTo, part: metre.part * this.part };
-		return new Zvoog_MetreMath2().set(rr).simplyfy();
-	}
-	minus(metre: Zvoog_Metre): Zvoog_MetreMath2 {
-		let countMe = this.count * metre.part;
-		let countTo = metre.count * this.part;
-		let rr = { count: countMe - countTo, part: metre.part * this.part };
-		return new Zvoog_MetreMath2().set(rr).simplyfy();
-	}
-
-	duration(tempo: number): number {
-		let wholeNoteSeconds = (4 * 60) / tempo;
-		let meterSeconds = (wholeNoteSeconds * this.count) / this.part;
-		return meterSeconds;
-	}
-	width(tempo: number, ratio: number): number {
-		return this.duration(tempo) * ratio;
-	}
-
-}
-*/
-/*
-function MZMM2(): Zvoog_MetreMathType {
-	return new Zvoog_MetreMath2().set({ count: 0, part: 1 });
-}
-*/
-function newMIDIparser2(arrayBuffer: ArrayBuffer) {
-	return new MidiParser(arrayBuffer);
 }

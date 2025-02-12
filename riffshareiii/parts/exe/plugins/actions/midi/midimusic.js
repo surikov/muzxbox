@@ -1,614 +1,4 @@
 "use strict";
-class MIDIIImportMusicPlugin {
-    constructor() {
-        this.callbackID = '';
-        this.parsedProject = null;
-        this.init();
-    }
-    init() {
-        window.addEventListener('message', this.receiveHostMessage.bind(this), false);
-        window.parent.postMessage({
-            dialogID: this.callbackID,
-            pluginData: this.parsedProject,
-            done: false
-        }, '*');
-    }
-    sendImportedMIDIData() {
-        if (this.parsedProject) {
-            var oo = {
-                dialogID: this.callbackID,
-                pluginData: this.parsedProject,
-                done: true
-            };
-            window.parent.postMessage(oo, '*');
-        }
-        else {
-            alert('No parsed data');
-        }
-    }
-    loadMIDIfile(inputFile) {
-        var file = inputFile.files[0];
-        var fileReader = new FileReader();
-        let me = this;
-        fileReader.onload = function (progressEvent) {
-            if (progressEvent != null) {
-                let title = file.name;
-                let dat = '' + file.lastModifiedDate;
-                try {
-                    let last = file.lastModifiedDate;
-                    dat = '' + last.getFullYear();
-                    if (last.getMonth() < 10) {
-                        dat = dat + '-' + last.getMonth();
-                    }
-                    else {
-                        dat = dat + '-0' + last.getMonth();
-                    }
-                    if (last.getDate() < 10) {
-                        dat = dat + '-' + last.getDate();
-                    }
-                    else {
-                        dat = dat + '-0' + last.getDate();
-                    }
-                }
-                catch (xx) {
-                    console.log(xx);
-                }
-                let comment = ', ' + file.size / 1000 + 'kb, ' + dat;
-                var arrayBuffer = progressEvent.target.result;
-                var midiParser = newMIDIparser2(arrayBuffer);
-                me.parsedProject = midiParser.convertProject(title, comment);
-            }
-        };
-        fileReader.readAsArrayBuffer(file);
-    }
-    receiveHostMessage(par) {
-        let message = par.data;
-        if (this.callbackID) {
-        }
-        else {
-            this.callbackID = message.hostData;
-        }
-    }
-}
-let drumNames = [];
-drumNames[35] = "Bass Drum 2";
-drumNames[36] = "Bass Drum 1";
-drumNames[37] = "Side Stick/Rimshot";
-drumNames[38] = "Snare Drum 1";
-drumNames[39] = "Hand Clap";
-drumNames[40] = "Snare Drum 2";
-drumNames[41] = "Low Tom 2";
-drumNames[42] = "Closed Hi-hat";
-drumNames[43] = "Low Tom 1";
-drumNames[44] = "Pedal Hi-hat";
-drumNames[45] = "Mid Tom 2";
-drumNames[46] = "Open Hi-hat";
-drumNames[47] = "Mid Tom 1";
-drumNames[48] = "High Tom 2";
-drumNames[49] = "Crash Cymbal 1";
-drumNames[50] = "High Tom 1";
-drumNames[51] = "Ride Cymbal 1";
-drumNames[52] = "Chinese Cymbal";
-drumNames[53] = "Ride Bell";
-drumNames[54] = "Tambourine";
-drumNames[55] = "Splash Cymbal";
-drumNames[56] = "Cowbell";
-drumNames[57] = "Crash Cymbal 2";
-drumNames[58] = "Vibra Slap";
-drumNames[59] = "Ride Cymbal 2";
-drumNames[60] = "High Bongo";
-drumNames[61] = "Low Bongo";
-drumNames[62] = "Mute High Conga";
-drumNames[63] = "Open High Conga";
-drumNames[64] = "Low Conga";
-drumNames[65] = "High Timbale";
-drumNames[66] = "Low Timbale";
-drumNames[67] = "High Agogo";
-drumNames[68] = "Low Agogo";
-drumNames[69] = "Cabasa";
-drumNames[70] = "Maracas";
-drumNames[71] = "Short Whistle";
-drumNames[72] = "Long Whistle";
-drumNames[73] = "Short Guiro";
-drumNames[74] = "Long Guiro";
-drumNames[75] = "Claves";
-drumNames[76] = "High Wood Block";
-drumNames[77] = "Low Wood Block";
-drumNames[78] = "Mute Cuica";
-drumNames[79] = "Open Cuica";
-drumNames[80] = "Mute Triangle";
-drumNames[81] = "Open Triangle";
-let insNames = [];
-insNames[0] = "Acoustic Grand Piano: Piano";
-insNames[1] = "Bright Acoustic Piano: Piano";
-insNames[2] = "Electric Grand Piano: Piano";
-insNames[3] = "Honky-tonk Piano: Piano";
-insNames[4] = "Electric Piano 1: Piano";
-insNames[5] = "Electric Piano 2: Piano";
-insNames[6] = "Harpsichord: Piano";
-insNames[7] = "Clavinet: Piano";
-insNames[8] = "Celesta: Chromatic Percussion";
-insNames[9] = "Glockenspiel: Chromatic Percussion";
-insNames[10] = "Music Box: Chromatic Percussion";
-insNames[11] = "Vibraphone: Chromatic Percussion";
-insNames[12] = "Marimba: Chromatic Percussion";
-insNames[13] = "Xylophone: Chromatic Percussion";
-insNames[14] = "Tubular Bells: Chromatic Percussion";
-insNames[15] = "Dulcimer: Chromatic Percussion";
-insNames[16] = "Drawbar Organ: Organ";
-insNames[17] = "Percussive Organ: Organ";
-insNames[18] = "Rock Organ: Organ";
-insNames[19] = "Church Organ: Organ";
-insNames[20] = "Reed Organ: Organ";
-insNames[21] = "Accordion: Organ";
-insNames[22] = "Harmonica: Organ";
-insNames[23] = "Tango Accordion: Organ";
-insNames[24] = "Acoustic Guitar (nylon): Guitar";
-insNames[25] = "Acoustic Guitar (steel): Guitar";
-insNames[26] = "Electric Guitar (jazz): Guitar";
-insNames[27] = "Electric Guitar (clean): Guitar";
-insNames[28] = "Electric Guitar (muted): Guitar";
-insNames[29] = "Overdriven Guitar: Guitar";
-insNames[30] = "Distortion Guitar: Guitar";
-insNames[31] = "Guitar Harmonics: Guitar";
-insNames[32] = "Acoustic Bass: Bass";
-insNames[33] = "Electric Bass (finger): Bass";
-insNames[34] = "Electric Bass (pick): Bass";
-insNames[35] = "Fretless Bass: Bass";
-insNames[36] = "Slap Bass 1: Bass";
-insNames[37] = "Slap Bass 2: Bass";
-insNames[38] = "Synth Bass 1: Bass";
-insNames[39] = "Synth Bass 2: Bass";
-insNames[40] = "Violin: Strings";
-insNames[41] = "Viola: Strings";
-insNames[42] = "Cello: Strings";
-insNames[43] = "Contrabass: Strings";
-insNames[44] = "Tremolo Strings: Strings";
-insNames[45] = "Pizzicato Strings: Strings";
-insNames[46] = "Orchestral Harp: Strings";
-insNames[47] = "Timpani: Strings";
-insNames[48] = "String Ensemble 1: Ensemble";
-insNames[49] = "String Ensemble 2: Ensemble";
-insNames[50] = "Synth Strings 1: Ensemble";
-insNames[51] = "Synth Strings 2: Ensemble";
-insNames[52] = "Choir Aahs: Ensemble";
-insNames[53] = "Voice Oohs: Ensemble";
-insNames[54] = "Synth Choir: Ensemble";
-insNames[55] = "Orchestra Hit: Ensemble";
-insNames[56] = "Trumpet: Brass";
-insNames[57] = "Trombone: Brass";
-insNames[58] = "Tuba: Brass";
-insNames[59] = "Muted Trumpet: Brass";
-insNames[60] = "French Horn: Brass";
-insNames[61] = "Brass Section: Brass";
-insNames[62] = "Synth Brass 1: Brass";
-insNames[63] = "Synth Brass 2: Brass";
-insNames[64] = "Soprano Sax: Reed";
-insNames[65] = "Alto Sax: Reed";
-insNames[66] = "Tenor Sax: Reed";
-insNames[67] = "Baritone Sax: Reed";
-insNames[68] = "Oboe: Reed";
-insNames[69] = "English Horn: Reed";
-insNames[70] = "Bassoon: Reed";
-insNames[71] = "Clarinet: Reed";
-insNames[72] = "Piccolo: Pipe";
-insNames[73] = "Flute: Pipe";
-insNames[74] = "Recorder: Pipe";
-insNames[75] = "Pan Flute: Pipe";
-insNames[76] = "Blown bottle: Pipe";
-insNames[77] = "Shakuhachi: Pipe";
-insNames[78] = "Whistle: Pipe";
-insNames[79] = "Ocarina: Pipe";
-insNames[80] = "Lead 1 (square): Synth Lead";
-insNames[81] = "Lead 2 (sawtooth): Synth Lead";
-insNames[82] = "Lead 3 (calliope): Synth Lead";
-insNames[83] = "Lead 4 (chiff): Synth Lead";
-insNames[84] = "Lead 5 (charang): Synth Lead";
-insNames[85] = "Lead 6 (voice): Synth Lead";
-insNames[86] = "Lead 7 (fifths): Synth Lead";
-insNames[87] = "Lead 8 (bass + lead): Synth Lead";
-insNames[88] = "Pad 1 (new age): Synth Pad";
-insNames[89] = "Pad 2 (warm): Synth Pad";
-insNames[90] = "Pad 3 (polysynth): Synth Pad";
-insNames[91] = "Pad 4 (choir): Synth Pad";
-insNames[92] = "Pad 5 (bowed): Synth Pad";
-insNames[93] = "Pad 6 (metallic): Synth Pad";
-insNames[94] = "Pad 7 (halo): Synth Pad";
-insNames[95] = "Pad 8 (sweep): Synth Pad";
-insNames[96] = "FX 1 (rain): Synth Effects";
-insNames[97] = "FX 2 (soundtrack): Synth Effects";
-insNames[98] = "FX 3 (crystal): Synth Effects";
-insNames[99] = "FX 4 (atmosphere): Synth Effects";
-insNames[100] = "FX 5 (brightness): Synth Effects";
-insNames[101] = "FX 6 (goblins): Synth Effects";
-insNames[102] = "FX 7 (echoes): Synth Effects";
-insNames[103] = "FX 8 (sci-fi): Synth Effects";
-insNames[104] = "Sitar: Ethnic";
-insNames[105] = "Banjo: Ethnic";
-insNames[106] = "Shamisen: Ethnic";
-insNames[107] = "Koto: Ethnic";
-insNames[108] = "Kalimba: Ethnic";
-insNames[109] = "Bagpipe: Ethnic";
-insNames[110] = "Fiddle: Ethnic";
-insNames[111] = "Shanai: Ethnic";
-insNames[112] = "Tinkle Bell: Percussive";
-insNames[113] = "Agogo: Percussive";
-insNames[114] = "Steel Drums: Percussive";
-insNames[115] = "Woodblock: Percussive";
-insNames[116] = "Taiko Drum: Percussive";
-insNames[117] = "Melodic Tom: Percussive";
-insNames[118] = "Synth Drum: Percussive";
-insNames[119] = "Reverse Cymbal: Percussive";
-insNames[120] = "Guitar Fret Noise: Sound effects";
-insNames[121] = "Breath Noise: Sound effects";
-insNames[122] = "Seashore: Sound effects";
-insNames[123] = "Bird Tweet: Sound effects";
-insNames[124] = "Telephone Ring: Sound effects";
-insNames[125] = "Helicopter: Sound effects";
-insNames[126] = "Applause: Sound effects";
-insNames[127] = "Gunshot: Sound effects";
-let instrumentNamesArray = [];
-let drumNamesArray = [];
-function findrumTitles(nn) {
-    let name = drumTitles()[nn];
-    if (name) {
-        return '' + name;
-    }
-    else {
-        return 'MIDI' + nn;
-    }
-}
-function drumTitles() {
-    if (drumNamesArray.length == 0) {
-        var drumNames = [];
-        drumNames[35] = "Bass Drum 2";
-        drumNames[36] = "Bass Drum 1";
-        drumNames[37] = "Side Stick/Rimshot";
-        drumNames[38] = "Snare Drum 1";
-        drumNames[39] = "Hand Clap";
-        drumNames[40] = "Snare Drum 2";
-        drumNames[41] = "Low Tom 2";
-        drumNames[42] = "Closed Hi-hat";
-        drumNames[43] = "Low Tom 1";
-        drumNames[44] = "Pedal Hi-hat";
-        drumNames[45] = "Mid Tom 2";
-        drumNames[46] = "Open Hi-hat";
-        drumNames[47] = "Mid Tom 1";
-        drumNames[48] = "High Tom 2";
-        drumNames[49] = "Crash Cymbal 1";
-        drumNames[50] = "High Tom 1";
-        drumNames[51] = "Ride Cymbal 1";
-        drumNames[52] = "Chinese Cymbal";
-        drumNames[53] = "Ride Bell";
-        drumNames[54] = "Tambourine";
-        drumNames[55] = "Splash Cymbal";
-        drumNames[56] = "Cowbell";
-        drumNames[57] = "Crash Cymbal 2";
-        drumNames[58] = "Vibra Slap";
-        drumNames[59] = "Ride Cymbal 2";
-        drumNames[60] = "High Bongo";
-        drumNames[61] = "Low Bongo";
-        drumNames[62] = "Mute High Conga";
-        drumNames[63] = "Open High Conga";
-        drumNames[64] = "Low Conga";
-        drumNames[65] = "High Timbale";
-        drumNames[66] = "Low Timbale";
-        drumNames[67] = "High Agogo";
-        drumNames[68] = "Low Agogo";
-        drumNames[69] = "Cabasa";
-        drumNames[70] = "Maracas";
-        drumNames[71] = "Short Whistle";
-        drumNames[72] = "Long Whistle";
-        drumNames[73] = "Short Guiro";
-        drumNames[74] = "Long Guiro";
-        drumNames[75] = "Claves";
-        drumNames[76] = "High Wood Block";
-        drumNames[77] = "Low Wood Block";
-        drumNames[78] = "Mute Cuica";
-        drumNames[79] = "Open Cuica";
-        drumNames[80] = "Mute Triangle";
-        drumNames[81] = "Open Triangle";
-        drumNamesArray = drumNames;
-    }
-    return drumNamesArray;
-}
-;
-function instrumentTitles() {
-    if (instrumentNamesArray.length == 0) {
-        var insNames = [];
-        insNames[0] = "Acoustic Grand Piano: Piano";
-        insNames[1] = "Bright Acoustic Piano: Piano";
-        insNames[2] = "Electric Grand Piano: Piano";
-        insNames[3] = "Honky-tonk Piano: Piano";
-        insNames[4] = "Electric Piano 1: Piano";
-        insNames[5] = "Electric Piano 2: Piano";
-        insNames[6] = "Harpsichord: Piano";
-        insNames[7] = "Clavinet: Piano";
-        insNames[8] = "Celesta: Chromatic Percussion";
-        insNames[9] = "Glockenspiel: Chromatic Percussion";
-        insNames[10] = "Music Box: Chromatic Percussion";
-        insNames[11] = "Vibraphone: Chromatic Percussion";
-        insNames[12] = "Marimba: Chromatic Percussion";
-        insNames[13] = "Xylophone: Chromatic Percussion";
-        insNames[14] = "Tubular Bells: Chromatic Percussion";
-        insNames[15] = "Dulcimer: Chromatic Percussion";
-        insNames[16] = "Drawbar Organ: Organ";
-        insNames[17] = "Percussive Organ: Organ";
-        insNames[18] = "Rock Organ: Organ";
-        insNames[19] = "Church Organ: Organ";
-        insNames[20] = "Reed Organ: Organ";
-        insNames[21] = "Accordion: Organ";
-        insNames[22] = "Harmonica: Organ";
-        insNames[23] = "Tango Accordion: Organ";
-        insNames[24] = "Acoustic Guitar (nylon): Guitar";
-        insNames[25] = "Acoustic Guitar (steel): Guitar";
-        insNames[26] = "Electric Guitar (jazz): Guitar";
-        insNames[27] = "Electric Guitar (clean): Guitar";
-        insNames[28] = "Electric Guitar (muted): Guitar";
-        insNames[29] = "Overdriven Guitar: Guitar";
-        insNames[30] = "Distortion Guitar: Guitar";
-        insNames[31] = "Guitar Harmonics: Guitar";
-        insNames[32] = "Acoustic Bass: Bass";
-        insNames[33] = "Electric Bass (finger): Bass";
-        insNames[34] = "Electric Bass (pick): Bass";
-        insNames[35] = "Fretless Bass: Bass";
-        insNames[36] = "Slap Bass 1: Bass";
-        insNames[37] = "Slap Bass 2: Bass";
-        insNames[38] = "Synth Bass 1: Bass";
-        insNames[39] = "Synth Bass 2: Bass";
-        insNames[40] = "Violin: Strings";
-        insNames[41] = "Viola: Strings";
-        insNames[42] = "Cello: Strings";
-        insNames[43] = "Contrabass: Strings";
-        insNames[44] = "Tremolo Strings: Strings";
-        insNames[45] = "Pizzicato Strings: Strings";
-        insNames[46] = "Orchestral Harp: Strings";
-        insNames[47] = "Timpani: Strings";
-        insNames[48] = "String Ensemble 1: Ensemble";
-        insNames[49] = "String Ensemble 2: Ensemble";
-        insNames[50] = "Synth Strings 1: Ensemble";
-        insNames[51] = "Synth Strings 2: Ensemble";
-        insNames[52] = "Choir Aahs: Ensemble";
-        insNames[53] = "Voice Oohs: Ensemble";
-        insNames[54] = "Synth Choir: Ensemble";
-        insNames[55] = "Orchestra Hit: Ensemble";
-        insNames[56] = "Trumpet: Brass";
-        insNames[57] = "Trombone: Brass";
-        insNames[58] = "Tuba: Brass";
-        insNames[59] = "Muted Trumpet: Brass";
-        insNames[60] = "French Horn: Brass";
-        insNames[61] = "Brass Section: Brass";
-        insNames[62] = "Synth Brass 1: Brass";
-        insNames[63] = "Synth Brass 2: Brass";
-        insNames[64] = "Soprano Sax: Reed";
-        insNames[65] = "Alto Sax: Reed";
-        insNames[66] = "Tenor Sax: Reed";
-        insNames[67] = "Baritone Sax: Reed";
-        insNames[68] = "Oboe: Reed";
-        insNames[69] = "English Horn: Reed";
-        insNames[70] = "Bassoon: Reed";
-        insNames[71] = "Clarinet: Reed";
-        insNames[72] = "Piccolo: Pipe";
-        insNames[73] = "Flute: Pipe";
-        insNames[74] = "Recorder: Pipe";
-        insNames[75] = "Pan Flute: Pipe";
-        insNames[76] = "Blown bottle: Pipe";
-        insNames[77] = "Shakuhachi: Pipe";
-        insNames[78] = "Whistle: Pipe";
-        insNames[79] = "Ocarina: Pipe";
-        insNames[80] = "Lead 1 (square): Synth Lead";
-        insNames[81] = "Lead 2 (sawtooth): Synth Lead";
-        insNames[82] = "Lead 3 (calliope): Synth Lead";
-        insNames[83] = "Lead 4 (chiff): Synth Lead";
-        insNames[84] = "Lead 5 (charang): Synth Lead";
-        insNames[85] = "Lead 6 (voice): Synth Lead";
-        insNames[86] = "Lead 7 (fifths): Synth Lead";
-        insNames[87] = "Lead 8 (bass + lead): Synth Lead";
-        insNames[88] = "Pad 1 (new age): Synth Pad";
-        insNames[89] = "Pad 2 (warm): Synth Pad";
-        insNames[90] = "Pad 3 (polysynth): Synth Pad";
-        insNames[91] = "Pad 4 (choir): Synth Pad";
-        insNames[92] = "Pad 5 (bowed): Synth Pad";
-        insNames[93] = "Pad 6 (metallic): Synth Pad";
-        insNames[94] = "Pad 7 (halo): Synth Pad";
-        insNames[95] = "Pad 8 (sweep): Synth Pad";
-        insNames[96] = "FX 1 (rain): Synth Effects";
-        insNames[97] = "FX 2 (soundtrack): Synth Effects";
-        insNames[98] = "FX 3 (crystal): Synth Effects";
-        insNames[99] = "FX 4 (atmosphere): Synth Effects";
-        insNames[100] = "FX 5 (brightness): Synth Effects";
-        insNames[101] = "FX 6 (goblins): Synth Effects";
-        insNames[102] = "FX 7 (echoes): Synth Effects";
-        insNames[103] = "FX 8 (sci-fi): Synth Effects";
-        insNames[104] = "Sitar: Ethnic";
-        insNames[105] = "Banjo: Ethnic";
-        insNames[106] = "Shamisen: Ethnic";
-        insNames[107] = "Koto: Ethnic";
-        insNames[108] = "Kalimba: Ethnic";
-        insNames[109] = "Bagpipe: Ethnic";
-        insNames[110] = "Fiddle: Ethnic";
-        insNames[111] = "Shanai: Ethnic";
-        insNames[112] = "Tinkle Bell: Percussive";
-        insNames[113] = "Agogo: Percussive";
-        insNames[114] = "Steel Drums: Percussive";
-        insNames[115] = "Woodblock: Percussive";
-        insNames[116] = "Taiko Drum: Percussive";
-        insNames[117] = "Melodic Tom: Percussive";
-        insNames[118] = "Synth Drum: Percussive";
-        insNames[119] = "Reverse Cymbal: Percussive";
-        insNames[120] = "Guitar Fret Noise: Sound effects";
-        insNames[121] = "Breath Noise: Sound effects";
-        insNames[122] = "Seashore: Sound effects";
-        insNames[123] = "Bird Tweet: Sound effects";
-        insNames[124] = "Telephone Ring: Sound effects";
-        insNames[125] = "Helicopter: Sound effects";
-        insNames[126] = "Applause: Sound effects";
-        insNames[127] = "Gunshot: Sound effects";
-        instrumentNamesArray = insNames;
-    }
-    return instrumentNamesArray;
-}
-;
-class DataViewStream {
-    constructor(dv) {
-        this.position = 0;
-        this.buffer = dv;
-    }
-    readUint8() {
-        var n = this.buffer.getUint8(this.position);
-        this.position++;
-        return n;
-    }
-    readUint16() {
-        var v = this.buffer.getUint16(this.position);
-        this.position = this.position + 2;
-        return v;
-    }
-    readVarInt() {
-        var v = 0;
-        var i = 0;
-        var b;
-        while (i < 4) {
-            b = this.readUint8();
-            if (b & 0x80) {
-                v = v + (b & 0x7f);
-                v = v << 7;
-            }
-            else {
-                return v + b;
-            }
-            i++;
-        }
-        throw new Error('readVarInt ' + i);
-    }
-    readBytes(length) {
-        var bytes = [];
-        for (var i = 0; i < length; i++) {
-            bytes.push(this.readUint8());
-        }
-        return bytes;
-    }
-    offset() {
-        return this.buffer.byteOffset + this.position;
-    }
-    end() {
-        return this.position == this.buffer.byteLength;
-    }
-}
-class MIDIFileHeader {
-    constructor(buffer) {
-        this.HEADER_LENGTH = 14;
-        this.tempoBPM = 120;
-        this.changes = [];
-        this.meters = [];
-        this.lyrics = [];
-        this.signs = [];
-        this.meterCount = 4;
-        this.meterDivision = 4;
-        this.keyFlatSharp = 0;
-        this.keyMajMin = 0;
-        this.lastNonZeroQuarter = 0;
-        this.datas = new DataView(buffer, 0, this.HEADER_LENGTH);
-        this.format = this.datas.getUint16(8);
-        this.trackCount = this.datas.getUint16(10);
-    }
-    getCalculatedTickResolution(tempo) {
-        this.lastNonZeroQuarter = tempo;
-        if (this.datas.getUint16(12) & 0x8000) {
-            var r = 1000000 / (this.getSMPTEFrames() * this.getTicksPerFrame());
-            return r;
-        }
-        else {
-            tempo = tempo || 500000;
-            var r = tempo / this.getTicksPerBeat();
-            return r;
-        }
-    }
-    get0TickResolution() {
-        var tempo = 0;
-        if (this.lastNonZeroQuarter) {
-            tempo = this.lastNonZeroQuarter;
-        }
-        else {
-            tempo = 60000000 / this.tempoBPM;
-        }
-        if (this.datas.getUint16(12) & 0x8000) {
-            var r = 1000000 / (this.getSMPTEFrames() * this.getTicksPerFrame());
-            return r;
-        }
-        else {
-            tempo = tempo || 500000;
-            var r = tempo / this.getTicksPerBeat();
-            return r;
-        }
-    }
-    getTicksPerBeat() {
-        var divisionWord = this.datas.getUint16(12);
-        return divisionWord;
-    }
-    getTicksPerFrame() {
-        const divisionWord = this.datas.getUint16(12);
-        return divisionWord & 0x00ff;
-    }
-    getSMPTEFrames() {
-        const divisionWord = this.datas.getUint16(12);
-        let smpteFrames;
-        smpteFrames = divisionWord & 0x7f00;
-        if (smpteFrames == 29) {
-            return 29.97;
-        }
-        else {
-            return smpteFrames;
-        }
-    }
-}
-class LastKeyVal {
-    constructor() {
-        this.data = [];
-    }
-    take(keyName) {
-        for (let ii = 0; ii < this.data.length; ii++) {
-            if (this.data[ii].name == keyName) {
-                return this.data[ii];
-            }
-        }
-        let newit = { name: keyName, value: -1 };
-        this.data.push(newit);
-        return newit;
-    }
-}
-class MIDIFileTrack {
-    constructor(buffer, start) {
-        this.HDR_LENGTH = 8;
-        this.chords = [];
-        this.datas = new DataView(buffer, start, this.HDR_LENGTH);
-        this.trackLength = this.datas.getUint32(4);
-        this.datas = new DataView(buffer, start, this.HDR_LENGTH + this.trackLength);
-        this.trackContent = new DataView(this.datas.buffer, this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
-        this.trackevents = [];
-        this.trackVolumePoints = [];
-        this.programChannel = [];
-    }
-}
-function utf8ArrayToString(aBytes) {
-    var sView = "";
-    for (var nPart, nLen = aBytes.length, nIdx = 0; nIdx < nLen; nIdx++) {
-        nPart = aBytes[nIdx];
-        sView = sView + String.fromCharCode(nPart > 251 && nPart < 254 && nIdx + 5 < nLen ?
-            (nPart - 252) * 1073741824 + (aBytes[++nIdx] - 128 << 24) + (aBytes[++nIdx] - 128 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
-            : nPart > 247 && nPart < 252 && nIdx + 4 < nLen ?
-                (nPart - 248 << 24) + (aBytes[++nIdx] - 128 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
-                : nPart > 239 && nPart < 248 && nIdx + 3 < nLen ?
-                    (nPart - 240 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
-                    : nPart > 223 && nPart < 240 && nIdx + 2 < nLen ?
-                        (nPart - 224 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
-                        : nPart > 191 && nPart < 224 && nIdx + 1 < nLen ?
-                            (nPart - 192 << 6) + aBytes[++nIdx] - 128
-                            :
-                                nPart);
-    }
-    return sView;
-}
 class MidiParser {
     constructor(arrayBuffer) {
         this.instrumentNamesArray = [];
@@ -1539,10 +929,79 @@ class MidiParser {
         };
         project.filters.push(filterEcho);
         project.filters.push(filterCompression);
-        console.log('midiSongData', midiSongData.meters, midiSongData);
+        console.log('midiParser', this);
+        console.log('midiSongData', midiSongData);
         console.log('project', project);
         this.trimProject(project);
+        this.calculateShiftDrum(project);
         return project;
+    }
+    avgLineRatio(project, start1, start2, duration) {
+        let point1 = MMUtil().set(start1);
+        let point2 = MMUtil().set(start2);
+        let ticker = MMUtil().set({ count: 0, part: 32 });
+        let sm = 0;
+        let cnt = 0;
+        while (ticker.less(duration)) {
+            let s1 = this.extractDrumPointStamp(project, point1);
+            let s2 = this.extractDrumPointStamp(project, point2);
+            sm = sm + this.diffPointRatio(s1, s2);
+            cnt++;
+            point1 = point1.plus({ count: 1, part: 32 });
+            point2 = point2.plus({ count: 1, part: 32 });
+            ticker = ticker.plus({ count: 1, part: 32 });
+        }
+        return sm / cnt;
+    }
+    diffPointRatio(a, b) {
+        if (a.length == 0 && b.length == 0) {
+            return 0;
+        }
+        let wrong = 0;
+        for (let ii = 0; ii < a.length; ii++) {
+            if (b.indexOf(a[ii]) < 0) {
+                wrong++;
+            }
+        }
+        for (let ii = 0; ii < b.length; ii++) {
+            if (a.indexOf(b[ii]) < 0) {
+                wrong++;
+            }
+        }
+        let ratio = wrong / (a.length + b.length);
+        return ratio;
+    }
+    extractDrumPointStamp(project, at) {
+        let slice = [];
+        let end = MMUtil().set({ count: 0, part: 32 });
+        for (let mm = 0; mm < project.timeline.length; mm++) {
+            let barStart = end.simplyfy();
+            end = end.plus(project.timeline[mm].metre);
+            if (end.more(at)) {
+                let skip = MMUtil().set(at).minus(barStart);
+                for (let pp = 0; pp < project.percussions.length; pp++) {
+                    let drum = project.percussions[pp];
+                    let bar = drum.measures[mm];
+                    for (let ss = 0; ss < bar.skips.length; ss++) {
+                        if (skip.equals(bar.skips[ss])) {
+                            slice.push(pp);
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        return slice;
+    }
+    calculateShiftDrum(project) {
+        let duration = MMUtil().set({ count: 0, part: 32 });
+        for (let mm = 0; mm < project.timeline.length; mm++) {
+            duration = duration.plus(project.timeline[mm].metre);
+        }
+        console.log('calculateShiftDrum', duration);
+        console.log(this.avgLineRatio(project, { count: 4, part: 1 }, { count: 5, part: 1 }, { count: 1, part: 4 }));
+        console.log(this.avgLineRatio(project, { count: 11, part: 1 }, { count: 12, part: 1 }, { count: 1, part: 4 }));
     }
     trimProject(project) {
         for (let ii = 0; ii < project.tracks.length; ii++) {
@@ -1582,8 +1041,6 @@ class MidiParser {
                 }
             }
         }
-        this.reShiftSequencer(project);
-        this.reShiftDrums(project);
         this.limitShort(project);
         this.cutShift(project);
         let len = project.timeline.length;
@@ -1593,66 +1050,6 @@ class MidiParser {
             else {
                 project.timeline.length = ii + 2;
                 return;
-            }
-        }
-    }
-    allShiftForwad(project, shiftSize) {
-        for (let tt = 0; tt < project.tracks.length; tt++) {
-            let track = project.tracks[tt];
-            for (let mm = track.measures.length; mm > 1; mm--) {
-                let fromDuration = project.timeline[mm - 2].metre;
-                let fromMeasure = track.measures[mm - 2];
-                let toMeasure = track.measures[mm - 1];
-                for (let cc = 0; cc < fromMeasure.chords.length; cc++) {
-                    let chord = fromMeasure.chords[cc];
-                    let skip = MMUtil().set(chord.skip).plus(shiftSize);
-                    if (skip.less(fromDuration)) {
-                        chord.skip = skip.simplyfy();
-                    }
-                    else {
-                        chord.skip = skip.minus(fromDuration).simplyfy();
-                        toMeasure.chords.push(chord);
-                        fromMeasure.chords.splice(cc, 1);
-                        cc--;
-                    }
-                }
-            }
-        }
-        for (let tt = 0; tt < project.percussions.length; tt++) {
-            let drum = project.percussions[tt];
-            for (let mm = drum.measures.length; mm > 1; mm--) {
-                let fromDuration = project.timeline[mm - 2].metre;
-                let fromMeasure = drum.measures[mm - 2];
-                let toMeasure = drum.measures[mm - 1];
-                for (let cc = 0; cc < fromMeasure.skips.length; cc++) {
-                    let skip = MMUtil().set(fromMeasure.skips[cc]).plus(shiftSize);
-                    if (skip.less(fromDuration)) {
-                        fromMeasure.skips[cc] = skip.simplyfy();
-                    }
-                    else {
-                        fromMeasure.skips[cc] = skip.minus(fromDuration).simplyfy();
-                        toMeasure.skips.push(fromMeasure.skips[cc]);
-                        fromMeasure.skips.splice(cc, 1);
-                        cc--;
-                    }
-                }
-            }
-        }
-        for (let mm = project.comments.length; mm > 1; mm--) {
-            let fromDuration = project.timeline[mm - 2].metre;
-            let fromMeasure = project.comments[mm - 2];
-            let toMeasure = project.comments[mm - 1];
-            for (let cc = 0; cc < fromMeasure.points.length; cc++) {
-                let skip = MMUtil().set(fromMeasure.points[cc].skip).plus(shiftSize);
-                if (skip.less(fromDuration)) {
-                    fromMeasure.points[cc].skip = skip.simplyfy();
-                }
-                else {
-                    fromMeasure.points[cc].skip = skip.minus(fromDuration).simplyfy();
-                    toMeasure.points.push(fromMeasure.points[cc]);
-                    fromMeasure.points.splice(cc, 1);
-                    cc--;
-                }
             }
         }
     }
@@ -1760,7 +1157,7 @@ class MidiParser {
             for (let mm = 0; mm < track.measures.length; mm++) {
                 let measure = track.measures[mm];
                 for (let cc = 0; cc < measure.chords.length; cc++) {
-                    let m16 = MMUtil().set(measure.chords[cc].skip).strip(16);
+                    let m16 = MMUtil().set(measure.chords[cc].skip).strip(32);
                     measure.chords[cc].skip.count = m16.count;
                     measure.chords[cc].skip.part = m16.part;
                     let chord = measure.chords[cc];
@@ -1796,7 +1193,7 @@ class MidiParser {
             for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
                 let measure = sampleTrack.measures[mm];
                 for (let mp = 0; mp < measure.skips.length; mp++) {
-                    let m16 = MMUtil().set(measure.skips[mp]).strip(16);
+                    let m16 = MMUtil().set(measure.skips[mp]).strip(32);
                     measure.skips[mp].count = m16.count;
                     measure.skips[mp].part = m16.part;
                     let skip = measure.skips[mp];
@@ -2059,6 +1456,249 @@ class MidiParser {
         return projectDrums;
     }
 }
+let instrumentNamesArray = [];
+let drumNamesArray = [];
+function findrumTitles(nn) {
+    let name = drumTitles()[nn];
+    if (name) {
+        return '' + name;
+    }
+    else {
+        return 'MIDI' + nn;
+    }
+}
+let drumNames = [];
+drumNames[35] = "Bass Drum 2";
+drumNames[36] = "Bass Drum 1";
+drumNames[37] = "Side Stick/Rimshot";
+drumNames[38] = "Snare Drum 1";
+drumNames[39] = "Hand Clap";
+drumNames[40] = "Snare Drum 2";
+drumNames[41] = "Low Tom 2";
+drumNames[42] = "Closed Hi-hat";
+drumNames[43] = "Low Tom 1";
+drumNames[44] = "Pedal Hi-hat";
+drumNames[45] = "Mid Tom 2";
+drumNames[46] = "Open Hi-hat";
+drumNames[47] = "Mid Tom 1";
+drumNames[48] = "High Tom 2";
+drumNames[49] = "Crash Cymbal 1";
+drumNames[50] = "High Tom 1";
+drumNames[51] = "Ride Cymbal 1";
+drumNames[52] = "Chinese Cymbal";
+drumNames[53] = "Ride Bell";
+drumNames[54] = "Tambourine";
+drumNames[55] = "Splash Cymbal";
+drumNames[56] = "Cowbell";
+drumNames[57] = "Crash Cymbal 2";
+drumNames[58] = "Vibra Slap";
+drumNames[59] = "Ride Cymbal 2";
+drumNames[60] = "High Bongo";
+drumNames[61] = "Low Bongo";
+drumNames[62] = "Mute High Conga";
+drumNames[63] = "Open High Conga";
+drumNames[64] = "Low Conga";
+drumNames[65] = "High Timbale";
+drumNames[66] = "Low Timbale";
+drumNames[67] = "High Agogo";
+drumNames[68] = "Low Agogo";
+drumNames[69] = "Cabasa";
+drumNames[70] = "Maracas";
+drumNames[71] = "Short Whistle";
+drumNames[72] = "Long Whistle";
+drumNames[73] = "Short Guiro";
+drumNames[74] = "Long Guiro";
+drumNames[75] = "Claves";
+drumNames[76] = "High Wood Block";
+drumNames[77] = "Low Wood Block";
+drumNames[78] = "Mute Cuica";
+drumNames[79] = "Open Cuica";
+drumNames[80] = "Mute Triangle";
+drumNames[81] = "Open Triangle";
+let insNames = [];
+insNames[0] = "Acoustic Grand Piano: Piano";
+insNames[1] = "Bright Acoustic Piano: Piano";
+insNames[2] = "Electric Grand Piano: Piano";
+insNames[3] = "Honky-tonk Piano: Piano";
+insNames[4] = "Electric Piano 1: Piano";
+insNames[5] = "Electric Piano 2: Piano";
+insNames[6] = "Harpsichord: Piano";
+insNames[7] = "Clavinet: Piano";
+insNames[8] = "Celesta: Chromatic Percussion";
+insNames[9] = "Glockenspiel: Chromatic Percussion";
+insNames[10] = "Music Box: Chromatic Percussion";
+insNames[11] = "Vibraphone: Chromatic Percussion";
+insNames[12] = "Marimba: Chromatic Percussion";
+insNames[13] = "Xylophone: Chromatic Percussion";
+insNames[14] = "Tubular Bells: Chromatic Percussion";
+insNames[15] = "Dulcimer: Chromatic Percussion";
+insNames[16] = "Drawbar Organ: Organ";
+insNames[17] = "Percussive Organ: Organ";
+insNames[18] = "Rock Organ: Organ";
+insNames[19] = "Church Organ: Organ";
+insNames[20] = "Reed Organ: Organ";
+insNames[21] = "Accordion: Organ";
+insNames[22] = "Harmonica: Organ";
+insNames[23] = "Tango Accordion: Organ";
+insNames[24] = "Acoustic Guitar (nylon): Guitar";
+insNames[25] = "Acoustic Guitar (steel): Guitar";
+insNames[26] = "Electric Guitar (jazz): Guitar";
+insNames[27] = "Electric Guitar (clean): Guitar";
+insNames[28] = "Electric Guitar (muted): Guitar";
+insNames[29] = "Overdriven Guitar: Guitar";
+insNames[30] = "Distortion Guitar: Guitar";
+insNames[31] = "Guitar Harmonics: Guitar";
+insNames[32] = "Acoustic Bass: Bass";
+insNames[33] = "Electric Bass (finger): Bass";
+insNames[34] = "Electric Bass (pick): Bass";
+insNames[35] = "Fretless Bass: Bass";
+insNames[36] = "Slap Bass 1: Bass";
+insNames[37] = "Slap Bass 2: Bass";
+insNames[38] = "Synth Bass 1: Bass";
+insNames[39] = "Synth Bass 2: Bass";
+insNames[40] = "Violin: Strings";
+insNames[41] = "Viola: Strings";
+insNames[42] = "Cello: Strings";
+insNames[43] = "Contrabass: Strings";
+insNames[44] = "Tremolo Strings: Strings";
+insNames[45] = "Pizzicato Strings: Strings";
+insNames[46] = "Orchestral Harp: Strings";
+insNames[47] = "Timpani: Strings";
+insNames[48] = "String Ensemble 1: Ensemble";
+insNames[49] = "String Ensemble 2: Ensemble";
+insNames[50] = "Synth Strings 1: Ensemble";
+insNames[51] = "Synth Strings 2: Ensemble";
+insNames[52] = "Choir Aahs: Ensemble";
+insNames[53] = "Voice Oohs: Ensemble";
+insNames[54] = "Synth Choir: Ensemble";
+insNames[55] = "Orchestra Hit: Ensemble";
+insNames[56] = "Trumpet: Brass";
+insNames[57] = "Trombone: Brass";
+insNames[58] = "Tuba: Brass";
+insNames[59] = "Muted Trumpet: Brass";
+insNames[60] = "French Horn: Brass";
+insNames[61] = "Brass Section: Brass";
+insNames[62] = "Synth Brass 1: Brass";
+insNames[63] = "Synth Brass 2: Brass";
+insNames[64] = "Soprano Sax: Reed";
+insNames[65] = "Alto Sax: Reed";
+insNames[66] = "Tenor Sax: Reed";
+insNames[67] = "Baritone Sax: Reed";
+insNames[68] = "Oboe: Reed";
+insNames[69] = "English Horn: Reed";
+insNames[70] = "Bassoon: Reed";
+insNames[71] = "Clarinet: Reed";
+insNames[72] = "Piccolo: Pipe";
+insNames[73] = "Flute: Pipe";
+insNames[74] = "Recorder: Pipe";
+insNames[75] = "Pan Flute: Pipe";
+insNames[76] = "Blown bottle: Pipe";
+insNames[77] = "Shakuhachi: Pipe";
+insNames[78] = "Whistle: Pipe";
+insNames[79] = "Ocarina: Pipe";
+insNames[80] = "Lead 1 (square): Synth Lead";
+insNames[81] = "Lead 2 (sawtooth): Synth Lead";
+insNames[82] = "Lead 3 (calliope): Synth Lead";
+insNames[83] = "Lead 4 (chiff): Synth Lead";
+insNames[84] = "Lead 5 (charang): Synth Lead";
+insNames[85] = "Lead 6 (voice): Synth Lead";
+insNames[86] = "Lead 7 (fifths): Synth Lead";
+insNames[87] = "Lead 8 (bass + lead): Synth Lead";
+insNames[88] = "Pad 1 (new age): Synth Pad";
+insNames[89] = "Pad 2 (warm): Synth Pad";
+insNames[90] = "Pad 3 (polysynth): Synth Pad";
+insNames[91] = "Pad 4 (choir): Synth Pad";
+insNames[92] = "Pad 5 (bowed): Synth Pad";
+insNames[93] = "Pad 6 (metallic): Synth Pad";
+insNames[94] = "Pad 7 (halo): Synth Pad";
+insNames[95] = "Pad 8 (sweep): Synth Pad";
+insNames[96] = "FX 1 (rain): Synth Effects";
+insNames[97] = "FX 2 (soundtrack): Synth Effects";
+insNames[98] = "FX 3 (crystal): Synth Effects";
+insNames[99] = "FX 4 (atmosphere): Synth Effects";
+insNames[100] = "FX 5 (brightness): Synth Effects";
+insNames[101] = "FX 6 (goblins): Synth Effects";
+insNames[102] = "FX 7 (echoes): Synth Effects";
+insNames[103] = "FX 8 (sci-fi): Synth Effects";
+insNames[104] = "Sitar: Ethnic";
+insNames[105] = "Banjo: Ethnic";
+insNames[106] = "Shamisen: Ethnic";
+insNames[107] = "Koto: Ethnic";
+insNames[108] = "Kalimba: Ethnic";
+insNames[109] = "Bagpipe: Ethnic";
+insNames[110] = "Fiddle: Ethnic";
+insNames[111] = "Shanai: Ethnic";
+insNames[112] = "Tinkle Bell: Percussive";
+insNames[113] = "Agogo: Percussive";
+insNames[114] = "Steel Drums: Percussive";
+insNames[115] = "Woodblock: Percussive";
+insNames[116] = "Taiko Drum: Percussive";
+insNames[117] = "Melodic Tom: Percussive";
+insNames[118] = "Synth Drum: Percussive";
+insNames[119] = "Reverse Cymbal: Percussive";
+insNames[120] = "Guitar Fret Noise: Sound effects";
+insNames[121] = "Breath Noise: Sound effects";
+insNames[122] = "Seashore: Sound effects";
+insNames[123] = "Bird Tweet: Sound effects";
+insNames[124] = "Telephone Ring: Sound effects";
+insNames[125] = "Helicopter: Sound effects";
+insNames[126] = "Applause: Sound effects";
+insNames[127] = "Gunshot: Sound effects";
+function drumTitles() {
+    if (drumNamesArray.length == 0) {
+        var drumNames = [];
+        drumNames[35] = "Bass Drum 2";
+        drumNames[36] = "Bass Drum 1";
+        drumNames[37] = "Side Stick/Rimshot";
+        drumNames[38] = "Snare Drum 1";
+        drumNames[39] = "Hand Clap";
+        drumNames[40] = "Snare Drum 2";
+        drumNames[41] = "Low Tom 2";
+        drumNames[42] = "Closed Hi-hat";
+        drumNames[43] = "Low Tom 1";
+        drumNames[44] = "Pedal Hi-hat";
+        drumNames[45] = "Mid Tom 2";
+        drumNames[46] = "Open Hi-hat";
+        drumNames[47] = "Mid Tom 1";
+        drumNames[48] = "High Tom 2";
+        drumNames[49] = "Crash Cymbal 1";
+        drumNames[50] = "High Tom 1";
+        drumNames[51] = "Ride Cymbal 1";
+        drumNames[52] = "Chinese Cymbal";
+        drumNames[53] = "Ride Bell";
+        drumNames[54] = "Tambourine";
+        drumNames[55] = "Splash Cymbal";
+        drumNames[56] = "Cowbell";
+        drumNames[57] = "Crash Cymbal 2";
+        drumNames[58] = "Vibra Slap";
+        drumNames[59] = "Ride Cymbal 2";
+        drumNames[60] = "High Bongo";
+        drumNames[61] = "Low Bongo";
+        drumNames[62] = "Mute High Conga";
+        drumNames[63] = "Open High Conga";
+        drumNames[64] = "Low Conga";
+        drumNames[65] = "High Timbale";
+        drumNames[66] = "Low Timbale";
+        drumNames[67] = "High Agogo";
+        drumNames[68] = "Low Agogo";
+        drumNames[69] = "Cabasa";
+        drumNames[70] = "Maracas";
+        drumNames[71] = "Short Whistle";
+        drumNames[72] = "Long Whistle";
+        drumNames[73] = "Short Guiro";
+        drumNames[74] = "Long Guiro";
+        drumNames[75] = "Claves";
+        drumNames[76] = "High Wood Block";
+        drumNames[77] = "Low Wood Block";
+        drumNames[78] = "Mute Cuica";
+        drumNames[79] = "Open Cuica";
+        drumNames[80] = "Mute Triangle";
+        drumNames[81] = "Open Triangle";
+        drumNamesArray = drumNames;
+    }
+    return drumNamesArray;
+}
+;
 function round1000(nn) {
     return Math.round(1000 * nn) / 1000;
 }
@@ -2082,7 +1722,223 @@ function findMeasureSkipByTime(time, measures) {
     }
     return null;
 }
+class DataViewStream {
+    constructor(dv) {
+        this.position = 0;
+        this.buffer = dv;
+    }
+    readUint8() {
+        var n = this.buffer.getUint8(this.position);
+        this.position++;
+        return n;
+    }
+    readUint16() {
+        var v = this.buffer.getUint16(this.position);
+        this.position = this.position + 2;
+        return v;
+    }
+    readVarInt() {
+        var v = 0;
+        var i = 0;
+        var b;
+        while (i < 4) {
+            b = this.readUint8();
+            if (b & 0x80) {
+                v = v + (b & 0x7f);
+                v = v << 7;
+            }
+            else {
+                return v + b;
+            }
+            i++;
+        }
+        throw new Error('readVarInt ' + i);
+    }
+    readBytes(length) {
+        var bytes = [];
+        for (var i = 0; i < length; i++) {
+            bytes.push(this.readUint8());
+        }
+        return bytes;
+    }
+    offset() {
+        return this.buffer.byteOffset + this.position;
+    }
+    end() {
+        return this.position == this.buffer.byteLength;
+    }
+}
+function utf8ArrayToString(aBytes) {
+    var sView = "";
+    for (var nPart, nLen = aBytes.length, nIdx = 0; nIdx < nLen; nIdx++) {
+        nPart = aBytes[nIdx];
+        sView = sView + String.fromCharCode(nPart > 251 && nPart < 254 && nIdx + 5 < nLen ?
+            (nPart - 252) * 1073741824 + (aBytes[++nIdx] - 128 << 24) + (aBytes[++nIdx] - 128 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+            : nPart > 247 && nPart < 252 && nIdx + 4 < nLen ?
+                (nPart - 248 << 24) + (aBytes[++nIdx] - 128 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+                : nPart > 239 && nPart < 248 && nIdx + 3 < nLen ?
+                    (nPart - 240 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+                    : nPart > 223 && nPart < 240 && nIdx + 2 < nLen ?
+                        (nPart - 224 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+                        : nPart > 191 && nPart < 224 && nIdx + 1 < nLen ?
+                            (nPart - 192 << 6) + aBytes[++nIdx] - 128
+                            :
+                                nPart);
+    }
+    return sView;
+}
+class MIDIFileHeader {
+    constructor(buffer) {
+        this.HEADER_LENGTH = 14;
+        this.tempoBPM = 120;
+        this.changes = [];
+        this.meters = [];
+        this.lyrics = [];
+        this.signs = [];
+        this.meterCount = 4;
+        this.meterDivision = 4;
+        this.keyFlatSharp = 0;
+        this.keyMajMin = 0;
+        this.lastNonZeroQuarter = 0;
+        this.datas = new DataView(buffer, 0, this.HEADER_LENGTH);
+        this.format = this.datas.getUint16(8);
+        this.trackCount = this.datas.getUint16(10);
+    }
+    getCalculatedTickResolution(tempo) {
+        this.lastNonZeroQuarter = tempo;
+        if (this.datas.getUint16(12) & 0x8000) {
+            var r = 1000000 / (this.getSMPTEFrames() * this.getTicksPerFrame());
+            return r;
+        }
+        else {
+            tempo = tempo || 500000;
+            var r = tempo / this.getTicksPerBeat();
+            return r;
+        }
+    }
+    get0TickResolution() {
+        var tempo = 0;
+        if (this.lastNonZeroQuarter) {
+            tempo = this.lastNonZeroQuarter;
+        }
+        else {
+            tempo = 60000000 / this.tempoBPM;
+        }
+        if (this.datas.getUint16(12) & 0x8000) {
+            var r = 1000000 / (this.getSMPTEFrames() * this.getTicksPerFrame());
+            return r;
+        }
+        else {
+            tempo = tempo || 500000;
+            var r = tempo / this.getTicksPerBeat();
+            return r;
+        }
+    }
+    getTicksPerBeat() {
+        var divisionWord = this.datas.getUint16(12);
+        return divisionWord;
+    }
+    getTicksPerFrame() {
+        const divisionWord = this.datas.getUint16(12);
+        return divisionWord & 0x00ff;
+    }
+    getSMPTEFrames() {
+        const divisionWord = this.datas.getUint16(12);
+        let smpteFrames;
+        smpteFrames = divisionWord & 0x7f00;
+        if (smpteFrames == 29) {
+            return 29.97;
+        }
+        else {
+            return smpteFrames;
+        }
+    }
+}
+class MIDIIImportMusicPlugin {
+    constructor() {
+        this.callbackID = '';
+        this.parsedProject = null;
+        this.init();
+    }
+    init() {
+        window.addEventListener('message', this.receiveHostMessage.bind(this), false);
+        window.parent.postMessage({
+            dialogID: this.callbackID,
+            pluginData: this.parsedProject,
+            done: false
+        }, '*');
+    }
+    sendImportedMIDIData() {
+        if (this.parsedProject) {
+            var oo = {
+                dialogID: this.callbackID,
+                pluginData: this.parsedProject,
+                done: true
+            };
+            window.parent.postMessage(oo, '*');
+        }
+        else {
+            alert('No parsed data');
+        }
+    }
+    loadMIDIfile(inputFile) {
+        var file = inputFile.files[0];
+        var fileReader = new FileReader();
+        let me = this;
+        fileReader.onload = function (progressEvent) {
+            if (progressEvent != null) {
+                let title = file.name;
+                let dat = '' + file.lastModifiedDate;
+                try {
+                    let last = file.lastModifiedDate;
+                    dat = '' + last.getFullYear();
+                    if (last.getMonth() < 10) {
+                        dat = dat + '-' + last.getMonth();
+                    }
+                    else {
+                        dat = dat + '-0' + last.getMonth();
+                    }
+                    if (last.getDate() < 10) {
+                        dat = dat + '-' + last.getDate();
+                    }
+                    else {
+                        dat = dat + '-0' + last.getDate();
+                    }
+                }
+                catch (xx) {
+                    console.log(xx);
+                }
+                let comment = ', ' + file.size / 1000 + 'kb, ' + dat;
+                var arrayBuffer = progressEvent.target.result;
+                var midiParser = newMIDIparser2(arrayBuffer);
+                me.parsedProject = midiParser.convertProject(title, comment);
+            }
+        };
+        fileReader.readAsArrayBuffer(file);
+    }
+    receiveHostMessage(par) {
+        let message = par.data;
+        if (this.callbackID) {
+        }
+        else {
+            this.callbackID = message.hostData;
+        }
+    }
+}
 function newMIDIparser2(arrayBuffer) {
     return new MidiParser(arrayBuffer);
+}
+class MIDIFileTrack {
+    constructor(buffer, start) {
+        this.HDR_LENGTH = 8;
+        this.chords = [];
+        this.datas = new DataView(buffer, start, this.HDR_LENGTH);
+        this.trackLength = this.datas.getUint32(4);
+        this.datas = new DataView(buffer, start, this.HDR_LENGTH + this.trackLength);
+        this.trackContent = new DataView(this.datas.buffer, this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
+        this.trackevents = [];
+        this.trackVolumePoints = [];
+        this.programChannel = [];
+    }
 }
 //# sourceMappingURL=midimusic.js.map

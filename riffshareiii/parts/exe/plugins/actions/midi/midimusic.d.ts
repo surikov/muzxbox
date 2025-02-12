@@ -274,21 +274,133 @@ declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string
 declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
-declare class MIDIIImportMusicPlugin {
-    callbackID: string;
-    parsedProject: Zvoog_Project | null;
-    constructor();
-    init(): void;
-    sendImportedMIDIData(): void;
-    loadMIDIfile(inputFile: any): void;
-    receiveHostMessage(par: any): void;
+declare class MidiParser {
+    header: MIDIFileHeader;
+    parsedTracks: MIDIFileTrack[];
+    instrumentNamesArray: string[];
+    drumNamesArray: string[];
+    EVENT_META: number;
+    EVENT_SYSEX: number;
+    EVENT_DIVSYSEX: number;
+    EVENT_MIDI: number;
+    EVENT_META_SEQUENCE_NUMBER: number;
+    EVENT_META_TEXT: number;
+    EVENT_META_COPYRIGHT_NOTICE: number;
+    EVENT_META_TRACK_NAME: number;
+    EVENT_META_INSTRUMENT_NAME: number;
+    EVENT_META_LYRICS: number;
+    EVENT_META_MARKER: number;
+    EVENT_META_CUE_POINT: number;
+    EVENT_META_MIDI_CHANNEL_PREFIX: number;
+    EVENT_META_END_OF_TRACK: number;
+    EVENT_META_SET_TEMPO: number;
+    EVENT_META_SMTPE_OFFSET: number;
+    EVENT_META_TIME_SIGNATURE: number;
+    EVENT_META_KEY_SIGNATURE: number;
+    EVENT_META_SEQUENCER_SPECIFIC: number;
+    EVENT_MIDI_NOTE_OFF: number;
+    EVENT_MIDI_NOTE_ON: number;
+    EVENT_MIDI_NOTE_AFTERTOUCH: number;
+    EVENT_MIDI_CONTROLLER: number;
+    EVENT_MIDI_PROGRAM_CHANGE: number;
+    EVENT_MIDI_CHANNEL_AFTERTOUCH: number;
+    EVENT_MIDI_PITCH_BEND: number;
+    midiEventType: number;
+    midiEventChannel: number;
+    midiEventParam1: number;
+    controller_BankSelectMSB: number;
+    controller_ModulationWheel: number;
+    controller_coarseDataEntrySlider: number;
+    controller_coarseVolume: number;
+    controller_ballance: number;
+    controller_pan: number;
+    controller_expression: number;
+    controller_BankSelectLSBGS: number;
+    controller_fineDataEntrySlider: number;
+    controller_ReverbLevel: number;
+    controller_HoldPedal1: number;
+    controller_TremoloDepth: number;
+    controller_ChorusLevel: number;
+    controller_NRPNParameterLSB: number;
+    controller_NRPNParameterMSB: number;
+    controller_fineRPN: number;
+    controller_coarseRPN: number;
+    controller_ResetAllControllers: number;
+    constructor(arrayBuffer: ArrayBuffer);
+    parseTracks(arrayBuffer: ArrayBuffer): void;
+    toText(arr: number[]): string;
+    findChordBefore(when: number, track: MIDIFileTrack, channel: number): TrackChord | null;
+    findOpenedNoteBefore(firstPitch: number, when: number, track: MIDIFileTrack, channel: number): {
+        chord: TrackChord;
+        note: TrackNote;
+    } | null;
+    takeChord(when: number, track: MIDIFileTrack, channel: number): TrackChord;
+    takeOpenedNote(first: number, when: number, track: MIDIFileTrack, channel: number): TrackNote;
+    distanceToPoint(line: PP, point: XYp): number;
+    douglasPeucker(points: XYp[], tolerance: number): XYp[];
+    simplifyAllBendPaths(): void;
+    dumpResolutionChanges(): void;
+    lastResolution(ms: number): number;
+    parseTicks2time(track: MIDIFileTrack): void;
+    parseNotes(): void;
+    nextEvent(stream: DataViewStream): MIDIEvent;
+    parseTrackEvents(track: MIDIFileTrack): void;
+    findOrCreateTrack(parsedtrack: MIDIFileTrack, trackNum: number, channelNum: number, trackChannel: {
+        trackNum: number;
+        channelNum: number;
+        track: MIDISongTrack;
+    }[]): {
+        trackNum: number;
+        channelNum: number;
+        track: MIDISongTrack;
+    };
+    findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): Zvoog_Metre;
+    findLastChange(midiSongData: MIDISongData, beforeMs: number): {
+        track: number;
+        ms: number;
+        resolution: number;
+        bpm: number;
+    };
+    findNextChange(midiSongData: MIDISongData, afterMs: number): {
+        track: number;
+        ms: number;
+        resolution: number;
+        bpm: number;
+    };
+    calcMeasureDuration(midiSongData: MIDISongData, meter: Zvoog_Metre, bpm: number, part: number, startMs: number): number;
+    createMeasure(midiSongData: MIDISongData, fromMs: number, barIdx: number): ImportMeasure;
+    createTimeLine(midiSongData: MIDISongData): Zvoog_SongMeasure[];
+    convertProject(title: string, comment: string): Zvoog_Project;
+    avgLineRatio(project: Zvoog_Project, start1: Zvoog_Metre, start2: Zvoog_Metre, duration: Zvoog_Metre): number;
+    diffPointRatio(a: number[], b: number[]): number;
+    extractDrumPointStamp(project: Zvoog_Project, at: Zvoog_Metre): number[];
+    calculateShiftDrum(project: Zvoog_Project): void;
+    trimProject(project: Zvoog_Project): void;
+    limitShort(project: Zvoog_Project): void;
+    reShiftSequencer(project: Zvoog_Project): void;
+    reShiftDrums(project: Zvoog_Project): void;
+    cutShift(project: Zvoog_Project): void;
+    shiftForwar32(project: Zvoog_Project): void;
+    drumForwar32(project: Zvoog_Project): void;
+    shiftBackwar(part: number, project: Zvoog_Project): void;
+    drumBackwar(part: number, project: Zvoog_Project): void;
+    isBarEmpty(barIdx: number, project: Zvoog_Project): boolean;
+    addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string, tempo: number): void;
+    collectDrums(midiTrack: MIDISongTrack): number[];
+    numratio(nn: number): number;
+    createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack;
+    createProjectDrums(volume: number, top: number, drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack;
 }
+declare let instrumentNamesArray: string[];
+declare let drumNamesArray: string[];
+declare function findrumTitles(nn: number): string;
+declare let drumNames: string[];
+declare let insNames: string[];
+declare function drumTitles(): string[];
 declare type ImportMeasure = Zvoog_SongMeasure & {
     startMs: number;
     durationMs: number;
 };
-declare let drumNames: string[];
-declare let insNames: string[];
 declare type XYp = {
     x: number;
     y: number;
@@ -412,11 +524,11 @@ declare type MIDISongData = {
     speedMode: number;
     lineMode: number;
 };
-declare let instrumentNamesArray: string[];
-declare let drumNamesArray: string[];
-declare function findrumTitles(nn: number): string;
-declare function drumTitles(): string[];
-declare function instrumentTitles(): string[];
+declare function round1000(nn: number): number;
+declare function findMeasureSkipByTime(time: number, measures: Zvoog_SongMeasure[]): null | {
+    idx: number;
+    skip: Zvoog_Metre;
+};
 declare class DataViewStream {
     position: number;
     buffer: DataView;
@@ -428,6 +540,7 @@ declare class DataViewStream {
     offset(): number;
     end(): boolean;
 }
+declare function utf8ArrayToString(aBytes: any): string;
 declare class MIDIFileHeader {
     datas: DataView;
     HEADER_LENGTH: number;
@@ -468,16 +581,16 @@ declare class MIDIFileHeader {
     getTicksPerFrame(): number;
     getSMPTEFrames(): number;
 }
-declare class LastKeyVal {
-    data: {
-        name: string;
-        value: number;
-    }[];
-    take(keyName: string): {
-        name: string;
-        value: number;
-    };
+declare class MIDIIImportMusicPlugin {
+    callbackID: string;
+    parsedProject: Zvoog_Project | null;
+    constructor();
+    init(): void;
+    sendImportedMIDIData(): void;
+    loadMIDIfile(inputFile: any): void;
+    receiveHostMessage(par: any): void;
 }
+declare function newMIDIparser2(arrayBuffer: ArrayBuffer): MidiParser;
 declare class MIDIFileTrack {
     datas: DataView;
     HDR_LENGTH: number;
@@ -498,124 +611,3 @@ declare class MIDIFileTrack {
     chords: TrackChord[];
     constructor(buffer: ArrayBuffer, start: number);
 }
-declare function utf8ArrayToString(aBytes: any): string;
-declare class MidiParser {
-    header: MIDIFileHeader;
-    parsedTracks: MIDIFileTrack[];
-    instrumentNamesArray: string[];
-    drumNamesArray: string[];
-    EVENT_META: number;
-    EVENT_SYSEX: number;
-    EVENT_DIVSYSEX: number;
-    EVENT_MIDI: number;
-    EVENT_META_SEQUENCE_NUMBER: number;
-    EVENT_META_TEXT: number;
-    EVENT_META_COPYRIGHT_NOTICE: number;
-    EVENT_META_TRACK_NAME: number;
-    EVENT_META_INSTRUMENT_NAME: number;
-    EVENT_META_LYRICS: number;
-    EVENT_META_MARKER: number;
-    EVENT_META_CUE_POINT: number;
-    EVENT_META_MIDI_CHANNEL_PREFIX: number;
-    EVENT_META_END_OF_TRACK: number;
-    EVENT_META_SET_TEMPO: number;
-    EVENT_META_SMTPE_OFFSET: number;
-    EVENT_META_TIME_SIGNATURE: number;
-    EVENT_META_KEY_SIGNATURE: number;
-    EVENT_META_SEQUENCER_SPECIFIC: number;
-    EVENT_MIDI_NOTE_OFF: number;
-    EVENT_MIDI_NOTE_ON: number;
-    EVENT_MIDI_NOTE_AFTERTOUCH: number;
-    EVENT_MIDI_CONTROLLER: number;
-    EVENT_MIDI_PROGRAM_CHANGE: number;
-    EVENT_MIDI_CHANNEL_AFTERTOUCH: number;
-    EVENT_MIDI_PITCH_BEND: number;
-    midiEventType: number;
-    midiEventChannel: number;
-    midiEventParam1: number;
-    controller_BankSelectMSB: number;
-    controller_ModulationWheel: number;
-    controller_coarseDataEntrySlider: number;
-    controller_coarseVolume: number;
-    controller_ballance: number;
-    controller_pan: number;
-    controller_expression: number;
-    controller_BankSelectLSBGS: number;
-    controller_fineDataEntrySlider: number;
-    controller_ReverbLevel: number;
-    controller_HoldPedal1: number;
-    controller_TremoloDepth: number;
-    controller_ChorusLevel: number;
-    controller_NRPNParameterLSB: number;
-    controller_NRPNParameterMSB: number;
-    controller_fineRPN: number;
-    controller_coarseRPN: number;
-    controller_ResetAllControllers: number;
-    constructor(arrayBuffer: ArrayBuffer);
-    parseTracks(arrayBuffer: ArrayBuffer): void;
-    toText(arr: number[]): string;
-    findChordBefore(when: number, track: MIDIFileTrack, channel: number): TrackChord | null;
-    findOpenedNoteBefore(firstPitch: number, when: number, track: MIDIFileTrack, channel: number): {
-        chord: TrackChord;
-        note: TrackNote;
-    } | null;
-    takeChord(when: number, track: MIDIFileTrack, channel: number): TrackChord;
-    takeOpenedNote(first: number, when: number, track: MIDIFileTrack, channel: number): TrackNote;
-    distanceToPoint(line: PP, point: XYp): number;
-    douglasPeucker(points: XYp[], tolerance: number): XYp[];
-    simplifyAllBendPaths(): void;
-    dumpResolutionChanges(): void;
-    lastResolution(ms: number): number;
-    parseTicks2time(track: MIDIFileTrack): void;
-    parseNotes(): void;
-    nextEvent(stream: DataViewStream): MIDIEvent;
-    parseTrackEvents(track: MIDIFileTrack): void;
-    findOrCreateTrack(parsedtrack: MIDIFileTrack, trackNum: number, channelNum: number, trackChannel: {
-        trackNum: number;
-        channelNum: number;
-        track: MIDISongTrack;
-    }[]): {
-        trackNum: number;
-        channelNum: number;
-        track: MIDISongTrack;
-    };
-    findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): Zvoog_Metre;
-    findLastChange(midiSongData: MIDISongData, beforeMs: number): {
-        track: number;
-        ms: number;
-        resolution: number;
-        bpm: number;
-    };
-    findNextChange(midiSongData: MIDISongData, afterMs: number): {
-        track: number;
-        ms: number;
-        resolution: number;
-        bpm: number;
-    };
-    calcMeasureDuration(midiSongData: MIDISongData, meter: Zvoog_Metre, bpm: number, part: number, startMs: number): number;
-    createMeasure(midiSongData: MIDISongData, fromMs: number, barIdx: number): ImportMeasure;
-    createTimeLine(midiSongData: MIDISongData): Zvoog_SongMeasure[];
-    convertProject(title: string, comment: string): Zvoog_Project;
-    trimProject(project: Zvoog_Project): void;
-    allShiftForwad(project: Zvoog_Project, shiftSize: Zvoog_Metre): void;
-    limitShort(project: Zvoog_Project): void;
-    reShiftSequencer(project: Zvoog_Project): void;
-    reShiftDrums(project: Zvoog_Project): void;
-    cutShift(project: Zvoog_Project): void;
-    shiftForwar32(project: Zvoog_Project): void;
-    drumForwar32(project: Zvoog_Project): void;
-    shiftBackwar(part: number, project: Zvoog_Project): void;
-    drumBackwar(part: number, project: Zvoog_Project): void;
-    isBarEmpty(barIdx: number, project: Zvoog_Project): boolean;
-    addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string, tempo: number): void;
-    collectDrums(midiTrack: MIDISongTrack): number[];
-    numratio(nn: number): number;
-    createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack;
-    createProjectDrums(volume: number, top: number, drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack;
-}
-declare function round1000(nn: number): number;
-declare function findMeasureSkipByTime(time: number, measures: Zvoog_SongMeasure[]): null | {
-    idx: number;
-    skip: Zvoog_Metre;
-};
-declare function newMIDIparser2(arrayBuffer: ArrayBuffer): MidiParser;

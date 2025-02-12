@@ -29,5 +29,8 @@
         "../../mzxbxapi/musicenginetypes.ts"
 		,"../../mzxbxapi/musicenginedeclarations.ts"
         ,"midiimport.ts"
+		,"midinames.ts"
+		,"miditypes.ts"
+		,"midiplugin.ts"
 	]
 }
