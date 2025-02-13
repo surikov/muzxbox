@@ -1075,13 +1075,70 @@ class MidiParser {
 		project.filters.push(filterEcho);
 		project.filters.push(filterCompression);
 
+		for (let mm = project.timeline.length - 2; mm >= 0; mm--) {
+			for (let ff = 0; ff < project.filters.length; ff++) {
+				if (!(project.filters[ff].automation[mm])) {
+					project.filters[ff].automation[mm] = { changes: [] };
+				}
+			}
+			for (let cc = 0; cc < project.comments.length; cc++) {
+				if (!(project.comments[mm])) {
+					project.comments[mm] = { points: [] };
+				}
+			}
+		}
+
 		console.log('midiParser', this);
 		console.log('midiSongData', midiSongData);
 		console.log('project', project);
-		this.trimProject(project);
-		this.calculateShiftDrum(project);
+		//console.log('project', midiSongData.changes);
+		let needSlice = (midiSongData.meters.length < 2)
+			&& (midiSongData.changes.length < 3)
+			&& (project.timeline[0].metre.count / project.timeline[0].metre.part == 1)
+			;
+		//needSlice=false;
+		this.trimProject(project, needSlice);
+		/*if (midiSongData.meters.length < 2) {
+			let mxSh = 0;
+			let mxIdx = 0;
+			for (let ii = 0; ii < 32; ii++) {
+				let sh = this.calculateShift32(project, ii);
+				if (sh > mxSh) {
+					mxSh = sh;
+					mxIdx = ii;
+				}
+			}
+
+			if (mxIdx) {
+				console.log('shift', '' + (32-mxIdx) + '/32');
+				this.shiftForwar32(project, 32-mxIdx)
+				//this.drumForwar32(project, 32-mxIdx)
+			}
+		}*/
 		return project;
 	}
+	calculateShift32(project: Zvoog_Project, count32: number): Zvoog_Metre {
+		let ticker: Zvoog_MetreMathType = MMUtil().set({ count: count32, part: 32 });
+		let duration: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 32 });
+		for (let mm = 0; mm < project.timeline.length; mm++) {
+			duration = duration.plus(project.timeline[mm].metre);
+		}
+		//console.log('calculateShift32',count32,duration);
+		let smm = MMUtil().set({ count: 0, part: 32 });
+		while (ticker.less(duration)) {
+			//let all = this.extractInstrumPointStamp(project, ticker);
+			let pointLen = this.extractPointStampDuration(project, ticker);
+
+			//smm = smm + all.length;
+			smm = smm.plus(pointLen).strip(32);
+			//console.log(cnt);
+			ticker = ticker.plus({ count: 1, part: 1 });
+
+		}
+
+		return smm.strip(32);
+	}
+	/*
 	avgLineRatio(project: Zvoog_Project, start1: Zvoog_Metre, start2: Zvoog_Metre, duration: Zvoog_Metre):number {
 		let point1: Zvoog_MetreMathType = MMUtil().set(start1);
 		let point2: Zvoog_MetreMathType = MMUtil().set(start2);
@@ -1141,7 +1198,60 @@ class MidiParser {
 			}
 		}
 		return slice;
+	}*/
+	extractPointStampDuration(project: Zvoog_Project, at: Zvoog_Metre): Zvoog_Metre {
+		let pointSumm: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 32 });
+		let end: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 32 });
+		for (let mm = 0; mm < project.timeline.length; mm++) {
+			let barStart = end.simplyfy();
+			end = end.plus(project.timeline[mm].metre).strip(32);
+			if (end.more(at)) {
+				let skip = MMUtil().set(at).minus(barStart);
+				//console.log(at,mm,skip);
+				for (let pp = 0; pp < project.tracks.length; pp++) {
+					let track = project.tracks[pp];
+					let trackBar = track.measures[mm];
+					//console.log(bar);
+					for (let ss = 0; ss < trackBar.chords.length; ss++) {
+						let chord = trackBar.chords[ss];
+
+						if (skip.equals(chord.skip)) {
+							let chordLen: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 32 });
+							for (let ss = 0; ss < chord.slides.length; ss++) {
+								chordLen = chordLen.plus(chord.slides[ss].duration).strip(32);
+							}
+							pointSumm = pointSumm.plus(chordLen).strip(32);
+							break;
+						}
+					}
+				}
+
+				for (let dd = 0; dd < project.percussions.length; dd++) {
+					let drum = project.percussions[dd];
+					let drumBar = drum.measures[mm];
+					let drumDuration = { count: 1, part: 16 };
+					//console.log(drum);
+					if (drum.sampler.data == '35' || drum.sampler.data == '36') {//kick
+						drumDuration = { count: 3, part: 16 };
+					} else {
+						if (drum.sampler.data == '38' || drum.sampler.data == '40') {//snare
+							drumDuration = { count: 2, part: 16 };
+						}
+					}
+					for (let ss = 0; ss < drumBar.skips.length; ss++) {
+						if (skip.equals(drumBar.skips[ss])) {
+							pointSumm = pointSumm.plus(drumDuration).strip(32);
+							break;
+						}
+					}
+				}
+				break;
+			}
+		}
+		//console.log('pointSumm',pointSumm);
+		return pointSumm;
 	}
+	/*
 	calculateShiftDrum(project: Zvoog_Project) {
 		let duration: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 32 });
 		for (let mm = 0; mm < project.timeline.length; mm++) {
@@ -1155,7 +1265,8 @@ class MidiParser {
 		//this.extractDrumPointStamp(project, { count: 2, part: 1 });
 		//this.extractDrumPointStamp(project, { count: 3, part: 1 });
 	}
-	trimProject(project: Zvoog_Project) {
+	*/
+	trimProject(project: Zvoog_Project, reslice: boolean) {
 		for (let ii = 0; ii < project.tracks.length; ii++) {
 			project.tracks[ii].performer.iconPosition.x = 10 + ii * 9;
 			project.tracks[ii].performer.iconPosition.y = 0 + ii * 4;
@@ -1181,7 +1292,7 @@ class MidiParser {
 				let measure = track.measures[mm];
 				for (let cc = 0; cc < measure.chords.length; cc++) {
 					let chord = measure.chords[cc];
-					chord.skip = MMUtil().set(chord.skip).strip(1024);
+					chord.skip = MMUtil().set(chord.skip).strip(32);
 				}
 			}
 		}
@@ -1190,7 +1301,7 @@ class MidiParser {
 			for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
 				let measure = sampleTrack.measures[mm];
 				for (let mp = 0; mp < measure.skips.length; mp++) {
-					let newSkip = MMUtil().set(measure.skips[mp]).strip(1024);
+					let newSkip = MMUtil().set(measure.skips[mp]).strip(32);
 					measure.skips[mp].count = newSkip.count;
 					measure.skips[mp].part = newSkip.part;
 				}
@@ -1200,7 +1311,70 @@ class MidiParser {
 		//this.reShiftSequencer(project);
 		//this.reShiftDrums(project);
 		this.limitShort(project)
-		this.cutShift(project);
+		if (reslice) {
+			/*
+			let mxLen = MMUtil().set({ count: 0, part: 32 });
+			let mxIdx = 0;
+			for (let ii = 0; ii < 32; ii++) {
+				let sh = this.calculateShift32(project, ii);
+
+				if (mxLen.less(sh)) {
+					mxLen.set(sh);
+					mxIdx = ii;
+				}
+				console.log((32 - ii), sh, mxLen);
+			}
+*/
+			let durations: { len: number, shft: number }[] = [];
+			for (let ii = 0; ii < 32; ii++) {
+				let len: Zvoog_Metre = this.calculateShift32(project, ii);
+				let nn = 32 - ii;
+				if (ii == 0) {
+					nn = 0;
+				}
+				durations.push({ len: Math.round(len.count / len.part), shft: nn });
+			}
+			durations.sort((a, b) => {
+				/*if (MMUtil().set(a.len).less(b.len)) {
+					return 1;
+				} else {
+					if (MMUtil().set(a.len).equals(b.len)) {
+						return 0;
+					} else {
+						return -1;
+					}
+				}*/
+				return b.len - a.len;
+			});
+			console.log(durations);
+			let top: { len: number, shft: number }[] = [durations[0]];
+			for (let ii = 1; ii < durations.length; ii++) {
+				if (durations[ii].len * 2.2 > durations[0].len) {
+					top.push(durations[ii]);
+				}
+			}
+			top.sort((a, b) => { return a.shft - b.shft });
+			console.log(top);
+			let shsize = top[0].shft;
+			if (shsize) {
+				console.log('shift', '' + shsize + '/32');
+				this.shiftForwar32(project, shsize)
+			}
+			/*
+			let mainSh = durations[0].shft;
+			if (mainSh > durations[1].shft) mainSh = durations[1].shft;
+			if (mainSh > durations[2].shft) mainSh = durations[2].shft;
+			if (mainSh > 0) {
+				console.log('shift', '' + mainSh + '/32');
+				this.shiftForwar32(project, mainSh)
+			}*/
+			/*if (mxIdx) {
+				console.log('shift', '' + (32 - mxIdx) + '/32');
+				this.shiftForwar32(project, 32 - mxIdx)
+				//this.drumForwar32(project, 32-mxIdx)
+			}*/
+		}
+		//this.cutShift(project);
 		//this.allShiftForwad(project, { count: 5, part: 8 });
 
 		//---------------
@@ -1216,71 +1390,71 @@ class MidiParser {
 
 
 	}
-/*
-	allShiftForwad(project: Zvoog_Project, shiftSize: Zvoog_Metre) {
-		//console.log('allShiftForwad', shiftSize);
-		for (let tt = 0; tt < project.tracks.length; tt++) {
-			let track = project.tracks[tt];
-			for (let mm = track.measures.length; mm > 1; mm--) {
-				//console.log(mm);
-				let fromDuration = project.timeline[mm - 2].metre;
-				let fromMeasure = track.measures[mm - 2];
-				let toMeasure = track.measures[mm - 1];
-				for (let cc = 0; cc < fromMeasure.chords.length; cc++) {
-					let chord = fromMeasure.chords[cc];
-					let skip: Zvoog_MetreMathType = MMUtil().set(chord.skip).plus(shiftSize);
-					//console.log(chord.skip, skip.simplyfy());
-					if (skip.less(fromDuration)) {
-						chord.skip = skip.simplyfy();
-					} else {
-						chord.skip = skip.minus(fromDuration).simplyfy();
-						toMeasure.chords.push(chord);
-						fromMeasure.chords.splice(cc, 1);
-						cc--;
+	/*
+		allShiftForwad(project: Zvoog_Project, shiftSize: Zvoog_Metre) {
+			//console.log('allShiftForwad', shiftSize);
+			for (let tt = 0; tt < project.tracks.length; tt++) {
+				let track = project.tracks[tt];
+				for (let mm = track.measures.length; mm > 1; mm--) {
+					//console.log(mm);
+					let fromDuration = project.timeline[mm - 2].metre;
+					let fromMeasure = track.measures[mm - 2];
+					let toMeasure = track.measures[mm - 1];
+					for (let cc = 0; cc < fromMeasure.chords.length; cc++) {
+						let chord = fromMeasure.chords[cc];
+						let skip: Zvoog_MetreMathType = MMUtil().set(chord.skip).plus(shiftSize);
+						//console.log(chord.skip, skip.simplyfy());
+						if (skip.less(fromDuration)) {
+							chord.skip = skip.simplyfy();
+						} else {
+							chord.skip = skip.minus(fromDuration).simplyfy();
+							toMeasure.chords.push(chord);
+							fromMeasure.chords.splice(cc, 1);
+							cc--;
+						}
 					}
 				}
 			}
-		}
-		for (let tt = 0; tt < project.percussions.length; tt++) {
-			let drum = project.percussions[tt];
-			for (let mm = drum.measures.length; mm > 1; mm--) {
+			for (let tt = 0; tt < project.percussions.length; tt++) {
+				let drum = project.percussions[tt];
+				for (let mm = drum.measures.length; mm > 1; mm--) {
+					let fromDuration = project.timeline[mm - 2].metre;
+					let fromMeasure = drum.measures[mm - 2];
+					let toMeasure = drum.measures[mm - 1];
+					for (let cc = 0; cc < fromMeasure.skips.length; cc++) {
+						//let drumskip = fromMeasure.skips[cc];
+						let skip: Zvoog_MetreMathType = MMUtil().set(fromMeasure.skips[cc]).plus(shiftSize);
+						//console.log(chord.skip, skip.simplyfy());
+						if (skip.less(fromDuration)) {
+							fromMeasure.skips[cc] = skip.simplyfy();
+						} else {
+							fromMeasure.skips[cc] = skip.minus(fromDuration).simplyfy();
+							toMeasure.skips.push(fromMeasure.skips[cc]);
+							fromMeasure.skips.splice(cc, 1);
+							cc--;
+						}
+					}
+				}
+			}
+			for (let mm = project.comments.length; mm > 1; mm--) {
 				let fromDuration = project.timeline[mm - 2].metre;
-				let fromMeasure = drum.measures[mm - 2];
-				let toMeasure = drum.measures[mm - 1];
-				for (let cc = 0; cc < fromMeasure.skips.length; cc++) {
+				let fromMeasure = project.comments[mm - 2];
+				let toMeasure = project.comments[mm - 1];
+				for (let cc = 0; cc < fromMeasure.points.length; cc++) {
 					//let drumskip = fromMeasure.skips[cc];
-					let skip: Zvoog_MetreMathType = MMUtil().set(fromMeasure.skips[cc]).plus(shiftSize);
+					let skip: Zvoog_MetreMathType = MMUtil().set(fromMeasure.points[cc].skip).plus(shiftSize);
 					//console.log(chord.skip, skip.simplyfy());
 					if (skip.less(fromDuration)) {
-						fromMeasure.skips[cc] = skip.simplyfy();
+						fromMeasure.points[cc].skip = skip.simplyfy();
 					} else {
-						fromMeasure.skips[cc] = skip.minus(fromDuration).simplyfy();
-						toMeasure.skips.push(fromMeasure.skips[cc]);
-						fromMeasure.skips.splice(cc, 1);
+						fromMeasure.points[cc].skip = skip.minus(fromDuration).simplyfy();
+						toMeasure.points.push(fromMeasure.points[cc]);
+						fromMeasure.points.splice(cc, 1);
 						cc--;
 					}
 				}
 			}
-		}
-		for (let mm = project.comments.length; mm > 1; mm--) {
-			let fromDuration = project.timeline[mm - 2].metre;
-			let fromMeasure = project.comments[mm - 2];
-			let toMeasure = project.comments[mm - 1];
-			for (let cc = 0; cc < fromMeasure.points.length; cc++) {
-				//let drumskip = fromMeasure.skips[cc];
-				let skip: Zvoog_MetreMathType = MMUtil().set(fromMeasure.points[cc].skip).plus(shiftSize);
-				//console.log(chord.skip, skip.simplyfy());
-				if (skip.less(fromDuration)) {
-					fromMeasure.points[cc].skip = skip.simplyfy();
-				} else {
-					fromMeasure.points[cc].skip = skip.minus(fromDuration).simplyfy();
-					toMeasure.points.push(fromMeasure.points[cc]);
-					fromMeasure.points.splice(cc, 1);
-					cc--;
-				}
-			}
-		}
-	}*/
+		}*/
 	limitShort(project: Zvoog_Project) {
 		let note16 = MMUtil().set({ count: 1, part: 16 });
 		for (let tt = 0; tt < project.tracks.length; tt++) {
@@ -1300,6 +1474,7 @@ class MidiParser {
 			}
 		}
 	}
+	/*
 	reShiftSequencer(project: Zvoog_Project) {
 		let plus32 = 0;
 		let cOther = 0;
@@ -1367,7 +1542,8 @@ class MidiParser {
 				this.drumForwar32(project);
 			}
 		}
-	}
+	}*/
+	/*
 	cutShift(project: Zvoog_Project) {
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let track = project.tracks[tt];
@@ -1439,58 +1615,115 @@ class MidiParser {
 				}
 			}
 		}
-	}
-	shiftForwar32(project: Zvoog_Project) {
-		for (let tt = 0; tt < project.tracks.length; tt++) {
-			let track = project.tracks[tt];
-			for (let mm = 0; mm < track.measures.length; mm++) {
-				let measure = track.measures[mm];
-				for (let cc = 0; cc < measure.chords.length; cc++) {
-					let chord = measure.chords[cc];
-					chord.skip = MMUtil().set(chord.skip).plus({ count: 1, part: 32 }).simplyfy();
+	}*/
+	shiftForwar32(project: Zvoog_Project, amount: number) {
+		for (let mm = project.timeline.length - 2; mm >= 0; mm--) {
+			let measureDuration = MMUtil().set(project.timeline[mm].metre);
+			for (let tt = 0; tt < project.tracks.length; tt++) {
+				let track = project.tracks[tt];
+				let trackMeasure = track.measures[mm];
+				let trackNextMeasure = track.measures[mm + 1];
+				for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
+					let chord = trackMeasure.chords[cc];
+					let newSkip = MMUtil().set(chord.skip).plus({ count: amount, part: 32 });
+					if (measureDuration.more(newSkip)) {
+						chord.skip = newSkip.simplyfy();
+					} else {
+						trackMeasure.chords.splice(cc, 1);
+						cc--;
+						trackNextMeasure.chords.push(chord);
+						chord.skip = newSkip.minus(measureDuration).simplyfy();
+					}
+				}
+			}
+			for (let ss = 0; ss < project.percussions.length; ss++) {
+				let sampleTrack = project.percussions[ss];
+				let sampleMeasure = sampleTrack.measures[mm];
+				let sampleNextMeasure = sampleTrack.measures[mm + 1];
+				for (let mp = 0; mp < sampleMeasure.skips.length; mp++) {
+					let newSkip = MMUtil().set(sampleMeasure.skips[mp]).plus({ count: amount, part: 32 });
+					if (measureDuration.more(newSkip)) {
+						sampleMeasure.skips[mp] = newSkip.simplyfy();
+					} else {
+						sampleMeasure.skips.splice(mp, 1);
+						mp--;
+						sampleNextMeasure.skips.push(newSkip.minus(measureDuration).simplyfy());
+					}
+				}
+			}
+			for (let cc = 0; cc < project.comments.length; cc++) {
+				let comMeasure = project.comments[mm];
+				let comNextMeasure = project.comments[mm + 1];
+				for (let pp = 0; pp < comMeasure.points.length; pp++) {
+					let point = comMeasure.points[pp];
+					let newSkip = MMUtil().set(point.skip).plus({ count: amount, part: 32 });
+					if (measureDuration.more(newSkip)) {
+						point.skip = newSkip.simplyfy();
+					} else {
+						comMeasure.points.splice(pp, 1);
+						pp--;
+						comNextMeasure.points.push(point);
+						point.skip = newSkip.minus(measureDuration).simplyfy();
+					}
+				}
+			}
+			for (let ff = 0; ff < project.filters.length; ff++) {
+				let autoMeasure = project.filters[ff].automation[mm];
+				let autoNextMeasure = project.filters[ff].automation[mm + 1];
+				for (let cc = 0; cc < autoMeasure.changes.length; cc++) {
+					let change = autoMeasure.changes[cc];
+					let newSkip = MMUtil().set(change.skip).plus({ count: amount, part: 32 });
+					if (measureDuration.more(newSkip)) {
+						change.skip = newSkip.simplyfy();
+					} else {
+						autoMeasure.changes.splice(cc, 1);
+						cc--;
+						autoNextMeasure.changes.push(change);
+						change.skip = newSkip.minus(measureDuration).simplyfy();
+					}
 				}
 			}
 		}
 	}
-	drumForwar32(project: Zvoog_Project) {
+	/*drumForwar32(project: Zvoog_Project, amount: number) {
 		for (let ss = 0; ss < project.percussions.length; ss++) {
 			let sampleTrack = project.percussions[ss];
 			for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
 				let measure = sampleTrack.measures[mm];
 				for (let mp = 0; mp < measure.skips.length; mp++) {
-					let newSkip = MMUtil().set(measure.skips[mp]).plus({ count: 1, part: 32 }).simplyfy();
+					let newSkip = MMUtil().set(measure.skips[mp]).plus({ count: amount, part: 32 }).simplyfy();
 					measure.skips[mp].count = newSkip.count;
 					measure.skips[mp].part = newSkip.part;
 				}
 			}
 		}
-	}
-
-	shiftBackwar(part: number, project: Zvoog_Project) {
-		for (let tt = 0; tt < project.tracks.length; tt++) {
-			let track = project.tracks[tt];
-			for (let mm = 0; mm < track.measures.length; mm++) {
-				let measure = track.measures[mm];
-				for (let cc = 0; cc < measure.chords.length; cc++) {
-					let chord = measure.chords[cc];
-					chord.skip = MMUtil().set(chord.skip).minus({ count: 1, part: part }).simplyfy();
+	}*/
+	/*
+		shiftBackwar(part: number, project: Zvoog_Project) {
+			for (let tt = 0; tt < project.tracks.length; tt++) {
+				let track = project.tracks[tt];
+				for (let mm = 0; mm < track.measures.length; mm++) {
+					let measure = track.measures[mm];
+					for (let cc = 0; cc < measure.chords.length; cc++) {
+						let chord = measure.chords[cc];
+						chord.skip = MMUtil().set(chord.skip).minus({ count: 1, part: part }).simplyfy();
+					}
 				}
 			}
 		}
-	}
-	drumBackwar(part: number, project: Zvoog_Project) {
-		for (let ss = 0; ss < project.percussions.length; ss++) {
-			let sampleTrack = project.percussions[ss];
-			for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
-				let measure = sampleTrack.measures[mm];
-				for (let mp = 0; mp < measure.skips.length; mp++) {
-					let newSkip = MMUtil().set(measure.skips[mp]).minus({ count: 1, part: part }).simplyfy();
-					measure.skips[mp].count = newSkip.count;
-					measure.skips[mp].part = newSkip.part;
+		drumBackwar(part: number, project: Zvoog_Project) {
+			for (let ss = 0; ss < project.percussions.length; ss++) {
+				let sampleTrack = project.percussions[ss];
+				for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
+					let measure = sampleTrack.measures[mm];
+					for (let mp = 0; mp < measure.skips.length; mp++) {
+						let newSkip = MMUtil().set(measure.skips[mp]).minus({ count: 1, part: part }).simplyfy();
+						measure.skips[mp].count = newSkip.count;
+						measure.skips[mp].part = newSkip.part;
+					}
 				}
 			}
-		}
-	}
+		}*/
 	isBarEmpty(barIdx: number, project: Zvoog_Project): boolean {
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let track = project.tracks[tt];

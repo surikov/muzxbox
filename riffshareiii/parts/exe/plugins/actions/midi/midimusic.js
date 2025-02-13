@@ -929,62 +929,79 @@ class MidiParser {
         };
         project.filters.push(filterEcho);
         project.filters.push(filterCompression);
+        for (let mm = project.timeline.length - 2; mm >= 0; mm--) {
+            for (let ff = 0; ff < project.filters.length; ff++) {
+                if (!(project.filters[ff].automation[mm])) {
+                    project.filters[ff].automation[mm] = { changes: [] };
+                }
+            }
+            for (let cc = 0; cc < project.comments.length; cc++) {
+                if (!(project.comments[mm])) {
+                    project.comments[mm] = { points: [] };
+                }
+            }
+        }
         console.log('midiParser', this);
         console.log('midiSongData', midiSongData);
         console.log('project', project);
-        this.trimProject(project);
-        this.calculateShiftDrum(project);
+        let needSlice = (midiSongData.meters.length < 2)
+            && (midiSongData.changes.length < 3)
+            && (project.timeline[0].metre.count / project.timeline[0].metre.part == 1);
+        this.trimProject(project, needSlice);
         return project;
     }
-    avgLineRatio(project, start1, start2, duration) {
-        let point1 = MMUtil().set(start1);
-        let point2 = MMUtil().set(start2);
-        let ticker = MMUtil().set({ count: 0, part: 32 });
-        let sm = 0;
-        let cnt = 0;
+    calculateShift32(project, count32) {
+        let ticker = MMUtil().set({ count: count32, part: 32 });
+        let duration = MMUtil().set({ count: 0, part: 32 });
+        for (let mm = 0; mm < project.timeline.length; mm++) {
+            duration = duration.plus(project.timeline[mm].metre);
+        }
+        let smm = MMUtil().set({ count: 0, part: 32 });
         while (ticker.less(duration)) {
-            let s1 = this.extractDrumPointStamp(project, point1);
-            let s2 = this.extractDrumPointStamp(project, point2);
-            sm = sm + this.diffPointRatio(s1, s2);
-            cnt++;
-            point1 = point1.plus({ count: 1, part: 32 });
-            point2 = point2.plus({ count: 1, part: 32 });
-            ticker = ticker.plus({ count: 1, part: 32 });
+            let pointLen = this.extractPointStampDuration(project, ticker);
+            smm = smm.plus(pointLen).strip(32);
+            ticker = ticker.plus({ count: 1, part: 1 });
         }
-        return sm / cnt;
+        return smm.strip(32);
     }
-    diffPointRatio(a, b) {
-        if (a.length == 0 && b.length == 0) {
-            return 0;
-        }
-        let wrong = 0;
-        for (let ii = 0; ii < a.length; ii++) {
-            if (b.indexOf(a[ii]) < 0) {
-                wrong++;
-            }
-        }
-        for (let ii = 0; ii < b.length; ii++) {
-            if (a.indexOf(b[ii]) < 0) {
-                wrong++;
-            }
-        }
-        let ratio = wrong / (a.length + b.length);
-        return ratio;
-    }
-    extractDrumPointStamp(project, at) {
-        let slice = [];
+    extractPointStampDuration(project, at) {
+        let pointSumm = MMUtil().set({ count: 0, part: 32 });
         let end = MMUtil().set({ count: 0, part: 32 });
         for (let mm = 0; mm < project.timeline.length; mm++) {
             let barStart = end.simplyfy();
-            end = end.plus(project.timeline[mm].metre);
+            end = end.plus(project.timeline[mm].metre).strip(32);
             if (end.more(at)) {
                 let skip = MMUtil().set(at).minus(barStart);
-                for (let pp = 0; pp < project.percussions.length; pp++) {
-                    let drum = project.percussions[pp];
-                    let bar = drum.measures[mm];
-                    for (let ss = 0; ss < bar.skips.length; ss++) {
-                        if (skip.equals(bar.skips[ss])) {
-                            slice.push(pp);
+                for (let pp = 0; pp < project.tracks.length; pp++) {
+                    let track = project.tracks[pp];
+                    let trackBar = track.measures[mm];
+                    for (let ss = 0; ss < trackBar.chords.length; ss++) {
+                        let chord = trackBar.chords[ss];
+                        if (skip.equals(chord.skip)) {
+                            let chordLen = MMUtil().set({ count: 0, part: 32 });
+                            for (let ss = 0; ss < chord.slides.length; ss++) {
+                                chordLen = chordLen.plus(chord.slides[ss].duration).strip(32);
+                            }
+                            pointSumm = pointSumm.plus(chordLen).strip(32);
+                            break;
+                        }
+                    }
+                }
+                for (let dd = 0; dd < project.percussions.length; dd++) {
+                    let drum = project.percussions[dd];
+                    let drumBar = drum.measures[mm];
+                    let drumDuration = { count: 1, part: 16 };
+                    if (drum.sampler.data == '35' || drum.sampler.data == '36') {
+                        drumDuration = { count: 3, part: 16 };
+                    }
+                    else {
+                        if (drum.sampler.data == '38' || drum.sampler.data == '40') {
+                            drumDuration = { count: 2, part: 16 };
+                        }
+                    }
+                    for (let ss = 0; ss < drumBar.skips.length; ss++) {
+                        if (skip.equals(drumBar.skips[ss])) {
+                            pointSumm = pointSumm.plus(drumDuration).strip(32);
                             break;
                         }
                     }
@@ -992,18 +1009,9 @@ class MidiParser {
                 break;
             }
         }
-        return slice;
+        return pointSumm;
     }
-    calculateShiftDrum(project) {
-        let duration = MMUtil().set({ count: 0, part: 32 });
-        for (let mm = 0; mm < project.timeline.length; mm++) {
-            duration = duration.plus(project.timeline[mm].metre);
-        }
-        console.log('calculateShiftDrum', duration);
-        console.log(this.avgLineRatio(project, { count: 4, part: 1 }, { count: 5, part: 1 }, { count: 1, part: 4 }));
-        console.log(this.avgLineRatio(project, { count: 11, part: 1 }, { count: 12, part: 1 }, { count: 1, part: 4 }));
-    }
-    trimProject(project) {
+    trimProject(project, reslice) {
         for (let ii = 0; ii < project.tracks.length; ii++) {
             project.tracks[ii].performer.iconPosition.x = 10 + ii * 9;
             project.tracks[ii].performer.iconPosition.y = 0 + ii * 4;
@@ -1026,7 +1034,7 @@ class MidiParser {
                 let measure = track.measures[mm];
                 for (let cc = 0; cc < measure.chords.length; cc++) {
                     let chord = measure.chords[cc];
-                    chord.skip = MMUtil().set(chord.skip).strip(1024);
+                    chord.skip = MMUtil().set(chord.skip).strip(32);
                 }
             }
         }
@@ -1035,14 +1043,41 @@ class MidiParser {
             for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
                 let measure = sampleTrack.measures[mm];
                 for (let mp = 0; mp < measure.skips.length; mp++) {
-                    let newSkip = MMUtil().set(measure.skips[mp]).strip(1024);
+                    let newSkip = MMUtil().set(measure.skips[mp]).strip(32);
                     measure.skips[mp].count = newSkip.count;
                     measure.skips[mp].part = newSkip.part;
                 }
             }
         }
         this.limitShort(project);
-        this.cutShift(project);
+        if (reslice) {
+            let durations = [];
+            for (let ii = 0; ii < 32; ii++) {
+                let len = this.calculateShift32(project, ii);
+                let nn = 32 - ii;
+                if (ii == 0) {
+                    nn = 0;
+                }
+                durations.push({ len: Math.round(len.count / len.part), shft: nn });
+            }
+            durations.sort((a, b) => {
+                return b.len - a.len;
+            });
+            console.log(durations);
+            let top = [durations[0]];
+            for (let ii = 1; ii < durations.length; ii++) {
+                if (durations[ii].len * 2.2 > durations[0].len) {
+                    top.push(durations[ii]);
+                }
+            }
+            top.sort((a, b) => { return a.shft - b.shft; });
+            console.log(top);
+            let shsize = top[0].shft;
+            if (shsize) {
+                console.log('shift', '' + shsize + '/32');
+                this.shiftForwar32(project, shsize);
+            }
+        }
         let len = project.timeline.length;
         for (let ii = len - 1; ii > 0; ii--) {
             if (this.isBarEmpty(ii, project)) {
@@ -1071,206 +1106,75 @@ class MidiParser {
             }
         }
     }
-    reShiftSequencer(project) {
-        let plus32 = 0;
-        let cOther = 0;
-        let c0 = 0;
-        let minus32 = 0;
-        for (let tt = 0; tt < project.tracks.length; tt++) {
-            let track = project.tracks[tt];
-            for (let mm = 0; mm < track.measures.length; mm++) {
-                let measure = track.measures[mm];
-                let meme = MMUtil().set(project.timeline[mm].metre);
-                for (let cc = 0; cc < measure.chords.length; cc++) {
-                    let chord = measure.chords[cc];
-                    if (chord.skip.count == 1 && chord.skip.part == 32) {
-                        plus32++;
+    shiftForwar32(project, amount) {
+        for (let mm = project.timeline.length - 2; mm >= 0; mm--) {
+            let measureDuration = MMUtil().set(project.timeline[mm].metre);
+            for (let tt = 0; tt < project.tracks.length; tt++) {
+                let track = project.tracks[tt];
+                let trackMeasure = track.measures[mm];
+                let trackNextMeasure = track.measures[mm + 1];
+                for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
+                    let chord = trackMeasure.chords[cc];
+                    let newSkip = MMUtil().set(chord.skip).plus({ count: amount, part: 32 });
+                    if (measureDuration.more(newSkip)) {
+                        chord.skip = newSkip.simplyfy();
                     }
                     else {
-                        if (chord.skip.count == 0) {
-                            c0++;
-                        }
-                        else {
-                            if (meme.minus({ count: 1, part: 32 }).equals(chord.skip)) {
-                                minus32++;
-                            }
-                            else {
-                                cOther++;
-                            }
-                        }
+                        trackMeasure.chords.splice(cc, 1);
+                        cc--;
+                        trackNextMeasure.chords.push(chord);
+                        chord.skip = newSkip.minus(measureDuration).simplyfy();
                     }
                 }
             }
-        }
-        if (plus32 && c0 / plus32 < 0.5) {
-            this.shiftBackwar(32, project);
-        }
-        else {
-            if (minus32 && c0 / minus32 < 0.5) {
-                this.shiftForwar32(project);
-            }
-        }
-    }
-    reShiftDrums(project) {
-        let plus32 = 0;
-        let cOther = 0;
-        let c0 = 0;
-        let minus32 = 0;
-        for (let tt = 0; tt < project.percussions.length; tt++) {
-            let track = project.percussions[tt];
-            for (let mm = 0; mm < track.measures.length; mm++) {
-                let measure = track.measures[mm];
-                let meme = MMUtil().set(project.timeline[mm].metre);
-                for (let cc = 0; cc < measure.skips.length; cc++) {
-                    let chord = measure.skips[cc];
-                    if (chord.count == 1 && chord.part == 32) {
-                        plus32++;
+            for (let ss = 0; ss < project.percussions.length; ss++) {
+                let sampleTrack = project.percussions[ss];
+                let sampleMeasure = sampleTrack.measures[mm];
+                let sampleNextMeasure = sampleTrack.measures[mm + 1];
+                for (let mp = 0; mp < sampleMeasure.skips.length; mp++) {
+                    let newSkip = MMUtil().set(sampleMeasure.skips[mp]).plus({ count: amount, part: 32 });
+                    if (measureDuration.more(newSkip)) {
+                        sampleMeasure.skips[mp] = newSkip.simplyfy();
                     }
                     else {
-                        if (chord.count == 0) {
-                            c0++;
-                        }
-                        else {
-                            if (meme.minus({ count: 1, part: 32 }).equals(chord)) {
-                                minus32++;
-                            }
-                            else {
-                                cOther++;
-                            }
-                        }
+                        sampleMeasure.skips.splice(mp, 1);
+                        mp--;
+                        sampleNextMeasure.skips.push(newSkip.minus(measureDuration).simplyfy());
                     }
                 }
             }
-        }
-        if (plus32 && c0 / plus32 < 0.5) {
-            this.drumBackwar(32, project);
-        }
-        else {
-            if (minus32 && c0 / minus32 < 0.5) {
-                this.drumForwar32(project);
-            }
-        }
-    }
-    cutShift(project) {
-        for (let tt = 0; tt < project.tracks.length; tt++) {
-            let track = project.tracks[tt];
-            for (let mm = 0; mm < track.measures.length; mm++) {
-                let measure = track.measures[mm];
-                for (let cc = 0; cc < measure.chords.length; cc++) {
-                    let m16 = MMUtil().set(measure.chords[cc].skip).strip(32);
-                    measure.chords[cc].skip.count = m16.count;
-                    measure.chords[cc].skip.part = m16.part;
-                    let chord = measure.chords[cc];
-                    if (chord.skip.count < 0) {
-                        if (mm > 0) {
-                            let premetre = MMUtil().set(project.timeline[mm - 1].metre);
-                            chord.skip = premetre.plus(chord.skip);
-                            track.measures[mm - 1].chords.push(chord);
-                            track.measures[mm].chords.splice(cc, 1);
-                            cc--;
-                        }
-                        else {
-                            chord.skip.count = 0;
-                        }
+            for (let cc = 0; cc < project.comments.length; cc++) {
+                let comMeasure = project.comments[mm];
+                let comNextMeasure = project.comments[mm + 1];
+                for (let pp = 0; pp < comMeasure.points.length; pp++) {
+                    let point = comMeasure.points[pp];
+                    let newSkip = MMUtil().set(point.skip).plus({ count: amount, part: 32 });
+                    if (measureDuration.more(newSkip)) {
+                        point.skip = newSkip.simplyfy();
                     }
                     else {
-                        let metre = MMUtil().set(project.timeline[mm].metre);
-                        if (metre.less(chord.skip)) {
-                            if (mm < project.timeline.length - 1) {
-                                let metre = MMUtil().set(project.timeline[mm + 1].metre);
-                                chord.skip = MMUtil().set(chord.skip).minus(metre);
-                                track.measures[mm + 1].chords.push(chord);
-                                track.measures[mm].chords.splice(cc, 1);
-                                cc--;
-                            }
-                        }
+                        comMeasure.points.splice(pp, 1);
+                        pp--;
+                        comNextMeasure.points.push(point);
+                        point.skip = newSkip.minus(measureDuration).simplyfy();
                     }
                 }
             }
-        }
-        for (let ss = 0; ss < project.percussions.length; ss++) {
-            let sampleTrack = project.percussions[ss];
-            for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
-                let measure = sampleTrack.measures[mm];
-                for (let mp = 0; mp < measure.skips.length; mp++) {
-                    let m16 = MMUtil().set(measure.skips[mp]).strip(32);
-                    measure.skips[mp].count = m16.count;
-                    measure.skips[mp].part = m16.part;
-                    let skip = measure.skips[mp];
-                    if (skip.count < 0) {
-                        if (mm > 0) {
-                            let premetre = MMUtil().set(project.timeline[mm - 1].metre);
-                            let newskip = premetre.plus(skip);
-                            sampleTrack.measures[mm - 1].skips.push(newskip);
-                            measure.skips.splice(mp, 1);
-                            mp--;
-                        }
-                        else {
-                            skip.count = 0;
-                        }
+            for (let ff = 0; ff < project.filters.length; ff++) {
+                let autoMeasure = project.filters[ff].automation[mm];
+                let autoNextMeasure = project.filters[ff].automation[mm + 1];
+                for (let cc = 0; cc < autoMeasure.changes.length; cc++) {
+                    let change = autoMeasure.changes[cc];
+                    let newSkip = MMUtil().set(change.skip).plus({ count: amount, part: 32 });
+                    if (measureDuration.more(newSkip)) {
+                        change.skip = newSkip.simplyfy();
                     }
                     else {
-                        let metre = MMUtil().set(project.timeline[mm].metre);
-                        if (metre.less(skip)) {
-                            if (mm < project.timeline.length - 1) {
-                                let metre = MMUtil().set(project.timeline[mm + 1].metre);
-                                let newskip = MMUtil().set(skip).minus(metre);
-                                sampleTrack.measures[mm + 1].skips.push(newskip);
-                                measure.skips.splice(mp, 1);
-                                mp--;
-                            }
-                        }
+                        autoMeasure.changes.splice(cc, 1);
+                        cc--;
+                        autoNextMeasure.changes.push(change);
+                        change.skip = newSkip.minus(measureDuration).simplyfy();
                     }
-                }
-            }
-        }
-    }
-    shiftForwar32(project) {
-        for (let tt = 0; tt < project.tracks.length; tt++) {
-            let track = project.tracks[tt];
-            for (let mm = 0; mm < track.measures.length; mm++) {
-                let measure = track.measures[mm];
-                for (let cc = 0; cc < measure.chords.length; cc++) {
-                    let chord = measure.chords[cc];
-                    chord.skip = MMUtil().set(chord.skip).plus({ count: 1, part: 32 }).simplyfy();
-                }
-            }
-        }
-    }
-    drumForwar32(project) {
-        for (let ss = 0; ss < project.percussions.length; ss++) {
-            let sampleTrack = project.percussions[ss];
-            for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
-                let measure = sampleTrack.measures[mm];
-                for (let mp = 0; mp < measure.skips.length; mp++) {
-                    let newSkip = MMUtil().set(measure.skips[mp]).plus({ count: 1, part: 32 }).simplyfy();
-                    measure.skips[mp].count = newSkip.count;
-                    measure.skips[mp].part = newSkip.part;
-                }
-            }
-        }
-    }
-    shiftBackwar(part, project) {
-        for (let tt = 0; tt < project.tracks.length; tt++) {
-            let track = project.tracks[tt];
-            for (let mm = 0; mm < track.measures.length; mm++) {
-                let measure = track.measures[mm];
-                for (let cc = 0; cc < measure.chords.length; cc++) {
-                    let chord = measure.chords[cc];
-                    chord.skip = MMUtil().set(chord.skip).minus({ count: 1, part: part }).simplyfy();
-                }
-            }
-        }
-    }
-    drumBackwar(part, project) {
-        for (let ss = 0; ss < project.percussions.length; ss++) {
-            let sampleTrack = project.percussions[ss];
-            for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
-                let measure = sampleTrack.measures[mm];
-                for (let mp = 0; mp < measure.skips.length; mp++) {
-                    let newSkip = MMUtil().set(measure.skips[mp]).minus({ count: 1, part: part }).simplyfy();
-                    measure.skips[mp].count = newSkip.count;
-                    measure.skips[mp].part = newSkip.part;
                 }
             }
         }
