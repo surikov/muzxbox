@@ -54,7 +54,7 @@ class MIDIIImportMusicPlugin {
 				let comment: string = ', ' + file.size / 1000 + 'kb, ' + dat;
 				var arrayBuffer = progressEvent.target.result;
 				var midiParser = newMIDIparser2(arrayBuffer);
-				console.log('done midiParser', this);
+				console.log('done midiParser', midiParser);
 				//me.parsedProject = midiParser.convertProject(title, comment);
 				let cnvrtr: MIDIConverter = new MIDIConverter();
 
