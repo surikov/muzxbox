@@ -32,5 +32,7 @@
 		,"midinames.ts"
 		,"miditypes.ts"
 		,"midiplugin.ts"
+		,"midiconverter.ts"
+		,"projectr.ts"
 	]
 }

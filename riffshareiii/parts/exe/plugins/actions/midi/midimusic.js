@@ -641,724 +641,6 @@ class MidiParser {
             track.trackevents.push(e);
         }
     }
-    findOrCreateTrack(parsedtrack, trackNum, channelNum, trackChannel) {
-        for (let i = 0; i < trackChannel.length; i++) {
-            if (trackChannel[i].trackNum == trackNum && trackChannel[i].channelNum == channelNum) {
-                return trackChannel[i];
-            }
-        }
-        let it = {
-            trackNum: trackNum, channelNum: channelNum, track: {
-                order: 0,
-                title: parsedtrack.trackTitle + ((parsedtrack.instrumentName) ? (' - ' + parsedtrack.instrumentName) : ''),
-                channelNum: channelNum,
-                trackVolumes: [],
-                program: -1,
-                songchords: []
-            }
-        };
-        for (let vv = 0; vv < parsedtrack.trackVolumePoints.length; vv++) {
-            if (parsedtrack.trackVolumePoints[vv].channel == it.track.channelNum) {
-                it.track.trackVolumes.push(parsedtrack.trackVolumePoints[vv]);
-            }
-        }
-        trackChannel.push(it);
-        return it;
-    }
-    findLastMeter(midiSongData, beforeMs, barIdx) {
-        let metre = {
-            count: midiSongData.meter.count,
-            part: midiSongData.meter.division
-        };
-        let midimeter = { track: 0, ms: 0, count: 4, division: 4 };
-        for (let mi = 0; mi < midiSongData.meters.length; mi++) {
-            if (midiSongData.meters[mi].ms > beforeMs + 1 + barIdx * 3) {
-                break;
-            }
-            midimeter = midiSongData.meters[mi];
-        }
-        metre.count = midimeter.count;
-        metre.part = midimeter.division;
-        return metre;
-    }
-    findLastChange(midiSongData, beforeMs) {
-        let nextChange = { track: 0, ms: 0, resolution: 0, bpm: 120 };
-        for (let ii = 1; ii < midiSongData.changes.length; ii++) {
-            if (midiSongData.changes[ii].ms > beforeMs + 1) {
-                break;
-            }
-            nextChange = midiSongData.changes[ii];
-        }
-        return nextChange;
-    }
-    findNextChange(midiSongData, afterMs) {
-        let nextChange = { track: 0, ms: 0, resolution: 0, bpm: 120 };
-        for (let ii = 1; ii < midiSongData.changes.length; ii++) {
-            if (midiSongData.changes[ii].ms > afterMs) {
-                nextChange = midiSongData.changes[ii];
-                break;
-            }
-        }
-        return nextChange;
-    }
-    calcMeasureDuration(midiSongData, meter, bpm, part, startMs) {
-        let metreMath = MMUtil();
-        let wholeDurationMs = 1000 * metreMath.set(meter).duration(bpm);
-        let partDurationMs = part * wholeDurationMs;
-        let nextChange = this.findNextChange(midiSongData, startMs);
-        if (startMs < nextChange.ms && nextChange.ms < startMs + partDurationMs) {
-            let diffMs = nextChange.ms - startMs;
-            let ratio = diffMs / partDurationMs;
-            let newPart = ratio * part;
-            let newPartDurationMs = newPart * wholeDurationMs;
-            let remainsMs = this.calcMeasureDuration(midiSongData, meter, nextChange.bpm, part - newPart, nextChange.ms);
-            return newPartDurationMs + remainsMs;
-        }
-        else {
-            return partDurationMs;
-        }
-    }
-    createMeasure(midiSongData, fromMs, barIdx) {
-        let change = this.findLastChange(midiSongData, fromMs);
-        let meter = this.findLastMeter(midiSongData, fromMs, barIdx);
-        let duration = this.calcMeasureDuration(midiSongData, meter, change.bpm, 1, fromMs);
-        let measure = {
-            tempo: change.bpm,
-            metre: meter,
-            startMs: fromMs,
-            durationMs: duration
-        };
-        return measure;
-    }
-    createTimeLine(midiSongData) {
-        let count = 0;
-        let part = 0;
-        let bpm = 0;
-        let timeline = [];
-        let fromMs = 0;
-        while (fromMs < midiSongData.duration) {
-            let measure = this.createMeasure(midiSongData, fromMs, timeline.length);
-            fromMs = fromMs + measure.durationMs;
-            if (count != measure.metre.count || part != measure.metre.part || bpm != measure.tempo) {
-                count = measure.metre.count;
-                part = measure.metre.part;
-                bpm = measure.tempo;
-            }
-            else {
-            }
-            timeline.push(measure);
-        }
-        return timeline;
-    }
-    convertProject(title, comment) {
-        let midiSongData = {
-            parser: '1.12',
-            duration: 0,
-            bpm: this.header.tempoBPM,
-            changes: this.header.changes,
-            lyrics: this.header.lyrics,
-            key: this.header.keyFlatSharp,
-            mode: this.header.keyMajMin,
-            meter: { count: this.header.meterCount, division: this.header.meterDivision },
-            meters: this.header.meters,
-            signs: this.header.signs,
-            miditracks: [],
-            speedMode: 0,
-            lineMode: 0
-        };
-        let tracksChannels = [];
-        for (let i = 0; i < this.parsedTracks.length; i++) {
-            let parsedtrack = this.parsedTracks[i];
-            for (let k = 0; k < parsedtrack.programChannel.length; k++) {
-                this.findOrCreateTrack(parsedtrack, i, parsedtrack.programChannel[k].channel, tracksChannels);
-            }
-        }
-        var maxWhen = 0;
-        for (var i = 0; i < this.parsedTracks.length; i++) {
-            var miditrack = this.parsedTracks[i];
-            for (var ch = 0; ch < miditrack.chords.length; ch++) {
-                var midichord = miditrack.chords[ch];
-                var newchord = { when: midichord.when, notes: [], channel: midichord.channel };
-                if (maxWhen < midichord.when) {
-                    maxWhen = midichord.when;
-                }
-                for (var n = 0; n < midichord.notes.length; n++) {
-                    var midinote = midichord.notes[n];
-                    var newnote = { slidePoints: [], midiPitch: midinote.basePitch, midiDuration: midinote.baseDuration };
-                    newchord.notes.push(newnote);
-                    if (midinote.bendPoints.length > 0) {
-                        for (var v = 0; v < midinote.bendPoints.length; v++) {
-                            var midipoint = midinote.bendPoints[v];
-                            var newpoint = {
-                                pitch: midinote.basePitch + midipoint.basePitchDelta,
-                                durationms: midipoint.pointDuration
-                            };
-                            newpoint.midipoint = midinote;
-                            newnote.slidePoints.push(newpoint);
-                        }
-                    }
-                    else {
-                    }
-                }
-                let chanTrack = this.findOrCreateTrack(miditrack, i, newchord.channel, tracksChannels);
-                chanTrack.track.songchords.push(newchord);
-            }
-        }
-        for (let tt = 0; tt < tracksChannels.length; tt++) {
-            let trackChan = tracksChannels[tt];
-            if (trackChan.track.songchords.length > 0) {
-                midiSongData.miditracks.push(tracksChannels[tt].track);
-                if (midiSongData.duration < maxWhen) {
-                    midiSongData.duration = 54321 + maxWhen;
-                }
-                for (let i = 0; i < this.parsedTracks.length; i++) {
-                    let miditrack = this.parsedTracks[i];
-                    for (let kk = 0; kk < miditrack.programChannel.length; kk++) {
-                        if (miditrack.programChannel[kk].channel == trackChan.channelNum) {
-                            trackChan.track.program = miditrack.programChannel[kk].program;
-                        }
-                    }
-                }
-            }
-        }
-        let newtimeline = this.createTimeLine(midiSongData);
-        let project = {
-            title: title + ' ' + comment,
-            timeline: newtimeline,
-            tracks: [],
-            percussions: [],
-            filters: [],
-            comments: [],
-            selectedPart: {
-                startMeasure: -1,
-                endMeasure: -1
-            },
-            versionCode: '1',
-            list: false,
-            undo: [],
-            redo: [],
-            position: { x: 0, y: 0, z: 100 }
-        };
-        let echoOutID = 'reverberation';
-        let compresID = 'compression';
-        for (let ii = 0; ii < project.timeline.length; ii++) {
-            project.comments.push({ points: [] });
-        }
-        for (let ii = 0; ii < midiSongData.lyrics.length; ii++) {
-            let textpoint = midiSongData.lyrics[ii];
-            let pnt = findMeasureSkipByTime(textpoint.ms / 1000, project.timeline);
-            if (pnt) {
-                this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
-            }
-        }
-        let top = 0;
-        let outputID = '';
-        let volume = 1;
-        for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
-            let midiSongTrack = midiSongData.miditracks[ii];
-            if (midiSongTrack.trackVolumes.length > 1) {
-                let filterID = 'volume' + ii;
-                let filterVolume = {
-                    id: filterID,
-                    title: filterID,
-                    kind: 'zvolume1', data: '99', outputs: [compresID],
-                    iconPosition: { x: 77 + ii * 5, y: ii * 11 + 2 },
-                    automation: [], state: 0
-                };
-                outputID = filterID;
-                project.filters.push(filterVolume);
-                for (let mm = 0; mm < project.timeline.length; mm++) {
-                    filterVolume.automation.push({ changes: [] });
-                }
-                for (let vv = 0; vv < midiSongTrack.trackVolumes.length; vv++) {
-                    let gain = midiSongTrack.trackVolumes[vv];
-                    let vol = '' + Math.round(gain.value * 100) + '%';
-                    let pnt = findMeasureSkipByTime(gain.ms / 1000, project.timeline);
-                    if (pnt) {
-                        pnt.skip = MMUtil().set(pnt.skip).strip(16);
-                        for (let aa = 0; aa < filterVolume.automation[pnt.idx].changes.length; aa++) {
-                            let sk = filterVolume.automation[pnt.idx].changes[aa].skip;
-                            if (MMUtil().set(sk).equals(pnt.skip)) {
-                                filterVolume.automation[pnt.idx].changes.splice(aa, 1);
-                                break;
-                            }
-                        }
-                        filterVolume.automation[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
-                    }
-                }
-            }
-            else {
-                outputID = compresID;
-                if (midiSongTrack.trackVolumes.length == 1) {
-                    let vol = 1 * midiSongTrack.trackVolumes[0].value;
-                    volume = 1 * midiSongTrack.trackVolumes[0].value;
-                }
-                else {
-                }
-            }
-            if (midiSongTrack.channelNum == 9) {
-                let drums = this.collectDrums(midiSongTrack);
-                for (let dd = 0; dd < drums.length; dd++) {
-                    project.percussions.push(this.createProjectDrums(1, top * 9, drums[dd], project.timeline, midiSongTrack, outputID));
-                    top++;
-                }
-            }
-            else {
-                project.tracks.push(this.createProjectTrack(volume, top * 8, project.timeline, midiSongTrack, outputID));
-                top++;
-            }
-        }
-        let filterEcho = {
-            id: echoOutID, title: echoOutID,
-            kind: 'zvecho1', data: '22', outputs: [''],
-            iconPosition: {
-                x: 77 + midiSongData.miditracks.length * 30,
-                y: midiSongData.miditracks.length * 8 + 2
-            },
-            automation: [], state: 0
-        };
-        let filterCompression = {
-            id: compresID,
-            title: compresID,
-            kind: 'zvooco1', data: '1', outputs: [echoOutID],
-            iconPosition: {
-                x: 88 + midiSongData.miditracks.length * 30,
-                y: midiSongData.miditracks.length * 8 + 2
-            },
-            automation: [], state: 0
-        };
-        project.filters.push(filterEcho);
-        project.filters.push(filterCompression);
-        for (let mm = project.timeline.length - 2; mm >= 0; mm--) {
-            for (let ff = 0; ff < project.filters.length; ff++) {
-                if (!(project.filters[ff].automation[mm])) {
-                    project.filters[ff].automation[mm] = { changes: [] };
-                }
-            }
-            for (let cc = 0; cc < project.comments.length; cc++) {
-                if (!(project.comments[mm])) {
-                    project.comments[mm] = { points: [] };
-                }
-            }
-        }
-        console.log('midiParser', this);
-        console.log('midiSongData', midiSongData);
-        console.log('project', project);
-        let needSlice = (midiSongData.meters.length < 2)
-            && (midiSongData.changes.length < 3)
-            && (project.timeline[0].metre.count / project.timeline[0].metre.part == 1);
-        this.trimProject(project, needSlice);
-        return project;
-    }
-    calculateShift32(project, count32) {
-        let ticker = MMUtil().set({ count: count32, part: 32 });
-        let duration = MMUtil().set({ count: 0, part: 32 });
-        for (let mm = 0; mm < project.timeline.length; mm++) {
-            duration = duration.plus(project.timeline[mm].metre);
-        }
-        let smm = MMUtil().set({ count: 0, part: 32 });
-        while (ticker.less(duration)) {
-            let pointLen = this.extractPointStampDuration(project, ticker);
-            smm = smm.plus(pointLen).strip(32);
-            ticker = ticker.plus({ count: 1, part: 1 });
-        }
-        return smm.strip(32);
-    }
-    extractPointStampDuration(project, at) {
-        let pointSumm = MMUtil().set({ count: 0, part: 32 });
-        let end = MMUtil().set({ count: 0, part: 32 });
-        for (let mm = 0; mm < project.timeline.length; mm++) {
-            let barStart = end.simplyfy();
-            end = end.plus(project.timeline[mm].metre).strip(32);
-            if (end.more(at)) {
-                let skip = MMUtil().set(at).minus(barStart);
-                for (let pp = 0; pp < project.tracks.length; pp++) {
-                    let track = project.tracks[pp];
-                    let trackBar = track.measures[mm];
-                    for (let ss = 0; ss < trackBar.chords.length; ss++) {
-                        let chord = trackBar.chords[ss];
-                        if (skip.equals(chord.skip)) {
-                            let chordLen = MMUtil().set({ count: 0, part: 32 });
-                            for (let ss = 0; ss < chord.slides.length; ss++) {
-                                chordLen = chordLen.plus(chord.slides[ss].duration).strip(32);
-                            }
-                            pointSumm = pointSumm.plus(chordLen).strip(32);
-                            break;
-                        }
-                    }
-                }
-                for (let dd = 0; dd < project.percussions.length; dd++) {
-                    let drum = project.percussions[dd];
-                    let drumBar = drum.measures[mm];
-                    let drumDuration = { count: 1, part: 16 };
-                    if (drum.sampler.data == '35' || drum.sampler.data == '36') {
-                        drumDuration = { count: 3, part: 16 };
-                    }
-                    else {
-                        if (drum.sampler.data == '38' || drum.sampler.data == '40') {
-                            drumDuration = { count: 2, part: 16 };
-                        }
-                    }
-                    for (let ss = 0; ss < drumBar.skips.length; ss++) {
-                        if (skip.equals(drumBar.skips[ss])) {
-                            pointSumm = pointSumm.plus(drumDuration).strip(32);
-                            break;
-                        }
-                    }
-                }
-                break;
-            }
-        }
-        return pointSumm;
-    }
-    trimProject(project, reslice) {
-        for (let ii = 0; ii < project.tracks.length; ii++) {
-            project.tracks[ii].performer.iconPosition.x = 10 + ii * 9;
-            project.tracks[ii].performer.iconPosition.y = 0 + ii * 4;
-        }
-        for (let ii = 0; ii < project.percussions.length; ii++) {
-            project.percussions[ii].sampler.iconPosition.x = 20 + ii * 4;
-            project.percussions[ii].sampler.iconPosition.y = 30 + ii * 9;
-        }
-        for (let ii = 0; ii < project.filters.length - 2; ii++) {
-            project.filters[ii].iconPosition.x = 10 + project.tracks.length * 9 + 5 + ii * 4;
-            project.filters[ii].iconPosition.y = ii * 9;
-        }
-        project.filters[project.filters.length - 2].iconPosition.x = 35 + project.tracks.length * 9 + project.filters.length * 4;
-        project.filters[project.filters.length - 2].iconPosition.y = project.filters.length * 5;
-        project.filters[project.filters.length - 1].iconPosition.x = 20 + project.tracks.length * 9 + project.filters.length * 4;
-        project.filters[project.filters.length - 1].iconPosition.y = project.filters.length * 6;
-        for (let tt = 0; tt < project.tracks.length; tt++) {
-            let track = project.tracks[tt];
-            for (let mm = 0; mm < track.measures.length; mm++) {
-                let measure = track.measures[mm];
-                for (let cc = 0; cc < measure.chords.length; cc++) {
-                    let chord = measure.chords[cc];
-                    chord.skip = MMUtil().set(chord.skip).strip(32);
-                }
-            }
-        }
-        for (let ss = 0; ss < project.percussions.length; ss++) {
-            let sampleTrack = project.percussions[ss];
-            for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
-                let measure = sampleTrack.measures[mm];
-                for (let mp = 0; mp < measure.skips.length; mp++) {
-                    let newSkip = MMUtil().set(measure.skips[mp]).strip(32);
-                    measure.skips[mp].count = newSkip.count;
-                    measure.skips[mp].part = newSkip.part;
-                }
-            }
-        }
-        this.limitShort(project);
-        if (reslice) {
-            let durations = [];
-            for (let ii = 0; ii < 32; ii++) {
-                let len = this.calculateShift32(project, ii);
-                let nn = 32 - ii;
-                if (ii == 0) {
-                    nn = 0;
-                }
-                durations.push({ len: Math.round(len.count / len.part), shft: nn });
-            }
-            durations.sort((a, b) => {
-                return b.len - a.len;
-            });
-            console.log(durations);
-            let top = [durations[0]];
-            for (let ii = 1; ii < durations.length; ii++) {
-                if (durations[ii].len * 2.2 > durations[0].len) {
-                    top.push(durations[ii]);
-                }
-            }
-            top.sort((a, b) => { return a.shft - b.shft; });
-            console.log(top);
-            let shsize = top[0].shft;
-            if (shsize) {
-                console.log('shift', '' + shsize + '/32');
-                this.shiftForwar32(project, shsize);
-            }
-        }
-        let len = project.timeline.length;
-        for (let ii = len - 1; ii > 0; ii--) {
-            if (this.isBarEmpty(ii, project)) {
-            }
-            else {
-                project.timeline.length = ii + 2;
-                return;
-            }
-        }
-    }
-    limitShort(project) {
-        let note16 = MMUtil().set({ count: 1, part: 16 });
-        for (let tt = 0; tt < project.tracks.length; tt++) {
-            let track = project.tracks[tt];
-            for (let mm = 0; mm < track.measures.length; mm++) {
-                let measure = track.measures[mm];
-                for (let cc = 0; cc < measure.chords.length; cc++) {
-                    let chord = measure.chords[cc];
-                    if (chord.slides.length == 1) {
-                        chord.slides[0].duration = MMUtil().set(chord.slides[0].duration).simplyfy();
-                        if (note16.more(chord.slides[0].duration)) {
-                            chord.slides[0].duration = note16;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    shiftForwar32(project, amount) {
-        for (let mm = project.timeline.length - 2; mm >= 0; mm--) {
-            let measureDuration = MMUtil().set(project.timeline[mm].metre);
-            for (let tt = 0; tt < project.tracks.length; tt++) {
-                let track = project.tracks[tt];
-                let trackMeasure = track.measures[mm];
-                let trackNextMeasure = track.measures[mm + 1];
-                for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
-                    let chord = trackMeasure.chords[cc];
-                    let newSkip = MMUtil().set(chord.skip).plus({ count: amount, part: 32 });
-                    if (measureDuration.more(newSkip)) {
-                        chord.skip = newSkip.simplyfy();
-                    }
-                    else {
-                        trackMeasure.chords.splice(cc, 1);
-                        cc--;
-                        trackNextMeasure.chords.push(chord);
-                        chord.skip = newSkip.minus(measureDuration).simplyfy();
-                    }
-                }
-            }
-            for (let ss = 0; ss < project.percussions.length; ss++) {
-                let sampleTrack = project.percussions[ss];
-                let sampleMeasure = sampleTrack.measures[mm];
-                let sampleNextMeasure = sampleTrack.measures[mm + 1];
-                for (let mp = 0; mp < sampleMeasure.skips.length; mp++) {
-                    let newSkip = MMUtil().set(sampleMeasure.skips[mp]).plus({ count: amount, part: 32 });
-                    if (measureDuration.more(newSkip)) {
-                        sampleMeasure.skips[mp] = newSkip.simplyfy();
-                    }
-                    else {
-                        sampleMeasure.skips.splice(mp, 1);
-                        mp--;
-                        sampleNextMeasure.skips.push(newSkip.minus(measureDuration).simplyfy());
-                    }
-                }
-            }
-            for (let cc = 0; cc < project.comments.length; cc++) {
-                let comMeasure = project.comments[mm];
-                let comNextMeasure = project.comments[mm + 1];
-                for (let pp = 0; pp < comMeasure.points.length; pp++) {
-                    let point = comMeasure.points[pp];
-                    let newSkip = MMUtil().set(point.skip).plus({ count: amount, part: 32 });
-                    if (measureDuration.more(newSkip)) {
-                        point.skip = newSkip.simplyfy();
-                    }
-                    else {
-                        comMeasure.points.splice(pp, 1);
-                        pp--;
-                        comNextMeasure.points.push(point);
-                        point.skip = newSkip.minus(measureDuration).simplyfy();
-                    }
-                }
-            }
-            for (let ff = 0; ff < project.filters.length; ff++) {
-                let autoMeasure = project.filters[ff].automation[mm];
-                let autoNextMeasure = project.filters[ff].automation[mm + 1];
-                for (let cc = 0; cc < autoMeasure.changes.length; cc++) {
-                    let change = autoMeasure.changes[cc];
-                    let newSkip = MMUtil().set(change.skip).plus({ count: amount, part: 32 });
-                    if (measureDuration.more(newSkip)) {
-                        change.skip = newSkip.simplyfy();
-                    }
-                    else {
-                        autoMeasure.changes.splice(cc, 1);
-                        cc--;
-                        autoNextMeasure.changes.push(change);
-                        change.skip = newSkip.minus(measureDuration).simplyfy();
-                    }
-                }
-            }
-        }
-    }
-    isBarEmpty(barIdx, project) {
-        for (let tt = 0; tt < project.tracks.length; tt++) {
-            let track = project.tracks[tt];
-            if (track.measures[barIdx]) {
-                if (track.measures[barIdx].chords.length) {
-                    return false;
-                }
-            }
-        }
-        for (let tt = 0; tt < project.percussions.length; tt++) {
-            let drum = project.percussions[tt];
-            if (drum.measures[barIdx]) {
-                if (drum.measures[barIdx].skips.length) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-    addLyricsPoints(commentPoint, skip, txt, tempo) {
-        txt = txt.replace(/(\r)/g, '~');
-        txt = txt.replace(/\\r/g, '~');
-        txt = txt.replace(/(\n)/g, '~');
-        txt = txt.replace(/\\n/g, '~');
-        txt = txt.replace(/(~~)/g, '~');
-        txt = txt.replace(/(~~)/g, '~');
-        txt = txt.replace(/(~~)/g, '~');
-        txt = txt.replace(/(~~)/g, '~');
-        let strings = txt.split('~');
-        if (strings.length) {
-            let roundN = 750;
-            let nextMs = 1000 * MMUtil().set(skip).duration(tempo);
-            for (let ii = 0; ii < strings.length; ii++) {
-                let row = 0;
-                for (let ii = 0; ii < commentPoint.points.length; ii++) {
-                    let existsMs = 1000 * MMUtil().set(commentPoint.points[ii].skip).duration(tempo);
-                    if (Math.floor(Math.floor(existsMs / roundN) * roundN) == Math.floor(Math.floor(nextMs / roundN) * roundN)) {
-                        row++;
-                    }
-                }
-                commentPoint.points.push({ skip: skip, text: strings[ii].trim(), row: row });
-            }
-        }
-    }
-    collectDrums(midiTrack) {
-        let drums = [];
-        for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
-            let chord = midiTrack.songchords[ii];
-            for (let kk = 0; kk < chord.notes.length; kk++) {
-                let note = chord.notes[kk];
-                if (drums.indexOf(note.midiPitch) < 0) {
-                    drums.push(note.midiPitch);
-                }
-            }
-        }
-        return drums;
-    }
-    numratio(nn) {
-        let rr = 1;
-        return Math.round(nn * rr);
-    }
-    createProjectTrack(volume, top, timeline, midiTrack, outputId) {
-        let perfkind = 'zinstr1';
-        if (midiTrack.program == 24
-            || midiTrack.program == 25
-            || midiTrack.program == 26
-            || midiTrack.program == 27
-            || midiTrack.program == 28
-            || midiTrack.program == 29
-            || midiTrack.program == 30) {
-            perfkind = 'zvstrumming1';
-        }
-        let projectTrack = {
-            title: midiTrack.title + ' ' + insNames[midiTrack.program],
-            measures: [],
-            performer: {
-                id: 'track' + (midiTrack.program + Math.random()), data: '' + midiTrack.program, kind: perfkind, outputs: [outputId],
-                iconPosition: { x: top * 2, y: top }, state: 0
-            },
-            volume: volume
-        };
-        if (!(midiTrack.program >= 0 && midiTrack.program <= 127)) {
-            projectTrack.performer.outputs = [];
-        }
-        let mm = MMUtil();
-        for (let tt = 0; tt < timeline.length; tt++) {
-            let projectMeasure = { chords: [] };
-            projectTrack.measures.push(projectMeasure);
-            let nextMeasure = timeline[tt];
-            for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
-                let midiChord = midiTrack.songchords[ii];
-                if (this.numratio(midiChord.when) >= nextMeasure.startMs
-                    && this.numratio(midiChord.when) < nextMeasure.startMs + nextMeasure.durationMs) {
-                    let trackChord = null;
-                    let skip = mm.calculate((midiChord.when - nextMeasure.startMs) / 1000.0, nextMeasure.tempo).strip(32);
-                    if (skip.count < 0) {
-                        skip.count = 0;
-                    }
-                    for (let cc = 0; cc < projectMeasure.chords.length; cc++) {
-                        if (mm.set(projectMeasure.chords[cc].skip).equals(skip)) {
-                            trackChord = projectMeasure.chords[cc];
-                        }
-                    }
-                    if (trackChord == null) {
-                        trackChord = { skip: skip, pitches: [], slides: [] };
-                        projectMeasure.chords.push(trackChord);
-                    }
-                    if (trackChord) {
-                        for (let nn = 0; nn < midiChord.notes.length; nn++) {
-                            let midiNote = midiChord.notes[nn];
-                            if (midiNote.slidePoints.length > 0) {
-                                trackChord.slides = [];
-                                let bendDurationMs = 0;
-                                for (let pp = 0; pp < midiNote.slidePoints.length; pp++) {
-                                    let midiPoint = midiNote.slidePoints[pp];
-                                    let xduration = mm.calculate(midiPoint.durationms / 1000.0, nextMeasure.tempo);
-                                    trackChord.slides.push({
-                                        duration: xduration,
-                                        delta: midiNote.midiPitch - midiPoint.pitch
-                                    });
-                                    bendDurationMs = bendDurationMs + midiPoint.durationms;
-                                }
-                                let remains = midiNote.midiDuration - bendDurationMs;
-                                if (remains > 0) {
-                                    trackChord.slides.push({
-                                        duration: mm.calculate(remains / 1000.0, nextMeasure.tempo),
-                                        delta: midiNote.midiPitch - midiNote.slidePoints[midiNote.slidePoints.length - 1].pitch
-                                    });
-                                }
-                            }
-                            else {
-                                trackChord.slides = [{
-                                        duration: mm.calculate(midiNote.midiDuration / 1000.0, nextMeasure.tempo), delta: 0
-                                    }];
-                            }
-                            trackChord.pitches.push(midiNote.midiPitch);
-                        }
-                    }
-                }
-            }
-        }
-        return projectTrack;
-    }
-    createProjectDrums(volume, top, drum, timeline, midiTrack, outputId) {
-        let projectDrums = {
-            title: midiTrack.title + ' ' + drumNames[drum],
-            measures: [],
-            sampler: {
-                id: 'drum' + (drum + Math.random()), data: '' + drum, kind: 'zdrum1', outputs: [outputId],
-                iconPosition: { x: top * 1.5, y: top / 2 }, state: 0
-            },
-            volume: volume
-        };
-        if (!(drum >= 35 && drum <= 81)) {
-            projectDrums.sampler.outputs = [];
-        }
-        let currentTimeMs = 0;
-        let mm = MMUtil();
-        for (let tt = 0; tt < timeline.length; tt++) {
-            let projectMeasure = { skips: [] };
-            projectDrums.measures.push(projectMeasure);
-            let nextMeasure = timeline[tt];
-            let measureDurationS = mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
-            for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
-                let chord = midiTrack.songchords[ii];
-                for (let kk = 0; kk < chord.notes.length; kk++) {
-                    let note = chord.notes[kk];
-                    let pitch = note.midiPitch;
-                    if (pitch == drum) {
-                        if (chord.when >= currentTimeMs && chord.when < currentTimeMs + measureDurationS * 1000) {
-                            let skip = mm.calculate((chord.when - currentTimeMs) / 1000, nextMeasure.tempo);
-                            projectMeasure.skips.push(skip);
-                        }
-                    }
-                }
-            }
-            currentTimeMs = currentTimeMs + measureDurationS * 1000;
-        }
-        return projectDrums;
-    }
 }
 let instrumentNamesArray = [];
 let drumNamesArray = [];
@@ -1758,6 +1040,19 @@ class MIDIFileHeader {
         }
     }
 }
+class MIDIFileTrack {
+    constructor(buffer, start) {
+        this.HDR_LENGTH = 8;
+        this.chords = [];
+        this.datas = new DataView(buffer, start, this.HDR_LENGTH);
+        this.trackLength = this.datas.getUint32(4);
+        this.datas = new DataView(buffer, start, this.HDR_LENGTH + this.trackLength);
+        this.trackContent = new DataView(this.datas.buffer, this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
+        this.trackevents = [];
+        this.trackVolumePoints = [];
+        this.programChannel = [];
+    }
+}
 class MIDIIImportMusicPlugin {
     constructor() {
         this.callbackID = '';
@@ -1815,7 +1110,13 @@ class MIDIIImportMusicPlugin {
                 let comment = ', ' + file.size / 1000 + 'kb, ' + dat;
                 var arrayBuffer = progressEvent.target.result;
                 var midiParser = newMIDIparser2(arrayBuffer);
-                me.parsedProject = midiParser.convertProject(title, comment);
+                console.log('done midiParser', this);
+                let cnvrtr = new MIDIConverter();
+                let midiSongData = cnvrtr.convertProject(midiParser);
+                console.log('done midiSongData', midiSongData);
+                let proj = new Projectr();
+                me.parsedProject = proj.readProject(midiSongData, title, comment);
+                console.log('done zproject', me.parsedProject);
             }
         };
         fileReader.readAsArrayBuffer(file);
@@ -1832,17 +1133,727 @@ class MIDIIImportMusicPlugin {
 function newMIDIparser2(arrayBuffer) {
     return new MidiParser(arrayBuffer);
 }
-class MIDIFileTrack {
-    constructor(buffer, start) {
-        this.HDR_LENGTH = 8;
-        this.chords = [];
-        this.datas = new DataView(buffer, start, this.HDR_LENGTH);
-        this.trackLength = this.datas.getUint32(4);
-        this.datas = new DataView(buffer, start, this.HDR_LENGTH + this.trackLength);
-        this.trackContent = new DataView(this.datas.buffer, this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
-        this.trackevents = [];
-        this.trackVolumePoints = [];
-        this.programChannel = [];
+class MIDIConverter {
+    convertProject(parser) {
+        let midiSongData = {
+            parser: '1.12',
+            duration: 0,
+            bpm: parser.header.tempoBPM,
+            changes: parser.header.changes,
+            lyrics: parser.header.lyrics,
+            key: parser.header.keyFlatSharp,
+            mode: parser.header.keyMajMin,
+            meter: { count: parser.header.meterCount, division: parser.header.meterDivision },
+            meters: parser.header.meters,
+            signs: parser.header.signs,
+            miditracks: [],
+            speedMode: 0,
+            lineMode: 0
+        };
+        let tracksChannels = [];
+        for (let i = 0; i < parser.parsedTracks.length; i++) {
+            let parsedtrack = parser.parsedTracks[i];
+            for (let k = 0; k < parsedtrack.programChannel.length; k++) {
+                this.findOrCreateTrack(parsedtrack, i, parsedtrack.programChannel[k].channel, tracksChannels);
+            }
+        }
+        var maxWhen = 0;
+        for (var i = 0; i < parser.parsedTracks.length; i++) {
+            var miditrack = parser.parsedTracks[i];
+            for (var ch = 0; ch < miditrack.chords.length; ch++) {
+                var midichord = miditrack.chords[ch];
+                var newchord = { when: midichord.when, notes: [], channel: midichord.channel };
+                if (maxWhen < midichord.when) {
+                    maxWhen = midichord.when;
+                }
+                for (var n = 0; n < midichord.notes.length; n++) {
+                    var midinote = midichord.notes[n];
+                    var newnote = { slidePoints: [], midiPitch: midinote.basePitch, midiDuration: midinote.baseDuration };
+                    newchord.notes.push(newnote);
+                    if (midinote.bendPoints.length > 0) {
+                        for (var v = 0; v < midinote.bendPoints.length; v++) {
+                            var midipoint = midinote.bendPoints[v];
+                            var newpoint = {
+                                pitch: midinote.basePitch + midipoint.basePitchDelta,
+                                durationms: midipoint.pointDuration
+                            };
+                            newpoint.midipoint = midinote;
+                            newnote.slidePoints.push(newpoint);
+                        }
+                    }
+                    else {
+                    }
+                }
+                let chanTrack = this.findOrCreateTrack(miditrack, i, newchord.channel, tracksChannels);
+                chanTrack.track.songchords.push(newchord);
+            }
+        }
+        for (let tt = 0; tt < tracksChannels.length; tt++) {
+            let trackChan = tracksChannels[tt];
+            if (trackChan.track.songchords.length > 0) {
+                midiSongData.miditracks.push(tracksChannels[tt].track);
+                if (midiSongData.duration < maxWhen) {
+                    midiSongData.duration = 54321 + maxWhen;
+                }
+                for (let i = 0; i < parser.parsedTracks.length; i++) {
+                    let miditrack = parser.parsedTracks[i];
+                    for (let kk = 0; kk < miditrack.programChannel.length; kk++) {
+                        if (miditrack.programChannel[kk].channel == trackChan.channelNum) {
+                            trackChan.track.program = miditrack.programChannel[kk].program;
+                        }
+                    }
+                }
+            }
+        }
+        return midiSongData;
+    }
+    findOrCreateTrack(parsedtrack, trackNum, channelNum, trackChannel) {
+        for (let i = 0; i < trackChannel.length; i++) {
+            if (trackChannel[i].trackNum == trackNum && trackChannel[i].channelNum == channelNum) {
+                return trackChannel[i];
+            }
+        }
+        let it = {
+            trackNum: trackNum, channelNum: channelNum, track: {
+                order: 0,
+                title: parsedtrack.trackTitle + ((parsedtrack.instrumentName) ? (' - ' + parsedtrack.instrumentName) : ''),
+                channelNum: channelNum,
+                trackVolumes: [],
+                program: -1,
+                songchords: []
+            }
+        };
+        for (let vv = 0; vv < parsedtrack.trackVolumePoints.length; vv++) {
+            if (parsedtrack.trackVolumePoints[vv].channel == it.track.channelNum) {
+                it.track.trackVolumes.push(parsedtrack.trackVolumePoints[vv]);
+            }
+        }
+        trackChannel.push(it);
+        return it;
+    }
+}
+class Projectr {
+    readProject(midiSongData, title, comment) {
+        let newtimeline = this.createTimeLine(midiSongData);
+        let project = {
+            title: title + ' ' + comment,
+            timeline: newtimeline,
+            tracks: [],
+            percussions: [],
+            filters: [],
+            comments: [],
+            selectedPart: {
+                startMeasure: -1,
+                endMeasure: -1
+            },
+            versionCode: '1',
+            list: false,
+            undo: [],
+            redo: [],
+            position: { x: 0, y: 0, z: 100 }
+        };
+        let echoOutID = 'reverberation';
+        let compresID = 'compression';
+        for (let ii = 0; ii < project.timeline.length; ii++) {
+            project.comments.push({ points: [] });
+        }
+        for (let ii = 0; ii < midiSongData.lyrics.length; ii++) {
+            let textpoint = midiSongData.lyrics[ii];
+            let pnt = findMeasureSkipByTime(textpoint.ms / 1000, project.timeline);
+            if (pnt) {
+                this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
+            }
+        }
+        let top = 0;
+        let outputID = '';
+        let volume = 1;
+        for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
+            let midiSongTrack = midiSongData.miditracks[ii];
+            if (midiSongTrack.trackVolumes.length > 1) {
+                let filterID = 'volume' + ii;
+                let filterVolume = {
+                    id: filterID,
+                    title: filterID,
+                    kind: 'zvolume1', data: '99', outputs: [compresID],
+                    iconPosition: { x: 77 + ii * 5, y: ii * 11 + 2 },
+                    automation: [], state: 0
+                };
+                outputID = filterID;
+                project.filters.push(filterVolume);
+                for (let mm = 0; mm < project.timeline.length; mm++) {
+                    filterVolume.automation.push({ changes: [] });
+                }
+                for (let vv = 0; vv < midiSongTrack.trackVolumes.length; vv++) {
+                    let gain = midiSongTrack.trackVolumes[vv];
+                    let vol = '' + Math.round(gain.value * 100) + '%';
+                    let pnt = findMeasureSkipByTime(gain.ms / 1000, project.timeline);
+                    if (pnt) {
+                        pnt.skip = MMUtil().set(pnt.skip).strip(16);
+                        for (let aa = 0; aa < filterVolume.automation[pnt.idx].changes.length; aa++) {
+                            let sk = filterVolume.automation[pnt.idx].changes[aa].skip;
+                            if (MMUtil().set(sk).equals(pnt.skip)) {
+                                filterVolume.automation[pnt.idx].changes.splice(aa, 1);
+                                break;
+                            }
+                        }
+                        filterVolume.automation[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
+                    }
+                }
+            }
+            else {
+                outputID = compresID;
+                if (midiSongTrack.trackVolumes.length == 1) {
+                    volume = 1 * midiSongTrack.trackVolumes[0].value;
+                }
+                else {
+                }
+            }
+            if (midiSongTrack.channelNum == 9) {
+                let drums = this.collectDrums(midiSongTrack);
+                for (let dd = 0; dd < drums.length; dd++) {
+                    project.percussions.push(this.createProjectDrums(1, top * 9, drums[dd], project.timeline, midiSongTrack, outputID));
+                    top++;
+                }
+            }
+            else {
+                project.tracks.push(this.createProjectTrack(volume, top * 8, project.timeline, midiSongTrack, outputID));
+                top++;
+            }
+        }
+        let filterEcho = {
+            id: echoOutID, title: echoOutID,
+            kind: 'zvecho1', data: '22', outputs: [''],
+            iconPosition: {
+                x: 77 + midiSongData.miditracks.length * 30,
+                y: midiSongData.miditracks.length * 8 + 2
+            },
+            automation: [], state: 0
+        };
+        let filterCompression = {
+            id: compresID,
+            title: compresID,
+            kind: 'zvooco1', data: '1', outputs: [echoOutID],
+            iconPosition: {
+                x: 88 + midiSongData.miditracks.length * 30,
+                y: midiSongData.miditracks.length * 8 + 2
+            },
+            automation: [], state: 0
+        };
+        project.filters.push(filterEcho);
+        project.filters.push(filterCompression);
+        for (let mm = project.timeline.length - 2; mm >= 0; mm--) {
+            for (let ff = 0; ff < project.filters.length; ff++) {
+                if (!(project.filters[ff].automation[mm])) {
+                    project.filters[ff].automation[mm] = { changes: [] };
+                }
+            }
+            for (let cc = 0; cc < project.comments.length; cc++) {
+                if (!(project.comments[mm])) {
+                    project.comments[mm] = { points: [] };
+                }
+            }
+        }
+        let needSlice = (midiSongData.meters.length < 2)
+            && (midiSongData.changes.length < 3)
+            && (project.timeline[0].metre.count / project.timeline[0].metre.part == 1);
+        this.trimProject(project, needSlice);
+        return project;
+    }
+    createTimeLine(midiSongData) {
+        let count = 0;
+        let part = 0;
+        let bpm = 0;
+        let timeline = [];
+        let fromMs = 0;
+        while (fromMs < midiSongData.duration) {
+            let measure = this.createMeasure(midiSongData, fromMs, timeline.length);
+            fromMs = fromMs + measure.durationMs;
+            if (count != measure.metre.count || part != measure.metre.part || bpm != measure.tempo) {
+                count = measure.metre.count;
+                part = measure.metre.part;
+                bpm = measure.tempo;
+            }
+            else {
+            }
+            timeline.push(measure);
+        }
+        return timeline;
+    }
+    createMeasure(midiSongData, fromMs, barIdx) {
+        let change = this.findLastChange(midiSongData, fromMs);
+        let meter = this.findLastMeter(midiSongData, fromMs, barIdx);
+        let duration = this.calcMeasureDuration(midiSongData, meter, change.bpm, 1, fromMs);
+        let measure = {
+            tempo: change.bpm,
+            metre: meter,
+            startMs: fromMs,
+            durationMs: duration
+        };
+        return measure;
+    }
+    findLastChange(midiSongData, beforeMs) {
+        let nextChange = { track: 0, ms: 0, resolution: 0, bpm: 120 };
+        for (let ii = 1; ii < midiSongData.changes.length; ii++) {
+            if (midiSongData.changes[ii].ms > beforeMs + 1) {
+                break;
+            }
+            nextChange = midiSongData.changes[ii];
+        }
+        return nextChange;
+    }
+    findLastMeter(midiSongData, beforeMs, barIdx) {
+        let metre = {
+            count: midiSongData.meter.count,
+            part: midiSongData.meter.division
+        };
+        let midimeter = { track: 0, ms: 0, count: 4, division: 4 };
+        for (let mi = 0; mi < midiSongData.meters.length; mi++) {
+            if (midiSongData.meters[mi].ms > beforeMs + 1 + barIdx * 3) {
+                break;
+            }
+            midimeter = midiSongData.meters[mi];
+        }
+        metre.count = midimeter.count;
+        metre.part = midimeter.division;
+        return metre;
+    }
+    calcMeasureDuration(midiSongData, meter, bpm, part, startMs) {
+        let metreMath = MMUtil();
+        let wholeDurationMs = 1000 * metreMath.set(meter).duration(bpm);
+        let partDurationMs = part * wholeDurationMs;
+        let nextChange = this.findNextChange(midiSongData, startMs);
+        if (startMs < nextChange.ms && nextChange.ms < startMs + partDurationMs) {
+            let diffMs = nextChange.ms - startMs;
+            let ratio = diffMs / partDurationMs;
+            let newPart = ratio * part;
+            let newPartDurationMs = newPart * wholeDurationMs;
+            let remainsMs = this.calcMeasureDuration(midiSongData, meter, nextChange.bpm, part - newPart, nextChange.ms);
+            return newPartDurationMs + remainsMs;
+        }
+        else {
+            return partDurationMs;
+        }
+    }
+    findNextChange(midiSongData, afterMs) {
+        let nextChange = { track: 0, ms: 0, resolution: 0, bpm: 120 };
+        for (let ii = 1; ii < midiSongData.changes.length; ii++) {
+            if (midiSongData.changes[ii].ms > afterMs) {
+                nextChange = midiSongData.changes[ii];
+                break;
+            }
+        }
+        return nextChange;
+    }
+    addLyricsPoints(commentPoint, skip, txt, tempo) {
+        txt = txt.replace(/(\r)/g, '~');
+        txt = txt.replace(/\\r/g, '~');
+        txt = txt.replace(/(\n)/g, '~');
+        txt = txt.replace(/\\n/g, '~');
+        txt = txt.replace(/(~~)/g, '~');
+        txt = txt.replace(/(~~)/g, '~');
+        txt = txt.replace(/(~~)/g, '~');
+        txt = txt.replace(/(~~)/g, '~');
+        let strings = txt.split('~');
+        if (strings.length) {
+            let roundN = 750;
+            let nextMs = 1000 * MMUtil().set(skip).duration(tempo);
+            for (let ii = 0; ii < strings.length; ii++) {
+                let row = 0;
+                for (let ii = 0; ii < commentPoint.points.length; ii++) {
+                    let existsMs = 1000 * MMUtil().set(commentPoint.points[ii].skip).duration(tempo);
+                    if (Math.floor(Math.floor(existsMs / roundN) * roundN) == Math.floor(Math.floor(nextMs / roundN) * roundN)) {
+                        row++;
+                    }
+                }
+                commentPoint.points.push({ skip: skip, text: strings[ii].trim(), row: row });
+            }
+        }
+    }
+    collectDrums(midiTrack) {
+        let drums = [];
+        for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
+            let chord = midiTrack.songchords[ii];
+            for (let kk = 0; kk < chord.notes.length; kk++) {
+                let note = chord.notes[kk];
+                if (drums.indexOf(note.midiPitch) < 0) {
+                    drums.push(note.midiPitch);
+                }
+            }
+        }
+        return drums;
+    }
+    createProjectDrums(volume, top, drum, timeline, midiTrack, outputId) {
+        let projectDrums = {
+            title: midiTrack.title + ' ' + drumNames[drum],
+            measures: [],
+            sampler: {
+                id: 'drum' + (drum + Math.random()), data: '' + drum, kind: 'zdrum1', outputs: [outputId],
+                iconPosition: { x: top * 1.5, y: top / 2 }, state: 0
+            },
+            volume: volume
+        };
+        if (!(drum >= 35 && drum <= 81)) {
+            projectDrums.sampler.outputs = [];
+        }
+        let currentTimeMs = 0;
+        let mm = MMUtil();
+        for (let tt = 0; tt < timeline.length; tt++) {
+            let projectMeasure = { skips: [] };
+            projectDrums.measures.push(projectMeasure);
+            let nextMeasure = timeline[tt];
+            let measureDurationS = mm.set(nextMeasure.metre).duration(nextMeasure.tempo);
+            for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
+                let chord = midiTrack.songchords[ii];
+                for (let kk = 0; kk < chord.notes.length; kk++) {
+                    let note = chord.notes[kk];
+                    let pitch = note.midiPitch;
+                    if (pitch == drum) {
+                        if (chord.when >= currentTimeMs && chord.when < currentTimeMs + measureDurationS * 1000) {
+                            let skip = mm.calculate((chord.when - currentTimeMs) / 1000, nextMeasure.tempo);
+                            projectMeasure.skips.push(skip);
+                        }
+                    }
+                }
+            }
+            currentTimeMs = currentTimeMs + measureDurationS * 1000;
+        }
+        return projectDrums;
+    }
+    createProjectTrack(volume, top, timeline, midiTrack, outputId) {
+        let perfkind = 'zinstr1';
+        if (midiTrack.program == 24
+            || midiTrack.program == 25
+            || midiTrack.program == 26
+            || midiTrack.program == 27
+            || midiTrack.program == 28
+            || midiTrack.program == 29
+            || midiTrack.program == 30) {
+            perfkind = 'zvstrumming1';
+        }
+        let projectTrack = {
+            title: midiTrack.title + ' ' + insNames[midiTrack.program],
+            measures: [],
+            performer: {
+                id: 'track' + (midiTrack.program + Math.random()), data: '' + midiTrack.program, kind: perfkind, outputs: [outputId],
+                iconPosition: { x: top * 2, y: top }, state: 0
+            },
+            volume: volume
+        };
+        if (!(midiTrack.program >= 0 && midiTrack.program <= 127)) {
+            projectTrack.performer.outputs = [];
+        }
+        let mm = MMUtil();
+        for (let tt = 0; tt < timeline.length; tt++) {
+            let projectMeasure = { chords: [] };
+            projectTrack.measures.push(projectMeasure);
+            let nextMeasure = timeline[tt];
+            for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
+                let midiChord = midiTrack.songchords[ii];
+                if (this.numratio(midiChord.when) >= nextMeasure.startMs
+                    && this.numratio(midiChord.when) < nextMeasure.startMs + nextMeasure.durationMs) {
+                    let trackChord = null;
+                    let skip = mm.calculate((midiChord.when - nextMeasure.startMs) / 1000.0, nextMeasure.tempo).strip(32);
+                    if (skip.count < 0) {
+                        skip.count = 0;
+                    }
+                    for (let cc = 0; cc < projectMeasure.chords.length; cc++) {
+                        if (mm.set(projectMeasure.chords[cc].skip).equals(skip)) {
+                            trackChord = projectMeasure.chords[cc];
+                        }
+                    }
+                    if (trackChord == null) {
+                        trackChord = { skip: skip, pitches: [], slides: [] };
+                        projectMeasure.chords.push(trackChord);
+                    }
+                    if (trackChord) {
+                        for (let nn = 0; nn < midiChord.notes.length; nn++) {
+                            let midiNote = midiChord.notes[nn];
+                            if (midiNote.slidePoints.length > 0) {
+                                trackChord.slides = [];
+                                let bendDurationMs = 0;
+                                for (let pp = 0; pp < midiNote.slidePoints.length; pp++) {
+                                    let midiPoint = midiNote.slidePoints[pp];
+                                    let xduration = mm.calculate(midiPoint.durationms / 1000.0, nextMeasure.tempo);
+                                    trackChord.slides.push({
+                                        duration: xduration,
+                                        delta: midiNote.midiPitch - midiPoint.pitch
+                                    });
+                                    bendDurationMs = bendDurationMs + midiPoint.durationms;
+                                }
+                                let remains = midiNote.midiDuration - bendDurationMs;
+                                if (remains > 0) {
+                                    trackChord.slides.push({
+                                        duration: mm.calculate(remains / 1000.0, nextMeasure.tempo),
+                                        delta: midiNote.midiPitch - midiNote.slidePoints[midiNote.slidePoints.length - 1].pitch
+                                    });
+                                }
+                            }
+                            else {
+                                trackChord.slides = [{
+                                        duration: mm.calculate(midiNote.midiDuration / 1000.0, nextMeasure.tempo), delta: 0
+                                    }];
+                            }
+                            trackChord.pitches.push(midiNote.midiPitch);
+                        }
+                    }
+                }
+            }
+        }
+        return projectTrack;
+    }
+    trimProject(project, reslice) {
+        for (let ii = 0; ii < project.tracks.length; ii++) {
+            project.tracks[ii].performer.iconPosition.x = 10 + ii * 9;
+            project.tracks[ii].performer.iconPosition.y = 0 + ii * 4;
+        }
+        for (let ii = 0; ii < project.percussions.length; ii++) {
+            project.percussions[ii].sampler.iconPosition.x = 20 + ii * 4;
+            project.percussions[ii].sampler.iconPosition.y = 30 + ii * 9;
+        }
+        for (let ii = 0; ii < project.filters.length - 2; ii++) {
+            project.filters[ii].iconPosition.x = 10 + project.tracks.length * 9 + 5 + ii * 4;
+            project.filters[ii].iconPosition.y = ii * 9;
+        }
+        project.filters[project.filters.length - 2].iconPosition.x = 35 + project.tracks.length * 9 + project.filters.length * 4;
+        project.filters[project.filters.length - 2].iconPosition.y = project.filters.length * 5;
+        project.filters[project.filters.length - 1].iconPosition.x = 20 + project.tracks.length * 9 + project.filters.length * 4;
+        project.filters[project.filters.length - 1].iconPosition.y = project.filters.length * 6;
+        for (let tt = 0; tt < project.tracks.length; tt++) {
+            let track = project.tracks[tt];
+            for (let mm = 0; mm < track.measures.length; mm++) {
+                let measure = track.measures[mm];
+                for (let cc = 0; cc < measure.chords.length; cc++) {
+                    let chord = measure.chords[cc];
+                    chord.skip = MMUtil().set(chord.skip);
+                }
+            }
+        }
+        for (let ss = 0; ss < project.percussions.length; ss++) {
+            let sampleTrack = project.percussions[ss];
+            for (let mm = 0; mm < sampleTrack.measures.length; mm++) {
+                let measure = sampleTrack.measures[mm];
+                for (let mp = 0; mp < measure.skips.length; mp++) {
+                    let newSkip = MMUtil().set(measure.skips[mp]);
+                    measure.skips[mp].count = newSkip.count;
+                    measure.skips[mp].part = newSkip.part;
+                }
+            }
+        }
+        this.limitShort(project);
+        if (reslice) {
+            let durations = [];
+            for (let ii = 0; ii < 32; ii++) {
+                let len = this.calculateShift32(project, ii);
+                let nn = 32 - ii;
+                if (ii == 0) {
+                    nn = 0;
+                }
+                durations.push({ len: Math.round(len.count / len.part), shft: nn });
+            }
+            durations.sort((a, b) => {
+                return b.len - a.len;
+            });
+            console.log(durations);
+            let top = [durations[0]];
+            for (let ii = 1; ii < durations.length; ii++) {
+                if (durations[ii].len * 2.2 > durations[0].len) {
+                    top.push(durations[ii]);
+                }
+            }
+            top.sort((a, b) => { return a.shft - b.shft; });
+            console.log(top);
+            let shsize = top[0].shft;
+            if (shsize) {
+                console.log('shift', '' + shsize + '/32');
+                this.shiftForwar32(project, shsize);
+            }
+        }
+        let len = project.timeline.length;
+        for (let ii = len - 1; ii > 0; ii--) {
+            if (this.isBarEmpty(ii, project)) {
+            }
+            else {
+                project.timeline.length = ii + 2;
+                return;
+            }
+        }
+    }
+    limitShort(project) {
+        let note16 = MMUtil().set({ count: 1, part: 16 });
+        for (let tt = 0; tt < project.tracks.length; tt++) {
+            let track = project.tracks[tt];
+            for (let mm = 0; mm < track.measures.length; mm++) {
+                let measure = track.measures[mm];
+                for (let cc = 0; cc < measure.chords.length; cc++) {
+                    let chord = measure.chords[cc];
+                    if (chord.slides.length == 1) {
+                        chord.slides[0].duration = MMUtil().set(chord.slides[0].duration).simplyfy();
+                        if (note16.more(chord.slides[0].duration)) {
+                            chord.slides[0].duration = note16;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    calculateShift32(project, count32) {
+        let ticker = MMUtil().set({ count: count32, part: 32 });
+        let duration = MMUtil().set({ count: 0, part: 32 });
+        for (let mm = 0; mm < project.timeline.length; mm++) {
+            duration = duration.plus(project.timeline[mm].metre);
+        }
+        let smm = MMUtil().set({ count: 0, part: 32 });
+        while (ticker.less(duration)) {
+            let pointLen = this.extractPointStampDuration(project, ticker);
+            smm = smm.plus(pointLen).strip(32);
+            ticker = ticker.plus({ count: 1, part: 1 });
+        }
+        return smm.strip(32);
+    }
+    extractPointStampDuration(project, at) {
+        let pointSumm = MMUtil().set({ count: 0, part: 32 });
+        let end = MMUtil().set({ count: 0, part: 32 });
+        for (let mm = 0; mm < project.timeline.length; mm++) {
+            let barStart = end.simplyfy();
+            end = end.plus(project.timeline[mm].metre).strip(32);
+            if (end.more(at)) {
+                let skip = MMUtil().set(at).minus(barStart);
+                for (let pp = 0; pp < project.tracks.length; pp++) {
+                    let track = project.tracks[pp];
+                    let trackBar = track.measures[mm];
+                    for (let ss = 0; ss < trackBar.chords.length; ss++) {
+                        let chord = trackBar.chords[ss];
+                        let chordSkip = MMUtil().set(chord.skip).strip(32);
+                        if (skip.strip(32).equals(chordSkip)) {
+                            let chordLen = MMUtil().set({ count: 0, part: 32 });
+                            for (let ss = 0; ss < chord.slides.length; ss++) {
+                                chordLen = chordLen.plus(chord.slides[ss].duration).strip(32);
+                            }
+                            pointSumm = pointSumm.plus(chordLen).strip(32);
+                            break;
+                        }
+                    }
+                }
+                for (let dd = 0; dd < project.percussions.length; dd++) {
+                    let drum = project.percussions[dd];
+                    let drumBar = drum.measures[mm];
+                    let drumDuration = { count: 1, part: 16 };
+                    if (drum.sampler.data == '35' || drum.sampler.data == '36') {
+                        drumDuration = { count: 3, part: 16 };
+                    }
+                    else {
+                        if (drum.sampler.data == '38' || drum.sampler.data == '40') {
+                            drumDuration = { count: 2, part: 16 };
+                        }
+                    }
+                    for (let ss = 0; ss < drumBar.skips.length; ss++) {
+                        let drumSkip = MMUtil().set(drumBar.skips[ss]).strip(32);
+                        if (skip.strip(32).equals(drumSkip)) {
+                            pointSumm = pointSumm.plus(drumDuration).strip(32);
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        return pointSumm;
+    }
+    numratio(nn) {
+        let rr = 1;
+        return Math.round(nn * rr);
+    }
+    shiftForwar32(project, amount) {
+        for (let mm = project.timeline.length - 2; mm >= 0; mm--) {
+            let measureDuration = MMUtil().set(project.timeline[mm].metre);
+            for (let tt = 0; tt < project.tracks.length; tt++) {
+                let track = project.tracks[tt];
+                let trackMeasure = track.measures[mm];
+                let trackNextMeasure = track.measures[mm + 1];
+                for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
+                    let chord = trackMeasure.chords[cc];
+                    let newSkip = MMUtil().set(chord.skip).plus({ count: amount, part: 32 });
+                    if (measureDuration.more(newSkip)) {
+                        chord.skip = newSkip.simplyfy();
+                    }
+                    else {
+                        trackMeasure.chords.splice(cc, 1);
+                        cc--;
+                        trackNextMeasure.chords.push(chord);
+                        chord.skip = newSkip.minus(measureDuration).simplyfy();
+                    }
+                }
+            }
+            for (let ss = 0; ss < project.percussions.length; ss++) {
+                let sampleTrack = project.percussions[ss];
+                let sampleMeasure = sampleTrack.measures[mm];
+                let sampleNextMeasure = sampleTrack.measures[mm + 1];
+                for (let mp = 0; mp < sampleMeasure.skips.length; mp++) {
+                    let newSkip = MMUtil().set(sampleMeasure.skips[mp]).plus({ count: amount, part: 32 });
+                    if (measureDuration.more(newSkip)) {
+                        sampleMeasure.skips[mp] = newSkip.simplyfy();
+                    }
+                    else {
+                        sampleMeasure.skips.splice(mp, 1);
+                        mp--;
+                        sampleNextMeasure.skips.push(newSkip.minus(measureDuration).simplyfy());
+                    }
+                }
+            }
+            for (let cc = 0; cc < project.comments.length; cc++) {
+                let comMeasure = project.comments[mm];
+                let comNextMeasure = project.comments[mm + 1];
+                for (let pp = 0; pp < comMeasure.points.length; pp++) {
+                    let point = comMeasure.points[pp];
+                    let newSkip = MMUtil().set(point.skip).plus({ count: amount, part: 32 });
+                    if (measureDuration.more(newSkip)) {
+                        point.skip = newSkip.simplyfy();
+                    }
+                    else {
+                        comMeasure.points.splice(pp, 1);
+                        pp--;
+                        comNextMeasure.points.push(point);
+                        point.skip = newSkip.minus(measureDuration).simplyfy();
+                    }
+                }
+            }
+            for (let ff = 0; ff < project.filters.length; ff++) {
+                let autoMeasure = project.filters[ff].automation[mm];
+                let autoNextMeasure = project.filters[ff].automation[mm + 1];
+                for (let cc = 0; cc < autoMeasure.changes.length; cc++) {
+                    let change = autoMeasure.changes[cc];
+                    let newSkip = MMUtil().set(change.skip).plus({ count: amount, part: 32 });
+                    if (measureDuration.more(newSkip)) {
+                        change.skip = newSkip.simplyfy();
+                    }
+                    else {
+                        autoMeasure.changes.splice(cc, 1);
+                        cc--;
+                        autoNextMeasure.changes.push(change);
+                        change.skip = newSkip.minus(measureDuration).simplyfy();
+                    }
+                }
+            }
+        }
+    }
+    isBarEmpty(barIdx, project) {
+        for (let tt = 0; tt < project.tracks.length; tt++) {
+            let track = project.tracks[tt];
+            if (track.measures[barIdx]) {
+                if (track.measures[barIdx].chords.length) {
+                    return false;
+                }
+            }
+        }
+        for (let tt = 0; tt < project.percussions.length; tt++) {
+            let drum = project.percussions[tt];
+            if (drum.measures[barIdx]) {
+                if (drum.measures[barIdx].skips.length) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
 //# sourceMappingURL=midimusic.js.map

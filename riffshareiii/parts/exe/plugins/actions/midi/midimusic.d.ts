@@ -345,43 +345,6 @@ declare class MidiParser {
     parseNotes(): void;
     nextEvent(stream: DataViewStream): MIDIEvent;
     parseTrackEvents(track: MIDIFileTrack): void;
-    findOrCreateTrack(parsedtrack: MIDIFileTrack, trackNum: number, channelNum: number, trackChannel: {
-        trackNum: number;
-        channelNum: number;
-        track: MIDISongTrack;
-    }[]): {
-        trackNum: number;
-        channelNum: number;
-        track: MIDISongTrack;
-    };
-    findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): Zvoog_Metre;
-    findLastChange(midiSongData: MIDISongData, beforeMs: number): {
-        track: number;
-        ms: number;
-        resolution: number;
-        bpm: number;
-    };
-    findNextChange(midiSongData: MIDISongData, afterMs: number): {
-        track: number;
-        ms: number;
-        resolution: number;
-        bpm: number;
-    };
-    calcMeasureDuration(midiSongData: MIDISongData, meter: Zvoog_Metre, bpm: number, part: number, startMs: number): number;
-    createMeasure(midiSongData: MIDISongData, fromMs: number, barIdx: number): ImportMeasure;
-    createTimeLine(midiSongData: MIDISongData): Zvoog_SongMeasure[];
-    convertProject(title: string, comment: string): Zvoog_Project;
-    calculateShift32(project: Zvoog_Project, count32: number): Zvoog_Metre;
-    extractPointStampDuration(project: Zvoog_Project, at: Zvoog_Metre): Zvoog_Metre;
-    trimProject(project: Zvoog_Project, reslice: boolean): void;
-    limitShort(project: Zvoog_Project): void;
-    shiftForwar32(project: Zvoog_Project, amount: number): void;
-    isBarEmpty(barIdx: number, project: Zvoog_Project): boolean;
-    addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string, tempo: number): void;
-    collectDrums(midiTrack: MIDISongTrack): number[];
-    numratio(nn: number): number;
-    createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack;
-    createProjectDrums(volume: number, top: number, drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack;
 }
 declare let instrumentNamesArray: string[];
 declare let drumNamesArray: string[];
@@ -573,16 +536,6 @@ declare class MIDIFileHeader {
     getTicksPerFrame(): number;
     getSMPTEFrames(): number;
 }
-declare class MIDIIImportMusicPlugin {
-    callbackID: string;
-    parsedProject: Zvoog_Project | null;
-    constructor();
-    init(): void;
-    sendImportedMIDIData(): void;
-    loadMIDIfile(inputFile: any): void;
-    receiveHostMessage(par: any): void;
-}
-declare function newMIDIparser2(arrayBuffer: ArrayBuffer): MidiParser;
 declare class MIDIFileTrack {
     datas: DataView;
     HDR_LENGTH: number;
@@ -602,4 +555,56 @@ declare class MIDIFileTrack {
     }[];
     chords: TrackChord[];
     constructor(buffer: ArrayBuffer, start: number);
+}
+declare class MIDIIImportMusicPlugin {
+    callbackID: string;
+    parsedProject: Zvoog_Project | null;
+    constructor();
+    init(): void;
+    sendImportedMIDIData(): void;
+    loadMIDIfile(inputFile: any): void;
+    receiveHostMessage(par: any): void;
+}
+declare function newMIDIparser2(arrayBuffer: ArrayBuffer): MidiParser;
+declare class MIDIConverter {
+    convertProject(parser: MidiParser): MIDISongData;
+    findOrCreateTrack(parsedtrack: MIDIFileTrack, trackNum: number, channelNum: number, trackChannel: {
+        trackNum: number;
+        channelNum: number;
+        track: MIDISongTrack;
+    }[]): {
+        trackNum: number;
+        channelNum: number;
+        track: MIDISongTrack;
+    };
+}
+declare class Projectr {
+    readProject(midiSongData: MIDISongData, title: string, comment: string): Zvoog_Project;
+    createTimeLine(midiSongData: MIDISongData): Zvoog_SongMeasure[];
+    createMeasure(midiSongData: MIDISongData, fromMs: number, barIdx: number): ImportMeasure;
+    findLastChange(midiSongData: MIDISongData, beforeMs: number): {
+        track: number;
+        ms: number;
+        resolution: number;
+        bpm: number;
+    };
+    findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): Zvoog_Metre;
+    calcMeasureDuration(midiSongData: MIDISongData, meter: Zvoog_Metre, bpm: number, part: number, startMs: number): number;
+    findNextChange(midiSongData: MIDISongData, afterMs: number): {
+        track: number;
+        ms: number;
+        resolution: number;
+        bpm: number;
+    };
+    addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string, tempo: number): void;
+    collectDrums(midiTrack: MIDISongTrack): number[];
+    createProjectDrums(volume: number, top: number, drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack;
+    createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack;
+    trimProject(project: Zvoog_Project, reslice: boolean): void;
+    limitShort(project: Zvoog_Project): void;
+    calculateShift32(project: Zvoog_Project, count32: number): Zvoog_Metre;
+    extractPointStampDuration(project: Zvoog_Project, at: Zvoog_Metre): Zvoog_Metre;
+    numratio(nn: number): number;
+    shiftForwar32(project: Zvoog_Project, amount: number): void;
+    isBarEmpty(barIdx: number, project: Zvoog_Project): boolean;
 }

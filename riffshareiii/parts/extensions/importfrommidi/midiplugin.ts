@@ -54,7 +54,16 @@ class MIDIIImportMusicPlugin {
 				let comment: string = ', ' + file.size / 1000 + 'kb, ' + dat;
 				var arrayBuffer = progressEvent.target.result;
 				var midiParser = newMIDIparser2(arrayBuffer);
-				me.parsedProject = midiParser.convertProject(title, comment);
+				console.log('done midiParser', this);
+				//me.parsedProject = midiParser.convertProject(title, comment);
+				let cnvrtr: MIDIConverter = new MIDIConverter();
+
+				let midiSongData: MIDISongData=cnvrtr.convertProject(midiParser);
+				console.log('done midiSongData', midiSongData);
+				let proj = new Projectr();
+				me.parsedProject = proj.readProject(midiSongData,title, comment);
+				console.log('done zproject', me.parsedProject);
+				//me.parsedProject = cnvrtr.convertProject(midiParser, title, comment);
 			}
 		};
 		fileReader.readAsArrayBuffer(file);
@@ -73,26 +82,4 @@ class MIDIIImportMusicPlugin {
 
 function newMIDIparser2(arrayBuffer: ArrayBuffer) {
 	return new MidiParser(arrayBuffer);
-}
-class MIDIFileTrack {
-	//nn:number
-	datas: DataView;
-	HDR_LENGTH: number = 8;
-	trackLength: number;
-	trackContent: DataView;
-	trackevents: MIDIEvent[];
-	trackTitle: string;
-	instrumentName: string;
-	programChannel: { program: number, channel: number }[];
-	trackVolumePoints: { ms: number, value: number, channel: number }[];
-	chords: TrackChord[] = [];
-	constructor(buffer: ArrayBuffer, start: number) {
-		this.datas = new DataView(buffer, start, this.HDR_LENGTH);
-		this.trackLength = this.datas.getUint32(4);
-		this.datas = new DataView(buffer, start, this.HDR_LENGTH + this.trackLength);
-		this.trackContent = new DataView(this.datas.buffer, this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
-		this.trackevents = [];
-		this.trackVolumePoints = [];
-		this.programChannel = [];
-	}
 }
