@@ -23,9 +23,11 @@
 	fill: url(#positionTimeMarkFill);
 }
 
+
+
 .timeSelection {
-	fill-opacity: 20%;
-	fill: var(--line-color);
+	fill-opacity2: 20%;
+	fill: var(--selectedtime-color);
 	pointer-events: none;
 	animation2: focusFlashFill 4s linear infinite;
 

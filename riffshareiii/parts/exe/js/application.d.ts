@@ -28,6 +28,7 @@ declare class StateDiff {
 declare function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player;
 declare function createTileLevel(): TileLevelBase;
 declare function startApplication(): void;
+declare function saveProjectState(): void;
 declare function initWebAudioFromUI(): void;
 declare function startLoadCSSfile(cssurl: string): void;
 declare class PluginDialogPrompt {
@@ -86,7 +87,7 @@ declare class CommandDispatcher {
     setupAndStartPlay(): void;
     startPlayLoop(from: number, position: number, to: number): void;
     setThemeLocale(loc: string, ratio: number): void;
-    setThemeColor(cssPath: string): void;
+    setThemeColor(idx: string): void;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     changeTapSize(ratio: number): void;
     resetProject(): void;
@@ -96,6 +97,7 @@ declare class CommandDispatcher {
     cancelPluginGUI(): void;
     timeSelectChange(idx: number): void;
     playFromTimeSelection(idx: number): void;
+    setupSelectionBackground(selectedPart: Zvoog_Selection): void;
     expandTimeLineSelection(idx: number): void;
 }
 declare let globalCommandDispatcher: CommandDispatcher;
@@ -533,6 +535,9 @@ declare class WarningUI {
     showWarning(title: string, msg: string, onCancel: null | (() => void)): void;
     hideWarning(): void;
 }
+declare function saveText2localStorage(name: string, text: string): void;
+declare function readTextFromlocalStorage(name: string): string;
+declare function readObjectFromlocalStorage(name: string): any;
 declare let _mzxbxProjectForTesting2: Zvoog_Project;
 declare class MixerDataMathUtility {
     data: Zvoog_Project;

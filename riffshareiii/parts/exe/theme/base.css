@@ -103,11 +103,18 @@
 
 	--click-color50: color-mix(in lab, transparent 50%, var(--click-color));
 
+	--line-color90: color-mix(in lab, transparent 90%, var(--line-color));
 	--line-color75: color-mix(in lab, transparent 75%, var(--line-color));
 	--line-color50: color-mix(in lab, transparent 50%, var(--line-color));
 	--line-color6: color-mix(in lab, transparent 6%, var(--line-color));
 
 	--background-color10: color-mix(in lab, transparent 10%, var(--background-color));
+
+	--selectedtime-color: color-mix(in lab, transparent 0%, var(--background-color));
+	--selectedbgground-color: color-mix(in lab, transparent 90%, var(--line-color));
+	--unselectedbg-color: color-mix(in lab, transparent 99%, var(--line-color));
+
+
 
 }
 
@@ -182,6 +189,7 @@ body {
 	background-position: center;
 	display: flex;
 	flex-direction: column;
+	background: var(--back-color);
 }
 
 #tileLevelSVG {
@@ -192,12 +200,13 @@ body {
 	stroke-linecap: round;
 	margin: 0px;
 	padding: 0px;
-	background: var(--back-color);
+	background: var(--unselectedbg-color);
 	flex-basis: 0;
 	flex-shrink: 1;
 	flex-grow: 1;
 
 }
+
 
 
 

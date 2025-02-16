@@ -6,7 +6,17 @@ function startApplication() {
     //let commands = new CommandDispatcher();
     let ui = new UIRenderer();
     ui.createUI();
+    window.addEventListener("unload", saveProjectState);
     globalCommandDispatcher.registerWorkProject(_mzxbxProjectForTesting2);
+    try {
+        let last = readObjectFromlocalStorage('lastprojectdata');
+        if (last) {
+            globalCommandDispatcher.registerWorkProject(last);
+        }
+    } catch (xx) {
+        console.log(xx);
+
+    }
     globalCommandDispatcher.resetProject();
     //ui.fillWholeUI();//testBigMixerData);//testEmptyMixerData);
     //testNumMathUtil();
@@ -16,6 +26,9 @@ function startApplication() {
         initWebAudioFromUI();
         
     });*/
+}
+function saveProjectState() {
+    saveText2localStorage('lastprojectdata', JSON.stringify(globalCommandDispatcher.cfg().data));
 }
 function initWebAudioFromUI() {
     console.log('initWebAudioFromUI');

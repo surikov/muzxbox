@@ -69,6 +69,7 @@ class CommandDispatcher {
 	}
 	registerWorkProject(data: Zvoog_Project) {
 		this._mixerDataMathUtility = new MixerDataMathUtility(data);
+		
 	}
 	registerUI(renderer: UIRenderer) {
 		this.renderer = renderer;
@@ -368,10 +369,18 @@ class CommandDispatcher {
 		}
 		this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
 	}
-	setThemeColor(cssPath: string) {
+	setThemeColor(idx: string) {//cssPath: string) {
+		let cssPath: string = 'theme/colordarkblue.css';
+		if (idx == 'green1') {
+			cssPath = 'theme/colordarkgreen.css';
+		}
+		if (idx == 'red1') {
+			cssPath = 'theme/colordarkred.css';
+		}
 		console.log("cssPath " + cssPath);
 		startLoadCSSfile(cssPath);
 		this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
+		saveText2localStorage('uicolortheme', idx);
 	}
 	resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) {
 		this.renderer.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
@@ -391,6 +400,7 @@ class CommandDispatcher {
 					this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
 
 			this.renderer.fillWholeUI();
+			this.setupSelectionBackground(this.cfg().data.selectedPart);
 		} catch (xx) {
 			console.log('resetProject', xx);
 			console.log('data', this.cfg().data);
@@ -502,6 +512,24 @@ class CommandDispatcher {
 		this.reDrawPlayPosition();
 		this.setupAndStartPlay();
 	}
+	setupSelectionBackground(selectedPart: Zvoog_Selection) {
+		/*
+				#tileLevelSVG {
+					width: 100%;
+					user-select: none;
+					touch-action: manipulation;
+					background-size: cover;
+					stroke-linecap: round;
+					margin: 0px;
+					padding: 0px;
+					background: var(--back-color);*/
+		let tileLevelSVG = document.getElementById('tileLevelSVG');
+		if (selectedPart.startMeasure < 0) {
+			tileLevelSVG?.style.setProperty('background', 'var(--unselectedbg-color)');
+		} else {
+			tileLevelSVG?.style.setProperty('background', 'var(--selectedbgground-color)');
+		}
+	}
 	expandTimeLineSelection(idx: number) {
 
 		if (this.cfg().data) {
@@ -533,6 +561,7 @@ class CommandDispatcher {
 						, endMeasure: idx
 					};
 				}
+				this.setupSelectionBackground(curPro.selectedPart);
 			}
 		} else {
 			console.log('no project data');

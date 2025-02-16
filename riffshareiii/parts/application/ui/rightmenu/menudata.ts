@@ -185,15 +185,15 @@ function composeBaseMenu(): MenuInfo[] {
 						text: 'Colors', children: [
 							{
 								text: 'Red', onClick: () => {
-									globalCommandDispatcher.setThemeColor('theme/colordarkred.css');
+									globalCommandDispatcher.setThemeColor('red1');//'theme/colordarkred.css');
 								}
 							}, {
 								text: 'Green', onClick: () => {
-									globalCommandDispatcher.setThemeColor('theme/colordarkgreen.css');
+									globalCommandDispatcher.setThemeColor('green1');//'theme/colordarkgreen.css');
 								}
 							}, {
 								text: 'Blue', onClick: () => {
-									globalCommandDispatcher.setThemeColor('theme/colordarkblue.css');
+									globalCommandDispatcher.setThemeColor('blue1');//'theme/colordarkblue.css');
 								}
 							}
 						]

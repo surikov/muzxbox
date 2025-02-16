@@ -235,8 +235,21 @@ function startApplication() {
     console.log('startApplication v1.6.11');
     let ui = new UIRenderer();
     ui.createUI();
+    window.addEventListener("unload", saveProjectState);
     globalCommandDispatcher.registerWorkProject(_mzxbxProjectForTesting2);
+    try {
+        let last = readObjectFromlocalStorage('lastprojectdata');
+        if (last) {
+            globalCommandDispatcher.registerWorkProject(last);
+        }
+    }
+    catch (xx) {
+        console.log(xx);
+    }
     globalCommandDispatcher.resetProject();
+}
+function saveProjectState() {
+    saveText2localStorage('lastprojectdata', JSON.stringify(globalCommandDispatcher.cfg().data));
 }
 function initWebAudioFromUI() {
     console.log('initWebAudioFromUI');
@@ -819,10 +832,18 @@ class CommandDispatcher {
         }
         this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
     }
-    setThemeColor(cssPath) {
+    setThemeColor(idx) {
+        let cssPath = 'theme/colordarkblue.css';
+        if (idx == 'green1') {
+            cssPath = 'theme/colordarkgreen.css';
+        }
+        if (idx == 'red1') {
+            cssPath = 'theme/colordarkred.css';
+        }
         console.log("cssPath " + cssPath);
         startLoadCSSfile(cssPath);
         this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
+        saveText2localStorage('uicolortheme', idx);
     }
     resetAnchor(parentSVGGroup, anchor, layerMode) {
         this.renderer.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
@@ -841,6 +862,7 @@ class CommandDispatcher {
                 if (this.cfg().data.tracks[0])
                     this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
             this.renderer.fillWholeUI();
+            this.setupSelectionBackground(this.cfg().data.selectedPart);
         }
         catch (xx) {
             console.log('resetProject', xx);
@@ -891,6 +913,15 @@ class CommandDispatcher {
         this.reDrawPlayPosition();
         this.setupAndStartPlay();
     }
+    setupSelectionBackground(selectedPart) {
+        let tileLevelSVG = document.getElementById('tileLevelSVG');
+        if (selectedPart.startMeasure < 0) {
+            tileLevelSVG === null || tileLevelSVG === void 0 ? void 0 : tileLevelSVG.style.setProperty('background', 'var(--unselectedbg-color)');
+        }
+        else {
+            tileLevelSVG === null || tileLevelSVG === void 0 ? void 0 : tileLevelSVG.style.setProperty('background', 'var(--selectedbgground-color)');
+        }
+    }
     expandTimeLineSelection(idx) {
         if (this.cfg().data) {
             if (idx >= 0 && idx < this.cfg().data.timeline.length) {
@@ -925,6 +956,7 @@ class CommandDispatcher {
                         endMeasure: idx
                     };
                 }
+                this.setupSelectionBackground(curPro.selectedPart);
             }
         }
         else {
@@ -1054,6 +1086,10 @@ class UIRenderer {
             this.tiler.setCurrentPointPosition({ x: 0, y: 0, z: 32 });
         }
         this.tiler.resetModel();
+        let themei = readTextFromlocalStorage('uicolortheme');
+        if (themei) {
+            globalCommandDispatcher.setThemeColor(themei);
+        }
     }
     onReSizeView() {
         let mixH = 1;
@@ -2229,15 +2265,15 @@ function composeBaseMenu() {
                         text: 'Colors', children: [
                             {
                                 text: 'Red', onClick: () => {
-                                    globalCommandDispatcher.setThemeColor('theme/colordarkred.css');
+                                    globalCommandDispatcher.setThemeColor('red1');
                                 }
                             }, {
                                 text: 'Green', onClick: () => {
-                                    globalCommandDispatcher.setThemeColor('theme/colordarkgreen.css');
+                                    globalCommandDispatcher.setThemeColor('green1');
                                 }
                             }, {
                                 text: 'Blue', onClick: () => {
-                                    globalCommandDispatcher.setThemeColor('theme/colordarkblue.css');
+                                    globalCommandDispatcher.setThemeColor('blue1');
                                 }
                             }
                         ]
@@ -4104,6 +4140,40 @@ class WarningUI {
         document.getElementById("warningDialogGroup").style.visibility = "hidden";
         this.onCancel = null;
     }
+}
+function saveText2localStorage(name, text) {
+    localStorage.setItem(name, text);
+}
+function readTextFromlocalStorage(name) {
+    try {
+        let o = localStorage.getItem(name);
+        if (o) {
+            return o;
+        }
+        else {
+            return '';
+        }
+    }
+    catch (ex) {
+        console.log(ex);
+    }
+    return '';
+}
+function readObjectFromlocalStorage(name) {
+    try {
+        let txt = localStorage.getItem(name);
+        if (txt) {
+            let o = JSON.parse(txt);
+            return o;
+        }
+        else {
+            return null;
+        }
+    }
+    catch (ex) {
+        console.log(ex);
+    }
+    return null;
 }
 let _mzxbxProjectForTesting2 = {
     title: 'test data for debug',

@@ -202,6 +202,10 @@ class UIRenderer {//} implements RenderedPart {
 		this.tiler.resetModel();
 
 		//console.log('fillWholeUI', this.tiler);
+		let themei=readTextFromlocalStorage('uicolortheme');
+		if(themei){
+			globalCommandDispatcher.setThemeColor(themei);
+		}
 
 	}
 	onReSizeView() {
