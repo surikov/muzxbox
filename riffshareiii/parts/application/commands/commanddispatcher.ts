@@ -377,6 +377,9 @@ class CommandDispatcher {
 		if (idx == 'red1') {
 			cssPath = 'theme/colordarkred.css';
 		}
+		if (idx == 'neon1') {
+			cssPath = 'theme/colorneon.css';
+		}
 		console.log("cssPath " + cssPath);
 		startLoadCSSfile(cssPath);
 		this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);

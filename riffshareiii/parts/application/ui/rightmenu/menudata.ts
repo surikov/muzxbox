@@ -195,6 +195,10 @@ function composeBaseMenu(): MenuInfo[] {
 								text: 'Blue', onClick: () => {
 									globalCommandDispatcher.setThemeColor('blue1');//'theme/colordarkblue.css');
 								}
+							}, {
+								text: 'Neon', onClick: () => {
+									globalCommandDispatcher.setThemeColor('neon1');
+								}
 							}
 						]
 					}
