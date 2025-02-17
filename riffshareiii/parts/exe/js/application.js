@@ -843,6 +843,9 @@ class CommandDispatcher {
         if (idx == 'neon1') {
             cssPath = 'theme/colorneon.css';
         }
+        if (idx == 'light1') {
+            cssPath = 'theme/colorlight.css';
+        }
         console.log("cssPath " + cssPath);
         startLoadCSSfile(cssPath);
         this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
@@ -2280,6 +2283,11 @@ function composeBaseMenu() {
                             }, {
                                 text: 'Neon', onClick: () => {
                                     globalCommandDispatcher.setThemeColor('neon1');
+                                }
+                            },
+                            {
+                                text: 'Light', onClick: () => {
+                                    globalCommandDispatcher.setThemeColor('light1');
                                 }
                             }
                         ]
