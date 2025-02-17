@@ -1,8 +1,17 @@
 :root {
 	--background-color: #eef6ff;
-	--main-color: #000;
+	--main-color: #006;
 	--drag-color: #f60;
-	--line-color: #666;
+	--line-color: #333;
 	--click-color: #f00;
 }
+/*
+#pagediv {
 
+	background-image: url("bg/gjel.png");
+	background-repeat: repeat-x;
+	background-size2: cover;
+	background-position: bottom;
+
+}
+*/

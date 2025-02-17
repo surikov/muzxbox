@@ -184,9 +184,9 @@ body {
 	padding: 0px;
 	min-height: 100%;
 	background-image2: url("bg/burevestnik.jpg");
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-position: center;
+	background-repeat2: no-repeat;
+	background-size2: cover;
+	background-position2: center;
 	display: flex;
 	flex-direction: column;
 	background: var(--back-color);
