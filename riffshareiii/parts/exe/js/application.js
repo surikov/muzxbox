@@ -235,7 +235,7 @@ function startApplication() {
     console.log('startApplication v1.6.11');
     let ui = new UIRenderer();
     ui.createUI();
-    window.addEventListener("unload", saveProjectState);
+    window.addEventListener("beforeunload", saveProjectState);
     globalCommandDispatcher.registerWorkProject(_mzxbxProjectForTesting2);
     try {
         let last = readObjectFromlocalStorage('lastprojectdata');
@@ -249,7 +249,20 @@ function startApplication() {
     globalCommandDispatcher.resetProject();
 }
 function saveProjectState() {
-    saveText2localStorage('lastprojectdata', JSON.stringify(globalCommandDispatcher.cfg().data));
+    try {
+        saveText2localStorage('lastprojectdata', JSON.stringify(globalCommandDispatcher.cfg().data));
+    }
+    catch (xx) {
+        console.log(xx);
+        globalCommandDispatcher.cfg().data.undo = [];
+        globalCommandDispatcher.cfg().data.redo = [];
+        try {
+            saveText2localStorage('lastprojectdata', JSON.stringify(globalCommandDispatcher.cfg().data));
+        }
+        catch (rr) {
+            console.log(rr);
+        }
+    }
 }
 function initWebAudioFromUI() {
     console.log('initWebAudioFromUI');
