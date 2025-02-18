@@ -249,6 +249,7 @@ function startApplication() {
     globalCommandDispatcher.resetProject();
 }
 function saveProjectState() {
+    globalCommandDispatcher.exe.cutLongUndo();
     try {
         saveText2localStorage('lastprojectdata', JSON.stringify(globalCommandDispatcher.cfg().data));
     }
@@ -492,19 +493,15 @@ class CommandExe {
         }
     }
     cutLongUndo() {
-        let unCnt = 0;
+        let actionCount = 0;
         for (let ii = 0; ii < globalCommandDispatcher.cfg().data.undo.length; ii++) {
             let one = globalCommandDispatcher.cfg().data.undo[ii];
-            unCnt = unCnt + one.actions.length;
-        }
-        let reCnt = 0;
-        for (let ii = 0; ii < globalCommandDispatcher.cfg().data.redo.length; ii++) {
-            let one = globalCommandDispatcher.cfg().data.redo[ii];
-            reCnt = reCnt + one.actions.length;
-        }
-        if (unCnt > 32100) {
-            console.log('cut undo queue');
-            let cmd = globalCommandDispatcher.cfg().data.undo.shift();
+            actionCount = actionCount + one.actions.length;
+            if (actionCount > 43210) {
+                console.log('cut undo ', ii, 'from', globalCommandDispatcher.cfg().data.undo.length);
+                globalCommandDispatcher.cfg().data.undo.splice(0, ii);
+                break;
+            }
         }
     }
     undo(cnt) {

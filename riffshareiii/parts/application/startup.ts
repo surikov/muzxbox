@@ -29,6 +29,8 @@ function startApplication() {
 	});*/
 }
 function saveProjectState() {
+	//https://github.com/pieroxy/lz-string
+	globalCommandDispatcher.exe.cutLongUndo();
 	try {
 		saveText2localStorage('lastprojectdata', JSON.stringify(globalCommandDispatcher.cfg().data));
 	} catch (xx) {

@@ -74,6 +74,7 @@ class CommandExe {
 		}
 	}
 	cutLongUndo() {
+		/*
 		let unCnt = 0;
 		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.undo.length; ii++) {
 			let one = globalCommandDispatcher.cfg().data.undo[ii];
@@ -83,11 +84,25 @@ class CommandExe {
 		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.redo.length; ii++) {
 			let one = globalCommandDispatcher.cfg().data.redo[ii];
 			reCnt = reCnt + one.actions.length;
-		}
+		}*/
 		//console.log('undo', unCnt, 'redo', reCnt);
-		if (unCnt > 32100) {
+
+		/*if (unCnt > 4210) {
 			console.log('cut undo queue');
-			let cmd = globalCommandDispatcher.cfg().data.undo.shift();
+			//let cmd = globalCommandDispatcher.cfg().data.undo.shift();
+			globalCommandDispatcher.cfg().data.undo.splice(0,unCnt-3210);
+		}*/
+		//console.log('undo len ', globalCommandDispatcher.cfg().data.undo.length);
+		let actionCount = 0;
+		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.undo.length; ii++) {
+			let one = globalCommandDispatcher.cfg().data.undo[ii];
+			actionCount = actionCount + one.actions.length;
+			if (actionCount > 43210) {
+				console.log('cut undo ', ii, 'from', globalCommandDispatcher.cfg().data.undo.length);
+				globalCommandDispatcher.cfg().data.undo.splice(0, ii);
+				globalCommandDispatcher.cfg().data.redo = []
+				break;
+			}
 		}
 	}
 	undo(cnt: number) {
