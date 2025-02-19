@@ -110,9 +110,9 @@
 
 	--background-color10: color-mix(in lab, transparent 10%, var(--background-color));
 
-	--selectedtime-color: color-mix(in lab, transparent 0%, var(--background-color));
-	--selectedbgground-color: color-mix(in lab, transparent 90%, var(--line-color));
-	--unselectedbg-color: color-mix(in lab, transparent 99%, var(--line-color));
+	--selectedtime-color: color-mix(in lab, transparent 85%, var(--line-color));
+	--selectedbgground-color: color-mix(in lab, transparent 0%, var(--background-color));
+	--unselectedbg-color: color-mix(in lab, transparent 0%, var(--background-color));
 
 
 

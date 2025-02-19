@@ -144,11 +144,13 @@ class TimeSelectBar {
 
 	createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor//, data: Zvoog_Project
 		//,cfg:MixerDataMathUtility
+		, zz: number
 	) {
 		let mark: TileRectangle = {
 			x: barLeft, y: 0, w: size, h: size
-			//, rx: size / 2, ry: size / 2
-			, css: 'timeMarkButtonCircle', activation: (x, y) => {
+			, rx: size / 2, ry: size / 2
+			, css: 'timeMarkButtonCircle'+ zoomPrefixLevelsCSS[zz].prefix
+			, activation: (x, y) => {
 				//console.log('barIdx', barIdx);
 				globalCommandDispatcher.timeSelectChange(barIdx);//expandTimeLineSelection(barIdx);
 			}
@@ -161,13 +163,14 @@ class TimeSelectBar {
 		, curBar: Zvoog_SongMeasure
 		, measureAnchor: TileAnchor
 		, barTime: number
+		, size: number
 	) {
 		let mins = Math.floor(barTime / 60);
 		let secs = Math.floor(barTime % 60);
 		let hunds = Math.round(100 * (barTime - Math.floor(barTime)));
 		//let timeText = Math.round(barTime * 100) / 100;
 		let nm: TileText = {
-			x: barLeft
+			x: barLeft+size/4
 			, y: zoomPrefixLevelsCSS[zz].minZoom * 1
 			, text: '' + (1 + barnum) + ': ' + mins + '\'' + (secs > 9 ? '' : '0') + secs + '.' + hunds
 			, css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
@@ -175,7 +178,7 @@ class TimeSelectBar {
 		measureAnchor.content.push(nm);
 
 		let bpm: TileText = {
-			x: barLeft
+			x: barLeft+size/4
 			, y: zoomPrefixLevelsCSS[zz].minZoom * 2
 			, text: '' + Math.round(curBar.tempo) + ': ' + curBar.metre.count + '/' + curBar.metre.part
 			, css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
@@ -225,10 +228,11 @@ class TimeSelectBar {
 						//, zoomPrefixLevelsCSS[zz].minZoom * 3
 						, measureAnchor
 						//, cfg
+						,zz
 					);
 					this.createBarNumber(barLeft
 						//, zoomPrefixLevelsCSS[zz].minZoom * 3
-						, kk, zz, curBar, measureAnchor, barTime);
+						, kk, zz, curBar, measureAnchor, barTime, zoomPrefixLevelsCSS[zz].minZoom * 1.5);
 				}
 				let zoomInfo = zoomPrefixLevelsCSS[zz];
 				if (zoomInfo.gridLines.length > 0) {

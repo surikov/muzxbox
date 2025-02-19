@@ -1376,28 +1376,30 @@ class TimeSelectBar {
             this.selectionMark.w = 0.0005;
         }
     }
-    createBarMark(barIdx, barLeft, size, measureAnchor) {
+    createBarMark(barIdx, barLeft, size, measureAnchor, zz) {
         let mark = {
             x: barLeft, y: 0, w: size, h: size,
-            css: 'timeMarkButtonCircle', activation: (x, y) => {
+            rx: size / 2, ry: size / 2,
+            css: 'timeMarkButtonCircle' + zoomPrefixLevelsCSS[zz].prefix,
+            activation: (x, y) => {
                 globalCommandDispatcher.timeSelectChange(barIdx);
             }
         };
         measureAnchor.content.push(mark);
     }
-    createBarNumber(barLeft, barnum, zz, curBar, measureAnchor, barTime) {
+    createBarNumber(barLeft, barnum, zz, curBar, measureAnchor, barTime, size) {
         let mins = Math.floor(barTime / 60);
         let secs = Math.floor(barTime % 60);
         let hunds = Math.round(100 * (barTime - Math.floor(barTime)));
         let nm = {
-            x: barLeft,
+            x: barLeft + size / 4,
             y: zoomPrefixLevelsCSS[zz].minZoom * 1,
             text: '' + (1 + barnum) + ': ' + mins + '\'' + (secs > 9 ? '' : '0') + secs + '.' + hunds,
             css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(nm);
         let bpm = {
-            x: barLeft,
+            x: barLeft + size / 4,
             y: zoomPrefixLevelsCSS[zz].minZoom * 2,
             text: '' + Math.round(curBar.tempo) + ': ' + curBar.metre.count + '/' + curBar.metre.part,
             css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
@@ -1431,8 +1433,8 @@ class TimeSelectBar {
                 };
                 selectLevelAnchor.content.push(measureAnchor);
                 if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
-                    this.createBarMark(kk, barLeft, zoomPrefixLevelsCSS[zz].minZoom * 1.5, measureAnchor);
-                    this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor, barTime);
+                    this.createBarMark(kk, barLeft, zoomPrefixLevelsCSS[zz].minZoom * 1.5, measureAnchor, zz);
+                    this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor, barTime, zoomPrefixLevelsCSS[zz].minZoom * 1.5);
                 }
                 let zoomInfo = zoomPrefixLevelsCSS[zz];
                 if (zoomInfo.gridLines.length > 0) {
