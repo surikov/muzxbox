@@ -799,19 +799,30 @@ class TileLevelRealTime implements TileLevelBase {
 		this.slideToContentPosition();
 		this.allTilesOK = false;
 	}
-	resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor
-		//, layer: TileLayerDefinition
-		, layerMode: LevelModes
-	) {
+	updateAnchorTranslation(anchor: TileAnchor): void {
 
 		var gid: string = anchor.id ? anchor.id : '';
+		let tr = anchor.translation;
+		var translate = '';
+		if (tr) {
+			translate = 'translate(' + (tr.x * this.tapSize) + ',' + (tr.y * this.tapSize) + ')';
+		}
+		let element = document.getElementById(gid);
+		//let existedSVGchild: SVGElement | null = this.groupChildWithID(parentSVGGroup, gid);
+		if (element) {
+			element.setAttribute('transform', translate);
+			//console.log('update ', element);
+		} else {
+			//console.log('not found', gid,element);
+		}
+	};
+	resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes
+	) {
+		var gid: string = anchor.id ? anchor.id : '';
 		let existedSVGchild: SVGElement | null = this.groupChildWithID(parentSVGGroup, gid);
-		//if (anchor.id == 'rightMenuContentAnchor') console.log('resetAnchor', parentSVGGroup.id, gid);
 		if (existedSVGchild) {
-			//console.log('remove',existedSVGchild,'from',parentSVGGroup);
 			parentSVGGroup.removeChild(existedSVGchild);
 		}
-		//console.log('add',anchor);
 		this.addGroupTile(parentSVGGroup, anchor, layerMode);
 	}
 	delayedResetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor

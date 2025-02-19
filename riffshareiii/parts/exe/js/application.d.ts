@@ -716,6 +716,7 @@ declare type TileLevelBase = {
     screen2view(screen: TilePoint): TilePoint;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     delayedResetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
+    updateAnchorTranslation(anchor: TileAnchor): void;
     setAfterResizeCallback(f: () => void): void;
     setAfterZoomCallback(f: () => void): void;
     resetInnerSize(inWidth: number, inHeight: number): void;

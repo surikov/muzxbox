@@ -63,6 +63,7 @@ class PerformerIcon {
 			rec.draggable = true;
 			let toFilter: Zvoog_FilterTarget | null = null;
 			let toSpeaker: boolean = false;
+			let needReset = false;
 			rec.activation = (x: number, y: number) => {
 				if (!dragAnchor.translation) {
 					dragAnchor.translation = { x: 0, y: 0 };
@@ -73,38 +74,15 @@ class PerformerIcon {
 						track.performer.iconPosition = { x: 0, y: 0 };
 					}
 					if (toSpeaker) {
-						//track.performer.outputs.push('');
-						/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectPerformer, {
-							track: trackNo
-							, id: ''
-						});*/
 						globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer', 'outputs'], () => {
 							track.performer.outputs.push('');
 						});
 					} else {
 						if (toFilter) {
-							//track.performer.outputs.push(toFilter.id);
-							/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectPerformer, {
-								track: trackNo
-								, id: toFilter.id
-							});*/
-
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer', 'outputs'], () => {
 								if (toFilter) track.performer.outputs.push(toFilter.id);
 							});
 						} else {
-							//let xx = track.performer.iconPosition.x;
-							//let yy = track.performer.iconPosition.y;
-							//track.performer.iconPosition.x = track.performer.iconPosition.x + dragAnchor.translation.x;
-							//track.performer.iconPosition.y = track.performer.iconPosition.y + dragAnchor.translation.y;
-							/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeMovePerformerIcon, {
-								track: trackNo
-								, from: { x: xx, y: yy }
-								, to: {
-									x: track.performer.iconPosition.x + dragAnchor.translation.x
-									, y: track.performer.iconPosition.y + dragAnchor.translation.y
-								}
-							});*/
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer'], () => {
 								if (dragAnchor.translation) {
 									track.performer.iconPosition.x = track.performer.iconPosition.x + dragAnchor.translation.x;
@@ -114,7 +92,9 @@ class PerformerIcon {
 						}
 					}
 					dragAnchor.translation = { x: 0, y: 0 };
-					//globalCommandDispatcher.resetProject();
+					globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
+						, fanLevelAnchor
+						, LevelModes.normal);
 				} else {
 					toSpeaker = false;
 					toFilter = null;
@@ -125,7 +105,7 @@ class PerformerIcon {
 						let yy = track.performer.iconPosition.y + dragAnchor.translation.y;
 						toFilter = globalCommandDispatcher.cfg().dragFindPluginFilterIcon(xx, yy, zidx, track.performer.id, track.performer.outputs);
 						if (toFilter) {
-							//toSpeaker = false;
+							needReset = true;
 							let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
 							let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 							let top = globalCommandDispatcher.cfg().gridTop();
@@ -141,9 +121,12 @@ class PerformerIcon {
 								, rx: sz * 0.75, ry: sz * 0.75
 								, css: 'fanConnectionBase  fanConnection' + zidx
 							});
+							globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
+								, fanLevelAnchor
+								, LevelModes.normal);
 						} else {
 							if (globalCommandDispatcher.cfg().dragCollisionSpeaker(xx, yy, track.performer.outputs)) {
-								//toFilter = null;
+								needReset = true;
 								toSpeaker = true;
 								let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
 								let rec: TileRectangle = {
@@ -156,20 +139,24 @@ class PerformerIcon {
 									, css: 'fanConnectionBase  fanConnection' + zidx
 								};
 								dropAnchor.content = [rec];
+								globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
+									, fanLevelAnchor
+									, LevelModes.normal);
+							}else{
+								//globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(dragAnchor);
+								if (needReset) {
+									globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+									needReset = false;
+								} else {
+									globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(dragAnchor);
+								}
 							}
 						}
 					}
-					globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
-						, fanLevelAnchor
-						, LevelModes.normal);
+					
 				}
 			}
-			//rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
-			//if(secondary){
-				rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
-			//}else{
-			//	rec.css = 'fanSamplerMoveIcon fanSamplerUpIcon' + zidx;
-			//}
+			rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
 		} else {
 			rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
 		}
@@ -193,20 +180,20 @@ class PerformerIcon {
 					if (info) {
 						let url = info.ui;
 						globalCommandDispatcher.promptPluginPointDialog(track.title, url, track.performer.data, (obj: any) => {
-							globalCommandDispatcher.exe.commitProjectChanges(['tracks',trackNo,'performer'], () => {
+							globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer'], () => {
 								track.performer.data = obj;
 							});
 							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
-						},LO(localDropInsTrack),()=>{
+						}, LO(localDropInsTrack), () => {
 							//console.log(localDropInsTrack);
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
 								globalCommandDispatcher.cfg().data.tracks.splice(trackNo, 1);
 							});
 							globalCommandDispatcher.cancelPluginGUI();
-						}, (newTitle: string) => { 
-							globalCommandDispatcher.exe.commitProjectChanges(['tracks',trackNo], () => {
-								track.title=newTitle;
+						}, (newTitle: string) => {
+							globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo], () => {
+								track.title = newTitle;
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});

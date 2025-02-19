@@ -247,6 +247,10 @@ function startApplication() {
         console.log(xx);
     }
     globalCommandDispatcher.resetProject();
+    let themei = readTextFromlocalStorage('uicolortheme');
+    if (themei) {
+        globalCommandDispatcher.setThemeColor(themei);
+    }
 }
 function saveProjectState() {
     globalCommandDispatcher.exe.cutLongUndo();
@@ -500,6 +504,7 @@ class CommandExe {
             if (actionCount > 43210) {
                 console.log('cut undo ', ii, 'from', globalCommandDispatcher.cfg().data.undo.length);
                 globalCommandDispatcher.cfg().data.undo.splice(0, ii);
+                globalCommandDispatcher.cfg().data.redo = [];
                 break;
             }
         }
@@ -856,7 +861,6 @@ class CommandDispatcher {
         if (idx == 'light1') {
             cssPath = 'theme/colorlight.css';
         }
-        console.log("cssPath " + cssPath);
         startLoadCSSfile(cssPath);
         this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
         saveText2localStorage('uicolortheme', idx);
@@ -1102,10 +1106,6 @@ class UIRenderer {
             this.tiler.setCurrentPointPosition({ x: 0, y: 0, z: 32 });
         }
         this.tiler.resetModel();
-        let themei = readTextFromlocalStorage('uicolortheme');
-        if (themei) {
-            globalCommandDispatcher.setThemeColor(themei);
-        }
     }
     onReSizeView() {
         let mixH = 1;
@@ -3253,6 +3253,7 @@ class PerformerIcon {
             rec.draggable = true;
             let toFilter = null;
             let toSpeaker = false;
+            let needReset = false;
             rec.activation = (x, y) => {
                 if (!dragAnchor.translation) {
                     dragAnchor.translation = { x: 0, y: 0 };
@@ -3284,6 +3285,7 @@ class PerformerIcon {
                         }
                     }
                     dragAnchor.translation = { x: 0, y: 0 };
+                    globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
                 }
                 else {
                     toSpeaker = false;
@@ -3295,6 +3297,7 @@ class PerformerIcon {
                         let yy = track.performer.iconPosition.y + dragAnchor.translation.y;
                         toFilter = globalCommandDispatcher.cfg().dragFindPluginFilterIcon(xx, yy, zidx, track.performer.id, track.performer.outputs);
                         if (toFilter) {
+                            needReset = true;
                             let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
                             let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
                             let top = globalCommandDispatcher.cfg().gridTop();
@@ -3310,9 +3313,11 @@ class PerformerIcon {
                                 rx: sz * 0.75, ry: sz * 0.75,
                                 css: 'fanConnectionBase  fanConnection' + zidx
                             });
+                            globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
                         }
                         else {
                             if (globalCommandDispatcher.cfg().dragCollisionSpeaker(xx, yy, track.performer.outputs)) {
+                                needReset = true;
                                 toSpeaker = true;
                                 let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
                                 let rec = {
@@ -3325,10 +3330,19 @@ class PerformerIcon {
                                     css: 'fanConnectionBase  fanConnection' + zidx
                                 };
                                 dropAnchor.content = [rec];
+                                globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+                            }
+                            else {
+                                if (needReset) {
+                                    globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+                                    needReset = false;
+                                }
+                                else {
+                                    globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(dragAnchor);
+                                }
                             }
                         }
                     }
-                    globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
                 }
             };
             rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
@@ -3452,6 +3466,7 @@ class SamplerIcon {
             rec.draggable = true;
             let toFilter = null;
             let toSpeaker = false;
+            let needReset = false;
             rec.activation = (x, y) => {
                 if (!dragAnchor.translation) {
                     dragAnchor.translation = { x: 0, y: 0 };
@@ -3494,6 +3509,7 @@ class SamplerIcon {
                         let yy = samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y;
                         toFilter = globalCommandDispatcher.cfg().dragFindPluginFilterIcon(xx, yy, zidx, samplerTrack.sampler.id, samplerTrack.sampler.outputs);
                         if (toFilter) {
+                            needReset = true;
                             let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
                             let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
                             let top = globalCommandDispatcher.cfg().gridTop();
@@ -3509,10 +3525,12 @@ class SamplerIcon {
                                 rx: sz * 0.75, ry: sz * 0.75,
                                 css: 'fanConnectionBase  fanConnection' + zidx
                             });
+                            globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
                         }
                         else {
                             if (globalCommandDispatcher.cfg().dragCollisionSpeaker(xx, yy, samplerTrack.sampler.outputs)) {
                                 toSpeaker = true;
+                                needReset = true;
                                 let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
                                 let rec = {
                                     x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize * 0.55,
@@ -3524,10 +3542,19 @@ class SamplerIcon {
                                     css: 'fanConnectionBase  fanConnection' + zidx
                                 };
                                 dropAnchor.content = [rec];
+                                globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+                            }
+                            else {
+                                if (needReset) {
+                                    globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+                                    needReset = false;
+                                }
+                                else {
+                                    globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(dragAnchor);
+                                }
                             }
                         }
                     }
-                    globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
                 }
             };
             rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
@@ -3654,6 +3681,7 @@ class FilterIcon {
             rec.draggable = true;
             let toFilter = null;
             let toSpeaker = false;
+            let needReset = false;
             rec.activation = (x, y) => {
                 if (!dragAnchor.translation) {
                     dragAnchor.translation = { x: 0, y: 0 };
@@ -3685,6 +3713,7 @@ class FilterIcon {
                         }
                     }
                     dragAnchor.translation = { x: 0, y: 0 };
+                    globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
                 }
                 else {
                     toSpeaker = false;
@@ -3696,6 +3725,7 @@ class FilterIcon {
                         let yy = filterTarget.iconPosition.y + dragAnchor.translation.y;
                         toFilter = globalCommandDispatcher.cfg().dragFindPluginFilterIcon(xx, yy, zidx, filterTarget.id, filterTarget.outputs);
                         if (toFilter) {
+                            needReset = true;
                             let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
                             let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
                             let top = globalCommandDispatcher.cfg().gridTop();
@@ -3711,10 +3741,12 @@ class FilterIcon {
                                 rx: sz * 0.75, ry: sz * 0.75,
                                 css: 'fanConnectionBase  fanConnection' + zidx
                             });
+                            globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
                         }
                         else {
                             if (globalCommandDispatcher.cfg().dragCollisionSpeaker(xx, yy, filterTarget.outputs)) {
                                 toSpeaker = true;
+                                needReset = true;
                                 let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
                                 let rec = {
                                     x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize * 0.55,
@@ -3726,10 +3758,19 @@ class FilterIcon {
                                     css: 'fanConnectionBase  fanConnection' + zidx
                                 };
                                 dropAnchor.content = [rec];
+                                globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+                            }
+                            else {
+                                if (needReset) {
+                                    globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+                                    needReset = false;
+                                }
+                                else {
+                                    globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(dragAnchor);
+                                }
                             }
                         }
                     }
-                    globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
                 }
             };
             rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;

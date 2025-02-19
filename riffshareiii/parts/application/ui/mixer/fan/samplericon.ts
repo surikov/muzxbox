@@ -12,7 +12,6 @@ class SamplerIcon {
 		}
 	}
 	addSamplerSpot(order: number, samplerTrack: Zvoog_PercussionTrack, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
-
 		let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.66;
 		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let top = globalCommandDispatcher.cfg().gridTop();
@@ -41,6 +40,7 @@ class SamplerIcon {
 			rec.draggable = true;
 			let toFilter: Zvoog_FilterTarget | null = null;
 			let toSpeaker: boolean = false;
+			let needReset = false;
 			rec.activation = (x: number, y: number) => {
 				if (!dragAnchor.translation) {
 					dragAnchor.translation = { x: 0, y: 0 };
@@ -51,37 +51,15 @@ class SamplerIcon {
 						samplerTrack.sampler.iconPosition = { x: 0, y: 0 };
 					}
 					if (toSpeaker) {
-						//samplerTrack.sampler.outputs.push('');
-						/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectSampler, {
-							drum: order
-							, id: ''
-						});*/
 						globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler', 'outputs'], () => {
 							samplerTrack.sampler.outputs.push('');
 						});
 					} else {
 						if (toFilter) {
-							//samplerTrack.sampler.outputs.push(toFilter.id);
-							/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeConnectSampler, {
-								drum: order
-								, id: toFilter.id
-							});*/
 							globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler', 'outputs'], () => {
 								if (toFilter) samplerTrack.sampler.outputs.push(toFilter.id);
 							});
 						} else {
-							//samplerTrack.sampler.iconPosition.x = samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x;
-							//samplerTrack.sampler.iconPosition.y = samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y;
-							//let xx = samplerTrack.sampler.iconPosition.x;
-							//let yy = samplerTrack.sampler.iconPosition.y;
-							/*globalCommandDispatcher.exe.addUndoCommandFromUI(ExeMoveSamplerIcon, {
-								drum: order
-								, from: { x: xx, y: yy }
-								, to: {
-									x: samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x
-									, y: samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y
-								}
-							});*/
 							globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler'], () => {
 								if (dragAnchor.translation) {
 									samplerTrack.sampler.iconPosition.x = samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x;
@@ -91,7 +69,6 @@ class SamplerIcon {
 						}
 					}
 					dragAnchor.translation = { x: 0, y: 0 };
-					//globalCommandDispatcher.resetProject();
 				} else {
 					toSpeaker = false;
 					toFilter = null;
@@ -102,7 +79,7 @@ class SamplerIcon {
 						let yy = samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y;
 						toFilter = globalCommandDispatcher.cfg().dragFindPluginFilterIcon(xx, yy, zidx, samplerTrack.sampler.id, samplerTrack.sampler.outputs);
 						if (toFilter) {
-							//toSpeaker = false;
+							needReset = true;
 							let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
 							let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 							let top = globalCommandDispatcher.cfg().gridTop();
@@ -118,11 +95,13 @@ class SamplerIcon {
 								, rx: sz * 0.75, ry: sz * 0.75
 								, css: 'fanConnectionBase  fanConnection' + zidx
 							});
+							globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
+								, fanLevelAnchor
+								, LevelModes.normal);
 						} else {
-
 							if (globalCommandDispatcher.cfg().dragCollisionSpeaker(xx, yy, samplerTrack.sampler.outputs)) {
-								//toFilter = null;
 								toSpeaker = true;
+								needReset = true;
 								let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
 								let rec: TileRectangle = {
 									x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize * 0.55
@@ -134,20 +113,24 @@ class SamplerIcon {
 									, css: 'fanConnectionBase  fanConnection' + zidx
 								};
 								dropAnchor.content = [rec];
+								globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
+									, fanLevelAnchor
+									, LevelModes.normal);
+							} else {
+								if (needReset) {
+									globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
+										, fanLevelAnchor
+										, LevelModes.normal);
+									needReset = false;
+								} else {
+									globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(dragAnchor);
+								}
 							}
 						}
 					}
-					globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
-						, fanLevelAnchor
-						, LevelModes.normal);
 				}
 			}
-			//rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
-			//if(order){
 			rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
-			//}else{
-			//	rec.css = 'fanSamplerMoveIcon fanSamplerUpIcon' + zidx;
-			//}
 		} else {
 			rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
 		}
@@ -178,12 +161,12 @@ class SamplerIcon {
 						}, LO(localDropSampleTrack), () => {
 							//console.log(localDropSampleTrack);
 							globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-								globalCommandDispatcher.cfg().data.percussions.splice(order,1);
+								globalCommandDispatcher.cfg().data.percussions.splice(order, 1);
 							});
 							globalCommandDispatcher.cancelPluginGUI();
-						}, (newTitle: string) => { 
-							globalCommandDispatcher.exe.commitProjectChanges(['percussions',order], () => {
-								samplerTrack.title=newTitle;
+						}, (newTitle: string) => {
+							globalCommandDispatcher.exe.commitProjectChanges(['percussions', order], () => {
+								samplerTrack.title = newTitle;
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});

@@ -172,6 +172,7 @@ type TileLevelBase = {
 		//, layer: TileLayerDefinition
 		, layerMode: LevelModes
 	): void;
+	updateAnchorTranslation(anchor: TileAnchor): void;
 	setAfterResizeCallback(f: () => void): void;
 	setAfterZoomCallback(f: () => void): void;
 	//resetAnchor: (//fromSVGGroup: SVGElement,

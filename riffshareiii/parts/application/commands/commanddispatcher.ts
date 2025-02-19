@@ -384,7 +384,7 @@ class CommandDispatcher {
 			cssPath = 'theme/colorlight.css';
 		}
 		
-		console.log("cssPath " + cssPath);
+		//console.log("cssPath " + cssPath);
 		startLoadCSSfile(cssPath);
 		this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
 		saveText2localStorage('uicolortheme', idx);

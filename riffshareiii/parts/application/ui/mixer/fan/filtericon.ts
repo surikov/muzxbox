@@ -26,6 +26,7 @@ class FilterIcon {
 		let dragAnchor: TileAnchor = {
 			xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz
 			, showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [], translation: { x: 0, y: 0 }
+			//,id:'drag'+Math.random()
 		};
 		fanLevelAnchor.content.push(dragAnchor);
 		let dropAnchor: TileAnchor = {
@@ -42,8 +43,8 @@ class FilterIcon {
 			rec.draggable = true;
 			let toFilter: Zvoog_FilterTarget | null = null;
 			let toSpeaker: boolean = false;
+			let needReset = false;
 			rec.activation = (x: number, y: number) => {
-				//https://stackoverflow.com/questions/56653453/why-touchmove-event-is-not-fired-after-dom-changes
 				if (!dragAnchor.translation) {
 					dragAnchor.translation = { x: 0, y: 0 };
 				}
@@ -71,26 +72,18 @@ class FilterIcon {
 						}
 					}
 					dragAnchor.translation = { x: 0, y: 0 };
-					//globalCommandDispatcher.resetProject();
+					globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
 				} else {
 					toSpeaker = false;
 					toFilter = null;
 					dragAnchor.translation.x = dragAnchor.translation.x + x;
 					dragAnchor.translation.y = dragAnchor.translation.y + y;
-					/*if (dragAnchor.id) {
-						let elem = document.getElementById(dragAnchor.id);
-
-						if (elem) {
-							let translate = 'translate(' + dragAnchor.translation.x + ',' + dragAnchor.translation.y + ')';
-							elem.setAttribute('transform', translate);
-							//console.log('translate', translate);
-						}
-					}*/
 					if (filterTarget.iconPosition) {
 						let xx = filterTarget.iconPosition.x + dragAnchor.translation.x;
 						let yy = filterTarget.iconPosition.y + dragAnchor.translation.y;
 						toFilter = globalCommandDispatcher.cfg().dragFindPluginFilterIcon(xx, yy, zidx, filterTarget.id, filterTarget.outputs);
 						if (toFilter) {
+							needReset = true;
 							let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
 							let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 							let top = globalCommandDispatcher.cfg().gridTop();
@@ -106,9 +99,11 @@ class FilterIcon {
 								, rx: sz * 0.75, ry: sz * 0.75
 								, css: 'fanConnectionBase  fanConnection' + zidx
 							});
+							globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
 						} else {
 							if (globalCommandDispatcher.cfg().dragCollisionSpeaker(xx, yy, filterTarget.outputs)) {
 								toSpeaker = true;
+								needReset = true;
 								let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
 								let rec: TileRectangle = {
 									x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize * 0.55
@@ -120,21 +115,22 @@ class FilterIcon {
 									, css: 'fanConnectionBase  fanConnection' + zidx
 								};
 								dropAnchor.content = [rec];
+								globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+							} else {
+								//console.log('updateAnchorTranslation',dragAnchor);
+								//globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(dragAnchor);
+								if (needReset) {
+									globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+									needReset = false;
+								} else {
+									globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(dragAnchor);
+								}
 							}
 						}
 					}
-
-					globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
-						, fanLevelAnchor
-						, LevelModes.normal);
-
 				}
 			}
-			//if (order) {
 			rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
-			//} else {
-			//	rec.css = 'fanSamplerMoveIcon fanSamplerUpIcon' + zidx;
-			//}
 		} else {
 			rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
 		}
@@ -164,15 +160,15 @@ class FilterIcon {
 							});
 							//globalCommandDispatcher.reStartPlayIfPlay();
 							return true;
-						},LO(localDropFilterTrack),()=>{
+						}, LO(localDropFilterTrack), () => {
 							//console.log(localDropFilterTrack);
 							globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
 								globalCommandDispatcher.cfg().data.filters.splice(order, 1);
 							});
 							globalCommandDispatcher.cancelPluginGUI();
-						}, (newTitle: string) => { 
-							globalCommandDispatcher.exe.commitProjectChanges(['filters',order], () => {
-								filterTarget.title=newTitle;
+						}, (newTitle: string) => {
+							globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+								filterTarget.title = newTitle;
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});

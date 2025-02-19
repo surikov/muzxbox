@@ -710,6 +710,21 @@ class TileLevelRealTime {
         this.slideToContentPosition();
         this.allTilesOK = false;
     }
+    updateAnchorTranslation(anchor) {
+        var gid = anchor.id ? anchor.id : '';
+        let tr = anchor.translation;
+        var translate = '';
+        if (tr) {
+            translate = 'translate(' + (tr.x * this.tapSize) + ',' + (tr.y * this.tapSize) + ')';
+        }
+        let element = document.getElementById(gid);
+        if (element) {
+            element.setAttribute('transform', translate);
+        }
+        else {
+        }
+    }
+    ;
     resetAnchor(parentSVGGroup, anchor, layerMode) {
         var gid = anchor.id ? anchor.id : '';
         let existedSVGchild = this.groupChildWithID(parentSVGGroup, gid);

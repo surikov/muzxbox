@@ -27,6 +27,10 @@ function startApplication() {
 		initWebAudioFromUI();
 	    
 	});*/
+	let themei=readTextFromlocalStorage('uicolortheme');
+		if(themei){
+			globalCommandDispatcher.setThemeColor(themei);
+		}
 }
 function saveProjectState() {
 	//https://github.com/pieroxy/lz-string
