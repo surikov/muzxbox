@@ -61,7 +61,7 @@ let menuPointFxTracks: MenuInfo = {
 		//console.log('samplers');
 	}
 };
-
+/*
 let menuPlayStop: MenuInfo = {
 	text: localMenuPlay
 	, onClick: () => {
@@ -69,7 +69,7 @@ let menuPlayStop: MenuInfo = {
 		globalCommandDispatcher.toggleStartStop();
 		menuItemsData = null;
 	}
-};
+};*/
 function fillPluginsLists() {
 	menuPointFilters.children = [];
 	menuPointPerformers.children = [];
@@ -123,7 +123,7 @@ function fillPluginsLists() {
 	}
 }
 function composeBaseMenu(): MenuInfo[] {
-	menuPlayStop.text = localMenuPlay;
+	/*menuPlayStop.text = localMenuPlay;
 	if (globalCommandDispatcher.player) {
 		if (
 			(globalCommandDispatcher.player.playState().play)
@@ -131,20 +131,28 @@ function composeBaseMenu(): MenuInfo[] {
 		) {
 			menuPlayStop.text = localMenuPause;
 		}
-	}
+	}*/
 	if (menuItemsData) {
 		return menuItemsData;
 	} else {
 		fillPluginsLists();
 		menuItemsData = [
-			menuPlayStop
-			, menuPointInsTracks
+			//menuPlayStop
+			menuPointInsTracks
 			, menuPointDrumTracks
 			, menuPointFxTracks
 			, menuPointActions
-			, menuPointFilters
-			, menuPointPerformers
-			, menuPointSamplers
+
+			, {
+				text: localMenuNewPlugin, children: [
+
+					menuPointFilters
+					, menuPointPerformers
+					, menuPointSamplers
+				]
+			}
+
+
 			, {
 				text: localMenuItemSettings, children: [
 					{
@@ -166,21 +174,6 @@ function composeBaseMenu(): MenuInfo[] {
 								}
 							}
 						]
-					}, {
-						text: 'Locale', children: [
-							{
-								text: 'Russian', onClick: () => {
-									globalCommandDispatcher.setThemeLocale('ru', 1);
-								}
-							}, {
-								text: 'English', onClick: () => {
-									globalCommandDispatcher.setThemeLocale('en', 1);
-								}
-							}, {
-								text: 'kitaiskiy', onClick: () => {
-									globalCommandDispatcher.setThemeLocale('zh', 1.5);
-								}
-							}]
 					}, {
 						text: 'Colors', children: [
 							{
@@ -214,6 +207,19 @@ function composeBaseMenu(): MenuInfo[] {
 						}
 					}
 				]
+			}
+			, {
+				text: 'Russian', onClick: () => {
+					globalCommandDispatcher.setThemeLocale('ru', 1);
+				}
+			}, {
+				text: 'English', onClick: () => {
+					globalCommandDispatcher.setThemeLocale('en', 1);
+				}
+			}, {
+				text: 'kitaiskiy', onClick: () => {
+					globalCommandDispatcher.setThemeLocale('zh', 1.5);
+				}
 			}
 		];
 		return menuItemsData;

@@ -7,6 +7,8 @@ class UIToolbar {
 	undoButton: ToolBarButton;
 	redoButton: ToolBarButton;
 
+	playStopButton: ToolBarButton;
+
     constructor(){
 		//
     }
@@ -15,12 +17,17 @@ class UIToolbar {
             globalCommandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
             globalCommandDispatcher.showRightMenu();
         });
-		this.undoButton = new ToolBarButton([icon_undo], -1, 0, (nn: number) => {
+		
+		this.playStopButton = new ToolBarButton([icon_play,icon_pause], -1, 0, (nn: number) => {
+			globalCommandDispatcher.toggleStartStop();
+        });
+		this.undoButton = new ToolBarButton([icon_undo], -1, 1, (nn: number) => {
 			globalCommandDispatcher.exe.undo(1);
         });
-		this.redoButton = new ToolBarButton([icon_redo], -1, 1, (nn: number) => {
+		this.redoButton = new ToolBarButton([icon_redo], -1, 2, (nn: number) => {
 			globalCommandDispatcher.exe.redo(1);
         });
+		
         this.toolBarGroup = (document.getElementById("toolBarPanelGroup") as any) as SVGElement;
         this.toolBarAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111
@@ -30,6 +37,7 @@ class UIToolbar {
                 this.menuButton.iconLabelButton.anchor
 				,this.undoButton.iconLabelButton.anchor
 				,this.redoButton.iconLabelButton.anchor
+				,this.playStopButton.iconLabelButton.anchor
             ]
         };
         this.toolBarLayer = {
@@ -47,5 +55,6 @@ class UIToolbar {
         this.menuButton.resize(viewWIdth, viewHeight);
 		this.undoButton.resize(viewWIdth, viewHeight);
 		this.redoButton.resize(viewWIdth, viewHeight);
+		this.playStopButton.resize(viewWIdth, viewHeight);
     }
 }

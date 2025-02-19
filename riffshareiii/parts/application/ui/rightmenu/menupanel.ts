@@ -499,7 +499,7 @@ class RightMenuPanel {
 		this.lastWidth = viewWidth;
 		this.lastHeight = viewHeight;
 		this.itemsWidth = viewWidth - 1;
-		if (this.itemsWidth > 9) this.itemsWidth = 9;
+		if (this.itemsWidth > 14) this.itemsWidth = 14;
 		if (this.itemsWidth < 2) {
 			this.itemsWidth = 2;
 		}

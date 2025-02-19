@@ -157,6 +157,7 @@ declare let localMenuSamplersFolder: string;
 declare let localMenuInsTracksFolder: string;
 declare let localMenuDrumTracksFolder: string;
 declare let localMenuFxTracksFolder: string;
+declare let localMenuNewPlugin: string;
 declare let localeDictionary: {
     id: string;
     data: {
@@ -195,6 +196,7 @@ declare class UIToolbar {
     menuButton: ToolBarButton;
     undoButton: ToolBarButton;
     redoButton: ToolBarButton;
+    playStopButton: ToolBarButton;
     constructor();
     createToolbar(): TileLayerDefinition[];
     resizeToolbar(viewWIdth: number, viewHeight: number): void;
@@ -300,7 +302,6 @@ declare let menuPointSamplers: MenuInfo;
 declare let menuPointInsTracks: MenuInfo;
 declare let menuPointDrumTracks: MenuInfo;
 declare let menuPointFxTracks: MenuInfo;
-declare let menuPlayStop: MenuInfo;
 declare function fillPluginsLists(): void;
 declare function composeBaseMenu(): MenuInfo[];
 declare class LeftPanel {

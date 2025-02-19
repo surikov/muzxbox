@@ -1147,6 +1147,7 @@ let localMenuSamplersFolder = 'localMenuSamplersFolder';
 let localMenuInsTracksFolder = 'localMenuInsTracksFolder';
 let localMenuDrumTracksFolder = 'localMenuDrumTracksFolder';
 let localMenuFxTracksFolder = 'localMenuFxTracksFolder';
+let localMenuNewPlugin = 'localMenuNewPlugin';
 let localeDictionary = [
     {
         id: localNameLocal, data: [
@@ -1191,6 +1192,12 @@ let localeDictionary = [
         id: localMenuActionsFolder, data: [
             { locale: 'en', text: 'Actions' },
             { locale: 'ru', text: 'Действия' },
+            { locale: 'zh', text: '?' }
+        ]
+    }, {
+        id: localMenuNewPlugin, data: [
+            { locale: 'en', text: 'Add new item to the mixer' },
+            { locale: 'ru', text: 'Добавить дорожку' },
             { locale: 'zh', text: '?' }
         ]
     }, {
@@ -1485,10 +1492,13 @@ class UIToolbar {
             globalCommandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
             globalCommandDispatcher.showRightMenu();
         });
-        this.undoButton = new ToolBarButton([icon_undo], -1, 0, (nn) => {
+        this.playStopButton = new ToolBarButton([icon_play, icon_pause], -1, 0, (nn) => {
+            globalCommandDispatcher.toggleStartStop();
+        });
+        this.undoButton = new ToolBarButton([icon_undo], -1, 1, (nn) => {
             globalCommandDispatcher.exe.undo(1);
         });
-        this.redoButton = new ToolBarButton([icon_redo], -1, 1, (nn) => {
+        this.redoButton = new ToolBarButton([icon_redo], -1, 2, (nn) => {
             globalCommandDispatcher.exe.redo(1);
         });
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
@@ -1499,7 +1509,8 @@ class UIToolbar {
             content: [
                 this.menuButton.iconLabelButton.anchor,
                 this.undoButton.iconLabelButton.anchor,
-                this.redoButton.iconLabelButton.anchor
+                this.redoButton.iconLabelButton.anchor,
+                this.playStopButton.iconLabelButton.anchor
             ]
         };
         this.toolBarLayer = {
@@ -1517,6 +1528,7 @@ class UIToolbar {
         this.menuButton.resize(viewWIdth, viewHeight);
         this.undoButton.resize(viewWIdth, viewHeight);
         this.redoButton.resize(viewWIdth, viewHeight);
+        this.playStopButton.resize(viewWIdth, viewHeight);
     }
 }
 class ToolBarButton {
@@ -1935,8 +1947,8 @@ class RightMenuPanel {
         this.lastWidth = viewWidth;
         this.lastHeight = viewHeight;
         this.itemsWidth = viewWidth - 1;
-        if (this.itemsWidth > 9)
-            this.itemsWidth = 9;
+        if (this.itemsWidth > 14)
+            this.itemsWidth = 14;
         if (this.itemsWidth < 2) {
             this.itemsWidth = 2;
         }
@@ -2156,13 +2168,6 @@ let menuPointFxTracks = {
     onFolderOpen: () => {
     }
 };
-let menuPlayStop = {
-    text: localMenuPlay,
-    onClick: () => {
-        globalCommandDispatcher.toggleStartStop();
-        menuItemsData = null;
-    }
-};
 function fillPluginsLists() {
     menuPointFilters.children = [];
     menuPointPerformers.children = [];
@@ -2220,27 +2225,23 @@ function fillPluginsLists() {
     }
 }
 function composeBaseMenu() {
-    menuPlayStop.text = localMenuPlay;
-    if (globalCommandDispatcher.player) {
-        if ((globalCommandDispatcher.player.playState().play)
-            || (globalCommandDispatcher.player.playState().loading)) {
-            menuPlayStop.text = localMenuPause;
-        }
-    }
     if (menuItemsData) {
         return menuItemsData;
     }
     else {
         fillPluginsLists();
         menuItemsData = [
-            menuPlayStop,
             menuPointInsTracks,
             menuPointDrumTracks,
             menuPointFxTracks,
             menuPointActions,
-            menuPointFilters,
-            menuPointPerformers,
-            menuPointSamplers,
+            {
+                text: localMenuNewPlugin, children: [
+                    menuPointFilters,
+                    menuPointPerformers,
+                    menuPointSamplers
+                ]
+            },
             {
                 text: localMenuItemSettings, children: [
                     {
@@ -2259,22 +2260,6 @@ function composeBaseMenu() {
                                 text: 'Huge', onClick: () => {
                                     startLoadCSSfile('theme/sizehuge.css');
                                     globalCommandDispatcher.changeTapSize(4);
-                                }
-                            }
-                        ]
-                    }, {
-                        text: 'Locale', children: [
-                            {
-                                text: 'Russian', onClick: () => {
-                                    globalCommandDispatcher.setThemeLocale('ru', 1);
-                                }
-                            }, {
-                                text: 'English', onClick: () => {
-                                    globalCommandDispatcher.setThemeLocale('en', 1);
-                                }
-                            }, {
-                                text: 'kitaiskiy', onClick: () => {
-                                    globalCommandDispatcher.setThemeLocale('zh', 1.5);
                                 }
                             }
                         ]
@@ -2311,6 +2296,19 @@ function composeBaseMenu() {
                         }
                     }
                 ]
+            },
+            {
+                text: 'Russian', onClick: () => {
+                    globalCommandDispatcher.setThemeLocale('ru', 1);
+                }
+            }, {
+                text: 'English', onClick: () => {
+                    globalCommandDispatcher.setThemeLocale('en', 1);
+                }
+            }, {
+                text: 'kitaiskiy', onClick: () => {
+                    globalCommandDispatcher.setThemeLocale('zh', 1.5);
+                }
             }
         ];
         return menuItemsData;

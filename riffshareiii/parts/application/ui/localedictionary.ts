@@ -31,6 +31,8 @@ let localMenuInsTracksFolder='localMenuInsTracksFolder';
 let localMenuDrumTracksFolder='localMenuDrumTracksFolder';
 let localMenuFxTracksFolder='localMenuFxTracksFolder';
 
+let localMenuNewPlugin = 'localMenuNewPlugin';
+
 let localeDictionary: { id: string, data: { locale: string, text: string }[] }[] = [
     {
         id: localNameLocal, data: [
@@ -97,6 +99,11 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
         id: localMenuActionsFolder, data: [
             { locale: 'en', text: 'Actions' }
             , { locale: 'ru', text: 'Действия' }
+            , { locale: 'zh', text: '?' }]
+    }, {
+		id: localMenuNewPlugin, data: [
+            { locale: 'en', text: 'Add new item to the mixer' }
+            , { locale: 'ru', text: 'Добавить дорожку' }
             , { locale: 'zh', text: '?' }]
     }, {
         id: localMenuPerformersFolder, data: [
