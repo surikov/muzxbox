@@ -3,8 +3,8 @@ let _mzxbxProjectForTesting2: Zvoog_Project = {
 	, versionCode: '1'
 	, list: false
 	, selectedPart: { startMeasure: 1, endMeasure: 1 }
-	, undo: []
-	, redo: []
+	//, undo: []
+	//, redo: []
 	, position: { x: -13037.9, y: -1317.9, z: 4.7 }
 	, timeline: [
 		{ tempo: 120, metre: { count: 4, part: 4 } }

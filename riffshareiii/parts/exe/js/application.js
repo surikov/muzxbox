@@ -238,9 +238,23 @@ function startApplication() {
     window.addEventListener("beforeunload", saveProjectState);
     globalCommandDispatcher.registerWorkProject(_mzxbxProjectForTesting2);
     try {
-        let last = readObjectFromlocalStorage('lastprojectdata');
-        if (last) {
-            globalCommandDispatcher.registerWorkProject(last);
+        let lastprojectdata = readObjectFromlocalStorage('lastprojectdata');
+        if (lastprojectdata) {
+            globalCommandDispatcher.registerWorkProject(lastprojectdata);
+        }
+        globalCommandDispatcher.clearUndo();
+        globalCommandDispatcher.clearRedo();
+        let undocommands = readObjectFromlocalStorage('undocommands');
+        if (undocommands) {
+            if (undocommands.length) {
+                globalCommandDispatcher.undoQueue = undocommands;
+            }
+        }
+        let redocommands = readObjectFromlocalStorage('redocommands');
+        if (redocommands) {
+            if (redocommands.length) {
+                globalCommandDispatcher.redoQueue = redocommands;
+            }
         }
     }
     catch (xx) {
@@ -259,14 +273,13 @@ function saveProjectState() {
     }
     catch (xx) {
         console.log(xx);
-        globalCommandDispatcher.cfg().data.undo = [];
-        globalCommandDispatcher.cfg().data.redo = [];
-        try {
-            saveText2localStorage('lastprojectdata', JSON.stringify(globalCommandDispatcher.cfg().data));
-        }
-        catch (rr) {
-            console.log(rr);
-        }
+    }
+    try {
+        saveText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
+        saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
+    }
+    catch (xx) {
+        console.log(xx);
     }
 }
 function initWebAudioFromUI() {
@@ -381,7 +394,6 @@ class PluginDialogPrompt {
                         globalCommandDispatcher.exe.commitProjectChanges([], () => {
                             if (me.waitProjectCallback) {
                                 let newProj = message.pluginData;
-                                newProj.undo = globalCommandDispatcher.cfg().data.undo;
                                 me.waitProjectCallback(message.pluginData);
                                 if (message.done) {
                                     me.closeDialogFrame();
@@ -433,8 +445,8 @@ class CommandExe {
         this.cutLongUndo();
     }
     addUndoCommandActiions(cmd) {
-        globalCommandDispatcher.cfg().data.redo.length = 0;
-        globalCommandDispatcher.cfg().data.undo.push(cmd);
+        globalCommandDispatcher.clearRedo();
+        globalCommandDispatcher.undo().push(cmd);
         globalCommandDispatcher.resetProject();
     }
     parentFromPath(path) {
@@ -498,13 +510,13 @@ class CommandExe {
     }
     cutLongUndo() {
         let actionCount = 0;
-        for (let ii = 0; ii < globalCommandDispatcher.cfg().data.undo.length; ii++) {
-            let one = globalCommandDispatcher.cfg().data.undo[ii];
+        for (let ii = 0; ii < globalCommandDispatcher.undo().length; ii++) {
+            let one = globalCommandDispatcher.undo()[ii];
             actionCount = actionCount + one.actions.length;
             if (actionCount > 43210) {
-                console.log('cut undo ', ii, 'from', globalCommandDispatcher.cfg().data.undo.length);
-                globalCommandDispatcher.cfg().data.undo.splice(0, ii);
-                globalCommandDispatcher.cfg().data.redo = [];
+                console.log('cut undo ', ii, 'from', globalCommandDispatcher.undo().length);
+                globalCommandDispatcher.undo().splice(0, ii);
+                globalCommandDispatcher.clearRedo();
                 break;
             }
         }
@@ -516,11 +528,11 @@ class CommandExe {
         else {
             this.lockUndoRedo = true;
             for (let ii = 0; ii < cnt; ii++) {
-                if (globalCommandDispatcher.cfg().data.undo.length) {
-                    let cmd = globalCommandDispatcher.cfg().data.undo.pop();
+                if (globalCommandDispatcher.undo().length) {
+                    let cmd = globalCommandDispatcher.undo().pop();
                     if (cmd) {
                         this.unAction(cmd);
-                        globalCommandDispatcher.cfg().data.redo.unshift(cmd);
+                        globalCommandDispatcher.redo().unshift(cmd);
                         if (cmd.position) {
                             this.setCurPosition(cmd.position);
                         }
@@ -539,11 +551,11 @@ class CommandExe {
         else {
             this.lockUndoRedo = true;
             for (let ii = 0; ii < cnt; ii++) {
-                if (globalCommandDispatcher.cfg().data.redo.length) {
-                    let cmd = globalCommandDispatcher.cfg().data.redo.shift();
+                if (globalCommandDispatcher.redo().length) {
+                    let cmd = globalCommandDispatcher.redo().shift();
                     if (cmd) {
                         this.reAction(cmd);
-                        globalCommandDispatcher.cfg().data.undo.push(cmd);
+                        globalCommandDispatcher.undo().push(cmd);
                         if (cmd.position) {
                             this.setCurPosition(cmd.position);
                         }
@@ -568,9 +580,23 @@ class CommandDispatcher {
         };
         this.listener = null;
         this.exe = new CommandExe();
+        this.undoQueue = [];
+        this.redoQueue = [];
     }
     cfg() {
         return this._mixerDataMathUtility;
+    }
+    undo() {
+        return this.undoQueue;
+    }
+    redo() {
+        return this.redoQueue;
+    }
+    clearUndo() {
+        this.undoQueue = [];
+    }
+    clearRedo() {
+        this.redoQueue = [];
     }
     reDrawPlayPosition() {
         let ww = this.renderer.timeselectbar.positionMarkWidth();
@@ -2291,8 +2317,8 @@ function composeBaseMenu() {
                     },
                     {
                         text: localMenuClearUndoRedo, onClick: () => {
-                            globalCommandDispatcher.cfg().data.undo = [];
-                            globalCommandDispatcher.cfg().data.redo = [];
+                            globalCommandDispatcher.clearUndo();
+                            globalCommandDispatcher.clearRedo();
                         }
                     }
                 ]
@@ -4245,8 +4271,6 @@ let _mzxbxProjectForTesting2 = {
     versionCode: '1',
     list: false,
     selectedPart: { startMeasure: 1, endMeasure: 1 },
-    undo: [],
-    redo: [],
     position: { x: -13037.9, y: -1317.9, z: 4.7 },
     timeline: [
         { tempo: 120, metre: { count: 4, part: 4 } },

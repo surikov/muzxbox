@@ -11,8 +11,8 @@ class CommandExe {
 	}
 	addUndoCommandActiions(cmd: Zvoog_UICommand) {
 		//console.log(cmd);
-		globalCommandDispatcher.cfg().data.redo.length = 0;
-		globalCommandDispatcher.cfg().data.undo.push(cmd);
+		globalCommandDispatcher.clearRedo();
+		globalCommandDispatcher.undo().push(cmd);
 		globalCommandDispatcher.resetProject();
 	}
 	parentFromPath(path: (string | number)[]) {
@@ -94,13 +94,13 @@ class CommandExe {
 		}*/
 		//console.log('undo len ', globalCommandDispatcher.cfg().data.undo.length);
 		let actionCount = 0;
-		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.undo.length; ii++) {
-			let one = globalCommandDispatcher.cfg().data.undo[ii];
+		for (let ii = 0; ii < globalCommandDispatcher.undo().length; ii++) {
+			let one = globalCommandDispatcher.undo()[ii];
 			actionCount = actionCount + one.actions.length;
 			if (actionCount > 43210) {
-				console.log('cut undo ', ii, 'from', globalCommandDispatcher.cfg().data.undo.length);
-				globalCommandDispatcher.cfg().data.undo.splice(0, ii);
-				globalCommandDispatcher.cfg().data.redo = []
+				console.log('cut undo ', ii, 'from', globalCommandDispatcher.undo().length);
+				globalCommandDispatcher.undo().splice(0, ii);
+				globalCommandDispatcher.clearRedo();
 				break;
 			}
 		}
@@ -111,12 +111,12 @@ class CommandExe {
 		} else {
 			this.lockUndoRedo = true;
 			for (let ii = 0; ii < cnt; ii++) {
-				if (globalCommandDispatcher.cfg().data.undo.length) {
-					let cmd = globalCommandDispatcher.cfg().data.undo.pop();
+				if (globalCommandDispatcher.undo().length) {
+					let cmd = globalCommandDispatcher.undo().pop();
 					if (cmd) {
 						//this.executeCommand(cmd.kind, cmd.params, true);
 						this.unAction(cmd);
-						globalCommandDispatcher.cfg().data.redo.unshift(cmd);
+						globalCommandDispatcher.redo().unshift(cmd);
 						if (cmd.position) {
 							this.setCurPosition(cmd.position);
 						}
@@ -135,12 +135,12 @@ class CommandExe {
 		} else {
 			this.lockUndoRedo = true;
 			for (let ii = 0; ii < cnt; ii++) {
-				if (globalCommandDispatcher.cfg().data.redo.length) {
-					let cmd = globalCommandDispatcher.cfg().data.redo.shift();
+				if (globalCommandDispatcher.redo().length) {
+					let cmd = globalCommandDispatcher.redo().shift();
 					if (cmd) {
 						//this.executeCommand(cmd.kind, cmd.params, false);
 						this.reAction(cmd);
-						globalCommandDispatcher.cfg().data.undo.push(cmd);
+						globalCommandDispatcher.undo().push(cmd);
 						if (cmd.position) {
 							this.setCurPosition(cmd.position);
 						}

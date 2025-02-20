@@ -21,10 +21,23 @@ class CommandDispatcher {
 	exe: CommandExe = new CommandExe();
 	//undoQueue: UndoRedoCommand[] = [];
 	//redoQueue: UndoRedoCommand[] = [];
+	undoQueue: Zvoog_UICommand[] = [];
+	redoQueue: Zvoog_UICommand[] = [];
 	cfg(): MixerDataMathUtility {
 		return this._mixerDataMathUtility;
 	}
-
+	undo(): Zvoog_UICommand[] {
+		return this.undoQueue;
+	}
+	redo(): Zvoog_UICommand[] {
+		return this.redoQueue;
+	}
+	clearUndo(){
+		this.undoQueue=[];
+	}
+	clearRedo(){
+		this.redoQueue=[];
+	}
 	reDrawPlayPosition() {
 		let ww = this.renderer.timeselectbar.positionMarkWidth();
 		let xx = this.cfg().leftPad + this.playPosition * this.cfg().widthDurationRatio - ww;
@@ -69,7 +82,7 @@ class CommandDispatcher {
 	}
 	registerWorkProject(data: Zvoog_Project) {
 		this._mixerDataMathUtility = new MixerDataMathUtility(data);
-		
+
 	}
 	registerUI(renderer: UIRenderer) {
 		this.renderer = renderer;
@@ -383,7 +396,7 @@ class CommandDispatcher {
 		if (idx == 'light1') {
 			cssPath = 'theme/colorlight.css';
 		}
-		
+
 		//console.log("cssPath " + cssPath);
 		startLoadCSSfile(cssPath);
 		this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);

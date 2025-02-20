@@ -71,7 +71,13 @@ declare class CommandDispatcher {
     _mixerDataMathUtility: MixerDataMathUtility;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
     exe: CommandExe;
+    undoQueue: Zvoog_UICommand[];
+    redoQueue: Zvoog_UICommand[];
     cfg(): MixerDataMathUtility;
+    undo(): Zvoog_UICommand[];
+    redo(): Zvoog_UICommand[];
+    clearUndo(): void;
+    clearRedo(): void;
     reDrawPlayPosition(): void;
     initAudioFromUI(): void;
     registerWorkProject(data: Zvoog_Project): void;
@@ -880,8 +886,6 @@ declare type Zvoog_Project = {
         z: number;
     };
     list: boolean;
-    undo: Zvoog_UICommand[];
-    redo: Zvoog_UICommand[];
 };
 declare type MZXBX_CachedWave = {
     path: string;

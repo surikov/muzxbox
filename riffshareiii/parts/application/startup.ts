@@ -10,9 +10,23 @@ function startApplication() {
 	window.addEventListener("beforeunload", saveProjectState);
 	globalCommandDispatcher.registerWorkProject(_mzxbxProjectForTesting2);
 	try {
-		let last = readObjectFromlocalStorage('lastprojectdata');
-		if (last) {
-			globalCommandDispatcher.registerWorkProject(last);
+		let lastprojectdata = readObjectFromlocalStorage('lastprojectdata');
+		if (lastprojectdata) {
+			globalCommandDispatcher.registerWorkProject(lastprojectdata);
+		}
+		globalCommandDispatcher.clearUndo();
+		globalCommandDispatcher.clearRedo();
+		let undocommands = readObjectFromlocalStorage('undocommands');
+		if(undocommands){
+			if(undocommands.length){
+				globalCommandDispatcher.undoQueue=undocommands;
+			}
+		}
+		let redocommands = readObjectFromlocalStorage('redocommands');
+		if(redocommands){
+			if(redocommands.length){
+				globalCommandDispatcher.redoQueue=redocommands;
+			}
 		}
 	} catch (xx) {
 		console.log(xx);
@@ -27,10 +41,10 @@ function startApplication() {
 		initWebAudioFromUI();
 	    
 	});*/
-	let themei=readTextFromlocalStorage('uicolortheme');
-		if(themei){
-			globalCommandDispatcher.setThemeColor(themei);
-		}
+	let themei = readTextFromlocalStorage('uicolortheme');
+	if (themei) {
+		globalCommandDispatcher.setThemeColor(themei);
+	}
 }
 function saveProjectState() {
 	//https://github.com/pieroxy/lz-string
@@ -39,13 +53,19 @@ function saveProjectState() {
 		saveText2localStorage('lastprojectdata', JSON.stringify(globalCommandDispatcher.cfg().data));
 	} catch (xx) {
 		console.log(xx);
-		globalCommandDispatcher.cfg().data.undo = [];
-		globalCommandDispatcher.cfg().data.redo = [];
-		try {
+		//globalCommandDispatcher.cfg().data.undo = [];
+		//globalCommandDispatcher.cfg().data.redo = [];
+		/*try {
 			saveText2localStorage('lastprojectdata', JSON.stringify(globalCommandDispatcher.cfg().data));
 		} catch (rr) {
 			console.log(rr);
-		}
+		}*/
+	}
+	try {
+		saveText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
+		saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
+	} catch (xx) {
+		console.log(xx);
 	}
 }
 function initWebAudioFromUI() {

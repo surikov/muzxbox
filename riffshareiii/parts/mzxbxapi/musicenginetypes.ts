@@ -184,8 +184,8 @@ type Zvoog_Project = {
 		z: number;
 	};
 	list: boolean;
-	undo: Zvoog_UICommand[];//Zvoog_Command[];
-	redo: Zvoog_UICommand[];//Zvoog_Command[];
+	//undo: Zvoog_UICommand[];//Zvoog_Command[];
+	//redo: Zvoog_UICommand[];//Zvoog_Command[];
 };
 
 

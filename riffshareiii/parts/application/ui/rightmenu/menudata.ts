@@ -202,8 +202,8 @@ function composeBaseMenu(): MenuInfo[] {
 					}
 					, {
 						text: localMenuClearUndoRedo, onClick: () => {
-							globalCommandDispatcher.cfg().data.undo = [];
-							globalCommandDispatcher.cfg().data.redo = [];
+							globalCommandDispatcher.clearUndo();
+							globalCommandDispatcher.clearRedo();
 						}
 					}
 				]

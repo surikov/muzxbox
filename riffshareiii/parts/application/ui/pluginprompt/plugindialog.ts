@@ -109,7 +109,7 @@ class PluginDialogPrompt {
 						globalCommandDispatcher.exe.commitProjectChanges([], () => {
 							if (me.waitProjectCallback) {
 								let newProj: Zvoog_Project = message.pluginData;
-								newProj.undo = globalCommandDispatcher.cfg().data.undo;
+								//newProj.undo = globalCommandDispatcher.cfg().data.undo;
 								me.waitProjectCallback(message.pluginData);
 								if (message.done) {
 									me.closeDialogFrame();
