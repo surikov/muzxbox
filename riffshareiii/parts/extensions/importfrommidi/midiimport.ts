@@ -38,13 +38,13 @@ class MidiParser {
 
 	controller_BankSelectMSB = 0x00;
 	controller_ModulationWheel = 0x01;
-	controller_coarseDataEntrySlider: number = 0x06;
+	controller_coarseDataEntrySlider: number = 0x06;//6
 	controller_coarseVolume: number = 0x07;
 	controller_ballance: number = 0x08;
 	controller_pan: number = 0x0A;
 	controller_expression: number = 0x0B;
 	controller_BankSelectLSBGS: number = 0x20;
-	controller_fineDataEntrySlider: number = 0x26;
+	controller_fineDataEntrySlider: number = 0x26;//38
 	controller_ReverbLevel = 0x5B;
 	controller_HoldPedal1 = 0x40;
 	controller_TremoloDepth = 0x5C;
@@ -52,8 +52,8 @@ class MidiParser {
 	controller_NRPNParameterLSB: number = 0x62;
 	controller_NRPNParameterMSB: number = 0x63;
 
-	controller_fineRPN: number = 0x64;
-	controller_coarseRPN: number = 0x65;
+	controller_fineRPN: number = 0x64;//100
+	controller_coarseRPN: number = 0x65;//101
 
 	controller_ResetAllControllers: number = 0x79;
 
@@ -228,6 +228,7 @@ class MidiParser {
 				for (var n = 0; n < chord.notes.length; n++) {
 					var note: TrackNote = chord.notes[n];
 					if (note.bendPoints.length > 1) {
+						
 						let simplifiedPath: NotePitch[] = [];
 						let cuPointDuration = 0;
 						let lastBasePitchDelta = 0;
@@ -246,7 +247,8 @@ class MidiParser {
 							}
 						}
 						simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
-						note.bendPoints = simplifiedPath;
+						//note.bendPoints = simplifiedPath;
+						//console.log(note,simplifiedPath);
 					} else {
 						if (note.bendPoints.length == 1) {
 							if (note.bendPoints[0].pointDuration > 4321) {
@@ -317,14 +319,14 @@ class MidiParser {
 		//, number 2 (required after number 1)
 		//, number 3 (required after number 2)
 		//, or number 4 (optional)
-		var expectedPitchBendRangeMessageNumber = 1;
+		var expectedState = 1;
 		var expectedPitchBendRangeChannel: number | undefined | null = null;
-		var pitchBendRange = Array(16).fill(2); // Default pitch-bend range is 2 semitones.
+		var pitchBendValuesRange = Array(16).fill(2); // Default pitch-bend range is 2 semitones.
 		for (let t = 0; t < this.parsedTracks.length; t++) {
 			var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
 			this.parseTicks2time(singleParsedTrack);
 			for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
-				var expectedPitchBendRangeMessageNumberOld = expectedPitchBendRangeMessageNumber;
+				var preState = expectedState;
 				var evnt = singleParsedTrack.trackevents[e];
 				if (evnt.basetype == this.EVENT_MIDI) {
 					evnt.param1 = evnt.param1 ? evnt.param1 : 0;
@@ -373,7 +375,7 @@ class MidiParser {
 												//when: event.playTime / 1000-track.notes[i].when
 												let idx: number = evnt.midiChannel ? evnt.midiChannel : 0;
 												let pp2 = evnt.param2 ? evnt.param2 : 0;
-												var delta: number = (pp2 - 64) / 64 * pitchBendRange[idx];
+												var delta: number = (pp2 - 64) / 64 * pitchBendValuesRange[idx];
 												var point: NotePitch = {
 													pointDuration: eventWhen - chord.when - allPointsDuration
 													, basePitchDelta: delta
@@ -393,28 +395,31 @@ class MidiParser {
 										} else {
 											if (
 
-												(expectedPitchBendRangeMessageNumber == 1 && evnt.param1 == this.controller_coarseRPN && evnt.param2 == 0x00) ||
-												(expectedPitchBendRangeMessageNumber == 2 && evnt.param1 == this.controller_fineRPN && evnt.param2 == 0x00) ||
-												(expectedPitchBendRangeMessageNumber == 3 && evnt.param1 == this.controller_coarseDataEntrySlider) ||
-												(expectedPitchBendRangeMessageNumber == 4 && evnt.param1 == this.controller_fineDataEntrySlider)
+												(expectedState == 1 && evnt.param1 == this.controller_coarseRPN && evnt.param2 == 0x00) ||
+												(expectedState == 2 && evnt.param1 == this.controller_fineRPN && evnt.param2 == 0x00) ||
+												(expectedState == 3 && evnt.param1 == this.controller_coarseDataEntrySlider) ||
+												(expectedState == 4 && evnt.param1 == this.controller_fineDataEntrySlider)
 											) {
-												if (expectedPitchBendRangeMessageNumber > 1 && evnt.midiChannel != expectedPitchBendRangeChannel) {
+												//console.log(expectedState,'->',evnt.param1,evnt.param2);
+												//console.log('bend range',evnt.param2,evnt.midiChannel,expectedPitchBendRangeMessageNumber,pitchBendValuesRange);
+												if (expectedState > 1 && evnt.midiChannel != expectedPitchBendRangeChannel) {
 													console.log('Unexpected channel number in non-first pitch-bend RANGE (SENSITIVITY) message. MIDI file might be corrupt.');
 												}
 												expectedPitchBendRangeChannel = evnt.midiChannel;
 												let idx: number = evnt.midiChannel ? evnt.midiChannel : 0;
-												if (expectedPitchBendRangeMessageNumber == 3) {
-													pitchBendRange[idx] = evnt.param2; // in semitones
+												if (expectedState == 3) {
+													pitchBendValuesRange[idx] = evnt.param2; // in semitones
 												}
-												if (expectedPitchBendRangeMessageNumber == 4) {
+												if (expectedState == 4) {
 													let pp = evnt.param2 ? evnt.param2 : 0;
-													pitchBendRange[idx] = pitchBendRange[idx] + pp / 100; // convert cents to semitones, add to semitones set in the previous MIDI message
+													pitchBendValuesRange[idx] = pitchBendValuesRange[idx] + pp / 100; // convert cents to semitones, add to semitones set in the previous MIDI message
 
 												}
-												expectedPitchBendRangeMessageNumber++;
-												if (expectedPitchBendRangeMessageNumber == 5) {
-													expectedPitchBendRangeMessageNumber = 1;
+												expectedState++;
+												if (expectedState == 5) {
+													expectedState = 1;
 												}
+												
 											} else {
 												if (evnt.param1 == this.controller_BankSelectMSB
 													|| evnt.param1 == this.controller_ModulationWheel
@@ -518,12 +523,12 @@ class MidiParser {
 						});
 					}
 				}
-				if (expectedPitchBendRangeMessageNumberOld == expectedPitchBendRangeMessageNumber) { // If the current message wasn't an expected pitch-bend range message
-					if (expectedPitchBendRangeMessageNumberOld >= 2 && expectedPitchBendRangeMessageNumberOld <= 3) {
-						//throw Error('Pitch-bend RANGE (SENSITIVITY) messages ended prematurely. MIDI file might be corrupt.');
+				if (preState == expectedState) { // If the current message wasn't an expected pitch-bend range message
+					if (preState >= 2 && preState <= 3) {
+						console.log('Pitch-bend RANGE (SENSITIVITY) messages ended prematurely. MIDI file might be corrupt.');
 					}
-					if (expectedPitchBendRangeMessageNumberOld == 4) { // The fourth message is optional, so since it wasn't sent, the setting of the pitch-bend range is done, and we might expect the first pitch-bend range message some time in the future
-						expectedPitchBendRangeMessageNumber = 1;
+					if (preState == 4) { // The fourth message is optional, so since it wasn't sent, the setting of the pitch-bend range is done, and we might expect the first pitch-bend range message some time in the future
+						expectedState = 1;
 					}
 				}
 			}

@@ -227,7 +227,6 @@ class MidiParser {
                             }
                         }
                         simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
-                        note.bendPoints = simplifiedPath;
                     }
                     else {
                         if (note.bendPoints.length == 1) {
@@ -291,14 +290,14 @@ class MidiParser {
     }
     parseNotes() {
         this.dumpResolutionChanges();
-        var expectedPitchBendRangeMessageNumber = 1;
+        var expectedState = 1;
         var expectedPitchBendRangeChannel = null;
-        var pitchBendRange = Array(16).fill(2);
+        var pitchBendValuesRange = Array(16).fill(2);
         for (let t = 0; t < this.parsedTracks.length; t++) {
             var singleParsedTrack = this.parsedTracks[t];
             this.parseTicks2time(singleParsedTrack);
             for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
-                var expectedPitchBendRangeMessageNumberOld = expectedPitchBendRangeMessageNumber;
+                var preState = expectedState;
                 var evnt = singleParsedTrack.trackevents[e];
                 if (evnt.basetype == this.EVENT_MIDI) {
                     evnt.param1 = evnt.param1 ? evnt.param1 : 0;
@@ -351,7 +350,7 @@ class MidiParser {
                                                 }
                                                 let idx = evnt.midiChannel ? evnt.midiChannel : 0;
                                                 let pp2 = evnt.param2 ? evnt.param2 : 0;
-                                                var delta = (pp2 - 64) / 64 * pitchBendRange[idx];
+                                                var delta = (pp2 - 64) / 64 * pitchBendValuesRange[idx];
                                                 var point = {
                                                     pointDuration: eventWhen - chord.when - allPointsDuration,
                                                     basePitchDelta: delta
@@ -369,25 +368,25 @@ class MidiParser {
                                             singleParsedTrack.trackVolumePoints.push(point);
                                         }
                                         else {
-                                            if ((expectedPitchBendRangeMessageNumber == 1 && evnt.param1 == this.controller_coarseRPN && evnt.param2 == 0x00) ||
-                                                (expectedPitchBendRangeMessageNumber == 2 && evnt.param1 == this.controller_fineRPN && evnt.param2 == 0x00) ||
-                                                (expectedPitchBendRangeMessageNumber == 3 && evnt.param1 == this.controller_coarseDataEntrySlider) ||
-                                                (expectedPitchBendRangeMessageNumber == 4 && evnt.param1 == this.controller_fineDataEntrySlider)) {
-                                                if (expectedPitchBendRangeMessageNumber > 1 && evnt.midiChannel != expectedPitchBendRangeChannel) {
+                                            if ((expectedState == 1 && evnt.param1 == this.controller_coarseRPN && evnt.param2 == 0x00) ||
+                                                (expectedState == 2 && evnt.param1 == this.controller_fineRPN && evnt.param2 == 0x00) ||
+                                                (expectedState == 3 && evnt.param1 == this.controller_coarseDataEntrySlider) ||
+                                                (expectedState == 4 && evnt.param1 == this.controller_fineDataEntrySlider)) {
+                                                if (expectedState > 1 && evnt.midiChannel != expectedPitchBendRangeChannel) {
                                                     console.log('Unexpected channel number in non-first pitch-bend RANGE (SENSITIVITY) message. MIDI file might be corrupt.');
                                                 }
                                                 expectedPitchBendRangeChannel = evnt.midiChannel;
                                                 let idx = evnt.midiChannel ? evnt.midiChannel : 0;
-                                                if (expectedPitchBendRangeMessageNumber == 3) {
-                                                    pitchBendRange[idx] = evnt.param2;
+                                                if (expectedState == 3) {
+                                                    pitchBendValuesRange[idx] = evnt.param2;
                                                 }
-                                                if (expectedPitchBendRangeMessageNumber == 4) {
+                                                if (expectedState == 4) {
                                                     let pp = evnt.param2 ? evnt.param2 : 0;
-                                                    pitchBendRange[idx] = pitchBendRange[idx] + pp / 100;
+                                                    pitchBendValuesRange[idx] = pitchBendValuesRange[idx] + pp / 100;
                                                 }
-                                                expectedPitchBendRangeMessageNumber++;
-                                                if (expectedPitchBendRangeMessageNumber == 5) {
-                                                    expectedPitchBendRangeMessageNumber = 1;
+                                                expectedState++;
+                                                if (expectedState == 5) {
+                                                    expectedState = 1;
                                                 }
                                             }
                                             else {
@@ -496,11 +495,12 @@ class MidiParser {
                         });
                     }
                 }
-                if (expectedPitchBendRangeMessageNumberOld == expectedPitchBendRangeMessageNumber) {
-                    if (expectedPitchBendRangeMessageNumberOld >= 2 && expectedPitchBendRangeMessageNumberOld <= 3) {
+                if (preState == expectedState) {
+                    if (preState >= 2 && preState <= 3) {
+                        console.log('Pitch-bend RANGE (SENSITIVITY) messages ended prematurely. MIDI file might be corrupt.');
                     }
-                    if (expectedPitchBendRangeMessageNumberOld == 4) {
-                        expectedPitchBendRangeMessageNumber = 1;
+                    if (preState == 4) {
+                        expectedState = 1;
                     }
                 }
             }
@@ -1248,8 +1248,6 @@ class Projectr {
             },
             versionCode: '1',
             list: false,
-            undo: [],
-            redo: [],
             position: { x: 0, y: 0, z: 100 }
         };
         let echoOutID = 'reverberation';

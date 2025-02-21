@@ -268,18 +268,24 @@ function startApplication() {
 }
 function saveProjectState() {
     globalCommandDispatcher.exe.cutLongUndo();
+    let txtdata = JSON.stringify(globalCommandDispatcher.cfg().data);
     try {
-        saveText2localStorage('lastprojectdata', JSON.stringify(globalCommandDispatcher.cfg().data));
-    }
-    catch (xx) {
-        console.log(xx);
-    }
-    try {
+        console.log('state size', txtdata.length);
+        saveText2localStorage('lastprojectdata', txtdata);
         saveText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
         saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
     }
     catch (xx) {
         console.log(xx);
+        window.localStorage.clear();
+        try {
+            saveText2localStorage('lastprojectdata', txtdata);
+            saveText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
+            saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
+        }
+        catch (nn) {
+            console.log(nn);
+        }
     }
 }
 function initWebAudioFromUI() {
