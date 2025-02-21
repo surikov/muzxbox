@@ -686,8 +686,8 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 
 	let ratioPre = 0.99;//0.99;
 
-	let red = '#ff3333ff';
-	let red2 = '#ff333333';
+	let red = '#ff6633ff';
+	let red2 = '#ff663366';
 	let blue2 = '#3333ff33';
 	let blue = '#3333ffff';
 

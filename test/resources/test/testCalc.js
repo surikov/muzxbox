@@ -610,8 +610,8 @@ function dumpRowFillsColor(rows, color, shiftX) {
 }
 function dumpTriads(svg, rows) {
     var ratioPre = 0.99; //0.99;
-    var red = '#ff3333ff';
-    var red2 = '#ff333333';
+    var red = '#ff6633ff';
+    var red2 = '#ff663366';
     var blue2 = '#3333ff33';
     var blue = '#3333ffff';
     for (var rr = 0; rr < rowsVisibleCount; rr++) {
