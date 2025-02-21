@@ -17,8 +17,8 @@ class Projectr {
 			}
 			, versionCode: '1'
 			, list: false
-			, undo: []
-			, redo: []
+			//, undo: []
+			//, redo: []
 			, position: { x: 0, y: 0, z: 100 }
 		};
 
