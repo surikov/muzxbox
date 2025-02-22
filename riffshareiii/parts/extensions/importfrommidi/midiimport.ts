@@ -61,7 +61,7 @@ class MidiParser {
 	constructor(arrayBuffer: ArrayBuffer) {
 		this.header = new MIDIFileHeader(arrayBuffer);
 		this.parseTracks(arrayBuffer);
-		
+
 	}
 	parseTracks(arrayBuffer: ArrayBuffer) {
 		//console.log('start parseTracks');
@@ -228,7 +228,7 @@ class MidiParser {
 				for (var n = 0; n < chord.notes.length; n++) {
 					var note: TrackNote = chord.notes[n];
 					if (note.bendPoints.length > 1) {
-						
+
 						let simplifiedPath: NotePitch[] = [];
 						let cuPointDuration = 0;
 						let lastBasePitchDelta = 0;
@@ -247,15 +247,21 @@ class MidiParser {
 							}
 						}
 						simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
-						//note.bendPoints = simplifiedPath;
+						note.bendPoints = simplifiedPath;
 						//console.log(note,simplifiedPath);
 					} else {
-						if (note.bendPoints.length == 1) {
+						/*if (note.bendPoints.length == 1) {
 							if (note.bendPoints[0].pointDuration > 4321) {
-								note.bendPoints[0].pointDuration = 1234;
+								note.bendPoints[0].pointDuration = 432;
 							}
+							console.log('to long',note);
+						}*/
+						if(note.baseDuration>7654){
+							//console.log('to long',note);
+							note.baseDuration=4321;
 						}
 					}
+					//console.log(note);
 				}
 			}
 		}
@@ -367,24 +373,30 @@ class MidiParser {
 									if (chord) {
 										for (var i = 0; i < chord.notes.length; i++) {
 											var note: TrackNote = chord.notes[i];
-											if (!(note.closed)) {
+											let idx: number = evnt.midiChannel ? evnt.midiChannel : 0;
+												let pp2 = evnt.param2 ? evnt.param2 : 0;
+												var delta: number = -(pp2 - 64.0) / 64.0 * pitchBendValuesRange[idx];
 												var allPointsDuration = 0;
 												for (var k = 0; k < note.bendPoints.length; k++) {
 													allPointsDuration = allPointsDuration + note.bendPoints[k].pointDuration;
 												}
-												//when: event.playTime / 1000-track.notes[i].when
-												let idx: number = evnt.midiChannel ? evnt.midiChannel : 0;
-												let pp2 = evnt.param2 ? evnt.param2 : 0;
-												var delta: number = (pp2 - 64) / 64 * pitchBendValuesRange[idx];
 												var point: NotePitch = {
 													pointDuration: eventWhen - chord.when - allPointsDuration
 													, basePitchDelta: delta
 												};
+											//if (!(note.closed)) {
+												
+												//when: event.playTime / 1000-track.notes[i].when
+												
+												
 												note.bendPoints.push(point);
-											}
+												//console.log('basePitchDelta',note,point);
+											//}else{
+											//	console.log('no bend',point,'for closed',note);
+											//}
 										}
 									}
-
+									
 								} else {
 									if (evnt.subtype == this.EVENT_MIDI_CONTROLLER) {
 
@@ -409,17 +421,18 @@ class MidiParser {
 												let idx: number = evnt.midiChannel ? evnt.midiChannel : 0;
 												if (expectedState == 3) {
 													pitchBendValuesRange[idx] = evnt.param2; // in semitones
+													//console.log('bend range', idx, pitchBendValuesRange[idx], evnt.param2);
 												}
 												if (expectedState == 4) {
 													let pp = evnt.param2 ? evnt.param2 : 0;
 													pitchBendValuesRange[idx] = pitchBendValuesRange[idx] + pp / 100; // convert cents to semitones, add to semitones set in the previous MIDI message
-
+													//console.log('bend range convert', idx, pitchBendValuesRange[idx], pp / 100);
 												}
 												expectedState++;
 												if (expectedState == 5) {
 													expectedState = 1;
 												}
-												
+
 											} else {
 												if (evnt.param1 == this.controller_BankSelectMSB
 													|| evnt.param1 == this.controller_ModulationWheel
@@ -440,7 +453,7 @@ class MidiParser {
 													|| (evnt.param1 >= 32 && evnt.param1 <= 63) //LSB for Control 0-31
 													|| (evnt.param1 >= 70 && evnt.param1 <= 79) //Sound Controller 1-10
 												) {
-													//skip controller
+													//console.log('skip controller', evnt.param1, evnt.param2, 'at', evnt.playTimeMs, 'ms, for channel', evnt.midiChannel);
 												} else {
 													console.log('unknown controller', evnt.playTimeMs, 'ms, channel', evnt.midiChannel, ':', evnt.param1, evnt.param2);
 												}
@@ -678,12 +691,12 @@ class MidiParser {
 
 
 
-	
-
-	
-	
 
 
-	
-	
+
+
+
+
+
+
 }

@@ -367,19 +367,16 @@ class Projectr {
 						for (let nn = 0; nn < midiChord.notes.length; nn++) {
 							let midiNote: MIDISongNote = midiChord.notes[nn];
 							if (midiNote.slidePoints.length > 0) {
-								//this.reslideChord(trackChord,midiNote,nextMeasure);
-								//this.noreslide(trackChord, midiNote, nextMeasure);
 								trackChord.slides = [];
 								let bendDurationMs = 0;
-								//let mm = MMUtil();
 								for (let pp = 0; pp < midiNote.slidePoints.length; pp++) {
-									let midiPoint: MIDISongPoint = midiNote.slidePoints[pp];
-									let xduration: Zvoog_Metre = mm.calculate(midiPoint.durationms / 1000.0, nextMeasure.tempo);
+									let midiSlidePoint: MIDISongPoint = midiNote.slidePoints[pp];
+									let xduration: Zvoog_Metre = mm.calculate(midiSlidePoint.durationms / 1000.0, nextMeasure.tempo);
 									trackChord.slides.push({
 										duration: xduration
-										, delta: midiNote.midiPitch - midiPoint.pitch
+										, delta:  midiSlidePoint.pitch-midiNote.midiPitch
 									});
-									bendDurationMs = bendDurationMs + midiPoint.durationms;
+									bendDurationMs = bendDurationMs + midiSlidePoint.durationms;
 								}
 								let remains = midiNote.midiDuration - bendDurationMs;
 								if (remains > 0) {
@@ -388,6 +385,8 @@ class Projectr {
 										, delta: midiNote.midiPitch - midiNote.slidePoints[midiNote.slidePoints.length - 1].pitch
 									});
 								}
+							
+								
 							} else {
 								trackChord.slides = [{
 									duration: mm.calculate(midiNote.midiDuration / 1000.0

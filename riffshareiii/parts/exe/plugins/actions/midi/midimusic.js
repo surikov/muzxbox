@@ -227,12 +227,11 @@ class MidiParser {
                             }
                         }
                         simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
+                        note.bendPoints = simplifiedPath;
                     }
                     else {
-                        if (note.bendPoints.length == 1) {
-                            if (note.bendPoints[0].pointDuration > 4321) {
-                                note.bendPoints[0].pointDuration = 1234;
-                            }
+                        if (note.baseDuration > 7654) {
+                            note.baseDuration = 4321;
                         }
                     }
                 }
@@ -343,20 +342,18 @@ class MidiParser {
                                     if (chord) {
                                         for (var i = 0; i < chord.notes.length; i++) {
                                             var note = chord.notes[i];
-                                            if (!(note.closed)) {
-                                                var allPointsDuration = 0;
-                                                for (var k = 0; k < note.bendPoints.length; k++) {
-                                                    allPointsDuration = allPointsDuration + note.bendPoints[k].pointDuration;
-                                                }
-                                                let idx = evnt.midiChannel ? evnt.midiChannel : 0;
-                                                let pp2 = evnt.param2 ? evnt.param2 : 0;
-                                                var delta = (pp2 - 64) / 64 * pitchBendValuesRange[idx];
-                                                var point = {
-                                                    pointDuration: eventWhen - chord.when - allPointsDuration,
-                                                    basePitchDelta: delta
-                                                };
-                                                note.bendPoints.push(point);
+                                            let idx = evnt.midiChannel ? evnt.midiChannel : 0;
+                                            let pp2 = evnt.param2 ? evnt.param2 : 0;
+                                            var delta = -(pp2 - 64.0) / 64.0 * pitchBendValuesRange[idx];
+                                            var allPointsDuration = 0;
+                                            for (var k = 0; k < note.bendPoints.length; k++) {
+                                                allPointsDuration = allPointsDuration + note.bendPoints[k].pointDuration;
                                             }
+                                            var point = {
+                                                pointDuration: eventWhen - chord.when - allPointsDuration,
+                                                basePitchDelta: delta
+                                            };
+                                            note.bendPoints.push(point);
                                         }
                                     }
                                 }
@@ -1569,13 +1566,13 @@ class Projectr {
                                 trackChord.slides = [];
                                 let bendDurationMs = 0;
                                 for (let pp = 0; pp < midiNote.slidePoints.length; pp++) {
-                                    let midiPoint = midiNote.slidePoints[pp];
-                                    let xduration = mm.calculate(midiPoint.durationms / 1000.0, nextMeasure.tempo);
+                                    let midiSlidePoint = midiNote.slidePoints[pp];
+                                    let xduration = mm.calculate(midiSlidePoint.durationms / 1000.0, nextMeasure.tempo);
                                     trackChord.slides.push({
                                         duration: xduration,
-                                        delta: midiNote.midiPitch - midiPoint.pitch
+                                        delta: midiSlidePoint.pitch - midiNote.midiPitch
                                     });
-                                    bendDurationMs = bendDurationMs + midiPoint.durationms;
+                                    bendDurationMs = bendDurationMs + midiSlidePoint.durationms;
                                 }
                                 let remains = midiNote.midiDuration - bendDurationMs;
                                 if (remains > 0) {
