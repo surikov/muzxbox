@@ -382,7 +382,7 @@ class Projectr {
 								if (remains > 0) {
 									trackChord.slides.push({
 										duration: mm.calculate(remains / 1000.0, nextMeasure.tempo)
-										, delta: midiNote.midiPitch - midiNote.slidePoints[midiNote.slidePoints.length - 1].pitch
+										, delta:  midiNote.slidePoints[midiNote.slidePoints.length - 1].pitch-midiNote.midiPitch
 									});
 								}
 							

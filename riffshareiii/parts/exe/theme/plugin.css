@@ -13,6 +13,7 @@
 	flex-direction: column;
 	visibility: hidden;
 	border-radius2: 0.25cm;
+	background-color: var(--line-color50);
 }
 
 #pluginFrame {

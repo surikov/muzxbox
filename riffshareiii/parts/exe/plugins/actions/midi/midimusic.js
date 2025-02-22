@@ -207,26 +207,26 @@ class MidiParser {
                 var chord = track.chords[ch];
                 for (var n = 0; n < chord.notes.length; n++) {
                     var note = chord.notes[n];
-                    if (note.bendPoints.length > 1) {
+                    if (note.bendPoints.length > 0) {
                         let simplifiedPath = [];
                         let cuPointDuration = 0;
-                        let lastBasePitchDelta = 0;
+                        let lastPitchDelta = 0;
                         for (let pp = 0; pp < note.bendPoints.length; pp++) {
                             let cuPoint = note.bendPoints[pp];
-                            lastBasePitchDelta = cuPoint.basePitchDelta;
+                            lastPitchDelta = cuPoint.basePitchDelta;
                             cuPointDuration = cuPointDuration + cuPoint.pointDuration;
                             if (cuPointDuration > msMin) {
-                                simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
+                                simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastPitchDelta });
                                 cuPointDuration = 0;
                             }
                             else {
                                 if (simplifiedPath.length > 0) {
                                     let prePoint = simplifiedPath[simplifiedPath.length - 1];
-                                    prePoint.basePitchDelta = lastBasePitchDelta;
+                                    prePoint.basePitchDelta = lastPitchDelta;
                                 }
                             }
                         }
-                        simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
+                        simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastPitchDelta });
                         note.bendPoints = simplifiedPath;
                     }
                     else {
@@ -344,7 +344,7 @@ class MidiParser {
                                             var note = chord.notes[i];
                                             let idx = evnt.midiChannel ? evnt.midiChannel : 0;
                                             let pp2 = evnt.param2 ? evnt.param2 : 0;
-                                            var delta = -(pp2 - 64.0) / 64.0 * pitchBendValuesRange[idx];
+                                            var delta = (pp2 - 64.0) / 64.0 * pitchBendValuesRange[idx];
                                             var allPointsDuration = 0;
                                             for (var k = 0; k < note.bendPoints.length; k++) {
                                                 allPointsDuration = allPointsDuration + note.bendPoints[k].pointDuration;
@@ -353,7 +353,11 @@ class MidiParser {
                                                 pointDuration: eventWhen - chord.when - allPointsDuration,
                                                 basePitchDelta: delta
                                             };
-                                            note.bendPoints.push(point);
+                                            if (!(note.closed)) {
+                                                note.bendPoints.push(point);
+                                            }
+                                            else {
+                                            }
                                         }
                                     }
                                 }
@@ -1578,7 +1582,7 @@ class Projectr {
                                 if (remains > 0) {
                                     trackChord.slides.push({
                                         duration: mm.calculate(remains / 1000.0, nextMeasure.tempo),
-                                        delta: midiNote.midiPitch - midiNote.slidePoints[midiNote.slidePoints.length - 1].pitch
+                                        delta: midiNote.slidePoints[midiNote.slidePoints.length - 1].pitch - midiNote.midiPitch
                                     });
                                 }
                             }

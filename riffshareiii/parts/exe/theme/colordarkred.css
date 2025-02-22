@@ -1,9 +1,9 @@
 :root {
-	--background-color: #300;
+	--background-color: #411;
 	--main-color: #ff9;
-	--drag-color: #c90;
+	--drag-color: #960;
 	--line-color: #fff;
-	--click-color: #c00;
+	--click-color: #c01;
 }
 /*
 #pagediv {

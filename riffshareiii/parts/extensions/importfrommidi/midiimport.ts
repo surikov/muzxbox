@@ -227,26 +227,26 @@ class MidiParser {
 				var chord: TrackChord = track.chords[ch];
 				for (var n = 0; n < chord.notes.length; n++) {
 					var note: TrackNote = chord.notes[n];
-					if (note.bendPoints.length > 1) {
+					if (note.bendPoints.length > 0) {
 
 						let simplifiedPath: NotePitch[] = [];
 						let cuPointDuration = 0;
-						let lastBasePitchDelta = 0;
+						let lastPitchDelta = 0;
 						for (let pp = 0; pp < note.bendPoints.length; pp++) {
 							let cuPoint = note.bendPoints[pp];
-							lastBasePitchDelta = cuPoint.basePitchDelta;
+							lastPitchDelta = cuPoint.basePitchDelta;
 							cuPointDuration = cuPointDuration + cuPoint.pointDuration;
 							if (cuPointDuration > msMin) {
-								simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
+								simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastPitchDelta });
 								cuPointDuration = 0;
 							} else {
 								if (simplifiedPath.length > 0) {
 									let prePoint = simplifiedPath[simplifiedPath.length - 1];
-									prePoint.basePitchDelta = lastBasePitchDelta;
+									prePoint.basePitchDelta = lastPitchDelta;
 								}
 							}
 						}
-						simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastBasePitchDelta });
+						simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastPitchDelta });
 						note.bendPoints = simplifiedPath;
 						//console.log(note,simplifiedPath);
 					} else {
@@ -375,7 +375,7 @@ class MidiParser {
 											var note: TrackNote = chord.notes[i];
 											let idx: number = evnt.midiChannel ? evnt.midiChannel : 0;
 												let pp2 = evnt.param2 ? evnt.param2 : 0;
-												var delta: number = -(pp2 - 64.0) / 64.0 * pitchBendValuesRange[idx];
+												var delta: number = (pp2 - 64.0) / 64.0 * pitchBendValuesRange[idx];
 												var allPointsDuration = 0;
 												for (var k = 0; k < note.bendPoints.length; k++) {
 													allPointsDuration = allPointsDuration + note.bendPoints[k].pointDuration;
@@ -384,16 +384,16 @@ class MidiParser {
 													pointDuration: eventWhen - chord.when - allPointsDuration
 													, basePitchDelta: delta
 												};
-											//if (!(note.closed)) {
+											if (!(note.closed)) {
 												
 												//when: event.playTime / 1000-track.notes[i].when
 												
 												
 												note.bendPoints.push(point);
 												//console.log('basePitchDelta',note,point);
-											//}else{
+											}else{
 											//	console.log('no bend',point,'for closed',note);
-											//}
+											}
 										}
 									}
 									
