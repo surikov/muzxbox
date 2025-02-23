@@ -102,7 +102,7 @@ class LeftPanel {
 				}
 			}
 		
-			if (zz < 4) {
+			if (zz < 5) {
 				for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++) {
 					let samplerLabel: TileText = {
 						text: '' + globalCommandDispatcher.cfg().data.percussions[ss].title
@@ -116,7 +116,7 @@ class LeftPanel {
 					//console.log('samplerLabel', samplerLabel);
 				}
 			}
-			if (zz < 4) {
+			if (zz < 5) {
 				//let yy = 0;
 				for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
 					let filter = globalCommandDispatcher.cfg().data.filters[ff];

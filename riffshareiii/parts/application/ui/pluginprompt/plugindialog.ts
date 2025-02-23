@@ -19,7 +19,7 @@ class PluginDialogPrompt {
 				this.waitForPluginInit = true;
 				pluginFrame.src = url;
 				//(document.getElementById("pluginDeleteLabel") as any).innerHTML = "action";
-				(document.getElementById("pluginEditTitleButton") as any).style.display = "none";
+				//(document.getElementById("pluginEditTitleButton") as any).style.display = "none";
 				(document.getElementById("pluginBottom") as any).style.display = "none";
 				(document.getElementById("pluginDiv") as any).style.visibility = "visible";
 			}
@@ -41,8 +41,8 @@ class PluginDialogPrompt {
 				this.waitForPluginInit = true;
 				pluginFrame.src = url;
 
-				(document.getElementById("pluginEditTitleButton") as any).style.display = "flex";
-				(document.getElementById("pluginEditTitleButton") as any).onclick = () => {
+				//(document.getElementById("pluginEditTitleButton") as any).style.display = "flex";
+				/*(document.getElementById("pluginEditTitleButton") as any).onclick = () => {
 					if (this.waitTitleAction) {
 						let newTitle = prompt(label, label);
 						if (newTitle == label) {
@@ -53,9 +53,9 @@ class PluginDialogPrompt {
 							}
 						}
 					}
-				};
-				(document.getElementById("pluginDeleteButton") as any).onclick = btnAction;
-				(document.getElementById("pluginDeleteLabel") as any).innerHTML = btnLabel;
+				};*/
+				//(document.getElementById("pluginDeleteButton") as any).onclick = btnAction;
+				//(document.getElementById("pluginDeleteLabel") as any).innerHTML = btnLabel;
 				(document.getElementById("pluginBottom") as any).style.display = "flex";
 				(document.getElementById("pluginDiv") as any).style.visibility = "visible";
 			}

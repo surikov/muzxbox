@@ -19,7 +19,7 @@ class Projectr {
 			, list: false
 			//, undo: []
 			//, redo: []
-			, position: { x: 0, y: 0, z: 100 }
+			, position: { x: 0, y: 0, z: 30 }
 		};
 
 		let echoOutID = 'reverberation';

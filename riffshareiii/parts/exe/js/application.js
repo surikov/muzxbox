@@ -320,7 +320,6 @@ class PluginDialogPrompt {
             if (pluginFrame.contentWindow) {
                 this.waitForPluginInit = true;
                 pluginFrame.src = url;
-                document.getElementById("pluginEditTitleButton").style.display = "none";
                 document.getElementById("pluginBottom").style.display = "none";
                 document.getElementById("pluginDiv").style.visibility = "visible";
             }
@@ -338,21 +337,6 @@ class PluginDialogPrompt {
             if (pluginFrame.contentWindow) {
                 this.waitForPluginInit = true;
                 pluginFrame.src = url;
-                document.getElementById("pluginEditTitleButton").style.display = "flex";
-                document.getElementById("pluginEditTitleButton").onclick = () => {
-                    if (this.waitTitleAction) {
-                        let newTitle = prompt(label, label);
-                        if (newTitle == label) {
-                        }
-                        else {
-                            if (newTitle != null) {
-                                this.waitTitleAction(newTitle);
-                            }
-                        }
-                    }
-                };
-                document.getElementById("pluginDeleteButton").onclick = btnAction;
-                document.getElementById("pluginDeleteLabel").innerHTML = btnLabel;
                 document.getElementById("pluginBottom").style.display = "flex";
                 document.getElementById("pluginDiv").style.visibility = "visible";
             }
@@ -910,9 +894,6 @@ class CommandDispatcher {
     }
     resetProject() {
         try {
-            if (this.cfg().data.tracks)
-                if (this.cfg().data.tracks[0])
-                    this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
             this.renderer.fillWholeUI();
             this.setupSelectionBackground(this.cfg().data.selectedPart);
         }
@@ -1615,13 +1596,11 @@ class RightMenuPanel {
             this.scrollY = 0;
             this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         });
-        this.layerCurrentTitle = { x: 2.5, y: 0, text: '', css: 'currentTitleLabel' };
         this.backgroundAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111,
             showZoom: zoomPrefixLevelsCSS[0].minZoom,
             hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
-                this.layerCurrentTitle,
                 this.listingShadow,
                 this.backgroundRectangle
             ], id: 'rightMenuBackgroundAnchor'
@@ -2408,7 +2387,7 @@ class LeftPanel {
                     }
                 }
             }
-            if (zz < 4) {
+            if (zz < 5) {
                 for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++) {
                     let samplerLabel = {
                         text: '' + globalCommandDispatcher.cfg().data.percussions[ss].title,
@@ -2421,7 +2400,7 @@ class LeftPanel {
                     this.leftZoomAnchors[zz].content.push(samplerLabel);
                 }
             }
-            if (zz < 4) {
+            if (zz < 5) {
                 for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
                     let filter = globalCommandDispatcher.cfg().data.filters[ff];
                     let autoLabel = {

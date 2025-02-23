@@ -28,7 +28,7 @@
 	<link rel="stylesheet" type="text/css" href="theme/plugin.css">
 	<link rel="stylesheet" type="text/css" href="theme/fanpane.css">
 
-	<link rel="stylesheet" type="text/css" href="theme/colordarkblue.css">
+	<link rel="stylesheet" type="text/css" href="theme/colordarkred.css">
 	<link rel="stylesheet" type="text/css" href="theme/font1small.css">
 
 	<title>ZvoogHub</title>
@@ -37,14 +37,21 @@
 <body>
 	<div id="pluginDiv">
 		<div id="pluginHeader">
-			<div id="pluginEditTitleButton" onclick="globalCommandDispatcher.pick();">&#xf222;</div>
+			<!--<div id="pluginEditTitleButton" onclick="globalCommandDispatcher.pick();">&#xf222;</div>-->
 			<div id="pluginTitle">Plugin name and other information for identification</div>
 			<div id="pluginCancel" onclick="globalCommandDispatcher.cancelPluginGUI();">&#xf136;</div>
 		</div>
 		<iframe id="pluginFrame" src="plugins/pluginplaceholder.html"></iframe>
 		<div id="pluginBottom">
-			<div id="pluginDeleteLabel">Delete</div>
-			<div id="pluginDeleteButton" onclick="globalCommandDispatcher.delete();">&#xf154;</div>
+			<!--<div id="pluginDeleteLabel">Delete</div>-->
+			<div id="pluginSetFilter" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf39e;</div>
+			<div id="pluginSetPlay" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf3bc;</div>
+
+			<div id="pluginSetPasstrough" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf1af;</div>
+			<div id="pluginSetSolo" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf166;</div>
+			
+			<div id="pluginSetTitle" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf1c6;</div>
+			<div id="pluginDelete" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf154;</div>
 		</div>
 	</div>
 	<div id='pagediv'>

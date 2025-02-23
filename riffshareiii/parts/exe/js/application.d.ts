@@ -222,7 +222,6 @@ declare class RightMenuPanel {
     backgroundRectangle: TileRectangle;
     listingShadow: TileRectangle;
     backgroundAnchor: TileAnchor;
-    layerCurrentTitle: TileText;
     menuPanelBackground: SVGElement;
     menuPanelContent: SVGElement;
     menuPanelInteraction: SVGElement;

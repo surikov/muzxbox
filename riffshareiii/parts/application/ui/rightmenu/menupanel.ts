@@ -8,7 +8,7 @@ class RightMenuPanel {
 	backgroundRectangle: TileRectangle;
 	listingShadow: TileRectangle;
 	backgroundAnchor: TileAnchor;
-	layerCurrentTitle: TileText;
+	//layerCurrentTitle: TileText;
 
 	menuPanelBackground: SVGElement;
 	menuPanelContent: SVGElement;
@@ -67,7 +67,7 @@ class RightMenuPanel {
 			this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
 		});
 
-		this.layerCurrentTitle = { x: 2.5, y: 0, text: '', css: 'currentTitleLabel' };
+		//this.layerCurrentTitle = { x: 2.5, y: 0, text: '', css: 'currentTitleLabel' };
 
 
 
@@ -77,8 +77,9 @@ class RightMenuPanel {
 			, showZoom: zoomPrefixLevelsCSS[0].minZoom
 			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
 			, content: [
-				this.layerCurrentTitle
-				, this.listingShadow
+				//this.layerCurrentTitle
+				//, 
+				this.listingShadow
 				, this.backgroundRectangle
 
 			], id: 'rightMenuBackgroundAnchor'
