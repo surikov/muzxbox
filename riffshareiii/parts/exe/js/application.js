@@ -2387,6 +2387,24 @@ class LeftPanel {
                     }
                 }
             }
+            let titleLabel = {
+                x: 0,
+                y: globalCommandDispatcher.cfg().gridTop(),
+                text: globalCommandDispatcher.cfg().data.title,
+                css: 'titleLabel' + zoomPrefixLevelsCSS[zz].prefix
+            };
+            this.leftZoomAnchors[zz].content.push(titleLabel);
+            if (zz < 5) {
+                if (globalCommandDispatcher.cfg().data.tracks.length > 0) {
+                    let trackLabel = {
+                        x: 0,
+                        y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight(),
+                        text: globalCommandDispatcher.cfg().data.tracks[0].title,
+                        css: 'firstTrackLabel' + zoomPrefixLevelsCSS[zz].prefix
+                    };
+                    this.leftZoomAnchors[zz].content.push(trackLabel);
+                }
+            }
             if (zz < 5) {
                 for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++) {
                     let samplerLabel = {
@@ -3075,13 +3093,6 @@ class MixerZoomLevel {
             this.bars.push(mixBar);
             left = left + width;
         }
-        let titleLabel = {
-            x: 0,
-            y: globalCommandDispatcher.cfg().heightOfTitle(),
-            text: globalCommandDispatcher.cfg().data.title,
-            css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix
-        };
-        this.zoomGridAnchor.content.push(titleLabel);
         this.addDrumLines();
         this.addGridLines(this.zoomGridAnchor);
         this.addCommentLines();

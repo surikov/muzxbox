@@ -61,7 +61,7 @@ class LeftPanel {
 					};
 					this.leftZoomAnchors[zz].content.push(octavemark);
 					*/
-					let olabel='' + (globalCommandDispatcher.cfg().drawOctaveCount() - oo);// + globalCommandDispatcher.cfg().transposeOctaveCount());
+					let olabel = '' + (globalCommandDispatcher.cfg().drawOctaveCount() - oo);// + globalCommandDispatcher.cfg().transposeOctaveCount());
 					let nm3: TileText = {
 						x: 1
 						, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom
@@ -101,7 +101,25 @@ class LeftPanel {
 
 				}
 			}
-		
+
+			let titleLabel: TileText = {
+				x: 0
+				, y: globalCommandDispatcher.cfg().gridTop()
+				, text: globalCommandDispatcher.cfg().data.title
+				, css: 'titleLabel' + zoomPrefixLevelsCSS[zz].prefix
+			};
+			this.leftZoomAnchors[zz].content.push(titleLabel);
+			if (zz < 5) {
+				if (globalCommandDispatcher.cfg().data.tracks.length > 0) {
+					let trackLabel: TileText = {
+						x: 0
+						, y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight()
+						, text: globalCommandDispatcher.cfg().data.tracks[0].title
+						, css: 'firstTrackLabel' + zoomPrefixLevelsCSS[zz].prefix
+					};
+					this.leftZoomAnchors[zz].content.push(trackLabel);
+				}
+			}
 			if (zz < 5) {
 				for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++) {
 					let samplerLabel: TileText = {

@@ -155,8 +155,6 @@ declare type Zvoog_Project = {
         z: number;
     };
     list: boolean;
-    undo: Zvoog_UICommand[];
-    redo: Zvoog_UICommand[];
 };
 declare type MZXBX_CachedWave = {
     path: string;

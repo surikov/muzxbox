@@ -252,6 +252,36 @@
 
 
 
+.firstTrackLabel025 {
+    fill: var(--line-color);
+	fill-opacity: 75%;
+    font-size: calc(2*0.125*var(--tapSize));
+	pointer-events: none;
+}
+.firstTrackLabel05 {
+    fill: var(--line-color);
+	fill-opacity: 75%;
+    font-size: calc(4*0.125*var(--tapSize));
+	pointer-events: none;
+}
+.firstTrackLabel1 {
+    fill: var(--line-color);
+	fill-opacity: 75%;
+    font-size: calc(6*0.125*var(--tapSize));
+	pointer-events: none;
+}
+.firstTrackLabel2 {
+    fill: var(--line-color);
+	fill-opacity: 75%;
+    font-size: calc(8*0.125*var(--tapSize));
+	pointer-events: none;
+}
+.firstTrackLabel4 {
+    fill: var(--line-color);
+	fill-opacity: 75%;
+    font-size: calc(12*0.125*var(--tapSize));
+	pointer-events: none;
+}
 
 .octaveMark{
     fill: var(--line-color);

@@ -48,6 +48,7 @@ class MixerZoomLevel {
 			this.bars.push(mixBar);
 			left = left + width;
 		}
+		/*
 		let titleLabel: TileText = {
 			x: 0
 			//, y: globalCommandDispatcher.cfg().gridTop() - zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom * 2
@@ -56,6 +57,7 @@ class MixerZoomLevel {
 			, css: 'titleLabel' + zoomPrefixLevelsCSS[this.zoomLevelIndex].prefix
 		};
 		this.zoomGridAnchor.content.push(titleLabel);
+		*/
 		this.addDrumLines();
 
 		this.addGridLines(this.zoomGridAnchor);//zoomLevel, left, top, width, height, data, barIdx, octaveIdx);
