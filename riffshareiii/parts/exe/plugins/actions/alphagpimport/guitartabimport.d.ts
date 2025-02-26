@@ -12,13 +12,16 @@ declare function addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track): vo
 declare function takeDrumTrack(title: string, trackDrums: Zvoog_PercussionTrack[], drumNum: number): Zvoog_PercussionTrack;
 declare function takeDrumMeasure(trackDrum: Zvoog_PercussionTrack, barNum: number): Zvoog_PercussionMeasure;
 declare function addScoreDrumsTracks(project: Zvoog_Project, scoreTrack: Track): void;
+declare let drumNames: string[];
+declare let insNames: string[];
 declare class GP345ImportMusicPlugin {
     callbackID: string;
     parsedProject: Zvoog_Project | null;
     constructor();
+    init(): void;
+    sendParsedGP345Data(): void;
     receiveHostMessage(par: any): void;
     loadGP345file(from: any): void;
-    sendParsedGP345Data(): void;
 }
 declare type Zvoog_Metre = {
     count: number;
@@ -67,6 +70,7 @@ declare type Zvoog_FilterTarget = {
         y: number;
     };
     state: 0 | 1;
+    title: string;
 };
 declare type Zvoog_AudioSequencer = {
     id: string;
@@ -176,8 +180,6 @@ declare type Zvoog_Project = {
         z: number;
     };
     list: boolean;
-    undo: Zvoog_UICommand[];
-    redo: Zvoog_UICommand[];
 };
 declare type MZXBX_CachedWave = {
     path: string;
@@ -262,12 +264,17 @@ declare type MZXBX_Schedule = {
 };
 declare type MZXBX_Player = {
     startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
-    startLoop: (from: number, position: number, to: number) => string;
+    startLoopTicks: (from: number, position: number, to: number) => string;
     reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];
     allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
     position: number;
+    playState(): {
+        connected: boolean;
+        play: boolean;
+        loading: boolean;
+    };
 };
 declare type MZXBX_PluginRegistrationInformation = {
     label: string;

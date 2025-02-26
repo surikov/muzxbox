@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es2015",
-		"outFile": "../../../web/actions/alphagpimport/guitartabimport.js"
+		"outFile": "../../exe/plugins/actions/alphagpimport/guitartabimport.js"
 		//,"outDir":"../js"
 		,
 		"strictNullChecks": true,
@@ -25,6 +25,8 @@
 	},
 	"files": [
 		"./35/GPImporter.ts",
+		"./35/GPParser.ts",
+		"./35/GPPlugin.ts",
 		"../../mzxbxapi/musicenginetypes.ts",
 		"../../mzxbxapi/musicenginedeclarations.ts",
 		"./alphatab/ImporterSettings.ts",

@@ -200,7 +200,7 @@ class MidiParser {
     }
     ;
     simplifyAllBendPaths() {
-        let msMin = 75;
+        let msMin = 25;
         for (var t = 0; t < this.parsedTracks.length; t++) {
             var track = this.parsedTracks[t];
             for (var ch = 0; ch < track.chords.length; ch++) {
