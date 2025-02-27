@@ -823,7 +823,7 @@ class ZvoogBasePerformerImplementation {
             if (this.volume) {
                 if (this.preset) {
                     let duration = 0;
-                    let volumeLevel = 0.66;
+                    let volumeLevel = 0.66 + 0.15 * Math.random();
                     for (let ii = 0; ii < mzbxslide.length; ii++) {
                         let one = mzbxslide[ii];
                         duration = duration + one.duration;

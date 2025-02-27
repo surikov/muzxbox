@@ -58,22 +58,16 @@ class ZvoogBasePerformerImplementation implements MZXBX_AudioPerformerPlugin {
 			if (this.volume) {
 				if (this.preset) {
 					let duration = 0;
-					let volumeLevel = 0.66;
-					//let slides: ZPWaveSlide[][] = [];
+					//let volumeLevel = 0.66;
+					let volumeLevel=0.66+0.15*Math.random();
 					for (let ii = 0; ii < mzbxslide.length; ii++) {
 						let one = mzbxslide[ii];
 						duration = duration + one.duration;
-						//let sipi: ZPWaveSlide[] = [];
-						//for (let pp = 0; pp < zpitches.length; pp++) {
-						//	sipi.push({ when: 0, delta: 0 });
-						//}
-						//slides.push(sipi);
 					}
 					let pitches: number[] = [];
 					for (let ii = 0; ii < zpitches.length; ii++) {
 						pitches.push(zpitches[ii] + 0);
 					}
-					//console.log(duration, zpitches, mzbxslide);
 					when = when + Math.random() * 2 / tempo;
 					this.player.queueChord(this.audioContext, this.volume, this.preset, when, pitches, duration, volumeLevel, mzbxslide);
 				}

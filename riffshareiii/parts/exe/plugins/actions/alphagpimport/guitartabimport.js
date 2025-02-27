@@ -165,6 +165,11 @@ function addScoreInsTrack(project, scoreTrack) {
         },
         volume: 1
     };
+    if (scoreTrack.playbackInfo.program == 29
+        || scoreTrack.playbackInfo.program == 30) {
+        mzxbxTrack.performer.data = '30/341';
+        palmMuteTrack.performer.data = '29/323';
+    }
     let flag = false;
     project.tracks.push(mzxbxTrack);
     for (let mm = 0; mm < project.timeline.length; mm++) {
@@ -182,18 +187,18 @@ function addScoreInsTrack(project, scoreTrack) {
                 for (let bb = 0; bb < voice.beats.length; bb++) {
                     let beat = voice.beats[bb];
                     let currentDuration = beatDuration(beat);
-                    let chord = takeChord(start, mzxbxMeasure);
-                    let pmChord = takeChord(start, pmMeasure);
-                    chord.slides.push({ duration: currentDuration, delta: 0 });
-                    pmChord.slides.push({ duration: currentDuration, delta: 0 });
                     for (let nn = 0; nn < beat.notes.length; nn++) {
                         let note = beat.notes[nn];
                         let pitch = stringFret2pitch(note.string, note.fret, tuning);
                         if (note.isPalmMute) {
+                            let pmChord = takeChord(start, pmMeasure);
+                            pmChord.slides = [{ duration: currentDuration, delta: 0 }];
                             pmChord.pitches.push(pitch);
                             flag = true;
                         }
                         else {
+                            let chord = takeChord(start, mzxbxMeasure);
+                            chord.slides = [{ duration: currentDuration, delta: 0 }];
                             chord.pitches.push(pitch);
                         }
                     }

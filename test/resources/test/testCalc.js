@@ -986,6 +986,13 @@ function addTestLines1(data) {
             toY: skipRowsCount + bas,
             color: data[ii].color, manual: true
         });
+        markLines.push({
+            fromX: data[ii].ball - 1 + rowLen,
+            fromY: skipRowsCount + 0.85 * (bas / data.length * ii),
+            toX: data[ii].ball - 1 + rowLen,
+            toY: skipRowsCount + bas,
+            color: data[ii].color, manual: true
+        });
     }
 }
 function addTestLines2(data) {
@@ -995,6 +1002,13 @@ function addTestLines2(data) {
             fromX: data[ii].ball - 1,
             fromY: skipRowsCount + 0.85 * (bas - bas / data.length * ii),
             toX: data[ii].ball - 1,
+            toY: skipRowsCount + bas,
+            color: data[ii].color, manual: true
+        });
+        markLines.push({
+            fromX: data[ii].ball - 1 + rowLen,
+            fromY: skipRowsCount + 0.85 * (bas - bas / data.length * ii),
+            toX: data[ii].ball - 1 + rowLen,
             toY: skipRowsCount + bas,
             color: data[ii].color, manual: true
         });

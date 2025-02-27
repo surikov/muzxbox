@@ -63,7 +63,8 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 			if (this.volume) {
 				if (this.preset) {
 					when = when + Math.random() * 1 / tempo;
-					this.player.queueWaveTable(this.audioContext, this.volume, this.preset, when, this.info.pitch, this.sampleDuration+0.001, 1.0);
+					let rlevel=1+0.15*Math.random();
+					this.player.queueWaveTable(this.audioContext, this.volume, this.preset, when, this.info.pitch, this.sampleDuration+0.001, rlevel);
 				}
 			}
 		}

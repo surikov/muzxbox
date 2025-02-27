@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"target": "es2015"
         //,"outFile": "beep_plugin.js"
-        ,"outFile": "../../../web/samplers/zvoog_drum_kit/zvoogdrumkit_plugin.js"
+        ,"outFile": "../../exe/plugins/samplers/zvoog_drum_kit/zvoogdrumkit_plugin.js"
         //,"outDir":"../js"
 		,"strictNullChecks": true
 		,"alwaysStrict": true
@@ -24,8 +24,8 @@
 		,"types": [ ]
 	}
 	,"files": [
-        "../../mzxbx/publictypes/musicenginetypes.ts"
-		,"../../mzxbx/publictypes/musicenginedeclarations.ts"
+        "../../mzxbxapi/musicenginetypes.ts"
+		,"../../mzxbxapi/musicenginedeclarations.ts"
         ,"zdrtypes.ts"
 		,"zdrloader.ts"
 		,"zdrplayer.ts"
