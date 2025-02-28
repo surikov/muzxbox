@@ -32,6 +32,8 @@ function score2schedule(title: string, comment: string, score: Score): Zvoog_Pro
 		project.timeline.push(measure);
 
 	}
+	let echoOutID = 'reverberation';
+	let compresID = 'compression';
 	for (let tt = 0; tt < score.tracks.length; tt++) {
 		let scoreTrack = score.tracks[tt];
 		let pp = false;
@@ -41,11 +43,36 @@ function score2schedule(title: string, comment: string, score: Score): Zvoog_Pro
 			}
 		}
 		if (pp) {
-			addScoreDrumsTracks(project, scoreTrack);
+			addScoreDrumsTracks(project, scoreTrack,compresID);
 		} else {
-			addScoreInsTrack(project, scoreTrack);
+			addScoreInsTrack(project, scoreTrack,compresID);
 		}
 	}
+	
+	let filterEcho: Zvoog_FilterTarget = {
+		id: echoOutID, title: echoOutID
+		, kind: 'zvecho1', data: '22', outputs: ['']
+		, iconPosition: {
+			x: 77 + project.tracks.length * 30
+			, y: project.tracks.length * 8 + 2
+		}
+		, automation: [], state: 0
+	};
+	let filterCompression: Zvoog_FilterTarget = {
+		id: compresID
+		, title: compresID
+		, kind: 'zvooco1', data: '1', outputs: [echoOutID]
+		, iconPosition: {
+			x: 88 + project.tracks.length * 30
+			, y: project.tracks.length * 8 + 2
+		}
+		, automation: [], state: 0
+	};
+	project.filters.push(filterEcho);
+	project.filters.push(filterCompression);
+
+
+
 	for (let ii = 0; ii < project.tracks.length; ii++) {
 		project.tracks[ii].performer.iconPosition.x = 10 + ii * 9;
 		project.tracks[ii].performer.iconPosition.y = 0 + ii * 4;
@@ -58,13 +85,16 @@ function score2schedule(title: string, comment: string, score: Score): Zvoog_Pro
 		project.filters[ii].iconPosition.x = 10 + project.tracks.length * 9 + 5 + ii * 4;
 		project.filters[ii].iconPosition.y = ii * 9;
 	}
-	/*
+	
 	project.filters[project.filters.length - 2].iconPosition.x = 35 + project.tracks.length * 9 + project.filters.length * 4;
 		project.filters[project.filters.length - 2].iconPosition.y = project.filters.length * 5;
 
 		project.filters[project.filters.length - 1].iconPosition.x = 20 + project.tracks.length * 9 + project.filters.length * 4;
 		project.filters[project.filters.length - 1].iconPosition.y = project.filters.length * 6;
-	*/
+	
+
+
+		
 	console.log(project);
 	return project;
 }
@@ -113,39 +143,65 @@ function takeChord(start: Zvoog_Metre, measure: Zvoog_TrackMeasure): Zvoog_Chord
 	measure.chords.push(newChord);
 	return newChord;
 }
-function addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track) {
+function addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track, targetId: string) {
 	let perfkind = 'zinstr1';
-		if (scoreTrack.playbackInfo.program == 24
-			|| scoreTrack.playbackInfo.program == 25
-			|| scoreTrack.playbackInfo.program == 26
-			|| scoreTrack.playbackInfo.program == 27
-			|| scoreTrack.playbackInfo.program == 28
-			|| scoreTrack.playbackInfo.program == 29
-			|| scoreTrack.playbackInfo.program == 30
-		) {
-			perfkind = 'zvstrumming1';
-		}
+	if (scoreTrack.playbackInfo.program == 24
+		|| scoreTrack.playbackInfo.program == 25
+		|| scoreTrack.playbackInfo.program == 26
+		|| scoreTrack.playbackInfo.program == 27
+		|| scoreTrack.playbackInfo.program == 28
+		|| scoreTrack.playbackInfo.program == 29
+		|| scoreTrack.playbackInfo.program == 30
+	) {
+		perfkind = 'zvstrumming1';
+	}
 	let mzxbxTrack: Zvoog_MusicTrack = {
-		title: scoreTrack.trackName+' '+insNames[scoreTrack.playbackInfo.program]
+		title: scoreTrack.trackName + ' ' + insNames[scoreTrack.playbackInfo.program]
 		, measures: []
 		, performer: {
 			id: 'track' + (insNames[scoreTrack.playbackInfo.program] + Math.random())
-			, data: ''+scoreTrack.playbackInfo.program
-			, kind:perfkind
-			, outputs: ['']
+			, data: '' + scoreTrack.playbackInfo.program + '//pong'
+			, kind: perfkind
+			, outputs: [targetId]
 			, iconPosition: { x: 0, y: 0 }
 			, state: 0
 		}
 		, volume: 1
 	};
 	let palmMuteTrack: Zvoog_MusicTrack = {
-		title: 'P.M.'+scoreTrack.trackName+' '+insNames[scoreTrack.playbackInfo.program]
+		title: 'P.M.' + scoreTrack.trackName + ' ' + insNames[scoreTrack.playbackInfo.program]
 		, measures: []
 		, performer: {
 			id: 'track' + (insNames[scoreTrack.playbackInfo.program] + Math.random())
-			, data: ''+scoreTrack.playbackInfo.program
-			, kind:perfkind
-			, outputs: ['']
+			, data: '' + scoreTrack.playbackInfo.program
+			, kind: perfkind
+			, outputs: [targetId]
+			, iconPosition: { x: 0, y: 0 }
+			, state: 0
+		}
+		, volume: 1
+	};
+	let upTrack: Zvoog_MusicTrack = {
+		title: '^' + scoreTrack.trackName + ' ' + insNames[scoreTrack.playbackInfo.program]
+		, measures: []
+		, performer: {
+			id: 'track' + (insNames[scoreTrack.playbackInfo.program] + Math.random())
+			, data: '' + scoreTrack.playbackInfo.program + '//up'
+			, kind: perfkind
+			, outputs: [targetId]
+			, iconPosition: { x: 0, y: 0 }
+			, state: 0
+		}
+		, volume: 1
+	};
+	let downTrack: Zvoog_MusicTrack = {
+		title: 'v' + scoreTrack.trackName + ' ' + insNames[scoreTrack.playbackInfo.program]
+		, measures: []
+		, performer: {
+			id: 'track' + (insNames[scoreTrack.playbackInfo.program] + Math.random())
+			, data: '' + scoreTrack.playbackInfo.program + '//down'
+			, kind: perfkind
+			, outputs: [targetId]
 			, iconPosition: { x: 0, y: 0 }
 			, state: 0
 		}
@@ -156,13 +212,19 @@ function addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track) {
 		mzxbxTrack.performer.data = '30/341';
 		palmMuteTrack.performer.data = '29/323';
 	}
-	let flag=false;
+	let pmFlag = false;
+	let upFlag = false;
+	let downFlag = false;
 	project.tracks.push(mzxbxTrack);
 	for (let mm = 0; mm < project.timeline.length; mm++) {
 		let mzxbxMeasure: Zvoog_TrackMeasure = { chords: [] };
 		let pmMeasure: Zvoog_TrackMeasure = { chords: [] };
+		let upMeasure: Zvoog_TrackMeasure = { chords: [] };
+		let downMeasure: Zvoog_TrackMeasure = { chords: [] };
 		mzxbxTrack.measures.push(mzxbxMeasure);
 		palmMuteTrack.measures.push(pmMeasure);
+		upTrack.measures.push(upMeasure);
+		downTrack.measures.push(downMeasure);
 		for (let ss = 0; ss < scoreTrack.staves.length; ss++) {
 			let staff = scoreTrack.staves[ss];
 			let tuning: number[] = staff.stringTuning.tunings;
@@ -172,23 +234,37 @@ function addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track) {
 				let start: Zvoog_MetreMathType = MMUtil();
 				for (let bb = 0; bb < voice.beats.length; bb++) {
 					let beat = voice.beats[bb];
+					//beat.brushType;
 					let currentDuration = beatDuration(beat);
-					
-					
 					for (let nn = 0; nn < beat.notes.length; nn++) {
 						let note = beat.notes[nn];
 						let pitch = stringFret2pitch(note.string, note.fret, tuning);
-						if(note.isPalmMute){
+						if (note.isPalmMute) {
 							let pmChord: Zvoog_Chord = takeChord(start, pmMeasure);
-					pmChord.slides=[{ duration: currentDuration, delta: 0 }];
+							pmChord.slides = [{ duration: currentDuration, delta: 0 }];
 							pmChord.pitches.push(pitch);
-							flag=true;
-						}else{
-							let chord: Zvoog_Chord = takeChord(start, mzxbxMeasure);
-					chord.slides=[{ duration: currentDuration, delta: 0 }];
-							chord.pitches.push(pitch);
+							pmFlag = true;
+						} else {
+							if (beat.brushType == 1) {
+								let upchord: Zvoog_Chord = takeChord(start, upMeasure);
+								upchord.slides = [{ duration: currentDuration, delta: 0 }];
+								upchord.pitches.push(pitch);
+								upFlag = true;
+							} else {
+								if (beat.brushType == 2) {
+									let downchord: Zvoog_Chord = takeChord(start, downMeasure);
+									downchord.slides = [{ duration: currentDuration, delta: 0 }];
+									downchord.pitches.push(pitch);
+									downFlag = true;
+								} else {
+									let chord: Zvoog_Chord = takeChord(start, mzxbxMeasure);
+									chord.slides = [{ duration: currentDuration, delta: 0 }];
+									chord.pitches.push(pitch);
+								}
+							}
+
 						}
-						
+
 					}
 					start = start.plus(currentDuration);
 				}
@@ -197,11 +273,17 @@ function addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track) {
 		}
 		//let bar = scoreTrack.staves
 	}
-	if(flag){
+	if (pmFlag) {
 		project.tracks.push(palmMuteTrack);
 	}
+	if (upFlag) {
+		project.tracks.push(upTrack);
+	}
+	if (downFlag) {
+		project.tracks.push(downTrack);
+	}
 }
-function takeDrumTrack(title: string, trackDrums: Zvoog_PercussionTrack[], drumNum: number): Zvoog_PercussionTrack {
+function takeDrumTrack(title: string, trackDrums: Zvoog_PercussionTrack[], drumNum: number, targetId: string): Zvoog_PercussionTrack {
 	if (trackDrums[drumNum]) {
 		//
 	} else {
@@ -214,7 +296,7 @@ function takeDrumTrack(title: string, trackDrums: Zvoog_PercussionTrack[], drumN
 				id: 'drum' + (drumNum + Math.random())
 				, data: '' + drumNum
 				, kind: 'zdrum1'
-				, outputs: ['']
+				, outputs: [targetId]
 				, iconPosition: { x: 0, y: 0 }
 				, state: 0
 			}
@@ -222,7 +304,7 @@ function takeDrumTrack(title: string, trackDrums: Zvoog_PercussionTrack[], drumN
 		};
 		trackDrums[drumNum] = track;
 	}
-	trackDrums[drumNum].title = title+' '+drumNames[drumNum];
+	trackDrums[drumNum].title = title + ' ' + drumNames[drumNum];
 	return trackDrums[drumNum];
 }
 function takeDrumMeasure(trackDrum: Zvoog_PercussionTrack, barNum: number): Zvoog_PercussionMeasure {
@@ -237,7 +319,7 @@ function takeDrumMeasure(trackDrum: Zvoog_PercussionTrack, barNum: number): Zvoo
 	return trackDrum.measures[barNum];
 }
 
-function addScoreDrumsTracks(project: Zvoog_Project, scoreTrack: Track) {
+function addScoreDrumsTracks(project: Zvoog_Project, scoreTrack: Track, targetId: string) {
 	let trackDrums: Zvoog_PercussionTrack[] = [];
 	for (let mm = 0; mm < project.timeline.length; mm++) {
 		//let mzxbxMeasure: Zvoog_TrackMeasure = { chords: [] };
@@ -255,7 +337,7 @@ function addScoreDrumsTracks(project: Zvoog_Project, scoreTrack: Track) {
 					for (let nn = 0; nn < beat.notes.length; nn++) {
 						let note = beat.notes[nn];
 						let drum = note.percussionArticulation;
-						let track = takeDrumTrack(scoreTrack.trackName + ': ' + drum, trackDrums, drum);
+						let track = takeDrumTrack(scoreTrack.trackName + ': ' + drum, trackDrums, drum, targetId);
 						let measure = takeDrumMeasure(track, mm);
 						measure.skips.push(start);
 						/*let pitch = stringFret2pitch(note.string, note.fret, tuning);

@@ -155,8 +155,6 @@ declare type Zvoog_Project = {
         z: number;
     };
     list: boolean;
-    undo: Zvoog_UICommand[];
-    redo: Zvoog_UICommand[];
 };
 declare type MZXBX_CachedWave = {
     path: string;
@@ -382,18 +380,21 @@ declare class ZvoogStrumPerformerImplementation implements MZXBX_AudioPerformerP
     info: ZPPresetInfo;
     preset: ZPWavePreset | null;
     up: boolean;
+    mode: 'plain' | 'pong' | 'up' | 'down' | 'snap';
     launch(context: AudioContext, parameters: string): void;
     busy(): null | string;
-    strum(when: number, zpitches: number[], tempo: number, mzbxslide: MZXBX_SlideItem[]): void;
+    strum(whenStart: number, zpitches: number[], tempo: number, mzbxslide: MZXBX_SlideItem[]): void;
     cancel(): void;
     output(): AudioNode | null;
 }
 declare class ZSUI {
     id: string;
     data: string;
-    list: any;
+    inslist: any;
+    modelist: any;
     player: ZS_WebAudioFontPlayer;
     init(): void;
+    send2State(): void;
     sendMessageToHost(data: string): void;
     receiveHostMessage(messageEvent: MessageEvent): void;
     setMessagingId(newId: string): void;

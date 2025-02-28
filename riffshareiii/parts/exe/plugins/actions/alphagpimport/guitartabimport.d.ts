@@ -8,10 +8,10 @@ declare function score2schedule(title: string, comment: string, score: Score): Z
 declare function stringFret2pitch(stringNum: number, fretNum: number, tuning: number[]): number;
 declare function beatDuration(beat: Beat): Zvoog_MetreMathType;
 declare function takeChord(start: Zvoog_Metre, measure: Zvoog_TrackMeasure): Zvoog_Chord;
-declare function addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track): void;
-declare function takeDrumTrack(title: string, trackDrums: Zvoog_PercussionTrack[], drumNum: number): Zvoog_PercussionTrack;
+declare function addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track, targetId: string): void;
+declare function takeDrumTrack(title: string, trackDrums: Zvoog_PercussionTrack[], drumNum: number, targetId: string): Zvoog_PercussionTrack;
 declare function takeDrumMeasure(trackDrum: Zvoog_PercussionTrack, barNum: number): Zvoog_PercussionMeasure;
-declare function addScoreDrumsTracks(project: Zvoog_Project, scoreTrack: Track): void;
+declare function addScoreDrumsTracks(project: Zvoog_Project, scoreTrack: Track, targetId: string): void;
 declare let drumNames: string[];
 declare let insNames: string[];
 declare class GP345ImportMusicPlugin {

@@ -784,6 +784,7 @@ class ZvoogStrumPerformerImplementation {
         this.listidx = -1;
         this.preset = null;
         this.up = false;
+        this.mode = 'pong';
     }
     launch(context, parameters) {
         this.preset = null;
@@ -791,7 +792,7 @@ class ZvoogStrumPerformerImplementation {
         this.volume = this.audioContext.createGain();
         let split = parameters.split('/');
         let idx = 0;
-        if (split.length == 2) {
+        if (split.length > 1 && (split[1].trim().length > 0)) {
             this.listidx = parseInt(split[1]);
             this.midiidx = parseInt(split[0]);
             idx = this.listidx;
@@ -800,6 +801,9 @@ class ZvoogStrumPerformerImplementation {
             this.listidx = -1;
             this.midiidx = parseInt(parameters);
             idx = this.loader.findInstrument(this.midiidx);
+        }
+        if (split.length > 2) {
+            this.mode = split[2];
         }
         this.info = this.loader.instrumentInfo(idx);
         this.loader.startLoad(context, this.info.url, this.info.variable);
@@ -821,12 +825,13 @@ class ZvoogStrumPerformerImplementation {
             }
         }
     }
-    strum(when, zpitches, tempo, mzbxslide) {
+    strum(whenStart, zpitches, tempo, mzbxslide) {
         if (this.audioContext) {
             if (this.volume) {
                 if (this.preset) {
                     let duration = 0;
-                    let volumeLevel = 0.66;
+                    let volumeLevel = 0.66 + 0.15 * Math.random();
+                    let when = whenStart + Math.random() * 2 / tempo;
                     for (let ii = 0; ii < mzbxslide.length; ii++) {
                         let one = mzbxslide[ii];
                         duration = duration + one.duration;
@@ -835,13 +840,33 @@ class ZvoogStrumPerformerImplementation {
                     for (let ii = 0; ii < zpitches.length; ii++) {
                         pitches.push(zpitches[ii] + 0);
                     }
-                    if (this.up) {
-                        this.player.queueStrumDown(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                    if (this.mode == 'pong') {
+                        if (this.up) {
+                            this.player.queueStrumDown(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                        }
+                        else {
+                            this.player.queueStrumUp(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                        }
+                        this.up = !this.up;
                     }
                     else {
-                        this.player.queueStrumUp(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                        if (this.mode == 'down') {
+                            this.player.queueStrumDown(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                        }
+                        else {
+                            if (this.mode == 'up') {
+                                this.player.queueStrumUp(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                            }
+                            else {
+                                if (this.mode == 'snap') {
+                                    this.player.queueSnap(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                                }
+                                else {
+                                    this.player.queueChord(this.audioContext, this.volume, this.preset, when, pitches, duration, volumeLevel, mzbxslide);
+                                }
+                            }
+                        }
                     }
-                    this.up = !this.up;
                 }
             }
         }
@@ -867,21 +892,51 @@ class ZSUI {
     init() {
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
         this.sendMessageToHost('');
-        this.list = document.getElementById('inslist');
+        this.inslist = document.getElementById('inslist');
+        this.modelist = document.getElementById('modelist');
         let ins = this.player.loader.instrumentKeys();
         for (let ii = 0; ii < ins.length; ii++) {
             var option = document.createElement('option');
             option.value = '' + ii;
             let midi = parseInt(ins[ii].substring(0, 3));
             option.innerHTML = ins[ii] + ": " + this.player.loader.instrumentTitles()[midi];
-            this.list.appendChild(option);
+            this.inslist.appendChild(option);
         }
-        this.list.addEventListener('change', (event) => {
-            this.sendMessageToHost('0/' + this.list.value);
+        this.inslist.addEventListener('change', (event) => {
+            this.send2State();
         });
+        this.modelist.addEventListener('change', (event) => {
+            this.send2State();
+        });
+    }
+    send2State() {
+        let mode = '';
+        if (this.modelist.value == '1') {
+            mode = 'pong';
+        }
+        else {
+            if (this.modelist.value == '2') {
+                mode = 'up';
+            }
+            else {
+                if (this.modelist.value == '3') {
+                    mode = 'down';
+                }
+                else {
+                    if (this.modelist.value == '4') {
+                        mode = 'snap';
+                    }
+                    else {
+                        mode = 'plain';
+                    }
+                }
+            }
+        }
+        this.sendMessageToHost('0/' + this.inslist.value + '/' + mode);
     }
     sendMessageToHost(data) {
         var message = { dialogID: this.id, pluginData: data, done: false };
+        console.log('sendMessageToHost', message);
         window.parent.postMessage(message, '*');
     }
     receiveHostMessage(messageEvent) {
@@ -897,13 +952,39 @@ class ZSUI {
         this.id = newId;
     }
     setState(data) {
+        console.log('setState', data);
         this.data = data;
         let split = this.data.split('/');
-        if (split.length == 2) {
-            this.list.value = parseInt(split[1]);
+        if (split.length > 1 && split[1].trim().length > 0) {
+            this.inslist.value = parseInt(split[1]);
         }
         else {
-            this.list.value = this.player.loader.findInstrument(parseInt(split[0]));
+            this.inslist.value = this.player.loader.findInstrument(parseInt(split[0]));
+        }
+        this.modelist.value = 1;
+        if (split.length > 2) {
+            let mode = split[2];
+            if (mode == 'pong') {
+                this.modelist.value = 1;
+            }
+            else {
+                if (mode == 'up') {
+                    this.modelist.value = 2;
+                }
+                else {
+                    if (mode == 'down') {
+                        this.modelist.value = 3;
+                    }
+                    else {
+                        if (mode == 'snap') {
+                            this.modelist.value = 4;
+                        }
+                        else {
+                            this.modelist.value = 0;
+                        }
+                    }
+                }
+            }
         }
     }
 }
