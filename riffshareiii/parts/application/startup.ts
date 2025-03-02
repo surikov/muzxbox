@@ -8,7 +8,7 @@ function startApplication() {
 	ui.createUI();
 	//window.addEventListener("unload", saveProjectState);
 	window.addEventListener("beforeunload", saveProjectState);
-	globalCommandDispatcher.registerWorkProject(_mzxbxProjectForTesting2);
+	globalCommandDispatcher.registerWorkProject(___newEmptyProject);
 	try {
 		let lastprojectdata = readObjectFromlocalStorage('lastprojectdata');
 		if (lastprojectdata) {
@@ -58,28 +58,24 @@ function saveProjectState() {
 		saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
 	} catch (xx) {
 		console.log(xx);
-		window.localStorage.clear();
+		globalCommandDispatcher.clearUndo();
+		globalCommandDispatcher.clearRedo();
 		try {
 			saveText2localStorage('lastprojectdata', txtdata);
 			saveText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
-		saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
+			saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
 		} catch (nn) {
 			console.log(nn);
+			window.localStorage.clear();
+			try {
+				saveText2localStorage('lastprojectdata', txtdata);
+				saveText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
+				saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
+			} catch (n22) {
+				console.log(n22);
+			}
 		}
-		//globalCommandDispatcher.cfg().data.undo = [];
-		//globalCommandDispatcher.cfg().data.redo = [];
-		/*try {
-			saveText2localStorage('lastprojectdata', JSON.stringify(globalCommandDispatcher.cfg().data));
-		} catch (rr) {
-			console.log(rr);
-		}*/
 	}
-	/*try {
-		saveText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
-		saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
-	} catch (xx) {
-		console.log(xx);
-	}*/
 }
 function initWebAudioFromUI() {
 	console.log('initWebAudioFromUI');

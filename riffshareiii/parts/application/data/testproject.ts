@@ -1,4 +1,37 @@
-let _mzxbxProjectForTesting2: Zvoog_Project = {
+let ___newEmptyProject: Zvoog_Project = {
+	title: 'New Project'
+	, versionCode: '1'
+	, list: false
+	, selectedPart: { startMeasure: -1, endMeasure: -1 }
+	, position: { x: 0, y: -0, z: 33 }
+	, timeline: [
+		{ tempo: 120, metre: { count: 4, part: 4 } }
+		, { tempo: 120, metre: { count: 4, part: 4 } }
+
+		, { tempo: 200, metre: { count: 3, part: 4 } }
+		, { tempo: 180, metre: { count: 4, part: 4 } }
+
+	]
+	, tracks: []
+	, percussions: []
+	, comments: []
+	, filters: []
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+let ____mzxbxProjectForTesting2: Zvoog_Project = {
 	title: 'test data for debug'
 	, versionCode: '1'
 	, list: false
@@ -153,7 +186,7 @@ let _mzxbxProjectForTesting2: Zvoog_Project = {
 	, filters: [
 		{
 			id: 'volumeSlide', kind: 'zvolume1', data: '99', outputs: ['masterVolme']
-			,title:'t1'
+			, title: 't1'
 			, automation: [{ changes: [] }, {
 				changes: [
 					//{ skip: { count: 5, part: 16 }, stateBlob: '99' }
@@ -161,15 +194,15 @@ let _mzxbxProjectForTesting2: Zvoog_Project = {
 				]
 			}
 				, {
-					changes: [
-						{ skip: { count: 1, part: 4 }, stateBlob: '99' }
-					]
+				changes: [
+					{ skip: { count: 1, part: 4 }, stateBlob: '99' }
+				]
 			}]
 			, iconPosition: { x: 152, y: 39 }, state: 0
 		}
 		, {
 			id: 'masterVolme', kind: 'zvolume1', data: '99', outputs: ['']
-			,title:'t2'
+			, title: 't2'
 			, automation: [{ changes: [] }, { changes: [] }
 				, {
 				changes: [
@@ -185,13 +218,13 @@ let _mzxbxProjectForTesting2: Zvoog_Project = {
 				, { changes: [] }]
 			, iconPosition: { x: 188, y: 7 }, state: 0
 		}
-		, { id: 'allDrumsVolme',title:'t1', kind: 'zvolume1', data: '99', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 }, automation: [], state: 0 }
-		, { id: 'drum1Volme',title:'t1a', kind: 'zvolume1', data: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 }, automation: [], state: 0 }
-		, { id: 'drum2Volme',title:'t1s', kind: 'zvolume1', data: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 }, automation: [], state: 0 }
-		, { id: 'drum3Volme',title:'t1d', kind: 'zvolume1', data: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 }, automation: [], state: 0 }
-		, { id: 'track1Volme',title:'tf1', kind: 'zvolume1', data: '99', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [], state: 0 }
-		, { id: 'track2Volme',title:'tg1', kind: 'zvolume1', data: '99', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [], state: 0 }
-		, { id: 'track3Echo',title:'t1h', kind: 'zvecho1', data: '100', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [], state: 0 }
+		, { id: 'allDrumsVolme', title: 't1', kind: 'zvolume1', data: '99', outputs: ['masterVolme'], iconPosition: { x: 112, y: 87 }, automation: [], state: 0 }
+		, { id: 'drum1Volme', title: 't1a', kind: 'zvolume1', data: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 52, y: 73 }, automation: [], state: 0 }
+		, { id: 'drum2Volme', title: 't1s', kind: 'zvolume1', data: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 72, y: 83 }, automation: [], state: 0 }
+		, { id: 'drum3Volme', title: 't1d', kind: 'zvolume1', data: '99', outputs: ['allDrumsVolme'], iconPosition: { x: 82, y: 119 }, automation: [], state: 0 }
+		, { id: 'track1Volme', title: 'tf1', kind: 'zvolume1', data: '99', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [], state: 0 }
+		, { id: 'track2Volme', title: 'tg1', kind: 'zvolume1', data: '99', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [], state: 0 }
+		, { id: 'track3Echo', title: 't1h', kind: 'zvecho1', data: '100', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [], state: 0 }
 	]
 	/*
 	, automations: [

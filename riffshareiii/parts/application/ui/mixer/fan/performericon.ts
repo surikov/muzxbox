@@ -204,12 +204,12 @@ class PerformerIcon {
 			};
 			dragAnchor.content.push(btn);
 		}
-		if (zidx < globalCommandDispatcher.cfg().zoomEditSLess) {
+		if (zidx <=5){//} globalCommandDispatcher.cfg().zoomEditSLess) {
 			let txt: TileText = {
-				text: track.title + ': ' + track.volume + ': ' + track.performer.kind + ': ' + track.performer.id
-				, x: xx
-				, y: yy
-				, css: 'fanIconLabel'
+				text: track.title //+ ': ' + track.volume + ': ' + track.performer.kind + ': ' + track.performer.id
+				, x: xx- sz * 0.45
+				, y: yy- sz * 0.1
+				, css: 'fanIconLabel fanIconLabelSize'+zidx
 			};
 			dragAnchor.content.push(txt);
 

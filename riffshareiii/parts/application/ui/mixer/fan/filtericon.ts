@@ -177,8 +177,14 @@ class FilterIcon {
 			};
 			dragAnchor.content.push(btn);
 		}
-		if (zidx < globalCommandDispatcher.cfg().zoomEditSLess) {
-			let txt: TileText = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy, css: 'fanIconLabel' };
+		if (zidx <=5){// globalCommandDispatcher.cfg().zoomEditSLess) {
+			//let txt: TileText = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy, css: 'fanIconLabel' };
+			let txt: TileText = {
+				text: filterTarget.title //+ ': ' + track.volume + ': ' + track.performer.kind + ': ' + track.performer.id
+				, x: xx- sz * 0.4
+				, y: yy- sz * 0.1
+				, css: 'fanIconLabel fanIconLabelSize'+zidx
+			};
 			dragAnchor.content.push(txt);
 		}
 		let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;

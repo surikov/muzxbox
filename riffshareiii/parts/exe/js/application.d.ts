@@ -544,7 +544,8 @@ declare class WarningUI {
 declare function saveText2localStorage(name: string, text: string): void;
 declare function readTextFromlocalStorage(name: string): string;
 declare function readObjectFromlocalStorage(name: string): any;
-declare let _mzxbxProjectForTesting2: Zvoog_Project;
+declare let ___newEmptyProject: Zvoog_Project;
+declare let ____mzxbxProjectForTesting2: Zvoog_Project;
 declare class MixerDataMathUtility {
     data: Zvoog_Project;
     leftPad: number;

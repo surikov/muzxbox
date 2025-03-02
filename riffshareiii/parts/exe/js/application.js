@@ -236,7 +236,7 @@ function startApplication() {
     let ui = new UIRenderer();
     ui.createUI();
     window.addEventListener("beforeunload", saveProjectState);
-    globalCommandDispatcher.registerWorkProject(_mzxbxProjectForTesting2);
+    globalCommandDispatcher.registerWorkProject(___newEmptyProject);
     try {
         let lastprojectdata = readObjectFromlocalStorage('lastprojectdata');
         if (lastprojectdata) {
@@ -277,7 +277,8 @@ function saveProjectState() {
     }
     catch (xx) {
         console.log(xx);
-        window.localStorage.clear();
+        globalCommandDispatcher.clearUndo();
+        globalCommandDispatcher.clearRedo();
         try {
             saveText2localStorage('lastprojectdata', txtdata);
             saveText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
@@ -285,6 +286,15 @@ function saveProjectState() {
         }
         catch (nn) {
             console.log(nn);
+            window.localStorage.clear();
+            try {
+                saveText2localStorage('lastprojectdata', txtdata);
+                saveText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
+                saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
+            }
+            catch (n22) {
+                console.log(n22);
+            }
         }
     }
 }
@@ -3410,12 +3420,12 @@ class PerformerIcon {
             };
             dragAnchor.content.push(btn);
         }
-        if (zidx < globalCommandDispatcher.cfg().zoomEditSLess) {
+        if (zidx <= 5) {
             let txt = {
-                text: track.title + ': ' + track.volume + ': ' + track.performer.kind + ': ' + track.performer.id,
-                x: xx,
-                y: yy,
-                css: 'fanIconLabel'
+                text: track.title,
+                x: xx - sz * 0.45,
+                y: yy - sz * 0.1,
+                css: 'fanIconLabel fanIconLabelSize' + zidx
             };
             dragAnchor.content.push(txt);
         }
@@ -3623,12 +3633,12 @@ class SamplerIcon {
             };
             dragAnchor.content.push(btn);
         }
-        if (zidx < globalCommandDispatcher.cfg().zoomEditSLess) {
+        if (zidx <= 5) {
             let txt = {
-                text: samplerTrack.title + ": " + samplerTrack.volume + ": " + samplerTrack.sampler.kind + ': ' + samplerTrack.sampler.id,
-                x: xx,
-                y: yy,
-                css: 'fanIconLabel'
+                text: samplerTrack.title,
+                x: xx - sz * 0.5,
+                y: yy - sz * 0.2,
+                css: 'fanIconLabel fanIconLabelSize' + zidx
             };
             dragAnchor.content.push(txt);
         }
@@ -3840,8 +3850,13 @@ class FilterIcon {
             };
             dragAnchor.content.push(btn);
         }
-        if (zidx < globalCommandDispatcher.cfg().zoomEditSLess) {
-            let txt = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy, css: 'fanIconLabel' };
+        if (zidx <= 5) {
+            let txt = {
+                text: filterTarget.title,
+                x: xx - sz * 0.4,
+                y: yy - sz * 0.1,
+                css: 'fanIconLabel fanIconLabelSize' + zidx
+            };
             dragAnchor.content.push(txt);
         }
         let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;
@@ -4262,7 +4277,24 @@ function readObjectFromlocalStorage(name) {
     }
     return null;
 }
-let _mzxbxProjectForTesting2 = {
+let ___newEmptyProject = {
+    title: 'New Project',
+    versionCode: '1',
+    list: false,
+    selectedPart: { startMeasure: -1, endMeasure: -1 },
+    position: { x: 0, y: -0, z: 33 },
+    timeline: [
+        { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 120, metre: { count: 4, part: 4 } },
+        { tempo: 200, metre: { count: 3, part: 4 } },
+        { tempo: 180, metre: { count: 4, part: 4 } }
+    ],
+    tracks: [],
+    percussions: [],
+    comments: [],
+    filters: []
+};
+let ____mzxbxProjectForTesting2 = {
     title: 'test data for debug',
     versionCode: '1',
     list: false,

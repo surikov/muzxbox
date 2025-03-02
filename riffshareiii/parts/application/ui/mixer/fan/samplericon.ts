@@ -175,12 +175,13 @@ class SamplerIcon {
 			};
 			dragAnchor.content.push(btn);
 		}
-		if (zidx < globalCommandDispatcher.cfg().zoomEditSLess) {
+		
+		if (zidx <=5){//} globalCommandDispatcher.cfg().zoomEditSLess) {
 			let txt: TileText = {
-				text: samplerTrack.title + ": " + samplerTrack.volume + ": " + samplerTrack.sampler.kind + ': ' + samplerTrack.sampler.id
-				, x: xx
-				, y: yy
-				, css: 'fanIconLabel'
+				text: samplerTrack.title //+ ": " + samplerTrack.volume + ": " + samplerTrack.sampler.kind + ': ' + samplerTrack.sampler.id
+				, x: xx- sz * 0.5
+				, y: yy- sz * 0.2
+				, css: 'fanIconLabel fanIconLabelSize'+zidx
 			};
 			dragAnchor.content.push(txt);
 		}
