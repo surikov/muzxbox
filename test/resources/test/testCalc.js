@@ -4,7 +4,7 @@ var linesLevel;
 var dataBalls;
 var datarows;
 var showFirstRow = true;
-var sversion = 'v1.142 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var sversion = 'v1.143 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
@@ -17,6 +17,9 @@ var highLightMode = 1;
 var calcLen = 32;
 var diffWide = 5;
 var wideRange = false;
+var mxdata = [];
+var mindata = [];
+var mincopy = [];
 var sortedBlue = [];
 var sortedGreen = [];
 var sortedGrey = [];
@@ -870,8 +873,8 @@ function addTails() {
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
     dumpRowFills(slicedrows);
     fillCells();
-    var mxdata = [];
-    var mindata = [];
+    mindata = [];
+    mxdata = [];
     for (var ii = 0; ii < rowLen; ii++) {
         var blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
         var green = sortedGreen.indexOf(ii + 1);
@@ -912,9 +915,12 @@ function addTails() {
     }
     dumpInfo2('statpurple', padLen('' + padLen('' + (0 + begin), 2) + ':' + padLen('' + end, 2) + '(' + padLen('' + (rowLen - end - 1), 2) + '): mx:', 20) + lbl);
     lbl = '';
+    //let modidata=mindata.slice();
     mindata.sort(function (a, b) {
         return a.min - b.min;
     });
+    mincopy = mindata.slice();
+    ;
     begin = -1;
     end = -1;
     for (var kk = 0; kk < mindata.length; kk++) {
@@ -1013,6 +1019,56 @@ function addTestLines2(data) {
             color: data[ii].color, manual: true
         });
     }
+}
+function arrHas0(arr) {
+    for (var ii = 1; ii < arr.length; ii++) {
+        if (arr[ii] == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+function testTest2() {
+    /*
+    sortedBlue = sortedBlue.reverse();
+    console.log('sortedBlue', sortedBlue);
+    console.log('sortedGreen', sortedGreen);
+    console.log('sortedGrey', sortedGrey);
+
+    console.log('mxdata', mxdata);
+    console.log('mincopy', mincopy);
+*/
+    var sumar = [];
+    for (var ii_1 = 0; ii_1 <= rowLen; ii_1++) {
+        sumar[ii_1] = 0;
+    }
+    var ii = 0;
+    for (ii = 0; ii < rowLen && arrHas0(sumar); ii++) {
+        sumar[sortedBlue[ii]]++;
+        sumar[sortedGreen[ii]]++;
+        sumar[sortedGrey[ii]]++;
+        sumar[mxdata[ii].ball]++;
+        sumar[mincopy[ii].ball]++;
+    }
+    //console.log(ii,sumar);
+    var bas = 19;
+    for (var ii_2 = 1; ii_2 < sumar.length; ii_2++) {
+        markLines.push({
+            fromX: ii_2 - 1,
+            fromY: skipRowsCount - (sumar[ii_2] - 1) * 4 + bas,
+            toX: ii_2 - 1,
+            toY: skipRowsCount + bas,
+            color: '#909', manual: true
+        });
+        markLines.push({
+            fromX: ii_2 - 1 + rowLen,
+            fromY: skipRowsCount - (sumar[ii_2] - 1) * 4 + bas,
+            toX: ii_2 - 1 + rowLen,
+            toY: skipRowsCount + bas,
+            color: '#909', manual: true
+        });
+    }
+    drawLines();
 }
 function testTest() {
     var yyy = rowsVisibleCount + 22 + skipRowsCount - 1;

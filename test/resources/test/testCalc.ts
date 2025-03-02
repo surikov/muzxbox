@@ -11,7 +11,7 @@ declare var dataName: string;
 declare var rowLen: number;
 declare var ballsInRow: number;
 
-let sversion = 'v1.142 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+let sversion = 'v1.143 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 
 let markX = -1;
 let markY = -1;
@@ -26,6 +26,10 @@ var calcLen = 32;
 let diffWide = 5;
 
 let wideRange = false;
+
+let mxdata: { ball: number, mx: number }[] = [];
+let mindata: { ball: number, min: number, exists?: boolean, diff: number }[] = [];
+let mincopy: { ball: number, min: number, exists?: boolean, diff: number }[] = [];
 
 type StatBeginEnd = {
 	row: number;
@@ -982,8 +986,9 @@ function addTails() {
 
 	fillCells();
 
-	let mxdata: { ball: number, mx: number }[] = [];
-	let mindata: { ball: number, min: number, exists?: boolean, diff: number }[] = [];
+	mindata = [];
+	mxdata = [];
+
 	for (let ii = 0; ii < rowLen; ii++) {
 		let blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
 		let green = sortedGreen.indexOf(ii + 1);
@@ -1026,10 +1031,11 @@ function addTails() {
 	dumpInfo2('statpurple', padLen('' + padLen('' + (0 + begin), 2) + ':' + padLen('' + end, 2) + '(' + padLen('' + (rowLen - end - 1), 2) + '): mx:', 20) + lbl);
 
 	lbl = '';
+	//let modidata=mindata.slice();
 	mindata.sort((a: { ball: number, min: number }, b: { ball: number, min: number }) => {
 		return a.min - b.min;
 	});
-
+	mincopy = mindata.slice();;
 	begin = -1;
 	end = -1;
 	for (let kk = 0; kk < mindata.length; kk++) {
@@ -1139,7 +1145,56 @@ function addTestLines2(data: { ball: number, color: string }[]) {
 		});
 	}
 }
+function arrHas0(arr: number[]) :boolean{
+	for (let ii = 1; ii < arr.length; ii++) {
+		if (arr[ii]==0) {
+			return true;
+		}
+	}
+	return false;
+}
+function testTest2() {
+	/*
+	sortedBlue = sortedBlue.reverse();
+	console.log('sortedBlue', sortedBlue);
+	console.log('sortedGreen', sortedGreen);
+	console.log('sortedGrey', sortedGrey);
 
+	console.log('mxdata', mxdata);
+	console.log('mincopy', mincopy);
+*/
+	let sumar: number[] = [];
+	for (let ii = 0; ii <= rowLen; ii++) {
+		sumar[ii] = 0;
+	}
+	let ii=0;
+	for (ii = 0; ii < rowLen && arrHas0(sumar); ii++) {
+		sumar[sortedBlue[ii]]++;
+		sumar[sortedGreen[ii]]++;
+		sumar[sortedGrey[ii]]++;
+		sumar[mxdata[ii].ball]++;
+		sumar[mincopy[ii].ball]++;
+	}
+	//console.log(ii,sumar);
+	let bas=19;
+	for(let ii=1;ii<sumar.length;ii++){
+		markLines.push({
+			fromX: ii - 1
+			, fromY: skipRowsCount - (sumar[ii]-1)*4+bas
+			, toX: ii - 1
+			, toY: skipRowsCount + bas
+			, color: '#909', manual: true
+		});
+		markLines.push({
+			fromX: ii - 1+rowLen
+			, fromY: skipRowsCount - (sumar[ii]-1)*4+bas
+			, toX: ii - 1+rowLen
+			, toY: skipRowsCount + bas
+			, color: '#909', manual: true
+		});
+	}
+	drawLines();
+}
 function testTest() {
 	let yyy = rowsVisibleCount + 22 + skipRowsCount - 1;
 	console.log('TESTtEST', sortedBlue, sortedGreen, sortedGrey);
