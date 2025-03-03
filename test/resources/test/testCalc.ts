@@ -25,6 +25,8 @@ let highLightMode = 1;
 var calcLen = 32;
 let diffWide = 5;
 
+let lastfirst: BallsRow;
+
 let wideRange = false;
 
 let mxdata: { ball: number, mx: number }[] = [];
@@ -982,6 +984,7 @@ function resetNumbs() {
 function addTails() {
 	clearNonManual();
 	let slicedrows: BallsRow[] = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
+	lastfirst = slicedrows[0];
 	dumpRowFills(slicedrows);
 
 	fillCells();
@@ -1194,18 +1197,38 @@ function testTest2() {
 		});
 	}
 	drawLines();
-	let statsum:number[]=[];
+	let statsum: number[] = [];
 	for (let ii = 0; ii < sumar.length; ii++) {
-		statsum[sumar[ii]]=(statsum[sumar[ii]])?statsum[sumar[ii]]:0;
+		statsum[sumar[ii]] = (statsum[sumar[ii]]) ? statsum[sumar[ii]] : 0;
 		statsum[sumar[ii]]++;
 	}
-	let sumtext='';
-	for(let ii=1;ii<statsum.length;ii++){
-		sumtext=sumtext+' / '+(ii-1)+':'+statsum[ii];
+	let sumtext = '';
+	for (let ii = 1; ii < statsum.length; ii++) {
+		sumtext = sumtext + ' / ' + (ii - 1) + ':' + statsum[ii];
+		let cnt = 0;
+		if (showFirstRow) {
+			for (let kk = 0; kk < lastfirst.balls.length; kk++) {
+				let ball=lastfirst.balls[kk];
+				let level=sumar[ball]
+				if (level==ii) {
+					cnt++;
+				}
+			}
+			sumtext = sumtext + '=' + cnt;
+		}
 	}
 	//console.log(statsum);
+	//console.log(sumar, lastfirst);
 	let span = (document.getElementById('sumstat') as any) as HTMLElement;
 	span.innerText = sumtext;
+	/*if (showFirstRow) {
+		let ballstat = '';
+		for (let ii = 0; ii < lastfirst.balls.length; ii++) {
+			ballstat = ballstat + ' | ' + lastfirst.balls[ii] + ' in ' + (sumar[lastfirst.balls[ii] ]-1);
+		}
+		span.innerText = sumtext + ' = ' + ballstat;;
+		console.log(sumar, lastfirst);
+	}*/
 }
 function testTest() {
 	let yyy = rowsVisibleCount + 22 + skipRowsCount - 1;

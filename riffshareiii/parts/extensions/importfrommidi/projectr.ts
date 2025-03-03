@@ -374,7 +374,7 @@ class Projectr {
 									let xduration: Zvoog_Metre = mm.calculate(midiSlidePoint.durationms / 1000.0, nextMeasure.tempo);
 									trackChord.slides.push({
 										duration: xduration
-										, delta:  midiSlidePoint.pitch-midiNote.midiPitch
+										, delta: midiSlidePoint.pitch - midiNote.midiPitch
 									});
 									bendDurationMs = bendDurationMs + midiSlidePoint.durationms;
 								}
@@ -382,11 +382,11 @@ class Projectr {
 								if (remains > 0) {
 									trackChord.slides.push({
 										duration: mm.calculate(remains / 1000.0, nextMeasure.tempo)
-										, delta:  midiNote.slidePoints[midiNote.slidePoints.length - 1].pitch-midiNote.midiPitch
+										, delta: midiNote.slidePoints[midiNote.slidePoints.length - 1].pitch - midiNote.midiPitch
 									});
 								}
-							
-								
+
+
 							} else {
 								trackChord.slides = [{
 									duration: mm.calculate(midiNote.midiDuration / 1000.0
@@ -446,24 +446,25 @@ class Projectr {
 	}*/
 
 	trimProject(project: Zvoog_Project, reslice: boolean) {
+		let hh = 12 * 6 * 1 + project.percussions.length * 3 + 17;
 		for (let ii = 0; ii < project.tracks.length; ii++) {
-			project.tracks[ii].performer.iconPosition.x = 10 + ii * 9;
-			project.tracks[ii].performer.iconPosition.y = 0 + ii * 4;
+			project.tracks[ii].performer.iconPosition.x = 10 + ii * 4;
+			project.tracks[ii].performer.iconPosition.y = 0 + ii * 9;
 		}
 		for (let ii = 0; ii < project.percussions.length; ii++) {
-			project.percussions[ii].sampler.iconPosition.x = 20 + ii * 4;
-			project.percussions[ii].sampler.iconPosition.y = 30 + ii * 9;
+			project.percussions[project.percussions.length - ii - 1].sampler.iconPosition.x = 70 + project.tracks.length * 4 + project.percussions.length * 4 - ii * 8;
+			project.percussions[project.percussions.length - ii - 1].sampler.iconPosition.y = hh - ii * 6;
 		}
 		for (let ii = 0; ii < project.filters.length - 2; ii++) {
-			project.filters[ii].iconPosition.x = 10 + project.tracks.length * 9 + 5 + ii * 4;
-			project.filters[ii].iconPosition.y = ii * 9;
+			project.filters[ii].iconPosition.x = 50 + project.tracks.length * 4 + project.percussions.length * 8  + ii * 8;
+			project.filters[ii].iconPosition.y = ii * 6;
 		}
 
-		project.filters[project.filters.length - 2].iconPosition.x = 35 + project.tracks.length * 9 + project.filters.length * 4;
-		project.filters[project.filters.length - 2].iconPosition.y = project.filters.length * 5;
+		project.filters[project.filters.length - 2].iconPosition.x = 85 + project.tracks.length * 9 + project.percussions.length * 8 + project.filters.length * 4;
+		project.filters[project.filters.length - 2].iconPosition.y = hh * 0.7;
 
-		project.filters[project.filters.length - 1].iconPosition.x = 20 + project.tracks.length * 9 + project.filters.length * 4;
-		project.filters[project.filters.length - 1].iconPosition.y = project.filters.length * 6;
+		project.filters[project.filters.length - 1].iconPosition.x = 60 + project.tracks.length * 9 + project.percussions.length * 8 + project.filters.length * 4;
+		project.filters[project.filters.length - 1].iconPosition.y = hh * 0.4;
 		/*
 				for (let tt = 0; tt < project.tracks.length; tt++) {
 					let track = project.tracks[tt];

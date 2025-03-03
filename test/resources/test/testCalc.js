@@ -16,6 +16,7 @@ var reduceRatio = 1;
 var highLightMode = 1;
 var calcLen = 32;
 var diffWide = 5;
+var lastfirst;
 var wideRange = false;
 var mxdata = [];
 var mindata = [];
@@ -871,6 +872,7 @@ function resetNumbs() {
 function addTails() {
     clearNonManual();
     var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
+    lastfirst = slicedrows[0];
     dumpRowFills(slicedrows);
     fillCells();
     mindata = [];
@@ -1077,10 +1079,30 @@ function testTest2() {
     var sumtext = '';
     for (var ii_4 = 1; ii_4 < statsum.length; ii_4++) {
         sumtext = sumtext + ' / ' + (ii_4 - 1) + ':' + statsum[ii_4];
+        var cnt = 0;
+        if (showFirstRow) {
+            for (var kk = 0; kk < lastfirst.balls.length; kk++) {
+                var ball = lastfirst.balls[kk];
+                var level = sumar[ball];
+                if (level == ii_4) {
+                    cnt++;
+                }
+            }
+            sumtext = sumtext + '=' + cnt;
+        }
     }
     //console.log(statsum);
+    //console.log(sumar, lastfirst);
     var span = document.getElementById('sumstat');
     span.innerText = sumtext;
+    /*if (showFirstRow) {
+        let ballstat = '';
+        for (let ii = 0; ii < lastfirst.balls.length; ii++) {
+            ballstat = ballstat + ' | ' + lastfirst.balls[ii] + ' in ' + (sumar[lastfirst.balls[ii] ]-1);
+        }
+        span.innerText = sumtext + ' = ' + ballstat;;
+        console.log(sumar, lastfirst);
+    }*/
 }
 function testTest() {
     var yyy = rowsVisibleCount + 22 + skipRowsCount - 1;

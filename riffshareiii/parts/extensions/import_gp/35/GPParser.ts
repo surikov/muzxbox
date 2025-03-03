@@ -43,12 +43,12 @@ function score2schedule(title: string, comment: string, score: Score): Zvoog_Pro
 			}
 		}
 		if (pp) {
-			addScoreDrumsTracks(project, scoreTrack,compresID);
+			addScoreDrumsTracks(project, scoreTrack, compresID);
 		} else {
-			addScoreInsTrack(project, scoreTrack,compresID);
+			addScoreInsTrack(project, scoreTrack, compresID);
 		}
 	}
-	
+
 	let filterEcho: Zvoog_FilterTarget = {
 		id: echoOutID, title: echoOutID
 		, kind: 'zvecho1', data: '22', outputs: ['']
@@ -74,27 +74,28 @@ function score2schedule(title: string, comment: string, score: Score): Zvoog_Pro
 
 
 	for (let ii = 0; ii < project.tracks.length; ii++) {
-		project.tracks[ii].performer.iconPosition.x = 10 + ii * 9;
-		project.tracks[ii].performer.iconPosition.y = 0 + ii * 4;
+		project.tracks[ii].performer.iconPosition.x = 10 + ii * 4;
+		project.tracks[ii].performer.iconPosition.y = 0 + ii * 9;
 	}
+	let hh = 12 * 6 * 1 + project.percussions.length * 3 + 17;
 	for (let ii = 0; ii < project.percussions.length; ii++) {
-		project.percussions[ii].sampler.iconPosition.x = 20 + ii * 4;
-		project.percussions[ii].sampler.iconPosition.y = 30 + ii * 9;
+		project.percussions[project.percussions.length - ii - 1].sampler.iconPosition.x = 20 + project.tracks.length * 4 + project.percussions.length * 9 - ii * 4;
+		project.percussions[project.percussions.length - ii - 1].sampler.iconPosition.y = hh - ii * 6;
 	}
 	for (let ii = 0; ii < project.filters.length - 2; ii++) {
 		project.filters[ii].iconPosition.x = 10 + project.tracks.length * 9 + 5 + ii * 4;
 		project.filters[ii].iconPosition.y = ii * 9;
 	}
-	
+
 	project.filters[project.filters.length - 2].iconPosition.x = 35 + project.tracks.length * 9 + project.filters.length * 4;
-		project.filters[project.filters.length - 2].iconPosition.y = project.filters.length * 5;
+	project.filters[project.filters.length - 2].iconPosition.y = hh*0.7;
 
-		project.filters[project.filters.length - 1].iconPosition.x = 20 + project.tracks.length * 9 + project.filters.length * 4;
-		project.filters[project.filters.length - 1].iconPosition.y = project.filters.length * 6;
-	
+	project.filters[project.filters.length - 1].iconPosition.x = 20 + project.tracks.length * 9 + project.filters.length * 4;
+	project.filters[project.filters.length - 1].iconPosition.y = hh*0.4;
 
 
-		
+
+
 	console.log(project);
 	return project;
 }
