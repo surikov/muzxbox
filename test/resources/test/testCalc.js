@@ -1050,7 +1050,7 @@ function testTest2() {
         sumar[mxdata[ii].ball]++;
         sumar[mincopy[ii].ball]++;
     }
-    //console.log(ii,sumar);
+    //console.log(ii, sumar);
     var bas = 19;
     for (var ii_2 = 1; ii_2 < sumar.length; ii_2++) {
         markLines.push({
@@ -1069,6 +1069,18 @@ function testTest2() {
         });
     }
     drawLines();
+    var statsum = [];
+    for (var ii_3 = 0; ii_3 < sumar.length; ii_3++) {
+        statsum[sumar[ii_3]] = (statsum[sumar[ii_3]]) ? statsum[sumar[ii_3]] : 0;
+        statsum[sumar[ii_3]]++;
+    }
+    var sumtext = '';
+    for (var ii_4 = 1; ii_4 < statsum.length; ii_4++) {
+        sumtext = sumtext + ' / ' + (ii_4 - 1) + ':' + statsum[ii_4];
+    }
+    //console.log(statsum);
+    var span = document.getElementById('sumstat');
+    span.innerText = sumtext;
 }
 function testTest() {
     var yyy = rowsVisibleCount + 22 + skipRowsCount - 1;

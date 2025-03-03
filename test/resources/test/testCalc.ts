@@ -1145,9 +1145,9 @@ function addTestLines2(data: { ball: number, color: string }[]) {
 		});
 	}
 }
-function arrHas0(arr: number[]) :boolean{
+function arrHas0(arr: number[]): boolean {
 	for (let ii = 1; ii < arr.length; ii++) {
-		if (arr[ii]==0) {
+		if (arr[ii] == 0) {
 			return true;
 		}
 	}
@@ -1167,7 +1167,7 @@ function testTest2() {
 	for (let ii = 0; ii <= rowLen; ii++) {
 		sumar[ii] = 0;
 	}
-	let ii=0;
+	let ii = 0;
 	for (ii = 0; ii < rowLen && arrHas0(sumar); ii++) {
 		sumar[sortedBlue[ii]]++;
 		sumar[sortedGreen[ii]]++;
@@ -1175,25 +1175,37 @@ function testTest2() {
 		sumar[mxdata[ii].ball]++;
 		sumar[mincopy[ii].ball]++;
 	}
-	//console.log(ii,sumar);
-	let bas=19;
-	for(let ii=1;ii<sumar.length;ii++){
+	//console.log(ii, sumar);
+	let bas = 19;
+	for (let ii = 1; ii < sumar.length; ii++) {
 		markLines.push({
 			fromX: ii - 1
-			, fromY: skipRowsCount - (sumar[ii]-1)*4+bas
+			, fromY: skipRowsCount - (sumar[ii] - 1) * 4 + bas
 			, toX: ii - 1
 			, toY: skipRowsCount + bas
 			, color: '#909', manual: true
 		});
 		markLines.push({
-			fromX: ii - 1+rowLen
-			, fromY: skipRowsCount - (sumar[ii]-1)*4+bas
-			, toX: ii - 1+rowLen
+			fromX: ii - 1 + rowLen
+			, fromY: skipRowsCount - (sumar[ii] - 1) * 4 + bas
+			, toX: ii - 1 + rowLen
 			, toY: skipRowsCount + bas
 			, color: '#909', manual: true
 		});
 	}
 	drawLines();
+	let statsum:number[]=[];
+	for (let ii = 0; ii < sumar.length; ii++) {
+		statsum[sumar[ii]]=(statsum[sumar[ii]])?statsum[sumar[ii]]:0;
+		statsum[sumar[ii]]++;
+	}
+	let sumtext='';
+	for(let ii=1;ii<statsum.length;ii++){
+		sumtext=sumtext+' / '+(ii-1)+':'+statsum[ii];
+	}
+	//console.log(statsum);
+	let span = (document.getElementById('sumstat') as any) as HTMLElement;
+	span.innerText = sumtext;
 }
 function testTest() {
 	let yyy = rowsVisibleCount + 22 + skipRowsCount - 1;
