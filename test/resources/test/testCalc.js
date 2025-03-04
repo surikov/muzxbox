@@ -1090,7 +1090,9 @@ function testTest2() {
                 }
             }
             //sumtext = sumtext + '=' + cnt;
-            sumtext = sumtext + ' | ' + (ii_4 - 1) + ': ' + cnt + '/' + statsum[ii_4] + ' = ' + Math.round(100 * cnt / ballsInRow) + '/' + Math.round(100 * statsum[ii_4] / rowLen) + '%';
+            sumtext = sumtext + ' | ' + (ii_4 - 1) + ': ' + cnt + '/' + statsum[ii_4]
+                + ' = ' + Math.round((cnt / ballsInRow) / (statsum[ii_4] / rowLen) * 100) / 100;
+            //+' = '+ Math.round(100*cnt/ballsInRow) + '/' + Math.round(100*statsum[ii]/rowLen)+'%';
         }
         else {
             sumtext = sumtext + ' | ' + (ii_4 - 1) + ': ' + statsum[ii_4];
