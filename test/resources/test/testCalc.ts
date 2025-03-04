@@ -1108,6 +1108,8 @@ function addTails() {
 
 	resetNumbs();
 
+	testTest2();
+
 }
 
 function addTestLines1(data: { ball: number, color: string }[]) {
@@ -1184,16 +1186,16 @@ function testTest2() {
 		markLines.push({
 			fromX: ii - 1
 			, fromY: skipRowsCount - (sumar[ii] - 1) * 4 + bas
-			, toX: ii - 1
+			, toX:  ii - 1
 			, toY: skipRowsCount + bas
-			, color: '#909', manual: true
+			, color: '#33990033', manual: false
 		});
 		markLines.push({
 			fromX: ii - 1 + rowLen
 			, fromY: skipRowsCount - (sumar[ii] - 1) * 4 + bas
-			, toX: ii - 1 + rowLen
+			, toX:  ii - 1 + rowLen
 			, toY: skipRowsCount + bas
-			, color: '#909', manual: true
+			, color: '#33990033', manual: false
 		});
 	}
 	drawLines();
@@ -1208,9 +1210,9 @@ function testTest2() {
 		let cnt = 0;
 		if (showFirstRow) {
 			for (let kk = 0; kk < lastfirst.balls.length; kk++) {
-				let ball=lastfirst.balls[kk];
-				let level=sumar[ball]
-				if (level==ii) {
+				let ball = lastfirst.balls[kk];
+				let level = sumar[ball]
+				if (level == ii) {
 					cnt++;
 				}
 			}

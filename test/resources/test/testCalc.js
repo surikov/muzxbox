@@ -983,6 +983,7 @@ function addTails() {
         return Math.abs(a.diff) - Math.abs(b.diff);
     });
     resetNumbs();
+    testTest2();
 }
 function addTestLines1(data) {
     var bas = 19;
@@ -1060,14 +1061,14 @@ function testTest2() {
             fromY: skipRowsCount - (sumar[ii_2] - 1) * 4 + bas,
             toX: ii_2 - 1,
             toY: skipRowsCount + bas,
-            color: '#909', manual: true
+            color: '#33990033', manual: false
         });
         markLines.push({
             fromX: ii_2 - 1 + rowLen,
             fromY: skipRowsCount - (sumar[ii_2] - 1) * 4 + bas,
             toX: ii_2 - 1 + rowLen,
             toY: skipRowsCount + bas,
-            color: '#909', manual: true
+            color: '#33990033', manual: false
         });
     }
     drawLines();
