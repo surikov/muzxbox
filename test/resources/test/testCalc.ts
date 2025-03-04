@@ -1186,14 +1186,14 @@ function testTest2() {
 		markLines.push({
 			fromX: ii - 1
 			, fromY: skipRowsCount - (sumar[ii] - 1) * 4 + bas
-			, toX:  ii - 1
+			, toX: ii - 1
 			, toY: skipRowsCount + bas
 			, color: '#33990033', manual: false
 		});
 		markLines.push({
 			fromX: ii - 1 + rowLen
 			, fromY: skipRowsCount - (sumar[ii] - 1) * 4 + bas
-			, toX:  ii - 1 + rowLen
+			, toX: ii - 1 + rowLen
 			, toY: skipRowsCount + bas
 			, color: '#33990033', manual: false
 		});
@@ -1206,9 +1206,11 @@ function testTest2() {
 	}
 	let sumtext = '';
 	for (let ii = 1; ii < statsum.length; ii++) {
-		sumtext = sumtext + ' / ' + (ii - 1) + ':' + statsum[ii];
-		let cnt = 0;
+		//
+
+
 		if (showFirstRow) {
+			let cnt = 0;
 			for (let kk = 0; kk < lastfirst.balls.length; kk++) {
 				let ball = lastfirst.balls[kk];
 				let level = sumar[ball]
@@ -1216,7 +1218,10 @@ function testTest2() {
 					cnt++;
 				}
 			}
-			sumtext = sumtext + '=' + cnt;
+			//sumtext = sumtext + '=' + cnt;
+			sumtext = sumtext + ' | ' + (ii - 1) + ': ' + cnt + '/' + statsum[ii] +' = '+ Math.round(100*cnt/ballsInRow) + '/' + Math.round(100*statsum[ii]/rowLen)+'%';
+		} else {
+			sumtext = sumtext + ' | ' + (ii - 1) + ': ' + statsum[ii];
 		}
 	}
 	//console.log(statsum);

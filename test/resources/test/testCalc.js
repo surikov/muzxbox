@@ -1079,9 +1079,9 @@ function testTest2() {
     }
     var sumtext = '';
     for (var ii_4 = 1; ii_4 < statsum.length; ii_4++) {
-        sumtext = sumtext + ' / ' + (ii_4 - 1) + ':' + statsum[ii_4];
-        var cnt = 0;
+        //
         if (showFirstRow) {
+            var cnt = 0;
             for (var kk = 0; kk < lastfirst.balls.length; kk++) {
                 var ball = lastfirst.balls[kk];
                 var level = sumar[ball];
@@ -1089,7 +1089,11 @@ function testTest2() {
                     cnt++;
                 }
             }
-            sumtext = sumtext + '=' + cnt;
+            //sumtext = sumtext + '=' + cnt;
+            sumtext = sumtext + ' | ' + (ii_4 - 1) + ': ' + cnt + '/' + statsum[ii_4] + ' = ' + Math.round(100 * cnt / ballsInRow) + '/' + Math.round(100 * statsum[ii_4] / rowLen) + '%';
+        }
+        else {
+            sumtext = sumtext + ' | ' + (ii_4 - 1) + ': ' + statsum[ii_4];
         }
     }
     //console.log(statsum);
