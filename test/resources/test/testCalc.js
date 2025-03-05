@@ -1092,13 +1092,14 @@ function testTest2() {
                 }
             }
             //sumtext = sumtext + '=' + cnt;
-            sumtext = sumtext + ' | ' + (ii_4 - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ') '
-                + cntExists + '/' + countCurHeigth + ' = ' + Math.round((cntExists / ballsInRow) / (countCurHeigth / rowLen) * 100) / 100;
+            sumtext = sumtext + (ii_4 - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ')'
+                + cntExists + '/' + countCurHeigth + '=' + Math.round((cntExists / ballsInRow) / (countCurHeigth / rowLen) * 100) / 100;
         }
         else {
-            sumtext = sumtext + ' | ' + (ii_4 - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ') '
+            sumtext = sumtext + (ii_4 - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ')'
                 + countCurHeigth;
         }
+        sumtext = sumtext + ' | ';
     }
     //console.log(statsum);
     //console.log(sumar, lastfirst);
