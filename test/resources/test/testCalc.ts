@@ -1219,11 +1219,11 @@ function testTest2() {
 				}
 			}
 			//sumtext = sumtext + '=' + cnt;
-			sumtext = sumtext + ' | ' + (ii - 1) + ': ' + cnt + '/' + statsum[ii]
-				+ ' = ' + Math.round((cnt / ballsInRow) / (statsum[ii] / rowLen)*100)/100;
+			sumtext = sumtext + ' | ' + (ii - 1) + '(' + Math.round(100 * ballsInRow*statsum[ii] / rowLen)/100 + ') ' + cnt + '/' + statsum[ii]
+				+ ' = ' + Math.round((cnt / ballsInRow) / (statsum[ii] / rowLen) * 100) / 100;
 			//+' = '+ Math.round(100*cnt/ballsInRow) + '/' + Math.round(100*statsum[ii]/rowLen)+'%';
 		} else {
-			sumtext = sumtext + ' | ' + (ii - 1) + ': ' + statsum[ii];
+			sumtext = sumtext + ' | ' + (ii - 1) + '(' + Math.round(100 * ballsInRow*statsum[ii] / rowLen)/100  + ') ' + statsum[ii];
 		}
 	}
 	//console.log(statsum);
