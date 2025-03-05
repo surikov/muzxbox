@@ -1078,24 +1078,26 @@ function testTest2() {
         statsum[sumar[ii_3]]++;
     }
     var sumtext = '';
+    var veroyat1 = ballsInRow / rowLen;
     for (var ii_4 = 1; ii_4 < statsum.length; ii_4++) {
         //
+        var countCurHeigth = statsum[ii_4];
         if (showFirstRow) {
-            var cnt = 0;
+            var cntExists = 0;
             for (var kk = 0; kk < lastfirst.balls.length; kk++) {
                 var ball = lastfirst.balls[kk];
                 var level = sumar[ball];
                 if (level == ii_4) {
-                    cnt++;
+                    cntExists++;
                 }
             }
             //sumtext = sumtext + '=' + cnt;
-            sumtext = sumtext + ' | ' + (ii_4 - 1) + '(' + Math.round(100 * ballsInRow * statsum[ii_4] / rowLen) / 100 + ') ' + cnt + '/' + statsum[ii_4]
-                + ' = ' + Math.round((cnt / ballsInRow) / (statsum[ii_4] / rowLen) * 100) / 100;
-            //+' = '+ Math.round(100*cnt/ballsInRow) + '/' + Math.round(100*statsum[ii]/rowLen)+'%';
+            sumtext = sumtext + ' | ' + (ii_4 - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ') '
+                + cntExists + '/' + countCurHeigth + ' = ' + Math.round((cntExists / ballsInRow) / (countCurHeigth / rowLen) * 100) / 100;
         }
         else {
-            sumtext = sumtext + ' | ' + (ii_4 - 1) + '(' + Math.round(100 * ballsInRow * statsum[ii_4] / rowLen) / 100 + ') ' + statsum[ii_4];
+            sumtext = sumtext + ' | ' + (ii_4 - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ') '
+                + countCurHeigth;
         }
     }
     //console.log(statsum);
