@@ -318,82 +318,154 @@ class PluginDialogPrompt {
         this.waitTitleAction = null;
         this.waitProjectCallback = null;
         this.waitTimelinePointCallback = null;
+        this.pluginMode = '';
         window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
     }
-    openActionPluginDialogFrame(label, url, callback) {
-        this.waitProjectCallback = callback;
+    openActionPluginDialogFrame(actionPlugin) {
+        this.pluginMode = 'action';
+        this.waitTitleAction = null;
+        this.waitProjectCallback = (obj) => {
+            let project = obj;
+            globalCommandDispatcher.registerWorkProject(project);
+            globalCommandDispatcher.resetProject();
+        };
         this.waitTimelinePointCallback = null;
-        let pluginTitle = document.getElementById("pluginTitle");
-        pluginTitle.innerHTML = " " + label;
-        let pluginFrame = document.getElementById("pluginFrame");
+        let pluginTitle = document.getElementById("pluginActionTitle");
+        pluginTitle.innerHTML = " " + actionPlugin.label;
+        let pluginFrame = document.getElementById("pluginActionFrame");
+        let pluginDiv = document.getElementById("pluginActionDiv");
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
                 this.waitForPluginInit = true;
-                pluginFrame.src = url;
-                document.getElementById("pluginBottom").style.display = "none";
-                document.getElementById("pluginDiv").style.visibility = "visible";
+                pluginFrame.src = actionPlugin.ui;
+                pluginDiv.style.visibility = "visible";
             }
         }
     }
-    openPluginPointDialogFrame(label, url, raw, callback, btnLabel, btnAction, titleAction) {
-        this.waitTitleAction = titleAction;
+    openFilterPluginDialogFrame(order, raw, filter, filterPlugin) {
+        this.pluginMode = 'filter';
         this.waitProjectCallback = null;
-        this.waitTimelinePointCallback = callback;
+        this.waitTimelinePointCallback = (raw) => {
+            globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+                filter.data = raw;
+            });
+        };
+        this.waitTitleAction = () => {
+            let newTitle = prompt(filter.title, filter.title);
+            if (newTitle == filter.title) {
+            }
+            else {
+                if (newTitle != null) {
+                    globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+                        if (newTitle) {
+                            filter.title = newTitle;
+                        }
+                        ;
+                        let pluginTitle = document.getElementById("pluginFilterTitle");
+                        pluginTitle.innerHTML = '&nbsp;&nbsp;' + filter.title;
+                    });
+                }
+            }
+        };
         this.rawData = raw;
-        let pluginTitle = document.getElementById("pluginTitle");
-        pluginTitle.innerHTML = label;
-        let pluginFrame = document.getElementById("pluginFrame");
+        let pluginTitle = document.getElementById("pluginFilterTitle");
+        pluginTitle.innerHTML = '&nbsp;&nbsp;' + filter.title;
+        let pluginFrame = document.getElementById("pluginFilterFrame");
+        let pluginDiv = document.getElementById("pluginFilterDiv");
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
                 this.waitForPluginInit = true;
-                pluginFrame.src = url;
-                document.getElementById("pluginBottom").style.display = "flex";
-                document.getElementById("pluginDiv").style.visibility = "visible";
+                pluginFrame.src = filterPlugin.ui;
+                if (filter.state == 1) {
+                    document.getElementById("pluginFilterSetFilter").className = 'pluginDoButton';
+                    document.getElementById("pluginFilterSetPasstrough").className = 'pluginNoneButton';
+                }
+                else {
+                    document.getElementById("pluginFilterSetFilter").className = 'pluginNoneButton';
+                    document.getElementById("pluginFilterSetPasstrough").className = 'pluginDoButton';
+                }
+                pluginDiv.style.visibility = "visible";
             }
+        }
+    }
+    promptPluginDialogTitle() {
+        if (this.waitTitleAction) {
+            this.waitTitleAction();
         }
     }
     sendNewIdToPlugin() {
-        let pluginFrame = document.getElementById("pluginFrame");
+        let pluginFrame;
+        if (this.pluginMode == 'action') {
+            pluginFrame = document.getElementById("pluginActionFrame");
+        }
+        else {
+            if (this.pluginMode == 'filter') {
+                pluginFrame = document.getElementById("pluginFilterFrame");
+            }
+        }
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
             let message = { hostData: this.dialogID };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
-    sendCurrentProjectToPlugin() {
-        let pluginFrame = document.getElementById("pluginFrame");
+    sendCurrentProjectToActionPlugin() {
+        let pluginFrame = document.getElementById("pluginActionFrame");
         if (pluginFrame) {
             let message = { hostData: globalCommandDispatcher.cfg().data };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     sendPointToPlugin() {
-        let pluginFrame = document.getElementById("pluginFrame");
+        let pluginFrame;
+        if (this.pluginMode == 'action') {
+            pluginFrame = document.getElementById("pluginActionFrame");
+        }
+        else {
+            if (this.pluginMode == 'filter') {
+                pluginFrame = document.getElementById("pluginFilterFrame");
+            }
+        }
         if (pluginFrame) {
             let message = { hostData: this.rawData };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     closeDialogFrame() {
-        let pluginFrame = document.getElementById("pluginFrame");
+        let pluginFrame;
+        let pluginDiv;
+        if (this.pluginMode == 'action') {
+            pluginFrame = document.getElementById("pluginActionFrame");
+            pluginDiv = document.getElementById("pluginActionDiv");
+        }
+        else {
+            if (this.pluginMode == 'filter') {
+                pluginFrame = document.getElementById("pluginFilterFrame");
+                pluginDiv = document.getElementById("pluginFilterDiv");
+            }
+        }
+        if (pluginDiv) {
+            pluginDiv.style.visibility = "hidden";
+        }
         if (pluginFrame) {
             pluginFrame.src = "plugins/pluginplaceholder.html";
         }
-        document.getElementById("pluginBottom").style.display = "none";
-        document.getElementById("pluginDiv").style.visibility = "hidden";
     }
     receiveMessageFromPlugin(event) {
+        console.log('receiveMessageFromPlugin', event);
         if (!(event.data)) {
+            console.log('empty message data');
         }
         else {
             let message = event.data;
             if (message.dialogID) {
+                console.log('receiveMessageFromPlugin', message);
                 if (message.dialogID == this.dialogID) {
                     if (this.waitProjectCallback) {
                         let me = this;
+                        console.log('waitProjectCallback');
                         globalCommandDispatcher.exe.commitProjectChanges([], () => {
                             if (me.waitProjectCallback) {
-                                let newProj = message.pluginData;
                                 me.waitProjectCallback(message.pluginData);
                                 if (message.done) {
                                     me.closeDialogFrame();
@@ -403,20 +475,23 @@ class PluginDialogPrompt {
                     }
                     else {
                         if (this.waitTimelinePointCallback) {
+                            console.log('waitTimelinePointCallback');
                             this.waitTimelinePointCallback(message.pluginData);
                         }
                     }
                     globalCommandDispatcher.reStartPlayIfPlay();
                 }
                 else {
+                    console.log('wrong received message id', message.dialogID, this.dialogID);
                 }
             }
             else {
+                console.log('init receiveMessageFromPlugin');
                 if (this.waitForPluginInit) {
                     this.waitForPluginInit = false;
                     this.sendNewIdToPlugin();
                     if (this.waitProjectCallback) {
-                        this.sendCurrentProjectToPlugin();
+                        this.sendCurrentProjectToActionPlugin();
                     }
                     else {
                         if (this.waitTimelinePointCallback) {
@@ -426,6 +501,294 @@ class PluginDialogPrompt {
                 }
                 else {
                     console.log('wrong received object');
+                }
+            }
+        }
+    }
+}
+class FilterPluginDialog {
+    constructor() {
+        this.dialogID = '?';
+        this.waitFilterPluginInit = false;
+        window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
+    }
+    promptFilterTitle() {
+        let newTitle = prompt(this.filter.title, this.filter.title);
+        if (newTitle == this.filter.title) {
+        }
+        else {
+            if (newTitle != null) {
+                globalCommandDispatcher.exe.commitProjectChanges(['filters', this.order], () => {
+                    if (newTitle) {
+                        this.filter.title = newTitle;
+                    }
+                    ;
+                });
+                this.resetFilterTitle();
+            }
+        }
+    }
+    resetFilterTitle() {
+        let pluginTitle = document.getElementById("pluginFilterTitle");
+        pluginTitle.innerHTML = '&nbsp;&nbsp;' + this.filter.title;
+    }
+    resetStateButtons() {
+        if (this.filter.state == 1) {
+            document.getElementById("pluginFilterSetFilter").className = 'pluginDoButton';
+            document.getElementById("pluginFilterSetPasstrough").className = 'pluginNoneButton';
+        }
+        else {
+            document.getElementById("pluginFilterSetFilter").className = 'pluginNoneButton';
+            document.getElementById("pluginFilterSetPasstrough").className = 'pluginDoButton';
+        }
+    }
+    setFilterOn() {
+        globalCommandDispatcher.exe.commitProjectChanges(['filters', this.order], () => {
+            this.filter.state = 0;
+        });
+        this.resetStateButtons();
+        globalCommandDispatcher.reConnectPluginsIfPlay();
+    }
+    setFilterPass() {
+        globalCommandDispatcher.exe.commitProjectChanges(['filters', this.order], () => {
+            this.filter.state = 1;
+        });
+        this.resetStateButtons();
+        globalCommandDispatcher.reConnectPluginsIfPlay();
+    }
+    dropFilter() {
+        globalCommandDispatcher.exe.commitProjectChanges([], () => {
+            let id = globalCommandDispatcher.cfg().data.filters[this.order].id;
+            globalCommandDispatcher.cfg().data.filters.splice(this.order, 1);
+            for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
+                let oo = globalCommandDispatcher.cfg().data.filters[ii];
+                oo.outputs = oo.outputs.filter(item => item !== id);
+            }
+            for (let ii = 0; ii < globalCommandDispatcher.cfg().data.percussions.length; ii++) {
+                let oo = globalCommandDispatcher.cfg().data.percussions[ii].sampler;
+                oo.outputs = oo.outputs.filter(item => item !== id);
+            }
+            for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
+                let oo = globalCommandDispatcher.cfg().data.tracks[ii].performer;
+                oo.outputs = oo.outputs.filter(item => item !== id);
+            }
+        });
+        this.closeFilterDialogFrame();
+        globalCommandDispatcher.reConnectPluginsIfPlay();
+    }
+    openFilterPluginDialogFrame(order, filter, filterPlugin) {
+        this.filter = filter;
+        this.order = order;
+        this.pluginRawData = filter.data;
+        this.resetFilterTitle();
+        let pluginFrame = document.getElementById("pluginFilterFrame");
+        let pluginDiv = document.getElementById("pluginFilterDiv");
+        if (pluginFrame) {
+            if (pluginFrame.contentWindow) {
+                this.waitFilterPluginInit = true;
+                pluginFrame.src = filterPlugin.ui;
+                pluginDiv.style.visibility = "visible";
+                this.resetStateButtons();
+            }
+        }
+    }
+    closeFilterDialogFrame() {
+        let pluginDiv = document.getElementById("pluginFilterDiv");
+        if (pluginDiv) {
+            pluginDiv.style.visibility = "hidden";
+        }
+        let pluginFrame = document.getElementById("pluginFilterFrame");
+        if (pluginFrame) {
+            pluginFrame.src = "plugins/pluginplaceholder.html";
+        }
+    }
+    sendNewIdToPlugin() {
+        let pluginFrame = document.getElementById("pluginFilterFrame");
+        if (pluginFrame) {
+            this.dialogID = '' + Math.random();
+            let message = { hostData: this.dialogID };
+            pluginFrame.contentWindow.postMessage(message, '*');
+        }
+    }
+    sendPointToPlugin() {
+        let pluginFrame = document.getElementById("pluginFilterFrame");
+        if (pluginFrame) {
+            let message = { hostData: this.pluginRawData };
+            pluginFrame.contentWindow.postMessage(message, '*');
+        }
+    }
+    setFilterValue() {
+        globalCommandDispatcher.exe.commitProjectChanges(['filters', this.order], () => {
+            this.filter.data = this.pluginRawData;
+        });
+        globalCommandDispatcher.reStartPlayIfPlay();
+    }
+    receiveMessageFromPlugin(event) {
+        if (!(event.data)) {
+        }
+        else {
+            let message = event.data;
+            if (message.dialogID) {
+                if (message.dialogID == this.dialogID) {
+                    this.pluginRawData = message.pluginData;
+                    this.setFilterValue();
+                }
+                else {
+                }
+            }
+            else {
+                if (this.waitFilterPluginInit) {
+                    this.waitFilterPluginInit = false;
+                    this.sendNewIdToPlugin();
+                    this.sendPointToPlugin();
+                }
+                else {
+                }
+            }
+        }
+    }
+}
+class SamplerPluginDialog {
+    constructor() {
+        this.dialogID = '?';
+        this.waitSamplerPluginInit = false;
+        window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
+    }
+    promptDrumTitle() {
+        let newTitle = prompt(this.drum.title, this.drum.title);
+        if (newTitle == this.drum.title) {
+        }
+        else {
+            if (newTitle != null) {
+                globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
+                    if (newTitle) {
+                        this.drum.title = newTitle;
+                    }
+                    ;
+                });
+                this.resetDrumTitle();
+            }
+        }
+    }
+    resetDrumTitle() {
+        let pluginTitle = document.getElementById("pluginSamplerTitle");
+        pluginTitle.innerHTML = '&nbsp;&nbsp;' + this.drum.title;
+    }
+    resetStateButtons() {
+        if (this.drum.sampler.state == 1) {
+            document.getElementById("pluginSamplerSetPlay").className = 'pluginDoButton';
+            document.getElementById("pluginSamplerSetPasstrough").className = 'pluginNoneButton';
+            document.getElementById("pluginSamplerSetSolo").className = 'pluginDoButton';
+        }
+        else {
+            if (this.drum.sampler.state == 2) {
+                document.getElementById("pluginSamplerSetPlay").className = 'pluginDoButton';
+                document.getElementById("pluginSamplerSetPasstrough").className = 'pluginDoButton';
+                document.getElementById("pluginSamplerSetSolo").className = 'pluginNoneButton';
+            }
+            else {
+                document.getElementById("pluginSamplerSetPlay").className = 'pluginNoneButton';
+                document.getElementById("pluginSamplerSetPasstrough").className = 'pluginDoButton';
+                document.getElementById("pluginSamplerSetSolo").className = 'pluginDoButton';
+            }
+        }
+    }
+    setDrumOn() {
+        globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
+            this.drum.sampler.state = 0;
+        });
+        this.resetStateButtons();
+        globalCommandDispatcher.reConnectPluginsIfPlay();
+    }
+    setDrumMute() {
+        globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
+            this.drum.sampler.state = 1;
+        });
+        this.resetStateButtons();
+        globalCommandDispatcher.reConnectPluginsIfPlay();
+    }
+    setDrumSolo() {
+        globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
+            this.drum.sampler.state = 2;
+        });
+        this.resetStateButtons();
+        globalCommandDispatcher.reConnectPluginsIfPlay();
+    }
+    dropDrum() {
+        globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+            globalCommandDispatcher.cfg().data.percussions.splice(this.order, 1);
+        });
+        this.closeDrumDialogFrame();
+        globalCommandDispatcher.reConnectPluginsIfPlay();
+    }
+    openDrumPluginDialogFrame(order, drum, filterPlugin) {
+        console.log('openDrumPluginDialogFrame', order, drum, filterPlugin);
+        this.drum = drum;
+        this.order = order;
+        this.pluginRawData = drum.sampler.data;
+        this.resetDrumTitle();
+        let pluginFrame = document.getElementById("pluginSamplerFrame");
+        let pluginDiv = document.getElementById("pluginSamplerDiv");
+        if (pluginFrame) {
+            if (pluginFrame.contentWindow) {
+                this.waitSamplerPluginInit = true;
+                pluginFrame.src = filterPlugin.ui;
+                pluginDiv.style.visibility = "visible";
+                this.resetStateButtons();
+            }
+        }
+    }
+    closeDrumDialogFrame() {
+        let pluginDiv = document.getElementById("pluginSamplerDiv");
+        if (pluginDiv) {
+            pluginDiv.style.visibility = "hidden";
+        }
+        let pluginFrame = document.getElementById("pluginSamplerFrame");
+        if (pluginFrame) {
+            pluginFrame.src = "plugins/pluginplaceholder.html";
+        }
+    }
+    sendNewIdToPlugin() {
+        let pluginFrame = document.getElementById("pluginSamplerFrame");
+        if (pluginFrame) {
+            this.dialogID = '' + Math.random();
+            let message = { hostData: this.dialogID };
+            pluginFrame.contentWindow.postMessage(message, '*');
+        }
+    }
+    sendPointToPlugin() {
+        let pluginFrame = document.getElementById("pluginSamplerFrame");
+        if (pluginFrame) {
+            let message = { hostData: this.pluginRawData };
+            pluginFrame.contentWindow.postMessage(message, '*');
+        }
+    }
+    setFilterValue() {
+        globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
+            this.drum.sampler.data = this.pluginRawData;
+        });
+        globalCommandDispatcher.reStartPlayIfPlay();
+    }
+    receiveMessageFromPlugin(event) {
+        if (!(event.data)) {
+        }
+        else {
+            let message = event.data;
+            if (message.dialogID) {
+                if (message.dialogID == this.dialogID) {
+                    this.pluginRawData = message.pluginData;
+                    this.setFilterValue();
+                }
+                else {
+                }
+            }
+            else {
+                if (this.waitSamplerPluginInit) {
+                    this.waitSamplerPluginInit = false;
+                    this.sendNewIdToPlugin();
+                    this.sendPointToPlugin();
+                }
+                else {
                 }
             }
         }
@@ -582,6 +945,8 @@ class CommandDispatcher {
         this.exe = new CommandExe();
         this.undoQueue = [];
         this.redoQueue = [];
+        this.filterPluginDialog = new FilterPluginDialog();
+        this.samplerPluginDialog = new SamplerPluginDialog();
     }
     cfg() {
         return this._mixerDataMathUtility;
@@ -905,18 +1270,15 @@ class CommandDispatcher {
     resetProject() {
         try {
             this.renderer.fillWholeUI();
-            this.setupSelectionBackground(this.cfg().data.selectedPart);
         }
         catch (xx) {
             console.log('resetProject', xx);
             console.log('data', this.cfg().data);
         }
     }
-    promptActionPluginDialog(label, url, callback) {
-        pluginDialogPrompt.openActionPluginDialogFrame(label, url, callback);
+    promptActionPluginDialog(actionPlugin) {
     }
-    promptPluginPointDialog(label, url, rawdata, callback, btnLabel, btnAction, titleAction) {
-        pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction, titleAction);
+    promptPluginSequencerDialog(track, performerPlugin) {
     }
     findPluginRegistrationByKind(kind) {
         let list = MZXBX_currentPlugins();
@@ -926,9 +1288,6 @@ class CommandDispatcher {
             }
         }
         return null;
-    }
-    cancelPluginGUI() {
-        pluginDialogPrompt.closeDialogFrame();
     }
     timeSelectChange(idx) {
         if (this.player.playState().play) {
@@ -956,14 +1315,7 @@ class CommandDispatcher {
         this.reDrawPlayPosition();
         this.setupAndStartPlay();
     }
-    setupSelectionBackground(selectedPart) {
-        let tileLevelSVG = document.getElementById('tileLevelSVG');
-        if (selectedPart.startMeasure < 0) {
-            tileLevelSVG === null || tileLevelSVG === void 0 ? void 0 : tileLevelSVG.style.setProperty('background', 'var(--unselectedbg-color)');
-        }
-        else {
-            tileLevelSVG === null || tileLevelSVG === void 0 ? void 0 : tileLevelSVG.style.setProperty('background', 'var(--selectedbgground-color)');
-        }
+    setupSelectionBackground22(selectedPart) {
     }
     expandTimeLineSelection(idx) {
         if (this.cfg().data) {
@@ -999,7 +1351,6 @@ class CommandDispatcher {
                         endMeasure: idx
                     };
                 }
-                this.setupSelectionBackground(curPro.selectedPart);
             }
         }
         else {
@@ -1019,7 +1370,6 @@ class CommandDispatcher {
     }
 }
 let globalCommandDispatcher = new CommandDispatcher();
-let pluginDialogPrompt = new PluginDialogPrompt();
 let gridLinesBrief = [
     { ratio: 0.4, duration: { count: 1, part: 2 } }
 ];
@@ -1808,23 +2158,7 @@ class RightMenuPanel {
                 item.onClick = () => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
                     if (info) {
-                        let url = info.ui;
-                        globalCommandDispatcher.promptPluginPointDialog(track.title, url, track.performer.data, (obj) => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt, 'performer'], () => {
-                                track.performer.data = obj;
-                            });
-                            return true;
-                        }, LO(localDropInsTrack), () => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
-                                globalCommandDispatcher.cfg().data.tracks.splice(tt, 1);
-                            });
-                            globalCommandDispatcher.cancelPluginGUI();
-                        }, (newTitle) => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt], () => {
-                                track.title = newTitle;
-                            });
-                            globalCommandDispatcher.cancelPluginGUI();
-                        });
+                        globalCommandDispatcher.promptPluginSequencerDialog(track, info);
                     }
                 };
                 item.highlight = icon_sliders;
@@ -1867,23 +2201,7 @@ class RightMenuPanel {
                 item.onClick = () => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(drum.sampler.kind);
                     if (info) {
-                        let url = info.ui;
-                        globalCommandDispatcher.promptPluginPointDialog(drum.title, url, drum.sampler.data, (obj) => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt, 'sampler'], () => {
-                                drum.sampler.data = obj;
-                            });
-                            return true;
-                        }, LO(localDropSampleTrack), () => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-                                globalCommandDispatcher.cfg().data.percussions.splice(tt, 1);
-                            });
-                            globalCommandDispatcher.cancelPluginGUI();
-                        }, (newTitle) => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt], () => {
-                                drum.title = newTitle;
-                            });
-                            globalCommandDispatcher.cancelPluginGUI();
-                        });
+                        globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(tt, drum, info);
                     }
                 };
                 item.highlight = icon_sliders;
@@ -1921,23 +2239,7 @@ class RightMenuPanel {
                 item.onClick = () => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
                     if (info) {
-                        let url = info.ui;
-                        globalCommandDispatcher.promptPluginPointDialog(filter.title, url, filter.data, (obj) => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
-                                filter.data = obj;
-                            });
-                            return true;
-                        }, LO(localDropFilterTrack), () => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
-                                globalCommandDispatcher.cfg().data.filters.splice(ff, 1);
-                            });
-                            globalCommandDispatcher.cancelPluginGUI();
-                        }, (newTitle) => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
-                                filter.title = newTitle;
-                            });
-                            globalCommandDispatcher.cancelPluginGUI();
-                        });
+                        globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(ff, filter, info);
                     }
                 };
                 item.highlight = icon_sliders;
@@ -2197,16 +2499,10 @@ function fillPluginsLists() {
     for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
         let label = MZXBX_currentPlugins()[ii].label;
         let purpose = MZXBX_currentPlugins()[ii].purpose;
-        let url = MZXBX_currentPlugins()[ii].ui;
         if (purpose == 'Action') {
             menuPointActions.children.push({
                 text: label, noLocalization: true, onClick: () => {
-                    globalCommandDispatcher.promptActionPluginDialog(label, url, (obj) => {
-                        let project = obj;
-                        globalCommandDispatcher.registerWorkProject(project);
-                        globalCommandDispatcher.resetProject();
-                        return true;
-                    });
+                    globalCommandDispatcher.promptActionPluginDialog(MZXBX_currentPlugins()[ii]);
                 }
             });
         }
@@ -3398,23 +3694,7 @@ class PerformerIcon {
                 activation: (x, y) => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
                     if (info) {
-                        let url = info.ui;
-                        globalCommandDispatcher.promptPluginPointDialog(track.title, url, track.performer.data, (obj) => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer'], () => {
-                                track.performer.data = obj;
-                            });
-                            return true;
-                        }, LO(localDropInsTrack), () => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
-                                globalCommandDispatcher.cfg().data.tracks.splice(trackNo, 1);
-                            });
-                            globalCommandDispatcher.cancelPluginGUI();
-                        }, (newTitle) => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo], () => {
-                                track.title = newTitle;
-                            });
-                            globalCommandDispatcher.cancelPluginGUI();
-                        });
+                        globalCommandDispatcher.promptPluginSequencerDialog(track, info);
                     }
                 }
             };
@@ -3611,23 +3891,7 @@ class SamplerIcon {
                     console.log('' + samplerTrack.sampler.kind + ':' + samplerTrack.sampler.id);
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
                     if (info) {
-                        let url = info.ui;
-                        globalCommandDispatcher.promptPluginPointDialog(samplerTrack.title, url, samplerTrack.sampler.data, (obj) => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['percussions', order], () => {
-                                samplerTrack.sampler.data = obj;
-                            });
-                            return true;
-                        }, LO(localDropSampleTrack), () => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-                                globalCommandDispatcher.cfg().data.percussions.splice(order, 1);
-                            });
-                            globalCommandDispatcher.cancelPluginGUI();
-                        }, (newTitle) => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['percussions', order], () => {
-                                samplerTrack.title = newTitle;
-                            });
-                            globalCommandDispatcher.cancelPluginGUI();
-                        });
+                        globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(order, samplerTrack, info);
                     }
                 }
             };
@@ -3828,23 +4092,7 @@ class FilterIcon {
                 activation: (x, y) => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
                     if (info) {
-                        let url = info.ui;
-                        globalCommandDispatcher.promptPluginPointDialog(filterTarget.title, url, filterTarget.data, (obj) => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
-                                filterTarget.data = obj;
-                            });
-                            return true;
-                        }, LO(localDropFilterTrack), () => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
-                                globalCommandDispatcher.cfg().data.filters.splice(order, 1);
-                            });
-                            globalCommandDispatcher.cancelPluginGUI();
-                        }, (newTitle) => {
-                            globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
-                                filterTarget.title = newTitle;
-                            });
-                            globalCommandDispatcher.cancelPluginGUI();
-                        });
+                        globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(order, filterTarget, info);
                     }
                 }
             };

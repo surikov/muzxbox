@@ -23,6 +23,8 @@ class CommandDispatcher {
 	//redoQueue: UndoRedoCommand[] = [];
 	undoQueue: Zvoog_UICommand[] = [];
 	redoQueue: Zvoog_UICommand[] = [];
+	filterPluginDialog = new FilterPluginDialog();
+	samplerPluginDialog = new SamplerPluginDialog();
 	cfg(): MixerDataMathUtility {
 		return this._mixerDataMathUtility;
 	}
@@ -32,11 +34,11 @@ class CommandDispatcher {
 	redo(): Zvoog_UICommand[] {
 		return this.redoQueue;
 	}
-	clearUndo(){
-		this.undoQueue=[];
+	clearUndo() {
+		this.undoQueue = [];
 	}
-	clearRedo(){
-		this.redoQueue=[];
+	clearRedo() {
+		this.redoQueue = [];
 	}
 	reDrawPlayPosition() {
 		let ww = this.renderer.timeselectbar.positionMarkWidth();
@@ -414,13 +416,13 @@ class CommandDispatcher {
 	}
 	resetProject() {
 		try {
-/*
-			if (this.cfg().data.tracks)
-				if (this.cfg().data.tracks[0])
-					this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
-*/
+			/*
+						if (this.cfg().data.tracks)
+							if (this.cfg().data.tracks[0])
+								this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
+			*/
 			this.renderer.fillWholeUI();
-			this.setupSelectionBackground(this.cfg().data.selectedPart);
+			//this.setupSelectionBackground(this.cfg().data.selectedPart);
 		} catch (xx) {
 			console.log('resetProject', xx);
 			console.log('data', this.cfg().data);
@@ -462,16 +464,31 @@ class CommandDispatcher {
 	setDrumSoloState(state: number) {
 		console.log('setDrumSoloState', state);
 	}*/
-	promptActionPluginDialog(label: string, url: string, callback: (obj: Zvoog_Project) => void) {
+	promptActionPluginDialog(actionPlugin: MZXBX_PluginRegistrationInformation) {
 		//console.log('promptProjectPluginGUI', url);
-		pluginDialogPrompt.openActionPluginDialogFrame(label, url, callback);
+		//pluginDialogPrompt.openActionPluginDialogFrame(actionPlugin);
 	}
+	promptPluginSequencerDialog(track: Zvoog_MusicTrack, performerPlugin: MZXBX_PluginRegistrationInformation) {
+		//pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction, titleAction);
+	}
+	//promptPluginSamplerDialog(drum: Zvoog_PercussionTrack, samplerPlugin: MZXBX_PluginRegistrationInformation) {
+		//pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction, titleAction);
+	//}
+	//promptPluginFilterDialog(order: number, raw: string, filter: Zvoog_FilterTarget, filterPlugin: MZXBX_PluginRegistrationInformation) {
+		//pluginDialogPrompt.openFilterPluginDialogFrame(order, raw, filter, filterPlugin);//label, url, rawdata, callback, btnLabel, btnAction, titleAction);
+		
+	//}
+	/*promptPluginDialogTitle(){
+		pluginDialogPrompt.promptPluginDialogTitle();
+	}*/
+	/*
 	promptPluginPointDialog(label: string, url: string, rawdata: string, callback: (obj: Zvoog_Project) => void
 		, btnLabel: string, btnAction: () => void
 		, titleAction: (newTitle: string) => void
 	) {
 		pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction, titleAction);
 	}
+	*/
 	/*
 	promptStepPluginGUI(label: string, url: string, rawdata: string, callback: (obj: any) => boolean) {
 		//console.log('promptPointPluginGUI', url);
@@ -500,11 +517,11 @@ class CommandDispatcher {
 		//console.log('findPluginRegistrationByKind wrong', kind);
 		return null;
 	}
-	cancelPluginGUI() {
+	/*cancelPluginGUI() {
 		//console.log('cancelPluginGUI');
 		pluginDialogPrompt.closeDialogFrame();
 
-	}
+	}*/
 	timeSelectChange(idx: number) {
 		if (this.player.playState().play) {
 			this.playFromTimeSelection(idx);
@@ -532,7 +549,7 @@ class CommandDispatcher {
 		this.reDrawPlayPosition();
 		this.setupAndStartPlay();
 	}
-	setupSelectionBackground(selectedPart: Zvoog_Selection) {
+	setupSelectionBackground22(selectedPart: Zvoog_Selection) {
 		/*
 				#tileLevelSVG {
 					width: 100%;
@@ -543,12 +560,12 @@ class CommandDispatcher {
 					margin: 0px;
 					padding: 0px;
 					background: var(--back-color);*/
-		let tileLevelSVG = document.getElementById('tileLevelSVG');
+		/*let tileLevelSVG = document.getElementById('tileLevelSVG');
 		if (selectedPart.startMeasure < 0) {
 			tileLevelSVG?.style.setProperty('background', 'var(--unselectedbg-color)');
 		} else {
 			tileLevelSVG?.style.setProperty('background', 'var(--selectedbgground-color)');
-		}
+		}*/
 	}
 	expandTimeLineSelection(idx: number) {
 
@@ -581,7 +598,7 @@ class CommandDispatcher {
 						, endMeasure: idx
 					};
 				}
-				this.setupSelectionBackground(curPro.selectedPart);
+				//this.setupSelectionBackground(curPro.selectedPart);
 			}
 		} else {
 			console.log('no project data');
@@ -603,7 +620,7 @@ class CommandDispatcher {
 	}
 }
 let globalCommandDispatcher = new CommandDispatcher();
-let pluginDialogPrompt = new PluginDialogPrompt();
+//let pluginDialogPrompt = new PluginDialogPrompt();
 
 
 

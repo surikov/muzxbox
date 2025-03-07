@@ -151,7 +151,8 @@ class SamplerIcon {
 					console.log('' + samplerTrack.sampler.kind + ':' + samplerTrack.sampler.id);
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
 					if (info) {
-						let url = info.ui;
+						globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(order,samplerTrack, info);
+						/*let url = info.ui;
 						globalCommandDispatcher.promptPluginPointDialog(samplerTrack.title, url, samplerTrack.sampler.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['percussions', order], () => {
 								samplerTrack.sampler.data = obj;
@@ -169,7 +170,7 @@ class SamplerIcon {
 								samplerTrack.title = newTitle;
 							});
 							globalCommandDispatcher.cancelPluginGUI();
-						});
+						});*/
 					}
 				}
 			};

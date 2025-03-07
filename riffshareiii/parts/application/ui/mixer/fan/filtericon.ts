@@ -153,7 +153,9 @@ class FilterIcon {
 				, activation: (x: number, y: number) => {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
 					if (info) {
-						let url = info.ui;
+						//this.filterPluginDialog.openFilterPluginDialogFrame(order, raw, filter, filterPlugin);//label, url, rawdata, callback, btnLabel, btnAction, titleAction);
+						globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(order, filterTarget, info);
+						/*let url = info.ui;
 						globalCommandDispatcher.promptPluginPointDialog(filterTarget.title, url, filterTarget.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
 								filterTarget.data = obj;
@@ -172,18 +174,19 @@ class FilterIcon {
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});
+						*/
 					}
 				}
 			};
 			dragAnchor.content.push(btn);
 		}
-		if (zidx <=5){// globalCommandDispatcher.cfg().zoomEditSLess) {
+		if (zidx <= 5) {// globalCommandDispatcher.cfg().zoomEditSLess) {
 			//let txt: TileText = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy, css: 'fanIconLabel' };
 			let txt: TileText = {
 				text: filterTarget.title //+ ': ' + track.volume + ': ' + track.performer.kind + ': ' + track.performer.id
-				, x: xx- sz * 0.4
-				, y: yy- sz * 0.1
-				, css: 'fanIconLabel fanIconLabelSize'+zidx
+				, x: xx - sz * 0.4
+				, y: yy - sz * 0.1
+				, css: 'fanIconLabel fanIconLabelSize' + zidx
 			};
 			dragAnchor.content.push(txt);
 		}

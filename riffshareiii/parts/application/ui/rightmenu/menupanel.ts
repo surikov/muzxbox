@@ -312,6 +312,8 @@ class RightMenuPanel {
 				item.onClick = () => {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
 					if (info) {
+						globalCommandDispatcher.promptPluginSequencerDialog(track, info);
+						/*
 						let url = info.ui;
 						globalCommandDispatcher.promptPluginPointDialog(track.title, url, track.performer.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt, 'performer'], () => {
@@ -331,6 +333,7 @@ class RightMenuPanel {
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});
+						*/
 					}
 					//console.log('first',track);
 				};
@@ -379,7 +382,9 @@ class RightMenuPanel {
 				item.onClick = () => {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(drum.sampler.kind);
 					if (info) {
-						let url = info.ui;
+						//globalCommandDispatcher.promptPluginSamplerDialog(drum, info);
+						globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(tt, drum, info);
+						/*let url = info.ui;
 						globalCommandDispatcher.promptPluginPointDialog(drum.title, url, drum.sampler.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt, 'sampler'], () => {
 								drum.sampler.data = obj;
@@ -397,7 +402,7 @@ class RightMenuPanel {
 								drum.title = newTitle;
 							});
 							globalCommandDispatcher.cancelPluginGUI();
-						});
+						});*/
 					}
 					//console.log('first',track);
 				};
@@ -442,7 +447,8 @@ class RightMenuPanel {
 				item.onClick = () => {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
 					if (info) {
-						let url = info.ui;
+						globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(ff, filter, info);
+						/*let url = info.ui;
 						globalCommandDispatcher.promptPluginPointDialog(filter.title, url, filter.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
 								filter.data = obj;
@@ -460,7 +466,7 @@ class RightMenuPanel {
 								filter.title = newTitle;
 							});
 							globalCommandDispatcher.cancelPluginGUI();
-						});
+						});*/
 					}
 					//console.log('first',track);
 				};

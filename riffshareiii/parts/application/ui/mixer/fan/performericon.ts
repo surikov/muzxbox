@@ -178,7 +178,8 @@ class PerformerIcon {
 					//console.log('' + track.performer.kind + ':' + track.performer.id);
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
 					if (info) {
-						let url = info.ui;
+						globalCommandDispatcher.promptPluginSequencerDialog(track, info);
+						/*let url = info.ui;
 						globalCommandDispatcher.promptPluginPointDialog(track.title, url, track.performer.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer'], () => {
 								track.performer.data = obj;
@@ -196,7 +197,7 @@ class PerformerIcon {
 								track.title = newTitle;
 							});
 							globalCommandDispatcher.cancelPluginGUI();
-						});
+						});*/
 					}
 
 

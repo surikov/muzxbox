@@ -34,17 +34,60 @@ declare function startLoadCSSfile(cssurl: string): void;
 declare class PluginDialogPrompt {
     dialogID: string;
     waitForPluginInit: boolean;
-    waitTitleAction: null | ((newTitle: string) => void);
+    waitTitleAction: null | (() => void);
     waitProjectCallback: null | ((newProject: Zvoog_Project) => void);
     waitTimelinePointCallback: null | ((raw: any) => void);
+    pluginMode: '' | 'action' | 'filter' | 'sequencer' | 'sampler';
     rawData: any;
     constructor();
-    openActionPluginDialogFrame(label: string, url: string, callback: (obj: Zvoog_Project) => void): void;
-    openPluginPointDialogFrame(label: string, url: string, raw: any, callback: (obj: any) => void, btnLabel: string, btnAction: () => void, titleAction: (newTitle: string) => void): void;
+    openActionPluginDialogFrame(actionPlugin: MZXBX_PluginRegistrationInformation): void;
+    openFilterPluginDialogFrame(order: number, raw: string, filter: Zvoog_FilterTarget, filterPlugin: MZXBX_PluginRegistrationInformation): void;
+    promptPluginDialogTitle(): void;
     sendNewIdToPlugin(): void;
-    sendCurrentProjectToPlugin(): void;
+    sendCurrentProjectToActionPlugin(): void;
     sendPointToPlugin(): void;
     closeDialogFrame(): void;
+    receiveMessageFromPlugin(event: any): void;
+}
+declare class FilterPluginDialog {
+    filter: Zvoog_FilterTarget;
+    order: number;
+    pluginRawData: string;
+    dialogID: string;
+    waitFilterPluginInit: boolean;
+    constructor();
+    promptFilterTitle(): void;
+    resetFilterTitle(): void;
+    resetStateButtons(): void;
+    setFilterOn(): void;
+    setFilterPass(): void;
+    dropFilter(): void;
+    openFilterPluginDialogFrame(order: number, filter: Zvoog_FilterTarget, filterPlugin: MZXBX_PluginRegistrationInformation): void;
+    closeFilterDialogFrame(): void;
+    sendNewIdToPlugin(): void;
+    sendPointToPlugin(): void;
+    setFilterValue(): void;
+    receiveMessageFromPlugin(event: any): void;
+}
+declare class SamplerPluginDialog {
+    drum: Zvoog_PercussionTrack;
+    order: number;
+    pluginRawData: string;
+    dialogID: string;
+    waitSamplerPluginInit: boolean;
+    constructor();
+    promptDrumTitle(): void;
+    resetDrumTitle(): void;
+    resetStateButtons(): void;
+    setDrumOn(): void;
+    setDrumMute(): void;
+    setDrumSolo(): void;
+    dropDrum(): void;
+    openDrumPluginDialogFrame(order: number, drum: Zvoog_PercussionTrack, filterPlugin: MZXBX_PluginRegistrationInformation): void;
+    closeDrumDialogFrame(): void;
+    sendNewIdToPlugin(): void;
+    sendPointToPlugin(): void;
+    setFilterValue(): void;
     receiveMessageFromPlugin(event: any): void;
 }
 declare class CommandExe {
@@ -73,6 +116,8 @@ declare class CommandDispatcher {
     exe: CommandExe;
     undoQueue: Zvoog_UICommand[];
     redoQueue: Zvoog_UICommand[];
+    filterPluginDialog: FilterPluginDialog;
+    samplerPluginDialog: SamplerPluginDialog;
     cfg(): MixerDataMathUtility;
     undo(): Zvoog_UICommand[];
     redo(): Zvoog_UICommand[];
@@ -97,17 +142,15 @@ declare class CommandDispatcher {
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     changeTapSize(ratio: number): void;
     resetProject(): void;
-    promptActionPluginDialog(label: string, url: string, callback: (obj: Zvoog_Project) => void): void;
-    promptPluginPointDialog(label: string, url: string, rawdata: string, callback: (obj: Zvoog_Project) => void, btnLabel: string, btnAction: () => void, titleAction: (newTitle: string) => void): void;
+    promptActionPluginDialog(actionPlugin: MZXBX_PluginRegistrationInformation): void;
+    promptPluginSequencerDialog(track: Zvoog_MusicTrack, performerPlugin: MZXBX_PluginRegistrationInformation): void;
     findPluginRegistrationByKind(kind: String): null | MZXBX_PluginRegistrationInformation;
-    cancelPluginGUI(): void;
     timeSelectChange(idx: number): void;
     playFromTimeSelection(idx: number): void;
-    setupSelectionBackground(selectedPart: Zvoog_Selection): void;
+    setupSelectionBackground22(selectedPart: Zvoog_Selection): void;
     expandTimeLineSelection(idx: number): void;
 }
 declare let globalCommandDispatcher: CommandDispatcher;
-declare let pluginDialogPrompt: PluginDialogPrompt;
 declare type GridTimeTemplate14 = {
     ratio: number;
     duration: Zvoog_Metre;

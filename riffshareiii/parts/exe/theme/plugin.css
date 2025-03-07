@@ -1,4 +1,55 @@
-#pluginDiv {
+#pluginFilterDiv {
+	position: absolute;
+	z-index: 1999;
+	left: 0.0cm;
+	right: 0.0cm;
+	top: 0.0cm;
+	bottom: 0.0cm;
+	border-style: solid;
+	border-width: 0.0cm;
+	border-width2: 0.125cm;
+	border-color2: var(--shadow-color);
+	display: flex;
+	flex-direction: column;
+	visibility: hidden;
+	border-radius2: 0.25cm;
+	background-color: #888888ee;
+}
+#pluginSamplerDiv {
+	position: absolute;
+	z-index: 1999;
+	left: 0.0cm;
+	right: 0.0cm;
+	top: 0.0cm;
+	bottom: 0.0cm;
+	border-style: solid;
+	border-width: 0.0cm;
+	border-width2: 0.125cm;
+	border-color2: var(--shadow-color);
+	display: flex;
+	flex-direction: column;
+	visibility: hidden;
+	border-radius2: 0.25cm;
+	background-color: #888888ee;
+}
+#pluginSequencerDiv {
+	position: absolute;
+	z-index: 1999;
+	left: 0.0cm;
+	right: 0.0cm;
+	top: 0.0cm;
+	bottom: 0.0cm;
+	border-style: solid;
+	border-width: 0.0cm;
+	border-width2: 0.125cm;
+	border-color2: var(--shadow-color);
+	display: flex;
+	flex-direction: column;
+	visibility: hidden;
+	border-radius2: 0.25cm;
+	background-color: #888888ee;
+}
+#pluginActionDiv {
 	position: absolute;
 	z-index: 1999;
 	left: 0.0cm;
@@ -16,7 +67,7 @@
 	background-color: #888888ee;
 }
 
-#pluginFrame {
+.pluginFrame {
 	left: 0.0cm;
 	right: 0.0cm;
 	top: 1.0cm;
@@ -32,7 +83,7 @@
 	scrollbar-width: thin;
 }
 
-#pluginHeader {
+#pluginActionHeader {
 	width: 100%;
 	height: 1.0cm;
 	background-color: var(--background-color10);
@@ -45,6 +96,20 @@
 	justify-content: space-between;
 	padding-top: 0.1cm;
 }
+.pluginOtherHeader {
+	width: 100%;
+	height: 1.0cm;
+	background-color: var(--background-color10);
+	border-radius2: 0.125cm 0.125cm 0.0cm 0.0cm;
+	flex-basis: auto;
+	flex-shrink: 0;
+	flex-grow: 0;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	padding-top: 0.1cm;
+}
+/*
 #pluginEditTitleButton {
 	border-radius: 0.4cm;
 	background-color: var(--click-color);
@@ -63,7 +128,8 @@
 	justify-content: center;
 	min-width: 0.8cm;
 }
-#pluginTitle {
+*/
+#pluginActionTitle {
 	color: var(--line-color);
 	font-size: var(--label-04cm);
 	padding-left: 0.0cm;
@@ -73,9 +139,29 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	text-align: center;
+	cursor:default;
+}
+.pluginPromptTitle {
+	border-radius: 0.4cm;
+	background-color: var(--click-color);
+	color: var(--main-color);
+	box-shadow: inset 0px 0px 0px 0.5px var(--main-color);
+	font-size: var(--label-05cm);
+	width: 0.8cm;
+	height: 0.8cm;
+	text-align: left;
+	cursor: pointer;
+	margin-left: 0.2cm;
+	margin-right: 0.2cm;
+	display: flex;
+	align-items: center;
+	justify-content: start;
+	min-width: 0.8cm;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
-#pluginCancel {
+.pluginCancel {
 	border-radius: 0.4cm;
 	background-color: var(--click-color);
 	color: var(--main-color);
@@ -103,7 +189,7 @@
 	justify-content: center;
 	min-width: 0.8cm;
 }
-
+/*
 #pluginRefresh {
 	border-radius2: 0.4cm;
 	background-color: var(--click-color);
@@ -124,10 +210,10 @@
 	min-width: 0.8cm;
 
 }
+*/
 
 
-
-#pluginBottom {
+.pluginBottom {
 	width: 100%;
 	height: 1.0cm;
 	background-color: var(--background-color10);
@@ -140,6 +226,7 @@
 	justify-content: center;
 	padding-top: 0.1cm;
 }
+/*
 #pluginDeleteLabel {
 	color: var(--main-color);
 	font-size: var(--label-04cm);
@@ -151,7 +238,27 @@
 	text-overflow: ellipsis;
 	text-align: right;
 }
+*/
 .pluginDoButton {
+	border-radius: 0.4cm;
+	background-color: var(--click-color);
+	background-color2: var(--background-color);
+	color: var(--main-color);
+	box-shadow: inset 0px 0px 0px 0.5px var(--main-color);
+	font-size: var(--label-05cm);
+	width: 0.8cm;
+	height: 0.8cm;
+	text-align: center;
+	font-family: "Material-Design-Iconic-Font";
+	cursor: pointer;
+	margin-left: 0.07cm;
+	margin-right: 0.07cm;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 0.8cm;
+}
+.pluginNoneButton {
 	border-radius: 0.4cm;
 	background-color2: var(--click-color);
 	background-color: var(--background-color);

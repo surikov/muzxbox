@@ -165,7 +165,7 @@ html {
 	font-family2: 'Fontquan-XinYiJiXiangSong-Regular';
 	background-color2: #ff0000;
 	user-select: none;
-
+background-color2: var(--main-color);
 }
 
 body {
@@ -176,7 +176,7 @@ body {
 	touch-action: manipulation;
 	background-color2: #ff00ff;
 	cursor: grab;
-	background-color: var(--main-color);
+	background-color2: var(--main-color);
 }
 
 #pagediv {
@@ -191,7 +191,7 @@ body {
 	background-position2: center;
 	display: flex;
 	flex-direction: column;
-	background: var(--back-color);
+	background: var(--background-color);
 }
 
 #tileLevelSVG {
@@ -202,7 +202,7 @@ body {
 	stroke-linecap: round;
 	margin: 0px;
 	padding: 0px;
-	background: var(--unselectedbg-color);
+	background2: var(--unselectedbg-color);
 	flex-basis: 0;
 	flex-shrink: 1;
 	flex-grow: 1;

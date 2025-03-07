@@ -78,16 +78,17 @@ function fillPluginsLists() {
 	for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
 		let label: string = MZXBX_currentPlugins()[ii].label;
 		let purpose: string = MZXBX_currentPlugins()[ii].purpose;
-		let url: string = MZXBX_currentPlugins()[ii].ui;
+		//let url: string = MZXBX_currentPlugins()[ii].ui;
 		if (purpose == 'Action') {
 			menuPointActions.children.push({
 				text: label, noLocalization: true, onClick: () => {
-					globalCommandDispatcher.promptActionPluginDialog(label, url, (obj: Zvoog_Project) => {
+					globalCommandDispatcher.promptActionPluginDialog(MZXBX_currentPlugins()[ii]);
+					/*globalCommandDispatcher.promptActionPluginDialog(label, url, (obj: Zvoog_Project) => {
 						let project: Zvoog_Project = obj;
 						globalCommandDispatcher.registerWorkProject(project);
 						globalCommandDispatcher.resetProject();
 						return true;
-					});
+					});*/
 				}
 			});
 		} else {

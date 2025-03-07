@@ -5,13 +5,16 @@
 	--line-color: #339;
 	--click-color: #6cf;
 }
-/*
+
 #pagediv {
 
 	background-image: url("bg/gjel.png");
 	background-repeat: repeat-x;
 	background-size2: cover;
 	background-position: bottom;
-
+	background-position-x2: center;
+	background-position-y2: bottom;
+	background-color2: red;
+	background-size: 500px;
 }
-*/
+

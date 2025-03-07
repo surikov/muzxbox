@@ -29,6 +29,8 @@
 
 		
 		,"ui/pluginprompt/plugindialog.ts"
+		,"ui/pluginprompt/filterPluginDialog.ts"
+		,"ui/pluginprompt/samplerPluginDialog.ts"
 
 		,"commands/execommand.ts"
         ,"commands/commanddispatcher.ts"

@@ -35,25 +35,60 @@
 </head>
 
 <body>
-	<div id="pluginDiv">
-		<div id="pluginHeader">
-			<!--<div id="pluginEditTitleButton" onclick="globalCommandDispatcher.pick();">&#xf222;</div>-->
-			<div id="pluginTitle">Plugin name and other information for identification</div>
-			<div id="pluginCancel" onclick="globalCommandDispatcher.cancelPluginGUI();">&#xf136;</div>
+	<div id="pluginActionDiv">
+		<div id="pluginActionHeader">
+			<div id="pluginActionTitle">Action plugin UI</div>
+			<div class="pluginCancel" onclick="globalCommandDispatcher.cancelPluginGUI();">&#xf136;</div>
 		</div>
-		<iframe id="pluginFrame" src="plugins/pluginplaceholder.html"></iframe>
-		<div id="pluginBottom">
-			<!--<div id="pluginDeleteLabel">Delete</div>-->
-			<div id="pluginSetFilter" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf39e;</div>
-			<div id="pluginSetPlay" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf3bc;</div>
-
-			<div id="pluginSetPasstrough" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf1af;</div>
-			<div id="pluginSetSolo" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf166;</div>
-			
-			<div id="pluginSetTitle" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf1c6;</div>
-			<div id="pluginDelete" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf154;</div>
+		<iframe id="pluginActionFrame" class="pluginFrame" src="plugins/pluginplaceholder.html"></iframe>
+	</div>
+	
+	<div id="pluginFilterDiv">
+		<div id="pluginFilterHeader" class='pluginOtherHeader'>
+			<!--<div class="pluginCancel" onclick="globalCommandDispatcher.cancelPluginGUI();">12345678901234567890</div>-->
+			<div id="pluginFilterTitle" class='pluginPromptTitle' onclick="globalCommandDispatcher.filterPluginDialog.promptFilterTitle();">&nbsp;&nbsp;Filter plugin UI</div>
+			<div class="pluginCancel" onclick="globalCommandDispatcher.filterPluginDialog.closeFilterDialogFrame();">&#xf136;</div>
+		</div>
+		<iframe id="pluginFilterFrame" class="pluginFrame" src="plugins/pluginplaceholder.html"></iframe>
+		<div id="pluginFilterBottom" class='pluginBottom'>
+			<div id="pluginFilterSetFilter" class='pluginDoButton' onclick="globalCommandDispatcher.filterPluginDialog.setFilterOn();">&#xf39e;</div>
+			<div id="pluginFilterSetPasstrough" class='pluginDoButton' onclick="globalCommandDispatcher.filterPluginDialog.setFilterPass();">&#xf1af;</div>
+			<div id="pluginFilterDelete" class='pluginDoButton' onclick="globalCommandDispatcher.filterPluginDialog.dropFilter();">&#xf154;</div>
 		</div>
 	</div>
+	
+	<div id="pluginSequencerDiv">
+		<div id="pluginSequencerHeader" class='pluginOtherHeader'>
+			<div id="pluginSequencerTitle">Sequencer plugin UI</div>
+			<div class="pluginCancel" onclick="globalCommandDispatcher.cancelPluginGUI();">&#xf136;</div>
+		</div>
+		<iframe id="pluginSequencerFrame" class="pluginFrame" src="plugins/pluginplaceholder.html"></iframe>
+		<div id="pluginSequencerBottom" class='pluginBottom'>
+			<div id="pluginSequencerSetPlay" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf3bc;</div>
+			<div id="pluginSequencerSetPasstrough" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf1af;</div>
+			<div id="pluginSequencerSetSolo" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf166;</div>
+			<div id="pluginSequencerDelete" class='pluginDoButton' onclick="globalCommandDispatcher.none();">&#xf154;</div>
+		</div>
+	</div>
+	
+	<div id="pluginSamplerDiv">
+		<div id="pluginSamplerHeader" class='pluginOtherHeader'>
+			<!--
+			<div id="pluginSamplerTitle">Sampler plugin UI</div>
+			<div class="pluginCancel" onclick="globalCommandDispatcher.cancelPluginGUI();">&#xf136;</div>
+			-->
+			<div id="pluginSamplerTitle" class='pluginPromptTitle' onclick="globalCommandDispatcher.samplerPluginDialog.promptDrumTitle();">&nbsp;&nbsp;Filter plugin UI</div>
+			<div class="pluginCancel" onclick="globalCommandDispatcher.samplerPluginDialog.closeDrumDialogFrame();">&#xf136;</div>
+		</div>
+		<iframe id="pluginSamplerFrame" class="pluginFrame" src="plugins/pluginplaceholder.html"></iframe>
+		<div id="pluginSamplerBottom" class='pluginBottom'>
+			<div id="pluginSamplerSetPlay" class='pluginDoButton' onclick="globalCommandDispatcher.samplerPluginDialog.setDrumOn();">&#xf3bc;</div>
+			<div id="pluginSamplerSetPasstrough" class='pluginDoButton' onclick="globalCommandDispatcher.samplerPluginDialog.setDrumMute();">&#xf1af;</div>
+			<div id="pluginSamplerSetSolo" class='pluginDoButton' onclick="globalCommandDispatcher.samplerPluginDialog.setDrumSolo();">&#xf166;</div>
+			<div id="pluginSamplerDelete" class='pluginDoButton' onclick="globalCommandDispatcher.samplerPluginDialog.dropDrum();">&#xf154;</div>
+		</div>
+	</div>
+	
 	<div id='pagediv'>
 		<!--
 		<input type="file" id="file_midi_input" accept="audio/midi, audio/x-midi" />
