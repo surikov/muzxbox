@@ -199,6 +199,11 @@ function composeBaseMenu(): MenuInfo[] {
 									globalCommandDispatcher.setThemeColor('light1');
 								}
 							}
+							, {
+								text: 'Light 2', onClick: () => {
+									globalCommandDispatcher.setThemeColor('light2');
+								}
+							}
 						]
 					}
 					, {

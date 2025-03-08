@@ -1,0 +1,20 @@
+:root {
+	--background-color: #fff;
+	--main-color: #900;
+	--drag-color: #6c0;
+	--line-color: #333;
+	--click-color: #f90;
+}
+
+#pagediv {
+
+	background-image: url("bg/rus.png");
+	background-repeat: no-repeat;
+	background-size2: cover;
+	background-position: bottom;
+	background-position-x: left;
+	background-position-y: top;
+	background-color2: red;
+	background-size: 700px;
+}
+

@@ -5,5 +5,10 @@
 	--line-color: #ffc;
 	--click-color: #c39;
 }
-
+#pagediv {
+	background-image: url("bg/neon.png");
+	background-size: cover;
+	background-position-x: center;
+	background-position-y: bottom;
+}
 

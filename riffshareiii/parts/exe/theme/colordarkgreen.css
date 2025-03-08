@@ -6,4 +6,9 @@
 	--click-color: #360;
 
 }
-
+#pagediv {
+	background-image: url("bg/green.png");
+	background-size: cover;
+	background-position-x: center;
+	background-position-y: center;
+}

@@ -1252,6 +1252,9 @@ class CommandDispatcher {
         if (idx == 'light1') {
             cssPath = 'theme/colorlight.css';
         }
+        if (idx == 'light2') {
+            cssPath = 'theme/colorwhite.css';
+        }
         startLoadCSSfile(cssPath);
         this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
         saveText2localStorage('uicolortheme', idx);
@@ -2602,6 +2605,11 @@ function composeBaseMenu() {
                             {
                                 text: 'Light', onClick: () => {
                                     globalCommandDispatcher.setThemeColor('light1');
+                                }
+                            },
+                            {
+                                text: 'Light 2', onClick: () => {
+                                    globalCommandDispatcher.setThemeColor('light2');
                                 }
                             }
                         ]

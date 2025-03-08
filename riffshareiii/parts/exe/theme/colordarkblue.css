@@ -5,5 +5,10 @@
 	--line-color: #9cf;
 	--click-color: #069;
 }
-
+#pagediv {
+	background-image: url("bg/blue.png");
+	background-size: cover;
+	background-position-x: center;
+	background-position-y: center;
+}
 
