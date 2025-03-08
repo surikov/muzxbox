@@ -7,9 +7,11 @@
 }
 
 #pagediv {
-	background-image: url("bg/plant.png");
-	background-size: cover;
-	background-position-x: center;
+	background-image: url("bg/logo.png");
+	background-size2: cover;
+	background-position-x: left;
 	background-position-y: bottom;
+	background-repeat: no-repeat;
+	background-size: 300px;
 }
 

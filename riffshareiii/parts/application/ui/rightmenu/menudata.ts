@@ -178,15 +178,15 @@ function composeBaseMenu(): MenuInfo[] {
 					}, {
 						text: 'Colors', children: [
 							{
-								text: 'Red', onClick: () => {
+								text: 'Minium', onClick: () => {
 									globalCommandDispatcher.setThemeColor('red1');//'theme/colordarkred.css');
 								}
 							}, {
-								text: 'Green', onClick: () => {
+								text: 'Emerald', onClick: () => {
 									globalCommandDispatcher.setThemeColor('green1');//'theme/colordarkgreen.css');
 								}
 							}, {
-								text: 'Blue', onClick: () => {
+								text: 'Deep', onClick: () => {
 									globalCommandDispatcher.setThemeColor('blue1');//'theme/colordarkblue.css');
 								}
 							}, {
@@ -195,12 +195,12 @@ function composeBaseMenu(): MenuInfo[] {
 								}
 							}
 							, {
-								text: 'Light', onClick: () => {
+								text: 'Gjel', onClick: () => {
 									globalCommandDispatcher.setThemeColor('light1');
 								}
 							}
 							, {
-								text: 'Light 2', onClick: () => {
+								text: 'Vorot', onClick: () => {
 									globalCommandDispatcher.setThemeColor('light2');
 								}
 							}
