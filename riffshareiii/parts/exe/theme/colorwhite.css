@@ -2,8 +2,8 @@
 	--background-color: #fff;
 	--main-color: #900;
 	--drag-color: #6c0;
-	--line-color: #333;
-	--click-color: #f90;
+	--line-color: #433;
+	--click-color: #fc0;
 }
 
 #pagediv {
@@ -15,6 +15,6 @@
 	background-position-x: left;
 	background-position-y: top;
 	background-color2: red;
-	background-size: 700px;
+	background-size: auto 33%;
 }
 

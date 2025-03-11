@@ -12,6 +12,6 @@
 	background-position-x: left;
 	background-position-y: bottom;
 	background-repeat: no-repeat;
-	background-size: 300px;
+	background-size: auto 100%;
 }
 
