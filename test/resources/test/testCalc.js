@@ -1092,14 +1092,25 @@ function testTest2() {
                 }
             }
             //sumtext = sumtext + '=' + cnt;
-            sumtext = sumtext + (ii_4 - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ')'
-                + cntExists + '/' + countCurHeigth + '=' + Math.round((cntExists / ballsInRow) / (countCurHeigth / rowLen) * 100) / 100;
+            //sumtext = sumtext +  (ii - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ')'
+            //	+ cntExists + '/' + countCurHeigth + '=' + Math.round((cntExists / ballsInRow) / (countCurHeigth / rowLen) * 100) / 100;
+            var verCount = Math.round(100 * veroyat1 * countCurHeigth) / 100;
+            //let exstsVero=(Math.round(100 * cntExists/countCurHeigth) / 100);
+            var verCountDiff = Math.round(100 * (1 - cntExists / verCount));
+            var verCountDiffTxt = '-' + verCountDiff;
+            if (verCountDiff < 0) {
+                verCountDiffTxt = '+' + (-verCountDiff);
+            }
+            sumtext = sumtext + '[' + (ii_4 - 1) + ']' + countCurHeigth
+                + ' ' + verCount + '/' + cntExists
+                + ' ' + verCountDiffTxt + '%';
         }
         else {
-            sumtext = sumtext + (ii_4 - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ')'
-                + countCurHeigth;
+            //sumtext = sumtext +  (ii - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ')'
+            //	+ countCurHeigth;
+            sumtext = sumtext + (ii_4 - 1) + ':' + countCurHeigth + '=' + Math.round(100 * veroyat1 * countCurHeigth) / 100;
         }
-        sumtext = sumtext + ' | ';
+        sumtext = sumtext + ' ';
     }
     //console.log(statsum);
     //console.log(sumar, lastfirst);
