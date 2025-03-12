@@ -312,7 +312,8 @@ class RightMenuPanel {
 				item.onClick = () => {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
 					if (info) {
-						globalCommandDispatcher.promptPluginSequencerDialog(track, info);
+						//globalCommandDispatcher.promptPluginSequencerDialog(track, info);
+						globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(tt, track, info);
 						/*
 						let url = info.ui;
 						globalCommandDispatcher.promptPluginPointDialog(track.title, url, track.performer.data, (obj: any) => {

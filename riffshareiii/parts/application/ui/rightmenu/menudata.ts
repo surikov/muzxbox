@@ -82,7 +82,8 @@ function fillPluginsLists() {
 		if (purpose == 'Action') {
 			menuPointActions.children.push({
 				text: label, noLocalization: true, onClick: () => {
-					globalCommandDispatcher.promptActionPluginDialog(MZXBX_currentPlugins()[ii]);
+					//globalCommandDispatcher.promptActionPluginDialog(MZXBX_currentPlugins()[ii]);
+					globalCommandDispatcher.actionPluginDialog.openActionPluginDialogFrame(MZXBX_currentPlugins()[ii]);
 					/*globalCommandDispatcher.promptActionPluginDialog(label, url, (obj: Zvoog_Project) => {
 						let project: Zvoog_Project = obj;
 						globalCommandDispatcher.registerWorkProject(project);

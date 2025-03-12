@@ -794,6 +794,233 @@ class SamplerPluginDialog {
         }
     }
 }
+class ActionPluginDialog {
+    constructor() {
+        this.waitActionPluginInit = false;
+        this.dialogID = '?';
+        window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
+    }
+    sendNewIdToPlugin() {
+        let pluginFrame = document.getElementById("pluginActionFrame");
+        if (pluginFrame) {
+            this.dialogID = '' + Math.random();
+            let message = { hostData: this.dialogID };
+            pluginFrame.contentWindow.postMessage(message, '*');
+        }
+    }
+    sendCurrentProjectToActionPlugin() {
+        let pluginFrame = document.getElementById("pluginActionFrame");
+        if (pluginFrame) {
+            let message = { hostData: globalCommandDispatcher.cfg().data };
+            pluginFrame.contentWindow.postMessage(message, '*');
+        }
+    }
+    receiveMessageFromPlugin(event) {
+        if (!(event.data)) {
+        }
+        else {
+            let message = event.data;
+            if (message.dialogID) {
+                if (message.dialogID == this.dialogID) {
+                    let me = this;
+                    console.log('waitProjectCallback');
+                    globalCommandDispatcher.exe.commitProjectChanges([], () => {
+                        let project = message.pluginData;
+                        globalCommandDispatcher.registerWorkProject(project);
+                        globalCommandDispatcher.resetProject();
+                    });
+                    if (message.done) {
+                        me.closeActionDialogFrame();
+                    }
+                }
+                else {
+                }
+            }
+            else {
+                if (this.waitActionPluginInit) {
+                    this.waitActionPluginInit = false;
+                    this.sendNewIdToPlugin();
+                    this.sendCurrentProjectToActionPlugin();
+                }
+                else {
+                }
+            }
+        }
+    }
+    openActionPluginDialogFrame(info) {
+        this.pluginInfo = info;
+        this.resetActionTitle();
+        let pluginFrame = document.getElementById("pluginActionFrame");
+        let pluginDiv = document.getElementById("pluginActionDiv");
+        if (pluginFrame) {
+            if (pluginFrame.contentWindow) {
+                this.waitActionPluginInit = true;
+                pluginFrame.src = this.pluginInfo.ui;
+                pluginDiv.style.visibility = "visible";
+            }
+        }
+    }
+    closeActionDialogFrame() {
+        let pluginDiv = document.getElementById("pluginActionDiv");
+        if (pluginDiv) {
+            pluginDiv.style.visibility = "hidden";
+        }
+        let pluginFrame = document.getElementById("pluginActionFrame");
+        if (pluginFrame) {
+            pluginFrame.src = "plugins/pluginplaceholder.html";
+        }
+    }
+    resetActionTitle() {
+        let pluginTitle = document.getElementById("pluginActionTitle");
+        pluginTitle.innerHTML = '&nbsp;&nbsp;' + this.pluginInfo.label;
+    }
+}
+class SequencerPluginDialog {
+    constructor() {
+        this.dialogID = '?';
+        this.waitSequencerPluginInit = false;
+        window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
+    }
+    promptSequencerTitle() {
+        let newTitle = prompt(this.track.title, this.track.title);
+        if (newTitle == this.track.title) {
+        }
+        else {
+            if (newTitle != null) {
+                globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
+                    if (newTitle) {
+                        this.track.title = newTitle;
+                    }
+                    ;
+                });
+                this.resetSequencerTitle();
+            }
+        }
+    }
+    resetSequencerTitle() {
+        let pluginTitle = document.getElementById("pluginSequencerTitle");
+        pluginTitle.innerHTML = '&nbsp;&nbsp;' + this.track.title;
+    }
+    resetStateButtons() {
+        if (this.track.performer.state == 1) {
+            document.getElementById("pluginSequencerSetPlay").className = 'pluginDoButton';
+            document.getElementById("pluginSequencerSetPasstrough").className = 'pluginNoneButton';
+            document.getElementById("pluginSequencerSetSolo").className = 'pluginDoButton';
+        }
+        else {
+            if (this.track.performer.state == 2) {
+                document.getElementById("pluginSequencerSetPlay").className = 'pluginDoButton';
+                document.getElementById("pluginSequencerSetPasstrough").className = 'pluginDoButton';
+                document.getElementById("pluginSequencerSetSolo").className = 'pluginNoneButton';
+            }
+            else {
+                document.getElementById("pluginSequencerSetPlay").className = 'pluginNoneButton';
+                document.getElementById("pluginSequencerSetPasstrough").className = 'pluginDoButton';
+                document.getElementById("pluginSequencerSetSolo").className = 'pluginDoButton';
+            }
+        }
+    }
+    setSequencerOn() {
+        globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
+            this.track.performer.state = 0;
+        });
+        this.resetStateButtons();
+        globalCommandDispatcher.reConnectPluginsIfPlay();
+    }
+    setSequencerMute() {
+        globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
+            this.track.performer.state = 1;
+        });
+        this.resetStateButtons();
+        globalCommandDispatcher.reConnectPluginsIfPlay();
+    }
+    setSequencerSolo() {
+        globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
+            this.track.performer.state = 2;
+        });
+        this.resetStateButtons();
+        globalCommandDispatcher.reConnectPluginsIfPlay();
+    }
+    dropSequencer() {
+        globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+            globalCommandDispatcher.cfg().data.tracks.splice(this.order, 1);
+        });
+        this.closeSequencerDialogFrame();
+        globalCommandDispatcher.reConnectPluginsIfPlay();
+    }
+    openSequencerPluginDialogFrame(order, track, trackPlugin) {
+        console.log('openSequencerPluginDialogFrame', order, track, trackPlugin);
+        this.track = track;
+        this.order = order;
+        this.pluginRawData = track.performer.data;
+        this.resetSequencerTitle();
+        let pluginFrame = document.getElementById("pluginSequencerFrame");
+        let pluginDiv = document.getElementById("pluginSequencerDiv");
+        if (pluginFrame) {
+            if (pluginFrame.contentWindow) {
+                this.waitSequencerPluginInit = true;
+                pluginFrame.src = trackPlugin.ui;
+                pluginDiv.style.visibility = "visible";
+                this.resetStateButtons();
+            }
+        }
+    }
+    closeSequencerDialogFrame() {
+        let pluginDiv = document.getElementById("pluginSequencerDiv");
+        if (pluginDiv) {
+            pluginDiv.style.visibility = "hidden";
+        }
+        let pluginFrame = document.getElementById("pluginSequencerFrame");
+        if (pluginFrame) {
+            pluginFrame.src = "plugins/pluginplaceholder.html";
+        }
+    }
+    sendNewIdToPlugin() {
+        let pluginFrame = document.getElementById("pluginSequencerFrame");
+        if (pluginFrame) {
+            this.dialogID = '' + Math.random();
+            let message = { hostData: this.dialogID };
+            pluginFrame.contentWindow.postMessage(message, '*');
+        }
+    }
+    sendPointToPlugin() {
+        let pluginFrame = document.getElementById("pluginSequencerFrame");
+        if (pluginFrame) {
+            let message = { hostData: this.pluginRawData };
+            pluginFrame.contentWindow.postMessage(message, '*');
+        }
+    }
+    setSequencerValue() {
+        globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
+            this.track.performer.data = this.pluginRawData;
+        });
+        globalCommandDispatcher.reStartPlayIfPlay();
+    }
+    receiveMessageFromPlugin(event) {
+        if (!(event.data)) {
+        }
+        else {
+            let message = event.data;
+            if (message.dialogID) {
+                if (message.dialogID == this.dialogID) {
+                    this.pluginRawData = message.pluginData;
+                    this.setSequencerValue();
+                }
+                else {
+                }
+            }
+            else {
+                if (this.waitSequencerPluginInit) {
+                    this.waitSequencerPluginInit = false;
+                    this.sendNewIdToPlugin();
+                    this.sendPointToPlugin();
+                }
+                else {
+                }
+            }
+        }
+    }
+}
 class CommandExe {
     constructor() {
         this.lockUndoRedo = false;
@@ -947,6 +1174,8 @@ class CommandDispatcher {
         this.redoQueue = [];
         this.filterPluginDialog = new FilterPluginDialog();
         this.samplerPluginDialog = new SamplerPluginDialog();
+        this.actionPluginDialog = new ActionPluginDialog();
+        this.sequencerPluginDialog = new SequencerPluginDialog();
     }
     cfg() {
         return this._mixerDataMathUtility;
@@ -1278,10 +1507,6 @@ class CommandDispatcher {
             console.log('resetProject', xx);
             console.log('data', this.cfg().data);
         }
-    }
-    promptActionPluginDialog(actionPlugin) {
-    }
-    promptPluginSequencerDialog(track, performerPlugin) {
     }
     findPluginRegistrationByKind(kind) {
         let list = MZXBX_currentPlugins();
@@ -2161,7 +2386,7 @@ class RightMenuPanel {
                 item.onClick = () => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
                     if (info) {
-                        globalCommandDispatcher.promptPluginSequencerDialog(track, info);
+                        globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(tt, track, info);
                     }
                 };
                 item.highlight = icon_sliders;
@@ -2505,7 +2730,7 @@ function fillPluginsLists() {
         if (purpose == 'Action') {
             menuPointActions.children.push({
                 text: label, noLocalization: true, onClick: () => {
-                    globalCommandDispatcher.promptActionPluginDialog(MZXBX_currentPlugins()[ii]);
+                    globalCommandDispatcher.actionPluginDialog.openActionPluginDialogFrame(MZXBX_currentPlugins()[ii]);
                 }
             });
         }
@@ -3702,7 +3927,7 @@ class PerformerIcon {
                 activation: (x, y) => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
                     if (info) {
-                        globalCommandDispatcher.promptPluginSequencerDialog(track, info);
+                        globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(trackNo, track, info);
                     }
                 }
             };

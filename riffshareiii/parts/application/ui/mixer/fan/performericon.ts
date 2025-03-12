@@ -142,7 +142,7 @@ class PerformerIcon {
 								globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup
 									, fanLevelAnchor
 									, LevelModes.normal);
-							}else{
+							} else {
 								//globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(dragAnchor);
 								if (needReset) {
 									globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
@@ -153,7 +153,7 @@ class PerformerIcon {
 							}
 						}
 					}
-					
+
 				}
 			}
 			rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
@@ -178,7 +178,8 @@ class PerformerIcon {
 					//console.log('' + track.performer.kind + ':' + track.performer.id);
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
 					if (info) {
-						globalCommandDispatcher.promptPluginSequencerDialog(track, info);
+						//globalCommandDispatcher.promptPluginSequencerDialog(track, info);
+						globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(trackNo, track, info);
 						/*let url = info.ui;
 						globalCommandDispatcher.promptPluginPointDialog(track.title, url, track.performer.data, (obj: any) => {
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks', trackNo, 'performer'], () => {
@@ -205,12 +206,12 @@ class PerformerIcon {
 			};
 			dragAnchor.content.push(btn);
 		}
-		if (zidx <=5){//} globalCommandDispatcher.cfg().zoomEditSLess) {
+		if (zidx <= 5) {//} globalCommandDispatcher.cfg().zoomEditSLess) {
 			let txt: TileText = {
 				text: track.title //+ ': ' + track.volume + ': ' + track.performer.kind + ': ' + track.performer.id
-				, x: xx- sz * 0.45
-				, y: yy- sz * 0.1
-				, css: 'fanIconLabel fanIconLabelSize'+zidx
+				, x: xx - sz * 0.45
+				, y: yy - sz * 0.1
+				, css: 'fanIconLabel fanIconLabelSize' + zidx
 			};
 			dragAnchor.content.push(txt);
 

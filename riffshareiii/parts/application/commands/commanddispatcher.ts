@@ -25,6 +25,8 @@ class CommandDispatcher {
 	redoQueue: Zvoog_UICommand[] = [];
 	filterPluginDialog = new FilterPluginDialog();
 	samplerPluginDialog = new SamplerPluginDialog();
+	actionPluginDialog=new ActionPluginDialog();
+	sequencerPluginDialog=new SequencerPluginDialog();
 	cfg(): MixerDataMathUtility {
 		return this._mixerDataMathUtility;
 	}
@@ -467,13 +469,13 @@ class CommandDispatcher {
 	setDrumSoloState(state: number) {
 		console.log('setDrumSoloState', state);
 	}*/
-	promptActionPluginDialog(actionPlugin: MZXBX_PluginRegistrationInformation) {
+	//promptActionPluginDialog(actionPlugin: MZXBX_PluginRegistrationInformation) {
 		//console.log('promptProjectPluginGUI', url);
 		//pluginDialogPrompt.openActionPluginDialogFrame(actionPlugin);
-	}
-	promptPluginSequencerDialog(track: Zvoog_MusicTrack, performerPlugin: MZXBX_PluginRegistrationInformation) {
+	//}
+	//promptPluginSequencerDialog(track: Zvoog_MusicTrack, performerPlugin: MZXBX_PluginRegistrationInformation) {
 		//pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction, titleAction);
-	}
+	//}
 	//promptPluginSamplerDialog(drum: Zvoog_PercussionTrack, samplerPlugin: MZXBX_PluginRegistrationInformation) {
 		//pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction, titleAction);
 	//}

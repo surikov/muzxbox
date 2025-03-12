@@ -31,6 +31,8 @@
 		,"ui/pluginprompt/plugindialog.ts"
 		,"ui/pluginprompt/filterPluginDialog.ts"
 		,"ui/pluginprompt/samplerPluginDialog.ts"
+		,"ui/pluginprompt/actionPluginDialog.ts"
+		,"ui/pluginprompt/sequencerPluginDialog.ts"
 
 		,"commands/execommand.ts"
         ,"commands/commanddispatcher.ts"

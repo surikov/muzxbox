@@ -90,6 +90,39 @@ declare class SamplerPluginDialog {
     setFilterValue(): void;
     receiveMessageFromPlugin(event: any): void;
 }
+declare class ActionPluginDialog {
+    pluginInfo: MZXBX_PluginRegistrationInformation;
+    waitActionPluginInit: boolean;
+    dialogID: string;
+    constructor();
+    sendNewIdToPlugin(): void;
+    sendCurrentProjectToActionPlugin(): void;
+    receiveMessageFromPlugin(event: any): void;
+    openActionPluginDialogFrame(info: MZXBX_PluginRegistrationInformation): void;
+    closeActionDialogFrame(): void;
+    resetActionTitle(): void;
+}
+declare class SequencerPluginDialog {
+    track: Zvoog_MusicTrack;
+    order: number;
+    pluginRawData: string;
+    dialogID: string;
+    waitSequencerPluginInit: boolean;
+    constructor();
+    promptSequencerTitle(): void;
+    resetSequencerTitle(): void;
+    resetStateButtons(): void;
+    setSequencerOn(): void;
+    setSequencerMute(): void;
+    setSequencerSolo(): void;
+    dropSequencer(): void;
+    openSequencerPluginDialogFrame(order: number, track: Zvoog_MusicTrack, trackPlugin: MZXBX_PluginRegistrationInformation): void;
+    closeSequencerDialogFrame(): void;
+    sendNewIdToPlugin(): void;
+    sendPointToPlugin(): void;
+    setSequencerValue(): void;
+    receiveMessageFromPlugin(event: any): void;
+}
 declare class CommandExe {
     lockUndoRedo: boolean;
     setCurPosition(xyz: TileZoom): void;
@@ -118,6 +151,8 @@ declare class CommandDispatcher {
     redoQueue: Zvoog_UICommand[];
     filterPluginDialog: FilterPluginDialog;
     samplerPluginDialog: SamplerPluginDialog;
+    actionPluginDialog: ActionPluginDialog;
+    sequencerPluginDialog: SequencerPluginDialog;
     cfg(): MixerDataMathUtility;
     undo(): Zvoog_UICommand[];
     redo(): Zvoog_UICommand[];
@@ -142,8 +177,6 @@ declare class CommandDispatcher {
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     changeTapSize(ratio: number): void;
     resetProject(): void;
-    promptActionPluginDialog(actionPlugin: MZXBX_PluginRegistrationInformation): void;
-    promptPluginSequencerDialog(track: Zvoog_MusicTrack, performerPlugin: MZXBX_PluginRegistrationInformation): void;
     findPluginRegistrationByKind(kind: String): null | MZXBX_PluginRegistrationInformation;
     timeSelectChange(idx: number): void;
     playFromTimeSelection(idx: number): void;
