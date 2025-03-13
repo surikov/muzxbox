@@ -40,7 +40,7 @@ export function convertToUint8Array(data: string | null, forceEven?: boolean) {
 export function convertFromUint8Array(data: Uint8Array) {
     // There might be an odd number of digits
     const length = Math.floor(data.byteLength / 2);
-    const arr = [];
+    const arr:string[] = [];
 
     for (let i = 0; i < length; i++) {
         arr.push(String.fromCharCode(data[i * 2] * 256 + data[i * 2 + 1]));

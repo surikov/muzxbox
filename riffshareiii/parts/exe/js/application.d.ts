@@ -28,6 +28,8 @@ declare class StateDiff {
 declare function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player;
 declare function createTileLevel(): TileLevelBase;
 declare function startApplication(): void;
+declare function squashString(data: string): string;
+declare function resolveString(data: string): string | null;
 declare function saveProjectState(): void;
 declare function initWebAudioFromUI(): void;
 declare function startLoadCSSfile(cssurl: string): void;
@@ -608,13 +610,14 @@ declare class WarningUI {
     warningInfo4: TileImage;
     warningTitle: TileText;
     warningDescription: TileText;
+    warningSmallText: TileText;
     onCancel: null | (() => void);
     cancel(): void;
     initDialogUI(): void;
     resetDialogView(data: Zvoog_Project): void;
     resizeDialog(ww: number, hh: number, resetWarningAnchor: () => void): void;
     allLayers(): TileLayerDefinition[];
-    showWarning(title: string, msg: string, onCancel: null | (() => void)): void;
+    showWarning(title: string, msg: string, smallMsg: string, onCancel: null | (() => void)): void;
     hideWarning(): void;
 }
 declare function saveText2localStorage(name: string, text: string): void;
@@ -691,6 +694,28 @@ declare type PackedProject = {
     bars: PackedBar[];
 };
 declare function testNumMathUtil(): void;
+declare type Dictionary = Record<string, number>;
+declare type PendingDictionary = Record<string, true>;
+declare type DictionaryCollection = Record<string, Dictionary>;
+interface DecompressionTracker {
+    val: number;
+    position: number;
+    index: number;
+}
+declare class LZUtil {
+    keyStrBase64: string;
+    keyStrUriSafe: string;
+    baseReverseDic: DictionaryCollection;
+    getBaseValue(alphabet: string, character: string): number;
+    _compress(uncompressed: string | null, bitsPerChar: number, getCharFromInt: (a: number) => string): string;
+    _decompress(length: number, resetValue: number, getNextValue: (a: number) => number): string | null | undefined;
+    compressToBase64(input: string | null): string;
+    decompressFromBase64(input: string | null): string | null | undefined;
+    compressToEncodedURIComponent(input: string | null): string;
+    decompressFromEncodedURIComponent(input: string | null): string | null | undefined;
+    compressToUTF16(input: string | null): string;
+    decompressFromUTF16(compressed: string | null): string | null | undefined;
+}
 declare type TileZoom = {
     x: number;
     y: number;

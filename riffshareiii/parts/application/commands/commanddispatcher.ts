@@ -338,7 +338,7 @@ class CommandDispatcher {
 		if (result != null) {
 			//this.onAir = false;
 			//this.neeToStart = false;
-			me.renderer.warning.showWarning('Start playing', result, null);
+			me.renderer.warning.showWarning('Start playing', result, 'Loading...',null);
 		} else {
 			//this.renderer.menu.rerenderMenuContent()
 		}
@@ -352,7 +352,7 @@ class CommandDispatcher {
 		if (msg) {
 			//me.onAir = false;
 			//console.log('toggleStartStop cancel', msg);
-			me.renderer.warning.showWarning('Start playing', 'Wait for ' + msg, () => {
+			me.renderer.warning.showWarning('Start playing', 'Loading...','Wait for ' + msg,() => {
 				console.log('cancel wait spart loop');
 				//me.neeToStart = false;
 				//me.onAir = false;

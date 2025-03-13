@@ -73,6 +73,7 @@
         ,"data/musicmetremath.ts"
         ,"data/mixerdatamath.ts"
         ,"data/numathutil.ts"
+		,"data/lzutil.ts"
 		
         ,"../tilelevelapi/apitilelevel.ts"
         ,"../../parts/mzxbxapi/musicenginetypes.ts"

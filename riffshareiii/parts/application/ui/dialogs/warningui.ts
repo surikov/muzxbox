@@ -12,6 +12,7 @@ class WarningUI {
 
 	warningTitle: TileText;
 	warningDescription: TileText;
+	warningSmallText: TileText;
 
 	onCancel: null | (() => void);
 
@@ -32,7 +33,8 @@ class WarningUI {
 
 
 		this.warningTitle = { x: 0, y: 0, text: 'Play', css: 'warningTitle' };
-		this.warningDescription = { x: 0, y: 0, text: 'Use mouse or touchpad to move and zoom piano roll', css: 'warningDescription' };
+		this.warningDescription = { x: 0, y: 0, text: 'Controls:', css: 'warningDescription' };
+		this.warningSmallText= { x: 0, y: 0, text: 'Use mouse or touchpad to move and zoom piano roll', css: 'warningSmallText' };
 		this.warningGroup = (document.getElementById("warningDialogGroup") as any) as SVGElement;
 		this.warningRectangle = {
 			x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: () => {
@@ -46,7 +48,10 @@ class WarningUI {
 			id: 'warningAnchor', xx: 0, yy: 0, ww: 1, hh: 1
 			, showZoom: zoomPrefixLevelsCSS[0].minZoom
 			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1
-			, content: [this.warningRectangle, this.warningIcon, this.warningTitle, this.warningDescription
+			, content: [this.warningRectangle, this.warningIcon
+				, this.warningTitle
+				, this.warningDescription
+				, this.warningSmallText
 				, this.warningInfo1, this.warningInfo2, this.warningInfo3, this.warningInfo4
 			]
 		};
@@ -68,6 +73,10 @@ class WarningUI {
 		this.warningTitle.y = hh / 3 + 1.5;
 		this.warningDescription.x = ww / 2;
 		this.warningDescription.y = hh / 3 + 2.5;
+
+		this.warningSmallText.x = ww / 2;
+		this.warningSmallText.y = hh / 3 + 2.5+0.5;
+
 		//console.log('debugLayer',this.debugLayer);
 		this.warningInfo1.x = ww / 2 - 3;
 		this.warningInfo1.y = hh - 1.5;
@@ -82,11 +91,12 @@ class WarningUI {
 	allLayers(): TileLayerDefinition[] {
 		return [this.warningLayer];
 	}
-	showWarning(title: string, msg: string, onCancel: null | (() => void)) {
+	showWarning(title: string, msg: string, smallMsg:string,onCancel: null | (() => void)) {
 		//console.log('WarningUI show', title, msg);
 		this.onCancel = onCancel;
 		this.warningTitle.text = title;
 		this.warningDescription.text = msg;
+		this.warningSmallText.text = smallMsg;
 		globalCommandDispatcher.renderer.tiler.resetAnchor(this.warningGroup, this.warningAnchor, LevelModes.overlay);
 		(document.getElementById("warningDialogGroup") as any).style.visibility = "visible";
 	}

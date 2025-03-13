@@ -46,6 +46,12 @@ function startApplication() {
 		globalCommandDispatcher.setThemeColor(themei);
 	}
 }
+function squashString(data: string): string {
+	return data;
+}
+function resolveString(data: string): string | null {
+	return data;
+}
 function saveProjectState() {
 	//https://github.com/pieroxy/lz-string
 	globalCommandDispatcher.exe.cutLongUndo();

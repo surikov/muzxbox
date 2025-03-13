@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: MIT
  */
-
+/*
 import { _compress } from "./_compress";
 import { _decompress } from "./_decompress";
 import { compressToBase64, decompressFromBase64 } from "./base64";
@@ -39,3 +39,5 @@ export default {
     //loadBinaryFile,
     //saveBinaryFile,
 };
+*/
+console.log('test lz');

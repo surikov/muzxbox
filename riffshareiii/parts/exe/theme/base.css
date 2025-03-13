@@ -256,6 +256,15 @@ body {
 	fill: var(--line-color);
 	text-anchor: middle;
 	pointer-events: none;
+	width2:50%;
+}
+.warningSmallText {
+	font-size222: calc(0.33*var(--tapSize));
+	font-size: var(--label-025cm);
+	fill: var(--line-color);
+	text-anchor: middle;
+	pointer-events: none;
+	width2:50%;
 }
 
 .warningInfoIcon {
