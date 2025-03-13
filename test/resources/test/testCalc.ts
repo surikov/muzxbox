@@ -1229,9 +1229,9 @@ function testTest2() {
 			if(verCountDiff<0){
 				verCountDiffTxt='+'+(-verCountDiff);
 			}
-			sumtext = sumtext + '['+ (ii - 1) + ']' + countCurHeigth
-				+' '+ verCount  +'/'+cntExists
-				+' '+verCountDiffTxt+'%';
+			sumtext = sumtext + '\n['+ (ii - 1) + ']' + countCurHeigth
+				+' \t'+ verCount  +'/'+cntExists
+				+' \t'+verCountDiffTxt+'%';
 		} else {
 			//sumtext = sumtext +  (ii - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ')'
 			//	+ countCurHeigth;
