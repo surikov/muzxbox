@@ -37,7 +37,10 @@ class TextCommentsBar {
 				, w: barOctaveAnchor.ww
 				, h: globalCommandDispatcher.cfg().commentsMaxHeight()
 				, css: 'commentPaneForClick'
-				, activation: (x: number, y: number) => { this.cellClick(x, y, zIndex, barIdx); }
+				//, rx: barOctaveAnchor.ww/2
+				//, ry: globalCommandDispatcher.cfg().commentsMaxHeight()/2
+				//, css: 'debug'//'commentPaneForClick'
+				, activation: (x: number, y: number) => { this.textCellClick(x, y, zIndex, barIdx); }
 			};
 			barOctaveAnchor.content.push(interpane);
 		}
@@ -53,7 +56,7 @@ class TextCommentsBar {
 			}
 		}
 	}
-	cellClick(x: number, y: number, zz: number, idx: number) {
+	textCellClick(x: number, y: number, zz: number, idx: number) {
 		let row = 0;
 		for (let tt = 0; tt <= globalCommandDispatcher.cfg().maxCommentRowCount; tt++) {
 			let nextY = globalCommandDispatcher.cfg().commentsZoomLineY(zz, tt);
@@ -62,7 +65,7 @@ class TextCommentsBar {
 			}
 			row++;
 		}
-		let info = globalCommandDispatcher.cfg().gridClickInfo(idx, x, zz);
+		let info:BarStepStartEnd = globalCommandDispatcher.cfg().gridClickInfo(idx, x, zz);
 		this.testBars();
 		let commentBar = globalCommandDispatcher.cfg().data.comments[idx];
 		let first = this.getFirstCommentText(commentBar, row, info);

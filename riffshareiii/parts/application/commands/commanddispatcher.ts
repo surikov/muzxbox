@@ -24,6 +24,7 @@ class CommandDispatcher {
 	undoQueue: Zvoog_UICommand[] = [];
 	redoQueue: Zvoog_UICommand[] = [];
 	filterPluginDialog = new FilterPluginDialog();
+	pointPluginDialog = new PointPluginDialog();
 	samplerPluginDialog = new SamplerPluginDialog();
 	actionPluginDialog=new ActionPluginDialog();
 	sequencerPluginDialog=new SequencerPluginDialog();

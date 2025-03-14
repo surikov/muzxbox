@@ -30,7 +30,7 @@ class Projectr {
 		}
 		for (let ii = 0; ii < midiSongData.lyrics.length; ii++) {
 			let textpoint = midiSongData.lyrics[ii];
-			let pnt = findMeasureSkipByTime(textpoint.ms / 1000, project.timeline);
+			let pnt = findMeasureSkipByTime('lyrics', textpoint.ms / 1000, project.timeline);
 			if (pnt) {
 				//console.log(pnt.skip, textpoint.ms, textpoint.txt);
 				this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
@@ -59,7 +59,7 @@ class Projectr {
 				for (let vv = 0; vv < midiSongTrack.trackVolumes.length; vv++) {
 					let gain = midiSongTrack.trackVolumes[vv];
 					let vol = '' + Math.round(gain.value * 100) + '%';
-					let pnt = findMeasureSkipByTime(gain.ms / 1000, project.timeline);
+					let pnt = findMeasureSkipByTime('v' + ii, gain.ms / 1000, project.timeline);
 
 					//
 					if (pnt) {
@@ -129,6 +129,7 @@ class Projectr {
 				}
 			}
 		}
+
 
 
 
@@ -456,7 +457,7 @@ class Projectr {
 			project.percussions[project.percussions.length - ii - 1].sampler.iconPosition.y = hh - ii * 6;
 		}
 		for (let ii = 0; ii < project.filters.length - 2; ii++) {
-			project.filters[ii].iconPosition.x = 50 + project.tracks.length * 4 + project.percussions.length * 8  + ii * 8;
+			project.filters[ii].iconPosition.x = 50 + project.tracks.length * 4 + project.percussions.length * 8 + ii * 8;
 			project.filters[ii].iconPosition.y = ii * 6;
 		}
 
@@ -517,6 +518,26 @@ class Projectr {
 						sampleTrack.measures[bb + 1].skips.push(newSkip);
 						sampleTrack.measures[bb].skips.splice(mp, 1);
 						mp--;
+					}
+				}
+			}
+		}
+
+		for (let mm = project.timeline.length - 1; mm > 0; mm--) {
+			for (let ff = 0; ff < project.filters.length; ff++) {
+				let filter = project.filters[ff].automation;
+				let cuAuto = filter[mm];
+				let preAUto = filter[mm - 1];
+				let preMetre = MMUtil().set(project.timeline[mm].metre);
+				for (let cc = 0; cc < preAUto.changes.length; cc++) {
+					let change = preAUto.changes[cc];
+					if (preMetre.more(change.skip)) {
+						//
+					} else {
+						preAUto.changes.splice(cc, 1);
+						cc--;
+						change.skip = MMUtil().set(change.skip).minus(preMetre);
+						cuAuto.changes.push(change);
 					}
 				}
 			}

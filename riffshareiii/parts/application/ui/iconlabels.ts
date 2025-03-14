@@ -3,7 +3,7 @@
 let icon_play='&#xf3aa;';
 let icon_pause='&#xf3a7;';
 let icon_hor_menu='&#xf19c;';
-let icon_ver_menu='&#xf19b;';
+let icon_ver_menu='&#xf247;';
 let icon_closemenu='&#xf1ea;';
 
 let icon_closedbranch='&#xf2f6;';
@@ -19,6 +19,8 @@ let icon_moveleft='&#xf2fa;';
 let icon_moveright='&#xf2fb;';
 let icon_warningPlay='&#xf2f5;'
 let icon_gear='&#xf1c6;';
+
+//let icon_list='&#xf247;';
 
 let icon_sound_low='&#xf3ba;';
 let icon_sound_middle='&#xf3b9;';

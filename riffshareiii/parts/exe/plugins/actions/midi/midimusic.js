@@ -889,7 +889,7 @@ function drumTitles() {
 function round1000(nn) {
     return Math.round(1000 * nn) / 1000;
 }
-function findMeasureSkipByTime(time, measures) {
+function findMeasureSkipByTime(cmnt, time, measures) {
     let curTime = 0;
     let mm = MMUtil();
     for (let ii = 0; ii < measures.length; ii++) {
@@ -1258,7 +1258,7 @@ class Projectr {
         }
         for (let ii = 0; ii < midiSongData.lyrics.length; ii++) {
             let textpoint = midiSongData.lyrics[ii];
-            let pnt = findMeasureSkipByTime(textpoint.ms / 1000, project.timeline);
+            let pnt = findMeasureSkipByTime('lyrics', textpoint.ms / 1000, project.timeline);
             if (pnt) {
                 this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
             }
@@ -1285,7 +1285,7 @@ class Projectr {
                 for (let vv = 0; vv < midiSongTrack.trackVolumes.length; vv++) {
                     let gain = midiSongTrack.trackVolumes[vv];
                     let vol = '' + Math.round(gain.value * 100) + '%';
-                    let pnt = findMeasureSkipByTime(gain.ms / 1000, project.timeline);
+                    let pnt = findMeasureSkipByTime('v' + ii, gain.ms / 1000, project.timeline);
                     if (pnt) {
                         pnt.skip = MMUtil().set(pnt.skip).strip(16);
                         for (let aa = 0; aa < filterVolume.automation[pnt.idx].changes.length; aa++) {
@@ -1645,6 +1645,25 @@ class Projectr {
                         sampleTrack.measures[bb + 1].skips.push(newSkip);
                         sampleTrack.measures[bb].skips.splice(mp, 1);
                         mp--;
+                    }
+                }
+            }
+        }
+        for (let mm = project.timeline.length - 1; mm > 0; mm--) {
+            for (let ff = 0; ff < project.filters.length; ff++) {
+                let filter = project.filters[ff].automation;
+                let cuAuto = filter[mm];
+                let preAUto = filter[mm - 1];
+                let preMetre = MMUtil().set(project.timeline[mm].metre);
+                for (let cc = 0; cc < preAUto.changes.length; cc++) {
+                    let change = preAUto.changes[cc];
+                    if (preMetre.more(change.skip)) {
+                    }
+                    else {
+                        preAUto.changes.splice(cc, 1);
+                        cc--;
+                        change.skip = MMUtil().set(change.skip).minus(preMetre);
+                        cuAuto.changes.push(change);
                     }
                 }
             }

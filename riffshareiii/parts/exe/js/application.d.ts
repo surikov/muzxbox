@@ -33,23 +33,7 @@ declare function resolveString(data: string): string | null;
 declare function saveProjectState(): void;
 declare function initWebAudioFromUI(): void;
 declare function startLoadCSSfile(cssurl: string): void;
-declare class PluginDialogPrompt {
-    dialogID: string;
-    waitForPluginInit: boolean;
-    waitTitleAction: null | (() => void);
-    waitProjectCallback: null | ((newProject: Zvoog_Project) => void);
-    waitTimelinePointCallback: null | ((raw: any) => void);
-    pluginMode: '' | 'action' | 'filter' | 'sequencer' | 'sampler';
-    rawData: any;
-    constructor();
-    openActionPluginDialogFrame(actionPlugin: MZXBX_PluginRegistrationInformation): void;
-    openFilterPluginDialogFrame(order: number, raw: string, filter: Zvoog_FilterTarget, filterPlugin: MZXBX_PluginRegistrationInformation): void;
-    promptPluginDialogTitle(): void;
-    sendNewIdToPlugin(): void;
-    sendCurrentProjectToActionPlugin(): void;
-    sendPointToPlugin(): void;
-    closeDialogFrame(): void;
-    receiveMessageFromPlugin(event: any): void;
+declare class Plugin__DialogPrompt2 {
 }
 declare class FilterPluginDialog {
     filter: Zvoog_FilterTarget;
@@ -125,6 +109,21 @@ declare class SequencerPluginDialog {
     setSequencerValue(): void;
     receiveMessageFromPlugin(event: any): void;
 }
+declare class PointPluginDialog {
+    filter: Zvoog_FilterTarget;
+    pluginRawData: string;
+    dialogID: string;
+    waitPointPluginInit: boolean;
+    constructor();
+    resetPointTitle(): void;
+    dropPoint(): void;
+    openPointPluginDialogFrame(filter: Zvoog_FilterTarget, filterPlugin: MZXBX_PluginRegistrationInformation): void;
+    closePointDialogFrame(): void;
+    sendNewIdToPlugin(): void;
+    sendPointToPlugin(): void;
+    setPointValue(): void;
+    receiveMessageFromPlugin(event: any): void;
+}
 declare class CommandExe {
     lockUndoRedo: boolean;
     setCurPosition(xyz: TileZoom): void;
@@ -152,6 +151,7 @@ declare class CommandDispatcher {
     undoQueue: Zvoog_UICommand[];
     redoQueue: Zvoog_UICommand[];
     filterPluginDialog: FilterPluginDialog;
+    pointPluginDialog: PointPluginDialog;
     samplerPluginDialog: SamplerPluginDialog;
     actionPluginDialog: ActionPluginDialog;
     sequencerPluginDialog: SequencerPluginDialog;
@@ -416,7 +416,7 @@ declare class MixerBar {
 declare class TextCommentsBar {
     constructor(barIdx: number, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number);
     testBars(): void;
-    cellClick(x: number, y: number, zz: number, idx: number): void;
+    textCellClick(x: number, y: number, zz: number, idx: number): void;
     getFirstCommentText(commentBar: Zvoog_CommentMeasure, row: number, info: {
         start: Zvoog_MetreMathType;
         length: Zvoog_MetreMathType;
@@ -430,6 +430,7 @@ declare class TextCommentsBar {
 }
 declare class AutomationBarContent {
     constructor(barIdx: number, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number);
+    autoCellClick(barIdx: number, barX: number, yy: number, zz: number): void;
 }
 declare class MixerUI {
     gridLayers: TileLayerDefinition;
@@ -625,6 +626,11 @@ declare function readTextFromlocalStorage(name: string): string;
 declare function readObjectFromlocalStorage(name: string): any;
 declare let ___newEmptyProject: Zvoog_Project;
 declare let ____mzxbxProjectForTesting2: Zvoog_Project;
+declare type BarStepStartEnd = {
+    start: Zvoog_MetreMathType;
+    length: Zvoog_MetreMathType;
+    end: Zvoog_MetreMathType;
+};
 declare class MixerDataMathUtility {
     data: Zvoog_Project;
     leftPad: number;
@@ -676,11 +682,7 @@ declare class MixerDataMathUtility {
     samplerTop(): number;
     findFilterTarget(filterId: string): Zvoog_FilterTarget | null;
     textZoomRatio(zIndex: number): number;
-    gridClickInfo(barIdx: number, barX: number, zoomIdx: number): {
-        start: Zvoog_MetreMathType;
-        length: Zvoog_MetreMathType;
-        end: Zvoog_MetreMathType;
-    };
+    gridClickInfo(barIdx: number, barX: number, zoomIdx: number): BarStepStartEnd;
 }
 declare let biChar32: String[];
 declare type PackedChannel = {

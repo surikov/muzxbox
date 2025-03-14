@@ -478,7 +478,7 @@ declare type MIDISongData = {
     lineMode: number;
 };
 declare function round1000(nn: number): number;
-declare function findMeasureSkipByTime(time: number, measures: Zvoog_SongMeasure[]): null | {
+declare function findMeasureSkipByTime(cmnt: string, time: number, measures: Zvoog_SongMeasure[]): null | {
     idx: number;
     skip: Zvoog_Metre;
 };

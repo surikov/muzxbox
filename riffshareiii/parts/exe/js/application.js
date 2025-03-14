@@ -317,200 +317,7 @@ function startLoadCSSfile(cssurl) {
     link.media = 'all';
     head.appendChild(link);
 }
-class PluginDialogPrompt {
-    constructor() {
-        this.dialogID = '?';
-        this.waitForPluginInit = false;
-        this.waitTitleAction = null;
-        this.waitProjectCallback = null;
-        this.waitTimelinePointCallback = null;
-        this.pluginMode = '';
-        window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
-    }
-    openActionPluginDialogFrame(actionPlugin) {
-        this.pluginMode = 'action';
-        this.waitTitleAction = null;
-        this.waitProjectCallback = (obj) => {
-            let project = obj;
-            globalCommandDispatcher.registerWorkProject(project);
-            globalCommandDispatcher.resetProject();
-        };
-        this.waitTimelinePointCallback = null;
-        let pluginTitle = document.getElementById("pluginActionTitle");
-        pluginTitle.innerHTML = " " + actionPlugin.label;
-        let pluginFrame = document.getElementById("pluginActionFrame");
-        let pluginDiv = document.getElementById("pluginActionDiv");
-        if (pluginFrame) {
-            if (pluginFrame.contentWindow) {
-                this.waitForPluginInit = true;
-                pluginFrame.src = actionPlugin.ui;
-                pluginDiv.style.visibility = "visible";
-            }
-        }
-    }
-    openFilterPluginDialogFrame(order, raw, filter, filterPlugin) {
-        this.pluginMode = 'filter';
-        this.waitProjectCallback = null;
-        this.waitTimelinePointCallback = (raw) => {
-            globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
-                filter.data = raw;
-            });
-        };
-        this.waitTitleAction = () => {
-            let newTitle = prompt(filter.title, filter.title);
-            if (newTitle == filter.title) {
-            }
-            else {
-                if (newTitle != null) {
-                    globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
-                        if (newTitle) {
-                            filter.title = newTitle;
-                        }
-                        ;
-                        let pluginTitle = document.getElementById("pluginFilterTitle");
-                        pluginTitle.innerHTML = '&nbsp;&nbsp;' + filter.title;
-                    });
-                }
-            }
-        };
-        this.rawData = raw;
-        let pluginTitle = document.getElementById("pluginFilterTitle");
-        pluginTitle.innerHTML = '&nbsp;&nbsp;' + filter.title;
-        let pluginFrame = document.getElementById("pluginFilterFrame");
-        let pluginDiv = document.getElementById("pluginFilterDiv");
-        if (pluginFrame) {
-            if (pluginFrame.contentWindow) {
-                this.waitForPluginInit = true;
-                pluginFrame.src = filterPlugin.ui;
-                if (filter.state == 1) {
-                    document.getElementById("pluginFilterSetFilter").className = 'pluginDoButton';
-                    document.getElementById("pluginFilterSetPasstrough").className = 'pluginNoneButton';
-                }
-                else {
-                    document.getElementById("pluginFilterSetFilter").className = 'pluginNoneButton';
-                    document.getElementById("pluginFilterSetPasstrough").className = 'pluginDoButton';
-                }
-                pluginDiv.style.visibility = "visible";
-            }
-        }
-    }
-    promptPluginDialogTitle() {
-        if (this.waitTitleAction) {
-            this.waitTitleAction();
-        }
-    }
-    sendNewIdToPlugin() {
-        let pluginFrame;
-        if (this.pluginMode == 'action') {
-            pluginFrame = document.getElementById("pluginActionFrame");
-        }
-        else {
-            if (this.pluginMode == 'filter') {
-                pluginFrame = document.getElementById("pluginFilterFrame");
-            }
-        }
-        if (pluginFrame) {
-            this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID };
-            pluginFrame.contentWindow.postMessage(message, '*');
-        }
-    }
-    sendCurrentProjectToActionPlugin() {
-        let pluginFrame = document.getElementById("pluginActionFrame");
-        if (pluginFrame) {
-            let message = { hostData: globalCommandDispatcher.cfg().data };
-            pluginFrame.contentWindow.postMessage(message, '*');
-        }
-    }
-    sendPointToPlugin() {
-        let pluginFrame;
-        if (this.pluginMode == 'action') {
-            pluginFrame = document.getElementById("pluginActionFrame");
-        }
-        else {
-            if (this.pluginMode == 'filter') {
-                pluginFrame = document.getElementById("pluginFilterFrame");
-            }
-        }
-        if (pluginFrame) {
-            let message = { hostData: this.rawData };
-            pluginFrame.contentWindow.postMessage(message, '*');
-        }
-    }
-    closeDialogFrame() {
-        let pluginFrame;
-        let pluginDiv;
-        if (this.pluginMode == 'action') {
-            pluginFrame = document.getElementById("pluginActionFrame");
-            pluginDiv = document.getElementById("pluginActionDiv");
-        }
-        else {
-            if (this.pluginMode == 'filter') {
-                pluginFrame = document.getElementById("pluginFilterFrame");
-                pluginDiv = document.getElementById("pluginFilterDiv");
-            }
-        }
-        if (pluginDiv) {
-            pluginDiv.style.visibility = "hidden";
-        }
-        if (pluginFrame) {
-            pluginFrame.src = "plugins/pluginplaceholder.html";
-        }
-    }
-    receiveMessageFromPlugin(event) {
-        console.log('receiveMessageFromPlugin', event);
-        if (!(event.data)) {
-            console.log('empty message data');
-        }
-        else {
-            let message = event.data;
-            if (message.dialogID) {
-                console.log('receiveMessageFromPlugin', message);
-                if (message.dialogID == this.dialogID) {
-                    if (this.waitProjectCallback) {
-                        let me = this;
-                        console.log('waitProjectCallback');
-                        globalCommandDispatcher.exe.commitProjectChanges([], () => {
-                            if (me.waitProjectCallback) {
-                                me.waitProjectCallback(message.pluginData);
-                                if (message.done) {
-                                    me.closeDialogFrame();
-                                }
-                            }
-                        });
-                    }
-                    else {
-                        if (this.waitTimelinePointCallback) {
-                            console.log('waitTimelinePointCallback');
-                            this.waitTimelinePointCallback(message.pluginData);
-                        }
-                    }
-                    globalCommandDispatcher.reStartPlayIfPlay();
-                }
-                else {
-                    console.log('wrong received message id', message.dialogID, this.dialogID);
-                }
-            }
-            else {
-                console.log('init receiveMessageFromPlugin');
-                if (this.waitForPluginInit) {
-                    this.waitForPluginInit = false;
-                    this.sendNewIdToPlugin();
-                    if (this.waitProjectCallback) {
-                        this.sendCurrentProjectToActionPlugin();
-                    }
-                    else {
-                        if (this.waitTimelinePointCallback) {
-                            this.sendPointToPlugin();
-                        }
-                    }
-                }
-                else {
-                    console.log('wrong received object');
-                }
-            }
-        }
-    }
+class Plugin__DialogPrompt2 {
 }
 class FilterPluginDialog {
     constructor() {
@@ -1027,6 +834,84 @@ class SequencerPluginDialog {
         }
     }
 }
+class PointPluginDialog {
+    constructor() {
+        this.dialogID = '?';
+        this.waitPointPluginInit = false;
+        window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
+    }
+    resetPointTitle() {
+        let pluginTitle = document.getElementById("pluginPointTitle");
+        pluginTitle.innerHTML = '&nbsp;&nbsp;' + this.filter.title;
+    }
+    dropPoint() {
+    }
+    openPointPluginDialogFrame(filter, filterPlugin) {
+        this.filter = filter;
+        this.pluginRawData = filter.data;
+        this.resetPointTitle();
+        let pluginFrame = document.getElementById("pluginPointFrame");
+        let pluginDiv = document.getElementById("pluginPointDiv");
+        if (pluginFrame) {
+            if (pluginFrame.contentWindow) {
+                this.waitPointPluginInit = true;
+                pluginFrame.src = filterPlugin.ui;
+                pluginDiv.style.visibility = "visible";
+            }
+        }
+    }
+    closePointDialogFrame() {
+        let pluginDiv = document.getElementById("pluginPointDiv");
+        if (pluginDiv) {
+            pluginDiv.style.visibility = "hidden";
+        }
+        let pluginFrame = document.getElementById("pluginPointFrame");
+        if (pluginFrame) {
+            pluginFrame.src = "plugins/pluginplaceholder.html";
+        }
+    }
+    sendNewIdToPlugin() {
+        let pluginFrame = document.getElementById("pluginPointFrame");
+        if (pluginFrame) {
+            this.dialogID = '' + Math.random();
+            let message = { hostData: this.dialogID };
+            pluginFrame.contentWindow.postMessage(message, '*');
+        }
+    }
+    sendPointToPlugin() {
+        let pluginFrame = document.getElementById("pluginPointFrame");
+        if (pluginFrame) {
+            let message = { hostData: this.pluginRawData };
+            pluginFrame.contentWindow.postMessage(message, '*');
+        }
+    }
+    setPointValue() {
+    }
+    receiveMessageFromPlugin(event) {
+        if (!(event.data)) {
+        }
+        else {
+            let message = event.data;
+            if (message.dialogID) {
+                if (message.dialogID == this.dialogID) {
+                    this.pluginRawData = message.pluginData;
+                    this.setPointValue();
+                }
+                else {
+                }
+            }
+            else {
+                if (this.waitPointPluginInit) {
+                    this.waitPointPluginInit = false;
+                    this.sendNewIdToPlugin();
+                    this.sendPointToPlugin();
+                }
+                else {
+                }
+            }
+        }
+    }
+}
 class CommandExe {
     constructor() {
         this.lockUndoRedo = false;
@@ -1179,6 +1064,7 @@ class CommandDispatcher {
         this.undoQueue = [];
         this.redoQueue = [];
         this.filterPluginDialog = new FilterPluginDialog();
+        this.pointPluginDialog = new PointPluginDialog();
         this.samplerPluginDialog = new SamplerPluginDialog();
         this.actionPluginDialog = new ActionPluginDialog();
         this.sequencerPluginDialog = new SequencerPluginDialog();
@@ -3336,7 +3222,7 @@ class TextCommentsBar {
                 w: barOctaveAnchor.ww,
                 h: globalCommandDispatcher.cfg().commentsMaxHeight(),
                 css: 'commentPaneForClick',
-                activation: (x, y) => { this.cellClick(x, y, zIndex, barIdx); }
+                activation: (x, y) => { this.textCellClick(x, y, zIndex, barIdx); }
             };
             barOctaveAnchor.content.push(interpane);
         }
@@ -3352,7 +3238,7 @@ class TextCommentsBar {
             }
         }
     }
-    cellClick(x, y, zz, idx) {
+    textCellClick(x, y, zz, idx) {
         let row = 0;
         for (let tt = 0; tt <= globalCommandDispatcher.cfg().maxCommentRowCount; tt++) {
             let nextY = globalCommandDispatcher.cfg().commentsZoomLineY(zz, tt);
@@ -3438,13 +3324,48 @@ class AutomationBarContent {
                         let editIcon = {
                             x: xx + globalCommandDispatcher.cfg().autoPointHeight / 16,
                             y: top + globalCommandDispatcher.cfg().autoPointHeight / 16 + globalCommandDispatcher.cfg().autoPointHeight * aa + yShift,
-                            text: icon_gear,
+                            text: icon_sliders,
                             css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zIndex
                         };
                         barOctaveAnchor.content.push(editIcon);
                     }
                 }
             }
+        }
+        if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+            let interpane = {
+                x: barOctaveAnchor.xx,
+                y: globalCommandDispatcher.cfg().automationTop(),
+                w: barOctaveAnchor.ww,
+                h: globalCommandDispatcher.cfg().data.filters.length * globalCommandDispatcher.cfg().autoPointHeight,
+                css: 'commentPaneForClick',
+                activation: (x, y) => { this.autoCellClick(barIdx, x, y, zIndex); }
+            };
+            barOctaveAnchor.content.push(interpane);
+        }
+    }
+    autoCellClick(barIdx, barX, yy, zz) {
+        let row = Math.floor(yy / globalCommandDispatcher.cfg().autoPointHeight);
+        let filter = globalCommandDispatcher.cfg().data.filters[row];
+        let info = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
+        let change = null;
+        let muStart = MMUtil().set(info.start);
+        let muEnd = MMUtil().set(info.end);
+        for (let cc = 0; cc < filter.automation[barIdx].changes.length; cc++) {
+            let testChange = filter.automation[barIdx].changes[cc];
+            if (muStart.more(testChange.skip)) {
+            }
+            else {
+                if (muEnd.more(testChange.skip)) {
+                    change = testChange;
+                    break;
+                }
+            }
+        }
+        console.log('autoCellClick', change);
+        let finfo = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
+        if (finfo) {
+            globalCommandDispatcher.pointPluginDialog.openPointPluginDialogFrame(filter, finfo);
         }
     }
 }
@@ -4592,7 +4513,7 @@ class UnDoReDo {
 let icon_play = '&#xf3aa;';
 let icon_pause = '&#xf3a7;';
 let icon_hor_menu = '&#xf19c;';
-let icon_ver_menu = '&#xf19b;';
+let icon_ver_menu = '&#xf247;';
 let icon_closemenu = '&#xf1ea;';
 let icon_closedbranch = '&#xf2f6;';
 let icon_openedbranch = '&#xf2f2;';

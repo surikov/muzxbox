@@ -33,6 +33,7 @@
 		,"ui/pluginprompt/samplerPluginDialog.ts"
 		,"ui/pluginprompt/actionPluginDialog.ts"
 		,"ui/pluginprompt/sequencerPluginDialog.ts"
+		,"ui/pluginprompt/pointPluginDialog.ts"
 
 		,"commands/execommand.ts"
         ,"commands/commanddispatcher.ts"

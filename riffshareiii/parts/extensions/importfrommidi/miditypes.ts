@@ -108,18 +108,21 @@ type MIDISongData = {
 function round1000(nn: number): number {
 	return Math.round(1000 * nn) / 1000;
 }
-function findMeasureSkipByTime(time: number, measures: Zvoog_SongMeasure[]): null | { idx: number, skip: Zvoog_Metre } {
+function findMeasureSkipByTime(cmnt:string,time: number, measures: Zvoog_SongMeasure[]): null | { idx: number, skip: Zvoog_Metre } {
 	let curTime = 0;
 	let mm = MMUtil();
 	for (let ii = 0; ii < measures.length; ii++) {
 		let cumea = measures[ii];
 		let measureDurationS = mm.set(cumea.metre).duration(cumea.tempo);
 		if (round1000(curTime + measureDurationS) > round1000(time)) {
-			//console.log(time - curTime, curTime, measureDurationS, time,round1000(curTime + measureDurationS ),round1000( time));
+			
 			let delta = time - curTime;
 			if (delta < 0) {
 				delta = 0;
 			}
+			/*if(ii==85){
+				console.log(cmnt,ii,round1000(curTime + measureDurationS), round1000(time), mm.calculate(delta, cumea.tempo),curTime + measureDurationS, time);
+				}*/
 			return {
 				idx: ii
 				, skip: mm.calculate(delta, cumea.tempo)
