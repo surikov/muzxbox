@@ -842,13 +842,33 @@ class PointPluginDialog {
     }
     resetPointTitle() {
         let pluginTitle = document.getElementById("pluginPointTitle");
-        pluginTitle.innerHTML = '&nbsp;&nbsp;' + this.filter.title;
+        pluginTitle.innerHTML = '&nbsp;&nbsp;' + (this.barIdx + 1) + ':' + this.pluginPoint.skip.count + '/' + this.pluginPoint.skip.part + ' ' + this.filter.title;
     }
     dropPoint() {
+        globalCommandDispatcher.exe.commitProjectChanges(['filters', this.filterIdx, 'automation', this.barIdx], () => {
+            let muStart = MMUtil().set(this.startEnd.start);
+            let muEnd = MMUtil().set(this.startEnd.end);
+            for (let changeIdx = 0; changeIdx < this.filter.automation[this.barIdx].changes.length; changeIdx++) {
+                let testChange = this.filter.automation[this.barIdx].changes[changeIdx];
+                if (muStart.more(testChange.skip)) {
+                }
+                else {
+                    if (muEnd.more(testChange.skip)) {
+                        this.filter.automation[this.barIdx].changes.splice(changeIdx, 1);
+                        changeIdx--;
+                    }
+                }
+            }
+        });
+        this.closePointDialogFrame();
     }
-    openPointPluginDialogFrame(filter, filterPlugin) {
+    openPointPluginDialogFrame(filterIdx, barIdx, info, pointIdx, pointChange, filter, filterPlugin) {
         this.filter = filter;
-        this.pluginRawData = filter.data;
+        this.startEnd = info,
+            this.barIdx = barIdx;
+        this.filterIdx = filterIdx;
+        this.pointIdx = pointIdx;
+        this.pluginPoint = pointChange;
         this.resetPointTitle();
         let pluginFrame = document.getElementById("pluginPointFrame");
         let pluginDiv = document.getElementById("pluginPointDiv");
@@ -881,11 +901,15 @@ class PointPluginDialog {
     sendPointToPlugin() {
         let pluginFrame = document.getElementById("pluginPointFrame");
         if (pluginFrame) {
-            let message = { hostData: this.pluginRawData };
+            let message = { hostData: this.pluginPoint.stateBlob };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
-    setPointValue() {
+    setPointValue(data) {
+        globalCommandDispatcher.exe.commitProjectChanges(['filters', this.filterIdx, 'automation', this.barIdx], () => {
+            this.pluginPoint.stateBlob = data;
+        });
+        globalCommandDispatcher.reStartPlayIfPlay();
     }
     receiveMessageFromPlugin(event) {
         if (!(event.data)) {
@@ -894,8 +918,7 @@ class PointPluginDialog {
             let message = event.data;
             if (message.dialogID) {
                 if (message.dialogID == this.dialogID) {
-                    this.pluginRawData = message.pluginData;
-                    this.setPointValue();
+                    this.setPointValue(message.pluginData);
                 }
                 else {
                 }
@@ -3351,8 +3374,9 @@ class AutomationBarContent {
         let change = null;
         let muStart = MMUtil().set(info.start);
         let muEnd = MMUtil().set(info.end);
-        for (let cc = 0; cc < filter.automation[barIdx].changes.length; cc++) {
-            let testChange = filter.automation[barIdx].changes[cc];
+        let changeIdx = 0;
+        for (changeIdx = 0; changeIdx < filter.automation[barIdx].changes.length; changeIdx++) {
+            let testChange = filter.automation[barIdx].changes[changeIdx];
             if (muStart.more(testChange.skip)) {
             }
             else {
@@ -3363,9 +3387,19 @@ class AutomationBarContent {
             }
         }
         console.log('autoCellClick', change);
+        if (change) {
+        }
+        else {
+            globalCommandDispatcher.exe.commitProjectChanges(['filters', row, 'automation', barIdx], () => {
+                change = { skip: info.start, stateBlob: '' };
+                filter.automation[barIdx].changes.push(change);
+            });
+        }
         let finfo = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
         if (finfo) {
-            globalCommandDispatcher.pointPluginDialog.openPointPluginDialogFrame(filter, finfo);
+            if (change) {
+                globalCommandDispatcher.pointPluginDialog.openPointPluginDialogFrame(row, barIdx, info, changeIdx, change, filter, finfo);
+            }
         }
     }
 }

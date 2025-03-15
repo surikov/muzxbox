@@ -111,17 +111,21 @@ declare class SequencerPluginDialog {
 }
 declare class PointPluginDialog {
     filter: Zvoog_FilterTarget;
-    pluginRawData: string;
+    barIdx: number;
+    filterIdx: number;
+    pointIdx: number;
+    pluginPoint: Zvoog_FilterStateChange;
+    startEnd: BarStepStartEnd;
     dialogID: string;
     waitPointPluginInit: boolean;
     constructor();
     resetPointTitle(): void;
     dropPoint(): void;
-    openPointPluginDialogFrame(filter: Zvoog_FilterTarget, filterPlugin: MZXBX_PluginRegistrationInformation): void;
+    openPointPluginDialogFrame(filterIdx: number, barIdx: number, info: BarStepStartEnd, pointIdx: number, pointChange: Zvoog_FilterStateChange, filter: Zvoog_FilterTarget, filterPlugin: MZXBX_PluginRegistrationInformation): void;
     closePointDialogFrame(): void;
     sendNewIdToPlugin(): void;
     sendPointToPlugin(): void;
-    setPointValue(): void;
+    setPointValue(data: string): void;
     receiveMessageFromPlugin(event: any): void;
 }
 declare class CommandExe {

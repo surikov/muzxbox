@@ -72,8 +72,9 @@ class AutomationBarContent {
 		let change: null | Zvoog_FilterStateChange = null;
 		let muStart = MMUtil().set(info.start);
 		let muEnd = MMUtil().set(info.end);
-		for (let cc = 0; cc < filter.automation[barIdx].changes.length; cc++) {
-			let testChange = filter.automation[barIdx].changes[cc];
+		let changeIdx = 0;
+		for (changeIdx = 0; changeIdx < filter.automation[barIdx].changes.length; changeIdx++) {
+			let testChange = filter.automation[barIdx].changes[changeIdx];
 			if (muStart.more(testChange.skip)) {
 				//
 			} else {
@@ -84,9 +85,20 @@ class AutomationBarContent {
 			}
 		}
 		console.log('autoCellClick', change);
+		if (change) {
+			//
+		} else {
+			//console.log(['filters', row, 'automation', barIdx]);
+			globalCommandDispatcher.exe.commitProjectChanges(['filters', row, 'automation', barIdx], () => {
+				change = { skip: info.start, stateBlob: '' };
+				filter.automation[barIdx].changes.push(change);
+			});
+		}
 		let finfo = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
 		if (finfo) {
-			globalCommandDispatcher.pointPluginDialog.openPointPluginDialogFrame(filter, finfo);
+			if (change) {
+				globalCommandDispatcher.pointPluginDialog.openPointPluginDialogFrame(row, barIdx, info, changeIdx, change, filter, finfo);
+			}
 		}
 	}
 }
