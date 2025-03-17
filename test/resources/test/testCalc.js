@@ -1096,11 +1096,11 @@ function testTest2() {
             //	+ cntExists + '/' + countCurHeigth + '=' + Math.round((cntExists / ballsInRow) / (countCurHeigth / rowLen) * 100) / 100;
             var verCount = Math.round(100 * veroyat1 * countCurHeigth) / 100;
             //let exstsVero=(Math.round(100 * cntExists/countCurHeigth) / 100);
-            var verCountDiff = Math.round(100 * (1 - cntExists / verCount));
-            var verCountDiffTxt = '-' + verCountDiff;
-            if (verCountDiff < 0) {
-                verCountDiffTxt = '+' + (-verCountDiff);
-            }
+            var verCountDiff = -100 + Math.round(100 * (1 - cntExists / verCount));
+            var verCountDiffTxt = '' + (-1 * verCountDiff);
+            //if(verCountDiff<0){
+            //	verCountDiffTxt='+'+(-verCountDiff);
+            //}
             sumtext = sumtext + '\n[' + (ii_4 - 1) + ']' + countCurHeigth
                 + ' \t' + verCount + '/' + cntExists
                 + ' \t' + verCountDiffTxt + '%';
