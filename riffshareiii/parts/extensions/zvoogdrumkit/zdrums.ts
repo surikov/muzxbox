@@ -21,7 +21,7 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 		//console.log('parameters',parameters);
 		let split = parameters.split('/');
 		let idx = 0;
-		if (split.length>1) {
+		if (split.length>1 && split[1].length>0) {
 			let listidx = parseInt(split[1]);
 			idx = listidx;
 			//console.log('from list',idx);
@@ -146,7 +146,7 @@ class ZDUI {
 		//console.log('setState', data);
 		this.data = data;
 		let split = this.data.split('/');
-		if (split.length >1) {
+		if (split.length >1 && split[1].length>0) {
 			this.list.value = parseInt(split[1]);
 		} else {
 			this.list.value = this.player.loader.findDrum(parseInt(split[0]));

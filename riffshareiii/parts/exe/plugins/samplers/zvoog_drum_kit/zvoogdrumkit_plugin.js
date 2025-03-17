@@ -516,7 +516,7 @@ class ZvoogDrumKitImplementation {
         this.volumeNode = this.audioContext.createGain();
         let split = parameters.split('/');
         let idx = 0;
-        if (split.length > 1) {
+        if (split.length > 1 && split[1].length > 0) {
             let listidx = parseInt(split[1]);
             idx = listidx;
         }
@@ -631,7 +631,7 @@ class ZDUI {
     setState(data) {
         this.data = data;
         let split = this.data.split('/');
-        if (split.length > 1) {
+        if (split.length > 1 && split[1].length > 0) {
             this.list.value = parseInt(split[1]);
         }
         else {
