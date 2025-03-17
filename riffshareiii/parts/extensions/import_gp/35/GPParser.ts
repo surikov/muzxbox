@@ -145,7 +145,8 @@ function takeChord(start: Zvoog_Metre, measure: Zvoog_TrackMeasure): Zvoog_Chord
 	return newChord;
 }
 function addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track, targetId: string) {
-	let perfkind = 'zinstr1';
+	//let perfkind = 'zinstr1';
+	let strummode='plain';
 	if (scoreTrack.playbackInfo.program == 24
 		|| scoreTrack.playbackInfo.program == 25
 		|| scoreTrack.playbackInfo.program == 26
@@ -154,15 +155,18 @@ function addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track, targetId: s
 		|| scoreTrack.playbackInfo.program == 29
 		|| scoreTrack.playbackInfo.program == 30
 	) {
-		perfkind = 'zvstrumming1';
+		//perfkind = 'zvstrumming1';
+		strummode='pong';
 	}
 	let mzxbxTrack: Zvoog_MusicTrack = {
 		title: scoreTrack.trackName + ' ' + insNames[scoreTrack.playbackInfo.program]
 		, measures: []
 		, performer: {
 			id: 'track' + (insNames[scoreTrack.playbackInfo.program] + Math.random())
-			, data: '' + scoreTrack.playbackInfo.program + '//pong'
-			, kind: perfkind
+			//, data: '' + scoreTrack.playbackInfo.program + '//pong'
+			, data: '' + scoreTrack.playbackInfo.program + '//'+strummode
+			//, kind: perfkind
+			, kind:'zvstrumming1'
 			, outputs: [targetId]
 			, iconPosition: { x: 0, y: 0 }
 			, state: 0
@@ -175,7 +179,8 @@ function addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track, targetId: s
 		, performer: {
 			id: 'track' + (insNames[scoreTrack.playbackInfo.program] + Math.random())
 			, data: '' + scoreTrack.playbackInfo.program
-			, kind: perfkind
+			//, kind: perfkind
+			, kind:'zvstrumming1'
 			, outputs: [targetId]
 			, iconPosition: { x: 0, y: 0 }
 			, state: 0
@@ -188,7 +193,8 @@ function addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track, targetId: s
 		, performer: {
 			id: 'track' + (insNames[scoreTrack.playbackInfo.program] + Math.random())
 			, data: '' + scoreTrack.playbackInfo.program + '//up'
-			, kind: perfkind
+			//, kind: perfkind
+			, kind:'zvstrumming1'
 			, outputs: [targetId]
 			, iconPosition: { x: 0, y: 0 }
 			, state: 0
@@ -201,7 +207,8 @@ function addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track, targetId: s
 		, performer: {
 			id: 'track' + (insNames[scoreTrack.playbackInfo.program] + Math.random())
 			, data: '' + scoreTrack.playbackInfo.program + '//down'
-			, kind: perfkind
+			//, kind: perfkind
+			, kind:'zvstrumming1'
 			, outputs: [targetId]
 			, iconPosition: { x: 0, y: 0 }
 			, state: 0

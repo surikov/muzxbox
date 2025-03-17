@@ -157,7 +157,7 @@ function takeChord(start, measure) {
     return newChord;
 }
 function addScoreInsTrack(project, scoreTrack, targetId) {
-    let perfkind = 'zinstr1';
+    let strummode = 'plain';
     if (scoreTrack.playbackInfo.program == 24
         || scoreTrack.playbackInfo.program == 25
         || scoreTrack.playbackInfo.program == 26
@@ -165,15 +165,15 @@ function addScoreInsTrack(project, scoreTrack, targetId) {
         || scoreTrack.playbackInfo.program == 28
         || scoreTrack.playbackInfo.program == 29
         || scoreTrack.playbackInfo.program == 30) {
-        perfkind = 'zvstrumming1';
+        strummode = 'pong';
     }
     let mzxbxTrack = {
         title: scoreTrack.trackName + ' ' + insNames[scoreTrack.playbackInfo.program],
         measures: [],
         performer: {
             id: 'track' + (insNames[scoreTrack.playbackInfo.program] + Math.random()),
-            data: '' + scoreTrack.playbackInfo.program + '//pong',
-            kind: perfkind,
+            data: '' + scoreTrack.playbackInfo.program + '//' + strummode,
+            kind: 'zvstrumming1',
             outputs: [targetId],
             iconPosition: { x: 0, y: 0 },
             state: 0
@@ -186,7 +186,7 @@ function addScoreInsTrack(project, scoreTrack, targetId) {
         performer: {
             id: 'track' + (insNames[scoreTrack.playbackInfo.program] + Math.random()),
             data: '' + scoreTrack.playbackInfo.program,
-            kind: perfkind,
+            kind: 'zvstrumming1',
             outputs: [targetId],
             iconPosition: { x: 0, y: 0 },
             state: 0
@@ -199,7 +199,7 @@ function addScoreInsTrack(project, scoreTrack, targetId) {
         performer: {
             id: 'track' + (insNames[scoreTrack.playbackInfo.program] + Math.random()),
             data: '' + scoreTrack.playbackInfo.program + '//up',
-            kind: perfkind,
+            kind: 'zvstrumming1',
             outputs: [targetId],
             iconPosition: { x: 0, y: 0 },
             state: 0
@@ -212,7 +212,7 @@ function addScoreInsTrack(project, scoreTrack, targetId) {
         performer: {
             id: 'track' + (insNames[scoreTrack.playbackInfo.program] + Math.random()),
             data: '' + scoreTrack.playbackInfo.program + '//down',
-            kind: perfkind,
+            kind: 'zvstrumming1',
             outputs: [targetId],
             iconPosition: { x: 0, y: 0 },
             state: 0

@@ -315,7 +315,8 @@ class Projectr {
 		return projectDrums;
 	}
 	createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack {
-		let perfkind = 'zinstr1';
+		//let perfkind = 'zinstr1';
+		let strummode='plain';
 		if (midiTrack.program == 24
 			|| midiTrack.program == 25
 			|| midiTrack.program == 26
@@ -324,15 +325,21 @@ class Projectr {
 			|| midiTrack.program == 29
 			|| midiTrack.program == 30
 		) {
-			perfkind = 'zvstrumming1';
+			//perfkind = 'zvstrumming1';
+			strummode='pong';
 		}
 		let projectTrack: Zvoog_MusicTrack = {
 			title: midiTrack.title + ' ' + insNames[midiTrack.program]
 			, measures: []
 			//, filters: []
 			, performer: {
-				id: 'track' + (midiTrack.program + Math.random()), data: '' + midiTrack.program, kind: perfkind, outputs: [outputId]
-				, iconPosition: { x: top * 2, y: top }, state: 0
+				id: 'track' + (midiTrack.program + Math.random())
+				, data: '' + midiTrack.program+'//'+strummode
+				//, kind: perfkind
+				, kind: 'zvstrumming1'
+				, outputs: [outputId]
+				, iconPosition: { x: top * 2, y: top }
+				, state: 0
 			}
 			, volume: volume
 		};

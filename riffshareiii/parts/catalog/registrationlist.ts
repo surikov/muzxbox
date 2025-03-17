@@ -39,10 +39,10 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 		label: 'Zvoog Compressor', purpose: 'Filter', kind: 'zvooco1', ui: './plugins/filters/zvoog_compressor/zvoocomp.html'
 		, evaluate: 'newZvoogCompreImplementation', script: './plugins/filters/zvoog_compressor/zc_plugin.js'
 	}
-	, {
+	/*, {
 		label: 'Zvoog Performer', purpose: 'Performer', kind: 'zinstr1', ui: './plugins/performers/zvoog_perf/perfui.html'
 		, evaluate: 'newZvoogBasePerformerImplementation', script: './plugins/performers/zvoog_perf/zvoogperf_plugin.js'
-	}
+	}*/
 	, {
 		label: 'Zvoog Strum', purpose: 'Performer', kind: 'zvstrumming1', ui: './plugins/performers/zvoog_strum/strumui.html'
 		, evaluate: 'newZvoogStrumPerformerImplementation', script: './plugins/performers/zvoog_strum/zvoogstrum_plugin.js'
