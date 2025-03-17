@@ -4,7 +4,6 @@ class ZS_WebAudioFontLoader {
         this.cached = [];
         this.instrumentKeyArray = [];
         this.instrumentNamesArray = [];
-        this.choosenInfos = [];
         this.drumNamesArray = [];
         this.drumKeyArray = [];
         this.instrumentTitles = function () {
@@ -370,60 +369,6 @@ class ZS_WebAudioFontLoader {
     }
     ;
     findInstrument(program) {
-        if (this.choosenInfos.length == 0) {
-            this.choosenInfos = [
-                [1, 2],
-                [2, 14],
-                [3, 25],
-                [4, 37],
-                [5, 48],
-                [6, 58],
-                [7, 70],
-                [8, 83],
-                [9, 91],
-                [10, 99],
-                [11, 107],
-                [12, 118],
-                [13, 127],
-                [14, 136],
-                [15, 144],
-                [16, 152],
-                [17, 164],
-                [18, 170],
-                [19, 183],
-                [20, 194],
-                [21, 205],
-                [22, 215],
-                [23, 228],
-                [24, 241],
-                [25, 254],
-                [26, 263],
-                [27, 277],
-                [28, 296],
-                [29, 308],
-                [30, 319],
-                [31, 350],
-                [32, 356],
-                [33, 369],
-                [34, 379],
-                [35, 385],
-                [36, 399],
-                [37, 403],
-                [38, 412],
-                [39, 421],
-                [40, 438],
-                [41, 452],
-                [42, 461],
-                [43, 467],
-                [44, 477],
-                [45, 488],
-                [46, 493],
-                [47, 501],
-                [48, 511],
-                [49, 518],
-                [50, 547]
-            ];
-        }
         for (var i = 0; i < this.instrumentKeys().length; i++) {
             if (program == 1 * parseInt(this.instrumentKeys()[i].substring(0, 3))) {
                 return i;
@@ -783,13 +728,14 @@ class ZvoogStrumPerformerImplementation {
         this.midiidx = 0;
         this.listidx = -1;
         this.preset = null;
+        this.loudness = 0.5;
         this.up = false;
         this.mode = 'pong';
     }
     launch(context, parameters) {
         this.preset = null;
         this.audioContext = context;
-        this.volume = this.audioContext.createGain();
+        this.volumeNode = this.audioContext.createGain();
         let split = parameters.split('/');
         let idx = 0;
         if (split.length > 1 && (split[1].trim().length > 0)) {
@@ -803,11 +749,19 @@ class ZvoogStrumPerformerImplementation {
             idx = this.loader.findInstrument(this.midiidx);
         }
         if (split.length > 2) {
-            this.mode = split[2];
+            if (split[2].length > 0) {
+                this.mode = split[2];
+            }
+        }
+        if (split.length > 3) {
+            if (split[3].length > 0) {
+                this.loudness = 0.01 * (0.0 + parseInt(split[3]));
+            }
         }
         this.info = this.loader.instrumentInfo(idx);
         this.loader.startLoad(context, this.info.url, this.info.variable);
-        this.volume.gain.setValueAtTime(0.5, this.audioContext.currentTime + 0.001);
+        this.volumeNode.gain.setValueAtTime(this.loudness, this.audioContext.currentTime + 0.001);
+        console.log('loudness', this.loudness);
         this.loader.waitLoad(() => {
             this.preset = window[this.info.variable];
         });
@@ -827,10 +781,10 @@ class ZvoogStrumPerformerImplementation {
     }
     strum(whenStart, zpitches, tempo, mzbxslide) {
         if (this.audioContext) {
-            if (this.volume) {
+            if (this.volumeNode) {
                 if (this.preset) {
                     let duration = 0;
-                    let volumeLevel = 0.66 + 0.15 * Math.random();
+                    let volumeLevel = 0.95 + 0.05 * Math.random();
                     let when = whenStart + Math.random() * 2 / tempo;
                     for (let ii = 0; ii < mzbxslide.length; ii++) {
                         let one = mzbxslide[ii];
@@ -842,27 +796,27 @@ class ZvoogStrumPerformerImplementation {
                     }
                     if (this.mode == 'pong') {
                         if (this.up) {
-                            this.player.queueStrumDown(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                            this.player.queueStrumDown(this.audioContext, this.volumeNode, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
                         }
                         else {
-                            this.player.queueStrumUp(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                            this.player.queueStrumUp(this.audioContext, this.volumeNode, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
                         }
                         this.up = !this.up;
                     }
                     else {
                         if (this.mode == 'down') {
-                            this.player.queueStrumDown(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                            this.player.queueStrumDown(this.audioContext, this.volumeNode, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
                         }
                         else {
                             if (this.mode == 'up') {
-                                this.player.queueStrumUp(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                                this.player.queueStrumUp(this.audioContext, this.volumeNode, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
                             }
                             else {
                                 if (this.mode == 'snap') {
-                                    this.player.queueSnap(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                                    this.player.queueSnap(this.audioContext, this.volumeNode, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
                                 }
                                 else {
-                                    this.player.queueChord(this.audioContext, this.volume, this.preset, when, pitches, duration, volumeLevel, mzbxslide);
+                                    this.player.queueChord(this.audioContext, this.volumeNode, this.preset, when, pitches, duration, volumeLevel, mzbxslide);
                                 }
                             }
                         }
@@ -875,8 +829,8 @@ class ZvoogStrumPerformerImplementation {
         this.player.cancelQueue(this.audioContext);
     }
     output() {
-        if (this.volume) {
-            return this.volume;
+        if (this.volumeNode) {
+            return this.volumeNode;
         }
         else {
             return null;
@@ -887,6 +841,7 @@ class ZSUI {
     constructor() {
         this.id = '';
         this.data = '';
+        this.loud = 50;
         this.player = new ZS_WebAudioFontPlayer();
     }
     init() {
@@ -894,6 +849,7 @@ class ZSUI {
         this.sendMessageToHost('');
         this.inslist = document.getElementById('inslist');
         this.modelist = document.getElementById('modelist');
+        this.voluctrl = document.getElementById('voluctrl');
         let ins = this.player.loader.instrumentKeys();
         for (let ii = 0; ii < ins.length; ii++) {
             var option = document.createElement('option');
@@ -906,6 +862,9 @@ class ZSUI {
             this.send2State();
         });
         this.modelist.addEventListener('change', (event) => {
+            this.send2State();
+        });
+        this.voluctrl.addEventListener('change', (event) => {
             this.send2State();
         });
     }
@@ -932,7 +891,8 @@ class ZSUI {
                 }
             }
         }
-        this.sendMessageToHost('0/' + this.inslist.value + '/' + mode);
+        this.loud = this.voluctrl.value;
+        this.sendMessageToHost('0/' + this.inslist.value + '/' + mode + '/' + this.loud);
     }
     sendMessageToHost(data) {
         var message = { dialogID: this.id, pluginData: data, done: false };
@@ -984,6 +944,13 @@ class ZSUI {
                         }
                     }
                 }
+            }
+        }
+        this.voluctrl.value = 50;
+        if (split.length > 3) {
+            if (split[3].length > 0) {
+                this.loud = parseInt(split[3]);
+                this.voluctrl.value = this.loud;
             }
         }
     }

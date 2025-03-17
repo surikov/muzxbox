@@ -2,18 +2,19 @@ console.log('zvoog defaulet performer v1.0');
 class ZvoogStrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 	audioContext: AudioContext;
 	player: ZS_WebAudioFontPlayer = new ZS_WebAudioFontPlayer();
-	volume: GainNode;
+	volumeNode: GainNode;
 	loader: ZS_WebAudioFontLoader = new ZS_WebAudioFontLoader(this.player);
 	midiidx: number = 0;
 	listidx: number = -1;
 	info: ZPPresetInfo;
 	preset: ZPWavePreset | null = null;
+	loudness = 0.5;
 	up = false;
 	mode: 'plain' | 'pong' | 'up' | 'down' | 'snap' = 'pong';
 	launch(context: AudioContext, parameters: string): void {
 		this.preset = null;
 		this.audioContext = context;
-		this.volume = this.audioContext.createGain();
+		this.volumeNode = this.audioContext.createGain();
 
 		let split = parameters.split('/');
 		let idx = 0;
@@ -27,13 +28,21 @@ class ZvoogStrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 			idx = this.loader.findInstrument(this.midiidx);
 		}
 		if (split.length > 2) {
-			this.mode = split[2] as any;
+			if (split[2].length > 0) {
+				this.mode = split[2] as any;
+			}
+		}
+		if (split.length > 3) {
+			if (split[3].length > 0) {
+				this.loudness = 0.01 * (0.0 + parseInt(split[3]));
+			}
 		}
 		//this.midinumber = parseInt(parameters);
 		//let idx = this.loader.findInstrument(this.midinumber);
 		this.info = this.loader.instrumentInfo(idx);
 		this.loader.startLoad(context, this.info.url, this.info.variable);
-		this.volume.gain.setValueAtTime(0.5, this.audioContext.currentTime + 0.001);
+		this.volumeNode.gain.setValueAtTime(this.loudness, this.audioContext.currentTime + 0.001);
+		console.log('loudness',this.loudness);
 		/*
 		if(this.info.variable=="_tone_0300_SBAWE32_sf2_file"){
 			this.volume.gain.setValueAtTime(0.99, this.audioContext.currentTime+0.002);
@@ -60,11 +69,11 @@ class ZvoogStrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 	}
 	strum(whenStart: number, zpitches: number[], tempo: number, mzbxslide: MZXBX_SlideItem[]): void {
 		if (this.audioContext) {
-			if (this.volume) {
+			if (this.volumeNode) {
 				if (this.preset) {
 					let duration = 0;
 					//let volumeLevel = 0.66;
-					let volumeLevel = 0.66 + 0.15 * Math.random();
+					let volumeLevel = 0.95 + 0.05 * Math.random();
 					let when = whenStart + Math.random() * 2 / tempo;
 					//let slides: ZPWaveSlide[][] = [];
 					for (let ii = 0; ii < mzbxslide.length; ii++) {
@@ -83,22 +92,22 @@ class ZvoogStrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 					//console.log(duration, zpitches, mzbxslide);
 					if (this.mode == 'pong') {
 						if (this.up) {
-							this.player.queueStrumDown(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+							this.player.queueStrumDown(this.audioContext, this.volumeNode, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
 						} else {
-							this.player.queueStrumUp(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+							this.player.queueStrumUp(this.audioContext, this.volumeNode, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
 						}
 						this.up = !this.up;
 					} else {
 						if (this.mode == 'down') {
-							this.player.queueStrumDown(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+							this.player.queueStrumDown(this.audioContext, this.volumeNode, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
 						} else {
 							if (this.mode == 'up') {
-								this.player.queueStrumUp(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+								this.player.queueStrumUp(this.audioContext, this.volumeNode, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
 							} else {
 								if (this.mode == 'snap') {
-									this.player.queueSnap(this.audioContext, this.volume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+									this.player.queueSnap(this.audioContext, this.volumeNode, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
 								} else {
-									this.player.queueChord(this.audioContext, this.volume, this.preset, when, pitches, duration, volumeLevel, mzbxslide);
+									this.player.queueChord(this.audioContext, this.volumeNode, this.preset, when, pitches, duration, volumeLevel, mzbxslide);
 								}
 							}
 						}
@@ -111,8 +120,8 @@ class ZvoogStrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 		this.player.cancelQueue(this.audioContext)
 	}
 	output(): AudioNode | null {
-		if (this.volume) {
-			return this.volume;
+		if (this.volumeNode) {
+			return this.volumeNode;
 		} else {
 			return null;
 		}
@@ -123,12 +132,15 @@ class ZSUI {
 	data: string = '';
 	inslist: any;
 	modelist: any;
+	voluctrl: any;
+	loud = 50;
 	player: ZS_WebAudioFontPlayer = new ZS_WebAudioFontPlayer();
 	init() {
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
 		this.sendMessageToHost('');
 		this.inslist = document.getElementById('inslist');
 		this.modelist = document.getElementById('modelist');
+		this.voluctrl = document.getElementById('voluctrl');
 		let ins = this.player.loader.instrumentKeys();
 
 		for (let ii = 0; ii < ins.length; ii++) {
@@ -145,7 +157,9 @@ class ZSUI {
 		this.modelist.addEventListener('change', (event) => {
 			this.send2State();
 		});
-
+		this.voluctrl.addEventListener('change', (event) => {
+			this.send2State();
+		});
 	}
 
 	send2State() {
@@ -167,7 +181,8 @@ class ZSUI {
 				}
 			}
 		}
-		this.sendMessageToHost('0/' + this.inslist.value + '/' + mode);
+		this.loud = this.voluctrl.value;
+		this.sendMessageToHost('0/' + this.inslist.value + '/' + mode + '/' + this.loud);
 	}
 
 	sendMessageToHost(data: string) {
@@ -214,6 +229,13 @@ class ZSUI {
 						}
 					}
 				}
+			}
+		}
+		this.voluctrl.value = 50;
+		if (split.length > 3) {
+			if (split[3].length > 0) {
+				this.loud = parseInt(split[3]);
+				this.voluctrl.value = this.loud;
 			}
 		}
 	}
