@@ -1108,7 +1108,7 @@ function testTest2() {
         else {
             //sumtext = sumtext +  (ii - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ')'
             //	+ countCurHeigth;
-            sumtext = sumtext + (ii_4 - 1) + ':' + countCurHeigth + '=' + Math.round(100 * veroyat1 * countCurHeigth) / 100;
+            sumtext = sumtext + '\n[' + (ii_4 - 1) + ']' + countCurHeigth + '\t' + Math.round(100 * veroyat1 * countCurHeigth) / 100;
         }
         sumtext = sumtext + ' ';
     }
