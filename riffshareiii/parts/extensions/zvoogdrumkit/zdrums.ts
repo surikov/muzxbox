@@ -10,7 +10,7 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 	info: ZDRPresetInfo;
 	preset: ZDRWavePreset | null = null;
 	sampleDuration = 0.000001;
-	loudness = 0.5;
+	loudness = 0.9;
 	launch(context: AudioContext, parameters: string): void {
 		this.preset = null;
 		this.audioContext = context;

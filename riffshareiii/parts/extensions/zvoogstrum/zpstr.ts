@@ -74,7 +74,7 @@ class ZvoogStrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 					let duration = 0;
 					//let volumeLevel = 0.66;
 					let volumeLevel = 0.95 + 0.05 * Math.random();
-					let when = whenStart + Math.random() * 2 / tempo;
+					let when = whenStart + Math.random() * 1 / tempo;
 					//let slides: ZPWaveSlide[][] = [];
 					for (let ii = 0; ii < mzbxslide.length; ii++) {
 						let one = mzbxslide[ii];

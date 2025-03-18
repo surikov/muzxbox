@@ -343,6 +343,21 @@ class Projectr {
 			}
 			, volume: volume
 		};
+		if(midiTrack.program==65){
+			projectTrack.performer.data='' + midiTrack.program+'//'+strummode+'/90'
+		}
+		if(midiTrack.program==49){
+			projectTrack.performer.data='' + midiTrack.program+'//'+strummode+'/20'
+		}
+		if(midiTrack.program==80){
+			projectTrack.performer.data='' + midiTrack.program+'//'+strummode+'/20'
+		}
+		if(midiTrack.program==38){
+			projectTrack.performer.data='' + midiTrack.program+'//'+strummode+'/30'
+		}
+		if(midiTrack.program==16){
+			projectTrack.performer.data='' + midiTrack.program+'//'+strummode+'/20'
+		}
 		if (!(midiTrack.program >= 0 && midiTrack.program <= 127)) {
 			projectTrack.performer.outputs = [];
 		}

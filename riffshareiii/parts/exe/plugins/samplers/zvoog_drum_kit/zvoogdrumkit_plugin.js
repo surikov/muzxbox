@@ -508,7 +508,7 @@ class ZvoogDrumKitImplementation {
         this.loader = new ZDRWebAudioFontLoader();
         this.preset = null;
         this.sampleDuration = 0.000001;
-        this.loudness = 0.5;
+        this.loudness = 0.9;
     }
     launch(context, parameters) {
         this.preset = null;
