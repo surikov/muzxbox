@@ -1,5 +1,658 @@
 console.log('https://github.com/mmontag/dx7-synth-js');
 
+function setupAudioGraph() {
+	var scriptProcessor = null;
+	var audioContext = new (window.AudioContext )();
+
+	scriptProcessor = audioContext.createScriptProcessor(config.bufferSize, 0, 2);
+	var synth = new Synth( config.polyphony);
+	scriptProcessor.connect(audioContext.destination);
+
+	var bufferSize = scriptProcessor.bufferSize || config.bufferSize;
+	var bufferSizeMs = 1000 * bufferSize / config.sampleRate;
+	var msPerSample = 1000 / config.sampleRate;
+	// Attach to window to avoid GC. http://sriku.org/blog/2013/01/30/taming-the-scriptprocessornode
+	scriptProcessor.onaudioprocess =  function (e) {
+		var buffer = e.outputBuffer;
+		var outputL = buffer.getChannelData(0);
+		var outputR = buffer.getChannelData(1);
+
+		var sampleTime = performance.now() - bufferSizeMs;
+		//var visualizerFrequency = new FMVoice('','').frequencyFromNoteNumber(synth.getLatestNoteDown());
+		
+
+		for (var i = 0, length = buffer.length; i < length; i++) {
+			sampleTime += msPerSample;
+			synth.processQueuedEventsUpToSampleTime(sampleTime);
+			var output = synth.render();
+			outputL[i] = output[0];
+			outputR[i] = output[1];
+		}
+	};
+}
+
+
+//src app.js
+
+/*
+var _ = require('lodash');
+var Angular = require('angular');
+var ngStorage = require('ngstorage');
+var MMLEmitter = require('mml-emitter');
+var MIDIFile = require('midifile');
+var MIDIPlayer = require('midiplayer');
+
+var FMVoice = require('./voice-dx7');
+var MIDI = require('./midi');
+var Synth = require('./synth');
+var SysexDX7 = require('./sysex-dx7');
+var Visualizer = require('./visualizer');
+var Reverb = require('./reverb');
+
+var config = require('./config');
+var defaultPresets = require('./default-presets');
+
+var PARAM_START_MANIPULATION = 'param-start-manipulation';
+var PARAM_STOP_MANIPULATION = 'param-stop-manipulation';
+var PARAM_CHANGE = 'param-change';
+var DEFAULT_PARAM_TEXT = '--';
+
+var app = Angular.module('synthApp', ['ngStorage']);
+var synth = new Synth(FMVoice, config.polyphony);
+var midi = new MIDI(synth);
+var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+config.sampleRate = audioContext.sampleRate;
+var visualizer = new Visualizer("analysis", 256, 35, 0xc0cf35, 0x2f3409, audioContext);
+var scriptProcessor = null;
+var reverbGainNode = null;
+
+function setupAudioGraph() {
+	Reverb.extend(audioContext);
+	var reverbNode = audioContext.createReverbFromUrl("impulses/church-saint-laurentius.wav");
+	reverbGainNode = audioContext.createGain();
+	reverbNode.connect(reverbGainNode);
+
+	scriptProcessor = audioContext.createScriptProcessor(config.bufferSize, 0, 2);
+	scriptProcessor.connect(visualizer.getAudioNode());
+	scriptProcessor.connect(reverbNode);
+
+	scriptProcessor.connect(audioContext.destination);
+	reverbGainNode.connect(audioContext.destination);
+
+	var bufferSize = scriptProcessor.bufferSize || config.bufferSize;
+	var bufferSizeMs = 1000 * bufferSize / config.sampleRate;
+	var msPerSample = 1000 / config.sampleRate;
+	// Attach to window to avoid GC. http://sriku.org/blog/2013/01/30/taming-the-scriptprocessornode
+	scriptProcessor.onaudioprocess = window.audioProcess = function (e) {
+		var buffer = e.outputBuffer;
+		var outputL = buffer.getChannelData(0);
+		var outputR = buffer.getChannelData(1);
+
+		var sampleTime = performance.now() - bufferSizeMs;
+		var visualizerFrequency = FMVoice.frequencyFromNoteNumber(synth.getLatestNoteDown());
+		visualizer.setPeriod(config.sampleRate / visualizerFrequency);
+
+		for (var i = 0, length = buffer.length; i < length; i++) {
+			sampleTime += msPerSample;
+			synth.processQueuedEventsUpToSampleTime(sampleTime);
+			var output = synth.render();
+			outputL[i] = output[0];
+			outputR[i] = output[1];
+		}
+	};
+}
+
+setupAudioGraph();
+
+// Polyphony counter
+setInterval(function() {
+	var count = 0;
+	synth.voices.map(function(voice) { if (voice) count++; });
+	if (count) console.log("Current polyphony:", count);
+}, 1000);
+
+app.directive('toNumber', function() {
+	return {
+		require: 'ngModel',
+		link: function (scope, elem, attrs, ctrl) {
+			ctrl.$parsers.push(function (value) {
+				return parseFloat(value || '');
+			});
+		}
+	};
+});
+
+app.filter('reverse', function() {
+	return function(items) {
+		return items ? items.slice().reverse() : items;
+	};
+});
+
+app.directive('toggleButton', function() {
+	return {
+		restrict: 'E',
+		replace: true,
+		transclude: true,
+		require: 'ngModel',
+		scope: {'ngModel': '='},
+		template: '<button type="button" class="dx7-toggle ng-class:{\'dx7-toggle-on\':ngModel}" data-toggle="button" ng-click="ngModel = 1 - ngModel" ng-transclude></button>'
+	};
+});
+
+app.directive('knob', function() {
+	function link(scope, element, attrs) {
+		var rotationRange = 300; // ±degrees
+		var pixelRange = 200; // pixels between max and min
+		var startY, startModel, down = false;
+		var fgEl = element.find('div');
+		var max = element.attr('max');
+		var min = element.attr('min');
+		var increment = (max - min) < 99 ? 1 : 2;
+		element.on('mousedown', function(e) {
+			startY = e.clientY;
+			startModel = scope.ngModel || 0;
+			down = true;
+			e.preventDefault();
+			e.stopPropagation();
+			window.addEventListener('mousemove', onMove);
+			window.addEventListener('mouseup', onUp);
+			element[0].querySelector('.knob').focus();
+			scope.$emit(PARAM_START_MANIPULATION, scope.ngModel);
+		});
+
+		element.on('touchstart', function(e) {
+			if (e.touches.length > 1) {
+				// Don't interfere with any multitouch gestures
+				onUp(e);
+				return;
+			}
+
+			startY = e.targetTouches[0].clientY;
+			startModel = scope.ngModel || 0;
+			down = true;
+			e.preventDefault();
+			e.stopPropagation();
+			window.addEventListener('touchmove', onMove);
+			window.addEventListener('touchend', onUp);
+			element[0].querySelector('.knob').focus();
+			scope.$emit(PARAM_START_MANIPULATION, scope.ngModel);
+		});
+
+		element.on('keydown', function(e) {
+			var code = e.keyCode;
+			if (code >= 37 && code <= 40) {
+				e.preventDefault();
+				e.stopPropagation();
+				if (code == 38 || code == 39) {
+					scope.ngModel = Math.min(scope.ngModel + 1, max);
+				} else {
+					scope.ngModel = Math.max(scope.ngModel - 1, min);
+				}
+				apply();
+			}
+		});
+
+		element.on('wheel', function(e) {
+			e.preventDefault();
+			element[0].focus();
+			if (e.deltaY > 0) {
+				scope.ngModel = Math.max(scope.ngModel - increment, min);
+			} else {
+				scope.ngModel = Math.min(scope.ngModel + increment, max);
+			}
+			apply();
+		});
+
+		function onMove(e) {
+			if (down) {
+				var clientY = e.clientY;
+				if (e.targetTouches && e.targetTouches[0])
+					clientY = e.targetTouches[0].clientY;
+				var dy = (startY - clientY) * (max - min) / pixelRange;
+				// TODO: use 'step' attribute
+				scope.ngModel = Math.round(Math.max(min, Math.min(max, dy + startModel)));
+				apply();
+			}
+		}
+
+		function onUp(e) {
+			down = false;
+			window.removeEventListener('mousemove', onMove);
+			window.removeEventListener('mouseup', onUp);
+			window.removeEventListener('touchmove', onMove);
+			window.removeEventListener('touchend', onUp);
+			scope.$emit(PARAM_STOP_MANIPULATION, scope.ngModel);
+		}
+
+		var apply = _.throttle(function () {
+			scope.$emit(PARAM_CHANGE, scope.label + ": " + scope.ngModel);
+			scope.$apply();
+		}, 33);
+
+		scope.getDegrees = function() {
+			return (this.ngModel - min) / (max - min) * rotationRange - (rotationRange / 2) ;
+		}
+	}
+
+	return {
+		restrict: 'E',
+		replace: true,
+		require: 'ngModel',
+		scope: {ngModel: '=', label: '@'},
+		template: '<div><div class="param-label">{{ label }}</div><div class="knob" tabindex="0"><div class="knob-foreground" ng-style="{\'transform\': \'rotate(\' + getDegrees() + \'deg)\'}"></div></div></div>',
+		link: link
+	};
+});
+
+app.directive('slider', function() {
+	function link(scope, element, attrs) {
+		var sliderHandleHeight = 8;
+		var sliderRailHeight = 50;
+		var positionRange = sliderRailHeight - sliderHandleHeight;
+		var pixelRange = 50;
+		var startY, startModel, down = false;
+		var max = element.attr('max');
+		var min = element.attr('min');
+		var increment = (max - min) < 99 ? 1 : 2;
+		element.on('mousedown', function(e) {
+			startY = e.clientY;
+			startModel = scope.ngModel || 0;
+			down = true;
+			e.preventDefault();
+			e.stopPropagation();
+			window.addEventListener('mousemove', onMove);
+			window.addEventListener('mouseup', onUp);
+			element[0].querySelector('.slider').focus();
+			scope.$emit(PARAM_START_MANIPULATION, scope.ngModel);
+		});
+
+		element.on('touchstart', function(e) {
+			if (e.touches.length > 1) {
+				// Don't interfere with any multitouch gestures
+				onUp(e);
+				return;
+			}
+
+			startY = e.targetTouches[0].clientY;
+			startModel = scope.ngModel || 0;
+			down = true;
+			e.preventDefault();
+			e.stopPropagation();
+			window.addEventListener('touchmove', onMove);
+			window.addEventListener('touchend', onUp);
+			element[0].querySelector('.slider').focus();
+			scope.$emit(PARAM_START_MANIPULATION, scope.ngModel);
+		});
+
+		element.on('keydown', function(e) {
+			var code = e.keyCode;
+			if (code >= 37 && code <= 40) {
+				e.preventDefault();
+				e.stopPropagation();
+				if (code == 38 || code == 39) {
+					scope.ngModel = Math.min(scope.ngModel + 1, max);
+				} else {
+					scope.ngModel = Math.max(scope.ngModel - 1, min);
+				}
+				apply();
+			}
+		});
+
+		element.on('wheel', function(e) {
+			e.preventDefault();
+			element[0].querySelector('.slider').focus();
+			if (e.deltaY > 0) {
+				scope.ngModel = Math.max(scope.ngModel - increment, min);
+			} else {
+				scope.ngModel = Math.min(scope.ngModel + increment, max);
+			}
+			apply();
+		});
+
+		function onMove(e) {
+			if (down) {
+				var clientY = e.clientY;
+				if (e.targetTouches && e.targetTouches[0])
+					clientY = e.targetTouches[0].clientY;
+				var dy = (startY - clientY) * (max - min) / pixelRange;
+				scope.ngModel = Math.round(Math.max(min, Math.min(max, dy + startModel)));
+				apply();
+			}
+		}
+
+		function onUp(e) {
+			down = false;
+			window.removeEventListener('mousemove', onMove);
+			window.removeEventListener('mouseup', onUp);
+			window.removeEventListener('touchmove', onMove);
+			window.removeEventListener('touchend', onUp);
+			scope.$emit(PARAM_STOP_MANIPULATION, scope.ngModel);
+		}
+
+		var apply = _.throttle(function() {
+			scope.$emit(PARAM_CHANGE, scope.label + ": " + scope.ngModel);
+			scope.$apply();
+		}, 33);
+
+		scope.getTop = function() {
+			return positionRange - ((this.ngModel - min) / (max - min) * positionRange);
+		}
+	}
+
+	return {
+		restrict: 'E',
+		replace: true,
+		require: 'ngModel',
+		scope: {ngModel: '=', label: '@'},
+		template: '<div><div class="slider" tabindex="0"><div class="slider-foreground" ng-style="{\'top\': getTop() + \'px\'}"></div></div><div class="slider-meter"></div></div>',
+		link: link
+	};
+});
+
+app.controller('MidiCtrl', ['$scope', '$http', function($scope, $http) {
+	// MIDI stuff
+	var self = this;
+	this.midiFileIndex = 0;
+	this.midiFiles = [
+		"midi/rachmaninoff-op39-no6.mid",
+		"midi/minute_waltz.mid",
+		"midi/bluebossa.mid",
+		"midi/cantaloup.mid",
+		"midi/chameleon.mid",
+		"midi/tunisia.mid",
+		"midi/sowhat.mid",
+		"midi/got-a-match.mid"
+	];
+	this.midiPlayer = new MIDIPlayer({
+		output: {
+			// Loopback MIDI to input handler.
+			send: function(data, timestamp) {
+				// Synthetic MIDIMessageEvent
+				midi.send({ data: data, timeStamp: timestamp });
+			}
+		}
+	});
+
+	this.onMidiPlay = function() {
+		$http.get(this.midiFiles[this.midiFileIndex], {responseType: "arraybuffer"})
+			.success(function(data) {
+				console.log("Loaded %d bytes.", data.byteLength);
+				var midiFile = new MIDIFile(data);
+				self.midiPlayer.load(midiFile);
+				self.midiPlayer.play(function() { console.log("MIDI file playback ended."); });
+			});
+	};
+
+	this.onMidiStop = function() {
+		this.midiPlayer.stop();
+		synth.panic();
+	};
+
+	var mml = null;
+	var mmlDemos = [ "t92 l8 o4 $" +
+		"[>cg<cea]2.        [>cg<ceg]4" +
+		"[>>a<a<c+fa+]2.    [>>a <a <c+ e a]4" +
+		"[>>f <f g+ <c g]2. [>>f <f g+ <c f]4" +
+		"[>>g <g g+ b <g+]2.[>>g <g <g]4;" +
+		"t92 $ l1 o3 v12 r r r r2 r8 l32 v6 cdef v8 ga v10 b<c v12 de v14 fg;",
+		"t120$ l8 o3    >g+2.. g+ a+4. a+ <c2 >a+    g+2.. a+4 a+4 <c4. >d+" +
+			"              a+ g+2. g+ a+4. a+ <c2 >a+   g+2.. a+4 a+4 <c2.;" +
+			"t120$l8 o4    rr g g4 g+ a+4 d4 d4 d+2     d c g g4 g+ a+4 d4 d4 d+2" +
+			"              rr g g4 g+ a+4 d4 d4 d+2     d c g g4 g+ a+4 d4 d4 d+2.;" +
+			"t120$l8 o4 v9 rr d+ d+2 r >a+4 a+4 <c2     >a+ g+ <d+ d+2 r >a+4 a+4 a+2" +
+			"              rr d+ d+2 r >a+4 a+4 <c2     >a+ g+ <d+ d+2 r >a+4 a+4 a+2.;" +
+			"t120$l8 o4 v8 rr c c2 r   >f4 f4 g2        a+ g+ <c c2 >f f4 r f g2<" +
+			"              rr c c2 r   >f4 f4 g2        a+ g+ <c c2 >f f4 r f g2.<;"
+	];
+	var qwertyNotes = [];
+	//Lower row: zsxdcvgbhnjm...
+	qwertyNotes[16] = 41; // = F2
+	qwertyNotes[65] = 42;
+	qwertyNotes[90] = 43;
+	qwertyNotes[83] = 44;
+	qwertyNotes[88] = 45;
+	qwertyNotes[68] = 46;
+	qwertyNotes[67] = 47;
+	qwertyNotes[86] = 48; // = C3
+	qwertyNotes[71] = 49;
+	qwertyNotes[66] = 50;
+	qwertyNotes[72] = 51;
+	qwertyNotes[78] = 52;
+	qwertyNotes[77] = 53; // = F3
+	qwertyNotes[75] = 54;
+	qwertyNotes[188] = 55;
+	qwertyNotes[76] = 56;
+	qwertyNotes[190] = 57;
+	qwertyNotes[186] = 58;
+	qwertyNotes[191] = 59;
+
+	// Upper row: q2w3er5t6y7u...
+	qwertyNotes[81] = 60; // = C4 ("middle C")
+	qwertyNotes[50] = 61;
+	qwertyNotes[87] = 62;
+	qwertyNotes[51] = 63;
+	qwertyNotes[69] = 64;
+	qwertyNotes[82] = 65; // = F4
+	qwertyNotes[53] = 66;
+	qwertyNotes[84] = 67;
+	qwertyNotes[54] = 68;
+	qwertyNotes[89] = 69;
+	qwertyNotes[55] = 70;
+	qwertyNotes[85] = 71;
+	qwertyNotes[73] = 72; // = C5
+	qwertyNotes[57] = 73;
+	qwertyNotes[79] = 74;
+	qwertyNotes[48] = 75;
+	qwertyNotes[80] = 76;
+	qwertyNotes[219] = 77; // = F5
+	qwertyNotes[187] = 78;
+	qwertyNotes[221] = 79;
+	qwertyNotes[220] = 80;
+
+	this.createMML = function (idx) {
+		var mml = new MMLEmitter(audioContext, mmlDemos[idx]);
+		var noteHandler = function(e) {
+			synth.noteOn(e.midi, e.volume / 20);
+			e.noteOff(function() {
+				synth.noteOff(e.midi);
+			});
+		};
+		mml.tracks.map(function(track) { track.on('note', noteHandler); });
+		return mml;
+	};
+
+	this.onDemoClick = function(idx) {
+		if (mml && mml._ended == 0) {
+			mml.stop();
+			synth.panic();
+			mml = null;
+		} else {
+			mml = this.createMML(idx);
+			mml.start();
+		}
+	};
+
+	this.onVizClick = function() {
+		visualizer.cycleMode();
+	};
+
+	this.onKeyDown = function(ev) {
+		var note = qwertyNotes[ev.keyCode];
+		if (ev.metaKey) return false;
+		if (ev.keyCode == 32) {
+			synth.panic();
+			ev.stopPropagation();
+			ev.preventDefault();
+			return false;
+		}
+		if (note) {
+			if (!ev.repeat) {
+				synth.noteOn(note, 0.8 + (ev.ctrlKey ? 0.47 : 0));
+			}
+			ev.stopPropagation();
+			ev.preventDefault();
+		}
+		return false;
+	};
+
+	this.onKeyUp = function(ev) {
+		var note = qwertyNotes[ev.keyCode];
+		if (note)
+			synth.noteOff(note);
+		return false;
+	};
+
+	window.addEventListener('keydown', this.onKeyDown, false);
+	window.addEventListener('keyup', this.onKeyUp, false);
+}]);
+
+app.controller('OperatorCtrl', function($scope) {
+	$scope.$watchGroup(['operator.oscMode', 'operator.freqCoarse', 'operator.freqFine', 'operator.detune'], function() {
+		FMVoice.updateFrequency($scope.operator.idx);
+		$scope.freqDisplay = $scope.operator.oscMode === 0 ?
+			parseFloat($scope.operator.freqRatio).toFixed(2).toString() :
+			$scope.operator.freqFixed.toString().substr(0,4).replace(/\.$/,'');
+	});
+	$scope.$watch('operator.volume', function() {
+		FMVoice.setOutputLevel($scope.operator.idx, $scope.operator.volume);
+	});
+	$scope.$watch('operator.pan', function() {
+		FMVoice.setPan($scope.operator.idx, $scope.operator.pan);
+	});
+});
+
+app.controller('PresetCtrl', ['$scope', '$localStorage', '$http', function ($scope, $localStorage, $http) {
+	var self = this;
+
+	this.lfoWaveformOptions = [ 'Triangle', 'Saw Down', 'Saw Up', 'Square', 'Sine', 'Sample & Hold' ];
+	this.presets = defaultPresets;
+	this.selectedIndex = 0;
+	this.paramDisplayText = DEFAULT_PARAM_TEXT;
+
+	var paramManipulating = false;
+	var paramDisplayTimer = null;
+
+	function flashParam(value) {
+		self.paramDisplayText = value;
+		$scope.$apply();
+		clearTimeout(paramDisplayTimer);
+		if (!paramManipulating) {
+			paramDisplayTimer = setTimeout(function() {
+				self.paramDisplayText = DEFAULT_PARAM_TEXT;
+				$scope.$apply();
+			}, 1500);
+		}
+	}
+
+	$scope.$on(PARAM_START_MANIPULATION, function(e, value) {
+		paramManipulating = true;
+		flashParam(value);
+	});
+
+	$scope.$on(PARAM_STOP_MANIPULATION, function(e, value) {
+		paramManipulating = false;
+		flashParam(value);
+	});
+
+	$scope.$on(PARAM_CHANGE, function(e, value) {
+		flashParam(value);
+	});
+
+	$http.get('roms/ROM1A.SYX')
+		.success(function(data) {
+			self.basePresets = SysexDX7.loadBank(data);
+			self.$storage = $localStorage;
+			self.presets = [];
+			for (var i = 0; i < self.basePresets.length; i++) {
+				if (self.$storage[i]) {
+					self.presets[i] = Angular.copy(self.$storage[i]);
+				} else {
+					self.presets[i] = Angular.copy(self.basePresets[i]);
+				}
+			}
+			self.selectedIndex = 10; // Select E.PIANO 1
+			self.onChange();
+		});
+
+	this.onChange = function() {
+		this.params = this.presets[this.selectedIndex];
+		FMVoice.setParams(this.params);
+		// TODO: separate UI parameters from internal synth parameters
+		// TODO: better initialization of computed parameters
+		for (var i = 0; i < this.params.operators.length; i++) {
+			var op = this.params.operators[i];
+			FMVoice.setOutputLevel(i, op.volume);
+			FMVoice.updateFrequency(i);
+			FMVoice.setPan(i, op.pan);
+		}
+		FMVoice.setFeedback(this.params.feedback);
+	};
+
+	this.save = function() {
+		this.$storage[this.selectedIndex] = Angular.copy(this.presets[this.selectedIndex]);
+		console.log("Saved preset %s.", this.presets[this.selectedIndex].name);
+	};
+
+	this.reset = function() {
+		if (confirm('Are you sure you want to reset this patch?')) {
+			delete this.$storage[this.selectedIndex];
+			console.log("Reset preset %s.", this.presets[this.selectedIndex].name);
+			this.presets[this.selectedIndex] = Angular.copy(self.basePresets[this.selectedIndex]);
+			this.onChange();
+		}
+	};
+
+	$scope.$watch('presetCtrl.params.feedback', function(newValue) {
+		if (newValue !== undefined) {
+			FMVoice.setFeedback(self.params.feedback);
+		}
+	});
+
+	$scope.$watchGroup([
+		'presetCtrl.params.lfoSpeed',
+		'presetCtrl.params.lfoDelay',
+		'presetCtrl.params.lfoAmpModDepth',
+		'presetCtrl.params.lfoPitchModDepth',
+		'presetCtrl.params.lfoPitchModSens',
+		'presetCtrl.params.lfoWaveform'
+	], function() {
+		FMVoice.updateLFO();
+	});
+
+	$scope.presetCtrl.reverb = 33;
+	$scope.$watch('presetCtrl.reverb', (value) => {
+		reverbGainNode.gain.value = 4 * value / 100;
+	});
+
+	self.onChange();
+
+	// Audio context unlock that should work in both iOS and Chrome
+	function unlockAudioContext(context) {
+		if (context.state === 'suspended') {
+			var events = ['touchstart', 'touchend', 'mousedown', 'keydown'];
+			var unlock = function unlock() {
+				events.forEach(function (event) {
+					document.body.removeEventListener(event, unlock)
+				});
+
+				console.log("Resuming audio context...");
+				context.resume();
+				flashParam("** DX7-JS **");
+
+			};
+
+			events.forEach(function (event) {
+				document.body.addEventListener(event, unlock, false)
+			});
+		}
+	}
+
+	unlockAudioContext(audioContext);
+
+}]);
+
+*/
+
 //src config.js
 
 var LFO_SAMPLE_PERIOD = 100;
@@ -23,7 +676,7 @@ var Config = {
 var config = Config;
 
 //src operator.js
-class Operator {
+class AlgOperator {
 	//var config = require('./config');
 
 
@@ -33,15 +686,15 @@ class Operator {
 
 	phase = 0;
 	val = 0;
-	params;
-	envelope;
+	params:ROMPresetOperator;
+	envelope:EnvelopeDX7;
 	// TODO: Pitch envelope
 	// this.pitchEnvelope = pitchEnvelope;
-	lfo;
+	lfo:LfoDX7;
 	phaseStep;
 	outputLevel;
 
-	constructor(params, baseFrequency, envelope, lfo) {
+	constructor(params:ROMPresetOperator, baseFrequency:number, envelope:EnvelopeDX7, lfo:LfoDX7) {
 		this.phase = 0;
 		this.val = 0;
 		this.params = params;
@@ -151,14 +804,14 @@ class FMVoice {
 	];
 
 	//var params: any = {};
-	params;
+	params: ROMPresetData;
 	down = true;
-	note;
-	frequency;
-	velocity;
-	operators;
+	note:number;
+	frequency:number;
+	velocity:number;
+	operators:AlgOperator[];
 
-	constructor(note, velocity) {
+	constructor(note:string, velocity:string) {
 		this.down = true;
 		this.note = parseInt(note, 10);
 		this.frequency = this.frequencyFromNoteNumber(this.note);
@@ -169,8 +822,8 @@ class FMVoice {
 			// see https://github.com/smbolton/hexter/blob/621202b4f6ac45ee068a5d6586d3abe91db63eaf/src/dx7_voice.c#L789
 			// https://github.com/asb2m10/dexed/blob/1eda313316411c873f8388f971157664827d1ac9/Source/msfa/dx7note.cc#L55
 			// https://groups.yahoo.com/neo/groups/YamahaDX/conversations/messages/15919
-			var opParams = this.params.operators[i];
-			var op = new Operator(
+			var opParams:ROMPresetOperator = this.params.operators[i];
+			var op = new AlgOperator(
 				opParams,
 				this.frequency,
 				new EnvelopeDX7(opParams.levels, opParams.rates),
@@ -188,24 +841,24 @@ class FMVoice {
 	mod = 0;
 	bend = 0;
 
-	frequencyFromNoteNumber(note) {
+	frequencyFromNoteNumber(note:number):number {
 		return 440 * Math.pow(2, (note - 69) / 12);
 	};
 
-	setParams(globalParams) {
-		this.setParams(globalParams);
+	setParams(globalParams: ROMPresetData) {
+		//this.setParams(globalParams);
 		this.params = globalParams;
 	};
 
-	setFeedback(value) {
+	setFeedback(value:number) {
 		this.params.fbRatio = Math.pow(2, (value - 7)); // feedback of range 0 to 7
 	};
 
-	setOutputLevel(operatorIndex, value) {
+	setOutputLevel(operatorIndex:number, value:number) {
 		this.params.operators[operatorIndex].outputLevel = this.mapOutputLevel(value);
 	};
 
-	updateFrequency(operatorIndex) {
+	updateFrequency(operatorIndex:number) {
 		var op = this.params.operators[operatorIndex];
 		if (op.oscMode == 0) {
 			var freqCoarse = op.freqCoarse || 0.5; // freqCoarse of 0 is used for ratio of 0.5
@@ -216,26 +869,26 @@ class FMVoice {
 	};
 
 	updateLFO() {
-		new LfoDX7({}).update();
+		//new LfoDX7({}).update();
 	};
 
-	setPan(operatorIndex, value) {
+	setPan(operatorIndex:number, value:number) {
 		var op = this.params.operators[operatorIndex];
 		op.ampL = Math.cos(Math.PI / 2 * (value + 50) / 100);
 		op.ampR = Math.sin(Math.PI / 2 * (value + 50) / 100);
 	};
 
-	mapOutputLevel(input) {
+	mapOutputLevel(input:number) {
 		var idx = Math.min(99, Math.max(0, Math.floor(input)));
 		return this.OUTPUT_LEVEL_TABLE[idx] * 1.27;
 	};
 
-	channelAftertouch(value) {
+	channelAftertouch(value:number) {
 		this.aftertouch = value;
 		this.updateMod();
 	};
 
-	modulationWheel(value) {
+	modulationWheel(value:number) {
 		this.mod = value;
 		this.updateMod();
 	};
@@ -245,7 +898,7 @@ class FMVoice {
 		this.params.controllerModVal = Math.min(1.27, aftertouch + this.mod); // Allow 27% overdrive
 	};
 
-	pitchBend(value) {
+	pitchBend(value:number) {
 		this.bend = value;
 	};
 
@@ -387,7 +1040,7 @@ class LfoDX7 {
 	delayVals = [0, 0, 1];
 	params: any = {};
 
-	opParams;
+	opParams:ROMPresetOperator;
 	phase = 0;
 	pitchVal = 0;
 	counter = 0;
@@ -397,7 +1050,7 @@ class LfoDX7 {
 	delayVal = 0;
 	delayState;
 
-	constructor(opParams) {
+	constructor(opParams:ROMPresetOperator) {
 		this.opParams = opParams;
 		this.phase = 0;
 		this.pitchVal = 0;
@@ -591,14 +1244,17 @@ class Synth {
 	MIDI_CC_MODULATION = 1;
 	MIDI_CC_SUSTAIN_PEDAL = 64;
 	voices = [];
-	voiceClass;
+	//voiceClass;
+	voiceClassO;
 	polyphony;
 	sustainPedalDown = false;
 	eventQueue = [];
 	// TODO: Probably reduce responsibility to voice management; rename VoiceManager, MIDIChannel, etc.
-	constructor(voiceClass, polyphony) {
+	constructor( polyphony) {
+	//constructor(voiceClass, polyphony) {
 		this.voices = [];
-		this.voiceClass = voiceClass;
+		//this.voiceClass = voiceClass;
+		this.voiceClassO=new FMVoice('','');
 		this.polyphony = polyphony || 12;
 		this.sustainPedalDown = false;
 		this.eventQueue = [];
@@ -608,17 +1264,17 @@ class Synth {
 		this.eventQueue.push(ev);
 	};
 
-	processQueuedEventsUpToSampleTime(sampleTime) {
+	processQueuedEventsUpToSampleTime(sampleTime:number) {
 		if (this.eventQueue.length && this.eventQueue[0].timeStamp < sampleTime) {
 			this.processMidiEvent(this.eventQueue.shift());
 		}
 	}
 
-	processMidiEvent(ev) {
-		var cmd = ev.data[0] >> 4;
-		var channel = ev.data[0] & 0xf;
-		var noteNumber = ev.data[1];
-		var velocity = ev.data[2];
+	processMidiEvent(midiev) {
+		var cmd = midiev.data[0] >> 4;
+		var channel = midiev.data[0] & 0xf;
+		var noteNumber = midiev.data[1];
+		var velocity = midiev.data[2];
 		// console.log( "" + ev.data[0] + " " + ev.data[1] + " " + ev.data[2])
 		// console.log("midi: ch %d, cmd %d, note %d, vel %d", channel, cmd, noteNumber, velocity);
 		if (channel === 9) // Ignore drum channel
@@ -650,7 +1306,7 @@ class Synth {
 		// see http://www.midi.org/techspecs/midimessages.php#3
 		switch (controlNumber) {
 			case this.MIDI_CC_MODULATION:
-				this.voiceClass.modulationWheel(value);
+				this.voiceClassO.modulationWheel(value);
 				break;
 			case this.MIDI_CC_SUSTAIN_PEDAL:
 				this.sustainPedal(value > 0.5);
@@ -659,7 +1315,7 @@ class Synth {
 	};
 
 	channelAftertouch(value) {
-		this.voiceClass.channelAftertouch(value);
+		this.voiceClassO.channelAftertouch(value);
 	};
 
 	sustainPedal(down) {
@@ -675,7 +1331,7 @@ class Synth {
 	};
 
 	pitchBend(value) {
-		this.voiceClass.pitchBend(value * this.PITCH_BEND_RANGE);
+		this.voiceClassO.pitchBend(value * this.PITCH_BEND_RANGE);
 		for (var i = 0, l = this.voices.length; i < l; i++) {
 			if (this.voices[i])
 				this.voices[i].updatePitchBend();
@@ -683,7 +1339,7 @@ class Synth {
 	};
 
 	noteOn(note, velocity) {
-		var voice = new this.voiceClass(note, velocity);
+		var voice = new this.voiceClassO(note, velocity);
 		if (this.voices.length >= this.polyphony) {
 			// TODO: fade out removed voices
 			this.voices.shift(); // remove first
@@ -739,7 +1395,7 @@ class Synth {
 //src sysex-dx7.js
 
 class SysexDX7 {
-	bin2hex(s) {
+	_bin2hex(s) {
 		var i, f = s.length, a = [];
 		for (i = 0; i < f; i++) {
 			a[i] = ('0' + s.charCodeAt(i).toString(16)).slice(-2);
@@ -748,8 +1404,8 @@ class SysexDX7 {
 	}
 
 	// Expects bankData to be a DX7 SYSEX Bulk Data for 32 Voices
-	loadBank(bankData) {
-		var presets = [];
+	loadBank(bankData: string): ROMPresetData[] {
+		var presets: ROMPresetData[] = [];
 		for (var i = 0; i < 32; i++) {
 			presets.push(this.extractPatchFromRom(bankData, i));
 		}
@@ -758,42 +1414,47 @@ class SysexDX7 {
 
 	// see http://homepages.abdn.ac.uk/mth192/pages/dx7/sysex-format.txt
 	// Section F: Data Structure: Bulk Dump Packed Format
-	extractPatchFromRom(bankData, patchId) {
+	extractPatchFromRom(bankData: string, patchId: number): ROMPresetData {
 		var dataStart = 128 * patchId + 6;
 		var dataEnd = dataStart + 128;
 		var voiceData = bankData.substring(dataStart, dataEnd);
-		var operators = [{}, {}, {}, {}, {}, {}];
+		var operators: ROMPresetOperator[] = [];//[{}, {}, {}, {}, {}, {}];
 
 		for (var i = 5; i >= 0; --i) {
 			var oscStart = (5 - i) * 17;
 			var oscEnd = oscStart + 17;
-			var oscData = voiceData.substring(oscStart, oscEnd);
+			var oscData: string = voiceData.substring(oscStart, oscEnd);
 			//var operator = operators[i];
-			var operator: any = {};
-			operator.rates = [oscData.charCodeAt(0), oscData.charCodeAt(1), oscData.charCodeAt(2), oscData.charCodeAt(3)];
-			operator.levels = [oscData.charCodeAt(4), oscData.charCodeAt(5), oscData.charCodeAt(6), oscData.charCodeAt(7)];
-			operator.keyScaleBreakpoint = oscData.charCodeAt(8);
-			operator.keyScaleDepthL = oscData.charCodeAt(9);
-			operator.keyScaleDepthR = oscData.charCodeAt(10);
-			operator.keyScaleCurveL = oscData.charCodeAt(11) & 3;
-			operator.keyScaleCurveR = oscData.charCodeAt(11) >> 2;
-			operator.keyScaleRate = oscData.charCodeAt(12) & 7;
-			operator.detune = Math.floor(oscData.charCodeAt(12) >> 3) - 7; // range 0 to 14
-			operator.lfoAmpModSens = oscData.charCodeAt(13) & 3;
-			operator.velocitySens = oscData.charCodeAt(13) >> 2;
-			operator.volume = oscData.charCodeAt(14);
-			operator.oscMode = oscData.charCodeAt(15) & 1;
-			operator.freqCoarse = Math.floor(oscData.charCodeAt(15) >> 1);
-			operator.freqFine = oscData.charCodeAt(16);
-			// Extended/non-standard parameters
-			operator.pan = ((i + 1) % 3 - 1) * 25; // Alternate panning: -25, 0, 25, -25, 0, 25
-			operator.idx = i;
-			operator.enabled = true;
-
+			var operator: ROMPresetOperator = {
+				rates: [oscData.charCodeAt(0), oscData.charCodeAt(1), oscData.charCodeAt(2), oscData.charCodeAt(3)]
+				, levels: [oscData.charCodeAt(4), oscData.charCodeAt(5), oscData.charCodeAt(6), oscData.charCodeAt(7)]
+				, keyScaleBreakpoint: oscData.charCodeAt(8)
+				, keyScaleDepthL: oscData.charCodeAt(9)
+				, keyScaleDepthR: oscData.charCodeAt(10)
+				, keyScaleCurveL: oscData.charCodeAt(11) & 3
+				, keyScaleCurveR: oscData.charCodeAt(11) >> 2
+				, keyScaleRate: oscData.charCodeAt(12) & 7
+				, detune: Math.floor(oscData.charCodeAt(12) >> 3) - 7 // range 0 to 14
+				, lfoAmpModSens: oscData.charCodeAt(13) & 3
+				, velocitySens: oscData.charCodeAt(13) >> 2
+				, volume: oscData.charCodeAt(14)
+				, oscMode: oscData.charCodeAt(15) & 1
+				, freqCoarse: Math.floor(oscData.charCodeAt(15) >> 1)
+				, freqFine: oscData.charCodeAt(16)
+				// Extended/non-standard parameters
+				, pan: ((i + 1) % 3 - 1) * 25 // Alternate panning: -25, 0, 25, -25, 0, 25
+				, idx: i
+				, enabled: true
+				, outputLevel: 0
+				, freqRatio: 0
+				, freqFixed: 0
+				, ampL: 0
+				, ampR: 0
+			};
 			operators[i] = operator;
 		}
 
-		return {
+		let romset: ROMPresetData = {
 			algorithm: voiceData.charCodeAt(110) + 1, // start at 1 for readability
 			feedback: voiceData.charCodeAt(111) & 7,
 			operators: operators,
@@ -811,7 +1472,9 @@ class SysexDX7 {
 			},
 			controllerModVal: 0,
 			aftertouchEnabled: 0
+			, fbRatio: 0
 		}
+		return romset;
 	}
 }
 
@@ -838,6 +1501,7 @@ type ROMPresetData = {
 	, controllerModVal: number
 	, aftertouchEnabled: number
 	, operators: ROMPresetOperator[]
+	, fbRatio: number
 };
 type ROMPresetOperator = {
 	idx: number
@@ -853,6 +1517,16 @@ type ROMPresetOperator = {
 	, freqFine: number
 	, pan: number
 	, outputLevel: number
+	, keyScaleDepthL: number
+	, keyScaleDepthR: number
+	, keyScaleCurveL: number
+	, keyScaleCurveR: number
+	, keyScaleRate: number
+	, keyScaleBreakpoint: number
+	, freqRatio: number
+	, freqFixed: number
+	, ampL: number
+	, ampR: number
 };
 var defaultPresets: ROMPresetData[] = [
 	{
@@ -870,12 +1544,13 @@ var defaultPresets: ROMPresetData[] = [
 		, controllerModVal: 0
 		, aftertouchEnabled: 0
 		, operators: [
-			{ idx: 0, enabled: true, rates: [96, 0, 12, 70], levels: [99, 95, 95, 0], detune: 1, velocitySens: 0, lfoAmpModSens: 0, volume: 99, oscMode: 0, freqCoarse: 2, freqFine: 0, pan: 0, outputLevel: 13.12273 }
-			, { idx: 1, enabled: true, rates: [99, 95, 0, 70], levels: [99, 96, 89, 0], detune: -1, velocitySens: 0, lfoAmpModSens: 0, volume: 99, oscMode: 0, freqCoarse: 0, freqFine: 0, pan: 0, outputLevel: 13.12273 }
-			, { idx: 2, enabled: true, rates: [99, 87, 0, 70], levels: [93, 90, 0, 0], detune: 0, velocitySens: 0, lfoAmpModSens: 0, volume: 82, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: 0, outputLevel: 3.008399 }
-			, { idx: 3, enabled: true, rates: [99, 92, 28, 60], levels: [99, 90, 0, 0], detune: 2, velocitySens: 0, lfoAmpModSens: 0, volume: 71, oscMode: 0, freqCoarse: 2, freqFine: 0, pan: 0, outputLevel: 1.159897 }
-			, { idx: 4, enabled: true, rates: [99, 99, 97, 70], levels: [99, 65, 60, 0], detune: -2, velocitySens: 0, lfoAmpModSens: 0, volume: 43, oscMode: 0, freqCoarse: 3, freqFine: 0, pan: 0, outputLevel: 0.102521 }
-			, { idx: 5, enabled: true, rates: [99, 70, 60, 70], levels: [99, 99, 97, 0], detune: 0, velocitySens: 0, lfoAmpModSens: 0, volume: 47, oscMode: 0, freqCoarse: 17, freqFine: 0, pan: 0, outputLevel: 0.144987 }
+			{ idx: 0, enabled: true, rates: [96, 0, 12, 70], levels: [99, 95, 95, 0], detune: 1, velocitySens: 0, lfoAmpModSens: 0, volume: 99, oscMode: 0, freqCoarse: 2, freqFine: 0, pan: 0, outputLevel: 13.12273, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 0, keyScaleCurveR: 0, keyScaleRate: 0, keyScaleBreakpoint: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
+			, { idx: 1, enabled: true, rates: [99, 95, 0, 70], levels: [99, 96, 89, 0], detune: -1, velocitySens: 0, lfoAmpModSens: 0, volume: 99, oscMode: 0, freqCoarse: 0, freqFine: 0, pan: 0, outputLevel: 13.12273, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 0, keyScaleCurveR: 0, keyScaleRate: 0, keyScaleBreakpoint: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
+			, { idx: 2, enabled: true, rates: [99, 87, 0, 70], levels: [93, 90, 0, 0], detune: 0, velocitySens: 0, lfoAmpModSens: 0, volume: 82, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: 0, outputLevel: 3.008399, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 0, keyScaleCurveR: 0, keyScaleRate: 0, keyScaleBreakpoint: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
+			, { idx: 3, enabled: true, rates: [99, 92, 28, 60], levels: [99, 90, 0, 0], detune: 2, velocitySens: 0, lfoAmpModSens: 0, volume: 71, oscMode: 0, freqCoarse: 2, freqFine: 0, pan: 0, outputLevel: 1.159897, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 0, keyScaleCurveR: 0, keyScaleRate: 0, keyScaleBreakpoint: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
+			, { idx: 4, enabled: true, rates: [99, 99, 97, 70], levels: [99, 65, 60, 0], detune: -2, velocitySens: 0, lfoAmpModSens: 0, volume: 43, oscMode: 0, freqCoarse: 3, freqFine: 0, pan: 0, outputLevel: 0.102521, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 0, keyScaleCurveR: 0, keyScaleRate: 0, keyScaleBreakpoint: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
+			, { idx: 5, enabled: true, rates: [99, 70, 60, 70], levels: [99, 99, 97, 0], detune: 0, velocitySens: 0, lfoAmpModSens: 0, volume: 47, oscMode: 0, freqCoarse: 17, freqFine: 0, pan: 0, outputLevel: 0.144987, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 0, keyScaleCurveR: 0, keyScaleRate: 0, keyScaleBreakpoint: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
 		]
+		, fbRatio: 0
 	}
 ];
