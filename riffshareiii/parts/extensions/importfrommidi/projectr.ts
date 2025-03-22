@@ -353,7 +353,7 @@ class Projectr {
 			projectTrack.performer.data='' + midiTrack.program+'//'+strummode+'/20'
 		}
 		if(midiTrack.program==38){
-			projectTrack.performer.data='' + midiTrack.program+'//'+strummode+'/30'
+			projectTrack.performer.data='' + midiTrack.program+'//'+strummode+'/90'
 		}
 		if(midiTrack.program==16){
 			projectTrack.performer.data='' + midiTrack.program+'//'+strummode+'/20'
