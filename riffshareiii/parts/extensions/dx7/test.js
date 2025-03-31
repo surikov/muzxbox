@@ -1,5 +1,3 @@
-//https://github.com/mmontag/dx7-synth-js/blob/d4d5e3557bf6d6f178c9a42658a54ce6fb8986fe/src/voice-dx7.js
-//https://github.com/mohayonao/fm-synth
 var OUTPUT_LEVEL_TABLE = [
     0.000000, 0.000337, 0.000476, 0.000674, 0.000952, 0.001235, 0.001602, 0.001905, 0.002265, 0.002694,
     0.003204, 0.003810, 0.004531, 0.005388, 0.006408, 0.007620, 0.008310, 0.009062, 0.010776, 0.011752,
@@ -74,40 +72,40 @@ var LFO_PITCH_MOD_TABLE = [
 ];
 var algorithmsDX7 = [
     //stacking
-    { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], [5]] }, //1
-    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4], [5], []] }, //2
-    { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], [5]] }, //3
-    { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], [3]] }, //4
-    { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], [5]] }, //5 e.piano 1
-    { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], [4]] }, //6
+    { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], [5]] },
+    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4], [5], []] },
+    { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], [5]] },
+    { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], [3]] },
+    { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], [5]] },
+    { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], [4]] },
     //branch
-    { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], [5]] }, //7
-    { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [3], [5], []] }, //8
-    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3, 4], [], [5], []] }, //9
-    { outputMix: [0, 3], modulationMatrix: [[1], [2], [2], [4, 5], [], []] }, //10
-    { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4, 5], [], [5]] }, //11
-    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3, 4, 5], [], [], []] }, //12
-    { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4, 5], [], [], [5]] }, //13
-    { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4, 5], [], [5]] }, //14
-    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4, 5], [], []] }, //15
-    { outputMix: [0], modulationMatrix: [[1, 2, 4], [], [3], [], [5], [5]] }, //16 bass 1
-    { outputMix: [0], modulationMatrix: [[1, 2, 4], [1], [3], [], [5], []] }, //17
-    { outputMix: [0], modulationMatrix: [[1, 2, 3], [], [2], [4], [5], []] }, //18
+    { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], [5]] },
+    { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [3], [5], []] },
+    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3, 4], [], [5], []] },
+    { outputMix: [0, 3], modulationMatrix: [[1], [2], [2], [4, 5], [], []] },
+    { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4, 5], [], [5]] },
+    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3, 4, 5], [], [], []] },
+    { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4, 5], [], [], [5]] },
+    { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4, 5], [], [5]] },
+    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4, 5], [], []] },
+    { outputMix: [0], modulationMatrix: [[1, 2, 4], [], [3], [], [5], [5]] },
+    { outputMix: [0], modulationMatrix: [[1, 2, 4], [1], [3], [], [5], []] },
+    { outputMix: [0], modulationMatrix: [[1, 2, 3], [], [2], [4], [5], []] },
     //rooting/tower combi
-    { outputMix: [0, 3, 4], modulationMatrix: [[1], [2], [], [5], [5], [5]] }, //19
-    { outputMix: [0, 1, 3], modulationMatrix: [[2], [2], [2], [4, 5], [], []] }, //20
-    { outputMix: [0, 1, 3, 4], modulationMatrix: [[2], [2], [2], [5], [5], []] }, //21
-    { outputMix: [0, 2, 3, 4], modulationMatrix: [[1], [], [5], [5], [5], [5]] }, //22
-    { outputMix: [0, 1, 3, 4], modulationMatrix: [[], [2], [], [5], [5], [5]] }, //23 vibe 1
-    { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [5], [5], [5], [5]] }, //24
-    { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [5], [5], [5]] }, //25
+    { outputMix: [0, 3, 4], modulationMatrix: [[1], [2], [], [5], [5], [5]] },
+    { outputMix: [0, 1, 3], modulationMatrix: [[2], [2], [2], [4, 5], [], []] },
+    { outputMix: [0, 1, 3, 4], modulationMatrix: [[2], [2], [2], [5], [5], []] },
+    { outputMix: [0, 2, 3, 4], modulationMatrix: [[1], [], [5], [5], [5], [5]] },
+    { outputMix: [0, 1, 3, 4], modulationMatrix: [[], [2], [], [5], [5], [5]] },
+    { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [5], [5], [5], [5]] },
+    { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [5], [5], [5]] },
     //branch/tower combi
-    { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [], [4, 5], [], [5]] }, //26
-    { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [2], [4, 5], [], []] }, //27
-    { outputMix: [0, 2, 5], modulationMatrix: [[1], [], [3], [4], [4], []] }, //28
-    { outputMix: [0, 1, 2, 4], modulationMatrix: [[], [], [3], [], [5], [5]] }, //29
-    { outputMix: [0, 1, 2, 5], modulationMatrix: [[], [], [3], [4], [4], []] }, //30
-    { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [], [5], [5]] }, //31
+    { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [], [4, 5], [], [5]] },
+    { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [2], [4, 5], [], []] },
+    { outputMix: [0, 2, 5], modulationMatrix: [[1], [], [3], [4], [4], []] },
+    { outputMix: [0, 1, 2, 4], modulationMatrix: [[], [], [3], [], [5], [5]] },
+    { outputMix: [0, 1, 2, 5], modulationMatrix: [[], [], [3], [4], [4], []] },
+    { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [], [5], [5]] },
     { outputMix: [0, 1, 2, 3, 4, 5], modulationMatrix: [[], [], [], [], [], [5]] } //32 e.organ 1
 ];
 var testX7rom = [{
@@ -425,30 +423,6 @@ function getNoteFrequency(semitones) {
     console.log(semitones,rr);
     return rr;
 }*/
-function testPlay() {
-    console.log(presets);
-    if (audioContext) {
-        //
-    }
-    else {
-        audioContext = new window.AudioContext();
-    }
-    var carrier = audioContext.createOscillator();
-    var mod1 = audioContext.createOscillator();
-    carrier.frequency.value = 440; //getNoteFrequency(55);
-    mod1.frequency.value = 10;
-    var mod1Gain = audioContext.createGain();
-    mod1Gain.gain.value = 90.95;
-    mod1.connect(mod1Gain);
-    mod1Gain.connect(carrier.detune); // This is the magic FM part!
-    carrier.connect(audioContext.destination);
-    var bgn = audioContext.currentTime + 0.1;
-    mod1.start(bgn);
-    carrier.start(bgn);
-    // Schedule automatic oscillation stop
-    mod1.stop(audioContext.currentTime + 1);
-    carrier.stop(audioContext.currentTime + 1);
-}
 function loadFile(changeEvent) {
     //console.log(changeEvent);
     var file = changeEvent.target.files[0];
@@ -514,7 +488,7 @@ function extractPatchFromRom(bankData, patchId) {
         operators[i] = operator;
     }
     var romset = {
-        algorithm: voiceData.charCodeAt(110) + 1, // start at 1 for readability
+        algorithm: voiceData.charCodeAt(110) + 1,
         feedback: voiceData.charCodeAt(111) & 7,
         operators: operators,
         name: voiceData.substring(118, 128),
@@ -535,8 +509,104 @@ function extractPatchFromRom(bankData, patchId) {
     };
     return romset;
 }
+function testPlay() {
+    console.log(presets);
+    if (audioContext) {
+        //
+    }
+    else {
+        audioContext = new window.AudioContext();
+    }
+    var carrier = audioContext.createOscillator();
+    var mod1 = audioContext.createOscillator();
+    carrier.frequency.value = 440; //getNoteFrequency(55);
+    mod1.frequency.value = 10;
+    var mod1Gain = audioContext.createGain();
+    mod1Gain.gain.value = 4090.95;
+    mod1.connect(mod1Gain);
+    mod1Gain.connect(carrier.detune); // This is the magic FM part!
+    carrier.connect(audioContext.destination);
+    var bgn = audioContext.currentTime + 0.1;
+    mod1.start(bgn);
+    carrier.start(bgn);
+    // Schedule automatic oscillation stop
+    mod1.stop(audioContext.currentTime + 1);
+    carrier.stop(audioContext.currentTime + 1);
+}
 function testPlay2() {
     console.log('testPlay2');
+    var curAlgorithms23 = { outputMix: [0, 1, 3, 4], modulationMatrix: [[], [2], [], [5], [5], [5]] };
+    var patchVibe1 = {
+        algorithm: 23, name: 'VIBE 1', operators: [
+            {
+                rates: [99, 28, 99, 50], levels: [99, 25, 0, 0],
+                keyScaleBreakpoint: 39, keyScaleDepthL: 12, keyScaleDepthR: 12, keyScaleCurveL: 0, keyScaleCurveR: 3, keyScaleRate: 2,
+                freqCoarse: 4, freqFine: 0, freqRatio: 0, freqFixed: 0,
+                detune: 0, lfoAmpModSens: 0, velocitySens: 7, volume: 50, oscMode: 0, pan: 0, idx: 0, enabled: true, outputLevel: 0,
+                ampL: 0, ampR: 0
+            },
+            { rates: [80, 85, 24, 50], levels: [99, 90, 0, 0], keyScaleBreakpoint: 39, keyScaleDepthL: 4, keyScaleDepthR: 12, keyScaleCurveL: 0, keyScaleCurveR: 3, keyScaleRate: 2, detune: 0, lfoAmpModSens: 0, velocitySens: 1, volume: 99, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: 25, idx: 1, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 },
+            { rates: [80, 85, 43, 50], levels: [99, 74, 0, 0], keyScaleBreakpoint: 39, keyScaleDepthL: 12, keyScaleDepthR: 12, keyScaleCurveL: 0, keyScaleCurveR: 3, keyScaleRate: 4, detune: 0, lfoAmpModSens: 0, velocitySens: 4, volume: 72, oscMode: 0, freqCoarse: 3, freqFine: 0, pan: -25, idx: 2, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 },
+            { rates: [80, 85, 24, 50], levels: [99, 90, 0, 0], keyScaleBreakpoint: 9, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 1, keyScaleCurveR: 1, keyScaleRate: 3, detune: -7, lfoAmpModSens: 0, velocitySens: 1, volume: 99, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: 0, idx: 3, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 },
+            { rates: [80, 85, 24, 50], levels: [99, 90, 42, 0], keyScaleBreakpoint: 9, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 1, keyScaleCurveR: 1, keyScaleRate: 3, detune: 7, lfoAmpModSens: 0, velocitySens: 5, volume: 99, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: 25, idx: 4, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 },
+            {
+                rates: [99, 48, 99, 50], levels: [99, 32, 0, 0],
+                keyScaleBreakpoint: 39, keyScaleDepthL: 12, keyScaleDepthR: 12, keyScaleCurveL: 0, keyScaleCurveR: 3, keyScaleRate: 5,
+                detune: 0, lfoAmpModSens: 0, velocitySens: 7, volume: 57, oscMode: 0, freqCoarse: 14, freqFine: 0, pan: -25, idx: 5,
+                enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0
+            }
+        ],
+        lfoSpeed: 26, lfoDelay: 0, lfoPitchModDepth: 0, lfoAmpModDepth: 0, lfoPitchModSens: 2, lfoWaveform: 0, lfoSync: 1,
+        controllerModVal: 0, aftertouchEnabled: 0, fbRatio: 0, feedback: 5,
+        pitchEnvelope: { rates: [99, 98, 75, 60], levels: [50, 50, 50, 50] }
+    };
+    if (audioContext) {
+        //
+    }
+    else {
+        audioContext = new window.AudioContext();
+    }
+    var when = audioContext.currentTime + 0.2;
+    var duration = 1;
+    var carrier1 = audioContext.createOscillator();
+    var carrier2 = audioContext.createOscillator();
+    var modulator3 = audioContext.createOscillator();
+    var gain3 = audioContext.createGain();
+    var carrier4 = audioContext.createOscillator();
+    var carrier5 = audioContext.createOscillator();
+    var modulator6 = audioContext.createOscillator();
+    var gain6 = audioContext.createGain();
+    var freqTone = 440;
+    carrier1.frequency.value = freqTone;
+    carrier2.frequency.value = freqTone;
+    modulator3.frequency.value = 3.0;
+    gain3.gain.value = 4321.0;
+    carrier4.frequency.value = freqTone;
+    carrier5.frequency.value = freqTone;
+    modulator6.frequency.value = 14.0;
+    gain6.gain.value = 4321.0;
+    carrier1.connect(audioContext.destination);
+    carrier2.connect(audioContext.destination);
+    modulator3.connect(gain3);
+    gain3.connect(carrier2.detune);
+    carrier4.connect(audioContext.destination);
+    carrier5.connect(audioContext.destination);
+    modulator6.connect(gain6);
+    gain6.connect(carrier4.detune);
+    gain6.connect(carrier5.detune);
+    gain6.connect(modulator6.detune);
+    carrier1.start(when);
+    carrier2.start(when);
+    modulator3.start(when);
+    carrier4.start(when);
+    carrier5.start(when);
+    modulator6.start(when);
+    carrier1.stop(when + duration);
+    carrier2.stop(when + duration);
+    modulator3.stop(when + duration);
+    carrier4.stop(when + duration);
+    carrier5.stop(when + duration);
+    modulator6.stop(when + duration);
 }
 var DX7Operator = /** @class */ (function () {
     function DX7Operator() {
