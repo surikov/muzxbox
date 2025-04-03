@@ -39,3 +39,17 @@
 .samplerDrumDeleteSize0{
 	font-size: var(--icon-05cm);
 }
+.samplerDrumDragSpot{
+	fill: var(--drag-color);
+    stroke: none;
+	cursor: ew-resize;
+	stroke: var(--main-color);
+    stroke-width: 0.015cm;
+}
+.samplerDrumDragIcon{
+	font-size: var(--icon-05cm);
+	font-family: 'Material-Design-Iconic-Font';
+	fill: var(--main-color);
+	stroke: none;
+	pointer-events: none;
+}

@@ -3323,6 +3323,17 @@ class AutomationBarContent {
         let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
         let top = globalCommandDispatcher.cfg().automationTop();
         let css = 'automationBgDot';
+        if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+            let interpane = {
+                x: barOctaveAnchor.xx,
+                y: globalCommandDispatcher.cfg().automationTop(),
+                w: barOctaveAnchor.ww,
+                h: globalCommandDispatcher.cfg().data.filters.length * globalCommandDispatcher.cfg().autoPointHeight,
+                css: 'commentPaneForClick',
+                activation: (x, y) => { this.autoCellClick(barIdx, x, y, zIndex); }
+            };
+            barOctaveAnchor.content.push(interpane);
+        }
         for (let aa = 0; aa < globalCommandDispatcher.cfg().data.filters.length; aa++) {
             let filter = globalCommandDispatcher.cfg().data.filters[aa];
             if (filter.automation[barIdx]) {
@@ -3351,20 +3362,28 @@ class AutomationBarContent {
                             css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zIndex
                         };
                         barOctaveAnchor.content.push(editIcon);
+                        if (zIndex < globalCommandDispatcher.cfg().zoomAuxLess) {
+                            let dragCircle = {
+                                x: xx + globalCommandDispatcher.cfg().autoPointHeight * (1 / 4 - 1 / 64),
+                                y: top + globalCommandDispatcher.cfg().autoPointHeight * (1 / 4 - 1 / 100) + globalCommandDispatcher.cfg().autoPointHeight * aa,
+                                w: globalCommandDispatcher.cfg().autoPointHeight / 8,
+                                h: globalCommandDispatcher.cfg().autoPointHeight / 8,
+                                rx: globalCommandDispatcher.cfg().autoPointHeight / 16,
+                                ry: globalCommandDispatcher.cfg().autoPointHeight / 16,
+                                css: 'samplerDrumDragSpot'
+                            };
+                            barOctaveAnchor.content.push(dragCircle);
+                            let dragIcon = {
+                                x: xx + globalCommandDispatcher.cfg().autoPointHeight / 4,
+                                y: top + globalCommandDispatcher.cfg().autoPointHeight / 4 + globalCommandDispatcher.cfg().autoPointHeight * aa + yShift,
+                                text: icon_leftright,
+                                css: 'samplerDrumDragIcon'
+                            };
+                            barOctaveAnchor.content.push(dragIcon);
+                        }
                     }
                 }
             }
-        }
-        if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
-            let interpane = {
-                x: barOctaveAnchor.xx,
-                y: globalCommandDispatcher.cfg().automationTop(),
-                w: barOctaveAnchor.ww,
-                h: globalCommandDispatcher.cfg().data.filters.length * globalCommandDispatcher.cfg().autoPointHeight,
-                css: 'commentPaneForClick',
-                activation: (x, y) => { this.autoCellClick(barIdx, x, y, zIndex); }
-            };
-            barOctaveAnchor.content.push(interpane);
         }
     }
     autoCellClick(barIdx, barX, yy, zz) {
@@ -3386,7 +3405,7 @@ class AutomationBarContent {
                 }
             }
         }
-        console.log('autoCellClick', change);
+        console.log('autoCellClick', zz, change);
         if (change) {
         }
         else {
@@ -4583,6 +4602,8 @@ let icon_play_circle = '&#xf3a8;';
 let icon_close_circle = '&#xf134;';
 let icon_delete = '&#xf154;';
 let icon_power = '&#xf1af;';
+let icon_leftright = '&#xf30d';
+let icon_leftrightupdown = '&#xf2f0';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];
@@ -4930,6 +4951,7 @@ class MixerDataMathUtility {
         this.speakerIconPad = 44;
         this.padGridFan = 15;
         this.zoomEditSLess = 3;
+        this.zoomAuxLess = 1;
         this.data = data;
         this.recalculateCommentMax();
     }

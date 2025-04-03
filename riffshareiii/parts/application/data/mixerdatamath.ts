@@ -40,6 +40,7 @@ class MixerDataMathUtility {
 	padGridFan = 15;
 
 	zoomEditSLess = 3;
+	zoomAuxLess = 1;
 
 	constructor(data: Zvoog_Project) {
 		this.data = data;

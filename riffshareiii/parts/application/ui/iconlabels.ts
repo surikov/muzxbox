@@ -51,3 +51,7 @@ let icon_close_circle='&#xf134;';
 let icon_delete='&#xf154;';
 let icon_power='&#xf1af;';
 
+let icon_leftright='&#xf30d';
+let icon_leftrightupdown='&#xf2f0';
+
+
