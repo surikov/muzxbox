@@ -163,14 +163,22 @@ let algorithmsDX7: AlgorithmsDX7[] = [
 	{ outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [], [5], [5]] },       //31
 	{ outputMix: [0, 1, 2, 3, 4, 5], modulationMatrix: [[], [], [], [], [], [5]] }         //32 e.organ 1
 ];
+//lfoWaveform "Triangle", "Sawtooth Down", "Sawtooth Up","Square", "Sine", "Sample and Hold" 
 let testX7rom: ROMPresetData[] = [{
-	algorithm: 22, feedback: 7, operators: [{ envelope: { rates: [72, 76, 99, 71], levels: [99, 88, 96, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 0, keyScaleDepthR: 14, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0, detune: 7, lfoAmpModSens: 0, velocitySens: 0, volume: 98, oscMode: 0, freqCoarse: 0, freqFine: 0, pan: 0, idx: 0, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
+	algorithm: 22, feedback: 7, operators: [
+		{ /*0*/ envelope: { rates: [72, 76, 99, 71], levels: [99, 88, 96, 0] }
+			, keyScaleBreakpoint: 39, keyScaleDepthL: 0, keyScaleDepthR: 14, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0
+			, detune: 7, lfoAmpModSens: 0, velocitySens: 0, volume: 98, oscMode: 0, freqCoarse: 0, freqFine: 0, pan: 0, idx: 0, enabled: true
+			, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0
+		}
 		, { envelope: { rates: [62, 51, 29, 71], levels: [82, 95, 96, 0] }, keyScaleBreakpoint: 27, keyScaleDepthL: 0, keyScaleDepthR: 7, keyScaleCurveL: 3, keyScaleCurveR: 1, keyScaleRate: 0, detune: 7, lfoAmpModSens: 0, velocitySens: 0, volume: 86, oscMode: 0, freqCoarse: 0, freqFine: 0, pan: 25, idx: 1, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
-		, { envelope: { rates: [77, 76, 82, 71], levels: [99, 98, 98, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0, detune: -2, lfoAmpModSens: 0, velocitySens: 2, volume: 99, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: -25, idx: 2, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
-		, { envelope: { rates: [77, 36, 41, 71], levels: [99, 98, 98, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0, detune: 0, lfoAmpModSens: 0, velocitySens: 2, volume: 99, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: 0, idx: 3, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
-		, { envelope: { rates: [77, 36, 41, 71], levels: [99, 98, 98, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0, detune: 1, lfoAmpModSens: 0, velocitySens: 2, volume: 98, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: 25, idx: 4, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
+		, /*0*/ { envelope: { rates: [77, 76, 82, 71], levels: [99, 98, 98, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0, detune: -2, lfoAmpModSens: 0, velocitySens: 2, volume: 99, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: -25, idx: 2, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
+		, /*0*/ { envelope: { rates: [77, 36, 41, 71], levels: [99, 98, 98, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0, detune: 0, lfoAmpModSens: 0, velocitySens: 2, volume: 99, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: 0, idx: 3, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
+		, /*0*/ { envelope: { rates: [77, 36, 41, 71], levels: [99, 98, 98, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0, detune: 1, lfoAmpModSens: 0, velocitySens: 2, volume: 98, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: 25, idx: 4, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
 		, { envelope: { rates: [49, 99, 28, 68], levels: [98, 98, 91, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 54, keyScaleDepthR: 50, keyScaleCurveL: 1, keyScaleCurveR: 1, keyScaleRate: 4, detune: 0, lfoAmpModSens: 0, velocitySens: 2, volume: 82, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: -25, idx: 5, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }]
-	, name: 'BRASS 1', lfoSpeed: 37, lfoDelay: 0, lfoPitchModDepth: 5, lfoAmpModDepth: 0, lfoPitchModSens: 3, lfoWaveform: 4, lfoSync: 0, pitchEnvelope: { rates: [84, 95, 95, 60], levels: [50, 50, 50, 50] }, controllerModVal: 0, aftertouchEnabled: 0, fbRatio: 0
+	, name: 'BRASS 1'
+	, lfoSpeed: 37, lfoDelay: 0, lfoPitchModDepth: 5, lfoAmpModDepth: 0, lfoPitchModSens: 3, lfoWaveform: 4, lfoSync: 0
+	, pitchEnvelope: { rates: [84, 95, 95, 60], levels: [50, 50, 50, 50] }, controllerModVal: 0, aftertouchEnabled: 0, fbRatio: 0
 }
 	, {
 	algorithm: 22, feedback: 7, operators: [{ envelope: { rates: [99, 39, 32, 71], levels: [99, 98, 80, 0] }, keyScaleBreakpoint: 51, keyScaleDepthL: 0, keyScaleDepthR: 38, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0, detune: 7, lfoAmpModSens: 0, velocitySens: 0, volume: 99, oscMode: 0, freqCoarse: 0, freqFine: 0, pan: 0, idx: 0, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
@@ -442,13 +450,51 @@ function testPlay2() {
 }
 
 class DX7Modulator {
-	queueFrom(anothr: DX7Modulator) {
-
+	fromAnothers: DX7Modulator[] = [];
+	moContext: AudioContext;
+	modulator: OscillatorNode;
+	gain: GainNode;
+	constructor(audioContext: AudioContext) {
+		this.moContext = audioContext;
+		this.modulator = this.moContext.createOscillator();
+		this.gain = this.moContext.createGain();
+		this.modulator.connect(this.gain);
+	}
+	addAnother(anothr: DX7Modulator) {
+		this.fromAnothers.push(anothr);
+	}
+	scheduleControl(when: number, duration: number) {
+		for (let ii = 0; ii < this.fromAnothers.length; ii++) {
+			this.fromAnothers[ii].output().connect(this.modulator.detune);
+		}
+		this.modulator.frequency.value = 3.0;
+		this.gain.gain.value = 4321.0;
+		this.modulator.start(when);
+		this.modulator.stop(when + duration);
+	}
+	output(): AudioNode {
+		return this.gain;
 	}
 }
 class DX7Carrier {
-	controlFrom(mod: DX7Modulator) {
-
+	fromMods: DX7Modulator[] = [];
+	caContext: AudioContext;
+	carrierBeep: OscillatorNode;
+	constructor(audioContext: AudioContext) {
+		this.caContext = audioContext;
+		this.carrierBeep = this.caContext.createOscillator();
+	}
+	addModulator(mod: DX7Modulator) {
+		this.fromMods.push(mod);
+	}
+	schedulePitch(target: AudioNode, pitch: number, when: number, duration: number) {
+		for (let ii = 0; ii < this.fromMods.length; ii++) {
+			this.fromMods[ii].output().connect(this.carrierBeep.detune);
+		}
+		this.carrierBeep.frequency.value = pitch;
+		this.carrierBeep.connect(target);
+		this.carrierBeep.start(when);
+		this.carrierBeep.stop(when + duration);
 	}
 }
 class DX7Envelope {
@@ -466,26 +512,51 @@ class DX7Sound {
 		this.algorithm = algorithmsDX7[this.preset.algorithm];
 		this.createOperators();
 		this.output = target;
+		this.createOperators();
+		this.linkOperators();
 	}
 	createOperators() {
 		for (let ii = 0; ii < this.algorithm.outputMix.length; ii++) {
-			this.operators[this.algorithm.outputMix[ii]] = { carrier: new DX7Carrier(), modulator: null };
+			this.operators[this.algorithm.outputMix[ii]] = { carrier: new DX7Carrier(this.audioContext), modulator: null };
 		}
 		for (let ii = 0; ii < 6; ii++) {
 			if (this.operators[ii]) {
 				//
 			} else {
-				this.operators[ii] = { carrier: null, modulator: new DX7Modulator };
+				this.operators[ii] = { carrier: null, modulator: new DX7Modulator(this.audioContext) };
 			}
 		}
 	}
 	linkOperators() {
 		for (let ii = 0; ii < this.algorithm.modulationMatrix.length; ii++) {
-			let fromOperators = this.algorithm.modulationMatrix[ii];
+			let fromOperators: number[] = this.algorithm.modulationMatrix[ii];
 			let operator = this.operators[ii];
+			if (operator.carrier) {
+				for (let ff = 0; ff < fromOperators.length; ff++) {
+					let control = this.operators[fromOperators[ff]];
+					if (control.modulator) {
+						operator.carrier.addModulator(control.modulator);
+					}
+				}
+			} else {
+				for (let ff = 0; ff < fromOperators.length; ff++) {
+					let control = this.operators[fromOperators[ff]];
+					if (control.modulator) {
+						operator.modulator.addAnother(control.modulator);
+					}
+				}
+			}
 		}
 	}
 	scheduleSound(pitch: number, when: number, duration: number) {
-		this.audioContext.destination
+		//console.log(pitch, this.operators);
+		for (let ff = 0; ff < this.operators.length; ff++) {
+			let operator = this.operators[ff];
+			if (operator.modulator) {
+				operator.modulator.scheduleControl(when, duration);
+			} else {
+				operator.carrier.schedulePitch(this.output, pitch, when, duration);
+			}
+		}
 	}
 }

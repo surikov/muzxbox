@@ -301,7 +301,8 @@ function testPlay2() {
     else {
         audioContext = new window.AudioContext();
     }
-    var dx7s = new DX7Sound(audioContext, testX7rom[4]);
+    var dx7s = new DX7Sound(audioContext, audioContext.destination, testX7rom[4]);
+    dx7s.scheduleSound(440, audioContext.currentTime + 0.1, 1);
     /*
     let curAlgorithms23: AlgorithmsDX7 = { outputMix: [0, 1, 3, 4], modulationMatrix: [[], [2], [], [5], [5], [5]] };
     let patchVibe1: ROMPresetData = {
@@ -379,13 +380,48 @@ function testPlay2() {
     */
 }
 var DX7Modulator = /** @class */ (function () {
-    function DX7Modulator() {
+    function DX7Modulator(audioContext) {
+        this.fromAnothers = [];
+        this.moContext = audioContext;
+        this.modulator = this.moContext.createOscillator();
+        this.gain = this.moContext.createGain();
+        this.modulator.connect(this.gain);
     }
+    DX7Modulator.prototype.addAnother = function (anothr) {
+        this.fromAnothers.push(anothr);
+    };
+    DX7Modulator.prototype.scheduleControl = function (when, duration) {
+        for (var ii = 0; ii < this.fromAnothers.length; ii++) {
+            this.fromAnothers[ii].output().connect(this.modulator.detune);
+        }
+        this.modulator.frequency.value = 3.0;
+        this.gain.gain.value = 4321.0;
+        this.modulator.start(when);
+        this.modulator.stop(when + duration);
+    };
+    DX7Modulator.prototype.output = function () {
+        return this.gain;
+    };
     return DX7Modulator;
 }());
 var DX7Carrier = /** @class */ (function () {
-    function DX7Carrier() {
+    function DX7Carrier(audioContext) {
+        this.fromMods = [];
+        this.caContext = audioContext;
+        this.carrierBeep = this.caContext.createOscillator();
     }
+    DX7Carrier.prototype.addModulator = function (mod) {
+        this.fromMods.push(mod);
+    };
+    DX7Carrier.prototype.schedulePitch = function (target, pitch, when, duration) {
+        for (var ii = 0; ii < this.fromMods.length; ii++) {
+            this.fromMods[ii].output().connect(this.carrierBeep.detune);
+        }
+        this.carrierBeep.frequency.value = pitch;
+        this.carrierBeep.connect(target);
+        this.carrierBeep.start(when);
+        this.carrierBeep.stop(when + duration);
+    };
     return DX7Carrier;
 }());
 var DX7Envelope = /** @class */ (function () {
@@ -394,29 +430,62 @@ var DX7Envelope = /** @class */ (function () {
     return DX7Envelope;
 }());
 var DX7Sound = /** @class */ (function () {
-    function DX7Sound(audioContext, preset) {
+    function DX7Sound(audioContext, target, preset) {
         this.operators = [];
         this.preset = preset;
         this.audioContext = audioContext;
         this.algorithm = algorithmsDX7[this.preset.algorithm];
         this.createOperators();
-        console.log(this.operators);
+        this.output = target;
+        this.createOperators();
+        this.linkOperators();
     }
     DX7Sound.prototype.createOperators = function () {
         for (var ii = 0; ii < this.algorithm.outputMix.length; ii++) {
-            this.operators[this.algorithm.outputMix[ii]] = { carrier: new DX7Carrier(), modulator: null };
+            this.operators[this.algorithm.outputMix[ii]] = { carrier: new DX7Carrier(this.audioContext), modulator: null };
         }
         for (var ii = 0; ii < 6; ii++) {
             if (this.operators[ii]) {
                 //
             }
             else {
-                this.operators[ii] = { carrier: null, modulator: new DX7Modulator };
+                this.operators[ii] = { carrier: null, modulator: new DX7Modulator(this.audioContext) };
             }
         }
     };
-    DX7Sound.prototype.scheduleSound = function (when, duration) {
-        this.audioContext.destination;
+    DX7Sound.prototype.linkOperators = function () {
+        for (var ii = 0; ii < this.algorithm.modulationMatrix.length; ii++) {
+            var fromOperators = this.algorithm.modulationMatrix[ii];
+            var operator = this.operators[ii];
+            if (operator.carrier) {
+                for (var ff = 0; ff < fromOperators.length; ff++) {
+                    var control = this.operators[fromOperators[ff]];
+                    if (control.modulator) {
+                        operator.carrier.addModulator(control.modulator);
+                    }
+                }
+            }
+            else {
+                for (var ff = 0; ff < fromOperators.length; ff++) {
+                    var control = this.operators[fromOperators[ff]];
+                    if (control.modulator) {
+                        operator.modulator.addAnother(control.modulator);
+                    }
+                }
+            }
+        }
+    };
+    DX7Sound.prototype.scheduleSound = function (pitch, when, duration) {
+        //console.log(pitch, this.operators);
+        for (var ff = 0; ff < this.operators.length; ff++) {
+            var operator = this.operators[ff];
+            if (operator.modulator) {
+                operator.modulator.scheduleControl(when, duration);
+            }
+            else {
+                operator.carrier.schedulePitch(this.output, pitch, when, duration);
+            }
+        }
     };
     return DX7Sound;
 }());
