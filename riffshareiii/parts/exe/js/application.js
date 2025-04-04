@@ -2896,7 +2896,7 @@ class SamplerBar {
         let measure = drum.measures[barIdx];
         let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().samplerDotHeight;
         let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
-        let css = 'samplerDrumDotBg';
+        let cucss = 'samplerDrumDotBg';
         if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
             let interpane = {
                 x: anchor.xx,
@@ -2924,7 +2924,7 @@ class SamplerBar {
                     xx, yy + globalCommandDispatcher.cfg().samplerDotHeight,
                     xx + ww, yy + globalCommandDispatcher.cfg().samplerDotHeight / 2
                 ],
-                css: css
+                css: cucss
             };
             anchor.content.push(ply);
             if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
@@ -2973,7 +2973,7 @@ class SamplerBar {
         });
     }
 }
-class BarOctave {
+class BarOctaveRender {
     constructor(barIdx, octaveIdx, left, top, width, height, barOctaveGridAnchor, barOctaveTrackAnchor, barOctaveFirstAnchor, transpose, zoomLevel) {
         new OctaveContent(barIdx, octaveIdx, left, top, width, height, barOctaveTrackAnchor, barOctaveFirstAnchor, transpose, zoomLevel);
     }
@@ -3085,6 +3085,17 @@ class MixerBar {
     constructor(barIdx, left, ww, zoomLevel, gridZoomBarAnchor, tracksZoomBarAnchor, firstZoomBarAnchor) {
         let h12 = 12 * globalCommandDispatcher.cfg().notePathHeight;
         let transpose = globalCommandDispatcher.cfg().transposeOctaveCount() * 12;
+        if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
+            let interpane = {
+                x: gridZoomBarAnchor.xx,
+                y: globalCommandDispatcher.cfg().gridTop(),
+                w: gridZoomBarAnchor.ww,
+                h: globalCommandDispatcher.cfg().gridHeight(),
+                css: 'commentPaneForClick',
+                activation: (x, y) => { this.trackCellClick(barIdx, x, y, zoomLevel); }
+            };
+            gridZoomBarAnchor.content.push(interpane);
+        }
         for (let oo = globalCommandDispatcher.cfg().transposeOctaveCount(); oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
             let gridOctaveAnchor = {
                 showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom,
@@ -3116,7 +3127,7 @@ class MixerBar {
                 id: 'octaveFirst' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
             };
             firstZoomBarAnchor.content.push(firstOctaveAnchor);
-            new BarOctave(barIdx, (globalCommandDispatcher.cfg().drawOctaveCount() - oo - 1), left, globalCommandDispatcher.cfg().gridTop() + oo * h12, ww, h12, gridOctaveAnchor, tracksOctaveAnchor, firstOctaveAnchor, transpose, zoomLevel);
+            new BarOctaveRender(barIdx, (globalCommandDispatcher.cfg().drawOctaveCount() - oo - 1), left, globalCommandDispatcher.cfg().gridTop() + oo * h12, ww, h12, gridOctaveAnchor, tracksOctaveAnchor, firstOctaveAnchor, transpose, zoomLevel);
             if (firstZoomBarAnchor.ww < firstOctaveAnchor.ww) {
                 firstZoomBarAnchor.ww = firstOctaveAnchor.ww;
             }
@@ -3254,6 +3265,9 @@ class MixerBar {
                 });
             }
         }
+    }
+    trackCellClick(barIdx, barX, yy, zz) {
+        console.log('trackCellClick', barIdx, barX, yy, zz);
     }
 }
 class TextCommentsBar {

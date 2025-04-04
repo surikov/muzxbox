@@ -12,6 +12,7 @@
 	fill: var(--main-color);
 	fill-opacity2:75%;
     stroke: none;
+	pointer-events: none;
 }
 .samplerDrumDotActive23542354{
 	fill: var(--click-color);
@@ -22,6 +23,7 @@
 	fill: var(--main-color);
 	fill-opacity33:95%;
     stroke: none;
+	pointer-events: none;
 }
 .samplerDrumDeleteIcon{
 	fill: var(--click-color);

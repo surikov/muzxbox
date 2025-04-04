@@ -402,7 +402,7 @@ declare class SamplerBar {
     constructor(barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number, durationLen: number);
     drumCellClick(barIdx: number, barX: number, yy: number, zz: number): void;
 }
-declare class BarOctave {
+declare class BarOctaveRender {
     constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, transpose: number, zoomLevel: number);
 }
 declare class OctaveContent {
@@ -412,11 +412,12 @@ declare class OctaveContent {
     addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveAnchor: TileAnchor, transpose: number, css: string, interact: boolean, zoomLevel: number): void;
 }
 declare class MixerBar {
-    octaves: BarOctave[];
+    octaves: BarOctaveRender[];
     zoomLevel: number;
     constructor(barIdx: number, left: number, ww: number, zoomLevel: number, gridZoomBarAnchor: TileAnchor, tracksZoomBarAnchor: TileAnchor, firstZoomBarAnchor: TileAnchor);
     findDurationOfSample(samplerId: string): number;
     addOctaveGridSteps(barIdx: number, barLeft: number, width: number, barOctaveAnchor: TileAnchor, zIndex: number): void;
+    trackCellClick(barIdx: number, barX: number, yy: number, zz: number): void;
 }
 declare class TextCommentsBar {
     constructor(barIdx: number, barLeft: number, barOctaveAnchor: TileAnchor, zIndex: number);

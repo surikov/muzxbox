@@ -1,5 +1,5 @@
 class MixerBar {
-	octaves: BarOctave[];
+	octaves: BarOctaveRender[];
 	zoomLevel: number;
 	constructor(
 		barIdx: number
@@ -15,6 +15,20 @@ class MixerBar {
 		//let durationLen = 1 * globalCommandDispatcher.cfg().widthDurationRatio;
 		let h12 = 12 * globalCommandDispatcher.cfg().notePathHeight;
 		let transpose = globalCommandDispatcher.cfg().transposeOctaveCount() * 12;
+		if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
+			let interpane: TileRectangle = {
+				x: gridZoomBarAnchor.xx
+				, y: globalCommandDispatcher.cfg().gridTop()
+				, w: gridZoomBarAnchor.ww
+				, h: globalCommandDispatcher.cfg().gridHeight()
+				//, rx: barOctaveAnchor.ww / 2
+				//, ry: globalCommandDispatcher.cfg().data.filters.length*globalCommandDispatcher.cfg().autoPointHeight / 2
+				, css: 'commentPaneForClick'
+				, activation: (x: number, y: number) => { this.trackCellClick(barIdx, x, y, zoomLevel); }
+			};
+			gridZoomBarAnchor.content.push(interpane);
+		}
+
 		for (let oo = globalCommandDispatcher.cfg().transposeOctaveCount(); oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
 			let gridOctaveAnchor: TileAnchor = {
 				showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom
@@ -46,7 +60,7 @@ class MixerBar {
 				, id: 'octaveFirst' + zoomLevel + 'b' + barIdx + 'o' + oo + 'r' + Math.random()
 			};
 			firstZoomBarAnchor.content.push(firstOctaveAnchor);
-			new BarOctave(
+			new BarOctaveRender(
 				barIdx, (globalCommandDispatcher.cfg().drawOctaveCount() - oo - 1), left, globalCommandDispatcher.cfg().gridTop() + oo * h12
 				, ww, h12
 				, gridOctaveAnchor
@@ -200,6 +214,9 @@ class MixerBar {
 				});
 			}
 		}
+	}
+	trackCellClick(barIdx: number, barX: number, yy: number, zz: number) {
+		console.log('trackCellClick',barIdx, barX, yy, zz);
 	}
 
 }

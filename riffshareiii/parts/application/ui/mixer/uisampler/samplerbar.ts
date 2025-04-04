@@ -5,7 +5,7 @@ class SamplerBar {
 		let measure: Zvoog_PercussionMeasure = drum.measures[barIdx];
 		let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().samplerDotHeight;
 		let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
-		let css = 'samplerDrumDotBg';
+		let cucss = 'samplerDrumDotBg';
 		if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
 
 			let interpane: TileRectangle = {
@@ -38,7 +38,7 @@ class SamplerBar {
 					, xx, yy + globalCommandDispatcher.cfg().samplerDotHeight
 					, xx + ww, yy + globalCommandDispatcher.cfg().samplerDotHeight / 2
 				]
-				, css: css
+				, css: cucss
 			};
 			anchor.content.push(ply);
 			if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {

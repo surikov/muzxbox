@@ -45,6 +45,7 @@ class OctaveContent {
 	) {
 		let measure: Zvoog_TrackMeasure = track.measures[barIdx];
 		if (measure) {
+			
 			for (let cc = 0; cc < measure.chords.length; cc++) {
 				let chord: Zvoog_Chord = measure.chords[cc];
 				for (let nn = 0; nn < chord.pitches.length; nn++) {

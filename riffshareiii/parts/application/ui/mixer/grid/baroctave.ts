@@ -1,4 +1,4 @@
-class BarOctave {
+class BarOctaveRender {
 
 	constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number
 		, barOctaveGridAnchor: TileAnchor
