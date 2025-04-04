@@ -57,7 +57,7 @@ class AutomationBarContent {
 							, css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zIndex
 						};
 						barOctaveAnchor.content.push(editIcon);
-
+/*
 						if (zIndex < globalCommandDispatcher.cfg().zoomAuxLess) {
 							let dragCircle: TileRectangle = {
 								x: xx + globalCommandDispatcher.cfg().autoPointHeight * (1 / 4 - 1 / 64)
@@ -76,7 +76,7 @@ class AutomationBarContent {
 								, css: 'samplerDrumDragIcon' 
 							};
 							barOctaveAnchor.content.push(dragIcon);
-						}
+						}*/
 					}
 				}
 
@@ -105,7 +105,7 @@ class AutomationBarContent {
 				}
 			}
 		}
-		console.log('autoCellClick', zz, change);
+		//console.log('autoCellClick', zz, change);
 
 		if (change) {
 			//

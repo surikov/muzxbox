@@ -400,6 +400,7 @@ declare class LeftPanel {
 }
 declare class SamplerBar {
     constructor(barIdx: number, drumIdx: number, zoomLevel: number, anchor: TileAnchor, left: number, durationLen: number);
+    drumCellClick(barIdx: number, barX: number, yy: number, zz: number): void;
 }
 declare class BarOctave {
     constructor(barIdx: number, octaveIdx: number, left: number, top: number, width: number, height: number, barOctaveGridAnchor: TileAnchor, barOctaveTrackAnchor: TileAnchor, barOctaveFirstAnchor: TileAnchor, transpose: number, zoomLevel: number);

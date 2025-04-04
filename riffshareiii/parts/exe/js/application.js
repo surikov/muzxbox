@@ -2897,6 +2897,17 @@ class SamplerBar {
         let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().samplerDotHeight;
         let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
         let css = 'samplerDrumDotBg';
+        if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
+            let interpane = {
+                x: anchor.xx,
+                y: globalCommandDispatcher.cfg().samplerTop(),
+                w: anchor.ww,
+                h: globalCommandDispatcher.cfg().data.percussions.length * globalCommandDispatcher.cfg().samplerDotHeight,
+                css: 'commentPaneForClick',
+                activation: (x, y) => { this.drumCellClick(barIdx, x, y, zoomLevel); }
+            };
+            anchor.content.push(interpane);
+        }
         for (let ss = 0; ss < measure.skips.length; ss++) {
             let skip = measure.skips[ss];
             let xx = left + MMUtil().set(skip).duration(tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
@@ -2931,6 +2942,35 @@ class SamplerBar {
                 anchor.content.push(deleteIcon);
             }
         }
+    }
+    drumCellClick(barIdx, barX, yy, zz) {
+        let row = Math.floor(yy / globalCommandDispatcher.cfg().samplerDotHeight);
+        let drum = globalCommandDispatcher.cfg().data.percussions[row];
+        let info = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
+        let muStart = MMUtil().set(info.start);
+        let muEnd = MMUtil().set(info.end);
+        let deleteSkipIdx = 0;
+        let addDrum = true;
+        globalCommandDispatcher.exe.commitProjectChanges(['percussions', row, 'measures', barIdx], () => {
+            for (deleteSkipIdx = 0; deleteSkipIdx < drum.measures[barIdx].skips.length; deleteSkipIdx++) {
+                let probeSkip = drum.measures[barIdx].skips[deleteSkipIdx];
+                if (muStart.more(probeSkip)) {
+                }
+                else {
+                    if (muEnd.more(probeSkip)) {
+                        addDrum = false;
+                        console.log('drop', barIdx, probeSkip, drum);
+                        drum.measures[barIdx].skips.splice(deleteSkipIdx, 1);
+                        deleteSkipIdx--;
+                        break;
+                    }
+                }
+            }
+            if (addDrum) {
+                console.log('add', barIdx, muStart, drum);
+                drum.measures[barIdx].skips.push(muStart.metre());
+            }
+        });
     }
 }
 class BarOctave {
@@ -3362,25 +3402,6 @@ class AutomationBarContent {
                             css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zIndex
                         };
                         barOctaveAnchor.content.push(editIcon);
-                        if (zIndex < globalCommandDispatcher.cfg().zoomAuxLess) {
-                            let dragCircle = {
-                                x: xx + globalCommandDispatcher.cfg().autoPointHeight * (1 / 4 - 1 / 64),
-                                y: top + globalCommandDispatcher.cfg().autoPointHeight * (1 / 4 - 1 / 100) + globalCommandDispatcher.cfg().autoPointHeight * aa,
-                                w: globalCommandDispatcher.cfg().autoPointHeight / 8,
-                                h: globalCommandDispatcher.cfg().autoPointHeight / 8,
-                                rx: globalCommandDispatcher.cfg().autoPointHeight / 16,
-                                ry: globalCommandDispatcher.cfg().autoPointHeight / 16,
-                                css: 'samplerDrumDragSpot'
-                            };
-                            barOctaveAnchor.content.push(dragCircle);
-                            let dragIcon = {
-                                x: xx + globalCommandDispatcher.cfg().autoPointHeight / 4,
-                                y: top + globalCommandDispatcher.cfg().autoPointHeight / 4 + globalCommandDispatcher.cfg().autoPointHeight * aa + yShift,
-                                text: icon_leftright,
-                                css: 'samplerDrumDragIcon'
-                            };
-                            barOctaveAnchor.content.push(dragIcon);
-                        }
                     }
                 }
             }
@@ -3405,7 +3426,6 @@ class AutomationBarContent {
                 }
             }
         }
-        console.log('autoCellClick', zz, change);
         if (change) {
         }
         else {
