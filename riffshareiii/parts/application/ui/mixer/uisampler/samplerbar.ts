@@ -53,11 +53,11 @@ class SamplerBar {
 				};
 				anchor.content.push(idot);
 				*/
-				let yShift = 0.4;
-				if (zoomLevel < 2) yShift = 0.27;
-				if (zoomLevel < 1) yShift = 0.20;
+				let yShift = 0.3;
+				if (zoomLevel < 2) yShift = 0.2;
+				if (zoomLevel < 1) yShift = 0.15;
 				let deleteIcon: TileText = {
-					x: xx + globalCommandDispatcher.cfg().samplerDotHeight / 32
+					x: xx //+ globalCommandDispatcher.cfg().samplerDotHeight / 32
 					, y: yy + globalCommandDispatcher.cfg().samplerDotHeight / 2 + yShift
 					, text: icon_close_circle//icon_close
 					, css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zoomLevel

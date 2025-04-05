@@ -98,15 +98,15 @@ class OctaveContent {
 								};
 								barOctaveAnchor.content.push(inetrDot);
 								*/
-								let yShift = 0.13;
-								let xShift = 0.10;
+								let yShift = 0.24;
+								let xShift = 0.20;
 								if (zoomLevel < 2) {
-									yShift = 0.22;
-									xShift = 0.21;
+									yShift = 0.29;
+									xShift = 0.29;
 								}
 								if (zoomLevel < 1) {
-									yShift = 0.33;
-									xShift = 0.33;
+									yShift = 0.37;
+									xShift = 0.37;
 								}
 								let deleteIcon: TileText = {
 									x: xStart + xShift

@@ -2928,13 +2928,13 @@ class SamplerBar {
             };
             anchor.content.push(ply);
             if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
-                let yShift = 0.4;
+                let yShift = 0.3;
                 if (zoomLevel < 2)
-                    yShift = 0.27;
+                    yShift = 0.2;
                 if (zoomLevel < 1)
-                    yShift = 0.20;
+                    yShift = 0.15;
                 let deleteIcon = {
-                    x: xx + globalCommandDispatcher.cfg().samplerDotHeight / 32,
+                    x: xx,
                     y: yy + globalCommandDispatcher.cfg().samplerDotHeight / 2 + yShift,
                     text: icon_close_circle,
                     css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zoomLevel
@@ -3043,15 +3043,15 @@ class OctaveContent {
                         }
                         if (interact) {
                             if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
-                                let yShift = 0.13;
-                                let xShift = 0.10;
+                                let yShift = 0.24;
+                                let xShift = 0.20;
                                 if (zoomLevel < 2) {
-                                    yShift = 0.22;
-                                    xShift = 0.21;
+                                    yShift = 0.29;
+                                    xShift = 0.29;
                                 }
                                 if (zoomLevel < 1) {
-                                    yShift = 0.33;
-                                    xShift = 0.33;
+                                    yShift = 0.37;
+                                    xShift = 0.37;
                                 }
                                 let deleteIcon = {
                                     x: xStart + xShift,
@@ -3267,7 +3267,12 @@ class MixerBar {
         }
     }
     trackCellClick(barIdx, barX, yy, zz) {
-        console.log('trackCellClick', barIdx, barX, yy, zz);
+        let pitch = Math.ceil(12 * (globalCommandDispatcher.cfg().drawOctaveCount() - globalCommandDispatcher.cfg().transposeOctaveCount()) - yy);
+        let info = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
+        let change = null;
+        let muStart = MMUtil().set(info.start);
+        let muEnd = MMUtil().set(info.end);
+        console.log('trackCellClick', barIdx, pitch, muStart, muEnd);
     }
 }
 class TextCommentsBar {
@@ -4974,7 +4979,7 @@ class MixerDataMathUtility {
         this.padAutomation2Comments = 1;
         this.bottomPad = 11;
         this.notePathHeight = 1.01;
-        this.samplerDotHeight = 3;
+        this.samplerDotHeight = 2;
         this.autoPointHeight = 4;
         this.widthDurationRatio = 27;
         this.octaveDrawCount = 8;

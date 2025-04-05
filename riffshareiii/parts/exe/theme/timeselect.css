@@ -36,7 +36,7 @@
 .timeSubMark {
 	fill: var(--line-color);
 	fill-opacity: 50%;
-
+	pointer-events: none;
 }
 
 .timeMarkButtonCircle025 {

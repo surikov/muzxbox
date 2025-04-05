@@ -33,13 +33,13 @@
 	
 }
 .samplerDrumDeleteSize2{
-	font-size: var(--icon-1cm);
-}
-.samplerDrumDeleteSize1{
 	font-size: var(--icon-075cm);
 }
-.samplerDrumDeleteSize0{
+.samplerDrumDeleteSize1{
 	font-size: var(--icon-05cm);
+}
+.samplerDrumDeleteSize0{
+	font-size: var(--icon-033cm);
 }
 .samplerDrumDragSpot{
 	fill: var(--drag-color);

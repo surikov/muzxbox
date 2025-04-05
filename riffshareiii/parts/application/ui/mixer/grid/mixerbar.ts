@@ -216,7 +216,12 @@ class MixerBar {
 		}
 	}
 	trackCellClick(barIdx: number, barX: number, yy: number, zz: number) {
-		console.log('trackCellClick',barIdx, barX, yy, zz);
+		let pitch = Math.ceil(12 * (globalCommandDispatcher.cfg().drawOctaveCount() - globalCommandDispatcher.cfg().transposeOctaveCount()) - yy);
+		let info: BarStepStartEnd = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
+		let change: null | Zvoog_FilterStateChange = null;
+		let muStart = MMUtil().set(info.start);
+		let muEnd = MMUtil().set(info.end);
+		console.log('trackCellClick', barIdx,pitch,muStart,muEnd);
 	}
 
 }
