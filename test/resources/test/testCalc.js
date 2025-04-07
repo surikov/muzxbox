@@ -1252,7 +1252,7 @@ function diffPart(a, b) {
 }
 function dumpPairsCounts() {
     var start = Math.round(Math.random() * 4321 + 1);
-    var deep = 5;
+    var deep = 4;
     console.log('dumpPairsCounts', start, datarows[start], datarows);
     var ball = datarows[start].balls[0];
     var preArr1 = [];
@@ -1261,7 +1261,7 @@ function dumpPairsCounts() {
 }
 function dumpPairsPatterns(start, preArr, left, deep) {
     for (var nn = start; nn < start + 100; nn++) {
-        if (datarows[nn].balls[0] == left) {
+        if (datarows[nn].balls[0] >= left) {
             var smm = 0;
             for (var dd = 1; dd <= deep; dd++) {
                 smm = smm + datarows[nn + dd].balls[0];
