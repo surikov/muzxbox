@@ -1250,27 +1250,36 @@ function diffPart(a, b) {
         return b / a;
     }
 }
-function dumpPairsPatterns() {
-    console.log('dumpPairsPatterns', datarows); //,skipRowsCount,redStat);
-    var calcLen = 7;
-    for (var lop = 1; lop < 5000; lop++) {
-        for (var kk = 1; kk < datarows.length - calcLen; kk++) {
-            if (lop != kk) {
-                var smm = 0;
-                for (var ii = 0; ii < calcLen; ii++) {
-                    var a = datarows[ii + lop].balls[0];
-                    var b = datarows[ii + kk].balls[0];
-                    var dp = diffPart(a, b);
-                    //console.log(ii,':',a,b,'=',dp);
-                    smm = smm + dp;
-                }
-                if (smm / calcLen < 1.25) {
-                    console.log(lop, datarows[lop - 1].balls[0], datarows[kk - 1].balls[0], ':', kk, smm / calcLen);
-                }
+function dumpPairsCounts() {
+    var start = Math.round(Math.random() * 4321 + 1);
+    var deep = 5;
+    console.log('dumpPairsCounts', start, datarows[start], datarows);
+    var ball = datarows[start].balls[0];
+    var preArr1 = [];
+    dumpPairsPatterns(start, preArr1, ball, deep);
+    console.log('dumpPairsPatterns', ball, preArr1);
+}
+function dumpPairsPatterns(start, preArr, left, deep) {
+    for (var nn = start; nn < start + 100; nn++) {
+        if (datarows[nn].balls[0] == left) {
+            var smm = 0;
+            for (var dd = 1; dd <= deep; dd++) {
+                smm = smm + datarows[nn + dd].balls[0];
             }
+            var avg = Math.round(smm / deep);
+            if (nn == start) {
+                console.log('first average', smm / deep);
+            }
+            else {
+                preArr[avg] = (preArr[avg]) ? preArr[avg] : [];
+                preArr[avg][deep] = (preArr[avg][deep]) ? preArr[avg][deep] : 0;
+                preArr[avg][deep]++;
+            }
+            //console.log(nn,datarows[nn]);
         }
     }
 }
 init();
 addTails();
+dumpPairsCounts();
 console.log('start');

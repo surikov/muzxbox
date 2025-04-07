@@ -222,13 +222,14 @@ class MixerBar {
 
 		let muStart = MMUtil().set(info.start);
 		let muEnd = MMUtil().set(info.end);
-		console.log('trackCellClick', barIdx, pitch, muStart, muEnd);
+		//console.log('trackCellClick', barIdx, pitch, muStart, muEnd);
 		let drop = false;
 		globalCommandDispatcher.exe.commitProjectChanges(['tracks', 0, 'measures', barIdx], () => {
 			for (let ii = 0; ii < trMeasure.chords.length; ii++) {
 				let chord = trMeasure.chords[ii];
-				console.log(chord);
+				//console.log(ii,chord);
 				if ((!muStart.more(chord.skip)) && muEnd.more(chord.skip)) {
+					//console.log('found',chord);
 					for (let nn = 0; nn < chord.pitches.length; nn++) {
 						if (chord.pitches[nn] >= pitch && chord.pitches[nn] < pitch + 1) {
 							chord.pitches.splice(nn, 1);

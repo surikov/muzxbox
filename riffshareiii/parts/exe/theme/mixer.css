@@ -140,6 +140,7 @@
 	fill: var(--line-color);
 	fill-opacity:75%;
     stroke: none;
+	pointer-events: none;
 }
 .octaveBottomBorder123{
 	fill: url(#horizontalBorderLine);;

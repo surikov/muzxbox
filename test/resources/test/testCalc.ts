@@ -1388,32 +1388,39 @@ function diffPart(a: number, b: number): number {
 		return b / a;
 	}
 }
-function dumpPairsPatterns() {
-	console.log('dumpPairsPatterns', datarows);//,skipRowsCount,redStat);
-	let calcLen = 7;
-
-	for (let lop = 1; lop < 5000; lop++) {
-
-		for (let kk = 1; kk < datarows.length - calcLen; kk++) {
-			if (lop != kk) {
-				let smm = 0;
-				for (let ii = 0; ii < calcLen; ii++) {
-					let a = datarows[ii + lop].balls[0];
-					let b = datarows[ii + kk].balls[0];
-					let dp = diffPart(a, b);
-					//console.log(ii,':',a,b,'=',dp);
-					smm = smm + dp;
-				}
-				if (smm / calcLen < 1.25) {
-					console.log(lop, datarows[lop - 1].balls[0], datarows[kk - 1].balls[0], ':', kk, smm / calcLen);
-				}
+function dumpPairsCounts() {
+	let start=Math.round(Math.random()*4321+1);
+	let deep=5;
+	console.log('dumpPairsCounts',start,datarows[start],datarows);
+	let ball=datarows[start].balls[0];
+	let preArr1=[];
+	dumpPairsPatterns(start,preArr1,ball,deep);
+	console.log('dumpPairsPatterns',ball,preArr1);
+	
+}
+function dumpPairsPatterns(start,preArr,left,deep) {
+	for (let nn = start; nn < start+100; nn++) {
+		if(datarows[nn].balls[0]==left){
+			let smm=0;
+			for(let dd=1;dd<=deep;dd++){
+				smm=smm+datarows[nn+dd].balls[0];
 			}
+			let avg=Math.round(smm/deep);
+			if(nn==start){
+				console.log('first average',smm/deep);
+			}else{
+				preArr[avg]=(preArr[avg])?preArr[avg]:[];
+				preArr[avg][deep]=(preArr[avg][deep])?preArr[avg][deep]:0;
+				preArr[avg][deep]++;
+			}
+			//console.log(nn,datarows[nn]);
 		}
 	}
+	
 }
 init();
 addTails();
-
+dumpPairsCounts();
 console.log('start');
 
 
