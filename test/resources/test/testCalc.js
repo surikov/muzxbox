@@ -1252,11 +1252,15 @@ function diffPart(a, b) {
 }
 function dumpPairsCounts() {
     var start = Math.round(Math.random() * 4321 + 1);
-    var deep = 4;
-    console.log('dumpPairsCounts', start, datarows[start], datarows);
+    //let deep=4;
     var ball = datarows[start].balls[0];
+    console.log('dumpPairsCounts', start, datarows[start], datarows, ball);
     var preArr1 = [];
-    dumpPairsPatterns(start, preArr1, ball, deep);
+    dumpPairsPatterns(start, preArr1, ball, 1);
+    dumpPairsPatterns(start, preArr1, ball, 2);
+    dumpPairsPatterns(start, preArr1, ball, 3);
+    dumpPairsPatterns(start, preArr1, ball, 4);
+    dumpPairsPatterns(start, preArr1, ball, 5);
     console.log('dumpPairsPatterns', ball, preArr1);
 }
 function dumpPairsPatterns(start, preArr, left, deep) {

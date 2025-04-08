@@ -1390,11 +1390,16 @@ function diffPart(a: number, b: number): number {
 }
 function dumpPairsCounts() {
 	let start=Math.round(Math.random()*4321+1);
-	let deep=4;
-	console.log('dumpPairsCounts',start,datarows[start],datarows);
+	//let deep=4;
+	
 	let ball=datarows[start].balls[0];
+	console.log('dumpPairsCounts',start,datarows[start],datarows,ball);
 	let preArr1=[];
-	dumpPairsPatterns(start,preArr1,ball,deep);
+	dumpPairsPatterns(start,preArr1,ball,1);
+	dumpPairsPatterns(start,preArr1,ball,2);
+	dumpPairsPatterns(start,preArr1,ball,3);
+	dumpPairsPatterns(start,preArr1,ball,4);
+	dumpPairsPatterns(start,preArr1,ball,5);
 	console.log('dumpPairsPatterns',ball,preArr1);
 	
 }

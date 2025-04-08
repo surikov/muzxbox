@@ -3092,7 +3092,9 @@ class MixerBar {
                 w: gridZoomBarAnchor.ww,
                 h: globalCommandDispatcher.cfg().gridHeight(),
                 css: 'commentPaneForClick',
-                activation: (x, y) => { this.trackCellClick(barIdx, x, y, zoomLevel); }
+                activation: (x, y) => {
+                    this.trackCellClick(barIdx, x, y, zoomLevel);
+                }
             };
             gridZoomBarAnchor.content.push(interpane);
         }
@@ -3268,7 +3270,7 @@ class MixerBar {
     }
     trackCellClick(barIdx, barX, yy, zz) {
         let trMeasure = globalCommandDispatcher.cfg().data.tracks[0].measures[barIdx];
-        let pitch = Math.ceil(12 * (globalCommandDispatcher.cfg().drawOctaveCount() - globalCommandDispatcher.cfg().transposeOctaveCount()) - yy);
+        let pitch = Math.round(12 * (globalCommandDispatcher.cfg().drawOctaveCount() - globalCommandDispatcher.cfg().transposeOctaveCount()) - yy + 0);
         let info = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
         let muStart = MMUtil().set(info.start);
         let muEnd = MMUtil().set(info.end);
@@ -3278,7 +3280,9 @@ class MixerBar {
                 let chord = trMeasure.chords[ii];
                 if ((!muStart.more(chord.skip)) && muEnd.more(chord.skip)) {
                     for (let nn = 0; nn < chord.pitches.length; nn++) {
+                        console.log(yy, chord.pitches[nn], pitch, globalCommandDispatcher.cfg().gridTop(), globalCommandDispatcher.renderer.tiler.tapPxSize());
                         if (chord.pitches[nn] >= pitch && chord.pitches[nn] < pitch + 1) {
+                            console.log('drop #', nn);
                             chord.pitches.splice(nn, 1);
                             nn--;
                             drop = true;
