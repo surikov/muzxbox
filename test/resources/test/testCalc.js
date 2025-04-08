@@ -1254,13 +1254,20 @@ function dumpPairsCounts() {
     var start = Math.round(Math.random() * 4321 + 1);
     //let deep=4;
     var ball = datarows[start].balls[0];
-    console.log('dumpPairsCounts', start, datarows[start], datarows, ball);
+    console.log('dumpPairsCounts', start, datarows[start], datarows);
+    var line = '';
+    for (var kk = 0; kk < ball; kk++) {
+        line = line + 'I';
+    }
+    console.log(line, ball);
     var preArr1 = [];
     dumpPairsPatterns(start, preArr1, ball, 1);
     dumpPairsPatterns(start, preArr1, ball, 2);
     dumpPairsPatterns(start, preArr1, ball, 3);
     dumpPairsPatterns(start, preArr1, ball, 4);
     dumpPairsPatterns(start, preArr1, ball, 5);
+    dumpPairsPatterns(start, preArr1, ball, 6);
+    dumpPairsPatterns(start, preArr1, ball, 7);
     console.log('dumpPairsPatterns', ball, preArr1);
 }
 function dumpPairsPatterns(start, preArr, left, deep) {
@@ -1272,7 +1279,12 @@ function dumpPairsPatterns(start, preArr, left, deep) {
             }
             var avg = Math.round(smm / deep);
             if (nn == start) {
-                console.log('first average', smm / deep);
+                //console.log('first average',smm/deep);
+                var line = '';
+                for (var kk = 0; kk < smm / deep; kk++) {
+                    line = line + '|';
+                }
+                console.log(line, smm / deep);
             }
             else {
                 preArr[avg] = (preArr[avg]) ? preArr[avg] : [];
