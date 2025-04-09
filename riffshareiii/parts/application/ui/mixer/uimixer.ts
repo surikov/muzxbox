@@ -14,6 +14,8 @@ class MixerUI {
 
 	levels: MixerZoomLevel[] = [];
 	fillerAnchor: TileAnchor;
+	markAnchor: TileAnchor;
+	markRectangle: TileRectangle;
 	//samplerUI: SamplerRows;
 	fanPane: FanPane = new FanPane();
 	//iconsFanAnchor: TileAnchor;
@@ -50,6 +52,7 @@ class MixerUI {
 
 			this.levels[ii].reCreateBars();
 		}
+		this.resetEditMark();
 		this.fanPane.resetPlates(this.fanLayer.anchors, this.spearsLayer.anchors);
 		//console.log('spearsLayer',this.spearsLayer.anchors);
 		//this.iconsFanAnchor.ww = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().rightPad;
@@ -76,6 +79,38 @@ class MixerUI {
 			, globalCommandDispatcher.cfg().commentsMaxHeight()
 			, this.barCommentsCount);
 	}
+	resetEditMark() {
+		let mark = globalCommandDispatcher.cfg().editmark;
+		if (mark) {
+			let mm: Zvoog_MetreMathType = MMUtil();
+			let barX = 0;
+			let bar: Zvoog_SongMeasure = globalCommandDispatcher.cfg().data.timeline[0];
+			for (let ii = 0; ii < mark.barIdx; ii++) {
+				bar = globalCommandDispatcher.cfg().data.timeline[ii];
+				barX = barX + mm.set(bar.metre).duration(bar.tempo)
+					* globalCommandDispatcher.cfg().widthDurationRatio
+					;
+			}
+
+			let top = globalCommandDispatcher.cfg().gridTop()
+				+ globalCommandDispatcher.cfg().gridHeight()
+				- mark.pitch;
+			let rr = globalCommandDispatcher.cfg().notePathHeight;
+			let skipX = mm.set(mark.skip).duration(bar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio
+			this.markAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX;
+			this.markAnchor.yy = top;
+			this.markAnchor.ww = rr ;
+			this.markAnchor.hh = rr ;
+			this.markRectangle.x = this.markAnchor.xx;
+			this.markRectangle.y = this.markAnchor.yy;
+			this.markRectangle.w = rr ;
+			this.markRectangle.h = rr ;
+			this.markRectangle.rx = rr/2;
+			this.markRectangle.ry = rr/2;
+
+			//console.log(globalCommandDispatcher.cfg().editmark, this.markAnchor, globalCommandDispatcher.cfg().leftPad, skipX);
+		}
+	}
 	createMixerLayers(): TileLayerDefinition[] {
 		let tracksLayerZoom: SVGElement = (document.getElementById('tracksLayerZoom') as any) as SVGElement;
 		this.trackLayers = { g: tracksLayerZoom, anchors: [], mode: LevelModes.normal };
@@ -90,12 +125,19 @@ class MixerUI {
 		this.fanLayer = { g: this.fanSVGgroup, anchors: [], mode: LevelModes.normal };
 		this.spearsSVGgroup = (document.getElementById('spearsLayer') as any) as SVGElement;
 		this.spearsLayer = { g: this.spearsSVGgroup, anchors: [], mode: LevelModes.normal };
-
+		this.markRectangle = {
+			x: 0
+			, y: 0
+			, w: 222
+			, h: 222
+			, css: 'markPointFill'
+		};
+		
 
 		/*
 		this.iconsFanAnchor = {
-			showZoom: zoomPrefixLevelsCSS[0].minZoom
-			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom
+			minZoom: zoomPrefixLevelsCSS[0].minZoom
+			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom
 			, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 		};
 		console.log('createMixerLayers',this.iconsFanAnchor);
@@ -104,32 +146,32 @@ class MixerUI {
 		for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
 			//this.svgs.push((document.getElementById(zoomPrefixLevelsCSS[ii].svg) as any) as SVGElement);
 			let mixerGridAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[ii].minZoom
-				, hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom
+				minZoom: zoomPrefixLevelsCSS[ii].minZoom
+				, beforeZoom: zoomPrefixLevelsCSS[ii + 1].minZoom
 				, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 			};
 			this.gridLayers.anchors.push(mixerGridAnchor);
 			let mixerTrackAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[ii].minZoom
-				, hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom
+				minZoom: zoomPrefixLevelsCSS[ii].minZoom
+				, beforeZoom: zoomPrefixLevelsCSS[ii + 1].minZoom
 				, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 			};
 			this.trackLayers.anchors.push(mixerTrackAnchor);
 			let mixerFirstAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[ii].minZoom
-				, hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom
+				minZoom: zoomPrefixLevelsCSS[ii].minZoom
+				, beforeZoom: zoomPrefixLevelsCSS[ii + 1].minZoom
 				, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 			};
 			this.firstLayers.anchors.push(mixerFirstAnchor);
 			let fanLevelAnchor = {
-				showZoom: zoomPrefixLevelsCSS[ii].minZoom
-				, hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom
+				minZoom: zoomPrefixLevelsCSS[ii].minZoom
+				, beforeZoom: zoomPrefixLevelsCSS[ii + 1].minZoom
 				, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 			};
 			this.fanLayer.anchors.push(fanLevelAnchor);
 			let spearAnchor = {
-				showZoom: zoomPrefixLevelsCSS[ii].minZoom
-				, hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom
+				minZoom: zoomPrefixLevelsCSS[ii].minZoom
+				, beforeZoom: zoomPrefixLevelsCSS[ii + 1].minZoom
 				, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 			};
 			this.spearsLayer.anchors.push(spearAnchor);
@@ -144,13 +186,20 @@ class MixerUI {
 
 			//
 		}
-		//console.log('this.fanLayer', this.fanLayer);
+		this.markAnchor = {
+			minZoom: 0
+			, beforeZoom: zoomPrefixLevelsCSS[6].minZoom
+			, xx: 0, yy: 0, ww: 1, hh: 1, content: [this.markRectangle]
+		};
+		this.gridLayers.anchors.push(this.markAnchor);
+		//console.log(this.gridLayers.anchors);
 		this.fillerAnchor = {
-			showZoom: zoomPrefixLevelsCSS[6].minZoom
-			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1
+			minZoom: zoomPrefixLevelsCSS[6].minZoom
+			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1
 			, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 		};
 		this.gridLayers.anchors.push(this.fillerAnchor);
+
 		return [this.gridLayers, this.trackLayers, this.firstLayers, this.fanLayer, this.spearsLayer];
 	}
 	reFillSingleRatio(yy: number, hh: number, countFunction: (barIdx: number) => number) {
@@ -176,12 +225,13 @@ class MixerUI {
 				, h: hh
 				, css: css
 			};
-			
+
 			this.fillerAnchor.content.push(fillRectangle);
 			barX = barX + barwidth;
 		}
+		//console.log(this.fillerAnchor.content);
 	}
-	
+
 
 	barTrackCount(bb: number): number {
 		let notecount = 0;
@@ -211,9 +261,9 @@ class MixerUI {
 		for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
 			let filter = globalCommandDispatcher.cfg().data.filters[ff];
 			//if (automation) {
-				if (filter.automation[bb]) {
-					autoCnt = autoCnt + filter.automation[bb].changes.length;
-				}
+			if (filter.automation[bb]) {
+				autoCnt = autoCnt + filter.automation[bb].changes.length;
+			}
 			//}
 		}
 		return autoCnt;

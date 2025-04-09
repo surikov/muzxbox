@@ -601,7 +601,7 @@ class TileLevelRealTime implements TileLevelBase {
 				}
 			}
 		}
-		if (anchor.showZoom <= this.translateZ && anchor.hideZoom > this.translateZ) {
+		if (anchor.minZoom <= this.translateZ && anchor.beforeZoom > this.translateZ) {
 			let collide = this.collision(anchor.xx * this.tapSize
 				, anchor.yy * this.tapSize
 				, anchor.ww * this.tapSize
@@ -635,8 +635,8 @@ class TileLevelRealTime implements TileLevelBase {
 					g.watchW = anchor.ww * this.tapSize;
 					g.watchH = anchor.hh * this.tapSize;
 					parentSVGElement.appendChild(g);
-					g.minZoom = anchor.showZoom;
-					g.maxZoom = anchor.hideZoom;
+					g.minZoom = anchor.minZoom;
+					g.maxZoom = anchor.beforeZoom;
 					if (anchor.translation) {
 						let tr = anchor.translation;
 						let translate = 'translate(' + (tr.x * this.tapSize) + ',' + (tr.y * this.tapSize) + ')';

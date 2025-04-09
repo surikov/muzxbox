@@ -448,9 +448,12 @@ declare class MixerUI {
     spearsLayer: TileLayerDefinition;
     levels: MixerZoomLevel[];
     fillerAnchor: TileAnchor;
+    markAnchor: TileAnchor;
+    markRectangle: TileRectangle;
     fanPane: FanPane;
     constructor();
     reFillMixerUI(): void;
+    resetEditMark(): void;
     createMixerLayers(): TileLayerDefinition[];
     reFillSingleRatio(yy: number, hh: number, countFunction: (barIdx: number) => number): void;
     barTrackCount(bb: number): number;
@@ -662,6 +665,11 @@ declare class MixerDataMathUtility {
     padGridFan: number;
     zoomEditSLess: number;
     zoomAuxLess: number;
+    editmark: null | {
+        barIdx: number;
+        skip: Zvoog_Metre;
+        pitch: number;
+    };
     constructor(data: Zvoog_Project);
     recalculateCommentMax(): void;
     extractDifference(from: Zvoog_Project): Object;
@@ -766,8 +774,8 @@ declare type TileAnchor = {
     yy: number;
     ww: number;
     hh: number;
-    showZoom: number;
-    hideZoom: number;
+    minZoom: number;
+    beforeZoom: number;
     content: TileItem[];
     translation?: TilePoint;
 } & TileBaseDefinition;

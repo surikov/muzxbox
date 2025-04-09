@@ -79,13 +79,13 @@ type TileAnchor = {
 	, yy: number
 	, ww: number
 	, hh: number
-	, showZoom: number
-	, hideZoom: number
+	, minZoom: number
+	, beforeZoom: number
 	, content: TileItem[]
 	, translation?: TilePoint
 } & TileBaseDefinition;
 function TAnchor(xx: number, yy: number, ww: number, hh: number, showZoom: number, hideZoom: number, id?: string, translation?: TilePoint): TileAnchor {
-	return { xx: xx, yy: yy, ww: ww, hh: hh, showZoom: showZoom, hideZoom: hideZoom, content: [], id: id };
+	return { xx: xx, yy: yy, ww: ww, hh: hh, minZoom: showZoom, beforeZoom: hideZoom, content: [], id: id };
 }
 
 type TileImage = {

@@ -72,8 +72,8 @@ class RightMenuItem {
 		this.top = itemTop;
 		let anchor: TileAnchor = {
 			xx: 0, yy: itemTop, ww: 111, hh: 111
-			, showZoom: zoomPrefixLevelsCSS[0].minZoom
-			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
+			, minZoom: zoomPrefixLevelsCSS[0].minZoom
+			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
 			, content: []
 		};
 		if (this.info.focused) {

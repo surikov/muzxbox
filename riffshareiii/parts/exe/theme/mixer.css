@@ -136,6 +136,16 @@
 }
 
 
+.markPointFill {
+    fill: var(--drag-color);
+	fill-opacity: 90%;
+    stroke: var(--main-color);
+    stroke-linejoin: round;
+    stroke-width: calc(0.15*var(--tapSize));
+	stroke-opacity: 90%;
+	pointer-events: none;
+}
+
 .octaveBottomBorder{
 	fill: var(--line-color);
 	fill-opacity:75%;

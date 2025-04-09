@@ -11,8 +11,8 @@ class LeftPanel {
 		this.leftLayer = { g: leftsidebar, anchors: [], mode: LevelModes.left };
 		/*this.leftPanelAnchor = {
 			xx: 0, yy: 0, ww: 111, hh: 111
-			, showZoom: zoomPrefixLevelsCSS[0].minZoom
-			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom
+			, minZoom: zoomPrefixLevelsCSS[0].minZoom
+			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom
 			, content: [
 			    
 			]
@@ -24,8 +24,8 @@ class LeftPanel {
 		for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
 
 			let zoomLeftLevelAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[zz].minZoom
-				, hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom
+				minZoom: zoomPrefixLevelsCSS[zz].minZoom
+				, beforeZoom: zoomPrefixLevelsCSS[zz + 1].minZoom
 				, xx: 0, yy: 0, ww: 1, hh: 1, content: []
 			};
 			this.leftZoomAnchors.push(zoomLeftLevelAnchor);

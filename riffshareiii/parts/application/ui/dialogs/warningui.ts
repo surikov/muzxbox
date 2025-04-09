@@ -46,8 +46,8 @@ class WarningUI {
 		};
 		this.warningAnchor = {
 			id: 'warningAnchor', xx: 0, yy: 0, ww: 1, hh: 1
-			, showZoom: zoomPrefixLevelsCSS[0].minZoom
-			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1
+			, minZoom: zoomPrefixLevelsCSS[0].minZoom
+			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1
 			, content: [this.warningRectangle, this.warningIcon
 				, this.warningTitle
 				, this.warningDescription

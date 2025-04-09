@@ -4,11 +4,12 @@ declare function createTileLevel(): TileLevelBase;
 function startApplication() {
 	console.log('startApplication v1.6.11');
 	//let commands = new CommandDispatcher();
+	globalCommandDispatcher.registerWorkProject(___newEmptyProject);
 	let ui = new UIRenderer();
 	ui.createUI();
 	//window.addEventListener("unload", saveProjectState);
 	window.addEventListener("beforeunload", saveProjectState);
-	globalCommandDispatcher.registerWorkProject(___newEmptyProject);
+	
 	try {
 		let lastprojectdata = readObjectFromlocalStorage('lastprojectdata');
 		if (lastprojectdata) {

@@ -184,8 +184,8 @@ declare type TileAnchor = {
     yy: number;
     ww: number;
     hh: number;
-    showZoom: number;
-    hideZoom: number;
+    minZoom: number;
+    beforeZoom: number;
     content: TileItem[];
     translation?: TilePoint;
 } & TileBaseDefinition;

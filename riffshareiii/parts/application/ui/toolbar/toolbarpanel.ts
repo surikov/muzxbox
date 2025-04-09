@@ -31,8 +31,8 @@ class UIToolbar {
         this.toolBarGroup = (document.getElementById("toolBarPanelGroup") as any) as SVGElement;
         this.toolBarAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111
-            , showZoom: zoomPrefixLevelsCSS[0].minZoom
-            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom
+            , minZoom: zoomPrefixLevelsCSS[0].minZoom
+            , beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom
             , content: [
                 this.menuButton.iconLabelButton.anchor
 				,this.undoButton.iconLabelButton.anchor

@@ -1,4 +1,4 @@
-type BarStepStartEnd= { start: Zvoog_MetreMathType, length: Zvoog_MetreMathType, end: Zvoog_MetreMathType };
+type BarStepStartEnd = { start: Zvoog_MetreMathType, length: Zvoog_MetreMathType, end: Zvoog_MetreMathType };
 class MixerDataMathUtility {
 	data: Zvoog_Project;
 
@@ -13,7 +13,7 @@ class MixerDataMathUtility {
 	bottomPad = 11;
 
 
-	notePathHeight = 1.01;
+	notePathHeight = 1.00;
 	samplerDotHeight = 2;
 	autoPointHeight = 4;
 	//commentPointHeight = 9;
@@ -41,6 +41,8 @@ class MixerDataMathUtility {
 
 	zoomEditSLess = 3;
 	zoomAuxLess = 1;
+
+	editmark: null | { barIdx: number, skip: Zvoog_Metre, pitch: number } = { barIdx: 2, skip: { count: 3, part: 4 }, pitch: 36 };
 
 	constructor(data: Zvoog_Project) {
 		this.data = data;
@@ -294,7 +296,7 @@ class MixerDataMathUtility {
 		if (zIndex > 4) txtZoomRatio = 8;
 		return txtZoomRatio;
 	}
-	gridClickInfo(barIdx: number, barX: number, zoomIdx: number):BarStepStartEnd {
+	gridClickInfo(barIdx: number, barX: number, zoomIdx: number): BarStepStartEnd {
 		let curBar = this.data.timeline[barIdx];
 		let curDur = barX / this.widthDurationRatio;
 		let start: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 1 });

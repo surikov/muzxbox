@@ -233,10 +233,10 @@ class StateDiff {
 }
 function startApplication() {
     console.log('startApplication v1.6.11');
+    globalCommandDispatcher.registerWorkProject(___newEmptyProject);
     let ui = new UIRenderer();
     ui.createUI();
     window.addEventListener("beforeunload", saveProjectState);
-    globalCommandDispatcher.registerWorkProject(___newEmptyProject);
     try {
         let lastprojectdata = readObjectFromlocalStorage('lastprojectdata');
         if (lastprojectdata) {
@@ -1799,8 +1799,8 @@ class TimeSelectBar {
         this.selectionBarSVGGroup = document.getElementById("timeselectbar");
         this.selectBarAnchor = {
             xx: 0, yy: 0, ww: 1, hh: 1,
-            showZoom: zoomPrefixLevelsCSS[0].minZoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            minZoom: zoomPrefixLevelsCSS[0].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: []
         };
         this.selectionBarLayer = {
@@ -1818,8 +1818,8 @@ class TimeSelectBar {
         };
         this.selectionAnchor = {
             xx: 0, yy: 0, ww: 1, hh: 1,
-            showZoom: zoomPrefixLevelsCSS[0].minZoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            minZoom: zoomPrefixLevelsCSS[0].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [this.selectionMark]
         };
         this.selectedTimeLayer = {
@@ -1835,8 +1835,8 @@ class TimeSelectBar {
         };
         this.positionTimeAnchor = {
             xx: 0, yy: 0, ww: 1, hh: 1,
-            showZoom: zoomPrefixLevelsCSS[0].minZoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            minZoom: zoomPrefixLevelsCSS[0].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [this.positionTimeMark]
         };
         this.positionTimeLayer = {
@@ -1935,8 +1935,8 @@ class TimeSelectBar {
         this.zoomAnchors = [];
         for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
             let selectLevelAnchor = {
-                showZoom: zoomPrefixLevelsCSS[zz].minZoom,
-                hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
+                minZoom: zoomPrefixLevelsCSS[zz].minZoom,
+                beforeZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
                 xx: 0, yy: 0, ww: globalCommandDispatcher.cfg().wholeWidth(), hh: globalCommandDispatcher.cfg().wholeHeight(), content: [],
                 id: 'time' + (zz + Math.random())
             };
@@ -1949,8 +1949,8 @@ class TimeSelectBar {
                 let curMeasureMeter = mm.set(curBar.metre);
                 let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
                 let measureAnchor = {
-                    showZoom: zoomPrefixLevelsCSS[zz].minZoom,
-                    hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
+                    minZoom: zoomPrefixLevelsCSS[zz].minZoom,
+                    beforeZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
                     xx: barLeft, yy: 0, ww: barWidth, hh: 1234, content: [],
                     id: 'measure' + (kk + Math.random())
                 };
@@ -2020,8 +2020,8 @@ class UIToolbar {
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
         this.toolBarAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111,
-            showZoom: zoomPrefixLevelsCSS[0].minZoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            minZoom: zoomPrefixLevelsCSS[0].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
                 this.menuButton.iconLabelButton.anchor,
                 this.undoButton.iconLabelButton.anchor,
@@ -2101,8 +2101,8 @@ class RightMenuPanel {
         });
         this.backgroundAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111,
-            showZoom: zoomPrefixLevelsCSS[0].minZoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            minZoom: zoomPrefixLevelsCSS[0].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
                 this.listingShadow,
                 this.backgroundRectangle
@@ -2110,22 +2110,22 @@ class RightMenuPanel {
         };
         this.contentAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111,
-            showZoom: zoomPrefixLevelsCSS[0].minZoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            minZoom: zoomPrefixLevelsCSS[0].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [], id: 'rightMenuContentAnchor'
         };
         this.interAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0,
-            showZoom: zoomPrefixLevelsCSS[0].minZoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            minZoom: zoomPrefixLevelsCSS[0].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
                 this.dragHandler
             ], id: 'rightMenuInteractionAnchor'
         };
         this.buttonsAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0,
-            showZoom: zoomPrefixLevelsCSS[0].minZoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            minZoom: zoomPrefixLevelsCSS[0].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
                 this.menuCloseButton.anchor, this.menuUpButton.anchor
             ]
@@ -2528,8 +2528,8 @@ class RightMenuItem {
         this.top = itemTop;
         let anchor = {
             xx: 0, yy: itemTop, ww: 111, hh: 111,
-            showZoom: zoomPrefixLevelsCSS[0].minZoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            minZoom: zoomPrefixLevelsCSS[0].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: []
         };
         if (this.info.focused) {
@@ -2788,8 +2788,8 @@ class LeftPanel {
         this.leftLayer = { g: leftsidebar, anchors: [], mode: LevelModes.left };
         for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
             let zoomLeftLevelAnchor = {
-                showZoom: zoomPrefixLevelsCSS[zz].minZoom,
-                hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
+                minZoom: zoomPrefixLevelsCSS[zz].minZoom,
+                beforeZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
                 xx: 0, yy: 0, ww: 1, hh: 1, content: []
             };
             this.leftZoomAnchors.push(zoomLeftLevelAnchor);
@@ -3100,8 +3100,8 @@ class MixerBar {
         }
         for (let oo = globalCommandDispatcher.cfg().transposeOctaveCount(); oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
             let gridOctaveAnchor = {
-                showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom,
-                hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom,
+                minZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom,
+                beforeZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom,
                 xx: left,
                 yy: globalCommandDispatcher.cfg().gridTop() + oo * h12 - transpose,
                 ww: ww,
@@ -3110,8 +3110,8 @@ class MixerBar {
             };
             gridZoomBarAnchor.content.push(gridOctaveAnchor);
             let tracksOctaveAnchor = {
-                showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom,
-                hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom,
+                minZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom,
+                beforeZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom,
                 xx: left,
                 yy: globalCommandDispatcher.cfg().gridTop() + oo * h12 - transpose,
                 ww: ww,
@@ -3120,8 +3120,8 @@ class MixerBar {
             };
             tracksZoomBarAnchor.content.push(tracksOctaveAnchor);
             let firstOctaveAnchor = {
-                showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom,
-                hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom,
+                minZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom,
+                beforeZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom,
                 xx: left,
                 yy: globalCommandDispatcher.cfg().gridTop() + oo * h12 - transpose,
                 ww: ww,
@@ -3270,7 +3270,7 @@ class MixerBar {
     }
     trackCellClick(barIdx, barX, yy, zz) {
         let trMeasure = globalCommandDispatcher.cfg().data.tracks[0].measures[barIdx];
-        let pitch = Math.round(12 * (globalCommandDispatcher.cfg().drawOctaveCount() - globalCommandDispatcher.cfg().transposeOctaveCount()) - yy + 0);
+        let pitch = Math.ceil(globalCommandDispatcher.cfg().gridHeight() - yy);
         let info = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
         let muStart = MMUtil().set(info.start);
         let muEnd = MMUtil().set(info.end);
@@ -3280,7 +3280,6 @@ class MixerBar {
                 let chord = trMeasure.chords[ii];
                 if ((!muStart.more(chord.skip)) && muEnd.more(chord.skip)) {
                     for (let nn = 0; nn < chord.pitches.length; nn++) {
-                        console.log(yy, chord.pitches[nn], pitch, globalCommandDispatcher.cfg().gridTop(), globalCommandDispatcher.renderer.tiler.tapPxSize());
                         if (chord.pitches[nn] >= pitch && chord.pitches[nn] < pitch + 1) {
                             console.log('drop #', nn);
                             chord.pitches.splice(nn, 1);
@@ -3292,6 +3291,9 @@ class MixerBar {
             }
         });
         if (!drop) {
+            console.log('set mark', barIdx, muStart.metre(), globalCommandDispatcher.cfg().data.tracks[0].title);
+            globalCommandDispatcher.cfg().editmark = { barIdx: barIdx, skip: muStart.metre(), pitch };
+            globalCommandDispatcher.resetProject();
         }
     }
 }
@@ -3504,6 +3506,7 @@ class MixerUI {
             this.spearsLayer.anchors[ii].content = [];
             this.levels[ii].reCreateBars();
         }
+        this.resetEditMark();
         this.fanPane.resetPlates(this.fanLayer.anchors, this.spearsLayer.anchors);
         this.fillerAnchor.xx = globalCommandDispatcher.cfg().leftPad;
         this.fillerAnchor.yy = globalCommandDispatcher.cfg().gridTop();
@@ -3514,6 +3517,34 @@ class MixerUI {
         this.reFillSingleRatio(globalCommandDispatcher.cfg().gridTop(), globalCommandDispatcher.cfg().gridHeight(), this.barTrackCount);
         this.reFillSingleRatio(globalCommandDispatcher.cfg().automationTop(), globalCommandDispatcher.cfg().automationHeight(), this.barAutoCount);
         this.reFillSingleRatio(globalCommandDispatcher.cfg().commentsTop(), globalCommandDispatcher.cfg().commentsMaxHeight(), this.barCommentsCount);
+    }
+    resetEditMark() {
+        let mark = globalCommandDispatcher.cfg().editmark;
+        if (mark) {
+            let mm = MMUtil();
+            let barX = 0;
+            let bar = globalCommandDispatcher.cfg().data.timeline[0];
+            for (let ii = 0; ii < mark.barIdx; ii++) {
+                bar = globalCommandDispatcher.cfg().data.timeline[ii];
+                barX = barX + mm.set(bar.metre).duration(bar.tempo)
+                    * globalCommandDispatcher.cfg().widthDurationRatio;
+            }
+            let top = globalCommandDispatcher.cfg().gridTop()
+                + globalCommandDispatcher.cfg().gridHeight()
+                - mark.pitch;
+            let rr = globalCommandDispatcher.cfg().notePathHeight;
+            let skipX = mm.set(mark.skip).duration(bar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+            this.markAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX;
+            this.markAnchor.yy = top;
+            this.markAnchor.ww = rr;
+            this.markAnchor.hh = rr;
+            this.markRectangle.x = this.markAnchor.xx;
+            this.markRectangle.y = this.markAnchor.yy;
+            this.markRectangle.w = rr;
+            this.markRectangle.h = rr;
+            this.markRectangle.rx = rr / 2;
+            this.markRectangle.ry = rr / 2;
+        }
     }
     createMixerLayers() {
         let tracksLayerZoom = document.getElementById('tracksLayerZoom');
@@ -3526,42 +3557,55 @@ class MixerUI {
         this.fanLayer = { g: this.fanSVGgroup, anchors: [], mode: LevelModes.normal };
         this.spearsSVGgroup = document.getElementById('spearsLayer');
         this.spearsLayer = { g: this.spearsSVGgroup, anchors: [], mode: LevelModes.normal };
+        this.markRectangle = {
+            x: 0,
+            y: 0,
+            w: 222,
+            h: 222,
+            css: 'markPointFill'
+        };
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             let mixerGridAnchor = {
-                showZoom: zoomPrefixLevelsCSS[ii].minZoom,
-                hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
+                minZoom: zoomPrefixLevelsCSS[ii].minZoom,
+                beforeZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
                 xx: 0, yy: 0, ww: 1, hh: 1, content: []
             };
             this.gridLayers.anchors.push(mixerGridAnchor);
             let mixerTrackAnchor = {
-                showZoom: zoomPrefixLevelsCSS[ii].minZoom,
-                hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
+                minZoom: zoomPrefixLevelsCSS[ii].minZoom,
+                beforeZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
                 xx: 0, yy: 0, ww: 1, hh: 1, content: []
             };
             this.trackLayers.anchors.push(mixerTrackAnchor);
             let mixerFirstAnchor = {
-                showZoom: zoomPrefixLevelsCSS[ii].minZoom,
-                hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
+                minZoom: zoomPrefixLevelsCSS[ii].minZoom,
+                beforeZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
                 xx: 0, yy: 0, ww: 1, hh: 1, content: []
             };
             this.firstLayers.anchors.push(mixerFirstAnchor);
             let fanLevelAnchor = {
-                showZoom: zoomPrefixLevelsCSS[ii].minZoom,
-                hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
+                minZoom: zoomPrefixLevelsCSS[ii].minZoom,
+                beforeZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
                 xx: 0, yy: 0, ww: 1, hh: 1, content: []
             };
             this.fanLayer.anchors.push(fanLevelAnchor);
             let spearAnchor = {
-                showZoom: zoomPrefixLevelsCSS[ii].minZoom,
-                hideZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
+                minZoom: zoomPrefixLevelsCSS[ii].minZoom,
+                beforeZoom: zoomPrefixLevelsCSS[ii + 1].minZoom,
                 xx: 0, yy: 0, ww: 1, hh: 1, content: []
             };
             this.spearsLayer.anchors.push(spearAnchor);
             this.levels.push(new MixerZoomLevel(ii, mixerGridAnchor, mixerTrackAnchor, mixerFirstAnchor));
         }
+        this.markAnchor = {
+            minZoom: 0,
+            beforeZoom: zoomPrefixLevelsCSS[6].minZoom,
+            xx: 0, yy: 0, ww: 1, hh: 1, content: [this.markRectangle]
+        };
+        this.gridLayers.anchors.push(this.markAnchor);
         this.fillerAnchor = {
-            showZoom: zoomPrefixLevelsCSS[6].minZoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1,
+            minZoom: zoomPrefixLevelsCSS[6].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1,
             xx: 0, yy: 0, ww: 1, hh: 1, content: []
         };
         this.gridLayers.anchors.push(this.fillerAnchor);
@@ -3653,17 +3697,17 @@ class MixerZoomLevel {
             let timebar = globalCommandDispatcher.cfg().data.timeline[ii];
             width = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
             let barGridAnchor = {
-                showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
+                minZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, beforeZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
                 xx: left, yy: 0, ww: width, hh: globalCommandDispatcher.cfg().wholeHeight(), content: [], id: 'barGrid' + (ii + Math.random())
             };
             this.zoomGridAnchor.content.push(barGridAnchor);
             let barTracksAnchor = {
-                showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
+                minZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, beforeZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
                 xx: left, yy: 0, ww: width, hh: globalCommandDispatcher.cfg().wholeHeight(), content: [], id: 'barTrack' + (ii + Math.random())
             };
             this.zoomTracksAnchor.content.push(barTracksAnchor);
             let barFirstAnchor = {
-                showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
+                minZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, beforeZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
                 xx: left, yy: 0, ww: width, hh: globalCommandDispatcher.cfg().wholeHeight(), content: [], id: 'barFirst' + (ii + Math.random())
             };
             this.zoomFirstAnchor.content.push(barFirstAnchor);
@@ -3681,11 +3725,12 @@ class MixerZoomLevel {
     }
     addGridLines(barOctaveAnchor) {
         if (this.zoomLevelIndex < 6) {
-            for (let oo = 0; oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
-                if (oo > 0) {
+            for (let octaveIdx = 0; octaveIdx < globalCommandDispatcher.cfg().drawOctaveCount(); octaveIdx++) {
+                let octaveY = globalCommandDispatcher.cfg().gridTop() + octaveIdx * 12 * globalCommandDispatcher.cfg().notePathHeight;
+                if (octaveIdx > 0) {
                     let octaveBottomBorder = {
                         x: globalCommandDispatcher.cfg().leftPad,
-                        y: globalCommandDispatcher.cfg().gridTop() + oo * 12 * globalCommandDispatcher.cfg().notePathHeight,
+                        y: octaveY,
                         w: globalCommandDispatcher.cfg().timelineWidth(),
                         h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
                         css: 'octaveBottomBorder'
@@ -3694,9 +3739,10 @@ class MixerZoomLevel {
                 }
                 if (this.zoomLevelIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
                     for (let kk = 1; kk < 12; kk++) {
+                        let pitchY = octaveY + kk * globalCommandDispatcher.cfg().notePathHeight;
                         barOctaveAnchor.content.push({
                             x: globalCommandDispatcher.cfg().leftPad,
-                            y: globalCommandDispatcher.cfg().gridTop() + (oo * 12 + kk) * globalCommandDispatcher.cfg().notePathHeight,
+                            y: pitchY,
                             w: globalCommandDispatcher.cfg().timelineWidth(),
                             h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
                             css: 'interActiveGridLine'
@@ -3837,12 +3883,12 @@ class PerformerIcon {
         }
         let dragAnchor = {
             xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
-            showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [], translation: { x: 0, y: 0 }
+            minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [], translation: { x: 0, y: 0 }
         };
         fanLevelAnchor.content.push(dragAnchor);
         let dropAnchor = {
             xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
-            showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [], translation: { x: 0, y: 0 }
+            minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [], translation: { x: 0, y: 0 }
         };
         fanLevelAnchor.content.push(dropAnchor);
         let rec = {
@@ -4033,12 +4079,12 @@ class SamplerIcon {
         }
         let dragAnchor = {
             xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
-            showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [], translation: { x: 0, y: 0 }
+            minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [], translation: { x: 0, y: 0 }
         };
         fanLevelAnchor.content.push(dragAnchor);
         let dropAnchor = {
             xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
-            showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [], translation: { x: 0, y: 0 }
+            minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [], translation: { x: 0, y: 0 }
         };
         fanLevelAnchor.content.push(dropAnchor);
         let rec = {
@@ -4232,12 +4278,12 @@ class FilterIcon {
         }
         let dragAnchor = {
             xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
-            showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [], translation: { x: 0, y: 0 }
+            minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [], translation: { x: 0, y: 0 }
         };
         fanLevelAnchor.content.push(dragAnchor);
         let dropAnchor = {
             xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
-            showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [], translation: { x: 0, y: 0 }
+            minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [], translation: { x: 0, y: 0 }
         };
         fanLevelAnchor.content.push(dropAnchor);
         let rec = {
@@ -4530,8 +4576,8 @@ class IconLabelButton {
         this.label = { x: 0, y: 0, text: this.labels[this.selection], css: cssLabel };
         this.anchor = {
             xx: 0, yy: 0, ww: 111, hh: 111,
-            showZoom: zoomPrefixLevelsCSS[0].minZoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            minZoom: zoomPrefixLevelsCSS[0].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
                 this.bg,
                 this.label,
@@ -4672,8 +4718,8 @@ class DebugLayerUI {
         this.debugGroup = document.getElementById("debugLayer");
         this.debugAnchor = {
             xx: 0, yy: 0, ww: 1, hh: 1,
-            showZoom: zoomPrefixLevelsCSS[0].minZoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            minZoom: zoomPrefixLevelsCSS[0].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: []
         };
         this.debugLayer = {
@@ -4720,8 +4766,8 @@ class WarningUI {
         };
         this.warningAnchor = {
             id: 'warningAnchor', xx: 0, yy: 0, ww: 1, hh: 1,
-            showZoom: zoomPrefixLevelsCSS[0].minZoom,
-            hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1,
+            minZoom: zoomPrefixLevelsCSS[0].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1,
             content: [this.warningRectangle, this.warningIcon,
                 this.warningTitle,
                 this.warningDescription,
@@ -4998,7 +5044,7 @@ class MixerDataMathUtility {
         this.padSampler2Automation = 1;
         this.padAutomation2Comments = 1;
         this.bottomPad = 11;
-        this.notePathHeight = 1.01;
+        this.notePathHeight = 1.00;
         this.samplerDotHeight = 2;
         this.autoPointHeight = 4;
         this.widthDurationRatio = 27;
@@ -5011,6 +5057,7 @@ class MixerDataMathUtility {
         this.padGridFan = 15;
         this.zoomEditSLess = 3;
         this.zoomAuxLess = 1;
+        this.editmark = { barIdx: 2, skip: { count: 3, part: 4 }, pitch: 36 };
         this.data = data;
         this.recalculateCommentMax();
     }
@@ -5709,7 +5756,7 @@ var LevelModes;
 })(LevelModes || (LevelModes = {}));
 ;
 function TAnchor(xx, yy, ww, hh, showZoom, hideZoom, id, translation) {
-    return { xx: xx, yy: yy, ww: ww, hh: hh, showZoom: showZoom, hideZoom: hideZoom, content: [], id: id };
+    return { xx: xx, yy: yy, ww: ww, hh: hh, minZoom: showZoom, beforeZoom: hideZoom, content: [], id: id };
 }
 function TText(x, y, css, text) {
     return { x: x, y: y, text: text, css: css, };

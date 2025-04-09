@@ -560,7 +560,7 @@ class TileLevelRealTime {
                 }
             }
         }
-        if (anchor.showZoom <= this.translateZ && anchor.hideZoom > this.translateZ) {
+        if (anchor.minZoom <= this.translateZ && anchor.beforeZoom > this.translateZ) {
             let collide = this.collision(anchor.xx * this.tapSize, anchor.yy * this.tapSize, anchor.ww * this.tapSize, anchor.hh * this.tapSize, x, y, w, h);
             if (layerMode == LevelModes.overlay || collide) {
                 var gid = anchor.id ? anchor.id : '';
@@ -586,8 +586,8 @@ class TileLevelRealTime {
                     g.watchW = anchor.ww * this.tapSize;
                     g.watchH = anchor.hh * this.tapSize;
                     parentSVGElement.appendChild(g);
-                    g.minZoom = anchor.showZoom;
-                    g.maxZoom = anchor.hideZoom;
+                    g.minZoom = anchor.minZoom;
+                    g.maxZoom = anchor.beforeZoom;
                     if (anchor.translation) {
                         let tr = anchor.translation;
                         let translate = 'translate(' + (tr.x * this.tapSize) + ',' + (tr.y * this.tapSize) + ')';
@@ -1240,7 +1240,7 @@ var LevelModes;
 })(LevelModes || (LevelModes = {}));
 ;
 function TAnchor(xx, yy, ww, hh, showZoom, hideZoom, id, translation) {
-    return { xx: xx, yy: yy, ww: ww, hh: hh, showZoom: showZoom, hideZoom: hideZoom, content: [], id: id };
+    return { xx: xx, yy: yy, ww: ww, hh: hh, minZoom: showZoom, beforeZoom: hideZoom, content: [], id: id };
 }
 function TText(x, y, css, text) {
     return { x: x, y: y, text: text, css: css, };

@@ -33,7 +33,7 @@ class ToolBarButton {
             //,css:'step fi-arrows-compress size-14'
         }
         this.anchor = {
-            xx: 0, yy: 0, ww: 111, hh: 111, showZoom: zoomPrefixLevelsCSS[0].zoom, hideZoom: zoomPrefixLevelsCSS[10].zoom, content: [
+            xx: 0, yy: 0, ww: 111, hh: 111, minZoom: zoomPrefixLevelsCSS[0].zoom, beforeZoom: zoomPrefixLevelsCSS[10].zoom, content: [
                 this.bg
                 , this.label
                 , this.spot

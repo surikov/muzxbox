@@ -24,8 +24,8 @@ class TimeSelectBar {
 		this.selectionBarSVGGroup = (document.getElementById("timeselectbar") as any) as SVGElement;
 		this.selectBarAnchor = {
 			xx: 0, yy: 0, ww: 1, hh: 1
-			, showZoom: zoomPrefixLevelsCSS[0].minZoom
-			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
+			, minZoom: zoomPrefixLevelsCSS[0].minZoom
+			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
 			, content: [
 			]
 		};
@@ -45,8 +45,8 @@ class TimeSelectBar {
 		};
 		this.selectionAnchor = {
 			xx: 0, yy: 0, ww: 1, hh: 1
-			, showZoom: zoomPrefixLevelsCSS[0].minZoom
-			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
+			, minZoom: zoomPrefixLevelsCSS[0].minZoom
+			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
 			, content: [this.selectionMark]
 		};
 		this.selectedTimeLayer = {
@@ -63,8 +63,8 @@ class TimeSelectBar {
 		};
 		this.positionTimeAnchor = {
 			xx: 0, yy: 0, ww: 1, hh: 1
-			, showZoom: zoomPrefixLevelsCSS[0].minZoom
-			, hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
+			, minZoom: zoomPrefixLevelsCSS[0].minZoom
+			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
 			, content: [this.positionTimeMark]
 		};
 		this.positionTimeLayer = {
@@ -198,8 +198,8 @@ class TimeSelectBar {
 		for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
 			//console.log('add',zoomPrefixLevelsCSS[zz]);
 			let selectLevelAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[zz].minZoom
-				, hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom
+				minZoom: zoomPrefixLevelsCSS[zz].minZoom
+				, beforeZoom: zoomPrefixLevelsCSS[zz + 1].minZoom
 				, xx: 0, yy: 0, ww: globalCommandDispatcher.cfg().wholeWidth(), hh: globalCommandDispatcher.cfg().wholeHeight(), content: []
 				, id: 'time' + (zz + Math.random())
 			};
@@ -214,8 +214,8 @@ class TimeSelectBar {
 				let curMeasureMeter = mm.set(curBar.metre);
 				let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 				let measureAnchor: TileAnchor = {
-					showZoom: zoomPrefixLevelsCSS[zz].minZoom
-					, hideZoom: zoomPrefixLevelsCSS[zz + 1].minZoom
+					minZoom: zoomPrefixLevelsCSS[zz].minZoom
+					, beforeZoom: zoomPrefixLevelsCSS[zz + 1].minZoom
 					, xx: barLeft, yy: 0, ww: barWidth, hh: 1234, content: []
 					, id: 'measure' + (kk + Math.random())
 				};

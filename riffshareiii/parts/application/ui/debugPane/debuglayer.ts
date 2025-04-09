@@ -12,8 +12,8 @@ class DebugLayerUI {//} implements RenderedLayers {
         this.debugGroup = (document.getElementById("debugLayer") as any) as SVGElement;
         this.debugAnchor = {
             xx: 0, yy: 0, ww: 1, hh: 1
-            , showZoom: zoomPrefixLevelsCSS[0].minZoom
-            , hideZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom
+            , minZoom: zoomPrefixLevelsCSS[0].minZoom
+            , beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom
             , content: [
                 /*this.debugRectangle
                 ,{ x: 0.25, y: 0, w: 0.25, h:0.25, css: 'debug' }

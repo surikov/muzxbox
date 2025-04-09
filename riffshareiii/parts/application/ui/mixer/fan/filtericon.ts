@@ -25,13 +25,13 @@ class FilterIcon {
 		}
 		let dragAnchor: TileAnchor = {
 			xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz
-			, showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [], translation: { x: 0, y: 0 }
+			, minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [], translation: { x: 0, y: 0 }
 			//,id:'drag'+Math.random()
 		};
 		fanLevelAnchor.content.push(dragAnchor);
 		let dropAnchor: TileAnchor = {
 			xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz
-			, showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [], translation: { x: 0, y: 0 }
+			, minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [], translation: { x: 0, y: 0 }
 		};
 		fanLevelAnchor.content.push(dropAnchor);
 		let rec: TileRectangle = {
@@ -246,7 +246,7 @@ class FilterIcon {
 				, yy: sbuttn.y
 				, ww: sbuttn.w
 				, hh: sbuttn.h
-				, showZoom: fanLevelAnchor.showZoom, hideZoom: fanLevelAnchor.hideZoom, content: [sbuttn], translation: { x: 0, y: 0 }
+				, minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [sbuttn], translation: { x: 0, y: 0 }
 			};
 			sbuttn.activation = (x: number, y: number) => {
 				if (!btnAnchor.translation) {

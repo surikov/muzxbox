@@ -25,17 +25,17 @@ class MixerZoomLevel {
 			width = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 
 			let barGridAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
+				minZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, beforeZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
 				, xx: left, yy: 0, ww: width, hh: globalCommandDispatcher.cfg().wholeHeight(), content: [], id: 'barGrid' + (ii + Math.random())
 			};
 			this.zoomGridAnchor.content.push(barGridAnchor);
 			let barTracksAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
+				minZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, beforeZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
 				, xx: left, yy: 0, ww: width, hh: globalCommandDispatcher.cfg().wholeHeight(), content: [], id: 'barTrack' + (ii + Math.random())
 			};
 			this.zoomTracksAnchor.content.push(barTracksAnchor);
 			let barFirstAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, hideZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
+				minZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, beforeZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom
 				, xx: left, yy: 0, ww: width, hh: globalCommandDispatcher.cfg().wholeHeight(), content: [], id: 'barFirst' + (ii + Math.random())
 			};
 			this.zoomFirstAnchor.content.push(barFirstAnchor);
@@ -58,11 +58,14 @@ class MixerZoomLevel {
 		};
 		this.zoomGridAnchor.content.push(titleLabel);
 		*/
+
+
 		this.addDrumLines();
 
 		this.addGridLines(this.zoomGridAnchor);//zoomLevel, left, top, width, height, data, barIdx, octaveIdx);
 		this.addCommentLines();
 	}
+
 	addDrumLines() {
 		/*	if (this.zoomLevelIndex < 4) {
 				for (let ss = 1; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++) {
@@ -89,16 +92,14 @@ class MixerZoomLevel {
 			}
 		}*/
 	}
-	addGridLines(barOctaveAnchor: TileAnchor//, data: Zvoog_Project
-		//, cfg: MixerDataMathUtility
-	) {
-		//let mixm: MixerDataMath = new MixerDataMath(data);
+	addGridLines(barOctaveAnchor: TileAnchor) {
 		if (this.zoomLevelIndex < 6) {
-			for (let oo = 0; oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
-				if (oo > 0) {
+			for (let octaveIdx = 0; octaveIdx < globalCommandDispatcher.cfg().drawOctaveCount(); octaveIdx++) {
+				let octaveY = globalCommandDispatcher.cfg().gridTop() + octaveIdx * 12 * globalCommandDispatcher.cfg().notePathHeight;
+				if (octaveIdx > 0) {
 					let octaveBottomBorder: TileRectangle = {
 						x: globalCommandDispatcher.cfg().leftPad
-						, y: globalCommandDispatcher.cfg().gridTop() + oo * 12 * globalCommandDispatcher.cfg().notePathHeight
+						, y: octaveY
 						, w: globalCommandDispatcher.cfg().timelineWidth()
 						, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
 						, css: 'octaveBottomBorder'
@@ -107,38 +108,15 @@ class MixerZoomLevel {
 				}
 				if (this.zoomLevelIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
 					for (let kk = 1; kk < 12; kk++) {
-						//let yy = globalCommandDispatcher.cfg().gridTop() + (oo * 12 + kk) * globalCommandDispatcher.cfg().notePathHeight;
-						/*let need = false;
-						if (globalCommandDispatcher.cfg().data.focus) {
-							if (globalCommandDispatcher.cfg().data.focus == 1) {
-								if (oo * 12 + kk > 12 * globalCommandDispatcher.cfg().octaveCount - globalCommandDispatcher.cfg().data.percussions.length * 2 - 2) {
-									if (!((oo * 12 + kk) % 2)) {
-										need = true;
-									}
-								}
-							} else {
-								if (globalCommandDispatcher.cfg().data.focus == 2) {
-									if (oo * 12 + kk <= globalCommandDispatcher.cfg().maxAutomationsCount) {
-										need = true;
-									}
-								} else {
-									if (oo * 12 + kk < 2 + globalCommandDispatcher.cfg().maxCommentRowCount) {
-										need = true;
-									}
-								}
-							}
-						} else {
-							need = true;
-						}
-						if (need) {*/
+						let pitchY = octaveY + kk * globalCommandDispatcher.cfg().notePathHeight;
 						barOctaveAnchor.content.push({
 							x: globalCommandDispatcher.cfg().leftPad
-							, y: globalCommandDispatcher.cfg().gridTop() + (oo * 12 + kk) * globalCommandDispatcher.cfg().notePathHeight
+							, y: pitchY//globalCommandDispatcher.cfg().gridTop() + (octaveIdx * 12 + kk) * globalCommandDispatcher.cfg().notePathHeight
 							, w: globalCommandDispatcher.cfg().timelineWidth()
 							, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
 							, css: 'interActiveGridLine'
 						});
-						//}
+						//console.log(this.zoomLevelIndex,octaveIdx,octaveY,kk,pitchY);
 					}
 				}
 			}
@@ -162,12 +140,10 @@ class MixerZoomLevel {
 				});
 			}
 			if (this.zoomLevelIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
-				//let ratio = globalCommandDispatcher.cfg().textZoomRatio(this.zoomLevelIndex);
-				//console.log(this.zoomLevelIndex, ratio);
 				for (let tt = 0; tt <= globalCommandDispatcher.cfg().maxCommentRowCount; tt++) {
 					barOctaveAnchor.content.push({
 						x: globalCommandDispatcher.cfg().leftPad
-						, y: globalCommandDispatcher.cfg().commentsTop() +  globalCommandDispatcher.cfg().commentsZoomLineY(this.zoomLevelIndex, tt)
+						, y: globalCommandDispatcher.cfg().commentsTop() + globalCommandDispatcher.cfg().commentsZoomLineY(this.zoomLevelIndex, tt)
 						, w: globalCommandDispatcher.cfg().timelineWidth()
 						, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
 						, css: 'interActiveGridLine'

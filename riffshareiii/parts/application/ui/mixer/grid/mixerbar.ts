@@ -24,18 +24,19 @@ class MixerBar {
 				//, rx: barOctaveAnchor.ww / 2
 				//, ry: globalCommandDispatcher.cfg().data.filters.length*globalCommandDispatcher.cfg().autoPointHeight / 2
 				, css: 'commentPaneForClick'
-				, activation: (x: number, y: number) => { 
-					
-					this.trackCellClick(barIdx, x, y, zoomLevel); 
+				, activation: (x: number, y: number) => {
+
+					this.trackCellClick(barIdx, x, y, zoomLevel);
 				}
 			};
 			gridZoomBarAnchor.content.push(interpane);
+			
 		}
 
 		for (let oo = globalCommandDispatcher.cfg().transposeOctaveCount(); oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
 			let gridOctaveAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom
-				, hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom
+				minZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom
+				, beforeZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom
 				, xx: left
 				, yy: globalCommandDispatcher.cfg().gridTop() + oo * h12 - transpose
 				, ww: ww
@@ -44,8 +45,8 @@ class MixerBar {
 			};
 			gridZoomBarAnchor.content.push(gridOctaveAnchor);
 			let tracksOctaveAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom
-				, hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom
+				minZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom
+				, beforeZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom
 				, xx: left
 				, yy: globalCommandDispatcher.cfg().gridTop() + oo * h12 - transpose
 				, ww: ww
@@ -54,8 +55,8 @@ class MixerBar {
 			};
 			tracksZoomBarAnchor.content.push(tracksOctaveAnchor);
 			let firstOctaveAnchor: TileAnchor = {
-				showZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom
-				, hideZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom
+				minZoom: zoomPrefixLevelsCSS[zoomLevel].minZoom
+				, beforeZoom: zoomPrefixLevelsCSS[zoomLevel + 1].minZoom
 				, xx: left
 				, yy: globalCommandDispatcher.cfg().gridTop() + oo * h12 - transpose
 				, ww: ww
@@ -220,7 +221,8 @@ class MixerBar {
 	}
 	trackCellClick(barIdx: number, barX: number, yy: number, zz: number) {
 		let trMeasure = globalCommandDispatcher.cfg().data.tracks[0].measures[barIdx];
-		let pitch = Math.round(12 * (globalCommandDispatcher.cfg().drawOctaveCount() - globalCommandDispatcher.cfg().transposeOctaveCount()) - yy + 0);
+		//let pitch = Math.round(12 * (globalCommandDispatcher.cfg().drawOctaveCount() - globalCommandDispatcher.cfg().transposeOctaveCount()) - yy + 0);
+		let pitch=Math.ceil(globalCommandDispatcher.cfg().gridHeight()-yy);
 		let info: BarStepStartEnd = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
 
 		let muStart = MMUtil().set(info.start);
@@ -234,7 +236,7 @@ class MixerBar {
 				if ((!muStart.more(chord.skip)) && muEnd.more(chord.skip)) {
 					//console.log('found',chord);
 					for (let nn = 0; nn < chord.pitches.length; nn++) {
-						
+
 						//console.log(yy,chord.pitches[nn], pitch,globalCommandDispatcher.cfg().gridTop(),globalCommandDispatcher.renderer.tiler.tapPxSize());
 						if (chord.pitches[nn] >= pitch && chord.pitches[nn] < pitch + 1) {
 							console.log('drop #', nn);
@@ -248,8 +250,10 @@ class MixerBar {
 			}
 		});
 		if (!drop) {
-			//set
+			console.log('set mark', barIdx, muStart.metre(), globalCommandDispatcher.cfg().data.tracks[0].title);
+			globalCommandDispatcher.cfg().editmark={ barIdx: barIdx, skip:  muStart.metre(), pitch };
+			globalCommandDispatcher.resetProject();
 		}
 	}
-
+	
 }
