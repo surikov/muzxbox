@@ -15,6 +15,11 @@
 	stroke-opacity: 90%;
     pointer-events: none;
 }
+.mixDropClick{
+    fill: red;/* var(--click-color); */
+	fill-opacity: 0.001%;
+cursor:col-resize;
+}
 .mixDropNote{
     fill: var(--click-color);
 	fill-opacity: 90%;

@@ -115,6 +115,19 @@ class OctaveContent {
 									, css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zoomLevel
 								};
 								barOctaveAnchor.content.push(deleteIcon);
+								let slideClick: TileRectangle = {
+									x: x1 - globalCommandDispatcher.cfg().notePathHeight 
+									, y: y1 - globalCommandDispatcher.cfg().notePathHeight 
+									, w: globalCommandDispatcher.cfg().notePathHeight
+									, h: globalCommandDispatcher.cfg().notePathHeight 
+									, rx: globalCommandDispatcher.cfg().notePathHeight / 2
+									, ry: globalCommandDispatcher.cfg().notePathHeight / 2
+									, css: 'mixDropClick'
+									,activation:(x: number, y: number)=>{
+										console.log(x,y);
+									}
+								};
+								barOctaveAnchor.content.push(slideClick);
 								let slideDot: TileRectangle = {
 									x: x1 - globalCommandDispatcher.cfg().notePathHeight * 5 / 8
 									, y: y1 - globalCommandDispatcher.cfg().notePathHeight * 5 / 8

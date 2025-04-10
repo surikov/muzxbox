@@ -3060,6 +3060,19 @@ class OctaveContent {
                                     css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zoomLevel
                                 };
                                 barOctaveAnchor.content.push(deleteIcon);
+                                let slideClick = {
+                                    x: x1 - globalCommandDispatcher.cfg().notePathHeight,
+                                    y: y1 - globalCommandDispatcher.cfg().notePathHeight,
+                                    w: globalCommandDispatcher.cfg().notePathHeight,
+                                    h: globalCommandDispatcher.cfg().notePathHeight,
+                                    rx: globalCommandDispatcher.cfg().notePathHeight / 2,
+                                    ry: globalCommandDispatcher.cfg().notePathHeight / 2,
+                                    css: 'mixDropClick',
+                                    activation: (x, y) => {
+                                        console.log(x, y);
+                                    }
+                                };
+                                barOctaveAnchor.content.push(slideClick);
                                 let slideDot = {
                                     x: x1 - globalCommandDispatcher.cfg().notePathHeight * 5 / 8,
                                     y: y1 - globalCommandDispatcher.cfg().notePathHeight * 5 / 8,
