@@ -42,7 +42,7 @@ class MixerDataMathUtility {
 	zoomEditSLess = 3;
 	zoomAuxLess = 1;
 
-	editmark: null | { barIdx: number, skip: Zvoog_Metre, pitch: number } = { barIdx: 2, skip: { count: 3, part: 4 }, pitch: 36 };
+	editmark: null | { barIdx: number, skip: Zvoog_Metre, pitch: number } = null;// { barIdx: 2, skip: { count: 3, part: 4 }, pitch: 36 };
 
 	constructor(data: Zvoog_Project) {
 		this.data = data;

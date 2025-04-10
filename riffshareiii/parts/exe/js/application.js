@@ -3272,29 +3272,81 @@ class MixerBar {
         let trMeasure = globalCommandDispatcher.cfg().data.tracks[0].measures[barIdx];
         let pitch = Math.ceil(globalCommandDispatcher.cfg().gridHeight() - yy);
         let info = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
-        let muStart = MMUtil().set(info.start);
-        let muEnd = MMUtil().set(info.end);
-        let drop = false;
-        globalCommandDispatcher.exe.commitProjectChanges(['tracks', 0, 'measures', barIdx], () => {
-            for (let ii = 0; ii < trMeasure.chords.length; ii++) {
-                let chord = trMeasure.chords[ii];
-                if ((!muStart.more(chord.skip)) && muEnd.more(chord.skip)) {
-                    for (let nn = 0; nn < chord.pitches.length; nn++) {
-                        if (chord.pitches[nn] >= pitch && chord.pitches[nn] < pitch + 1) {
-                            console.log('drop #', nn);
-                            chord.pitches.splice(nn, 1);
-                            nn--;
-                            drop = true;
+        let mark = globalCommandDispatcher.cfg().editmark;
+        if (mark) {
+            let from = MMUtil().set(mark.skip);
+            let toStart = MMUtil().set(info.start);
+            let toEnd = MMUtil().set(info.end);
+            let fromBar = mark.barIdx;
+            let chordPitch = mark.pitch;
+            let shift = pitch - mark.pitch;
+            for (let ii = 0; ii < globalCommandDispatcher.cfg().data.timeline.length; ii++) {
+                if (ii < mark.barIdx) {
+                    from.set(from.plus(globalCommandDispatcher.cfg().data.timeline[ii].metre));
+                }
+                if (ii < barIdx) {
+                    toStart.set(toStart.plus(globalCommandDispatcher.cfg().data.timeline[ii].metre));
+                    toEnd.set(toEnd.plus(globalCommandDispatcher.cfg().data.timeline[ii].metre));
+                }
+            }
+            let to = MMUtil().set(toEnd);
+            if (from.more(toStart)) {
+                let newForm = toStart.metre();
+                to.set(MMUtil().set(from.metre()).plus(info.end).minus(info.start));
+                from.set(newForm);
+                fromBar = barIdx;
+                chordPitch = pitch;
+                shift = mark.pitch - pitch;
+            }
+            let duration = to.minus(from).simplyfy();
+            let skip = MMUtil().set(from);
+            for (let ii = 0; ii < globalCommandDispatcher.cfg().data.timeline.length; ii++) {
+                if (ii < fromBar) {
+                    skip.set(skip.minus(globalCommandDispatcher.cfg().data.timeline[ii].metre));
+                }
+            }
+            let chord = null;
+            let measure = globalCommandDispatcher.cfg().data.tracks[0].measures[fromBar];
+            globalCommandDispatcher.exe.commitProjectChanges(['tracks', 0, 'measures', barIdx], () => {
+                for (let ii = 0; ii < measure.chords.length; ii++) {
+                    if (MMUtil().set(measure.chords[ii].skip).equals(skip)) {
+                        chord = measure.chords[ii];
+                    }
+                }
+                if (chord) {
+                }
+                else {
+                    chord = { skip: skip, pitches: [], slides: [] };
+                    measure.chords.push(chord);
+                }
+                chord.pitches.push(chordPitch + 11);
+                chord.slides = [{ duration: duration, delta: shift }];
+            });
+            globalCommandDispatcher.cfg().editmark = null;
+        }
+        else {
+            let muStart = MMUtil().set(info.start);
+            let muEnd = MMUtil().set(info.end);
+            let drop = false;
+            globalCommandDispatcher.exe.commitProjectChanges(['tracks', 0, 'measures', barIdx], () => {
+                for (let ii = 0; ii < trMeasure.chords.length; ii++) {
+                    let chord = trMeasure.chords[ii];
+                    if ((!muStart.more(chord.skip)) && muEnd.more(chord.skip)) {
+                        for (let nn = 0; nn < chord.pitches.length; nn++) {
+                            if (chord.pitches[nn] >= pitch + 11 && chord.pitches[nn] < pitch + 11 + 1) {
+                                chord.pitches.splice(nn, 1);
+                                nn--;
+                                drop = true;
+                            }
                         }
                     }
                 }
+            });
+            if (!drop) {
+                globalCommandDispatcher.cfg().editmark = { barIdx: barIdx, skip: muStart.metre(), pitch };
             }
-        });
-        if (!drop) {
-            console.log('set mark', barIdx, muStart.metre(), globalCommandDispatcher.cfg().data.tracks[0].title);
-            globalCommandDispatcher.cfg().editmark = { barIdx: barIdx, skip: muStart.metre(), pitch };
-            globalCommandDispatcher.resetProject();
         }
+        globalCommandDispatcher.resetProject();
     }
 }
 class TextCommentsBar {
@@ -3544,6 +3596,10 @@ class MixerUI {
             this.markRectangle.h = rr;
             this.markRectangle.rx = rr / 2;
             this.markRectangle.ry = rr / 2;
+            this.markRectangle.css = 'markPointFill';
+        }
+        else {
+            this.markRectangle.css = 'markPointNone';
         }
     }
     createMixerLayers() {
@@ -5057,7 +5113,7 @@ class MixerDataMathUtility {
         this.padGridFan = 15;
         this.zoomEditSLess = 3;
         this.zoomAuxLess = 1;
-        this.editmark = { barIdx: 2, skip: { count: 3, part: 4 }, pitch: 36 };
+        this.editmark = null;
         this.data = data;
         this.recalculateCommentMax();
     }

@@ -107,8 +107,10 @@ class MixerUI {
 			this.markRectangle.h = rr ;
 			this.markRectangle.rx = rr/2;
 			this.markRectangle.ry = rr/2;
-
+			this.markRectangle.css='markPointFill';
 			//console.log(globalCommandDispatcher.cfg().editmark, this.markAnchor, globalCommandDispatcher.cfg().leftPad, skipX);
+		}else{
+			this.markRectangle.css='markPointNone';
 		}
 	}
 	createMixerLayers(): TileLayerDefinition[] {
