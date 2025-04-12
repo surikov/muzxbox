@@ -26,8 +26,8 @@ class CommandDispatcher {
 	filterPluginDialog = new FilterPluginDialog();
 	pointPluginDialog = new PointPluginDialog();
 	samplerPluginDialog = new SamplerPluginDialog();
-	actionPluginDialog=new ActionPluginDialog();
-	sequencerPluginDialog=new SequencerPluginDialog();
+	actionPluginDialog = new ActionPluginDialog();
+	sequencerPluginDialog = new SequencerPluginDialog();
 	cfg(): MixerDataMathUtility {
 		return this._mixerDataMathUtility;
 	}
@@ -339,7 +339,7 @@ class CommandDispatcher {
 		if (result != null) {
 			//this.onAir = false;
 			//this.neeToStart = false;
-			me.renderer.warning.showWarning('Start playing', result, 'Loading...',null);
+			me.renderer.warning.showWarning('Start playing', result, 'Loading...', null);
 		} else {
 			//this.renderer.menu.rerenderMenuContent()
 		}
@@ -353,7 +353,7 @@ class CommandDispatcher {
 		if (msg) {
 			//me.onAir = false;
 			//console.log('toggleStartStop cancel', msg);
-			me.renderer.warning.showWarning('Start playing', 'Loading...','Wait for ' + msg,() => {
+			me.renderer.warning.showWarning('Start playing', 'Loading...', 'Wait for ' + msg, () => {
 				console.log('cancel wait spart loop');
 				//me.neeToStart = false;
 				//me.onAir = false;
@@ -471,18 +471,18 @@ class CommandDispatcher {
 		console.log('setDrumSoloState', state);
 	}*/
 	//promptActionPluginDialog(actionPlugin: MZXBX_PluginRegistrationInformation) {
-		//console.log('promptProjectPluginGUI', url);
-		//pluginDialogPrompt.openActionPluginDialogFrame(actionPlugin);
+	//console.log('promptProjectPluginGUI', url);
+	//pluginDialogPrompt.openActionPluginDialogFrame(actionPlugin);
 	//}
 	//promptPluginSequencerDialog(track: Zvoog_MusicTrack, performerPlugin: MZXBX_PluginRegistrationInformation) {
-		//pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction, titleAction);
+	//pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction, titleAction);
 	//}
 	//promptPluginSamplerDialog(drum: Zvoog_PercussionTrack, samplerPlugin: MZXBX_PluginRegistrationInformation) {
-		//pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction, titleAction);
+	//pluginDialogPrompt.openPluginPointDialogFrame(label, url, rawdata, callback, btnLabel, btnAction, titleAction);
 	//}
 	//promptPluginFilterDialog(order: number, raw: string, filter: Zvoog_FilterTarget, filterPlugin: MZXBX_PluginRegistrationInformation) {
-		//pluginDialogPrompt.openFilterPluginDialogFrame(order, raw, filter, filterPlugin);//label, url, rawdata, callback, btnLabel, btnAction, titleAction);
-		
+	//pluginDialogPrompt.openFilterPluginDialogFrame(order, raw, filter, filterPlugin);//label, url, rawdata, callback, btnLabel, btnAction, titleAction);
+
 	//}
 	/*promptPluginDialogTitle(){
 		pluginDialogPrompt.promptPluginDialogTitle();
@@ -623,6 +623,31 @@ class CommandDispatcher {
 			, LevelModes.top);
 		this.reDrawPlayPosition();
 
+	}
+	adjustTimeline() {
+		for (let tt = 0; tt < this.cfg().data.timeline.length; tt++) {
+			for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
+				let track = this.cfg().data.tracks[nn];
+				if (!(track.measures[tt])) {
+					track.measures[tt] = { chords: [] };
+				}
+			}
+			for (let nn = 0; nn < this.cfg().data.percussions.length; nn++) {
+				let percu = this.cfg().data.percussions[nn];
+				if (!(percu.measures[tt])) {
+					percu.measures[tt] = { skips: [] };
+				}
+			}
+			for (let nn = 0; nn < this.cfg().data.filters.length; nn++) {
+				let filter = this.cfg().data.filters[nn];
+				if (!(filter.automation[tt])) {
+					filter.automation[tt] = { changes: [] };
+				}
+			}
+			if (!(this.cfg().data.comments[tt])) {
+				this.cfg().data.comments[tt][tt] = { changes: [] };
+			}
+		}
 	}
 }
 let globalCommandDispatcher = new CommandDispatcher();

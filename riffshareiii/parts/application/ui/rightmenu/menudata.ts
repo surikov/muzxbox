@@ -183,7 +183,7 @@ function composeBaseMenu(): MenuInfo[] {
 									globalCommandDispatcher.setThemeColor('red1');//'theme/colordarkred.css');
 								}
 							}, {
-								text: 'Emerald', onClick: () => {
+								text: 'Greenstone', onClick: () => {
 									globalCommandDispatcher.setThemeColor('green1');//'theme/colordarkgreen.css');
 								}
 							}, {

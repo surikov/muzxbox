@@ -43,9 +43,12 @@ class OctaveContent {
 		, css: string
 		, interact: boolean, zoomLevel: number
 	) {
+		if (!track.measures[barIdx]) {
+			globalCommandDispatcher.adjustTimeline();
+		}
 		let measure: Zvoog_TrackMeasure = track.measures[barIdx];
 		if (measure) {
-			
+
 			for (let cc = 0; cc < measure.chords.length; cc++) {
 				let chord: Zvoog_Chord = measure.chords[cc];
 				for (let nn = 0; nn < chord.pitches.length; nn++) {
@@ -116,15 +119,25 @@ class OctaveContent {
 								};
 								barOctaveAnchor.content.push(deleteIcon);
 								let slideClick: TileRectangle = {
-									x: x1 - globalCommandDispatcher.cfg().notePathHeight 
-									, y: y1 - globalCommandDispatcher.cfg().notePathHeight 
+									x: x1 - globalCommandDispatcher.cfg().notePathHeight
+									, y: y1 - globalCommandDispatcher.cfg().notePathHeight
 									, w: globalCommandDispatcher.cfg().notePathHeight
-									, h: globalCommandDispatcher.cfg().notePathHeight 
+									, h: globalCommandDispatcher.cfg().notePathHeight
 									, rx: globalCommandDispatcher.cfg().notePathHeight / 2
 									, ry: globalCommandDispatcher.cfg().notePathHeight / 2
 									, css: 'mixDropClick'
-									,activation:(x: number, y: number)=>{
-										console.log(x,y);
+									, activation: (x: number, y: number) => {
+										let start = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight();
+
+										//let pitch = (start - y1) / globalCommandDispatcher.cfg().notePathHeight;
+										globalCommandDispatcher.cfg().slidermark = {
+											barIdx: barIdx
+											, chord: chord
+											, pitch: chord.pitches[nn]
+											, delta: chord.slides[chord.slides.length-1].delta
+										};
+										//console.log('start slide', x, y, globalCommandDispatcher.cfg().slidermark);
+										globalCommandDispatcher.resetProject();
 									}
 								};
 								barOctaveAnchor.content.push(slideClick);

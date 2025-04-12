@@ -16,6 +16,8 @@ class MixerUI {
 	fillerAnchor: TileAnchor;
 	markAnchor: TileAnchor;
 	markRectangle: TileRectangle;
+	sliderAnchor: TileAnchor;
+	sliderRectangle: TileRectangle;
 	//samplerUI: SamplerRows;
 	fanPane: FanPane = new FanPane();
 	//iconsFanAnchor: TileAnchor;
@@ -53,6 +55,7 @@ class MixerUI {
 			this.levels[ii].reCreateBars();
 		}
 		this.resetEditMark();
+		this.resetSliderMark();
 		this.fanPane.resetPlates(this.fanLayer.anchors, this.spearsLayer.anchors);
 		//console.log('spearsLayer',this.spearsLayer.anchors);
 		//this.iconsFanAnchor.ww = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().rightPad;
@@ -79,8 +82,52 @@ class MixerUI {
 			, globalCommandDispatcher.cfg().commentsMaxHeight()
 			, this.barCommentsCount);
 	}
+	resetSliderMark() {
+
+		let mark = globalCommandDispatcher.cfg().slidermark;
+		console.log('resetSliderMark', mark);
+		if (mark) {
+			let mm: Zvoog_MetreMathType = MMUtil();
+			let barX = 0;
+			let bar: Zvoog_SongMeasure = globalCommandDispatcher.cfg().data.timeline[0];
+			for (let ii = 0; ii < mark.barIdx; ii++) {
+				bar = globalCommandDispatcher.cfg().data.timeline[ii];
+				barX = barX + mm.set(bar.metre).duration(bar.tempo)
+					* globalCommandDispatcher.cfg().widthDurationRatio
+					;
+			}
+
+			let top = globalCommandDispatcher.cfg().gridTop()
+				+ globalCommandDispatcher.cfg().gridHeight()
+				- mark.pitch
+				+ 11 - mark.delta
+				;
+			let len = 0;
+			for (let ss = 0; ss < mark.chord.slides.length; ss++) {
+				let duration = MMUtil().set(mark.chord.slides[ss].duration);
+				len=len+duration.duration(globalCommandDispatcher.cfg().data.timeline[mark.barIdx].tempo)*globalCommandDispatcher.cfg().widthDurationRatio;
+			}
+
+			let rr = globalCommandDispatcher.cfg().notePathHeight;
+			let skipX = mm.set(mark.chord.skip).duration(bar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio
+			this.sliderAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX + len - rr / 2-rr;
+			this.sliderAnchor.yy = top - rr / 2;
+			this.sliderAnchor.ww = rr;
+			this.sliderAnchor.hh = rr;
+			this.sliderRectangle.x = this.sliderAnchor.xx;
+			this.sliderRectangle.y = this.sliderAnchor.yy;
+			this.sliderRectangle.w = rr * 2;
+			this.sliderRectangle.h = rr * 2;
+			this.sliderRectangle.rx = rr;
+			this.sliderRectangle.ry = rr;
+			this.sliderRectangle.css = 'markPointFill';
+		} else {
+			this.sliderRectangle.css = 'markPointNone';
+		}
+	}
 	resetEditMark() {
 		let mark = globalCommandDispatcher.cfg().editmark;
+		//console.log('resetEditMark', mark);
 		if (mark) {
 			let mm: Zvoog_MetreMathType = MMUtil();
 			let barX = 0;
@@ -97,20 +144,20 @@ class MixerUI {
 				- mark.pitch;
 			let rr = globalCommandDispatcher.cfg().notePathHeight;
 			let skipX = mm.set(mark.skip).duration(bar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio
-			this.markAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX;
-			this.markAnchor.yy = top;
-			this.markAnchor.ww = rr ;
-			this.markAnchor.hh = rr ;
+			this.markAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX - rr / 2;
+			this.markAnchor.yy = top - rr / 2;
+			this.markAnchor.ww = rr;
+			this.markAnchor.hh = rr;
 			this.markRectangle.x = this.markAnchor.xx;
 			this.markRectangle.y = this.markAnchor.yy;
-			this.markRectangle.w = rr ;
-			this.markRectangle.h = rr ;
-			this.markRectangle.rx = rr/2;
-			this.markRectangle.ry = rr/2;
-			this.markRectangle.css='markPointFill';
+			this.markRectangle.w = rr * 2;
+			this.markRectangle.h = rr * 2;
+			this.markRectangle.rx = rr;
+			this.markRectangle.ry = rr;
+			this.markRectangle.css = 'markPointFill';
 			//console.log(globalCommandDispatcher.cfg().editmark, this.markAnchor, globalCommandDispatcher.cfg().leftPad, skipX);
-		}else{
-			this.markRectangle.css='markPointNone';
+		} else {
+			this.markRectangle.css = 'markPointNone';
 		}
 	}
 	createMixerLayers(): TileLayerDefinition[] {
@@ -134,7 +181,14 @@ class MixerUI {
 			, h: 222
 			, css: 'markPointFill'
 		};
-		
+		this.sliderRectangle = {
+			x: 0
+			, y: 0
+			, w: 222
+			, h: 222
+			, css: 'markPointFill'
+		};
+
 
 		/*
 		this.iconsFanAnchor = {
@@ -194,6 +248,12 @@ class MixerUI {
 			, xx: 0, yy: 0, ww: 1, hh: 1, content: [this.markRectangle]
 		};
 		this.gridLayers.anchors.push(this.markAnchor);
+		this.sliderAnchor = {
+			minZoom: 0
+			, beforeZoom: zoomPrefixLevelsCSS[6].minZoom
+			, xx: 0, yy: 0, ww: 1, hh: 1, content: [this.sliderRectangle]
+		};
+		this.gridLayers.anchors.push(this.sliderAnchor);
 		//console.log(this.gridLayers.anchors);
 		this.fillerAnchor = {
 			minZoom: zoomPrefixLevelsCSS[6].minZoom

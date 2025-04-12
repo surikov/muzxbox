@@ -1017,13 +1017,15 @@ class CommandExe {
         for (let ii = 0; ii < globalCommandDispatcher.undo().length; ii++) {
             let one = globalCommandDispatcher.undo()[ii];
             actionCount = actionCount + one.actions.length;
-            if (actionCount > 43210) {
+            if (actionCount > 20123) {
                 console.log('cut undo ', ii, 'from', globalCommandDispatcher.undo().length);
                 globalCommandDispatcher.undo().splice(0, ii);
                 globalCommandDispatcher.clearRedo();
                 break;
             }
         }
+        let calc = JSON.stringify(globalCommandDispatcher.undo());
+        console.log('undo len', calc.length / 1000, 'kb');
     }
     undo(cnt) {
         if (this.lockUndoRedo) {
@@ -1510,6 +1512,31 @@ class CommandDispatcher {
         this.renderer.timeselectbar.updateTimeSelectionBar();
         this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup, this.renderer.timeselectbar.selectionAnchor, LevelModes.top);
         this.reDrawPlayPosition();
+    }
+    adjustTimeline() {
+        for (let tt = 0; tt < this.cfg().data.timeline.length; tt++) {
+            for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
+                let track = this.cfg().data.tracks[nn];
+                if (!(track.measures[tt])) {
+                    track.measures[tt] = { chords: [] };
+                }
+            }
+            for (let nn = 0; nn < this.cfg().data.percussions.length; nn++) {
+                let percu = this.cfg().data.percussions[nn];
+                if (!(percu.measures[tt])) {
+                    percu.measures[tt] = { skips: [] };
+                }
+            }
+            for (let nn = 0; nn < this.cfg().data.filters.length; nn++) {
+                let filter = this.cfg().data.filters[nn];
+                if (!(filter.automation[tt])) {
+                    filter.automation[tt] = { changes: [] };
+                }
+            }
+            if (!(this.cfg().data.comments[tt])) {
+                this.cfg().data.comments[tt][tt] = { changes: [] };
+            }
+        }
     }
 }
 let globalCommandDispatcher = new CommandDispatcher();
@@ -2730,7 +2757,7 @@ function composeBaseMenu() {
                                     globalCommandDispatcher.setThemeColor('red1');
                                 }
                             }, {
-                                text: 'Emerald', onClick: () => {
+                                text: 'Greenstone', onClick: () => {
                                     globalCommandDispatcher.setThemeColor('green1');
                                 }
                             }, {
@@ -3001,6 +3028,9 @@ class OctaveContent {
         }
     }
     addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, interact, zoomLevel) {
+        if (!track.measures[barIdx]) {
+            globalCommandDispatcher.adjustTimeline();
+        }
         let measure = track.measures[barIdx];
         if (measure) {
             for (let cc = 0; cc < measure.chords.length; cc++) {
@@ -3069,7 +3099,14 @@ class OctaveContent {
                                     ry: globalCommandDispatcher.cfg().notePathHeight / 2,
                                     css: 'mixDropClick',
                                     activation: (x, y) => {
-                                        console.log(x, y);
+                                        let start = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight();
+                                        globalCommandDispatcher.cfg().slidermark = {
+                                            barIdx: barIdx,
+                                            chord: chord,
+                                            pitch: chord.pitches[nn],
+                                            delta: chord.slides[chord.slides.length - 1].delta
+                                        };
+                                        globalCommandDispatcher.resetProject();
                                     }
                                 };
                                 barOctaveAnchor.content.push(slideClick);
@@ -3572,6 +3609,7 @@ class MixerUI {
             this.levels[ii].reCreateBars();
         }
         this.resetEditMark();
+        this.resetSliderMark();
         this.fanPane.resetPlates(this.fanLayer.anchors, this.spearsLayer.anchors);
         this.fillerAnchor.xx = globalCommandDispatcher.cfg().leftPad;
         this.fillerAnchor.yy = globalCommandDispatcher.cfg().gridTop();
@@ -3582,6 +3620,45 @@ class MixerUI {
         this.reFillSingleRatio(globalCommandDispatcher.cfg().gridTop(), globalCommandDispatcher.cfg().gridHeight(), this.barTrackCount);
         this.reFillSingleRatio(globalCommandDispatcher.cfg().automationTop(), globalCommandDispatcher.cfg().automationHeight(), this.barAutoCount);
         this.reFillSingleRatio(globalCommandDispatcher.cfg().commentsTop(), globalCommandDispatcher.cfg().commentsMaxHeight(), this.barCommentsCount);
+    }
+    resetSliderMark() {
+        let mark = globalCommandDispatcher.cfg().slidermark;
+        console.log('resetSliderMark', mark);
+        if (mark) {
+            let mm = MMUtil();
+            let barX = 0;
+            let bar = globalCommandDispatcher.cfg().data.timeline[0];
+            for (let ii = 0; ii < mark.barIdx; ii++) {
+                bar = globalCommandDispatcher.cfg().data.timeline[ii];
+                barX = barX + mm.set(bar.metre).duration(bar.tempo)
+                    * globalCommandDispatcher.cfg().widthDurationRatio;
+            }
+            let top = globalCommandDispatcher.cfg().gridTop()
+                + globalCommandDispatcher.cfg().gridHeight()
+                - mark.pitch
+                + 11 - mark.delta;
+            let len = 0;
+            for (let ss = 0; ss < mark.chord.slides.length; ss++) {
+                let duration = MMUtil().set(mark.chord.slides[ss].duration);
+                len = len + duration.duration(globalCommandDispatcher.cfg().data.timeline[mark.barIdx].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+            }
+            let rr = globalCommandDispatcher.cfg().notePathHeight;
+            let skipX = mm.set(mark.chord.skip).duration(bar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+            this.sliderAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX + len - rr / 2 - rr;
+            this.sliderAnchor.yy = top - rr / 2;
+            this.sliderAnchor.ww = rr;
+            this.sliderAnchor.hh = rr;
+            this.sliderRectangle.x = this.sliderAnchor.xx;
+            this.sliderRectangle.y = this.sliderAnchor.yy;
+            this.sliderRectangle.w = rr * 2;
+            this.sliderRectangle.h = rr * 2;
+            this.sliderRectangle.rx = rr;
+            this.sliderRectangle.ry = rr;
+            this.sliderRectangle.css = 'markPointFill';
+        }
+        else {
+            this.sliderRectangle.css = 'markPointNone';
+        }
     }
     resetEditMark() {
         let mark = globalCommandDispatcher.cfg().editmark;
@@ -3599,16 +3676,16 @@ class MixerUI {
                 - mark.pitch;
             let rr = globalCommandDispatcher.cfg().notePathHeight;
             let skipX = mm.set(mark.skip).duration(bar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-            this.markAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX;
-            this.markAnchor.yy = top;
+            this.markAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX - rr / 2;
+            this.markAnchor.yy = top - rr / 2;
             this.markAnchor.ww = rr;
             this.markAnchor.hh = rr;
             this.markRectangle.x = this.markAnchor.xx;
             this.markRectangle.y = this.markAnchor.yy;
-            this.markRectangle.w = rr;
-            this.markRectangle.h = rr;
-            this.markRectangle.rx = rr / 2;
-            this.markRectangle.ry = rr / 2;
+            this.markRectangle.w = rr * 2;
+            this.markRectangle.h = rr * 2;
+            this.markRectangle.rx = rr;
+            this.markRectangle.ry = rr;
             this.markRectangle.css = 'markPointFill';
         }
         else {
@@ -3627,6 +3704,13 @@ class MixerUI {
         this.spearsSVGgroup = document.getElementById('spearsLayer');
         this.spearsLayer = { g: this.spearsSVGgroup, anchors: [], mode: LevelModes.normal };
         this.markRectangle = {
+            x: 0,
+            y: 0,
+            w: 222,
+            h: 222,
+            css: 'markPointFill'
+        };
+        this.sliderRectangle = {
             x: 0,
             y: 0,
             w: 222,
@@ -3672,6 +3756,12 @@ class MixerUI {
             xx: 0, yy: 0, ww: 1, hh: 1, content: [this.markRectangle]
         };
         this.gridLayers.anchors.push(this.markAnchor);
+        this.sliderAnchor = {
+            minZoom: 0,
+            beforeZoom: zoomPrefixLevelsCSS[6].minZoom,
+            xx: 0, yy: 0, ww: 1, hh: 1, content: [this.sliderRectangle]
+        };
+        this.gridLayers.anchors.push(this.sliderAnchor);
         this.fillerAnchor = {
             minZoom: zoomPrefixLevelsCSS[6].minZoom,
             beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom + 1,
@@ -5127,6 +5217,7 @@ class MixerDataMathUtility {
         this.zoomEditSLess = 3;
         this.zoomAuxLess = 1;
         this.editmark = null;
+        this.slidermark = null;
         this.data = data;
         this.recalculateCommentMax();
     }

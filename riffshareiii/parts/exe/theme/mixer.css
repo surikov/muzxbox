@@ -141,13 +141,23 @@ cursor:col-resize;
 }
 
 
-.markPointFill {
+.markPointFill22222 {
     fill: var(--drag-color);
 	fill-opacity: 90%;
+    stroke-dasharray: 5px;
     stroke: var(--main-color);
     stroke-linejoin: round;
-    stroke-width: calc(0.15*var(--tapSize));
+    stroke-linecap: butt;
+    stroke-width: calc(0.25*var(--tapSize));
 	stroke-opacity: 90%;
+	pointer-events: none;
+}
+.markPointFill {
+    fill: none;
+    stroke-dasharray: 5px;
+    stroke: var(--drag-color);
+    stroke-width: calc(0.25*var(--tapSize));
+	stroke-opacity: 60%;
 	pointer-events: none;
 }
 .markPointNone {
