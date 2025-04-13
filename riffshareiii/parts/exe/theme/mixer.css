@@ -152,10 +152,18 @@ cursor:col-resize;
 	stroke-opacity: 90%;
 	pointer-events: none;
 }
+.slidePointFill {
+    fill: none;
+    stroke-dasharray2: 5px;
+    stroke: var(--drag-color);
+    stroke-width: calc(0.25*var(--tapSize));
+	stroke-opacity: 60%;
+	pointer-events: none;
+}
 .markPointFill {
     fill: none;
-    stroke-dasharray: 5px;
-    stroke: var(--drag-color);
+    stroke-dasharray2: 5px;
+    stroke: var(--main-color);
     stroke-width: calc(0.25*var(--tapSize));
 	stroke-opacity: 60%;
 	pointer-events: none;

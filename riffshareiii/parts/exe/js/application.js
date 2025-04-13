@@ -1025,7 +1025,6 @@ class CommandExe {
             }
         }
         let calc = JSON.stringify(globalCommandDispatcher.undo());
-        console.log('undo len', calc.length / 1000, 'kb');
     }
     undo(cnt) {
         if (this.lockUndoRedo) {
@@ -2986,7 +2985,6 @@ class SamplerBar {
                 else {
                     if (muEnd.more(probeSkip)) {
                         addDrum = false;
-                        console.log('drop', barIdx, probeSkip, drum);
                         drum.measures[barIdx].skips.splice(deleteSkipIdx, 1);
                         deleteSkipIdx--;
                         break;
@@ -2994,7 +2992,6 @@ class SamplerBar {
                 }
             }
             if (addDrum) {
-                console.log('add', barIdx, muStart, drum);
                 drum.measures[barIdx].skips.push(muStart.metre());
             }
         });
@@ -3099,12 +3096,10 @@ class OctaveContent {
                                     ry: globalCommandDispatcher.cfg().notePathHeight / 2,
                                     css: 'mixDropClick',
                                     activation: (x, y) => {
-                                        let start = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight();
-                                        globalCommandDispatcher.cfg().slidermark = {
+                                        globalCommandDispatcher.cfg().slidemark = {
                                             barIdx: barIdx,
                                             chord: chord,
-                                            pitch: chord.pitches[nn],
-                                            delta: chord.slides[chord.slides.length - 1].delta
+                                            pitch: chord.pitches[nn]
                                         };
                                         globalCommandDispatcher.resetProject();
                                     }
@@ -3322,16 +3317,16 @@ class MixerBar {
         let trMeasure = globalCommandDispatcher.cfg().data.tracks[0].measures[barIdx];
         let pitch = Math.ceil(globalCommandDispatcher.cfg().gridHeight() - yy);
         let info = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
-        let mark = globalCommandDispatcher.cfg().editmark;
-        if (mark) {
-            let from = MMUtil().set(mark.skip);
+        let cueditmark = globalCommandDispatcher.cfg().editmark;
+        if (cueditmark) {
+            let from = MMUtil().set(cueditmark.skip);
             let toStart = MMUtil().set(info.start);
             let toEnd = MMUtil().set(info.end);
-            let fromBar = mark.barIdx;
-            let chordPitch = mark.pitch;
-            let shift = pitch - mark.pitch;
+            let fromBar = cueditmark.barIdx;
+            let chordPitch = cueditmark.pitch;
+            let shift = pitch - cueditmark.pitch;
             for (let ii = 0; ii < globalCommandDispatcher.cfg().data.timeline.length; ii++) {
-                if (ii < mark.barIdx) {
+                if (ii < cueditmark.barIdx) {
                     from.set(from.plus(globalCommandDispatcher.cfg().data.timeline[ii].metre));
                 }
                 if (ii < barIdx) {
@@ -3346,7 +3341,7 @@ class MixerBar {
                 from.set(newForm);
                 fromBar = barIdx;
                 chordPitch = pitch;
-                shift = mark.pitch - pitch;
+                shift = cueditmark.pitch - pitch;
             }
             let duration = to.minus(from).simplyfy();
             let skip = MMUtil().set(from);
@@ -3375,25 +3370,61 @@ class MixerBar {
             globalCommandDispatcher.cfg().editmark = null;
         }
         else {
-            let muStart = MMUtil().set(info.start);
-            let muEnd = MMUtil().set(info.end);
-            let drop = false;
-            globalCommandDispatcher.exe.commitProjectChanges(['tracks', 0, 'measures', barIdx], () => {
-                for (let ii = 0; ii < trMeasure.chords.length; ii++) {
-                    let chord = trMeasure.chords[ii];
-                    if ((!muStart.more(chord.skip)) && muEnd.more(chord.skip)) {
-                        for (let nn = 0; nn < chord.pitches.length; nn++) {
-                            if (chord.pitches[nn] >= pitch + 11 && chord.pitches[nn] < pitch + 11 + 1) {
-                                chord.pitches.splice(nn, 1);
-                                nn--;
-                                drop = true;
+            let cuslidemark = globalCommandDispatcher.cfg().slidemark;
+            if (cuslidemark) {
+                let from = MMUtil().set(cuslidemark.chord.skip);
+                let toStart = MMUtil().set(info.start);
+                let toEnd = MMUtil().set(info.end);
+                let fromBar = cuslidemark.barIdx;
+                for (let ii = 0; ii < globalCommandDispatcher.cfg().data.timeline.length; ii++) {
+                    if (ii < cuslidemark.barIdx) {
+                        from.set(from.plus(globalCommandDispatcher.cfg().data.timeline[ii].metre));
+                    }
+                    if (ii < barIdx) {
+                        toStart.set(toStart.plus(globalCommandDispatcher.cfg().data.timeline[ii].metre));
+                        toEnd.set(toEnd.plus(globalCommandDispatcher.cfg().data.timeline[ii].metre));
+                    }
+                }
+                let to = MMUtil().set(toEnd);
+                if (from.more(toStart)) {
+                    let newForm = toStart.metre();
+                    to.set(MMUtil().set(from.metre()).plus(info.end).minus(info.start));
+                    from.set(newForm);
+                    fromBar = barIdx;
+                }
+                let duration = to.minus(from).simplyfy();
+                for (let kk = 0; kk < cuslidemark.chord.slides.length; kk++) {
+                    duration = MMUtil().set(duration).minus(cuslidemark.chord.slides[kk].duration);
+                }
+                if (duration.count > 0) {
+                    globalCommandDispatcher.exe.commitProjectChanges(['tracks', 0, 'measures', barIdx], () => {
+                        cuslidemark.chord.slides.push({ duration: duration, delta: pitch - cuslidemark.pitch + 11 });
+                        console.log(cuslidemark, pitch);
+                    });
+                    globalCommandDispatcher.cfg().slidemark = null;
+                }
+            }
+            else {
+                let muStart = MMUtil().set(info.start);
+                let muEnd = MMUtil().set(info.end);
+                let drop = false;
+                globalCommandDispatcher.exe.commitProjectChanges(['tracks', 0, 'measures', barIdx], () => {
+                    for (let ii = 0; ii < trMeasure.chords.length; ii++) {
+                        let chord = trMeasure.chords[ii];
+                        if ((!muStart.more(chord.skip)) && muEnd.more(chord.skip)) {
+                            for (let nn = 0; nn < chord.pitches.length; nn++) {
+                                if (chord.pitches[nn] >= pitch + 11 && chord.pitches[nn] < pitch + 11 + 1) {
+                                    chord.pitches.splice(nn, 1);
+                                    nn--;
+                                    drop = true;
+                                }
                             }
                         }
                     }
+                });
+                if (!drop) {
+                    globalCommandDispatcher.cfg().editmark = { barIdx: barIdx, skip: muStart.metre(), pitch };
                 }
-            });
-            if (!drop) {
-                globalCommandDispatcher.cfg().editmark = { barIdx: barIdx, skip: muStart.metre(), pitch };
             }
         }
         globalCommandDispatcher.resetProject();
@@ -3622,8 +3653,7 @@ class MixerUI {
         this.reFillSingleRatio(globalCommandDispatcher.cfg().commentsTop(), globalCommandDispatcher.cfg().commentsMaxHeight(), this.barCommentsCount);
     }
     resetSliderMark() {
-        let mark = globalCommandDispatcher.cfg().slidermark;
-        console.log('resetSliderMark', mark);
+        let mark = globalCommandDispatcher.cfg().slidemark;
         if (mark) {
             let mm = MMUtil();
             let barX = 0;
@@ -3636,7 +3666,7 @@ class MixerUI {
             let top = globalCommandDispatcher.cfg().gridTop()
                 + globalCommandDispatcher.cfg().gridHeight()
                 - mark.pitch
-                + 11 - mark.delta;
+                + 11 - mark.chord.slides[mark.chord.slides.length - 1].delta;
             let len = 0;
             for (let ss = 0; ss < mark.chord.slides.length; ss++) {
                 let duration = MMUtil().set(mark.chord.slides[ss].duration);
@@ -3654,7 +3684,7 @@ class MixerUI {
             this.sliderRectangle.h = rr * 2;
             this.sliderRectangle.rx = rr;
             this.sliderRectangle.ry = rr;
-            this.sliderRectangle.css = 'markPointFill';
+            this.sliderRectangle.css = 'slidePointFill';
         }
         else {
             this.sliderRectangle.css = 'markPointNone';
@@ -3715,7 +3745,7 @@ class MixerUI {
             y: 0,
             w: 222,
             h: 222,
-            css: 'markPointFill'
+            css: 'slidePointFill'
         };
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             let mixerGridAnchor = {
@@ -5217,7 +5247,7 @@ class MixerDataMathUtility {
         this.zoomEditSLess = 3;
         this.zoomAuxLess = 1;
         this.editmark = null;
-        this.slidermark = null;
+        this.slidemark = null;
         this.data = data;
         this.recalculateCommentMax();
     }

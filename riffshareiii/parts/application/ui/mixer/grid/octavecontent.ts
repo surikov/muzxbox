@@ -127,14 +127,14 @@ class OctaveContent {
 									, ry: globalCommandDispatcher.cfg().notePathHeight / 2
 									, css: 'mixDropClick'
 									, activation: (x: number, y: number) => {
-										let start = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight();
+										//let start = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight();
 
 										//let pitch = (start - y1) / globalCommandDispatcher.cfg().notePathHeight;
-										globalCommandDispatcher.cfg().slidermark = {
+										globalCommandDispatcher.cfg().slidemark = {
 											barIdx: barIdx
 											, chord: chord
 											, pitch: chord.pitches[nn]
-											, delta: chord.slides[chord.slides.length-1].delta
+											//, delta: chord.slides[chord.slides.length-1].delta
 										};
 										//console.log('start slide', x, y, globalCommandDispatcher.cfg().slidermark);
 										globalCommandDispatcher.resetProject();

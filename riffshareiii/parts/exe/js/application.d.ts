@@ -674,11 +674,10 @@ declare class MixerDataMathUtility {
         skip: Zvoog_Metre;
         pitch: number;
     };
-    slidermark: null | {
+    slidemark: null | {
         barIdx: number;
         chord: Zvoog_Chord;
         pitch: number;
-        delta: number;
     };
     constructor(data: Zvoog_Project);
     recalculateCommentMax(): void;

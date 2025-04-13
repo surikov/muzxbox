@@ -84,8 +84,8 @@ class MixerUI {
 	}
 	resetSliderMark() {
 
-		let mark = globalCommandDispatcher.cfg().slidermark;
-		console.log('resetSliderMark', mark);
+		let mark = globalCommandDispatcher.cfg().slidemark;
+		//console.log('resetSliderMark', mark);
 		if (mark) {
 			let mm: Zvoog_MetreMathType = MMUtil();
 			let barX = 0;
@@ -100,7 +100,7 @@ class MixerUI {
 			let top = globalCommandDispatcher.cfg().gridTop()
 				+ globalCommandDispatcher.cfg().gridHeight()
 				- mark.pitch
-				+ 11 - mark.delta
+				+ 11 - mark.chord.slides[mark.chord.slides.length-1].delta
 				;
 			let len = 0;
 			for (let ss = 0; ss < mark.chord.slides.length; ss++) {
@@ -120,7 +120,7 @@ class MixerUI {
 			this.sliderRectangle.h = rr * 2;
 			this.sliderRectangle.rx = rr;
 			this.sliderRectangle.ry = rr;
-			this.sliderRectangle.css = 'markPointFill';
+			this.sliderRectangle.css = 'slidePointFill';
 		} else {
 			this.sliderRectangle.css = 'markPointNone';
 		}
@@ -186,7 +186,7 @@ class MixerUI {
 			, y: 0
 			, w: 222
 			, h: 222
-			, css: 'markPointFill'
+			, css: 'slidePointFill'
 		};
 
 

@@ -106,7 +106,7 @@ class CommandExe {
 			}
 		}
 		let calc=JSON.stringify(globalCommandDispatcher.undo());
-		console.log('undo len',calc.length/1000,'kb');
+		//console.log('undo len',calc.length/1000,'kb');
 	}
 	undo(cnt: number) {
 		if (this.lockUndoRedo) {

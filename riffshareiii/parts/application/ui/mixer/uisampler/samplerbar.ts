@@ -83,7 +83,7 @@ class SamplerBar {
 				} else {
 					if (muEnd.more(probeSkip)) {
 						addDrum = false;
-						console.log('drop', barIdx, probeSkip, drum);
+						//console.log('drop', barIdx, probeSkip, drum);
 						drum.measures[barIdx].skips.splice(deleteSkipIdx, 1);
 						deleteSkipIdx--;
 						break;
@@ -91,7 +91,7 @@ class SamplerBar {
 				}
 			}
 			if (addDrum) {
-				console.log('add', barIdx, muStart, drum);
+				//console.log('add', barIdx, muStart, drum);
 				drum.measures[barIdx].skips.push(muStart.metre());
 			}
 		});

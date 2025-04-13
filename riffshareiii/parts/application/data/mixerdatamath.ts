@@ -43,7 +43,7 @@ class MixerDataMathUtility {
 	zoomAuxLess = 1;
 
 	editmark: null | { barIdx: number, skip: Zvoog_Metre, pitch: number } = null;// { barIdx: 2, skip: { count: 3, part: 4 }, pitch: 36 };
-	slidermark: null | {  barIdx: number, chord: Zvoog_Chord, pitch: number,delta:number } = null;
+	slidemark: null | {  barIdx: number, chord: Zvoog_Chord, pitch: number } = null;
 
 	constructor(data: Zvoog_Project) {
 		this.data = data;
