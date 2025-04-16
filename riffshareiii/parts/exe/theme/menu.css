@@ -2,6 +2,12 @@
     fill: var(--background-color);
 }
 
+.rectangleDragItem {
+    fill: var(--drag-color);
+	stroke: var(--main-color);
+    stroke-width: 0.01cm;
+}
+
 .rightMenuDelimiterLine {
     fill: var(--shadow-color);
     pointer-events: none;

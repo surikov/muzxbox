@@ -13,6 +13,7 @@ type MenuInfo = {
 	selectedState?: number;
 	dragMix?: boolean;
 	highlight?: string;
+	top?:number;
 };
 
 let menuItemsData: MenuInfo[] | null = null;
@@ -34,6 +35,7 @@ let menuPointFilters: MenuInfo = {
 	, onFolderOpen: () => {
 		//console.log('filters');
 	}
+
 };
 let menuPointSamplers: MenuInfo = {
 	text: localMenuSamplersFolder
@@ -110,12 +112,33 @@ function fillPluginsLists() {
 					});
 				} else {
 					if (purpose == 'Filter') {
-						menuPointFilters.children.push({
+						let dragStarted = false;
+						let info:MenuInfo;
+						info={
 							dragMix: true
-							, text: label, noLocalization: true, onDrag: (x: number, y: number) => {
-								console.log(purpose, label, x, y);
+							, text: label
+							, noLocalization: true
+							, onDrag: (x: number, y: number) => {
+								//console.log(purpose, label, x, y);
+								if (dragStarted) {
+									if (x == 0 && y == 0) {
+										//console.log('set', purpose, label, x, y);
+										dragStarted = false;
+										globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+									} else {
+										//console.log('drag',x,y);
+										globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
+									}
+								} else {
+									//console.log('start', purpose, label, x, y,info.top,globalCommandDispatcher.renderer.menu.scrollY);
+									dragStarted = true;
+									globalCommandDispatcher.hideRightMenu();
+									globalCommandDispatcher.renderer.menu.showDragMenuItem(x, y, label);
+								}
 							}
-						});
+						};
+
+						menuPointFilters.children.push(info);
 					} else {
 						console.log('unknown plugin kind');
 					}

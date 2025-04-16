@@ -1126,6 +1126,11 @@ class CommandDispatcher {
     registerUI(renderer) {
         this.renderer = renderer;
     }
+    hideRightMenu() {
+        globalCommandDispatcher.cfg().data.list = false;
+        this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
+        this.renderer.menu.resetAllAnchors();
+    }
     showRightMenu() {
         let vw = this.renderer.tileLevelSVG.clientWidth / this.renderer.tiler.tapPxSize();
         let vh = this.renderer.tileLevelSVG.clientHeight / this.renderer.tiler.tapPxSize();
@@ -2096,6 +2101,8 @@ class RightMenuPanel {
     constructor() {
         this.lastWidth = 0;
         this.lastHeight = 0;
+        this.dragItemX = 0;
+        this.dragItemY = 0;
         this.items = [];
         this.scrollY = 0;
         this.shiftX = 0;
@@ -2108,18 +2115,35 @@ class RightMenuPanel {
         globalCommandDispatcher.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
         globalCommandDispatcher.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
     }
+    showDragMenuItem(dx, dy, itlabel) {
+        let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+        this.dragItemX = dx / zz;
+        this.dragItemY = dy / zz;
+        console.log('showDragMenuItem', dx, dy);
+    }
+    moveDragMenuItem(dx, dy) {
+        let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+        this.dragItemX = this.dragItemX + dx / zz;
+        this.dragItemY = this.dragItemY + dy / zz;
+        this.rectangleDragItem.x = this.dragItemX;
+        this.rectangleDragItem.y = this.dragItemY;
+        globalCommandDispatcher.renderer.tiler.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
+        console.log('moveDragMenuItem', this.dragItemX, this.dragItemY);
+    }
+    hideDragMenuItem() {
+        console.log('hideDragMenuItem');
+    }
     createMenu() {
         this.menuPanelBackground = document.getElementById("menuPanelBackground");
         this.menuPanelContent = document.getElementById("menuPanelContent");
         this.menuPanelInteraction = document.getElementById("menuPanelInteraction");
         this.menuPanelButtons = document.getElementById("menuPanelButtons");
         this.backgroundRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'rightMenuPanel' };
+        this.rectangleDragItem = { x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'rectangleDragItem' };
         this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
         this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
         this.menuCloseButton = new IconLabelButton([icon_moveright], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
-            globalCommandDispatcher.cfg().data.list = false;
-            this.resizeMenu(this.lastWidth, this.lastHeight);
-            this.resetAllAnchors();
+            globalCommandDispatcher.hideRightMenu();
         });
         this.menuUpButton = new IconLabelButton([icon_moveup], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
             this.scrollY = 0;
@@ -2145,7 +2169,8 @@ class RightMenuPanel {
             minZoom: zoomPrefixLevelsCSS[0].minZoom,
             beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
-                this.dragHandler
+                this.dragHandler,
+                this.rectangleDragItem
             ], id: 'rightMenuInteractionAnchor'
         };
         this.buttonsAnchor = {
@@ -2217,6 +2242,7 @@ class RightMenuPanel {
                         me.rerenderMenuContent(so);
                     }).initOpenedFolderItem();
                     this.items.push(so);
+                    it.top = this.items.length - 1;
                     this.fillMenuItemChildren(pad + 0.5, children);
                 }
                 else {
@@ -2228,6 +2254,7 @@ class RightMenuPanel {
                         me.rerenderMenuContent(si);
                     }).initClosedFolderItem();
                     this.items.push(si);
+                    it.top = this.items.length - 1;
                 }
             }
             else {
@@ -2239,6 +2266,7 @@ class RightMenuPanel {
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
                     }).initDraggableItem());
+                    it.top = this.items.length - 1;
                 }
                 else {
                     if (it.onSubClick) {
@@ -2265,6 +2293,7 @@ class RightMenuPanel {
                             me.rerenderMenuContent(rightMenuItem);
                         });
                         this.items.push(rightMenuItem.initActionItem2());
+                        it.top = this.items.length - 1;
                     }
                     else {
                         if (it.onClick) {
@@ -2275,12 +2304,14 @@ class RightMenuPanel {
                                 me.setFocus(it, infos);
                                 me.resetAllAnchors();
                             }).initActionItem());
+                            it.top = this.items.length - 1;
                         }
                         else {
                             this.items.push(new RightMenuItem(it, pad, () => {
                                 me.setFocus(it, infos);
                                 me.resetAllAnchors();
                             }).initDisabledItem());
+                            it.top = this.items.length - 1;
                         }
                     }
                 }
@@ -2695,12 +2726,30 @@ function fillPluginsLists() {
                 }
                 else {
                     if (purpose == 'Filter') {
-                        menuPointFilters.children.push({
+                        let dragStarted = false;
+                        let info;
+                        info = {
                             dragMix: true,
-                            text: label, noLocalization: true, onDrag: (x, y) => {
-                                console.log(purpose, label, x, y);
+                            text: label,
+                            noLocalization: true,
+                            onDrag: (x, y) => {
+                                if (dragStarted) {
+                                    if (x == 0 && y == 0) {
+                                        dragStarted = false;
+                                        globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+                                    }
+                                    else {
+                                        globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
+                                    }
+                                }
+                                else {
+                                    dragStarted = true;
+                                    globalCommandDispatcher.hideRightMenu();
+                                    globalCommandDispatcher.renderer.menu.showDragMenuItem(x, y, label);
+                                }
                             }
-                        });
+                        };
+                        menuPointFilters.children.push(info);
                     }
                     else {
                         console.log('unknown plugin kind');
@@ -3398,8 +3447,10 @@ class MixerBar {
                 }
                 if (duration.count > 0) {
                     globalCommandDispatcher.exe.commitProjectChanges(['tracks', 0, 'measures', barIdx], () => {
-                        cuslidemark.chord.slides.push({ duration: duration, delta: pitch - cuslidemark.pitch + 11 });
-                        console.log(cuslidemark, pitch);
+                        if (cuslidemark) {
+                            cuslidemark.chord.slides.push({ duration: duration, delta: pitch - cuslidemark.pitch + 11 });
+                            console.log(cuslidemark, pitch);
+                        }
                     });
                     globalCommandDispatcher.cfg().slidemark = null;
                 }

@@ -92,6 +92,11 @@ class CommandDispatcher {
 	registerUI(renderer: UIRenderer) {
 		this.renderer = renderer;
 	}
+	hideRightMenu(){
+		globalCommandDispatcher.cfg().data.list = false;
+		this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
+		this.renderer.menu.resetAllAnchors();
+	}
 	showRightMenu() {
 		let vw = this.renderer.tileLevelSVG.clientWidth / this.renderer.tiler.tapPxSize();
 		let vh = this.renderer.tileLevelSVG.clientHeight / this.renderer.tiler.tapPxSize();

@@ -328,8 +328,10 @@ class MixerBar {
 
 				if (duration.count > 0) {
 					globalCommandDispatcher.exe.commitProjectChanges(['tracks', 0, 'measures', barIdx], () => {
-						cuslidemark.chord.slides.push({ duration: duration, delta: pitch - cuslidemark.pitch + 11 });
-						console.log(cuslidemark, pitch);
+						if (cuslidemark) {
+							cuslidemark.chord.slides.push({ duration: duration, delta: pitch - cuslidemark.pitch + 11 });
+							console.log(cuslidemark, pitch);
+						}
 					});
 
 					globalCommandDispatcher.cfg().slidemark = null;

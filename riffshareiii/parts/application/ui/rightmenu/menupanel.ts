@@ -10,6 +10,11 @@ class RightMenuPanel {
 	backgroundAnchor: TileAnchor;
 	//layerCurrentTitle: TileText;
 
+	rectangleDragItem: TileRectangle;
+	dragItemX = 0;
+	dragItemY = 0;
+	dragAnchor: TileAnchor;
+
 	menuPanelBackground: SVGElement;
 	menuPanelContent: SVGElement;
 	menuPanelInteraction: SVGElement;
@@ -45,6 +50,26 @@ class RightMenuPanel {
 		globalCommandDispatcher.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
 	}
 
+	showDragMenuItem(dx: number, dy: number, itlabel: string) {
+		
+		let zz=globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+		this.dragItemX = dx/zz;
+		this.dragItemY = dy/zz;
+		console.log('showDragMenuItem',dx,dy);
+	}
+	moveDragMenuItem(dx: number, dy: number) {
+		let zz=globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+		this.dragItemX = this.dragItemX + dx/zz;
+		this.dragItemY = this.dragItemY + dy/zz;
+		this.rectangleDragItem.x = this.dragItemX;
+		this.rectangleDragItem.y = this.dragItemY;
+		globalCommandDispatcher.renderer.tiler.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
+		console.log('moveDragMenuItem',this.dragItemX,this.dragItemY);
+	}
+	hideDragMenuItem() {
+		console.log('hideDragMenuItem');
+	}
+
 	createMenu(): TileLayerDefinition[] {
 
 		this.menuPanelBackground = (document.getElementById("menuPanelBackground") as any) as SVGElement;
@@ -54,13 +79,18 @@ class RightMenuPanel {
 
 		this.backgroundRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'rightMenuPanel' };
 
+		this.rectangleDragItem = { x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'rectangleDragItem' };
+
 		this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
 
 		this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
 		this.menuCloseButton = new IconLabelButton([icon_moveright], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
+			/*
 			globalCommandDispatcher.cfg().data.list = false;
 			this.resizeMenu(this.lastWidth, this.lastHeight);
 			this.resetAllAnchors();
+			*/
+			globalCommandDispatcher.hideRightMenu();
 		});
 		this.menuUpButton = new IconLabelButton([icon_moveup], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
 			this.scrollY = 0;
@@ -98,6 +128,7 @@ class RightMenuPanel {
 			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
 			, content: [
 				this.dragHandler
+				, this.rectangleDragItem
 			], id: 'rightMenuInteractionAnchor'
 		};
 		this.buttonsAnchor = {
@@ -167,6 +198,7 @@ class RightMenuPanel {
 		let me = this;
 		for (let ii = 0; ii < infos.length; ii++) {
 			let it = infos[ii];
+
 			//let focused = (it.focused) ? true : false;
 			let opened = (it.opened) ? true : false;
 			let children = it.children;
@@ -184,6 +216,7 @@ class RightMenuPanel {
 
 					}).initOpenedFolderItem();
 					this.items.push(so);
+					it.top = this.items.length - 1;
 					this.fillMenuItemChildren(pad + 0.5, children);
 				} else {
 					let si: RightMenuItem = new RightMenuItem(it, pad, () => {
@@ -196,6 +229,7 @@ class RightMenuPanel {
 
 					}).initClosedFolderItem();
 					this.items.push(si);
+					it.top = this.items.length - 1;
 				}
 			} else {
 				if (it.dragMix) {
@@ -206,6 +240,7 @@ class RightMenuPanel {
 						me.setFocus(it, infos);
 						me.resetAllAnchors();
 					}).initDraggableItem());
+					it.top = this.items.length - 1;
 				} else {
 					if (it.onSubClick) {
 						//if (it.onClick) {
@@ -231,6 +266,7 @@ class RightMenuPanel {
 							me.rerenderMenuContent(rightMenuItem);
 						});
 						this.items.push(rightMenuItem.initActionItem2());
+						it.top = this.items.length - 1;
 						/*} else {
 							let rightMenuItem = new RightMenuItem(it, pad, () => {
 								//
@@ -260,11 +296,13 @@ class RightMenuPanel {
 								me.setFocus(it, infos);
 								me.resetAllAnchors();
 							}).initActionItem());
+							it.top = this.items.length - 1;
 						} else {
 							this.items.push(new RightMenuItem(it, pad, () => {
 								me.setFocus(it, infos);
 								me.resetAllAnchors();
 							}).initDisabledItem());
+							it.top = this.items.length - 1;
 						}
 					}
 
