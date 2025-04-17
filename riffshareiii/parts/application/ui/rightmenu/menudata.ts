@@ -13,7 +13,7 @@ type MenuInfo = {
 	selectedState?: number;
 	dragMix?: boolean;
 	highlight?: string;
-	top?:number;
+	top?: number;
 };
 
 let menuItemsData: MenuInfo[] | null = null;
@@ -113,8 +113,8 @@ function fillPluginsLists() {
 				} else {
 					if (purpose == 'Filter') {
 						let dragStarted = false;
-						let info:MenuInfo;
-						info={
+						let info: MenuInfo;
+						info = {
 							dragMix: true
 							, text: label
 							, noLocalization: true
@@ -131,9 +131,22 @@ function fillPluginsLists() {
 									}
 								} else {
 									//console.log('start', purpose, label, x, y,info.top,globalCommandDispatcher.renderer.menu.scrollY);
-									dragStarted = true;
-									globalCommandDispatcher.hideRightMenu();
-									globalCommandDispatcher.renderer.menu.showDragMenuItem(x, y, label);
+									let id = globalCommandDispatcher.renderer.menu.rectangleDragItem.id;
+									if (id) {
+										let el: HTMLElement | null = document.getElementById(id);
+										if (el) {
+											let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+											let ss = globalCommandDispatcher.renderer.menu.scrollY;
+											let tt = info.top ? info.top : 0;
+											//let tp = globalCommandDispatcher.renderer.tiler.tapPxSize();
+											let yy = (tt + ss-0.0) * zz;
+											let xx = (1+globalCommandDispatcher.renderer.menu.shiftX) * zz;
+											//console.log('start drag', globalCommandDispatcher.renderer.menu.shiftX * zz);
+											dragStarted = true;
+											globalCommandDispatcher.hideRightMenu();
+											globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, label);
+										}
+									}
 								}
 							}
 						};

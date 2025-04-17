@@ -2119,19 +2119,18 @@ class RightMenuPanel {
         let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
         this.dragItemX = dx / zz;
         this.dragItemY = dy / zz;
-        console.log('showDragMenuItem', dx, dy);
+        this.dragAnchor.translation = { x: this.dragItemX, y: this.dragItemY };
+        globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(this.dragAnchor);
     }
     moveDragMenuItem(dx, dy) {
         let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
         this.dragItemX = this.dragItemX + dx / zz;
         this.dragItemY = this.dragItemY + dy / zz;
-        this.rectangleDragItem.x = this.dragItemX;
-        this.rectangleDragItem.y = this.dragItemY;
-        globalCommandDispatcher.renderer.tiler.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
-        console.log('moveDragMenuItem', this.dragItemX, this.dragItemY);
+        this.dragAnchor.translation = { x: this.dragItemX, y: this.dragItemY };
+        globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(this.dragAnchor);
     }
     hideDragMenuItem() {
-        console.log('hideDragMenuItem');
+        console.log('hideDragMenuItem', this.dragItemX, this.dragItemY);
     }
     createMenu() {
         this.menuPanelBackground = document.getElementById("menuPanelBackground");
@@ -2139,7 +2138,7 @@ class RightMenuPanel {
         this.menuPanelInteraction = document.getElementById("menuPanelInteraction");
         this.menuPanelButtons = document.getElementById("menuPanelButtons");
         this.backgroundRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'rightMenuPanel' };
-        this.rectangleDragItem = { x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'rectangleDragItem' };
+        this.rectangleDragItem = { x: 0, y: 0, w: 1, h: 1, rx: 0.25, ry: 0.25, css: 'rectangleDragItem' };
         this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
         this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
         this.menuCloseButton = new IconLabelButton([icon_moveright], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
@@ -2164,13 +2163,19 @@ class RightMenuPanel {
             beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [], id: 'rightMenuContentAnchor'
         };
+        this.dragAnchor = {
+            xx: 0, yy: 111, ww: 111, hh: 0,
+            minZoom: zoomPrefixLevelsCSS[0].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            content: [this.rectangleDragItem], id: 'rightMenuInteractionAnchor'
+        };
         this.interAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0,
             minZoom: zoomPrefixLevelsCSS[0].minZoom,
             beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
                 this.dragHandler,
-                this.rectangleDragItem
+                this.dragAnchor
             ], id: 'rightMenuInteractionAnchor'
         };
         this.buttonsAnchor = {
@@ -2743,9 +2748,20 @@ function fillPluginsLists() {
                                     }
                                 }
                                 else {
-                                    dragStarted = true;
-                                    globalCommandDispatcher.hideRightMenu();
-                                    globalCommandDispatcher.renderer.menu.showDragMenuItem(x, y, label);
+                                    let id = globalCommandDispatcher.renderer.menu.rectangleDragItem.id;
+                                    if (id) {
+                                        let el = document.getElementById(id);
+                                        if (el) {
+                                            let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+                                            let ss = globalCommandDispatcher.renderer.menu.scrollY;
+                                            let tt = info.top ? info.top : 0;
+                                            let yy = (tt + ss - 0.0) * zz;
+                                            let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
+                                            dragStarted = true;
+                                            globalCommandDispatcher.hideRightMenu();
+                                            globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, label);
+                                        }
+                                    }
                                 }
                             }
                         };

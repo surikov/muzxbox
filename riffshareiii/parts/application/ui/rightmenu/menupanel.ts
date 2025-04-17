@@ -14,6 +14,7 @@ class RightMenuPanel {
 	dragItemX = 0;
 	dragItemY = 0;
 	dragAnchor: TileAnchor;
+	//dragElement: HTMLElement | null = null;
 
 	menuPanelBackground: SVGElement;
 	menuPanelContent: SVGElement;
@@ -50,25 +51,54 @@ class RightMenuPanel {
 		globalCommandDispatcher.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
 	}
 
+
+
+
+
+
 	showDragMenuItem(dx: number, dy: number, itlabel: string) {
-		
-		let zz=globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-		this.dragItemX = dx/zz;
-		this.dragItemY = dy/zz;
-		console.log('showDragMenuItem',dx,dy);
+		//let id = this.dragAnchor.id;
+		//if (id) {
+		//	this.dragElement = document.getElementById(id);
+		//	if (this.dragElement) {
+		let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+		this.dragItemX = dx / zz;
+		this.dragItemY = dy / zz;
+		//console.log('showDragMenuItem', dx, dy);
+		//let translate = 'translate(' + (this.dragItemX * globalCommandDispatcher.renderer.tiler.tapPxSize()) + ',' + (this.dragItemY * globalCommandDispatcher.renderer.tiler.tapPxSize()) + ')';
+		//this.dragElement.setAttribute('transform', translate);
+		this.dragAnchor.translation = { x: this.dragItemX, y: this.dragItemY };
+		globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(this.dragAnchor);
+		//	}
+		//}
 	}
 	moveDragMenuItem(dx: number, dy: number) {
-		let zz=globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-		this.dragItemX = this.dragItemX + dx/zz;
-		this.dragItemY = this.dragItemY + dy/zz;
-		this.rectangleDragItem.x = this.dragItemX;
-		this.rectangleDragItem.y = this.dragItemY;
-		globalCommandDispatcher.renderer.tiler.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
-		console.log('moveDragMenuItem',this.dragItemX,this.dragItemY);
+		//let id = this.dragAnchor.id;
+		//if (id) {
+		//this.dragElement = document.getElementById(id);
+		//if (this.dragElement) {
+		let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+		this.dragItemX = this.dragItemX + dx / zz;
+		this.dragItemY = this.dragItemY + dy / zz;
+		//this.rectangleDragItem.x = this.dragItemX;
+		//this.rectangleDragItem.y = this.dragItemY;
+		//globalCommandDispatcher.renderer.tiler.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
+		//this.dragAnchor.translation = { x: this.dragItemX, y: this.dragItemY };
+		//console.log('moveDragMenuItem', this.dragItemX, this.dragItemY);
+		//let translate = 'translate(' + (this.dragItemX * globalCommandDispatcher.renderer.tiler.tapPxSize()) + ',' + (this.dragItemY * globalCommandDispatcher.renderer.tiler.tapPxSize()) + ')';
+		//this.dragElement.setAttribute('transform', translate);
+		this.dragAnchor.translation = { x: this.dragItemX, y: this.dragItemY };
+		globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(this.dragAnchor);
+		//	}
+		//}
 	}
 	hideDragMenuItem() {
-		console.log('hideDragMenuItem');
+		console.log('hideDragMenuItem',this.dragItemX,this.dragItemY);
 	}
+
+
+
+
 
 	createMenu(): TileLayerDefinition[] {
 
@@ -79,7 +109,7 @@ class RightMenuPanel {
 
 		this.backgroundRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'rightMenuPanel' };
 
-		this.rectangleDragItem = { x: 0, y: 0, w: 1, h: 1, rx: 0.5, ry: 0.5, css: 'rectangleDragItem' };
+		this.rectangleDragItem = { x: 0, y: 0, w: 1, h: 1, rx: 0.25, ry: 0.25, css: 'rectangleDragItem' };
 
 		this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
 
@@ -122,13 +152,19 @@ class RightMenuPanel {
 				//this.testContent
 			], id: 'rightMenuContentAnchor'
 		};
+		this.dragAnchor = {
+			xx: 0, yy: 111, ww: 111, hh: 0
+			, minZoom: zoomPrefixLevelsCSS[0].minZoom
+			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
+			, content: [this.rectangleDragItem], id: 'rightMenuInteractionAnchor'
+		};
 		this.interAnchor = {
 			xx: 0, yy: 111, ww: 111, hh: 0
 			, minZoom: zoomPrefixLevelsCSS[0].minZoom
 			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
 			, content: [
 				this.dragHandler
-				, this.rectangleDragItem
+				, this.dragAnchor
 			], id: 'rightMenuInteractionAnchor'
 		};
 		this.buttonsAnchor = {
