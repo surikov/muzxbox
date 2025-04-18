@@ -306,7 +306,6 @@ declare class RightMenuPanel {
     backgroundRectangle: TileRectangle;
     listingShadow: TileRectangle;
     backgroundAnchor: TileAnchor;
-    rectangleDragItem: TileRectangle;
     dragItemX: number;
     dragItemY: number;
     dragAnchor: TileAnchor;
@@ -329,9 +328,9 @@ declare class RightMenuPanel {
     itemsWidth: number;
     constructor();
     resetAllAnchors(): void;
-    showDragMenuItem(dx: number, dy: number, itlabel: string): void;
+    showDragMenuItem(dx: number, dy: number, dragContent: TileItem): void;
     moveDragMenuItem(dx: number, dy: number): void;
-    hideDragMenuItem(): void;
+    hideDragMenuItem(): TilePoint;
     createMenu(): TileLayerDefinition[];
     scrollListing(dx: number, dy: number): void;
     fillMenuItems(): void;
@@ -858,10 +857,10 @@ declare type TileLevelBase = {
     getCurrentPointPosition(): TileZoom;
     setCurrentPointPosition: (xyz: TileZoom) => void;
     getStartMouseScreen(): TilePoint;
-    screen2view(screen: TilePoint): TilePoint;
+    screen2view(screenpx: TilePoint): TilePoint;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     delayedResetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
-    updateAnchorTranslation(anchor: TileAnchor): void;
+    updateAnchorStyle(anchor: TileAnchor): void;
     setAfterResizeCallback(f: () => void): void;
     setAfterZoomCallback(f: () => void): void;
     resetInnerSize(inWidth: number, inHeight: number): void;
@@ -964,13 +963,11 @@ declare type Zvoog_PercussionTrack = {
     title: string;
     measures: Zvoog_PercussionMeasure[];
     sampler: Zvoog_AudioSampler;
-    volume: number;
 };
 declare type Zvoog_MusicTrack = {
     title: string;
     measures: Zvoog_TrackMeasure[];
     performer: Zvoog_AudioSequencer;
-    volume: number;
 };
 declare type Zvoog_CommentText = {
     skip: Zvoog_Metre;

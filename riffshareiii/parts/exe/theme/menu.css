@@ -8,6 +8,13 @@
     stroke-width: 0.01cm;
 }
 
+.dragDropMixerItem {
+    visibility: visible;
+}
+.noDragDropMixerItem {
+    visibility: hidden;
+}
+
 .rightMenuDelimiterLine {
     fill: var(--shadow-color);
     pointer-events: none;

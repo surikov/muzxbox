@@ -163,7 +163,7 @@ type TileLevelBase = {
 	getCurrentPointPosition(): TileZoom;
 	setCurrentPointPosition: (xyz: TileZoom) => void;
 	getStartMouseScreen(): TilePoint;
-	screen2view(screen: TilePoint): TilePoint;
+	screen2view(screenpx: TilePoint): TilePoint;
 	resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor
 		//, layer: TileLayerDefinition
 		, layerMode: LevelModes
@@ -172,7 +172,7 @@ type TileLevelBase = {
 		//, layer: TileLayerDefinition
 		, layerMode: LevelModes
 	): void;
-	updateAnchorTranslation(anchor: TileAnchor): void;
+	updateAnchorStyle(anchor: TileAnchor): void;
 	setAfterResizeCallback(f: () => void): void;
 	setAfterZoomCallback(f: () => void): void;
 	//resetAnchor: (//fromSVGGroup: SVGElement,

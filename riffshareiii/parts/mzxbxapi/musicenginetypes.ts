@@ -102,14 +102,14 @@ type Zvoog_PercussionTrack = {
 	title: string;
 	measures: Zvoog_PercussionMeasure[];
 	sampler: Zvoog_AudioSampler;
-	volume: number;
+	//volume: number;
 };
 type Zvoog_MusicTrack = {
 	title: string;
 	//active?:boolean;
 	measures: Zvoog_TrackMeasure[];
 	performer: Zvoog_AudioSequencer;
-	volume: number;
+	//volume: number;
 };
 type Zvoog_CommentText = {
 	skip: Zvoog_Metre;

@@ -2115,22 +2115,35 @@ class RightMenuPanel {
         globalCommandDispatcher.resetAnchor(this.menuPanelInteraction, this.interAnchor, LevelModes.overlay);
         globalCommandDispatcher.resetAnchor(this.menuPanelButtons, this.buttonsAnchor, LevelModes.overlay);
     }
-    showDragMenuItem(dx, dy, itlabel) {
+    showDragMenuItem(dx, dy, dragContent) {
+        this.dragAnchor.content = [dragContent];
         let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
         this.dragItemX = dx / zz;
         this.dragItemY = dy / zz;
         this.dragAnchor.translation = { x: this.dragItemX, y: this.dragItemY };
-        globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(this.dragAnchor);
+        this.dragAnchor.css = 'dragDropMixerItem';
+        globalCommandDispatcher.renderer.tiler.updateAnchorStyle(this.dragAnchor);
     }
     moveDragMenuItem(dx, dy) {
         let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
         this.dragItemX = this.dragItemX + dx / zz;
         this.dragItemY = this.dragItemY + dy / zz;
         this.dragAnchor.translation = { x: this.dragItemX, y: this.dragItemY };
-        globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(this.dragAnchor);
+        this.dragAnchor.css = 'dragDropMixerItem';
+        globalCommandDispatcher.renderer.tiler.updateAnchorStyle(this.dragAnchor);
     }
     hideDragMenuItem() {
-        console.log('hideDragMenuItem', this.dragItemX, this.dragItemY);
+        let tap = globalCommandDispatcher.renderer.tiler.tapPxSize();
+        let point = globalCommandDispatcher.renderer.tiler.screen2view({
+            x: this.dragItemX * tap,
+            y: this.dragItemY * tap
+        });
+        let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+        let left = point.x - start;
+        let top = point.y - globalCommandDispatcher.cfg().gridTop();
+        this.dragAnchor.css = 'noDragDropMixerItem';
+        globalCommandDispatcher.renderer.tiler.updateAnchorStyle(this.dragAnchor);
+        return { x: left, y: top };
     }
     createMenu() {
         this.menuPanelBackground = document.getElementById("menuPanelBackground");
@@ -2138,7 +2151,6 @@ class RightMenuPanel {
         this.menuPanelInteraction = document.getElementById("menuPanelInteraction");
         this.menuPanelButtons = document.getElementById("menuPanelButtons");
         this.backgroundRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'rightMenuPanel' };
-        this.rectangleDragItem = { x: 0, y: 0, w: 1, h: 1, rx: 0.25, ry: 0.25, css: 'rectangleDragItem' };
         this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
         this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
         this.menuCloseButton = new IconLabelButton([icon_moveright], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
@@ -2167,7 +2179,8 @@ class RightMenuPanel {
             xx: 0, yy: 111, ww: 111, hh: 0,
             minZoom: zoomPrefixLevelsCSS[0].minZoom,
             beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
-            content: [this.rectangleDragItem], id: 'rightMenuInteractionAnchor'
+            content: [],
+            css: 'noDragDropMixerItem'
         };
         this.interAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0,
@@ -2176,7 +2189,7 @@ class RightMenuPanel {
             content: [
                 this.dragHandler,
                 this.dragAnchor
-            ], id: 'rightMenuInteractionAnchor'
+            ]
         };
         this.buttonsAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0,
@@ -2713,21 +2726,107 @@ function fillPluginsLists() {
         }
         else {
             if (purpose == 'Sampler') {
-                menuPointSamplers.children.push({
+                let dragStarted = false;
+                let info;
+                info = {
                     dragMix: true,
-                    text: label, noLocalization: true, onDrag: (x, y) => {
-                        console.log(purpose, label, x, y);
+                    text: label,
+                    noLocalization: true,
+                    onDrag: (x, y) => {
+                        if (dragStarted) {
+                            if (x == 0 && y == 0) {
+                                dragStarted = false;
+                                let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+                                globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+                                    globalCommandDispatcher.cfg().data.percussions.push({
+                                        sampler: {
+                                            id: '' + Math.random(),
+                                            kind: MZXBX_currentPlugins()[ii].kind,
+                                            data: '',
+                                            outputs: [],
+                                            iconPosition: newPos,
+                                            state: 1
+                                        },
+                                        measures: [],
+                                        title: MZXBX_currentPlugins()[ii].label
+                                    });
+                                });
+                            }
+                            else {
+                                globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
+                            }
+                        }
+                        else {
+                            let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+                            let ss = globalCommandDispatcher.renderer.menu.scrollY;
+                            let tt = info.top ? info.top : 0;
+                            let yy = (tt + ss - 0.0) * zz;
+                            let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
+                            dragStarted = true;
+                            globalCommandDispatcher.hideRightMenu();
+                            let sz = 1;
+                            globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, {
+                                x: 0, y: 0,
+                                w: sz, h: sz,
+                                rx: sz / 2, ry: sz / 2,
+                                css: 'rectangleDragItem'
+                            });
+                        }
                     }
-                });
+                };
+                menuPointSamplers.children.push(info);
             }
             else {
                 if (purpose == 'Performer') {
-                    menuPointPerformers.children.push({
+                    let dragStarted = false;
+                    let info;
+                    info = {
                         dragMix: true,
-                        text: label, noLocalization: true, onDrag: (x, y) => {
-                            console.log(purpose, label, x, y);
+                        text: label,
+                        noLocalization: true,
+                        onDrag: (x, y) => {
+                            if (dragStarted) {
+                                if (x == 0 && y == 0) {
+                                    dragStarted = false;
+                                    let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+                                    globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+                                        globalCommandDispatcher.cfg().data.tracks.push({
+                                            performer: {
+                                                id: '' + Math.random(),
+                                                kind: MZXBX_currentPlugins()[ii].kind,
+                                                data: '',
+                                                outputs: [],
+                                                iconPosition: newPos,
+                                                state: 1
+                                            },
+                                            measures: [],
+                                            title: MZXBX_currentPlugins()[ii].label
+                                        });
+                                    });
+                                }
+                                else {
+                                    globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
+                                }
+                            }
+                            else {
+                                let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+                                let ss = globalCommandDispatcher.renderer.menu.scrollY;
+                                let tt = info.top ? info.top : 0;
+                                let yy = (tt + ss - 0.0) * zz;
+                                let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
+                                dragStarted = true;
+                                globalCommandDispatcher.hideRightMenu();
+                                let sz = 1;
+                                globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, {
+                                    x: 0, y: 0,
+                                    w: sz, h: sz,
+                                    rx: sz / 2, ry: sz / 2,
+                                    css: 'rectangleDragItem'
+                                });
+                            }
                         }
-                    });
+                    };
+                    menuPointPerformers.children.push(info);
                 }
                 else {
                     if (purpose == 'Filter') {
@@ -2741,27 +2840,39 @@ function fillPluginsLists() {
                                 if (dragStarted) {
                                     if (x == 0 && y == 0) {
                                         dragStarted = false;
-                                        globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+                                        let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+                                        globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+                                            globalCommandDispatcher.cfg().data.filters.push({
+                                                id: '' + Math.random(),
+                                                kind: MZXBX_currentPlugins()[ii].kind,
+                                                data: '',
+                                                outputs: [],
+                                                automation: [],
+                                                iconPosition: newPos,
+                                                state: 1,
+                                                title: MZXBX_currentPlugins()[ii].label
+                                            });
+                                        });
                                     }
                                     else {
                                         globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
                                     }
                                 }
                                 else {
-                                    let id = globalCommandDispatcher.renderer.menu.rectangleDragItem.id;
-                                    if (id) {
-                                        let el = document.getElementById(id);
-                                        if (el) {
-                                            let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-                                            let ss = globalCommandDispatcher.renderer.menu.scrollY;
-                                            let tt = info.top ? info.top : 0;
-                                            let yy = (tt + ss - 0.0) * zz;
-                                            let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
-                                            dragStarted = true;
-                                            globalCommandDispatcher.hideRightMenu();
-                                            globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, label);
-                                        }
-                                    }
+                                    let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+                                    let ss = globalCommandDispatcher.renderer.menu.scrollY;
+                                    let tt = info.top ? info.top : 0;
+                                    let yy = (tt + ss - 0.0) * zz;
+                                    let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
+                                    dragStarted = true;
+                                    globalCommandDispatcher.hideRightMenu();
+                                    let sz = 1;
+                                    globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, {
+                                        x: 0, y: 0,
+                                        w: sz, h: sz,
+                                        rx: sz / 2, ry: sz / 2,
+                                        css: 'rectangleDragItem'
+                                    });
                                 }
                             }
                         };
@@ -4240,7 +4351,7 @@ class PerformerIcon {
                                     needReset = false;
                                 }
                                 else {
-                                    globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(dragAnchor);
+                                    globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragAnchor);
                                 }
                             }
                         }
@@ -4436,7 +4547,7 @@ class SamplerIcon {
                                     needReset = false;
                                 }
                                 else {
-                                    globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(dragAnchor);
+                                    globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragAnchor);
                                 }
                             }
                         }
@@ -4636,7 +4747,7 @@ class FilterIcon {
                                     needReset = false;
                                 }
                                 else {
-                                    globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(dragAnchor);
+                                    globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragAnchor);
                                 }
                             }
                         }
@@ -5145,7 +5256,7 @@ let ____mzxbxProjectForTesting2 = {
     ],
     tracks: [
         {
-            title: "Track one", volume: 1, measures: [
+            title: "Track one", measures: [
                 {
                     chords: [
                         { skip: { count: 0, part: 1 }, pitches: [25], slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] },
@@ -5173,7 +5284,7 @@ let ____mzxbxProjectForTesting2 = {
             performer: { id: 'firstPerfoemrID', data: '77', kind: 'zinstr1', outputs: ['track1Volme'], iconPosition: { x: 40, y: 20 }, state: 0 }
         },
         {
-            title: "Second track", volume: 1, measures: [
+            title: "Second track", measures: [
                 {
                     chords: [
                         { skip: { count: 3, part: 4 }, pitches: [44, 47, 49], slides: [{ duration: { count: 5, part: 8 }, delta: -5 }] }
@@ -5192,7 +5303,7 @@ let ____mzxbxProjectForTesting2 = {
             performer: { id: 'secTrPerfId', data: '34', kind: 'zinstr1', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 }, state: 0 }
         },
         {
-            title: "Third track", volume: 1, measures: [
+            title: "Third track", measures: [
                 { chords: [] },
                 { chords: [] },
                 { chords: [] },
@@ -5207,12 +5318,12 @@ let ____mzxbxProjectForTesting2 = {
             performer: { id: 'at3', data: '23', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 }, state: 0 }
         },
         {
-            title: "A track 1", volume: 1, measures: [
+            title: "A track 1", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
             performer: { id: 'bt3', data: '29', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 }, state: 0 }
         }, {
-            title: "A track 987654321", volume: 1, measures: [
+            title: "A track 987654321", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] },
                 { chords: [] }
             ],
@@ -5221,17 +5332,17 @@ let ____mzxbxProjectForTesting2 = {
     ],
     percussions: [
         {
-            title: "Snare", volume: 1, measures: [
+            title: "Snare", measures: [
                 { skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
             ],
             sampler: { id: 'd1', data: '39', kind: 'zdrum1', outputs: ['drum1Volme'], iconPosition: { x: 22, y: 75 }, state: 0 }
         },
         {
-            title: "Snare2", volume: 1, measures: [],
+            title: "Snare2", measures: [],
             sampler: { id: 'd2', data: '41', kind: 'zdrum1', outputs: ['drum2Volme'], iconPosition: { x: 22, y: 91 }, state: 0 }
         },
         {
-            title: "Snare3", volume: 1, measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }],
+            title: "Snare3", measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }],
             sampler: { id: 'd3', data: '47', kind: 'zdrum1', outputs: ['drum3Volme'], iconPosition: { x: 22, y: 99 }, state: 0 }
         }
     ],

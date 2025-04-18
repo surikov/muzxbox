@@ -644,6 +644,7 @@ class TileLevelRealTime implements TileLevelBase {
 						//console.log('translation',g);
 					}
 					if (anchor.css) {
+						g.setAttribute("class", "");
 						g.classList.add(anchor.css);
 					}
 					for (let n = 0; n < anchor.content.length; n++) {
@@ -799,7 +800,7 @@ class TileLevelRealTime implements TileLevelBase {
 		this.slideToContentPosition();
 		this.allTilesOK = false;
 	}
-	updateAnchorTranslation(anchor: TileAnchor): void {
+	updateAnchorStyle(anchor: TileAnchor): void {
 
 		var gid: string = anchor.id ? anchor.id : '';
 		let tr = anchor.translation;
@@ -811,10 +812,14 @@ class TileLevelRealTime implements TileLevelBase {
 		//let existedSVGchild: SVGElement | null = this.groupChildWithID(parentSVGGroup, gid);
 		if (element) {
 			element.setAttribute('transform', translate);
-			//console.log('update ', element);
+			if (anchor.css) {
+				element.setAttribute("class", "");
+				element.classList.add(anchor.css);
+			}
 		} else {
 			//console.log('not found', gid,element);
 		}
+		//console.log(element);
 	};
 	resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes
 	) {

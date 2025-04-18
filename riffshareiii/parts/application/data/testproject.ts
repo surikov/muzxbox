@@ -57,7 +57,7 @@ let ____mzxbxProjectForTesting2: Zvoog_Project = {
 	]
 	, tracks: [
 		{
-			title: "Track one", volume: 1, measures: [
+			title: "Track one", measures: [
 				{
 					chords: [
 						/*{ skip: { count: 0, part: 1 }, notes: [{ pitch: 25, slides: [{ duration: { count: 1, part: 8 }, delta: 0 }] }] }
@@ -98,7 +98,7 @@ let ____mzxbxProjectForTesting2: Zvoog_Project = {
 			, performer: { id: 'firstPerfoemrID', data: '77', kind: 'zinstr1', outputs: ['track1Volme'], iconPosition: { x: 40, y: 20 }, state: 0 }
 		}
 		, {
-			title: "Second track", volume: 1, measures: [
+			title: "Second track", measures: [
 				{
 					chords: [
 						{ skip: { count: 3, part: 4 }, pitches: [44, 47, 49], slides: [{ duration: { count: 5, part: 8 }, delta: -5 }] }
@@ -117,7 +117,7 @@ let ____mzxbxProjectForTesting2: Zvoog_Project = {
 			, performer: { id: 'secTrPerfId', data: '34', kind: 'zinstr1', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 }, state: 0 }
 		}
 		, {
-			title: "Third track", volume: 1, measures: [
+			title: "Third track", measures: [
 				{ chords: [] }
 				, { chords: [] }
 				, { chords: [] }
@@ -132,12 +132,12 @@ let ____mzxbxProjectForTesting2: Zvoog_Project = {
 			, performer: { id: 'at3', data: '23', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 }, state: 0 }
 		}
 		, {
-			title: "A track 1", volume: 1, measures: [
+			title: "A track 1", measures: [
 				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			]//, filters: []
 			, performer: { id: 'bt3', data: '29', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 }, state: 0 }
 		}, {
-			title: "A track 987654321", volume: 1, measures: [
+			title: "A track 987654321", measures: [
 				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 				, { chords: [] }
 			]//, filters: []
@@ -146,17 +146,17 @@ let ____mzxbxProjectForTesting2: Zvoog_Project = {
 	]
 	, percussions: [
 		{
-			title: "Snare", volume: 1, measures: [
+			title: "Snare", measures: [
 				{ skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
 			]//, filters: []
 			, sampler: { id: 'd1', data: '39', kind: 'zdrum1', outputs: ['drum1Volme'], iconPosition: { x: 22, y: 75 }, state: 0 }
 		}
 		, {
-			title: "Snare2", volume: 1, measures: []//, filters: []
+			title: "Snare2", measures: []//, filters: []
 			, sampler: { id: 'd2', data: '41', kind: 'zdrum1', outputs: ['drum2Volme'], iconPosition: { x: 22, y: 91 }, state: 0 }
 		}
 		, {
-			title: "Snare3", volume: 1, measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }]//, filters: []
+			title: "Snare3", measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }]//, filters: []
 			, sampler: { id: 'd3', data: '47', kind: 'zdrum1', outputs: ['drum3Volme'], iconPosition: { x: 22, y: 99 }, state: 0 }
 		}
 	]

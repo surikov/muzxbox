@@ -594,6 +594,7 @@ class TileLevelRealTime {
                         g.setAttribute('transform', translate);
                     }
                     if (anchor.css) {
+                        g.setAttribute("class", "");
                         g.classList.add(anchor.css);
                     }
                     for (let n = 0; n < anchor.content.length; n++) {
@@ -710,7 +711,7 @@ class TileLevelRealTime {
         this.slideToContentPosition();
         this.allTilesOK = false;
     }
-    updateAnchorTranslation(anchor) {
+    updateAnchorStyle(anchor) {
         var gid = anchor.id ? anchor.id : '';
         let tr = anchor.translation;
         var translate = '';
@@ -720,6 +721,10 @@ class TileLevelRealTime {
         let element = document.getElementById(gid);
         if (element) {
             element.setAttribute('transform', translate);
+            if (anchor.css) {
+                element.setAttribute("class", "");
+                element.classList.add(anchor.css);
+            }
         }
         else {
         }

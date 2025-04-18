@@ -96,20 +96,119 @@ function fillPluginsLists() {
 			});
 		} else {
 			if (purpose == 'Sampler') {
+				/*
 				menuPointSamplers.children.push({
 					dragMix: true
 					, text: label, noLocalization: true, onDrag: (x: number, y: number) => {
 						console.log(purpose, label, x, y);
 					}
-				});
+				});*/
+				let dragStarted = false;
+					let info: MenuInfo;
+					info = {
+						dragMix: true
+						, text: label
+						, noLocalization: true
+						, onDrag: (x: number, y: number) => {
+							if (dragStarted) {
+								if (x == 0 && y == 0) {
+									dragStarted = false;
+									let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+									globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+										globalCommandDispatcher.cfg().data.percussions.push({
+											sampler: {
+												id: '' + Math.random()
+												, kind: MZXBX_currentPlugins()[ii].kind
+												, data: ''
+												, outputs: []
+												, iconPosition: newPos
+												, state: 1
+											}
+											//, volume: 1
+											, measures: []
+											, title: MZXBX_currentPlugins()[ii].label
+										});
+									});
+								} else {
+									globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
+								}
+							} else {
+								let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+								let ss = globalCommandDispatcher.renderer.menu.scrollY;
+								let tt = info.top ? info.top : 0;
+								let yy = (tt + ss - 0.0) * zz;
+								let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
+								dragStarted = true;
+								globalCommandDispatcher.hideRightMenu();
+								let sz = 1;
+								globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, {
+									x: 0, y: 0
+									, w: sz, h: sz
+									, rx: sz / 2, ry: sz / 2
+									, css: 'rectangleDragItem'
+								});
+							}
+						}
+					};
+					menuPointSamplers.children.push(info);
 			} else {
 				if (purpose == 'Performer') {
+					/*
 					menuPointPerformers.children.push({
 						dragMix: true
 						, text: label, noLocalization: true, onDrag: (x: number, y: number) => {
 							console.log(purpose, label, x, y);
 						}
 					});
+					*/
+					let dragStarted = false;
+					let info: MenuInfo;
+					info = {
+						dragMix: true
+						, text: label
+						, noLocalization: true
+						, onDrag: (x: number, y: number) => {
+							if (dragStarted) {
+								if (x == 0 && y == 0) {
+									dragStarted = false;
+									let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+									globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+										globalCommandDispatcher.cfg().data.tracks.push({
+											performer: {
+												id: '' + Math.random()
+												, kind: MZXBX_currentPlugins()[ii].kind
+												, data: ''
+												, outputs: []
+												, iconPosition: newPos
+												, state: 1
+											}
+											//, volume: 1
+											, measures: []
+											, title: MZXBX_currentPlugins()[ii].label
+										});
+									});
+								} else {
+									globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
+								}
+							} else {
+								let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+								let ss = globalCommandDispatcher.renderer.menu.scrollY;
+								let tt = info.top ? info.top : 0;
+								let yy = (tt + ss - 0.0) * zz;
+								let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
+								dragStarted = true;
+								globalCommandDispatcher.hideRightMenu();
+								let sz = 1;
+								globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, {
+									x: 0, y: 0
+									, w: sz, h: sz
+									, rx: sz / 2, ry: sz / 2
+									, css: 'rectangleDragItem'
+								});
+							}
+						}
+					};
+					menuPointPerformers.children.push(info);
 				} else {
 					if (purpose == 'Filter') {
 						let dragStarted = false;
@@ -119,38 +218,43 @@ function fillPluginsLists() {
 							, text: label
 							, noLocalization: true
 							, onDrag: (x: number, y: number) => {
-								//console.log(purpose, label, x, y);
 								if (dragStarted) {
 									if (x == 0 && y == 0) {
-										//console.log('set', purpose, label, x, y);
 										dragStarted = false;
-										globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+										let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+										globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+											globalCommandDispatcher.cfg().data.filters.push({
+												id: '' + Math.random()
+												, kind: MZXBX_currentPlugins()[ii].kind
+												, data: ''
+												, outputs: []
+												, automation: []
+												, iconPosition: newPos
+												, state: 1
+												, title: MZXBX_currentPlugins()[ii].label
+											});
+										});
 									} else {
-										//console.log('drag',x,y);
 										globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
 									}
 								} else {
-									//console.log('start', purpose, label, x, y,info.top,globalCommandDispatcher.renderer.menu.scrollY);
-									let id = globalCommandDispatcher.renderer.menu.rectangleDragItem.id;
-									if (id) {
-										let el: HTMLElement | null = document.getElementById(id);
-										if (el) {
-											let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-											let ss = globalCommandDispatcher.renderer.menu.scrollY;
-											let tt = info.top ? info.top : 0;
-											//let tp = globalCommandDispatcher.renderer.tiler.tapPxSize();
-											let yy = (tt + ss-0.0) * zz;
-											let xx = (1+globalCommandDispatcher.renderer.menu.shiftX) * zz;
-											//console.log('start drag', globalCommandDispatcher.renderer.menu.shiftX * zz);
-											dragStarted = true;
-											globalCommandDispatcher.hideRightMenu();
-											globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, label);
-										}
-									}
+									let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+									let ss = globalCommandDispatcher.renderer.menu.scrollY;
+									let tt = info.top ? info.top : 0;
+									let yy = (tt + ss - 0.0) * zz;
+									let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
+									dragStarted = true;
+									globalCommandDispatcher.hideRightMenu();
+									let sz = 1;
+									globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, {
+										x: 0, y: 0
+										, w: sz, h: sz
+										, rx: sz / 2, ry: sz / 2
+										, css: 'rectangleDragItem'
+									});
 								}
 							}
 						};
-
 						menuPointFilters.children.push(info);
 					} else {
 						console.log('unknown plugin kind');

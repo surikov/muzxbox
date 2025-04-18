@@ -123,7 +123,7 @@ class SamplerIcon {
 										, LevelModes.normal);
 									needReset = false;
 								} else {
-									globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(dragAnchor);
+									globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragAnchor);
 								}
 							}
 						}

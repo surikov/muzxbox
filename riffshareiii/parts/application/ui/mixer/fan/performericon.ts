@@ -148,7 +148,7 @@ class PerformerIcon {
 									globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
 									needReset = false;
 								} else {
-									globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(dragAnchor);
+									globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragAnchor);
 								}
 							}
 						}

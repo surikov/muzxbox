@@ -89,7 +89,7 @@ declare class TileLevelRealTime implements TileLevelBase {
     clearGroupDetails(group: SVGElement): void;
     setModel(layers: TileLayerDefinition[]): void;
     resetModel(): void;
-    updateAnchorTranslation(anchor: TileAnchor): void;
+    updateAnchorStyle(anchor: TileAnchor): void;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     delayedResetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     startLoop(): void;
@@ -253,7 +253,7 @@ declare type TileLevelBase = {
     screen2view(screen: TilePoint): TilePoint;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     delayedResetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
-    updateAnchorTranslation(anchor: TileAnchor): void;
+    updateAnchorStyle(anchor: TileAnchor): void;
     setAfterResizeCallback(f: () => void): void;
     setAfterZoomCallback(f: () => void): void;
     resetInnerSize(inWidth: number, inHeight: number): void;
