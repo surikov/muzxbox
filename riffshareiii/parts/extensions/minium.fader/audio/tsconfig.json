@@ -23,8 +23,7 @@
     },
     "files": [
         "../../../mzxbxapi/musicenginetypes.ts",
-        "../.././mzxbxapi/musicenginedeclarations.ts",
-        "faderplugin.ts",
-        "faderfilter.ts"
+        "../../../mzxbxapi/musicenginedeclarations.ts",
+        "faderplugin.ts"
     ]
 }

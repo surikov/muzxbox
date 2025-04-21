@@ -1,0 +1,8 @@
+{
+    "label": "Fader"
+    , "purpose": "Performer"
+    , "kind": "miniumfader1"
+    , "ui": "faderui.html"
+    , "evaluate": "newBaseFader"
+    , "script": "faderaudio.js"
+}

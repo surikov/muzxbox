@@ -1,69 +1,28 @@
 <html>
 
 <head>
+	<title>Fader UI</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<script src="faderui.js"></script>
 	<style>
-		html {
-			--color-background: #ffffffcc;
-			(((--main-color))): #003366ff;
-			--color-scroll: color-mix(in lab, transparent 90%, var(--main-color));
-
-			font-family: "Bruno Ace", sans-serif;
-
-			background-color: var(--color-background);
-			color: var(--main-color);
-			scrollbar-color: var(--color-scroll) var(--color-background);
-			scrollbar-width: thin;
+		body {
+			text-align: center;
+		}
+		input {
+			width: 100%;
 		}
 	</style>
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&display=swap" rel="stylesheet">
-    <script type='text/javascript' src='./midimusic.js'></script>
-    <script type='text/javascript' src='../../../js/mzxbxlib.js'></script>
 </head>
 
 <body>
-	<h1>MIDI import</h1>
-    <p><input type="file" id="file_midi_input" accept="audio/midi, audio/x-midi" 
-        onchange="plugin.loadMIDIfile(this);" /></p>
+	<h1>Fader</h1>
+	<p>0 : <span id='numval'>77</span> : 150%</p>
 	<p>
-		<button onclick='plugin.sendImportedMIDIData();'>Send data</button>
+		<input type="range" id="volume" name="volume" min="0" max="150" value="77" />
 	</p>
 </body>
 <script>
-	/*
-	var callbackID = '';
-
-	function sendTestData() {
-		console.log('sendTestData');
-		var oo = {
-			dialog: callbackID,
-			data: {
-				bla: 'bla',
-				test: 121212
-			}
-		};
-		window.parent.postMessage(JSON.stringify(oo), '*');
-	}
-
-	function loadfile(ff) {
-		console.log('loadfile', ff);
-	}
-
-	function receiveHostMessage(par) {
-		console.log('receiveHostMessage', par);
-		//callbackID = par.data;
-		try {
-			var oo = JSON.parse(par.data);
-			callbackID = oo.dialog;
-		} catch (xx) {
-			console.log(xx);
-		}
-	}
-	window.addEventListener('message', receiveHostMessage, false);
-	//console.log(this);
-	*/
-	let plugin=new MIDIIImportMusicPlugin();
+	initFaderUI();
 </script>
 
 </html>
