@@ -73,6 +73,7 @@ let menuPlayStop: MenuInfo = {
 	}
 };*/
 function fillPluginsLists() {
+	//console.log('fillPluginsLists');
 	menuPointFilters.children = [];
 	menuPointPerformers.children = [];
 	menuPointSamplers.children = [];
@@ -80,87 +81,64 @@ function fillPluginsLists() {
 	for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
 		let label: string = MZXBX_currentPlugins()[ii].label;
 		let purpose: string = MZXBX_currentPlugins()[ii].purpose;
-		//let url: string = MZXBX_currentPlugins()[ii].ui;
+		//console.log(ii,purpose,label);
 		if (purpose == 'Action') {
 			menuPointActions.children.push({
 				text: label, noLocalization: true, onClick: () => {
-					//globalCommandDispatcher.promptActionPluginDialog(MZXBX_currentPlugins()[ii]);
 					globalCommandDispatcher.actionPluginDialog.openActionPluginDialogFrame(MZXBX_currentPlugins()[ii]);
-					/*globalCommandDispatcher.promptActionPluginDialog(label, url, (obj: Zvoog_Project) => {
-						let project: Zvoog_Project = obj;
-						globalCommandDispatcher.registerWorkProject(project);
-						globalCommandDispatcher.resetProject();
-						return true;
-					});*/
 				}
 			});
 		} else {
 			if (purpose == 'Sampler') {
-				/*
-				menuPointSamplers.children.push({
-					dragMix: true
-					, text: label, noLocalization: true, onDrag: (x: number, y: number) => {
-						console.log(purpose, label, x, y);
-					}
-				});*/
 				let dragStarted = false;
-					let info: MenuInfo;
-					info = {
-						dragMix: true
-						, text: label
-						, noLocalization: true
-						, onDrag: (x: number, y: number) => {
-							if (dragStarted) {
-								if (x == 0 && y == 0) {
-									dragStarted = false;
-									let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
-									globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-										globalCommandDispatcher.cfg().data.percussions.push({
-											sampler: {
-												id: '' + Math.random()
-												, kind: MZXBX_currentPlugins()[ii].kind
-												, data: ''
-												, outputs: []
-												, iconPosition: newPos
-												, state: 1
-											}
-											//, volume: 1
-											, measures: []
-											, title: MZXBX_currentPlugins()[ii].label
-										});
+				let info: MenuInfo;
+				info = {
+					dragMix: true
+					, text: label
+					, noLocalization: true
+					, onDrag: (x: number, y: number) => {
+						if (dragStarted) {
+							if (x == 0 && y == 0) {
+								dragStarted = false;
+								let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+								globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+									globalCommandDispatcher.cfg().data.percussions.push({
+										sampler: {
+											id: '' + Math.random()
+											, kind: MZXBX_currentPlugins()[ii].kind
+											, data: ''
+											, outputs: []
+											, iconPosition: newPos
+											, state: 1
+										}
+										, measures: []
+										, title: MZXBX_currentPlugins()[ii].label
 									});
-								} else {
-									globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
-								}
-							} else {
-								let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-								let ss = globalCommandDispatcher.renderer.menu.scrollY;
-								let tt = info.top ? info.top : 0;
-								let yy = (tt + ss - 0.0) * zz;
-								let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
-								dragStarted = true;
-								globalCommandDispatcher.hideRightMenu();
-								let sz = 1;
-								globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, {
-									x: 0, y: 0
-									, w: sz, h: sz
-									, rx: sz / 2, ry: sz / 2
-									, css: 'rectangleDragItem'
 								});
+							} else {
+								globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
 							}
+						} else {
+							let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+							let ss = globalCommandDispatcher.renderer.menu.scrollY;
+							let tt = info.top ? info.top : 0;
+							let yy = (tt + ss - 0.0) * zz;
+							let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
+							dragStarted = true;
+							globalCommandDispatcher.hideRightMenu();
+							let sz = 1;
+							globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, {
+								x: 0, y: 0
+								, w: sz, h: sz
+								, rx: sz / 2, ry: sz / 2
+								, css: 'rectangleDragItem'
+							});
 						}
-					};
-					menuPointSamplers.children.push(info);
+					}
+				};
+				menuPointSamplers.children.push(info);
 			} else {
 				if (purpose == 'Performer') {
-					/*
-					menuPointPerformers.children.push({
-						dragMix: true
-						, text: label, noLocalization: true, onDrag: (x: number, y: number) => {
-							console.log(purpose, label, x, y);
-						}
-					});
-					*/
 					let dragStarted = false;
 					let info: MenuInfo;
 					info = {
@@ -182,7 +160,6 @@ function fillPluginsLists() {
 												, iconPosition: newPos
 												, state: 1
 											}
-											//, volume: 1
 											, measures: []
 											, title: MZXBX_currentPlugins()[ii].label
 										});
@@ -284,7 +261,6 @@ function composeBaseMenu(): MenuInfo[] {
 			, menuPointDrumTracks
 			, menuPointFxTracks
 			, menuPointActions
-
 			, {
 				text: localMenuNewPlugin, children: [
 
@@ -293,8 +269,6 @@ function composeBaseMenu(): MenuInfo[] {
 					, menuPointSamplers
 				]
 			}
-
-
 			, {
 				text: localMenuItemSettings, children: [
 					{
@@ -346,28 +320,38 @@ function composeBaseMenu(): MenuInfo[] {
 								}
 							}
 						]
+					}, {
+						text: 'Language', children: [
+							{
+								text: 'Russian', onClick: () => {
+									globalCommandDispatcher.setThemeLocale('ru', 1);
+								}
+							}, {
+								text: 'English', onClick: () => {
+									globalCommandDispatcher.setThemeLocale('en', 1);
+								}
+							}, {
+								text: 'kitaiskiy', onClick: () => {
+									globalCommandDispatcher.setThemeLocale('zh', 1.5);
+								}
+							}
+						]
 					}
 					, {
-						text: localMenuClearUndoRedo, onClick: () => {
-							globalCommandDispatcher.clearUndo();
-							globalCommandDispatcher.clearRedo();
-						}
+						text: 'other', children: [{
+							text: localMenuClearUndoRedo, onClick: () => {
+								globalCommandDispatcher.clearUndo();
+								globalCommandDispatcher.clearRedo();
+							}
+						},{
+							text: 'Plugindebug', onClick: () => {
+								globalCommandDispatcher.promptPluginInfoDebug();
+							}
+						}]
 					}
 				]
 			}
-			, {
-				text: 'Russian', onClick: () => {
-					globalCommandDispatcher.setThemeLocale('ru', 1);
-				}
-			}, {
-				text: 'English', onClick: () => {
-					globalCommandDispatcher.setThemeLocale('en', 1);
-				}
-			}, {
-				text: 'kitaiskiy', onClick: () => {
-					globalCommandDispatcher.setThemeLocale('zh', 1.5);
-				}
-			}
+
 		];
 		return menuItemsData;
 	}

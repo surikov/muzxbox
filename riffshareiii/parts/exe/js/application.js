@@ -399,7 +399,9 @@ class FilterPluginDialog {
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
                 this.waitFilterPluginInit = true;
-                pluginFrame.src = filterPlugin.ui;
+                if (filterPlugin) {
+                    pluginFrame.src = filterPlugin.ui;
+                }
                 pluginDiv.style.visibility = "visible";
                 this.resetStateButtons();
             }
@@ -534,8 +536,8 @@ class SamplerPluginDialog {
         this.closeDrumDialogFrame();
         globalCommandDispatcher.reConnectPluginsIfPlay();
     }
-    openDrumPluginDialogFrame(order, drum, filterPlugin) {
-        console.log('openDrumPluginDialogFrame', order, drum, filterPlugin);
+    openDrumPluginDialogFrame(order, drum, fplugin) {
+        console.log('openDrumPluginDialogFrame', order, drum, fplugin);
         this.drum = drum;
         this.order = order;
         this.pluginRawData = drum.sampler.data;
@@ -545,7 +547,9 @@ class SamplerPluginDialog {
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
                 this.waitSamplerPluginInit = true;
-                pluginFrame.src = filterPlugin.ui;
+                if (fplugin) {
+                    pluginFrame.src = fplugin.ui;
+                }
                 pluginDiv.style.visibility = "visible";
                 this.resetStateButtons();
             }
@@ -772,7 +776,9 @@ class SequencerPluginDialog {
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
                 this.waitSequencerPluginInit = true;
-                pluginFrame.src = trackPlugin.ui;
+                if (trackPlugin) {
+                    pluginFrame.src = trackPlugin.ui;
+                }
                 pluginDiv.style.visibility = "visible";
                 this.resetStateButtons();
             }
@@ -1095,6 +1101,29 @@ class CommandDispatcher {
     }
     cfg() {
         return this._mixerDataMathUtility;
+    }
+    promptPluginInfoDebug() {
+        console.log('promptPluginInfoDebug');
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.onchange = (evnt) => {
+            var file = evnt.target.files[0];
+            console.log(file);
+            var reader = new FileReader();
+            reader.readAsText(file, 'UTF-8');
+            reader.onload = (readerEvent) => {
+                var content = readerEvent.target.result;
+                console.log(content);
+                let inf = JSON.parse(content);
+                console.log(inf);
+                MZXBX_currentPlugins().push(inf);
+                console.log(MZXBX_currentPlugins());
+                menuItemsData = null;
+                globalCommandDispatcher.renderer.menu.rerenderMenuContent(null);
+                globalCommandDispatcher.resetProject();
+            };
+        };
+        input.click();
     }
     undo() {
         return this.undoQueue;
@@ -2955,27 +2984,36 @@ function composeBaseMenu() {
                                 }
                             }
                         ]
+                    }, {
+                        text: 'Language', children: [
+                            {
+                                text: 'Russian', onClick: () => {
+                                    globalCommandDispatcher.setThemeLocale('ru', 1);
+                                }
+                            }, {
+                                text: 'English', onClick: () => {
+                                    globalCommandDispatcher.setThemeLocale('en', 1);
+                                }
+                            }, {
+                                text: 'kitaiskiy', onClick: () => {
+                                    globalCommandDispatcher.setThemeLocale('zh', 1.5);
+                                }
+                            }
+                        ]
                     },
                     {
-                        text: localMenuClearUndoRedo, onClick: () => {
-                            globalCommandDispatcher.clearUndo();
-                            globalCommandDispatcher.clearRedo();
-                        }
+                        text: 'other', children: [{
+                                text: localMenuClearUndoRedo, onClick: () => {
+                                    globalCommandDispatcher.clearUndo();
+                                    globalCommandDispatcher.clearRedo();
+                                }
+                            }, {
+                                text: 'Plugindebug', onClick: () => {
+                                    globalCommandDispatcher.promptPluginInfoDebug();
+                                }
+                            }]
                     }
                 ]
-            },
-            {
-                text: 'Russian', onClick: () => {
-                    globalCommandDispatcher.setThemeLocale('ru', 1);
-                }
-            }, {
-                text: 'English', onClick: () => {
-                    globalCommandDispatcher.setThemeLocale('en', 1);
-                }
-            }, {
-                text: 'kitaiskiy', onClick: () => {
-                    globalCommandDispatcher.setThemeLocale('zh', 1.5);
-                }
             }
         ];
         return menuItemsData;
@@ -4378,9 +4416,7 @@ class PerformerIcon {
                 css: 'fanSamplerInteractionIcon fanButton' + zidx,
                 activation: (x, y) => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
-                    if (info) {
-                        globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(trackNo, track, info);
-                    }
+                    globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(trackNo, track, info);
                 }
             };
             dragAnchor.content.push(btn);
@@ -4575,9 +4611,7 @@ class SamplerIcon {
                 activation: (x, y) => {
                     console.log('' + samplerTrack.sampler.kind + ':' + samplerTrack.sampler.id);
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
-                    if (info) {
-                        globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(order, samplerTrack, info);
-                    }
+                    globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(order, samplerTrack, info);
                 }
             };
             dragAnchor.content.push(btn);
@@ -4776,9 +4810,7 @@ class FilterIcon {
                 css: 'fanSamplerInteractionIcon fanButton' + zidx,
                 activation: (x, y) => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
-                    if (info) {
-                        globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(order, filterTarget, info);
-                    }
+                    globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(order, filterTarget, info);
                 }
             };
             dragAnchor.content.push(btn);

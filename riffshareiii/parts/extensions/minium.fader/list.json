@@ -1,8 +1,8 @@
 {
     "label": "Fader"
-    , "purpose": "Performer"
+    , "purpose": "Filter"
     , "kind": "miniumfader1"
-    , "ui": "faderui.html"
+    , "ui": "http://127.0.0.1:8080/ui/faderui.html"
     , "evaluate": "newBaseFader"
-    , "script": "faderaudio.js"
+    , "script": "http://127.0.0.1:8080/audio/faderaudio.js"
 }

@@ -177,7 +177,7 @@ class PerformerIcon {
 				, activation: (x: number, y: number) => {
 					//console.log('' + track.performer.kind + ':' + track.performer.id);
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
-					if (info) {
+					//if (info) {
 						//globalCommandDispatcher.promptPluginSequencerDialog(track, info);
 						globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(trackNo, track, info);
 						/*let url = info.ui;
@@ -199,7 +199,7 @@ class PerformerIcon {
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});*/
-					}
+					//}
 
 
 				}

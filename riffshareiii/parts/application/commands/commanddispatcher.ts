@@ -31,6 +31,30 @@ class CommandDispatcher {
 	cfg(): MixerDataMathUtility {
 		return this._mixerDataMathUtility;
 	}
+	promptPluginInfoDebug() {
+		console.log('promptPluginInfoDebug');
+		var input = document.createElement('input');
+		input.type = 'file';
+		input.onchange = (evnt) => {
+			var file = (evnt as any).target.files[0];
+			console.log(file);
+			var reader = new FileReader();
+			reader.readAsText(file, 'UTF-8');
+			reader.onload = (readerEvent) => {
+				var content = (readerEvent as any).target.result;
+				console.log(content);
+				let inf=JSON.parse(content);
+				console.log(inf);
+				MZXBX_currentPlugins().push(inf);
+				console.log(MZXBX_currentPlugins());
+				menuItemsData=null;
+				globalCommandDispatcher.renderer.menu.rerenderMenuContent(null);
+				globalCommandDispatcher.resetProject();
+			}
+		}
+
+		input.click();
+	}
 	undo(): Zvoog_UICommand[] {
 		return this.undoQueue;
 	}
@@ -92,7 +116,7 @@ class CommandDispatcher {
 	registerUI(renderer: UIRenderer) {
 		this.renderer = renderer;
 	}
-	hideRightMenu(){
+	hideRightMenu() {
 		globalCommandDispatcher.cfg().data.list = false;
 		this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
 		this.renderer.menu.resetAllAnchors();

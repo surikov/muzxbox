@@ -69,7 +69,8 @@ class FilterPluginDialog {
 		this.closeFilterDialogFrame();
 		globalCommandDispatcher.reConnectPluginsIfPlay();
 	}
-	openFilterPluginDialogFrame(order: number, filter: Zvoog_FilterTarget, filterPlugin: MZXBX_PluginRegistrationInformation) {
+	openFilterPluginDialogFrame(order: number, filter: Zvoog_FilterTarget, filterPlugin: null|MZXBX_PluginRegistrationInformation) {
+		//console.log('openFilterPluginDialogFrame');
 		this.filter = filter;
 		this.order = order;
 		this.pluginRawData = filter.data;
@@ -79,7 +80,9 @@ class FilterPluginDialog {
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
 				this.waitFilterPluginInit = true;
+				if(filterPlugin){
 				pluginFrame.src = filterPlugin.ui;
+				}
 				pluginDiv.style.visibility = "visible";
 				this.resetStateButtons();
 			}

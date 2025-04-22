@@ -225,7 +225,7 @@ class RightMenuPanel {
 	}
 
 	fillMenuItemChildren(pad: number, infos: MenuInfo[]): void {
-
+//console.log('fillMenuItemChildren',infos);
 		let me = this;
 		for (let ii = 0; ii < infos.length; ii++) {
 			let it = infos[ii];
@@ -548,7 +548,7 @@ class RightMenuPanel {
 
 	}
 	rerenderMenuContent(folder: RightMenuItem | null) {
-
+//console.log('rerenderMenuContent',folder);
 		this.contentAnchor.content = [];
 		this.fillMenuItems();
 

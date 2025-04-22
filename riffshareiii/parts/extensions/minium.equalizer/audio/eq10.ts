@@ -1,8 +1,18 @@
-console.log('Fader v1.0');
-class FaderImplementation implements MZXBX_AudioFilterPlugin {
+console.log('Equalizer v1.0');
+class EqualizerImplementation implements MZXBX_AudioFilterPlugin {
 	audioContext: AudioContext;
-	volumeNode: GainNode;
-	volVal: number = 0;
+	inputNode: GainNode;
+	band32: BiquadFilterNode;
+	band64: BiquadFilterNode;
+	band128: BiquadFilterNode;
+	band256: BiquadFilterNode;
+	band512: BiquadFilterNode;
+	band1k: BiquadFilterNode;
+	band2k: BiquadFilterNode;
+	band4k: BiquadFilterNode;
+	band8k: BiquadFilterNode;
+	band16k: BiquadFilterNode;
+	outputNode: GainNode;
 	launch(context: AudioContext, parameters: string): void {
 		this.audioContext = context;
 		this.volumeNode = this.audioContext.createGain();
@@ -29,7 +39,8 @@ class FaderImplementation implements MZXBX_AudioFilterPlugin {
 		this.volVal = (this.volVal < 0) ? 0 : this.volVal;
 		this.volVal = (this.volVal > 150) ? 150 : this.volVal;
 	}
+	
 }
-function newBaseFader(): MZXBX_AudioFilterPlugin {
-	return new FaderImplementation();
+function new10bEqualizer(): MZXBX_AudioFilterPlugin {
+	return new EqualizerImplementation();
 }

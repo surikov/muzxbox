@@ -8,6 +8,7 @@
 		body {
 			text-align: center;
 		}
+
 		input {
 			width: 100%;
 		}
@@ -16,10 +17,11 @@
 
 <body>
 	<h1>Fader</h1>
-	<p>0 : <span id='numval'>77</span> : 150%</p>
+	<p>0 - 150%</p>
 	<p>
 		<input type="range" id="volume" name="volume" min="0" max="150" value="77" />
 	</p>
+	<p><span id='numval'>77</span>%</p>
 </body>
 <script>
 	initFaderUI();

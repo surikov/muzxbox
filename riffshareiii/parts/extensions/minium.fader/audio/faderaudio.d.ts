@@ -272,12 +272,13 @@ declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 declare class FaderImplementation implements MZXBX_AudioFilterPlugin {
     audioContext: AudioContext;
-    volume: GainNode;
-    num: number;
+    volumeNode: GainNode;
+    volVal: number;
     launch(context: AudioContext, parameters: string): void;
     busy(): null | string;
     schedule(when: number, tempo: number, parameters: string): void;
     input(): AudioNode | null;
     output(): AudioNode | null;
+    parseParameters(parameters: string): void;
 }
 declare function newBaseFader(): MZXBX_AudioFilterPlugin;

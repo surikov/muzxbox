@@ -71,8 +71,8 @@ class SamplerPluginDialog {
 		this.closeDrumDialogFrame();
 		globalCommandDispatcher.reConnectPluginsIfPlay();
 	}
-	openDrumPluginDialogFrame(order: number, drum: Zvoog_PercussionTrack, filterPlugin: MZXBX_PluginRegistrationInformation) {
-		console.log('openDrumPluginDialogFrame',order, drum, filterPlugin);
+	openDrumPluginDialogFrame(order: number, drum: Zvoog_PercussionTrack, fplugin: null|MZXBX_PluginRegistrationInformation) {
+		console.log('openDrumPluginDialogFrame',order, drum, fplugin);
 		this.drum = drum;
 		this.order = order;
 		this.pluginRawData = drum.sampler.data;
@@ -82,7 +82,9 @@ class SamplerPluginDialog {
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
 				this.waitSamplerPluginInit = true;
-				pluginFrame.src = filterPlugin.ui;
+				if(fplugin){
+				pluginFrame.src = fplugin.ui;
+				}
 				pluginDiv.style.visibility = "visible";
 				this.resetStateButtons();
 			}

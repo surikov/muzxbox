@@ -150,7 +150,7 @@ class SamplerIcon {
 				, activation: (x: number, y: number) => {
 					console.log('' + samplerTrack.sampler.kind + ':' + samplerTrack.sampler.id);
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
-					if (info) {
+					//if (info) {
 						globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(order,samplerTrack, info);
 						/*let url = info.ui;
 						globalCommandDispatcher.promptPluginPointDialog(samplerTrack.title, url, samplerTrack.sampler.data, (obj: any) => {
@@ -171,7 +171,7 @@ class SamplerIcon {
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});*/
-					}
+					//}
 				}
 			};
 			dragAnchor.content.push(btn);

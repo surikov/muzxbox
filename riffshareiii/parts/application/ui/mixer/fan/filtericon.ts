@@ -152,30 +152,10 @@ class FilterIcon {
 				, css: 'fanSamplerInteractionIcon fanButton' + zidx
 				, activation: (x: number, y: number) => {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
-					if (info) {
-						//this.filterPluginDialog.openFilterPluginDialogFrame(order, raw, filter, filterPlugin);//label, url, rawdata, callback, btnLabel, btnAction, titleAction);
+					//console.log(filterTarget.kind,info);
+					//if (info) {
 						globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(order, filterTarget, info);
-						/*let url = info.ui;
-						globalCommandDispatcher.promptPluginPointDialog(filterTarget.title, url, filterTarget.data, (obj: any) => {
-							globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
-								filterTarget.data = obj;
-							});
-							//globalCommandDispatcher.reStartPlayIfPlay();
-							return true;
-						}, LO(localDropFilterTrack), () => {
-							//console.log(localDropFilterTrack);
-							globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
-								globalCommandDispatcher.cfg().data.filters.splice(order, 1);
-							});
-							globalCommandDispatcher.cancelPluginGUI();
-						}, (newTitle: string) => {
-							globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
-								filterTarget.title = newTitle;
-							});
-							globalCommandDispatcher.cancelPluginGUI();
-						});
-						*/
-					}
+					//}
 				}
 			};
 			dragAnchor.content.push(btn);
