@@ -57,35 +57,36 @@ class AutomationBarContent {
 							, css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zIndex
 						};
 						barOctaveAnchor.content.push(editIcon);
-/*
-						if (zIndex < globalCommandDispatcher.cfg().zoomAuxLess) {
-							let dragCircle: TileRectangle = {
-								x: xx + globalCommandDispatcher.cfg().autoPointHeight * (1 / 4 - 1 / 64)
-								, y: top + globalCommandDispatcher.cfg().autoPointHeight * (1 / 4 - 1 / 100) + globalCommandDispatcher.cfg().autoPointHeight * aa //+ yShift
-								, w: globalCommandDispatcher.cfg().autoPointHeight / 8
-								, h: globalCommandDispatcher.cfg().autoPointHeight / 8
-								, rx: globalCommandDispatcher.cfg().autoPointHeight / 16
-								, ry: globalCommandDispatcher.cfg().autoPointHeight / 16
-								, css: 'samplerDrumDragSpot'
-							};
-							barOctaveAnchor.content.push(dragCircle);
-							let dragIcon: TileText = {
-								x: xx + globalCommandDispatcher.cfg().autoPointHeight / 4
-								, y: top + globalCommandDispatcher.cfg().autoPointHeight / 4 + globalCommandDispatcher.cfg().autoPointHeight * aa + yShift
-								, text: icon_leftright
-								, css: 'samplerDrumDragIcon' 
-							};
-							barOctaveAnchor.content.push(dragIcon);
-						}*/
+						/*
+												if (zIndex < globalCommandDispatcher.cfg().zoomAuxLess) {
+													let dragCircle: TileRectangle = {
+														x: xx + globalCommandDispatcher.cfg().autoPointHeight * (1 / 4 - 1 / 64)
+														, y: top + globalCommandDispatcher.cfg().autoPointHeight * (1 / 4 - 1 / 100) + globalCommandDispatcher.cfg().autoPointHeight * aa //+ yShift
+														, w: globalCommandDispatcher.cfg().autoPointHeight / 8
+														, h: globalCommandDispatcher.cfg().autoPointHeight / 8
+														, rx: globalCommandDispatcher.cfg().autoPointHeight / 16
+														, ry: globalCommandDispatcher.cfg().autoPointHeight / 16
+														, css: 'samplerDrumDragSpot'
+													};
+													barOctaveAnchor.content.push(dragCircle);
+													let dragIcon: TileText = {
+														x: xx + globalCommandDispatcher.cfg().autoPointHeight / 4
+														, y: top + globalCommandDispatcher.cfg().autoPointHeight / 4 + globalCommandDispatcher.cfg().autoPointHeight * aa + yShift
+														, text: icon_leftright
+														, css: 'samplerDrumDragIcon' 
+													};
+													barOctaveAnchor.content.push(dragIcon);
+												}*/
 					}
 				}
 
 			}
 		}
-		
-		
+
+
 	}
 	autoCellClick(barIdx: number, barX: number, yy: number, zz: number) {
+		globalCommandDispatcher.adjustTimeline();
 
 		let row = Math.floor(yy / globalCommandDispatcher.cfg().autoPointHeight);
 		let filter = globalCommandDispatcher.cfg().data.filters[row];
