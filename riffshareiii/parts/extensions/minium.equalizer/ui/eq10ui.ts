@@ -34,7 +34,6 @@ function initEQUI() {
 	band16k.addEventListener('change', (event) => { bridge.eqstate[9] = 1 * band16k.value; bridge.sendMessageToHost(JSON.stringify(bridge.eqstate)); updateStateUI(bridge); });
 }
 function updateStateUI(bridge: EQBridge) {
-	console.log('updateStateUI', bridge.eqstate);
 	label32.innerHTML = '' + bridge.eqstate[0];
 	label64.innerHTML = '' + bridge.eqstate[1];
 	label128.innerHTML = '' + bridge.eqstate[2];

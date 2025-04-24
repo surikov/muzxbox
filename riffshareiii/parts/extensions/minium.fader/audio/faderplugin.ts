@@ -13,8 +13,10 @@ class FaderImplementation implements MZXBX_AudioFilterPlugin {
 	}
 	schedule(when: number, tempo: number, parameters: string): void {
 		this.parseParameters(parameters);
-		this.volumeNode.gain.setValueAtTime(this.volVal / 100, when);
-		this.volumeNode.gain.linearRampToValueAtTime(this.volVal / 100, when + 0.001);
+		//this.volumeNode.gain.setValueAtTime(this.volVal / 100, when);
+		//this.volumeNode.gain.linearRampToValueAtTime(this.volVal / 100, when + 0.001);
+		this.volumeNode.gain.setTargetAtTime(this.volVal / 100, when, 0.001);
+
 	}
 	input(): AudioNode | null {
 		return this.volumeNode;

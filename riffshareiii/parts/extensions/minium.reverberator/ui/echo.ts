@@ -1,6 +1,6 @@
-class EQBridge {
+class EchoBridge {
 	id: string = '';
-	eqstate = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	data: string = '';
 	onReadHostData: () => void;
 	constructor(onReadHostData: () => void) {
 		this.onReadHostData = onReadHostData;
@@ -14,7 +14,7 @@ class EQBridge {
 	receiveHostMessage(messageEvent: MessageEvent) {
 		let message: MZXBX_MessageToPlugin = messageEvent.data;
 		if (this.id) {
-			parseState(this, message.hostData);
+			this.data = message.hostData;
 			this.onReadHostData();
 		} else {
 			this.setMessagingId(message.hostData);

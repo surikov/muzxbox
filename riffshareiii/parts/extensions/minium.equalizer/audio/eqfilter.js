@@ -30,16 +30,16 @@ class EqualizerImplementation {
     }
     schedule(when, tempo, parameters) {
         this.parseParameters(parameters);
-        this.band32.gain.setTargetAtTime(this.values[0] / 5, when, 0.01);
-        this.band64.gain.setTargetAtTime(this.values[1] / 5, when, 0.01);
-        this.band128.gain.setTargetAtTime(this.values[2] / 5, when, 0.01);
-        this.band256.gain.setTargetAtTime(this.values[3] / 5, when, 0.01);
-        this.band512.gain.setTargetAtTime(this.values[4] / 5, when, 0.01);
-        this.band1k.gain.setTargetAtTime(this.values[5] / 5, when, 0.01);
-        this.band2k.gain.setTargetAtTime(this.values[6] / 5, when, 0.01);
-        this.band4k.gain.setTargetAtTime(this.values[7] / 5, when, 0.01);
-        this.band8k.gain.setTargetAtTime(this.values[8] / 5, when, 0.01);
-        this.band16k.gain.setTargetAtTime(this.values[9] / 5, when, 0.01);
+        this.band32.gain.setTargetAtTime(this.values[0], when, 0.01);
+        this.band64.gain.setTargetAtTime(this.values[1], when, 0.01);
+        this.band128.gain.setTargetAtTime(this.values[2], when, 0.01);
+        this.band256.gain.setTargetAtTime(this.values[3], when, 0.01);
+        this.band512.gain.setTargetAtTime(this.values[4], when, 0.01);
+        this.band1k.gain.setTargetAtTime(this.values[5], when, 0.01);
+        this.band2k.gain.setTargetAtTime(this.values[6], when, 0.01);
+        this.band4k.gain.setTargetAtTime(this.values[7], when, 0.01);
+        this.band8k.gain.setTargetAtTime(this.values[8], when, 0.01);
+        this.band16k.gain.setTargetAtTime(this.values[9], when, 0.01);
     }
     input() {
         return this.inputNode;

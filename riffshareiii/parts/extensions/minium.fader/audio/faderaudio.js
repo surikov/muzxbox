@@ -14,8 +14,7 @@ class FaderImplementation {
     }
     schedule(when, tempo, parameters) {
         this.parseParameters(parameters);
-        this.volumeNode.gain.setValueAtTime(this.volVal / 100, when);
-        this.volumeNode.gain.linearRampToValueAtTime(this.volVal / 100, when + 0.001);
+        this.volumeNode.gain.setTargetAtTime(this.volVal / 100, when, 0.001);
     }
     input() {
         return this.volumeNode;

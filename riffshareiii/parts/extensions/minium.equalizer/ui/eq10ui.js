@@ -8,7 +8,6 @@ class EQBridge {
         this.sendMessageToHost('');
     }
     sendMessageToHost(data) {
-        console.log('sendMessageToHost', data);
         var message = { dialogID: this.id, pluginData: data, done: false };
         window.parent.postMessage(message, '*');
     }
@@ -62,7 +61,6 @@ function initEQUI() {
     band16k.addEventListener('change', (event) => { bridge.eqstate[9] = 1 * band16k.value; bridge.sendMessageToHost(JSON.stringify(bridge.eqstate)); updateStateUI(bridge); });
 }
 function updateStateUI(bridge) {
-    console.log('updateStateUI', bridge.eqstate);
     label32.innerHTML = '' + bridge.eqstate[0];
     label64.innerHTML = '' + bridge.eqstate[1];
     label128.innerHTML = '' + bridge.eqstate[2];

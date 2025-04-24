@@ -1,9 +1,9 @@
 <html>
 
 <head>
-	<title>Fader UI</title>
+	<title>Compressor UI</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<script src="faderui.js"></script>
+	<script src="dcui.js"></script>
 	<style>
 		h1 {
 			text-align: center;
@@ -16,14 +16,14 @@
 </head>
 
 <body>
-	<h1>Fader</h1>
+	<h1>Compressor</h1>
 	<p>
-		<input type="range" id="volume" name="volume" min="0" max="150" value="77" />
+		<input type="range" id="level"min="0" max="100" value="33" />
 	</p>
 	<p><span id='numval'>77</span>%</p>
 </body>
 <script>
-	initFaderUI();
+	initCompressorUI();
 </script>
 
 </html>

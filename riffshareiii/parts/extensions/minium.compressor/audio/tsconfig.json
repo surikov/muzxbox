@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "target": "es2015",
+        "outFile": "compress.js",
+        "strictNullChecks": true,
+        "alwaysStrict": true,
+        "esModuleInterop": true,
+        "noResolve": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "experimentalDecorators": true,
+        "isolatedModules": false,
+        "module": "AMD",
+        "lib": [
+            "dom",
+            "es2015",
+            "es5"
+        ],
+        "declaration": true,
+        "types": []
+    },
+    "files": [
+        "../../../mzxbxapi/musicenginetypes.ts",
+        "../../../mzxbxapi/musicenginedeclarations.ts",
+        "dcplugin.ts"
+    ]
+}
