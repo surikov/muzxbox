@@ -4,23 +4,19 @@
 	<title>Compressor UI</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<script src="dcui.js"></script>
-	<style>
-		h1 {
-			text-align: center;
-		}
-
-		input {
-			width: 100%;
-		}
-	</style>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="plugins.css">
 </head>
 
 <body>
 	<h1>Compressor</h1>
+	<p><span id='numval'>77</span>%</p>
 	<p>
 		<input type="range" id="level"min="0" max="100" value="33" />
 	</p>
-	<p><span id='numval'>77</span>%</p>
+	
 </body>
 <script>
 	initCompressorUI();

@@ -374,7 +374,7 @@ class ZS_WebAudioFontLoader {
                 return i;
             }
         }
-        console.log('program', program, 'not found');
+        console.log('program', program, 'not found set 0');
         return 0;
     }
     ;
@@ -761,7 +761,6 @@ class ZvoogStrumPerformerImplementation {
         this.info = this.loader.instrumentInfo(idx);
         this.loader.startLoad(context, this.info.url, this.info.variable);
         this.volumeNode.gain.setValueAtTime(this.loudness, this.audioContext.currentTime + 0.001);
-        console.log('loudness', this.loudness);
         this.loader.waitLoad(() => {
             this.preset = window[this.info.variable];
         });

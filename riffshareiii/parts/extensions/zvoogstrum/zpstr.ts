@@ -42,7 +42,7 @@ class ZvoogStrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 		this.info = this.loader.instrumentInfo(idx);
 		this.loader.startLoad(context, this.info.url, this.info.variable);
 		this.volumeNode.gain.setValueAtTime(this.loudness, this.audioContext.currentTime + 0.001);
-		console.log('loudness',this.loudness);
+		//console.log('loudness',this.loudness);
 		/*
 		if(this.info.variable=="_tone_0300_SBAWE32_sf2_file"){
 			this.volume.gain.setValueAtTime(0.99, this.audioContext.currentTime+0.002);

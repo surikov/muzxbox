@@ -336,7 +336,7 @@ class CommandDispatcher {
 		//console.log('stopPlay done', this.player.playState());
 	}
 	setupAndStartPlay() {
-		//console.log('setupAndStartPlay');
+		console.log('setupAndStartPlay');
 		//this.onAir = true;
 		let schedule = this.renderCurrentProjectForOutput();
 		let from = 0;
@@ -374,22 +374,24 @@ class CommandDispatcher {
 		}
 	}
 	startPlayLoop(from: number, position: number, to: number) {
-		//console.log('startPlayLoop', from, position, to);
+		console.log('startPlayLoop', from, position, to);
 		//if (this.neeToStart) {
 		let me = this;
 		//let n120 = 120 / 60;
 		let msg: string = me.player.startLoopTicks(from, position, to);
 		if (msg) {
 			//me.onAir = false;
-			//console.log('toggleStartStop cancel', msg);
+			console.log('startLoopTicks', msg);
 			me.renderer.warning.showWarning('Start playing', 'Loading...', 'Wait for ' + msg, () => {
-				console.log('cancel wait spart loop');
+				console.log('cancel wait start loop');
 				//me.neeToStart = false;
 				//me.onAir = false;
 			});
+			/*
 			let id = setTimeout(() => {
 				me.startPlayLoop(from, position, to);
 			}, 1000);
+*/
 			//console.log('wait',id);
 		} else {
 			//console.log('startPlayLoop done', from, position, to, me.player.playState());

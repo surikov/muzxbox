@@ -125,19 +125,25 @@ class SchedulePlayer {
         return this.performers;
     }
     launchCollectedPlugins() {
-        for (let ff = 0; ff < this.filters.length; ff++) {
-            let plugin = this.filters[ff].plugin;
-            if (plugin) {
-                plugin.launch(this.audioContext, this.filters[ff].properties);
+        try {
+            for (let ff = 0; ff < this.filters.length; ff++) {
+                let plugin = this.filters[ff].plugin;
+                if (plugin) {
+                    plugin.launch(this.audioContext, this.filters[ff].properties);
+                }
             }
-        }
-        for (let pp = 0; pp < this.performers.length; pp++) {
-            let plugin = this.performers[pp].plugin;
-            if (plugin) {
-                plugin.launch(this.audioContext, this.performers[pp].properties);
+            for (let pp = 0; pp < this.performers.length; pp++) {
+                let plugin = this.performers[pp].plugin;
+                if (plugin) {
+                    plugin.launch(this.audioContext, this.performers[pp].properties);
+                }
             }
+            return null;
         }
-        return null;
+        catch (xx) {
+            console.log('Can not launch due', xx);
+            return 'Can not launch due ' + xx;
+        }
     }
     checkCollectedPlugins() {
         for (let ff = 0; ff < this.filters.length; ff++) {
@@ -168,19 +174,27 @@ class SchedulePlayer {
         this.disconnectAllPlugins();
         this.schedule = schedule;
         let msg = this.connectAllPlugins();
+        console.log('reconnectAllPlugins', msg, schedule);
     }
     startLoopTicks(loopStart, currentPosition, loopEnd) {
+        console.log('startLoopTicks', loopStart, currentPosition, loopEnd);
         let msg = this.connectAllPlugins();
         if (msg) {
             return msg;
         }
         else {
-            this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
-            this.position = currentPosition;
-            this.isPlayLoop = true;
-            this.waitForID = Math.random();
-            this.tick(loopStart, loopEnd, this.waitForID);
-            return '';
+            if (this.audioContext) {
+                this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
+                this.position = currentPosition;
+                this.isPlayLoop = true;
+                this.waitForID = Math.random();
+                this.tick(loopStart, loopEnd, this.waitForID);
+                return '';
+            }
+            else {
+                this.cancel();
+                return 'Empty audio context';
+            }
         }
     }
     playState() {
@@ -191,13 +205,16 @@ class SchedulePlayer {
         };
     }
     connectAllPlugins() {
+        console.log('connectAllPlugins');
         if (!this.isConnected) {
             let msg = this.launchCollectedPlugins();
+            console.log('launchCollectedPlugins', msg);
             if (msg) {
                 return msg;
             }
             else {
                 msg = this.checkCollectedPlugins();
+                console.log('checkCollectedPlugins', msg);
                 if (msg) {
                     return msg;
                 }
@@ -329,41 +346,43 @@ class SchedulePlayer {
         }
     }
     tick(loopStart, loopEnd, waitId) {
-        if (waitId == this.waitForID) {
-            let sendFrom = this.position;
-            let sendTo = this.position + this.tickDuration;
-            if (this.audioContext.currentTime > this.nextAudioContextStart - this.tickDuration) {
-                let atTime = this.nextAudioContextStart;
-                if (sendTo > loopEnd) {
-                    this.sendPiece(sendFrom, loopEnd, atTime);
-                    atTime = atTime + (loopEnd - sendFrom);
-                    sendFrom = loopStart;
-                    sendTo = loopStart + (sendTo - loopEnd);
+        if (this.audioContext) {
+            if (waitId == this.waitForID) {
+                let sendFrom = this.position;
+                let sendTo = this.position + this.tickDuration;
+                if (this.audioContext.currentTime > this.nextAudioContextStart - this.tickDuration) {
+                    let atTime = this.nextAudioContextStart;
+                    if (sendTo > loopEnd) {
+                        this.sendPiece(sendFrom, loopEnd, atTime);
+                        atTime = atTime + (loopEnd - sendFrom);
+                        sendFrom = loopStart;
+                        sendTo = loopStart + (sendTo - loopEnd);
+                    }
+                    this.sendPiece(sendFrom, sendTo, atTime);
+                    this.position = sendTo;
+                    this.nextAudioContextStart = this.nextAudioContextStart + this.tickDuration;
+                    if (this.nextAudioContextStart < this.audioContext.currentTime) {
+                        this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
+                    }
+                    this.playCallback(loopStart, this.position, loopEnd);
                 }
-                this.sendPiece(sendFrom, sendTo, atTime);
-                this.position = sendTo;
-                this.nextAudioContextStart = this.nextAudioContextStart + this.tickDuration;
-                if (this.nextAudioContextStart < this.audioContext.currentTime) {
-                    this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
-                }
-                this.playCallback(loopStart, this.position, loopEnd);
-            }
-            let me = this;
-            if (this.isPlayLoop) {
-                if (this.waitForID == waitId) {
-                    this.waitForID = Math.random();
-                    let id = this.waitForID;
-                    window.requestAnimationFrame(function (time) {
-                        me.tick(loopStart, loopEnd, id);
-                    });
-                    this.waitForID = id;
+                let me = this;
+                if (this.isPlayLoop) {
+                    if (this.waitForID == waitId) {
+                        this.waitForID = Math.random();
+                        let id = this.waitForID;
+                        window.requestAnimationFrame(function (time) {
+                            me.tick(loopStart, loopEnd, id);
+                        });
+                        this.waitForID = id;
+                    }
+                    else {
+                        console.log('cancel ticks due different id');
+                    }
                 }
                 else {
-                    console.log('cancel ticks due different id');
+                    console.log('cancel ticks due stop');
                 }
-            }
-            else {
-                console.log('cancel ticks due stop');
             }
         }
     }

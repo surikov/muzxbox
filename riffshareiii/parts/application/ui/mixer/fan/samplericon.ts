@@ -148,7 +148,7 @@ class SamplerIcon {
 				, dots: [0, sz, sz * 2 * 0.8, sz, 0, sz * 2]
 				, css: 'fanSamplerInteractionIcon fanButton' + zidx
 				, activation: (x: number, y: number) => {
-					console.log('' + samplerTrack.sampler.kind + ':' + samplerTrack.sampler.id);
+					//console.log('' + samplerTrack.sampler.kind + ':' + samplerTrack.sampler.id);
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
 					//if (info) {
 						globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(order,samplerTrack, info);

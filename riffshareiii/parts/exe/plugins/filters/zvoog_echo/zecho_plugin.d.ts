@@ -45,6 +45,7 @@ declare type Zvoog_FilterTarget = {
         y: number;
     };
     state: 0 | 1;
+    title: string;
 };
 declare type Zvoog_AudioSequencer = {
     id: string;
@@ -94,13 +95,11 @@ declare type Zvoog_PercussionTrack = {
     title: string;
     measures: Zvoog_PercussionMeasure[];
     sampler: Zvoog_AudioSampler;
-    volume: number;
 };
 declare type Zvoog_MusicTrack = {
     title: string;
     measures: Zvoog_TrackMeasure[];
     performer: Zvoog_AudioSequencer;
-    volume: number;
 };
 declare type Zvoog_CommentText = {
     skip: Zvoog_Metre;
@@ -154,8 +153,6 @@ declare type Zvoog_Project = {
         z: number;
     };
     list: boolean;
-    undo: Zvoog_UICommand[];
-    redo: Zvoog_UICommand[];
 };
 declare type MZXBX_CachedWave = {
     path: string;
@@ -169,8 +166,8 @@ declare type MZXBX_FilterHolder = {
     kind: string;
     properties: string;
 };
-declare type MZXBX_PerformerHolder = {
-    plugin: MZXBX_AudioPerformerPlugin | null;
+declare type MZXBX_PerformerSamplerHolder = {
+    plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null;
     channelId: string;
     kind: string;
     properties: string;
@@ -210,14 +207,14 @@ declare type MZXBX_Filter = {
 declare type MZXBX_AudioFilterPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
-    schedule: (when: number, parameters: string) => void;
+    schedule: (when: number, tempo: number, parameters: string) => void;
     input: () => AudioNode | null;
     output: () => AudioNode | null;
 };
 declare type MZXBX_AudioSamplerPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
-    schedule: (when: number) => void;
+    start: (when: number, tempo: number) => void;
     cancel: () => void;
     output: () => AudioNode | null;
     duration: () => number;
@@ -229,7 +226,7 @@ declare type MZXBX_ChannelSource = {
 declare type MZXBX_AudioPerformerPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
     busy: () => null | string;
-    schedule: (when: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]) => void;
+    strum: (when: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
     output: () => AudioNode | null;
 };
@@ -239,13 +236,18 @@ declare type MZXBX_Schedule = {
     filters: MZXBX_Filter[];
 };
 declare type MZXBX_Player = {
-    setupPlugins: (context: AudioContext, schedule: MZXBX_Schedule, onDone: () => void) => string | null;
-    startLoop: (from: number, position: number, to: number) => string;
+    startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
+    startLoopTicks: (from: number, position: number, to: number) => string;
     reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];
-    allPerformers(): MZXBX_PerformerHolder[];
+    allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
     position: number;
+    playState(): {
+        connected: boolean;
+        play: boolean;
+        loading: boolean;
+    };
 };
 declare type MZXBX_PluginRegistrationInformation = {
     label: string;
@@ -268,6 +270,7 @@ declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string
 declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
+declare let cachedEchoOluginAudioBufferIRR: AudioBuffer | null;
 declare class ZEchoImplementation implements MZXBX_AudioFilterPlugin {
     irrRaw: string;
     audioContext: AudioContext;
@@ -279,10 +282,12 @@ declare class ZEchoImplementation implements MZXBX_AudioFilterPlugin {
     irrArrayBuffer: ArrayBuffer;
     status: string | null;
     num: number;
+    constructor();
     createAll(context: AudioContext, parameters: string): void;
+    resetBuffer(parameters: string): void;
     launch(context: AudioContext, parameters: string): void;
     busy(): null | string;
-    schedule(when: number, parameters: string): void;
+    schedule(when: number, tempo: number, parameters: string): void;
     input(): AudioNode | null;
     output(): AudioNode | null;
 }

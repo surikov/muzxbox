@@ -72,7 +72,7 @@ class SequencerPluginDialog {
 		globalCommandDispatcher.reConnectPluginsIfPlay();
 	}
 	openSequencerPluginDialogFrame(order: number, track: Zvoog_MusicTrack, trackPlugin: null|MZXBX_PluginRegistrationInformation) {
-		console.log('openSequencerPluginDialogFrame',order, track, trackPlugin);
+		//console.log('openSequencerPluginDialogFrame',order, track, trackPlugin);
 		this.track = track;
 		this.order = order;
 		this.pluginRawData = track.performer.data;

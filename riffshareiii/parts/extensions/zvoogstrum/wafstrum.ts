@@ -478,7 +478,7 @@ class ZS_WebAudioFontLoader {
 				return i;
 			}
 		}
-		console.log('program', program, 'not found');
+		console.log('program', program, 'not found set 0');
 		return 0;
 	};
 

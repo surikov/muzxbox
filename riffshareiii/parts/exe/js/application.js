@@ -537,7 +537,6 @@ class SamplerPluginDialog {
         globalCommandDispatcher.reConnectPluginsIfPlay();
     }
     openDrumPluginDialogFrame(order, drum, fplugin) {
-        console.log('openDrumPluginDialogFrame', order, drum, fplugin);
         this.drum = drum;
         this.order = order;
         this.pluginRawData = drum.sampler.data;
@@ -766,7 +765,6 @@ class SequencerPluginDialog {
         globalCommandDispatcher.reConnectPluginsIfPlay();
     }
     openSequencerPluginDialogFrame(order, track, trackPlugin) {
-        console.log('openSequencerPluginDialogFrame', order, track, trackPlugin);
         this.track = track;
         this.order = order;
         this.pluginRawData = track.performer.data;
@@ -1353,6 +1351,7 @@ class CommandDispatcher {
         this.resetProject();
     }
     setupAndStartPlay() {
+        console.log('setupAndStartPlay');
         let schedule = this.renderCurrentProjectForOutput();
         let from = 0;
         let to = 0;
@@ -1385,15 +1384,14 @@ class CommandDispatcher {
         }
     }
     startPlayLoop(from, position, to) {
+        console.log('startPlayLoop', from, position, to);
         let me = this;
         let msg = me.player.startLoopTicks(from, position, to);
         if (msg) {
+            console.log('startLoopTicks', msg);
             me.renderer.warning.showWarning('Start playing', 'Loading...', 'Wait for ' + msg, () => {
-                console.log('cancel wait spart loop');
+                console.log('cancel wait start loop');
             });
-            let id = setTimeout(() => {
-                me.startPlayLoop(from, position, to);
-            }, 1000);
         }
         else {
             me.renderer.warning.hideWarning();
@@ -3116,7 +3114,7 @@ class LeftPanel {
                 for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
                     let filter = globalCommandDispatcher.cfg().data.filters[ff];
                     let autoLabel = {
-                        text: '' + filter.id,
+                        text: '' + filter.title,
                         x: 0,
                         y: globalCommandDispatcher.cfg().automationTop()
                             + (1 + ff) * globalCommandDispatcher.cfg().autoPointHeight
@@ -4610,7 +4608,6 @@ class SamplerIcon {
                 dots: [0, sz, sz * 2 * 0.8, sz, 0, sz * 2],
                 css: 'fanSamplerInteractionIcon fanButton' + zidx,
                 activation: (x, y) => {
-                    console.log('' + samplerTrack.sampler.kind + ':' + samplerTrack.sampler.id);
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
                     globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(order, samplerTrack, info);
                 }

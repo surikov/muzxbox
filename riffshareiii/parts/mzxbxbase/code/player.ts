@@ -48,19 +48,28 @@ class SchedulePlayer implements MZXBX_Player {
 		return this.performers;
 	}
 	launchCollectedPlugins(): null | string {
-		for (let ff = 0; ff < this.filters.length; ff++) {
-			let plugin: MZXBX_AudioFilterPlugin | null = this.filters[ff].plugin;
-			if (plugin) {
-				plugin.launch(this.audioContext, this.filters[ff].properties);
+		try {
+			//
+			for (let ff = 0; ff < this.filters.length; ff++) {
+				//console.log('launch filter',ff,this.filters[ff]);
+				let plugin: MZXBX_AudioFilterPlugin | null = this.filters[ff].plugin;
+				
+				if (plugin) {
+					plugin.launch(this.audioContext, this.filters[ff].properties);
+				}
 			}
-		}
-		for (let pp = 0; pp < this.performers.length; pp++) {
-			let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performers[pp].plugin;
-			if (plugin) {
-				plugin.launch(this.audioContext, this.performers[pp].properties);
+			for (let pp = 0; pp < this.performers.length; pp++) {
+				//console.log('launch performer',pp,this.performers[pp]);
+				let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performers[pp].plugin;
+				if (plugin) {
+					plugin.launch(this.audioContext, this.performers[pp].properties);
+				}
 			}
+			return null;
+		} catch (xx) {
+			console.log('Can not launch due',xx);
+			return 'Can not launch due ' + xx;
 		}
-		return null;
 	}
 	checkCollectedPlugins(): null | string {
 		for (let ff = 0; ff < this.filters.length; ff++) {
@@ -89,22 +98,27 @@ class SchedulePlayer implements MZXBX_Player {
 		this.disconnectAllPlugins();
 		this.schedule = schedule;
 		let msg = this.connectAllPlugins();
-		//console.log('reconnectAllPlugins', msg, schedule);
+		console.log('reconnectAllPlugins', msg, schedule);
 	}
 	startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number): string {
-		//console.log('startLoopTicks', loopStart, currentPosition, loopEnd);
+		console.log('startLoopTicks', loopStart, currentPosition, loopEnd);
 		let msg: string | null = this.connectAllPlugins();
 		if (msg) {
 			//console.log('Can\'t start loop:', msg);
 			return msg;
 		} else {
-			this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
-			this.position = currentPosition;
-			this.isPlayLoop = true;
-			//this.onAir = true;
-			this.waitForID = Math.random();
-			this.tick(loopStart, loopEnd, this.waitForID);
-			return '';
+			if (this.audioContext) {
+				this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
+				this.position = currentPosition;
+				this.isPlayLoop = true;
+				//this.onAir = true;
+				this.waitForID = Math.random();
+				this.tick(loopStart, loopEnd, this.waitForID);
+				return '';
+			} else {
+				this.cancel();
+				return 'Empty audio context';
+			}
 		}
 	}
 	playState(): { connected: boolean, play: boolean, loading: boolean } {
@@ -115,13 +129,15 @@ class SchedulePlayer implements MZXBX_Player {
 		};
 	}
 	connectAllPlugins(): string | null {
-		//console.log('connectAllPlugins');
+		console.log('connectAllPlugins');
 		if (!this.isConnected) {
 			let msg: string | null = this.launchCollectedPlugins();
+			console.log('launchCollectedPlugins',msg);
 			if (msg) {
 				return msg;
 			} else {
 				msg = this.checkCollectedPlugins();
+				console.log('checkCollectedPlugins',msg);
 				if (msg) {
 					return msg;
 				} else {
@@ -251,41 +267,43 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 	}
 	tick(loopStart: number, loopEnd: number, waitId: number) {
-		if (waitId == this.waitForID) {
-			let sendFrom = this.position;
-			let sendTo = this.position + this.tickDuration;
-			if (this.audioContext.currentTime > this.nextAudioContextStart - this.tickDuration) {
-				let atTime = this.nextAudioContextStart;
-				if (sendTo > loopEnd) {
-					this.sendPiece(sendFrom, loopEnd, atTime);
-					atTime = atTime + (loopEnd - sendFrom);
-					sendFrom = loopStart;
-					sendTo = loopStart + (sendTo - loopEnd);
+		if (this.audioContext) {
+			if (waitId == this.waitForID) {
+				let sendFrom = this.position;
+				let sendTo = this.position + this.tickDuration;
+				if (this.audioContext.currentTime > this.nextAudioContextStart - this.tickDuration) {
+					let atTime = this.nextAudioContextStart;
+					if (sendTo > loopEnd) {
+						this.sendPiece(sendFrom, loopEnd, atTime);
+						atTime = atTime + (loopEnd - sendFrom);
+						sendFrom = loopStart;
+						sendTo = loopStart + (sendTo - loopEnd);
+					}
+					this.sendPiece(sendFrom, sendTo, atTime);
+					this.position = sendTo;
+					this.nextAudioContextStart = this.nextAudioContextStart + this.tickDuration;
+					if (this.nextAudioContextStart < this.audioContext.currentTime) {
+						this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
+					}
+					this.playCallback(loopStart, this.position, loopEnd);
 				}
-				this.sendPiece(sendFrom, sendTo, atTime);
-				this.position = sendTo;
-				this.nextAudioContextStart = this.nextAudioContextStart + this.tickDuration;
-				if (this.nextAudioContextStart < this.audioContext.currentTime) {
-					this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
-				}
-				this.playCallback(loopStart, this.position, loopEnd);
-			}
-			let me = this;
-			if (this.isPlayLoop) {
-				if (this.waitForID == waitId) {
-					this.waitForID = Math.random();
-					let id = this.waitForID;
-					window.requestAnimationFrame(function (time) {
-						me.tick(loopStart, loopEnd, id);
-					});
-					this.waitForID = id;
+				let me = this;
+				if (this.isPlayLoop) {
+					if (this.waitForID == waitId) {
+						this.waitForID = Math.random();
+						let id = this.waitForID;
+						window.requestAnimationFrame(function (time) {
+							me.tick(loopStart, loopEnd, id);
+						});
+						this.waitForID = id;
+					} else {
+						console.log('cancel ticks due different id');
+					}
+					//} else {
+					//this.disconnectAllPlugins();
 				} else {
-					console.log('cancel ticks due different id');
+					console.log('cancel ticks due stop');
 				}
-				//} else {
-				//this.disconnectAllPlugins();
-			} else {
-				console.log('cancel ticks due stop');
 			}
 		}
 	}

@@ -72,7 +72,7 @@ class SamplerPluginDialog {
 		globalCommandDispatcher.reConnectPluginsIfPlay();
 	}
 	openDrumPluginDialogFrame(order: number, drum: Zvoog_PercussionTrack, fplugin: null|MZXBX_PluginRegistrationInformation) {
-		console.log('openDrumPluginDialogFrame',order, drum, fplugin);
+		//console.log('openDrumPluginDialogFrame',order, drum, fplugin);
 		this.drum = drum;
 		this.order = order;
 		this.pluginRawData = drum.sampler.data;

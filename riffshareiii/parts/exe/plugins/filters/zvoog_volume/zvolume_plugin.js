@@ -15,6 +15,11 @@ class ZVolImplementation {
     schedule(when, tempo, parameters) {
         this.volume.gain.setValueAtTime(this.num / 100, when);
         this.num = parseInt(parameters);
+        this.num = (this.num) ? this.num : 0;
+        if (this.num < 0)
+            this.num = 0;
+        if (this.num > 100)
+            this.num = 100;
         this.volume.gain.linearRampToValueAtTime(this.num / 100, when + 0.001);
     }
     input() {

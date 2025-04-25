@@ -95,13 +95,11 @@ declare type Zvoog_PercussionTrack = {
     title: string;
     measures: Zvoog_PercussionMeasure[];
     sampler: Zvoog_AudioSampler;
-    volume: number;
 };
 declare type Zvoog_MusicTrack = {
     title: string;
     measures: Zvoog_TrackMeasure[];
     performer: Zvoog_AudioSequencer;
-    volume: number;
 };
 declare type Zvoog_CommentText = {
     skip: Zvoog_Metre;
@@ -155,8 +153,6 @@ declare type Zvoog_Project = {
         z: number;
     };
     list: boolean;
-    undo: Zvoog_UICommand[];
-    redo: Zvoog_UICommand[];
 };
 declare type MZXBX_CachedWave = {
     path: string;

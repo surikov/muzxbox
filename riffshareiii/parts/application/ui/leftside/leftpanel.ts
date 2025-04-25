@@ -140,7 +140,7 @@ class LeftPanel {
 					let filter = globalCommandDispatcher.cfg().data.filters[ff];
 					//if (filter.automation) {
 					let autoLabel: TileText = {
-						text: '' + filter.id
+						text: '' + filter.title
 						, x: 0
 						, y: globalCommandDispatcher.cfg().automationTop()
 							+ (1 + ff) * globalCommandDispatcher.cfg().autoPointHeight
