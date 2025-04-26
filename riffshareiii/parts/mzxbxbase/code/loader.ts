@@ -1,17 +1,17 @@
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 class PluginLoader {
-	collectLoadPlugins(schedule: MZXBX_Schedule, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[]): null | string {
+	collectLoadPlugins(schedule: MZXBX_Schedule, allfilters: MZXBX_FilterHolder[], allperformers: MZXBX_PerformerSamplerHolder[]): null | string {
 		
 		for (let ff = 0; ff < schedule.filters.length; ff++) {
 			let filter: MZXBX_Filter = schedule.filters[ff];
-			this.сollectFilterPlugin(filter.id, filter.kind, filter.properties, filters);
+			this.сollectFilterPlugin(filter.id, filter.kind, filter.properties,filter.description, allfilters);
 		}
 		for (let ch = 0; ch < schedule.channels.length; ch++) {
 			let performer: MZXBX_ChannelSource = schedule.channels[ch].performer;
 			let chanid = schedule.channels[ch].id;
-			this.сollectPerformerPlugin(chanid, performer.kind, performer.properties, performers);
+			this.сollectPerformerPlugin(chanid, performer.kind, performer.properties, performer.description,allperformers);
 		}
-		let result = this.startLoadCollectedPlugins(filters, performers);
+		let result = this.startLoadCollectedPlugins(allfilters, allperformers);
 		//afterStart();
 		return result;
 	}
@@ -66,23 +66,23 @@ class PluginLoader {
 			return 'Not found registration for ' + kind;
 		}
 	}
-	сollectFilterPlugin(id: string, kind: string, properties: string, filters: MZXBX_FilterHolder[]): void {
+	сollectFilterPlugin(id: string, kind: string, properties: string, description: string, filters: MZXBX_FilterHolder[]): void {
 		for (let ii = 0; ii < filters.length; ii++) {
 			if (filters[ii].filterId == id) {
 				filters[ii].properties = properties;
 				return;
 			}
 		}
-		filters.push({ plugin: null, filterId: id, kind: kind, properties: properties });
+		filters.push({ plugin: null, filterId: id, kind: kind, properties: properties ,description:description});
 	}
-	сollectPerformerPlugin(id: string, kind: string, properties: string, performers: MZXBX_PerformerSamplerHolder[]): void {
+	сollectPerformerPlugin(id: string, kind: string, properties: string, description: string, performers: MZXBX_PerformerSamplerHolder[]): void {
 		for (let ii = 0; ii < performers.length; ii++) {
 			if (performers[ii].channelId == id) {
 				performers[ii].properties = properties;
 				return;
 			}
 		}
-		performers.push({ plugin: null, channelId: id, kind: kind, properties: properties });
+		performers.push({ plugin: null, channelId: id, kind: kind, properties: properties ,description:description});
 	}
 	findPluginInfo(kind: string): MZXBX_PluginRegistrationInformation | null {
 		for (let ll = 0; ll < MZXBX_currentPlugins().length; ll++) {

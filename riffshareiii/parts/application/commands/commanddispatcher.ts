@@ -193,6 +193,7 @@ class CommandDispatcher {
 					//id: sampler.sampler.id
 					kind: sampler.sampler.kind
 					, properties: sampler.sampler.data
+					,description:'sampler '+sampler.title
 				}
 			};
 			if (
@@ -215,6 +216,7 @@ class CommandDispatcher {
 					//id: track.performer.id
 					kind: track.performer.kind
 					, properties: track.performer.data
+					,description:'track '+track.title
 				}
 			};
 			if (
@@ -235,6 +237,7 @@ class CommandDispatcher {
 				, kind: filter.kind
 				, properties: filter.data
 				, outputs: []//filter.outputs
+				,description:'filter '+filter.title
 			}
 			if (filter.state == 1) {
 				//outFilter.outputs = [];

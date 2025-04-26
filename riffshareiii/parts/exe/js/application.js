@@ -1226,7 +1226,8 @@ class CommandDispatcher {
                 outputs: [],
                 performer: {
                     kind: sampler.sampler.kind,
-                    properties: sampler.sampler.data
+                    properties: sampler.sampler.data,
+                    description: 'sampler ' + sampler.title
                 }
             };
             if ((soloOnly && sampler.sampler.state != 2)
@@ -1244,7 +1245,8 @@ class CommandDispatcher {
                 outputs: [],
                 performer: {
                     kind: track.performer.kind,
-                    properties: track.performer.data
+                    properties: track.performer.data,
+                    description: 'track ' + track.title
                 }
             };
             if ((soloOnly && track.performer.state != 2)
@@ -1261,7 +1263,8 @@ class CommandDispatcher {
                 id: filter.id,
                 kind: filter.kind,
                 properties: filter.data,
-                outputs: []
+                outputs: [],
+                description: 'filter ' + filter.title
             };
             if (filter.state == 1) {
             }

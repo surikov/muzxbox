@@ -79,7 +79,8 @@ class SchedulePlayer implements MZXBX_Player {
 					return 'filter ' + this.filters[ff].filterId + ' ' + plugin.busy();
 				}
 			} else {
-				return 'empty plugin for filter ' + this.filters[ff].filterId;
+				console.log('no plugin for filter',this.filters[ff]);
+				return 'empty plugin for filter ' + this.filters[ff].description;
 			}
 		}
 		for (let pp = 0; pp < this.performers.length; pp++) {
@@ -89,7 +90,8 @@ class SchedulePlayer implements MZXBX_Player {
 					return 'performer/sampler ' + this.performers[pp].channelId + ' ' + plugin.busy();
 				}
 			} else {
-				return 'empty performer/sampler ' + this.performers[pp];
+				console.log('no plugin for performer/sampler',this.performers[pp]);
+				return 'empty performer/sampler ' + this.performers[pp].description;
 			}
 		}
 		return null;

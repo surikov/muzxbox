@@ -154,7 +154,8 @@ class SchedulePlayer {
                 }
             }
             else {
-                return 'empty plugin for filter ' + this.filters[ff].filterId;
+                console.log('no plugin for filter', this.filters[ff]);
+                return 'empty plugin for filter ' + this.filters[ff].description;
             }
         }
         for (let pp = 0; pp < this.performers.length; pp++) {
@@ -165,7 +166,8 @@ class SchedulePlayer {
                 }
             }
             else {
-                return 'empty performer/sampler ' + this.performers[pp];
+                console.log('no plugin for performer/sampler', this.performers[pp]);
+                return 'empty performer/sampler ' + this.performers[pp].description;
             }
         }
         return null;
@@ -485,17 +487,17 @@ class SchedulePlayer {
     }
 }
 class PluginLoader {
-    collectLoadPlugins(schedule, filters, performers) {
+    collectLoadPlugins(schedule, allfilters, allperformers) {
         for (let ff = 0; ff < schedule.filters.length; ff++) {
             let filter = schedule.filters[ff];
-            this.сollectFilterPlugin(filter.id, filter.kind, filter.properties, filters);
+            this.сollectFilterPlugin(filter.id, filter.kind, filter.properties, filter.description, allfilters);
         }
         for (let ch = 0; ch < schedule.channels.length; ch++) {
             let performer = schedule.channels[ch].performer;
             let chanid = schedule.channels[ch].id;
-            this.сollectPerformerPlugin(chanid, performer.kind, performer.properties, performers);
+            this.сollectPerformerPlugin(chanid, performer.kind, performer.properties, performer.description, allperformers);
         }
-        let result = this.startLoadCollectedPlugins(filters, performers);
+        let result = this.startLoadCollectedPlugins(allfilters, allperformers);
         return result;
     }
     startLoadCollectedPlugins(filters, performers) {
@@ -543,23 +545,23 @@ class PluginLoader {
             return 'Not found registration for ' + kind;
         }
     }
-    сollectFilterPlugin(id, kind, properties, filters) {
+    сollectFilterPlugin(id, kind, properties, description, filters) {
         for (let ii = 0; ii < filters.length; ii++) {
             if (filters[ii].filterId == id) {
                 filters[ii].properties = properties;
                 return;
             }
         }
-        filters.push({ plugin: null, filterId: id, kind: kind, properties: properties });
+        filters.push({ plugin: null, filterId: id, kind: kind, properties: properties, description: description });
     }
-    сollectPerformerPlugin(id, kind, properties, performers) {
+    сollectPerformerPlugin(id, kind, properties, description, performers) {
         for (let ii = 0; ii < performers.length; ii++) {
             if (performers[ii].channelId == id) {
                 performers[ii].properties = properties;
                 return;
             }
         }
-        performers.push({ plugin: null, channelId: id, kind: kind, properties: properties });
+        performers.push({ plugin: null, channelId: id, kind: kind, properties: properties, description: description });
     }
     findPluginInfo(kind) {
         for (let ll = 0; ll < MZXBX_currentPlugins().length; ll++) {

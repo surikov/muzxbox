@@ -218,14 +218,14 @@ type MZXBX_FilterHolder = {
 	, filterId: string
 	, kind: string
 	, properties: string
-	//, launched: boolean
+	, description: string
 };
 type MZXBX_PerformerSamplerHolder = {
 	plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null
 	, channelId: string
 	, kind: string
 	, properties: string
-	//, launched: boolean
+	, description: string
 };
 type MZXBX_Channel = {
 	id: string;
@@ -260,6 +260,7 @@ type MZXBX_Filter = {
 	kind: string;
 	properties: string;
 	outputs: string[];
+	description:string;
 };
 type MZXBX_AudioFilterPlugin = {
 	launch: (context: AudioContext, parameters: string) => void;
@@ -288,6 +289,7 @@ type MZXBX_ChannelSource = {
 	//id: string;
 	kind: string;
 	properties: string;
+	description:string;
 };
 
 type MZXBX_AudioPerformerPlugin = {
