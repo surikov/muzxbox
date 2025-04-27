@@ -1371,27 +1371,26 @@ class CommandDispatcher {
                 to = to + schedule.series[nn].duration;
             }
         }
-        let me = this;
-        let result = me.player.startSetupPlugins(me.audioContext, schedule);
+        let result = this.player.startSetupPlugins(this.audioContext, schedule);
         if (this.playPosition < from) {
             this.playPosition = from;
         }
         if (this.playPosition >= to) {
             this.playPosition = to;
         }
-        me.startPlayLoop(from, this.playPosition, to);
         if (result != null) {
-            me.renderer.warning.showWarning('Start playing', result, 'Loading...', null);
+            this.renderer.warning.showWarning('Start playing', result, 'Loading...', null);
         }
         else {
         }
+        this.startPlayLoop(from, this.playPosition, to);
     }
     startPlayLoop(from, position, to) {
         console.log('startPlayLoop', from, position, to);
         let me = this;
         let msg = me.player.startLoopTicks(from, position, to);
         if (msg) {
-            console.log('startLoopTicks', msg);
+            console.log('startPlayLoop', msg);
             me.renderer.warning.showWarning('Start playing', 'Loading...', 'Wait for ' + msg, () => {
                 console.log('cancel wait start loop');
             });
@@ -5140,11 +5139,19 @@ class DebugLayerUI {
     }
 }
 class WarningUI {
+    constructor() {
+        this.noWarning = true;
+    }
     cancel() {
-        this.hideWarning();
+        console.log('warning cancel', this.onCancel, (typeof this.onCancel));
         if (this.onCancel) {
+            console.log('warning start onCancel');
             this.onCancel();
         }
+        else {
+            console.log('warning skip onCancel');
+        }
+        this.hideWarning();
     }
     ;
     initDialogUI() {
@@ -5212,10 +5219,12 @@ class WarningUI {
         this.warningSmallText.text = smallMsg;
         globalCommandDispatcher.renderer.tiler.resetAnchor(this.warningGroup, this.warningAnchor, LevelModes.overlay);
         document.getElementById("warningDialogGroup").style.visibility = "visible";
+        this.noWarning = false;
     }
     hideWarning() {
         document.getElementById("warningDialogGroup").style.visibility = "hidden";
         this.onCancel = null;
+        this.noWarning = true;
     }
 }
 function saveText2localStorage(name, text) {

@@ -16,11 +16,19 @@ class WarningUI {
 
 	onCancel: null | (() => void);
 
+	noWarning = true;
+
 	cancel() {
-		this.hideWarning();
-		if (this.onCancel) {
+		//console.log('warning cancel', this.onCancel,(typeof this.onCancel));
+		
+		if(this.onCancel){
+			//console.log('warning start onCancel');
 			this.onCancel();
+		} else {
+			//console.log('warning skip onCancel');
+			
 		}
+		this.hideWarning();
 	};
 	initDialogUI() {
 		let me = this;
@@ -34,7 +42,7 @@ class WarningUI {
 
 		this.warningTitle = { x: 0, y: 0, text: 'Play', css: 'warningTitle' };
 		this.warningDescription = { x: 0, y: 0, text: 'Controls:', css: 'warningDescription' };
-		this.warningSmallText= { x: 0, y: 0, text: 'Use mouse or touchpad to move and zoom piano roll', css: 'warningSmallText' };
+		this.warningSmallText = { x: 0, y: 0, text: 'Use mouse or touchpad to move and zoom piano roll', css: 'warningSmallText' };
 		this.warningGroup = (document.getElementById("warningDialogGroup") as any) as SVGElement;
 		this.warningRectangle = {
 			x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: () => {
@@ -75,7 +83,7 @@ class WarningUI {
 		this.warningDescription.y = hh / 3 + 2.5;
 
 		this.warningSmallText.x = ww / 2;
-		this.warningSmallText.y = hh / 3 + 2.5+0.5;
+		this.warningSmallText.y = hh / 3 + 2.5 + 0.5;
 
 		//console.log('debugLayer',this.debugLayer);
 		this.warningInfo1.x = ww / 2 - 3;
@@ -91,7 +99,7 @@ class WarningUI {
 	allLayers(): TileLayerDefinition[] {
 		return [this.warningLayer];
 	}
-	showWarning(title: string, msg: string, smallMsg:string,onCancel: null | (() => void)) {
+	showWarning(title: string, msg: string, smallMsg: string, onCancel: null | (() => void)) {
 		//console.log('WarningUI show', title, msg);
 		this.onCancel = onCancel;
 		this.warningTitle.text = title;
@@ -99,10 +107,12 @@ class WarningUI {
 		this.warningSmallText.text = smallMsg;
 		globalCommandDispatcher.renderer.tiler.resetAnchor(this.warningGroup, this.warningAnchor, LevelModes.overlay);
 		(document.getElementById("warningDialogGroup") as any).style.visibility = "visible";
+		this.noWarning = false;
 	}
 	hideWarning() {
 		//console.log('WarningUI hide');
 		(document.getElementById("warningDialogGroup") as any).style.visibility = "hidden";
 		this.onCancel = null;
+		this.noWarning = true;
 	}
 }

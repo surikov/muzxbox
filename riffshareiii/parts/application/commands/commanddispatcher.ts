@@ -43,11 +43,11 @@ class CommandDispatcher {
 			reader.onload = (readerEvent) => {
 				var content = (readerEvent as any).target.result;
 				console.log(content);
-				let inf=JSON.parse(content);
+				let inf = JSON.parse(content);
 				console.log(inf);
 				MZXBX_currentPlugins().push(inf);
 				console.log(MZXBX_currentPlugins());
-				menuItemsData=null;
+				menuItemsData = null;
 				globalCommandDispatcher.renderer.menu.rerenderMenuContent(null);
 				globalCommandDispatcher.resetProject();
 			}
@@ -193,7 +193,7 @@ class CommandDispatcher {
 					//id: sampler.sampler.id
 					kind: sampler.sampler.kind
 					, properties: sampler.sampler.data
-					,description:'sampler '+sampler.title
+					, description: 'sampler ' + sampler.title
 				}
 			};
 			if (
@@ -216,7 +216,7 @@ class CommandDispatcher {
 					//id: track.performer.id
 					kind: track.performer.kind
 					, properties: track.performer.data
-					,description:'track '+track.title
+					, description: 'track ' + track.title
 				}
 			};
 			if (
@@ -237,7 +237,7 @@ class CommandDispatcher {
 				, kind: filter.kind
 				, properties: filter.data
 				, outputs: []//filter.outputs
-				,description:'filter '+filter.title
+				, description: 'filter ' + filter.title
 			}
 			if (filter.state == 1) {
 				//outFilter.outputs = [];
@@ -356,8 +356,8 @@ class CommandDispatcher {
 				to = to + schedule.series[nn].duration;
 			}
 		}
-		let me = this;
-		let result = me.player.startSetupPlugins(me.audioContext, schedule);
+		//let me = this;
+		let result = this.player.startSetupPlugins(this.audioContext, schedule);
 		//console.log('after setupPlugins');
 		//me.neeToStart = true;
 		if (this.playPosition < from) {
@@ -366,15 +366,17 @@ class CommandDispatcher {
 		if (this.playPosition >= to) {
 			this.playPosition = to;
 		}
-		me.startPlayLoop(from, this.playPosition, to);
+
 
 		if (result != null) {
 			//this.onAir = false;
 			//this.neeToStart = false;
-			me.renderer.warning.showWarning('Start playing', result, 'Loading...', null);
+			this.renderer.warning.showWarning('Start playing', result, 'Loading...', null);
 		} else {
 			//this.renderer.menu.rerenderMenuContent()
 		}
+
+		this.startPlayLoop(from, this.playPosition, to);
 	}
 	startPlayLoop(from: number, position: number, to: number) {
 		console.log('startPlayLoop', from, position, to);
@@ -384,12 +386,13 @@ class CommandDispatcher {
 		let msg: string = me.player.startLoopTicks(from, position, to);
 		if (msg) {
 			//me.onAir = false;
-			console.log('startLoopTicks', msg);
-			me.renderer.warning.showWarning('Start playing', 'Loading...', 'Wait for ' + msg, () => {
-				console.log('cancel wait start loop');
-				//me.neeToStart = false;
-				//me.onAir = false;
-			});
+			console.log('startPlayLoop', msg);
+
+			me.renderer.warning.showWarning('Start playing', 'Loading...', 'Wait for ' + msg//,null);
+				, () => {
+					console.log('cancel wait start loop');
+				});
+
 			/*
 			let id = setTimeout(() => {
 				me.startPlayLoop(from, position, to);

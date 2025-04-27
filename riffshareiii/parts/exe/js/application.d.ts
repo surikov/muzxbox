@@ -637,6 +637,7 @@ declare class WarningUI {
     warningDescription: TileText;
     warningSmallText: TileText;
     onCancel: null | (() => void);
+    noWarning: boolean;
     cancel(): void;
     initDialogUI(): void;
     resetDialogView(data: Zvoog_Project): void;
