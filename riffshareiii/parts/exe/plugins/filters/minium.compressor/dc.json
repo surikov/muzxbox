@@ -1,0 +1,8 @@
+{
+    "label": "Compressor"
+    , "purpose": "Filter"
+    , "kind": "miniumdcompressor1"
+    , "ui": "http://127.0.0.1:8080/ui/cmprui.html"
+    , "evaluate": "newBaseCompressor"
+    , "script": "http://127.0.0.1:8080/audio/compress.js"
+}

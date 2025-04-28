@@ -26,6 +26,38 @@ let _t_all_registerd_plugins_list = [
     {
         label: 'Zvoog Strum', purpose: 'Performer', kind: 'zvstrumming1', ui: './plugins/performers/zvoog_strum/strumui.html',
         evaluate: 'newZvoogStrumPerformerImplementation', script: './plugins/performers/zvoog_strum/zvoogstrum_plugin.js'
+    },
+    {
+        "label": "Compressor",
+        "purpose": "Filter",
+        "kind": "miniumdcompressor1",
+        "ui": "./plugins/filters/minium.compressor/ui/cmprui.html",
+        "evaluate": "newBaseCompressor",
+        "script": "./plugins/filters/minium.compressor/audio/compress.js"
+    },
+    {
+        "label": "Equalizer",
+        "purpose": "Filter",
+        "kind": "10band_equalizer1",
+        "ui": "./plugins/filters/minium.equalizer/ui/equi.html",
+        "evaluate": "new10bEqualizer",
+        "script": "./plugins/filters/minium.equalizer/audio/eqfilter.js"
+    },
+    {
+        "label": "Fader",
+        "purpose": "Filter",
+        "kind": "miniumfader1",
+        "ui": "./plugins/filters/minium.fader/ui/faderui.html",
+        "evaluate": "newBaseFader",
+        "script": "./plugins/filters/minium.fader/audio/faderaudio.js"
+    },
+    {
+        "label": "Echo",
+        "purpose": "Filter",
+        "kind": "miniumecho1",
+        "ui": "./plugins/filters/minium.reverberator/ui/echo.html",
+        "evaluate": "newBaseEcho",
+        "script": "./plugins/filters/minium.reverberator/audio/plugin.js"
     }
 ];
 function MZXBX_currentPlugins() {

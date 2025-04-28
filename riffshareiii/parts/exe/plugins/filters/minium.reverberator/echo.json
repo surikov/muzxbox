@@ -1,0 +1,8 @@
+{
+    "label": "Echo"
+    , "purpose": "Filter"
+    , "kind": "miniumecho1"
+    , "ui": "http://127.0.0.1:8080/ui/echo.html"
+    , "evaluate": "newBaseFader"
+    , "script": "http://127.0.0.1:8080/audio/plugin.js"
+}

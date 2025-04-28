@@ -95,13 +95,11 @@ declare type Zvoog_PercussionTrack = {
     title: string;
     measures: Zvoog_PercussionMeasure[];
     sampler: Zvoog_AudioSampler;
-    volume: number;
 };
 declare type Zvoog_MusicTrack = {
     title: string;
     measures: Zvoog_TrackMeasure[];
     performer: Zvoog_AudioSequencer;
-    volume: number;
 };
 declare type Zvoog_CommentText = {
     skip: Zvoog_Metre;
@@ -163,16 +161,18 @@ declare type MZXBX_CachedWave = {
     line100?: number[];
 };
 declare type MZXBX_FilterHolder = {
-    plugin: MZXBX_AudioFilterPlugin | null;
+    pluginAudioFilter: MZXBX_AudioFilterPlugin | null;
     filterId: string;
     kind: string;
     properties: string;
+    description: string;
 };
 declare type MZXBX_PerformerSamplerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null;
     channelId: string;
     kind: string;
     properties: string;
+    description: string;
 };
 declare type MZXBX_Channel = {
     id: string;
@@ -205,6 +205,7 @@ declare type MZXBX_Filter = {
     kind: string;
     properties: string;
     outputs: string[];
+    description: string;
 };
 declare type MZXBX_AudioFilterPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
@@ -224,6 +225,7 @@ declare type MZXBX_AudioSamplerPlugin = {
 declare type MZXBX_ChannelSource = {
     kind: string;
     properties: string;
+    description: string;
 };
 declare type MZXBX_AudioPerformerPlugin = {
     launch: (context: AudioContext, parameters: string) => void;

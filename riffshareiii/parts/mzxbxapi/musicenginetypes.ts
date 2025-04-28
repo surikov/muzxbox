@@ -214,7 +214,7 @@ type MZXBX_CachedWave = {
 	line100?: number[];
 };
 type MZXBX_FilterHolder = {
-	plugin: MZXBX_AudioFilterPlugin | null
+	pluginAudioFilter: MZXBX_AudioFilterPlugin | null
 	, filterId: string
 	, kind: string
 	, properties: string

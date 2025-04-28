@@ -14,6 +14,7 @@ class SchedulePlayer implements MZXBX_Player {
 	isPlayLoop: boolean = false;
 	isConnected: boolean = false;
 	isLoadingPlugins: boolean = false;
+
 	playCallback: (start: number, position: number, end: number) => void = (start: number, position: number, end: number) => { };
 	waitForID: number = -1;
 	constructor(callback: (start: number, position: number, end: number) => void) {
@@ -52,8 +53,8 @@ class SchedulePlayer implements MZXBX_Player {
 			//
 			for (let ff = 0; ff < this.filters.length; ff++) {
 				//console.log('launch filter',ff,this.filters[ff]);
-				let plugin: MZXBX_AudioFilterPlugin | null = this.filters[ff].plugin;
-				
+				let plugin: MZXBX_AudioFilterPlugin | null = this.filters[ff].pluginAudioFilter;
+
 				if (plugin) {
 					plugin.launch(this.audioContext, this.filters[ff].properties);
 				}
@@ -67,31 +68,34 @@ class SchedulePlayer implements MZXBX_Player {
 			}
 			return null;
 		} catch (xx) {
-			console.log('Can not launch due',xx);
+			console.log('Can not launch due', xx);
 			return 'Can not launch due ' + xx;
 		}
 	}
 	checkCollectedPlugins(): null | string {
 		for (let ff = 0; ff < this.filters.length; ff++) {
-			let plugin: MZXBX_AudioFilterPlugin | null = this.filters[ff].plugin;
+			//console.log(ff, this.filters[ff]);
+			let plugin: MZXBX_AudioFilterPlugin | null = this.filters[ff].pluginAudioFilter;
 			if (plugin) {
-				if (plugin.busy()) {
-					return 'filter ' + this.filters[ff].filterId + ' ' + plugin.busy();
+				let busyState = plugin.busy()
+				if (busyState) {
+					return busyState + ' [' + this.filters[ff].filterId + ']';
 				}
 			} else {
-				console.log('no plugin for filter',this.filters[ff]);
-				return 'empty plugin for filter ' + this.filters[ff].description;
+				console.log('no plugin for filter', this.filters[ff]);
+				return 'plugin not found [' + this.filters[ff].description + ']';
 			}
 		}
 		for (let pp = 0; pp < this.performers.length; pp++) {
 			let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performers[pp].plugin;
 			if (plugin) {
-				if (plugin.busy()) {
-					return 'performer/sampler ' + this.performers[pp].channelId + ' ' + plugin.busy();
+				let busyState = plugin.busy()
+				if (busyState) {
+					return busyState + ' [' + this.performers[pp].description + ' ]';
 				}
 			} else {
-				console.log('no plugin for performer/sampler',this.performers[pp]);
-				return 'empty performer/sampler ' + this.performers[pp].description;
+				console.log('no plugin for performer/sampler', this.performers[pp]);
+				return 'plugin not found [' + this.performers[pp].description + ']';
 			}
 		}
 		return null;
@@ -134,18 +138,19 @@ class SchedulePlayer implements MZXBX_Player {
 		console.log('connectAllPlugins');
 		if (!this.isConnected) {
 			let msg: string | null = this.launchCollectedPlugins();
-			console.log('launchCollectedPlugins',msg);
+			console.log('launchCollectedPlugins', msg);
 			if (msg) {
 				return msg;
 			} else {
 				msg = this.checkCollectedPlugins();
-				console.log('checkCollectedPlugins',msg);
+				console.log('checkCollectedPlugins', msg);
 				if (msg) {
 					return msg;
 				} else {
 					if (this.schedule) {
 						let master: AudioNode = this.audioContext.destination;
 						for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
+
 							let filter = this.schedule.filters[ff];
 							let plugin = this.findFilterPlugin(filter.id);
 							if (plugin) {
@@ -348,8 +353,8 @@ class SchedulePlayer implements MZXBX_Player {
 			for (let nn = 0; nn < this.filters.length; nn++) {
 				let filter = this.filters[nn];
 				if (filter.filterId == filterId) {
-					if (filter.plugin) {
-						let plugin: MZXBX_AudioFilterPlugin = filter.plugin;
+					if (filter.pluginAudioFilter) {
+						let plugin: MZXBX_AudioFilterPlugin = filter.pluginAudioFilter;
 						if (plugin) {
 							return plugin;
 						}
@@ -357,6 +362,7 @@ class SchedulePlayer implements MZXBX_Player {
 				}
 			}
 		}
+		console.log('not found filter', filterId);
 		return null;
 	}
 	sendFilterItem(state: MZXBX_FilterState, whenAudio: number, tempo: number) {

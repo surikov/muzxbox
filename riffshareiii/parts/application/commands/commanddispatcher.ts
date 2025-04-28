@@ -381,31 +381,43 @@ class CommandDispatcher {
 	startPlayLoop(from: number, position: number, to: number) {
 		console.log('startPlayLoop', from, position, to);
 		//if (this.neeToStart) {
-		let me = this;
+		//let me = this;
 		//let n120 = 120 / 60;
-		let msg: string = me.player.startLoopTicks(from, position, to);
+		let msg: string = this.player.startLoopTicks(from, position, to);
 		if (msg) {
 			//me.onAir = false;
-			console.log('startPlayLoop', msg);
+			console.log('startPlayLoop', msg, this.renderer.warning.noWarning);
+			/*if (this.renderer.warning.noWarning) {
+				//
+			} else {
+				let me = this;
+				let id = setTimeout(() => {
+					me.startPlayLoop(from, position, to);
+				}, 1000);
+				console.log('setTimeout',id);
+			}*/
 
-			me.renderer.warning.showWarning('Start playing', 'Loading...', 'Wait for ' + msg//,null);
+			this.renderer.warning.showWarning('Start playing', 'Loading...', '' + msg//,null);
 				, () => {
 					console.log('cancel wait start loop');
 				});
 
-			/*
+			let me = this;
 			let id = setTimeout(() => {
-				me.startPlayLoop(from, position, to);
+				if (!me.renderer.warning.noWarning) {
+					me.startPlayLoop(from, position, to);
+				}
+
 			}, 1000);
-*/
+
 			//console.log('wait',id);
 		} else {
 			//console.log('startPlayLoop done', from, position, to, me.player.playState());
 			//me.neeToStart = false;
-			me.renderer.warning.hideWarning();
+			this.renderer.warning.hideWarning();
 
-			me.renderer.menu.rerenderMenuContent(null);
-			me.resetProject();
+			this.renderer.menu.rerenderMenuContent(null);
+			this.resetProject();
 			//console.log('startPlayLoop done', from, position, to, me.player.playState());
 		}
 		//}

@@ -17,10 +17,10 @@ class PluginLoader {
 	}
 	startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[]): null | string {
 		for (let ff = 0; ff < filters.length; ff++) {
-			if (!(filters[ff].plugin)) {
+			if (!(filters[ff].pluginAudioFilter)) {
 				let result = this.startLoadPluginStarter(filters[ff].kind, filters, performers
 					, (plugin) => {
-						filters[ff].plugin = plugin;
+						filters[ff].pluginAudioFilter = plugin;
 					});
 				if (result != null) {
 					return result;
@@ -46,9 +46,11 @@ class PluginLoader {
 		let tt: MZXBX_PluginRegistrationInformation | null = this.findPluginInfo(kind);
 		if (tt) {
 			let info: MZXBX_PluginRegistrationInformation = tt;
+			//console.log(info);
 			MZXBX_appendScriptURL(info.script);
 			MZXBX_waitForCondition(250
 				, () => {
+					//console.log('check evaluate',Math.random(),info);
 					return (window[info.evaluate]);
 				}
 				, () => {
@@ -73,7 +75,7 @@ class PluginLoader {
 				return;
 			}
 		}
-		filters.push({ plugin: null, filterId: id, kind: kind, properties: properties ,description:description});
+		filters.push({ pluginAudioFilter: null, filterId: id, kind: kind, properties: properties ,description:description});
 	}
 	сollectPerformerPlugin(id: string, kind: string, properties: string, description: string, performers: MZXBX_PerformerSamplerHolder[]): void {
 		for (let ii = 0; ii < performers.length; ii++) {

@@ -1387,18 +1387,23 @@ class CommandDispatcher {
     }
     startPlayLoop(from, position, to) {
         console.log('startPlayLoop', from, position, to);
-        let me = this;
-        let msg = me.player.startLoopTicks(from, position, to);
+        let msg = this.player.startLoopTicks(from, position, to);
         if (msg) {
-            console.log('startPlayLoop', msg);
-            me.renderer.warning.showWarning('Start playing', 'Loading...', 'Wait for ' + msg, () => {
+            console.log('startPlayLoop', msg, this.renderer.warning.noWarning);
+            this.renderer.warning.showWarning('Start playing', 'Loading...', '' + msg, () => {
                 console.log('cancel wait start loop');
             });
+            let me = this;
+            let id = setTimeout(() => {
+                if (!me.renderer.warning.noWarning) {
+                    me.startPlayLoop(from, position, to);
+                }
+            }, 1000);
         }
         else {
-            me.renderer.warning.hideWarning();
-            me.renderer.menu.rerenderMenuContent(null);
-            me.resetProject();
+            this.renderer.warning.hideWarning();
+            this.renderer.menu.rerenderMenuContent(null);
+            this.resetProject();
         }
     }
     setThemeLocale(loc, ratio) {
@@ -5143,13 +5148,10 @@ class WarningUI {
         this.noWarning = true;
     }
     cancel() {
-        console.log('warning cancel', this.onCancel, (typeof this.onCancel));
         if (this.onCancel) {
-            console.log('warning start onCancel');
             this.onCancel();
         }
         else {
-            console.log('warning skip onCancel');
         }
         this.hideWarning();
     }
