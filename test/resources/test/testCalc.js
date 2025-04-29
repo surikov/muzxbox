@@ -649,17 +649,20 @@ function dumpTriads(svg, rows) {
             }
         }
         lbl = '';
-        var begin = -1;
+        var begin1 = -1;
         var end = -1;
         var begin2 = -1;
         var end2 = -1;
         for (var kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
+                /*if(rr==1 && (kk==0 || kk==first.length-1)){
+console.log(kk,first[kk].ball);
+                }*/
                 if (showFirstRow || rr > 0) {
                     lbl = '[' + pad0('' + first[kk].ball, 2) + ']' + lbl;
                     end = kk;
-                    if (begin == -1) {
-                        begin = kk;
+                    if (begin1 == -1) {
+                        begin1 = kk;
                     }
                 }
                 else {
@@ -676,15 +679,32 @@ function dumpTriads(svg, rows) {
                     if (kk < end) {
                         end2 = kk;
                     }
-                    if (begin2 == -1 && kk > begin) {
+                    if (begin2 == -1 && kk > begin1) {
                         begin2 = kk;
                     }
                 }
             }
         }
-        lbl = padLen('' + padLen('' + (rowLen - end - 1), 2) + ':' + padLen('' + (rowLen - begin - 1), 2) + '(' + padLen('' + begin, 2) + '): blue ', 20) + lbl;
+        lbl = padLen('' + padLen('' + (rowLen - end - 1), 2) + ':' + padLen('' + (rowLen - begin1 - 1), 2) + '(' + padLen('' + begin1, 2) + '): blue ', 20) + lbl;
         if (rr == 0) {
             dumpInfo2('statblue', lbl);
+        }
+        if (rr == 1) {
+            var leftNum = -1;
+            var rightNum = 0;
+            for (var kk = 0; kk < first.length; kk++) {
+                if (ballExists(first[kk].ball, rows[rr])) {
+                    rightNum = kk;
+                    if (leftNum < 0) {
+                        leftNum = kk;
+                    }
+                }
+            }
+            var leftStart = rowLen - rightNum;
+            var leftBall = first[rightNum].ball;
+            var rightEnd = rowLen - leftNum;
+            var rightBall = first[leftNum].ball;
+            console.log('preblue', leftStart, '>', rightEnd);
         }
         var yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
         var xxx = 0 * rowLen / 2;
@@ -692,27 +712,27 @@ function dumpTriads(svg, rows) {
             var x2 = xxx + (rowLen - 1) / 2;
             markLines.push({ fromX: x2, fromY: yyy, toX: x2 - begin2 / 2, toY: yyy, color: blue2, manual: false });
             markLines.push({ fromX: xxx, fromY: yyy, toX: x2 - end2 / 2, toY: yyy, color: blue2, manual: false });
-            markLines.push({ fromX: x2, fromY: yyy, toX: x2 - begin / 2, toY: yyy, color: blue, manual: false });
+            markLines.push({ fromX: x2, fromY: yyy, toX: x2 - begin1 / 2, toY: yyy, color: blue, manual: false });
             markLines.push({ fromX: xxx, fromY: yyy, toX: x2 - end / 2, toY: yyy, color: blue, manual: false });
         }
         if (showFirstRow || rr > 0) {
-            begin = rowLen + 1;
+            begin1 = rowLen + 1;
             end = 0;
             var begin2_1 = rowLen + 1;
             var end2_1 = 0;
             for (var kk = 0; kk < rows[rr].balls.length; kk++) {
-                if (rows[rr].balls[kk] < begin)
-                    begin = rows[rr].balls[kk];
+                if (rows[rr].balls[kk] < begin1)
+                    begin1 = rows[rr].balls[kk];
                 if (rows[rr].balls[kk] > end)
                     end = rows[rr].balls[kk];
             }
             for (var kk = 0; kk < rows[rr].balls.length; kk++) {
-                if (rows[rr].balls[kk] < begin2_1 && rows[rr].balls[kk] > begin)
+                if (rows[rr].balls[kk] < begin2_1 && rows[rr].balls[kk] > begin1)
                     begin2_1 = rows[rr].balls[kk];
                 if (rows[rr].balls[kk] > end2_1 && rows[rr].balls[kk] < end)
                     end2_1 = rows[rr].balls[kk];
             }
-            begin--;
+            begin1--;
             end--;
             begin2_1--;
             end2_1--;
@@ -720,7 +740,7 @@ function dumpTriads(svg, rows) {
             xxx = 3 * rowLen / 2;
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2_1 / 2, toY: yyy, color: red2, manual: false });
             markLines.push({ fromX: xxx + end2_1 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red2, manual: false });
-            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: red, manual: false });
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin1 / 2, toY: yyy, color: red, manual: false });
             markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red, manual: false });
         }
         for (var ii = 0; ii < rowLen; ii++) {

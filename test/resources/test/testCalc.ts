@@ -728,7 +728,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		}
 
 		lbl = '';
-		let begin = -1;
+		let begin1 = -1;
 		let end = -1;
 		let begin2 = -1;
 		let end2 = -1;
@@ -736,12 +736,15 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		for (let kk = 0; kk < first.length; kk++) {
 
 			if (ballExists(first[kk].ball, rows[rr])) {
+				/*if(rr==1 && (kk==0 || kk==first.length-1)){
+console.log(kk,first[kk].ball);
+				}*/
 				if (showFirstRow || rr > 0) {
 
 					lbl = '[' + pad0('' + first[kk].ball, 2) + ']' + lbl;
 					end = kk;
-					if (begin == -1) {
-						begin = kk;
+					if (begin1 == -1) {
+						begin1 = kk;
 					}
 				} else {
 
@@ -759,18 +762,35 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 					if (kk < end) {
 						end2 = kk;
 					}
-					if (begin2 == -1 && kk > begin) {
+					if (begin2 == -1 && kk > begin1) {
 						begin2 = kk;
 					}
 				}
 			}
 		}
 
-		lbl = padLen('' + padLen('' + (rowLen - end - 1), 2) + ':' + padLen('' + (rowLen - begin - 1), 2) + '(' + padLen('' + begin, 2) + '): blue ', 20) + lbl;
+		lbl = padLen('' + padLen('' + (rowLen - end - 1), 2) + ':' + padLen('' + (rowLen - begin1 - 1), 2) + '(' + padLen('' + begin1, 2) + '): blue ', 20) + lbl;
 		if (rr == 0) {
 
 			dumpInfo2('statblue', lbl);
 
+		}
+		if (rr == 1) {
+			let leftNum = -1;
+			let rightNum = 0;
+			for (let kk = 0; kk < first.length; kk++) {
+				if (ballExists(first[kk].ball, rows[rr])) {
+					rightNum = kk;
+					if (leftNum < 0) {
+						leftNum = kk;
+					}
+				}
+			}
+			let leftStart = rowLen - rightNum;
+			let leftBall = first[rightNum].ball;
+			let rightEnd = rowLen - leftNum;
+			let rightBall = first[leftNum].ball;
+			console.log('preblue', leftStart, '>', rightEnd);
 		}
 
 		let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
@@ -783,24 +803,24 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 			markLines.push({ fromX: xxx, fromY: yyy, toX: x2 - end2 / 2, toY: yyy, color: blue2, manual: false });
 
 
-			markLines.push({ fromX: x2, fromY: yyy, toX: x2 - begin / 2, toY: yyy, color: blue, manual: false });
+			markLines.push({ fromX: x2, fromY: yyy, toX: x2 - begin1 / 2, toY: yyy, color: blue, manual: false });
 			markLines.push({ fromX: xxx, fromY: yyy, toX: x2 - end / 2, toY: yyy, color: blue, manual: false });
 
 		}
 		if (showFirstRow || rr > 0) {
-			begin = rowLen + 1;
+			begin1 = rowLen + 1;
 			end = 0;
 			let begin2 = rowLen + 1;
 			let end2 = 0;
 			for (let kk = 0; kk < rows[rr].balls.length; kk++) {
-				if (rows[rr].balls[kk] < begin) begin = rows[rr].balls[kk];
+				if (rows[rr].balls[kk] < begin1) begin1 = rows[rr].balls[kk];
 				if (rows[rr].balls[kk] > end) end = rows[rr].balls[kk];
 			}
 			for (let kk = 0; kk < rows[rr].balls.length; kk++) {
-				if (rows[rr].balls[kk] < begin2 && rows[rr].balls[kk] > begin) begin2 = rows[rr].balls[kk];
+				if (rows[rr].balls[kk] < begin2 && rows[rr].balls[kk] > begin1) begin2 = rows[rr].balls[kk];
 				if (rows[rr].balls[kk] > end2 && rows[rr].balls[kk] < end) end2 = rows[rr].balls[kk];
 			}
-			begin--;
+			begin1--;
 			end--;
 			begin2--;
 			end2--;
@@ -809,7 +829,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 
 			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: red2, manual: false });
 			markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red2, manual: false });
-			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin / 2, toY: yyy, color: red, manual: false });
+			markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin1 / 2, toY: yyy, color: red, manual: false });
 			markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red, manual: false });
 
 		}
@@ -1110,6 +1130,8 @@ function addTails() {
 
 	testTest2();
 
+
+
 }
 
 function addTestLines1(data: { ball: number, color: string }[]) {
@@ -1222,20 +1244,20 @@ function testTest2() {
 			//sumtext = sumtext + '=' + cnt;
 			//sumtext = sumtext +  (ii - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ')'
 			//	+ cntExists + '/' + countCurHeigth + '=' + Math.round((cntExists / ballsInRow) / (countCurHeigth / rowLen) * 100) / 100;
-			let verCount=Math.round(100 * veroyat1 * countCurHeigth) / 100;
+			let verCount = Math.round(100 * veroyat1 * countCurHeigth) / 100;
 			//let exstsVero=(Math.round(100 * cntExists/countCurHeigth) / 100);
-			let verCountDiff=-100+Math.round(100 *(1-cntExists/verCount)) ;
-			let verCountDiffTxt=''+(-1*verCountDiff);
+			let verCountDiff = -100 + Math.round(100 * (1 - cntExists / verCount));
+			let verCountDiffTxt = '' + (-1 * verCountDiff);
 			//if(verCountDiff<0){
 			//	verCountDiffTxt='+'+(-verCountDiff);
 			//}
-			sumtext = sumtext + '\n['+ (ii - 1) + ']' + countCurHeigth
-				+' \t'+ verCount  +'/'+cntExists
-				+' \t'+verCountDiffTxt+'%';
+			sumtext = sumtext + '\n[' + (ii - 1) + ']' + countCurHeigth
+				+ ' \t' + verCount + '/' + cntExists
+				+ ' \t' + verCountDiffTxt + '%';
 		} else {
 			//sumtext = sumtext +  (ii - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ')'
 			//	+ countCurHeigth;
-			sumtext = sumtext+ '\n[' +  (ii - 1) + ']' + countCurHeigth+'\t'+ Math.round(100 * veroyat1 * countCurHeigth) / 100 ;
+			sumtext = sumtext + '\n[' + (ii - 1) + ']' + countCurHeigth + '\t' + Math.round(100 * veroyat1 * countCurHeigth) / 100;
 		}
 		sumtext = sumtext + ' ';
 	}
@@ -1389,51 +1411,51 @@ function diffPart(a: number, b: number): number {
 	}
 }
 function dumpPairsCounts() {
-	let start=Math.round(Math.random()*4321+1);
+	let start = Math.round(Math.random() * 4321 + 1);
 	//let deep=4;
-	
-	let ball=datarows[start].balls[0];
-	console.log('dumpPairsCounts',start,datarows[start],datarows);
-	let line='';
-	for(let kk=0;kk<ball;kk++){
-		line=line+'I';
+
+	let ball = datarows[start].balls[0];
+	console.log('dumpPairsCounts', start, datarows[start], datarows);
+	let line = '';
+	for (let kk = 0; kk < ball; kk++) {
+		line = line + 'I';
 	}
-	console.log(line,ball);
-	let preArr1=[];
-	dumpPairsPatterns(start,preArr1,ball,1);
-	dumpPairsPatterns(start,preArr1,ball,2);
-	dumpPairsPatterns(start,preArr1,ball,3);
-	dumpPairsPatterns(start,preArr1,ball,4);
-	dumpPairsPatterns(start,preArr1,ball,5);
-	dumpPairsPatterns(start,preArr1,ball,6);
-	dumpPairsPatterns(start,preArr1,ball,7);
-	console.log('dumpPairsPatterns',ball,preArr1);
-	
+	console.log(line, ball);
+	let preArr1 = [];
+	dumpPairsPatterns(start, preArr1, ball, 1);
+	dumpPairsPatterns(start, preArr1, ball, 2);
+	dumpPairsPatterns(start, preArr1, ball, 3);
+	dumpPairsPatterns(start, preArr1, ball, 4);
+	dumpPairsPatterns(start, preArr1, ball, 5);
+	dumpPairsPatterns(start, preArr1, ball, 6);
+	dumpPairsPatterns(start, preArr1, ball, 7);
+	console.log('dumpPairsPatterns', ball, preArr1);
+
 }
-function dumpPairsPatterns(start,preArr,left,deep) {
-	for (let nn = start; nn < start+100; nn++) {
-		if(datarows[nn].balls[0]>=left){
-			let smm=0;
-			for(let dd=1;dd<=deep;dd++){
-				smm=smm+datarows[nn+dd].balls[0];
+function dumpPairsPatterns(start, preArr, left, deep) {
+	for (let nn = start; nn < start + 100; nn++) {
+		if (datarows[nn].balls[0] >= left) {
+			let smm = 0;
+			for (let dd = 1; dd <= deep; dd++) {
+				smm = smm + datarows[nn + dd].balls[0];
 			}
-			let avg=Math.round(smm/deep);
-			if(nn==start){
+			let avg = Math.round(smm / deep);
+			if (nn == start) {
 				//console.log('first average',smm/deep);
-				let line='';
-				for(let kk=0;kk<smm/deep;kk++){
-					line=line+'|';
+				let line = '';
+				for (let kk = 0; kk < smm / deep; kk++) {
+					line = line + '|';
 				}
-				console.log(line,smm/deep);
-			}else{
-				preArr[avg]=(preArr[avg])?preArr[avg]:[];
-				preArr[avg][deep]=(preArr[avg][deep])?preArr[avg][deep]:0;
+				console.log(line, smm / deep);
+			} else {
+				preArr[avg] = (preArr[avg]) ? preArr[avg] : [];
+				preArr[avg][deep] = (preArr[avg][deep]) ? preArr[avg][deep] : 0;
 				preArr[avg][deep]++;
 			}
 			//console.log(nn,datarows[nn]);
 		}
 	}
-	
+
 }
 init();
 addTails();
