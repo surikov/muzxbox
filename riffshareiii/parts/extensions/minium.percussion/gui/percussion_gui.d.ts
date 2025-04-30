@@ -293,4 +293,4 @@ declare class ZDUI {
     tapItem(idx: number): void;
 }
 declare function initZDRUI(): void;
-declare let drumKeysArray: string[];
+declare let drumKeysArrayPercussionPaths: string[];

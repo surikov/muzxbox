@@ -1,4 +1,14 @@
-let drumKeysArray = [
+function firstDrumKeysArrayPercussionPaths(midi: number): number {
+	let pre = '' + midi;
+	for (let nn = 0; nn < drumKeysArrayPercussionPaths.length; nn++) {
+		if (drumKeysArrayPercussionPaths[nn].startsWith(pre)) {
+			return nn;
+		}
+	}
+	console.log('firstDrumKeysArrayPercussionPaths no', midi);
+	return 0;
+}
+let drumKeysArrayPercussionPaths = [
 	//'35_0_SBLive_sf2'
 	'35_0_Chaos_sf2_file', '35_12_JCLive_sf2_file', '35_16_JCLive_sf2_file', '35_18_JCLive_sf2_file', '35_4_Chaos_sf2_file'
 	, '36_0_SBLive_sf2', '36_12_JCLive_sf2_file', '36_16_JCLive_sf2_file', '36_18_JCLive_sf2_file', '36_4_Chaos_sf2_file'

@@ -68,11 +68,11 @@ class ZDUI {
 				if (this.selectedCategoryIdx == ii) {
 					let ul = document.createElement('ul');
 					let pre = '' + ii;
-					for (let nn = 0; nn < drumKeysArray.length; nn++) {
-						if (drumKeysArray[nn].startsWith(pre)) {
+					for (let nn = 0; nn < drumKeysArrayPercussionPaths.length; nn++) {
+						if (drumKeysArrayPercussionPaths[nn].startsWith(pre)) {
 							this.drumlist.appendChild(ul);
 							let it = document.createElement('li');
-							it.textContent = drumKeysArray[nn];
+							it.textContent = drumKeysArrayPercussionPaths[nn];
 							it.addEventListener('click', (evnt) => {
 								me.tapItem(nn);
 							});
@@ -86,8 +86,8 @@ class ZDUI {
 	refreshTitle() {
 		let tileval = document.getElementById('tileval');
 		if (tileval) {
-			let catIdx = parseInt(drumKeysArray[this.selectedItemIdx].substring(0, 2));
-			tileval.innerHTML = '' + drumNames[catIdx] + ' / ' + drumKeysArray[this.selectedItemIdx];
+			let catIdx = parseInt(drumKeysArrayPercussionPaths[this.selectedItemIdx].substring(0, 2));
+			tileval.innerHTML = '' + drumNames[catIdx] + ' / ' + drumKeysArrayPercussionPaths[this.selectedItemIdx];
 		}
 	}
 	init() {
