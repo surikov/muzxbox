@@ -20,8 +20,8 @@ input {
 input[type="range"] {
 	-webkit-appearance: none;
 	width: 100%;
-	height: 2px;
-	background: #000;
+	height: 3px;
+	background: #99c;
 	outline: none;
 }
 
@@ -46,11 +46,15 @@ ul {
 	list-style-type: "▢  ";
 	font-family222: sans-serif;
 	font-size: 0.75cm;
+	width2: 100%;
 }
-
-li222 {
-	font-family: "Poiret One", sans-serif;
-	font-weight: 600;
-	font-style: normal;
-	font-size: 0.75cm;
-}
+/*
+li {
+	text-overflow2: ellipsis;
+	text-overflow: clip;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	color: #056;
+}*/

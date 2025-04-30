@@ -27,5 +27,6 @@
         "../../../mzxbxapi/musicenginetypes.ts"
 		,"../../../mzxbxapi/musicenginedeclarations.ts"
         ,"gui.ts"
+		,"../list/names.ts"
 	]
 }
