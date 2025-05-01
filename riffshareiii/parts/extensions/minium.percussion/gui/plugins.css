@@ -1,7 +1,7 @@
 body {
 	font-family: "Poiret One", sans-serif;
-	font-weight222: 600;
-	font-style222: normal;
+	font-weight: 600;
+	font-style: normal;
 	background-color: #eef;
 	color: #006;
 	background2: #2A7B9B;
@@ -30,7 +30,7 @@ input[type="range"]::-webkit-slider-thumb {
 	width: 0.75cm;
 	height: 1cm;
 	background2: #000;
-	background: radial-gradient(circle, rgba(111, 111, 111, 1) 0%, rgba(0, 0, 0, 1) 100%);
+	background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(190, 190, 255, 1) 100%);
 	position: relative;
 	z-index: 3;
 	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.75);

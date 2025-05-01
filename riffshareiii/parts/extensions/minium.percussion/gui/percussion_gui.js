@@ -1,4 +1,5 @@
 "use strict";
+console.log('Percussion GUI v1.0.3');
 var drumNames = [];
 drumNames[35] = "Bass Drum 2";
 drumNames[36] = "Bass Drum 1";
@@ -53,6 +54,7 @@ class ZDUI {
         this.data = '';
         this.selectedCategoryIdx = 0;
         this.selectedItemIdx = 0;
+        this.selectedVolume = 0;
     }
     reFillList() {
         if (this.drumlist) {
@@ -90,14 +92,32 @@ class ZDUI {
             tileval.innerHTML = '' + drumNames[catIdx] + ' / ' + drumKeysArrayPercussionPaths[this.selectedItemIdx];
         }
     }
+    refreshVolume() {
+        let numval = document.getElementById('numval');
+        if (numval) {
+            numval.innerHTML = '' + this.selectedVolume;
+        }
+    }
     init() {
         let el = document.getElementById('drumlist');
         if (el) {
             this.drumlist = el;
-            this.reFillList();
         }
+        el = document.getElementById('level');
+        if (el) {
+            this.level = el;
+            this.level.addEventListener('change', (event) => {
+                this.selectedVolume = parseInt(this.level.value);
+                this.refreshVolume();
+                this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx);
+            });
+            console.dir(this.level);
+        }
+        this.reFillList();
         this.refreshTitle();
-        console.dir(this.drumlist);
+        this.refreshVolume();
+        window.addEventListener('message', this.receiveHostMessage.bind(this), false);
+        this.sendMessageToHost('');
     }
     sendMessageToHost(data) {
         var message = { dialogID: this.id, pluginData: data, done: false };
@@ -106,6 +126,7 @@ class ZDUI {
     }
     receiveHostMessage(messageEvent) {
         let message = messageEvent.data;
+        console.log('receiveHostMessage', this.id, message);
         if (this.id) {
             this.setState(message.hostData);
         }
@@ -117,18 +138,26 @@ class ZDUI {
         this.id = newId;
     }
     setState(data) {
+        console.log('setState', data);
         this.data = data;
-        let split = this.data.split('/');
-        if (split.length > 1 && split[1].length > 0) {
+        try {
+            let split = this.data.split('/');
+            this.selectedVolume = parseInt(split[0]);
+            this.selectedItemIdx = parseInt(split[1]);
+            this.selectedCategoryIdx = parseInt(drumKeysArrayPercussionPaths[this.selectedItemIdx].substring(0, 2));
         }
-        else {
+        catch (xx) {
+            console.log(xx);
+            this.selectedVolume = 77;
+            this.selectedItemIdx = 0;
+            this.selectedCategoryIdx = 35;
         }
-        this.voluctrl.value = 95;
-        if (split.length > 2) {
-            if (split[2].length > 0) {
-                this.voluctrl.value = parseInt(split[2]);
-            }
+        if (this.level) {
+            this.level.value = '' + this.selectedVolume;
         }
+        this.reFillList();
+        this.refreshTitle();
+        this.refreshVolume();
     }
     tapCategory(idx) {
         console.log('tapCategory', idx);
@@ -138,11 +167,22 @@ class ZDUI {
     tapItem(idx) {
         console.log('tapItem', idx);
         this.selectedItemIdx = idx;
+        this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx);
         this.refreshTitle();
     }
 }
 function initZDRUI() {
     new ZDUI().init();
+}
+function firstDrumKeysArrayPercussionPaths(midi) {
+    let pre = '' + midi;
+    for (let nn = 0; nn < drumKeysArrayPercussionPaths.length; nn++) {
+        if (drumKeysArrayPercussionPaths[nn].startsWith(pre)) {
+            return nn;
+        }
+    }
+    console.log('firstDrumKeysArrayPercussionPaths no', midi);
+    return 0;
 }
 let drumKeysArrayPercussionPaths = [
     '35_0_Chaos_sf2_file', '35_12_JCLive_sf2_file', '35_16_JCLive_sf2_file', '35_18_JCLive_sf2_file', '35_4_Chaos_sf2_file',

@@ -1,3 +1,5 @@
+console.log('Percussion GUI v1.0.3');
+
 var drumNames: string[] = [];
 drumNames[35] = "Bass Drum 2";
 drumNames[36] = "Bass Drum 1";
@@ -51,7 +53,9 @@ class ZDUI {
 	data: string = '';
 	selectedCategoryIdx: number = 0;
 	selectedItemIdx: number = 0;
-	voluctrl: any;
+	selectedVolume = 0;
+	//voluctrl: any;
+	level: HTMLInputElement;
 	drumlist: HTMLUListElement;
 	//player: ZDRWebAudioFontPlayer = new ZDRWebAudioFontPlayer();
 	reFillList() {
@@ -90,43 +94,35 @@ class ZDUI {
 			tileval.innerHTML = '' + drumNames[catIdx] + ' / ' + drumKeysArrayPercussionPaths[this.selectedItemIdx];
 		}
 	}
+	refreshVolume() {
+		let numval = document.getElementById('numval');
+		if (numval) {
+			numval.innerHTML = '' + this.selectedVolume;
+		}
+	}
 	init() {
 		//let me = this;
 		let el = document.getElementById('drumlist');
 		if (el) {
 			this.drumlist = el as HTMLUListElement;
-			this.reFillList();
+			//this.reFillList();
 		}
+		el = document.getElementById('level');
+		if (el) {
+			this.level = el as HTMLInputElement;
+			this.level.addEventListener('change', (event) => {
+				this.selectedVolume = parseInt(this.level.value);
+				this.refreshVolume();
+				this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx);
+			});
+			console.dir(this.level);
+		}
+		this.reFillList();
 		this.refreshTitle();
-		console.dir(this.drumlist);
-		/*
+		this.refreshVolume();
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
 		this.sendMessageToHost('');
-		this.list = document.getElementById('drlist');
-		this.player = new ZDRWebAudioFontPlayer();
-		let drms = this.player.loader.drumKeys();
-		this.voluctrl = document.getElementById('voluctrl');
 
-		for (let ii = 0; ii < drms.length; ii++) {
-			var option = document.createElement('option');
-			option.value = '' + ii;
-			let midi = parseInt(drms[ii].substring(0, 2));
-			option.innerHTML = drms[ii] + ": " + this.player.loader.drumTitles()[midi];
-			this.list.appendChild(option);
-		}
-		this.list.addEventListener('change', (event) => {
-			//console.dir(this.player.loader.drumKeys()[1 * this.list.value]);
-			let msg = '0/' + this.list.value + '/' + this.voluctrl.value;
-			//console.log('change', msg);
-			this.sendMessageToHost(msg);
-		});
-		this.voluctrl.addEventListener('change', (event) => {
-			
-			let msg = '0/' + this.list.value + '/' + this.voluctrl.value;
-			//console.log('change', msg);
-			this.sendMessageToHost(msg);
-		});
-*/
 	}
 	sendMessageToHost(data: string) {
 
@@ -136,6 +132,7 @@ class ZDUI {
 	}
 	receiveHostMessage(messageEvent: MessageEvent) {
 		let message: MZXBX_MessageToPlugin = messageEvent.data;
+		console.log('receiveHostMessage', this.id, message);
 		if (this.id) {
 			this.setState(message.hostData);
 		} else {
@@ -146,20 +143,26 @@ class ZDUI {
 		this.id = newId;
 	}
 	setState(data: string) {
-		//console.log('setState', data);
+		console.log('setState', data);
 		this.data = data;
-		let split = this.data.split('/');
-		if (split.length > 1 && split[1].length > 0) {
-			//this.list.value = parseInt(split[1]);
-		} else {
-			//this.list.value = this.player.loader.findDrum(parseInt(split[0]));
+		try {
+			let split = this.data.split('/');
+			this.selectedVolume = parseInt(split[0]);
+			this.selectedItemIdx = parseInt(split[1]);
+			this.selectedCategoryIdx = parseInt(drumKeysArrayPercussionPaths[this.selectedItemIdx].substring(0, 2));
+
+		} catch (xx) {
+			console.log(xx);
+			this.selectedVolume = 77;
+			this.selectedItemIdx = 0;
+			this.selectedCategoryIdx = 35;
 		}
-		this.voluctrl.value = 95;
-		if (split.length > 2) {
-			if (split[2].length > 0) {
-				this.voluctrl.value = parseInt(split[2]);
-			}
+		if(this.level){
+		this.level.value=''+this.selectedVolume;
 		}
+		this.reFillList();
+		this.refreshTitle();
+		this.refreshVolume();
 	}
 	tapCategory(idx: number) {
 		console.log('tapCategory', idx);
@@ -169,10 +172,10 @@ class ZDUI {
 	tapItem(idx: number) {
 		console.log('tapItem', idx);
 		this.selectedItemIdx = idx;
+		this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx);
 		this.refreshTitle();
 	}
 }
 function initZDRUI() {
-	//console.log('initZPerfUI');
 	new ZDUI().init();
 }
