@@ -1,14 +1,14 @@
-console.log('ZvoogDrumKit v1.0');
-class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
+console.log('Percussion Plugin v1.0.1');
+class PercussionDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 	audioContext: AudioContext;
-	player: ZDRWebAudioFontPlayer = new ZDRWebAudioFontPlayer();
+	player: PercussionWebAudioFontPlayer = new PercussionWebAudioFontPlayer();
 	volumeNode: GainNode;
-	loader: ZDRWebAudioFontLoader = new ZDRWebAudioFontLoader();
+	loader: PercussionWebAudioFontLoader = new PercussionWebAudioFontLoader();
 	//midinumber: number = 0;
 	//midiidx: number = 0;
 	//listidx: number = -1;
-	info: ZDRPresetInfo;
-	preset: ZDRWavePreset | null = null;
+	info: PercussionPresetInfo;
+	preset: PercussionWavePreset | null = null;
 	sampleDuration = 0.000001;
 	loudness = 0.9;
 	launch(context: AudioContext, parameters: string): void {
@@ -19,7 +19,7 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 		//this.midinumber = parseInt(parameters);
 
 		//console.log('parameters',parameters);
-		let split = parameters.split('/');
+		/*let split = parameters.split('/');
 		let idx = 0;
 		if (split.length>1 && split[1].length>0) {
 			let listidx = parseInt(split[1]);
@@ -34,6 +34,17 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 			if (split[2].length > 0) {
 				this.loudness = 0.01 * (0.0 + parseInt(split[2]));
 			}
+		}*/
+		let idx=0;
+		try {
+			let split = parameters.split('/');
+			let volume = parseInt(split[0]);
+			idx = parseInt(split[1]);
+			
+			this.loudness=volume/100;
+
+		} catch (xx) {
+			console.log(xx);
 		}
 		this.volumeNode.gain.setValueAtTime(this.loudness, 0);
 		//let idx = this.loader.findDrum(this.midinumber);
@@ -90,6 +101,6 @@ class ZvoogDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 
 }
 
-function newZvoogDrumKitImplementation(): MZXBX_AudioSamplerPlugin {
-	return new ZvoogDrumKitImplementation();
+function newBasePercussionPlugin(): MZXBX_AudioSamplerPlugin {
+	return new PercussionDrumKitImplementation();
 }

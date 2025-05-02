@@ -3,6 +3,8 @@ class StateDiff {
 	pathDataCopy: any;
 	basePath: (string | number)[];
 	constructor(path: (string | number)[]) {
+		globalCommandDispatcher.adjustTimeline();
+		//console.log(path,globalCommandDispatcher.cfg().data);
 		this.basePath = path.slice(0);
 		this.pathDataCopy = JSON.parse(JSON.stringify(this.findNodeByPath()));
 	}

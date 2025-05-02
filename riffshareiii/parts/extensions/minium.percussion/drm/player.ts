@@ -4,9 +4,9 @@
 //npm link typescript
 //npx typedoc player.ts otypes.ts channel.ts loader.ts reverberator.ts ticker.ts
 
-class ZDRWebAudioFontPlayer {
-	envelopes: ZDRWaveEnvelope[] = [];
-	loader = new ZDRWebAudioFontLoader();
+class PercussionWebAudioFontPlayer {
+	envelopes: PercussionWaveEnvelope[] = [];
+	loader = new PercussionWebAudioFontLoader();
 	//onCacheFinish = null;
 	//onCacheProgress = null;
 	afterTime = 0.05;
@@ -36,10 +36,10 @@ class ZDRWebAudioFontPlayer {
 			//don't care
 		}
 	}
-	queueWaveTable(audioContext: AudioContext, target: AudioNode, preset: ZDRWavePreset, when: number, pitch: number, duration: number, volume: number): ZDRWaveEnvelope | null {
+	queueWaveTable(audioContext: AudioContext, target: AudioNode, preset: PercussionWavePreset, when: number, pitch: number, duration: number, volume: number): PercussionWaveEnvelope | null {
 		this.resumeContext(audioContext);
 		volume = this.limitVolume(volume);
-		var zone: ZDRWaveZone | null = this.findZone(audioContext, preset, pitch);
+		var zone: PercussionWaveZone | null = this.findZone(audioContext, preset, pitch);
 		if (zone) {
 			if (!(zone.buffer)) {
 				console.log('empty buffer ', zone);
@@ -61,7 +61,7 @@ class ZDRWebAudioFontPlayer {
 					waveDuration = zone.buffer.duration / playbackRate;
 				}
 			}
-			var envelope: ZDRWaveEnvelope = this.findEnvelope(audioContext, target);
+			var envelope: PercussionWaveEnvelope = this.findEnvelope(audioContext, target);
 			this.setupEnvelope(audioContext, envelope, zone, volume, startWhen, waveDuration, duration);
 			envelope.audioBufferSourceNode = audioContext.createBufferSource();
 			envelope.audioBufferSourceNode.playbackRate.setValueAtTime(playbackRate, 0);
@@ -92,12 +92,12 @@ class ZDRWebAudioFontPlayer {
 			return this.nearZero;
 		}
 	};
-	setupEnvelope(audioContext: AudioContext, envelope: ZDRWaveEnvelope, zone: ZDRWaveZone, volume: number, when: number, sampleDuration: number, noteDuration: number) {
+	setupEnvelope(audioContext: AudioContext, envelope: PercussionWaveEnvelope, zone: PercussionWaveZone, volume: number, when: number, sampleDuration: number, noteDuration: number) {
 		((envelope as any) as GainNode).gain.setValueAtTime(this.noZeroVolume(0), audioContext.currentTime);
 		var lastTime = 0;
 		var lastVolume = 0;
 		var duration = noteDuration;
-		var zoneahdsr: undefined | boolean | ZDRWaveAHDSR[] = zone.ahdsr;
+		var zoneahdsr: undefined | boolean | PercussionWaveAHDSR[] = zone.ahdsr;
 		if (sampleDuration < duration + this.afterTime) {
 			duration = sampleDuration - this.afterTime;
 		}
@@ -128,7 +128,7 @@ class ZDRWebAudioFontPlayer {
 			}
 			];
 		}
-		var ahdsr: ZDRWaveAHDSR[] = zoneahdsr as ZDRWaveAHDSR[];
+		var ahdsr: PercussionWaveAHDSR[] = zoneahdsr as PercussionWaveAHDSR[];
 		((envelope as any) as GainNode).gain.cancelScheduledValues(when);
 		((envelope as any) as GainNode).gain.setValueAtTime(this.noZeroVolume(ahdsr[0].volume * volume), when);
 		for (var i = 0; i < ahdsr.length; i++) {
@@ -153,8 +153,8 @@ class ZDRWebAudioFontPlayer {
 			return defValue;
 		}
 	};
-	findEnvelope(audioContext: AudioContext, target: AudioNode): ZDRWaveEnvelope {
-		var envelope: ZDRWaveEnvelope | null = null;
+	findEnvelope(audioContext: AudioContext, target: AudioNode): PercussionWaveEnvelope {
+		var envelope: PercussionWaveEnvelope | null = null;
 		for (var i = 0; i < this.envelopes.length; i++) {
 			var e = this.envelopes[i];
 			if (e.target == target && audioContext.currentTime > e.when + e.duration + 0.001) {
@@ -172,7 +172,7 @@ class ZDRWebAudioFontPlayer {
 			}
 		}
 		if (!(envelope)) {
-			envelope = (audioContext.createGain() as any) as ZDRWaveEnvelope;
+			envelope = (audioContext.createGain() as any) as PercussionWaveEnvelope;
 			envelope.target = target;
 			((envelope as any) as GainNode).connect(target);
 			envelope.cancel = function () {
@@ -188,8 +188,8 @@ class ZDRWebAudioFontPlayer {
 		return envelope;
 	};
 	
-	findZone(audioContext: AudioContext, preset: ZDRWavePreset, pitch: number): ZDRWaveZone | null {
-		var zone: ZDRWaveZone | null = null;
+	findZone(audioContext: AudioContext, preset: PercussionWavePreset, pitch: number): PercussionWaveZone | null {
+		var zone: PercussionWaveZone | null = null;
 		for (var i = preset.zones.length - 1; i >= 0; i--) {
 			zone = preset.zones[i];
 			if (zone.keyRangeLow <= pitch && zone.keyRangeHigh + 1 >= pitch) {

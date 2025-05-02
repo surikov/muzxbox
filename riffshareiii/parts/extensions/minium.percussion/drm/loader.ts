@@ -1,5 +1,5 @@
-class ZDRWebAudioFontLoader {
-	cached: ZDRCachedPreset[] = [];
+class PercussionWebAudioFontLoader {
+	cached: PercussionCachedPreset[] = [];
 	drumNamesArray: string[] = [];
 	drumKeyArray: string[] = [];
 	constructor() {
@@ -24,13 +24,13 @@ class ZDRWebAudioFontLoader {
 		document.getElementsByTagName("head")[0].appendChild(r);
 		this.decodeAfterLoading(audioContext, variableName);
 	};
-	adjustPreset(audioContext: AudioContext, preset: ZDRWavePreset) {
+	adjustPreset(audioContext: AudioContext, preset: PercussionWavePreset) {
 		//console.log('adjustPreset',preset);
 		for (var i = 0; i < preset.zones.length; i++) {
 			this.adjustZone(audioContext, preset.zones[i]);
 		}
 	}
-	adjustZone(audioContext: AudioContext, zone: ZDRWaveZone) {
+	adjustZone(audioContext: AudioContext, zone: PercussionWaveZone) {
 		if (zone.buffer) {
 			//
 		} else {
@@ -93,7 +93,7 @@ class ZDRWebAudioFontLoader {
 		//console.log('decodeAfterLoading',variableName);
 		var me = this;
 		this.waitOrFinish(variableName, function () {
-			me.adjustPreset(audioContext, (window[variableName] as any) as ZDRWavePreset);
+			me.adjustPreset(audioContext, (window[variableName] as any) as PercussionWavePreset);
 		});
 	};
 	waitOrFinish(variableName: string, onFinish: () => void) {
@@ -111,7 +111,7 @@ class ZDRWebAudioFontLoader {
 		if (!(window[variableName])) {
 			return false;
 		}
-		var preset: ZDRWavePreset = (window[variableName] as any) as ZDRWavePreset;
+		var preset: PercussionWavePreset = (window[variableName] as any) as PercussionWavePreset;
 		for (var i = 0; i < preset.zones.length; i++) {
 			//console.log('zone', preset.zones[i].buffer);
 			if (!(preset.zones[i].buffer)) {
@@ -144,6 +144,7 @@ class ZDRWebAudioFontLoader {
 			}, 333);
 		}
 	};
+	/*
 	drumTitles(): string[] {
 		if (this.drumNamesArray.length == 0) {
 			var drumNames: string[] = [];
@@ -198,6 +199,8 @@ class ZDRWebAudioFontLoader {
 		}
 		return this.drumNamesArray;
 	};
+	*/
+	/*
 	drumKeys(): string[] {
 		if (this.drumKeyArray.length == 0) {
 			this.drumKeyArray = [
@@ -254,20 +257,20 @@ class ZDRWebAudioFontLoader {
 			];
 		}
 		return this.drumKeyArray;
-	};
-	drumInfo(n: number): ZDRPresetInfo {
-		var key = this.drumKeys()[n];
+	};*/
+	drumInfo(n: number): PercussionPresetInfo {
+		var key = drumKeysArrayPercussionPaths[n];
 		var p = 1 * parseInt(key.substring(0, 2));
 		return {
 			variable: '_drum_' + key,
 			url: 'https://surikov.github.io/webaudiofontdata/sound/128' + key + '.js',
 			pitch: p,
-			title: this.drumTitles()[p]
+			title: allPercussionDrumTitles()[p]
 		};
 	};
 	findDrum(midinu: number): number {//35-81
-		for (var i = 0; i < this.drumKeys().length; i++) {
-			if (midinu == 1 * parseInt(this.drumKeys()[i].substring(0, 2))) {
+		for (var i = 0; i < drumKeysArrayPercussionPaths.length; i++) {
+			if (midinu == 1 * parseInt(drumKeysArrayPercussionPaths[i].substring(0, 2))) {
 				return i;
 			}
 		}

@@ -8,6 +8,61 @@ function firstDrumKeysArrayPercussionPaths(midi: number): number {
 	console.log('firstDrumKeysArrayPercussionPaths no', midi);
 	return 0;
 }
+function allPercussionDrumTitles(): string[] {
+	//if (this.drumNamesArray.length == 0) {
+		var drumNames: string[] = [];
+		drumNames[35] = "Bass Drum 2";
+		drumNames[36] = "Bass Drum 1";
+		drumNames[37] = "Side Stick/Rimshot";
+		drumNames[38] = "Snare Drum 1";
+		drumNames[39] = "Hand Clap";
+		drumNames[40] = "Snare Drum 2";
+		drumNames[41] = "Low Tom 2";
+		drumNames[42] = "Closed Hi-hat";
+		drumNames[43] = "Low Tom 1";
+		drumNames[44] = "Pedal Hi-hat";
+		drumNames[45] = "Mid Tom 2";
+		drumNames[46] = "Open Hi-hat";
+		drumNames[47] = "Mid Tom 1";
+		drumNames[48] = "High Tom 2";
+		drumNames[49] = "Crash Cymbal 1";
+		drumNames[50] = "High Tom 1";
+		drumNames[51] = "Ride Cymbal 1";
+		drumNames[52] = "Chinese Cymbal";
+		drumNames[53] = "Ride Bell";
+		drumNames[54] = "Tambourine";
+		drumNames[55] = "Splash Cymbal";
+		drumNames[56] = "Cowbell";
+		drumNames[57] = "Crash Cymbal 2";
+		drumNames[58] = "Vibra Slap";
+		drumNames[59] = "Ride Cymbal 2";
+		drumNames[60] = "High Bongo";
+		drumNames[61] = "Low Bongo";
+		drumNames[62] = "Mute High Conga";
+		drumNames[63] = "Open High Conga";
+		drumNames[64] = "Low Conga";
+		drumNames[65] = "High Timbale";
+		drumNames[66] = "Low Timbale";
+		drumNames[67] = "High Agogo";
+		drumNames[68] = "Low Agogo";
+		drumNames[69] = "Cabasa";
+		drumNames[70] = "Maracas";
+		drumNames[71] = "Short Whistle";
+		drumNames[72] = "Long Whistle";
+		drumNames[73] = "Short Guiro";
+		drumNames[74] = "Long Guiro";
+		drumNames[75] = "Claves";
+		drumNames[76] = "High Wood Block";
+		drumNames[77] = "Low Wood Block";
+		drumNames[78] = "Mute Cuica";
+		drumNames[79] = "Open Cuica";
+		drumNames[80] = "Mute Triangle";
+		drumNames[81] = "Open Triangle";
+		//this.drumNamesArray = drumNames;
+	//}
+	//return this.drumNamesArray;
+	return drumNames;
+};
 let drumKeysArrayPercussionPaths = [
 	//'35_0_SBLive_sf2'
 	'35_0_Chaos_sf2_file', '35_12_JCLive_sf2_file', '35_16_JCLive_sf2_file', '35_18_JCLive_sf2_file', '35_4_Chaos_sf2_file'

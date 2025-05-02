@@ -138,6 +138,7 @@ class TreeValue {
 }
 class StateDiff {
     constructor(path) {
+        globalCommandDispatcher.adjustTimeline();
         this.basePath = path.slice(0);
         this.pathDataCopy = JSON.parse(JSON.stringify(this.findNodeByPath()));
     }

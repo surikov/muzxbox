@@ -274,26 +274,96 @@ declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string
 declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
-declare class ZDUI {
-    id: string;
-    data: string;
-    selectedCategoryIdx: number;
-    selectedItemIdx: number;
-    selectedVolume: number;
-    level: HTMLInputElement;
-    drumlist: HTMLUListElement;
-    reFillList(): void;
-    refreshTitle(): void;
-    refreshVolume(): void;
-    init(): void;
-    sendMessageToHost(data: string): void;
-    receiveHostMessage(messageEvent: MessageEvent): void;
-    setMessagingId(newId: string): void;
-    setState(data: string): void;
-    tapCategory(idx: number): void;
-    tapItem(idx: number): void;
-}
-declare function initZDRUI(): void;
 declare function firstDrumKeysArrayPercussionPaths(midi: number): number;
 declare function allPercussionDrumTitles(): string[];
 declare let drumKeysArrayPercussionPaths: string[];
+type PercussionWaveEnvelope = {
+    audioBufferSourceNode?: AudioBufferSourceNode | null;
+    target: AudioNode;
+    when: number;
+    duration: number;
+    cancel: () => void;
+    pitch: number;
+    preset: PercussionWavePreset;
+};
+type PercussionWaveAHDSR = {
+    duration: number;
+    volume: number;
+};
+type PercussionWaveZone = {
+    keyRangeLow: number;
+    keyRangeHigh: number;
+    originalPitch: number;
+    coarseTune: number;
+    fineTune: number;
+    loopStart: number;
+    loopEnd: number;
+    buffer?: AudioBuffer;
+    sampleRate: number;
+    sample?: string;
+    file?: string;
+    sustain?: number;
+    ahdsr?: boolean | PercussionWaveAHDSR[];
+};
+type PercussionWavePreset = {
+    zones: PercussionWaveZone[];
+};
+type PercussionCachedPreset = {
+    variableName: string;
+    filePath: string;
+};
+type PercussionPresetInfo = {
+    variable: string;
+    url: string;
+    title: string;
+    pitch: number;
+};
+declare class PercussionWebAudioFontLoader {
+    cached: PercussionCachedPreset[];
+    drumNamesArray: string[];
+    drumKeyArray: string[];
+    constructor();
+    startLoad(audioContext: AudioContext, filePath: string, variableName: string): void;
+    adjustPreset(audioContext: AudioContext, preset: PercussionWavePreset): void;
+    adjustZone(audioContext: AudioContext, zone: PercussionWaveZone): void;
+    numValue(aValue: any, defValue: number): number;
+    decodeAfterLoading(audioContext: AudioContext, variableName: string): void;
+    waitOrFinish(variableName: string, onFinish: () => void): void;
+    loaded(variableName: string): boolean;
+    progress(): number;
+    waitLoad(onFinish: () => void): void;
+    drumInfo(n: number): PercussionPresetInfo;
+    findDrum(midinu: number): number;
+}
+declare class PercussionWebAudioFontPlayer {
+    envelopes: PercussionWaveEnvelope[];
+    loader: PercussionWebAudioFontLoader;
+    afterTime: number;
+    nearZero: number;
+    limitVolume(volume: number | undefined): number;
+    resumeContext(audioContext: AudioContext): void;
+    queueWaveTable(audioContext: AudioContext, target: AudioNode, preset: PercussionWavePreset, when: number, pitch: number, duration: number, volume: number): PercussionWaveEnvelope | null;
+    noZeroVolume(n: number): number;
+    setupEnvelope(audioContext: AudioContext, envelope: PercussionWaveEnvelope, zone: PercussionWaveZone, volume: number, when: number, sampleDuration: number, noteDuration: number): void;
+    numValue(aValue: any, defValue: number): number;
+    findEnvelope(audioContext: AudioContext, target: AudioNode): PercussionWaveEnvelope;
+    findZone(audioContext: AudioContext, preset: PercussionWavePreset, pitch: number): PercussionWaveZone | null;
+    cancelQueue(audioContext: AudioContext): void;
+}
+declare class PercussionDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
+    audioContext: AudioContext;
+    player: PercussionWebAudioFontPlayer;
+    volumeNode: GainNode;
+    loader: PercussionWebAudioFontLoader;
+    info: PercussionPresetInfo;
+    preset: PercussionWavePreset | null;
+    sampleDuration: number;
+    loudness: number;
+    launch(context: AudioContext, parameters: string): void;
+    busy(): null | string;
+    start(when: number, tempo: any): void;
+    cancel(): void;
+    output(): AudioNode | null;
+    duration(): number;
+}
+declare function newBasePercussionPlugin(): MZXBX_AudioSamplerPlugin;

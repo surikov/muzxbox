@@ -3,6 +3,6 @@
     , "purpose": "Sampler"
     , "kind": "miniumdrums1"
     , "ui": "http://127.0.0.1:8080/gui/drmsui.html"
-    , "evaluate": "newBaseFader"
+    , "evaluate": "newBasePercussionPlugin"
     , "script": "http://127.0.0.1:8080/drm/drmsplgn.js"
 }

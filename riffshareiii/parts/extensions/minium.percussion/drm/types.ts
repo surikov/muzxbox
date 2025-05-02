@@ -1,17 +1,17 @@
-type ZDRWaveEnvelope = {
+type PercussionWaveEnvelope = {
 	audioBufferSourceNode?: AudioBufferSourceNode | null
 	, target: AudioNode
 	, when: number
 	, duration: number
 	, cancel: () => void
 	, pitch: number
-	, preset: ZDRWavePreset
+	, preset: PercussionWavePreset
 };
-type ZDRWaveAHDSR = {
+type PercussionWaveAHDSR = {
 	duration: number
 	, volume: number
 };
-type ZDRWaveZone = {
+type PercussionWaveZone = {
 	keyRangeLow: number
 	, keyRangeHigh: number
 	, originalPitch: number
@@ -24,16 +24,16 @@ type ZDRWaveZone = {
 	, sample?: string
 	, file?: string
 	, sustain?: number
-	, ahdsr?: boolean | ZDRWaveAHDSR[]
+	, ahdsr?: boolean | PercussionWaveAHDSR[]
 };
-type ZDRWavePreset = {
-	zones: ZDRWaveZone[];
+type PercussionWavePreset = {
+	zones: PercussionWaveZone[];
 };
-type ZDRCachedPreset = {
+type PercussionCachedPreset = {
 	variableName: string
 	, filePath: string
 };
-type ZDRPresetInfo = {
+type PercussionPresetInfo = {
 	variable: string
 	, url: string
 	, title: string

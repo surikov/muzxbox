@@ -1,5 +1,5 @@
 console.log('Percussion GUI v1.0.3');
-
+/*
 var drumNames: string[] = [];
 drumNames[35] = "Bass Drum 2";
 drumNames[36] = "Bass Drum 1";
@@ -48,6 +48,7 @@ drumNames[78] = "Mute Cuica";
 drumNames[79] = "Open Cuica";
 drumNames[80] = "Mute Triangle";
 drumNames[81] = "Open Triangle";
+*/
 class ZDUI {
 	id: string = '';
 	data: string = '';
@@ -64,7 +65,7 @@ class ZDUI {
 			this.drumlist.replaceChildren();
 			for (let ii = 35; ii <= 81; ii++) {
 				let li = document.createElement('li');
-				li.textContent = drumNames[ii];
+				li.textContent = allPercussionDrumTitles()[ii];
 				li.addEventListener('click', (evnt) => {
 					me.tapCategory(ii);
 				});
@@ -91,7 +92,7 @@ class ZDUI {
 		let tileval = document.getElementById('tileval');
 		if (tileval) {
 			let catIdx = parseInt(drumKeysArrayPercussionPaths[this.selectedItemIdx].substring(0, 2));
-			tileval.innerHTML = '' + drumNames[catIdx] + ' / ' + drumKeysArrayPercussionPaths[this.selectedItemIdx];
+			tileval.innerHTML = '' + allPercussionDrumTitles()[catIdx] + ' / ' + drumKeysArrayPercussionPaths[this.selectedItemIdx];
 		}
 	}
 	refreshVolume() {
