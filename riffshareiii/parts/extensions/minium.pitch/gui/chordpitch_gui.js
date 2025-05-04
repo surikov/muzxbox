@@ -8,6 +8,7 @@ class CHPUI {
         this.selectedSubIdx = 0;
         this.selectedItemIdx = 0;
         this.selectedVolume = 0;
+        this.selectedMode = 0;
     }
     addSub(label, idx) {
         if (this.subUl) {
@@ -85,6 +86,14 @@ class CHPUI {
             numval.innerHTML = '' + this.selectedVolume;
         }
     }
+    refreshMode() {
+        let nam = 'radio' + this.selectedMode;
+        let el = document.getElementById(nam);
+        if (el) {
+            el.checked = true;
+        }
+        console.log(el);
+    }
     init() {
         let el = document.getElementById('inslist');
         if (el) {
@@ -96,19 +105,44 @@ class CHPUI {
             this.level.addEventListener('change', (event) => {
                 this.selectedVolume = parseInt(this.level.value);
                 this.refreshVolume();
-                this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx);
+                this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx + '/' + this.selectedMode);
             });
             console.dir(this.level);
+        }
+        el = document.getElementById('radio1');
+        if (el) {
+            el.addEventListener('change', (event) => { this.setMode(1); });
+        }
+        el = document.getElementById('radio2');
+        if (el) {
+            el.addEventListener('change', (event) => { this.setMode(2); });
+        }
+        el = document.getElementById('radio3');
+        if (el) {
+            el.addEventListener('change', (event) => { this.setMode(3); });
+        }
+        el = document.getElementById('radio4');
+        if (el) {
+            el.addEventListener('change', (event) => { this.setMode(4); });
+        }
+        el = document.getElementById('radio5');
+        if (el) {
+            el.addEventListener('change', (event) => { this.setMode(5); });
         }
         this.reFillList();
         this.refreshTitle();
         this.refreshVolume();
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
         this.sendMessageToHost('');
+        this.setState('88/445/3');
+    }
+    setMode(num) {
+        this.selectedMode = num;
+        this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx + '/' + this.selectedMode);
     }
     sendMessageToHost(data) {
         var message = { dialogID: this.id, pluginData: data, done: false };
-        console.log('set drum', data);
+        console.log('set instr', data);
         window.parent.postMessage(message, '*');
     }
     receiveHostMessage(messageEvent) {
@@ -131,6 +165,7 @@ class CHPUI {
             let split = this.data.split('/');
             this.selectedVolume = parseInt(split[0]);
             this.selectedItemIdx = parseInt(split[1]);
+            this.selectedMode = parseInt(split[2]);
         }
         catch (xx) {
             console.log(xx);
@@ -143,6 +178,7 @@ class CHPUI {
         }
         this.reFillList();
         this.refreshTitle();
+        this.refreshMode();
         this.refreshVolume();
     }
     tapCategory(idx) {
@@ -158,7 +194,7 @@ class CHPUI {
     tapItem(idx) {
         console.log('tapItem', idx);
         this.selectedItemIdx = idx;
-        this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx);
+        this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx + '/' + this.selectedMode);
         this.refreshTitle();
     }
 }

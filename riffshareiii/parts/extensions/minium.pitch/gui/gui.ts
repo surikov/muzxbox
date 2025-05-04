@@ -7,6 +7,7 @@ class CHPUI {
 	selectedSubIdx: number = 0;
 	selectedItemIdx: number = 0;
 	selectedVolume = 0;
+	selectedMode = 0;
 	//voluctrl: any;
 	level: HTMLInputElement;
 	inslist: HTMLUListElement;
@@ -65,33 +66,13 @@ class CHPUI {
 					if (this.selectedCategoryIdx == ii) {
 						this.subUl = document.createElement('ul');
 						this.addSub(fullName.split(': ')[0], ii);
-						/*this.inslist.appendChild(this.subUl);
-						let subli = document.createElement('li');
-						subli.textContent = fullName.split(': ')[0];
-						subli.addEventListener('click', (evnt) => {
-							me.tapSub(ii);
-						});
-						this.subUl.appendChild(subli);*/
+
 					} else {
 						this.subUl = null;
 					}
 				}
 				curCat = cat;
-				/*if (this.selectedCategoryIdx == ii) {
-					let ul = document.createElement('ul');
-					let pre = '' + ii;
-					for (let nn = 0; nn < drumKeysArrayPercussionPaths.length; nn++) {
-						if (drumKeysArrayPercussionPaths[nn].startsWith(pre)) {
-							this.drumlist.appendChild(ul);
-							let it = document.createElement('li');
-							it.textContent = drumKeysArrayPercussionPaths[nn];
-							it.addEventListener('click', (evnt) => {
-								me.tapItem(nn);
-							});
-							ul.appendChild(it);
-						}
-					}
-				}*/
+
 			}
 		}
 	}
@@ -108,8 +89,16 @@ class CHPUI {
 			numval.innerHTML = '' + this.selectedVolume;
 		}
 	}
+	refreshMode() {
+		let nam = 'radio' + this.selectedMode;
+		let el = document.getElementById(nam);
+		if (el) {
+			(el as any).checked = true;
+		}
+		console.log(el);
+	}
 	init() {
-		//let me = this;
+
 		let el = document.getElementById('inslist');
 		if (el) {
 			this.inslist = el as HTMLUListElement;
@@ -121,21 +110,32 @@ class CHPUI {
 			this.level.addEventListener('change', (event) => {
 				this.selectedVolume = parseInt(this.level.value);
 				this.refreshVolume();
-				this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx);
+				this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx + '/' + this.selectedMode);
 			});
 			console.dir(this.level);
 		}
+		el = document.getElementById('radio1'); if (el) { el.addEventListener('change', (event) => { this.setMode(1); }); }
+		el = document.getElementById('radio2'); if (el) { el.addEventListener('change', (event) => { this.setMode(2); }); }
+		el = document.getElementById('radio3'); if (el) { el.addEventListener('change', (event) => { this.setMode(3); }); }
+		el = document.getElementById('radio4'); if (el) { el.addEventListener('change', (event) => { this.setMode(4); }); }
+		el = document.getElementById('radio5'); if (el) { el.addEventListener('change', (event) => { this.setMode(5); }); }
 		this.reFillList();
 		this.refreshTitle();
 		this.refreshVolume();
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
 		this.sendMessageToHost('');
 
+		this.setState('88/445/3');
+	}
+	setMode(num: number) {
+		//console.log('setMode', num);
+		this.selectedMode = num;
+		this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx + '/' + this.selectedMode);
 	}
 	sendMessageToHost(data: string) {
 
 		var message: MZXBX_MessageToHost = { dialogID: this.id, pluginData: data, done: false };
-		console.log('set drum', data);
+		console.log('set instr', data);
 		window.parent.postMessage(message, '*');
 	}
 	receiveHostMessage(messageEvent: MessageEvent) {
@@ -157,7 +157,7 @@ class CHPUI {
 			let split = this.data.split('/');
 			this.selectedVolume = parseInt(split[0]);
 			this.selectedItemIdx = parseInt(split[1]);
-			//this.selectedCategoryIdx = parseInt(drumKeysArrayPercussionPaths[this.selectedItemIdx].substring(0, 2));
+			this.selectedMode = parseInt(split[2]);
 
 		} catch (xx) {
 			console.log(xx);
@@ -170,6 +170,7 @@ class CHPUI {
 		}
 		this.reFillList();
 		this.refreshTitle();
+		this.refreshMode();
 		this.refreshVolume();
 	}
 	tapCategory(idx: number) {
@@ -185,7 +186,7 @@ class CHPUI {
 	tapItem(idx: number) {
 		console.log('tapItem', idx);
 		this.selectedItemIdx = idx;
-		this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx);
+		this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx + '/' + this.selectedMode);
 		this.refreshTitle();
 	}
 }

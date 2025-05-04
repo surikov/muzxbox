@@ -281,6 +281,7 @@ declare class CHPUI {
     selectedSubIdx: number;
     selectedItemIdx: number;
     selectedVolume: number;
+    selectedMode: number;
     level: HTMLInputElement;
     inslist: HTMLUListElement;
     subUl: HTMLUListElement | null;
@@ -288,7 +289,9 @@ declare class CHPUI {
     reFillList(): void;
     refreshTitle(): void;
     refreshVolume(): void;
+    refreshMode(): void;
     init(): void;
+    setMode(num: number): void;
     sendMessageToHost(data: string): void;
     receiveHostMessage(messageEvent: MessageEvent): void;
     setMessagingId(newId: string): void;
