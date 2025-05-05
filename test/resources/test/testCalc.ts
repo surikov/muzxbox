@@ -306,8 +306,8 @@ function drawStat3(svg: SVGElement, rows: BallsRow[]) {
 			for (let colNum = 1; colNum <= rowLen; colNum++) {
 				if (ballExists(colNum, rows[rowNum])) {
 					let topy = topShift + 0.5 * cellSize + rowNum * cellSize;
-					let szz = cellSize / 5 - 0.5;
-					let clr = '#ff0000ff';
+					let szz = cellSize / 3 - 0.5;
+					let clr = '#ff000066';
 					if (rowNum == 0) {
 						topy = topy - 1.5 * cellSize;
 						szz = cellSize / 3 - 0.5
@@ -775,6 +775,7 @@ console.log(kk,first[kk].ball);
 			dumpInfo2('statblue', lbl);
 
 		}
+/*
 		if (rr == 1) {
 			let leftNum = -1;
 			let rightNum = 0;
@@ -792,7 +793,7 @@ console.log(kk,first[kk].ball);
 			let rightBall = first[leftNum].ball;
 			console.log('preblue', leftStart, '>', rightEnd);
 		}
-
+*/
 		let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
 		let xxx = 0 * rowLen / 2;
 
@@ -1128,7 +1129,7 @@ function addTails() {
 
 	resetNumbs();
 
-	testTest2();
+	//testTest2();
 
 
 
@@ -1459,7 +1460,7 @@ function dumpPairsPatterns(start, preArr, left, deep) {
 }
 init();
 addTails();
-dumpPairsCounts();
+//dumpPairsCounts();
 console.log('start');
 
 

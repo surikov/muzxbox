@@ -268,8 +268,8 @@ function drawStat3(svg, rows) {
             for (var colNum = 1; colNum <= rowLen; colNum++) {
                 if (ballExists(colNum, rows[rowNum])) {
                     var topy = topShift + 0.5 * cellSize + rowNum * cellSize;
-                    var szz = cellSize / 5 - 0.5;
-                    var clr = '#ff0000ff';
+                    var szz = cellSize / 3 - 0.5;
+                    var clr = '#ff000066';
                     if (rowNum == 0) {
                         topy = topy - 1.5 * cellSize;
                         szz = cellSize / 3 - 0.5;
@@ -689,23 +689,25 @@ console.log(kk,first[kk].ball);
         if (rr == 0) {
             dumpInfo2('statblue', lbl);
         }
-        if (rr == 1) {
-            var leftNum = -1;
-            var rightNum = 0;
-            for (var kk = 0; kk < first.length; kk++) {
-                if (ballExists(first[kk].ball, rows[rr])) {
-                    rightNum = kk;
-                    if (leftNum < 0) {
-                        leftNum = kk;
+        /*
+                if (rr == 1) {
+                    let leftNum = -1;
+                    let rightNum = 0;
+                    for (let kk = 0; kk < first.length; kk++) {
+                        if (ballExists(first[kk].ball, rows[rr])) {
+                            rightNum = kk;
+                            if (leftNum < 0) {
+                                leftNum = kk;
+                            }
+                        }
                     }
+                    let leftStart = rowLen - rightNum;
+                    let leftBall = first[rightNum].ball;
+                    let rightEnd = rowLen - leftNum;
+                    let rightBall = first[leftNum].ball;
+                    console.log('preblue', leftStart, '>', rightEnd);
                 }
-            }
-            var leftStart = rowLen - rightNum;
-            var leftBall = first[rightNum].ball;
-            var rightEnd = rowLen - leftNum;
-            var rightBall = first[leftNum].ball;
-            console.log('preblue', leftStart, '>', rightEnd);
-        }
+        */
         var yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
         var xxx = 0 * rowLen / 2;
         if (showFirstRow || rr > 0) {
@@ -1003,7 +1005,7 @@ function addTails() {
         return Math.abs(a.diff) - Math.abs(b.diff);
     });
     resetNumbs();
-    testTest2();
+    //testTest2();
 }
 function addTestLines1(data) {
     var bas = 19;
@@ -1317,5 +1319,5 @@ function dumpPairsPatterns(start, preArr, left, deep) {
 }
 init();
 addTails();
-dumpPairsCounts();
+//dumpPairsCounts();
 console.log('start');
