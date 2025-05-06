@@ -1458,9 +1458,61 @@ function dumpPairsPatterns(start, preArr, left, deep) {
 	}
 
 }
+function randBalls(count:number):number[]{
+	let test:number[]=[];
+	for(let ii=0;ii<count;ii++){
+		let ball=Math.floor(Math.random()*rowLen);
+		if(test[ball]){
+			ii--;
+		}else{
+			test[ball]=1;
+		}
+	}
+	return test;
+}
+function chackRow(selection:number[],row:BallsRow):number{
+	let foundcount=0;
+	for(let ii=1;ii<=rowLen;ii++){
+		if(selection[ii]){
+			if (ballExists(ii, row)) {
+				foundcount++;
+			}
+		}
+	}
+	return foundcount;
+}
+function checkAllRows(count:number){
+	let calcs:number[]=[];
+	for(let ii=1;ii<5001;ii++){
+		let chk=randBalls(count);
+		let cc=chackRow(chk,datarows[ii]);
+		calcs[cc]=(calcs[cc])?calcs[cc]:0;
+		calcs[cc]=calcs[cc]+2;
+	}
+	console.log(Math.floor(count),calcs);
+}
 init();
 addTails();
 //dumpPairsCounts();
+//let chk=randBalls(20);
+console.log(datarows);
+checkAllRows(rowLen*1/4);
+checkAllRows(rowLen*1/2);
+checkAllRows(rowLen*3/4);
+
+let row=datarows[123];
+let chk=randBalls(33);
+console.log(chackRow(randBalls(33),row));
+console.log(chackRow(randBalls(33),row));
+console.log(chackRow(randBalls(33),row));
+console.log(chackRow(randBalls(33),row));
+console.log(chackRow(randBalls(33),row));
+console.log(chackRow(randBalls(33),row));
+console.log(chackRow(randBalls(33),row));
+console.log(chackRow(randBalls(33),row));
+console.log(chackRow(randBalls(33),row));
+console.log(chackRow(randBalls(33),row));
+
 console.log('start');
 
 
