@@ -1344,8 +1344,8 @@ function chackRow(selection, row) {
 function checkAllRows(count) {
     var calcs = [];
     for (var ii = 1; ii < 5001; ii++) {
-        var chk_1 = randBalls(count);
-        var cc = chackRow(chk_1, datarows[ii]);
+        var chk = randBalls(count);
+        var cc = chackRow(chk, datarows[ii]);
         calcs[cc] = (calcs[cc]) ? calcs[cc] : 0;
         calcs[cc] = calcs[cc] + 2;
     }
@@ -1359,16 +1359,9 @@ console.log(datarows);
 checkAllRows(rowLen * 1 / 4);
 checkAllRows(rowLen * 1 / 2);
 checkAllRows(rowLen * 3 / 4);
-var row = datarows[123];
-var chk = randBalls(33);
-console.log(chackRow(randBalls(33), row));
-console.log(chackRow(randBalls(33), row));
-console.log(chackRow(randBalls(33), row));
-console.log(chackRow(randBalls(33), row));
-console.log(chackRow(randBalls(33), row));
-console.log(chackRow(randBalls(33), row));
-console.log(chackRow(randBalls(33), row));
-console.log(chackRow(randBalls(33), row));
-console.log(chackRow(randBalls(33), row));
-console.log(chackRow(randBalls(33), row));
+var row = datarows[Math.round(Math.random() * 5000 + 1)];
+console.log(33, row);
+for (var ii = 0; ii < 10; ii++) {
+    console.log(chackRow(randBalls(33), row));
+}
 console.log('start');

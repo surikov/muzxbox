@@ -1500,18 +1500,12 @@ checkAllRows(rowLen*1/4);
 checkAllRows(rowLen*1/2);
 checkAllRows(rowLen*3/4);
 
-let row=datarows[123];
-let chk=randBalls(33);
-console.log(chackRow(randBalls(33),row));
-console.log(chackRow(randBalls(33),row));
-console.log(chackRow(randBalls(33),row));
-console.log(chackRow(randBalls(33),row));
-console.log(chackRow(randBalls(33),row));
-console.log(chackRow(randBalls(33),row));
-console.log(chackRow(randBalls(33),row));
-console.log(chackRow(randBalls(33),row));
-console.log(chackRow(randBalls(33),row));
-console.log(chackRow(randBalls(33),row));
+let row=datarows[Math.round(Math.random()*5000+1)];
+console.log(33,row);
+for(let ii=0;ii<10;ii++){
+	console.log(chackRow(randBalls(33),row));
+}
+
 
 console.log('start');
 
