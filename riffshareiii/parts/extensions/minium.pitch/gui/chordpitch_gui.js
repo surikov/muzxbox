@@ -5,7 +5,7 @@ class CHPUI {
         this.id = '';
         this.data = '';
         this.selectedCategoryIdx = 0;
-        this.selectedSubIdx = 0;
+        this.selectedMIDInum = 0;
         this.selectedItemIdx = 0;
         this.selectedVolume = 0;
         this.selectedMode = 0;
@@ -20,7 +20,7 @@ class CHPUI {
                 me.tapSub(idx);
             });
             this.subUl.appendChild(subli);
-            if (idx == this.selectedSubIdx) {
+            if (idx == this.selectedMIDInum) {
                 let pref = '' + idx;
                 if (pref.length == 2)
                     pref = '0' + pref;
@@ -78,6 +78,9 @@ class CHPUI {
     refreshTitle() {
         let tileval = document.getElementById('tileval');
         if (tileval) {
+            let insName = tonechordinstrumentKeys()[this.selectedItemIdx];
+            this.selectedMIDInum = parseInt(insName.substring(0, 3));
+            tileval.innerHTML = '' + tonechordinslist()[this.selectedMIDInum] + ' / ' + insName;
         }
     }
     refreshVolume() {
@@ -134,7 +137,6 @@ class CHPUI {
         this.refreshVolume();
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
         this.sendMessageToHost('');
-        this.setState('88/445/3');
     }
     setMode(num) {
         this.selectedMode = num;
@@ -171,8 +173,11 @@ class CHPUI {
             console.log(xx);
             this.selectedVolume = 77;
             this.selectedItemIdx = 0;
-            this.selectedCategoryIdx = 35;
+            this.selectedMode = 0;
         }
+        let insName = tonechordinstrumentKeys()[this.selectedItemIdx];
+        this.selectedMIDInum = parseInt(insName.substring(0, 3));
+        this.selectedCategoryIdx = 8 * Math.floor(this.selectedMIDInum / 8);
         if (this.level) {
             this.level.value = '' + this.selectedVolume;
         }
@@ -188,7 +193,7 @@ class CHPUI {
     }
     tapSub(idx) {
         console.log('tapSub', idx);
-        this.selectedSubIdx = idx;
+        this.selectedMIDInum = idx;
         this.reFillList();
     }
     tapItem(idx) {

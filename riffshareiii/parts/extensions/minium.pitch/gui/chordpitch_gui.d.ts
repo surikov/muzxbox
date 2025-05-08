@@ -278,7 +278,7 @@ declare class CHPUI {
     id: string;
     data: string;
     selectedCategoryIdx: number;
-    selectedSubIdx: number;
+    selectedMIDInum: number;
     selectedItemIdx: number;
     selectedVolume: number;
     selectedMode: number;

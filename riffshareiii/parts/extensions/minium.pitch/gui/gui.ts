@@ -4,7 +4,7 @@ class CHPUI {
 	id: string = '';
 	data: string = '';
 	selectedCategoryIdx: number = 0;
-	selectedSubIdx: number = 0;
+	selectedMIDInum: number = 0;
 	selectedItemIdx: number = 0;
 	selectedVolume = 0;
 	selectedMode = 0;
@@ -23,7 +23,7 @@ class CHPUI {
 				me.tapSub(idx);
 			});
 			this.subUl.appendChild(subli);
-			if (idx == this.selectedSubIdx) {
+			if (idx == this.selectedMIDInum) {
 				let pref = '' + idx;
 				if (pref.length == 2) pref = '0' + pref;
 				if (pref.length == 1) pref = '00' + pref;
@@ -79,8 +79,10 @@ class CHPUI {
 	refreshTitle() {
 		let tileval = document.getElementById('tileval');
 		if (tileval) {
-			//let catIdx = parseInt(drumKeysArrayPercussionPaths[this.selectedItemIdx].substring(0, 2));
-			//tileval.innerHTML = '' + allPercussionDrumTitles()[catIdx] + ' / ' + drumKeysArrayPercussionPaths[this.selectedItemIdx];
+			let insName = tonechordinstrumentKeys()[this.selectedItemIdx];
+
+		this.selectedMIDInum = parseInt(insName.substring(0, 3));
+			tileval.innerHTML = '' + tonechordinslist()[this.selectedMIDInum]+ ' / ' + insName;
 		}
 	}
 	refreshVolume() {
@@ -125,7 +127,7 @@ class CHPUI {
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
 		this.sendMessageToHost('');
 
-		this.setState('88/445/3');
+		//this.setState('88/289/3');
 	}
 	setMode(num: number) {
 		//console.log('setMode', num);
@@ -163,8 +165,14 @@ class CHPUI {
 			console.log(xx);
 			this.selectedVolume = 77;
 			this.selectedItemIdx = 0;
-			this.selectedCategoryIdx = 35;
+			this.selectedMode = 0;
 		}
+
+
+		let insName = tonechordinstrumentKeys()[this.selectedItemIdx];
+		this.selectedMIDInum = parseInt(insName.substring(0, 3));
+		this.selectedCategoryIdx=8*Math.floor(this.selectedMIDInum/8);
+		
 		if (this.level) {
 			this.level.value = '' + this.selectedVolume;
 		}
@@ -180,7 +188,7 @@ class CHPUI {
 	}
 	tapSub(idx: number) {
 		console.log('tapSub', idx);
-		this.selectedSubIdx = idx;
+		this.selectedMIDInum = idx;
 		this.reFillList();
 	}
 	tapItem(idx: number) {
