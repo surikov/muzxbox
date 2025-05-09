@@ -390,6 +390,22 @@ class FilterPluginDialog {
         this.closeFilterDialogFrame();
         globalCommandDispatcher.reConnectPluginsIfPlay();
     }
+    openEmptyFilterPluginDialogFrame(order, filter) {
+        this.filter = filter;
+        this.order = order;
+        this.pluginRawData = filter.data;
+        this.resetFilterTitle();
+        let pluginFrame = document.getElementById("pluginFilterFrame");
+        let pluginDiv = document.getElementById("pluginFilterDiv");
+        if (pluginFrame) {
+            if (pluginFrame.contentWindow) {
+                this.waitFilterPluginInit = true;
+                pluginFrame.src = 'pluginplaceholder.html';
+                pluginDiv.style.visibility = "visible";
+                this.resetStateButtons();
+            }
+        }
+    }
     openFilterPluginDialogFrame(order, filter, filterPlugin) {
         this.filter = filter;
         this.order = order;
@@ -536,6 +552,16 @@ class SamplerPluginDialog {
         });
         this.closeDrumDialogFrame();
         globalCommandDispatcher.reConnectPluginsIfPlay();
+    }
+    openEmptyDrumPluginDialogFrame(order, drum) {
+        this.drum = drum;
+        this.order = order;
+        this.resetDrumTitle();
+        let pluginFrame = document.getElementById("pluginSamplerFrame");
+        let pluginDiv = document.getElementById("pluginSamplerDiv");
+        pluginFrame.src = 'pluginplaceholder.html';
+        pluginDiv.style.visibility = "visible";
+        this.resetStateButtons();
     }
     openDrumPluginDialogFrame(order, drum, fplugin) {
         this.drum = drum;
@@ -764,6 +790,20 @@ class SequencerPluginDialog {
         });
         this.closeSequencerDialogFrame();
         globalCommandDispatcher.reConnectPluginsIfPlay();
+    }
+    openEmptySequencerPluginDialogFrame(order, track) {
+        this.track = track;
+        this.order = order;
+        this.resetSequencerTitle();
+        let pluginFrame = document.getElementById("pluginSequencerFrame");
+        let pluginDiv = document.getElementById("pluginSequencerDiv");
+        if (pluginFrame) {
+            if (pluginFrame.contentWindow) {
+                pluginFrame.src = 'pluginplaceholder.html';
+                pluginDiv.style.visibility = "visible";
+                this.resetStateButtons();
+            }
+        }
     }
     openSequencerPluginDialogFrame(order, track, trackPlugin) {
         this.track = track;
@@ -2413,6 +2453,9 @@ class RightMenuPanel {
                     if (info) {
                         globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(tt, track, info);
                     }
+                    else {
+                        globalCommandDispatcher.sequencerPluginDialog.openEmptySequencerPluginDialogFrame(tt, track);
+                    }
                 };
                 item.highlight = icon_sliders;
             }
@@ -2456,6 +2499,9 @@ class RightMenuPanel {
                     if (info) {
                         globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(tt, drum, info);
                     }
+                    else {
+                        globalCommandDispatcher.samplerPluginDialog.openEmptyDrumPluginDialogFrame(tt, drum);
+                    }
                 };
                 item.highlight = icon_sliders;
             }
@@ -2493,6 +2539,9 @@ class RightMenuPanel {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
                     if (info) {
                         globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(ff, filter, info);
+                    }
+                    else {
+                        globalCommandDispatcher.filterPluginDialog.openEmptyFilterPluginDialogFrame(ff, filter);
                     }
                 };
                 item.highlight = icon_sliders;

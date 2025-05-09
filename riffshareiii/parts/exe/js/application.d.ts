@@ -48,6 +48,7 @@ declare class FilterPluginDialog {
     setFilterOn(): void;
     setFilterPass(): void;
     dropFilter(): void;
+    openEmptyFilterPluginDialogFrame(order: number, filter: Zvoog_FilterTarget): void;
     openFilterPluginDialogFrame(order: number, filter: Zvoog_FilterTarget, filterPlugin: null | MZXBX_PluginRegistrationInformation): void;
     closeFilterDialogFrame(): void;
     sendNewIdToPlugin(): void;
@@ -69,6 +70,7 @@ declare class SamplerPluginDialog {
     setDrumMute(): void;
     setDrumSolo(): void;
     dropDrum(): void;
+    openEmptyDrumPluginDialogFrame(order: number, drum: Zvoog_PercussionTrack): void;
     openDrumPluginDialogFrame(order: number, drum: Zvoog_PercussionTrack, fplugin: null | MZXBX_PluginRegistrationInformation): void;
     closeDrumDialogFrame(): void;
     sendNewIdToPlugin(): void;
@@ -102,6 +104,7 @@ declare class SequencerPluginDialog {
     setSequencerMute(): void;
     setSequencerSolo(): void;
     dropSequencer(): void;
+    openEmptySequencerPluginDialogFrame(order: number, track: Zvoog_MusicTrack): void;
     openSequencerPluginDialogFrame(order: number, track: Zvoog_MusicTrack, trackPlugin: null | MZXBX_PluginRegistrationInformation): void;
     closeSequencerDialogFrame(): void;
     sendNewIdToPlugin(): void;

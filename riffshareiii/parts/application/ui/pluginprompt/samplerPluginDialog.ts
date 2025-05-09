@@ -32,7 +32,7 @@ class SamplerPluginDialog {
 			(document.getElementById("pluginSamplerSetPasstrough") as any).className = 'pluginNoneButton';
 			(document.getElementById("pluginSamplerSetSolo") as any).className = 'pluginDoButton';
 		} else {
-			if (this.drum.sampler.state == 2) { 
+			if (this.drum.sampler.state == 2) {
 				(document.getElementById("pluginSamplerSetPlay") as any).className = 'pluginDoButton';
 				(document.getElementById("pluginSamplerSetPasstrough") as any).className = 'pluginDoButton';
 				(document.getElementById("pluginSamplerSetSolo") as any).className = 'pluginNoneButton';
@@ -71,7 +71,17 @@ class SamplerPluginDialog {
 		this.closeDrumDialogFrame();
 		globalCommandDispatcher.reConnectPluginsIfPlay();
 	}
-	openDrumPluginDialogFrame(order: number, drum: Zvoog_PercussionTrack, fplugin: null|MZXBX_PluginRegistrationInformation) {
+	openEmptyDrumPluginDialogFrame(order: number, drum: Zvoog_PercussionTrack) {
+		this.drum = drum;
+		this.order = order;
+		this.resetDrumTitle();
+		let pluginFrame = document.getElementById("pluginSamplerFrame") as any;
+		let pluginDiv = document.getElementById("pluginSamplerDiv") as any;
+		pluginFrame.src = 'pluginplaceholder.html';
+		pluginDiv.style.visibility = "visible";
+		this.resetStateButtons();
+	}
+	openDrumPluginDialogFrame(order: number, drum: Zvoog_PercussionTrack, fplugin: null | MZXBX_PluginRegistrationInformation) {
 		//console.log('openDrumPluginDialogFrame',order, drum, fplugin);
 		this.drum = drum;
 		this.order = order;
@@ -82,8 +92,8 @@ class SamplerPluginDialog {
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
 				this.waitSamplerPluginInit = true;
-				if(fplugin){
-				pluginFrame.src = fplugin.ui;
+				if (fplugin) {
+					pluginFrame.src = fplugin.ui;
 				}
 				pluginDiv.style.visibility = "visible";
 				this.resetStateButtons();

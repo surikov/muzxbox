@@ -69,7 +69,7 @@ class FilterPluginDialog {
 		this.closeFilterDialogFrame();
 		globalCommandDispatcher.reConnectPluginsIfPlay();
 	}
-	openFilterPluginDialogFrame(order: number, filter: Zvoog_FilterTarget, filterPlugin: null|MZXBX_PluginRegistrationInformation) {
+	openEmptyFilterPluginDialogFrame(order: number, filter: Zvoog_FilterTarget) {
 		//console.log('openFilterPluginDialogFrame');
 		this.filter = filter;
 		this.order = order;
@@ -80,8 +80,25 @@ class FilterPluginDialog {
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
 				this.waitFilterPluginInit = true;
-				if(filterPlugin){
-				pluginFrame.src = filterPlugin.ui;
+				pluginFrame.src = 'pluginplaceholder.html';
+				pluginDiv.style.visibility = "visible";
+				this.resetStateButtons();
+			}
+		}
+	}
+	openFilterPluginDialogFrame(order: number, filter: Zvoog_FilterTarget, filterPlugin: null | MZXBX_PluginRegistrationInformation) {
+		//console.log('openFilterPluginDialogFrame');
+		this.filter = filter;
+		this.order = order;
+		this.pluginRawData = filter.data;
+		this.resetFilterTitle();
+		let pluginFrame = document.getElementById("pluginFilterFrame") as any;
+		let pluginDiv = document.getElementById("pluginFilterDiv") as any;
+		if (pluginFrame) {
+			if (pluginFrame.contentWindow) {
+				this.waitFilterPluginInit = true;
+				if (filterPlugin) {
+					pluginFrame.src = filterPlugin.ui;
 				}
 				pluginDiv.style.visibility = "visible";
 				this.resetStateButtons();

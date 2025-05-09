@@ -71,6 +71,23 @@ class SequencerPluginDialog {
 		this.closeSequencerDialogFrame();
 		globalCommandDispatcher.reConnectPluginsIfPlay();
 	}
+	openEmptySequencerPluginDialogFrame(order: number, track: Zvoog_MusicTrack) {
+		
+		
+		this.track = track;
+		this.order = order;
+		
+		this.resetSequencerTitle();
+		let pluginFrame = document.getElementById("pluginSequencerFrame") as any;
+		let pluginDiv = document.getElementById("pluginSequencerDiv") as any;
+		if (pluginFrame) {
+			if (pluginFrame.contentWindow) {
+				pluginFrame.src = 'pluginplaceholder.html';
+				pluginDiv.style.visibility = "visible";
+				this.resetStateButtons();
+			}
+		}
+	}
 	openSequencerPluginDialogFrame(order: number, track: Zvoog_MusicTrack, trackPlugin: null|MZXBX_PluginRegistrationInformation) {
 		//console.log('openSequencerPluginDialogFrame',order, track, trackPlugin);
 		this.track = track;

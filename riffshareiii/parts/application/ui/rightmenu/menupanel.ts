@@ -404,6 +404,8 @@ class RightMenuPanel {
 							globalCommandDispatcher.cancelPluginGUI();
 						});
 						*/
+					}else{
+						globalCommandDispatcher.sequencerPluginDialog.openEmptySequencerPluginDialogFrame(tt, track);
 					}
 					//console.log('first',track);
 				};
@@ -473,6 +475,8 @@ class RightMenuPanel {
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});*/
+					}else{
+						globalCommandDispatcher.samplerPluginDialog.openEmptyDrumPluginDialogFrame(tt,drum);
 					}
 					//console.log('first',track);
 				};
@@ -537,6 +541,8 @@ class RightMenuPanel {
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});*/
+					}else{
+						globalCommandDispatcher.filterPluginDialog.openEmptyFilterPluginDialogFrame(ff, filter);
 					}
 					//console.log('first',track);
 				};
