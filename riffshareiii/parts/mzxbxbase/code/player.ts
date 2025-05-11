@@ -5,8 +5,8 @@ class SchedulePlayer implements MZXBX_Player {
 	position: number = 0;
 	audioContext: AudioContext;
 	schedule: MZXBX_Schedule | null = null;
-	performers: MZXBX_PerformerSamplerHolder[] = [];
-	filters: MZXBX_FilterHolder[] = [];
+	performerDrumHolders: MZXBX_PerformerSamplerHolder[] = [];
+	filterHolders: MZXBX_FilterHolder[] = [];
 	pluginsList: MZXBX_PerformerSamplerHolder[] = [];
 	nextAudioContextStart: number = 0;
 	tickDuration = 0.25;
@@ -27,7 +27,7 @@ class SchedulePlayer implements MZXBX_Player {
 			this.schedule = schedule;
 			if (this.schedule) {
 				let pluginLoader: PluginLoader = new PluginLoader();
-				let waitload = pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers);
+				let waitload = pluginLoader.collectLoadPlugins(this.schedule, this.filterHolders, this.performerDrumHolders);
 				if (waitload) {
 					return waitload;
 				} else {
@@ -43,27 +43,28 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 	}
 	allFilters(): MZXBX_FilterHolder[] {
-		return this.filters;
+		return this.filterHolders;
 	}
 	allPerformersSamplers(): MZXBX_PerformerSamplerHolder[] {
-		return this.performers;
+		return this.performerDrumHolders;
 	}
 	launchCollectedPlugins(): null | string {
+		//console.log('launchCollectedPlugins',this.filterHolders,this.performerDrumHolders);
 		try {
 			//
-			for (let ff = 0; ff < this.filters.length; ff++) {
+			for (let ff = 0; ff < this.filterHolders.length; ff++) {
 				//console.log('launch filter',ff,this.filters[ff]);
-				let plugin: MZXBX_AudioFilterPlugin | null = this.filters[ff].pluginAudioFilter;
+				let plugin: MZXBX_AudioFilterPlugin | null = this.filterHolders[ff].pluginAudioFilter;
 
 				if (plugin) {
-					plugin.launch(this.audioContext, this.filters[ff].properties);
+					plugin.launch(this.audioContext, this.filterHolders[ff].properties);
 				}
 			}
-			for (let pp = 0; pp < this.performers.length; pp++) {
-				//console.log('launch performer',pp,this.performers[pp]);
-				let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performers[pp].plugin;
+			for (let pp = 0; pp < this.performerDrumHolders.length; pp++) {
+				//console.log('launch performer/drum',pp,this.performerDrumHolders[pp]);
+				let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performerDrumHolders[pp].plugin;
 				if (plugin) {
-					plugin.launch(this.audioContext, this.performers[pp].properties);
+					plugin.launch(this.audioContext, this.performerDrumHolders[pp].properties);
 				}
 			}
 			return null;
@@ -73,29 +74,29 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 	}
 	checkCollectedPlugins(): null | string {
-		for (let ff = 0; ff < this.filters.length; ff++) {
+		for (let ff = 0; ff < this.filterHolders.length; ff++) {
 			//console.log(ff, this.filters[ff]);
-			let plugin: MZXBX_AudioFilterPlugin | null = this.filters[ff].pluginAudioFilter;
+			let plugin: MZXBX_AudioFilterPlugin | null = this.filterHolders[ff].pluginAudioFilter;
 			if (plugin) {
 				let busyState = plugin.busy()
 				if (busyState) {
-					return busyState + ' [' + this.filters[ff].filterId + ']';
+					return busyState + ' [' + this.filterHolders[ff].filterId + ']';
 				}
 			} else {
-				console.log('no plugin for filter', this.filters[ff]);
-				return 'plugin not found [' + this.filters[ff].description + ']';
+				console.log('no plugin for filter', this.filterHolders[ff]);
+				return 'plugin not found [' + this.filterHolders[ff].description + ']';
 			}
 		}
-		for (let pp = 0; pp < this.performers.length; pp++) {
-			let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performers[pp].plugin;
+		for (let pp = 0; pp < this.performerDrumHolders.length; pp++) {
+			let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performerDrumHolders[pp].plugin;
 			if (plugin) {
 				let busyState = plugin.busy()
 				if (busyState) {
-					return busyState + ' [' + this.performers[pp].description + ' ]';
+					return busyState + ' [' + this.performerDrumHolders[pp].description + ' ]';
 				}
 			} else {
-				console.log('no plugin for performer/sampler', this.performers[pp]);
-				return 'plugin not found [' + this.performers[pp].description + ']';
+				console.log('no plugin for performer/sampler', this.performerDrumHolders[pp]);
+				return 'plugin not found [' + this.performerDrumHolders[pp].description + ']';
 			}
 		}
 		return null;
@@ -318,8 +319,8 @@ class SchedulePlayer implements MZXBX_Player {
 		if (this.schedule) {
 			for (let ii = 0; ii < this.schedule.channels.length; ii++) {
 				if (this.schedule.channels[ii].id == channelId) {
-					for (let nn = 0; nn < this.performers.length; nn++) {
-						let performer = this.performers[nn];
+					for (let nn = 0; nn < this.performerDrumHolders.length; nn++) {
+						let performer = this.performerDrumHolders[nn];
 						if (channelId == performer.channelId) {
 							if (performer.plugin) {
 								let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin = performer.plugin;
@@ -350,8 +351,8 @@ class SchedulePlayer implements MZXBX_Player {
 	}
 	findFilterPlugin(filterId: string): MZXBX_AudioFilterPlugin | null {
 		if (this.schedule) {
-			for (let nn = 0; nn < this.filters.length; nn++) {
-				let filter = this.filters[nn];
+			for (let nn = 0; nn < this.filterHolders.length; nn++) {
+				let filter = this.filterHolders[nn];
 				if (filter.filterId == filterId) {
 					if (filter.pluginAudioFilter) {
 						let plugin: MZXBX_AudioFilterPlugin = filter.pluginAudioFilter;

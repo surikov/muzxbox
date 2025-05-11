@@ -84,6 +84,7 @@ class PluginLoader {
 				return;
 			}
 		}
+		//console.log('performer',description);
 		performers.push({ plugin: null, channelId: id, kind: kind, properties: properties ,description:description});
 	}
 	findPluginInfo(kind: string): MZXBX_PluginRegistrationInformation | null {

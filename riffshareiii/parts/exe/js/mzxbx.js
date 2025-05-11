@@ -82,8 +82,8 @@ class SchedulePlayer {
     constructor(callback) {
         this.position = 0;
         this.schedule = null;
-        this.performers = [];
-        this.filters = [];
+        this.performerDrumHolders = [];
+        this.filterHolders = [];
         this.pluginsList = [];
         this.nextAudioContextStart = 0;
         this.tickDuration = 0.25;
@@ -101,7 +101,7 @@ class SchedulePlayer {
             this.schedule = schedule;
             if (this.schedule) {
                 let pluginLoader = new PluginLoader();
-                let waitload = pluginLoader.collectLoadPlugins(this.schedule, this.filters, this.performers);
+                let waitload = pluginLoader.collectLoadPlugins(this.schedule, this.filterHolders, this.performerDrumHolders);
                 if (waitload) {
                     return waitload;
                 }
@@ -119,23 +119,23 @@ class SchedulePlayer {
         }
     }
     allFilters() {
-        return this.filters;
+        return this.filterHolders;
     }
     allPerformersSamplers() {
-        return this.performers;
+        return this.performerDrumHolders;
     }
     launchCollectedPlugins() {
         try {
-            for (let ff = 0; ff < this.filters.length; ff++) {
-                let plugin = this.filters[ff].pluginAudioFilter;
+            for (let ff = 0; ff < this.filterHolders.length; ff++) {
+                let plugin = this.filterHolders[ff].pluginAudioFilter;
                 if (plugin) {
-                    plugin.launch(this.audioContext, this.filters[ff].properties);
+                    plugin.launch(this.audioContext, this.filterHolders[ff].properties);
                 }
             }
-            for (let pp = 0; pp < this.performers.length; pp++) {
-                let plugin = this.performers[pp].plugin;
+            for (let pp = 0; pp < this.performerDrumHolders.length; pp++) {
+                let plugin = this.performerDrumHolders[pp].plugin;
                 if (plugin) {
-                    plugin.launch(this.audioContext, this.performers[pp].properties);
+                    plugin.launch(this.audioContext, this.performerDrumHolders[pp].properties);
                 }
             }
             return null;
@@ -146,30 +146,30 @@ class SchedulePlayer {
         }
     }
     checkCollectedPlugins() {
-        for (let ff = 0; ff < this.filters.length; ff++) {
-            let plugin = this.filters[ff].pluginAudioFilter;
+        for (let ff = 0; ff < this.filterHolders.length; ff++) {
+            let plugin = this.filterHolders[ff].pluginAudioFilter;
             if (plugin) {
                 let busyState = plugin.busy();
                 if (busyState) {
-                    return busyState + ' [' + this.filters[ff].filterId + ']';
+                    return busyState + ' [' + this.filterHolders[ff].filterId + ']';
                 }
             }
             else {
-                console.log('no plugin for filter', this.filters[ff]);
-                return 'plugin not found [' + this.filters[ff].description + ']';
+                console.log('no plugin for filter', this.filterHolders[ff]);
+                return 'plugin not found [' + this.filterHolders[ff].description + ']';
             }
         }
-        for (let pp = 0; pp < this.performers.length; pp++) {
-            let plugin = this.performers[pp].plugin;
+        for (let pp = 0; pp < this.performerDrumHolders.length; pp++) {
+            let plugin = this.performerDrumHolders[pp].plugin;
             if (plugin) {
                 let busyState = plugin.busy();
                 if (busyState) {
-                    return busyState + ' [' + this.performers[pp].description + ' ]';
+                    return busyState + ' [' + this.performerDrumHolders[pp].description + ' ]';
                 }
             }
             else {
-                console.log('no plugin for performer/sampler', this.performers[pp]);
-                return 'plugin not found [' + this.performers[pp].description + ']';
+                console.log('no plugin for performer/sampler', this.performerDrumHolders[pp]);
+                return 'plugin not found [' + this.performerDrumHolders[pp].description + ']';
             }
         }
         return null;
@@ -394,8 +394,8 @@ class SchedulePlayer {
         if (this.schedule) {
             for (let ii = 0; ii < this.schedule.channels.length; ii++) {
                 if (this.schedule.channels[ii].id == channelId) {
-                    for (let nn = 0; nn < this.performers.length; nn++) {
-                        let performer = this.performers[nn];
+                    for (let nn = 0; nn < this.performerDrumHolders.length; nn++) {
+                        let performer = this.performerDrumHolders[nn];
                         if (channelId == performer.channelId) {
                             if (performer.plugin) {
                                 let plugin = performer.plugin;
@@ -428,8 +428,8 @@ class SchedulePlayer {
     }
     findFilterPlugin(filterId) {
         if (this.schedule) {
-            for (let nn = 0; nn < this.filters.length; nn++) {
-                let filter = this.filters[nn];
+            for (let nn = 0; nn < this.filterHolders.length; nn++) {
+                let filter = this.filterHolders[nn];
                 if (filter.filterId == filterId) {
                     if (filter.pluginAudioFilter) {
                         let plugin = filter.pluginAudioFilter;

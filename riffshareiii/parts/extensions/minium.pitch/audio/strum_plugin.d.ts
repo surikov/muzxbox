@@ -373,7 +373,7 @@ declare class MM_WebAudioFontPlayer {
 declare class StrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
     audioContext: AudioContext;
     player: MM_WebAudioFontPlayer;
-    volumeNode: GainNode;
+    outputVolume: GainNode;
     loader: MM_WebAudioFontLoader;
     listidx: number;
     info: MMPresetInfo;

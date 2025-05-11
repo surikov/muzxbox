@@ -730,15 +730,20 @@ class StrumPerformerImplementation {
         this.strumMode = this.strumModeFlat;
     }
     launch(context, parameters) {
-        this.preset = null;
-        this.audioContext = context;
-        this.volumeNode = this.audioContext.createGain();
-        this.info = this.loader.instrumentInfo(this.listidx);
-        this.loader.startLoad(context, this.info.url, this.info.variable);
-        this.volumeNode.gain.setValueAtTime(this.loudness, this.audioContext.currentTime + 0.001);
-        this.loader.waitLoad(() => {
-            this.preset = window[this.info.variable];
-        });
+        if (this.audioContext) {
+            this.parseParameters(parameters);
+        }
+        else {
+            this.preset = null;
+            this.audioContext = context;
+            this.outputVolume = this.audioContext.createGain();
+            this.parseParameters(parameters);
+            this.info = this.loader.instrumentInfo(this.listidx);
+            this.loader.startLoad(context, this.info.url, this.info.variable);
+            this.loader.waitLoad(() => {
+                this.preset = window[this.info.variable];
+            });
+        }
     }
     parseParameters(parameters) {
         try {
@@ -763,6 +768,8 @@ class StrumPerformerImplementation {
             this.listidx = 0;
             this.strumMode = 0;
         }
+        this.outputVolume.gain.setValueAtTime(this.loudness, this.audioContext.currentTime + 0.00001);
+        console.log('parseParameter', parameters, this.loudness, this.listidx, this.strumMode);
     }
     busy() {
         if (this.preset == null) {
@@ -779,7 +786,7 @@ class StrumPerformerImplementation {
     }
     strum(whenStart, zpitches, tempo, mzbxslide) {
         if (this.audioContext) {
-            if (this.volumeNode) {
+            if (this.outputVolume) {
                 if (this.preset) {
                     let duration = 0;
                     let volumeLevel = 0.95 + 0.05 * Math.random();
@@ -794,27 +801,27 @@ class StrumPerformerImplementation {
                     }
                     if (this.strumMode == this.strumModePong) {
                         if (this.up) {
-                            this.player.queueStrumDown(this.audioContext, this.volumeNode, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                            this.player.queueStrumDown(this.audioContext, this.outputVolume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
                         }
                         else {
-                            this.player.queueStrumUp(this.audioContext, this.volumeNode, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                            this.player.queueStrumUp(this.audioContext, this.outputVolume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
                         }
                         this.up = !this.up;
                     }
                     else {
                         if (this.strumMode == this.strumModeDown) {
-                            this.player.queueStrumDown(this.audioContext, this.volumeNode, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                            this.player.queueStrumDown(this.audioContext, this.outputVolume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
                         }
                         else {
                             if (this.strumMode == this.strumModeUp) {
-                                this.player.queueStrumUp(this.audioContext, this.volumeNode, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                                this.player.queueStrumUp(this.audioContext, this.outputVolume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
                             }
                             else {
                                 if (this.strumMode == this.strumModeSnap) {
-                                    this.player.queueSnap(this.audioContext, this.volumeNode, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
+                                    this.player.queueSnap(this.audioContext, this.outputVolume, this.preset, when, tempo, pitches, duration, volumeLevel, mzbxslide);
                                 }
                                 else {
-                                    this.player.queueChord(this.audioContext, this.volumeNode, this.preset, when, pitches, duration, volumeLevel, mzbxslide);
+                                    this.player.queueChord(this.audioContext, this.outputVolume, this.preset, when, pitches, duration, volumeLevel, mzbxslide);
                                 }
                             }
                         }
@@ -827,8 +834,10 @@ class StrumPerformerImplementation {
         this.player.cancelQueue(this.audioContext);
     }
     output() {
-        if (this.volumeNode) {
-            return this.volumeNode;
+        console.log('outputVolume', this.outputVolume);
+        if (this.outputVolume) {
+            console.log('gain', this.outputVolume.gain.value);
+            return this.outputVolume;
         }
         else {
             return null;
@@ -836,6 +845,7 @@ class StrumPerformerImplementation {
     }
 }
 function newStrumPerformerImplementation() {
+    console.log('newStrumPerformerImplementation');
     return new StrumPerformerImplementation();
 }
 //# sourceMappingURL=strum_plugin.js.map
