@@ -17,15 +17,19 @@ class StrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 	strumModeSnap: 3 = 3;
 	strumModePong: 4 = 4;
 	strumMode: 0 | 1 | 2 | 3 | 4 = this.strumModeFlat;	//Flat / Down / Up / Snap / Pong
+	util: ChordPitchPerformerUtil = new ChordPitchPerformerUtil();
+	constructor() {
+		//
+	}
 	launch(context: AudioContext, parameters: string): void {
 		if (this.audioContext) {
-			this.parseParameters(parameters);
+			this.parseParametersData(parameters);
 		} else {
 			this.preset = null;
 			this.audioContext = context;
 			this.outputVolume = this.audioContext.createGain();
 			//this.outputVolume.connect(this.audioContext.destination);
-			this.parseParameters(parameters);
+			this.parseParametersData(parameters);
 
 			this.info = this.loader.instrumentInfo(this.listidx);
 
@@ -40,28 +44,33 @@ class StrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 			});
 		}
 	}
-	parseParameters(parameters: string) {
-
-		try {
-			let split = parameters.split('/');
-			this.loudness = parseInt(split[0]) / 100;
-			this.listidx = parseInt(split[1]);
-			let mode = parseInt(split[2]);
-			if (mode == 0) this.strumMode = 0;
-			if (mode == 1) this.strumMode = 1;
-			if (mode == 2) this.strumMode = 2;
-			if (mode == 3) this.strumMode = 3;
-			if (mode == 4) this.strumMode = 4;
-
-
-		} catch (xx) {
-			console.log(xx);
-			this.loudness = 0.5;
-			this.listidx = 0;
-			this.strumMode = 0;
-		}
-		this.outputVolume.gain.setValueAtTime(this.loudness, this.audioContext.currentTime + 0.00001);
-		console.log('parseParameter', parameters, this.loudness, this.listidx, this.strumMode);
+	parseParametersData(parameters: string) {
+		let parsed = this.util.checkParameters(parameters);
+		this.loudness = parsed.loudness;
+		this.listidx = parsed.idx;
+		this.strumMode = parsed.mode;
+		/*
+				try {
+					let split = parameters.split('/');
+					this.loudness = parseInt(split[0]) / 100;
+					this.listidx = parseInt(split[1]);
+					let mode = parseInt(split[2]);
+					if (mode == 0) this.strumMode = 0;
+					if (mode == 1) this.strumMode = 1;
+					if (mode == 2) this.strumMode = 2;
+					if (mode == 3) this.strumMode = 3;
+					if (mode == 4) this.strumMode = 4;
+		
+		
+				} catch (xx) {
+					console.log(xx);
+					this.loudness = 0.5;
+					this.listidx = 0;
+					this.strumMode = 0;
+				}
+				this.outputVolume.gain.setValueAtTime(this.loudness, this.audioContext.currentTime + 0.00001);
+				console.log('parseParameter', parameters, this.loudness, this.listidx, this.strumMode);
+				*/
 	}
 	busy(): null | string {
 		if (this.preset == null) {

@@ -63,6 +63,7 @@ class MM_WebAudioFontLoader {
 	//choosenInfos: ZPNumPair[] = [];
 	drumNamesArray: string[] = [];
 	drumKeyArray: string[] = [];
+	util: ChordPitchPerformerUtil = new ChordPitchPerformerUtil();
 	constructor(player: MM_WebAudioFontPlayer) {
 		this.player = player;
 	}
@@ -137,20 +138,20 @@ class MM_WebAudioFontLoader {
 	};
 	
 	instrumentInfo(n: number): MMPresetInfo {
-		var key: string = tonechordinstrumentKeys()[n];
+		var key: string = this.util.tonechordinstrumentKeys()[n];
 		//var key: string = this.instrumentKeys()[n];
 		var p = 1 * parseInt(key.substring(0, 3));
 		return {
 			variable: '_tone_' + key,
 			url: 'https://surikov.github.io/webaudiofontdata/sound/' + key + '.js',
-			title: tonechordinslist()[p]
+			title: this.util.tonechordinslist()[p]
 			, pitch: -1
 		};
 	};
 	findInstrument(program: number): number {
 		
-		for (var i = 0; i < tonechordinstrumentKeys().length; i++) {
-			if (program == 1 * parseInt(tonechordinstrumentKeys()[i].substring(0, 3))) {
+		for (var i = 0; i < this.util.tonechordinstrumentKeys().length; i++) {
+			if (program == 1 * parseInt(this.util.tonechordinstrumentKeys()[i].substring(0, 3))) {
 				return i;
 			}
 		}
