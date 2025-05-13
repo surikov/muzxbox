@@ -16,6 +16,7 @@ var reduceRatio = 1;
 var highLightMode = 1;
 var calcLen = 32;
 var diffWide = 5;
+var blueNotGree = true;
 var lastfirst;
 var wideRange = false;
 var mxdata = [];
@@ -745,14 +746,72 @@ console.log(kk,first[kk].ball);
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin1 / 2, toY: yyy, color: red, manual: false });
             markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red, manual: false });
         }
-        for (var ii = 0; ii < rowLen; ii++) {
-            var idx = ratioPre * (calcs[ii].summ - minCnt) / df;
-            var color = 'rgba(0,0,255,' + idx + ')';
-            addRect(svg, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
-            , color);
-            addRect(svg, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
-            , color);
+        /*
+                for (let ii = 0; ii < rowLen; ii++) {
+                    let idx = ratioPre * (calcs[ii].summ - minCnt) / df;
+                    let color = 'rgba(0,0,255,' + idx + ')';
+                    //color='rgba(0,0,255,0.5)';
+        
+                    addRect(svg
+                        , ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize
+                        , topShift + 0 * cellSize + rr * cellSize
+                        , cellSize
+                        , cellSize //- 0.1
+                        , color);
+                    addRect(svg
+                        , ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize
+                        , topShift + 0 * cellSize + rr * cellSize
+                        , cellSize
+                        , cellSize //- 0.1
+                        , color);
+        
+                }
+        */
+        if (blueNotGree) {
+            paintCellsBlue(ratioPre, calcs, minCnt, svg, df, rr);
         }
+        else {
+            paintCellsGreen(ratioPre, calcs, minCnt, svg, df, rr, rows);
+        }
+        //paintCellsGreen(ratioPre, calcs, minCnt, svg, df, rr, rows);
+    }
+}
+function paintCellsBlue(ratioPre, calcs, minCnt, svg, df, rr) {
+    for (var ii = 0; ii < rowLen; ii++) {
+        var idx = ratioPre * (calcs[ii].summ - minCnt) / df;
+        //let color = 'rgba(0,0,255,' + idx + ')';
+        var colorP = Math.floor(255 * (1 - idx));
+        var color = 'rgba(' + colorP + ',' + colorP + ',255)';
+        //color='rgba(0,0,255,0.5)';
+        addRect(svg, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
+        , color);
+        addRect(svg, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
+        , color);
+    }
+}
+function paintCellsGreen(ratioPre, calcs, minCnt, svg, df, rr, rows) {
+    for (var ii = 0; ii < rowLen; ii++) {
+        var idx = 0;
+        var stepColor = 2 * ballsInRow;
+        for (var kk = 1; kk <= stepColor; kk++) {
+            if (ballExists(ii + 1, rows[rr + kk])) {
+                idx = idx + 1; // / kk;
+            }
+        }
+        idx = ballsInRow * (idx * idx) / (stepColor * stepColor);
+        //let color = 'rgba(0,0,255,' + idx + ')';
+        var colorP = Math.floor(255 * (1 - idx));
+        //colorP = colorP * colorP / 255;
+        if (colorP < 0)
+            colorP = 0;
+        if (colorP > 255)
+            colorP = 255;
+        var color = 'rgba(' + colorP + ',255,' + colorP + ')';
+        //color='rgba(0,0,255,0.5)';
+        addRect(svg, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
+        , color);
+        addRect(svg, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
+        , color);
     }
 }
 function roundDown(num, base) {
@@ -773,6 +832,10 @@ function fillCells() {
     msgp.innerText = '' + reduceRatio;
     msgp = document.getElementById('calcWide');
     msgp.innerText = '' + diffWide;
+}
+function clickToggleMode() {
+    blueNotGree = !blueNotGree;
+    addTails();
 }
 function clickHop() {
     skipRowsCount = Math.round(Math.random() * (datarows.length - reduceRatio * rowsVisibleCount));

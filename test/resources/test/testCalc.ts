@@ -25,6 +25,7 @@ let highLightMode = 1;
 var calcLen = 32;
 let diffWide = 5;
 
+let blueNotGree = true;
 let lastfirst: BallsRow;
 
 let wideRange = false;
@@ -775,25 +776,25 @@ console.log(kk,first[kk].ball);
 			dumpInfo2('statblue', lbl);
 
 		}
-/*
-		if (rr == 1) {
-			let leftNum = -1;
-			let rightNum = 0;
-			for (let kk = 0; kk < first.length; kk++) {
-				if (ballExists(first[kk].ball, rows[rr])) {
-					rightNum = kk;
-					if (leftNum < 0) {
-						leftNum = kk;
+		/*
+				if (rr == 1) {
+					let leftNum = -1;
+					let rightNum = 0;
+					for (let kk = 0; kk < first.length; kk++) {
+						if (ballExists(first[kk].ball, rows[rr])) {
+							rightNum = kk;
+							if (leftNum < 0) {
+								leftNum = kk;
+							}
+						}
 					}
+					let leftStart = rowLen - rightNum;
+					let leftBall = first[rightNum].ball;
+					let rightEnd = rowLen - leftNum;
+					let rightBall = first[leftNum].ball;
+					console.log('preblue', leftStart, '>', rightEnd);
 				}
-			}
-			let leftStart = rowLen - rightNum;
-			let leftBall = first[rightNum].ball;
-			let rightEnd = rowLen - leftNum;
-			let rightBall = first[leftNum].ball;
-			console.log('preblue', leftStart, '>', rightEnd);
-		}
-*/
+		*/
 		let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
 		let xxx = 0 * rowLen / 2;
 
@@ -837,28 +838,106 @@ console.log(kk,first[kk].ball);
 
 
 
-
-		for (let ii = 0; ii < rowLen; ii++) {
-			let idx = ratioPre * (calcs[ii].summ - minCnt) / df;
-			let color = 'rgba(0,0,255,' + idx + ')';
-
-			addRect(svg
-				, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize
-				, topShift + 0 * cellSize + rr * cellSize
-				, cellSize
-				, cellSize //- 0.1
-				, color);
-			addRect(svg
-				, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize
-				, topShift + 0 * cellSize + rr * cellSize
-				, cellSize
-				, cellSize //- 0.1
-				, color);
-
+		/*
+				for (let ii = 0; ii < rowLen; ii++) {
+					let idx = ratioPre * (calcs[ii].summ - minCnt) / df;
+					let color = 'rgba(0,0,255,' + idx + ')';
+					//color='rgba(0,0,255,0.5)';
+		
+					addRect(svg
+						, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize
+						, topShift + 0 * cellSize + rr * cellSize
+						, cellSize
+						, cellSize //- 0.1
+						, color);
+					addRect(svg
+						, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize
+						, topShift + 0 * cellSize + rr * cellSize
+						, cellSize
+						, cellSize //- 0.1
+						, color);
+		
+				}
+		*/
+		if (blueNotGree) {
+			paintCellsBlue(ratioPre, calcs, minCnt, svg, df, rr);
+		} else {
+			paintCellsGreen(ratioPre, calcs, minCnt, svg, df, rr, rows);
 		}
-
+		//paintCellsGreen(ratioPre, calcs, minCnt, svg, df, rr, rows);
 	}
 
+}
+
+function paintCellsBlue(ratioPre: number
+	, calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[]
+	, minCnt: number
+	, svg: SVGElement
+	, df: number
+	, rr: number
+) {
+	for (let ii = 0; ii < rowLen; ii++) {
+		let idx = ratioPre * (calcs[ii].summ - minCnt) / df;
+		//let color = 'rgba(0,0,255,' + idx + ')';
+		let colorP = Math.floor(255 * (1 - idx));
+		let color = 'rgba(' + colorP + ',' + colorP + ',255)';
+		//color='rgba(0,0,255,0.5)';
+
+		addRect(svg
+			, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize
+			, topShift + 0 * cellSize + rr * cellSize
+			, cellSize
+			, cellSize //- 0.1
+			, color);
+		addRect(svg
+			, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize
+			, topShift + 0 * cellSize + rr * cellSize
+			, cellSize
+			, cellSize //- 0.1
+			, color);
+
+	}
+}
+function paintCellsGreen(ratioPre: number
+	, calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[]
+	, minCnt: number
+	, svg: SVGElement
+	, df: number
+	, rr: number
+	, rows: BallsRow[]
+) {
+	for (let ii = 0; ii < rowLen; ii++) {
+		let idx = 0;
+		let stepColor = 2 * ballsInRow;
+		for (let kk = 1; kk <= stepColor; kk++) {
+			if (ballExists(ii + 1, rows[rr + kk])) {
+				idx = idx + 1;// / kk;
+			}
+		}
+		idx = ballsInRow * (idx * idx) / (stepColor * stepColor);
+
+		//let color = 'rgba(0,0,255,' + idx + ')';
+		let colorP = Math.floor(255 * (1 - idx));
+		//colorP = colorP * colorP / 255;
+		if (colorP < 0) colorP = 0;
+		if (colorP > 255) colorP = 255;
+		let color = 'rgba(' + colorP + ',255,' + colorP + ')';
+		//color='rgba(0,0,255,0.5)';
+
+		addRect(svg
+			, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize
+			, topShift + 0 * cellSize + rr * cellSize
+			, cellSize
+			, cellSize //- 0.1
+			, color);
+		addRect(svg
+			, ii * cellSize - 0 * cellSize + 1 * rowLen * cellSize
+			, topShift + 0 * cellSize + rr * cellSize
+			, cellSize
+			, cellSize //- 0.1
+			, color);
+
+	}
 }
 
 function roundDown(num: number, base: number): number {
@@ -883,6 +962,10 @@ function fillCells() {
 	msgp = (document.getElementById('calcWide') as any) as HTMLElement;
 	msgp.innerText = '' + diffWide;
 
+}
+function clickToggleMode() {
+	blueNotGree = !blueNotGree;
+	addTails();
 }
 function clickHop() {
 	skipRowsCount = Math.round(Math.random() * (datarows.length - reduceRatio * rowsVisibleCount));
@@ -1458,22 +1541,22 @@ function dumpPairsPatterns(start, preArr, left, deep) {
 	}
 
 }
-function randBalls(count:number):number[]{
-	let test:number[]=[];
-	for(let ii=0;ii<count;ii++){
-		let ball=Math.floor(Math.random()*rowLen);
-		if(test[ball]){
+function randBalls(count: number): number[] {
+	let test: number[] = [];
+	for (let ii = 0; ii < count; ii++) {
+		let ball = Math.floor(Math.random() * rowLen);
+		if (test[ball]) {
 			ii--;
-		}else{
-			test[ball]=1;
+		} else {
+			test[ball] = 1;
 		}
 	}
 	return test;
 }
-function chackRow(selection:number[],row:BallsRow):number{
-	let foundcount=0;
-	for(let ii=1;ii<=rowLen;ii++){
-		if(selection[ii]){
+function chackRow(selection: number[], row: BallsRow): number {
+	let foundcount = 0;
+	for (let ii = 1; ii <= rowLen; ii++) {
+		if (selection[ii]) {
 			if (ballExists(ii, row)) {
 				foundcount++;
 			}
@@ -1481,29 +1564,29 @@ function chackRow(selection:number[],row:BallsRow):number{
 	}
 	return foundcount;
 }
-function checkAllRows(count:number){
-	let calcs:number[]=[];
-	for(let ii=1;ii<5001;ii++){
-		let chk=randBalls(count);
-		let cc=chackRow(chk,datarows[ii]);
-		calcs[cc]=(calcs[cc])?calcs[cc]:0;
-		calcs[cc]=calcs[cc]+2;
+function checkAllRows(count: number) {
+	let calcs: number[] = [];
+	for (let ii = 1; ii < 5001; ii++) {
+		let chk = randBalls(count);
+		let cc = chackRow(chk, datarows[ii]);
+		calcs[cc] = (calcs[cc]) ? calcs[cc] : 0;
+		calcs[cc] = calcs[cc] + 2;
 	}
-	console.log(Math.floor(count),calcs);
+	console.log(Math.floor(count), calcs);
 }
 init();
 addTails();
 //dumpPairsCounts();
 //let chk=randBalls(20);
 console.log(datarows);
-checkAllRows(rowLen*1/4);
-checkAllRows(rowLen*1/2);
-checkAllRows(rowLen*3/4);
+checkAllRows(rowLen * 1 / 4);
+checkAllRows(rowLen * 1 / 2);
+checkAllRows(rowLen * 3 / 4);
 
-let row=datarows[Math.round(Math.random()*5000+1)];
-console.log(33,row);
-for(let ii=0;ii<10;ii++){
-	console.log(chackRow(randBalls(33),row));
+let row = datarows[Math.round(Math.random() * 5000 + 1)];
+console.log(33, row);
+for (let ii = 0; ii < 10; ii++) {
+	console.log(chackRow(randBalls(33), row));
 }
 
 
