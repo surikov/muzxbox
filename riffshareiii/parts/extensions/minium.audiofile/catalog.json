@@ -1,0 +1,8 @@
+{
+    "label": "AudioFile"
+    , "purpose": "Sampler"
+    , "kind": "miniumfader1"
+    , "ui": "http://127.0.0.1:8080/chooser/pickfile.html"
+    , "evaluate": "newAudiFileSampleTrack"
+    , "script": "http://127.0.0.1:8080/player/dataplay.js"
+}
