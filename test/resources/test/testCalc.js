@@ -771,7 +771,7 @@ console.log(kk,first[kk].ball);
             paintCellsBlue(ratioPre, calcs, minCnt, svg, df, rr);
         }
         else {
-            paintCellsGreen(ratioPre, calcs, minCnt, svg, df, rr, rows);
+            paintCellsGreen(svg, rr, rows);
         }
         //paintCellsGreen(ratioPre, calcs, minCnt, svg, df, rr, rows);
     }
@@ -789,24 +789,33 @@ function paintCellsBlue(ratioPre, calcs, minCnt, svg, df, rr) {
         , color);
     }
 }
-function paintCellsGreen(ratioPre, calcs, minCnt, svg, df, rr, rows) {
+function paintCellsGreen(//ratioPre: number
+//, calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[]
+//, minCnt: number
+svg
+//, df: number
+, rr, rows) {
     for (var ii = 0; ii < rowLen; ii++) {
         var idx = 0;
         var stepColor = 2 * ballsInRow;
         for (var kk = 1; kk <= stepColor; kk++) {
             if (ballExists(ii + 1, rows[rr + kk])) {
-                idx = idx + 1; // / kk;
+                idx = idx + ballsInRow / kk;
             }
         }
-        idx = ballsInRow * (idx * idx) / (stepColor * stepColor);
+        idx = idx / ballsInRow;
+        //idx = ballsInRow * (idx * idx) / (stepColor * stepColor);
+        //console.log(idx);
         //let color = 'rgba(0,0,255,' + idx + ')';
-        var colorP = Math.floor(255 * (1 - idx));
+        //let colorP = Math.floor(255 * (1 - idx));
         //colorP = colorP * colorP / 255;
-        if (colorP < 0)
-            colorP = 0;
-        if (colorP > 255)
-            colorP = 255;
-        var color = 'rgba(' + colorP + ',255,' + colorP + ')';
+        //if (colorP < 0) colorP = 0;
+        //if (colorP > 150) colorP = 150;
+        if (idx < 0)
+            idx = 0;
+        if (idx > 1)
+            idx = 1;
+        var color = 'rgba(0,200,0,' + idx + ')';
         //color='rgba(0,0,255,0.5)';
         addRect(svg, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
         , color);
