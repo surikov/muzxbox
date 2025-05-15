@@ -1,57 +1,51 @@
-<html>
+<li><a href='zdbsdbf'></a>
+	<html>
 
-<head>
-	<title>AudioFile UI</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="plugins.css">
-</head>
+	<head>
+		<title>AudioFile UI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="plugins.css">
+	</head>
 
-<body>
-	<h1>Audio File</h1>
+	<body>
+		<h1>Audio File</h1>
+		<p>Frequency <span id='numval'>77</span>%</p>
+		<p>
+			<input type="range" id="ratioslider"  min="-100" max="100" value="0" />
+		</p>
+		<div class="cntrblk"><input type="text" id="fname" value="./plugins/minium/audio/576544__bogenseeberg__too"></div>
+		<div class="cntrblk"><br/><button onclick='javascript:pickerbridge.checkPath();'>Check</button></div>
+		<div class="cntrblk">
+			<ul><li><a href='javascript:pickerbridge.selectPath("bye-bye.wav");'>bye-bye.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("getup.wav");'>getup.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("goodbye-in-russian.wav");'>goodbye-in-russian.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("hello.wav");'>hello.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("oh-yeah.mp3");'>oh-yeah.mp3</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("okay.wav");'>okay.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("russian-metro-announce.wav");'>russian-metro-announce.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("russian-metro-announce2.wav");'>russian-metro-announce2.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("shouting-yeah.wav");'>shouting-yeah.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("sinner.wav");'>sinner.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("subscribe1.wav");'>subscribe1.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("tetris.wav");'>tetris.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("too-high.wav");'>too-high.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("too-low.wav");'>too-low.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("turn-around.wav");'>turn-around.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("voice-yeah.wav");'>voice-yeah.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("wait.mp3");'>wait.mp3</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("what.ogg");'>what.ogg</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("wowowo.wav");'>wowowo.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("yeah-right.wav");'>yeah-right.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("yo.wav");'></a>yo.wav</a></li>
+				<li><a href='javascript:pickerbridge.selectPath("zdravstvuite.wav");'>zdravstvuite.wav</a></li>
+			</ul>
+		</div>
+		<p style="visibility: hidden;">▢</p>
+		<script src="dataplay.js"></script>
+	</body>
 	
-	
-	<!--<div class="cntrblk"><button type="button">File</button></div>-->
-	<p>Frequency <span id='numval'>77</span>%</p>
-	<p>
-		<input type="range" id="ratio" name="volume" min="-100" max="100" value="0" />
-	</p>
-	<div class="cntrblk"><input type="text" id="fname" value="./plugins/minium/audio/576544__bogenseeberg__too"></div>
 
-
-	<div class="cntrblk">
-		<ul>
-			<li><a href='zdbsdbf'>474 254395__jagadamba__male-voice-yeah.wav</a></li>
-			<li><a href='zdbsdbf'>416843__tonsil5__shouting-yeah.wav</a></li>
-			<li><a href='zdbsdbf'>563906__bogenseeberg__2-moscow-underground-voice-russian-metro-announce.wav</a></li>
-			<li><a href='zdbsdbf'>563911__bogenseeberg__6-moscow-underground-voice-russian-metro-announce.wav</a></li>
-			<li><a href='zdbsdbf'>564244__bogenseeberg__ok-okay-akiei-voice-sound-with-strong-subtling-russian-accent-and-reductuction-of-vowels-for-games-songs-movies-apps.wav</a></li>
-			<li><a href='zdbsdbf'>569249__bogenseeberg__goodbye-in-russian.wav</a></li>
-			<li><a href='zdbsdbf'>569250__bogenseeberg__zdravstvuite.wav</a></li>
-			<li><a href='zdbsdbf'>576520__bogenseeberg__turn-around.wav</a></li>
-			<li><a href='zdbsdbf'>576544__bogenseeberg__too-low.wav</a></li>
-			<li><a href='zdbsdbf'>576545__bogenseeberg__too-high.wav</a></li>
-			<li><a href='zdbsdbf'>578890__bogenseeberg__yo.wav</a></li>
-			<li><a href='zdbsdbf'>578894__bogenseeberg__wowowo.wav</a></li>
-			<li><a href='zdbsdbf'>586926__bogenseeberg__tetris.wav</a></li>
-			<li><a href='zdbsdbf'>591726__bogenseeberg__subscribe1.wav</a></li>
-			<li><a href='zdbsdbf'>637071__sergequadrado__dad-says-bye-bye.wav</a></li>
-			<li><a href='zdbsdbf'>643313__bogenseeberg__wait-pedestrian-crossing-button-voice-ny.mp3</a></li>
-			<li><a href='zdbsdbf'>678387__leavingfebruary__yeah-right.wav</a></li>
-			<li><a href='zdbsdbf'>684666__omagod__oh-yeah.mp3</a></li>
-			<li><a href='zdbsdbf'>685081__pfranzen__confused-man-saying-what.ogg</a></li>
-			<li><a href='zdbsdbf'>759142__valerie-vivegnis__hello.wav</a></li>
-			<li><a href='zdbsdbf'>786363__copyc4t__sinner.wav</a></li>
-			<li><a href='zdbsdbf'>802515__sadiquecat__getup.wav</a></li>
-		</ul>
-	</div>
-	<p style="visibility: hidden;">▢</p>
-</body>
-<script src="dataplay.js"></script>
-<script>
-	initAudioFilePickerUI();
-</script>
-
-</html>
+	</html>
