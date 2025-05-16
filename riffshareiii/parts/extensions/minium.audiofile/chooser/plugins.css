@@ -26,7 +26,7 @@ input[type="range"] {
 
 input[type="range"]::-webkit-slider-thumb {
 	-webkit-appearance: none;
-	width: 0.75cm;
+	width: 1cm;
 	height: 1cm;
 	background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(190, 210, 255, 1) 100%);
 	position: relative;
@@ -44,7 +44,7 @@ input[type="range"]::-webkit-slider-thumb {
 ul {
 	display: inline-block;
 	text-align: left;
-	list-style-type: "▢  ";
+	list-style-type2: "▢  ";
 	font-size: 0.75cm;
 }
 

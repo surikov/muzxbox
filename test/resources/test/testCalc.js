@@ -797,13 +797,13 @@ svg
 , rr, rows) {
     for (var ii = 0; ii < rowLen; ii++) {
         var idx = 0;
-        var stepColor = 2 * ballsInRow;
+        var stepColor = 4 * ballsInRow;
         for (var kk = 1; kk <= stepColor; kk++) {
             if (ballExists(ii + 1, rows[rr + kk])) {
-                idx = idx + ballsInRow / kk;
+                idx = idx + 4 * ballsInRow / kk;
             }
         }
-        idx = idx / ballsInRow;
+        idx = 1 - idx / ballsInRow;
         //idx = ballsInRow * (idx * idx) / (stepColor * stepColor);
         //console.log(idx);
         //let color = 'rgba(0,0,255,' + idx + ')';

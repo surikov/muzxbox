@@ -909,13 +909,13 @@ function paintCellsGreen(//ratioPre: number
 
 	for (let ii = 0; ii < rowLen; ii++) {
 		let idx = 0;
-		let stepColor = 2 * ballsInRow;
+		let stepColor = 4 * ballsInRow;
 		for (let kk = 1; kk <= stepColor; kk++) {
 			if (ballExists(ii + 1, rows[rr + kk])) {
-				idx = idx+ballsInRow / kk;
+				idx = idx+4*ballsInRow / kk;
 			}
 		}
-		idx=idx/ballsInRow;
+		idx=1-idx/ballsInRow;
 		//idx = ballsInRow * (idx * idx) / (stepColor * stepColor);
 		//console.log(idx);
 

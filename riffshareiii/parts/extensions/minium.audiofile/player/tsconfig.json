@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es2015",
-        "outFile": "compress.js",
+        "outFile": "fileplay.js",
         "strictNullChecks": true,
         "alwaysStrict": true,
         "esModuleInterop": true,
@@ -24,6 +24,6 @@
     "files": [
         "../../../mzxbxapi/musicenginetypes.ts",
         "../../../mzxbxapi/musicenginedeclarations.ts",
-        "dcplugin.ts"
+        "fileplayer.ts"
     ]
 }

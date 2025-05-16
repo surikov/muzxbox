@@ -274,18 +274,19 @@ declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string
 declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
-declare class AudioFilePicker {
-    id: string;
-    path: string;
-    ratio: number;
-    ratioslider: any;
-    numval: any;
-    fname: any;
-    constructor();
-    sendMessageToHost(data: string): void;
-    receiveHostMessage(messageEvent: MessageEvent): void;
-    updateUI(): void;
-    selectPath(name: string): void;
-    checkPath(): void;
+declare class CompressorImplementation implements MZXBX_AudioFilterPlugin {
+    audioContext: AudioContext;
+    outputNode: GainNode;
+    inputNode: GainNode;
+    compressor: DynamicsCompressorNode;
+    dry: GainNode;
+    wet: GainNode;
+    num: number;
+    launch(context: AudioContext, parameters: string): void;
+    busy(): null | string;
+    schedule(when: number, tempo: number, parameters: string): void;
+    input(): AudioNode | null;
+    output(): AudioNode | null;
+    parseParameters(parameters: string): void;
 }
-declare let pickerbridge: AudioFilePicker;
+declare function newBaseCompressor(): MZXBX_AudioFilterPlugin;
