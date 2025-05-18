@@ -1,64 +1,69 @@
 "use strict";
-console.log('Compressor v1.0');
-class CompressorImplementation {
+class AudioFileParametersUrility {
+    parse(parameters) {
+        let result = { ratio: 0, volume: 100, url: '' };
+        try {
+            let split = parameters.split(',');
+            result.ratio = parseInt(split[0]);
+            result.volume = parseInt(split[1]);
+            result.url = split[2];
+        }
+        catch (xx) {
+            console.log(xx);
+        }
+        if (result.ratio >= -100 && result.ratio <= 100) {
+        }
+        else {
+            result.ratio = 0;
+        }
+        if (result.volume >= 0 && result.ratio <= 100) {
+        }
+        else {
+            result.volume = 100;
+        }
+        result.url = (result.url) ? result.url : '';
+        return result;
+    }
+    dump(ratio, volume, url) {
+        return '' + ratio + ',' + volume + ',' + url;
+    }
+}
+console.log('Audio File v1.0');
+class AudiFileSamplerTrackImplementation {
     constructor() {
-        this.num = 100;
+        this.freqRatio = 0;
+        this.fileURL = '';
+        this.volumeLevel = 0;
+        this.ratio = 0;
+        this.path = '';
     }
     launch(context, parameters) {
+        console.log('audiofile lauch');
         if (this.audioContext) {
         }
         else {
             this.audioContext = context;
-            this.inputNode = this.audioContext.createGain();
             this.outputNode = this.audioContext.createGain();
-            this.compressor = this.audioContext.createDynamicsCompressor();
-            var threshold = -40;
-            var knee = 35;
-            var ratio = 15;
-            var attack = 0.02;
-            var release = 0.91;
-            this.compressor.threshold.setValueAtTime(threshold, this.audioContext.currentTime + 0.0001);
-            this.compressor.knee.setValueAtTime(knee, this.audioContext.currentTime + 0.0001);
-            this.compressor.ratio.setValueAtTime(ratio, this.audioContext.currentTime + 0.0001);
-            this.compressor.attack.setValueAtTime(attack, this.audioContext.currentTime + 0.0001);
-            this.compressor.release.setValueAtTime(release, this.audioContext.currentTime + 0.0001);
-            this.dry = this.audioContext.createGain();
-            this.wet = this.audioContext.createGain();
-            this.dry.gain.setTargetAtTime(0.001, 0, 0.0001);
-            this.wet.gain.setTargetAtTime(0.999, 0, 0.0001);
-            this.inputNode.connect(this.dry);
-            this.inputNode.connect(this.compressor);
-            this.compressor.connect(this.wet);
-            this.dry.connect(this.outputNode);
-            this.wet.connect(this.outputNode);
+            let parsed = new AudioFileParametersUrility().parse(parameters);
+            this.ratio = parsed.ratio;
+            this.volumeLevel = parsed.volume;
+            this.path = parsed.url;
         }
-        this.schedule(this.audioContext.currentTime + 0.0001, 120, parameters);
     }
+    strum(when, pitches, tempo, slides) {
+    }
+    cancel() {
+    }
+    ;
     busy() {
-        return null;
-    }
-    schedule(when, tempo, parameters) {
-        this.parseParameters(parameters);
-        this.wet.gain.setValueAtTime(this.num, when);
-        this.dry.gain.setValueAtTime(1 - this.num, when);
-        this.wet.gain.linearRampToValueAtTime(this.num / 100, when + 0.001);
-        this.dry.gain.linearRampToValueAtTime(1 - this.num / 100, when + 0.001);
-    }
-    input() {
-        return this.inputNode;
+        return 'testing';
     }
     output() {
         return this.outputNode;
     }
-    parseParameters(parameters) {
-        this.num = parseInt(parameters);
-        this.num = (this.num) ? this.num : 0;
-        this.num = 1 * this.num;
-        this.num = (this.num < 0) ? 0 : this.num;
-        this.num = (this.num > 100) ? 100 : this.num;
-    }
 }
-function newBaseCompressor() {
-    return new CompressorImplementation();
+function newAudiFileSamplerTrack() {
+    console.log('audiofile newAudiFileSamplerTrack');
+    return new AudiFileSamplerTrackImplementation();
 }
 //# sourceMappingURL=fileplay.js.map

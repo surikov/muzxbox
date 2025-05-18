@@ -24,6 +24,7 @@
     "files": [
         "../../../mzxbxapi/musicenginetypes.ts",
         "../../../mzxbxapi/musicenginedeclarations.ts",
+        "../util/audiofileparametersutil.ts",
         "fileplayer.ts"
     ]
 }

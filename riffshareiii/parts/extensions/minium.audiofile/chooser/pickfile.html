@@ -11,11 +11,15 @@
 
 <body>
 	<h1>Audio File</h1>
+	<p>Volume <span id='volval'>77</span>%</p>
+	<p>
+		<input type="range" id="volumeslider" min="0" max="100" value="90" />
+	</p>
 	<p>Frequency ratio <span id='numval'>77</span>%</p>
 	<p>
 		<input type="range" id="ratioslider" min="-100" max="100" value="0" />
 	</p>
-	<div class="cntrblk"><input type="text" id="fname" value="./plugins/minium/audio/576544__bogenseeberg__too"></div>
+	<div class="cntrblk"><input type="text" id="fname" value="https://surikov.github.io/muzxbox/hello.wav"></div>
 	<div class="cntrblk"><br /><button onclick='javascript:pickerbridge.checkPath();'>Check</button></div>
 	<div class="cntrblk">
 		<ul>
