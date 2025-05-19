@@ -18,10 +18,12 @@ interface Zvoog_MetreMathType {
 	duration(tempo: number): number;
 	calculate(duration: number, tempo: number): Zvoog_MetreMathType;
 }
+
 type Zvoog_Slide = {
 	duration: Zvoog_Metre;
 	delta: number;
 };
+
 /*
 type Zvoog_Note = {
 	pitch: number;
@@ -72,6 +74,7 @@ type Zvoog_Chord = {
 	//notes: Zvoog_Note[];
 	pitches: number[];
 	slides: Zvoog_Slide[];
+	//slides:number[][]//duration/delta[]
 };
 type Zvoog_TrackMeasure = {
 	chords: Zvoog_Chord[];

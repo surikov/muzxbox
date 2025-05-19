@@ -44,11 +44,12 @@ class AudiFileSamplerTrackImplementation {
         else {
             this.audioContext = context;
             this.outputNode = this.audioContext.createGain();
-            let parsed = new AudioFileParametersUrility().parse(parameters);
-            this.ratio = parsed.ratio;
-            this.volumeLevel = parsed.volume;
-            this.path = parsed.url;
         }
+        let parsed = new AudioFileParametersUrility().parse(parameters);
+        this.ratio = parsed.ratio;
+        this.volumeLevel = parsed.volume;
+        this.path = parsed.url;
+        this.startLoadFile();
     }
     strum(when, pitches, tempo, slides) {
     }
@@ -60,6 +61,10 @@ class AudiFileSamplerTrackImplementation {
     }
     output() {
         return this.outputNode;
+    }
+    startLoadFile() {
+        let loadedFile = window[this.path];
+        console.log('loadedFile', loadedFile);
     }
 }
 function newAudiFileSamplerTrack() {

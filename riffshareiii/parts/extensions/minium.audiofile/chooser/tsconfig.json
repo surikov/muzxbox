@@ -24,7 +24,7 @@
     "files": [
         "../../../mzxbxapi/musicenginetypes.ts",
         "../../../mzxbxapi/musicenginedeclarations.ts",
-        "../util/audiofileparametersutil.ts",
+        "../util/audiofileparametersutil.ts","../util/pitchshift.ts",
         "audiochooser.ts"
     ]
 }
