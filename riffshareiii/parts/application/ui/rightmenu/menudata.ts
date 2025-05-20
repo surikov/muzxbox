@@ -119,9 +119,9 @@ function fillPluginsLists() {
 											id: '' + Math.random()
 											, kind: MZXBX_currentPlugins()[ii].kind
 											, data: ''
-											, outputs: []
+											, outputs: ['']
 											, iconPosition: newPos
-											, state: 1
+											, state: 0
 										}
 										, measures: []
 										, title: MZXBX_currentPlugins()[ii].label
@@ -139,12 +139,21 @@ function fillPluginsLists() {
 							dragStarted = true;
 							globalCommandDispatcher.hideRightMenu();
 							let sz = 1;
-							globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, {
+
+							let tri: TilePolygon = {
+								x: 0
+								, y: 0
+								, dots: [0, 0, sz * 2 * 0.8 * 0.9, sz * 0.9, 0, sz * 2 * 0.9]
+								, css: 'rectangleDragItem'
+							};
+							globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, tri);
+							/*globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, {
 								x: 0, y: 0
 								, w: sz, h: sz
 								, rx: sz / 2, ry: sz / 2
 								, css: 'rectangleDragItem'
-							});
+							});*/
+
 						}
 					}
 				};
@@ -168,9 +177,9 @@ function fillPluginsLists() {
 												id: '' + Math.random()
 												, kind: MZXBX_currentPlugins()[ii].kind
 												, data: ''
-												, outputs: []
+												, outputs: ['']
 												, iconPosition: newPos
-												, state: 1
+												, state: 0
 											}
 											, measures: []
 											, title: MZXBX_currentPlugins()[ii].label
@@ -191,7 +200,7 @@ function fillPluginsLists() {
 								globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, {
 									x: 0, y: 0
 									, w: sz, h: sz
-									, rx: sz / 2, ry: sz / 2
+									, rx: sz / 20, ry: sz / 20
 									, css: 'rectangleDragItem'
 								});
 							}
@@ -216,10 +225,10 @@ function fillPluginsLists() {
 												id: '' + Math.random()
 												, kind: MZXBX_currentPlugins()[ii].kind
 												, data: ''
-												, outputs: []
+												, outputs: ['']
 												, automation: []
 												, iconPosition: newPos
-												, state: 1
+												, state: 0
 												, title: MZXBX_currentPlugins()[ii].label
 											});
 										});
@@ -273,7 +282,7 @@ function composeBaseMenu(): MenuInfo[] {
 			, menuPointDrumTracks
 			, menuPointFxTracks
 			, menuPointActions
-			,menuPointAddPlugin
+			, menuPointAddPlugin
 			/*, {
 				text: localMenuNewPlugin, children: [
 
@@ -356,7 +365,7 @@ function composeBaseMenu(): MenuInfo[] {
 								globalCommandDispatcher.clearUndo();
 								globalCommandDispatcher.clearRedo();
 							}
-						},{
+						}, {
 							text: 'Plugindebug', onClick: () => {
 								globalCommandDispatcher.promptPluginInfoDebug();
 							}
