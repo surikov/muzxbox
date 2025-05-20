@@ -50,37 +50,63 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 
 
 ,{
-    "label": "Compressor"
-    , "purpose": "Filter"
-    , "kind": "miniumdcompressor1"
-    , "ui": "./plugins/filters/minium.compressor/ui/cmprui.html"
-    , "evaluate": "newBaseCompressor"
-    , "script": "./plugins/filters/minium.compressor/audio/compress.js"
+    label: "Compressor"
+    , purpose: "Filter"
+    , kind: "miniumdcompressor1"
+    , ui: "./plugins/filters/minium.compressor/ui/cmprui.html"
+    , evaluate: "newBaseCompressor"
+    , script: "./plugins/filters/minium.compressor/audio/compress.js"
 }
 ,{
-    "label": "Equalizer"
-    , "purpose": "Filter"
-    , "kind": "10band_equalizer1"
-    , "ui": "./plugins/filters/minium.equalizer/ui/equi.html"
-    , "evaluate": "new10bEqualizer"
-    , "script": "./plugins/filters/minium.equalizer/audio/eqfilter.js"
+    label: "Equalizer"
+    , purpose: "Filter"
+    , kind: "10band_equalizer1"
+    , ui: "./plugins/filters/minium.equalizer/ui/equi.html"
+    , evaluate: "new10bEqualizer"
+    , script: "./plugins/filters/minium.equalizer/audio/eqfilter.js"
 }
 ,{
-    "label": "Fader"
-    , "purpose": "Filter"
-    , "kind": "miniumfader1"
-    , "ui": "./plugins/filters/minium.fader/ui/faderui.html"
-    , "evaluate": "newBaseFader"
-    , "script": "./plugins/filters/minium.fader/audio/faderaudio.js"
+    label: "Fader"
+    , purpose: "Filter"
+    , kind: "miniumfader1"
+    , ui: "./plugins/filters/minium.fader/ui/faderui.html"
+    , evaluate: "newBaseFader"
+    , script: "./plugins/filters/minium.fader/audio/faderaudio.js"
 }
 ,{
-    "label": "Echo"
-    , "purpose": "Filter"
-    , "kind": "miniumecho1"
-    , "ui": "./plugins/filters/minium.reverberator/ui/echo.html"
-    , "evaluate": "newBaseEcho"
-    , "script": "./plugins/filters/minium.reverberator/audio/plugin.js"
+    label: "Echo"
+    , purpose: "Filter"
+    , kind: "miniumecho1"
+    , ui: "./plugins/filters/minium.reverberator/ui/echo.html"
+    , evaluate: "newBaseEcho"
+    , script: "./plugins/filters/minium.reverberator/audio/plugin.js"
 }
+
+
+,{
+    label: "Audio File"
+    , purpose: "Sampler"
+    , kind: "miniumaudiofile1"
+    , ui: "./plugins/performers/miniumaudiofile1/chooser/pickfile.html"
+    , evaluate: "newAudiFileSamplerTrack"
+    , script: "./plugins/performers/miniumaudiofile1/player/fileplay.js"
+},{
+    label: "Percussion"
+    , purpose: "Sampler"
+    , kind: "miniumdrums1"
+    , ui: "./plugins/samplers/miniumdrums1/drmsui.html"
+    , evaluate: "newBasePercussionPlugin"
+    , script: "./plugins/samplers/miniumdrums1/drmsplgn.js"
+}
+
+
+
+
+
+
+
+
+
 
 
 

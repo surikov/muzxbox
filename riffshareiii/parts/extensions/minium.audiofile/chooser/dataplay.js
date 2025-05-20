@@ -27,6 +27,63 @@ class AudioFileParametersUrility {
     dump(ratio, volume, url) {
         return '' + ratio + ',' + volume + ',' + url;
     }
+    bufferName(ratio, url) {
+        return ratio + ',' + url;
+    }
+    startLoadFile(url, ratio, onDone) {
+        let xmlHttpRequest = new XMLHttpRequest();
+        xmlHttpRequest.open("GET", url, true);
+        xmlHttpRequest.responseType = "arraybuffer";
+        xmlHttpRequest.onload = (event) => {
+            const arrayBuffer = xmlHttpRequest.response;
+            if (arrayBuffer) {
+                this.startDecodeBuffer(arrayBuffer, url, ratio, onDone);
+            }
+        };
+        xmlHttpRequest.onerror = (proevent) => {
+            console.log('onerror', proevent);
+            console.log('xmlHttpRequest', xmlHttpRequest);
+            alert('Error ' + proevent);
+        };
+        try {
+            xmlHttpRequest.send(null);
+        }
+        catch (xx) {
+            console.log(xx);
+            alert('Error ' + xx);
+        }
+    }
+    startDecodeBuffer(arrayBuffer, path, ratio, onDone) {
+        let audioContext = new AudioContext();
+        let me = this;
+        audioContext.decodeAudioData(arrayBuffer, function (audioBuffer) {
+            window[new AudioFileParametersUrility().bufferName(ratio, path)] = audioBuffer;
+            me.startTransposeAudioBuffer(path, ratio, onDone);
+        });
+    }
+    startTransposeAudioBuffer(path, ratio, onDone) {
+        ratio = ratio ? ratio : 0;
+        if (ratio) {
+            let audioBuffer = window[new AudioFileParametersUrility().bufferName(ratio, path)];
+            let data = new Float32Array(audioBuffer.length);
+            audioBuffer.copyFromChannel(data, 0);
+            let sampleRate = audioBuffer.sampleRate;
+            let pitchShift = 0;
+            if (ratio < 0) {
+                pitchShift = 1 + ratio / 100 * 0.5;
+            }
+            else {
+                pitchShift = 1 + ratio / 100 * 1;
+            }
+            let newData = resamplePitchShiftFloat32Array(pitchShift, data.length, 1024, 10, sampleRate, data);
+            for (let ii = 0; ii < audioBuffer.numberOfChannels; ii++) {
+                audioBuffer.copyToChannel(newData, ii);
+            }
+        }
+        else {
+        }
+        onDone();
+    }
 }
 function resamplePitchShiftFloat32Array(pitchShift, numSampsToProcess, fftFrameSize, osamp, sampleRate, indata) {
     let MAX_FRAME_LENGTH = 16000;
@@ -257,76 +314,19 @@ class AudioFilePicker {
         this.sendMessageToHost('' + this.ratio + ',' + this.path);
         this.updateUI();
     }
-    bufferName(ratio, url) {
-        return ratio + ',' + url;
-    }
     checkPath() {
         this.sendMessageToHost(new AudioFileParametersUrility().dump(this.ratio, this.volumeLevel, this.path));
-        if (window[this.bufferName(this.ratio, this.path)]) {
+        if (window[new AudioFileParametersUrility().bufferName(this.ratio, this.path)]) {
             this.beep();
         }
         else {
-            this.startLoadFile(this.path, this.ratio);
+            new AudioFileParametersUrility().startLoadFile(this.path, this.ratio, () => { this.beep(); });
         }
-    }
-    startLoadFile(url, ratio) {
-        let xmlHttpRequest = new XMLHttpRequest();
-        xmlHttpRequest.open("GET", url, true);
-        xmlHttpRequest.responseType = "arraybuffer";
-        xmlHttpRequest.onload = (event) => {
-            const arrayBuffer = xmlHttpRequest.response;
-            if (arrayBuffer) {
-                this.startDecodeBuffer(arrayBuffer, url, ratio);
-            }
-        };
-        xmlHttpRequest.onerror = (proevent) => {
-            console.log('onerror', proevent);
-            console.log('xmlHttpRequest', xmlHttpRequest);
-            alert('Error ' + proevent);
-        };
-        try {
-            xmlHttpRequest.send(null);
-        }
-        catch (xx) {
-            console.log(xx);
-            alert('Error ' + xx);
-        }
-    }
-    startDecodeBuffer(arrayBuffer, path, ratio) {
-        let audioContext = new AudioContext();
-        let me = this;
-        audioContext.decodeAudioData(arrayBuffer, function (audioBuffer) {
-            window[me.bufferName(ratio, path)] = audioBuffer;
-            me.startTransposeAudioBuffer(path, ratio);
-        });
-    }
-    startTransposeAudioBuffer(path, ratio) {
-        ratio = ratio ? ratio : 0;
-        if (ratio) {
-            let audioBuffer = window[this.bufferName(ratio, path)];
-            let data = new Float32Array(audioBuffer.length);
-            audioBuffer.copyFromChannel(data, 0);
-            let sampleRate = audioBuffer.sampleRate;
-            let pitchShift = 0;
-            if (ratio < 0) {
-                pitchShift = 1 + ratio / 100 * 0.5;
-            }
-            else {
-                pitchShift = 1 + ratio / 100 * 1;
-            }
-            let newData = resamplePitchShiftFloat32Array(pitchShift, data.length, 1024, 10, sampleRate, data);
-            for (let ii = 0; ii < audioBuffer.numberOfChannels; ii++) {
-                audioBuffer.copyToChannel(newData, ii);
-            }
-        }
-        else {
-        }
-        this.beep();
     }
     beep() {
         let audioContext = new AudioContext();
         let audioBufferSourceNode = audioContext.createBufferSource();
-        audioBufferSourceNode.buffer = window[this.bufferName(this.ratio, this.path)];
+        audioBufferSourceNode.buffer = window[new AudioFileParametersUrility().bufferName(this.ratio, this.path)];
         audioBufferSourceNode.connect(audioContext.destination);
         audioBufferSourceNode.start(0);
     }

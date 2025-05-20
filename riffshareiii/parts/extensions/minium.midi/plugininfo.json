@@ -1,0 +1,8 @@
+{
+    "label": "Import *.mid"
+    , "purpose": "Action"
+    , "kind": "minimidimport1"
+    , "ui": "./plugins/actions/minimidimport1/mimidi.html"
+    , "evaluate": ""
+    , "script": ""
+}

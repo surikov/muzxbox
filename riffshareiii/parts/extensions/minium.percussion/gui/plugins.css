@@ -26,7 +26,7 @@ input[type="range"] {
 
 input[type="range"]::-webkit-slider-thumb {
 	-webkit-appearance: none;
-	width: 0.75cm;
+	width: 1cm;
 	height: 1cm;
 	background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(190, 210, 255, 1) 100%);
 	position: relative;
@@ -35,6 +35,7 @@ input[type="range"]::-webkit-slider-thumb {
 	border-style: solid;
 	border-width: 1px;
 	border-color: #66c;
+	border-radius: 0.5cm;
 }
 
 .cntrblk {
@@ -44,8 +45,128 @@ input[type="range"]::-webkit-slider-thumb {
 ul {
 	display: inline-block;
 	text-align: left;
-	list-style-type: "▢  ";
+	list-style-type2: "▢  ";
 	font-size: 0.75cm;
 }
 
+.form_radio_group {
+	display: inline-block;
+	overflow: hidden;
+}
 
+.form_radio_group-item {
+	display: inline-block;
+	float: left;
+}
+
+.form_radio_group input[type=radio] {
+	display: none;
+}
+
+.form_radio_group label {
+	display: inline-block;
+	cursor: pointer;
+	padding: 0px 15px;
+	line-height: 1cm;
+	border: 1px solid #006;
+	border-right: none;
+	user-select: none;
+}
+
+.form_radio_group .form_radio_group-item:first-child label {
+	border-radius: 0.5cm 0 0 0.5cm;
+}
+
+.form_radio_group .form_radio_group-item:last-child label {
+	border-radius: 0 0.5cm 0.5cm 0;
+	border-right: 1px solid #006;
+}
+
+/* Checked */
+.form_radio_group input[type=radio]:checked+label {
+	background: #006;
+	color: #def;
+}
+
+/* Hover */
+.form_radio_group label:hover {
+	color: #666;
+}
+
+/* Disabled */
+.form_radio_group input[type=radio]:disabled+label {
+	background: #efefef;
+	color: #666;
+}
+
+input[type=text] {
+	background: #ffffff00;
+	border: none;
+	border-bottom: 1px solid #99c;
+	outline: none;
+	height:1cm;
+	font-family: "Poiret One", sans-serif;
+	font-weight: 600;
+	font-style: normal;
+	color: #006;
+}
+
+input[type=text]:focus {
+	background: #ffffff33;
+}
+
+button{
+	height:1cm;
+	font-family: "Poiret One", sans-serif;
+	font-weight: 600;
+	font-style: normal;
+	font-size: 0.75cm;
+	background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(190, 210, 255, 1) 100%);
+	border-style: solid;
+	border-width: 1px;
+	border-color: #99c;
+	border-radius: 0.5cm;
+	padding-left: 0.5cm;
+	padding-right: 0.5cm;
+}
+input[type=file]{
+	height:1cm;
+	font-family: "Poiret One", sans-serif;
+	font-weight: 600;
+	font-style: normal;
+	font-size: 0.75cm;
+	background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(190, 210, 255, 1) 100%);
+	border-style: solid;
+	border-width: 1px;
+	border-color: #99c;
+	border-radius: 0.5cm;
+}
+input::file-selector-button {
+	font-weight2: bold;
+	font-family: "Poiret One", sans-serif;
+	font-weight: 600;
+	font-style: normal;
+	font-size: 0.75cm;
+	color2: dodgerblue;
+	padding-left: 0.5cm;
+	padding-right: 0.5cm;
+	border: none;
+	border-radius2: 3px;
+	background: #ffffff66;
+  }
+
+a{
+	color: #006;
+}
+a:link { 
+	text-decoration: none; 
+  } 
+  a:visited { 
+	text-decoration: none; 
+  } 
+  a:hover { 
+	text-decoration: none; 
+  } 
+  a:active { 
+	text-decoration: none; 
+  }

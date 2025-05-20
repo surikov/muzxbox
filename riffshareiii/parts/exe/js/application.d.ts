@@ -347,13 +347,15 @@ declare class RightMenuPanel {
 }
 declare class RightMenuItem {
     kindAction: 1;
-    kindDraggable: 2;
-    kindPreview: 3;
-    kindClosedFolder: 4;
-    kindOpenedFolder: 5;
-    kindAction2: 6;
-    kindActionDisabled: 7;
-    kind: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+    kindDraggableCircle: 2;
+    kindDraggableSquare: 3;
+    kindDraggableTriangle: 4;
+    kindPreview: 5;
+    kindClosedFolder: 6;
+    kindOpenedFolder: 7;
+    kindAction2: 8;
+    kindActionDisabled: 9;
+    kind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
     action?: {
         (): void;
     };
@@ -370,7 +372,9 @@ declare class RightMenuItem {
     initDisabledItem(): RightMenuItem;
     initActionItem(): RightMenuItem;
     initActionItem2(): RightMenuItem;
-    initDraggableItem(): RightMenuItem;
+    initDraggableCircle(): RightMenuItem;
+    initDraggableSquare(): RightMenuItem;
+    initDraggableTriangle(): RightMenuItem;
     initOpenedFolderItem(): RightMenuItem;
     initClosedFolderItem(): RightMenuItem;
     initPreviewItem(): RightMenuItem;
@@ -390,15 +394,15 @@ declare type MenuInfo = {
     onFolderOpen?: () => void;
     itemStates?: string[];
     selectedState?: number;
-    dragMix?: boolean;
+    dragCircle?: boolean;
+    dragSquare?: boolean;
+    dragTriangle?: boolean;
     highlight?: string;
     top?: number;
 };
 declare let menuItemsData: MenuInfo[] | null;
 declare let menuPointActions: MenuInfo;
-declare let menuPointPerformers: MenuInfo;
-declare let menuPointFilters: MenuInfo;
-declare let menuPointSamplers: MenuInfo;
+declare let menuPointAddPlugin: MenuInfo;
 declare let menuPointInsTracks: MenuInfo;
 declare let menuPointDrumTracks: MenuInfo;
 declare let menuPointFxTracks: MenuInfo;

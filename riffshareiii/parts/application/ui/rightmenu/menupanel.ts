@@ -73,21 +73,21 @@ class RightMenuPanel {
 		this.dragAnchor.css = 'dragDropMixerItem';
 		globalCommandDispatcher.renderer.tiler.updateAnchorStyle(this.dragAnchor);
 	}
-	hideDragMenuItem():TilePoint {
-		let tap=globalCommandDispatcher.renderer.tiler.tapPxSize();
-		let point:TilePoint=globalCommandDispatcher.renderer.tiler.screen2view({
-			x: this.dragItemX*tap
-			, y: this.dragItemY*tap
+	hideDragMenuItem(): TilePoint {
+		let tap = globalCommandDispatcher.renderer.tiler.tapPxSize();
+		let point: TilePoint = globalCommandDispatcher.renderer.tiler.screen2view({
+			x: this.dragItemX * tap
+			, y: this.dragItemY * tap
 		});
-		
+
 		//let zz=globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-		let start= globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
-		let left=point.x-start;
-		let top=point.y-globalCommandDispatcher.cfg().gridTop();
+		let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+		let left = point.x - start;
+		let top = point.y - globalCommandDispatcher.cfg().gridTop();
 		//console.log('hideDragMenuItem',point,start,zz ,left,this.dragItemY);
 		this.dragAnchor.css = 'noDragDropMixerItem';
 		globalCommandDispatcher.renderer.tiler.updateAnchorStyle(this.dragAnchor);
-		return {x:left,y:top};
+		return { x: left, y: top };
 	}
 
 
@@ -225,7 +225,7 @@ class RightMenuPanel {
 	}
 
 	fillMenuItemChildren(pad: number, infos: MenuInfo[]): void {
-//console.log('fillMenuItemChildren',infos);
+		//console.log('fillMenuItemChildren',infos);
 		let me = this;
 		for (let ii = 0; ii < infos.length; ii++) {
 			let it = infos[ii];
@@ -263,81 +263,82 @@ class RightMenuPanel {
 					it.top = this.items.length - 1;
 				}
 			} else {
-				if (it.dragMix) {
+				if (it.dragCircle) {
 					this.items.push(new RightMenuItem(it, pad, () => { }, () => { }, (x: number, y: number) => {
 						if (it.onDrag) {
 							it.onDrag(x, y);
 						}
 						me.setFocus(it, infos);
 						me.resetAllAnchors();
-					}).initDraggableItem());
+					}).initDraggableCircle());
 					it.top = this.items.length - 1;
 				} else {
-					if (it.onSubClick) {
-						//if (it.onClick) {
-						let rightMenuItem = new RightMenuItem(it, pad, () => {
-							if (it.onClick) {
-								it.onClick();
+					if (it.dragSquare) {
+						this.items.push(new RightMenuItem(it, pad, () => { }, () => { }, (x: number, y: number) => {
+							if (it.onDrag) {
+								it.onDrag(x, y);
 							}
 							me.setFocus(it, infos);
 							me.resetAllAnchors();
-						}, () => {
-							if (it.itemStates) {
-								let sel = it.selectedState ? it.selectedState : 0;
-								if (it.itemStates.length - 1 > sel) {
-									sel++;
-								} else {
-									sel = 0;
-								}
-								it.selectedState = sel;
-							}
-							if (it.onSubClick) {
-								it.onSubClick();
-							}
-							me.rerenderMenuContent(rightMenuItem);
-						});
-						this.items.push(rightMenuItem.initActionItem2());
+						}).initDraggableSquare());
 						it.top = this.items.length - 1;
-						/*} else {
-							let rightMenuItem = new RightMenuItem(it, pad, () => {
-								//
-							}, () => {
-								if (it.itemStates) {
-									let sel = it.selectedState ? it.selectedState : 0;
-									if (it.itemStates.length - 1 > sel) {
-										sel++;
-									} else {
-										sel = 0;
-									}
-									it.selectedState = sel;
-								}
-								if (it.onSubClick) {
-									it.onSubClick();
-								}
-								me.rerenderMenuContent(rightMenuItem);
-							});
-							this.items.push(rightMenuItem.initDisabledItem2());
-						}*/
 					} else {
-						if (it.onClick) {
-							this.items.push(new RightMenuItem(it, pad, () => {
-								if (it.onClick) {
-									it.onClick();
+						if (it.dragTriangle) {
+							this.items.push(new RightMenuItem(it, pad, () => { }, () => { }, (x: number, y: number) => {
+								if (it.onDrag) {
+									it.onDrag(x, y);
 								}
 								me.setFocus(it, infos);
 								me.resetAllAnchors();
-							}).initActionItem());
+							}).initDraggableTriangle());
 							it.top = this.items.length - 1;
 						} else {
-							this.items.push(new RightMenuItem(it, pad, () => {
-								me.setFocus(it, infos);
-								me.resetAllAnchors();
-							}).initDisabledItem());
-							it.top = this.items.length - 1;
+							if (it.onSubClick) {
+								//if (it.onClick) {
+								let rightMenuItem = new RightMenuItem(it, pad, () => {
+									if (it.onClick) {
+										it.onClick();
+									}
+									me.setFocus(it, infos);
+									me.resetAllAnchors();
+								}, () => {
+									if (it.itemStates) {
+										let sel = it.selectedState ? it.selectedState : 0;
+										if (it.itemStates.length - 1 > sel) {
+											sel++;
+										} else {
+											sel = 0;
+										}
+										it.selectedState = sel;
+									}
+									if (it.onSubClick) {
+										it.onSubClick();
+									}
+									me.rerenderMenuContent(rightMenuItem);
+								});
+								this.items.push(rightMenuItem.initActionItem2());
+								it.top = this.items.length - 1;
+							} else {
+								if (it.onClick) {
+									this.items.push(new RightMenuItem(it, pad, () => {
+										if (it.onClick) {
+											it.onClick();
+										}
+										me.setFocus(it, infos);
+										me.resetAllAnchors();
+									}).initActionItem());
+									it.top = this.items.length - 1;
+								} else {
+									this.items.push(new RightMenuItem(it, pad, () => {
+										me.setFocus(it, infos);
+										me.resetAllAnchors();
+									}).initDisabledItem());
+									it.top = this.items.length - 1;
+								}
+							}
+
 						}
 					}
-
-
 				}
 			}
 		}
@@ -404,7 +405,7 @@ class RightMenuPanel {
 							globalCommandDispatcher.cancelPluginGUI();
 						});
 						*/
-					}else{
+					} else {
 						globalCommandDispatcher.sequencerPluginDialog.openEmptySequencerPluginDialogFrame(tt, track);
 					}
 					//console.log('first',track);
@@ -475,8 +476,8 @@ class RightMenuPanel {
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});*/
-					}else{
-						globalCommandDispatcher.samplerPluginDialog.openEmptyDrumPluginDialogFrame(tt,drum);
+					} else {
+						globalCommandDispatcher.samplerPluginDialog.openEmptyDrumPluginDialogFrame(tt, drum);
 					}
 					//console.log('first',track);
 				};
@@ -541,7 +542,7 @@ class RightMenuPanel {
 							});
 							globalCommandDispatcher.cancelPluginGUI();
 						});*/
-					}else{
+					} else {
 						globalCommandDispatcher.filterPluginDialog.openEmptyFilterPluginDialogFrame(ff, filter);
 					}
 					//console.log('first',track);
@@ -554,7 +555,7 @@ class RightMenuPanel {
 
 	}
 	rerenderMenuContent(folder: RightMenuItem | null) {
-//console.log('rerenderMenuContent',folder);
+		//console.log('rerenderMenuContent',folder);
 		this.contentAnchor.content = [];
 		this.fillMenuItems();
 

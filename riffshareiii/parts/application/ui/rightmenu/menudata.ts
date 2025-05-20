@@ -11,7 +11,9 @@ type MenuInfo = {
 	onFolderOpen?: () => void;
 	itemStates?: string[];
 	selectedState?: number;
-	dragMix?: boolean;
+	dragCircle?: boolean;
+	dragSquare?: boolean;
+	dragTriangle?: boolean;
 	highlight?: string;
 	top?: number;
 };
@@ -24,26 +26,34 @@ let menuPointActions: MenuInfo = {
 		//console.log('actions');
 	}
 };
+/*
 let menuPointPerformers: MenuInfo = {
 	text: localMenuPerformersFolder
 	, onFolderOpen: () => {
 		//console.log('performers');
 	}
-};
+};*/
+/*
 let menuPointFilters: MenuInfo = {
 	text: localMenuFiltersFolder
 	, onFolderOpen: () => {
 		//console.log('filters');
 	}
 
-};
+};*/
+/*
 let menuPointSamplers: MenuInfo = {
 	text: localMenuSamplersFolder
 	, onFolderOpen: () => {
 		//console.log('samplers');
 	}
+};*/
+let menuPointAddPlugin: MenuInfo = {
+	text: localMenuNewPlugin
+	, onFolderOpen: () => {
+		//console.log('samplers');
+	}
 };
-
 
 let menuPointInsTracks: MenuInfo = {
 	text: localMenuInsTracksFolder
@@ -63,6 +73,7 @@ let menuPointFxTracks: MenuInfo = {
 		//console.log('samplers');
 	}
 };
+
 /*
 let menuPlayStop: MenuInfo = {
 	text: localMenuPlay
@@ -74,9 +85,10 @@ let menuPlayStop: MenuInfo = {
 };*/
 function fillPluginsLists() {
 	//console.log('fillPluginsLists');
-	menuPointFilters.children = [];
-	menuPointPerformers.children = [];
-	menuPointSamplers.children = [];
+	//menuPointFilters.children = [];
+	//menuPointPerformers.children = [];
+	//menuPointSamplers.children = [];
+	menuPointAddPlugin.children = [];
 	menuPointActions.children = [];
 	for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
 		let label: string = MZXBX_currentPlugins()[ii].label;
@@ -93,7 +105,7 @@ function fillPluginsLists() {
 				let dragStarted = false;
 				let info: MenuInfo;
 				info = {
-					dragMix: true
+					dragTriangle: true
 					, text: label
 					, noLocalization: true
 					, onDrag: (x: number, y: number) => {
@@ -136,13 +148,13 @@ function fillPluginsLists() {
 						}
 					}
 				};
-				menuPointSamplers.children.push(info);
+				menuPointAddPlugin.children.push(info);
 			} else {
 				if (purpose == 'Performer') {
 					let dragStarted = false;
 					let info: MenuInfo;
 					info = {
-						dragMix: true
+						dragSquare: true
 						, text: label
 						, noLocalization: true
 						, onDrag: (x: number, y: number) => {
@@ -185,13 +197,13 @@ function fillPluginsLists() {
 							}
 						}
 					};
-					menuPointPerformers.children.push(info);
+					menuPointAddPlugin.children.push(info);
 				} else {
 					if (purpose == 'Filter') {
 						let dragStarted = false;
 						let info: MenuInfo;
 						info = {
-							dragMix: true
+							dragCircle: true
 							, text: label
 							, noLocalization: true
 							, onDrag: (x: number, y: number) => {
@@ -232,7 +244,7 @@ function fillPluginsLists() {
 								}
 							}
 						};
-						menuPointFilters.children.push(info);
+						menuPointAddPlugin.children.push(info);
 					} else {
 						console.log('unknown plugin kind');
 					}
@@ -261,14 +273,15 @@ function composeBaseMenu(): MenuInfo[] {
 			, menuPointDrumTracks
 			, menuPointFxTracks
 			, menuPointActions
-			, {
+			,menuPointAddPlugin
+			/*, {
 				text: localMenuNewPlugin, children: [
 
 					menuPointFilters
 					, menuPointPerformers
 					, menuPointSamplers
 				]
-			}
+			}*/
 			, {
 				text: localMenuItemSettings, children: [
 					{

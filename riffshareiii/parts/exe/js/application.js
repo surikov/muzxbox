@@ -1823,24 +1823,6 @@ let localeDictionary = [
             { locale: 'zh', text: '?' }
         ]
     }, {
-        id: localMenuPerformersFolder, data: [
-            { locale: 'en', text: 'Add performer' },
-            { locale: 'ru', text: '+ Перформер' },
-            { locale: 'zh', text: '?' }
-        ]
-    }, {
-        id: localMenuFiltersFolder, data: [
-            { locale: 'en', text: 'Add filter' },
-            { locale: 'ru', text: '+ Фильтр' },
-            { locale: 'zh', text: '?' }
-        ]
-    }, {
-        id: localMenuSamplersFolder, data: [
-            { locale: 'en', text: 'Add sampler' },
-            { locale: 'ru', text: '+ Сэмплер' },
-            { locale: 'zh', text: '?' }
-        ]
-    }, {
         id: localMenuInsTracksFolder, data: [
             { locale: 'en', text: 'Performers' },
             { locale: 'ru', text: 'Перформеры' },
@@ -2351,60 +2333,84 @@ class RightMenuPanel {
                 }
             }
             else {
-                if (it.dragMix) {
+                if (it.dragCircle) {
                     this.items.push(new RightMenuItem(it, pad, () => { }, () => { }, (x, y) => {
                         if (it.onDrag) {
                             it.onDrag(x, y);
                         }
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
-                    }).initDraggableItem());
+                    }).initDraggableCircle());
                     it.top = this.items.length - 1;
                 }
                 else {
-                    if (it.onSubClick) {
-                        let rightMenuItem = new RightMenuItem(it, pad, () => {
-                            if (it.onClick) {
-                                it.onClick();
+                    if (it.dragSquare) {
+                        this.items.push(new RightMenuItem(it, pad, () => { }, () => { }, (x, y) => {
+                            if (it.onDrag) {
+                                it.onDrag(x, y);
                             }
                             me.setFocus(it, infos);
                             me.resetAllAnchors();
-                        }, () => {
-                            if (it.itemStates) {
-                                let sel = it.selectedState ? it.selectedState : 0;
-                                if (it.itemStates.length - 1 > sel) {
-                                    sel++;
-                                }
-                                else {
-                                    sel = 0;
-                                }
-                                it.selectedState = sel;
-                            }
-                            if (it.onSubClick) {
-                                it.onSubClick();
-                            }
-                            me.rerenderMenuContent(rightMenuItem);
-                        });
-                        this.items.push(rightMenuItem.initActionItem2());
+                        }).initDraggableSquare());
                         it.top = this.items.length - 1;
                     }
                     else {
-                        if (it.onClick) {
-                            this.items.push(new RightMenuItem(it, pad, () => {
-                                if (it.onClick) {
-                                    it.onClick();
+                        if (it.dragTriangle) {
+                            this.items.push(new RightMenuItem(it, pad, () => { }, () => { }, (x, y) => {
+                                if (it.onDrag) {
+                                    it.onDrag(x, y);
                                 }
                                 me.setFocus(it, infos);
                                 me.resetAllAnchors();
-                            }).initActionItem());
+                            }).initDraggableTriangle());
                             it.top = this.items.length - 1;
                         }
                         else {
-                            this.items.push(new RightMenuItem(it, pad, () => {
-                                me.setFocus(it, infos);
-                                me.resetAllAnchors();
-                            }).initDisabledItem());
-                            it.top = this.items.length - 1;
+                            if (it.onSubClick) {
+                                let rightMenuItem = new RightMenuItem(it, pad, () => {
+                                    if (it.onClick) {
+                                        it.onClick();
+                                    }
+                                    me.setFocus(it, infos);
+                                    me.resetAllAnchors();
+                                }, () => {
+                                    if (it.itemStates) {
+                                        let sel = it.selectedState ? it.selectedState : 0;
+                                        if (it.itemStates.length - 1 > sel) {
+                                            sel++;
+                                        }
+                                        else {
+                                            sel = 0;
+                                        }
+                                        it.selectedState = sel;
+                                    }
+                                    if (it.onSubClick) {
+                                        it.onSubClick();
+                                    }
+                                    me.rerenderMenuContent(rightMenuItem);
+                                });
+                                this.items.push(rightMenuItem.initActionItem2());
+                                it.top = this.items.length - 1;
+                            }
+                            else {
+                                if (it.onClick) {
+                                    this.items.push(new RightMenuItem(it, pad, () => {
+                                        if (it.onClick) {
+                                            it.onClick();
+                                        }
+                                        me.setFocus(it, infos);
+                                        me.resetAllAnchors();
+                                    }).initActionItem());
+                                    it.top = this.items.length - 1;
+                                }
+                                else {
+                                    this.items.push(new RightMenuItem(it, pad, () => {
+                                        me.setFocus(it, infos);
+                                        me.resetAllAnchors();
+                                    }).initDisabledItem());
+                                    it.top = this.items.length - 1;
+                                }
+                            }
                         }
                     }
                 }
@@ -2621,12 +2627,14 @@ class RightMenuPanel {
 class RightMenuItem {
     constructor(info, pad, tap, tap2, drag) {
         this.kindAction = 1;
-        this.kindDraggable = 2;
-        this.kindPreview = 3;
-        this.kindClosedFolder = 4;
-        this.kindOpenedFolder = 5;
-        this.kindAction2 = 6;
-        this.kindActionDisabled = 7;
+        this.kindDraggableCircle = 2;
+        this.kindDraggableSquare = 3;
+        this.kindDraggableTriangle = 4;
+        this.kindPreview = 5;
+        this.kindClosedFolder = 6;
+        this.kindOpenedFolder = 7;
+        this.kindAction2 = 8;
+        this.kindActionDisabled = 9;
         this.kind = this.kindAction;
         this.pad = 0;
         this.info = info;
@@ -2652,8 +2660,16 @@ class RightMenuItem {
         this.kind = this.kindAction2;
         return this;
     }
-    initDraggableItem() {
-        this.kind = this.kindDraggable;
+    initDraggableCircle() {
+        this.kind = this.kindDraggableCircle;
+        return this;
+    }
+    initDraggableSquare() {
+        this.kind = this.kindDraggableSquare;
+        return this;
+    }
+    initDraggableTriangle() {
+        this.kind = this.kindDraggableTriangle;
         return this;
     }
     initOpenedFolderItem() {
@@ -2724,10 +2740,29 @@ class RightMenuItem {
             anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
             spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
         }
-        if (this.kind == this.kindDraggable) {
+        if (this.kind == this.kindDraggableCircle) {
             spot.draggable = true;
             spot.activation = this.drag;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+        }
+        if (this.kind == this.kindDraggableSquare) {
+            spot.draggable = true;
+            spot.activation = this.drag;
+            anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.15, w: 0.7, h: 0.7, rx: 0.05, ry: 0.05, css: 'rightMenuItemDragBG' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+        }
+        if (this.kind == this.kindDraggableTriangle) {
+            spot.draggable = true;
+            spot.activation = this.drag;
+            let sz = 0.45;
+            let tri = {
+                x: 0.1 + this.pad,
+                y: itemTop + 0.1,
+                dots: [0, 0, sz * 2 * 0.8 * 0.9, sz * 0.9, 0, sz * 2 * 0.9],
+                css: 'rightMenuItemDragBG'
+            };
+            anchor.content.push(tri);
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
         if (this.kind == this.kindOpenedFolder) {
@@ -2763,18 +2798,8 @@ let menuPointActions = {
     onFolderOpen: () => {
     }
 };
-let menuPointPerformers = {
-    text: localMenuPerformersFolder,
-    onFolderOpen: () => {
-    }
-};
-let menuPointFilters = {
-    text: localMenuFiltersFolder,
-    onFolderOpen: () => {
-    }
-};
-let menuPointSamplers = {
-    text: localMenuSamplersFolder,
+let menuPointAddPlugin = {
+    text: localMenuNewPlugin,
     onFolderOpen: () => {
     }
 };
@@ -2794,9 +2819,7 @@ let menuPointFxTracks = {
     }
 };
 function fillPluginsLists() {
-    menuPointFilters.children = [];
-    menuPointPerformers.children = [];
-    menuPointSamplers.children = [];
+    menuPointAddPlugin.children = [];
     menuPointActions.children = [];
     for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
         let label = MZXBX_currentPlugins()[ii].label;
@@ -2813,7 +2836,7 @@ function fillPluginsLists() {
                 let dragStarted = false;
                 let info;
                 info = {
-                    dragMix: true,
+                    dragTriangle: true,
                     text: label,
                     noLocalization: true,
                     onDrag: (x, y) => {
@@ -2858,14 +2881,14 @@ function fillPluginsLists() {
                         }
                     }
                 };
-                menuPointSamplers.children.push(info);
+                menuPointAddPlugin.children.push(info);
             }
             else {
                 if (purpose == 'Performer') {
                     let dragStarted = false;
                     let info;
                     info = {
-                        dragMix: true,
+                        dragSquare: true,
                         text: label,
                         noLocalization: true,
                         onDrag: (x, y) => {
@@ -2910,14 +2933,14 @@ function fillPluginsLists() {
                             }
                         }
                     };
-                    menuPointPerformers.children.push(info);
+                    menuPointAddPlugin.children.push(info);
                 }
                 else {
                     if (purpose == 'Filter') {
                         let dragStarted = false;
                         let info;
                         info = {
-                            dragMix: true,
+                            dragCircle: true,
                             text: label,
                             noLocalization: true,
                             onDrag: (x, y) => {
@@ -2960,7 +2983,7 @@ function fillPluginsLists() {
                                 }
                             }
                         };
-                        menuPointFilters.children.push(info);
+                        menuPointAddPlugin.children.push(info);
                     }
                     else {
                         console.log('unknown plugin kind');
@@ -2981,13 +3004,7 @@ function composeBaseMenu() {
             menuPointDrumTracks,
             menuPointFxTracks,
             menuPointActions,
-            {
-                text: localMenuNewPlugin, children: [
-                    menuPointFilters,
-                    menuPointPerformers,
-                    menuPointSamplers
-                ]
-            },
+            menuPointAddPlugin,
             {
                 text: localMenuItemSettings, children: [
                     {

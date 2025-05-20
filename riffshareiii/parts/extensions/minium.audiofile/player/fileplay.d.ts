@@ -281,8 +281,15 @@ declare class AudioFileParametersUrility {
         url: string;
     };
     dump(ratio: number, volume: number, url: string): string;
+    bufferName(ratio: number, url: string): string;
+    startLoadFile(url: string, ratio: number, onDone: () => void): void;
+    startDecodeBuffer(arrayBuffer: ArrayBuffer, path: string, ratio: number, onDone: () => void): void;
+    startTransposeAudioBuffer(path: string, ratio: number, onDone: () => void): void;
 }
-declare class AudiFileSamplerTrackImplementation implements MZXBX_AudioPerformerPlugin {
+declare function resamplePitchShiftFloat32Array(pitchShift: number, numSampsToProcess: number, fftFrameSize: number, osamp: number, sampleRate: number, indata: Float32Array): Float32Array;
+declare function ShortTimeFourierTransform(fftBuffer: number[], fftFrameSize: number, sign: number): void;
+declare function ___do___PitchShift(audioBuffer: AudioBuffer, ratio: number): void;
+declare class AudiFileSamplerTrackImplementation implements MZXBX_AudioSamplerPlugin {
     audioContext: AudioContext;
     outputNode: GainNode;
     freqRatio: number;
@@ -290,11 +297,17 @@ declare class AudiFileSamplerTrackImplementation implements MZXBX_AudioPerformer
     volumeLevel: number;
     ratio: number;
     path: string;
+    allNodes: {
+        audio: AudioBufferSourceNode;
+        end: number;
+    }[];
     launch(context: AudioContext, parameters: string): void;
-    strum(when: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]): void;
+    start(when: number, tempo: number): void;
     cancel(): void;
     busy(): null | string;
     output(): AudioNode | null;
+    duration(): number;
+    takeFreeNode(when: number, duration: number): AudioBufferSourceNode;
     startLoadFile(): void;
 }
-declare function newAudiFileSamplerTrack(): MZXBX_AudioPerformerPlugin;
+declare function newAudiFileSamplerTrack(): MZXBX_AudioSamplerPlugin;

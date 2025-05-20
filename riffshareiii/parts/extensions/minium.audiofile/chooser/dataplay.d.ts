@@ -281,6 +281,10 @@ declare class AudioFileParametersUrility {
         url: string;
     };
     dump(ratio: number, volume: number, url: string): string;
+    bufferName(ratio: number, url: string): string;
+    startLoadFile(url: string, ratio: number, onDone: () => void): void;
+    startDecodeBuffer(arrayBuffer: ArrayBuffer, path: string, ratio: number, onDone: () => void): void;
+    startTransposeAudioBuffer(path: string, ratio: number, onDone: () => void): void;
 }
 declare function resamplePitchShiftFloat32Array(pitchShift: number, numSampsToProcess: number, fftFrameSize: number, osamp: number, sampleRate: number, indata: Float32Array): Float32Array;
 declare function ShortTimeFourierTransform(fftBuffer: number[], fftFrameSize: number, sign: number): void;
@@ -300,11 +304,7 @@ declare class AudioFilePicker {
     receiveHostMessage(messageEvent: MessageEvent): void;
     updateUI(): void;
     selectPath(name: string): void;
-    bufferName(ratio: number, url: string): string;
     checkPath(): void;
-    startLoadFile(url: string, ratio: number): void;
-    startDecodeBuffer(arrayBuffer: ArrayBuffer, path: string, ratio: number): void;
-    startTransposeAudioBuffer(path: string, ratio: number): void;
     beep(): void;
 }
 declare let pickerbridge: AudioFilePicker;

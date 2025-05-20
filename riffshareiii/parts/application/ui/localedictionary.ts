@@ -106,7 +106,7 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
             , { locale: 'ru', text: 'Добавить дорожку' }
             , { locale: 'zh', text: '?' }]
     }, {
-        id: localMenuPerformersFolder, data: [
+    /*    id: localMenuPerformersFolder, data: [
             { locale: 'en', text: 'Add performer' }
             , { locale: 'ru', text: '+ Перформер' }
             , { locale: 'zh', text: '?' }]
@@ -120,7 +120,7 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
             { locale: 'en', text: 'Add sampler' }
             , { locale: 'ru', text: '+ Сэмплер' }
             , { locale: 'zh', text: '?' }]
-    }, {
+    }, {*/
         id: localMenuInsTracksFolder, data: [
             { locale: 'en', text: 'Performers' }
             , { locale: 'ru', text: 'Перформеры' }
