@@ -73,6 +73,22 @@ let _t_all_registerd_plugins_list = [
         ui: "./plugins/samplers/miniumdrums1/drmsui.html",
         evaluate: "newBasePercussionPlugin",
         script: "./plugins/samplers/miniumdrums1/drmsplgn.js"
+    },
+    {
+        "label": "Import *.mid",
+        "purpose": "Action",
+        "kind": "minimidimport1",
+        "ui": "./plugins/actions/minimidimport1/mimidi.html",
+        "evaluate": "",
+        "script": ""
+    },
+    {
+        "label": "Chords",
+        "purpose": "Performer",
+        "kind": "miniumpitchchord1",
+        "ui": "./plugins/performers/miniumpitchchord1/gui/pitchui.html",
+        "evaluate": "newStrumPerformerImplementation",
+        "script": "./plugins/performers/miniumpitchchord1/audio/strum_plugin.js"
     }
 ];
 function MZXBX_currentPlugins() {

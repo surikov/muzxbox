@@ -133,7 +133,7 @@ class RightMenuItem {
 		if (this.kind == this.kindDraggableSquare) {
 			spot.draggable = true;
 			spot.activation = this.drag;
-			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.15, w: 0.7, h: 0.7, rx: 0.05, ry: 0.05, css: 'rightMenuItemDragBG' });
+			anchor.content.push({ x: 0.15 + this.pad, y: itemTop + 0.15, w: 0.7, h: 0.7, rx: 0.05, ry: 0.05, css: 'rightMenuItemDragBG' });
 			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
 		}
 		if (this.kind == this.kindDraggableTriangle) {
@@ -142,7 +142,7 @@ class RightMenuItem {
 			//anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
 			let sz=0.45;
 			let tri:TilePolygon={
-				x: 0.1 + this.pad
+				x: 0.2 + this.pad
 				, y: itemTop + 0.1
 				, dots: [0, 0, sz * 2 * 0.8 * 0.9, sz * 0.9, 0, sz * 2 * 0.9]
 				, css: 'rightMenuItemDragBG' 

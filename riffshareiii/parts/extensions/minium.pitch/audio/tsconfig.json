@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es2015"
-        ,"outFile": "strum_plugin.js"
+        ,"outFile": "../../../exe/plugins/performers/miniumpitchchord1/audio/strum_plugin.js"
 		,"strictNullChecks": true
 		,"alwaysStrict": true
 		,"esModuleInterop": true

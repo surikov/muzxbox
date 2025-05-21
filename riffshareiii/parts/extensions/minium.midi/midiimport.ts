@@ -538,7 +538,7 @@ class MidiParser {
 				}
 				if (preState == expectedState) { // If the current message wasn't an expected pitch-bend range message
 					if (preState >= 2 && preState <= 3) {
-						console.log('Pitch-bend RANGE (SENSITIVITY) messages ended prematurely. MIDI file might be corrupt.');
+						//console.log('Pitch-bend RANGE (SENSITIVITY) messages ended prematurely. MIDI file might be corrupt.');
 					}
 					if (preState == 4) { // The fourth message is optional, so since it wasn't sent, the setting of the pitch-bend range is done, and we might expect the first pitch-bend range message some time in the future
 						expectedState = 1;

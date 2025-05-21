@@ -335,7 +335,7 @@ declare class PluginLoader {
     collectLoadPlugins(schedule: MZXBX_Schedule, allfilters: MZXBX_FilterHolder[], allperformers: MZXBX_PerformerSamplerHolder[]): null | string;
     startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[]): null | string;
     startLoadPluginStarter(kind: string, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[], onDone: (plugin: any) => void): null | string;
-    сollectFilterPlugin(id: string, kind: string, properties: string, description: string, filters: MZXBX_FilterHolder[]): void;
-    сollectPerformerPlugin(id: string, kind: string, properties: string, description: string, performers: MZXBX_PerformerSamplerHolder[]): void;
+    collectFilterPlugin(id: string, kind: string, properties: string, description: string, filters: MZXBX_FilterHolder[]): void;
+    collectPerformerPlugin(id: string, kind: string, properties: string, description: string, performers: MZXBX_PerformerSamplerHolder[]): void;
     findPluginInfo(kind: string): MZXBX_PluginRegistrationInformation | null;
 }

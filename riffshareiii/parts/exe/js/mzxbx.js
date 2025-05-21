@@ -493,12 +493,12 @@ class PluginLoader {
     collectLoadPlugins(schedule, allfilters, allperformers) {
         for (let ff = 0; ff < schedule.filters.length; ff++) {
             let filter = schedule.filters[ff];
-            this.сollectFilterPlugin(filter.id, filter.kind, filter.properties, filter.description, allfilters);
+            this.collectFilterPlugin(filter.id, filter.kind, filter.properties, filter.description, allfilters);
         }
         for (let ch = 0; ch < schedule.channels.length; ch++) {
             let performer = schedule.channels[ch].performer;
             let chanid = schedule.channels[ch].id;
-            this.сollectPerformerPlugin(chanid, performer.kind, performer.properties, performer.description, allperformers);
+            this.collectPerformerPlugin(chanid, performer.kind, performer.properties, performer.description, allperformers);
         }
         let result = this.startLoadCollectedPlugins(allfilters, allperformers);
         return result;
@@ -548,7 +548,7 @@ class PluginLoader {
             return 'Not found registration for ' + kind;
         }
     }
-    сollectFilterPlugin(id, kind, properties, description, filters) {
+    collectFilterPlugin(id, kind, properties, description, filters) {
         for (let ii = 0; ii < filters.length; ii++) {
             if (filters[ii].filterId == id) {
                 filters[ii].properties = properties;
@@ -557,7 +557,7 @@ class PluginLoader {
         }
         filters.push({ pluginAudioFilter: null, filterId: id, kind: kind, properties: properties, description: description });
     }
-    сollectPerformerPlugin(id, kind, properties, description, performers) {
+    collectPerformerPlugin(id, kind, properties, description, performers) {
         for (let ii = 0; ii < performers.length; ii++) {
             if (performers[ii].channelId == id) {
                 performers[ii].properties = properties;

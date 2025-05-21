@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es2015"
-        ,"outFile": "miniumidi.js"
+        ,"outFile": "../../exe/plugins/actions/minimidimport1/miniumidi.js"
         //,"outDir":"../js"
 		,"strictNullChecks": true
 		,"alwaysStrict": true

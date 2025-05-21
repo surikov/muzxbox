@@ -1,3 +1,4 @@
+console.log('Minium Import *.mid v1.0.1');
 class MINIUMIDIIImportMusicPlugin {
 	callbackID = '';
 	parsedProject: Zvoog_Project | null = null;
@@ -13,7 +14,7 @@ class MINIUMIDIIImportMusicPlugin {
 		}, '*');
 	}
 	sendImportedMIDIData() {
-
+console.log('sendImportedMIDIData',this.parsedProject);
 		if (this.parsedProject) {
 			var oo: MZXBX_MessageToHost = {
 				dialogID: this.callbackID

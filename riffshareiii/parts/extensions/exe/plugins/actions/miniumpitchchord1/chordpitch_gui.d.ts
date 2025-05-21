@@ -1,24 +1,3 @@
-declare class MZXBX_MetreMathUtil implements Zvoog_MetreMathType {
-    count: number;
-    part: number;
-    set(from: Zvoog_Metre): MZXBX_MetreMathUtil;
-    calculate(duration: number, tempo: number): MZXBX_MetreMathUtil;
-    metre(): Zvoog_Metre;
-    simplyfy(): MZXBX_MetreMathUtil;
-    strip(toPart: number): MZXBX_MetreMathUtil;
-    equals(metre: Zvoog_Metre): boolean;
-    less(metre: Zvoog_Metre): boolean;
-    more(metre: Zvoog_Metre): boolean;
-    plus(metre: Zvoog_Metre): MZXBX_MetreMathUtil;
-    minus(metre: Zvoog_Metre): MZXBX_MetreMathUtil;
-    duration(tempo: number): number;
-    width(tempo: number, ratio: number): number;
-}
-declare function MMUtil(): Zvoog_MetreMathType;
-declare function MZXBX_appendScriptURL(url: string): boolean;
-declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
-declare function MZXBX_FillLinesOfBuffer(buffer: null | AudioBuffer): number[];
-declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare type Zvoog_Metre = {
     count: number;
     part: number;
@@ -290,3 +269,47 @@ declare type MZXBX_MessageToHost = {
     pluginData: any;
     done: boolean;
 };
+declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
+declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
+declare function MZXBX_appendScriptURL(url: string): boolean;
+declare function MMUtil(): Zvoog_MetreMathType;
+declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
+declare class CHPUI {
+    id: string;
+    selectedCategoryIdx: number;
+    selectedMIDInum: number;
+    selectedItemIdx: number;
+    selectedVolume: number;
+    selectedMode: number;
+    level: HTMLInputElement;
+    inslist: HTMLUListElement;
+    subUl: HTMLUListElement | null;
+    util: ChordPitchPerformerUtil;
+    addSub(label: string, idx: number): void;
+    reFillList(): void;
+    refreshTitle(): void;
+    refreshVolume(): void;
+    refreshMode(): void;
+    init(): void;
+    setMode(num: number): void;
+    sendIDRequestToHost(): void;
+    sendDataToHost(): void;
+    sendToHost(data: string): void;
+    receiveHostMessage(messageEvent: MessageEvent): void;
+    setMessagingId(newId: string): void;
+    setState(data: string): void;
+    tapCategory(idx: number): void;
+    tapSub(idx: number): void;
+    tapItem(idx: number): void;
+}
+declare function initCHPUI(): void;
+declare class ChordPitchPerformerUtil {
+    checkParameters(parameters: string): {
+        loudness: number;
+        idx: number;
+        mode: 0 | 1 | 2 | 3 | 4;
+    };
+    dumpParameters(loudness: number, idx: number, mode: number): string;
+    tonechordinslist(): string[];
+    tonechordinstrumentKeys(): string[];
+}

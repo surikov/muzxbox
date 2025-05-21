@@ -498,7 +498,6 @@ class MidiParser {
                 }
                 if (preState == expectedState) {
                     if (preState >= 2 && preState <= 3) {
-                        console.log('Pitch-bend RANGE (SENSITIVITY) messages ended prematurely. MIDI file might be corrupt.');
                     }
                     if (preState == 4) {
                         expectedState = 1;
@@ -1054,6 +1053,7 @@ class MIDIFileTrack {
         this.programChannel = [];
     }
 }
+console.log('Minium Import *.mid');
 class MINIUMIDIIImportMusicPlugin {
     constructor() {
         this.callbackID = '';
@@ -1069,6 +1069,7 @@ class MINIUMIDIIImportMusicPlugin {
         }, '*');
     }
     sendImportedMIDIData() {
+        console.log('sendImportedMIDIData', this.parsedProject);
         if (this.parsedProject) {
             var oo = {
                 dialogID: this.callbackID,

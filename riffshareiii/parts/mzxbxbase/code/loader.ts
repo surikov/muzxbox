@@ -4,12 +4,12 @@ class PluginLoader {
 		
 		for (let ff = 0; ff < schedule.filters.length; ff++) {
 			let filter: MZXBX_Filter = schedule.filters[ff];
-			this.сollectFilterPlugin(filter.id, filter.kind, filter.properties,filter.description, allfilters);
+			this.collectFilterPlugin(filter.id, filter.kind, filter.properties,filter.description, allfilters);
 		}
 		for (let ch = 0; ch < schedule.channels.length; ch++) {
 			let performer: MZXBX_ChannelSource = schedule.channels[ch].performer;
 			let chanid = schedule.channels[ch].id;
-			this.сollectPerformerPlugin(chanid, performer.kind, performer.properties, performer.description,allperformers);
+			this.collectPerformerPlugin(chanid, performer.kind, performer.properties, performer.description,allperformers);
 		}
 		let result = this.startLoadCollectedPlugins(allfilters, allperformers);
 		//afterStart();
@@ -68,7 +68,7 @@ class PluginLoader {
 			return 'Not found registration for ' + kind;
 		}
 	}
-	сollectFilterPlugin(id: string, kind: string, properties: string, description: string, filters: MZXBX_FilterHolder[]): void {
+	collectFilterPlugin(id: string, kind: string, properties: string, description: string, filters: MZXBX_FilterHolder[]): void {
 		for (let ii = 0; ii < filters.length; ii++) {
 			if (filters[ii].filterId == id) {
 				filters[ii].properties = properties;
@@ -77,7 +77,7 @@ class PluginLoader {
 		}
 		filters.push({ pluginAudioFilter: null, filterId: id, kind: kind, properties: properties ,description:description});
 	}
-	сollectPerformerPlugin(id: string, kind: string, properties: string, description: string, performers: MZXBX_PerformerSamplerHolder[]): void {
+	collectPerformerPlugin(id: string, kind: string, properties: string, description: string, performers: MZXBX_PerformerSamplerHolder[]): void {
 		for (let ii = 0; ii < performers.length; ii++) {
 			if (performers[ii].channelId == id) {
 				performers[ii].properties = properties;

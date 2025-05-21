@@ -1,10 +1,26 @@
+:root {
+	--background-color: #411;
+	--main-color: #ff9;
+	--drag-color: #960;
+	--line-color: #fff;
+	--click-color: #c01;
+	--line-color90: color-mix(in lab, transparent 90%, var(--line-color));
+	--line-color80: color-mix(in lab, transparent 80%, var(--line-color));
+	--bgfill2: radial-gradient(circle, var(--click-color) 0%, var(--background-color) 100%);
+	--bgfill: var(--background-color);
+}
+
+html{
+	scrollbar-color: var(--drag-color) var(--background-color);
+}
 body {
 	font-family: "Poiret One", sans-serif;
 	font-weight: 600;
 	font-style: normal;
 	background-color: #eef;
-	color: #006;
-	background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(190, 210, 255, 1) 100%);
+	color: var(--line-color);
+	background: var(--bgfill);
+	
 }
 
 h1 {
@@ -20,7 +36,7 @@ input[type="range"] {
 	-webkit-appearance: none;
 	width: 100%;
 	height: 3px;
-	background: #99c;
+	background: var(--main-color);
 	outline: none;
 }
 
@@ -28,13 +44,13 @@ input[type="range"]::-webkit-slider-thumb {
 	-webkit-appearance: none;
 	width: 1cm;
 	height: 1cm;
-	background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(190, 210, 255, 1) 100%);
+	background: var(--drag-color);
 	position: relative;
 	z-index: 3;
 	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.75);
 	border-style: solid;
 	border-width: 1px;
-	border-color: #66c;
+	border-color: var(--main-color);
 	border-radius: 0.5cm;
 }
 
@@ -68,9 +84,10 @@ ul {
 	cursor: pointer;
 	padding: 0px 15px;
 	line-height: 1cm;
-	border: 1px solid #006;
+	border: 1px solid var(--main-color);
 	border-right: none;
 	user-select: none;
+	background: var(--click-color);
 }
 
 .form_radio_group .form_radio_group-item:first-child label {
@@ -79,18 +96,19 @@ ul {
 
 .form_radio_group .form_radio_group-item:last-child label {
 	border-radius: 0 0.5cm 0.5cm 0;
-	border-right: 1px solid #006;
+	border-right: 1px solid var(--main-color);
 }
 
 /* Checked */
 .form_radio_group input[type=radio]:checked+label {
-	background: #006;
-	color: #def;
+	background: var(--background-color);
+	
+	color: var(--line-color);
 }
 
 /* Hover */
 .form_radio_group label:hover {
-	color: #666;
+	color: var(--main-color);
 }
 
 /* Disabled */
@@ -100,19 +118,19 @@ ul {
 }
 
 input[type=text] {
-	background: #ffffff00;
+	background: var(--line-color90);
 	border: none;
-	border-bottom: 1px solid #99c;
+	border-bottom: 1px solid #ffc;
 	outline: none;
 	height:1cm;
 	font-family: "Poiret One", sans-serif;
 	font-weight: 600;
 	font-style: normal;
-	color: #006;
+	color: var(--line-color);
 }
 
 input[type=text]:focus {
-	background: #ffffff33;
+	background: var(--line-color80);
 }
 
 button{
@@ -121,13 +139,15 @@ button{
 	font-weight: 600;
 	font-style: normal;
 	font-size: 0.75cm;
-	background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(190, 210, 255, 1) 100%);
+	bbbackground: var(--bgfill);
+	background: var(--click-color);
 	border-style: solid;
 	border-width: 1px;
-	border-color: #99c;
+	border-color: var(--main-color);
 	border-radius: 0.5cm;
 	padding-left: 0.5cm;
 	padding-right: 0.5cm;
+	color: var(--line-color);
 }
 input[type=file]{
 	height:1cm;
@@ -135,10 +155,10 @@ input[type=file]{
 	font-weight: 600;
 	font-style: normal;
 	font-size: 0.75cm;
-	background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(190, 210, 255, 1) 100%);
+	background: var(--bgfill);
 	border-style: solid;
 	border-width: 1px;
-	border-color: #99c;
+	border-color: var(--main-color);
 	border-radius: 0.5cm;
 }
 input::file-selector-button {
@@ -147,16 +167,16 @@ input::file-selector-button {
 	font-weight: 600;
 	font-style: normal;
 	font-size: 0.75cm;
-	color2: dodgerblue;
+	color: var(--main-color);
 	padding-left: 0.5cm;
 	padding-right: 0.5cm;
 	border: none;
 	border-radius2: 3px;
-	background: #ffffff66;
+	background: var(--click-color);
   }
 
 a{
-	color: #006;
+	color: var(--line-color);
 }
 a:link { 
 	text-decoration: none; 
