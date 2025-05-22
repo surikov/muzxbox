@@ -1,9 +1,9 @@
 :root {
-	--background-color: #411;
-	--main-color: #ff9;
-	--drag-color: #960;
-	--line-color: #fff;
-	--click-color: #c01;
+	--background-color: #F2E2CE;
+	--main-color: #1FA65A;
+	--drag-color: #f96;
+	--line-color: #1EA4D9;
+	--click-color: #fff;
 	--line-color90: color-mix(in lab, transparent 90%, var(--line-color));
 	--line-color80: color-mix(in lab, transparent 80%, var(--line-color));
 	--bgfill2: radial-gradient(circle, var(--click-color) 0%, var(--background-color) 100%);

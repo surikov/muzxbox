@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es2015",
-        "outFile": "plugin.js",
+        "outFile": "../../../exe/plugins/filters/miniumecho1/audio/plugin.js",
         "strictNullChecks": true,
         "alwaysStrict": true,
         "esModuleInterop": true,

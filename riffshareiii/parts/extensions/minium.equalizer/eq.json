@@ -1,8 +1,0 @@
-{
-    "label": "Equalizer"
-    , "purpose": "Filter"
-    , "kind": "10band_equalizer1"
-    , "ui": "http://127.0.0.1:8080/ui/equi.html"
-    , "evaluate": "new10bEqualizer"
-    , "script": "http://127.0.0.1:8080/audio/eqfilter.js"
-}

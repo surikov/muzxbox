@@ -148,7 +148,7 @@ class MM_WebAudioFontLoader {
 			, pitch: -1
 		};
 	};
-	findInstrument(program: number): number {
+	/*findInstrument(program: number): number {
 		
 		for (var i = 0; i < this.util.tonechordinstrumentKeys().length; i++) {
 			if (program == 1 * parseInt(this.util.tonechordinstrumentKeys()[i].substring(0, 3))) {
@@ -157,7 +157,7 @@ class MM_WebAudioFontLoader {
 		}
 		console.log('program', program, 'not found set 0');
 		return 0;
-	};
+	};*/
 
 }
 //'use strict'

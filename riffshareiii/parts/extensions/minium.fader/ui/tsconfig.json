@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es2015",
-        "outFile": "faderui.js",
+        "outFile": "../../../exe/plugins/filters/newBaseFader/ui/faderui.js",
         "strictNullChecks": true,
         "alwaysStrict": true,
         "esModuleInterop": true,

@@ -277,7 +277,8 @@ class Projectr {
 
 	createProjectDrums(volume: number, top: number, drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack {
 		let projectDrums: Zvoog_PercussionTrack = {
-			title: midiTrack.title + ' ' + drumNames[drum]
+			//title: midiTrack.title + ' ' + drumNames[drum]
+			title: midiTrack.title + ' ' + allPercussionDrumTitles()[drum]
 			, measures: []
 			, sampler: {
 				id: 'drum' + (drum + Math.random()), data: '' + drum, kind: 'zdrum1', outputs: [outputId]
@@ -314,9 +315,19 @@ class Projectr {
 		}
 		return projectDrums;
 	}
+	findInstrument(program: number): number {
+		let instrs=new ChordPitchPerformerUtil().tonechordinstrumentKeys();
+		for (var i = 0; i < instrs.length; i++) {
+			if (program == 1 * parseInt(instrs[i].substring(0, 3))) {
+				return i;
+			}
+		}
+		console.log('program', program, 'not found set 0');
+		return 0;
+	};
 	createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack {
 		//let perfkind = 'zinstr1';
-		let strummode='plain';
+		/*let strummode='plain';
 		if (midiTrack.program == 24
 			|| midiTrack.program == 25
 			|| midiTrack.program == 26
@@ -327,23 +338,32 @@ class Projectr {
 		) {
 			//perfkind = 'zvstrumming1';
 			strummode='pong';
-		}
+		}*/
+		let iidx = this.findInstrument(midiTrack.program);
+		let imode = 1;//4;//3;//2;//Flat / Down / Up / Snap / Pong
+		let ivolume = 99;
+		let idata = new ChordPitchPerformerUtil().dumpParameters(ivolume, iidx, imode);
+		console.log('createProjectTrack',midiTrack.title,idata);
 		let projectTrack: Zvoog_MusicTrack = {
-			title: midiTrack.title + ' ' + insNames[midiTrack.program]
+			//title: midiTrack.title + ' ' + insNames[midiTrack.program]
+			title: midiTrack.title + ' ' + new ChordPitchPerformerUtil().tonechordinslist()[midiTrack.program]
 			, measures: []
 			//, filters: []
 			, performer: {
 				id: 'track' + (midiTrack.program + Math.random())
-				, data: '' + midiTrack.program+'//'+strummode
+				//, data: '' + midiTrack.program+'//'+strummode
+				, data: idata
 				//, kind: perfkind
-				, kind: 'zvstrumming1'
+				//, kind: 'zvstrumming1'
+				, kind: 'miniumpitchchord1'
+
 				, outputs: [outputId]
 				, iconPosition: { x: top * 2, y: top }
 				, state: 0
 			}
 			//, volume: volume
 		};
-		if(midiTrack.program==65){
+		/*if(midiTrack.program==65){
 			projectTrack.performer.data='' + midiTrack.program+'//'+strummode+'/90'
 		}
 		if(midiTrack.program==49){
@@ -357,7 +377,7 @@ class Projectr {
 		}
 		if(midiTrack.program==16){
 			projectTrack.performer.data='' + midiTrack.program+'//'+strummode+'/20'
-		}
+		}*/
 		if (!(midiTrack.program >= 0 && midiTrack.program <= 127)) {
 			projectTrack.performer.outputs = [];
 		}

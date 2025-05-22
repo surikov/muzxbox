@@ -346,12 +346,19 @@ declare class MidiParser {
     nextEvent(stream: DataViewStream): MIDIEvent;
     parseTrackEvents(track: MIDIFileTrack): void;
 }
-declare let instrumentNamesArray: string[];
-declare let drumNamesArray: string[];
-declare function findrumTitles(nn: number): string;
-declare let drumNames: string[];
-declare let insNames: string[];
-declare function drumTitles(): string[];
+declare function firstDrumKeysArrayPercussionPaths(midi: number): number;
+declare function allPercussionDrumTitles(): string[];
+declare let drumKeysArrayPercussionPaths: string[];
+declare class ChordPitchPerformerUtil {
+    checkParameters(parameters: string): {
+        loudness: number;
+        idx: number;
+        mode: 0 | 1 | 2 | 3 | 4;
+    };
+    dumpParameters(loudness: number, idx: number, mode: number): string;
+    tonechordinslist(): string[];
+    tonechordinstrumentKeys(): string[];
+}
 declare type ImportMeasure = Zvoog_SongMeasure & {
     startMs: number;
     durationMs: number;
@@ -599,6 +606,7 @@ declare class Projectr {
     addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string, tempo: number): void;
     collectDrums(midiTrack: MIDISongTrack): number[];
     createProjectDrums(volume: number, top: number, drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack;
+    findInstrument(program: number): number;
     createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack;
     trimProject(project: Zvoog_Project, reslice: boolean): void;
     limitShort(project: Zvoog_Project): void;

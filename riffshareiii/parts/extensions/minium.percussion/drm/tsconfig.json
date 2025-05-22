@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es2015"
-        ,"outFile": "drmsplgn.js"
+        ,"outFile": "../../../exe/plugins/samplers/miniumdrums1/drm/drmsplgn.js"
 		,"strictNullChecks": true
 		,"alwaysStrict": true
 		,"esModuleInterop": true

@@ -28,23 +28,23 @@ let _t_all_registerd_plugins_list = [
         evaluate: 'newZvoogStrumPerformerImplementation', script: './plugins/performers/zvoog_strum/zvoogstrum_plugin.js'
     },
     {
-        label: "Compressor",
+        label: "Minium Compressor",
         purpose: "Filter",
         kind: "miniumdcompressor1",
-        ui: "./plugins/filters/minium.compressor/ui/cmprui.html",
+        ui: "./plugins/filters/miniumdcompressor1/ui/cmprui.html",
         evaluate: "newBaseCompressor",
-        script: "./plugins/filters/minium.compressor/audio/compress.js"
+        script: "./plugins/filters/miniumdcompressor1/audio/compress.js"
     },
     {
-        label: "Equalizer",
+        label: "Minium 10-band Equalizer",
         purpose: "Filter",
         kind: "10band_equalizer1",
-        ui: "./plugins/filters/minium.equalizer/ui/equi.html",
+        ui: "./plugins/filters/10band_equalizer1/ui/equi.html",
         evaluate: "new10bEqualizer",
-        script: "./plugins/filters/minium.equalizer/audio/eqfilter.js"
+        script: "./plugins/filters/10band_equalizer1/audio/eqfilter.js"
     },
     {
-        label: "Fader",
+        label: "Minium Fader",
         purpose: "Filter",
         kind: "miniumfader1",
         ui: "./plugins/filters/minium.fader/ui/faderui.html",
@@ -52,30 +52,30 @@ let _t_all_registerd_plugins_list = [
         script: "./plugins/filters/minium.fader/audio/faderaudio.js"
     },
     {
-        label: "Echo",
+        label: "Minium Echo",
         purpose: "Filter",
         kind: "miniumecho1",
-        ui: "./plugins/filters/minium.reverberator/ui/echo.html",
-        evaluate: "newBaseEcho",
-        script: "./plugins/filters/minium.reverberator/audio/plugin.js"
+        ui: "./plugins/filters/miniumecho1/ui/echo.html",
+        evaluate: "newBaseEchoV1",
+        script: "./plugins/filters/miniumecho1/audio/plugin.js"
     },
     {
-        label: "Audio File",
+        label: "Minium Audio File",
         purpose: "Sampler",
         kind: "miniumaudiofile1",
         ui: "./plugins/performers/miniumaudiofile1/chooser/pickfile.html",
         evaluate: "newAudiFileSamplerTrack",
         script: "./plugins/performers/miniumaudiofile1/player/fileplay.js"
     }, {
-        label: "Percussion",
+        label: "Minium Percussion",
         purpose: "Sampler",
         kind: "miniumdrums1",
-        ui: "./plugins/samplers/miniumdrums1/drmsui.html",
+        ui: "./plugins/samplers/miniumdrums1/gui/drmsui.html",
         evaluate: "newBasePercussionPlugin",
-        script: "./plugins/samplers/miniumdrums1/drmsplgn.js"
+        script: "./plugins/samplers/miniumdrums1/drm/drmsplgn.js"
     },
     {
-        "label": "Import *.mid",
+        "label": "Minium Import *.mid",
         "purpose": "Action",
         "kind": "minimidimport1",
         "ui": "./plugins/actions/minimidimport1/mimidi.html",
@@ -83,7 +83,7 @@ let _t_all_registerd_plugins_list = [
         "script": ""
     },
     {
-        "label": "Chords",
+        "label": "Minium Chords",
         "purpose": "Performer",
         "kind": "miniumpitchchord1",
         "ui": "./plugins/performers/miniumpitchchord1/gui/pitchui.html",

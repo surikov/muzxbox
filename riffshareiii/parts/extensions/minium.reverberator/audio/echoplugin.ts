@@ -74,6 +74,6 @@ class EchoImplementation implements MZXBX_AudioFilterPlugin {
 		this.level = (this.level > 150) ? 100 : this.level;
 	}
 }
-function newBaseEcho(): MZXBX_AudioFilterPlugin {
+function newBaseEchoV1(): MZXBX_AudioFilterPlugin {
 	return new EchoImplementation();
 }

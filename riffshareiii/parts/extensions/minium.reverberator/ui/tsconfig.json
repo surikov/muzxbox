@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es2015",
-        "outFile": "ui.js",
+        "outFile": "../../../exe/plugins/filters/miniumecho1/ui/ui.js",
         "strictNullChecks": true,
         "alwaysStrict": true,
         "esModuleInterop": true,

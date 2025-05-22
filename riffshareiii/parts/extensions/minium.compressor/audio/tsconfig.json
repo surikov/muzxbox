@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es2015",
-        "outFile": "compress.js",
+        "outFile": "../../../exe/plugins/filters/miniumdcompressor1/audio/compress.js",
         "strictNullChecks": true,
         "alwaysStrict": true,
         "esModuleInterop": true,

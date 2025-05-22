@@ -4,7 +4,7 @@ class ChordPitchPerformerUtil {
         let checked = { loudness: 0.99, idx: 0, mode: 0 };
         try {
             let split = parameters.split('/');
-            checked.loudness = parseInt(split[0]) / 100;
+            checked.loudness = parseInt(split[0]);
             checked.idx = parseInt(split[1]);
             let mode = parseInt(split[2]);
             if (mode == 0)
@@ -21,15 +21,17 @@ class ChordPitchPerformerUtil {
         catch (xx) {
             console.log(xx);
         }
-        if (!(checked.loudness >= 0 && checked.loudness <= 1.5)) {
-            checked.loudness = 0.99;
+        if (!(checked.loudness >= 0 && checked.loudness <= 150)) {
+            checked.loudness = 100;
         }
         if (!(checked.idx >= 0 && checked.idx <= this.tonechordinstrumentKeys().length)) {
             checked.idx = 0;
         }
+        console.log('ChordPitchPerformerUtil.checkParameters', parameters, checked);
         return checked;
     }
     dumpParameters(loudness, idx, mode) {
+        console.log('ChordPitchPerformerUtil.dumpParameters', loudness, idx, mode);
         return loudness + '/' + idx + '/' + mode;
     }
     tonechordinslist() {
