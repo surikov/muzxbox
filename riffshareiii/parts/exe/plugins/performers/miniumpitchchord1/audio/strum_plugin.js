@@ -27,7 +27,6 @@ class ChordPitchPerformerUtil {
         if (!(checked.idx >= 0 && checked.idx <= this.tonechordinstrumentKeys().length)) {
             checked.idx = 0;
         }
-        console.log('ChordPitchPerformerUtil.checkParameters', parameters, checked);
         return checked;
     }
     dumpParameters(loudness, idx, mode) {
@@ -400,16 +399,6 @@ class MM_WebAudioFontLoader {
         };
     }
     ;
-    findInstrument(program) {
-        for (var i = 0; i < this.util.tonechordinstrumentKeys().length; i++) {
-            if (program == 1 * parseInt(this.util.tonechordinstrumentKeys()[i].substring(0, 3))) {
-                return i;
-            }
-        }
-        console.log('program', program, 'not found set 0');
-        return 0;
-    }
-    ;
 }
 class MM_WebAudioFontPlayer {
     constructor() {
@@ -768,14 +757,18 @@ class StrumPerformerImplementation {
         this.util = new ChordPitchPerformerUtil();
     }
     launch(context, parameters) {
+        this.parseParametersData(parameters);
         if (this.audioContext) {
-            this.parseParametersData(parameters);
         }
         else {
             this.preset = null;
             this.audioContext = context;
             this.outputVolume = this.audioContext.createGain();
-            this.parseParametersData(parameters);
+        }
+        this.outputVolume.gain.setValueAtTime(this.loudness / 100, this.audioContext.currentTime + 0.00001);
+        if (this.preset) {
+        }
+        else {
             this.info = this.loader.instrumentInfo(this.listidx);
             this.loader.startLoad(context, this.info.url, this.info.variable);
             this.loader.waitLoad(() => {
@@ -852,9 +845,7 @@ class StrumPerformerImplementation {
         this.player.cancelQueue(this.audioContext);
     }
     output() {
-        console.log('outputVolume', this.outputVolume);
         if (this.outputVolume) {
-            console.log('gain', this.outputVolume.gain.value);
             return this.outputVolume;
         }
         else {
@@ -863,7 +854,6 @@ class StrumPerformerImplementation {
     }
 }
 function newStrumPerformerImplementation() {
-    console.log('newStrumPerformerImplementation');
     return new StrumPerformerImplementation();
 }
 //# sourceMappingURL=strum_plugin.js.map

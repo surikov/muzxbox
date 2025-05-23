@@ -605,8 +605,15 @@ declare class Projectr {
     };
     addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string, tempo: number): void;
     collectDrums(midiTrack: MIDISongTrack): number[];
+    findVolumeDrum(midi: number): {
+        idx: number;
+        ratio: number;
+    };
     createProjectDrums(volume: number, top: number, drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack;
-    findInstrument(program: number): number;
+    findVolumeInstrument(program: number): {
+        idx: number;
+        ratio: number;
+    };
     createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack;
     trimProject(project: Zvoog_Project, reslice: boolean): void;
     limitShort(project: Zvoog_Project): void;

@@ -512,9 +512,13 @@ class PercussionDrumKitImplementation {
         this.loudness = 0.9;
     }
     launch(context, parameters) {
-        this.preset = null;
-        this.audioContext = context;
-        this.volumeNode = this.audioContext.createGain();
+        if (this.audioContext) {
+        }
+        else {
+            this.preset = null;
+            this.audioContext = context;
+            this.volumeNode = this.audioContext.createGain();
+        }
         let idx = 0;
         try {
             let split = parameters.split('/');
@@ -526,11 +530,15 @@ class PercussionDrumKitImplementation {
             console.log(xx);
         }
         this.volumeNode.gain.setValueAtTime(this.loudness, 0);
-        this.info = this.loader.drumInfo(idx);
-        this.loader.startLoad(context, this.info.url, this.info.variable);
-        this.loader.waitLoad(() => {
-            this.preset = window[this.info.variable];
-        });
+        if (this.preset) {
+        }
+        else {
+            this.info = this.loader.drumInfo(idx);
+            this.loader.startLoad(context, this.info.url, this.info.variable);
+            this.loader.waitLoad(() => {
+                this.preset = window[this.info.variable];
+            });
+        }
     }
     busy() {
         if (this.preset == null) {

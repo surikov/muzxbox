@@ -355,7 +355,6 @@ declare class MM_WebAudioFontLoader {
     progress(): number;
     waitLoad(onFinish: () => void): void;
     instrumentInfo(n: number): MMPresetInfo;
-    findInstrument(program: number): number;
 }
 declare class MM_WebAudioFontPlayer {
     envelopes: MMWaveEnvelope[];

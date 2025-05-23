@@ -782,7 +782,6 @@ class ChordPitchPerformerUtil {
         if (!(checked.idx >= 0 && checked.idx <= this.tonechordinstrumentKeys().length)) {
             checked.idx = 0;
         }
-        console.log('ChordPitchPerformerUtil.checkParameters', parameters, checked);
         return checked;
     }
     dumpParameters(loudness, idx, mode) {
@@ -1445,7 +1444,9 @@ class Projectr {
                 let filterVolume = {
                     id: filterID,
                     title: filterID,
-                    kind: 'zvolume1', data: '99', outputs: [compresID],
+                    kind: 'miniumfader1',
+                    data: '99',
+                    outputs: [compresID],
                     iconPosition: { x: 77 + ii * 5, y: ii * 11 + 2 },
                     automation: [], state: 0
                 };
@@ -1492,8 +1493,11 @@ class Projectr {
             }
         }
         let filterEcho = {
-            id: echoOutID, title: echoOutID,
-            kind: 'zvecho1', data: '22', outputs: [''],
+            id: echoOutID,
+            title: echoOutID,
+            kind: 'miniumecho1',
+            data: '22',
+            outputs: [''],
             iconPosition: {
                 x: 77 + midiSongData.miditracks.length * 30,
                 y: midiSongData.miditracks.length * 8 + 2
@@ -1503,7 +1507,9 @@ class Projectr {
         let filterCompression = {
             id: compresID,
             title: compresID,
-            kind: 'zvooco1', data: '1', outputs: [echoOutID],
+            kind: 'miniumdcompressor1',
+            data: '33',
+            outputs: [echoOutID],
             iconPosition: {
                 x: 88 + midiSongData.miditracks.length * 30,
                 y: midiSongData.miditracks.length * 8 + 2
@@ -1652,15 +1658,33 @@ class Projectr {
         }
         return drums;
     }
+    findVolumeDrum(midi) {
+        let re = { idx: 0, ratio: 1 };
+        let pre = '' + midi;
+        for (let nn = 0; nn < drumKeysArrayPercussionPaths.length; nn++) {
+            if (drumKeysArrayPercussionPaths[nn].startsWith(pre)) {
+                re.idx = nn;
+                break;
+            }
+        }
+        return re;
+    }
+    ;
     createProjectDrums(volume, top, drum, timeline, midiTrack, outputId) {
+        let idxratio = this.findVolumeDrum(drum);
+        let drumvolidx = '' + Math.round(volume * 100) + '/' + idxratio.idx;
         let projectDrums = {
             title: midiTrack.title + ' ' + allPercussionDrumTitles()[drum],
             measures: [],
             sampler: {
-                id: 'drum' + (drum + Math.random()), data: '' + drum, kind: 'zdrum1', outputs: [outputId],
+                id: 'drum' + (drum + Math.random()),
+                data: drumvolidx,
+                kind: 'miniumdrums1',
+                outputs: [outputId],
                 iconPosition: { x: top * 1.5, y: top / 2 }, state: 0
             }
         };
+        console.log(('' + midiTrack.title + ' ' + allPercussionDrumTitles()[drum]), drum, drumvolidx);
         if (!(drum >= 35 && drum <= 81)) {
             projectDrums.sampler.outputs = [];
         }
@@ -1688,23 +1712,24 @@ class Projectr {
         }
         return projectDrums;
     }
-    findInstrument(program) {
+    findVolumeInstrument(program) {
+        let re = { idx: 0, ratio: 0.7 };
         let instrs = new ChordPitchPerformerUtil().tonechordinstrumentKeys();
         for (var i = 0; i < instrs.length; i++) {
             if (program == 1 * parseInt(instrs[i].substring(0, 3))) {
-                return i;
+                re.idx = i;
+                break;
             }
         }
-        console.log('program', program, 'not found set 0');
-        return 0;
+        return re;
     }
     ;
     createProjectTrack(volume, top, timeline, midiTrack, outputId) {
-        let iidx = this.findInstrument(midiTrack.program);
-        let imode = 1;
-        let ivolume = 99;
+        let idxRatio = this.findVolumeInstrument(midiTrack.program);
+        let iidx = idxRatio.idx;
+        let imode = 0;
+        let ivolume = Math.round(volume * 100) * idxRatio.ratio;
         let idata = new ChordPitchPerformerUtil().dumpParameters(ivolume, iidx, imode);
-        console.log('createProjectTrack', midiTrack.title, idata);
         let projectTrack = {
             title: midiTrack.title + ' ' + new ChordPitchPerformerUtil().tonechordinslist()[midiTrack.program],
             measures: [],
@@ -1717,6 +1742,7 @@ class Projectr {
                 state: 0
             }
         };
+        console.log((midiTrack.title + ' ' + new ChordPitchPerformerUtil().tonechordinslist()[midiTrack.program]), midiTrack.program, idata);
         if (!(midiTrack.program >= 0 && midiTrack.program <= 127)) {
             projectTrack.performer.outputs = [];
         }
@@ -1862,7 +1888,6 @@ class Projectr {
             durations.sort((a, b) => {
                 return b.len - a.len;
             });
-            console.log(durations);
             let top = [durations[0]];
             for (let ii = 1; ii < durations.length; ii++) {
                 if (durations[ii].len * 2 > durations[0].len) {
@@ -1870,10 +1895,8 @@ class Projectr {
                 }
             }
             top.sort((a, b) => { return a.shft - b.shft; });
-            console.log(top);
             let shsize = top[0].shft;
             if (shsize) {
-                console.log('shift', '' + shsize + '/32');
                 this.shiftForwar32(project, shsize);
             }
         }

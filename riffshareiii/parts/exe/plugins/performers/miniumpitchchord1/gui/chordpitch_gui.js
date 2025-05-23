@@ -95,7 +95,6 @@ class CHPUI {
         if (el) {
             el.checked = true;
         }
-        console.log(el);
     }
     init() {
         let el = document.getElementById('inslist');
@@ -225,7 +224,6 @@ class ChordPitchPerformerUtil {
         if (!(checked.idx >= 0 && checked.idx <= this.tonechordinstrumentKeys().length)) {
             checked.idx = 0;
         }
-        console.log('ChordPitchPerformerUtil.checkParameters', parameters, checked);
         return checked;
     }
     dumpParameters(loudness, idx, mode) {

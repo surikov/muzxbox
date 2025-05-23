@@ -1,26 +1,25 @@
 :root {
-	--background-color: #F2E2CE;
-	--main-color: #1FA65A;
-	--drag-color: #f96;
-	--line-color: #1EA4D9;
-	--click-color: #fff;
-	--line-color90: color-mix(in lab, transparent 90%, var(--line-color));
-	--line-color80: color-mix(in lab, transparent 80%, var(--line-color));
+	--background-color: #cde;
+	--main-color: #003;
+	--drag-color: #9cc;
+	--line-color: #39c;
+	--click-color: #cff;
+	--line-color90: color-mix(in lab, transparent 90%, var(--main-color));
+	--line-color80: color-mix(in lab, transparent 80%, var(--main-color));
 	--bgfill2: radial-gradient(circle, var(--click-color) 0%, var(--background-color) 100%);
 	--bgfill: var(--background-color);
 }
 
-html{
+html {
 	scrollbar-color: var(--drag-color) var(--background-color);
 }
+
 body {
 	font-family: "Poiret One", sans-serif;
 	font-weight: 600;
 	font-style: normal;
-	background-color: #eef;
-	color: var(--line-color);
-	background: var(--bgfill);
-	
+	background-color: var(--background-color);
+	color: var(--main-color);
 }
 
 h1 {
@@ -36,7 +35,7 @@ input[type="range"] {
 	-webkit-appearance: none;
 	width: 100%;
 	height: 3px;
-	background: var(--main-color);
+	background: var(--line-color);
 	outline: none;
 }
 
@@ -50,7 +49,7 @@ input[type="range"]::-webkit-slider-thumb {
 	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.75);
 	border-style: solid;
 	border-width: 1px;
-	border-color: var(--main-color);
+	border-color: var(--line-color);
 	border-radius: 0.5cm;
 }
 
@@ -61,7 +60,6 @@ input[type="range"]::-webkit-slider-thumb {
 ul {
 	display: inline-block;
 	text-align: left;
-	list-style-type2: "▢  ";
 	font-size: 0.75cm;
 }
 
@@ -84,10 +82,11 @@ ul {
 	cursor: pointer;
 	padding: 0px 15px;
 	line-height: 1cm;
-	border: 1px solid var(--main-color);
+	border: 1px solid var(--line-color);
 	border-right: none;
 	user-select: none;
 	background: var(--click-color);
+	color: var(--line-color);
 }
 
 .form_radio_group .form_radio_group-item:first-child label {
@@ -96,33 +95,33 @@ ul {
 
 .form_radio_group .form_radio_group-item:last-child label {
 	border-radius: 0 0.5cm 0.5cm 0;
-	border-right: 1px solid var(--main-color);
+	border-right: 1px solid var(--line-color);
 }
 
 /* Checked */
 .form_radio_group input[type=radio]:checked+label {
 	background: var(--background-color);
-	
+
 	color: var(--line-color);
 }
 
 /* Hover */
 .form_radio_group label:hover {
-	color: var(--main-color);
+	color: var(--drag-color);
 }
 
 /* Disabled */
-.form_radio_group input[type=radio]:disabled+label {
+/*.form_radio_group input[type=radio]:disabled+label {
 	background: #efefef;
 	color: #666;
-}
+}*/
 
 input[type=text] {
 	background: var(--line-color90);
 	border: none;
-	border-bottom: 1px solid #ffc;
+	border-bottom: 1px solid var(--line-color);
 	outline: none;
-	height:1cm;
+	height: 1cm;
 	font-family: "Poiret One", sans-serif;
 	font-weight: 600;
 	font-style: normal;
@@ -131,26 +130,27 @@ input[type=text] {
 
 input[type=text]:focus {
 	background: var(--line-color80);
+	
 }
 
-button{
-	height:1cm;
+button {
+	height: 1cm;
 	font-family: "Poiret One", sans-serif;
 	font-weight: 600;
 	font-style: normal;
 	font-size: 0.75cm;
-	bbbackground: var(--bgfill);
 	background: var(--click-color);
 	border-style: solid;
 	border-width: 1px;
-	border-color: var(--main-color);
+	border-color: var(--line-color);
 	border-radius: 0.5cm;
 	padding-left: 0.5cm;
 	padding-right: 0.5cm;
 	color: var(--line-color);
 }
-input[type=file]{
-	height:1cm;
+
+input[type=file] {
+	height: 1cm;
 	font-family: "Poiret One", sans-serif;
 	font-weight: 600;
 	font-style: normal;
@@ -158,35 +158,39 @@ input[type=file]{
 	background: var(--bgfill);
 	border-style: solid;
 	border-width: 1px;
-	border-color: var(--main-color);
+	border-color: var(--line-color);
 	border-radius: 0.5cm;
+	
 }
+
 input::file-selector-button {
-	font-weight2: bold;
 	font-family: "Poiret One", sans-serif;
 	font-weight: 600;
 	font-style: normal;
 	font-size: 0.75cm;
-	color: var(--main-color);
+	color: var(--line-color);
 	padding-left: 0.5cm;
 	padding-right: 0.5cm;
 	border: none;
-	border-radius2: 3px;
 	background: var(--click-color);
-  }
-
-a{
-	color: var(--line-color);
 }
-a:link { 
-	text-decoration: none; 
-  } 
-  a:visited { 
-	text-decoration: none; 
-  } 
-  a:hover { 
-	text-decoration: none; 
-  } 
-  a:active { 
-	text-decoration: none; 
-  }
+
+a {
+	color: var(--main-color);
+}
+
+a:link {
+	text-decoration: none;
+}
+
+a:visited {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+a:active {
+	text-decoration: none;
+}

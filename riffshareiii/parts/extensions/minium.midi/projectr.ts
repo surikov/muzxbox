@@ -47,7 +47,9 @@ class Projectr {
 				let filterVolume: Zvoog_FilterTarget = {
 					id: filterID
 					, title: filterID
-					, kind: 'zvolume1', data: '99', outputs: [compresID]
+					, kind: 'miniumfader1'
+					, data: '99'
+					, outputs: [compresID]
 					, iconPosition: { x: 77 + ii * 5, y: ii * 11 + 2 }
 					, automation: [], state: 0
 				};
@@ -96,8 +98,11 @@ class Projectr {
 			}
 		}
 		let filterEcho: Zvoog_FilterTarget = {
-			id: echoOutID, title: echoOutID
-			, kind: 'zvecho1', data: '22', outputs: ['']
+			id: echoOutID
+			, title: echoOutID
+			, kind: 'miniumecho1'
+			, data: '22'
+			, outputs: ['']
 			, iconPosition: {
 				x: 77 + midiSongData.miditracks.length * 30
 				, y: midiSongData.miditracks.length * 8 + 2
@@ -107,7 +112,9 @@ class Projectr {
 		let filterCompression: Zvoog_FilterTarget = {
 			id: compresID
 			, title: compresID
-			, kind: 'zvooco1', data: '1', outputs: [echoOutID]
+			, kind: 'miniumdcompressor1'
+			, data: '33'
+			, outputs: [echoOutID]
 			, iconPosition: {
 				x: 88 + midiSongData.miditracks.length * 30
 				, y: midiSongData.miditracks.length * 8 + 2
@@ -274,18 +281,41 @@ class Projectr {
 		}
 		return drums;
 	}
+	findVolumeDrum(midi: number): { idx: number, ratio: number } {
+		let re = { idx: 0, ratio: 1 };
+		//let instrs = new ChordPitchPerformerUtil().tonechordinstrumentKeys();
+		let pre = '' + midi;
+		for (let nn = 0; nn < drumKeysArrayPercussionPaths.length; nn++) {
+			if (drumKeysArrayPercussionPaths[nn].startsWith(pre)) {
+				re.idx = nn;
+				break;
+			}
+		}
 
+
+		return re;
+	};
 	createProjectDrums(volume: number, top: number, drum: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_PercussionTrack {
+		let idxratio = this.findVolumeDrum(drum);
+		let drumvolidx = '' + Math.round(volume * 100) + '/' + idxratio.idx;
+
 		let projectDrums: Zvoog_PercussionTrack = {
 			//title: midiTrack.title + ' ' + drumNames[drum]
+
 			title: midiTrack.title + ' ' + allPercussionDrumTitles()[drum]
 			, measures: []
 			, sampler: {
-				id: 'drum' + (drum + Math.random()), data: '' + drum, kind: 'zdrum1', outputs: [outputId]
+				id: 'drum' + (drum + Math.random())
+				//, data: '' + drum
+				, data: drumvolidx
+				//, kind: 'zdrum1'
+				, kind: 'miniumdrums1'
+				, outputs: [outputId]
 				, iconPosition: { x: top * 1.5, y: top / 2 }, state: 0
 			}
 			//, volume: volume
 		};
+		console.log((''+midiTrack.title + ' ' + allPercussionDrumTitles()[drum]), drum, drumvolidx);
 		if (!(drum >= 35 && drum <= 81)) {
 			projectDrums.sampler.outputs = [];
 		}
@@ -313,17 +343,20 @@ class Projectr {
 			}
 			currentTimeMs = currentTimeMs + measureDurationS * 1000;
 		}
+		//console.log(projectDrums);
 		return projectDrums;
 	}
-	findInstrument(program: number): number {
-		let instrs=new ChordPitchPerformerUtil().tonechordinstrumentKeys();
+	findVolumeInstrument(program: number): { idx: number, ratio: number } {
+		let re = { idx: 0, ratio: 0.7 };
+		let instrs = new ChordPitchPerformerUtil().tonechordinstrumentKeys();
 		for (var i = 0; i < instrs.length; i++) {
 			if (program == 1 * parseInt(instrs[i].substring(0, 3))) {
-				return i;
+				re.idx = i;
+				break;
 			}
 		}
-		console.log('program', program, 'not found set 0');
-		return 0;
+		//console.log('program', program, 'not found set 0');
+		return re;
 	};
 	createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack {
 		//let perfkind = 'zinstr1';
@@ -339,11 +372,12 @@ class Projectr {
 			//perfkind = 'zvstrumming1';
 			strummode='pong';
 		}*/
-		let iidx = this.findInstrument(midiTrack.program);
-		let imode = 1;//4;//3;//2;//Flat / Down / Up / Snap / Pong
-		let ivolume = 99;
+		let idxRatio = this.findVolumeInstrument(midiTrack.program);
+		let iidx = idxRatio.idx;
+		let imode = 0;//Flat / Down / Up / Snap / Pong
+		let ivolume = Math.round(volume * 100) * idxRatio.ratio;
 		let idata = new ChordPitchPerformerUtil().dumpParameters(ivolume, iidx, imode);
-		console.log('createProjectTrack',midiTrack.title,idata);
+		//console.log('createProjectTrack', volume, midiTrack.title, idata);
 		let projectTrack: Zvoog_MusicTrack = {
 			//title: midiTrack.title + ' ' + insNames[midiTrack.program]
 			title: midiTrack.title + ' ' + new ChordPitchPerformerUtil().tonechordinslist()[midiTrack.program]
@@ -363,6 +397,7 @@ class Projectr {
 			}
 			//, volume: volume
 		};
+		console.log( (midiTrack.title + ' ' + new ChordPitchPerformerUtil().tonechordinslist()[midiTrack.program]), midiTrack.program,idata);
 		/*if(midiTrack.program==65){
 			projectTrack.performer.data='' + midiTrack.program+'//'+strummode+'/90'
 		}
@@ -602,7 +637,7 @@ class Projectr {
 
 				return b.len - a.len;
 			});
-			console.log(durations);
+			//console.log(durations);
 			let top: { len: number, shft: number }[] = [durations[0]];
 			for (let ii = 1; ii < durations.length; ii++) {
 				if (durations[ii].len * 2 > durations[0].len) {
@@ -610,10 +645,10 @@ class Projectr {
 				}
 			}
 			top.sort((a, b) => { return a.shft - b.shft });
-			console.log(top);
+			//console.log(top);
 			let shsize = top[0].shft;
 			if (shsize) {
-				console.log('shift', '' + shsize + '/32');
+				//console.log('shift', '' + shsize + '/32');
 				this.shiftForwar32(project, shsize)
 			}
 

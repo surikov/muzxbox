@@ -22,21 +22,27 @@ class StrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 		//
 	}
 	launch(context: AudioContext, parameters: string): void {
+		this.parseParametersData(parameters);
 		if (this.audioContext) {
-			this.parseParametersData(parameters);
+
 		} else {
 			this.preset = null;
 			this.audioContext = context;
 			this.outputVolume = this.audioContext.createGain();
 			//this.outputVolume.connect(this.audioContext.destination);
-			this.parseParametersData(parameters);
+			//this.parseParametersData(parameters);
 
+
+		}
+		this.outputVolume.gain.setValueAtTime(this.loudness / 100, this.audioContext.currentTime + 0.00001);
+		//this.volumeNode.gain.value=this.loudness;
+		//console.log('StrumPerformerImplementation launch loudness', this.loudness, this.outputVolume.gain.value);
+		if (this.preset) {
+			//
+		} else {
 			this.info = this.loader.instrumentInfo(this.listidx);
 
 			this.loader.startLoad(context, this.info.url, this.info.variable);
-			//this.outputVolume.gain.setValueAtTime(this.loudness, this.audioContext.currentTime + 0.00001);
-			//this.volumeNode.gain.value=this.loudness;
-			//console.log('loudness',this.loudness,this.volumeNode.gain.value);
 
 			this.loader.waitLoad(() => {
 				this.preset = window[this.info.variable];
@@ -132,9 +138,9 @@ class StrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 		this.player.cancelQueue(this.audioContext)
 	}
 	output(): AudioNode | null {
-		console.log('outputVolume', this.outputVolume);
+		//console.log('outputVolume', this.outputVolume);
 		if (this.outputVolume) {
-			console.log('gain', this.outputVolume.gain.value);
+			//console.log('gain', this.outputVolume.gain.value);
 			return this.outputVolume;
 		} else {
 			return null;
@@ -143,7 +149,7 @@ class StrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 }
 
 function newStrumPerformerImplementation(): MZXBX_AudioPerformerPlugin {
-	console.log('newStrumPerformerImplementation');
+	//console.log('newStrumPerformerImplementation');
 	return new StrumPerformerImplementation();
 }
 

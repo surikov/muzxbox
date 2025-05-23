@@ -92,7 +92,7 @@ class CHPUI {
 		if (el) {
 			(el as any).checked = true;
 		}
-		console.log(el);
+		//console.log(el);
 	}
 	init() {
 		let el = document.getElementById('inslist');

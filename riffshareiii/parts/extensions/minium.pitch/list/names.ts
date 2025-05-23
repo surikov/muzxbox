@@ -20,7 +20,7 @@ class ChordPitchPerformerUtil {
 		if (!(checked.idx >= 0 && checked.idx <= this.tonechordinstrumentKeys().length)) {
 			checked.idx = 0;
 		}
-		console.log('ChordPitchPerformerUtil.checkParameters',parameters,checked);
+		//console.log('ChordPitchPerformerUtil.checkParameters',parameters,checked);
 		return checked;
 	}
 	dumpParameters(loudness: number, idx: number, mode: number): string {
