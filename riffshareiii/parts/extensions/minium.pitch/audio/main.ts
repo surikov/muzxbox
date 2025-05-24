@@ -93,6 +93,8 @@ class StrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 		if (this.audioContext) {
 			if (this.outputVolume) {
 				if (this.preset) {
+console.log('',this.loudness,this.strumMode,zpitches,whenStart);
+
 					let duration = 0;
 
 					let volumeLevel = 0.95 + 0.05 * Math.random();

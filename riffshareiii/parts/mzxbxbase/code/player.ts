@@ -108,7 +108,7 @@ class SchedulePlayer implements MZXBX_Player {
 		console.log('reconnectAllPlugins', msg, schedule);
 	}
 	startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number): string {
-		console.log('startLoopTicks', loopStart, currentPosition, loopEnd);
+		console.log('startLoopTicks', loopStart, currentPosition, loopEnd,this.schedule);
 		let msg: string | null = this.connectAllPlugins();
 		if (msg) {
 			//console.log('Can\'t start loop:', msg);
@@ -339,6 +339,7 @@ class SchedulePlayer implements MZXBX_Player {
 	}
 	sendPerformerItem(it: MZXBX_PlayItem, whenAudio: number, tempo: number) {
 		let pp = this.findPerformerSamplerPlugin(it.channelId) as any;
+		//console.log('sendPerformerItem',whenAudio,it);
 		if (pp) {
 			if (pp.start) {
 				let sampler: MZXBX_AudioSamplerPlugin = pp;

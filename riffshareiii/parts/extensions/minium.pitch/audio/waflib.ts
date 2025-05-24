@@ -205,15 +205,18 @@ class MM_WebAudioFontPlayer {
 		pitches.sort(function (a, b) {
 			return b - a;
 		});
+		//console.log('up',pitches);
 		return this.queueStrum(audioContext, target, preset, when, tempo, pitches, duration, volume, slides);
 	};
 	queueStrumDown(audioContext: AudioContext, target: AudioNode, preset: MMWavePreset, when: number, tempo: number, pitches: number[], duration: number, volume?: number
 		//, slides?: ZPWaveSlide[][]
 		, slides?: MZXBX_SlideItem[]
 	): MMWaveEnvelope[] {
+		
 		pitches.sort(function (a, b) {
 			return a - b;
 		});
+		//console.log('down',pitches);
 		return this.queueStrum(audioContext, target, preset, when, tempo, pitches, duration, volume, slides);
 	};
 	queueStrum(audioContext: AudioContext, target: AudioNode, preset: MMWavePreset, when: number, tempo: number, pitches: number[], duration: number, volume?: number
@@ -228,15 +231,16 @@ class MM_WebAudioFontPlayer {
 		when = when + Math.random() * 2 / tempo;
 		//console.log('~',when);
 		var envelopes: MMWaveEnvelope[] = [];
-		let strumStep = 1 / tempo;
+		let strumStep = 2 / tempo;
 		for (var i = 0; i < pitches.length; i++) {
 			/*var singleSlide: undefined | ZPWaveSlide[] = undefined;
 			if (slides) {
 				singleSlide = slides[i];
 			}*/
+			//console.log((when + i * strumStep),( pitches[i]));
 			var envlp: MMWaveEnvelope | null = this.queueWaveTable(audioContext, target, preset, when + i * strumStep, pitches[i], duration, volume - Math.random() * 0.01, slides);
 			if (envlp) envelopes.push(envlp);
-			volume = 0.9 * volume;
+			volume = 0.85 * volume;
 		}
 		return envelopes;
 	};

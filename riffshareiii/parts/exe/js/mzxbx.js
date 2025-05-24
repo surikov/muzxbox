@@ -181,7 +181,7 @@ class SchedulePlayer {
         console.log('reconnectAllPlugins', msg, schedule);
     }
     startLoopTicks(loopStart, currentPosition, loopEnd) {
-        console.log('startLoopTicks', loopStart, currentPosition, loopEnd);
+        console.log('startLoopTicks', loopStart, currentPosition, loopEnd, this.schedule);
         let msg = this.connectAllPlugins();
         if (msg) {
             return msg;
