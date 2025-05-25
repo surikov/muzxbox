@@ -505,7 +505,7 @@ class MM_WebAudioFontPlayer {
         }
         when = when + Math.random() * 2 / tempo;
         var envelopes = [];
-        let strumStep = 2 / tempo;
+        let strumStep = 1.5 / tempo;
         for (var i = 0; i < pitches.length; i++) {
             var envlp = this.queueWaveTable(audioContext, target, preset, when + i * strumStep, pitches[i], duration, volume - Math.random() * 0.01, slides);
             if (envlp)
@@ -799,7 +799,6 @@ class StrumPerformerImplementation {
         if (this.audioContext) {
             if (this.outputVolume) {
                 if (this.preset) {
-                    console.log('', this.loudness, this.strumMode, zpitches, whenStart);
                     let duration = 0;
                     let volumeLevel = 0.95 + 0.05 * Math.random();
                     let when = whenStart + Math.random() * 1 / tempo;

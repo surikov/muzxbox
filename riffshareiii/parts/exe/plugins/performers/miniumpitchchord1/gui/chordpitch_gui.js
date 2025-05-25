@@ -95,6 +95,7 @@ class CHPUI {
         if (el) {
             el.checked = true;
         }
+        console.log('refreshMode', el);
     }
     init() {
         let el = document.getElementById('inslist');
@@ -109,6 +110,10 @@ class CHPUI {
                 this.refreshVolume();
                 this.sendDataToHost();
             });
+        }
+        el = document.getElementById('radio0');
+        if (el) {
+            el.addEventListener('change', (event) => { this.setMode(0); });
         }
         el = document.getElementById('radio1');
         if (el) {
@@ -125,10 +130,6 @@ class CHPUI {
         el = document.getElementById('radio4');
         if (el) {
             el.addEventListener('change', (event) => { this.setMode(4); });
-        }
-        el = document.getElementById('radio5');
-        if (el) {
-            el.addEventListener('change', (event) => { this.setMode(5); });
         }
         this.reFillList();
         this.refreshTitle();
@@ -148,6 +149,7 @@ class CHPUI {
     }
     sendToHost(data) {
         var message = { dialogID: this.id, pluginData: data, done: false };
+        console.log('sendToHost', message);
         window.parent.postMessage(message, '*');
     }
     receiveHostMessage(messageEvent) {

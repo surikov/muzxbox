@@ -92,7 +92,7 @@ class CHPUI {
 		if (el) {
 			(el as any).checked = true;
 		}
-		//console.log(el);
+		console.log('refreshMode',el);
 	}
 	init() {
 		let el = document.getElementById('inslist');
@@ -108,11 +108,11 @@ class CHPUI {
 				this.sendDataToHost();
 			});
 		}
+		el = document.getElementById('radio0'); if (el) { el.addEventListener('change', (event) => { this.setMode(0); }); }
 		el = document.getElementById('radio1'); if (el) { el.addEventListener('change', (event) => { this.setMode(1); }); }
 		el = document.getElementById('radio2'); if (el) { el.addEventListener('change', (event) => { this.setMode(2); }); }
 		el = document.getElementById('radio3'); if (el) { el.addEventListener('change', (event) => { this.setMode(3); }); }
 		el = document.getElementById('radio4'); if (el) { el.addEventListener('change', (event) => { this.setMode(4); }); }
-		el = document.getElementById('radio5'); if (el) { el.addEventListener('change', (event) => { this.setMode(5); }); }
 		this.reFillList();
 		this.refreshTitle();
 		this.refreshVolume();
@@ -131,6 +131,7 @@ class CHPUI {
 	}
 	sendToHost(data: string) {
 		var message: MZXBX_MessageToHost = { dialogID: this.id, pluginData: data, done: false };
+		console.log('sendToHost',message);
 		window.parent.postMessage(message, '*');
 	}
 	receiveHostMessage(messageEvent: MessageEvent) {

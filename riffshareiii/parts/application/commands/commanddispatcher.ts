@@ -164,6 +164,7 @@ class CommandDispatcher {
 		}
 	}
 	renderCurrentProjectForOutput(): MZXBX_Schedule {
+		globalCommandDispatcher.adjustTimeline();
 		let forOutput: MZXBX_Schedule = {
 			series: []
 			, channels: []
@@ -299,6 +300,9 @@ class CommandDispatcher {
 							it.slides.push({ duration: MMUtil().set(one.duration).duration(measure.tempo), delta: one.delta });
 						}
 						//}
+						if (it.pitches.length < 1) {
+							console.log('empty', it);
+						}
 					}
 				}
 			}
@@ -695,6 +699,22 @@ class CommandDispatcher {
 			}
 			if (!(this.cfg().data.comments[tt])) {
 				this.cfg().data.comments[tt][tt] = { changes: [] };
+			}
+		}
+		for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
+			let track = this.cfg().data.tracks[nn];
+			for (let mm = 0; mm < track.measures.length; mm++) {
+				let trackMeasure = track.measures[mm];
+				for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
+					let chord = trackMeasure.chords[cc];
+					if (chord.pitches.length) {
+						//
+					} else {
+						trackMeasure.chords.splice(cc, 1);
+						cc--;
+					}
+				}
+
 			}
 		}
 	}
