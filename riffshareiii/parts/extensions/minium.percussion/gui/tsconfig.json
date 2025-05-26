@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"target": "es2015"
         //,"outFile": "beep_plugin.js"
-        ,"outFile": "../../../exe/plugins/samplers/miniumdrums1/gui/percussion_gui.js"
+        ,"outFile": "../../../exe/plugins/samplers/miniumaudiofile1/gui/percussion_gui.js"
         //,"outDir":"../js"
 		,"strictNullChecks": true
 		,"alwaysStrict": true

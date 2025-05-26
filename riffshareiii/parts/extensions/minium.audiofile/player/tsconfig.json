@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es2015",
-        "outFile": "fileplay.js",
+        "outFile": "../../../exe/plugins/samplers/miniumaudiofile1/player/fileplay.js",
         "strictNullChecks": true,
         "alwaysStrict": true,
         "esModuleInterop": true,

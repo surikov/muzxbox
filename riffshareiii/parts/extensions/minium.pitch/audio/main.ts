@@ -6,6 +6,7 @@ class StrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 	loader: MM_WebAudioFontLoader = new MM_WebAudioFontLoader(this.player);
 
 	listidx: number = 0;
+	cachedListIdx: number = -1;
 	info: MMPresetInfo;
 	preset: MMWavePreset | null = null;
 	loudness = 0.5;
@@ -37,16 +38,14 @@ class StrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 		this.outputVolume.gain.setValueAtTime(this.loudness / 100, this.audioContext.currentTime + 0.00001);
 		//this.volumeNode.gain.value=this.loudness;
 		//console.log('StrumPerformerImplementation launch loudness', this.loudness, this.outputVolume.gain.value);
-		if (this.preset) {
+		if (this.cachedListIdx == this.listidx) {
 			//
 		} else {
 			this.info = this.loader.instrumentInfo(this.listidx);
-
 			this.loader.startLoad(context, this.info.url, this.info.variable);
-
 			this.loader.waitLoad(() => {
 				this.preset = window[this.info.variable];
-
+				this.cachedListIdx = this.listidx;
 			});
 		}
 	}
@@ -93,7 +92,7 @@ class StrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 		if (this.audioContext) {
 			if (this.outputVolume) {
 				if (this.preset) {
-//console.log('strum',this.loudness,this.strumMode,this.up,zpitches,whenStart);
+					//console.log('strum',this.loudness,this.strumMode,this.up,zpitches,whenStart);
 
 					let duration = 0;
 

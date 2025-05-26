@@ -1440,7 +1440,7 @@ class Projectr {
         for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
             let midiSongTrack = midiSongData.miditracks[ii];
             if (midiSongTrack.trackVolumes.length > 1) {
-                let filterID = 'volume' + ii;
+                let filterID = 'fade automation ' + midiSongTrack.title;
                 let filterVolume = {
                     id: filterID,
                     title: filterID,

@@ -111,6 +111,7 @@ class LeftPanel {
 			this.leftZoomAnchors[zz].content.push(titleLabel);
 			if (zz < 5) {
 				if (globalCommandDispatcher.cfg().data.tracks.length > 0) {
+
 					let trackLabel: TileText = {
 						x: 0
 						, y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight()
@@ -118,6 +119,15 @@ class LeftPanel {
 						, css: 'firstTrackLabel' + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(trackLabel);
+					for (let tr = 1; tr < globalCommandDispatcher.cfg().data.tracks.length; tr++) {
+						let trackLabel: TileText = {
+							x: 0
+							, y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight()-(1+tr)*globalCommandDispatcher.cfg().notePathHeight
+							, text: globalCommandDispatcher.cfg().data.tracks[tr].title
+							, css: 'otherTrackLabel' + zoomPrefixLevelsCSS[zz].prefix
+						};
+						this.leftZoomAnchors[zz].content.push(trackLabel);
+					}
 				}
 			}
 			if (zz < 5) {

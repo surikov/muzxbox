@@ -43,7 +43,7 @@ class Projectr {
 		for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
 			let midiSongTrack: MIDISongTrack = midiSongData.miditracks[ii];
 			if (midiSongTrack.trackVolumes.length > 1) {
-				let filterID = 'volume' + ii;
+				let filterID = 'fade automation ' + midiSongTrack.title;
 				let filterVolume: Zvoog_FilterTarget = {
 					id: filterID
 					, title: filterID

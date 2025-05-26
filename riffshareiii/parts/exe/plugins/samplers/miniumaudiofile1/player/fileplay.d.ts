@@ -274,134 +274,40 @@ declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string
 declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
-declare class ChordPitchPerformerUtil {
-    checkParameters(parameters: string): {
-        loudness: number;
-        idx: number;
-        mode: 0 | 1 | 2 | 3 | 4;
+declare class AudioFileParametersUrility {
+    parse(parameters: string): {
+        ratio: number;
+        volume: number;
+        url: string;
     };
-    dumpParameters(loudness: number, idx: number, mode: number): string;
-    tonechordinslist(): string[];
-    tonechordinstrumentKeys(): string[];
+    dump(ratio: number, volume: number, url: string): string;
+    bufferName(ratio: number, url: string): string;
+    startLoadFile(url: string, ratio: number, onDone: () => void): void;
+    startDecodeBuffer(arrayBuffer: ArrayBuffer, path: string, ratio: number, onDone: () => void): void;
+    startTransposeAudioBuffer(path: string, ratio: number, onDone: () => void): void;
 }
-declare type MMWaveEnvelope = {
-    audioBufferSourceNode?: AudioBufferSourceNode | null;
-    target: AudioNode;
-    when: number;
-    duration: number;
-    cancel: () => void;
-    pitch: number;
-    preset: MMWavePreset;
-};
-declare type MMWaveZone = {
-    keyRangeLow: number;
-    keyRangeHigh: number;
-    originalPitch: number;
-    coarseTune: number;
-    fineTune: number;
-    loopStart: number;
-    loopEnd: number;
-    buffer?: AudioBuffer;
-    sampleRate: number;
-    delay?: number;
-    ahdsr?: boolean | MMWaveAHDSR[];
-    sample?: string;
-    file?: string;
-    sustain?: number;
-};
-declare type MMWavePreset = {
-    zones: MMWaveZone[];
-};
-declare type MMWaveSlide = {
-    when: number;
-    delta: number;
-};
-declare type MMWaveAHDSR = {
-    duration: number;
-    volume: number;
-};
-declare type MMCachedPreset = {
-    variableName: string;
-    filePath: string;
-};
-declare type MMPresetInfo = {
-    variable: string;
-    url: string;
-    title: string;
-    pitch: number;
-};
-declare type MMChordQueue = {
-    when: number;
-    destination: AudioNode;
-    preset: MMWavePreset;
-    pitch: number;
-    duration: number;
-    volume?: number;
-    slides?: MMWaveSlide[];
-};
-declare class MM_WebAudioFontLoader {
-    cached: MMCachedPreset[];
-    player: MM_WebAudioFontPlayer;
-    instrumentKeyArray: string[];
-    instrumentNamesArray: string[];
-    drumNamesArray: string[];
-    drumKeyArray: string[];
-    util: ChordPitchPerformerUtil;
-    constructor(player: MM_WebAudioFontPlayer);
-    startLoad(audioContext: AudioContext, filePath: string, variableName: string): void;
-    decodeAfterLoading(audioContext: AudioContext, variableName: string): void;
-    waitOrFinish(variableName: string, onFinish: () => void): void;
-    loaded(variableName: string): boolean;
-    progress(): number;
-    waitLoad(onFinish: () => void): void;
-    instrumentInfo(n: number): MMPresetInfo;
-}
-declare class MM_WebAudioFontPlayer {
-    envelopes: MMWaveEnvelope[];
-    loader: MM_WebAudioFontLoader;
-    afterTime: number;
-    nearZero: number;
-    limitVolume(volume: number | undefined): number;
-    queueChord(audioContext: AudioContext, target: AudioNode, preset: MMWavePreset, when: number, pitches: number[], duration: number, volume?: number, slides?: MZXBX_SlideItem[]): MMWaveEnvelope[];
-    queueStrumUp(audioContext: AudioContext, target: AudioNode, preset: MMWavePreset, when: number, tempo: number, pitches: number[], duration: number, volume?: number, slides?: MZXBX_SlideItem[]): MMWaveEnvelope[];
-    queueStrumDown(audioContext: AudioContext, target: AudioNode, preset: MMWavePreset, when: number, tempo: number, pitches: number[], duration: number, volume?: number, slides?: MZXBX_SlideItem[]): MMWaveEnvelope[];
-    queueStrum(audioContext: AudioContext, target: AudioNode, preset: MMWavePreset, when: number, tempo: number, pitches: number[], duration: number, volume?: number, slides?: MZXBX_SlideItem[]): MMWaveEnvelope[];
-    queueSnap(audioContext: AudioContext, target: AudioNode, preset: MMWavePreset, when: number, tempo: number, pitches: number[], duration: number, volume?: number, slides?: MZXBX_SlideItem[]): MMWaveEnvelope[];
-    resumeContext(audioContext: AudioContext): void;
-    queueWaveTable(audioContext: AudioContext, target: AudioNode, preset: MMWavePreset, when: number, pitch: number, duration: number, volume?: number, slides?: MZXBX_SlideItem[]): MMWaveEnvelope | null;
-    noZeroVolume(n: number): number;
-    setupEnvelope(audioContext: AudioContext, envelope: MMWaveEnvelope, zone: MMWaveZone, volume: number, when: number, sampleDuration: number, noteDuration: number): void;
-    numValue(aValue: any, defValue: number): number;
-    findEnvelope(audioContext: AudioContext, target: AudioNode): MMWaveEnvelope;
-    adjustPreset: (audioContext: AudioContext, preset: MMWavePreset) => void;
-    adjustZone: (audioContext: AudioContext, zone: MMWaveZone) => void;
-    findZone(audioContext: AudioContext, preset: MMWavePreset, pitch: number): MMWaveZone | null;
-    cancelQueue(audioContext: AudioContext): void;
-}
-declare class StrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
+declare function resamplePitchShiftFloat32Array(pitchShift: number, numSampsToProcess: number, fftFrameSize: number, osamp: number, sampleRate: number, indata: Float32Array): Float32Array;
+declare function ShortTimeFourierTransform(fftBuffer: number[], fftFrameSize: number, sign: number): void;
+declare function ___do___PitchShift(audioBuffer: AudioBuffer, ratio: number): void;
+declare class AudiFileSamplerTrackImplementation implements MZXBX_AudioSamplerPlugin {
     audioContext: AudioContext;
-    player: MM_WebAudioFontPlayer;
-    outputVolume: GainNode;
-    loader: MM_WebAudioFontLoader;
-    listidx: number;
-    cachedListIdx: number;
-    info: MMPresetInfo;
-    preset: MMWavePreset | null;
-    loudness: number;
-    up: boolean;
-    strumModeFlat: 0;
-    strumModeDown: 1;
-    strumModeUp: 2;
-    strumModeSnap: 3;
-    strumModePong: 4;
-    strumMode: 0 | 1 | 2 | 3 | 4;
-    util: ChordPitchPerformerUtil;
-    constructor();
+    outputNode: GainNode;
+    freqRatio: number;
+    fileURL: string;
+    volumeLevel: number;
+    ratio: number;
+    path: string;
+    allNodes: {
+        audio: AudioBufferSourceNode;
+        end: number;
+    }[];
     launch(context: AudioContext, parameters: string): void;
-    parseParametersData(parameters: string): void;
-    busy(): null | string;
-    strum(whenStart: number, zpitches: number[], tempo: number, mzbxslide: MZXBX_SlideItem[]): void;
+    start(when: number, tempo: number): void;
     cancel(): void;
+    busy(): null | string;
     output(): AudioNode | null;
+    duration(): number;
+    takeFreeNode(when: number, duration: number): AudioBufferSourceNode;
+    startLoadFile(): void;
 }
-declare function newStrumPerformerImplementation(): MZXBX_AudioPerformerPlugin;
+declare function newAudiFileSamplerTrack(): MZXBX_AudioSamplerPlugin;

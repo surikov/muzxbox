@@ -3189,6 +3189,15 @@ class LeftPanel {
                         css: 'firstTrackLabel' + zoomPrefixLevelsCSS[zz].prefix
                     };
                     this.leftZoomAnchors[zz].content.push(trackLabel);
+                    for (let tr = 1; tr < globalCommandDispatcher.cfg().data.tracks.length; tr++) {
+                        let trackLabel = {
+                            x: 0,
+                            y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - (1 + tr) * globalCommandDispatcher.cfg().notePathHeight,
+                            text: globalCommandDispatcher.cfg().data.tracks[tr].title,
+                            css: 'otherTrackLabel' + zoomPrefixLevelsCSS[zz].prefix
+                        };
+                        this.leftZoomAnchors[zz].content.push(trackLabel);
+                    }
                 }
             }
             if (zz < 5) {

@@ -745,6 +745,7 @@ class StrumPerformerImplementation {
         this.player = new MM_WebAudioFontPlayer();
         this.loader = new MM_WebAudioFontLoader(this.player);
         this.listidx = 0;
+        this.cachedListIdx = -1;
         this.preset = null;
         this.loudness = 0.5;
         this.up = false;
@@ -766,13 +767,14 @@ class StrumPerformerImplementation {
             this.outputVolume = this.audioContext.createGain();
         }
         this.outputVolume.gain.setValueAtTime(this.loudness / 100, this.audioContext.currentTime + 0.00001);
-        if (this.preset) {
+        if (this.cachedListIdx == this.listidx) {
         }
         else {
             this.info = this.loader.instrumentInfo(this.listidx);
             this.loader.startLoad(context, this.info.url, this.info.variable);
             this.loader.waitLoad(() => {
                 this.preset = window[this.info.variable];
+                this.cachedListIdx = this.listidx;
             });
         }
     }

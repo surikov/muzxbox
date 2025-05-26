@@ -1,10 +1,11 @@
 :root {
-	--background-color: #cde;
+	--background-color: #bdf;
 	--main-color: #003;
-	--drag-color: #9cc;
-	--line-color: #39c;
-	--click-color: #cff;
+	--drag-color: #0c9;
+	--line-color: #09f;
+	--click-color: #c30;
 	--line-color90: color-mix(in lab, transparent 90%, var(--main-color));
+	--line-color95: color-mix(in lab, transparent 95%, var(--main-color));
 	--line-color80: color-mix(in lab, transparent 80%, var(--main-color));
 	--bgfill2: radial-gradient(circle, var(--click-color) 0%, var(--background-color) 100%);
 	--bgfill: var(--background-color);
@@ -62,6 +63,9 @@ ul {
 	text-align: left;
 	font-size: 0.75cm;
 }
+li {
+	color: var(--click-color);
+}
 
 .form_radio_group {
 	display: inline-block;
@@ -86,7 +90,7 @@ ul {
 	border-right: none;
 	user-select: none;
 	background: var(--click-color);
-	color: var(--line-color);
+	color: var(--drag-color);
 }
 
 .form_radio_group .form_radio_group-item:first-child label {
@@ -102,7 +106,7 @@ ul {
 .form_radio_group input[type=radio]:checked+label {
 	background: var(--background-color);
 
-	color: var(--line-color);
+	color: var(--main-color);
 }
 
 /* Hover */
@@ -117,19 +121,19 @@ ul {
 }*/
 
 input[type=text] {
-	background: var(--line-color90);
+	background: var(--background-color);
 	border: none;
-	border-bottom: 1px solid var(--line-color);
+	border-bottom: 1px solid var(--click-color);
 	outline: none;
 	height: 1cm;
 	font-family: "Poiret One", sans-serif;
 	font-weight: 600;
 	font-style: normal;
-	color: var(--line-color);
+	color: var(--main-color);
 }
 
 input[type=text]:focus {
-	background: var(--line-color80);
+	background: var(--line-color95);
 	
 }
 
@@ -146,7 +150,7 @@ button {
 	border-radius: 0.5cm;
 	padding-left: 0.5cm;
 	padding-right: 0.5cm;
-	color: var(--line-color);
+	color: var(--drag-color);
 }
 
 input[type=file] {
@@ -168,7 +172,7 @@ input::file-selector-button {
 	font-weight: 600;
 	font-style: normal;
 	font-size: 0.75cm;
-	color: var(--line-color);
+	color: var(--drag-color);
 	padding-left: 0.5cm;
 	padding-right: 0.5cm;
 	border: none;
@@ -176,7 +180,7 @@ input::file-selector-button {
 }
 
 a {
-	color: var(--main-color);
+	color: var(--click-color);
 }
 
 a:link {

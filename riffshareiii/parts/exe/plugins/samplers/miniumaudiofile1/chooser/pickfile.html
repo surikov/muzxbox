@@ -1,0 +1,56 @@
+<html>
+
+<head>
+	<title>AudioFile UI</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../../../plugins.css">
+</head>
+
+<body>
+
+	<h1>Audio File</h1>
+	<p>Volume <span id='volval'>77</span>%</p>
+	<p>
+		<input type="range" id="volumeslider" min="0" max="100" value="90" />
+	</p>
+	<p>Frequency ratio <span id='numval'>77</span>%</p>
+	<p>
+		<input type="range" id="ratioslider" min="-100" max="100" value="0" />
+	</p>
+	<div class="cntrblk"><input type="text" id="fname" value="https://surikov.github.io/muzxbox/hello.wav"></div>
+	<div class="cntrblk"><br /><button onclick='javascript:pickerbridge.checkPath();'>Check</button></div>
+	<div class="cntrblk">
+		<ul>
+			<li><a href='javascript:pickerbridge.selectPath("bye-bye.wav");'>bye-bye.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("getup.wav");'>getup.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("goodbye-in-russian.wav");'>goodbye-in-russian.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("hello.wav");'>hello.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("oh-yeah.mp3");'>oh-yeah.mp3</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("okay.wav");'>okay.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("russian-metro-announce.wav");'>russian-metro-announce.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("russian-metro-announce2.wav");'>russian-metro-announce2.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("shouting-yeah.wav");'>shouting-yeah.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("sinner.wav");'>sinner.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("subscribe1.wav");'>subscribe1.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("tetris.wav");'>tetris.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("too-high.wav");'>too-high.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("too-low.wav");'>too-low.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("turn-around.wav");'>turn-around.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("voice-yeah.wav");'>voice-yeah.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("wait.mp3");'>wait.mp3</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("what.ogg");'>what.ogg</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("wowowo.wav");'>wowowo.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("yeah-right.wav");'>yeah-right.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("yo.wav");'>yo.wav</a></li>
+			<li><a href='javascript:pickerbridge.selectPath("zdravstvuite.wav");'>zdravstvuite.wav</a></li>
+		</ul>
+	</div>
+	<!--<p style="visibility: hidden;">▢</p>-->
+	<script src="dataplay.js"></script>
+</body>
+
+
+</html>

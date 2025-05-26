@@ -283,6 +283,43 @@
 	pointer-events: none;
 }
 
+
+
+
+
+.otherTrackLabel025 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(1*0.125*var(--tapSize));
+	pointer-events: none;
+}
+.otherTrackLabel05 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(2*0.125*var(--tapSize));
+	pointer-events: none;
+}
+.otherTrackLabel1 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(3*0.125*var(--tapSize));
+	pointer-events: none;
+}
+.otherTrackLabel2 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(4*0.125*var(--tapSize));
+	pointer-events: none;
+}
+.otherTrackLabel4 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(6*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+
+
 .octaveMark{
     fill: var(--line-color);
 	fill-opacity: 25%;

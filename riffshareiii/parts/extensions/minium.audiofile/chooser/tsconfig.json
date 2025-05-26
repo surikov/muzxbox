@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es2015",
-		"outFile": "dataplay.js",
+		"outFile": "../../../exe/plugins/samplers/miniumaudiofile1/chooser/dataplay.js",
 		"strictNullChecks": true,
 		"alwaysStrict": true,
 		"esModuleInterop": true,

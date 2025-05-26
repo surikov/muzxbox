@@ -87,9 +87,9 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
     label: "Minium Audio File"
     , purpose: "Sampler"
     , kind: "miniumaudiofile1"
-    , ui: "./plugins/performers/miniumaudiofile1/chooser/pickfile.html"
+    , ui: "./plugins/samplers/miniumaudiofile1/chooser/pickfile.html"
     , evaluate: "newAudiFileSamplerTrack"
-    , script: "./plugins/performers/miniumaudiofile1/player/fileplay.js"
+    , script: "./plugins/samplers/miniumaudiofile1/player/fileplay.js"
 },{
     label: "Minium Percussion"
     , purpose: "Sampler"
