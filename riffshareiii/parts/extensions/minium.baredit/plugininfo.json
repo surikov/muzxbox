@@ -1,0 +1,8 @@
+{
+    "label": "Edit selected bars"
+    , "purpose": "Action"
+    , "kind": "minimidimport1"
+    , "ui": "./plugins/actions/miniumeditselection1/mied.html"
+    , "evaluate": ""
+    , "script": ""
+}

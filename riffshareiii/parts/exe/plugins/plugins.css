@@ -1,9 +1,11 @@
 :root {
-	--background-color: #bdf;
-	--main-color: #003;
-	--drag-color: #0c9;
-	--line-color: #09f;
-	--click-color: #c30;
+	--background-color: #a9bbc4;
+	--main-color: #000;
+	--line-color: #06523f;
+
+	--drag-color: #396;
+	--click-color: #0369a8;
+
 	--line-color90: color-mix(in lab, transparent 90%, var(--main-color));
 	--line-color95: color-mix(in lab, transparent 95%, var(--main-color));
 	--line-color80: color-mix(in lab, transparent 80%, var(--main-color));
@@ -90,7 +92,7 @@ li {
 	border-right: none;
 	user-select: none;
 	background: var(--click-color);
-	color: var(--drag-color);
+	color: var(--background-color);
 }
 
 .form_radio_group .form_radio_group-item:first-child label {
@@ -150,7 +152,7 @@ button {
 	border-radius: 0.5cm;
 	padding-left: 0.5cm;
 	padding-right: 0.5cm;
-	color: var(--drag-color);
+	color: var(--background-color);
 }
 
 input[type=file] {
@@ -172,7 +174,7 @@ input::file-selector-button {
 	font-weight: 600;
 	font-style: normal;
 	font-size: 0.75cm;
-	color: var(--drag-color);
+	color: var(--background-color);
 	padding-left: 0.5cm;
 	padding-right: 0.5cm;
 	border: none;

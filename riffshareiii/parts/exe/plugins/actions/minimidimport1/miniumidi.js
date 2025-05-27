@@ -1408,7 +1408,7 @@ class Projectr {
     readProject(midiSongData, title, comment) {
         let newtimeline = this.createTimeLine(midiSongData);
         let project = {
-            title: title + ' ' + comment,
+            title: title,
             timeline: newtimeline,
             tracks: [],
             percussions: [],
@@ -1434,6 +1434,7 @@ class Projectr {
                 this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
             }
         }
+        this.addLyricsPoints(project.comments[0], { count: 0, part: 4 }, 'import from .mid' + comment, project.timeline[0].tempo);
         let top = 0;
         let outputID = '';
         let volume = 1;

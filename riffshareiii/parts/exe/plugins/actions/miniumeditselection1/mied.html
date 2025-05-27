@@ -1,0 +1,28 @@
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../../plugins.css">
+	<script type='text/javascript' src='../../../js/mzxbx.js'></script>
+	<script type='text/javascript' src='../../../js/mzxbxlib.js'></script>
+	
+</head>
+
+<body>
+	<h1>Minium edit selection</h1>
+	<p class="cntrblk" id="selectionInfo">Selection: 34-35 bar</p>
+	<p class="cntrblk"><button onclick="plugin.deleteBars();">Delete bars</button></p>
+	<p class="cntrblk"><button onclick="plugin.addBars();">Add empty bars</button></p>
+	<p class="cntrblk"><button onclick="plugin.shiftContent();">Shift content</button></p>
+	<p class="cntrblk"><button onclick="plugin.promptTempo();">Set tempo</button></p>
+	<p class="cntrblk"><button onclick="plugin.promptMetre();">Set metre</button></p>
+</body>
+<script type='text/javascript' src='misel.js'></script>
+<script>
+	let plugin=new MINIUMselectionEditPlugin();
+</script>
+
+</html>

@@ -114,7 +114,14 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
     , "evaluate": "newStrumPerformerImplementation"
     , "script": "./plugins/performers/miniumpitchchord1/audio/strum_plugin.js"
 }
-
+,{
+    "label": "Minium Selection properties"
+    , "purpose": "Action"
+    , "kind": "miniumeditselection1"
+    , "ui": "./plugins/actions/miniumeditselection1/mied.html"
+    , "evaluate": ""
+    , "script": ""
+}
 
 
 

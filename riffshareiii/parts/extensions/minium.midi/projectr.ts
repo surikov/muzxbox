@@ -4,7 +4,7 @@ class Projectr {
 
 		let newtimeline: Zvoog_SongMeasure[] = this.createTimeLine(midiSongData);
 		let project: Zvoog_Project = {
-			title: title + ' ' + comment
+			title: title// + ' ' + comment
 			, timeline: newtimeline
 			, tracks: []
 			, percussions: []
@@ -28,6 +28,7 @@ class Projectr {
 		for (let ii = 0; ii < project.timeline.length; ii++) {
 			project.comments.push({ points: [] });
 		}
+		
 		for (let ii = 0; ii < midiSongData.lyrics.length; ii++) {
 			let textpoint = midiSongData.lyrics[ii];
 			let pnt = findMeasureSkipByTime('lyrics', textpoint.ms / 1000, project.timeline);
@@ -36,6 +37,7 @@ class Projectr {
 				this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
 			}
 		}
+		this.addLyricsPoints(project.comments[0], { count: 0, part: 4 }, 'import from .mid'+comment, project.timeline[0].tempo);
 
 		let top = 0;
 		let outputID = '';
