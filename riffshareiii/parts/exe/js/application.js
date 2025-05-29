@@ -1032,6 +1032,7 @@ class CommandExe {
         }
     }
     reAction(cmd) {
+        console.log('redo', cmd);
         globalCommandDispatcher.stopPlay();
         for (let ii = 0; ii < cmd.actions.length; ii++) {
             let act = cmd.actions[ii];
@@ -1050,8 +1051,16 @@ class CommandExe {
                 }
                 else {
                     if (act.kind == '=') {
-                        let change = act;
-                        parent[prop] = JSON.parse(JSON.stringify(change.newValue));
+                        try {
+                            let change = act;
+                            let val = change.newValue;
+                            let txt = JSON.stringify(val);
+                            let oo = undefined;
+                            oo = JSON.parse(txt);
+                            parent[prop] = oo;
+                        }
+                        catch (xx) {
+                        }
                     }
                 }
             }
@@ -1501,6 +1510,7 @@ class CommandDispatcher {
     }
     resetProject() {
         try {
+            this.adjustTimeline();
             this.renderer.fillWholeUI();
         }
         catch (xx) {
@@ -1617,7 +1627,7 @@ class CommandDispatcher {
                 }
             }
             if (!(this.cfg().data.comments[tt])) {
-                this.cfg().data.comments[tt][tt] = { changes: [] };
+                this.cfg().data.comments[tt] = { points: [] };
             }
         }
         for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {

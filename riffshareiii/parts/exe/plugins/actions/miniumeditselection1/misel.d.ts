@@ -281,12 +281,14 @@ declare class MINIUMselectionEditPlugin {
     endMeasure: number;
     constructor();
     init(): void;
-    sendImportedMIDIData(): void;
     refreshInfo(): void;
+    sendProjectToHost(): void;
     receiveHostMessage(par: any): void;
     deleteBars(): void;
+    insertEmptyBar(at: number, newTempo: number, metreCount: number, metrePart: number): void;
     addBars(): void;
     promptTempo(): void;
     promptMetre(): void;
     shiftContent(): void;
+    adjustContent(): void;
 }

@@ -48,7 +48,7 @@ class CommandExe {
 		}
 	}
 	reAction(cmd: Zvoog_UICommand) {
-		//console.log('redo', cmd);
+		console.log('redo', cmd);
 		globalCommandDispatcher.stopPlay();
 		for (let ii = 0; ii < cmd.actions.length; ii++) {
 			let act = cmd.actions[ii];
@@ -66,8 +66,18 @@ class CommandExe {
 					(parent as any[]).splice(idx, 1);
 				} else {
 					if (act.kind == '=') {
-						let change = act as DifferenceChange;
-						parent[prop] = JSON.parse(JSON.stringify(change.newValue));
+
+						try {
+							let change = act as DifferenceChange;
+							let val = change.newValue;
+							let txt = JSON.stringify(val);
+							let oo = undefined;
+							oo = JSON.parse(txt);
+							parent[prop] = oo;
+						} catch (xx) {
+							console.log(xx);
+						}
+
 					}
 				}
 			}
@@ -105,7 +115,7 @@ class CommandExe {
 				break;
 			}
 		}
-		let calc=JSON.stringify(globalCommandDispatcher.undo());
+		let calc = JSON.stringify(globalCommandDispatcher.undo());
 		//console.log('undo len',calc.length/1000,'kb');
 	}
 	undo(cnt: number) {

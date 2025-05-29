@@ -480,6 +480,7 @@ class CommandDispatcher {
 							if (this.cfg().data.tracks[0])
 								this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
 			*/
+			this.adjustTimeline();
 			this.renderer.fillWholeUI();
 			//this.setupSelectionBackground(this.cfg().data.selectedPart);
 		} catch (xx) {
@@ -698,7 +699,8 @@ class CommandDispatcher {
 				}
 			}
 			if (!(this.cfg().data.comments[tt])) {
-				this.cfg().data.comments[tt][tt] = { changes: [] };
+				//this.cfg().data.comments[tt][tt] = { changes: [] };
+				this.cfg().data.comments[tt] = { points: [] };
 			}
 		}
 		for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
