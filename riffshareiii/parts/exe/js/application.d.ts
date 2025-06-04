@@ -137,6 +137,9 @@ declare class CommandExe {
     commitProjectChanges(path: (string | number)[], proAction: () => void): void;
     addUndoCommandActiions(cmd: Zvoog_UICommand): void;
     parentFromPath(path: (string | number)[]): any;
+    actionChangeNode(act: Zvoog_Action, value: any): void;
+    actionDeleteNode(act: Zvoog_Action): void;
+    actionAddNode(act: Zvoog_Action, node: string): void;
     unAction(cmd: Zvoog_UICommand): void;
     reAction(cmd: Zvoog_UICommand): void;
     cutLongUndo(): void;

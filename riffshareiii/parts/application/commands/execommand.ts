@@ -16,12 +16,73 @@ class CommandExe {
 		globalCommandDispatcher.resetProject();
 	}
 	parentFromPath(path: (string | number)[]) {
-		let parent = globalCommandDispatcher.cfg().data as any;
+		let nodeparent = globalCommandDispatcher.cfg().data as any;
 		for (let ii = 0; ii < path.length - 1; ii++) {
-			parent = parent[path[ii]];
+			nodeparent = nodeparent[path[ii]];
 		}
-		return parent;
+		return nodeparent;
 	}
+	actionChangeNode(act: Zvoog_Action, value: any) {
+		let nodeProp = act.path[act.path.length - 1];
+		let nodeParent = this.parentFromPath(act.path);
+		//let change = act as DifferenceChange;
+		//nodeParent[nodeProp] = JSON.parse(JSON.stringify(change.oldValue));
+		nodeParent[nodeProp] = JSON.parse(JSON.stringify(value));
+	}
+	actionDeleteNode(act: Zvoog_Action) {
+		let nodeParent = this.parentFromPath(act.path);
+		(nodeParent as any[]).pop();
+	}
+	actionAddNode(act: Zvoog_Action, node: string) {
+		let nodeParent = this.parentFromPath(act.path);
+		//let remove = act as DifferenceRemove;
+		//let value = JSON.parse(JSON.stringify(remove.oldNode));
+		//(nodeParent as any[]).push(value);
+		(nodeParent as any[]).push(JSON.parse(JSON.stringify(node)));
+	}
+	unAction(cmd: Zvoog_UICommand) {
+		for (let ii = 0; ii < cmd.actions.length; ii++) {
+			let act: Zvoog_Action = cmd.actions[ii];
+			if (act.kind == '-') {
+				this.actionAddNode(act, (act as DifferenceRemove).oldNode);
+			}
+		}
+		for (let ii = 0; ii < cmd.actions.length; ii++) {
+			let act: Zvoog_Action = cmd.actions[ii];
+			if (act.kind == '+') {
+				this.actionDeleteNode(act);
+			}
+		}
+		for (let ii = 0; ii < cmd.actions.length; ii++) {
+			let act: Zvoog_Action = cmd.actions[ii];
+			if (act.kind == '=') {
+				this.actionChangeNode(act, (act as DifferenceChange).oldValue);
+			}
+		}
+	}
+	reAction(cmd: Zvoog_UICommand) {
+		for (let ii = 0; ii < cmd.actions.length; ii++) {
+			let act: Zvoog_Action = cmd.actions[ii];
+			if (act.kind == '+') {
+				this.actionAddNode(act, (act as DifferenceCreate).newNode);
+			}
+		}
+		for (let ii = 0; ii < cmd.actions.length; ii++) {
+			let act: Zvoog_Action = cmd.actions[ii];
+			if (act.kind == '-') {
+				this.actionDeleteNode(act);
+			}
+		}
+		for (let ii = 0; ii < cmd.actions.length; ii++) {
+			let act: Zvoog_Action = cmd.actions[ii];
+			if (act.kind == '=') {
+				this.actionChangeNode(act, (act as DifferenceChange).newValue);
+			}
+		}
+	}
+
+
+	/*
 	unAction(cmd: Zvoog_UICommand) {
 		//console.log('undo', cmd);
 		globalCommandDispatcher.stopPlay();
@@ -52,7 +113,6 @@ class CommandExe {
 		globalCommandDispatcher.stopPlay();
 		for (let ii = 0; ii < cmd.actions.length; ii++) {
 			let act = cmd.actions[ii];
-
 			let parent = this.parentFromPath(act.path);
 			let prop = act.path[act.path.length - 1];
 			if (act.kind == '+') {
@@ -66,7 +126,6 @@ class CommandExe {
 					(parent as any[]).splice(idx, 1);
 				} else {
 					if (act.kind == '=') {
-
 						try {
 							let change = act as DifferenceChange;
 							let val = change.newValue;
@@ -83,7 +142,7 @@ class CommandExe {
 			}
 		}
 	}
-
+*/
 	cutLongUndo() {
 		/*
 		let unCnt = 0;
@@ -119,9 +178,11 @@ class CommandExe {
 		//console.log('undo len',calc.length/1000,'kb');
 	}
 	undo(cnt: number) {
+		console.log('undo',cnt,globalCommandDispatcher.undo(),globalCommandDispatcher.redo());
 		if (this.lockUndoRedo) {
 			console.log('lockUndoRedo');
 		} else {
+			globalCommandDispatcher.stopPlay();
 			this.lockUndoRedo = true;
 			for (let ii = 0; ii < cnt; ii++) {
 				if (globalCommandDispatcher.undo().length) {
@@ -139,13 +200,15 @@ class CommandExe {
 
 			this.lockUndoRedo = false;
 			this.cutLongUndo();
+			globalCommandDispatcher.resetProject();
 		}
-		globalCommandDispatcher.resetProject();
+
 	}
 	redo(cnt: number) {
 		if (this.lockUndoRedo) {
 			console.log('lockUndoRedo');
 		} else {
+			globalCommandDispatcher.stopPlay();
 			this.lockUndoRedo = true;
 			for (let ii = 0; ii < cnt; ii++) {
 				if (globalCommandDispatcher.redo().length) {
@@ -163,7 +226,8 @@ class CommandExe {
 
 			this.lockUndoRedo = false;
 			this.cutLongUndo();
+			globalCommandDispatcher.resetProject();
 		}
-		globalCommandDispatcher.resetProject();
+
 	}
 }

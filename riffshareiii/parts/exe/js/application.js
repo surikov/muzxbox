@@ -274,6 +274,7 @@ function resolveString(data) {
     return data;
 }
 function saveProjectState() {
+    console.log('saveProjectState');
     globalCommandDispatcher.exe.cutLongUndo();
     let txtdata = JSON.stringify(globalCommandDispatcher.cfg().data);
     try {
@@ -304,6 +305,7 @@ function saveProjectState() {
             }
         }
     }
+    console.log('done saveProjectState');
 }
 function initWebAudioFromUI() {
     console.log('initWebAudioFromUI');
@@ -999,70 +1001,62 @@ class CommandExe {
         globalCommandDispatcher.resetProject();
     }
     parentFromPath(path) {
-        let parent = globalCommandDispatcher.cfg().data;
+        let nodeparent = globalCommandDispatcher.cfg().data;
         for (let ii = 0; ii < path.length - 1; ii++) {
-            parent = parent[path[ii]];
+            nodeparent = nodeparent[path[ii]];
         }
-        return parent;
+        return nodeparent;
+    }
+    actionChangeNode(act, value) {
+        let nodeProp = act.path[act.path.length - 1];
+        let nodeParent = this.parentFromPath(act.path);
+        nodeParent[nodeProp] = JSON.parse(JSON.stringify(value));
+    }
+    actionDeleteNode(act) {
+        let nodeParent = this.parentFromPath(act.path);
+        nodeParent.pop();
+    }
+    actionAddNode(act, node) {
+        let nodeParent = this.parentFromPath(act.path);
+        nodeParent.push(JSON.parse(JSON.stringify(node)));
     }
     unAction(cmd) {
-        globalCommandDispatcher.stopPlay();
-        for (let ii = cmd.actions.length - 1; ii >= 0; ii--) {
+        for (let ii = 0; ii < cmd.actions.length; ii++) {
             let act = cmd.actions[ii];
-            let parent = this.parentFromPath(act.path);
-            let prop = act.path[act.path.length - 1];
-            if (act.kind == '+') {
-                let idx = prop;
-                parent.splice(idx, 1);
+            if (act.kind == '-') {
+                this.actionAddNode(act, act.oldNode);
             }
-            else {
-                if (act.kind == '-') {
-                    let remove = act;
-                    let value = JSON.parse(JSON.stringify(remove.oldNode));
-                    let idx = prop;
-                    parent.splice(idx, 0, value);
-                }
-                else {
-                    if (act.kind == '=') {
-                        let change = act;
-                        parent[prop] = JSON.parse(JSON.stringify(change.oldValue));
-                    }
-                }
+        }
+        for (let ii = 0; ii < cmd.actions.length; ii++) {
+            let act = cmd.actions[ii];
+            if (act.kind == '+') {
+                this.actionDeleteNode(act);
+            }
+        }
+        for (let ii = 0; ii < cmd.actions.length; ii++) {
+            let act = cmd.actions[ii];
+            if (act.kind == '=') {
+                this.actionChangeNode(act, act.oldValue);
             }
         }
     }
     reAction(cmd) {
-        console.log('redo', cmd);
-        globalCommandDispatcher.stopPlay();
         for (let ii = 0; ii < cmd.actions.length; ii++) {
             let act = cmd.actions[ii];
-            let parent = this.parentFromPath(act.path);
-            let prop = act.path[act.path.length - 1];
             if (act.kind == '+') {
-                let create = act;
-                let value = JSON.parse(JSON.stringify(create.newNode));
-                let idx = prop;
-                parent.splice(idx, 0, value);
+                this.actionAddNode(act, act.newNode);
             }
-            else {
-                if (act.kind == '-') {
-                    let idx = prop;
-                    parent.splice(idx, 1);
-                }
-                else {
-                    if (act.kind == '=') {
-                        try {
-                            let change = act;
-                            let val = change.newValue;
-                            let txt = JSON.stringify(val);
-                            let oo = undefined;
-                            oo = JSON.parse(txt);
-                            parent[prop] = oo;
-                        }
-                        catch (xx) {
-                        }
-                    }
-                }
+        }
+        for (let ii = 0; ii < cmd.actions.length; ii++) {
+            let act = cmd.actions[ii];
+            if (act.kind == '-') {
+                this.actionDeleteNode(act);
+            }
+        }
+        for (let ii = 0; ii < cmd.actions.length; ii++) {
+            let act = cmd.actions[ii];
+            if (act.kind == '=') {
+                this.actionChangeNode(act, act.newValue);
             }
         }
     }
@@ -1081,10 +1075,12 @@ class CommandExe {
         let calc = JSON.stringify(globalCommandDispatcher.undo());
     }
     undo(cnt) {
+        console.log('undo', cnt, globalCommandDispatcher.undo(), globalCommandDispatcher.redo());
         if (this.lockUndoRedo) {
             console.log('lockUndoRedo');
         }
         else {
+            globalCommandDispatcher.stopPlay();
             this.lockUndoRedo = true;
             for (let ii = 0; ii < cnt; ii++) {
                 if (globalCommandDispatcher.undo().length) {
@@ -1100,14 +1096,15 @@ class CommandExe {
             }
             this.lockUndoRedo = false;
             this.cutLongUndo();
+            globalCommandDispatcher.resetProject();
         }
-        globalCommandDispatcher.resetProject();
     }
     redo(cnt) {
         if (this.lockUndoRedo) {
             console.log('lockUndoRedo');
         }
         else {
+            globalCommandDispatcher.stopPlay();
             this.lockUndoRedo = true;
             for (let ii = 0; ii < cnt; ii++) {
                 if (globalCommandDispatcher.redo().length) {
@@ -1123,8 +1120,8 @@ class CommandExe {
             }
             this.lockUndoRedo = false;
             this.cutLongUndo();
+            globalCommandDispatcher.resetProject();
         }
-        globalCommandDispatcher.resetProject();
     }
 }
 let uiLinkFilterToSpeaker = 'uiLinkFilterToSpeaker';

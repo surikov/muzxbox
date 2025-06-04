@@ -54,6 +54,7 @@ function resolveString(data: string): string | null {
 	return data;
 }
 function saveProjectState() {
+	console.log('saveProjectState');
 	//https://github.com/pieroxy/lz-string
 	globalCommandDispatcher.exe.cutLongUndo();
 	let txtdata = JSON.stringify(globalCommandDispatcher.cfg().data);
@@ -83,6 +84,7 @@ function saveProjectState() {
 			}
 		}
 	}
+	console.log('done saveProjectState');
 }
 function initWebAudioFromUI() {
 	console.log('initWebAudioFromUI');
