@@ -196,7 +196,7 @@ declare class CommandDispatcher {
     playFromTimeSelection(idx: number): void;
     setupSelectionBackground22(selectedPart: Zvoog_Selection): void;
     expandTimeLineSelection(idx: number): void;
-    adjustTimeline(): void;
+    adjustTimelineChords(): void;
 }
 declare let globalCommandDispatcher: CommandDispatcher;
 declare type GridTimeTemplate14 = {

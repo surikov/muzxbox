@@ -86,7 +86,7 @@ class AutomationBarContent {
 
 	}
 	autoCellClick(barIdx: number, barX: number, yy: number, zz: number) {
-		globalCommandDispatcher.adjustTimeline();
+		//globalCommandDispatcher.adjustTimeline();
 
 		let row = Math.floor(yy / globalCommandDispatcher.cfg().autoPointHeight);
 		let filter = globalCommandDispatcher.cfg().data.filters[row];

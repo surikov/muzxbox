@@ -138,7 +138,6 @@ class TreeValue {
 }
 class StateDiff {
     constructor(path) {
-        globalCommandDispatcher.adjustTimeline();
         this.basePath = path.slice(0);
         this.pathDataCopy = JSON.parse(JSON.stringify(this.findNodeByPath()));
     }
@@ -1247,7 +1246,6 @@ class CommandDispatcher {
         }
     }
     renderCurrentProjectForOutput() {
-        globalCommandDispatcher.adjustTimeline();
         let forOutput = {
             series: [],
             channels: [],
@@ -1507,7 +1505,6 @@ class CommandDispatcher {
     }
     resetProject() {
         try {
-            this.adjustTimeline();
             this.renderer.fillWholeUI();
         }
         catch (xx) {
@@ -1603,7 +1600,7 @@ class CommandDispatcher {
         this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup, this.renderer.timeselectbar.selectionAnchor, LevelModes.top);
         this.reDrawPlayPosition();
     }
-    adjustTimeline() {
+    adjustTimelineChords() {
         for (let tt = 0; tt < this.cfg().data.timeline.length; tt++) {
             for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
                 let track = this.cfg().data.tracks[nn];
@@ -3348,7 +3345,8 @@ class OctaveContent {
     }
     addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, interact, zoomLevel) {
         if (!track.measures[barIdx]) {
-            globalCommandDispatcher.adjustTimeline();
+            console.log('addTrackNotes not found', barIdx, 'for track', track.title);
+            return;
         }
         let measure = track.measures[barIdx];
         if (measure) {
@@ -3906,7 +3904,6 @@ class AutomationBarContent {
         }
     }
     autoCellClick(barIdx, barX, yy, zz) {
-        globalCommandDispatcher.adjustTimeline();
         let row = Math.floor(yy / globalCommandDispatcher.cfg().autoPointHeight);
         let filter = globalCommandDispatcher.cfg().data.filters[row];
         let info = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);

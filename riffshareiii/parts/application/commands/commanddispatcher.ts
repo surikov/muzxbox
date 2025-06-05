@@ -164,7 +164,7 @@ class CommandDispatcher {
 		}
 	}
 	renderCurrentProjectForOutput(): MZXBX_Schedule {
-		globalCommandDispatcher.adjustTimeline();
+		//globalCommandDispatcher.adjustTimeline();
 		let forOutput: MZXBX_Schedule = {
 			series: []
 			, channels: []
@@ -480,7 +480,7 @@ class CommandDispatcher {
 							if (this.cfg().data.tracks[0])
 								this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
 			*/
-			this.adjustTimeline();
+			//this.adjustTimeline();
 			this.renderer.fillWholeUI();
 			//this.setupSelectionBackground(this.cfg().data.selectedPart);
 		} catch (xx) {
@@ -678,7 +678,7 @@ class CommandDispatcher {
 		this.reDrawPlayPosition();
 
 	}
-	adjustTimeline() {
+	adjustTimelineChords() {
 		for (let tt = 0; tt < this.cfg().data.timeline.length; tt++) {
 			for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
 				let track = this.cfg().data.tracks[nn];

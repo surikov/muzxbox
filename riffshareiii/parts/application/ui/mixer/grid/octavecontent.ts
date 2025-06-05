@@ -44,7 +44,9 @@ class OctaveContent {
 		, interact: boolean, zoomLevel: number
 	) {
 		if (!track.measures[barIdx]) {
-			globalCommandDispatcher.adjustTimeline();
+			//globalCommandDispatcher.adjustTimeline();
+			console.log('addTrackNotes not found',barIdx,'for track',track.title);
+			return;
 		}
 		let measure: Zvoog_TrackMeasure = track.measures[barIdx];
 		if (measure) {
