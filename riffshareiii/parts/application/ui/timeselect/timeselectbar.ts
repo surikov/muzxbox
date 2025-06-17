@@ -70,6 +70,7 @@ class TimeSelectBar {
 		this.positionTimeLayer = {
 			g: this.positionTimeSVGGroup, anchors: [this.positionTimeAnchor], mode: LevelModes.top//LevelModes.normal
 		};
+
 		///////////////////////////////////////////
 
 		return [this.selectionBarLayer, this.selectedTimeLayer, this.positionTimeLayer];
@@ -102,6 +103,7 @@ class TimeSelectBar {
 	updateTimeSelectionBar(//data: Zvoog_Project
 		//cfg:MixerDataMathUtility
 	) {
+		//console.log('updateTimeSelectionBar',globalCommandDispatcher.cfg().data.selectedPart);
 		let selection: Zvoog_Selection = globalCommandDispatcher.cfg().data.selectedPart;
 		//if (selection) {
 		if (selection.startMeasure > -1 || selection.endMeasure > -1) {
@@ -140,6 +142,7 @@ class TimeSelectBar {
 			this.selectionMark.w = 0.0005;
 		}
 		//console.log('updateTimeSelectionBar',this.selectionMark.x,this.selectionMark.w);
+
 	}
 
 	createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor//, data: Zvoog_Project

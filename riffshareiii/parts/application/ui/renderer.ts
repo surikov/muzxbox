@@ -55,18 +55,18 @@ let zoomPrefixLevelsCSS: {
 	prefix: string
 	, minZoom: number
 	, gridLines: GridTimeTemplate14[]
-	,iconRatio:number
+	, iconRatio: number
 }[] = [
-		{ prefix: '025', minZoom: 0.25, gridLines: gridLinesExplicit,iconRatio:1 }//0
-		, { prefix: '05', minZoom: 0.5, gridLines: gridLinesDtailed,iconRatio:1.25 }//1
-		, { prefix: '1', minZoom: 1, gridLines: gridLinesAccurate,iconRatio:1.5 }//2
-		, { prefix: '2', minZoom: 2, gridLines: gridLinesBrief,iconRatio:1.75 }//3
-		, { prefix: '4', minZoom: 4, gridLines: [],iconRatio:2 }//4
-		, { prefix: '8', minZoom: 8, gridLines: [] ,iconRatio:2.25}//5
-		, { prefix: '16', minZoom: 16, gridLines: [],iconRatio:2.5 }//6
-		, { prefix: '32', minZoom: 32, gridLines: [] ,iconRatio:2.75}//7
-		, { prefix: '64', minZoom: 64, gridLines: [],iconRatio:3 }//8
-		, { prefix: '128', minZoom: 128, gridLines: [],iconRatio:3.25 }//9
+		{ prefix: '025', minZoom: 0.25, gridLines: gridLinesExplicit, iconRatio: 1 }//0
+		, { prefix: '05', minZoom: 0.5, gridLines: gridLinesDtailed, iconRatio: 1.25 }//1
+		, { prefix: '1', minZoom: 1, gridLines: gridLinesAccurate, iconRatio: 1.5 }//2
+		, { prefix: '2', minZoom: 2, gridLines: gridLinesBrief, iconRatio: 1.75 }//3
+		, { prefix: '4', minZoom: 4, gridLines: [], iconRatio: 2 }//4
+		, { prefix: '8', minZoom: 8, gridLines: [], iconRatio: 2.25 }//5
+		, { prefix: '16', minZoom: 16, gridLines: [], iconRatio: 2.5 }//6
+		, { prefix: '32', minZoom: 32, gridLines: [], iconRatio: 2.75 }//7
+		, { prefix: '64', minZoom: 64, gridLines: [], iconRatio: 3 }//8
+		, { prefix: '128', minZoom: 128, gridLines: [], iconRatio: 3.25 }//9
 		//, { prefix: '256', zoom: 256,svg:'tracksLayerZoom025' }//10
 	];
 class UIRenderer {//} implements RenderedPart {
@@ -160,6 +160,8 @@ class UIRenderer {//} implements RenderedPart {
 
 			this.onReSizeView();
 		});
+
+
 	}
 
 	fillWholeUI() {
@@ -202,7 +204,7 @@ class UIRenderer {//} implements RenderedPart {
 		this.tiler.resetModel();
 
 		//console.log('fillWholeUI', this.tiler);
-		
+		globalCommandDispatcher.reDrawPlayPosition();
 
 	}
 	onReSizeView() {

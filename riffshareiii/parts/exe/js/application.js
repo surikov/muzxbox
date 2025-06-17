@@ -1505,6 +1505,7 @@ class CommandDispatcher {
     }
     resetProject() {
         try {
+            this.setPlayPositionFromSelectedPart();
             this.renderer.fillWholeUI();
         }
         catch (xx) {
@@ -1588,6 +1589,13 @@ class CommandDispatcher {
         else {
             console.log('no project data');
         }
+        this.setPlayPositionFromSelectedPart();
+        this.renderer.timeselectbar.updateTimeSelectionBar();
+        this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup, this.renderer.timeselectbar.selectionAnchor, LevelModes.top);
+        this.reDrawPlayPosition();
+    }
+    setPlayPositionFromSelectedPart() {
+        console.log('setPlayPositionFromSelectedPart');
         if (this.cfg().data.selectedPart.startMeasure >= 0) {
             this.playPosition = 0;
             for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
@@ -1595,10 +1603,8 @@ class CommandDispatcher {
                 let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
                 this.playPosition = this.playPosition + cuDuration;
             }
+            console.log('playPosition', this.playPosition);
         }
-        this.renderer.timeselectbar.updateTimeSelectionBar();
-        this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup, this.renderer.timeselectbar.selectionAnchor, LevelModes.top);
-        this.reDrawPlayPosition();
     }
     adjustTimelineChords() {
         for (let tt = 0; tt < this.cfg().data.timeline.length; tt++) {
@@ -1751,6 +1757,7 @@ class UIRenderer {
             this.tiler.setCurrentPointPosition({ x: 0, y: 0, z: 32 });
         }
         this.tiler.resetModel();
+        globalCommandDispatcher.reDrawPlayPosition();
     }
     onReSizeView() {
         let mixH = 1;

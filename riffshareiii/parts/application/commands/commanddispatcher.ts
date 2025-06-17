@@ -68,12 +68,13 @@ class CommandDispatcher {
 		this.redoQueue = [];
 	}
 	reDrawPlayPosition() {
+
 		let ww = this.renderer.timeselectbar.positionMarkWidth();
 		let xx = this.cfg().leftPad + this.playPosition * this.cfg().widthDurationRatio - ww;
 		this.renderer.timeselectbar.positionTimeAnchor.translation = { x: xx, y: 0 };
 		this.renderer.timeselectbar.positionTimeMark.w = ww;
-		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup
-			, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
+		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
+		//console.log('reDrawPlayPosition', ww, xx, this.playPosition);
 	}
 	/*addUndoRedo(cc: UndoRedoCommand) {
 		cc.redo();
@@ -481,7 +482,9 @@ class CommandDispatcher {
 								this.renderer.menu.layerCurrentTitle.text = this.cfg().data.tracks[0].title;
 			*/
 			//this.adjustTimeline();
+			this.setPlayPositionFromSelectedPart();
 			this.renderer.fillWholeUI();
+
 			//this.setupSelectionBackground(this.cfg().data.selectedPart);
 		} catch (xx) {
 			console.log('resetProject', xx);
@@ -663,6 +666,16 @@ class CommandDispatcher {
 		} else {
 			console.log('no project data');
 		}
+		this.setPlayPositionFromSelectedPart();
+		this.renderer.timeselectbar.updateTimeSelectionBar();
+		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
+			, this.renderer.timeselectbar.selectionAnchor
+			, LevelModes.top);
+		this.reDrawPlayPosition();
+
+	}
+	setPlayPositionFromSelectedPart() {
+		console.log('setPlayPositionFromSelectedPart');
 		if (this.cfg().data.selectedPart.startMeasure >= 0) {
 			this.playPosition = 0;
 			for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
@@ -670,13 +683,8 @@ class CommandDispatcher {
 				let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
 				this.playPosition = this.playPosition + cuDuration;
 			}
+			console.log('playPosition', this.playPosition);
 		}
-		this.renderer.timeselectbar.updateTimeSelectionBar();
-		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
-			, this.renderer.timeselectbar.selectionAnchor
-			, LevelModes.top);
-		this.reDrawPlayPosition();
-
 	}
 	adjustTimelineChords() {
 		for (let tt = 0; tt < this.cfg().data.timeline.length; tt++) {

@@ -196,6 +196,7 @@ declare class CommandDispatcher {
     playFromTimeSelection(idx: number): void;
     setupSelectionBackground22(selectedPart: Zvoog_Selection): void;
     expandTimeLineSelection(idx: number): void;
+    setPlayPositionFromSelectedPart(): void;
     adjustTimelineChords(): void;
 }
 declare let globalCommandDispatcher: CommandDispatcher;

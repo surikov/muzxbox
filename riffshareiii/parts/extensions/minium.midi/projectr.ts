@@ -45,10 +45,10 @@ class Projectr {
 		for (var ii = 0; ii < midiSongData.miditracks.length; ii++) {
 			let midiSongTrack: MIDISongTrack = midiSongData.miditracks[ii];
 			if (midiSongTrack.trackVolumes.length > 1) {
-				let filterID = 'fade automation ' + midiSongTrack.title;
+				let filterID = 'fader' + Math.random();
 				let filterVolume: Zvoog_FilterTarget = {
 					id: filterID
-					, title: filterID
+					, title: 'Fader automation ' + midiSongTrack.title
 					, kind: 'miniumfader1'
 					, data: '99'
 					, outputs: [compresID]
