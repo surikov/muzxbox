@@ -675,7 +675,7 @@ class CommandDispatcher {
 
 	}
 	setPlayPositionFromSelectedPart() {
-		console.log('setPlayPositionFromSelectedPart');
+		//console.log('setPlayPositionFromSelectedPart');
 		if (this.cfg().data.selectedPart.startMeasure >= 0) {
 			this.playPosition = 0;
 			for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
@@ -683,7 +683,7 @@ class CommandDispatcher {
 				let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
 				this.playPosition = this.playPosition + cuDuration;
 			}
-			console.log('playPosition', this.playPosition);
+			//console.log('playPosition', this.playPosition);
 		}
 	}
 	adjustTimelineChords() {

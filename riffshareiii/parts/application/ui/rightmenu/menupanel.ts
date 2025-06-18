@@ -344,7 +344,9 @@ class RightMenuPanel {
 		}
 	}
 	readCurrentSongData(project: Zvoog_Project) {
-
+		let solo = false;
+		for (let tt = 0; tt < project.tracks.length; tt++) if (project.tracks[tt].performer.state == 2) solo = true;
+		for (let tt = 0; tt < project.percussions.length; tt++) if (project.percussions[tt].sampler.state == 2) solo = true;
 		menuPointInsTracks.children = [];
 		menuPointDrumTracks.children = [];
 		menuPointFxTracks.children = [];
@@ -370,63 +372,33 @@ class RightMenuPanel {
 					globalCommandDispatcher.reConnectPluginsIfPlay();
 				}
 			};
+			if (track.performer.state == 1 || (solo && track.performer.state != 2)) item.lightTitle = true;
 			if (tt > 0) {
 				item.onClick = () => {
 					globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
 						let track: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(tt, 1)[0];
 						globalCommandDispatcher.cfg().data.tracks.splice(0, 0, track);
 					});
-					//globalCommandDispatcher.relaunchPlayer();
 				};
 			} else {
 				item.onClick = () => {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
 					if (info) {
-						//globalCommandDispatcher.promptPluginSequencerDialog(track, info);
 						globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(tt, track, info);
-						/*
-						let url = info.ui;
-						globalCommandDispatcher.promptPluginPointDialog(track.title, url, track.performer.data, (obj: any) => {
-							globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt, 'performer'], () => {
-								track.performer.data = obj;
-							});
-							//globalCommandDispatcher.reStartPlayIfPlay();
-							return true;
-						}, LO(localDropInsTrack), () => {
-							//console.log(localDropInsTrack);
-							globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
-								globalCommandDispatcher.cfg().data.tracks.splice(tt, 1);
-							});
-							globalCommandDispatcher.cancelPluginGUI();
-						}, (newTitle: string) => {
-							globalCommandDispatcher.exe.commitProjectChanges(['tracks', tt], () => {
-								track.title = newTitle;
-							});
-							globalCommandDispatcher.cancelPluginGUI();
-						});
-						*/
 					} else {
 						globalCommandDispatcher.sequencerPluginDialog.openEmptySequencerPluginDialogFrame(tt, track);
 					}
-					//console.log('first',track);
 				};
 				item.highlight = icon_sliders;
 			}
 			menuPointInsTracks.children.push(item);
 		}
-
-		//menuPointPercussion.children = [];
 		for (let tt = 0; tt < project.percussions.length; tt++) {
 			let drum = project.percussions[tt];
 			let item: MenuInfo = {
 				text: drum.title
 				, noLocalization: true
 				, onSubClick: () => {
-					/*item.selectedState = item.selectedState ? item.selectedState : 0;
-					if (item.selectedState > 2) {
-						item.selectedState = 0;
-					}
-					console.log(item.selectedState, drum);*/
 					globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
 						if (item.selectedState == 1) {
 							drum.sampler.state = 1;
@@ -443,51 +415,33 @@ class RightMenuPanel {
 				, itemStates: [icon_sound_loud, icon_power, icon_flash]
 				, selectedState: drum.sampler.state
 			};
+			if (drum.sampler.state == 1 || (solo && drum.sampler.state != 2)) item.lightTitle = true;
 			if (tt > 0) {
 				item.onClick = () => {
 					globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
 						let smpl: Zvoog_PercussionTrack = globalCommandDispatcher.cfg().data.percussions.splice(tt, 1)[0];
 						globalCommandDispatcher.cfg().data.percussions.splice(0, 0, smpl);
 					});
-					//globalCommandDispatcher.relaunchPlayer();
 				};
 			} else {
 				item.onClick = () => {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(drum.sampler.kind);
 					if (info) {
-						//globalCommandDispatcher.promptPluginSamplerDialog(drum, info);
 						globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(tt, drum, info);
-						/*let url = info.ui;
-						globalCommandDispatcher.promptPluginPointDialog(drum.title, url, drum.sampler.data, (obj: any) => {
-							globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt, 'sampler'], () => {
-								drum.sampler.data = obj;
-							});
-							//globalCommandDispatcher.reStartPlayIfPlay();
-							return true;
-						}, LO(localDropSampleTrack), () => {
-							//console.log(localDropSampleTrack);
-							globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-								globalCommandDispatcher.cfg().data.percussions.splice(tt, 1);
-							});
-							globalCommandDispatcher.cancelPluginGUI();
-						}, (newTitle: string) => {
-							globalCommandDispatcher.exe.commitProjectChanges(['percussions', tt], () => {
-								drum.title = newTitle;
-							});
-							globalCommandDispatcher.cancelPluginGUI();
-						});*/
 					} else {
 						globalCommandDispatcher.samplerPluginDialog.openEmptyDrumPluginDialogFrame(tt, drum);
 					}
-					//console.log('first',track);
 				};
 				item.highlight = icon_sliders;
 			}
 			menuPointDrumTracks.children.push(item);
 		}
+
+
+
 		//menuPointAutomation.children = [];
 		for (let ff = 0; ff < project.filters.length; ff++) {
-			let filter = project.filters[ff];
+			let filter: Zvoog_FilterTarget = project.filters[ff];
 			//if (filter.automation) {
 			let item: MenuInfo = {
 				text: filter.title
@@ -510,6 +464,9 @@ class RightMenuPanel {
 				});
 				globalCommandDispatcher.reConnectPluginsIfPlay();
 			};
+			if (filter.state) {
+				item.lightTitle = true;
+			}
 			if (ff > 0) {
 				item.onClick = () => {
 					globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
@@ -548,6 +505,7 @@ class RightMenuPanel {
 					//console.log('first',track);
 				};
 				item.highlight = icon_sliders;
+				//
 			}
 			menuPointFxTracks.children.push(item);
 			//}

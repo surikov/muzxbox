@@ -118,7 +118,7 @@
 	--selectedbgground-color: color-mix(in lab, transparent 0%, var(--background-color));
 	--unselectedbg-color: color-mix(in lab, transparent 0%, var(--background-color));
 
-
+	
 
 }
 
@@ -126,6 +126,7 @@
 	--fog-color: color-mix(in lab, transparent 10%, var(--background-color));
 	--back-color: color-mix(in lab, transparent 3%, var(--background-color));
 	--shadow-color: color-mix(in lab, transparent 75%, var(--main-color));
+	
 }
 
 #file_midi_input {

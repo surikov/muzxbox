@@ -31,6 +31,11 @@
     font-size: var(--label-04cm);
     pointer-events: none;
 }
+.rightMenuLightLabel {
+    fill: var(--shadow-color);
+    font-size: var(--label-04cm);
+    pointer-events: none;
+}
 
 .rightMenuSubLabel {
     fill: var(--drag-color);

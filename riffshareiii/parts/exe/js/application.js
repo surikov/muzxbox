@@ -1595,7 +1595,6 @@ class CommandDispatcher {
         this.reDrawPlayPosition();
     }
     setPlayPositionFromSelectedPart() {
-        console.log('setPlayPositionFromSelectedPart');
         if (this.cfg().data.selectedPart.startMeasure >= 0) {
             this.playPosition = 0;
             for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
@@ -1603,7 +1602,6 @@ class CommandDispatcher {
                 let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
                 this.playPosition = this.playPosition + cuDuration;
             }
-            console.log('playPosition', this.playPosition);
         }
     }
     adjustTimelineChords() {
@@ -2023,7 +2021,17 @@ class TimeSelectBar {
             rx: size / 2, ry: size / 2,
             css: 'timeMarkButtonCircle' + zoomPrefixLevelsCSS[zz].prefix,
             activation: (x, y) => {
-                globalCommandDispatcher.timeSelectChange(barIdx);
+                let toIdx = barIdx;
+                if (zz > 4) {
+                    if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure < barIdx
+                        && globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1
+                        && globalCommandDispatcher.cfg().data.selectedPart.startMeasure == globalCommandDispatcher.cfg().data.selectedPart.endMeasure) {
+                        toIdx = barIdx - 1;
+                    }
+                }
+                else {
+                }
+                globalCommandDispatcher.timeSelectChange(toIdx);
             }
         };
         measureAnchor.content.push(mark);
@@ -2046,6 +2054,24 @@ class TimeSelectBar {
             css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(bpm);
+    }
+    fillSelectionMenu() {
+        let zz = zoomPrefixLevelsCSS.length - 1;
+        let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
+        let opt1 = {
+            x: 0,
+            y: 0,
+            w: size,
+            h: size,
+            rx: size / 2,
+            ry: size / 2,
+            css: 'timeMarkButtonCircle128',
+            activation: (x, y) => {
+                console.log('selection menu');
+            }
+        };
+        this.selectBarAnchor.content.push(opt1);
+        console.log(this.selectBarAnchor);
     }
     fillTimeBar() {
         this.selectBarAnchor.ww = globalCommandDispatcher.cfg().wholeWidth();
@@ -2115,6 +2141,7 @@ class TimeSelectBar {
             }
         }
         this.selectBarAnchor.content = this.zoomAnchors;
+        this.fillSelectionMenu();
         this.updateTimeSelectionBar();
     }
 }
@@ -2448,6 +2475,13 @@ class RightMenuPanel {
         }
     }
     readCurrentSongData(project) {
+        let solo = false;
+        for (let tt = 0; tt < project.tracks.length; tt++)
+            if (project.tracks[tt].performer.state == 2)
+                solo = true;
+        for (let tt = 0; tt < project.percussions.length; tt++)
+            if (project.percussions[tt].sampler.state == 2)
+                solo = true;
         menuPointInsTracks.children = [];
         menuPointDrumTracks.children = [];
         menuPointFxTracks.children = [];
@@ -2475,6 +2509,8 @@ class RightMenuPanel {
                     globalCommandDispatcher.reConnectPluginsIfPlay();
                 }
             };
+            if (track.performer.state == 1 || (solo && track.performer.state != 2))
+                item.lightTitle = true;
             if (tt > 0) {
                 item.onClick = () => {
                     globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
@@ -2521,6 +2557,8 @@ class RightMenuPanel {
                 itemStates: [icon_sound_loud, icon_power, icon_flash],
                 selectedState: drum.sampler.state
             };
+            if (drum.sampler.state == 1 || (solo && drum.sampler.state != 2))
+                item.lightTitle = true;
             if (tt > 0) {
                 item.onClick = () => {
                     globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
@@ -2562,6 +2600,9 @@ class RightMenuPanel {
                 });
                 globalCommandDispatcher.reConnectPluginsIfPlay();
             };
+            if (filter.state) {
+                item.lightTitle = true;
+            }
             if (ff > 0) {
                 item.onClick = () => {
                     globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
@@ -2730,6 +2771,10 @@ class RightMenuItem {
         else {
             label = LO(this.info.text);
         }
+        let labelCss = 'rightMenuLabel';
+        if (this.info.lightTitle) {
+            labelCss = 'rightMenuLightLabel';
+        }
         this.top = itemTop;
         let anchor = {
             xx: 0, yy: itemTop, ww: 111, hh: 111,
@@ -2744,11 +2789,11 @@ class RightMenuItem {
         let spot2 = null;
         if (this.kind == this.kindAction) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
         if (this.kind == this.kindActionDisabled) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
         if (this.kind == this.kindAction2) {
             let stateIicon = '?';
@@ -2761,10 +2806,10 @@ class RightMenuItem {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             if (this.info.highlight) {
                 anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: this.info.highlight, css: 'rightMenuIconLabel' });
-                anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+                anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
             }
             else {
-                anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+                anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
             }
             anchor.content.push({ x: itemWidth - 1.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
@@ -2774,13 +2819,13 @@ class RightMenuItem {
             spot.draggable = true;
             spot.activation = this.drag;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
         if (this.kind == this.kindDraggableSquare) {
             spot.draggable = true;
             spot.activation = this.drag;
             anchor.content.push({ x: 0.15 + this.pad, y: itemTop + 0.15, w: 0.7, h: 0.7, rx: 0.05, ry: 0.05, css: 'rightMenuItemDragBG' });
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
         if (this.kind == this.kindDraggableTriangle) {
             spot.draggable = true;
@@ -2793,7 +2838,7 @@ class RightMenuItem {
                 css: 'rightMenuItemDragBG'
             };
             anchor.content.push(tri);
-            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+            anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
         if (this.kind == this.kindOpenedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });

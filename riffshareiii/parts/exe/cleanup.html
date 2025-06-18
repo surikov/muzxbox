@@ -1,0 +1,185 @@
+<!--
+<!DOCTYPE html>
+-->
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
+
+	<script type='text/javascript' src='./js/mzxbx.js'></script>
+	<script type='text/javascript' src='./js/mzxbxlib.js'></script>
+	<script type='text/javascript' src='./js/application.js'></script>
+	<script type='text/javascript' src='./plugins/catalog.js'></script>
+	<script type='text/javascript' src='./js/tilerender.js'></script>
+
+	
+	<link rel="stylesheet" type="text/css" href="theme/topbar.css">
+	<link rel="stylesheet" type="text/css" href="theme/sizesmall.css">
+	<link rel="stylesheet" type="text/css" href="theme/font1small.css">
+	<link rel="stylesheet" type="text/css" href="theme/material-design-iconic-font/css/material-design-iconic-font.css">
+	<link rel="stylesheet" type="text/css" href="theme/base.css">
+	<link rel="stylesheet" type="text/css" href="theme/sampler.css">
+	<link rel="stylesheet" type="text/css" href="theme/menu.css">
+	<link rel="stylesheet" type="text/css" href="theme/leftbar.css">
+	<link rel="stylesheet" type="text/css" href="theme/toolbar.css">
+	<link rel="stylesheet" type="text/css" href="theme/mixer.css">
+	<link rel="stylesheet" type="text/css" href="theme/timeselect.css">
+	<link rel="stylesheet" type="text/css" href="theme/plugin.css">
+	<link rel="stylesheet" type="text/css" href="theme/fanpane.css">
+
+	<link rel="stylesheet" type="text/css" href="theme/colordarkred.css">
+	<link rel="stylesheet" type="text/css" href="theme/font1small.css">
+
+	<title>ZvoogHub</title>
+</head>
+
+<body>
+	<div id="pluginActionDiv">
+		<div id="pluginActionHeader">
+			<div id="pluginActionTitle">Action plugin UI</div>
+			<div class="pluginCancel" onclick="globalCommandDispatcher.actionPluginDialog.closeActionDialogFrame();">&#xf136;</div>
+		</div>
+		<iframe id="pluginActionFrame" class="pluginFrame" src="plugins/pluginplaceholder.html"></iframe>
+	</div>
+	
+	<div id="pluginFilterDiv">
+		<div id="pluginFilterHeader" class='pluginOtherHeader'>
+			<!--<div class="pluginCancel" onclick="globalCommandDispatcher.cancelPluginGUI();">12345678901234567890</div>-->
+			<div id="pluginFilterTitle" class='pluginPromptTitle' onclick="globalCommandDispatcher.filterPluginDialog.promptFilterTitle();">&nbsp;&nbsp;Filter plugin UI</div>
+			<div class="pluginCancel" onclick="globalCommandDispatcher.filterPluginDialog.closeFilterDialogFrame();">&#xf136;</div>
+		</div>
+		<iframe id="pluginFilterFrame" class="pluginFrame" src="plugins/pluginplaceholder.html"></iframe>
+		<div id="pluginFilterBottom" class='pluginBottom'>
+			<div id="pluginFilterSetFilter" class='pluginDoButton' onclick="globalCommandDispatcher.filterPluginDialog.setFilterOn();">&#xf39e;</div>
+			<div id="pluginFilterSetPasstrough" class='pluginDoButton' onclick="globalCommandDispatcher.filterPluginDialog.setFilterPass();">&#xf1af;</div>
+			<div id="pluginFilterDelete" class='pluginDoButton' onclick="globalCommandDispatcher.filterPluginDialog.dropFilter();">&#xf154;</div>
+		</div>
+	</div>
+
+	<div id="pluginPointDiv">
+		<div id="pluginPointHeader">
+			<div id="pluginPointTitle">Point plugin UI</div>
+			<div class="pluginCancel" onclick="globalCommandDispatcher.pointPluginDialog.closePointDialogFrame();">&#xf136;</div>
+		</div>
+		<iframe id="pluginPointFrame" class="pluginFrame" src="plugins/pluginplaceholder.html"></iframe>
+		<div id="pluginPointBottom" class='pluginBottom'>
+			<div id="pluginPointDelete" class='pluginDoButton' onclick="globalCommandDispatcher.pointPluginDialog.dropPoint();">&#xf154;</div>
+		</div>
+	</div>
+	
+	<div id="pluginSequencerDiv">
+		<div id="pluginSequencerHeader" class='pluginOtherHeader'>
+			<div id="pluginSequencerTitle" class='pluginPromptTitle' onclick="globalCommandDispatcher.sequencerPluginDialog.promptSequencerTitle();">&nbsp;&nbsp;Sequencer plugin UI</div>
+			<div class="pluginCancel" onclick="globalCommandDispatcher.sequencerPluginDialog.closeSequencerDialogFrame();">&#xf136;</div>
+		</div>
+		<iframe id="pluginSequencerFrame" class="pluginFrame" src="plugins/pluginplaceholder.html"></iframe>
+		<div id="pluginSequencerBottom" class='pluginBottom'>
+			<div id="pluginSequencerSetPlay" class='pluginDoButton' onclick="globalCommandDispatcher.sequencerPluginDialog.setSequencerOn();">&#xf3bc;</div>
+			<div id="pluginSequencerSetPasstrough" class='pluginDoButton' onclick="globalCommandDispatcher.sequencerPluginDialog.setSequencerMute();">&#xf1af;</div>
+			<div id="pluginSequencerSetSolo" class='pluginDoButton' onclick="globalCommandDispatcher.sequencerPluginDialog.setSequencerSolo();">&#xf166;</div>
+			<div id="pluginSequencerDelete" class='pluginDoButton' onclick="globalCommandDispatcher.sequencerPluginDialog.dropSequencer();">&#xf154;</div>
+		</div>
+	</div>
+	
+	<div id="pluginSamplerDiv">
+		<div id="pluginSamplerHeader" class='pluginOtherHeader'>
+			<!--
+			<div id="pluginSamplerTitle">Sampler plugin UI</div>
+			<div class="pluginCancel" onclick="globalCommandDispatcher.cancelPluginGUI();">&#xf136;</div>
+			-->
+			<div id="pluginSamplerTitle" class='pluginPromptTitle' onclick="globalCommandDispatcher.samplerPluginDialog.promptDrumTitle();">&nbsp;&nbsp;Filter plugin UI</div>
+			<div class="pluginCancel" onclick="globalCommandDispatcher.samplerPluginDialog.closeDrumDialogFrame();">&#xf136;</div>
+		</div>
+		<iframe id="pluginSamplerFrame" class="pluginFrame" src="plugins/pluginplaceholder.html"></iframe>
+		<div id="pluginSamplerBottom" class='pluginBottom'>
+			<div id="pluginSamplerSetPlay" class='pluginDoButton' onclick="globalCommandDispatcher.samplerPluginDialog.setDrumOn();">&#xf3bc;</div>
+			<div id="pluginSamplerSetPasstrough" class='pluginDoButton' onclick="globalCommandDispatcher.samplerPluginDialog.setDrumMute();">&#xf1af;</div>
+			<div id="pluginSamplerSetSolo" class='pluginDoButton' onclick="globalCommandDispatcher.samplerPluginDialog.setDrumSolo();">&#xf166;</div>
+			<div id="pluginSamplerDelete" class='pluginDoButton' onclick="globalCommandDispatcher.samplerPluginDialog.dropDrum();">&#xf154;</div>
+		</div>
+	</div>
+	
+	<div id='pagediv'>
+		<!--
+		<input type="file" id="file_midi_input" accept="audio/midi, audio/x-midi" />
+		<input type="file" id="file_gp35_input" accept=".gp3, .gp4, .gp5" />
+	-->
+		<!--
+        <div id='warningDialog'>
+            <div>
+                <div id='warningIcon'>&#xf1f5;</div>
+                <div id='warningTitle'>Test 123</div>
+                <div id='warningText'>Qwerty asdfg 123</div>
+            </div>
+        </div>
+        -->
+		<!--
+		<div id="topbox">
+			<iframe id="innerframe" src="web/test/test.html"></iframe>
+		</div>
+	-->
+		<svg id="tileLevelSVG" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+
+			<linearGradient id="verticalBorderLine">
+				<stop class="verLineFrom" offset="0%" />
+				<stop class="verLineMiddle" offset="10%" />
+				<stop class="verLineTo" offset="100%" />
+			</linearGradient>
+			<linearGradient id="horizontalBorderLine" x1="0" x2="0" y1="0" y2="1">
+				<stop class="verLineFrom" offset="0%" />
+				<stop class="verLineMiddle" offset="25%" />
+				<stop class="verLineTo" offset="100%" />
+			</linearGradient>
+			<linearGradient id="positionTimeMarkFill">
+				<stop class="positionMark1" offset="0%" />
+				<stop class="positionMark2" offset="98%" />
+				<stop class="positionMark3" offset="100%" />
+			</linearGradient>
+
+			<g id='backgroundLayer' />
+			<g id='selectedTime' />
+			<g id='timepositionmark' />
+			
+			<g id='gridLayerZoom' />
+			<g id='tracksLayerZoom' />
+			<g id='leftsidebar' />
+			<g id='firstLayerZoom' />
+
+			<g id='spearsLayer' />
+			<g id='fanLayer' />
+
+			<!--<g id='mixerLayer' />
+            <g id='tracksLayerZoom025' />
+            <g id='tracksLayerZoom05' />
+            <g id='tracksLayerZoom1' />
+            <g id='tracksLayerZoom2' />
+            <g id='tracksLayerZoom4' />
+            <g id='tracksLayerZoom8' />
+            <g id='tracksLayerZoom16' />
+            <g id='tracksLayerZoom32' />
+            <g id='tracksLayerZoom64' />
+            <g id='tracksLayerZoom128' />
+            <g id='tracksLayerZoom256' />-->
+
+			<g id='timeselectbar' />
+			<g id='debugLayer' />
+
+			<g id='toolBarPanelGroup' />
+
+			<g id='menuPanelBackground' />
+			<g id='menuPanelInteraction' />
+			<g id='menuPanelContent' />
+			<g id='menuPanelButtons' />
+
+			<g id='warningDialogGroup' />
+		</svg>
+		<script>
+			//console.log('start page v1.01');
+			startApplication();
+		</script>
+	</div>
+</body>
+
+
+</html>

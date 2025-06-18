@@ -1,5 +1,6 @@
 type MenuInfo = {
 	text: string;
+	lightTitle?:boolean;
 	noLocalization?: boolean;
 	focused?: boolean;
 	opened?: boolean;
@@ -107,6 +108,7 @@ function fillPluginsLists() {
 				info = {
 					dragTriangle: true
 					, text: label
+					
 					, noLocalization: true
 					, onDrag: (x: number, y: number) => {
 						if (dragStarted) {

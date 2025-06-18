@@ -78,11 +78,17 @@ class RightMenuItem {
 		}
 	}
 	buildTile(itemTop: number, itemWidth: number): TileItem {
+		//rightMenuLightLabel
+		//rightMenuLabel
 		let label: string = '?';
 		if (this.info.noLocalization) {
 			label = this.info.text;
 		} else {
 			label = LO(this.info.text);
+		}
+		let labelCss: string = 'rightMenuLabel';
+		if (this.info.lightTitle) {
+			labelCss = 'rightMenuLightLabel';
 		}
 		this.top = itemTop;
 		let anchor: TileAnchor = {
@@ -99,11 +105,11 @@ class RightMenuItem {
 		let spot2: TileRectangle | null = null;
 		if (this.kind == this.kindAction) {
 			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
-			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 		}
 		if (this.kind == this.kindActionDisabled) {
 			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
-			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 		}
 		if (this.kind == this.kindAction2) {
 			let stateIicon = '?';
@@ -116,9 +122,9 @@ class RightMenuItem {
 			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
 			if (this.info.highlight) {
 				anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: this.info.highlight, css: 'rightMenuIconLabel' });
-				anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+				anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 			} else {
-				anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+				anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 			}
 			anchor.content.push({ x: itemWidth - 1.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
 			anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
@@ -128,27 +134,27 @@ class RightMenuItem {
 			spot.draggable = true;
 			spot.activation = this.drag;
 			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
-			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 		}
 		if (this.kind == this.kindDraggableSquare) {
 			spot.draggable = true;
 			spot.activation = this.drag;
 			anchor.content.push({ x: 0.15 + this.pad, y: itemTop + 0.15, w: 0.7, h: 0.7, rx: 0.05, ry: 0.05, css: 'rightMenuItemDragBG' });
-			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 		}
 		if (this.kind == this.kindDraggableTriangle) {
 			spot.draggable = true;
 			spot.activation = this.drag;
 			//anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
-			let sz=0.45;
-			let tri:TilePolygon={
+			let sz = 0.45;
+			let tri: TilePolygon = {
 				x: 0.2 + this.pad
 				, y: itemTop + 0.1
 				, dots: [0, 0, sz * 2 * 0.8 * 0.9, sz * 0.9, 0, sz * 2 * 0.9]
-				, css: 'rightMenuItemDragBG' 
+				, css: 'rightMenuItemDragBG'
 			};
 			anchor.content.push(tri);
-			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
+			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 		}
 
 

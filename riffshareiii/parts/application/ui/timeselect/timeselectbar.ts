@@ -75,15 +75,15 @@ class TimeSelectBar {
 
 		return [this.selectionBarLayer, this.selectedTimeLayer, this.positionTimeLayer];
 	}
-	positionMarkWidth() :number{
+	positionMarkWidth(): number {
 		let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-		let ww=zz*2;
+		let ww = zz * 2;
 		return ww;
 	}
 	resizeTimeScale(viewWidth: number, viewHeight: number) {
 		//console.log('resizeTimeSelect',viewWidth,viewHeight,globalCommandDispatcher.player);
 		let ww = 0.001;
-		if((globalCommandDispatcher.player) && (globalCommandDispatcher.player.playState().play)){
+		if ((globalCommandDispatcher.player) && (globalCommandDispatcher.player.playState().play)) {
 			ww = this.positionMarkWidth();
 		}
 		this.positionTimeMark.w = ww;
@@ -145,17 +145,28 @@ class TimeSelectBar {
 
 	}
 
-	createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor//, data: Zvoog_Project
-		//,cfg:MixerDataMathUtility
-		, zz: number
-	) {
+	createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, zz: number) {
 		let mark: TileRectangle = {
 			x: barLeft, y: 0, w: size, h: size
 			, rx: size / 2, ry: size / 2
-			, css: 'timeMarkButtonCircle'+ zoomPrefixLevelsCSS[zz].prefix
+			, css: 'timeMarkButtonCircle' + zoomPrefixLevelsCSS[zz].prefix
 			, activation: (x, y) => {
-				//console.log('barIdx', barIdx);
-				globalCommandDispatcher.timeSelectChange(barIdx);//expandTimeLineSelection(barIdx);
+				let toIdx = barIdx;
+				//console.log('bar click', barIdx, globalCommandDispatcher.cfg().data.selectedPart);
+
+				//expandTimeLineSelection(barIdx);
+				if (zz > 4) {
+					if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure < barIdx
+						&& globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1
+						&& globalCommandDispatcher.cfg().data.selectedPart.startMeasure == globalCommandDispatcher.cfg().data.selectedPart.endMeasure
+					) {
+						toIdx = barIdx - 1;
+					}
+				} else {
+
+				}
+				globalCommandDispatcher.timeSelectChange(toIdx);
+				//console.log(globalCommandDispatcher.cfg().data.selectedPart);
 			}
 		};
 		measureAnchor.content.push(mark);
@@ -173,7 +184,7 @@ class TimeSelectBar {
 		let hunds = Math.round(100 * (barTime - Math.floor(barTime)));
 		//let timeText = Math.round(barTime * 100) / 100;
 		let nm: TileText = {
-			x: barLeft+size/4
+			x: barLeft + size / 4
 			, y: zoomPrefixLevelsCSS[zz].minZoom * 1
 			, text: '' + (1 + barnum) + ': ' + mins + '\'' + (secs > 9 ? '' : '0') + secs + '.' + hunds
 			, css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
@@ -181,7 +192,7 @@ class TimeSelectBar {
 		measureAnchor.content.push(nm);
 
 		let bpm: TileText = {
-			x: barLeft+size/4
+			x: barLeft + size / 4
 			, y: zoomPrefixLevelsCSS[zz].minZoom * 2
 			, text: '' + Math.round(curBar.tempo) + ': ' + curBar.metre.count + '/' + curBar.metre.part
 			, css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
@@ -190,16 +201,31 @@ class TimeSelectBar {
 
 	}
 
-	fillTimeBar(//data:Zvoog_Project
-		//cfg:MixerDataMathUtility
-	) {
-		//console.log('fillTimeBar', globalCommandDispatcher.cfg().data.timeline);
-		//let mixm: MixerDataMath = new MixerDataMath(data);
+	fillSelectionMenu() {
+		let zz = zoomPrefixLevelsCSS.length - 1;
+		let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
+		let opt1: TileRectangle = {
+			x: 0
+			, y: 0
+			, w: size
+			, h: size
+			, rx: size / 2
+			, ry: size / 2
+			, css: 'timeMarkButtonCircle128'
+			, activation: (x, y) => {
+				console.log('selection menu');
+
+			}
+		};
+		this.selectBarAnchor.content.push(opt1);
+		console.log(this.selectBarAnchor);
+	}
+
+	fillTimeBar() {
 		this.selectBarAnchor.ww = globalCommandDispatcher.cfg().wholeWidth();
 		this.selectBarAnchor.hh = globalCommandDispatcher.cfg().wholeHeight();
 		this.zoomAnchors = [];
 		for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
-			//console.log('add',zoomPrefixLevelsCSS[zz]);
 			let selectLevelAnchor: TileAnchor = {
 				minZoom: zoomPrefixLevelsCSS[zz].minZoom
 				, beforeZoom: zoomPrefixLevelsCSS[zz + 1].minZoom
@@ -208,8 +234,6 @@ class TimeSelectBar {
 			};
 			this.zoomAnchors.push(selectLevelAnchor);
 			let mm: Zvoog_MetreMathType = MMUtil();
-			//this.reBuildSelectionMark(zz, data);
-
 			let barLeft = globalCommandDispatcher.cfg().leftPad;
 			let barTime = 0;
 			for (let kk = 0; kk < globalCommandDispatcher.cfg().data.timeline.length; kk++) {
@@ -223,23 +247,16 @@ class TimeSelectBar {
 					, id: 'measure' + (kk + Math.random())
 				};
 				selectLevelAnchor.content.push(measureAnchor);
-
-				//this.addGridMarks(data, kk, barLeft, curBar, measureAnchor, zz);
 				if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
 					this.createBarMark(kk, barLeft
 						, zoomPrefixLevelsCSS[zz].minZoom * 1.5
-						//, zoomPrefixLevelsCSS[zz].minZoom * 3
 						, measureAnchor
-						//, cfg
-						,zz
+						, zz
 					);
-					this.createBarNumber(barLeft
-						//, zoomPrefixLevelsCSS[zz].minZoom * 3
-						, kk, zz, curBar, measureAnchor, barTime, zoomPrefixLevelsCSS[zz].minZoom * 1.5);
+					this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor, barTime, zoomPrefixLevelsCSS[zz].minZoom * 1.5);
 				}
 				let zoomInfo = zoomPrefixLevelsCSS[zz];
 				if (zoomInfo.gridLines.length > 0) {
-					//let mixm: MixerDataMath = new MixerDataMath(data);
 					let lineCount = 0;
 					let skip: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 1 });
 					while (true) {
@@ -248,7 +265,6 @@ class TimeSelectBar {
 						if (!skip.less(curBar.metre)) {
 							break;
 						}
-
 						if (line.label) {
 							let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 							let mark: TileRectangle = {
@@ -275,8 +291,11 @@ class TimeSelectBar {
 				barLeft = barLeft + barWidth;
 				barTime = barTime + curMeasureMeter.duration(curBar.tempo);
 			}
+
 		}
+
 		this.selectBarAnchor.content = this.zoomAnchors;
+		this.fillSelectionMenu();
 		this.updateTimeSelectionBar();
 	}
 }
