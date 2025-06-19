@@ -28,7 +28,7 @@ class Projectr {
 		for (let ii = 0; ii < project.timeline.length; ii++) {
 			project.comments.push({ points: [] });
 		}
-		
+
 		for (let ii = 0; ii < midiSongData.lyrics.length; ii++) {
 			let textpoint = midiSongData.lyrics[ii];
 			let pnt = findMeasureSkipByTime('lyrics', textpoint.ms / 1000, project.timeline);
@@ -37,7 +37,7 @@ class Projectr {
 				this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
 			}
 		}
-		this.addLyricsPoints(project.comments[0], { count: 0, part: 4 }, 'import from .mid'+comment, project.timeline[0].tempo);
+		this.addLyricsPoints(project.comments[0], { count: 0, part: 4 }, 'import from .mid' + comment, project.timeline[0].tempo);
 
 		let top = 0;
 		let outputID = '';
@@ -317,7 +317,7 @@ class Projectr {
 			}
 			//, volume: volume
 		};
-		console.log((''+midiTrack.title + ' ' + allPercussionDrumTitles()[drum]), drum, drumvolidx);
+		console.log(('' + midiTrack.title + ' ' + allPercussionDrumTitles()[drum]), drum, drumvolidx);
 		if (!(drum >= 35 && drum <= 81)) {
 			projectDrums.sampler.outputs = [];
 		}
@@ -357,8 +357,22 @@ class Projectr {
 				break;
 			}
 		}
+		if (program == 51) re.ratio = 0.4;
+		if (program == 89) re.ratio = 0.4;
+		if (program == 50) re.ratio = 0.5;
+		if (program == 27) re.ratio = 0.85;
+
 		//console.log('program', program, 'not found set 0');
 		return re;
+	};
+	findModeInstrument(program: number): number {
+		if (program == 24) return 4;
+		if (program == 25) return 4;
+		if (program == 26) return 4;
+		if (program == 27) return 4;
+		if (program == 29) return 1;
+		if (program == 30) return 1;
+		return 0;
 	};
 	createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack {
 		//let perfkind = 'zinstr1';
@@ -376,7 +390,7 @@ class Projectr {
 		}*/
 		let idxRatio = this.findVolumeInstrument(midiTrack.program);
 		let iidx = idxRatio.idx;
-		let imode = 0;//Flat / Down / Up / Snap / Pong
+		let imode = this.findModeInstrument(midiTrack.program);//Flat / Down / Up / Snap / Pong
 		let ivolume = Math.round(volume * 100) * idxRatio.ratio;
 		let idata = new ChordPitchPerformerUtil().dumpParameters(ivolume, iidx, imode);
 		//console.log('createProjectTrack', volume, midiTrack.title, idata);
@@ -399,7 +413,7 @@ class Projectr {
 			}
 			//, volume: volume
 		};
-		console.log( (midiTrack.title + ' ' + new ChordPitchPerformerUtil().tonechordinslist()[midiTrack.program]), midiTrack.program,idata);
+		console.log((midiTrack.title + ' ' + new ChordPitchPerformerUtil().tonechordinslist()[midiTrack.program]), midiTrack.program, idata);
 		/*if(midiTrack.program==65){
 			projectTrack.performer.data='' + midiTrack.program+'//'+strummode+'/90'
 		}
@@ -532,18 +546,18 @@ class Projectr {
 			project.tracks[ii].performer.iconPosition.y = 0 + ii * 9;
 		}
 		for (let ii = 0; ii < project.percussions.length; ii++) {
-			project.percussions[project.percussions.length - ii - 1].sampler.iconPosition.x = 70 + project.tracks.length * 4 + project.percussions.length * 4 - ii * 8;
+			project.percussions[project.percussions.length - ii - 1].sampler.iconPosition.x = 110 + project.tracks.length * 4 + project.percussions.length * 4 - ii * 8;
 			project.percussions[project.percussions.length - ii - 1].sampler.iconPosition.y = hh - ii * 6;
 		}
 		for (let ii = 0; ii < project.filters.length - 2; ii++) {
-			project.filters[ii].iconPosition.x = 50 + project.tracks.length * 4 + project.percussions.length * 8 + ii * 8;
+			project.filters[ii].iconPosition.x = 120 + project.tracks.length * 4 + project.percussions.length * 8 + ii * 5;
 			project.filters[ii].iconPosition.y = ii * 6;
 		}
 
-		project.filters[project.filters.length - 2].iconPosition.x = 85 + project.tracks.length * 9 + project.percussions.length * 8 + project.filters.length * 4;
+		project.filters[project.filters.length - 2].iconPosition.x = 150 + project.tracks.length * 9 + project.percussions.length * 8 + project.filters.length * 4;
 		project.filters[project.filters.length - 2].iconPosition.y = hh * 0.7;
 
-		project.filters[project.filters.length - 1].iconPosition.x = 60 + project.tracks.length * 9 + project.percussions.length * 8 + project.filters.length * 4;
+		project.filters[project.filters.length - 1].iconPosition.x = 120 + project.tracks.length * 9 + project.percussions.length * 8 + project.filters.length * 4;
 		project.filters[project.filters.length - 1].iconPosition.y = hh * 0.4;
 		/*
 				for (let tt = 0; tt < project.tracks.length; tt++) {

@@ -614,6 +614,7 @@ declare class Projectr {
         idx: number;
         ratio: number;
     };
+    findModeInstrument(program: number): number;
     createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack;
     trimProject(project: Zvoog_Project, reslice: boolean): void;
     limitShort(project: Zvoog_Project): void;
