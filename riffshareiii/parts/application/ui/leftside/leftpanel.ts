@@ -109,22 +109,42 @@ class LeftPanel {
 				, css: 'titleLabel' + zoomPrefixLevelsCSS[zz].prefix
 			};
 			this.leftZoomAnchors[zz].content.push(titleLabel);
+			let soloOnly = false;
+			for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
+				if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
+					soloOnly = true;
+					break;
+				}
+
+			for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+				if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
+					soloOnly = true;
+					break;
+				}
+			}
 			if (zz < 5) {
 				if (globalCommandDispatcher.cfg().data.tracks.length > 0) {
-
+					let preCSS = 'firstTrackLabel';
+					if ((soloOnly && globalCommandDispatcher.cfg().data.tracks[0].performer.state != 2) || ((!soloOnly) && globalCommandDispatcher.cfg().data.tracks[0].performer.state == 1)) {
+						preCSS = 'firstTrackMute';
+					}
 					let trackLabel: TileText = {
 						x: 0
 						, y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight()
 						, text: globalCommandDispatcher.cfg().data.tracks[0].title
-						, css: 'firstTrackLabel' + zoomPrefixLevelsCSS[zz].prefix
+						, css: preCSS + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(trackLabel);
 					for (let tr = 1; tr < globalCommandDispatcher.cfg().data.tracks.length; tr++) {
+						let preCSS = 'otherTrackLabel';
+						if ((soloOnly && globalCommandDispatcher.cfg().data.tracks[tr].performer.state != 2) || ((!soloOnly) && globalCommandDispatcher.cfg().data.tracks[tr].performer.state == 1)) {
+							preCSS = 'otherTrackMute';
+						}
 						let trackLabel: TileText = {
 							x: 0
-							, y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight()-(1+tr)*globalCommandDispatcher.cfg().notePathHeight
+							, y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - (1 + tr) * globalCommandDispatcher.cfg().notePathHeight
 							, text: globalCommandDispatcher.cfg().data.tracks[tr].title
-							, css: 'otherTrackLabel' + zoomPrefixLevelsCSS[zz].prefix
+							, css: preCSS + zoomPrefixLevelsCSS[zz].prefix
 						};
 						this.leftZoomAnchors[zz].content.push(trackLabel);
 					}
@@ -132,13 +152,18 @@ class LeftPanel {
 			}
 			if (zz < 5) {
 				for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++) {
+					let preCSS = 'samplerRowLabel';
+					if ((soloOnly && globalCommandDispatcher.cfg().data.percussions[ss].sampler.state != 2) || ((!soloOnly) && globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 1)) {
+						preCSS = 'samplerMuteLabel';
+					}
 					let samplerLabel: TileText = {
 						text: '' + globalCommandDispatcher.cfg().data.percussions[ss].title
 						, x: 0
 						, y: globalCommandDispatcher.cfg().samplerTop()
 							+ globalCommandDispatcher.cfg().samplerDotHeight * (1 + ss)
 							- globalCommandDispatcher.cfg().samplerDotHeight * 0.3
-						, css: 'samplerRowLabel' + zoomPrefixLevelsCSS[zz].prefix
+						//, css: 'samplerRowLabel' + zoomPrefixLevelsCSS[zz].prefix
+						, css: preCSS + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(samplerLabel);
 					//console.log('samplerLabel', samplerLabel);
@@ -146,16 +171,21 @@ class LeftPanel {
 			}
 			if (zz < 5) {
 				//let yy = 0;
+
 				for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
 					let filter = globalCommandDispatcher.cfg().data.filters[ff];
-					//if (filter.automation) {
+					let preCSS = 'autoRowLabel';
+					if (filter.state == 1) {
+						preCSS = 'autoMuteLabel';
+					}
 					let autoLabel: TileText = {
 						text: '' + filter.title
 						, x: 0
 						, y: globalCommandDispatcher.cfg().automationTop()
 							+ (1 + ff) * globalCommandDispatcher.cfg().autoPointHeight
 							- 0.3 * globalCommandDispatcher.cfg().autoPointHeight
-						, css: 'autoRowLabel' + zoomPrefixLevelsCSS[zz].prefix
+						//, css: 'autoRowLabel' + zoomPrefixLevelsCSS[zz].prefix
+						, css: preCSS + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(autoLabel);
 					//console.log('autoLabel', autoLabel);

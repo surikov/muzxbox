@@ -20,8 +20,26 @@ class OctaveContent {
 		, zoomLevel: number
 	) {
 		if (globalCommandDispatcher.cfg().data.tracks.length) {
+			let soloOnly = false;
+			for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
+				if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
+					soloOnly = true;
+					break;
+				}
+
+			for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+				if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
+					soloOnly = true;
+					break;
+				}
+			}
+			
 			let track = globalCommandDispatcher.cfg().data.tracks[0];
 			let css = 'mixNoteLine';
+			//css = 'mixMuteLine';
+			if ((soloOnly && track.performer.state != 2) || ((!soloOnly) && track.performer.state == 1)) {
+				css = 'mixMuteLine';
+			}
 			this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, true, zoomLevel);
 		}
 	}
@@ -31,9 +49,27 @@ class OctaveContent {
 		, transpose: number
 		, zoomLevel: number
 	) {
+		let soloOnly = false;
+			for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
+				if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
+					soloOnly = true;
+					break;
+				}
+
+			for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+				if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
+					soloOnly = true;
+					break;
+				}
+			}
 		for (let ii = 1; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
 			let track = globalCommandDispatcher.cfg().data.tracks[ii];
-			this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, 'mixNoteSub', false, zoomLevel);
+			let css = 'mixNoteSub';
+			
+			if ((soloOnly && track.performer.state != 2) || ((!soloOnly) && track.performer.state == 1)) {
+				css = 'mixMuteSub';
+			}
+			this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, false, zoomLevel);
 		}
 	}
 	addTrackNotes(track: Zvoog_MusicTrack, barIdx: number, octaveIdx: number
@@ -45,7 +81,7 @@ class OctaveContent {
 	) {
 		if (!track.measures[barIdx]) {
 			//globalCommandDispatcher.adjustTimeline();
-			console.log('addTrackNotes not found',barIdx,'for track',track.title);
+			console.log('addTrackNotes not found', barIdx, 'for track', track.title);
 			return;
 		}
 		let measure: Zvoog_TrackMeasure = track.measures[barIdx];

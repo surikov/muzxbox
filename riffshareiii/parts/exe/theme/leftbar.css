@@ -1,187 +1,215 @@
-.leftBlackKey{
+.leftBlackKey {
 	fill: var(--drag-color);
 }
-.leftKeyWhite{
+
+.leftKeyWhite {
 	fill: var(--main-color);
 }
 
 
 .octaveLabel025 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*0.25*var(--tapSize));
+	font-size: calc(1*0.25*var(--tapSize));
 
 }
+
 .octaveLabel05 {
 	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*0.5*var(--tapSize));
+	font-size: calc(1*0.5*var(--tapSize));
 }
+
 .octaveLabel1 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*var(--tapSize));
+	font-size: calc(1*var(--tapSize));
 }
+
 .octaveLabel2 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*2*var(--tapSize));
+	font-size: calc(1*2*var(--tapSize));
 }
+
 .octaveLabel4 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*4*var(--tapSize));
+	font-size: calc(1*4*var(--tapSize));
 }
+
 .octaveLabel8 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*8*var(--tapSize));
+	font-size: calc(1*8*var(--tapSize));
 }
+
 .octaveLabel16 {
 	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*16*var(--tapSize));
+	font-size: calc(1*16*var(--tapSize));
 }
+
 .octaveLabel32 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*32*var(--tapSize));
+	font-size: calc(1*32*var(--tapSize));
 }
+
 .octaveLabel64 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*64*var(--tapSize));
+	font-size: calc(1*64*var(--tapSize));
 }
+
 .octaveLabel128 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*128*var(--tapSize));
+	font-size: calc(1*128*var(--tapSize));
 }
 
 
 .octaveSubLabel025 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*0.25*var(--tapSize));
-    text-anchor22: start;
+	font-size: calc(1*0.25*var(--tapSize));
+	text-anchor22: start;
 	pointer-events: none;
 }
+
 .octaveSubLabel05 {
 	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*0.5*var(--tapSize));
+	font-size: calc(1*0.5*var(--tapSize));
 	pointer-events: none;
 }
+
 .octaveSubLabel1 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*var(--tapSize));
+	font-size: calc(1*var(--tapSize));
 	pointer-events: none;
 }
+
 .octaveSubLabel2 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*2*var(--tapSize));
+	font-size: calc(1*2*var(--tapSize));
 	pointer-events: none;
 }
+
 .octaveSubLabel4 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*4*var(--tapSize));
+	font-size: calc(1*4*var(--tapSize));
 	pointer-events: none;
 }
+
 .octaveSubLabel8 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*8*var(--tapSize));
+	font-size: calc(1*8*var(--tapSize));
 	pointer-events: none;
 }
+
 .octaveSubLabel16 {
 	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*16*var(--tapSize));
+	font-size: calc(1*16*var(--tapSize));
 	pointer-events: none;
 }
+
 .octaveSubLabel32 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*32*var(--tapSize));
+	font-size: calc(1*32*var(--tapSize));
 	pointer-events: none;
 }
+
 .octaveSubLabel64 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*64*var(--tapSize));
+	font-size: calc(1*64*var(--tapSize));
 	pointer-events: none;
 }
+
 .octaveSubLabel128 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*128*var(--tapSize));
+	font-size: calc(1*128*var(--tapSize));
 	pointer-events: none;
 }
 
 
 
 .curTrackTitleLabel025 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(0.5*0.25*var(--tapSize));
-    text-anchor22: start;
+	font-size: calc(0.5*0.25*var(--tapSize));
+	text-anchor22: start;
 	pointer-events: none;
 }
+
 .curTrackTitleLabel05 {
 	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(0.5*0.5*var(--tapSize));
+	font-size: calc(0.5*0.5*var(--tapSize));
 	pointer-events: none;
 }
+
 .curTrackTitleLabel1 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(0.5*var(--tapSize));
+	font-size: calc(0.5*var(--tapSize));
 	pointer-events: none;
 }
+
 .curTrackTitleLabel2 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(0.5*2*var(--tapSize));
+	font-size: calc(0.5*2*var(--tapSize));
 	pointer-events: none;
 }
+
 .curTrackTitleLabel4 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(0.5*4*var(--tapSize));
+	font-size: calc(0.5*4*var(--tapSize));
 	pointer-events: none;
 }
+
 .curTrackTitleLabel8 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(0.5*8*var(--tapSize));
+	font-size: calc(0.5*8*var(--tapSize));
 	pointer-events: none;
 }
+
 .curTrackTitleLabel16 {
 	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(0.5*16*var(--tapSize));
+	font-size: calc(0.5*16*var(--tapSize));
 	pointer-events: none;
 }
+
 .curTrackTitleLabel32 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(0.5*32*var(--tapSize));
+	font-size: calc(0.5*32*var(--tapSize));
 	pointer-events: none;
 }
+
 .curTrackTitleLabel64 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(0.5*64*var(--tapSize));
+	font-size: calc(0.5*64*var(--tapSize));
 	pointer-events: none;
 }
+
 .curTrackTitleLabel128 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(0.5*128*var(--tapSize));
+	font-size: calc(0.5*128*var(--tapSize));
 	pointer-events: none;
 }
 
@@ -189,138 +217,315 @@
 
 
 .samplerRowLabel025 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 75%;
-    font-size: calc(0.25*var(--tapSize));
-	pointer-events: none;
-}
-.samplerRowLabel05 {
-    fill: var(--line-color);
-	fill-opacity: 75%;
-    font-size: calc(0.5*var(--tapSize));
-	pointer-events: none;
-}
-.samplerRowLabel1 {
-    fill: var(--line-color);
-	fill-opacity: 75%;
-    font-size: calc(0.75*var(--tapSize));
-	pointer-events: none;
-}
-.samplerRowLabel2 {
-    fill: var(--line-color);
-	fill-opacity: 75%;
-    font-size: calc(1*var(--tapSize));
-	pointer-events: none;
-}
-.samplerRowLabel4 {
-    fill: var(--line-color);
-	fill-opacity: 75%;
-    font-size: calc(1.5*var(--tapSize));
+	font-size: calc(0.25*var(--tapSize));
 	pointer-events: none;
 }
 
+.samplerRowLabel05 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(0.5*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerRowLabel1 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(0.75*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerRowLabel2 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(1*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerRowLabel4 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(1.5*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerMuteLabel025 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(0.25*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerMuteLabel05 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(0.5*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerMuteLabel1 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(0.75*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerMuteLabel2 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(1*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerMuteLabel4 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(1.5*var(--tapSize));
+	pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 .autoRowLabel025 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 75%;
-    font-size: calc(2*0.125*var(--tapSize));
+	font-size: calc(2*0.125*var(--tapSize));
 	pointer-events: none;
 }
+
 .autoRowLabel05 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 75%;
-    font-size: calc(4*0.125*var(--tapSize));
+	font-size: calc(4*0.125*var(--tapSize));
 	pointer-events: none;
 }
+
 .autoRowLabel1 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 75%;
-    font-size: calc(6*0.125*var(--tapSize));
+	font-size: calc(6*0.125*var(--tapSize));
 	pointer-events: none;
 }
+
 .autoRowLabel2 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 75%;
-    font-size: calc(8*0.125*var(--tapSize));
+	font-size: calc(8*0.125*var(--tapSize));
 	pointer-events: none;
 }
+
 .autoRowLabel4 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 75%;
-    font-size: calc(12*0.125*var(--tapSize));
+	font-size: calc(12*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.autoMuteLabel025 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(2*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.autoMuteLabel05 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(4*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.autoMuteLabel1 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(6*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.autoMuteLabel2 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(8*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.autoMuteLabel4 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(12*0.125*var(--tapSize));
 	pointer-events: none;
 }
 
 
 
 .firstTrackLabel025 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 75%;
-    font-size: calc(2*0.125*var(--tapSize));
+	font-size: calc(2*0.15*var(--tapSize));
 	pointer-events: none;
 }
+
 .firstTrackLabel05 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 75%;
-    font-size: calc(4*0.125*var(--tapSize));
+	font-size: calc(4*0.15*var(--tapSize));
 	pointer-events: none;
 }
+
 .firstTrackLabel1 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 75%;
-    font-size: calc(6*0.125*var(--tapSize));
+	font-size: calc(6*0.15*var(--tapSize));
 	pointer-events: none;
 }
+
 .firstTrackLabel2 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 75%;
-    font-size: calc(8*0.125*var(--tapSize));
+	font-size: calc(8*0.15*var(--tapSize));
 	pointer-events: none;
 }
+
 .firstTrackLabel4 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 75%;
-    font-size: calc(12*0.125*var(--tapSize));
+	font-size: calc(12*0.15*var(--tapSize));
 	pointer-events: none;
 }
+
+
+.firstTrackMute05 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(4*0.15*var(--tapSize));
+	pointer-events: none;
+}
+
+.firstTrackMute1 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(6*0.15*var(--tapSize));
+	pointer-events: none;
+}
+
+.firstTrackMute2 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(8*0.15*var(--tapSize));
+	pointer-events: none;
+}
+
+.firstTrackMute4 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(12*0.15*var(--tapSize));
+	pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 
 .otherTrackLabel025 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(1*0.125*var(--tapSize));
+	font-size: calc(1*0.125*var(--tapSize));
 	pointer-events: none;
 }
+
 .otherTrackLabel05 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(2*0.125*var(--tapSize));
+	font-size: calc(2*0.125*var(--tapSize));
 	pointer-events: none;
 }
+
 .otherTrackLabel1 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(3*0.125*var(--tapSize));
+	font-size: calc(3*0.125*var(--tapSize));
 	pointer-events: none;
 }
+
 .otherTrackLabel2 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(4*0.125*var(--tapSize));
+	font-size: calc(4*0.125*var(--tapSize));
 	pointer-events: none;
 }
+
 .otherTrackLabel4 {
-    fill: var(--line-color);
+	fill: var(--line-color);
 	fill-opacity: 50%;
-    font-size: calc(6*0.125*var(--tapSize));
+	font-size: calc(6*0.125*var(--tapSize));
 	pointer-events: none;
 }
 
 
 
-.octaveMark{
-    fill: var(--line-color);
+.otherTrackMute025 {
+	fill: var(--line-color);
+	fill-opacity: 20%;
+	font-size: calc(1*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.otherTrackMute05 {
+	fill: var(--line-color);
+	fill-opacity: 20%;
+	font-size: calc(2*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.otherTrackMute1 {
+	fill: var(--line-color);
+	fill-opacity: 20%;
+	font-size: calc(3*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.otherTrackMute2 {
+	fill: var(--line-color);
+	fill-opacity: 20%;
+	font-size: calc(4*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.otherTrackMute4 {
+	fill: var(--line-color);
+	fill-opacity: 20%;
+	font-size: calc(6*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+
+
+
+
+
+.octaveMark {
+	fill: var(--line-color);
 	fill-opacity: 25%;
 }

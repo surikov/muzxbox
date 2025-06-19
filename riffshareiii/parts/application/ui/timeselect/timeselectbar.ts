@@ -200,7 +200,7 @@ class TimeSelectBar {
 		measureAnchor.content.push(bpm);
 
 	}
-
+/*
 	fillSelectionMenu() {
 		let zz = zoomPrefixLevelsCSS.length - 1;
 		let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
@@ -219,7 +219,7 @@ class TimeSelectBar {
 		};
 		this.selectBarAnchor.content.push(opt1);
 		console.log(this.selectBarAnchor);
-	}
+	}*/
 
 	fillTimeBar() {
 		this.selectBarAnchor.ww = globalCommandDispatcher.cfg().wholeWidth();
@@ -295,7 +295,7 @@ class TimeSelectBar {
 		}
 
 		this.selectBarAnchor.content = this.zoomAnchors;
-		this.fillSelectionMenu();
+		//this.fillSelectionMenu();
 		this.updateTimeSelectionBar();
 	}
 }

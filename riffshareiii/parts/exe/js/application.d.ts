@@ -285,7 +285,6 @@ declare class TimeSelectBar {
     updateTimeSelectionBar(): void;
     createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, zz: number): void;
     createBarNumber(barLeft: number, barnum: number, zz: number, curBar: Zvoog_SongMeasure, measureAnchor: TileAnchor, barTime: number, size: number): void;
-    fillSelectionMenu(): void;
     fillTimeBar(): void;
 }
 declare class UIToolbar {

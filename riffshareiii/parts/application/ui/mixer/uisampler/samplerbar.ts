@@ -6,6 +6,24 @@ class SamplerBar {
 		let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().samplerDotHeight;
 		let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
 		let cucss = 'samplerDrumDotBg';
+		let licss = 'samplerDrumDotLine';
+		let soloOnly = false;
+		for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
+			if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
+				soloOnly = true;
+				break;
+			}
+
+		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+			if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
+				soloOnly = true;
+				break;
+			}
+		}
+		if ((soloOnly && drum.sampler.state != 2) || ((!soloOnly) && drum.sampler.state == 1)) {
+			cucss = 'samplerDrumMuteBg';
+			licss = 'samplerDrumMuteLine';
+		}
 		if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
 
 			let interpane: TileRectangle = {
@@ -29,7 +47,7 @@ class SamplerBar {
 					, xx, yy + globalCommandDispatcher.cfg().samplerDotHeight
 					, xx + durationLen, yy + globalCommandDispatcher.cfg().samplerDotHeight / 2
 				]
-				, css: 'samplerDrumDotLine'
+				, css: licss//'samplerDrumDotLine'
 			};
 			anchor.content.push(bgline);
 
@@ -42,17 +60,6 @@ class SamplerBar {
 			};
 			anchor.content.push(ply);
 			if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
-				/*let idot: TileRectangle = {
-					x: xx + globalCommandDispatcher.cfg().samplerDotHeight / 16
-					, y: yy + globalCommandDispatcher.cfg().samplerDotHeight * (1 / 2 - 1 / 16)
-					, w: globalCommandDispatcher.cfg().samplerDotHeight / 8
-					, h: globalCommandDispatcher.cfg().samplerDotHeight / 8
-					, rx: globalCommandDispatcher.cfg().samplerDotHeight / 16
-					, ry: globalCommandDispatcher.cfg().samplerDotHeight / 16
-					, css: 'samplerDrumDotActive'
-				};
-				anchor.content.push(idot);
-				*/
 				let yShift = 0.3;
 				if (zoomLevel < 2) yShift = 0.2;
 				if (zoomLevel < 1) yShift = 0.15;

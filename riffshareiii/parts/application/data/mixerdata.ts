@@ -24,12 +24,20 @@ type MixerData = {
 */
 function saveText2localStorage(name: string, text: string) {
 	//console.log('saveText2localStorage', name, text);
-	localStorage.setItem(name, text);
+	let lzu = new LZUtil();
+	let cmpr: string = lzu.compressToUTF16(text);
+	//localStorage.setItem(name, text);
+	localStorage.setItem(name, cmpr);
+	console.log('saveText2localStorage', name, text.length, '->', cmpr.length);
 }
 
 function readTextFromlocalStorage(name: string): string {
 	try {
-		let o = localStorage.getItem(name);
+		//let o = localStorage.getItem(name);
+		let cmpr = localStorage.getItem(name);
+		let lzu = new LZUtil();
+		let o = lzu.decompressFromUTF16(cmpr);
+		console.log('readTextFromlocalStorage', name, ('' + cmpr).length, '->', ('' + o).length);
 		if (o) {
 			return o;
 		} else {
@@ -42,7 +50,11 @@ function readTextFromlocalStorage(name: string): string {
 }
 function readObjectFromlocalStorage(name: string): any {
 	try {
-		let txt = localStorage.getItem(name);
+		//let txt = localStorage.getItem(name);
+		let cmpr = localStorage.getItem(name);
+		let lzu = new LZUtil();
+		let txt = lzu.decompressFromUTF16(cmpr);
+		console.log('readObjectFromlocalStorage', name, ('' + cmpr).length, '->', ('' + txt).length);
 		if (txt) {
 			let o = JSON.parse(txt);
 			return o;

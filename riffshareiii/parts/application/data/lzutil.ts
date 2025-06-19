@@ -460,6 +460,7 @@ class LZUtil {
 
 }
 /*
+console.log('===lztest');
 let teststring = 'Mar 12, 2022 — LZ-based compression algorithm for TypeScript projects (Browser, Node.js). Latest version: 1.1.2, last published: 3 years ago. WebAudioFont is a set of resources and associated technology that uses sample-based synthesis to play musical instruments in the browser. You can choose from thousands of instrument, see Catalog. Это значит, что можно запустить приложение с одним набором зависимостей, а рядом — второе с другим. Это значит, что можно сохранить все связки приложения, упаковать его в контейнер и деплоить где угодно — и знать, что оно точно запустится. Есть нюансы с переходом между ARM-архитектурой и x86, но в целом контейнеры универсальны. Для быстрого создания какого-то продукта часто используют различные open source решения. Но применение открытого ПО несёт в себе определённые риски: от финансовых до юридических. Потому что разработка на базе ПО с открытым исходным кодом не означает бесконтрольное использование созданных на этом коде продуктов из-за действия соответствующей лицензии: BSD, GNU, MIT, LGPL, AGPL, BSPL, SSPL, Demoware License, Apache License 2.0, RSAL и других. А в соответствии со статьями 1252 и 1301 ГК РФ иски о нарушении лицензионного права предъявляются к юридическому лицу, использующему указанное программное обеспечение. ';
 
 console.log(teststring);
@@ -474,4 +475,5 @@ let dcp = lzu.decompressFromUTF16(cmpr);
 console.log(dcp);
 if (dcp)
 	console.log(dcp.length);
+	
 	*/

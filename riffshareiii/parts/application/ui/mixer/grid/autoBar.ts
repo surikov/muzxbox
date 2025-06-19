@@ -5,7 +5,7 @@ class AutomationBarContent {
 		, zIndex: number) {
 		let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
 		let top = globalCommandDispatcher.cfg().automationTop();
-		let css = 'automationBgDot';
+
 		if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
 
 			let interpane: TileRectangle = {
@@ -23,6 +23,10 @@ class AutomationBarContent {
 		for (let aa = 0; aa < globalCommandDispatcher.cfg().data.filters.length; aa++) {
 			let filter = globalCommandDispatcher.cfg().data.filters[aa];
 			if (filter.automation[barIdx]) {
+				let css = 'automationBgDot';
+				if (filter.state > 0) {
+					css = 'automationMuteDot';
+				}
 				let measure: Zvoog_FilterMeasure = filter.automation[barIdx];
 				for (let ii = 0; ii < measure.changes.length; ii++) {
 					let change = measure.changes[ii];
@@ -36,16 +40,6 @@ class AutomationBarContent {
 					};
 					barOctaveAnchor.content.push(aubtn);
 					if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
-						/*let idot: TileRectangle = {
-							x: xx + globalCommandDispatcher.cfg().autoPointHeight  /16
-							, y: top + globalCommandDispatcher.cfg().autoPointHeight /16+globalCommandDispatcher.cfg().autoPointHeight * aa
-							, w: globalCommandDispatcher.cfg().autoPointHeight / 8
-							, h: globalCommandDispatcher.cfg().autoPointHeight / 8
-							, rx: globalCommandDispatcher.cfg().autoPointHeight / 16
-							, ry: globalCommandDispatcher.cfg().autoPointHeight / 16
-							, css: 'automationFocusedDot'
-						};
-						barOctaveAnchor.content.push(idot);*/
 						let yShift = 2 * 0.4;
 						if (zIndex < 2) yShift = 2 * 0.27;
 						if (zIndex < 1) yShift = 2 * 0.20;
@@ -57,26 +51,6 @@ class AutomationBarContent {
 							, css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zIndex
 						};
 						barOctaveAnchor.content.push(editIcon);
-						/*
-												if (zIndex < globalCommandDispatcher.cfg().zoomAuxLess) {
-													let dragCircle: TileRectangle = {
-														x: xx + globalCommandDispatcher.cfg().autoPointHeight * (1 / 4 - 1 / 64)
-														, y: top + globalCommandDispatcher.cfg().autoPointHeight * (1 / 4 - 1 / 100) + globalCommandDispatcher.cfg().autoPointHeight * aa //+ yShift
-														, w: globalCommandDispatcher.cfg().autoPointHeight / 8
-														, h: globalCommandDispatcher.cfg().autoPointHeight / 8
-														, rx: globalCommandDispatcher.cfg().autoPointHeight / 16
-														, ry: globalCommandDispatcher.cfg().autoPointHeight / 16
-														, css: 'samplerDrumDragSpot'
-													};
-													barOctaveAnchor.content.push(dragCircle);
-													let dragIcon: TileText = {
-														x: xx + globalCommandDispatcher.cfg().autoPointHeight / 4
-														, y: top + globalCommandDispatcher.cfg().autoPointHeight / 4 + globalCommandDispatcher.cfg().autoPointHeight * aa + yShift
-														, text: icon_leftright
-														, css: 'samplerDrumDragIcon' 
-													};
-													barOctaveAnchor.content.push(dragIcon);
-												}*/
 					}
 				}
 

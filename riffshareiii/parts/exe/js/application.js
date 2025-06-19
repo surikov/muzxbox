@@ -2055,24 +2055,6 @@ class TimeSelectBar {
         };
         measureAnchor.content.push(bpm);
     }
-    fillSelectionMenu() {
-        let zz = zoomPrefixLevelsCSS.length - 1;
-        let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
-        let opt1 = {
-            x: 0,
-            y: 0,
-            w: size,
-            h: size,
-            rx: size / 2,
-            ry: size / 2,
-            css: 'timeMarkButtonCircle128',
-            activation: (x, y) => {
-                console.log('selection menu');
-            }
-        };
-        this.selectBarAnchor.content.push(opt1);
-        console.log(this.selectBarAnchor);
-    }
     fillTimeBar() {
         this.selectBarAnchor.ww = globalCommandDispatcher.cfg().wholeWidth();
         this.selectBarAnchor.hh = globalCommandDispatcher.cfg().wholeHeight();
@@ -2141,7 +2123,6 @@ class TimeSelectBar {
             }
         }
         this.selectBarAnchor.content = this.zoomAnchors;
-        this.fillSelectionMenu();
         this.updateTimeSelectionBar();
     }
 }
@@ -3236,21 +3217,41 @@ class LeftPanel {
                 css: 'titleLabel' + zoomPrefixLevelsCSS[zz].prefix
             };
             this.leftZoomAnchors[zz].content.push(titleLabel);
+            let soloOnly = false;
+            for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
+                if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
+                    soloOnly = true;
+                    break;
+                }
+            for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+                if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
+                    soloOnly = true;
+                    break;
+                }
+            }
             if (zz < 5) {
                 if (globalCommandDispatcher.cfg().data.tracks.length > 0) {
+                    let preCSS = 'firstTrackLabel';
+                    if ((soloOnly && globalCommandDispatcher.cfg().data.tracks[0].performer.state != 2) || ((!soloOnly) && globalCommandDispatcher.cfg().data.tracks[0].performer.state == 1)) {
+                        preCSS = 'firstTrackMute';
+                    }
                     let trackLabel = {
                         x: 0,
                         y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight(),
                         text: globalCommandDispatcher.cfg().data.tracks[0].title,
-                        css: 'firstTrackLabel' + zoomPrefixLevelsCSS[zz].prefix
+                        css: preCSS + zoomPrefixLevelsCSS[zz].prefix
                     };
                     this.leftZoomAnchors[zz].content.push(trackLabel);
                     for (let tr = 1; tr < globalCommandDispatcher.cfg().data.tracks.length; tr++) {
+                        let preCSS = 'otherTrackLabel';
+                        if ((soloOnly && globalCommandDispatcher.cfg().data.tracks[tr].performer.state != 2) || ((!soloOnly) && globalCommandDispatcher.cfg().data.tracks[tr].performer.state == 1)) {
+                            preCSS = 'otherTrackMute';
+                        }
                         let trackLabel = {
                             x: 0,
                             y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - (1 + tr) * globalCommandDispatcher.cfg().notePathHeight,
                             text: globalCommandDispatcher.cfg().data.tracks[tr].title,
-                            css: 'otherTrackLabel' + zoomPrefixLevelsCSS[zz].prefix
+                            css: preCSS + zoomPrefixLevelsCSS[zz].prefix
                         };
                         this.leftZoomAnchors[zz].content.push(trackLabel);
                     }
@@ -3258,13 +3259,17 @@ class LeftPanel {
             }
             if (zz < 5) {
                 for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++) {
+                    let preCSS = 'samplerRowLabel';
+                    if ((soloOnly && globalCommandDispatcher.cfg().data.percussions[ss].sampler.state != 2) || ((!soloOnly) && globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 1)) {
+                        preCSS = 'samplerMuteLabel';
+                    }
                     let samplerLabel = {
                         text: '' + globalCommandDispatcher.cfg().data.percussions[ss].title,
                         x: 0,
                         y: globalCommandDispatcher.cfg().samplerTop()
                             + globalCommandDispatcher.cfg().samplerDotHeight * (1 + ss)
                             - globalCommandDispatcher.cfg().samplerDotHeight * 0.3,
-                        css: 'samplerRowLabel' + zoomPrefixLevelsCSS[zz].prefix
+                        css: preCSS + zoomPrefixLevelsCSS[zz].prefix
                     };
                     this.leftZoomAnchors[zz].content.push(samplerLabel);
                 }
@@ -3272,13 +3277,17 @@ class LeftPanel {
             if (zz < 5) {
                 for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
                     let filter = globalCommandDispatcher.cfg().data.filters[ff];
+                    let preCSS = 'autoRowLabel';
+                    if (filter.state == 1) {
+                        preCSS = 'autoMuteLabel';
+                    }
                     let autoLabel = {
                         text: '' + filter.title,
                         x: 0,
                         y: globalCommandDispatcher.cfg().automationTop()
                             + (1 + ff) * globalCommandDispatcher.cfg().autoPointHeight
                             - 0.3 * globalCommandDispatcher.cfg().autoPointHeight,
-                        css: 'autoRowLabel' + zoomPrefixLevelsCSS[zz].prefix
+                        css: preCSS + zoomPrefixLevelsCSS[zz].prefix
                     };
                     this.leftZoomAnchors[zz].content.push(autoLabel);
                 }
@@ -3294,6 +3303,23 @@ class SamplerBar {
         let yy = globalCommandDispatcher.cfg().samplerTop() + drumIdx * globalCommandDispatcher.cfg().samplerDotHeight;
         let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
         let cucss = 'samplerDrumDotBg';
+        let licss = 'samplerDrumDotLine';
+        let soloOnly = false;
+        for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
+            if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
+                soloOnly = true;
+                break;
+            }
+        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+            if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
+                soloOnly = true;
+                break;
+            }
+        }
+        if ((soloOnly && drum.sampler.state != 2) || ((!soloOnly) && drum.sampler.state == 1)) {
+            cucss = 'samplerDrumMuteBg';
+            licss = 'samplerDrumMuteLine';
+        }
         if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
             let interpane = {
                 x: anchor.xx,
@@ -3313,7 +3339,7 @@ class SamplerBar {
                     xx, yy + globalCommandDispatcher.cfg().samplerDotHeight,
                     xx + durationLen, yy + globalCommandDispatcher.cfg().samplerDotHeight / 2
                 ],
-                css: 'samplerDrumDotLine'
+                css: licss
             };
             anchor.content.push(bgline);
             let ply = {
@@ -3384,15 +3410,46 @@ class OctaveContent {
     }
     addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, zoomLevel) {
         if (globalCommandDispatcher.cfg().data.tracks.length) {
+            let soloOnly = false;
+            for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
+                if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
+                    soloOnly = true;
+                    break;
+                }
+            for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+                if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
+                    soloOnly = true;
+                    break;
+                }
+            }
             let track = globalCommandDispatcher.cfg().data.tracks[0];
             let css = 'mixNoteLine';
+            if ((soloOnly && track.performer.state != 2) || ((!soloOnly) && track.performer.state == 1)) {
+                css = 'mixMuteLine';
+            }
             this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, true, zoomLevel);
         }
     }
     addOtherNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, zoomLevel) {
+        let soloOnly = false;
+        for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
+            if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
+                soloOnly = true;
+                break;
+            }
+        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+            if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
+                soloOnly = true;
+                break;
+            }
+        }
         for (let ii = 1; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
             let track = globalCommandDispatcher.cfg().data.tracks[ii];
-            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, 'mixNoteSub', false, zoomLevel);
+            let css = 'mixNoteSub';
+            if ((soloOnly && track.performer.state != 2) || ((!soloOnly) && track.performer.state == 1)) {
+                css = 'mixMuteSub';
+            }
+            this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, false, zoomLevel);
         }
     }
     addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, interact, zoomLevel) {
@@ -3910,7 +3967,6 @@ class AutomationBarContent {
     constructor(barIdx, barLeft, barOctaveAnchor, zIndex) {
         let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
         let top = globalCommandDispatcher.cfg().automationTop();
-        let css = 'automationBgDot';
         if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
             let interpane = {
                 x: barOctaveAnchor.xx,
@@ -3925,6 +3981,10 @@ class AutomationBarContent {
         for (let aa = 0; aa < globalCommandDispatcher.cfg().data.filters.length; aa++) {
             let filter = globalCommandDispatcher.cfg().data.filters[aa];
             if (filter.automation[barIdx]) {
+                let css = 'automationBgDot';
+                if (filter.state > 0) {
+                    css = 'automationMuteDot';
+                }
                 let measure = filter.automation[barIdx];
                 for (let ii = 0; ii < measure.changes.length; ii++) {
                     let change = measure.changes[ii];
@@ -5382,11 +5442,17 @@ class WarningUI {
     }
 }
 function saveText2localStorage(name, text) {
-    localStorage.setItem(name, text);
+    let lzu = new LZUtil();
+    let cmpr = lzu.compressToUTF16(text);
+    localStorage.setItem(name, cmpr);
+    console.log('saveText2localStorage', name, text.length, '->', cmpr.length);
 }
 function readTextFromlocalStorage(name) {
     try {
-        let o = localStorage.getItem(name);
+        let cmpr = localStorage.getItem(name);
+        let lzu = new LZUtil();
+        let o = lzu.decompressFromUTF16(cmpr);
+        console.log('readTextFromlocalStorage', name, ('' + cmpr).length, '->', ('' + o).length);
         if (o) {
             return o;
         }
@@ -5401,7 +5467,10 @@ function readTextFromlocalStorage(name) {
 }
 function readObjectFromlocalStorage(name) {
     try {
-        let txt = localStorage.getItem(name);
+        let cmpr = localStorage.getItem(name);
+        let lzu = new LZUtil();
+        let txt = lzu.decompressFromUTF16(cmpr);
+        console.log('readObjectFromlocalStorage', name, ('' + cmpr).length, '->', ('' + txt).length);
         if (txt) {
             let o = JSON.parse(txt);
             return o;
