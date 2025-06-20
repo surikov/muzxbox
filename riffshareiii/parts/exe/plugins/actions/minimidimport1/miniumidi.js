@@ -1722,14 +1722,42 @@ class Projectr {
                 break;
             }
         }
-        if (program == 51)
+        if (program == 16)
             re.ratio = 0.4;
-        if (program == 89)
+        if (program == 19)
+            re.ratio = 0.4;
+        if (program == 27)
+            re.ratio = 0.85;
+        if (program == 32)
+            re.ratio = 0.95;
+        if (program == 33)
+            re.ratio = 0.95;
+        if (program == 34)
+            re.ratio = 0.95;
+        if (program == 35)
+            re.ratio = 0.95;
+        if (program == 36)
+            re.ratio = 0.95;
+        if (program == 37)
+            re.ratio = 0.95;
+        if (program == 38)
+            re.ratio = 0.95;
+        if (program == 39)
+            re.ratio = 0.95;
+        if (program == 48)
+            re.ratio = 0.4;
+        if (program == 49)
             re.ratio = 0.4;
         if (program == 50)
             re.ratio = 0.5;
-        if (program == 27)
-            re.ratio = 0.85;
+        if (program == 51)
+            re.ratio = 0.4;
+        if (program == 65)
+            re.ratio = 0.99;
+        if (program == 80)
+            re.ratio = 0.3;
+        if (program == 89)
+            re.ratio = 0.4;
         return re;
     }
     ;
