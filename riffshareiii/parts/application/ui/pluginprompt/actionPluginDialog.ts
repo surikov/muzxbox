@@ -33,6 +33,7 @@ class ActionPluginDialog {
 						let project: Zvoog_Project = message.pluginData;
 						globalCommandDispatcher.registerWorkProject(project);
 						globalCommandDispatcher.resetProject();
+						globalCommandDispatcher.reStartPlayIfPlay();
 					});
 					if (message.done) {
 						me.closeActionDialogFrame();

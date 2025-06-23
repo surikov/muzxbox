@@ -203,7 +203,7 @@ cursor:col-resize;
 .stepPartDelimiter{
 	fill2: var(--line-color);
 
-	fill-opacity2:25%;
+	fill-opacity:9%;
     stroke2: none;
 
 	fill22: url(#verticalBorderLine);;

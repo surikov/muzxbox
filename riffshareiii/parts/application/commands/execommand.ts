@@ -162,14 +162,18 @@ class CommandExe {
 			//let cmd = globalCommandDispatcher.cfg().data.undo.shift();
 			globalCommandDispatcher.cfg().data.undo.splice(0,unCnt-3210);
 		}*/
-		//console.log('undo len ', globalCommandDispatcher.cfg().data.undo.length);
+		console.log('undo len ', globalCommandDispatcher.undo());
 		let actionCount = 0;
 		for (let ii = 0; ii < globalCommandDispatcher.undo().length; ii++) {
 			let one = globalCommandDispatcher.undo()[ii];
+
 			actionCount = actionCount + one.actions.length;
-			if (actionCount > 20123) {
-				console.log('cut undo ', ii, 'from', globalCommandDispatcher.undo().length);
+			console.log(ii, actionCount);
+			if (actionCount > 54321) {
+				console.log('cut undo ', ii, 'from', actionCount);
 				globalCommandDispatcher.undo().splice(0, ii);
+				//globalCommandDispatcher.spliseUndo(ii);
+				console.log('now undo', globalCommandDispatcher.undo().length);
 				globalCommandDispatcher.clearRedo();
 				break;
 			}
@@ -178,7 +182,7 @@ class CommandExe {
 		//console.log('undo len',calc.length/1000,'kb');
 	}
 	undo(cnt: number) {
-		console.log('undo',cnt,globalCommandDispatcher.undo(),globalCommandDispatcher.redo());
+		console.log('undo', cnt, globalCommandDispatcher.undo(), globalCommandDispatcher.redo());
 		if (this.lockUndoRedo) {
 			console.log('lockUndoRedo');
 		} else {

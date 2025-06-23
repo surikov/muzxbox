@@ -179,6 +179,7 @@ class Projectr {
 		let change = this.findLastChange(midiSongData, fromMs);
 		let meter: Zvoog_Metre = this.findLastMeter(midiSongData, fromMs, barIdx);
 		let duration = this.calcMeasureDuration(midiSongData, meter, change.bpm, 1, fromMs);
+		console.log(barIdx, fromMs + ' + ' + duration + ' = ' + (fromMs + duration), change.bpm, meter);
 		let measure: ImportMeasure = {
 			tempo: change.bpm
 			, metre: meter
@@ -192,7 +193,8 @@ class Projectr {
 	findLastChange(midiSongData: MIDISongData, beforeMs: number): { track: number, ms: number, resolution: number, bpm: number } {
 		let nextChange: { track: number, ms: number, resolution: number, bpm: number } = { track: 0, ms: 0, resolution: 0, bpm: 120 };
 		for (let ii = 1; ii < midiSongData.changes.length; ii++) {
-			if (midiSongData.changes[ii].ms > beforeMs + 1) {
+			//if (midiSongData.changes[ii].ms > beforeMs + 1) {
+			if (midiSongData.changes[ii].ms > beforeMs + 1000) {
 				break;
 			}
 			nextChange = midiSongData.changes[ii];
@@ -201,6 +203,7 @@ class Projectr {
 	}
 
 	findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): Zvoog_Metre {
+		//console.log('findLastMeter',barIdx,beforeMs);
 		let metre: Zvoog_Metre = {
 			count: midiSongData.meter.count
 			, part: midiSongData.meter.division
@@ -208,9 +211,11 @@ class Projectr {
 		let midimeter: { track: number, ms: number, count: number, division: number } = { track: 0, ms: 0, count: 4, division: 4 };
 		for (let mi = 0; mi < midiSongData.meters.length; mi++) {
 			if (midiSongData.meters[mi].ms > beforeMs + 1 + barIdx * 3) {
+				//if (midiSongData.meters[mi].ms > beforeMs + 500) {
 				break;
 			}
 			midimeter = midiSongData.meters[mi];
+			//console.log(midiSongData.meters[mi].ms);
 		}
 		metre.count = midimeter.count;
 		metre.part = midimeter.division;
@@ -357,7 +362,7 @@ class Projectr {
 				break;
 			}
 		}
-		
+
 		if (program == 16) re.ratio = 0.4;
 		if (program == 19) re.ratio = 0.4;
 
@@ -382,7 +387,7 @@ class Projectr {
 		if (program == 80) re.ratio = 0.3;
 		if (program == 89) re.ratio = 0.4;
 
-		
+
 
 		//console.log('program', program, 'not found set 0');
 		return re;

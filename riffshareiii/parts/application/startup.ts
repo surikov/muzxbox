@@ -21,6 +21,7 @@ function startApplication() {
 		if (undocommands) {
 			if (undocommands.length) {
 				globalCommandDispatcher.undoQueue = undocommands;
+				console.log(undocommands);
 			}
 		}
 		let redocommands = readObjectFromlocalStorage('redocommands');

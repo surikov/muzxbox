@@ -55,6 +55,11 @@ class CommandDispatcher {
 
 		input.click();
 	}
+	/*spliseUndo(cnt:number): void {
+		console.log('from',this.undoQueue.length);
+		this.undoQueue.splice(0, 11);
+		console.log('to',this.undoQueue.length);
+	}*/
 	undo(): Zvoog_UICommand[] {
 		return this.undoQueue;
 	}

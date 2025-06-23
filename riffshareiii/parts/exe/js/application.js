@@ -248,6 +248,7 @@ function startApplication() {
         if (undocommands) {
             if (undocommands.length) {
                 globalCommandDispatcher.undoQueue = undocommands;
+                console.log(undocommands);
             }
         }
         let redocommands = readObjectFromlocalStorage('redocommands');
@@ -672,6 +673,7 @@ class ActionPluginDialog {
                         let project = message.pluginData;
                         globalCommandDispatcher.registerWorkProject(project);
                         globalCommandDispatcher.resetProject();
+                        globalCommandDispatcher.reStartPlayIfPlay();
                     });
                     if (message.done) {
                         me.closeActionDialogFrame();
@@ -1060,13 +1062,16 @@ class CommandExe {
         }
     }
     cutLongUndo() {
+        console.log('undo len ', globalCommandDispatcher.undo());
         let actionCount = 0;
         for (let ii = 0; ii < globalCommandDispatcher.undo().length; ii++) {
             let one = globalCommandDispatcher.undo()[ii];
             actionCount = actionCount + one.actions.length;
-            if (actionCount > 20123) {
-                console.log('cut undo ', ii, 'from', globalCommandDispatcher.undo().length);
+            console.log(ii, actionCount);
+            if (actionCount > 54321) {
+                console.log('cut undo ', ii, 'from', actionCount);
                 globalCommandDispatcher.undo().splice(0, ii);
+                console.log('now undo', globalCommandDispatcher.undo().length);
                 globalCommandDispatcher.clearRedo();
                 break;
             }
@@ -5470,7 +5475,7 @@ function readObjectFromlocalStorage(name) {
         let cmpr = localStorage.getItem(name);
         let lzu = new LZUtil();
         let txt = lzu.decompressFromUTF16(cmpr);
-        console.log('readObjectFromlocalStorage', name, ('' + cmpr).length, '->', ('' + txt).length);
+        console.log('readObjectFromlocalStorage', name, Math.round(('' + cmpr).length / 1000) + 'kb', '->', Math.round(('' + txt).length / 1000) + 'kb');
         if (txt) {
             let o = JSON.parse(txt);
             return o;

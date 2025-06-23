@@ -54,7 +54,9 @@ function readObjectFromlocalStorage(name: string): any {
 		let cmpr = localStorage.getItem(name);
 		let lzu = new LZUtil();
 		let txt = lzu.decompressFromUTF16(cmpr);
-		console.log('readObjectFromlocalStorage', name, ('' + cmpr).length, '->', ('' + txt).length);
+		console.log('readObjectFromlocalStorage', name
+			, Math.round(('' + cmpr).length / 1000) + 'kb'
+			, '->', Math.round(('' + txt).length/ 1000) + 'kb');
 		if (txt) {
 			let o = JSON.parse(txt);
 			return o;

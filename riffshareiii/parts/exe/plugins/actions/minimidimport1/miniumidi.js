@@ -950,7 +950,7 @@ class ChordPitchPerformerUtil {
             "0240_Aspirin_sf2_file", "0240_GeneralUserGS_sf2_file", "0240_Chaos_sf2_file", "0240_FluidR3_GM_sf2_file", "0240_JCLive_sf2_file", "0240_LK_Godin_Nylon_SF2_file", "0240_SBLive_sf2", "0240_SoundBlasterOld_sf2", "0241_GeneralUserGS_sf2_file", "0241_JCLive_sf2_file", "0242_JCLive_sf2_file", "0243_JCLive_sf2_file",
             "0250_Aspirin_sf2_file", "0250_GeneralUserGS_sf2_file", "0253_Acoustic_Guitar_sf2_file", "0250_Chaos_sf2_file", "0250_FluidR3_GM_sf2_file", "0250_JCLive_sf2_file", "0250_LK_AcousticSteel_SF2_file", "0250_SBLive_sf2", "0250_SoundBlasterOld_sf2", "0251_Acoustic_Guitar_sf2_file", "0251_GeneralUserGS_sf2_file", "0252_Acoustic_Guitar_sf2_file", "0252_GeneralUserGS_sf2_file", "0253_Acoustic_Guitar_sf2_file", "0253_GeneralUserGS_sf2_file", "0254_Acoustic_Guitar_sf2_file", "0254_GeneralUserGS_sf2_file", "0255_GeneralUserGS_sf2_file",
             "0260_GeneralUserGS_sf2_file", "0260_Aspirin_sf2_file", "0260_Chaos_sf2_file", "0260_FluidR3_GM_sf2_file", "0260_JCLive_sf2_file", "0260_SBLive_sf2", "0260_SoundBlasterOld_sf2", "0260_Stratocaster_sf2_file", "0261_GeneralUserGS_sf2_file", "0261_SoundBlasterOld_sf2", "0261_Stratocaster_sf2_file", "0262_Stratocaster_sf2_file",
-            "0270_GeneralUserGS_sf2_file", "0270_FluidR3_GM_sf2_file", "0270_JCLive_sf2_file", "0270_Stratocaster_sf2_file", "0270_Aspirin_sf2_file", "0270_Chaos_sf2_file", "0270_Gibson_Les_Paul_sf2_file", "0270_SBAWE32_sf2_file", "0270_SBLive_sf2", "0270_SoundBlasterOld_sf2", "0271_GeneralUserGS_sf2_file", "0271_Stratocaster_sf2_file", "0272_Stratocaster_sf2_file",
+            "0270_Aspirin_sf2_file", "0270_GeneralUserGS_sf2_file", "0270_FluidR3_GM_sf2_file", "0270_JCLive_sf2_file", "0270_Stratocaster_sf2_file", "0270_Chaos_sf2_file", "0270_Gibson_Les_Paul_sf2_file", "0270_SBAWE32_sf2_file", "0270_SBLive_sf2", "0270_SoundBlasterOld_sf2", "0271_GeneralUserGS_sf2_file", "0271_Stratocaster_sf2_file", "0272_Stratocaster_sf2_file",
             "0280_GeneralUserGS_sf2_file", "0280_Aspirin_sf2_file", "0280_Chaos_sf2_file", "0280_FluidR3_GM_sf2_file", "0280_JCLive_sf2_file", "0280_LesPaul_sf2", "0280_LesPaul_sf2_file", "0280_SBAWE32_sf2_file", "0280_SBLive_sf2", "0280_SoundBlasterOld_sf2", "0281_Aspirin_sf2_file", "0281_FluidR3_GM_sf2_file", "0281_GeneralUserGS_sf2_file", "0282_FluidR3_GM_sf2_file", "0282_GeneralUserGS_sf2_file", "0283_GeneralUserGS_sf2_file",
             "0290_GeneralUserGS_sf2_file", "0292_Aspirin_sf2_file", "0290_SBAWE32_sf2_file", "0290_Aspirin_sf2_file", "0290_Chaos_sf2_file", "0290_FluidR3_GM_sf2_file", "0290_JCLive_sf2_file", "0290_LesPaul_sf2", "0290_LesPaul_sf2_file", "0290_SBLive_sf2", "0290_SoundBlasterOld_sf2", "0291_Aspirin_sf2_file", "0291_LesPaul_sf2", "0291_LesPaul_sf2_file", "0291_SBAWE32_sf2_file", "0291_SoundBlasterOld_sf2", "0292_LesPaul_sf2", "0292_LesPaul_sf2_file",
             "0300_LesPaul_sf2_file", "0300_FluidR3_GM_sf2_file", "0300_SBAWE32_sf2_file", "0300_Chaos_sf2_file", "0300_SBLive_sf2", "0300_Aspirin_sf2_file", "0300_GeneralUserGS_sf2_file", "0300_JCLive_sf2_file", "0300_LesPaul_sf2", "0300_SoundBlasterOld_sf2", "0301_Aspirin_sf2_file", "0301_FluidR3_GM_sf2_file", "0301_GeneralUserGS_sf2_file", "0301_JCLive_sf2_file", "0301_LesPaul_sf2", "0301_LesPaul_sf2_file", "0302_Aspirin_sf2_file", "0302_GeneralUserGS_sf2_file", "0302_JCLive_sf2_file", "0303_Aspirin_sf2_file", "0304_Aspirin_sf2_file",
@@ -977,7 +977,7 @@ class ChordPitchPerformerUtil {
             "0510_Aspirin_sf2_file", "0510_SBLive_sf2", "0510_GeneralUserGS_sf2_file", "0510_Chaos_sf2_file", "0510_FluidR3_GM_sf2_file", "0510_JCLive_sf2_file", "0510_SoundBlasterOld_sf2", "0511_GeneralUserGS_sf2_file", "0511_SoundBlasterOld_sf2",
             "0520_JCLive_sf2_file", "0520_GeneralUserGS_sf2_file", "0520_Aspirin_sf2_file", "0520_Chaos_sf2_file", "0520_FluidR3_GM_sf2_file", "0520_SBLive_sf2", "0520_Soul_Ahhs_sf2_file", "0520_SoundBlasterOld_sf2", "0521_FluidR3_GM_sf2_file", "0521_Soul_Ahhs_sf2_file", "0521_SoundBlasterOld_sf2", "0522_Soul_Ahhs_sf2_file",
             "0530_GeneralUserGS_sf2_file", "0530_Aspirin_sf2_file", "0530_Chaos_sf2_file", "0530_FluidR3_GM_sf2_file", "0530_JCLive_sf2_file", "0530_SBLive_sf2", "0530_Soul_Ahhs_sf2_file", "0530_SoundBlasterOld_sf2", "0531_FluidR3_GM_sf2_file", "0531_GeneralUserGS_sf2_file", "0531_JCLive_sf2_file", "0531_SoundBlasterOld_sf2",
-            "0540_GeneralUserGS_sf2_file", "0540_Aspirin_sf2_file", "0540_Chaos_sf2_file", "0540_FluidR3_GM_sf2_file", "0540_JCLive_sf2_file", "0540_SBLive_sf2", "0540_SoundBlasterOld_sf2", "0541_FluidR3_GM_sf2_file",
+            "0540_JCLive_sf2_file", "0540_GeneralUserGS_sf2_file", "0540_Aspirin_sf2_file", "0540_Chaos_sf2_file", "0540_FluidR3_GM_sf2_file", "0540_SBLive_sf2", "0540_SoundBlasterOld_sf2", "0541_FluidR3_GM_sf2_file",
             "0550_GeneralUserGS_sf2_file", "0550_Aspirin_sf2_file", "0550_Chaos_sf2_file", "0550_FluidR3_GM_sf2_file", "0550_JCLive_sf2_file", "0550_SBLive_sf2", "0550_SoundBlasterOld_sf2", "0551_Aspirin_sf2_file", "0551_FluidR3_GM_sf2_file",
             "0560_Aspirin_sf2_file", "0560_GeneralUserGS_sf2_file", "0560_Chaos_sf2_file", "0560_FluidR3_GM_sf2_file", "0560_JCLive_sf2_file", "0560_SBLive_sf2", "0560_SoundBlasterOld_sf2",
             "0570_GeneralUserGS_sf2_file", "0570_Aspirin_sf2_file", "0570_Chaos_sf2_file", "0570_FluidR3_GM_sf2_file", "0570_JCLive_sf2_file", "0570_SBLive_sf2", "0570_SoundBlasterOld_sf2", "0571_GeneralUserGS_sf2_file",
@@ -1560,6 +1560,7 @@ class Projectr {
         let change = this.findLastChange(midiSongData, fromMs);
         let meter = this.findLastMeter(midiSongData, fromMs, barIdx);
         let duration = this.calcMeasureDuration(midiSongData, meter, change.bpm, 1, fromMs);
+        console.log(barIdx, fromMs, duration, change.bpm, meter);
         let measure = {
             tempo: change.bpm,
             metre: meter,
@@ -1571,7 +1572,7 @@ class Projectr {
     findLastChange(midiSongData, beforeMs) {
         let nextChange = { track: 0, ms: 0, resolution: 0, bpm: 120 };
         for (let ii = 1; ii < midiSongData.changes.length; ii++) {
-            if (midiSongData.changes[ii].ms > beforeMs + 1) {
+            if (midiSongData.changes[ii].ms > beforeMs + 1000) {
                 break;
             }
             nextChange = midiSongData.changes[ii];
