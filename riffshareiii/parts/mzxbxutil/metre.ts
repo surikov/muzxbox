@@ -32,6 +32,7 @@ class MZXBX_MetreMathUtil implements Zvoog_MetreMathType {
         let pp = this.part;
         let rr = pp / toPart;
         cc = Math.round(cc / rr);
+		//cc = Math.floor(cc / rr);
         pp = toPart;
         //if (cc < 1) {
         //    cc = 1;

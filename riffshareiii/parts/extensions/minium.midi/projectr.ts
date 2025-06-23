@@ -69,8 +69,8 @@ class Projectr {
 					if (pnt) {
 						pnt.skip = MMUtil().set(pnt.skip).strip(16);
 						for (let aa = 0; aa < filterVolume.automation[pnt.idx].changes.length; aa++) {
-							let sk = filterVolume.automation[pnt.idx].changes[aa].skip;
-							if (MMUtil().set(sk).equals(pnt.skip)) {
+							let volumeskip = filterVolume.automation[pnt.idx].changes[aa].skip;
+							if (MMUtil().set(volumeskip).equals(pnt.skip)) {
 								filterVolume.automation[pnt.idx].changes.splice(aa, 1);
 								break;
 							}
@@ -139,7 +139,7 @@ class Projectr {
 			}
 		}
 
-
+this.align32();
 
 
 
@@ -151,7 +151,9 @@ class Projectr {
 
 		return project;
 	}
+align32(){
 
+}
 	createTimeLine(midiSongData: MIDISongData): Zvoog_SongMeasure[] {
 		let count = 0;
 		let part = 0;
@@ -176,13 +178,19 @@ class Projectr {
 		return timeline;
 	}
 	createMeasure(midiSongData: MIDISongData, fromMs: number, barIdx: number): ImportMeasure {
-		let change = this.findLastChange(midiSongData, fromMs);
-		let meter: Zvoog_Metre = this.findLastMeter(midiSongData, fromMs, barIdx);
-		let duration = this.calcMeasureDuration(midiSongData, meter, change.bpm, 1, fromMs);
-		console.log(barIdx, fromMs + ' + ' + duration + ' = ' + (fromMs + duration), change.bpm, meter);
+		let lasthange = this.findLastChange(midiSongData, fromMs);
+		let lastmeter: Zvoog_Metre = this.findLastMeter(midiSongData, fromMs, barIdx);
+		let duration = this.calcMeasureDuration(midiSongData, lastmeter, lasthange.bpm, 1, fromMs);
+
+		lasthange = this.findLastChange(midiSongData, fromMs + duration);
+		//lastmeter = this.findLastMeter(midiSongData, fromMs + duration, barIdx);
+		//duration = this.calcMeasureDuration(midiSongData, meter, change.bpm, 1, fromMs + duration);
+
+
+		//console.log(barIdx, fromMs + ' + ' + duration + ' = ' + (fromMs + duration), change.bpm, meter);
 		let measure: ImportMeasure = {
-			tempo: change.bpm
-			, metre: meter
+			tempo: lasthange.bpm
+			, metre: lastmeter
 			, startMs: fromMs
 			, durationMs: duration
 		};
@@ -194,7 +202,7 @@ class Projectr {
 		let nextChange: { track: number, ms: number, resolution: number, bpm: number } = { track: 0, ms: 0, resolution: 0, bpm: 120 };
 		for (let ii = 1; ii < midiSongData.changes.length; ii++) {
 			//if (midiSongData.changes[ii].ms > beforeMs + 1) {
-			if (midiSongData.changes[ii].ms > beforeMs + 1000) {
+			if (midiSongData.changes[ii].ms > beforeMs + 100) {
 				break;
 			}
 			nextChange = midiSongData.changes[ii];
@@ -210,8 +218,8 @@ class Projectr {
 		};
 		let midimeter: { track: number, ms: number, count: number, division: number } = { track: 0, ms: 0, count: 4, division: 4 };
 		for (let mi = 0; mi < midiSongData.meters.length; mi++) {
-			if (midiSongData.meters[mi].ms > beforeMs + 1 + barIdx * 3) {
-				//if (midiSongData.meters[mi].ms > beforeMs + 500) {
+			//if (midiSongData.meters[mi].ms > beforeMs + 1 + barIdx * 3) {
+			if (midiSongData.meters[mi].ms > beforeMs + 100) {
 				break;
 			}
 			midimeter = midiSongData.meters[mi];
@@ -341,8 +349,9 @@ class Projectr {
 					let pitch = note.midiPitch;
 					if (pitch == drum) {
 						if (chord.when >= currentTimeMs && chord.when < currentTimeMs + measureDurationS * 1000) {
-							let skip = mm.calculate((chord.when - currentTimeMs) / 1000, nextMeasure.tempo);
-							projectMeasure.skips.push(skip);
+							let skip32 = mm.calculate((chord.when - currentTimeMs) / 1000, nextMeasure.tempo).strip(32);
+							//console.log(skip);
+							projectMeasure.skips.push(skip32);
 						}
 					}
 					//}
@@ -471,17 +480,17 @@ class Projectr {
 					&& this.numratio(midiChord.when) < (nextMeasure as any).startMs + (nextMeasure as any).durationMs //this.numratio(currentMeasureStart + measureDurationMs) - 33
 				) {
 					let trackChord: Zvoog_Chord | null = null;
-					let skip = mm.calculate((midiChord.when - (nextMeasure as any).startMs) / 1000.0, nextMeasure.tempo).strip(32);
-					if (skip.count < 0) {
-						skip.count = 0;
+					let skip32 = mm.calculate((midiChord.when - (nextMeasure as any).startMs) / 1000.0, nextMeasure.tempo).strip(32);
+					if (skip32.count < 0) {
+						skip32.count = 0;
 					}
 					for (let cc = 0; cc < projectMeasure.chords.length; cc++) {
-						if (mm.set(projectMeasure.chords[cc].skip).equals(skip)) {
+						if (mm.set(projectMeasure.chords[cc].skip).equals(skip32)) {
 							trackChord = projectMeasure.chords[cc];
 						}
 					}
 					if (trackChord == null) {
-						trackChord = { skip: skip, pitches: [], slides: [] };
+						trackChord = { skip: skip32, pitches: [], slides: [] };
 						projectMeasure.chords.push(trackChord);
 					}
 					if (trackChord) {

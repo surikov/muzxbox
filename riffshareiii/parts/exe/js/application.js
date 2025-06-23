@@ -2044,7 +2044,9 @@ class TimeSelectBar {
     createBarNumber(barLeft, barnum, zz, curBar, measureAnchor, barTime, size) {
         let mins = Math.floor(barTime / 60);
         let secs = Math.floor(barTime % 60);
-        let hunds = Math.round(100 * (barTime - Math.floor(barTime)));
+        let hunds = barTime - Math.floor(barTime);
+        hunds = hunds * 100;
+        hunds = Math.floor(hunds);
         let nm = {
             x: barLeft + size / 4,
             y: zoomPrefixLevelsCSS[zz].minZoom * 1,

@@ -125,7 +125,7 @@ function findMeasureSkipByTime(cmnt:string,time: number, measures: Zvoog_SongMea
 				}*/
 			return {
 				idx: ii
-				, skip: mm.calculate(delta, cumea.tempo)
+				, skip: mm.calculate(delta, cumea.tempo).strip(32)
 			};
 		}
 		curTime = curTime + measureDurationS;

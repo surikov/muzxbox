@@ -181,7 +181,10 @@ class TimeSelectBar {
 	) {
 		let mins = Math.floor(barTime / 60);
 		let secs = Math.floor(barTime % 60);
-		let hunds = Math.round(100 * (barTime - Math.floor(barTime)));
+		//let hunds = Math.round(100 * (barTime - Math.floor(barTime)));
+		let hunds = barTime - Math.floor(barTime);
+		hunds = hunds * 100;
+		hunds = Math.floor(hunds);
 		//let timeText = Math.round(barTime * 100) / 100;
 		let nm: TileText = {
 			x: barLeft + size / 4
@@ -200,26 +203,26 @@ class TimeSelectBar {
 		measureAnchor.content.push(bpm);
 
 	}
-/*
-	fillSelectionMenu() {
-		let zz = zoomPrefixLevelsCSS.length - 1;
-		let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
-		let opt1: TileRectangle = {
-			x: 0
-			, y: 0
-			, w: size
-			, h: size
-			, rx: size / 2
-			, ry: size / 2
-			, css: 'timeMarkButtonCircle128'
-			, activation: (x, y) => {
-				console.log('selection menu');
-
-			}
-		};
-		this.selectBarAnchor.content.push(opt1);
-		console.log(this.selectBarAnchor);
-	}*/
+	/*
+		fillSelectionMenu() {
+			let zz = zoomPrefixLevelsCSS.length - 1;
+			let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
+			let opt1: TileRectangle = {
+				x: 0
+				, y: 0
+				, w: size
+				, h: size
+				, rx: size / 2
+				, ry: size / 2
+				, css: 'timeMarkButtonCircle128'
+				, activation: (x, y) => {
+					console.log('selection menu');
+	
+				}
+			};
+			this.selectBarAnchor.content.push(opt1);
+			console.log(this.selectBarAnchor);
+		}*/
 
 	fillTimeBar() {
 		this.selectBarAnchor.ww = globalCommandDispatcher.cfg().wholeWidth();
@@ -289,6 +292,7 @@ class TimeSelectBar {
 					}
 				}
 				barLeft = barLeft + barWidth;
+				//console.log((kk+1),barTime,curMeasureMeter.duration(curBar.tempo),curBar.metre,curBar.tempo);
 				barTime = barTime + curMeasureMeter.duration(curBar.tempo);
 			}
 
