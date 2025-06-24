@@ -950,7 +950,7 @@ class ChordPitchPerformerUtil {
             "0240_Aspirin_sf2_file", "0240_GeneralUserGS_sf2_file", "0240_Chaos_sf2_file", "0240_FluidR3_GM_sf2_file", "0240_JCLive_sf2_file", "0240_LK_Godin_Nylon_SF2_file", "0240_SBLive_sf2", "0240_SoundBlasterOld_sf2", "0241_GeneralUserGS_sf2_file", "0241_JCLive_sf2_file", "0242_JCLive_sf2_file", "0243_JCLive_sf2_file",
             "0250_Aspirin_sf2_file", "0250_GeneralUserGS_sf2_file", "0253_Acoustic_Guitar_sf2_file", "0250_Chaos_sf2_file", "0250_FluidR3_GM_sf2_file", "0250_JCLive_sf2_file", "0250_LK_AcousticSteel_SF2_file", "0250_SBLive_sf2", "0250_SoundBlasterOld_sf2", "0251_Acoustic_Guitar_sf2_file", "0251_GeneralUserGS_sf2_file", "0252_Acoustic_Guitar_sf2_file", "0252_GeneralUserGS_sf2_file", "0253_Acoustic_Guitar_sf2_file", "0253_GeneralUserGS_sf2_file", "0254_Acoustic_Guitar_sf2_file", "0254_GeneralUserGS_sf2_file", "0255_GeneralUserGS_sf2_file",
             "0260_GeneralUserGS_sf2_file", "0260_Aspirin_sf2_file", "0260_Chaos_sf2_file", "0260_FluidR3_GM_sf2_file", "0260_JCLive_sf2_file", "0260_SBLive_sf2", "0260_SoundBlasterOld_sf2", "0260_Stratocaster_sf2_file", "0261_GeneralUserGS_sf2_file", "0261_SoundBlasterOld_sf2", "0261_Stratocaster_sf2_file", "0262_Stratocaster_sf2_file",
-            "0270_Aspirin_sf2_file", "0270_GeneralUserGS_sf2_file", "0270_FluidR3_GM_sf2_file", "0270_JCLive_sf2_file", "0270_Stratocaster_sf2_file", "0270_Chaos_sf2_file", "0270_Gibson_Les_Paul_sf2_file", "0270_SBAWE32_sf2_file", "0270_SBLive_sf2", "0270_SoundBlasterOld_sf2", "0271_GeneralUserGS_sf2_file", "0271_Stratocaster_sf2_file", "0272_Stratocaster_sf2_file",
+            "0270_FluidR3_GM_sf2_file", "0270_Aspirin_sf2_file", "0270_GeneralUserGS_sf2_file", "0270_JCLive_sf2_file", "0270_Stratocaster_sf2_file", "0270_Chaos_sf2_file", "0270_Gibson_Les_Paul_sf2_file", "0270_SBAWE32_sf2_file", "0270_SBLive_sf2", "0270_SoundBlasterOld_sf2", "0271_GeneralUserGS_sf2_file", "0271_Stratocaster_sf2_file", "0272_Stratocaster_sf2_file",
             "0280_GeneralUserGS_sf2_file", "0280_Aspirin_sf2_file", "0280_Chaos_sf2_file", "0280_FluidR3_GM_sf2_file", "0280_JCLive_sf2_file", "0280_LesPaul_sf2", "0280_LesPaul_sf2_file", "0280_SBAWE32_sf2_file", "0280_SBLive_sf2", "0280_SoundBlasterOld_sf2", "0281_Aspirin_sf2_file", "0281_FluidR3_GM_sf2_file", "0281_GeneralUserGS_sf2_file", "0282_FluidR3_GM_sf2_file", "0282_GeneralUserGS_sf2_file", "0283_GeneralUserGS_sf2_file",
             "0290_GeneralUserGS_sf2_file", "0292_Aspirin_sf2_file", "0290_SBAWE32_sf2_file", "0290_Aspirin_sf2_file", "0290_Chaos_sf2_file", "0290_FluidR3_GM_sf2_file", "0290_JCLive_sf2_file", "0290_LesPaul_sf2", "0290_LesPaul_sf2_file", "0290_SBLive_sf2", "0290_SoundBlasterOld_sf2", "0291_Aspirin_sf2_file", "0291_LesPaul_sf2", "0291_LesPaul_sf2_file", "0291_SBAWE32_sf2_file", "0291_SoundBlasterOld_sf2", "0292_LesPaul_sf2", "0292_LesPaul_sf2_file",
             "0300_LesPaul_sf2_file", "0300_FluidR3_GM_sf2_file", "0300_SBAWE32_sf2_file", "0300_Chaos_sf2_file", "0300_SBLive_sf2", "0300_Aspirin_sf2_file", "0300_GeneralUserGS_sf2_file", "0300_JCLive_sf2_file", "0300_LesPaul_sf2", "0300_SoundBlasterOld_sf2", "0301_Aspirin_sf2_file", "0301_FluidR3_GM_sf2_file", "0301_GeneralUserGS_sf2_file", "0301_JCLive_sf2_file", "0301_LesPaul_sf2", "0301_LesPaul_sf2_file", "0302_Aspirin_sf2_file", "0302_GeneralUserGS_sf2_file", "0302_JCLive_sf2_file", "0303_Aspirin_sf2_file", "0304_Aspirin_sf2_file",
@@ -1707,8 +1707,8 @@ class Projectr {
                     let pitch = note.midiPitch;
                     if (pitch == drum) {
                         if (chord.when >= currentTimeMs && chord.when < currentTimeMs + measureDurationS * 1000) {
-                            let skip32 = mm.calculate((chord.when - currentTimeMs) / 1000, nextMeasure.tempo).strip(32);
-                            projectMeasure.skips.push(skip32);
+                            let skip64 = mm.calculate((chord.when - currentTimeMs) / 1000, nextMeasure.tempo).strip(64);
+                            projectMeasure.skips.push(skip64);
                         }
                     }
                 }
@@ -1731,7 +1731,7 @@ class Projectr {
         if (program == 19)
             re.ratio = 0.4;
         if (program == 27)
-            re.ratio = 0.85;
+            re.ratio = 0.95;
         if (program == 32)
             re.ratio = 0.95;
         if (program == 33)
@@ -1813,17 +1813,17 @@ class Projectr {
                 if (this.numratio(midiChord.when) >= nextMeasure.startMs
                     && this.numratio(midiChord.when) < nextMeasure.startMs + nextMeasure.durationMs) {
                     let trackChord = null;
-                    let skip32 = mm.calculate((midiChord.when - nextMeasure.startMs) / 1000.0, nextMeasure.tempo).strip(32);
-                    if (skip32.count < 0) {
-                        skip32.count = 0;
+                    let skip64 = mm.calculate((midiChord.when - nextMeasure.startMs) / 1000.0, nextMeasure.tempo).strip(64);
+                    if (skip64.count < 0) {
+                        skip64.count = 0;
                     }
                     for (let cc = 0; cc < projectMeasure.chords.length; cc++) {
-                        if (mm.set(projectMeasure.chords[cc].skip).equals(skip32)) {
+                        if (mm.set(projectMeasure.chords[cc].skip).equals(skip64)) {
                             trackChord = projectMeasure.chords[cc];
                         }
                     }
                     if (trackChord == null) {
-                        trackChord = { skip: skip32, pitches: [], slides: [] };
+                        trackChord = { skip: skip64, pitches: [], slides: [] };
                         projectMeasure.chords.push(trackChord);
                     }
                     if (trackChord) {
