@@ -108,7 +108,7 @@ type MIDISongData = {
 function round1000(nn: number): number {
 	return Math.round(1000 * nn) / 1000;
 }
-function findMeasureSkipByTime(cmnt:string,time: number, measures: Zvoog_SongMeasure[]): null | { idx: number, skip: Zvoog_Metre } {
+function findMeasureSkipByTime64(cmnt:string,time: number, measures: Zvoog_SongMeasure[]): null | { idx: number, skip: Zvoog_Metre } {
 	let curTime = 0;
 	let mm = MMUtil();
 	for (let ii = 0; ii < measures.length; ii++) {
@@ -125,7 +125,7 @@ function findMeasureSkipByTime(cmnt:string,time: number, measures: Zvoog_SongMea
 				}*/
 			return {
 				idx: ii
-				, skip: mm.calculate(delta, cumea.tempo).strip(32)
+				, skip: mm.calculate(delta, cumea.tempo).strip(64)
 			};
 		}
 		curTime = curTime + measureDurationS;

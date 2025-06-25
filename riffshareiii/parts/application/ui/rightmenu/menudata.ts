@@ -1,6 +1,6 @@
 type MenuInfo = {
 	text: string;
-	lightTitle?:boolean;
+	lightTitle?: boolean;
 	noLocalization?: boolean;
 	focused?: boolean;
 	opened?: boolean;
@@ -108,7 +108,7 @@ function fillPluginsLists() {
 				info = {
 					dragTriangle: true
 					, text: label
-					
+
 					, noLocalization: true
 					, onDrag: (x: number, y: number) => {
 						if (dragStarted) {
@@ -293,6 +293,77 @@ function composeBaseMenu(): MenuInfo[] {
 					, menuPointSamplers
 				]
 			}*/
+			, {
+				text: 'Selection', children: [
+					{
+						text: 'Delete bars', onClick: () => {
+							let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
+							let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
+							let count = endMeasure - startMeasure + 1;
+							if (count >= globalCommandDispatcher.cfg().data.timeline.length) {
+								count = globalCommandDispatcher.cfg().data.timeline.length - 1;
+							}
+							console.log('start delete',startMeasure, endMeasure,globalCommandDispatcher.cfg().data.timeline.length);
+							globalCommandDispatcher.exe.commitProjectChanges([], () => {
+								globalCommandDispatcher.adjustTimelineChords();
+								for (let ii = 0; ii < count; ii++) {
+									globalCommandDispatcher.cfg().data.timeline.splice(startMeasure, 1);
+									for (let nn = 0; nn < globalCommandDispatcher.cfg().data.tracks.length; nn++) {
+										let track = globalCommandDispatcher.cfg().data.tracks[nn];
+										track.measures.splice(startMeasure, 1);
+									}
+									for (let nn = 0; nn < globalCommandDispatcher.cfg().data.percussions.length; nn++) {
+										let percu = globalCommandDispatcher.cfg().data.percussions[nn];
+										percu.measures.splice(startMeasure, 1);
+									}
+									for (let nn = 0; nn < globalCommandDispatcher.cfg().data.filters.length; nn++) {
+										let filter = globalCommandDispatcher.cfg().data.filters[nn];
+										filter.automation.splice(startMeasure, 1);
+									}
+									globalCommandDispatcher.cfg().data.comments.splice(startMeasure, 1);
+								}
+								globalCommandDispatcher.adjustTimelineChords();
+							});
+							globalCommandDispatcher.resetProject();
+							console.log('end delete',startMeasure, endMeasure,globalCommandDispatcher.cfg().data.timeline.length);
+						}
+					}, {
+						text: 'Insert bars', onClick: () => {
+							//
+						}
+
+					}, {
+						text: 'Change tempo', onClick: () => {
+							//
+						}
+					}, {
+						text: 'Change meter', onClick: () => {
+							//
+						}
+					}, {
+						text: 'Recalculate meter', onClick: () => {
+							//
+						}
+					}, {
+						text: 'Copy visibled items', onClick: () => {
+							//
+						}
+					}, {
+						text: 'Cut visibled items', onClick: () => {
+							//
+						}
+					}, {
+						text: 'Paste', onClick: () => {
+							//
+						}
+					}, {
+
+						text: 'Align to 32th', onClick: () => {
+							//
+						}
+					}
+				]
+			}
 			, {
 				text: localMenuItemSettings, children: [
 					{

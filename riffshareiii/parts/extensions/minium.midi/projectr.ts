@@ -31,7 +31,7 @@ class Projectr {
 
 		for (let ii = 0; ii < midiSongData.lyrics.length; ii++) {
 			let textpoint = midiSongData.lyrics[ii];
-			let pnt = findMeasureSkipByTime('lyrics', textpoint.ms / 1000, project.timeline);
+			let pnt = findMeasureSkipByTime64('lyrics', textpoint.ms / 1000, project.timeline);
 			if (pnt) {
 				//console.log(pnt.skip, textpoint.ms, textpoint.txt);
 				this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
@@ -63,7 +63,7 @@ class Projectr {
 				for (let vv = 0; vv < midiSongTrack.trackVolumes.length; vv++) {
 					let gain = midiSongTrack.trackVolumes[vv];
 					let vol = '' + Math.round(gain.value * 100) + '%';
-					let pnt = findMeasureSkipByTime('v' + ii, gain.ms / 1000, project.timeline);
+					let pnt = findMeasureSkipByTime64('v' + ii, gain.ms / 1000, project.timeline);
 
 					//
 					if (pnt) {
@@ -270,6 +270,7 @@ align32(){
 		let strings: string[] = txt.split('~');
 		if (strings.length) {
 			let roundN = 750;
+			MMUtil().set(skip).strip(16);
 			let nextMs = 1000 * MMUtil().set(skip).duration(tempo);
 			for (let ii = 0; ii < strings.length; ii++) {
 				let row = 0;
