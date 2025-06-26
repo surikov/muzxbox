@@ -21,8 +21,10 @@ class CommandDispatcher {
 	exe: CommandExe = new CommandExe();
 	//undoQueue: UndoRedoCommand[] = [];
 	//redoQueue: UndoRedoCommand[] = [];
-	undoQueue: Zvoog_UICommand[] = [];
-	redoQueue: Zvoog_UICommand[] = [];
+	//undoQueue: Zvoog_UICommand[] = [];
+	//redoQueue: Zvoog_UICommand[] = [];
+	undoQueue: string[] = [];
+	redoQueue: string[] = [];
 	filterPluginDialog = new FilterPluginDialog();
 	pointPluginDialog = new PointPluginDialog();
 	samplerPluginDialog = new SamplerPluginDialog();
@@ -60,10 +62,12 @@ class CommandDispatcher {
 		this.undoQueue.splice(0, 11);
 		console.log('to',this.undoQueue.length);
 	}*/
-	undo(): Zvoog_UICommand[] {
+	undo(): string[] {
+		//undo(): Zvoog_UICommand[] {
 		return this.undoQueue;
 	}
-	redo(): Zvoog_UICommand[] {
+	redo(): string[] {
+		//redo(): Zvoog_UICommand[] {
 		return this.redoQueue;
 	}
 	clearUndo() {
@@ -467,7 +471,7 @@ class CommandDispatcher {
 		//console.log("cssPath " + cssPath);
 		startLoadCSSfile(cssPath);
 		this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
-		saveText2localStorage('uicolortheme', idx);
+		saveRawText2localStorage('uicolortheme', idx);
 	}
 	resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) {
 		this.renderer.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);

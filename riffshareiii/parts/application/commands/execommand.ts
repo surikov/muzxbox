@@ -12,7 +12,8 @@ class CommandExe {
 	addUndoCommandActiions(cmd: Zvoog_UICommand) {
 		//console.log(cmd);
 		globalCommandDispatcher.clearRedo();
-		globalCommandDispatcher.undo().push(cmd);
+		//globalCommandDispatcher.undo().push(cmd);
+		globalCommandDispatcher.undo().push(new LZUtil().compressToUTF16(JSON.stringify(cmd)));
 		globalCommandDispatcher.resetProject();
 	}
 	parentFromPath(path: (string | number)[]) {
@@ -162,27 +163,30 @@ class CommandExe {
 			//let cmd = globalCommandDispatcher.cfg().data.undo.shift();
 			globalCommandDispatcher.cfg().data.undo.splice(0,unCnt-3210);
 		}*/
-		console.log('undo len ', globalCommandDispatcher.undo());
-		let actionCount = 0;
+		//console.log('redo/undo len ', globalCommandDispatcher.redo().length, globalCommandDispatcher.undo().length);
+		//let actionCount = 0;
+		let size=0;
 		for (let ii = 0; ii < globalCommandDispatcher.undo().length; ii++) {
-			let one = globalCommandDispatcher.undo()[ii];
-
-			actionCount = actionCount + one.actions.length;
-			console.log(ii, actionCount);
-			if (actionCount > 54321) {
-				console.log('cut undo ', ii, 'from', actionCount);
-				globalCommandDispatcher.undo().splice(0, ii);
+			//let one: Zvoog_UICommand = JSON.parse('' + new LZUtil().decompressFromUTF16(globalCommandDispatcher.undo()[ii]));
+			//let one = globalCommandDispatcher.undo()[ii];
+			//actionCount = actionCount + one.actions.length;
+			size=size+globalCommandDispatcher.undo()[ii].length;
+			//console.log(ii, size);
+			if (size > 543210) {
+				let drp=Math.ceil(ii/2);
+				//console.log('cut undo ', drp, 'for', size);
+				globalCommandDispatcher.undo().splice(0, drp);
 				//globalCommandDispatcher.spliseUndo(ii);
-				console.log('now undo', globalCommandDispatcher.undo().length);
+				//console.log('now undo', globalCommandDispatcher.undo().length);
 				globalCommandDispatcher.clearRedo();
 				break;
 			}
 		}
-		let calc = JSON.stringify(globalCommandDispatcher.undo());
+		//let calc = JSON.stringify(globalCommandDispatcher.undo());
 		//console.log('undo len',calc.length/1000,'kb');
 	}
 	undo(cnt: number) {
-		console.log('undo', cnt, globalCommandDispatcher.undo(), globalCommandDispatcher.redo());
+		//console.log('undo', cnt, globalCommandDispatcher.undo(), globalCommandDispatcher.redo());
 		if (this.lockUndoRedo) {
 			console.log('lockUndoRedo');
 		} else {
@@ -190,11 +194,13 @@ class CommandExe {
 			this.lockUndoRedo = true;
 			for (let ii = 0; ii < cnt; ii++) {
 				if (globalCommandDispatcher.undo().length) {
-					let cmd = globalCommandDispatcher.undo().pop();
+					//let cmd = globalCommandDispatcher.undo().pop();
+					let cmd: Zvoog_UICommand = JSON.parse('' + new LZUtil().decompressFromUTF16(globalCommandDispatcher.undo().pop()));
 					if (cmd) {
 						//this.executeCommand(cmd.kind, cmd.params, true);
 						this.unAction(cmd);
-						globalCommandDispatcher.redo().unshift(cmd);
+						let lz: string = new LZUtil().compressToUTF16(JSON.stringify(cmd));
+						globalCommandDispatcher.redo().unshift(lz);
 						if (cmd.position) {
 							this.setCurPosition(cmd.position);
 						}
@@ -216,11 +222,13 @@ class CommandExe {
 			this.lockUndoRedo = true;
 			for (let ii = 0; ii < cnt; ii++) {
 				if (globalCommandDispatcher.redo().length) {
-					let cmd = globalCommandDispatcher.redo().shift();
+					//let cmd = globalCommandDispatcher.redo().shift();
+					let cmd: Zvoog_UICommand = JSON.parse('' + new LZUtil().decompressFromUTF16(globalCommandDispatcher.redo().shift()));
 					if (cmd) {
 						//this.executeCommand(cmd.kind, cmd.params, false);
 						this.reAction(cmd);
-						globalCommandDispatcher.undo().push(cmd);
+						let lz: string = new LZUtil().compressToUTF16(JSON.stringify(cmd));
+						globalCommandDispatcher.undo().push(lz);
 						if (cmd.position) {
 							this.setCurPosition(cmd.position);
 						}

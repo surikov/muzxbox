@@ -22,18 +22,19 @@ type MixerData = {
 	//, drumsTracks: DrumsTrack[]
 };
 */
-function saveText2localStorage(name: string, text: string) {
-	//console.log('saveText2localStorage', name, text);
+function saveLzText2localStorage(name: string, text: string) {
 	let lzu = new LZUtil();
 	let cmpr: string = lzu.compressToUTF16(text);
-	//localStorage.setItem(name, text);
 	localStorage.setItem(name, cmpr);
-	console.log('saveText2localStorage', name, text.length, '->', cmpr.length);
+	console.log('saveLzText2localStorage', name, text.length, '->', cmpr.length);
+}
+function saveRawText2localStorage(name: string, text: string) {
+	localStorage.setItem(name, text);
+	console.log('saveRawText2localStorage', name);
 }
 
-function readTextFromlocalStorage(name: string): string {
+function readLzTextFromlocalStorage(name: string): string {
 	try {
-		//let o = localStorage.getItem(name);
 		let cmpr = localStorage.getItem(name);
 		let lzu = new LZUtil();
 		let o = lzu.decompressFromUTF16(cmpr);
@@ -48,15 +49,40 @@ function readTextFromlocalStorage(name: string): string {
 	}
 	return '';
 }
-function readObjectFromlocalStorage(name: string): any {
+function readRawTextFromlocalStorage(name: string): string {
+	try {
+		let txt = localStorage.getItem(name);
+		return '' + txt;
+	} catch (ex) {
+		console.log(ex);
+	}
+	return '';
+}
+function readLzObjectFromlocalStorage(name: string): any {
 	try {
 		//let txt = localStorage.getItem(name);
 		let cmpr = localStorage.getItem(name);
 		let lzu = new LZUtil();
 		let txt = lzu.decompressFromUTF16(cmpr);
-		console.log('readObjectFromlocalStorage', name
+		console.log('readLzObjectFromlocalStorage', name
 			, Math.round(('' + cmpr).length / 1000) + 'kb'
-			, '->', Math.round(('' + txt).length/ 1000) + 'kb');
+			, '->', Math.round(('' + txt).length / 1000) + 'kb');
+		if (txt) {
+			let o = JSON.parse(txt);
+			return o;
+		} else {
+			return null;
+		}
+	} catch (ex) {
+		console.log(ex);
+
+	}
+	return null;
+}
+function readRawObjectFromlocalStorage(name: string): any {
+	try {
+		let txt = localStorage.getItem(name);
+		console.log('readRawObjectFromlocalStorage', name);
 		if (txt) {
 			let o = JSON.parse(txt);
 			return o;

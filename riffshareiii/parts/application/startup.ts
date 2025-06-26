@@ -9,22 +9,22 @@ function startApplication() {
 	ui.createUI();
 	//window.addEventListener("unload", saveProjectState);
 	window.addEventListener("beforeunload", saveProjectState);
-	
+
 	try {
-		let lastprojectdata = readObjectFromlocalStorage('lastprojectdata');
+		let lastprojectdata = readLzObjectFromlocalStorage('lastprojectdata');
 		if (lastprojectdata) {
 			globalCommandDispatcher.registerWorkProject(lastprojectdata);
 		}
 		globalCommandDispatcher.clearUndo();
 		globalCommandDispatcher.clearRedo();
-		let undocommands = readObjectFromlocalStorage('undocommands');
+		let undocommands = readRawObjectFromlocalStorage('undocommands');
 		if (undocommands) {
 			if (undocommands.length) {
 				globalCommandDispatcher.undoQueue = undocommands;
-				console.log(undocommands);
+				//console.log(undocommands);
 			}
 		}
-		let redocommands = readObjectFromlocalStorage('redocommands');
+		let redocommands = readRawObjectFromlocalStorage('redocommands');
 		if (redocommands) {
 			if (redocommands.length) {
 				globalCommandDispatcher.redoQueue = redocommands;
@@ -43,7 +43,7 @@ function startApplication() {
 		initWebAudioFromUI();
 	    
 	});*/
-	let themei = readTextFromlocalStorage('uicolortheme');
+	let themei = readRawTextFromlocalStorage('uicolortheme');
 	if (themei) {
 		globalCommandDispatcher.setThemeColor(themei);
 	}
@@ -62,24 +62,24 @@ function saveProjectState() {
 	try {
 
 		console.log('state size', txtdata.length);
-		saveText2localStorage('lastprojectdata', txtdata);
-		saveText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
-		saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
+		saveLzText2localStorage('lastprojectdata', txtdata);
+		saveRawText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
+		saveRawText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
 	} catch (xx) {
 		console.log(xx);
 		globalCommandDispatcher.clearUndo();
 		globalCommandDispatcher.clearRedo();
 		try {
-			saveText2localStorage('lastprojectdata', txtdata);
-			saveText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
-			saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
+			saveLzText2localStorage('lastprojectdata', txtdata);
+			saveRawText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
+			saveRawText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
 		} catch (nn) {
 			console.log(nn);
 			window.localStorage.clear();
 			try {
-				saveText2localStorage('lastprojectdata', txtdata);
-				saveText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
-				saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
+				saveLzText2localStorage('lastprojectdata', txtdata);
+				saveRawText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
+				saveRawText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
 			} catch (n22) {
 				console.log(n22);
 			}

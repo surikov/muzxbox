@@ -405,7 +405,7 @@ class LZUtil {
 			}
 		}
 	}
-	compressToBase64(input: string | null): string {
+	/*compressToBase64(input: string | null): string {
 		if (input == null) {
 			return "";
 		}
@@ -443,17 +443,22 @@ class LZUtil {
 		input = input.replace(/ /g, "+");
 
 		return this._decompress(input.length, 32, (index) => this.getBaseValue(this.keyStrUriSafe, input!.charAt(index)));
-	}
-	compressToUTF16(input: string | null) {
-		if (input == null) return "";
-
+	}*/
+	compressToUTF16(input: string | null| undefined):string {
+		//if (input == null) return "";
+		if(input){
 		return this._compress(input, 15, (a) => String.fromCharCode(a + 32)) + " ";
+		}else{
+			return '';
+		}
 	}
-	decompressFromUTF16(compressed: string | null) {
-		if (compressed == null) return "";
-		if (compressed == "") return null;
-
-		return this._decompress(compressed.length, 16384, (index) => compressed.charCodeAt(index) - 32);
+	decompressFromUTF16(compressed: string | null | undefined) {
+		//if (compressed == null) return "";
+		//if (compressed == "") return null;
+		if (compressed) {
+			return this._decompress(compressed.length, 16384, (index) => compressed.charCodeAt(index) - 32);
+		}
+		else return null;
 	}
 
 

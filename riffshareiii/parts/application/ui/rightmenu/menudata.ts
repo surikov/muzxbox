@@ -303,29 +303,40 @@ function composeBaseMenu(): MenuInfo[] {
 							if (count >= globalCommandDispatcher.cfg().data.timeline.length) {
 								count = globalCommandDispatcher.cfg().data.timeline.length - 1;
 							}
-							console.log('start delete',startMeasure, endMeasure,globalCommandDispatcher.cfg().data.timeline.length);
-							globalCommandDispatcher.exe.commitProjectChanges([], () => {
-								globalCommandDispatcher.adjustTimelineChords();
-								for (let ii = 0; ii < count; ii++) {
-									globalCommandDispatcher.cfg().data.timeline.splice(startMeasure, 1);
-									for (let nn = 0; nn < globalCommandDispatcher.cfg().data.tracks.length; nn++) {
-										let track = globalCommandDispatcher.cfg().data.tracks[nn];
-										track.measures.splice(startMeasure, 1);
+							if (startMeasure > -1 && count > 0) {
+								console.log('start delete', startMeasure, endMeasure, globalCommandDispatcher.cfg().data.timeline.length);
+								globalCommandDispatcher.exe.commitProjectChanges([], () => {
+									globalCommandDispatcher.adjustTimelineChords();
+									for (let ii = 0; ii < count; ii++) {
+										globalCommandDispatcher.cfg().data.timeline.splice(startMeasure, 1);
+										for (let nn = 0; nn < globalCommandDispatcher.cfg().data.tracks.length; nn++) {
+											let track = globalCommandDispatcher.cfg().data.tracks[nn];
+											track.measures.splice(startMeasure, 1);
+										}
+										for (let nn = 0; nn < globalCommandDispatcher.cfg().data.percussions.length; nn++) {
+											let percu = globalCommandDispatcher.cfg().data.percussions[nn];
+											percu.measures.splice(startMeasure, 1);
+										}
+										for (let nn = 0; nn < globalCommandDispatcher.cfg().data.filters.length; nn++) {
+											let filter = globalCommandDispatcher.cfg().data.filters[nn];
+											filter.automation.splice(startMeasure, 1);
+										}
+										globalCommandDispatcher.cfg().data.comments.splice(startMeasure, 1);
 									}
-									for (let nn = 0; nn < globalCommandDispatcher.cfg().data.percussions.length; nn++) {
-										let percu = globalCommandDispatcher.cfg().data.percussions[nn];
-										percu.measures.splice(startMeasure, 1);
-									}
-									for (let nn = 0; nn < globalCommandDispatcher.cfg().data.filters.length; nn++) {
-										let filter = globalCommandDispatcher.cfg().data.filters[nn];
-										filter.automation.splice(startMeasure, 1);
-									}
-									globalCommandDispatcher.cfg().data.comments.splice(startMeasure, 1);
-								}
-								globalCommandDispatcher.adjustTimelineChords();
-							});
-							globalCommandDispatcher.resetProject();
-							console.log('end delete',startMeasure, endMeasure,globalCommandDispatcher.cfg().data.timeline.length);
+									globalCommandDispatcher.adjustTimelineChords();
+									globalCommandDispatcher.cfg().data.selectedPart.startMeasure = -1;
+									globalCommandDispatcher.cfg().data.selectedPart.endMeasure = -1;
+
+								});
+								/*this.setPlayPositionFromSelectedPart();
+								this.renderer.timeselectbar.updateTimeSelectionBar();
+								this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
+									, this.renderer.timeselectbar.selectionAnchor
+									, LevelModes.top);
+								this.reDrawPlayPosition();*/
+								globalCommandDispatcher.resetProject();
+								console.log('end delete', startMeasure, endMeasure, globalCommandDispatcher.cfg().data.timeline.length);
+							}
 						}
 					}, {
 						text: 'Insert bars', onClick: () => {

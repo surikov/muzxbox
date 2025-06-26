@@ -238,20 +238,19 @@ function startApplication() {
     ui.createUI();
     window.addEventListener("beforeunload", saveProjectState);
     try {
-        let lastprojectdata = readObjectFromlocalStorage('lastprojectdata');
+        let lastprojectdata = readLzObjectFromlocalStorage('lastprojectdata');
         if (lastprojectdata) {
             globalCommandDispatcher.registerWorkProject(lastprojectdata);
         }
         globalCommandDispatcher.clearUndo();
         globalCommandDispatcher.clearRedo();
-        let undocommands = readObjectFromlocalStorage('undocommands');
+        let undocommands = readRawObjectFromlocalStorage('undocommands');
         if (undocommands) {
             if (undocommands.length) {
                 globalCommandDispatcher.undoQueue = undocommands;
-                console.log(undocommands);
             }
         }
-        let redocommands = readObjectFromlocalStorage('redocommands');
+        let redocommands = readRawObjectFromlocalStorage('redocommands');
         if (redocommands) {
             if (redocommands.length) {
                 globalCommandDispatcher.redoQueue = redocommands;
@@ -262,7 +261,7 @@ function startApplication() {
         console.log(xx);
     }
     globalCommandDispatcher.resetProject();
-    let themei = readTextFromlocalStorage('uicolortheme');
+    let themei = readRawTextFromlocalStorage('uicolortheme');
     if (themei) {
         globalCommandDispatcher.setThemeColor(themei);
     }
@@ -279,26 +278,26 @@ function saveProjectState() {
     let txtdata = JSON.stringify(globalCommandDispatcher.cfg().data);
     try {
         console.log('state size', txtdata.length);
-        saveText2localStorage('lastprojectdata', txtdata);
-        saveText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
-        saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
+        saveLzText2localStorage('lastprojectdata', txtdata);
+        saveRawText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
+        saveRawText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
     }
     catch (xx) {
         console.log(xx);
         globalCommandDispatcher.clearUndo();
         globalCommandDispatcher.clearRedo();
         try {
-            saveText2localStorage('lastprojectdata', txtdata);
-            saveText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
-            saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
+            saveLzText2localStorage('lastprojectdata', txtdata);
+            saveRawText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
+            saveRawText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
         }
         catch (nn) {
             console.log(nn);
             window.localStorage.clear();
             try {
-                saveText2localStorage('lastprojectdata', txtdata);
-                saveText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
-                saveText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
+                saveLzText2localStorage('lastprojectdata', txtdata);
+                saveRawText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
+                saveRawText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
             }
             catch (n22) {
                 console.log(n22);
@@ -998,7 +997,7 @@ class CommandExe {
     }
     addUndoCommandActiions(cmd) {
         globalCommandDispatcher.clearRedo();
-        globalCommandDispatcher.undo().push(cmd);
+        globalCommandDispatcher.undo().push(new LZUtil().compressToUTF16(JSON.stringify(cmd)));
         globalCommandDispatcher.resetProject();
     }
     parentFromPath(path) {
@@ -1062,24 +1061,18 @@ class CommandExe {
         }
     }
     cutLongUndo() {
-        console.log('undo len ', globalCommandDispatcher.undo());
-        let actionCount = 0;
+        let size = 0;
         for (let ii = 0; ii < globalCommandDispatcher.undo().length; ii++) {
-            let one = globalCommandDispatcher.undo()[ii];
-            actionCount = actionCount + one.actions.length;
-            console.log(ii, actionCount);
-            if (actionCount > 54321) {
-                console.log('cut undo ', ii, 'from', actionCount);
-                globalCommandDispatcher.undo().splice(0, ii);
-                console.log('now undo', globalCommandDispatcher.undo().length);
+            size = size + globalCommandDispatcher.undo()[ii].length;
+            if (size > 543210) {
+                let drp = Math.ceil(ii / 2);
+                globalCommandDispatcher.undo().splice(0, drp);
                 globalCommandDispatcher.clearRedo();
                 break;
             }
         }
-        let calc = JSON.stringify(globalCommandDispatcher.undo());
     }
     undo(cnt) {
-        console.log('undo', cnt, globalCommandDispatcher.undo(), globalCommandDispatcher.redo());
         if (this.lockUndoRedo) {
             console.log('lockUndoRedo');
         }
@@ -1088,10 +1081,11 @@ class CommandExe {
             this.lockUndoRedo = true;
             for (let ii = 0; ii < cnt; ii++) {
                 if (globalCommandDispatcher.undo().length) {
-                    let cmd = globalCommandDispatcher.undo().pop();
+                    let cmd = JSON.parse('' + new LZUtil().decompressFromUTF16(globalCommandDispatcher.undo().pop()));
                     if (cmd) {
                         this.unAction(cmd);
-                        globalCommandDispatcher.redo().unshift(cmd);
+                        let lz = new LZUtil().compressToUTF16(JSON.stringify(cmd));
+                        globalCommandDispatcher.redo().unshift(lz);
                         if (cmd.position) {
                             this.setCurPosition(cmd.position);
                         }
@@ -1112,10 +1106,11 @@ class CommandExe {
             this.lockUndoRedo = true;
             for (let ii = 0; ii < cnt; ii++) {
                 if (globalCommandDispatcher.redo().length) {
-                    let cmd = globalCommandDispatcher.redo().shift();
+                    let cmd = JSON.parse('' + new LZUtil().decompressFromUTF16(globalCommandDispatcher.redo().shift()));
                     if (cmd) {
                         this.reAction(cmd);
-                        globalCommandDispatcher.undo().push(cmd);
+                        let lz = new LZUtil().compressToUTF16(JSON.stringify(cmd));
+                        globalCommandDispatcher.undo().push(lz);
                         if (cmd.position) {
                             this.setCurPosition(cmd.position);
                         }
@@ -1495,7 +1490,7 @@ class CommandDispatcher {
         }
         startLoadCSSfile(cssPath);
         this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
-        saveText2localStorage('uicolortheme', idx);
+        saveRawText2localStorage('uicolortheme', idx);
     }
     resetAnchor(parentSVGGroup, anchor, layerMode) {
         this.renderer.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
@@ -3079,29 +3074,33 @@ function composeBaseMenu() {
                             if (count >= globalCommandDispatcher.cfg().data.timeline.length) {
                                 count = globalCommandDispatcher.cfg().data.timeline.length - 1;
                             }
-                            console.log('start delete', startMeasure, endMeasure, globalCommandDispatcher.cfg().data.timeline.length);
-                            globalCommandDispatcher.exe.commitProjectChanges([], () => {
-                                globalCommandDispatcher.adjustTimelineChords();
-                                for (let ii = 0; ii < count; ii++) {
-                                    globalCommandDispatcher.cfg().data.timeline.splice(startMeasure, 1);
-                                    for (let nn = 0; nn < globalCommandDispatcher.cfg().data.tracks.length; nn++) {
-                                        let track = globalCommandDispatcher.cfg().data.tracks[nn];
-                                        track.measures.splice(startMeasure, 1);
+                            if (startMeasure > -1 && count > 0) {
+                                console.log('start delete', startMeasure, endMeasure, globalCommandDispatcher.cfg().data.timeline.length);
+                                globalCommandDispatcher.exe.commitProjectChanges([], () => {
+                                    globalCommandDispatcher.adjustTimelineChords();
+                                    for (let ii = 0; ii < count; ii++) {
+                                        globalCommandDispatcher.cfg().data.timeline.splice(startMeasure, 1);
+                                        for (let nn = 0; nn < globalCommandDispatcher.cfg().data.tracks.length; nn++) {
+                                            let track = globalCommandDispatcher.cfg().data.tracks[nn];
+                                            track.measures.splice(startMeasure, 1);
+                                        }
+                                        for (let nn = 0; nn < globalCommandDispatcher.cfg().data.percussions.length; nn++) {
+                                            let percu = globalCommandDispatcher.cfg().data.percussions[nn];
+                                            percu.measures.splice(startMeasure, 1);
+                                        }
+                                        for (let nn = 0; nn < globalCommandDispatcher.cfg().data.filters.length; nn++) {
+                                            let filter = globalCommandDispatcher.cfg().data.filters[nn];
+                                            filter.automation.splice(startMeasure, 1);
+                                        }
+                                        globalCommandDispatcher.cfg().data.comments.splice(startMeasure, 1);
                                     }
-                                    for (let nn = 0; nn < globalCommandDispatcher.cfg().data.percussions.length; nn++) {
-                                        let percu = globalCommandDispatcher.cfg().data.percussions[nn];
-                                        percu.measures.splice(startMeasure, 1);
-                                    }
-                                    for (let nn = 0; nn < globalCommandDispatcher.cfg().data.filters.length; nn++) {
-                                        let filter = globalCommandDispatcher.cfg().data.filters[nn];
-                                        filter.automation.splice(startMeasure, 1);
-                                    }
-                                    globalCommandDispatcher.cfg().data.comments.splice(startMeasure, 1);
-                                }
-                                globalCommandDispatcher.adjustTimelineChords();
-                            });
-                            globalCommandDispatcher.resetProject();
-                            console.log('end delete', startMeasure, endMeasure, globalCommandDispatcher.cfg().data.timeline.length);
+                                    globalCommandDispatcher.adjustTimelineChords();
+                                    globalCommandDispatcher.cfg().data.selectedPart.startMeasure = -1;
+                                    globalCommandDispatcher.cfg().data.selectedPart.endMeasure = -1;
+                                });
+                                globalCommandDispatcher.resetProject();
+                                console.log('end delete', startMeasure, endMeasure, globalCommandDispatcher.cfg().data.timeline.length);
+                            }
                         }
                     }, {
                         text: 'Insert bars', onClick: () => {
@@ -5509,13 +5508,17 @@ class WarningUI {
         this.noWarning = true;
     }
 }
-function saveText2localStorage(name, text) {
+function saveLzText2localStorage(name, text) {
     let lzu = new LZUtil();
     let cmpr = lzu.compressToUTF16(text);
     localStorage.setItem(name, cmpr);
-    console.log('saveText2localStorage', name, text.length, '->', cmpr.length);
+    console.log('saveLzText2localStorage', name, text.length, '->', cmpr.length);
 }
-function readTextFromlocalStorage(name) {
+function saveRawText2localStorage(name, text) {
+    localStorage.setItem(name, text);
+    console.log('saveRawText2localStorage', name);
+}
+function readLzTextFromlocalStorage(name) {
     try {
         let cmpr = localStorage.getItem(name);
         let lzu = new LZUtil();
@@ -5533,12 +5536,39 @@ function readTextFromlocalStorage(name) {
     }
     return '';
 }
-function readObjectFromlocalStorage(name) {
+function readRawTextFromlocalStorage(name) {
+    try {
+        let txt = localStorage.getItem(name);
+        return '' + txt;
+    }
+    catch (ex) {
+        console.log(ex);
+    }
+    return '';
+}
+function readLzObjectFromlocalStorage(name) {
     try {
         let cmpr = localStorage.getItem(name);
         let lzu = new LZUtil();
         let txt = lzu.decompressFromUTF16(cmpr);
-        console.log('readObjectFromlocalStorage', name, Math.round(('' + cmpr).length / 1000) + 'kb', '->', Math.round(('' + txt).length / 1000) + 'kb');
+        console.log('readLzObjectFromlocalStorage', name, Math.round(('' + cmpr).length / 1000) + 'kb', '->', Math.round(('' + txt).length / 1000) + 'kb');
+        if (txt) {
+            let o = JSON.parse(txt);
+            return o;
+        }
+        else {
+            return null;
+        }
+    }
+    catch (ex) {
+        console.log(ex);
+    }
+    return null;
+}
+function readRawObjectFromlocalStorage(name) {
+    try {
+        let txt = localStorage.getItem(name);
+        console.log('readRawObjectFromlocalStorage', name);
         if (txt) {
             let o = JSON.parse(txt);
             return o;
@@ -6396,54 +6426,20 @@ class LZUtil {
             }
         }
     }
-    compressToBase64(input) {
-        if (input == null) {
-            return "";
-        }
-        const res = this._compress(input, 6, (a) => this.keyStrBase64.charAt(a));
-        switch (res.length % 4) {
-            default:
-            case 0:
-                return res;
-            case 1:
-                return res + "===";
-            case 2:
-                return res + "==";
-            case 3:
-                return res + "=";
-        }
-    }
-    decompressFromBase64(input) {
-        if (input == null)
-            return "";
-        if (input == "")
-            return null;
-        return this._decompress(input.length, 32, (index) => this.getBaseValue(this.keyStrBase64, input.charAt(index)));
-    }
-    compressToEncodedURIComponent(input) {
-        if (input == null)
-            return "";
-        return this._compress(input, 6, (a) => this.keyStrUriSafe.charAt(a));
-    }
-    decompressFromEncodedURIComponent(input) {
-        if (input == null)
-            return "";
-        if (input == "")
-            return null;
-        input = input.replace(/ /g, "+");
-        return this._decompress(input.length, 32, (index) => this.getBaseValue(this.keyStrUriSafe, input.charAt(index)));
-    }
     compressToUTF16(input) {
-        if (input == null)
-            return "";
-        return this._compress(input, 15, (a) => String.fromCharCode(a + 32)) + " ";
+        if (input) {
+            return this._compress(input, 15, (a) => String.fromCharCode(a + 32)) + " ";
+        }
+        else {
+            return '';
+        }
     }
     decompressFromUTF16(compressed) {
-        if (compressed == null)
-            return "";
-        if (compressed == "")
+        if (compressed) {
+            return this._decompress(compressed.length, 16384, (index) => compressed.charCodeAt(index) - 32);
+        }
+        else
             return null;
-        return this._decompress(compressed.length, 16384, (index) => compressed.charCodeAt(index) - 32);
     }
 }
 var LevelModes;

@@ -158,8 +158,8 @@ declare class CommandDispatcher {
     _mixerDataMathUtility: MixerDataMathUtility;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
     exe: CommandExe;
-    undoQueue: Zvoog_UICommand[];
-    redoQueue: Zvoog_UICommand[];
+    undoQueue: string[];
+    redoQueue: string[];
     filterPluginDialog: FilterPluginDialog;
     pointPluginDialog: PointPluginDialog;
     samplerPluginDialog: SamplerPluginDialog;
@@ -167,8 +167,8 @@ declare class CommandDispatcher {
     sequencerPluginDialog: SequencerPluginDialog;
     cfg(): MixerDataMathUtility;
     promptPluginInfoDebug(): void;
-    undo(): Zvoog_UICommand[];
-    redo(): Zvoog_UICommand[];
+    undo(): string[];
+    redo(): string[];
     clearUndo(): void;
     clearRedo(): void;
     reDrawPlayPosition(): void;
@@ -658,9 +658,12 @@ declare class WarningUI {
     showWarning(title: string, msg: string, smallMsg: string, onCancel: null | (() => void)): void;
     hideWarning(): void;
 }
-declare function saveText2localStorage(name: string, text: string): void;
-declare function readTextFromlocalStorage(name: string): string;
-declare function readObjectFromlocalStorage(name: string): any;
+declare function saveLzText2localStorage(name: string, text: string): void;
+declare function saveRawText2localStorage(name: string, text: string): void;
+declare function readLzTextFromlocalStorage(name: string): string;
+declare function readRawTextFromlocalStorage(name: string): string;
+declare function readLzObjectFromlocalStorage(name: string): any;
+declare function readRawObjectFromlocalStorage(name: string): any;
 declare let ___newEmptyProject: Zvoog_Project;
 declare let ____mzxbxProjectForTesting2: Zvoog_Project;
 declare type BarStepStartEnd = {
@@ -759,12 +762,8 @@ declare class LZUtil {
     getBaseValue(alphabet: string, character: string): number;
     _compress(uncompressed: string | null, bitsPerChar: number, getCharFromInt: (a: number) => string): string;
     _decompress(length: number, resetValue: number, getNextValue: (a: number) => number): string | null | undefined;
-    compressToBase64(input: string | null): string;
-    decompressFromBase64(input: string | null): string | null | undefined;
-    compressToEncodedURIComponent(input: string | null): string;
-    decompressFromEncodedURIComponent(input: string | null): string | null | undefined;
-    compressToUTF16(input: string | null): string;
-    decompressFromUTF16(compressed: string | null): string | null | undefined;
+    compressToUTF16(input: string | null | undefined): string;
+    decompressFromUTF16(compressed: string | null | undefined): string | null | undefined;
 }
 declare type TileZoom = {
     x: number;

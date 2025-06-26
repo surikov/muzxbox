@@ -64,7 +64,7 @@ class MidiParser {
 
 	}
 	parseTracks(arrayBuffer: ArrayBuffer) {
-		//console.log('start parseTracks');
+		console.log('start parseTracks');
 		var curIndex: number = this.header.HEADER_LENGTH;
 		var trackCount: number = this.header.trackCount;
 		this.parsedTracks = [];
@@ -319,6 +319,7 @@ class MidiParser {
 	}
 
 	parseNotes() {
+		console.log('parseNotes');
 		this.dumpResolutionChanges();
 		// counts which pitch-bend range message can be expected next
 		//: number 1 (can be sent any time, except after pitch-bend range messages number 1 or 2)
@@ -331,7 +332,11 @@ class MidiParser {
 		for (let t = 0; t < this.parsedTracks.length; t++) {
 			var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
 			this.parseTicks2time(singleParsedTrack);
+			console.log('notes for track',t,singleParsedTrack);
 			for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
+				if(Math.floor(e/1000)==e/1000){
+					console.log('event',e);
+				}
 				var preState = expectedState;
 				var evnt = singleParsedTrack.trackevents[e];
 				if (evnt.basetype == this.EVENT_MIDI) {

@@ -54,6 +54,7 @@ class MidiParser {
         this.parseTracks(arrayBuffer);
     }
     parseTracks(arrayBuffer) {
+        console.log('start parseTracks');
         var curIndex = this.header.HEADER_LENGTH;
         var trackCount = this.header.trackCount;
         this.parsedTracks = [];
@@ -288,6 +289,7 @@ class MidiParser {
         }
     }
     parseNotes() {
+        console.log('parseNotes');
         this.dumpResolutionChanges();
         var expectedState = 1;
         var expectedPitchBendRangeChannel = null;
@@ -295,7 +297,11 @@ class MidiParser {
         for (let t = 0; t < this.parsedTracks.length; t++) {
             var singleParsedTrack = this.parsedTracks[t];
             this.parseTicks2time(singleParsedTrack);
+            console.log('notes for track', t, singleParsedTrack);
             for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
+                if (Math.floor(e / 1000) == e / 1000) {
+                    console.log('event', e);
+                }
                 var preState = expectedState;
                 var evnt = singleParsedTrack.trackevents[e];
                 if (evnt.basetype == this.EVENT_MIDI) {
@@ -1024,7 +1030,7 @@ class ChordPitchPerformerUtil {
             "0980_GeneralUserGS_sf2_file", "0980_Aspirin_sf2_file", "0980_Chaos_sf2_file", "0980_FluidR3_GM_sf2_file", "0980_JCLive_sf2_file", "0980_SBLive_sf2", "0980_SoundBlasterOld_sf2", "0981_Aspirin_sf2_file", "0981_FluidR3_GM_sf2_file", "0981_GeneralUserGS_sf2_file", "0981_SoundBlasterOld_sf2", "0982_GeneralUserGS_sf2_file", "0983_GeneralUserGS_sf2_file", "0984_GeneralUserGS_sf2_file",
             "0990_GeneralUserGS_sf2_file", "0990_Aspirin_sf2_file", "0990_Chaos_sf2_file", "0990_FluidR3_GM_sf2_file", "0990_JCLive_sf2_file", "0990_SBLive_sf2", "0990_SoundBlasterOld_sf2", "0991_Aspirin_sf2_file", "0991_FluidR3_GM_sf2_file", "0991_GeneralUserGS_sf2_file", "0991_JCLive_sf2_file", "0991_SoundBlasterOld_sf2", "0992_FluidR3_GM_sf2_file", "0992_JCLive_sf2_file", "0993_JCLive_sf2_file", "0994_JCLive_sf2_file",
             "1000_GeneralUserGS_sf2_file", "1000_Aspirin_sf2_file", "1000_Chaos_sf2_file", "1000_FluidR3_GM_sf2_file", "1000_JCLive_sf2_file", "1000_SBLive_sf2", "1000_SoundBlasterOld_sf2", "1001_Aspirin_sf2_file", "1001_FluidR3_GM_sf2_file", "1001_GeneralUserGS_sf2_file", "1001_JCLive_sf2_file", "1001_SoundBlasterOld_sf2", "1002_Aspirin_sf2_file", "1002_FluidR3_GM_sf2_file", "1002_GeneralUserGS_sf2_file",
-            "1010_GeneralUserGS_sf2_file", "1010_Aspirin_sf2_file", "1010_Chaos_sf2_file", "1010_FluidR3_GM_sf2_file", "1010_JCLive_sf2_file", "1010_SBLive_sf2", "1010_SoundBlasterOld_sf2", "1011_Aspirin_sf2_file", "1011_FluidR3_GM_sf2_file", "1011_JCLive_sf2_file", "1012_Aspirin_sf2_file",
+            "1010_Aspirin_sf2_file", "1010_GeneralUserGS_sf2_file", "1010_Chaos_sf2_file", "1010_FluidR3_GM_sf2_file", "1010_JCLive_sf2_file", "1010_SBLive_sf2", "1010_SoundBlasterOld_sf2", "1011_Aspirin_sf2_file", "1011_FluidR3_GM_sf2_file", "1011_JCLive_sf2_file", "1012_Aspirin_sf2_file",
             "1021_Aspirin_sf2_file", "1020_GeneralUserGS_sf2_file", "1020_Aspirin_sf2_file", "1020_Chaos_sf2_file", "1020_FluidR3_GM_sf2_file", "1020_JCLive_sf2_file", "1020_SBLive_sf2", "1020_SoundBlasterOld_sf2", "1021_FluidR3_GM_sf2_file", "1021_GeneralUserGS_sf2_file", "1021_JCLive_sf2_file", "1021_SoundBlasterOld_sf2", "1022_GeneralUserGS_sf2_file",
             "1030_GeneralUserGS_sf2_file", "1030_Aspirin_sf2_file", "1030_Chaos_sf2_file", "1030_FluidR3_GM_sf2_file", "1030_JCLive_sf2_file", "1030_SBLive_sf2", "1030_SoundBlasterOld_sf2", "1031_Aspirin_sf2_file", "1031_FluidR3_GM_sf2_file", "1031_GeneralUserGS_sf2_file", "1031_SoundBlasterOld_sf2", "1032_FluidR3_GM_sf2_file",
             "1040_GeneralUserGS_sf2_file", "1040_Aspirin_sf2_file", "1040_Chaos_sf2_file", "1040_FluidR3_GM_sf2_file", "1040_JCLive_sf2_file", "1040_SBLive_sf2", "1040_SoundBlasterOld_sf2", "1041_FluidR3_GM_sf2_file", "1041_GeneralUserGS_sf2_file",
