@@ -683,6 +683,137 @@ class CommandDispatcher {
 		this.reDrawPlayPosition();
 
 	}
+	dropSelectedBars() {
+		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
+		let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
+		let count = endMeasure - startMeasure + 1;
+		if (count >= globalCommandDispatcher.cfg().data.timeline.length) {
+			count = globalCommandDispatcher.cfg().data.timeline.length - 1;
+		}
+		if (startMeasure > -1 && count > 0) {
+			console.log('start delete', startMeasure, endMeasure, globalCommandDispatcher.cfg().data.timeline.length);
+			globalCommandDispatcher.exe.commitProjectChanges([], () => {
+				globalCommandDispatcher.adjustTimelineChords();
+				for (let ii = 0; ii < count; ii++) {
+					globalCommandDispatcher.cfg().data.timeline.splice(startMeasure, 1);
+					for (let nn = 0; nn < globalCommandDispatcher.cfg().data.tracks.length; nn++) {
+						let track = globalCommandDispatcher.cfg().data.tracks[nn];
+						track.measures.splice(startMeasure, 1);
+					}
+					for (let nn = 0; nn < globalCommandDispatcher.cfg().data.percussions.length; nn++) {
+						let percu = globalCommandDispatcher.cfg().data.percussions[nn];
+						percu.measures.splice(startMeasure, 1);
+					}
+					for (let nn = 0; nn < globalCommandDispatcher.cfg().data.filters.length; nn++) {
+						let filter = globalCommandDispatcher.cfg().data.filters[nn];
+						filter.automation.splice(startMeasure, 1);
+					}
+					globalCommandDispatcher.cfg().data.comments.splice(startMeasure, 1);
+				}
+				globalCommandDispatcher.adjustTimelineChords();
+				globalCommandDispatcher.cfg().data.selectedPart.startMeasure = -1;
+				globalCommandDispatcher.cfg().data.selectedPart.endMeasure = -1;
+
+			});
+			globalCommandDispatcher.resetProject();
+			console.log('end delete', startMeasure, endMeasure, globalCommandDispatcher.cfg().data.timeline.length);
+		}
+
+
+	}
+	insertAfterSelectedBars() {
+		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
+		let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
+		let count = endMeasure - startMeasure + 1;
+		if (count >= globalCommandDispatcher.cfg().data.timeline.length) {
+			count = globalCommandDispatcher.cfg().data.timeline.length - 1;
+		}
+		if (startMeasure > -1 && count > 0) {
+			globalCommandDispatcher.exe.commitProjectChanges([], () => {
+				globalCommandDispatcher.adjustTimelineChords();
+				for (let ii = 0; ii < count; ii++) {
+					let fromBar = globalCommandDispatcher.cfg().data.timeline[startMeasure + ii];
+					globalCommandDispatcher.cfg().data.timeline.splice(startMeasure + count + ii, 0, {
+						tempo: fromBar.tempo
+						, metre: { count: fromBar.metre.count, part: fromBar.metre.part }
+					});
+					for (let nn = 0; nn < globalCommandDispatcher.cfg().data.tracks.length; nn++) {
+						let track = globalCommandDispatcher.cfg().data.tracks[nn];
+						track.measures.splice(startMeasure + count + ii, 0, { chords: [] });
+					}
+					for (let nn = 0; nn < globalCommandDispatcher.cfg().data.percussions.length; nn++) {
+						let percu = globalCommandDispatcher.cfg().data.percussions[nn];
+						percu.measures.splice(startMeasure + count + ii, 0, { skips: [] });
+					}
+					for (let nn = 0; nn < globalCommandDispatcher.cfg().data.filters.length; nn++) {
+						let filter = globalCommandDispatcher.cfg().data.filters[nn];
+						filter.automation.splice(startMeasure + count + ii, 0, { changes: [] });
+					}
+					globalCommandDispatcher.cfg().data.comments.splice(startMeasure + count + ii, 0, { points: [] });
+				}
+				globalCommandDispatcher.adjustTimelineChords();
+				globalCommandDispatcher.cfg().data.selectedPart.endMeasure = globalCommandDispatcher.cfg().data.selectedPart.startMeasure + count * 2 - 1;
+
+			});
+			globalCommandDispatcher.resetProject();
+		}
+	}
+	promptTempoForSelectedBars() {
+		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
+		let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
+		let count = endMeasure - startMeasure + 1;
+		if (count >= globalCommandDispatcher.cfg().data.timeline.length) {
+			count = globalCommandDispatcher.cfg().data.timeline.length - 1;
+		}
+		if (startMeasure > -1 && count > 0) {
+			let oldTempo = Math.round(globalCommandDispatcher.cfg().data.timeline[startMeasure].tempo);
+			let txt = prompt('Tempo', '' + oldTempo);
+			if (txt) {
+				let newTempo = parseInt(txt);
+				if (newTempo > 20 && newTempo < 400) {
+					globalCommandDispatcher.exe.commitProjectChanges([], () => {
+						globalCommandDispatcher.adjustTimelineChords();
+						for (let ii = 0; ii < count; ii++) {
+							globalCommandDispatcher.cfg().data.timeline[startMeasure + ii].tempo = newTempo;
+							//console.log(ii, globalCommandDispatcher.cfg().data.timeline[ii]);
+						}
+						globalCommandDispatcher.adjustTimelineChords();
+					});
+					globalCommandDispatcher.resetProject();
+					//console.log(globalCommandDispatcher.cfg().data);
+				}
+			}
+		}
+	}
+	promptMeterForSelectedBars() {
+		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
+		let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
+		let count = endMeasure - startMeasure + 1;
+		if (count >= globalCommandDispatcher.cfg().data.timeline.length) {
+			count = globalCommandDispatcher.cfg().data.timeline.length - 1;
+		}
+		if (startMeasure > -1 && count > 0) {
+			let oldMeter = '' + globalCommandDispatcher.cfg().data.timeline[startMeasure].metre.count + '/' + globalCommandDispatcher.cfg().data.timeline[startMeasure].metre.part;
+			let txt = prompt('Metre', '' + oldMeter);
+
+			if (txt) {
+				let newpart = parseInt(txt.split('/')[1]);
+				let newcount = parseInt(txt.split('/')[0]);
+				if (newpart == 1 || newpart == 2 || newpart == 4 || newpart == 8 || newpart == 16 || newpart == 32) {
+					globalCommandDispatcher.exe.commitProjectChanges([], () => {
+						globalCommandDispatcher.adjustTimelineChords();
+						for (let ii = 0; ii < count; ii++) {
+							globalCommandDispatcher.cfg().data.timeline[startMeasure + ii].metre = { count: newcount, part: newpart };
+							//console.log(ii, globalCommandDispatcher.cfg().data.timeline[ii]);
+						}
+						globalCommandDispatcher.adjustTimelineChords();
+					});
+					globalCommandDispatcher.resetProject();
+					//console.log(globalCommandDispatcher.cfg().data);
+				}
+			}
+		}
+	}
 	setPlayPositionFromSelectedPart() {
 		//console.log('setPlayPositionFromSelectedPart');
 		if (this.cfg().data.selectedPart.startMeasure >= 0) {
@@ -695,7 +826,7 @@ class CommandDispatcher {
 			//console.log('playPosition', this.playPosition);
 		}
 	}
-	adjustTimelineChords() {
+	adjustTimeLineLength() {
 		for (let tt = 0; tt < this.cfg().data.timeline.length; tt++) {
 			for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
 				let track = this.cfg().data.tracks[nn];
@@ -716,10 +847,11 @@ class CommandDispatcher {
 				}
 			}
 			if (!(this.cfg().data.comments[tt])) {
-				//this.cfg().data.comments[tt][tt] = { changes: [] };
 				this.cfg().data.comments[tt] = { points: [] };
 			}
 		}
+	}
+	adjustRemoveEmptyChords() {
 		for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
 			let track = this.cfg().data.tracks[nn];
 			for (let mm = 0; mm < track.measures.length; mm++) {
@@ -736,6 +868,147 @@ class CommandDispatcher {
 
 			}
 		}
+	}
+	appendBar() {
+		this.cfg().data.timeline.push({
+			tempo: this.cfg().data.timeline[this.cfg().data.timeline.length - 1].tempo
+			, metre: {
+				count: this.cfg().data.timeline[this.cfg().data.timeline.length - 1].metre.count
+				, part: this.cfg().data.timeline[this.cfg().data.timeline.length - 1].metre.part
+			}
+		});
+	}
+	adjustTracksChords() {
+		for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
+			let barMetre = MMUtil().set(this.cfg().data.timeline[ii].metre);
+			for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
+				let trackBar = this.cfg().data.tracks[nn].measures[ii];
+				for (let kk = 0; kk < trackBar.chords.length; kk++) {
+					let chord = trackBar.chords[kk];
+					if (barMetre.less(chord.skip)) {
+						if (ii >= this.cfg().data.timeline.length) {
+							this.appendBar();
+							this.cfg().data.tracks[nn].measures.push({ chords: [] });
+						}
+						chord.skip = MMUtil().set(chord.skip).minus(barMetre).simplyfy();
+						this.cfg().data.tracks[nn].measures[ii + 1].chords.push(chord);
+						trackBar.chords.splice(kk, 1);
+						kk--;
+					} else {
+						if (chord.skip.count < 0) {
+							if (ii > 0) {
+								let preMetre = MMUtil().set(this.cfg().data.timeline[ii - 1].metre);
+								chord.skip = preMetre.plus(chord.skip).simplyfy();
+								this.cfg().data.tracks[nn].measures[ii - 1].chords.push(chord);
+							}
+							trackBar.chords.splice(kk, 1);
+							kk--;
+						}
+					}
+				}
+			}
+		}
+	}
+	adjustSamplerSkips() {
+		for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
+			let barMetre = MMUtil().set(this.cfg().data.timeline[ii].metre);
+			for (let nn = 0; nn < this.cfg().data.percussions.length; nn++) {
+				let percuBar = this.cfg().data.percussions[nn].measures[ii];
+				for (let kk = 0; kk < percuBar.skips.length; kk++) {
+					if (barMetre.less(percuBar.skips[kk])) {
+						if (ii >= this.cfg().data.timeline.length) {
+							this.appendBar();
+							this.cfg().data.percussions[nn].measures.push({ skips: [] });
+						}
+						percuBar.skips[kk] = MMUtil().set(percuBar.skips[kk]).minus(barMetre).simplyfy();
+						this.cfg().data.percussions[nn].measures[ii + 1].skips.push(percuBar.skips[kk]);
+
+						percuBar.skips.splice(kk, 1);
+						kk--;
+					} else {
+						if (percuBar.skips[kk].count < 0) {
+							if (ii > 0) {
+								let preMetre = MMUtil().set(this.cfg().data.timeline[ii - 1].metre);
+								percuBar.skips[kk] = preMetre.plus(percuBar.skips[kk]).simplyfy();
+								this.cfg().data.percussions[nn].measures[ii - 1].skips.push(percuBar.skips[kk]);
+							}
+							percuBar.skips.splice(kk, 1);
+							kk--;
+						}
+					}
+				}
+			}
+		}
+	}
+	adjustAutoPoints() {
+		for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
+			let barMetre = MMUtil().set(this.cfg().data.timeline[ii].metre);
+			for (let nn = 0; nn < this.cfg().data.filters.length; nn++) {
+				let autoBar = this.cfg().data.filters[nn].automation[ii];
+				for (let kk = 0; kk < autoBar.changes.length; kk++) {
+					if (barMetre.less(autoBar.changes[kk].skip)) {
+						if (ii >= this.cfg().data.timeline.length) {
+							this.appendBar();
+							this.cfg().data.filters[nn].automation.push({ changes: [] });
+						}
+						autoBar.changes[kk].skip = MMUtil().set(autoBar.changes[kk].skip).minus(barMetre).simplyfy();
+						this.cfg().data.percussions[nn].measures[ii + 1].skips.push(autoBar.changes[kk].skip);
+						autoBar.changes.splice(kk, 1);
+						kk--;
+					} else {
+						if (autoBar.changes[kk].skip.count < 0) {
+							if (ii > 0) {
+								let preMetre = MMUtil().set(this.cfg().data.timeline[ii - 1].metre);
+								autoBar.changes[kk].skip = preMetre.plus(autoBar.changes[kk].skip).simplyfy();
+								this.cfg().data.percussions[nn].measures[ii - 1].skips.push(autoBar.changes[kk].skip);
+							}
+							autoBar.changes.splice(kk, 1);
+							kk--;
+						}
+					}
+				}
+			}
+		}
+	}
+	adjustLyricsPoints() {
+		for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
+			let barMetre = MMUtil().set(this.cfg().data.timeline[ii].metre);
+			let txtBar = this.cfg().data.comments[ii];
+			for (let kk = 0; kk < txtBar.points.length; kk++) {
+				if (barMetre.less(txtBar.points[kk].skip)) {
+					if (ii >= this.cfg().data.timeline.length) {
+						this.appendBar();
+						this.cfg().data.comments.push({ points: [] });
+					}
+					txtBar.points[kk].skip = MMUtil().set(txtBar.points[kk].skip).minus(barMetre).simplyfy();
+					this.cfg().data.comments[ii + 1].points.push(txtBar.points[kk]);
+
+					txtBar.points.splice(kk, 1);
+					kk--;
+				} else {
+					if (txtBar.points[kk].skip.count < 0) {
+						if (ii > 0) {
+							let preMetre = MMUtil().set(this.cfg().data.timeline[ii - 1].metre);
+							txtBar.points[kk].skip = preMetre.plus(txtBar.points[kk].skip).simplyfy();
+							this.cfg().data.comments[ii - 1].points.push(txtBar.points[kk]);
+						}
+						txtBar.points.splice(kk, 1);
+						kk--;
+					}
+				}
+			}
+
+		}
+	}
+	adjustTimelineChords() {
+		console.log('adjustTimelineChords');
+		this.adjustTimeLineLength();
+		this.adjustRemoveEmptyChords();
+		this.adjustTracksChords();
+		this.adjustSamplerSkips();
+		this.adjustAutoPoints();
+		this.adjustLyricsPoints();
+		this.adjustTimeLineLength();
 	}
 }
 let globalCommandDispatcher = new CommandDispatcher();
