@@ -76,6 +76,14 @@ class CommandDispatcher {
 	clearRedo() {
 		this.redoQueue = [];
 	}
+	setVisibleTimeMark(){
+		this.renderer.timeselectbar.positionTimeMark.css='positionTimeMarkShow';
+		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
+	}
+	setHiddenTimeMark(){
+		this.renderer.timeselectbar.positionTimeMark.css='positionTimeMarkHide';
+		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
+	}
 	reDrawPlayPosition() {
 
 		let ww = this.renderer.timeselectbar.positionMarkWidth();
@@ -349,6 +357,7 @@ class CommandDispatcher {
 		}*/
 		this.player.cancel();
 		this.renderer.menu.rerenderMenuContent(null);
+		this.setHiddenTimeMark();
 		this.resetProject();
 		//console.log('stopPlay done', this.player.playState());
 	}
@@ -391,6 +400,7 @@ class CommandDispatcher {
 		}
 
 		this.startPlayLoop(from, this.playPosition, to);
+		
 	}
 	startPlayLoop(from: number, position: number, to: number) {
 		console.log('startPlayLoop', from, position, to);
@@ -429,7 +439,7 @@ class CommandDispatcher {
 			//console.log('startPlayLoop done', from, position, to, me.player.playState());
 			//me.neeToStart = false;
 			this.renderer.warning.hideWarning();
-
+this.setVisibleTimeMark();
 			this.renderer.menu.rerenderMenuContent(null);
 			this.resetProject();
 			//console.log('startPlayLoop done', from, position, to, me.player.playState());

@@ -1181,6 +1181,14 @@ class CommandDispatcher {
     clearRedo() {
         this.redoQueue = [];
     }
+    setVisibleTimeMark() {
+        this.renderer.timeselectbar.positionTimeMark.css = 'positionTimeMarkShow';
+        this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
+    }
+    setHiddenTimeMark() {
+        this.renderer.timeselectbar.positionTimeMark.css = 'positionTimeMarkHide';
+        this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
+    }
     reDrawPlayPosition() {
         let ww = this.renderer.timeselectbar.positionMarkWidth();
         let xx = this.cfg().leftPad + this.playPosition * this.cfg().widthDurationRatio - ww;
@@ -1400,6 +1408,7 @@ class CommandDispatcher {
     stopPlay() {
         this.player.cancel();
         this.renderer.menu.rerenderMenuContent(null);
+        this.setHiddenTimeMark();
         this.resetProject();
     }
     setupAndStartPlay() {
@@ -1451,6 +1460,7 @@ class CommandDispatcher {
         }
         else {
             this.renderer.warning.hideWarning();
+            this.setVisibleTimeMark();
             this.renderer.menu.rerenderMenuContent(null);
             this.resetProject();
         }
@@ -2213,7 +2223,7 @@ class TimeSelectBar {
             y: 0,
             w: this.positionMarkWidth(),
             h: 11,
-            css: 'positionTimeMark'
+            css: 'positionTimeMarkHide'
         };
         this.positionTimeAnchor = {
             xx: 0, yy: 0, ww: 1, hh: 1,
@@ -3346,6 +3356,7 @@ function composeBaseMenu() {
                         }
                     }, {
                         text: 'Change meter', onClick: () => {
+                            globalCommandDispatcher.promptMeterForSelectedBars();
                         }
                     }, {
                         text: 'Recalculate meter', onClick: () => {

@@ -311,7 +311,7 @@ function composeBaseMenu(): MenuInfo[] {
 						}
 					}, {
 						text: 'Change meter', onClick: () => {
-							//
+							globalCommandDispatcher.promptMeterForSelectedBars()
 						}
 					}, {
 						text: 'Recalculate meter', onClick: () => {

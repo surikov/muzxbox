@@ -18,9 +18,15 @@
 	stop-opacity: 100%;
 }
 
-.positionTimeMark {
+.positionTimeMarkShow {
 	fill2: var(--drag-color);
 	fill: url(#positionTimeMarkFill);
+	visibility:visible;
+}
+.positionTimeMarkHide {
+	fill2: var(--drag-color);
+	fill: url(#positionTimeMarkFill);
+	visibility:hidden;
 }
 
 

@@ -59,7 +59,7 @@ class TimeSelectBar {
 			, y: 0
 			, w: this.positionMarkWidth()
 			, h: 11
-			, css: 'positionTimeMark'
+			, css: 'positionTimeMarkHide'
 		};
 		this.positionTimeAnchor = {
 			xx: 0, yy: 0, ww: 1, hh: 1
