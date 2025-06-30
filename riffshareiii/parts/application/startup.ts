@@ -34,7 +34,7 @@ function startApplication() {
 		console.log(xx);
 
 	}
-	globalCommandDispatcher.resetProject();
+	
 	//ui.fillWholeUI();//testBigMixerData);//testEmptyMixerData);
 	//testNumMathUtil();
 	//console.log('done startApplication');
@@ -47,6 +47,18 @@ function startApplication() {
 	if (themei) {
 		globalCommandDispatcher.setThemeColor(themei);
 	}
+	let uilocale = readRawTextFromlocalStorage('uilocale');
+	if (uilocale) {
+		let uiratio = readRawTextFromlocalStorage('uiratio');
+		if (uiratio) {
+			let nratio = parseInt(uiratio);
+			if (nratio >= 0.1) {
+				globalCommandDispatcher.setThemeLocale(uilocale, nratio);
+			}
+		}
+	}
+
+	globalCommandDispatcher.resetProject();
 }
 function squashString(data: string): string {
 	return data;

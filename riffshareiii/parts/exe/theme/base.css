@@ -180,6 +180,7 @@ body {
 	background-color2: #ff00ff;
 	cursor: grab;
 	background-color2: var(--main-color);
+	overflow: hidden;
 }
 
 #pagediv {

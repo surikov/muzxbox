@@ -294,7 +294,7 @@ function composeBaseMenu(): MenuInfo[] {
 					, menuPointSamplers
 				]
 			}*/
-			, {
+			/*, {
 				text: 'Selection', children: [
 					{
 						text: 'Delete bars', onClick: () => {
@@ -336,7 +336,7 @@ function composeBaseMenu(): MenuInfo[] {
 						}
 					}
 				]
-			}
+			}*/
 			, {
 				text: localMenuItemSettings, children: [
 					{

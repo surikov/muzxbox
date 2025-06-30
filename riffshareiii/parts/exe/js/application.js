@@ -260,11 +260,21 @@ function startApplication() {
     catch (xx) {
         console.log(xx);
     }
-    globalCommandDispatcher.resetProject();
     let themei = readRawTextFromlocalStorage('uicolortheme');
     if (themei) {
         globalCommandDispatcher.setThemeColor(themei);
     }
+    let uilocale = readRawTextFromlocalStorage('uilocale');
+    if (uilocale) {
+        let uiratio = readRawTextFromlocalStorage('uiratio');
+        if (uiratio) {
+            let nratio = parseInt(uiratio);
+            if (nratio >= 0.1) {
+                globalCommandDispatcher.setThemeLocale(uilocale, nratio);
+            }
+        }
+    }
+    globalCommandDispatcher.resetProject();
 }
 function squashString(data) {
     return data;
@@ -1466,7 +1476,7 @@ class CommandDispatcher {
         }
     }
     setThemeLocale(loc, ratio) {
-        console.log("setThemeLocale " + loc);
+        console.log("setThemeLocale", loc, ratio);
         setLocaleID(loc, ratio);
         if (loc == 'zh') {
             startLoadCSSfile('theme/font2big.css');
@@ -1480,6 +1490,7 @@ class CommandDispatcher {
             }
         }
         this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
+        this.resetProject();
     }
     setThemeColor(idx) {
         let cssPath = 'theme/colordarkblue.css';
@@ -1561,6 +1572,7 @@ class CommandDispatcher {
     setupSelectionBackground22(selectedPart) {
     }
     expandTimeLineSelection(idx) {
+        console.log('expandTimeLineSelection');
         if (this.cfg().data) {
             if (idx >= 0 && idx < this.cfg().data.timeline.length) {
                 let curPro = this.cfg().data;
@@ -1600,9 +1612,8 @@ class CommandDispatcher {
             console.log('no project data');
         }
         this.setPlayPositionFromSelectedPart();
-        this.renderer.timeselectbar.updateTimeSelectionBar();
-        this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup, this.renderer.timeselectbar.selectionAnchor, LevelModes.top);
         this.reDrawPlayPosition();
+        this.resetProject();
     }
     dropSelectedBars() {
         let startMeasure = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
@@ -2009,6 +2020,7 @@ class UIRenderer {
         });
     }
     fillWholeUI() {
+        console.log('fillWholeUI');
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.tiler.resetInnerSize(globalCommandDispatcher.cfg().wholeWidth(), globalCommandDispatcher.cfg().wholeHeight());
@@ -2073,6 +2085,11 @@ let localMenuSamplersFolder = 'localMenuSamplersFolder';
 let localMenuInsTracksFolder = 'localMenuInsTracksFolder';
 let localMenuDrumTracksFolder = 'localMenuDrumTracksFolder';
 let localMenuFxTracksFolder = 'localMenuFxTracksFolder';
+let localAddEmptyMeasures = 'localAddEmptyMeasures';
+let localRemoveSelectedMeasures = 'localRemoveSelectedMeasures';
+let localSplitFirstSelectedMeasure = 'localSplitFirstSelectedMeasure';
+let localShiftContentOfSelectedMeausres = 'localShiftContentOfSelectedMeausres';
+let localMorphMeterSelectedMeausres = 'localMorphMeterSelectedMeausres';
 let localMenuNewPlugin = 'localMenuNewPlugin';
 let localeDictionary = [
     {
@@ -2095,6 +2112,11 @@ let localeDictionary = [
             { locale: 'zh', text: '?' }
         ]
     },
+    { id: localAddEmptyMeasures, data: [{ locale: 'en', text: 'Add' }, { locale: 'ru', text: 'Добавить' }, { locale: 'zh', text: '?' }] },
+    { id: localRemoveSelectedMeasures, data: [{ locale: 'en', text: 'Remove' }, { locale: 'ru', text: 'Убрать' }, { locale: 'zh', text: '?' }] },
+    { id: localSplitFirstSelectedMeasure, data: [{ locale: 'en', text: 'Split' }, { locale: 'ru', text: 'Разделить' }, { locale: 'zh', text: '?' }] },
+    { id: localShiftContentOfSelectedMeausres, data: [{ locale: 'en', text: 'Shift' }, { locale: 'ru', text: 'Сдвинуть' }, { locale: 'zh', text: '?' }] },
+    { id: localMorphMeterSelectedMeausres, data: [{ locale: 'en', text: 'Morph' }, { locale: 'ru', text: 'Сменить' }, { locale: 'zh', text: '?' }] },
     {
         id: localMenuAutomationFolder, data: [
             { locale: 'en', text: 'Automation' },
@@ -2169,6 +2191,8 @@ let localeDictionary = [
 function setLocaleID(loname, ratio) {
     labelLocaleDictionary = loname;
     localeFontRatio = ratio;
+    saveRawText2localStorage('uilocale', loname);
+    saveRawText2localStorage('uiratio', '' + ratio);
 }
 function LO(id) {
     for (let ii = 0; ii < localeDictionary.length; ii++) {
@@ -2255,6 +2279,7 @@ class TimeSelectBar {
         this.selectionMark.h = viewHeight * 1024;
     }
     updateTimeSelectionBar() {
+        console.log('updateTimeSelectionBar', globalCommandDispatcher.cfg().data.selectedPart);
         let selection = globalCommandDispatcher.cfg().data.selectedPart;
         if (selection.startMeasure > -1 || selection.endMeasure > -1) {
             let mm = MMUtil();
@@ -2333,6 +2358,49 @@ class TimeSelectBar {
         };
         measureAnchor.content.push(bpm);
     }
+    addSelectionMenuButton(label, left, order, zz, selectLevelAnchor, action) {
+        let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
+        let opt1 = {
+            x: left,
+            y: (size * 1.1) * order,
+            w: size,
+            h: size,
+            rx: size / 2,
+            ry: size / 2,
+            css: 'timeMarkButtonCircle' + zoomPrefixLevelsCSS[zz].prefix,
+            activation: action
+        };
+        selectLevelAnchor.content.push(opt1);
+        let nm = {
+            x: left + size / 4,
+            y: (size * 1.1) * order + size * 3 / 4,
+            text: label,
+            css: 'selectedBarNum' + zoomPrefixLevelsCSS[zz].prefix
+        };
+        selectLevelAnchor.content.push(nm);
+    }
+    fillSelectionMenu(zz, selectLevelAnchor) {
+        if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > 0) {
+            let left = globalCommandDispatcher.cfg().leftPad;
+            for (let ii = 0; ii < globalCommandDispatcher.cfg().data.selectedPart.startMeasure; ii++) {
+                let curBar = globalCommandDispatcher.cfg().data.timeline[ii];
+                let curMeasureMeter = MMUtil().set(curBar.metre);
+                let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                left = left + barWidth;
+            }
+            let tempoLabel = '' + Math.round(globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].tempo);
+            let meterLabel = '' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.count
+                + '/' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.part;
+            this.addSelectionMenuButton(LO('localAddEmptyMeasures'), left, 1, zz, selectLevelAnchor, globalCommandDispatcher.insertAfterSelectedBars);
+            this.addSelectionMenuButton(LO('localRemoveSelectedMeasures'), left, 2, zz, selectLevelAnchor, globalCommandDispatcher.dropSelectedBars);
+            this.addSelectionMenuButton(LO('localSplitFirstSelectedMeasure'), left, 3, zz, selectLevelAnchor, () => { });
+            this.addSelectionMenuButton(LO('localShiftContentOfSelectedMeausres'), left, 4, zz, selectLevelAnchor, () => { });
+            this.addSelectionMenuButton(LO(localMorphMeterSelectedMeausres), left, 5, zz, selectLevelAnchor, () => { });
+            this.addSelectionMenuButton(tempoLabel, left, 6, zz, selectLevelAnchor, globalCommandDispatcher.promptTempoForSelectedBars);
+            this.addSelectionMenuButton(meterLabel, left, 7, zz, selectLevelAnchor, globalCommandDispatcher.promptMeterForSelectedBars);
+            this.addSelectionMenuButton('/16', left, 8, zz, selectLevelAnchor, () => { });
+        }
+    }
     fillTimeBar() {
         this.selectBarAnchor.ww = globalCommandDispatcher.cfg().wholeWidth();
         this.selectBarAnchor.hh = globalCommandDispatcher.cfg().wholeHeight();
@@ -2399,6 +2467,7 @@ class TimeSelectBar {
                 barLeft = barLeft + barWidth;
                 barTime = barTime + curMeasureMeter.duration(curBar.tempo);
             }
+            this.fillSelectionMenu(zz, selectLevelAnchor);
         }
         this.selectBarAnchor.content = this.zoomAnchors;
         this.updateTimeSelectionBar();
@@ -3340,42 +3409,6 @@ function composeBaseMenu() {
             menuPointFxTracks,
             menuPointActions,
             menuPointAddPlugin,
-            {
-                text: 'Selection', children: [
-                    {
-                        text: 'Delete bars', onClick: () => {
-                            globalCommandDispatcher.dropSelectedBars();
-                        }
-                    }, {
-                        text: 'Insert bars', onClick: () => {
-                            globalCommandDispatcher.insertAfterSelectedBars();
-                        }
-                    }, {
-                        text: 'Change tempo', onClick: () => {
-                            globalCommandDispatcher.promptTempoForSelectedBars();
-                        }
-                    }, {
-                        text: 'Change meter', onClick: () => {
-                            globalCommandDispatcher.promptMeterForSelectedBars();
-                        }
-                    }, {
-                        text: 'Recalculate meter', onClick: () => {
-                        }
-                    }, {
-                        text: 'Copy visibled items', onClick: () => {
-                        }
-                    }, {
-                        text: 'Cut visibled items', onClick: () => {
-                        }
-                    }, {
-                        text: 'Paste', onClick: () => {
-                        }
-                    }, {
-                        text: 'Align to 32th', onClick: () => {
-                        }
-                    }
-                ]
-            },
             {
                 text: localMenuItemSettings, children: [
                     {

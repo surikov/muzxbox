@@ -186,6 +186,102 @@
 
 
 
+.selectedBarNum025 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*0.2*var(--tapSize));
+	text-anchor22: start;
+	pointer-events: none;
+}
+
+.selectedBarNum05 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*0.4*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum1 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*0.8*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum2 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*1.6*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum4 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*3.2*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum8 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*6.4*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum16 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*12.8*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum32 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*25.6*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum64 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*51.2*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum128 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*102.4*var(--tapSize));
+	pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

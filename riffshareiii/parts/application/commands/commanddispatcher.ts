@@ -76,12 +76,12 @@ class CommandDispatcher {
 	clearRedo() {
 		this.redoQueue = [];
 	}
-	setVisibleTimeMark(){
-		this.renderer.timeselectbar.positionTimeMark.css='positionTimeMarkShow';
+	setVisibleTimeMark() {
+		this.renderer.timeselectbar.positionTimeMark.css = 'positionTimeMarkShow';
 		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
 	}
-	setHiddenTimeMark(){
-		this.renderer.timeselectbar.positionTimeMark.css='positionTimeMarkHide';
+	setHiddenTimeMark() {
+		this.renderer.timeselectbar.positionTimeMark.css = 'positionTimeMarkHide';
 		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
 	}
 	reDrawPlayPosition() {
@@ -400,7 +400,7 @@ class CommandDispatcher {
 		}
 
 		this.startPlayLoop(from, this.playPosition, to);
-		
+
 	}
 	startPlayLoop(from: number, position: number, to: number) {
 		console.log('startPlayLoop', from, position, to);
@@ -439,7 +439,7 @@ class CommandDispatcher {
 			//console.log('startPlayLoop done', from, position, to, me.player.playState());
 			//me.neeToStart = false;
 			this.renderer.warning.hideWarning();
-this.setVisibleTimeMark();
+			this.setVisibleTimeMark();
 			this.renderer.menu.rerenderMenuContent(null);
 			this.resetProject();
 			//console.log('startPlayLoop done', from, position, to, me.player.playState());
@@ -447,7 +447,7 @@ this.setVisibleTimeMark();
 		//}
 	}
 	setThemeLocale(loc: string, ratio: number) {
-		console.log("setThemeLocale " + loc);
+		console.log("setThemeLocale", loc, ratio);
 		setLocaleID(loc, ratio);
 		if (loc == 'zh') {
 			startLoadCSSfile('theme/font2big.css');
@@ -459,6 +459,7 @@ this.setVisibleTimeMark();
 			}
 		}
 		this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
+		this.resetProject();
 	}
 	setThemeColor(idx: string) {//cssPath: string) {
 		let cssPath: string = 'theme/colordarkblue.css';
@@ -650,7 +651,7 @@ this.setVisibleTimeMark();
 		}*/
 	}
 	expandTimeLineSelection(idx: number) {
-
+		console.log('expandTimeLineSelection');
 		if (this.cfg().data) {
 			if (idx >= 0 && idx < this.cfg().data.timeline.length) {
 				let curPro = this.cfg().data;
@@ -686,12 +687,12 @@ this.setVisibleTimeMark();
 			console.log('no project data');
 		}
 		this.setPlayPositionFromSelectedPart();
-		this.renderer.timeselectbar.updateTimeSelectionBar();
-		this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
+		//this.renderer.timeselectbar.updateTimeSelectionBar();
+		/*this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup
 			, this.renderer.timeselectbar.selectionAnchor
-			, LevelModes.top);
+			, LevelModes.top);*/
 		this.reDrawPlayPosition();
-
+		this.resetProject();
 	}
 	dropSelectedBars() {
 		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;

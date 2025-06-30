@@ -103,7 +103,7 @@ class TimeSelectBar {
 	updateTimeSelectionBar(//data: Zvoog_Project
 		//cfg:MixerDataMathUtility
 	) {
-		//console.log('updateTimeSelectionBar',globalCommandDispatcher.cfg().data.selectedPart);
+		console.log('updateTimeSelectionBar', globalCommandDispatcher.cfg().data.selectedPart);
 		let selection: Zvoog_Selection = globalCommandDispatcher.cfg().data.selectedPart;
 		//if (selection) {
 		if (selection.startMeasure > -1 || selection.endMeasure > -1) {
@@ -203,26 +203,57 @@ class TimeSelectBar {
 		measureAnchor.content.push(bpm);
 
 	}
-	/*
-		fillSelectionMenu() {
-			let zz = zoomPrefixLevelsCSS.length - 1;
-			let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
-			let opt1: TileRectangle = {
-				x: 0
-				, y: 0
-				, w: size
-				, h: size
-				, rx: size / 2
-				, ry: size / 2
-				, css: 'timeMarkButtonCircle128'
-				, activation: (x, y) => {
-					console.log('selection menu');
-	
-				}
-			};
-			this.selectBarAnchor.content.push(opt1);
-			console.log(this.selectBarAnchor);
-		}*/
+	addSelectionMenuButton(label: string, left: number, order: number, zz: number, selectLevelAnchor: TileAnchor, action: () => void) {
+		let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
+
+		let opt1: TileRectangle = {
+			x: left
+			, y:  (size * 1.1) * order
+			, w: size
+			, h: size
+			, rx: size / 2
+			, ry: size / 2
+			, css: 'timeMarkButtonCircle' + zoomPrefixLevelsCSS[zz].prefix
+			, activation: action
+		};
+		selectLevelAnchor.content.push(opt1);
+		let nm: TileText = {
+			x: left + size / 4
+			, y:  (size * 1.1) * order + size * 3 / 4
+			, text: label
+			, css: 'selectedBarNum' + zoomPrefixLevelsCSS[zz].prefix
+		};
+		selectLevelAnchor.content.push(nm);
+		//console.log('addSelectionMenuButton', zz, label);
+
+	}
+	fillSelectionMenu(zz: number, selectLevelAnchor: TileAnchor) {
+		if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > 0) {
+			//let zz = zoomPrefixLevelsCSS.length - 1;
+			//for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
+
+			let left = globalCommandDispatcher.cfg().leftPad;
+			for (let ii = 0; ii < globalCommandDispatcher.cfg().data.selectedPart.startMeasure; ii++) {
+				let curBar = globalCommandDispatcher.cfg().data.timeline[ii];
+				let curMeasureMeter = MMUtil().set(curBar.metre);
+				let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+				left = left + barWidth;
+			}
+			let tempoLabel = '' + Math.round(globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].tempo);
+			let meterLabel = '' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.count
+				+ '/' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.part;
+			this.addSelectionMenuButton(LO('localAddEmptyMeasures'), left, 1, zz, selectLevelAnchor, globalCommandDispatcher.insertAfterSelectedBars);
+			this.addSelectionMenuButton(LO('localRemoveSelectedMeasures'), left, 2, zz, selectLevelAnchor, globalCommandDispatcher.dropSelectedBars);
+			this.addSelectionMenuButton(LO('localSplitFirstSelectedMeasure'), left, 3, zz, selectLevelAnchor, () => { });
+			this.addSelectionMenuButton(LO('localShiftContentOfSelectedMeausres'), left, 4, zz, selectLevelAnchor, () => { });
+			this.addSelectionMenuButton(LO(localMorphMeterSelectedMeausres), left, 5, zz, selectLevelAnchor, () => { });
+			this.addSelectionMenuButton(tempoLabel, left, 6, zz, selectLevelAnchor, globalCommandDispatcher.promptTempoForSelectedBars);
+			this.addSelectionMenuButton(meterLabel, left, 7, zz, selectLevelAnchor, globalCommandDispatcher.promptMeterForSelectedBars);
+			this.addSelectionMenuButton('/16', left, 8, zz, selectLevelAnchor, () => { });
+			//}
+			//console.log(opt1);
+		}
+	}
 
 	fillTimeBar() {
 		this.selectBarAnchor.ww = globalCommandDispatcher.cfg().wholeWidth();
@@ -295,11 +326,11 @@ class TimeSelectBar {
 				//console.log((kk+1),barTime,curMeasureMeter.duration(curBar.tempo),curBar.metre,curBar.tempo);
 				barTime = barTime + curMeasureMeter.duration(curBar.tempo);
 			}
-
+			this.fillSelectionMenu(zz, selectLevelAnchor);
 		}
 
 		this.selectBarAnchor.content = this.zoomAnchors;
-		//this.fillSelectionMenu();
+
 		this.updateTimeSelectionBar();
 	}
 }
