@@ -165,15 +165,15 @@ class CommandExe {
 		}*/
 		//console.log('redo/undo len ', globalCommandDispatcher.redo().length, globalCommandDispatcher.undo().length);
 		//let actionCount = 0;
-		let size=0;
+		let size = 0;
 		for (let ii = 0; ii < globalCommandDispatcher.undo().length; ii++) {
 			//let one: Zvoog_UICommand = JSON.parse('' + new LZUtil().decompressFromUTF16(globalCommandDispatcher.undo()[ii]));
 			//let one = globalCommandDispatcher.undo()[ii];
 			//actionCount = actionCount + one.actions.length;
-			size=size+globalCommandDispatcher.undo()[ii].length;
+			size = size + globalCommandDispatcher.undo()[ii].length;
 			//console.log(ii, size);
 			if (size > 543210) {
-				let drp=Math.ceil(ii/2);
+				let drp = Math.ceil(ii / 2);
 				//console.log('cut undo ', drp, 'for', size);
 				globalCommandDispatcher.undo().splice(0, drp);
 				//globalCommandDispatcher.spliseUndo(ii);

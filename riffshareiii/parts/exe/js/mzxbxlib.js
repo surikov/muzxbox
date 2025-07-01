@@ -29,7 +29,7 @@ class MZXBX_MetreMathUtil {
         let cc = this.count;
         let pp = this.part;
         let rr = pp / toPart;
-        cc = Math.floor(cc / rr);
+        cc = Math.round(cc / rr);
         pp = toPart;
         let r = new MZXBX_MetreMathUtil().set({ count: cc, part: pp }).simplyfy();
         return r;

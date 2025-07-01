@@ -33,9 +33,9 @@ let localMenuFxTracksFolder = 'localMenuFxTracksFolder';
 
 let localAddEmptyMeasures = 'localAddEmptyMeasures';
 let localRemoveSelectedMeasures = 'localRemoveSelectedMeasures';
-let localSplitFirstSelectedMeasure = 'localSplitFirstSelectedMeasure';
-let localShiftContentOfSelectedMeausres = 'localShiftContentOfSelectedMeausres';
-let localMorphMeterSelectedMeausres = 'localMorphMeterSelectedMeausres';
+//let localSplitFirstSelectedMeasure = 'localSplitFirstSelectedMeasure';
+let localMergeSelectedMeausres = 'localMergeSelectedMeausres';
+//let localMorphMeterSelectedMeausres = 'localMorphMeterSelectedMeausres';
 
 let localMenuNewPlugin = 'localMenuNewPlugin';
 
@@ -69,9 +69,9 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
 	}
 	, { id: localAddEmptyMeasures, data: [{ locale: 'en', text: 'Add' }, { locale: 'ru', text: 'Добавить' }, { locale: 'zh', text: '?' }] }
 	, { id: localRemoveSelectedMeasures, data: [{ locale: 'en', text: 'Remove' }, { locale: 'ru', text: 'Убрать' }, { locale: 'zh', text: '?' }] }
-	, { id: localSplitFirstSelectedMeasure, data: [{ locale: 'en', text: 'Split' }, { locale: 'ru', text: 'Разделить' }, { locale: 'zh', text: '?' }] }
-	, { id: localShiftContentOfSelectedMeausres, data: [{ locale: 'en', text: 'Shift' }, { locale: 'ru', text: 'Сдвинуть' }, { locale: 'zh', text: '?' }] }
-	, { id: localMorphMeterSelectedMeausres, data: [{ locale: 'en', text: 'Morph' }, { locale: 'ru', text: 'Сменить' }, { locale: 'zh', text: '?' }] }
+	//, { id: localSplitFirstSelectedMeasure, data: [{ locale: 'en', text: 'Split' }, { locale: 'ru', text: 'Разделить' }, { locale: 'zh', text: '?' }] }
+	, { id: localMergeSelectedMeausres, data: [{ locale: 'en', text: 'Merge' }, { locale: 'ru', text: 'Объединить' }, { locale: 'zh', text: '?' }] }
+	//, { id: localMorphMeterSelectedMeausres, data: [{ locale: 'en', text: 'Morph' }, { locale: 'ru', text: 'Сменить' }, { locale: 'zh', text: '?' }] }
 
 	/*, {
         id: localMenuFileFolder, data: [

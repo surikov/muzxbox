@@ -208,7 +208,7 @@ class TimeSelectBar {
 
 		let opt1: TileRectangle = {
 			x: left
-			, y:  (size * 1.1) * order
+			, y: (size * 1.1) * order
 			, w: size
 			, h: size
 			, rx: size / 2
@@ -219,7 +219,7 @@ class TimeSelectBar {
 		selectLevelAnchor.content.push(opt1);
 		let nm: TileText = {
 			x: left + size / 4
-			, y:  (size * 1.1) * order + size * 3 / 4
+			, y: (size * 1.1) * order + size * 3 / 4
 			, text: label
 			, css: 'selectedBarNum' + zoomPrefixLevelsCSS[zz].prefix
 		};
@@ -228,7 +228,7 @@ class TimeSelectBar {
 
 	}
 	fillSelectionMenu(zz: number, selectLevelAnchor: TileAnchor) {
-		if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > 0) {
+		if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
 			//let zz = zoomPrefixLevelsCSS.length - 1;
 			//for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
 
@@ -242,14 +242,14 @@ class TimeSelectBar {
 			let tempoLabel = '' + Math.round(globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].tempo);
 			let meterLabel = '' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.count
 				+ '/' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.part;
-			this.addSelectionMenuButton(LO('localAddEmptyMeasures'), left, 1, zz, selectLevelAnchor, globalCommandDispatcher.insertAfterSelectedBars);
-			this.addSelectionMenuButton(LO('localRemoveSelectedMeasures'), left, 2, zz, selectLevelAnchor, globalCommandDispatcher.dropSelectedBars);
-			this.addSelectionMenuButton(LO('localSplitFirstSelectedMeasure'), left, 3, zz, selectLevelAnchor, () => { });
-			this.addSelectionMenuButton(LO('localShiftContentOfSelectedMeausres'), left, 4, zz, selectLevelAnchor, () => { });
-			this.addSelectionMenuButton(LO(localMorphMeterSelectedMeausres), left, 5, zz, selectLevelAnchor, () => { });
-			this.addSelectionMenuButton(tempoLabel, left, 6, zz, selectLevelAnchor, globalCommandDispatcher.promptTempoForSelectedBars);
-			this.addSelectionMenuButton(meterLabel, left, 7, zz, selectLevelAnchor, globalCommandDispatcher.promptMeterForSelectedBars);
-			this.addSelectionMenuButton('/16', left, 8, zz, selectLevelAnchor, () => { });
+			this.addSelectionMenuButton(LO(localAddEmptyMeasures), left, 1, zz, selectLevelAnchor, globalCommandDispatcher.insertAfterSelectedBars);
+			this.addSelectionMenuButton(LO(localRemoveSelectedMeasures), left, 2, zz, selectLevelAnchor, globalCommandDispatcher.dropSelectedBars);
+			//this.addSelectionMenuButton(LO(localSplitFirstSelectedMeasure), left, 3, zz, selectLevelAnchor, () => { });
+			this.addSelectionMenuButton(LO(localMergeSelectedMeausres), left, 3, zz, selectLevelAnchor, globalCommandDispatcher.mergeSelectedBars);
+			//this.addSelectionMenuButton(LO(localMorphMeterSelectedMeausres), left, 4, zz, selectLevelAnchor, () => { });
+			this.addSelectionMenuButton(tempoLabel, left, 4, zz, selectLevelAnchor, globalCommandDispatcher.promptTempoForSelectedBars);
+			this.addSelectionMenuButton(meterLabel, left, 5, zz, selectLevelAnchor, globalCommandDispatcher.promptMeterForSelectedBars);
+			//this.addSelectionMenuButton('/16', left, 7, zz, selectLevelAnchor, globalCommandDispatcher.align16forSelection);
 			//}
 			//console.log(opt1);
 		}

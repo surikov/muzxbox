@@ -198,6 +198,7 @@ declare class CommandDispatcher {
     playFromTimeSelection(idx: number): void;
     setupSelectionBackground22(selectedPart: Zvoog_Selection): void;
     expandTimeLineSelection(idx: number): void;
+    mergeSelectedBars(): void;
     dropSelectedBars(): void;
     insertAfterSelectedBars(): void;
     promptTempoForSelectedBars(): void;
@@ -206,11 +207,12 @@ declare class CommandDispatcher {
     adjustTimeLineLength(): void;
     adjustRemoveEmptyChords(): void;
     appendBar(): void;
+    adjustMergeChordByTime(trackBar: Zvoog_TrackMeasure): void;
     adjustTracksChords(): void;
     adjustSamplerSkips(): void;
     adjustAutoPoints(): void;
     adjustLyricsPoints(): void;
-    adjustTimelineChords(): void;
+    adjustTimelineContent(): void;
 }
 declare let globalCommandDispatcher: CommandDispatcher;
 declare type GridTimeTemplate14 = {
@@ -270,9 +272,7 @@ declare let localMenuDrumTracksFolder: string;
 declare let localMenuFxTracksFolder: string;
 declare let localAddEmptyMeasures: string;
 declare let localRemoveSelectedMeasures: string;
-declare let localSplitFirstSelectedMeasure: string;
-declare let localShiftContentOfSelectedMeausres: string;
-declare let localMorphMeterSelectedMeausres: string;
+declare let localMergeSelectedMeausres: string;
 declare let localMenuNewPlugin: string;
 declare let localeDictionary: {
     id: string;

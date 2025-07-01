@@ -15,6 +15,7 @@ function startApplication() {
 		if (lastprojectdata) {
 			globalCommandDispatcher.registerWorkProject(lastprojectdata);
 		}
+		console.log('lastprojectdata',lastprojectdata);
 		globalCommandDispatcher.clearUndo();
 		globalCommandDispatcher.clearRedo();
 		let undocommands = readRawObjectFromlocalStorage('undocommands');
@@ -59,6 +60,7 @@ function startApplication() {
 	}
 
 	globalCommandDispatcher.resetProject();
+
 }
 function squashString(data: string): string {
 	return data;
