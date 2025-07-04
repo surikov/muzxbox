@@ -2219,9 +2219,9 @@ let localeDictionary = [
             { locale: 'zh', text: '?' }
         ]
     },
-    { id: localAddEmptyMeasures, data: [{ locale: 'en', text: 'Add' }, { locale: 'ru', text: 'Добавить' }, { locale: 'zh', text: '?' }] },
-    { id: localRemoveSelectedMeasures, data: [{ locale: 'en', text: 'Remove' }, { locale: 'ru', text: 'Убрать' }, { locale: 'zh', text: '?' }] },
-    { id: localMergeSelectedMeausres, data: [{ locale: 'en', text: 'Merge' }, { locale: 'ru', text: 'Объединить' }, { locale: 'zh', text: '?' }] },
+    { id: localAddEmptyMeasures, data: [{ locale: 'en', text: '+' }, { locale: 'ru', text: '+' }, { locale: 'zh', text: '?' }] },
+    { id: localRemoveSelectedMeasures, data: [{ locale: 'en', text: 'x' }, { locale: 'ru', text: 'x' }, { locale: 'zh', text: '?' }] },
+    { id: localMergeSelectedMeausres, data: [{ locale: 'en', text: '>|<' }, { locale: 'ru', text: '()' }, { locale: 'zh', text: '?' }] },
     {
         id: localMenuAutomationFolder, data: [
             { locale: 'en', text: 'Automation' },

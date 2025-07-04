@@ -249,7 +249,7 @@ class TimeSelectBar {
 			//this.addSelectionMenuButton(LO(localMorphMeterSelectedMeausres), left, 4, zz, selectLevelAnchor, () => { });
 			this.addSelectionMenuButton(tempoLabel, left, 4, zz, selectLevelAnchor, globalCommandDispatcher.promptTempoForSelectedBars);
 			this.addSelectionMenuButton(meterLabel, left, 5, zz, selectLevelAnchor, globalCommandDispatcher.promptMeterForSelectedBars);
-			//this.addSelectionMenuButton('/16', left, 7, zz, selectLevelAnchor, globalCommandDispatcher.align16forSelection);
+			//this.addSelectionMenuButton('/16', left, 6, zz, selectLevelAnchor, globalCommandDispatcher.align16forSelection);
 			//}
 			//console.log(opt1);
 		}
