@@ -1,11 +1,4 @@
 "use strict";
-var MZXBX_PluginPurpose;
-(function (MZXBX_PluginPurpose) {
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Action"] = 0] = "Action";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Filter"] = 1] = "Filter";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Sampler"] = 2] = "Sampler";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Performer"] = 3] = "Performer";
-})(MZXBX_PluginPurpose || (MZXBX_PluginPurpose = {}));
 console.log('Simple beep plugin? build 1');
 class SimpleBeepImplementation {
     constructor() {
@@ -29,7 +22,7 @@ class SimpleBeepImplementation {
             }
         });
     }
-    schedule(when, pitches, tempo, slides) {
+    strum(when, pitches, tempo, slides) {
         if (this.audioContext) {
             if (this.volume) {
                 this.clear();

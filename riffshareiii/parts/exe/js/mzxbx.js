@@ -485,7 +485,6 @@ class SchedulePlayer {
             this.disconnectAllPlugins();
         }
         else {
-            console.log('No loop to cancel');
         }
     }
 }

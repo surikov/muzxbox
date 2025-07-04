@@ -21,7 +21,7 @@ class SimpleBeepImplementation implements MZXBX_AudioPerformerPlugin {
 			}
 		});
 	}
-	schedule(when: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]) {
+	strum(when: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]) {
 		//console.log(when, pitches, tempo, slides);
 		if (this.audioContext) {
 			if (this.volume) {

@@ -8,14 +8,26 @@ function startApplication() {
 	let ui = new UIRenderer();
 	ui.createUI();
 	//window.addEventListener("unload", saveProjectState);
-	window.addEventListener("beforeunload", saveProjectState);
-
+	window.addEventListener("beforeunload", () => {
+		//console.log('save on beforeunload');
+		saveProjectState();
+	});
+	window.addEventListener("blur", () => {
+		//console.log('save on blur');
+		saveProjectState();
+	});
+	window.addEventListener("visibilitychange", function () {
+		if (document.hidden) {
+			//console.log("save on tab is hidden");
+			saveProjectState();
+		}
+	});
 	try {
 		let lastprojectdata = readLzObjectFromlocalStorage('lastprojectdata');
 		if (lastprojectdata) {
 			globalCommandDispatcher.registerWorkProject(lastprojectdata);
 		}
-		console.log('lastprojectdata',lastprojectdata);
+		console.log('lastprojectdata', lastprojectdata);
 		globalCommandDispatcher.clearUndo();
 		globalCommandDispatcher.clearRedo();
 		let undocommands = readRawObjectFromlocalStorage('undocommands');
@@ -35,7 +47,7 @@ function startApplication() {
 		console.log(xx);
 
 	}
-	
+
 	//ui.fillWholeUI();//testBigMixerData);//testEmptyMixerData);
 	//testNumMathUtil();
 	//console.log('done startApplication');
@@ -69,13 +81,13 @@ function resolveString(data: string): string | null {
 	return data;
 }
 function saveProjectState() {
-	console.log('saveProjectState');
+	//console.log('saveProjectState');
 	//https://github.com/pieroxy/lz-string
 	globalCommandDispatcher.exe.cutLongUndo();
 	let txtdata = JSON.stringify(globalCommandDispatcher.cfg().data);
 	try {
 
-		console.log('state size', txtdata.length);
+		//console.log('state size', txtdata.length);
 		saveLzText2localStorage('lastprojectdata', txtdata);
 		saveRawText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
 		saveRawText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
@@ -99,7 +111,7 @@ function saveProjectState() {
 			}
 		}
 	}
-	console.log('done saveProjectState');
+	//console.log('done saveProjectState');
 }
 function initWebAudioFromUI() {
 	console.log('initWebAudioFromUI');

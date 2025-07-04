@@ -103,7 +103,7 @@ class TimeSelectBar {
 	updateTimeSelectionBar(//data: Zvoog_Project
 		//cfg:MixerDataMathUtility
 	) {
-		console.log('updateTimeSelectionBar', globalCommandDispatcher.cfg().data.selectedPart);
+		//console.log('updateTimeSelectionBar', globalCommandDispatcher.cfg().data.selectedPart);
 		let selection: Zvoog_Selection = globalCommandDispatcher.cfg().data.selectedPart;
 		//if (selection) {
 		if (selection.startMeasure > -1 || selection.endMeasure > -1) {

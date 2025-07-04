@@ -1,11 +1,4 @@
 "use strict";
-var MZXBX_PluginPurpose;
-(function (MZXBX_PluginPurpose) {
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Action"] = 0] = "Action";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Filter"] = 1] = "Filter";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Sampler"] = 2] = "Sampler";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Performer"] = 3] = "Performer";
-})(MZXBX_PluginPurpose || (MZXBX_PluginPurpose = {}));
 console.log('Simple beep UI');
 class SimpleBeepPlugin {
     constructor() {
@@ -18,7 +11,6 @@ class SimpleBeepPlugin {
         window.parent.postMessage('', '*');
     }
     receiveHostMessage(messageEvent) {
-        console.log('receiveHostMessage', messageEvent);
         let message = messageEvent.data;
         if (this.id) {
             this.data = message.hostData;
@@ -29,7 +21,7 @@ class SimpleBeepPlugin {
     }
     sendMessageToHost(data) {
         console.log('sendMessageToHost');
-        var message = { dialogID: this.id, pluginData: data };
+        var message = { dialogID: this.id, pluginData: data, done: false };
         window.parent.postMessage(message, '*');
     }
     test() {
@@ -53,7 +45,7 @@ class SimpleBeepPlugin {
         }
         else {
             this.plugin.cancel();
-            this.plugin.schedule(this.audioContext.currentTime + 0.1, [48, 60, 64, 67], 120, [{ duration: 0.1, delta: 7 },
+            this.plugin.strum(this.audioContext.currentTime + 0.1, [48, 60, 64, 67], 120, [{ duration: 0.1, delta: 7 },
                 { duration: 0.2, delta: -7 },
                 { duration: 0.7, delta: 0 }
             ]);

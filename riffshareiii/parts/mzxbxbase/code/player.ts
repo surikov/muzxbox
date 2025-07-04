@@ -408,7 +408,7 @@ class SchedulePlayer implements MZXBX_Player {
 			this.isPlayLoop = false;
 			this.disconnectAllPlugins();
 		} else {
-			console.log('No loop to cancel');
+			//console.log('No loop to cancel');
 		}
 	}
 

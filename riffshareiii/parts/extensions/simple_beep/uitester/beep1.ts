@@ -25,7 +25,7 @@ class SimpleBeepPlugin {
 	}
 	sendMessageToHost(data: string) {
 		console.log('sendMessageToHost');
-		var message: MZXBX_MessageToHost = { dialogID: this.id, pluginData: data };
+		var message: MZXBX_MessageToHost = { dialogID: this.id, pluginData: data, done: false };
 		window.parent.postMessage(message, '*');
 	}
 	test() {
@@ -49,7 +49,7 @@ class SimpleBeepPlugin {
 			//
 		} else {
 			this.plugin.cancel();
-			this.plugin.schedule(this.audioContext.currentTime + 0.1, [48, 60, 64, 67], 120
+			this.plugin.strum(this.audioContext.currentTime + 0.1, [48, 60, 64, 67], 120
 				, [{ duration: 0.1, delta: 7 }
 					, { duration: 0.2, delta: -7 }
 					, { duration: 0.7, delta: 0 }

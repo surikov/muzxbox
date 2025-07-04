@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"target": "es2015"
         //,"outFile": "beep_plugin.js"
-        ,"outFile": "../../../../web/performers/simplebeep/beeper/beep_plugin.js"
+        ,"outFile": "../../../exe/plugins/performers/simplebeep/beeper/beep_plugin.js"
         //,"outDir":"../js"
 		,"strictNullChecks": true
 		,"alwaysStrict": true
@@ -27,8 +27,8 @@
 		
 		
 		
-        "../../../mzxbx/publictypes/musicenginetypes.ts"
-		,"../../../mzxbx/publictypes/musicenginedeclarations.ts"
+        "../../../mzxbxapi/musicenginetypes.ts"
+		,"../../../mzxbxapi/musicenginedeclarations.ts"
         ,"beeperplugin.ts"
 	]
 }

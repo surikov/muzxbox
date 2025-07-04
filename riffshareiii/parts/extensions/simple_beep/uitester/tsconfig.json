@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"target": "es2015"
         //,"outFile": "beeppui.js"
-        ,"outFile": "../../../../web/performers/simplebeep/uitester/beeppui.js"
+        ,"outFile": "../../../exe/plugins/performers/simplebeep/uitester/beeppui.js"
         //,"outDir":"../js"
 		,"strictNullChecks": true
 		,"alwaysStrict": true
@@ -27,8 +27,8 @@
 		
 		
 		
-        "../../../mzxbx/publictypes/musicenginetypes.ts"
-		,"../../../mzxbx/publictypes/musicenginedeclarations.ts"
+        "../../../mzxbxapi/musicenginetypes.ts"
+		,"../../../mzxbxapi/musicenginedeclarations.ts"
         
         ,"beep1.ts"
 	]

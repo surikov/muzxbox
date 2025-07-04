@@ -236,7 +236,17 @@ function startApplication() {
     globalCommandDispatcher.registerWorkProject(___newEmptyProject);
     let ui = new UIRenderer();
     ui.createUI();
-    window.addEventListener("beforeunload", saveProjectState);
+    window.addEventListener("beforeunload", () => {
+        saveProjectState();
+    });
+    window.addEventListener("blur", () => {
+        saveProjectState();
+    });
+    window.addEventListener("visibilitychange", function () {
+        if (document.hidden) {
+            saveProjectState();
+        }
+    });
     try {
         let lastprojectdata = readLzObjectFromlocalStorage('lastprojectdata');
         if (lastprojectdata) {
@@ -284,11 +294,9 @@ function resolveString(data) {
     return data;
 }
 function saveProjectState() {
-    console.log('saveProjectState');
     globalCommandDispatcher.exe.cutLongUndo();
     let txtdata = JSON.stringify(globalCommandDispatcher.cfg().data);
     try {
-        console.log('state size', txtdata.length);
         saveLzText2localStorage('lastprojectdata', txtdata);
         saveRawText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
         saveRawText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
@@ -315,7 +323,6 @@ function saveProjectState() {
             }
         }
     }
-    console.log('done saveProjectState');
 }
 function initWebAudioFromUI() {
     console.log('initWebAudioFromUI');
@@ -1510,6 +1517,9 @@ class CommandDispatcher {
         if (idx == 'light2') {
             cssPath = 'theme/colorwhite.css';
         }
+        if (idx == 'blue1') {
+            cssPath = 'theme/colordarkblue.css';
+        }
         startLoadCSSfile(cssPath);
         this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
         saveRawText2localStorage('uicolortheme', idx);
@@ -1573,7 +1583,6 @@ class CommandDispatcher {
     setupSelectionBackground22(selectedPart) {
     }
     expandTimeLineSelection(idx) {
-        console.log('expandTimeLineSelection');
         if (this.cfg().data) {
             if (idx >= 0 && idx < this.cfg().data.timeline.length) {
                 let curPro = this.cfg().data;
@@ -1624,16 +1633,14 @@ class CommandDispatcher {
                 globalCommandDispatcher.adjustTimelineContent();
                 let newDuration = MMUtil().set(globalCommandDispatcher.cfg().data.timeline[startMeasure].metre);
                 for (let ii = startMeasure + 1; ii <= endMeasure; ii++) {
-                    console.log('check', ii, newDuration);
                     for (let nn = 0; nn < globalCommandDispatcher.cfg().data.tracks.length; nn++) {
                         let trackBar = globalCommandDispatcher.cfg().data.tracks[nn].measures[ii];
                         let trackPreBar = globalCommandDispatcher.cfg().data.tracks[nn].measures[ii - 1];
                         for (let kk = 0; kk < trackBar.chords.length; kk++) {
-                            console.log('chord', kk, newDuration, JSON.stringify(trackBar.chords[kk].skip));
                             trackBar.chords[kk].skip = newDuration.plus(trackBar.chords[kk].skip).metre();
                             trackPreBar.chords.push(trackBar.chords[kk]);
-                            console.log('result', JSON.stringify(trackBar.chords[kk].skip));
                         }
+                        trackBar.chords = [];
                     }
                     for (let nn = 0; nn < globalCommandDispatcher.cfg().data.percussions.length; nn++) {
                         let percuBar = globalCommandDispatcher.cfg().data.percussions[nn].measures[ii];
@@ -1642,6 +1649,7 @@ class CommandDispatcher {
                             percuBar.skips[kk] = newDuration.plus(percuBar.skips[kk]).metre();
                             percuPreBar.skips.push(percuBar.skips[kk]);
                         }
+                        percuBar.skips = [];
                     }
                     for (let nn = 0; nn < globalCommandDispatcher.cfg().data.filters.length; nn++) {
                         let autoBar = globalCommandDispatcher.cfg().data.filters[nn].automation[ii];
@@ -1650,6 +1658,7 @@ class CommandDispatcher {
                             autoBar.changes[kk].skip = newDuration.plus(autoBar.changes[kk].skip).metre();
                             autoPreBar.changes.push(autoBar.changes[kk]);
                         }
+                        autoBar.changes = [];
                     }
                     let txtBar = globalCommandDispatcher.cfg().data.comments[ii];
                     let txtPreBar = globalCommandDispatcher.cfg().data.comments[ii - 1];
@@ -1657,15 +1666,14 @@ class CommandDispatcher {
                         txtBar.points[kk].skip = newDuration.plus(txtBar.points[kk].skip).metre();
                         txtPreBar.points.push(txtBar.points[kk]);
                     }
+                    txtBar.points = [];
                     newDuration = newDuration.plus(globalCommandDispatcher.cfg().data.timeline[ii].metre);
                 }
                 globalCommandDispatcher.cfg().data.timeline[startMeasure].metre = newDuration.metre();
-                console.log(startMeasure, globalCommandDispatcher.cfg().data.timeline[startMeasure].metre);
                 globalCommandDispatcher.adjustTimelineContent();
                 globalCommandDispatcher.cfg().data.selectedPart.endMeasure = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
             });
             globalCommandDispatcher.resetProject();
-            console.log(globalCommandDispatcher.cfg().data);
         }
     }
     dropSelectedBars() {
@@ -1778,10 +1786,33 @@ class CommandDispatcher {
                 let newpart = parseInt(txt.split('/')[1]);
                 let newcount = parseInt(txt.split('/')[0]);
                 if (newpart == 1 || newpart == 2 || newpart == 4 || newpart == 8 || newpart == 16 || newpart == 32) {
+                    let newMeter = MMUtil().set({ count: newcount, part: newpart });
                     globalCommandDispatcher.exe.commitProjectChanges([], () => {
                         globalCommandDispatcher.adjustTimelineContent();
                         for (let ii = 0; ii < count; ii++) {
-                            globalCommandDispatcher.cfg().data.timeline[startMeasure + ii].metre = { count: newcount, part: newpart };
+                            let bar = globalCommandDispatcher.cfg().data.timeline[startMeasure + ii];
+                            if (newMeter.less(bar.metre)) {
+                                globalCommandDispatcher.cfg().data.timeline.splice(startMeasure + ii + 1, 0, {
+                                    tempo: bar.tempo,
+                                    metre: MMUtil().set(bar.metre).minus(newMeter).metre()
+                                });
+                                for (let nn = 0; nn < globalCommandDispatcher.cfg().data.tracks.length; nn++) {
+                                    let track = globalCommandDispatcher.cfg().data.tracks[nn];
+                                    track.measures.splice(startMeasure + ii + 1, 0, { chords: [] });
+                                }
+                                for (let nn = 0; nn < globalCommandDispatcher.cfg().data.percussions.length; nn++) {
+                                    let percu = globalCommandDispatcher.cfg().data.percussions[nn];
+                                    percu.measures.splice(startMeasure + ii + 1, 0, { skips: [] });
+                                }
+                                for (let nn = 0; nn < globalCommandDispatcher.cfg().data.filters.length; nn++) {
+                                    let filter = globalCommandDispatcher.cfg().data.filters[nn];
+                                    filter.automation.splice(startMeasure + ii + 1, 0, { changes: [] });
+                                }
+                                globalCommandDispatcher.cfg().data.comments.splice(startMeasure + ii + 1, 0, { points: [] });
+                                ii++;
+                                globalCommandDispatcher.cfg().data.selectedPart.endMeasure++;
+                            }
+                            bar.metre = newMeter.metre();
                         }
                         globalCommandDispatcher.adjustTimelineContent();
                     });
@@ -1882,9 +1913,7 @@ class CommandDispatcher {
                 for (let kk = 0; kk < trackBar.chords.length; kk++) {
                     let chord = trackBar.chords[kk];
                     if (barMetre.less(chord.skip)) {
-                        console.log(ii, barMetre, 'less', chord.skip);
                         if (ii >= this.cfg().data.timeline.length) {
-                            this.appendBar();
                         }
                         chord.skip = MMUtil().set(chord.skip).minus(barMetre).simplyfy().metre();
                         this.cfg().data.tracks[nn].measures[ii + 1].chords.push(chord);
@@ -2004,7 +2033,6 @@ class CommandDispatcher {
         }
     }
     adjustTimelineContent() {
-        console.log('adjustTimelineContent');
         this.adjustTimeLineLength();
         this.adjustRemoveEmptyChords();
         this.adjustTracksChords();
@@ -2102,7 +2130,6 @@ class UIRenderer {
         });
     }
     fillWholeUI() {
-        console.log('fillWholeUI');
         let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
         let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
         this.tiler.resetInnerSize(globalCommandDispatcher.cfg().wholeWidth(), globalCommandDispatcher.cfg().wholeHeight());
@@ -2357,7 +2384,6 @@ class TimeSelectBar {
         this.selectionMark.h = viewHeight * 1024;
     }
     updateTimeSelectionBar() {
-        console.log('updateTimeSelectionBar', globalCommandDispatcher.cfg().data.selectedPart);
         let selection = globalCommandDispatcher.cfg().data.selectedPart;
         if (selection.startMeasure > -1 || selection.endMeasure > -1) {
             let mm = MMUtil();
@@ -5870,18 +5896,15 @@ function saveLzText2localStorage(name, text) {
     let lzu = new LZUtil();
     let cmpr = lzu.compressToUTF16(text);
     localStorage.setItem(name, cmpr);
-    console.log('saveLzText2localStorage', name, text.length, '->', cmpr.length);
 }
 function saveRawText2localStorage(name, text) {
     localStorage.setItem(name, text);
-    console.log('saveRawText2localStorage', name);
 }
 function readLzTextFromlocalStorage(name) {
     try {
         let cmpr = localStorage.getItem(name);
         let lzu = new LZUtil();
         let o = lzu.decompressFromUTF16(cmpr);
-        console.log('readTextFromlocalStorage', name, ('' + cmpr).length, '->', ('' + o).length);
         if (o) {
             return o;
         }
@@ -5909,7 +5932,6 @@ function readLzObjectFromlocalStorage(name) {
         let cmpr = localStorage.getItem(name);
         let lzu = new LZUtil();
         let txt = lzu.decompressFromUTF16(cmpr);
-        console.log('readLzObjectFromlocalStorage', name, Math.round(('' + cmpr).length / 1000) + 'kb', '->', Math.round(('' + txt).length / 1000) + 'kb');
         if (txt) {
             let o = JSON.parse(txt);
             return o;
@@ -5926,7 +5948,6 @@ function readLzObjectFromlocalStorage(name) {
 function readRawObjectFromlocalStorage(name) {
     try {
         let txt = localStorage.getItem(name);
-        console.log('readRawObjectFromlocalStorage', name);
         if (txt) {
             let o = JSON.parse(txt);
             return o;

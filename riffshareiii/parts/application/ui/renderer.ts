@@ -165,7 +165,7 @@ class UIRenderer {//} implements RenderedPart {
 	}
 
 	fillWholeUI() {
-		console.log('fillWholeUI');
+		//console.log('fillWholeUI');
 		//let mixm: MixerDataMath = new MixerDataMath(globalCommandDispatcher.globalCommandDispatcher.cfg().data);
 		let vw = this.tileLevelSVG.clientWidth / this.tiler.tapPxSize();
 		let vh = this.tileLevelSVG.clientHeight / this.tiler.tapPxSize();
