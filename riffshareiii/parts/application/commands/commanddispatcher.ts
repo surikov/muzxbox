@@ -362,7 +362,7 @@ class CommandDispatcher {
 		//console.log('stopPlay done', this.player.playState());
 	}
 	setupAndStartPlay() {
-		console.log('setupAndStartPlay');
+		//console.log('setupAndStartPlay');
 		//this.onAir = true;
 		let schedule = this.renderCurrentProjectForOutput();
 		let from = 0;
@@ -381,7 +381,7 @@ class CommandDispatcher {
 		}
 		//let me = this;
 		let result = this.player.startSetupPlugins(this.audioContext, schedule);
-		//console.log('after setupPlugins');
+		//console.log('after setupPlugins',schedule);
 		//me.neeToStart = true;
 		if (this.playPosition < from) {
 			this.playPosition = from;

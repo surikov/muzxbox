@@ -49,7 +49,7 @@ class SchedulePlayer implements MZXBX_Player {
 		return this.performerDrumHolders;
 	}
 	launchCollectedPlugins(): null | string {
-		//console.log('launchCollectedPlugins',this.filterHolders,this.performerDrumHolders);
+		console.log('launchCollectedPlugins filters',this.filterHolders,'drums/tones',this.performerDrumHolders);
 		try {
 			//
 			for (let ff = 0; ff < this.filterHolders.length; ff++) {
@@ -61,7 +61,7 @@ class SchedulePlayer implements MZXBX_Player {
 				}
 			}
 			for (let pp = 0; pp < this.performerDrumHolders.length; pp++) {
-				//console.log('launch performer/drum',pp,this.performerDrumHolders[pp]);
+				console.log('launch performer/drum',pp,this.performerDrumHolders[pp]);
 				let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performerDrumHolders[pp].plugin;
 				if (plugin) {
 					plugin.launch(this.audioContext, this.performerDrumHolders[pp].properties);

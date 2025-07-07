@@ -510,6 +510,7 @@ class PercussionDrumKitImplementation {
         this.preset = null;
         this.sampleDuration = 0.000001;
         this.loudness = 0.9;
+        this.preidx = -1;
     }
     launch(context, parameters) {
         if (this.audioContext) {
@@ -530,7 +531,7 @@ class PercussionDrumKitImplementation {
             console.log(xx);
         }
         this.volumeNode.gain.setValueAtTime(this.loudness, 0);
-        if (this.preset) {
+        if ((this.preset) && this.preidx == idx) {
         }
         else {
             this.info = this.loader.drumInfo(idx);
@@ -539,6 +540,7 @@ class PercussionDrumKitImplementation {
                 this.preset = window[this.info.variable];
             });
         }
+        this.preidx = idx;
     }
     busy() {
         if (this.preset == null) {

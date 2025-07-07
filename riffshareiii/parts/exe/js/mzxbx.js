@@ -125,6 +125,7 @@ class SchedulePlayer {
         return this.performerDrumHolders;
     }
     launchCollectedPlugins() {
+        console.log('launchCollectedPlugins filters', this.filterHolders, 'drums/tones', this.performerDrumHolders);
         try {
             for (let ff = 0; ff < this.filterHolders.length; ff++) {
                 let plugin = this.filterHolders[ff].pluginAudioFilter;
@@ -133,6 +134,7 @@ class SchedulePlayer {
                 }
             }
             for (let pp = 0; pp < this.performerDrumHolders.length; pp++) {
+                console.log('launch performer/drum', pp, this.performerDrumHolders[pp]);
                 let plugin = this.performerDrumHolders[pp].plugin;
                 if (plugin) {
                     plugin.launch(this.audioContext, this.performerDrumHolders[pp].properties);

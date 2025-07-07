@@ -632,6 +632,7 @@ class SamplerPluginDialog {
         globalCommandDispatcher.reStartPlayIfPlay();
     }
     receiveMessageFromPlugin(event) {
+        console.log('receiveMessageFromPlugin', event);
         if (!(event.data)) {
         }
         else {
@@ -1430,7 +1431,6 @@ class CommandDispatcher {
         this.resetProject();
     }
     setupAndStartPlay() {
-        console.log('setupAndStartPlay');
         let schedule = this.renderCurrentProjectForOutput();
         let from = 0;
         let to = 0;
