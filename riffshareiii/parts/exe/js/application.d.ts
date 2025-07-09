@@ -192,6 +192,7 @@ declare class CommandDispatcher {
     setThemeColor(idx: string): void;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     changeTapSize(ratio: number): void;
+    newEmptyProject(): void;
     resetProject(): void;
     findPluginRegistrationByKind(kind: String): null | MZXBX_PluginRegistrationInformation;
     timeSelectChange(idx: number): void;
@@ -251,6 +252,7 @@ declare class UIRenderer {
 declare let labelLocaleDictionary: string;
 declare let localNameLocal: string;
 declare let localeFontRatio: number;
+declare let localMenuNewEmptyProject: string;
 declare let localMenuItemSettings: string;
 declare let localMenuPercussionFolder: string;
 declare let localMenuAutomationFolder: string;
@@ -684,8 +686,8 @@ declare function readLzTextFromlocalStorage(name: string): string;
 declare function readRawTextFromlocalStorage(name: string): string;
 declare function readLzObjectFromlocalStorage(name: string): any;
 declare function readRawObjectFromlocalStorage(name: string): any;
-declare let ___newEmptyProject: Zvoog_Project;
-declare let ____mzxbxProjectForTesting2: Zvoog_Project;
+declare function createNewEmptyProjectData(): Zvoog_Project;
+declare let _______mzxbxProjectForTesting2: Zvoog_Project;
 declare type BarStepStartEnd = {
     start: Zvoog_MetreMathType;
     length: Zvoog_MetreMathType;

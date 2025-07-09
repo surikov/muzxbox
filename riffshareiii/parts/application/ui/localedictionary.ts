@@ -2,6 +2,7 @@ let labelLocaleDictionary = 'en';
 let localNameLocal = 'localNameLocal';
 let localeFontRatio = 1;
 
+let localMenuNewEmptyProject = 'localMenuNewEmptyProject';
 let localMenuItemSettings = 'localMenuItemSettings';
 //let localMenuTracksFolder = 'localMenuTracksFolder';
 //let localMenuImportMIDI = 'localMenuImportMIDI';
@@ -73,6 +74,8 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
 	, { id: localMergeSelectedMeausres, data: [{ locale: 'en', text: '>|<' }, { locale: 'ru', text: '()' }, { locale: 'zh', text: '?' }] }
 	//, { id: localMorphMeterSelectedMeausres, data: [{ locale: 'en', text: 'Morph' }, { locale: 'ru', text: 'Сменить' }, { locale: 'zh', text: '?' }] }
 
+	, { id: localMenuNewEmptyProject, data: [{ locale: 'en', text: 'New empty project' }, { locale: 'ru', text: 'Новый проект' }, { locale: 'zh', text: 'тew' }] }
+	
 	/*, {
         id: localMenuFileFolder, data: [
             { locale: 'en', text: 'File' }

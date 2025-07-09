@@ -1,37 +1,44 @@
-let ___newEmptyProject: Zvoog_Project = {
-	title: 'New Project'
-	, versionCode: '1'
-	, list: false
-	, selectedPart: { startMeasure: -1, endMeasure: -1 }
-	, position: { x: 0, y: -0, z: 33 }
-	, timeline: [
-		{ tempo: 120, metre: { count: 4, part: 4 } }
-		, { tempo: 120, metre: { count: 4, part: 4 } }
+function createNewEmptyProjectData(): Zvoog_Project {
+	let pianoID = 'piano' + Math.random();
+	let newEmptyProject: Zvoog_Project = {
+		title: 'New Project'
+		, versionCode: '1'
+		, list: false
+		, selectedPart: { startMeasure: -1, endMeasure: -1 }
+		, position: { x: 0, y: -0, z: 33 }
+		, timeline: [
+			{ tempo: 120, metre: { count: 4, part: 4 } }
+			, { tempo: 120, metre: { count: 4, part: 4 } }
+			, { tempo: 120, metre: { count: 4, part: 4 } }
+			, { tempo: 120, metre: { count: 4, part: 4 } }
 
-		, { tempo: 200, metre: { count: 3, part: 4 } }
-		, { tempo: 180, metre: { count: 4, part: 4 } }
+		]
+		, tracks: [
+			{
+				title: "Piano track"
+				, measures: [{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }]
+				, performer: { id: pianoID, data: '85/14/0', kind: 'miniumpitchchord1', outputs: [''], iconPosition: { x: 50*Math.random(), y: 100*Math.random() }, state: 0 }
+			}
+		]
+		, percussions: []
+		, comments: []
+		, filters: []
+	};
+	return newEmptyProject
 
-	]
-	, tracks: []
-	, percussions: []
-	, comments: []
-	, filters: []
-};
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
-let ____mzxbxProjectForTesting2: Zvoog_Project = {
+
+
+
+
+
+
+
+
+
+let _______mzxbxProjectForTesting2: Zvoog_Project = {
 	title: 'test data for debug'
 	, versionCode: '1'
 	, list: false

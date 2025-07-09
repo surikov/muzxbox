@@ -233,7 +233,7 @@ class StateDiff {
 }
 function startApplication() {
     console.log('startApplication v1.6.11');
-    globalCommandDispatcher.registerWorkProject(___newEmptyProject);
+    globalCommandDispatcher.registerWorkProject(createNewEmptyProjectData());
     let ui = new UIRenderer();
     ui.createUI();
     window.addEventListener("beforeunload", () => {
@@ -1535,6 +1535,10 @@ class CommandDispatcher {
         this.renderer.onReSizeView();
         this.renderer.tiler.resetModel();
     }
+    newEmptyProject() {
+        this.registerWorkProject(createNewEmptyProjectData());
+        this.resetProject();
+    }
     resetProject() {
         try {
             this.setPlayPositionFromSelectedPart();
@@ -2175,6 +2179,7 @@ class UIRenderer {
 let labelLocaleDictionary = 'en';
 let localNameLocal = 'localNameLocal';
 let localeFontRatio = 1;
+let localMenuNewEmptyProject = 'localMenuNewEmptyProject';
 let localMenuItemSettings = 'localMenuItemSettings';
 let localMenuPercussionFolder = 'localMenuPercussionFolder';
 let localMenuAutomationFolder = 'localMenuAutomationFolder';
@@ -2222,6 +2227,7 @@ let localeDictionary = [
     { id: localAddEmptyMeasures, data: [{ locale: 'en', text: '+' }, { locale: 'ru', text: '+' }, { locale: 'zh', text: '?' }] },
     { id: localRemoveSelectedMeasures, data: [{ locale: 'en', text: 'x' }, { locale: 'ru', text: 'x' }, { locale: 'zh', text: '?' }] },
     { id: localMergeSelectedMeausres, data: [{ locale: 'en', text: '>|<' }, { locale: 'ru', text: '()' }, { locale: 'zh', text: '?' }] },
+    { id: localMenuNewEmptyProject, data: [{ locale: 'en', text: 'New empty project' }, { locale: 'ru', text: 'Новый проект' }, { locale: 'zh', text: 'тew' }] },
     {
         id: localMenuAutomationFolder, data: [
             { locale: 'en', text: 'Automation' },
@@ -3515,6 +3521,11 @@ function composeBaseMenu() {
             menuPointAddPlugin,
             {
                 text: localMenuItemSettings, children: [
+                    {
+                        text: localMenuNewEmptyProject, onClick: () => {
+                            globalCommandDispatcher.newEmptyProject();
+                        }
+                    },
                     {
                         text: 'Size', children: [
                             {
@@ -5961,24 +5972,34 @@ function readRawObjectFromlocalStorage(name) {
     }
     return null;
 }
-let ___newEmptyProject = {
-    title: 'New Project',
-    versionCode: '1',
-    list: false,
-    selectedPart: { startMeasure: -1, endMeasure: -1 },
-    position: { x: 0, y: -0, z: 33 },
-    timeline: [
-        { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 200, metre: { count: 3, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } }
-    ],
-    tracks: [],
-    percussions: [],
-    comments: [],
-    filters: []
-};
-let ____mzxbxProjectForTesting2 = {
+function createNewEmptyProjectData() {
+    let pianoID = 'piano' + Math.random();
+    let newEmptyProject = {
+        title: 'New Project',
+        versionCode: '1',
+        list: false,
+        selectedPart: { startMeasure: -1, endMeasure: -1 },
+        position: { x: 0, y: -0, z: 33 },
+        timeline: [
+            { tempo: 120, metre: { count: 4, part: 4 } },
+            { tempo: 120, metre: { count: 4, part: 4 } },
+            { tempo: 120, metre: { count: 4, part: 4 } },
+            { tempo: 120, metre: { count: 4, part: 4 } }
+        ],
+        tracks: [
+            {
+                title: "Piano track",
+                measures: [{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }],
+                performer: { id: pianoID, data: '85/14/0', kind: 'miniumpitchchord1', outputs: [''], iconPosition: { x: 50 * Math.random(), y: 100 * Math.random() }, state: 0 }
+            }
+        ],
+        percussions: [],
+        comments: [],
+        filters: []
+    };
+    return newEmptyProject;
+}
+let _______mzxbxProjectForTesting2 = {
     title: 'test data for debug',
     versionCode: '1',
     list: false,

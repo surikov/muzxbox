@@ -343,6 +343,12 @@ function composeBaseMenu(): MenuInfo[] {
 			, {
 				text: localMenuItemSettings, children: [
 					{
+						text: localMenuNewEmptyProject, onClick: () => {
+							globalCommandDispatcher.newEmptyProject();
+						}
+					}
+					,
+					{
 						text: 'Size', children: [
 							{
 								text: 'Small', onClick: () => {

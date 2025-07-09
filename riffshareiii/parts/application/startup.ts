@@ -4,7 +4,7 @@ declare function createTileLevel(): TileLevelBase;
 function startApplication() {
 	console.log('startApplication v1.6.11');
 	//let commands = new CommandDispatcher();
-	globalCommandDispatcher.registerWorkProject(___newEmptyProject);
+	globalCommandDispatcher.registerWorkProject(createNewEmptyProjectData());
 	let ui = new UIRenderer();
 	ui.createUI();
 	//window.addEventListener("unload", saveProjectState);

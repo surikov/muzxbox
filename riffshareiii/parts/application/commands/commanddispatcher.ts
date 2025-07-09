@@ -497,6 +497,10 @@ class CommandDispatcher {
 		this.renderer.onReSizeView();
 		this.renderer.tiler.resetModel();
 	}
+	newEmptyProject() {
+		this.registerWorkProject(createNewEmptyProjectData());
+		this.resetProject();
+	}
 	resetProject() {
 		try {
 			/*
@@ -926,7 +930,7 @@ class CommandDispatcher {
 						for (let ii = 0; ii < count; ii++) {
 							let bar = globalCommandDispatcher.cfg().data.timeline[startMeasure + ii];
 							//console.log(startMeasure + ii,bar.metre , newMeter);
-							
+
 							if (newMeter.less(bar.metre)) {
 								globalCommandDispatcher.cfg().data.timeline.splice(startMeasure + ii + 1, 0
 									, {
