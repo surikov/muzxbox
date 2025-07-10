@@ -38,13 +38,9 @@ class SynthDX7 {
         console.log('new SynthDX7');
         this.moContext = audioContext;
     }
-    createVoice() {
-        return new VoiceDX7();
-    }
     test() {
         console.log('SynthDX7 test');
-        let voice = this.createVoice();
-        voice.test();
+        let voice = new VoiceDX7(60, 1);
     }
 }
 class OperatorDX7 {
@@ -53,11 +49,16 @@ class OperatorDX7 {
     }
 }
 class VoiceDX7 {
-    constructor() {
-        console.log('new VoiceDX7');
-    }
-    test() {
-        console.log('VoiceDX7 test');
+    constructor(note, velocity) {
+        console.log('new VoiceDX7', note, velocity);
+        this.note = note;
+        this.velocity = velocity;
+        this.operator1 = new OperatorDX7();
+        this.operator2 = new OperatorDX7();
+        this.operator3 = new OperatorDX7();
+        this.operator4 = new OperatorDX7();
+        this.operator5 = new OperatorDX7();
+        this.operator6 = new OperatorDX7();
     }
     frequencyFromNoteNumber(note) {
         return 440 * Math.pow(2, (note - 69) / 12);
