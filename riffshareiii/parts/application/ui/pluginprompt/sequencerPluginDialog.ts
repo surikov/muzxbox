@@ -140,7 +140,7 @@ class SequencerPluginDialog {
 		globalCommandDispatcher.reStartPlayIfPlay();
 	}
 	receiveMessageFromPlugin(event) {
-		//console.log('receiveMessageFromPlugin', event);
+		//console.log('sequencer receiveMessageFromPlugin', event);
 		if (!(event.data)) {
 			//console.log('empty message data');
 		} else {

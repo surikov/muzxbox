@@ -85,7 +85,7 @@ class PointPluginDialog {
 		globalCommandDispatcher.reStartPlayIfPlay();
 	}
 	receiveMessageFromPlugin(event) {
-		//console.log('receiveMessageFromPlugin', event);
+		//console.log('point receiveMessageFromPlugin', event);
 		if (!(event.data)) {
 			//console.log('empty message data');
 		} else {

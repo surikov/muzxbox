@@ -632,7 +632,6 @@ class SamplerPluginDialog {
         globalCommandDispatcher.reStartPlayIfPlay();
     }
     receiveMessageFromPlugin(event) {
-        console.log('receiveMessageFromPlugin', event);
         if (!(event.data)) {
         }
         else {

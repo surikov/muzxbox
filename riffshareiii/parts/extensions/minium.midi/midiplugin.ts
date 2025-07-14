@@ -56,6 +56,7 @@ console.log('sendImportedMIDIData',this.parsedProject);
 				var arrayBuffer = progressEvent.target.result;
 				var midiParser = newMIDIparser2(arrayBuffer);
 				console.log('done midiParser', midiParser);
+				dumpStat(midiParser);
 				//me.parsedProject = midiParser.convertProject(title, comment);
 				let cnvrtr: MIDIConverter = new MIDIConverter();
 

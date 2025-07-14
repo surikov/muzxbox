@@ -24,7 +24,7 @@ class ChordPitchPerformerUtil {
 		return checked;
 	}
 	dumpParameters(loudness: number, idx: number, mode: number): string {
-		console.log('ChordPitchPerformerUtil.dumpParameters',loudness , idx , mode);
+		//console.log('ChordPitchPerformerUtil.dumpParameters',loudness , idx , mode);
 		return loudness + '/' + idx + '/' + mode;
 	}
 	tonechordinslist(): string[] {

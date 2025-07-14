@@ -54,7 +54,6 @@ class MidiParser {
         this.parseTracks(arrayBuffer);
     }
     parseTracks(arrayBuffer) {
-        console.log('start parseTracks');
         var curIndex = this.header.HEADER_LENGTH;
         var trackCount = this.header.trackCount;
         this.parsedTracks = [];
@@ -289,7 +288,6 @@ class MidiParser {
         }
     }
     parseNotes() {
-        console.log('parseNotes');
         this.dumpResolutionChanges();
         var expectedState = 1;
         var expectedPitchBendRangeChannel = null;
@@ -297,10 +295,8 @@ class MidiParser {
         for (let t = 0; t < this.parsedTracks.length; t++) {
             var singleParsedTrack = this.parsedTracks[t];
             this.parseTicks2time(singleParsedTrack);
-            console.log('notes for track', t, singleParsedTrack);
             for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
                 if (Math.floor(e / 1000) == e / 1000) {
-                    console.log('event', e);
                 }
                 var preState = expectedState;
                 var evnt = singleParsedTrack.trackevents[e];
@@ -417,7 +413,6 @@ class MidiParser {
                                                     || (evnt.param1 >= 70 && evnt.param1 <= 79)) {
                                                 }
                                                 else {
-                                                    console.log('unknown controller', evnt.playTimeMs, 'ms, channel', evnt.midiChannel, ':', evnt.param1, evnt.param2);
                                                 }
                                             }
                                         }
@@ -791,7 +786,6 @@ class ChordPitchPerformerUtil {
         return checked;
     }
     dumpParameters(loudness, idx, mode) {
-        console.log('ChordPitchPerformerUtil.dumpParameters', loudness, idx, mode);
         return loudness + '/' + idx + '/' + mode;
     }
     tonechordinslist() {
@@ -1289,6 +1283,7 @@ class MINIUMIDIIImportMusicPlugin {
                 var arrayBuffer = progressEvent.target.result;
                 var midiParser = newMIDIparser2(arrayBuffer);
                 console.log('done midiParser', midiParser);
+                dumpStat(midiParser);
                 let cnvrtr = new MIDIConverter();
                 let midiSongData = cnvrtr.convertProject(midiParser);
                 console.log('done midiSongData', midiSongData);
@@ -1409,6 +1404,57 @@ class MIDIConverter {
         trackChannel.push(it);
         return it;
     }
+}
+function timeMsNear(a, b) {
+    return Math.abs(a - b) < 50;
+}
+function takeNearWhen(when, statArr) {
+    for (let ii = 0; ii < statArr.length; ii++) {
+        let xsts = statArr[ii];
+        for (let nn = 0; nn < xsts.notes.length; nn++) {
+            let noteWhen = xsts.notes[nn].fromChord.when;
+            if (timeMsNear(when, noteWhen)) {
+                return xsts;
+            }
+        }
+    }
+    let newWhen = { when: when, notes: [] };
+    statArr.push(newWhen);
+    return newWhen;
+}
+function dumpStat(midiParser) {
+    console.log('dumpStat');
+    let statArr = [];
+    for (let tt = 0; tt < midiParser.parsedTracks.length; tt++) {
+        let track = midiParser.parsedTracks[tt];
+        for (let cc = 0; cc < track.chords.length; cc++) {
+            let chord = track.chords[cc];
+            let point = takeNearWhen(chord.when, statArr);
+            for (let nn = 0; nn < chord.notes.length; nn++) {
+                point.notes.push({
+                    track: tt,
+                    channel: chord.channel,
+                    pitch: chord.notes[nn],
+                    fromChord: chord
+                });
+            }
+        }
+    }
+    for (let ss = 0; ss < statArr.length; ss++) {
+        let one = statArr[ss];
+        let smm = 0;
+        for (let nn = 0; nn < one.notes.length; nn++) {
+            smm = smm + one.notes[nn].fromChord.when;
+        }
+        one.when = smm / one.notes.length;
+        for (let nn = 0; nn < one.notes.length; nn++) {
+            one.notes[nn].fromChord.when = one.when;
+        }
+    }
+    statArr.sort((a, b) => {
+        return a.when - b.when;
+    });
+    console.log(statArr);
 }
 class Projectr {
     readProject(midiSongData, title, comment) {
@@ -1696,7 +1742,6 @@ class Projectr {
                 iconPosition: { x: top * 1.5, y: top / 2 }, state: 0
             }
         };
-        console.log(('' + midiTrack.title + ' ' + allPercussionDrumTitles()[drum]), drum, drumvolidx);
         if (!(drum >= 35 && drum <= 81)) {
             projectDrums.sampler.outputs = [];
         }
@@ -1806,7 +1851,6 @@ class Projectr {
                 state: 0
             }
         };
-        console.log((midiTrack.title + ' ' + new ChordPitchPerformerUtil().tonechordinslist()[midiTrack.program]), midiTrack.program, idata);
         if (!(midiTrack.program >= 0 && midiTrack.program <= 127)) {
             projectTrack.performer.outputs = [];
         }

@@ -138,7 +138,7 @@ class FilterPluginDialog {
 		globalCommandDispatcher.reStartPlayIfPlay();
 	}
 	receiveMessageFromPlugin(event) {
-		//console.log('receiveMessageFromPlugin', event);
+		//console.log('filter receiveMessageFromPlugin', event);
 		if (!(event.data)) {
 			//console.log('empty message data');
 		} else {

@@ -585,6 +585,19 @@ declare class MIDIConverter {
         track: MIDISongTrack;
     };
 }
+declare type StatPitch = {
+    track: number;
+    channel: number;
+    pitch: TrackNote;
+    fromChord: TrackChord;
+};
+declare type StatWhen = {
+    when: number;
+    notes: StatPitch[];
+};
+declare function timeMsNear(a: number, b: number): boolean;
+declare function takeNearWhen(when: number, statArr: StatWhen[]): StatWhen;
+declare function dumpStat(midiParser: MidiParser): void;
 declare class Projectr {
     readProject(midiSongData: MIDISongData, title: string, comment: string): Zvoog_Project;
     align32(): void;

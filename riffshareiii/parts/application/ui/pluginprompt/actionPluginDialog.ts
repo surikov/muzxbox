@@ -21,6 +21,7 @@ class ActionPluginDialog {
 		}
 	}
 	receiveMessageFromPlugin(event) {
+		//console.log('action receiveMessageFromPlugin', event);
 		if (!(event.data)) {
 			//console.log('empty message data');
 		} else {

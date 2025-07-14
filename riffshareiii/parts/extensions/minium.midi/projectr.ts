@@ -331,7 +331,7 @@ align32(){
 			}
 			//, volume: volume
 		};
-		console.log(('' + midiTrack.title + ' ' + allPercussionDrumTitles()[drum]), drum, drumvolidx);
+		//console.log(('' + midiTrack.title + ' ' + allPercussionDrumTitles()[drum]), drum, drumvolidx);
 		if (!(drum >= 35 && drum <= 81)) {
 			projectDrums.sampler.outputs = [];
 		}
@@ -450,7 +450,7 @@ align32(){
 			}
 			//, volume: volume
 		};
-		console.log((midiTrack.title + ' ' + new ChordPitchPerformerUtil().tonechordinslist()[midiTrack.program]), midiTrack.program, idata);
+		//console.log((midiTrack.title + ' ' + new ChordPitchPerformerUtil().tonechordinslist()[midiTrack.program]), midiTrack.program, idata);
 		/*if(midiTrack.program==65){
 			projectTrack.performer.data='' + midiTrack.program+'//'+strummode+'/90'
 		}

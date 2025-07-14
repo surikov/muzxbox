@@ -76,11 +76,11 @@ class MIDIConverter {
 				}
 			}
 		}
-		
+
 		return midiSongData;
 	}
 
-	
+
 
 
 
@@ -112,4 +112,71 @@ class MIDIConverter {
 		return it;
 	}
 
+}
+type StatPitch = {
+	track: number;
+	channel: number;
+	pitch: TrackNote;
+	//existsWhen: number
+	fromChord: TrackChord;
+};
+type StatWhen = {
+	when: number;
+	notes: StatPitch[];
+};
+function timeMsNear(a: number, b: number): boolean {
+	return Math.abs(a - b) <50;
+}
+function takeNearWhen(when: number, statArr: StatWhen[]): StatWhen {
+	for (let ii = 0; ii < statArr.length; ii++) {
+		let xsts = statArr[ii];
+		for (let nn = 0; nn < xsts.notes.length; nn++) {
+			//let noteWhen = xsts.notes[nn].existsWhen;
+			let noteWhen = xsts.notes[nn].fromChord.when;
+			if (timeMsNear(when, noteWhen)) {
+				return xsts;
+			}
+		}
+	}
+	let newWhen: StatWhen = { when: when, notes: [] };
+	statArr.push(newWhen);
+	return newWhen;
+}
+function dumpStat(midiParser: MidiParser) {
+	console.log('dumpStat');
+	let statArr: StatWhen[] = [];
+	for (let tt = 0; tt < midiParser.parsedTracks.length; tt++) {
+		let track = midiParser.parsedTracks[tt];
+		for (let cc = 0; cc < track.chords.length; cc++) {
+			let chord = track.chords[cc];
+			//let whenStart = chord.when;
+			//whenStart=Math.round(whenStart/25)*25;
+			let point = takeNearWhen(chord.when, statArr);
+			for (let nn = 0; nn < chord.notes.length; nn++) {
+				point.notes.push({
+					track: tt
+					, channel: chord.channel
+					, pitch: chord.notes[nn]
+					//, existsWhen: chord.when
+					,fromChord:chord
+				});
+			}
+		}
+	}
+	for (let ss = 0; ss < statArr.length; ss++) {
+		let one = statArr[ss];
+		let smm = 0;
+		for (let nn = 0; nn < one.notes.length; nn++) {
+			//smm = smm + one.notes[nn].existsWhen;
+			smm = smm + one.notes[nn].fromChord.when;
+		}
+		one.when = smm / one.notes.length;
+		for (let nn = 0; nn < one.notes.length; nn++) {
+			one.notes[nn].fromChord.when=one.when;
+		}
+	}
+	statArr.sort((a: StatWhen, b: StatWhen) => {
+		return a.when - b.when;
+	});
+	console.log(statArr);
 }
