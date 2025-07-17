@@ -275,7 +275,7 @@ declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 declare class MidiParser {
-    header: MIDIFileHeader;
+    midiheader: MIDIFileHeader;
     parsedTracks: MIDIFileTrack[];
     instrumentNamesArray: string[];
     drumNamesArray: string[];
@@ -372,9 +372,9 @@ declare type PP = {
     p2: XYp;
 };
 declare type TrackChord = {
-    when: number;
-    channel: number;
-    notes: TrackNote[];
+    startMs: number;
+    channelidx: number;
+    tracknotes: TrackNote[];
 };
 declare type TrackNote = {
     closed: boolean;
@@ -560,7 +560,7 @@ declare class MIDIFileTrack {
         value: number;
         channel: number;
     }[];
-    chords: TrackChord[];
+    trackChords: TrackChord[];
     constructor(buffer: ArrayBuffer, start: number);
 }
 declare class MINIUMIDIIImportMusicPlugin {

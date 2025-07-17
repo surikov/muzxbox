@@ -16,9 +16,9 @@ type PP = {
 	p2: XYp;
 };
 type TrackChord = {
-	when: number
-	, channel: number
-	, notes: TrackNote[]
+	startMs: number
+	, channelidx: number
+	, tracknotes: TrackNote[]
 };
 type TrackNote = {
 	closed: boolean
@@ -283,7 +283,7 @@ class MIDIFileTrack {
 	instrumentName: string;
 	programChannel: { program: number, channel: number }[];
 	trackVolumePoints: { ms: number, value: number, channel: number }[];
-	chords: TrackChord[] = [];
+	trackChords: TrackChord[] = [];
 	constructor(buffer: ArrayBuffer, start: number) {
 		this.datas = new DataView(buffer, start, this.HDR_LENGTH);
 		this.trackLength = this.datas.getUint32(4);

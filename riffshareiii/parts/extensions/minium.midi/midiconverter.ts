@@ -4,14 +4,14 @@ class MIDIConverter {
 		let midiSongData: MIDISongData = {
 			parser: '1.12'
 			, duration: 0
-			, bpm: parser.header.tempoBPM
-			, changesData: parser.header.changesResolutionBPM
-			, lyrics: parser.header.lyricsList
-			, key: parser.header.keyFlatSharp
-			, mode: parser.header.keyMajMin
-			, startMeter: { count: parser.header.meterCount, division: parser.header.meterDivision }
-			, metersData: parser.header.metersList
-			, signs: parser.header.signsList
+			, bpm: parser.midiheader.tempoBPM
+			, changesData: parser.midiheader.changesResolutionBPM
+			, lyrics: parser.midiheader.lyricsList
+			, key: parser.midiheader.keyFlatSharp
+			, mode: parser.midiheader.keyMajMin
+			, startMeter: { count: parser.midiheader.meterCount, division: parser.midiheader.meterDivision }
+			, metersData: parser.midiheader.metersList
+			, signs: parser.midiheader.signsList
 			, miditracks: []
 			, speedMode: 0
 			, lineMode: 0
@@ -27,15 +27,15 @@ class MIDIConverter {
 		var maxWhen = 0;
 		for (var i = 0; i < parser.parsedTracks.length; i++) {
 			var miditrack: MIDIFileTrack = parser.parsedTracks[i];
-			for (var ch = 0; ch < miditrack.chords.length; ch++) {
-				var midichord: TrackChord = miditrack.chords[ch];
-				var newchord: MIDISongChord = { when: midichord.when, notes: [], channel: midichord.channel };
-				if (maxWhen < midichord.when) {
-					maxWhen = midichord.when;
+			for (var ch = 0; ch < miditrack.trackChords.length; ch++) {
+				var midichord: TrackChord = miditrack.trackChords[ch];
+				var newchord: MIDISongChord = { when: midichord.startMs, notes: [], channel: midichord.channelidx };
+				if (maxWhen < midichord.startMs) {
+					maxWhen = midichord.startMs;
 				}
 
-				for (var n = 0; n < midichord.notes.length; n++) {
-					var midinote: TrackNote = midichord.notes[n];
+				for (var n = 0; n < midichord.tracknotes.length; n++) {
+					var midinote: TrackNote = midichord.tracknotes[n];
 					var newnote: MIDISongNote = { slidePoints: [], midiPitch: midinote.basePitch, midiDuration: midinote.baseDuration };
 					newchord.notes.push(newnote);
 					if (midinote.bendPoints.length > 0) {
@@ -133,7 +133,7 @@ function takeNearWhen(when: number, statArr: StatWhen[]): StatWhen {
 		let xsts = statArr[ii];
 		for (let nn = 0; nn < xsts.notes.length; nn++) {
 			//let noteWhen = xsts.notes[nn].existsWhen;
-			let noteWhen = xsts.notes[nn].fromChord.when;
+			let noteWhen = xsts.notes[nn].fromChord.startMs;
 			if (timeMsNear(when, noteWhen)) {
 				return xsts;
 			}
@@ -157,22 +157,22 @@ function findNearestStart(when: number, statArr: StatWhen[]): number {
 }
 function findPreMeter(when: number, midiParser: MidiParser): { count: number, part: number } {
 	let meter: { count: number, part: number } = { count: 4, part: 4 };
-	for (let ii = 0; ii < midiParser.header.metersList.length; ii++) {
-		if (midiParser.header.metersList[ii].ms > when) {
+	for (let ii = 0; ii < midiParser.midiheader.metersList.length; ii++) {
+		if (midiParser.midiheader.metersList[ii].ms > when) {
 			break;
 		}
-		meter.count = midiParser.header.metersList[ii].count;
-		meter.part = midiParser.header.metersList[ii].division;
+		meter.count = midiParser.midiheader.metersList[ii].count;
+		meter.part = midiParser.midiheader.metersList[ii].division;
 	}
 	return meter;
 }
 function findPreTempo(when: number, midiParser: MidiParser): number {
 	let bpm: number = 120;
-	for (let ii = 0; ii < midiParser.header.metersList.length; ii++) {
-		if (midiParser.header.changesResolutionBPM[ii].ms > when) {
+	for (let ii = 0; ii < midiParser.midiheader.metersList.length; ii++) {
+		if (midiParser.midiheader.changesResolutionBPM[ii].ms > when) {
 			break;
 		}
-		bpm = midiParser.header.changesResolutionBPM[ii].bpm;
+		bpm = midiParser.midiheader.changesResolutionBPM[ii].bpm;
 	}
 	return bpm;
 }
@@ -181,20 +181,20 @@ function dumpStat(midiParser: MidiParser) {
 	let statArr: StatWhen[] = [];
 	for (let tt = 0; tt < midiParser.parsedTracks.length; tt++) {
 		let track = midiParser.parsedTracks[tt];
-		for (let cc = 0; cc < track.chords.length; cc++) {
-			let chord = track.chords[cc];
+		for (let cc = 0; cc < track.trackChords.length; cc++) {
+			let chord = track.trackChords[cc];
 			//let whenStart = chord.when;
 			//whenStart=Math.round(whenStart/25)*25;
-			let point = takeNearWhen(chord.when, statArr);
-			for (let nn = 0; nn < chord.notes.length; nn++) {
+			let point = takeNearWhen(chord.startMs, statArr);
+			for (let nn = 0; nn < chord.tracknotes.length; nn++) {
 				point.notes.push({
 					track: tt
-					, channel: chord.channel
-					, note: chord.notes[nn]
+					, channel: chord.channelidx
+					, note: chord.tracknotes[nn]
 					//, existsWhen: chord.when
 					, fromChord: chord
 				});
-				point.sumavg=point.sumavg+chord.notes[nn].basePitch;
+				point.sumavg=point.sumavg+chord.tracknotes[nn].basePitch;
 			}
 		}
 	}
@@ -203,11 +203,11 @@ function dumpStat(midiParser: MidiParser) {
 		let smm = 0;
 		for (let nn = 0; nn < one.notes.length; nn++) {
 			//smm = smm + one.notes[nn].existsWhen;
-			smm = smm + one.notes[nn].fromChord.when;
+			smm = smm + one.notes[nn].fromChord.startMs;
 		}
 		one.when = Math.round(smm / one.notes.length);
 		for (let nn = 0; nn < one.notes.length; nn++) {
-			one.notes[nn].fromChord.when = one.when;
+			one.notes[nn].fromChord.startMs = one.when;
 		}
 	}
 	statArr.sort((a: StatWhen, b: StatWhen) => {
