@@ -199,6 +199,7 @@ declare class CommandDispatcher {
     playFromTimeSelection(idx: number): void;
     setupSelectionBackground22(selectedPart: Zvoog_Selection): void;
     expandTimeLineSelection(idx: number): void;
+    moveAsideSelectedBars(): void;
     mergeSelectedBars(): void;
     dropSelectedBars(): void;
     insertAfterSelectedBars(): void;
@@ -275,6 +276,7 @@ declare let localMenuFxTracksFolder: string;
 declare let localAddEmptyMeasures: string;
 declare let localRemoveSelectedMeasures: string;
 declare let localMergeSelectedMeausres: string;
+declare let localMoveAsideContentSelectedMeausres: string;
 declare let localMenuNewPlugin: string;
 declare let localeDictionary: {
     id: string;

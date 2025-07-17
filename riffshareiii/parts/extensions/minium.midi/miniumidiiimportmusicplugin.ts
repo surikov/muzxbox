@@ -14,7 +14,7 @@ class MINIUMIDIIImportMusicPlugin {
 		}, '*');
 	}
 	sendImportedMIDIData() {
-console.log('sendImportedMIDIData',this.parsedProject);
+		console.log('sendImportedMIDIData', this.parsedProject);
 		if (this.parsedProject) {
 			var oo: MZXBX_MessageToHost = {
 				dialogID: this.callbackID
@@ -60,10 +60,10 @@ console.log('sendImportedMIDIData',this.parsedProject);
 				//me.parsedProject = midiParser.convertProject(title, comment);
 				let cnvrtr: MIDIConverter = new MIDIConverter();
 
-				let midiSongData: MIDISongData=cnvrtr.convertProject(midiParser);
+				let midiSongData: MIDISongData = cnvrtr.convertProject(midiParser);
 				console.log('done midiSongData', midiSongData);
 				let proj = new Projectr();
-				me.parsedProject = proj.readProject(midiSongData,title, comment);
+				me.parsedProject = proj.readProject(midiSongData, title, comment);
 				console.log('done zproject', me.parsedProject);
 				//me.parsedProject = cnvrtr.convertProject(midiParser, title, comment);
 			}

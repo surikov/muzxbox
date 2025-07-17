@@ -94,12 +94,12 @@ type MIDISongData = {
 	duration: number;
 	parser: string;
 	bpm: number;
-	changes: { track: number, ms: number, resolution: number, bpm: number }[];
-	meters: { track: number, ms: number, count: number, division: number }[];
+	changesData: { track: number, ms: number, resolution: number, bpm: number }[];
+	metersData: { track: number, ms: number, count: number, division: number }[];
 	lyrics: { track: number, ms: number, txt: string }[];
 	key: number;
 	mode: number;
-	meter: { count: number, division: number };
+	startMeter: { count: number, division: number };
 	signs: { track: number, ms: number, sign: string }[];
 	miditracks: MIDISongTrack[];
 	speedMode: number;
@@ -211,10 +211,10 @@ class MIDIFileHeader {
 	format: number;
 	trackCount: number;
 	tempoBPM: number = 120;
-	changes: { track: number, ms: number, resolution: number, bpm: number }[] = [];
-	meters: { track: number, ms: number, count: number, division: number }[] = [];
-	lyrics: { track: number, ms: number, txt: string }[] = [];
-	signs: { track: number, ms: number, sign: string }[] = [];
+	changesResolutionBPM: { track: number, ms: number, resolution: number, bpm: number }[] = [];
+	metersList: { track: number, ms: number, count: number, division: number }[] = [];
+	lyricsList: { track: number, ms: number, txt: string }[] = [];
+	signsList: { track: number, ms: number, sign: string }[] = [];
 	meterCount: number = 4;
 	meterDivision: number = 4;
 	keyFlatSharp: number = 0;
@@ -224,6 +224,7 @@ class MIDIFileHeader {
 		this.datas = new DataView(buffer, 0, this.HEADER_LENGTH);
 		this.format = this.datas.getUint16(8);
 		this.trackCount = this.datas.getUint16(10);
+		console.log('MIDIFileHeader',(this.datas.getUint16(12) & 0x8000),this.datas.getUint16(12));
 	}
 	getCalculatedTickResolution(tempo: number): number {
 		this.lastNonZeroQuarter = tempo;

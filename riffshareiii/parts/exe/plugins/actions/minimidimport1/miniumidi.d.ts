@@ -454,13 +454,13 @@ declare type MIDISongData = {
     duration: number;
     parser: string;
     bpm: number;
-    changes: {
+    changesData: {
         track: number;
         ms: number;
         resolution: number;
         bpm: number;
     }[];
-    meters: {
+    metersData: {
         track: number;
         ms: number;
         count: number;
@@ -473,7 +473,7 @@ declare type MIDISongData = {
     }[];
     key: number;
     mode: number;
-    meter: {
+    startMeter: {
         count: number;
         division: number;
     };
@@ -509,24 +509,24 @@ declare class MIDIFileHeader {
     format: number;
     trackCount: number;
     tempoBPM: number;
-    changes: {
+    changesResolutionBPM: {
         track: number;
         ms: number;
         resolution: number;
         bpm: number;
     }[];
-    meters: {
+    metersList: {
         track: number;
         ms: number;
         count: number;
         division: number;
     }[];
-    lyrics: {
+    lyricsList: {
         track: number;
         ms: number;
         txt: string;
     }[];
-    signs: {
+    signsList: {
         track: number;
         ms: number;
         sign: string;
@@ -588,19 +588,25 @@ declare class MIDIConverter {
 declare type StatPitch = {
     track: number;
     channel: number;
-    pitch: TrackNote;
+    note: TrackNote;
     fromChord: TrackChord;
 };
 declare type StatWhen = {
     when: number;
     notes: StatPitch[];
+    sumavg: number;
 };
 declare function timeMsNear(a: number, b: number): boolean;
 declare function takeNearWhen(when: number, statArr: StatWhen[]): StatWhen;
+declare function findNearestStart(when: number, statArr: StatWhen[]): number;
+declare function findPreMeter(when: number, midiParser: MidiParser): {
+    count: number;
+    part: number;
+};
+declare function findPreTempo(when: number, midiParser: MidiParser): number;
 declare function dumpStat(midiParser: MidiParser): void;
 declare class Projectr {
     readProject(midiSongData: MIDISongData, title: string, comment: string): Zvoog_Project;
-    align32(): void;
     createTimeLine(midiSongData: MIDISongData): Zvoog_SongMeasure[];
     createMeasure(midiSongData: MIDISongData, fromMs: number, barIdx: number): ImportMeasure;
     findLastChange(midiSongData: MIDISongData, beforeMs: number): {
@@ -630,11 +636,8 @@ declare class Projectr {
     };
     findModeInstrument(program: number): number;
     createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack;
-    trimProject(project: Zvoog_Project, reslice: boolean): void;
+    trimProject(project: Zvoog_Project): void;
     limitShort(project: Zvoog_Project): void;
-    calculateShift32(project: Zvoog_Project, count32: number): Zvoog_Metre;
-    extractPointStampDuration(project: Zvoog_Project, at: Zvoog_Metre): Zvoog_Metre;
     numratio(nn: number): number;
-    shiftForwar32(project: Zvoog_Project, amount: number): void;
     isBarEmpty(barIdx: number, project: Zvoog_Project): boolean;
 }

@@ -1628,6 +1628,9 @@ class CommandDispatcher {
         this.reDrawPlayPosition();
         this.resetProject();
     }
+    moveAsideSelectedBars() {
+        console.log('move aside');
+    }
     mergeSelectedBars() {
         let startMeasure = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
         let endMeasure = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
@@ -2201,6 +2204,7 @@ let localMenuFxTracksFolder = 'localMenuFxTracksFolder';
 let localAddEmptyMeasures = 'localAddEmptyMeasures';
 let localRemoveSelectedMeasures = 'localRemoveSelectedMeasures';
 let localMergeSelectedMeausres = 'localMergeSelectedMeausres';
+let localMoveAsideContentSelectedMeausres = 'localMoveAsideContentSelectedMeausres';
 let localMenuNewPlugin = 'localMenuNewPlugin';
 let localeDictionary = [
     {
@@ -2225,7 +2229,8 @@ let localeDictionary = [
     },
     { id: localAddEmptyMeasures, data: [{ locale: 'en', text: '+' }, { locale: 'ru', text: '+' }, { locale: 'zh', text: '?' }] },
     { id: localRemoveSelectedMeasures, data: [{ locale: 'en', text: 'x' }, { locale: 'ru', text: 'x' }, { locale: 'zh', text: '?' }] },
-    { id: localMergeSelectedMeausres, data: [{ locale: 'en', text: '>|<' }, { locale: 'ru', text: '()' }, { locale: 'zh', text: '?' }] },
+    { id: localMergeSelectedMeausres, data: [{ locale: 'en', text: '>|<' }, { locale: 'ru', text: '>|<' }, { locale: 'zh', text: '?' }] },
+    { id: localMoveAsideContentSelectedMeausres, data: [{ locale: 'en', text: '|>|' }, { locale: 'ru', text: '|>|' }, { locale: 'zh', text: '?' }] },
     { id: localMenuNewEmptyProject, data: [{ locale: 'en', text: 'New empty project' }, { locale: 'ru', text: 'Новый проект' }, { locale: 'zh', text: 'тew' }] },
     {
         id: localMenuAutomationFolder, data: [
@@ -2503,8 +2508,9 @@ class TimeSelectBar {
             this.addSelectionMenuButton(LO(localAddEmptyMeasures), left, 1, zz, selectLevelAnchor, globalCommandDispatcher.insertAfterSelectedBars);
             this.addSelectionMenuButton(LO(localRemoveSelectedMeasures), left, 2, zz, selectLevelAnchor, globalCommandDispatcher.dropSelectedBars);
             this.addSelectionMenuButton(LO(localMergeSelectedMeausres), left, 3, zz, selectLevelAnchor, globalCommandDispatcher.mergeSelectedBars);
-            this.addSelectionMenuButton(tempoLabel, left, 4, zz, selectLevelAnchor, globalCommandDispatcher.promptTempoForSelectedBars);
-            this.addSelectionMenuButton(meterLabel, left, 5, zz, selectLevelAnchor, globalCommandDispatcher.promptMeterForSelectedBars);
+            this.addSelectionMenuButton(LO(localMoveAsideContentSelectedMeausres), left, 4, zz, selectLevelAnchor, globalCommandDispatcher.moveAsideSelectedBars);
+            this.addSelectionMenuButton(tempoLabel, left, 5, zz, selectLevelAnchor, globalCommandDispatcher.promptTempoForSelectedBars);
+            this.addSelectionMenuButton(meterLabel, left, 6, zz, selectLevelAnchor, globalCommandDispatcher.promptMeterForSelectedBars);
         }
     }
     fillTimeBar() {

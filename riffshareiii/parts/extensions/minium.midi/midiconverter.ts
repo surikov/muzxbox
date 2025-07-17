@@ -5,13 +5,13 @@ class MIDIConverter {
 			parser: '1.12'
 			, duration: 0
 			, bpm: parser.header.tempoBPM
-			, changes: parser.header.changes
-			, lyrics: parser.header.lyrics
+			, changesData: parser.header.changesResolutionBPM
+			, lyrics: parser.header.lyricsList
 			, key: parser.header.keyFlatSharp
 			, mode: parser.header.keyMajMin
-			, meter: { count: parser.header.meterCount, division: parser.header.meterDivision }
-			, meters: parser.header.meters
-			, signs: parser.header.signs
+			, startMeter: { count: parser.header.meterCount, division: parser.header.meterDivision }
+			, metersData: parser.header.metersList
+			, signs: parser.header.signsList
 			, miditracks: []
 			, speedMode: 0
 			, lineMode: 0
@@ -116,16 +116,17 @@ class MIDIConverter {
 type StatPitch = {
 	track: number;
 	channel: number;
-	pitch: TrackNote;
+	note: TrackNote;
 	//existsWhen: number
 	fromChord: TrackChord;
 };
 type StatWhen = {
 	when: number;
 	notes: StatPitch[];
+	sumavg:number;
 };
 function timeMsNear(a: number, b: number): boolean {
-	return Math.abs(a - b) <50;
+	return Math.abs(a - b) < 20;
 }
 function takeNearWhen(when: number, statArr: StatWhen[]): StatWhen {
 	for (let ii = 0; ii < statArr.length; ii++) {
@@ -138,12 +139,45 @@ function takeNearWhen(when: number, statArr: StatWhen[]): StatWhen {
 			}
 		}
 	}
-	let newWhen: StatWhen = { when: when, notes: [] };
+	let newWhen: StatWhen = { when: when, notes: [],sumavg:0 };
 	statArr.push(newWhen);
 	return newWhen;
 }
+function findNearestStart(when: number, statArr: StatWhen[]): number {
+	let delta = 321;
+	let newWhen = when;
+	for (let ss = 0; ss < statArr.length; ss++) {
+		let newDelta = Math.abs(statArr[ss].when - when);
+		if (newDelta < delta) {
+			delta = newDelta;
+			newWhen = statArr[ss].when;
+		}
+	}
+	return newWhen;
+}
+function findPreMeter(when: number, midiParser: MidiParser): { count: number, part: number } {
+	let meter: { count: number, part: number } = { count: 4, part: 4 };
+	for (let ii = 0; ii < midiParser.header.metersList.length; ii++) {
+		if (midiParser.header.metersList[ii].ms > when) {
+			break;
+		}
+		meter.count = midiParser.header.metersList[ii].count;
+		meter.part = midiParser.header.metersList[ii].division;
+	}
+	return meter;
+}
+function findPreTempo(when: number, midiParser: MidiParser): number {
+	let bpm: number = 120;
+	for (let ii = 0; ii < midiParser.header.metersList.length; ii++) {
+		if (midiParser.header.changesResolutionBPM[ii].ms > when) {
+			break;
+		}
+		bpm = midiParser.header.changesResolutionBPM[ii].bpm;
+	}
+	return bpm;
+}
 function dumpStat(midiParser: MidiParser) {
-	console.log('dumpStat');
+	//console.log('dumpStat');
 	let statArr: StatWhen[] = [];
 	for (let tt = 0; tt < midiParser.parsedTracks.length; tt++) {
 		let track = midiParser.parsedTracks[tt];
@@ -156,10 +190,11 @@ function dumpStat(midiParser: MidiParser) {
 				point.notes.push({
 					track: tt
 					, channel: chord.channel
-					, pitch: chord.notes[nn]
+					, note: chord.notes[nn]
 					//, existsWhen: chord.when
-					,fromChord:chord
+					, fromChord: chord
 				});
+				point.sumavg=point.sumavg+chord.notes[nn].basePitch;
 			}
 		}
 	}
@@ -170,13 +205,45 @@ function dumpStat(midiParser: MidiParser) {
 			//smm = smm + one.notes[nn].existsWhen;
 			smm = smm + one.notes[nn].fromChord.when;
 		}
-		one.when = smm / one.notes.length;
+		one.when = Math.round(smm / one.notes.length);
 		for (let nn = 0; nn < one.notes.length; nn++) {
-			one.notes[nn].fromChord.when=one.when;
+			one.notes[nn].fromChord.when = one.when;
 		}
 	}
 	statArr.sort((a: StatWhen, b: StatWhen) => {
 		return a.when - b.when;
 	});
 	console.log(statArr);
+	let lastStart = 0;
+	if (statArr.length > 0) {
+		lastStart = statArr[statArr.length - 1].when;
+	}
+	let currentBarStart = 0;
+
+	//let barMeterCount = midiParser.header.meterCount;
+	//let barMeterPart = midiParser.header.meterDivision;
+	//let barTempo = midiParser.header.tempoBPM;
+	let barDuration = 0;//1000 * (4 * 60 / barTempo) * (barMeterCount / barMeterPart);
+
+	let barSign = 0;
+	let barIdx = 1;
+	//console.log(lastStart, ':', barIdx, barTempo, ('' + barMeterCount + '/' + barMeterPart), barStart, ('+' + barDuration));
+	while (currentBarStart + barDuration < lastStart) {
+		let currentMeter = findPreMeter(currentBarStart + 99, midiParser);
+		let currentBPM= findPreTempo(currentBarStart + 99, midiParser);
+
+		barDuration = 1000 * (4 * 60 / currentBPM) * (currentMeter.count / currentMeter.part);
+		//console.log(barDuration,(currentBarStart+barDuration));
+		let nextStart = findNearestStart(currentBarStart + barDuration, statArr);
+
+		//console.log(barStart + barDuration, nextStart);
+		barDuration = nextStart - currentBarStart;
+		let retempo = 1000 * (4 * 60 / barDuration) * (currentMeter.count / currentMeter.part)
+		//console.log(barIdx, Math.round(retempo), ('' + currentMeter.count + '/' + currentMeter.part), Math.round(currentBarStart), ('+' + Math.round(barDuration)));
+
+
+		currentBarStart = nextStart;
+		barIdx++;
+
+	}
 }

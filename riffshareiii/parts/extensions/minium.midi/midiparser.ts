@@ -267,9 +267,9 @@ class MidiParser {
 		}
 	}
 	dumpResolutionChanges(): void {
-		this.header.changes = [];
+		this.header.changesResolutionBPM = [];
 		let tickResolution: number = this.header.get0TickResolution();
-		this.header.changes.push({ track: -1, ms: -1, resolution: tickResolution, bpm: 120 });
+		this.header.changesResolutionBPM.push({ track: -1, ms: -1, resolution: tickResolution, bpm: 120 });
 		for (var t = 0; t < this.parsedTracks.length; t++) {
 			var track: MIDIFileTrack = this.parsedTracks[t];
 			let playTimeTicks: number = 0;
@@ -282,18 +282,18 @@ class MidiParser {
 					if (evnt.subtype === this.EVENT_META_SET_TEMPO) {
 						if (evnt.tempo) {
 							tickResolution = this.header.getCalculatedTickResolution(evnt.tempo);
-							this.header.changes.push({ track: t, ms: playTimeTicks, resolution: tickResolution, bpm: (evnt.tempoBPM) ? evnt.tempoBPM : 120 });
+							this.header.changesResolutionBPM.push({ track: t, ms: playTimeTicks, resolution: tickResolution, bpm: (evnt.tempoBPM) ? evnt.tempoBPM : 120 });
 						}
 					}
 				}
 			}
 		}
-		this.header.changes.sort((a, b) => { return a.ms - b.ms; });
+		this.header.changesResolutionBPM.sort((a, b) => { return a.ms - b.ms; });
 	}
 	lastResolution(ms: number): number {
-		for (var i = this.header.changes.length - 1; i >= 0; i--) {
-			if (this.header.changes[i].ms <= ms) {
-				return this.header.changes[i].resolution
+		for (var i = this.header.changesResolutionBPM.length - 1; i >= 0; i--) {
+			if (this.header.changesResolutionBPM[i].ms <= ms) {
+				return this.header.changesResolutionBPM[i].resolution
 			}
 		}
 		return 0;
@@ -473,13 +473,13 @@ class MidiParser {
 				} else {
 
 					if (evnt.subtype == this.EVENT_META_TEXT) {
-						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
+						this.header.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
 					}
 					if (evnt.subtype == this.EVENT_META_MARKER) {
-						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
+						this.header.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
 					}
 					if (evnt.subtype == this.EVENT_META_COPYRIGHT_NOTICE) {
-						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: 'Copyright: ' + (evnt.text ? evnt.text : "") });
+						this.header.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: 'Copyright: ' + (evnt.text ? evnt.text : "") });
 					}
 					if (evnt.subtype == this.EVENT_META_TRACK_NAME) {
 						singleParsedTrack.trackTitle = evnt.text ? evnt.text : '';
@@ -488,10 +488,10 @@ class MidiParser {
 						singleParsedTrack.instrumentName = evnt.text ? evnt.text : '';
 					}
 					if (evnt.subtype == this.EVENT_META_LYRICS) {
-						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
+						this.header.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
 					}
 					if (evnt.subtype == this.EVENT_META_CUE_POINT) {
-						this.header.lyrics.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: 'CUE: ' + (evnt.text ? evnt.text : "") });
+						this.header.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: 'CUE: ' + (evnt.text ? evnt.text : "") });
 					}
 					if (evnt.subtype == this.EVENT_META_KEY_SIGNATURE) {
 
@@ -521,7 +521,7 @@ class MidiParser {
 								signature = minFlatCircleOfFifths[Math.abs(this.header.keyFlatSharp)];
 							}
 						}
-						this.header.signs.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, sign: signature });
+						this.header.signsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, sign: signature });
 					}
 					if (evnt.subtype == this.EVENT_META_SET_TEMPO) {
 						this.header.tempoBPM = evnt.tempoBPM ? evnt.tempoBPM : 120;
@@ -535,7 +535,7 @@ class MidiParser {
 						else if (dvsn == 4) this.header.meterDivision = 16
 						else if (dvsn == 5) this.header.meterDivision = 32
 						else if (dvsn == 0) this.header.meterDivision = 1
-						this.header.meters.push({
+						this.header.metersList.push({
 							track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0
 							, count: this.header.meterCount, division: this.header.meterDivision
 						});

@@ -701,6 +701,9 @@ class CommandDispatcher {
 		this.reDrawPlayPosition();
 		this.resetProject();
 	}
+	moveAsideSelectedBars(){
+		console.log('move aside');
+	}
 	mergeSelectedBars() {
 		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
 		let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
