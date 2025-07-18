@@ -123,7 +123,8 @@ type StatPitch = {
 type StatWhen = {
 	when: number;
 	notes: StatPitch[];
-	sumavg:number;
+	pitches: number[];
+	shape: string;
 };
 function timeMsNear(a: number, b: number): boolean {
 	return Math.abs(a - b) < 20;
@@ -139,7 +140,7 @@ function takeNearWhen(when: number, statArr: StatWhen[]): StatWhen {
 			}
 		}
 	}
-	let newWhen: StatWhen = { when: when, notes: [],sumavg:0 };
+	let newWhen: StatWhen = { when: when, notes: [], pitches: [],shape:"" };
 	statArr.push(newWhen);
 	return newWhen;
 }
@@ -194,7 +195,14 @@ function dumpStat(midiParser: MidiParser) {
 					//, existsWhen: chord.when
 					, fromChord: chord
 				});
-				point.sumavg=point.sumavg+chord.tracknotes[nn].basePitch;
+				//point.sumavg=point.sumavg+chord.tracknotes[nn].basePitch;
+				if(chord.channelidx==9){
+					//
+				}else{
+				let tone = chord.tracknotes[nn].basePitch % 12;
+				if (point.pitches.indexOf(tone) < 0) {
+					point.pitches.push(tone);
+				}}
 			}
 		}
 	}
@@ -209,6 +217,8 @@ function dumpStat(midiParser: MidiParser) {
 		for (let nn = 0; nn < one.notes.length; nn++) {
 			one.notes[nn].fromChord.startMs = one.when;
 		}
+		one.pitches.sort();
+		one.shape=one.pitches.toString();
 	}
 	statArr.sort((a: StatWhen, b: StatWhen) => {
 		return a.when - b.when;
@@ -230,7 +240,7 @@ function dumpStat(midiParser: MidiParser) {
 	//console.log(lastStart, ':', barIdx, barTempo, ('' + barMeterCount + '/' + barMeterPart), barStart, ('+' + barDuration));
 	while (currentBarStart + barDuration < lastStart) {
 		let currentMeter = findPreMeter(currentBarStart + 99, midiParser);
-		let currentBPM= findPreTempo(currentBarStart + 99, midiParser);
+		let currentBPM = findPreTempo(currentBarStart + 99, midiParser);
 
 		barDuration = 1000 * (4 * 60 / currentBPM) * (currentMeter.count / currentMeter.part);
 		//console.log(barDuration,(currentBarStart+barDuration));
@@ -238,7 +248,7 @@ function dumpStat(midiParser: MidiParser) {
 
 		//console.log(barStart + barDuration, nextStart);
 		barDuration = nextStart - currentBarStart;
-		let retempo = 1000 * (4 * 60 / barDuration) * (currentMeter.count / currentMeter.part)
+		//let retempo = 1000 * (4 * 60 / barDuration) * (currentMeter.count / currentMeter.part)
 		//console.log(barIdx, Math.round(retempo), ('' + currentMeter.count + '/' + currentMeter.part), Math.round(currentBarStart), ('+' + Math.round(barDuration)));
 
 

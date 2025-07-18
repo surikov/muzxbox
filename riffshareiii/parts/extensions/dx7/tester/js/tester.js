@@ -41,6 +41,7 @@ class SynthDX7 {
     test() {
         console.log('SynthDX7 test');
         let voice = new VoiceDX7(60, 1);
+        voice.start();
     }
 }
 class OperatorDX7 {
@@ -64,6 +65,9 @@ class VoiceDX7 {
         return 440 * Math.pow(2, (note - 69) / 12);
     }
     ;
+    start() {
+        console.log('voice start');
+    }
 }
 let synth;
 function initTester() {

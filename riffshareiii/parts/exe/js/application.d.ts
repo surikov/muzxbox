@@ -276,7 +276,6 @@ declare let localMenuFxTracksFolder: string;
 declare let localAddEmptyMeasures: string;
 declare let localRemoveSelectedMeasures: string;
 declare let localMergeSelectedMeausres: string;
-declare let localMoveAsideContentSelectedMeausres: string;
 declare let localMenuNewPlugin: string;
 declare let localeDictionary: {
     id: string;

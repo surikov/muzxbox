@@ -140,13 +140,13 @@ class Projectr {
 		}
 
 
-		/*
-				let needSlice = (midiSongData.meters.length < 2)
+		
+				let needSlice = (midiSongData.metersData.length < 2)
 					//&& (midiSongData.changes.length < 3)
 					&& (project.timeline[0].metre.count / project.timeline[0].metre.part == 1)
 					;
-		*/
-		this.trimProject(project);//, needSlice);
+		
+		this.trimProject(project, needSlice);
 
 		return project;
 	}
@@ -573,7 +573,7 @@ class Projectr {
 		console.log(midiNote.slidePoints,trackChord.slides);
 	}*/
 
-	trimProject(project: Zvoog_Project) {//}, reslice: boolean) {
+	trimProject(project: Zvoog_Project, reslice: boolean) {
 		let hh = 12 * 6 * 1 + project.percussions.length * 3 + 17;
 		for (let ii = 0; ii < project.tracks.length; ii++) {
 			project.tracks[ii].performer.iconPosition.x = 10 + ii * 4;
@@ -672,7 +672,7 @@ class Projectr {
 
 
 		this.limitShort(project);
-		/*
+		
 				if (reslice) {
 		
 					let durations: { len: number, shft: number }[] = [];
@@ -704,7 +704,7 @@ class Projectr {
 					}
 		
 				}
-		*/
+		
 		let len = project.timeline.length;
 		for (let ii = len - 1; ii > 0; ii--) {
 			if (this.isBarEmpty(ii, project)) {
@@ -735,7 +735,7 @@ class Projectr {
 			}
 		}
 	}
-	/*
+	
 		calculateShift32(project: Zvoog_Project, count32: number): Zvoog_Metre {
 			let ticker: Zvoog_MetreMathType = MMUtil().set({ count: count32, part: 32 });
 			let duration: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 32 });
@@ -753,8 +753,8 @@ class Projectr {
 			//console.log(count32,smm);
 			return smm.strip(32);
 		}
-	*/
-	/*
+	
+	
 		extractPointStampDuration(project: Zvoog_Project, at: Zvoog_Metre): Zvoog_Metre {
 			//console.log('extractPointStampDuration',at);
 			let pointSumm: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 32 });
@@ -807,13 +807,13 @@ class Projectr {
 			//console.log(pointSumm);
 			return pointSumm;
 		}
-		*/
+		
 	numratio(nn: number): number {
 		let rr = 1;//0000;
 		return Math.round(nn * rr);
 	}
 
-	/*
+	
 		shiftForwar32(project: Zvoog_Project, amount: number) {
 			for (let mm = project.timeline.length - 2; mm >= 0; mm--) {
 				let measureDuration = MMUtil().set(project.timeline[mm].metre);
@@ -883,7 +883,7 @@ class Projectr {
 				}
 			}
 		}
-		*/
+		
 	isBarEmpty(barIdx: number, project: Zvoog_Project): boolean {
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let track = project.tracks[tt];

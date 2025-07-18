@@ -23,6 +23,7 @@ declare class VoiceDX7 {
     operator6: OperatorDX7;
     constructor(note: number, velocity: number);
     frequencyFromNoteNumber(note: number): number;
+    start(): void;
 }
 declare let synth: SynthDX7;
 declare function initTester(): void;

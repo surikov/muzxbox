@@ -11,6 +11,6 @@ class SynthDX7 {
 	test() {
 		console.log('SynthDX7 test');
 		let voice = new VoiceDX7(60, 1);
-		//voice.test();
+		voice.start();
 	}
 }

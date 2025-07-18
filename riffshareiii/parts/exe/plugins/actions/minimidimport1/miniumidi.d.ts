@@ -594,7 +594,8 @@ declare type StatPitch = {
 declare type StatWhen = {
     when: number;
     notes: StatPitch[];
-    sumavg: number;
+    pitches: number[];
+    shape: string;
 };
 declare function timeMsNear(a: number, b: number): boolean;
 declare function takeNearWhen(when: number, statArr: StatWhen[]): StatWhen;
@@ -636,8 +637,11 @@ declare class Projectr {
     };
     findModeInstrument(program: number): number;
     createProjectTrack(volume: number, top: number, timeline: Zvoog_SongMeasure[], midiTrack: MIDISongTrack, outputId: string): Zvoog_MusicTrack;
-    trimProject(project: Zvoog_Project): void;
+    trimProject(project: Zvoog_Project, reslice: boolean): void;
     limitShort(project: Zvoog_Project): void;
+    calculateShift32(project: Zvoog_Project, count32: number): Zvoog_Metre;
+    extractPointStampDuration(project: Zvoog_Project, at: Zvoog_Metre): Zvoog_Metre;
     numratio(nn: number): number;
+    shiftForwar32(project: Zvoog_Project, amount: number): void;
     isBarEmpty(barIdx: number, project: Zvoog_Project): boolean;
 }
