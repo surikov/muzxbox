@@ -125,7 +125,6 @@ class SchedulePlayer {
         return this.performerDrumHolders;
     }
     launchCollectedPlugins() {
-        console.log('launchCollectedPlugins filters', this.filterHolders, 'drums/tones', this.performerDrumHolders);
         try {
             for (let ff = 0; ff < this.filterHolders.length; ff++) {
                 let plugin = this.filterHolders[ff].pluginAudioFilter;
@@ -134,7 +133,6 @@ class SchedulePlayer {
                 }
             }
             for (let pp = 0; pp < this.performerDrumHolders.length; pp++) {
-                console.log('launch performer/drum', pp, this.performerDrumHolders[pp]);
                 let plugin = this.performerDrumHolders[pp].plugin;
                 if (plugin) {
                     plugin.launch(this.audioContext, this.performerDrumHolders[pp].properties);
@@ -183,7 +181,6 @@ class SchedulePlayer {
         console.log('reconnectAllPlugins', msg, schedule);
     }
     startLoopTicks(loopStart, currentPosition, loopEnd) {
-        console.log('startLoopTicks', loopStart, currentPosition, loopEnd, this.schedule);
         let msg = this.connectAllPlugins();
         if (msg) {
             return msg;
@@ -214,13 +211,11 @@ class SchedulePlayer {
         console.log('connectAllPlugins');
         if (!this.isConnected) {
             let msg = this.launchCollectedPlugins();
-            console.log('launchCollectedPlugins', msg);
             if (msg) {
                 return msg;
             }
             else {
                 msg = this.checkCollectedPlugins();
-                console.log('checkCollectedPlugins', msg);
                 if (msg) {
                     return msg;
                 }
@@ -283,6 +278,7 @@ class SchedulePlayer {
         }
     }
     disconnectAllPlugins() {
+        console.log('disconnectAllPlugins');
         if (this.isConnected) {
             if (this.schedule) {
                 let master = this.audioContext.destination;

@@ -1282,14 +1282,8 @@ class MINIUMIDIIImportMusicPlugin {
                 }
                 let comment = ', ' + file.size / 1000 + 'kb, ' + dat;
                 var arrayBuffer = progressEvent.target.result;
-                var midiParser = newMIDIparser2(arrayBuffer);
-                console.log('done midiParser', midiParser);
-                dumpStat(midiParser);
-                let cnvrtr = new MIDIConverter();
-                let midiSongData = cnvrtr.convertProject(midiParser);
-                console.log('done midiSongData', midiSongData);
                 let proj = new Projectr();
-                me.parsedProject = proj.readProject(midiSongData, title, comment);
+                me.parsedProject = proj.parseRawMIDIdata(arrayBuffer, title, comment);
                 console.log('done zproject', me.parsedProject);
             }
         };
@@ -1517,6 +1511,16 @@ function dumpStat(midiParser) {
     }
 }
 class Projectr {
+    parseRawMIDIdata(arrayBuffer, title, comment) {
+        var midiParser = newMIDIparser2(arrayBuffer);
+        console.log('done midiParser', midiParser);
+        dumpStat(midiParser);
+        let cnvrtr = new MIDIConverter();
+        let midiSongData = cnvrtr.convertProject(midiParser);
+        console.log('done midiSongData', midiSongData);
+        let proj = new Projectr();
+        return proj.readProject(midiSongData, title, comment);
+    }
     readProject(midiSongData, title, comment) {
         let newtimeline = this.createTimeLine(midiSongData);
         let project = {

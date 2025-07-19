@@ -49,7 +49,7 @@ class SchedulePlayer implements MZXBX_Player {
 		return this.performerDrumHolders;
 	}
 	launchCollectedPlugins(): null | string {
-		console.log('launchCollectedPlugins filters',this.filterHolders,'drums/tones',this.performerDrumHolders);
+		//console.log('launchCollectedPlugins filters',this.filterHolders,'drums/tones',this.performerDrumHolders);
 		try {
 			//
 			for (let ff = 0; ff < this.filterHolders.length; ff++) {
@@ -61,7 +61,7 @@ class SchedulePlayer implements MZXBX_Player {
 				}
 			}
 			for (let pp = 0; pp < this.performerDrumHolders.length; pp++) {
-				console.log('launch performer/drum',pp,this.performerDrumHolders[pp]);
+				//console.log('launch performer/drum',pp,this.performerDrumHolders[pp]);
 				let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performerDrumHolders[pp].plugin;
 				if (plugin) {
 					plugin.launch(this.audioContext, this.performerDrumHolders[pp].properties);
@@ -108,7 +108,7 @@ class SchedulePlayer implements MZXBX_Player {
 		console.log('reconnectAllPlugins', msg, schedule);
 	}
 	startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number): string {
-		console.log('startLoopTicks', loopStart, currentPosition, loopEnd,this.schedule);
+		//console.log('startLoopTicks', loopStart, currentPosition, loopEnd,this.schedule);
 		let msg: string | null = this.connectAllPlugins();
 		if (msg) {
 			//console.log('Can\'t start loop:', msg);
@@ -139,12 +139,12 @@ class SchedulePlayer implements MZXBX_Player {
 		console.log('connectAllPlugins');
 		if (!this.isConnected) {
 			let msg: string | null = this.launchCollectedPlugins();
-			console.log('launchCollectedPlugins', msg);
+			//console.log('launchCollectedPlugins', msg);
 			if (msg) {
 				return msg;
 			} else {
 				msg = this.checkCollectedPlugins();
-				console.log('checkCollectedPlugins', msg);
+				//console.log('checkCollectedPlugins', msg);
 				if (msg) {
 					return msg;
 				} else {
@@ -206,7 +206,7 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 	}
 	disconnectAllPlugins() {
-		//console.log('disconnectAllPlugins');
+		console.log('disconnectAllPlugins');
 		if (this.isConnected) {
 			if (this.schedule) {
 				let master: AudioNode = this.audioContext.destination;

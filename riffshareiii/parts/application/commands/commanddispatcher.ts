@@ -403,14 +403,14 @@ class CommandDispatcher {
 
 	}
 	startPlayLoop(from: number, position: number, to: number) {
-		console.log('startPlayLoop', from, position, to);
+		//console.log('startPlayLoop', from, position, to);
 		//if (this.neeToStart) {
 		//let me = this;
 		//let n120 = 120 / 60;
 		let msg: string = this.player.startLoopTicks(from, position, to);
 		if (msg) {
 			//me.onAir = false;
-			console.log('startPlayLoop', msg, this.renderer.warning.noWarning);
+			//console.log('startPlayLoop', msg, this.renderer.warning.noWarning);
 			/*if (this.renderer.warning.noWarning) {
 				//
 			} else {
@@ -447,7 +447,7 @@ class CommandDispatcher {
 		//}
 	}
 	setThemeLocale(loc: string, ratio: number) {
-		console.log("setThemeLocale", loc, ratio);
+		//console.log("setThemeLocale", loc, ratio);
 		setLocaleID(loc, ratio);
 		if (loc == 'zh') {
 			startLoadCSSfile('theme/font2big.css');
