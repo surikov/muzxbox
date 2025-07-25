@@ -264,6 +264,86 @@
 
 
 
+.selectedBarIcon025 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.2*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon05 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.4*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon1 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.8*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon2 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(1.6*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon4 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(3.2*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon8 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(6.4*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon16 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(12.8*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon32 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(25.6*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon64 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(51.2*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon128 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(102.4*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
 
 
 

@@ -189,7 +189,7 @@ class TimeSelectBar {
 		let nm: TileText = {
 			x: barLeft + size / 4
 			, y: zoomPrefixLevelsCSS[zz].minZoom * 1
-			, text: '' + (1 + barnum) + ': ' + mins + '\'' + (secs > 9 ? '' : '0') + secs + '.' + hunds
+			, text: '' + (1 + barnum) + ':' + mins + '\'' + (secs > 9 ? '' : '0') + secs + '.' + hunds
 			, css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
 		};
 		measureAnchor.content.push(nm);
@@ -203,7 +203,7 @@ class TimeSelectBar {
 		measureAnchor.content.push(bpm);
 
 	}
-	addSelectionMenuButton(label: string, left: number, order: number, zz: number, selectLevelAnchor: TileAnchor, action: () => void) {
+	addSelectionMenuButton(label: string, left: number, order: number, zz: number, selectLevelAnchor: TileAnchor, labelCSS: string, action: () => void) {
 		let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
 
 		let opt1: TileRectangle = {
@@ -214,14 +214,16 @@ class TimeSelectBar {
 			, rx: size / 2
 			, ry: size / 2
 			, css: 'timeMarkButtonCircle' + zoomPrefixLevelsCSS[zz].prefix
+
 			, activation: action
 		};
 		selectLevelAnchor.content.push(opt1);
 		let nm: TileText = {
-			x: left + size / 4
-			, y: (size * 1.1) * order + size * 3 / 4
+			x: left + size*10 / 33
+			, y: (size * 1.1) * order + size * 30 / 43
 			, text: label
-			, css: 'selectedBarNum' + zoomPrefixLevelsCSS[zz].prefix
+			//, css: 'selectedBarNum' + zoomPrefixLevelsCSS[zz].prefix
+			, css: labelCSS + zoomPrefixLevelsCSS[zz].prefix
 		};
 		selectLevelAnchor.content.push(nm);
 		//console.log('addSelectionMenuButton', zz, label);
@@ -242,17 +244,14 @@ class TimeSelectBar {
 			let tempoLabel = '' + Math.round(globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].tempo);
 			let meterLabel = '' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.count
 				+ '/' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.part;
-			this.addSelectionMenuButton(LO(localAddEmptyMeasures), left, 1, zz, selectLevelAnchor, globalCommandDispatcher.insertAfterSelectedBars);
-			this.addSelectionMenuButton(LO(localRemoveSelectedMeasures), left, 2, zz, selectLevelAnchor, globalCommandDispatcher.dropSelectedBars);
-			//this.addSelectionMenuButton(LO(localSplitFirstSelectedMeasure), left, 3, zz, selectLevelAnchor, () => { });
-			this.addSelectionMenuButton(LO(localMergeSelectedMeausres), left, 3, zz, selectLevelAnchor, globalCommandDispatcher.mergeSelectedBars);
-			//this.addSelectionMenuButton(LO(localMoveAsideContentSelectedMeausres), left, 4, zz, selectLevelAnchor, globalCommandDispatcher.moveAsideSelectedBars);
-			//this.addSelectionMenuButton(LO(localMorphMeterSelectedMeausres), left, , zz, selectLevelAnchor, () => { });
-			this.addSelectionMenuButton(tempoLabel, left, 4, zz, selectLevelAnchor, globalCommandDispatcher.promptTempoForSelectedBars);
-			this.addSelectionMenuButton(meterLabel, left, 5, zz, selectLevelAnchor, globalCommandDispatcher.promptMeterForSelectedBars);
-			//this.addSelectionMenuButton('/16', left, 6, zz, selectLevelAnchor, globalCommandDispatcher.align16forSelection);
-			//}
-			//console.log(opt1);
+
+			this.addSelectionMenuButton(tempoLabel, left, 1, zz, selectLevelAnchor, 'selectedBarNum', globalCommandDispatcher.promptTempoForSelectedBars);
+			this.addSelectionMenuButton(meterLabel, left, 2, zz, selectLevelAnchor, 'selectedBarNum', globalCommandDispatcher.promptMeterForSelectedBars);
+			this.addSelectionMenuButton(icon_addbars, left, 3, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.insertAfterSelectedBars);
+			this.addSelectionMenuButton(icon_deletebars, left, 4, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.dropSelectedBars);
+			this.addSelectionMenuButton(icon_mergebars, left, 5, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.mergeSelectedBars);
+			this.addSelectionMenuButton(icon_shiftbarcontent, left, 6, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.moveAsideSelectedBars);
+			this.addSelectionMenuButton(icon_copybarcontent, left, 7, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.copySelectedBars);
 		}
 	}
 

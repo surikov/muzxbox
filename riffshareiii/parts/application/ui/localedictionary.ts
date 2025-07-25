@@ -32,10 +32,10 @@ let localMenuInsTracksFolder = 'localMenuInsTracksFolder';
 let localMenuDrumTracksFolder = 'localMenuDrumTracksFolder';
 let localMenuFxTracksFolder = 'localMenuFxTracksFolder';
 
-let localAddEmptyMeasures = 'localAddEmptyMeasures';
-let localRemoveSelectedMeasures = 'localRemoveSelectedMeasures';
+//let localAddEmptyMeasures = 'localAddEmptyMeasures';
+//let localRemoveSelectedMeasures = 'localRemoveSelectedMeasures';
 //let localSplitFirstSelectedMeasure = 'localSplitFirstSelectedMeasure';
-let localMergeSelectedMeausres = 'localMergeSelectedMeausres';
+//let localMergeSelectedMeausres = 'localMergeSelectedMeausres';
 //let localMoveAsideContentSelectedMeausres='localMoveAsideContentSelectedMeausres';
 //let localMorphMeterSelectedMeausres = 'localMorphMeterSelectedMeausres';
 
@@ -69,10 +69,10 @@ let localeDictionary: { id: string, data: { locale: string, text: string }[] }[]
 			, { locale: 'ru', text: 'Сэмплер' }
 			, { locale: 'zh', text: '?' }]
 	}
-	, { id: localAddEmptyMeasures, data: [{ locale: 'en', text: '+' }, { locale: 'ru', text: '+' }, { locale: 'zh', text: '?' }] }
-	, { id: localRemoveSelectedMeasures, data: [{ locale: 'en', text: 'x' }, { locale: 'ru', text: 'x' }, { locale: 'zh', text: '?' }] }
+	//, { id: localAddEmptyMeasures, data: [{ locale: 'en', text: '+' }, { locale: 'ru', text: '+' }, { locale: 'zh', text: '?' }] }
+	//, { id: localRemoveSelectedMeasures, data: [{ locale: 'en', text: 'x' }, { locale: 'ru', text: 'x' }, { locale: 'zh', text: '?' }] }
 	//, { id: localSplitFirstSelectedMeasure, data: [{ locale: 'en', text: 'Split' }, { locale: 'ru', text: 'Разделить' }, { locale: 'zh', text: '?' }] }
-	, { id: localMergeSelectedMeausres, data: [{ locale: 'en', text: '>|<' }, { locale: 'ru', text: '>|<' }, { locale: 'zh', text: '?' }] }
+	//, { id: localMergeSelectedMeausres, data: [{ locale: 'en', text: '>|<' }, { locale: 'ru', text: '>|<' }, { locale: 'zh', text: '?' }] }
 	//, { id: localMoveAsideContentSelectedMeausres, data: [{ locale: 'en', text: '|>|' }, { locale: 'ru', text: '|>|' }, { locale: 'zh', text: '?' }] }
 	//, { id: localMorphMeterSelectedMeausres, data: [{ locale: 'en', text: 'Morph' }, { locale: 'ru', text: 'Сменить' }, { locale: 'zh', text: '?' }] }
 

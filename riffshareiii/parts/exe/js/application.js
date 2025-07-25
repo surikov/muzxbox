@@ -1628,6 +1628,44 @@ class CommandDispatcher {
         this.reDrawPlayPosition();
         this.resetProject();
     }
+    downloadBlob(blob, name) {
+        let a = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = name;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+    copySelectedBars() {
+        console.log('copySelectedBars');
+        let tileLevelSVG = document.getElementById('tileLevelSVG');
+        let xml = encodeURIComponent(tileLevelSVG.outerHTML);
+        let ww = window.innerWidth;
+        let hh = window.innerHeight;
+        let blob = new Blob([xml], { type: 'image/svg+xml' });
+        let url = URL.createObjectURL(blob);
+        console.log(url);
+        let canvas = document.createElement('canvas');
+        canvas.height = hh;
+        canvas.width = ww;
+        let context = canvas.getContext('2d');
+        let svgImg = new Image(ww, hh);
+        console.log('image onload');
+        context.beginPath();
+        context.rect(10, 20, 150, 100);
+        context.fill();
+        svgImg.onload = () => {
+            console.log('image onload');
+            context.drawImage(svgImg, 0, 0, ww, hh);
+            canvas.toBlob((blobresult) => {
+                console.log('canvas toBlob');
+                globalCommandDispatcher.downloadBlob(blobresult, 'canvasImage.png');
+            });
+        };
+        console.log('image start');
+        svgImg.src = 'http://upload.wikimedia.org/wikipedia/commons/d/d2/Svg_example_square.svg';
+        console.log('image done');
+    }
     moveAsideSelectedBars() {
         console.log('move aside');
     }
@@ -2201,9 +2239,6 @@ let localMenuSamplersFolder = 'localMenuSamplersFolder';
 let localMenuInsTracksFolder = 'localMenuInsTracksFolder';
 let localMenuDrumTracksFolder = 'localMenuDrumTracksFolder';
 let localMenuFxTracksFolder = 'localMenuFxTracksFolder';
-let localAddEmptyMeasures = 'localAddEmptyMeasures';
-let localRemoveSelectedMeasures = 'localRemoveSelectedMeasures';
-let localMergeSelectedMeausres = 'localMergeSelectedMeausres';
 let localMenuNewPlugin = 'localMenuNewPlugin';
 let localeDictionary = [
     {
@@ -2226,9 +2261,6 @@ let localeDictionary = [
             { locale: 'zh', text: '?' }
         ]
     },
-    { id: localAddEmptyMeasures, data: [{ locale: 'en', text: '+' }, { locale: 'ru', text: '+' }, { locale: 'zh', text: '?' }] },
-    { id: localRemoveSelectedMeasures, data: [{ locale: 'en', text: 'x' }, { locale: 'ru', text: 'x' }, { locale: 'zh', text: '?' }] },
-    { id: localMergeSelectedMeausres, data: [{ locale: 'en', text: '>|<' }, { locale: 'ru', text: '>|<' }, { locale: 'zh', text: '?' }] },
     { id: localMenuNewEmptyProject, data: [{ locale: 'en', text: 'New empty project' }, { locale: 'ru', text: 'Новый проект' }, { locale: 'zh', text: 'тew' }] },
     {
         id: localMenuAutomationFolder, data: [
@@ -2458,7 +2490,7 @@ class TimeSelectBar {
         let nm = {
             x: barLeft + size / 4,
             y: zoomPrefixLevelsCSS[zz].minZoom * 1,
-            text: '' + (1 + barnum) + ': ' + mins + '\'' + (secs > 9 ? '' : '0') + secs + '.' + hunds,
+            text: '' + (1 + barnum) + ':' + mins + '\'' + (secs > 9 ? '' : '0') + secs + '.' + hunds,
             css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(nm);
@@ -2470,7 +2502,7 @@ class TimeSelectBar {
         };
         measureAnchor.content.push(bpm);
     }
-    addSelectionMenuButton(label, left, order, zz, selectLevelAnchor, action) {
+    addSelectionMenuButton(label, left, order, zz, selectLevelAnchor, labelCSS, action) {
         let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
         let opt1 = {
             x: left,
@@ -2484,10 +2516,10 @@ class TimeSelectBar {
         };
         selectLevelAnchor.content.push(opt1);
         let nm = {
-            x: left + size / 4,
-            y: (size * 1.1) * order + size * 3 / 4,
+            x: left + size * 10 / 33,
+            y: (size * 1.1) * order + size * 30 / 43,
             text: label,
-            css: 'selectedBarNum' + zoomPrefixLevelsCSS[zz].prefix
+            css: labelCSS + zoomPrefixLevelsCSS[zz].prefix
         };
         selectLevelAnchor.content.push(nm);
     }
@@ -2503,11 +2535,13 @@ class TimeSelectBar {
             let tempoLabel = '' + Math.round(globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].tempo);
             let meterLabel = '' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.count
                 + '/' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.part;
-            this.addSelectionMenuButton(LO(localAddEmptyMeasures), left, 1, zz, selectLevelAnchor, globalCommandDispatcher.insertAfterSelectedBars);
-            this.addSelectionMenuButton(LO(localRemoveSelectedMeasures), left, 2, zz, selectLevelAnchor, globalCommandDispatcher.dropSelectedBars);
-            this.addSelectionMenuButton(LO(localMergeSelectedMeausres), left, 3, zz, selectLevelAnchor, globalCommandDispatcher.mergeSelectedBars);
-            this.addSelectionMenuButton(tempoLabel, left, 4, zz, selectLevelAnchor, globalCommandDispatcher.promptTempoForSelectedBars);
-            this.addSelectionMenuButton(meterLabel, left, 5, zz, selectLevelAnchor, globalCommandDispatcher.promptMeterForSelectedBars);
+            this.addSelectionMenuButton(tempoLabel, left, 1, zz, selectLevelAnchor, 'selectedBarNum', globalCommandDispatcher.promptTempoForSelectedBars);
+            this.addSelectionMenuButton(meterLabel, left, 2, zz, selectLevelAnchor, 'selectedBarNum', globalCommandDispatcher.promptMeterForSelectedBars);
+            this.addSelectionMenuButton(icon_addbars, left, 3, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.insertAfterSelectedBars);
+            this.addSelectionMenuButton(icon_deletebars, left, 4, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.dropSelectedBars);
+            this.addSelectionMenuButton(icon_mergebars, left, 5, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.mergeSelectedBars);
+            this.addSelectionMenuButton(icon_shiftbarcontent, left, 6, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.moveAsideSelectedBars);
+            this.addSelectionMenuButton(icon_copybarcontent, left, 7, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.copySelectedBars);
         }
     }
     fillTimeBar() {
@@ -5789,6 +5823,11 @@ let icon_delete = '&#xf154;';
 let icon_power = '&#xf1af;';
 let icon_leftright = '&#xf30d';
 let icon_leftrightupdown = '&#xf2f0';
+let icon_addbars = '&#xf277';
+let icon_deletebars = '&#xf314';
+let icon_shiftbarcontent = '&#xf302';
+let icon_mergebars = '&#xf232';
+let icon_copybarcontent = '&#xf237';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];

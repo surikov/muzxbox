@@ -54,4 +54,10 @@ let icon_power='&#xf1af;';
 let icon_leftright='&#xf30d';
 let icon_leftrightupdown='&#xf2f0';
 
+	let icon_addbars='&#xf277';
+	let icon_deletebars='&#xf314';
+	let icon_shiftbarcontent='&#xf302';
+let icon_mergebars='&#xf232';
+	let icon_copybarcontent='&#xf237';
+
 

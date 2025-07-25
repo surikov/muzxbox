@@ -1472,7 +1472,7 @@ function testTest() {
 	}
 	drawLines();
 }
-
+/*
 function dumpStat22() {
 	console.log('dumpStat22');
 	let counts: number[] = [];
@@ -1579,21 +1579,55 @@ function checkAllRows(count: number) {
 	}
 	console.log(Math.floor(count), calcs);
 }
+*/
+/*
+function test4(){
+	console.log('test4');
+	//let high=10;
+	//let low=7
+	let cntx=0;
+	let cless=0;
+	let cmore=0;
+	for(let ii=2;ii<datarows.length-99;ii++){
+		let a0=datarows[ii+0].balls[0];
+		let a1=datarows[ii+1].balls[0];
+		let a2=datarows[ii+2].balls[0];
+		let a3=datarows[ii+3].balls[0];
+		if(a1<a2 && a2>a3 ){
+			if(a0>=a1 && a0>1){
+				console.log('+',a0,a1,a2,a3,':',ii);
+				cmore++;
+			}else{
+				console.log('-',a0,a1,a2,a3,':',ii);
+				cless++;
+			}
+			//console.log(ii);
+			cntx++;
+		}
+	}
+	console.log(cntx,cless,cmore,cmore/cntx);
+}
+*/
 init();
 addTails();
 //dumpPairsCounts();
 //let chk=randBalls(20);
+
+
 console.log(datarows);
+//test4();
+/*
 checkAllRows(rowLen * 1 / 4);
 checkAllRows(rowLen * 1 / 2);
 checkAllRows(rowLen * 3 / 4);
-
+*/
+/*
 let row = datarows[Math.round(Math.random() * 5000 + 1)];
 console.log(33, row);
 for (let ii = 0; ii < 10; ii++) {
 	console.log(chackRow(randBalls(33), row));
 }
-
+*/
 
 console.log('start');
 

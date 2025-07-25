@@ -701,7 +701,53 @@ class CommandDispatcher {
 		this.reDrawPlayPosition();
 		this.resetProject();
 	}
-	moveAsideSelectedBars(){
+	downloadBlob(blob: Blob, name: string) {
+		let a = document.createElement('a');
+		const url = URL.createObjectURL(blob);
+		a.href = url;
+		a.download = name;
+		a.click();
+		URL.revokeObjectURL(url);
+	}
+	copySelectedBars() {
+		console.log('copySelectedBars');
+		let tileLevelSVG: HTMLElement = document.getElementById('tileLevelSVG') as HTMLElement;
+		let xml: string = encodeURIComponent(tileLevelSVG.outerHTML);
+		//var image_data_url: string = 'data:image/svg+xml;utf8,' + xml;
+		let ww = window.innerWidth;
+		let hh = window.innerHeight;
+		//svgImg.src = image_data_url;
+		//svgImg.src = 'http://upload.wikimedia.org/wikipedia/commons/d/d2/Svg_example_square.svg';
+		//let svg = xml;
+		let blob = new Blob([xml], { type: 'image/svg+xml' });
+		let url = URL.createObjectURL(blob);
+		console.log(url);
+		let canvas: HTMLCanvasElement = document.createElement('canvas');
+		canvas.height = hh;
+		canvas.width = ww;
+		let context: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
+		let svgImg: HTMLImageElement = new Image(ww, hh);
+		console.log('image onload');
+
+		context.beginPath();
+		context.rect(10, 20, 150, 100);
+		context.fill();
+
+		svgImg.onload = () => {
+			console.log('image onload');
+			context.drawImage(svgImg, 0, 0, ww, hh);
+			canvas.toBlob((blobresult: Blob) => {
+				console.log('canvas toBlob');
+				globalCommandDispatcher.downloadBlob(blobresult, 'canvasImage.png');
+			});
+		};
+		console.log('image start');
+		//svgImg.src = url;
+		svgImg.src = 'http://upload.wikimedia.org/wikipedia/commons/d/d2/Svg_example_square.svg';
+		
+		console.log('image done');
+	}
+	moveAsideSelectedBars() {
 		console.log('move aside');
 	}
 	mergeSelectedBars() {

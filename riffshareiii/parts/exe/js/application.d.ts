@@ -199,6 +199,8 @@ declare class CommandDispatcher {
     playFromTimeSelection(idx: number): void;
     setupSelectionBackground22(selectedPart: Zvoog_Selection): void;
     expandTimeLineSelection(idx: number): void;
+    downloadBlob(blob: Blob, name: string): void;
+    copySelectedBars(): void;
     moveAsideSelectedBars(): void;
     mergeSelectedBars(): void;
     dropSelectedBars(): void;
@@ -273,9 +275,6 @@ declare let localMenuSamplersFolder: string;
 declare let localMenuInsTracksFolder: string;
 declare let localMenuDrumTracksFolder: string;
 declare let localMenuFxTracksFolder: string;
-declare let localAddEmptyMeasures: string;
-declare let localRemoveSelectedMeasures: string;
-declare let localMergeSelectedMeausres: string;
 declare let localMenuNewPlugin: string;
 declare let localeDictionary: {
     id: string;
@@ -306,7 +305,7 @@ declare class TimeSelectBar {
     updateTimeSelectionBar(): void;
     createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, zz: number): void;
     createBarNumber(barLeft: number, barnum: number, zz: number, curBar: Zvoog_SongMeasure, measureAnchor: TileAnchor, barTime: number, size: number): void;
-    addSelectionMenuButton(label: string, left: number, order: number, zz: number, selectLevelAnchor: TileAnchor, action: () => void): void;
+    addSelectionMenuButton(label: string, left: number, order: number, zz: number, selectLevelAnchor: TileAnchor, labelCSS: string, action: () => void): void;
     fillSelectionMenu(zz: number, selectLevelAnchor: TileAnchor): void;
     fillTimeBar(): void;
 }
@@ -648,6 +647,11 @@ declare let icon_delete: string;
 declare let icon_power: string;
 declare let icon_leftright: string;
 declare let icon_leftrightupdown: string;
+declare let icon_addbars: string;
+declare let icon_deletebars: string;
+declare let icon_shiftbarcontent: string;
+declare let icon_mergebars: string;
+declare let icon_copybarcontent: string;
 declare class DebugLayerUI {
     debugRectangle: TileRectangle;
     debugAnchor: TileAnchor;
