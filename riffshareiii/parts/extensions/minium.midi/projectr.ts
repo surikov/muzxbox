@@ -1,4 +1,17 @@
 class Projectr {
+	parseRawMIDIdata(arrayBuffer:ArrayBuffer,title:string,comment:string): Zvoog_Project{
+
+		var midiParser = newMIDIparser2(arrayBuffer);
+		console.log('done midiParser', midiParser);
+		dumpStat(midiParser);
+		//me.parsedProject = midiParser.convertProject(title, comment);
+		let cnvrtr: MIDIConverter = new MIDIConverter();
+
+		let midiSongData: MIDISongData = cnvrtr.convertProject(midiParser);
+		console.log('done midiSongData', midiSongData);
+		let proj = new Projectr();
+		return proj.readProject(midiSongData, title, comment);
+	}
 	readProject(midiSongData: MIDISongData, title: string, comment: string): Zvoog_Project {
 
 

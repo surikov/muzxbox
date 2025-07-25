@@ -53,7 +53,8 @@ class MINIUMIDIIImportMusicPlugin {
 					console.log(xx);
 				}
 				let comment: string = ', ' + file.size / 1000 + 'kb, ' + dat;
-				var arrayBuffer = progressEvent.target.result;
+				var arrayBuffer :ArrayBuffer= progressEvent.target.result as ArrayBuffer;
+/*
 				var midiParser = newMIDIparser2(arrayBuffer);
 				console.log('done midiParser', midiParser);
 				dumpStat(midiParser);
@@ -64,6 +65,9 @@ class MINIUMIDIIImportMusicPlugin {
 				console.log('done midiSongData', midiSongData);
 				let proj = new Projectr();
 				me.parsedProject = proj.readProject(midiSongData, title, comment);
+				*/
+				let proj = new Projectr();
+				me.parsedProject = proj.parseRawMIDIdata(arrayBuffer, title, comment);
 				console.log('done zproject', me.parsedProject);
 				//me.parsedProject = cnvrtr.convertProject(midiParser, title, comment);
 			}

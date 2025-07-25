@@ -1461,10 +1461,8 @@ class CommandDispatcher {
         this.startPlayLoop(from, this.playPosition, to);
     }
     startPlayLoop(from, position, to) {
-        console.log('startPlayLoop', from, position, to);
         let msg = this.player.startLoopTicks(from, position, to);
         if (msg) {
-            console.log('startPlayLoop', msg, this.renderer.warning.noWarning);
             this.renderer.warning.showWarning('Start playing', 'Loading...', '' + msg, () => {
                 console.log('cancel wait start loop');
             });
@@ -1483,7 +1481,6 @@ class CommandDispatcher {
         }
     }
     setThemeLocale(loc, ratio) {
-        console.log("setThemeLocale", loc, ratio);
         setLocaleID(loc, ratio);
         if (loc == 'zh') {
             startLoadCSSfile('theme/font2big.css');
