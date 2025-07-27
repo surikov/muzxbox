@@ -712,19 +712,39 @@ class CommandDispatcher {
 		a.click();
 		URL.revokeObjectURL(url);
 	}
+	/*copySelectedBars() {
+
+	}*/
 	copySelectedBars() {
 		console.log('copySelectedBars');
 		let tileLevelSVG: HTMLElement = document.getElementById('tileLevelSVG') as HTMLElement;
 		let xml: string = encodeURIComponent(tileLevelSVG.outerHTML);
-		//var image_data_url: string = 'data:image/svg+xml;utf8,' + xml;
+		
+		let replaceText='%3C!--%20css%20--%3E';//<!-- css -->;
+		xml=xml.replace(replaceText,'%3C!--%20donestyle%20--%3E');
+		var url: string = 'data:image/svg+xml;utf8,' + xml;
+		//console.log(url);
 		let ww = window.innerWidth;
 		let hh = window.innerHeight;
 		//svgImg.src = image_data_url;
 		//svgImg.src = 'http://upload.wikimedia.org/wikipedia/commons/d/d2/Svg_example_square.svg';
 		//let svg = xml;
-		let blob = new Blob([xml], { type: 'image/svg+xml' });
-		let url = URL.createObjectURL(blob);
+		//let blob = new Blob([xml], { type: 'image/svg+xml' });
+		//let url = URL.createObjectURL(blob);
+		//let url='data:image/svg+xml;base64,'+xml;
 		console.log(url);
+/*
+		var xml2 = new XMLSerializer().serializeToString(tileLevelSVG);
+console.log('xml2',xml2);
+		// make it base64
+		var svg64 = btoa(xml2);
+		console.log(svg64);
+		var b64Start = 'data:image/svg+xml;base64,';
+		// prepend a "header"
+var image64 = b64Start + svg64;
+*/
+
+
 		let canvas: HTMLCanvasElement = document.createElement('canvas');
 		canvas.height = hh;
 		canvas.width = ww;
@@ -745,8 +765,9 @@ class CommandDispatcher {
 			});
 		};
 		console.log('image start');
-		//svgImg.src = url;
-		svgImg.src = 'http://upload.wikimedia.org/wikipedia/commons/d/d2/Svg_example_square.svg';
+		svgImg.src = url;
+		//svgImg.src = image64;
+		//svgImg.src = 'http://upload.wikimedia.org/wikipedia/commons/d/d2/Svg_example_square.svg';
 		
 		console.log('image done');
 	}

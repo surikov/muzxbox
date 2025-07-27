@@ -1461,8 +1461,10 @@ class CommandDispatcher {
         this.startPlayLoop(from, this.playPosition, to);
     }
     startPlayLoop(from, position, to) {
+        console.log('startPlayLoop', from, position, to);
         let msg = this.player.startLoopTicks(from, position, to);
         if (msg) {
+            console.log('startPlayLoop', msg, this.renderer.warning.noWarning);
             this.renderer.warning.showWarning('Start playing', 'Loading...', '' + msg, () => {
                 console.log('cancel wait start loop');
             });
@@ -1481,6 +1483,7 @@ class CommandDispatcher {
         }
     }
     setThemeLocale(loc, ratio) {
+        console.log("setThemeLocale", loc, ratio);
         setLocaleID(loc, ratio);
         if (loc == 'zh') {
             startLoadCSSfile('theme/font2big.css');
@@ -1637,10 +1640,11 @@ class CommandDispatcher {
         console.log('copySelectedBars');
         let tileLevelSVG = document.getElementById('tileLevelSVG');
         let xml = encodeURIComponent(tileLevelSVG.outerHTML);
+        let replaceText = '%3C!--%20css%20--%3E';
+        xml = xml.replace(replaceText, '%3C!--%20donestyle%20--%3E');
+        var url = 'data:image/svg+xml;utf8,' + xml;
         let ww = window.innerWidth;
         let hh = window.innerHeight;
-        let blob = new Blob([xml], { type: 'image/svg+xml' });
-        let url = URL.createObjectURL(blob);
         console.log(url);
         let canvas = document.createElement('canvas');
         canvas.height = hh;
@@ -1660,7 +1664,7 @@ class CommandDispatcher {
             });
         };
         console.log('image start');
-        svgImg.src = 'http://upload.wikimedia.org/wikipedia/commons/d/d2/Svg_example_square.svg';
+        svgImg.src = url;
         console.log('image done');
     }
     moveAsideSelectedBars() {
