@@ -75,6 +75,7 @@
         ,"data/mixerdatamath.ts"
         ,"data/numathutil.ts"
 		,"data/lzutil.ts"
+		,"data/wholecss.ts"
 		
         ,"../tilelevelapi/apitilelevel.ts"
         ,"../../parts/mzxbxapi/musicenginetypes.ts"

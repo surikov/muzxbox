@@ -211,6 +211,11 @@ body {
 	flex-shrink: 1;
 	flex-grow: 1;
 
+	background-image22: url("bg/blue.png");
+	background-size: cover;
+	background-position-x: center;
+	background-position-y: center;
+	background: var(--background-color);
 }
 
 

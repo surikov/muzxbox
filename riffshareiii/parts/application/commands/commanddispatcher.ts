@@ -715,13 +715,44 @@ class CommandDispatcher {
 	/*copySelectedBars() {
 
 	}*/
+	exportCanvasAsFile(canvas: HTMLCanvasElement, fileName: string): void {
+		canvas.toBlob((blobresult: Blob) => {
+			globalCommandDispatcher.downloadBlob(blobresult, fileName);
+		});
+	}
+	makeTileSVGcanvas(onDoneCanvas: (canvas: HTMLCanvasElement) => void): void {
+		let tileLevelSVG: HTMLElement = document.getElementById('tileLevelSVG') as HTMLElement;
+		let xml: string = encodeURIComponent(tileLevelSVG.outerHTML);
+		let replaceText = '%3C!--%20css%20--%3E';//<!-- css -->;
+		xml = xml.replace(replaceText, wholeCSSstring);
+		var url: string = 'data:image/svg+xml;utf8,' + xml;
+		let ww = window.innerWidth;
+		let hh = window.innerHeight;
+		let canvas: HTMLCanvasElement = document.createElement('canvas');
+		canvas.height = hh;
+		canvas.width = ww;
+		let context: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
+		let svgImg: HTMLImageElement = new Image(ww, hh);
+		svgImg.onload = () => {
+			context.drawImage(svgImg, 0, 0, ww, hh);
+			onDoneCanvas(canvas);
+		};
+		svgImg.src = url;
+	}
 	copySelectedBars() {
+		console.log('copySelectedBars');
+		globalCommandDispatcher.makeTileSVGcanvas((canvas: HTMLCanvasElement) => {
+			globalCommandDispatcher.exportCanvasAsFile(canvas, 'testCanvasSVG.png');
+		});
+	}
+	copySelectedBars222() {
 		console.log('copySelectedBars');
 		let tileLevelSVG: HTMLElement = document.getElementById('tileLevelSVG') as HTMLElement;
 		let xml: string = encodeURIComponent(tileLevelSVG.outerHTML);
-		
-		let replaceText='%3C!--%20css%20--%3E';//<!-- css -->;
-		xml=xml.replace(replaceText,'%3C!--%20donestyle%20--%3E');
+
+		let replaceText = '%3C!--%20css%20--%3E';//<!-- css -->;
+		//xml=xml.replace(replaceText,'%3C!--%20donestyle%20--%3E');
+		xml = xml.replace(replaceText, wholeCSSstring);
 		var url: string = 'data:image/svg+xml;utf8,' + xml;
 		//console.log(url);
 		let ww = window.innerWidth;
@@ -733,16 +764,16 @@ class CommandDispatcher {
 		//let url = URL.createObjectURL(blob);
 		//let url='data:image/svg+xml;base64,'+xml;
 		console.log(url);
-/*
-		var xml2 = new XMLSerializer().serializeToString(tileLevelSVG);
-console.log('xml2',xml2);
-		// make it base64
-		var svg64 = btoa(xml2);
-		console.log(svg64);
-		var b64Start = 'data:image/svg+xml;base64,';
-		// prepend a "header"
-var image64 = b64Start + svg64;
-*/
+		/*
+				var xml2 = new XMLSerializer().serializeToString(tileLevelSVG);
+		console.log('xml2',xml2);
+				// make it base64
+				var svg64 = btoa(xml2);
+				console.log(svg64);
+				var b64Start = 'data:image/svg+xml;base64,';
+				// prepend a "header"
+		var image64 = b64Start + svg64;
+		*/
 
 
 		let canvas: HTMLCanvasElement = document.createElement('canvas');
@@ -768,7 +799,7 @@ var image64 = b64Start + svg64;
 		svgImg.src = url;
 		//svgImg.src = image64;
 		//svgImg.src = 'http://upload.wikimedia.org/wikipedia/commons/d/d2/Svg_example_square.svg';
-		
+
 		console.log('image done');
 	}
 	moveAsideSelectedBars() {

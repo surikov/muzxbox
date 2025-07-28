@@ -5,7 +5,7 @@
 	--line-color: #9cf;
 	--click-color: #069;
 }
-#pagediv {
+#tileLevelSVG {
 	background-image: url("bg/blue.png");
 	background-size: cover;
 	background-position-x: center;
