@@ -2873,30 +2873,58 @@ class RightMenuPanel {
             else {
                 itemLabel = LO(it.text);
             }
-            if (children) {
-                if (opened) {
-                    let so = new RightMenuItem(kindOpenedFolder, it, pad, () => {
-                        me.setOpenState(false, it, infos);
-                        me.rerenderMenuContent(so);
-                    });
-                    this.items.push(so);
-                    it.top = this.items.length - 1;
-                    this.fillMenuItemChildren(pad + 0.5, children);
-                }
-                else {
-                    let si = new RightMenuItem(kindClosedFolder, it, pad, () => {
-                        if (it.onFolderOpen) {
-                            it.onFolderOpen();
+            switch (it.itemKind) {
+                case kindOpenedFolder: {
+                    if (opened) {
+                        let so = new RightMenuItem(kindOpenedFolder, it, pad, () => {
+                            me.setOpenState(false, it, infos);
+                            me.rerenderMenuContent(so);
+                        });
+                        this.items.push(so);
+                        it.top = this.items.length - 1;
+                        if (children) {
+                            this.fillMenuItemChildren(pad + 0.5, children);
                         }
-                        me.setOpenState(true, it, infos);
-                        me.rerenderMenuContent(si);
-                    });
-                    this.items.push(si);
-                    it.top = this.items.length - 1;
+                    }
+                    else {
+                        let si = new RightMenuItem(kindClosedFolder, it, pad, () => {
+                            if (it.onFolderOpen) {
+                                it.onFolderOpen();
+                            }
+                            me.setOpenState(true, it, infos);
+                            me.rerenderMenuContent(si);
+                        });
+                        this.items.push(si);
+                        it.top = this.items.length - 1;
+                    }
+                    break;
                 }
-            }
-            else {
-                if (it.dragCircle) {
+                case kindClosedFolder: {
+                    if (opened) {
+                        let so = new RightMenuItem(kindOpenedFolder, it, pad, () => {
+                            me.setOpenState(false, it, infos);
+                            me.rerenderMenuContent(so);
+                        });
+                        this.items.push(so);
+                        it.top = this.items.length - 1;
+                        if (children) {
+                            this.fillMenuItemChildren(pad + 0.5, children);
+                        }
+                    }
+                    else {
+                        let si = new RightMenuItem(kindClosedFolder, it, pad, () => {
+                            if (it.onFolderOpen) {
+                                it.onFolderOpen();
+                            }
+                            me.setOpenState(true, it, infos);
+                            me.rerenderMenuContent(si);
+                        });
+                        this.items.push(si);
+                        it.top = this.items.length - 1;
+                    }
+                    break;
+                }
+                case kindDraggableCircle: {
                     this.items.push(new RightMenuItem(kindDraggableCircle, it, pad, () => { }, () => { }, (x, y) => {
                         if (it.onDrag) {
                             it.onDrag(x, y);
@@ -2905,105 +2933,102 @@ class RightMenuPanel {
                         me.resetAllAnchors();
                     }));
                     it.top = this.items.length - 1;
+                    break;
                 }
-                else {
-                    if (it.dragSquare) {
-                        this.items.push(new RightMenuItem(kindDraggableSquare, it, pad, () => { }, () => { }, (x, y) => {
-                            if (it.onDrag) {
-                                it.onDrag(x, y);
-                            }
-                            me.setFocus(it, infos);
-                            me.resetAllAnchors();
-                        }));
-                        it.top = this.items.length - 1;
-                    }
-                    else {
-                        if (it.dragTriangle) {
-                            this.items.push(new RightMenuItem(kindDraggableTriangle, it, pad, () => { }, () => { }, (x, y) => {
-                                if (it.onDrag) {
-                                    it.onDrag(x, y);
-                                }
-                                me.setFocus(it, infos);
-                                me.resetAllAnchors();
-                            }));
-                            it.top = this.items.length - 1;
+                case kindDraggableSquare: {
+                    this.items.push(new RightMenuItem(kindDraggableSquare, it, pad, () => { }, () => { }, (x, y) => {
+                        if (it.onDrag) {
+                            it.onDrag(x, y);
                         }
-                        else {
-                            if (it.onSubClick) {
-                                if (it.url) {
-                                    let rightMenuItem = new RightMenuItem(kindPreview, it, pad, () => {
-                                        if (it.onClick) {
-                                            it.onClick();
-                                        }
-                                        me.setFocus(it, infos);
-                                        me.resetAllAnchors();
-                                    }, () => {
-                                        if (it.itemStates) {
-                                            let sel = it.selectedState ? it.selectedState : 0;
-                                            if (it.itemStates.length - 1 > sel) {
-                                                sel++;
-                                            }
-                                            else {
-                                                sel = 0;
-                                            }
-                                            it.selectedState = sel;
-                                        }
-                                        if (it.onSubClick) {
-                                            it.onSubClick();
-                                        }
-                                        me.rerenderMenuContent(rightMenuItem);
-                                    });
-                                    this.items.push(rightMenuItem);
-                                    it.top = this.items.length - 1;
-                                }
-                                else {
-                                    let rightMenuItem = new RightMenuItem(kindAction2, it, pad, () => {
-                                        if (it.onClick) {
-                                            it.onClick();
-                                        }
-                                        me.setFocus(it, infos);
-                                        me.resetAllAnchors();
-                                    }, () => {
-                                        if (it.itemStates) {
-                                            let sel = it.selectedState ? it.selectedState : 0;
-                                            if (it.itemStates.length - 1 > sel) {
-                                                sel++;
-                                            }
-                                            else {
-                                                sel = 0;
-                                            }
-                                            it.selectedState = sel;
-                                        }
-                                        if (it.onSubClick) {
-                                            it.onSubClick();
-                                        }
-                                        me.rerenderMenuContent(rightMenuItem);
-                                    });
-                                    this.items.push(rightMenuItem);
-                                    it.top = this.items.length - 1;
-                                }
+                        me.setFocus(it, infos);
+                        me.resetAllAnchors();
+                    }));
+                    it.top = this.items.length - 1;
+                    break;
+                }
+                case kindDraggableTriangle: {
+                    this.items.push(new RightMenuItem(kindDraggableTriangle, it, pad, () => { }, () => { }, (x, y) => {
+                        if (it.onDrag) {
+                            it.onDrag(x, y);
+                        }
+                        me.setFocus(it, infos);
+                        me.resetAllAnchors();
+                    }));
+                    it.top = this.items.length - 1;
+                    break;
+                }
+                case kindPreview: {
+                    let rightMenuItem = new RightMenuItem(kindPreview, it, pad, () => {
+                        if (it.onClick) {
+                            it.onClick();
+                        }
+                        me.setFocus(it, infos);
+                        me.resetAllAnchors();
+                    }, () => {
+                        if (it.itemStates) {
+                            let sel = it.selectedState ? it.selectedState : 0;
+                            if (it.itemStates.length - 1 > sel) {
+                                sel++;
                             }
                             else {
-                                if (it.onClick) {
-                                    this.items.push(new RightMenuItem(kindAction, it, pad, () => {
-                                        if (it.onClick) {
-                                            it.onClick();
-                                        }
-                                        me.setFocus(it, infos);
-                                        me.resetAllAnchors();
-                                    }));
-                                    it.top = this.items.length - 1;
-                                }
-                                else {
-                                    this.items.push(new RightMenuItem(kindActionDisabled, it, pad, () => {
-                                        me.setFocus(it, infos);
-                                        me.resetAllAnchors();
-                                    }));
-                                    it.top = this.items.length - 1;
-                                }
+                                sel = 0;
                             }
+                            it.selectedState = sel;
                         }
-                    }
+                        if (it.onSubClick) {
+                            it.onSubClick();
+                        }
+                        me.rerenderMenuContent(rightMenuItem);
+                    });
+                    this.items.push(rightMenuItem);
+                    it.top = this.items.length - 1;
+                    break;
+                }
+                case kindAction2: {
+                    let rightMenuItem = new RightMenuItem(kindAction2, it, pad, () => {
+                        if (it.onClick) {
+                            it.onClick();
+                        }
+                        me.setFocus(it, infos);
+                        me.resetAllAnchors();
+                    }, () => {
+                        if (it.itemStates) {
+                            let sel = it.selectedState ? it.selectedState : 0;
+                            if (it.itemStates.length - 1 > sel) {
+                                sel++;
+                            }
+                            else {
+                                sel = 0;
+                            }
+                            it.selectedState = sel;
+                        }
+                        if (it.onSubClick) {
+                            it.onSubClick();
+                        }
+                        me.rerenderMenuContent(rightMenuItem);
+                    });
+                    this.items.push(rightMenuItem);
+                    it.top = this.items.length - 1;
+                    break;
+                }
+                case kindAction: {
+                    this.items.push(new RightMenuItem(kindAction, it, pad, () => {
+                        if (it.onClick) {
+                            it.onClick();
+                        }
+                        me.setFocus(it, infos);
+                        me.resetAllAnchors();
+                    }));
+                    it.top = this.items.length - 1;
+                    break;
+                }
+                case kindActionDisabled: {
+                    this.items.push(new RightMenuItem(kindActionDisabled, it, pad, () => {
+                        me.setFocus(it, infos);
+                        me.resetAllAnchors();
+                    }));
+                    it.top = this.items.length - 1;
+                    break;
                 }
             }
         }
@@ -3374,7 +3399,7 @@ let menuPointActions = {
     text: localMenuActionsFolder,
     onFolderOpen: () => {
     },
-    itemKind: kindAction
+    itemKind: kindClosedFolder
 };
 let menuPointStore = {
     text: 'snippets',

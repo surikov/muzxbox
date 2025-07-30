@@ -28,7 +28,7 @@ let menuPointActions: MenuInfo = {
 	, onFolderOpen: () => {
 		//console.log('actions');
 	}
-	, itemKind: kindAction
+	, itemKind: kindClosedFolder
 };
 let menuPointStore: MenuInfo = {
 	text: 'snippets'
