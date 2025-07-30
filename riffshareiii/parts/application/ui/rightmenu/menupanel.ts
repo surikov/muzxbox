@@ -239,18 +239,21 @@ class RightMenuPanel {
 			} else {
 				itemLabel = LO(it.text);
 			}
-			if (children) {
+			//if (children) {//folder
+			if (it.itemKind == kindOpenedFolder || it.itemKind == kindClosedFolder) {
 				if (opened) {
-					let so: RightMenuItem = new RightMenuItem(it, pad, () => {
+					let so: RightMenuItem = new RightMenuItem(kindOpenedFolder, it, pad, () => {
 						me.setOpenState(false, it, infos);
 						me.rerenderMenuContent(so);
 
-					}).initOpenedFolderItem();
+					});
 					this.items.push(so);
 					it.top = this.items.length - 1;
-					this.fillMenuItemChildren(pad + 0.5, children);
+					if (children) {
+						this.fillMenuItemChildren(pad + 0.5, children);
+					}
 				} else {
-					let si: RightMenuItem = new RightMenuItem(it, pad, () => {
+					let si: RightMenuItem = new RightMenuItem(kindClosedFolder, it, pad, () => {
 						//console.log('test', it.text, it.onOpen);
 						if (it.onFolderOpen) {
 							it.onFolderOpen();
@@ -258,81 +261,107 @@ class RightMenuPanel {
 						me.setOpenState(true, it, infos);
 						me.rerenderMenuContent(si);
 
-					}).initClosedFolderItem();
+					});
 					this.items.push(si);
 					it.top = this.items.length - 1;
 				}
 			} else {
 				if (it.dragCircle) {
-					this.items.push(new RightMenuItem(it, pad, () => { }, () => { }, (x: number, y: number) => {
+					this.items.push(new RightMenuItem(kindDraggableCircle, it, pad, () => { }, () => { }, (x: number, y: number) => {
 						if (it.onDrag) {
 							it.onDrag(x, y);
 						}
 						me.setFocus(it, infos);
 						me.resetAllAnchors();
-					}).initDraggableCircle());
+					}));
 					it.top = this.items.length - 1;
 				} else {
 					if (it.dragSquare) {
-						this.items.push(new RightMenuItem(it, pad, () => { }, () => { }, (x: number, y: number) => {
+						this.items.push(new RightMenuItem(kindDraggableSquare, it, pad, () => { }, () => { }, (x: number, y: number) => {
 							if (it.onDrag) {
 								it.onDrag(x, y);
 							}
 							me.setFocus(it, infos);
 							me.resetAllAnchors();
-						}).initDraggableSquare());
+						}));
 						it.top = this.items.length - 1;
 					} else {
 						if (it.dragTriangle) {
-							this.items.push(new RightMenuItem(it, pad, () => { }, () => { }, (x: number, y: number) => {
+							this.items.push(new RightMenuItem(kindDraggableTriangle, it, pad, () => { }, () => { }, (x: number, y: number) => {
 								if (it.onDrag) {
 									it.onDrag(x, y);
 								}
 								me.setFocus(it, infos);
 								me.resetAllAnchors();
-							}).initDraggableTriangle());
+							}));
 							it.top = this.items.length - 1;
 						} else {
 							if (it.onSubClick) {
-								//if (it.onClick) {
-								let rightMenuItem = new RightMenuItem(it, pad, () => {
-									if (it.onClick) {
-										it.onClick();
-									}
-									me.setFocus(it, infos);
-									me.resetAllAnchors();
-								}, () => {
-									if (it.itemStates) {
-										let sel = it.selectedState ? it.selectedState : 0;
-										if (it.itemStates.length - 1 > sel) {
-											sel++;
-										} else {
-											sel = 0;
-										}
-										it.selectedState = sel;
-									}
-									if (it.onSubClick) {
-										it.onSubClick();
-									}
-									me.rerenderMenuContent(rightMenuItem);
-								});
-								this.items.push(rightMenuItem.initActionItem2());
-								it.top = this.items.length - 1;
-							} else {
-								if (it.onClick) {
-									this.items.push(new RightMenuItem(it, pad, () => {
+								if (it.url) {
+									let rightMenuItem = new RightMenuItem(kindPreview, it, pad, () => {
 										if (it.onClick) {
 											it.onClick();
 										}
 										me.setFocus(it, infos);
 										me.resetAllAnchors();
-									}).initActionItem());
+									}, () => {
+										if (it.itemStates) {
+											let sel = it.selectedState ? it.selectedState : 0;
+											if (it.itemStates.length - 1 > sel) {
+												sel++;
+											} else {
+												sel = 0;
+											}
+											it.selectedState = sel;
+										}
+										if (it.onSubClick) {
+											it.onSubClick();
+										}
+										me.rerenderMenuContent(rightMenuItem);
+									});
+									this.items.push(rightMenuItem);
 									it.top = this.items.length - 1;
 								} else {
-									this.items.push(new RightMenuItem(it, pad, () => {
+									//if (it.onClick) {
+									let rightMenuItem = new RightMenuItem(kindAction2, it, pad, () => {
+										if (it.onClick) {
+											it.onClick();
+										}
 										me.setFocus(it, infos);
 										me.resetAllAnchors();
-									}).initDisabledItem());
+									}, () => {
+										if (it.itemStates) {
+											let sel = it.selectedState ? it.selectedState : 0;
+											if (it.itemStates.length - 1 > sel) {
+												sel++;
+											} else {
+												sel = 0;
+											}
+											it.selectedState = sel;
+										}
+										if (it.onSubClick) {
+											it.onSubClick();
+										}
+										me.rerenderMenuContent(rightMenuItem);
+									});
+									this.items.push(rightMenuItem);
+									it.top = this.items.length - 1;
+								}
+							} else {
+								if (it.onClick) {
+									this.items.push(new RightMenuItem(kindAction, it, pad, () => {
+										if (it.onClick) {
+											it.onClick();
+										}
+										me.setFocus(it, infos);
+										me.resetAllAnchors();
+									}));
+									it.top = this.items.length - 1;
+								} else {
+									this.items.push(new RightMenuItem(kindActionDisabled, it, pad, () => {
+										me.setFocus(it, infos);
+										me.resetAllAnchors();
+									}));
 									it.top = this.items.length - 1;
 								}
 							}
@@ -371,6 +400,7 @@ class RightMenuPanel {
 					});
 					globalCommandDispatcher.reConnectPluginsIfPlay();
 				}
+				, itemKind: kindAction2
 			};
 			if (track.performer.state == 1 || (solo && track.performer.state != 2)) item.lightTitle = true;
 			if (tt > 0) {
@@ -414,6 +444,7 @@ class RightMenuPanel {
 				}
 				, itemStates: [icon_sound_loud, icon_power, icon_flash]
 				, selectedState: drum.sampler.state
+				, itemKind: kindAction2
 			};
 			if (drum.sampler.state == 1 || (solo && drum.sampler.state != 2)) item.lightTitle = true;
 			if (tt > 0) {
@@ -448,6 +479,7 @@ class RightMenuPanel {
 				, noLocalization: true
 				, itemStates: [icon_equalizer, icon_power]
 				, selectedState: filter.state
+				, itemKind: kindAction
 			};
 			item.onSubClick = () => {
 				//item.selectedState = item.selectedState ? item.selectedState : 0;

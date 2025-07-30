@@ -30,6 +30,7 @@
 		,"./tilepath.ts"
         ,"./tilepolygon.ts"
         ,"./tilerectangle.ts"
+		,"./tileimage.ts"
         ,"./tiletext.ts"
 		,"../tilelevelapi/apitilelevel.ts"
     ]

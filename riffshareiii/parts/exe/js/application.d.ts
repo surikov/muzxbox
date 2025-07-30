@@ -201,7 +201,7 @@ declare class CommandDispatcher {
     expandTimeLineSelection(idx: number): void;
     downloadBlob(blob: Blob, name: string): void;
     exportCanvasAsFile(canvas: HTMLCanvasElement, fileName: string): void;
-    makeTileSVGcanvas(onDoneCanvas: (canvas: HTMLCanvasElement) => void): void;
+    makeTileSVGcanvas(maxWidth: number, maxHeight: number, onDoneCanvas: (canvas: HTMLCanvasElement) => void): void;
     copySelectedBars(): void;
     copySelectedBars222(): void;
     moveAsideSelectedBars(): void;
@@ -374,16 +374,16 @@ declare class RightMenuPanel {
     rerenderMenuContent(folder: RightMenuItem | null): void;
     resizeMenu(viewWidth: number, viewHeight: number): void;
 }
+declare const kindAction: 1;
+declare const kindDraggableCircle: 2;
+declare const kindDraggableSquare: 3;
+declare const kindDraggableTriangle: 4;
+declare const kindPreview: 5;
+declare const kindClosedFolder: 6;
+declare const kindOpenedFolder: 7;
+declare const kindAction2: 8;
+declare const kindActionDisabled: 9;
 declare class RightMenuItem {
-    kindAction: 1;
-    kindDraggableCircle: 2;
-    kindDraggableSquare: 3;
-    kindDraggableTriangle: 4;
-    kindPreview: 5;
-    kindClosedFolder: 6;
-    kindOpenedFolder: 7;
-    kindAction2: 8;
-    kindActionDisabled: 9;
     kind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
     action?: {
         (): void;
@@ -397,16 +397,7 @@ declare class RightMenuItem {
     pad: number;
     top: number;
     info: MenuInfo;
-    constructor(info: MenuInfo, pad: number, tap?: () => void, tap2?: () => void, drag?: (x: number, y: number) => void);
-    initDisabledItem(): RightMenuItem;
-    initActionItem(): RightMenuItem;
-    initActionItem2(): RightMenuItem;
-    initDraggableCircle(): RightMenuItem;
-    initDraggableSquare(): RightMenuItem;
-    initDraggableTriangle(): RightMenuItem;
-    initOpenedFolderItem(): RightMenuItem;
-    initClosedFolderItem(): RightMenuItem;
-    initPreviewItem(): RightMenuItem;
+    constructor(newkind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9, info: MenuInfo, pad: number, tap?: () => void, tap2?: () => void, drag?: (x: number, y: number) => void);
     calculateHeight(): number;
     buildTile(itemTop: number, itemWidth: number): TileItem;
 }
@@ -429,9 +420,12 @@ declare type MenuInfo = {
     dragTriangle?: boolean;
     highlight?: string;
     top?: number;
+    url?: string;
+    itemKind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 };
 declare let menuItemsData: MenuInfo[] | null;
 declare let menuPointActions: MenuInfo;
+declare let menuPointStore: MenuInfo;
 declare let menuPointAddPlugin: MenuInfo;
 declare let menuPointInsTracks: MenuInfo;
 declare let menuPointDrumTracks: MenuInfo;

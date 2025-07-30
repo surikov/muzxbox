@@ -1641,7 +1641,7 @@ class CommandDispatcher {
             globalCommandDispatcher.downloadBlob(blobresult, fileName);
         });
     }
-    makeTileSVGcanvas(onDoneCanvas) {
+    makeTileSVGcanvas(maxWidth, maxHeight, onDoneCanvas) {
         let tileLevelSVG = document.getElementById('tileLevelSVG');
         let xml = encodeURIComponent(tileLevelSVG.outerHTML);
         let replaceText = '%3C!--%20css%20--%3E';
@@ -1649,6 +1649,10 @@ class CommandDispatcher {
         var url = 'data:image/svg+xml;utf8,' + xml;
         let ww = window.innerWidth;
         let hh = window.innerHeight;
+        let iWidth = 0;
+        let iHeight = 0;
+        let iLeft = 0;
+        let iTop = 0;
         let canvas = document.createElement('canvas');
         canvas.height = hh;
         canvas.width = ww;
@@ -1662,7 +1666,7 @@ class CommandDispatcher {
     }
     copySelectedBars() {
         console.log('copySelectedBars');
-        globalCommandDispatcher.makeTileSVGcanvas((canvas) => {
+        globalCommandDispatcher.makeTileSVGcanvas(200, 200, (canvas) => {
             globalCommandDispatcher.exportCanvasAsFile(canvas, 'testCanvasSVG.png');
         });
     }
@@ -2871,102 +2875,130 @@ class RightMenuPanel {
             }
             if (children) {
                 if (opened) {
-                    let so = new RightMenuItem(it, pad, () => {
+                    let so = new RightMenuItem(kindOpenedFolder, it, pad, () => {
                         me.setOpenState(false, it, infos);
                         me.rerenderMenuContent(so);
-                    }).initOpenedFolderItem();
+                    });
                     this.items.push(so);
                     it.top = this.items.length - 1;
                     this.fillMenuItemChildren(pad + 0.5, children);
                 }
                 else {
-                    let si = new RightMenuItem(it, pad, () => {
+                    let si = new RightMenuItem(kindClosedFolder, it, pad, () => {
                         if (it.onFolderOpen) {
                             it.onFolderOpen();
                         }
                         me.setOpenState(true, it, infos);
                         me.rerenderMenuContent(si);
-                    }).initClosedFolderItem();
+                    });
                     this.items.push(si);
                     it.top = this.items.length - 1;
                 }
             }
             else {
                 if (it.dragCircle) {
-                    this.items.push(new RightMenuItem(it, pad, () => { }, () => { }, (x, y) => {
+                    this.items.push(new RightMenuItem(kindDraggableCircle, it, pad, () => { }, () => { }, (x, y) => {
                         if (it.onDrag) {
                             it.onDrag(x, y);
                         }
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
-                    }).initDraggableCircle());
+                    }));
                     it.top = this.items.length - 1;
                 }
                 else {
                     if (it.dragSquare) {
-                        this.items.push(new RightMenuItem(it, pad, () => { }, () => { }, (x, y) => {
+                        this.items.push(new RightMenuItem(kindDraggableSquare, it, pad, () => { }, () => { }, (x, y) => {
                             if (it.onDrag) {
                                 it.onDrag(x, y);
                             }
                             me.setFocus(it, infos);
                             me.resetAllAnchors();
-                        }).initDraggableSquare());
+                        }));
                         it.top = this.items.length - 1;
                     }
                     else {
                         if (it.dragTriangle) {
-                            this.items.push(new RightMenuItem(it, pad, () => { }, () => { }, (x, y) => {
+                            this.items.push(new RightMenuItem(kindDraggableTriangle, it, pad, () => { }, () => { }, (x, y) => {
                                 if (it.onDrag) {
                                     it.onDrag(x, y);
                                 }
                                 me.setFocus(it, infos);
                                 me.resetAllAnchors();
-                            }).initDraggableTriangle());
+                            }));
                             it.top = this.items.length - 1;
                         }
                         else {
                             if (it.onSubClick) {
-                                let rightMenuItem = new RightMenuItem(it, pad, () => {
-                                    if (it.onClick) {
-                                        it.onClick();
-                                    }
-                                    me.setFocus(it, infos);
-                                    me.resetAllAnchors();
-                                }, () => {
-                                    if (it.itemStates) {
-                                        let sel = it.selectedState ? it.selectedState : 0;
-                                        if (it.itemStates.length - 1 > sel) {
-                                            sel++;
-                                        }
-                                        else {
-                                            sel = 0;
-                                        }
-                                        it.selectedState = sel;
-                                    }
-                                    if (it.onSubClick) {
-                                        it.onSubClick();
-                                    }
-                                    me.rerenderMenuContent(rightMenuItem);
-                                });
-                                this.items.push(rightMenuItem.initActionItem2());
-                                it.top = this.items.length - 1;
-                            }
-                            else {
-                                if (it.onClick) {
-                                    this.items.push(new RightMenuItem(it, pad, () => {
+                                if (it.url) {
+                                    let rightMenuItem = new RightMenuItem(kindPreview, it, pad, () => {
                                         if (it.onClick) {
                                             it.onClick();
                                         }
                                         me.setFocus(it, infos);
                                         me.resetAllAnchors();
-                                    }).initActionItem());
+                                    }, () => {
+                                        if (it.itemStates) {
+                                            let sel = it.selectedState ? it.selectedState : 0;
+                                            if (it.itemStates.length - 1 > sel) {
+                                                sel++;
+                                            }
+                                            else {
+                                                sel = 0;
+                                            }
+                                            it.selectedState = sel;
+                                        }
+                                        if (it.onSubClick) {
+                                            it.onSubClick();
+                                        }
+                                        me.rerenderMenuContent(rightMenuItem);
+                                    });
+                                    this.items.push(rightMenuItem);
                                     it.top = this.items.length - 1;
                                 }
                                 else {
-                                    this.items.push(new RightMenuItem(it, pad, () => {
+                                    let rightMenuItem = new RightMenuItem(kindAction2, it, pad, () => {
+                                        if (it.onClick) {
+                                            it.onClick();
+                                        }
                                         me.setFocus(it, infos);
                                         me.resetAllAnchors();
-                                    }).initDisabledItem());
+                                    }, () => {
+                                        if (it.itemStates) {
+                                            let sel = it.selectedState ? it.selectedState : 0;
+                                            if (it.itemStates.length - 1 > sel) {
+                                                sel++;
+                                            }
+                                            else {
+                                                sel = 0;
+                                            }
+                                            it.selectedState = sel;
+                                        }
+                                        if (it.onSubClick) {
+                                            it.onSubClick();
+                                        }
+                                        me.rerenderMenuContent(rightMenuItem);
+                                    });
+                                    this.items.push(rightMenuItem);
+                                    it.top = this.items.length - 1;
+                                }
+                            }
+                            else {
+                                if (it.onClick) {
+                                    this.items.push(new RightMenuItem(kindAction, it, pad, () => {
+                                        if (it.onClick) {
+                                            it.onClick();
+                                        }
+                                        me.setFocus(it, infos);
+                                        me.resetAllAnchors();
+                                    }));
+                                    it.top = this.items.length - 1;
+                                }
+                                else {
+                                    this.items.push(new RightMenuItem(kindActionDisabled, it, pad, () => {
+                                        me.setFocus(it, infos);
+                                        me.resetAllAnchors();
+                                    }));
                                     it.top = this.items.length - 1;
                                 }
                             }
@@ -3009,7 +3041,8 @@ class RightMenuPanel {
                         }
                     });
                     globalCommandDispatcher.reConnectPluginsIfPlay();
-                }
+                },
+                itemKind: kindAction2
             };
             if (track.performer.state == 1 || (solo && track.performer.state != 2))
                 item.lightTitle = true;
@@ -3057,7 +3090,8 @@ class RightMenuPanel {
                     globalCommandDispatcher.reConnectPluginsIfPlay();
                 },
                 itemStates: [icon_sound_loud, icon_power, icon_flash],
-                selectedState: drum.sampler.state
+                selectedState: drum.sampler.state,
+                itemKind: kindAction2
             };
             if (drum.sampler.state == 1 || (solo && drum.sampler.state != 2))
                 item.lightTitle = true;
@@ -3089,7 +3123,8 @@ class RightMenuPanel {
                 text: filter.title,
                 noLocalization: true,
                 itemStates: [icon_equalizer, icon_power],
-                selectedState: filter.state
+                selectedState: filter.state,
+                itemKind: kindAction
             };
             item.onSubClick = () => {
                 globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
@@ -3197,18 +3232,18 @@ class RightMenuPanel {
         this.rerenderMenuContent(null);
     }
 }
+const kindAction = 1;
+const kindDraggableCircle = 2;
+const kindDraggableSquare = 3;
+const kindDraggableTriangle = 4;
+const kindPreview = 5;
+const kindClosedFolder = 6;
+const kindOpenedFolder = 7;
+const kindAction2 = 8;
+const kindActionDisabled = 9;
 class RightMenuItem {
-    constructor(info, pad, tap, tap2, drag) {
-        this.kindAction = 1;
-        this.kindDraggableCircle = 2;
-        this.kindDraggableSquare = 3;
-        this.kindDraggableTriangle = 4;
-        this.kindPreview = 5;
-        this.kindClosedFolder = 6;
-        this.kindOpenedFolder = 7;
-        this.kindAction2 = 8;
-        this.kindActionDisabled = 9;
-        this.kind = this.kindAction;
+    constructor(newkind, info, pad, tap, tap2, drag) {
+        this.kind = kindAction;
         this.pad = 0;
         this.info = info;
         this.pad = pad;
@@ -3220,45 +3255,10 @@ class RightMenuItem {
         else {
             this.info.sid = 'random' + Math.random();
         }
-    }
-    initDisabledItem() {
-        this.kind = this.kindActionDisabled;
-        return this;
-    }
-    initActionItem() {
-        this.kind = this.kindAction;
-        return this;
-    }
-    initActionItem2() {
-        this.kind = this.kindAction2;
-        return this;
-    }
-    initDraggableCircle() {
-        this.kind = this.kindDraggableCircle;
-        return this;
-    }
-    initDraggableSquare() {
-        this.kind = this.kindDraggableSquare;
-        return this;
-    }
-    initDraggableTriangle() {
-        this.kind = this.kindDraggableTriangle;
-        return this;
-    }
-    initOpenedFolderItem() {
-        this.kind = this.kindOpenedFolder;
-        return this;
-    }
-    initClosedFolderItem() {
-        this.kind = this.kindClosedFolder;
-        return this;
-    }
-    initPreviewItem() {
-        this.kind = this.kindPreview;
-        return this;
+        this.kind = newkind;
     }
     calculateHeight() {
-        if (this.kind == this.kindPreview) {
+        if (this.kind == kindPreview) {
             return 2;
         }
         else {
@@ -3289,15 +3289,15 @@ class RightMenuItem {
         anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.02, css: 'rightMenuDelimiterLine' });
         let spot = { x: this.pad, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
         let spot2 = null;
-        if (this.kind == this.kindAction) {
+        if (this.kind == kindAction) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
-        if (this.kind == this.kindActionDisabled) {
+        if (this.kind == kindActionDisabled) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
-        if (this.kind == this.kindAction2) {
+        if (this.kind == kindAction2) {
             let stateIicon = '?';
             let sel = this.info.selectedState ? this.info.selectedState : 0;
             if (this.info.itemStates) {
@@ -3317,19 +3317,19 @@ class RightMenuItem {
             anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
             spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
         }
-        if (this.kind == this.kindDraggableCircle) {
+        if (this.kind == kindDraggableCircle) {
             spot.draggable = true;
             spot.activation = this.drag;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
-        if (this.kind == this.kindDraggableSquare) {
+        if (this.kind == kindDraggableSquare) {
             spot.draggable = true;
             spot.activation = this.drag;
             anchor.content.push({ x: 0.15 + this.pad, y: itemTop + 0.15, w: 0.7, h: 0.7, rx: 0.05, ry: 0.05, css: 'rightMenuItemDragBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
-        if (this.kind == this.kindDraggableTriangle) {
+        if (this.kind == kindDraggableTriangle) {
             spot.draggable = true;
             spot.activation = this.drag;
             let sz = 0.45;
@@ -3342,17 +3342,17 @@ class RightMenuItem {
             anchor.content.push(tri);
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
-        if (this.kind == this.kindOpenedFolder) {
+        if (this.kind == kindOpenedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_movedown, css: 'rightMenuIconLabel' });
             anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
-        if (this.kind == this.kindClosedFolder) {
+        if (this.kind == kindClosedFolder) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_moveright, css: 'rightMenuIconLabel' });
             anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
-        if (this.kind == this.kindPreview) {
+        if (this.kind == kindPreview) {
             spot.draggable = true;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
@@ -3373,31 +3373,55 @@ let menuItemsData = null;
 let menuPointActions = {
     text: localMenuActionsFolder,
     onFolderOpen: () => {
-    }
+    },
+    itemKind: kindAction
+};
+let menuPointStore = {
+    text: 'snippets',
+    onFolderOpen: () => {
+    },
+    itemKind: kindClosedFolder
 };
 let menuPointAddPlugin = {
     text: localMenuNewPlugin,
     onFolderOpen: () => {
-    }
+    },
+    itemKind: kindClosedFolder
 };
 let menuPointInsTracks = {
     text: localMenuInsTracksFolder,
     onFolderOpen: () => {
-    }
+    },
+    itemKind: kindClosedFolder
 };
 let menuPointDrumTracks = {
     text: localMenuDrumTracksFolder,
     onFolderOpen: () => {
-    }
+    },
+    itemKind: kindClosedFolder
 };
 let menuPointFxTracks = {
     text: localMenuFxTracksFolder,
     onFolderOpen: () => {
-    }
+    },
+    itemKind: kindClosedFolder
 };
 function fillPluginsLists() {
     menuPointAddPlugin.children = [];
     menuPointActions.children = [];
+    menuPointStore.children = [];
+    menuPointStore.children.push({
+        text: 'fragment 1',
+        noLocalization: true,
+        onClick: () => {
+            console.log('click');
+        },
+        onSubClick: () => {
+            console.log('subclick');
+        },
+        url: 'url main 1',
+        itemKind: kindPreview
+    });
     for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
         let label = MZXBX_currentPlugins()[ii].label;
         let purpose = MZXBX_currentPlugins()[ii].purpose;
@@ -3405,7 +3429,8 @@ function fillPluginsLists() {
             menuPointActions.children.push({
                 text: label, noLocalization: true, onClick: () => {
                     globalCommandDispatcher.actionPluginDialog.openActionPluginDialogFrame(MZXBX_currentPlugins()[ii]);
-                }
+                },
+                itemKind: kindAction
             });
         }
         else {
@@ -3458,7 +3483,8 @@ function fillPluginsLists() {
                             };
                             globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, tri);
                         }
-                    }
+                    },
+                    itemKind: kindDraggableCircle
                 };
                 menuPointAddPlugin.children.push(info);
             }
@@ -3511,7 +3537,8 @@ function fillPluginsLists() {
                                     css: 'rectangleDragItem'
                                 });
                             }
-                        }
+                        },
+                        itemKind: kindDraggableSquare
                     };
                     menuPointAddPlugin.children.push(info);
                 }
@@ -3562,7 +3589,8 @@ function fillPluginsLists() {
                                         css: 'rectangleDragItem'
                                     });
                                 }
-                            }
+                            },
+                            itemKind: kindDraggableTriangle
                         };
                         menuPointAddPlugin.children.push(info);
                     }
@@ -3586,12 +3614,14 @@ function composeBaseMenu() {
             menuPointFxTracks,
             menuPointActions,
             menuPointAddPlugin,
+            menuPointStore,
             {
                 text: localMenuItemSettings, children: [
                     {
                         text: localMenuNewEmptyProject, onClick: () => {
                             globalCommandDispatcher.newEmptyProject();
-                        }
+                        },
+                        itemKind: kindAction
                     },
                     {
                         text: 'Size', children: [
@@ -3599,79 +3629,94 @@ function composeBaseMenu() {
                                 text: 'Small', onClick: () => {
                                     startLoadCSSfile('theme/sizesmall.css');
                                     globalCommandDispatcher.changeTapSize(1);
-                                }
+                                },
+                                itemKind: kindAction
                             }, {
                                 text: 'Big', onClick: () => {
                                     startLoadCSSfile('theme/sizebig.css');
                                     globalCommandDispatcher.changeTapSize(1.5);
-                                }
+                                },
+                                itemKind: kindAction
                             }, {
                                 text: 'Huge', onClick: () => {
                                     startLoadCSSfile('theme/sizehuge.css');
                                     globalCommandDispatcher.changeTapSize(4);
-                                }
+                                },
+                                itemKind: kindAction
                             }
-                        ]
+                        ], itemKind: kindClosedFolder
                     }, {
                         text: 'Colors', children: [
                             {
                                 text: 'Minium', onClick: () => {
                                     globalCommandDispatcher.setThemeColor('red1');
-                                }
+                                },
+                                itemKind: kindAction
                             }, {
                                 text: 'Greenstone', onClick: () => {
                                     globalCommandDispatcher.setThemeColor('green1');
-                                }
+                                },
+                                itemKind: kindAction
                             }, {
                                 text: 'Deep', onClick: () => {
                                     globalCommandDispatcher.setThemeColor('blue1');
-                                }
+                                },
+                                itemKind: kindAction
                             }, {
                                 text: 'Neon', onClick: () => {
                                     globalCommandDispatcher.setThemeColor('neon1');
-                                }
+                                },
+                                itemKind: kindAction
                             },
                             {
                                 text: 'Gjel', onClick: () => {
                                     globalCommandDispatcher.setThemeColor('light1');
-                                }
+                                },
+                                itemKind: kindAction
                             },
                             {
                                 text: 'Vorot', onClick: () => {
                                     globalCommandDispatcher.setThemeColor('light2');
-                                }
+                                },
+                                itemKind: kindAction
                             }
-                        ]
+                        ], itemKind: kindClosedFolder
                     }, {
                         text: 'Language', children: [
                             {
                                 text: 'Russian', onClick: () => {
                                     globalCommandDispatcher.setThemeLocale('ru', 1);
-                                }
+                                },
+                                itemKind: kindAction
                             }, {
                                 text: 'English', onClick: () => {
                                     globalCommandDispatcher.setThemeLocale('en', 1);
-                                }
+                                },
+                                itemKind: kindAction
                             }, {
                                 text: 'kitaiskiy', onClick: () => {
                                     globalCommandDispatcher.setThemeLocale('zh', 1.5);
-                                }
+                                },
+                                itemKind: kindAction
                             }
-                        ]
+                        ], itemKind: kindClosedFolder
                     },
                     {
                         text: 'other', children: [{
                                 text: localMenuClearUndoRedo, onClick: () => {
                                     globalCommandDispatcher.clearUndo();
                                     globalCommandDispatcher.clearRedo();
-                                }
+                                },
+                                itemKind: kindAction
                             }, {
                                 text: 'Plugindebug', onClick: () => {
                                     globalCommandDispatcher.promptPluginInfoDebug();
-                                }
-                            }]
+                                },
+                                itemKind: kindAction
+                            }
+                        ], itemKind: kindClosedFolder
                     }
-                ]
+                ], itemKind: kindClosedFolder
             }
         ];
         return menuItemsData;

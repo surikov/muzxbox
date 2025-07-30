@@ -17,6 +17,8 @@ type MenuInfo = {
 	dragTriangle?: boolean;
 	highlight?: string;
 	top?: number;
+	url?: string;
+	itemKind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 };
 
 let menuItemsData: MenuInfo[] | null = null;
@@ -26,6 +28,14 @@ let menuPointActions: MenuInfo = {
 	, onFolderOpen: () => {
 		//console.log('actions');
 	}
+	, itemKind: kindAction
+};
+let menuPointStore: MenuInfo = {
+	text: 'snippets'
+	, onFolderOpen: () => {
+		//console.log('actions');
+	}
+	, itemKind: kindClosedFolder
 };
 /*
 let menuPointPerformers: MenuInfo = {
@@ -54,6 +64,7 @@ let menuPointAddPlugin: MenuInfo = {
 	, onFolderOpen: () => {
 		//console.log('samplers');
 	}
+	, itemKind: kindClosedFolder
 };
 
 let menuPointInsTracks: MenuInfo = {
@@ -61,18 +72,21 @@ let menuPointInsTracks: MenuInfo = {
 	, onFolderOpen: () => {
 		//console.log('samplers');
 	}
+	, itemKind: kindClosedFolder
 };
 let menuPointDrumTracks: MenuInfo = {
 	text: localMenuDrumTracksFolder
 	, onFolderOpen: () => {
 		//console.log('samplers');
 	}
+	, itemKind: kindClosedFolder
 };
 let menuPointFxTracks: MenuInfo = {
 	text: localMenuFxTracksFolder
 	, onFolderOpen: () => {
 		//console.log('samplers');
 	}
+	, itemKind: kindClosedFolder
 };
 
 /*
@@ -91,6 +105,19 @@ function fillPluginsLists() {
 	//menuPointSamplers.children = [];
 	menuPointAddPlugin.children = [];
 	menuPointActions.children = [];
+	menuPointStore.children = [];
+	menuPointStore.children.push({
+		text: 'fragment 1'
+		, noLocalization: true
+		, onClick: () => {
+			console.log('click');
+		}
+		, onSubClick: () => {
+			console.log('subclick');
+		}
+		, url: 'url main 1'
+		, itemKind: kindPreview
+	});
 	for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
 		let label: string = MZXBX_currentPlugins()[ii].label;
 		let purpose: string = MZXBX_currentPlugins()[ii].purpose;
@@ -100,6 +127,7 @@ function fillPluginsLists() {
 				text: label, noLocalization: true, onClick: () => {
 					globalCommandDispatcher.actionPluginDialog.openActionPluginDialogFrame(MZXBX_currentPlugins()[ii]);
 				}
+				, itemKind: kindAction
 			});
 		} else {
 			if (purpose == 'Sampler') {
@@ -159,6 +187,7 @@ function fillPluginsLists() {
 
 						}
 					}
+					, itemKind: kindDraggableCircle
 				};
 				menuPointAddPlugin.children.push(info);
 			} else {
@@ -209,6 +238,7 @@ function fillPluginsLists() {
 								});
 							}
 						}
+						, itemKind: kindDraggableSquare
 					};
 					menuPointAddPlugin.children.push(info);
 				} else {
@@ -257,6 +287,7 @@ function fillPluginsLists() {
 									});
 								}
 							}
+							, itemKind: kindDraggableTriangle
 						};
 						menuPointAddPlugin.children.push(info);
 					} else {
@@ -289,6 +320,7 @@ function composeBaseMenu(): MenuInfo[] {
 			, menuPointFxTracks
 			, menuPointActions
 			, menuPointAddPlugin
+			, menuPointStore
 			/*, {
 				text: localMenuNewPlugin, children: [
 
@@ -346,6 +378,7 @@ function composeBaseMenu(): MenuInfo[] {
 						text: localMenuNewEmptyProject, onClick: () => {
 							globalCommandDispatcher.newEmptyProject();
 						}
+						, itemKind: kindAction
 					}
 					,
 					{
@@ -355,64 +388,77 @@ function composeBaseMenu(): MenuInfo[] {
 									startLoadCSSfile('theme/sizesmall.css');
 									globalCommandDispatcher.changeTapSize(1);
 								}
+								, itemKind: kindAction
 							}, {
 								text: 'Big', onClick: () => {
 									startLoadCSSfile('theme/sizebig.css');
 									globalCommandDispatcher.changeTapSize(1.5);
 								}
+								, itemKind: kindAction
 							}, {
 								text: 'Huge', onClick: () => {
 									startLoadCSSfile('theme/sizehuge.css');
 									globalCommandDispatcher.changeTapSize(4);
 								}
+								, itemKind: kindAction
 							}
-						]
+
+						], itemKind: kindClosedFolder
 					}, {
 						text: 'Colors', children: [
 							{
 								text: 'Minium', onClick: () => {
 									globalCommandDispatcher.setThemeColor('red1');//'theme/colordarkred.css');
 								}
+								, itemKind: kindAction
 							}, {
 								text: 'Greenstone', onClick: () => {
 									globalCommandDispatcher.setThemeColor('green1');//'theme/colordarkgreen.css');
 								}
+								, itemKind: kindAction
 							}, {
 								text: 'Deep', onClick: () => {
 									globalCommandDispatcher.setThemeColor('blue1');//'theme/colordarkblue.css');
 								}
+								, itemKind: kindAction
 							}, {
 								text: 'Neon', onClick: () => {
 									globalCommandDispatcher.setThemeColor('neon1');
 								}
+								, itemKind: kindAction
 							}
 							, {
 								text: 'Gjel', onClick: () => {
 									globalCommandDispatcher.setThemeColor('light1');
 								}
+								, itemKind: kindAction
 							}
 							, {
 								text: 'Vorot', onClick: () => {
 									globalCommandDispatcher.setThemeColor('light2');
 								}
+								, itemKind: kindAction
 							}
-						]
+						], itemKind: kindClosedFolder
 					}, {
 						text: 'Language', children: [
 							{
 								text: 'Russian', onClick: () => {
 									globalCommandDispatcher.setThemeLocale('ru', 1);
 								}
+								, itemKind: kindAction
 							}, {
 								text: 'English', onClick: () => {
 									globalCommandDispatcher.setThemeLocale('en', 1);
 								}
+								, itemKind: kindAction
 							}, {
 								text: 'kitaiskiy', onClick: () => {
 									globalCommandDispatcher.setThemeLocale('zh', 1.5);
 								}
+								, itemKind: kindAction
 							}
-						]
+						], itemKind: kindClosedFolder
 					}
 					, {
 						text: 'other', children: [{
@@ -420,13 +466,16 @@ function composeBaseMenu(): MenuInfo[] {
 								globalCommandDispatcher.clearUndo();
 								globalCommandDispatcher.clearRedo();
 							}
+							, itemKind: kindAction
 						}, {
 							text: 'Plugindebug', onClick: () => {
 								globalCommandDispatcher.promptPluginInfoDebug();
 							}
-						}]
+							, itemKind: kindAction
+						}
+						], itemKind: kindClosedFolder
 					}
-				]
+				], itemKind: kindClosedFolder
 			}
 
 		];

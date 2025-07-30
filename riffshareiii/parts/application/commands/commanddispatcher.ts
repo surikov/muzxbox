@@ -720,7 +720,7 @@ class CommandDispatcher {
 			globalCommandDispatcher.downloadBlob(blobresult, fileName);
 		});
 	}
-	makeTileSVGcanvas(onDoneCanvas: (canvas: HTMLCanvasElement) => void): void {
+	makeTileSVGcanvas(maxWidth: number, maxHeight: number, onDoneCanvas: (canvas: HTMLCanvasElement) => void): void {
 		let tileLevelSVG: HTMLElement = document.getElementById('tileLevelSVG') as HTMLElement;
 		let xml: string = encodeURIComponent(tileLevelSVG.outerHTML);
 		let replaceText = '%3C!--%20css%20--%3E';//<!-- css -->;
@@ -728,6 +728,10 @@ class CommandDispatcher {
 		var url: string = 'data:image/svg+xml;utf8,' + xml;
 		let ww = window.innerWidth;
 		let hh = window.innerHeight;
+		let iWidth=0;
+		let iHeight=0;
+		let iLeft=0;
+		let iTop=0;
 		let canvas: HTMLCanvasElement = document.createElement('canvas');
 		canvas.height = hh;
 		canvas.width = ww;
@@ -741,7 +745,8 @@ class CommandDispatcher {
 	}
 	copySelectedBars() {
 		console.log('copySelectedBars');
-		globalCommandDispatcher.makeTileSVGcanvas((canvas: HTMLCanvasElement) => {
+		//https://media.geeksforgeeks.org/wp-content/uploads/20231004184219/gfglogo0.jpg
+		globalCommandDispatcher.makeTileSVGcanvas(200, 200, (canvas: HTMLCanvasElement) => {
 			globalCommandDispatcher.exportCanvasAsFile(canvas, 'testCanvasSVG.png');
 		});
 	}

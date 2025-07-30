@@ -250,7 +250,7 @@ declare type TileLevelBase = {
     getCurrentPointPosition(): TileZoom;
     setCurrentPointPosition: (xyz: TileZoom) => void;
     getStartMouseScreen(): TilePoint;
-    screen2view(screen: TilePoint): TilePoint;
+    screen2view(screenpx: TilePoint): TilePoint;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     delayedResetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     updateAnchorStyle(anchor: TileAnchor): void;
