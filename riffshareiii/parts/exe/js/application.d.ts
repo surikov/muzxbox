@@ -368,7 +368,6 @@ declare class RightMenuPanel {
     scrollListing(dx: number, dy: number): void;
     fillMenuItems(): void;
     setFocus(it: MenuInfo, infos: MenuInfo[]): void;
-    setOpenState(state: boolean, it: MenuInfo, infos: MenuInfo[]): void;
     fillMenuItemChildren(pad: number, infos: MenuInfo[]): void;
     readCurrentSongData(project: Zvoog_Project): void;
     rerenderMenuContent(folder: RightMenuItem | null): void;
@@ -384,7 +383,6 @@ declare const kindOpenedFolder: 7;
 declare const kindAction2: 8;
 declare const kindActionDisabled: 9;
 declare class RightMenuItem {
-    kind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
     action?: {
         (): void;
     };
@@ -406,20 +404,16 @@ declare type MenuInfo = {
     lightTitle?: boolean;
     noLocalization?: boolean;
     focused?: boolean;
-    opened?: boolean;
     children?: MenuInfo[];
     sid?: string;
     onClick?: () => void;
     onDrag?: (x: number, y: number) => void;
     onSubClick?: () => void;
-    onFolderOpen?: () => void;
+    onFolderCloseOpen?: () => void;
     itemStates?: string[];
     selectedState?: number;
-    dragCircle?: boolean;
-    dragSquare?: boolean;
-    dragTriangle?: boolean;
     highlight?: string;
-    top?: number;
+    menuTop?: number;
     url?: string;
     itemKind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 };
@@ -427,6 +421,7 @@ declare let menuItemsData: MenuInfo[] | null;
 declare let menuPointActions: MenuInfo;
 declare let menuPointStore: MenuInfo;
 declare let menuPointAddPlugin: MenuInfo;
+declare let menuPointSettings: MenuInfo;
 declare let menuPointInsTracks: MenuInfo;
 declare let menuPointDrumTracks: MenuInfo;
 declare let menuPointFxTracks: MenuInfo;
@@ -1059,6 +1054,13 @@ declare type Zvoog_Project = {
         z: number;
     };
     list: boolean;
+    menuPerformers?: boolean;
+    menuSamplers?: boolean;
+    menuFilters?: boolean;
+    menuActions?: boolean;
+    menuPlugins?: boolean;
+    menuClipboard?: boolean;
+    menuSettings?: boolean;
 };
 declare type MZXBX_CachedWave = {
     path: string;

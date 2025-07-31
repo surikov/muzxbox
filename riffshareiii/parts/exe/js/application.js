@@ -1220,6 +1220,7 @@ class CommandDispatcher {
         this.player = createSchedulePlayer(this.playCallback);
     }
     registerWorkProject(data) {
+        console.log('registerWorkProject', data.menuPerformers);
         this._mixerDataMathUtility = new MixerDataMathUtility(data);
     }
     registerUI(renderer) {
@@ -1535,7 +1536,10 @@ class CommandDispatcher {
         this.renderer.tiler.resetModel();
     }
     newEmptyProject() {
-        this.registerWorkProject(createNewEmptyProjectData());
+        globalCommandDispatcher.exe.commitProjectChanges([], () => {
+            this.registerWorkProject(createNewEmptyProjectData());
+            globalCommandDispatcher.adjustTimelineContent();
+        });
         this.resetProject();
     }
     resetProject() {
@@ -2856,15 +2860,55 @@ class RightMenuPanel {
         it.focused = true;
         this.rerenderMenuContent(null);
     }
-    setOpenState(state, it, infos) {
-        it.focused = true;
-        it.opened = state;
-    }
     fillMenuItemChildren(pad, infos) {
+        console.log('fillMenuItemChildren', infos);
+        if (globalCommandDispatcher.cfg()) {
+            if (globalCommandDispatcher.cfg().data.menuPerformers) {
+                menuPointInsTracks.itemKind = kindOpenedFolder;
+            }
+            else {
+                menuPointInsTracks.itemKind = kindClosedFolder;
+            }
+            if (globalCommandDispatcher.cfg().data.menuSamplers) {
+                menuPointDrumTracks.itemKind = kindOpenedFolder;
+            }
+            else {
+                menuPointDrumTracks.itemKind = kindClosedFolder;
+            }
+            if (globalCommandDispatcher.cfg().data.menuFilters) {
+                menuPointFxTracks.itemKind = kindOpenedFolder;
+            }
+            else {
+                menuPointFxTracks.itemKind = kindClosedFolder;
+            }
+            if (globalCommandDispatcher.cfg().data.menuPlugins) {
+                menuPointAddPlugin.itemKind = kindOpenedFolder;
+            }
+            else {
+                menuPointAddPlugin.itemKind = kindClosedFolder;
+            }
+            if (globalCommandDispatcher.cfg().data.menuClipboard) {
+                menuPointStore.itemKind = kindOpenedFolder;
+            }
+            else {
+                menuPointStore.itemKind = kindClosedFolder;
+            }
+            if (globalCommandDispatcher.cfg().data.menuActions) {
+                menuPointActions.itemKind = kindOpenedFolder;
+            }
+            else {
+                menuPointActions.itemKind = kindClosedFolder;
+            }
+            if (globalCommandDispatcher.cfg().data.menuSettings) {
+                menuPointSettings.itemKind = kindOpenedFolder;
+            }
+            else {
+                menuPointSettings.itemKind = kindClosedFolder;
+            }
+        }
         let me = this;
         for (let ii = 0; ii < infos.length; ii++) {
             let it = infos[ii];
-            let opened = (it.opened) ? true : false;
             let children = it.children;
             let itemLabel = '';
             if (it.noLocalization) {
@@ -2875,53 +2919,32 @@ class RightMenuPanel {
             }
             switch (it.itemKind) {
                 case kindOpenedFolder: {
-                    if (opened) {
-                        let so = new RightMenuItem(kindOpenedFolder, it, pad, () => {
-                            me.setOpenState(false, it, infos);
-                            me.rerenderMenuContent(so);
-                        });
-                        this.items.push(so);
-                        it.top = this.items.length - 1;
-                        if (children) {
-                            this.fillMenuItemChildren(pad + 0.5, children);
+                    let so = new RightMenuItem(kindOpenedFolder, it, pad, () => {
+                        if (it.onFolderCloseOpen) {
+                            it.onFolderCloseOpen();
                         }
-                    }
-                    else {
-                        let si = new RightMenuItem(kindClosedFolder, it, pad, () => {
-                            if (it.onFolderOpen) {
-                                it.onFolderOpen();
-                            }
-                            me.setOpenState(true, it, infos);
-                            me.rerenderMenuContent(si);
-                        });
-                        this.items.push(si);
-                        it.top = this.items.length - 1;
+                        it.focused = true;
+                        it.itemKind = kindClosedFolder;
+                        me.rerenderMenuContent(so);
+                    });
+                    this.items.push(so);
+                    it.menuTop = this.items.length - 1;
+                    if (children) {
+                        this.fillMenuItemChildren(pad + 0.5, children);
                     }
                     break;
                 }
                 case kindClosedFolder: {
-                    if (opened) {
-                        let so = new RightMenuItem(kindOpenedFolder, it, pad, () => {
-                            me.setOpenState(false, it, infos);
-                            me.rerenderMenuContent(so);
-                        });
-                        this.items.push(so);
-                        it.top = this.items.length - 1;
-                        if (children) {
-                            this.fillMenuItemChildren(pad + 0.5, children);
+                    let si = new RightMenuItem(kindClosedFolder, it, pad, () => {
+                        if (it.onFolderCloseOpen) {
+                            it.onFolderCloseOpen();
                         }
-                    }
-                    else {
-                        let si = new RightMenuItem(kindClosedFolder, it, pad, () => {
-                            if (it.onFolderOpen) {
-                                it.onFolderOpen();
-                            }
-                            me.setOpenState(true, it, infos);
-                            me.rerenderMenuContent(si);
-                        });
-                        this.items.push(si);
-                        it.top = this.items.length - 1;
-                    }
+                        it.focused = true;
+                        it.itemKind = kindOpenedFolder;
+                        me.rerenderMenuContent(si);
+                    });
+                    this.items.push(si);
+                    it.menuTop = this.items.length - 1;
                     break;
                 }
                 case kindDraggableCircle: {
@@ -2932,7 +2955,7 @@ class RightMenuPanel {
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
                     }));
-                    it.top = this.items.length - 1;
+                    it.menuTop = this.items.length - 1;
                     break;
                 }
                 case kindDraggableSquare: {
@@ -2943,7 +2966,7 @@ class RightMenuPanel {
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
                     }));
-                    it.top = this.items.length - 1;
+                    it.menuTop = this.items.length - 1;
                     break;
                 }
                 case kindDraggableTriangle: {
@@ -2954,7 +2977,7 @@ class RightMenuPanel {
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
                     }));
-                    it.top = this.items.length - 1;
+                    it.menuTop = this.items.length - 1;
                     break;
                 }
                 case kindPreview: {
@@ -2981,7 +3004,7 @@ class RightMenuPanel {
                         me.rerenderMenuContent(rightMenuItem);
                     });
                     this.items.push(rightMenuItem);
-                    it.top = this.items.length - 1;
+                    it.menuTop = this.items.length - 1;
                     break;
                 }
                 case kindAction2: {
@@ -3008,7 +3031,7 @@ class RightMenuPanel {
                         me.rerenderMenuContent(rightMenuItem);
                     });
                     this.items.push(rightMenuItem);
-                    it.top = this.items.length - 1;
+                    it.menuTop = this.items.length - 1;
                     break;
                 }
                 case kindAction: {
@@ -3019,7 +3042,7 @@ class RightMenuPanel {
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
                     }));
-                    it.top = this.items.length - 1;
+                    it.menuTop = this.items.length - 1;
                     break;
                 }
                 case kindActionDisabled: {
@@ -3027,7 +3050,7 @@ class RightMenuPanel {
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
                     }));
-                    it.top = this.items.length - 1;
+                    it.menuTop = this.items.length - 1;
                     break;
                 }
             }
@@ -3268,7 +3291,6 @@ const kindAction2 = 8;
 const kindActionDisabled = 9;
 class RightMenuItem {
     constructor(newkind, info, pad, tap, tap2, drag) {
-        this.kind = kindAction;
         this.pad = 0;
         this.info = info;
         this.pad = pad;
@@ -3280,10 +3302,9 @@ class RightMenuItem {
         else {
             this.info.sid = 'random' + Math.random();
         }
-        this.kind = newkind;
     }
     calculateHeight() {
-        if (this.kind == kindPreview) {
+        if (this.info.itemKind == kindPreview) {
             return 2;
         }
         else {
@@ -3314,15 +3335,15 @@ class RightMenuItem {
         anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.02, css: 'rightMenuDelimiterLine' });
         let spot = { x: this.pad, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
         let spot2 = null;
-        if (this.kind == kindAction) {
+        if (this.info.itemKind == kindAction) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
-        if (this.kind == kindActionDisabled) {
+        if (this.info.itemKind == kindActionDisabled) {
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
-        if (this.kind == kindAction2) {
+        if (this.info.itemKind == kindAction2) {
             let stateIicon = '?';
             let sel = this.info.selectedState ? this.info.selectedState : 0;
             if (this.info.itemStates) {
@@ -3342,19 +3363,19 @@ class RightMenuItem {
             anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
             spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
         }
-        if (this.kind == kindDraggableCircle) {
+        if (this.info.itemKind == kindDraggableCircle) {
             spot.draggable = true;
             spot.activation = this.drag;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
-        if (this.kind == kindDraggableSquare) {
+        if (this.info.itemKind == kindDraggableSquare) {
             spot.draggable = true;
             spot.activation = this.drag;
             anchor.content.push({ x: 0.15 + this.pad, y: itemTop + 0.15, w: 0.7, h: 0.7, rx: 0.05, ry: 0.05, css: 'rightMenuItemDragBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
-        if (this.kind == kindDraggableTriangle) {
+        if (this.info.itemKind == kindDraggableTriangle) {
             spot.draggable = true;
             spot.activation = this.drag;
             let sz = 0.45;
@@ -3367,17 +3388,19 @@ class RightMenuItem {
             anchor.content.push(tri);
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
-        if (this.kind == kindOpenedFolder) {
+        if (this.info.itemKind == kindOpenedFolder) {
+            console.log('opened folder', label);
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_movedown, css: 'rightMenuIconLabel' });
             anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
-        if (this.kind == kindClosedFolder) {
+        if (this.info.itemKind == kindClosedFolder) {
+            console.log('closed folder', label);
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_moveright, css: 'rightMenuIconLabel' });
             anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
-        if (this.kind == kindPreview) {
+        if (this.info.itemKind == kindPreview) {
             spot.draggable = true;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
@@ -3397,37 +3420,182 @@ class RightMenuItem {
 let menuItemsData = null;
 let menuPointActions = {
     text: localMenuActionsFolder,
-    onFolderOpen: () => {
+    onFolderCloseOpen: () => {
+        if (globalCommandDispatcher.cfg()) {
+            if (menuPointActions.itemKind == kindClosedFolder) {
+                globalCommandDispatcher.cfg().data.menuActions = true;
+            }
+            else {
+                globalCommandDispatcher.cfg().data.menuActions = false;
+            }
+        }
     },
     itemKind: kindClosedFolder
 };
 let menuPointStore = {
     text: 'snippets',
-    onFolderOpen: () => {
+    onFolderCloseOpen: () => {
+        if (globalCommandDispatcher.cfg()) {
+            if (menuPointStore.itemKind == kindClosedFolder) {
+                globalCommandDispatcher.cfg().data.menuClipboard = true;
+            }
+            else {
+                globalCommandDispatcher.cfg().data.menuClipboard = false;
+            }
+        }
     },
     itemKind: kindClosedFolder
 };
 let menuPointAddPlugin = {
     text: localMenuNewPlugin,
-    onFolderOpen: () => {
+    onFolderCloseOpen: () => {
+        if (globalCommandDispatcher.cfg()) {
+            if (menuPointAddPlugin.itemKind == kindClosedFolder) {
+                globalCommandDispatcher.cfg().data.menuPlugins = true;
+            }
+            else {
+                globalCommandDispatcher.cfg().data.menuPlugins = false;
+            }
+        }
     },
     itemKind: kindClosedFolder
+};
+let menuPointSettings = {
+    text: localMenuItemSettings, onFolderCloseOpen: () => {
+        if (globalCommandDispatcher.cfg()) {
+            if (menuPointSettings.itemKind == kindClosedFolder) {
+                globalCommandDispatcher.cfg().data.menuSettings = true;
+            }
+            else {
+                globalCommandDispatcher.cfg().data.menuSettings = false;
+            }
+        }
+    }, children: [
+        {
+            text: localMenuNewEmptyProject, onClick: () => {
+                globalCommandDispatcher.newEmptyProject();
+            }, itemKind: kindAction
+        }, {
+            text: 'Size', children: [
+                {
+                    text: 'Small', onClick: () => {
+                        startLoadCSSfile('theme/sizesmall.css');
+                        globalCommandDispatcher.changeTapSize(1);
+                    }, itemKind: kindAction
+                }, {
+                    text: 'Big', onClick: () => {
+                        startLoadCSSfile('theme/sizebig.css');
+                        globalCommandDispatcher.changeTapSize(1.5);
+                    },
+                    itemKind: kindAction
+                }, {
+                    text: 'Huge', onClick: () => {
+                        startLoadCSSfile('theme/sizehuge.css');
+                        globalCommandDispatcher.changeTapSize(4);
+                    },
+                    itemKind: kindAction
+                }
+            ], itemKind: kindClosedFolder
+        }, {
+            text: 'Colors', children: [
+                {
+                    text: 'Minium', onClick: () => {
+                        globalCommandDispatcher.setThemeColor('red1');
+                    }, itemKind: kindAction
+                }, {
+                    text: 'Greenstone', onClick: () => {
+                        globalCommandDispatcher.setThemeColor('green1');
+                    }, itemKind: kindAction
+                }, {
+                    text: 'Deep', onClick: () => {
+                        globalCommandDispatcher.setThemeColor('blue1');
+                    }, itemKind: kindAction
+                }, {
+                    text: 'Neon', onClick: () => {
+                        globalCommandDispatcher.setThemeColor('neon1');
+                    }, itemKind: kindAction
+                },
+                {
+                    text: 'Gjel', onClick: () => {
+                        globalCommandDispatcher.setThemeColor('light1');
+                    }, itemKind: kindAction
+                },
+                {
+                    text: 'Vorot', onClick: () => {
+                        globalCommandDispatcher.setThemeColor('light2');
+                    }, itemKind: kindAction
+                }
+            ], itemKind: kindClosedFolder
+        }, {
+            text: 'Language', children: [
+                {
+                    text: 'Russian', onClick: () => {
+                        globalCommandDispatcher.setThemeLocale('ru', 1);
+                    }, itemKind: kindAction
+                }, {
+                    text: 'English', onClick: () => {
+                        globalCommandDispatcher.setThemeLocale('en', 1);
+                    }, itemKind: kindAction
+                }, {
+                    text: 'kitaiskiy', onClick: () => {
+                        globalCommandDispatcher.setThemeLocale('zh', 1.5);
+                    }, itemKind: kindAction
+                }
+            ], itemKind: kindClosedFolder
+        },
+        {
+            text: 'other', children: [{
+                    text: localMenuClearUndoRedo, onClick: () => {
+                        globalCommandDispatcher.clearUndo();
+                        globalCommandDispatcher.clearRedo();
+                    }, itemKind: kindAction
+                }, {
+                    text: 'Plugindebug', onClick: () => {
+                        globalCommandDispatcher.promptPluginInfoDebug();
+                    }, itemKind: kindAction
+                }
+            ], itemKind: kindClosedFolder
+        }
+    ], itemKind: kindClosedFolder
 };
 let menuPointInsTracks = {
     text: localMenuInsTracksFolder,
-    onFolderOpen: () => {
-    },
-    itemKind: kindClosedFolder
+    onFolderCloseOpen: () => {
+        if (globalCommandDispatcher.cfg()) {
+            if (menuPointInsTracks.itemKind == kindClosedFolder) {
+                globalCommandDispatcher.cfg().data.menuPerformers = true;
+            }
+            else {
+                globalCommandDispatcher.cfg().data.menuPerformers = false;
+            }
+        }
+    }, itemKind: kindClosedFolder
 };
 let menuPointDrumTracks = {
     text: localMenuDrumTracksFolder,
-    onFolderOpen: () => {
+    onFolderCloseOpen: () => {
+        if (globalCommandDispatcher.cfg()) {
+            if (menuPointDrumTracks.itemKind == kindClosedFolder) {
+                globalCommandDispatcher.cfg().data.menuSamplers = true;
+            }
+            else {
+                globalCommandDispatcher.cfg().data.menuSamplers = false;
+            }
+        }
     },
     itemKind: kindClosedFolder
 };
 let menuPointFxTracks = {
     text: localMenuFxTracksFolder,
-    onFolderOpen: () => {
+    onFolderCloseOpen: () => {
+        if (globalCommandDispatcher.cfg()) {
+            if (menuPointFxTracks.itemKind == kindClosedFolder) {
+                globalCommandDispatcher.cfg().data.menuFilters = true;
+            }
+            else {
+                globalCommandDispatcher.cfg().data.menuFilters = false;
+            }
+        }
     },
     itemKind: kindClosedFolder
 };
@@ -3463,7 +3631,6 @@ function fillPluginsLists() {
                 let dragStarted = false;
                 let info;
                 info = {
-                    dragTriangle: true,
                     text: label,
                     noLocalization: true,
                     onDrag: (x, y) => {
@@ -3494,7 +3661,7 @@ function fillPluginsLists() {
                         else {
                             let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
                             let ss = globalCommandDispatcher.renderer.menu.scrollY;
-                            let tt = info.top ? info.top : 0;
+                            let tt = info.menuTop ? info.menuTop : 0;
                             let yy = (tt + ss - 0.0) * zz;
                             let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
                             dragStarted = true;
@@ -3509,7 +3676,7 @@ function fillPluginsLists() {
                             globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, tri);
                         }
                     },
-                    itemKind: kindDraggableCircle
+                    itemKind: kindDraggableTriangle
                 };
                 menuPointAddPlugin.children.push(info);
             }
@@ -3518,7 +3685,6 @@ function fillPluginsLists() {
                     let dragStarted = false;
                     let info;
                     info = {
-                        dragSquare: true,
                         text: label,
                         noLocalization: true,
                         onDrag: (x, y) => {
@@ -3549,7 +3715,7 @@ function fillPluginsLists() {
                             else {
                                 let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
                                 let ss = globalCommandDispatcher.renderer.menu.scrollY;
-                                let tt = info.top ? info.top : 0;
+                                let tt = info.menuTop ? info.menuTop : 0;
                                 let yy = (tt + ss - 0.0) * zz;
                                 let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
                                 dragStarted = true;
@@ -3572,7 +3738,6 @@ function fillPluginsLists() {
                         let dragStarted = false;
                         let info;
                         info = {
-                            dragCircle: true,
                             text: label,
                             noLocalization: true,
                             onDrag: (x, y) => {
@@ -3601,7 +3766,7 @@ function fillPluginsLists() {
                                 else {
                                     let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
                                     let ss = globalCommandDispatcher.renderer.menu.scrollY;
-                                    let tt = info.top ? info.top : 0;
+                                    let tt = info.menuTop ? info.menuTop : 0;
                                     let yy = (tt + ss - 0.0) * zz;
                                     let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
                                     dragStarted = true;
@@ -3615,7 +3780,7 @@ function fillPluginsLists() {
                                     });
                                 }
                             },
-                            itemKind: kindDraggableTriangle
+                            itemKind: kindDraggableCircle
                         };
                         menuPointAddPlugin.children.push(info);
                     }
@@ -3640,109 +3805,7 @@ function composeBaseMenu() {
             menuPointActions,
             menuPointAddPlugin,
             menuPointStore,
-            {
-                text: localMenuItemSettings, children: [
-                    {
-                        text: localMenuNewEmptyProject, onClick: () => {
-                            globalCommandDispatcher.newEmptyProject();
-                        },
-                        itemKind: kindAction
-                    },
-                    {
-                        text: 'Size', children: [
-                            {
-                                text: 'Small', onClick: () => {
-                                    startLoadCSSfile('theme/sizesmall.css');
-                                    globalCommandDispatcher.changeTapSize(1);
-                                },
-                                itemKind: kindAction
-                            }, {
-                                text: 'Big', onClick: () => {
-                                    startLoadCSSfile('theme/sizebig.css');
-                                    globalCommandDispatcher.changeTapSize(1.5);
-                                },
-                                itemKind: kindAction
-                            }, {
-                                text: 'Huge', onClick: () => {
-                                    startLoadCSSfile('theme/sizehuge.css');
-                                    globalCommandDispatcher.changeTapSize(4);
-                                },
-                                itemKind: kindAction
-                            }
-                        ], itemKind: kindClosedFolder
-                    }, {
-                        text: 'Colors', children: [
-                            {
-                                text: 'Minium', onClick: () => {
-                                    globalCommandDispatcher.setThemeColor('red1');
-                                },
-                                itemKind: kindAction
-                            }, {
-                                text: 'Greenstone', onClick: () => {
-                                    globalCommandDispatcher.setThemeColor('green1');
-                                },
-                                itemKind: kindAction
-                            }, {
-                                text: 'Deep', onClick: () => {
-                                    globalCommandDispatcher.setThemeColor('blue1');
-                                },
-                                itemKind: kindAction
-                            }, {
-                                text: 'Neon', onClick: () => {
-                                    globalCommandDispatcher.setThemeColor('neon1');
-                                },
-                                itemKind: kindAction
-                            },
-                            {
-                                text: 'Gjel', onClick: () => {
-                                    globalCommandDispatcher.setThemeColor('light1');
-                                },
-                                itemKind: kindAction
-                            },
-                            {
-                                text: 'Vorot', onClick: () => {
-                                    globalCommandDispatcher.setThemeColor('light2');
-                                },
-                                itemKind: kindAction
-                            }
-                        ], itemKind: kindClosedFolder
-                    }, {
-                        text: 'Language', children: [
-                            {
-                                text: 'Russian', onClick: () => {
-                                    globalCommandDispatcher.setThemeLocale('ru', 1);
-                                },
-                                itemKind: kindAction
-                            }, {
-                                text: 'English', onClick: () => {
-                                    globalCommandDispatcher.setThemeLocale('en', 1);
-                                },
-                                itemKind: kindAction
-                            }, {
-                                text: 'kitaiskiy', onClick: () => {
-                                    globalCommandDispatcher.setThemeLocale('zh', 1.5);
-                                },
-                                itemKind: kindAction
-                            }
-                        ], itemKind: kindClosedFolder
-                    },
-                    {
-                        text: 'other', children: [{
-                                text: localMenuClearUndoRedo, onClick: () => {
-                                    globalCommandDispatcher.clearUndo();
-                                    globalCommandDispatcher.clearRedo();
-                                },
-                                itemKind: kindAction
-                            }, {
-                                text: 'Plugindebug', onClick: () => {
-                                    globalCommandDispatcher.promptPluginInfoDebug();
-                                },
-                                itemKind: kindAction
-                            }
-                        ], itemKind: kindClosedFolder
-                    }
-                ], itemKind: kindClosedFolder
-            }
+            menuPointSettings
         ];
         return menuItemsData;
     }

@@ -20,7 +20,7 @@ class RightMenuItem {
 		kindAction2: 8 = 8;
 		kindActionDisabled: 9 = 9;
 		*/
-	kind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 = kindAction;
+	//kind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 = kindAction;
 	action?: { (): void };
 	action2?: { (): void };
 	drag?: { (x: number, y: number): void };
@@ -28,7 +28,7 @@ class RightMenuItem {
 	top: number;
 	info: MenuInfo;
 
-	constructor(newkind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,info: MenuInfo, pad: number, tap?: () => void, tap2?: () => void, drag?: (x: number, y: number) => void) {
+	constructor(newkind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9, info: MenuInfo, pad: number, tap?: () => void, tap2?: () => void, drag?: (x: number, y: number) => void) {
 		this.info = info;
 		this.pad = pad;
 		this.action = tap;
@@ -39,7 +39,7 @@ class RightMenuItem {
 		} else {
 			this.info.sid = 'random' + Math.random();
 		}
-		this.kind = newkind;
+		//this.kind = newkind;
 	}
 	/*initDisabledItem(): RightMenuItem {
 		this.kind = kindActionDisabled;
@@ -83,7 +83,7 @@ class RightMenuItem {
 		return this;
 	}*/
 	calculateHeight(): number {
-		if (this.kind == kindPreview) {
+		if (this.info.itemKind == kindPreview) {
 			return 2;
 		} else {
 			return 1;
@@ -115,15 +115,15 @@ class RightMenuItem {
 		anchor.content.push({ x: 0, y: itemTop + this.calculateHeight(), w: itemWidth, h: 0.02, css: 'rightMenuDelimiterLine' });
 		let spot: TileRectangle = { x: this.pad, y: itemTop, w: 1, h: 1, activation: this.action, css: 'transparentSpot' };
 		let spot2: TileRectangle | null = null;
-		if (this.kind == kindAction) {
+		if (this.info.itemKind == kindAction) {
 			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
 			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 		}
-		if (this.kind == kindActionDisabled) {
+		if (this.info.itemKind == kindActionDisabled) {
 			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDisabledBG' });
 			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 		}
-		if (this.kind == kindAction2) {
+		if (this.info.itemKind == kindAction2) {
 			let stateIicon = '?';
 			let sel = this.info.selectedState ? this.info.selectedState : 0;
 			if (this.info.itemStates) {
@@ -142,19 +142,19 @@ class RightMenuItem {
 			anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
 			spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
 		}
-		if (this.kind == kindDraggableCircle) {
+		if (this.info.itemKind == kindDraggableCircle) {
 			spot.draggable = true;
 			spot.activation = this.drag;
 			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
 			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 		}
-		if (this.kind == kindDraggableSquare) {
+		if (this.info.itemKind == kindDraggableSquare) {
 			spot.draggable = true;
 			spot.activation = this.drag;
 			anchor.content.push({ x: 0.15 + this.pad, y: itemTop + 0.15, w: 0.7, h: 0.7, rx: 0.05, ry: 0.05, css: 'rightMenuItemDragBG' });
 			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 		}
-		if (this.kind == kindDraggableTriangle) {
+		if (this.info.itemKind == kindDraggableTriangle) {
 			spot.draggable = true;
 			spot.activation = this.drag;
 			//anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
@@ -179,17 +179,19 @@ class RightMenuItem {
 
 
 
-		if (this.kind == kindOpenedFolder) {
+		if (this.info.itemKind == kindOpenedFolder) {
+			console.log('opened folder',label);
 			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
 			anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_movedown, css: 'rightMenuIconLabel' });
 			anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
 		}
-		if (this.kind == kindClosedFolder) {
+		if (this.info.itemKind == kindClosedFolder) {
+			console.log('closed folder',label);
 			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
 			anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_moveright, css: 'rightMenuIconLabel' });
 			anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
 		}
-		if (this.kind == kindPreview) {
+		if (this.info.itemKind == kindPreview) {
 			spot.draggable = true;
 			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
 			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });

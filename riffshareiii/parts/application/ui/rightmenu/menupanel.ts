@@ -215,23 +215,61 @@ class RightMenuPanel {
 		this.rerenderMenuContent(null);
 
 	}
+	/*
 	setOpenState(state: boolean, it: MenuInfo, infos: MenuInfo[]) {
-		/*for (let ii = 0; ii < infos.length; ii++) {
+		/for (let ii = 0; ii < infos.length; ii++) {
 			infos[ii].opened = false;
 			infos[ii].focused = false;
-		}*/
+		}/
 		it.focused = true;
 		it.opened = state;
 	}
-
+*/
 	fillMenuItemChildren(pad: number, infos: MenuInfo[]): void {
-		//console.log('fillMenuItemChildren',infos);
+		console.log('fillMenuItemChildren',infos);
+		if(globalCommandDispatcher.cfg()){
+			if(globalCommandDispatcher.cfg().data.menuPerformers){
+				menuPointInsTracks.itemKind=kindOpenedFolder;
+			}else{
+				menuPointInsTracks.itemKind=kindClosedFolder;
+			}
+			if(globalCommandDispatcher.cfg().data.menuSamplers){
+				menuPointDrumTracks.itemKind=kindOpenedFolder;
+			}else{
+				menuPointDrumTracks.itemKind=kindClosedFolder;
+			}
+			if(globalCommandDispatcher.cfg().data.menuFilters){
+				menuPointFxTracks.itemKind=kindOpenedFolder;
+			}else{
+				menuPointFxTracks.itemKind=kindClosedFolder;
+			}
+			if(globalCommandDispatcher.cfg().data.menuPlugins){
+				menuPointAddPlugin.itemKind=kindOpenedFolder;
+			}else{
+				menuPointAddPlugin.itemKind=kindClosedFolder;
+			}
+			if(globalCommandDispatcher.cfg().data.menuClipboard){
+				menuPointStore.itemKind=kindOpenedFolder;
+			}else{
+				menuPointStore.itemKind=kindClosedFolder;
+			}
+			if(globalCommandDispatcher.cfg().data.menuActions){
+				menuPointActions.itemKind=kindOpenedFolder;
+			}else{
+				menuPointActions.itemKind=kindClosedFolder;
+			}
+			if(globalCommandDispatcher.cfg().data.menuSettings){
+				menuPointSettings.itemKind=kindOpenedFolder;
+			}else{
+				menuPointSettings.itemKind=kindClosedFolder;
+			}
+		}
 		let me = this;
 		for (let ii = 0; ii < infos.length; ii++) {
 			let it = infos[ii];
 
 			//let focused = (it.focused) ? true : false;
-			let opened = (it.opened) ? true : false;
+			//let opened = (it.opened) ? true : false;
 			let children = it.children;
 			let itemLabel = '';
 			if (it.noLocalization) {
@@ -242,18 +280,23 @@ class RightMenuPanel {
 
 			switch (it.itemKind) {
 				case kindOpenedFolder: {
-					if (opened) {
-						let so: RightMenuItem = new RightMenuItem(kindOpenedFolder, it, pad, () => {
-							me.setOpenState(false, it, infos);
-							me.rerenderMenuContent(so);
-
-						});
-						this.items.push(so);
-						it.top = this.items.length - 1;
-						if (children) {
-							this.fillMenuItemChildren(pad + 0.5, children);
+					//if (opened) {
+					let so: RightMenuItem = new RightMenuItem(kindOpenedFolder, it, pad, () => {
+						//me.setOpenState(false, it, infos);
+						if (it.onFolderCloseOpen) {
+							it.onFolderCloseOpen();
 						}
-					} else {
+						it.focused = true;
+						it.itemKind = kindClosedFolder;
+						me.rerenderMenuContent(so);
+						
+					});
+					this.items.push(so);
+					it.menuTop = this.items.length - 1;
+					if (children) {
+						this.fillMenuItemChildren(pad + 0.5, children);
+					}
+					/*} else {
 						let si: RightMenuItem = new RightMenuItem(kindClosedFolder, it, pad, () => {
 							//console.log('test', it.text, it.onOpen);
 							if (it.onFolderOpen) {
@@ -265,11 +308,11 @@ class RightMenuPanel {
 						});
 						this.items.push(si);
 						it.top = this.items.length - 1;
-					}
+					}*/
 					break;
 				}
 				case kindClosedFolder: {
-					if (opened) {
+					/*if (opened) {
 						let so: RightMenuItem = new RightMenuItem(kindOpenedFolder, it, pad, () => {
 							me.setOpenState(false, it, infos);
 							me.rerenderMenuContent(so);
@@ -280,19 +323,21 @@ class RightMenuPanel {
 						if (children) {
 							this.fillMenuItemChildren(pad + 0.5, children);
 						}
-					} else {
-						let si: RightMenuItem = new RightMenuItem(kindClosedFolder, it, pad, () => {
-							//console.log('test', it.text, it.onOpen);
-							if (it.onFolderOpen) {
-								it.onFolderOpen();
-							}
-							me.setOpenState(true, it, infos);
-							me.rerenderMenuContent(si);
-
-						});
-						this.items.push(si);
-						it.top = this.items.length - 1;
-					}
+					} else {*/
+					let si: RightMenuItem = new RightMenuItem(kindClosedFolder, it, pad, () => {
+						//console.log('test', it.text, it.onOpen);
+						if (it.onFolderCloseOpen) {
+							it.onFolderCloseOpen();
+						}
+						//me.setOpenState(true, it, infos);
+						it.focused = true;
+						it.itemKind = kindOpenedFolder;
+						me.rerenderMenuContent(si);
+						
+					});
+					this.items.push(si);
+					it.menuTop = this.items.length - 1;
+					//}
 					break;
 				}
 				case kindDraggableCircle: {
@@ -303,7 +348,7 @@ class RightMenuPanel {
 						me.setFocus(it, infos);
 						me.resetAllAnchors();
 					}));
-					it.top = this.items.length - 1;
+					it.menuTop = this.items.length - 1;
 					break;
 				}
 				case kindDraggableSquare: {
@@ -314,7 +359,7 @@ class RightMenuPanel {
 						me.setFocus(it, infos);
 						me.resetAllAnchors();
 					}));
-					it.top = this.items.length - 1;
+					it.menuTop = this.items.length - 1;
 					break;
 				}
 				case kindDraggableTriangle: {
@@ -325,7 +370,7 @@ class RightMenuPanel {
 						me.setFocus(it, infos);
 						me.resetAllAnchors();
 					}));
-					it.top = this.items.length - 1;
+					it.menuTop = this.items.length - 1;
 					break;
 				}
 				case kindPreview: {
@@ -351,7 +396,7 @@ class RightMenuPanel {
 						me.rerenderMenuContent(rightMenuItem);
 					});
 					this.items.push(rightMenuItem);
-					it.top = this.items.length - 1;
+					it.menuTop = this.items.length - 1;
 					break;
 				}
 				case kindAction2: {
@@ -377,7 +422,7 @@ class RightMenuPanel {
 						me.rerenderMenuContent(rightMenuItem);
 					});
 					this.items.push(rightMenuItem);
-					it.top = this.items.length - 1;
+					it.menuTop = this.items.length - 1;
 					break;
 				}
 				case kindAction: {
@@ -388,7 +433,7 @@ class RightMenuPanel {
 						me.setFocus(it, infos);
 						me.resetAllAnchors();
 					}));
-					it.top = this.items.length - 1;
+					it.menuTop = this.items.length - 1;
 					break;
 				}
 				case kindActionDisabled: {
@@ -396,149 +441,149 @@ class RightMenuPanel {
 						me.setFocus(it, infos);
 						me.resetAllAnchors();
 					}));
-					it.top = this.items.length - 1;
+					it.menuTop = this.items.length - 1;
 					break;
 				}
 			}
-/*
-			//if (children) {//folder
-			if (it.itemKind == kindOpenedFolder || it.itemKind == kindClosedFolder) {
-				if (opened) {
-					let so: RightMenuItem = new RightMenuItem(kindOpenedFolder, it, pad, () => {
-						me.setOpenState(false, it, infos);
-						me.rerenderMenuContent(so);
-
-					});
-					this.items.push(so);
-					it.top = this.items.length - 1;
-					if (children) {
-						this.fillMenuItemChildren(pad + 0.5, children);
-					}
-				} else {
-					let si: RightMenuItem = new RightMenuItem(kindClosedFolder, it, pad, () => {
-						//console.log('test', it.text, it.onOpen);
-						if (it.onFolderOpen) {
-							it.onFolderOpen();
-						}
-						me.setOpenState(true, it, infos);
-						me.rerenderMenuContent(si);
-
-					});
-					this.items.push(si);
-					it.top = this.items.length - 1;
-				}
-			} else {
-				//if (it.dragCircle) {
-				if (it.itemKind == kindDraggableCircle) {
-					this.items.push(new RightMenuItem(kindDraggableCircle, it, pad, () => { }, () => { }, (x: number, y: number) => {
-						if (it.onDrag) {
-							it.onDrag(x, y);
-						}
-						me.setFocus(it, infos);
-						me.resetAllAnchors();
-					}));
-					it.top = this.items.length - 1;
-				} else {
-					//if (it.dragSquare) {
-					if (it.itemKind == kindDraggableSquare) {
-						this.items.push(new RightMenuItem(kindDraggableSquare, it, pad, () => { }, () => { }, (x: number, y: number) => {
-							if (it.onDrag) {
-								it.onDrag(x, y);
-							}
-							me.setFocus(it, infos);
-							me.resetAllAnchors();
-						}));
-						it.top = this.items.length - 1;
-					} else {
-						//if (it.dragTriangle) {
-						if (it.itemKind == kindDraggableTriangle) {
-							this.items.push(new RightMenuItem(kindDraggableTriangle, it, pad, () => { }, () => { }, (x: number, y: number) => {
-								if (it.onDrag) {
-									it.onDrag(x, y);
+			/*
+						//if (children) {//folder
+						if (it.itemKind == kindOpenedFolder || it.itemKind == kindClosedFolder) {
+							if (opened) {
+								let so: RightMenuItem = new RightMenuItem(kindOpenedFolder, it, pad, () => {
+									me.setOpenState(false, it, infos);
+									me.rerenderMenuContent(so);
+			
+								});
+								this.items.push(so);
+								it.top = this.items.length - 1;
+								if (children) {
+									this.fillMenuItemChildren(pad + 0.5, children);
 								}
-								me.setFocus(it, infos);
-								me.resetAllAnchors();
-							}));
-							it.top = this.items.length - 1;
-						} else {
-							//if (it.onSubClick) {
-							//if (it.url) {
-							if (it.itemKind == kindPreview) {
-								let rightMenuItem = new RightMenuItem(kindPreview, it, pad, () => {
-									if (it.onClick) {
-										it.onClick();
-									}
-									me.setFocus(it, infos);
-									me.resetAllAnchors();
-								}, () => {
-									if (it.itemStates) {
-										let sel = it.selectedState ? it.selectedState : 0;
-										if (it.itemStates.length - 1 > sel) {
-											sel++;
-										} else {
-											sel = 0;
-										}
-										it.selectedState = sel;
-									}
-									if (it.onSubClick) {
-										it.onSubClick();
-									}
-									me.rerenderMenuContent(rightMenuItem);
-								});
-								this.items.push(rightMenuItem);
-								it.top = this.items.length - 1;
 							} else {
-								//if (it.onClick) {
-								let rightMenuItem = new RightMenuItem(kindAction2, it, pad, () => {
-									if (it.onClick) {
-										it.onClick();
+								let si: RightMenuItem = new RightMenuItem(kindClosedFolder, it, pad, () => {
+									//console.log('test', it.text, it.onOpen);
+									if (it.onFolderOpen) {
+										it.onFolderOpen();
 									}
-									me.setFocus(it, infos);
-									me.resetAllAnchors();
-								}, () => {
-									if (it.itemStates) {
-										let sel = it.selectedState ? it.selectedState : 0;
-										if (it.itemStates.length - 1 > sel) {
-											sel++;
-										} else {
-											sel = 0;
-										}
-										it.selectedState = sel;
-									}
-									if (it.onSubClick) {
-										it.onSubClick();
-									}
-									me.rerenderMenuContent(rightMenuItem);
+									me.setOpenState(true, it, infos);
+									me.rerenderMenuContent(si);
+			
 								});
-								this.items.push(rightMenuItem);
+								this.items.push(si);
 								it.top = this.items.length - 1;
 							}
-							//} else {
-							//if (it.onClick) {
-							if (it.itemKind == kindAction) {
-								this.items.push(new RightMenuItem(kindAction, it, pad, () => {
-									if (it.onClick) {
-										it.onClick();
+						} else {
+							//if (it.dragCircle) {
+							if (it.itemKind == kindDraggableCircle) {
+								this.items.push(new RightMenuItem(kindDraggableCircle, it, pad, () => { }, () => { }, (x: number, y: number) => {
+									if (it.onDrag) {
+										it.onDrag(x, y);
 									}
 									me.setFocus(it, infos);
 									me.resetAllAnchors();
 								}));
 								it.top = this.items.length - 1;
 							} else {
-								if (it.itemKind == kindActionDisabled) {
-									this.items.push(new RightMenuItem(kindActionDisabled, it, pad, () => {
+								//if (it.dragSquare) {
+								if (it.itemKind == kindDraggableSquare) {
+									this.items.push(new RightMenuItem(kindDraggableSquare, it, pad, () => { }, () => { }, (x: number, y: number) => {
+										if (it.onDrag) {
+											it.onDrag(x, y);
+										}
 										me.setFocus(it, infos);
 										me.resetAllAnchors();
 									}));
 									it.top = this.items.length - 1;
+								} else {
+									//if (it.dragTriangle) {
+									if (it.itemKind == kindDraggableTriangle) {
+										this.items.push(new RightMenuItem(kindDraggableTriangle, it, pad, () => { }, () => { }, (x: number, y: number) => {
+											if (it.onDrag) {
+												it.onDrag(x, y);
+											}
+											me.setFocus(it, infos);
+											me.resetAllAnchors();
+										}));
+										it.top = this.items.length - 1;
+									} else {
+										//if (it.onSubClick) {
+										//if (it.url) {
+										if (it.itemKind == kindPreview) {
+											let rightMenuItem = new RightMenuItem(kindPreview, it, pad, () => {
+												if (it.onClick) {
+													it.onClick();
+												}
+												me.setFocus(it, infos);
+												me.resetAllAnchors();
+											}, () => {
+												if (it.itemStates) {
+													let sel = it.selectedState ? it.selectedState : 0;
+													if (it.itemStates.length - 1 > sel) {
+														sel++;
+													} else {
+														sel = 0;
+													}
+													it.selectedState = sel;
+												}
+												if (it.onSubClick) {
+													it.onSubClick();
+												}
+												me.rerenderMenuContent(rightMenuItem);
+											});
+											this.items.push(rightMenuItem);
+											it.top = this.items.length - 1;
+										} else {
+											//if (it.onClick) {
+											let rightMenuItem = new RightMenuItem(kindAction2, it, pad, () => {
+												if (it.onClick) {
+													it.onClick();
+												}
+												me.setFocus(it, infos);
+												me.resetAllAnchors();
+											}, () => {
+												if (it.itemStates) {
+													let sel = it.selectedState ? it.selectedState : 0;
+													if (it.itemStates.length - 1 > sel) {
+														sel++;
+													} else {
+														sel = 0;
+													}
+													it.selectedState = sel;
+												}
+												if (it.onSubClick) {
+													it.onSubClick();
+												}
+												me.rerenderMenuContent(rightMenuItem);
+											});
+											this.items.push(rightMenuItem);
+											it.top = this.items.length - 1;
+										}
+										//} else {
+										//if (it.onClick) {
+										if (it.itemKind == kindAction) {
+											this.items.push(new RightMenuItem(kindAction, it, pad, () => {
+												if (it.onClick) {
+													it.onClick();
+												}
+												me.setFocus(it, infos);
+												me.resetAllAnchors();
+											}));
+											it.top = this.items.length - 1;
+										} else {
+											if (it.itemKind == kindActionDisabled) {
+												this.items.push(new RightMenuItem(kindActionDisabled, it, pad, () => {
+													me.setFocus(it, infos);
+													me.resetAllAnchors();
+												}));
+												it.top = this.items.length - 1;
+											}
+										}
+										//}
+			
+									}
 								}
 							}
-							//}
-
-						}
-					}
-				}
-			}*/
+						}*/
 		}
 	}
 	readCurrentSongData(project: Zvoog_Project) {

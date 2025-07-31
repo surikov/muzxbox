@@ -128,6 +128,7 @@ class CommandDispatcher {
 		this.player = createSchedulePlayer(this.playCallback);
 	}
 	registerWorkProject(data: Zvoog_Project) {
+		console.log('registerWorkProject',data.menuPerformers)
 		this._mixerDataMathUtility = new MixerDataMathUtility(data);
 
 	}
@@ -501,9 +502,16 @@ class CommandDispatcher {
 		this.renderer.tiler.resetModel();
 	}
 	newEmptyProject() {
-		this.registerWorkProject(createNewEmptyProjectData());
+		//this.registerWorkProject(createNewEmptyProjectData());
+		globalCommandDispatcher.exe.commitProjectChanges([], () => {
+			this.registerWorkProject(createNewEmptyProjectData());
+			globalCommandDispatcher.adjustTimelineContent();
+		});
 		this.resetProject();
 	}
+
+
+	
 	resetProject() {
 		try {
 			/*

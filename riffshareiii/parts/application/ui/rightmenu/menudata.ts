@@ -3,20 +3,20 @@ type MenuInfo = {
 	lightTitle?: boolean;
 	noLocalization?: boolean;
 	focused?: boolean;
-	opened?: boolean;
+	//opened?: boolean;
 	children?: MenuInfo[];
 	sid?: string;
 	onClick?: () => void;
 	onDrag?: (x: number, y: number) => void;
 	onSubClick?: () => void;
-	onFolderOpen?: () => void;
+	onFolderCloseOpen?: () => void;
 	itemStates?: string[];
 	selectedState?: number;
-	dragCircle?: boolean;
-	dragSquare?: boolean;
-	dragTriangle?: boolean;
+	//dragCircle?: boolean;
+	//dragSquare?: boolean;
+	//dragTriangle?: boolean;
 	highlight?: string;
-	top?: number;
+	menuTop?: number;
 	url?: string;
 	itemKind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 };
@@ -25,15 +25,27 @@ let menuItemsData: MenuInfo[] | null = null;
 
 let menuPointActions: MenuInfo = {
 	text: localMenuActionsFolder
-	, onFolderOpen: () => {
-		//console.log('actions');
+	, onFolderCloseOpen: () => {
+		if (globalCommandDispatcher.cfg()) {
+			if (menuPointActions.itemKind == kindClosedFolder) {
+				globalCommandDispatcher.cfg().data.menuActions = true;
+			} else {
+				globalCommandDispatcher.cfg().data.menuActions = false;
+			}
+		}
 	}
 	, itemKind: kindClosedFolder
 };
 let menuPointStore: MenuInfo = {
 	text: 'snippets'
-	, onFolderOpen: () => {
-		//console.log('actions');
+	, onFolderCloseOpen: () => {
+		if (globalCommandDispatcher.cfg()) {
+			if (menuPointStore.itemKind == kindClosedFolder) {
+				globalCommandDispatcher.cfg().data.menuClipboard = true;
+			} else {
+				globalCommandDispatcher.cfg().data.menuClipboard = false;
+			}
+		}
 	}
 	, itemKind: kindClosedFolder
 };
@@ -61,30 +73,165 @@ let menuPointSamplers: MenuInfo = {
 };*/
 let menuPointAddPlugin: MenuInfo = {
 	text: localMenuNewPlugin
-	, onFolderOpen: () => {
-		//console.log('samplers');
+	, onFolderCloseOpen: () => {
+		if (globalCommandDispatcher.cfg()) {
+			if (menuPointAddPlugin.itemKind == kindClosedFolder) {
+				globalCommandDispatcher.cfg().data.menuPlugins = true;
+			} else {
+				globalCommandDispatcher.cfg().data.menuPlugins = false;
+			}
+		}
 	}
 	, itemKind: kindClosedFolder
+};
+let menuPointSettings: MenuInfo = {
+	text: localMenuItemSettings, onFolderCloseOpen: () => {
+		if (globalCommandDispatcher.cfg()) {
+			if (menuPointSettings.itemKind == kindClosedFolder) {
+				globalCommandDispatcher.cfg().data.menuSettings = true;
+			} else {
+				globalCommandDispatcher.cfg().data.menuSettings = false;
+			}
+		}
+	}, children: [
+		{
+			text: localMenuNewEmptyProject, onClick: () => {
+				globalCommandDispatcher.newEmptyProject();
+			}, itemKind: kindAction
+		}, {
+			text: 'Size', children: [
+				{
+					text: 'Small', onClick: () => {
+						startLoadCSSfile('theme/sizesmall.css');
+						globalCommandDispatcher.changeTapSize(1);
+					}, itemKind: kindAction
+				}, {
+					text: 'Big', onClick: () => {
+						startLoadCSSfile('theme/sizebig.css');
+						globalCommandDispatcher.changeTapSize(1.5);
+					}
+					, itemKind: kindAction
+				}, {
+					text: 'Huge', onClick: () => {
+						startLoadCSSfile('theme/sizehuge.css');
+						globalCommandDispatcher.changeTapSize(4);
+					}
+					, itemKind: kindAction
+				}
+
+			], itemKind: kindClosedFolder
+		}, {
+			text: 'Colors', children: [
+				{
+					text: 'Minium', onClick: () => {
+						globalCommandDispatcher.setThemeColor('red1');//'theme/colordarkred.css');
+					}, itemKind: kindAction
+				}, {
+					text: 'Greenstone', onClick: () => {
+						globalCommandDispatcher.setThemeColor('green1');//'theme/colordarkgreen.css');
+					}, itemKind: kindAction
+				}, {
+					text: 'Deep', onClick: () => {
+						globalCommandDispatcher.setThemeColor('blue1');//'theme/colordarkblue.css');
+					}, itemKind: kindAction
+				}, {
+					text: 'Neon', onClick: () => {
+						globalCommandDispatcher.setThemeColor('neon1');
+					}, itemKind: kindAction
+				}
+				, {
+					text: 'Gjel', onClick: () => {
+						globalCommandDispatcher.setThemeColor('light1');
+					}, itemKind: kindAction
+				}
+				, {
+					text: 'Vorot', onClick: () => {
+						globalCommandDispatcher.setThemeColor('light2');
+					}, itemKind: kindAction
+				}
+			], itemKind: kindClosedFolder
+		}, {
+			text: 'Language', children: [
+				{
+					text: 'Russian', onClick: () => {
+						globalCommandDispatcher.setThemeLocale('ru', 1);
+					}, itemKind: kindAction
+				}, {
+					text: 'English', onClick: () => {
+						globalCommandDispatcher.setThemeLocale('en', 1);
+					}, itemKind: kindAction
+				}, {
+					text: 'kitaiskiy', onClick: () => {
+						globalCommandDispatcher.setThemeLocale('zh', 1.5);
+					}, itemKind: kindAction
+				}
+			], itemKind: kindClosedFolder
+		}
+		, {
+			text: 'other', children: [{
+				text: localMenuClearUndoRedo, onClick: () => {
+					globalCommandDispatcher.clearUndo();
+					globalCommandDispatcher.clearRedo();
+				}, itemKind: kindAction
+			}, {
+				text: 'Plugindebug', onClick: () => {
+					globalCommandDispatcher.promptPluginInfoDebug();
+				}, itemKind: kindAction
+			}
+			], itemKind: kindClosedFolder
+		}
+	], itemKind: kindClosedFolder
 };
 
 let menuPointInsTracks: MenuInfo = {
 	text: localMenuInsTracksFolder
-	, onFolderOpen: () => {
-		//console.log('samplers');
-	}
-	, itemKind: kindClosedFolder
+	, onFolderCloseOpen: () => {
+		//console.log('menuPerformers', menuPointInsTracks.itemKind);
+		if (globalCommandDispatcher.cfg()) {
+			if (menuPointInsTracks.itemKind == kindClosedFolder) {
+				globalCommandDispatcher.cfg().data.menuPerformers = true;
+			} else {
+				globalCommandDispatcher.cfg().data.menuPerformers = false;
+			}
+		}
+		/*let closed = true;
+		if (globalCommandDispatcher.cfg()) {
+			if (globalCommandDispatcher.cfg().data.menuPerformers) {
+				closed = false;
+			}
+		}
+		console.log('menuPerformers', closed);
+		if (globalCommandDispatcher.cfg().data.menuPerformers) {
+			globalCommandDispatcher.cfg().data.menuPerformers = false;
+		} else {
+			globalCommandDispatcher.cfg().data.menuPerformers = true;
+		}*/
+	}, itemKind: kindClosedFolder
 };
+//console.log('menuPointInsTracks', menuPointInsTracks.itemKind);
 let menuPointDrumTracks: MenuInfo = {
 	text: localMenuDrumTracksFolder
-	, onFolderOpen: () => {
-		//console.log('samplers');
+	, onFolderCloseOpen: () => {
+		if (globalCommandDispatcher.cfg()) {
+			if (menuPointDrumTracks.itemKind == kindClosedFolder) {
+				globalCommandDispatcher.cfg().data.menuSamplers = true;
+			} else {
+				globalCommandDispatcher.cfg().data.menuSamplers = false;
+			}
+		}
 	}
 	, itemKind: kindClosedFolder
 };
 let menuPointFxTracks: MenuInfo = {
 	text: localMenuFxTracksFolder
-	, onFolderOpen: () => {
-		//console.log('samplers');
+	, onFolderCloseOpen: () => {
+		if (globalCommandDispatcher.cfg()) {
+			if (menuPointFxTracks.itemKind == kindClosedFolder) {
+				globalCommandDispatcher.cfg().data.menuFilters = true;
+			} else {
+				globalCommandDispatcher.cfg().data.menuFilters = false;
+			}
+		}
 	}
 	, itemKind: kindClosedFolder
 };
@@ -134,8 +281,9 @@ function fillPluginsLists() {
 				let dragStarted = false;
 				let info: MenuInfo;
 				info = {
-					dragTriangle: true
-					, text: label
+					//dragTriangle: true
+					//, 
+					text: label
 
 					, noLocalization: true
 					, onDrag: (x: number, y: number) => {
@@ -164,7 +312,7 @@ function fillPluginsLists() {
 						} else {
 							let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
 							let ss = globalCommandDispatcher.renderer.menu.scrollY;
-							let tt = info.top ? info.top : 0;
+							let tt = info.menuTop ? info.menuTop : 0;
 							let yy = (tt + ss - 0.0) * zz;
 							let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
 							dragStarted = true;
@@ -187,7 +335,7 @@ function fillPluginsLists() {
 
 						}
 					}
-					, itemKind: kindDraggableCircle
+					, itemKind: kindDraggableTriangle
 				};
 				menuPointAddPlugin.children.push(info);
 			} else {
@@ -195,8 +343,9 @@ function fillPluginsLists() {
 					let dragStarted = false;
 					let info: MenuInfo;
 					info = {
-						dragSquare: true
-						, text: label
+						//dragSquare: true
+						//, 
+						text: label
 						, noLocalization: true
 						, onDrag: (x: number, y: number) => {
 							if (dragStarted) {
@@ -224,7 +373,7 @@ function fillPluginsLists() {
 							} else {
 								let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
 								let ss = globalCommandDispatcher.renderer.menu.scrollY;
-								let tt = info.top ? info.top : 0;
+								let tt = info.menuTop ? info.menuTop : 0;
 								let yy = (tt + ss - 0.0) * zz;
 								let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
 								dragStarted = true;
@@ -246,8 +395,9 @@ function fillPluginsLists() {
 						let dragStarted = false;
 						let info: MenuInfo;
 						info = {
-							dragCircle: true
-							, text: label
+							//dragCircle: true
+							//,
+							text: label
 							, noLocalization: true
 							, onDrag: (x: number, y: number) => {
 								if (dragStarted) {
@@ -273,7 +423,7 @@ function fillPluginsLists() {
 								} else {
 									let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
 									let ss = globalCommandDispatcher.renderer.menu.scrollY;
-									let tt = info.top ? info.top : 0;
+									let tt = info.menuTop ? info.menuTop : 0;
 									let yy = (tt + ss - 0.0) * zz;
 									let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
 									dragStarted = true;
@@ -287,7 +437,7 @@ function fillPluginsLists() {
 									});
 								}
 							}
-							, itemKind: kindDraggableTriangle
+							, itemKind: kindDraggableCircle
 						};
 						menuPointAddPlugin.children.push(info);
 					} else {
@@ -321,6 +471,7 @@ function composeBaseMenu(): MenuInfo[] {
 			, menuPointActions
 			, menuPointAddPlugin
 			, menuPointStore
+			, menuPointSettings
 			/*, {
 				text: localMenuNewPlugin, children: [
 
@@ -372,6 +523,7 @@ function composeBaseMenu(): MenuInfo[] {
 					}
 				]
 			}*/
+			/*
 			, {
 				text: localMenuItemSettings, children: [
 					{
@@ -477,7 +629,7 @@ function composeBaseMenu(): MenuInfo[] {
 					}
 				], itemKind: kindClosedFolder
 			}
-
+*/
 		];
 		return menuItemsData;
 	}

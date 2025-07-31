@@ -51,7 +51,7 @@ type Zvoog_FilterTarget = {
 	automation: Zvoog_FilterMeasure[];
 	iconPosition: { x: number, y: number };
 	state: 0 | 1;//on|off
-	title:string;
+	title: string;
 };
 type Zvoog_AudioSequencer = {
 	id: string;
@@ -187,6 +187,13 @@ type Zvoog_Project = {
 		z: number;
 	};
 	list: boolean;
+	menuPerformers?: boolean;
+	menuSamplers?: boolean;
+	menuFilters?: boolean;
+	menuActions?: boolean;
+	menuPlugins?: boolean;
+	menuClipboard?: boolean;
+	menuSettings?: boolean;
 	//undo: Zvoog_UICommand[];//Zvoog_Command[];
 	//redo: Zvoog_UICommand[];//Zvoog_Command[];
 };
@@ -263,7 +270,7 @@ type MZXBX_Filter = {
 	kind: string;
 	properties: string;
 	outputs: string[];
-	description:string;
+	description: string;
 };
 type MZXBX_AudioFilterPlugin = {
 	launch: (context: AudioContext, parameters: string) => void;
@@ -292,7 +299,7 @@ type MZXBX_ChannelSource = {
 	//id: string;
 	kind: string;
 	properties: string;
-	description:string;
+	description: string;
 };
 
 type MZXBX_AudioPerformerPlugin = {
