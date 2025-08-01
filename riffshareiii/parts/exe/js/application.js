@@ -1645,32 +1645,32 @@ class CommandDispatcher {
             globalCommandDispatcher.downloadBlob(blobresult, fileName);
         });
     }
-    makeTileSVGcanvas(maxWidth, maxHeight, onDoneCanvas) {
+    makeTileSVGsquareCanvas(canvasSize, onDoneCanvas) {
         let tileLevelSVG = document.getElementById('tileLevelSVG');
         let xml = encodeURIComponent(tileLevelSVG.outerHTML);
         let replaceText = '%3C!--%20css%20--%3E';
         xml = xml.replace(replaceText, wholeCSSstring);
         var url = 'data:image/svg+xml;utf8,' + xml;
-        let ww = window.innerWidth;
-        let hh = window.innerHeight;
-        let iWidth = 0;
-        let iHeight = 0;
-        let iLeft = 0;
-        let iTop = 0;
+        let ratio = window.innerWidth / window.innerHeight;
         let canvas = document.createElement('canvas');
-        canvas.height = hh;
-        canvas.width = ww;
+        canvas.height = canvasSize;
+        canvas.width = canvasSize;
         let context = canvas.getContext('2d');
-        let svgImg = new Image(ww, hh);
+        let svgImg = new Image(window.innerWidth, window.innerHeight);
         svgImg.onload = () => {
-            context.drawImage(svgImg, 0, 0, ww, hh);
+            if (ratio > 1) {
+                context.drawImage(svgImg, -0.5 * (canvasSize * ratio - canvasSize), 0, canvasSize * ratio, canvasSize);
+            }
+            else {
+                context.drawImage(svgImg, 0, -0.5 * (canvasSize / ratio - canvasSize), canvasSize, canvasSize / ratio);
+            }
             onDoneCanvas(canvas);
         };
         svgImg.src = url;
     }
     copySelectedBars() {
         console.log('copySelectedBars');
-        globalCommandDispatcher.makeTileSVGcanvas(200, 200, (canvas) => {
+        globalCommandDispatcher.makeTileSVGsquareCanvas(300, (canvas) => {
             globalCommandDispatcher.exportCanvasAsFile(canvas, 'testCanvasSVG.png');
         });
     }
@@ -2861,7 +2861,6 @@ class RightMenuPanel {
         this.rerenderMenuContent(null);
     }
     fillMenuItemChildren(pad, infos) {
-        console.log('fillMenuItemChildren', infos);
         if (globalCommandDispatcher.cfg()) {
             if (globalCommandDispatcher.cfg().data.menuPerformers) {
                 menuPointInsTracks.itemKind = kindOpenedFolder;
@@ -3389,13 +3388,11 @@ class RightMenuItem {
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
         if (this.info.itemKind == kindOpenedFolder) {
-            console.log('opened folder', label);
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_movedown, css: 'rightMenuIconLabel' });
             anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });
         }
         if (this.info.itemKind == kindClosedFolder) {
-            console.log('closed folder', label);
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: icon_moveright, css: 'rightMenuIconLabel' });
             anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: 'rightMenuLabel' });

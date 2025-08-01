@@ -226,7 +226,7 @@ class RightMenuPanel {
 	}
 */
 	fillMenuItemChildren(pad: number, infos: MenuInfo[]): void {
-		console.log('fillMenuItemChildren',infos);
+		//console.log('fillMenuItemChildren',infos);
 		if(globalCommandDispatcher.cfg()){
 			if(globalCommandDispatcher.cfg().data.menuPerformers){
 				menuPointInsTracks.itemKind=kindOpenedFolder;

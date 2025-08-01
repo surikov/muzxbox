@@ -128,7 +128,7 @@ class CommandDispatcher {
 		this.player = createSchedulePlayer(this.playCallback);
 	}
 	registerWorkProject(data: Zvoog_Project) {
-		console.log('registerWorkProject',data.menuPerformers)
+		console.log('registerWorkProject', data.menuPerformers)
 		this._mixerDataMathUtility = new MixerDataMathUtility(data);
 
 	}
@@ -511,7 +511,7 @@ class CommandDispatcher {
 	}
 
 
-	
+
 	resetProject() {
 		try {
 			/*
@@ -728,25 +728,24 @@ class CommandDispatcher {
 			globalCommandDispatcher.downloadBlob(blobresult, fileName);
 		});
 	}
-	makeTileSVGcanvas(maxWidth: number, maxHeight: number, onDoneCanvas: (canvas: HTMLCanvasElement) => void): void {
+	makeTileSVGsquareCanvas(canvasSize: number, onDoneCanvas: (canvas: HTMLCanvasElement) => void): void {
 		let tileLevelSVG: HTMLElement = document.getElementById('tileLevelSVG') as HTMLElement;
 		let xml: string = encodeURIComponent(tileLevelSVG.outerHTML);
 		let replaceText = '%3C!--%20css%20--%3E';//<!-- css -->;
 		xml = xml.replace(replaceText, wholeCSSstring);
 		var url: string = 'data:image/svg+xml;utf8,' + xml;
-		let ww = window.innerWidth;
-		let hh = window.innerHeight;
-		let iWidth=0;
-		let iHeight=0;
-		let iLeft=0;
-		let iTop=0;
+		let ratio = window.innerWidth / window.innerHeight;
 		let canvas: HTMLCanvasElement = document.createElement('canvas');
-		canvas.height = hh;
-		canvas.width = ww;
+		canvas.height = canvasSize;
+		canvas.width = canvasSize;
 		let context: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
-		let svgImg: HTMLImageElement = new Image(ww, hh);
+		let svgImg: HTMLImageElement = new Image(window.innerWidth, window.innerHeight);
 		svgImg.onload = () => {
-			context.drawImage(svgImg, 0, 0, ww, hh);
+			if (ratio > 1) {
+				context.drawImage(svgImg, -0.5 * (canvasSize * ratio - canvasSize), 0, canvasSize * ratio, canvasSize);
+			} else {
+				context.drawImage(svgImg, 0,-0.5 * (canvasSize / ratio - canvasSize), canvasSize , canvasSize/ ratio);
+			}
 			onDoneCanvas(canvas);
 		};
 		svgImg.src = url;
@@ -754,7 +753,7 @@ class CommandDispatcher {
 	copySelectedBars() {
 		console.log('copySelectedBars');
 		//https://media.geeksforgeeks.org/wp-content/uploads/20231004184219/gfglogo0.jpg
-		globalCommandDispatcher.makeTileSVGcanvas(200, 200, (canvas: HTMLCanvasElement) => {
+		globalCommandDispatcher.makeTileSVGsquareCanvas(300, (canvas: HTMLCanvasElement) => {
 			globalCommandDispatcher.exportCanvasAsFile(canvas, 'testCanvasSVG.png');
 		});
 	}

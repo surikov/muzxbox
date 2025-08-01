@@ -201,7 +201,7 @@ declare class CommandDispatcher {
     expandTimeLineSelection(idx: number): void;
     downloadBlob(blob: Blob, name: string): void;
     exportCanvasAsFile(canvas: HTMLCanvasElement, fileName: string): void;
-    makeTileSVGcanvas(maxWidth: number, maxHeight: number, onDoneCanvas: (canvas: HTMLCanvasElement) => void): void;
+    makeTileSVGsquareCanvas(canvasSize: number, onDoneCanvas: (canvas: HTMLCanvasElement) => void): void;
     copySelectedBars(): void;
     copySelectedBars222(): void;
     moveAsideSelectedBars(): void;
