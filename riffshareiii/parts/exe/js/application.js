@@ -1645,7 +1645,21 @@ class CommandDispatcher {
             globalCommandDispatcher.downloadBlob(blobresult, fileName);
         });
     }
+    hideMenuByStyle() {
+        this.renderer.menu.menuPanelBackground.style.visibility = 'hidden';
+        this.renderer.menu.menuPanelContent.style.visibility = 'hidden';
+        this.renderer.menu.menuPanelInteraction.style.visibility = 'hidden';
+        this.renderer.menu.menuPanelButtons.style.visibility = 'hidden';
+    }
+    showMenuByStyle() {
+        this.renderer.menu.menuPanelBackground.style.visibility = 'visible';
+        this.renderer.menu.menuPanelContent.style.visibility = 'visible';
+        this.renderer.menu.menuPanelInteraction.style.visibility = 'visible';
+        this.renderer.menu.menuPanelButtons.style.visibility = 'visible';
+    }
     makeTileSVGsquareCanvas(canvasSize, onDoneCanvas) {
+        console.log('makeTileSVGsquareCanvas', canvasSize);
+        this.hideMenuByStyle();
         let tileLevelSVG = document.getElementById('tileLevelSVG');
         let xml = encodeURIComponent(tileLevelSVG.outerHTML);
         let replaceText = '%3C!--%20css%20--%3E';
@@ -1667,6 +1681,7 @@ class CommandDispatcher {
             onDoneCanvas(canvas);
         };
         svgImg.src = url;
+        this.showMenuByStyle();
     }
     copySelectedBars() {
         console.log('copySelectedBars');
