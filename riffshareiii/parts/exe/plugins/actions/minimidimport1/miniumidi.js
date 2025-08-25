@@ -1647,9 +1647,7 @@ class Projectr {
                 }
             }
         }
-        let needSlice = (midiSongData.metersData.length < 2)
-            && (project.timeline[0].metre.count / project.timeline[0].metre.part == 1);
-        this.trimProject(project, needSlice);
+        this.trimProject(project);
         return project;
     }
     createTimeLine(midiSongData) {
@@ -1974,7 +1972,7 @@ class Projectr {
         }
         return projectTrack;
     }
-    trimProject(project, reslice) {
+    trimProject(project) {
         let hh = 12 * 6 * 1 + project.percussions.length * 3 + 17;
         for (let ii = 0; ii < project.tracks.length; ii++) {
             project.tracks[ii].performer.iconPosition.x = 10 + ii * 4;
@@ -2044,31 +2042,7 @@ class Projectr {
             }
         }
         this.limitShort(project);
-        if (reslice) {
-            let durations = [];
-            for (let ii = 0; ii < 32; ii++) {
-                let len = this.calculateShift32(project, ii);
-                let nn = 32 - ii;
-                if (ii == 0) {
-                    nn = 0;
-                }
-                durations.push({ len: Math.round(len.count / len.part), shft: nn });
-            }
-            durations.sort((a, b) => {
-                return b.len - a.len;
-            });
-            let top = [durations[0]];
-            for (let ii = 1; ii < durations.length; ii++) {
-                if (durations[ii].len * 2 > durations[0].len) {
-                    top.push(durations[ii]);
-                }
-            }
-            top.sort((a, b) => { return a.shft - b.shft; });
-            let shsize = top[0].shft;
-            if (shsize) {
-                this.shiftForwar32(project, shsize);
-            }
-        }
+        this.dumpStartNoteStat(project);
         let len = project.timeline.length;
         for (let ii = len - 1; ii > 0; ii--) {
             if (this.isBarEmpty(ii, project)) {
@@ -2097,68 +2071,46 @@ class Projectr {
             }
         }
     }
-    calculateShift32(project, count32) {
-        let ticker = MMUtil().set({ count: count32, part: 32 });
-        let duration = MMUtil().set({ count: 0, part: 32 });
-        for (let mm = 0; mm < project.timeline.length; mm++) {
-            duration = duration.plus(project.timeline[mm].metre);
-        }
-        let smm = MMUtil().set({ count: 0, part: 32 });
-        while (ticker.less(duration)) {
-            let pointLen = this.extractPointStampDuration(project, ticker);
-            smm = smm.plus(pointLen).strip(32);
-            ticker = ticker.plus({ count: 1, part: 1 });
-        }
-        return smm.strip(32);
-    }
-    extractPointStampDuration(project, at) {
-        let pointSumm = MMUtil().set({ count: 0, part: 32 });
-        let end = MMUtil().set({ count: 0, part: 32 });
-        for (let mm = 0; mm < project.timeline.length; mm++) {
-            let barStart = end.simplyfy();
-            end = end.plus(project.timeline[mm].metre).strip(32);
-            if (end.more(at)) {
-                let skip = MMUtil().set(at).minus(barStart);
-                for (let pp = 0; pp < project.tracks.length; pp++) {
-                    let track = project.tracks[pp];
-                    let trackBar = track.measures[mm];
-                    for (let ss = 0; ss < trackBar.chords.length; ss++) {
-                        let chord = trackBar.chords[ss];
-                        let chordSkip = MMUtil().set(chord.skip).strip(32);
-                        if (skip.strip(32).equals(chordSkip)) {
-                            let chordLen = MMUtil().set({ count: 0, part: 32 });
-                            for (let ss = 0; ss < chord.slides.length; ss++) {
-                                chordLen = chordLen.plus(chord.slides[ss].duration).strip(32);
-                            }
-                            pointSumm = pointSumm.plus(chordLen).strip(32);
-                            break;
-                        }
-                    }
+    dumpStartNoteStat(project) {
+        let starts = [];
+        for (let tt = 0; tt < project.tracks.length; tt++) {
+            let track = project.tracks[tt];
+            for (let mm = 0; mm < track.measures.length; mm++) {
+                let measure = track.measures[mm];
+                for (let cc = 0; cc < measure.chords.length; cc++) {
+                    let chord = measure.chords[cc];
+                    this.addStartOrIncreae(chord.skip, starts);
                 }
-                for (let dd = 0; dd < project.percussions.length; dd++) {
-                    let drum = project.percussions[dd];
-                    let drumBar = drum.measures[mm];
-                    let drumDuration = { count: 1, part: 16 };
-                    if (drum.sampler.data == '35' || drum.sampler.data == '36') {
-                        drumDuration = { count: 8, part: 16 };
-                    }
-                    else {
-                        if (drum.sampler.data == '38' || drum.sampler.data == '40') {
-                            drumDuration = { count: 2, part: 16 };
-                        }
-                    }
-                    for (let ss = 0; ss < drumBar.skips.length; ss++) {
-                        let drumSkip = MMUtil().set(drumBar.skips[ss]).strip(32);
-                        if (skip.strip(32).equals(drumSkip)) {
-                            pointSumm = pointSumm.plus(drumDuration).strip(32);
-                            break;
-                        }
-                    }
-                }
-                break;
             }
         }
-        return pointSumm;
+        starts.sort((a, b) => {
+            let first = MMUtil().set(a.skip);
+            if (first.equals(b.skip)) {
+                return 0;
+            }
+            else {
+                if (first.more(b.skip)) {
+                    return 1;
+                }
+                else {
+                    return -1;
+                }
+            }
+        });
+        for (let ii = 0; ii < starts.length; ii++) {
+            console.log(starts[ii].count, ':', starts[ii].skip.count, '/', starts[ii].skip.part);
+        }
+    }
+    addStartOrIncreae(probe, starts) {
+        let start = MMUtil().set(probe);
+        for (let ii = 0; ii < starts.length; ii++) {
+            let it = starts[ii];
+            if (start.equals(it.skip)) {
+                it.count++;
+                return;
+            }
+        }
+        starts.push({ skip: start.metre(), count: 1 });
     }
     numratio(nn) {
         let rr = 1;
