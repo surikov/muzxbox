@@ -762,8 +762,17 @@ class Projectr {
 				}
 			}
 		}
+		for(let ss=0;ss<project.percussions.length;ss++){
+			let drm=project.percussions[ss];
+			for (let mm = 0; mm < drm.measures.length; mm++) {
+				let measure = drm.measures[mm];
+				for (let cc = 0; cc < measure.skips.length; cc++) {
+					this.addStartOrIncreae(measure.skips[cc], starts);
+				}
+			}
+		}
 		starts.sort((a: { skip: Zvoog_Metre, count: number }, b: { skip: Zvoog_Metre, count: number }) => {
-			let first = MMUtil().set(a.skip);
+			/*let first = MMUtil().set(a.skip);
 			if (first.equals(b.skip)) {
 				return 0;
 			} else {
@@ -772,12 +781,16 @@ class Projectr {
 				} else {
 					return -1;
 				}
-			}
-			//return b.count - a.count;
+			}*/
+			return b.count - a.count;
 		})
 		//console.log('performers stat', starts);
+		let smm = 0;
 		for (let ii = 0; ii < starts.length; ii++) {
-			console.log(starts[ii].count, ':', starts[ii].skip.count, '/', starts[ii].skip.part);
+			smm = smm + starts[ii].count;
+		}
+		for (let ii = 0; ii < starts.length; ii++) {
+			console.log(Math.round(10000 * starts[ii].count / smm) / 100, ':', starts[ii].skip.count, '/', starts[ii].skip.part);
 		}
 	}
 	addStartOrIncreae(probe: Zvoog_Metre, starts: { skip: Zvoog_Metre, count: number }[]) {
