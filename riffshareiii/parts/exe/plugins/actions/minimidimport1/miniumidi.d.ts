@@ -347,11 +347,12 @@ declare class MidiParser {
     douglasPeucker(points: XYp[], tolerance: number): XYp[];
     simplifyAllBendPaths(): void;
     dumpResolutionChanges(): void;
-    lastResolution(ms: number): number;
+    findResolutionBefore(ms: number): number;
     parseTicks2time(track: MIDIFileTrack): void;
     parseNotes(): void;
     nextEvent(stream: DataViewStream): MIDIEvent;
     parseTrackEvents(track: MIDIFileTrack): void;
+    dumpStatyistics(): void;
 }
 declare function firstDrumKeysArrayPercussionPaths(midi: number): number;
 declare function allPercussionDrumTitles(): string[];
@@ -473,7 +474,7 @@ declare type MIDISongData = {
         count: number;
         division: number;
     }[];
-    lyrics: {
+    lyricstrack: {
         track: number;
         ms: number;
         txt: string;
@@ -494,7 +495,7 @@ declare type MIDISongData = {
     lineMode: number;
 };
 declare function round1000(nn: number): number;
-declare function findMeasureSkipByTime64(cmnt: string, time: number, measures: Zvoog_SongMeasure[]): null | {
+declare function findMeasureSkipByTime(cmnt: string, time: number, measures: Zvoog_SongMeasure[]): null | {
     idx: number;
     skip: Zvoog_Metre;
 };
@@ -612,7 +613,7 @@ declare function findPreMeter(when: number, midiParser: MidiParser): {
     part: number;
 };
 declare function findPreTempo(when: number, midiParser: MidiParser): number;
-declare function dumpStat(midiParser: MidiParser): void;
+declare function _____dumpStat(midiParser: MidiParser): void;
 declare class Projectr {
     parseRawMIDIdata(arrayBuffer: ArrayBuffer, title: string, comment: string): Zvoog_Project;
     readProject(midiSongData: MIDISongData, title: string, comment: string): Zvoog_Project;
@@ -648,11 +649,11 @@ declare class Projectr {
     trimProject(project: Zvoog_Project): void;
     limitShort(project: Zvoog_Project): void;
     dumpStartNoteStat(project: Zvoog_Project): void;
-    addStartOrIncreae(probe: Zvoog_Metre, starts: {
+    addStartOrIncrese(probe: Zvoog_Metre, starts: {
         skip: Zvoog_Metre;
         count: number;
     }[]): void;
     numratio(nn: number): number;
-    shiftForwar32(project: Zvoog_Project, amount: number): void;
+    shiftForward(project: Zvoog_Project, amount: Zvoog_Metre): void;
     isBarEmpty(barIdx: number, project: Zvoog_Project): boolean;
 }

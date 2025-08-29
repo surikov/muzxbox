@@ -256,9 +256,9 @@ class MidiParser {
 							}
 							console.log('to long',note);
 						}*/
-						if(note.baseDuration>7654){
+						if (note.baseDuration > 7654) {
 							//console.log('to long',note);
-							note.baseDuration=4321;
+							note.baseDuration = 4321;
 						}
 					}
 					//console.log(note);
@@ -269,7 +269,8 @@ class MidiParser {
 	dumpResolutionChanges(): void {
 		this.midiheader.changesResolutionBPM = [];
 		let tickResolution: number = this.midiheader.get0TickResolution();
-		this.midiheader.changesResolutionBPM.push({ track: -1, ms: -1, resolution: tickResolution, bpm: 120 });
+		let reChange = { track: -1, ms: -1, resolution: tickResolution, bpm: 120 };
+		this.midiheader.changesResolutionBPM.push(reChange);
 		for (var t = 0; t < this.parsedTracks.length; t++) {
 			var track: MIDIFileTrack = this.parsedTracks[t];
 			let playTimeTicks: number = 0;
@@ -282,7 +283,13 @@ class MidiParser {
 					if (evnt.subtype === this.EVENT_META_SET_TEMPO) {
 						if (evnt.tempo) {
 							tickResolution = this.midiheader.getCalculatedTickResolution(evnt.tempo);
-							this.midiheader.changesResolutionBPM.push({ track: t, ms: playTimeTicks, resolution: tickResolution, bpm: (evnt.tempoBPM) ? evnt.tempoBPM : 120 });
+							let reChange = {
+								track: t
+								, ms: playTimeTicks
+								, resolution: tickResolution
+								, bpm: (evnt.tempoBPM) ? evnt.tempoBPM : 120
+							};
+							this.midiheader.changesResolutionBPM.push(reChange);
 						}
 					}
 				}
@@ -290,7 +297,7 @@ class MidiParser {
 		}
 		this.midiheader.changesResolutionBPM.sort((a, b) => { return a.ms - b.ms; });
 	}
-	lastResolution(ms: number): number {
+	findResolutionBefore(ms: number): number {
 		for (var i = this.midiheader.changesResolutionBPM.length - 1; i >= 0; i--) {
 			if (this.midiheader.changesResolutionBPM[i].ms <= ms) {
 				return this.midiheader.changesResolutionBPM[i].resolution
@@ -299,7 +306,7 @@ class MidiParser {
 		return 0;
 	}
 	parseTicks2time(track: MIDIFileTrack) {
-		let tickResolution: number = this.lastResolution(0);
+		let tickResolution: number = this.findResolutionBefore(0);
 		let playTimeTicks: number = 0;
 		for (let e = 0; e < track.trackevents.length; e++) {
 
@@ -308,7 +315,7 @@ class MidiParser {
 			let curDelta: number = 0.0;
 			if (evnt.delta) curDelta = evnt.delta;
 			let searchPlayTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
-			tickResolution = this.lastResolution(searchPlayTimeTicks);
+			tickResolution = this.findResolutionBefore(searchPlayTimeTicks);
 
 			evnt.preTimeMs = playTimeTicks;
 			playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
@@ -334,7 +341,7 @@ class MidiParser {
 			this.parseTicks2time(singleParsedTrack);
 			//console.log('notes for track',t,singleParsedTrack);
 			for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
-				if(Math.floor(e/1000)==e/1000){
+				if (Math.floor(e / 1000) == e / 1000) {
 					//console.log('event',e);
 				}
 				var preState = expectedState;
@@ -379,29 +386,29 @@ class MidiParser {
 										for (var i = 0; i < chord.tracknotes.length; i++) {
 											var note: TrackNote = chord.tracknotes[i];
 											let idx: number = evnt.midiChannel ? evnt.midiChannel : 0;
-												let pp2 = evnt.param2 ? evnt.param2 : 0;
-												var delta: number = (pp2 - 64.0) / 64.0 * pitchBendValuesRange[idx];
-												var allPointsDuration = 0;
-												for (var k = 0; k < note.bendPoints.length; k++) {
-													allPointsDuration = allPointsDuration + note.bendPoints[k].pointDuration;
-												}
-												var point: NotePitch = {
-													pointDuration: eventWhen - chord.startMs - allPointsDuration
-													, basePitchDelta: delta
-												};
+											let pp2 = evnt.param2 ? evnt.param2 : 0;
+											var delta: number = (pp2 - 64.0) / 64.0 * pitchBendValuesRange[idx];
+											var allPointsDuration = 0;
+											for (var k = 0; k < note.bendPoints.length; k++) {
+												allPointsDuration = allPointsDuration + note.bendPoints[k].pointDuration;
+											}
+											var point: NotePitch = {
+												pointDuration: eventWhen - chord.startMs - allPointsDuration
+												, basePitchDelta: delta
+											};
 											if (!(note.closed)) {
-												
+
 												//when: event.playTime / 1000-track.notes[i].when
-												
-												
+
+
 												note.bendPoints.push(point);
 												//console.log('basePitchDelta',note,point);
-											}else{
-											//	console.log('no bend',point,'for closed',note);
+											} else {
+												//	console.log('no bend',point,'for closed',note);
 											}
 										}
 									}
-									
+
 								} else {
 									if (evnt.subtype == this.EVENT_MIDI_CONTROLLER) {
 
@@ -694,7 +701,32 @@ class MidiParser {
 
 
 
+	dumpStatyistics() {
+		console.log('events stat');
+		let starts: { startms: number, count: number }[] = [];
+		for (let pp = 0; pp < this.parsedTracks.length; pp++) {
+			let track = this.parsedTracks[pp];
 
+			for (let ss = 0; ss < track.trackChords.length; ss++) {
+				let chrd = track.trackChords[ss];
+				let strt = Math.round(chrd.startMs / 1) / 1000;
+				let xsts = false;
+				for (let exx = 0; exx < starts.length; exx++) {
+					if (starts[exx].startms == strt) {
+						starts[exx].count = starts[exx].count + chrd.tracknotes.length;
+						xsts = true;
+						break;
+					}
+
+				}
+				if (!xsts) {
+					starts.push({ startms: strt, count: chrd.tracknotes.length });
+				}
+			}
+		}
+		starts.sort((a, b) => { return a.startms - b.startms; });
+		console.log(starts);
+	}
 
 
 

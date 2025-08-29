@@ -96,7 +96,7 @@ type MIDISongData = {
 	bpm: number;
 	changesData: { track: number, ms: number, resolution: number, bpm: number }[];
 	metersData: { track: number, ms: number, count: number, division: number }[];
-	lyrics: { track: number, ms: number, txt: string }[];
+	lyricstrack: { track: number, ms: number, txt: string }[];
 	key: number;
 	mode: number;
 	startMeter: { count: number, division: number };
@@ -108,7 +108,7 @@ type MIDISongData = {
 function round1000(nn: number): number {
 	return Math.round(1000 * nn) / 1000;
 }
-function findMeasureSkipByTime64(cmnt:string,time: number, measures: Zvoog_SongMeasure[]): null | { idx: number, skip: Zvoog_Metre } {
+function findMeasureSkipByTime(cmnt:string,time: number, measures: Zvoog_SongMeasure[]): null | { idx: number, skip: Zvoog_Metre } {
 	let curTime = 0;
 	let mm = MMUtil();
 	for (let ii = 0; ii < measures.length; ii++) {
@@ -125,7 +125,7 @@ function findMeasureSkipByTime64(cmnt:string,time: number, measures: Zvoog_SongM
 				}*/
 			return {
 				idx: ii
-				, skip: mm.calculate(delta, cumea.tempo).strip(64)
+				, skip: mm.calculate(delta, cumea.tempo).strip(8)
 			};
 		}
 		curTime = curTime + measureDurationS;

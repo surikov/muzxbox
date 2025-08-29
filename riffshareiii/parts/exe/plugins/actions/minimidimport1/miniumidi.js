@@ -241,7 +241,8 @@ class MidiParser {
     dumpResolutionChanges() {
         this.midiheader.changesResolutionBPM = [];
         let tickResolution = this.midiheader.get0TickResolution();
-        this.midiheader.changesResolutionBPM.push({ track: -1, ms: -1, resolution: tickResolution, bpm: 120 });
+        let reChange = { track: -1, ms: -1, resolution: tickResolution, bpm: 120 };
+        this.midiheader.changesResolutionBPM.push(reChange);
         for (var t = 0; t < this.parsedTracks.length; t++) {
             var track = this.parsedTracks[t];
             let playTimeTicks = 0;
@@ -255,7 +256,13 @@ class MidiParser {
                     if (evnt.subtype === this.EVENT_META_SET_TEMPO) {
                         if (evnt.tempo) {
                             tickResolution = this.midiheader.getCalculatedTickResolution(evnt.tempo);
-                            this.midiheader.changesResolutionBPM.push({ track: t, ms: playTimeTicks, resolution: tickResolution, bpm: (evnt.tempoBPM) ? evnt.tempoBPM : 120 });
+                            let reChange = {
+                                track: t,
+                                ms: playTimeTicks,
+                                resolution: tickResolution,
+                                bpm: (evnt.tempoBPM) ? evnt.tempoBPM : 120
+                            };
+                            this.midiheader.changesResolutionBPM.push(reChange);
                         }
                     }
                 }
@@ -263,7 +270,7 @@ class MidiParser {
         }
         this.midiheader.changesResolutionBPM.sort((a, b) => { return a.ms - b.ms; });
     }
-    lastResolution(ms) {
+    findResolutionBefore(ms) {
         for (var i = this.midiheader.changesResolutionBPM.length - 1; i >= 0; i--) {
             if (this.midiheader.changesResolutionBPM[i].ms <= ms) {
                 return this.midiheader.changesResolutionBPM[i].resolution;
@@ -272,7 +279,7 @@ class MidiParser {
         return 0;
     }
     parseTicks2time(track) {
-        let tickResolution = this.lastResolution(0);
+        let tickResolution = this.findResolutionBefore(0);
         let playTimeTicks = 0;
         for (let e = 0; e < track.trackevents.length; e++) {
             let evnt = track.trackevents[e];
@@ -280,7 +287,7 @@ class MidiParser {
             if (evnt.delta)
                 curDelta = evnt.delta;
             let searchPlayTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
-            tickResolution = this.lastResolution(searchPlayTimeTicks);
+            tickResolution = this.findResolutionBefore(searchPlayTimeTicks);
             evnt.preTimeMs = playTimeTicks;
             playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
             evnt.playTimeMs = playTimeTicks;
@@ -641,6 +648,30 @@ class MidiParser {
             var e = this.nextEvent(stream);
             track.trackevents.push(e);
         }
+    }
+    dumpStatyistics() {
+        console.log('events stat');
+        let starts = [];
+        for (let pp = 0; pp < this.parsedTracks.length; pp++) {
+            let track = this.parsedTracks[pp];
+            for (let ss = 0; ss < track.trackChords.length; ss++) {
+                let chrd = track.trackChords[ss];
+                let strt = Math.round(chrd.startMs / 1) / 1000;
+                let xsts = false;
+                for (let exx = 0; exx < starts.length; exx++) {
+                    if (starts[exx].startms == strt) {
+                        starts[exx].count = starts[exx].count + chrd.tracknotes.length;
+                        xsts = true;
+                        break;
+                    }
+                }
+                if (!xsts) {
+                    starts.push({ startms: strt, count: chrd.tracknotes.length });
+                }
+            }
+        }
+        starts.sort((a, b) => { return a.startms - b.startms; });
+        console.log(starts);
     }
 }
 function firstDrumKeysArrayPercussionPaths(midi) {
@@ -1058,7 +1089,7 @@ class ChordPitchPerformerUtil {
 function round1000(nn) {
     return Math.round(1000 * nn) / 1000;
 }
-function findMeasureSkipByTime64(cmnt, time, measures) {
+function findMeasureSkipByTime(cmnt, time, measures) {
     let curTime = 0;
     let mm = MMUtil();
     for (let ii = 0; ii < measures.length; ii++) {
@@ -1071,7 +1102,7 @@ function findMeasureSkipByTime64(cmnt, time, measures) {
             }
             return {
                 idx: ii,
-                skip: mm.calculate(delta, cumea.tempo).strip(64)
+                skip: mm.calculate(delta, cumea.tempo).strip(8)
             };
         }
         curTime = curTime + measureDurationS;
@@ -1308,7 +1339,7 @@ class MIDIConverter {
             duration: 0,
             bpm: parser.midiheader.tempoBPM,
             changesData: parser.midiheader.changesResolutionBPM,
-            lyrics: parser.midiheader.lyricsList,
+            lyricstrack: parser.midiheader.lyricsList,
             key: parser.midiheader.keyFlatSharp,
             mode: parser.midiheader.keyMajMin,
             startMeter: { count: parser.midiheader.meterCount, division: parser.midiheader.meterDivision },
@@ -1450,7 +1481,7 @@ function findPreTempo(when, midiParser) {
     }
     return bpm;
 }
-function dumpStat(midiParser) {
+function _____dumpStat(midiParser) {
     let statArr = [];
     for (let tt = 0; tt < midiParser.parsedTracks.length; tt++) {
         let track = midiParser.parsedTracks[tt];
@@ -1514,7 +1545,7 @@ class Projectr {
     parseRawMIDIdata(arrayBuffer, title, comment) {
         var midiParser = newMIDIparser2(arrayBuffer);
         console.log('done midiParser', midiParser);
-        dumpStat(midiParser);
+        midiParser.dumpStatyistics();
         let cnvrtr = new MIDIConverter();
         let midiSongData = cnvrtr.convertProject(midiParser);
         console.log('done midiSongData', midiSongData);
@@ -1543,9 +1574,9 @@ class Projectr {
         for (let ii = 0; ii < project.timeline.length; ii++) {
             project.comments.push({ points: [] });
         }
-        for (let ii = 0; ii < midiSongData.lyrics.length; ii++) {
-            let textpoint = midiSongData.lyrics[ii];
-            let pnt = findMeasureSkipByTime64('lyrics', textpoint.ms / 1000, project.timeline);
+        for (let ii = 0; ii < midiSongData.lyricstrack.length; ii++) {
+            let textpoint = midiSongData.lyricstrack[ii];
+            let pnt = findMeasureSkipByTime('lyrics', textpoint.ms / 1000, project.timeline);
             if (pnt) {
                 this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
             }
@@ -1575,7 +1606,7 @@ class Projectr {
                 for (let vv = 0; vv < midiSongTrack.trackVolumes.length; vv++) {
                     let gain = midiSongTrack.trackVolumes[vv];
                     let vol = '' + Math.round(gain.value * 100) + '%';
-                    let pnt = findMeasureSkipByTime64('v' + ii, gain.ms / 1000, project.timeline);
+                    let pnt = findMeasureSkipByTime('v' + ii, gain.ms / 1000, project.timeline);
                     if (pnt) {
                         pnt.skip = MMUtil().set(pnt.skip).strip(16);
                         for (let aa = 0; aa < filterVolume.automation[pnt.idx].changes.length; aa++) {
@@ -2042,7 +2073,6 @@ class Projectr {
             }
         }
         this.limitShort(project);
-        this.dumpStartNoteStat(project);
         let len = project.timeline.length;
         for (let ii = len - 1; ii > 0; ii--) {
             if (this.isBarEmpty(ii, project)) {
@@ -2079,7 +2109,7 @@ class Projectr {
                 let measure = track.measures[mm];
                 for (let cc = 0; cc < measure.chords.length; cc++) {
                     let chord = measure.chords[cc];
-                    this.addStartOrIncreae(chord.skip, starts);
+                    this.addStartOrIncrese(chord.skip, starts);
                 }
             }
         }
@@ -2088,7 +2118,7 @@ class Projectr {
             for (let mm = 0; mm < drm.measures.length; mm++) {
                 let measure = drm.measures[mm];
                 for (let cc = 0; cc < measure.skips.length; cc++) {
-                    this.addStartOrIncreae(measure.skips[cc], starts);
+                    this.addStartOrIncrese(measure.skips[cc], starts);
                 }
             }
         }
@@ -2100,10 +2130,10 @@ class Projectr {
             smm = smm + starts[ii].count;
         }
         for (let ii = 0; ii < starts.length; ii++) {
-            console.log(Math.round(10000 * starts[ii].count / smm) / 100, ':', starts[ii].skip.count, '/', starts[ii].skip.part);
+            console.log(starts[ii].count, '' + Math.round(100 * starts[ii].count / smm) + '%:', starts[ii].skip.count, '/', starts[ii].skip.part);
         }
     }
-    addStartOrIncreae(probe, starts) {
+    addStartOrIncrese(probe, starts) {
         let start = MMUtil().set(probe);
         for (let ii = 0; ii < starts.length; ii++) {
             let it = starts[ii];
@@ -2118,7 +2148,7 @@ class Projectr {
         let rr = 1;
         return Math.round(nn * rr);
     }
-    shiftForwar32(project, amount) {
+    shiftForward(project, amount) {
         for (let mm = project.timeline.length - 2; mm >= 0; mm--) {
             let measureDuration = MMUtil().set(project.timeline[mm].metre);
             for (let tt = 0; tt < project.tracks.length; tt++) {
@@ -2127,7 +2157,7 @@ class Projectr {
                 let trackNextMeasure = track.measures[mm + 1];
                 for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
                     let chord = trackMeasure.chords[cc];
-                    let newSkip = MMUtil().set(chord.skip).plus({ count: amount, part: 32 });
+                    let newSkip = MMUtil().set(chord.skip).plus(amount);
                     if (measureDuration.more(newSkip)) {
                         chord.skip = newSkip.simplyfy();
                     }
@@ -2144,7 +2174,7 @@ class Projectr {
                 let sampleMeasure = sampleTrack.measures[mm];
                 let sampleNextMeasure = sampleTrack.measures[mm + 1];
                 for (let mp = 0; mp < sampleMeasure.skips.length; mp++) {
-                    let newSkip = MMUtil().set(sampleMeasure.skips[mp]).plus({ count: amount, part: 32 });
+                    let newSkip = MMUtil().set(sampleMeasure.skips[mp]).plus(amount);
                     if (measureDuration.more(newSkip)) {
                         sampleMeasure.skips[mp] = newSkip.simplyfy();
                     }
@@ -2160,7 +2190,7 @@ class Projectr {
                 let comNextMeasure = project.comments[mm + 1];
                 for (let pp = 0; pp < comMeasure.points.length; pp++) {
                     let point = comMeasure.points[pp];
-                    let newSkip = MMUtil().set(point.skip).plus({ count: amount, part: 32 });
+                    let newSkip = MMUtil().set(point.skip).plus(amount);
                     if (measureDuration.more(newSkip)) {
                         point.skip = newSkip.simplyfy();
                     }
@@ -2177,7 +2207,7 @@ class Projectr {
                 let autoNextMeasure = project.filters[ff].automation[mm + 1];
                 for (let cc = 0; cc < autoMeasure.changes.length; cc++) {
                     let change = autoMeasure.changes[cc];
-                    let newSkip = MMUtil().set(change.skip).plus({ count: amount, part: 32 });
+                    let newSkip = MMUtil().set(change.skip).plus(amount);
                     if (measureDuration.more(newSkip)) {
                         change.skip = newSkip.simplyfy();
                     }

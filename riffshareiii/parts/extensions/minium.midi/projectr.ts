@@ -1,9 +1,10 @@
 class Projectr {
 	parseRawMIDIdata(arrayBuffer: ArrayBuffer, title: string, comment: string): Zvoog_Project {
 
-		var midiParser = newMIDIparser2(arrayBuffer);
+		var midiParser:MidiParser = newMIDIparser2(arrayBuffer);
 		console.log('done midiParser', midiParser);
-		dumpStat(midiParser);
+		midiParser.dumpStatyistics();
+
 		//me.parsedProject = midiParser.convertProject(title, comment);
 		let cnvrtr: MIDIConverter = new MIDIConverter();
 
@@ -42,9 +43,9 @@ class Projectr {
 			project.comments.push({ points: [] });
 		}
 
-		for (let ii = 0; ii < midiSongData.lyrics.length; ii++) {
-			let textpoint = midiSongData.lyrics[ii];
-			let pnt = findMeasureSkipByTime64('lyrics', textpoint.ms / 1000, project.timeline);
+		for (let ii = 0; ii < midiSongData.lyricstrack.length; ii++) {
+			let textpoint = midiSongData.lyricstrack[ii];
+			let pnt = findMeasureSkipByTime('lyrics', textpoint.ms / 1000, project.timeline);
 			if (pnt) {
 				//console.log(pnt.skip, textpoint.ms, textpoint.txt);
 				this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt, project.timeline[pnt.idx].tempo);
@@ -76,7 +77,7 @@ class Projectr {
 				for (let vv = 0; vv < midiSongTrack.trackVolumes.length; vv++) {
 					let gain = midiSongTrack.trackVolumes[vv];
 					let vol = '' + Math.round(gain.value * 100) + '%';
-					let pnt = findMeasureSkipByTime64('v' + ii, gain.ms / 1000, project.timeline);
+					let pnt = findMeasureSkipByTime('v' + ii, gain.ms / 1000, project.timeline);
 
 					//
 					if (pnt) {
@@ -159,7 +160,11 @@ class Projectr {
 					&& (project.timeline[0].metre.count / project.timeline[0].metre.part == 1)
 					;
 		*/
+		//dumpStat(midiParser);
+		
 		this.trimProject(project);//, needSlice);
+
+		//this.dumpStartNoteStat(project);
 
 		return project;
 	}
@@ -248,7 +253,7 @@ class Projectr {
 		if (startMs < nextChange.ms && nextChange.ms < startMs + partDurationMs) {
 			let diffMs = nextChange.ms - startMs;
 			let ratio = diffMs / partDurationMs;
-			let newPart = ratio * part
+			let newPart = ratio * part;
 			let newPartDurationMs = newPart * wholeDurationMs;
 			let remainsMs = this.calcMeasureDuration(midiSongData, meter, nextChange.bpm, part - newPart, nextChange.ms);
 			return newPartDurationMs + remainsMs;
@@ -719,7 +724,7 @@ class Projectr {
 		
 				}
 		*/
-		this.dumpStartNoteStat(project);
+
 		let len = project.timeline.length;
 		for (let ii = len - 1; ii > 0; ii--) {
 			if (this.isBarEmpty(ii, project)) {
@@ -758,16 +763,16 @@ class Projectr {
 				let measure = track.measures[mm];
 				for (let cc = 0; cc < measure.chords.length; cc++) {
 					let chord = measure.chords[cc];
-					this.addStartOrIncreae(chord.skip, starts);
+					this.addStartOrIncrese(chord.skip, starts);
 				}
 			}
 		}
-		for(let ss=0;ss<project.percussions.length;ss++){
-			let drm=project.percussions[ss];
+		for (let ss = 0; ss < project.percussions.length; ss++) {
+			let drm = project.percussions[ss];
 			for (let mm = 0; mm < drm.measures.length; mm++) {
 				let measure = drm.measures[mm];
 				for (let cc = 0; cc < measure.skips.length; cc++) {
-					this.addStartOrIncreae(measure.skips[cc], starts);
+					this.addStartOrIncrese(measure.skips[cc], starts);
 				}
 			}
 		}
@@ -790,10 +795,11 @@ class Projectr {
 			smm = smm + starts[ii].count;
 		}
 		for (let ii = 0; ii < starts.length; ii++) {
-			console.log(Math.round(10000 * starts[ii].count / smm) / 100, ':', starts[ii].skip.count, '/', starts[ii].skip.part);
+			//console.log(starts[ii].count,Math.round(10000 * starts[ii].count / smm) / 100, '%:', starts[ii].skip.count, '/', starts[ii].skip.part);
+			console.log(starts[ii].count, '' + Math.round(100*starts[ii].count / smm) + '%:', starts[ii].skip.count, '/', starts[ii].skip.part);
 		}
 	}
-	addStartOrIncreae(probe: Zvoog_Metre, starts: { skip: Zvoog_Metre, count: number }[]) {
+	addStartOrIncrese(probe: Zvoog_Metre, starts: { skip: Zvoog_Metre, count: number }[]) {
 		let start = MMUtil().set(probe);
 		for (let ii = 0; ii < starts.length; ii++) {
 			let it = starts[ii];
@@ -885,7 +891,8 @@ class Projectr {
 	}
 
 
-	shiftForwar32(project: Zvoog_Project, amount: number) {
+	//shiftForwar32(project: Zvoog_Project, amount: number) {
+	shiftForward(project: Zvoog_Project, amount: Zvoog_Metre) {
 		for (let mm = project.timeline.length - 2; mm >= 0; mm--) {
 			let measureDuration = MMUtil().set(project.timeline[mm].metre);
 			for (let tt = 0; tt < project.tracks.length; tt++) {
@@ -894,7 +901,7 @@ class Projectr {
 				let trackNextMeasure = track.measures[mm + 1];
 				for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
 					let chord = trackMeasure.chords[cc];
-					let newSkip = MMUtil().set(chord.skip).plus({ count: amount, part: 32 });
+					let newSkip = MMUtil().set(chord.skip).plus(amount);
 					if (measureDuration.more(newSkip)) {
 						chord.skip = newSkip.simplyfy();
 					} else {
@@ -910,7 +917,7 @@ class Projectr {
 				let sampleMeasure = sampleTrack.measures[mm];
 				let sampleNextMeasure = sampleTrack.measures[mm + 1];
 				for (let mp = 0; mp < sampleMeasure.skips.length; mp++) {
-					let newSkip = MMUtil().set(sampleMeasure.skips[mp]).plus({ count: amount, part: 32 });
+					let newSkip = MMUtil().set(sampleMeasure.skips[mp]).plus(amount);
 					if (measureDuration.more(newSkip)) {
 						sampleMeasure.skips[mp] = newSkip.simplyfy();
 					} else {
@@ -925,7 +932,7 @@ class Projectr {
 				let comNextMeasure = project.comments[mm + 1];
 				for (let pp = 0; pp < comMeasure.points.length; pp++) {
 					let point = comMeasure.points[pp];
-					let newSkip = MMUtil().set(point.skip).plus({ count: amount, part: 32 });
+					let newSkip = MMUtil().set(point.skip).plus(amount);
 					if (measureDuration.more(newSkip)) {
 						point.skip = newSkip.simplyfy();
 					} else {
@@ -941,7 +948,7 @@ class Projectr {
 				let autoNextMeasure = project.filters[ff].automation[mm + 1];
 				for (let cc = 0; cc < autoMeasure.changes.length; cc++) {
 					let change = autoMeasure.changes[cc];
-					let newSkip = MMUtil().set(change.skip).plus({ count: amount, part: 32 });
+					let newSkip = MMUtil().set(change.skip).plus(amount);
 					if (measureDuration.more(newSkip)) {
 						change.skip = newSkip.simplyfy();
 					} else {
@@ -974,6 +981,8 @@ class Projectr {
 		}
 		return true;
 	}
+
+
 
 }
 

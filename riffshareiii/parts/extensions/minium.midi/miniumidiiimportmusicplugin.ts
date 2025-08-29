@@ -86,6 +86,6 @@ class MINIUMIDIIImportMusicPlugin {
 
 }
 
-function newMIDIparser2(arrayBuffer: ArrayBuffer) {
+function newMIDIparser2(arrayBuffer: ArrayBuffer):MidiParser {
 	return new MidiParser(arrayBuffer);
 }

@@ -1608,12 +1608,58 @@ function test4(){
 	console.log(cntx,cless,cmore,cmore/cntx);
 }
 */
+function yetAnotherStat(){
+	let cnts:number[]=[];
+	for(let ii=1;ii<datarows.length;ii++){
+		let nn=datarows[ii].balls[0];
+		if(!(cnts[nn]))cnts[nn]=0;
+		cnts[nn]++;
+	}
+	console.log('empty left',cnts);
+	for(let ii=0;ii<cnts.length;ii++){
+		console.log(ii,cnts[ii]/datarows.length);
+	}
+}
+function anotherStat(){
+	//let randProbe:number[]=[];
+	let sz=15;
+	let ln=4321;
+	let sm0=0;
+	let sm1=0;
+	let sm2=0;
+	let sm3=0;
+	let sm4=0;
+	let sm5=0;
+	let sm6=0;
+	for(let rn=1;rn<ln;rn++){
+		//let rn=1+Math.floor(Math.random()*datarows.length-1);
+		let hitCount=0;
+		for(let ii=0;ii<sz;ii++){
+			let nxt=1+Math.floor(Math.random()*rowLen);
+			//console.log(nxt);
+			if(ballExists(nxt,datarows[rn])){
+				hitCount++;
+			}
+		}
+		if(hitCount==0)sm0++;
+		if(hitCount==1)sm1++;
+		if(hitCount==2)sm2++;
+		if(hitCount==3)sm3++;
+		if(hitCount==4)sm4++;
+		if(hitCount==5)sm5++;
+		if(hitCount==6)sm6++;
+		//sm=sm+hitCount;
+		//if(hitCount>ballsInRow)console.log(rn,':',hitCount);
+	}
+	console.log('random',sz,ln,'0-6:',sm0/ln,sm1/ln,sm2/ln,sm3/ln,sm4/ln,sm5/ln,sm6/ln);
+}
+
 init();
 addTails();
 //dumpPairsCounts();
 //let chk=randBalls(20);
-
-
+//anotherStat();
+//yetAnotherStat();
 console.log(datarows);
 //test4();
 /*

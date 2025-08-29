@@ -6,7 +6,7 @@ class MIDIConverter {
 			, duration: 0
 			, bpm: parser.midiheader.tempoBPM
 			, changesData: parser.midiheader.changesResolutionBPM
-			, lyrics: parser.midiheader.lyricsList
+			, lyricstrack: parser.midiheader.lyricsList
 			, key: parser.midiheader.keyFlatSharp
 			, mode: parser.midiheader.keyMajMin
 			, startMeter: { count: parser.midiheader.meterCount, division: parser.midiheader.meterDivision }
@@ -177,7 +177,8 @@ function findPreTempo(when: number, midiParser: MidiParser): number {
 	}
 	return bpm;
 }
-function dumpStat(midiParser: MidiParser) {
+
+function _____dumpStat(midiParser: MidiParser) {
 	//console.log('dumpStat');
 	let statArr: StatWhen[] = [];
 	for (let tt = 0; tt < midiParser.parsedTracks.length; tt++) {
