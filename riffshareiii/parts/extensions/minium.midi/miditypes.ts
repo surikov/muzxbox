@@ -94,7 +94,7 @@ type MIDISongData = {
 	duration: number;
 	parser: string;
 	bpm: number;
-	changesData: { track: number, ms: number, resolution: number, bpm: number }[];
+	changesData: { track: number, ms: number, newresolution: number, bpm: number }[];
 	metersData: { track: number, ms: number, count: number, division: number }[];
 	lyricstrack: { track: number, ms: number, txt: string }[];
 	key: number;
@@ -211,7 +211,7 @@ class MIDIFileHeader {
 	format: number;
 	trackCount: number;
 	tempoBPM: number = 120;
-	changesResolutionBPM: { track: number, ms: number, resolution: number, bpm: number }[] = [];
+	changesResolutionBPM: { track: number, ms: number, newresolution: number, bpm: number,evnt:MIDIEvent|null }[] = [];
 	metersList: { track: number, ms: number, count: number, division: number }[] = [];
 	lyricsList: { track: number, ms: number, txt: string }[] = [];
 	signsList: { track: number, ms: number, sign: string }[] = [];

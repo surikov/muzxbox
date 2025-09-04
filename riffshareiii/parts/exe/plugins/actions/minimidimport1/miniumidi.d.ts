@@ -281,6 +281,10 @@ declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string
 declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
+declare type TicksAverageTime = {
+    avgstartms: number;
+    items: number[];
+};
 declare class MidiParser {
     midiheader: MIDIFileHeader;
     parsedTracks: MIDIFileTrack[];
@@ -352,7 +356,8 @@ declare class MidiParser {
     parseNotes(): void;
     nextEvent(stream: DataViewStream): MIDIEvent;
     parseTrackEvents(track: MIDIFileTrack): void;
-    dumpStatyistics(): void;
+    findNearestAvgTick(ms: number, stat: TicksAverageTime[]): number;
+    dumpStartStatistics(): TicksAverageTime[];
 }
 declare function firstDrumKeysArrayPercussionPaths(midi: number): number;
 declare function allPercussionDrumTitles(): string[];
@@ -465,7 +470,7 @@ declare type MIDISongData = {
     changesData: {
         track: number;
         ms: number;
-        resolution: number;
+        newresolution: number;
         bpm: number;
     }[];
     metersData: {
@@ -520,8 +525,9 @@ declare class MIDIFileHeader {
     changesResolutionBPM: {
         track: number;
         ms: number;
-        resolution: number;
+        newresolution: number;
         bpm: number;
+        evnt: MIDIEvent | null;
     }[];
     metersList: {
         track: number;
@@ -613,7 +619,6 @@ declare function findPreMeter(when: number, midiParser: MidiParser): {
     part: number;
 };
 declare function findPreTempo(when: number, midiParser: MidiParser): number;
-declare function _____dumpStat(midiParser: MidiParser): void;
 declare class Projectr {
     parseRawMIDIdata(arrayBuffer: ArrayBuffer, title: string, comment: string): Zvoog_Project;
     readProject(midiSongData: MIDISongData, title: string, comment: string): Zvoog_Project;
@@ -622,7 +627,7 @@ declare class Projectr {
     findLastChange(midiSongData: MIDISongData, beforeMs: number): {
         track: number;
         ms: number;
-        resolution: number;
+        newresolution: number;
         bpm: number;
     };
     findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): Zvoog_Metre;
@@ -630,7 +635,7 @@ declare class Projectr {
     findNextChange(midiSongData: MIDISongData, afterMs: number): {
         track: number;
         ms: number;
-        resolution: number;
+        newresolution: number;
         bpm: number;
     };
     addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string, tempo: number): void;

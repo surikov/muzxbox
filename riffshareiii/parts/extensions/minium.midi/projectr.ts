@@ -3,7 +3,7 @@ class Projectr {
 
 		var midiParser:MidiParser = newMIDIparser2(arrayBuffer);
 		console.log('done midiParser', midiParser);
-		midiParser.dumpStatyistics();
+		midiParser.dumpStartStatistics();
 
 		//me.parsedProject = midiParser.convertProject(title, comment);
 		let cnvrtr: MIDIConverter = new MIDIConverter();
@@ -213,8 +213,8 @@ class Projectr {
 	}
 
 
-	findLastChange(midiSongData: MIDISongData, beforeMs: number): { track: number, ms: number, resolution: number, bpm: number } {
-		let nextChange: { track: number, ms: number, resolution: number, bpm: number } = { track: 0, ms: 0, resolution: 0, bpm: 120 };
+	findLastChange(midiSongData: MIDISongData, beforeMs: number): { track: number, ms: number, newresolution: number, bpm: number } {
+		let nextChange: { track: number, ms: number, newresolution: number, bpm: number } = { track: 0, ms: 0, newresolution: 0, bpm: 120 };
 		for (let ii = 1; ii < midiSongData.changesData.length; ii++) {
 			//if (midiSongData.changes[ii].ms > beforeMs + 1) {
 			if (midiSongData.changesData[ii].ms > beforeMs + 100) {
@@ -262,8 +262,8 @@ class Projectr {
 		}
 	}
 
-	findNextChange(midiSongData: MIDISongData, afterMs: number): { track: number, ms: number, resolution: number, bpm: number } {
-		let nextChange: { track: number, ms: number, resolution: number, bpm: number } = { track: 0, ms: 0, resolution: 0, bpm: 120 };
+	findNextChange(midiSongData: MIDISongData, afterMs: number): { track: number, ms: number, newresolution: number, bpm: number } {
+		let nextChange: { track: number, ms: number, newresolution: number, bpm: number } = { track: 0, ms: 0, newresolution: 0, bpm: 120 };
 		for (let ii = 1; ii < midiSongData.changesData.length; ii++) {
 			if (midiSongData.changesData[ii].ms > afterMs) {
 				nextChange = midiSongData.changesData[ii];

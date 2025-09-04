@@ -1,11 +1,12 @@
+type TicksAverageTime = { avgstartms: number, items: number[] };
 class MidiParser {
 	midiheader: MIDIFileHeader;
 	parsedTracks: MIDIFileTrack[];
 	instrumentNamesArray: string[] = [];
 	drumNamesArray: string[] = [];
-	EVENT_META: number = 0xff;
-	EVENT_SYSEX: number = 0xf0;
-	EVENT_DIVSYSEX: number = 0xf7;
+	EVENT_META: number = 0xff;//255
+	EVENT_SYSEX: number = 0xf0;//240
+	EVENT_DIVSYSEX: number = 0xf7;//247
 	EVENT_MIDI: number = 0x8;
 	// Meta event types https://www.recordingblogs.com/wiki/midi-meta-messages
 	EVENT_META_SEQUENCE_NUMBER: number = 0x00;//
@@ -16,21 +17,21 @@ class MidiParser {
 	EVENT_META_LYRICS: number = 0x05;
 	EVENT_META_MARKER: number = 0x06;
 	EVENT_META_CUE_POINT: number = 0x07;
-	EVENT_META_MIDI_CHANNEL_PREFIX: number = 0x20;//https://www.recordingblogs.com/wiki/midi-channel-prefix-meta-message
-	EVENT_META_END_OF_TRACK: number = 0x2f;
-	EVENT_META_SET_TEMPO: number = 0x51;
-	EVENT_META_SMTPE_OFFSET: number = 0x54;
-	EVENT_META_TIME_SIGNATURE: number = 0x58;//https://www.recordingblogs.com/wiki/midi-time-signature-meta-message
-	EVENT_META_KEY_SIGNATURE: number = 0x59;//https://www.recordingblogs.com/wiki/midi-key-signature-meta-message
-	EVENT_META_SEQUENCER_SPECIFIC: number = 0x7f;
+	EVENT_META_MIDI_CHANNEL_PREFIX: number = 0x20;//32 https://www.recordingblogs.com/wiki/midi-channel-prefix-meta-message
+	EVENT_META_END_OF_TRACK: number = 0x2f;//47
+	EVENT_META_SET_TEMPO: number = 0x51;//81
+	EVENT_META_SMTPE_OFFSET: number = 0x54;//84
+	EVENT_META_TIME_SIGNATURE: number = 0x58;//88 https://www.recordingblogs.com/wiki/midi-time-signature-meta-message
+	EVENT_META_KEY_SIGNATURE: number = 0x59;//89 https://www.recordingblogs.com/wiki/midi-key-signature-meta-message
+	EVENT_META_SEQUENCER_SPECIFIC: number = 0x7f;//127
 	// MIDI event types
 	EVENT_MIDI_NOTE_OFF: number = 0x8;
 	EVENT_MIDI_NOTE_ON: number = 0x9;
-	EVENT_MIDI_NOTE_AFTERTOUCH: number = 0xa;
-	EVENT_MIDI_CONTROLLER: number = 0xb;
-	EVENT_MIDI_PROGRAM_CHANGE: number = 0xc;
-	EVENT_MIDI_CHANNEL_AFTERTOUCH: number = 0xd;
-	EVENT_MIDI_PITCH_BEND: number = 0xe;
+	EVENT_MIDI_NOTE_AFTERTOUCH: number = 0xa;//10
+	EVENT_MIDI_CONTROLLER: number = 0xb;//11
+	EVENT_MIDI_PROGRAM_CHANGE: number = 0xc;//12
+	EVENT_MIDI_CHANNEL_AFTERTOUCH: number = 0xd;//13
+	EVENT_MIDI_PITCH_BEND: number = 0xe;//14
 	midiEventType: number = 0;
 	midiEventChannel: number = 0;
 	midiEventParam1: number = 0;
@@ -41,21 +42,21 @@ class MidiParser {
 	controller_coarseDataEntrySlider: number = 0x06;//6
 	controller_coarseVolume: number = 0x07;
 	controller_ballance: number = 0x08;
-	controller_pan: number = 0x0A;
-	controller_expression: number = 0x0B;
-	controller_BankSelectLSBGS: number = 0x20;
+	controller_pan: number = 0x0A;//10
+	controller_expression: number = 0x0B;//11
+	controller_BankSelectLSBGS: number = 0x20;//32
 	controller_fineDataEntrySlider: number = 0x26;//38
-	controller_ReverbLevel = 0x5B;
-	controller_HoldPedal1 = 0x40;
-	controller_TremoloDepth = 0x5C;
-	controller_ChorusLevel = 0x5D;
-	controller_NRPNParameterLSB: number = 0x62;
-	controller_NRPNParameterMSB: number = 0x63;
+	controller_ReverbLevel = 0x5B;//91
+	controller_HoldPedal1 = 0x40;//64
+	controller_TremoloDepth = 0x5C;//92
+	controller_ChorusLevel = 0x5D;//93
+	controller_NRPNParameterLSB: number = 0x62;//98
+	controller_NRPNParameterMSB: number = 0x63;//99
 
 	controller_fineRPN: number = 0x64;//100
 	controller_coarseRPN: number = 0x65;//101
 
-	controller_ResetAllControllers: number = 0x79;
+	controller_ResetAllControllers: number = 0x79;//121
 
 
 	constructor(arrayBuffer: ArrayBuffer) {
@@ -269,25 +270,27 @@ class MidiParser {
 	dumpResolutionChanges(): void {
 		this.midiheader.changesResolutionBPM = [];
 		let tickResolution: number = this.midiheader.get0TickResolution();
-		let reChange = { track: -1, ms: -1, resolution: tickResolution, bpm: 120 };
+		let reChange = { track: -1, ms: -1, newresolution: tickResolution, bpm: 120, evnt: null };
 		this.midiheader.changesResolutionBPM.push(reChange);
 		for (var t = 0; t < this.parsedTracks.length; t++) {
 			var track: MIDIFileTrack = this.parsedTracks[t];
-			let playTimeTicks: number = 0;
+			//let playTimeTicks: number = 0;
 			for (var e = 0; e < track.trackevents.length; e++) {
-				var evnt = track.trackevents[e];
+				var cuevnt = track.trackevents[e];
 				let curDelta: number = 0.0;
-				if (evnt.delta) curDelta = evnt.delta;
-				playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
-				if (evnt.basetype === this.EVENT_META) {
-					if (evnt.subtype === this.EVENT_META_SET_TEMPO) {
-						if (evnt.tempo) {
-							tickResolution = this.midiheader.getCalculatedTickResolution(evnt.tempo);
+				if (cuevnt.delta) curDelta = cuevnt.delta;
+				//playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
+				if (cuevnt.basetype === this.EVENT_META) {
+					if (cuevnt.subtype === this.EVENT_META_SET_TEMPO) {
+						if (cuevnt.tempo) {
+							tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo);
 							let reChange = {
 								track: t
-								, ms: playTimeTicks
-								, resolution: tickResolution
-								, bpm: (evnt.tempoBPM) ? evnt.tempoBPM : 120
+								//, ms: playTimeTicks
+								,ms:cuevnt.playTimeMs
+								, newresolution: tickResolution
+								, bpm: (cuevnt.tempoBPM) ? cuevnt.tempoBPM : 120
+								, evnt: cuevnt
 							};
 							this.midiheader.changesResolutionBPM.push(reChange);
 						}
@@ -300,7 +303,7 @@ class MidiParser {
 	findResolutionBefore(ms: number): number {
 		for (var i = this.midiheader.changesResolutionBPM.length - 1; i >= 0; i--) {
 			if (this.midiheader.changesResolutionBPM[i].ms <= ms) {
-				return this.midiheader.changesResolutionBPM[i].resolution
+				return this.midiheader.changesResolutionBPM[i].newresolution
 			}
 		}
 		return 0;
@@ -700,16 +703,72 @@ class MidiParser {
 	}
 
 
+	findNearestAvgTick(ms: number, stat: TicksAverageTime[]): number {
+		let foundDiff = 1234567890;
+		let fountMs = 0;
+		for (let ii = 0; ii < stat.length; ii++) {
+			let cuDiff = Math.abs(stat[ii].avgstartms - ms);
+			if (foundDiff > cuDiff) {
+				foundDiff = cuDiff;
+				fountMs = stat[ii].avgstartms;
+			}
+		}
+		return fountMs;
+	}
+	dumpStartStatistics(): TicksAverageTime[] {
+		console.log('dumpStartStatistics');
+		let sortedStarts: { startms: number, count: number }[] = [];
 
-	dumpStatyistics() {
-		console.log('events stat');
-		let starts: { startms: number, count: number }[] = [];
 		for (let pp = 0; pp < this.parsedTracks.length; pp++) {
 			let track = this.parsedTracks[pp];
-
 			for (let ss = 0; ss < track.trackChords.length; ss++) {
 				let chrd = track.trackChords[ss];
-				let strt = Math.round(chrd.startMs / 1) / 1000;
+				//let strt = chrd.startMs / 1000;
+				let strt = chrd.startMs;
+				sortedStarts.push({ startms: strt, count: chrd.tracknotes.length });
+			}
+		}
+		sortedStarts.sort((a, b) => { return a.startms - b.startms; });
+
+		let adjustedStarts: TicksAverageTime[] = [{ avgstartms: 0, items: [0] }];
+		let pluckDiff = 50;
+		for (let ii = 0; ii < sortedStarts.length; ii++) {
+			let cuStart = sortedStarts[ii];
+			if (adjustedStarts.length < 1) {
+				adjustedStarts.push({ avgstartms: cuStart.startms, items: [cuStart.startms] });
+			} else {
+				let lastStart = adjustedStarts[adjustedStarts.length - 1];
+				let lastItem = lastStart.items[lastStart.items.length - 1];
+				if (cuStart.startms < lastItem + pluckDiff) {
+					lastStart.items.push(cuStart.startms);
+				} else {
+					adjustedStarts.push({ avgstartms: cuStart.startms, items: [cuStart.startms] });
+				}
+			}
+		}
+
+		for (let ii = 0; ii < adjustedStarts.length; ii++) {
+			let one = adjustedStarts[ii];
+			let sm = 0;
+			for (let tt = 0; tt < one.items.length; tt++) {
+				sm = sm + one.items[tt];
+			}
+			one.avgstartms = sm / one.items.length;
+		}
+
+		for (let pp = 0; pp < this.parsedTracks.length; pp++) {
+			let track = this.parsedTracks[pp];
+			for (let ss = 0; ss < track.trackChords.length; ss++) {
+				let chrd = track.trackChords[ss];
+				chrd.startMs=this.findNearestAvgTick(chrd.startMs, adjustedStarts);
+			}
+		}
+
+		/*for (let pp = 0; pp < this.parsedTracks.length; pp++) {
+			let track = this.parsedTracks[pp];
+			for (let ss = 0; ss < track.trackChords.length; ss++) {
+				let chrd = track.trackChords[ss];
+				let strt = Math.round(chrd.startMs) / 1000;
 				let xsts = false;
 				for (let exx = 0; exx < starts.length; exx++) {
 					if (starts[exx].startms == strt) {
@@ -723,9 +782,26 @@ class MidiParser {
 					starts.push({ startms: strt, count: chrd.tracknotes.length });
 				}
 			}
+		}*/
+
+		console.log('tempo');
+		for (let ii = 0; ii < this.midiheader.changesResolutionBPM.length; ii++) {
+			let it = this.midiheader.changesResolutionBPM[ii];
+			let tick = this.findNearestAvgTick(it.ms, adjustedStarts);
+			console.log(ii, it.bpm, it.ms, '->', tick);
+			it.ms=tick;
 		}
-		starts.sort((a, b) => { return a.startms - b.startms; });
-		console.log(starts);
+		console.log('meter');
+		for (let ii = 0; ii < this.midiheader.metersList.length; ii++) {
+			let it = this.midiheader.metersList[ii];
+			let tick = this.findNearestAvgTick(it.ms, adjustedStarts);
+			console.log(ii, '' + it.count + '/' + it.division, it.ms, '->', tick);
+			it.ms=tick;
+		}
+
+		console.log(adjustedStarts);
+
+		return adjustedStarts;
 	}
 
 

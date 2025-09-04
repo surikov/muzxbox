@@ -177,7 +177,7 @@ function findPreTempo(when: number, midiParser: MidiParser): number {
 	}
 	return bpm;
 }
-
+/*
 function _____dumpStat(midiParser: MidiParser) {
 	//console.log('dumpStat');
 	let statArr: StatWhen[] = [];
@@ -258,3 +258,4 @@ function _____dumpStat(midiParser: MidiParser) {
 
 	}
 }
+*/

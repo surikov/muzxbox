@@ -241,26 +241,25 @@ class MidiParser {
     dumpResolutionChanges() {
         this.midiheader.changesResolutionBPM = [];
         let tickResolution = this.midiheader.get0TickResolution();
-        let reChange = { track: -1, ms: -1, resolution: tickResolution, bpm: 120 };
+        let reChange = { track: -1, ms: -1, newresolution: tickResolution, bpm: 120, evnt: null };
         this.midiheader.changesResolutionBPM.push(reChange);
         for (var t = 0; t < this.parsedTracks.length; t++) {
             var track = this.parsedTracks[t];
-            let playTimeTicks = 0;
             for (var e = 0; e < track.trackevents.length; e++) {
-                var evnt = track.trackevents[e];
+                var cuevnt = track.trackevents[e];
                 let curDelta = 0.0;
-                if (evnt.delta)
-                    curDelta = evnt.delta;
-                playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
-                if (evnt.basetype === this.EVENT_META) {
-                    if (evnt.subtype === this.EVENT_META_SET_TEMPO) {
-                        if (evnt.tempo) {
-                            tickResolution = this.midiheader.getCalculatedTickResolution(evnt.tempo);
+                if (cuevnt.delta)
+                    curDelta = cuevnt.delta;
+                if (cuevnt.basetype === this.EVENT_META) {
+                    if (cuevnt.subtype === this.EVENT_META_SET_TEMPO) {
+                        if (cuevnt.tempo) {
+                            tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo);
                             let reChange = {
                                 track: t,
-                                ms: playTimeTicks,
-                                resolution: tickResolution,
-                                bpm: (evnt.tempoBPM) ? evnt.tempoBPM : 120
+                                ms: cuevnt.playTimeMs,
+                                newresolution: tickResolution,
+                                bpm: (cuevnt.tempoBPM) ? cuevnt.tempoBPM : 120,
+                                evnt: cuevnt
                             };
                             this.midiheader.changesResolutionBPM.push(reChange);
                         }
@@ -273,7 +272,7 @@ class MidiParser {
     findResolutionBefore(ms) {
         for (var i = this.midiheader.changesResolutionBPM.length - 1; i >= 0; i--) {
             if (this.midiheader.changesResolutionBPM[i].ms <= ms) {
-                return this.midiheader.changesResolutionBPM[i].resolution;
+                return this.midiheader.changesResolutionBPM[i].newresolution;
             }
         }
         return 0;
@@ -649,29 +648,79 @@ class MidiParser {
             track.trackevents.push(e);
         }
     }
-    dumpStatyistics() {
-        console.log('events stat');
-        let starts = [];
+    findNearestAvgTick(ms, stat) {
+        let foundDiff = 1234567890;
+        let fountMs = 0;
+        for (let ii = 0; ii < stat.length; ii++) {
+            let cuDiff = Math.abs(stat[ii].avgstartms - ms);
+            if (foundDiff > cuDiff) {
+                foundDiff = cuDiff;
+                fountMs = stat[ii].avgstartms;
+            }
+        }
+        return fountMs;
+    }
+    dumpStartStatistics() {
+        console.log('dumpStartStatistics');
+        let sortedStarts = [];
         for (let pp = 0; pp < this.parsedTracks.length; pp++) {
             let track = this.parsedTracks[pp];
             for (let ss = 0; ss < track.trackChords.length; ss++) {
                 let chrd = track.trackChords[ss];
-                let strt = Math.round(chrd.startMs / 1) / 1000;
-                let xsts = false;
-                for (let exx = 0; exx < starts.length; exx++) {
-                    if (starts[exx].startms == strt) {
-                        starts[exx].count = starts[exx].count + chrd.tracknotes.length;
-                        xsts = true;
-                        break;
-                    }
+                let strt = chrd.startMs;
+                sortedStarts.push({ startms: strt, count: chrd.tracknotes.length });
+            }
+        }
+        sortedStarts.sort((a, b) => { return a.startms - b.startms; });
+        let adjustedStarts = [{ avgstartms: 0, items: [0] }];
+        let pluckDiff = 50;
+        for (let ii = 0; ii < sortedStarts.length; ii++) {
+            let cuStart = sortedStarts[ii];
+            if (adjustedStarts.length < 1) {
+                adjustedStarts.push({ avgstartms: cuStart.startms, items: [cuStart.startms] });
+            }
+            else {
+                let lastStart = adjustedStarts[adjustedStarts.length - 1];
+                let lastItem = lastStart.items[lastStart.items.length - 1];
+                if (cuStart.startms < lastItem + pluckDiff) {
+                    lastStart.items.push(cuStart.startms);
                 }
-                if (!xsts) {
-                    starts.push({ startms: strt, count: chrd.tracknotes.length });
+                else {
+                    adjustedStarts.push({ avgstartms: cuStart.startms, items: [cuStart.startms] });
                 }
             }
         }
-        starts.sort((a, b) => { return a.startms - b.startms; });
-        console.log(starts);
+        for (let ii = 0; ii < adjustedStarts.length; ii++) {
+            let one = adjustedStarts[ii];
+            let sm = 0;
+            for (let tt = 0; tt < one.items.length; tt++) {
+                sm = sm + one.items[tt];
+            }
+            one.avgstartms = sm / one.items.length;
+        }
+        for (let pp = 0; pp < this.parsedTracks.length; pp++) {
+            let track = this.parsedTracks[pp];
+            for (let ss = 0; ss < track.trackChords.length; ss++) {
+                let chrd = track.trackChords[ss];
+                chrd.startMs = this.findNearestAvgTick(chrd.startMs, adjustedStarts);
+            }
+        }
+        console.log('tempo');
+        for (let ii = 0; ii < this.midiheader.changesResolutionBPM.length; ii++) {
+            let it = this.midiheader.changesResolutionBPM[ii];
+            let tick = this.findNearestAvgTick(it.ms, adjustedStarts);
+            console.log(ii, it.bpm, it.ms, '->', tick);
+            it.ms = tick;
+        }
+        console.log('meter');
+        for (let ii = 0; ii < this.midiheader.metersList.length; ii++) {
+            let it = this.midiheader.metersList[ii];
+            let tick = this.findNearestAvgTick(it.ms, adjustedStarts);
+            console.log(ii, '' + it.count + '/' + it.division, it.ms, '->', tick);
+            it.ms = tick;
+        }
+        console.log(adjustedStarts);
+        return adjustedStarts;
     }
 }
 function firstDrumKeysArrayPercussionPaths(midi) {
@@ -1481,71 +1530,11 @@ function findPreTempo(when, midiParser) {
     }
     return bpm;
 }
-function _____dumpStat(midiParser) {
-    let statArr = [];
-    for (let tt = 0; tt < midiParser.parsedTracks.length; tt++) {
-        let track = midiParser.parsedTracks[tt];
-        for (let cc = 0; cc < track.trackChords.length; cc++) {
-            let chord = track.trackChords[cc];
-            let point = takeNearWhen(chord.startMs, statArr);
-            for (let nn = 0; nn < chord.tracknotes.length; nn++) {
-                point.notes.push({
-                    track: tt,
-                    channel: chord.channelidx,
-                    note: chord.tracknotes[nn],
-                    fromChord: chord
-                });
-                if (chord.channelidx == 9) {
-                }
-                else {
-                    let tone = chord.tracknotes[nn].basePitch % 12;
-                    if (point.pitches.indexOf(tone) < 0) {
-                        point.pitches.push(tone);
-                    }
-                }
-            }
-        }
-    }
-    for (let ss = 0; ss < statArr.length; ss++) {
-        let one = statArr[ss];
-        let smm = 0;
-        for (let nn = 0; nn < one.notes.length; nn++) {
-            smm = smm + one.notes[nn].fromChord.startMs;
-        }
-        one.when = Math.round(smm / one.notes.length);
-        for (let nn = 0; nn < one.notes.length; nn++) {
-            one.notes[nn].fromChord.startMs = one.when;
-        }
-        one.pitches.sort();
-        one.shape = one.pitches.toString();
-    }
-    statArr.sort((a, b) => {
-        return a.when - b.when;
-    });
-    console.log(statArr);
-    let lastStart = 0;
-    if (statArr.length > 0) {
-        lastStart = statArr[statArr.length - 1].when;
-    }
-    let currentBarStart = 0;
-    let barDuration = 0;
-    let barSign = 0;
-    let barIdx = 1;
-    while (currentBarStart + barDuration < lastStart) {
-        let currentMeter = findPreMeter(currentBarStart + 99, midiParser);
-        let currentBPM = findPreTempo(currentBarStart + 99, midiParser);
-        barDuration = 1000 * (4 * 60 / currentBPM) * (currentMeter.count / currentMeter.part);
-        let nextStart = findNearestStart(currentBarStart + barDuration, statArr);
-        barDuration = nextStart - currentBarStart;
-        currentBarStart = nextStart;
-        barIdx++;
-    }
-}
 class Projectr {
     parseRawMIDIdata(arrayBuffer, title, comment) {
         var midiParser = newMIDIparser2(arrayBuffer);
         console.log('done midiParser', midiParser);
-        midiParser.dumpStatyistics();
+        midiParser.dumpStartStatistics();
         let cnvrtr = new MIDIConverter();
         let midiSongData = cnvrtr.convertProject(midiParser);
         console.log('done midiSongData', midiSongData);
@@ -1715,7 +1704,7 @@ class Projectr {
         return measure;
     }
     findLastChange(midiSongData, beforeMs) {
-        let nextChange = { track: 0, ms: 0, resolution: 0, bpm: 120 };
+        let nextChange = { track: 0, ms: 0, newresolution: 0, bpm: 120 };
         for (let ii = 1; ii < midiSongData.changesData.length; ii++) {
             if (midiSongData.changesData[ii].ms > beforeMs + 100) {
                 break;
@@ -1758,7 +1747,7 @@ class Projectr {
         }
     }
     findNextChange(midiSongData, afterMs) {
-        let nextChange = { track: 0, ms: 0, resolution: 0, bpm: 120 };
+        let nextChange = { track: 0, ms: 0, newresolution: 0, bpm: 120 };
         for (let ii = 1; ii < midiSongData.changesData.length; ii++) {
             if (midiSongData.changesData[ii].ms > afterMs) {
                 nextChange = midiSongData.changesData[ii];
