@@ -268,30 +268,32 @@ class MidiParser {
 		}
 	}
 	dumpResolutionChanges(): void {
+		console.log('dumpResolutionChanges');
 		this.midiheader.changesResolutionBPM = [];
 		let tickResolution: number = this.midiheader.get0TickResolution();
 		let reChange = { track: -1, ms: -1, newresolution: tickResolution, bpm: 120, evnt: null };
 		this.midiheader.changesResolutionBPM.push(reChange);
 		for (var t = 0; t < this.parsedTracks.length; t++) {
 			var track: MIDIFileTrack = this.parsedTracks[t];
-			//let playTimeTicks: number = 0;
+			let playTimeTicks: number = 0;
 			for (var e = 0; e < track.trackevents.length; e++) {
 				var cuevnt = track.trackevents[e];
 				let curDelta: number = 0.0;
 				if (cuevnt.delta) curDelta = cuevnt.delta;
-				//playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
+				playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
 				if (cuevnt.basetype === this.EVENT_META) {
 					if (cuevnt.subtype === this.EVENT_META_SET_TEMPO) {
 						if (cuevnt.tempo) {
 							tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo);
 							let reChange = {
 								track: t
-								//, ms: playTimeTicks
-								,ms:cuevnt.playTimeMs
+								, ms: playTimeTicks
+								//, ms: cuevnt.playTimeMs
 								, newresolution: tickResolution
 								, bpm: (cuevnt.tempoBPM) ? cuevnt.tempoBPM : 120
 								, evnt: cuevnt
 							};
+							//console.log(cuevnt.playTimeMs);
 							this.midiheader.changesResolutionBPM.push(reChange);
 						}
 					}
@@ -308,7 +310,16 @@ class MidiParser {
 		}
 		return 0;
 	}
+	/*adjustChangesResolutionBPM() {
+		for (var i = 0; i < this.midiheader.changesResolutionBPM.length; i++) {
+			let ee = this.midiheader.changesResolutionBPM[i].evnt;
+			if (ee) {
+				this.midiheader.changesResolutionBPM[i].ms = ee.playTimeMs
+			}
+		}
+	}*/
 	parseTicks2time(track: MIDIFileTrack) {
+		console.log('parseTicks2time');
 		let tickResolution: number = this.findResolutionBefore(0);
 		let playTimeTicks: number = 0;
 		for (let e = 0; e < track.trackevents.length; e++) {
@@ -326,6 +337,7 @@ class MidiParser {
 			evnt.playTimeMs = playTimeTicks;
 			evnt.deltaTimeMs = curDelta * tickResolution / 1000.0;
 		}
+		//this.adjustChangesResolutionBPM();
 	}
 
 	parseNotes() {
@@ -731,7 +743,7 @@ class MidiParser {
 		sortedStarts.sort((a, b) => { return a.startms - b.startms; });
 
 		let adjustedStarts: TicksAverageTime[] = [{ avgstartms: 0, items: [0] }];
-		let pluckDiff = 33;
+		let pluckDiff = 23;
 		for (let ii = 0; ii < sortedStarts.length; ii++) {
 			let cuStart = sortedStarts[ii];
 			if (adjustedStarts.length < 1) {
@@ -755,50 +767,28 @@ class MidiParser {
 			}
 			one.avgstartms = sm / one.items.length;
 		}
-
+/*
 		for (let pp = 0; pp < this.parsedTracks.length; pp++) {
 			let track = this.parsedTracks[pp];
 			for (let ss = 0; ss < track.trackChords.length; ss++) {
 				let chrd = track.trackChords[ss];
-				chrd.startMs=this.findNearestAvgTick(chrd.startMs, adjustedStarts);
+				chrd.startMs = this.findNearestAvgTick(chrd.startMs, adjustedStarts);
 			}
 		}
-
-		/*for (let pp = 0; pp < this.parsedTracks.length; pp++) {
-			let track = this.parsedTracks[pp];
-			for (let ss = 0; ss < track.trackChords.length; ss++) {
-				let chrd = track.trackChords[ss];
-				let strt = Math.round(chrd.startMs) / 1000;
-				let xsts = false;
-				for (let exx = 0; exx < starts.length; exx++) {
-					if (starts[exx].startms == strt) {
-						starts[exx].count = starts[exx].count + chrd.tracknotes.length;
-						xsts = true;
-						break;
-					}
-
-				}
-				if (!xsts) {
-					starts.push({ startms: strt, count: chrd.tracknotes.length });
-				}
-			}
-		}*/
-
 		console.log('tempo');
 		for (let ii = 0; ii < this.midiheader.changesResolutionBPM.length; ii++) {
 			let it = this.midiheader.changesResolutionBPM[ii];
 			let tick = this.findNearestAvgTick(it.ms, adjustedStarts);
-			console.log(ii, it.bpm, it.ms, '->', tick);
-			it.ms=tick;
+			console.log(ii, ':', it.bpm, ':', it.ms, '->', tick);
+			it.ms = tick;
 		}
 		console.log('meter');
 		for (let ii = 0; ii < this.midiheader.metersList.length; ii++) {
 			let it = this.midiheader.metersList[ii];
 			let tick = this.findNearestAvgTick(it.ms, adjustedStarts);
-			console.log(ii, '' + it.count + '/' + it.division, it.ms, '->', tick);
-			it.ms=tick;
-		}
-
+			console.log(ii, '' + it.count + '/' + it.division, ':', it.ms, '->', tick);
+			it.ms = tick;
+		}*/
 		console.log(adjustedStarts);
 
 		return adjustedStarts;

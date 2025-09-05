@@ -108,14 +108,14 @@ type MIDISongData = {
 function round1000(nn: number): number {
 	return Math.round(1000 * nn) / 1000;
 }
-function findMeasureSkipByTime(cmnt:string,time: number, measures: Zvoog_SongMeasure[]): null | { idx: number, skip: Zvoog_Metre } {
+function findMeasureSkipByTime(cmnt: string, time: number, measures: Zvoog_SongMeasure[]): null | { idx: number, skip: Zvoog_Metre } {
 	let curTime = 0;
 	let mm = MMUtil();
 	for (let ii = 0; ii < measures.length; ii++) {
 		let cumea = measures[ii];
 		let measureDurationS = mm.set(cumea.metre).duration(cumea.tempo);
 		if (round1000(curTime + measureDurationS) > round1000(time)) {
-			
+
 			let delta = time - curTime;
 			if (delta < 0) {
 				delta = 0;
@@ -211,7 +211,7 @@ class MIDIFileHeader {
 	format: number;
 	trackCount: number;
 	tempoBPM: number = 120;
-	changesResolutionBPM: { track: number, ms: number, newresolution: number, bpm: number,evnt:MIDIEvent|null }[] = [];
+	changesResolutionBPM: { track: number, ms: number, newresolution: number, bpm: number, evnt: MIDIEvent | null }[] = [];
 	metersList: { track: number, ms: number, count: number, division: number }[] = [];
 	lyricsList: { track: number, ms: number, txt: string }[] = [];
 	signsList: { track: number, ms: number, sign: string }[] = [];
@@ -224,7 +224,7 @@ class MIDIFileHeader {
 		this.datas = new DataView(buffer, 0, this.HEADER_LENGTH);
 		this.format = this.datas.getUint16(8);
 		this.trackCount = this.datas.getUint16(10);
-		console.log('MIDIFileHeader',(this.datas.getUint16(12) & 0x8000),this.datas.getUint16(12));
+		console.log('MIDIFileHeader', (this.datas.getUint16(12) & 0x8000), this.datas.getUint16(12));
 	}
 	getCalculatedTickResolution(tempo: number): number {
 		this.lastNonZeroQuarter = tempo;
