@@ -731,7 +731,7 @@ class MidiParser {
 		sortedStarts.sort((a, b) => { return a.startms - b.startms; });
 
 		let adjustedStarts: TicksAverageTime[] = [{ avgstartms: 0, items: [0] }];
-		let pluckDiff = 50;
+		let pluckDiff = 33;
 		for (let ii = 0; ii < sortedStarts.length; ii++) {
 			let cuStart = sortedStarts[ii];
 			if (adjustedStarts.length < 1) {

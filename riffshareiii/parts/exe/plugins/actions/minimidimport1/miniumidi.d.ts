@@ -9,6 +9,7 @@ interface Zvoog_MetreMathType {
     metre(): Zvoog_Metre;
     simplyfy(): Zvoog_MetreMathType;
     strip(toPart: number): Zvoog_MetreMathType;
+    floor(toPart: number): Zvoog_MetreMathType;
     equals(metre: Zvoog_Metre): boolean;
     less(metre: Zvoog_Metre): boolean;
     more(metre: Zvoog_Metre): boolean;

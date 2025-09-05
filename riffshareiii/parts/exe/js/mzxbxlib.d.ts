@@ -6,6 +6,7 @@ declare class MZXBX_MetreMathUtil implements Zvoog_MetreMathType {
     metre(): Zvoog_Metre;
     simplyfy(): MZXBX_MetreMathUtil;
     strip(toPart: number): MZXBX_MetreMathUtil;
+    floor(toPart: number): MZXBX_MetreMathUtil;
     equals(metre: Zvoog_Metre): boolean;
     less(metre: Zvoog_Metre): boolean;
     more(metre: Zvoog_Metre): boolean;
@@ -30,6 +31,7 @@ interface Zvoog_MetreMathType {
     metre(): Zvoog_Metre;
     simplyfy(): Zvoog_MetreMathType;
     strip(toPart: number): Zvoog_MetreMathType;
+    floor(toPart: number): Zvoog_MetreMathType;
     equals(metre: Zvoog_Metre): boolean;
     less(metre: Zvoog_Metre): boolean;
     more(metre: Zvoog_Metre): boolean;
@@ -174,6 +176,13 @@ declare type Zvoog_Project = {
         z: number;
     };
     list: boolean;
+    menuPerformers?: boolean;
+    menuSamplers?: boolean;
+    menuFilters?: boolean;
+    menuActions?: boolean;
+    menuPlugins?: boolean;
+    menuClipboard?: boolean;
+    menuSettings?: boolean;
 };
 declare type MZXBX_CachedWave = {
     path: string;

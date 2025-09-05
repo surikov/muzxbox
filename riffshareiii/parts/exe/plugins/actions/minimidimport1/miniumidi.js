@@ -673,7 +673,7 @@ class MidiParser {
         }
         sortedStarts.sort((a, b) => { return a.startms - b.startms; });
         let adjustedStarts = [{ avgstartms: 0, items: [0] }];
-        let pluckDiff = 50;
+        let pluckDiff = 33;
         for (let ii = 0; ii < sortedStarts.length; ii++) {
             let cuStart = sortedStarts[ii];
             if (adjustedStarts.length < 1) {
@@ -1838,8 +1838,8 @@ class Projectr {
                     let pitch = note.midiPitch;
                     if (pitch == drum) {
                         if (chord.when >= currentTimeMs && chord.when < currentTimeMs + measureDurationS * 1000) {
-                            let skip64 = mm.calculate((chord.when - currentTimeMs) / 1000, nextMeasure.tempo).strip(64);
-                            projectMeasure.skips.push(skip64);
+                            let skip32 = mm.calculate((chord.when - currentTimeMs) / 1000, nextMeasure.tempo).strip(32);
+                            projectMeasure.skips.push(skip32);
                         }
                     }
                 }
@@ -1943,17 +1943,17 @@ class Projectr {
                 if (this.numratio(midiChord.when) >= nextMeasure.startMs
                     && this.numratio(midiChord.when) < nextMeasure.startMs + nextMeasure.durationMs) {
                     let trackChord = null;
-                    let skip64 = mm.calculate((midiChord.when - nextMeasure.startMs) / 1000.0, nextMeasure.tempo).strip(64);
-                    if (skip64.count < 0) {
-                        skip64.count = 0;
+                    let skip32 = mm.calculate((midiChord.when - nextMeasure.startMs) / 1000.0, nextMeasure.tempo).strip(32);
+                    if (skip32.count < 0) {
+                        skip32.count = 0;
                     }
                     for (let cc = 0; cc < projectMeasure.chords.length; cc++) {
-                        if (mm.set(projectMeasure.chords[cc].skip).equals(skip64)) {
+                        if (mm.set(projectMeasure.chords[cc].skip).equals(skip32)) {
                             trackChord = projectMeasure.chords[cc];
                         }
                     }
                     if (trackChord == null) {
-                        trackChord = { skip: skip64, pitches: [], slides: [] };
+                        trackChord = { skip: skip32, pitches: [], slides: [] };
                         projectMeasure.chords.push(trackChord);
                     }
                     if (trackChord) {

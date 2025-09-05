@@ -34,6 +34,15 @@ class MZXBX_MetreMathUtil {
         let r = new MZXBX_MetreMathUtil().set({ count: cc, part: pp }).simplyfy();
         return r;
     }
+    floor(toPart) {
+        let cc = this.count;
+        let pp = this.part;
+        let rr = pp / toPart;
+        cc = Math.floor(cc / rr);
+        pp = toPart;
+        let r = new MZXBX_MetreMathUtil().set({ count: cc, part: pp }).simplyfy();
+        return r;
+    }
     equals(metre) {
         let countMe = this.count * metre.part;
         let countTo = metre.count * this.part;

@@ -40,6 +40,15 @@ class MZXBX_MetreMathUtil implements Zvoog_MetreMathType {
 		let r = new MZXBX_MetreMathUtil().set({ count: cc, part: pp }).simplyfy();
 		return r;
 	}
+	floor(toPart: number): MZXBX_MetreMathUtil {
+		let cc = this.count;
+		let pp = this.part;
+		let rr = pp / toPart;
+		cc = Math.floor(cc / rr);
+		pp = toPart;
+		let r = new MZXBX_MetreMathUtil().set({ count: cc, part: pp }).simplyfy();
+		return r;
+	}
 	equals(metre: Zvoog_Metre): boolean {
 		let countMe = this.count * metre.part;
 		let countTo = metre.count * this.part;
