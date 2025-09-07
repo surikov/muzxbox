@@ -767,34 +767,65 @@ class MidiParser {
 			}
 			one.avgstartms = sm / one.items.length;
 		}
-/*
-		for (let pp = 0; pp < this.parsedTracks.length; pp++) {
-			let track = this.parsedTracks[pp];
-			for (let ss = 0; ss < track.trackChords.length; ss++) {
-				let chrd = track.trackChords[ss];
-				chrd.startMs = this.findNearestAvgTick(chrd.startMs, adjustedStarts);
-			}
-		}
-		console.log('tempo');
-		for (let ii = 0; ii < this.midiheader.changesResolutionBPM.length; ii++) {
-			let it = this.midiheader.changesResolutionBPM[ii];
-			let tick = this.findNearestAvgTick(it.ms, adjustedStarts);
-			console.log(ii, ':', it.bpm, ':', it.ms, '->', tick);
-			it.ms = tick;
-		}
-		console.log('meter');
-		for (let ii = 0; ii < this.midiheader.metersList.length; ii++) {
-			let it = this.midiheader.metersList[ii];
-			let tick = this.findNearestAvgTick(it.ms, adjustedStarts);
-			console.log(ii, '' + it.count + '/' + it.division, ':', it.ms, '->', tick);
-			it.ms = tick;
-		}*/
+
+		/*
+				for (let pp = 0; pp < this.parsedTracks.length; pp++) {
+					let track = this.parsedTracks[pp];
+					for (let ss = 0; ss < track.trackChords.length; ss++) {
+						let chrd = track.trackChords[ss];
+						chrd.startMs = this.findNearestAvgTick(chrd.startMs, adjustedStarts);
+					}
+				}
+				console.log('tempo');
+				for (let ii = 0; ii < this.midiheader.changesResolutionBPM.length; ii++) {
+					let it = this.midiheader.changesResolutionBPM[ii];
+					let tick = this.findNearestAvgTick(it.ms, adjustedStarts);
+					console.log(ii, ':', it.bpm, ':', it.ms, '->', tick);
+					it.ms = tick;
+				}
+				console.log('meter');
+				for (let ii = 0; ii < this.midiheader.metersList.length; ii++) {
+					let it = this.midiheader.metersList[ii];
+					let tick = this.findNearestAvgTick(it.ms, adjustedStarts);
+					console.log(ii, '' + it.count + '/' + it.division, ':', it.ms, '->', tick);
+					it.ms = tick;
+				}*/
 		console.log(adjustedStarts);
+		let lastEventTime = adjustedStarts[adjustedStarts.length - 1].avgstartms;
+		let currentMs = 0;
+		let currentTempo = 120;
+		let currentMeter = MMUtil().set({ count: 4, part: 4 });
+		while (currentMs < lastEventTime) {
+			currentMeter.set(this.findPreMetre(currentMs));
+			currentTempo = this.findPreBPM(currentMs);
+			let barDuration = currentMeter.duration(currentTempo) * 1000;
+
+			console.log(currentMs, ''+currentMeter.count+'/'+currentMeter.part, currentTempo,barDuration);
+			currentMs = currentMs + barDuration;
+		}
 
 		return adjustedStarts;
 	}
-
-
+	findPreMetre(ms: number): Zvoog_Metre {
+		let cume: Zvoog_Metre = { count: this.midiheader.metersList[0].count, part: this.midiheader.metersList[0].division };
+		for (let ii = this.midiheader.metersList.length - 1; ii >= 0; ii--) {
+			cume = { count: this.midiheader.metersList[ii].count, part: this.midiheader.metersList[ii].division };
+			if (ms >= this.midiheader.metersList[ii].ms) {
+				break;
+			}
+		}
+		return cume;
+	}
+	findPreBPM(ms: number): number {
+		let bpm = this.midiheader.changesResolutionBPM[0].bpm;
+		for (let ii = this.midiheader.changesResolutionBPM.length - 1; ii >= 0; ii--) {
+			bpm = this.midiheader.changesResolutionBPM[ii].bpm;
+			if (ms >= this.midiheader.changesResolutionBPM[ii].ms) {
+				break;
+			}
+		}
+		return bpm;
+	}
 
 
 

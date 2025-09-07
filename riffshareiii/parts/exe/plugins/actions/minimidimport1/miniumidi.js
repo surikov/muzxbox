@@ -703,7 +703,38 @@ class MidiParser {
             one.avgstartms = sm / one.items.length;
         }
         console.log(adjustedStarts);
+        let lastEventTime = adjustedStarts[adjustedStarts.length - 1].avgstartms;
+        let currentMs = 0;
+        let currentTempo = 120;
+        let currentMeter = MMUtil().set({ count: 4, part: 4 });
+        while (currentMs < lastEventTime) {
+            currentMeter.set(this.findPreMetre(currentMs));
+            currentTempo = this.findPreBPM(currentMs);
+            let barDuration = currentMeter.duration(currentTempo) * 1000;
+            console.log(currentMs, '' + currentMeter.count + '/' + currentMeter.part, currentTempo, barDuration);
+            currentMs = currentMs + barDuration;
+        }
         return adjustedStarts;
+    }
+    findPreMetre(ms) {
+        let cume = { count: this.midiheader.metersList[0].count, part: this.midiheader.metersList[0].division };
+        for (let ii = this.midiheader.metersList.length - 1; ii >= 0; ii--) {
+            cume = { count: this.midiheader.metersList[ii].count, part: this.midiheader.metersList[ii].division };
+            if (ms >= this.midiheader.metersList[ii].ms) {
+                break;
+            }
+        }
+        return cume;
+    }
+    findPreBPM(ms) {
+        let bpm = this.midiheader.changesResolutionBPM[0].bpm;
+        for (let ii = this.midiheader.changesResolutionBPM.length - 1; ii >= 0; ii--) {
+            bpm = this.midiheader.changesResolutionBPM[ii].bpm;
+            if (ms >= this.midiheader.changesResolutionBPM[ii].ms) {
+                break;
+            }
+        }
+        return bpm;
     }
 }
 function firstDrumKeysArrayPercussionPaths(midi) {
