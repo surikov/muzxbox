@@ -1,9 +1,9 @@
 class Projectr {
 	parseRawMIDIdata(arrayBuffer: ArrayBuffer, title: string, comment: string): Zvoog_Project {
 
-		var midiParser:MidiParser = newMIDIparser2(arrayBuffer);
+		var midiParser: MidiParser = newMIDIparser2(arrayBuffer);
 		console.log('done midiParser', midiParser);
-		midiParser.dumpStartStatistics();
+		let statMetre: { start: number, tempo: number, metre: Zvoog_Metre }[] = midiParser.dumpStartStatistics();
 
 		//me.parsedProject = midiParser.convertProject(title, comment);
 		let cnvrtr: MIDIConverter = new MIDIConverter();
@@ -11,12 +11,13 @@ class Projectr {
 		let midiSongData: MIDISongData = cnvrtr.convertProject(midiParser);
 		console.log('done midiSongData', midiSongData);
 		let proj = new Projectr();
-		return proj.readProject(midiSongData, title, comment);
+		return proj.readProject(midiSongData, title, comment, this.recalculateTimeLine(statMetre));
 	}
-	readProject(midiSongData: MIDISongData, title: string, comment: string): Zvoog_Project {
+
+	readProject(midiSongData: MIDISongData, title: string, comment: string, newtimeline: Zvoog_SongMeasure[]): Zvoog_Project {
 
 
-		let newtimeline: Zvoog_SongMeasure[] = this.createTimeLine(midiSongData);
+		//let newtimeline: Zvoog_SongMeasure[] = this.createTimeLine(midiSongData);
 		let project: Zvoog_Project = {
 			title: title// + ' ' + comment
 			, timeline: newtimeline
@@ -161,37 +162,64 @@ class Projectr {
 					;
 		*/
 		//dumpStat(midiParser);
-		
+
 		this.trimProject(project);//, needSlice);
 
 		//this.dumpStartNoteStat(project);
 
 		return project;
 	}
-
-	createTimeLine(midiSongData: MIDISongData): Zvoog_SongMeasure[] {
-		let count = 0;
-		let part = 0;
-		let bpm = 0;
-
-		let timeline: Zvoog_SongMeasure[] = [];
-		let fromMs = 0;
-		while (fromMs < midiSongData.duration) {
-			let measure: ImportMeasure = this.createMeasure(midiSongData, fromMs, timeline.length);
-			fromMs = fromMs + measure.durationMs;
-
-			if (count != measure.metre.count || part != measure.metre.part || bpm != measure.tempo) {
-
-				count = measure.metre.count;
-				part = measure.metre.part;
-				bpm = measure.tempo;
-			} else {
-				//console.log(timeline.length, measure.startMs);
+	recalculateTimeLine(statMetre: { start: number, tempo: number, metre: Zvoog_Metre }[]): Zvoog_SongMeasure[] {
+		let newtimeline: Zvoog_SongMeasure[] = [];
+		for (let ii = 0; ii < statMetre.length; ii++) {
+			let measure: ImportMeasure = {
+				startMs: statMetre[ii].start,
+				durationMs: 2000,
+				tempo: statMetre[ii].tempo,
+				metre: statMetre[ii].metre
+			};
+			if (ii < statMetre.length - 1) {
+				measure.durationMs = statMetre[ii + 1].start - statMetre[ii].start;
+				let wholeNoteSeconds = ((measure.durationMs/1000) / measure.metre.count) * measure.metre.part;
+				measure.tempo = (4 * 60) / wholeNoteSeconds;
 			}
-			timeline.push(measure);
+			newtimeline.push(measure);
 		}
-		return timeline;
+		/*let measure: ImportMeasure = {
+			startMs: 111,
+			durationMs: 2000,
+			tempo: 111,
+			metre: { count: 4, part: 4 }
+		};
+		newtimeline.push(measure);
+		*/
+		return newtimeline;
 	}
+	/*
+		createTimeLine(midiSongData: MIDISongData): Zvoog_SongMeasure[] {
+			let count = 0;
+			let part = 0;
+			let bpm = 0;
+	
+			let timeline: Zvoog_SongMeasure[] = [];
+			let fromMs = 0;
+			while (fromMs < midiSongData.duration) {
+				let measure: ImportMeasure = this.createMeasure(midiSongData, fromMs, timeline.length);
+				fromMs = fromMs + measure.durationMs;
+	
+				if (count != measure.metre.count || part != measure.metre.part || bpm != measure.tempo) {
+	
+					count = measure.metre.count;
+					part = measure.metre.part;
+					bpm = measure.tempo;
+				} else {
+					//console.log(timeline.length, measure.startMs);
+				}
+				timeline.push(measure);
+			}
+			return timeline;
+		}*/
+	/*
 	createMeasure(midiSongData: MIDISongData, fromMs: number, barIdx: number): ImportMeasure {
 		let lasthange = this.findLastChange(midiSongData, fromMs);
 		let lastmeter: Zvoog_Metre = this.findLastMeter(midiSongData, fromMs, barIdx);
@@ -211,68 +239,70 @@ class Projectr {
 		};
 		return measure;
 	}
-
-
-	findLastChange(midiSongData: MIDISongData, beforeMs: number): { track: number, ms: number, newresolution: number, bpm: number } {
-		let nextChange: { track: number, ms: number, newresolution: number, bpm: number } = { track: 0, ms: 0, newresolution: 0, bpm: 120 };
-		for (let ii = 1; ii < midiSongData.changesData.length; ii++) {
-			//if (midiSongData.changes[ii].ms > beforeMs + 1) {
-			if (midiSongData.changesData[ii].ms > beforeMs + 100) {
-				break;
-			}
-			nextChange = midiSongData.changesData[ii];
-		}
-		return nextChange;
-	}
-
-	findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): Zvoog_Metre {
-		//console.log('findLastMeter',barIdx,beforeMs);
-		let metre: Zvoog_Metre = {
-			count: midiSongData.startMeter.count
-			, part: midiSongData.startMeter.division
-		};
-		let midimeter: { track: number, ms: number, count: number, division: number } = { track: 0, ms: 0, count: 4, division: 4 };
-		for (let mi = 0; mi < midiSongData.metersData.length; mi++) {
-			//if (midiSongData.meters[mi].ms > beforeMs + 1 + barIdx * 3) {
-			if (midiSongData.metersData[mi].ms > beforeMs + 100) {
-				break;
-			}
-			midimeter = midiSongData.metersData[mi];
-			//console.log(midiSongData.meters[mi].ms);
-		}
-		metre.count = midimeter.count;
-		metre.part = midimeter.division;
-		return metre;
-	}
-
-	calcMeasureDuration(midiSongData: MIDISongData, meter: Zvoog_Metre, bpm: number, part: number, startMs: number): number {
-		let metreMath = MMUtil();
-		let wholeDurationMs = 1000 * metreMath.set(meter).duration(bpm);
-		let partDurationMs = part * wholeDurationMs;
-		let nextChange = this.findNextChange(midiSongData, startMs);
-		if (startMs < nextChange.ms && nextChange.ms < startMs + partDurationMs) {
-			let diffMs = nextChange.ms - startMs;
-			let ratio = diffMs / partDurationMs;
-			let newPart = ratio * part;
-			let newPartDurationMs = newPart * wholeDurationMs;
-			let remainsMs = this.calcMeasureDuration(midiSongData, meter, nextChange.bpm, part - newPart, nextChange.ms);
-			return newPartDurationMs + remainsMs;
-		} else {
-			return partDurationMs;
-		}
-	}
-
-	findNextChange(midiSongData: MIDISongData, afterMs: number): { track: number, ms: number, newresolution: number, bpm: number } {
-		let nextChange: { track: number, ms: number, newresolution: number, bpm: number } = { track: 0, ms: 0, newresolution: 0, bpm: 120 };
-		for (let ii = 1; ii < midiSongData.changesData.length; ii++) {
-			if (midiSongData.changesData[ii].ms > afterMs) {
+*/
+	/*
+		findLastChange(midiSongData: MIDISongData, beforeMs: number): { track: number, ms: number, newresolution: number, bpm: number } {
+			let nextChange: { track: number, ms: number, newresolution: number, bpm: number } = { track: 0, ms: 0, newresolution: 0, bpm: 120 };
+			for (let ii = 1; ii < midiSongData.changesData.length; ii++) {
+				//if (midiSongData.changes[ii].ms > beforeMs + 1) {
+				if (midiSongData.changesData[ii].ms > beforeMs + 100) {
+					break;
+				}
 				nextChange = midiSongData.changesData[ii];
-				break;
+			}
+			return nextChange;
+		}
+	
+		findLastMeter(midiSongData: MIDISongData, beforeMs: number, barIdx: number): Zvoog_Metre {
+			//console.log('findLastMeter',barIdx,beforeMs);
+			let metre: Zvoog_Metre = {
+				count: midiSongData.startMeter.count
+				, part: midiSongData.startMeter.division
+			};
+			let midimeter: { track: number, ms: number, count: number, division: number } = { track: 0, ms: 0, count: 4, division: 4 };
+			for (let mi = 0; mi < midiSongData.metersData.length; mi++) {
+				//if (midiSongData.meters[mi].ms > beforeMs + 1 + barIdx * 3) {
+				if (midiSongData.metersData[mi].ms > beforeMs + 100) {
+					break;
+				}
+				midimeter = midiSongData.metersData[mi];
+				//console.log(midiSongData.meters[mi].ms);
+			}
+			metre.count = midimeter.count;
+			metre.part = midimeter.division;
+			return metre;
+		}
+	*/
+	/*
+		calcMeasureDuration(midiSongData: MIDISongData, meter: Zvoog_Metre, bpm: number, part: number, startMs: number): number {
+			let metreMath = MMUtil();
+			let wholeDurationMs = 1000 * metreMath.set(meter).duration(bpm);
+			let partDurationMs = part * wholeDurationMs;
+			let nextChange = this.findNextChange(midiSongData, startMs);
+			if (startMs < nextChange.ms && nextChange.ms < startMs + partDurationMs) {
+				let diffMs = nextChange.ms - startMs;
+				let ratio = diffMs / partDurationMs;
+				let newPart = ratio * part;
+				let newPartDurationMs = newPart * wholeDurationMs;
+				let remainsMs = this.calcMeasureDuration(midiSongData, meter, nextChange.bpm, part - newPart, nextChange.ms);
+				return newPartDurationMs + remainsMs;
+			} else {
+				return partDurationMs;
 			}
 		}
-		return nextChange;
-	}
-
+	*/
+	/*
+		findNextChange(midiSongData: MIDISongData, afterMs: number): { track: number, ms: number, newresolution: number, bpm: number } {
+			let nextChange: { track: number, ms: number, newresolution: number, bpm: number } = { track: 0, ms: 0, newresolution: 0, bpm: 120 };
+			for (let ii = 1; ii < midiSongData.changesData.length; ii++) {
+				if (midiSongData.changesData[ii].ms > afterMs) {
+					nextChange = midiSongData.changesData[ii];
+					break;
+				}
+			}
+			return nextChange;
+		}
+	*/
 	addLyricsPoints(commentPoint: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string, tempo: number) {
 		txt = txt.replace(/(\r)/g, '~');
 		txt = txt.replace(/\\r/g, '~');
@@ -492,11 +522,11 @@ class Projectr {
 			for (let ii = 0; ii < midiTrack.songchords.length; ii++) {
 				let midiChord = midiTrack.songchords[ii];
 				if (
-					this.numratio(midiChord.when) >= (nextMeasure as any).startMs //this.numratio(currentMeasureStart) - 33
-					&& this.numratio(midiChord.when) < (nextMeasure as any).startMs + (nextMeasure as any).durationMs //this.numratio(currentMeasureStart + measureDurationMs) - 33
+					this.numratio(midiChord.when) >= (nextMeasure as ImportMeasure).startMs //this.numratio(currentMeasureStart) - 33
+					&& this.numratio(midiChord.when) < (nextMeasure as ImportMeasure).startMs + (nextMeasure as ImportMeasure).durationMs //this.numratio(currentMeasureStart + measureDurationMs) - 33
 				) {
 					let trackChord: Zvoog_Chord | null = null;
-					let skip32 = mm.calculate((midiChord.when - (nextMeasure as any).startMs) / 1000.0, nextMeasure.tempo).strip(32);
+					let skip32 = mm.calculate((midiChord.when - (nextMeasure as ImportMeasure).startMs) / 1000.0, nextMeasure.tempo).strip(32);
 					if (skip32.count < 0) {
 						skip32.count = 0;
 					}
@@ -796,7 +826,7 @@ class Projectr {
 		}
 		for (let ii = 0; ii < starts.length; ii++) {
 			//console.log(starts[ii].count,Math.round(10000 * starts[ii].count / smm) / 100, '%:', starts[ii].skip.count, '/', starts[ii].skip.part);
-			console.log(starts[ii].count, '' + Math.round(100*starts[ii].count / smm) + '%:', starts[ii].skip.count, '/', starts[ii].skip.part);
+			console.log(starts[ii].count, '' + Math.round(100 * starts[ii].count / smm) + '%:', starts[ii].skip.count, '/', starts[ii].skip.part);
 		}
 	}
 	addStartOrIncrese(probe: Zvoog_Metre, starts: { skip: Zvoog_Metre, count: number }[]) {

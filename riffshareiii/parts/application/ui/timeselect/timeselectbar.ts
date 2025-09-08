@@ -219,7 +219,7 @@ class TimeSelectBar {
 		};
 		selectLevelAnchor.content.push(opt1);
 		let nm: TileText = {
-			x: left + size*10 / 33
+			x: left + size * 10 / 33
 			, y: (size * 1.1) * order + size * 30 / 43
 			, text: label
 			//, css: 'selectedBarNum' + zoomPrefixLevelsCSS[zz].prefix
@@ -272,59 +272,61 @@ class TimeSelectBar {
 			let barTime = 0;
 			for (let kk = 0; kk < globalCommandDispatcher.cfg().data.timeline.length; kk++) {
 				let curBar = globalCommandDispatcher.cfg().data.timeline[kk];
-				let curMeasureMeter = mm.set(curBar.metre);
-				let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-				let measureAnchor: TileAnchor = {
-					minZoom: zoomPrefixLevelsCSS[zz].minZoom
-					, beforeZoom: zoomPrefixLevelsCSS[zz + 1].minZoom
-					, xx: barLeft, yy: 0, ww: barWidth, hh: 1234, content: []
-					, id: 'measure' + (kk + Math.random())
-				};
-				selectLevelAnchor.content.push(measureAnchor);
-				if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
-					this.createBarMark(kk, barLeft
-						, zoomPrefixLevelsCSS[zz].minZoom * 1.5
-						, measureAnchor
-						, zz
-					);
-					this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor, barTime, zoomPrefixLevelsCSS[zz].minZoom * 1.5);
-				}
-				let zoomInfo = zoomPrefixLevelsCSS[zz];
-				if (zoomInfo.gridLines.length > 0) {
-					let lineCount = 0;
-					let skip: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 1 });
-					while (true) {
-						let line = zoomInfo.gridLines[lineCount];
-						skip = skip.plus(line.duration).simplyfy();
-						if (!skip.less(curBar.metre)) {
-							break;
-						}
-						if (line.label) {
-							let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-							let mark: TileRectangle = {
-								x: xx, y: 0
-								, w: line.ratio * 2 * zoomInfo.minZoom
-								, h: line.ratio * 8 * zoomInfo.minZoom
-								, css: 'timeSubMark'
-							};
-							measureAnchor.content.push(mark);
-							let mtr: TileText = {
-								x: xx
-								, y: 0.5 * zoomInfo.minZoom
-								, text: '' + skip.count + '/' + skip.part
-								, css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
-							};
-							measureAnchor.content.push(mtr);
-						}
-						lineCount++;
-						if (lineCount >= zoomInfo.gridLines.length) {
-							lineCount = 0;
+				if (curBar) {
+					let curMeasureMeter = mm.set(curBar.metre);
+					let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+					let measureAnchor: TileAnchor = {
+						minZoom: zoomPrefixLevelsCSS[zz].minZoom
+						, beforeZoom: zoomPrefixLevelsCSS[zz + 1].minZoom
+						, xx: barLeft, yy: 0, ww: barWidth, hh: 1234, content: []
+						, id: 'measure' + (kk + Math.random())
+					};
+					selectLevelAnchor.content.push(measureAnchor);
+					if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
+						this.createBarMark(kk, barLeft
+							, zoomPrefixLevelsCSS[zz].minZoom * 1.5
+							, measureAnchor
+							, zz
+						);
+						this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor, barTime, zoomPrefixLevelsCSS[zz].minZoom * 1.5);
+					}
+					let zoomInfo = zoomPrefixLevelsCSS[zz];
+					if (zoomInfo.gridLines.length > 0) {
+						let lineCount = 0;
+						let skip: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 1 });
+						while (true) {
+							let line = zoomInfo.gridLines[lineCount];
+							skip = skip.plus(line.duration).simplyfy();
+							if (!skip.less(curBar.metre)) {
+								break;
+							}
+							if (line.label) {
+								let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+								let mark: TileRectangle = {
+									x: xx, y: 0
+									, w: line.ratio * 2 * zoomInfo.minZoom
+									, h: line.ratio * 8 * zoomInfo.minZoom
+									, css: 'timeSubMark'
+								};
+								measureAnchor.content.push(mark);
+								let mtr: TileText = {
+									x: xx
+									, y: 0.5 * zoomInfo.minZoom
+									, text: '' + skip.count + '/' + skip.part
+									, css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
+								};
+								measureAnchor.content.push(mtr);
+							}
+							lineCount++;
+							if (lineCount >= zoomInfo.gridLines.length) {
+								lineCount = 0;
+							}
 						}
 					}
+					barLeft = barLeft + barWidth;
+					//console.log((kk+1),barTime,curMeasureMeter.duration(curBar.tempo),curBar.metre,curBar.tempo);
+					barTime = barTime + curMeasureMeter.duration(curBar.tempo);
 				}
-				barLeft = barLeft + barWidth;
-				//console.log((kk+1),barTime,curMeasureMeter.duration(curBar.tempo),curBar.metre,curBar.tempo);
-				barTime = barTime + curMeasureMeter.duration(curBar.tempo);
 			}
 			this.fillSelectionMenu(zz, selectLevelAnchor);
 		}

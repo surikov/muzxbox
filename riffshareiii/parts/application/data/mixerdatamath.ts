@@ -43,7 +43,7 @@ class MixerDataMathUtility {
 	zoomAuxLess = 1;
 
 	editmark: null | { barIdx: number, skip: Zvoog_Metre, pitch: number } = null;// { barIdx: 2, skip: { count: 3, part: 4 }, pitch: 36 };
-	slidemark: null | {  barIdx: number, chord: Zvoog_Chord, pitch: number } = null;
+	slidemark: null | { barIdx: number, chord: Zvoog_Chord, pitch: number } = null;
 
 	constructor(data: Zvoog_Project) {
 		this.data = data;
@@ -201,7 +201,12 @@ class MixerDataMathUtility {
 		let mm: Zvoog_MetreMathType = MMUtil();
 		let ww = 0;
 		for (let ii = 0; ii < this.data.timeline.length; ii++) {
-			ww = ww + mm.set(this.data.timeline[ii].metre).duration(this.data.timeline[ii].tempo) * this.widthDurationRatio;
+			let timebar = this.data.timeline[ii];
+			if (!(timebar)) {
+				timebar = { tempo: 120, metre: { count: 4, part: 4 } }
+			}
+			ww = ww + mm.set(timebar.metre).duration(timebar.tempo) * this.widthDurationRatio;
+			//ww = ww + mm.set(this.data.timeline[ii].metre).duration(this.data.timeline[ii].tempo) * this.widthDurationRatio;
 		}
 		return ww;
 	}

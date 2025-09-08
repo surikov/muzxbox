@@ -22,6 +22,9 @@ class MixerZoomLevel {
 		let width = 0;
 		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.timeline.length; ii++) {
 			let timebar = globalCommandDispatcher.cfg().data.timeline[ii];
+			if (!(timebar)) {
+				timebar = { tempo: 120, metre: { count: 4, part: 4 } }
+			}
 			width = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 
 			let barGridAnchor: TileAnchor = {

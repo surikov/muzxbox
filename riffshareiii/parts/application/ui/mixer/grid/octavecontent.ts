@@ -81,7 +81,7 @@ class OctaveContent {
 	) {
 		if (!track.measures[barIdx]) {
 			//globalCommandDispatcher.adjustTimeline();
-			console.log('addTrackNotes not found', barIdx, 'for track', track.title);
+			//console.log('addTrackNotes not found', barIdx, 'for track', track.title);
 			return;
 		}
 		let measure: Zvoog_TrackMeasure = track.measures[barIdx];

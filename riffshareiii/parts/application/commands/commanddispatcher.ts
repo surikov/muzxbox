@@ -130,7 +130,7 @@ class CommandDispatcher {
 	registerWorkProject(data: Zvoog_Project) {
 		console.log('registerWorkProject', data.menuPerformers)
 		this._mixerDataMathUtility = new MixerDataMathUtility(data);
-
+		this.adjustTimelineContent();
 	}
 	registerUI(renderer: UIRenderer) {
 		this.renderer = renderer;
@@ -1108,6 +1108,22 @@ class CommandDispatcher {
 		}
 	}
 	adjustTimeLineLength() {
+		console.log('adjustTimeLineLength');
+		if (this.cfg().data.timeline.length > 1) {
+			if (!(this.cfg().data.timeline[this.cfg().data.timeline.length - 1])) {
+				this.cfg().data.timeline.length = this.cfg().data.timeline.length - 1;
+			}
+		}
+		if (this.cfg().data.timeline.length > 1) {
+			if (!(this.cfg().data.timeline[this.cfg().data.timeline.length - 1])) {
+				this.cfg().data.timeline.length = this.cfg().data.timeline.length - 1;
+			}
+		}
+		if (this.cfg().data.timeline.length > 1) {
+			if (!(this.cfg().data.timeline[this.cfg().data.timeline.length - 1])) {
+				this.cfg().data.timeline.length = this.cfg().data.timeline.length - 1;
+			}
+		}
 		for (let tt = 0; tt < this.cfg().data.timeline.length; tt++) {
 			for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
 				let track = this.cfg().data.tracks[nn];
@@ -1131,6 +1147,16 @@ class CommandDispatcher {
 				this.cfg().data.comments[tt] = { points: [] };
 			}
 		}
+		for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
+			this.cfg().data.tracks[nn].measures.length = this.cfg().data.timeline.length;
+		}
+		for (let nn = 0; nn < this.cfg().data.percussions.length; nn++) {
+			this.cfg().data.percussions[nn].measures.length = this.cfg().data.timeline.length;
+		}
+		for (let nn = 0; nn < this.cfg().data.filters.length; nn++) {
+			this.cfg().data.filters[nn].automation.length = this.cfg().data.timeline.length;
+		}
+		this.cfg().data.comments.length = this.cfg().data.timeline.length;
 	}
 	adjustRemoveEmptyChords() {
 		for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {

@@ -1,3 +1,4 @@
+let pluckDiff = 23;
 type TicksAverageTime = { avgstartms: number, items: number[] };
 class MidiParser {
 	midiheader: MIDIFileHeader;
@@ -727,7 +728,7 @@ class MidiParser {
 		}
 		return fountMs;
 	}
-	dumpStartStatistics(): TicksAverageTime[] {
+	dumpStartStatistics(): { start: number, tempo: number, metre: Zvoog_Metre }[] {
 		console.log('dumpStartStatistics');
 		let sortedStarts: { startms: number, count: number }[] = [];
 
@@ -743,7 +744,7 @@ class MidiParser {
 		sortedStarts.sort((a, b) => { return a.startms - b.startms; });
 
 		let adjustedStarts: TicksAverageTime[] = [{ avgstartms: 0, items: [0] }];
-		let pluckDiff = 23;
+		
 		for (let ii = 0; ii < sortedStarts.length; ii++) {
 			let cuStart = sortedStarts[ii];
 			if (adjustedStarts.length < 1) {
@@ -768,29 +769,31 @@ class MidiParser {
 			one.avgstartms = sm / one.items.length;
 		}
 
+
+		for (let pp = 0; pp < this.parsedTracks.length; pp++) {
+			let track = this.parsedTracks[pp];
+			for (let ss = 0; ss < track.trackChords.length; ss++) {
+				let chrd = track.trackChords[ss];
+				chrd.startMs = this.findNearestAvgTick(chrd.startMs, adjustedStarts);
+			}
+		}
 		/*
-				for (let pp = 0; pp < this.parsedTracks.length; pp++) {
-					let track = this.parsedTracks[pp];
-					for (let ss = 0; ss < track.trackChords.length; ss++) {
-						let chrd = track.trackChords[ss];
-						chrd.startMs = this.findNearestAvgTick(chrd.startMs, adjustedStarts);
-					}
-				}
-				console.log('tempo');
-				for (let ii = 0; ii < this.midiheader.changesResolutionBPM.length; ii++) {
-					let it = this.midiheader.changesResolutionBPM[ii];
-					let tick = this.findNearestAvgTick(it.ms, adjustedStarts);
-					console.log(ii, ':', it.bpm, ':', it.ms, '->', tick);
-					it.ms = tick;
-				}
-				console.log('meter');
-				for (let ii = 0; ii < this.midiheader.metersList.length; ii++) {
-					let it = this.midiheader.metersList[ii];
-					let tick = this.findNearestAvgTick(it.ms, adjustedStarts);
-					console.log(ii, '' + it.count + '/' + it.division, ':', it.ms, '->', tick);
-					it.ms = tick;
-				}*/
+		console.log('tempo');
+		for (let ii = 0; ii < this.midiheader.changesResolutionBPM.length; ii++) {
+			let it = this.midiheader.changesResolutionBPM[ii];
+			let tick = this.findNearestAvgTick(it.ms, adjustedStarts);
+			console.log(ii, ':', it.bpm, ':', it.ms, '->', tick);
+			it.ms = tick;
+		}
+		console.log('meter');
+		for (let ii = 0; ii < this.midiheader.metersList.length; ii++) {
+			let it = this.midiheader.metersList[ii];
+			let tick = this.findNearestAvgTick(it.ms, adjustedStarts);
+			console.log(ii, '' + it.count + '/' + it.division, ':', it.ms, '->', tick);
+			it.ms = tick;
+		}*/
 		console.log(adjustedStarts);
+		let avgTimeLine: { start: number, tempo: number, metre: Zvoog_Metre }[] = [];
 		let lastEventTime = adjustedStarts[adjustedStarts.length - 1].avgstartms;
 		let currentMs = 0;
 		let currentTempo = 120;
@@ -798,19 +801,29 @@ class MidiParser {
 		while (currentMs < lastEventTime) {
 			currentMeter.set(this.findPreMetre(currentMs));
 			currentTempo = this.findPreBPM(currentMs);
-			let barDuration = currentMeter.duration(currentTempo) * 1000;
-
-			console.log(currentMs, ''+currentMeter.count+'/'+currentMeter.part, currentTempo,barDuration);
-			currentMs = currentMs + barDuration;
+			let barMIDIDuration = currentMeter.duration(currentTempo) * 1000;
+			let nextMs = this.findNearestAvgTick(currentMs + barMIDIDuration, adjustedStarts);
+			if(nextMs>currentMs){
+				currentMs=nextMs;
+			}else{
+				currentMs=currentMs+1000;
+			}
+			 
+			//console.log(currentMs, '' + currentMeter.count + '/' + currentMeter.part, currentTempo, barMIDIDuration, currentMs);
+			//currentMs = currentMs + barRealDuration;
+			if (currentMs > 0 && avgTimeLine.length == 0) {
+				avgTimeLine.push({ start: 0, tempo: currentTempo, metre: currentMeter });
+			}
+			avgTimeLine.push({ start: currentMs, tempo: currentTempo, metre: currentMeter });
 		}
-
-		return adjustedStarts;
+		console.log(avgTimeLine);
+		return avgTimeLine;
 	}
 	findPreMetre(ms: number): Zvoog_Metre {
 		let cume: Zvoog_Metre = { count: this.midiheader.metersList[0].count, part: this.midiheader.metersList[0].division };
 		for (let ii = this.midiheader.metersList.length - 1; ii >= 0; ii--) {
 			cume = { count: this.midiheader.metersList[ii].count, part: this.midiheader.metersList[ii].division };
-			if (ms >= this.midiheader.metersList[ii].ms) {
+			if (ms >= this.midiheader.metersList[ii].ms - 99) {
 				break;
 			}
 		}
@@ -820,7 +833,7 @@ class MidiParser {
 		let bpm = this.midiheader.changesResolutionBPM[0].bpm;
 		for (let ii = this.midiheader.changesResolutionBPM.length - 1; ii >= 0; ii--) {
 			bpm = this.midiheader.changesResolutionBPM[ii].bpm;
-			if (ms >= this.midiheader.changesResolutionBPM[ii].ms) {
+			if (ms >= this.midiheader.changesResolutionBPM[ii].ms - 99) {
 				break;
 			}
 		}

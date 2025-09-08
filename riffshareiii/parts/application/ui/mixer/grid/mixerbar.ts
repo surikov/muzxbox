@@ -135,6 +135,7 @@ class MixerBar {
 		, zIndex: number) {
 		let zoomInfo = zoomPrefixLevelsCSS[zIndex];
 		let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
+		if(curBar){
 		let lineCount = 0;
 		let skip: Zvoog_MetreMathType = MMUtil().set({ count: 0, part: 1 });
 		barOctaveAnchor.content.push({
@@ -218,6 +219,7 @@ class MixerBar {
 				});
 			}
 		}
+	}
 	}
 	trackCellClick(barIdx: number, barX: number, yy: number, zz: number) {
 		let trMeasure = globalCommandDispatcher.cfg().data.tracks[0].measures[barIdx];

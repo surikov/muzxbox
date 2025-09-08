@@ -1,4 +1,5 @@
 "use strict";
+let pluckDiff = 23;
 class MidiParser {
     constructor(arrayBuffer) {
         this.instrumentNamesArray = [];
@@ -677,7 +678,6 @@ class MidiParser {
         }
         sortedStarts.sort((a, b) => { return a.startms - b.startms; });
         let adjustedStarts = [{ avgstartms: 0, items: [0] }];
-        let pluckDiff = 23;
         for (let ii = 0; ii < sortedStarts.length; ii++) {
             let cuStart = sortedStarts[ii];
             if (adjustedStarts.length < 1) {
@@ -702,7 +702,15 @@ class MidiParser {
             }
             one.avgstartms = sm / one.items.length;
         }
+        for (let pp = 0; pp < this.parsedTracks.length; pp++) {
+            let track = this.parsedTracks[pp];
+            for (let ss = 0; ss < track.trackChords.length; ss++) {
+                let chrd = track.trackChords[ss];
+                chrd.startMs = this.findNearestAvgTick(chrd.startMs, adjustedStarts);
+            }
+        }
         console.log(adjustedStarts);
+        let avgTimeLine = [];
         let lastEventTime = adjustedStarts[adjustedStarts.length - 1].avgstartms;
         let currentMs = 0;
         let currentTempo = 120;
@@ -710,17 +718,27 @@ class MidiParser {
         while (currentMs < lastEventTime) {
             currentMeter.set(this.findPreMetre(currentMs));
             currentTempo = this.findPreBPM(currentMs);
-            let barDuration = currentMeter.duration(currentTempo) * 1000;
-            console.log(currentMs, '' + currentMeter.count + '/' + currentMeter.part, currentTempo, barDuration);
-            currentMs = currentMs + barDuration;
+            let barMIDIDuration = currentMeter.duration(currentTempo) * 1000;
+            let nextMs = this.findNearestAvgTick(currentMs + barMIDIDuration, adjustedStarts);
+            if (nextMs > currentMs) {
+                currentMs = nextMs;
+            }
+            else {
+                currentMs = currentMs + 1000;
+            }
+            if (currentMs > 0 && avgTimeLine.length == 0) {
+                avgTimeLine.push({ start: 0, tempo: currentTempo, metre: currentMeter });
+            }
+            avgTimeLine.push({ start: currentMs, tempo: currentTempo, metre: currentMeter });
         }
-        return adjustedStarts;
+        console.log(avgTimeLine);
+        return avgTimeLine;
     }
     findPreMetre(ms) {
         let cume = { count: this.midiheader.metersList[0].count, part: this.midiheader.metersList[0].division };
         for (let ii = this.midiheader.metersList.length - 1; ii >= 0; ii--) {
             cume = { count: this.midiheader.metersList[ii].count, part: this.midiheader.metersList[ii].division };
-            if (ms >= this.midiheader.metersList[ii].ms) {
+            if (ms >= this.midiheader.metersList[ii].ms - 99) {
                 break;
             }
         }
@@ -730,7 +748,7 @@ class MidiParser {
         let bpm = this.midiheader.changesResolutionBPM[0].bpm;
         for (let ii = this.midiheader.changesResolutionBPM.length - 1; ii >= 0; ii--) {
             bpm = this.midiheader.changesResolutionBPM[ii].bpm;
-            if (ms >= this.midiheader.changesResolutionBPM[ii].ms) {
+            if (ms >= this.midiheader.changesResolutionBPM[ii].ms - 99) {
                 break;
             }
         }
@@ -1548,15 +1566,14 @@ class Projectr {
     parseRawMIDIdata(arrayBuffer, title, comment) {
         var midiParser = newMIDIparser2(arrayBuffer);
         console.log('done midiParser', midiParser);
-        midiParser.dumpStartStatistics();
+        let statMetre = midiParser.dumpStartStatistics();
         let cnvrtr = new MIDIConverter();
         let midiSongData = cnvrtr.convertProject(midiParser);
         console.log('done midiSongData', midiSongData);
         let proj = new Projectr();
-        return proj.readProject(midiSongData, title, comment);
+        return proj.readProject(midiSongData, title, comment, this.recalculateTimeLine(statMetre));
     }
-    readProject(midiSongData, title, comment) {
-        let newtimeline = this.createTimeLine(midiSongData);
+    readProject(midiSongData, title, comment, newtimeline) {
         let project = {
             title: title,
             timeline: newtimeline,
@@ -1684,91 +1701,30 @@ class Projectr {
         this.trimProject(project);
         return project;
     }
-    createTimeLine(midiSongData) {
-        let count = 0;
-        let part = 0;
-        let bpm = 0;
-        let timeline = [];
-        let fromMs = 0;
-        while (fromMs < midiSongData.duration) {
-            let measure = this.createMeasure(midiSongData, fromMs, timeline.length);
-            fromMs = fromMs + measure.durationMs;
-            if (count != measure.metre.count || part != measure.metre.part || bpm != measure.tempo) {
-                count = measure.metre.count;
-                part = measure.metre.part;
-                bpm = measure.tempo;
+    recalculateTimeLine(statMetre) {
+        let newtimeline = [];
+        for (let ii = 0; ii < statMetre.length; ii++) {
+            let measure = {
+                startMs: statMetre[ii].start,
+                durationMs: 2000,
+                tempo: statMetre[ii].tempo,
+                metre: statMetre[ii].metre
+            };
+            if (ii < statMetre.length - 1) {
+                measure.durationMs = statMetre[ii + 1].start - statMetre[ii].start;
+                let wholeNoteSeconds = ((measure.durationMs / 1000) / measure.metre.count) * measure.metre.part;
+                measure.tempo = (4 * 60) / wholeNoteSeconds;
             }
-            else {
-            }
-            timeline.push(measure);
+            newtimeline.push(measure);
         }
-        return timeline;
-    }
-    createMeasure(midiSongData, fromMs, barIdx) {
-        let lasthange = this.findLastChange(midiSongData, fromMs);
-        let lastmeter = this.findLastMeter(midiSongData, fromMs, barIdx);
-        let duration = this.calcMeasureDuration(midiSongData, lastmeter, lasthange.bpm, 1, fromMs);
-        lasthange = this.findLastChange(midiSongData, fromMs + duration);
         let measure = {
-            tempo: lasthange.bpm,
-            metre: lastmeter,
-            startMs: fromMs,
-            durationMs: duration
+            startMs: 111,
+            durationMs: 2000,
+            tempo: 111,
+            metre: { count: 4, part: 4 }
         };
-        return measure;
-    }
-    findLastChange(midiSongData, beforeMs) {
-        let nextChange = { track: 0, ms: 0, newresolution: 0, bpm: 120 };
-        for (let ii = 1; ii < midiSongData.changesData.length; ii++) {
-            if (midiSongData.changesData[ii].ms > beforeMs + 100) {
-                break;
-            }
-            nextChange = midiSongData.changesData[ii];
-        }
-        return nextChange;
-    }
-    findLastMeter(midiSongData, beforeMs, barIdx) {
-        let metre = {
-            count: midiSongData.startMeter.count,
-            part: midiSongData.startMeter.division
-        };
-        let midimeter = { track: 0, ms: 0, count: 4, division: 4 };
-        for (let mi = 0; mi < midiSongData.metersData.length; mi++) {
-            if (midiSongData.metersData[mi].ms > beforeMs + 100) {
-                break;
-            }
-            midimeter = midiSongData.metersData[mi];
-        }
-        metre.count = midimeter.count;
-        metre.part = midimeter.division;
-        return metre;
-    }
-    calcMeasureDuration(midiSongData, meter, bpm, part, startMs) {
-        let metreMath = MMUtil();
-        let wholeDurationMs = 1000 * metreMath.set(meter).duration(bpm);
-        let partDurationMs = part * wholeDurationMs;
-        let nextChange = this.findNextChange(midiSongData, startMs);
-        if (startMs < nextChange.ms && nextChange.ms < startMs + partDurationMs) {
-            let diffMs = nextChange.ms - startMs;
-            let ratio = diffMs / partDurationMs;
-            let newPart = ratio * part;
-            let newPartDurationMs = newPart * wholeDurationMs;
-            let remainsMs = this.calcMeasureDuration(midiSongData, meter, nextChange.bpm, part - newPart, nextChange.ms);
-            return newPartDurationMs + remainsMs;
-        }
-        else {
-            return partDurationMs;
-        }
-    }
-    findNextChange(midiSongData, afterMs) {
-        let nextChange = { track: 0, ms: 0, newresolution: 0, bpm: 120 };
-        for (let ii = 1; ii < midiSongData.changesData.length; ii++) {
-            if (midiSongData.changesData[ii].ms > afterMs) {
-                nextChange = midiSongData.changesData[ii];
-                break;
-            }
-        }
-        return nextChange;
+        newtimeline.push(measure);
+        return newtimeline;
     }
     addLyricsPoints(commentPoint, skip, txt, tempo) {
         txt = txt.replace(/(\r)/g, '~');

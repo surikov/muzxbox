@@ -1222,6 +1222,7 @@ class CommandDispatcher {
     registerWorkProject(data) {
         console.log('registerWorkProject', data.menuPerformers);
         this._mixerDataMathUtility = new MixerDataMathUtility(data);
+        this.adjustTimelineContent();
     }
     registerUI(renderer) {
         this.renderer = renderer;
@@ -1930,6 +1931,22 @@ class CommandDispatcher {
         }
     }
     adjustTimeLineLength() {
+        console.log('adjustTimeLineLength');
+        if (this.cfg().data.timeline.length > 1) {
+            if (!(this.cfg().data.timeline[this.cfg().data.timeline.length - 1])) {
+                this.cfg().data.timeline.length = this.cfg().data.timeline.length - 1;
+            }
+        }
+        if (this.cfg().data.timeline.length > 1) {
+            if (!(this.cfg().data.timeline[this.cfg().data.timeline.length - 1])) {
+                this.cfg().data.timeline.length = this.cfg().data.timeline.length - 1;
+            }
+        }
+        if (this.cfg().data.timeline.length > 1) {
+            if (!(this.cfg().data.timeline[this.cfg().data.timeline.length - 1])) {
+                this.cfg().data.timeline.length = this.cfg().data.timeline.length - 1;
+            }
+        }
         for (let tt = 0; tt < this.cfg().data.timeline.length; tt++) {
             for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
                 let track = this.cfg().data.tracks[nn];
@@ -1953,6 +1970,16 @@ class CommandDispatcher {
                 this.cfg().data.comments[tt] = { points: [] };
             }
         }
+        for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
+            this.cfg().data.tracks[nn].measures.length = this.cfg().data.timeline.length;
+        }
+        for (let nn = 0; nn < this.cfg().data.percussions.length; nn++) {
+            this.cfg().data.percussions[nn].measures.length = this.cfg().data.timeline.length;
+        }
+        for (let nn = 0; nn < this.cfg().data.filters.length; nn++) {
+            this.cfg().data.filters[nn].automation.length = this.cfg().data.timeline.length;
+        }
+        this.cfg().data.comments.length = this.cfg().data.timeline.length;
     }
     adjustRemoveEmptyChords() {
         for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
@@ -2615,54 +2642,56 @@ class TimeSelectBar {
             let barTime = 0;
             for (let kk = 0; kk < globalCommandDispatcher.cfg().data.timeline.length; kk++) {
                 let curBar = globalCommandDispatcher.cfg().data.timeline[kk];
-                let curMeasureMeter = mm.set(curBar.metre);
-                let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-                let measureAnchor = {
-                    minZoom: zoomPrefixLevelsCSS[zz].minZoom,
-                    beforeZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
-                    xx: barLeft, yy: 0, ww: barWidth, hh: 1234, content: [],
-                    id: 'measure' + (kk + Math.random())
-                };
-                selectLevelAnchor.content.push(measureAnchor);
-                if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
-                    this.createBarMark(kk, barLeft, zoomPrefixLevelsCSS[zz].minZoom * 1.5, measureAnchor, zz);
-                    this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor, barTime, zoomPrefixLevelsCSS[zz].minZoom * 1.5);
-                }
-                let zoomInfo = zoomPrefixLevelsCSS[zz];
-                if (zoomInfo.gridLines.length > 0) {
-                    let lineCount = 0;
-                    let skip = MMUtil().set({ count: 0, part: 1 });
-                    while (true) {
-                        let line = zoomInfo.gridLines[lineCount];
-                        skip = skip.plus(line.duration).simplyfy();
-                        if (!skip.less(curBar.metre)) {
-                            break;
-                        }
-                        if (line.label) {
-                            let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-                            let mark = {
-                                x: xx, y: 0,
-                                w: line.ratio * 2 * zoomInfo.minZoom,
-                                h: line.ratio * 8 * zoomInfo.minZoom,
-                                css: 'timeSubMark'
-                            };
-                            measureAnchor.content.push(mark);
-                            let mtr = {
-                                x: xx,
-                                y: 0.5 * zoomInfo.minZoom,
-                                text: '' + skip.count + '/' + skip.part,
-                                css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
-                            };
-                            measureAnchor.content.push(mtr);
-                        }
-                        lineCount++;
-                        if (lineCount >= zoomInfo.gridLines.length) {
-                            lineCount = 0;
+                if (curBar) {
+                    let curMeasureMeter = mm.set(curBar.metre);
+                    let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                    let measureAnchor = {
+                        minZoom: zoomPrefixLevelsCSS[zz].minZoom,
+                        beforeZoom: zoomPrefixLevelsCSS[zz + 1].minZoom,
+                        xx: barLeft, yy: 0, ww: barWidth, hh: 1234, content: [],
+                        id: 'measure' + (kk + Math.random())
+                    };
+                    selectLevelAnchor.content.push(measureAnchor);
+                    if ((zz <= 4) || (zz == 5 && kk % 2 == 0) || (zz == 6 && kk % 4 == 0) || (zz == 7 && kk % 8 == 0) || (zz == 8 && kk % 16 == 0)) {
+                        this.createBarMark(kk, barLeft, zoomPrefixLevelsCSS[zz].minZoom * 1.5, measureAnchor, zz);
+                        this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor, barTime, zoomPrefixLevelsCSS[zz].minZoom * 1.5);
+                    }
+                    let zoomInfo = zoomPrefixLevelsCSS[zz];
+                    if (zoomInfo.gridLines.length > 0) {
+                        let lineCount = 0;
+                        let skip = MMUtil().set({ count: 0, part: 1 });
+                        while (true) {
+                            let line = zoomInfo.gridLines[lineCount];
+                            skip = skip.plus(line.duration).simplyfy();
+                            if (!skip.less(curBar.metre)) {
+                                break;
+                            }
+                            if (line.label) {
+                                let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                                let mark = {
+                                    x: xx, y: 0,
+                                    w: line.ratio * 2 * zoomInfo.minZoom,
+                                    h: line.ratio * 8 * zoomInfo.minZoom,
+                                    css: 'timeSubMark'
+                                };
+                                measureAnchor.content.push(mark);
+                                let mtr = {
+                                    x: xx,
+                                    y: 0.5 * zoomInfo.minZoom,
+                                    text: '' + skip.count + '/' + skip.part,
+                                    css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
+                                };
+                                measureAnchor.content.push(mtr);
+                            }
+                            lineCount++;
+                            if (lineCount >= zoomInfo.gridLines.length) {
+                                lineCount = 0;
+                            }
                         }
                     }
+                    barLeft = barLeft + barWidth;
+                    barTime = barTime + curMeasureMeter.duration(curBar.tempo);
                 }
-                barLeft = barLeft + barWidth;
-                barTime = barTime + curMeasureMeter.duration(curBar.tempo);
             }
             this.fillSelectionMenu(zz, selectLevelAnchor);
         }
@@ -4128,7 +4157,6 @@ class OctaveContent {
     }
     addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, interact, zoomLevel) {
         if (!track.measures[barIdx]) {
-            console.log('addTrackNotes not found', barIdx, 'for track', track.title);
             return;
         }
         let measure = track.measures[barIdx];
@@ -4333,63 +4361,80 @@ class MixerBar {
     addOctaveGridSteps(barIdx, barLeft, width, barOctaveAnchor, zIndex) {
         let zoomInfo = zoomPrefixLevelsCSS[zIndex];
         let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
-        let lineCount = 0;
-        let skip = MMUtil().set({ count: 0, part: 1 });
-        barOctaveAnchor.content.push({
-            x: barLeft + width,
-            y: globalCommandDispatcher.cfg().gridTop(),
-            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.8,
-            h: globalCommandDispatcher.cfg().gridHeight(),
-            css: 'barRightBorder'
-        });
-        barOctaveAnchor.content.push({
-            x: barLeft + width,
-            y: globalCommandDispatcher.cfg().samplerTop(),
-            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.8,
-            h: globalCommandDispatcher.cfg().samplerHeight(),
-            css: 'barRightBorder'
-        });
-        barOctaveAnchor.content.push({
-            x: barLeft + width,
-            y: globalCommandDispatcher.cfg().automationTop(),
-            w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.8,
-            h: globalCommandDispatcher.cfg().automationHeight(),
-            css: 'barRightBorder'
-        });
-        if (zoomInfo.gridLines.length > 0) {
-            let css = 'stepPartDelimiter';
-            if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
-                css = 'interactiveTimeMeasureMark';
-            }
-            while (true) {
-                let line = zoomInfo.gridLines[lineCount];
-                skip = skip.plus(line.duration).simplyfy();
-                if (!skip.less(curBar.metre)) {
-                    break;
-                }
-                let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-                barOctaveAnchor.content.push({
-                    x: xx,
-                    y: globalCommandDispatcher.cfg().gridTop(),
-                    w: line.ratio * zoomInfo.minZoom / 4,
-                    h: globalCommandDispatcher.cfg().gridHeight(),
-                    css: css
-                });
-                barOctaveAnchor.content.push({
-                    x: xx,
-                    y: globalCommandDispatcher.cfg().samplerTop(),
-                    w: line.ratio * zoomInfo.minZoom / 4,
-                    h: globalCommandDispatcher.cfg().samplerHeight(),
-                    css: css
-                });
-                barOctaveAnchor.content.push({
-                    x: xx,
-                    y: globalCommandDispatcher.cfg().automationTop(),
-                    w: line.ratio * zoomInfo.minZoom / 4,
-                    h: globalCommandDispatcher.cfg().automationHeight(),
-                    css: css
-                });
+        if (curBar) {
+            let lineCount = 0;
+            let skip = MMUtil().set({ count: 0, part: 1 });
+            barOctaveAnchor.content.push({
+                x: barLeft + width,
+                y: globalCommandDispatcher.cfg().gridTop(),
+                w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.8,
+                h: globalCommandDispatcher.cfg().gridHeight(),
+                css: 'barRightBorder'
+            });
+            barOctaveAnchor.content.push({
+                x: barLeft + width,
+                y: globalCommandDispatcher.cfg().samplerTop(),
+                w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.8,
+                h: globalCommandDispatcher.cfg().samplerHeight(),
+                css: 'barRightBorder'
+            });
+            barOctaveAnchor.content.push({
+                x: barLeft + width,
+                y: globalCommandDispatcher.cfg().automationTop(),
+                w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.8,
+                h: globalCommandDispatcher.cfg().automationHeight(),
+                css: 'barRightBorder'
+            });
+            if (zoomInfo.gridLines.length > 0) {
+                let css = 'stepPartDelimiter';
                 if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+                    css = 'interactiveTimeMeasureMark';
+                }
+                while (true) {
+                    let line = zoomInfo.gridLines[lineCount];
+                    skip = skip.plus(line.duration).simplyfy();
+                    if (!skip.less(curBar.metre)) {
+                        break;
+                    }
+                    let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                    barOctaveAnchor.content.push({
+                        x: xx,
+                        y: globalCommandDispatcher.cfg().gridTop(),
+                        w: line.ratio * zoomInfo.minZoom / 4,
+                        h: globalCommandDispatcher.cfg().gridHeight(),
+                        css: css
+                    });
+                    barOctaveAnchor.content.push({
+                        x: xx,
+                        y: globalCommandDispatcher.cfg().samplerTop(),
+                        w: line.ratio * zoomInfo.minZoom / 4,
+                        h: globalCommandDispatcher.cfg().samplerHeight(),
+                        css: css
+                    });
+                    barOctaveAnchor.content.push({
+                        x: xx,
+                        y: globalCommandDispatcher.cfg().automationTop(),
+                        w: line.ratio * zoomInfo.minZoom / 4,
+                        h: globalCommandDispatcher.cfg().automationHeight(),
+                        css: css
+                    });
+                    if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+                        barOctaveAnchor.content.push({
+                            x: xx,
+                            y: globalCommandDispatcher.cfg().commentsTop(),
+                            w: line.ratio * zoomInfo.minZoom / 4,
+                            h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex),
+                            css: css
+                        });
+                    }
+                    lineCount++;
+                    if (lineCount >= zoomInfo.gridLines.length) {
+                        lineCount = 0;
+                    }
+                }
+                if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+                    let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                    let line = zoomInfo.gridLines[lineCount];
                     barOctaveAnchor.content.push({
                         x: xx,
                         y: globalCommandDispatcher.cfg().commentsTop(),
@@ -4398,21 +4443,6 @@ class MixerBar {
                         css: css
                     });
                 }
-                lineCount++;
-                if (lineCount >= zoomInfo.gridLines.length) {
-                    lineCount = 0;
-                }
-            }
-            if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
-                let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-                let line = zoomInfo.gridLines[lineCount];
-                barOctaveAnchor.content.push({
-                    x: xx,
-                    y: globalCommandDispatcher.cfg().commentsTop(),
-                    w: line.ratio * zoomInfo.minZoom / 4,
-                    h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex),
-                    css: css
-                });
             }
         }
     }
@@ -4923,7 +4953,11 @@ class MixerUI {
             let itemcount = countFunction(bb);
             let filIdx = 1 + Math.round(7 * itemcount / mxItems);
             let css = 'mixFiller' + filIdx;
-            let barwidth = MMUtil().set(globalCommandDispatcher.cfg().data.timeline[bb].metre).duration(globalCommandDispatcher.cfg().data.timeline[bb].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+            let timebar = globalCommandDispatcher.cfg().data.timeline[bb];
+            if (!(timebar)) {
+                timebar = { tempo: 120, metre: { count: 4, part: 4 } };
+            }
+            let barwidth = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
             let fillRectangle = {
                 x: globalCommandDispatcher.cfg().leftPad + barX,
                 y: yy,
@@ -4992,6 +5026,9 @@ class MixerZoomLevel {
         let width = 0;
         for (let ii = 0; ii < globalCommandDispatcher.cfg().data.timeline.length; ii++) {
             let timebar = globalCommandDispatcher.cfg().data.timeline[ii];
+            if (!(timebar)) {
+                timebar = { tempo: 120, metre: { count: 4, part: 4 } };
+            }
             width = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
             let barGridAnchor = {
                 minZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom, beforeZoom: zoomPrefixLevelsCSS[this.zoomLevelIndex + 1].minZoom,
@@ -6511,7 +6548,11 @@ class MixerDataMathUtility {
         let mm = MMUtil();
         let ww = 0;
         for (let ii = 0; ii < this.data.timeline.length; ii++) {
-            ww = ww + mm.set(this.data.timeline[ii].metre).duration(this.data.timeline[ii].tempo) * this.widthDurationRatio;
+            let timebar = this.data.timeline[ii];
+            if (!(timebar)) {
+                timebar = { tempo: 120, metre: { count: 4, part: 4 } };
+            }
+            ww = ww + mm.set(timebar.metre).duration(timebar.tempo) * this.widthDurationRatio;
         }
         return ww;
     }

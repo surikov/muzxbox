@@ -279,7 +279,14 @@ class MixerUI {
 			let itemcount = countFunction(bb);
 			let filIdx = 1 + Math.round(7 * itemcount / mxItems);
 			let css = 'mixFiller' + filIdx;
-			let barwidth = MMUtil().set(globalCommandDispatcher.cfg().data.timeline[bb].metre).duration(globalCommandDispatcher.cfg().data.timeline[bb].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+
+			let timebar = globalCommandDispatcher.cfg().data.timeline[bb];
+			if (!(timebar)) {
+				timebar = { tempo: 120, metre: { count: 4, part: 4 } }
+			}
+
+			//let barwidth = MMUtil().set(globalCommandDispatcher.cfg().data.timeline[bb].metre).duration(globalCommandDispatcher.cfg().data.timeline[bb].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+			let barwidth = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 			let fillRectangle: TileRectangle = {
 				x: globalCommandDispatcher.cfg().leftPad + barX
 				, y: yy
