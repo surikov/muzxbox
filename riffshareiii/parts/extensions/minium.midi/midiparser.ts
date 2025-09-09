@@ -812,9 +812,9 @@ class MidiParser {
 			//console.log(currentMs, '' + currentMeter.count + '/' + currentMeter.part, currentTempo, barMIDIDuration, currentMs);
 			//currentMs = currentMs + barRealDuration;
 			if (currentMs > 0 && avgTimeLine.length == 0) {
-				avgTimeLine.push({ start: 0, tempo: currentTempo, metre: currentMeter });
+				avgTimeLine.push({ start: 0, tempo: currentTempo, metre: currentMeter.metre() });
 			}
-			avgTimeLine.push({ start: currentMs, tempo: currentTempo, metre: currentMeter });
+			avgTimeLine.push({ start: currentMs, tempo: currentTempo, metre: currentMeter.metre() });
 		}
 		console.log(avgTimeLine);
 		return avgTimeLine;

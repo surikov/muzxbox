@@ -727,9 +727,9 @@ class MidiParser {
                 currentMs = currentMs + 1000;
             }
             if (currentMs > 0 && avgTimeLine.length == 0) {
-                avgTimeLine.push({ start: 0, tempo: currentTempo, metre: currentMeter });
+                avgTimeLine.push({ start: 0, tempo: currentTempo, metre: currentMeter.metre() });
             }
-            avgTimeLine.push({ start: currentMs, tempo: currentTempo, metre: currentMeter });
+            avgTimeLine.push({ start: currentMs, tempo: currentTempo, metre: currentMeter.metre() });
         }
         console.log(avgTimeLine);
         return avgTimeLine;
@@ -1717,13 +1717,6 @@ class Projectr {
             }
             newtimeline.push(measure);
         }
-        let measure = {
-            startMs: 111,
-            durationMs: 2000,
-            tempo: 111,
-            metre: { count: 4, part: 4 }
-        };
-        newtimeline.push(measure);
         return newtimeline;
     }
     addLyricsPoints(commentPoint, skip, txt, tempo) {
