@@ -1,0 +1,41 @@
+class FileLoaderAlpha {
+	constructor(inputFile) {
+		var file = inputFile.files[0];
+		var fileReader = new FileReader();
+		let me = this;
+
+		fileReader.onload = function (progressEvent: any) {
+			if (progressEvent != null) {
+				let title: string = file.name;
+				let dat = '' + file.lastModifiedDate;
+				try {
+					let last: Date = file.lastModifiedDate;
+					dat = '' + last.getFullYear();
+					if (last.getMonth() < 10) {
+						dat = dat + '-' + last.getMonth();
+					} else {
+						dat = dat + '-0' + last.getMonth();
+					}
+					if (last.getDate() < 10) {
+						dat = dat + '-' + last.getDate();
+					} else {
+						dat = dat + '-0' + last.getDate();
+					}
+				} catch (xx) {
+					console.log(xx);
+				}
+				let comment: string = ', ' + file.size / 1000 + 'kb, ' + dat;
+				var arrayBuffer: ArrayBuffer = progressEvent.target.result as ArrayBuffer;
+				let tt: Gp3To5Importer;
+				//let scoreImporter:Gp3To5Importer = new Gp3To5Importer(arrayBuffer);
+				//let proj = new Projectr();
+				//me.parsedProject = proj.parseRawMIDIdata(arrayBuffer, title, comment);
+				//console.log('done zproject', me.parsedProject);
+			}
+		};
+		fileReader.readAsArrayBuffer(file);
+	}
+}
+console.log('test');
+
+

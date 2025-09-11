@@ -1,0 +1,108 @@
+{
+	"compilerOptions": {
+		"target": "es2015"
+        ,"outFile": "../../exe/plugins/actions/alphatabimport1/aimportfile.js"
+        //,"outDir":"../js"
+		,"strictNullChecks": true
+		,"alwaysStrict": true
+		,"esModuleInterop": true
+		,"noResolve": false
+        ,"noImplicitAny": false
+        ,"removeComments": true
+        ,"preserveConstEnums": true
+        ,"sourceMap": true
+        ,"experimentalDecorators": true
+        ,"isolatedModules": false
+		,"module": "AMD"
+        ,"lib": [
+            "dom"
+            ,"es2015"
+            ,"es5"
+        ]
+        ,"declaration": true
+		,"types": [ ]
+	}
+	,"files": [
+		
+		
+		
+        "../../mzxbxapi/musicenginetypes.ts"
+		,"../../mzxbxapi/musicenginedeclarations.ts"
+		,"../minium.percussion/list/names.ts"
+		,"../minium.pitch/list/names.ts"
+
+		,"./alphatab/AlphaTabError.ts"
+		,"./alphatab/CoreSettings.ts"
+		,"./alphatab/LogLevel.ts"
+		,"./alphatab/ImporterSettings.ts"
+		,"./alphatab/Settings.ts"
+		,"./alphatab/Logger.ts"
+		,"./alphatab/NotationSettings.ts"
+		,"./alphatab/io/IReadable.ts"
+		,"./alphatab/io/IOHelper.ts"
+		,"./alphatab/io/TypeConversions.ts"
+		,"./alphatab/io/IWriteable.ts"
+		,"./alphatab/synth/SynthConstants.ts"
+		,"./alphatab/model/Score.ts"
+		,"./alphatab/model/PickStroke.ts"
+		,"./alphatab/model/RepeatGroup.ts"
+		,"./alphatab/model/MasterBar.ts"
+		,"./alphatab/model/KeySignature.ts"
+		,"./alphatab/model/KeySignatureType.ts"
+		,"./alphatab/model/TripletFeel.ts"
+		,"./alphatab/model/Section.ts"
+		,"./alphatab/model/Automation.ts"
+		,"./alphatab/model/Fermata.ts"
+		,"./alphatab/model/Direction.ts"
+		,"./alphatab/model/Duration.ts"
+		,"./alphatab/model/DynamicValue.ts"
+		,"./alphatab/model/Beat.ts"
+		,"./alphatab/model/Voice.ts"
+		,"./alphatab/model/Note.ts"
+		,"./alphatab/model/BendStyle.ts"
+		,"./alphatab/model/AccentuationType.ts"
+		,"./alphatab/model/Ottavia.ts"
+		,"./alphatab/model/BendType.ts"
+		,"./alphatab/model/BendPoint.ts"
+		,"./alphatab/model/HarmonicType.ts"
+		,"./alphatab/model/SlideInType.ts"
+		,"./alphatab/model/SlideOutType.ts"
+		,"./alphatab/model/VibratoType.ts"
+		,"./alphatab/model/Fingers.ts"
+		,"./alphatab/model/NoteAccidentalMode.ts"
+		,"./alphatab/model/NoteOrnament.ts"
+		,"./alphatab/model/Staff.ts"
+		,"./alphatab/model/Track.ts"
+		,"./alphatab/model/Bar.ts"
+		,"./alphatab/model/Clef.ts"
+		,"./alphatab/model/Chord.ts"
+		,"./alphatab/model/Tuning.ts"
+		,"./alphatab/model/ModelUtils.ts"
+		,"./alphatab/model/GraceGroup.ts"
+		,"./alphatab/model/GraceType.ts"
+		,"./alphatab/model/CrescendoType.ts"
+		,"./alphatab/model/FadeType.ts"
+		,"./alphatab/model/Rasgueado.ts"
+		,"./alphatab/model/BrushType.ts"
+		,"./alphatab/model/TupletGroup.ts"
+		,"./alphatab/model/WhammyType.ts"
+		,"./alphatab/model/GolpeType.ts"
+		,"./alphatab/model/WahPedal.ts"
+		,"./alphatab/model/BarreShape.ts"
+		,"./alphatab/model/Lyrics.ts"
+		,"./alphatab/model/SimileMark.ts"
+		,"./alphatab/model/PlaybackInformation.ts"
+		,"./alphatab/model/InstrumentArticulation.ts"
+		,"./alphatab/midi/MidiUtils.ts"		
+		,"./alphatab/midi/GeneralMidi.ts"
+		,"./alphatab/importer/ScoreImporter.ts"
+		,"./alphatab/importer/UnsupportedFormatError.ts"
+		,"./alphatab/util/Lazy.ts"
+
+		,"./alphatab/importer/Gp3To5Importer.ts"
+
+        ,"./fileimport/aimportplugin.ts"
+		,"./fileimport/fileloader.ts"
+
+	]
+}

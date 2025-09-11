@@ -1,0 +1,8 @@
+{
+    "label": "Import *.*"
+    , "purpose": "Action"
+    , "kind": "alphatabimport1"
+    , "ui": "./plugins/actions/alphatabimport1/ui.html"
+    , "evaluate": ""
+    , "script": ""
+}

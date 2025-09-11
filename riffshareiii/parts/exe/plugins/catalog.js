@@ -97,6 +97,14 @@ let _t_all_registerd_plugins_list = [
         "ui": "./plugins/actions/miniumeditselection1/mied.html",
         "evaluate": "",
         "script": ""
+    },
+    {
+        "label": "Alpha Tab Import",
+        "purpose": "Action",
+        "kind": "alphatabimport1",
+        "ui": "./plugins/actions/alphatabimport1/ui.html",
+        "evaluate": "",
+        "script": ""
     }
 ];
 function MZXBX_currentPlugins() {
