@@ -37,8 +37,8 @@ class AlphaTabImportMusicPlugin {
 	}
 
 	loadMusicfile(inputFile) {
-		console.log('loadMusicfile');
-		console.dir(inputFile);
+		//console.log('loadMusicfile');
+		//console.dir(inputFile);
 		let loader = new FileLoaderAlpha(inputFile);
 	}
 

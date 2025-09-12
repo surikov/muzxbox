@@ -82,6 +82,7 @@ class Gp3To5Importer extends ScoreImporter {
         this._directionLookup.clear();
 
         this.readVersion();
+		//console.log('readScore',this._versionNumber);
         this._score = new Score();
         // basic song info
         this.readScoreInformation();
@@ -150,7 +151,9 @@ class Gp3To5Importer extends ScoreImporter {
         }
         // contents
         this._barCount = IOHelper.readInt32LE(this.data);
+		//console.log('_barCount',this._barCount);
         this._trackCount = IOHelper.readInt32LE(this.data);
+		//console.log('_trackCount',this._trackCount);
         this.readMasterBars();
         this.readTracks();
         this.readBars();
@@ -432,6 +435,7 @@ class Gp3To5Importer extends ScoreImporter {
     }
 
     public readTrack(): void {
+		//console.log(1,this.data.position);
         const newTrack: Track = new Track();
         newTrack.ensureStaveCount(1);
         this._score.addTrack(newTrack);
@@ -471,12 +475,12 @@ class Gp3To5Importer extends ScoreImporter {
             }
         }
         mainStaff.stringTuning.tunings = tuning;
-
+		//console.log(2,this.data.position);
         const port: number = IOHelper.readInt32LE(this.data);
         const index: number = IOHelper.readInt32LE(this.data) - 1;
         const effectChannel: number = IOHelper.readInt32LE(this.data) - 1;
         this.data.skip(4); // Fretcount
-
+		//console.log('a',this.data.position);
         if (index >= 0 && index < this._playbackInfos.length) {
             const info: PlaybackInformation = this._playbackInfos[index];
             info.port = port;
@@ -487,9 +491,12 @@ class Gp3To5Importer extends ScoreImporter {
                 mainStaff.displayTranspositionPitch = -12;
             }
             newTrack.playbackInfo = info;
+			//console.log('index',this.data.position,index,this._playbackInfos.length);
         }
+		//console.log('b',this.data.position);
         mainStaff.capo = IOHelper.readInt32LE(this.data);
-        //newTrack.color = GpBinaryHelpers.gpReadColor(this.data, false);
+        newTrack.color = GpBinaryHelpers.gpReadColor(this.data, false);
+		//console.log(3,this.data.position);
         if (this._versionNumber >= 500) {
             const staffFlags = this.data.readByte();
             mainStaff.showTablature = (staffFlags & 0x01) !== 0;
@@ -573,9 +580,11 @@ class Gp3To5Importer extends ScoreImporter {
                 this._clefsPerTrack.set(index, Clef.G2);
             }
         }
+		//console.log(this.data.position,newTrack);
     }
 
     public readBars(): void {
+		//console.log('readBars',this);
         for (let i: number = 0; i < this._barCount; i++) {
             for (let t: number = 0; t < this._trackCount; t++) {
                 this.readBar(this._score.tracks[t]);
@@ -584,6 +593,7 @@ class Gp3To5Importer extends ScoreImporter {
     }
 
     public readBar(track: Track): void {
+		//console.log('readBar',this.data.position,this.data.length);
         const newBar: Bar = new Bar();
         const mainStaff: Staff = track.staves[0];
         if (mainStaff.isPercussion) {
@@ -617,18 +627,22 @@ class Gp3To5Importer extends ScoreImporter {
     }
 
     public readVoice(track: Track, bar: Bar): void {
+		//console.log('readVoice',this.data.position,this.data.length);
         const beatCount: number = IOHelper.readInt32LE(this.data);
+		
         if (beatCount === 0) {
             return;
         }
         const newVoice: Voice = new Voice();
         bar.addVoice(newVoice);
+		//console.log(':',beatCount,newVoice);
         for (let i: number = 0; i < beatCount; i++) {
             this.readBeat(track, bar, newVoice);
         }
     }
 
     public readBeat(track: Track, bar: Bar, voice: Voice): void {
+		//console.log('readBeat',this.data.position,this.data.length);
         const newBeat: Beat = new Beat();
         const flags: number = this.data.readByte();
         if ((flags & 0x01) !== 0) {
@@ -704,6 +718,7 @@ class Gp3To5Importer extends ScoreImporter {
         const beatTextAsLyrics = this.settings.importer.beatTextAsLyrics && track.index !== this._lyricsTrack; // detect if not lyrics track
 
         if ((flags & 0x04) !== 0) {
+			
             const text = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
             if (beatTextAsLyrics) {
                 const lyrics = new Lyrics();
@@ -1483,8 +1498,9 @@ class Gp3To5Importer extends ScoreImporter {
     }
 }
 
-export class GpBinaryHelpers {
-    /*public static gpReadColor(data: IReadable, readAlpha: boolean = false): Color {
+//export 
+class GpBinaryHelpers {
+    public static gpReadColor(data: IReadable, readAlpha: boolean = false): Color {
         const r: number = data.readByte();
         const g: number = data.readByte();
         const b: number = data.readByte();
@@ -1496,7 +1512,7 @@ export class GpBinaryHelpers {
         }
         return new Color(r, g, b, a);
     }
-*/
+
     public static gpReadBool(data: IReadable): boolean {
         return data.readByte() !== 0;
     }

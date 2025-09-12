@@ -79,7 +79,7 @@ class Track {
     /**
      * Gets or sets the display color defined for this track.
      */
-    //public color: Color = new Color(200, 0, 0, 255);
+    public color: Color = new Color(200, 0, 0, 255);
 
     /**
      * Gets or sets the long name of this track.

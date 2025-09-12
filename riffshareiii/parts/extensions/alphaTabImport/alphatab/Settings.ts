@@ -56,7 +56,7 @@ class Settings {
     //public readonly exporter: ExporterSettings = new ExporterSettings();
 
     public setSongBookModeSettings(): void {
-		/*
+		
         this.notation.notationMode = NotationMode.SongBook;
         this.notation.smallGraceTabNotes = false;
         this.notation.fingeringMode = FingeringMode.SingleNoteEffectBand;
@@ -64,7 +64,7 @@ class Settings {
         this.notation.elements.set(NotationElement.ParenthesisOnTiedBends, false);
         this.notation.elements.set(NotationElement.TabNotesOnTiedBends, false);
         this.notation.elements.set(NotationElement.ZerosOnDiveWhammys, true);
-		*/
+		
     }
 
     public static get songBook(): Settings {

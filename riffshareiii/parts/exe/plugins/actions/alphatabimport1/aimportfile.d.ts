@@ -304,6 +304,9 @@ declare class AlphaTabError extends Error {
     type: AlphaTabErrorType;
     constructor(type: AlphaTabErrorType, message?: string | null, inner?: Error);
 }
+declare class FormatError extends AlphaTabError {
+    constructor(message: string);
+}
 declare enum FontFileFormat {
     EmbeddedOpenType = 0,
     Woff = 1,
@@ -518,6 +521,27 @@ interface IWriteable {
     readonly bytesWritten: number;
     writeByte(value: number): void;
     write(buffer: Uint8Array, offset: number, count: number): void;
+}
+declare class ByteBuffer implements IWriteable, IReadable {
+    private _buffer;
+    length: number;
+    position: number;
+    get bytesWritten(): number;
+    getBuffer(): Uint8Array;
+    static empty(): ByteBuffer;
+    static withCapacity(capacity: number): ByteBuffer;
+    static fromBuffer(data: Uint8Array): ByteBuffer;
+    static fromString(contents: string): ByteBuffer;
+    reset(): void;
+    skip(offset: number): void;
+    readByte(): number;
+    read(buffer: Uint8Array, offset: number, count: number): number;
+    writeByte(value: number): void;
+    write(buffer: Uint8Array, offset: number, count: number): void;
+    private ensureCapacity;
+    readAll(): Uint8Array;
+    toArray(): Uint8Array;
+    copyTo(destination: IWriteable): void;
 }
 declare class SynthConstants {
     static readonly DefaultChannelCount: number;
@@ -1183,6 +1207,7 @@ declare class Track {
     score: Score;
     staves: Staff[];
     playbackInfo: PlaybackInformation;
+    color: Color;
     name: string;
     isVisibleOnMultiTrack: boolean;
     shortName: string;
@@ -1486,6 +1511,21 @@ declare enum SimileMark {
     FirstOfDouble = 2,
     SecondOfDouble = 3
 }
+declare type ColorJson = Color | string | number;
+declare class Color {
+    static readonly BlackRgb: string;
+    constructor(r: number, g: number, b: number, a?: number);
+    updateRgba(): void;
+    raw: number;
+    get a(): number;
+    get r(): number;
+    get g(): number;
+    get b(): number;
+    rgba: string;
+    static random(opacity?: number): Color;
+    static fromJson(v: unknown): Color | null;
+    static toJson(obj: Color | null): number | null;
+}
 declare class PlaybackInformation {
     volume: number;
     balance: number;
@@ -1547,16 +1587,72 @@ declare class Lazy<T> {
     constructor(factory: () => T);
     get value(): T;
 }
-declare module "extensions/alphaTabImport/alphatab/importer/Gp3To5Importer" {
-    export class GpBinaryHelpers {
-        static gpReadBool(data: IReadable): boolean;
-        static gpReadStringIntUnused(data: IReadable, encoding: string): string;
-        static gpReadStringInt(data: IReadable, encoding: string): string;
-        static gpReadStringIntByte(data: IReadable, encoding: string): string;
-        static gpReadString(data: IReadable, length: number, encoding: string): string;
-        static gpWriteString(data: IWriteable, s: string): void;
-        static gpReadStringByteLength(data: IReadable, length: number, encoding: string): string;
-    }
+declare class Gp3To5Importer extends ScoreImporter {
+    constructor();
+    private static readonly VersionString;
+    private _versionNumber;
+    private _score;
+    private _globalTripletFeel;
+    private _lyricsTrack;
+    private _lyrics;
+    private _barCount;
+    private _trackCount;
+    private _playbackInfos;
+    private _doubleBars;
+    private _clefsPerTrack;
+    private _keySignatures;
+    private _beatTextChunksByTrack;
+    private _directionLookup;
+    get name(): string;
+    readScore(): Score;
+    private readDirection;
+    readVersion(): void;
+    readScoreInformation(): void;
+    readLyrics(): void;
+    readPageSetup(): void;
+    readPlaybackInfos(): void;
+    readMasterBars(): void;
+    readMasterBar(): void;
+    readTracks(): void;
+    readTrack(): void;
+    readBars(): void;
+    readBar(track: Track): void;
+    readVoice(track: Track, bar: Bar): void;
+    readBeat(track: Track, bar: Bar, voice: Voice): void;
+    readChord(beat: Beat): void;
+    readBeatEffects(beat: Beat): HarmonicType;
+    readTremoloBarEffect(beat: Beat): void;
+    private static toStrokeValue;
+    private readRseBank;
+    readMixTableChange(beat: Beat): void;
+    readNote(track: Track, bar: Bar, voice: Voice, beat: Beat, stringIndex: number): Note;
+    toDynamicValue(value: number): DynamicValue;
+    readNoteEffects(_track: Track, voice: Voice, beat: Beat, note: Note): void;
+    private static readonly BendStep;
+    readBend(note: Note): void;
+    readGrace(voice: Voice, note: Note): void;
+    readTremoloPicking(beat: Beat): void;
+    readSlide(note: Note): void;
+    readArtificialHarmonic(note: Note): void;
+    readTrill(note: Note): void;
+}
+declare class GpBinaryHelpers {
+    static gpReadColor(data: IReadable, readAlpha?: boolean): Color;
+    static gpReadBool(data: IReadable): boolean;
+    static gpReadStringIntUnused(data: IReadable, encoding: string): string;
+    static gpReadStringInt(data: IReadable, encoding: string): string;
+    static gpReadStringIntByte(data: IReadable, encoding: string): string;
+    static gpReadString(data: IReadable, length: number, encoding: string): string;
+    static gpWriteString(data: IWriteable, s: string): void;
+    static gpReadStringByteLength(data: IReadable, length: number, encoding: string): string;
+}
+declare class MixTableChange {
+    volume: number;
+    balance: number;
+    instrument: number;
+    tempoName: string;
+    tempo: number;
+    duration: number;
 }
 declare class AlphaTabImportMusicPlugin {
     callbackID: string;

@@ -419,9 +419,15 @@ var AlphaTabErrorType;
 })(AlphaTabErrorType || (AlphaTabErrorType = {}));
 class AlphaTabError extends Error {
     constructor(type, message = '', inner) {
-        super(message !== null && message !== void 0 ? message : '');
+        super(message ?? '');
         this.type = type;
         Object.setPrototypeOf(this, AlphaTabError.prototype);
+    }
+}
+class FormatError extends AlphaTabError {
+    constructor(message) {
+        super(AlphaTabErrorType.Format, message);
+        Object.setPrototypeOf(this, FormatError.prototype);
     }
 }
 var FontFileFormat;
@@ -451,7 +457,7 @@ class CoreSettings {
     }
     static buildDefaultSmuflFontSources(fontDirectory) {
         const map = new Map();
-        const prefix = fontDirectory !== null && fontDirectory !== void 0 ? fontDirectory : '';
+        const prefix = fontDirectory ?? '';
         map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
         map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
         map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
@@ -480,6 +486,13 @@ class Settings {
         this.importer = new ImporterSettings();
     }
     setSongBookModeSettings() {
+        this.notation.notationMode = NotationMode.SongBook;
+        this.notation.smallGraceTabNotes = false;
+        this.notation.fingeringMode = FingeringMode.SingleNoteEffectBand;
+        this.notation.extendBendArrowsOnTiedNotes = false;
+        this.notation.elements.set(NotationElement.ParenthesisOnTiedBends, false);
+        this.notation.elements.set(NotationElement.TabNotesOnTiedBends, false);
+        this.notation.elements.set(NotationElement.ZerosOnDiveWhammys, true);
     }
     static get songBook() {
         const settings = new Settings();
@@ -891,6 +904,107 @@ class TypeConversions {
 TypeConversions._conversionBuffer = new ArrayBuffer(8);
 TypeConversions._conversionByteArray = new Uint8Array(TypeConversions._conversionBuffer);
 TypeConversions._dataView = new DataView(TypeConversions._conversionBuffer);
+class ByteBuffer {
+    constructor() {
+        this.length = 0;
+        this.position = 0;
+    }
+    get bytesWritten() {
+        return this.position;
+    }
+    getBuffer() {
+        return this._buffer;
+    }
+    static empty() {
+        return ByteBuffer.withCapacity(0);
+    }
+    static withCapacity(capacity) {
+        const buffer = new ByteBuffer();
+        buffer._buffer = new Uint8Array(capacity);
+        return buffer;
+    }
+    static fromBuffer(data) {
+        const buffer = new ByteBuffer();
+        buffer._buffer = data;
+        buffer.length = data.length;
+        return buffer;
+    }
+    static fromString(contents) {
+        const byteArray = IOHelper.stringToBytes(contents);
+        return ByteBuffer.fromBuffer(byteArray);
+    }
+    reset() {
+        this.position = 0;
+    }
+    skip(offset) {
+        this.position += offset;
+    }
+    readByte() {
+        const n = this.length - this.position;
+        if (n <= 0) {
+            return -1;
+        }
+        return this._buffer[this.position++];
+    }
+    read(buffer, offset, count) {
+        let n = this.length - this.position;
+        if (n > count) {
+            n = count;
+        }
+        if (n <= 0) {
+            return 0;
+        }
+        buffer.set(this._buffer.subarray(this.position, this.position + n), offset);
+        this.position += n;
+        return n;
+    }
+    writeByte(value) {
+        const i = this.position + 1;
+        this.ensureCapacity(i);
+        this._buffer[this.position] = value & 0xff;
+        if (i > this.length) {
+            this.length = i;
+        }
+        this.position = i;
+    }
+    write(buffer, offset, count) {
+        const i = this.position + count;
+        this.ensureCapacity(i);
+        const count1 = Math.min(count, buffer.length - offset);
+        this._buffer.set(buffer.subarray(offset, offset + count1), this.position);
+        if (i > this.length) {
+            this.length = i;
+        }
+        this.position = i;
+    }
+    ensureCapacity(value) {
+        if (value > this._buffer.length) {
+            let newCapacity = value;
+            if (newCapacity < 256) {
+                newCapacity = 256;
+            }
+            if (newCapacity < this._buffer.length * 2) {
+                newCapacity = this._buffer.length * 2;
+            }
+            const newBuffer = new Uint8Array(newCapacity);
+            if (this.length > 0) {
+                newBuffer.set(this._buffer.subarray(0, 0 + this.length), 0);
+            }
+            this._buffer = newBuffer;
+        }
+    }
+    readAll() {
+        return this.toArray();
+    }
+    toArray() {
+        const copy = new Uint8Array(this.length);
+        copy.set(this._buffer.subarray(0, 0 + this.length), 0);
+        return copy;
+    }
+    copyTo(destination) {
+        destination.write(this._buffer, 0, this.length);
+    }
+}
 class SynthConstants {
 }
 SynthConstants.DefaultChannelCount = 16 + 1;
@@ -1031,9 +1145,8 @@ class Score {
         this.masterBars.push(bar);
     }
     addMasterBarToRepeatGroups(bar) {
-        var _a;
         if (bar.isRepeatStart) {
-            if ((_a = this._currentRepeatGroup) === null || _a === void 0 ? void 0 : _a.isClosed) {
+            if (this._currentRepeatGroup?.isClosed) {
                 this._openedRepeatGroups.pop();
                 this._properlyOpenedRepeatGroups--;
             }
@@ -1131,8 +1244,7 @@ class RepeatGroup {
         return opening ? [opening] : [];
     }
     get isOpened() {
-        var _a;
-        return ((_a = this.opening) === null || _a === void 0 ? void 0 : _a.isRepeatStart) === true;
+        return this.opening?.isRepeatStart === true;
     }
     addMasterBar(masterBar) {
         if (this.opening === null) {
@@ -2708,7 +2820,6 @@ class Note {
         return null;
     }
     chain(sharedDataBag = null) {
-        var _a;
         if (sharedDataBag === null) {
             return;
         }
@@ -2749,7 +2860,7 @@ class Note {
             if (!this.isTieDestination && this.tieOrigin === null) {
                 return;
             }
-            const tieOrigin = (_a = this.tieOrigin) !== null && _a !== void 0 ? _a : Note.findTieOrigin(this);
+            const tieOrigin = this.tieOrigin ?? Note.findTieOrigin(this);
             if (!tieOrigin) {
                 this.isTieDestination = false;
             }
@@ -3001,12 +3112,10 @@ class Staff {
         chordMap.set(chordId, chord);
     }
     hasChord(chordId) {
-        var _a, _b;
-        return (_b = (_a = this.chords) === null || _a === void 0 ? void 0 : _a.has(chordId)) !== null && _b !== void 0 ? _b : false;
+        return this.chords?.has(chordId) ?? false;
     }
     getChord(chordId) {
-        var _a, _b;
-        return (_b = (_a = this.chords) === null || _a === void 0 ? void 0 : _a.get(chordId)) !== null && _b !== void 0 ? _b : null;
+        return this.chords?.get(chordId) ?? null;
     }
     addBar(bar) {
         const bars = this.bars;
@@ -3032,6 +3141,7 @@ class Track {
         this.index = 0;
         this.staves = [];
         this.playbackInfo = new PlaybackInformation();
+        this.color = new Color(200, 0, 0, 255);
         this.name = '';
         this.isVisibleOnMultiTrack = true;
         this.shortName = '';
@@ -3365,7 +3475,7 @@ class Tuning {
     constructor(name = '', tuning = null, isStandard = false) {
         this.isStandard = isStandard;
         this.name = name;
-        this.tunings = tuning !== null && tuning !== void 0 ? tuning : [];
+        this.tunings = tuning ?? [];
     }
     static getTextForTuning(tuning, includeOctave) {
         const parts = Tuning.getTextPartsForTuning(tuning);
@@ -4306,6 +4416,86 @@ var SimileMark;
     SimileMark[SimileMark["FirstOfDouble"] = 2] = "FirstOfDouble";
     SimileMark[SimileMark["SecondOfDouble"] = 3] = "SecondOfDouble";
 })(SimileMark || (SimileMark = {}));
+class Color {
+    constructor(r, g, b, a = 0xff) {
+        this.raw = 0;
+        this.raw = ((a & 0xff) << 24) | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
+        this.updateRgba();
+    }
+    updateRgba() {
+        if (this.a === 0xff) {
+            this.rgba = `#${ModelUtils.toHexString(this.r, 2)}${ModelUtils.toHexString(this.g, 2)}${ModelUtils.toHexString(this.b, 2)}`;
+        }
+        else {
+            this.rgba = `rgba(${this.r},${this.g},${this.b},${this.a / 255.0})`;
+        }
+    }
+    get a() {
+        return (this.raw >> 24) & 0xff;
+    }
+    get r() {
+        return (this.raw >> 16) & 0xff;
+    }
+    get g() {
+        return (this.raw >> 8) & 0xff;
+    }
+    get b() {
+        return this.raw & 0xff;
+    }
+    static random(opacity = 100) {
+        return new Color((Math.random() * 255) | 0, (Math.random() * 255) | 0, (Math.random() * 255) | 0, opacity);
+    }
+    static fromJson(v) {
+        if (v instanceof Color) {
+            return v;
+        }
+        switch (typeof v) {
+            case 'number': {
+                const c = new Color(0, 0, 0, 0);
+                c.raw = v;
+                c.updateRgba();
+                return c;
+            }
+            case 'string': {
+                const json = v;
+                if (json.startsWith('#')) {
+                    if (json.length === 4) {
+                        return new Color(Number.parseInt(json[1], 16) * 17, Number.parseInt(json[2], 16) * 17, Number.parseInt(json[3], 16) * 17);
+                    }
+                    if (json.length === 5) {
+                        return new Color(Number.parseInt(json[1], 16) * 17, Number.parseInt(json[2], 16) * 17, Number.parseInt(json[3], 16) * 17, Number.parseInt(json[4], 16) * 17);
+                    }
+                    if (json.length === 7) {
+                        return new Color(Number.parseInt(json.substring(1, 3), 16), Number.parseInt(json.substring(3, 5), 16), Number.parseInt(json.substring(5, 7), 16));
+                    }
+                    if (json.length === 9) {
+                        return new Color(Number.parseInt(json.substring(1, 3), 16), Number.parseInt(json.substring(3, 5), 16), Number.parseInt(json.substring(5, 7), 16), Number.parseInt(json.substring(7, 9), 16));
+                    }
+                }
+                else if (json.startsWith('rgba') || json.startsWith('rgb')) {
+                    const start = json.indexOf('(');
+                    const end = json.lastIndexOf(')');
+                    if (start === -1 || end === -1) {
+                        throw new FormatError('No values specified for rgb/rgba function');
+                    }
+                    const numbers = json.substring(start + 1, end).split(',');
+                    if (numbers.length === 3) {
+                        return new Color(Number.parseInt(numbers[0], 10), Number.parseInt(numbers[1], 10), Number.parseInt(numbers[2], 10));
+                    }
+                    if (numbers.length === 4) {
+                        return new Color(Number.parseInt(numbers[0], 10), Number.parseInt(numbers[1], 10), Number.parseInt(numbers[2], 10), Number.parseFloat(numbers[3]) * 255);
+                    }
+                }
+                return null;
+            }
+        }
+        throw new FormatError('Unsupported format for color');
+    }
+    static toJson(obj) {
+        return obj === null ? null : obj.raw;
+    }
+}
+Color.BlackRgb = '#000000';
 class PlaybackInformation {
     constructor() {
         this.volume = 15;
@@ -4602,7 +4792,7 @@ class ScoreImporter {
 }
 class UnsupportedFormatError extends AlphaTabError {
     constructor(message = null, inner) {
-        super(AlphaTabErrorType.Format, message !== null && message !== void 0 ? message : 'Unsupported format', inner);
+        super(AlphaTabErrorType.Format, message ?? 'Unsupported format', inner);
         Object.setPrototypeOf(this, UnsupportedFormatError.prototype);
     }
 }
@@ -4618,1185 +4808,1192 @@ class Lazy {
         return this._value;
     }
 }
-define("extensions/alphaTabImport/alphatab/importer/Gp3To5Importer", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.GpBinaryHelpers = void 0;
-    class Gp3To5Importer extends ScoreImporter {
-        constructor() {
-            super();
-            this._versionNumber = 0;
-            this._globalTripletFeel = TripletFeel.NoTripletFeel;
-            this._lyricsTrack = 0;
-            this._lyrics = [];
-            this._barCount = 0;
-            this._trackCount = 0;
-            this._playbackInfos = [];
-            this._doubleBars = new Set();
-            this._clefsPerTrack = new Map();
-            this._keySignatures = new Map();
-            this._beatTextChunksByTrack = new Map();
-            this._directionLookup = new Map();
+class Gp3To5Importer extends ScoreImporter {
+    constructor() {
+        super();
+        this._versionNumber = 0;
+        this._globalTripletFeel = TripletFeel.NoTripletFeel;
+        this._lyricsTrack = 0;
+        this._lyrics = [];
+        this._barCount = 0;
+        this._trackCount = 0;
+        this._playbackInfos = [];
+        this._doubleBars = new Set();
+        this._clefsPerTrack = new Map();
+        this._keySignatures = new Map();
+        this._beatTextChunksByTrack = new Map();
+        this._directionLookup = new Map();
+    }
+    get name() {
+        return 'Guitar Pro 3-5';
+    }
+    readScore() {
+        this._directionLookup.clear();
+        this.readVersion();
+        this._score = new Score();
+        this.readScoreInformation();
+        if (this._versionNumber < 500) {
+            this._globalTripletFeel = GpBinaryHelpers.gpReadBool(this.data)
+                ? TripletFeel.Triplet8th
+                : TripletFeel.NoTripletFeel;
         }
-        get name() {
-            return 'Guitar Pro 3-5';
+        if (this._versionNumber >= 400) {
+            this.readLyrics();
         }
-        readScore() {
-            this._directionLookup.clear();
-            this.readVersion();
-            this._score = new Score();
-            this.readScoreInformation();
-            if (this._versionNumber < 500) {
-                this._globalTripletFeel = GpBinaryHelpers.gpReadBool(this.data)
-                    ? TripletFeel.Triplet8th
-                    : TripletFeel.NoTripletFeel;
-            }
-            if (this._versionNumber >= 400) {
-                this.readLyrics();
-            }
-            if (this._versionNumber >= 510) {
-                this.data.skip(19);
-            }
-            if (this._versionNumber >= 500) {
-                this.readPageSetup();
-                this._score.tempoLabel = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
-            }
-            this._score.tempo = IOHelper.readInt32LE(this.data);
-            if (this._versionNumber >= 510) {
-                GpBinaryHelpers.gpReadBool(this.data);
-            }
-            IOHelper.readInt32LE(this.data);
-            if (this._versionNumber >= 400) {
-                this.data.readByte();
-            }
-            this.readPlaybackInfos();
-            if (this._versionNumber >= 500) {
-                this.readDirection(Direction.TargetCoda);
-                this.readDirection(Direction.TargetDoubleCoda);
-                this.readDirection(Direction.TargetSegno);
-                this.readDirection(Direction.TargetSegnoSegno);
-                this.readDirection(Direction.TargetFine);
-                this.readDirection(Direction.JumpDaCapo);
-                this.readDirection(Direction.JumpDaCapoAlCoda);
-                this.readDirection(Direction.JumpDaCapoAlDoubleCoda);
-                this.readDirection(Direction.JumpDaCapoAlFine);
-                this.readDirection(Direction.JumpDalSegno);
-                this.readDirection(Direction.JumpDalSegnoAlCoda);
-                this.readDirection(Direction.JumpDalSegnoAlDoubleCoda);
-                this.readDirection(Direction.JumpDalSegnoAlFine);
-                this.readDirection(Direction.JumpDalSegnoSegno);
-                this.readDirection(Direction.JumpDalSegnoSegnoAlCoda);
-                this.readDirection(Direction.JumpDalSegnoSegnoAlDoubleCoda);
-                this.readDirection(Direction.JumpDalSegnoSegnoAlFine);
-                this.readDirection(Direction.JumpDaCoda);
-                this.readDirection(Direction.JumpDaDoubleCoda);
-                this.data.skip(4);
-            }
-            this._barCount = IOHelper.readInt32LE(this.data);
-            this._trackCount = IOHelper.readInt32LE(this.data);
-            this.readMasterBars();
-            this.readTracks();
-            this.readBars();
-            if (this._score.masterBars.length > 0) {
-                const automation = Automation.buildTempoAutomation(false, 0, this._score.tempo, 2);
-                automation.text = this._score.tempoLabel;
-                this._score.masterBars[0].tempoAutomations.push(automation);
-            }
-            ModelUtils.consolidate(this._score);
-            this._score.finish(this.settings);
-            if (this._lyrics && this._lyricsTrack >= 0) {
-                this._score.tracks[this._lyricsTrack].applyLyrics(this._lyrics);
-            }
-            return this._score;
+        if (this._versionNumber >= 510) {
+            this.data.skip(19);
         }
-        readDirection(direction) {
-            let directionIndex = IOHelper.readInt16LE(this.data);
-            if (directionIndex === -1) {
-                return;
-            }
-            directionIndex--;
-            let directionsList;
-            if (this._directionLookup.has(directionIndex)) {
-                directionsList = this._directionLookup.get(directionIndex);
-            }
-            else {
-                directionsList = [];
-                this._directionLookup.set(directionIndex, directionsList);
-            }
-            directionsList.push(direction);
+        if (this._versionNumber >= 500) {
+            this.readPageSetup();
+            this._score.tempoLabel = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
         }
-        readVersion() {
-            let version = GpBinaryHelpers.gpReadStringByteLength(this.data, 30, this.settings.importer.encoding);
-            if (!version.startsWith(Gp3To5Importer.VersionString)) {
-                throw new UnsupportedFormatError('Unsupported format');
-            }
-            version = version.substr(Gp3To5Importer.VersionString.length + 1);
-            const dot = version.indexOf(String.fromCharCode(46));
-            this._versionNumber = 100 * Number.parseInt(version.substr(0, dot), 10) + Number.parseInt(version.substr(dot + 1), 10);
-            Logger.debug(this.name, `Guitar Pro version ${version} detected`);
+        this._score.tempo = IOHelper.readInt32LE(this.data);
+        if (this._versionNumber >= 510) {
+            GpBinaryHelpers.gpReadBool(this.data);
         }
-        readScoreInformation() {
-            var _a;
-            this._score.title = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-            this._score.subTitle = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-            this._score.artist = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-            this._score.album = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-            this._score.words = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-            this._score.music =
-                this._versionNumber >= 500
-                    ? GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding)
-                    : this._score.words;
-            this._score.copyright = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-            this._score.tab = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-            this._score.instructions = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-            const noticeLines = IOHelper.readInt32LE(this.data);
-            let notice = '';
-            for (let i = 0; i < noticeLines; i++) {
-                if (i > 0) {
-                    notice += '\r\n';
-                }
-                notice += (_a = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding)) === null || _a === void 0 ? void 0 : _a.toString();
-            }
-            this._score.notices = notice;
+        IOHelper.readInt32LE(this.data);
+        if (this._versionNumber >= 400) {
+            this.data.readByte();
         }
-        readLyrics() {
-            this._lyrics = [];
-            this._lyricsTrack = IOHelper.readInt32LE(this.data) - 1;
-            for (let i = 0; i < 5; i++) {
-                const lyrics = new Lyrics();
-                lyrics.startBar = IOHelper.readInt32LE(this.data) - 1;
-                lyrics.text = GpBinaryHelpers.gpReadStringInt(this.data, this.settings.importer.encoding);
-                this._lyrics.push(lyrics);
-            }
-        }
-        readPageSetup() {
-            this.data.skip(28);
-            const flags = IOHelper.readInt16LE(this.data);
-            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
-        }
-        readPlaybackInfos() {
-            this._playbackInfos = [];
-            let channel = 0;
-            for (let i = 0; i < 64; i++) {
-                const info = new PlaybackInformation();
-                info.primaryChannel = channel++;
-                info.secondaryChannel = channel++;
-                info.program = IOHelper.readInt32LE(this.data);
-                info.volume = this.data.readByte();
-                info.balance = this.data.readByte();
-                this.data.skip(6);
-                this._playbackInfos.push(info);
-            }
-        }
-        readMasterBars() {
-            for (let i = 0; i < this._barCount; i++) {
-                this.readMasterBar();
-            }
-        }
-        readMasterBar() {
-            let previousMasterBar = null;
-            if (this._score.masterBars.length > 0) {
-                previousMasterBar = this._score.masterBars[this._score.masterBars.length - 1];
-            }
-            const newMasterBar = new MasterBar();
-            const flags = this.data.readByte();
-            if ((flags & 0x01) !== 0) {
-                newMasterBar.timeSignatureNumerator = this.data.readByte();
-            }
-            else if (previousMasterBar) {
-                newMasterBar.timeSignatureNumerator = previousMasterBar.timeSignatureNumerator;
-            }
-            if ((flags & 0x02) !== 0) {
-                newMasterBar.timeSignatureDenominator = this.data.readByte();
-            }
-            else if (previousMasterBar) {
-                newMasterBar.timeSignatureDenominator = previousMasterBar.timeSignatureDenominator;
-            }
-            newMasterBar.isRepeatStart = (flags & 0x04) !== 0;
-            if ((flags & 0x08) !== 0) {
-                newMasterBar.repeatCount = this.data.readByte() + (this._versionNumber >= 500 ? 0 : 1);
-            }
-            if ((flags & 0x10) !== 0 && this._versionNumber < 500) {
-                let currentMasterBar = previousMasterBar;
-                let existentAlternatives = 0;
-                while (currentMasterBar) {
-                    if (currentMasterBar.isRepeatEnd && currentMasterBar !== previousMasterBar) {
-                        break;
-                    }
-                    if (currentMasterBar.isRepeatStart) {
-                        break;
-                    }
-                    existentAlternatives = existentAlternatives | currentMasterBar.alternateEndings;
-                    currentMasterBar = currentMasterBar.previousMasterBar;
-                }
-                let repeatAlternative = 0;
-                const repeatMask = this.data.readByte();
-                for (let i = 0; i < 8; i++) {
-                    const repeating = 1 << i;
-                    if (repeatMask > i && (existentAlternatives & repeating) === 0) {
-                        repeatAlternative = repeatAlternative | repeating;
-                    }
-                }
-                newMasterBar.alternateEndings = repeatAlternative;
-            }
-            if ((flags & 0x20) !== 0) {
-                const section = new Section();
-                section.text = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
-                section.marker = '';
-                newMasterBar.section = section;
-            }
-            if ((flags & 0x40) !== 0) {
-                this._keySignatures.set(this._score.masterBars.length, [
-                    IOHelper.readSInt8(this.data),
-                    this.data.readByte()
-                ]);
-            }
-            if (this._versionNumber >= 500 && (flags & 0x03) !== 0) {
-                this.data.skip(4);
-            }
-            if (this._versionNumber >= 500) {
-                newMasterBar.alternateEndings = this.data.readByte();
-            }
-            if (this._versionNumber >= 500) {
-                const tripletFeel = this.data.readByte();
-                switch (tripletFeel) {
-                    case 1:
-                        newMasterBar.tripletFeel = TripletFeel.Triplet8th;
-                        break;
-                    case 2:
-                        newMasterBar.tripletFeel = TripletFeel.Triplet16th;
-                        break;
-                }
-                this.data.readByte();
-            }
-            else {
-                newMasterBar.tripletFeel = this._globalTripletFeel;
-            }
-            const isDoubleBar = (flags & 0x80) !== 0;
-            newMasterBar.isDoubleBar = isDoubleBar;
-            const barIndexForDirection = this._score.masterBars.length;
-            if (this._directionLookup.has(barIndexForDirection)) {
-                for (const direction of this._directionLookup.get(barIndexForDirection)) {
-                    newMasterBar.addDirection(direction);
-                }
-            }
-            this._score.addMasterBar(newMasterBar);
-            if (isDoubleBar) {
-                this._doubleBars.add(newMasterBar.index);
-            }
-        }
-        readTracks() {
-            for (let i = 0; i < this._trackCount; i++) {
-                this.readTrack();
-            }
-        }
-        readTrack() {
-            const newTrack = new Track();
-            newTrack.ensureStaveCount(1);
-            this._score.addTrack(newTrack);
-            const mainStaff = newTrack.staves[0];
-            const flags = this.data.readByte();
-            newTrack.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 40, this.settings.importer.encoding);
-            if ((flags & 0x01) !== 0) {
-                mainStaff.isPercussion = true;
-            }
-            if (this._versionNumber >= 500) {
-                newTrack.isVisibleOnMultiTrack = (flags & 0x08) !== 0;
-            }
-            const stringCount = IOHelper.readInt32LE(this.data);
-            const tuning = [];
-            for (let i = 0; i < 7; i++) {
-                const stringTuning = IOHelper.readInt32LE(this.data);
-                if (stringCount > i) {
-                    tuning.push(stringTuning);
-                }
-            }
-            mainStaff.stringTuning.tunings = tuning;
-            const port = IOHelper.readInt32LE(this.data);
-            const index = IOHelper.readInt32LE(this.data) - 1;
-            const effectChannel = IOHelper.readInt32LE(this.data) - 1;
+        this.readPlaybackInfos();
+        if (this._versionNumber >= 500) {
+            this.readDirection(Direction.TargetCoda);
+            this.readDirection(Direction.TargetDoubleCoda);
+            this.readDirection(Direction.TargetSegno);
+            this.readDirection(Direction.TargetSegnoSegno);
+            this.readDirection(Direction.TargetFine);
+            this.readDirection(Direction.JumpDaCapo);
+            this.readDirection(Direction.JumpDaCapoAlCoda);
+            this.readDirection(Direction.JumpDaCapoAlDoubleCoda);
+            this.readDirection(Direction.JumpDaCapoAlFine);
+            this.readDirection(Direction.JumpDalSegno);
+            this.readDirection(Direction.JumpDalSegnoAlCoda);
+            this.readDirection(Direction.JumpDalSegnoAlDoubleCoda);
+            this.readDirection(Direction.JumpDalSegnoAlFine);
+            this.readDirection(Direction.JumpDalSegnoSegno);
+            this.readDirection(Direction.JumpDalSegnoSegnoAlCoda);
+            this.readDirection(Direction.JumpDalSegnoSegnoAlDoubleCoda);
+            this.readDirection(Direction.JumpDalSegnoSegnoAlFine);
+            this.readDirection(Direction.JumpDaCoda);
+            this.readDirection(Direction.JumpDaDoubleCoda);
             this.data.skip(4);
-            if (index >= 0 && index < this._playbackInfos.length) {
-                const info = this._playbackInfos[index];
-                info.port = port;
-                info.isSolo = (flags & 0x10) !== 0;
-                info.isMute = (flags & 0x20) !== 0;
-                info.secondaryChannel = effectChannel;
-                if (GeneralMidi.isGuitar(info.program)) {
-                    mainStaff.displayTranspositionPitch = -12;
-                }
-                newTrack.playbackInfo = info;
-            }
-            mainStaff.capo = IOHelper.readInt32LE(this.data);
-            if (this._versionNumber >= 500) {
-                const staffFlags = this.data.readByte();
-                mainStaff.showTablature = (staffFlags & 0x01) !== 0;
-                mainStaff.showStandardNotation = (staffFlags & 0x02) !== 0;
-                const showChordDiagramListOnTopOfScore = (staffFlags & 0x64) !== 0;
-                this.data.readByte();
-                this.data.readByte();
-                newTrack.playbackInfo.bank = this.data.readByte();
-                this.data.readByte();
-                const clefMode = IOHelper.readInt32LE(this.data);
-                if (clefMode === 12) {
-                    this._clefsPerTrack.set(index, Clef.F4);
-                }
-                else {
-                    this._clefsPerTrack.set(index, Clef.G2);
-                }
-                IOHelper.readInt32LE(this.data);
-                IOHelper.readInt32LE(this.data);
-                this.data.skip(10);
-                this.data.readByte();
-                this.data.readByte();
-                this.readRseBank();
-                if (this._versionNumber >= 510) {
-                    this.data.skip(4);
-                    GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
-                    GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
-                }
-            }
-            else {
-                if (GeneralMidi.isBass(newTrack.playbackInfo.program)) {
-                    this._clefsPerTrack.set(index, Clef.F4);
-                }
-                else {
-                    this._clefsPerTrack.set(index, Clef.G2);
-                }
-            }
         }
-        readBars() {
-            for (let i = 0; i < this._barCount; i++) {
-                for (let t = 0; t < this._trackCount; t++) {
-                    this.readBar(this._score.tracks[t]);
-                }
-            }
+        this._barCount = IOHelper.readInt32LE(this.data);
+        this._trackCount = IOHelper.readInt32LE(this.data);
+        this.readMasterBars();
+        this.readTracks();
+        this.readBars();
+        if (this._score.masterBars.length > 0) {
+            const automation = Automation.buildTempoAutomation(false, 0, this._score.tempo, 2);
+            automation.text = this._score.tempoLabel;
+            this._score.masterBars[0].tempoAutomations.push(automation);
         }
-        readBar(track) {
-            const newBar = new Bar();
-            const mainStaff = track.staves[0];
-            if (mainStaff.isPercussion) {
-                newBar.clef = Clef.Neutral;
-            }
-            else if (this._clefsPerTrack.has(track.index)) {
-                newBar.clef = this._clefsPerTrack.get(track.index);
-            }
-            mainStaff.addBar(newBar);
-            if (this._keySignatures.has(newBar.index)) {
-                const newKeySignature = this._keySignatures.get(newBar.index);
-                newBar.keySignature = newKeySignature[0];
-                newBar.keySignatureType = newKeySignature[1];
-            }
-            else if (newBar.index > 0) {
-                newBar.keySignature = newBar.previousBar.keySignature;
-                newBar.keySignatureType = newBar.previousBar.keySignatureType;
-            }
-            if (this._doubleBars.has(newBar.index)) {
-                newBar.barLineRight = BarLineStyle.LightLight;
-            }
-            let voiceCount = 1;
-            if (this._versionNumber >= 500) {
-                this.data.readByte();
-                voiceCount = 2;
-            }
-            for (let v = 0; v < voiceCount; v++) {
-                this.readVoice(track, newBar);
-            }
+        ModelUtils.consolidate(this._score);
+        this._score.finish(this.settings);
+        if (this._lyrics && this._lyricsTrack >= 0) {
+            this._score.tracks[this._lyricsTrack].applyLyrics(this._lyrics);
         }
-        readVoice(track, bar) {
-            const beatCount = IOHelper.readInt32LE(this.data);
-            if (beatCount === 0) {
-                return;
-            }
-            const newVoice = new Voice();
-            bar.addVoice(newVoice);
-            for (let i = 0; i < beatCount; i++) {
-                this.readBeat(track, bar, newVoice);
-            }
+        return this._score;
+    }
+    readDirection(direction) {
+        let directionIndex = IOHelper.readInt16LE(this.data);
+        if (directionIndex === -1) {
+            return;
         }
-        readBeat(track, bar, voice) {
-            const newBeat = new Beat();
-            const flags = this.data.readByte();
-            if ((flags & 0x01) !== 0) {
-                newBeat.dots = 1;
+        directionIndex--;
+        let directionsList;
+        if (this._directionLookup.has(directionIndex)) {
+            directionsList = this._directionLookup.get(directionIndex);
+        }
+        else {
+            directionsList = [];
+            this._directionLookup.set(directionIndex, directionsList);
+        }
+        directionsList.push(direction);
+    }
+    readVersion() {
+        let version = GpBinaryHelpers.gpReadStringByteLength(this.data, 30, this.settings.importer.encoding);
+        if (!version.startsWith(Gp3To5Importer.VersionString)) {
+            throw new UnsupportedFormatError('Unsupported format');
+        }
+        version = version.substr(Gp3To5Importer.VersionString.length + 1);
+        const dot = version.indexOf(String.fromCharCode(46));
+        this._versionNumber = 100 * Number.parseInt(version.substr(0, dot), 10) + Number.parseInt(version.substr(dot + 1), 10);
+        Logger.debug(this.name, `Guitar Pro version ${version} detected`);
+    }
+    readScoreInformation() {
+        this._score.title = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
+        this._score.subTitle = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
+        this._score.artist = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
+        this._score.album = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
+        this._score.words = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
+        this._score.music =
+            this._versionNumber >= 500
+                ? GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding)
+                : this._score.words;
+        this._score.copyright = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
+        this._score.tab = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
+        this._score.instructions = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
+        const noticeLines = IOHelper.readInt32LE(this.data);
+        let notice = '';
+        for (let i = 0; i < noticeLines; i++) {
+            if (i > 0) {
+                notice += '\r\n';
             }
-            if ((flags & 0x40) !== 0) {
-                const type = this.data.readByte();
-                newBeat.isEmpty = (type & 0x02) === 0;
-            }
-            voice.addBeat(newBeat);
-            const duration = IOHelper.readSInt8(this.data);
-            switch (duration) {
-                case -2:
-                    newBeat.duration = Duration.Whole;
+            notice += GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding)?.toString();
+        }
+        this._score.notices = notice;
+    }
+    readLyrics() {
+        this._lyrics = [];
+        this._lyricsTrack = IOHelper.readInt32LE(this.data) - 1;
+        for (let i = 0; i < 5; i++) {
+            const lyrics = new Lyrics();
+            lyrics.startBar = IOHelper.readInt32LE(this.data) - 1;
+            lyrics.text = GpBinaryHelpers.gpReadStringInt(this.data, this.settings.importer.encoding);
+            this._lyrics.push(lyrics);
+        }
+    }
+    readPageSetup() {
+        this.data.skip(28);
+        const flags = IOHelper.readInt16LE(this.data);
+        GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+    }
+    readPlaybackInfos() {
+        this._playbackInfos = [];
+        let channel = 0;
+        for (let i = 0; i < 64; i++) {
+            const info = new PlaybackInformation();
+            info.primaryChannel = channel++;
+            info.secondaryChannel = channel++;
+            info.program = IOHelper.readInt32LE(this.data);
+            info.volume = this.data.readByte();
+            info.balance = this.data.readByte();
+            this.data.skip(6);
+            this._playbackInfos.push(info);
+        }
+    }
+    readMasterBars() {
+        for (let i = 0; i < this._barCount; i++) {
+            this.readMasterBar();
+        }
+    }
+    readMasterBar() {
+        let previousMasterBar = null;
+        if (this._score.masterBars.length > 0) {
+            previousMasterBar = this._score.masterBars[this._score.masterBars.length - 1];
+        }
+        const newMasterBar = new MasterBar();
+        const flags = this.data.readByte();
+        if ((flags & 0x01) !== 0) {
+            newMasterBar.timeSignatureNumerator = this.data.readByte();
+        }
+        else if (previousMasterBar) {
+            newMasterBar.timeSignatureNumerator = previousMasterBar.timeSignatureNumerator;
+        }
+        if ((flags & 0x02) !== 0) {
+            newMasterBar.timeSignatureDenominator = this.data.readByte();
+        }
+        else if (previousMasterBar) {
+            newMasterBar.timeSignatureDenominator = previousMasterBar.timeSignatureDenominator;
+        }
+        newMasterBar.isRepeatStart = (flags & 0x04) !== 0;
+        if ((flags & 0x08) !== 0) {
+            newMasterBar.repeatCount = this.data.readByte() + (this._versionNumber >= 500 ? 0 : 1);
+        }
+        if ((flags & 0x10) !== 0 && this._versionNumber < 500) {
+            let currentMasterBar = previousMasterBar;
+            let existentAlternatives = 0;
+            while (currentMasterBar) {
+                if (currentMasterBar.isRepeatEnd && currentMasterBar !== previousMasterBar) {
                     break;
-                case -1:
-                    newBeat.duration = Duration.Half;
+                }
+                if (currentMasterBar.isRepeatStart) {
                     break;
-                case 0:
-                    newBeat.duration = Duration.Quarter;
-                    break;
+                }
+                existentAlternatives = existentAlternatives | currentMasterBar.alternateEndings;
+                currentMasterBar = currentMasterBar.previousMasterBar;
+            }
+            let repeatAlternative = 0;
+            const repeatMask = this.data.readByte();
+            for (let i = 0; i < 8; i++) {
+                const repeating = 1 << i;
+                if (repeatMask > i && (existentAlternatives & repeating) === 0) {
+                    repeatAlternative = repeatAlternative | repeating;
+                }
+            }
+            newMasterBar.alternateEndings = repeatAlternative;
+        }
+        if ((flags & 0x20) !== 0) {
+            const section = new Section();
+            section.text = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            section.marker = '';
+            newMasterBar.section = section;
+        }
+        if ((flags & 0x40) !== 0) {
+            this._keySignatures.set(this._score.masterBars.length, [
+                IOHelper.readSInt8(this.data),
+                this.data.readByte()
+            ]);
+        }
+        if (this._versionNumber >= 500 && (flags & 0x03) !== 0) {
+            this.data.skip(4);
+        }
+        if (this._versionNumber >= 500) {
+            newMasterBar.alternateEndings = this.data.readByte();
+        }
+        if (this._versionNumber >= 500) {
+            const tripletFeel = this.data.readByte();
+            switch (tripletFeel) {
                 case 1:
-                    newBeat.duration = Duration.Eighth;
+                    newMasterBar.tripletFeel = TripletFeel.Triplet8th;
                     break;
                 case 2:
-                    newBeat.duration = Duration.Sixteenth;
-                    break;
-                case 3:
-                    newBeat.duration = Duration.ThirtySecond;
-                    break;
-                case 4:
-                    newBeat.duration = Duration.SixtyFourth;
-                    break;
-                default:
-                    newBeat.duration = Duration.Quarter;
+                    newMasterBar.tripletFeel = TripletFeel.Triplet16th;
                     break;
             }
-            if ((flags & 0x20) !== 0) {
-                newBeat.tupletNumerator = IOHelper.readInt32LE(this.data);
-                switch (newBeat.tupletNumerator) {
-                    case 1:
-                        newBeat.tupletDenominator = 1;
-                        break;
-                    case 3:
-                        newBeat.tupletDenominator = 2;
-                        break;
-                    case 5:
-                    case 6:
-                    case 7:
-                        newBeat.tupletDenominator = 4;
-                        break;
-                    case 9:
-                    case 10:
-                    case 11:
-                    case 12:
-                    case 13:
-                        newBeat.tupletDenominator = 8;
-                        break;
-                    case 2:
-                    case 4:
-                    case 8:
-                        break;
-                    default:
-                        newBeat.tupletNumerator = 1;
-                        newBeat.tupletDenominator = 1;
-                        break;
-                }
-            }
-            if ((flags & 0x02) !== 0) {
-                this.readChord(newBeat);
-            }
-            const beatTextAsLyrics = this.settings.importer.beatTextAsLyrics && track.index !== this._lyricsTrack;
-            if ((flags & 0x04) !== 0) {
-                const text = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-                if (beatTextAsLyrics) {
-                    const lyrics = new Lyrics();
-                    lyrics.text = text.trim();
-                    lyrics.finish(true);
-                    const beatLyrics = [];
-                    for (let i = lyrics.chunks.length - 1; i >= 0; i--) {
-                        beatLyrics.push(lyrics.chunks[i]);
-                    }
-                    this._beatTextChunksByTrack.set(track.index, beatLyrics);
-                }
-                else {
-                    newBeat.text = text;
-                }
-            }
-            let allNoteHarmonicType = HarmonicType.None;
-            if ((flags & 0x08) !== 0) {
-                allNoteHarmonicType = this.readBeatEffects(newBeat);
-            }
-            if ((flags & 0x10) !== 0) {
-                this.readMixTableChange(newBeat);
-            }
-            const stringFlags = this.data.readByte();
-            for (let i = 6; i >= 0; i--) {
-                if ((stringFlags & (1 << i)) !== 0 && 6 - i < bar.staff.tuning.length) {
-                    const note = this.readNote(track, bar, voice, newBeat, 6 - i);
-                    if (allNoteHarmonicType !== HarmonicType.None) {
-                        note.harmonicType = allNoteHarmonicType;
-                        if (note.harmonicType === HarmonicType.Natural) {
-                            note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(note.fret);
-                        }
-                    }
-                }
-            }
-            if (this._versionNumber >= 500) {
-                const flags2 = IOHelper.readInt16LE(this.data);
-                if ((flags2 & 0x01) !== 0) {
-                    if (newBeat.index > 0) {
-                        voice.beats[newBeat.index - 1].beamingMode = BeatBeamingMode.ForceSplitToNext;
-                    }
-                }
-                if ((flags2 & 0x02) !== 0) {
-                }
-                if ((flags2 & 0x04) !== 0) {
-                    if (newBeat.index > 0) {
-                        voice.beats[newBeat.index - 1].beamingMode = BeatBeamingMode.ForceMergeWithNext;
-                    }
-                }
-                if ((flags2 & 0x08) !== 0) {
-                }
-                if ((flags2 & 0x10) !== 0) {
-                    newBeat.ottava = Ottavia._8va;
-                }
-                if ((flags2 & 0x20) !== 0) {
-                    newBeat.ottava = Ottavia._8vb;
-                }
-                if ((flags2 & 0x40) !== 0) {
-                    newBeat.ottava = Ottavia._15ma;
-                }
-                if ((flags2 & 0x100) !== 0) {
-                    newBeat.ottava = Ottavia._15mb;
-                }
-                if ((flags2 & 0x800) !== 0) {
-                    const breakSecondaryBeams = this.data.readByte() !== 0;
-                    if (newBeat.index > 0 && breakSecondaryBeams) {
-                        voice.beats[newBeat.index - 1].beamingMode = BeatBeamingMode.ForceSplitOnSecondaryToNext;
-                    }
-                }
-            }
-            if (beatTextAsLyrics &&
-                !newBeat.isRest &&
-                this._beatTextChunksByTrack.has(track.index) &&
-                this._beatTextChunksByTrack.get(track.index).length > 0) {
-                newBeat.lyrics = [this._beatTextChunksByTrack.get(track.index).pop()];
+            this.data.readByte();
+        }
+        else {
+            newMasterBar.tripletFeel = this._globalTripletFeel;
+        }
+        const isDoubleBar = (flags & 0x80) !== 0;
+        newMasterBar.isDoubleBar = isDoubleBar;
+        const barIndexForDirection = this._score.masterBars.length;
+        if (this._directionLookup.has(barIndexForDirection)) {
+            for (const direction of this._directionLookup.get(barIndexForDirection)) {
+                newMasterBar.addDirection(direction);
             }
         }
-        readChord(beat) {
-            const chord = new Chord();
-            const chordId = ModelUtils.newGuid();
-            if (this._versionNumber >= 500) {
-                this.data.skip(17);
-                chord.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 21, this.settings.importer.encoding);
-                this.data.skip(4);
-                chord.firstFret = IOHelper.readInt32LE(this.data);
-                for (let i = 0; i < 7; i++) {
-                    const fret = IOHelper.readInt32LE(this.data);
-                    if (i < beat.voice.bar.staff.tuning.length) {
-                        chord.strings.push(fret);
-                    }
-                }
-                const numberOfBarres = this.data.readByte();
-                const barreFrets = new Uint8Array(5);
-                this.data.read(barreFrets, 0, barreFrets.length);
-                for (let i = 0; i < numberOfBarres; i++) {
-                    chord.barreFrets.push(barreFrets[i]);
-                }
-                this.data.skip(26);
+        this._score.addMasterBar(newMasterBar);
+        if (isDoubleBar) {
+            this._doubleBars.add(newMasterBar.index);
+        }
+    }
+    readTracks() {
+        for (let i = 0; i < this._trackCount; i++) {
+            this.readTrack();
+        }
+    }
+    readTrack() {
+        const newTrack = new Track();
+        newTrack.ensureStaveCount(1);
+        this._score.addTrack(newTrack);
+        const mainStaff = newTrack.staves[0];
+        const flags = this.data.readByte();
+        newTrack.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 40, this.settings.importer.encoding);
+        if ((flags & 0x01) !== 0) {
+            mainStaff.isPercussion = true;
+        }
+        if (this._versionNumber >= 500) {
+            newTrack.isVisibleOnMultiTrack = (flags & 0x08) !== 0;
+        }
+        const stringCount = IOHelper.readInt32LE(this.data);
+        const tuning = [];
+        for (let i = 0; i < 7; i++) {
+            const stringTuning = IOHelper.readInt32LE(this.data);
+            if (stringCount > i) {
+                tuning.push(stringTuning);
+            }
+        }
+        mainStaff.stringTuning.tunings = tuning;
+        const port = IOHelper.readInt32LE(this.data);
+        const index = IOHelper.readInt32LE(this.data) - 1;
+        const effectChannel = IOHelper.readInt32LE(this.data) - 1;
+        this.data.skip(4);
+        if (index >= 0 && index < this._playbackInfos.length) {
+            const info = this._playbackInfos[index];
+            info.port = port;
+            info.isSolo = (flags & 0x10) !== 0;
+            info.isMute = (flags & 0x20) !== 0;
+            info.secondaryChannel = effectChannel;
+            if (GeneralMidi.isGuitar(info.program)) {
+                mainStaff.displayTranspositionPitch = -12;
+            }
+            newTrack.playbackInfo = info;
+        }
+        mainStaff.capo = IOHelper.readInt32LE(this.data);
+        newTrack.color = GpBinaryHelpers.gpReadColor(this.data, false);
+        if (this._versionNumber >= 500) {
+            const staffFlags = this.data.readByte();
+            mainStaff.showTablature = (staffFlags & 0x01) !== 0;
+            mainStaff.showStandardNotation = (staffFlags & 0x02) !== 0;
+            const showChordDiagramListOnTopOfScore = (staffFlags & 0x64) !== 0;
+            this.data.readByte();
+            this.data.readByte();
+            newTrack.playbackInfo.bank = this.data.readByte();
+            this.data.readByte();
+            const clefMode = IOHelper.readInt32LE(this.data);
+            if (clefMode === 12) {
+                this._clefsPerTrack.set(index, Clef.F4);
             }
             else {
-                if (this.data.readByte() !== 0) {
-                    if (this._versionNumber >= 400) {
-                        this.data.skip(16);
-                        chord.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 21, this.settings.importer.encoding);
-                        this.data.skip(4);
-                        chord.firstFret = IOHelper.readInt32LE(this.data);
-                        for (let i = 0; i < 7; i++) {
-                            const fret = IOHelper.readInt32LE(this.data);
-                            if (i < beat.voice.bar.staff.tuning.length) {
-                                chord.strings.push(fret);
-                            }
-                        }
-                        const numberOfBarres = this.data.readByte();
-                        const barreFrets = new Uint8Array(5);
-                        this.data.read(barreFrets, 0, barreFrets.length);
-                        for (let i = 0; i < numberOfBarres; i++) {
-                            chord.barreFrets.push(barreFrets[i]);
-                        }
-                        this.data.skip(26);
-                    }
-                    else {
-                        this.data.skip(25);
-                        chord.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 34, this.settings.importer.encoding);
-                        chord.firstFret = IOHelper.readInt32LE(this.data);
-                        for (let i = 0; i < 6; i++) {
-                            const fret = IOHelper.readInt32LE(this.data);
-                            if (i < beat.voice.bar.staff.tuning.length) {
-                                chord.strings.push(fret);
-                            }
-                        }
-                        this.data.skip(36);
-                    }
-                }
-                else {
-                    const strings = this._versionNumber >= 406 ? 7 : 6;
-                    chord.name = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
-                    chord.firstFret = IOHelper.readInt32LE(this.data);
-                    if (chord.firstFret > 0) {
-                        for (let i = 0; i < strings; i++) {
-                            const fret = IOHelper.readInt32LE(this.data);
-                            if (i < beat.voice.bar.staff.tuning.length) {
-                                chord.strings.push(fret);
-                            }
-                        }
-                    }
-                }
+                this._clefsPerTrack.set(index, Clef.G2);
             }
-            if (chord.name) {
-                beat.chordId = chordId;
-                beat.voice.bar.staff.addChord(beat.chordId, chord);
+            IOHelper.readInt32LE(this.data);
+            IOHelper.readInt32LE(this.data);
+            this.data.skip(10);
+            this.data.readByte();
+            this.data.readByte();
+            this.readRseBank();
+            if (this._versionNumber >= 510) {
+                this.data.skip(4);
+                GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+                GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
             }
         }
-        readBeatEffects(beat) {
-            const flags = this.data.readByte();
-            let flags2 = 0;
-            if (this._versionNumber >= 400) {
-                flags2 = this.data.readByte();
+        else {
+            if (GeneralMidi.isBass(newTrack.playbackInfo.program)) {
+                this._clefsPerTrack.set(index, Clef.F4);
             }
-            if ((flags & 0x10) !== 0) {
-                beat.fade = FadeType.FadeIn;
+            else {
+                this._clefsPerTrack.set(index, Clef.G2);
             }
-            if ((this._versionNumber < 400 && (flags & 0x01) !== 0) || (flags & 0x02) !== 0) {
-                beat.vibrato = VibratoType.Slight;
+        }
+    }
+    readBars() {
+        for (let i = 0; i < this._barCount; i++) {
+            for (let t = 0; t < this._trackCount; t++) {
+                this.readBar(this._score.tracks[t]);
             }
+        }
+    }
+    readBar(track) {
+        const newBar = new Bar();
+        const mainStaff = track.staves[0];
+        if (mainStaff.isPercussion) {
+            newBar.clef = Clef.Neutral;
+        }
+        else if (this._clefsPerTrack.has(track.index)) {
+            newBar.clef = this._clefsPerTrack.get(track.index);
+        }
+        mainStaff.addBar(newBar);
+        if (this._keySignatures.has(newBar.index)) {
+            const newKeySignature = this._keySignatures.get(newBar.index);
+            newBar.keySignature = newKeySignature[0];
+            newBar.keySignatureType = newKeySignature[1];
+        }
+        else if (newBar.index > 0) {
+            newBar.keySignature = newBar.previousBar.keySignature;
+            newBar.keySignatureType = newBar.previousBar.keySignatureType;
+        }
+        if (this._doubleBars.has(newBar.index)) {
+            newBar.barLineRight = BarLineStyle.LightLight;
+        }
+        let voiceCount = 1;
+        if (this._versionNumber >= 500) {
+            this.data.readByte();
+            voiceCount = 2;
+        }
+        for (let v = 0; v < voiceCount; v++) {
+            this.readVoice(track, newBar);
+        }
+    }
+    readVoice(track, bar) {
+        const beatCount = IOHelper.readInt32LE(this.data);
+        if (beatCount === 0) {
+            return;
+        }
+        const newVoice = new Voice();
+        bar.addVoice(newVoice);
+        for (let i = 0; i < beatCount; i++) {
+            this.readBeat(track, bar, newVoice);
+        }
+    }
+    readBeat(track, bar, voice) {
+        const newBeat = new Beat();
+        const flags = this.data.readByte();
+        if ((flags & 0x01) !== 0) {
+            newBeat.dots = 1;
+        }
+        if ((flags & 0x40) !== 0) {
+            const type = this.data.readByte();
+            newBeat.isEmpty = (type & 0x02) === 0;
+        }
+        voice.addBeat(newBeat);
+        const duration = IOHelper.readSInt8(this.data);
+        switch (duration) {
+            case -2:
+                newBeat.duration = Duration.Whole;
+                break;
+            case -1:
+                newBeat.duration = Duration.Half;
+                break;
+            case 0:
+                newBeat.duration = Duration.Quarter;
+                break;
+            case 1:
+                newBeat.duration = Duration.Eighth;
+                break;
+            case 2:
+                newBeat.duration = Duration.Sixteenth;
+                break;
+            case 3:
+                newBeat.duration = Duration.ThirtySecond;
+                break;
+            case 4:
+                newBeat.duration = Duration.SixtyFourth;
+                break;
+            default:
+                newBeat.duration = Duration.Quarter;
+                break;
+        }
+        if ((flags & 0x20) !== 0) {
+            newBeat.tupletNumerator = IOHelper.readInt32LE(this.data);
+            switch (newBeat.tupletNumerator) {
+                case 1:
+                    newBeat.tupletDenominator = 1;
+                    break;
+                case 3:
+                    newBeat.tupletDenominator = 2;
+                    break;
+                case 5:
+                case 6:
+                case 7:
+                    newBeat.tupletDenominator = 4;
+                    break;
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                    newBeat.tupletDenominator = 8;
+                    break;
+                case 2:
+                case 4:
+                case 8:
+                    break;
+                default:
+                    newBeat.tupletNumerator = 1;
+                    newBeat.tupletDenominator = 1;
+                    break;
+            }
+        }
+        if ((flags & 0x02) !== 0) {
+            this.readChord(newBeat);
+        }
+        const beatTextAsLyrics = this.settings.importer.beatTextAsLyrics && track.index !== this._lyricsTrack;
+        if ((flags & 0x04) !== 0) {
+            const text = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
+            if (beatTextAsLyrics) {
+                const lyrics = new Lyrics();
+                lyrics.text = text.trim();
+                lyrics.finish(true);
+                const beatLyrics = [];
+                for (let i = lyrics.chunks.length - 1; i >= 0; i--) {
+                    beatLyrics.push(lyrics.chunks[i]);
+                }
+                this._beatTextChunksByTrack.set(track.index, beatLyrics);
+            }
+            else {
+                newBeat.text = text;
+            }
+        }
+        let allNoteHarmonicType = HarmonicType.None;
+        if ((flags & 0x08) !== 0) {
+            allNoteHarmonicType = this.readBeatEffects(newBeat);
+        }
+        if ((flags & 0x10) !== 0) {
+            this.readMixTableChange(newBeat);
+        }
+        const stringFlags = this.data.readByte();
+        for (let i = 6; i >= 0; i--) {
+            if ((stringFlags & (1 << i)) !== 0 && 6 - i < bar.staff.tuning.length) {
+                const note = this.readNote(track, bar, voice, newBeat, 6 - i);
+                if (allNoteHarmonicType !== HarmonicType.None) {
+                    note.harmonicType = allNoteHarmonicType;
+                    if (note.harmonicType === HarmonicType.Natural) {
+                        note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(note.fret);
+                    }
+                }
+            }
+        }
+        if (this._versionNumber >= 500) {
+            const flags2 = IOHelper.readInt16LE(this.data);
             if ((flags2 & 0x01) !== 0) {
-                beat.rasgueado = Rasgueado.Ii;
-            }
-            if ((flags & 0x20) !== 0 && this._versionNumber >= 400) {
-                const slapPop = IOHelper.readSInt8(this.data);
-                switch (slapPop) {
-                    case 1:
-                        beat.tap = true;
-                        break;
-                    case 2:
-                        beat.slap = true;
-                        break;
-                    case 3:
-                        beat.pop = true;
-                        break;
-                }
-            }
-            else if ((flags & 0x20) !== 0) {
-                const slapPop = IOHelper.readSInt8(this.data);
-                switch (slapPop) {
-                    case 1:
-                        beat.tap = true;
-                        break;
-                    case 2:
-                        beat.slap = true;
-                        break;
-                    case 3:
-                        beat.pop = true;
-                        break;
-                }
-                this.data.skip(4);
-            }
-            if ((flags2 & 0x04) !== 0) {
-                this.readTremoloBarEffect(beat);
-            }
-            if ((flags & 0x40) !== 0) {
-                let strokeUp = 0;
-                let strokeDown = 0;
-                if (this._versionNumber < 500) {
-                    strokeDown = this.data.readByte();
-                    strokeUp = this.data.readByte();
-                }
-                else {
-                    strokeUp = this.data.readByte();
-                    strokeDown = this.data.readByte();
-                }
-                if (strokeUp > 0) {
-                    beat.brushType = BrushType.BrushUp;
-                    beat.brushDuration = Gp3To5Importer.toStrokeValue(strokeUp);
-                }
-                else if (strokeDown > 0) {
-                    beat.brushType = BrushType.BrushDown;
-                    beat.brushDuration = Gp3To5Importer.toStrokeValue(strokeDown);
+                if (newBeat.index > 0) {
+                    voice.beats[newBeat.index - 1].beamingMode = BeatBeamingMode.ForceSplitToNext;
                 }
             }
             if ((flags2 & 0x02) !== 0) {
-                switch (IOHelper.readSInt8(this.data)) {
-                    case 0:
-                        beat.pickStroke = PickStroke.None;
-                        break;
-                    case 1:
-                        beat.pickStroke = PickStroke.Up;
-                        break;
-                    case 2:
-                        beat.pickStroke = PickStroke.Down;
-                        break;
-                }
-            }
-            if (this._versionNumber < 400) {
-                if ((flags & 0x04) !== 0) {
-                    return HarmonicType.Natural;
-                }
-                if ((flags & 0x08) !== 0) {
-                    return HarmonicType.Artificial;
-                }
-            }
-            return HarmonicType.None;
-        }
-        readTremoloBarEffect(beat) {
-            this.data.readByte();
-            IOHelper.readInt32LE(this.data);
-            const pointCount = IOHelper.readInt32LE(this.data);
-            if (pointCount > 0) {
-                for (let i = 0; i < pointCount; i++) {
-                    const point = new BendPoint(0, 0);
-                    point.offset = IOHelper.readInt32LE(this.data);
-                    point.value = (IOHelper.readInt32LE(this.data) / Gp3To5Importer.BendStep) | 0;
-                    GpBinaryHelpers.gpReadBool(this.data);
-                    beat.addWhammyBarPoint(point);
-                }
-            }
-        }
-        static toStrokeValue(value) {
-            switch (value) {
-                case 1:
-                    return 30;
-                case 2:
-                    return 30;
-                case 3:
-                    return 60;
-                case 4:
-                    return 120;
-                case 5:
-                    return 240;
-                case 6:
-                    return 480;
-                default:
-                    return 0;
-            }
-        }
-        readRseBank() {
-            this.data.skip(4);
-            this.data.skip(4);
-            this.data.skip(4);
-            this.data.skip(4);
-        }
-        readMixTableChange(beat) {
-            const tableChange = new MixTableChange();
-            tableChange.instrument = IOHelper.readSInt8(this.data);
-            if (this._versionNumber >= 500) {
-                this.readRseBank();
-            }
-            tableChange.volume = IOHelper.readSInt8(this.data);
-            tableChange.balance = IOHelper.readSInt8(this.data);
-            const chorus = IOHelper.readSInt8(this.data);
-            const reverb = IOHelper.readSInt8(this.data);
-            const phaser = IOHelper.readSInt8(this.data);
-            const tremolo = IOHelper.readSInt8(this.data);
-            if (this._versionNumber >= 500) {
-                tableChange.tempoName = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
-            }
-            tableChange.tempo = IOHelper.readInt32LE(this.data);
-            if (tableChange.volume >= 0) {
-                this.data.readByte();
-            }
-            if (tableChange.balance >= 0) {
-                this.data.readByte();
-            }
-            if (chorus >= 0) {
-                this.data.readByte();
-            }
-            if (reverb >= 0) {
-                this.data.readByte();
-            }
-            if (phaser >= 0) {
-                this.data.readByte();
-            }
-            if (tremolo >= 0) {
-                this.data.readByte();
-            }
-            if (tableChange.tempo >= 0) {
-                tableChange.duration = IOHelper.readSInt8(this.data);
-                if (this._versionNumber >= 510) {
-                    this.data.readByte();
-                }
-            }
-            if (this._versionNumber >= 400) {
-                this.data.readByte();
-            }
-            if (this._versionNumber >= 500) {
-                const wahType = IOHelper.readSInt8(this.data);
-                if (wahType >= 100) {
-                    beat.wahPedal = WahPedal.Closed;
-                }
-                else if (wahType >= 0) {
-                    beat.wahPedal = WahPedal.Open;
-                }
-            }
-            if (this._versionNumber >= 510) {
-                GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
-                GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
-            }
-            if (tableChange.volume >= 0) {
-                const volumeAutomation = new Automation();
-                volumeAutomation.isLinear = true;
-                volumeAutomation.type = AutomationType.Volume;
-                volumeAutomation.value = tableChange.volume;
-                beat.automations.push(volumeAutomation);
-            }
-            if (tableChange.balance >= 0) {
-                const balanceAutomation = new Automation();
-                balanceAutomation.isLinear = true;
-                balanceAutomation.type = AutomationType.Balance;
-                balanceAutomation.value = tableChange.balance;
-                beat.automations.push(balanceAutomation);
-            }
-            if (tableChange.instrument >= 0) {
-                const instrumentAutomation = new Automation();
-                instrumentAutomation.isLinear = true;
-                instrumentAutomation.type = AutomationType.Instrument;
-                instrumentAutomation.value = tableChange.instrument;
-                beat.automations.push(instrumentAutomation);
-            }
-            if (tableChange.tempo >= 0) {
-                const tempoAutomation = new Automation();
-                tempoAutomation.isLinear = true;
-                tempoAutomation.type = AutomationType.Tempo;
-                tempoAutomation.value = tableChange.tempo;
-                beat.automations.push(tempoAutomation);
-                if (!beat.voice.bar.masterBar.tempoAutomations.some(a => a.ratioPosition === tempoAutomation.ratioPosition && a.value === tempoAutomation.value)) {
-                    beat.voice.bar.masterBar.tempoAutomations.push(tempoAutomation);
-                }
-            }
-        }
-        readNote(track, bar, voice, beat, stringIndex) {
-            const newNote = new Note();
-            newNote.string = bar.staff.tuning.length - stringIndex;
-            const flags = this.data.readByte();
-            if ((flags & 0x02) !== 0) {
-                newNote.accentuated = AccentuationType.Heavy;
-            }
-            else if ((flags & 0x40) !== 0) {
-                newNote.accentuated = AccentuationType.Normal;
-            }
-            newNote.isGhost = (flags & 0x04) !== 0;
-            if ((flags & 0x20) !== 0) {
-                const noteType = this.data.readByte();
-                if (noteType === 3) {
-                    newNote.isDead = true;
-                }
-                else if (noteType === 2) {
-                    newNote.isTieDestination = true;
-                }
-            }
-            if ((flags & 0x01) !== 0 && this._versionNumber < 500) {
-                this.data.readByte();
-                this.data.readByte();
-            }
-            if ((flags & 0x10) !== 0) {
-                const dynamicNumber = IOHelper.readSInt8(this.data);
-                newNote.dynamics = this.toDynamicValue(dynamicNumber);
-                beat.dynamics = newNote.dynamics;
-            }
-            if ((flags & 0x20) !== 0) {
-                newNote.fret = IOHelper.readSInt8(this.data);
-            }
-            if ((flags & 0x80) !== 0) {
-                newNote.leftHandFinger = IOHelper.readSInt8(this.data);
-                newNote.rightHandFinger = IOHelper.readSInt8(this.data);
-            }
-            let swapAccidentals = false;
-            if (this._versionNumber >= 500) {
-                if ((flags & 0x01) !== 0) {
-                    newNote.durationPercent = IOHelper.readFloat64BE(this.data);
-                }
-                const flags2 = this.data.readByte();
-                swapAccidentals = (flags2 & 0x02) !== 0;
-            }
-            beat.addNote(newNote);
-            if ((flags & 0x08) !== 0) {
-                this.readNoteEffects(track, voice, beat, newNote);
-            }
-            if (bar.staff.isPercussion) {
-                newNote.percussionArticulation = newNote.fret;
-                newNote.string = -1;
-                newNote.fret = -1;
-            }
-            if (swapAccidentals) {
-            }
-            return newNote;
-        }
-        toDynamicValue(value) {
-            switch (value) {
-                case 1:
-                    return DynamicValue.PPP;
-                case 2:
-                    return DynamicValue.PP;
-                case 3:
-                    return DynamicValue.P;
-                case 4:
-                    return DynamicValue.MP;
-                case 5:
-                    return DynamicValue.MF;
-                case 6:
-                    return DynamicValue.F;
-                case 7:
-                    return DynamicValue.FF;
-                case 8:
-                    return DynamicValue.FFF;
-                default:
-                    return DynamicValue.F;
-            }
-        }
-        readNoteEffects(_track, voice, beat, note) {
-            const flags = this.data.readByte();
-            let flags2 = 0;
-            if (this._versionNumber >= 400) {
-                flags2 = this.data.readByte();
-            }
-            if ((flags & 0x01) !== 0) {
-                this.readBend(note);
-            }
-            if ((flags & 0x10) !== 0) {
-                this.readGrace(voice, note);
             }
             if ((flags2 & 0x04) !== 0) {
-                this.readTremoloPicking(beat);
+                if (newBeat.index > 0) {
+                    voice.beats[newBeat.index - 1].beamingMode = BeatBeamingMode.ForceMergeWithNext;
+                }
             }
             if ((flags2 & 0x08) !== 0) {
-                this.readSlide(note);
-            }
-            else if (this._versionNumber < 400) {
-                if ((flags & 0x04) !== 0) {
-                    note.slideOutType = SlideOutType.Shift;
-                }
             }
             if ((flags2 & 0x10) !== 0) {
-                this.readArtificialHarmonic(note);
+                newBeat.ottava = Ottavia._8va;
             }
             if ((flags2 & 0x20) !== 0) {
-                this.readTrill(note);
+                newBeat.ottava = Ottavia._8vb;
             }
-            note.isLetRing = (flags & 0x08) !== 0;
-            note.isHammerPullOrigin = (flags & 0x02) !== 0;
             if ((flags2 & 0x40) !== 0) {
-                note.vibrato = VibratoType.Slight;
+                newBeat.ottava = Ottavia._15ma;
             }
-            note.isPalmMute = (flags2 & 0x02) !== 0;
-            note.isStaccato = (flags2 & 0x01) !== 0;
-        }
-        readBend(note) {
-            this.data.readByte();
-            IOHelper.readInt32LE(this.data);
-            const pointCount = IOHelper.readInt32LE(this.data);
-            if (pointCount > 0) {
-                for (let i = 0; i < pointCount; i++) {
-                    const point = new BendPoint(0, 0);
-                    point.offset = IOHelper.readInt32LE(this.data);
-                    point.value = (IOHelper.readInt32LE(this.data) / Gp3To5Importer.BendStep) | 0;
-                    GpBinaryHelpers.gpReadBool(this.data);
-                    note.addBendPoint(point);
+            if ((flags2 & 0x100) !== 0) {
+                newBeat.ottava = Ottavia._15mb;
+            }
+            if ((flags2 & 0x800) !== 0) {
+                const breakSecondaryBeams = this.data.readByte() !== 0;
+                if (newBeat.index > 0 && breakSecondaryBeams) {
+                    voice.beats[newBeat.index - 1].beamingMode = BeatBeamingMode.ForceSplitOnSecondaryToNext;
                 }
             }
         }
-        readGrace(voice, note) {
-            const graceBeat = new Beat();
-            const graceNote = new Note();
-            graceNote.string = note.string;
-            graceNote.fret = IOHelper.readSInt8(this.data);
-            graceBeat.duration = Duration.ThirtySecond;
-            graceBeat.dynamics = this.toDynamicValue(IOHelper.readSInt8(this.data));
-            const transition = IOHelper.readSInt8(this.data);
-            switch (transition) {
-                case 0:
-                    break;
+        if (beatTextAsLyrics &&
+            !newBeat.isRest &&
+            this._beatTextChunksByTrack.has(track.index) &&
+            this._beatTextChunksByTrack.get(track.index).length > 0) {
+            newBeat.lyrics = [this._beatTextChunksByTrack.get(track.index).pop()];
+        }
+    }
+    readChord(beat) {
+        const chord = new Chord();
+        const chordId = ModelUtils.newGuid();
+        if (this._versionNumber >= 500) {
+            this.data.skip(17);
+            chord.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 21, this.settings.importer.encoding);
+            this.data.skip(4);
+            chord.firstFret = IOHelper.readInt32LE(this.data);
+            for (let i = 0; i < 7; i++) {
+                const fret = IOHelper.readInt32LE(this.data);
+                if (i < beat.voice.bar.staff.tuning.length) {
+                    chord.strings.push(fret);
+                }
+            }
+            const numberOfBarres = this.data.readByte();
+            const barreFrets = new Uint8Array(5);
+            this.data.read(barreFrets, 0, barreFrets.length);
+            for (let i = 0; i < numberOfBarres; i++) {
+                chord.barreFrets.push(barreFrets[i]);
+            }
+            this.data.skip(26);
+        }
+        else {
+            if (this.data.readByte() !== 0) {
+                if (this._versionNumber >= 400) {
+                    this.data.skip(16);
+                    chord.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 21, this.settings.importer.encoding);
+                    this.data.skip(4);
+                    chord.firstFret = IOHelper.readInt32LE(this.data);
+                    for (let i = 0; i < 7; i++) {
+                        const fret = IOHelper.readInt32LE(this.data);
+                        if (i < beat.voice.bar.staff.tuning.length) {
+                            chord.strings.push(fret);
+                        }
+                    }
+                    const numberOfBarres = this.data.readByte();
+                    const barreFrets = new Uint8Array(5);
+                    this.data.read(barreFrets, 0, barreFrets.length);
+                    for (let i = 0; i < numberOfBarres; i++) {
+                        chord.barreFrets.push(barreFrets[i]);
+                    }
+                    this.data.skip(26);
+                }
+                else {
+                    this.data.skip(25);
+                    chord.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 34, this.settings.importer.encoding);
+                    chord.firstFret = IOHelper.readInt32LE(this.data);
+                    for (let i = 0; i < 6; i++) {
+                        const fret = IOHelper.readInt32LE(this.data);
+                        if (i < beat.voice.bar.staff.tuning.length) {
+                            chord.strings.push(fret);
+                        }
+                    }
+                    this.data.skip(36);
+                }
+            }
+            else {
+                const strings = this._versionNumber >= 406 ? 7 : 6;
+                chord.name = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+                chord.firstFret = IOHelper.readInt32LE(this.data);
+                if (chord.firstFret > 0) {
+                    for (let i = 0; i < strings; i++) {
+                        const fret = IOHelper.readInt32LE(this.data);
+                        if (i < beat.voice.bar.staff.tuning.length) {
+                            chord.strings.push(fret);
+                        }
+                    }
+                }
+            }
+        }
+        if (chord.name) {
+            beat.chordId = chordId;
+            beat.voice.bar.staff.addChord(beat.chordId, chord);
+        }
+    }
+    readBeatEffects(beat) {
+        const flags = this.data.readByte();
+        let flags2 = 0;
+        if (this._versionNumber >= 400) {
+            flags2 = this.data.readByte();
+        }
+        if ((flags & 0x10) !== 0) {
+            beat.fade = FadeType.FadeIn;
+        }
+        if ((this._versionNumber < 400 && (flags & 0x01) !== 0) || (flags & 0x02) !== 0) {
+            beat.vibrato = VibratoType.Slight;
+        }
+        if ((flags2 & 0x01) !== 0) {
+            beat.rasgueado = Rasgueado.Ii;
+        }
+        if ((flags & 0x20) !== 0 && this._versionNumber >= 400) {
+            const slapPop = IOHelper.readSInt8(this.data);
+            switch (slapPop) {
                 case 1:
-                    graceNote.slideOutType = SlideOutType.Legato;
-                    graceNote.slideTarget = note;
+                    beat.tap = true;
                     break;
                 case 2:
+                    beat.slap = true;
                     break;
                 case 3:
-                    graceNote.isHammerPullOrigin = true;
+                    beat.pop = true;
                     break;
             }
-            graceNote.dynamics = graceBeat.dynamics;
-            this.data.skip(1);
+        }
+        else if ((flags & 0x20) !== 0) {
+            const slapPop = IOHelper.readSInt8(this.data);
+            switch (slapPop) {
+                case 1:
+                    beat.tap = true;
+                    break;
+                case 2:
+                    beat.slap = true;
+                    break;
+                case 3:
+                    beat.pop = true;
+                    break;
+            }
+            this.data.skip(4);
+        }
+        if ((flags2 & 0x04) !== 0) {
+            this.readTremoloBarEffect(beat);
+        }
+        if ((flags & 0x40) !== 0) {
+            let strokeUp = 0;
+            let strokeDown = 0;
             if (this._versionNumber < 500) {
-                graceBeat.graceType = GraceType.BeforeBeat;
+                strokeDown = this.data.readByte();
+                strokeUp = this.data.readByte();
             }
             else {
-                const flags = this.data.readByte();
-                graceNote.isDead = (flags & 0x01) !== 0;
-                graceBeat.graceType = (flags & 0x02) !== 0 ? GraceType.OnBeat : GraceType.BeforeBeat;
+                strokeUp = this.data.readByte();
+                strokeDown = this.data.readByte();
             }
-            voice.addGraceBeat(graceBeat);
-            graceBeat.addNote(graceNote);
+            if (strokeUp > 0) {
+                beat.brushType = BrushType.BrushUp;
+                beat.brushDuration = Gp3To5Importer.toStrokeValue(strokeUp);
+            }
+            else if (strokeDown > 0) {
+                beat.brushType = BrushType.BrushDown;
+                beat.brushDuration = Gp3To5Importer.toStrokeValue(strokeDown);
+            }
         }
-        readTremoloPicking(beat) {
-            const speed = this.data.readByte();
-            switch (speed) {
+        if ((flags2 & 0x02) !== 0) {
+            switch (IOHelper.readSInt8(this.data)) {
+                case 0:
+                    beat.pickStroke = PickStroke.None;
+                    break;
                 case 1:
-                    beat.tremoloSpeed = Duration.Eighth;
+                    beat.pickStroke = PickStroke.Up;
                     break;
                 case 2:
-                    beat.tremoloSpeed = Duration.Sixteenth;
-                    break;
-                case 3:
-                    beat.tremoloSpeed = Duration.ThirtySecond;
+                    beat.pickStroke = PickStroke.Down;
                     break;
             }
         }
-        readSlide(note) {
-            if (this._versionNumber >= 500) {
-                const type = IOHelper.readSInt8(this.data);
-                if ((type & 1) !== 0) {
+        if (this._versionNumber < 400) {
+            if ((flags & 0x04) !== 0) {
+                return HarmonicType.Natural;
+            }
+            if ((flags & 0x08) !== 0) {
+                return HarmonicType.Artificial;
+            }
+        }
+        return HarmonicType.None;
+    }
+    readTremoloBarEffect(beat) {
+        this.data.readByte();
+        IOHelper.readInt32LE(this.data);
+        const pointCount = IOHelper.readInt32LE(this.data);
+        if (pointCount > 0) {
+            for (let i = 0; i < pointCount; i++) {
+                const point = new BendPoint(0, 0);
+                point.offset = IOHelper.readInt32LE(this.data);
+                point.value = (IOHelper.readInt32LE(this.data) / Gp3To5Importer.BendStep) | 0;
+                GpBinaryHelpers.gpReadBool(this.data);
+                beat.addWhammyBarPoint(point);
+            }
+        }
+    }
+    static toStrokeValue(value) {
+        switch (value) {
+            case 1:
+                return 30;
+            case 2:
+                return 30;
+            case 3:
+                return 60;
+            case 4:
+                return 120;
+            case 5:
+                return 240;
+            case 6:
+                return 480;
+            default:
+                return 0;
+        }
+    }
+    readRseBank() {
+        this.data.skip(4);
+        this.data.skip(4);
+        this.data.skip(4);
+        this.data.skip(4);
+    }
+    readMixTableChange(beat) {
+        const tableChange = new MixTableChange();
+        tableChange.instrument = IOHelper.readSInt8(this.data);
+        if (this._versionNumber >= 500) {
+            this.readRseBank();
+        }
+        tableChange.volume = IOHelper.readSInt8(this.data);
+        tableChange.balance = IOHelper.readSInt8(this.data);
+        const chorus = IOHelper.readSInt8(this.data);
+        const reverb = IOHelper.readSInt8(this.data);
+        const phaser = IOHelper.readSInt8(this.data);
+        const tremolo = IOHelper.readSInt8(this.data);
+        if (this._versionNumber >= 500) {
+            tableChange.tempoName = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+        }
+        tableChange.tempo = IOHelper.readInt32LE(this.data);
+        if (tableChange.volume >= 0) {
+            this.data.readByte();
+        }
+        if (tableChange.balance >= 0) {
+            this.data.readByte();
+        }
+        if (chorus >= 0) {
+            this.data.readByte();
+        }
+        if (reverb >= 0) {
+            this.data.readByte();
+        }
+        if (phaser >= 0) {
+            this.data.readByte();
+        }
+        if (tremolo >= 0) {
+            this.data.readByte();
+        }
+        if (tableChange.tempo >= 0) {
+            tableChange.duration = IOHelper.readSInt8(this.data);
+            if (this._versionNumber >= 510) {
+                this.data.readByte();
+            }
+        }
+        if (this._versionNumber >= 400) {
+            this.data.readByte();
+        }
+        if (this._versionNumber >= 500) {
+            const wahType = IOHelper.readSInt8(this.data);
+            if (wahType >= 100) {
+                beat.wahPedal = WahPedal.Closed;
+            }
+            else if (wahType >= 0) {
+                beat.wahPedal = WahPedal.Open;
+            }
+        }
+        if (this._versionNumber >= 510) {
+            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+        }
+        if (tableChange.volume >= 0) {
+            const volumeAutomation = new Automation();
+            volumeAutomation.isLinear = true;
+            volumeAutomation.type = AutomationType.Volume;
+            volumeAutomation.value = tableChange.volume;
+            beat.automations.push(volumeAutomation);
+        }
+        if (tableChange.balance >= 0) {
+            const balanceAutomation = new Automation();
+            balanceAutomation.isLinear = true;
+            balanceAutomation.type = AutomationType.Balance;
+            balanceAutomation.value = tableChange.balance;
+            beat.automations.push(balanceAutomation);
+        }
+        if (tableChange.instrument >= 0) {
+            const instrumentAutomation = new Automation();
+            instrumentAutomation.isLinear = true;
+            instrumentAutomation.type = AutomationType.Instrument;
+            instrumentAutomation.value = tableChange.instrument;
+            beat.automations.push(instrumentAutomation);
+        }
+        if (tableChange.tempo >= 0) {
+            const tempoAutomation = new Automation();
+            tempoAutomation.isLinear = true;
+            tempoAutomation.type = AutomationType.Tempo;
+            tempoAutomation.value = tableChange.tempo;
+            beat.automations.push(tempoAutomation);
+            if (!beat.voice.bar.masterBar.tempoAutomations.some(a => a.ratioPosition === tempoAutomation.ratioPosition && a.value === tempoAutomation.value)) {
+                beat.voice.bar.masterBar.tempoAutomations.push(tempoAutomation);
+            }
+        }
+    }
+    readNote(track, bar, voice, beat, stringIndex) {
+        const newNote = new Note();
+        newNote.string = bar.staff.tuning.length - stringIndex;
+        const flags = this.data.readByte();
+        if ((flags & 0x02) !== 0) {
+            newNote.accentuated = AccentuationType.Heavy;
+        }
+        else if ((flags & 0x40) !== 0) {
+            newNote.accentuated = AccentuationType.Normal;
+        }
+        newNote.isGhost = (flags & 0x04) !== 0;
+        if ((flags & 0x20) !== 0) {
+            const noteType = this.data.readByte();
+            if (noteType === 3) {
+                newNote.isDead = true;
+            }
+            else if (noteType === 2) {
+                newNote.isTieDestination = true;
+            }
+        }
+        if ((flags & 0x01) !== 0 && this._versionNumber < 500) {
+            this.data.readByte();
+            this.data.readByte();
+        }
+        if ((flags & 0x10) !== 0) {
+            const dynamicNumber = IOHelper.readSInt8(this.data);
+            newNote.dynamics = this.toDynamicValue(dynamicNumber);
+            beat.dynamics = newNote.dynamics;
+        }
+        if ((flags & 0x20) !== 0) {
+            newNote.fret = IOHelper.readSInt8(this.data);
+        }
+        if ((flags & 0x80) !== 0) {
+            newNote.leftHandFinger = IOHelper.readSInt8(this.data);
+            newNote.rightHandFinger = IOHelper.readSInt8(this.data);
+        }
+        let swapAccidentals = false;
+        if (this._versionNumber >= 500) {
+            if ((flags & 0x01) !== 0) {
+                newNote.durationPercent = IOHelper.readFloat64BE(this.data);
+            }
+            const flags2 = this.data.readByte();
+            swapAccidentals = (flags2 & 0x02) !== 0;
+        }
+        beat.addNote(newNote);
+        if ((flags & 0x08) !== 0) {
+            this.readNoteEffects(track, voice, beat, newNote);
+        }
+        if (bar.staff.isPercussion) {
+            newNote.percussionArticulation = newNote.fret;
+            newNote.string = -1;
+            newNote.fret = -1;
+        }
+        if (swapAccidentals) {
+        }
+        return newNote;
+    }
+    toDynamicValue(value) {
+        switch (value) {
+            case 1:
+                return DynamicValue.PPP;
+            case 2:
+                return DynamicValue.PP;
+            case 3:
+                return DynamicValue.P;
+            case 4:
+                return DynamicValue.MP;
+            case 5:
+                return DynamicValue.MF;
+            case 6:
+                return DynamicValue.F;
+            case 7:
+                return DynamicValue.FF;
+            case 8:
+                return DynamicValue.FFF;
+            default:
+                return DynamicValue.F;
+        }
+    }
+    readNoteEffects(_track, voice, beat, note) {
+        const flags = this.data.readByte();
+        let flags2 = 0;
+        if (this._versionNumber >= 400) {
+            flags2 = this.data.readByte();
+        }
+        if ((flags & 0x01) !== 0) {
+            this.readBend(note);
+        }
+        if ((flags & 0x10) !== 0) {
+            this.readGrace(voice, note);
+        }
+        if ((flags2 & 0x04) !== 0) {
+            this.readTremoloPicking(beat);
+        }
+        if ((flags2 & 0x08) !== 0) {
+            this.readSlide(note);
+        }
+        else if (this._versionNumber < 400) {
+            if ((flags & 0x04) !== 0) {
+                note.slideOutType = SlideOutType.Shift;
+            }
+        }
+        if ((flags2 & 0x10) !== 0) {
+            this.readArtificialHarmonic(note);
+        }
+        if ((flags2 & 0x20) !== 0) {
+            this.readTrill(note);
+        }
+        note.isLetRing = (flags & 0x08) !== 0;
+        note.isHammerPullOrigin = (flags & 0x02) !== 0;
+        if ((flags2 & 0x40) !== 0) {
+            note.vibrato = VibratoType.Slight;
+        }
+        note.isPalmMute = (flags2 & 0x02) !== 0;
+        note.isStaccato = (flags2 & 0x01) !== 0;
+    }
+    readBend(note) {
+        this.data.readByte();
+        IOHelper.readInt32LE(this.data);
+        const pointCount = IOHelper.readInt32LE(this.data);
+        if (pointCount > 0) {
+            for (let i = 0; i < pointCount; i++) {
+                const point = new BendPoint(0, 0);
+                point.offset = IOHelper.readInt32LE(this.data);
+                point.value = (IOHelper.readInt32LE(this.data) / Gp3To5Importer.BendStep) | 0;
+                GpBinaryHelpers.gpReadBool(this.data);
+                note.addBendPoint(point);
+            }
+        }
+    }
+    readGrace(voice, note) {
+        const graceBeat = new Beat();
+        const graceNote = new Note();
+        graceNote.string = note.string;
+        graceNote.fret = IOHelper.readSInt8(this.data);
+        graceBeat.duration = Duration.ThirtySecond;
+        graceBeat.dynamics = this.toDynamicValue(IOHelper.readSInt8(this.data));
+        const transition = IOHelper.readSInt8(this.data);
+        switch (transition) {
+            case 0:
+                break;
+            case 1:
+                graceNote.slideOutType = SlideOutType.Legato;
+                graceNote.slideTarget = note;
+                break;
+            case 2:
+                break;
+            case 3:
+                graceNote.isHammerPullOrigin = true;
+                break;
+        }
+        graceNote.dynamics = graceBeat.dynamics;
+        this.data.skip(1);
+        if (this._versionNumber < 500) {
+            graceBeat.graceType = GraceType.BeforeBeat;
+        }
+        else {
+            const flags = this.data.readByte();
+            graceNote.isDead = (flags & 0x01) !== 0;
+            graceBeat.graceType = (flags & 0x02) !== 0 ? GraceType.OnBeat : GraceType.BeforeBeat;
+        }
+        voice.addGraceBeat(graceBeat);
+        graceBeat.addNote(graceNote);
+    }
+    readTremoloPicking(beat) {
+        const speed = this.data.readByte();
+        switch (speed) {
+            case 1:
+                beat.tremoloSpeed = Duration.Eighth;
+                break;
+            case 2:
+                beat.tremoloSpeed = Duration.Sixteenth;
+                break;
+            case 3:
+                beat.tremoloSpeed = Duration.ThirtySecond;
+                break;
+        }
+    }
+    readSlide(note) {
+        if (this._versionNumber >= 500) {
+            const type = IOHelper.readSInt8(this.data);
+            if ((type & 1) !== 0) {
+                note.slideOutType = SlideOutType.Shift;
+            }
+            else if ((type & 2) !== 0) {
+                note.slideOutType = SlideOutType.Legato;
+            }
+            else if ((type & 4) !== 0) {
+                note.slideOutType = SlideOutType.OutDown;
+            }
+            else if ((type & 8) !== 0) {
+                note.slideOutType = SlideOutType.OutUp;
+            }
+            if ((type & 16) !== 0) {
+                note.slideInType = SlideInType.IntoFromBelow;
+            }
+            else if ((type & 32) !== 0) {
+                note.slideInType = SlideInType.IntoFromAbove;
+            }
+        }
+        else {
+            const type = IOHelper.readSInt8(this.data);
+            switch (type) {
+                case 1:
                     note.slideOutType = SlideOutType.Shift;
-                }
-                else if ((type & 2) !== 0) {
-                    note.slideOutType = SlideOutType.Legato;
-                }
-                else if ((type & 4) !== 0) {
-                    note.slideOutType = SlideOutType.OutDown;
-                }
-                else if ((type & 8) !== 0) {
-                    note.slideOutType = SlideOutType.OutUp;
-                }
-                if ((type & 16) !== 0) {
-                    note.slideInType = SlideInType.IntoFromBelow;
-                }
-                else if ((type & 32) !== 0) {
-                    note.slideInType = SlideInType.IntoFromAbove;
-                }
-            }
-            else {
-                const type = IOHelper.readSInt8(this.data);
-                switch (type) {
-                    case 1:
-                        note.slideOutType = SlideOutType.Shift;
-                        break;
-                    case 2:
-                        note.slideOutType = SlideOutType.Legato;
-                        break;
-                    case 3:
-                        note.slideOutType = SlideOutType.OutDown;
-                        break;
-                    case 4:
-                        note.slideOutType = SlideOutType.OutUp;
-                        break;
-                    case -1:
-                        note.slideInType = SlideInType.IntoFromBelow;
-                        break;
-                    case -2:
-                        note.slideInType = SlideInType.IntoFromAbove;
-                        break;
-                }
-            }
-        }
-        readArtificialHarmonic(note) {
-            const type = this.data.readByte();
-            if (this._versionNumber >= 500) {
-                switch (type) {
-                    case 1:
-                        note.harmonicType = HarmonicType.Natural;
-                        note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(note.fret);
-                        break;
-                    case 2:
-                        this.data.readByte();
-                        this.data.readByte();
-                        this.data.readByte();
-                        note.harmonicType = HarmonicType.Artificial;
-                        break;
-                    case 3:
-                        note.harmonicType = HarmonicType.Tap;
-                        note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(this.data.readByte());
-                        break;
-                    case 4:
-                        note.harmonicType = HarmonicType.Pinch;
-                        note.harmonicValue = 12;
-                        break;
-                    case 5:
-                        note.harmonicType = HarmonicType.Semi;
-                        note.harmonicValue = 12;
-                        break;
-                }
-            }
-            else if (this._versionNumber >= 400) {
-                switch (type) {
-                    case 1:
-                        note.harmonicType = HarmonicType.Natural;
-                        break;
-                    case 3:
-                        note.harmonicType = HarmonicType.Tap;
-                        break;
-                    case 4:
-                        note.harmonicType = HarmonicType.Pinch;
-                        break;
-                    case 5:
-                        note.harmonicType = HarmonicType.Semi;
-                        break;
-                    case 15:
-                        note.harmonicType = HarmonicType.Artificial;
-                        break;
-                    case 17:
-                        note.harmonicType = HarmonicType.Artificial;
-                        break;
-                    case 22:
-                        note.harmonicType = HarmonicType.Artificial;
-                        break;
-                }
-            }
-        }
-        readTrill(note) {
-            note.trillValue = this.data.readByte() + note.stringTuning;
-            switch (this.data.readByte()) {
-                case 1:
-                    note.trillSpeed = Duration.Sixteenth;
                     break;
                 case 2:
-                    note.trillSpeed = Duration.ThirtySecond;
+                    note.slideOutType = SlideOutType.Legato;
                     break;
                 case 3:
-                    note.trillSpeed = Duration.SixtyFourth;
+                    note.slideOutType = SlideOutType.OutDown;
+                    break;
+                case 4:
+                    note.slideOutType = SlideOutType.OutUp;
+                    break;
+                case -1:
+                    note.slideInType = SlideInType.IntoFromBelow;
+                    break;
+                case -2:
+                    note.slideInType = SlideInType.IntoFromAbove;
                     break;
             }
         }
     }
-    Gp3To5Importer.VersionString = 'FICHIER GUITAR PRO ';
-    Gp3To5Importer.BendStep = 25;
-    class GpBinaryHelpers {
-        static gpReadBool(data) {
-            return data.readByte() !== 0;
-        }
-        static gpReadStringIntUnused(data, encoding) {
-            data.skip(4);
-            return GpBinaryHelpers.gpReadString(data, data.readByte(), encoding);
-        }
-        static gpReadStringInt(data, encoding) {
-            return GpBinaryHelpers.gpReadString(data, IOHelper.readInt32LE(data), encoding);
-        }
-        static gpReadStringIntByte(data, encoding) {
-            const length = IOHelper.readInt32LE(data) - 1;
-            data.readByte();
-            return GpBinaryHelpers.gpReadString(data, length, encoding);
-        }
-        static gpReadString(data, length, encoding) {
-            const b = new Uint8Array(length);
-            data.read(b, 0, b.length);
-            return IOHelper.toString(b, encoding);
-        }
-        static gpWriteString(data, s) {
-            const encoded = IOHelper.stringToBytes(s);
-            data.writeByte(s.length);
-            data.write(encoded, 0, encoded.length);
-        }
-        static gpReadStringByteLength(data, length, encoding) {
-            const stringLength = data.readByte();
-            const s = GpBinaryHelpers.gpReadString(data, stringLength, encoding);
-            if (stringLength < length) {
-                data.skip(length - stringLength);
+    readArtificialHarmonic(note) {
+        const type = this.data.readByte();
+        if (this._versionNumber >= 500) {
+            switch (type) {
+                case 1:
+                    note.harmonicType = HarmonicType.Natural;
+                    note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(note.fret);
+                    break;
+                case 2:
+                    this.data.readByte();
+                    this.data.readByte();
+                    this.data.readByte();
+                    note.harmonicType = HarmonicType.Artificial;
+                    break;
+                case 3:
+                    note.harmonicType = HarmonicType.Tap;
+                    note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(this.data.readByte());
+                    break;
+                case 4:
+                    note.harmonicType = HarmonicType.Pinch;
+                    note.harmonicValue = 12;
+                    break;
+                case 5:
+                    note.harmonicType = HarmonicType.Semi;
+                    note.harmonicValue = 12;
+                    break;
             }
-            return s;
+        }
+        else if (this._versionNumber >= 400) {
+            switch (type) {
+                case 1:
+                    note.harmonicType = HarmonicType.Natural;
+                    break;
+                case 3:
+                    note.harmonicType = HarmonicType.Tap;
+                    break;
+                case 4:
+                    note.harmonicType = HarmonicType.Pinch;
+                    break;
+                case 5:
+                    note.harmonicType = HarmonicType.Semi;
+                    break;
+                case 15:
+                    note.harmonicType = HarmonicType.Artificial;
+                    break;
+                case 17:
+                    note.harmonicType = HarmonicType.Artificial;
+                    break;
+                case 22:
+                    note.harmonicType = HarmonicType.Artificial;
+                    break;
+            }
         }
     }
-    exports.GpBinaryHelpers = GpBinaryHelpers;
-    class MixTableChange {
-        constructor() {
-            this.volume = -1;
-            this.balance = -1;
-            this.instrument = -1;
-            this.tempoName = '';
-            this.tempo = -1;
-            this.duration = -1;
+    readTrill(note) {
+        note.trillValue = this.data.readByte() + note.stringTuning;
+        switch (this.data.readByte()) {
+            case 1:
+                note.trillSpeed = Duration.Sixteenth;
+                break;
+            case 2:
+                note.trillSpeed = Duration.ThirtySecond;
+                break;
+            case 3:
+                note.trillSpeed = Duration.SixtyFourth;
+                break;
         }
     }
-});
+}
+Gp3To5Importer.VersionString = 'FICHIER GUITAR PRO ';
+Gp3To5Importer.BendStep = 25;
+class GpBinaryHelpers {
+    static gpReadColor(data, readAlpha = false) {
+        const r = data.readByte();
+        const g = data.readByte();
+        const b = data.readByte();
+        let a = 255;
+        if (readAlpha) {
+            a = data.readByte();
+        }
+        else {
+            data.skip(1);
+        }
+        return new Color(r, g, b, a);
+    }
+    static gpReadBool(data) {
+        return data.readByte() !== 0;
+    }
+    static gpReadStringIntUnused(data, encoding) {
+        data.skip(4);
+        return GpBinaryHelpers.gpReadString(data, data.readByte(), encoding);
+    }
+    static gpReadStringInt(data, encoding) {
+        return GpBinaryHelpers.gpReadString(data, IOHelper.readInt32LE(data), encoding);
+    }
+    static gpReadStringIntByte(data, encoding) {
+        const length = IOHelper.readInt32LE(data) - 1;
+        data.readByte();
+        return GpBinaryHelpers.gpReadString(data, length, encoding);
+    }
+    static gpReadString(data, length, encoding) {
+        const b = new Uint8Array(length);
+        data.read(b, 0, b.length);
+        return IOHelper.toString(b, encoding);
+    }
+    static gpWriteString(data, s) {
+        const encoded = IOHelper.stringToBytes(s);
+        data.writeByte(s.length);
+        data.write(encoded, 0, encoded.length);
+    }
+    static gpReadStringByteLength(data, length, encoding) {
+        const stringLength = data.readByte();
+        const s = GpBinaryHelpers.gpReadString(data, stringLength, encoding);
+        if (stringLength < length) {
+            data.skip(length - stringLength);
+        }
+        return s;
+    }
+}
+class MixTableChange {
+    constructor() {
+        this.volume = -1;
+        this.balance = -1;
+        this.instrument = -1;
+        this.tempoName = '';
+        this.tempo = -1;
+        this.duration = -1;
+    }
+}
 console.log('Alpha Tab Import *.mid v1.0.1');
 class AlphaTabImportMusicPlugin {
     constructor() {
@@ -5835,8 +6032,6 @@ class AlphaTabImportMusicPlugin {
         }
     }
     loadMusicfile(inputFile) {
-        console.log('loadMusicfile');
-        console.dir(inputFile);
         let loader = new FileLoaderAlpha(inputFile);
     }
 }
@@ -5870,7 +6065,21 @@ class FileLoaderAlpha {
                 }
                 let comment = ', ' + file.size / 1000 + 'kb, ' + dat;
                 var arrayBuffer = progressEvent.target.result;
-                let tt;
+                let uint8Array = new Uint8Array(arrayBuffer);
+                let data = ByteBuffer.fromBuffer(uint8Array);
+                let settings = new Settings();
+                let path = inputFile.value;
+                path = path.toLowerCase().trim();
+                if (path.endsWith('.gp3') || path.endsWith('.gp4') || path.endsWith('.gp5')) {
+                    let scoreImporter = new Gp3To5Importer();
+                    settings.importer.encoding = 'windows-1251';
+                    scoreImporter.init(data, settings);
+                    let score = scoreImporter.readScore();
+                    console.log(score);
+                }
+                else {
+                    console.log('wrong path', path);
+                }
             }
         };
         fileReader.readAsArrayBuffer(file);

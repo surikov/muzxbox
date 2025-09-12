@@ -21,9 +21,10 @@ class GPImporter {
             settings.importer.encoding = 'windows-1251';
             scoreImporter.init(data, settings);
             this.score = scoreImporter.readScore();
+			console.log(this.score);
         }
     }
-    convertProject(title, comment) {
+    _________convertProject(title, comment) {
         let project = score2schedule(title, comment, this.score);
         return project;
     }
@@ -782,7 +783,9 @@ class Gp3To5Importer extends ScoreImporter {
         return 'Guitar Pro 3-5';
     }
     readScore() {
+		
         this.readVersion();
+		console.log('readScore',this._versionNumber);
         this._score = new Score();
         this.readScoreInformation();
         if (this._versionNumber < 500) {
@@ -814,7 +817,9 @@ class Gp3To5Importer extends ScoreImporter {
             this.data.skip(4);
         }
         this._barCount = IOHelper.readInt32LE(this.data);
+		console.log('_barCount',this._barCount);
         this._trackCount = IOHelper.readInt32LE(this.data);
+		console.log('_trackCount',this._trackCount);
         this.readMasterBars();
         this.readTracks();
         this.readBars();
@@ -987,6 +992,7 @@ class Gp3To5Importer extends ScoreImporter {
         }
     }
     readTrack() {
+		console.log(1,this.data.position);
         let newTrack = new Track();
         newTrack.ensureStaveCount(1);
         this._score.addTrack(newTrack);
@@ -1005,10 +1011,12 @@ class Gp3To5Importer extends ScoreImporter {
             }
         }
         mainStaff.stringTuning.tunings = tuning;
+		console.log(2,this.data.position);
         let port = IOHelper.readInt32LE(this.data);
         let index = IOHelper.readInt32LE(this.data) - 1;
         let effectChannel = IOHelper.readInt32LE(this.data) - 1;
         this.data.skip(4);
+		console.log('a',this.data.position);
         if (index >= 0 && index < this._playbackInfos.length) {
             let info = this._playbackInfos[index];
             info.port = port;
@@ -1019,9 +1027,11 @@ class Gp3To5Importer extends ScoreImporter {
                 mainStaff.displayTranspositionPitch = -12;
             }
             newTrack.playbackInfo = info;
+			console.log('index',this.data.position,index,this._playbackInfos.length);
         }
         mainStaff.capo = IOHelper.readInt32LE(this.data);
         newTrack.color = GpBinaryHelpers.gpReadColor(this.data, false);
+		console.log(3,this.data.position);
         if (this._versionNumber >= 500) {
             this.data.readByte();
             this.data.readByte();
@@ -1032,6 +1042,7 @@ class Gp3To5Importer extends ScoreImporter {
             GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
             GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
         }
+		console.log(this.data.position,newTrack);
     }
     readBars() {
         for (let i = 0; i < this._barCount; i++) {

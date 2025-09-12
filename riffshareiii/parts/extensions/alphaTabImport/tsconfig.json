@@ -1,6 +1,7 @@
 {
 	"compilerOptions": {
-		"target": "es2015"
+		"target": "es2020"
+		//"target": "es2015"
         ,"outFile": "../../exe/plugins/actions/alphatabimport1/aimportfile.js"
         //,"outDir":"../js"
 		,"strictNullChecks": true
@@ -14,10 +15,22 @@
         ,"experimentalDecorators": true
         ,"isolatedModules": false
 		,"module": "AMD"
+		//,"module": "es2020"
         ,"lib": [
-            "dom"
-            ,"es2015"
-            ,"es5"
+			"ES2015",
+            "ES2016",
+            "ES2017",
+            "ES2021",
+            //"es2022.regexp",
+            //"es2022.error",
+            //"ES2024.Promise",
+            "DOM",
+            "DOM.Iterable",
+            //"ES2017.ArrayBuffer",
+            //"ES2024.ArrayBuffer"
+            //"dom"
+            //,"es2015"
+            //,"es5"
         ]
         ,"declaration": true
 		,"types": [ ]
@@ -32,6 +45,7 @@
 		,"../minium.pitch/list/names.ts"
 
 		,"./alphatab/AlphaTabError.ts"
+		,"./alphatab/FormatError.ts"
 		,"./alphatab/CoreSettings.ts"
 		,"./alphatab/LogLevel.ts"
 		,"./alphatab/ImporterSettings.ts"
@@ -42,6 +56,7 @@
 		,"./alphatab/io/IOHelper.ts"
 		,"./alphatab/io/TypeConversions.ts"
 		,"./alphatab/io/IWriteable.ts"
+		,"./alphatab/io/ByteBuffer.ts"
 		,"./alphatab/synth/SynthConstants.ts"
 		,"./alphatab/model/Score.ts"
 		,"./alphatab/model/PickStroke.ts"
@@ -91,6 +106,7 @@
 		,"./alphatab/model/BarreShape.ts"
 		,"./alphatab/model/Lyrics.ts"
 		,"./alphatab/model/SimileMark.ts"
+		,"./alphatab/model/Color.ts"
 		,"./alphatab/model/PlaybackInformation.ts"
 		,"./alphatab/model/InstrumentArticulation.ts"
 		,"./alphatab/midi/MidiUtils.ts"		
